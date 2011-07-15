@@ -51,7 +51,7 @@ c     :              -1.0E-9,  2.0, 1.0, 2.0 /
       call ast_begin( status )
 
       acc = 1.0D-7
-      errlim = 10*acc
+      errlim = 1000*acc
       maxacc = 1.0D-3
       maxord = 10
 

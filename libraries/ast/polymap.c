@@ -167,8 +167,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Structure used to pass data to the Levenberg - Marquardt non-linear
    minimization algorithm. */
 typedef struct LevMarData {
-   int order1;     /* Max power of X1, plus one. */
-   int order2;     /* Max power of X2, plus one. */
+   int order;      /* Max power of X1 or X2, plus one. */
    int nsamp;      /* No. of polynomial samples to fit */
    int init_jac;   /* Has the constant Jacobian been found yet? */
    double *xp1;    /* Pointer to powers of X1 (1st poly i/p) at all samples */
@@ -190,17 +189,21 @@ AstPolyMap *astPolyMapId_( int, int, int, const double[], int, const double[], c
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstPolyMap *PolyTran( AstPolyMap *, int, double, double, int, double *, double *, int * );
-static double *FitPoly2D( int, int, double, int, int, double **, double[4], int *, double *, int * );
-static double **SamplePoly( AstPolyMap *, int, int, double **, double *, double *, int, int *, double[4], int * );
+static double *FitPoly1D( int, double, int, double **, double[2], int *, double *, int * );
+static double *FitPoly2D( int, double, int, double **, double[4], int *, double *, int * );
+static double **SamplePoly2D( AstPolyMap *, int, double **, double *, double *, int, int *, double[4], int * );
+static double **SamplePoly1D( AstPolyMap *, int, double **, double, double, int, int *, double[2], int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static void Copy( const AstObject *, AstObject *, int * );
-static void CreateInverse( AstPolyMap *, int, double, double, int, double *, double *, int * );
+static void ReplaceTransformation( AstPolyMap *, int, double, double, int, double *, double *, int * );
 static void Delete( AstObject *obj, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void FreeArrays( AstPolyMap *, int, int * );
-static void LMFunc(  double *, double *, int, int, void * );
-static void LMJacob( double *, double *, int, int, void * );
+static void LMFunc2D(  double *, double *, int, int, void * );
+static void LMJacob2D( double *, double *, int, int, void * );
+static void LMFunc1D(  double *, double *, int, int, void * );
+static void LMJacob1D( double *, double *, int, int, void * );
 static void StoreArrays( AstPolyMap *, int, int, const double *, int * );
 static int GetTranForward( AstMapping *, int * );
 static int GetTranInverse( AstMapping *, int * );
@@ -209,183 +212,6 @@ static int GetTranInverse( AstMapping *, int * );
 
 /* Member functions. */
 /* ================= */
-
-static void CreateInverse( AstPolyMap *this, int forward, double acc,
-                           double maxacc, int maxorder, double *lbnd,
-                           double *ubnd, int *status ){
-/*
-*  Name:
-*     CreateInverse
-
-*  Purpose:
-*     Create a new inverse or forward transformation for a PolyMap.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     void CreateInverse( AstPolyMap *this, int forward, double acc,
-*                         double maxacc, int maxorder, double *lbnd,
-*                         double *ubnd, int *status )
-
-*  Description:
-*     This function creates a new forward or inverse transformation for
-*     the supplied PolyMap (replacing any existing transformation), by
-*     sampling the other transformation and performing a least squares
-*     polynomial fit to the sample positions and values.
-*
-*     The transformation to create is specified by the "forward" parameter.
-*     In what follows "X" refers to the inputs of the PolyMap, and "Y" to
-*     the outputs of the PolyMap. The forward transformation transforms
-*     input values (X) into output values (Y), and the inverse transformation
-*     transforms output values (Y) into input values (X). Within a PolyMap,
-*     each transformation is represented by an independent set of
-*     polynomials: Y=P_f(X) for the forward transformation and X=P_i(Y)
-*     for the inverse transformation.
-*
-*     If "forward" is zero then a new inverse transformation is created by
-*     first finding the output values (Y) using the forward transformation
-*     (which must be available) at a regular grid of points (X) covering a
-*     rectangular region of the PolyMap's input space. The coefficients of
-*     the required inverse polynomial, X=P_i(Y), are chosen in order to
-*     minimise the sum of the squared residuals between the sampled values
-*     of X and P_i(Y).
-*
-*     If "forward" is non-zero then a new forward transformation is created
-*     by first finding the input values (X) using the inverse transformation
-*     (which must be available) at a regular grid of points (Y) covering a
-*     rectangular region of the PolyMap's output space. The coefficients of
-*     the required forward polynomial, Y=P_f(X), are chosen in order to
-*     minimise the sum of the squared residuals between the sampled values
-*     of Y and P_f(X).
-*
-*     This fitting process is performed repeatedly with increasing
-*     polynomial orders (starting with quadratic) until the target
-*     accuracy is achieved, or a specified maximum order is reached. If
-*     the target accuracy cannot be achieved even with this maximum-order
-*     polynomial, the best fitting maximum-order polynomial is returned so
-*     long as its accuracy is better than "maxacc".
-
-*  Parameters:
-*     this
-*        The PolyMap.
-*     forward
-*        If non-zero, then the forward PolyMap transformation is
-*        replaced. Otherwise the inverse transformation is replaced.
-*     acc
-*        The target accuracy, expressed as a geodesic distance within
-*        the PolyMap's input space (if "forward" is zero) or output
-*        space (if "forward" is non-zero).
-*     maxacc
-*        The maximum allowed accuracy for an acceptable polynomial,
-*        expressed as a geodesic distance within the PolyMap's input
-*        space (if "forward" is zero) or output space (if "forward" is
-*        non-zero).
-*     maxorder
-*        The maximum allowed polynomial order. This is one more than the
-*        maximum power of either input axis. So for instance, a value of
-*        3 refers to a quadratic polynomial.
-*     lbnd
-*        An array holding the lower bounds of a rectangular region within
-*        the PolyMap's input space (if "forward" is zero) or output
-*        space (if "forward" is non-zero). The new polynomial will be
-*        evaluated over this rectangle.
-*     ubnd
-*        An array holding the upper bounds of a rectangular region within
-*        the PolyMap's input space (if "forward" is zero) or output
-*        space (if "forward" is non-zero). The new polynomial will be
-*        evaluated over this rectangle.
-*     status
-*        Pointer to the inherited status variable.
-
-*  Notes:
-*     - An error is reported if the transformation that is not being
-*     replaced is not defined.
-*     - An error is reported if the PolyMap does not have equal numbers
-*     of inputs and outputs.
-*     - An error is reported if the PolyMap has more than 2 inputs or outputs.
-
-*/
-
-/* Local Variables: */
-   double **table;
-   double *cofs;
-   double racc;
-   double scales[ 4 ];
-   int ndim;
-   int ncof;
-   int nsamp;
-   int order;
-
-/* Check inherited status */
-   if( !astOK ) return;
-
-/* Check the PolyMap can be used. */
-   ndim = astGetNin( this );
-   if( astGetNout( this ) != ndim ) {
-      astError( AST__BADNI, "astCreateInverse(%s): Supplied %s has "
-                "different number of inputs (%d) and outputs (%d).",
-                status, astGetClass( this ), astGetClass( this ), ndim,
-                astGetNout( this ) );
-
-   } else if( ndim > 2 ) {
-      astError( AST__BADNI, "astCreateInverse(%s): Supplied %s has "
-                "too many inputs and outputs (%d) - must be 1 or 2.",
-                status, astGetClass( this ), astGetClass( this ), ndim );
-   }
-
-   if( forward != astGetInvert( this ) ){
-      if( ! this->ncoeff_i ) {
-         astError( AST__NODEF, "astCreateInverse(%s): Supplied %s has "
-                   "no inverse transformation.", status, astGetClass( this ),
-                   astGetClass( this ) );
-      }
-   } else {
-      if( ! this->ncoeff_f  ) {
-         astError( AST__NODEF, "astCreateInverse(%s): Supplied %s has "
-                   "no forward transformation.", status, astGetClass( this ),
-                   astGetClass( this ) );
-      }
-   }
-
-/* Initialise pointer to work space. */
-   table = NULL;
-
-/* Loop over increasing polynomial orders until the required accuracy is
-   achieved, up to the specified maximum order. The "order" value is one more
-   than the maximum power in the polynomial (so a quadratic has "order" 3). */
-   for( order = 3; order <= maxorder; order++ ) {
-
-/* Sample the requested polynomial transformation at a grid of points. This
-   grid covers the user-supplied region, using 2*order points on each
-   axis. If the PolyMap is 1D, then it will be treated as a 2D polynomial
-   in which the second output is a unit transformation. */
-      table = SamplePoly( this, ndim, !forward, table, lbnd, ubnd, 2*order,
-                          &nsamp, scales, status );
-
-/* Fit the polynomial. Always fit a linear polynomial ("order" 2) to any
-   dummy second axis. If succesful, replace the PolyMap transformation
-   and break out of the order loop. */
-      cofs = FitPoly2D( ndim, nsamp, acc, order, order, table, scales, &ncof,
-                        &racc, status );
-      if( cofs && ( racc < acc || ( racc < maxacc && order == maxorder ) ) ) {
-         StoreArrays( this, forward, ncof, cofs, status );
-         break;
-      }
-   }
-
-/* If no fit was produced, report an error. */
-   if( !cofs && astOK ) {
-      astError( AST__NOFIT, "astCreateInverse(%s): Failed to find a new "
-                "%s transformation for the supplied %s: fit failed.",
-                status, astGetClass( this ),
-                (forward ? "forward" : "forward" ), astGetClass( this ) );
-   }
-
-/* Free resources. */
-   cofs = astFree( cofs );
-   table = astFreeDouble( table );
-}
 
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
@@ -544,8 +370,231 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    return result;
 }
 
-static double *FitPoly2D( int ndim, int nsamp, double acc,
-                          int order1, int order2, double **table,
+static double *FitPoly1D( int nsamp, double acc, int order, double **table,
+                          double scales[2], int *ncoeff, double *racc,
+                          int *status ){
+/*
+*  Name:
+*     FitPoly1D
+
+*  Purpose:
+*     Fit a (1-in,1-out) polynomial to a supplied set of data.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     double *FitPoly1D( int nsamp, double acc, int order, double **table,
+*                        double scales[2], int *ncoeff, double *racc,
+*                        int *status )
+
+*  Description:
+*     This function fits a least squares 1D polynomial curve to the
+*     positions in a supplied table. For the purposes of this function,
+*     the polynomial input is refered to as x1 and the output as y1. So
+*     the polynomial is:
+*
+*     y1 = P1( x1 )
+
+*  Parameters:
+*     nsamp
+*        The number of (x1,y1) positions in the supplied table.
+*     acc
+*        The required accuracy, expressed as an offset within the polynomials
+*        output space.
+*     order
+*        The maximum power (minus one) of x1 within P1. So for instance, a
+*        value of 3 refers to a quadratic polynomial.
+*     table
+*        Pointer to an array of 2 pointers. Each of these pointers points
+*        to an array of "nsamp" doubles, being the scaled and sampled values
+*        for x1 and y1 in that order.
+*     scales
+*        Array holding the scaling factors for the two columns of the table.
+*        Multiplying the table values by the scale factor produces PolyMap
+*        input or output axis values.
+*     ncoeff
+*        Pointer to an ant in which to return the number of coefficients
+*        described by the returned array.
+*     racc
+*        Pointer to a double in which to return the achieved accuracy
+*        (which may be greater than "acc").
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to an array of doubles defining the polynomial in the
+*     form required by the PolyMap contructor. The number of coefficients
+*     is returned via "ncoeff". If the polynomial could not be found with
+*     sufficient accuracy , then NULL is returned. The returned pointer
+*     should be freed using astFree when no longer needed.
+
+*/
+
+/* Local Variables: */
+   LevMarData data;
+   double *coeffs;
+   double *pc;
+   double *pr;
+   double *px1;
+   double *pxp1;
+   double *result;
+   double f1;
+   double f2;
+   double facc;
+   double info[10];
+   double maxterm;
+   double term;
+   double tv;
+   double x1;
+   int k;
+   int ncof;
+   int niter;
+   int w1;
+
+/* Termination criteria for the minimisation - see levmar.c */
+   double opts[] = { 1E-3, 1E-7, 1E-10, 1E-17 };
+
+/* Initialise returned value */
+   result = NULL;
+   *ncoeff = 0;
+   *racc = 10*acc;
+
+/* Check inherited status */
+   if( !astOK ) return result;
+
+/* Number of coefficients per poly. */
+   ncof = order;
+
+/* Initialise the elements of the structure. */
+   data.order = order;
+   data.nsamp = nsamp;
+   data.init_jac = 1;
+   data.xp1 = astMalloc( nsamp*order*sizeof( double ) );
+   data.xp2 = NULL;
+   data.y[ 0 ] = table[ 1 ];
+   data.y[ 1 ] = NULL;
+
+/* Work space to hold coefficients. */
+   coeffs = astMalloc( ncof*sizeof( double ) );
+   if( astOK ) {
+
+/* Store required squared acccuracy, taking account of the fact that the
+   optimisation uses scaled axis values rather than PolyMap axis values. */
+      facc = 1.0/(scales[1]*scales[1]);
+      opts[ 3 ] = nsamp*acc*acc*facc;
+
+/* Get pointers to the supplied x1 values. */
+      px1 = table[ 0 ];
+
+/* Get pointers to the location for the next power of x1. */
+      pxp1 = data.xp1;
+
+/* Loop round all samples. */
+      for( k = 0; k < nsamp; k++ ) {
+
+/* Get the current x1 value. */
+         x1 = *(px1++);
+
+/* Find all the required powers of x1 and store them in the "xp1"
+   component of the data structure. */
+         tv = 1.0;
+         for( w1 = 0; w1 < order; w1++ ) {
+            *(pxp1++) = tv;
+            tv *= x1;
+         }
+      }
+
+/* The initial guess at the coefficient values represents a unit
+   transformation in PolyMap axis values. */
+      for( k = 0; k < ncof; k++ ) coeffs[ k ] = 0.0;
+      coeffs[ 1 ] = scales[ 0 ]/scales[ 1 ];
+
+/* Find the best coefficients */
+      niter = dlevmar_der( LMFunc1D, LMJacob1D, coeffs, NULL, ncof, nsamp,
+                           1000, opts, info, NULL, NULL, &data );
+
+/* Return the achieved accuracy. */
+      *racc = sqrt( info[ 1 ]/(nsamp*facc) );
+
+/* The best fitting polynomial coefficient found above relate to the
+   polynomial between the scaled positions stored in "table". These
+   scaled positions are related to PolyMap input/output axis values via
+   the scale factors supplied in "scales". Find the initial factor for the
+   current output. */
+      f1 = scales[ 1 ];
+      f2 = 1.0;
+
+/* Look at each coefficient. */
+      pc = coeffs;
+      for( w1 = 0; w1 < order; w1++,pc++ ) {
+
+/* Get a pointer to the powers of X1 appropriate for the current coefficient,
+    at the first sample. */
+         pxp1 = data.xp1 + w1;
+
+/* We find the contribution which this coefficient makes to the total
+   polynomial value. Find the maximum contribution made at any sample
+   points. */
+         maxterm = 0.0;
+         for( k = 0; k < nsamp; k++ ) {
+
+/* Get the absolute value of the polynomial term that uses the current
+   coefficient. */
+            term = fabs( ( *pc )*( *pxp1 ) );
+
+/* Update the maximum term found at any sample. */
+            if( term > maxterm ) maxterm = term;
+
+/* Increment the pointers to refer to the next sample. */
+            pxp1 += order;
+         }
+
+/* If the maximum contribution made by this term is less than the
+   required accuracy, set the coefficient value to zero. */
+         if( maxterm*f1 < acc ) {
+            *pc = 0.0;
+
+/* Scale the best fitting polynomial coefficient found above to take
+   account of the fact that the tabulated input and output positions in
+   "table" were are not actual PolyMap input and output axis values, but
+   are scaled by the factors stored in "scales". */
+         } else {
+            *pc *= f1/f2;
+         }
+
+         f2 *= scales[ 0 ];
+      }
+
+/* Convert the array of coefficients into PolyMap form. */
+      result = astMalloc( ncof*3*sizeof( double ) );
+
+      *ncoeff = 0;
+      pr = result;
+      pc = coeffs;
+      for( w1 = 0; w1 < order; w1++,pc++ ) {
+         if( *pc != 0.0 ) {
+            *(pr++) = *pc;
+            *(pr++) = 1;
+            *(pr++) = w1;
+            (*ncoeff)++;
+         }
+      }
+
+/* Truncate the returned array. */
+      result = astRealloc( result, (*ncoeff)*3*sizeof( double ) );
+   }
+
+/* Free resources. */
+   coeffs = astFree( coeffs );
+   data.xp1 = astFree( data.xp1 );
+
+/* Return the coefficient array. */
+   return result;
+
+}
+
+static double *FitPoly2D( int nsamp, double acc, int order, double **table,
                           double scales[4], int *ncoeff, double *racc,
                           int *status ){
 /*
@@ -559,8 +608,7 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
 *     Private function.
 
 *  Synopsis:
-*     double *FitPoly2D( int ndim, int nsamp, double acc,
-*                        int order1, int order2, double **table,
+*     double *FitPoly2D( int nsamp, double acc, int order, double **table,
 *                        double scales[4], int *ncoeff, double *racc,
 *                        int *status )
 
@@ -573,22 +621,21 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
 *     y1 = P1( x1, x2 )
 *     y2 = P2( x1, x2 )
 *
-*     P1 and P2 have the same maximum powers on each input (specified by
-*     the "order" parameters).
+*     P1 and P2 have the same maximum power on each input (specified by
+*     the "order" parameter).
 
 *  Parameters:
-*     ndim
-*        The number of inputs and outputs for Poly - 1 or 2.
 *     nsamp
 *        The number of (x1,x2,y1,y2) positions in the supplied table.
 *     acc
 *        The required accuracy, expressed as a geodesic distance within
 *        the polynomials output space.
-*     order1
-*        The maximum power (minus one) of x1 within P1 and P2.
-*     order2
-*        The maximum power (minus one) of x2 within P1 and P2. Ignored if
-*        ndim is 1 (a value of 2 is used).
+*     order
+*        The maximum power (minus one) of x1 or x2 within P1 and P2. So for
+*        instance, a value of 3 refers to a quadratic polynomial. Note, cross
+*        terms with total powers greater than or equal to "order" are not
+*        inlcuded in the fit. So the maximum number of terms in the fitted
+*        polynomial is order*(order+1)/2.
 *     table
 *        Pointer to an array of 4 pointers. Each of these pointers points
 *        to an array of "nsamp" doubles, being the scaled and sampled values
@@ -627,6 +674,7 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
    double *result;
    double f1;
    double f2;
+   double f20;
    double f3;
    double facc;
    double info[10];
@@ -639,6 +687,7 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
    int k;
    int ncof;
    int niter;
+   int w12;
    int w1;
    int w2;
 
@@ -653,19 +702,15 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
 /* Check inherited status */
    if( !astOK ) return result;
 
-/* Set order 2 if poly is 1-D */
-   if( ndim == 1 ) order2 = 2;
-
 /* Number of coefficients per poly. */
-   ncof = order1*order2;
+   ncof = order*( order + 1 )/2;
 
 /* Initialise the elements of the structure. */
-   data.order1 = order1;
-   data.order2 = order2;
+   data.order = order;
    data.nsamp = nsamp;
    data.init_jac = 1;
-   data.xp1 = astMalloc( nsamp*order1*sizeof( double ) );
-   data.xp2 = astMalloc( nsamp*order2*sizeof( double ) );
+   data.xp1 = astMalloc( nsamp*order*sizeof( double ) );
+   data.xp2 = astMalloc( nsamp*order*sizeof( double ) );
    data.y[ 0 ] = table[ 2 ];
    data.y[ 1 ] = table[ 3 ];
 
@@ -696,7 +741,7 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
 /* Find all the required powers of x1 and store them in the "xp1"
    component of the data structure. */
          tv = 1.0;
-         for( w1 = 0; w1 < order1; w1++ ) {
+         for( w1 = 0; w1 < order; w1++ ) {
             *(pxp1++) = tv;
             tv *= x1;
          }
@@ -704,7 +749,7 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
 /* Find all the required powers of x2 and store them in the "xp2"
    comonent of the data structure. */
          tv = 1.0;
-         for( w2 = 0; w2 < order2; w2++ ) {
+         for( w2 = 0; w2 < order; w2++ ) {
             *(pxp2++) = tv;
             tv *= x2;
          }
@@ -713,23 +758,21 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
 /* The initial guess at the coefficient values represents a unit
    transformation in PolyMap axis values. */
       for( k = 0; k < 2*ncof; k++ ) coeffs[ k ] = 0.0;
-      coeffs[ order2 ] = scales[ 0 ]/scales[ 2 ];
-      coeffs[ 1 + ncof ] = scales[ 1 ]/scales[ 3 ];
+      coeffs[ 1 ] = scales[ 0 ]/scales[ 2 ];
+      coeffs[ 2 ] = scales[ 1 ]/scales[ 3 ];
 
 /* Find the best coefficients */
-      niter = dlevmar_der( LMFunc, LMJacob, coeffs, NULL, 2*ncof, 2*nsamp,
+      niter = dlevmar_der( LMFunc2D, LMJacob2D, coeffs, NULL, 2*ncof, 2*nsamp,
                            1000, opts, info, NULL, NULL, &data );
-
 
 /* Return the achieved accuracy. */
       *racc = sqrt( info[ 1 ]/(nsamp*facc) );
-
 
 /* Pointer to the first coefficient. */
       pc = coeffs;
 
 /* Look at coefficients for each output in turn. */
-      for( iout = 0; iout < ndim && astOK; iout++ ) {
+      for( iout = 0; iout < 2 && astOK; iout++ ) {
 
 /* The best fitting polynomial coefficient found above relate to the
    polynomial between the scaled positions stored in "table". These
@@ -739,11 +782,12 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
          f1 = scales[ 2 + iout ];
 
 /* Look at each coefficient for the current output. */
-         f2 = 1.0;
-         for( w1 = 0; w1 < order1; w1++ ) {
-
+         f20 = 1.0;
+         for( w12 = 0; w12 < order; w12++ ) {
             f3 = 1.0;
-            for( w2 = 0; w2 < order2; w2++,pc++ ) {
+            f2 = f20;
+            for( w2 = 0; w2 <= w12; w2++,pc++ ) {
+               w1 = w12 - w2;
 
 /* Get pointers to the powers of X1 and X2 appropriate for the current
    coefficient, at the first sample. */
@@ -764,8 +808,8 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
                   if( term > maxterm ) maxterm = term;
 
 /* Increment the pointers to refer to the next sample. */
-                  pxp1 += order1;
-                  pxp2 += order2;
+                  pxp1 += order;
+                  pxp2 += order;
                }
 
 /* If the maximum contribution made by this term is less than the
@@ -781,27 +825,29 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
                   *pc *= f1/( f2*f3 );
                }
 
+               f2 /= scales[ 0 ];
                f3 *= scales[ 1 ];
             }
 
-            f2 *= scales[ 0 ];
+            f20 *= scales[ 0 ];
          }
       }
 
 /* Convert the array of coefficients into PolyMap form. */
-      result = astMalloc( 2*ncof*(2+ndim)*sizeof( double ) );
+      result = astMalloc( 2*ncof*4*sizeof( double ) );
 
       *ncoeff = 0;
       pr = result;
       pc = coeffs;
-      for( iout = 0; iout < ndim && astOK; iout++ ) {
-         for( w1 = 0; w1 < order1; w1++ ) {
-            for( w2 = 0; w2 < order2; w2++,pc++ ) {
+      for( iout = 0; iout < 2 && astOK; iout++ ) {
+         for( w12 = 0; w12 < order; w12++ ) {
+            for( w2 = 0; w2 <= w12; w2++,pc++ ) {
+               w1 = w12 - w2;
                if( *pc != 0.0 ) {
                   *(pr++) = *pc;
                   *(pr++) = iout + 1;
                   *(pr++) = w1;
-                  if( ndim > 1 ) *(pr++) = w2;
+                  *(pr++) = w2;
                   (*ncoeff)++;
                }
             }
@@ -809,7 +855,7 @@ static double *FitPoly2D( int ndim, int nsamp, double acc,
       }
 
 /* Truncate the returned array. */
-      result = astRealloc( result, (*ncoeff)*( 2 + ndim )*sizeof( double ) );
+      result = astRealloc( result, (*ncoeff)*4*sizeof( double ) );
    }
 
 /* Free resources. */
@@ -1119,19 +1165,107 @@ void astInitPolyMapVtab_(  AstPolyMapVtab *vtab, const char *name, int *status )
    }
 }
 
-static void LMFunc(  double *p, double *hx, int m, int n, void *adata ){
+static void LMFunc1D(  double *p, double *hx, int m, int n, void *adata ){
 /*
 *  Name:
-*     LMFunc
+*     LMFunc1D
 
 *  Purpose:
-*     Evaluate a test polynomal.
+*     Evaluate a test 1D polynomal.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
-*     void LMFunc(  double *p, double *hx, int m, int n, void *adata )
+*     void LMFunc1D(  double *p, double *hx, int m, int n, void *adata )
+
+*  Description:
+*     This function finds the residuals implied by a supplied set of
+*     candidate polynomial coefficients. Each residual is a candidate
+*     polynomial evaluated at one of the sample points, minus the
+*     supplied target value for the polynomial at that test point.
+*
+*     The minimisation process minimises the sum of the squared residuals.
+
+*  Parameters:
+*     p
+*        An array of "m" coefficients for the candidate polynomial. The
+*        coefficients are ordered C0, C1, C2, etc.
+*     hx
+*        An array in which to return the "n" residuals. The residual at
+*        sample "k" is returned in element (k).
+*     m
+*        The length of the "p" array. This should be equal to order.
+*     n
+*        The length of the "hx" array. This should be equal to nsamp.
+*     adata
+*        Pointer to a structure holding the sample positions and values,
+*        and other information.
+
+*/
+
+/* Local Variables: */
+   LevMarData *data;
+   double *px1;
+   double *py;
+   double *vp;
+   double *vr;
+   double res;
+   int k;
+   int w1;
+
+/* Get a pointer to the data structure. */
+   data = (LevMarData *) adata;
+
+/* Initialise a pointer to the current returned residual value. */
+   vr = hx;
+
+/* Initialise a pointer to the sampled Y values for the polynomial output. */
+   py = data->y[ 0 ];
+
+/* Initialise a pointer to the powers of the input X values at the curent
+   (i.e. first) sample. */
+   px1 = data->xp1;
+
+/* Loop over the index of the sample to which this residual refers. */
+   for( k = 0; k < data->nsamp; k++ ) {
+
+/* Initialise a pointer to the first coefficient (the  constant term) for the
+   polynomial output coordinate. */
+      vp = p;
+
+/* Initialise this residual to hold the sampled Y value. Increment the
+   pointer to the next sampled value for the current polynomial output. */
+      res = -( *(py++) );
+
+/* Loop over the coefficients. */
+      for( w1 = 0; w1 < data->order; w1++ ) {
+
+/* Increment the residual by the value of the current term Cw1*(x1^w1).
+   Increment the pointer to the next coefficient (C). Also increment the
+   pointer to the next higher power of X1. */
+         res += ( *(vp++) )*( *(px1++) );
+      }
+
+/* Store the complete residual in the returned array, and increment the
+   pointer to the next residual. */
+      *(vr++) = res;
+   }
+}
+
+static void LMFunc2D(  double *p, double *hx, int m, int n, void *adata ){
+/*
+*  Name:
+*     LMFunc2D
+
+*  Purpose:
+*     Evaluate a test 2D polynomal.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void LMFunc2D(  double *p, double *hx, int m, int n, void *adata )
 
 *  Description:
 *     This function finds the residuals implied by a supplied set of
@@ -1144,18 +1278,21 @@ static void LMFunc(  double *p, double *hx, int m, int n, void *adata ){
 
 *  Parameters:
 *     p
-*        An array of "m" candidate polynomial coefficients. The
-*        coefficient of (x1^j*x2^k) for polynomial Pi is stored in
-*        element ( k + j*order[1] + i*order[0]*order[1]).
+*        An array of "m" coefficients for the candidate polynomial. All the
+*        coefficients for polynomial P1 come first, followed by those for P2.
+*        Within each each polynomial, the coefficients are order C00, C10,
+*        C01, C20, C11, C02, C30, C21, C12, C03, etc. So the coefficient
+*        of (x1^j*x2^k) (=Cjk) for polynomial Pi is stored in element
+*        [k + (j + k)*(j + k + 1)/2 + i*order*(order+1)/2] of the "p" array.
 *     hx
 *        An array in which to return the "n" residuals. The residual at
 *        sample "k" for polynomial "i" is returned in element (k + nsamp*i).
 *     m
-*        The length of the "p" array. This should be equal to 2*order1*order2.
+*        The length of the "p" array. This should be equal to order*(order+1).
 *     n
 *        The length of the "hx" array. This should be equal to 2*nsamp.
 *     adata
-*        Pointer to a structure holdin gthe sample positions and values,
+*        Pointer to a structure holding the sample positions and values,
 *        and other information.
 
 */
@@ -1163,6 +1300,7 @@ static void LMFunc(  double *p, double *hx, int m, int n, void *adata ){
 /* Local Variables: */
    LevMarData *data;
    double *px1;
+   double *px10;
    double *px20;
    double *px2;
    double *py;
@@ -1172,7 +1310,7 @@ static void LMFunc(  double *p, double *hx, int m, int n, void *adata ){
    double res;
    int iout;
    int k;
-   int w1;
+   int w12;
    int w2;
 
 /* Get a pointer to the data structure. */
@@ -1182,7 +1320,7 @@ static void LMFunc(  double *p, double *hx, int m, int n, void *adata ){
    vr = hx;
 
 /* Initilise a pointer to the first coefficient (the  constant term) for the
-   current polynomial output  coordinate. */
+   current (i.e. first) polynomial output  coordinate. */
    vp0 = p;
 
 /* Loop over each polynomial output coordinate. */
@@ -1192,18 +1330,15 @@ static void LMFunc(  double *p, double *hx, int m, int n, void *adata ){
    output. */
       py = data->y[ iout ];
 
-/* Get a pointer to the value holding the second polynomial input value,
-   raised to the power zero, at the first sample. */
+/* Initialise pointers to the powers of the input X values at the curent
+   (i.e. first) sample. */
+      px10 = data->xp1;
       px20 = data->xp2;
-
-/* Get a pointer to the value holding the first polynomial input value,
-   raised to the power zero, at the first sample. */
-      px1 = data->xp1;
 
 /* Loop over the index of the sample to which this residual refers. */
       for( k = 0; k < data->nsamp; k++ ) {
 
-/* Otherwise, reset the pointer to the first coefficient (the  constant term)
+/* Reset the pointer to the first coefficient (the  constant term)
    for the current polynomial output  coordinate. */
          vp = vp0;
 
@@ -1211,56 +1346,142 @@ static void LMFunc(  double *p, double *hx, int m, int n, void *adata ){
    pointer to the next sampled value for the current polynomial output. */
          res = -( *(py++) );
 
-/* Loop round every power of X1 - the first polynomial input coordinate. */
-         for( w1 = 0; w1 < data->order1; w1++ ){
+/* The w12 value is the sum of the powers of X1 and X2. So w12=0
+   corresponds to the constant term in the polynomial, and (e.g.) w12=6
+   corresponds to all the terms for which the sum of the powerss (w1+w2)
+   is 6. Loop over all possible w12 values. */
+         for( w12 = 0; w12 < data->order; w12++ ) {
 
-/* Reset the pointer to the value holding the second polynomial input
-   value, raised to the power zero. */
+/* The next coeff refers to (x1^w12)*(x2^0). Get pointers to the values
+   holding x1^w12 and x2^0. */
+            px1 = px10++;
             px2 = px20;
 
-/* Loop round every power of X2 - the second polynomial input coordinate.*/
-            for( w2 = 0; w2 < data->order2; w2++ ){
+/* Loop over powers of x2. The corresponding power of x1 is "w12-x2", but
+   is not explicitly needed here. So x1 moves down from w12 to zero, as
+   w2 moves up from zero to w12. */
+            for( w2 = 0; w2 <= w12; w2++ ) {
 
-/* Increment the current residual by the current term of the polynomial.
-   Also update the pointer to the next coefficient, and the pointer to the
-   next power of X2. */
-               res += ( *(vp++) )*( *px1 )*( *(px2++) );
+/* Increment the residual by the value of the current term Cw1w2*(x1^w1)*(x2^w2).
+   Increment the pointer tio the next coefficient (C). Also decrement the
+   pointer to the next lower power of X1, and increment the pointer to the next
+   higher power of X2. */
+               res += ( *(vp++) )*( *(px1--) )*( *(px2++) );
             }
-
-/* Increment the pointer to the value of the first polynomial input value,
-   raised to the next power "w1". */
-            px1++;
          }
+
+/* Move on to the x2 powers for the next sample. Don't need to do this
+   for x1 since px10 is incremented within the above loop. */
+         px20 += data->order;
 
 /* Store the complete residual in the returned array, and increment the
    pointer to the next residual. */
          *(vr++) = res;
-
-/* Increment the pointer to the value holding the second polynomial input
-   value, raised to the power zero, so that it refers to the next sampled
-   value. */
-         px20 += data->order2;
       }
 
 /* Get a pointer to the first coefficient (the  constant term) for the
    next polynomial output  coordinate. */
-      vp0 += data->order1*data->order2;
+      vp0 += data->order*( 1 + data->order )/2;
    }
 }
 
-static void LMJacob( double *p, double *jac, int m, int n, void *adata ){
+static void LMJacob1D( double *p, double *jac, int m, int n, void *adata ){
 /*
 *  Name:
-*     LMJacob
+*     LMJacob1D
 
 *  Purpose:
-*     Evaluate the Jacobian matrix of a test polynomal.
+*     Evaluate the Jacobian matrix of a test 1D polynomal.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
-*     void LMJacob( double *p, double *jac, int m, int n, void *adata )
+*     void LMJacob1D( double *p, double *jac, int m, int n, void *adata )
+
+*  Description:
+*     This function finds the Jacobian matrix that describes the rate of
+*     change of every residual with respect to every polynomial coefficient.
+*     Each residual is a candidate polynomial evaluated at one of the sample
+*     points minus the supplied target value for the polynomial at that test
+*     point.
+*
+*     For a polynomial the Jacobian matrix is constant (i.e. does not
+*     depend on the values of the polynomial coefficients). So we only
+*     evaluate it on the first call.
+
+*  Parameters:
+*     p
+*        An array of "m" coefficients for the candidate polynomial.
+*     jac
+*        An array in which to return the "m*n" elements of the Jacobian
+*        matrix. The rate of change of residual "r" with respect to
+*        coefficient "c" is returned in element "r + c*n". The residual
+*        at sample "k" of polynomial Pi has an "r" index of (k + nsamp*i).
+*        The coefficient of (x1^j) for polynomial Pi has a "c" index
+*        of j.
+*     m
+*        The length of the "p" array. This should be equal to order.
+*     n
+*        The number of residuals. This should be equal to nsamp.
+*     adata
+*        Pointer to a structure holding the sample positions and values,
+*        and other information.
+
+*/
+
+/* Local Variables: */
+   LevMarData *data;
+   double *pj;
+   int k;
+   int ncof;
+   int w1;
+
+/* Get a pointer to the data structure. */
+   data = (LevMarData *) adata;
+
+/* The Jacobian of the residuals with respect to the polynomial
+   coefficients is constant (i.e. does not depend on the values of the
+   polynomial coefficients). So we only need to calculate it once. If
+   this is the first call, calculate the Jacobian and return it in "jac".
+   otherwise, just return immediately retaining the supplied "jac" values
+   (which will be the values returned by the previous call to this
+   function). */
+   if( data->init_jac ) {
+      data->init_jac = 0;
+
+/* Store the number of coefficients in one polynomial. */
+      ncof = data->order;
+
+/* Store a pointer to the next element of the returned Jacobian. */
+      pj = jac;
+
+/* Loop over all residuals. */
+      for( k = 0; k < n; k++ ) {
+
+/* Loop over all parameters (i.e. polynomial coefficients). */
+         for( w1 = 0; w1 < m; w1++ ) {
+
+/* Store the Jacobian. */
+            *(pj++) = (data->xp1)[ w1 + k*data->order ];
+         }
+      }
+   }
+}
+
+static void LMJacob2D( double *p, double *jac, int m, int n, void *adata ){
+/*
+*  Name:
+*     LMJacob2D
+
+*  Purpose:
+*     Evaluate the Jacobian matrix of a test 2D polynomal.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void LMJacob2D( double *p, double *jac, int m, int n, void *adata )
 
 *  Description:
 *     This function finds the Jacobian matrix that describes the rate of
@@ -1275,18 +1496,21 @@ static void LMJacob( double *p, double *jac, int m, int n, void *adata ){
 
 *  Parameters:
 *     p
-*        An array of "m" candidate polynomial coefficients. The
-*        coefficient of (x1^j*x2^k) for polynomial Pi is stored in
-*        element ( k + j*order[1] + i*order[0]*order[1]).
+*        An array of "m" coefficients for the candidate polynomial. All the
+*        coefficients for polynomial P1 come first, followed by those for P2.
+*        Within each each polynomial, the coefficients are order C00, C10,
+*        C01, C20, C11, C02, C30, C21, C12, C03, etc. So the coefficient
+*        of (x1^j*x2^k) (=Cjk) for polynomial Pi is stored in element
+*        [k + (j + k)*(j + k + 1)/2 + i*order*(order+1)/2] of the "p" array.
 *     jac
 *        An array in which to return the "m*n" elements of the Jacobian
 *        matrix. The rate of change of residual "r" with respect to
 *        coefficient "c" is returned in element "r + c*n". The residual
 *        at sample "k" of polynomial Pi has an "r" index of (k + nsamp*i).
 *        The coefficient of (x1^j*x2^k) for polynomial Pi has a "c" index
-*        of ( k + j*order[1] + i*order[0]*order[1]).
+*        of [k + (j + k)*(j + k + 1)/2 + i*order*(order+1)/2].
 *     m
-*        The number of coefficients. This should be equal to 2*order1*order2.
+*        The length of the "p" array. This should be equal to order*(order+1).
 *     n
 *        The number of residuals. This should be equal to 2*nsamp.
 *     adata
@@ -1304,6 +1528,7 @@ static void LMJacob( double *p, double *jac, int m, int n, void *adata ){
    int vp;
    int vr;
    int w1;
+   int w12;
    int w2;
 
 /* Get a pointer to the data structure. */
@@ -1320,7 +1545,7 @@ static void LMJacob( double *p, double *jac, int m, int n, void *adata ){
       data->init_jac = 0;
 
 /* Store the number of coefficients in one polynomial. */
-      ncof = data->order1*data->order2;
+      ncof = data->order*( 1 + data->order )/2;
 
 /* Store a pointer to the next element of the returned Jacobian. */
       pj = jac;
@@ -1344,12 +1569,13 @@ static void LMJacob( double *p, double *jac, int m, int n, void *adata ){
 /* Otherwise, get the powers of the two polynomial inputs, to which
    the current coefficient relates. */
             } else {
-               w1 = ( vp - iout*ncof )/data->order2;
-               w2 = vp - iout*ncof - w1*data->order2;
+               w12 = ( -1.0 + sqrt( 1.0 + 8.0*(vp - iout*ncof) ) )/2.0;
+               w2 = vp - iout*ncof - w12*( w12 + 1 )/2;
+               w1 = w12 - w2;
 
 /* Store the Jacobian. */
-               *(pj++) = (data->xp1)[ w1 + k*data->order1 ]*
-                         (data->xp2)[ w2 + k*data->order2 ];
+               *(pj++) = (data->xp1)[ w1 + k*data->order ]*
+                         (data->xp2)[ w2 + k*data->order ];
             }
          }
       }
@@ -1655,10 +1881,13 @@ f                            UBND, STATUS )
 *  Description:
 *     This function creates a new PolyMap which is a copy of the supplied
 *     PolyMap, in which a specified transformation (forward or inverse)
-*     has been replaced by a new polynomial function. The
+*     has been replaced by a new polynomial transformation. The
 *     coefficients of the new transformation are estimated by sampling
 *     the other transformation and performing a least squares polynomial
 *     fit in the opposite direction to the sampled positions and values.
+*
+*     This method can only be used on (1-input,1-output) or (2-input,2-output)
+*     PolyMaps.
 *
 *     The transformation to create is specified by the
 c     "forward" parameter.
@@ -1668,21 +1897,14 @@ f     FORWARD parameter.
 *     input values (X) into output values (Y), and the inverse transformation
 *     transforms output values (Y) into input values (X). Within a PolyMap,
 *     each transformation is represented by an independent set of
-*     polynomials: Y=P_f(X) for the forward transformation and X=P_i(Y)
-*     for the inverse transformation.
+*     polynomials, P_f or P_i: Y=P_f(X) for the forward transformation and
+*     X=P_i(Y) for the inverse transformation.
 *
-c     If "forward" is zero,
-f     If FORWARD is .FALSE.,
-*     a new inverse transformation is created by
-*     first finding the output values (Y) using the forward transformation
-*     (which must be available) at a regular grid of points (X) covering a
-*     rectangular region of the PolyMap's input space. The coefficients of
-*     the required inverse polynomial, X=P_i(Y), are chosen in order to
-*     minimise the sum of the squared residuals between the sampled values
-*     of X and P_i(Y).
-*
-c     If "forward" is non-zero,
-f     If FORWARD is .TRUE.,
+c     The "forward"
+f     The FORWARD
+*     parameter specifies the transformation to be replaced. If it is
+c     non-zero,
+f     is .TRUE.,
 *     a new forward transformation is created
 *     by first finding the input values (X) using the inverse transformation
 *     (which must be available) at a regular grid of points (Y) covering a
@@ -1691,8 +1913,18 @@ f     If FORWARD is .TRUE.,
 *     minimise the sum of the squared residuals between the sampled values
 *     of Y and P_f(X).
 *
+c     If "forward" is zero (probably the most likely case),
+f     If FORWARD is .FALSE. (probably the most likely case),
+*     a new inverse transformation is created by
+*     first finding the output values (Y) using the forward transformation
+*     (which must be available) at a regular grid of points (X) covering a
+*     rectangular region of the PolyMap's input space. The coefficients of
+*     the required inverse polynomial, X=P_i(Y), are chosen in order to
+*     minimise the sum of the squared residuals between the sampled values
+*     of X and P_i(Y).
+*
 *     This fitting process is performed repeatedly with increasing
-*     polynomial orders (starting with quadratic) until the target
+*     polynomial orders (starting with linear) until the target
 *     accuracy is achieved, or a specified maximum order is reached. If
 *     the target accuracy cannot be achieved even with this maximum-order
 *     polynomial, the best fitting maximum-order polynomial is returned so
@@ -1728,7 +1960,14 @@ c     maxorder
 f     MAXORDER = INTEGER (Given)
 *        The maximum allowed polynomial order. This is one more than the
 *        maximum power of either input axis. So for instance, a value of
-*        3 refers to a quadratic polynomial.
+*        3 refers to a quadratic polynomial. Note, cross terms with total
+*        powers greater than or equal to
+c        maxorder
+f        MAXORDER
+*        are not inlcuded in the fit. So the maximum number of terms in
+*        each of the fitted polynomials is
+c        maxorder*(maxorder+1)/2.
+f        MAXORDER*(MAXORDER+1)/2.
 c     lbnd
 f     LBND( * ) = DOUBLE PRECISION (Given)
 c        Pointer to an
@@ -1787,7 +2026,7 @@ f     function is invoked with STATUS set to an error value, or if it
    result = astCopy( this );
 
 /* Replace the required transformation. */
-   CreateInverse( result, forward, acc, maxacc, maxorder, lbnd, ubnd,
+   ReplaceTransformation( result, forward, acc, maxacc, maxorder, lbnd, ubnd,
                   status );
 
 /* If an error occurred, annul the returned PolyMap. */
@@ -1797,40 +2036,382 @@ f     function is invoked with STATUS set to an error value, or if it
    return result;
 }
 
-static double **SamplePoly( AstPolyMap *this, int ndim, int forward,
-                            double **table, double *lbnd, double *ubnd,
-                            int npoint, int *nsamp, double scales[4],
-                            int *status ){
+static void ReplaceTransformation( AstPolyMap *this, int forward, double acc,
+                                   double maxacc, int maxorder, double *lbnd,
+                                   double *ubnd, int *status ){
 /*
 *  Name:
-*     SamplePoly
+*     ReplaceTransformation
 
 *  Purpose:
-*     Create a table of input and output positions for a 2D PolMap.
+*     Create a new inverse or forward transformation for a PolyMap.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
-*     double **SamplePoly( AstPolyMap *this, int ndim, int forward,
-*                          double **table, double *lbnd, double *ubnd,
-*                          int npoint, int *nsamp, double scales[4],
-*                          int *status )
+*     void ReplaceTransformation( AstPolyMap *this, int forward, double acc,
+*                                 double maxacc, int maxorder, double *lbnd,
+*                                 double *ubnd, int *status )
 
 *  Description:
-*     This function creates a table containing samples of the requested
-*     polynomial transformation at a grid of input points. This grid covers
-*     the user-supplied region, using "npoint" points on each axis. If the
-*     PolyMap is 1D, then it will be treated as a 2D polynomial in which the
-*     second output is a unit transformation.
+*     This function creates a new forward or inverse transformation for
+*     the supplied PolyMap (replacing any existing transformation), by
+*     sampling the other transformation and performing a least squares
+*     polynomial fit to the sample positions and values.
+*
+*     The transformation to create is specified by the "forward" parameter.
+*     In what follows "X" refers to the inputs of the PolyMap, and "Y" to
+*     the outputs of the PolyMap. The forward transformation transforms
+*     input values (X) into output values (Y), and the inverse transformation
+*     transforms output values (Y) into input values (X). Within a PolyMap,
+*     each transformation is represented by an independent set of
+*     polynomials: Y=P_f(X) for the forward transformation and X=P_i(Y)
+*     for the inverse transformation.
+*
+*     If "forward" is zero then a new inverse transformation is created by
+*     first finding the output values (Y) using the forward transformation
+*     (which must be available) at a regular grid of points (X) covering a
+*     rectangular region of the PolyMap's input space. The coefficients of
+*     the required inverse polynomial, X=P_i(Y), are chosen in order to
+*     minimise the sum of the squared residuals between the sampled values
+*     of X and P_i(Y).
+*
+*     If "forward" is non-zero then a new forward transformation is created
+*     by first finding the input values (X) using the inverse transformation
+*     (which must be available) at a regular grid of points (Y) covering a
+*     rectangular region of the PolyMap's output space. The coefficients of
+*     the required forward polynomial, Y=P_f(X), are chosen in order to
+*     minimise the sum of the squared residuals between the sampled values
+*     of Y and P_f(X).
+*
+*     This fitting process is performed repeatedly with increasing
+*     polynomial orders (starting with linear) until the target
+*     accuracy is achieved, or a specified maximum order is reached. If
+*     the target accuracy cannot be achieved even with this maximum-order
+*     polynomial, the best fitting maximum-order polynomial is returned so
+*     long as its accuracy is better than "maxacc".
 
 *  Parameters:
 *     this
 *        The PolyMap.
-*     ndim
-*        The value the Nin and Nout attributes (which must be equal).
-*        This must be either 1 or 2. If the PolyMap is 1-dimensional,
-*        a unit trasformation is used for the second dimension.
+*     forward
+*        If non-zero, then the forward PolyMap transformation is
+*        replaced. Otherwise the inverse transformation is replaced.
+*     acc
+*        The target accuracy, expressed as a geodesic distance within
+*        the PolyMap's input space (if "forward" is zero) or output
+*        space (if "forward" is non-zero).
+*     maxacc
+*        The maximum allowed accuracy for an acceptable polynomial,
+*        expressed as a geodesic distance within the PolyMap's input
+*        space (if "forward" is zero) or output space (if "forward" is
+*        non-zero).
+*     maxorder
+*        The maximum allowed polynomial order. This is one more than the
+*        maximum power of either input axis. So for instance, a value of
+*        3 refers to a quadratic polynomial. Note, cross terms with total
+*        powers greater than or equal to maxorder are not inlcuded in the
+*        fit. So the maximum number of terms in each of the fitted polynomials
+*        is maxorder*(maxorder+1)/2.
+*     lbnd
+*        An array holding the lower bounds of a rectangular region within
+*        the PolyMap's input space (if "forward" is zero) or output
+*        space (if "forward" is non-zero). The new polynomial will be
+*        evaluated over this rectangle.
+*     ubnd
+*        An array holding the upper bounds of a rectangular region within
+*        the PolyMap's input space (if "forward" is zero) or output
+*        space (if "forward" is non-zero). The new polynomial will be
+*        evaluated over this rectangle.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Notes:
+*     - An error is reported if the transformation that is not being
+*     replaced is not defined.
+*     - An error is reported if the PolyMap does not have equal numbers
+*     of inputs and outputs.
+*     - An error is reported if the PolyMap has more than 2 inputs or outputs.
+
+*/
+
+/* Local Variables: */
+   double **table;
+   double *cofs;
+   double racc;
+   double scales[ 4 ];
+   int ndim;
+   int ncof;
+   int nsamp;
+   int order;
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* Check the PolyMap can be used. */
+   ndim = astGetNin( this );
+   if( astGetNout( this ) != ndim ) {
+      astError( AST__BADNI, "astReplaceTransformation(%s): Supplied %s has "
+                "different number of inputs (%d) and outputs (%d).",
+                status, astGetClass( this ), astGetClass( this ), ndim,
+                astGetNout( this ) );
+
+   } else if( ndim > 2 ) {
+      astError( AST__BADNI, "astReplaceTransformation(%s): Supplied %s has "
+                "too many inputs and outputs (%d) - must be 1 or 2.",
+                status, astGetClass( this ), astGetClass( this ), ndim );
+   }
+
+   if( forward != astGetInvert( this ) ){
+      if( ! this->ncoeff_i ) {
+         astError( AST__NODEF, "astReplaceTransformation(%s): Supplied %s has "
+                   "no inverse transformation.", status, astGetClass( this ),
+                   astGetClass( this ) );
+      }
+   } else {
+      if( ! this->ncoeff_f  ) {
+         astError( AST__NODEF, "astReplaceTransformation(%s): Supplied %s has "
+                   "no forward transformation.", status, astGetClass( this ),
+                   astGetClass( this ) );
+      }
+   }
+
+/* Initialise pointer to work space. */
+   table = NULL;
+
+/* Loop over increasing polynomial orders until the required accuracy is
+   achieved, up to the specified maximum order. The "order" value is one more
+   than the maximum power in the polynomial (so a quadratic has "order" 3). */
+   for( order = 2; order <= maxorder; order++ ) {
+
+/* First do 2D PolyMaps. */
+      if( ndim == 2 ) {
+
+/* Sample the requested polynomial transformation at a grid of points. This
+   grid covers the user-supplied region, using 2*order points on each
+   axis. If the PolyMap is 1D, then it will be treated as a 2D polynomial
+   in which the second output is a unit transformation. */
+         table = SamplePoly2D( this, !forward, table, lbnd, ubnd, 2*order,
+                               &nsamp, scales, status );
+
+/* Fit the polynomial. Always fit a linear polynomial ("order" 2) to any
+   dummy second axis. If succesful, replace the PolyMap transformation
+   and break out of the order loop. */
+         cofs = FitPoly2D( nsamp, acc, order, table, scales, &ncof, &racc,
+                           status );
+
+/* Now do 1D PolyMaps. */
+      } else {
+         table = SamplePoly1D( this, !forward, table, lbnd[ 0 ], ubnd[ 0 ],
+                               2*order, &nsamp, scales, status );
+         cofs = FitPoly1D( nsamp, acc, order, table, scales, &ncof, &racc,
+                           status );
+      }
+
+/* If the fit was succesful, replace the PolyMap transformation and break
+   out of the order loop. */
+      if( cofs && ( racc < acc || ( racc < maxacc && order == maxorder ) ) ) {
+         StoreArrays( this, forward, ncof, cofs, status );
+         break;
+      }
+   }
+
+/* If no fit was produced, report an error. */
+   if( !cofs && astOK ) {
+      astError( AST__NOFIT, "astReplaceTransformation(%s): Failed to find a new "
+                "%s transformation for the supplied %s: fit failed.",
+                status, astGetClass( this ),
+                (forward ? "forward" : "forward" ), astGetClass( this ) );
+   }
+
+/* Free resources. */
+   cofs = astFree( cofs );
+   table = astFreeDouble( table );
+}
+
+static double **SamplePoly1D( AstPolyMap *this, int forward, double **table,
+                              double lbnd, double ubnd, int npoint, int *nsamp,
+                              double scales[2], int *status ){
+/*
+*  Name:
+*     SamplePoly1D
+
+*  Purpose:
+*     Create a table of input and output positions for a 1D PolyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     double **SamplePoly1D( AstPolyMap *this, int forward, double **table,
+*                            double lbnd, double ubnd, int npoint, int *nsamp,
+*                            double scales[2], int *status )
+
+*  Description:
+*     This function creates a table containing samples of the requested
+*     polynomial transformation at a grid of input points. This grid covers
+*     the user-supplied region, using "npoint" points.
+
+*  Parameters:
+*     this
+*        The PolyMap.
+*     forward
+*        If non-zero, then the forward PolyMap transformation is sampled.
+*        Otherwise the inverse transformation is sampled.
+*     table
+*        Pointer to a previous table created by this function, which is
+*        to be re-used, or NULL.
+*     lbnd
+*        The lower bounds of the region within the PolyMap's 1D input space
+*        (if "forward" is non-zero) or output space (if "forward" is zero).
+*        The new polynomial will be evaluated over this region.
+*     ubnd
+*        The upper bounds of the region within the PolyMap's 1D input space
+*        (if "forward" is non-zero) or output space (if "forward" is zero).
+*        The new polynomial will be evaluated over this region.
+*     npoint
+*        The number of points to use.
+*     nsamp
+*        Address of an int in which to return the total number of samples
+*        in the returned table.
+*     scales
+*        Array in which to return the scaling factors for the two columns
+*        of the returned table. Multiplying the returned table values by
+*        the scale factor produces PolyMap input or output axis values.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*        Pointer to an array of 2 pointers. Each of these pointers points
+*        to an array of "nsamp" doubles, being the sampled values for y1
+*        and x1 in that order. Here x1 is the input value for the sampled
+*        transformation (these are spaced on the regular grid specified
+*        by lbnd, ubnd and npoint), and y1 is the output position produced
+*        by the sampled transformation. The returned values are scaled so
+*        that each column has an RMS value of 1.0. The scaling factors that
+*        convert scaled values into original values are returned in "scales".
+*        The returned pointer should be freed using astFreeDouble when no
+*        longer needed.
+
+*/
+
+/* Local Variables: */
+   AstPointSet *ps1;
+   AstPointSet *ps2;
+   double **result;
+   double *p0;
+   double *p1;
+   double *ptr1[ 1 ];
+   double *ptr2[ 1 ];
+   double delta0;
+   double rms;
+   double sum;
+   double val0;
+   int i;
+   int icol;
+
+/* Initialise returned value */
+   result = table;
+   *nsamp = 0;
+
+/* Check inherited status */
+   if( !astOK ) return result;
+
+/* Ensure we have a table of the correct size. */
+   *nsamp = npoint;
+   if( !result ) result = astCalloc( 2, sizeof( double * ) );
+   if( result ) {
+      for( i = 0; i < 2; i++ ) {
+         result[ i ] = astRealloc( result[ i ] , (*nsamp)*sizeof( double ) );
+      }
+   }
+
+/* Work out the step sizes for the grid. */
+   delta0 = ( ubnd - lbnd )/( npoint - 1 );
+
+/* Create a PointSet to hold the grid of input positions. Use column 1
+   of the table to hold the PointSet values. */
+   ps1 = astPointSet( *nsamp, 1, " ", status );
+   ptr1[ 0 ] = result[ 1 ];
+   astSetPoints( ps1, ptr1 );
+
+/* Create a PointSet to hold the grid of output positions. Use column 0
+   of the table to hold the PointSet values. */
+   ps2 = astPointSet( *nsamp, 1, " ", status );
+   ptr2[ 0 ] = result[ 0 ];
+   astSetPoints( ps2, ptr2 );
+   if( astOK ) {
+
+/* Calculate the grid of input positions and store in the PointSet and
+   therefore also in the returned table. */
+      val0 = lbnd;
+      p0 = ptr1[ 0 ];
+      for( i = 0; i < npoint; i++ ) {
+         *(p0++) = val0;
+         val0 += delta0;
+      }
+
+/* Transform the input grid to get the output grid. */
+      (void) astTransform( this, ps1, forward, ps2 );
+
+/* Scale each column in turn. */
+      for( icol = 0; icol < 2; icol++ ) {
+
+/* Find the RMS of the values in the column. */
+         sum = 0.0;
+         p0 = result[ icol ];
+         p1 = p0 + (*nsamp);
+         for( ; p0 < p1; p0++ ) sum += ( *p0 )*( *p0 );
+         rms = sqrt( sum/(*nsamp) );
+
+/* Divide the table values by the RMS. */
+         p0 = result[ icol ];
+         p1 = p0 + (*nsamp);
+         for( ; p0 < p1; p0++ ) *p0 /= rms;
+
+/* Return the RMS as the scale factor. */
+         scales[ icol ] = rms;
+      }
+   }
+
+/* Free resources */
+   ps1 = astAnnul( ps1 );
+   ps2 = astAnnul( ps2 );
+
+/* If an error occurred, free the returned array. */
+   if( !astOK ) result = astFreeDouble( result );
+
+/* Return a pointer to the table. */
+   return result;
+}
+
+static double **SamplePoly2D( AstPolyMap *this, int forward, double **table,
+                              double *lbnd, double *ubnd, int npoint, int *nsamp,
+                              double scales[4], int *status ){
+/*
+*  Name:
+*     SamplePoly2D
+
+*  Purpose:
+*     Create a table of input and output positions for a 2D PolyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     double **SamplePoly2D( AstPolyMap *this, int forward, double **table,
+*                            double *lbnd, double *ubnd, int npoint, int *nsamp,
+*                            double scales[4], int *status )
+
+*  Description:
+*     This function creates a table containing samples of the requested
+*     polynomial transformation at a grid of input points. This grid covers
+*     the user-supplied region, using "npoint" points on each axis.
+
+*  Parameters:
+*     this
+*        The PolyMap.
 *     forward
 *        If non-zero, then the forward PolyMap transformation is sampled.
 *        Otherwise the inverse transformation is sampled.
@@ -1841,16 +2422,12 @@ static double **SamplePoly( AstPolyMap *this, int ndim, int forward,
 *        An array holding the lower bounds of a rectangular region within
 *        the PolyMap's input space (if "forward" is non-zero) or output
 *        space (if "forward" is zero). The new polynomial will be
-*        evaluated over this rectangle. If "ndim" is 1, only the first
-*        element is accessed, and the second element will be assumed to
-*        be equal to the first element.
+*        evaluated over this rectangle.
 *     ubnd
 *        An array holding the upper bounds of a rectangular region within
 *        the PolyMap's input space (if "forward" is non-zero) or output
 *        space (if "forward" is zero). The new polynomial will be
-*        evaluated over this rectangle. If "ndim" is 1, only the first
-*        element is accessed, and the second element will be assumed to
-*        be equal to the first element.
+*        evaluated over this rectangle.
 *     npoint
 *        The number of points along each edge of the grid.
 *     nsamp
@@ -1879,10 +2456,8 @@ static double **SamplePoly( AstPolyMap *this, int ndim, int forward,
 */
 
 /* Local Variables: */
-   AstMapping *map;
    AstPointSet *ps1;
    AstPointSet *ps2;
-   AstUnitMap *um;
    double **result;
    double *p0;
    double *p1;
@@ -1890,12 +2465,8 @@ static double **SamplePoly( AstPolyMap *this, int ndim, int forward,
    double *ptr2[ 2 ];
    double delta1;
    double delta0;
-   double lbnd0;
-   double lbnd1;
    double rms;
    double sum;
-   double ubnd0;
-   double ubnd1;
    double val0;
    double val1;
    int i;
@@ -1918,20 +2489,9 @@ static double **SamplePoly( AstPolyMap *this, int ndim, int forward,
       }
    }
 
-/* Store the bounds to use. */
-   lbnd0 = lbnd[ 0 ];
-   ubnd0 = ubnd[ 0 ];
-   if( ndim == 1 ) {
-      lbnd1 = lbnd0;
-      ubnd1 = ubnd0;
-   } else {
-      lbnd1 = lbnd[ 1 ];
-      ubnd1 = ubnd[ 1 ];
-   }
-
 /* Work out the step sizes for the grid. */
-   delta0 = ( ubnd0 - lbnd0 )/( npoint - 1 );
-   delta1 = ( ubnd1 - lbnd1 )/( npoint - 1 );
+   delta0 = ( ubnd[ 0 ] - lbnd[ 0 ] )/( npoint - 1 );
+   delta1 = ( ubnd[ 1 ] - lbnd[ 1 ] )/( npoint - 1 );
 
 /* Create a PointSet to hold the grid of input positions. Use columns 2
    and 3 of the table to hold the PointSet values. */
@@ -1950,11 +2510,11 @@ static double **SamplePoly( AstPolyMap *this, int ndim, int forward,
 
 /* Calculate the grid of input positions and store in the PointSet and
    therefore also in the returned table. */
-      val0 = lbnd0;
+      val0 = lbnd[ 0 ];
       p0 = ptr1[ 0 ];
       p1 = ptr1[ 1 ];
       for( i = 0; i < npoint; i++ ) {
-         val1 = lbnd1;
+         val1 = lbnd[ 1 ];
          for( j = 0; j < npoint; j++ ) {
              *(p0++) = val0;
              *(p1++) = val1;
@@ -1963,17 +2523,8 @@ static double **SamplePoly( AstPolyMap *this, int ndim, int forward,
          val0 += delta0;
       }
 
-/* If the PolyMap is 1D, add in a second dimension that uses a unit map. */
-      if( ndim == 1 ) {
-         um = astUnitMap( 1, " ", status );
-         map = (AstMapping *) astCmpMap( this, um, 0, " ", status );
-         um = astAnnul( um );
-      } else {
-         map = astClone( this );
-      }
-
 /* Transform the input grid to get the output grid. */
-      (void) astTransform( map, ps1, forward, ps2 );
+      (void) astTransform( this, ps1, forward, ps2 );
 
 /* Scale each pair of columns in turn. Use the ssame scale factor for
    each axis in order to ensure an isotropic metric. */
@@ -2004,10 +2555,9 @@ static double **SamplePoly( AstPolyMap *this, int ndim, int forward,
          scales[ icol ] = rms;
          scales[ icol + 1 ] = rms;
       }
+   }
 
 /* Free resources */
-      map = astAnnul( map );
-   }
    ps1 = astAnnul( ps1 );
    ps2 = astAnnul( ps2 );
 
