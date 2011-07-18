@@ -37,6 +37,7 @@
 *     2011-07-18 (COBA):
 *        - Add fts2_getmirrorpositions
 *        - Remove fts2_deglitch
+*        - Remove fts2_phasecorrection
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -133,24 +134,6 @@ sc2astCache* fts2ast_createwcs2(
     AstFrameSet **fset,
     sc2astCache *cache,
     int *status);
-
-void fts2_phasecorrection(
-    double* interferogram,
-    int size,
-    int zpdIndex,
-    int dsHalfLength,
-    int ssHalfLength,
-    int polynomialDegree,
-    int phaseFunctionHalfLength,
-    double wnLBoundPercent,
-    double wnUBoundPercent,
-    double weightLimit,
-    double* sigma,
-    double* coefficients,
-    double* phase,
-    double* phaseFunction,
-    double* newInterferogram,
-    int* status);
 
 void fts2_getmirrorpositions(
     smfData* data,
