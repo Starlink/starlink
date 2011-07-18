@@ -50,6 +50,8 @@ c     :              -1.0E-9,  2.0, 1.0, 2.0 /
       status = sai__ok
       call ast_begin( status )
 
+c      call ast_watchmemory( 131 )
+
       acc = 1.0D-7
       errlim = 1000*acc
       maxacc = 1.0D-3
@@ -82,6 +84,18 @@ c     :              -1.0E-9,  2.0, 1.0, 2.0 /
 
 
 
+      call ast_setl( pm2, 'IterInverse', .TRUE., status )
+      call ast_tran2( pm2, 3, xout, yout, .false., xin2, yin2,
+     :                status )
+      do i = 1, 3
+         if( abs( xin( i ) - xin2( i ) ) .gt. errlim ) then
+            call stopit( 1001, status )
+         endif
+         if( abs( yin( i ) - yin2( i ) ) .gt. errlim ) then
+            call stopit( 1002, status )
+         endif
+      end do
+
 
 
 
@@ -103,7 +117,14 @@ c     :              -1.0E-9,  2.0, 1.0, 2.0 /
          endif
       end do
 
+      call ast_setl( pm2, 'IterInverse', .TRUE., status )
+      call ast_tran1( pm2, 3, xout, .false., xin2, status )
 
+      do i = 1, 3
+         if( abs( xin( i ) - xin2( i ) ) .gt. errlim ) then
+            call stopit( 3001, status )
+         endif
+      end do
 
 
 
@@ -133,6 +154,18 @@ c     :              -1.0E-9,  2.0, 1.0, 2.0 /
          endif
       end do
 
+      call ast_setl( pm2, 'IterInverse', .TRUE., status )
+      call ast_tran2( pm2, 3, xout, yout, .false., xin2, yin2,
+     :                status )
+
+      do i = 1, 3
+         if( abs( xin( i ) - xin2( i ) ) .gt. errlim ) then
+            call stopit( 4001, status )
+         endif
+         if( abs( yin( i ) - yin2( i ) ) .gt. errlim ) then
+            call stopit( 5001, status )
+         endif
+      end do
 
 
 
@@ -167,7 +200,30 @@ c     :              -1.0E-9,  2.0, 1.0, 2.0 /
       end do
 
 
+      call ast_setl( pm2, 'IterInverse', .TRUE., status )
+      call ast_tran2( pm2, 3, xout, yout, .false., xin2, yin2,
+     :                status )
+
+      do i = 1, 3
+         if( abs( xin( i ) - xin2( i ) ) .gt. errlim ) then
+             write(*,*) i, xin( i ), xin2( i ), errlim
+             call stopit( 6001, status )
+         endif
+         if( abs( yin( i ) - yin2( i ) ) .gt. errlim ) then
+            call stopit( 7001, status )
+         endif
+      end do
+
+
+
+
+
+
+
+
+
       call ast_end( status )
+      call ast_activememory( 'testpolymap' );
       call ast_flushmemory( 1 )
 
       if( status .eq. sai__ok ) then

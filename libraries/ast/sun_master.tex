@@ -22480,12 +22480,10 @@ from the resulting output values to the grid of input values.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.7-1}
+\subsection{Changes Introduced in V5.7-1}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V5.7-0 and V5.7-1 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V5.7-0 and V5.7-1:
 
 \begin{enumerate}
 
@@ -22502,6 +22500,29 @@ keywords when reading a FrameSet from a FITS header.
 not provide an inverse polynomial correction, the FitsChan class will now
 use the PolyTran method of the PolyMap class to create an estimate of the
 inverse polynomial correction.
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.7-2}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.7-1 and V5.7-2 (the
+current version):
+
+\begin{enumerate}
+
+\item The PolyMap class can now use an iterative Newton-Raphson method to
+evaluate the inverse the inverse transformation if no inverse
+transformation is defined when the PolyMap is created.
+
+\item - If the FitsChan astRead method reads a FITS header that uses the
+-SIP (Spitzer) distortion code within the CTYPE values, but which does
+not provide an inverse polynomial correction, and for which the PolyTran
+method of the PolyMap class fails to create an accurate estimate of the
+inverse polynomial correction, then an iterative method will be used to
+evaluate the inverse correction for each point transformed.
 
 \end{enumerate}
 

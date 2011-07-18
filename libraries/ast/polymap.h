@@ -160,6 +160,10 @@ typedef struct AstPolyMap {
    int *mxpow_i;              /* Max power of each i/p axis for each inverse polynomial */
    int ***power_i;            /* Pointer to i/p powers for all inverse coefficients */
    double **coeff_i;          /* Pointer to values of all inverse coefficients */
+   int iterinverse;           /* Use an iterative inverse? */
+   int niterinverse;          /* Max number of iterations for iterative inverse */
+   double tolinverse;         /* Target relative error for iterative inverse */
+   struct AstPolyMap **jacobian;/* PolyMaps defining Jacobian of forward transformation */
 } AstPolyMap;
 
 /* Virtual function table. */
@@ -177,6 +181,20 @@ typedef struct AstPolyMapVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    AstPolyMap *(* PolyTran)( AstPolyMap *, int, double, double, int, double *, double *, int * );
+   int (*GetIterInverse)( AstPolyMap *, int * );
+   int (* TestIterInverse)( AstPolyMap *, int * );
+   void (* ClearIterInverse)( AstPolyMap *, int * );
+   void (* SetIterInverse)( AstPolyMap *, int, int * );
+
+   int (*GetNiterInverse)( AstPolyMap *, int * );
+   int (* TestNiterInverse)( AstPolyMap *, int * );
+   void (* ClearNiterInverse)( AstPolyMap *, int * );
+   void (* SetNiterInverse)( AstPolyMap *, int, int * );
+
+   double (*GetTolInverse)( AstPolyMap *, int * );
+   int (* TestTolInverse)( AstPolyMap *, int * );
+   void (* ClearTolInverse)( AstPolyMap *, int * );
+   void (* SetTolInverse)( AstPolyMap *, double, int * );
 
 } AstPolyMapVtab;
 
@@ -188,6 +206,7 @@ typedef struct AstPolyMapVtab {
 typedef struct AstPolyMapGlobals {
    AstPolyMapVtab Class_Vtab;
    int Class_Init;
+   char GetAttrib_Buff[ AST__GETATTRIB_BUFF_LEN + 1 ];
 } AstPolyMapGlobals;
 
 
@@ -229,6 +248,24 @@ AstPolyMap *astLoadPolyMap_( void *, size_t, AstPolyMapVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 AstPolyMap *astPolyTran_( AstPolyMap *, int, double, double, int, double *, double *, int * );
+
+# if defined(astCLASS)           /* Protected */
+   int astGetIterInverse_( AstPolyMap *, int * );
+   int astTestIterInverse_( AstPolyMap *, int * );
+   void astClearIterInverse_( AstPolyMap *, int * );
+   void astSetIterInverse_( AstPolyMap *, int, int * );
+
+   int astGetNiterInverse_( AstPolyMap *, int * );
+   int astTestNiterInverse_( AstPolyMap *, int * );
+   void astClearNiterInverse_( AstPolyMap *, int * );
+   void astSetNiterInverse_( AstPolyMap *, int, int * );
+
+   double astGetTolInverse_( AstPolyMap *, int * );
+   int astTestTolInverse_( AstPolyMap *, int * );
+   void astClearTolInverse_( AstPolyMap *, int * );
+   void astSetTolInverse_( AstPolyMap *, double, int * );
+#endif
+
 
 /* Function interfaces. */
 /* ==================== */
@@ -280,6 +317,34 @@ astINVOKE(O,astLoadPolyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 astINVOKE(O,astPolyTran_(astCheckPolyMap(this),forward,acc,maxacc,maxorder,lbnd,ubnd,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
+
+#define astClearIterInverse(this) \
+        astINVOKE(V,astClearIterInverse_(astCheckPolyMap(this),STATUS_PTR))
+#define astGetIterInverse(this) \
+        astINVOKE(V,astGetIterInverse_(astCheckPolyMap(this),STATUS_PTR))
+#define astSetIterInverse(this,value) \
+        astINVOKE(V,astSetIterInverse_(astCheckPolyMap(this),value,STATUS_PTR))
+#define astTestIterInverse(this) \
+        astINVOKE(V,astTestIterInverse_(astCheckPolyMap(this),STATUS_PTR))
+
+#define astClearNiterInverse(this) \
+        astINVOKE(V,astClearNiterInverse_(astCheckPolyMap(this),STATUS_PTR))
+#define astGetNiterInverse(this) \
+        astINVOKE(V,astGetNiterInverse_(astCheckPolyMap(this),STATUS_PTR))
+#define astSetNiterInverse(this,value) \
+        astINVOKE(V,astSetNiterInverse_(astCheckPolyMap(this),value,STATUS_PTR))
+#define astTestNiterInverse(this) \
+        astINVOKE(V,astTestNiterInverse_(astCheckPolyMap(this),STATUS_PTR))
+
+#define astClearTolInverse(this) \
+        astINVOKE(V,astClearTolInverse_(astCheckPolyMap(this),STATUS_PTR))
+#define astGetTolInverse(this) \
+        astINVOKE(V,astGetTolInverse_(astCheckPolyMap(this),STATUS_PTR))
+#define astSetTolInverse(this,value) \
+        astINVOKE(V,astSetTolInverse_(astCheckPolyMap(this),value,STATUS_PTR))
+#define astTestTolInverse(this) \
+        astINVOKE(V,astTestTolInverse_(astCheckPolyMap(this),STATUS_PTR))
+
 #endif
 #endif
 

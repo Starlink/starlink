@@ -25892,18 +25892,24 @@ static AstMapping *SIPMapping( double *dim, FitsStore *store, char s,
    } else {
       pmap = astPolyMap( 2, 2, ncoeff_f, coeff_f, ncoeff_i, coeff_i, "", status );
 
-/* If only one transformation was supplied, create the other by sampliong
+/* If only one transformation was supplied, attempt create the other by sampling
    the supplied transformation, and fitting a polynomial to the sampled
-   positions. */
+   positions. If the fit fails to reach 0.1 pixel accuracy, forget it and
+   rely on the iterative inverse provided by the PolyMap class. */
       if( ncoeff_f == 0 || ncoeff_i == 0 ){
          lbnd[ 0 ] = 1.0;
          lbnd[ 1 ] = 1.0;
          ubnd[ 0 ] = dim[ 0 ] != AST__BAD ? dim[ 0 ] : 1000.0;
          ubnd[ 1 ] = dim[ 1 ] != AST__BAD ? dim[ 1 ] : 1000.0;
-         pmap2 = astPolyTran( pmap, (ncoeff_f == 0), 0.001, 1.0, 10, lbnd,
+         pmap2 = astPolyTran( pmap, (ncoeff_f == 0), 0.001, 0.1, 6, lbnd,
                               ubnd );
-         (void) astAnnul( pmap );
-         pmap = pmap2;
+         if( pmap2 ) {
+            (void) astAnnul( pmap );
+            pmap = pmap2;
+         } else {
+            astSet( pmap, "IterInverse=1,NiterInverse=6,TolInverse=1.0E-8",
+                    status );
+         }
       }
 
 /* Add the above Mapping in parallel with a UnitMap which passes any

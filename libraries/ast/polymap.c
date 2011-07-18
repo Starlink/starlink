@@ -15,14 +15,20 @@ f     AST_POLYMAP
 *     transformation.  Each output coordinate is a polynomial function of
 *     all the input coordinates. The coefficients are specified separately
 *     for each output coordinate. The forward and inverse transformations
-*     are defined independantly by separate sets of coefficients.
+*     are defined independantly by separate sets of coefficients. If no
+*     inverse transformation is supplied, an iterative method can be used
+*     to evaluate the inverse based only on the forward transformation.
 
 *  Inheritance:
 *     The PolyMap class inherits from the Mapping class.
 
 *  Attributes:
-*     The PolyMap class does not define any new attributes beyond
-*     those which are applicable to all Mappings.
+*     In addition to those attributes common to all Mappings, every
+*     PolyMap also has the following attributes:
+*
+*     - IterInverse: Provide an iterative inverse transformation?
+*     - NiterInverse: Maximum number of iterations for iterative inverse
+*     - TolInverse: Target relative error for iterative inverse
 
 *  Functions:
 c     In addition to those functions applicable to all Objects, the
@@ -75,6 +81,9 @@ f     - AST_POLYTRAN: Fit a PolyMap inverse or forward transformation
 *        Fixed loop indexing problems in Equal function.
 *     27-MAY-2011 (DSB):
 *        Added public method astPolyTran.
+*     18-JUL-2011 (DSB):
+*        - Added attributes IterInverse, NiterInverse and TolInverse.
+*        - Do not report an error if astPolyTran fails to fit an inverse.
 *class--
 */
 
@@ -109,6 +118,7 @@ exceptions, so bad values are dealt with explicitly. */
 #include "polymap.h"             /* Interface definition for this class */
 #include "unitmap.h"             /* Unit mappings */
 #include "levmar.h"              /* Levenberg - Marquardt minimization */
+#include "pal.h"                 /* SLALIB function definitions */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -132,12 +142,22 @@ static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+static int (* parent_getobjsize)( AstObject *, int * );
+
+#if defined(THREAD_SAFE)
+static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
+#endif
 
 
 #ifdef THREAD_SAFE
 /* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0;
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(PolyMap)
@@ -145,13 +165,14 @@ astMAKE_INITGLOBALS(PolyMap)
 /* Define macros for accessing each item of thread specific global data. */
 #define class_init astGLOBAL(PolyMap,Class_Init)
 #define class_vtab astGLOBAL(PolyMap,Class_Vtab)
-
+#define getattrib_buff astGLOBAL(LutMap,GetAttrib_Buff)
 
 #include <pthread.h>
 
 
 #else
 
+static char getattrib_buff[ 101 ];
 
 /* Define the class virtual function table and its initialisation flag
    as static variables. */
@@ -188,30 +209,123 @@ AstPolyMap *astPolyMapId_( int, int, int, const double[], int, const double[], c
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstPolyMap **GetJacobian( AstPolyMap *, int * );
 static AstPolyMap *PolyTran( AstPolyMap *, int, double, double, int, double *, double *, int * );
+static double **SamplePoly1D( AstPolyMap *, int, double **, double, double, int, int *, double[2], int * );
+static double **SamplePoly2D( AstPolyMap *, int, double **, double *, double *, int, int *, double[4], int * );
 static double *FitPoly1D( int, double, int, double **, double[2], int *, double *, int * );
 static double *FitPoly2D( int, double, int, double **, double[4], int *, double *, int * );
-static double **SamplePoly2D( AstPolyMap *, int, double **, double *, double *, int, int *, double[4], int * );
-static double **SamplePoly1D( AstPolyMap *, int, double **, double, double, int, int *, double[2], int * );
 static int Equal( AstObject *, AstObject *, int * );
+static int GetObjSize( AstObject *, int * );
+static int GetTranForward( AstMapping *, int * );
+static int GetTranInverse( AstMapping *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int ReplaceTransformation( AstPolyMap *, int, double, double, int, double *, double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
-static void ReplaceTransformation( AstPolyMap *, int, double, double, int, double *, double *, int * );
 static void Delete( AstObject *obj, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void FreeArrays( AstPolyMap *, int, int * );
-static void LMFunc2D(  double *, double *, int, int, void * );
-static void LMJacob2D( double *, double *, int, int, void * );
+static void IterInverse( AstPolyMap *, AstPointSet *, AstPointSet *, int * );
 static void LMFunc1D(  double *, double *, int, int, void * );
+static void LMFunc2D(  double *, double *, int, int, void * );
 static void LMJacob1D( double *, double *, int, int, void * );
+static void LMJacob2D( double *, double *, int, int, void * );
 static void StoreArrays( AstPolyMap *, int, int, const double *, int * );
-static int GetTranForward( AstMapping *, int * );
-static int GetTranInverse( AstMapping *, int * );
 
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *, int, int, AstObject **, int * );
+#endif
+
+static const char *GetAttrib( AstObject *, const char *, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+
+static int GetIterInverse( AstPolyMap *, int * );
+static int TestIterInverse( AstPolyMap *, int * );
+static void ClearIterInverse( AstPolyMap *, int * );
+static void SetIterInverse( AstPolyMap *, int, int * );
+
+static int GetNiterInverse( AstPolyMap *, int * );
+static int TestNiterInverse( AstPolyMap *, int * );
+static void ClearNiterInverse( AstPolyMap *, int * );
+static void SetNiterInverse( AstPolyMap *, int, int * );
+
+static double GetTolInverse( AstPolyMap *, int * );
+static int TestTolInverse( AstPolyMap *, int * );
+static void ClearTolInverse( AstPolyMap *, int * );
+static void SetTolInverse( AstPolyMap *, double, int * );
 
 
 /* Member functions. */
 /* ================= */
+
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
+/*
+*  Name:
+*     ClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a PolyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polymap.h"
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
+
+*  Class Membership:
+*     PolyMap member function (over-rides the astClearAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function clears the value of a specified attribute for a
+*     PolyMap, so that the default value will subsequently be used.
+
+*  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     attrib
+*        Pointer to a null-terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*     status
+*        Pointer to the inherited status variable.
+*/
+
+/* Local Variables: */
+   AstPolyMap *this;             /* Pointer to the PolyMap structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the PolyMap structure. */
+   this = (AstPolyMap *) this_object;
+
+/* Check the attribute name and clear the appropriate attribute. */
+
+/* IterInverse. */
+/* ------------ */
+   if ( !strcmp( attrib, "iterinverse" ) ) {
+      astClearIterInverse( this );
+
+/* NiterInverse. */
+/* ------------- */
+   } else if ( !strcmp( attrib, "niterinverse" ) ) {
+      astClearNiterInverse( this );
+
+/* TolInverse. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "tolinverse" ) ) {
+      astClearTolInverse( this );
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      (*parent_clearattrib)( this_object, attrib, status );
+   }
+}
 
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
@@ -965,6 +1079,341 @@ static void FreeArrays( AstPolyMap *this, int forward, int *status ) {
    }
 }
 
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
+/*
+*  Name:
+*     GetAttrib
+
+*  Purpose:
+*     Get the value of a specified attribute for a PolyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polymap.h"
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
+
+*  Class Membership:
+*     PolyMap member function (over-rides the protected astGetAttrib
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a pointer to the value of a specified
+*     attribute for a PolyMap, formatted as a character string.
+
+*  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     attrib
+*        Pointer to a null-terminated string containing the name of
+*        the attribute whose value is required. This name should be in
+*        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the attribute
+*     value.
+
+*  Notes:
+*     - The returned string pointer may point at memory allocated
+*     within the PolyMap, or at static memory. The contents of the
+*     string may be over-written or the pointer may become invalid
+*     following a further invocation of the same function or any
+*     modification of the PolyMap. A copy of the string should
+*     therefore be made if necessary.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
+   AstPolyMap *this;            /* Pointer to the PolyMap structure */
+   const char *result;          /* Pointer value to return */
+   double dval;                 /* Floating point attribute value */
+   int ival;                    /* Integer attribute value */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+
+/* Obtain a pointer to the PolyMap structure. */
+   this = (AstPolyMap *) this_object;
+
+/* Compare "attrib" with each recognised attribute name in turn,
+   obtaining the value of the required attribute. If necessary, write
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
+   format.  Set "result" to point at the result string. */
+
+/* IterInverse. */
+/* ------------ */
+   if ( !strcmp( attrib, "iterinverse" ) ) {
+      ival = astGetIterInverse( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* NiterInverse. */
+/* ------------- */
+   } else if ( !strcmp( attrib, "niterinverse" ) ) {
+      ival = astGetNiterInverse( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* TolInverse. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "tolinverse" ) ) {
+      dval = astGetTolInverse( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
+      }
+
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_getattrib)( this_object, attrib, status );
+   }
+
+/* Return the result. */
+   return result;
+
+}
+
+static AstPolyMap **GetJacobian( AstPolyMap *this, int *status ){
+/*
+*  Name:
+*     GetJacobian
+
+*  Purpose:
+*     Get a description of a Jacobian matrix for the fwd transformation
+*     of a PolyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     AstPolyMap **GetJacobian( AstPolyMap *this, int *status )
+
+*  Description:
+*     This function returns a set of PolyMaps which define the Jacobian
+*     matrix of the forward transformation of the supplied PolyMap.
+*
+*     The Jacobian matrix has "nout" rows and "nin" columns, where "nin"
+*     and "nout" are the number of inputs and outputs of the supplied PolyMap.
+*     Row "i", column "j" of the matrix holds the rate of change of the
+*     i'th PolyMap output with respect to the j'th PolyMap input.
+*
+*     Since the values in the Jacobian matrix vary across the input space
+*     of the PolyMap, the matrix is returned in the form of a set of new
+*     PolyMaps which generate the elements of the Jacobian for any given
+*     position in the input space. The "nout" values in a single column of
+*     the Jacobian matrix are generated by the "nout" outputs from a single
+*     new PolyMap. The whole matrix is described by "nin" PolyMaps.
+*
+*     The returned PolyMaps are cached in the supplied PolyMap object in
+*     order to speed up subsequent calls to this function.
+
+*  Parameters:
+*     this
+*        The PolyMap for which the Jacbian is required.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to an array of "nin" PolyMap pointers, where "nin" is the number
+*     of inputs for the sipplied PolyMap. The returned array should not be changed
+*     in any way, and the PolyMaps should not be freed (they will be freed when
+*     the supplied PolyMap is deleted).
+
+*/
+
+/* Local Variables: */
+   double *coeffs;
+   double *pc;
+   int icof;
+   int icol;
+   int iin;
+   int irow;
+   int ncof;
+   int ncof_row;
+   int ncof_total;
+   int nin;
+   int nout;
+   int power;
+
+/* Check inherited status */
+   if( !astOK ) return NULL;
+
+/* Ensure there is a Jacobian stored in the PolyMap. */
+   if( !this->jacobian ) {
+
+/* Get the number of inputs and outputs. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+
+/* Allocate memory to hold pointers to the PolyMaps used to describe the
+   Jacobian matrix. */
+      this->jacobian = astCalloc( nin, sizeof(AstPolyMap *) );
+
+/* Find the total number of coefficients used to describe the supplied
+   PolyMap (forward transformation) and allocate work space to hold the
+   coefficients for a single new PolyMap forward transformation. */
+      ncof = 0;
+      for( irow = 0; irow <  nout; irow++ ) {
+         ncof += this->ncoeff_f[ irow ];
+      }
+      coeffs = astMalloc( ncof*( 2 + nin )*sizeof( double ) );
+
+/* Check pointers can be used safely. */
+      if( astOK ) {
+
+/* The Jacobian matrix has "nout" rows and "nin" columns. The "nout" values
+   in a single column of the Jacobian matrix corresponds to the "nout" outputs
+   from a single PolyMap. The whole matrix is described by "nin" PolyMaps.
+   Loop over each column of the Matrix, creating the corresponding PolyMap
+   for each. */
+         for( icol = 0; icol <  nin; icol++ ) {
+
+/* Initialise the total number of coefficients used to describe the
+   element of the PolyMap. */
+            ncof_total = 0;
+
+/* Loop over each row of the Jacobian matrix (i.e. each PolyMap output). */
+            pc = coeffs;
+            for( irow = 0; irow <  nout; irow++ ) {
+
+/* Loop over each coefficient used in the polynomial that generates the
+   current PolyMap output. */
+               ncof_row = this->ncoeff_f[ irow ];
+               for( icof = 0; icof <  ncof_row; icof++ ) {
+
+/* Get the power of input "icol" associated with the current coefficient. */
+                  power = (int)( this->power_f[ irow ][ icof ][ icol ] + 0.5 );
+
+/* We can skip the coefficient if the power is zero. */
+                  if( power > 0 ) {
+                     ncof_total++;
+
+/* Store the coefficient value, modified so that it describes a
+   polynomial that has been differentiated with respect to input "icol". */
+                     *(pc++) = this->coeff_f[ irow ][ icof ]*power;
+
+/* Store the output PolyMap to which the coeff relates. */
+                     *(pc++) = irow + 1;
+
+/* Store the powers of the inputs associated with the coeff. These are
+   the same as the original powers, except that the power of "icol"
+   (the input with respect to which the output has been differentiated)
+   is reduced by one. */
+                     for( iin = 0; iin <  nin; iin++ ) {
+                        if( iin != icol ) {
+                           *(pc++) = this->power_f[ irow ][ icof ][ iin ];
+                        } else {
+                           *(pc++) = this->power_f[ irow ][ icof ][ iin ] - 1;
+                        }
+                     }
+                  }
+               }
+            }
+
+/* Create the PolyMap and store a pointer to it in the jacobian array in
+   the supplied PolyMap. */
+            (this->jacobian)[ icol ] = astPolyMap( nin, nout, ncof_total, coeffs,
+                                                   0, NULL, " ", status );
+         }
+      }
+
+/* Free resources */
+      coeffs = astFree( coeffs );
+   }
+
+/* Return the Jacobian. */
+   return this->jacobian;
+}
+
+static int GetObjSize( AstObject *this_object, int *status ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polymap.h"
+*     int GetObjSize( AstObject *this, int *status )
+
+*  Class Membership:
+*     PolyMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied PolyMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPolyMap *this;
+   int ic;
+   int nc;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the PolyMap structure. */
+   this = (AstPolyMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by this class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object, status );
+
+   if( this->jacobian ) {
+      nc = astGetNin( this );
+      for( ic = 0; ic < nc; ic++ ) {
+         result +=  astGetObjSize( (this->jacobian)[ ic ] );
+      }
+      result += sizeof( AstPolyMap * )*nc;
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetTranForward( AstMapping *this, int *status ) {
 /*
 *
@@ -1066,7 +1515,7 @@ static int GetTranInverse( AstMapping *this, int *status ) {
    map = (AstPolyMap *) this;
 
 /* Return the result. */
-   return map->ncoeff_i ? 1 : 0;
+   return ( map->ncoeff_i || astGetIterInverse( map ) ) ? 1 : 0;
 }
 
 void astInitPolyMapVtab_(  AstPolyMapVtab *vtab, const char *name, int *status ) {
@@ -1134,10 +1583,42 @@ void astInitPolyMapVtab_(  AstPolyMapVtab *vtab, const char *name, int *status )
    virtual methods for this class. */
    vtab->PolyTran = PolyTran;
 
+   vtab->ClearIterInverse = ClearIterInverse;
+   vtab->GetIterInverse = GetIterInverse;
+   vtab->SetIterInverse = SetIterInverse;
+   vtab->TestIterInverse = TestIterInverse;
+
+   vtab->ClearNiterInverse = ClearNiterInverse;
+   vtab->GetNiterInverse = GetNiterInverse;
+   vtab->SetNiterInverse = SetNiterInverse;
+   vtab->TestNiterInverse = TestNiterInverse;
+
+   vtab->ClearTolInverse = ClearTolInverse;
+   vtab->GetTolInverse = GetTolInverse;
+   vtab->SetTolInverse = SetTolInverse;
+   vtab->TestTolInverse = TestTolInverse;
+
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
+
+#if defined(THREAD_SAFE)
+   parent_managelock = object->ManageLock;
+   object->ManageLock = ManageLock;
+#endif
+
+   parent_clearattrib = object->ClearAttrib;
+   object->ClearAttrib = ClearAttrib;
+   parent_getattrib = object->GetAttrib;
+   object->GetAttrib = GetAttrib;
+   parent_setattrib = object->SetAttrib;
+   object->SetAttrib = SetAttrib;
+   parent_testattrib = object->TestAttrib;
+   object->TestAttrib = TestAttrib;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
@@ -1163,6 +1644,272 @@ void astInitPolyMapVtab_(  AstPolyMapVtab *vtab, const char *name, int *status )
       class_init = 1;
       astSetVtabClassIdentifier( vtab, &(vtab->id) );
    }
+}
+
+static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result,
+                         int *status ){
+/*
+*  Name:
+*     IterInverse
+
+*  Purpose:
+*     Use an iterative method to evaluate the inverse transformation of a
+*     PolyMap at a set of output positions.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result,
+*                       int *status )
+
+*  Description:
+*     This function transforms a set of PolyMap output positions using
+*     the inverse transformation of the PolyMap, to generate the corresponding
+*     input positions. An iterative Newton-Raphson method is used which
+*     only required the forward transformation of the PolyMap to be deifned.
+
+*  Parameters:
+*     this
+*        The PolyMap.
+*     out
+*        A PointSet holding the PolyMap output positions that are to be
+*        transformed using the inverse transformation.
+*     result
+*        A PointSet into which the generated PolyMap input positions are to be
+*        stored.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstPointSet *work;
+   AstPointSet **ps_jac;
+   AstPolyMap **jacob;
+   double *vec;
+   double *pb;
+   double **ptr_work;
+   double ***ptr_jac;
+   double *mat;
+   double **ptr_out;
+   double **ptr_in;
+   double *pa;
+   double det;
+   double maxerr;
+   double vlensq;
+   double xlensq;
+   double xx;
+   int *flags;
+   int *iw;
+   int fwd;
+   int icol;
+   int icoord;
+   int ipoint;
+   int irow;
+   int iter;
+   int maxiter;
+   int nconv;
+   int ncoord;
+   int npoint;
+   int sing;
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* Check the PolyMap has equal numbers of inputs and outputs. */
+   ncoord = astGetNin( this );
+   if( ncoord != astGetNout( this ) ) {
+      astError( AST__INTER, "astTransform(%s): Supplied %s has unequal numbers"
+                " of inputs and outputs and therefore an iterative inverse "
+                "cannot be used (internal AST Programming errpr).", status,
+                astGetClass(this), astGetClass(this) );
+   }
+
+/* Get information about the Jacobian matrix for the forward polynomial
+   transformation. This matrix is a ncoord X ncoord matrix, in which
+   element (row=I,col=J) is the rate of change of output coord I with
+   respect to input coord J, of the supplied PolyMap's forward transformation.
+   The numerical values of the matrix vary depending on where it is
+   evaluated within the input space of the PolyMap. For this reason, the
+   "jacob" variable holds a vector of "ncoord" PolyMaps. The outputs of
+   each of these PolyMaps corresponds to a single column in the Jacobian
+   matrix. */
+   jacob = GetJacobian( this, status );
+
+/* Get the number of points to be transformed. */
+   npoint = astGetNpoint( out );
+
+/* Get another PointSet to hold intermediate results. */
+   work = astPointSet( npoint, ncoord, " ", status );
+
+/* See if the PolyMap has been inverted. */
+   fwd = !astGetInvert( this );
+
+/* Get pointers to the data arrays for all PointSets. Note, here "in" and
+   "out" refer to inputs and outputs of the PolyMap (i.e. the forward
+   transformation). These are respectively *outputs* and *inputs* of the
+   inverse transformation. */
+   ptr_in = astGetPoints( result );  /* Returned input positions */
+   ptr_out = astGetPoints( out );    /* Supplied output positions */
+   ptr_work = astGetPoints( work );  /* Work space */
+
+/* Allocate an array of PointSets to hold the elements of the Jacobian
+   matrix. */
+   ptr_jac = astMalloc( sizeof( double ** )*ncoord );
+   ps_jac = astCalloc( ncoord, sizeof( AstPointSet * ) );
+   if( astOK ) {
+      for( icoord = 0; icoord < ncoord; icoord++ ) {
+         ps_jac[ icoord ] = astPointSet( npoint, ncoord, " ", status );
+         ptr_jac[ icoord ] = astGetPoints( ps_jac[ icoord ] );
+      }
+   }
+
+/* Allocate an array to hold flags indicating if each position has
+   converged. Initialise it to hold zero at every element. */
+   flags = astCalloc( npoint, sizeof( int ) );
+
+/* Allocate memory to hold the Jacobian matrix at a single point. */
+   mat = astMalloc( sizeof( double )*ncoord*ncoord );
+
+/* Allocate memory to hold the offset vector. */
+   vec = astMalloc( sizeof( double )*ncoord );
+
+/* Allocate memory to hold work space for palSlaDmat. */
+   iw = astMalloc( sizeof( int )*ncoord );
+
+/* Check pointers can be used safely. */
+   if( astOK ) {
+
+/* Store the initial guess at the required input positions. We assume initially
+   that the inverse transformation is a unit mapping, and so we just copy
+   the supplied outputs positions to the results PointSet holding the
+   corresponding input positions. */
+      for( icoord = 0; icoord < ncoord; icoord++ ) {
+         memcpy( ptr_in[ icoord ], ptr_out[ icoord ], sizeof( double )*npoint );
+      }
+
+/* Get the maximum number of iterations to perform. */
+      maxiter = astGetNiterInverse( this );
+
+/* Get the target relative error for the returned input axis values, and
+   square it. */
+      maxerr = astGetTolInverse( this );
+      maxerr *= maxerr;
+
+/* Initialise the number of positions which have reached the required
+   accuracy. */
+      nconv = 0;
+
+/* Loop round doing iterations of a Newton-Raphson algorithm, until
+   all points have achieved the required relative error, or the
+   maximum number of iterations have been performed. */
+      for( iter = 0; iter < maxiter && nconv < npoint && astOK; iter++ ) {
+
+/* Use the forward transformation of the supplied PolyMap to transform
+   the current guesses at the required input positions into the
+   corresponding output positions. Store the results in the "work"
+   PointSet. */
+         (void) astTransform( this, result, fwd, work );
+
+/* Modify the work PointSet so that it holds the offsets from the output
+   positions produced by the current input position guesses, and the
+   required output positions. */
+         for( icoord = 0; icoord < ncoord; icoord++ ) {
+            pa = ptr_out[ icoord ];
+            pb = ptr_work[ icoord ];
+            for( ipoint = 0; ipoint< npoint; ipoint++,pa++,pb++ ) {
+               if( *pa != AST__BAD && *pb != AST__BAD ){
+                  *pb = *pa - *pb;
+               } else {
+                  *pb = AST__BAD;
+               }
+            }
+         }
+
+/* Evaluate the elements of the Jacobian matrix at the current input
+   position guesses. */
+         for( icoord = 0; icoord < ncoord; icoord++ ) {
+            (void) astTransform( jacob[ icoord ], result, 1, ps_jac[ icoord ] );
+         }
+
+/* For each position, we now invert the matrix equation
+
+    Dy = Jacobian.Dx
+
+   to find a guess at the vector (dx) holding the offsets from the
+   current input positions guesses to their required values. Loop over all
+   points. */
+         for( ipoint = 0; ipoint < npoint; ipoint++ ) {
+
+/* Do not change positions that have already converged. */
+            if( !flags[ ipoint ] ) {
+
+/* Get the numerical values for the elements of the Jacobian matrix at
+   the current point. */
+               pa = mat;
+               for( irow = 0; irow < ncoord; irow++ ) {
+                  for( icol = 0; icol < ncoord; icol++ ) {
+                     *(pa++) = ptr_jac[ icol ][ irow ][ ipoint ];
+                  }
+
+/* Store the offset from the current output position to the required
+   output position. */
+                  vec[ irow ] = ptr_work[ irow ][ ipoint ];
+               }
+
+/* Find the corresponding offset from the current input position to the required
+   input position. */
+               palSlaDmat( ncoord, mat, vec, &det, &sing, iw );
+
+/* If the matrix was singular, the input position cannot be evaluated so
+   store a bad value for it and indicate it has converged. */
+               if( sing ) {
+                  for( icoord = 0; icoord < ncoord; icoord++ ) {
+                     ptr_in[ icoord ][ ipoint ] = AST__BAD;
+                  }
+                  flags[ ipoint ] = 1;
+                  nconv++;
+
+/* Otherwise, update the input position guess. */
+               } else {
+                  vlensq = 0.0;
+                  xlensq = 0.0;
+                  pa = vec;
+                  for( icoord = 0; icoord < ncoord; icoord++,pa++ ) {
+                     xx = ptr_in[ icoord ][ ipoint ] + (*pa);
+                     ptr_in[ icoord ][ ipoint ] = xx;
+                     xlensq += xx*xx;
+                     vlensq += (*pa)*(*pa);
+                  }
+
+/* Check for convergence. */
+                  if( vlensq < maxerr*xlensq ) {
+                     flags[ ipoint ] = 1;
+                     nconv++;
+                  }
+               }
+            }
+         }
+      }
+   }
+
+/* Free resources. */
+   vec = astFree( vec );
+   iw = astFree( iw );
+   mat = astFree( mat );
+   flags = astFree( flags );
+   work = astAnnul( work );
+
+   if( ps_jac ) {
+      for( icoord = 0; icoord < ncoord; icoord++ ) {
+         ps_jac[ icoord ] = astAnnul( ps_jac[ icoord ] );
+      }
+      ps_jac = astFree( ps_jac );
+   }
+
+   ptr_jac = astFree( ptr_jac );
+
 }
 
 static void LMFunc1D(  double *p, double *hx, int m, int n, void *adata ){
@@ -1581,6 +2328,108 @@ static void LMJacob2D( double *p, double *jac, int m, int n, void *adata ){
       }
    }
 }
+
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *this_object, int mode, int extra,
+                       AstObject **fail, int *status ) {
+/*
+*  Name:
+*     ManageLock
+
+*  Purpose:
+*     Manage the thread lock on an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *ManageLock( AstObject *this, int mode, int extra,
+*                            AstObject **fail, int *status )
+
+*  Class Membership:
+*     PolyMap member function (over-rides the astManageLock protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function manages the thread lock on the supplied Object. The
+*     lock can be locked, unlocked or checked by this function as
+*     deteremined by parameter "mode". See astLock for details of the way
+*     these locks are used.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+*     mode
+*        An integer flag indicating what the function should do:
+*
+*        AST__LOCK: Lock the Object for exclusive use by the calling
+*        thread. The "extra" value indicates what should be done if the
+*        Object is already locked (wait or report an error - see astLock).
+*
+*        AST__UNLOCK: Unlock the Object for use by other threads.
+*
+*        AST__CHECKLOCK: Check that the object is locked for use by the
+*        calling thread (report an error if not).
+*     extra
+*        Extra mode-specific information.
+*     fail
+*        If a non-zero function value is returned, a pointer to the
+*        Object that caused the failure is returned at "*fail". This may
+*        be "this" or it may be an Object contained within "this". Note,
+*        the Object's reference count is not incremented, and so the
+*        returned pointer should not be annulled. A NULL pointer is
+*        returned if this function returns a value of zero.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*    A local status value:
+*        0 - Success
+*        1 - Could not lock or unlock the object because it was already
+*            locked by another thread.
+*        2 - Failed to lock a POSIX mutex
+*        3 - Failed to unlock a POSIX mutex
+*        4 - Bad "mode" value supplied.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+*/
+
+/* Local Variables: */
+   AstPolyMap *this;
+   int ic;
+   int result;
+   int nc;
+
+/* Initialise */
+   result = 0;
+
+/* Check the supplied pointer is not NULL. */
+   if( !this_object ) return result;
+
+/* Obtain a pointer to the PolyMap structure. */
+   this = (AstPolyMap *) this_object;
+
+/* Invoke the ManageLock method inherited from the parent class. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra,
+                                                fail, status );
+
+/* Invoke the astManageLock method on any Objects contained within
+   the supplied Object. */
+   if( this->jacobian ) {
+      nc = astGetNin( this );
+      for( ic = 0; ic < nc && result; ic++ ) {
+         result = astManageLock( (this->jacobian)[ ic ], mode,
+                                 extra, fail );
+      }
+   }
+
+   return result;
+
+}
+#endif
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      AstMapping ***map_list, int **invert_list, int *status ) {
@@ -2001,11 +2850,17 @@ f        The global status.
 c     astPolyTran()
 f     AST_POLYTRAN = INTEGER
 *        A pointer to the new PolyMap.
+c        A NULL pointer
+f        AST__NULL
+*        will be returned if the fit fails to achieve the accuracy
+*        specified by
+c        "maxacc",
+f        MAXACC,
+*        but no error will be reported.
 
 *  Notes:
 *     - This function can only be used on 1D or 2D PolyMaps which have
 *     the same number of inputs and outputs.
-*     - An error will be reported if a successfull fit cannot be found.
 *     - A null Object pointer (AST__NULL) will be returned if this
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
@@ -2015,6 +2870,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Local Variables: */
    AstPolyMap *result;
+   int ok;
 
 /* Initialise. */
    result = NULL;
@@ -2026,19 +2882,20 @@ f     function is invoked with STATUS set to an error value, or if it
    result = astCopy( this );
 
 /* Replace the required transformation. */
-   ReplaceTransformation( result, forward, acc, maxacc, maxorder, lbnd, ubnd,
-                  status );
+   ok = ReplaceTransformation( result, forward, acc, maxacc, maxorder, lbnd,
+                               ubnd, status );
 
-/* If an error occurred, annul the returned PolyMap. */
-   if ( !astOK ) result = astAnnul( result );
+/* If an error occurred, or the fit was not good enough, annul the returned
+   PolyMap. */
+   if ( !ok || !astOK ) result = astAnnul( result );
 
 /* Return the result. */
    return result;
 }
 
-static void ReplaceTransformation( AstPolyMap *this, int forward, double acc,
-                                   double maxacc, int maxorder, double *lbnd,
-                                   double *ubnd, int *status ){
+static int ReplaceTransformation( AstPolyMap *this, int forward, double acc,
+                                  double maxacc, int maxorder, double *lbnd,
+                                  double *ubnd, int *status ){
 /*
 *  Name:
 *     ReplaceTransformation
@@ -2050,9 +2907,9 @@ static void ReplaceTransformation( AstPolyMap *this, int forward, double acc,
 *     Private function.
 
 *  Synopsis:
-*     void ReplaceTransformation( AstPolyMap *this, int forward, double acc,
-*                                 double maxacc, int maxorder, double *lbnd,
-*                                 double *ubnd, int *status )
+*     int ReplaceTransformation( AstPolyMap *this, int forward, double acc,
+*                                double maxacc, int maxorder, double *lbnd,
+*                                double *ubnd, int *status )
 
 *  Description:
 *     This function creates a new forward or inverse transformation for
@@ -2127,7 +2984,14 @@ static void ReplaceTransformation( AstPolyMap *this, int forward, double acc,
 *     status
 *        Pointer to the inherited status variable.
 
+*  Returned Value:
+*     - Non-zero if a fit was performed succesfully, to at least the
+*     maximum allowed accuracy. Zero if the fit failed, or an error
+*     occurred.
+
 *  Notes:
+*     - No error is reported if the fit fails to achieve the required
+*     maximum accuracy.
 *     - An error is reported if the transformation that is not being
 *     replaced is not defined.
 *     - An error is reported if the PolyMap does not have equal numbers
@@ -2145,9 +3009,10 @@ static void ReplaceTransformation( AstPolyMap *this, int forward, double acc,
    int ncof;
    int nsamp;
    int order;
+   int result;
 
 /* Check inherited status */
-   if( !astOK ) return;
+   if( !astOK ) return 0;
 
 /* Check the PolyMap can be used. */
    ndim = astGetNin( this );
@@ -2214,20 +3079,20 @@ static void ReplaceTransformation( AstPolyMap *this, int forward, double acc,
       if( cofs && ( racc < acc || ( racc < maxacc && order == maxorder ) ) ) {
          StoreArrays( this, forward, ncof, cofs, status );
          break;
+      } else {
+        cofs = astFree( cofs );
       }
    }
 
-/* If no fit was produced, report an error. */
-   if( !cofs && astOK ) {
-      astError( AST__NOFIT, "astReplaceTransformation(%s): Failed to find a new "
-                "%s transformation for the supplied %s: fit failed.",
-                status, astGetClass( this ),
-                (forward ? "forward" : "forward" ), astGetClass( this ) );
-   }
+/* If no fit was produced, return zero. */
+   result = cofs ? 1 : 0;
 
 /* Free resources. */
    cofs = astFree( cofs );
    table = astFreeDouble( table );
+
+/* Return the result. */
+   return result;
 }
 
 static double **SamplePoly1D( AstPolyMap *this, int forward, double **table,
@@ -2568,6 +3433,97 @@ static double **SamplePoly2D( AstPolyMap *this, int forward, double **table,
    return result;
 }
 
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
+/*
+*  Name:
+*     SetAttrib
+
+*  Purpose:
+*     Set an attribute value for a PolyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polymap.h"
+*     void SetAttrib( AstObject *this, const char *setting )
+
+*  Class Membership:
+*     PolyMap member function (over-rides the astSetAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function assigns an attribute value for a PolyMap, the
+*     attribute and its value being specified by means of a string of
+*     the form:
+*
+*        "attribute= value "
+*
+*     Here, "attribute" specifies the attribute name and should be in
+*     lower case with no white space present. The value to the right
+*     of the "=" should be a suitable textual representation of the
+*     value to be assigned and this will be interpreted according to
+*     the attribute's data type.  White space surrounding the value is
+*     only significant for string attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     setting
+*        Pointer to a null-terminated string specifying the new attribute
+*        value.
+*/
+
+/* Local Variables: */
+   AstPolyMap *this;             /* Pointer to the PolyMap structure */
+   double dval;                  /* Floating point attribute value */
+   int ival;                     /* Integer attribute value */
+   int len;                      /* Length of setting string */
+   int nc;                       /* Number of characters read by astSscanf */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the PolyMap structure. */
+   this = (AstPolyMap *) this_object;
+
+/* Obtain the length of the setting string. */
+   len = (int) strlen( setting );
+
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
+   the setting string and extract the attribute value (or an offset to
+   it in the case of string values). In each case, use the value set
+   in "nc" to check that the entire string was matched. Once a value
+   has been obtained, use the appropriate method to set it. */
+
+/* IterInverse. */
+/* ------------ */
+   if ( nc = 0,
+        ( 1 == astSscanf( setting, "iterinverse= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetIterInverse( this, ival );
+
+/* NiterInverse. */
+/* ------------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "niterinverse= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetNiterInverse( this, ival );
+
+/* TolInverse. */
+/* ----------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "tolinverse= %lg %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetTolInverse( this, dval );
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      (*parent_setattrib)( this_object, setting, status );
+   }
+}
+
 static void StoreArrays( AstPolyMap *this, int forward, int ncoeff,
                          const double *coeff, int *status ){
 /*
@@ -2813,6 +3769,87 @@ static void StoreArrays( AstPolyMap *this, int forward, int ncoeff,
    }
 }
 
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
+/*
+*  Name:
+*     TestAttrib
+
+*  Purpose:
+*     Test if a specified attribute value is set for a PolyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polymap.h"
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
+
+*  Class Membership:
+*     PolyMap member function (over-rides the astTestAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     a value has been set for one of a PolyMap's attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     attrib
+*        Pointer to a null-terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPolyMap *this;             /* Pointer to the PolyMap structure */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the PolyMap structure. */
+   this = (AstPolyMap *) this_object;
+
+/* Check the attribute name and test the appropriate attribute. */
+
+/* IterInverse. */
+/* ------------ */
+   if ( !strcmp( attrib, "iterinverse" ) ) {
+      result = astTestIterInverse( this );
+
+/* NiterInverse. */
+/* ------------- */
+   } else if ( !strcmp( attrib, "niterinverse" ) ) {
+      result = astTestNiterInverse( this );
+
+/* TolInverse. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "tolinverse" ) ) {
+      result = astTestTolInverse( this );
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_testattrib)( this_object, attrib, status );
+   }
+
+/* Return the result, */
+   return result;
+}
+
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                                int forward, AstPointSet *out, int *status ) {
 /*
@@ -2909,127 +3946,135 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    actually transform any coordinate values. */
    result = (*parent_transform)( this, in, forward, out, status );
 
-/* We will now extend the parent astTransform method by performing the
-   calculations needed to generate the output coordinate values. */
-
-/* Determine the numbers of points and coordinates per point from the input
-   and output PointSets and obtain pointers for accessing the input and
-   output coordinate values. */
-   ncoord_in = astGetNcoord( in );
-   ncoord_out = astGetNcoord( result );
-   npoint = astGetNpoint( in );
-   ptr_in = astGetPoints( in );
-   ptr_out = astGetPoints( result );
-
 /* Determine whether to apply the forward or inverse mapping, according to the
    direction specified and whether the mapping has been inverted. */
    if ( astGetInvert( map ) ) forward = !forward;
 
-/* Get a pointer to the arrays holding the required coefficient values
-   and powers, according to the direction of mapping required. */
-   if ( forward ) {
-      ncoeff = map->ncoeff_f;
-      coeff = map->coeff_f;
-      power = map->power_f;
-      mxpow = map->mxpow_f;
+/* We will now extend the parent astTransform method by performing the
+   calculations needed to generate the output coordinate values. */
+
+/* If we are using the inverse transformatiom, and the IterInverse
+   attribute is non-zero, use an iterative inverse algorithm rather than any
+   inverse transformation defined within the PolyMap. */
+   if( !forward && astGetIterInverse(map) ) {
+      IterInverse( map, in, result, status );
+
+/* Otherwise, determine the numbers of points and coordinates per point from
+   the input and output PointSets and obtain pointers for accessing the input
+   and output coordinate values. */
    } else {
-      ncoeff = map->ncoeff_i;
-      coeff = map->coeff_i;
-      power = map->power_i;
-      mxpow = map->mxpow_i;
-   }
+      ncoord_in = astGetNcoord( in );
+      ncoord_out = astGetNcoord( result );
+      npoint = astGetNpoint( in );
+      ptr_in = astGetPoints( in );
+      ptr_out = astGetPoints( result );
+
+/* Get a pointer to the arrays holding the required coefficient
+   values and powers, according to the direction of mapping required. */
+      if ( forward ) {
+         ncoeff = map->ncoeff_f;
+         coeff = map->coeff_f;
+         power = map->power_f;
+         mxpow = map->mxpow_f;
+      } else {
+         ncoeff = map->ncoeff_i;
+         coeff = map->coeff_i;
+         power = map->power_i;
+         mxpow = map->mxpow_i;
+      }
 
 /* Allocate memory to hold the required powers of the input axis values. */
-   work = astMalloc( sizeof( double * )*(size_t) ncoord_in );
-   for( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
-      work[ in_coord ] = astMalloc( sizeof( double )*(size_t) ( mxpow[ in_coord ] + 1 ) );
-   }
+      work = astMalloc( sizeof( double * )*(size_t) ncoord_in );
+      for( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
+         work[ in_coord ] = astMalloc( sizeof( double )*(size_t) ( mxpow[ in_coord ] + 1 ) );
+      }
 
 /* Perform coordinate arithmetic. */
 /* ------------------------------ */
-   if ( astOK ) {
+      if ( astOK ) {
 
 /* Loop to apply the polynomial to each point in turn.*/
-      for ( point = 0; point < npoint; point++ ) {
+         for ( point = 0; point < npoint; point++ ) {
 
 /* Find the required powers of the input axis values and store them in
    the work array. */
-         for( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
-            pwork = work[ in_coord ];
-            pwork[ 0 ] = 1.0;
-            x = ptr_in[ in_coord ][ point ];
-            if( x == AST__BAD ) {
-               for( ip = 1; ip <= mxpow[ in_coord ]; ip++ ) pwork[ ip ] = AST__BAD;
-            } else {
-               for( ip = 1; ip <= mxpow[ in_coord ]; ip++ ) {
-                  pwork[ ip ] = pwork[ ip - 1 ]*x;
+            for( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
+               pwork = work[ in_coord ];
+               pwork[ 0 ] = 1.0;
+               x = ptr_in[ in_coord ][ point ];
+               if( x == AST__BAD ) {
+                  for( ip = 1; ip <= mxpow[ in_coord ]; ip++ ) pwork[ ip ] = AST__BAD;
+               } else {
+                  for( ip = 1; ip <= mxpow[ in_coord ]; ip++ ) {
+                     pwork[ ip ] = pwork[ ip - 1 ]*x;
+                  }
                }
             }
-         }
 
 /* Loop round each output. */
-         for( out_coord = 0; out_coord < ncoord_out; out_coord++ ) {
+            for( out_coord = 0; out_coord < ncoord_out; out_coord++ ) {
 
 /* Initialise the output value. */
-            outval = 0.0;
+               outval = 0.0;
 
 /* Get pointers to the coefficients and powers for this output. */
-            outcof = coeff[ out_coord ];
-            outpow = power[ out_coord ];
+               outcof = coeff[ out_coord ];
+               outpow = power[ out_coord ];
 
 /* Loop round all polynomial coefficients.*/
-            nc = ncoeff[ out_coord ];
-            for ( ico = 0; ico < nc && outval != AST__BAD;
-                  ico++, outcof++, outpow++ ) {
+               nc = ncoeff[ out_coord ];
+               for ( ico = 0; ico < nc && outval != AST__BAD;
+                     ico++, outcof++, outpow++ ) {
 
 /* Initialise the current term to be equal to the value of the coefficient.
    If it is bad, store a bad output value. */
-               term = *outcof;
-               if( term == AST__BAD ) {
-                  outval = AST__BAD;
+                  term = *outcof;
+                  if( term == AST__BAD ) {
+                     outval = AST__BAD;
 
 /* Otherwise, loop round all inputs */
-               } else {
-                  for( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
+                  } else {
+                     for( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
 
 /* Get the power of the current input axis value used by the current
    coefficient. If it is zero, pass on. */
-                     pow = (*outpow)[ in_coord ];
-                     if( pow > 0 ) {
+                        pow = (*outpow)[ in_coord ];
+                        if( pow > 0 ) {
 
 /* Get the axis value raised to the appropriate power. */
-                        xp = work[ in_coord ][ pow ];
+                           xp = work[ in_coord ][ pow ];
 
 /* If bad, set the output value bad and break. */
-                        if( xp == AST__BAD ) {
-                           outval = AST__BAD;
-                           break;
+                           if( xp == AST__BAD ) {
+                              outval = AST__BAD;
+                              break;
 
 /* Otherwise multiply the current term by the exponentiated axis value. */
-                        } else {
-                           term *= xp;
+                           } else {
+                              term *= xp;
+                           }
                         }
                      }
                   }
-               }
 
 /* Increment the output value by the current term of the polynomial. */
-               outval += term;
+                  outval += term;
 
-            }
+               }
 
 /* Store the output value. */
-            ptr_out[ out_coord ][ point ] = outval;
+               ptr_out[ out_coord ][ point ] = outval;
 
+            }
          }
       }
-   }
 
 /* Free resources. */
-   for( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
-      work[ in_coord ] = astFree( work[ in_coord ] );
+      for( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
+         work[ in_coord ] = astFree( work[ in_coord ] );
+      }
+      work = astFree( work );
    }
-   work = astFree( work );
 
 /* Return a pointer to the output PointSet. */
    return result;
@@ -3041,6 +4086,125 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    this class using the macros defined for this purpose in the
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
+
+/*
+*att++
+*  Name:
+*     IterInverse
+
+*  Purpose:
+*     Provide an iterative inverse transformation?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute indicates whether the inverse transformation of
+*     the PolyMap should be implemented via an iterative Newton-Raphson
+*     approximation that uses the forward transformation to transform
+*     candidate input positions until an output position is found which
+*     is close to the required output position. By default, an iterative
+*     inverse is provided if, and only if, no inverse polynomial was supplied
+*     when the PolyMap was constructed.
+*
+*     The NiterInverse and TolInverse attributes provide parameters that
+*     control the behaviour of the inverse approcimation method.
+
+*  Applicability:
+*     PolyMap
+*        All PolyMaps have this attribute.
+
+*  Notes:
+*     - An iterative inverse can only be used if the PolyMap has equal
+*     numbers of inputs and outputs, as given by the Nin and Nout
+*     attributes. An error will be reported if IterInverse is set non-zero
+*     for a PolyMap that does not meet this requirement.
+
+*att--
+*/
+astMAKE_CLEAR(PolyMap,IterInverse,iterinverse,-INT_MAX)
+astMAKE_GET(PolyMap,IterInverse,int,0,( ( this->iterinverse == -INT_MAX ) ?
+                                          (this->ncoeff_i == 0) : this->iterinverse ))
+astMAKE_SET(PolyMap,IterInverse,int,iterinverse,
+  (((astGetNin(this)==astGetNout(this))||!value)?((value?1:0)):(astError(AST__ATTIN,"astSetIterInverse(%s):"
+  "Cannot use an iterative inverse because the %s has unequal numbers of "
+  "inputs and outputs.", status, astGetClass(this),astGetClass(this)),this->iterinverse)))
+astMAKE_TEST(PolyMap,IterInverse,( this->iterinverse != -INT_MAX ))
+
+/* NiterInverse. */
+/* --------- */
+/*
+*att++
+*  Name:
+*     NiterInverse
+
+*  Purpose:
+*     Maximum number of iterations for the iterative inverse transformation.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer.
+
+*  Description:
+*     This attribute controls the iterative inverse transformation
+*     used if the IterInverse attribute is non-zero.
+*
+*     Its value gives the maximum number of iterations of the
+*     Newton-Raphson algorithm to be used for each transformed position.
+*     The default value is 4. See also attribute TolInverse.
+
+*  Applicability:
+*     PolyMap
+*        All PolyMaps have this attribute.
+
+*att--
+*/
+astMAKE_CLEAR(PolyMap,NiterInverse,niterinverse,-INT_MAX)
+astMAKE_GET(PolyMap,NiterInverse,int,0,( this->niterinverse == -INT_MAX ? 4 : this->niterinverse))
+astMAKE_SET(PolyMap,NiterInverse,int,niterinverse,value)
+astMAKE_TEST(PolyMap,NiterInverse,( this->niterinverse != -INT_MAX ))
+
+/* TolInverse. */
+/* ----------- */
+/*
+*att++
+*  Name:
+*     TolInverse
+
+*  Purpose:
+*     Target relative error for the iterative inverse transformation.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute controls the iterative inverse transformation
+*     used if the IterInverse attribute is non-zero.
+*
+*     Its value gives the target relative error in teh axis values of
+*     each transformed position. Further iterations will be performed
+*     until the target relative error is reached, or the maximum number
+*     of iterations given by attribute NiterInverse is reached.
+
+*     The default value is 1.0E-6.
+
+*  Applicability:
+*     PolyMap
+*        All PolyMaps have this attribute.
+*att--
+*/
+astMAKE_CLEAR(PolyMap,TolInverse,tolinverse,AST__BAD)
+astMAKE_GET(PolyMap,TolInverse,double,0.0,( this->tolinverse == AST__BAD ? 1.0E-6 : this->tolinverse))
+astMAKE_SET(PolyMap,TolInverse,double,tolinverse,value)
+astMAKE_TEST(PolyMap,TolInverse,( this->tolinverse != AST__BAD ))
 
 /* Copy constructor. */
 /* ----------------- */
@@ -3107,6 +4271,8 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->power_i = NULL;
    out->coeff_i = NULL;
    out->mxpow_i = NULL;
+
+   out->jacobian = NULL;
 
 /* Get the number of inputs and outputs of the uninverted Mapping. */
    nin = ( (AstMapping *) in )->nin;
@@ -3186,7 +4352,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
       }
    }
 
-/* If an error has occurred, free the output arrays. */
+/* If an error has occurred, free al the resources allocated above. */
    if( !astOK ) {
       FreeArrays( out, 1, status );
       FreeArrays( out, 0, status );
@@ -3230,7 +4396,11 @@ static void Delete( AstObject *obj, int *status ) {
 */
 
 /* Local Variables: */
-   AstPolyMap *this;            /* Pointer to PolyMap */
+   AstPolyMap *this;
+   int nc;
+   int ic;
+   int lstat;
+   int error;
 
 /* Obtain a pointer to the PolyMap structure. */
    this = (AstPolyMap *) obj;
@@ -3239,6 +4409,27 @@ static void Delete( AstObject *obj, int *status ) {
    FreeArrays( this, 1, status );
    FreeArrays( this, 0, status );
 
+/* Free the resources used to store the Jacobian of the forward
+   transformation. */
+   if( this->jacobian ) {
+
+/* Get the number of PolyMap inputs. We need to clear any error status
+   first since astGetNin returns zero if an error has occurred. The
+   Jacobian will only be non-NULL if the number of inputs and outputs
+   are equal. */
+      error = !astOK;
+      if( error ) {
+         lstat = astStatus;
+         astClearStatus;
+      }
+      nc = astGetNin( this );
+      if( error ) astSetStatus( lstat );
+
+      for( ic = 0; ic < nc; ic++ ) {
+         (this->jacobian)[ ic ] = astAnnul( (this->jacobian)[ ic ] );
+      }
+      this->jacobian = astFree( this->jacobian );
+   }
 }
 
 /* Dump function. */
@@ -3276,12 +4467,15 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    AstPolyMap *this;             /* Pointer to the PolyMap structure */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    char comm[ 100 ];             /* Buffer for comment string */
+   double dval;                  /* Floating point attribute value */
    int i;                        /* Loop index */
    int iv;                       /* Vectorised keyword index */
+   int ival;                     /* Integer value */
    int j;                        /* Loop index */
    int k;                        /* Loop index */
    int nin;                      /* No. of input coords */
    int nout;                     /* No. of output coords */
+   int set;                      /* Attribute value set? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -3390,6 +4584,21 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       }
    }
 
+/* Use an iterative inverse? */
+   set = TestIterInverse( this, status );
+   ival = set ? GetIterInverse( this, status ) : astGetIterInverse( this );
+   astWriteInt( channel, "IterInv", set, 0, ival, ival ? "Use an iterative inverse" : "Do not use an iterative inverse" );
+
+/* Max number of iterations for iterative inverse. */
+   set = TestNiterInverse( this, status );
+   ival = set ? GetNiterInverse( this, status ) : astGetNiterInverse( this );
+   astWriteInt( channel, "NiterInv", set, 0, ival, "Max number of iterations for iterative inverse" );
+
+/* Target relative error for iterative inverse. */
+   set = TestTolInverse( this, status );
+   dval = set ? GetTolInverse( this, status ) : astGetTolInverse( this );
+   astWriteDouble( channel, "TolInv", set, 0, dval, "Target relative error for iterative inverse" );
+
 /* Undefine macros local to this function. */
 #undef KEY_LEN
 }
@@ -3434,7 +4643,9 @@ f                           OPTIONS, STATUS )
 *     transformation.  Each output coordinate is a polynomial function of
 *     all the input coordinates. The coefficients are specified separately
 *     for each output coordinate. The forward and inverse transformations
-*     are defined independantly by separate sets of coefficients.
+*     are defined independantly by separate sets of coefficients. If no
+*     inverse transformation is supplied, an iterative method can be used
+*     to evaluate the inverse based only on the forward transformation.
 
 *  Parameters:
 c     nin
@@ -3797,6 +5008,12 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
 /* Store the inverse transformation. */
       StoreArrays( new, 0, ncoeff_i, coeff_i, status );
 
+/* Other class attributes. */
+      new->iterinverse = -INT_MAX;
+      new->niterinverse = -INT_MAX;
+      new->tolinverse = AST__BAD;
+      new->jacobian = NULL;
+
 /* If an error occurred, clean up by deleting the new PolyMap. */
       if ( !astOK ) new = astDelete( new );
    }
@@ -4097,6 +5314,22 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
          }
       }
 
+/* Whether to use an iterative inverse transformation. */
+      new->iterinverse = astReadInt( channel, "iterinv", -INT_MAX );
+      if ( TestIterInverse( new, status ) ) SetIterInverse( new, new->iterinverse, status );
+
+/* Max number of iterations for iterative inverse transformation. */
+      new->niterinverse = astReadInt( channel, "niterinv", -INT_MAX );
+      if ( TestNiterInverse( new, status ) ) SetNiterInverse( new, new->niterinverse, status );
+
+/* Target relative error for iterative inverse transformation. */
+      new->tolinverse = astReadDouble( channel, "tolinv", AST__BAD );
+      if ( TestTolInverse( new, status ) ) SetTolInverse( new, new->tolinverse, status );
+
+/* The Jacobian of the PolyMap's forward transformation has not yet been
+   found. */
+      new->jacobian = NULL;
+
 /* If an error occurred, clean up by deleting the new PolyMap. */
       if ( !astOK ) new = astDelete( new );
    }
@@ -4128,14 +5361,6 @@ AstPolyMap *astPolyTran_( AstPolyMap *this, int forward, double acc,
                                                 maxacc, maxorder, lbnd,
                                                 ubnd, status );
 }
-
-
-
-
-
-
-
-
 
 
 
