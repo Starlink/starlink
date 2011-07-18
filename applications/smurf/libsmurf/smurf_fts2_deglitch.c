@@ -53,6 +53,9 @@
 *        - Added ADAM param to control deglitching mode
 *     2010-11-26 (COBA):
 *        - Read ZPD index from smfFts->zpd insted of ZPD calibration file
+*     2011-05-10 (COBA):
+*        - Deglitching of core and tails done within the function
+*        - Look for glitches in core and tail sections of the interferogram
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -84,8 +87,9 @@
 #endif
 
 /* STANDARD INCLUDES */
-#include <string.h>
+#include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /* STARLINK INCLUDES */
 #include "ast.h"
@@ -104,108 +108,365 @@
 #define FUNC_NAME "smurf_fts2_deglitch"
 #define TASK_NAME "FTS2DEGLITCH"
 
+
 void smurf_fts2_deglitch(int* status)
 {
   if(*status != SAI__OK) { return; }
 
-  int bolIndex           = 0;  /* Current bolometer index */
-  int coreClusterSize    = 0;  /* Core cluster size */
-  int dsHalfLength       = 0;  /* Size of the double sided interferogram */
-  int index              = 0;  /* Index */
-  int fIndex             = 0;  /* File loop counter */
-  int i                  = 0;    /* Loop counter */
-  int j                  = 0;    /* Loop counter */
-  int k                  = 0;    /* Loop counter */
-  int mode               = 0;    /* Deglitch mode 0 = ALL */
-  int numBol             = 0;  /* Number of bolometers in the subarray */
-  int srcH               = 0;  /* Height of the subarray */
-  int srcW               = 0;  /* Width of the subarray */
-  int srcN               = 0;  /* Time series length of the input data */
-  int tailClusterSize    = 0;  /* Tail cluster size */
-  int zpdIndex           = 0;    /* Index of ZPD */
-  double tcSigma         = 0.0;  /* Tail cutoff standard deviation percentage */
-  double tcSigmaMul      = 0.0;  /* Tail cutoff standard deviation multiplier */
-  double* interferogram  = NULL; /* Single bolometer interferogram */
-  Grp* grpInput          = NULL; /* Input group */
-  Grp* grpOutput         = NULL; /* output group */
-  size_t inSize          = 0;    /* Size of the input group */
-  size_t outSize         = 0;    /* Size of the output group */
-  smfData* srcData       = NULL; /* Pointer to input data */
-  smfData* zpdData       = NULL; /* Pointer to ZPD data */
-  void* srcCube          = NULL; /* Pointer to the input data cube */
+  // ADAM VARIABLES
+  int ccSize              = 0;    // Core cluster size
+  int tcSize              = 0;    // Tail cluster size
+  int dsLength2           = 0;    // Double-sided interferogram half-length
+  int mode                = 0;    // Deglitching mode
+  double tcSigma          = 0.0;  // Tail cutoff standard deviation percentage
+  double tcSigmaMul       = 0.0;  // Tail cutoff standard deviation multiplier
 
-  /* GET INPUT GROUP */
-  kpg1Rgndf("IN", 0, 1, "", &grpInput, &inSize, status);
-  /* GET OUTPUT GROUP */
-  kpg1Wgndf("OUT", grpOutput, inSize, inSize,
+  // INTERNAL VARIABLES
+  Grp* grpInput           = NULL; // Input group
+  Grp* grpOutput          = NULL; // output group
+  int i                   = 0;    // Loop counter
+  int j                   = 0;    // Loop counter
+  int k                   = 0;    // Loop counter
+  int ii                  = 0;    // Loop counter
+  int jj                  = 0;    // Loop counter
+  int index               = 0;    // Index
+  int zpdIndex            = 0;    // ZPD Index
+  int srcH                = 0;    // Height of the subarray
+  int srcW                = 0;    // Width of the subarray
+  int srcN                = 0;    // Time series length of the input data
+  int bolIndex            = 0;    // Current bolometer index
+  int numBol              = 0;    // Number of bolometers in the subarray
+  int numCluster          = 0;    // Number of clusters
+  int START               = 0;    // Start index
+  int STOP                = 0;    // End index
+  double MEAN             = 0.0;  // Mean
+  double min              = 0.0;  // Minimum
+  double max              = 0.0;  // Maximum
+  double* IFG             = NULL; // Single bolometer interferogram
+  double* SDEVF           = NULL; // Array of forward sdev
+  double* SDEVR           = NULL; // Array of reverse sdev
+  double* cMEAN           = NULL; // Array of cluster mean
+  double* cSDEV           = NULL; // Array of cluster sdev
+  size_t fileIndex        = 0;    // File loop counter
+  size_t numInputFile     = 0;    // Size of the input group
+  size_t numOutputFile    = 0;    // Size of the output group
+  smfData* inputData      = NULL; // Pointer to input data
+  smfData* zpdData        = NULL; // Pointer to ZPD data
+
+  // GROUPS
+  kpg1Rgndf("IN", 0, 1, "", &grpInput, &numInputFile, status);
+  kpg1Wgndf("OUT", grpOutput, numInputFile, numInputFile,
             "Equal number of input and output files expected!",
-            &grpOutput, &outSize, status);
+            &grpOutput, &numOutputFile, status);
 
   // GET PARAMS
-  parGet0i("CCSIZE", &coreClusterSize, status);
-  parGet0i("TCSIZE", &tailClusterSize, status);
+  parGet0i("CCSIZE", &ccSize, status);
+  parGet0i("TCSIZE", &tcSize, status);
   parGet0d("TCSIGMA", &tcSigma, status);
   parGet0d("TCSIGMAMUL", &tcSigmaMul, status);
-  parGet0i("DSHALFLENGTH", &dsHalfLength, status);
+  parGet0i("DSHALFLENGTH", &dsLength2, status);
   parGet0i("DEGLITCHMODE", &mode, status);
 
   // BEGIN NDF
   ndfBegin();
 
-  // LOOP THROUGH EACH NDF FILE
-  for(fIndex = 1; fIndex <= inSize; fIndex++) {
-    smf_open_and_flatfield(grpInput, grpOutput, fIndex, NULL, NULL, &srcData, status);
+  // ===========================================================================
+  // LOOP THROUGH EACH NDF FILE IN THE INPUT GROUP
+  // ===========================================================================
+  for(fileIndex = 1; fileIndex <= numInputFile; fileIndex++) {
+    smf_open_and_flatfield(grpInput, grpOutput, fileIndex, NULL, NULL, &inputData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
+      goto CLEANUP;
     }
 
-    if(srcData->fts && srcData->fts->zpd) {
-      zpdData = srcData->fts->zpd;
+    // CHECK IF INPUT FILE IS INITIALIZED
+    if(inputData->fts && inputData->fts->zpd) {
+      zpdData = inputData->fts->zpd;
     } else {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "The input file is NOT initialized!", status);
+      errRep(FUNC_NAME, "Input file is NOT initialized for FTS2 data reduction!", status);
+      goto CLEANUP;
     }
 
-    // GET DATA CUBE
-    srcCube = srcData->pntr[0];
-    srcW = srcData->dims[0];
-    srcH = srcData->dims[1];
-    srcN = srcData->dims[2];
+    // INPUT FILE DIMENSIONS
+    srcW = inputData->dims[0];
+    srcH = inputData->dims[1];
+    srcN = inputData->dims[2];
     numBol = srcW * srcH;
 
     // LOOP THROUGH THE SUBARRAY
-    interferogram = astMalloc(srcN * sizeof(*interferogram));
+    IFG = astMalloc(srcN * sizeof(*IFG));
     for(i = 0; i < srcH; i++) {
       for(j = 0; j < srcW; j++) {
-        bolIndex = j + i * srcW;
-
-        // GET INTERFEROGRAM FOR THE BOLOMETER
-        for(k = 0; k < srcN; k++) {
-          index = bolIndex + numBol * k;
-          interferogram[k] = *((double*)srcCube + index);
-        }
-
-        // GET CORRESPONDING ZPD INDEX
+        bolIndex = i + j * srcH;
         zpdIndex = *((int*)zpdData->pntr[0] + bolIndex);
 
-        // REMOVE GLITCHES
-        fts2_deglitch( interferogram, srcN, coreClusterSize, tailClusterSize,
-                       tcSigma, tcSigmaMul, zpdIndex, dsHalfLength, mode,
-                       SMF__DEGLITCH_THRESHOLD);
-
-        // UPDATE BOLOMETER INTERFEROGRAM
+        // GET INTERFEROGRAM
         for(k = 0; k < srcN; k++) {
           index = bolIndex + numBol * k;
-          *((double*)srcCube + index) = (double) interferogram[k];
+          IFG[k] = *((double*)inputData->pntr[0] + index);
+        }
+
+        // =====================================================================
+        // REMOVE GLITCHES FROM CORE
+        // =====================================================================
+        if(mode == SMF__DEGLITCH_CORE || mode == SMF__DEGLITCH_ALL) {
+          int nFORWARD    = 0;
+          int nREVERSE    = 0;
+          int ccSize2     = 0;    // Half length of core cluster size
+          double Fc       = 0.0;  // Cutoff Frequency
+          double Ampc     = 0.0;  // Cutoff amplitude
+          double maxSDEV  = NUM__MIND;
+          START = zpdIndex - dsLength2;
+          STOP  = zpdIndex + dsLength2;
+          // COMPUTE DOUBLE-SIDED INTERFEROGRAM MEAN
+          MEAN = 0.0;
+          for(ii = START; ii <= STOP; ii++) {
+            MEAN += IFG[ii];
+          }
+          MEAN /= (STOP - START + 1);
+          // COMPUTE CUTOFF AMPLITUDE FROM THE CLUSTER AT ZPD
+          min = NUM__MAXD;
+          max = NUM__MIND;
+          ccSize2 = ccSize >> 1;
+          START = zpdIndex - ccSize2;
+          STOP 	= zpdIndex + ccSize2;
+          for(ii = START; ii <= STOP; ii++) {
+            if(IFG[ii] > max) { max = IFG[ii]; }
+            if(IFG[ii] < min) { min = IFG[ii]; }
+          }
+          Ampc = 0.75 * (max - min);
+          // COMPUTE STANDARD DEVIATION FOR EACH CLUSTER
+          numCluster  = dsLength2 / ccSize + 1;
+          SDEVF = astMalloc(numCluster * sizeof(*SDEVF));
+          SDEVR = astMalloc(numCluster * sizeof(*SDEVR));
+          maxSDEV = NUM__MIND;
+          for(ii = 0; ii < numCluster; ii++) {
+            double t = 0.0;
+            double tFORWARD = 0.0;
+            double tREVERSE	= 0.0;
+            START	= (ii - 1) * ccSize;
+            STOP	= ii * ccSize;
+            for(jj = START; jj < STOP; jj++) {
+              t = (IFG[zpdIndex + jj] - MEAN);
+              tFORWARD += (t * t);
+
+              t = (IFG[zpdIndex - jj] - MEAN);
+              tREVERSE += (t * t);
+            }
+            SDEVF[ii] = sqrt(tFORWARD / ccSize);
+            SDEVR[ii] = sqrt(tREVERSE / ccSize);
+            maxSDEV = SDEVF[ii];
+
+            if(SDEVF[ii] > maxSDEV) {
+              maxSDEV = SDEVF[ii];
+            }
+          }
+          // CORE LENGTH - FORWARD
+          nFORWARD = (numCluster - 1) * ccSize;
+          for(ii = 2; ii < numCluster; ii++) {
+            if(SDEVF[ii] < 0.1 * maxSDEV) {
+              nFORWARD = (ii - 1) * ccSize;
+              break;
+            }
+          }
+          // CORE LENGTH - REVERSE
+          nREVERSE = (numCluster - 1) * ccSize;
+          for(ii = 2; ii < numCluster; ii++) {
+            if(SDEVR[ii] < 0.1 * maxSDEV) {
+              nREVERSE = (ii - 1) * ccSize;
+              break;
+            }
+          }
+          // COMPUTE THE CUTOFF FREQUENCY
+          Fc = (nFORWARD < nREVERSE) ? (10.0 / nFORWARD) : (10.0 / nREVERSE);
+          START = zpdIndex - dsLength2;
+          STOP 	= zpdIndex + dsLength2;
+          for(ii = START; ii <= STOP; ii++) {
+            double t = abs((ii - zpdIndex) * Fc);
+            double y = (t < AST__DPI / 2.0) ? ((t > SMF__DEGLITCH_THRESHOLD) ?
+                                                    Ampc * sin(t) / t :
+                                                    Ampc) :
+                                              (Ampc / t);
+            double ERROR = IFG[ii] - MEAN;
+            if(abs(ERROR) > 2.0 * y) {
+              if(ERROR > 0) IFG[ii] = MEAN + y;
+              if(ERROR < 0) IFG[ii] = MEAN - y;
+            }
+          }
+          if(SDEVF) { astFree(SDEVF); SDEVF = NULL; }
+          if(SDEVR) { astFree(SDEVR); SDEVR = NULL; }
+        }
+
+        // =====================================================================
+        // REMOVE GLITCHES FROM TAILS
+        // =====================================================================
+        if(mode == SMF__DEGLITCH_TAIL || mode == SMF__DEGLITCH_ALL) {
+          int TAILSTART = 0;
+          double avgSDEV = 0.0;
+          double cutoffSigma = 0.0;
+          //
+          // CLEANUP LEFT TAIL
+          //======================================================================
+          TAILSTART = 0;
+          numCluster = (zpdIndex - dsLength2) / tcSize;
+          cMEAN = astMalloc(numCluster * sizeof(*cMEAN));
+          cSDEV = astMalloc(numCluster * sizeof(*cSDEV));
+          for(ii = 0; ii < numCluster; ii++) {
+            START = TAILSTART + ii * tcSize;
+            STOP  = START + tcSize;
+            // CLUSTER MEAN
+            cMEAN[ii] = 0.0;
+            for(jj = START; jj < STOP; jj++) {
+            	cMEAN[ii] += IFG[jj];
+            }
+            cMEAN[ii] /= tcSize;
+            // CLUSTER STANDARD DEVIATION, SIGMA
+            cSDEV[ii] = 0.0;
+            for(jj = START; jj < STOP; jj++) {
+              double t = (IFG[jj] - cMEAN[ii]);
+              cSDEV[ii] += (t * t);
+            }
+            cSDEV[ii] = sqrt(cSDEV[ii] / tcSize);
+          }
+          // SORT CLUSTER STANDARD DEVIATIONS IN ASCENDING ORDER
+          fts2_arrayquicksort(cSDEV, numCluster, 0, numCluster - 1, 1);
+          avgSDEV = 0.0;
+          START = 0;
+          STOP  = numCluster * tcSigma;
+          for(ii = START; ii < STOP; ii++) {
+            avgSDEV += cSDEV[ii];
+          }
+          avgSDEV /= (STOP - START);
+          cutoffSigma = avgSDEV * tcSigmaMul;
+          MEAN = 0.0;
+          for(ii = 0; ii < numCluster; ii++) {
+            MEAN = cMEAN[ii];
+            START = TAILSTART + ii * tcSize;
+            STOP = START + tcSize;
+            for(jj = START; jj < STOP; jj++) {
+              if(IFG[jj] > (MEAN + cutoffSigma)) {
+                IFG[jj] = MEAN + cutoffSigma;
+              }
+              if(IFG[jj] < (MEAN - cutoffSigma)) {
+                IFG[jj] = MEAN - cutoffSigma;
+              }
+            }
+          }
+          START = TAILSTART + numCluster * tcSize;
+          STOP = zpdIndex - dsLength2;
+          if(START < STOP) {
+            MEAN = 0.0;
+            for(jj = START; jj < STOP; jj++) {
+              MEAN += IFG[jj];
+            }
+            MEAN /= (STOP - START);
+            for(jj= START; jj < STOP; jj++) {
+              if(IFG[jj] > (MEAN + cutoffSigma)) {
+                IFG[jj] = MEAN + cutoffSigma;
+              }
+              if(IFG[jj] < (MEAN - cutoffSigma)) {
+                IFG[jj] = MEAN - cutoffSigma;
+              }
+            }
+          }
+          if(cMEAN) { astFree(cMEAN); cMEAN = NULL;}
+          if(cSDEV) { astFree(cSDEV); cSDEV = NULL;}
+
+          //
+          // CLEANUP RIGHT TAIL
+          // =====================================================================
+          TAILSTART = zpdIndex + dsLength2;
+          numCluster = (srcN - TAILSTART) / tcSize;
+          cMEAN = astMalloc(numCluster * sizeof(*cMEAN));
+          cSDEV = astMalloc(numCluster * sizeof(*cSDEV));
+          for(ii = 0; ii < numCluster; ii++) {
+            START = TAILSTART + ii * tcSize;
+            STOP  = START + tcSize;
+            // CLUSTER MEAN
+            cMEAN[ii] = 0.0;
+            for(jj = START; jj < STOP; jj++) {
+            	cMEAN[ii] += IFG[jj];
+            }
+            cMEAN[ii] /= tcSize;
+            // CLUSTER STANDARD DEVIATION, SIGMA
+            cSDEV[ii] = 0.0;
+            for(jj = START; jj < STOP; jj++) {
+              double t = (IFG[jj] - cMEAN[ii]);
+              cSDEV[ii] += (t * t);
+            }
+            cSDEV[ii] = sqrt(cSDEV[ii] / tcSize);
+          }
+          // SORT CLUSTER STANDARD DEVIATIONS IN ASCENDING ORDER
+          fts2_arrayquicksort(cSDEV, numCluster, 0, numCluster - 1, 1);
+          avgSDEV = 0.0;
+          START = 0;
+          STOP  = numCluster * tcSigma;
+          for(ii = START; ii < STOP; ii++) {
+            avgSDEV += cSDEV[ii];
+          }
+          avgSDEV /= (STOP - START);
+          cutoffSigma = avgSDEV * tcSigmaMul;
+          MEAN = 0.0;
+          for(ii = 0; ii < numCluster; ii++) {
+            MEAN = cMEAN[ii];
+            START = TAILSTART + ii * tcSize;
+            STOP = START + tcSize;
+            for(jj = START; jj < STOP; jj++) {
+              if(IFG[jj] > (MEAN + cutoffSigma)) {
+                IFG[jj] = MEAN + cutoffSigma;
+              }
+              if(IFG[jj] < (MEAN - cutoffSigma)) {
+                IFG[jj] = MEAN - cutoffSigma;
+              }
+            }
+          }
+          START = TAILSTART + numCluster * tcSize;
+          STOP = srcN;
+          if(START < STOP) {
+            MEAN = 0.0;
+            for(jj = START; jj < STOP; jj++) {
+              MEAN += IFG[jj];
+            }
+            MEAN /= (STOP - START);
+            for(jj= START; jj < STOP; jj++) {
+              if(IFG[jj] > (MEAN + cutoffSigma)) {
+                IFG[jj] = MEAN + cutoffSigma;
+              }
+              if(IFG[jj] < (MEAN - cutoffSigma)) {
+                IFG[jj] = MEAN - cutoffSigma;
+              }
+            }
+          }
+          if(cMEAN) { astFree(cMEAN); cMEAN = NULL;}
+          if(cSDEV) { astFree(cSDEV); cSDEV = NULL;}
+        }
+
+        // UPDATE INTERFEROGRAM
+        for(k = 0; k < srcN; k++) {
+          index = bolIndex + numBol * k;
+          *((double*)inputData->pntr[0] + index) = IFG[k];
         }
       }
-    }
-    astFree(interferogram);
-    smf_close_file(&srcData, status);
-  }
+    } // END LOOP THROUGH BOLOMETERS
+
+    if(IFG) { astFree(IFG); IFG = NULL; }
+    if(inputData) { smf_close_file(&inputData, status); }
+  } // END FILE LOOP
 
   CLEANUP:
+    // DELETE ARRAYS
+    if(IFG)   { astFree(IFG);   IFG = NULL; }
+    if(SDEVF) { astFree(SDEVF); SDEVF = NULL; }
+    if(SDEVR) { astFree(SDEVR); SDEVR = NULL; }
+    if(cMEAN) { astFree(cMEAN); cMEAN = NULL;}
+    if(cSDEV) { astFree(cSDEV); cSDEV = NULL;}
+
+    // CLOSE FILES
+    if(inputData) { smf_close_file(&inputData, status); }
+
     // END NDF
     ndfEnd(status);
 

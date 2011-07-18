@@ -36,6 +36,7 @@
 *        - Remove FTS2AST_SPD
 *     2011-07-18 (COBA):
 *        - Add fts2_getmirrorpositions
+*        - Remove fts2_deglitch
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -132,18 +133,6 @@ sc2astCache* fts2ast_createwcs2(
     AstFrameSet **fset,
     sc2astCache *cache,
     int *status);
-
-void fts2_deglitch(
-    double* interferogram,
-    int size,
-    int coreClusterSize,
-    int tailClusterSize,
-    double tailCutoffStdDevPercent,
-    double tailCutoffStdDevMultiplier,
-    int zpdIndex,
-    int dsHalfLength,
-    smf_deglitchmode mode,
-    double threshold);
 
 void fts2_phasecorrection(
     double* interferogram,
