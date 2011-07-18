@@ -35,14 +35,16 @@
 
 *  History :
 *     15-JUL-2010 (COBA):
-*        Original version.
+*        - Original version.
 *     27-AUG-2010 (COBA):
-*        Removed older utility method calls.
+*        - Removed older utility method calls.
 *     28-OCT-2010 (COBA):
 *        - Reading wave number factor from FITS
 *        - Minor changes to coding style
 *     05-NOV-2010 (COBA):
-*        Cleanup group resources
+*        - Cleanup group resources
+*     18-JUL-2011 (COBA):
+*        - Changed wavenumber unit from 1/mm to 1/cm
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -173,7 +175,7 @@ void smurf_fts2_spatialwcs(int* status)
     gridmapping = astGetMapping(gridfset, AST__BASE, AST__CURRENT);
 
     // CRETAE 1D SPECTRUM FRAME
-    specframe = astSpecFrame("System=wavenum,Unit=1/mm,StdOfRest=Topocentric");
+    specframe = astSpecFrame("System=wavenum,Unit=1/cm,StdOfRest=Topocentric");
 
     // IF GRIDFRAME IS SKYFRAME, SET ATTRIBUTES: REFRA and REFDEC
     if(astIsASkyFrame(gridframe)) {
