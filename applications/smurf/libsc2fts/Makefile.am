@@ -10,7 +10,8 @@ C_ROUTINES =  \
               fts2_deglitch.c \
               fts2_getsplineindex.c \
               fts2_naturalcubicsplineinterpolator.c \
-              fts2_phasecorrection.c
+              fts2_phasecorrection.c \
+              fts2_getmirrorpositions.c
 
 
 noinst_INCLUDES = \

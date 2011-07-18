@@ -34,6 +34,8 @@
 *        - Remove PI
 *        - Remove PIBY2
 *        - Remove FTS2AST_SPD
+*     2011-07-18 (COBA):
+*        - Add fts2_getmirrorpositions
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -77,7 +79,7 @@
 #endif
 
 #ifndef SMF__DEGLITCH_THRESHOLD
-#define SMF__DEGLITCH_THRESHOLD 1.0e-30
+#define SMF__DEGLITCH_THRESHOLD 1.0e-9
 #endif
 
 #ifndef SMF__FLAT_THRESHOLD
@@ -159,4 +161,10 @@ void fts2_phasecorrection(
     double* phase,
     double* phaseFunction,
     double* newInterferogram,
+    int* status);
+
+void fts2_getmirrorpositions(
+    smfData* data,
+    double* positions,
+    int* size,
     int* status);
