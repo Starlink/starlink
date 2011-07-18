@@ -36,6 +36,10 @@
 *  History :
 *     23-NOV-2010 (COBA):
 *        Original version.
+*     2011-05-05 (COBA):
+*        - Get mirror positions via fts2_getmirrorpositions
+*        - Fixed possible memory leaks
+*        - Removed redundancies
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -96,31 +100,37 @@ void smurf_fts2_init(int* status)
 {
   if( *status != SAI__OK ) { return; }
 
-  int bolIndex          = 0;
+  int bolIndex          = 0;  /* Bolometer index */
+  int i                 = 0;  /* Loop counter */
+  int index             = 0;  /* Index */
+  int j                 = 0;  /* Loop counter */
+  int k                 = 0;  /* Loop counter */
   int numBol            = 0;  /* Number of bolometers in the subarray */
-  size_t posN           = 0;
-  int srcW              = 0;
-  int srcH              = 0;
-  int srcN              = 0;
-  int srcID             = 0;    /* Input file sub-array ID */
-  int zpdW              = 0;
-  int zpdH              = 0;
-  int zpdID             = 0;    /* ZPD calibration file sub-array ID */
-  float* posArr         = NULL; /* Mirror positions */
+  int srcW              = 0;  /* Width of the source array */
+  int srcH              = 0;  /* Height of the source array */
+  int srcN              = 0;  /* Sample size */
+  int srcID             = 0;  /* Input file sub-array ID */
+  int zpdW              = 0;  /* Width of the ZPD array */
+  int zpdH              = 0;  /* Height of the ZPD array */
+  int zpdID             = 0;  /* ZPD calibration file sub-array ID */
+
+  double* IFG           = NULL; /* Interferogram */
+  double* IFGEVEN       = NULL; /* Interpolated interferogram */
+  double* posArr        = NULL; /* Mirror positions */
+  double* posArrEven    = NULL; /* Evenly spaced mirror positions */
+
   Grp* grpInput         = NULL; /* Input group */
   Grp* grpOutput        = NULL; /* Output group */
   Grp* grpZPD           = NULL; /* TAU WET group */
-  HDSLoc* hds           = NULL; /* Pointer to HDS location */
-  HDSLoc* hdsPOS        = NULL; /* Pointer to mirror positions */
+
   size_t fileIndex      = 0;    /* File loop counter */
   size_t numInputFile   = 0;    /* Size of the input group */
   size_t numOutputFile  = 0;    /* Size of the output group */
   size_t numZPDFile     = 0;    /* Size of the tau group */
+
   smfData* inputData    = NULL; /* Pointer to input data */
   smfData* outputData   = NULL; /* Pointer to output data */
   smfData* zpdInData    = NULL; /* Pointer to input zpd data */
-  void* ptrSRC          = NULL; /* Pointer to 3D input data values */
-  void* ptrZPD          = NULL; /* Pointer to 2D ZPD data values */
 
   // GROUPS
   kpg1Rgndf("IN", 0, 1, "", &grpInput, &numInputFile, status);
@@ -140,15 +150,16 @@ void smurf_fts2_init(int* status)
     errRep(FUNC_NAME, "Unable to open ZPD calibration file!", status);
     goto CLEANUP;
   }
-  ptrZPD = zpdInData->pntr[0];
+
+  // ZPD FILE DIMENSIONS
   zpdW = zpdInData->dims[0];
   zpdH = zpdInData->dims[1];
+
+  // FIND ZPD FILE SUBARRAY ID
   smf_find_subarray(zpdInData->hdr, NULL, 0, &zpdID, status);
   if(*status != SAI__OK) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-            "Unable to determine the sub-array ID for the ZPD calibration file!",
-            status);
+    errRep( FUNC_NAME, "Unable to determine the ZPD sub-array ID!", status);
     goto CLEANUP;
   }
 
@@ -161,44 +172,52 @@ void smurf_fts2_init(int* status)
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
-      break;
+      goto CLEANUP;
     }
 
-    outputData = smf_deepcopy_smfData(inputData, 0, SMF__NOCREATE_FTS, 0, 0, status);
-
-    ptrSRC = inputData->pntr[0];
+    // INPUT FILE DIMENSIONS
     srcW = inputData->dims[0];
     srcH = inputData->dims[1];
     srcN = inputData->dims[2];
     numBol = srcW * srcH;
+
+    // FIND INPUT FILE SUBARRAY ID
     smf_find_subarray(inputData->hdr, NULL, 0, &srcID, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME,
-              "Unable to determine the sub-array ID for the input file!",
-              status);
-      break;
+      errRep(FUNC_NAME, "Unable to determine the input sub-array ID!", status);
+      goto CLEANUP;
     }
 
-    // VERIFY THAT THE INPUT FILE & THE CALIBRATION FILE ARE COMPATIBLE
+    // VERIFY THAT THE INPUT & THE CALIBRATION FILES ARE COMPATIBLE
     if(zpdID != srcID || zpdW != srcW || zpdH != srcH) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME,
-              "ZPD calibration file and the input file are incompatible!",
-              status);
-      break;
+      errRep( FUNC_NAME, "Incompatible ZPD calibration file!", status);
+      goto CLEANUP;
     }
 
     // GET MIRROR POSITIONS FOR THE SCAN
-    hds = smf_get_xloc(inputData, "JCMTSTATE", "EXT", "UPDATE", 0, 0, status);
-    datFind(hds, "FTS_POS", &hdsPOS, status);
-    datSize(hdsPOS, &posN, status);
-    posArr = astMalloc(posN * sizeof(*posArr));
-    datGetVR(hdsPOS, posN, posArr, &posN, status);
-    if(hds) { datAnnul(&hds, status); }
-    if(hdsPOS) { datAnnul(&hdsPOS, status); }
+    int num = 0;
+    posArr = astMalloc(srcN * sizeof(*posArr));
+    fts2_getmirrorpositions(inputData, posArr, &num, status);
+    if(*status != SAI__OK) {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, "Unable to get the mirror positions!", status);
+      goto CLEANUP;
+    }
 
-    // CREATE ZPD (2D INDEX ARRAY)
+    // CREATE EVENLY SPACED MIRROR POSITIONS AND UPDATE MIRROR POSITIONS
+    JCMTState* state = inputData->hdr->allState;
+    posArrEven = astMalloc(srcN * sizeof(*posArrEven));
+    double dPos = (posArr[srcN - 1] - posArr[0]) / (srcN - 1);
+    for(i = 0; i < srcN; i++) {
+      posArrEven[i] = posArr[0] + i * dPos;
+
+      state->fts_pos = (float) posArrEven[i];
+      state++;
+    }
+
+    // CREATE 2D ZPD INDEX ARRAY
     smfData* zpd = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
     zpd->dtype   = SMF__INTEGER;
     zpd->ndims   = 2;
@@ -206,28 +225,48 @@ void smurf_fts2_init(int* status)
     zpd->dims[1] = zpdH;
     zpd->pntr[0] = (int*) astMalloc(numBol * sizeof(int));
 
-    int i = 0, j = 0;
-    for(i = 0; i < zpdH; i++) {
-      for(j = 0; j < zpdW; j++) {
-        bolIndex = i + j * zpdH;
-        double zpdVal = *((double*)ptrZPD + bolIndex);
+    // LOOP THROUGH THE SUBARRAY
+    IFG = astMalloc(srcN * sizeof(*IFG));
+    IFGEVEN = astMalloc(srcN * sizeof(*IFGEVEN));
+    for(i = 0; i < srcH; i++) {
+      for(j = 0; j < srcW; j++) {
+        bolIndex = i + j * srcH;
 
-        int ii = 0;
-        int jj = 0;
-        int kk = srcN - 1;
-        while(kk - jj > 1) {
-          ii = (kk + jj) >> 1;
-          if(zpdVal < posArr[ii]) {
-            kk = ii;
+        // FIND ZPD INDEX
+        double zpdVal = *((double*) (zpdInData->pntr[0]) + bolIndex);
+        int mid = 0;
+        int a = 0;
+        int b = srcN - 1;
+        while(b - a > 1) {
+          mid = (b + a) >> 1;
+          if(zpdVal < posArrEven[mid]) {
+            b = mid;
           } else {
-            jj = ii;
+            a = mid;
           }
         }
+        *((int*) (zpd->pntr[0]) + bolIndex) = ++a;
 
-        *((int*) (zpd->pntr[0]) + bolIndex) = ++jj;
+        // INTERPOLATE INTERFEROGRAM ONTO EVENLY SPACED GRID
+        for(k = 0; k < srcN; k++) {
+          index = bolIndex + numBol * k;
+          IFG[k] = *((double*) (inputData->pntr[0]) + index);
+        }
+        fts2_naturalcubicsplineinterpolator(posArr, IFG, srcN, posArrEven, IFGEVEN, srcN);
+        for(k = 0; k < srcN; k++) {
+          index = bolIndex + numBol * k;
+          *((double*) (inputData->pntr[0]) + index) = IFGEVEN[k];
+        }
+
+
       }
     }
-    astFree(posArr);
+    if(IFG) { astFree(IFG); IFG = NULL; }
+    if(IFGEVEN) { astFree(IFGEVEN); IFGEVEN = NULL; }
+    if(posArr) { astFree(posArr); posArr = NULL; }
+    if(posArrEven) { astFree(posArrEven); posArrEven = NULL; }
+
+    outputData = smf_deepcopy_smfData(inputData, 0, SMF__NOCREATE_FTS, 0, 0, status);
     smf_close_file(&inputData, status);
 
     // CREATE EMPTY FPM & SIGMA
@@ -253,7 +292,15 @@ void smurf_fts2_init(int* status)
   }
 
   CLEANUP:
+    // DELETE ARRAYS
+    if(IFG) { astFree(IFG); IFG = NULL; }
+    if(IFGEVEN) { astFree(IFGEVEN); IFGEVEN = NULL; }
+    if(posArr) { astFree(posArr); posArr = NULL; }
+    if(posArrEven) { astFree(posArrEven); posArrEven = NULL; }
+
     // CLOSE FILES
+    if(inputData) { smf_close_file(&inputData, status); }
+    if(outputData) { smf_close_file(&outputData, status); }
     if(zpdInData) { smf_close_file(&zpdInData, status); }
 
     // END NDF
