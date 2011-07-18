@@ -144,9 +144,14 @@
 *     2011-06-08 (DSB):
 *        Add UNMAKEMAP
 *     2011-06-21 (DSB):
-*        Use astCheckMemory rather than astFlushMemory since we do not want 
-*        to free the memory used to hold the singleton workforce returned by 
-*        smf_get_workforce. 
+*        Use astCheckMemory rather than astFlushMemory since we do not want
+*        to free the memory used to hold the singleton workforce returned by
+*        smf_get_workforce.
+*     2011-11-18 (COBA):
+*         Remove FTS2EQSLICED
+*         Remove FTS2SPECRE
+*         Add FTS2SPECTRUM
+*         Update FTS2PHASECORR
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -289,8 +294,6 @@ void smurf_mon( int * status ) {
     smurf_flatfield( status );
   } else if (strcmp( taskname, "FTS2DEGLITCH" ) == 0 ) {
     smurf_fts2_deglitch( status );
-  } else if (strcmp( taskname, "FTS2EQSLICED" ) == 0 ) {
-    smurf_fts2_eqsliced( status );
   } else if (strcmp( taskname, "FTS2FLATFIELD" ) == 0 ) {
     smurf_fts2_flatfield( status );
   } else if (strcmp( taskname, "FTS2FREQCORR" ) == 0 ) {
@@ -305,8 +308,8 @@ void smurf_mon( int * status ) {
     smurf_fts2_portimbal( status );
   } else if (strcmp( taskname, "FTS2REMOVEBSE" ) == 0 ) {
     smurf_fts2_removebse( status );
-  } else if (strcmp( taskname, "FTS2SPECRE" ) == 0 ) {
-    smurf_fts2_specre( status );
+  } else if (strcmp( taskname, "FTS2SPECTRUM" ) == 0 ) {
+    smurf_fts2_spectrum( status );
   } else if (strcmp( taskname, "FTS2TRANSCORR" ) == 0 ) {
     smurf_fts2_transcorr( status );
   } else if (strcmp( taskname, "GSD2ACSIS" ) == 0 ) {

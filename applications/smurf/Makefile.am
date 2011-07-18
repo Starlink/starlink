@@ -35,7 +35,6 @@ extinction \
 fixsteps \
 flatfield \
 fts2deglitch \
-fts2eqsliced \
 fts2flatfield \
 fts2freqcorr \
 fts2init \
@@ -43,7 +42,7 @@ fts2opcorr \
 fts2phasecorr \
 fts2portimbal \
 fts2removebse \
-fts2specre \
+fts2spectrum \
 fts2transcorr \
 gsd2acsis \
 gsdshow \

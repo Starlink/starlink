@@ -85,6 +85,10 @@
 *         Add smurf_sc2pca
 *     2011-06-8 (DSB):
 *         Add smurf_unmakemap
+*     2011-07-18 (COBA):
+*         Remove smurf_fts2_eqsliced
+*         Remove smurf_fts2_specre
+*         Add smurf_fts2_spectrum
 
 *     {enter_further_changes_here}
 
@@ -131,7 +135,6 @@ void smurf_extinction( int * );
 void smurf_flatfield( int * );
 void smurf_fixsteps( int * );
 void smurf_fts2_deglitch( int * );
-void smurf_fts2_eqsliced( int * );
 void smurf_fts2_flatfield( int * );
 void smurf_fts2_freqcorr( int * );
 void smurf_fts2_init( int * );
@@ -139,7 +142,7 @@ void smurf_fts2_phasecorr( int * );
 void smurf_fts2_portimbal( int * );
 void smurf_fts2_removebse( int * );
 void smurf_fts2_spatialwcs( int * );
-void smurf_fts2_specre( int * );
+void smurf_fts2_spectrum( int * );
 void smurf_fts2_transcorr( int * );
 void smurf_gsd2acsis( int * );
 void smurf_gsdshow( int * );
