@@ -27,6 +27,8 @@
 
       -  Now permits plotting of the histogram for data-value limits
       that exceed the single-precision data range.
+      -  The default for the AXES parameter has changed so that by
+      default axes are only drawn if the picture is cleared.
 
    o  LOOK
 
@@ -39,6 +41,21 @@
 
       -  Permits processing of very large datasets by dividing into
       manageable sections.
+
+   o  NORMALIZE
+
+      -  The default for the AXES parameter has changed so that by
+      default axes are only drawn if the picture is cleared.
+
+   o  PSF
+
+      -  The default for the AXES parameter has changed so that by
+      default axes are only drawn if the picture is cleared.
+
+   o  SCATTER
+
+      -  The default for the AXES parameter has changed so that by
+      default axes are only drawn if the picture is cleared.
 
    o  SHOWQUAL
 

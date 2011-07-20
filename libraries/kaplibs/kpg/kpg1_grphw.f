@@ -304,6 +304,9 @@
 *        via the + prefix notation.
 *     16-JUN-2011 (DSB):
 *        Added argument BSCALE.
+*     20-JUL-2011 (DSB):
+*        Set dynamic default for AXES so that by default axes are only
+*        drawn if the existing picture is cleared.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -372,6 +375,7 @@
       INTEGER NGOOD           ! No. of points to plot
       INTEGER NMARG           ! No. of supplied margin widths
       LOGICAL AXES            ! Draw axes?
+      LOGICAL CLEAR           ! Clear old picture first?
       LOGICAL LVAL            ! Unused logical argument
       REAL DEFMAR             ! Default margin value
       REAL MARGIN( 4 )        ! Margins for plot annotation
@@ -411,9 +415,9 @@
       CALL KPG1_GRLM1( PLMODE, N, Y, X, NSIGMA, YSIGMA, YBOT, YTOP,
      :                 STATUS )
 
-*  Get new bounds for the plot, using these as dynamic defaults. The user 
+*  Get new bounds for the plot, using these as dynamic defaults. The user
 *  deals wants to see original unscaled data values, so remove the scaling
-*  from the default value, and then put it back into the obtaiend value. 
+*  from the default value, and then put it back into the obtaiend value.
       IF( STATUS .EQ. SAI__OK ) THEN
          DVAL = XLEFT*BSCALE( 1 )
          CALL PAR_DEF0D( 'XLEFT', DVAL, STATUS )
@@ -509,6 +513,14 @@
       ELSE
          IMARK = 0
       END IF
+
+*  See if any current picture is to be cleared before plotting the new
+*  one.
+      CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
+
+*  Set the dynamic default for AXES so that by default axes are only
+*  drawn if the picture is cleared.
+      CALL PAR_DEF0L( 'AXES', CLEAR, STATUS )
 
 *  See if annotated axes are required.
       CALL PAR_GET0L( 'AXES', AXES, STATUS )

@@ -44,7 +44,8 @@
 *        plot. The width of the margins left for the annotation may be
 *        controlled using Parameter MARGIN. The appearance of the axes
 *        (colours, founts, etc.) can be controlled using the Parameter
-*        STYLE.  [TRUE]
+*        STYLE. The dynamic default is TRUE if CLEAR is TRUE, and FALSE
+*        otherwise. []
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is
 *        drawn. If CLEAR is FALSE not only is the existing plot retained,

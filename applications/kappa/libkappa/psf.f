@@ -61,7 +61,8 @@
 *        plot. The width of the margins left for the annotation may be
 *        controlled using Parameter MARGIN.  The appearance of the axes
 *        (colours, fonts, etc) can be controlled using the Parameter
-*        STYLE. [TRUE]
+*        STYLE. The dynamic default is TRUE if CLEAR is TRUE, and FALSE
+*        otherwise. []
 *     AXISR = _REAL (Write)
 *        The axis ratio of the star images: the ratio of the major
 *        axis length to that of the minor axis.

@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.38}
 \newcommand{\stardocnumber}    {95.38}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2011 June 16}
+\newcommand{\stardocdate}      {2011 July 20}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -28289,7 +28289,8 @@ scaling limits are used for both images.
          plot.  The width of the margins left for the annotation may be
          controlled using Parameter MARGIN.  The appearance of the axes
          (colours, founts, \emph{etc.}) can be controlled using the Parameter
-         STYLE.  {\tt [TRUE]}
+         STYLE.  The dynamic default is TRUE if CLEAR is TRUE, and FALSE
+         otherwise. {\tt []}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -37218,7 +37219,8 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          plot.  The width of the margins left for the annotation may be
          controlled using Parameter MARGIN.  The appearance of the axes
          (colours, founts, \emph{etc.}) can be controlled using the Parameter
-         STYLE.  {\tt [TRUE]}
+         STYLE.  The dynamic default is TRUE if CLEAR is TRUE, and FALSE
+         otherwise. {\tt []}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -41987,7 +41989,8 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          plot.  The width of the margins left for the annotation may be
          controlled using Parameter MARGIN.  The appearance of the axes
          (colours, founts, \emph{etc.}) can be controlled using the Parameter
-         STYLE.  {\tt [TRUE]}
+         STYLE.  The dynamic default is TRUE if CLEAR is TRUE, and FALSE
+         otherwise. {\tt []}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -43661,7 +43664,8 @@ KAPPA: \htmlref{FLIP}{FLIP},
          plot.  The width of the margins left for the annotation may be
          controlled using Parameter MARGIN.  The appearance of the axes
          (colours, founts, \emph{etc.}) can be controlled using the Parameter
-         STYLE.  {\tt [TRUE]}
+         STYLE.  The dynamic default is TRUE if CLEAR is TRUE, and FALSE
+         otherwise. {\tt []}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -57755,6 +57759,8 @@ The following applications have been modified:
       \begin{itemize}
         \item Now permits plotting of the histogram for data-value
         limits that exceed the single-precision data range.
+        \item The default for the AXES parameter has changed so that by
+        default axes are only drawn if the picture is cleared.
       \end{itemize}
 
    \item [\htmlref{LOOK}{LOOK}]\mbox{}
@@ -57769,6 +57775,24 @@ The following applications have been modified:
       \begin{itemize}
         \item Permits processing of very large datasets by dividing into
         manageable sections.
+      \end{itemize}
+
+   \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
+      \begin{itemize}
+        \item The default for the AXES parameter has changed so that by
+        default axes are only drawn if the picture is cleared.
+      \end{itemize}
+
+   \item [\htmlref{PSF}{PSF}]\mbox{}
+      \begin{itemize}
+        \item The default for the AXES parameter has changed so that by
+        default axes are only drawn if the picture is cleared.
+      \end{itemize}
+
+   \item [\htmlref{SCATTER}{SCATTER}]\mbox{}
+      \begin{itemize}
+        \item The default for the AXES parameter has changed so that by
+        default axes are only drawn if the picture is cleared.
       \end{itemize}
 
    \item [\htmlref{SHOWQUAL}{SHOWQUAL}]\mbox{}

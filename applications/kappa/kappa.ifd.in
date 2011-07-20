@@ -6880,8 +6880,8 @@ package kappa {
 
          parameter axes {
             type _LOGICAL
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
             default TRUE
             prompt {Produce annotated axes?}
             helpkey *
@@ -11305,8 +11305,8 @@ package kappa {
 
          parameter axes {
             type _LOGICAL
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
             default TRUE
             prompt {Produce annotated axes?}
             helpkey *
@@ -13895,8 +13895,8 @@ iraf! {
 
          parameter axes {
             type _LOGICAL
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
             default TRUE
             prompt {Produce annotated axes?}
             helpkey *
@@ -14898,8 +14898,8 @@ iraf! {
 
          parameter axes {
             type _LOGICAL
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
             default TRUE
             prompt {Produce annotated axes?}
             helpkey *
