@@ -24,7 +24,7 @@
 *     and SUBND.  If EXACT is .TRUE., an error is reported if the number of
 *     significant axes is not exactly NDIM.  This mode is intended for case
 *     where (say) the user has supplied a single plane from a
-*     three-dimensional data cube to an application that requires a 
+*     three-dimensional data cube to an application that requires a
 *     two-dimensional array.
 *
 *     If EXACT is .FALSE. an error is only reported if the number of
@@ -32,7 +32,7 @@
 *     NDIM significant dimensions then the insignificant dimensions are
 *     used (starting from the lowest) to ensure that the required number
 *     of dimensions are returned. This mode is intended for cases where (say)
-*     the user supplies a one-dimensional data stream to an application 
+*     the user supplies a one-dimensional data stream to an application
 *     that requires a two-dimensional array.
 *
 *     The GRID Frame (i.e. the Base Frame) obtained from the NDFs WCS
@@ -159,6 +159,9 @@
 *        Stop modfication of NDIM given argument in call to NDF_BOUND.
 *     19-AUG-2010 (DSB):
 *        Add SDIM argument to KPG1_ASNDF.
+*     20-JUL-2011 (DSB):
+*        When testing axis monotonicity, use the precision appropriate to
+*        the AXIS data type.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -200,6 +203,7 @@
       PARAMETER ( SZFMT = 2 * VAL__SZD )
 
 *  Local Variables:
+      CHARACTER AXTYPE*(NDF__SZTYP)! Merged AXIS data type.
       CHARACTER DOM*30             ! Current Frame domain
       CHARACTER TTL*80             ! NDF title
       DOUBLE PRECISION OFFSET      ! Axis offset scale factor
@@ -230,6 +234,8 @@
       INTEGER PMAP                 ! AST pointer to a PermMap
       INTEGER UBND( NDF__MXDIM )   ! Original NDF bounds
       LOGICAL MONO                 ! Are all axes monotonic?
+      REAL ROFFSET                 ! Axis offset scale factor
+      REAL RSCALE                  ! Axis scale factor
 *.
 
 *  Initialise.
@@ -487,8 +493,14 @@
             AX( I ) = I
          END DO
 
-         CALL KPG1_CHAXD( INDF, NDIMS, AX, MONO, SCALE, OFFSET,
-     :                    STATUS )
+         CALL NDF_ATYPE( INDF, 'CENTRE', 0, AXTYPE, STATUS )
+         IF( AXTYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPG1_CHAXD( INDF, NDIMS, AX, MONO, SCALE, OFFSET,
+     :                       STATUS )
+         ELSE
+            CALL KPG1_CHAXR( INDF, NDIMS, AX, MONO, RSCALE, ROFFSET,
+     :                       STATUS )
+         END IF
 
          IF( .NOT. MONO ) THEN
             CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX2, STATUS )
