@@ -108,6 +108,11 @@
 *        Frame in the Plot because KPG1_GDGET adds one).
 *     2011 May 10 (MJC):
 *        Set mandatory bad status before calling ERR_REP.
+*     20-JUL-2011 (DSB):
+*        If the two aligned Frames represent the same coordinate system,
+*        modify the Domain of one of them in the returned FrameSet so
+*        that the alignment Domain is only included once in the returned
+*        FrameSet.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -136,17 +141,19 @@
       CHARACTER DOM*80           ! Domain of Current Frame in FrameSet
       CHARACTER DOMLST*255       ! Domain search list
       CHARACTER TEXT*30          ! General text string
+      INTEGER FRM                ! Pointer to modified Frame
       INTEGER I                  ! Frame Index
       INTEGER IAT                ! No. of characters in string
       INTEGER IBASE1             ! Index of original Base Frame in IWCS1
-      INTEGER IBASE2             ! Index of original Base Frame in IWCS2
+      INTEGER IBASE2             ! Index of original Base Frame in IWCS2C
       INTEGER ICURR1             ! Index of Current Frame in IWCS1
-      INTEGER ICURR2             ! Index of Current Frame in IWCS2
+      INTEGER ICURR2             ! Index of Current Frame in IWCS2C
       INTEGER IMAT1              ! Index of alignment Frame in IWCS1
-      INTEGER IMAT2              ! Index of alignment Frame in IWCS2
+      INTEGER IMAT2              ! Index of alignment Frame in IWCS2C
+      INTEGER IWCS2C             ! Deep copy of IWCS2
       INTEGER MAP                ! Simplified mapping between two Frames
       INTEGER NAXC1              ! Number of axies in current Frame of IWCS1
-      INTEGER NAXC2              ! Number of axies in current Frame of IWCS2
+      INTEGER NAXC2              ! Number of axies in current Frame of IWCS2C
       INTEGER NFRM1              ! No. of Frames supplied in IWCS1
       INTEGER TEMP               ! AST pointer to a FrameSet
       LOGICAL WARNED             ! Warning of duplicate Frames issued?
@@ -158,27 +165,32 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
+*  Take a deep copy of IWCS2 so that we do not chnmage it, and so that
+*  any Frames which are common to them both are guaranteed to be
+*  independent (i.e. not pointers to the same object).
+      IWCS2C = AST_COPY( IWCS2, STATUS )
+
 *  Note the number of axes in the two current Frames.
       NAXC1 = AST_GETI( IWCS1, 'NAXES', status )
-      NAXC2 = AST_GETI( IWCS2, 'NAXES', status )
+      NAXC2 = AST_GETI( IWCS2C, 'NAXES', status )
 
 *  Note the indices of the Base and Currrent Frames in the two FrameSets so
 *  that they can be re-instated after AST_CONVERT has changed them.
       IBASE1 = AST_GETI( IWCS1, 'BASE', STATUS )
-      IBASE2 = AST_GETI( IWCS2, 'BASE', STATUS )
+      IBASE2 = AST_GETI( IWCS2C, 'BASE', STATUS )
 
       ICURR1 = AST_GETI( IWCS1, 'CURRENT', STATUS )
-      ICURR2 = AST_GETI( IWCS2, 'CURRENT', STATUS )
+      ICURR2 = AST_GETI( IWCS2C, 'CURRENT', STATUS )
 
 *  Note the number of Frames supplied in IWCS1.
       NFRM1 = AST_GETI( IWCS1, 'NFRAME', STATUS )
 
 *  Get the name of the Domain in which the Current Frame of the second
 *  FrameSet lives.
-      DOM = AST_GETC( IWCS2, 'DOMAIN', STATUS )
+      DOM = AST_GETC( IWCS2C, 'DOMAIN', STATUS )
 
 *  Create a list of preferences for the Domain in which alignment should
-*  occur. First use the Domain of the Current Frame in IWCS2, then try
+*  occur. First use the Domain of the Current Frame in IWCS2C, then try
 *  SKY, SPECTRUM, PIXEL and GRID, then try the supplied Domain (if any),
 *  then try any other Domain.
       DOMLST = ' '
@@ -203,13 +215,13 @@
 *  Frame. To do this, ensure that the current Frame is considered first by
 *  setting the base Frame in each FrameSet to be the current Frame.
       CALL AST_SETI( IWCS1, 'BASE', ICURR1, STATUS )
-      CALL AST_SETI( IWCS2, 'BASE', ICURR2, STATUS )
+      CALL AST_SETI( IWCS2C, 'BASE', ICURR2, STATUS )
 
 *  Attempt to align the FrameSets. If successful, a new FrameSet is
 *  returned describing the relationship between the Current Frames in
-*  IWCS2 and IWCS1, and the Base Frames are changed to indicate
+*  IWCS2C and IWCS1, and the Base Frames are changed to indicate
 *  the Frames in which alignment occurred.
-      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS )
+      TEMP = AST_CONVERT( IWCS1, IWCS2C, DOMLST( : IAT ), STATUS )
 
 *  Issue a fatal error if alignment was not possible in any Domain.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
@@ -244,7 +256,7 @@
 
 *  Note indices of Frames in which alignment occurred.
       IMAT1 = AST_GETI( IWCS1, 'BASE', STATUS )
-      IMAT2 = AST_GETI( IWCS2, 'BASE', STATUS )
+      IMAT2 = AST_GETI( IWCS2C, 'BASE', STATUS )
 
 *  We now repeat the call to AST_CONVERT, but before we do so we make sure
 *  that the Current Frame in each FrameSet is the one in which alignment
@@ -253,10 +265,10 @@
 *  information. First set the Current Frames in the the two FrameSets to
 *  be the matching Frames.
       CALL AST_SETI( IWCS1, 'CURRENT', IMAT1, STATUS )
-      CALL AST_SETI( IWCS2, 'CURRENT', IMAT2, STATUS )
+      CALL AST_SETI( IWCS2C, 'CURRENT', IMAT2, STATUS )
 
 *  Now call AST_CONVERT again.
-      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS )
+      TEMP = AST_CONVERT( IWCS1, IWCS2C, DOMLST( : IAT ), STATUS )
 
 *  Issue a fatal error if alignment was not possible. This shouldn't happen.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
@@ -276,9 +288,9 @@
       END IF
 
 *  If succesful, tell the user what Domain alignment was performed in.
+      DOM = AST_GETC( AST_GETFRAME( IWCS2C, AST__BASE, STATUS ),
+     :                'Domain', STATUS )
       IF( .NOT. QUIET ) THEN
-         DOM = AST_GETC( AST_GETFRAME( IWCS2, AST__BASE, STATUS ),
-     :                   'Domain', STATUS )
 
          TEXT = ' '
          IAT = IND
@@ -307,9 +319,9 @@
                END IF
             END DO
 
-            DO I = 1, AST_GETI( IWCS2, 'NFRAME', STATUS )
+            DO I = 1, AST_GETI( IWCS2C, 'NFRAME', STATUS )
                IF( I .NE. IMAT2 .AND. .NOT. WARNED ) THEN
-                  IF( AST_GETC( AST_GETFRAME( IWCS2, I, STATUS ),
+                  IF( AST_GETC( AST_GETFRAME( IWCS2C, I, STATUS ),
      :                          'Domain', STATUS ) .EQ. DOM ) THEN
                      CALL MSG_OUT( 'KPG1_ASMRG_3', 'WARNING: More '//
      :                  'than one Frame with this Domain was found '//
@@ -329,18 +341,32 @@
 
 *  Merge the second FrameSet into the first FrameSet using the Mapping
 *  returned by AST_CONVERT to join the two matching Frames.
-      CALL AST_ADDFRAME( IWCS1, IMAT1, MAP, IWCS2, STATUS )
+      CALL AST_ADDFRAME( IWCS1, IMAT1, MAP, IWCS2C, STATUS )
 
-*  Re-instate the two Base Frames which were modified by AST_CONVERT.
+*  Re-instate the IWCS1 Base Frame that was modified by AST_CONVERT.
       CALL AST_SETI( IWCS1, 'BASE', IBASE1, STATUS )
-      CALL AST_SETI( IWCS2, 'BASE', IBASE2, STATUS )
-
-*  Re-instate the original Current Frame in IWCS2.
-      CALL AST_SETI( IWCS2, 'CURRENT', ICURR2, STATUS )
 
 *  Set the Current Frame in the merged FrameSet so that it corresponds to
 *  the originalCurrent Frame in IWCS2.
       CALL AST_SETI( IWCS1, 'CURRENT', ICURR2 + NFRM1, STATUS )
+
+*  If the Mapping that was used to add in the second FrameSet is a
+*  UnitMap, then the two Frames connected by the Mapping are both
+*  identical copies of the alignment Frame. We only want one, but we
+*  cannot delete one of them as calling code assumes that this routine
+*  increases the number of Frames in IWCS1 by the number of Frames in
+*  IWCS2. So instead change the domain of on of the two Frames by
+*  appending "_OLD" to the original domain. Modify the Frame inherited
+*  from IWCS1, since the ICS2 Frame may be the current Frame (which we
+*  do not want to change).
+      IF( AST_ISAUNITMAP( MAP, STATUS ) ) THEN
+         FRM = AST_GETFRAME( IWCS1, IMAT1, STATUS )
+         TEXT = ' '
+         IAT = IND
+         CALL CHR_APPND( DOM, TEXT, IAT )
+         CALL CHR_APPND( '_OLD', TEXT, IAT )
+         CALL AST_SETC( FRM, 'Domain', TEXT( : IAT ), STATUS )
+      END IF
 
  999  CONTINUE
 
