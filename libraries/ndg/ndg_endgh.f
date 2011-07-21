@@ -58,6 +58,9 @@
 *  History:
 *     16-OCT-2009 (DSB):
 *        Original version.
+*     21-JUL-2011 (DSB):
+*        New scheme for preventing a group from being written out more 
+*        than once to a NDF - see NDG1_HWRGH.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -119,10 +122,6 @@
 *  key is immediately removed form the KeyMap, what was key 2 will become
 *  key 1 on each pass.
          PATH = AST_MAPKEY( DHKMP_COM2, 1, STATUS )
-
-*  Remove the NDF form the keymap to avoid it recieving a second copy of
-*  group contents if this routine is ever called again.
-         CALL AST_MAPREMOVE( DHKMP_COM2, PATH, STATUS )
 
 *  Check no error has occurred.
          IF( STATUS .EQ. SAI__OK ) THEN

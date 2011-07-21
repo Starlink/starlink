@@ -55,6 +55,20 @@
 *     21-AUG-2010 (DSB):
 *        Now that entries are removed from the KeyMap, we need to access
 *        keymap entry number 1 every time.
+*     21-JUL-2011 (DSB):
+*        There was a problem with the scheme of removing each group from
+*        the KeyMap at the end of this routine - the group was only
+*        written out to the first output NDF created by an NDF, and
+*        sometimes the main NDF is not the first NDF to be created. So, I've
+*        reverted to the original scheme were the groups are not deleted
+*        by this routine, so they are still around to be written out to
+*        subsequent NDFs. But this allows the possibility of writing the
+*        same group out twice to the same NDF. To avoid this, the
+*        DHKMP_COM2 KeyMap (which holds the paths of the NDFs to which
+*        default history has been written) is now used to associate a
+*        list of parameter names with each NDF. This list contains the
+*        names of all the parameters which have already been written out
+*        to the NDF and should not be written out again.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,9 +104,9 @@
 *  Local Variables:
       CHARACTER ELEM*(GRP__SZNAM)
       CHARACTER LINES( MXLINE )*(NDF__SZHMX)
+      CHARACTER NDFNAM*255
       CHARACTER PARAM*(AST__SZCHR)
       INTEGER ELEN
-      INTEGER I
       INTEGER IAT
       INTEGER IEL
       INTEGER IGRP
@@ -100,24 +114,35 @@
       INTEGER IPAR
       INTEGER JAT
       INTEGER NC
+      INTEGER NDFLEN
       INTEGER NEL
       INTEGER NLEFT
       INTEGER NPAR
       INTEGER NREM
+      INTEGER PKM
+      LOGICAL JUNK
 *.
 
 *  Check inherited status
       IF( STATUS .NE. SAI__OK ) RETURN
 
-*  Loop round every entry in the GRP NDF history keymap.
+*  Get a pointer to a KeyMap holding the names of all the group parameters
+*  that have already been written out to the NDF's history component.
+      CALL NDF_MSG( 'T', INDF )
+      CALL MSG_LOAD( ' ', '^T', NDFNAM, NDFLEN, STATUS )
+      JUNK = AST_MAPGET0A( DHKMP_COM2, NDFNAM( : NDFLEN ), PKM, STATUS )
+
+*  Loop round every entry in the GRP NDF history keymap. Each entry has a
+*  key equal to an ADAM parameter name, and an integer value holding the
+*  identifier for a GRP group associated with the parameter.
       NPAR = AST_MAPSIZE( GHKMP_COM2, STATUS )
       DO IPAR = 1, NPAR
+         PARAM = AST_MAPKEY( GHKMP_COM2, IPAR, STATUS )
 
-*  Since the current KeyMap entry is removed at the end of this do loop,
-*  all later entries move down one slot, so we always access entry
-*  number 1.
-         PARAM = AST_MAPKEY( GHKMP_COM2, 1, STATUS )
-         IF( AST_MAPGET0I( GHKMP_COM2, PARAM, IGRP, STATUS ) ) THEN
+*  If the parameter has not already been written out to the NDF, get the
+*  GRP identifier for the associated group.
+         IF( .NOT. AST_MAPHASKEY( PKM, PARAM, STATUS ) .AND.
+     :       AST_MAPGET0I( GHKMP_COM2, PARAM, IGRP, STATUS ) ) THEN
 
 *  Initialise the first line to hold the parameter name.
             ILINE = 1
@@ -200,16 +225,18 @@
                END IF
             END DO
 
-*  Delete the group and remove the entry from the KeyMap so that it cannot
-*  be written out again.
-            CALL GRP_DELET( IGRP, STATUS )
-            CALL AST_MAPREMOVE( GHKMP_COM2, PARAM, STATUS )
-         END IF
-
 *  Append the array of lines describing the contents of the expanded group
 *  to the current history record.
-         CALL NDF_HPUT( ' ', '<APPEND>', .FALSE., ILINE, LINES, .FALSE.,
-     :                  .FALSE., .FALSE., INDF, STATUS )
+            CALL NDF_HPUT( ' ', '<APPEND>', .FALSE., ILINE, LINES,
+     :                     .FALSE., .FALSE., .FALSE., INDF, STATUS )
+
+*  Indicate that the parameter has now been written out to the NDF.
+            CALL AST_MAPPUT0I( PKM, PARAM, 1, ' ', STATUS )
+
+         END IF
       END DO
+
+*  Free resources.
+      CALL AST_ANNUL( PKM, STATUS )
 
       END

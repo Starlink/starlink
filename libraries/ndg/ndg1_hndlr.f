@@ -63,6 +63,14 @@
 *        Ensure a re-opened output NDF is not treated as an input NDF.
 *     15-OCT-2009 (DSB):
 *        Add handler for DEF_HISTORY event.
+*     21-JUL-2011 (DSB):
+*        The DHKMP_COM2 KeyMap is now used to associate a list of
+*        parameter names with each NDF (previously, an arbitrary integer
+*        value (0) was stored for each NDF). This list is held in a
+*        nested KeyMap, and is used later to hold the names of all
+*        parameters that have been written to the NDF's history component.
+*        This is needed to avoid writing the same parameter more than
+*        once to an NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,6 +98,9 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER PKM
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -129,9 +140,13 @@
       END IF
 
 *  If the event was the writing of default history, add the path to the NDF
-*  to the DHKMP_COM2 KeyMap.
+*  to the DHKMP_COM2 KeyMap. The associated value is an empty KeyMap that
+*  will be used later to record the parameter names written out to the NDF's
+*  history component.
       IF( EVNAME .EQ. 'DEF_HISTORY' ) THEN
-         CALL AST_MAPPUT0I( DHKMP_COM2, EVTEXT, 0, ' ', STATUS )
+         PKM = AST_KEYMAP( ' ', STATUS )
+         CALL AST_MAPPUT0A( DHKMP_COM2, EVTEXT, PKM, ' ', STATUS )
+         CALL AST_ANNUL( PKM, STATUS )
       END IF
 
       END
