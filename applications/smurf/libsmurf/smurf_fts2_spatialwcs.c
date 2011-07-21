@@ -45,6 +45,9 @@
 *        - Cleanup group resources
 *     18-JUL-2011 (COBA):
 *        - Changed wavenumber unit from 1/mm to 1/cm
+*     21-JUL-2011 (COBA):
+*        - Use smf_open_file instead of sm_open_and_flatfield
+*        - Shifted wavenumber grid by -wnFact
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -105,12 +108,22 @@ void smurf_fts2_spatialwcs(int* status)
 {
   if(*status != SAI__OK) { return; }
 
-  double refra                = 0.0;
-  double refdec               = 0.0;
-  double wnFact               = 0.0;
+  Grp* inputGrp               = NULL;
+  Grp* outputGrp              = NULL;
+
+  smfData* outputData         = NULL;
+
   size_t fIndex               = 0;
   size_t inSize               = 0;
   size_t outSize              = 0;
+
+  int indf;
+  int outndf;
+  int nout;
+  void *outdata[1] = { NULL };
+
+  double refra                = 0.0;
+  double refdec               = 0.0;
   sc2ast_subarray_t subnum    = 0;
   AstCmpFrame* currentfrm3d   = NULL;
   AstCmpMap* speccubemapping  = NULL;
@@ -121,51 +134,65 @@ void smurf_fts2_spatialwcs(int* status)
   AstSkyFrame* gridframe      = NULL;
   AstSpecFrame* specframe     = NULL;
   AstZoomMap* specmapping     = NULL;
-  Grp* igrp                   = NULL;
-  Grp* ogrp                   = NULL;
-  smfData* srcData            = NULL;
 
   // GET INPUT GROUP
-  kpg1Rgndf("IN", 0, 1, "", &igrp, &inSize, status);
+  kpg1Rgndf("IN", 0, 1, "", &inputGrp, &inSize, status);
 
   // GET OUTPUT GROUP
-  kpg1Wgndf( "OUT", ogrp, inSize, inSize,
+  kpg1Wgndf( "OUT", outputGrp, inSize, inSize,
              "Equal number of input and output files expected!",
-             &ogrp, &outSize, status);
+             &outputGrp, &outSize, status);
+
 
   ndfBegin();
 
   // CORRECT FOR IMAGE DISTORTION & FIELD ROTATION FOR EACH FILE
   for(fIndex = 1; fIndex <= inSize; fIndex++) {
-    smf_open_and_flatfield(igrp, ogrp, fIndex, NULL, NULL, &srcData, status);
+    // PROPAGATE SELECTED CONTENTS TO THE OUTPUT
+    if(outputGrp != NULL) {
+      ndgNdfas(inputGrp, fIndex, "READ", &indf, status);
+      ndgNdfpr(indf, "WCS,UNITS,DATA,TITLE,LABEL,NOEXTENSION(PROVENANCE)",
+                outputGrp, fIndex, &outndf, status);
+      ndfAnnul(&indf, status);
+      ndfStype("_DOUBLE", outndf, "DATA", status);
+      ndfMap(outndf, "DATA", "_DOUBLE", "WRITE", &(outdata[0]), &nout, status);
+      ndfHsmod("SKIP", outndf, status);
+      ndfAnnul(&outndf, status);
+    }
+
+    // OPEN OUTPUT FILE AND COMPENSATE FOR FTS2 OPTICS
+    smf_open_file(outputGrp, fIndex, "UPDATE", SMF__NOTTSERIES, &outputData, status);
     if(*status != SAI__OK) {
-      errRep(FUNC_NAME, "Unable to open source file!", status);
-      break;
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to open source file TEST!", status);
+      goto CLEANUP;
     }
 
     // GET WAVENUMBER FACTOR
-    smf_fits_getD(srcData->hdr, "WNFACT", &wnFact, status);
+    double wnFact = 0.0;
+    smf_fits_getD(outputData->hdr, "WNFACT", &wnFact, status);
     if(*status != SAI__OK) {
+      *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to find wave number factor!", status);
-      break;
+      goto CLEANUP;
     }
 
     astBegin;
 
     // Create a 2D WCS
-    smf_find_subarray(srcData->hdr, NULL, 0, &subnum, status);
+    smf_find_subarray(outputData->hdr, NULL, 0, &subnum, status);
     if(subnum == S8C || subnum == S8D || subnum == S4A || subnum == S4B) {
       fts2ast_createwcs( subnum,
-                         srcData->hdr->state,
-                         srcData->hdr->instap,
-                         srcData->hdr->telpos,
+                         outputData->hdr->state,
+                         outputData->hdr->instap,
+                         outputData->hdr->telpos,
                          &gridfset,
                          status);
     } else {
       sc2ast_createwcs( subnum,
-                        srcData->hdr->state,
-                        srcData->hdr->instap,
-                        srcData->hdr->telpos,
+                        outputData->hdr->state,
+                        outputData->hdr->instap,
+                        outputData->hdr->telpos,
                         &gridfset,
                         status);
     }
@@ -188,6 +215,10 @@ void smurf_fts2_spatialwcs(int* status)
 
     // CREATE ZOOMMAP FOR 1D SPECTRUM
     specmapping = astZoomMap(1, wnFact, "");
+    double zshift[1];
+    zshift[0] = -wnFact;
+    AstShiftMap* zshiftmap = astShiftMap(1, zshift, " ");
+    specmapping = (AstZoomMap *) astCmpMap(specmapping, zshiftmap, 1, " ");
 
     // COMBINE 2D GRID MAPPING AND 1D SPECTRUM MAPPING
     // TO CREATE 3D MAPPING FOR SPECTRUM CUBE
@@ -215,16 +246,18 @@ void smurf_fts2_spatialwcs(int* status)
     astAddFrame(speccubewcs, AST__BASE, speccubemapping, currentfrm3d);
 
     // WRITE WCS
-    ndfPtwcs(speccubewcs, srcData->file->ndfid, status);
+    ndfPtwcs(speccubewcs, outputData->file->ndfid, status);
 
     astEnd;
 
-    // FREE RESOURCES
-    smf_close_file(&srcData, status);
+    smf_close_file(&outputData, status);
   }
 
   CLEANUP:
+    if(outputData) { smf_close_file(&outputData, status); }
+
     ndfEnd(status);
-    grpDelet(&igrp, status);
-    grpDelet(&ogrp, status);
+
+    grpDelet(&inputGrp, status);
+    grpDelet(&outputGrp, status);
 }
