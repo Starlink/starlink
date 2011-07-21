@@ -76,6 +76,7 @@
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/one.h"
 
 /* SMURF INCLUDES */
 #include "smurflib.h"
@@ -92,6 +93,8 @@ void smurf_fts2_spectrum(int* status)
 {
   if(*status != SAI__OK) { return; }
 
+  const char*  dataLabel  = "Spectrum";
+
   Grp*      grpInput      = NULL; // Input group
   Grp*      grpOutput     = NULL; // Output group
   smfData*  inputData     = NULL; // Pointer to input data
@@ -106,7 +109,6 @@ void smurf_fts2_spectrum(int* status)
   int       i             = 0;    // Row index
   int       j             = 0;    // Column index
   int       k             = 0;    // Frame index
-  int       n             = 0;    // Helper index
   int       m             = 0;    // Helper index
   int       index         = 0;    // Helper index
   int       bolIndex      = 0;    // Bolometer index
@@ -176,6 +178,14 @@ void smurf_fts2_spectrum(int* status)
 
     // OUTPUT SMFDATA
     smfData* outputData = smf_deepcopy_smfData(inputData, 0, SMF__NOCREATE_DATA, 0, 0, status);
+
+    // SET DATA LABEL
+    if (dataLabel) {
+      one_strlcpy(  outputData->hdr->dlabel,
+                    dataLabel,
+                    sizeof(outputData->hdr->dlabel),
+                    status );
+    }
 
     // DATA ARRAY
     outputData->dtype   = SMF__DOUBLE;
