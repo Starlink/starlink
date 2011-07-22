@@ -1284,7 +1284,9 @@ typedef struct AstObject {
    char *ident;                  /* Pointer to Ident string */
    char usedefs;                 /* Use default attribute values? */
    int iref;                     /* Object index (unique within class) */
-
+   void *proxy;                  /* A pointer to an external object that
+                                    acts as a foreign language proxy for the
+                                    AST object */
 #if defined(THREAD_SAFE)
    int locker;                   /* Thread that has locked this Object */
    pthread_mutex_t mutex1;       /* Guards access to all elements of the
@@ -1346,6 +1348,9 @@ typedef struct AstObjectVtab {
    void (* SetIdent)( AstObject *, const char *, int * );
    void (* Show)( AstObject *, int * );
    void (* VSet)( AstObject *, const char *, char **, va_list, int * );
+
+   void *(* GetProxy)( AstObject *, int * );
+   void (* SetProxy)( AstObject *, void *, int * );
 
    int (* GetObjSize)( AstObject *, int * );
 
@@ -1489,6 +1494,8 @@ void astSetI_( AstObject *, const char *, int, int * );
 void astSetL_( AstObject *, const char *, long, int * );
 void astShow_( AstObject *, int * );
 void astUnlockId_( AstObject *, int, int * );
+void *astGetProxy_( AstObject *, int * );
+void astSetProxy_( AstObject *, void *, int * );
 
 #if defined(astCLASS)            /* Protected */
 
@@ -1645,6 +1652,11 @@ astINVOKE(V,astTest_(astCheckObject(this),attrib,STATUS_PTR))
 astINVOKE(V,astSame_(astCheckObject(this),astCheckObject(that),STATUS_PTR))
 #define astHasAttribute(this,attrib) \
 astINVOKE(V,astHasAttribute_(astCheckObject(this),attrib,STATUS_PTR))
+#define astGetProxy(this) \
+astINVOKE(V,astGetProxy_(astCheckObject(this),STATUS_PTR))
+#define astSetProxy(this,proxy) \
+astINVOKE(V,astSetProxy_(astCheckObject(this),proxy,STATUS_PTR))
+
 
 #if defined(astCLASS)            /* Protected */
 

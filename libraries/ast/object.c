@@ -206,6 +206,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Added component "iref" to the Object structure. This is an
 *        integer identifier for each object that is unique within the
 *        class of the object. Useful for debugging.
+*     22-JUL-2011 (DSB):
+*        Add methods astSetProxy and astGetProxy.
 *class--
 */
 
@@ -1338,6 +1340,7 @@ f     function is invoked with STATUS set to an error value, or if it
       new->dynamic = 1;
       new->ref_count = 1;
       new->id = NULL;   /* ID attribute is not copied (but Ident is copied) */
+      new->proxy = NULL;
 
 /* Copy the persistent identifier string. */
       if( this->ident ) {
@@ -2179,6 +2182,50 @@ static int GetObjSize( AstObject *this, int *status ) {
 
 /* Return the object size. */
    return this->size;
+}
+
+void *astGetProxy_( AstObject *this, int *status ) {
+/*
+*+
+*  Name:
+*     astGetProxy
+
+*  Purpose:
+*     Get a pointer to the foreign language proxy used to represent a
+*     given AST Object.
+
+*  Type:
+*     Undocumented public function.
+
+*  Synopsis:
+*     #include "object.h"
+*     void *astGetProxy( AstObject *this )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function returns any pointer stored previously in the AST
+*     Object using astSetProxy. If no such pointer has been stored, a
+*     NULL pointer is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+
+*  Returned Value:
+*     Pointer to the proxy object, or NULL.
+
+*  Notes:
+*     - This function is public, but is currently undocumented since it
+*     is only of interest to people writing AST interfaces for other
+*     languages.
+*     - This function attempts to execute even if the AST error status
+*     is set on entry, although no further error report will be made
+*     if it subsequently fails under these circumstances.
+*-
+*/
+   return this ? this->proxy : NULL;
 }
 
 int astGetRefCount_( AstObject *this, int *status ) {
@@ -3242,6 +3289,58 @@ void astSetDump_( AstObjectVtab *vtab,
 /* Mark the end of the section in which memory allocations may never be
    freed (other than by any AST exit handler). */
    astEndPM;
+}
+
+void astSetProxy_( AstObject *this, void *proxy, int *status ) {
+/*
+*+
+*  Name:
+*     astSetProxy
+
+*  Purpose:
+*     Store a pointer to the foreign language proxy used to represent a
+*     given AST Object.
+
+*  Type:
+*     Undocumented public function.
+
+*  Synopsis:
+*     #include "object.h"
+*     void astSetProxy( AstObject *this, void *proxy )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function stores the supplied pointer in the AST Object so that
+*     it can be retrieved later using astGetProxy.
+*
+*     The supplied pointer should point to a structure that is used
+*     to represent the AST Object within some external system. It is
+*     expected that the external system will check each object reference
+*     returned by AST to see if it has an associated proxy object. If not
+*     (i.e. if astGetProxy returns NULL), a new external object will be
+*     created to represent the AST Object, and a pointer to it will be
+*     stored in the AST Object using astSetProxy. If the AST Object
+*     already has a proxy, the AST reference is annulled and the existing
+*     proxy object is used by the external system.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+*     proxy
+*        Pointer to the proxy object, or NULL.
+
+*  Notes:
+*     - The suppied pointer is not used within AST itself, other than to
+*     be returned by the astGetProxy method.
+*     - This function is public, but is currently undocumented since it
+*     is only of interest to people writing AST interfaces for other
+*     languages.
+*-
+*/
+   if( !astOK ) return;
+   this->proxy = proxy;
 }
 
 void astSetVtab_( AstObject *this, AstObjectVtab *vtab, int *status ) {
@@ -4934,6 +5033,10 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
    Use the count as a unique identifier (unique within the class) for
    the Object. */
          new->iref = vtab->nobject++;
+
+/* Initialise the pointer to an external object that acts as a proxy for
+   the AST Object within foreign language interfaces. */
+         new->proxy = NULL;
       }
 
 /* If an error occurred, clean up by deleting the new Object. Otherwise
@@ -5089,6 +5192,10 @@ AstObject *astLoadObject_( void *mem, size_t size,
    input. */
       (void) astReadInt( channel, "refcnt", 0 );
       (void) astReadInt( channel, "nobj", 0 );
+
+/* Initialise the pointer to an external object that acts as a proxy for
+   the AST Object within foreign language interfaces. */
+      new->proxy = NULL;
 
 /* If an error occurred, clean up by deleting the new Object. */
       if ( !astOK ) new = astDelete( new );
