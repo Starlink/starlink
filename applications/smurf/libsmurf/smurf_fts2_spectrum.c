@@ -163,7 +163,7 @@ void smurf_fts2_spectrum(int* status)
       }
     }
 
-    int N2 = srcN - zMin - 1;   // FFT READY INTERFEROGRAM HALF-LENGTH
+    int N2 = srcN - zMin + 1;   // FFT READY INTERFEROGRAM HALF-LENGTH
     int N  = N2 << 1;           // FFT READY INTERFEROGRAM LENGTH
 
     outN = N2 + 1;
