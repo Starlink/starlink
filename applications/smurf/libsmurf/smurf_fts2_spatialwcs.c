@@ -151,20 +151,23 @@ void smurf_fts2_spatialwcs(int* status)
     // PROPAGATE SELECTED CONTENTS TO THE OUTPUT
     if(outputGrp != NULL) {
       ndgNdfas(inputGrp, fIndex, "READ", &indf, status);
-      ndgNdfpr(indf, "WCS,UNITS,DATA,TITLE,LABEL,NOEXTENSION(PROVENANCE)",
-                outputGrp, fIndex, &outndf, status);
+      ndgNdfpr(indf, "TITLE,LABEL,UNITS,DATA,WCS", outputGrp, fIndex, &outndf, status);
       ndfAnnul(&indf, status);
       ndfStype("_DOUBLE", outndf, "DATA", status);
       ndfMap(outndf, "DATA", "_DOUBLE", "WRITE", &(outdata[0]), &nout, status);
       ndfHsmod("SKIP", outndf, status);
       ndfAnnul(&outndf, status);
+    } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "An output group is required!", status);
+      goto CLEANUP;
     }
 
     // OPEN OUTPUT FILE AND COMPENSATE FOR FTS2 OPTICS
     smf_open_file(outputGrp, fIndex, "UPDATE", SMF__NOTTSERIES, &outputData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to open source file TEST!", status);
+      errRep(FUNC_NAME, "Unable to open source file!", status);
       goto CLEANUP;
     }
 
