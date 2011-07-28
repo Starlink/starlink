@@ -32,15 +32,18 @@
 
 #  History:
 #     10-JAN-2005 (DSB):
-#        Added second argument (mode) to the mkdir invocation which creates 
+#        Added second argument (mode) to the mkdir invocation which creates
 #        the temporary directory.
 #     2-MAR-2006 (DSB):
 #        Check for "config.h" as well as <config.h>
 #     6-JAN-2010 (DSB):
-#        Add work-around for GCC 4.4.2 problem - the pre-processor seesm to simply 
+#        Add work-around for GCC 4.4.2 problem - the pre-processor seesm to simply
 #        throw away backslshes that escape newlines in the input header file. Reported
 #        by Bryan Irby at GSFC.
-
+#     27-JUL-2011 (DSB):
+#        Include the process ID in the name of the temporary directory and
+#        file, so that simultaneous invocations of this script do not trample
+#        all over each other.
 #-
 
 ( $#ARGV >= 0 ) || Usage();
@@ -64,7 +67,7 @@ while ( $ARGV[0] =~ /^-/ ) {
 }
 
 #  Create a scratch directory.
-$tmpdir='/tmp/makeh.tmp';
+$tmpdir="/tmp/makeh-$$.tmp";
 unless ( -d $tmpdir && -w $tmpdir ) {
     if ( -e $tmpdir ) {
         die "Temp $tmpdir exists, but is unwritable or is not a directory\n";
@@ -79,9 +82,9 @@ foreach $file ( @ARGV ) {
 }
 
 
-#  Open a pipe to a scipt (in the current directory) which runs the C
+#  Open a pipe to a script (in the current directory) which runs the C
 # preprocessor and direct its output to a scratch file.
-open( CC, '| ./ast_cpp >/tmp/ast.h' ) ||
+open( CC, "| ./ast_cpp >/tmp/ast-$$.h" ) ||
                                 die "Can't open pipe to C preprocessor (cpp)";
 
 if ( $need_config_h ) {
@@ -148,12 +151,12 @@ print(
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -190,7 +193,7 @@ print( ' (makeh):
 
 #  Open the scratch file created above and read it.
 $space = 0;
-open( TEMP, '</tmp/ast.h' );
+open( TEMP, "</tmp/ast-$$.h" );
 while( <TEMP> ) {
 
 #  Remove the underscores from the protected lines and macros.
@@ -228,7 +231,7 @@ print(
 
 #  Close and remove the scratch file.
 close( TEMP );
-unlink '/tmp/ast.h';
+unlink "/tmp/ast-$$.h";
 
 
 sub protect_copy_file {
@@ -278,19 +281,19 @@ line: while ( <INCLUDE> ) {
       s/__LINE__/___LINE__/g;
       s/__FILE__/___FILE__/g;
 
-#  Some pre-processors (e.g. GCC 4.4.2) seem to simply throw away trailing 
-#  backslashes used to concatenate consecutive lines, producing two 
-#  independent lines in the output rather than one. This completely fouls 
-#  up the resulting header file. To avoid this, we concatenate such lines 
+#  Some pre-processors (e.g. GCC 4.4.2) seem to simply throw away trailing
+#  backslashes used to concatenate consecutive lines, producing two
+#  independent lines in the output rather than one. This completely fouls
+#  up the resulting header file. To avoid this, we concatenate such lines
 #  explicitly, before writing them out to the temporary output file.
 #  If the current line ends with an escaped newline, remove the escape
-#  character and newline, and concatenate it with any previously deferred 
-#  lines. 
+#  character and newline, and concatenate it with any previously deferred
+#  lines.
       if( /^(.*)\\\s*$/ ) {
          $total .= $1;
 
-#  If the current line does not end with an escaped newline, concatenate it 
-#  with any previously deferred lines, and write the total string out. Then 
+#  If the current line does not end with an escaped newline, concatenate it
+#  with any previously deferred lines, and write the total string out. Then
 #  reset the total string to indicate we have no deferred text.
       } else {
          $total .= $_;
