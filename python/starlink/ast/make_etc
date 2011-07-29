@@ -1,0 +1,181 @@
+#!/bin/tcsh
+#+
+#  Name:
+#    make_etc
+
+#  Purpose:
+#    Genarates additional files needed to build the Pythion Ast module.
+
+#  Description:
+#    This script should be run prior to compiling the C source code
+#    within the Ast module. It generates the following files needed
+#    to build the Ast module:
+#
+#       exceptions.c: Converts AST error reports into Python exceptions.
+
+#  Notes:
+#    - The environment variable AST_SOURCE should be set to point to the
+#    folder containing the source distribution for the AST library
+
+#  History:
+#     26-JUL-2011 (DSB):
+#        Original version.
+
+#-
+
+
+# Get the path to the directory holding the AST source code
+if( $?AST_SOURCE == 1 ) then
+   set src = "$AST_SOURCE"
+else
+   set src = "$MYGIT/libraries/ast"
+endif
+
+
+
+#  Create the exceptions.c file.
+cat << FOO >! exceptions.c
+/*
+*  Name:
+*     exceptions.c
+
+*  Purpose:
+*     Raise a Python exception when AST reports an error.
+
+*  Description:
+*     For each AST error code defined in ast_err.msg, this file creates
+*     a singleton instance of a corresponding Python Exception class. It
+*     also provides an implementation of the astPutErr function that AST
+*     uses to report errors. This implementation raises the corresponding
+*     Python exception whenever AST reports an error.
+
+*  Notes:
+*     - This file is generated automatically my the "make_etc" script, and
+*     should not be edited.
+
+*/
+
+/* Prototypes for functions defined in this file. */
+static int RegisterErrors( PyObject *m );
+
+/* Declare a static variable to hold an instance of a base AST Exception
+   from which all the others are derived. */
+static PyObject *AstError_err;
+
+/* For each AST error code, declare a static variable to hold an instance
+   of the corresponding Python Exception. */
+FOO
+
+set errors = `grep "^[A-Z]" $src/ast_err.msg | awk '{print $1}'`
+foreach name ($errors)
+   echo "static PyObject *${name}_err;" >> exceptions.c
+end
+
+cat << FOO >> exceptions.c
+
+/* Defines a function that creates a Python Exception object
+   for each AST error code, and uses them to initialises the
+   above static variables. It reurns 1 if successful, and zero
+   if an error occurs. */
+
+static int RegisterErrors( PyObject *m ){
+
+   PyObject *dict = PyModule_GetDict(m);
+
+/* First create an instance of a base AST exception class from which
+   the other derive. */
+   if( !( AstError_err = PyErr_NewException("Ast.AstError", NULL, NULL))) return 0;
+   PyDict_SetItemString( dict, "AstError", AstError_err );
+
+/* Now create an instance of each derived AST exception class. */
+FOO
+
+foreach name ($errors)
+   echo '   if( !('${name}'_err = PyErr_NewException("Ast.'${name}'", AstError_err, NULL))) return 0;' >> exceptions.c
+   echo '   PyDict_SetItemString( dict, "'${name}'", '${name}'_err );' >> exceptions.c
+   echo ' ' >> exceptions.c
+end
+
+cat << FOO >> exceptions.c
+   return 1;
+}
+
+
+/* The AST library calls this function to deliver an error message
+   in the form of a Python Exception. For each AST error code, raise
+   the corresponding Python Exception. */
+void astPutErr_( int status_value, const char *message ) {
+
+/* Local Variables: */
+   PyObject *ptype;
+   PyObject *pvalue;
+   PyObject *ptraceback;
+   char *text;
+   int lstat;
+   int nc;
+
+/* Clear the AST status value so that AST memory functions will function
+   properly. */
+   lstat = astStatus;
+   astClearStatus;
+
+/* If an AST exception has already occurred, append the new message to it. */
+   PyObject *ex = PyErr_Occurred();
+   if( ex ){
+      if( PyErr_GivenExceptionMatches( ex, AstError_err ) ) {
+
+/* Get the existing Exception text */
+         PyErr_Fetch( &ptype, &pvalue, &ptraceback );
+         text = GetString( pvalue );
+         nc = astChrLen( text );
+
+/* Ignore messages that give the C source file and line number since they are
+   not useful for Python users. */
+         if( strstr( text, "Ast.c" ) ) {
+            text = astFree( text );
+            nc = 0;
+         } else {
+            text = astAppendString( text, &nc, "\n" );
+         }
+
+/* Append the new message and store the extended text with the Exception. */
+         text = astAppendString( text, &nc, message );
+         Py_DECREF( pvalue );
+         pvalue = PyUnicode_FromString( text );
+         PyErr_Restore( ptype, pvalue, ptraceback);
+
+         text = astFree( text );
+      }
+
+/* If an AST or non-AST exception has already occurred, return without action. */
+      return;
+   }
+
+/* If no exception has already occurred, raise an appropriate AST exception now. */
+FOO
+
+set first = 1
+foreach name ($errors)
+   if( $first == 1 ) then
+      echo '   if( status_value == AST__'${name}' ) {' >> exceptions.c
+      set first = 0
+   else
+      echo '   } else if( status_value == AST__'${name}' ) {' >> exceptions.c
+   endif
+
+   echo '      PyErr_SetString( '${name}'_err, message );' >> exceptions.c
+end
+
+cat << FOO >> exceptions.c
+   } else {
+      PyErr_SetString( AstError_err, message );
+   }
+
+/* restore the original AST status value. */
+   astSetStatus( lstat );
+}
+
+FOO
+
+
+

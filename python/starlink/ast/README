@@ -1,0 +1,153 @@
+starlink.Ast is a Python extension that provides an interface to Starlink
+AST library. To install first run the make_etc script to build some
+required files. Then ensure the environment variable STARLINK_DIR is
+defined and do:
+
+python3 setup.py install
+
+or
+
+python3 setup.py install --prefix=<your specific installation directory>
+
+To test it, do
+
+python3 starlink/ast/test/test.py
+
+
+General Notes:
+--------------
+
+- Each AST object class has a corresponding Python class (e.g. the AST
+ZoomMap class corresponds to Python type starlink.Ast.ZoomMap)
+
+- Each constant defined in ast.h has a corresponding Python constant. For
+instance, the AST__TUNULL constant is available as starlink.Ast.TUNULL.
+
+- A reference to the Python object "None" is used whenever an AST method
+would returned a NULL object pointer.
+
+- Unless otherwise stated, the argument lists for all AST functions and
+methods are as listed in SUN/211 (special cases are listed below under
+"Special Cases"). A general rule is that the value returned by an Ast
+Python interface function will in general be a tuple. If the C AST
+function returns a non-void function value, it will be the first element
+in the tuple. Any other values returned by the C function via supplied C
+pointers will be returned as subsequent elements of the tuple, in the
+order in which the C pointers appear in the argument list of the C
+function. If the C function does not return any values via C pointers,
+then the returned Python value will be a single object reference rather
+than a tuple. If additionally, the C function returns void, then the
+returned Python value will be a reference to the "None" object.
+
+As an example, the C astDecompose function has the following interface:
+
+void astDecompose( AstMapping *this, AstMapping **map1, AstMapping **map2,
+                   int *series, int *invert1, int *invert2  )
+
+
+and the corresponding starlink.Ast.decompose method is invoked as:
+
+map1,map2,series,invert1,invert2 = this.decompose()
+
+The astDecompose function returns void - if it had returned a non-void
+value this value would have been the first element in the returned tuple.
+
+- Until some documentation is written, consult the module test script
+(starlink/ast/test/test.py) for examples of how to call specific methods.
+
+- Each Python method name is the lower case equivalent of the corresponding
+AST method name.
+
+- The standard "options" argument taken by all AST object constructors is
+optional in the Python interface.
+
+- Each AST Object "attribute" (as listed in SUN/211) has a corresponding
+Python property with exactly the same name. So for instance, either of
+the following can be used to set the "Zoom" attribute (the zoom factor)
+in a ZoomMap refered to by "zm":
+
+   >>> zm.set("Zoom=1.2")
+   >>> zm.Zoom = 1.2
+
+- Ast attributes can be retrieved using the AST "Get" method or the
+corresponding Python property:
+
+>>> print( zm.get("Zoom") )
+>>> print( zm.Zoom )
+
+The "Get" method is equivalent to astGetC (see SUN/211) in that it always
+returns the string representation of the AST attribute value. Each Python
+property return the attribute value using the native data type of the
+AST attribute (integer, boolean, floating point or string).
+
+- Testing and clearing AST attributes can only be done using the "test"
+and "clear" methods (astsee SUN/211):
+
+>>> zm.clear("Zoom")
+>>> zm.test("Zoom")
+
+- If an AST function fails, it will raise a Python Exception. Each AST
+error code listed in the AST header file "ast.h" has a corresponding
+subclass of Exception (e.g. the Exception subclass starlink.Ast.ZOOMI is
+raised if an AST function returns an error code of AST__ZOOMI). All of
+these Exception subclasses inherit from the single Exception type
+starlink.Ast.AstError, which itself inherits from Exception.
+
+- The following AST methods are not implemented in the Python interface
+as they are superceded by infrastructure provided by the Python language
+itself: astAnnul, astBegin, astClone, astDelete, astEnd, astExempt, astExport,
+astImport, astGet<X> (except astGetC, see above), astSet<X>.
+
+- A deep copy of an AST Object can be made either using the Python "copy"
+module (e.g. "newobj = copy.deepcopy(obj)"), or using the standard AST
+"copy" method (e.g. "newobj = obj.copy()").
+
+
+
+Special Cases:
+--------------
+
+- The Python interface does not currently include astTran1 or astTran2.
+The interface for astTranN is
+
+  result = mapping.trann( in, forward, out )
+
+where "forward" is a boolean, and "in" is a 1- or 2-dimensional numpy
+array of floating point values, or any sequence (lists, tuples, etc.)
+that can be converted to a numpy array. A 1-dimensional array is only
+allowed if the mapping has exactly one input, in which case the length of
+the array gives the number of positions to be transformed. If a
+2-dimensional array is supplied, its shape should be (Nin,npoint), where
+Nin is the number of inputs for the Mapping, and npoint is the number of
+positions to transform. The "out" argument is optional. If supplied, it
+should be an existing 1- or 2-dimensional numpy array with a shape of
+(npoint) (if 1-dimensional) or (Nout,npoint) (if 2-dimensional), where
+Nout is the number of outputs from the Mapping and npoint is the number
+of positions being transformed. A 1-dimensional array may be supplied
+only if Nout is 1. If supplied, the transformed values are stored in the
+supplied array. If not supplied, a new array with suitable shape is
+created to store the transformed positions. IN either case, the value
+returned by the method is a new reference to the array storing the
+transformed values.
+
+
+- The Python interface for astTranGrid is
+
+  pout = mapping.trangrid( lbnd, ubnd, tol, maxpix, forward )
+
+where "lbnd" and "ubnd" are 1-dimensional numpy arrays of integers, or
+any sequence (lists, tuples, etc.) that can be converted to a numpy
+array. The length of these arrays must equal the number of inputs for the
+Mapping. The returned value (pout) is a 2-dimensional numpy array holding
+the mapping output values at the grid points.
+
+- Methods for which AST provides variants for different data types (e.g.
+astRebin, astRebinSeq, astResample, etc) are unified into one method in
+the Python interface. The names of such function are the same as the AST
+names, but without any final letter indicating the data type (e.g.
+astRebinD, astRebinF and astRebinI are replaced by
+starlink.Ast.Mapping.rebin). The data type to use is determined from the
+supplied array containing the input data.
+
+
+
