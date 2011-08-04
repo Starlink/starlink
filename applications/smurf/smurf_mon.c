@@ -147,11 +147,13 @@
 *        Use astCheckMemory rather than astFlushMemory since we do not want
 *        to free the memory used to hold the singleton workforce returned by
 *        smf_get_workforce.
-*     2011-11-18 (COBA):
+*     2011-07-18 (COBA):
 *         Remove FTS2EQSLICED
 *         Remove FTS2SPECRE
 *         Add FTS2SPECTRUM
 *         Update FTS2PHASECORR
+*     2011-08-04 (COBA):
+*         Replaced FTS2PHASECORR with FTS2PHASECORRDS and FTS2PHASECORRSS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -302,8 +304,10 @@ void smurf_mon( int * status ) {
     smurf_fts2_init( status );
   } else if (strcmp( taskname, "FTS2OPCORR" ) == 0 ) {
     smurf_fts2_spatialwcs( status );
-  } else if (strcmp( taskname, "FTS2PHASECORR" ) == 0 ) {
-    smurf_fts2_phasecorr( status );
+  } else if (strcmp( taskname, "FTS2PHASECORRDS" ) == 0 ) {
+    smurf_fts2_phasecorrds( status );
+  } else if (strcmp( taskname, "FTS2PHASECORRSS" ) == 0 ) {
+    smurf_fts2_phasecorrss( status );
   } else if (strcmp( taskname, "FTS2PORTIMBAL" ) == 0 ) {
     smurf_fts2_portimbal( status );
   } else if (strcmp( taskname, "FTS2REMOVEBSE" ) == 0 ) {

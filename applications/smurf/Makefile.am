@@ -39,7 +39,8 @@ fts2flatfield \
 fts2freqcorr \
 fts2init \
 fts2opcorr \
-fts2phasecorr \
+fts2phasecorrds \
+fts2phasecorrss \
 fts2portimbal \
 fts2removebse \
 fts2spectrum \

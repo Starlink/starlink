@@ -1,10 +1,11 @@
 /*
 *+
 *  Name:
-*     FTS2PHASECORR
+*     FTS2PHASECORRSS
 
 *  Purpose:
-*     Applies phase correction to the source interferograms.
+*     Given a 3D data cube of single-sided interferograms, applies phase
+*     correction and outputs the corresponding 3D interferogram cube.
 
 *  Language:
 *     Starlink ANSI C
@@ -20,7 +21,14 @@
 *        Pointer to global status.
 
 *  Description:
-*     Applies phase correction to the source interferograms.
+*     Given a 3D data cube of single-sided interferograms, applies phase
+*     correction and outputs the corresponding 3D interferogram cube.
+*     Although double-sided 3D interferogram cubes can be ingested, it is
+*     recommended that the FTS2PHASECORRDS task is utilized to process them.
+*     IMPORTANT NOTE: Unlike FTS2PHASECORRDS which outputs the 3D spectrum cube,
+*     FTS2PHASECORRSS does NOT output the spectrum cube, instead, it phase
+*     corrects the interferograms but does NOT compute the spectrum.
+*     Hence outputs a 3D phase-corrected interferogram cube.
 
 *  ADAM Parameters:
 *     DEGREE = _INTEGER (Read)
@@ -95,10 +103,10 @@
 /* FFTW INCLUDES */
 #include <fftw3.h>
 
-#define FUNC_NAME "smurf_fts2_phasecorr"
-#define TASK_NAME "FTS2PHASECORR"
+#define FUNC_NAME "smurf_fts2_phasecorrss"
+#define TASK_NAME "FTS2PHASECORRSS"
 
-void smurf_fts2_phasecorr(int* status)
+void smurf_fts2_phasecorrss(int* status)
 {
   if(*status != SAI__OK) { return; }
 
@@ -166,6 +174,8 @@ void smurf_fts2_phasecorr(int* status)
   parGet0d("WNLBOUND",      &wnLower,    status);
   parGet0d("WNUBOUND",      &wnUpper,    status);
 
+  int debug = 1;
+
   // SET ARRAY LENGTHS
   coeffLength = pDegree + 1;
   pcfLength2  = (pcfLength2 > dsLength2) ? dsLength2 : pcfLength2;
@@ -201,6 +211,9 @@ void smurf_fts2_phasecorr(int* status)
     srcH   = inputData->dims[1];
     srcN   = inputData->dims[2];
     numBol = srcW * srcH;  // NUMBER OF BOLOMETERS IN THE SUBARRAY
+
+    int xc = srcW >> 1;
+    int yc = srcH >> 1;
 
     outN = srcN - pcfLength + 1;
 
@@ -302,6 +315,7 @@ void smurf_fts2_phasecorr(int* status)
         fts2_arraycopy(IFG, srcN, DS, dsLength, zpdIndex - dsLength2,
                         dsLength2 + 1, dsLength2 - 1);
 
+        // TO COMPLEX FOR FFT, FOR NOW C2C FFT
         for(k = 0; k < dsLength; k++) {
           DSIN[k][0] = DS[k];
           DSIN[k][1] = 0.0;
@@ -316,83 +330,71 @@ void smurf_fts2_phasecorr(int* status)
         //
 
         // COMPUTE PHASE
-	      for(k = 0; k < dsLength; k++) {
-	        PHASE[k] = atan2(DSOUT[k][1], DSOUT[k][0]);
+	      for(k = 0; k < dsLength; k++) { PHASE[k] = atan2(DSOUT[k][1], DSOUT[k][0]); }
+        // PRINT
+        // ---------------------------------------------------------------------
+        if(debug > 0 && i == yc && j == xc) {
+          FILE* file = NULL;
+	        file = fopen("/home/oba/jach/TEST/PHASE.txt", "w");
+	        for(k = 0; k < dsLength; k++) { fprintf(file, "%e\n", PHASE[k]); }
+	        fclose(file);
 	      }
+	      // ---------------------------------------------------------------------
 
-        // COMPUTE WAVENUMBERS [0, FNYQ]
-        for(k = 0; k <= dsLength2; k++) {
-          WN[k] = k * df;
-        }
+        // WAVENUMBERS [0, FNYQ]
+        for(k = 0; k <= dsLength2; k++) { WN[k] = k * df; }
 
-        // COMPUTE WEIGHTS [0, FNYQ]
+        // WEIGHTS [0, FNYQ]
 	      double maxWeight = NUM__MIND;
         for(k = 0; k <= dsLength2; k++) {
-          if(k < wnL || k > wnU) {
-            WEIGHTS[k] = 0.0;
-          } else {
+          if(k < wnL || k > wnU) { WEIGHTS[k] = 0.0; }
+          else {
             WEIGHTS[k] = DSOUT[k][0] * DSOUT[k][0] + DSOUT[k][1] * DSOUT[k][1];
             WEIGHTS[k] = sqrt(WEIGHTS[k]);
-            if(WEIGHTS[k] > maxWeight) {
-              maxWeight = WEIGHTS[k];
-            }
+            if(WEIGHTS[k] > maxWeight) { maxWeight = WEIGHTS[k]; }
           }
         }
-
         // NORMALIZE WEIGHTS
 	      if(maxWeight <= 0) { maxWeight = 1; }
-	      for(k = 0; k <= dsLength2; k++) {
-	        WEIGHTS[k] /= maxWeight;
-	      }
+	      for(k = 0; k <= dsLength2; k++) { WEIGHTS[k] /= maxWeight; }
 	      WEIGHTS[0] = WEIGHTS[dsLength2] = 0.0;
 
-        // COMPUTE PHASE [0, FNYQ]
-	      for(k = 0; k <= dsLength2; k++) {
-	        TMPPHASE[k] = PHASE[k];
-	      }
+        // PHASE [0, FNYQ]
+	      for(k = 0; k <= dsLength2; k++) { TMPPHASE[k] = PHASE[k]; }
 
-	      // COMPUTE PHASE FIT
+	      // PHASE FIT
         smf_fit_poly1d(pDegree, dsLength2 + 1, CLIP, WN, TMPPHASE, WEIGHTS,
                        NULL, COEFFS, NULL, FIT, &nUsed, status);
 
-        // STANDARD DEVIATION
-        // MORE.FTS2.SIGMA
+        // STANDARD DEVIATION, MORE.FTS2.SIGMA
         double sum   = 0.0;
         double error = 0.0;
-        for(k = 0; k <= dsLength; k++) {
+        for(k = 0; k <= dsLength2; k++) {
           error += WEIGHTS[k] * (PHASE[k] - FIT[k]) * (PHASE[k] - FIT[k]);
           sum   += WEIGHTS[k];
         }
         *((double*)(sigma->pntr[0]) + bolIndex) = sqrt(error / sum);
 
-        // POLYNOMIAL COEFFICIENTS
-        // MORE.FTS2.FPM
+        // POLYNOMIAL COEFFICIENTS, MORE.FTS2.FPM
         for(k = 0; k < coeffLength; k++) {
           index = bolIndex + numBol * k;
           *((double*) (fpm->pntr[0]) + index) = COEFFS[k];
         }
 
-        // NEW ZPD INDICES
-        // MORE.FTS2.ZPD
+        // NEW ZPD INDICES, MORE.FTS2.ZPD
         *((int*) (zpd->pntr[0]) + bolIndex) = zpdIndex - pcfLength2 + 1;
 
         // POLYNOMIAL FITTED PHASE
-        for(k = 0; k < dsLength2; k++) {
-          //PHASE[k] = FIT[k];
-	        EVALPOLY(PHASE[k], WN[k], pDegree, COEFFS);
-        }
-
+        for(k = 0; k < dsLength2; k++) { EVALPOLY(PHASE[k], WN[k], pDegree, COEFFS); }
         // PHASE(-k) = -PHASE(k)
-        for(k = 1; k < dsLength2; k++) {
-          PHASE[dsLength2 + k] = -PHASE[dsLength2 - k];
-        }
+        for(k = 1; k < dsLength2; k++) { PHASE[dsLength2 + k] = -PHASE[dsLength2 - k]; }
         PHASE[0] = PHASE[dsLength2] = 0.0;
 
         //
 	      // PHASE CORRECTION FUNCTION, PCF
 	      //
 
-	      // COMPUTE EXP(-iPHASE)
+	      // EXP(-iPHASE)
 	      for(k = 0; k < dsLength; k++) {
 	        PCFIN[k][0] =  cos(PHASE[k]);
 	        PCFIN[k][1] = -sin(PHASE[k]);
@@ -403,12 +405,10 @@ void smurf_fts2_phasecorr(int* status)
 	      fftw_execute(planB);
 
 	      // NORMALIZE PCF - REAL COMPONENT
-	      for(k = 0; k < dsLength; k++) {
-	        PCFOUT[k][0] /= dsLength;
-	      }
+	      for(k = 0; k < dsLength; k++) { PCFOUT[k][0] /= dsLength; }
 
 	      // SHIFT PCF - REAL COMPONENT BY HALF
-	      for(k = 0; k <= dsLength2; k++) {
+	      for(k = 0; k < dsLength2; k++) {
 	        double t = PCFOUT[dsLength - 1][0];
 	        for(n = 1; n < dsLength; n++) {
 	          PCFOUT[dsLength - n][0] = PCFOUT[dsLength - (n + 1)][0];
@@ -418,9 +418,7 @@ void smurf_fts2_phasecorr(int* status)
 
 	      // TRUNCATE PCF - REAL COMPONENT
 	      int M = dsLength2 - pcfLength2;
-        for(k = 0; k < pcfLength; k++) {
-          PCF[k] = PCFOUT[M + k][0];
-        }
+        for(k = 0; k < pcfLength; k++) { PCF[k] = PCFOUT[M + k][0]; }
 
         // REVERSE PCF FOR CONVOLUTION
         for(k = 0; k < pcfLength2; k++) {
@@ -442,6 +440,46 @@ void smurf_fts2_phasecorr(int* status)
           index = bolIndex + numBol * k;
           *((double*)(outputData->pntr[0]) + index) = t;
         }
+
+        //
+        // DEBUG
+        //
+        // ---------------------------------------------------------------------
+        if(debug > 0 && i == yc && j == xc) {
+          FILE* file = NULL;
+	        file = fopen("/home/oba/jach/TEST/INPUT.txt", "w");
+	        for(k = 0; k < srcN; k++) { fprintf(file, "%e\n", IFG[k]); }
+	        fclose(file);
+
+	        file = NULL;
+	        file = fopen("/home/oba/jach/TEST/INPUT_FFT.txt", "w");
+	        for(k = 0; k < dsLength; k++) { fprintf(file, "%e\n", DS[k]); }
+	        fclose(file);
+
+          file = NULL;
+	        file = fopen("/home/oba/jach/TEST/PHASE_FIT.txt", "w");
+	        for(k = 0; k < dsLength; k++) { fprintf(file, "%e\n", PHASE[k]); }
+	        fclose(file);
+
+          file = NULL;
+	        file = fopen("/home/oba/jach/TEST/PCF_RE.txt", "w");
+	        for(k = 0; k < dsLength; k++) { fprintf(file, "%e\n", PCFOUT[k][0]); }
+	        fclose(file);
+
+          file = NULL;
+	        file = fopen("/home/oba/jach/TEST/PCF_IM.txt", "w");
+	        for(k = 0; k < dsLength; k++) { fprintf(file, "%e\n", PCFOUT[k][1]); }
+	        fclose(file);
+
+          file = NULL;
+	        file = fopen("/home/oba/jach/TEST/RESULT.txt", "w");
+	        for(k = 0; k < outN; k++) {
+            index = bolIndex + numBol * k;
+	          fprintf(file, "%e\n", *((double*)(outputData->pntr[0]) + index));
+	        }
+	        fclose(file);
+	      }
+	      // ---------------------------------------------------------------------
       } // END FOR LOOP - COLUMNS
     } // END FOR LOOP - ROWS
 
@@ -453,16 +491,17 @@ void smurf_fts2_phasecorr(int* status)
     if(DS)       { astFree(DS);               DS        = NULL; }
     if(PHASE)    { astFree(PHASE);            PHASE     = NULL; }
     if(PCF)      { astFree(PCF);              PCF       = NULL; }
-    if(DSIN)     { fftw_free(DSIN);           DSIN      = NULL; }
-    if(DSOUT)    { fftw_free(DSOUT);          DSOUT     = NULL; }
-	  if(PCFIN)    { fftw_free(PCFIN);          PCFIN     = NULL; }
-	  if(PCFOUT)   { fftw_free(PCFOUT);         PCFOUT    = NULL; }
     if(COEFFS)   { astFree(COEFFS);           COEFFS    = NULL; }
     if(TMPPHASE) { astFree(TMPPHASE);         TMPPHASE  = NULL; }
     if(WN)       { astFree(WN);               WN        = NULL; }
     if(WEIGHTS)  { astFree(WEIGHTS);          WEIGHTS   = NULL; }
     if(FIT)      { astFree(FIT);              FIT       = NULL; }
     if(POS)      { astFree(POS);              POS       = NULL; }
+
+    if(DSIN)     { fftw_free(DSIN);           DSIN      = NULL; }
+    if(DSOUT)    { fftw_free(DSOUT);          DSOUT     = NULL; }
+	  if(PCFIN)    { fftw_free(PCFIN);          PCFIN     = NULL; }
+	  if(PCFOUT)   { fftw_free(PCFOUT);         PCFOUT    = NULL; }
 	  if(planA)    { fftw_destroy_plan(planA);  planA     = NULL; }
 	  if(planB)    { fftw_destroy_plan(planB);  planB     = NULL; }
 
@@ -478,16 +517,17 @@ void smurf_fts2_phasecorr(int* status)
     if(DS)       { astFree(DS);               DS        = NULL; }
     if(PHASE)    { astFree(PHASE);            PHASE     = NULL; }
     if(PCF)      { astFree(PCF);              PCF       = NULL; }
-    if(DSIN)     { fftw_free(DSIN);           DSIN      = NULL; }
-    if(DSOUT)    { fftw_free(DSOUT);          DSOUT     = NULL; }
-	  if(PCFIN)    { fftw_free(PCFIN);          PCFIN     = NULL; }
-	  if(PCFOUT)   { fftw_free(PCFOUT);         PCFOUT    = NULL; }
     if(COEFFS)   { astFree(COEFFS);           COEFFS    = NULL; }
     if(TMPPHASE) { astFree(TMPPHASE);         TMPPHASE  = NULL; }
     if(WN)       { astFree(WN);               WN        = NULL; }
     if(WEIGHTS)  { astFree(WEIGHTS);          WEIGHTS   = NULL; }
     if(FIT)      { astFree(FIT);              FIT       = NULL; }
     if(POS)      { astFree(POS);              POS       = NULL; }
+
+    if(DSIN)     { fftw_free(DSIN);           DSIN      = NULL; }
+    if(DSOUT)    { fftw_free(DSOUT);          DSOUT     = NULL; }
+	  if(PCFIN)    { fftw_free(PCFIN);          PCFIN     = NULL; }
+	  if(PCFOUT)   { fftw_free(PCFOUT);         PCFOUT    = NULL; }
 	  if(planA)    { fftw_destroy_plan(planA);  planA     = NULL; }
 	  if(planB)    { fftw_destroy_plan(planB);  planB     = NULL; }
 	  fftw_cleanup();
