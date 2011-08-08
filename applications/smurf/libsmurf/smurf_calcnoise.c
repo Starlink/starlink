@@ -723,14 +723,14 @@ void smurf_calcnoise( int *status ) {
                                                      ".MORE.SMURF.NEP", "NEP",
                                                      "W s**0.5", status );
 
-            nepbolo = (nepdata->dims)[0]*(nepdata->dims)[1];
-
             /* and divide the noise data by the responsivity
                correcting for SIMULT */
             if (*status == SAI__OK) {
               double * noise = (outdata->pntr)[0];
               double * resp = (respmap->pntr)[0];
               double * nep  = (nepdata->pntr)[0];
+
+              nepbolo = (nepdata->dims)[0]*(nepdata->dims)[1];
 
               if (strlen(refnepunits) == 0) one_strlcpy( refnepunits,
                                                          nepdata->hdr->units,
