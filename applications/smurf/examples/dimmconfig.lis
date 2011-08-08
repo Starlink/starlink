@@ -375,11 +375,11 @@ cleandk.order = 0
 
 #com.noremove=1
 
-# low-pass boxcar filter on COM (samples) to assist with convergence
+# low-pass boxcarfilter on COM (samples) to assist with convergence
 # if boxfact set reduce width of boxcar by this factor each iteration
 # boxmin specifies a minimum width below which it can't be reduced
 
-com.boxcar = 10
+#com.boxcar = 10
 #com.boxcar  = 400
 #com.boxfact = 0.5
 #com.boxmin  = 10

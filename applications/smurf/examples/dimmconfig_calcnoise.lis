@@ -2,7 +2,6 @@
 
 # *** Specialized config for CALCNOISE ***
 #
-
 # The purpose of CALCNOISE is to estimate the white noise level of the
 # bolometers using cleaning steps that are similar to those used by
 # MAKEMAP. This configuration ensures that DC step correction is
@@ -13,7 +12,6 @@
 # "compreprocess" and "com.noflag". Finally, we don't turn off the
 # excessively noisy bolometers since we want to measure the properties
 # of as many bolometers as possible rather than make a map.
-
 #
 # ***********************************************************************
 
@@ -23,9 +21,11 @@
 order = 3
 
 # If you use common-mode subtraction instead, it may be a good idea to
-# turn off the flagging of bad bolos using the com.noflag option.
+# turn off the flagging of bad bolos using the com.noflag option. Also
+# turn off common-mode smoothing.
 #compreprocess=1
 #com.noflag=1
+#com.boxcar=0
 
 # turn off noise clipping during pre-processing since CALCNOISE has its
 # own ADAM parameters to control clipping
