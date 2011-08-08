@@ -230,7 +230,7 @@ void smurf_fts2_spectrum(int* status)
         // WRITE OUT REAL COMPONENT OF THE SPECTRUM
         for(k = 0; k < outN; k++) {
           index = bolIndex + numBol * k;
-          *((double*)(outputData->pntr[0]) + index) = SPEC[k][0];
+          *((double*)(outputData->pntr[0]) + index) = fabs(SPEC[k][0]);
         }
       } // END FOR LOOP - COLUMNS
     } // END FOR LOOP - ROWS
