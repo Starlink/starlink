@@ -167,6 +167,8 @@
 *        Original version.
 *     27-APR-2011 (EC):
 *        Add gain_positive flag
+*     08-AUG-2011 (EC):
+*        Add noflag keymap option to skip bad bolo flagging
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -255,6 +257,7 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
    dim_t itime;
    dim_t nblock;
    dim_t nbolo;
+   int noflag;
    dim_t ntime;
    dim_t ntslice;
    dim_t off_offset;
@@ -366,6 +369,7 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
    nblock /= 3;
 
 /* Get the required configuration parameters. */
+   astMapGet0I( keymap, "NOFLAG", &noflag );
    astMapGet0D( keymap, "CORR_TOL", &corr_tol );
    astMapGet0D( keymap, "CORR_ABSTOL", &corr_abstol );
    astMapGet0D( keymap, "GAIN_TOL", &gain_tol );
@@ -507,19 +511,24 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
 /* Initialise the number of time slices left to be processed. */
       ntime = ntslice;
 
+/* Initialise the number of remaining good bolo-blocks. */
+      totgood = 0;
+
 /* We now reject bolo-blocks that have unusual gains or correlation
    coefficients compared to the other bolo-blocks in the same block.
-   Do each block in turn. */
-      for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ) {
+   Do each block in turn. We skip this if noflag has been set. */
+
+      if( !noflag ) {
+        for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ) {
 
 /* Determine the number of time slices in the current block. The final
    block picks up any left over times slices. Update the number left to
    be processed. */
-         block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
-         ntime -= block_size;
+          block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
+          ntime -= block_size;
 
 /* Skip blocks that have already converged. */
-         if( ! converged[ iblock ] ) {
+          if( ! converged[ iblock ] ) {
 
 /* Detection of unusual gain values is based on the logarithm of the gain
    values rather than the gain values themselves. So we need an array
@@ -531,44 +540,44 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
             for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
 
 /* Assume the bolometer should not be included in the statistics. */
-               glog[ ibolo ] = VAL__BADD;
-               corr[ ibolo ] = VAL__BADD;
+              glog[ ibolo ] = VAL__BADD;
+              corr[ ibolo ] = VAL__BADD;
 
 /* Ignore bad bolometers. */
-               if( !( qua[ ibolo*bstride ] & SMF__Q_BADB) ) {
+              if( !( qua[ ibolo*bstride ] & SMF__Q_BADB) ) {
 
 /* Get the gain and correlation coefficient for the current bolometer at
    the current block. */
-                  g = gai[ igbase ];
-                  c = gai[ igbase + corr_offset ];
+                g = gai[ igbase ];
+                c = gai[ igbase + corr_offset ];
 
 /* Ignore bolo-blocks rejected by previous invocations of this function. */
-                  if( g == VAL__BADD ) {
+                if( g == VAL__BADD ) {
 
 /* Ignore failed fits, negative gains and very low correlation
    coefficients, recording the reason why the bolometer was rejected.
    We can allow negative gains, but never a gain of 0, if gain_positive
    was set. */
-                  } else if( g == NOFIT ){
-                     reason[ 0 ]++;
+                } else if( g == NOFIT ){
+                  reason[ 0 ]++;
 
-                  } else if( ((gain_positive) && (g < 0)) || (g == 0) ){
-                     reason[ 1 ]++;
+                } else if( ((gain_positive) && (g < 0)) || (g == 0) ){
+                  reason[ 1 ]++;
 
-                  } else if( c <= corr_abstol ){
-                     reason[ 2 ]++;
+                } else if( c <= corr_abstol ){
+                  reason[ 2 ]++;
 
 /* Otherwise, store the correlation coefficient and the logarithm of the
    gain. We take the absolute value in case we are allowing negative gain
    values... a bit of a kludge. */
-                  } else {
-                     glog[ ibolo ] = log( fabs(g) );
-                     corr[ ibolo ] = c;
-                  }
-               }
+                } else {
+                  glog[ ibolo ] = log( fabs(g) );
+                  corr[ ibolo ] = c;
+                }
+              }
 
 /* Get the vector index of the gain value for the next bolometer. */
-               igbase += gbstride;
+              igbase += gbstride;
             }
 
 /* Find the mean and standard deviation of the log(gain) values and the
@@ -584,13 +593,13 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
 /* If there are insufficient usable bolometers left to find the statistics,
    annull the error and set all gain values bad. */
             if( *status == SMF__INSMP ) {
-               errAnnul( status );
+              errAnnul( status );
 
-               for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
-                  glog[ ibolo ] = VAL__BADD;
-               }
+              for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+                glog[ ibolo ] = VAL__BADD;
+              }
 
-               reason[ 4 ] += ggood;
+              reason[ 4 ] += ggood;
             }
 
 /* We now go on to identify bolometers that have unusual gains or
@@ -603,74 +612,72 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
             for( ibolo = 0; ibolo < nbolo && *status == SAI__OK; ibolo++ ) {
 
 /* If the bolometer has no gain, it cannot be used. */
-               if( glog[ ibolo ] == VAL__BADD ) {
-                  badbol = 1;
+              if( glog[ ibolo ] == VAL__BADD ) {
+                badbol = 1;
 
 /* If the bolometer has not yet been rejected... */
-               } else {
-                  badbol = 0;
+              } else {
+                badbol = 0;
 
 /* Reject blocks that have an unusually low correlation coefficient
    compared to the spread of correlation coefficients in other bolometers.
    Note, unusually high correlation coefficients are accepted as OK! */
-                  if( cmean - corr[ ibolo ] > corr_tol*csig ) {
-                     badbol = 1;
-                     reason[ 3 ]++;
+                if( cmean - corr[ ibolo ] > corr_tol*csig ) {
+                  badbol = 1;
+                  reason[ 3 ]++;
 
 /* Reject blocks that have an unusually low or high gain compared to
    the spread of gain values in other bolometers. */
-                  } else if( fabs( gmean - glog[ ibolo ] ) > gain_tol*gsig ) {
-                     badbol = 1;
-                     reason[ 5 ]++;
+                } else if( fabs( gmean - glog[ ibolo ] ) > gain_tol*gsig ) {
+                  badbol = 1;
+                  reason[ 5 ]++;
 
 /* Reject blocks that have an unusually low or high gain compared to
    the mean gain in other bolometers. */
-                  } else if( fabs( gmean - glog[ ibolo ] ) > gain_abstol ) {
-                     badbol = 1;
-                     reason[ 6 ]++;
-                  }
-               }
+                } else if( fabs( gmean - glog[ ibolo ] ) > gain_abstol ) {
+                  badbol = 1;
+                  reason[ 6 ]++;
+                }
+              }
 
 /* If the current bolometer cannot be used, but it was not flagged as
    rejected on entry, reject it now. */
-               if( badbol && gai[ igbase ] != VAL__BADD ) {
+              if( badbol && gai[ igbase ] != VAL__BADD ) {
 
 /* Set the requested bit in the quality array for all samples for the
    current bolometer in the current block. */
-                  for( itime = 0; itime < block_size; itime++ ) {
-                     qua[ ibase + itime*tstride ] |= badqual;
-                  }
+                for( itime = 0; itime < block_size; itime++ ) {
+                  qua[ ibase + itime*tstride ] |= badqual;
+                }
 
 /* Return a bad gain value */
-                  gai[ igbase ] = VAL__BADD;
+                gai[ igbase ] = VAL__BADD;
 
 /* Increment the number of bolometers rejected from this block. */
-                  nrej[ iblock ]++;
+                nrej[ iblock ]++;
 
 /* Increment the total number of new rejected bolo-blocks. */
-                  nbad++;
-               }
+                nbad++;
+              }
 
 /* Prepare for the next bolometer. */
-               igbase += gbstride;
-               ibase += bstride;
+              igbase += gbstride;
+              ibase += bstride;
             }
-         }
-      }
+          }
+        }
 
-/* Initialise the number of remaining good bolo-blocks. */
-      totgood = 0;
 
 /* We now consider the consistency of the 'nblock' gain values for each
    individual bolometer. We reject blocks for which the gain value is very
    different to the other gain values for the same bolometer. We also
    reject the entire boloemeter if it has too few good blocks. Loop round
    all remaining bolometers. */
-      for( ibolo = 0; ibolo < nbolo && *status == SAI__OK; ibolo++ ) {
+        for( ibolo = 0; ibolo < nbolo && *status == SAI__OK; ibolo++ ) {
 
 /* Skip entirely bad bolometers. */
-         ibase = ibolo*bstride;
-         if( !( qua[ ibase ] & SMF__Q_BADB) ) {
+          ibase = ibolo*bstride;
+          if( !( qua[ ibase ] & SMF__Q_BADB) ) {
 
 /* Get the index within "gai" of the gain value for the first block for
    the current bolometer. */
@@ -684,81 +691,86 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
             csum = 0.0;
 
             for( iblock = 0; iblock < nblock; iblock++ ) {
-               g = gai[ igbase ];
-               if( g != VAL__BADD ) {
-                  c = gai[ igbase + corr_offset ];
-                  gmean += g*c;
-                  csum += c;
-                  ggood++;
-               }
-               igbase += gcstride;
+              g = gai[ igbase ];
+              if( g != VAL__BADD ) {
+                c = gai[ igbase + corr_offset ];
+                gmean += g*c;
+                csum += c;
+                ggood++;
+              }
+              igbase += gcstride;
             }
 
 /* Check there were sufficient good blocks. */
             if( ggood >= glim && csum > 0.0 ) {
-               gmean /= csum;
+              gmean /= csum;
 
 /* Get the maximum and minimum acceptable gain for this bolometer. */
-               gmax = gmean*gain_rat;
-               gmin = gmean/gain_rat;
+              gmax = gmean*gain_rat;
+              gmin = gmean/gain_rat;
 
 /* Loop round all blocks, rejecting any that have gains outside the above
    limits. */
-               ntime = ntslice;
-               igbase = ibolo*gbstride;
-               for( iblock = 0; iblock < nblock; iblock++ ) {
-                  block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
-                  ntime -= block_size;
+              ntime = ntslice;
+              igbase = ibolo*gbstride;
+              for( iblock = 0; iblock < nblock; iblock++ ) {
+                block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
+                ntime -= block_size;
 
-                  g = gai[ igbase ];
-                  if( g != VAL__BADD ) {
+                g = gai[ igbase ];
+                if( g != VAL__BADD ) {
 
-                     if( g > gmax || g < gmin ) {
-                        for( itime = 0; itime < block_size; itime++ ) {
-                           qua[ ibase + itime*tstride ] |= badqual;
-                        }
+                  if( g > gmax || g < gmin ) {
+                    for( itime = 0; itime < block_size; itime++ ) {
+                      qua[ ibase + itime*tstride ] |= badqual;
+                    }
 
-                        gai[ igbase ] = VAL__BADD;
-                        nrej[ iblock ]++;
-                        nbad++;
+                    gai[ igbase ] = VAL__BADD;
+                    nrej[ iblock ]++;
+                    nbad++;
 
-                        if( g > gmax ) {
-                           reason[ 8 ]++;
-                        } else {
-                           reason[ 9 ]++;
-                        }
+                    if( g > gmax ) {
+                      reason[ 8 ]++;
+                    } else {
+                      reason[ 9 ]++;
+                    }
 
-                     } else {
-                        totgood++;
-                     }
+                  } else {
+                    totgood++;
                   }
+                }
 
 /* Prepare for the next block. */
-                  ibase += block_size*tstride;
-                  igbase += gcstride;
-               }
+                ibase += block_size*tstride;
+                igbase += gcstride;
+              }
 
 /* If there were insufficient good blocks for the current bolometer,
    reject all blocks in the current bolometer. */
             } else {
 
-               for( itime = 0; itime < ntslice; itime++ ) {
-                  qua[ ibase ] |= ( SMF__Q_BADB | badqual );
-                  ibase += tstride;
-               }
+              for( itime = 0; itime < ntslice; itime++ ) {
+                qua[ ibase ] |= ( SMF__Q_BADB | badqual );
+                ibase += tstride;
+              }
 
-               igbase = ibolo*gbstride;
-               for( iblock = 0; iblock < nblock; iblock++ ) {
-                  if( gai[ igbase ] != VAL__BADD ) {
-                     nrej[ iblock ]++;
-                     gai[ igbase ] = VAL__BADD;
-                     reason[ 10 ]++;
-                     nbad++;
-                  }
-                  igbase += gcstride;
-               }
+              igbase = ibolo*gbstride;
+              for( iblock = 0; iblock < nblock; iblock++ ) {
+                if( gai[ igbase ] != VAL__BADD ) {
+                  nrej[ iblock ]++;
+                  gai[ igbase ] = VAL__BADD;
+                  reason[ 10 ]++;
+                  nbad++;
+                }
+                igbase += gcstride;
+              }
             }
-         }
+          }
+        }
+      } else {
+        msgOutif( MSG__VERB, "",
+                  "    NOFLAG is set, template will not be used to flag outlier"
+                  " bolometers", status );
       }
 
 /* Calculate and report debugging info only if needed. */

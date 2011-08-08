@@ -371,7 +371,7 @@ void smurf_calcqu( int *status ) {
 /* Clean the smfArray containing the dark squid data. Use the "CLEANDK.*"
    parameters. */
             (void) astMapGet0A( config, "CLEANDK", &dkpars );
-            smf_clean_smfArray( wf, dkarray, NULL, dkpars, status );
+            smf_clean_smfArray( wf, dkarray, NULL, NULL, NULL, dkpars, status );
             dkpars = astAnnul( dkpars );
 
 /* Nullify the header pointers so that we don't accidentally close any. */
@@ -389,7 +389,7 @@ void smurf_calcqu( int *status ) {
          }
 
 /* Now clean the bolometer data */
-         smf_clean_smfArray( wf, concat, NULL, config, status );
+         smf_clean_smfArray( wf, concat, NULL, NULL, NULL, config, status );
 
 /* Loop round each sub-array in the current contiguous chunk of data. */
          for( idx = 0; idx < concat->ndat && *status == SAI__OK; idx++ ) {

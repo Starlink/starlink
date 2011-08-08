@@ -401,7 +401,7 @@ void smurf_unmakemap( int *status ) {
 
 /* Write the output data to disk. */
       smf_write_smfData( odata, NULL, NULL, ogrp, ifile, NDF__NOID,
-                         status );
+                         MSG__VERB, status );
 
 /* Close the input time series file. */
       smf_close_file( &data, status );

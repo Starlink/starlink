@@ -206,8 +206,10 @@ void smurf_sc2pca( int *status ) {
     smf_clean_pca( wf, data, 0, &components, &amplitudes, 0, NULL, status );
 
     /* Write out to the new files */
-    smf_write_smfData( amplitudes, NULL, NULL, outampgrp, i, 0, status );
-    smf_write_smfData( components, NULL, NULL, outcompgrp, i, 0, status );
+    smf_write_smfData( amplitudes, NULL, NULL, outampgrp, i, 0, MSG__VERB,
+                       status );
+    smf_write_smfData( components, NULL, NULL, outcompgrp, i, 0, MSG__VERB,
+                       status );
 
     /* Free resources for output data */
     smf_close_file( &data, status );

@@ -16,7 +16,7 @@
 *     smf_write_smfData ( const smfData *data, const smfData *variance,
 *                        const char * filename,
 *                        const Grp * igrp, size_t grpindex,
-*                        int provid, int * status );
+*                        int provid, msglev_t msglev, int * status );
 
 *  Arguments:
 *     data = const smfData* (Given)
@@ -37,6 +37,8 @@
 *        Index into group.
 *     provid = int (Given)
 *        NDF id to propagate provenance from. Can be NDF__NOID.
+*     msglev = msglev_t (Given)
+*        What message level to report the filename?
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -96,11 +98,13 @@
 *     2011-02-17 (TIMJ):
 *        Get the file name from the group for display since the filename
 *        can be a null pointer. Use grpMsg.
+*     2011-08-08 (EC):
+*        Added msglev
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
-*     Copyright (C) 2008-2010 University of British Columbia.
+*     Copyright (C) 2008-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -151,7 +155,7 @@
 void smf_write_smfData( const smfData *data, const smfData *variance,
                         const char * filename,
                         const Grp * igrp, size_t grpindex,
-                        int provid, int * status ) {
+                        int provid, msglev_t msglev, int * status ) {
 
   size_t dbstride;              /* bolo stride of data */
   size_t dtstride;              /* tstride of data */
@@ -272,7 +276,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
 
   /* Say that we are going to write a file */
   grpMsg( "NAME", ogrp, 1 );
-  msgOutif( MSG__VERB, "", FUNC_NAME ": writing ^NAME", status );
+  msgOutif( msglev, "", FUNC_NAME ": writing ^NAME", status );
 
   /* Open the file */
   smf_open_newfile( ogrp, 1, data->dtype, data->ndims, lbnd, ubnd,

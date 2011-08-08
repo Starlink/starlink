@@ -243,7 +243,8 @@ void smurf_fts2_spectrum(int* status)
 	  if(SPEC){ fftw_free(SPEC); SPEC = NULL; }
 
     // WRITE OUTPUT
-    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0, status);
+    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0,
+                      MSG__VERB, status);
     smf_close_file(&outputData, status);
   } // END FOR LOOP - FILES
 

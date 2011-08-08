@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
-*                         smfArray **noisemaps, AstKeyMap *keymap,
-*                         int *status )
+*                         smfArray **noisemaps, smfArray **com, smfArray **gai,
+*                         AstKeyMap *keymap, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -25,6 +25,11 @@
 *     noisemaps = smfArray ** (Returned)
 *        Optionally return bolo noise maps for each subarray if noiseclipping
 *        is specified. Can be NULL.
+*     com = smfArray ** (Returned)
+*        Optionally return common mode if compreprocess was set.
+*     gai = smfArray ** (Returned)
+*        Optionally return gain/offset/correlation coefficient of the
+*        common mode for all bolos if compreprocess was set.
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control cleaning
 *     status = int* (Given and Returned)
@@ -98,6 +103,8 @@
 *        Remove gap filling since it is now done in smf_filter_execute.
 *     2011-06-23 (EC):
 *        Now have noisecliphigh and noisecliplow instead of noiseclip.
+*     2011-08-08 (EC):
+*        Can return COM & GAI if common-mode cleaning used.
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -139,8 +146,8 @@
 #define FUNC_NAME "smf_clean_smfArray"
 
 void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
-                         smfArray **noisemaps, AstKeyMap *keymap,
-                         int *status ){
+                         smfArray **noisemaps, smfArray **com, smfArray **gai,
+                         AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
   double badfrac;           /* Fraction of bad samples to flag bad bolo */
@@ -398,10 +405,20 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                ":   ** %f s removing common-mode",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
-    /* Clean up */
-    if( comdata ) smf_close_related( &comdata, status );
+    /* Clean up and/or return values */
+    if( com ) {
+      *com = comdata;
+    } else {
+      if( comdata ) smf_close_related( &comdata, status );
+    }
+
+    if( gai ) {
+      *gai = gaidata;
+    } else {
+      if( gaidata ) smf_close_related( &gaidata, status );
+    }
+
     if( comgroup ) smf_close_smfGroup( &comgroup, status );
-    if( gaidata ) smf_close_related( &gaidata, status );
     if( gaigroup ) smf_close_smfGroup( &gaigroup, status );
 
     /* Before closing quadata unset all the pntr[0] since this is shared

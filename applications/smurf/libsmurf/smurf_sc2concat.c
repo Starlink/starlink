@@ -253,7 +253,7 @@ void smurf_sc2concat( int *status ) {
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
       if( concat->sdata[idx]->file && concat->sdata[idx]->file->name ) {
         smf_write_smfData( concat->sdata[idx], NULL, NULL, ogrp, gcount,
-                           NDF__NOID, status );
+                           NDF__NOID, MSG__VERB, status );
       } else {
         *status = SAI__ERROR;
         errRep( FUNC_NAME,

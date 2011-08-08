@@ -543,7 +543,7 @@ void smurf_calcnoise( int *status ) {
           astMapGet0A( keymap, "CLEANDK", &kmap );
           array = smf_create_smfArray( status );
           smf_addto_smfArray( array, dksquid, status );
-          smf_clean_smfArray( wf, array, NULL, kmap, status );
+          smf_clean_smfArray( wf, array, NULL, NULL, NULL, kmap, status );
           if( array ) {
             array->owndata = 0;
             smf_close_related( &array, status );
@@ -557,7 +557,7 @@ void smurf_calcnoise( int *status ) {
 
       /* Then clean the main data arrays */
       msgOut("", TASK_NAME ": cleaning bolometer data", status );
-      smf_clean_smfArray( wf, concat, NULL, keymap, status );
+      smf_clean_smfArray( wf, concat, NULL, NULL, NULL, keymap, status );
 
       /* Report statistics (currently need a smfArray for that) */
       if (*status == SAI__OK) {
@@ -654,7 +654,7 @@ void smurf_calcnoise( int *status ) {
             /* open a reference input file for provenance propagation */
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
             smf_write_smfData( powdata, NULL, NULL, powgrp, gcount, provid,
-                               status );
+                               MSG__VERB, status );
             smf_close_file( &powdata, status );
             ndfAnnul( &provid, status );
           }
@@ -664,7 +664,7 @@ void smurf_calcnoise( int *status ) {
             /* open a reference input file for provenance propagation */
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
             smf_write_smfData( thedata, NULL, NULL, tsgrp, gcount, provid,
-                               status );
+                               MSG__VERB, status );
             ndfAnnul( &provid, status );
           }
 

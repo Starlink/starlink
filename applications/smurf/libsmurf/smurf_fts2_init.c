@@ -287,7 +287,8 @@ void smurf_fts2_init(int* status)
     *((double*) sigma->pntr[0]) = 0;
 
     outputData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0, status);
+    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0,
+                      MSG__VERB, status);
     smf_close_file(&outputData, status);
   }
 

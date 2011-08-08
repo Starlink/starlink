@@ -391,8 +391,11 @@ com.boxcar = 10
 # are basically sigma-clippers; outliers are removed at the given threshold
 # and then new means and sample standard deviations are measured until
 # convergence. The time axis is divided up into one or more equal sized boxes,
-# and a separate fit is performed for each box.
+# and a separate fit is performed for each box. If you wish to completely
+# disable the flagging of outlier bolometers compared to the common-mode,
+# simply set com.noflag=1
 #
+# com.noflag: if set, disable flagging of bad bolos using common-mode
 # com.gain_box: the number of time slices in a box
 # com.corr_tol: n-sigma away from mean correlation coefficient tolerance
 # com.corr_abstol: the absolute lower limit of acceptable correlation
@@ -401,6 +404,7 @@ com.boxcar = 10
 # com.gain_fgood: minimum fraction of good boxes for a usable bolometer
 # com.gain_rat: ratio of largest usable gain to mean gain for a bolometer
 
+com.noflag = 0
 com.corr_tol = 5
 com.gain_tol = 5
 com.gain_abstol = 3

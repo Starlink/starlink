@@ -46,6 +46,11 @@
 *          mask the closest following will be used. It is not an error for
 *          no mask to match. A NULL parameter indicates no mask files to be
 *          supplied. [!]
+*     COM = NDF (Write)
+*          If COMPREPROCESS is set in the configuration file, the common mode
+*          is calculated and removed from the bolometer data. The COM adam
+*          parameter can then be used to specify an NDF to store the
+*          common mode. See also GAI. [!]
 *     CONFIG = GROUP (Read)
 *          Specifies values for the cleaning parameters. If the string
 *          "def" (case-insensitive) or a null (!) value is supplied, a
@@ -84,6 +89,12 @@
 *     FLAT = _LOGICAL (Read)
 *          If set ensure data are flatfielded. If not set do not scale the
 *          data in any way (but convert to DOUBLE). [TRUE]
+*     GAI  = NDF (Write)
+*          If COMPREPROCESS is set in the configuration file, the common mode
+*          is calculated and removed from the bolometer data. The GAI adam
+*          parameter can then be used to specify an NDF to store the
+*          gain/offset/correlation coefficients of the common-mode template
+*          for each bolometer. See also COM. [!]
 *     IN = NDF (Read)
 *          Input files to be cleaned
 *     MAXLEN = _DOUBLE (Read)
@@ -166,6 +177,8 @@
 *        Add concatenation functionality from SMURF:SC2CONCAT
 *     2011-06-09 (EC):
 *        Make it possible to downsample with some re-ordering of the code
+*     2011-08-08 (EC):
+*        Add ability to export COM and GAI of COMPREPROCESS specified
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -250,6 +263,8 @@ void smurf_sc2clean( int *status ) {
   int temp;                  /* Temporary signed integer */
   int usedarks;              /* flag for using darks */
   smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+  int writecom;              /* Write COMmon mode to NDF if calculated? */
+  int writegai;              /* Write GAIns to NDF if calculated? */
 
   /* Main routine */
   ndfBegin();
@@ -305,6 +320,10 @@ void smurf_sc2clean( int *status ) {
 
   /* Are we flatfielding? */
   parGet0l( "FLAT", &ensureflat, status );
+
+  /* Write COM/GAI to NDFs if calculated? */
+  parGet0l( "COM", &writecom, status );
+  parGet0l( "GAI", &writegai, status );
 
   /* Get group of bolometer masks and read them into a smfArray */
   smf_request_mask( "BBM", &bbms, status );
@@ -390,7 +409,7 @@ void smurf_sc2clean( int *status ) {
           astMapGet0A( keymap, "CLEANDK", &kmap );
           array = smf_create_smfArray( status );
           smf_addto_smfArray( array, dksquid, status );
-          smf_clean_smfArray( wf, array, NULL, kmap, status );
+          smf_clean_smfArray( wf, array, NULL, NULL, NULL, kmap, status );
           if( array ) {
             array->owndata = 0;
             smf_close_related( &array, status );
@@ -403,8 +422,49 @@ void smurf_sc2clean( int *status ) {
       }
 
       /* Then the main data arrays */
-      msgOut("", TASK_NAME ": cleaning bolometer data", status );
-      smf_clean_smfArray( wf, concat, NULL, keymap, status );
+      if( *status == SAI__OK ) {
+        smfArray *com = NULL;
+        smfArray *gai = NULL;
+        char filename[GRP__SZNAM+1];
+
+        msgOut("", TASK_NAME ": cleaning bolometer data", status );
+        smf_clean_smfArray( wf, concat, NULL, &com, &gai, keymap, status );
+
+        /* If ADAM parameters for COM or GAI were specified, and the
+           common-mode was calculated, export to files here */
+
+        if( writecom && com ) {
+          for( idx=0; (*status==SAI__OK)&&(idx<com->ndat); idx++ ) {
+            smf_model_createHdr( com->sdata[idx], SMF__COM, concat->sdata[idx],
+                                 status );
+            smf_model_stripsuffix( com->sdata[idx]->file->name, filename,
+                                   status );
+
+            smf_dataOrder( com->sdata[idx], 1, status );
+
+            smf_write_smfData( com->sdata[idx], NULL, filename, NULL, 0,
+                               NDF__NOID, MSG__NORM, status );
+          }
+        }
+
+        if( writegai && gai ) {
+          for( idx=0; (*status==SAI__OK)&&(idx<gai->ndat); idx++ ) {
+            smf_model_createHdr( gai->sdata[idx], SMF__GAI, concat->sdata[idx],
+                                 status );
+            smf_model_stripsuffix( gai->sdata[idx]->file->name, filename,
+                                   status );
+
+            smf_dataOrder( gai->sdata[idx], 1, status );
+            smf_write_smfData( gai->sdata[idx], NULL, filename, NULL, 0,
+                               NDF__NOID, MSG__NORM, status );
+          }
+        }
+
+        /* Close com and gai */
+        if( com ) smf_close_related( &com, status );
+        if( gai ) smf_close_related( &gai, status );
+
+      }
 
       /* Report statistics (currently need a smfArray for that) */
       if (*status == SAI__OK) {
@@ -431,7 +491,8 @@ void smurf_sc2clean( int *status ) {
       smf_dataOrder( odata, 1, status );
 
       if( odata->file && odata->file->name ) {
-        smf_write_smfData( odata, NULL, NULL, ogrp, gcount, NDF__NOID, status );
+        smf_write_smfData( odata, NULL, NULL, ogrp, gcount, NDF__NOID,
+                           MSG__VERB, status );
       } else {
         *status = SAI__ERROR;
         errRep( FUNC_NAME,

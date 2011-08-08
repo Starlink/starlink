@@ -1070,7 +1070,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                 astMapGet0A( keymap, "CLEANDK", &kmap );
                 array = smf_create_smfArray( status );
                 smf_addto_smfArray( array, dksquid, status );
-                smf_clean_smfArray( wf, array, NULL, kmap, status );
+                smf_clean_smfArray( wf, array, NULL, NULL, NULL, kmap, status );
                 if( array ) {
                   array->owndata = 0;
                   smf_close_related( &array, status );

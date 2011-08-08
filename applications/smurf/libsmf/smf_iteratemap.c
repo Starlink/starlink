@@ -1344,7 +1344,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         /* Do data cleaning */
         if( doclean ) {
-          smf_clean_smfArray( wf, res[0], &noisemaps, keymap, status );
+          smf_clean_smfArray( wf, res[0], &noisemaps, NULL, NULL, keymap,
+                              status );
         } else {
           msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
                   "so not pre-conditioning data before map-making",
@@ -1593,7 +1594,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             if( iter==0 ) {
               if( doclean ) {
                 msgOut(" ", FUNC_NAME ": Pre-conditioning data", status);
-                smf_clean_smfArray( wf, res[i], NULL, keymap, status );
+                smf_clean_smfArray( wf, res[i], NULL, NULL, NULL, keymap,
+                                    status );
               } else {
                 msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
                         "so not pre-conditioning data before map-making",
@@ -1671,7 +1673,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                 smf_write_smfData( res[i]->sdata[idx], NULL,
                                    name, NULL, 0, NDF__NOID,
-                                   status );
+                                   MSG__VERB, status );
 
                 /* Revert the order */
                 smf_dataOrder( res[i]->sdata[idx], oldorder, status );
@@ -2317,7 +2319,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                      (havenoi && exportNDF_which[whichnoi]) ?
                                      dat.noi[i]->sdata[idx] : NULL,
                                      name, NULL, 0, NDF__NOID,
-                                     status );
+                                     MSG__VERB, status );
                 } else {
                   msgOut( " ",
                           "SMF__ITERATEMAP: Can't export RES -- NULL filename",
@@ -2340,7 +2342,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                   /* Also export QUAlity if requested */
                   smf_write_smfData( ast[i]->sdata[idx], NULL, name,
-                                     NULL, 0, NDF__NOID, status );
+                                     NULL, 0, NDF__NOID, MSG__VERB, status );
                 } else {
                   msgOut( " ",
                           "SMF__ITERATEMAP: Can't export AST -- NULL filename",
@@ -2394,7 +2396,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   }
 
                   smf_write_smfData( model[j][i]->sdata[idx], NULL,
-                                     name, NULL, 0, NDF__NOID, status );
+                                     name, NULL, 0, NDF__NOID,
+                                     MSG__VERB, status );
 
                   /* if we had temporary quality free it */
                   if ( modeltyps[j] == SMF__COM && qua_data ) {

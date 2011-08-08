@@ -421,7 +421,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
            status );
    smf_dataOrder( data, 1, status );
    smf_write_smfData ( data, NULL,
-                     "fix_steps_input", NULL, 0, 0, status );
+                       "fix_steps_input", NULL, 0, 0, MSG__VERB, status );
    smf_dataOrder( data, isT, status );
 #endif
 

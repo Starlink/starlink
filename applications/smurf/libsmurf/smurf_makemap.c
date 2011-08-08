@@ -721,6 +721,9 @@
 *       Ratio of largest usable gain to mean gain for a bolometer. [4.0]
 *     COM.GAIN_TOL = REAL
 *       N-sigma away from mean gain coefficient tolerance. [5.0]
+*     COM.NOFLAG = LOGICAL
+*       If true, do not use common-mode to flag bad bolometers (e.g.,
+*       ignore COM.*TOL COM.GAIN*). [0]
 *     COM.NOTFIRST = LOGICAL
 *       If true the common mode will not be subtracted on the first
 *       iteration. [0]

@@ -3292,6 +3292,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter com {
+                type _LOGICAL
+                prompt {Write common-mode to NDF if calculated?}
+                default FALSE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter config {
                 type LITERAL
                 access READ
@@ -3306,6 +3315,15 @@ package @PACKAGE@ {
                 prompt {If set ensure data are flatfielded}
                 ppath GLOBAL CURRENT
                 default TRUE
+                helpkey *
+            }
+
+            parameter gai {
+                type _LOGICAL
+                prompt {Write common-mode gain to NDF if calculated?}
+                default FALSE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
 
