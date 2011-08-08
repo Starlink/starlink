@@ -280,29 +280,11 @@ void smurf_fts2_phasecorrds(int* status)
           index = bolIndex + numBol * k;
           IFG[k] = *((double*)(inputData->pntr[0]) + index);
         }
-        // PRINT
-        // ---------------------------------------------------------------------
-        if(i == 0 && j == 0) {
-          FILE* file = NULL;
-	        file = fopen("/home/oba/jach/TEST/INPUT.txt", "w");
-	        for(k = 0; k < N; k++) { fprintf(file, "%e\n", IFG[k]); }
-	        fclose(file);
-	      }
-	      // ---------------------------------------------------------------------
 
         // BUTTERFLIED INTERFEROGRAM FOR FFT
         int M = N - zpdIndex;
         for(k = 0; k < M; k++) { DS[k] = IFG[zpdIndex + k]; }
         for(k = 0; k < zpdIndex; k++) { DS[M + k] = IFG[k]; }
-        // PRINT
-        // ---------------------------------------------------------------------
-        if(i == 0 && j == 0) {
-          FILE* file = NULL;
-	        file = fopen("/home/oba/jach/TEST/INPUT_FFT.txt", "w");
-	        for(k = 0; k < N; k++) { fprintf(file, "%e\n", DS[k]); }
-	        fclose(file);
-	      }
-	      // ---------------------------------------------------------------------
 
         // TO COMPLEX FOR FFT, FOR NOW C2C FFT
         for(k = 0; k < N; k++) {
@@ -313,31 +295,9 @@ void smurf_fts2_phasecorrds(int* status)
         // FORWARD FFT DOUBLE-SIDED INTERFEROGRAM
 	      planA = fftw_plan_dft_1d(N, DSIN, DSOUT, FFTW_FORWARD, FFTW_ESTIMATE);
 	      fftw_execute(planA);
-        // PRINT
-        // ---------------------------------------------------------------------
-        if(i == 0 && j == 0) {
-          FILE* file = NULL;
-	        file = fopen("/home/oba/jach/TEST/OUTPUT_FFT_RE.txt", "w");
-	        for(k = 0; k < N; k++) { fprintf(file, "%e\n", DSOUT[k][0]); }
-	        fclose(file);
-          file = NULL;
-	        file = fopen("/home/oba/jach/TEST/OUTPUT_FFT_IM.txt", "w");
-	        for(k = 0; k < N; k++) { fprintf(file, "%e\n", DSOUT[k][1]); }
-	        fclose(file);
-	      }
-	      // ---------------------------------------------------------------------
 
         // PHASE
 	      for(k = 0; k < N; k++) { PHASE[k] = atan2(DSOUT[k][1], DSOUT[k][0]); }
-        // PRINT
-        // ---------------------------------------------------------------------
-        if(i == 0 && j == 0) {
-          FILE* file = NULL;
-	        file = fopen("/home/oba/jach/TEST/PHASE.txt", "w");
-	        for(k = 0; k < N; k++) { fprintf(file, "%e\n", PHASE[k]); }
-	        fclose(file);
-	      }
-	      // ---------------------------------------------------------------------
 
         // WAVENUMBERS [0, FNYQ]
         for(k = 0; k <= N2; k++) { WN[k] = k * df; }
@@ -386,54 +346,18 @@ void smurf_fts2_phasecorrds(int* status)
         for(k = 1; k <= N2; k++) { EVALPOLY(PHASE[k], WN[k], pDegree, COEFFS); }
         for(k = N2 + 1; k < N; k++) { PHASE[k] = -PHASE[N2 - p++]; } // P(-k) = -P(k)
         PHASE[0] = PHASE[N - 1] = 0.0;
-        // PRINT
-        // ---------------------------------------------------------------------
-        if(i == 0 && j == 0) {
-          FILE* file = NULL;
-	        file = fopen("/home/oba/jach/TEST/PHASE_FIT.txt", "w");
-	        for(k = 0; k < N; k++) { fprintf(file, "%e\n", PHASE[k]); }
-	        fclose(file);
-	      }
-	      // ---------------------------------------------------------------------
-
 
 	      // PHASE CORRECTION FUNCTION, PCF, EXP(-iPHASE)
 	      for(k = 0; k < N; k++) {
 	        PCF[k][0] =  cos(PHASE[k]);
 	        PCF[k][1] = -sin(PHASE[k]);
 	      }
-        // PRINT
-        // ---------------------------------------------------------------------
-        if(i == 0 && j == 0) {
-          FILE* file = NULL;
-	        file = fopen("/home/oba/jach/TEST/PCF_RE.txt", "w");
-	        for(k = 0; k < N; k++) { fprintf(file, "%e\n", PCF[k][0]); }
-	        fclose(file);
-          file = NULL;
-	        file = fopen("/home/oba/jach/TEST/PCF_IM.txt", "w");
-	        for(k = 0; k < N; k++) { fprintf(file, "%e\n", PCF[k][1]); }
-	        fclose(file);
-	      }
-	      // ---------------------------------------------------------------------
 
 	      // MULTIPLICATION IN FREQUENCY DOMAIN
 	      for(k = 0; k < N; k++) {
 	        SPEC[k][0] = DSOUT[k][0] * PCF[k][0] - DSOUT[k][1] * PCF[k][1];
 	        SPEC[k][1] = DSOUT[k][0] * PCF[k][1] + DSOUT[k][1] * PCF[k][0];
 	      }
-        // PRINT
-        // ---------------------------------------------------------------------
-        if(i == 0 && j == 0) {
-          FILE* file = NULL;
-	        file = fopen("/home/oba/jach/TEST/SPEC_RE.txt", "w");
-	        for(k = 0; k < N; k++) { fprintf(file, "%e\n", SPEC[k][0]); }
-	        fclose(file);
-          file = NULL;
-	        file = fopen("/home/oba/jach/TEST/SPEC_IM.txt", "w");
-	        for(k = 0; k < N; k++) { fprintf(file, "%e\n", SPEC[k][1]); }
-	        fclose(file);
-	      }
-	      // ---------------------------------------------------------------------
 
         // WRITE OUT REAL COMPONENT OF THE SPECTRUM
         for(k = 0; k <= N2; k++) {

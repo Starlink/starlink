@@ -174,8 +174,6 @@ void smurf_fts2_phasecorrss(int* status)
   parGet0d("WNLBOUND",      &wnLower,    status);
   parGet0d("WNUBOUND",      &wnUpper,    status);
 
-  int debug = 1;
-
   // SET ARRAY LENGTHS
   coeffLength = pDegree + 1;
   pcfLength2  = (pcfLength2 > dsLength2) ? dsLength2 : pcfLength2;
@@ -331,15 +329,6 @@ void smurf_fts2_phasecorrss(int* status)
 
         // COMPUTE PHASE
 	      for(k = 0; k < dsLength; k++) { PHASE[k] = atan2(DSOUT[k][1], DSOUT[k][0]); }
-        // PRINT
-        // ---------------------------------------------------------------------
-        if(debug > 0 && i == yc && j == xc) {
-          FILE* file = NULL;
-	        file = fopen("/home/oba/jach/TEST/PHASE.txt", "w");
-	        for(k = 0; k < dsLength; k++) { fprintf(file, "%e\n", PHASE[k]); }
-	        fclose(file);
-	      }
-	      // ---------------------------------------------------------------------
 
         // WAVENUMBERS [0, FNYQ]
         for(k = 0; k <= dsLength2; k++) { WN[k] = k * df; }
@@ -440,46 +429,6 @@ void smurf_fts2_phasecorrss(int* status)
           index = bolIndex + numBol * k;
           *((double*)(outputData->pntr[0]) + index) = t;
         }
-
-        //
-        // DEBUG
-        //
-        // ---------------------------------------------------------------------
-        if(debug > 0 && i == yc && j == xc) {
-          FILE* file = NULL;
-	        file = fopen("/home/oba/jach/TEST/INPUT.txt", "w");
-	        for(k = 0; k < srcN; k++) { fprintf(file, "%e\n", IFG[k]); }
-	        fclose(file);
-
-	        file = NULL;
-	        file = fopen("/home/oba/jach/TEST/INPUT_FFT.txt", "w");
-	        for(k = 0; k < dsLength; k++) { fprintf(file, "%e\n", DS[k]); }
-	        fclose(file);
-
-          file = NULL;
-	        file = fopen("/home/oba/jach/TEST/PHASE_FIT.txt", "w");
-	        for(k = 0; k < dsLength; k++) { fprintf(file, "%e\n", PHASE[k]); }
-	        fclose(file);
-
-          file = NULL;
-	        file = fopen("/home/oba/jach/TEST/PCF_RE.txt", "w");
-	        for(k = 0; k < dsLength; k++) { fprintf(file, "%e\n", PCFOUT[k][0]); }
-	        fclose(file);
-
-          file = NULL;
-	        file = fopen("/home/oba/jach/TEST/PCF_IM.txt", "w");
-	        for(k = 0; k < dsLength; k++) { fprintf(file, "%e\n", PCFOUT[k][1]); }
-	        fclose(file);
-
-          file = NULL;
-	        file = fopen("/home/oba/jach/TEST/RESULT.txt", "w");
-	        for(k = 0; k < outN; k++) {
-            index = bolIndex + numBol * k;
-	          fprintf(file, "%e\n", *((double*)(outputData->pntr[0]) + index));
-	        }
-	        fclose(file);
-	      }
-	      // ---------------------------------------------------------------------
       } // END FOR LOOP - COLUMNS
     } // END FOR LOOP - ROWS
 
