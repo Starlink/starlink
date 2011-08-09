@@ -6,38 +6,38 @@
 # bolometers using cleaning steps that are similar to those used by
 # MAKEMAP. This configuration ensures that DC step correction is
 # applied.  A low-order polynomial is also removed from the
-# time-series to avoid ringing in the FFTs. Alternatively, you could
-# comment out "order=3" and instead use common-mode subtraction to
-# remove low frequency noise (remove commented lines for
-# "compreprocess" and "com.noflag". Finally, we don't turn off the
-# excessively noisy bolometers since we want to measure the properties
-# of as many bolometers as possible rather than make a map.
+# time-series to avoid ringing in the FFTs. This method is quite
+# robust for short time-series (less than 30 seconds or so) in the
+# sense that it will give a decent answer for even poor data sets
+# although there is a potential for the answer to be a bit high due to
+# correlated noise getting through the polynomial baseline removal in
+# the measurement band (default 2--10 Hz). This is probably the best
+# method to use in the pipeline. Alternative methods for removing
+# correlated noise are using common-mode subtraction (see
+# dimmconfig_calcnoise_com.lis) and PCA cleaning (see
+# dimmconfig_calcnoise_pca.lis). We don't turn off the excessively
+# noisy bolometers since we want to measure the properties of as many
+# bolometers as possible rather than make a map. We also turn off
+# flagging of data taken while the telescope is moving too fast or too
+# slow.
 #
 # ***********************************************************************
 
-# Default behaviour is to use a low-order polynomial to remove
-# low-frequency noise. However, you can comment out this line and
-# instead use common-mode subtraction.
+# Remove baseline drift
 order = 3
-
-# If you use common-mode subtraction instead, it may be a good idea to
-# turn off the flagging of bad bolos using the com.noflag
-# option. Since very bad bolos may still be present at the time of
-# common-mode subtraction, use the noiseclipprecom flag, and turn
-# noisecliphigh on to something like 20. Also turn off common-mode
-# smoothing.
-
-#compreprocess=1
-#com.noflag=1
-#com.boxcar=0
-#noiseclipprecom=1
-#noisecliphigh=20
 
 # turn off noise clipping during pre-processing since CALCNOISE has its
 # own ADAM parameters to control clipping
 noisecliphigh = 0
 noisecliplow = 0
 
+# don't flag data where the telescope is moving slowly
+450.flagslow = 0
+450.flagfast = 0
+850.flagslow = 0
+850.flagfast = 0
+
+# ensure that no other filtering happens
 modelorder = <undef>
 
 450.apod = 0

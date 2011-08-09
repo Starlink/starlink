@@ -1,0 +1,23 @@
+^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise.lis
+
+# *** Specialized config for CALCNOISE with PCA cleaning ***
+#
+# This variant on the CALCNOISE cleaning configuration uses PCA
+# cleaning instead of polynomials. We introduce clipping of extremely
+# noisy bolometers prior to the PCA cleaning which may help identify
+# the most important correlated modes. PCA cleaning is extremely slow.
+# It also seems to work better on short data sets. So, I recommend using
+# this only to analyze short snippets of data (e.g. 2000 samples).
+#
+# ***********************************************************************
+
+# Just remove the mean
+order = 0
+
+# clip really noisy bolos prior to PCA cleaning (not obvious, but
+# setting the noiseclipprecom flag will do this)
+noiseclipprecom=1
+noisecliphigh=10
+
+# set a lower value if you want to remove more correlated noise
+pcathresh = 4

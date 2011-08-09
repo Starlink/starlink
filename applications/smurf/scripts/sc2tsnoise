@@ -39,7 +39,9 @@ if ( ($#argv < 3) || ($#argv > 8) ) then
     echo " "
     echo "example:"
     echo "    ls -d /jcmtdata/raw/scuba2/s4?/2011????/0???? > obsdir.txt"
-    echo "    sc2tsnoise obsdir.txt effnep_450_2011.txt out"
+    echo " "
+    echo "    sc2tsnoise obsdir.txt effnep_450_2011.txt out \\"
+    echo "      -config ^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise.lis"
     echo " "
 
     goto done
