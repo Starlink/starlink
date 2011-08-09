@@ -21,11 +21,17 @@
 order = 3
 
 # If you use common-mode subtraction instead, it may be a good idea to
-# turn off the flagging of bad bolos using the com.noflag option. Also
-# turn off common-mode smoothing.
+# turn off the flagging of bad bolos using the com.noflag
+# option. Since very bad bolos may still be present at the time of
+# common-mode subtraction, use the noiseclipprecom flag, and turn
+# noisecliphigh on to something like 20. Also turn off common-mode
+# smoothing.
+
 #compreprocess=1
 #com.noflag=1
 #com.boxcar=0
+#noiseclipprecom=1
+#noisecliphigh=20
 
 # turn off noise clipping during pre-processing since CALCNOISE has its
 # own ADAM parameters to control clipping
