@@ -51,11 +51,12 @@
 *     Dark squids  : DKCLEAN
 *     Gap filling  : ZEROPAD
 *     Baselines    : ORDER
+*     [Noisy Bolos]: Optionally happens here instead if "NOISECLIPPRECOM" is set
 *     Common-Mode  : COMPREPROCESS
 *     PCA          : PCATHRESH
 *     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW,
 *                    FILT_NOTCHHIGH, APOD, FILT_WLIM, WHITEN
-*     Noisy Bolos  : NOISECLIPHIGH, NOISECLIPLOW
+*     Noisy Bolos  : NOISECLIPHIGH, NOISECLIPLOW, NOISECLIPPRECOM
 
 *  Notes:
 *     The resulting dataOrder of the cube is not guaranteed, so smf_dataOrder
@@ -105,6 +106,8 @@
 *        Now have noisecliphigh and noisecliplow instead of noiseclip.
 *     2011-08-08 (EC):
 *        Can return COM & GAI if common-mode cleaning used.
+*     2011-08-09 (EC):
+*        Can flag noisy boloms before common-mode removal using noiseclipprecom
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -145,6 +148,11 @@
 
 #define FUNC_NAME "smf_clean_smfArray"
 
+void smf__noisymask( smfWorkForce *wf, smfData *data, smfArray **noisemaps,
+                     double noisecliphigh, double noisecliplow,
+                     int zeropad, struct timeval *tv1,
+                     struct timeval *tv2, int *status );
+
 void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                          smfArray **noisemaps, smfArray **com, smfArray **gai,
                          AstKeyMap *keymap, int *status ) {
@@ -167,7 +175,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
   size_t nflag;             /* Number of elements flagged */
   double noisecliphigh = 0; /* Sigma clip high-noise outlier bolos */
   double noisecliplow = 0;  /* Sigma clip low-noise outlier bolos */
-  smfData *noisemap=NULL;   /* Individual noisemap */
+  int noiseclipprecom = 0;  /* Noise clipping before common-mode cleaning? */
   int order;                /* Order of polynomial for baseline fitting */
   double pcathresh;         /* n-sigma threshold for PCA cleaning */
   double spikethresh;       /* Threshold for finding spikes */
@@ -209,7 +217,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
                     &spikethresh, &spikebox, &noisecliphigh, &noisecliplow,
                     NULL, &compreprocess, &pcathresh, NULL, NULL, NULL,
-                    status );
+                    &noiseclipprecom, status );
 
   /* Loop over subarray */
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
@@ -334,6 +342,15 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                  status, smf_timerupdate(&tv1,&tv2,status) );
     }
   }
+
+  /* Mask noisy bolos here if happening before common-mode cleaning */
+  if( (*status == SAI__OK) && ((noisecliphigh>0.0) || (noisecliplow>0.0)) &&
+      noiseclipprecom ) {
+
+    smf__noisymask( wf, data, noisemaps, noisecliphigh, noisecliplow,
+                    zeropad, &tv1, &tv2, status );
+  }
+
 
   /* Optionally call smf_calcmodel_com to perform a subset of the following
      tasks as a pre-processing step:
@@ -477,20 +494,39 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
     }
     filt = smf_free_smfFilter( filt, status );
 
-    /* Noise mask */
-    if( (*status==SAI__OK) && ((noisecliphigh>0.0) || (noisecliplow>0.0)) ) {
-      msgOutif( MSG__VERB, "", FUNC_NAME ": masking noisy bolometers", status );
-      smf_mask_noisy( wf, data,
-                      (noisemaps && *noisemaps) ? (&noisemap) : NULL,
-                      noisecliphigh, noisecliplow, 1, zeropad, status );
+    /* Mask noisy bolos here if happening after common-mode cleaning */
+    if( (*status == SAI__OK) && ((noisecliphigh>0.0) || (noisecliplow>0.0)) &&
+        !noiseclipprecom ) {
 
-      if( noisemaps && *noisemaps && noisemap ) {
-        smf_addto_smfArray( *noisemaps, noisemap, status );
-      }
-
-      /*** TIMER ***/
-      msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s masking noisy",
-                 status, smf_timerupdate(&tv1,&tv2,status) );
+      smf__noisymask( wf, data, noisemaps, noisecliphigh, noisecliplow,
+                      zeropad, &tv1, &tv2, status );
     }
+
   }
+}
+
+/* Private function for carrying out the noisy bolometer masking */
+void smf__noisymask( smfWorkForce *wf, smfData *data, smfArray **noisemaps,
+                     double noisecliphigh, double noisecliplow,
+                     int zeropad, struct timeval *tv1,
+                     struct timeval *tv2, int *status ) {
+
+  smfData *noisemap=NULL;   /* Individual noisemap */
+
+  if( *status != SAI__OK ) return;
+
+  msgOutif( MSG__VERB, "", FUNC_NAME ": masking noisy bolometers", status );
+  smf_mask_noisy( wf, data,
+                  (noisemaps && *noisemaps) ? (&noisemap) : NULL,
+                  noisecliphigh, noisecliplow, 1, zeropad, status );
+
+  if( noisemaps && *noisemaps && noisemap ) {
+    smf_addto_smfArray( *noisemaps, noisemap, status );
+  }
+
+  /*** TIMER ***/
+  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s masking noisy",
+             status, smf_timerupdate(tv1,tv2,status) );
+
+
 }

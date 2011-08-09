@@ -26,7 +26,7 @@
 *                       double *noisecliplow, int *whiten, int *compreprocess,
 *                       double *pcathresh, int groupsubarray,
 *                       double *downsampscale, double *downsampfreq,
-*                       int *status )
+*                       int *noiseclipprecom, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -114,6 +114,9 @@
 *        and the slew speed.
 *     downsampfreq = double * (Returned)
 *        Target down-sampling rate in Hz.
+*     noiseclipprecom = int * (Returned)
+*        Should clipping of noisy bolometers happen before common-mode cleaning
+*        instead of after as is the default?
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -175,7 +178,9 @@
 *     2011-06-22 (EC):
 *        Add downsampfreq
 *     2011-06-23 (EC):
-*       noisecliphigh and noisecliplow instead of noiseclip
+*        noisecliphigh and noisecliplow instead of noiseclip
+*     2011-08-09 (EC):
+*        Add noiseclipprecom
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -236,7 +241,8 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        double *noisecliphigh, double *noisecliplow, int *whiten,
                        int *compreprocess, double *pcathresh,
                        int *groupsubarray, double *downsampscale,
-                       double *downsampfreq, int *status ) {
+                       double *downsampfreq, int *noiseclipprecom,
+                       int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -600,4 +606,19 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DOWNSAMPFREQ=%f", status,
                *downsampfreq );
   }
+
+  if( noiseclipprecom ) {
+    *noiseclipprecom = 0;
+    astMapGet0I( keymap, "NOISECLIPPRECOM", &temp );
+    if( temp != 0 && temp != 1 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "NOISECLIPPRECOM must be either 0 or 1.", status );
+    } else {
+      *noiseclipprecom = temp;
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": NOISECLIPPRECOM is %s", status,
+               (*noiseclipprecom ? "enabled" : "disabled") );
+  }
+
 }

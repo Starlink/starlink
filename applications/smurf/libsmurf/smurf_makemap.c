@@ -478,10 +478,18 @@
 *     NOEXPORTSETBAD = LOGICAL
 *       If true, the output models from the map-maker will not be modified
 *       to use bad values wherever the bolometer is known to be bad. [0]
-*     NOISECLIP = REAL
+*     NOISECLIPHIGH = REAL
 *       Clip outlier bolometers based on their noise. Any bolometers more
-*       than this number of standard deviations from the mean noise will be
+*       than this number of standard deviations above the median noise will be
 *       removed. [0]
+*     NOISECLIPLOW = REAL
+*       Clip outlier bolometers based on their noise. Any bolometers more
+*       than this number of standard deviations below the median noise will be
+*       removed. [0]
+*     NOISECLIPPRECOM = LOGICAL
+*       If true, outlier noisy bolometer clipping will happen immediately
+*       prior to common-mode removal (see COMPPREPROCESS) instead of the
+*       end of the cleaning process as is the default. [0]
 *     NUMITER = INTEGER
 *       A positive value if a set number of iterations are desired. A
 *       negative number indicates the maximum number of iterations allowed if

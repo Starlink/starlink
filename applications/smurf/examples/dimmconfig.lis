@@ -327,11 +327,15 @@ fillgaps = 1
 # Should a whitening filter be applied to compensate for 1/f noise?
 # whiten = 1
 
-# Clip bolometers based on their noise. This parameter will remove
-# any bolometers noisier than noisecliphigh standard deviations above
-# the median, or noisecliplow standard deviations below the median
+# Clip bolometers based on their noise. This step will remove any
+# bolometers noisier than noisecliphigh standard deviations above the
+# median, or noisecliplow standard deviations below the
+# median. Normally the noise clipping happens at the end of the
+# cleaning stage, but if you set noiseclipprecom it will instead occur
+# immediately prior to common-mode subtraction (see comppreprocess)
 noisecliphigh = 4.0
 #noisecliplow = 4.0
+#noiseclipprecom = 1
 
 # ----------------------------------------------------------------------------
 # A number of analagous parameters to clean dark squid signals before fitting
@@ -352,6 +356,9 @@ cleandk.fillgaps = 1
 #cleandk.filt_edgehigh = 0
 #cleandk.filt_notchlow = <undef>
 #cleandk.filt_notchhigh = <undef>
+#cleandk.noisecliphigh = 0.0
+#cleandk.noisecliplow = 0.0
+#cleandk.noiseclipprecom = 0
 #cleandk.whiten = 0
 cleandk.order = 0
 #cleandk.spikethresh = 0
