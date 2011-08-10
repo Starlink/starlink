@@ -663,6 +663,11 @@ void smurf_calcnoise( int *status ) {
             int provid = NDF__NOID;
             /* open a reference input file for provenance propagation */
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
+
+            /* Ensure ICD data order */
+            smf_dataOrder( thedata, 1, status );
+
+            /* Write it out */
             smf_write_smfData( thedata, NULL, NULL, tsgrp, gcount, provid,
                                MSG__VERB, status );
             ndfAnnul( &provid, status );
