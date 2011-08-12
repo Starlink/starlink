@@ -669,8 +669,10 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
         /* Do dark subtraction */
         smf_apply_dark( refdata, darks, status );
 
-        /* If required, apply the flat-field correction. */
-        if( doflat ) smf_flatfield_smfData( refdata, flatramps, status );
+        /* If required, apply the flat-field correction. We force the flatfield without
+           checking because we just switched to _DOUBLE and smf_check_flat does not yet
+           handle that properly. */
+        if( doflat ) smf_flatfield_smfData( refdata, flatramps, 1, status );
 
         /* Set havequal flag based on first file. This is required
            because the initial pass through for dimensions only looked

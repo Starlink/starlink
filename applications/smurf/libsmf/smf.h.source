@@ -1148,7 +1148,7 @@ void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **oda
                      const int flags, int *status );
 
 int smf_flatfield_smfData ( smfData *data, const smfArray * flats,
-                            int *status );
+                            int force, int *status );
 
 void smf_flatten ( smfData *data, int *status );
 

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     didflat = smf_flatfield_smfData( smfData *data, const smfArray * flats,
-*                                      int *status );
+*                                      int force, int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
@@ -22,6 +22,8 @@
 *     flats = const smfArray * (Given)
 *        Array of flatfield data. If a relevant flatfield is found it
 *        will be applied to "data" before flatfielding is calculated.
+*     force = int (Given)
+*        Force flatfielding without checking whether the data are flatfielded.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -39,6 +41,10 @@
 *     - Use smf_flatfield to create an independent output smfData
 *     - Use smf_flatten directly to apply a flatfield without updating
 *       history (not recommended) or applying an override.
+*     - The force argument is required because smf_check_flat is not
+*       100% reliable (it does not examine history) and in some cases
+*       we know we have done something that would make smf_check_flat
+*       get the wrong answer. The best fix is to fix smf_check_flat.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -90,17 +96,21 @@
 #define FUNC_NAME "smf_flatfield_smfData"
 
 int smf_flatfield_smfData ( smfData *data, const smfArray * flats,
-                            int *status ) {
+                            int force, int *status ) {
 
   if (*status != SAI__OK) return 0;
 
-  /* See if data are flatfielded */
-  smf_check_flat( data, status );
+  smf_dump_smfData( data, 0, status );
 
-  /* Data are flatfielded if status set to SMF__FLATN */
-  if ( *status == SMF__FLATN ) {
-    errAnnul(status);
-    return 0;
+  /* See if data are flatfielded (unless forced) */
+  if (!force) {
+    smf_check_flat( data, status );
+
+    /* Data are flatfielded if status set to SMF__FLATN */
+    if ( *status == SMF__FLATN ) {
+      errAnnul(status);
+      return 0;
+    }
   }
 
   /* See if we have an override flatfield. */

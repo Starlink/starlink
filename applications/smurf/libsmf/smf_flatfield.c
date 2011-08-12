@@ -176,7 +176,8 @@ void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **oda
       smf_check_smfData( idata, *odata, flags, status );
     }
 
-    smf_flatfield_smfData( *odata, flats, status );
+    /* Disable the check because we know that we have just checked */
+    smf_flatfield_smfData( *odata, flats, 1, status );
 
   }
 }
