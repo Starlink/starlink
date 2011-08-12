@@ -154,6 +154,10 @@
 *     2011-04-12 (TIMJ):
 *        If DARKS are to be treated as SCIENCE then we also need to free the
 *        darks smfArray.
+*     2011-08-12 (TIMJ):
+*        Revamp flatfield handling to ensure that ratios are taken properly
+*        for multiple subarrays and to determine if a failed flatfield was
+*        required. We only ignore a bad flat if it was not going to be used.
 
 *  Copyright:
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
@@ -218,6 +222,9 @@ static void
 smf__addto_durations( const smfData *indata, double * duration,
                       size_t * nsteps, int *status );
 
+static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
+                                  int *status );
+
 void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                       Grp **darkgrp, Grp **flatgrp, int reducedark,
                       int calcflat, smf_dtype darktype, smfArray ** darks,
@@ -238,6 +245,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
   size_t nsteps_sci = 0;     /* Total number of steps for science */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
+  AstKeyMap * scimap = NULL; /* All non-flat obs indexed by unique key */
   Grp *ogrp = NULL;   /* local copy of output group */
   size_t sccount = 0; /* Number of accepted science files */
   struct timeval tv1;  /* Timer */
@@ -272,10 +280,15 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
   fgrp =  smf_grp_new( ingrp, "FastFlats", status );
 
   /* and also create a keymap for the observation description */
-  obsmap = astKeyMap( " " );
+  obsmap = astKeyMap( "KeyError=1" );
 
   /* and an object map */
-  objmap = astKeyMap( " " );
+  objmap = astKeyMap( "KeyError=1" );
+
+  /* This keymap contains the sequence counters for each related
+     subarray/obsidss/heater/shutter combination and is used to decide
+     if a bad flat is relevant */
+  scimap = astKeyMap( "KeyError=1,KeyCase=0" );
 
   /* Work out how many input files we have and allocate sufficient sorting
      space */
@@ -285,6 +298,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
   /* check each file in turn */
   for (i = 1; i <= insize; i++) {
+    int seqcount = 0;
+    char keystr[100];  /* Key for scimap entry */
 
     /* open the file but just to get the header */
     smf_open_file( ingrp, i, "READ", SMF__NOCREATE_DATA, &infile, status );
@@ -293,10 +308,18 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     /* Fill in the keymap with observation details */
     smf_obsmap_fill( infile, obsmap, objmap, status );
 
+    /* Get the sequence counter for the file. We do not worry about
+       duplicate sequence counters (at the moment) */
+    smf_find_seqcount( infile->hdr, &seqcount, status );
+
+    /* The key identifying this subarray/obsidss/heater/shutter combo */
+    smf__calc_flatobskey( infile->hdr, keystr, sizeof(keystr), status );
+
     if (smf_isdark( infile, status )) {
       /* Store the sorting information */
       dkcount = smf__addto_sortinfo( infile, alldarks, i, dkcount, "Dark", status );
       smf__addto_durations( infile, &duration_darks, &nsteps_dark, status );
+      astMapPutElemI( scimap, keystr, -1, seqcount );
     } else {
       /* compare sequence type with observation type and drop it (for now)
          if they differ */
@@ -320,6 +343,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
             ndgCpsup( ingrp, i, ogrp, status );
             msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
             smf__addto_durations( infile, &duration_sci, &nsteps_sci, status );
+            astMapPutElemI( scimap, keystr, -1, seqcount );
             sccount++;
           } else {
             msgOutif( MSG__QUIET, "",
@@ -333,6 +357,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
           msgOutif( MSG__DEBUG, " ",
                     "File ^F lacks JCMTState: assuming it is non-dark",status);
           smf__addto_durations( infile, &duration_sci, &nsteps_sci, status );
+          astMapPutElemI( scimap, keystr, -1, seqcount );
           sccount++;
         }
 
@@ -365,103 +390,187 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     if (fflats) array = smf_create_smfArray( status );
 
     /* now open the flats and store them if requested */
-    if (*status == SAI__OK) {
-      int prevheat = 0;
-      smfData * prevresp = NULL;
-      smfData * prevflat = NULL;
+    if (*status == SAI__OK && array && ffcount) {
       size_t start_ffcount = ffcount;
+      smfArray * resps = NULL;
+      AstKeyMap * flatmap = NULL;
+
+      if (calcflat) {
+        resps = smf_create_smfArray( status );
+        flatmap = astKeyMap( "KeyCase=0,KeyError=1" );
+      }
+
+      /* Read each flatfield. Calculate a responsivity image and a flatfield
+         solution. Store these in a keymap along with related information
+         which is itself stored in a keymap indexed by a string made of
+         OBSIDSS, reference heater value, shutter and subarray.
+      */
 
       for (i = 0; i < start_ffcount; i++ ) {
         size_t ori_index =  (allfflats[i]).index;
+        smfData * outfile = NULL;
+        char keystr[100];
+        AstKeyMap * infomap = astKeyMap( "KeyError=1" );
+        int oplen = 0;
+        char thisfile[MSG__SZMSG];
+        int seqcount = 0;
 
-        if (array) {
-          smfData * outfile = NULL;
+        /* read filename from group */
+        infile = NULL;
+        smf_open_file( ingrp, ori_index, "READ", 0, &infile, status );
+        if ( *status != SAI__OK ) {
+          /* This should not happen because we have already opened
+             the file. If it does happen we abort with error. */
+          if (infile) smf_close_file( &infile, status );
+          break;
+        }
 
-          /* read filename from group */
-          smf_open_file( ingrp, ori_index, "READ", 0, &infile, status );
+        /* Calculate the key for this observation */
+        smf__calc_flatobskey( infile->hdr, keystr, sizeof(keystr), status );
 
-          /* Collapse it */
+        /* Get the file name for error messages */
+        smf_smfFile_msg( infile->file, "F", 1, "<unknown file>" );
+        msgLoad( "", "^F", thisfile, sizeof(thisfile), &oplen, status );
+
+        /* And the sequence counter to link against science observations */
+        smf_find_seqcount( infile->hdr, &seqcount, status );
+
+        /* Prefill infomap */
+        astMapPut0C( infomap, "FILENAME", thisfile, "");
+        astMapPut0I( infomap, "SEQCOUNT", seqcount, "");
+
+        /* Collapse it */
+        if (*status == SAI__OK) {
           smf_flat_fastflat( infile, &outfile, status );
           if (*status == SMF__BADFLAT) {
             errAnnul( status );
+            astMapPut0I( infomap, "ISGOOD", 0, "" );
+            astMapPutElemA( flatmap, keystr, -1, infomap );
             if (outfile) smf_close_file( &outfile, status );
-            smf_smfFile_msg( infile->file, "F", 1, "<unknown file>" );
-            msgOutif( MSG__QUIET, "",
-                      "Flatfield ramp file ^F could not be processed. Ignoring.",
-                      status );
             if (infile) smf_close_file( &infile, status );
+            infomap = astAnnul( infomap );
             ffcount--;
             continue;
           }
+        }
 
-          if (outfile) {
-            /* Cache the filename since it will not be associated with
-               the responsivity image */
-            int oplen = 0;
-            char thisfile[MSG__SZMSG];
-            smf_smfFile_msg( infile->file, "F", 1, "<unknown file>" );
-            msgLoad( "", "^F", thisfile, sizeof(thisfile), &oplen, status );
+        if (outfile && *status == SAI__OK) {
+          smf_close_file( &infile, status );
+          infile = outfile;
 
-            smf_close_file( &infile, status );
-            infile = outfile;
+          if (calcflat) {
+            size_t ngood = 0;
+            smfData * curresp = NULL;
 
-            if (calcflat) {
-              size_t ngood = 0;
-              int curheat = 0;
-              smfData * curresp = NULL;
-
-              /* get reference heater value */
-              smf_getfitsi( infile->hdr, "PIXHEAT", &curheat, status );
-
-              if (*status == SAI__OK) {
-                ngood = smf_flat_calcflat( MSG__VERB, NULL, "RESIST",
-                                           "FLATMETH", "FLATORDER", NULL, "RESPMASK",
-                                           "FLATSNR", NULL, infile, &curresp, status );
-                if (*status != SAI__OK) {
-                  /* if we failed to calculate a flatfield we should simply ignore it */
-                  ngood = 0;
-                  errAnnul(status);
-                }
+            if (*status == SAI__OK) {
+              ngood = smf_flat_calcflat( MSG__VERB, NULL, "RESIST",
+                                         "FLATMETH", "FLATORDER", NULL, "RESPMASK",
+                                         "FLATSNR", NULL, infile, &curresp, status );
+              if (*status != SAI__OK) {
+                /* if we failed to calculate a flatfield we can not analyse a responsivity*/
+                errAnnul(status);
+                ffcount--;
+                if (curresp) smf_close_file( &curresp, status );
+                if (infile) smf_close_file( &infile, status );
+                astMapPut0I( infomap, "ISGOOD", 0, "" );
+                astMapPutElemA( flatmap, keystr, -1, infomap );
+                infomap = astAnnul( infomap );
+                continue;
               }
 
-              if (ngood < SMF__MINSTATSAMP) {
-                smf_smfFile_msg( NULL, "F", 1, thisfile );
-                if (infile->hdr->obstype != SMF__TYP_NEP) {
-                  msgOutiff( MSG__QUIET, "",
-                            "Flatfield ramp file ^F had %zu good bolometer%s. Ignoring.",
-                            status, ngood, (ngood == 1 ? "" : "s") );
-                  ffcount--;
-                  if (curresp) smf_close_file( &curresp, status );
-                  if (infile) smf_close_file( &infile, status );
-                  continue;
-                } else {
-                  msgOutiff( MSG__NORM, "",
-                            "Flatfield ramp file ^F had %zu good bolometer%s. Eng mode.",
-                             status, ngood, (ngood == 1 ? "" : "s") );
-                }
-              }
+              /* Store the responsivity data for later on and the processed
+                 flatfield until we have vetted it */
+              astMapPut0P( infomap, "CALCFLAT", infile, "" );
+              astMapPut0P( infomap, "RESP", curresp, "" );
+              astMapPut0I( infomap, "ISGOOD", 1, "" );
+              astMapPut0I( infomap, "NGOOD", ngood, "" );
+              astMapPut0I( infomap, "GRPINDEX", ori_index, "" );
+              astMapPut0I( infomap, "SMFTYP", infile->hdr->obstype, "" );
+              astMapPutElemA( flatmap, keystr, -1, infomap );
 
-              /* See if we need to compare responsivity images */
-              if ( prevresp && curresp && curheat == prevheat &&
-                   strcmp(prevresp->hdr->obsidss, curresp->hdr->obsidss) == 0 ) {
+            }
+
+          } else { /* if (calcflat) */
+            /* Store the collapsed flatfield  - the processed flat is not stored here yet */
+            smf_addto_smfArray( array, infile, status );
+          }
+
+        } /* if (outfile) */
+
+        /* Annul the keymap (will be fine if it is has been stored in another keymap) */
+        infomap = astAnnul( infomap );
+
+      } /* End loop over flatfields */
+
+      /* Now we have to loop over the related flatfields to disable
+         bolometers that are not good and also decide whether we
+         need to set status to bad. */
+      if (*status == SAI__OK && calcflat ) {
+        size_t nkeys = astMapSize( flatmap );
+        for (i = 0; i < nkeys; i++ ) {
+          const char *key = astMapKey( flatmap, i );
+          int nf = 0;
+          AstKeyMap ** kmaps = NULL;
+          int nelem = astMapLength( flatmap, key );
+          kmaps = astMalloc( sizeof(*kmaps) * nelem );
+          astMapGet1A( flatmap, key, nelem, &nelem, kmaps );
+
+          for ( nf = 0; nf < nelem && *status == SAI__OK; nf++ ) {
+            AstKeyMap * infomap = kmaps[nf];
+            int isgood = 0;
+
+            astMapGet0I( infomap, "ISGOOD", &isgood );
+
+            if (isgood) {
+              /* The flatfield worked */
+              int ngood = 0;
+
+              /* Get the number of good bolometers at this point */
+              astMapGet0I( infomap, "NGOOD", &ngood );
+
+              /* Can we compare with the next flatfield? */
+              if (ngood < SMF__MINSTATSAMP ) {
+                /* no point doing all the ratio checking for this */
+              } else if ( nelem - nf >= 2 ) {
+                AstKeyMap * nextmap = kmaps[nf+1];
+                const char *nextfname = NULL;
+                const char *fname = NULL;
+                smfData * curresp = NULL;
+                smfData * nextresp = NULL;
+                smfData * curflat = NULL;
+                void *tmpvar = NULL;
                 size_t bol = 0;
                 smfData * ratio = NULL;
                 double *in1 = NULL;
                 double *in2 = NULL;
                 double mean = VAL__BADD;
-                size_t nbolo = (prevresp->dims)[0] * (prevresp->dims)[1];
+                size_t nbolo;
                 double *out = NULL;
                 double sigma = VAL__BADD;
                 float clips[] = { 5.0, 5.0 }; /* 5.0 sigma iterative clip */
+                size_t ngoodz = 0;
+
+                astMapGet0C( nextmap, "FILENAME", &nextfname );
+                astMapGet0C( infomap, "FILENAME", &fname );
+
+                /* Retrieve the responsivity images from the keymap */
+                astMapGet0P( infomap, "RESP", &tmpvar );
+                curresp = tmpvar;
+                astMapGet0P( nextmap, "RESP", &tmpvar );
+                nextresp = tmpvar;
+                astMapGet0P( infomap, "CALCFLAT", &tmpvar );
+                curflat = tmpvar;
+
+                nbolo = (curresp->dims)[0] * (curresp->dims)[1];
 
                 /* get some memory for the ratio if we have not already.
                    We could get some memory once assuming each flat has the
                    same number of bolometers... */
-                ratio = smf_deepcopy_smfData( prevresp, 0, 0, 0, 0, status );
+                ratio = smf_deepcopy_smfData( curresp, 0, 0, 0, 0, status );
 
                 /* divide: smf_divide_smfData ? */
-                in1 = (prevresp->pntr)[0];
-                in2 = (curresp->pntr)[0];
+                in1 = (curresp->pntr)[0];
+                in2 = (nextresp->pntr)[0];
                 out = (ratio->pntr)[0];
 
                 for (bol=0; bol<nbolo;bol++) {
@@ -475,23 +584,24 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
                 /* find some statistics */
                 smf_clipped_stats1D( out, 2, clips, 1, nbolo, NULL, 0, 0, &mean,
-                                     &sigma, NULL, 0, &ngood, status );
+                                     &sigma, NULL, 0, &ngoodz, status );
 
                 if (*status == SMF__INSMP) {
                   errAnnul(status);
-                  smf_smfFile_msg( NULL, "F", 1, thisfile );
                   msgOutiff( MSG__QUIET, "",
-                            "Flatfield ramp ratio with second file ^F had too few bolometers (%zu < %d). Not clipping ratio.",
-                             status, ngood, SMF__MINSTATSAMP );
+                            "Flatfield ramp ratio of %s with %s had too few bolometers (%zu < %d).",
+                             status, fname, nextfname, ngoodz, SMF__MINSTATSAMP );
+                  isgood = 0;
+                  ngood = ngoodz; /* Must be lower or equal to original ngood */
 
-                } else if (*status == SAI__OK && mean != VAL__BADD && sigma != VAL__BADD && prevflat->da) {
+                } else if (*status == SAI__OK && mean != VAL__BADD && sigma != VAL__BADD && curflat->da) {
                   /* Now flag the flatfield as bad for bolometers that have changed
                      more than N sigma from the mean (the mean should be 1.0 within errors) */
                   double sigclip = 3.0 * sigma;  /* 3 sigma clip */
                   double thrlo = mean - sigclip;
                   double thrhi = mean + sigclip;
                   size_t nmasked = 0;
-                  double *flatcal = prevflat->da->flatcal;
+                  double *flatcal = curflat->da->flatcal;
 
                   msgOutiff( MSG__DEBUG, "", "Flatfield fast ramp ratio mean = %g +/- %g (%zu bolometers)",
                              status, mean, sigma, ngood);
@@ -504,36 +614,136 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                          (out[bol] < thrlo || out[bol] > thrhi ) ) {
                       flatcal[bol] = VAL__BADD;
                       nmasked++;
+                    } else if ( in1[bol] != VAL__BADD && in2[bol] == VAL__BADD ) {
+                      /* A bolometer is bad next time but good now so we must set it bad now */
+                      flatcal[bol] = VAL__BADD;
+                      nmasked++;
                     }
                   }
 
                   if ( nmasked > 0 ) {
                     msgOutiff( MSG__NORM, "", "Masked %zu bolometers because of flatfield ramp instability",
                                status, nmasked );
+
+                    /* update ngood to take into account the masking */
+                    ngood -= nmasked;
                   }
 
                 }
 
                 smf_close_file( &ratio, status );
+
+              } /* End of flatfield responsivity comparison */
+
+              /* if we only have a few bolometers left we now consider this
+                 a bad flat unless it is actually an engineering measurement
+                 where expect some configurations to give zero bolometers */
+              if (ngood < SMF__MINSTATSAMP) {
+                const char *fname = NULL;
+                int smftyp = 0;
+                astMapGet0I( infomap, "SMFTYP", &smftyp );
+                astMapGet0C( infomap, "FILENAME", &fname );
+                if (smftyp != SMF__TYP_NEP) {
+                  msgOutiff( MSG__QUIET, "",
+                            "Flatfield ramp file %s only has %zu good bolometer%s.",
+                             status, fname, ngood, (ngood == 1 ? "" : "s") );
+                  isgood = 0;
+
+                } else {
+                  msgOutiff( MSG__NORM, "",
+                            "Flatfield ramp file ^F has %zu good bolometer%s. Eng mode.",
+                             status, ngood, (ngood == 1 ? "" : "s") );
+                }
               }
 
-              /* Free previous and then store new previous */
-              if (prevresp) smf_close_file( &prevresp, status );
-              prevresp = curresp;
-              prevheat = curheat;
+              /* We do not need the responsivity image again */
+              {
+                void *tmpvar = NULL;
+                smfData * resp = NULL;
+                astMapGet0P( infomap, "RESP", &tmpvar );
+                resp = tmpvar;
+                if (resp) smf_close_file( &resp, status );
+                astMapRemove( infomap, "RESP" );
+              }
+
+            } /* End of isgood comparison */
+
+            /* Now we may have lost a previously good flat so we test again
+               before storing the result */
+            if (isgood) {
+              int ori_index;
+              smfData * flatfile = NULL;
+              void *tmpvar = NULL;
+
+              /* Store in the output group */
+              astMapGet0I( infomap, "GRPINDEX", &ori_index );
+              ndgCpsup( ingrp, ori_index, fgrp, status );
+
+              /* And store in the smfArray */
+              astMapGet0P( infomap, "CALCFLAT", &tmpvar );
+              astMapRemove( infomap, "CALCFLAT" );
+              flatfile = tmpvar;
+              smf_addto_smfArray( array, flatfile, status );
+
+            } else {
+              /* The flatfield failed - do we care? */
+              const char * fname = NULL;
+              astMapGet0C( infomap, "FILENAME", &fname );
+
+              /* See if there is the same key in scimap */
+              if (astMapHasKey( scimap, key ) ) {
+                int refseq = 0;
+                int *allseqs = NULL;  /* List of sequence counters to compare */
+                int nseq = astMapLength( scimap, key );
+                int needed = 0;
+                int ns = 0;
+                astMapGet0I( infomap, "SEQCOUNT", &refseq );
+
+                allseqs = astMalloc( sizeof(*allseqs) * nseq);
+                if (allseqs) {
+                  astMapGet1I( scimap, key, nseq, &nseq, allseqs );
+
+                  for (ns = 0; ns < nseq; ns++) {
+                    if ( abs( allseqs[ns] - refseq ) == 1 ) {
+                      needed = 1;
+                      break;
+                    }
+                  }
+                }
+                if (allseqs) allseqs = astFree(allseqs);
+
+                if (needed) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "Flatfield from %s failed to process but this is "
+                           "required for science processing", status, fname );
+                }
+
+              }
+
+              /* Free the flat if we have a flat to free */
+                  /* free the flatfield data since we are not storing it */
+              if (astMapHasKey( infomap, "CALCFLAT" ) ) {
+                smfData * flatfile = NULL;
+                void *tmpvar = NULL;
+                astMapGet0P( infomap, "CALCFLAT", &tmpvar );
+                flatfile = tmpvar;
+                if (flatfile) smf_close_file( &flatfile, status );
+              }
+
+              /* if status is still okay then we will print a message */
+              msgOutiff(MSG__NORM, "", "Flatfield from %s failed to process but "
+                        "it does not seem to be required", status, fname );
             }
 
-          }
+            /* Free the object as we go */
+            kmaps[nf] = astAnnul( kmaps[nf] );
+          } /* End of loop over this obsidss/subarray/heater */
 
-          smf_addto_smfArray( array, infile, status );
-          prevflat = infile;
+          kmaps = astFree( kmaps );
+
         }
-
-        /* Store the entry in the output group */
-        ndgCpsup( ingrp, ori_index, fgrp, status );
-
       }
-      if (prevresp) smf_close_file( &prevresp, status );
+
       if (array->ndat) {
         if (fflats) *fflats = array;
       } else {
@@ -683,6 +893,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
   obsmap = astAnnul( obsmap );
   objmap = astAnnul( objmap );
+  scimap = astAnnul( scimap );
 
   msgOutiff( SMF__TIMER_MSG, "",
              "Took %.3f s to find science observations",
@@ -730,4 +941,34 @@ static void smf__addto_durations ( const smfData *indata, double *duration,
   *duration += ( indata->hdr->nframes * indata->hdr->steptime );
 
   return;
+}
+
+static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
+                                  int *status ) {
+
+  int curheat = 0;
+  char subarray[10];
+  double shutter = 0.0;
+  size_t nwrite = 0;
+
+  if (*status != SAI__OK) return;
+  if (!hdr) return;
+
+  /* get reference heater value and subarray string */
+  smf_getfitsi( hdr, "PIXHEAT", &curheat, status );
+  smf_getfitsd( hdr, "SHUTTER", &shutter, status );
+  smf_find_subarray( hdr, subarray, sizeof(subarray), NULL,
+                     status );
+  if (*status != SAI__OK) return;
+
+  nwrite = snprintf(keystr, keylen, "%s_%s_%.1f_%d",
+                    hdr->obsidss, subarray, shutter, curheat );
+
+  if (nwrite >= keylen) {
+    /* The string was truncated */
+    *status = SMF__STRUN;
+    errRep("", "String truncation forming flatfield key (Possible programming error)",
+           status );
+  }
+
 }
