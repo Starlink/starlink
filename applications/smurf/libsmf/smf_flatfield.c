@@ -176,14 +176,8 @@ void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **oda
       smf_check_smfData( idata, *odata, flags, status );
     }
 
-    /* See if we have an override flatfield. */
-    smf_flat_override( flats, *odata, status );
+    smf_flatfield_smfData( *odata, flats, status );
 
-    /* OK now apply flatfield calibration */
-    smf_flatten( *odata, status);
-
-    /* Write history entry to file */
-    smf_history_add( *odata, FUNC_NAME, status);
   }
 }
 

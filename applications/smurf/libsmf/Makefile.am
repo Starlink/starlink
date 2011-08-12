@@ -196,6 +196,7 @@ smf_flat_smfData.c \
 smf_flat_standardpow.c \
 smf_flat_write.c \
 smf_flatfield.c \
+smf_flatfield_smfData.c \
 smf_flatten.c \
 smf_free_smfFilter.c \
 smf_freepolbins.c \

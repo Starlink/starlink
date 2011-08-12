@@ -670,18 +670,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
         smf_apply_dark( refdata, darks, status );
 
         /* If required, apply the flat-field correction. */
-        if( doflat ) {
-
-          /* Override if necessary */
-          smf_flat_override( flatramps, refdata, status );
-
-          /* OK now apply flatfield calibration */
-          smf_flatten( refdata, status);
-
-          /* Write history entry to file */
-          smf_history_add( refdata, FUNC_NAME, status);
-
-        }
+        if( doflat ) smf_flatfield_smfData( refdata, flatramps, status );
 
         /* Set havequal flag based on first file. This is required
            because the initial pass through for dimensions only looked

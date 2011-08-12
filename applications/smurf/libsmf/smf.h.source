@@ -1147,6 +1147,9 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
 void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **odata,
                      const int flags, int *status );
 
+int smf_flatfield_smfData ( smfData *data, const smfArray * flats,
+                            int *status );
+
 void smf_flatten ( smfData *data, int *status );
 
 smfFilter *smf_free_smfFilter( smfFilter *filt, int *status );
