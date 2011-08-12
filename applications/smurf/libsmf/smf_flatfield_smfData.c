@@ -100,8 +100,6 @@ int smf_flatfield_smfData ( smfData *data, const smfArray * flats,
 
   if (*status != SAI__OK) return 0;
 
-  smf_dump_smfData( data, 0, status );
-
   /* See if data are flatfielded (unless forced) */
   if (!force) {
     smf_check_flat( data, status );
