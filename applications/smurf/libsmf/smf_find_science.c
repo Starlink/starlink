@@ -622,8 +622,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                   }
 
                   if ( nmasked > 0 ) {
-                    msgOutiff( MSG__NORM, "", "Masked %zu bolometers because of flatfield ramp instability",
-                               status, nmasked );
+                    msgOutiff( MSG__NORM, "", "Masked %zu bolometers in %s from unstable flatfield",
+                               status, nmasked, fname );
 
                     /* update ngood to take into account the masking */
                     ngood -= nmasked;
