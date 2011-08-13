@@ -97,11 +97,15 @@ int smf_flat_override ( const smfArray *flats, smfData * indata,
 
     smf_smfFile_msg( indata->file, "INF", 1, "<unknown>" );
     smf_smfFile_msg( flatdata->file, "FLAT", 1, "<unknown>");
-    msgOutif( MSG__VERB, "", FUNC_NAME
-              ": Override flatfield of ^INF using ^FLAT", status );
+    msgOutif( MSG__QUIET, "",
+              "Override flatfield of ^INF using ^FLAT", status );
     smf_flat_assign( 1, SMF__FLATMETH_NULL, NULL, flatdata,
                      indata, status );
     retval = 1;
+  } else {
+    smf_smfFile_msg( indata->file, "INF", 1, "<unknown>" );
+    msgOutif( MSG__QUIET, "",
+              "Did not find an override flatfield for ^INF", status );
   }
 
   return retval;
