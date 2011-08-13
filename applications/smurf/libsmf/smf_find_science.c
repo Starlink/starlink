@@ -596,10 +596,10 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
                 } else if (*status == SAI__OK && mean != VAL__BADD && sigma != VAL__BADD && curflat->da) {
                   /* Now flag the flatfield as bad for bolometers that have changed
-                     more than N sigma from the mean (the mean should be 1.0 within errors) */
-                  double sigclip = 3.0 * sigma;  /* 3 sigma clip */
-                  double thrlo = mean - sigclip;
-                  double thrhi = mean + sigclip;
+                     more than n%. We expect the variation to be 1+/-a small bit */
+                  const double pmrange = 0.05;
+                  double thrlo = 1.0 - pmrange;
+                  double thrhi = 1.0 + pmrange;
                   size_t nmasked = 0;
                   double *flatcal = curflat->da->flatcal;
 
