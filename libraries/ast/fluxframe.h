@@ -64,6 +64,10 @@
 #define STATUS_PTR astGetStatusPtr
 #endif
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
 
 #if defined(astCLASS)            /* Protected */
 
@@ -152,7 +156,7 @@ astPROTO_ISA(FluxFrame)           /* Test class membership */
 #if defined(astCLASS)            /* Protected */
 AstFluxFrame *astFluxFrame_( double, void *, const char *, int *, ...);
 #else
-AstFluxFrame *astFluxFrameId_( double, void *, const char *, ... );
+AstFluxFrame *astFluxFrameId_( double, void *, const char *, ... )__attribute__((format(printf,3,4)));
 #endif
 
 #if defined(astCLASS)            /* Protected */
