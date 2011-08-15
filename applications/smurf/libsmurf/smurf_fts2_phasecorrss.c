@@ -210,9 +210,6 @@ void smurf_fts2_phasecorrss(int* status)
     srcN   = inputData->dims[2];
     numBol = srcW * srcH;  // NUMBER OF BOLOMETERS IN THE SUBARRAY
 
-    int xc = srcW >> 1;
-    int yc = srcH >> 1;
-
     outN = srcN - pcfLength + 1;
 
     // GET SOURCE MIRROR POSITIONS
