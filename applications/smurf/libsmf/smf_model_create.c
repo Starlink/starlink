@@ -203,6 +203,8 @@
 *     2011-04-14 (DSB):
 *        Remove gap filling since it is done in smf_fft_data (called by
 *        bolonoise).
+*     2011-08-16 (DSB):
+*        Optionally, create one smfData per subarray for SMF__COM models.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -307,6 +309,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   dim_t nrel=0;                 /* Number of related elements (subarrays) */
   dim_t ntslice=0;              /* Number of time slices */
   int oflag=0;                  /* Flags for opening template file */
+  int perarray;                 /* Create a COM model for each subarray? */
   char *pname=NULL;             /* Poiner to fname */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
   double tau;                   /* tau */
@@ -354,6 +357,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
   /* If nofile is set, leaveopen=0 is meaningless */
   if( nofile ) leaveopen = 1;
+
+  /* See if a separate COM model is to be created for each subarray. */
+  astMapGet0A( keymap, "COM", &kmap );
+  astMapGet0I( kmap, "PERARRAY", &perarray );
+  kmap = astAnnul( kmap );
 
   /* If using igroup as a template use group expressions to make filenames */
   if( igroup != NULL ) {
@@ -416,7 +424,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
          is used. Do this by setting remaining elements of mgroup->subgroups
          to 0. nrel is 1. */
 
-      if( mtype == SMF__COM ) {
+      if( mtype == SMF__COM && !perarray ) {
         if (mgroup != NULL) {
           for( j=1; j<(*mgroup)->nrelated; j++ ) {
             (*mgroup)->subgroups[i][j] = 0;

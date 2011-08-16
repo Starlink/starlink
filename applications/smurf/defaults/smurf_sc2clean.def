@@ -126,6 +126,7 @@ com.gain_box = 6000
 com.fit_box = <undef>
 com.notfirst = 0
 com.noremove = 0
+com.perarray = 0
 
 # Setting com.gain_is_one non-zero causes all bolometer gains to be
 # forced to 1.0. Setting com.offset_is_zero non-zero causes all

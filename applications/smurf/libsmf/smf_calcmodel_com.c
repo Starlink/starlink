@@ -177,6 +177,9 @@
 *        together to form COM, but this introduces a degeneracy between
 *        COM and GAI that could cause instabilities (i.e. high GAI*low
 *        COM is the same as low GAI*high COM).
+*     2010-08-16 (DSB)
+*        - Add "perarray" config parameter - if non-zero, a separate COM
+*        model is calculated for each subarray.
 
 *  Copyright:
 *     Copyright (C) 2006-2010 University of British Columbia.
@@ -526,8 +529,11 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   AstKeyMap *gkmap=NULL;        /* Local GAIn keymap */
   dim_t i;                      /* Loop counter */
   dim_t iblock;                 /* Index of time block */
+  int icom;                     /* Index of current COM model */
   int ii;                       /* Loop counter */
   int ival = 0;                 /* Integer value */
+  dim_t idx_hi;                 /* Highest subarray index in current COM model */
+  dim_t idx_lo;                 /* Lowest subarray index in current COM model */
   dim_t idx=0;                  /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   smfCalcmodelComData *job_data=NULL; /* Array of job data */
@@ -539,6 +545,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   int nbad;                     /* Number of rejected bolo-blocks */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t nblock=0;               /* Number of time blocks */
+  int ncom;                     /* Number of COM models */
   dim_t ndata=0;                /* Total number of data points */
   int *nrej=NULL;               /* Array holding no. of rejections per block */
   int nogains;                  /* Force all gains to unity? */
@@ -558,6 +565,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t off_offset=0;           /* Offset from offset to correlation value */
   double off_copy=0;            /* copy of off */
   smfCalcmodelComData *pdata=NULL; /* Pointer to job data */
+  int perarray;                 /* Use a separate common mode for each array? */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   int quit;                     /* While loop quit flag */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
@@ -576,9 +584,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Main routine */
   if (*status != SAI__OK) return;
-
-  /* How many threads do we get to play with */
-  nw = wf ? wf->nworker : 1;
 
   /* Obtain pointer to sub-keymap containing COM parameters */
   astMapGet0A( keymap, "COM", &obj );
@@ -645,6 +650,12 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     return;
   }
 
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
+
+  /* Allocate job data for threads */
+  job_data = astCalloc( nw, sizeof(*job_data) );
+
   /* Assert bolo-ordered data */
   smf_model_dataOrder( dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__GAI|SMF__NOI, 0,
                        status );
@@ -673,442 +684,494 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
   if(dat->noi) noi = dat->noi[chunk];
 
-  /* The common mode signal is stored as a single 1d vector for all 4
-     subarrays.  The corresponding smfData is at position 0 in the
-     model sdata. */
+  /* Use separate common modes for each sub-array? */
+  astMapGet0I( kmap, "PERARRAY", &perarray );
 
-  if( model->sdata[0] ) {
-    /* Pointer to model data array */
-    model_data = (model->sdata[0]->pntr)[0];
-
-    /* Copy of model data array */
-    model_data_copy = astCalloc( (model->sdata[0]->dims)[0],
-                                 sizeof(*model_data_copy) );
-    if( *status == SAI__OK ) {
-      memcpy( model_data_copy, model_data, (model->sdata[0]->dims)[0] *
-	      sizeof(*model_data_copy) );
+  /* If "perarray" is non-zero, a separate common mode signal is calculated
+     for each available subarrays and is stored as a separate 1d vector.
+     If "perarray" is zero, a single common mode signal is calculated from
+     all available subarrays and is stored as a 1d vector. The corresponding
+     smfData is at position 0 in the model sdata. Store the number of COM
+     models to create. */
+  if( perarray ) {
+    ncom = model->ndat;
+    if( (int) res->ndat != ncom && *status == SAI__OK  ) {
+       *status = SAI__ERROR;
+       errRep( "", FUNC_NAME ": COM model and residuals contain different "
+               "number of data arrays!", status);
     }
-    /* Temporary buffer to store weights */
-    weight = astMalloc( ((model->sdata[0]->dims)[0])*sizeof(*weight) );
-
-    /* Find the number of blocks of time slices per bolometer. Each
-       block contains "gain_box" time slices (except possibly for the
-       last time slice which may contain more than gain_box but will
-       be less than 2*gain_box). Each block of time slices from a
-       single bolometer has its own gain, offset and correlation
-       values. */
-    nblock = (model->sdata[0]->dims)[0]/gain_box;
-    if( nblock == 0 ) nblock = 1;
-
   } else {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Model smfData was not loaded!", status);
+    ncom = 1;
   }
 
-  /* Allocate job data for threads */
-  job_data = astCalloc( nw, sizeof(*job_data) );
+  /* Loop round creating each COM model. */
+  for( icom = 0; icom < ncom; icom++ ) {
 
-
-
-  /* Add the previous estimate of the common mode signal back on to the
-     bolometer residuals. If we do not yet have an estimate of the common
-     mode signal, then the bolometer residuals are left unchanged, but
-     the gain values in the "gai" model are set to the rms value of the
-     bolometer data stream. This is to ensure that the very high gain
-     bolometers do not dominate the initial estimate of the common mode
-     signal calculated below.
-     --------------------------------------------------------------  */
-
-  /* Loop over index in subgrp (subarray). */
-  for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
-    /* Obtain dimensions of the data */
-    smf_get_dims( res->sdata[idx],  NULL, NULL, &thisnbolo, &thisntslice,
-                  &thisndata, &bstride, &tstride, status);
-
-    if(gai) {
-      smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
-                    &gbstride, &gcstride, status);
-      off_offset = 1*nblock*gcstride;
-      corr_offset = 2*nblock*gcstride;
+    /* Set the index of the first and last subarray that contributes to the
+       current COM model. */
+    if( perarray ) {
+       idx_lo = icom;
+       idx_hi = icom;
+       msgSeti( "I", icom + 1 );
+       msgSeti( "N", ncom );
+       msgOutif( MSG__VERB, "", "  Calculating COM model for array ^I of ^N",
+                 status );
+    } else {
+       idx_lo = 0;
+       idx_hi = res->ndat - 1;
     }
 
-    if( idx == 0 ) {
-      /* Store dimensions of the first file */
-      nbolo = thisnbolo;
-      ntslice = thisntslice;
-      ndata = thisndata;
+    /* Check space is available for the current COM model. */
+    if( model->sdata[icom] ) {
 
+      /* Pointer to model data array */
+      model_data = (model->sdata[icom]->pntr)[0];
 
-
-
-      /*  --- Set up the division of labour for threads --- */
-
-      /* Mutually exclusive blocks of bolos */
-
-      if( nw > (int) nbolo ) {
-        step = 1;
-      } else {
-        step = nbolo/nw;
+      /* Copy of model data array */
+      model_data_copy = astCalloc( (model->sdata[icom]->dims)[0],
+                                   sizeof(*model_data_copy) );
+      if( *status == SAI__OK ) {
+        memcpy( model_data_copy, model_data, (model->sdata[icom]->dims)[0] *
+  	      sizeof(*model_data_copy) );
       }
+      /* Temporary buffer to store weights */
+      weight = astMalloc( ((model->sdata[icom]->dims)[0])*sizeof(*weight) );
 
-      for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
-        pdata = job_data + ii;
-
-        pdata->b1 = ii*step;
-        pdata->b2 = (ii+1)*step-1;
-
-        /* Ensure that the last thread picks up any left-over bolometers */
-        if( (ii==(nw-1)) && (pdata->b1<(nbolo-1)) ) {
-          pdata->b2=nbolo-1;
-        }
-      }
-
-      /* Mutually exclusive blocks of time slices */
-
-      if( (ntslice < 1000) && (nw > (int) ntslice) ) {
-        step = 1;
-      } else {
-        step = ntslice/nw;
-      }
-
-      for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
-        pdata = job_data + ii;
-
-        /* Blocks of bolos */
-        pdata->t1 = ii*step;
-        pdata->t2 = (ii+1)*step-1;
-
-        /* Ensure that the last thread picks up any left-over tslices */
-        if( (ii==(nw-1)) && (pdata->t1<(ntslice-1)) ) {
-          pdata->t2=ntslice-1;
-        }
-      }
+      /* Find the number of blocks of time slices per bolometer. Each
+         block contains "gain_box" time slices (except possibly for the
+         last time slice which may contain more than gain_box but will
+         be less than 2*gain_box). Each block of time slices from a
+         single bolometer has its own gain, offset and correlation
+         values. */
+      nblock = (model->sdata[icom]->dims)[0]/gain_box;
+      if( nblock == 0 ) nblock = 1;
 
     } else {
-      /* Check that dimensions haven't changed */
-      if( (thisnbolo != nbolo) || (thisntslice != ntslice) ||
-          (thisndata != ndata) ) {
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME
-                ": smfData's in smfArray have different dimensions!",
-                status);
-      }
-    }
-
-    /* Get pointers to data/quality/model */
-    res_data = (res->sdata[idx]->pntr)[0];
-    qua_data = (qua->sdata[idx]->pntr)[0];
-    if( gai ) {
-      gai_data = (gai->sdata[idx]->pntr)[0];
-    }
-
-    if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": Null data in inputs", status);
-    } else {
+      errRep( "", FUNC_NAME ": Model smfData was not loaded!", status);
+    }
 
-      /* Set up the job data and undo previous iteration of model */
 
-      for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
-        pdata = job_data + ii;
 
-        pdata->bstride = bstride;
-        pdata->gai_data = gai_data;
-        pdata->gbstride = gbstride;
-        pdata->gcstride = gcstride;
-        pdata->gflat = gflat;
-        pdata->idx = idx;
-        pdata->model_data = model_data_copy; /* Careful! */
-        pdata->nbolo = nbolo;
-        pdata->ntslice = ntslice;
-        pdata->operation = 0;
-        pdata->res_data = res_data;
-        pdata->tstride = tstride;
-        pdata->qua_data = qua_data;
-        pdata->ijob = -1;
-        pdata->weight = weight;
-        pdata->gain_box = gain_box;
-        pdata->nogains = nogains;
-        pdata->nooffs = nooffs;
-        pdata->nblock = nblock;
+
+    /* Add the previous estimate of the common mode signal back on to the
+       bolometer residuals. If we do not yet have an estimate of the common
+       mode signal, then the bolometer residuals are left unchanged, but
+       the gain values in the "gai" model are set to the rms value of the
+       bolometer data stream. This is to ensure that the very high gain
+       bolometers do not dominate the initial estimate of the common mode
+       signal calculated below.
+       --------------------------------------------------------------  */
+
+    /* Loop over the subarrays that contribute to the current COM model. */
+    for( idx=idx_lo; idx<=idx_hi; idx++ ) if (*status == SAI__OK ) {
+      /* Obtain dimensions of the data */
+      smf_get_dims( res->sdata[idx],  NULL, NULL, &thisnbolo, &thisntslice,
+                    &thisndata, &bstride, &tstride, status);
+
+      if(gai) {
+        smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
+                      &gbstride, &gcstride, status);
+        off_offset = 1*nblock*gcstride;
+        corr_offset = 2*nblock*gcstride;
       }
-    }
 
-    for( ii=0; ii<nw; ii++ ) {
-      /* Submit the job */
-      pdata = job_data + ii;
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                                 smfCalcmodelComPar, 0, NULL, status );
-    }
-    /* Wait until all of the submitted jobs have completed */
-    smf_wait( wf, status );
-  }
+      if( idx == 0 ) {
+        /* Store dimensions of the first file */
+        nbolo = thisnbolo;
+        ntslice = thisntslice;
+        ndata = thisndata;
 
 
 
 
+        /*  --- Set up the division of labour for threads --- */
 
+        /* Mutually exclusive blocks of bolos */
 
+        if( nw > (int) nbolo ) {
+          step = 1;
+        } else {
+          step = nbolo/nw;
+        }
 
+        for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
+          pdata = job_data + ii;
 
+          pdata->b1 = ii*step;
+          pdata->b2 = (ii+1)*step-1;
 
-  /* Now calculate a new common mode equal to the average of the scaled
-     bolometer time series (averaged over all sub-arrays). Then (if using
-     a GAI model) determine a set of gains and offsets for each bolometer
-     (one for each block of "gain_box" time slices) by comparing the bolometer
-     values with the new common mode. Reject any bolometers that are
-     insufficiently similar to the average common mode, or that have
-     unusual gains, and then loop to form a new average common mode,
-     excluding the rejected bolometers. Iterate until converged.
-     ---------------------------------------------------------------- */
+          /* Ensure that the last thread picks up any left-over bolometers */
+          if( (ii==(nw-1)) && (pdata->b1<(nbolo-1)) ) {
+            pdata->b2=nbolo-1;
+          }
+        }
 
-  /* If we are using a GAI model, create an integer array to hold the
-     number of bolometers rejected from each block on the previous call to
-     smf_find_gains_array. Initialise to hold an arbitrary non-zero value
-     (1) to indicate no blocks have yet converged. */
-  if( gai ) {
-    nrej = astMalloc( nblock*sizeof( *nrej ) );
-    if( *status == SAI__OK ) {
-      for( iblock = 0; iblock < nblock; iblock++ ) nrej[ iblock ] = 1;
-    }
-  }
+        /* Mutually exclusive blocks of time slices */
 
-  /* Outer loop re-calculates common-mode until the list of "good" blocks
-     converges. Without a fit for gain/offset this loop only happens once.
-     Otherwise it keeps going until the correlation coefficients of the
-     template fits settle down to a list with no N-sigma outliers. */
+        if( (ntslice < 1000) && (nw > (int) ntslice) ) {
+          step = 1;
+        } else {
+          step = ntslice/nw;
+        }
 
-  fillgaps = 0;
-  first = 1;
-  quit = 0;
-  while( !quit && (*status==SAI__OK) ) {
+        for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
+          pdata = job_data + ii;
 
-    /* Calculate a new estimate of the common mode signal excluding
-       blocks rejected on any previous passes round this loop. The new
-       common mode signal is the mean of the remaining bolometer data.
-       Initialize model data and weights to 0 */
-    memset(model_data,0,(model->sdata[0]->dims)[0]*sizeof(*model_data));
-    memset(weight,0,(model->sdata[0]->dims)[0]*sizeof(*weight));
+          /* Blocks of bolos */
+          pdata->t1 = ii*step;
+          pdata->t2 = (ii+1)*step-1;
 
-    /* Loop over index in subgrp (subarray) */
-    for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
+          /* Ensure that the last thread picks up any left-over tslices */
+          if( (ii==(nw-1)) && (pdata->t1<(ntslice-1)) ) {
+            pdata->t2=ntslice-1;
+          }
+        }
 
-      /* Get pointers to data/quality/gain values for the current
-         sub-array. */
+      } else {
+        /* Check that dimensions haven't changed */
+        if( (thisnbolo != nbolo) || (thisntslice != ntslice) ||
+            (thisndata != ndata) ) {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME
+                  ": smfData's in smfArray have different dimensions!",
+                  status);
+        }
+      }
+
+      /* Get pointers to data/quality/model */
       res_data = (res->sdata[idx]->pntr)[0];
       qua_data = (qua->sdata[idx]->pntr)[0];
-      if( gai ) gai_data = (gai->sdata[idx]->pntr)[0];
-
-      /* Set up the job data to update "model_data" and "weight" to
-         include the contribution from the current sub-array. */
-      for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
-        pdata = job_data + ii;
-
-        pdata->bstride = bstride;
-        pdata->gai_data = gai_data;
-        pdata->gbstride = gbstride;
-        pdata->gcstride = gcstride;
-        pdata->gflat = gflat;
-        pdata->idx = idx;
-        pdata->model_data = model_data; /* Careful! */
-        pdata->nbolo = nbolo;
-        pdata->ntslice = ntslice;
-        pdata->operation = 1;
-        pdata->res_data = res_data;
-        pdata->tstride = tstride;
-        pdata->qua_data = qua_data;
-        pdata->ijob = -1;
-        pdata->weight = weight;
+      if( gai ) {
+        gai_data = (gai->sdata[idx]->pntr)[0];
       }
 
-      /* Submit the jobs to the workforce and Wait until they have all
-         completed */
+      if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": Null data in inputs", status);
+      } else {
+
+        /* Set up the job data and undo previous iteration of model */
+
+        for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
+          pdata = job_data + ii;
+
+          pdata->bstride = bstride;
+          pdata->gai_data = gai_data;
+          pdata->gbstride = gbstride;
+          pdata->gcstride = gcstride;
+          pdata->gflat = gflat;
+          pdata->idx = idx;
+          pdata->model_data = model_data_copy; /* Careful! */
+          pdata->nbolo = nbolo;
+          pdata->ntslice = ntslice;
+          pdata->operation = 0;
+          pdata->res_data = res_data;
+          pdata->tstride = tstride;
+          pdata->qua_data = qua_data;
+          pdata->ijob = -1;
+          pdata->weight = weight;
+          pdata->gain_box = gain_box;
+          pdata->nogains = nogains;
+          pdata->nooffs = nooffs;
+          pdata->nblock = nblock;
+        }
+      }
+
       for( ii=0; ii<nw; ii++ ) {
         /* Submit the job */
         pdata = job_data + ii;
         pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
                                    smfCalcmodelComPar, 0, NULL, status );
       }
-
+      /* Wait until all of the submitted jobs have completed */
       smf_wait( wf, status );
     }
 
-    /* Re-normalize the model, or set model bad if no data. */
-    for( i=0; i<ntslice; i++ ) {
-      if( weight[i] ) {
-        model_data[i] /= weight[i];
+
+
+
+
+
+
+
+
+    /* Now calculate a new common mode equal to the average of the scaled
+       bolometer time series (averaged over all sub-arrays). Then (if using
+       a GAI model) determine a set of gains and offsets for each bolometer
+       (one for each block of "gain_box" time slices) by comparing the bolometer
+       values with the new common mode. Reject any bolometers that are
+       insufficiently similar to the average common mode, or that have
+       unusual gains, and then loop to form a new average common mode,
+       excluding the rejected bolometers. Iterate until converged.
+       ---------------------------------------------------------------- */
+
+    /* If we are using a GAI model, create an integer array to hold the
+       number of bolometers rejected from each block on the previous call to
+       smf_find_gains_array. Initialise to hold an arbitrary non-zero value
+       (1) to indicate no blocks have yet converged. */
+    if( gai ) {
+      nrej = astMalloc( nblock*sizeof( *nrej ) );
+      if( *status == SAI__OK ) {
+        for( iblock = 0; iblock < nblock; iblock++ ) nrej[ iblock ] = 1;
+      }
+    }
+
+    /* Outer loop re-calculates common-mode until the list of "good" blocks
+       converges. Without a fit for gain/offset this loop only happens once.
+       Otherwise it keeps going until the correlation coefficients of the
+       template fits settle down to a list with no N-sigma outliers. */
+
+    fillgaps = 0;
+    first = 1;
+    quit = 0;
+    while( !quit && (*status==SAI__OK) ) {
+
+      /* Calculate a new estimate of the common mode signal excluding
+         blocks rejected on any previous passes round this loop. The new
+         common mode signal is the mean of the remaining bolometer data.
+         Initialize model data and weights to 0 */
+      memset(model_data,0,(model->sdata[icom]->dims)[0]*sizeof(*model_data));
+      memset(weight,0,(model->sdata[icom]->dims)[0]*sizeof(*weight));
+
+      /* Loop over the subarrays that contribute to the current COM model. */
+      for( idx=idx_lo; (idx<=idx_hi)&&(*status==SAI__OK); idx++ ) {
+
+        /* Get pointers to data/quality/gain values for the current
+           sub-array. */
+        res_data = (res->sdata[idx]->pntr)[0];
+        qua_data = (qua->sdata[idx]->pntr)[0];
+        if( gai ) gai_data = (gai->sdata[idx]->pntr)[0];
+
+        /* Set up the job data to update "model_data" and "weight" to
+           include the contribution from the current sub-array. */
+        for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
+          pdata = job_data + ii;
+
+          pdata->bstride = bstride;
+          pdata->gai_data = gai_data;
+          pdata->gbstride = gbstride;
+          pdata->gcstride = gcstride;
+          pdata->gflat = gflat;
+          pdata->idx = idx;
+          pdata->model_data = model_data; /* Careful! */
+          pdata->nbolo = nbolo;
+          pdata->ntslice = ntslice;
+          pdata->operation = 1;
+          pdata->res_data = res_data;
+          pdata->tstride = tstride;
+          pdata->qua_data = qua_data;
+          pdata->ijob = -1;
+          pdata->weight = weight;
+        }
+
+        /* Submit the jobs to the workforce and Wait until they have all
+           completed */
+        for( ii=0; ii<nw; ii++ ) {
+          /* Submit the job */
+          pdata = job_data + ii;
+          pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+                                     smfCalcmodelComPar, 0, NULL, status );
+        }
+
+        smf_wait( wf, status );
+      }
+
+      /* Re-normalize the model, or set model bad if no data. */
+      for( i=0; i<ntslice; i++ ) {
+        if( weight[i] ) {
+          model_data[i] /= weight[i];
+        } else {
+          model_data[i] = VAL__BADD;
+        }
+      }
+
+      /* boxcar smooth if desired */
+      if( do_boxcar ) smf_tophat1D( model_data, ntslice, boxcar, NULL, 0,
+                                    0.0, status );
+
+      /* Now try to fit the remaining bolometer data to the new common mode
+         estimate. Each bolometer is split into blocks of "gain_box" time
+         slices, and a linear fit is performed between the bolometer values
+         in a block and the corresponding values in the new common mode
+         estimate. This also rejects aberrant bolometers from all sub-arrays.
+         If we do not have a GAI model, then zero bolometers are rejected. */
+      if( perarray ) {
+         nbad = gai ? smf_find_gains( wf, res->sdata[icom], model_data, kmap,
+                                      SMF__Q_GOOD, SMF__Q_COM, gai->sdata[icom],
+                                      nrej, status ) : 0;
       } else {
-        model_data[i] = VAL__BADD;
+         nbad = gai ? smf_find_gains_array( wf, res, model_data, kmap,
+                                            SMF__Q_GOOD, SMF__Q_COM,
+                                            gai, nrej, status ) : 0;
       }
+
+      /* If no bolometers were rejected we can quit the loop. */
+      if( nbad > 0 ) {
+        fillgaps = 1;
+        msgOutif( MSG__DEBUG, "", "    Common mode not yet converged",
+                  status );
+      } else {
+        quit = 1;
+        msgOutif( MSG__DEBUG, "", "    Common mode converged",
+                  status );
+      }
+
     }
 
-    /* boxcar smooth if desired */
-    if( do_boxcar ) smf_tophat1D( model_data, ntslice, boxcar, NULL, 0,
-                                  0.0, status );
-
-    /* Now try to fit the remaining bolometer data to the new common mode
-       estimate. Each bolometer is split into blocks of "gain_box" time
-       slices, and a linear fit is performed between the bolometer values
-       in a block and the corresponding values in the new common mode
-       estimate. This also rejects aberrant bolometers from all sub-arrays.
-       If we do not have a GAI model, then zero bolometers are rejected. */
-    nbad = gai ? smf_find_gains_array( wf, res, model_data, kmap,
-                                       SMF__Q_GOOD, SMF__Q_COM,
-                                       gai, nrej, status ) : 0;
-
-    /* If no bolometers were rejected we can quit the loop. */
-    if( nbad > 0 ) {
-      fillgaps = 1;
-      msgOutif( MSG__DEBUG, "", "    Common mode not yet converged",
-                status );
-    } else {
-      quit = 1;
-      msgOutif( MSG__DEBUG, "", "    Common mode converged",
-                status );
-    }
-
-  }
 
 
+   /* Once the common mode converged form the residuals by removing the scaled
+      common mode estimate from the bolometer data (this is designed to work
+      even if we are not using a GAI model).
+      ----------------------------------------------------------------- */
 
- /* Once the common mode converged form the residuals by removing the scaled
-    common mode estimate from the bolometer data (this is designed to work
-    even if we are not using a GAI model).
-    ----------------------------------------------------------------- */
+    if( !noremove ) {
 
-  if( !noremove ) {
+      /*  Allocate work space. */
+      woff = astMalloc( sizeof( *woff )*ntslice );
+      wg = astMalloc( sizeof( *wg )*ntslice );
+      woff_copy = astMalloc( sizeof( *woff_copy )*ntslice );
+      wg_copy = astMalloc( sizeof( *wg_copy )*ntslice );
 
-    /*  Allocate work space. */
-    woff = astMalloc( sizeof( *woff )*ntslice );
-    wg = astMalloc( sizeof( *wg )*ntslice );
-    woff_copy = astMalloc( sizeof( *woff_copy )*ntslice );
-    wg_copy = astMalloc( sizeof( *wg_copy )*ntslice );
+      for( idx=idx_lo; (idx<=idx_hi)&&(*status==SAI__OK); idx++ ) {
+        smf_get_dims( res->sdata[idx],  NULL, NULL, NULL, NULL, NULL, &bstride,
+                      &tstride, status );
 
-    for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
-      smf_get_dims( res->sdata[idx],  NULL, NULL, NULL, NULL, NULL, &bstride,
-                    &tstride, status );
+        /* Get pointers */
+        res_data = (double *)(res->sdata[idx]->pntr)[0];
+        qua_data = (smf_qual_t *)(qua->sdata[idx]->pntr)[0];
+        if( gai ) {
+          smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
+                        &gbstride, &gcstride, status);
+          gai_data = (gai->sdata[idx]->pntr)[0];
+          gai_copy = gai_data_copy[ idx ];
+        }
+        if( noi ) {
+          smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
+                        NULL, &noibstride, &noitstride, status);
+          noi_data = (double *)(noi->sdata[idx]->pntr)[0];
+        }
 
-      /* Get pointers */
-      res_data = (double *)(res->sdata[idx]->pntr)[0];
-      qua_data = (smf_qual_t *)(qua->sdata[idx]->pntr)[0];
-      if( gai ) {
-        smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
-                      &gbstride, &gcstride, status);
-        gai_data = (gai->sdata[idx]->pntr)[0];
-        gai_copy = gai_data_copy[ idx ];
-      }
-      if( noi ) {
-        smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
-                      NULL, &noibstride, &noitstride, status);
-        noi_data = (double *)(noi->sdata[idx]->pntr)[0];
-      }
+        /* Loop round all bolometers. */
+        for( j = 0 ; j < nbolo && *status == SAI__OK; j++ ) {
 
-      /* Loop round all bolometers. */
-      for( j = 0 ; j < nbolo && *status == SAI__OK; j++ ) {
+          /* Initialise the index of the first time slice for the current
+             bolometer within the res_data and qua_data arrays. */
+          size_t ijindex = j*bstride;
 
-        /* Initialise the index of the first time slice for the current
-           bolometer within the res_data and qua_data arrays. */
-        size_t ijindex = j*bstride;
+          /* Skip bad bolometers */
+          if( !(qua_data[ ijindex ] & SMF__Q_BADB ) ) {
+            size_t inbase = j*noibstride;
 
-        /* Skip bad bolometers */
-        if( !(qua_data[ ijindex ] & SMF__Q_BADB ) ) {
-          size_t inbase = j*noibstride;
+            /* Get the gain and offset for each time slice. */
+            smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,
+                         gai_data, nblock, gain_box, wg, woff, status );
 
-          /* Get the gain and offset for each time slice. */
-          smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,
-                       gai_data, nblock, gain_box, wg, woff, status );
+            /* Also get the previous gain and offset for each time slice. */
+            smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,
+                         gai_copy, nblock, gain_box, wg_copy, woff_copy,
+                         status );
 
-          /* Also get the previous gain and offset for each time slice. */
-          smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,
-                       gai_copy, nblock, gain_box, wg_copy, woff_copy,
-                       status );
+            /* Loop over all time slices. */
+            for( i = 0; i < ntslice; i++ ) {
 
-          /* Loop over all time slices. */
-          for( i = 0; i < ntslice; i++ ) {
+              g = wg[ i ];
+              off = woff[ i ];
+              g_copy = wg_copy[ i ];
+              off_copy = woff_copy[ i ];
 
-            g = wg[ i ];
-            off = woff[ i ];
-            g_copy = wg_copy[ i ];
-            off_copy = woff_copy[ i ];
+              if( (g!=VAL__BADD) && (g!=0) ) {
 
-            if( (g!=VAL__BADD) && (g!=0) ) {
+                /* Important: if flat-fielding data re-scale noi. May have
+                   different dimensions from res. */
+                if( gflat && noi && i < nointslice &&
+                    noi_data[ inbase + i*noitstride ] != VAL__BADD ) {
+                  noi_data[ inbase + i*noitstride ] /= (g*g);
+                }
 
-              /* Important: if flat-fielding data re-scale noi. May have
-                 different dimensions from res. */
-              if( gflat && noi && i < nointslice &&
-                  noi_data[ inbase + i*noitstride ] != VAL__BADD ) {
-                noi_data[ inbase + i*noitstride ] /= (g*g);
-              }
-
-              /* Remove the common mode */
-              if( !( qua_data[ijindex] & SMF__Q_MOD ) ){
-                if( model_data[ i ] != VAL__BADD ) {
-                  if( gflat ) {
-                    /* If correcting the flatfield, scale data to match
-                       template amplitude first, then remove */
-                    res_data[ijindex] =
-                      (res_data[ijindex] - off)/g - model_data[i];
-                  } else {
-                    /* Otherwise subtract scaled template off data */
-                    res_data[ijindex] -= (g*model_data[i] + off);
-                  }
-
-                  /* also measure contribution to dchisq */
-                  if( noi &&
-                      (noi_data[inbase+(i%nointslice)*noitstride] != 0) &&
-                      !(qua_data[ijindex]&SMF__Q_GOOD) ) {
-
+                /* Remove the common mode */
+                if( !( qua_data[ijindex] & SMF__Q_MOD ) ){
+                  if( model_data[ i ] != VAL__BADD ) {
                     if( gflat ) {
-                      /* Compare change in template + offset/g */
-                      dchisq += ( (model_data[i] + off/g) -
-                                  (model_data_copy[i] + off_copy/g_copy) ) *
-                        ( (model_data[i] + off/g) -
-                          (model_data_copy[i] + off_copy/g_copy) ) /
-                        noi_data[inbase + (i%nointslice)*noitstride];
-                      ndchisq++;
+                      /* If correcting the flatfield, scale data to match
+                         template amplitude first, then remove */
+                      res_data[ijindex] =
+                        (res_data[ijindex] - off)/g - model_data[i];
                     } else {
-                      /* Otherwise scale the template and measure change*/
-                      dchisq += ((g*model_data[i] + off) -
-                                 (g_copy*model_data_copy[i] + off_copy)) *
-                        ((g*model_data[i] + off) -
-                         (g_copy*model_data_copy[i] + off_copy)) /
-                        noi_data[inbase + (i%nointslice)*noitstride];
-                      ndchisq++;
+                      /* Otherwise subtract scaled template off data */
+                      res_data[ijindex] -= (g*model_data[i] + off);
                     }
+
+                    /* also measure contribution to dchisq */
+                    if( noi &&
+                        (noi_data[inbase+(i%nointslice)*noitstride] != 0) &&
+                        !(qua_data[ijindex]&SMF__Q_GOOD) ) {
+
+                      if( gflat ) {
+                        /* Compare change in template + offset/g */
+                        dchisq += ( (model_data[i] + off/g) -
+                                    (model_data_copy[i] + off_copy/g_copy) ) *
+                          ( (model_data[i] + off/g) -
+                            (model_data_copy[i] + off_copy/g_copy) ) /
+                          noi_data[inbase + (i%nointslice)*noitstride];
+                        ndchisq++;
+                      } else {
+                        /* Otherwise scale the template and measure change*/
+                        dchisq += ((g*model_data[i] + off) -
+                                   (g_copy*model_data_copy[i] + off_copy)) *
+                          ((g*model_data[i] + off) -
+                           (g_copy*model_data_copy[i] + off_copy)) /
+                          noi_data[inbase + (i%nointslice)*noitstride];
+                        ndchisq++;
+                      }
+                    }
+                  } else {
+                    qua_data[ijindex] |= SMF__Q_COM;
                   }
-                } else {
-                  qua_data[ijindex] |= SMF__Q_COM;
                 }
               }
+              ijindex += tstride;
             }
-            ijindex += tstride;
           }
         }
       }
+
+      /*  Free work space. */
+      woff = astFree( woff );
+      wg = astFree( wg );
+      woff_copy = astFree( woff_copy );
+      wg_copy = astFree( wg_copy );
     }
 
-    /*  Free work space. */
-    woff = astFree( woff );
-    wg = astFree( wg );
-    woff_copy = astFree( woff_copy );
-    wg_copy = astFree( wg_copy );
-  }
-
-  /* If any blocks of bolometer values were flagged, replace the bad
-     bolometer values with artifical data that is continuous with the
-     surround good data. This is needed since subsequent filtering
-     operations may not ignore flagged bolometer values but may instead
-     use the bolometer values literally. */
-  if( fillgaps ) astMapGet0I( keymap, "FILLGAPS", &fillgaps );
-  if( fillgaps ) {
-    for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
-      smf_fillgaps( wf, res->sdata[idx], SMF__Q_COM, status );
+    /* If any blocks of bolometer values were flagged, replace the bad
+       bolometer values with artifical data that is continuous with the
+       surround good data. This is needed since subsequent filtering
+       operations may not ignore flagged bolometer values but may instead
+       use the bolometer values literally. */
+    if( fillgaps ) astMapGet0I( keymap, "FILLGAPS", &fillgaps );
+    if( fillgaps ) {
+      for( idx=idx_lo; (idx<=idx_hi)&&(*status==SAI__OK); idx++ ) {
+        smf_fillgaps( wf, res->sdata[idx], SMF__Q_COM, status );
+      }
     }
+
+    /* If we're not removing the common-mode, set it to 0 here */
+    if( noremove && (*status==SAI__OK) ) {
+      memset(model_data,0,(model->sdata[icom]->dims)[0]*sizeof(*model_data));
+    }
+
+    /* Free memory used just to calculate the current COM model. */
+    weight = astFree( weight );
+    model_data_copy = astFree( model_data_copy );
+    nrej = astFree( nrej );
   }
 
-  /* If we're not removing the common-mode, set it to 0 here */
-  if( noremove && (*status==SAI__OK) ) {
-    memset(model_data,0,(model->sdata[0]->dims)[0]*sizeof(*model_data));
+  /* Print normalized residual chisq for this model */
+  if( (*status==SAI__OK) && noi && (ndchisq>0) ) {
+    dchisq /= (double) ndchisq;
+    msgOutiff( MSG__VERB, "", "    normalized change in model: %lf", status,
+               dchisq );
   }
 
   /* If damping boxcar smooth, reduce window size here */
@@ -1122,33 +1185,15 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     astMapPut0D( kmap, "BOXCARD", boxcard, NULL );
   }
 
-  /* Print normalized residual chisq for this model */
-  if( (*status==SAI__OK) && noi && (ndchisq>0) ) {
-    dchisq /= (double) ndchisq;
-    msgOutiff( MSG__VERB, "", "    normalized change in model: %lf", status,
-               dchisq );
-  }
-
-  /* Free memory */
-  weight = astFree( weight );
-  model_data_copy = astFree( model_data_copy );
-  nrej = astFree( nrej );
-  job_data = astFree( job_data );
-
-  if( gai_data_copy ) {
-    for( idx=0; idx<gai->ndat; idx++ ) {
-      if( gai_data_copy[idx] ) {
-        gai_data_copy[idx] = astFree( gai_data_copy[idx] );
-      }
-    }
-    gai_data_copy = astFree( gai_data_copy );
-  }
-
-
   /* Annul objects. Unlike freeing a NULL memory pointer, annulling a NULL
      object pointer causes an error, so check before annulling. */
   if( kmap ) kmap = astAnnul( kmap );
   if( gkmap ) gkmap = astAnnul( gkmap );
+
+  /* Free memory used to calculate all COM models. */
+  job_data = astFree( job_data );
+  gai_data_copy = astFreeDouble( gai_data_copy );
+
 }
 
 

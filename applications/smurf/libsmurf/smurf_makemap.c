@@ -741,6 +741,10 @@
 *     COM.OFFSET_IS_ZERO = LOGICAL
 *       Setting com.offset_is_zero non-zero causes all bolometer
 *       offsets to be forced to 0.0. [0]
+*     COM.PERARRAY = LOGICAL
+*       If true, a separate common-mode will be estimated for each
+*       sub-array. Otherwise, a single common mode will be estimated from
+*       all available subarrays. [0]
 *     DKS.BOXCAR = INTEGER
 *       If DKS (dark squid) model component requested, boxcar the dark squid
 *       signal by this many samples before fitting/removing from each detector
