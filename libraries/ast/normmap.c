@@ -31,7 +31,7 @@ f     AST_SIMPLIFY
 *     The NormMap class inherits from the Mapping class.
 
 *  Attributes:
-*     The MatrixMap class does not define any new attributes beyond
+*     The NormMap class does not define any new attributes beyond
 *     those which are applicable to all Mappings.
 
 *  Functions:
