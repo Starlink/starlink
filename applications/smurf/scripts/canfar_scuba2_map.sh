@@ -38,52 +38,69 @@
 # MAKEMAP_CONFIG = /home/echapin/dimmconfig.lis
 #
 
-export MAKEMAP_CONFIG_DIR=$HOME/$1
-SCRATCHDIR=/staging/$LOGNAME/scratch
-PERSISTDIR=/staging/$LOGNAME/persist
+CONFIGDIR=$1
+INPUTSFILE=$2
+JOBID=$3
+VOSPACEUSER=$4
+ORACPARAM=$5
 
-# extra paranoid setup of /staging partition since we may need to
-# clean up from the last person who made it
+SCRATCHDIR=$TMPDIR/scratch
+PERSISTDIR=$TMPDIR/persist
 
-sudo /bin/rm -rf /staging/*
-sudo chown root:root /staging
-sudo mkdir /staging/$LOGNAME
-sudo chown $LOGNAME:$LOGNAME /staging/$LOGNAME
-chmod +s /staging/$LOGNAME
+# setup directories where we do the work
 
 mkdir $SCRATCHDIR
+mkdir $SCRATCHDIR/$JOBID
 mkdir $PERSISTDIR
-mkdir $PERSISTDIR/$3
+mkdir $PERSISTDIR/$JOBID
 
-echo "Job started at" >> $PERSISTDIR/$3/scuba2_map.log
-date >> $PERSISTDIR/$3/scuba2_map.log
+export ORAC_LOGDIR=$PERSISTDIR/$JOBID
 
-# rsync config directory from login host, and change to the directory
-# with the config files relevant for this reduction.
+echo ==========================================================================
+echo === Starting to process $JOBID ===
+echo ==========================================================================
 
-rsync -az -e ssh --delete canfar.dao.nrc.ca:$1 /home/$LOGNAME/
-cd $1
+date
+
+echo SCRATCHDIR is $SCRATCHDIR
+echo PERSISTDIR is $PERSISTDIR
+echo ORAC_LOGDIR is $ORAC_LOGDIR
+echo VOSPACEUSER is $VOSPACEUSER
+
+echo --- Rsyncing config files from login host --------------------------------
+
+# rsync config directory from login host to scratch, and change to the
+# directory with the config files relevant for this reduction.
+
+rsync -az -e ssh --delete canfar.dao.nrc.ca:$CONFIGDIR $SCRATCHDIR/
+
+cd $SCRATCHDIR/$CONFIGDIR
+pwd
+ls -l
+
+echo --- Launch pipeline ------------------------------------------------------
 
 # launch the pipeline
-/stardev/Perl/bin/jsawrapdr --inputs=$2 --id=$3 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $HOME/$1/$5" --canfar --cleanup all &> $PERSISTDIR/$3/jsawrapdr.log
+/stardev/Perl/bin/jsawrapdr --inputs=$INPUTSFILE --id=$JOBID -persist -log h --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $ORACPARAM" --canfar --cleanup all &> $PERSISTDIR/$JOBID/jsawrapdr.log
 
-echo "Job finished at" >> $PERSISTDIR/$3/scuba2_map.log
 
-date >> $PERSISTDIR/$3/scuba2_map.log
+echo --- Copy results to vospace ----------------------------------------------
 
 # copy data products to vospace
 
-java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --delete --target=vos://cadc.nrc.ca\!vospace/$4/$3
+java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --delete --target=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID
 
-java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --create --target=vos://cadc.nrc.ca\!vospace/$4/$3
+java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --create --target=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID
 
-for i in $PERSISTDIR/$3/*.fits; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$4/$3/`basename $i`; done;
-for i in $PERSISTDIR/$3/*.png; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$4/$3/`basename $i`; done;
+for i in $PERSISTDIR/$JOBID/*.html; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID/`basename $i`; done;
 
-for i in $PERSISTDIR/$3/*_reduced.sdf; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$4/$3/`basename $i`; done;
+for i in $PERSISTDIR/$JOBID/*.png; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID/`basename $i`; done;
 
-for i in $PERSISTDIR/$3/*.log; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$4/$3/`basename $i`; done;
+for i in $PERSISTDIR/$JOBID/*.fits; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID/`basename $i`; done;
 
-for i in $PERSISTDIR/$3/.*log; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$4/$3/`basename $i`; done;
 
-for i in $PERSISTDIR/$3/*fmos.sdf; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$4/$3/`basename $i`; done;
+for i in $PERSISTDIR/$JOBID/s*.sdf; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID/`basename $i`; done;
+
+date
+echo === Done! ===
+
