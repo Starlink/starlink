@@ -59,39 +59,39 @@ fi
 
 # Add Starlink directories to relevant paths.
 tmppath="${PATH}"
-if((`echo ${tmppath} | grep -c ':${bindir}/startcl:'`)); then
+if ((`echo ${tmppath} | grep -c ':${bindir}/startcl:'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:${bindir}/startcl:#:#g'`
 fi
 
-if((`echo ${tmppath} | grep -c ':${bindir}/startcl$'`)); then
+if ((`echo ${tmppath} | grep -c ':${bindir}/startcl$'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:${bindir}/startcl##g'`
 fi
 
-if((`echo ${tmppath} | grep -c '^${bindir}/startcl'`)); then
+if ((`echo ${tmppath} | grep -c '^${bindir}/startcl'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#${bindir}/startcl:##g'`
 fi
 
-if((`echo ${tmppath} | grep -c ':${bindir}:'`)); then
+if ((`echo ${tmppath} | grep -c ':${bindir}:'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:${bindir}:#:#g'`
 fi
 
-if((`echo ${tmppath} | grep -c ':${bindir}$'`)); then
+if ((`echo ${tmppath} | grep -c ':${bindir}$'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:${bindir}##g'`
 fi
 
-if((`echo ${tmppath} | grep -c '^${bindir}'`)); then
+if ((`echo ${tmppath} | grep -c '^${bindir}'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#${bindir}:##g'`
 fi
 
-if((`echo ${tmppath} | grep -c ':${starjavadir}/bin:'`)); then
+if ((`echo ${tmppath} | grep -c ':${starjavadir}/bin:'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:${starjavadir}/bin:#:#g'`
 fi
 
-if((`echo ${tmppath} | grep -c ':${starjavadir}/bin$'`)); then
+if ((`echo ${tmppath} | grep -c ':${starjavadir}/bin$'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:${starjavadir}/bin##g'`
 fi
 
-if((`echo ${tmppath} | grep -c '^${starjavadir}/bin'`)); then
+if ((`echo ${tmppath} | grep -c '^${starjavadir}/bin'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#${starjavadir}:##g'`
 fi
 
