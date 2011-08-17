@@ -59,40 +59,40 @@ fi
 
 # Add Starlink directories to relevant paths.
 tmppath="${PATH}"
-if ((`echo ${tmppath} | grep -c ':${bindir}/startcl:'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:${bindir}/startcl:#:#g'`
+if ((`echo ${tmppath} | grep -c ":${bindir}/startcl:"`)); then
+    tmppath=`echo ${tmppath} | sed -e "s#:${bindir}/startcl:#:#g"`
 fi
 
-if ((`echo ${tmppath} | grep -c ':${bindir}/startcl$'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:${bindir}/startcl##g'`
+if ((`echo ${tmppath} | grep -c ":${bindir}/startcl$"`)); then
+    tmppath=`echo ${tmppath} | sed -e "s#:${bindir}/startcl##g"`
 fi
 
-if ((`echo ${tmppath} | grep -c '^${bindir}/startcl'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#${bindir}/startcl:##g'`
+if ((`echo ${tmppath} | grep -c "^${bindir}/startcl"`)); then
+    tmppath=`echo ${tmppath} | sed -e "s#${bindir}/startcl:##g"`
 fi
 
-if ((`echo ${tmppath} | grep -c ':${bindir}:'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:${bindir}:#:#g'`
+if ((`echo ${tmppath} | grep -c ":${bindir}:"`)); then
+    tmppath=`echo ${tmppath} | sed -e "s#:${bindir}:#:#g"`
 fi
 
-if ((`echo ${tmppath} | grep -c ':${bindir}$'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:${bindir}##g'`
+if ((`echo ${tmppath} | grep -c ":${bindir}$"`)); then
+    tmppath=`echo ${tmppath} | sed -e "s#:${bindir}##g"`
 fi
 
-if ((`echo ${tmppath} | grep -c '^${bindir}'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#${bindir}:##g'`
+if ((`echo ${tmppath} | grep -c "^${bindir}"`)); then
+    tmppath=`echo ${tmppath} | sed -e "s#${bindir}:##g"`
 fi
 
-if ((`echo ${tmppath} | grep -c ':${starjavadir}/bin:'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:${starjavadir}/bin:#:#g'`
+if ((`echo ${tmppath} | grep -c ":${starjavadir}/bin:"`)); then
+    tmppath=`echo ${tmppath} | sed -e "s#:${starjavadir}/bin:#:#g"`
 fi
 
-if ((`echo ${tmppath} | grep -c ':${starjavadir}/bin$'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:${starjavadir}/bin##g'`
+if ((`echo ${tmppath} | grep -c ":${starjavadir}/bin$"`)); then
+    tmppath=`echo ${tmppath} | sed -e "s#:${starjavadir}/bin##g"`
 fi
 
-if ((`echo ${tmppath} | grep -c '^${starjavadir}/bin'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#${starjavadir}:##g'`
+if ((`echo ${tmppath} | grep -c "^${starjavadir}/bin"`)); then
+    tmppath=`echo ${tmppath} | sed -e "s#${starjavadir}:##g"`
 fi
 
 export PATH="${tmppath}:${bindir}/startcl:${bindir}:${starjavadir}/bin"
@@ -124,10 +124,10 @@ if test "${@LD_LIB_PATH@}" != ""; then
 #  Set appropriate flag variables.
 
    found_sharelib="no"
-   if test "`echo ${@LD_LIB_PATH@} | grep -c ':${sharelibdir}'`" != "0"; then
+   if test "`echo ${@LD_LIB_PATH@} | grep -c ":${sharelibdir}"`" != "0"; then
       found_sharelib="yes"
    fi
-   if test "`echo ${@LD_LIB_PATH@} | grep -c '^${sharelibdir}'`" != "0"; then
+   if test "`echo ${@LD_LIB_PATH@} | grep -c "^${sharelibdir}"`" != "0"; then
       found_sharelib="yes"
    fi
 
