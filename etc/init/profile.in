@@ -134,7 +134,7 @@ if test "${@LD_LIB_PATH@}" != ""; then
 #  Add required components to end of @LD_LIB_PATH@ if flag variables
 #  indicate they are not present.
 
-   if test "$found_sharelib" == "no"; then
+   if test "$found_sharelib" = "no"; then
       export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${sharelibdir}"
 
       case "@build@" in
