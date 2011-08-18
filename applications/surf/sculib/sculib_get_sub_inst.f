@@ -184,7 +184,7 @@
 
 *  Ask for the sub array
 
-            CALL PAR_CHOIC('SUB_INSTRUMENT', SUB_INSTRUMENT(1), SUBLIST,
+            CALL PAR_CHOIC(PARAM, SUB_INSTRUMENT(1), SUBLIST,
      :           .TRUE., SUB_REQUIRED, STATUS)
             CALL CHR_UCASE (SUB_REQUIRED)
 
