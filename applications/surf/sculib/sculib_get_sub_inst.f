@@ -51,12 +51,15 @@
 
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     1997 March 27 (TIMJ)
 *        Extract from main tasks
+*     2011-08-18 (TIMJ):
+*        Update all _N FITS headers and not just the ones being returned.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -220,11 +223,62 @@
          CALL SCULIB_REWRITE_FITS_R (N_FITS, N_FITS, FITS,
      :        'WAVE_1', SUB_WAVE(SUB_POINTER), STATUS)
 
+*     Also need to update T_COLD, ETATEL and TAUZ to keep the header
+*     consistent
+         CALL SCULIB__UPDATE_SUBITEM( N_FITS, FITS,
+     :        SUB_POINTER, 'TAUZ_', STATUS )
+         CALL SCULIB__UPDATE_SUBITEM( N_FITS, FITS,
+     :        SUB_POINTER, 'T_COLD_', STATUS )
+         CALL SCULIB__UPDATE_SUBITEM( N_FITS, FITS,
+     :        SUB_POINTER, 'ETATEL_', STATUS )
+
+
 *     Setup current values of wavelength and filter
          WAVE = SUB_WAVE(SUB_POINTER)
          INST = SUB_INSTRUMENT(SUB_POINTER)
          FILT = SUB_FILTER(SUB_POINTER)
 
       END IF
+
+      END
+
+      SUBROUTINE SCULIB__UPDATE_SUBITEM( N_FITS, FITS,
+     :     CURPOS, ROOT, STATUS )
+
+      IMPLICIT NONE
+
+      INCLUDE 'SAE_PAR'
+
+      INTEGER CHR_LEN
+      EXTERNAL CHR_LEN
+
+      INTEGER N_FITS
+      CHARACTER*(*) FITS(N_FITS)
+      INTEGER CURPOS
+      CHARACTER*(*) ROOT
+      INTEGER STATUS
+
+      REAL CURVAL
+      CHARACTER *(8) STEMP
+      INTEGER ITEMP
+
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      STEMP = ROOT
+      ITEMP = CHR_LEN(ROOT)
+      CALL CHR_PUTI( CURPOS, STEMP, ITEMP )
+
+*     Get the current value
+      CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS,
+     :     STEMP, CURVAL, STATUS)
+
+*     Build up the new card with index 1
+      ITEMP = CHR_LEN(ROOT)
+      CALL CHR_PUTI( 1, STEMP, ITEMP )
+
+*     and update the header
+      CALL SCULIB_REWRITE_FITS_R (N_FITS, N_FITS, FITS,
+     :     STEMP, CURVAL, STATUS)
 
       END
