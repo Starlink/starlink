@@ -493,6 +493,10 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
           } else { /* if (calcflat) */
             /* Store the collapsed flatfield  - the processed flat is not stored here yet */
             smf_addto_smfArray( array, infile, status );
+
+            /* Copy the group info */
+            ndgCpsup( ingrp, ori_index, fgrp, status );
+
           }
 
         } /* if (outfile) */
