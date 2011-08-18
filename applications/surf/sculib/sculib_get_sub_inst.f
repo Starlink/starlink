@@ -1,4 +1,4 @@
-      SUBROUTINE SCULIB_GET_SUB_INST(PACKAGE, N_FITS, FITS, PARAM,
+      SUBROUTINE SCULIB_GET_SUB_INST(PKG, N_FITS, FITS, PARAM,
      :     N_SUB, SUB_POINTER, WAVE, INST, FILT, STATUS)
 *+
 *  Name:
@@ -42,8 +42,6 @@
 *        Global status
 
 *  Notes:
-*     I actually need to include REDS_SYS (for SCUBA__MAX_SUB) but I am
-*     doing it by hand at the moment.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -60,6 +58,7 @@
 *        Extract from main tasks
 *     2011-08-18 (TIMJ):
 *        Update all _N FITS headers and not just the ones being returned.
+*        Use SURF_PAR for constant.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -72,10 +71,11 @@
 *  Global Constants:
       INCLUDE 'PRM_PAR'          ! for VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'SURF_PAR'         ! SCUBA__MAX_SUB
 
 *  Arguments Given:
       INTEGER         N_FITS
-      CHARACTER * (*) PACKAGE
+      CHARACTER * (*) PKG        ! Not PACKAGE since that is in SURF_PAR
       CHARACTER * (*) PARAM
 
 *  Arguments given & returned:
@@ -92,8 +92,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local constants:
-      INTEGER  SCUBA__MAX_SUB    ! I need to include REDS_SYS!!!
-      PARAMETER (SCUBA__MAX_SUB = 5)
+
 *  Local Variables:
       INTEGER I                         ! Loop counter
       INTEGER IPOSN                     ! Position in string
@@ -117,7 +116,7 @@
       CALL SCULIB_GET_FITS_I (N_FITS, N_FITS, FITS, 'N_SUBS',
      :  N_SUB, STATUS)
 
-      CALL MSG_SETC('PKG',PACKAGE)
+      CALL MSG_SETC('PKG',PKG)
       CALL MSG_OUT (' ', '^PKG: file contains data for the '//
      :  'following sub-instrument(s)', STATUS)
 
