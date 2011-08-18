@@ -369,6 +369,12 @@ cleandk.order = 0
 # These parameters control the iterative model components
 # ----------------------------------------------------------------------------
 
+# Set this flag to calculate a separate common-mode signal for each
+# subarray, rather than the default which considers all subarrays at a
+# given wavelength simultaneously
+
+#com.perarray = 1
+
 # delay calculation of COM until after the first iteration? (good if
 # the astronomical signal is expected to dominate the sky signal)
 
