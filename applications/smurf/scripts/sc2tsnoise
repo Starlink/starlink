@@ -4,13 +4,15 @@ source $SMURF_DIR/smurf.csh > /dev/null
 source $CONVERT_DIR/convert.csh > /dev/null
 source $KAPPA_DIR/kappa.csh > /dev/null
 
-if ( ($#argv < 3) || ($#argv > 8) ) then
+if ( ($#argv < 3) || ($#argv > 10) ) then
     echo "sc2tsnoise: calculate SCUBA-2 time-series noise (effective NEPs)"
     echo " "
     echo "usage:"
-    echo "    sc2tsnoise <obsdir.txt> <nepfile.txt> <outdir> [-tseries] [-pspec] [-clean] [-config <dimmconfig>]"
+    echo " "
+    echo "    sc2tsnoise <obsdir.txt> <nepfile.txt> <outdir> [-tseries] [-pspec] [-clean] [-config <dimmconfig>] [-len <nsamples>]"
     echo " "
     echo "parameters:"
+    echo " "
     echo "    obsdir.txt  a text file with path to SCUBA-2 obs dirs each line"
     echo "    nepfile.txt output text file containing effective NEPs etc."
     echo "    outdir      directory to store intermediate files (NEP maps etc.)"
@@ -18,26 +20,37 @@ if ( ($#argv < 3) || ($#argv > 8) ) then
     echo "    -pspec      if set write noise power spectra to <outdir>"
     echo "    -clean      if set clean <outdir> before starting"
     echo "    -config     use specified <dimmconfig> parameter for CALCNOISE"
+    echo "    -len        analyze up to <nsamples> instead of default 2000"
     echo " "
     echo "notes:"
+    echo " "
     echo " o <nepfile.txt> is rewritten each time the script is executed, so"
     echo "   be sure to make a copy if you care about the results of a long"
     echo "   run before re-starting!"
+    echo " "
     echo " o a single flatfield may be used for multiple noise observations,"
     echo "   so if you run the script multiple times you can save some"
     echo "   execution time if you _don't_ set -clean, since the old flatfield"
     echo "   will be cached in <outdir>"
+    echo " "
     echo " o the script just checks the first 4 files (subscans) for"
     echo "   shutter-closed and shutter-open files suitable for noise"
     echo "   measurements. It will only reduce one shutter-open file, but"
     echo "   it will reduce multiple shutter-closed files."
+    echo " "
     echo " o to improve execution time only the first 2000 samples (10s)"
     echo "   of each subscan are analyzed. This should be fine since we"
-    echo "   are only measuring the 2--20 Hz noise level."
+    echo "   are only measuring the 2--20 Hz noise level. However, you can"
+    echo "   fiddle this using the -len flag (note that only single files"
+    echo "   are analyzed, so the maximum meaningful value is usually 6000)."
+    echo " "
     echo " o normally the <dimmconfig> parameter for -config will probably"
-    echo "   require the redirection symbol, e.g. -config ^dimmconfig.lis"
+    echo "   require the redirection symbol, e.g. -config ^dimmconfig.lis."
+    echo "   The default is to use common-mode cleaning:"
+    echo "   ^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise_com.lis"
     echo " "
     echo "example:"
+    echo " "
     echo "    ls -d /jcmtdata/raw/scuba2/s4?/2011????/0???? > obsdir.txt"
     echo " "
     echo "    sc2tsnoise obsdir.txt effnep_450_2011.txt out \\"
@@ -59,7 +72,12 @@ shift
 set writetseries = 0 # write out cleaned time-series?
 set writepspec = 0   # write out power spectra?
 set cleanout = 0     # clean outdir before starting?
-set dimmconfig = "^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise.lis"
+
+# use common-mode cleaning as the default
+set dimmconfig = "^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise_com.lis"
+
+# analyze first 2000 samples by default
+set len_default = 2000
 
 while ( $# > 0 )
     set arg = $1
@@ -85,10 +103,26 @@ while ( $# > 0 )
         else
             echo "-config specified, but no filename given. Ignoring."
         endif
+    else if ( "$arg" =~ "-len" ) then
+        # the new requested length to analyze. Shouldn't start with a dash
+        if ( $# > 0 ) then
+            set temp = `echo $1 | cut -b 1`
+            if ( "$temp" !~ "-" ) then
+                set len_default = $1
+                shift
+            else
+                echo "Parameter following -len starts with a dash. Ignoring."
+            endif
+        else
+            echo "-len specified, but no argument supplied"
+        endif
     endif
+
 end
 
-echo "CALCNOISE will use the following config: $dimmconfig"
+echo "*** Will analyze up to $len_default samples of each file"
+echo "*** CALCNOISE will use the following config: $dimmconfig"
+
 
 # ensure ADAM tasks fail rather than prompting
 setenv ADAM_NOPROMPT 1
@@ -132,7 +166,11 @@ foreach obsdir ( `cat $filenames` )
     # this is the root of the data tree
     set basedir = `dirname $temp`
 
-    # set this flag once we have done an open-shutter sky measurement
+    # set this to the name of the dark NEP once we have done a closed-shutter
+    # noise measurement
+    set havedarkndf = "0"
+
+    # set this flag once we have done an open-shutter sky noise measurement
     set havesky = 0
 
     # set this flag to ndf name if we encounter a skyflat or darkflat
@@ -338,7 +376,7 @@ foreach obsdir ( `cat $filenames` )
                 # should be plenty to just measure a white-noise level
 
                 ndftrace $thisndf > /dev/null
-                set len = 2000
+                set len = $len_default
                 set maxlen = `parget dims ndftrace | awk '{split($0,a," "); print a[3]}'`
                 if ( $maxlen < $len ) set len = $maxlen
 
@@ -433,6 +471,22 @@ foreach obsdir ( `cat $filenames` )
                         `calc "pa/pb" pa=$sumnepweight pb=$suminvvar prec=_d`
                         if ( $? != 0 ) set weightnep = -1
 
+                        # if this is a shutter-open NEP and we have a dark
+                        # NEP, calculate a background (photon) NEP
+                        if (("$shutter" =~ "1") && ("$havedarkndf" !~ "0")) then
+                            set bgnepndf = `basename $thisndf`
+                            set bgnepndf = $outdir/$bgnepndf\_bgnep
+
+                            maths exp="sqrt(ia*ia-ib*ib)" \
+                                ia=$nepndf ib=$havedarkndf out=$bgnepndf \
+                                accept > /dev/null
+
+                            if( $? == 0 ) then
+                                echo "    calculated background NEP $bgnepndf"
+                            else
+                                echo "    background NEP calculation failed"
+                            endif
+                        endif
                     endif
                 endif
 
@@ -472,6 +526,7 @@ foreach obsdir ( `cat $filenames` )
             # if OK is set, we got useful results to report
             if ( $ok == 1 ) then
                 if ( ("$shutter" =~ "1") && ( $havesky != 1 ) ) set havesky = 1
+                if ( ("$shutter" =~ "0") ) set havedarkndf = $nepndf
 
                 echo "    trans=$meantrans effNEP=$effnep"
 
