@@ -29,6 +29,8 @@
       that exceed the single-precision data range.
       -  The default for the AXES parameter has changed so that by
       default axes are only drawn if the picture is cleared.
+      - New parameter WEIGHTS allows different weights to be associated
+      with each value in the input NDF.
 
    o  LOOK
 
