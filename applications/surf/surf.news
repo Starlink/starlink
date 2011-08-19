@@ -1,7 +1,7 @@
 1 SURF - SCUBA User Reduction Facility -update
                                                      Expires: ????.??.??
 
-  This is the release V1.7-1 of SURF.
+  This is the release V1.8-1 of SURF.
 
   The SCUBA User Reduction Facility (SURF) is a collection of applications
   for use in reducing mapping and photometry data from the Submillimetre
@@ -32,6 +32,14 @@
   The list is at scubadr@jach.hawaii.edu.
   To subscribe please send a message to majordomo@jach.hawaii.edu with
   an empty subject and containing the message 'subscribe scubadr <your email>'
+
+2 New_in_version_1_8
+
+  - Added a command, SKYDIP2, that can be used to fit skydip data that
+    is purely sky temperature and airmass. This allows skydips to be
+    fitted that were not observed with SCUBA but want to use the atmospheric
+    model that is fitted in SURF. The command can be tested by using
+    the output of the SKYDIP command (via the OUT parameter).
 
 2 New_in_version_1_7
 
