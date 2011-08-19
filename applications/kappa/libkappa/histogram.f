@@ -24,6 +24,10 @@
 *     between specified limits.  The histogram is reported, and may
 *     optionally be written to a text log file, and/or plotted
 *     graphically.
+*
+*     By default, each data value contributes a value of one to the
+*     corresponding histogram bin, but alternative weights may be
+*     supplied via parameter WEIGHTS.
 
 *  Usage:
 *     histogram in numbin range [comp] [logfile]
@@ -167,6 +171,23 @@
 *        Line may be used in place of Curves.)  [current value]
 *     TITLE = LITERAL (Read)
 *        Title for the histogram NDF.  ["KAPPA - Histogram"]
+*     WEIGHTS = NDF (Read)
+*        An optional NDF holding weights associated with each input pixel
+*        value (supplied via parameter IN). Together with parameter
+*        WEIGHTSTEP, these determine the count added to the corresponding
+*        histogram bin for each input pixel value. For instance, weights
+*        could be related to the variance of the data values, or to the
+*        position of the data values within the input NDF. If a null value
+*        (!) is supplied for WEIGHTS, all input values contribute a count of
+*        one to the corresponding histogram bin. If an NDF is supplied, the
+*        histogram count for a particular input pixel is formed by dividing
+*        its weight value (supplied in the WEIGHTS NDF) by the value of
+*        parameter WEIGHTSTEP, and then taking the nearest integer. Input
+*        pixels with bad or zero weights are excluded from the histogram. [!]
+*     WEIGHTSTEP = _DOUBLE (Read)
+*        Only accessed if a value is supplied for parameter WEIGHTS.
+*        WEIGHTSTEP is the increment in weight value that corresponds to
+*        a unit increment in histogram count.
 *     XLEFT = _DOUBLE (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis of the plot.  If a null (!) value is supplied, the minimum
@@ -325,6 +346,8 @@
 *        Permit temporary style attributes.  Withdraw TEMPSTYLE.
 *     16-JUN-2011 (DSB):
 *        Changed to allow display of data values outside range of _REAL.
+*     19-AUG-2011 (DSB):
+*        Added parameter WEIGHTS and WEIGHTSTEP.
 *     {enter_further_changes_here}
 
 *-
@@ -382,6 +405,7 @@
       INTEGER IFIL               ! File descriptor for logfile
       INTEGER IWCS               ! Pointer to NDFs WCS FrameSet
       CHARACTER * ( 256 ) LABEL  ! Label of the histogram NDF
+      INTEGER LBND( NDF__MXDIM ) ! Lower pixel bounds of input NDF
       LOGICAL LOGFIL             ! Log file is required
       INTEGER MAXH               ! Maximum number in an histogram bin
       REAL MAXIM                 ! Maximum value of pixels in array
@@ -395,6 +419,9 @@
       INTEGER NC                 ! No. characters in text buffer
       INTEGER NDFI               ! Identifier for input NDF
       INTEGER NDFO               ! NDF identifier of output histogram
+      INTEGER NDFW               ! Identifier for weights base NDF
+      INTEGER NDFW2              ! Identifier for weights section NDF
+      INTEGER NDIM               ! Number of pixel axes in input NDF
       INTEGER NERR               ! Number of conversion errors
       INTEGER NINVAL             ! Number of invalid pixels in array
       INTEGER NUMBIN             ! Number of histogram bins
@@ -402,7 +429,10 @@
       INTEGER PNTR( 1 )          ! Pointer to mapped NDF array
       CHARACTER * ( 255 ) TEXT   ! Temporary text variable
       CHARACTER *( NDF__SZTYP ) TYPE ! Numeric type for processing
+      INTEGER UBND( NDF__MXDIM ) ! Upper pixel bounds of input NDF
       CHARACTER * ( 256 ) UNITS  ! Units of the histogram NDF
+      DOUBLE PRECISION WEIGHT    ! Value of WEIGHTSTEP parameter
+      INTEGER WPNTR              ! Pointer to weights array
       CHARACTER * ( 255 ) XL     ! Default X axis label
       LOGICAL XLOG               ! X axis of plot is logarithmic
       CHARACTER * ( 255 ) YL     ! Default Y axis label
@@ -513,6 +543,38 @@
       CALL PAR_GDR0I( 'NUMBIN', 20, 2, MAXBIN, .TRUE., NUMBIN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
+*  Obtain weights for each data value.
+*  ===================================
+
+*  Assume all values will contribute a count of 1 to the corresponding
+*  histogram bin. This is indicated by a WEIGHT value of zero.
+      WEIGHT = 0.0D0
+      WPNTR = PNTR( 1 )
+
+*  Attempt to get a weights NDF. If none is supplied, annul the error.
+      CALL LPG_ASSOC( 'WEIGHTS', 'READ', NDFW, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+*  Otherwise, get the weight corresponding to a histogram bin count of 1.
+      ELSE
+         CALL PAR_GET0D( 'WEIGHTSTEP', WEIGHT, STATUS )
+
+*  Report an error if a value of zero is given.
+         IF( WEIGHT .EQ. 0.0D0 .AND. STATUS .EQ. SAI__OK ) THEN
+            CALL ERR_REP( ' ', 'Illegal value of zero supplied for '//
+     :                    'parameter WEIGHT.', STATUS )
+
+*  Otherwise get a section of the weights array that matches the bounds
+*  of the input NDF, and map it.
+         ELSE
+            CALL NDF_BOUND( NDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+            CALL NDF_SECT( NDFW, NDIM, LBND, UBND, NDFW2, STATUS )
+            CALL NDF_MAP( NDFW2, 'Data', '_DOUBLE', 'READ', WPNTR,
+     :                    EL, STATUS )
+         END IF
+      END IF
+
 *  Obtain an optional file for logging the results.
 *  ================================================
       CALL ERR_MARK
@@ -589,6 +651,7 @@
 
 *  Compute the histogram.
          CALL KPG1_GHSTB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( WPNTR ) ), WEIGHT,
      :                    NUMBIN, CUMUL,
      :                    NUM_DTOB( DRANGE( 2 ) ),
      :                    NUM_DTOB( DRANGE( 1 ) ),
@@ -611,6 +674,7 @@
 
 *  Compute the histogram.
          CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( WPNTR ) ), WEIGHT,
      :                    NUMBIN, CUMUL,
      :                    DRANGE( 2 ), DRANGE( 1 ),
      :                    %VAL( CNF_PVAL( HPNTR ) ),
@@ -647,6 +711,7 @@
 
 *  Compute the histogram.
          CALL KPG1_GHSTI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( WPNTR ) ), WEIGHT,
      :                    NUMBIN, CUMUL,
      :                    NUM_DTOI( DRANGE( 2 ) ),
      :                    NUM_DTOI( DRANGE( 1 ) ),
@@ -669,6 +734,7 @@
 
 *  Compute the histogram.
          CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( WPNTR ) ), WEIGHT,
      :                    NUMBIN, CUMUL,
      :                    REAL( DRANGE( 2 ) ), REAL( DRANGE( 1 ) ),
      :                    %VAL( CNF_PVAL( HPNTR ) ), STATUS )
@@ -689,6 +755,7 @@
 
 *  Compute the histogram.
          CALL KPG1_GHSTUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( WPNTR ) ), WEIGHT,
      :                     NUMBIN, CUMUL,
      :                     NUM_DTOUB( DRANGE( 2 ) ),
      :                     NUM_DTOUB( DRANGE( 1 ) ),
@@ -711,6 +778,7 @@
 
 *  Compute the histogram.
          CALL KPG1_GHSTUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( WPNTR ) ), WEIGHT,
      :                     NUMBIN, CUMUL,
      :                     NUM_DTOUW( DRANGE( 2 ) ),
      :                     NUM_DTOUW( DRANGE( 1 ) ),
@@ -733,6 +801,7 @@
 
 *  Compute the histogram.
          CALL KPG1_GHSTW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( WPNTR ) ), WEIGHT,
      :                    NUMBIN, CUMUL,
      :                    NUM_DTOW( DRANGE( 2 ) ),
      :                    NUM_DTOW( DRANGE( 1 ) ),

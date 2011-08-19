@@ -311,8 +311,8 @@
 *  Generate the histogram between those bounds. The number of bad pixels
 *  has been counted so it might be possible to save future processing.
             CALL KPG1_GHSTD( ( NINVAL .EQ. 0 ), N,
-     :                       %VAL( CNF_PVAL( IPW1 ) ), HISTSZ,
-     :                       .FALSE., DMAX, DMIN, HIST, STATUS )
+     :                       %VAL( CNF_PVAL( IPW1 ) ), 0.0D0, 0.0D0,
+     :                       HISTSZ, .FALSE., DMAX, DMIN, HIST, STATUS )
 
 *  Estimate the values at the percentiles. On exit, the values in FRAC
 *  are re-arranged into ascending order.

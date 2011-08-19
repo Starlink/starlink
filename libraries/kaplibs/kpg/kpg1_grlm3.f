@@ -15,7 +15,7 @@
 
 *  Description:
 *     This routine is exactly like KPG1_GRLM2,except that it uses
-*     single-precision data rather than double precision. Ideally, this 
+*     single-precision data rather than double precision. Ideally, this
 *     should be handled using GENERIC, but this would involve renaming
 *     the long-standing KPG1_GRLM2 routine, which is not a good idea.
 *
@@ -315,8 +315,8 @@
 *  Generate the histogram between those bounds. The number of bad pixels
 *  has been counted so it might be possible to save future processing.
             CALL KPG1_GHSTR( ( NINVAL .EQ. 0 ), N,
-     :                       %VAL( CNF_PVAL( IPW1 ) ), HISTSZ,
-     :                       .FALSE., DMAX, DMIN, HIST, STATUS )
+     :                       %VAL( CNF_PVAL( IPW1 ) ), 0.0, 0.0D0,
+     :                       HISTSZ, .FALSE., DMAX, DMIN, HIST, STATUS )
 
 *  Estimate the values at the percentiles. On exit, the values in FRAC
 *  are re-arranged into ascending order.

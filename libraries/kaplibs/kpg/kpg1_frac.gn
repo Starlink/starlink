@@ -20,7 +20,7 @@
 *     ordered distribution, such as percentiles.  Thus to find the
 *     upper-quartile value, the fraction would be 0.75.  Since it uses
 *     an histogram technique rather than sorting the whole array, for
-*     efficiency, the result may not be exactly correct.  However, 
+*     efficiency, the result may not be exactly correct.  However,
 *     the histogram has a large number of bins (10000), combined with
 *     linear interpolation between bins in the routine reduce the error.
 *     The histogram extends between the minimum and maximum data values.
@@ -73,7 +73,7 @@
 *     data range.  The number of bins is reduced as clipping occurs.
 
 *  Deficiencies:
-*     -  The iterative algorithm is not especially efficient; for data 
+*     -  The iterative algorithm is not especially efficient; for data
 *     with a very wide range the iterations can be numerous.  A
 *     sigma-clipping approach to remove the outliers might be better.
 *     -  The adjustment of the limiting fractions is done for each
@@ -95,12 +95,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -122,8 +122,8 @@
 *        involving clipping fractions and made returned values double
 *        precision.
 *     2000 October 20 (MJC):
-*        Adjusted the minimum binsize to be resolvable at the data 
-*        type's precision.  This includes testing for floating-point 
+*        Adjusted the minimum binsize to be resolvable at the data
+*        type's precision.  This includes testing for floating-point
 *        integers which could lead to an artifically sparse histogram.
 *        Use previous cycle's histogram for the case where the histogram
 *        is naturally sparse and the increased resolution made no
@@ -131,7 +131,7 @@
 *     2000 October 24 (MJC):
 *        Tested for extreme fractions and assign to the limiting values.
 *        Fixed comparison bug finding clipped limits.  Changed non-empty
-*        bin counting threshold from 1 to 0 (test is GT, not GE). 
+*        bin counting threshold from 1 to 0 (test is GT, not GE).
 *        Remove initial experimental code introduced for previous fix.
 *        Some corrections to NUM_<func> and intrinisc-function usage.
 *        thus curing a potential divide-by-zero error if maximum were
@@ -153,7 +153,7 @@
 *     2002 August 12 (MJC)
 *        Corrections and improvements to the previous enhancement.
 *     2005 November 28 (BEC)
-*        Fix bug possibly related to G95 and upcasting of BYTE to 
+*        Fix bug possibly related to G95 and upcasting of BYTE to
 *        INTEGER.
 *     2005 December 7 (PWD):
 *        Change use of MIN to NUM_MIN<T> so that MIN(BYTE,BYTE) works.
@@ -210,7 +210,7 @@
 *  with outliers, against a spiketrum-like quantised value.  It was
 *  originally 4% to permit quantized histograms not to be rejected,
 *  however, such distributions are not really within the remit of the
-*  algorithm.  The increase to 16% does produce far more-accurate 
+*  algorithm.  The increase to 16% does produce far more-accurate
 *  quantiles for the regular mono-modal data with extreme outliers.
 *  The loss of accuracy for quantised data is now offset by the fact
 *  that STATS can compute precise quantiles for any distribution.
@@ -241,7 +241,7 @@
                                ! clipped fraction
       REAL HALFIL              ! Minimum number of bins
       DOUBLE PRECISION HISLIM( NLIMIT ) ! Limits for fraction finding
-      INTEGER HIST( NUMBIN )   ! Histogram for finding fractional 
+      INTEGER HIST( NUMBIN )   ! Histogram for finding fractional
                                ! values
       INTEGER I                ! Loop counter
       DOUBLE PRECISION INCR    ! Increment between adjacent values
@@ -307,7 +307,7 @@
          INTVAL = .TRUE.
 
 *  The extreme values must not exceed the integer dynamic range.
-      ELSE IF ( MAXV .GT. NUM_ITO<T>( VAL__MAXI ) .OR. 
+      ELSE IF ( MAXV .GT. NUM_ITO<T>( VAL__MAXI ) .OR.
      :          MINV .LT. NUM_ITO<T>( VAL__MINI ) .OR.
 
 *  The extreme values must exceed +/-3.  This is to cater for small
@@ -415,7 +415,7 @@
 
 *  Percentiles close to 0 or 100 can be assigned the extreme values
 *  and this also avoids problems trying to compute histogram fractions
-*  with fewer than two values.  
+*  with fewer than two values.
       LIMITS( 1 ) = 1.0D0 / DNVAL
       LIMITS( 2 ) = 1.0D0 - LIMITS( 1 )
       DO I = 1, NFRAC
@@ -474,7 +474,7 @@
 *  range.
             RANGE = ABS( DATLIM( 2 ) / 2<CONST> -
      :                   DATLIM( 1 ) / 2<CONST> )
-   
+
 *  For the case of integers the maximum number of bins is data range
 *  plus one.
             IF ( INTVAL ) THEN
@@ -484,13 +484,13 @@
                ELSE
                   MAXBIN = VAL__MAXI
                END IF
-   
+
 *  For floating point we have at least two bins.
             ELSE
                AVELIM = ( ABS( DATLIM( 2 ) / 2<CONST> ) +
      :                    ABS( DATLIM( 1 ) / 2<CONST> ) )
                AVESIZE = RANGE / AVELIM / VAL__EPS<T> / 2<CONST>
-               MAXBIN = MIN( NUMBIN, NUM_<T>TOI( NUM_INT<T>( 
+               MAXBIN = MIN( NUMBIN, NUM_<T>TOI( NUM_INT<T>(
      :                  NUM_MIN<T>( NUM_ITO<T>( VAL__MAXI ),
      :                              AVESIZE ) ) ) )
             END IF
@@ -508,14 +508,15 @@
 *  Set the number of bins.  This is adjusted because the clipping itself
 *  may make the histogram sparse artificially.  Set a reasonable
 *  minimum number of bins subject to the MAXBIN limit.
-            CLNBIN = MIN( MAXBIN, 
+            CLNBIN = MIN( MAXBIN,
      :               INT( MAX( HALFIL, REAL( NBIN ) * SCALE ) ) )
             DNBIN = DBLE( CLNBIN )
 
 *  Generate the histogram between the current data bounds.  Do not
 *  recompute if already known.
-            CALL KPG1_GHST<T>( BAD, EL, ARRAY, CLNBIN, .FALSE.,
-     :                         DATLIM( 2 ), DATLIM( 1 ), HIST, STATUS )
+            CALL KPG1_GHST<T>( BAD, EL, ARRAY, ARRAY, 0.0D0, CLNBIN,
+     :                         .FALSE., DATLIM( 2 ), DATLIM( 1 ), HIST,
+     :                         STATUS )
          ELSE
             FINDHI = .TRUE.
          END IF
@@ -596,7 +597,7 @@
 
 *  Find the new limiting value for the finer-resolution histogram.
                DATLIM( 2 ) = NUM_SUB<T>( DATLIM( 2 ),
-     :                       NUM_DTO<T>( DBLE( CLNBIN - K ) * 
+     :                       NUM_DTO<T>( DBLE( CLNBIN - K ) *
      :                                   BINSIZ ) )
                IF ( NUM_LT<T>( DATLIM( 2 ), DATLIM( 1 ) ) )
      :           DATLIM( 2 ) = DATLIM( 1 )
@@ -665,7 +666,7 @@
 *  should be adequate.  Protect against the bin limits being the
 *  same, although this should not occur.
                   IF ( HISLIM( 1 ) .NE. HISLIM( 2 ) ) THEN
-                     CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ), 
+                     CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ),
      :                                HISLIM( 1 ), 1, CLFRAC( LOWER ),
      :                                VALUES( LOWER ), STATUS )
                   ELSE
@@ -695,7 +696,7 @@
 *  should be adequate.  Protect against the bin limits being the
 *  same, although this should not occur.
                   IF ( HISLIM( 1 ) .NE. HISLIM( 2 ) ) THEN
-                     CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ), 
+                     CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ),
      :                                HISLIM( 1 ), 1, CLFRAC( UPPER ),
      :                                VALUES( UPPER ), STATUS )
                   ELSE
@@ -743,7 +744,7 @@
       DO I = LOWER, UPPER
          CLFRAC( I ) = ( FRAC( I ) - CLIPFR( 1 ) ) / SCALE
       END DO
- 
+
 *  Estimate the values at the fractions of the distribution, excluding
 *  those outliers already derived (hence the offsets in the fractions
 *  passed and the values returned).  Protect against the bin limits
@@ -758,7 +759,7 @@
       ELSE
          DO I = LOWER, UPPER
             VALUES( I ) = HISLIM( 1 )
-         END DO   
+         END DO
       END IF
 
  999  CONTINUE

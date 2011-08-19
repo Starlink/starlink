@@ -11428,6 +11428,25 @@ package kappa {
             helpkey *
          }
 
+         parameter weights {
+            type NDF
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {NDF holding weights}
+            default !
+            helpkey *
+         }
+
+         parameter weightstep {
+            type _DOUBLE
+            prompt {Weight corresponding to a single histogram count}
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1.0
+            helpkey *
+         }
+
          parameter xleft {
             type _DOUBLE
             prompt {Axis value at left end of horizontal axis}

@@ -357,8 +357,9 @@
          CALL PSX_CALLOC( NPEN, '_INTEGER', IPHIST, STATUS )
 
 *  Produce the histogram.
-         CALL KPG1_GHSTI( .FALSE., NEL, COLDAT, NPEN, .FALSE., UP, LP,
-     :                    %VAL( CNF_PVAL( IPHIST ) ), STATUS )
+         CALL KPG1_GHSTI( .FALSE., NEL, COLDAT, COLDAT, 0.0D0, NPEN,
+     :                    .FALSE., UP, LP, %VAL( CNF_PVAL( IPHIST ) ),
+     :                    STATUS )
 
 *  Find the maximum and minimum count in any bin.
          CALL KPG1_MXMNI( .FALSE., NPEN, %VAL( CNF_PVAL( IPHIST ) ),

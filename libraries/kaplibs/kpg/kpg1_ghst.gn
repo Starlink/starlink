@@ -1,5 +1,5 @@
-      SUBROUTINE KPG1_GHST<T>( BAD, SIZE, ARRAY, NUMBIN, CUMUL,
-     :                         VALMAX, VALMIN, HIST, STATUS )
+      SUBROUTINE KPG1_GHST<T>( BAD, SIZE, ARRAY, WGTS, WEIGHT, NUMBIN,
+     :                         CUMUL, VALMAX, VALMIN, HIST, STATUS )
 *+
 *  Name:
 *     KPG1_GHSTx
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation
-*     CALL KPG1_GHSTx( BAD, SIZE, ARRAY, NUMBIN, CUMUL, VALMAX, VALMIN,
-*    :                 HIST, STATUS )
+*     CALL KPG1_GHSTx( BAD, SIZE, ARRAY, WGTS, WEIGHT, NUMBIN, CUMUL,
+*    :                 VALMAX, VALMIN, HIST, STATUS )
 
 *  Description:
 *     This routine calculates the truncated histogram of an array of
@@ -26,6 +26,16 @@
 *        The dimension of the array whose histogram is required.
 *     ARRAY( SIZE ) = ? (Given)
 *        The input data array.
+*     WGTS( SIZE ) = DOUBLE PRECISION (Given)
+*        The weight associed with each element of the input data array.
+*        Ignored if WEIGHT is zero.
+*     WEIGHT = DOUBLE PRECISION (Given)
+*        If non-zero, this is the increment in weight that contributes a
+*        single count to a histogram bin. This if WEIGHT is 0.1, and
+*        WGTS(10) is 0.232, the histogram bin containing the value of
+*        ARRAY(10) will be incremented by 2 (i.e. int(0.232/0.1). If
+*        WEIGHT is ZERO, then the WGTS array is ignored and every element
+*        of ARRAY is assigned a unit weight.
 *     NUMBIN = INTEGER (Given)
 *        Number of bins used in the histogram.  For integer data types
 *        this should result in a bin width of at least one unit.  So for
@@ -33,12 +43,12 @@
 *     CUMUL = LOGICAL (Given)
 *        Is a cumulative histogram required?
 *     VALMAX = ? (Given and Returned)
-*        Maximum data value included in the array.  If this is supplied 
-*        as VAL__BAD<T>, then the actual maximum value in the ARRAY is 
+*        Maximum data value included in the array.  If this is supplied
+*        as VAL__BAD<T>, then the actual maximum value in the ARRAY is
 *        found and used, and returned on exit.
 *     VALMIN = ? (Given and Returned)
 *        Minimum data value included in the array.  If this is supplied
-*        as VAL__BAD<T>, then the actual minimum value in the ARRAY is 
+*        as VAL__BAD<T>, then the actual minimum value in the ARRAY is
 *        found and used, and returned on exit.
 *     HIST( NUMBIN ) = INTEGER (Returned)
 *        Array containing the histogram.
@@ -47,7 +57,7 @@
 
 *  Notes:
 *     - If VALMAX or VALMIN is supplied equal to VAL__BAD<T>, then the
-*     actual maximum and minimum values will be found (by searching the 
+*     actual maximum and minimum values will be found (by searching the
 *     ARRAY), and used.
 *     -  There is a routine for all numeric data types: replace "x" in
 *     the routine name by B, D, R, I, UB, UW, or W as appropriate.  The
@@ -59,7 +69,7 @@
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research
 *                   Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -67,12 +77,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -104,12 +114,14 @@
 *        Report an error if VALMAX/MIN are supplied bad, and all data
 *        values are bad.
 *     15-MAY-2008 (DSB):
-*        Guard against cases where all values are equal and THRESH is 
+*        Guard against cases where all values are equal and THRESH is
 *        zero.
 *     03-MAR-2009 (PWD):
 *        Use NUM_MIN/MAX functions to handle generic MIN/MAX (byte data
 *        types). Rename DIM argument to SIZE to avoid clash with intrinsic of
-*        same name. 
+*        same name.
+*     18-AUG-2011 (DSB):
+*        Added WEIGHT and WGTS arguments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -130,6 +142,8 @@
       LOGICAL CUMUL
       LOGICAL BAD
       <TYPE> ARRAY( SIZE )
+      DOUBLE PRECISION WGTS( SIZE )
+      DOUBLE PRECISION WEIGHT
 
 *  Arguments Given and Returned:
       <TYPE> VALMAX
@@ -146,6 +160,7 @@
       DOUBLE PRECISION DVMAX     ! Maximum value
       DOUBLE PRECISION DVMIN     ! Minimum value
       INTEGER I                  ! Counter
+      INTEGER INC                ! Increment for bin value
       INTEGER K                  ! Counter
       DOUBLE PRECISION SCALE     ! Scale factor used for choosing
                                  ! correct bin
@@ -170,8 +185,8 @@
          HIST( K ) = 0
       END DO
 
-*  If either max or min values were not supplied, find them now. 
-      IF ( VALMAX .EQ. VAL__BAD<T> .OR. 
+*  If either max or min values were not supplied, find them now.
+      IF ( VALMAX .EQ. VAL__BAD<T> .OR.
      :     VALMIN .EQ. VAL__BAD<T> ) THEN
 
          VLMAX = VAL__MIN<T>
@@ -266,8 +281,17 @@
      :                    ( NUM_<T>TOD( ARRAY( I ) ) - DVMIN )
      :                    / SCALE ) )
 
+*  Get the value by which to increment the histogram.
+                  IF( WEIGHT .EQ. 0 ) THEN
+                     INC = 1
+                  ELSE IF( WGTS( I ) .NE. VAL__BADD ) THEN
+                     INC = WGTS( I )/WEIGHT
+                  ELSE
+                     INC = 0
+                  ENDIF
+
 *  Increment the number of data in the bin by one.
-                  HIST( DUMMY )  =  HIST( DUMMY ) + 1
+                  HIST( DUMMY )  =  HIST( DUMMY ) + INC
                END IF
 
 *  End of loop round elements.
@@ -290,8 +314,15 @@
      :                    ( NUM_<T>TOD( ARRAY( I ) ) - DVMIN )
      :                    / SCALE ) )
 
+*  Get the value by which to increment the histogram.
+                  IF( WEIGHT .EQ. 0 ) THEN
+                     INC = 1
+                  ELSE
+                     INC = WGTS( I )/WEIGHT
+                  ENDIF
+
 *  Increment the number of data in the bin by one.
-                  HIST( DUMMY )  =  HIST( DUMMY ) + 1
+                  HIST( DUMMY )  =  HIST( DUMMY ) + INC
                END IF
 
 *  End of loop round elements.
@@ -319,8 +350,17 @@
                   DUMMY = MIN( NUMBIN, 1 + INT( TNUMB *
      :                    ( TEMP - DVMIN ) / SCALE ) )
 
+*  Get the value by which to increment the histogram.
+                  IF( WEIGHT .EQ. 0 ) THEN
+                     INC = 1
+                  ELSE IF( WGTS( I ) .NE. VAL__BADD) THEN
+                     INC = WGTS( I )/WEIGHT
+                  ELSE
+                     INC = 0
+                  ENDIF
+
 *  Increment the number of data in the bin by one.
-                  HIST( DUMMY )  =  HIST( DUMMY ) + 1
+                  HIST( DUMMY )  =  HIST( DUMMY ) + INC
                END IF
 
 *  End of loop round elements.
@@ -342,8 +382,15 @@
                   DUMMY = MIN( NUMBIN, 1 + INT( TNUMB *
      :                    ( TEMP - DVMIN ) / SCALE ) )
 
+*  Get the value by which to increment the histogram.
+                  IF( WEIGHT .EQ. 0 ) THEN
+                     INC = 1
+                  ELSE
+                     INC = WGTS( I )/WEIGHT
+                  ENDIF
+
 *  Increment the number of data in the bin by one.
-                  HIST( DUMMY )  =  HIST( DUMMY ) + 1
+                  HIST( DUMMY )  =  HIST( DUMMY ) + INC
                END IF
 
 *  End of loop round elements.

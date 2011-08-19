@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.38}
 \newcommand{\stardocnumber}    {95.38}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2011 July 20}
+\newcommand{\stardocdate}      {2011 August 19}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -28277,6 +28277,10 @@ scaling limits are used for both images.
       between specified limits.  The histogram is reported, and may
       optionally be written to a text log file, and/or plotted
       graphically.
+
+      By default, each data value contributes a value of one to the
+      corresponding histogram bin, but alternative weights may be
+      supplied via parameter WEIGHTS.
    }
    \sstusage{
       histogram in numbin range [comp] [logfile]
@@ -28468,6 +28472,30 @@ scaling limits are used for both images.
          TITLE = LITERAL (Read)
       }{
          Title for the histogram NDF.  {\tt ["KAPPA - Histogram"]}
+      }
+      \sstsubsection{
+         WEIGHTS = NDF (Read)
+      }{
+         An optional NDF holding weights associated with each input pixel
+         value (supplied via parameter IN). Together with parameter
+         WEIGHTSTEP, these determine the count added to the corresponding
+         histogram bin for each input pixel value. For instance, weights
+         could be related to the variance of the data values, or to the
+         position of the data values within the input NDF. If a null value
+         ({\tt{!}}) is supplied for WEIGHTS, all input values contribute a
+         count of one to the corresponding histogram bin. If an NDF is
+         supplied, the histogram count for a particular input pixel is
+         formed by dividing its weight value (supplied in the WEIGHTS NDF)
+         by the value of parameter WEIGHTSTEP, and then taking the nearest
+         integer. Input pixels with bad or zero weights are excluded from
+         the histogram. {\tt [!]}
+      }
+      \sstsubsection{
+         WEIGHTSTEP = _DOUBLE (Read)
+      }{
+         Only accessed if a value is supplied for parameter WEIGHTS.
+         WEIGHTSTEP is the increment in weight value that corresponds to
+         a unit increment in histogram count.
       }
       \sstsubsection{
          XLEFT = \_DOUBLE (Read)
@@ -57761,6 +57789,8 @@ The following applications have been modified:
         limits that exceed the single-precision data range.
         \item The default for the AXES parameter has changed so that by
         default axes are only drawn if the picture is cleared.
+        \item New parameter WEIGHTS allows different weights to be
+        associated with each value in the input NDF.
       \end{itemize}
 
    \item [\htmlref{LOOK}{LOOK}]\mbox{}
