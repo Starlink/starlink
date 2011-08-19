@@ -293,6 +293,9 @@ c
 c Revision 1.1  1996/08/16  15:26:31  timj
 c Initial revision
 c
+*     2011-08-18 (TIMJ):
+*        Factor out model/data writing to separate routine which simplifies
+*        the code a lot and saves us from using %LOC.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -358,7 +361,6 @@ c
       REAL    AIRMASS_TVAR(MAX_FIT_DATA)! First Array of AIRMASS variance
       REAL    AIRMASS_VAR(MAX_FIT_DATA) ! Array of AIRMASS variance
       REAL    AIRSTEP                   ! AIRMASS increment for DO loop
-      INTEGER AREF                      ! Pointer to axis data
       REAL    AV_DATA(SCUBA__MAX_SUB, SCUBA__MAX_MEAS)
                                         ! Average skydip
       BYTE    AV_QUAL(SCUBA__MAX_SUB, SCUBA__MAX_MEAS)
@@ -367,7 +369,6 @@ c
                                         ! Var for average skydip
       REAL    B                         ! requested B
       REAL    B_ERROR                   ! Error in B
-      LOGICAL BADPIX                    ! are there bad pixels
       REAL    B_FIT                     ! B parameter
       INTEGER BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers measured in
@@ -382,14 +383,12 @@ c
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! dU4 Nasmyth coord of bolometers
       LOGICAL CVAR                      ! Use constant variance?
-      REAL    EXPOSURE_TIME             ! Exposure time per sample
       DOUBLE PRECISION DAIRMASST(MAX_FIT_DATA)
                                         ! Tmp DBL airmass array for RASTER
       DOUBLE PRECISION DAIRMASS_TVAR(MAX_FIT_DATA)
                                         ! DBL airmass var array for RASTER
       INTEGER DIM (MAXDIM)              ! the dimensions of an array
       REAL    DEFAULT_ETA_TEL           ! Eta tel read from FITS header
-      INTEGER DREF                      ! Pointer to output data
       INTEGER DUM_DATA_PTR_END          ! Scratch space end
       INTEGER DUM_DATA_PTR              ! Scratch space
       INTEGER DUM_VAR_PTR_END           ! Scratch space 2end
@@ -409,7 +408,6 @@ c
       REAL    ETA_TEL_FIT               ! Fitted eta_tel
       INTEGER EXP_END                   ! end index of data for an exposure
       INTEGER EXP_START                 ! start index of data for an exposure
-      INTEGER FILE                      ! File counter in DO loop
       CHARACTER*15 FILT                 ! Selected filter
       LOGICAL FITFAIL                   ! Status of the Model fit
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
@@ -418,36 +416,27 @@ c
       REAL    FSIGN                     ! Used to store sign information +/-
       INTEGER GOOD                      ! dummy status for PAR_PUT/GOODFIT
       INTEGER I                         ! DO loop index
-      INTEGER IERR                      ! For VEC_
       INTEGER ITEMP                     ! scratch integer
       BYTE    IN_BADBIT                 ! input Bad bit mask
       INTEGER IN_DEM_PNTR_PTR           ! pointer to input .SCUBA.DEM_PNTR array
       INTEGER IN_DATA_PTR               ! pointer to data array of input file
       INTEGER IN_NDF                    ! NDF identifier of input file
       INTEGER IN_QUAL_PTR               ! pointer to qual array of input file
-      LOGICAL ISAREFREG                 ! Was AREF pointer newly registered?
-      LOGICAL ISDREFREG                 ! Was DREF pointer newly registered?
       REAL    JSKY (SCUBA__MAX_MEAS)    ! Average SKY data for used SUB-INS
       REAL    JSKY_VAR (SCUBA__MAX_MEAS)! Variance of JSKY
       REAL    J_THEORETICAL (N_MODEL)   ! Array of model sky data
-      CHARACTER * 15 LABEL              ! File label
       INTEGER      LAST_INT             ! the last integration number in
                                         ! an aborted observation
       INTEGER      LAST_MEAS            ! the last measurement number in
                                         ! an aborted observation
-      INTEGER LBND (MAXDIM)             ! lower bounds of array
-      CHARACTER*(DAT__SZLOC) LOC1       ! Dummy locator
       DOUBLE PRECISION MEAN             ! Mean of measurement
       INTEGER MEASUREMENT               ! Measurement loop counter
       DOUBLE PRECISION MEDIAN           ! Median of measurement
       DOUBLE PRECISION MJD              ! MJD of observation
       LOGICAL MODIFIED                  ! ETA_TEL default has been modified
       INTEGER NDIM                      ! the number of dimensions in an array
-      INTEGER NERR                      ! For VEC_
-      INTEGER NFILES                    ! Number of output files
       INTEGER NGOOD                     ! Number of good points from stats
       INTEGER NKEPT                     ! Number of good measurements
-      INTEGER NPTS                      ! Number of output data points
       INTEGER NREC                      ! number of history records in file
       INTEGER N_BOLS                    ! number of bolometers measured
       INTEGER N_EXPOSURES               ! number of exposures per integration
@@ -459,13 +448,6 @@ c
       INTEGER N_SWITCHES                ! number of switches per exposure
       CHARACTER*15 OBSERVING_MODE       ! type of observation
       INTEGER OFFSET                    ! Offset in array
-      INTEGER OUT_AXIS_PTR              ! pointer to axis of observed output file
-      INTEGER OUT_DATA_PTR              ! pointer to data array of output file
-      CHARACTER *80 OUT_NAME            ! Name of output NDF
-      INTEGER OUT_NDF                   ! NDF identifier of output file
-      INTEGER OUT_VAR_PTR               ! pointer to variance array of output file
-      CHARACTER * 15 PARAM              ! Name of output file parameter
-      INTEGER PLACE                     ! A placeholder
       REAL    QSORT(SCUBA__MAX_INT)     ! Scratch space for SCULIB_STATR
       LOGICAL RASTER                    ! True if this is on-the-fly skydip
       DOUBLE PRECISION RESIDUAL         ! Residual of fit
@@ -492,37 +474,21 @@ c
       CHARACTER*15 SWITCH_MODE          ! switch mode used
       REAL    TAU_ERROR                 ! Error in tau
       REAL    TAUZ_FIT                  ! Fitted TAU
-      CHARACTER * 15 TITLE              ! File title
-      REAL    T                         ! A time
-      REAL    T1                        ! Time1 - raster
-      REAL    T2                        ! Time2 - raster
-      REAL    T3                        ! Time3 - raster
       REAL    T_AMB                     ! Temperature of ambient load
       REAL    T_COLD                    ! Temperature of cold load
       REAL    T_TEL                     ! Temperature of telescope
-      INTEGER UBND (MAXDIM)             ! upper bounds of array
       REAL    WAVE                      ! Selectred wavelength
       DOUBLE PRECISION ZD               ! Zenith distance
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC ! Locator to EXTENSIONS
 
 *  External functions:
       INCLUDE 'NDF_FUNC'
-
-#if HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
 *  Initialisations for compiler
       RESW = .FALSE.
-      NFILES = 0
-
-
-
 
 * Start up the NDF system and read in some data
 
@@ -1384,11 +1350,9 @@ c
 
          IF (STATUS .EQ. SAI__OK) THEN
             FITFAIL = .FALSE.
-            NFILES = 2
          ELSE
             CALL ERR_FLUSH(STATUS)
             FITFAIL = .TRUE.
-            NFILES =1
          ENDIF
       END IF
 
@@ -1402,7 +1366,6 @@ c
       IF (TAUZ_FIT .LT. 0.0) FITFAIL = .TRUE.
       IF (ETA_TEL_FIT .LT. 0.0) FITFAIL = .TRUE.
       IF (B_FIT .LT. 0.0) FITFAIL = .TRUE.
-      IF (FITFAIL) NFILES = 1
 
       GOOD = SAI__OK
       CALL PAR_PUT0L('GOODFIT', .NOT.FITFAIL, GOOD)
@@ -1416,196 +1379,44 @@ c
       CALL PAR_PUT0D('SIGMA', SIGMA, GOOD)
       CALL PAR_PUT0D('RESIDUAL', RESIDUAL, GOOD)
 
-*     Now create output files
-*     Only create model if we fitted okay
-      DO FILE = 1, NFILES
-
-         IF (STATUS .EQ. SAI__OK) THEN
-
-*     Setup bits that are DIFFERENT between model and data
-
-         IF (FILE .EQ. 1) THEN
-*     Data parameters
-            PARAM = 'OUT'
-            NPTS = NKEPT   ! Not necessarily N_MEASUREMENTS
-            LABEL = 'Jsky'
-            TITLE = 'Skydip'
-            BADPIX = .FALSE.  ! I remove all bad data points
-#if HAVE_INTRINSIC_LOC
-            DREF = CNF_PREG(LOC(JSKY), ISDREFREG)
-            AREF = CNF_PREG(LOC(AIRMASS), ISAREFREG)
-#else
-            DREF = CNF_PREG(%LOC(JSKY), ISDREFREG)
-            AREF = CNF_PREG(%LOC(AIRMASS), ISAREFREG)
-#endif
-         ELSE
-*     Model parameters and create
-            PARAM = 'MODEL_OUT'
-            NPTS = N_MODEL
-            LABEL = 'Jsky'
-            TITLE = 'Skydip (model)'
-            BADPIX = .FALSE.
-#if HAVE_INTRINSIC_LOC
-            DREF = CNF_PREG(LOC(J_THEORETICAL), ISDREFREG) ! Reference to data
-            AREF = CNF_PREG(LOC(AIR_MODEL), ISAREFREG)     ! Reference to axis
-#else
-            DREF = CNF_PREG(%LOC(J_THEORETICAL), ISDREFREG) ! Reference to data
-            AREF = CNF_PREG(%LOC(AIR_MODEL), ISAREFREG)     ! Reference to axis
-#endif
-
-            AIRSTEP = (AIRMASS(NKEPT) - AIRMASS(1)) /
-     :           (N_MODEL - 1)
-
-            DO I = 1, N_MODEL
-               AIR_MODEL(I) = AIRMASS(1) + AIRSTEP * (I - 1)
-               CALL SCULIB_J_THEORETICAL (TAUZ_FIT, AIR_MODEL(I), T_TEL,
-     :              T_AMB, WAVE, ETA_TEL_FIT, B_FIT, J_THEORETICAL(I),
-     :              STATUS)
-            END DO
-
-         END IF
-
-*     Check that our pointer registration was okay
-         IF (AREF .EQ. 0 .OR. CNF_PVAL(AREF) .EQ. 0) THEN
-            IF ( STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'SKYDIP_AREF_CNF_ERR',
-     :              'Unable to register AREF pointer with CNF',
-     :              STATUS )
-            END IF
-         END IF
-         IF (DREF .EQ. 0 .OR. CNF_PVAL(DREF) .EQ. 0) THEN
-            IF ( STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'SKYDIP_DREF_CNF_ERR',
-     :              'Unable to register DREF pointer with CNF',
-     :              STATUS )
-            END IF
-         END IF
-
-*     Find out the name of the output file
-         CALL PAR_GET0C(PARAM, OUT_NAME, STATUS)
-
-*     Only write out if required
-         IF (STATUS .EQ. PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-         ELSE
-
-*  now open the output NDF
-            NDIM = 1
-            LBND (1) = 1
-            UBND (1) = NPTS
-
-            CALL NDF_PLACE(DAT__ROOT, OUT_NAME, PLACE, STATUS)
-            CALL NDF_NEW('_REAL',NDIM, LBND, UBND, PLACE, OUT_NDF,
-     :           STATUS)
-
-* probably should store the FITS header
-
-            CALL NDF_XNEW(OUT_NDF, 'FITS','_CHAR*80', 1, N_FITS, LOC1,
-     :           STATUS)
-            CALL DAT_PUT1C(LOC1, N_FITS, FITS, STATUS)
-            CALL DAT_ANNUL(LOC1, STATUS)
-
-* Create a REDS extension to store the FIT parameters
-            CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION', 0, 0,
-     :           LOC1, STATUS)
-            CALL DAT_ANNUL (LOC1, STATUS)
-
-* Store description of selected sub instrument
-
-            CALL NDF_XPT0C(SUB_INST, OUT_NDF, 'REDS', 'SUB_INSTRUMENT',
-     :           STATUS)
-            CALL NDF_XPT0C(FILT, OUT_NDF, 'REDS', 'FILTER', STATUS)
-            CALL NDF_XPT0R(WAVE, OUT_NDF, 'REDS', 'WAVELENGTH', STATUS)
-
 *     Retrieve the Cold temperature from the FITS header
 
-            STEMP = 'T_COLD_'
-            ITEMP = 7
-            CALL CHR_PUTI(SUB_POINTER, STEMP, ITEMP)
-            CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, STEMP,
-     :           T_COLD, STATUS)
+      STEMP = 'T_COLD_'
+      ITEMP = 7
+      CALL CHR_PUTI(SUB_POINTER, STEMP, ITEMP)
+      CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, STEMP,
+     :     T_COLD, STATUS)
 
-            CALL NDF_XPT0R(T_COLD, OUT_NDF,'REDS','T_COLD',
+*     Now create output files
+
+*     The data we fitted
+      CALL SCULIB_WRITE_SKYDIP_DATAMODEL( 'OUT', N_FITS, FITS,
+     :     'Jsky', 'Skydip', 'K', 'Airmass', NKEPT,
+     :     JSKY, .TRUE., JSKY_VAR, AIRMASS, .TRUE., AIRMASS_VAR,
+     :     SUB_INST, FILT, WAVE, T_COLD,
+     :     VAL__BADR, VAL__BADR, VAL__BADR, STATUS )
+
+*     Only create model if we fitted okay
+      IF ( .NOT. FITFAIL ) THEN
+
+         AIRSTEP = (AIRMASS(NKEPT) - AIRMASS(1)) /
+     :        (N_MODEL - 1)
+
+         DO I = 1, N_MODEL
+            AIR_MODEL(I) = AIRMASS(1) + AIRSTEP * (I - 1)
+            CALL SCULIB_J_THEORETICAL (TAUZ_FIT, AIR_MODEL(I), T_TEL,
+     :           T_AMB, WAVE, ETA_TEL_FIT, B_FIT, J_THEORETICAL(I),
      :           STATUS)
+         END DO
 
-*     Store the fit results
+         CALL SCULIB_WRITE_SKYDIP_DATAMODEL( 'MODEL_OUT', N_FITS, FITS,
+     :        'Jsky', 'Skydip (model)', 'K', 'Airmass', N_MODEL,
+     :        J_THEORETICAL, .FALSE., J_THEORETICAL,
+     :        AIR_MODEL, .FALSE., AIR_MODEL,
+     :        SUB_INST, FILT, WAVE, T_COLD,
+     :        ETA_TEL_FIT, B_FIT, TAUZ_FIT, STATUS )
 
-            IF (FILE .EQ. 2) THEN
-               CALL NDF_XPT0R(ETA_TEL_FIT, OUT_NDF, 'REDS', 'ETA_TEL',
-     :              STATUS)
-               CALL NDF_XPT0R(B_FIT, OUT_NDF, 'REDS', 'B_FIT', STATUS)
-               CALL NDF_XPT0R(TAUZ_FIT, OUT_NDF, 'REDS', 'TAU_Z',STATUS)
-            END IF
-
-*  create a history component in the output file
-            CALL NDF_HCRE (OUT_NDF, STATUS)
-
-*     Title, label and units
-            CALL NDF_CPUT (TITLE, OUT_NDF,'TITLE',STATUS)
-            CALL NDF_CPUT (LABEL, OUT_NDF,'LABEL',STATUS)
-            CALL NDF_CPUT ('K', OUT_NDF, 'UNITS', STATUS)
-
-* Create and label the AXES
-            CALL NDF_ACRE(OUT_NDF, STATUS)
-            CALL NDF_ACPUT('AIRMASS',OUT_NDF,'LABEL',1,STATUS)
-
-*     Map the data
-            CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
-     :           OUT_DATA_PTR, ITEMP, STATUS)
-
-            CALL VEC_RTOR(.FALSE.,UBND(1), %VAL(CNF_PVAL(DREF)),
-     :           %VAL(CNF_PVAL(OUT_DATA_PTR)), IERR, NERR, STATUS)
-
-*     Only data has VARIANCE
-            IF (FILE .EQ. 1) THEN
-               CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
-     :              OUT_VAR_PTR, ITEMP, STATUS)
-
-               CALL VEC_RTOR(.FALSE., UBND(1), JSKY_VAR,
-     :              %VAL(CNF_PVAL(OUT_VAR_PTR)), IERR, NERR, STATUS)
-
-*               CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
-*     :              OUT_QUAL_PTR, ITEMP, STATUS)
-*               CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
-
-*               CALL VEC_UBTOUB(.FALSE., UBND(1), JSKY_QUAL,
-*     :              %VAL(OUT_QUAL_PTR), IERR, NERR, STATUS)
-            END IF
-
-*     Map the Axes
-            CALL NDF_AMAP (OUT_NDF, 'Centre', 1, '_REAL', 'WRITE',
-     :           OUT_AXIS_PTR, UBND(1), STATUS)
-
-            CALL VEC_RTOR(.FALSE., UBND(1), %VAL(CNF_PVAL(AREF)),
-     :           %VAL(CNF_PVAL(OUT_AXIS_PTR)), IERR, NERR, STATUS)
-
-* if data then write the AXIS variance (probably pretty inaccurate)
-            IF (FILE .EQ. 1) THEN
-
-               CALL NDF_AMAP (OUT_NDF, 'Error', 1, '_REAL', 'WRITE',
-     :              OUT_AXIS_PTR, UBND(1), STATUS)
-
-               CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS_VAR,
-     :              %VAL(CNF_PVAL(OUT_AXIS_PTR)), IERR, NERR, STATUS)
-            END IF
-
-*     Set the bad pixel flag
-            CALL NDF_SBAD(BADPIX, OUT_NDF, 'Data', STATUS)
-
-*     Tidy up
-            CALL NDF_ANNUL(OUT_NDF, STATUS)
-
-*  Release the %LOC pointers from CNF so that it can be re-used
-            IF (ISAREFREG .AND. AREF .NE. 0) CALL CNF_UNREGP( AREF )
-            IF (ISDREFREG .AND. DREF .NE. 0) CALL CNF_UNREGP( DREF )
-
-         ENDIF
-
-         END IF
-
-      END DO
+      END IF
 
 * Shut down the NDF system
 

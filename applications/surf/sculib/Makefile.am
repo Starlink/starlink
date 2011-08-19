@@ -67,7 +67,8 @@ sculib_mask_data.f sculib_construct_out.f sculib_get_filename.f	       \
 sculib_par_get.f sculib_apparent_2_mp.f sculib_scan_2_rd.f	       \
 sculib_add_chop.f sculib_fix_scan_v10.f sculib_gauss_wtinit.f	       \
 sculib_skydip_var.f sculib_noise_mean.f sculib_find_int.f	       \
-sculib_calc_clockerr.f sculib_rad2string.f sculib_mjd_to_dateobs.f
+sculib_calc_clockerr.f sculib_rad2string.f sculib_mjd_to_dateobs.f     \
+sculib_write_skydip_datamodel.f
 
 FPP_ROUTINES = sculib_secnds.F sculib_bessel_wtinit.F sculib_skydip_temperatures.F
 
