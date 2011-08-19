@@ -2475,12 +2475,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          initialised to zero and will not contain bad values. */
       if( *status == SAI__OK ) {
         steptime = res[0]->sdata[0]->hdr->steptime;
-        for (i=0; (i<msize) && (*status == SAI__OK); i++) {
-          if ( map[i] != VAL__BADD) {
-            exp_time[i] += steptime * (double)hitsmap[i];
+        for (i=0; i<msize; i++) {
+          if ( thishits[i] != VAL__BADI) {
+            exp_time[i] += steptime * (double)thishits[i];
           }
         }
       }
+
     }
 
 
