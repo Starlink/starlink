@@ -22,7 +22,8 @@ surf_mon_TASKS = bolrebin calcsky change_data change_flat change_pointing \
 	change_quality despike despike2 extinction extract_data \
 	extract_flat flatfield intrebin rebin reduce_switch \
 	remsky restore scucat scan_rlb scuclip scuhelp scuover scuphot \
-	skydip scuba2mem scumakewt reduce_noise add_dbm remip scuclkerr
+	skydip scuba2mem scumakewt reduce_noise add_dbm remip scuclkerr \
+	skydip2
 
 # Linking
 surf_mon_LDADD =  src/libsurf.la surflib/libsurflib.la sculib/libsculib.la `$(srcdir)/surf_link_adam`

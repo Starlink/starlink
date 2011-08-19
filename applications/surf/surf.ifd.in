@@ -3101,6 +3101,157 @@ package surf {
 
 
       }
+## SKYDIP2 - Process pre-processed skydip data
+
+      action skydip2 {
+
+         helplib {$SURF_HELP}
+
+         parameter b_fit {
+            prompt {Fitted value of B}
+            type _REAL
+            default -1.0
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+         parameter b_err {
+            prompt {Error in fitted value of B}
+            type _REAL
+            default -1.0
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+         parameter b_val {
+            position 2
+            prompt {B parameter}
+            type _REAL
+            default -1.0
+            range -1000000 1.0
+            helpkey *
+          }
+
+         parameter cvar {
+            prompt {Use the same variance for each point}
+            type _LOGICAL
+            default FALSE
+            helpkey *
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+          }
+
+         parameter eta_tel {
+            position 3
+            prompt {Telescope efficiency}
+            type _REAL
+            default -1.0
+            range -1000000 1.0
+            helpkey *
+          }
+
+         parameter eta_tel_err {
+            prompt {Error in fitted value of ETA_TEL}
+            type _REAL
+            default -1.0
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+         parameter eta_tel_fit {
+            prompt {Fitted value of Eta_Tel}
+            type _REAL
+            default -1.0
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+         parameter goodfit {
+            prompt {Was the fit good}
+            type _LOGICAL
+            default FALSE
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+         parameter in {
+            position 1
+            type _CHAR
+            prompt {Name of input file containing sky temperature data}
+            helpkey *
+          }
+
+         parameter out {
+            position 4
+            prompt {Name of output NDF for MODEL data}
+            type _CHAR
+            association ->GLOBAL.DATA_ARRAY
+            default !
+            helpkey *
+          }
+
+         parameter residual {
+            prompt {Residual of fit}
+            type _DOUBLE
+            default -1.0
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+         parameter sigma {
+            prompt {Standard deviation of residuals}
+            type _DOUBLE
+            default -1.0
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+         parameter tauz_err {
+            prompt {Error in fitted sky opacity}
+            type _REAL
+            default -1.0
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+
+         parameter tauz_fit {
+            prompt {Fitted sky opacity}
+            type _REAL
+            default -1.0
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+         parameter wavelength {
+            prompt {Selected wavelength of fit}
+            type _REAL
+            default -1.0
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+         parameter xisq {
+            prompt {Reduced chi square of fit}
+            type _REAL
+            default -1.0
+            helpkey *
+            vpath DEFAULT
+            access WRITE
+          }
+
+
+      }
 ## SCUBA2MEM - Write out position information for SCUBA DBMEM
 
 #+
