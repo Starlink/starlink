@@ -39,7 +39,7 @@ scripts/scupa.csh scripts/scusetenv.csh scripts/setbolwt.pl	       \
 scripts/remdbm.pl scripts/scuplot.csh scripts/scushift scripts/sigclip \
 scripts/sculog \
 scripts/calcflat.pl scripts/polphot.pl scripts/scunoise		       \
-scripts/scuquick scripts/sdip.csh
+scripts/scuquick scripts/sdip.csh scripts/sdip2.csh
 
 # Dynamically generated scripts
 DYNSCRIPTS = surf.sh surf.csh surf.icl

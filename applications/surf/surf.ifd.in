@@ -3847,6 +3847,10 @@ package surf {
       obey {$SURF_DIR/sdip.csh}
    }
 
+   command sdip2 {
+      obey {$SURF_DIR/sdip2.csh}
+   }
+
    command dspbol {
       obey {$SURF_DIR/dspbol}
    }
