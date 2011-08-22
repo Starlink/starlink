@@ -413,6 +413,7 @@ C     Get the wavelength from the FITS header. Needed in microns
       T_AMB = T_AMB + TOFFSET
 
 *     ETA TEL from the header
+      DEFAULT_ETA_TEL = -1.0D0
       DUMMY = AST_GETFITSF( FCHAN, ETALKEY, DEFAULT_ETA_TEL, STATUS )
       CALL PAR_DEF0D('ETA_TEL', DEFAULT_ETA_TEL, STATUS)
 
