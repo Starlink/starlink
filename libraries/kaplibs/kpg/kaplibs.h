@@ -86,6 +86,8 @@
 *        Modify kpg1Config API
 *     2010 August 6 (MJC):
 *        Add kpg1Filli.
+*     2011-08-22 (TIMJ):
+*        kpg1GhstX has a new API
 *     {enter_further_changes_here}
 
 *-
@@ -158,8 +160,8 @@ void kpg1Asffr( AstFrameSet *, const char *, int *, int * );
 void kpg1Datcp( const HDSLoc *, HDSLoc *, const char *, int * );
 void kpg1Hdsky( const HDSLoc *, AstKeyMap *, int, int, int * );
 void kpg1Kyhds( AstKeyMap *, const int *, int, int, HDSLoc *, int * );
-void kpg1Ghstd( int, int, const double *, int, int, double *, double *, int *, int * );
-void kpg1Ghstr( int, int, const float *, int, int, float *, float *, int *, int * );
+void kpg1Ghstd( int, int, const double *, const double *, double, int, int, double *, double *, int *, int * );
+void kpg1Ghstr( int, int, const float *, const double *, double, int, int, float *, float *, int *, int * );
 void kpg1Hsstp( int, const int *, double, double, double *, double *, double *, double *, int * );
 void fts1Astwn( AstFitsChan *, int, int * );
 void kpg1Ky2hd( AstKeyMap *, HDSLoc *, int * );

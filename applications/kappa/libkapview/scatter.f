@@ -204,7 +204,7 @@
 *     Copyright (C) 1999, 2001, 2004 Central Laboratory of the Research
 *     Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -251,6 +251,8 @@
 *        by SCATTER. At some point SCATTER should be changed to handle
 *        data that exceeds the range of a REAL (as has been done to
 *        HISTOGRAM).
+*     2011-08-22 (TIMJ):
+*        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *-
@@ -503,6 +505,7 @@
 
 *  Generate the histogram between those bounds.
       CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IPW3 ) ),
+     :                 %VAL( CNF_PVAL( IPW3 ) ), 0.0D0,
      :                 NUMBIN, .FALSE., RMAXV, RMINV,
      :                 HIST, STATUS )
 
@@ -522,6 +525,7 @@
      :                 NINVAL, RMAXV, RMINV,
      :                 MAXPOS, MINPOS, STATUS )
       CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IPW4 ) ),
+     :                 %VAL( CNF_PVAL( IPW3 ) ), 0.0D0,
      :                 NUMBIN, .FALSE., RMAXV, RMINV,
      :                 HIST, STATUS )
       CALL KPG1_HSTFR( NUMBIN, HIST, RMAXV, RMINV, 2, PERC2, PERV2,

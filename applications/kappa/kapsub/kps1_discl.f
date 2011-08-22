@@ -78,6 +78,7 @@
 *     in which the image is to be displayed.
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 1998-1999, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
 *     Research Council. All Rights Reserved.
@@ -118,6 +119,8 @@
 *        Move CNF_PAR include into declarations.
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
+*     2011-08-22 (TIMJ):
+*        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *-
@@ -780,6 +783,7 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 0.0D0,
      :                          NUMBIN, .FALSE., RMAXV, RMINV, HIST,
      :                          STATUS )
 
@@ -824,6 +828,7 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 0.0D0,
      :                          NUMBIN, .FALSE., DMAXV, DMINV, HIST,
      :                          STATUS )
 
@@ -869,6 +874,7 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 0.0D0,
      :                          NUMBIN, .FALSE., IMAXV, IMINV, HIST,
      :                          STATUS )
 
@@ -914,6 +920,7 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 0.0D0,
      :                          NUMBIN, .FALSE., WMAXV, WMINV, HIST,
      :                          STATUS )
 
@@ -959,6 +966,7 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 0.0D0,
      :                          NUMBIN, .FALSE., BMAXV, BMINV, HIST,
      :                          STATUS )
 

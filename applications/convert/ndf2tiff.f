@@ -118,7 +118,7 @@
 
 *  Copyright:
 *     Copyright (C) 1995-1996, 1999, 2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2008 Science & Technology
+*     Research Councils. Copyright (C) 2008, 2011 Science & Technology
 *     Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -155,6 +155,8 @@
 *        Use CNF_PVAL.
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
+*     2011-08-22 (TIMJ):
+*        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *-
@@ -422,6 +424,7 @@
 
 *  Generate the histogram between those bounds.
             CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 0.0D0,
      :                       NUMBIN, .FALSE., DMAXV, DMINV, HIST,
      :                       STATUS )
 

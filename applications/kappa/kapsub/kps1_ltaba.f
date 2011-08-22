@@ -35,6 +35,7 @@
 *        Global status value.
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
 *     Research Council. All Rights Reserved.
@@ -73,6 +74,8 @@
 *        Also remove fourth workspace for the revised KPS1_HEQPx API.
 *      2006 March 9 (MJC):
 *        Correct colour-index offset when the palette is being used.
+*     2011-08-22 (TIMJ):
+*        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *-
@@ -475,6 +478,7 @@
 *  percentile routine.
             IF( ITYPE .EQ. '_REAL' ) THEN
                CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 0.0D0,
      :                          NUMBIN, .FALSE., RMAXV, RMINV, HIST,
      :                          STATUS )
                DMAXV = DBLE( RMAXV )
@@ -482,6 +486,7 @@
 
             ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 0.0D0,
      :                          NUMBIN, .FALSE., DMAXV, DMINV, HIST,
      :                          STATUS )
             END IF

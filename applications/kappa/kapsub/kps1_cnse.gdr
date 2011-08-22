@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_CNSE<T>( PNMODE, PNCONT, PNSTRT, PNEND, PNSTEP, 
-     :                       PNVAL, PNPER, BAD, EL, ARRAY, MXCONT, 
+      SUBROUTINE KPS1_CNSE<T>( PNMODE, PNCONT, PNSTRT, PNEND, PNSTEP,
+     :                       PNVAL, PNPER, BAD, EL, ARRAY, MXCONT,
      :                       CNTLEV, PERCNT, AREA, NCONT, MODE, STATUS )
 *+
 *  Name:
@@ -48,7 +48,7 @@
 *        i) 'Bounds'      - Draw a single "contour" (a rectangle in pixel
 *                           co-ordinates) marking the bounds of the array.
 *        j) 'Scale'       - The specified number of contours are equally
-*                           spaced between specified pixel values in the 
+*                           spaced between specified pixel values in the
 *                           array.  The minmum number of contours is
 *                           two.
 
@@ -95,6 +95,7 @@
 *     arguments ARRAY and CNTLEV must have the data type specified.
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 1988-1990, 1992 Science & Engineering Research
 *     Council. Copyright (C) 1995, 1997, 2001 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
@@ -119,6 +120,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK).
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -148,6 +150,8 @@
 *        Added 'Scale' method.  Added argument PNEND.
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
+*     2011-08-22 (TIMJ):
+*        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *-
@@ -295,8 +299,8 @@
      :                            MINVAL, MAXPOS, MINPOS, STATUS )
 
 *  Generate an histogram of the required array.
-               CALL KPG1_GHST<T>( BAD, EL, ARRAY, NUMBIN, .FALSE.,
-     :                            MAXVAL, MINVAL, HISTOG, STATUS )
+               CALL KPG1_GHST<T>( BAD, EL, ARRAY, ARRAY, 0.0D0, NUMBIN,
+     :              .FALSE., MAXVAL, MINVAL, HISTOG, STATUS )
 
 *  Find the pixel values corresponding to the areas.
                CALL KPG1_HSTF<T>( NUMBIN, HISTOG, MAXVAL, MINVAL,
@@ -376,8 +380,8 @@
             ELSE
 
 *  Form histogram.
-               CALL KPG1_GHST<T>( BAD, EL, ARRAY, NUMBIN, .FALSE.,
-     :                            MAXVAL, MINVAL, HISTOG, STATUS )
+               CALL KPG1_GHST<T>( BAD, EL, ARRAY, ARRAY, 0.0D0, NUMBIN,
+     :               .FALSE., MAXVAL, MINVAL, HISTOG, STATUS )
 
                IF ( MODE( 1:2 ) .EQ. 'PE' ) THEN
 

@@ -89,6 +89,7 @@
 *     see 'Digital Image Processing' by R.C.Gonzalez and P.Wintz.
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 1983, 1986, 1988-1990 Science & Engineering
 *     Research Council. Copyright (C) 1995 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
@@ -115,6 +116,7 @@
 *     APH: A.P.Horsfield (RGO)
 *     SC: S.Chan (RGO)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -144,6 +146,8 @@
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .TRUE. to KPG1_GHSTx call
 *        and thus eliminate the HIST array argument.
+*     2011-08-22 (TIMJ):
+*        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *-
@@ -234,8 +238,8 @@
       END DO
 
 *  Create the histogram.
-      CALL KPG1_GHST<T>( BAD, EL, ARRAY, NINTS, .TRUE., MAXV, MINV,
-     :                 CUMUL( 0 ), STATUS )
+      CALL KPG1_GHST<T>( BAD, EL, ARRAY, ARRAY, 0.0D0, NINTS, .TRUE.,
+     :      MAXV, MINV, CUMUL( 0 ), STATUS )
 
 *  Set up data for least-squares fit.
       DO  I = 0, NINTS-1, 1

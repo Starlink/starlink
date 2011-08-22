@@ -182,7 +182,7 @@ int *smf_find_median( const float *farray, const double *darray, size_t nel,
          fvalmin = VAL__BADR;
 
 /* Form the histogram. */
-         kpg1Ghstr( 1, nel, farray, numbin, 0, &fvalmax, &fvalmin, result,
+         kpg1Ghstr( 1, nel, farray, NULL, 0.0, numbin, 0, &fvalmax, &fvalmin, result,
                     status );
 
 /* Convert the max and min data value to double precision. */
@@ -198,7 +198,7 @@ int *smf_find_median( const float *farray, const double *darray, size_t nel,
          valmin = VAL__BADD;
 
 /* Form the histogram. */
-         kpg1Ghstd( 1, nel, darray, numbin, 0, &valmax, &valmin, result,
+         kpg1Ghstd( 1, nel, darray, NULL, 0.0, numbin, 0, &valmax, &valmin, result,
                     status );
       }
 

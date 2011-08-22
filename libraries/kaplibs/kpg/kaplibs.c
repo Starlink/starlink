@@ -80,6 +80,8 @@
 *        Add kpg1_pixsc
 *     2010 August 6 (MJC):
 *        Add kpg1_filli.
+*     2011-08-22 (TIMJ):
+*        kpg1GhstX has a new API
 *     {enter_further_changes_here}
 
 *-
@@ -1020,6 +1022,8 @@ void kpg1Datcp( const HDSLoc *loc1, HDSLoc *loc2, const char *name, int *status 
 F77_SUBROUTINE(kpg1_ghstd)( LOGICAL(BAD),
                             INTEGER(DIM),
                             DOUBLE_ARRAY(ARRAY),
+                            DOUBLE_ARRAY(WGTS),
+                            DOUBLE(WEIGHT),
                             INTEGER(NUMBIN),
                             LOGICAL(CUMUL),
                             DOUBLE(VALMAX),
@@ -1027,11 +1031,14 @@ F77_SUBROUTINE(kpg1_ghstd)( LOGICAL(BAD),
                             INTEGER_ARRAY(HIST),
                             INTEGER(STATUS) );
 
-void kpg1Ghstd( int bad, int dim, const double *array, int numbin, int cumul,
+void kpg1Ghstd( int bad, int dim, const double *array, const double *wgts,
+                double weight, int numbin, int cumul,
                 double *valmax, double *valmin, int *hist, int *status ){
    DECLARE_LOGICAL(BAD);
    DECLARE_INTEGER(DIM);
    DECLARE_DOUBLE_ARRAY_DYN(ARRAY);
+   DECLARE_DOUBLE_ARRAY_DYN(WGTS);
+   DECLARE_DOUBLE(WEIGHT);
    DECLARE_INTEGER(NUMBIN);
    DECLARE_LOGICAL(CUMUL);
    DECLARE_DOUBLE(VALMAX);
@@ -1043,6 +1050,9 @@ void kpg1Ghstd( int bad, int dim, const double *array, int numbin, int cumul,
    F77_EXPORT_INTEGER( dim, DIM );
    F77_CREATE_DOUBLE_ARRAY( ARRAY, dim );
    F77_EXPORT_DOUBLE_ARRAY( array, ARRAY, dim );
+   F77_CREATE_DOUBLE_ARRAY( WGTS, dim );
+   F77_EXPORT_DOUBLE_ARRAY( wgts, WGTS, dim );
+   F77_EXPORT_DOUBLE( weight, WEIGHT );
    F77_EXPORT_INTEGER( numbin, NUMBIN );
    F77_EXPORT_LOGICAL( cumul, CUMUL );
    F77_EXPORT_DOUBLE( *valmax, VALMAX );
@@ -1054,6 +1064,8 @@ void kpg1Ghstd( int bad, int dim, const double *array, int numbin, int cumul,
    F77_LOCK( F77_CALL(kpg1_ghstd)( LOGICAL_ARG(&BAD),
                          INTEGER_ARG(&DIM),
                          DOUBLE_ARRAY_ARG(ARRAY),
+                         DOUBLE_ARRAY_ARG(WGTS),
+                         DOUBLE_ARG(&WEIGHT),
                          INTEGER_ARG(&NUMBIN),
                          LOGICAL_ARG(&CUMUL),
                          DOUBLE_ARG(&VALMAX),
@@ -1074,6 +1086,8 @@ void kpg1Ghstd( int bad, int dim, const double *array, int numbin, int cumul,
 F77_SUBROUTINE(kpg1_ghstr)( LOGICAL(BAD),
                             INTEGER(DIM),
                             REAL_ARRAY(ARRAY),
+                            DOUBLE_ARRAY(WGTS),
+                            DOUBLE(WEIGHT),
                             INTEGER(NUMBIN),
                             LOGICAL(CUMUL),
                             REAL(VALMAX),
@@ -1081,11 +1095,14 @@ F77_SUBROUTINE(kpg1_ghstr)( LOGICAL(BAD),
                             INTEGER_ARRAY(HIST),
                             INTEGER(STATUS) );
 
-void kpg1Ghstr( int bad, int dim, const float *array, int numbin, int cumul,
+void kpg1Ghstr( int bad, int dim, const float *array,  const double *wgts,
+                double weight, int numbin, int cumul,
                 float *valmax, float *valmin, int *hist, int *status ){
    DECLARE_LOGICAL(BAD);
    DECLARE_INTEGER(DIM);
    DECLARE_REAL_ARRAY_DYN(ARRAY);
+   DECLARE_DOUBLE_ARRAY_DYN(WGTS);
+   DECLARE_DOUBLE(WEIGHT);
    DECLARE_INTEGER(NUMBIN);
    DECLARE_LOGICAL(CUMUL);
    DECLARE_REAL(VALMAX);
@@ -1097,6 +1114,9 @@ void kpg1Ghstr( int bad, int dim, const float *array, int numbin, int cumul,
    F77_EXPORT_INTEGER( dim, DIM );
    F77_CREATE_REAL_ARRAY( ARRAY, dim );
    F77_EXPORT_REAL_ARRAY( array, ARRAY, dim );
+   F77_CREATE_DOUBLE_ARRAY( WGTS, dim );
+   F77_EXPORT_DOUBLE_ARRAY( wgts, WGTS, dim );
+   F77_EXPORT_DOUBLE( weight, WEIGHT );
    F77_EXPORT_INTEGER( numbin, NUMBIN );
    F77_EXPORT_LOGICAL( cumul, CUMUL );
    F77_EXPORT_REAL( *valmax, VALMAX );
@@ -1108,6 +1128,8 @@ void kpg1Ghstr( int bad, int dim, const float *array, int numbin, int cumul,
    F77_LOCK( F77_CALL(kpg1_ghstr)( LOGICAL_ARG(&BAD),
                          INTEGER_ARG(&DIM),
                          REAL_ARRAY_ARG(ARRAY),
+                         DOUBLE_ARRAY_ARG(WGTS),
+                         DOUBLE_ARG(&WEIGHT),
                          INTEGER_ARG(&NUMBIN),
                          LOGICAL_ARG(&CUMUL),
                          REAL_ARG(&VALMAX),

@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_HSMO<T>( BAD, EL, ARRAY, PARAM, METHOD, DMAX, 
-     :                         DMIN, NGOOD, NUMPER, PERCNT, PERVAL, 
+      SUBROUTINE KPS1_HSMO<T>( BAD, EL, ARRAY, PARAM, METHOD, DMAX,
+     :                         DMIN, NGOOD, NUMPER, PERCNT, PERVAL,
      :                         MODE, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_HSMOx( BAD, EL, ARRAY, PARAM, METHOD, DMAX, DMIN, 
+*     CALL KPS1_HSMOx( BAD, EL, ARRAY, PARAM, METHOD, DMAX, DMIN,
 *                      NGOOD, NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
 *  Description:
@@ -22,7 +22,7 @@
 
 *     It derives the optimal bin width from the Freedman and Diaconis
 *     formula, and from that it find the number of bins within
-*     constraints.   A parameter allows the user to override the 
+*     constraints.   A parameter allows the user to override the
 *     optimal bin size, supplied as the suggested default.
 
 *  Arguments:
@@ -39,15 +39,15 @@
 *        The method used to evaluate the mode.  The choices are as
 *        follows.
 *
-*        - "HISTOGRAM" -- This finds the peak of an optimally binned 
+*        - "HISTOGRAM" -- This finds the peak of an optimally binned
 *        histogram.  The number of bins may be altered given by
 *        through parameter NUMBIN, however it is recommended to use
 *        the optimal binsize derived from the prescription of Freedman
-*        & Diatonis. 
+*        & Diatonis.
 *
-*        - "MOMENTS" -- As "HISTOGRAM" but the mode is the weighted 
-*        centroid from the moments of the peak bin and its neighbours.  
-*        The neighbours are those bins either side of the peak in a 
+*        - "MOMENTS" -- As "HISTOGRAM" but the mode is the weighted
+*        centroid from the moments of the peak bin and its neighbours.
+*        The neighbours are those bins either side of the peak in a
 *        continuous sequence whose membership exceeds the peak value
 *        less three times the Poisson error of the peak bin.  Thus it
 *        gives interpolated mode and does reduce the effect of noise.
@@ -62,13 +62,13 @@
 *     NUMPER = INTEGER (Given)
 *        The number of percentiles.
 *     PERCNT( NUMPER ) = REAL (Given & Returned)
-*        The sorted percentiles in increasing order that must include 
-*        values of 25 and 75.  They may just comprise these two 
-*        for the inter-quartile range, but there could be user-selected 
-*        values too. 
+*        The sorted percentiles in increasing order that must include
+*        values of 25 and 75.  They may just comprise these two
+*        for the inter-quartile range, but there could be user-selected
+*        values too.
 *
 *        On exit the first value is set to bad if there are no user
-*        percentiles so that these percentiles are not reported or 
+*        percentiles so that these percentiles are not reported or
 *        logged.
 *     PERVAL( NUMPER ) = DOUBLE PRECISION (Given & Returned)
 *        The values corresponding the percentiles given in PERCNT.
@@ -82,16 +82,16 @@
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     array ARRAY supplied to the routine must have the data type 
+*     array ARRAY supplied to the routine must have the data type
 *     specified.
 
 *  References:
 *     Freedman, D. & Diaconis, P. 1981, "On the histogram as a density
-*        estimator: L2 theory", Zeitschrift f\"ur 
+*        estimator: L2 theory", Zeitschrift f\"ur
 *        Wahrscheinlichkeitstheorie und verwandte Gebiete 57, 453.
 
 *  Copyright:
-*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010, 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -112,6 +112,8 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -123,6 +125,8 @@
 *     2010 April 20 (MJC):
 *       The previous fix only needed to set the percentile values to bad
 *       for NUMPER equal to 2.
+*     2011-08-22 (TIMJ):
+*        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *-
@@ -137,7 +141,7 @@
 
 *  Arguments Given:
       LOGICAL BAD
-      INTEGER EL 
+      INTEGER EL
       <TYPE> ARRAY( EL )
       CHARACTER*( * ) PARAM
       CHARACTER*( * ) METHOD
@@ -158,10 +162,10 @@
 
 *  Local Constants:
       INTEGER MAXBIN             ! Maximum number of histogram bins
-      PARAMETER( MAXBIN = 10000 ) 
+      PARAMETER( MAXBIN = 10000 )
 
       INTEGER MINBIN             ! Minimum number of histogram bins
-      PARAMETER( MINBIN = 10 ) 
+      PARAMETER( MINBIN = 10 )
 
 *  Local Variables:
       REAL FRAC                  ! Neighbourhood threshold factor
@@ -207,12 +211,12 @@
          PERVAL( 2 ) = VAL__BADD
       ELSE
 
-*  Hunt for the 25 and 75 percentiles.  Set the percentile values bad 
+*  Hunt for the 25 and 75 percentiles.  Set the percentile values bad
 *  when we are done with them to prevent them being reported.  We could
 *  probably test for equality as we know the exact values we supplied
 *  for the extra PERCNT.
          I = 1
-         DO WHILE ( I .LE. NUMPER .AND. 
+         DO WHILE ( I .LE. NUMPER .AND.
      :              ( 25.0 - PERCNT( I ) ) .GT. 0.001 )
             I = I + 1
          END DO
@@ -220,7 +224,7 @@
          PERVAL( I ) = VAL__BADD
          I = I + 1
 
-         DO WHILE ( I .LE. NUMPER .AND. 
+         DO WHILE ( I .LE. NUMPER .AND.
      :             ( 75.0 - PERCNT( I ) ) .GT. 0.001 )
             I = I + 1
          END DO
@@ -229,21 +233,21 @@
       END IF
 
 *  This is the optimum bin width.
-      OPTWID = 2.0D0 * 
+      OPTWID = 2.0D0 *
      :         ( P75 - P25 ) / DBLE( NGOOD ) ** ( 1.0D0 / 3.0D0 )
 
 *  Need to take care with integer data such that the bin size must be
 *  an integer too, otherwise a sawtooth histogram could result.
-      INTTYP = '<T>' .EQ. 'B' .OR. '<T>' .EQ. 'I' .OR. 
+      INTTYP = '<T>' .EQ. 'B' .OR. '<T>' .EQ. 'I' .OR.
      :         '<T>' .EQ. 'W' .OR. '<T>' .EQ. 'UB' .OR. '<T>' .EQ. 'UW'
-     
+
       IF ( INTTYP ) OPTWID = DBLE( NINT( OPTWID ) )
 
 *  Form the histogram.
 *  ===================
 
 *  Determine the optimum the number of bins...
-      OPTBIN = MIN( MAXBIN, MAX( MINBIN, 
+      OPTBIN = MIN( MAXBIN, MAX( MINBIN,
      :                           NINT( ( DMAX - DMIN ) / OPTWID ) ) )
 
 *  making it the dynamic default when asking the user.
@@ -255,16 +259,16 @@
 
 *  Form the histogram over the data range optimally sampling the
 *  the probability density function.
-      CALL KPG1_GHST<T>( BAD, EL, ARRAY, NUMBIN, .FALSE., 
-     :                   NUM_DTO<T>( DMAX ), NUM_DTO<T>( DMIN ), 
+      CALL KPG1_GHST<T>( BAD, EL, ARRAY, ARRAY, 0.0D0, NUMBIN, .FALSE.,
+     :                   NUM_DTO<T>( DMAX ), NUM_DTO<T>( DMIN ),
      :                   %VAL( CNF_PVAL( HPNTR ) ), STATUS )
 
 *  Compute the mode.
 *  =================
 
 *  Find the index of the peak bin.
-      CALL KPG1_MXMNI( .FALSE., NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
-     :                 NBAD, MAXV, MINV, MAXPOS, MINPOS, STATUS ) 
+      CALL KPG1_MXMNI( .FALSE., NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
+     :                 NBAD, MAXV, MINV, MAXPOS, MINPOS, STATUS )
 
 *  Just check that we have a valid histogram.
       IF ( MAXV .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
@@ -273,7 +277,7 @@
 *  Poisson error of the peak bin.
          IF ( METHOD .EQ. 'MOMENTS' ) THEN
             FRAC = -3.0
-            CALL KPS1_HSCEM( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), MAXPOS, 
+            CALL KPS1_HSCEM( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), MAXPOS,
      :                       FRAC, MODEI, STATUS )
          ELSE
             MODEI = MAXPOS

@@ -165,7 +165,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
   range = max - min;
 
   /* Calculate the histogram */
-  kpg1Ghstd( 1, ntslice, theta, THETABINS_MAXBINS, 0, &max, &min, hist,
+  kpg1Ghstd( 1, ntslice, theta, NULL, 0.0, THETABINS_MAXBINS, 0, &max, &min, hist,
              status );
 
   step = (max-min)/THETABINS_MAXBINS;

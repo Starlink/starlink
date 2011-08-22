@@ -283,7 +283,7 @@
 *     Copyright (C) 1995, 1998-1999, 2001, 2004 Central Laboratory of
 *     the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010. 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -344,6 +344,8 @@
 *        Remove unused variable and wrapped long lines.
 *     2010 October 14 (MJC):
 *        Document temporary style attributes.
+*     2011-08-22 (TIMJ):
+*        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *-
@@ -508,6 +510,7 @@
 
 *  Generate the histogram of the section of IN2.
       CALL KPG1_GHSTR( BAD, NELS, %VAL( CNF_PVAL( PNT2S( 1 ) ) ),
+     :                 %VAL( CNF_PVAL( PNT2S( 1 ) ) ), 0.0D0,
      :                 HISIZE, .FALSE.,
      :                 MAX2, MIN2, %VAL( CNF_PVAL( PNTW0 ) ), STATUS )
 

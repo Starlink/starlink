@@ -222,6 +222,7 @@
 *     other types will be converted to _REAL before being processed.
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 1999, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
 *     Research Council. All Rights Reserved.
@@ -257,6 +258,8 @@
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
+*     2011-08-22 (TIMJ):
+*        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *-
@@ -544,6 +547,7 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( IPIN( I ) ) ),
+     :                          %VAL( CNF_PVAL( IPIN( I ) ) ), 0.0D0,
      :                          NUMBIN, .FALSE., RMAXV, RMINV, HIST,
      :                          STATUS )
 
