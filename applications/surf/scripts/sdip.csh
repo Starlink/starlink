@@ -14,8 +14,8 @@ if !($?STAR_LOGIN) then
 # note that should probably put in something that gets
 # updated during INSTALLation.
 
-  if (-e STAR_ETC/login) then
-    source STAR_ETC/login
+  if (-e ${STARLINK_DIR}/etc/login) then
+    source ${STARLINK_DIR}/etc/login
   else
     echo 'Error: Starlink system not initialised'
     exit 1
@@ -27,8 +27,8 @@ endif
 # This is the location of the psmerge command on the starlink system
 # Need to make sure we do not use the non-starlink version
 # Allow us to fallback to /star
-if ( -d STAR_BIN ) then
-    set starbin = STAR_BIN
+if ( -d ${STARLINK_DIR}/bin ) then
+    set starbin = ${STARLINK_DIR}/bin
 else
     set starbin = /star/bin
 endif

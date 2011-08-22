@@ -12,8 +12,8 @@ if !($?STAR_LOGIN) then
 
 # Start up Starlink (if possible)
 
-  if (-e STAR_ETC/login) then
-    source STAR_ETC/login
+  if (-e ${STARLINK_DIR}/etc/login) then
+    source ${STARLINK_DIR}/login
   else
     echo 'Error: Starlink system not initialised'
     exit 1
