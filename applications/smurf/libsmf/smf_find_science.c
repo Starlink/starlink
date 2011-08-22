@@ -951,6 +951,7 @@ static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
                                   int *status ) {
 
   int curheat = 0;
+  int detbias = 0;
   char subarray[10];
   double shutter = 0.0;
   size_t nwrite = 0;
@@ -958,15 +959,22 @@ static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
   if (*status != SAI__OK) return;
   if (!hdr) return;
 
-  /* get reference heater value and subarray string */
+  /* get reference heater value, bias, shutter and subarray string */
+  /* PIXHEAT and DETBIAS are not written by the simulator so we default
+     those to 0 */
   smf_getfitsi( hdr, "PIXHEAT", &curheat, status );
+  if (*status == SMF__NOKWRD) errAnnul(status);
+
+  smf_getfitsi( hdr, "DETBIAS", &curheat, status );
+  if (*status == SMF__NOKWRD) errAnnul(status);
+
   smf_getfitsd( hdr, "SHUTTER", &shutter, status );
   smf_find_subarray( hdr, subarray, sizeof(subarray), NULL,
                      status );
   if (*status != SAI__OK) return;
 
-  nwrite = snprintf(keystr, keylen, "%s_%s_%.1f_%d",
-                    hdr->obsidss, subarray, shutter, curheat );
+  nwrite = snprintf(keystr, keylen, "%s_%s_%.1f_%d_%d",
+                    hdr->obsidss, subarray, shutter, detbias, curheat );
 
   if (nwrite >= keylen) {
     /* The string was truncated */
