@@ -57,6 +57,8 @@
 *  History:
 *     2011-06-23 (EC):
 *        Initial version moved private routine out of smurf_calcnoise
+*     2011-08-23 (TIMJ):
+*        Disable clipping if we have too few bolometers.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -85,6 +87,7 @@
 */
 
 #include "smf.h"
+#include "smf_err.h"
 
 #include "sae_par.h"
 #include "mers.h"
@@ -133,6 +136,16 @@ void smf_clipnoise( double *clipdata, size_t ndata, int cliplog,
 
     smf_clipped_stats1D( work, nclips, clips, 1, ndata, NULL, 0, 0,
                          &mean, &sigma, &median, 1, NULL, status );
+
+    /* Assume that we do not need to clip if we can not get good
+       statistics */
+    if (*status == SMF__INSMP) {
+      errAnnul( status );
+      msgOutif(MSG__NORM, "",
+               "Noise clipping disabled as there are too few bolometers",
+               status );
+      return;
+    }
 
     sigma *= 1.85;
 
