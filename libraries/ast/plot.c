@@ -671,6 +671,13 @@ f     - Title: The Plot title drawn using AST_GRID
 *     4-MAR-2011 (DSB):
 *        - Added grf functions BBuf and EBuf.
 *        - Added public method astBBuf and astEBuf.
+*     23-AUG-2011 (DSB):
+*        - If exterior labelling was requested but would produced too
+*        few labels, only swap to interior labelling if doing so would
+*        allow more labels to be drawn (i.e. do not swap to interior if
+*        it does not gain us anything).
+*        - Slightly decrease the dynamic range of an axis needed to produce
+*        logarithmic ticks (this is to avoid problems with round errors).
 *class--
 */
 
@@ -2168,6 +2175,7 @@ static int IdFind( int, int, int *, int *, int *, int * );
 static int Inside( int, float *, float *, float, float, int * );
 static int IsASkyAxis( AstFrame *, int, int * );
 static int IsASkyFrame( AstObject *, int * );
+static int Labelat( AstPlot *, TickInfo **, AstPlotCurveData **, double *, const char *, const char *, int * );
 static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *, int * );
 static int PopGat( AstPlot *, float *, const char *, const char *, int * );
 static int RegionOutline( AstPlot *, AstFrame *, const char *, const char *, int * );
@@ -2218,7 +2226,6 @@ static void GrfWrapper( AstPlot *, const char *,  AstGrfWrap, int * );
 static void Grid( AstPlot *, int * );
 static void GridLine( AstPlot *, int, const double [], double, int * );
 static void InterpEscape( AstPlot *, int, double, float *, float *, float, float, float, float, const char *, float *, double, double, double, double, double, const char *, const char *, int * );
-static void Labelat( AstPlot *, TickInfo **, AstPlotCurveData **, double *, const char *, const char *, int * );
 static void Labels( AstPlot *, TickInfo **, AstPlotCurveData **, double *, double *, const char *, const char *, int * );
 static void LinePlot( AstPlot *, double, double, double, double, int, AstPlotCurveData *, const char *, const char *, int * );
 static void Map1( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
@@ -8977,7 +8984,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
 /* See if ticks on this axis are spaced linearly or logarithmically. If a
    value has been set for LogTicks used it, otherwise find a default value.
    The default is 0 unless LogPlot is non-zero, the axis range does not
-   encompass zero and and the dynamic range is 100 or more. Set this
+   encompass zero and and the dynamic range is 90 or more. Set this
    default value explicitly so that later functions will pick it up (it will
    be cleared at the end of the astGrid function). */
       if( astTestLogTicks( this, j ) ) {
@@ -8986,7 +8993,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
          logticks = 0;
          if( astGetLogPlot( this, j ) && minv*maxv > 0.0 ) {
             dran = maxv/minv;
-            if( dran >= 100.0 || dran <= 0.01 ) logticks = 1;
+            if( dran >= 90.0 || dran <= 1.0/90.0 ) logticks = 1;
          }
          astSetLogTicks( this, j, logticks );
       }
@@ -17441,11 +17448,13 @@ f        The global status.
    int escs;               /* Original astEscapes value */
    int ink;                /* Draw the grid with visible ink? */
    int inval;              /* Were areas of invalid coordinates found? */
+   int labelling;          /* Value of Labelling attribute */
    int loglabelset[2];     /* Were the LogLabel attributes set initially? */
    int logticksset[2];     /* Were the LogTicks attributes set initially? */
    int naxes;              /* No. of axes in the base or current Frame */
    int oldedge0;           /* Default value for Edge(1) */
    int oldedge1;           /* Default value for Edge(2) */
+   int useint;             /* Do interior labels give us an advantage? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -17540,7 +17549,8 @@ f        The global status.
    Exterior labelling may or may not be possible. If it is requested,
    check to see if it is possible. */
    clredge = 0;
-   if( astGetLabelling( this ) ){
+   labelling = astGetLabelling( this );
+   if( labelling ){
       edgeticks = 0;
    } else {
       edgeticks = EdgeLabels( this, 0, grid, cdata, 0, method, class, status );
@@ -17605,7 +17615,15 @@ f        The global status.
 /* Otherwise, see where interior labels and tick marks should go (the axis
    values are put in "labelat"). */
    } else {
-      Labelat( this, grid, cdata, labelat, method, class, status );
+      useint = Labelat( this, grid, cdata, labelat, method, class, status );
+
+/* If interior labelling does not allow us to draw any more ticks, revert
+   to edge labelling if that is what the user requested. */
+      if( !useint && !labelling ) {
+         labelat[ 0 ] = AST__BAD;
+         labelat[ 1 ] = AST__BAD;
+         edgeticks = EdgeLabels( this, 0, grid, cdata, 1, method, class, status );
+      }
    }
 
 /* See if a border is required. By default, a border is drawn only when
@@ -18850,7 +18868,6 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name, int *status ) {
    vtab->GetForceExterior = GetForceExterior;
    vtab->TestForceExterior = TestForceExterior;
 
-
    vtab->ClearInvisible = ClearInvisible;
    vtab->SetInvisible = SetInvisible;
    vtab->GetInvisible = GetInvisible;
@@ -19693,8 +19710,9 @@ static const char *JustMB( AstPlot *this, int esc, const char *text, float *x,
    return result;
 }
 
-static void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
-                     double *labelat, const char *method, const char *class, int *status ){
+static int Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
+                    double *labelat, const char *method, const char *class,
+                    int *status ){
 /*
 *
 *  Name:
@@ -19709,8 +19727,8 @@ static void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
-*                   double *labelat, const char *method, const char *class )
+*     int Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
+*                  double *labelat, const char *method, const char *class )
 
 *  Class Membership:
 *     Plot member function.
@@ -19726,6 +19744,10 @@ static void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
 *     short). The effective length assigned to each curve is reduced in
 *     proportion to the number of tick marks which are close to the edge
 *     of the plotting area.
+*
+*     A flag is returned indicating if the two axes appear to be
+*     independent, in which case there is nothing to be gained by using
+*     interior labelling.
 
 *  Parameters:
 *     this
@@ -19746,12 +19768,22 @@ static void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
 *        the axis 1 value at which tick marks for axis 0 are placed. Element
 *        1 is returned holding the axis 0 value at which tick marks for axis
 *        1 are placed.
+*     flags
+*        A pointer to a 2 element array. Each element is a flag which is
+*        returned non-zero if the corresponding axis
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
 *     class
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+
+*  Returned Value:
+*     Zero if and only if the lines of constant axis value are all the
+*     same length for all tick marks on either axis. If this is so, using
+*     interior labelling will not enable any more major ticks to be
+*     drawn, and so there is no reason to switch to interior labelling (unless
+*     the user has specifically requested interior labelling).
 
 *  Notes:
 *     -  This function assumes the current Frame of the Plot is 2
@@ -19772,6 +19804,7 @@ static void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
    double lim;            /* Largest insignificant axis value */
    double margin;         /* Width of margin around plotting area */
    double maxlen;         /* Effective length of longest curve */
+   double minlen;         /* Effective length of shortest (non-zero) curve */
    double x;              /* Tick X value */
    double xhi;            /* Upper limit on acceptable X range */
    double xlo;            /* Lower limit on acceptable X range */
@@ -19782,10 +19815,14 @@ static void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
    int axis;              /* Current axis index */
    int i;                 /* Tick index for this axis */
    int nin;               /* No. of counted ticks */
+   int result;            /* Does interior labelling allow more ticks to be drawn? */
    int tick;              /* Tick index */
 
 /* Check the global status. */
-   if( !astOK ) return;
+   if( !astOK ) return 0;
+
+/* Initialise */
+   result = 1;
 
 /* Create two PointSets to hold a set of tick mark positions along each
    axis. The values on "axis" will be taken from the info structure. For
@@ -19813,106 +19850,110 @@ static void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
 /* Do each axis. */
    for( axis = 0; axis < 2 && astOK; axis++ ){
 
-/* We need to decide where to put the labels. The major tick values give
-   their location on one axis. The position on the other axis may be
-   specified by the caller using the "LabelAt" attribute, or a default value
-   can be found if no values have been supplied for this attributes. If the
-   attribute for this axis has been set, use its value. */
-      if( astTestLabelAt( this, axis ) ){
-         labelat[ axis ] = astGetLabelAt( this, axis );
-
-/* Otherwise, find the longest curve parallel to the axis being labelled.
+/* Find the longest and shortest curves parallel to the axis being labelled.
    Also find the length of the curve which passes through the origin of the
-   other axis which is within the plotting area... */
-      } else {
+   other axis which is within the plotting area. We need to do this even
+   if LabelAt has been set since we need to calculate the returned flag. */
 
 /* Store pointers to the arrays holding tick mark physical coordinates,
    and set these in the PointSet. */
-         ptr1[ axis ] = grid[ axis ]->ticks;
-         ptr1[ 1 - axis ] = tvals[ axis ];
-         astSetPoints( pset[ axis ], ptr1 );
+      ptr1[ axis ] = grid[ axis ]->ticks;
+      ptr1[ 1 - axis ] = tvals[ axis ];
+      astSetPoints( pset[ axis ], ptr1 );
 
 /* Get a pointer to the structure containing information describing the
    positions of the major tick marks along the other axis. */
-         info = grid[ 1 - axis ];
+      info = grid[ 1 - axis ];
 
 /* Get a pointer to the other axis value at the first other axis major tick
    mark. */
-         value = info->ticks;
+      value = info->ticks;
 
 /* Get a limit on absolute magnitude for an axis value to be consider
    equal to zero. */
-         lim = 1.0E-6*fabs( value[ 1 ] - value [ 0 ] );
+      lim = 1.0E-6*fabs( value[ 1 ] - value [ 0 ] );
 
 /* Get a pointer to the structure containing information describing the
    breaks in the curve which passes through the first major tick mark. */
-         cdt = cdata[ 1 - axis ];
+      cdt = cdata[ 1 - axis ];
 
-/* Initialise the effective length of the longest curve, and the curve passing
-   through the origin. */
-         maxlen = -1.0;
-         zerolen = 0.0;
-         labelat[ axis ] = AST__BAD;
+/* Initialise the effective length of the longest and shortest curves, and
+   the curve passing through the origin. */
+      maxlen = -1.0;
+      minlen = DBL_MAX;
+      zerolen = 0.0;
+      labelat[ axis ] = AST__BAD;
 
 /* Loop round each of the major tick marks on the other axis. */
-         for( tick = 0; tick < info->nmajor && astOK; tick++ ){
+      for( tick = 0; tick < info->nmajor && astOK; tick++ ){
 
 /* Fill the array of other axis values with the current other axis value. */
-            for( i = 0; i < grid[ axis ]->nmajor; i++ ){
-               tvals[ axis ][ i ] = *value;
-            }
+         for( i = 0; i < grid[ axis ]->nmajor; i++ ){
+            tvals[ axis ][ i ] = *value;
+         }
 
 /* Transform the tick positions from the current frame (i.e. physical
    coordinates) to the base frame (i.e. graphics coordinates) using
    the inverse Mapping. */
-            pset2 = Trans( this, NULL, mapping, pset[ axis ], 0, NULL, 0,
-                           method, class, status );
+         pset2 = Trans( this, NULL, mapping, pset[ axis ], 0, NULL, 0,
+                        method, class, status );
 
 /* Get pointers to the graphics coordinates. */
-            ptr2 = astGetPoints( pset2 );
-            if( astOK ) {
+         ptr2 = astGetPoints( pset2 );
+         if( astOK ) {
 
 /* Count the number of graphics positions which are well within the plotting
    area. */
-               nin = 0;
-               for( i = 0; i < grid[ axis ]->nmajor; i++ ){
-                  x = ptr2[ 0 ][ i ];
-                  y = ptr2[ 1 ][ i ];
-                  if( x != AST__BAD && x > xlo && x < xhi &&
-                      y != AST__BAD && y > ylo && y < yhi ) nin++;
-               }
-
-/*  Find the effective length of this curve.*/
-               efflen = sqrt( (float) nin )*cdt->length;
-
-/* If the curve through this tick mark has a freater effective length than any
-   other found so far, record it. */
-               if( efflen > maxlen ){
-                  maxlen = efflen;
-                  labelat[ axis ] = *value;
-               }
-
-/* If this tick mark is at the origin, note the effective length. */
-               if( fabs( *value ) <= lim ) zerolen = efflen;
-
-/* Get a pointer to the curve through the next major tick mark. */
-               cdt++;
-
-/* Get a pointer to the axis value at the next major tick mark. */
-               value++;
-
+            nin = 0;
+            for( i = 0; i < grid[ axis ]->nmajor; i++ ){
+               x = ptr2[ 0 ][ i ];
+               y = ptr2[ 1 ][ i ];
+               if( x != AST__BAD && x > xlo && x < xhi &&
+                   y != AST__BAD && y > ylo && y < yhi ) nin++;
             }
 
-/* Free resources. */
-            pset2 = astAnnul( pset2 );
+/*  Find the effective length of this curve.*/
+            efflen = sqrt( (float) nin )*cdt->length;
+
+/* If the curve through this tick mark has a greater effective length than any
+   other found so far, record it. */
+            if( efflen > maxlen ){
+               maxlen = efflen;
+               labelat[ axis ] = *value;
+            }
+
+/* If the curve through this tick mark has a smaller non-zero effective length
+   than any other found so far, record it. */
+            if( efflen < minlen && efflen > 0.0 ) minlen = efflen;
+
+/* If this tick mark is at the origin, note the effective length. */
+            if( fabs( *value ) <= lim ) zerolen = efflen;
+
+/* Get a pointer to the curve through the next major tick mark. */
+            cdt++;
+
+/* Get a pointer to the axis value at the next major tick mark. */
+            value++;
+
          }
+
+/* Free resources. */
+         pset2 = astAnnul( pset2 );
+      }
 
 /* Use the curve through the origin unless it is significantly shorter
    than the longest curve. */
-         if( zerolen > 0.4*maxlen ) labelat[ axis ] = 0.0;
+      if( zerolen > 0.4*maxlen ) labelat[ axis ] = 0.0;
 
+/* Return a flag if the lengths of the shortest and longest curves are nearly
+   equal. */
+      if( ( maxlen - minlen )/( maxlen + minlen ) < 1.0E-5 ) result = 0;
+
+/* If the LabelAt attribute has been set, use it in preference to the
+   value found above. */
+      if( astTestLabelAt( this, axis ) ){
+         labelat[ axis ] = astGetLabelAt( this, axis );
       }
-
    }
 
 /* Release resources. */
@@ -19923,7 +19964,7 @@ static void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
    mapping = astAnnul( mapping );
 
 /* Return. */
-   return;
+   return result;
 
 }
 
@@ -20056,8 +20097,7 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
 
 /* If required, draw the labels around the edges of the plotting area. */
    if( labelat[ 0 ] == AST__BAD || labelat[ 1 ] == AST__BAD ){
-      (void) EdgeLabels( this, 1, grid, cdata, astGetForceExterior( this ),
-                         method, class, status );
+      (void) EdgeLabels( this, 1, grid, cdata, 1, method, class, status );
 
 /* Otherwise, draw labels within the interior of the plotting area. */
    } else {
