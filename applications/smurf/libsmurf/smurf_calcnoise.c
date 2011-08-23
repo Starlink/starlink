@@ -225,6 +225,10 @@
 *        Add ability to asymmetrically clip outlier NEP/NOISE values.
 *     2011-06-23 (EC):
 *        Moved private function smf__clipnoise to public smf_clipnoise
+*     2011-08-23 (TIMJ):
+*        Write effective noise to output image. This allows the pipeline
+*        to easily look at the results when multiple files have been
+*        created.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -262,6 +266,8 @@
 
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/atl.h"
+#include "star/kaplibs.h"
 #include "ndf.h"
 #include "mers.h"
 #include "par.h"
@@ -286,6 +292,11 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
                                const smfData *refdata, const char hdspath[],
                                const char datalabel[], const char units[],
                                int * status );
+
+static void
+smf__write_effnoise( const smfData * data, const char * noisekey,
+                     const char * units, size_t ngood, double noisesum,
+                     int *status );
 
 void smurf_calcnoise( int *status ) {
 
@@ -576,6 +587,8 @@ void smurf_calcnoise( int *status ) {
         smfData *outdata = NULL;
         smfData *ratdata = NULL;
         smfData *powdata = NULL;
+        size_t thisnoisegoodbol = 0;
+        double thisnoisesum = 0.0;
         int do_nep = 1;
         char noiseunits[SMF__CHARLABEL];
 
@@ -734,6 +747,8 @@ void smurf_calcnoise( int *status ) {
               double * noise = (outdata->pntr)[0];
               double * resp = (respmap->pntr)[0];
               double * nep  = (nepdata->pntr)[0];
+              size_t thisnepgoodbol = 0;
+              double thisnepsum = 0.0;
 
               nepbolo = (nepdata->dims)[0]*(nepdata->dims)[1];
 
@@ -760,10 +775,13 @@ void smurf_calcnoise( int *status ) {
               /* Finally, count good NEP values and calculate nepsum */
               for( i=0; i<nepbolo; i++ ) {
                 if( nep[i] != VAL__BADD ) {
-                  nepsum += ( 1.0 / (nep[i] * nep[i]) );
-                  nepgoodbol++;
+                  thisnepsum += ( 1.0 / (nep[i] * nep[i]) );
+                  thisnepgoodbol++;
                 }
               }
+              nepsum += thisnepsum;
+              nepgoodbol += thisnepgoodbol;
+              smf__write_effnoise( nepdata, "EFFNEP", refnepunits, thisnepgoodbol, thisnepsum, status );
 
             }
             if (*status == SAI__OK && nepdata->file) {
@@ -784,10 +802,13 @@ void smurf_calcnoise( int *status ) {
           for (i = 0; i < noisebolo; i++) {
             double *od = (outdata->pntr)[0];
             if ( od[i] != VAL__BADD ) {
-              noisegoodbol++;
-              noisesum += 1.0 / od[i];
+              thisnoisegoodbol++;
+              thisnoisesum += 1.0 / od[i];
             }
           }
+          noisegoodbol += thisnoisegoodbol;
+          noisesum += thisnoisesum;
+          smf__write_effnoise( outdata, "EFFNOISE", refunits, thisnoisegoodbol, thisnoisesum, status );
 
           /* now mask the noise and ratio data using responsivity*/
           if (respmap) {
@@ -920,3 +941,34 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
 }
 
 
+static void
+smf__write_effnoise( const smfData * data, const char * noisekey,
+                     const char * units, size_t ngood, double noisesum,
+                     int *status ) {
+
+  double noiseeff = 0.0;
+  AstFitsChan * fchan = NULL;
+  char noisecom[80];
+
+  if (*status != SAI__OK) return;
+  if (!smf_validate_smfData( data, 1, 1, status )) return;
+
+  if (!smf_validate_smfHead( data->hdr, 1, 0, status )) return;
+
+  noiseeff = sqrt( 1.0 / noisesum );
+
+  /* Get the FitsChan */
+  fchan = data->hdr->fitshdr;
+
+  /* Add the relevant headers */
+  atlPtfti( fchan, "NBOLO", ngood, "Number of bolometers used in eff noise stats",
+            status );
+
+  sprintf( noisecom, "[%s] Effective noise in image", units );
+  atlPtftd( fchan, noisekey, noiseeff, noisecom, status );
+
+  /* Update the file */
+  kpgPtfts( data->file->ndfid, fchan, status );
+
+  return;
+}
