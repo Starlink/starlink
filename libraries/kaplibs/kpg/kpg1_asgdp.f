@@ -16,11 +16,12 @@
 
 *  Description:
 *     This routine finds a position which has good co-ordinates in the
-*     output Frame of the given Mapping, and returns both the input and
-*     output co-ordinates at this position. The position is constrained
-*     to lie within a specified box within the input Frame. The first
-*     point to be tested is the centre of the box. If this does not give
-*     valid output co-ordinates then a set of 10000 points randomly
+*     output Frame of the given Mapping, and is a significant distance
+*     from the origin of both input and output Frame. It returns both the
+*     input and output co-ordinates at this position. The position is
+*     constrained to lie within a specified box within the input Frame.
+*     The first point to be tested is the centre of the box. If this does
+*     not pass the tests described above, a set of 10000 points randomly
 *     distributed within the box is tested. An error is reported if no
 *     good position can be found.
 
@@ -73,6 +74,12 @@
 *  History:
 *     31-AUG-2000 (DSB):
 *        Original version.
+*     23-AUG-2011 (DSB):
+*        Ensure the returned point is at least 10% of the box width away
+*        from the origin of both input and output Frame. This is because
+*        the origin of a coordinate system is a bad test point as it has
+*        unusual properties (e.g. multiplying the value zero by a scaling
+*        factor does not change the value).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -114,12 +121,19 @@
       PARAMETER ( SZBATCH = 100 )
 
 *  Local Variables:
-      DOUBLE PRECISION IN( SZBATCH, NDF__MXDIM ) ! Input positions
+      DOUBLE PRECISION EXIN( NDF__MXDIM )  ! Input exclusion zone
+      DOUBLE PRECISION EXOUT( NDF__MXDIM ) ! Output exclusion zone
+      DOUBLE PRECISION IN( SZBATCH, NDF__MXDIM )  ! Input positions
+      DOUBLE PRECISION LBOUT     ! Lower output bounds
       DOUBLE PRECISION OUT( SZBATCH, NDF__MXDIM ) ! Output positions
+      DOUBLE PRECISION UBOUT     ! Upper output bounds
+      DOUBLE PRECISION XL( NDF__MXDIM ) ! Lower bounds input pos
+      DOUBLE PRECISION XU( NDF__MXDIM ) ! Upper bounds input pos
       INTEGER I                  ! Batch index
       INTEGER J                  ! Sample index
       INTEGER K                  ! Axis index
       LOGICAL GOOD               ! Is this position good on all output axes?
+      LOGICAL OK                 ! Is this position far from the origin?
       REAL SEED                  ! Random number generator seed
       REAL VALUE                 ! Random number
 *.
@@ -127,20 +141,47 @@
 *  Check the inherited global status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
-*  First try the centre of the input box. Store the input co-ordinates.
+*  Get the range covered by the mapped box on each output axis.
+      DO K = 1, NDIM2
+         CALL AST_MAPBOX( MAP, LBND, UBND, .TRUE., K, LBOUT,
+     :                    UBOUT, XL, XU, STATUS )
+
+*  Set up the size of the exclusion zone around the origin of the
+*  output coordinate system (10% of the box width).
+         EXOUT( K ) = 0.1*( UBOUT - LBOUT )
+      END DO
+
+*  Set up the size of the exclusion zone around the origin of the
+*  input coordinate system (10% of the box width).
+      DO K = 1, NDIM1
+         EXIN( K ) = 0.1*( UBND( K ) - LBND( K ) )
+      END DO
+
+*  If the centre of the input box is far enough away from the origin, we
+*  consider using it first. Store the input co-ordinates.
+      OK = .TRUE.
       DO K = 1, NDIM1
          INPOS( K ) = 0.5*( LBND( K ) + UBND( K ) )
+         IF( ABS( INPOS( K ) ) .LE. EXIN( K ) ) OK = .FALSE.
       END DO
 
-*  Transform this point.
-      CALL AST_TRANN( MAP, 1, NDIM1, 1, INPOS, .TRUE., NDIM2, 1,
-     :                OUTPOS, STATUS )
-
-*  See if all output co-ordinate values are good.
-      GOOD = .TRUE.
-      DO K = 1, NDIM2
-        IF( OUTPOS( K ) .EQ. AST__BAD ) GOOD = .FALSE.
-      END DO
+*  If the centre is far enough away from the origin, transform this point,
+*  and see if all output co-ordinate values are good, and are
+*  sufficiently far from the origin of the output coordinate system.
+      IF( OK ) THEN
+         CALL AST_TRANN( MAP, 1, NDIM1, 1, INPOS, .TRUE., NDIM2, 1,
+     :                   OUTPOS, STATUS )
+         GOOD = .TRUE.
+         DO K = 1, NDIM2
+           IF( OUTPOS( K ) .EQ. AST__BAD ) THEN
+              GOOD = .FALSE.
+           ELSE IF( ABS( OUTPOS( K ) ) .LE. EXOUT( K ) ) THEN
+              GOOD = .FALSE.
+           END IF
+         END DO
+      ELSE
+         GOOD = .FALSE.
+      END IF
 
 *  If the point is not good...
       IF( .NOT. GOOD .AND. STATUS .EQ. SAI__OK ) THEN
@@ -159,11 +200,18 @@
 *  a good position.
          DO I = 1, NBATCH
 
-*  Set up a batch of points randomly distributed within the input box.
+*  Set up a batch of points randomly distributed within the input box,
+*  but exclude ones that are too close to the origin of the input
+*  coordinate system.
             DO J = 1, SZBATCH
-               DO K = 1, NDIM1
-                  IN( J, K ) = LBND( K ) + ( UBND( K ) -
-     :                             LBND( K ) )*SLA_RANDOM( SEED )
+               OK = .FALSE.
+               DO WHILE( .NOT. OK )
+                  OK = .TRUE.
+                  DO K = 1, NDIM1
+                     IN( J, K ) = LBND( K ) + ( UBND( K ) -
+     :                                LBND( K ) )*SLA_RANDOM( SEED )
+                     IF( ABS( IN( J, K ) ) .LE. EXIN( K ) ) OK = .FALSE.
+                  END DO
                END DO
             END DO
 
@@ -180,7 +228,11 @@
 *  Check this point.
                GOOD = .TRUE.
                DO K = 1, NDIM2
-                  IF( OUT( J, K ) .EQ. AST__BAD ) GOOD = .FALSE.
+                  IF( OUT( J, K ) .EQ. AST__BAD ) THEN
+                     GOOD = .FALSE.
+                  ELSE IF( ABS( OUT( J, K ) ) .LE. EXOUT( K ) ) THEN
+                     GOOD = .FALSE.
+                  END IF
                END DO
 
 *  If it is good in the output Frame, store the returned positions and
