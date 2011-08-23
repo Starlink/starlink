@@ -2,6 +2,7 @@
 
 #  Set defaults
 set sum_method = PSF
+set amp_method = PSF
 set diam = " "
 set error = " "
 set inlist = " "
@@ -48,6 +49,9 @@ while( $# > 0 )
          endif
       endif
 
+   else if( "$argv[1]" == "-p" ) then
+      set amp_method = STATS
+
    else if( "$argv[1]" == "-h" || "$argv[1]" == "--help" ) then
       set help = 1
 
@@ -88,15 +92,15 @@ if( $help == 1 ) then
 
 Short Map Analysis Script
 
-Usage: smas [-a diam] [-e error] <in-list> <out-table> [<out-image>]
+Usage: smas [-a diam] [-e error] [-p] <in-list> <out-table> [<out-image>]
 
    option:
-      -a: Specifies that the catalogue fsum column values (the total
+      -a: Specifies that the catalogue SUM column values (the total
           data sum) should be the integrated data value within a
 	  circular aperture centred on the source peak position,
 	  with radius specified by "diam" (a numerical value in
 	  arc-seconds). This is calculated using KAPPA:APERADD.
-	  If this option is not supplied, the fsum value is the
+	  If this option is not supplied, the SUM value is the
 	  integrated value under the model source calculated by
 	  KAPPA:PSF. If "diam" is not supplied, defaults of 30 and
 	  15 are used for 850 and 450 um data respectively.
@@ -108,6 +112,12 @@ Usage: smas [-a diam] [-e error] <in-list> <out-table> [<out-image>]
           or image. If the -e option is unspecified, then no sources are
           rejected. If no "error" value is supplied, a default of 1
           arc-second is used.
+
+      -p: Specifies that the catalogue AMP column values (the peak
+          value in the source) should be the maximum data value within
+	  a box of size 20 pixels centred on the expected source position.
+          If this option is not supplied, the AMP value is the peak value
+          of the model source calculated by KAPPA:PSF.
 
    arguments:
       <in-list>: a text file in which each line contains the path
@@ -126,7 +136,7 @@ Usage: smas [-a diam] [-e error] <in-list> <out-table> [<out-image>]
 	  <out-table>'.
 
       <out-image>: if supplied, and if the input data contains bolomaps,
-          a 2D NDF containing the fsum values for each bolometer is
+          a 2D NDF containing the SUM values for each bolometer is
 	  created, with the name given by <out-image>. The FITS headers
           from the first input NDF are copied to the output NDF.
 
@@ -495,7 +505,11 @@ foreach n (`cat files.smas`)
       if( $status == 0 ) then
 
 #  Get the parameters of the psf.
-         set amp = `$KAPPA_DIR/parget amp1 psf`
+         if( $amp_method == PSF ) then
+            set amp = `$KAPPA_DIR/parget amp1 psf`
+         else
+            set amp = $maxv
+         endif
          set posxy = `$KAPPA_DIR/parget centre psf`
          set axisr = `$KAPPA_DIR/parget axisr psf`
          set fwhm = `$KAPPA_DIR/parget fwhm psf`
