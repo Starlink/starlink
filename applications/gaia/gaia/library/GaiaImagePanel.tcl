@@ -11,7 +11,8 @@
 #  Description:
 #     This is class extends the RtdImagePanel class to add the extras
 #     facilities required for the GAIA interface. This consists of the
-#     extras needed to add autocuts and colour/intensity table controls.
+#     extras needed to add autocuts and colour map/scale/intensity
+#     table controls.
 
 #  Invocation:
 #     GaiaImagePanel name [configuration options]
@@ -349,27 +350,34 @@ itcl::class gaia::GaiaImagePanel {
                -command [code $this set_colormap_ $value] \
          }
 
-         #  Select an ITT table.
-         itk_component add autoitt {
-            LabelCommandMenu $itk_component(aframe).autoitt \
-               -text "Intensity Map:" \
+         #  Select a color scale/itt combination.
+         itk_component add autoscale {
+            LabelCommandMenu $itk_component(aframe).autoscale \
+               -text "Color Scale:" \
                -labelwidth $lwidth \
                -labelfont $itk_option(-labelfont) \
                -valuefont $itk_option(-valuefont) \
                -anchor e
          }
-         add_short_help $itk_component(autoitt) \
-            {Select a quick intensity transfer table (more in View...Colors)}
-         foreach {name value} \
-            {default ramp {hist equalize} equa log log
-            {negative ramp} neg wrapped lasritt} {
-            $itk_component(autoitt) add \
-               -label "$name" \
-               -command [code $this set_ittmap_ $value] \
+         add_short_help $itk_component(autoscale) \
+            {Select a quick color scale algorithm (more in View...Colors)}
+         foreach {name scale itt} { 
+            {linear} linear ramp
+            {logarithm} log ramp
+            {histogram equalize} histeq ramp 
+            {square root} sqrt ramp
+            {wrapped} linear lasritt 
+            {negative} linear neg
+            {negative logarithm} log neg
+            {negative histogram equalize} histeq neg
+            {square root negative} sqrt neg } {
+                 $itk_component(autoscale) add \
+                    -label "$name" \
+                    -command [code $this set_scaleitt_ $scale $itt] \
          }
          pack $itk_component(autocut) -expand 1 -ipadx 1m -ipady 1m
          pack $itk_component(autocolor) -expand 1 -ipadx 1m -ipady 1m
-         pack $itk_component(autoitt) -expand 1 -ipadx 1m -ipady 1m
+         pack $itk_component(autoscale) -expand 1 -ipadx 1m -ipady 1m
 
          # XXX how does this pack?
          if { "$itk_option(-panel_orient)" == "vertical" } {
@@ -653,9 +661,12 @@ itcl::class gaia::GaiaImagePanel {
       }
    }
 
-   #  Set the ITT map.
-   protected method set_ittmap_ {map} {
+   #  Set the colour scale and ITT map.
+   protected method set_scaleitt_ {scale map} {
       global gaia_library
+
+      #  Need better access...
+      $image_ colorscale $scale
       $image_ itt file $gaia_library/colormaps/$map.iasc
 
       #  If the colormap is read-only, we need to regenerate the colour ramp.

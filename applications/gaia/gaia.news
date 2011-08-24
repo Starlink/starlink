@@ -1,3 +1,24 @@
+
+    Version 4.4-3
+    =============
+
+    The "Intensity Map:" selector in the main panel has been replaced
+    by a "Color Scale:" selector. This still provides linear and log-like
+    intensity mapping of the displayed image, so no features have been
+    removed. Color scaling gives a more careful transformation of intensity
+    into log-like space, reducing the false contouring seen in low
+    intensities. The square root colour scale is now also available from
+    this control, as well as more negative mappings options.
+
+    As part of these changes the colour scale algorithms themselves (note
+    these are also found in the View->Colors window, as well as the "Color
+    Scale:" selector) have been tweaked to give better log and square root
+    mappings.
+
+    Errors in the default intensity and colormaps have been fixed to remove a
+    discontinous change that could show up as a false contour (this has been
+    present for many years).
+
     Version 4.4-2
     =============
 
@@ -63,7 +84,7 @@
     The "gaiadisp" command now accepts the options "-l" and "-h". These
     set the data limits to use when displaying the image.
 
-    The spectral extraction display can now show the coordinate of the 
+    The spectral extraction display can now show the coordinate of the
     reference line.
 
     Some old skycat catalogue server descriptions have been changed so that
