@@ -22,6 +22,29 @@ if ( ($#argv < 3) || ($#argv > 10) ) then
     echo "    -config     use specified <dimmconfig> parameter for CALCNOISE"
     echo "    -len        analyze up to <nsamples> instead of default 2000"
     echo " "
+    echo "columns of nepfile.txt:"
+    echo " "
+    echo "SUBARR     : subarray"
+    echo "OBSDATE    : UT date of observation"
+    echo "OBSNUM     : observation number"
+    echo "SUBSCAN    : file number"
+    echo "TIMEDATE   : full UT date/time string"
+    echo "EFFNEP     : effective array NEP = 1/sum(1/NEP^2)"
+    echo "NBOLO      : number of working bolometers after cleaning"
+    echo "MEANTRANS  : mean line-of-sight atmospheric transmission during obs"
+    echo "OBJECT     : target object"
+    echo "SEQTYPE    : sequence type from FITS header"
+    echo "SHUTTER    : shutter state (0=closed,1=open)"
+    echo "DARKHEAT   : pixel heater value in the dark"
+    echo "PIXHEAT    : pixel heater value when shutter open"
+    echo "ELSTART    : elevation at the start of the sequence"
+    echo "TAU_ST     : WVM zenith Tau at start of obs"
+    echo "TAU_EN     : WVM zenith Tau at end of obs"
+    echo "AIRMASS    : airmass at start of obs"
+    echo "WEIGHTRESP : (1/NEP^2) weighted-average array responsivity"
+    echo "WEIGHTNEP  : (1/NEP^2) weighted-average NEP"
+    echo "MEDBGNEP   : median background NEP from quad diff. of sky/dark NEP"
+    echo " "
     echo "notes:"
     echo " "
     echo " o <nepfile.txt> is rewritten each time the script is executed, so"
@@ -138,8 +161,8 @@ else if ( $cleanout == 1 ) then
 endif
 
 if ( -e "$nepfile" ) rm "$nepfile" > /dev/null
-echo SUBARR OBSDATE OBSNUM SUBSCAN TIMEDATE EFFNEP NBOLO MEANTRANS OBJECT SEQTYPE SHUTTER DARKHEAT PIXHEAT ELSTART TAU_ST TAU_EN AIRMASS WEIGHTRESP WEIGHTNEP > $nepfile
-echo ------ ------- ------ ------- -------- ------ ----- --------- ------ ------- ------- -------- ------- ------- ------ ------ ------- ---------- --------- >> $nepfile
+echo SUBARR OBSDATE OBSNUM SUBSCAN TIMEDATE EFFNEP NBOLO MEANTRANS OBJECT SEQTYPE SHUTTER DARKHEAT PIXHEAT ELSTART TAU_ST TAU_EN AIRMASS WEIGHTRESP WEIGHTNEP MEDBGNEP > $nepfile
+echo ------ ------- ------ ------- -------- ------ ----- --------- ------ ------- ------- -------- ------- ------- ------ ------ ------- ---------- --------- -------- >> $nepfile
 
 # loop over all of the observation directories that were specified
 foreach obsdir ( `cat $filenames` )
@@ -184,6 +207,10 @@ foreach obsdir ( `cat $filenames` )
     # noise measurements
 
     foreach filenum (1 2 3 4)
+
+        # default bgnep is -1: only gets calculated if we have a sky
+        # and dark nep
+        set bgnep = -1
 
         # do several checks before trying to do measurement
         set ok = 1
@@ -482,7 +509,11 @@ foreach obsdir ( `cat $filenames` )
                                 accept > /dev/null
 
                             if( $? == 0 ) then
-                                echo "    calculated background NEP $bgnepndf"
+                                echo "    background NEP map $bgnepndf"
+
+                                histat $bgnepndf > /dev/null
+                                set bgnep = `parget median histat`
+                                if ( $? != 0 ) set bgnep = -1
                             else
                                 echo "    background NEP calculation failed"
                             endif
@@ -528,9 +559,9 @@ foreach obsdir ( `cat $filenames` )
                 if ( ("$shutter" =~ "1") && ( $havesky != 1 ) ) set havesky = 1
                 if ( ("$shutter" =~ "0") ) set havedarkndf = $nepndf
 
-                echo "    trans=$meantrans effNEP=$effnep"
+                echo "    trans=$meantrans effNEP=$effnep medbgnep=$bgnep"
 
-                echo $subarr $obsdate $obsnum 000$filenum $timedate $effnep $nbolo $meantrans $object $seqtype $shutter $darkheat $pixheat $elstart $tau_st $tau_en $airmass $weightresp $weightnep >> $nepfile
+                echo $subarr $obsdate $obsnum 000$filenum $timedate $effnep $nbolo $meantrans $object $seqtype $shutter $darkheat $pixheat $elstart $tau_st $tau_en $airmass $weightresp $weightnep $bgnep >> $nepfile
             endif
 
         endif
