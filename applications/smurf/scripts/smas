@@ -4,6 +4,7 @@
 set sum_method = PSF
 set amp_method = PSF
 set diam = " "
+set perc = 95
 set error = " "
 set inlist = " "
 set outtable = " "
@@ -45,6 +46,15 @@ while( $# > 0 )
          echo "$argv[2]" | grep -q '[a-zA-Z]'
          if( $status == 1 ) then
             set error = "$argv[2]"
+            shift
+         endif
+      endif
+
+   else if( "$argv[1]" == "-r" ) then
+      if( $# > 1 ) then
+         echo "$argv[2]" | grep -q '[a-zA-Z]'
+         if( $status == 1 ) then
+            set perc = "$argv[2]"
             shift
          endif
       endif
@@ -92,7 +102,7 @@ if( $help == 1 ) then
 
 Short Map Analysis Script
 
-Usage: smas [-a diam] [-e error] [-p] <in-list> <out-table> [<out-image>]
+Usage: smas [-a diam] [-e error] [-r perc] [-p] <in-list> <out-table> [<out-image>]
 
    option:
       -a: Specifies that the catalogue SUM column values (the total
@@ -118,6 +128,12 @@ Usage: smas [-a diam] [-e error] [-p] <in-list> <out-table> [<out-image>]
 	  a box of size 20 pixels centred on the expected source position.
           If this option is not supplied, the AMP value is the peak value
           of the model source calculated by KAPPA:PSF.
+
+      -r: The following number ("perc") specifies the minimum percentage of
+          good pixel values in a small box around the expected source position.
+          Sources that have insufficient good pixels in the box are reported
+          and then ignored. If the "-r" option is not supplied (or is supplied
+          without a "perc" value), a default of 95 is used.
 
    arguments:
       <in-list>: a text file in which each line contains the path
@@ -388,6 +404,10 @@ else
    echo "# SUM ROW COL" >> $outtable
 endif
 
+# Get he number of good pixels required for each source.
+set box = 20
+set mingood = `$KAPPA_DIR/calc "nint(pa*pa*pb/100.0)" pa=$box pb=$perc`
+
 # Next loop round all the NDFs to be processed.
 set first = 1
 foreach n (`cat files.smas`)
@@ -430,15 +450,16 @@ foreach n (`cat files.smas`)
 #  nominally at the reference point and so should, in the absence of errors,
 #  have coords (0.0,0.0). PSF fails unless a good central position is
 #  supplied, so first find the peak value in a box centred on (0,0)
-      $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
+      $KAPPA_DIR/stats $ndf\(0~$box,0~$box\) quiet
       set maxco = `$KAPPA_DIR/parget maxwcs stats`
       rm -f coin.smas > /dev/null
       echo $maxco > coin.smas
 
 #  Check that the box contains at least 95% good pixels.
       set numgood = `$KAPPA_DIR/parget numgood stats`
-      if( $numgood < 380 ) then
-         echo "  Insufficient good data found around expected source position"
+      if( $numgood < $mingood ) then
+         set pc = `$KAPPA_DIR/calc "nint(100*pa/(pb*pb))" pa=$numgood pb=$box`
+         echo "  Insufficient good data ($pc %) found around expected source position"
          continue
       endif
 
