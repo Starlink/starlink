@@ -262,7 +262,6 @@ smf_model_getname.c \
 smf_model_getptr.c \
 smf_model_gettype.c \
 smf_model_stripsuffix.c \
-smf_ndf_sbnd.c \
 smf_ndg_copy.c \
 smf_obsmap_fill.c \
 smf_obsmap_report.c \

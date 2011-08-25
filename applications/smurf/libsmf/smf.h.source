@@ -1373,8 +1373,6 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status );
 
 void smf_model_stripsuffix( const char *instr, char *outstr, int *status );
 
-void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data, int *status );
-
 Grp *smf_ndg_copy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, int *status );
 
 void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap,
