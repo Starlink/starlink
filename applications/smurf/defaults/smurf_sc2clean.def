@@ -58,6 +58,17 @@ noiseclipprecom = 0
 pcathresh = 0
 groupsubarray = 0
 
+# These are read in smf_clean_smfArray
+
+optffs8a = <undef>
+optffs8b = <undef>
+optffs8c = <undef>
+optffs8d = <undef>
+optffs4a = <undef>
+optffs4b = <undef>
+optffs4c = <undef>
+optffs4d = <undef>
+
 # these are analogous cleaning parameters for dark squids
 # We do not have a clever syntax for recursively reading this
 # routine with a "cleandk" prefix so we have to duplicate all

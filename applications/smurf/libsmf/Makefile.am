@@ -329,6 +329,7 @@ smf_resampmap.c \
 smf_reshapendf.c \
 smf_rolling_fit.c \
 smf_samedims_smfData.c \
+smf_scale_bols.c \
 smf_scalar_multiply.c \
 smf_scale2freq.c \
 smf_select_pntr.c \

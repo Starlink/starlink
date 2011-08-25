@@ -50,6 +50,7 @@
 *     Slew speed   : FLAGSLOW, FLAGFAST
 *     Dark squids  : DKCLEAN
 *     Gap filling  : ZEROPAD
+*     Optical flat-fielding: OPTFFS8A, OPTFFS8B, ..., OPTFFS4A, OPTFFS4B, ...
 *     Baselines    : ORDER
 *     [Noisy Bolos]: Optionally happens here instead if "NOISECLIPPRECOM" is set
 *     Common-Mode  : COMPREPROCESS
@@ -108,6 +109,8 @@
 *        Can return COM & GAI if common-mode cleaning used.
 *     2011-08-09 (EC):
 *        Can flag noisy boloms before common-mode removal using noiseclipprecom
+*     2011-08-25 (DSB):
+*        Add optical flat-fielding option.
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -176,7 +179,9 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
   double noisecliphigh = 0; /* Sigma clip high-noise outlier bolos */
   double noisecliplow = 0;  /* Sigma clip low-noise outlier bolos */
   int noiseclipprecom = 0;  /* Noise clipping before common-mode cleaning? */
+  const char *optff;        /* Pointer to optical flatfield NDF */
   int order;                /* Order of polynomial for baseline fitting */
+  char param[ 20 ];         /* Buffer for config parameter name */
   double pcathresh;         /* n-sigma threshold for PCA cleaning */
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikebox=0;        /* Box size for spike finder */
@@ -326,6 +331,18 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
       /*** TIMER ***/
       msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s DKSquid cleaning",
                  status, smf_timerupdate(&tv1,&tv2,status) );
+    }
+
+    /* Apply optical flat-fielding corrections. */
+    strcpy( param, "OPTFF" );
+    smf_find_subarray( data->hdr, param + 5, sizeof(param) - 5, NULL,
+                       status );
+    astChrCase( NULL, param, 1, 0 );
+    if( astMapHasKey( keymap, param ) ) {
+       astMapGet0C( keymap, param, &optff );
+       msgOutiff( MSG__VERB,"", FUNC_NAME ": Correcting bolometer values "
+                  "using factors read from NDF %s", status, optff );
+       smf_scale_bols( wf, data, optff, param, status );
     }
 
     /* Remove baselines */
