@@ -1254,8 +1254,8 @@ AstKeyMap *smf_groupscans( const Grp *igrp,  int size, int *maxsyspop,
 
 Grp *smf_grp_new( const Grp *grp, const char *type, int *status );
 
-void smf_grp_related( const Grp *igrp, const size_t grpsize,
-                      const int grouping, dim_t maxlen, AstKeyMap *keymap,
+void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grouping,
+                      const int checkwave, dim_t maxlen, AstKeyMap *keymap,
                       dim_t *maxconcatlen, dim_t *maxfilelen, smfGroup **group,
                       Grp **basegrp, dim_t *pad, int *status );
 

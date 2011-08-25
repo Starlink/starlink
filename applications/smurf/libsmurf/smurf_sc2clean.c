@@ -329,7 +329,7 @@ void smurf_sc2clean( int *status ) {
   smf_request_mask( "BBM", &bbms, status );
 
   /* Group the input files by subarray and continuity ----------------------- */
-  smf_grp_related( igrp, size, 1, maxlen-padStart-padEnd, NULL, &maxconcat,
+  smf_grp_related( igrp, size, 1, 0, maxlen-padStart-padEnd, NULL, &maxconcat,
                    NULL, &igroup, &basegrp, NULL, status );
 
   /* Obtain the number of continuous chunks and subarrays */
@@ -375,7 +375,7 @@ void smurf_sc2clean( int *status ) {
     if( basegrp ) grpDelet( &basegrp, status );
     if( igroup ) smf_close_smfGroup( &igroup, status );
 
-    smf_grp_related( igrp, size, 1, maxlen-padStart-padEnd, keymap,
+    smf_grp_related( igrp, size, 1, 0, maxlen-padStart-padEnd, keymap,
                      &maxconcat, NULL, &igroup, &basegrp, NULL,
                      status );
 

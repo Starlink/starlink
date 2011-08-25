@@ -938,7 +938,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     &groupsubarray, NULL, NULL, NULL, status );
 
-  smf_grp_related( igrp, isize, 1+groupsubarray, maxlen, keymap,
+  smf_grp_related( igrp, isize, 1+groupsubarray, 1, maxlen, keymap,
                    &maxconcat, &maxfile, &igroup, NULL, &pad, status );
 
   /* Once we've run smf_grp_related we know how many subarrays there
@@ -1011,7 +1011,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_close_smfGroup( &igroup, status );
       }
 
-      smf_grp_related( igrp, isize, 1+groupsubarray, try, NULL,
+      smf_grp_related( igrp, isize, 1+groupsubarray, 1, try, NULL,
                        &maxconcat, NULL, &igroup, NULL, NULL, status );
     }
   }
