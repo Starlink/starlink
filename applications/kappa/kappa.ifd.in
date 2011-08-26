@@ -18458,6 +18458,26 @@ iraf! {
       }
    }
 
+   command lutcubehelix0 {
+      alias {lutcubehelix0}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/cubehelix0_lut}
+      }
+   }
+
+   command lutcubehelix1 {
+      alias {lutcubehelix1}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/cubehelix1_lut}
+      }
+   }
+
    command lutfc {
       alias {lutfc}
       task lutable {
@@ -18624,6 +18644,16 @@ iraf! {
          taskparam mapping=linear
          taskparam coltab=external
          taskparam {lut=$KAPPA_DIR/manycol_lut}
+      }
+   }
+
+   command lutmraospiral {
+      alias {lutmraospiral}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/mraospiral_lut}
       }
    }
 
@@ -18873,6 +18903,16 @@ iraf! {
          taskparam mapping=linear
          taskparam coltab=external
          taskparam {lut=$KAPPA_DIR/spectrum_lut}
+      }
+   }
+
+   command lutspecxbl2yel {
+      alias {lutspecxbl2yel}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/specxbl2yel_lut}
       }
    }
 

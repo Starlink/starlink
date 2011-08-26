@@ -60,12 +60,14 @@ NDFS = $(LUTS) $(TEST_FILES)
 
 LUTS = luts/aips0_lut.sdf luts/backgr_lut.sdf luts/bgyrw_lut.sdf       \
 luts/blue_lut.sdf luts/blulut_lut.sdf luts/brown_lut.sdf               \
-luts/cold_lut.sdf luts/color_lut.sdf luts/cont_lut.sdf luts/fc_lut.sdf \
+luts/cold_lut.sdf luts/color_lut.sdf luts/cont_lut.sdf                 \
+luts/cubehelix0_lut.sdf luts/cubehelix1_lut.sdf luts/fc_lut.sdf        \
 luts/green_lut.sdf luts/heat_lut.sdf luts/idl11_lut.sdf                \
 luts/idl12_lut.sdf luts/idl14_lut.sdf luts/idl15_lut.sdf               \
 luts/idl2_lut.sdf luts/idl4_lut.sdf luts/idl5_lut.sdf                  \
 luts/idl6_lut.sdf luts/ikon_lut.sdf luts/isophot_lut.sdf               \
 luts/light_lut.sdf luts/logo_lut.sdf luts/manycol_lut.sdf              \
+luts/mraospiral_lut.sdf                                                \
 luts/pastel_lut.sdf luts/rainbow1_lut.sdf luts/rainbow2_lut.sdf        \
 luts/rainbow3_lut.sdf luts/rainbow4_lut.sdf luts/rainbow_lut.sdf       \
 luts/ramp_lut.sdf luts/ramps_lut.sdf luts/random1_lut.sdf              \
@@ -73,7 +75,8 @@ luts/random2_lut.sdf luts/random3_lut.sdf luts/random4_lut.sdf         \
 luts/random5_lut.sdf luts/random6_lut.sdf luts/random_lut.sdf          \
 luts/real_lut.sdf luts/red_lut.sdf luts/smooth1_lut.sdf                \
 luts/smooth2_lut.sdf luts/smooth3_lut.sdf luts/smooth_lut.sdf          \
-luts/spectrum_lut.sdf luts/staircase_lut.sdf luts/stairs8_lut.sdf      \
+luts/spectrum_lut.sdf luts/specxbl2yel_lut.sdf luts/staircase_lut.sdf  \
+luts/stairs8_lut.sdf                                                   \
 luts/stairs9_lut.sdf luts/standard_lut.sdf luts/warm_lut.sdf           \
 luts/zebra_lut.sdf
 
