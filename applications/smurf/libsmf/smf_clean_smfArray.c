@@ -179,7 +179,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
   double noisecliphigh = 0; /* Sigma clip high-noise outlier bolos */
   double noisecliplow = 0;  /* Sigma clip low-noise outlier bolos */
   int noiseclipprecom = 0;  /* Noise clipping before common-mode cleaning? */
-  const char *optff;        /* Pointer to optical flatfield NDF */
+  const char *optff=NULL;   /* Pointer to optical flatfield NDF */
   int order;                /* Order of polynomial for baseline fitting */
   char param[ 20 ];         /* Buffer for config parameter name */
   double pcathresh;         /* n-sigma threshold for PCA cleaning */
@@ -340,6 +340,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
     astChrCase( NULL, param, 1, 0 );
     if( astMapHasKey( keymap, param ) ) {
        astMapGet0C( keymap, param, &optff );
+
        msgOutiff( MSG__VERB,"", FUNC_NAME ": Correcting bolometer values "
                   "using factors read from NDF %s", status, optff );
        smf_scale_bols( wf, data, optff, param, status );

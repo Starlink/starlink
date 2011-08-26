@@ -126,6 +126,9 @@ void smf_scale_bols( smfWorkForce *wf, smfData *data, const char *path,
 /* Check we have double precision data. */
    if( !smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status ) ) return;
 
+/* if NULL path supplied return */
+   if( path == NULL ) return;
+
 /* Get pointers to data array. */
    dat = data->pntr[ 0 ];
 
