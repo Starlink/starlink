@@ -14,8 +14,8 @@
 
  *  Invocation:
  *     smf_grp_related( const Grp *igrp, const size_t grpsize,
- *                      const int grouping, const int checkwave, dim_t maxlen,
- *                      AstKeyMap *keymap, dim_t *maxconcatlen,
+ *                      const int grouping, const int checksubinst,
+ *                      dim_t maxlen, AstKeyMap *keymap, dim_t *maxconcatlen,
  *                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
  *                      dim_t *pad, int *status );
 
@@ -28,9 +28,9 @@
  *        Flag describing how to group the data: 0 = all data taken
  *        simultaneously; 1 = all data at same wavelength taken
  *        simultaneously; 2 = only data from same subarray.
- *     checkwave = int (Given)
- *        If set, and a mixture of wavelengths are encountered, bad status
- *        will be set.
+ *     checksubinst = int (Given)
+ *        If set, and a mixture of subinstruments (i.e. 450 and 850 um)
+ *        are encountered, bad status will be set.
  *     maxlen = dim_t (Given)
  *        If set, maximum length of a continuous chunk in time samples
  *        (after applying the downsampling factor). If 0 don't enforce a
@@ -183,7 +183,10 @@
  *     2011-07-06 (DSB):
  *        Fix infinite loop when freeing memory used by subgroups.
  *     2011-08-25 (EC):
- *        Add checkwave option
+ *        Add checksubinst option
+ *     2011-08-26 (EC):
+ *        Change checkwave to checksubinst for robustness against future
+ *        SCUBA-2 filter modifications
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -240,9 +243,10 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grouping,
-                      const int checkwave, dim_t maxlen, AstKeyMap *keymap,
-                      dim_t *maxconcatlen, dim_t *maxfilelen, smfGroup **group,
+void smf_grp_related( const Grp *igrp, const size_t grpsize,
+                      const int grouping, const int checksubinst,
+                      dim_t maxlen, AstKeyMap *keymap, dim_t *maxconcatlen,
+                      dim_t *maxfilelen, smfGroup **group,
                       Grp **basegrp, dim_t *pad, int *status ) {
 
   /* Local variables */
@@ -267,8 +271,9 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grouping,
   size_t ngroups = 0;         /* Counter for subgroups to be stored */
   size_t nkeep = 0;           /* Number of chunks to keep */
   dim_t * piecelen = NULL;    /* Length of single file */
-  char refcwave[10];          /* Wavelength of first file */
+  smf_subinst_t refsubinst;   /* Subinst of first file */
   size_t **subgroups = NULL;  /* Array containing index arrays to parent Grp */
+  smf_subinst_t subinst;      /* Subinst of current file */
 
   if ( *status != SAI__OK ) return;
 
@@ -289,7 +294,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grouping,
   }
 
   /* Initialize refcwave */
-  refcwave[0] = '\0';
+  refsubinst = SMF__SUBINST_NONE;
 
   /* Loop over files in input Grp: remember Grps are indexed from 1 */
   grouped = astKeyMap( "SortBy=KeyUp" );
@@ -316,22 +321,24 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grouping,
     }
 
     /* If requested check to see if we are mixing wavelengths */
-    if( checkwave ) {
-      if( refcwave[0] == '\0' ) {
-        smf_fits_getS( data->hdr, "WAVELEN", refcwave, sizeof(refcwave),
-                       status);
+    if( checksubinst ) {
+      if( refsubinst == SMF__SUBINST_NONE ) {
+        refsubinst = smf_calc_subinst( data->hdr, status );
       }
 
-      smf_fits_getS( data->hdr, "WAVELEN", cwave, sizeof(cwave), status);
+      subinst = smf_calc_subinst( data->hdr, status );
 
-      if( strncmp(refcwave, cwave, sizeof(refcwave)) ) {
+      if( subinst != refsubinst ) {
+        const char *refsubstr = smf_subinst_str( refsubinst, status );
+        const char *substr = smf_subinst_str( subinst, status );
+
         *status = SAI__ERROR;
-         smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
-         msgSetc( "REFWAVE", refcwave );
-         msgSetc( "WAVE", cwave );
-         errRep( "", FUNC_NAME
-                 ": ^FILE has wavelength ^WAVE which doesn't match reference "
-                 "^REFWAVE", status );
+        smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
+        msgSetc( "REFSUB", refsubstr );
+        msgSetc( "SUB", substr );
+        errRep( "", FUNC_NAME
+                ": ^FILE uses sub-instrument ^SUB which doesn't match "
+                "reference ^REFSUB", status );
       }
     }
 
