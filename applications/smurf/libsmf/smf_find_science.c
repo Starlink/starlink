@@ -655,8 +655,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
                 } else {
                   msgOutiff( MSG__NORM, "",
-                            "Flatfield ramp file ^F has %zu good bolometer%s. Eng mode.",
-                             status, ngood, (ngood == 1 ? "" : "s") );
+                            "Flatfield ramp file %s has %zu good bolometer%s. Eng mode.",
+                             status, fname, ngood, (ngood == 1 ? "" : "s") );
                 }
               }
 
