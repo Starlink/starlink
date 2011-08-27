@@ -397,7 +397,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
       if (calcflat) {
         resps = smf_create_smfArray( status );
-        flatmap = astKeyMap( "KeyCase=0,KeyError=1" );
+        /* Use AgeUp so that we get the keys out in the sorted order
+           that allfflats used */
+        flatmap = astKeyMap( "KeyCase=0,KeyError=1,SortBy=AgeDown" );
       }
 
       /* Read each flatfield. Calculate a responsivity image and a flatfield
