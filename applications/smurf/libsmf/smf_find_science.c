@@ -964,7 +964,7 @@ static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
   smf_getfitsi( hdr, "PIXHEAT", &curheat, status );
   if (*status == SMF__NOKWRD) errAnnul(status);
 
-  smf_getfitsi( hdr, "DETBIAS", &curheat, status );
+  smf_getfitsi( hdr, "DETBIAS", &detbias, status );
   if (*status == SMF__NOKWRD) errAnnul(status);
 
   smf_getfitsd( hdr, "SHUTTER", &shutter, status );
