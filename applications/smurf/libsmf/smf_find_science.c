@@ -595,7 +595,6 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                   msgOutiff( MSG__QUIET, "",
                             "Flatfield ramp ratio of %s with %s had too few bolometers (%zu < %d).",
                              status, fname, nextfname, ngoodz, SMF__MINSTATSAMP );
-                  isgood = 0;
                   ngood = ngoodz; /* Must be lower or equal to original ngood */
 
                 } else if (*status == SAI__OK && mean != VAL__BADD && sigma != VAL__BADD && curflat->da) {
