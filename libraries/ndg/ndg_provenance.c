@@ -261,6 +261,13 @@
 *          when checking for equality of two NDFs, do not simply rely
 *          on equality of hash codes - if the hash codes are equal go
 *          on to perform further checks.
+*      29-AUG-2011 (DSB):
+*         - Change ndg1TheSame to exclude check on same number of children
+*         (a single NDF may aquire more children throughout its life, but
+*         it is still the same NDF).
+*         - Change ndg1TheSame to compare equivalent parents. Previously,
+*         this depended on the parents being stored in the same order in
+*         the two Provs being compared. But the order is arbitrary.
 */
 
 
@@ -7660,7 +7667,8 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 
 *  Description:
 *     This function returns non-zero if the two supplied Prov structures
-*     describe the same NDF.
+*     describe the same NDF, potentially used in two different contexts
+*     (i.e. they may have different numbers of children).
 
 *  Arguments:
 *     prov1
@@ -7712,22 +7720,68 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
    NDFs are the same. */
       } else {
 
-/* Compare the path, date, creator, no. of parents and no. of children for
-   both structures. If any of these values differ, the NDFs are different. */
+/* Compare the path, date, creator, and no. of parents for both structures.
+   If any of these values differ, the NDFs are different. Note, the
+   number of children may differ as the same NDF may be used to create
+   different groups of children without it changing its identity in any
+   sense. */
          result = CMP_STRING( prov1->path, prov2->path ) &&
                   CMP_STRING( prov1->date, prov2->date ) &&
                   CMP_STRING( prov1->creator, prov2->creator ) &&
-                  ( prov1->nchild == prov2->nchild ) &&
                   ( prov1->nparent == prov2->nparent );
 
-/* If the above components match, check that all parents are the same. */
-         if( result ) {
-            for( i = 0; i < prov1->nparent; i++ ) {
-               if( !ndg1TheSame( prov1->parents[ i ], prov2->parents[ i ],
-                                 status ) ) {
-                  result = 0;
-                  break;
+/* If the above components match, check that all parents are the same, if
+   there are any parents. */
+         if( result && prov1->nparent > 0 ) {
+
+/* If there is only one parent, just compare them. */
+            if( prov1->nparent == 1 ) {
+               result = ndg1TheSame( prov1->parents[ 0 ], prov2->parents[ 0 ],
+                                     status );
+
+/* If there is more than one parent, things are harder since we need to
+   ensure we are comnparing corresponding parents (the order of the
+   parents within the parents array is arbitrary). */
+            } else {
+               int j;
+
+/* Take a copy of the parent pointers from the second Prov structure. */
+               Prov **par2 = astStore( NULL, prov2->parents,
+                                       prov2->nparent*sizeof(*prov2->parents) );
+               if( *status == SAI__OK ) {
+
+/* For each parenty in prov1... */
+                  for( i = 0; i < prov1->nparent; i++ ) {
+
+/* Assume no matching parent in prov2 exists. */
+                     result = 0;
+
+/* Check each parent in prov2 to see if it matches the current parent
+   from prov1. Ignore prov2 parents that have already matched earlier
+   prov1 parents. */
+                     for( j = 0; j < prov2->nparent; j++ ) {
+                        if( par2[ j ] ) {
+
+/* Compare the two parents. If they match, flag a matching parents of
+   parents has been found, nullify the prov2 parent pointer to prevent
+    it from being used in further comparisons, and leave the loop. */
+                           if( !ndg1TheSame( prov1->parents[ i ], par2[ j ],
+                                             status ) ) {
+                              result = 1;
+                              par2[ j ] = NULL;
+                              break;
+                           }
+                        }
+                     }
+
+/* If no parent in prov2 matched the current parent from prov1, the
+   supplied Provs are not the same, so leave the "i" loop. */
+                     if( ! result ) break;
+                  }
                }
+
+/* Free resources. */
+               par2 = astFree( par2 );
             }
          }
       }
