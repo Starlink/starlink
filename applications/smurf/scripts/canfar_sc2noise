@@ -1,0 +1,187 @@
+#!/bin/tcsh
+
+# This is a script that is used for measuring SCUBA-2 noise levels
+# using the Canadian Advanced Network for Astrophysical Research
+# (CANFAR). A given set of files will be copied to the VM from the
+# CADC. The FITS headers will then be queried to identify the
+# corresponding flatfield observations, and if needed, will also be
+# copied over. SC2TSNOISE is then used to perform the noise measurements,
+# and the resulting outputs are copied to VOSpace.
+#
+# The first argument is the relative path to a file containing the
+# raw scuba-2 data files hosted at CADC that are to be processed.
+# The format of this file is that expected by dpRetrieve, and is easiest
+# to specify using a trailing wildcard expansions, 
+#
+# e.g.
+#         %s8d20100311_00079%
+#
+# is expanded to retrieve 850um s8d data files, from UT date
+# 20100311, observation 79. This file is assumed to be in the homespace
+# of the CANFAR login host and is scp'd to the VM.
+#
+# The second argument is a jobid that will also serve as the directory
+# name for stored outputs in VOSpace
+#
+# The third argument is the username corresponding to the VOSpace
+# path to be accessed at CADC for storing the results.
+#
+
+source $KAPPA_DIR/kappa.csh > /dev/null
+
+unsetenv PERL5LIB
+
+set ok = 1
+
+if ( $#argv != 3 ) then
+    echo "canfar_sc2noise: use CANFAR to measure SCUBA-2 noise"
+    echo " "
+    echo "usage:"
+    echo " "
+    echo "    sc2tsnoise <inputsfile.txt> <jobid> <vospaceuserid>"
+    echo " "
+    echo "parameters:"
+    echo " "
+    echo "    inputsfile.txt  a text file with path to SCUBA-2 obs dirs each line"
+    echo "    jobid           unique ID for job / subdir in VOSpace for results"
+    echo "    vospaceuser     vospace username"
+    echo " "
+
+    set ok = 0
+    goto done
+else
+
+set INPUTSFILE = $1
+set JOBID = $2
+set VOSPACEUSER = $3
+
+# setup directories where we do the work
+
+set WORKDIR = $TMPDIR/$JOBID
+set RAWDATA = $WORKDIR/raw/
+
+mkdir $WORKDIR
+mkdir $RAWDATA
+
+set NOISEFILES = $WORKDIR/__NOISE_FILES.txt
+set FLATFILES = $WORKDIR/__FLAT_FILES.txt
+
+echo ==========================================================================
+echo === Starting to process $JOBID ===
+echo ==========================================================================
+
+date
+
+echo WORKDIR is $WORKDIR
+echo VOSPACEUSER is $VOSPACEUSER
+
+cd $WORKDIR
+pwd
+
+echo --- Getting noise observation files --------------------------------------
+
+scp canfar.dao.nrc.ca:$INPUTSFILE .
+
+
+if ( $? != 0 ) then
+    echo Could not copy "$INPUTSFILE" from canfar.dao.nrc.ca
+    set ok = 0
+    goto done
+endif
+
+$STARLINK_DIR/Perl/bin/dpRetrieve --inputs $INPUTSFILE
+
+if ( $? != 0 ) then
+    echo dpRetrieve failed to fetch noise observation files
+    set ok = 0
+    goto done
+endif
+
+echo --- Getting flatfield files ----------------------------------------------
+
+rm $NOISEFILES
+
+foreach obsfile ( `ls *.sdf` )
+
+    # obtain noise file information and store in input file for sc2tsnoise
+    set file = `basename $obsfile`
+    set sub  = `echo $obsfile | cut -b 1-3`
+    set date = `echo $obsfile | cut -b 4-11`
+    set obs  = `echo $obsfile | cut -b 13-17`
+
+    echo $RAWDATA/$sub/$date/$obs >> $NOISEFILES
+
+    # obtain flatfield information
+    set flatfile = `fitsval $obsfile FLAT`
+    set flatfile = `basename $flatfile`
+    set flatsub  = `echo $flatfile | cut -b 1-3`
+    set flatdate = `echo $flatfile | cut -b 4-11`
+    set flatobs  = `echo $flatfile | cut -b 13-17`
+
+    if ( $? == 0 ) then
+        # does the first file from flat exist here? If not, copy from CADC
+        set firstflatfile = $flatsub$flatdate\_$flatobs\_0001.sdf
+
+        if ( ! -e $firstflatfile ) then
+            echo \%$flatsub$flatdate\_$flatobs\% > $FLATFILES
+
+            $STARLINK_DIR/Perl/bin/dpRetrieve --inputs $FLATFILES
+        endif
+    endif
+endif
+
+
+        endif
+    else
+        echo "Skipping... could not identify flat for $obsfile"
+    endif
+end
+
+echo --- Moving data files into JAC-like tree ---------------------------------
+
+foreach rawfile ( `ls *.sdf` )
+    set file = `basename $rawfile`
+    set sub  = `echo $rawfile | cut -b 1-3`
+    set date = `echo $rawfile | cut -b 4-11`
+    set obs  = `echo $rawfile | cut -b 13-17`
+
+    if ( ! -e $RAWDATA/$sub ) mkdir $RAWDATA/$sub
+    if ( ! -e $RAWDATA/$sub/$date ) mkdir $RAWDATA/$sub/$date
+    if ( ! -e $RAWDATA/$sub/$date/$obs ) mkdir $RAWDATA/$sub/$date/$obs
+
+    mv $file $RAWDATA/$sub/$date/$obs/
+end
+
+
+echo --- Launch sc2tsnoise ----------------------------------------------------
+
+$STARLINK_DIR/bin/smurf/sc2tsnoise $NOISEFILES $WORKDIR/nep.txt $WORKDIR/out
+
+if ( $ok != 1 ) goto done
+
+echo --- Copy results to vospace ----------------------------------------------
+
+# copy data products to vospace
+
+#java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --delete --target=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID
+
+#java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --create --target=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID
+
+#for i in $PERSISTDIR/$JOBID/*.html; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID/`basename $i`; done;
+
+#for i in $PERSISTDIR/$JOBID/*.png; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID/`basename $i`; done;
+
+#for i in $PERSISTDIR/$JOBID/*.fits; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID/`basename $i`; done;
+
+
+#for i in $PERSISTDIR/$JOBID/s*.sdf; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$VOSPACEUSER/$JOBID/`basename $i`; done;
+
+date
+echo === Done! ================================================================
+
+done:
+if ( $ok == 1 ) then
+  exit 0
+else
+  exit 1
+end 
