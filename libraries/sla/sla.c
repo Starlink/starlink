@@ -2229,3 +2229,36 @@ void slaPlante ( double date, double elong, double phi, int jform,
 
 }
 
+F77_SUBROUTINE(sla_preces)(CHARACTER(SYS),
+                           DOUBLE(EP0),
+			   DOUBLE(EP1),
+                           DOUBLE(RA),
+                           DOUBLE(DC)
+			   TRAIL(SYS) );
+
+void slaPreces ( const char sys[3], double ep0, double ep1,
+                 double *ra, double *dc ) {
+
+  DECLARE_CHARACTER(SYS,3);
+  DECLARE_DOUBLE(EP0);
+  DECLARE_DOUBLE(EP1);
+  DECLARE_DOUBLE(RA);
+  DECLARE_DOUBLE(DC);
+
+  slaStringExport( sys, SYS, 3 );
+  EP0 = ep0;
+  EP1 = ep1;
+  RA = *ra;
+  DC = *dc;
+
+  F77_LOCK( F77_CALL(sla_preces)( CHARACTER_ARG(SYS),
+				  DOUBLE_ARG(&EP0),
+				  DOUBLE_ARG(&EP1),
+				  DOUBLE_ARG(&RA),
+				  DOUBLE_ARG(&DC)
+				  TRAIL_ARG(SYS) ); )
+
+  *ra = RA;
+  *dc = DC;
+
+}
