@@ -897,13 +897,13 @@ MAKE_AST_GETFITS(cn,CN,CN)
 
 #undef MAKE_AST_GETFITS
 
-F77_SUBROUTINE(ast_dumpfits)( INTEGER(THIS),
-                              INTEGER(STATUS) ) {
+F77_SUBROUTINE(ast_writefits)( INTEGER(THIS),
+                               INTEGER(STATUS) ) {
    GENPTR_INTEGER(THIS)
 
-   astAt( "AST_DUMPFITS", NULL, 0 );
+   astAt( "AST_WRITEFITS", NULL, 0 );
    astWatchSTATUS(
-      astDumpFits( astI2P( *THIS ) );
+      astWriteFits( astI2P( *THIS ) );
    )
 }
 

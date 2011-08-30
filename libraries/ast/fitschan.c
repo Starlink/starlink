@@ -134,7 +134,6 @@ f     In addition to those routines applicable to all Channels, the
 f     following routines may also be applied to all FitsChans:
 *
 c     - astDelFits: Delete the current FITS card in a FitsChan
-c     - astDumpFits: Write all cards out to the sink function
 c     - astEmptyFits: Delete all cards in a FitsChan
 c     - astFindFits: Find a FITS card in a FitsChan by keyword
 c     - astGetFits<X>: Get a keyword value from a FitsChan
@@ -149,8 +148,8 @@ c     - astRetainFits: Ensure current card is retained in a FitsChan
 c     - astSetFits<X>: Store a new keyword value in a FitsChan
 c     - astTableSource: Register a source function for FITS table access
 c     - astTestFits: Test if a keyword has a defined value in a FitsChan
+c     - astWriteFits: Write all cards out to the sink function
 f     - AST_DELFITS: Delete the current FITS card in a FitsChan
-f     - AST_DUMPFITS: Write all cards out to the sink function
 f     - AST_EMPTYFITS: Delete all cards in a FitsChan
 f     - AST_FINDFITS: Find a FITS card in a FitsChan by keyword
 f     - AST_GETFITS<X>: Get a keyword value from a FitsChan
@@ -165,11 +164,12 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 f     - AST_SETFITS<X>: Store a new keyword value in a FitsChan
 f     - AST_TABLESOURCE: Register a source function for FITS table access
 f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
+f     - AST_WRITEFITS: Write all cards out to the sink function
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
-*     Copyright (C) 2008-2010 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -983,7 +983,7 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        specified by the SinkFile attribute. If no file is specified,
 *        use the sink function specified when the FitsChan was created.
 *     30-AUG-2011 (DSB):
-*        - Added astDumpFits.
+*        - Added astWriteFits.
 *        - Move the deletion of tables and warnings from Delete to
 *        EmptyFits.
 *class--
@@ -1676,7 +1676,6 @@ static void Delete( AstObject *, int * );
 static void DeleteCard( AstFitsChan *, const char *, const char *, int * );
 static void DistortMaps( AstFitsChan *, FitsStore *, char, int , AstMapping **, AstMapping **, AstMapping **, AstMapping **, const char *, const char *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static void DumpFits( AstFitsChan *, int * );
 static void EmptyFits( AstFitsChan *, int * );
 static void FindWcs( AstFitsChan *, int, int, int, const char *, const char *, int * );
 static void FixNew( AstFitsChan *, int, int, const char *, const char *, int * );
@@ -1731,6 +1730,7 @@ static void WcsToStore( AstFitsChan *, AstFitsChan *, FitsStore *, const char *,
 static void WriteBegin( AstChannel *, const char *, const char *, int * );
 static void WriteDouble( AstChannel *, const char *, int, int, double, const char *, int * );
 static void WriteEnd( AstChannel *, const char *, int * );
+static void WriteFits( AstFitsChan *, int * );
 static void WriteInt( AstChannel *, const char *, int, int, int, const char *, int * );
 static void WriteIsA( AstChannel *, const char *, const char *, int * );
 static void WriteObject( AstChannel *, const char *, int, int, AstObject *, const char *, int * );
@@ -8571,60 +8571,6 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
    }
 }
 
-static void DumpFits( AstFitsChan *this, int *status ){
-
-/*
-*++
-*  Name:
-c     astDumpFits
-f     AST_DUMPFITS
-
-*  Purpose:
-*     Write out all cards in a FitsChan to the sink function.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "fitschan.h"
-c     void astDumpFits( AstFitsChan *this )
-f     CALL AST_DUMPFITS( THIS, STATUS )
-
-*  Class Membership:
-*     FitsChan method.
-
-*  Description:
-c     This function
-f     This routine
-*     writes out all cards currently in the FitsChan. If the SinkFile
-*     attribute is set, they will be written out to the specified sink file.
-*     Otherwise, they will be written out using the sink function specified
-*     when the FitsChan was created. All cards are then deleted from the
-*     FitsChan.
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the FitsChan.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Notes:
-*     - If the SinkFile is unset, and no sink function is available, this
-*     method simply empties the FitsChan, and is then equivalent to
-c     astEmptyFits.
-f     AST_EMPTYFITS.
-*     - This method attempt to execute even if an error has occurred
-*     previously.
-*--
-*/
-
-/* We can usefully use the local destructor function to do the work,
-   since it only frees resources used within teh FitsChan, rather than
-   freeing the FitsChan itself. */
-   if( this ) Delete( (AstObject *) this, status );
-}
-
 static void EmptyFits( AstFitsChan *this, int *status ){
 
 /*
@@ -8661,8 +8607,8 @@ f        The global status.
 
 *  Notes:
 *     - This method simply deletes the cards currently in the FitsChan.
-c     Unlike astDumpFits,
-f     Unlike AST_DUMPFITS,
+c     Unlike astWriteFits,
+f     Unlike AST_WRITEFITS,
 *     they are not first written out to the sink function or sink file.
 *     - Any Tables or warnings stored in the FitsChan are also deleted.
 *     - This method attempt to execute even if an error has occurred
@@ -16956,7 +16902,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->RetainFits = RetainFits;
    vtab->FindFits = FindFits;
    vtab->KeyFields = KeyFields;
-   vtab->DumpFits = DumpFits;
+   vtab->WriteFits = WriteFits;
    vtab->EmptyFits = EmptyFits;
    vtab->FitsEof = FitsEof;
    vtab->GetFitsCF = GetFitsCF;
@@ -23894,7 +23840,6 @@ static void ReadFromSource( AstFitsChan *this, int *status ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     void ReadFromSource( AstFitsChan *this, int *status )
 
 *  Class Membership:
@@ -23918,7 +23863,7 @@ static void ReadFromSource( AstFitsChan *this, int *status ){
 *     cannot use the astPutChannelData function with a FitsChan, since the
 *     source function would already have been called by the time the
 *     FitsChan constructor returned (and thus before astPutChannelData
-*     could have been called). In order to ensure that teh source
+*     could have been called). In order to ensure that the source
 *     function is called only once, this function now nullifies the source
 *     function pointer after its first use.
 
@@ -36677,6 +36622,67 @@ static void WriteEnd( AstChannel *this_channel, const char *class, int *status )
    current_indent -= INDENT_INC;
 }
 
+static void WriteFits( AstFitsChan *this, int *status ){
+
+/*
+*++
+*  Name:
+c     astWriteFits
+f     AST_WriteFits
+
+*  Purpose:
+*     Write out all cards in a FitsChan to the sink function.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "fitschan.h"
+c     void astWriteFits( AstFitsChan *this )
+f     CALL AST_WriteFits( THIS, STATUS )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+c     This function
+f     This routine
+*     writes out all cards currently in the FitsChan. If the SinkFile
+*     attribute is set, they will be written out to the specified sink file.
+*     Otherwise, they will be written out using the sink function specified
+*     when the FitsChan was created. All cards are then deleted from the
+*     FitsChan.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsChan.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - If the SinkFile is unset, and no sink function is available, this
+*     method simply empties the FitsChan, and is then equivalent to
+c     astEmptyFits.
+f     AST_EMPTYFITS.
+*     - This method attempt to execute even if an error has occurred
+*     previously.
+*--
+*/
+
+/* Ensure a FitsChan was supplied. */
+   if( this ) {
+
+/* Ensure the source function has been called */
+      ReadFromSource( this, status );
+
+/* We can usefully use the local destructor function to do the work,
+   since it only frees resources used within teh FitsChan, rather than
+   freeing the FitsChan itself. */
+      Delete( (AstObject *) this, status );
+   }
+}
+
 static void WriteInt( AstChannel *this_channel, const char *name,
                       int set, int helpful,
                       int value, const char *comment, int *status ) {
@@ -40223,9 +40229,9 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-void astDumpFits_( AstFitsChan *this, int *status ){
+void astWriteFits_( AstFitsChan *this, int *status ){
    if( !this ) return;
-   (**astMEMBER(this,FitsChan,DumpFits))(this, status );
+   (**astMEMBER(this,FitsChan,WriteFits))(this, status );
 }
 
 void astEmptyFits_( AstFitsChan *this, int *status ){
