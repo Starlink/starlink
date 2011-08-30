@@ -22517,11 +22517,27 @@ current version):
 evaluate the inverse the inverse transformation if no inverse
 transformation is defined when the PolyMap is created.
 
-\item The FitsChan class has a new method astWriteFits (AST\_WRITEFITS)
+\item The FitsChan class has a new method
+c+
+astWriteFits
+c-
+f+
+AST\_WRITEFITS
+f-
 which writes out all cards currently in the FitsChan to the associated
 external data sink (specified either by the SinkFile attribute or the
 sink function supplied when the FitsChan was created), and then empties
 the FitsChan.
+
+\item The FitsChan class has a new method
+c+
+astReadFits
+c-
+f+
+AST\_READFITS
+f-
+which forces the FitsChan to reads cards from the associated external
+source and appends them to the end of the FitsChan.
 
 \item - If the FitsChan astRead method reads a FITS header that uses the
 -SIP (Spitzer) distortion code within the CTYPE values, but which does

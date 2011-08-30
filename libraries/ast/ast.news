@@ -26,6 +26,10 @@ external data sink (specified either by the SinkFile attribute or the
 sink function supplied when the FitsChan was created), and then empties
 the FitsChan.
 
+- The FitsChan class has a new method astReadFits (AST_READFITS)
+which forces the FitsChan to reads cards from the associated external
+source and appends them to the end of the FitsChan.
+
 - If the FitsChan astRead method reads a FITS header that uses the
 -SIP (Spitzer) distortion code within the CTYPE values, but which does
 not provide an inverse polynomial correction, and for which the PolyTran

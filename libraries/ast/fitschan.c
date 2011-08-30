@@ -143,6 +143,7 @@ c     - astPutCards: Stores a set of FITS header card in a FitsChan
 c     - astPutFits: Store a FITS header card in a FitsChan
 c     - astPutTable: Store a single FitsTable in a FitsChan
 c     - astPutTables: Store multiple FitsTables in a FitsChan
+c     - astReadFits: Read cards in through the source function
 c     - astRemoveTables: Remove one or more FitsTables from a FitsChan
 c     - astRetainFits: Ensure current card is retained in a FitsChan
 c     - astSetFits<X>: Store a new keyword value in a FitsChan
@@ -159,6 +160,7 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 f     - AST_PUTTABLE: Store a single FitsTables in a FitsChan
 f     - AST_PUTTABLES: Store multiple FitsTables in a FitsChan
+f     - AST_READFITS: Read cards in through the source function
 f     - AST_REMOVETABLES: Remove one or more FitsTables from a FitsChan
 f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 f     - AST_SETFITS<X>: Store a new keyword value in a FitsChan
@@ -983,7 +985,7 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        specified by the SinkFile attribute. If no file is specified,
 *        use the sink function specified when the FitsChan was created.
 *     30-AUG-2011 (DSB):
-*        - Added astWriteFits.
+*        - Added astWriteFits and astReadFits.
 *        - Move the deletion of tables and warnings from Delete to
 *        EmptyFits.
 *class--
@@ -1700,6 +1702,7 @@ static void PutCards( AstFitsChan *, const char *, int * );
 static void PutFits( AstFitsChan *, const char [ AST__FITSCHAN_FITSCARDLEN + 1 ], int, int * );
 static void PutTable( AstFitsChan *, AstFitsTable *, const char *, int * );
 static void PutTables( AstFitsChan *, AstKeyMap *, int * );
+static void ReadFits( AstFitsChan *, int * );
 static void ReadFromSource( AstFitsChan *, int * );
 static void RemoveTables( AstFitsChan *, const char *, int * );
 static void RetainFits( AstFitsChan *, int * );
@@ -16902,6 +16905,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->RetainFits = RetainFits;
    vtab->FindFits = FindFits;
    vtab->KeyFields = KeyFields;
+   vtab->ReadFits = ReadFits;
    vtab->WriteFits = WriteFits;
    vtab->EmptyFits = EmptyFits;
    vtab->FitsEof = FitsEof;
@@ -23826,6 +23830,75 @@ static double *ReadCrval( AstFitsChan *this, AstFrame *wcsfrm, char s,
    return ret;
 }
 
+static void ReadFits( AstFitsChan *this, int *status ){
+
+/*
+*++
+*  Name:
+c     astReadFits
+f     AST_READFITS
+
+*  Purpose:
+*     Read cards into a FitsChan from the source function.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "fitschan.h"
+c     void astReadFits( AstFitsChan *this )
+f     CALL AST_READFITS( THIS, STATUS )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+c     This function
+f     This routine
+*     reads cards from the source function that was specified when the
+*     FitsChan was created, and stores them in the FitsChan. This
+*     normally happens once-only, when the FitsChan is accessed for the
+*     first time.
+c     This function
+f     This routine
+*     provides a means of forcing a re-read of the external source, and
+*     may be useful if (say) new cards have been deposited into the
+*     external source. Any newcards read from the source are appended to
+*     the end of the current contents of the FitsChan.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsChan.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - This function returns without action if no source function was
+*     specified when the FitsChan was created.
+*     - The SourceFile attribute is ignored by this
+c     function.
+f     routine.
+*     New cards are read from the source file whenever a new value is
+*     assigned to the SourceFile attribute.
+
+*--
+*/
+
+/* Check the inherited status */
+   if( !astOK ) return;
+
+/* If no source function is available, re-instate any saved source
+   function pointer. */
+   if( !this->source ) {
+      this->source = this->saved_source;
+      this->saved_source = NULL;
+   }
+
+/* Call the source function. */
+   ReadFromSource( this, status );
+}
+
 static void ReadFromSource( AstFitsChan *this, int *status ){
 
 /*
@@ -23895,6 +23968,10 @@ static void ReadFromSource( AstFitsChan *this, int *status ){
    FitsChan structure. This avoids infinte loops. */
       source = this->source;
       this->source = NULL;
+
+/* Save the source fubnction pointer in the FitsChan so that it can be
+   re-instated if required (e.g. by astReadFits). */
+      this->saved_source = source;
 
 /* Ensure the FitsChan is at end-of-file. This will result in the
    new cards being appended to the end of the FitsChan. */
@@ -38837,6 +38914,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->keyseq = NULL;
    out->keywords = NULL;
    out->source = NULL;
+   out->saved_source = NULL;
    out->source_wrap = NULL;
    out->sink = NULL;
    out->sink_wrap = NULL;
@@ -39884,6 +39962,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
 /* Save the pointers to the source and sink functions and the wrapper
    functions that invoke them. */
       new->source = source;
+      new->saved_source = NULL;
       new->source_wrap = source_wrap;
       new->sink = sink;
       new->sink_wrap = sink_wrap;
@@ -40042,6 +40121,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
    wrapper functions, to NULL (we cannot restore these since they
    refer to process-specific addresses). */
       new->source = NULL;
+      new->saved_source = NULL;
       new->source_wrap = NULL;
       new->sink = NULL;
       new->sink_wrap = NULL;
@@ -40232,6 +40312,11 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 void astWriteFits_( AstFitsChan *this, int *status ){
    if( !this ) return;
    (**astMEMBER(this,FitsChan,WriteFits))(this, status );
+}
+
+void astReadFits_( AstFitsChan *this, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,FitsChan,ReadFits))(this, status );
 }
 
 void astEmptyFits_( AstFitsChan *this, int *status ){

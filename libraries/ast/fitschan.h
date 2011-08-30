@@ -187,6 +187,7 @@ typedef struct AstFitsChan {
    AstKeyMap *tables;   /* A KeyMap holding the binary tables in the FitsChan */
 
    const char *(* source)( void ); /* Pointer to source function */
+   const char *(* saved_source)( void ); /* Pointer to saved source function */
    char *(* source_wrap)( const char *(*)( void ), int * );
                                    /* Source wrapper function pointer */
 
@@ -235,6 +236,7 @@ typedef struct AstFitsChanVtab {
    int (* TestFits)( AstFitsChan *, const char *, int *, int * );
    void (* DelFits)( AstFitsChan *, int * );
    void (* Empty)( AstFitsChan *, int * );
+   void (* ReadFits)( AstFitsChan *, int * );
    void (* WriteFits)( AstFitsChan *, int * );
    void (* EmptyFits)( AstFitsChan *, int * );
    void (* PurgeWCS)( AstFitsChan *, int * );
@@ -423,6 +425,7 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    int  astGetFitsS_( AstFitsChan *, const char *, char **, int * );
    int  astTestFits_( AstFitsChan *, const char *, int *, int * );
    void astDelFits_( AstFitsChan *, int * );
+   void astReadFits_( AstFitsChan *, int * );
    void astWriteFits_( AstFitsChan *, int * );
    void astEmptyFits_( AstFitsChan *, int * );
    void astPurgeWCS_( AstFitsChan *, int * );
@@ -667,6 +670,9 @@ astINVOKE(V,astGetFitsS_(astCheckFitsChan(this),name,value,STATUS_PTR))
 
 #define astGetFitsCN(this,name,value) \
 astINVOKE(V,astGetFitsCN_(astCheckFitsChan(this),name,value,STATUS_PTR))
+
+#define astReadFits(this) \
+astINVOKE(V,astReadFits_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astWriteFits(this) \
 astINVOKE(V,astWriteFits_(astCheckFitsChan(this),STATUS_PTR))
