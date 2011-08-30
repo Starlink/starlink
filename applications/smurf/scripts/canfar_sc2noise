@@ -26,6 +26,8 @@
 # The third argument is the username corresponding to the VOSpace
 # path to be accessed at CADC for storing the results.
 #
+# All remaining parameters are passed to sc2tsnoise as optional
+# position-independent options
 
 source $KAPPA_DIR/kappa.csh > /dev/null
 
@@ -33,7 +35,7 @@ unsetenv PERL5LIB
 
 set ok = 1
 
-if ( $#argv != 3 ) then
+if ( $#argv < 3 ) then
     echo "canfar_sc2noise: use CANFAR to measure SCUBA-2 noise"
     echo " "
     echo "usage:"
@@ -54,6 +56,10 @@ else
 set INPUTSFILE = $1
 set JOBID = $2
 set VOSPACEUSER = $3
+
+shift
+shift
+shift
 
 # setup directories where we do the work
 
@@ -160,7 +166,7 @@ date
 echo --- Launch sc2tsnoise ----------------------------------------------------
 
 $STARLINK_DIR/bin/smurf/sc2tsnoise $NOISEFILES $WORKDIR/$NOISELOG \
-    $WORKDIR/$OUTDIR
+    $WORKDIR/$OUTDIR $*
 
 if ( $ok != 1 ) goto done
 
