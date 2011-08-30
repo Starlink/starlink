@@ -235,6 +235,7 @@ typedef struct AstFitsChanVtab {
    int (* TestFits)( AstFitsChan *, const char *, int *, int * );
    void (* DelFits)( AstFitsChan *, int * );
    void (* Empty)( AstFitsChan *, int * );
+   void (* DumpFits)( AstFitsChan *, int * );
    void (* EmptyFits)( AstFitsChan *, int * );
    void (* PurgeWCS)( AstFitsChan *, int * );
    void (* PutCards)( AstFitsChan *, const char *, int * );
@@ -422,6 +423,7 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    int  astGetFitsS_( AstFitsChan *, const char *, char **, int * );
    int  astTestFits_( AstFitsChan *, const char *, int *, int * );
    void astDelFits_( AstFitsChan *, int * );
+   void astDumpFits_( AstFitsChan *, int * );
    void astEmptyFits_( AstFitsChan *, int * );
    void astPurgeWCS_( AstFitsChan *, int * );
    void astPutCards_( AstFitsChan *, const char *, int * );
@@ -665,6 +667,9 @@ astINVOKE(V,astGetFitsS_(astCheckFitsChan(this),name,value,STATUS_PTR))
 
 #define astGetFitsCN(this,name,value) \
 astINVOKE(V,astGetFitsCN_(astCheckFitsChan(this),name,value,STATUS_PTR))
+
+#define astDumpFits(this) \
+astINVOKE(V,astDumpFits_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astEmptyFits(this) \
 astINVOKE(V,astEmptyFits_(astCheckFitsChan(this),STATUS_PTR))

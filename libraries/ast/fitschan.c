@@ -134,6 +134,7 @@ f     In addition to those routines applicable to all Channels, the
 f     following routines may also be applied to all FitsChans:
 *
 c     - astDelFits: Delete the current FITS card in a FitsChan
+c     - astDumpFits: Write all cards out to the sink function
 c     - astEmptyFits: Delete all cards in a FitsChan
 c     - astFindFits: Find a FITS card in a FitsChan by keyword
 c     - astGetFits<X>: Get a keyword value from a FitsChan
@@ -149,6 +150,7 @@ c     - astSetFits<X>: Store a new keyword value in a FitsChan
 c     - astTableSource: Register a source function for FITS table access
 c     - astTestFits: Test if a keyword has a defined value in a FitsChan
 f     - AST_DELFITS: Delete the current FITS card in a FitsChan
+f     - AST_DUMPFITS: Write all cards out to the sink function
 f     - AST_EMPTYFITS: Delete all cards in a FitsChan
 f     - AST_FINDFITS: Find a FITS card in a FitsChan by keyword
 f     - AST_GETFITS<X>: Get a keyword value from a FitsChan
@@ -980,6 +982,10 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        - On deletion, write out the FitsChan contents to the file
 *        specified by the SinkFile attribute. If no file is specified,
 *        use the sink function specified when the FitsChan was created.
+*     30-AUG-2011 (DSB):
+*        - Added astDumpFits.
+*        - Move the deletion of tables and warnings from Delete to
+*        EmptyFits.
 *class--
 */
 
@@ -1670,6 +1676,7 @@ static void Delete( AstObject *, int * );
 static void DeleteCard( AstFitsChan *, const char *, const char *, int * );
 static void DistortMaps( AstFitsChan *, FitsStore *, char, int , AstMapping **, AstMapping **, AstMapping **, AstMapping **, const char *, const char *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void DumpFits( AstFitsChan *, int * );
 static void EmptyFits( AstFitsChan *, int * );
 static void FindWcs( AstFitsChan *, int, int, int, const char *, const char *, int * );
 static void FixNew( AstFitsChan *, int, int, const char *, const char *, int * );
@@ -8564,6 +8571,60 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
    }
 }
 
+static void DumpFits( AstFitsChan *this, int *status ){
+
+/*
+*++
+*  Name:
+c     astDumpFits
+f     AST_DUMPFITS
+
+*  Purpose:
+*     Write out all cards in a FitsChan to the sink function.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "fitschan.h"
+c     void astDumpFits( AstFitsChan *this )
+f     CALL AST_DUMPFITS( THIS, STATUS )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+c     This function
+f     This routine
+*     writes out all cards currently in the FitsChan. If the SinkFile
+*     attribute is set, they will be written out to the specified sink file.
+*     Otherwise, they will be written out using the sink function specified
+*     when the FitsChan was created. All cards are then deleted from the
+*     FitsChan.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsChan.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - If the SinkFile is unset, and no sink function is available, this
+*     method simply empties the FitsChan, and is then equivalent to
+c     astEmptyFits.
+f     AST_EMPTYFITS.
+*     - This method attempt to execute even if an error has occurred
+*     previously.
+*--
+*/
+
+/* We can usefully use the local destructor function to do the work,
+   since it only frees resources used within teh FitsChan, rather than
+   freeing the FitsChan itself. */
+   if( this ) Delete( (AstObject *) this, status );
+}
+
 static void EmptyFits( AstFitsChan *this, int *status ){
 
 /*
@@ -8599,6 +8660,13 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
+*     - This method simply deletes the cards currently in the FitsChan.
+c     Unlike astDumpFits,
+f     Unlike AST_DUMPFITS,
+*     they are not first written out to the sink function or sink file.
+*     - Any Tables or warnings stored in the FitsChan are also deleted.
+*     - This method attempt to execute even if an error has occurred
+*     previously.
 *--
 */
 
@@ -8607,6 +8675,9 @@ f        The global status.
    const char *class;         /* Pointer to string holding object class */
    const char *method;        /* Pointer to string holding calling method */
    int old_ignore_used;       /* Original setting of ignore_used variable */
+
+/* Check a FitsChan was supplied. */
+   if( !this ) return;
 
 /* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(this);
@@ -8629,6 +8700,12 @@ f        The global status.
 
 /* Delete the KeyMap holding the keyword names. */
    if( this->keywords ) this->keywords = astAnnul( this->keywords );
+
+/* Free any memory used to hold the Warnings attribute value. */
+   this->warnings = astFree( this->warnings );
+
+/* Other objects in the FitsChan structure. */
+   if( this->tables ) this->tables = astAnnul( this->tables );
 }
 
 static int EncodeFloat( char *buf, int digits, int width, int maxwidth,
@@ -16879,6 +16956,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->RetainFits = RetainFits;
    vtab->FindFits = FindFits;
    vtab->KeyFields = KeyFields;
+   vtab->DumpFits = DumpFits;
    vtab->EmptyFits = EmptyFits;
    vtab->FitsEof = FitsEof;
    vtab->GetFitsCF = GetFitsCF;
@@ -38853,13 +38931,6 @@ static void Delete( AstObject *obj, int *status ) {
 
 /* Remove all cards from the FitsChan. */
    EmptyFits( this, status );
-
-/* Free any memory used to hold the Warnings attribute value. */
-   this->warnings = astFree( this->warnings );
-
-/* Other objects in the FitsChan structure. */
-   if( this->tables ) this->tables = astAnnul( this->tables );
-   return;
 }
 
 /* Dump function. */
@@ -40151,6 +40222,11 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+void astDumpFits_( AstFitsChan *this, int *status ){
+   if( !this ) return;
+   (**astMEMBER(this,FitsChan,DumpFits))(this, status );
+}
 
 void astEmptyFits_( AstFitsChan *this, int *status ){
    if( !this ) return;
