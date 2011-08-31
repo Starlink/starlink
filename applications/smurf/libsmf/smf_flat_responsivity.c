@@ -171,7 +171,7 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   double * bolvalvar = NULL;   /* pointer to variance in smfData bolvald */
 
   const int usevar = 1;
-  const double MINRESP = 0.1e5;/* Minimum "in specification" responsivity A/W */
+  const double MINRESP = 0.1e6;/* Minimum "in specification" responsivity A/W */
   const double MAXRESP = 5.0e8;/* Maximum "in specification" responsivity A/W */
 
   if (*status != SAI__OK) return ngood;
