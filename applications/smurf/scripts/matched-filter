@@ -20,23 +20,28 @@
 #                        sum( psf_i**2/input_variance_i )
 
 #  Invocation:
-#    matched-filter [-np] [-s fwhm] <in> <out>  [<psf>]
+#    matched-filter [-np] [-s fwhm] [-f fits] [-h] [--help] <in> <out>  [<psf>]
 
 #  Options:
-#    -np - If the script creates a new PSF (i.e. if the <psf> parameter is
-#          not supplied on the command line), then normalise the new PSF to
-#          a peak value of unity. Without this option, the new PSF is
-#          normalised to a total data sum of unity.
-#    -s  - If the script creates a new PSF (i.e. if the <psf> parameter is
-#          not supplied on the command line), then a slowly varying background
-#          is estimated and removed from the supplied image before the filter
-#          is applied. The background to remove is created by smoothing the
-#          image with a wide Gaussian. The FWHM of this Gaussian should be
-#          specified (in arc-seconds) on the command line after the "-s"
-#          option. In order to compensate for this, the PSF is also
-#          processed in the same way (i.e. it is smoothed using the wide
-#          Gaussian and the smoothed PSF is then removed from the original
-#          PSF).
+#    -np  - If the script creates a new PSF (i.e. if the <psf> parameter is
+#           not supplied on the command line), then normalise the new PSF to
+#           a peak value of unity. Without this option, the new PSF is
+#           normalised to a total data sum of unity.
+#    -s   - If the script creates a new PSF (i.e. if the <psf> parameter is
+#           not supplied on the command line), then a slowly varying background
+#           is estimated and removed from the supplied image before the filter
+#           is applied. The background to remove is created by smoothing the
+#           image with a wide Gaussian. The FWHM of this Gaussian should be
+#           specified (in arc-seconds) on the command line after the "-s"
+#           option. In order to compensate for this, the PSF is also
+#           processed in the same way (i.e. it is smoothed using the wide
+#           Gaussian and the smoothed PSF is then removed from the original
+#           PSF).
+#    -f   - Specifies an NDF from which the required FITS headers should be
+#           read. If this option is not specified, the FITS headers are read
+#           from the NDF specified by <in>.
+#    -h   - Display this prologue and exit.
+#  --help - Display this prologue and exit.
 
 #  Parameters:
 #    <in> - The input image.
@@ -50,6 +55,8 @@
 #    - The PSF must not contain any bad values.
 #    - The input must contain a variance component.
 #    - The input and PSF must contain floating point values.
+
+#-
 
 #  Authors:
 #    DSB: David S. Berry (JAC)
@@ -76,9 +83,12 @@
 #         small and then padding it with zeros.
 #    2010-6-7 (DSB):
 #       - Copy the input NDF data units to the output NDF.
+#    2011-8-31 (DSB):
+#       - Added the -f, -h and --help options.
+#       - Allow the input NDF to be stored as a component in a container file.
 
 #  Copyright:
-#     Copyright (C) 2010 Science & Technology Facilities Council.
+#     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -97,7 +107,6 @@
 #     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 #     MA 02111-1307, USA
 
-#-
 
 #  Search the command line for options starting with a minus sign, and set
 #  shell variables to the corresponding values. Also copy non-option arguments
@@ -105,6 +114,8 @@
    set norm = sum
    set arg_list = ""
    set fwhm_bg = ""
+   set fits_in = ""
+   set help = 0
 
    while( $# > 0 )
       set arg = $1
@@ -113,11 +124,21 @@
       if( "$arg" == "-np" ) then
          set norm = peak
 
+      else if( "$arg" == "-h" ) then
+         set help = 1
+
+      else if( "$arg" == "--help" ) then
+         set help = 1
+
       else if( "$arg" == "-ns" ) then
          set norm = sum
 
       else if( "$arg" == "-s" ) then
          set fwhm_bg = $1
+         shift
+
+      else if( "$arg" == "-f" ) then
+         set fits_in = $1
          shift
 
       else
@@ -126,33 +147,51 @@
 
    end
 
+#  Issue help and exit if required.
+if( $help == 1 ) then
+   awk 'BEGIN {pro=0;} /^#\+/ {pro=-1;} /#\-/ {pro=0;} {if ( pro == 1 ) print; else if ( pro == -1 ) pro = 1}' $0 | sed -e 's/^#//'
+   exit
+endif
+
 #  Check the input and output NDFs and the PSF were specified on the
 #  command line.
 if( $#arg_list < 2 ) then
-   echo "Usage: matched-filter [-np] [-s fwhm] <in.sdf> <out.sdf> [<psf.sdf>]"
+   echo
+   echo "Insufficient command line parameters given. Usage:"
+   awk 'BEGIN {pro=0;} /^# +Invocation:/ {pro=-1;} {if ( pro == 1 ) {print;pro=0;} else if (pro == -1 ) pro = 1;}' $0 | sed -e 's/# \+//'
+   echo
    exit
 endif
 
 #  Ensure ADAM tasks fail rather than prompt for parameter values
 setenv ADAM_NOPROMPT 1
 
+#  Ensure ADAM tasks set the system status variable non-zero if they fail.
+setenv ADAM_EXIT 1
+
 #  The supplied NDFs may or may not have a ".sdf" suffix. Ensure we have the
 #  NDF names without ".sdf".
 set dir = `dirname $arg_list[1]`
 set base = `basename $arg_list[1] .sdf`
 set in = "$dir/$base"
-if( ! -e "$in.sdf" ) then
-   echo "Cannot find $in.sdf"
-   exit
-endif
-
 set dir = `dirname $arg_list[2]`
 set base = `basename $arg_list[2] .sdf`
 set out = "$dir/$base"
 
+#  If the source of the FITS headers was unspecified, use the input NDF.
+if( $fits_in == "" ) then
+   set fits_in = $in
+endif
+
+# Check the input NDF exists, and get its properties.
+$KAPPA_DIR/ndftrace $in fullframe quiet >& /dev/null
+if( $status != 0 ) then
+   echo "Cannot access input NDF '$in'"
+   exit
+endif
+
 # Get the input pixel size, in arc-second. We assume the first pixel axis
 # is a spatial axis, and that pixels are square.
-$KAPPA_DIR/ndftrace $in fullframe quiet
 set insize = `$KAPPA_DIR/parget fpixscale\(1\) ndftrace`
 
 # Get the input data units.
@@ -184,7 +223,7 @@ if( $#arg_list > 2 ) then
 else
 
 # Check the data is from JCMT.
-   set telescope = `$KAPPA_DIR/fitsmod $in edit=print keyword=TELESCOP`
+   set telescope = `$KAPPA_DIR/fitsmod $fits_in edit=print keyword=TELESCOP`
 
    echo $telescope | grep '\!\!\|TELESCOP' >& /dev/null
    if( $status == 0 ) then
@@ -199,7 +238,7 @@ else
    endif
 
 # Get the wavelength (in metres).
-   set wavelen = `$KAPPA_DIR/fitsmod $in edit=print keyword=WAVELEN`
+   set wavelen = `$KAPPA_DIR/fitsmod $fits_in edit=print keyword=WAVELEN`
 
    echo $wavelen | grep '\!\!\|WAVELEN' >& /dev/null
    if( $status == 0 ) then
