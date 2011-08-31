@@ -1,0 +1,68 @@
+ Number of filters defined =  2
+
+ NF  Wavelngth     Freq.  Width  HPBW
+  1  850           350.0   30.0  14.0
+  2  450           677.0   30.0   7.5
+  3                  0.0    0.0   0.0
+  4                  0.0    0.0   0.0
+  5                  0.0    0.0   0.0
+  6                  0.0    0.0   0.0
+  7                  0.0    0.0   0.0
+  8                  0.0    0.0   0.0
+  9                  0.0    0.0   0.0
+ 10                  0.0    0.0   0.0
+ 11                  0.0    0.0   0.0
+ 12                  0.0    0.0   0.0
+ 13                  0.0    0.0   0.0
+ 14                  0.0    0.0   0.0
+ 15                  0.0    0.0   0.0
+
+
+ Planetary temperatures and errors:
+
+               Mars         Jupiter      Saturn       Uranus       Neptune
+ 850          0.0   0.0  163.8   4.0  124.3   5.0   85.9   1.7   81.3   2.0
+ 450          0.0   0.0  148.5   5.0  111.0   5.0   69.9   1.7   66.2   2.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+
+Notes (these are revised numbers as of 7 Aug 1992):
+
+The planetary brightness temperatures used are obtained from the measurements 
+of Griffin et al. (1986, Icarus 65, 244), Orton et al. (1986, Icarus 67, 289),
+and Griffin & Orton (1993, Icarus, 105, 537). The errors in brightness tempera-
+tures are the rms internal errors of the observations. For MJD's between 46040
+through 50000 the Martian temperatures are derived from the model developed by
+Wright (1976, Ap.J., 210, 250). Outside these MJD's (i.e., in particular after 
+10 October 1995) a simplified model of a rotating cratered asteroid is used 
+(Wright, 1995; private communication to H.E. Matthews). Since the results for 
+Mars are derived from models no errors are quoted; however the Martian bright-
+ness temperatures are probably uncertain at the 5% level and this uncertainty 
+must be added to obtain the absolute errors. Over the interval for which both 
+the original Wright model and the simplified model are valid, the differences 
+in brightness temperatures have an rms error of 0.13 K (i.e. negligible). The 
+flux densities for Saturn are for the planetary disk only; an additional flux 
+is expected when the rings present an open aspect, and at such times Saturn 
+should not be used as a calibration object. Individuals using these data in 
+published works should reference the appropriate papers as noted above.
+
+The filter frequencies are the effective frequencies for 1mm of water vapour. 
+These are the SCUBA filters (effective from 23-May-1996).
+
+Version 27-October-1995 (HEM)
+SCUBA Version 25-July-1996 (WSH)
+
+23-July-2003 (TJ) - Add THUMPER
+18-March-2005 (TJ) - Add THUMPER properly
+30-August-2011 (TJ) - SCUBA-2 clone

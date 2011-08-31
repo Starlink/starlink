@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(fluxes, 1.1-4, ussc@star.rl.ac.uk)
+AC_INIT(fluxes, 1.2-1, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)

@@ -23,6 +23,7 @@
 
 *     Modifications:
 
+*     30 Aug 11 : TIMJ- Add simple SCUBA-2
 *     31 Mar 05 : TIMJ- Fix infinite loop when time invalid
 *     18 Mar 05 : TIMJ- A THUMPER tweak to the output formatting
 *     2  Feb 04 : TIMJ- Fix TT vs UT confusion. RJDATE now returns TT MJD
@@ -565,7 +566,17 @@ C  The system time in seconds
 
 *     Open the file. This is fatal if they can not be opened.
 *     Should really be using FIO but this is historical.
-         IF (DATE.GT.960523) THEN
+*     SCUBA-2 starts in 2007
+         IF (DATE.GT.1070101) THEN
+            OPEN(UNIT=FIOD2,FILE=PATH(1:LPATH)//'/scuba2.dat',
+     1           STATUS='OLD',IOSTAT=IOSTATUS)
+            IF (IOSTATUS .NE. 0) THEN
+               IF (STATUS .EQ. SAI__OK) STATUS = SAI__ERROR
+               CALL MSG_SETC('PATH',PATH(1:LPATH))
+               CALL ERR_REP(' ','Error opening ^PATH/scuba2.dat',STATUS)
+               GOTO 9999
+            END IF
+         ELSE IF (DATE.GT.960523) THEN
             OPEN(UNIT=FIOD2,FILE=PATH(1:LPATH)//'/scuba.dat',
      1           STATUS='OLD',IOSTAT=IOSTATUS)
             IF (IOSTATUS .NE. 0) THEN
