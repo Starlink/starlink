@@ -162,23 +162,23 @@
 
 ****************************************************************************
 
-*   Changes undertaken to make this run under UNIX
+*     Changes undertaken to make this run under UNIX
 
-*  1) Output files opened as STATUS='UNKNOWN'
-*  2) CHEBY common block renamed CHEBYBLK (clashes with CHEBY sub)
-*  3) Function RJDATE defined as RJDATE () not RJDATE
-*  4) UKT14.DAT now opened on unit 21 NOT unit 5!! This screwed up STDIN
-*  5) Subroutine SPLIT re-written to use internal writes NOT for$cnv_out!
-*  6) LIB$DATE_TIME replaced with call to gmtime()
-*  6a) the to-UT code no longer necessary
-*  6b) Renamed TIME common block as TIMEBLK as clashed with time()
-*  7) The CHEBY data files converted to Sun binary - used all 16 decimal places
+*     1) Output files opened as STATUS='UNKNOWN'
+*     2) CHEBY common block renamed CHEBYBLK (clashes with CHEBY sub)
+*     3) Function RJDATE defined as RJDATE () not RJDATE
+*     4) UKT14.DAT now opened on unit 21 NOT unit 5!! This screwed up STDIN
+*     5) Subroutine SPLIT re-written to use internal writes NOT for$cnv_out!
+*     6) LIB$DATE_TIME replaced with call to gmtime()
+*     6a) the to-UT code no longer necessary
+*     6b) Renamed TIME common block as TIMEBLK as clashed with time()
+*     7) The CHEBY data files converted to Sun binary - used all 16 decimal places
 
 ****************************************************************************
 
       IMPLICIT NONE
 
-*   Variables:
+*  Variables:
       INTEGER      NDAYS(12),DATE
       CHARACTER*3  SYSMO(12),CMON
       CHARACTER*2  SYSMON(12)
@@ -212,14 +212,14 @@
       INTEGER CHR_LEN
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'MSG_PAR'               ! Msg constants
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'MSG_PAR'         ! Msg constants
 
 *  Status:
-      INTEGER STATUS                  ! Global status
-      INTEGER IOSTATUS                ! For OPEN command
+      INTEGER STATUS            ! Global status
+      INTEGER IOSTATUS          ! For OPEN command
 
-C For the time
+C     For the time
       INTEGER WDAY
       INTEGER TSTRCT
       INTEGER YDAY
@@ -237,7 +237,7 @@ C For the time
 
       DATA R,PI/0.0174532925D0,3.141592654D0/
 
-*   Common blocks:
+*  Common blocks:
       COMMON /TIMEBLK/IY,M,ID,IH,IM,IS
       COMMON /TIMEBLK2/S
       COMMON /TIMEBLK3/CMON
@@ -247,31 +247,32 @@ C For the time
 
       COMMON/INPUT/LUP,PLANET
       COMMON /TELESCOPE/TLONG,TLAT,THEIGHT,TNAME,TFULLNAME
+*.
 
-*   Check the inherited global status.
+*     Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
-*   Initialise values.
+*     Initialise values.
       NF =8
       RAD=PI/180.0D0
       FIOD=7
 
       LSTAT = SAI__OK
 
-*   Populate the telescope details common block. We use a common
-*   block since 1) the numbers were originally in the code twice
-*   2) that seems to be the fluxes style 3) we may want to allow
-*   a parameter to control the telescope position
+*     Populate the telescope details common block. We use a common
+*     block since 1) the numbers were originally in the code twice
+*     2) that seems to be the fluxes style 3) we may want to allow
+*     a parameter to control the telescope position
       TNAME = 'JCMT'
       CALL SLA_OBS(-1,TNAME,TFULLNAME,TLONG,TLAT,THEIGHT)
       TLONG = -1.0D0 * TLONG
 
-*   Tell the user we are running.
+*     Tell the user we are running.
       CALL MSG_BLANK(STATUS)
       CALL MSG_OUTIF(MSG__NORM, ' ','JCMT FLUXES',STATUS)
       CALL MSG_BLANK(STATUS)
 
-*   Zero out parameters
+*     Zero out parameters
       CALL PAR_PUT0R('F_CENTRE', -1.0, STATUS)
       CALL PAR_PUT0R('F_WIDTH', -1.0, STATUS)
       CALL PAR_PUT0R('F_TOTAL', -1.0, STATUS)
@@ -283,45 +284,45 @@ C For the time
       CALL PAR_PUT0R('SOLID_ANG', -1.0, STATUS)
       CALL PAR_PUT0R('SEMI_DIAM', -1.0, STATUS)
 
-*   Look for the environmental variable
-*   dealing with the .DAT files and grab the name.
+*     Look for the environmental variable
+*     dealing with the .DAT files and grab the name.
       CALL PSX_GETENV('FLUXES',PATH,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-*  Find its length.
+*     Find its length.
       LPATH=CHR_LEN(PATH)
 
-*   Planetary data?
+*     Planetary data?
       CALL PAR_GET0L('POS',POS,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*   Flux data?
+*     Flux data?
       CALL PAR_GET0L('FLU',FLU,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*   Check inputs so far.
+*     Check inputs so far.
       IF ((.NOT.FLU).AND.(.NOT.POS)) THEN
-	 CALL MSG_OUT(' ',
+         CALL MSG_OUT(' ',
      :        'No output requested. Exiting program.',STATUS)
-	 GOTO 9999
+         GOTO 9999
       END IF
 
-*   Display on terminal?
+*     Display on terminal?
  401  CALL MSG_BLANK(STATUS)
       CALL PAR_GET0L('SCREEN',SCREEN,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*   Save to a file?
+*     Save to a file?
       CALL PAR_GET0L('OFL',OFL,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*   Get file name.
+*     Get file name.
       IF (OFL) THEN
 
-*      Open the output file.
+*     Open the output file.
          OPENF=.FALSE.
          CALL ERR_MARK
          CALL FLU_AIF_ASFIO('OUTFILE','APPEND','LIST',80,
-     :                      FIOD,OPENF,EXCLAIM,STATUS)
+     :        FIOD,OPENF,EXCLAIM,STATUS)
          IF(STATUS.NE.SAI__OK) THEN
             CALL ERR_REP(' ',
      :           'Problems opening an output file',STATUS)
@@ -330,37 +331,37 @@ C For the time
          END IF
          CALL FIO_FNAME(FIOD,OUTFILE,STATUS)
 
-*      Tell the user that the file name is duff.
+*     Tell the user that the file name is duff.
          IF ((.NOT.OPENF).AND.(.NOT.EXCLAIM)) THEN
             CALL ERR_REP(' ','Bad file name.',STATUS)
             CALL ERR_REP(' ','To quit, type !',STATUS)
             CALL ERR_ANNUL(STATUS)
          END IF
 
-*      Cancel the error context and abort if the STATUS is bad.
+*     Cancel the error context and abort if the STATUS is bad.
          CALL ERR_RLSE
          IF (STATUS.NE.SAI__OK) GOTO 9999
          IF (EXCLAIM) GOTO 9999
 
-*      Tell the user.
-	 STRING='Data will be written to file: '//OUTFILE
+*     Tell the user.
+         STRING='Data will be written to file: '//OUTFILE
          I=CHR_LEN(STRING)
-	 CALL MSG_BLANK(STATUS)
-	 CALL MSG_OUT(' ',STRING(1:I),STATUS)
+         CALL MSG_BLANK(STATUS)
+         CALL MSG_OUT(' ',STRING(1:I),STATUS)
 
       ENDIF
 
-*   Check inputs so far. - this check removed now that it is possible
-*   to store the results to parameters as well
-*      IF((.NOT.SCREEN).AND.(.NOT.OFL)) THEN
-*	 CALL MSG_OUT(' ',
+*     Check inputs so far. - this check removed now that it is possible
+*     to store the results to parameters as well
+*     IF((.NOT.SCREEN).AND.(.NOT.OFL)) THEN
+*     CALL MSG_OUT(' ',
 *     :        'No output direction specified. Try again.',STATUS)
-*	 GOTO 401
-*      END IF
-*      CALL MSG_BLANK(STATUS)
+*     GOTO 401
+*     END IF
+*     CALL MSG_BLANK(STATUS)
 
-*   Read in date for which fluxes of planetary calibrators are
-*   required -- see ephemeris B8 et seq.
+*     Read in date for which fluxes of planetary calibrators are
+*     required -- see ephemeris B8 et seq.
       IP=0
       IC=0
       REPEAT = .FALSE.
@@ -369,99 +370,99 @@ C For the time
 
  1000 IC=IC+1
       IF (IC.NE.1) THEN
-	 CALL PAR_CANCL('PREVUT',STATUS)
-	 CALL PAR_GET0L('PREVUT',REPEAT,STATUS)
-	 IF (.NOT.REPEAT) THEN
-	    CALL PAR_CANCL('NOW',STATUS)
-	    CALL PAR_GET0L('NOW',CURT,STATUS)
-	 END IF
+         CALL PAR_CANCL('PREVUT',STATUS)
+         CALL PAR_GET0L('PREVUT',REPEAT,STATUS)
+         IF (.NOT.REPEAT) THEN
+            CALL PAR_CANCL('NOW',STATUS)
+            CALL PAR_GET0L('NOW',CURT,STATUS)
+         END IF
       ELSE
-	 CALL PAR_GET0L('NOW',CURT,STATUS)
+         CALL PAR_GET0L('NOW',CURT,STATUS)
       END IF
       IF (STATUS.NE.SAI__OK) GOTO 9999
       IF (SCREEN) CALL MSG_BLANK(STATUS)
 
-*   Avoid next section if want to use old date.
+*     Avoid next section if want to use old date.
       IF (.NOT.REPEAT) THEN
 
-*      Find out the time/date required.
-	 IF ( (.NOT.CURT) ) THEN
+*     Find out the time/date required.
+         IF ( (.NOT.CURT) ) THEN
 
-*         Date section
+*     Date section
 
-*         Bypass input system if current value is to be used.
+*     Bypass input system if current value is to be used.
 
-	    IF (.NOT. CURT) THEN
+            IF (.NOT. CURT) THEN
 
-*            Get input string.
+*     Get input string.
  2             IF (IC .NE. 1) CALL PAR_CANCL('DATE',STATUS)
-	       CALL PAR_GET0C('DATE',ALINE,STATUS)
-	       IF(STATUS.NE.SAI__OK) GOTO 9999
+               CALL PAR_GET0C('DATE',ALINE,STATUS)
+               IF(STATUS.NE.SAI__OK) GOTO 9999
 
-*            Remove leading blanks and clean.
-	       CALL CHR_LDBLK(ALINE)
-	       CALL CHR_CLEAN(ALINE)
+*     Remove leading blanks and clean.
+               CALL CHR_LDBLK(ALINE)
+               CALL CHR_CLEAN(ALINE)
 
-*            Break up string to get M, ID, Y.
-	       CALL CHR_DCWRD(ALINE,3,I,START,ASTOP,WORDS,LSTAT)
-	       IF(STATUS.NE.SAI__OK) GOTO 9999
+*     Break up string to get M, ID, Y.
+               CALL CHR_DCWRD(ALINE,3,I,START,ASTOP,WORDS,LSTAT)
+               IF(STATUS.NE.SAI__OK) GOTO 9999
 
-*            Set values for ID, M, IY.
-	       IF ((I.EQ.3).AND.(LSTAT.EQ.SAI__OK)) THEN
-		  CALL CHR_CTOI(WORDS(1),ID,STATUS)
-		  CALL CHR_CTOI(WORDS(2), M,STATUS)
-		  CALL CHR_CTOI(WORDS(3),IY,STATUS)
-	       END IF
+*     Set values for ID, M, IY.
+               IF ((I.EQ.3).AND.(LSTAT.EQ.SAI__OK)) THEN
+                  CALL CHR_CTOI(WORDS(1),ID,STATUS)
+                  CALL CHR_CTOI(WORDS(2), M,STATUS)
+                  CALL CHR_CTOI(WORDS(3),IY,STATUS)
+               END IF
 
-*             Testing the date is sensible
-	       IF (I.NE.3.OR.LSTAT.NE.SAI__OK
+*     Testing the date is sensible
+               IF (I.NE.3.OR.LSTAT.NE.SAI__OK
      :              .OR.ID.LT.1.OR.ID.GT.31.OR.M.LT.1.OR.M.GT.12
      :              .OR.IY.LT.0.OR.IY.GT.99) THEN
 
-		  IF (IY.LT.0 .OR. IY.GT.99) THEN
-		     CALL MSG_OUT(' ',
+                  IF (IY.LT.0 .OR. IY.GT.99) THEN
+                     CALL MSG_OUT(' ',
      :                    'YEAR OUT OF RANGE 1950-2050!',STATUS)
-		  ELSE
-		     CALL MSG_OUT(' ','ERROR INTERPRETING DATE',
-     :                     STATUS)
-		  END IF
+                  ELSE
+                     CALL MSG_OUT(' ','ERROR INTERPRETING DATE',
+     :                    STATUS)
+                  END IF
                   IC = IC + 1
-		  GOTO 2
+                  GOTO 2
 
-	       END IF
+               END IF
 
-*            Take next century into account.
+*     Take next century into account.
                IF(IY.LE.49) THEN
                   IY=IY+2000
                ELSE
-	          IY=IY+1900
+                  IY=IY+1900
                END IF
-	       CMON=SYSMO(M)
+               CMON=SYSMO(M)
 
-	    END IF
+            END IF
 
-*         Time section
+*     Time section
 
-*         Bypass input system if current value is to be used.
+*     Bypass input system if current value is to be used.
 
-	    IF (.NOT. CURT) THEN
+            IF (.NOT. CURT) THEN
 
-*            Get input string.
+*     Get input string.
  3             IF (IC.NE.1) CALL PAR_CANCL('TIME',STATUS)
-	       CALL PAR_GET0C('TIME',ALINE,STATUS)
-	       IF(STATUS.NE.SAI__OK) GOTO 9999
+               CALL PAR_GET0C('TIME',ALINE,STATUS)
+               IF(STATUS.NE.SAI__OK) GOTO 9999
 
-*            Remove leading blanks and clean.
-	      CALL CHR_LDBLK(ALINE)
-	      CALL CHR_CLEAN(ALINE)
+*     Remove leading blanks and clean.
+               CALL CHR_LDBLK(ALINE)
+               CALL CHR_CLEAN(ALINE)
 
-*            Break up string to get IH, IM, S.
-	      CALL CHR_DCWRD(ALINE,3,I,START,ASTOP,WORDS,LSTAT)
-	      IF (STATUS.NE.SAI__OK) GOTO 9999
+*     Break up string to get IH, IM, S.
+               CALL CHR_DCWRD(ALINE,3,I,START,ASTOP,WORDS,LSTAT)
+               IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*            Set values for IH, IM, S.
-*            Assume S is 0 if only 2 entries supplied
-*            Similarly for IM if only one is supplied
+*     Set values for IH, IM, S.
+*     Assume S is 0 if only 2 entries supplied
+*     Similarly for IM if only one is supplied
                IF (LSTAT .EQ. SAI__OK) THEN
 
                   IF (I.EQ.3) THEN
@@ -485,40 +486,40 @@ C For the time
                      IH = 0
                   END IF
 
-	       END IF
+               END IF
 
-*            Test the time value.
-	       IF (IH.LT.0.OR.IH.GT.23.OR.IM.LT.0.OR.IM.GT.59
-     :            .OR. S.LT.0.0D0 .OR. S.GE.60.D0) THEN
-		  CALL MSG_OUT(' ',
-     :            'ERROR INTERPRETING TIME',STATUS)
+*     Test the time value.
+               IF (IH.LT.0.OR.IH.GT.23.OR.IM.LT.0.OR.IM.GT.59
+     :              .OR. S.LT.0.0D0 .OR. S.GE.60.D0) THEN
+                  CALL MSG_OUT(' ',
+     :                 'ERROR INTERPRETING TIME',STATUS)
                   IC = IC + 1
-		  GOTO 3
-	       END IF
+                  GOTO 3
+               END IF
 
-	    END IF
+            END IF
 
-	 ELSE
+         ELSE
 
-*         Get UT time/date from computer. This section
-*         modified during the Linux port removing
-*         TIME() and GMTIME() calls. [but there is no PSX GMTIME
-*         so have to leave GMTIME in.
+*     Get UT time/date from computer. This section
+*     modified during the Linux port removing
+*     TIME() and GMTIME() calls. [but there is no PSX GMTIME
+*     so have to leave GMTIME in.
 
-C  The system time in seconds
+C     The system time in seconds
             CALL PSX_TIME(NTICKS,STATUS)
 
 
-*  We now need the GM time.
+*     We now need the GM time.
             CALL PSX_GMTIME(NTICKS, IS, IM, IH, ID, M, IY,
-     :                      WDAY, YDAY, TSTRCT, STATUS)
+     :           WDAY, YDAY, TSTRCT, STATUS)
 
             IY = IY + 1900
             M  =  M + 1
             S  = DBLE(IS)
             CMON=SYSMO(M)
 
-	 ENDIF
+         ENDIF
 
       END IF
 
@@ -548,7 +549,7 @@ C  The system time in seconds
             ENDIF
          ENDDO
          IF(.NOT. VALID) THEN
- 220        CALL MSG_OUT(' ','Invalid body name!',STATUS)
+ 220        CALL MSG_OUT(' ','Invalid body name !',STATUS)
             CALL PAR_CANCL('PLANET',STATUS)
             GOTO 210
          ENDIF
@@ -559,9 +560,9 @@ C  The system time in seconds
 
 *     Read filter file.
       IF (FLU) THEN
-	 DATE=10000*(IY-1900)+100*M+ID
+         DATE=10000*(IY-1900)+100*M+ID
 
-*      Get an unused unit number.
+*     Get an unused unit number.
          CALL FIO_GUNIT(FIOD2,STATUS)
 
 *     Open the file. This is fatal if they can not be opened.
@@ -605,48 +606,48 @@ C  The system time in seconds
                GOTO 9999
             END IF
          ENDIF
-   	 READ(FIOD2,122) NF
+         READ(FIOD2,122) NF
  122     FORMAT(29X,I2)
-	 READ(FIOD2,322) DUMMY
-	 READ(FIOD2,322) DUMMY
+         READ(FIOD2,322) DUMMY
+         READ(FIOD2,322) DUMMY
  322     FORMAT(A10)
-	 DO II=1,15
-	    READ(FIOD2,123)KK,FILT,FREQUENCY,WIDTH,BW
+         DO II=1,15
+            READ(FIOD2,123)KK,FILT,FREQUENCY,WIDTH,BW
  123        FORMAT(I3,2X,A10,2X,2(F7.1),F6.1)
-	    FNAME(II)=FILT
-	    FREQ(II,1)=FREQUENCY
-	    FREQ(II,2)=WIDTH
-	    HPBW(II)=BW
-	 ENDDO
-	 DO JJ=1,4
-	    READ(FIOD2,322)DUMMY
-	 ENDDO
-	 READ(FIOD2,124) FPLAN
+            FNAME(II)=FILT
+            FREQ(II,1)=FREQUENCY
+            FREQ(II,2)=WIDTH
+            HPBW(II)=BW
+         ENDDO
+         DO JJ=1,4
+            READ(FIOD2,322)DUMMY
+         ENDDO
+         READ(FIOD2,124) FPLAN
  124     FORMAT(15X,5(A7,6X))
-	 DO JJ=1,15
-	    READ(FIOD2,125)FILT,(TBNORM(JJ,II),ERROR(JJ,II),II=4,8)
+         DO JJ=1,15
+            READ(FIOD2,125)FILT,(TBNORM(JJ,II),ERROR(JJ,II),II=4,8)
  125        FORMAT(1X,A10,5(2(F6.1),1X))
-	 ENDDO
-	 DO I=1,50
-	    READ(FIOD2,'(A79)',END=127)NOTE(I)
-	    INOTE=I
-	 ENDDO
+         ENDDO
+         DO I=1,50
+            READ(FIOD2,'(A79)',END=127)NOTE(I)
+            INOTE=I
+         ENDDO
  127     CONTINUE
 
-*      Close the unit and return the number for later use.
-	 CLOSE(FIOD2)
+*     Close the unit and return the number for later use.
+         CLOSE(FIOD2)
          CALL FIO_PUNIT(FIOD2,STATUS)
 
-*      Now make sure that the planets read from the file are indeed
-*      Mars through Neptune.
+*     Now make sure that the planets read from the file are indeed
+*     Mars through Neptune.
          DO II=LUP(4),LUP(8)
             BODY = FPLAN(II-3)
             CALL CHR_UCASE(BODY)
             IF (PLANET(II)(1:4) .NE. BODY(1:4)) THEN
                STATUS = SAI__ERROR
                CALL MSG_OUT(' ',
-     :         'FATAL: PLANET sequence not MARS-NEPTUNE in flux file.',
-     :              STATUS)
+     :              'FATAL: PLANET sequence not MARS-NEPTUNE'//
+     :              ' in flux file.', STATUS)
                GOTO 9999
             END IF
          ENDDO
@@ -690,7 +691,8 @@ C  The system time in seconds
                   VALID   = .TRUE.
                ELSE
                   CALL MSG_SETC('FILT', REQFILT)
-                  CALL MSG_OUT(' ','Invalid filter name!: ^FILT',STATUS)
+                  CALL MSG_OUT(' ','Invalid filter name !: ^FILT',
+     :                 STATUS)
                   CALL PAR_CANCL('FILTER',STATUS)
                   GOTO 260
                END IF
@@ -700,148 +702,148 @@ C  The system time in seconds
       ENDIF
 
 
-*   For fluxes calculation, obtain Martian brightness temperature.
+*     For fluxes calculation, obtain Martian brightness temperature.
       IF (FLU) CALL TB350(RJD,TB857,STATUS)
 
-*   Print out the datetime and topocentric planetary positions.
+*     Print out the datetime and topocentric planetary positions.
 
       CALL TOPEPH(REQBODY,RA,DEC,GD,RJD,STATUS)
 
-*   Do not do if fluxes not needed.
+*     Do not do if fluxes not needed.
       IF (FLU) THEN
 
-   	 IF (POS) IP=1
-	 POS = .FALSE.
+         IF (POS) IP=1
+         POS = .FALSE.
 
-*      For planet (or planets in turn) work out solid angle,
-*      integrated and beam-corrected flux densities.
+*     For planet (or planets in turn) work out solid angle,
+*     integrated and beam-corrected flux densities.
 
-*      --------------------------------------------------------------------
-*      NOTE: FLUX DATA IS ONLY AVAILABLE FOR MARS (4) THROUGH  NEPTUNE (8).
-*            Make sure loop does not execute for other planets!
-*      --------------------------------------------------------------------
+*     --------------------------------------------------------------------
+*     NOTE: FLUX DATA IS ONLY AVAILABLE FOR MARS (4) THROUGH  NEPTUNE (8).
+*     Make sure loop does not execute for other planets!
+*     --------------------------------------------------------------------
 
          IR = -1
          IF(REQBODY.EQ.'ALL') THEN
-           IQ = LUP(4)
-           IR = LUP(8)
+            IQ = LUP(4)
+            IR = LUP(8)
          ELSE IF (IQ .GE. LUP(4) .AND. IQ .LE. LUP(8)) THEN
-           IR = IQ
+            IR = IQ
          ENDIF
 
- 	 DO J=IQ,IR
+         DO J=IQ,IR
 
-*         Display heading on screen or file.
+*     Display heading on screen or file.
 
-*         Planet name
+*     Planet name
             STRING2=PLANET(J)
 
-*         Screen/file.
+*     Screen/file.
             IF (SCREEN) THEN
-   	       CALL MSG_BLANK(STATUS)
                CALL MSG_BLANK(STATUS)
-	       CALL MSG_OUT(' ',STRING2(1:80),STATUS)
-	    END IF
-	    IF(OFL) THEN
+               CALL MSG_BLANK(STATUS)
+               CALL MSG_OUT(' ',STRING2(1:80),STATUS)
+            END IF
+            IF(OFL) THEN
                CALL FIO_WRITE(FIOD,' ',STATUS)
                CALL FIO_WRITE(FIOD,' ',STATUS)
                CALL FIO_WRITE(FIOD,STRING2(1:80),STATUS)
-	    END IF
+            END IF
 
-*         Obtain Apparent Geocentric Right Ascension Declination and
-*         True Distance of the planet
+*     Obtain Apparent Geocentric Right Ascension Declination and
+*     True Distance of the planet
 
-	    CALL GEOEPH(J,RA,DEC,GD,RJD,STATUS)
+            CALL GEOEPH(J,RA,DEC,GD,RJD,STATUS)
             CALL SOLIDANGLE(J,RJD,RA,DEC,GD,OMEGA,STATUS)
 
-	    IF(PLANET(J)(1:4).EQ.'MARS') THEN
+            IF(PLANET(J)(1:4).EQ.'MARS') THEN
 
-*            Use geocentric position of Mars and the Sun to calculate the
-*            heliocentric distance of Mars
+*     Use geocentric position of Mars and the Sun to calculate the
+*     heliocentric distance of Mars
 
-	       CALL GEOEPH(1,SRA,SDEC,SGD,RJD,STATUS)
+               CALL GEOEPH(1,SRA,SDEC,SGD,RJD,STATUS)
 
-*            Finds the heliocentric distance of a body from its
-*            geocentric postion and the geocentric position of the Sun.
+*     Finds the heliocentric distance of a body from its
+*     geocentric postion and the geocentric position of the Sun.
 
-	       COSE = DSIN(DEC*R)*DSIN(SDEC*R) + DCOS(DEC*R)
-     :                *DCOS(SDEC*R)*DCOS((SRA-RA)*R)
+               COSE = DSIN(DEC*R)*DSIN(SDEC*R) + DCOS(DEC*R)
+     :              *DCOS(SDEC*R)*DCOS((SRA-RA)*R)
                HD = DSQRT(GD*GD + SGD*SGD - 2.0D0*GD*SGD*COSE)
 
-*            Calculate the 3.33 millimetre brightness temperature of Mars
-*            for day in question (following Ulich's work)
+*     Calculate the 3.33 millimetre brightness temperature of Mars
+*     for day in question (following Ulich's work)
 
-	       TB90 = 206.8D0*DSQRT(1.524D0/HD)
-	       DIFF = (TB857-TB90)/(DLOG(GHZ857)-DLOG(GHZ90))
+               TB90 = 206.8D0*DSQRT(1.524D0/HD)
+               DIFF = (TB857-TB90)/(DLOG(GHZ857)-DLOG(GHZ90))
 
-*            Interpolate to get Martian brightness temperatures at effective
-*            frequencies of NF filters
+*     Interpolate to get Martian brightness temperatures at effective
+*     frequencies of NF filters
 
 
-*            Do a logarithmic interpolation between two points.
+*     Do a logarithmic interpolation between two points.
 
-	       DO I=1,NF
-		  TBNORM(I,4) = TB90 + DIFF*(DLOG(FREQ(I,1))
-     :                          -DLOG(GHZ90))
-	       ENDDO
-
-	    ENDIF
-
-       	    IF (PLANET(J)(1:4).EQ.'MARS') THEN
-               DO I = 1,NF
-		  ERROR(I,4) = 0.0D0
+               DO I=1,NF
+                  TBNORM(I,4) = TB90 + DIFF*(DLOG(FREQ(I,1))
+     :                 -DLOG(GHZ90))
                ENDDO
-	    ENDIF
-	    DO I = 1,NF
-	       TB(I) = TBNORM(I,LUP(J))
-	       ER(I) = ERROR(I,LUP(J))
-	    ENDDO
-	    CALL PBFLUX(OMEGA,FREQ,TB,RAD,HPBW,NF,FNAME,ER,
-     :                  REQFILT,PLANET(J),STATUS)
 
-	 ENDDO
+            ENDIF
+
+            IF (PLANET(J)(1:4).EQ.'MARS') THEN
+               DO I = 1,NF
+                  ERROR(I,4) = 0.0D0
+               ENDDO
+            ENDIF
+            DO I = 1,NF
+               TB(I) = TBNORM(I,LUP(J))
+               ER(I) = ERROR(I,LUP(J))
+            ENDDO
+            CALL PBFLUX(OMEGA,FREQ,TB,RAD,HPBW,NF,FNAME,ER,
+     :           REQFILT,PLANET(J),STATUS)
+
+         ENDDO
 
       END IF
 
-*   Loop again?
+*     Loop again?
       IF (IP.EQ.1) POS=.TRUE.
       IF (SCREEN) CALL MSG_BLANK(STATUS)
 
-*   Cancel loop again parameters if not first time through..
-*   Needed for the FLUXNOW version.
+*     Cancel loop again parameters if not first time through..
+*     Needed for the FLUXNOW version.
       IF(IC.NE.1) CALL PAR_CANCL('APASS',STATUS)
       CALL PAR_GET0L('APASS',APASS,STATUS)
 
-*   Cancel planet selection.
+*     Cancel planet selection.
       CALL PAR_CANCL('PLANET',STATUS)
       IF (SCREEN) CALL MSG_BLANK(STATUS)
 
-*   Cancel filter selection.
+*     Cancel filter selection.
       CALL PAR_CANCL('FILTER',STATUS)
       IF (SCREEN) CALL MSG_BLANK(STATUS)
 
       IF (APASS) GOTO 1000
 
-*   Write the user notes at the end of the file.
+*     Write the user notes at the end of the file.
       IF (OFL) THEN
          DO I=1,INOTE
             CALL MSG_FMTC('P1','A79',NOTE(I))
-	    CALL MSG_LOAD(' ','^P1',STRING2,JUNK,STATUS)
+            CALL MSG_LOAD(' ','^P1',STRING2,JUNK,STATUS)
             CALL FIO_WRITE(FIOD,STRING2(1:80),STATUS)
-	 ENDDO
+         ENDDO
       ENDIF
 
 
-*   Close down the output device.
+*     Close down the output device.
  999  CONTINUE
 
-*   Message to tell the user what file to look in.
+*     Message to tell the user what file to look in.
       IF (OFL) THEN
          CALL FIO_CLOSE(FIOD,STATUS)
          IF (SCREEN) THEN
             CALL MSG_BLANK(STATUS)
             I=CHR_LEN(STRING1)
-	    STRING1='File output is in this directory.'//
+            STRING1='File output is in this directory.'//
      :           ' See file: '//OUTFILE
             CALL MSG_OUT(' ',STRING1(1:I),STATUS)
             CALL MSG_BLANK(STATUS)
@@ -850,16 +852,16 @@ C  The system time in seconds
 
  9999 CONTINUE
 
-*   Reset the current directory
+*     Reset the current directory
       END
 
 
 ****************************************************************************
 
       SUBROUTINE PBFLUX(OMEGA,FREQ,TB,RAD,HPBW,NF,FNAME,ER,
-     :                  FILTER,BODY,STATUS)
+     :     FILTER,BODY,STATUS)
 
-*     Purpose:
+*  Purpose:
 *     Calculate integrated flux densities of planet at earth
 *     and beam-corrected flux densities of planet at earth
 *     for NF frequencies.
@@ -868,7 +870,7 @@ C  The system time in seconds
 
       IMPLICIT NONE
 
-*   Variables:
+*  Variables:
       DOUBLE PRECISION DENOM, ER(15), FLUX(15), FLUXBC(15), FREQ(15,2),
      :     HPBW(15), OMEGA, RAD, RATIO, TB(15)
 
@@ -880,53 +882,53 @@ C  The system time in seconds
 
       LOGICAL FLU,OFL,POS,SCREEN
 
-*   Common blocks:
+*  Common blocks:
       COMMON /OUTPUT/FIOD,SCREEN,POS,FLU,OFL
       COMMON /OUTPUT2/OUTFILE
 
       COMMON/INPUT/LUP,PLANET
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
 
 *  Status:
-      INTEGER STATUS                  ! Global status
+      INTEGER STATUS            ! Global status
+*.
 
-
-*   Check the inherited global status.
+*     Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
       NP=NF
 
       DO I=1,NP
-	 DENOM = DEXP(0.04799D0*FREQ(I,1)/TB(I))-1.0D0
-	 FLUX(I) = 1.475D3*OMEGA*(FREQ(I,1)**3)/DENOM
-	 RATIO = 1.133D0*(HPBW(I)*RAD/3600.0D0)**2/OMEGA
-	 FLUXBC(I) = RATIO*FLUX(I)*(1.0D0-DEXP(-1.0D0/RATIO))
+         DENOM = DEXP(0.04799D0*FREQ(I,1)/TB(I))-1.0D0
+         FLUX(I) = 1.475D3*OMEGA*(FREQ(I,1)**3)/DENOM
+         RATIO = 1.133D0*(HPBW(I)*RAD/3600.0D0)**2/OMEGA
+         FLUXBC(I) = RATIO*FLUX(I)*(1.0D0-DEXP(-1.0D0/RATIO))
       ENDDO
 
 *     Output integrated and beam-corrected flux densities for six
 *     frequencies
 
       HEAD1='Filter    Centre   Filter   Total    Flux in  '//
-     :      '  Brightness         HPBW'
+     :     '  Brightness         HPBW'
       HEAD2='Wavel.     Freq     Width    Flux     beam '//
-     :      '     Temperature       assumed'
+     :     '     Temperature       assumed'
       HEAD3='micron     (GHz)    (GHz)    (Jy)      (Jy)'//
-     :      '         (K)          (arcsecs)'
+     :     '         (K)          (arcsecs)'
 
-*   Screen.
+*     Screen.
       IF (SCREEN) THEN
-	 CALL MSG_OUT(' ',HEAD1,STATUS)
-	 CALL MSG_OUT(' ',HEAD2,STATUS)
-	 CALL MSG_OUT(' ',HEAD3,STATUS)
+         CALL MSG_OUT(' ',HEAD1,STATUS)
+         CALL MSG_OUT(' ',HEAD2,STATUS)
+         CALL MSG_OUT(' ',HEAD3,STATUS)
       END IF
 
-*   File.
+*     File.
       IF (OFL) THEN
-	 CALL FIO_WRITE(FIOD,HEAD1,STATUS)
-	 CALL FIO_WRITE(FIOD,HEAD2,STATUS)
-	 CALL FIO_WRITE(FIOD,HEAD3,STATUS)
+         CALL FIO_WRITE(FIOD,HEAD1,STATUS)
+         CALL FIO_WRITE(FIOD,HEAD2,STATUS)
+         CALL FIO_WRITE(FIOD,HEAD3,STATUS)
       END IF
 
       CALL PAR_PUT0R('F_CENTRE', -1.0, STATUS)
@@ -940,7 +942,7 @@ C  The system time in seconds
 *     Suppress the 600 micron (np=6) output for Jupiter (j=5) and Saturn (j=6)
       DO I = 1,NP
 
-	 FILT=FNAME(I)(1:4)
+         FILT=FNAME(I)(1:4)
          CALL CHR_UCASE(FILT)
          IF(FILTER .EQ. 'ALL' .OR. FILT(1:4).EQ.FILTER(1:4)) THEN
 
@@ -951,7 +953,7 @@ C  The system time in seconds
 
             ELSE
 
-*         Create output string.
+*     Create output string.
                CALL CHR_CTOI(FNAME(I),K,STATUS)
 
                IF (FILTER .NE. 'ALL') THEN
@@ -979,8 +981,8 @@ C  The system time in seconds
             ENDIF
 
 *     Write the output.
-               IF (SCREEN) CALL MSG_OUT(' ',STRING2,STATUS)
-               IF (OFL)    CALL FIO_WRITE(FIOD,STRING2,STATUS)
+            IF (SCREEN) CALL MSG_OUT(' ',STRING2,STATUS)
+            IF (OFL)    CALL FIO_WRITE(FIOD,STRING2,STATUS)
 
          ENDIF
 
@@ -996,7 +998,7 @@ C  The system time in seconds
 
       SUBROUTINE SOLIDANGLE(J,RJD,RA,DEC,GD,OMEGA,STATUS)
 
-*     Purpose:
+*  Purpose:
 *     Calculate solid angle subtended by planet at Earth.
 
 *     Variable Type  Function
@@ -1012,7 +1014,7 @@ C  The system time in seconds
 
       IMPLICIT NONE
 
-*   Variables:
+*  Variables:
       DOUBLE PRECISION APPDEC,APPRA,BC,DE,DE1,DE2,DEC,DECNPJ
       DOUBLE PRECISION DECP,EPSLN(10),GD,GM,OMEGA,P,P1,PI,R
       DOUBLE PRECISION RA,RANPJ,RAP,REQ(10),RJD,SD,SDRAD
@@ -1021,17 +1023,17 @@ C  The system time in seconds
       CHARACTER*128 OUTFILE
       LOGICAL FLU, OFL, POS, SCREEN
 
-*   Common blocks:
+*  Common blocks:
       COMMON /OUTPUT/FIOD,SCREEN,POS,FLU,OFL
       COMMON /OUTPUT2/OUTFILE
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
 
 *  Status:
-      INTEGER STATUS                  ! Global status
+      INTEGER STATUS            ! Global status
 
-*   Data: (Only array items for Mars thru Neptune)
+*  Data: (Only array items for Mars thru Neptune)
       DATA REQ(4),EPSLN(4)/ 3397.D0 ,0.005D0/
       DATA REQ(5),EPSLN(5)/71495.D0 ,0.065D0/
       DATA REQ(6),EPSLN(6)/60233.D0 ,0.096D0/
@@ -1039,11 +1041,12 @@ C  The system time in seconds
       DATA REQ(8),EPSLN(8)/24760.D0 ,0.021D0/
 
       DATA R,PI/0.0174532925D0,3.141592654D0/
+*.
 
-*   Check the inherited global status.
+*     Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
-*   Only implemented at present for Mars through Neptune
+*     Only implemented at present for Mars through Neptune
       IF (J .LT. 4 .OR. J .GT. 8) RETURN
 
 *     Set up arrays of equatorial radii and flattening
@@ -1071,35 +1074,35 @@ C  The system time in seconds
 
       IF (DE.LE.0.0D0) THEN
 
-*      Calc inclination.
-	 P = DE + 1.5708D0
-	 P1= P/R
+*     Calc inclination.
+         P = DE + 1.5708D0
+         P1= P/R
 
-*      Create output string.
-	 CALL MSG_FMTD('P1','F6.2',P1)
-	 STRING1='North pole is Earth-facing; '//
-     :           'Inclination Angle = ^P1 degrees'
-	 CALL MSG_LOAD(' ',STRING1,STRING2,JUNK,STATUS)
+*     Create output string.
+         CALL MSG_FMTD('P1','F6.2',P1)
+         STRING1='North pole is Earth-facing; '//
+     :        'Inclination Angle = ^P1 degrees'
+         CALL MSG_LOAD(' ',STRING1,STRING2,JUNK,STATUS)
 
-*      Output to file and screen.
-	 IF (SCREEN) CALL MSG_OUT(' ',STRING2,STATUS)
-	 IF (OFL)    CALL FIO_WRITE(FIOD,STRING2,STATUS)
+*     Output to file and screen.
+         IF (SCREEN) CALL MSG_OUT(' ',STRING2,STATUS)
+         IF (OFL)    CALL FIO_WRITE(FIOD,STRING2,STATUS)
 
       ELSE
 
-*      Calc inclination.
-	 P = 1.5708D0 - DE
-	 P1= P/R
+*     Calc inclination.
+         P = 1.5708D0 - DE
+         P1= P/R
 
-*      Create output string.
-	 CALL MSG_FMTD('P1','F6.2',P1)
-	 STRING1='South pole is Earth-facing; '//
-     :           'Inclination Angle = ^P1 degrees'
-	 CALL MSG_LOAD(' ',STRING1,STRING2,JUNK,STATUS)
+*     Create output string.
+         CALL MSG_FMTD('P1','F6.2',P1)
+         STRING1='South pole is Earth-facing; '//
+     :        'Inclination Angle = ^P1 degrees'
+         CALL MSG_LOAD(' ',STRING1,STRING2,JUNK,STATUS)
 
-*      Output to file and screen.
-	 IF (SCREEN) CALL MSG_OUT(' ',STRING2,STATUS)
-	 IF (OFL)    CALL FIO_WRITE(FIOD,STRING2,STATUS)
+*     Output to file and screen.
+         IF (SCREEN) CALL MSG_OUT(' ',STRING2,STATUS)
+         IF (OFL)    CALL FIO_WRITE(FIOD,STRING2,STATUS)
 
       ENDIF
 
@@ -1121,20 +1124,20 @@ C  The system time in seconds
 
       OMEGA = PI*(SDRAD**2)
 
-*   Create output string.
+*     Create output string.
       CALL MSG_FMTD('P1','F5.2',SD)
       CALL MSG_FMTD('P2','1PE9.2',OMEGA)
       STRING1='Semi-diameter = ^P1 arcsecs    '//
-     :        'Solid angle = ^P2 sterads'
+     :     'Solid angle = ^P2 sterads'
       CALL MSG_LOAD(' ',STRING1,STRING2,JUNK,STATUS)
 
-*   Store parameter values
+*     Store parameter values
       CALL PAR_PUT0D('SOLID_ANG', OMEGA, STATUS)
       CALL PAR_PUT0D('SEMI_DIAM', SD, STATUS)
 
 
 
-*   Output to file and screen.
+*     Output to file and screen.
       IF (SCREEN) CALL MSG_OUT(' ',STRING2,STATUS)
       IF (OFL)    CALL FIO_WRITE(FIOD,STRING2,STATUS)
 
@@ -1145,7 +1148,7 @@ C  The system time in seconds
 
       SUBROUTINE POLEPLAN(IB,AJD,RAP,DECP)
 
-*     Purpose:
+*  Purpose:
 *     Right Ascension and Declination of the Pole of the Planets
 *     for Mean Equinox and Equator of date.
 
@@ -1165,13 +1168,13 @@ C  The system time in seconds
 
       IMPLICIT NONE
 
-*   Variables:
+*     Variables:
       DOUBLE PRECISION AJD, AZ, C, CA, CD, CT, DEC, DEC0(2,0:9), DECP,
      :     DEG, EPOCH, PC(3,6), R, RA, RA0(2,0:9), RAP, S, SA, SD,
      :     SD1, ST, T, T1, TH, TYEAR, XI, Z
       INTEGER IB
 
-*   Data:
+*     Data:
       DATA  PC/+2306.2181   D0, +2306.2181   D0 , +2004.3109   D0 ,
      :     +1.39656  D0,    +1.39656  D0 ,    -0.85330  D0 ,
      :     -0.000139 D0,    -0.000139 D0 ,    -0.000217 D0 ,
@@ -1240,10 +1243,10 @@ C  The system time in seconds
 
       SD1 = SD*CT + CD*ST*CA
       IF (DABS(SD1).LE.0.99D0) THEN
-	 DECP = DASIN(SD1)/R
+         DECP = DASIN(SD1)/R
       ELSE
-	 DECP = DACOS( DSQRT(S*S +C*C) )/R
-	 IF(SD1.LT.0.0D0) DECP = -DECP
+         DECP = DACOS( DSQRT(S*S +C*C) )/R
+         IF(SD1.LT.0.0D0) DECP = -DECP
       ENDIF
 
       END
@@ -1252,17 +1255,17 @@ C  The system time in seconds
 
       SUBROUTINE GEOEPH(NOPL,EXRA,EXDEC,DIST,RJD,STATUS)
 
-*     Purpose:
+*  Purpose:
 *     Uses calls the SLA_LIB and the JPL ephemeris to create
 *     geocentric planet coordinates.
 
-*     Modified: GJP Starlink 07 September 1996
+*  Modified: GJP Starlink 07 September 1996
 
 *************************************************************************
 
       IMPLICIT NONE
 
-*   Variables:
+*  Variables:
       INTEGER NOPL,NP,LUP(10)
       DOUBLE PRECISION EXDEC,EXRA,TDB,RAV1,DECV1,DIST
       DOUBLE PRECISION RJD
@@ -1272,28 +1275,29 @@ C  The system time in seconds
       CHARACTER *40 TFULLNAME
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
 
 *  Status:
-      INTEGER STATUS                  ! Global status
+      INTEGER STATUS            ! Global status
 
-*   Common
+*  Common
       COMMON/INPUT/LUP,PLANET
       COMMON/TELESCOPE/TLONG,TLAT,THEIGHT,TNAME,TFULLNAME
+*.
 
-*   Check the inherited global status.
+*     Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
-*   Calculate the modified time.
+*     Calculate the modified time.
       TDB=RJD
 
-*   Calculate approximate topographical positions.
+*     Calculate approximate topographical positions.
       NP=LUP(NOPL)
 
-*   Call JPL/SLA_LIB locations.
+*     Call JPL/SLA_LIB locations.
       CALL SLAJPL2(TDB,NP,TLONG,RAV1,DECV1,DIST)
 
-*   Convert radians to degrees.
+*     Convert radians to degrees.
       EXRA=RAV1  /2.d0/3.141592653d0*360.d0
       EXDEC=DECV1/2.d0/3.141592653d0*360.d0
 
@@ -1306,7 +1310,7 @@ C  The system time in seconds
 
       SUBROUTINE TOPEPH(REQBODY,EXRA,EXDEC,EXGD,RJD,STATUS)
 
-*     Purpose:
+*  Purpose:
 *     Uses calls the SLA_LIB and the JPL ephemeris to create an approximate
 *     topocentric ephemeris for the planets, moon and sun.
 
@@ -1316,7 +1320,7 @@ C  The system time in seconds
 
       IMPLICIT NONE
 
-*   Variables:
+*  Variables:
       DOUBLE PRECISION EXDEC,EXGD,EXRA
       DOUBLE PRECISION S,RJD
       INTEGER I,ID,IH,IM,IS,IQ,IR,IY,FIOD,M,JUNK,TEMPI
@@ -1329,29 +1333,29 @@ C  The system time in seconds
       INTEGER LEN,CHR_LEN
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
 
 *  Status:
-      INTEGER STATUS                  ! Global status
+      INTEGER STATUS            ! Global status
 
-       DOUBLE PRECISION PI
+      DOUBLE PRECISION PI
 
-       DOUBLE PRECISION TDB,TDB2,RAV2,DECV2,DLEN3,DLEN4
-       DOUBLE PRECISION RAV1,DECV1,DIST,TLONG,TLAT,THEIGHT
-       INTEGER NP,IVR1(4),IVR2(4),LUP(10)
-       DOUBLE PRECISION FRAC1,FRAC2,STL
-       DOUBLE PRECISION AIRM,EPOCH
-       CHARACTER *1 SIGN
-       CHARACTER *10 TNAME
-       CHARACTER *40 TFULLNAME
+      DOUBLE PRECISION TDB,TDB2,RAV2,DECV2,DLEN3,DLEN4
+      DOUBLE PRECISION RAV1,DECV1,DIST,TLONG,TLAT,THEIGHT
+      INTEGER NP,IVR1(4),IVR2(4),LUP(10)
+      DOUBLE PRECISION FRAC1,FRAC2,STL
+      DOUBLE PRECISION AIRM,EPOCH
+      CHARACTER *1 SIGN
+      CHARACTER *10 TNAME
+      CHARACTER *40 TFULLNAME
 
-*   External function.
-       DOUBLE PRECISION SLA_EPJ, SLALAST
+*  External function:
+      DOUBLE PRECISION SLA_EPJ, SLALAST
 
-*   Data:
+*  Data:
       DATA PI/3.141592654D0/
 
-*   Common blocks:
+*  Common blocks:
       COMMON /TIMEBLK/IY,M,ID,IH,IM,IS
       COMMON /TIMEBLK2/S
       COMMON /TIMEBLK3/CMON
@@ -1361,14 +1365,15 @@ C  The system time in seconds
 
       COMMON /INPUT/LUP,PLANET
       COMMON /TELESCOPE/TLONG,TLAT,THEIGHT,TNAME,TFULLNAME
+*.
 
-*   Check the inherited global status.
+*     Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
-*   Initialise flags.
+*     Initialise flags.
       ALL = .FALSE.
 
-*   Set up requested PLanets
+*     Set up requested PLanets
       LEN=CHR_LEN(REQBODY)
       IF(REQBODY.EQ.'ALL' .OR. REQBODY.EQ.'all'
      :     .OR. REQBODY.EQ. '   ') THEN
@@ -1384,7 +1389,7 @@ C  The system time in seconds
          ENDDO
       ENDIF
 
-*   Headings.
+*     Headings.
       IF ( ALL .OR. (IQ .GE. 4 .AND. IQ .LE. 8) ) THEN
          HEAD1='Planetary Submillimetre Fluxes for the JCMT'
       ELSE IF (POS) THEN
@@ -1393,7 +1398,7 @@ C  The system time in seconds
          HEAD1='Date information only for this Planet'
       ENDIF
 
-*   Create substrings.
+*     Create substrings.
       TEMPI=IH-10
       IF (TEMPI.LT.0) TEMPI=TEMPI+24
       CALL MSG_FMTI('P1','I2.2',ID)
@@ -1404,23 +1409,23 @@ C  The system time in seconds
       CALL MSG_FMTI('P6','I2.2',IS)
       CALL MSG_FMTI('P7','I2',TEMPI)
 
-*   Create header string.
+*     Create header string.
       STRING1='UT:  ^P4:^P5:^P6'//
-     :      '       UT Date:^P1-^P2-^P3'//
-     :      '   HST:^P7:^P5:^P6'
+     :     '       UT Date:^P1-^P2-^P3'//
+     :     '   HST:^P7:^P5:^P6'
       CALL MSG_LOAD(' ',STRING1,STRING2,JUNK,STATUS)
 
-*   Display.
+*     Display.
 
       IF (SCREEN) THEN
-	 CALL MSG_BLANK(STATUS)
-	 CALL MSG_OUT(' ',HEAD1,STATUS)
-	 CALL MSG_BLANK(STATUS)
-	 CALL MSG_OUT(' ',STRING2,STATUS)
-	 CALL MSG_BLANK(STATUS)
+         CALL MSG_BLANK(STATUS)
+         CALL MSG_OUT(' ',HEAD1,STATUS)
+         CALL MSG_BLANK(STATUS)
+         CALL MSG_OUT(' ',STRING2,STATUS)
+         CALL MSG_BLANK(STATUS)
       END IF
 
-*   File.
+*     File.
       IF (OFL) THEN
          CALL FIO_WRITE(FIOD,' ',STATUS)
          CALL FIO_WRITE(FIOD,HEAD1,STATUS)
@@ -1429,18 +1434,18 @@ C  The system time in seconds
          CALL FIO_WRITE(FIOD,' ',STATUS)
       ENDIF
 
-*   Calculate the modified time.[RJD now is the MJD]
+*     Calculate the modified time.[RJD now is the MJD]
       TDB=RJD
-*   And a time 1 second into the future
+*     And a time 1 second into the future
       TDB2=TDB+1.D0/86400.0D0
 
-*   Current epoch.
+*     Current epoch.
       EPOCH=SLA_EPJ(TDB)
 
-*   Call the slalib jpl routines to get the local sid. time.
+*     Call the slalib jpl routines to get the local sid. time.
       CALL SLA_DR2TF(4,SLALAST(TDB,TLONG),SIGN,IVR1)
 
-*   Create output strings.
+*     Create output strings.
       CALL MSG_FMTI('P1','I2.2',IVR1(1))
       CALL MSG_FMTI('P2','I2.2',IVR1(2))
       FRAC1=IVR1(3)+DBLE(IVR1(4))/10000.D0
@@ -1450,7 +1455,7 @@ C  The system time in seconds
       STRING1='LST: ^P1:^P2:^P3  MJD (TT): ^P4  Epoch: ^P5'
       CALL MSG_LOAD(' ',STRING1,STRING2,JUNK,STATUS)
 
-*   Create display / file headings.
+*     Create display / file headings.
       IF (SCREEN) THEN
          CALL MSG_OUT(' ',STRING2,STATUS)
          CALL MSG_BLANK(STATUS)
@@ -1461,16 +1466,16 @@ C  The system time in seconds
          CALL FIO_WRITE(FIOD,' ',STATUS)
       END IF
 
-*   Return after date info if positional data not required.
+*     Return after date info if positional data not required.
       IF (.NOT. POS) GO TO 9999
 
-*   Header strings.
+*     Header strings.
       HEAD1='Body         RA        TRIMRA         '//
-     :      'Dec       TRIMDEC        GD     AMASS'
+     :     'Dec       TRIMDEC        GD     AMASS'
       HEAD2='           (h m s)  (arcsec/sec)'//
-     :      '    (d m s)  (arcsec/sec)     (au)'
+     :     '    (d m s)  (arcsec/sec)     (au)'
 
-*   Create display / file headings.
+*     Create display / file headings.
       IF (SCREEN) THEN
          CALL MSG_OUT(' ',HEAD1,STATUS)
          CALL MSG_OUT(' ',HEAD2,STATUS)
@@ -1481,57 +1486,57 @@ C  The system time in seconds
          CALL FIO_WRITE(FIOD,HEAD2,STATUS)
       END IF
 
-*   Loop through all objects.
+*     Loop through all objects.
       DO 100 I=IQ,IR
 
-*      Ensure that values come out in expected order.
-	 NP=LUP(I)
+*     Ensure that values come out in expected order.
+         NP=LUP(I)
 
-*      Call the slalib jpl routines.
-	 CALL SLAJPL(TDB,NP,TLONG,TLAT,THEIGHT,
-     :               RAV1,DECV1,DIST,STL,AIRM)
+*     Call the slalib jpl routines.
+         CALL SLAJPL(TDB,NP,TLONG,TLAT,THEIGHT,
+     :        RAV1,DECV1,DIST,STL,AIRM)
 
-*      Convert radians to hh mm ss and dd mm ss.
-	 CALL SLA_DR2TF(4,RAV1,SIGN,IVR1)
-	 CALL SLA_DR2AF(4,DECV1,SIGN,IVR2)
+*     Convert radians to hh mm ss and dd mm ss.
+         CALL SLA_DR2TF(4,RAV1,SIGN,IVR1)
+         CALL SLA_DR2AF(4,DECV1,SIGN,IVR2)
 
-*      Convert secs and fractional secs to a double precision for printing.
-	 FRAC1=IVR1(3)+DBLE(IVR1(4))/10000.D0
-	 FRAC2=IVR2(3)+DBLE(IVR2(4))/10000.D0
+*     Convert secs and fractional secs to a double precision for printing.
+         FRAC1=IVR1(3)+DBLE(IVR1(4))/10000.D0
+         FRAC2=IVR2(3)+DBLE(IVR2(4))/10000.D0
 
-*      Set up parameter values to display.
-	 CALL MSG_FMTI('P1','I2',IVR1(1))
-	 CALL MSG_FMTI('P2','I2',IVR1(2))
-	 CALL MSG_FMTD('P3','F7.4',FRAC1)
-	 CALL MSG_FMTC('P10','A1',SIGN)
-	 CALL MSG_FMTI('P4','I2',IVR2(1))
-	 CALL MSG_FMTI('P5','I2',IVR2(2))
-	 CALL MSG_FMTD('P6','F7.4',FRAC2)
-	 CALL MSG_FMTD('P7','F9.6',DIST)
-	 CALL MSG_FMTD('P11','F6.3',AIRM)
+*     Set up parameter values to display.
+         CALL MSG_FMTI('P1','I2',IVR1(1))
+         CALL MSG_FMTI('P2','I2',IVR1(2))
+         CALL MSG_FMTD('P3','F7.4',FRAC1)
+         CALL MSG_FMTC('P10','A1',SIGN)
+         CALL MSG_FMTI('P4','I2',IVR2(1))
+         CALL MSG_FMTI('P5','I2',IVR2(2))
+         CALL MSG_FMTD('P6','F7.4',FRAC2)
+         CALL MSG_FMTD('P7','F9.6',DIST)
+         CALL MSG_FMTD('P11','F6.3',AIRM)
 
-*      Recalc positions 1 sec later and deduce movement rate.
-	 CALL SLAJPL(TDB2,NP,TLONG,TLAT,THEIGHT,
-     :               RAV2,DECV2,DIST,STL,AIRM)
-	 DLEN3=(RAV2-RAV1)*360./2./3.1415926*3600.
-	 DLEN4=(DECV2-DECV1)*360./2./3.1415926*3600.
+*     Recalc positions 1 sec later and deduce movement rate.
+         CALL SLAJPL(TDB2,NP,TLONG,TLAT,THEIGHT,
+     :        RAV2,DECV2,DIST,STL,AIRM)
+         DLEN3=(RAV2-RAV1)*360./2./3.1415926*3600.
+         DLEN4=(DECV2-DECV1)*360./2./3.1415926*3600.
 
-*      Set up parameter values to display.
-	 CALL MSG_FMTD('P8','F7.4',DLEN3)
-	 CALL MSG_FMTD('P9','F7.4',DLEN4)
+*     Set up parameter values to display.
+         CALL MSG_FMTD('P8','F7.4',DLEN3)
+         CALL MSG_FMTD('P9','F7.4',DLEN4)
 
-*      Expand string.
-	 STRING1=PLANET(I)(1:7)//
-     :           ' ^P1 ^P2 ^P3 ^P8  '//
-     :           ' ^P10^P4 ^P5 ^P6'//
-     :           '  ^P9   ^P7  ^P11'
-	 CALL MSG_LOAD(' ',STRING1,STRING2,JUNK,STATUS)
+*     Expand string.
+         STRING1=PLANET(I)(1:7)//
+     :        ' ^P1 ^P2 ^P3 ^P8  '//
+     :        ' ^P10^P4 ^P5 ^P6'//
+     :        '  ^P9   ^P7  ^P11'
+         CALL MSG_LOAD(' ',STRING1,STRING2,JUNK,STATUS)
 
-*      Place output on the screen or in the file.
-	 IF (POS) THEN
-	    IF (SCREEN) CALL MSG_OUT(' ',STRING2,STATUS)
-	    IF (OFL)    CALL FIO_WRITE(FIOD,STRING2,STATUS)
-	 ENDIF
+*     Place output on the screen or in the file.
+         IF (POS) THEN
+            IF (SCREEN) CALL MSG_OUT(' ',STRING2,STATUS)
+            IF (OFL)    CALL FIO_WRITE(FIOD,STRING2,STATUS)
+         ENDIF
 
  100  CONTINUE
 
@@ -1544,30 +1549,31 @@ C  The system time in seconds
 
       DOUBLE PRECISION FUNCTION RJDATE ()
 
-*     Purpose:
+*  Purpose:
 *     To calculate real top Julian date from Gregorian date.
 *     Returned as a modified Julian date.
 *     Values are returned in TT rather than UT since this is the most common
 *     usage in the FLUXES program.
 
-*     Note:
+*  Note:
 *     Now uses SLA_CALDJ
 
 ************************************************************************
 
       IMPLICIT NONE
 
-*   Variables:
+*  Variables:
       DOUBLE PRECISION DAY, S
       DOUBLE PRECISION FDUTC
       INTEGER I, ID, IH,IM,IY,IS, IYEAR, J, K, L, M, MONTH
 
-*   External Functions
+*  External Functions
       DOUBLE PRECISION SLA_EPJ,SLA_DT,SLA_DTT
 
-*   Common blocks:
+*  Common blocks:
       COMMON /TIMEBLK/IY,M,ID,IH,IM,IS
       COMMON /TIMEBLK2/S
+*.
 
       CALL SLA_CALDJ(IY,M,ID,RJDATE,J)
       CALL SLA_DTF2D(IH,IM,S,FDUTC,J)
@@ -1594,7 +1600,7 @@ C  The system time in seconds
 *     26 Oct95        :  HEM - add in simplified model to extend MJD range
 *     Original version:  Unknown origin
 
-*     Purpose:
+*  Purpose:
 *     Do linear interpolation of Martian 350-micron brightness temp-
 *     eratures (M.350.TB.'s) produced by Wright's model to get value
 *     for any Modified Julian Date (MJD=J.D.-2400000.5) between
@@ -1606,12 +1612,12 @@ C  The system time in seconds
 *     correction for the cosmic background (-2.56 K) this model reproduces
 *     the original Wright (1976) values with an rms error of 0.13 K.
 
-*     Description of Parameters:
+*  Description of Parameters:
 
-*     Data arrays:
+*  Data arrays:
 *     TB1AR  - array of 100 TB'S for MJD's 46040 - 50000 in steps of 40 days
 *     TBWRIGHT - array of 326 TB's from simplified Wright model; step 40 days
-*     Input:
+*  Input:
 *     RJD    - J.D. for which M.350.TB. is calculated by interpolation
 *     Output:
 *     TBAR   - M.350.TB. calculated by interpolation for RJD
@@ -1625,13 +1631,13 @@ C  The system time in seconds
 
       IMPLICIT NONE
 
-*   Variables:
+*     Variables:
       REAL*8 DAT1I,DAT1I1,RJD,TBAR,TB1I,TB1I1,
      :     TB1AR(100),TBWRIGHT(326)
       INTEGER I,IERR
       REAL*8 JD
 
-*   Data:
+*     Data:
       DATA TB1AR/ 213.07, 215.42, 215.25, 213.54, 211.09, 210.47,
      :     211.17, 211.63, 211.75, 211.63, 210.13, 208.91, 211.40,
      :     218.38, 226.78, 219.98, 207.64, 206.85, 207.87, 207.42,
@@ -1691,45 +1697,45 @@ C  The system time in seconds
      :     196.0, 195.0, 199.0, 204.0, 210.0, 216.0, 222.0, 228.0,
      :     235.0, 237.0, 236.0, 231.0, 224.0, 219.0/
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
+*     Global Constants:
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
 
-*  Status:
-      INTEGER STATUS                  ! Global status
+*     Status:
+      INTEGER STATUS            ! Global status
 
-*   Check the inherited global status.
+*     Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
-*   Convert to JD
+*     Convert to JD
       JD = RJD + 2400000.5
 
-*   Interpolate to get M.350.TB for JD
+*     Interpolate to get M.350.TB for JD
 
       I = DINT((JD - 2442760.5D0)/40.0D0) + 1
       DAT1I = 2442760.5D0 + ((I-1) * 40.0D0)
       DAT1I1 = DAT1I + 40.0D0
       IERR=0
       IF ((I.LE.0).OR.(I.GE.326)) THEN
-	 IERR=1
+         IERR=1
       ELSEIF ((I.LE.82).OR.(I.GE.183)) THEN
-	 TB1I = TBWRIGHT(I)-2.56
+         TB1I = TBWRIGHT(I)-2.56
       ELSEIF ((I.GT.82).AND.(I.LT.183)) THEN
-	 TB1I = TB1AR(I-82)
+         TB1I = TB1AR(I-82)
       ENDIF
 
       I=I+1
       IF ((I.LE.0).OR.(I.GT.326)) THEN
-	 IERR=1
-	 CALL MSG_OUT(' ',
+         IERR=1
+         CALL MSG_OUT(' ',
      :        'Interpolation problem in subroutine TB350!',
      :        STATUS)
-	 CALL MSG_OUT(' ',
+         CALL MSG_OUT(' ',
      :        'Mars fluxes will be incorrect!',
      :        STATUS)
       ELSEIF ((I.LE.82).OR.(I.GE.183)) THEN
-	 TB1I1 = TBWRIGHT(I)-2.56
+         TB1I1 = TBWRIGHT(I)-2.56
       ELSEIF ((I.GT.82).AND.(I.LT.183)) THEN
-	 TB1I1 = TB1AR(I-82)
+         TB1I1 = TB1AR(I-82)
       ENDIF
 
 *     Do linear interpolation between two points.
@@ -1745,10 +1751,10 @@ C  The system time in seconds
 ****************************************************************************
 
       SUBROUTINE SLAJPL(DATE,NP,ELONG,PHI,HEIGHT,RA,DEC,
-     :                  R,STL,AIRM)
-*+
-*  Approximate topocentric apparent RA,Dec of a planet, and its
-*  angular diameter.
+     :     R,STL,AIRM)
+*     +
+*     Approximate topocentric apparent RA,Dec of a planet, and its
+*     angular diameter.
 
 *  Given:
 *     DATE        d       MJD of observation (JD - 2400000.5)
@@ -1775,31 +1781,31 @@ C  The system time in seconds
 
 *  Notes:
 
-*  1  The date is in a dynamical timescale (TDB, formerly ET) and is
+*     1  The date is in a dynamical timescale (TDB, formerly ET) and is
 *     in the form of a Modified Julian Date (JD-2400000.5).  For all
 *     practical purposes, TT can be used instead of TDB, and for many
 *     applications UT will do (except for the Moon).
 
-*  2  The longitude and latitude allow correction for geocentric
+*     2  The longitude and latitude allow correction for geocentric
 *     parallax.  This is a major effect for the Moon, but in the
 *     context of the limited accuracy of the present routine its
 *     effect on planetary positions is small (negligible for the
 *     outer planets).  Geocentric positions can be generated by
 *     calls to the routines sla_EVP, sla_DMOON and sla_PLANET.
 
-*  Called: sla_GMST, sla_DT, sla_EPJ, sla_PVOBS, sla_PRENUT,
-*          sla_DMXV, sla_DCC2S, sla_DRANRM, pleph, sla_EQEQX
+*     Called: sla_GMST, sla_DT, sla_EPJ, sla_PVOBS, sla_PRENUT,
+*     sla_DMXV, sla_DCC2S, sla_DRANRM, pleph, sla_EQEQX
 
-*  Based on sla_rdplan             P.T.Wallace  Starlink 30 November 1994
-*  Modified to use JPL ephemeris   G.J.Privett  Starlink 02 September 1996
+*     Based on sla_rdplan             P.T.Wallace  Starlink 30 November 1994
+*     Modified to use JPL ephemeris   G.J.Privett  Starlink 02 September 1996
 
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
-*-
+*     Copyright (C) 1995 Rutherford Appleton Laboratory
+*     -
 *****************************************************************************
 
       IMPLICIT NONE
 
-*   Variables:
+*     Variables:
       LOGICAL OK
       INTEGER NP,I
       DOUBLE PRECISION DATE,ELONG,PHI,RA,DEC,HEIGHT
@@ -1807,108 +1813,108 @@ C  The system time in seconds
       DOUBLE PRECISION VSE(6),VSG(6),VSP(6),VGO(6)
       DOUBLE PRECISION DX,DY,DZ,R,TL
 
-*   External functions.
+*     External functions.
       DOUBLE PRECISION SLA_DRANRM,SLALAST
       DOUBLE PRECISION SLA_ZD,SLA_AIRMAS
 
-*   Calculate Local Apparent Sidereal Time
+*     Calculate Local Apparent Sidereal Time
       STL = SLALAST( DATE, ELONG)
 
-*   Geocentric Moon position.
+*     Geocentric Moon position.
       CALL PLEPH(DATE,10,3,V,OK)
       V(4)=V(4)/86400.D0
       V(5)=V(5)/86400.D0
       V(6)=V(6)/86400.D0
 
-*   Create nutation matrix.
+*     Create nutation matrix.
       CALL SLA_NUT(DATE,RMAT)
 
-*   Multiply a 3D vector by a rotation matrix.
+*     Multiply a 3D vector by a rotation matrix.
       CALL SLA_DMXV(RMAT,V,VGM)
       CALL SLA_DMXV(RMAT,V(4),VGM(4))
 
-*  Moon?
+*     Moon?
       IF (NP.EQ.10) THEN
 
 *     Yes: geocentre to Moon (true of date)
-	 DO I=1,6
-	    V(I)=VGM(I)
-	 END DO
+         DO I=1,6
+            V(I)=VGM(I)
+         END DO
 
       ELSE
 
 *     No: precession/nutation matrix, J2000 to date
-	 CALL SLA_PRENUT(2000.D0,DATE,RMAT)
+         CALL SLA_PRENUT(2000.D0,DATE,RMAT)
 
 *     Sun to Earth-Moon Barycentre (J2000). Heliocentric position.
-	 CALL PLEPH(DATE,13,11,V,OK)
-	 V(4)=V(4)/86400.D0
-	 V(5)=V(5)/86400.D0
-	 V(6)=V(6)/86400.D0
+         CALL PLEPH(DATE,13,11,V,OK)
+         V(4)=V(4)/86400.D0
+         V(5)=V(5)/86400.D0
+         V(6)=V(6)/86400.D0
 
 *     Precession and nutation to date
-	 CALL SLA_DMXV(RMAT,V,VSE)
-	 CALL SLA_DMXV(RMAT,V(4),VSE(4))
+         CALL SLA_DMXV(RMAT,V,VSE)
+         CALL SLA_DMXV(RMAT,V(4),VSE(4))
 
 *     Sun to geocentre
-	 DO I=1,6
-	    VSG(I)=VSE(I)-0.012150581D0*VGM(I)
-	 END DO
+         DO I=1,6
+            VSG(I)=VSE(I)-0.012150581D0*VGM(I)
+         END DO
 
 *     Sun?
-	 IF (NP.EQ.11) THEN
+         IF (NP.EQ.11) THEN
 
-*        Yes: geocentre to Sun
-	    DO I=1,6
-	       V(I)=-VSG(I)
-	    END DO
+*     Yes: geocentre to Sun
+            DO I=1,6
+               V(I)=-VSG(I)
+            END DO
 
-	 ELSE
+         ELSE
 
-*        No: Sun to Planet. Heliocentric position.
-	    CALL PLEPH(DATE,NP,11,V,OK)
-	    V(4)=V(4)/86400.D0
-	    V(5)=V(5)/86400.D0
-	    V(6)=V(6)/86400.D0
+*     No: Sun to Planet. Heliocentric position.
+            CALL PLEPH(DATE,NP,11,V,OK)
+            V(4)=V(4)/86400.D0
+            V(5)=V(5)/86400.D0
+            V(6)=V(6)/86400.D0
 
-*        Precession and nutation to date
-	    CALL SLA_DMXV(RMAT,V,VSP)
-	    CALL SLA_DMXV(RMAT,V(4),VSP(4))
+*     Precession and nutation to date
+            CALL SLA_DMXV(RMAT,V,VSP)
+            CALL SLA_DMXV(RMAT,V(4),VSP(4))
 
-*        Geocentre to planet
-	    DO I=1,6
-	       V(I)=VSP(I)-VSG(I)
-	    END DO
+*     Geocentre to planet
+            DO I=1,6
+               V(I)=VSP(I)-VSG(I)
+            END DO
 
-	 END IF
+         END IF
 
       END IF
 
-*  Refer to origin at the observer
+*     Refer to origin at the observer
       CALL SLA_PVOBS(PHI,HEIGHT,STL,VGO)
       DO I=1,6
-	 V(I)=V(I)-VGO(I)
+         V(I)=V(I)-VGO(I)
       END DO
 
-*  Geometric distance (AU)
+*     Geometric distance (AU)
       DX=V(1)
       DY=V(2)
       DZ=V(3)
       R=SQRT(DX*DX+DY*DY+DZ*DZ)
 
-*  Light time (sec)
+*     Light time (sec)
       TL=499.004782D0*R
 
-*  Correct position for planetary aberration
+*     Correct position for planetary aberration
       DO I=1,3
-	 V(I)=V(I)-TL*V(I+3)
+         V(I)=V(I)-TL*V(I+3)
       END DO
 
-*  To RA,Dec
+*     To RA,Dec
       CALL SLA_DCC2S(V,RA,DEC)
       RA=SLA_DRANRM(RA)
 
-*  Calculate the zenith distance.
+*     Calculate the zenith distance.
       AIRM=SLA_AIRMAS(SLA_ZD((RA-STL),DEC,PHI))
 
       END
@@ -1917,9 +1923,9 @@ C  The system time in seconds
 
       SUBROUTINE SLAJPL2(DATE,NP,ELONG,RA,DEC,R)
 
-*+
-*  Approximate geocentric apparent RA,Dec of a planet.
-*  Does not cater for the moon.
+*     +
+*     Approximate geocentric apparent RA,Dec of a planet.
+*     Does not cater for the moon.
 
 *  Given:
 *     DATE        d       MJD of observation (JD - 2400000.5)
@@ -1940,23 +1946,23 @@ C  The system time in seconds
 
 *  Notes:
 
-*  1  The date is in a dynamical timescale (TDB, formerly ET) and is
+*     1  The date is in a dynamical timescale (TDB, formerly ET) and is
 *     in the form of a Modified Julian Date (JD-2400000.5).  For all
 *     practical purposes, TT can be used instead of TDB, and for many
 *     applications UT will do (except for the Moon).
 
-*  Called: sla_GMST, sla_DT, sla_EPJ, sla_PRENUT,
-*          sla_DMXV, sla_DCC2S, sla_DRANRM, pleph
+*     Called: sla_GMST, sla_DT, sla_EPJ, sla_PRENUT,
+*     sla_DMXV, sla_DCC2S, sla_DRANRM, pleph
 
-*  Based on sla_rdplan             P.T.Wallace  Starlink 30 November 1994
-*  Modified to use JPL ephemeris   G.J.Privett  Starlink 02 September 1996
+*     Based on sla_rdplan             P.T.Wallace  Starlink 30 November 1994
+*     Modified to use JPL ephemeris   G.J.Privett  Starlink 02 September 1996
 
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
-*-
+*     Copyright (C) 1995 Rutherford Appleton Laboratory
+*     -
 *****************************************************************************
       IMPLICIT NONE
 
-*   Variables:
+*     Variables:
       LOGICAL OK
       INTEGER NP,I
       DOUBLE PRECISION DATE,ELONG,RA,DEC
@@ -1964,96 +1970,96 @@ C  The system time in seconds
       DOUBLE PRECISION VSE(6),VSG(6),VSP(6)
       DOUBLE PRECISION DX,DY,DZ,R,TL
 
-*   External functions.
+*     External functions.
       DOUBLE PRECISION SLALAST,SLA_DRANRM
 
-*   Approximate local ST
+*     Approximate local ST
       STL = SLALAST( DATE, ELONG )
 
-*   Geocentric Moon position.
+*     Geocentric Moon position.
       CALL PLEPH(DATE,10,3,V,OK)
       V(4)=V(4)/86400.D0
       V(5)=V(5)/86400.D0
       V(6)=V(6)/86400.D0
 
-*   Create nutation matrix.
+*     Create nutation matrix.
       CALL SLA_NUT(DATE,RMAT)
 
-*   Multiply a 3D vector by a rotation matrix.
+*     Multiply a 3D vector by a rotation matrix.
       CALL SLA_DMXV(RMAT,V,VGM)
       CALL SLA_DMXV(RMAT,V(4),VGM(4))
 
-*   No: precession/nutation matrix, J2000 to date
+*     No: precession/nutation matrix, J2000 to date
       CALL SLA_PRENUT(2000.D0,DATE,RMAT)
 
-*   Sun to Earth-Moon Barycentre (J2000). Heliocentric position.
+*     Sun to Earth-Moon Barycentre (J2000). Heliocentric position.
       CALL PLEPH(DATE,13,11,V,OK)
       V(4)=V(4)/86400.D0
       V(5)=V(5)/86400.D0
       V(6)=V(6)/86400.D0
 
-*   Precession and nutation to date
+*     Precession and nutation to date
       CALL SLA_DMXV(RMAT,V,VSE)
       CALL SLA_DMXV(RMAT,V(4),VSE(4))
 
-*   Sun to geocentre
+*     Sun to geocentre
       DO I=1,6
-	 VSG(I)=VSE(I)-0.012150581D0*VGM(I)
+         VSG(I)=VSE(I)-0.012150581D0*VGM(I)
       END DO
 
-*   Sun?
+*     Sun?
       IF (NP.EQ.11) THEN
 
-*      Yes: geocentre to Sun
-	 DO I=1,6
-	    V(I)=-VSG(I)
-	 END DO
+*     Yes: geocentre to Sun
+         DO I=1,6
+            V(I)=-VSG(I)
+         END DO
 
       ELSE
 
-*      No: Sun to Planet. Heliocentric position.
-	 CALL PLEPH(DATE,NP,11,V,OK)
-	 V(4)=V(4)/86400.D0
-	 V(5)=V(5)/86400.D0
-	 V(6)=V(6)/86400.D0
+*     No: Sun to Planet. Heliocentric position.
+         CALL PLEPH(DATE,NP,11,V,OK)
+         V(4)=V(4)/86400.D0
+         V(5)=V(5)/86400.D0
+         V(6)=V(6)/86400.D0
 
 *     Precession and nutation to date
-	 CALL SLA_DMXV(RMAT,V,VSP)
-	 CALL SLA_DMXV(RMAT,V(4),VSP(4))
+         CALL SLA_DMXV(RMAT,V,VSP)
+         CALL SLA_DMXV(RMAT,V(4),VSP(4))
 
 *     Geocentre to planet
-	 DO I=1,6
-	    V(I)=VSP(I)-VSG(I)
-	 END DO
+         DO I=1,6
+            V(I)=VSP(I)-VSG(I)
+         END DO
 
       END IF
 
-*  Geometric distance (AU)
+*     Geometric distance (AU)
       DX=V(1)
       DY=V(2)
       DZ=V(3)
       R=SQRT(DX*DX+DY*DY+DZ*DZ)
 
-*  Light time (sec)
+*     Light time (sec)
       TL=499.004782D0*R
 
-*  Correct position for planetary aberration
+*     Correct position for planetary aberration
       DO I=1,3
-	 V(I)=V(I)-TL*V(I+3)
+         V(I)=V(I)-TL*V(I+3)
       END DO
 
-*  To RA,Dec
+*     To RA,Dec
       CALL SLA_DCC2S(V,RA,DEC)
       RA=SLA_DRANRM(RA)
 
       END
 
       DOUBLE PRECISION FUNCTION SLALAST( DATE, ELONG )
-*+
+*     +
 *     Calculate Local Apparent Sidereal time given the DATE
 *     (MJD TT) and the longitude (radians, east +ve).
 *     Returns the LAST in radians.
-*-
+*     -
       DOUBLE PRECISION DATE
       DOUBLE PRECISION ELONG
 
@@ -2069,52 +2075,52 @@ C  The system time in seconds
          UTDATE = DATE - (SLA_DT(SLA_EPJ(DATE)) / 86400.D0)
       END IF
 
-*   Note that DATE is UT despite what it says on the packet.
-*   It is not in TT.
+*     Note that DATE is UT despite what it says on the packet.
+*     It is not in TT.
       SLALAST = SLA_DRANRM(SLA_GMST(UTDATE) + ELONG + SLA_EQEQX(DATE))
 
       END
 
       SUBROUTINE FLU_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN,
-     :                           EXCLAIM,STATUS)
+     :     EXCLAIM,STATUS)
 *+
-*    Description :
+*  Description :
 *
 *     This routine opens a sequential file via FIO_ASSOC.  Up to four
 *     attempts may be made to open the file.  If a null response is
 *     supplied the file is not opened, and the flag returned indicates
 *     this fact.
 *
-*    Invocation :
+*  Invocation :
 *
-*      CALL FLU_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN,
-*                      EXCLAIM,STATUS)
+*     CALL FLU_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN,
+*     EXCLAIM,STATUS)
 
 *
-*    Arguments :
+*  Arguments :
 *
 *     PNFILE=CHARACTER*(*)
-*         Parameter name by which file is to be opened
+*     Parameter name by which file is to be opened
 *     ACMODE=CHARACTER*(*)
-*         Expression giving the required access mode.
-*           Valid modes are: 'WRITE', 'UPDATE', 'APPEND'..
+*     Expression giving the required access mode.
+*     Valid modes are: 'WRITE', 'UPDATE', 'APPEND'..
 *     FORM=CHARACTER*(*)( READ )
-*         Expression giving the required formatting of the file.
-*           Valid formats are: 'FORTRAN', 'LIST', 'NONE' and
-*           'UNFORMATTED'. For details, see FIO_OPEN.
+*     Expression giving the required formatting of the file.
+*     Valid formats are: 'FORTRAN', 'LIST', 'NONE' and
+*     'UNFORMATTED'. For details, see FIO_OPEN.
 *     RECSZ=INTEGER( READ )
-*         Expression giving the maximum record size in bytes.
-*           Set it to zero if the Fortran default is required.
+*     Expression giving the maximum record size in bytes.
+*     Set it to zero if the Fortran default is required.
 *     FD=INTEGER( WRITE )
-*         Variable to contain the file descriptor.
+*     Variable to contain the file descriptor.
 *     OPEN=LOGICAL( WRITE )
-*         If true the file has been opened.
+*     If true the file has been opened.
 *     EXCLAIM=LOGICAL( WRITE )
-*         If true then the user input was '!'.
+*     If true then the user input was '!'.
 *     STATUS=INTEGER( READ, WRITE )
-*         Global status value
+*     Global status value
 *
-*    Method :
+*  Method :
 *
 *     Check for error on entry - return if not o.k.
 *     Initialise looping flag
@@ -2122,21 +2128,21 @@ C  The system time in seconds
 *       and maximum number of attempts not exceeded
 *        Get file name and open file
 *        If null returned then
-*           Set flag so that a log file will not be created
-*           Annul the error
-*           Exit from the loop
+*            Set flag so that a log file will not be created
+*            Annul the error
+*            Exit from the loop
 *        Else if error occurred then
-*           If abort requested, do so
-*           Increment loop counter
-*           If maximum number of attempts not exceeded then
-*              Report error
-*           Else
-*              Set looping flag to exit
-*           Endif
-*             Cancel parameter used to get filename
+*            If abort requested, do so
+*            Increment loop counter
+*            If maximum number of attempts not exceeded then
+*               Report error
+*            Else
+*               Set looping flag to exit
+*            Endif
+*            Cancel parameter used to get filename
 *        Else
-*           Set flag to indicate that the file has been opened
-*           Set looping flag to false
+*            Set flag to indicate that the file has been opened
+*            Set looping flag to false
 *        Endif
 *     Enddo
 *     If error then
@@ -2144,76 +2150,76 @@ C  The system time in seconds
 *     Endif
 *     Return
 *
-*    Bugs :
+*  Bugs :
 *
 *     None known.
-*-
-*    Authors :
+*     -
+*  Authors :
 *
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
 *
-*    History :
+*  History :
 *
 *     1989 Jul 25: Original (RL.STAR::CUR).
 *     1990 Feb 20: Renamed from AIF_OPFIO (RAL::CUR).
 *     1994 mar 1: Modified to return EXCLAIM (CARDIFF::GJP).
 *
-*    Type definitions :
+*  Type definitions :
 
-      IMPLICIT  NONE           ! no implicit typing allowed
+      IMPLICIT  NONE            ! no implicit typing allowed
 
-*    Global constants :
-      INCLUDE  'SAE_PAR'       ! SSE global definitions
-      INCLUDE  'PAR_ERR'       ! Parameter-system errors
-      INCLUDE  'FIO_ERR'       ! FIO errors
+*  Global constants :
+      INCLUDE  'SAE_PAR'        ! SSE global definitions
+      INCLUDE  'PAR_ERR'        ! Parameter-system errors
+      INCLUDE  'FIO_ERR'        ! FIO errors
 
-*    Import :
-      CHARACTER*(*) PNFILE     ! File Parameter Name
-      CHARACTER*(*) ACMODE     ! File access mode
-      CHARACTER*(*) FORM       ! Required form of carriagecontrol
-      INTEGER RECSZ            ! File record size
+*  Import :
+      CHARACTER*(*) PNFILE      ! File Parameter Name
+      CHARACTER*(*) ACMODE      ! File access mode
+      CHARACTER*(*) FORM        ! Required form of carriagecontrol
+      INTEGER RECSZ             ! File record size
 
-*    Export :
-      LOGICAL OPEN             ! File opened successfully
-      LOGICAL EXCLAIM          ! File name was exclaimation
-      INTEGER FD               ! File descriptor
+*  Export :
+      LOGICAL OPEN              ! File opened successfully
+      LOGICAL EXCLAIM           ! File name was exclaimation
+      INTEGER FD                ! File descriptor
 
-*    Status :
+*  Status :
       INTEGER STATUS
 
-*    Local Variables :
-      INTEGER MXLOOP           ! Maximum number of attempts at
-                               ! opening a data file
+*  Local Variables :
+      INTEGER MXLOOP            ! Maximum number of attempts at
+! opening a data file
       PARAMETER ( MXLOOP=4 )
-      INTEGER LOOP             ! Number of attempts to open the file
-      LOGICAL LOOPAG           ! Loop again to open output file.
+      INTEGER LOOP              ! Number of attempts to open the file
+      LOGICAL LOOPAG            ! Loop again to open output file.
       CHARACTER *128 PATH,ALINE,PATH2
       INTEGER LPATH
 
-*    External functions :
+*  External functions :
       INTEGER CHR_LEN
 
 *.
 
-*    Check status on entry - return if not o.k.
+*     Check status on entry - return if not o.k.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*   Initialise
+*     Initialise
       EXCLAIM = .FALSE.
 
-*   Look for the environmental variable
-*   dealing with the saving files and grab the name.
+*     Look for the environmental variable
+*     dealing with the saving files and grab the name.
       CALL PSX_GETENV('FLUXPWD',PATH,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 999
 
-*  Find its length.
+*     Find its length.
       LPATH=CHR_LEN(PATH)
       LOOP=0
       LOOPAG=.TRUE.
       OPEN=.FALSE.
       DO WHILE (LOOPAG)
 
-*      Access the file (appending original directory name).
+*     Access the file (appending original directory name).
          CALL PAR_GET0C(PNFILE,ALINE,STATUS)
          IF(ALINE(1:1).EQ.'/') THEN
             PATH2=ALINE
@@ -2223,7 +2229,7 @@ C  The system time in seconds
          CALL PAR_PUT0C(PNFILE,PATH2,STATUS)
          CALL FIO_ASSOC(PNFILE,ACMODE,FORM,RECSZ,FD,STATUS)
 
-*      Check the status value.
+*     Check the status value.
          IF ( STATUS .EQ. PAR__NULL ) THEN
             OPEN=.FALSE.
             LOOPAG=.FALSE.
@@ -2233,20 +2239,20 @@ C  The system time in seconds
 
             IF ( STATUS .EQ. PAR__ABORT ) GOTO 999
 
-*         Here if filename is not allowed or file is not opened
-*         - try again
-*         Need to flush error here, as not quitting routine
+*     Here if filename is not allowed or file is not opened
+*     - try again
+*     Need to flush error here, as not quitting routine
 
             LOOP=LOOP + 1
             IF ( LOOP .LE. MXLOOP ) THEN
                CALL MSG_SETC( 'FILNAM', PNFILE )
                CALL ERR_REP( 'ERR_AIF_ASFIO_NOFI',
-     :           'AIF_ASFIO: Could not open file $^FILNAM - try again',
-     :           STATUS )
+     :              'AIF_ASFIO: Could not open file $^FILNAM -'//
+     :              ' try again',STATUS )
                CALL ERR_FLUSH( STATUS )
             ELSE
 
-*             end looping as user is having serious problems
+*     end looping as user is having serious problems
 
                LOOPAG=.FALSE.
 
@@ -2256,22 +2262,22 @@ C  The system time in seconds
 
          ELSE
 
-*          no problem, so exit loop
+*     no problem, so exit loop
 
             LOOPAG=.FALSE.
             OPEN=.TRUE.
 
-*       end of file-opened-successfully check
+*     end of file-opened-successfully check
 
          END IF
 
       END DO
 
-*    abort for repeated error
+*     abort for repeated error
 
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ERR_AIF_ASFIO_NOOPEN',
-     :     'AIF_ASFIO: Repeatedly unable to open a file.', STATUS )
+     :        'AIF_ASFIO: Repeatedly unable to open a file.', STATUS )
       END IF
 
  999  CONTINUE
