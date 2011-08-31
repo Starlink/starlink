@@ -16,7 +16,8 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun213_fig1.eps
 
 # The path here is ignored for the install location
 filterdir = $(bindir)
-dist_filter_DATA = data/scuba.dat data/ukt14.dat data/ukt14_old.dat
+dist_filter_DATA = data/scuba.dat data/ukt14.dat data/ukt14_old.dat \
+	data/scuba2.dat
 
 
 # IFL files
