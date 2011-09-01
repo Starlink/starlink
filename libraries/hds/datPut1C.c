@@ -129,7 +129,7 @@ datPut1C( const HDSLoc * locator, size_t nval, const char *values[], int * statu
 
     /* Get some memory and copy in the individual strings */
     bufsize = nval * lenstr;
-    buffer = starMalloc( bufsize + 1);
+    buffer = MEM_MALLOC( bufsize + 1);
     bufpos = buffer;
 
     for (i = 0; i < nval; i++ ) {
@@ -154,7 +154,7 @@ datPut1C( const HDSLoc * locator, size_t nval, const char *values[], int * statu
     datPutC( locator, 1, dims, buffer, lenstr, status );
 
     /* Tidy up */
-    starFree( buffer );
+    MEM_FREE( buffer );
 
     /* if we were truncated at all, let the user know */
     if ( *status == DAT__OK && trunc ) {

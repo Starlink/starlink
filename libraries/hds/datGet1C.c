@@ -170,7 +170,7 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t bufsize, char *buffer,
     tmpbufsize = *actval * lenstr;
 
     /* We need to get some memory to receive the Fortran buffer */
-    tmpbuf = starMalloc( tmpbufsize );
+    tmpbuf = MEM_MALLOC( tmpbufsize );
 
     /* need to be careful */
     if ( tmpbuf == NULL ) {
@@ -234,7 +234,7 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t bufsize, char *buffer,
     }
 
     /* Free the temporary buffer */
-    starFree( tmpbuf );
+    MEM_FREE( tmpbuf );
 
   }
 

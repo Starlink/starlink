@@ -146,7 +146,7 @@
 
 /* Allocate the required memory using malloc.                               */
       {
-         *pntr = starMalloc( size );
+         *pntr = MEM_MALLOC( size );
 
 /* If allocation failed, then report an error.                              */
          if ( *pntr == NULL )

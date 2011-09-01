@@ -40,7 +40,7 @@
 void dat1_free_hdsloc ( struct LOC ** loc ) {
 
   if ( *loc != NULL ) {
-    starFree( *loc );
+    MEM_FREE( *loc );
     *loc = NULL;
   }
 }

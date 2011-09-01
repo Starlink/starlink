@@ -146,7 +146,7 @@
 
 /* Release the memory previously allocated by malloc.                       */
       {
-         starFree( *pntr );
+         MEM_FREE( *pntr );
       }
 
 /* Return a null pointer.                                                   */

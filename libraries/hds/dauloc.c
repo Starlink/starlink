@@ -213,7 +213,7 @@ dau1_store_flq_malloc( struct LCP * lcp ) {
 
   if ( malloced == NULL ) {
     /* get some memory */
-    malloced = starMalloc( NBINS_INC * sizeof(struct LCP*) );
+    malloced = MEM_MALLOC( NBINS_INC * sizeof(struct LCP*) );
     if (malloced == NULL) {
       /* ignore for now since this is not a real leak */
       return DAT__OK;
@@ -222,7 +222,7 @@ dau1_store_flq_malloc( struct LCP * lcp ) {
 
   } else if ( totpntrs == npntrs ) {
     /* Need to realloc some space */
-      new = starRealloc( malloced, (totpntrs + NBINS_INC) * sizeof(struct LCP*));
+      new = MEM_REALLOC( malloced, (totpntrs + NBINS_INC) * sizeof(struct LCP*));
     if (new == NULL) {
       /* just ignore and leak a bit - do not need to free the
 	 old memory, since it can still contain useful information */

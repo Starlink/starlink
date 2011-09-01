@@ -90,7 +90,7 @@
       if ( !_ok( hds_gl_status ) ) return hds_gl_status;
 
 /* Re-allocate the required memory.                                         */
-      newptr = starRealloc( *pntr, size );
+      newptr = MEM_REALLOC( *pntr, size );
 
 /* If re-allocation failed, then report an error.                           */
       if ( newptr == NULL )

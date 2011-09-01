@@ -326,7 +326,7 @@ extern char **environ;
 /* Attempt to allocate a new array of environment pointers. Include an      */
 /* extra element if no PATH assignment currently exists (which is           */
 /* unlikely).                                                               */
-                  new_environ = (char **) starMalloc( sizeof( char * ) *
+                  new_environ = (char **) MEM_MALLOC( sizeof( char * ) *
                                 (size_t) ( n + 1 + ( ipath == -1 ) ) );
 
 /* Attempt to allocate memory to hold a new assignment string for the PATH  */
@@ -337,7 +337,7 @@ extern char **environ;
                   {
                      lpath_new += lpath_old - (size_t) 4;
                   }
-                  new_path = (char *) starMalloc( lpath_new + (size_t) 1 );
+                  new_path = (char *) MEM_MALLOC( lpath_new + (size_t) 1 );
 
 /* Check for success.                                                       */
                   if ( ( new_environ != NULL ) && ( new_path != NULL ) )
@@ -415,8 +415,8 @@ extern char **environ;
 /* effect if "vfork" wasn't used).                                         */
 #if defined( _POSIX2_VERSION )
          environ = old_environ;
-         starFree( (void *) new_environ );
-         starFree( (void *) new_path );
+         MEM_FREE( (void *) new_environ );
+         MEM_FREE( (void *) new_path );
 #endif
       }
 

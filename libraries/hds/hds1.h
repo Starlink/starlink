@@ -81,6 +81,14 @@
 #define _fork fork
 #endif
 
+/* Memory Allocation Routines */
+/* ===========================*/
+/* Define macros here for to allow us to easily fallback to native free/malloc */
+#include "star/mem.h"
+#define MEM_MALLOC  starMalloc
+#define MEM_FREE    starFree
+#define MEM_REALLOC starRealloc
+
 /* Defaults for tuning parameters:					    */
 /* ==============================					    */
 #define HDS__INALQ 2		 /* Initial file allocation quantity	    */

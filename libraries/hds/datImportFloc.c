@@ -130,7 +130,7 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
   /* See if we need to allocate memory for the locator struct */
   /* Allocate some memory to hold the C structure */
 
-     *clocator = starMalloc( sizeof( struct LOC ) );
+     *clocator = MEM_MALLOC( sizeof( struct LOC ) );
 
      if (*clocator == NULL ) {
        if( *status == DAT__OK ) {
