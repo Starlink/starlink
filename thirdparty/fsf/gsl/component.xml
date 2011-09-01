@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="gsl" support="U">
-  <version>1.12</version>
+  <version>1.15</version>
   <path>thirdparty/fsf/gsl</path>
   <description>GNU Scientific Library</description>
   <!-- <abstract><p></p></abstract> -->
