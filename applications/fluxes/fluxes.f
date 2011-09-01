@@ -253,6 +253,8 @@ C     For the time
       IF (STATUS.NE.SAI__OK) RETURN
 
 *     Initialise values.
+      IQ = 0
+      INOTE = 0
       NF =8
       RAD=PI/180.0D0
       FIOD=7
@@ -1367,6 +1369,9 @@ C     The system time in seconds
       COMMON /TELESCOPE/TLONG,TLAT,THEIGHT,TNAME,TFULLNAME
 *.
 
+      IR = 0
+      IQ = 0
+
 *     Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
 
@@ -1563,9 +1568,9 @@ C     The system time in seconds
       IMPLICIT NONE
 
 *  Variables:
-      DOUBLE PRECISION DAY, S
+      DOUBLE PRECISION S
       DOUBLE PRECISION FDUTC
-      INTEGER I, ID, IH,IM,IY,IS, IYEAR, J, K, L, M, MONTH
+      INTEGER ID, IH,IM,IY,IS,J,M
 
 *  External Functions
       DOUBLE PRECISION SLA_EPJ,SLA_DT,SLA_DTT
@@ -1711,6 +1716,7 @@ C     The system time in seconds
 
 *     Interpolate to get M.350.TB for JD
 
+      TB1I = 0.0D0
       I = DINT((JD - 2442760.5D0)/40.0D0) + 1
       DAT1I = 2442760.5D0 + ((I-1) * 40.0D0)
       DAT1I1 = DAT1I + 40.0D0
