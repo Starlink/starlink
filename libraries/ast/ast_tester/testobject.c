@@ -9,9 +9,9 @@ main(){
    AstFrameSet *fs = astConvert( bf, sf, " " );
 
    if( fs ) {
-      pickle1 = astPickle( fs );
-      AstFrameSet *fs2 = astUnpickle( pickle1 );
-      pickle2 = astPickle( fs2 );
+      pickle1 = astToString( fs );
+      AstFrameSet *fs2 = astFromString( pickle1 );
+      pickle2 = astToString( fs2 );
       if( pickle1 && pickle2 ) {
          if( strcmp( pickle1, pickle2 ) && astOK ) {
             astError( AST__INTER, "Error 1\n" );
@@ -25,9 +25,6 @@ main(){
       pickle2 = astFree( pickle2 );
 
       if( fs2 && !astEqual( fs, fs2 ) && astOK ) {
-
-astShow( fs );
-astShow( fs2 );
          astError( AST__INTER, "Error 3\n" );
       }
 
@@ -36,8 +33,8 @@ astShow( fs2 );
    }
 
    if( astOK ) {
-      printf(" All astPickle tests passed\n");
+      printf(" All Object tests passed\n");
    } else {
-      printf("astPickle tests failed\n");
+      printf("Object tests failed\n");
    }
 }

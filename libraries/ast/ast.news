@@ -37,9 +37,9 @@ method of the PolyMap class fails to create an accurate estimate of the
 inverse polynomial correction, then an iterative method will be used to
 evaluate the inverse correction for each point transformed.
 
-- The Object class has a new function astPickle (C only), which creates
+- The Object class has a new function astToString (C only), which creates
 an in-memory textual serialisation of a given AST Object. A corresponding
-new function called astUnpickle re-creates the Object from its
+new function called astFromString re-creates the Object from its
 serialisation.
 
 
