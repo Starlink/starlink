@@ -238,6 +238,9 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     29-APR-2011 (DSB):
 *        Prevent astFindFrame from matching a subclass template against a
 *        superclass target.
+*     2-SEP-2011 (DSB):
+*        Fix FrameSet implememntation of astEqual (mapping comparison
+*        tests were logically inverted).
 *class--
 */
 
@@ -3130,7 +3133,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 /* Check the Mappings, links and invert flags are equal. */
          if( result ) {
             for ( i = 0; i < this->nnode - 1; i++ ) {
-               if( astEqual( this->map[ i ], that->map[ i ] ) ||
+               if( !astEqual( this->map[ i ], that->map[ i ] ) ||
                    this->link[ i ] != that->link[ i ] ||
                    this->invert[ i ] != that->invert[ i ] ) {
                   result = 0;
