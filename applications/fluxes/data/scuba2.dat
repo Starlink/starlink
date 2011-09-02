@@ -46,7 +46,7 @@ tures are the rms internal errors of the observations. For MJD's between 46040
 through 50000 the Martian temperatures are derived from the model developed by
 Wright (1976, Ap.J., 210, 250). Outside these MJD's (i.e., in particular after 
 10 October 1995) a simplified model of a rotating cratered asteroid is used 
-(Wright, 1995; private communication to H.E. Matthews). Since the results for 
+(Wright, E. L, 2007, astro-ph/0703640v1). Since the results for 
 Mars are derived from models no errors are quoted; however the Martian bright-
 ness temperatures are probably uncertain at the 5% level and this uncertainty 
 must be added to obtain the absolute errors. Over the interval for which both 
