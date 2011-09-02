@@ -194,7 +194,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
       for ( idx=0; idx<(bolref->dims)[2]; idx++ ) {
         flatpar[idx] = idx - 2;
       }
-      (powref->dims)[2] = (bolref->dims)[2];
+      (powref->dims)[0] = (bolref->dims)[2];
 
     }
 
