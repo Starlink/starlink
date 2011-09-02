@@ -126,6 +126,8 @@
 *        Fix formatting of axis and data values in WLIST mode.
 *     5-MAY-2011 (DSB):
 *        Added WGList format.
+*     2-SEP-2011 (DSB):
+*        Fix VLIST formating of BAD and OUT values.
 *     {enter_further_changes_here}
 
 *-
@@ -556,10 +558,10 @@
          DO IY = YLO, YHI
             DO IX = XLO, XHI
                IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
-                  CALL CHR_PUTC( BADTXT, LINE, JAT )
+                  CALL CHR_CTOC( BADTXT, LINE, JAT )
 
                ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
-                  CALL CHR_PUTC( OUTTXT, LINE, JAT )
+                  CALL CHR_CTOC( OUTTXT, LINE, JAT )
 
                ELSE
                   CALL CHR_CTOC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ),
