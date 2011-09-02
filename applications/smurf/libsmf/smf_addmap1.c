@@ -60,14 +60,12 @@
 *        Use dim_t for msize
 *     2010-04-20 (EC):
 *        Handle map quality arrays.
+*     2011-09-01 (EC):
+*        The weightsmap does not necessarily need to be 1/varmap!
 *     {enter_further_changes_here}
 
-*  Notes:
-*     There is an assumption that variance is consistent with weight. In this
-*     routine the variance map is set to 1/(mapweight1 + mapweight2).
-
 *  Copyright:
-*     Copyright (C) 2008,2010 University of British Columbia.
+*     Copyright (C) 2008,2010-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -131,7 +129,7 @@ void smf_addmap1( double *map1, double *mapweight1, int *hitsmap1,
 
   for( i=0; i<msize; i++ ) {
     if( (map1[i] == VAL__BADD) || (mapvar1[i] == VAL__BADD) ) {
-      /* If bad pixel in map1 just copy map2 */
+      /* If bad pixel in map1 just copy map2 regardless */
       map1[i] = map2[i];
       mapweight1[i] = mapweight2[i];
       hitsmap1[i] = hitsmap2[i];
@@ -139,22 +137,19 @@ void smf_addmap1( double *map1, double *mapweight1, int *hitsmap1,
       mapqual1[i] = mapqual2[i];
     } else if( (map2[i] != VAL__BADD) && (mapvar2[i] != VAL__BADD) ) {
       /* Add together if both maps have good pixels */
-      map1[i] = mapweight1[i]*map1[i] + mapweight2[i]*map2[i];
-      mapweight1[i] += mapweight2[i];
-      hitsmap1[i] += hitsmap2[i];
-      mapqual1[i] &= mapqual2[i];
-
-      if( !mapweight1[i] ) {
+      if( (mapvar1[i]<=0) || (mapvar2[i]<=0) ) {
 	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Addmap failed due to divide-by-zero", status);
+	errRep("", FUNC_NAME ": invalid variance(s) <=0 detected", status);
 	return;
       } else {
-	map1[i] /= mapweight1[i];
+        double w = 1./mapvar1[i] + 1./mapvar2[i];
+
+        map1[i] = (map1[i]/mapvar1[i] + map2[i]/mapvar2[i])/w;
+        mapweight1[i] += mapweight2[i];
+        hitsmap1[i] += hitsmap2[i];
+        mapqual1[i] &= mapqual2[i];
+	mapvar1[i] = 1. / w;
       }
-
-      /* Variance should be consistent with weight */
-      mapvar1[i] = 1/mapweight1[i];
-
     }
   }
 
