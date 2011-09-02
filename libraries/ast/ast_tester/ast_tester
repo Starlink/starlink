@@ -71,7 +71,7 @@ end
 
 
 
-foreach prog (testconvert testlevmar)
+foreach prog (testpickle testconvert testlevmar)
 
 gcc -o $prog $prog.c -I.. -L/star/lib `ast_link`
 

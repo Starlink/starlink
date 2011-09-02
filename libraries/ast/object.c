@@ -49,6 +49,7 @@ c     - astHasAttribute: Test if an Object has a named attribute
 c     - astImport: Import an Object pointer to the current context
 c     - astIsA<Class>: Test class membership
 c     - astLock: Lock an Object for use by the calling thread
+c     - astPickle: Create an in-memory serialisation of an Object
 c     - astSame: Do two AST pointers refer to the same Object?
 c     - astSet: Set attribute values for an Object
 c     - astSet<X>: Set an attribute value for an Object
@@ -57,6 +58,7 @@ c     output
 c     - astTest: Test if an attribute value is set for an Object
 c     - astTune: Set or get an AST tuning parameter
 c     - astUnlock: Unlock an Object for use by other threads
+c     - astUnpickle: Re-create an Object from an in-memory serialisation
 c     - astVersion: Return the verson of the AST library being used.
 f     - AST_ANNUL: Annul a pointer to an Object
 f     - AST_BEGIN: Begin a new AST context
@@ -208,6 +210,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        class of the object. Useful for debugging.
 *     22-JUL-2011 (DSB):
 *        Add methods astSetProxy and astGetProxy.
+*     2-SEP-2011 (DSB):
+*        Add functions astPickle and astUnpickle
 *class--
 */
 
@@ -255,6 +259,16 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+
+/* Type Definitions */
+/* ================ */
+/* Structure used to pass data between astPickle/Unpickle and the
+   corresponding Channel source and sink functions. */
+typedef struct PickleData {
+   char *ptr;      /* Pointer to serialisation text */
+   char *buff;     /* Pointer to a buffer for a single line of text */
+   int len;        /* Current length of serialisation text */
+} PickleData;
 
 /* Module Variables. */
 /* ================= */
@@ -382,10 +396,11 @@ static int astgetc_init = 0;
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstObject *Cast( AstObject *, AstObject *, int * );
-static const char *Get( AstObject *, const char *, int * );
-static const char *GetAttrib( AstObject *, const char *, int * );
 static const char *GetID( AstObject *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
 static const char *GetIdent( AstObject *, int * );
+static const char *Get( AstObject *, const char *, int * );
+static const char *UnpickleSource( void );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetObjSize( AstObject *, int * );
 static int HasAttribute( AstObject *, const char *, int * );
@@ -397,10 +412,11 @@ static unsigned long Magic( const AstObject *, size_t, int * );
 static void CleanAttribs( AstObject *, int * );
 static void Clear( AstObject *, const char *, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
-static void ClearID( AstObject *, int * );
 static void ClearIdent( AstObject *, int * );
+static void ClearID( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void EmptyObjectCache( int * );
+static void PickleSink( const char * );
 static void SetAttrib( AstObject *, const char *, int * );
 static void SetID( AstObject *, const char *, int * );
 static void SetIdent( AstObject *, const char *, int * );
@@ -2810,6 +2826,126 @@ static int ManageLock( AstObject *this, int mode, int extra,
 }
 #endif
 
+char *astPickle_( AstObject *this, int *status ) {
+/*
+c++
+*  Name:
+*     astPickle
+
+*  Purpose:
+*     Create an in-memory serialisation of an Object
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "object.h"
+*     char *astPickle( AstObject *this )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function returns a string holding a minimal textual
+*     serialisation of the supplied AST Object. The Object can re
+*     re-created from the serialisation using astUnpickle.
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be serialised.
+
+*  Returned Value:
+*     astPickle()
+*        Pointer to dynamically allocated memory holding the
+*        serialisation, or NULL if an error occurs. The pointer
+*        should be freed when no longer needed using astFree.
+
+c--
+*/
+
+/* Local Variables: */
+   PickleData data;              /* Date passed to the sink function */
+   AstChannel *channel;          /* Pointer to output Channel */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Create a Channel which will write to an expanding dynamically
+   allocated memory buffer. Set Channel attributes to exclude all
+   non-essential characters. */
+   channel = astChannel( NULL, PickleSink, "Comment=0,Full=-1,Indent=0",
+                         status );
+
+/* Initialise the data structure used to communicate with the sink
+   function, and store a pointer to it in the Channel. */
+   data.ptr = NULL;
+   data.buff = NULL;
+   data.len = 0;
+   astPutChannelData( channel, &data );
+
+/* Write the Object to the Channel. */
+   astWrite( channel, this );
+
+/* Annul the Channel pointer. */
+   channel = astAnnul( channel );
+
+/* Free the returned string if an error has occurred. */
+   if( !astOK ) data.ptr = astFree( data.ptr );
+
+/* Return the pointer. */
+   return data.ptr;
+}
+
+static void PickleSink( const char *text ){
+/*
+*  Name:
+*     PickleSink
+
+*  Purpose:
+*     A Channel sink function for use by the astPickle method.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*      PickleSink( const char *text )
+
+*  Class Membership:
+*     Object member function.
+
+*  Description:
+*     This function appends the supplied line of text to the end of a
+*     dynamically growing memory block.
+
+*  Parameters:
+*     text
+*        Pointer to the null-terminated line of text to be stored.
+
+*/
+
+/* Local Variables: */
+   PickleData *data;     /* Date passed to the sink function */
+   int *status;          /* Pointer to local status value */
+   int status_value;     /* Local status value */
+
+/* Set up the local status */
+   status_value = 0;
+   status = &status_value;
+
+/* Get a pointer to the structure holding the current memory pointer and
+   the length of the currently allocated memory. */
+   data = astChannelData;
+
+/* Append the supplied text to the end of the string, and update the
+   string length. */
+   data->ptr = astAppendString( data->ptr, &(data->len), text );
+
+/* Append a newline character to the end of the string, and update the
+   string length. */
+   data->ptr = astAppendString( data->ptr, &(data->len), "\n" );
+}
+
 void astSet_( void *this_void, const char *settings, int *status, ... ) {
 /*
 *++
@@ -3229,9 +3365,9 @@ void astSetDump_( AstObjectVtab *vtab,
 *  Description:
 *     This function is provided so that class definitions can declare
 *     a dump function to be associated with an Object that is being
-*     constructed.  When the astWrite (or astShow) method is later
-*     used to write the Object to a Channel, the dump function of each
-*     class to which the Object belongs will be invoked in turn
+*     constructed.  When the astWrite (or astShow or astPickle) method
+*     is later used to write the Object to a Channel, the dump function
+*     of each class to which the Object belongs will be invoked in turn
 *     (working down the class hierarchy). The dump function is passed
 *     pointers to the Object and the output Channel. It should write
 *     out any internal values (e.g. instance variables) for its class
@@ -3996,6 +4132,142 @@ f     error value
    }
 
    return result;
+}
+
+AstObject *astUnpickle_( const char *pickle, int *status ) {
+/*
+c++
+*  Name:
+*     astUnpickle
+
+*  Purpose:
+*     Re-create an Object from an in-memory serialisation
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *astUnpickle( const char *pickle )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function returns a pointer to a new Object created from the
+*     supplied text string, which should have been created by astPickle.
+
+*  Parameters:
+*     pickle
+*        Pointer to a text string holding an Object serialisation created
+*        previously by astPickle.
+
+*  Returned Value:
+*     astUnpickle()
+*        Pointer to a new Object created from the supplied serialisation,
+*        or NULL if the serialisation was invalid, or an error occurred.
+
+c--
+*/
+
+/* Local Variables: */
+   PickleData data;              /* Date passed to the source function */
+   AstChannel *channel;          /* Pointer to output Channel */
+   AstObject *result;            /* Pointer to returned Object */
+
+/* Check the global error status and supplied serialisation. */
+   if ( !astOK || !pickle ) return NULL;
+
+/* Create a Channel which will read from the supplied serialisation. */
+   channel = astChannel( UnpickleSource, NULL, "", status );
+
+/* Initialise the data structure used to communicate with the source
+   function, and store a pointer to it in the Channel. */
+   data.ptr = (char *) pickle;
+   data.buff = NULL;
+   data.len = 0;
+   astPutChannelData( channel, &data );
+
+/* Read an Object from the Channel. */
+   result = astRead( channel );
+
+/* Annul the Channel pointer. */
+   channel = astAnnul( channel );
+
+/* Free the line buffer. */
+   data.buff = astFree( data.buff );
+
+/* Annul the returned Object if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the Object pointer. */
+   return result;
+}
+
+static const char *UnpickleSource( void ){
+/*
+*  Name:
+*     UnpickleSource
+
+*  Purpose:
+*     A Channel source function for use by the astUnpickle method.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     result = UnpickleSource( void )
+
+*  Class Membership:
+*     Object member function.
+
+*  Description:
+*     This function reads the next line of text from a serialisation and
+*     returns a pointer to it, or NULL if no lines remain.
+
+*  Returned Value:
+*     Pointer to the null terminated line of text or NULL if no lines
+*     remain.
+*/
+
+/* Local Variables: */
+   PickleData *data;     /* Date passed to the sink function */
+   char *nl;             /* Pointer to next newline character */
+   int *status;          /* Pointer to local status value */
+   int nc;               /* Number of characters to read from serialisation */
+   int status_value;     /* Local status value */
+
+/* Set up the local status */
+   status_value = 0;
+   status = &status_value;
+
+/* Get a pointer to the structure holding a pointer to the next line, and
+   to the buffer to return. */
+   data = astChannelData;
+
+/* Return NULL if no text remains to be read. */
+   if( !data->ptr || (data->ptr)[0] == 0 ) return NULL;
+
+/* Find the next newline (if any) in the serialisation. */
+   nl = strchr( data->ptr, '\n' );
+
+/* Get the number of characters to copy. */
+   nc = nl ? nl - data->ptr : strlen( data->ptr );
+
+/* Copy them into the returned buffer, including an extra character for
+   the terminating null. */
+   data->buff = astStore( data->buff, data->ptr, nc + 1 );
+
+/* Store the terminating null. */
+   (data->buff)[ nc ] = 0;
+
+/* Update the pointer to the next character to read from the
+   serialisation. */
+   data->ptr = nl ? nl + 1 : NULL;
+
+/* Return the buffer. */
+   return data->buff;
 }
 
 static void VSet( AstObject *this, const char *settings, char **text,

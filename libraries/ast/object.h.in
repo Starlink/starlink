@@ -1475,6 +1475,8 @@ AstObject *astAnnulId_( AstObject *, int * );
 AstObject *astCheckLock_( AstObject *, int * );
 AstObject *astClone_( AstObject *, int * );
 AstObject *astCopy_( const AstObject *, int * );
+AstObject *astUnpickle_( const char *, int * );
+char *astPickle_( AstObject *, int * );
 const char *astGetC_( AstObject *, const char *, int * );
 double astGetD_( AstObject *, const char *, int * );
 float astGetF_( AstObject *, const char *, int * );
@@ -1484,6 +1486,7 @@ int astHasAttribute_( AstObject *, const char *, int * );
 int astSame_( AstObject *, AstObject *, int * );
 int astTest_( AstObject *, const char *, int * );
 long astGetL_( AstObject *, const char *, int * );
+void *astGetProxy_( AstObject *, int * );
 void astClear_( AstObject *, const char *, int * );
 void astExemptId_( AstObject *, int * );
 void astLockId_( AstObject *, int, int * );
@@ -1492,10 +1495,9 @@ void astSetD_( AstObject *, const char *, double, int * );
 void astSetF_( AstObject *, const char *, float, int * );
 void astSetI_( AstObject *, const char *, int, int * );
 void astSetL_( AstObject *, const char *, long, int * );
+void astSetProxy_( AstObject *, void *, int * );
 void astShow_( AstObject *, int * );
 void astUnlockId_( AstObject *, int, int * );
-void *astGetProxy_( AstObject *, int * );
-void astSetProxy_( AstObject *, void *, int * );
 
 #if defined(astCLASS)            /* Protected */
 
@@ -1587,6 +1589,8 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astMakeId(pointer) ((void *)astMakeId_((AstObject *)(pointer),STATUS_PTR))
 #define astP2I(pointer) astP2I_((AstObject *)(pointer),STATUS_PTR)
 #define astMakePointer(id) ((void *)astCheckLock_(astMakePointer_((AstObject *)(id),STATUS_PTR),STATUS_PTR))
+#define astPickle(this) astINVOKE(V,astPickle_(astCheckObject(this),STATUS_PTR))
+#define astUnpickle(pickle) astINVOKE(O,astUnpickle_(pickle,STATUS_PTR))
 
 /* Interfaces to member functions. */
 /* ------------------------------- */

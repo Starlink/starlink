@@ -22513,6 +22513,13 @@ current version):
 
 \begin{enumerate}
 
+c+
+\item The Object class has a new function astPickle (C only), which creates
+an in-memory textual serialisation of a given AST Object. A corresponding
+new function called astUnpickle re-creates the Object from its
+serialisation.
+c-
+
 \item The PolyMap class can now use an iterative Newton-Raphson method to
 evaluate the inverse the inverse transformation if no inverse
 transformation is defined when the PolyMap is created.
