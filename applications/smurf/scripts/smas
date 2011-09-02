@@ -3,6 +3,7 @@
 #  Set defaults
 set sum_method = PSF
 set amp_method = PSF
+set amp_only = 0
 set diam = " "
 set perc = 95
 set error = " "
@@ -62,6 +63,9 @@ while( $# > 0 )
    else if( "$argv[1]" == "-p" ) then
       set amp_method = STATS
 
+   else if( "$argv[1]" == "-b" ) then
+      set amp_only = 1
+
    else if( "$argv[1]" == "-h" || "$argv[1]" == "--help" ) then
       set help = 1
 
@@ -102,7 +106,7 @@ if( $help == 1 ) then
 
 Short Map Analysis Script
 
-Usage: smas [-a diam] [-e error] [-r perc] [-p] <in-list> <out-table> [<out-image>]
+Usage: smas [-a diam] [-b] [-e error] [-r perc] [-p] <in-list> <out-table> [<out-image>]
 
    option:
       -a: Specifies that the catalogue SUM column values (the total
@@ -114,6 +118,10 @@ Usage: smas [-a diam] [-e error] [-r perc] [-p] <in-list> <out-table> [<out-imag
 	  integrated value under the model source calculated by
 	  KAPPA:PSF. If "diam" is not supplied, defaults of 30 and
 	  15 are used for 850 and 450 um data respectively.
+
+      -b: Specifies that the catalogue should contain only ROW, COL and
+          AMP only. Using this option also implies the "-p" option.
+          This reduces the run-time for script significantly.
 
       -e: Specifies the maximum allowed error (in arc-seconds) between the
           source position as determined by KAPPA:BEAMFIT and KAPPA:PSF.
@@ -152,9 +160,10 @@ Usage: smas [-a diam] [-e error] [-r perc] [-p] <in-list> <out-table> [<out-imag
 	  <out-table>'.
 
       <out-image>: if supplied, and if the input data contains bolomaps,
-          a 2D NDF containing the SUM values for each bolometer is
-	  created, with the name given by <out-image>. The FITS headers
-          from the first input NDF are copied to the output NDF.
+          a 2D NDF containing the SUM (or AMP if the "-b" option is used)
+          values for each bolometer is created with the name given by
+          <out-image>. The FITS headers from the first input NDF are
+          copied to the output NDF.
 
    Description:
 
@@ -395,13 +404,15 @@ foreach n (`cat $inlist`)
 end
 
 
-#  Create the line holding the system name and the line holding the column names in
-#  the output catalogue.
+#  Create the line holding the system name and the line holding the column
+#  names in the output catalogue.
 echo "# SYSTEM = $system" > $outtable
-if( $moon == 0 ) then
-   echo "# TAI UTC SEQSTART SEQEND DLON DLAT AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" >> $outtable
-else
+if( $moon == 1 ) then
    echo "# SUM ROW COL" >> $outtable
+else if( $amp_only == 1 ) then
+   echo "# AMP ROW COL" >> $outtable
+else
+   echo "# TAI UTC SEQSTART SEQEND DLON DLAT AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" >> $outtable
 endif
 
 # Get he number of good pixels required for each source.
@@ -424,26 +435,35 @@ foreach n (`cat files.smas`)
       set col = null
    endif
 
-# First handle all maps except those of hte Moon.
+# First handle all maps except those of the Moon.
    if( $moon == 0 ) then
-
-# Create a temp copy of the NDF so we can change it.
-      $KAPPA_DIR/ndfcopy $n'(0~30,0~30)'  temp-smas
-      set ndf = temp-smas
-
-#  From here on, use offset sky coords to refer to positions within the map.
-      $KAPPA_DIR/wcsframe $ndf sky
-      $KAPPA_DIR/wcsattrib $ndf set skyrefis origin
-
-#  Ensure formatted axis values are decimal arc-seconds.
-      $KAPPA_DIR/wcsattrib $ndf set 'format(1)' s.2
-      $KAPPA_DIR/wcsattrib $ndf set 'format(2)' s.2
 
 #  If source features are negative in the shortmap/bolomap, negate the map
 #  so that they become positive.
       if( $negative == 1 ) then
-         $KAPPA_DIR/cmult $ndf -1 pos-smas
-         set ndf = "pos-smas"
+         $KAPPA_DIR/cmult $n'(0~30,0~30)' -1 temp-smas
+         set ndf = "temp-smas"
+
+#  Otherwise, and if required, create a copy of the central section of the
+#  NDF so that we can change it.
+      else if( $amp_only == 0 ) then
+         $KAPPA_DIR/ndfcopy $n'(0~30,0~30)'  temp-smas
+         set ndf = temp-smas
+
+#  For AMP only catalogues, use the unmodified NDF.
+      else
+         set ndf = $n
+      endif
+
+#  From here on, if beamfit and psf will be used, use offset sky coords to
+#  refer to positions within the map.
+      if( $amp_only == 0 ) then
+         $KAPPA_DIR/wcsframe $ndf sky
+         $KAPPA_DIR/wcsattrib $ndf set skyrefis origin
+
+#  Ensure formatted axis values are decimal arc-seconds.
+         $KAPPA_DIR/wcsattrib $ndf set 'format(1)' s.2
+         $KAPPA_DIR/wcsattrib $ndf set 'format(2)' s.2
       endif
 
 #  Find the offset sky coords at the centre of the feature. The feature is
@@ -455,6 +475,9 @@ foreach n (`cat files.smas`)
       rm -f coin.smas > /dev/null
       echo $maxco > coin.smas
 
+#  Get the maximum value in the box.
+      set maxv = `$KAPPA_DIR/parget maximum stats`
+
 #  Check that the box contains at least 95% good pixels.
       set numgood = `$KAPPA_DIR/parget numgood stats`
       if( $numgood < $mingood ) then
@@ -463,204 +486,209 @@ foreach n (`cat files.smas`)
          continue
       endif
 
-#  Determine the source parameters using kappa:beamfit
-      $KAPPA_DIR/beamfit $ndf mode=file coin=coin.smas quiet
-      if( $status == 0 ) then
-         set centre = `$KAPPA_DIR/parget centre beamfit`
-         set bxcen = $centre[1]
-         set bycen = $centre[2]
-         set bamp = `$KAPPA_DIR/parget amp beamfit`
-         set bamp = $bamp[1]
-         set bsum = `$KAPPA_DIR/parget sum beamfit`
-         set bfwhm = `$KAPPA_DIR/parget minfwhm beamfit`
-         set bfwhm = $bfwhm[1]
-         set majfwhm = `$KAPPA_DIR/parget majfwhm beamfit`
-         set majfwhm = $majfwhm[1]
-         set baxisr = `$KAPPA_DIR/calc exp="pa/pb" pa=$majfwhm pb=$bfwhm`
-         set borient = `$KAPPA_DIR/parget orient beamfit`
-         set borient = $borient[1]
+#  If required, determine the source parameters using kappa:beamfit
+      if( $amp_only == 0 ) then
+         $KAPPA_DIR/beamfit $ndf mode=file coin=coin.smas quiet
+         if( $status == 0 ) then
+            set centre = `$KAPPA_DIR/parget centre beamfit`
+            set bxcen = $centre[1]
+            set bycen = $centre[2]
+            set bamp = `$KAPPA_DIR/parget amp beamfit`
+            set bamp = $bamp[1]
+            set bsum = `$KAPPA_DIR/parget sum beamfit`
+            set bfwhm = `$KAPPA_DIR/parget minfwhm beamfit`
+            set bfwhm = $bfwhm[1]
+            set majfwhm = `$KAPPA_DIR/parget majfwhm beamfit`
+            set majfwhm = $majfwhm[1]
+            set baxisr = `$KAPPA_DIR/calc exp="pa/pb" pa=$majfwhm pb=$bfwhm`
+            set borient = `$KAPPA_DIR/parget orient beamfit`
+            set borient = $borient[1]
 
 #  Scale beamfit FWHM from radians to arc-seconds (we can't just change the
 #  Format attribue since beamfit writes the fwhm out as a double rather than
 #  as a string)
-         set bfwhm = `$KAPPA_DIR/calc exp="3600*180*pa/3.1415926536" pa=$bfwhm`
+            set bfwhm = `$KAPPA_DIR/calc exp="3600*180*pa/3.1415926536" pa=$bfwhm`
 
-      else
-         echo "  beamfit failure"
-         set bxcen = null
-         set bycen = null
-         set bamp = null
-         set bsum = null
-         set bfwhm = null
-         set baxisr = null
-         set borient = null
-      endif
+         else
+            echo "  beamfit failure"
+            set bxcen = null
+            set bycen = null
+            set bamp = null
+            set bsum = null
+            set bfwhm = null
+            set baxisr = null
+            set borient = null
+         endif
 
 # PSF is also sensitive to low-level background structure, so threshold
 # the data at 5% of the peak value to exclude background regions.
-      set maxv = `$KAPPA_DIR/parget maximum stats`
-      set cut = `$KAPPA_DIR/calc exp="pa*0.05" pa=$maxv`
-      $KAPPA_DIR/thresh in=$ndf out=cut-smas thrlo=$cut newlo=bad thrhi=1.0E10 \
-                        newhi=bad quiet
-      set ndf = cut-smas
+         set cut = `$KAPPA_DIR/calc exp="pa*0.05" pa=$maxv`
+         $KAPPA_DIR/thresh in=$ndf out=cut-smas thrlo=$cut newlo=bad thrhi=1.0E10 \
+                           newhi=bad quiet
+         set ndf = cut-smas
 
 #  Find the size of the region containing the remaining good values.
-      $KAPPA_DIR/ndfcopy $ndf temp-smas trimbad
-      $KAPPA_DIR/ndftrace temp-smas quiet
-      set dim1 = `$KAPPA_DIR/parget dims\(1\) ndftrace`
-      set dim2 = `$KAPPA_DIR/parget dims\(2\) ndftrace`
-      if( $dim1 > $dim2 ) then
-         set isize = $dim1
-      else
-         set isize = $dim2
-      endif
+         $KAPPA_DIR/ndfcopy $ndf temp-smas trimbad
+         $KAPPA_DIR/ndftrace temp-smas quiet
+         set dim1 = `$KAPPA_DIR/parget dims\(1\) ndftrace`
+         set dim2 = `$KAPPA_DIR/parget dims\(2\) ndftrace`
+         if( $dim1 > $dim2 ) then
+            set isize = $dim1
+         else
+            set isize = $dim2
+         endif
 
 #  Ensure the size is odd since PSF reports an error is supplied an even
 #  ISIZE value.
-      set isize = `$KAPPA_DIR/calc exp="1+2*nint(pa/2-0.1)" pa=$isize`
+         set isize = `$KAPPA_DIR/calc exp="1+2*nint(pa/2-0.1)" pa=$isize`
 
 #  Determine the source parameters using kappa:psf
-      $KAPPA_DIR/psf $ndf incat=! cofile=coin.smas isize=$isize norm=f device=! quiet
+         $KAPPA_DIR/psf $ndf incat=! cofile=coin.smas isize=$isize norm=f device=! quiet
 
 #  Check a psf was found succesfully.
-      if( $status == 0 ) then
+         if( $status == 0 ) then
 
 #  Get the parameters of the psf.
-         if( $amp_method == PSF ) then
-            set amp = `$KAPPA_DIR/parget amp1 psf`
-         else
-            set amp = $maxv
-         endif
-         set posxy = `$KAPPA_DIR/parget centre psf`
-         set axisr = `$KAPPA_DIR/parget axisr psf`
-         set fwhm = `$KAPPA_DIR/parget fwhm psf`
-         set orient = `$KAPPA_DIR/parget orient psf`
-         set gamma = `$KAPPA_DIR/parget gamma psf`
+            if( $amp_method == PSF ) then
+               set amp = `$KAPPA_DIR/parget amp1 psf`
+            else
+               set amp = $maxv
+            endif
+            set posxy = `$KAPPA_DIR/parget centre psf`
+            set axisr = `$KAPPA_DIR/parget axisr psf`
+            set fwhm = `$KAPPA_DIR/parget fwhm psf`
+            set orient = `$KAPPA_DIR/parget orient psf`
+            set gamma = `$KAPPA_DIR/parget gamma psf`
 
 #  See if the beamfit and psf source positions are sufficiently similar.
-         if( "$error" != " " ) then
-            if( $bxcen != "null" && $bycen != "null" ) then
-               set ok = `$KAPPA_DIR/calc exp="abs(pa-pb)<=pc" pa=$bxcen pb=$posxy[1] pc=$error`
-               if( $ok == 1 ) then
-                  set ok = `$KAPPA_DIR/calc exp="abs(pa-pb)<=pc" pa=$bycen pb=$posxy[2] pc=$error`
+            if( "$error" != " " ) then
+               if( $bxcen != "null" && $bycen != "null" ) then
+                  set ok = `$KAPPA_DIR/calc exp="abs(pa-pb)<=pc" pa=$bxcen pb=$posxy[1] pc=$error`
+                  if( $ok == 1 ) then
+                     set ok = `$KAPPA_DIR/calc exp="abs(pa-pb)<=pc" pa=$bycen pb=$posxy[2] pc=$error`
+                  endif
+               else
+                  set ok = 0
                endif
             else
-               set ok = 0
+               set ok = 1
             endif
-         else
-            set ok = 1
-         endif
 
 #  Skip this map if the beamfit and psf positions disagree.
-         if( $ok == 1 ) then
+            if( $ok == 1 ) then
 
 #  Get the total data sum. Two methods - 1) aperture photometry...
-            if( $sum_method == APERADD ) then
+               if( $sum_method == APERADD ) then
 
 #  Choose the aperture size in pixels (60 arc-secs assuming default makemap
 #  pixel sizes of 2 and 4 arc-seconds)..
-               if( "$diam" == " " ) then
-                  if( $sar > 3 ) then
-                     set diam = 30
-                  else
-                     set diam = 15
+                  if( "$diam" == " " ) then
+                     if( $sar > 3 ) then
+                        set diam = 30
+                     else
+                        set diam = 15
+                     endif
                   endif
-               endif
 
-               if( $first == 1  ) then
-                  echo
-                  echo "Using KAPPA:APERADD to determine total flux (aperture $diam arcsec)"
-                  echo
-               endif
+                  if( $first == 1  ) then
+                     echo
+                     echo "Using KAPPA:APERADD to determine total flux (aperture $diam arcsec)"
+                     echo
+                  endif
 
 #  Replace any bad pixels within a box centred on the max pixel with sides twice
 #  the above diameter.
-               @ size = $diam + $diam
-               $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled-smas quiet
+                  @ size = $diam + $diam
+                  $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled-smas quiet
 
 #  Do the aperture photometry within the filled image. Check some bad pixels
 #  were filled. If not, use $ndf instead of "filled-smas".
-               if( $status == 0 ) then
-                  $KAPPA_DIR/aperadd filled-smas centre="'$posxy'" diam=$diam quiet
-               else
-                  $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam quiet
-               endif
-               set fsum = `$KAPPA_DIR/parget total aperadd`
+                  if( $status == 0 ) then
+                     $KAPPA_DIR/aperadd filled-smas centre="'$posxy'" diam=$diam quiet
+                  else
+                     $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam quiet
+                  endif
+                  set fsum = `$KAPPA_DIR/parget total aperadd`
 
 #  Alternatively - 2) use the integral of the model PSF as the souce total data sum.
-            else
-               if( $first == 1  ) then
-                  echo
-                  echo "Using KAPPA:PSF to determine total flux"
-                  echo
+               else
+                  if( $first == 1  ) then
+                     echo
+                     echo "Using KAPPA:PSF to determine total flux"
+                     echo
+                  endif
+                  set fsum = `$KAPPA_DIR/parget total psf`
                endif
-               set fsum = `$KAPPA_DIR/parget total psf`
-            endif
 
 #  Get the sequence number at start and end, if possible
-            set seqstart = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=SEQSTART`
-            echo $seqstart | grep "does not exist" >& /dev/null
-            if( $status != 1 ) then
-               set seqstart = null
-            endif
+               set seqstart = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=SEQSTART`
+               echo $seqstart | grep "does not exist" >& /dev/null
+               if( $status != 1 ) then
+                  set seqstart = null
+               endif
 
-            set seqend = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=SEQEND`
-            echo $seqend | grep "does not exist" >& /dev/null
-            if( $status != 1 ) then
-               set seqend = null
-            endif
+               set seqend = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=SEQEND`
+               echo $seqend | grep "does not exist" >& /dev/null
+               if( $status != 1 ) then
+                  set seqend = null
+               endif
 
 #  If possible get the MJD-AVG and TIMESYS FITS headers (shortmaps should
 #  have both of these).
-            set mjdavg = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=MJD-AVG`
-            echo $mjdavg | grep "does not exist" >& /dev/null
-            if( $status != 1 ) then
-               set mjdavg = null
-               set timesys = null
-            else
-               set timesys = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=TIMESYS`
-               echo $timesys | grep "does not exist" >& /dev/null
+               set mjdavg = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=MJD-AVG`
+               echo $mjdavg | grep "does not exist" >& /dev/null
                if( $status != 1 ) then
                   set mjdavg = null
                   set timesys = null
+               else
+                  set timesys = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=TIMESYS`
+                  echo $timesys | grep "does not exist" >& /dev/null
+                  if( $status != 1 ) then
+                     set mjdavg = null
+                     set timesys = null
+                  endif
                endif
-            endif
 
 #  If we have an MJD-AVG, store it as the TimeOrigin value in a TimeFrame.
-            $ATOOLS_DIR/asttimeframe options='system=mjd' result=tf
-            if( $mjdavg != null ) then
-               $ATOOLS_DIR/astset tf timescale $timesys result=tf
-               $ATOOLS_DIR/astset tf timeorigin $mjdavg result=tf
+               $ATOOLS_DIR/asttimeframe options='system=mjd' result=tf
+               if( $mjdavg != null ) then
+                  $ATOOLS_DIR/astset tf timescale $timesys result=tf
+                  $ATOOLS_DIR/astset tf timeorigin $mjdavg result=tf
 
 # If we do not have an MJD-AVG value, get the epoch from the WCS FrameSet, and
 # store it as the TimeOrigin value in a TimeFrame.
-            else
-               $ATOOLS_DIR/astset tf system JEPOCH result=tf
-               $ATOOLS_DIR/astset tf timescale TDB result=tf
-               set tdb = `$ATOOLS_DIR/astget $ndf epoch`
-               $ATOOLS_DIR/astset tf timeorigin $tdb result=tf
-               $ATOOLS_DIR/astset tf system MJD result=tf
-            endif
+               else
+                  $ATOOLS_DIR/astset tf system JEPOCH result=tf
+                  $ATOOLS_DIR/astset tf timescale TDB result=tf
+                  set tdb = `$ATOOLS_DIR/astget $ndf epoch`
+                  $ATOOLS_DIR/astset tf timeorigin $tdb result=tf
+                  $ATOOLS_DIR/astset tf system MJD result=tf
+               endif
 
 #  Convert the TimeFrame to TAI timescale and get the converted TimeOrigin value.
-            $ATOOLS_DIR/astset tf timescale TAI result=tf
-            set tai = `$ATOOLS_DIR/astget tf timeorigin`
+               $ATOOLS_DIR/astset tf timescale TAI result=tf
+               set tai = `$ATOOLS_DIR/astget tf timeorigin`
 
 #  Covert the TimeFrame to UTC timescale and get the converted TimeOrigin value.
-            $ATOOLS_DIR/astset tf timescale UTC result=tf
-            set utc = `$ATOOLS_DIR/astget tf timeorigin`
+               $ATOOLS_DIR/astset tf timescale UTC result=tf
+               set utc = `$ATOOLS_DIR/astget tf timeorigin`
 
 #  Set the TimeFrame Format to ISO and get the UTC date-time string.
-            $ATOOLS_DIR/astset tf format iso.2T result=tf
-            set date = `$ATOOLS_DIR/astformat tf axis=1 value=0.0`
+               $ATOOLS_DIR/astset tf format iso.2T result=tf
+               set date = `$ATOOLS_DIR/astformat tf axis=1 value=0.0`
 
 #  Write a row to the output catalogue.
-            echo "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient $row $col" >> $outtable
+               echo "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient $row $col" >> $outtable
+            endif
+
+#  Tell the user if PSF failed.
+         else
+            echo "  psf failure"
          endif
 
-#  Report any PSF failure.
+#  If only the AMP, COL and ROW columsn are needed, write them to the catalogue.
       else
-         echo "  psf failure"
+         echo "$maxv $row $col" >> $outtable
       endif
 
 #  Now handle maps of the Moon.
@@ -715,10 +743,10 @@ end
 #  TRANDAT fails if the file contains any non-numeric column values, so first
 #  copy the required columns from the returned catalogue into a separate file.
 if( "$outimage" != " " ) then
-   if( $moon == 0 ) then
-      cat $outtable | grep -v \# | awk '{print $21, $22, $8}' > cat.smas
-   else
+   if( $moon == 1 || $amp_only == 1 ) then
       cat $outtable | grep -v \# | awk '{print $2, $3, $1}' > cat.smas
+   else
+      cat $outtable | grep -v \# | awk '{print $21, $22, $8}' > cat.smas
    endif
 
    $KAPPA_DIR/trandat freename=cat.smas poscols="[1,2]" valcol=3 auto=no ndf=$outimage
