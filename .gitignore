@@ -712,6 +712,7 @@ applications/smurf/libsmf/smf_sort.c
 applications/smurf/libsmf/smf_stats1.c
 applications/smurf/libsmf/smf_templateFit1.c
 applications/smurf/libsmf/smf_tophat1.c
+applications/smurf/libsmf/smf_weightstats1.c
 applications/smurf/libsmurf/smurfmon.tex
 applications/smurf/smurf.csh
 applications/smurf/smurf.icl
