@@ -190,9 +190,9 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
       bolref = coeffs;
 
       /* Fix up powref to reflect the change in bolref to store coefficients
-         (see sc2sim_fitheat) */
+         (see sc2sim_heatrun) */
       for ( idx=0; idx<(bolref->dims)[2]; idx++ ) {
-        flatpar[idx] = idx - 2;
+        flatpar[idx] = (double)idx - 2.0;
       }
       (powref->dims)[0] = (bolref->dims)[2];
 
