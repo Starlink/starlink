@@ -105,6 +105,10 @@
 *        Add raw2current to API
 *     2011-06-09 (EC):
 *        Don't need raw2current because the respmap header has what we need
+*     2011-09-02 (TIMJ):
+*        Simplify logic with TABLE mode. Now just pass TABLE data to the
+*        polynomial fitting flatfield routine and then handle the responsivity
+*        calculation in the same place.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -148,29 +152,18 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
                                smfData ** polyfit, int *status ) {
 
   size_t bol;                  /* Bolometer offset into array */
-  double * bolv = NULL;        /* Temp space for bol values */
-  double * bolvv = NULL;       /* Temp space for bol variance values */
-  double * coeffs = NULL;      /* Polynomial coefficients of 1d fit */
-  size_t * goodidx = NULL;     /* Indices of good measurements */
-  int istable = 0;             /* Is this table mode? */
+  double * bolval = NULL;      /* pointer to data in smfData */
+  double * bolvalvar = NULL;   /* pointer to variance in smfData bolvald */
+  const size_t coffset = 2;    /* Offset into POLYNOMIAL for coefficients */
   size_t k;                    /* loop counter */
   size_t nbol;                 /* number of bolometers */
-  size_t nheat;                /* number of heater measurements */
+  size_t ncoeffs = 0;
   size_t ngood = 0;            /* number of valid responsivities */
-  size_t nrgood = 0;           /* number of good responsivities for bolo */
-  double *poly = NULL;         /* polynomial expansion of each fit */
-  double *polybol = NULL;      /* polynomial expansion for all bolometers */
-  double *powv = NULL;         /* Temp space for power values */
   double raw2current=VAL__BADD;/* Conversion from DAC --> current units */
   double *respdata = NULL;     /* responsivity data */
   double *respvar = NULL;      /* responsivity variance */
-  double * varcoeffs = NULL;   /* variance in polynomial coefficients of 1d fit */
+  smfData * tabbolval = NULL;  /* POLYNOMIAL bolval derived from TABLE data */
 
-  double * powval = NULL;      /* pointer to data in smfData */
-  double * bolval = NULL;      /* pointer to data in smfData */
-  double * bolvalvar = NULL;   /* pointer to variance in smfData bolvald */
-
-  const int usevar = 1;
   const double MINRESP = 0.1e6;/* Minimum "in specification" responsivity A/W */
   const double MAXRESP = 5.0e8;/* Maximum "in specification" responsivity A/W */
 
@@ -180,209 +173,84 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   if (!smf_dtype_check_fatal(powvald, NULL, SMF__DOUBLE, status)) return ngood;
   if (!smf_dtype_check_fatal(bolvald, NULL, SMF__DOUBLE, status)) return ngood;
 
-  /* Calculate a boolean for table mode */
-  istable = ( method == SMF__FLATMETH_TABLE ? 1 : 0 );
-
   /* Extract relevant information from the smfData */
   respdata = (respmap->pntr)[0];
   respvar  = (respmap->pntr)[1];
   raw2current = smf_raw2current( respmap->hdr, status );
 
-  powval = (powvald->pntr)[0];
-  bolval = (bolvald->pntr)[0];
-  bolvalvar = (bolvald->pntr)[1];
-
-  nheat = (powvald->dims)[0];
   nbol = (respmap->dims)[0] * (respmap->dims)[1];
 
   /* The flatfield mode makes a difference here. If we are fitting
-     in TABLE mode then we fit and expand the polynomial and take
-     the gradient. If we are in polynomial mode the polynomial
-     is actually the inverse of the polynomial we would be generating
-     in TABLE mode. Simplest to have two separate blocks. */
+     in TABLE mode we first have to fit the data with a polynomial.
+     We do that using the same code that we would have used to
+     calculate the POLYNOMIAL result. Then we can continue with
+     shared code and free the additional polynomial fit results at
+     the end. */
 
-  if (istable) {
+  if (method == SMF__FLATMETH_TABLE) {
+    /* Generate a polynomial fit of the TABLE data. Note that this
+       routine fits current as a function of heater so for order>1
+       the polynomial is not inverted. */
+    smf_flat_fitpoly( powvald, bolvald, snrmin, order, &tabbolval,
+                      polyfit, status );
 
-    /* Space for fit data */
-    bolv = astMalloc( nheat*sizeof(*bolv) );
-    if (usevar && bolvalvar) bolvv = astMalloc( nheat*sizeof(*bolvv) );
-    powv = astMalloc( nheat*sizeof(*powv) );
+    bolval = (tabbolval->pntr)[0];
+    bolvalvar = (tabbolval->pntr)[1];
+    ncoeffs = (tabbolval->dims)[2];
 
-    /* Polynomial expansion */
-    if (polyfit) polybol = astMalloc( (nheat*nbol)*sizeof(*polybol) );
-    poly = astMalloc( nheat*sizeof(*poly) );
-
-    /* prefil polynomial with bad */
-    if (polybol) {
-      for (k=0; k < nheat*nbol; k++) {
-        polybol[k] = VAL__BADD;
-      }
-    }
-
-    /* some memory for good indices */
-    goodidx = astCalloc( nheat, sizeof(*goodidx) );
-
-    /* coefficients */
-    coeffs = astCalloc( order+1, sizeof(*coeffs) );
-    varcoeffs = astCalloc( order+1, sizeof(*varcoeffs) );
-
-    /* dim1 must change slower than dim0 */
-    for (bol=0; bol < nbol; bol++) {
-
-      /* perform a fit - responsivity is the gradient */
-      nrgood = 0;
-      for (k = 0; k < nheat; k++) {
-        if ( bolval[k*nbol+bol] != VAL__BADD &&
-             powval[k] != VAL__BADD) {
-          bolv[nrgood] = raw2current * bolval[k*nbol+bol];
-          powv[nrgood] = powval[k];
-          if (bolvv) {
-            if  (bolvalvar[k*nbol+bol] != VAL__BADD) {
-              bolvv[nrgood] = bolvalvar[k*nbol+bol] * pow(raw2current,2);
-            } else {
-              bolvv[nrgood] = VAL__BADD;
-            }
-          }
-          goodidx[nrgood] = k;
-          nrgood++;
-        }
-      }
-
-      if (nrgood > 3) {
-        double resp = 0.0;
-        double varresp = 0.0;
-        double snr = VAL__BADD;
-        size_t nused;
-
-        /* Now fit a polynomial */
-        smf_fit_poly1d( order, nrgood, 5.0, powv, bolv, bolvv, NULL, coeffs,
-                        varcoeffs, poly, &nused, status );
-
-        /* we take the responsivity to be the gradient at the middle heater setting */
-        for (k=1; k<order+1; k++) {
-          /* standard differential of a polynomial */
-          double xterm = k * pow( powval[nheat/2], k-1 );
-          if (coeffs[k] == VAL__BADD) {
-            resp = VAL__BADD;
-            if (varcoeffs) varresp = VAL__BADD;
-            break;
-          }
-          resp += coeffs[k] * xterm;
-          if (varcoeffs) varresp += pow(xterm, 2) * varcoeffs[k];
-        }
-
-        /* Wayne wants a positive responsivity. Dennis wants it to be
-           properly negative. */
-        if (resp != VAL__BADD) resp = fabs( resp );
-
-        /* Calculate the signal to noise ratio. */
-        if (resp != VAL__BADD && varresp != VAL__BADD) snr = resp / sqrt( varresp );
-
-        /* Nominal responsivity is -1.0e6 but we allow a bigger range
-           through */
-        if ( resp == VAL__BADD || resp > MAXRESP || resp < MINRESP
-             || snr < snrmin ) {
-          respdata[bol] = VAL__BADD;
-          if (respvar) respvar[bol] = VAL__BADD;
-        } else {
-          respdata[bol] = resp;
-          if (respvar) respvar[bol] = varresp;
-          ngood++;
-        }
-
-        /* copy out the polynomial expansion */
-        if (polybol) {
-          for (k=0; k<nrgood; k++) {
-            size_t idx = goodidx[k];
-            polybol[idx*nbol+bol] = poly[k] / (raw2current);
-          }
-        }
-
-      } else {
-        respdata[bol] = VAL__BADD;
-        if (respvar) respvar[bol] = VAL__BADD;
-
-        if (polybol) {
-          for (k=0; k<nheat; k++) {
-            polybol[k*nbol+bol] = VAL__BADD;
-          }
-        }
-
-      }
-
-    }
   } else {
-    /* Polynomial fit of  POWER = f( DAC units ) so we calculate the gradient
+
+    bolval = (bolvald->pntr)[0];
+    bolvalvar = (bolvald->pntr)[1];
+    ncoeffs = (bolvald->dims)[2];
+
+  }
+
+  /* Polynomial fit of  POWER = f( DAC units ) so we calculate the gradient
      for the reference value (stored in coefficient [1]) and reciprocate it. We do
      not expand the polynomial in this branch. */
-    size_t ncoeffs = (bolvald->dims)[2];
-    size_t coffset = 2;
 
-    for (bol=0; bol < nbol; bol++) {
+  for (bol=0; bol < nbol; bol++) {
 
-      if ( bolval[1*nbol+bol] != VAL__BADD ) {
-        double refbol  = bolval[1*nbol+bol];
-        double resp = 0.0;
+    if ( bolval[1*nbol+bol] != VAL__BADD ) {
+      double refbol  = bolval[1*nbol+bol];
+      double resp = 0.0;
 
-        /* need the gradient at x=refbol */
-        for (k=1; k<ncoeffs-coffset; k++) {
-          /* standard differential of a polynomial:
-             grad = c[1] x^0 + 2 c[2] x^1 + 3 c[3] x^3
-           */
-          double xterm = k * pow( refbol, k-1 );
-          resp += bolval[(k+coffset)*nbol+bol] * xterm;
-        }
-
-        /* need to invert and take the absolute value */
-        resp = 1.0 / fabs(resp);
-
-        /* That gradient is DAC/W and we want A/W */
-        resp *= raw2current;
-
-        /* can not do a signal-to-noise clip */
-        if ( resp > MAXRESP || resp < MINRESP ) {
-          respdata[bol] = VAL__BADD;
-          if (respvar) respvar[bol] = VAL__BADD;
-        } else {
-          respdata[bol] = resp;
-          if (respvar) respvar[bol] = 0.0;
-          ngood++;
-        }
-
-      } else {
-
-        respdata[bol] = VAL__BADD;
-        if (respvar) respvar[bol] = VAL__BADD;
-
+      /* need the gradient at x=refbol */
+      for (k=1; k<ncoeffs-coffset; k++) {
+        /* standard differential of a polynomial:
+           grad = c[1] x^0 + 2 c[2] x^1 + 3 c[3] x^3
+        */
+        double xterm = k * pow( refbol, k-1 );
+        resp += bolval[(k+coffset)*nbol+bol] * xterm;
       }
 
-    }
+      /* need to invert and take the absolute value */
+      resp = 1.0 / fabs(resp);
 
-  }
+      /* That gradient is DAC/W and we want A/W */
+      resp *= raw2current;
 
-  if (polybol) {
-    if (polyfit && istable) {
-      void *pntr[2];
-      pntr[0] = polybol;
-      pntr[1] = NULL;
-      *polyfit = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                        pntr, NULL, SMF__QFAM_TSERIES, NULL, 1,
-                                        bolvald->dims, bolvald->lbnd, 3, 0, 0, NULL,
-                                        NULL, status );
-      if (*status != SAI__OK && ! *polyfit) astFree( polybol );
+      /* can not do a signal-to-noise clip */
+      if ( resp > MAXRESP || resp < MINRESP ) {
+        respdata[bol] = VAL__BADD;
+        if (respvar) respvar[bol] = VAL__BADD;
+      } else {
+        respdata[bol] = resp;
+        if (respvar) respvar[bol] = 0.0;
+        ngood++;
+      }
+
     } else {
-      astFree( polybol );
+
+      respdata[bol] = VAL__BADD;
+      if (respvar) respvar[bol] = VAL__BADD;
+
     }
+
   }
 
-  if (goodidx) astFree( goodidx );
-  if (coeffs) astFree( coeffs );
-  if (varcoeffs) astFree( varcoeffs );
-  if (poly) astFree( poly );
-  if (bolv) astFree( bolv );
-  if (bolvv) astFree( bolvv );
-  if (powv) astFree( powv );
-
+  if (tabbolval) smf_close_file(&tabbolval, status );
   if (*status != SAI__OK) {
     if (*polyfit) smf_close_file( polyfit, status );
   }
