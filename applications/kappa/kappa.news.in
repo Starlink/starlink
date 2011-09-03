@@ -21,7 +21,9 @@
    o FITSMOD
 
       - New parameter READONLY allows FITSMOD to be used to perform
-      read-only edits such as "Print" and "Exist" on write-protected NDFs.
+      read-only edits such as "Print" and "Exist" on write-protected
+      NDFs, although FITSVAL and FITSEXIST tasks are recommended for
+      these operations.
 
    o HISTOGRAM
 
