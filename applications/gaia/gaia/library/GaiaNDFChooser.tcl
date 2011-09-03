@@ -435,24 +435,26 @@ itcl::class gaia::GaiaNDFChooser {
    #  This method is called when the user clicks on an image NDF icon.
    #  Display the selected image.
    protected method select_image_ndf_ {ndf {component "data"}} {
-      if { [catch {
-         busy {
-            $image_ hdu $ndf $component
-            $itk_option(-image) configure -component $component
-            $itk_option(-image) update_title
 
-            for {set i 0} {$i < $num_images_} {incr i} {
-               if {[info exists ext_($i,frame)]} {
-                  if {"$ext_($i,ndf)" == "$ndf"} {
-                     $ext_($i,frame) configure -relief sunken
-                  } else {
-                     $ext_($i,frame) configure -relief raised
-                  }
+      #  Hold using blt::busy, not busy{}. See release call for why.
+      blt::busy hold $w_
+
+      if { [catch {
+         for {set i 0} {$i < $num_images_} {incr i} {
+            if {[info exists ext_($i,frame)]} {
+               if {"$ext_($i,ndf)" == "$ndf"} {
+                  $ext_($i,frame) configure -relief sunken
+               } else {
+                  $ext_($i,frame) configure -relief raised
                }
             }
-            catch "$table_ select_row [expr $ndf-1]"
-            select_ndf_
          }
+         catch "$table_ select_row [expr $ndf-1]"
+         select_ndf_
+
+         $itk_option(-image) configure -component $component
+         $itk_option(-image) update_title
+         $image_ hdu $ndf $component
       } msg ] } {
          warning_dialog "Failed to select NDF component: $msg"
 
@@ -462,6 +464,12 @@ itcl::class gaia::GaiaNDFChooser {
          if { $component != "data" } {
             select_image_ndf_ $ndf "data"
          }
+      }
+
+      #  Do not release if window has been destroyed. This can happen
+      #  during the handle new image callback (see GaiaImageCtrl).
+      if { [winfo exists $w_] } {
+         blt::busy release $w_
       }
    }
 
