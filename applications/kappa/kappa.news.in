@@ -10,7 +10,7 @@
    the width of margins cleared around the edges of each drawn
    text string.
 
-   o  Applications that report pixel scales (e.g.} NDFTRACE,
+   o  Applications that report pixel scales (e.g. NDFTRACE,
    WCSFRAME) now report more representative pixel scales.  The pixel
    scales were previously measured at the first pixel in the array.
    Now the pixel scales are found at a number of places within the
@@ -31,15 +31,15 @@
       that exceed the single-precision data range.
       -  The default for the AXES parameter has changed so that by
       default axes are only drawn if the picture is cleared.
-      - New parameter WEIGHTS allows different weights to be associated
-      with each value in the input NDF.
+      - New parameter WEIGHTS allows different weights to be
+      associated with each value in the input NDF.
 
    o  LOOK
 
       -  New format "wglist" has been added, which lists the WCS
       co-ordinates and pixel values in an image, omitting bad pixels.
-      -  New mode "all" has been added, which lists the entire supplied
-      NDF.
+      -  New mode "all" has been added, which lists the entire
+      supplied NDF.
 
    o  MFITTREND
 
