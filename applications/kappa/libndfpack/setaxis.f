@@ -259,6 +259,9 @@
 *        - In WCS mode, PNTRW only needs "EL" elements, not "NIN*EL".
 *     21-JUL-2009 (DSB):
 *        Scale SKY axes from radians to degrees in WCS mode.
+*     5-SEP-2011 (DSB):
+*        Change WCS mode so that it does not assume that corresponding 
+*        pixel and WCS axes have the same index. 
 *     {enter_further_changes_here}
 
 *-
@@ -313,6 +316,7 @@
       INTEGER I                  ! Loop count
       INTEGER IAT                ! Used length of a string
       INTEGER IAXIS              ! Dimension to modify
+      INTEGER IAXISW             ! Corresponding WCS axis
       INTEGER IERR               ! First conversion error (dummy=0)
       INTEGER IMAP               ! Compiled mapping identifier
       INTEGER INPRM( NDF__MXDIM )! Input axis permutation array
@@ -861,57 +865,67 @@
             NIN = AST_GETI( MAP0, 'NIN', STATUS )
             NOUT = AST_GETI( MAP0, 'NOUT', STATUS )
 
+*  Attempt to split the Mapping in order to find the WCS axis that
+*  corresponds to the selected pixel axis.
+            CALL AST_MAPSPLIT( MAP0, 1, IAXIS, IAXISW, MAP, STATUS )
+
+*  If the Mapping could not be split, assume wcs axis IAXIS corresponds
+*  to pixel axis IAXIS.
+            IF( MAP .EQ. AST__NULL ) THEN
+               IAXISW = IAXIS
+
 *  Abort if the output Frame does not include the requested axis index.
-            IF ( NOUT .LT. IAXIS .AND. STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI( 'NOUT', NOUT )
-               IF ( NOUT .EQ. 1 ) THEN
-                  CALL MSG_SETC( 'NOUT', ' axis' )
-               ELSE
-                  CALL MSG_SETC( 'NOUT', ' axes' )
+               IF ( NOUT .LT. IAXIS .AND. STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETI( 'NOUT', NOUT )
+                  IF ( NOUT .EQ. 1 ) THEN
+                     CALL MSG_SETC( 'NOUT', ' axis' )
+                  ELSE
+                     CALL MSG_SETC( 'NOUT', ' axes' )
+                  END IF
+                  CALL MSG_SETI( 'IAX', IAXIS )
+                  CALL NDF_MSG( 'NDF', NDF )
+                  CALL ERR_REP( 'SETAXIS_ERR', 'The current Frame of '//
+     :                          'the NDF ''NDF'' has only ^NOUT, so '//
+     :                          'the requested axis (^IAX) cannot be '//
+     :                          'used.', STATUS )
+                  GO TO 999
                END IF
-               CALL MSG_SETI( 'IAX', IAXIS )
-               CALL NDF_MSG( 'NDF', NDF )
-               CALL ERR_REP( 'SETAXIS_ERR', 'The current Frame of the'//
-     :                       ' NDF ''NDF'' has only ^NOUT, so the '//
-     :                       'requested axis (^IAX) cannot be used.',
-     :                       STATUS )
-               GO TO 999
-            END IF
 
 *  Create an AST PermMap which will feed values into the selected input
 *  axis of the above Mapping, using a value equal to half the axis length
 *  on all other axes.
-            INPRM( 1 ) = IAXIS
-            DO I = 1, NIN
-               OUTPRM( I ) = -I
-               CONST( I ) = 0.5D0*( UBND( I ) - LBND( I ) + 1 )
-            END DO
-            OUTPRM( IAXIS ) = 1
-            PMAP1 = AST_PERMMAP( 1, INPRM, NIN, OUTPRM, CONST, ' ',
-     :                           STATUS )
+               INPRM( 1 ) = IAXIS
+               DO I = 1, NIN
+                  OUTPRM( I ) = -I
+                  CONST( I ) = 0.5D0*( UBND( I ) - LBND( I ) + 1 )
+               END DO
+               OUTPRM( IAXIS ) = 1
+               PMAP1 = AST_PERMMAP( 1, INPRM, NIN, OUTPRM, CONST, ' ',
+     :                              STATUS )
 
 *  Create an AST PermMap which will extract values for the selected output
 *  axis of the above Mapping.
-            OUTPRM( 1 ) = IAXIS
-            DO I = 1, NOUT
-               INPRM( I ) = 0
-            END DO
-            INPRM( IAXIS ) = 1
-            PMAP2 = AST_PERMMAP( NOUT, INPRM, 1, OUTPRM, 0.0D0, ' ',
-     :                           STATUS )
+               OUTPRM( 1 ) = IAXIS
+               DO I = 1, NOUT
+                  INPRM( I ) = 0
+               END DO
+               INPRM( IAXIS ) = 1
+               PMAP2 = AST_PERMMAP( NOUT, INPRM, 1, OUTPRM, 0.0D0, ' ',
+     :                              STATUS )
 
 *  Combine the Mappings together to get a Mapping with 1 input and 1
 *  output.
-            MAP = AST_CMPMAP( PMAP1, AST_CMPMAP( MAP0, PMAP2, .TRUE.,
-     :                                           ' ', STATUS ),
-     :                        .TRUE., ' ', STATUS )
+               MAP = AST_CMPMAP( PMAP1, AST_CMPMAP( MAP0, PMAP2, .TRUE.,
+     :                                              ' ', STATUS ),
+     :                           .TRUE., ' ', STATUS )
+            END IF
 
 *  If the selected axis is a SkyAxis, add in a mapping that will scale
 *  the axis values from radians to degrees.
             ATTR = 'Domain('
             IAT = 7
-            CALL CHR_PUTI( IAXIS, ATTR, IAT )
+            CALL CHR_PUTI( IAXISW, ATTR, IAT )
             CALL CHR_APPND( ')', ATTR, IAT )
             IF( AST_GETC( IWCS, ATTR, STATUS ) .EQ. 'SKY' ) THEN
                MAP = AST_CMPMAP( MAP, AST_ZOOMMAP( 1, AST__DR2D, ' ',
@@ -924,7 +938,7 @@
             ELSE
                ATTR = 'UNIT('
                IAT = 6
-               CALL CHR_PUTI( IAXIS, ATTR, IAT )
+               CALL CHR_PUTI( IAXISW, ATTR, IAT )
                CALL CHR_APPND( ')', ATTR, IAT )
                UNIT = AST_GETC( IWCS, ATTR( : IAT ), STATUS )
             END IF
