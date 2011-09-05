@@ -370,6 +370,8 @@
 *        Correct "variance supplied" flags passed to KPG1_METHE.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     5-SEP-2011 (DSB):
+*        Initialise the "variance supplied" flags in all cases.
 *     {enter_further_changes_here}
 
 *-
@@ -991,6 +993,7 @@
                J = J + 1
                CALL KPG1_PROWR( EL, %VAL( CNF_PVAL( PNTRW( 3 ) ) ), J,
      :                          %VAL( CNF_PVAL( PNTRW( 1 ) ) ), STATUS )
+               VFLAG( J ) = .FALSE.
 
             END DO
 
@@ -1030,6 +1033,7 @@
                J = J + 1
                CALL KPG1_PROWD( EL, %VAL( CNF_PVAL( PNTRW( 3 ) ) ), J,
      :                          %VAL( CNF_PVAL( PNTRW( 1 ) ) ), STATUS )
+               VFLAG( J ) = .FALSE.
             END DO
          END IF
 
@@ -1076,6 +1080,7 @@
                J = J + 1
                CALL KPG1_PROWR( EL, %VAL( CNF_PVAL( PNTRW( 3 ) ) ), J,
      :                          %VAL( CNF_PVAL( PNTRW( 1 ) ) ), STATUS )
+               VFLAG( J ) = .FALSE.
             END DO
 
 *  Now repeat for double-precision data.
@@ -1109,6 +1114,7 @@
                J = J + 1
                CALL KPG1_PROWD( EL, %VAL( CNF_PVAL( PNTRW( 3 ) ) ), J,
      :                          %VAL( CNF_PVAL( PNTRW( 1 ) ) ), STATUS )
+               VFLAG( J ) = .FALSE.
             END DO
 
          END IF
