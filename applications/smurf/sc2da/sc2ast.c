@@ -176,6 +176,11 @@ int *status             /* global status (given and returned) */
      describing focal plane coordinates in arc-seconds, and a Frame with
      Domain BOLO describing bolometer coordinates.
 
+     Within the FPLANE domain, axis 1 corresponds to the "Virtual850
+     North" axis, described in document SC2/SOF/S200/042 by BD Kelly. Axis
+     2 in the FPLANE domain corresponds to the negative direction of the
+     "Virtual850 UP" axis.
+
      This function uses a supplied structure to hold a cache of information
      that does not change between invocations. If "cache" is supplied as
      NULL, then memory for a new structure is allocated and initialised, and
