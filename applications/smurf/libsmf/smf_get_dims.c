@@ -51,12 +51,16 @@
 *     data array. To index the i'th bolometer and the j'th tslice:
 *     value = data[i*bstride + j*tstride].
 *
+*     2-dimensional data are treated as if they are 3-d time-ordered
+*     bolometer data with a third dimension (number of time slices) equal
+*     to one.
+*
 *     4-dimensional data can also be handled if they contain FFT data,
 *     which is verified through a call to smf_isfft. In this case the
 *     bolometer and time strides refer to a single component (real
 *     or imaginary).
 *
-*     This routine will set SMF__WDIM if the input smfData are not 3-
+*     This routine will set SMF__WDIM if the input smfData are not 2-, 3-
 *     or 4-dimensional.
 
 *  Authors:
@@ -70,9 +74,13 @@
 *        Add stride to API
 *     2010-10-29 (EC):
 *        Handle 4d FFT data
+*     2011-09-06 (TIMJ):
+*        Allow 2d data (eg responsivity images) to return the number
+*        of columns or rows.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 2008,2010 University of British Columbia
 *     All Rights Reserved.
 
@@ -122,13 +130,13 @@ void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
    /* Check the inherited status */
    if ( *status != SAI__OK ) return;
 
-   if( data->ndims == 3 ) {
+   if( data->ndims == 3 || data->ndims == 2 ) {
      /* Calculate Dimensions */
-     if( data->isTordered ) {
+     if( data->ndims == 2 || data->isTordered ) {
        nr = (data->dims)[SC2STORE__ROW_INDEX];
        nc = (data->dims)[SC2STORE__COL_INDEX];
        nb = (data->dims)[0]*(data->dims)[1];
-       nt = (data->dims)[2];
+       nt = (data->ndims == 2 ? 1 : (data->dims)[2]);
        bs = 1;
        ts = nb;
      } else {
@@ -152,10 +160,12 @@ void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
      nd = 1;
      for( i=0; i<data->ndims; i++ ) nd *= data->dims[i];
    } else {
+     if (*status != SAI__OK) errAnnul(status); /* Annul smf_isfft error */
      *status = SMF__WDIM;
-     msgSeti("NDIMS",data->ndims);
-     errRep(" ", FUNC_NAME
-            ": Couldn't figure out dimensionality of smfData", status);
+     errRepf(" ", FUNC_NAME
+             ": Can not work out rows, columns or time slices from %d-dimensional data",
+             status, (int)data->ndims);
+
     return;
    }
 
