@@ -26,7 +26,7 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astselectormap astinterval astbox astshowmesh astzoommap astdistance \
  astcircle astlinearapprox astnegate astremoveregion astdownsize \
  astoutline astrate astoverlap astmask asttrangrid astquadapprox \
- astratemap astwcsmap astpolytran
+ astratemap astwcsmap astpolytran astangle
 
 FSRC = \
  atl1_gtfrm.f \
@@ -105,7 +105,7 @@ astselectormap.ifc astmapregion.ifc astcmpregion.ifc astgetregbounds.ifc \
 astgetregframe.ifc astshowmesh.ifc astzoommap.ifc astdistance.ifc astcircle.ifc \
 astlinearapprox.ifc astnegate.ifc astremoveregion.ifc astdownsize.ifc \
 astoutline.ifc astrate.ifc astoverlap.ifc astmask.ifc asttrangrid.ifc \
-astquadapprox.ifc astwcsmap.ifc
+astquadapprox.ifc astwcsmap.ifc astangle.ifc
 
 IFL_FILES = astaddframe.ifl astclear.ifl astcmpframe.ifl astcmpmap.ifl \
 astratemap.ifl astconvert.ifl astcopy.ifl astdsbframe.ifl astellipse.ifl \
@@ -123,7 +123,7 @@ astselectormap.ifl astmapregion.ifl astcmpregion.ifl astgetregbounds.ifl \
 astgetregframe.ifl astshowmesh.ifl astzoommap.ifl astdistance.ifl astcircle.ifl \
 astlinearapprox.ifl astnegate.ifl astremoveregion.ifl astdownsize.ifl \
 astoutline.ifl astrate.ifl astoverlap.ifl astmask.ifl asttrangrid.ifl \
-astquadapprox.ifl astwcsmap.ifl
+astquadapprox.ifl astwcsmap.ifl astangle.ifl
 
 
 CLEANFILES = $(MISC_FILES) $(IFC_FILES) $(IFL_FILES)

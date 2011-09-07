@@ -9,6 +9,10 @@
  high-level interface to the AST library.
 
 
+  Changes in V1.9-10
+
+  - New command astangle
+
   Changes in V1.9-9
 
   - New command astpolytran.

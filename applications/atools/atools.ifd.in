@@ -1553,6 +1553,53 @@ iraf! {
 
       }
 
+      action astangle {
+         helplib {$ATOOLS_HELP}
+
+          parameter a {
+            position 2
+            type _DOUBLE
+            prompt {Coords at first point}
+            ppath CURRENT
+            helpkey *
+          }
+
+          parameter b {
+            position 3
+            type _DOUBLE
+            prompt {Coords at second point}
+            ppath CURRENT
+            helpkey *
+          }
+
+          parameter c {
+            position 4
+            type _DOUBLE
+            prompt {Coords at third point}
+            ppath CURRENT
+            helpkey *
+          }
+
+          parameter degs {
+            type _LOGICAL
+            prompt {Report answer in degrees?}
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Frame}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+         }
+
+      }
+
       action astshiftmap {
          helplib {$ATOOLS_HELP}
 
