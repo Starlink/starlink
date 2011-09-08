@@ -126,6 +126,7 @@
 #include "sae_par.h"
 
 #include <ctype.h>
+#include <strings.h>
 
 void
 smf_flat_params( const smfData * refdata, const char resistpar[],
