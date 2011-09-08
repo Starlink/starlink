@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_flatfield( smfData *idata, const smfArray * flats,
+*     smf_flatfield( smfData *idata, const smfArray * flats, AstKeyMap * heateffmap,
 *                    smfData **odata, const int flags, int *status );
 
 *  Arguments:
@@ -22,6 +22,8 @@
 *     flats = const smfArray * (Given)
 *        Array of flatfield data. If a relevant flatfield is found it
 *        will be applied to idata before flatfielding is calculated.
+*     heateffmap = AstKeyMap * (Given)
+*        Details of heater efficiency data to be applied during flatfielding.
 *     odata = smfData** (Given and Returned)
 *        Pointer to a smfData struct. If *odata is NULL a new smfData*
 *        will be created and stored in this location.
@@ -132,8 +134,8 @@
 
 #define FUNC_NAME "smf_flatfield"
 
-void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **odata,
-                     const int flags, int *status ) {
+void smf_flatfield ( const smfData *idata, const smfArray * flats, AstKeyMap * heateffmap,
+                     smfData **odata, const int flags, int *status ) {
 
   if ( *status != SAI__OK ) return;
 
@@ -177,7 +179,7 @@ void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **oda
     }
 
     /* Disable the check because we know that we have just checked */
-    smf_flatfield_smfData( *odata, flats, 1, status );
+    smf_flatfield_smfData( *odata, flats, heateffmap, 1, status );
 
   }
 }

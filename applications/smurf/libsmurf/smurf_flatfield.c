@@ -155,6 +155,7 @@ void smurf_flatfield( int *status ) {
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   smfArray *flatramps = NULL;/* Flatfield ramps */
+  AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   size_t i = 0;             /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
   Grp *ogrp = NULL;         /* Output group of files */
@@ -169,7 +170,7 @@ void smurf_flatfield( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
-                    &flatramps, NULL, status );
+                    &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -196,7 +197,8 @@ void smurf_flatfield( int *status ) {
     if (*status != SAI__OK) break;
 
     /* Call flatfield routine */
-    didflat = smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps, &ffdata, status);
+    didflat = smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps,
+                                     heateffmap, &ffdata, status);
 
     /* Report failure by adding a message indicating which file failed */
     msgSeti("I",i);
@@ -234,6 +236,7 @@ void smurf_flatfield( int *status ) {
   if (darks) smf_close_related( &darks, status );
   if (bbms) smf_close_related( &bbms, status );
   if( flatramps ) smf_close_related( &flatramps, status );
+  if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   ndfEnd( status );
 }
 

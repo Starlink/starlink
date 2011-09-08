@@ -371,7 +371,7 @@ void smurf_calcnoise( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, NULL,
-                    &flatramps, NULL, status );
+                    &flatramps, NULL, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -493,7 +493,7 @@ void smurf_calcnoise( int *status ) {
     if (doclean) {
       /* Get the first smfData that will contribute to this continuous chunk,
          but do not concatenate the data just yet. */
-      smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, contchunk, 0, 1,
+      smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, NULL, contchunk, 0, 1,
                            NULL, 0, NULL, NULL, 0, 0, 0, 1, NULL, &firstdata,
                            status );
 
@@ -526,7 +526,7 @@ void smurf_calcnoise( int *status ) {
 
     /* Now that we have the padding, concatenate this continuous chunk but
        forcing a raw data read. We will need quality. */
-    smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, contchunk, 0, 1,
+    smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, NULL, contchunk, 0, 1,
                          NULL, 0, NULL, NULL, pad, pad, 0, 1, &concat, NULL,
                          status );
 

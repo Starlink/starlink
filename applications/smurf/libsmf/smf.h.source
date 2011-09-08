@@ -743,7 +743,7 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
 
 void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           const smfArray *darks, const smfArray *bpms,
-                          const smfArray *flatramps,
+                          const smfArray *flatramps, AstKeyMap * heateffmap,
                           size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
@@ -1007,7 +1007,7 @@ int *smf_find_median( const float *farray, const double *darray, size_t nel,
 void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                       Grp **darkgrp, Grp **flatgrp, int reducedark, int calcflat,
                       smf_dtype darktype, smfArray ** darks, smfArray **fflats,
-                      double * meanstep, int * status );
+                      AstKeyMap **heateffmap, double * meanstep, int * status );
 
 void smf_find_seqcount( const smfHead * hdr, int *seqcount, int *status );
 
@@ -1122,7 +1122,7 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
                  const char methpar[], const char orderpar[], const char snrminpar[],
                  double * refohms, double **resistance, int * nrows,
                  int * ncols, smf_flatmeth  *flatmeth,
-                 int * order, double * snrmin, int * status );
+                 int * order, double * snrmin, smfData ** heateff, int * status );
 
 void smf_flat_precondition( int allbad, smfData * powvald, smfData * bolvald,
                             int *status );
@@ -1144,13 +1144,15 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
                      const smfData * powref, const smfData * bolref,
                      const smfData * polyfit, const Grp * prvgrp, int * status );
 
-void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **odata,
-                     const int flags, int *status );
+void smf_flatfield ( const smfData *idata, const smfArray * flats, AstKeyMap * heateffmap,
+                     smfData **odata, const int flags, int *status );
 
-int smf_flatfield_smfData ( smfData *data, const smfArray * flats,
+int smf_flatfield_smfData ( smfData *data, const smfArray * flats, AstKeyMap * heateffmap,
                             int force, int *status );
 
-void smf_flatten ( smfData *data, int *status );
+void smf_flatten ( smfData *data, AstKeyMap * heateffmap, int *status );
+
+AstKeyMap * smf_free_effmap( AstKeyMap * effmap, int *status);
 
 smfFilter *smf_free_smfFilter( smfFilter *filt, int *status );
 
@@ -1288,7 +1290,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *flagrootgrp, const Grp *samprootgrp,
                      AstKeyMap *keymap,
                      const smfArray *darks, const smfArray *bbms,
-                     const smfArray * flatramps, AstFrameSet *outfset,
+                     const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
                      int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
                      double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
@@ -1349,8 +1351,8 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
 void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                        smfArray **iarray, const smfArray *darks,
                        const smfArray *bbms, const smfArray *flatramps,
-                       const smfArray *noisemaps,dim_t nchunks,
-                       smf_modeltype mtype, int isTordered,
+                       AstKeyMap * heateffmap, const smfArray *noisemaps,
+                       dim_t nchunks, smf_modeltype mtype, int isTordered,
                        AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
@@ -1387,10 +1389,10 @@ const char * smf_obstype_str( smf_obstype type, int * status );
 
 int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
                              const smfArray * darks, const smfArray * ramps,
-                             smfData **ffdata, int *status);
+                             AstKeyMap * heateffmap, smfData **ffdata, int *status);
 
 void smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
-                        const smfArray* flatramps, int ensureflat,
+                        const smfArray* flatramps, AstKeyMap * heateffmap, int ensureflat,
                         smfData **data, int *status );
 
 void smf_open_file( const Grp * igrp, size_t index, const char * mode,

@@ -395,11 +395,11 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
     msgOutif(MSG__VERB," ", FUNC_NAME ": Remove common-mode", status);
 
     /* Create model containers for COM, GAI */
-    smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, 1, SMF__COM,
+    smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, NULL, 1, SMF__COM,
                       0, NULL, 0, NULL, NULL, &comgroup, 1, 1, &comdata, keymap,
                       status );
 
-    smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, 1, SMF__GAI,
+    smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, NULL, 1, SMF__GAI,
                       0, NULL, 0, NULL, NULL, &gaigroup, 1, 1, &gaidata, keymap,
                       status );
 

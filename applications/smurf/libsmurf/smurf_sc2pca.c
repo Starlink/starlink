@@ -144,6 +144,7 @@ void smurf_sc2pca( int *status ) {
   smfData *data=NULL;        /* Pointer to input smfData */
   Grp *fgrp=NULL;            /* Filtered group, no darks */
   smfArray *flatramps=NULL;  /* Flatfield ramps */
+  AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   size_t i=0;                /* Counter, index */
   Grp *igrp=NULL;            /* Input group of files */
   Grp *outampgrp=NULL;       /* Output amplitude group of files */
@@ -168,7 +169,7 @@ void smurf_sc2pca( int *status ) {
 
   /* Filter out useful data (revert to darks if no science data) */
   smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
-                    &flatramps, NULL, status );
+                    &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -197,7 +198,7 @@ void smurf_sc2pca( int *status ) {
     if( *status != SAI__OK ) break;
 
     /* Load data, flatfielding and/or opening raw as double as necessary */
-    smf_open_asdouble( igrp, i, darks, flatramps, ensureflat, &data, status );
+    smf_open_asdouble( igrp, i, darks, flatramps, heateffmap, ensureflat, &data, status );
 
     /* Mask out bad bolometers - mask data array not quality array */
     smf_apply_mask( data, bbms, SMF__BBM_DATA, 0, status );
@@ -234,6 +235,7 @@ void smurf_sc2pca( int *status ) {
   if( darks ) smf_close_related( &darks, status );
   if( bbms ) smf_close_related( &bbms, status );
   if( flatramps ) smf_close_related( &flatramps, status );
+  if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   ndfEnd( status );
 }
 

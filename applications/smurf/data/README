@@ -1,0 +1,5 @@
+Data files needed by SMURF
+
+*_heateff.sdf are heater efficiency files used by SCUBA-2 flatfielding. They
+will be installed into $STARLINK_DIR/share/smurf and are referenced from the
+resist.cfg configuration file.

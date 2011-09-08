@@ -16,7 +16,8 @@
 *     smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 *                     Grp **darkgrp, Grp **flatgrp, int reducedark, int calcflat,
 *                     smf_dtype darktype, smfArray ** darks,
-*                     smfArray **fflats, double * meanstep, int * status );
+*                     smfArray **fflats, AstKeyMap **heateffmap,
+*                     double * meanstep, int * status );
 
 *  Arguments:
 *     ingrp = const Grp* (Given)
@@ -58,6 +59,9 @@
 *        are found. The flatfield solution will be calculated and stored in the smfDA
 *        component of each smfData if "calcflat" is true. Ramps are collapsed using
 *        smf_flat_fastflat irrespective of the calcflat parameter.
+*     heateffmap = AstKeyMap ** (Returned)
+*        AstKeyMap with keys of ARRAYID and values of a pointer to a smfData containing
+*        the associated heater efficiency data. Can be NULL.
 *     meanstep = double * (Returned)
 *        If non-NULL will contain the mean step time of all the data in outgrp
 *     status = int* (Given and Returned)
@@ -228,7 +232,8 @@ static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
 void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                       Grp **darkgrp, Grp **flatgrp, int reducedark,
                       int calcflat, smf_dtype darktype, smfArray ** darks,
-                      smfArray **fflats, double * meanstep, int * status ) {
+                      smfArray **fflats, AstKeyMap ** heateffmap,
+                      double * meanstep, int * status ) {
 
   smfSortInfo *alldarks; /* array of sort structs for darks */
   smfSortInfo *allfflats; /* array of fast flat info */
@@ -243,6 +248,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
   size_t insize;     /* number of input files */
   size_t nsteps_dark = 0;    /* Total number of steps for darks */
   size_t nsteps_sci = 0;     /* Total number of steps for science */
+  AstKeyMap * heatermap = NULL; /* Heater efficiency map */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
   AstKeyMap * scimap = NULL; /* All non-flat obs indexed by unique key */
@@ -256,6 +262,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
   if (darkgrp) *darkgrp = NULL;
   if (darks) *darks = NULL;
   if (fflats) *fflats = NULL;
+  if (heatermap) *heateffmap = NULL;
 
   if (*status != SAI__OK) return;
 
@@ -290,6 +297,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
      if a bad flat is relevant */
   scimap = astKeyMap( "KeyError=1,KeyCase=0" );
 
+  /* This keymap is used to contain relevant heater efficiency data */
+  heatermap = astKeyMap( "KeyError=1,KeyCase=0" );
+
   /* Work out how many input files we have and allocate sufficient sorting
      space */
   insize = grpGrpsz( ingrp, status );
@@ -307,6 +317,22 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
     /* Fill in the keymap with observation details */
     smf_obsmap_fill( infile, obsmap, objmap, status );
+
+    /* Find the heater efficiency map */
+    if (*status == SAI__OK) {
+      char arrayidstr[32];
+      smf_fits_getS( infile->hdr, "ARRAYID", arrayidstr, sizeof(arrayidstr),
+                     status );
+      if (!astMapHasKey( heatermap, arrayidstr ) ) {
+        smfData * heateff = NULL;
+        dim_t nbolos = 0;
+        smf_flat_params( infile, "RESIST", NULL, NULL, NULL, NULL, NULL,
+                         NULL, NULL, NULL, NULL, NULL, &heateff, status );
+        smf_get_dims( heateff, NULL, NULL, &nbolos, NULL, NULL, NULL, NULL,
+                      status );
+        astMapPut0P( heatermap, arrayidstr, heateff, NULL );
+      }
+    }
 
     /* Get the sequence counter for the file. We do not worry about
        duplicate sequence counters (at the moment) */
@@ -892,6 +918,10 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     msgOutiff( MSG__VERB, "", "Mean step time for input files = %g sec",
              status, *meanstep );
   }
+
+  /* Store the heater efficiency map */
+  if (*status != SAI__OK) heatermap = smf_free_effmap( heatermap, status );
+  if (heateffmap) *heateffmap = heatermap;
 
   /* Now report the details of the observation */
   smf_obsmap_report( MSG__NORM, obsmap, objmap, status );

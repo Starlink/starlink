@@ -13,11 +13,13 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_flatten( smfData *data, int *status );
+*     smf_flatten( smfData *data, AstKeyMap * heateffmap, int *status );
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
 *        Pointer to a smfData struct
+*     heateffmap = AstKeyMap * (Given)
+*        Details of heater efficiency data to be applied during flatfielding.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -44,10 +46,12 @@
 *        Change type of flatfield method in smfDA
 *     2010-03-19 (EC):
 *        Renamed SMF__Q_BADS to SMF__Q_BADDA
+*     2011-09-07 (TIMJ):
+*        Apply heater efficiency data after flatfielding.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
 *     2005-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -94,7 +98,7 @@
 /* SC2DA includes */
 #include "sc2da/sc2math.h"
 
-void smf_flatten ( smfData *data, int *status ) {
+void smf_flatten ( smfData *data, AstKeyMap * heateffmap, int *status ) {
 
   smfDA *da = NULL;            /* Pointer to struct containing flatfield info */
   double *dataArr = NULL;      /* Pointer to flatfielded data array */
@@ -139,6 +143,21 @@ void smf_flatten ( smfData *data, int *status ) {
 
     /* Update units and title if we have a header */
     smf_set_clabels( "Flatfielded", NULL, SIPREFIX "W", data->hdr, status);
+
+    /* Now correct for heater efficiency */
+    if (heateffmap && *status == SAI__OK) {
+      char arrayidstr[32];
+      smf_fits_getS( data->hdr, "ARRAYID", arrayidstr, sizeof(arrayidstr),
+                     status );
+      if (astMapHasKey( heateffmap, arrayidstr )) {
+        void * tmp = NULL;
+        astMapGet0P( heateffmap, arrayidstr, &tmp );
+        if (tmp) {
+          smfData * heateff = tmp;
+          smf_scale_bols( NULL, data, heateff, NULL, "HEATEFF", status );
+        }
+      }
+    }
 
     /* Now check for a QUALITY array */
     qual = data->qual;

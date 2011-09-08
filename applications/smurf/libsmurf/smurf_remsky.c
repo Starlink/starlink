@@ -158,6 +158,7 @@ void smurf_remsky( int * status ) {
   smfArray *darks = NULL;    /* Dark data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   smfArray *flatramps = NULL;/* Flatfield ramps */
+  AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
   smfData *odata = NULL;     /* Output data struct */
@@ -181,7 +182,7 @@ void smurf_remsky( int * status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
-                    &flatramps, NULL, status );
+                    &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -224,7 +225,8 @@ void smurf_remsky( int * status ) {
     /* Propagate input files to output */
     for (i=1; i<=size; i++) {
       /* This seems inefficient but it works */
-      smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, &odata, status );
+      smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps,
+                              heateffmap, &odata, status );
       /* Mask out bad bolometers - mask data array not quality array */
       smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
       smf_close_file( &odata, status);
@@ -244,7 +246,8 @@ void smurf_remsky( int * status ) {
   } else {
     for (i=1; i<=size && *status == SAI__OK; i++) {
       /* Flatfield - if necessary */
-      smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, &odata, status );
+      smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps,
+                              heateffmap, &odata, status );
 
       /* Mask out bad bolometers - mask data array not quality array */
       smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
@@ -290,6 +293,7 @@ void smurf_remsky( int * status ) {
   if (darks) smf_close_related( &darks, status );
   if (bbms) smf_close_related( &bbms, status );
   if ( flatramps ) smf_close_related( &flatramps, status );
+  if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 

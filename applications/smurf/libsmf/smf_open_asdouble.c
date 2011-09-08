@@ -14,8 +14,8 @@
 
  *  Invocation:
  *     smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
- *                        const smfArray* flatramps, int ensureflat,
- *                        smfData **data, int *status );
+ *                        const smfArray* flatramps, AstKeyMap * heateffmap,
+ *                        int ensureflat, smfData **data, int *status );
 
  *  Arguments:
  *     igrp = const Grp* (Given)
@@ -27,6 +27,8 @@
  *     flatramps = const smfArray * (Given)
  *        Set of flatfield ramps to be assigned to any relevant data files.
  *        Can be NULL.
+ *     heateffmap = AstKeyMap * (Given)
+ *        Details of heater efficiency data to be applied during flatfielding.
  *     ensureflat = int (Given)
  *        If true, ensure that the flatfield is applied when opening the data
  *        files, else, if they are already flatfielded read them as is, or if
@@ -85,15 +87,15 @@
 #define FUNC_NAME "smf_open_asdouble"
 
 void smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
-                        const smfArray* flatramps, int ensureflat,
-                        smfData **data, int *status ) {
+                        const smfArray* flatramps, AstKeyMap * heateffmap,
+                        int ensureflat, smfData **data, int *status ) {
 
   if( *status != SAI__OK ) return;
 
   /* Load data, flatfielding and/or opening raw as double as necessary */
   if( ensureflat ) {
-    smf_open_and_flatfield( igrp, NULL, index, darks, flatramps, data,
-                            status );
+    smf_open_and_flatfield( igrp, NULL, index, darks, flatramps, heateffmap,
+                            data, status );
   } else {
     /* open as raw if raw else just open as whatever we have */
     smfData *tmpdata = NULL;
@@ -101,8 +103,8 @@ void smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
     if (tmpdata && tmpdata->file && tmpdata->file->isSc2store) {
       smf_open_raw_asdouble( igrp, index, darks, data, status );
     } else {
-      smf_open_and_flatfield( igrp, NULL, index, darks, flatramps, data,
-                              status );
+      smf_open_and_flatfield( igrp, NULL, index, darks, flatramps, heateffmap,
+                              data, status );
     }
     smf_close_file( &tmpdata, status );
   }

@@ -19,7 +19,7 @@
 *                    const Grp *flagrootgrp, const Grp *samprootgrp,
 *                    AstKeyMap *keymap,
 *                    const smfArray * darks, const smfArray *bbms,
-*                    const smfArray * flatramps, AstFrameSet *outfset,
+*                    const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
 *                    int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
 *                    double *map, int *hitsmap, double *exp_time,
 *                    double *mapvar, smf_qual_t *mapqual, double *weights,
@@ -56,6 +56,8 @@
 *     flatramps = const smfArray * (Given)
 *        Collection of flatfield ramps. Will be passed to
 *        smf_open_and_flatfield.
+*     heateffmap = AstKeyMap * (Given)
+*        Details of heater efficiency data to be applied during flatfielding.
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping if calculating
 *        pointing LUT on-the-fly
@@ -435,7 +437,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *flagrootgrp, const Grp *samprootgrp,
                      AstKeyMap *keymap,
                      const smfArray *darks, const smfArray *bbms,
-                     const smfArray * flatramps, AstFrameSet *outfset,
+                     const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
                      int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
                      double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
@@ -1174,7 +1176,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         res = astCalloc( nfilegroups, sizeof(*res) );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
-        smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, contchunk,
+        smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, heateffmap, contchunk,
                              ensureflat, 0, outfset, moving, lbnd_out,
                              ubnd_out, pad, pad, SMF__NOCREATE_VARIANCE, tstep,
                              &res[0], NULL, status );
@@ -1240,7 +1242,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            bolo-ordered data although the work has already been done at
            the concatenation stage. */
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, NULL,
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap, NULL,
                           nfilegroups, SMF__QUA, 0, NULL, 0, NULL, NULL,
                           NULL, memiter, memiter, qua, keymap, status );
 
@@ -1264,7 +1266,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         /* Since a copy of the LUT is open in res[0], use it to initialize
            the LUT model and then free it */
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, NULL,
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap, NULL,
                           nfilegroups, SMF__LUT, 0, NULL, 0, NULL, NULL,
                           NULL, memiter, memiter, lut, keymap, status );
 
@@ -1280,7 +1282,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            it again later! */
 
         if( haveext ) {
-          smf_model_create( wf, NULL, res, darks, bbms, flatramps, noisemaps,
+          smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap, noisemaps,
                             nfilegroups, modeltyps[whichext], 0, NULL, 0, NULL,
                             NULL, NULL, memiter, memiter, model[whichext],
                             keymap, status);
@@ -1358,7 +1360,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                    status, smf_timerupdate(&tv1,&tv2,status) );
 
         /* Continue with other static model. */
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, NULL,
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap, NULL,
                           nfilegroups, SMF__AST, 0, NULL, 0, NULL, NULL,
                           NULL, memiter, memiter, ast, keymap, status );
 
@@ -1384,20 +1386,20 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         res = astCalloc( nfilegroups, sizeof(*res) );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, NULL, 0,
-                          SMF__RES, 0, NULL, 0, NULL, NULL,
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
+                          NULL, 0, SMF__RES, 0, NULL, 0, NULL, NULL,
                           &resgroup, memiter, memiter, res, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, NULL, 0,
-                          SMF__LUT, 0, outfset, moving, lbnd_out, ubnd_out,
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
+                          NULL, 0, SMF__LUT, 0, outfset, moving, lbnd_out, ubnd_out,
                           &lutgroup, memiter, memiter, lut, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, NULL, 0,
-                          SMF__AST, 0, NULL, 0, NULL, NULL,
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
+                          NULL, 0, SMF__AST, 0, NULL, 0, NULL, NULL,
                           &astgroup, memiter, memiter, ast, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, NULL, 0,
-                          SMF__QUA, 0, NULL, 0, NULL, NULL,
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
+                          NULL, 0, SMF__QUA, 0, NULL, 0, NULL, NULL,
                           &quagroup, memiter, memiter, qua, keymap, status );
 
         /*** TIMER ***/
@@ -1424,9 +1426,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( memiter ) {
           /* Don't do SMF__LUT or SMF__EXT as they were handled earlier */
           if( (modeltyps[i] != SMF__LUT) && (modeltyps[i] != SMF__EXT) ) {
-            smf_model_create( wf, NULL, res, darks, bbms, flatramps, noisemaps,
-                              nfilegroups, modeltyps[i], 0, NULL, 0, NULL, NULL,
-                              NULL, memiter, memiter, model[i], keymap, status);
+            smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
+                              noisemaps, nfilegroups, modeltyps[i], 0, NULL, 0, NULL,
+                              NULL, NULL, memiter, memiter, model[i], keymap, status);
           }
 
           /* Associate quality with some models */
@@ -1438,8 +1440,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           }
 
         } else {
-          smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, noisemaps,
-                            0, modeltyps[i], 0, NULL, 0, NULL, NULL,
+          smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
+                            noisemaps, 0, modeltyps[i], 0, NULL, 0, NULL, NULL,
                             &modelgroups[i], memiter, memiter, model[i], keymap,
                             status );
         }

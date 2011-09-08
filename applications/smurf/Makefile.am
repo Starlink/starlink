@@ -124,7 +124,15 @@ examples/simpar_heatrun.lis \
 examples/simpar_pong.lis \
 examples/simpar_stare.lis \
 examples/stareobs.lis \
-examples/staresim.lis
+examples/staresim.lis \
+data/sg450_m1004d1000_heateff.sdf \
+data/sg450_m1006d1003_heateff.sdf \
+data/sg450_m1007d1002_heateff.sdf \
+data/sg450_m1009d1008_heateff.sdf \
+data/sg850_m0906d1005_heateff.sdf \
+data/sg850_m1002d1006_heateff.sdf \
+data/sg850_m1003d1004_heateff.sdf \
+data/sg850_m1005d1007_heateff.sdf
 
 # Linking
 

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     didflat = smf_flatfield_smfData( smfData *data, const smfArray * flats,
-*                                      int force, int *status );
+*                                      AstKeyMap * heateffmap, int force, int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
@@ -22,6 +22,8 @@
 *     flats = const smfArray * (Given)
 *        Array of flatfield data. If a relevant flatfield is found it
 *        will be applied to "data" before flatfielding is calculated.
+*     heateffmap = AstKeyMap * (Given)
+*        Details of heater efficiency data to be applied during flatfielding.
 *     force = int (Given)
 *        Force flatfielding without checking whether the data are flatfielded.
 *     status = int* (Given and Returned)
@@ -96,7 +98,7 @@
 #define FUNC_NAME "smf_flatfield_smfData"
 
 int smf_flatfield_smfData ( smfData *data, const smfArray * flats,
-                            int force, int *status ) {
+                            AstKeyMap * heateffmap, int force, int *status ) {
 
   if (*status != SAI__OK) return 0;
 
@@ -115,7 +117,7 @@ int smf_flatfield_smfData ( smfData *data, const smfArray * flats,
   smf_flat_override( flats, data, status );
 
   /* OK now apply flatfield calibration */
-  smf_flatten( data, status);
+  smf_flatten( data, heateffmap, status);
 
   /* Write history entry to file */
   smf_history_add( data, "smf_flatfield", status);

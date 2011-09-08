@@ -15,7 +15,8 @@
 *  Invocation:
 *     didflat = smf_open_and_flatfield( const Grp *igrp, const Grp *ogrp,
 *                             size_t index, const smfArray* darks,
-*                             const smfArray* flatramps, smfData **data, int *status );
+*                             const smfArray* flatramps, AstKeyMap * heateffmap,
+*                             smfData **data, int *status );
 
 *  Arguments:
 *     igrp = const Grp* (Given)
@@ -29,6 +30,8 @@
 *     flatramps = const smfArray * (Given)
 *        Set of flatfield ramps to be assigned to any relevant data files.
 *        Can be NULL.
+*     heateffmap = AstKeyMap * (Given)
+*        Details of heater efficiency data to be applied during flatfielding.
 *     data = smfData** (Returned)
 *        Pointer to a pointer to smfData struct containing flatfielded data.
 *        Will be created by this routine, or NULL on error.
@@ -171,7 +174,7 @@
 
 int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
                              const smfArray *darks, const smfArray * flatramps,
-                             smfData **ffdata, int *status) {
+                             AstKeyMap * heateffmap, smfData **ffdata, int *status) {
 
   smfData *data = NULL;     /* Pointer to input data struct */
   smfFile *file = NULL;     /* Pointer to input file struct */
@@ -279,7 +282,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
 
     /* Flatfield the data */
     flags |= SMF__NOCREATE_FTS;
-    smf_flatfield( data, flatramps, ffdata, flags, status );
+    smf_flatfield( data, flatramps, heateffmap, ffdata, flags, status );
 
     if (*status == SAI__OK) retval = 1;
 

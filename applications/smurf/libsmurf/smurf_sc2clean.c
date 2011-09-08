@@ -245,6 +245,7 @@ void smurf_sc2clean( int *status ) {
   smfArray *darks = NULL;    /* Dark data */
   int ensureflat;            /* Flag for flatfielding data */
   smfArray *flatramps = NULL;/* Flatfield ramps */
+  AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   smfData *odata = NULL;     /* Pointer to output data struct */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t gcount=0;           /* Grp index counter */
@@ -278,7 +279,7 @@ void smurf_sc2clean( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
-                    &flatramps, NULL, status );
+                    &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -381,7 +382,7 @@ void smurf_sc2clean( int *status ) {
 
     /* Concatenate this continuous chunk */
     smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, bbms, flatramps,
-                         contchunk, ensureflat, 1, NULL, 0, NULL, NULL,
+                         heateffmap, contchunk, ensureflat, 1, NULL, 0, NULL, NULL,
                          padStart, padEnd, 0, 1, &concat, NULL, status );
 
     if( *status == SAI__OK) {
@@ -520,6 +521,7 @@ void smurf_sc2clean( int *status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines */
   if( darks ) smf_close_related( &darks, status );
   if( flatramps ) smf_close_related( &flatramps, status );
+  if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   if( bbms ) smf_close_related( &bbms, status );
   if( igrp ) grpDelet( &igrp, status);
   if( ogrp ) grpDelet( &ogrp, status);

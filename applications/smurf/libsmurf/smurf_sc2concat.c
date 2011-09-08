@@ -150,6 +150,7 @@ void smurf_sc2concat( int *status ) {
   int ensureflat;            /* Flag for flatfielding data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   smfArray * flatramps = NULL; /* Flatfield ramps */
+  AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   size_t gcount=0;           /* Grp index counter */
   size_t idx;                /* Subarray counter */
   int usedarks;              /* flag for using darks */
@@ -181,7 +182,7 @@ void smurf_sc2concat( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
-                    &flatramps, NULL, status );
+                    &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -246,7 +247,7 @@ void smurf_sc2concat( int *status ) {
 
     /* Concatenate this continuous chunk */
     smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, NULL, flatramps,
-                         contchunk, ensureflat, 1, NULL, 0, NULL, NULL,
+                         heateffmap, contchunk, ensureflat, 1, NULL, 0, NULL, NULL,
                          padStart, padEnd, 0, 1, &concat, NULL, status );
 
     /* Export concatenated data for each subarray to NDF file */
@@ -280,6 +281,7 @@ void smurf_sc2concat( int *status ) {
  CLEANUP:
   if( darks ) smf_close_related( &darks, status );
   if( flatramps ) smf_close_related( &flatramps, status );
+  if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   if( igrp ) grpDelet( &igrp, status);
   if( basegrp ) grpDelet( &basegrp, status );
   if( ogrp ) grpDelet( &ogrp, status );

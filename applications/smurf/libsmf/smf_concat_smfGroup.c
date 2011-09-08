@@ -15,7 +15,7 @@
  *  Invocation:
  *     smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
  *                          const smfArray *darks, const smfArray *bbms,
- *                          const smfArray *flatramps,
+ *                          const smfArray *flatramps, AstKeyMap * heateffmap,
  *                          size_t whichchunk, int ensureflat, int isTordered,
  *                          AstFrameSet *outfset, int moving,
  *                          int *lbnd_out, int *ubnd_out, dim_t req_padStart,
@@ -34,7 +34,9 @@
  *     bbms = const smfArray * (Given)
  *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
  *     flatramps = const smfArray * (Given)
- *        Collection of flatfield ramps. Passed to smf_open_and_flatfield.
+ *        Collection of flatfield ramps to apply (optionally) when flatfielding.
+ *     heateffmap = AstKeyMap * (Given)
+ *        Details of heater efficiency data to be applied during flatfielding.
  *     whichchunk = size_t (Given)
  *        Which continuous subset of igrp will get concatenated?
  *     ensureflat = int (Given)
@@ -274,8 +276,8 @@
 
 void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           const smfArray *darks, const smfArray *bbms,
-                          const smfArray *flatramps, size_t whichchunk,
-                          int ensureflat, int isTordered,
+                          const smfArray *flatramps, AstKeyMap * heateffmap,
+                          size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t req_padStart,
                           dim_t req_padEnd, int flags, int tstep,
@@ -672,7 +674,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
         /* If required, apply the flat-field correction. We force the flatfield without
            checking because we just switched to _DOUBLE and smf_check_flat does not yet
            handle that properly. */
-        if( doflat ) smf_flatfield_smfData( refdata, flatramps, 1, status );
+        if( doflat ) smf_flatfield_smfData( refdata, flatramps, heateffmap, 1, status );
 
         /* Set havequal flag based on first file. This is required
            because the initial pass through for dimensions only looked

@@ -232,6 +232,7 @@ void smurf_calcqu( int *status ) {
    AstFitsChan *fc;           /* Holds FITS headers for output NDFs */
    AstKeyMap *config;         /* Holds all cleaning parameters */
    AstKeyMap *dkpars;         /* Holds dark squid cleaning parameters */
+   AstKeyMap *heateffmap = NULL; /* Heater efficiency data */
    AstKeyMap *sub_instruments;/* Indicates which instrument is being used */
    Grp *bgrp = NULL;          /* Group of base names for each chunk */
    Grp *igrp = NULL;          /* Group of input files */
@@ -284,7 +285,7 @@ void smurf_calcqu( int *status ) {
 
 /* Get a group containing just the files holding science data. */
    smf_find_science( igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
-                     &flatramps, NULL, status );
+                     &flatramps, &heateffmap, NULL, status );
 
 /* Check we have at least once science file. */
    ssize = grpGrpsz( sgrp, status );
@@ -333,7 +334,7 @@ void smurf_calcqu( int *status ) {
    the chunk. Each smfData holds the concatenated data for a single
    subarray. */
          smf_concat_smfGroup( wf, sgroup, darks, NULL, flatramps,
-                              ichunk, 1, 1, NULL, 0, NULL, NULL,
+                              heateffmap, ichunk, 1, 1, NULL, 0, NULL, NULL,
                               0, 0, 0, 1, &concat, NULL, status );
 
 /* Get a KeyMap holding values for the configuration parameters. Since we
@@ -615,6 +616,7 @@ void smurf_calcqu( int *status ) {
    if( bgrp ) grpDelet( &bgrp, status );
    if( ogrp ) grpDelet( &ogrp, status );
    if( sgroup ) smf_close_smfGroup( &sgroup, status );
+   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
 
 /* End the NDF and AST contexts. */
    ndfEnd( status );

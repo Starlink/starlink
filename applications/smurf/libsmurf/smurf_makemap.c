@@ -1186,6 +1186,7 @@ void smurf_makemap( int *status ) {
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int first;                 /* Is this the first input file? */
   smfArray *flatramps = NULL;/* Flatfield ramps */
+  AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   int *histogram = NULL;     /* Histogram for calculating exposure statistics */
   int *hitsmap;              /* Hitsmap array calculated in ITERATE method */
   dim_t i;                   /* Loop counter */
@@ -1274,7 +1275,7 @@ void smurf_makemap( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
-                    &flatramps, &meanstep, status );
+                    &flatramps, &heateffmap, &meanstep, status );
 
   /*** TIMER ***/
   msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": %f s finding science obs",
@@ -1663,8 +1664,8 @@ void smurf_makemap( int *status ) {
         if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
           /* Read data from the ith input file in the group */
-          smf_open_and_flatfield( tile->grp, NULL, ifile, darks, flatramps, &data,
-                                  status );
+          smf_open_and_flatfield( tile->grp, NULL, ifile, darks, flatramps,
+                                  heateffmap, &data,status );
 
           /* Check that the data dimensions are 3 (for time ordered data) */
           if( *status == SAI__OK ) {
@@ -2011,8 +2012,8 @@ void smurf_makemap( int *status ) {
 
     smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
                     flagrootgrp, samprootgrp, keymap, NULL, bbms, flatramps,
-                    outfset, moving, lbnd_out, ubnd_out, maxmem-mapmem, map,
-                    hitsmap, exp_time, variance, mapqual, weights, data_units,
+                    heateffmap, outfset, moving, lbnd_out, ubnd_out, maxmem-mapmem,
+                    map, hitsmap, exp_time, variance, mapqual, weights, data_units,
                     &nboloeff, &ncontchunks, &ninsmp, &ncnvg, status );
 
     parPut0i( "NCONTCHUNK", (int) ncontchunks, status );
@@ -2147,6 +2148,7 @@ void smurf_makemap( int *status ) {
   if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
   if( darks ) smf_close_related( &darks, status );
   if( flatramps ) smf_close_related( &flatramps, status );
+  if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   if( bbms ) smf_close_related( &bbms, status );
   if( keymap ) keymap = astAnnul( keymap );
 

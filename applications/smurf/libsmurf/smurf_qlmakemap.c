@@ -384,7 +384,7 @@ void smurf_qlmakemap( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL,
-                    &meanstep, status );
+                    NULL, &meanstep, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -493,7 +493,7 @@ void smurf_qlmakemap( int *status ) {
   msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Process data files", status );
   for ( i=1; i<=size && *status == SAI__OK; i++ ) {
     /* Read data from the ith input file in the group */
-    smf_open_and_flatfield( igrp, NULL, i, darks, NULL, &data, status );
+    smf_open_and_flatfield( igrp, NULL, i, darks, NULL, NULL, &data, status );
 
     msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Cleaning bolometer data.",
               status );

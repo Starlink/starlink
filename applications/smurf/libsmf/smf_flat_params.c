@@ -17,7 +17,7 @@
 *                      const char resistpar[], const char methpar[], const char orderpar[],
 *                      const char snrminpar[], double * refres, double **resistance, int * nrows,
 *                      int * ncols, smf_flatmeth *flatmeth,
-*                      int * order, double * snrmin, int * status );
+*                      int * order, double * snrmin, smfData **heateff, int *status );
 
 *  Arguments:
 *     refdata = const smfData * (Given)
@@ -28,7 +28,7 @@
 *        reference resistance. (group).
 *     methpar = const char [] (Given)
 *        Name of the parameter to use to request the flatfield
-*        method.
+*        method. Can be NULL if flatmeth is NULL.
 *     orderpar = const char [] (Given)
 *        Name of the parameter to use to request the polynomial order.
 *        Only used if methpar indicates a polynomial is to be used.
@@ -36,22 +36,24 @@
 *        Name of the parameter to use to request the minimum signal-to-noise
 *        ratio for a fit. Can be NULL.
 *     refres = double * (Returned)
-*        Reference resistance in ohms.
+*        Reference resistance in ohms. Can be NULL.
 *     resistance = double ** (Returned)
 *        Will be returned pointing to an array of doubles (nrows * ncols)
 *        with the resistance of each bolometer. Should be freed by the caller
-*        using smf_free.
+*        using smf_free. Can be NULL.
 *     nrows = int * (Returned)
 *        Number of rows in the resistance array. Can be null.
 *     ncols = int * (Returned)
 *        Number of colums in the resistance array. Can be null.
 *     flatmeth = smf_flatmeth * (Returned)
-*        Flatfield method.
+*        Flatfield method. Can be NULL if methpar is NULL.
 *     order = int * (Returned)
-*        Polynomial order.
+*        Polynomial order. Can be NULL if methpar is NULL.
 *     snrmin = double * (Returned)
 *        Signal-to-noise ratio minimum for a good fit. Will be unchanged if
 *        "snrminpar" is NULL.
+*     heateff = smfData** (Returned)
+*        Heater efficiency data for this subarray. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -79,6 +81,11 @@
 *     2011-04-18 (TIMJ):
 *        Use ARRAYID rather than subarray name to handle resistor values.
 *        Focal plane name is not reliable.
+*     2011-08-31 (TIMJ):
+*        - Stop using the per-bolometer resistance in resist.cfg. Force
+*        a fixed value.
+*        - Allow routine to be called without any ADAM parameters specified.
+*        - Add heater efficiency reading from config file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -108,11 +115,13 @@
 
 #include "smf_typ.h"
 #include "smf.h"
+#include "smf_err.h"
 #include "smurf_par.h"
 
 #include "mers.h"
 #include "par.h"
 #include "star/kaplibs.h"
+#include "star/one.h"
 #include "prm_par.h"
 #include "sae_par.h"
 
@@ -123,15 +132,15 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
                  const char methpar[], const char orderpar[], const char snrminpar[],
                  double * refohms, double **resistance, int * outrows,
                  int * outcols, smf_flatmeth  *flatmeth,
-                 int * order, double * snrmin, int * status ) {
+                 int * order, double * snrmin, smfData ** heateff,
+                 int * status ) {
 
   dim_t datarows = 0;       /* Number of rows in refdata */
   dim_t datacols = 0;       /* Number of columns in refdata */
   size_t j = 0;             /* Counter, index */
   char method[SC2STORE_FLATLEN]; /* flatfield method string */
   size_t nbols;              /* Number of bolometers */
-  int ncols;                 /* number of columns read from resistor data */
-  int nrows;                 /* number of rows read from resistor data */
+  double refohmsval = 0.0;   /* Internal version of refohms */
   AstKeyMap * resmap = NULL; /* Resistor map */
   AstKeyMap * subarrays = NULL; /* Subarray lookup table */
   char thissub[32];          /* This sub-instrument string */
@@ -139,12 +148,6 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
   if (resistance) *resistance = NULL;
 
   if (*status != SAI__OK) return;
-  if (!resistance) {
-    *status = SAI__ERROR;
-    errRep( "", "Must provide a pointer for 'resistance' "
-            "(possible programming error)", status );
-    return;
-  }
 
   if (!refdata) {
     *status = SAI__ERROR;
@@ -154,7 +157,7 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
   }
 
   /* Based on refdata we now need to calculate the default reference
-     resistance and retrieve the correct resistance entry for each bolometer.
+     resistance and retrieve the correct heater efficiency file for each array.
      We need the unique subarray string so that we can set up a look up keymap.
      There is no code in SMURF to return all the known subarrays but
      we need to know all the options in order to use kpg1Config. */
@@ -187,94 +190,113 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
   if (*status != SAI__OK) goto CLEANUP;
 
   /* Read the reference resistance */
-  astMapGet0D( resmap, "REFRES", refohms );
+  astMapGet0D( resmap, "REFRES", &refohmsval );
 
-  msgOutiff(MSG__VERB, "",
-            "Read reference resistance for subarray %s of %g ohms\n",
-            status, thissub, *refohms );
-
-  /* Parse the file and generate a 2d array of resistor settings */
-  if (!astMapGet0I( resmap, "NROWS", &nrows ) ) {
-    *status = SAI__ERROR;
-    errRep(" ", "Resistor file did not have an nrows entry", status );
-    goto CLEANUP;
-  }
-  if (!astMapGet0I( resmap, "NCOLS", &ncols ) ) {
-    *status = SAI__ERROR;
-    errRep(" ", "Resistor file did not have an ncols entry", status );
-    goto CLEANUP;
+  if (refohms && *status == SAI__OK) {
+    *refohms = refohmsval;
+    msgOutiff(MSG__VERB, "",
+              "Read reference resistance for subarray %s of %g ohms\n",
+              status, thissub, *refohms );
   }
 
-  nbols = ncols * nrows;
-  *resistance = astMalloc( nbols*sizeof(**resistance) );
+  /* We no longer want to read per-bolometer resistor values from the
+     config file. To retain backwards compatibility with the current
+     implementation of smf_flat_standardpow we simply fill the
+     per-bol resistance array with the reference resistance which
+     effectively disables smf_flat_standardpow */
 
-  if (*status == SAI__OK) {
-    for (j = 0; j < (size_t)ncols; j++) {
-      int ngot;
-      char colname[6];
-      sprintf( colname, "COL%-d", (int)j );
-      astMapGet1D( resmap, colname, nrows, &ngot, &((*resistance)[nrows*j]));
-      if (ngot != nrows) {
+  smf_get_dims( refdata, &datarows, &datacols, NULL, NULL, NULL, NULL, NULL, status );
+  nbols = datacols * datarows;
+
+  if (*status == SAI__OK && resistance ) {
+    *resistance = astMalloc( nbols*sizeof(**resistance) );
+    for (j = 0; j < (size_t)nbols; j++) {
+      (*resistance)[j] = refohmsval;
+    }
+  }
+
+  /* Get the heater efficiency file */
+  if (heateff && astMapHasKey( resmap, "HEATEFF" ) ) {
+    const char * heateffstr = NULL;
+    if (astMapGet0C( resmap, "HEATEFF", &heateffstr )) {
+      Grp * heateffgrp = NULL;
+      heateffgrp = grpNew( "heateff", status );
+      grpPut1( heateffgrp, heateffstr, 0, status );
+      smf_open_file( heateffgrp, 1, "READ", SMF__NOTTSERIES|SMF__NOFIX_METADATA, heateff, status );
+
+      /* Check the dimensions */
+      if (*status == SAI__OK) {
+        dim_t heatrows = 0;
+        dim_t heatcols = 0;
+        smf_get_dims( *heateff, &heatrows, &heatcols, NULL, NULL, NULL, NULL, NULL, status );
+
         if (*status == SAI__OK) {
-          *status = SAI__ERROR;
-          msgSeti( "NG", ngot);
-          msgSetc( "COL", colname );
-          msgSeti( "NR", nrows );
-          errRep(" ", "Did not read ^NR resistor values from column ^COL, read ^NG", status );
+          if ( datarows != heatrows || datacols != heatcols ) {
+            *status = SAI__ERROR;
+            errRepf( "", "Dimensions of heater efficiency file %s are (%zu, %zu)"
+                     " but flatfield has dimensions (%zu, %zu)",
+                     status, heateffstr, (size_t)heatrows, (size_t)heatcols,
+                     (size_t)datarows, (size_t)datacols);
+          }
         }
-        goto CLEANUP;
+
+        if (*status == SAI__OK) {
+          smf_dtype_check_fatal( *heateff, NULL, SMF__DOUBLE, status );
+          if (*status == SMF__BDTYP) {
+            errRepf("", "Heater efficiency data in %s should be double precision",
+                   status, heateffstr);
+          }
+        }
+
+        if (*status == SAI__OK) {
+          char heateffarrid[32];
+          smf_fits_getS( refdata->hdr, "ARRAYID", heateffarrid, sizeof(heateffarrid), status );
+          if (*status != SAI__OK) errAnnul( status );
+          if (strcasecmp( thissub, heateffarrid ) != 0 ) {
+            if (*status == SAI__OK) {
+              *status = SAI__ERROR;
+              errRepf("", "Subarray associated with heater efficiency image (%s)"
+                     " does not match that of the data to be flatfielded (%s)",
+                      status, heateffarrid, thissub );
+            }
+          }
+        }
       }
-    }
-
-    /* Check row vs column count */
-    smf_get_dims( refdata, &datarows, &datacols, NULL, NULL, NULL, NULL, NULL, status );
-
-    if ( (size_t)datacols != (size_t)ncols ||
-         (size_t)datarows != (size_t)nrows ) {
-      *status = SAI__ERROR;
-      msgSeti( "RC", ncols );
-      msgSeti( "RR", nrows );
-      msgSeti( "DC", datacols);
-      msgSeti( "DR", datarows);
-      errRep( " ", "Dimensions of subarray from resistor file (^RC cols x ^RR rows)"
-              " do not match those of data file (^DC cols x ^DR rows)", status );
-      goto CLEANUP;
-    }
-
-    /* Replace small values with bad */
-    for (j = 0; j < nbols; j++) {
-      if ((*resistance)[j] < 0.1) {
-        (*resistance)[j] = VAL__BADD;
-      }
+      if (heateffgrp) grpDelet( &heateffgrp, status );
     }
   }
 
-  /* See if we want to use TABLE or POLYNOMIAL mode */
-  parChoic( methpar, "POLYNOMIAL", "POLYNOMIAL, TABLE", 1,
-            method, sizeof(method), status );
+  if (methpar && flatmeth) {
+    /* See if we want to use TABLE or POLYNOMIAL mode */
+    parChoic( methpar, "POLYNOMIAL", "POLYNOMIAL, TABLE", 1,
+              method, sizeof(method), status );
 
-  *flatmeth = smf_flat_methcode( method, status );
+    *flatmeth = smf_flat_methcode( method, status );
 
-  if (*flatmeth == SMF__FLATMETH_POLY) {
-    /* need an order for the polynomial */
-    parGdr0i( orderpar, 1, 1, 3, 1, order, status );
+    if (*flatmeth == SMF__FLATMETH_POLY) {
+      /* need an order for the polynomial */
+      if (order && orderpar) {
+        parGdr0i( orderpar, 1, 1, 3, 1, order, status );
 
-    /* and if the order is 1 then we can ask for the snr min */
-    if (snrminpar && *order == 1) {
-      parGet0d( snrminpar, snrmin, status );
+        /* and if the order is 1 then we can ask for the snr min */
+        if (snrminpar && *order == 1) {
+          parGet0d( snrminpar, snrmin, status );
+        }
+      }
+
+    } else {
+      /* need an snr min for table mode responsivities */
+      if (snrminpar) parGet0d( snrminpar, snrmin, status );
     }
-
-  } else {
-    /* need an snr min for table mode responsivities */
-    if (snrminpar) parGet0d( snrminpar, snrmin, status );
   }
 
-  if (outrows) *outrows = nrows;
-  if (outcols) *outcols = ncols;
+  if (outrows) *outrows = datarows;
+  if (outcols) *outcols = datacols;
 
  CLEANUP:
   if (*status != SAI__OK) {
-    if (*resistance) *resistance = astFree( *resistance );
+    if (resistance && *resistance) *resistance = astFree( *resistance );
+    if (heateff && *heateff) smf_close_file( heateff, status );
   }
 
   return;

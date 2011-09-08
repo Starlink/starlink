@@ -16,7 +16,7 @@
 *     smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 *                       smfArray **iarray, const smfArray *darks,
 *                       const smfArray *bbms, const smfArray* flatramps,
-*                       const smfArray *noisemaps, dim_t nchunks,
+*                       AstKeyMap * heateffmap, const smfArray *noisemaps, dim_t nchunks,
 *                       smf_modeltype mtype, int isTordered,
 *                       AstFrameSet *outfset, int moving, int *lbnd_out,
 *                       int *ubnd_out, smfGroup **mgroup, int nofile,
@@ -38,6 +38,8 @@
 *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     flatramps = const smfArray * (Given)
 *        Collection of flatfield ramps. Passed to smf_open_and_flatfield.
+*     heateffmap = AstKeyMap * (Given)
+*        Details of heater efficiency data to be applied during flatfielding.
 *     noisemaps = const smfArray * (Given)
 *        smfArray of 2d smfData's containing externally-calculated noise maps
 *        which, if supplied, are ued to initialize the NOI model.
@@ -263,8 +265,8 @@
 void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                        smfArray **iarray, const smfArray *darks,
                        const smfArray *bbms, const smfArray *flatramps,
-                       const smfArray *noisemaps,dim_t nchunks,
-                       smf_modeltype mtype, int isTordered,
+                       AstKeyMap * heateffmap, const smfArray *noisemaps,
+                       dim_t nchunks, smf_modeltype mtype, int isTordered,
                        AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
@@ -481,7 +483,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
             if( !(oflag&SMF__NOCREATE_DATA) ) {
               smf_open_and_flatfield( igroup->grp, NULL, idx, darks, flatramps,
-                                      &idata, status );
+                                      heateffmap, &idata, status );
               smf_apply_mask( idata, bbms, SMF__BBM_DATA, 0, status );
 
             } else {

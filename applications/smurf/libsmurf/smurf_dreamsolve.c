@@ -127,6 +127,8 @@ void smurf_dreamsolve ( int *status ) {
   /* Local Variables */
   smfArray *darks = NULL;          /* Dark data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
+  smfArray *flatramps = NULL;      /* Flatfield ramps */
+  AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   size_t i;                        /* Loop counter */
   Grp *igrp = NULL;                /* Input files */
   Grp *ogrp = NULL;                /* Output files */
@@ -141,8 +143,8 @@ void smurf_dreamsolve ( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL,
-                    NULL, status );
+  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 0, SMF__NULL, &darks, &flatramps,
+                    &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -163,7 +165,8 @@ void smurf_dreamsolve ( int *status ) {
   /* Loop over number of files */
   for ( i=1; i<=size; i++) {
     /* Open file and flatfield the data */
-    smf_open_and_flatfield( igrp, ogrp, i, darks, NULL, &data, status );
+    smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, heateffmap,
+                            &data, status );
     smf_dreamsolve( data, status );
 
     /* Check status to see if there was a problem */
@@ -182,6 +185,9 @@ void smurf_dreamsolve ( int *status ) {
 
   /* Free up resources */
   if (darks) smf_close_related( &darks, status );
+  if (flatramps) smf_close_related( &flatramps, status );
+  if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
+
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 

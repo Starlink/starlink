@@ -193,7 +193,8 @@ void smurf_fts2_removebse(int* status)
   // LOOP THROUGH EACH NDF FILE IN THE INPUT GROUP
   // ===========================================================================
   for(fileIndex = 1; fileIndex <= numInputFile; fileIndex++) {
-    smf_open_and_flatfield(grpInput, grpOutput, fileIndex, NULL, NULL, &inputData, status);
+    smf_open_and_flatfield(grpInput, grpOutput, fileIndex, NULL, NULL,
+                           NULL, &inputData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);

@@ -109,6 +109,8 @@
 *        Simplify logic with TABLE mode. Now just pass TABLE data to the
 *        polynomial fitting flatfield routine and then handle the responsivity
 *        calculation in the same place.
+*     2011-09-07 (TIMJ):
+*        Now reads heater efficiency data directly when calculating responsivity.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -155,6 +157,8 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   double * bolval = NULL;      /* pointer to data in smfData */
   double * bolvalvar = NULL;   /* pointer to variance in smfData bolvald */
   const size_t coffset = 2;    /* Offset into POLYNOMIAL for coefficients */
+  smfData * heateff = NULL;    /* Heater efficiency smfData */
+  double * heateffdata = NULL; /* Pointer to efficiency data */
   size_t k;                    /* loop counter */
   size_t nbol;                 /* number of bolometers */
   size_t ncoeffs = 0;
@@ -206,6 +210,12 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
 
   }
 
+  /* Get the heater efficiency file */
+  smf_flat_params( respmap, "RESIST", NULL, NULL, NULL, NULL, NULL,
+                   NULL, NULL, NULL, NULL, NULL, &heateff, status );
+
+  if (heateff) heateffdata = (heateff->pntr)[0];
+
   /* Polynomial fit of  POWER = f( DAC units ) so we calculate the gradient
      for the reference value (stored in coefficient [1]) and reciprocate it. We do
      not expand the polynomial in this branch. */
@@ -224,6 +234,9 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
         double xterm = k * pow( refbol, k-1 );
         resp += bolval[(k+coffset)*nbol+bol] * xterm;
       }
+
+      /* Correct by the heater efficiency */
+      if (heateffdata) resp *= heateffdata[bol];
 
       /* need to invert and take the absolute value */
       resp = 1.0 / fabs(resp);
@@ -251,8 +264,9 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   }
 
   if (tabbolval) smf_close_file(&tabbolval, status );
+  if (heateff) smf_close_file(&heateff, status);
   if (*status != SAI__OK) {
-    if (*polyfit) smf_close_file( polyfit, status );
+    if (polyfit && *polyfit) smf_close_file( polyfit, status );
   }
 
   return ngood;

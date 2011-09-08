@@ -214,7 +214,7 @@ void smurf_calcflat( int *status ) {
 
   /* Find darks (might be all) */
   smf_find_science( igrp, &fgrp, 0, &dkgrp, &ffgrp, 1, 0, SMF__DOUBLE, &darks,
-                    &fflats, NULL, status );
+                    &fflats, NULL, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */

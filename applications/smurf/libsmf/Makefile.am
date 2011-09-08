@@ -198,6 +198,7 @@ smf_flat_write.c \
 smf_flatfield.c \
 smf_flatfield_smfData.c \
 smf_flatten.c \
+smf_free_effmap.c \
 smf_free_smfFilter.c \
 smf_freepolbins.c \
 smf_freetiles.c \

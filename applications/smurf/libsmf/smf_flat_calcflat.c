@@ -161,7 +161,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
   /* Get flatfield processing parameters */
   smf_flat_params( flatdata, resistpar, methpar, orderpar, snrminpar,
                    &refohms, &resistance,  NULL, NULL,
-                   &flatmeth, &order, &snrmin, status );
+                   &flatmeth, &order, &snrmin, NULL, status );
 
   /* We now have data for the various pixel heater settings.
      Generate a set of reference heater power settings in pW, and calculate the
