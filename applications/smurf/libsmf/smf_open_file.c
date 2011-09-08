@@ -230,11 +230,14 @@
  *        Add pointing corrections onto SMU jiggle positions before
  *        returning.
  *     2011-07-11 (EC):
- *        Call smf_fix_data to repair may/june 2011 s4a row order problem 
+ *        Call smf_fix_data to repair may/june 2011 s4a row order problem
+ *     2011-09-07 (TIMJ):
+ *        Be forgiving of 2d images that do not have a full set of FITS
+ *        headers.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2007-2010 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2005-2008,2010-2011 University of British Columbia.
  *     All Rights Reserved.
@@ -889,8 +892,12 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         }
 
-        /* and work out the observing mode (assumes fixed headers) */
-        if (hdr->fitshdr) smf_calc_mode( hdr, status );
+        /* and work out the observing mode (assumes fixed headers and we
+           do not get upset if this fails for NOTTSERIES data) */
+        if (*status == SAI__OK && hdr->fitshdr) {
+          smf_calc_mode( hdr, status );
+          if (!isTseries && *status != SAI__OK) errAnnul(status);
+        }
 
         /* Determine and store the telescope location in hdr->telpos */
         smf_telpos_get( hdr, status );
@@ -1250,7 +1257,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   /* Read and store history */
   smf_history_read( *data, status );
 
-  if ( hdr &&  (hdr->instrument!=INST__NONE) ) {
+  if ( hdr &&  (hdr->instrument!=INST__NONE) && *status == SAI__OK ) {
     double steptime = VAL__BADD;
     double scanvel = VAL__BADD;
 
@@ -1262,6 +1269,12 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     /* Similarly get the SCAN_VEL (in arcsec/sec) from the header */
     smf_getfitsd( hdr, "SCAN_VEL", &scanvel, status );
     hdr->scanvel = scanvel;
+
+    /* If this looks like a SCUBA-2 image but we are missing
+       STEPTIME or SCAN_VEL we do not really mind if this is
+       not time series data */
+    if (!isTseries && *status != SAI__OK) errAnnul(status);
+
   }
 
   /* report data units */
