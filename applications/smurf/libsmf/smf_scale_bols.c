@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_scale_bols( smfWorkForce *wf, smfData *data,
+*     void smf_scale_bols( smfWorkForce *wf, smfData *data, const smfData * scaledata,
 *                          const char *path, const char *param, int *status )
 
 *  Arguments:
@@ -21,13 +21,20 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be corrected (in-place).
+*     scaledata = const smfData * (Given)
+*        2-D smfData with dimensions matching the dimensions of "data"
+*        and of type _DOUBLE. Each bolometer value in "data" is
+*        multiplied by the value of the same bolometer in "scaledata".
+*        Bad values are ignored (i.e. no change is made to the corresponding
+*        bolometer values - so bad values are equivalent to a value of 1.0).
 *     path = const char * (Given)
 *        The path to the NDF containing the correction factors. This
 *        should be a 2D NDF with pixel bounds (0:31,0:39). Each bolometer
 *        value in the supplied smfData is multiplied by the value of the
 *        same bolometer in the NDF. Bad values are ignored (i.e. no
 *        change is made to the corresponding bolometer values - so bad
-*        values are equivalent to a value of 1.0).
+*        values are equivalent to a value of 1.0). Will not be accessed if
+*        "scaledata" is supplied.
 *     param = const char * (Given)
 *        The name of the configuration parameter from which the NDF path
 *        was obtained. This is included in the error message if the NDF
@@ -41,11 +48,14 @@
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     25-AUG-2011 (DSB):
 *        Original version.
+*     2011-09-06 (TIMJ):
+*        Allow a smfData scaling array to be supplied externally.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -77,6 +87,7 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "prm_par.h"
+#include "ndf.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -98,17 +109,19 @@ typedef struct smfScaleBolsJobData {
 static void smf1_scale_bols_job( void *job_data, int *status );
 
 
-void smf_scale_bols( smfWorkForce *wf, smfData *data, const char *path,
-                     const char *param, int *status ){
+void smf_scale_bols( smfWorkForce *wf, smfData *data, const smfData * scaledata,
+                     const char *path, const char *param, int *status ){
 
 /* Local Variables */
    dim_t nbolo;
    dim_t ntslice;
    dim_t tstep;
-   double *corr;
+   double *corr = NULL;
    double *dat = NULL;
+   dim_t drows = 0;
+   dim_t dcols = 0;
    int el;
-   int indf;
+   int indf = NDF__NOID;
    int iworker;
    int lbnd[ 2 ];
    int ndim;
@@ -126,9 +139,6 @@ void smf_scale_bols( smfWorkForce *wf, smfData *data, const char *path,
 /* Check we have double precision data. */
    if( !smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status ) ) return;
 
-/* if NULL path supplied return */
-   if( path == NULL ) return;
-
 /* Get pointers to data array. */
    dat = data->pntr[ 0 ];
 
@@ -140,24 +150,56 @@ void smf_scale_bols( smfWorkForce *wf, smfData *data, const char *path,
    }
 
 /* Get the data dimensions and strides. */
-   smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
+   smf_get_dims( data, &drows, &dcols, &nbolo, &ntslice, NULL, &bstride,
                  &tstride, status );
 
+   if (scaledata) {
+     dim_t scrows;
+     dim_t sccols;
+
+     /* Sanity checks */
+     if( !smf_dtype_check_fatal( scaledata, NULL, SMF__DOUBLE, status ) ) return;
+
+     smf_get_dims( scaledata, &scrows, &sccols, NULL, NULL, NULL, NULL, NULL,
+                   status );
+
+     if (*status == SAI__OK) {
+       if ( drows != scrows || dcols != sccols ) {
+         *status = SAI__ERROR;
+         smf_smfFile_msg( scaledata->file, "F", 1, "" );
+         errRepf( "", "Dimensions of scaling file ^F are (%zu, %zu)"
+                  " but flatfield has dimensions (%zu, %zu)",
+                  status, (size_t)scrows, (size_t)sccols,
+                  (size_t)drows, (size_t)dcols);
+       }
+     }
+
+     corr = (scaledata->pntr)[0];
+
+   } else if (path) {
 /* Open the NDF, check its pixel bounds are as expected, and map the data
    array. */
-   ndfOpen( NULL, path, "Read", "Old", &indf, &place, status );
-   ndfBound( indf, 2, lbnd, ubnd, &ndim, status );
-   if( ( lbnd[ 0 ] != 0 || ubnd[ 0 ] != 31 ||
-         lbnd[ 1 ] != 0 || ubnd[ 1 ] != 39 ) && *status == SAI__OK ){
-      *status = SAI__ERROR;
-      msgSeti( "L1", lbnd[ 0 ] );
-      msgSeti( "U1", ubnd[ 0 ] );
-      msgSeti( "L2", lbnd[ 1 ] );
-      msgSeti( "U2", ubnd[ 1 ] );
-      errRep( " ", "The corrections NDF has incorrect pixel bounds "
-              "(^L1:^U1,^L2:^U2) - should be (0:31,0:39).", status );
+
+     ndfOpen( NULL, path, "Read", "Old", &indf, &place, status );
+     ndfBound( indf, 2, lbnd, ubnd, &ndim, status );
+     if( ( lbnd[ 0 ] != 0 || ubnd[ 0 ] != 31 ||
+           lbnd[ 1 ] != 0 || ubnd[ 1 ] != 39 ) && *status == SAI__OK ){
+       *status = SAI__ERROR;
+       msgSeti( "L1", lbnd[ 0 ] );
+       msgSeti( "U1", ubnd[ 0 ] );
+       msgSeti( "L2", lbnd[ 1 ] );
+       msgSeti( "U2", ubnd[ 1 ] );
+       errRep( " ", "The corrections NDF has incorrect pixel bounds "
+               "(^L1:^U1,^L2:^U2) - should be (0:31,0:39).", status );
+     }
+     ndfMap( indf, "Data", "_DOUBLE", "Read", (void *) &corr, &el, status );
+   } else {
+     if (*status == SAI__OK) {
+       *status = SAI__ERROR;
+       errRep(" ", "Must supply either scaledata or path argument"
+              " (possible programming error)", status );
+     }
    }
-   ndfMap( indf, "Data", "_DOUBLE", "Read", (void *) &corr, &el, status );
 
 /* Create structures used to pass information to the worker threads. */
    nworker = wf ? wf->nworker : 1;
@@ -204,7 +246,7 @@ void smf_scale_bols( smfWorkForce *wf, smfData *data, const char *path,
    job_data = astFree( job_data );
 
 /* Close the NDF. */
-   ndfAnnul( &indf, status );
+   if (indf != NDF__NOID) ndfAnnul( &indf, status );
 
 /* If anything went wrong, give a context message. */
    if( *status != SAI__OK ) {

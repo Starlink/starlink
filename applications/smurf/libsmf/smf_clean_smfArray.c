@@ -339,11 +339,11 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                        status );
     astChrCase( NULL, param, 1, 0 );
     if( astMapHasKey( keymap, param ) ) {
-       astMapGet0C( keymap, param, &optff );
-
-       msgOutiff( MSG__VERB,"", FUNC_NAME ": Correcting bolometer values "
-                  "using factors read from NDF %s", status, optff );
-       smf_scale_bols( wf, data, optff, param, status );
+      if ( astMapGet0C( keymap, param, &optff ) ) {
+        msgOutiff( MSG__VERB,"", FUNC_NAME ": Correcting bolometer values "
+                   "using factors read from NDF %s", status, optff );
+        smf_scale_bols( wf, data, NULL, optff, param, status );
+      }
     }
 
     /* Remove baselines */

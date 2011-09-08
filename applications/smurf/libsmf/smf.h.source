@@ -1651,8 +1651,8 @@ int smf_samedims_smfData( const smfData *data1, const smfData *data2,
 void smf_scale2freq( double f_edgesmall, double f_edgelarge, const smfHead *hdr,
                      double *f_edgelow, double *f_edgehigh, int *status );
 
-void smf_scale_bols( smfWorkForce *wf, smfData *data, const char *path,
-                     const char *param, int *status );
+void smf_scale_bols( smfWorkForce *wf, smfData *data, const smfData * scaledata,
+                     const char *path, const char *param, int *status );
 
 void smf_scalar_multiply( smfData * data, double dscalar, int * status );
 
