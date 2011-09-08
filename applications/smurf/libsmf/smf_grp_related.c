@@ -15,7 +15,7 @@
  *  Invocation:
  *     smf_grp_related( const Grp *igrp, const size_t grpsize,
  *                      const int grouping, const int checksubinst,
- *                      dim_t maxlen, AstKeyMap *keymap, dim_t *maxconcatlen,
+ *                      double maxlen_s, AstKeyMap *keymap, dim_t *maxconcatlen,
  *                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
  *                      dim_t *pad, int *status );
 
@@ -31,10 +31,9 @@
  *     checksubinst = int (Given)
  *        If set, and a mixture of subinstruments (i.e. 450 and 850 um)
  *        are encountered, bad status will be set.
- *     maxlen = dim_t (Given)
- *        If set, maximum length of a continuous chunk in time samples
- *        (after applying the downsampling factor). If 0 don't enforce a
- *        maximum length.
+ *     maxlen_s = double (Given)
+ *        If set, maximum length of a continuous chunk in seconds.
+ *        If 0 don't enforce a maximum length.
  *     keymap = AstKeyMap * (Given)
  *        A pointer to a KeyMap holding the configuration parameters. Only
  *        needed if "pad" is not NULL.
@@ -84,7 +83,7 @@
  *     of related files that all share the same sequence (SEQCOUNT and OBSID
  *     being equal) are assigned an integer "chunk number" which is stored in
  *     smfGroup.chunks. The chunk number increments if the consecutive groups
- *     are not part of the sequence, if the sequence is too long ("maxlen")
+ *     are not part of the sequence, if the sequence is too long ("maxlen_s")
  *     or if the two groups contain different subarrays. Files are not broken
  *     up so it is not guaranteed that chunks are equal size.
  *
@@ -98,7 +97,7 @@
  *     - Resources allocated with this routine should be freed by calling
  *     smf_close_smfGroup
  *     - This routine is not clever when deciding to break continuous chunks
- *     into smaller entities if "maxlen" is exceeded. If there are 6 files
+ *     into smaller entities if "maxlen_s" is exceeded. If there are 6 files
  *     contributing to a sequence and the 6th makes the sequence too long
  *     this function will return two chunks with one chunk containing 5
  *     files and the other containing 1. The clever thing to do would be to
@@ -187,6 +186,9 @@
  *     2011-08-26 (EC):
  *        Change checkwave to checksubinst for robustness against future
  *        SCUBA-2 filter modifications
+ *     2011-09-08 (EC):
+ *        Provide maxlen_s instead of maxlen so that correct down-sampled length
+ *        may be calculated.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -245,7 +247,7 @@
 
 void smf_grp_related( const Grp *igrp, const size_t grpsize,
                       const int grouping, const int checksubinst,
-                      dim_t maxlen, AstKeyMap *keymap, dim_t *maxconcatlen,
+                      double maxlen_s, AstKeyMap *keymap, dim_t *maxconcatlen,
                       dim_t *maxfilelen, smfGroup **group,
                       Grp **basegrp, dim_t *pad, int *status ) {
 
@@ -264,6 +266,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   int *keepchunk=NULL;        /* Flag for chunks that will be kept */
   dim_t maxconcat=0;          /* Longest continuous chunk length */
   dim_t maxflen=0;            /* Max file length in time steps */
+  dim_t maxlen=0;             /* Maximum concat length in samples */
+  int maxlen_scaled=0;        /* Set once maxlen has been scaled, if needed */
   dim_t maxpad=0;             /* Maximum padding neeed for any input file */
   size_t maxrelated = 0;      /* Keep track of max number of related items */
   size_t *new_chunk=NULL;     /* keeper chunks associated with subgroups */
@@ -276,6 +280,12 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   smf_subinst_t subinst;      /* Subinst of current file */
 
   if ( *status != SAI__OK ) return;
+
+  if( maxlen_s < 0 ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": maxlen_s cannot be < 0!", status );
+    return;
+  }
 
   /* Get downsampling parameters */
 
@@ -318,6 +328,11 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
               ": mixture of time-series and FFT data encountered!",
               status );
       break;
+    }
+
+    /* If maxlen has not been set, do it here */
+    if( !maxlen && maxlen_s && data->hdr->steptime) {
+      maxlen = (dim_t) (maxlen_s / data->hdr->steptime );
     }
 
     /* If requested check to see if we are mixing wavelengths */
@@ -401,7 +416,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       smf_get_dims( data, NULL, NULL, NULL, &ntslice, NULL, NULL, NULL,
                     status );
 
-      /* Find length of down-sampled data and steptime */
+      /* Find length of down-sampled data, new steptime and maxlen */
       if( (downsampscale || downsampfreq) && data->hdr && (*status==SAI__OK) ) {
         double scalelen;
 
@@ -428,6 +443,18 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
                      "%5.1lf Hz", status, (1./steptime), (scalelen/steptime) );
 
           ntslice = round(ntslice * scalelen);
+
+          /* If maxlen has been requested, and we have not already worked
+             out a scaled version (just uses the sample rates for the first
+             file... should be close enough). */
+
+          if( !maxlen_scaled ) {
+            maxlen = round(maxlen*scalelen);
+            maxlen_scaled = 1;
+            msgOutiff( MSG__VERB, "", FUNC_NAME
+                       ": requested maxlen %g seconds = %zu down-sampled "
+                       "time-slices", status, maxlen_s, maxlen );
+          }
         }
       }
 

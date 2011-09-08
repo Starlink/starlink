@@ -1,3 +1,4 @@
+
 /*
 *+
 *  Name:
@@ -463,7 +464,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int dimmflags;                /* Control flags for DIMM model components */
   int doclean=1;                /* Are we doing data pre-processing? */
   dim_t dsize;                  /* Size of data arrays in containers */
-  double dtemp;                 /* temporary double */
   int ensureflat=1;             /* flatfield data as they are loaded */
   int exportclean=0;            /* Are we doing to export clean data? */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
@@ -500,7 +500,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t maxconcat;              /* Longest continuous chunk that fits in mem.*/
   dim_t maxfile;                /* Longest file length in time samples*/
   int maxiter=0;                /* Maximum number of iterations */
-  dim_t maxlen=0;               /* Max length in timeslices of cont. chunk */
+  double maxlen=0;              /* Max length in seconds of cont. chunk */
   int memiter=0;                /* If set iterate completely in memory */
   size_t memneeded;             /* Memory required for map-maker */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
@@ -735,21 +735,12 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Maximum length of a continuous chunk */
     if( *status == SAI__OK ) {
-      astMapGet0D( keymap, "MAXLEN", &dtemp );
+      astMapGet0D( keymap, "MAXLEN", &maxlen );
 
-      if( dtemp < 0.0 ) {
+      if( maxlen < 0.0 ) {
         /* Trap negative MAXLEN */
         *status = SAI__ERROR;
         errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
-      } else if( dtemp == 0 ) {
-        /* 0 is OK... gets ignored later */
-        maxlen = 0;
-      } else if( steptime > 0 ) {
-        maxlen = (dim_t) (dtemp / steptime);
-      } else {
-        /* Trap invalid sample length in header */
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
       }
     }
 

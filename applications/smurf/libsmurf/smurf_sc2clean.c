@@ -253,8 +253,7 @@ void smurf_sc2clean( int *status ) {
   Grp *igrp = NULL;          /* Input group of files */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
   dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
-  dim_t maxlen=0;            /* Constrain maxconcat to this many samples */
-  double maxlen_s;           /* Constrain maxconcat to this many seconds */
+  double maxlen=0;           /* Constrain maxconcat to this many seconds */
   size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
   Grp *ogrp = NULL;          /* Output group of files */
   size_t osize;              /* Total number of NDF names in the output group */
@@ -297,17 +296,7 @@ void smurf_sc2clean( int *status ) {
   /* --- Parse ADAM parameters ---------------------------------------------- */
 
   /* Maximum length of a continuous chunk */
-  parGdr0d( "MAXLEN", 0, 0, VAL__MAXI, 1, &maxlen_s, status );
-  if( maxlen_s > 0 ) {
-    /* Obtain sample length from header of first file in igrp */
-    smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &odata, status );
-    if( (*status == SAI__OK) && odata && (odata->hdr) ) {
-      maxlen = (dim_t) (maxlen_s / odata->hdr->steptime);
-    }
-    if( odata ) smf_close_file( &odata, status );
-  } else {
-    maxlen = 0;
-  }
+  parGdr0d( "MAXLEN", 0, 0, VAL__MAXD, 1, &maxlen, status );
 
   /* Padding */
   parGdr0i( "PADSTART", 0, 0, VAL__MAXI, 1, &temp, status );
