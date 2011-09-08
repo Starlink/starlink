@@ -63,6 +63,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +91,9 @@
 *        Added indentation to output lines.
 *     9-MAR-1994 (RFWS):
 *        Use PAR__ constants to test for parameter state.
+*     2011-09-08 (TIMJ):
+*        Correct offsetting when breaking a long parameter over multiple
+*        lines. We were losing INDENT characters at each line break.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -306,7 +310,7 @@
      :                                         MSG( BR + 1 : BR + LBUF )
                         LBUF = LBUF + INDENT
                      END IF
-                     BR = BR + LBUF
+                     BR = BR + LBUF - INDENT
 
 *  If BUF now contains a complete output line, then return to transfer
 *  it to the output buffer. Otherwise, continue to process the next
