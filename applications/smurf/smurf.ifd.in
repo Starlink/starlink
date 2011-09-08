@@ -250,6 +250,10 @@
 #         Update FTS2PHASECORR
 #     2011-08-04 (COBA):
 #         Replaced FTS2PHASECORR with FTS2PHASECORRDS and FTS2PHASECORRSS
+#     2011-09-07 (TIMJ):
+#        On balance I think the RESIST parameter should always use the default
+#        unless there is a specific override. Silently reusing an old value
+#        can be confusing.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -422,8 +426,8 @@ package @PACKAGE@ {
                 position 3
                 type LITERAL
                 access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                ppath DEFAULT
                 default {^$STARLINK_DIR/share/smurf/resist.cfg}
                 prompt {Heater resistance information}
                 helpkey *
@@ -664,8 +668,8 @@ package @PACKAGE@ {
             parameter resist {
                 type LITERAL
                 access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                ppath DEFAULT
                 default {^$STARLINK_DIR/share/smurf/resist.cfg}
                 prompt {Heater resistance information}
                 helpkey *
@@ -1285,8 +1289,8 @@ package @PACKAGE@ {
             parameter resist {
                 type LITERAL
                 access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                ppath DEFAULT
                 default {^$STARLINK_DIR/share/smurf/resist.cfg}
                 prompt {Heater resistance information}
                 helpkey *
@@ -1517,8 +1521,8 @@ package @PACKAGE@ {
             parameter resist {
                 type LITERAL
                 access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                ppath DEFAULT
                 default {^$STARLINK_DIR/share/smurf/resist.cfg}
                 prompt {Heater resistance information}
                 helpkey *
@@ -2901,8 +2905,8 @@ package @PACKAGE@ {
             parameter resist {
                 type LITERAL
                 access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                ppath DEFAULT
                 default {^$STARLINK_DIR/share/smurf/resist.cfg}
                 prompt {Heater resistance information}
                 helpkey *
@@ -3260,8 +3264,8 @@ package @PACKAGE@ {
             parameter resist {
                 type LITERAL
                 access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                ppath DEFAULT
                 default {^$STARLINK_DIR/share/smurf/resist.cfg}
                 prompt {Heater resistance information}
                 helpkey *
@@ -3429,8 +3433,8 @@ package @PACKAGE@ {
             parameter resist {
                 type LITERAL
                 access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                ppath DEFAULT
                 default {^$STARLINK_DIR/share/smurf/resist.cfg}
                 prompt {Heater resistance information}
                 helpkey *
@@ -3565,8 +3569,8 @@ package @PACKAGE@ {
             parameter resist {
                 type LITERAL
                 access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                ppath DEFAULT
                 default {^$STARLINK_DIR/share/smurf/resist.cfg}
                 prompt {Heater resistance information}
                 helpkey *
@@ -3771,8 +3775,8 @@ package @PACKAGE@ {
             parameter resist {
                 type LITERAL
                 access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                ppath DEFAULT
                 default {^$STARLINK_DIR/share/smurf/resist.cfg}
                 prompt {Heater resistance information}
                 helpkey *
@@ -3895,8 +3899,8 @@ package @PACKAGE@ {
             parameter resist {
                 type LITERAL
                 access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                ppath DEFAULT
                 default {^$STARLINK_DIR/share/smurf/resist.cfg}
                 prompt {Heater resistance information}
                 helpkey *
