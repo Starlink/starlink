@@ -575,6 +575,7 @@ double meanwvm,           /* 225 GHz tau */
 const char file_name[],   /* output file name (given) */
 size_t numsamples,        /* number of samples (given) */
 size_t nflat,             /* number of flat coeffs per bol (given) */
+double refres,            /* reference resistance used to calculate flatfield (given) */
 const char flatname[],    /* name of flatfield algorithm (given) */
 const JCMTState *head,    /* header data for each frame (given) */
 const int *dbuf,          /* simulated data (given) */
@@ -617,6 +618,7 @@ int subindex,            /* index into sinx->subname of subarray being written *
 const char file_name[],  /* output file name (given) */
 size_t numsamples,    /* number of samples (given) */
 size_t nflat,         /* number of flat coeffs per bol (given) */
+double refres,        /* reference resistance used to calculate flatfield (given) */
 const char *flatname,    /* name of flatfield algorithm (given) */
 const JCMTState *head,   /* header data for each frame (given) */
 const int *dbuf,         /* time stream data (given) */

@@ -193,8 +193,8 @@ void smurf_copyflat( int *status ) {
     /* Get the filename and update the flatfield */
     grpGet( flatgrp, i, 1, &pname, SMF_PATH_MAX, status );
     sc2store_updflatcal( pname, colsize, rowsize,
-                         refda->nflat, smf_flat_methstring(refda->flatmeth,status), refda->flatcal,
-                         refda->flatpar, status );
+                         refda->nflat, refda->refres, smf_flat_methstring(refda->flatmeth,status),
+                         refda->flatcal, refda->flatpar, status );
 
     /* Now we need to update the FITS header - can not use the smfData
        since sc2store reads do not leave the file open */

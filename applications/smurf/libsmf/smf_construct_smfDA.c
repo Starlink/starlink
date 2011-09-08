@@ -15,8 +15,8 @@
 *  Invocation:
 *     pntr = smf_construct_smfDA( smfDA * tofill, smfData *dksquid,
 *                    double * flatcal, double * flatpar,
-*                    smf_flatmeth flatmeth, int nflat, double * heatval,
-*                    int nheat, int * status );
+*                    smf_flatmeth flatmeth, int nflat, double refres,
+*                    double * heatval, int nheat, int * status );
 
 *  Arguments:
 *     tofill = smfDA* (Given)
@@ -32,6 +32,8 @@
 *        Flatfield method enum.
 *     nflat = int (Given)
 *        Number of flatfield parameters per bolometer
+*     refres = double (Given)
+*        Reference resistance used to calculate the flatfield
 *     heatval = double * (Given)
 *        Pointer to array of heater values used for flatfield calculations.
 *     nheat = int (Given)
@@ -71,10 +73,12 @@
 *        use one_strlcpy. Add dksquid.
 *     2010-03-09 (TIMJ):
 *        flatname is now flatmeth
+*     2011-09-08 (TIMJ):
+*        Add refres
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -118,7 +122,7 @@
 smfDA *
 smf_construct_smfDA( smfDA * tofill, smfData * dksquid, double * flatcal,
 		     double * flatpar, smf_flatmeth flatmeth,
-                     int nflat, double * heatval, int nheat, int * status ) {
+                     int nflat, double refres, double * heatval, int nheat, int * status ) {
 
   smfDA * da = NULL;   /* File components */
 
@@ -138,6 +142,7 @@ smf_construct_smfDA( smfDA * tofill, smfData * dksquid, double * flatcal,
     da->heatval = heatval;
     da->nflat = nflat;
     da->nheat = nheat;
+    da->refres = refres;
     da->flatmeth = flatmeth;
   } else {
     msgOutif(MSG__VERB," ",

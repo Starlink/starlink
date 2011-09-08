@@ -237,6 +237,7 @@ size_t flatlen,          /* length of space for flatfield name (given) */
 size_t *colsize,         /* number of pixels in column (returned) */
 size_t *rowsize,         /* number of pixels in row (returned) */
 size_t *nflat,           /* number of flat coeffs per bol (returned) */
+double *refres,          /* Reference resistor used to create flatfield (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
@@ -259,6 +260,7 @@ size_t *colsize,         /* number of pixels in column (returned) */
 size_t *rowsize,         /* number of pixels in row (returned) */
 size_t *nframes,         /* number of frames (returned) */
 size_t *nflat,           /* number of flat coeffs per bol (returned) */
+double *refres,          /* Reference resistor used to create flatfield (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 JCMTState *frhead[],     /* header data for each frame (returned) */
 int **outdata,           /* pointer to data array (returned), or NULL */
@@ -289,6 +291,7 @@ void sc2store_readflatcal
 const char *access,      /* "READ" or "UPDATE" access (given) */
 size_t flatlen,          /* length of space for flatfield name (given) */
 size_t *nflat,           /* number of flat coeffs per bol (returned) */
+double *refres,          /* Reference resistor used to create flatfield (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
@@ -395,6 +398,7 @@ void sc2store_writeflatcal
 size_t colsize,             /* number of pixels in a column (given) */
 size_t rowsize,             /* number of pixels in a row (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
+double refres,              /* Reference resistor used to create flatfield (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const double *flatcal,      /* flat-field calibration (given) */
 const double *flatpar,      /* flat-field parameters (given) */
@@ -456,6 +460,7 @@ size_t colsize,             /* number of bolometers in column (given) */
 size_t rowsize,             /* number of bolometers in row (given) */
 size_t nframes,             /* number of frames (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
+double refres,              /* Reference resistor used to create flatfield (given) */
 size_t ntrack,              /* number of bolometers used for heater tracking (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const JCMTState head[],     /* header data for each frame (given) */
@@ -483,6 +488,7 @@ const char filename[],      /* name of file to update (given) */
 size_t colsize,             /* number of bolometers in column (given) */
 size_t rowsize,             /* number of bolometers in row (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
+double refres,              /* Reference resistor used to create flatfield (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const double *flatcal,      /* flat-field calibration (given) */
 const double *flatpar,      /* flat-field parameters (given) */

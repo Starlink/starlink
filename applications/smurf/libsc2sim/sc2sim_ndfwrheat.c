@@ -16,7 +16,7 @@
  *     sc2sim_ndfwrheat ( const struct sc2sim_obs_struct *inx,
  *                        const struct sc2sim_sim_struct *sinx,
  *                        const char file_name[], size_t numsamples,
- *                        size_t nflat, const char flatname[],
+ *                        size_t nflat, double refres, const char flatname[],
  *                        const JCMTState *head, const int *dbuf,
  *                        const int *dksquid, const double *fcal,
  *                        const double *fpar, const char filter[], int *status )
@@ -32,6 +32,8 @@
  *        Number of samples
  *     nflat = size_t (Given)
  *        Number of flat coeffs per bol
+ *     refres = double (Given)
+ *        Reference resistance used to calculate flatfield.
  *     flatname = const char[] (Given)
  *        Name of flatfield algorithm
  *     head = const JCMTState* (Given)
@@ -144,6 +146,7 @@ void sc2sim_ndfwrheat
  const char file_name[],  /* output file name (given) */
  size_t numsamples,    /* number of samples (given) */
  size_t nflat,         /* number of flat coeffs per bol (given) */
+ double refres,        /* reference resistance used to calculate flatfield (given) */
  const char flatname[],    /* name of flatfield algorithm (given) */
  const JCMTState *head,   /* header data for each frame (given) */
  const int *dbuf,         /* time stream data (given) */
@@ -211,7 +214,7 @@ void sc2sim_ndfwrheat
 
   /* Store the timestream data */
   sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->colsize,
-                       inx->rowsize, numsamples, nflat, 0, flatname, head, NULL,
+                       inx->rowsize, numsamples, nflat, refres, 0, flatname, head, NULL,
                        dbuf, dksquid, fcal, fpar, inx->obsmode,
                        NULL, NULL, jigvert, inx->nvert, NULL, 0,
                        NULL, status );

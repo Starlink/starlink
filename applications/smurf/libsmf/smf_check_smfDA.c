@@ -145,6 +145,7 @@ void smf_check_smfDA( const smfData *idata, smfData *odata, int * status ) {
     }
 
     if (oda->flatmeth == SMF__FLATMETH_NULL ) oda->flatmeth = ida->flatmeth;
+    if (oda->refres == VAL__BADD) oda->refres = ida->refres;
 
     if (!(oda->nheat)) {
       oda->nheat = ida->nheat;

@@ -111,6 +111,7 @@ smf_create_smfDA( int * status ) {
   da->dksquid = NULL;
   da->flatmeth = SMF__FLATMETH_NULL;
   da->nflat = 0;
+  da->refres = VAL__BADD;
   da->heatval = NULL;
   da->nheat = 0;
 

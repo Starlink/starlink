@@ -485,6 +485,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double pwvzen = 0;              /* zenith precipital water vapour (mm) */
   double raapp;                   /* Apparent RA */
   double raapp1;                  /* Recalculated apparent RA */
+  double refres[8];               /* Reference resistance used for flatfield */
   size_t rowsize;                 /* row size for flatfield */
   char scancrd[SZFITSCARD+1];     /* SCAN coordinate frame */
   double sigma;                   /* instrumental white noise */
@@ -959,7 +960,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                 (sinx->subname)[k], date_yr, date_mo, date_da );
 
       sc2store_rdflatcal ( heatname, SC2STORE_FLATLEN, &colsize,
-                           &rowsize, &(nflat[k]), flatname[k], &(flatcal[k]),
+                           &rowsize, &(nflat[k]), &(refres[k]), flatname[k], &(flatcal[k]),
                            &(flatpar[k]), status );
 
     }
@@ -1580,7 +1581,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
                 /* Write the data out to a file */
                 sc2sim_ndfwrdata( inx, sinx, k, tauCSO, filename, lastframe, nflat[k],
-                                  flatname[k], head, digits, dksquid, flatcal[k],
+                                  refres[k], flatname[k], head, digits, dksquid, flatcal[k],
                                   flatpar[k], INSTRUMENT, filter, dateobs, obsid,
                                   &(posptr[frameoffset*2]), jigsamples,
                                   jigpat, obscounter, focposn,

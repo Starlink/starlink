@@ -209,6 +209,7 @@ void smurf_rawpress( int *status ) {
                         fitsrec,        /* Fits char * array */
                         colsize, rowsize, nframes,
                         data->da->nflat,/* nflat */
+                        data->da->refres, /* refres */
                         0,              /* ntrack */
                         smf_flat_methstring( data->da->flatmeth, status ), /* flatname */
                         data->hdr->allState, /* JCMTSTATE */

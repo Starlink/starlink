@@ -753,7 +753,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
 smfDA *smf_construct_smfDA( smfDA * tofill, smfData *dksquid, double * flatcal,
                             double * flatpar, smf_flatmeth flatmeth,
-                            int nflat, double * heatval, int nheat, int * status );
+                            int nflat, double refres, double * heatval, int nheat,
+                            int * status );
 
 smfData *smf_construct_smfData( smfData * tofill, smfFile * file,
                                 smfHead * hdr, smfDA * da, smfFts* fts, smf_dtype dtype,
@@ -1086,8 +1087,9 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
                     int dclimcorr, size_t *nrej, smfStepFix **steps,
                     int *nstep, int *status );
 
-void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powval,
-                       const smfData * bolval, smfData * updata, int *status );
+void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, double refres,
+                       const smfData * powval, const smfData * bolval,
+                       smfData * updata, int *status );
 
 size_t
 smf_flat_calcflat( msglev_t msglev, const char flatname[],
@@ -1140,7 +1142,7 @@ void smf_flat_standardpow( const smfData * bolvald, double refohms,
                            smfData ** powref, smfData ** bolref, int * status);
 
 void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
-                     const smfData * bolval,
+                     double refres, const smfData * bolval,
                      const smfData * powref, const smfData * bolref,
                      const smfData * polyfit, const Grp * prvgrp, int * status );
 

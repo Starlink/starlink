@@ -307,7 +307,6 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
     }
   }
 
-
   /* Loop over array of subarrays */
   for ( j = 0; j < sinx->nsubarrays; j++ ) {
     /* Get the name of this flatfield solution */
@@ -317,8 +316,10 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
     msgSetc( "FILENAME", filename );
     msgOut(" ", "Writing ^FILENAME", status );
 
-    /* Store the data in output file file_name */
-    sc2sim_ndfwrheat( inx, sinx, j, filename, numsamples, nflat, flatname, head,
+    /* Store the data in output file file_name
+       Use a "bad" reference resistance to prevent heater efficiency values
+       from being applied to simulated data. */
+    sc2sim_ndfwrheat( inx, sinx, j, filename, numsamples, nflat, VAL__BADD, flatname, head,
                       digits, dksquid, flatcal, flatpar, filter, status );
 
     msgSetc( "FILENAME", filename );

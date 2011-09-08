@@ -234,6 +234,8 @@
  *     2011-09-07 (TIMJ):
  *        Be forgiving of 2d images that do not have a full set of FITS
  *        headers.
+ *     2011-09-08 (TIMJ):
+ *        refres is added to rdtstream
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -939,6 +941,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       char dlabel[SC2STORE_LABLEN];
       char flatname[SC2STORE_FLATLEN];
       size_t nflat = 0;
+      double refres = VAL__BADD;
 
       /* Get the time series WCS if header exists */
       if( hdr ) {
@@ -978,7 +981,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN,
                           SC2STORE__MAXFITS,
                           &nfits, fitsrec, units, dlabel, &colsize, &rowsize,
-                          &nframes, &nflat, flatname,
+                          &nframes, &nflat, &refres, flatname,
                           &tmpState, ptdata, pdksquid,
                           &flatcal, &flatpar, &jigvert, &nvert, &jigpath,
                           &nsampcycle, status);
@@ -986,6 +989,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
       if (da) da->flatmeth = smf_flat_methcode( flatname, status );
       if (da) da->nflat = nflat;
+      if (da) da->refres = refres;
 
       if (*status == SAI__OK) {
         /* Free header info if no longer needed */

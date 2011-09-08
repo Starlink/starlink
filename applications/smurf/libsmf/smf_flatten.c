@@ -145,17 +145,30 @@ void smf_flatten ( smfData *data, AstKeyMap * heateffmap, int *status ) {
     smf_set_clabels( "Flatfielded", NULL, SIPREFIX "W", data->hdr, status);
 
     /* Now correct for heater efficiency */
-    if (heateffmap && *status == SAI__OK) {
-      char arrayidstr[32];
-      smf_fits_getS( data->hdr, "ARRAYID", arrayidstr, sizeof(arrayidstr),
-                     status );
-      if (astMapHasKey( heateffmap, arrayidstr )) {
-        void * tmp = NULL;
-        astMapGet0P( heateffmap, arrayidstr, &tmp );
-        if (tmp) {
-          smfData * heateff = tmp;
-          smf_scale_bols( NULL, data, heateff, NULL, "HEATEFF", status );
+    if (heateffmap && da->refres != VAL__BADD && *status == SAI__OK) {
+      /* Do not apply the correction if these data do not know the
+         reference resistance. We only know the refres if we have been
+         flatfielded by a system that knows we have heater efficiencies */
+      if (da->refres != VAL__BADD) {
+        char arrayidstr[32];
+        smf_fits_getS( data->hdr, "ARRAYID", arrayidstr, sizeof(arrayidstr),
+                       status );
+        if (astMapHasKey( heateffmap, arrayidstr )) {
+          void * tmp = NULL;
+          astMapGet0P( heateffmap, arrayidstr, &tmp );
+          if (tmp) {
+            smfData * heateff = tmp;
+            smf_scale_bols( NULL, data, heateff, NULL, "HEATEFF", status );
+            msgOutiff(MSG__VERB, "", "Applying heater efficiency data for array '%s'",
+                      status, arrayidstr);
+          }
+        } else {
+          msgOutiff( MSG__QUIET, "", "Unable to find heater efficiency data "
+                     " for array '%s'", status, arrayidstr );
         }
+      } else {
+        msgOutif(MSG__QUIET, "", "Using old-style flatfield so not applying "
+                 "heater efficiency data. Consider re-running calcflat or using a flatramp.", status );
       }
     }
 

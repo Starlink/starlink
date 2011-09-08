@@ -272,10 +272,11 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
   }
 
   /* Now we need to attach the flatfield result to the flatfield data */
-  smf_flat_assign( 0, flatmeth, powref, bolref, flatdata, status );
+  smf_flat_assign( 0, flatmeth, refohms, powref, bolref, flatdata, status );
 
   /* write out the flatfield */
-  if (flatname) smf_flat_write( flatmeth, flatname, flatdata, powref, bolref, flatpoly, prvgrp, status );
+  if (flatname) smf_flat_write( flatmeth, flatname, refohms, flatdata, powref, bolref,
+                                flatpoly, prvgrp, status );
 
   if (respmap) {
     /* write the provenance at the end since we have some problems with A-tasks

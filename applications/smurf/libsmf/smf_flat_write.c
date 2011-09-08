@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
-*                          const smfData * bolval,
+*                          double refres, const smfData * bolval,
 *                          const smfData * powref,const smfData * bolref,
 *                          const smfData * polyfit, const Grp * prvgrp, int * status );
 
@@ -24,6 +24,8 @@
 *        bolref.
 *     flatname = const char * (Given)
 *        Name to be used for flatfield file.
+*     refres = double (Given)
+*        Reference resistor value used to calculate flatfield.
 *     bolval = const smfData * (Given)
 *        Merged flatfield bolometer data as calculated by smf_flat_fastflat
 *        or smf_flat_mergedata.
@@ -80,10 +82,12 @@
 *     2010-03-08 (TIMJ):
 *        Change API to use merged flatfield raw data so that we can share
 *        code with smf_flat_fastflat and smf_flat_mergedata.
+*     2011-09-08 (TIMJ):
+*        Add refres argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008,2010 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008,2010-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -124,7 +128,7 @@
 
 
 void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
-                     const smfData * bolval,
+                     double refres, const smfData * bolval,
                      const smfData * powref, const smfData * bolref,
                      const smfData * polyfit, const Grp * prvgrp, int * status ) {
 
@@ -225,7 +229,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   sc2store_setcompflag ( SC2STORE__NONE, status );
   sc2store_wrtstream ( flatname, subnum, ncards,
                        fitsrec, colsize, rowsize, nframes,
-                       (bolref->dims)[2], 0, smf_flat_methstring( flatmeth, status ),
+                       (bolref->dims)[2], refres, 0, smf_flat_methstring( flatmeth, status ),
                        bolval->hdr->allState, NULL,
                        ibuf, dksquid, (bolref->pntr)[0], (powref->pntr)[0],
                        "FLATCAL", NULL, NULL, jig_vert,

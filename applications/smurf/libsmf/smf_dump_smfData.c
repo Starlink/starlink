@@ -436,6 +436,12 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
     /* Number of flatfield coefficients per bolometer */
     msgSeti("F",(int)da->nflat);
     msgOut("", "    nflat = ^F", status);
+    if (da->refres != VAL__BADD) {
+      msgSetd( "RR", da->refres );
+    } else {
+      msgSetc( "RR", "NOT SET" );
+    }
+    msgOut("", "    refres = ^RR", status);
     msgOutf("","    heatval = %s", status, ( da->heatval ? "OK" : "NULL" ));
     msgOutf("","    nheat = %zd", status, da->nheat);
     if ( da->dksquid ) {

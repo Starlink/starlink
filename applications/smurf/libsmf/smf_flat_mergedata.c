@@ -166,7 +166,8 @@ void smf_flat_mergedata( const smfArray * heatframes,
     memcpy( dheatval, heatval, nheat * sizeof(*heatval) );
 
     da = smf_construct_smfDA( NULL, NULL, NULL, NULL,
-                              SMF__FLATMETH_NULL, 0, dheatval, nheat, status );
+                              SMF__FLATMETH_NULL, 0, VAL__BADD,
+                              dheatval, nheat, status );
 
     (*bolvald)->da = da;
   }

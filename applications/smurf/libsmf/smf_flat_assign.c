@@ -13,8 +13,9 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_flat_assign ( int use_da, smf_flatmeth flatmeth, const smfData * powval,
-*                       const smfData * bolval, smfData * updata, int *status );
+*     smf_flat_assign ( int use_da, smf_flatmeth flatmeth, double refres,
+*                       const smfData * powval, const smfData * bolval,
+*                       smfData * updata, int *status );
 
 *  Arguments:
 *     use_da = int (Given)
@@ -23,6 +24,9 @@
 *        and powval.
 *     flatmeth = smf_flatmeth (Given)
 *        Flatfield method. Only used if use_da is false.
+*     refres = double (Given)
+*        Reference resistor value used to calculate the flatfield. Will be ignored
+*        if the smfDA is being accessed.
 *     powval = const smfData * (Given)
 *        Power values to be copied into the flatpar entry of smfDA. The size of
 *        powval will correspond to the "nflat" entry of smfDA. Can be NULL if
@@ -92,8 +96,9 @@
 #include "prm_par.h"
 #include "sae_par.h"
 
-void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powval,
-                       const smfData * bolval, smfData * updata, int *status ) {
+void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, double inrefres,
+                       const smfData * powval, const smfData * bolval,
+                       smfData * updata, int *status ) {
 
   size_t nbols = 0;        /* Number of bolometers */
   smfDA * outda = NULL;    /* Pointer to output smfDA */
@@ -105,6 +110,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powv
   int nflat = 0;
   double * heatval = NULL;
   int nheat = 0;
+  double refres = VAL__BADD;
 
   if (*status != SAI__OK) return;
 
@@ -133,6 +139,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powv
     flatpar = inda->flatpar;
     heatval = inda->heatval;
     flatmeth = inda->flatmeth;
+    refres = inda->refres;
 
   } else {
     smfDA * bolda = NULL;
@@ -146,6 +153,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powv
 
     /* Get values from the smfDatas */
     flatmeth = inflatmeth;
+    refres = inrefres;
     nflat = (bolval->dims)[2];
     flatpar = (powval->pntr)[0];
     flatcal = (bolval->pntr)[0];
@@ -172,6 +180,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powv
   if (*status == SAI__OK) {
     outda->nflat = nflat;
     outda->flatmeth = flatmeth;
+    outda->refres = refres;
 
     outda->flatcal = astRealloc( outda->flatcal, nbols * nflat * sizeof(*(outda->flatcal)) );
     outda->flatpar = astRealloc( outda->flatpar, nflat * sizeof(*(outda->flatpar)) );

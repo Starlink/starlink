@@ -626,6 +626,7 @@ typedef struct smfDA {
   double *flatcal;           /* pointer to flatfield calibration */
   double *flatpar;           /* pointer to flatfield parameters */
   double *heatval;           /* Heater values in DAC units for flatfield */
+  double refres;             /* Reference resistor used to calculate flatfield */
   smf_flatmeth flatmeth;     /* Flatfield algorithm name */
   size_t nflat;              /* number of flat coeffs per bol */
   size_t nheat;              /* number of elements in heatval */

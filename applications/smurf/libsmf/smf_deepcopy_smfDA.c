@@ -119,6 +119,7 @@ smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status ) {
   double *flatcal = NULL; /* pointer to flatfield calibration */
   double *flatpar = NULL; /* pointer to flatfield parameters */
   double *heatval = NULL; /* pointer to heater values */
+  double refres = VAL__BADD; /* Reference heater resistance */
   smf_flatmeth flatmeth;  /* Flatfield method */
   size_t nheat;           /* number of entries in heatval */
   size_t nflat;           /* number of flat coeffs per bol */
@@ -140,6 +141,7 @@ smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status ) {
   nflat = oldda->nflat;
   nheat = oldda->nheat;
   flatmeth = oldda->flatmeth;
+  refres = oldda->refres;
 
   /* Need the number of bolometers, columns and time slices */
   smf_get_dims( old, NULL, &ncol, &nbol, &ntslice, NULL, NULL, NULL, status );
@@ -173,7 +175,7 @@ smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status ) {
 
   /* Construct the new smfData */
   newda = smf_construct_smfDA( newda, dksquid, flatcal, flatpar, flatmeth,
-                               nflat, heatval, nheat, status);
+                               nflat, refres, heatval, nheat, status);
 
   return newda;
 }

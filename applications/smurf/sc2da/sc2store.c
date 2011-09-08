@@ -78,6 +78,7 @@ static HDSLoc *sc2store_fdataloc = NULL;     /* HDS locator to FLATDATA structur
 static int sc2store_findf = NDF__NOID;       /* NDF identifier for flat calibration */
 static HDSLoc *sc2store_fnameloc = NULL;     /* HDS locator to FLATNAME structure */
 static HDSLoc *sc2store_fparloc = NULL;      /* HDS locator to FLATPAR structure */
+static HDSLoc *sc2store_frefresloc = NULL;   /* HDS locator to REFRES structure */
 static HDSLoc *sc2store_incomploc = NULL;    /* HDS locator to INCOMPS structure */
 static int sc2store_indf = NDF__NOID;        /* main NDF identifier */
 static int sc2store_indfgridext = NDF__NOID; /* NDF identifier for grid extent */
@@ -608,6 +609,7 @@ int *status          /* global status (given and returned) */
       datUnmap ( sc2store_fparloc, &tstatus );
       datAnnul ( &sc2store_fparloc, &tstatus );
       datAnnul ( &sc2store_fnameloc, &tstatus );
+      if (sc2store_frefresloc) datAnnul( &sc2store_frefresloc, &tstatus);
       datAnnul ( &sc2store_fdataloc, &tstatus );
       ndfUnmap ( sc2store_findf, "DATA", &tstatus );
       ndfAnnul ( &sc2store_findf, &tstatus );
@@ -1793,6 +1795,7 @@ size_t flatlen,          /* length of space for flatfield name (given) */
 size_t *colsize,         /* number of pixels in column (returned) */
 size_t *rowsize,         /* number of pixels in row (returned) */
 size_t *nflat,           /* number of flat coeffs per bol (returned) */
+double *refres,          /* Reference resistor used to create flatfield (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
@@ -1813,6 +1816,7 @@ int *status              /* global status (given and returned) */
     20Mar2007 : Use const in signature (TIMJ)
     11Nov2007 : make *data short instead of unsigned short (bdk)
     19Nov2007 : use sc2store_open and sc2store_readflatcal (bdk)
+    08Sep2011 : Add refres argument (timj)
 */
 
 {
@@ -1833,7 +1837,7 @@ int *status              /* global status (given and returned) */
    }
 
    sc2store_open ( filename, "READ", colsize, rowsize, &nframes, status );
-   sc2store_readflatcal ( "READ", flatlen, nflat, flatname, &fcal, &fpar,
+   sc2store_readflatcal ( "READ", flatlen, nflat, refres, flatname, &fcal, &fpar,
      status );
 
    if ( !StatusOkP(status) )
@@ -1878,6 +1882,7 @@ size_t *colsize,         /* number of pixels in column (returned) */
 size_t *rowsize,         /* number of pixels in row (returned) */
 size_t *nframes,         /* number of frames (returned) */
 size_t *nflat,           /* number of flat coeffs per bol (returned) */
+double *refres,          /* Reference resistor used to create flatfield (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 JCMTState *frhead[],     /* header data for each frame (returned) */
 int **outdata,           /* pointer to data array (returned), or NULL */
@@ -1955,7 +1960,7 @@ int *status              /* global status (given and returned) */
    sc2store_readraw ( access, *colsize, *rowsize, *nframes, units, label, outdata,
                       dksquid, status );
 
-   sc2store_readflatcal ( access, flatlen, nflat, flatname, flatcal, flatpar,
+   sc2store_readflatcal ( access, flatlen, nflat, refres, flatname, flatcal, flatpar,
      status );
    sc2store_readjig ( access, jigvert, nvert, jigpath, npath, status );
 
@@ -2040,6 +2045,7 @@ void sc2store_readflatcal
 const char *access,      /* "READ" or "UPDATE" access (given) */
 size_t flatlen,          /* length of space for flatfield name (given) */
 size_t *nflat,           /* number of flat coeffs per bol (returned) */
+double *refres,          /* Reference resistor used to create flatfield (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
@@ -2053,6 +2059,7 @@ int *status              /* global status (given and returned) */
 */
 {
    int el;                     /* number of elements mapped */
+   int isthere = 0;            /* Is component present? */
    int nfdim;                  /* number of flatpar dimensions */
    int fdims[1];               /* flatpar dimensios */
    int place;                  /* NDF placeholder */
@@ -2072,6 +2079,15 @@ int *status              /* global status (given and returned) */
    ndfXloc ( sc2store_findf, "FLATDATA", "READ", &sc2store_fdataloc, status );
    datFind ( sc2store_fdataloc, "FLATNAME", &sc2store_fnameloc, status );
    datGet0C ( sc2store_fnameloc, flatname, flatlen, status );
+
+   /* Old flatfields won't have this */
+   *refres = VAL__BADD;
+   datThere( sc2store_fdataloc, "REFRES", &isthere, status );
+   if (isthere) {
+     datFind( sc2store_fdataloc, "REFRES", &sc2store_frefresloc, status );
+     datGet0D( sc2store_frefresloc, refres, status );
+   }
+
    datFind ( sc2store_fdataloc, "FLATPAR", &sc2store_fparloc, status );
    datShape ( sc2store_fparloc, 1, fdims, &nfdim, status );
    datMap ( sc2store_fparloc, "_DOUBLE", "READ", 1, fdims, (void**)flatpar,
@@ -2836,6 +2852,7 @@ void sc2store_writeflatcal
 size_t colsize,             /* number of pixels in a column (given) */
 size_t rowsize,             /* number of pixels in a row (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
+double refres,              /* Reference resistor used to create flatfield (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const double *flatcal,      /* flat-field calibration (given) */
 const double *flatpar,      /* flat-field parameters (given) */
@@ -2879,6 +2896,13 @@ int *status              /* global status (given and returned) */
    datNew ( sc2store_fdataloc, "FLATNAME", "_CHAR*16", 0, 0, status );
    datFind ( sc2store_fdataloc, "FLATNAME", &sc2store_fnameloc, status );
    datPut0C ( sc2store_fnameloc, flatname, status );
+
+/* Reference resistance (if good) */
+   if (refres != VAL__BADD) {
+     datNew0D( sc2store_fdataloc, "REFRES", status );
+     datFind( sc2store_fdataloc, "REFRES", &sc2store_frefresloc, status );
+     datPut0D( sc2store_frefresloc, refres, status );
+   }
 
 /* Parameter matching each flatfield coefficient */
 
@@ -3692,6 +3716,7 @@ size_t colsize,             /* number of bolometers in column (given) */
 size_t rowsize,             /* number of bolometers in row (given) */
 size_t nframes,             /* number of frames (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
+double refres,              /* Reference resistor used to create flatfield (given) */
 size_t ntrack,              /* number of bolometers used for heater tracking (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const JCMTState head[],     /* header data for each frame (given) */
@@ -3758,7 +3783,7 @@ int *status                 /* global status (given and returned) */
 
    sc2store_writeraw ( filename, colsize, rowsize, nframes, ntrack, dbuf, dksquid,
                        trackinfo, status );
-   sc2store_writeflatcal ( colsize, rowsize, nflat, flatname, flatcal, flatpar,
+   sc2store_writeflatcal ( colsize, rowsize, nflat, refres, flatname, flatcal, flatpar,
      status );
 
    if ( !StatusOkP(status) )
@@ -3821,6 +3846,7 @@ const char filename[],      /* name of file to update (given) */
 size_t colsize,             /* number of bolometers in column (given) */
 size_t rowsize,             /* number of bolometers in row (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
+double refres,              /* Reference resistor used to create flatfield (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const double *flatcal,      /* flat-field calibration (given) */
 const double *flatpar,      /* flat-field parameters (given) */
@@ -3876,7 +3902,7 @@ int *status                 /* global status (given and returned) */
    }
 
    /* write the flatfield information */
-   sc2store_writeflatcal ( colsize, rowsize, nflat, flatname, flatcal, flatpar,
+   sc2store_writeflatcal ( colsize, rowsize, nflat, refres, flatname, flatcal, flatpar,
      status );
 
    if ( StatusOkP(status) )
