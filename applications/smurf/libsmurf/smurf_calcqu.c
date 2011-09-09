@@ -307,7 +307,7 @@ void smurf_calcqu( int *status ) {
    Also identify chunks of data that are contiguous in time, and
    determine to which such chunk each group belongs. All this information
    is returned in a smfGroup structure ("*sgroup"). */
-      smf_grp_related( sgrp, ssize, 1, 1, 0, NULL, NULL,
+      smf_grp_related( sgrp, ssize, 1, 1, 0, NULL, NULL, NULL,
                        NULL, &sgroup, &bgrp, NULL, status );
 
 /* Obtain the number of contiguous chunks. */

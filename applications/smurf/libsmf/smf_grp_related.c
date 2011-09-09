@@ -15,7 +15,8 @@
  *  Invocation:
  *     smf_grp_related( const Grp *igrp, const size_t grpsize,
  *                      const int grouping, const int checksubinst,
- *                      double maxlen_s, AstKeyMap *keymap, dim_t *maxconcatlen,
+ *                      double maxlen_s, double *srate_maxlen,
+ *                      AstKeyMap *keymap, dim_t *maxconcatlen,
  *                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
  *                      dim_t *pad, int *status );
 
@@ -34,6 +35,10 @@
  *     maxlen_s = double (Given)
  *        If set, maximum length of a continuous chunk in seconds.
  *        If 0 don't enforce a maximum length.
+ *     srate_maxlen = double * (Returned)
+ *        If non-NULL, return the sample rate that was used (or would be used)
+ *        internally to convert maxlen_s into a number of samples (taken from
+ *        first file)
  *     keymap = AstKeyMap * (Given)
  *        A pointer to a KeyMap holding the configuration parameters. Only
  *        needed if "pad" is not NULL.
@@ -189,6 +194,8 @@
  *     2011-09-08 (EC):
  *        Provide maxlen_s instead of maxlen so that correct down-sampled length
  *        may be calculated.
+ *     2011-09-09 (EC):
+ *        Add srate_maxlen
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -247,7 +254,8 @@
 
 void smf_grp_related( const Grp *igrp, const size_t grpsize,
                       const int grouping, const int checksubinst,
-                      double maxlen_s, AstKeyMap *keymap, dim_t *maxconcatlen,
+                      double maxlen_s, double *srate_maxlen,
+                      AstKeyMap *keymap, dim_t *maxconcatlen,
                       dim_t *maxfilelen, smfGroup **group,
                       Grp **basegrp, dim_t *pad, int *status ) {
 
@@ -334,6 +342,15 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     if( !maxlen && maxlen_s && data->hdr->steptime) {
       maxlen = (dim_t) (maxlen_s / data->hdr->steptime );
     }
+
+    /* Return srate_maxlen if requested: may want to know this number
+       even if maxlen_s is not set. Only calculate once, although it
+       gets overwritten once later if down-sampling. */
+
+    if( (i==1) && srate_maxlen && data->hdr->steptime ) {
+      *srate_maxlen = 1. / (double) data->hdr->steptime;
+    }
+
 
     /* If requested check to see if we are mixing wavelengths */
     if( checksubinst ) {
@@ -446,7 +463,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
           /* If maxlen has been requested, and we have not already worked
              out a scaled version (just uses the sample rates for the first
-             file... should be close enough). */
+             file... should be close enough -- the alternative is a 2-pass
+             system). */
 
           if( !maxlen_scaled ) {
             maxlen = round(maxlen*scalelen);
@@ -454,6 +472,11 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
             msgOutiff( MSG__VERB, "", FUNC_NAME
                        ": requested maxlen %g seconds = %zu down-sampled "
                        "time-slices", status, maxlen_s, maxlen );
+
+            /* Return updated srate_maxlen for down-sampling if requested */
+            if( srate_maxlen ) {
+              *srate_maxlen = scalelen/steptime;
+            }
           }
         }
       }

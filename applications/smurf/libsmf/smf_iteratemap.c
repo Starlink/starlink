@@ -537,6 +537,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int sampcube;                 /* write SAMPCUBES extensions? */
   double scalevar=0;            /* scale factor for variance */
   int shortmap=0;               /* If set, produce maps every shortmap tslices*/
+  double srate_maxlen=0;        /* Sample rate used to calc maxlen in samples */
   double steptime;              /* Length of a sample in seconds */
   const char *tempstr=NULL;     /* Temporary pointer to static char buffer */
   double *thetabincen=NULL;     /* Bin centres of scan angle */
@@ -931,8 +932,14 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     &groupsubarray, NULL, NULL, NULL, status );
 
-  smf_grp_related( igrp, isize, 1+groupsubarray, 1, maxlen, keymap,
-                   &maxconcat, &maxfile, &igroup, NULL, &pad, status );
+  smf_grp_related( igrp, isize, 1+groupsubarray, 1, maxlen, &srate_maxlen,
+                   keymap, &maxconcat, &maxfile, &igroup, NULL, &pad, status );
+
+  if( srate_maxlen <= 0 ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": error, sample rate used to convert maxlen_s to "
+            "number of samples is <= 0", status );
+  }
 
   /* Once we've run smf_grp_related we know how many subarrays there
      are.  We also know the maximum length of a concatenated piece of
@@ -965,13 +972,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          to re-group the files using smaller contchunks */
 
       errAnnul( status );
-      msgOut( " ", FUNC_NAME ": *** WARNING ***", status );
-      msgSeti( "LEN", maxconcat );
-      msgSeti( "AVAIL", maxmem/SMF__MIB );
-      msgSeti( "NEED", memneeded/SMF__MIB );
-      msgOut( " ", "  ^LEN continuous samples (including padding) require "
-              "^NEED MiB > ^AVAIL MiB",
-              status );
+      msgOutf( " ", FUNC_NAME ": *** WARNING ***\n  %zu continuous samples "
+               "(%lg s, including padding) require %zu MiB > %zu MiB",
+               status, maxconcat, maxconcat/srate_maxlen,
+               memneeded/SMF__MIB, maxmem/SMF__MIB);
 
       /* Try is meant to be the largest contchunk of ~equal length that fit in
          memory */
@@ -994,8 +998,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 "into smaller pieces.", status );
       }
 
-      msgOutf( "", "  Will try to re-group data in chunks < %zu samples long",
-               status, try );
+      msgOutf( "", "  Will try to re-group data in chunks < %zu samples long "
+               "(%lg s)",
+               status, try, (double) try/srate_maxlen );
       msgOut( " ", FUNC_NAME ": ***************", status );
 
       /* Close igroup if needed before re-running smf_grp_related */
@@ -1004,7 +1009,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_close_smfGroup( &igroup, status );
       }
 
-      smf_grp_related( igrp, isize, 1+groupsubarray, 1, try, NULL,
+      smf_grp_related( igrp, isize, 1+groupsubarray, 1,
+                       (double) try/srate_maxlen, NULL, NULL,
                        &maxconcat, NULL, &igroup, NULL, NULL, status );
     }
   }

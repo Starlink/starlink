@@ -1260,7 +1260,8 @@ Grp *smf_grp_new( const Grp *grp, const char *type, int *status );
 
 void smf_grp_related( const Grp *igrp, const size_t grpsize,
                       const int grouping, const int checksubinst,
-                      double maxlen_s, AstKeyMap *keymap, dim_t *maxconcatlen,
+                      double maxlen_s, double *srate_maxlen,
+                      AstKeyMap *keymap, dim_t *maxconcatlen,
                       dim_t *maxfilelen, smfGroup **group,
                       Grp **basegrp, dim_t *pad, int *status );
 
