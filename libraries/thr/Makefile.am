@@ -27,6 +27,8 @@ thrtest_LDADD = libthr.la `err_link` `ast_link`
 
 dist_pkgdata_DATA = LICENCE
 
+BUILT_SOURCES = sun264.tex
 
-
+sun264.tex: $(PUBLIC_C_FILES)
+	./make_sun264
 
