@@ -191,31 +191,33 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
      in case we need them later. Bounds are first two values (0,1)
      and last two values (2,3). This will also tell us how many readings we do per heater
      setting on a single ramp. */
-  heatbounds[0] = (hdr->allState)[0].sc2_heat;
-  heatbounds[3] = (hdr->allState)[nframes-1].sc2_heat;
-  for (i = 0; i < nframes; i++ ) {
-    int thisheat = (hdr->allState)[i].sc2_heat;
-    if (thisheat == VAL__BADI) {
-      /* flat ramps should never have bad heater values so if we see one we decide
-         that this ramp is invalid */
-      if (*status == SAI__OK) {
-        *status = SMF__BADFLAT;
-        errRep( "", "Bad values in the SC2_HEAT state structure. Can not calculate flatfield.",
-                status);
+  if (*status == SAI__OK) {
+    heatbounds[0] = (hdr->allState)[0].sc2_heat;
+    heatbounds[3] = (hdr->allState)[nframes-1].sc2_heat;
+    for (i = 0; i < nframes; i++ ) {
+      int thisheat = (hdr->allState)[i].sc2_heat;
+      if (thisheat == VAL__BADI) {
+        /* flat ramps should never have bad heater values so if we see one we decide
+           that this ramp is invalid */
+        if (*status == SAI__OK) {
+          *status = SMF__BADFLAT;
+          errRep( "", "Bad values in the SC2_HEAT state structure. Can not calculate flatfield.",
+                  status);
+        }
+        break;
       }
-      break;
+      if (thisheat != heatbounds[0] && heatbounds[1] == 0 ) {
+        heatbounds[1] = thisheat;
+        meas_per_heat = i;
+        break;
+      }
     }
-    if (thisheat != heatbounds[0] && heatbounds[1] == 0 ) {
-      heatbounds[1] = thisheat;
-      meas_per_heat = i;
-      break;
-    }
-  }
-  for ( i = nframes-1; i >= 1; i-- ) {
-    int thisheat = (hdr->allState)[i].sc2_heat;
-    if (thisheat != heatbounds[3] && heatbounds[2] == 0 ) {
-      heatbounds[2] = thisheat;
-      break;
+    for ( i = nframes-1; i >= 1; i-- ) {
+      int thisheat = (hdr->allState)[i].sc2_heat;
+      if (thisheat != heatbounds[3] && heatbounds[2] == 0 ) {
+        heatbounds[2] = thisheat;
+        break;
+      }
     }
   }
 
