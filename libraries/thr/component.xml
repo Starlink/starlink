@@ -10,14 +10,14 @@
 	<p>C Memory management wrapper routines.</p>
   </abstract>
   <dependencies >
-    <build>ast</build><build>ems</build>
+    <build>ast</build><build>ems</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
       <name>David Berry</name>
     </person>
   </developers>
-  <documentation></documentation>
+  <documentation> sun264</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

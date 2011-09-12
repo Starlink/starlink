@@ -18,6 +18,8 @@ endif
 PUBLIC_C_FILES = thr.c
 PUBLIC_CINCLUDES = thr.h
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 TESTS = thrtest
 check_PROGRAMS = thrtest
 thrtest_SOURCES = thrtest.c

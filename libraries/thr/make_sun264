@@ -1,0 +1,16 @@
+#!/bin/csh
+
+rm -f thr_routines.tex thr_routines_sorted.tex sun264.tex
+touch thr_routines.tex
+
+foreach n (thr.c)
+   $STARCONF_DEFAULT_STARLINK/bin/sst/prolat $n out=head \
+                            noatask nodocument nosingle nopage
+   cat head >> thr_routines.tex
+   rm head
+end
+
+./sort-routines.pl
+
+cat sun_head.tex thr_routines_sorted.tex sun_tail.tex > sun264.tex
+

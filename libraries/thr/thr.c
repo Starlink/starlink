@@ -188,6 +188,7 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
                void (*func)( void *, int * ), int nwait_on,
                const int *wait_on, int *status ){
 /*
+*+
 *  Name:
 *     thrAddJob
 
@@ -201,10 +202,18 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
 *                    void (*func)( void *, int * ),  int nwait_on,
 *                    const int *wait_on, int *status )
+
+*  Description:
+*     This function adds a job to the list of jobs to be performed by the
+*     workforce. The job will start immediately if a worker thread is
+*     available to execute the job, and any jobs specified in the
+*     "wait_on" list have completed. Otherwise, it will start as soon as
+*     a worker thread becomes available and all the "wait_on" jobs have
+*     completed. Jobs are not necessarily started in the order in which
+*     they are added to the workforce.
 
 *  Arguments:
 *     workforce
@@ -239,15 +248,6 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
 *  Returned Value:
 *     A positive integer identifier for the job. Zero if an error occurs.
 
-*  Description:
-*     This function adds a job to the list of jobs to be performed by the
-*     workforce. The job will start immediately if a worker thread is
-*     available to execute the job, and any jobs specified in the
-*     "wait_on" list have completed. Otherwise, it will start as soon as
-*     a worker thread becomes available and all the "wait_on" jobs have
-*     completed. Jobs are not necessarily started in the order in which
-*     they are added to the workforce.
-
 *  Job Control Flags:
 *     - THR__REPORT_JOB: Indicates that this job is to be included in the
 *     list of jobs for which thrJobWait will wait.
@@ -256,6 +256,8 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
 *     performed simply by passing the supplied "data" pointer to astFree.
 *     Therefore, if the job data includes pointers to other memory areas,
 *     such memory areas will not themselves be freed.
+
+*-
 */
 
 /* Local Variables: */
@@ -374,6 +376,7 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
 
 void thrBeginJobContext( ThrWorkForce *workforce, int *status ){
 /*
+*+
 *  Name:
 *     thrBeginJobContext
 
@@ -387,8 +390,12 @@ void thrBeginJobContext( ThrWorkForce *workforce, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thrBeginJobContext( ThrWorkForce *workforce, int *status )
+
+*  Description:
+*     This function indicates that all jobs created before the subsequent matching
+*     call to thrEndJobContext should be grouped together. This affects the
+*     behaviour of functions thrWait and thrJobWait.
 
 *  Arguments:
 *     workforce
@@ -397,11 +404,7 @@ void thrBeginJobContext( ThrWorkForce *workforce, int *status ){
 *     status
 *        Pointer to the inherited status value.
 
-*  Description:
-*     This function indicates that all jobs created before the subsequent matching
-*     call to thrEndJobContext should be grouped together. This affects the
-*     behaviour of functions thrWait and thrJobWait.
-
+*-
 */
 
 /* Check inherited status */
@@ -425,6 +428,7 @@ void thrBeginJobContext( ThrWorkForce *workforce, int *status ){
 
 ThrWorkForce *thrCreateWorkforce( int nworker, int *status ) {
 /*
+*+
 *  Name:
 *     thrCreateWorkforce
 
@@ -438,19 +442,7 @@ ThrWorkForce *thrCreateWorkforce( int nworker, int *status ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrWorkForce *thrCreateWorkforce( int nworker, int *status )
-
-*  Arguments:
-*     nworker
-*        The number of threads within the new thread pool.
-*     status
-*        Pointer to the inherited status value.
-
-*  Returned Value:
-*     A pointer to a structure describing the new thread pool. The
-*     returned pool should be freed using thrDestroyWorkforce when
-*     no longer needed.
 
 *  Description:
 *     This function creates a new "workforce" - a pool of threads that
@@ -489,6 +481,18 @@ ThrWorkForce *thrCreateWorkforce( int nworker, int *status ) {
 *     signal by waking up and continuing with whetever else it has to
 *     do (which may include submitting more jobs to the job desk).
 
+*  Arguments:
+*     nworker
+*        The number of threads within the new thread pool.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     A pointer to a structure describing the new thread pool. The
+*     returned pool should be freed using thrDestroyWorkforce when
+*     no longer needed.
+
+*-
 */
 
 /* Local Variables: */
@@ -550,6 +554,7 @@ ThrWorkForce *thrCreateWorkforce( int nworker, int *status ) {
 
 ThrWorkForce *thrDestroyWorkforce( ThrWorkForce *workforce ) {
 /*
+*+
 *  Name:
 *     thrDestroyWorkforce
 
@@ -563,8 +568,14 @@ ThrWorkForce *thrDestroyWorkforce( ThrWorkForce *workforce ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrWorkForce *thrDestroyWorkforce( ThrWorkForce *workforce )
+
+*  Description:
+*     This function frees all resources used by a work force. This
+*     includes cancelling the worker threads, and freeing memory
+*     structures. The calling thread blocks until any busy workers have
+*     completed their jobs. The worker threads themselves are then
+*     terminated.
 
 *  Arguments:
 *     workforce
@@ -574,13 +585,7 @@ ThrWorkForce *thrDestroyWorkforce( ThrWorkForce *workforce ) {
 *  Returned Value:
 *     A NULL pointer is returned.
 
-*  Description:
-*     This function frees all resources used by a work force. This
-*     includes cancelling the worker threads, and freeing memory
-*     structures. The calling thread blocks until any busy workers have
-*     completed their jobs. The worker threads themselves are then
-*     terminated.
-
+*-
 */
 
 /* Local Variables: */
@@ -674,6 +679,7 @@ ThrWorkForce *thrDestroyWorkforce( ThrWorkForce *workforce ) {
 
 void thrEndJobContext( ThrWorkForce *workforce, int *status ){
 /*
+*+
 *  Name:
 *     thrEndJobContext
 
@@ -687,8 +693,12 @@ void thrEndJobContext( ThrWorkForce *workforce, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thrEndJobContext( ThrWorkForce *workforce, int *status )
+
+*  Description:
+*     This function ends the job context started by the earlier matching
+*     call to thrBeginJobContext. Any remaining jobs belonging to the
+*     current job context are exported into the parent job context.
 
 *  Arguments:
 *     workforce
@@ -697,11 +707,7 @@ void thrEndJobContext( ThrWorkForce *workforce, int *status ){
 *     status
 *        Pointer to the inherited status value.
 
-*  Description:
-*     This function ends the job context started by the earlier matching
-*     call to thrBeginJobContext. Any remaining jobs belonging to the
-*     current job context are exported into the parent job context.
-
+*-
 */
 
 /* Local Variables: */
@@ -749,6 +755,7 @@ void thrEndJobContext( ThrWorkForce *workforce, int *status ){
 
 void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status ){
 /*
+*+
 *  Name:
 *     thrGetJobData
 
@@ -762,8 +769,11 @@ void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status )
+
+*  Description:
+*     This function returns the pointer that was supplied as argument
+*     "data" when thrAddJob was called to create the specified job.
 
 *  Arguments:
 *     ijob
@@ -778,10 +788,7 @@ void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status ){
 *  Returned Value:
 *     The pointer to the job data.
 
-*  Description:
-*     This function returns the pointer that was supplied as argument
-*     "data" when thrAddJob was called to create the specified job.
-
+*-
 */
 
 /* Local Variables: */
@@ -811,6 +818,7 @@ void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status ){
 
 int thrGetNThread( const char *env, int *status ){
 /*
+*+
 *  Name:
 *     thrGetNThread
 
@@ -824,8 +832,17 @@ int thrGetNThread( const char *env, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     int thrGetNThread( const char *env, int *status );
+
+*  Description:
+*     This function returns the number of worker threads to use when
+*     dividing a task up between multiple threads. Note, a value of "1"
+*     means one worker thread in addition to the required manager thread
+*     that co-ordinates the workers (i.e. the main thread in which the
+*     application is started). The default value is the number
+*     of CPU cores available, but this can be over-ridden by setting the
+*     environment variable specified by the "env" argument to some other
+*     value.
 
 *  Arguments:
 *     env = const char * (Given)
@@ -838,16 +855,7 @@ int thrGetNThread( const char *env, int *status ){
 *     The number of threads to use. A value of 1 is returned if an error
 *     occurs.
 
-*  Description:
-*     This function returns the number of worker threads to use when
-*     dividing a task up between multiple threads. Note, a value of "1"
-*     means one worker thread in addition to the required manager thread
-*     that co-ordinates the workers (i.e. the main thread in which the
-*     application is started). The default value is the number
-*     of CPU cores available, but this can be over-ridden by setting the
-*     environment variable specified by the "env" argument to some other
-*     value.
-
+*-
 */
 
 /* Local Variables */
@@ -898,6 +906,7 @@ int thrGetNThread( const char *env, int *status ){
 
 ThrWorkForce *thrGetWorkforce( int nworker, int *status ) {
 /*
+*+
 *  Name:
 *     thrGetWorkforce
 
@@ -911,18 +920,7 @@ ThrWorkForce *thrGetWorkforce( int nworker, int *status ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrWorkForce *thrGetWorkforce( int nworker, int *status )
-
-*  Arguments:
-*     nworker
-*        The number of threads to use if a new workforce is created.
-*     status
-*        Pointer to the inherited status value.
-
-*  Returned Value:
-*     A pointer to a workforce. The returned pointer should not usually be
-*     freed explicitly (e.g. with thrDestroyWorkforce).
 
 *  Description:
 *     Applications that may be run in a monolith environment such as ICL
@@ -943,6 +941,17 @@ ThrWorkForce *thrGetWorkforce( int nworker, int *status ) {
 *     resources associated with the workforce will be freed when the
 *     monolith process terminates.
 
+*  Arguments:
+*     nworker
+*        The number of threads to use if a new workforce is created.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     A pointer to a workforce. The returned pointer should not usually be
+*     freed explicitly (e.g. with thrDestroyWorkforce).
+
+*-
 */
 
 /* Check in herited status */
@@ -964,6 +973,7 @@ ThrWorkForce *thrGetWorkforce( int nworker, int *status ) {
 
 int thrJobWait( ThrWorkForce *workforce, int *status ) {
 /*
+*+
 *  Name:
 *     thrJobWait
 
@@ -977,15 +987,7 @@ int thrJobWait( ThrWorkForce *workforce, int *status ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     int thrJobWait( ThrWorkForce *workforce, int *status )
-
-*  Arguments:
-*     workforce
-*        Pointer to the workforce. If NULL is supplied, this function
-*        exits immediately, returning a value of zero.
-*     status
-*        Pointer to the inherited status value.
 
 *  Description:
 *     Each consecutive call to this function return the integer identifier
@@ -997,6 +999,13 @@ int thrJobWait( ThrWorkForce *workforce, int *status ) {
 *     thrAddJob and were created within the current job context (see
 *     thrBeginJobContext) are included in the list of returned jobs.
 
+*  Arguments:
+*     workforce
+*        Pointer to the workforce. If NULL is supplied, this function
+*        exits immediately, returning a value of zero.
+*     status
+*        Pointer to the inherited status value.
+
 *  Returned Value:
 *     The integer identifier for the completed job. This can be compared
 *     with the job identifiers returned by thrAddJob to determine which
@@ -1006,6 +1015,7 @@ int thrJobWait( ThrWorkForce *workforce, int *status ) {
 *     - This function attempts to execute even if an error has already
 *     occurred.
 
+*-
 */
 
 /* Local Variables: */
@@ -1082,6 +1092,7 @@ int thrJobWait( ThrWorkForce *workforce, int *status ) {
 
 void thrWait( ThrWorkForce *workforce, int *status ) {
 /*
+*+
 *  Name:
 *     thrWait
 
@@ -1095,15 +1106,7 @@ void thrWait( ThrWorkForce *workforce, int *status ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     thrWait( ThrWorkForce *workforce, int *status )
-
-*  Arguments:
-*     workforce
-*        Pointer to the workforce. If NULL is supplied, this function
-*        returns immediately.
-*     status
-*        Pointer to the inherited status value.
 
 *  Description:
 *     This function blocks the calling thread until all jobs within the
@@ -1115,10 +1118,18 @@ void thrWait( ThrWorkForce *workforce, int *status ) {
 *     have been reported (again, this only affects jobs within the current
 *     job context).
 
+*  Arguments:
+*     workforce
+*        Pointer to the workforce. If NULL is supplied, this function
+*        returns immediately.
+*     status
+*        Pointer to the inherited status value.
+
 *  Notes:
 *     - This function attempts to execute even if an error has already
 *     occurred.
 
+*-
 */
 
 /* Local Variables: */
@@ -1219,16 +1230,15 @@ static void thr1ClearStatus( ThrJobStatus *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thr1ClearStatus( ThrJobStatus *status )
-
-*  Arguments:
-*     status
-*        Pointer to the structure describing the job status. May be NULL.
 
 *  Description:
 *     This resets all fields of the supplied structure to indicate that
 *     no error has occurred.
+
+*  Arguments:
+*     status
+*        Pointer to the structure describing the job status. May be NULL.
 
 */
    int i;
@@ -1259,8 +1269,11 @@ static ThrJobStatus *thr1CopyStatus( ThrJobStatus *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrJobStatus *thr1CopyStatus( ThrJobStatus *status )
+
+*  Description:
+*     This function returns a new ThrJobStatus structure holding a copy
+*     of the information in the supplied ThrJobStatus structure.
 
 *  Arguments:
 *     status
@@ -1269,10 +1282,6 @@ static ThrJobStatus *thr1CopyStatus( ThrJobStatus *status ){
 *  Returned Value:
 *     A pointer to a new ThrJobStatus structure, or NULL if "status" is
 *     NULL.
-
-*  Description:
-*     This function returns a new ThrJobStatus structure holding a copy
-*     of the information in the supplied ThrJobStatus structure.
 
 */
 
@@ -1321,8 +1330,11 @@ static void thr1ExportJobs( ThrJob *head, int old, int new, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thr1ExportJobs( ThrJob *head, int old, int new, int *status )
+
+*  Description:
+*     This function searches the given lists of jobs for jobs belonging to the
+*     old context and assigns them to the new context.
 
 *  Arguments:
 *     head
@@ -1333,10 +1345,6 @@ static void thr1ExportJobs( ThrJob *head, int old, int new, int *status ){
 *        Identifier for the new context.
 *     status
 *        Pointer to the inherited status value.
-
-*  Description:
-*     This function searches the given lists of jobs for jobs belonging to the
-*     old context and assigns them to the new context.
 
 */
 
@@ -1378,8 +1386,13 @@ static ThrJob *thr1FindJob( ThrJob *head, int ijob, int conid, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrJob *thr1FindJob( ThrJob *head, int ijob, int conid, int *status )
+
+*  Description:
+*     This function searches the given lists of jobs for a job that has a
+*     given identifier and a given context. If found, a pointer to the job
+*     structure is returned. Otherwise a NULL pointer is returned (without
+*     error).
 
 *  Arguments:
 *     head
@@ -1394,12 +1407,6 @@ static ThrJob *thr1FindJob( ThrJob *head, int ijob, int conid, int *status ){
 *  Returned Value:
 *     Pointer to the ThrJob that has the given identifier, or NULL if no
 *     job is found.
-
-*  Description:
-*     This function searches the given lists of jobs for a job that has a
-*     given identifier and a given context. If found, a pointer to the job
-*     structure is returned. Otherwise a NULL pointer is returned (without
-*     error).
 
 */
 
@@ -1452,7 +1459,6 @@ static ThrJob *thr1FreeJob( ThrJob *job ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrJob *thr1FreeJob( ThrJob *job )
 
 *  Description:
@@ -1485,7 +1491,6 @@ static ThrJobStatus *thr1FreeStatus( ThrJobStatus *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrJobStatus *thr1FreeStatus( ThrJobStatus *status )
 
 *  Description:
@@ -1511,8 +1516,11 @@ static int thr1GetJobContext( ThrWorkForce *workforce, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     int thr1GetJobContext( ThrWorkForce *workforce, int *status )
+
+*  Description:
+*     This function returns an integer identifying the current job
+*     context from a workforce.
 
 *  Arguments:
 *     workforce
@@ -1523,9 +1531,6 @@ static int thr1GetJobContext( ThrWorkForce *workforce, int *status ){
 *  Returned Value:
 *     An integer identifying the current job context from a workforce.
 
-*  Description:
-*     This function returns an integer identifying the current job
-*     context from a workforce.
 
 */
 
@@ -1563,8 +1568,12 @@ static ThrJobStatus *thr1GetStatus( int *ems_status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrJobStatus *thr1GetStatus( int *ems_status )
+
+*  Description:
+*     If the current EMS status value is not SAI__OK, the current EMS status
+*     value and message stack are copied into a new ThrJobStatus structure,
+*     and the EMS error context is then annulled.
 
 *  Arguments:
 *     ems_status
@@ -1574,12 +1583,6 @@ static ThrJobStatus *thr1GetStatus( int *ems_status ){
 *     If an EMS error exists on exntry, a pointer to a new ThrJobStatus
 *     holding details of the EMS error is returned. Otherwise, a NULL pointer
 *     is returned.
-
-*  Description:
-*     If the current EMS status value is not SAI__OK, the current EMS status
-*     value and message stack are copied into a new ThrJobStatus structure,
-*     and the EMS error context is then annulled.
-
 */
 
 /* Local Variables: */
@@ -1649,17 +1652,16 @@ static void thr1InitJobs( ThrJob *job, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thr1InitJobs( ThrJob *job, int *status )
+
+*  Description:
+*     This function initialises the supplied job to hold null values.
 
 *  Arguments:
 *     job
 *        Pointer to the ThrJob to be initialised.
 *     status
 *        Pointer to the inherited status value.
-
-*  Description:
-*     This function initialises the supplied job to hold null values.
 
 */
 
@@ -1696,8 +1698,11 @@ static int thr1ListIsEmpty( int conid, ThrJob *head, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     iint thr1ListIsEmpty( int conid, ThrJob *head, int *status )
+
+*  Description:
+*     This function returns an integer indicating if the supplied list of jobs is
+*     devoid of any jobs belonging to a specified job context.
 
 *  Arguments:
 *     conid
@@ -1709,10 +1714,6 @@ static int thr1ListIsEmpty( int conid, ThrJob *head, int *status ){
 
 *  Returned Value:
 *     Non-zero if the list contains no jobs in the specified context.
-
-*  Description:
-*     This function returns an integer indicating if the supplied list of jobs is
-*     devoid of any jobs belonging to a specified job context.
 
 */
 
@@ -1761,7 +1762,6 @@ static ThrJobStatus *thr1MakeStatus( void ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrJobStatus *thr1MakeStatus( void )
 
 *  Description:
@@ -1793,8 +1793,11 @@ static ThrJob *thr1PopListFirst( ThrJob **head, int conid, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrJob *thr1PopListFirst( ThrJob **head, int conid, int *status )
+
+*  Description:
+*     This function returns a pointer to the job closest to the head of a list
+*     that is in the requested job context, and removes the job from the list.
 
 *  Arguments:
 *     head
@@ -1807,10 +1810,6 @@ static ThrJob *thr1PopListFirst( ThrJob **head, int conid, int *status ){
 
 *  Returned Value:
 *     Pointer to the first ThrJob that was in the required context.
-
-*  Description:
-*     This function returns a pointer to the job closest to the head of a list
-*     that is in the requested job context, and removes the job from the list.
 
 *  Notes:
 *     - The "prev" link in a ThrJob structure points towards the list
@@ -1878,8 +1877,11 @@ static ThrJob *thr1PopListHead( ThrJob **head, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrJob *thr1PopListHead( ThrJob **head, int *status ){
+
+*  Description:
+*     This function returns a pointer to the job at the head of a list,
+*     and removes the job from the list.
 
 *  Arguments:
 *     head
@@ -1890,10 +1892,6 @@ static ThrJob *thr1PopListHead( ThrJob **head, int *status ){
 
 *  Returned Value:
 *     Pointer to the ThrJob that was at the head of the list on entry.
-
-*  Description:
-*     This function returns a pointer to the job at the head of a list,
-*     and removes the job from the list.
 
 *  Notes:
 *     - The "prev" link in a ThrJob structure points towards the list
@@ -1946,8 +1944,10 @@ static void thr1PushListFoot( ThrJob *job, ThrJob **head, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thr1PushListFoot( ThrJob *job, ThrJob **head, int *status )
+
+*  Description:
+*     This function adds a new job to the foot of a list.
 
 *  Arguments:
 *     job
@@ -1957,10 +1957,6 @@ static void thr1PushListFoot( ThrJob *job, ThrJob **head, int *status ){
 *        the head of the list.
 *     status
 *        Pointer to the inherited status value.
-
-*  Description:
-*     This function adds a new job to the foot of a list.
-
 
 *  Notes:
 *     - The "prev" link in a ThrJob structure points towards the list
@@ -2004,8 +2000,10 @@ static void thr1PushListHead( ThrJob *job, ThrJob **head, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thr1PushListHead( ThrJob *job, ThrJob **head, int *status )
+
+*  Description:
+*     This function adds a new job to the head of a list.
 
 *  Arguments:
 *     job
@@ -2015,9 +2013,6 @@ static void thr1PushListHead( ThrJob *job, ThrJob **head, int *status ){
 *        the head of the list.
 *     status
 *        Pointer to the inherited status value.
-
-*  Description:
-*     This function adds a new job to the head of a list.
 
 *  Notes:
 *     - The "prev" link in a ThrJob structure points towards the list
@@ -2061,8 +2056,10 @@ static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status )
+
+*  Description:
+*     This function removes the supplied ThrJob from the specified list.
 
 *  Arguments:
 *     job
@@ -2072,10 +2069,6 @@ static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status ){
 *        the head of the list.
 *     status
 *        Pointer to the inherited status value.
-
-*  Description:
-*     This function removes the supplied ThrJob from the specified list.
-
 
 *  Notes:
 *     - The "prev" link in a ThrJob structure points towards the list
@@ -2123,8 +2116,13 @@ static ThrJobStatus *thr1ReportStatus( ThrJobStatus *status, int *ems_status ){
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     ThrJobStatus *thr1ReportStatus( ThrJobStatus *status, int *ems_status )
+
+*  Description:
+*     If the supplied ThrJobStatus describes an error, and the EMS error
+*     status is currently SAI__OK, the error described in the ThrJobStatus
+*     is reported using EMS. The ThrJobStatus is then freed, and a NULL
+*     pointer returned.
 
 *  Arguments:
 *     status
@@ -2134,12 +2132,6 @@ static ThrJobStatus *thr1ReportStatus( ThrJobStatus *status, int *ems_status ){
 
 *  Returned Value:
 *     A NULL pointer.
-
-*  Description:
-*     If the supplied ThrJobStatus describes an error, and the EMS error
-*     status is currently SAI__OK, the error described in the ThrJobStatus
-*     is reported using EMS. The ThrJobStatus is then freed, and a NULL
-*     pointer returned.
 
 */
 
@@ -2185,18 +2177,17 @@ static void *thr1RunWorker( void *wf_ptr ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void *thr1RunWorker( void *wf_ptr )
-
-*  Arguments:
-*     wf_ptr
-*        Pointer to a data structure describing the work force.
 
 *  Description:
 *     This is the main function executed within each worker thread. Each
 *     worker goes to the work desk to get a job from the list of
 *     remaining jobs, and then executes that job, returning to the work
 *     desk when complete to report completion and to get another job.
+
+*  Arguments:
+*     wf_ptr
+*        Pointer to a data structure describing the work force.
 
 */
 
@@ -2417,6 +2408,7 @@ static void *thr1RunWorker( void *wf_ptr ) {
 
 void thrMutexInit( pthread_mutex_t *mutex, int *status ) {
 /*
+*+
 *  Name:
 *     thrMutexInit
 
@@ -2430,8 +2422,10 @@ void thrMutexInit( pthread_mutex_t *mutex, int *status ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thrMutexInit( pthread_mutex_t *mutex, int *status )
+
+*  Description:
+*     This function initialises a mutex using default attributes.
 
 *  Arguments:
 *     mutex
@@ -2439,9 +2433,7 @@ void thrMutexInit( pthread_mutex_t *mutex, int *status ) {
 *     status
 *        Pointer to the inherited status value.
 
-*  Description:
-*     This function initialises a mutex using default attributes.
-
+*-
 */
 
    if( *status != SAI__OK ) return;
@@ -2455,6 +2447,7 @@ void thrMutexInit( pthread_mutex_t *mutex, int *status ) {
 
 void thrCondInit( pthread_cond_t *cond, int *status ) {
 /*
+*+
 *  Name:
 *     thrCondInit
 
@@ -2468,8 +2461,11 @@ void thrCondInit( pthread_cond_t *cond, int *status ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thrCondInit( pthread_cond_t *cond, int *status )
+
+*  Description:
+*     This function initialises a condition variable using default
+*     attributes.
 
 *  Arguments:
 *     cond
@@ -2477,10 +2473,7 @@ void thrCondInit( pthread_cond_t *cond, int *status ) {
 *     status
 *        Pointer to the inherited status value.
 
-*  Description:
-*     This function initialises a condition variable using default
-*     attributes.
-
+*-
 */
    if( *status != SAI__OK ) return;
 
@@ -2495,6 +2488,7 @@ void thrCondInit( pthread_cond_t *cond, int *status ) {
 void thrThreadCreate( pthread_t *thread, void *(*start_routine)(void*),
                         void *arg, int *status ) {
 /*
+*+
 *  Name:
 *     thrThreadCreate
 
@@ -2508,9 +2502,11 @@ void thrThreadCreate( pthread_t *thread, void *(*start_routine)(void*),
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thrThreadCreate( pthread_t *thread, void *(*start_routine)(void*),
                               void *arg, int *status )
+
+*  Description:
+*     This function creates a new thread using default attributes.
 
 *  Arguments:
 *     thread
@@ -2522,9 +2518,7 @@ void thrThreadCreate( pthread_t *thread, void *(*start_routine)(void*),
 *     status
 *        Pointer to the inherited status value.
 
-*  Description:
-*     This function creates a new thread using default attributes.
-
+*-
 */
 
    int stat;
@@ -2544,6 +2538,7 @@ void thrThreadCreate( pthread_t *thread, void *(*start_routine)(void*),
 
 void thrMutexLock( pthread_mutex_t *mutex, int *status ) {
 /*
+*+
 *  Name:
 *     thrMutexLock
 
@@ -2557,8 +2552,10 @@ void thrMutexLock( pthread_mutex_t *mutex, int *status ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thrMutexLock( pthread_mutex_t *mutex, int *status )
+
+*  Description:
+*     This function locks a mutex.
 
 *  Arguments:
 *     mutex
@@ -2566,9 +2563,7 @@ void thrMutexLock( pthread_mutex_t *mutex, int *status ) {
 *     status
 *        Pointer to the inherited status value.
 
-*  Description:
-*     This function locks a mutex.
-
+*-
 */
    if( *status != SAI__OK ) return;
 
@@ -2582,6 +2577,7 @@ void thrMutexLock( pthread_mutex_t *mutex, int *status ) {
 
 void thrMutexUnlock( pthread_mutex_t *mutex, int *status ) {
 /*
+*+
 *  Name:
 *     thrMutexUnlock
 
@@ -2595,8 +2591,10 @@ void thrMutexUnlock( pthread_mutex_t *mutex, int *status ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thrMutexUnlock( pthread_mutex_t *mutex, int *status )
+
+*  Description:
+*     This function unlocks a mutex.
 
 *  Arguments:
 *     mutex
@@ -2604,14 +2602,12 @@ void thrMutexUnlock( pthread_mutex_t *mutex, int *status ) {
 *     status
 *        Pointer to the inherited status value.
 
-*  Description:
-*     This function unlocks a mutex.
-
 *  Notes:
 *     - This function attempts to execute even if an error has already
 *     occurred, although no further error will be reported if this
 *     function should then subsequently fail.
 
+*-
 */
    int old_status;
 
@@ -2628,6 +2624,7 @@ void thrMutexUnlock( pthread_mutex_t *mutex, int *status ) {
 
 void thrCondBroadcast( pthread_cond_t *cond, int *status ) {
 /*
+*+
 *  Name:
 *     thrCondBroadcast
 
@@ -2641,8 +2638,11 @@ void thrCondBroadcast( pthread_cond_t *cond, int *status ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thrCondBroadcast( pthread_cond_t *cond, int *status )
+
+*  Description:
+*     This function broadcasts a condition to all threads, unblocking all
+*     threads that are blocked on the condition variable.
 
 *  Arguments:
 *     cond
@@ -2650,15 +2650,12 @@ void thrCondBroadcast( pthread_cond_t *cond, int *status ) {
 *     status
 *        Pointer to the inherited status value.
 
-*  Description:
-*     This function broadcasts a condition to all threads, unblocking all
-*     threads that are blocked on the condition variable.
-
 *  Notes:
 *     - This function attempts to execute even if an error has already
 *     occurred, although no further error will be reported if this
 *     function should then subsequently fail.
 
+*-
 */
    int old_status;
 
@@ -2676,6 +2673,7 @@ void thrCondBroadcast( pthread_cond_t *cond, int *status ) {
 
 void thrCondSignal( pthread_cond_t *cond, int *status ) {
 /*
+*+
 *  Name:
 *     thrCondSignal
 
@@ -2689,8 +2687,11 @@ void thrCondSignal( pthread_cond_t *cond, int *status ) {
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thrCondSignal( pthread_cond_t *cond, int *status )
+
+*  Description:
+*     This function signals a condition, unblocking at least one thread
+*     that is blocked on the condition variable.
 
 *  Arguments:
 *     cond
@@ -2698,15 +2699,12 @@ void thrCondSignal( pthread_cond_t *cond, int *status ) {
 *     status
 *        Pointer to the inherited status value.
 
-*  Description:
-*     This function signals a condition, unblocking at least one thread
-*     that is blocked on the condition variable.
-
 *  Notes:
 *     - This function attempts to execute even if an error has already
 *     occurred, although no further error will be reported if this
 *     function should then subsequently fail.
 
+*-
 */
    int old_status;
 
@@ -2725,6 +2723,7 @@ void thrCondSignal( pthread_cond_t *cond, int *status ) {
 void thrCondWait( pthread_cond_t *cond, pthread_mutex_t *mutex,
                     int *status ){
 /*
+*+
 *  Name:
 *     thrCondWait
 
@@ -2738,9 +2737,12 @@ void thrCondWait( pthread_cond_t *cond, pthread_mutex_t *mutex,
 *     C function
 
 *  Invocation:
-*     #include "thr.h"
 *     void thrCondWait( pthread_cond_t *cond, pthread_mutex_t *mutex,
 *                         int *status )
+
+*  Description:
+*     This function blocks the calling thread until a condition is
+*     signalled or broadcast.
 
 *  Arguments:
 *     cond
@@ -2750,10 +2752,7 @@ void thrCondWait( pthread_cond_t *cond, pthread_mutex_t *mutex,
 *     status
 *        Pointer to the inherited status value.
 
-*  Description:
-*     This function blocks the calling thread until a condition is
-*     signalled or broadcast.
-
+*-
 */
    if( *status != SAI__OK ) return;
 

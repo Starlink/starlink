@@ -41,6 +41,10 @@ dnl    STAR_LATEX_DOCUMENTATION(sun)
 
 AM_CONFIG_HEADER(config.h)
 
+dnl    List the sun/ssn/... numbers which document this package and
+dnl    which are present as .tex files in this directory.
+STAR_LATEX_DOCUMENTATION(sun264)
+
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES(Makefile component.xml)
