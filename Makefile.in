@@ -105,6 +105,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/surf \
 	$(MANIFESTS)/tcl \
 	$(MANIFESTS)/tclx \
+	$(MANIFESTS)/thr \
 	$(MANIFESTS)/tk \
 	$(MANIFESTS)/trn \
 	$(MANIFESTS)/tsp \

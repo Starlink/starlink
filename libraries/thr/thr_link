@@ -1,0 +1,48 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     thr_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against thr
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building
+#     applications which use thr in order to generate the correct
+#     arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        gcc -o program -L/star/lib `thr_link` program.c
+
+#  Copyright:
+#     Copyright (C) 2011 Science & Technology Facilities Council.
+#     All Rights Reserved.
+
+#  Authors:
+#     DSB: David Berry (JAC, Hawaii)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-SEP-2011 (DSB):
+#        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+    echo -lthr `ast_link` `ems_link` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.
