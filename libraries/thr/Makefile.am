@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = thr_link
+bin_SCRIPTS = thr_link thr_link_adam
 cincludedir = $(includedir)/star
 cinclude_HEADERS = $(PUBLIC_CINCLUDES)
 noinst_HEADERS = $(PRIVATE_INCLUDES)
