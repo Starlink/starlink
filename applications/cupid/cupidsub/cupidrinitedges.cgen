@@ -3,8 +3,8 @@
 #include <math.h>
 
 int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
-                                     int dims[ 3 ], int skip[ 3 ], int minpix, 
-                                     double thresh, double noise, double rms, 
+                                     int dims[ 3 ], int skip[ 3 ], int minpix,
+                                     double thresh, double noise, double rms,
                                      double flatslope, int *peakval,
                                      int *status ){
 /*
@@ -19,8 +19,8 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     int *cupidRInitEdges<X>( CGEN_TYPE *array, int nel, int ndim, 
-*                              int dims[ 3 ], int skip[ 3 ], int minpix, 
+*     int *cupidRInitEdges<X>( CGEN_TYPE *array, int nel, int ndim,
+*                              int dims[ 3 ], int skip[ 3 ], int minpix,
 *                              double thresh, double noise, double rms,
 *                              double flatslope, int *peakval,
 *                              int *status )
@@ -30,36 +30,36 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 *     size as the data array, and which identifies edge pixels, peak
 *     pixels and other pixels.
 *
-*     This initial estimate of the edges is formed by scanning the data 
+*     This initial estimate of the edges is formed by scanning the data
 *     array along a set of parallel 1D lines of various orientations, and
 *     looking for peaks in these 1D lines. Peaks are then traced outwards
 *     along the line, away from the peak centre, until a pair of significant
 *     minima is found in the peak profile, one on each side of the peak
-*     centre or the data value drops below a threshold value. The location 
+*     centre or the data value drops below a threshold value. The location
 *     of these minima are then flagged in the returned mask array (as is
 *     the peak position).
 
 *  Parameters:
 *     array
 *        The array containing the data to be scanned. The elements should
-*        be ordered according to Fortran order (first axis varying most 
-*        rapidly). 
-*     nel 
+*        be ordered according to Fortran order (first axis varying most
+*        rapidly).
+*     nel
 *        The number of elements in "array".
 *     ndim
 *        The number of significant pixel axes.
 *     dims
 *        The number of pixels on each pixel axis of the array.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if "ndim" is less than 3, and
 *        the extra elements should be filled with zero's.
 *     minpix
-*        The minimum number of pixels within a 1D line of data (including the 
-*        edge pixels) which must be spanned by a peak in order for its edges 
-*        to be marked in the returned mask. 
+*        The minimum number of pixels within a 1D line of data (including the
+*        edge pixels) which must be spanned by a peak in order for its edges
+*        to be marked in the returned mask.
 *     thresh
 *        The smallest significant peak data value. The edges of peaks
 *        which are below this limit are not included in the returned mask.
@@ -70,11 +70,11 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 *     rms
 *        The RMS noise in the data
 *     peakval
-*        Pointer to a location at which to return the minimum mask value used 
-*        to represent pixels which were found to be a peak in every scan 
+*        Pointer to a location at which to return the minimum mask value used
+*        to represent pixels which were found to be a peak in every scan
 *        direction. Note, it is possible that peak values may be marked
 *        with a value larger than "*peakval" since it is possible for a
-*        given peak to be scanned twice if it lies at the joint between two 
+*        given peak to be scanned twice if it lies at the joint between two
 *        cube faces.
 *     flatslope
 *        The minimum significant slope along a peak, in units of change
@@ -84,23 +84,23 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array holding the returned mask.
-*     Edge pixels are marked by the value CUPID__KEDGE in this array. Pixels 
+*     Edge pixels are marked by the value CUPID__KEDGE in this array. Pixels
 *     which are peaks in cross sections taken in all directions are marked by
-*     a value greater than or equal to the value returned in *peakval. That 
-*     is, if a peak is located while scanning in one direction, but that same 
-*     pixel is not a peak when scanning in some other direction, then the 
-*     pixel is not flagged as a peak in the returned array. All other pixels 
-*     are set to some other value (not necessarily CUPID__KBACK since peaks 
-*     found in some subset of the scans will have other values which are 
-*     neither CUPID_KBACK nor "*peakval"). The memory should be freed (using 
-*     astFree) when no longer needed. A NULL pointer is returned if an 
+*     a value greater than or equal to the value returned in *peakval. That
+*     is, if a peak is located while scanning in one direction, but that same
+*     pixel is not a peak when scanning in some other direction, then the
+*     pixel is not flagged as a peak in the returned array. All other pixels
+*     are set to some other value (not necessarily CUPID__KBACK since peaks
+*     found in some subset of the scans will have other values which are
+*     neither CUPID_KBACK nor "*peakval"). The memory should be freed (using
+*     astFree) when no longer needed. A NULL pointer is returned if an
 *     error occurs.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidRInitEdges macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidRInitEdges<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidRInitEdges macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidRInitEdges<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidRInitEdges... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -165,8 +165,8 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Allocate work arrays. These need to be at least as long as the
    diagonal of the data cube. */
-   wsize = sqrtf( dims[ 0 ]*dims[ 0 ] + 
-                  dims[ 1 ]*dims[ 1 ] + 
+   wsize = sqrtf( dims[ 0 ]*dims[ 0 ] +
+                  dims[ 1 ]*dims[ 1 ] +
                   dims[ 2 ]*dims[ 2 ] );
    work1 = astMalloc( sizeof( double )*wsize );
    work2 = astMalloc( sizeof( int )*wsize );
@@ -197,12 +197,12 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
             ivlim = 13;
             zlo = -1;
             zhi = 1;
-         } 
+         }
       }
 
 /* Consider all possible scan line directions. We only need to check the
-   first half of these directions since the others will be parallel (e.g. 
-   the first vector and the last vector will be parallel, but in opposite 
+   first half of these directions since the others will be parallel (e.g.
+   the first vector and the last vector will be parallel, but in opposite
    directions so we do not do the last vector since the results of
    scanning in opposite direction will be the same. */
       iv = 0;
@@ -211,23 +211,23 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
             for( xvec[ 0 ] = -1; xvec[ 0 ] <= 1; xvec[ 0 ]++ ){
                if( iv++ < ivlim ) {
 
-/* Consider lines starting on faces which are perpendicular to each pixel 
+/* Consider lines starting on faces which are perpendicular to each pixel
    axis in turn. */
                   for( axis = 0; axis < 3; axis++ ) {
 
 /* First scan the data cube using lines which originate on the face
-   corresponding to the upper axis limit, then consider those which 
+   corresponding to the upper axis limit, then consider those which
    originate on the face corresponding to the lower axis limit. */
-                     for( lbnd = 0; lbnd <= 1; lbnd++ ) {         
-      
+                     for( lbnd = 0; lbnd <= 1; lbnd++ ) {
+
 /* Scan the data cube using lines which start on the face of the cube
    specified by "axis" and "lbnd", and which extend in the direction
    given by "xvec". Edges of any peaks found along these scan lines are
    marked by 1's in the mask array. */
-                        nl = CGEN_FUNCTION(cupidRCheckFace)( array, nel, 
+                        nl = CGEN_FUNCTION(cupidRCheckFace)( array, nel,
                                                          axis, lbnd, dims, skip,
-                                                        xvec, work1, work2, 
-                                                        ret, minpix, thresh, 
+                                                        xvec, work1, work2,
+                                                        ret, minpix, thresh,
                                                         noise, rms, flatslope, status );
                      }
                   }
@@ -236,10 +236,10 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
          }
       }
 
-/* Work out the minimum mask value used to represent each pixel which was 
-   found to be a peak in every scan. It is possible for a peak to be scanned 
-   twice using the same scan-line vector. E.g. when scanning a 2D image 
-   diagonally, a peak which lies on the diagonal of the image may be scanned 
+/* Work out the minimum mask value used to represent each pixel which was
+   found to be a peak in every scan. It is possible for a peak to be scanned
+   twice using the same scan-line vector. E.g. when scanning a 2D image
+   diagonally, a peak which lies on the diagonal of the image may be scanned
    by lines originating from both faces on either sideof the diagonal. */
       *peakval = CUPID__KBACK + ivlim*CUPID__KPEAK;
    }

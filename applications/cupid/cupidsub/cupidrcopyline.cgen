@@ -2,8 +2,8 @@
 #include "cupid.h"
 #include "prm_par.h"
 
-int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout, 
-                                   int x0[3], int iv0, int vskip, 
+int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
+                                   int x0[3], int iv0, int vskip,
                                    int xskip[3], int dims[3],
                                    int *status ){
 /*
@@ -19,8 +19,8 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidRCopyLine<X>( CGEN_TYPE *in, double *dout, int *vout, 
-*                            int x0[3], int iv0, int vskip, int xskip[3], 
+*     int cupidRCopyLine<X>( CGEN_TYPE *in, double *dout, int *vout,
+*                            int x0[3], int iv0, int vskip, int xskip[3],
 *                            int dims[3], int *status )
 
 *  Description:
@@ -60,10 +60,10 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
 *     The number of values stored in each of "dout" and "vout".
 
 *  Notes:
-*     - This function can be invoked using the generic cupidRCopyLine macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidRCopyLine<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidRCopyLine macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidRCopyLine<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidRCopyLine... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -127,7 +127,7 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
           x[ 1 ] >= 1 && x[ 1 ] <= dims[ 1 ] &&
           x[ 2 ] >= 1 && x[ 2 ] <= dims[ 2 ] ){
 
-/* Put the data value at the current input pixel into the returned "dout" 
+/* Put the data value at the current input pixel into the returned "dout"
    array, checking for bad values (since CGEN_BAD may not be equal to
    VAL__BADD). */
       if( in[ iv ] == CGEN_BAD ) {
@@ -136,7 +136,7 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
          dout[ i ] = (double) in[ iv ];
       }
 
-/* Put the 1d vector index of the current input pixel into the returned 
+/* Put the 1d vector index of the current input pixel into the returned
    "vout" array. */
       vout[ i ] = iv;
 

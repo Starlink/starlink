@@ -11,7 +11,7 @@
 
 /* Global Variables: */
 /* ================= */
-/* A structure holding the global parameters of the GaussClump algorithm 
+/* A structure holding the global parameters of the GaussClump algorithm
    needed by this function. These are set by function cupidGaussClumps. */
 extern CupidGC cupidGC;
 
@@ -127,21 +127,21 @@ void CGEN_FUNCTION(cupidGCDump)( msglev_t msglev, CGEN_TYPE *array, int ndim,
       sprintf( name, "ard%d", jj );
       fd = fopen( name, "w" );
       if( jj == 1 ) {
-         fprintf( fd, "ellipse(%1f,%1f,%1f,%1f,%1f)\n", 
-                  cupidGC.initpars[2] - 1 + cupidGC.slbnd[ 0 ], 
-                  cupidGC.initpars[4] - 1 + cupidGC.slbnd[ 1 ], 
-                  0.5*cupidGC.initpars[3], 0.5*cupidGC.initpars[5], 
+         fprintf( fd, "ellipse(%1f,%1f,%1f,%1f,%1f)\n",
+                  cupidGC.initpars[2] - 1 + cupidGC.slbnd[ 0 ],
+                  cupidGC.initpars[4] - 1 + cupidGC.slbnd[ 1 ],
+                  0.5*cupidGC.initpars[3], 0.5*cupidGC.initpars[5],
                   cupidGC.initpars[6]*AST__DR2D );
       } else {
-         fprintf( fd, "ellipse(%1f,%1f,%1f,%1f,%1f)\n", cupidGC.pars[2], 
-               cupidGC.pars[4], 0.5*cupidGC.pars[3], 0.5*cupidGC.pars[5], 
+         fprintf( fd, "ellipse(%1f,%1f,%1f,%1f,%1f)\n", cupidGC.pars[2],
+               cupidGC.pars[4], 0.5*cupidGC.pars[3], 0.5*cupidGC.pars[5],
                cupidGC.pars[6]*AST__DR2D );
       }
       fclose( fd );
 
 
-      np = (cupidGC.ndim==1) ? CUPID__GCNP1 : 
-           ( (cupidGC.ndim==2) ? CUPID__GCNP2 : CUPID__GCNP3 ); 
+      np = (cupidGC.ndim==1) ? CUPID__GCNP1 :
+           ( (cupidGC.ndim==2) ? CUPID__GCNP2 : CUPID__GCNP3 );
 
 
       for( i = 0; i < cupidGC.ndim; i++ ) {
@@ -158,7 +158,7 @@ void CGEN_FUNCTION(cupidGCDump)( msglev_t msglev, CGEN_TYPE *array, int ndim,
       ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
       for( i = 0; i < el; i++ ) data[ i ] = cupidGC.data[ i ];
       ndfAnnul( &indf, status );
-   
+
       sprintf( name, "sqresw%d", jj );
       ndfOpen( NULL, name, "WRITE", "NEW", &indf, &place, status );
       ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );

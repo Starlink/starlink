@@ -6,9 +6,9 @@
 #include "ndf.h"
 #include <math.h>
 
-void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3], 
-                                    int box[3], double rms, CGEN_TYPE *din, 
-                                    CGEN_TYPE *dout, CGEN_TYPE *wa, 
+void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
+                                    int box[3], double rms, CGEN_TYPE *din,
+                                    CGEN_TYPE *dout, CGEN_TYPE *wa,
                                     CGEN_TYPE *wb, int alg, int *status ){
 /*
 *+
@@ -23,9 +23,9 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 *     Starlink C
 
 *  Synopsis:
-*     void cupidFindback1<X>( int ndim, int dim[3], int lbnd[3], int box[3], 
-*                             double rms, CGEN_TYPE *din, CGEN_TYPE *dout, 
-*                             CGEN_TYPE *wa, CGEN_TYPE *wb, int alg, 
+*     void cupidFindback1<X>( int ndim, int dim[3], int lbnd[3], int box[3],
+*                             double rms, CGEN_TYPE *din, CGEN_TYPE *dout,
+*                             CGEN_TYPE *wa, CGEN_TYPE *wb, int alg,
 *                             int *status )
 
 *  Description:
@@ -33,18 +33,18 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 *     scale size less than a specified size from a 3 dimensional array,
 *     thus producing an estimate of the local background within the array.
 *
-*     The algorithm proceeds as follows. A filtered form of the input data 
+*     The algorithm proceeds as follows. A filtered form of the input data
 *     is first produced by replacing every input pixel by the minimum of
 *     the input values within a rectangular box centred on the pixel.
 *     This filtered data is then filtered again, using a filter that
-*     replaces every pixel value by the maximum value in a box centred on 
+*     replaces every pixel value by the maximum value in a box centred on
 *     the pixel. This produces an estimate of the lower envelope of the data,
-*     but usually contains unacceptable sharp edges. In addition, this 
+*     but usually contains unacceptable sharp edges. In addition, this
 *     filtered data has a tendency to hug the lower envelope of the
-*     noise, thus under-estimating the true background of the noise-free 
+*     noise, thus under-estimating the true background of the noise-free
 *     data. The first problem is minimised by smoothing the background
 *     estimate using a filter that replaces every pixel value by the mean
-*     of the values in a box centred on the pixel. The second problem 
+*     of the values in a box centred on the pixel. The second problem
 *     is minimised by estimating the difference between the input data
 *     and the background estimate within regions well removed from any
 *     bright areas. This difference is then extrapolated into the bright
@@ -73,7 +73,7 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 *     rms
 *        The RMS noise level in the data.
 *     din
-*        Pointer to the start of the supplied data array. 
+*        Pointer to the start of the supplied data array.
 *     dout
 *        Pointer to the start of the array to contain the fitted lower
 *        envelope.
@@ -164,7 +164,7 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
                                 status );
    }
 
-/* Apply a second filter which replaces each pixel value in "wa" by the 
+/* Apply a second filter which replaces each pixel value in "wa" by the
    maximum value in a box centred on the pixel. The filtered data goes
    (temporarily) in the output array. */
    msgOutif( MSG__VERB, "", "      Applying maximum filter", status );
@@ -188,7 +188,7 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
    newbox[ 2 ] = box[ 2 ];
    while( 1 ){
 
-/* Smooth the current background estimate in dout using a mean box filter, 
+/* Smooth the current background estimate in dout using a mean box filter,
    putting the results in "wa". */
       msgOutiff( MSG__VERB, "",
                  "      Applying mean filter (box size [^%d,^%d,%d]).", status,
@@ -197,7 +197,7 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
       CGEN_FUNCTION(cupidFindback4)( dim, newbox, dout, wa, status );
 
       if( msgFlevok( MSG__DEBUG, status ) ) {
-         CGEN_FUNCTION(cupidDump)( wa, ndim, dim, lbnd, "mean filtered data", 
+         CGEN_FUNCTION(cupidDump)( wa, ndim, dim, lbnd, "mean filtered data",
                                    status );
       }
 
@@ -209,7 +209,7 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 /* Stop looping when all the filter box sizes are 1 (i.e. no further
    smoothing to be done), or if the original FINDBACK algorithm is
    required. */
-      if( alg == 0 || ( 
+      if( alg == 0 || (
           newbox[ 0 ] == 1 && newbox[ 1 ] == 1 && newbox[ 2 ] == 1 ) ) break;
 
 /* Find the minimum of the original background estimate and the smoothed
@@ -230,9 +230,9 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 
    }
 
-/* The background estimate in "wa" should now be a close fit to the lower 
-   envelope of the input data, but will be biassed by the noise. That is, 
-   it will tend to hug the lower envelope of the noise rather than the 
+/* The background estimate in "wa" should now be a close fit to the lower
+   envelope of the input data, but will be biassed by the noise. That is,
+   it will tend to hug the lower envelope of the noise rather than the
    lower envelope of the noise-free data. To correct for this bias, we look
    at the mean residuals between the background estimate and the input
    data in background areas. First form the residuals between the input
@@ -243,7 +243,7 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
    p3 = dout;
    for( i = 0; i < nel; i++ ) {
       if( *p1 != CGEN_BAD && *p2 != CGEN_BAD ) {
-         *(p3++) = *(p1++) - *(p2++);         
+         *(p3++) = *(p1++) - *(p2++);
       } else {
          *(p3++) = CGEN_BAD;
          p1++;
@@ -268,20 +268,20 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 
 
 
-/* Smooth the remaining residuals with a mean filter, putting the results 
+/* Smooth the remaining residuals with a mean filter, putting the results
    in "wb". */
    msgOutif( MSG__VERB, "", "      Smoothing background residuals", status );
    CGEN_FUNCTION(cupidFindback4)( dim, box, dout, wb, status );
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
-      CGEN_FUNCTION(cupidDump)( wb, ndim, dim, lbnd, "mean smoothed residuals", 
+      CGEN_FUNCTION(cupidDump)( wb, ndim, dim, lbnd, "mean smoothed residuals",
                                 status );
    }
 
 
 
 /* Fill in rejected pixel values by interpolation between the good pixels on
-   either side. For simplicity and speed, this is done independently for 
+   either side. For simplicity and speed, this is done independently for
    each row. */
    msgOutif( MSG__VERB, "", "      Filling in missing residuals", status );
    nrow = dim[ 1 ]*dim[ 2 ];
@@ -330,10 +330,10 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
    }
 
 
-/* The values in the output array now represent the bias between the input 
-   data and the background estimate formed above. It will be extended into 
-   the source regions by virture of the double smoothing and filling just 
-   performed. Add this correction onto the background estimate and store in 
+/* The values in the output array now represent the bias between the input
+   data and the background estimate formed above. It will be extended into
+   the source regions by virture of the double smoothing and filling just
+   performed. Add this correction onto the background estimate and store in
    the output. */
    msgOutif( MSG__VERB, "", "      Correcting background estimate", status );
    p1 = wa;
@@ -349,7 +349,7 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
    }
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
-      CGEN_FUNCTION(cupidDump)( dout, ndim, dim, lbnd, "final background", 
+      CGEN_FUNCTION(cupidDump)( dout, ndim, dim, lbnd, "final background",
                                 status );
    }
 

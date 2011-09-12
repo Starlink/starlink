@@ -3,10 +3,10 @@
 #include "ast.h"
 #include "mers.h"
 
-void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa, 
-                                 double rms, int velax, int nel, int ndim, 
-                                 int dims[3], int skip[3], int *slbnd, 
-                                 CupidPixelSet *ps, int *list_size, 
+void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
+                                 double rms, int velax, int nel, int ndim,
+                                 int dims[3], int skip[3], int *slbnd,
+                                 CupidPixelSet *ps, int *list_size,
                                  double **mlist, int **plist,
                                  int *status ){
 /*
@@ -21,28 +21,28 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidCFClump<X>( CGEN_TYPE *ipd, double *ipv, int *ipa, double rms, 
-*                           int velax, int nel, int ndim, int dims[3], 
-*                           int skip[3], int *slbnd, CupidPixelSet *ps, 
+*     void cupidCFClump<X>( CGEN_TYPE *ipd, double *ipv, int *ipa, double rms,
+*                           int velax, int nel, int ndim, int dims[3],
+*                           int skip[3], int *slbnd, CupidPixelSet *ps,
 *                           int *list_size, double **mlist, int **plist,
 *                           int *status )
 
 *  Description:
-*     This function gathers the information needed to produce an HDS clump 
+*     This function gathers the information needed to produce an HDS clump
 *     structure from a PixelSet describing a clump.
 
 *  Parameters:
 *     ipd
-*        Pointer to the start of the supplied data array. 
+*        Pointer to the start of the supplied data array.
 *     ipa
 *        Pointer to the start of the array holding the integer index
 *        (if any) associated with each pixel in the data array. This
-*        shows which clump each pixel belongs to (each clump is identified 
-*        by a unique integer index). The array should be the same shape and 
+*        shows which clump each pixel belongs to (each clump is identified
+*        by a unique integer index). The array should be the same shape and
 *        size as the data array. Pixels which have not yet been assigned
 *        to a clump are marked with the integer value CUPID__CFNULL.
 *     nel
-*        The total number of elements in the data array. 
+*        The total number of elements in the data array.
 *     ndim
 *        The number of pixel axes in the data array.
 *     dims
@@ -50,7 +50,7 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 *        array should have 3 elements even if "ndim" is less than 3, and
 *        the extra elements should be filled with 1's.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if "ndim" is less than 3, and
@@ -69,19 +69,19 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 *        the clump. If this is not NULL on entry, then the memory located
 *        will be re-used.
 *     plist
-*        A location at which to return a pointer to a dynamically allocated 
-*        array holding the grid coords at each pixel in the clump. If this is 
+*        A location at which to return a pointer to a dynamically allocated
+*        array holding the grid coords at each pixel in the clump. If this is
 *        not NULL on entry, then the memory located will be re-used. The
-*        grid coords of each pixel are stored in "ndim" consecutive elements 
+*        grid coords of each pixel are stored in "ndim" consecutive elements
 *        of this array.
 *     status
 *        Pointer to the inherited status value.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidCFClump macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidCFClump<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidCFClump macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidCFClump<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidCFClump... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -155,11 +155,11 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
    *plist = astGrow( *plist, bel*ndim, sizeof( int ) );
    if( *plist ) {
 
-/* Get a pointer to the assignment value of the first pixel in the PixelSet 
-   bounding box. If the data  has less than 3 axes, the unused upper and 
-   lower bounds will be set to [1,1] and so we can always pretend there are 
-   3 axes. */ 
-      v = ipa + ( ps->lbnd[ 0 ] - 1 ) + ( ps->lbnd[ 1 ] - 1 )*skip[ 1 ] + 
+/* Get a pointer to the assignment value of the first pixel in the PixelSet
+   bounding box. If the data  has less than 3 axes, the unused upper and
+   lower bounds will be set to [1,1] and so we can always pretend there are
+   3 axes. */
+      v = ipa + ( ps->lbnd[ 0 ] - 1 ) + ( ps->lbnd[ 1 ] - 1 )*skip[ 1 ] +
                 ( ps->lbnd[ 2 ] - 1 )*skip[ 2 ];
 
 /* Pointers to the next elements in *mlist and *plist. */
@@ -193,7 +193,7 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 /* Update the minimum value in the clump. */
                   if( d < vmin ) vmin = d;
                }
-               
+
 /* Get the pointer to the next pixel in the PixelSet bounding box. */
                v++;
             }

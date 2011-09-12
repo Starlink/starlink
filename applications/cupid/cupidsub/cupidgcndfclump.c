@@ -142,7 +142,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *     26-JAN-2011 (DSB):
 *        Ensure the "m" pointer is incremented even if the currrent model pixel
 *        is off the edge of the NDF. Previously, this bug caused a stripey
-*        "aliasing" type effect if the supplied model data extends outside the 
+*        "aliasing" type effect if the supplied model data extends outside the
 *        bounds of the NDF.
 *     {enter_further_changes_here}
 

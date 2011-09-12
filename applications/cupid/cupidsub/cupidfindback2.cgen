@@ -2,7 +2,7 @@
 #include "cupid.h"
 #include <stdio.h>
 
-void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din, 
+void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
                                     int *status ){
 /*
 *+
@@ -17,7 +17,7 @@ void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidFindback2<X>( double rms, int dim[3], CGEN_TYPE *din, 
+*     void cupidFindback2<X>( double rms, int dim[3], CGEN_TYPE *din,
 *                             int *status )
 
 *  Description:
@@ -26,11 +26,11 @@ void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
 
 *  Parameters:
 *     rms
-*        The RMS noise in the data. 
+*        The RMS noise in the data.
 *     dim
 *        The dimensions of the supplied array.
 *     din
-*        Pointer to the start of the supplied data array. 
+*        Pointer to the start of the supplied data array.
 *     status
 *        Pointer to the inherited status value.
 
@@ -66,7 +66,7 @@ void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
 *        because the supplied array represents the rediausl between the
 *        data and the *lower* enevelope of the noise. Therefore. assuming
 *        the noise extends to 3*sigma above and below the mean, the
-*        difference between the upper envelope and hte lower envelope 
+*        difference between the upper envelope and hte lower envelope
 *        should be 6*sigma.
 *     {enter_further_changes_here}
 
@@ -77,8 +77,8 @@ void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
 */
 
 /* Local Variables: */
-   CGEN_TYPE *ap; 
-   double thresh; 
+   CGEN_TYPE *ap;
+   double thresh;
    int i;
    int nel;
 

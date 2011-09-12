@@ -2,9 +2,9 @@
 #include "cupid.h"
 #include "math.h"
 
-double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims, 
-                                        int imax, int *ax_max, int ax, 
-                                        double rms, double fwhm, double *off, 
+double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
+                                        int imax, int *ax_max, int ax,
+                                        double rms, double fwhm, double *off,
                                         double *cen, int *status ){
 /*
 *+
@@ -18,9 +18,9 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *     Starlink C
 
 *  Synopsis:
-*     double cupidGCProfWidth<X>( CGEN_TYPE *array, int ndim, int *dims, 
-*                                 int imax, int *ax_max, int ax, double rms, 
-*                                 double fwhm, double *off, double *cen, 
+*     double cupidGCProfWidth<X>( CGEN_TYPE *array, int ndim, int *dims,
+*                                 int imax, int *ax_max, int ax, double rms,
+*                                 double fwhm, double *off, double *cen,
 *                                 int *status )
 
 *  Description:
@@ -28,7 +28,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *     background value of a Gaussian clump, along a specified pixel axis.
 *     If first finds the minima on either side of the specified peak
 *     position, and then find the weighted mean and standard deviation of
-*     the pixel positions between these minima, using the data values as 
+*     the pixel positions between these minima, using the data values as
 *     weights. A sloping background is removed from the data when
 *     calculating the weighted mean and standard deviation. This
 *     background is a straight line between the two minima.
@@ -36,8 +36,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *  Parameters:
 *     array
 *        The array containing the data to be fitted. The elements should
-*        be ordered according to Fortran order (first axis varying most 
-*        rapidly). 
+*        be ordered according to Fortran order (first axis varying most
+*        rapidly).
 *     ndim
 *        The number of pixel axes in the array.
 *     dims
@@ -61,7 +61,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *        two minima). This is an absolute data value (i.e. not normalised
 *        to units of "rms").
 *     cen
-*        A location at which to return an improved estimate of the 
+*        A location at which to return an improved estimate of the
 *        GRID coordinate of the profile peak, on axis "ax".
 *        >>>>>  CURRENTLY THIS IS UNDER REVIEW. EXTRA CODE IS NEEDED TO
 *        CALCULATE THIS PROPERLY, AND IT MAY NOT HAVE MUCH EFFECT <<<<<<
@@ -72,10 +72,10 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *     The FWHM of the profile, in pixels.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidGCProfWidth macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidGCProfWidth<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidGCProfWidth macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidGCProfWidth<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidGCProfWidth... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -160,7 +160,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    }
 
 /* First move out away from the peak to higher axis values, looking for a
-   significant minimum in the data value along the axis. Initialise the GRID 
+   significant minimum in the data value along the axis. Initialise the GRID
    axis value and vector index of the current pixel to be the pixel next
    to the peak pixel. */
    j2 = ax_max[ ax ] + 1;
@@ -175,14 +175,14 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    sum = 0.0;
    nsum = 0;
 
-/* Initialise the total data value in the clump up to the current minimum 
+/* Initialise the total data value in the clump up to the current minimum
    pixel. */
    clump_sum = 0.0;
 
 /* We have no previous value as yet. */
    prev = VAL__BADD;
 
-/* Loop round extending the profile to larger radii until the first 
+/* Loop round extending the profile to larger radii until the first
    significant minimum is found in the profile. */
    while( j2 <= dims[ ax ] ) {
 
@@ -194,8 +194,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
          clump_sum += v;
 
 /* If this value is lower than the previous lowest value, but not more
-   than 1.5*rms lower than the previous value, remember it. Also reset the 
-   values that are used to find the mean of the pixel values that follow 
+   than 1.5*rms lower than the previous value, remember it. Also reset the
+   values that are used to find the mean of the pixel values that follow
    this minimum. */
          if( v < v2low && prev != VAL__BADD && prev - v < 1.5*rms) {
             v2low = v;
@@ -213,7 +213,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
          } else {
             sum += v;
             nsum++;
-   
+
             if( sum/nsum - v2low >= 3*rms/sqrt( (double) nsum ) &&
                 nsum >= fwhm ) break;
          }
@@ -293,7 +293,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 
          prev = v;
 
-      } else { 
+      } else {
          prev = VAL__BADD;
       }
 
@@ -322,7 +322,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
       i1 -= step;
    }
 
-/* Form the total width at half max. */   
+/* Form the total width at half max. */
    ret = lowid + hiwid;
 
 /* Increment the sum of the offsets using the mean of the two minimum

@@ -40,7 +40,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *
 *     For each clump, this function finds the height of the "col" between
 *     the clump and each of its neighbours, and identifies the "best"
-*     neighbour - that is, the neighbour with the highest col. If the peak 
+*     neighbour - that is, the neighbour with the highest col. If the peak
 *     of the clump being considered is less than "MinDip" above the col, then
 *     we merge the clump into its best neighbour.
 

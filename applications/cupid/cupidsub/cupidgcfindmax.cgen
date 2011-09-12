@@ -15,7 +15,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 *     cupidGCFindMax<X>
 
 *  Purpose:
-*     Find the element with the largest value in the supplied array. 
+*     Find the element with the largest value in the supplied array.
 
 *  Language:
 *     Starlink C
@@ -25,19 +25,19 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 *                            double *sumdata, int *status )
 
 *  Description:
-*     This functions finds the element with the largest value in the supplied 
-*     1D array. 
+*     This functions finds the element with the largest value in the supplied
+*     1D array.
 
 *  Parameters:
 *     array
 *        Pointer to the start of the 1D array to be searched.
 *     nel
-*        The number of elements in the supplied array. 
+*        The number of elements in the supplied array.
 *     imax
 *        Pointer the location at which to return the index within the
 *        supplied array of the element with the largest value. A value of
 *        -1 is returned if there are no good values in the supplied array.
-*     sumdata 
+*     sumdata
 *        Pointer to a location at which to return the sum of the supplied
 *        array values. This is only done if the supplied value for
 *        "sumdata" is VAL__BADD (otherwise the supplied value is left
@@ -49,10 +49,10 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 *     A flag indicating if all the supplied array values are bad.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidGCFindMax macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidGCFindMax<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidGCFindMax macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidGCFindMax<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidGCFindMax... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -122,7 +122,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 /* Increment the sum of the supplied values */
           sum += (double) array[ i ];
 
-/* If this is the first good value,  or if this value is larger than the 
+/* If this is the first good value,  or if this value is larger than the
    previous found maximum, record its position. */
          if( *imax == -1 || array[ i ] > maxval ) {
             maxval = array[ i ];

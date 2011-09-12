@@ -24,7 +24,7 @@ typedef struct CGEN_FUNCTION(MeanFilterBox) {
 
 
 CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
-                                          CGEN_TYPE *din, CGEN_TYPE *dout, 
+                                          CGEN_TYPE *din, CGEN_TYPE *dout,
                                           int *status ){
 /*
 *+
@@ -39,17 +39,17 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
 
 *  Synopsis:
 *     CGEN_TYPE *cupidFindback4<X>( int dim[3], int box[3],
-*                                   CGEN_TYPE *din, CGEN_TYPE *dout, 
+*                                   CGEN_TYPE *din, CGEN_TYPE *dout,
 *                                   int *status )
 
 *  Description:
 *     This function smooths the supplied array with a filter that
-*     replaces every input pixel with the mean of the good input pixels 
+*     replaces every input pixel with the mean of the good input pixels
 *     within a box of specified size centred on the pixel being replaced.
 
 *     Note, this filter function is different ot the min and max filters
-*     in that as the filter box approaches the edges ofhte array, it shrinks 
-*     in size in order to kepp it symetric about the output pixel. Without 
+*     in that as the filter box approaches the edges ofhte array, it shrinks
+*     in size in order to kepp it symetric about the output pixel. Without
 *     this, an output value close to the array edge is biassed towards
 *     the values that are further away from the edge. The min and max
 *     filters use a constant width filter, even at the edges, because the
@@ -61,7 +61,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
 *     box
 *        The dimensions of the the box filter, in pixels.
 *     din
-*        Pointer to the start of the supplied data array. 
+*        Pointer to the start of the supplied data array.
 *     dout
 *        Pointer to the start of the output data array. May be NULL, in
 *        which case a new array will be allocated, and a pointer returned
@@ -103,8 +103,8 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
 *     13-SEP-2006 (DSB):
 *        Original version.
 *     14-SEP-2007 (DSB):
-*        Modified heavily to avoid edge effects. The filter box now shrinks 
-*        as it approaches any edge of the array in order to ensure that the 
+*        Modified heavily to avoid edge effects. The filter box now shrinks
+*        as it approaches any edge of the array in order to ensure that the
 *        filter box is centred on the output pixel.
 *     {enter_further_changes_here}
 
@@ -182,14 +182,14 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
 
 /* The box is initialially centred at (1,1,1). In order to eensure that
    the box is symetric about its centre, we give the box and initial
-   width of 1 pixel on all 3 axes. The box expands in size as it enters the 
-   array such that it always has an equal number of pixels on either side 
-   of the box centre, until it reaches its maximum size as specified by 
-   "box". The box shrinks again when it reaches the other side of the array 
-   until it reaches zero size as the centre of the box passes outside the 
+   width of 1 pixel on all 3 axes. The box expands in size as it enters the
+   array such that it always has an equal number of pixels on either side
+   of the box centre, until it reaches its maximum size as specified by
+   "box". The box shrinks again when it reaches the other side of the array
+   until it reaches zero size as the centre of the box passes outside the
    array. All this is done to ensure that the filtered value is not
    biased by the fact that the box is not symetric about its centre near
-   the edges of the array. Initialise the bounds of the slab of pixels 
+   the edges of the array. Initialise the bounds of the slab of pixels
    forming the ZY face at the upper bound on the X axis. */
       zbox->lbndxu[ 0 ] = 0;
       zbox->lbndxu[ 1 ] = 1;
@@ -198,7 +198,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
       zbox->ubndxu[ 1 ] = 1;
       zbox->ubndxu[ 2 ] = 1;
 
-/* Likewise initalise the bounds of the slab of pixels forming the ZY face at 
+/* Likewise initalise the bounds of the slab of pixels forming the ZY face at
    the lower bound on the X axis. */
       zbox->lbndxl[ 0 ] = 1;
       zbox->lbndxl[ 1 ] = 1;
@@ -207,7 +207,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
       zbox->ubndxl[ 1 ] = 1;
       zbox->ubndxl[ 2 ] = 1;
 
-/* Likewise initalise the bounds of the slab of pixels forming the XZ face at 
+/* Likewise initalise the bounds of the slab of pixels forming the XZ face at
    the upper bound on the Y axis. */
       zbox->lbndyu[ 0 ] = 1;
       zbox->lbndyu[ 1 ] = 0;
@@ -216,7 +216,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
       zbox->ubndyu[ 1 ] = 1;
       zbox->ubndyu[ 2 ] = 1;
 
-/* Likewise initalise the bounds of the slab of pixels forming the XZ face at 
+/* Likewise initalise the bounds of the slab of pixels forming the XZ face at
    the lower bound on the Y axis. */
       zbox->lbndyl[ 0 ] = 1;
       zbox->lbndyl[ 1 ] = 1;
@@ -225,7 +225,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
       zbox->ubndyl[ 1 ] = 1 - iylo;
       zbox->ubndyl[ 2 ] = 1;
 
-/* Likewise initalise the bounds of the slab of pixels forming the XY face at 
+/* Likewise initalise the bounds of the slab of pixels forming the XY face at
    the upper bound on the Z axis. */
       zbox->lbndzu[ 0 ] = 1;
       zbox->lbndzu[ 1 ] = 1;
@@ -234,7 +234,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
       zbox->ubndzu[ 1 ] = 1;
       zbox->ubndzu[ 2 ] = 1;
 
-/* Initalise the bounds of the slab of pixels forming the XY face at 
+/* Initalise the bounds of the slab of pixels forming the XY face at
    the lower bound on the Z axis. */
       zbox->lbndzl[ 0 ] = 1;
       zbox->lbndzl[ 1 ] = 1;
@@ -266,7 +266,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
          memcpy( ybox, zbox, sizeof( CGEN_FUNCTION(MeanFilterBox) ) );
 
 /* Now loop through the rows in this xy plane. */
-         iy = 1; 
+         iy = 1;
          while( 1 ){
 
 /* Initialise the x box  to be a copy of the modified y box. */
@@ -286,16 +286,16 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
 /* We now move the centre of the x filter box up the x axis by 1 pixel. */
                if( ++ix > dim[ 0 ] ) break;
 
-/* This involves deciding which new pixels are to be added into the x box 
-   (the pixels in the "upper slab") and which are to be removed (the 
-   "lower slab"). First deal with cases where the x box has not yet entered 
+/* This involves deciding which new pixels are to be added into the x box
+   (the pixels in the "upper slab") and which are to be removed (the
+   "lower slab"). First deal with cases where the x box has not yet entered
    fully into the array. */
                if( ix <= ixlo ) {
 
 /* The total x width of the box is increased by 2 pixels for each new "ix"
    value as the box enters the array. This is done so that the extent of
-   the box can remain centred on the "ix" value. The lower x limit of the 
-   box stays fixed at 1, and the upper x limit is increased by 2. The slab 
+   the box can remain centred on the "ix" value. The lower x limit of the
+   box stays fixed at 1, and the upper x limit is increased by 2. The slab
    forming the YZ surface at the upper x bound of the box contains the
    new pixels that will be added to the box. This is therefore 2 pixels
    wide (in the x direction) during this phase of the passage of the box
@@ -303,11 +303,11 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
                   xbox->lbndxu[ 0 ] += 2;
                   xbox->ubndxu[ 0 ] += 2;
 
-/* Since the box has not yet entered fully into the array, there are as yet 
-   no pixels to be removed from the box. Therefore, the slab forming the YZ 
-   surface at the lower x bound of the box contains zero pixels. The bounds 
-   of this slab were initialised so that, if we increment the upper bound of 
-   the slab, the lower bound will remain greater than the upper bounds until 
+/* Since the box has not yet entered fully into the array, there are as yet
+   no pixels to be removed from the box. Therefore, the slab forming the YZ
+   surface at the lower x bound of the box contains zero pixels. The bounds
+   of this slab were initialised so that, if we increment the upper bound of
+   the slab, the lower bound will remain greater than the upper bounds until
    the box has enetered fully into the array. */
                   xbox->ubndxl[ 0 ]++;
 
@@ -326,8 +326,8 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
 
 /* The total x width of the box is decreased by 2 pixels for each new "ix"
    value as the box leaves the array. This is done so that the extent of
-   the box can remain centred on the "ix" value. The upper x limit of the 
-   box stays fixed at "dim[0]", and the lower x limit is increased by 2. The 
+   the box can remain centred on the "ix" value. The upper x limit of the
+   box stays fixed at "dim[0]", and the lower x limit is increased by 2. The
    slab forming the YZ surface at the lower x bound of the box contains the
    old pixels that will be removed from the box. This is therefore 2 pixels
    wide (in the x direction) during this phase of the passage of the box
@@ -335,18 +335,18 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
                   xbox->ubndxl[ 0 ] += 2;
                   xbox->lbndxl[ 0 ] = ( xbox->ubndxl[ 0 ] - 1 );
 
-/* Since the box has reached the end of the array, there are no more new 
+/* Since the box has reached the end of the array, there are no more new
    pixels to be added into the box. Therefore, the slab forming the YZ
    surface at the upper x bound of the box contains zero pixels. This is
    arranged by incrementing the lower bounds of the slab, but not the
-   upper bounds, resulting in the lower bound being greater than the upper 
+   upper bounds, resulting in the lower bound being greater than the upper
    bounds of the array. */
                   xbox->lbndxu[ 0 ]++;
                }
 
-/* Loop through the pixels in the upper slab, adding the good pixel values 
+/* Loop through the pixels in the upper slab, adding the good pixel values
    into the filter box. */
-               iter = cupidBoxIterator( iter, dim, xbox->lbndxu, xbox->ubndxu, 
+               iter = cupidBoxIterator( iter, dim, xbox->lbndxu, xbox->ubndxu,
                                         1, status );
                while( cupidNextIt( iter, xx, &iv, status ) ) {
                   val = din[ iv ];
@@ -356,9 +356,9 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
                   }
                }
 
-/* Loop through the pixels in the lower slab, removing the good pixel values 
+/* Loop through the pixels in the lower slab, removing the good pixel values
    from the filter box. */
-               iter = cupidBoxIterator( iter, dim, xbox->lbndxl, xbox->ubndxl, 
+               iter = cupidBoxIterator( iter, dim, xbox->lbndxl, xbox->ubndxl,
                                         1, status );
                while( cupidNextIt( iter, xx, &iv, status ) ) {
                   val = din[ iv ];
@@ -372,16 +372,16 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
 /* We now move the centre of the Y filter box up the Y axis by 1 pixel. */
             if( ++iy > dim[ 1 ] ) break;
 
-/* This involves deciding which new pixels are to be added into the y box 
-   (the pixels in the "upper slab") and which are to be removed (the 
-   "lower slab"). First deal with cases where the y box has not yet entered 
+/* This involves deciding which new pixels are to be added into the y box
+   (the pixels in the "upper slab") and which are to be removed (the
+   "lower slab"). First deal with cases where the y box has not yet entered
    fully into the array. */
             if( iy <= iylo ) {
 
 /* The total Y width of the box is increased by 2 pixels for each new "iy"
    value as the box enters the array. This is done so that the extent of
-   the box can remain centred on the "iy" value. The lower Y limit of the 
-   box stays fixed at 1, and the upper Y limit is increased by 2. The slab 
+   the box can remain centred on the "iy" value. The lower Y limit of the
+   box stays fixed at 1, and the upper Y limit is increased by 2. The slab
    forming the XZ surface at the upper Y bound of the box contains the
    new pixels that will be added to the box. This is therefore 2 pixels
    wide (in the Y direction) during this phase of the passage of the box
@@ -389,11 +389,11 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
                ybox->lbndyu[ 1 ] += 2;
                ybox->ubndyu[ 1 ] += 2;
 
-/* Since the box has not yet entered fully into the array, there are as yet 
-   no pixels to be removed from the box. Therefore, the slab forming the XZ 
-   surface at the lower Y bound of the box contains zero pixels. The bounds 
-   of this slab were initialised so that, if we increment the upper bound of 
-   the slab, the lower bound will remain greater than the upper bounds until 
+/* Since the box has not yet entered fully into the array, there are as yet
+   no pixels to be removed from the box. Therefore, the slab forming the XZ
+   surface at the lower Y bound of the box contains zero pixels. The bounds
+   of this slab were initialised so that, if we increment the upper bound of
+   the slab, the lower bound will remain greater than the upper bounds until
    the box has enetered fully into the array. */
                ybox->ubndyl[ 1 ]++;
 
@@ -420,8 +420,8 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
 
 /* The total Y width of the box is decreased by 2 pixels for each new "iy"
    value as the box leaves the array. This is done so that the extent of
-   the box can remain centred on the "iy" value. The upper Y limit of the 
-   box stays fixed at "dim[1]", and the lower Y limit is increased by 2. The 
+   the box can remain centred on the "iy" value. The upper Y limit of the
+   box stays fixed at "dim[1]", and the lower Y limit is increased by 2. The
    slab forming the XZ surface at the lower Y bound of the box contains the
    old pixels that will be removed from the box. This is therefore 2 pixels
    wide (in the Y direction) during this phase of the passage of the box
@@ -429,11 +429,11 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
                ybox->ubndyl[ 1 ] += 2;
                ybox->lbndyl[ 1 ] = ( ybox->ubndyl[ 1 ] - 1 );
 
-/* Since the box has reached the end of the array, there are no more new 
+/* Since the box has reached the end of the array, there are no more new
    pixels to be added into the box. Therefore, the slab forming the XZ
    surface at the upper Y bound of the box contains zero pixels. This is
    arranged by incrementing the lower bounds of the slab, but not the
-   upper bounds, resulting in the lower bound being greater than the upper 
+   upper bounds, resulting in the lower bound being greater than the upper
    bounds of the array. */
                ybox->lbndyu[ 1 ]++;
 
@@ -442,9 +442,9 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
                iihi = dim[ 1 ];
             }
 
-/* Loop through the pixels in the upper slab, adding the good pixel values 
+/* Loop through the pixels in the upper slab, adding the good pixel values
    into the filter box. */
-            iter = cupidBoxIterator( iter, dim, ybox->lbndyu, ybox->ubndyu, 
+            iter = cupidBoxIterator( iter, dim, ybox->lbndyu, ybox->ubndyu,
                                      1, status );
             while( cupidNextIt( iter, xx, &iv, status ) ) {
                val = din[ iv ];
@@ -454,9 +454,9 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
                }
             }
 
-/* Loop through the pixels in the lower slab, removing the good pixel values 
+/* Loop through the pixels in the lower slab, removing the good pixel values
    from the filter box. */
-            iter = cupidBoxIterator( iter, dim, ybox->lbndyl, ybox->ubndyl, 
+            iter = cupidBoxIterator( iter, dim, ybox->lbndyl, ybox->ubndyl,
                                      1, status );
             while( cupidNextIt( iter, xx, &iv, status ) ) {
                val = din[ iv ];
@@ -477,16 +477,16 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
 /* We now move the centre of the Z filter box up the Z axis by 1 pixel. */
          if( ++iz > dim[ 2 ] ) break;
 
-/* This involves deciding which new pixels are to be added into the z box 
-   (the pixels in the "upper slab") and which are to be removed (the 
-   "lower slab"). First deal with cases where the z box has not yet entered 
+/* This involves deciding which new pixels are to be added into the z box
+   (the pixels in the "upper slab") and which are to be removed (the
+   "lower slab"). First deal with cases where the z box has not yet entered
    fully into the array. */
          if( iz <= izlo ) {
 
 /* The total Z width of the box is increased by 2 pixels for each new "iz"
    value as the box enters the array. This is done so that the extent of
-   the box can remain centred on the "iz" value. The lower Z limit of the 
-   box stays fixed at 1, and the upper Z limit is increased by 2. The slab 
+   the box can remain centred on the "iz" value. The lower Z limit of the
+   box stays fixed at 1, and the upper Z limit is increased by 2. The slab
    forming the XY surface at the upper Z bound of the box contains the
    new pixels that will be added to the box. This is therefore 2 pixels
    wide (in the Z direction) during this phase of the passage of the box
@@ -494,11 +494,11 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
             zbox->lbndzu[ 2 ] += 2;
             zbox->ubndzu[ 2 ] += 2;
 
-/* Since the box has not yet entered fully into the array, there are as yet 
-   no pixels to be removed from the box. Therefore, the slab forming the XY 
-   surface at the lower Z bound of the box contains zero pixels. The bounds 
-   of this slab were initialised so that, if we increment the upper bound of 
-   the slab, the lower bound will remain greater than the upper bounds until 
+/* Since the box has not yet entered fully into the array, there are as yet
+   no pixels to be removed from the box. Therefore, the slab forming the XY
+   surface at the lower Z bound of the box contains zero pixels. The bounds
+   of this slab were initialised so that, if we increment the upper bound of
+   the slab, the lower bound will remain greater than the upper bounds until
    the box has enetered fully into the array. */
             zbox->ubndzl[ 2 ]++;
 
@@ -525,8 +525,8 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
 
 /* The total Z width of the box is decreased by 2 pixels for each new "iz"
    value as the box leaves the array. This is done so that the extent of
-   the box can remain centred on the "iz" value. The upper Z limit of the 
-   box stays fixed at "dim[2]", and the lower Z limit is increased by 2. The 
+   the box can remain centred on the "iz" value. The upper Z limit of the
+   box stays fixed at "dim[2]", and the lower Z limit is increased by 2. The
    slab forming the XY surface at the lower Z bound of the box contains the
    old pixels that will be removed from the box. This is therefore 2 pixels
    wide (in the Z direction) during this phase of the passage of the box
@@ -534,11 +534,11 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
             zbox->ubndzl[ 2 ] += 2;
             zbox->lbndzl[ 2 ] = ( zbox->ubndzl[ 2 ] - 1 );
 
-/* Since the box has reached the end of the array, there are no more new 
-   pixels to be added into the box. Therefore, the slab forming the XY 
+/* Since the box has reached the end of the array, there are no more new
+   pixels to be added into the box. Therefore, the slab forming the XY
    surface at the upper Z bound of the box contains zero pixels. This is
    arranged by incrementing the lower bounds of the slab, but not the
-   upper bouds, resulting in the lower bound being greater than the upper 
+   upper bouds, resulting in the lower bound being greater than the upper
    bounds of the array. */
             zbox->lbndzu[ 2 ]++;
 
@@ -547,9 +547,9 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
             iihi = dim[ 2 ];
          }
 
-/* Loop through the pixels in the upper slab, adding the good pixel values 
+/* Loop through the pixels in the upper slab, adding the good pixel values
    into the filter box. */
-         iter = cupidBoxIterator( iter, dim, zbox->lbndzu, zbox->ubndzu, 
+         iter = cupidBoxIterator( iter, dim, zbox->lbndzu, zbox->ubndzu,
                                   1, status );
          while( cupidNextIt( iter, xx, &iv, status ) ) {
             val = din[ iv ];
@@ -559,9 +559,9 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback4)( int dim[3], int box[3],
             }
          }
 
-/* Loop through the pixels in the lower slab, removing the good pixel values 
+/* Loop through the pixels in the lower slab, removing the good pixel values
    from the filter box. */
-         iter = cupidBoxIterator( iter, dim, zbox->lbndzl, zbox->ubndzl, 
+         iter = cupidBoxIterator( iter, dim, zbox->lbndzl, zbox->ubndzl,
                                   1, status );
          while( cupidNextIt( iter, xx, &iv, status ) ) {
             val = din[ iv ];

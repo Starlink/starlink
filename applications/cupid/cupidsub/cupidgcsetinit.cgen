@@ -6,7 +6,7 @@
 
 /* Global Variables: */
 /* ================= */
-/* A structure holding the global parameters of the GaussClump algorithm 
+/* A structure holding the global parameters of the GaussClump algorithm
    needed by the service functions cupidGCcalcf and cupidGCcalcg called
    by the PDA minimisation function. This structure is declared in
    cupidGaussClumps, and its contents are initialised by this function. */
@@ -19,8 +19,8 @@ extern CupidGC cupidGC;
 
 
 void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
-                                    int *dims, int imax, double rms, 
-                                    AstKeyMap *config, int init, int velax, 
+                                    int *dims, int imax, double rms,
+                                    AstKeyMap *config, int init, int velax,
                                     double *par, int *slbnd, int *status ){
 /*
 *+
@@ -34,27 +34,27 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidGCSetInit<X>( CGEN_TYPE *array, double *var, int ndim, 
-*                             int *dims, int imax, double rms, 
-*                             AstKeyMap *config, int init, int velax, 
+*     void cupidGCSetInit<X>( CGEN_TYPE *array, double *var, int ndim,
+*                             int *dims, int imax, double rms,
+*                             AstKeyMap *config, int init, int velax,
 *                             double *par, int *slbnd, int *status )
 
 *  Description:
 *     This functions makes an initial guess at the Gaussian clump
-*     parameters for the current clump, and sets up the values in the 
-*     CupidGC structure (declared externally in the cupidGaussClumps 
+*     parameters for the current clump, and sets up the values in the
+*     CupidGC structure (declared externally in the cupidGaussClumps
 *     module) which is used to communicate with the service functions
 *     called by the PDA minimisation function.
 
 *  Parameters:
 *     array
 *        The array containing the data to be fitted. The elements should
-*        be ordered according to Fortran order (first axis varying most 
-*        rapidly). The index of the velocity axis (if any) is given by 
+*        be ordered according to Fortran order (first axis varying most
+*        rapidly). The index of the velocity axis (if any) is given by
 *        "velax" and need not be "2".
 *     var
-*        An array containing the variances from the original input data, or 
-*        NULL if variances are not available. 
+*        An array containing the variances from the original input data, or
+*        NULL if variances are not available.
 *     ndim
 *        The number of pixel axes in the array.
 *     dims
@@ -81,10 +81,10 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *        Pointer to the inherited status value.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidGCSetInit macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidGCSetInit<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidGCSetInit macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidGCSetInit<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidGCSetInit... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -122,7 +122,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *     7-MAR-2007 (DSB):
 *        - Change default for MaxWF from 2 to 1.1, andMaxWF from 0.1 to 0.8.
 *     20-MAR-2007 (DSB):
-*        Reduce the initial guess at the clump peak value by subtracting the 
+*        Reduce the initial guess at the clump peak value by subtracting the
 *        RMS noise level (the noise will normally cause the peak data
 *        value to be larger than the peak clump value).
 *     {enter_further_changes_here}
@@ -176,22 +176,22 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Do some initialisation if required. */
    if( init ) {
 
-/* Parameters which control the modification of the weights done by 
+/* Parameters which control the modification of the weights done by
    cupidGCChiSq (this modification is meant to give low weights to pixels
    which do not influence the Gaussian model, status ). */
       cupidGC.nwf = cupidConfigI( config, "NWF", 10, status );
       cupidGC.minwf = cupidConfigD( config, "MINWF", 0.8, status );
       cupidGC.maxwf = cupidConfigD( config, "MAXWF", 1.1, status );
 
-/* Maximum number of function evaluations to be used when fitting an 
+/* Maximum number of function evaluations to be used when fitting an
    individual clump. */
       cupidGC.maxnf = cupidConfigI( config, "MAXNF", 100, status );
 
-/* See if a value has been supplied for the initial guess at the ratio 
+/* See if a value has been supplied for the initial guess at the ratio
    of the clump velocity width to the velocity resolution. */
       fvel = cupidConfigD( config, "VELOSTART", VAL__BADD, status );
 
-/* See if a value has been supplied for the initial guess at the ratio 
+/* See if a value has been supplied for the initial guess at the ratio
    of the clump size to the beam width. If the data is 1D we assume it is
    psectral, and therefore use VELOSTART instead of FWHMSTART.  */
       if( ndim == 1 ) {
@@ -211,8 +211,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
          goto L999;
       }
 
-/* Get the FHWM of the instrument beam, in pixels, and store its square. If 
-   the data is 1D we assume it is spectral, and therefore use VELORES instead 
+/* Get the FHWM of the instrument beam, in pixels, and store its square. If
+   the data is 1D we assume it is spectral, and therefore use VELORES instead
    of FWHMBEAM. */
       if( ndim == 1 ) {
          beamfwhm = velres;
@@ -233,12 +233,12 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    observed data. */
       cupidGC.sa = cupidConfigD( config, "SA", 1.0, status );
 
-/* Get the Chi-square stiffness parameter "Sb" which encourages the 
+/* Get the Chi-square stiffness parameter "Sb" which encourages the
    background value to stay close to its initial value. This is an extra
    stiffness added by DSB which is not in the Stutzki & Gusten paper. It
    is used because the background value is usually determined by data
    points which have very low weight and is thus poorly constrained. It
-   would thus be possibly to get completely erroneous background values  
+   would thus be possibly to get completely erroneous background values
    without this extra stiffness. */
       cupidGC.sb = cupidConfigD( config, "SB", 0.1, status );
 
@@ -268,12 +268,12 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
          cupidGC.dax[ 0 ] = 1;
          cupidGC.dax[ 1 ] = 2;
          cupidGC.dax[ 2 ] = 0;
-   
+
       } else if( velax == 1 ) {
          cupidGC.dax[ 0 ] = 0;
          cupidGC.dax[ 1 ] = 2;
          cupidGC.dax[ 2 ] = 1;
-   
+
       } else {
          cupidGC.dax[ 0 ] = 0;
          cupidGC.dax[ 1 ] = 1;
@@ -281,14 +281,14 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       }
 
 /* The "fax" array is the inverse of the "dax" array. */
-      fax[ cupidGC.dax[ 0 ] ] = 0; 
-      fax[ cupidGC.dax[ 1 ] ] = 1; 
-      fax[ cupidGC.dax[ 2 ] ] = 2; 
+      fax[ cupidGC.dax[ 0 ] ] = 0;
+      fax[ cupidGC.dax[ 1 ] ] = 1;
+      fax[ cupidGC.dax[ 2 ] ] = 2;
 
 /* Get the ratio of the weighting function FWHM to the observed FWHM. */
       wwidth = cupidConfigD( config, "WWIDTH", 2.0, status );
 
-/* Get the factor which scales the FWHM on each axis to the half-width of the 
+/* Get the factor which scales the FWHM on each axis to the half-width of the
    section of the data array to be be fitted. */
       wmin = cupidConfigD( config, "WMIN", 0.05, status );
       if( wmin < 1.0E-8 ) wmin = 1.0E-8;
@@ -296,7 +296,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 
 /* The number of free parameters in the fit (assuming the background
    level is included in the fitting process - see cupidGC.fitback). */
-      npar = ( ndim == 1 ) ? CUPID__GCNP1 : 
+      npar = ( ndim == 1 ) ? CUPID__GCNP1 :
              ( (ndim == 2 ) ? CUPID__GCNP2 : CUPID__GCNP3 );
       cupidGC.npar = npar;
 
@@ -333,26 +333,26 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       ax_max[ 0 ] = imax + 1;
    }
 
-/* Get a guess at the observed clump fwhm by forming a radial profile and 
-   finding the distance to the first significant minimum. This also increments 
+/* Get a guess at the observed clump fwhm by forming a radial profile and
+   finding the distance to the first significant minimum. This also increments
    "off" by the minimum (i.e. base line) data value in the profile. Do
    this for both spatial axes, and then take the mean (i.e. we assume the
    clump is circular as an initial guess), and assigns the centroid of
    the profile to cupidGC.x_max[ iax ] (GRID coords). */
    off = 0.0;
-   fwhm_obs[ 0 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
-                                                ax_max, cupidGC.dax[ 0 ], 
+   fwhm_obs[ 0 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax,
+                                                ax_max, cupidGC.dax[ 0 ],
                                                 rms, beamfwhm, &off, cupidGC.x_max, status );
 
 /* Store the model centroid on internal axis 0 (i.e. axis 0 as used within
    the fitting algorithm). */
    par[ 2 ] = cupidGC.x_max[ 0 ];
 
-/* If dealing with 2D data, ensure the observed fwhm on both spatial axes are 
+/* If dealing with 2D data, ensure the observed fwhm on both spatial axes are
    equal to the mean of the values found for each individual axis. */
    if( ndim > 1 ) {
-      fwhm_obs[ 1 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
-                                                ax_max, cupidGC.dax[ 1 ], 
+      fwhm_obs[ 1 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax,
+                                                ax_max, cupidGC.dax[ 1 ],
                                                 rms, beamfwhm, &off, cupidGC.x_max + 1, status );
       fwhm_obs[ 0 ] += fwhm_obs[ 1 ];
       fwhm_obs[ 0 ] *= 0.5;
@@ -360,7 +360,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    }
 
 /* If a value for "fbeam" was supplied by the user, use it. Otherwise,
-   divide the observed FWHM by the beam FWHM to get a default value for 
+   divide the observed FWHM by the beam FWHM to get a default value for
    "fbeam".*/
    if( fbeam != VAL__BADD ) {
       fbeam_used = fbeam;
@@ -396,7 +396,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    zero velocity gradient. */
    if( ndim > 2 ) {
       fwhm_obs[ 2 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax,
-                                                 ax_max, cupidGC.dax[ 2], rms, 
+                                                 ax_max, cupidGC.dax[ 2], rms,
                                                  velres, &off, cupidGC.x_max + 2, status );
       par[ 7 ] = cupidGC.x_max[ 2 ];
       if( fvel != VAL__BADD ) {
@@ -431,8 +431,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    any background has already been removed from the data before running
    FINDCLUMPS). However, an apparent negative background can be formed by
    a previous ill-position fit resulting in negative residiauls. Therefore
-   we have to guard against negative backgrounds. If the initial background 
-   estimate is significantly less than zero, then set it to zero, and 
+   we have to guard against negative backgrounds. If the initial background
+   estimate is significantly less than zero, then set it to zero, and
    indicate that the background value should be fixed (i.e. not included
    as a free parameter in the fitting process). Here, "significant" means
    more than 5% of the total peak height. */
@@ -445,7 +445,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       cupidGC.fixback = 0;
    }
 
-/* Get the pixel bounds (in the arrays GRID coordinate system) of the section 
+/* Get the pixel bounds (in the arrays GRID coordinate system) of the section
    of the array containing the data to be fitted. */
    cupidGC.nel = 1;
    for( i = 0; i < ndim; i++ ) {
@@ -463,10 +463,10 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 
 /* Re-order the axes. */
    for( i = 0; i < ndim; i++ ) {
-      cupidGC.lbnd[ i ] = lbnd[ cupidGC.dax[ i ] ];   
-      cupidGC.ubnd[ i ] = ubnd[ cupidGC.dax[ i ] ];   
+      cupidGC.lbnd[ i ] = lbnd[ cupidGC.dax[ i ] ];
+      cupidGC.ubnd[ i ] = ubnd[ cupidGC.dax[ i ] ];
    }
-   
+
 /* Ensure we have enough room in the work arrays for the section being
    fitted. */
    cupidGC.data = astGrow( cupidGC.data, cupidGC.nel, sizeof( double ) );
@@ -481,8 +481,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    py = cupidGC.data;
    pw = cupidGC.weight;
 
-/* Loop round each axis. This is the "internal" axis index in which the 
-   velocity  axis (if any) is the third axis. Store the index within the 
+/* Loop round each axis. This is the "internal" axis index in which the
+   velocity  axis (if any) is the third axis. Store the index within the
    complete array of the first pixel in the work arrays to be filled. */
    for( iax = 0; iax < ndim; iax++ ) xx[ iax ] = cupidGC.lbnd[ iax ];
 
@@ -490,7 +490,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    variance reciprocals. */
    nv = 0;
    sv = 0;
-   
+
 /* Initialise the largest weight used so far to zero. */
    wmax = 0.0;
 
@@ -507,7 +507,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       j = yy[ ndim - 1 ];
       for( iax = ndim - 2; iax >= 0; iax-- ) {
          j = yy[ iax ] + j*dims[ iax ];
-      }         
+      }
 
 /* If the input data value is bad, store zero in place of the bad
    value, and store a zero weight. */
@@ -516,9 +516,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
          *pw = 0.0;
 
 /* Otherwise, store the data, converted to "double" and normalised to the
-   RMS noise level. Also calculate and store the Gaussian weight for the 
-   pixel. If Variances are available, factor in the reciprocal of the 
-   variance associated with the input data value. Increment the sum of the 
+   RMS noise level. Also calculate and store the Gaussian weight for the
+   pixel. If Variances are available, factor in the reciprocal of the
+   variance associated with the input data value. Increment the sum of the
    weights.  */
       } else {
          *py = ((double) array[ j ] )/rms;
@@ -552,8 +552,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       py++;
       pw++;
 
-/* Get the grid coords of the next pixel in the section currently being 
-   fitted. This assumes fortran ordering of the elements in the arrays, and 
+/* Get the grid coords of the next pixel in the section currently being
+   fitted. This assumes fortran ordering of the elements in the arrays, and
    assumes the velocity axis (if any) is axis 3. */
       iax = 0;
       xx[ iax ] += 1.0;
@@ -564,7 +564,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       }
    }
 
-/* Normalise the weights to a maximum value of 1.0 and set to zero any weights 
+/* Normalise the weights to a maximum value of 1.0 and set to zero any weights
    which are lower than the user supplied lower limit. */
    if( wmax > 0.0 ) {
       pw = cupidGC.weight;
@@ -574,7 +574,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       }
    }
 
-/* Store the number of invocations of cupidGCcalcf so far. */  
+/* Store the number of invocations of cupidGCcalcf so far. */
    cupidGC.nf = -1;
 
 /* Normalise all other data values in the CupidGC structure and in the "par"
@@ -587,16 +587,16 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    take account of the smoothing by the instrumental beam. */
    t = par[ 3 ]*par[ 3 ];
    dx_sq = cupidGC.beam_sq + t;
-   peakfactor = t/dx_sq;       
+   peakfactor = t/dx_sq;
    if( ndim > 1 ) {
       t = par[ 5 ]*par[ 5 ];
       dx_sq = cupidGC.beam_sq + t;
-      peakfactor *= t/dx_sq;       
+      peakfactor *= t/dx_sq;
       if( ndim > 2 ) {
          t = par[ 8 ]*par[ 8 ];
          dx_sq = cupidGC.velres_sq + t;
-         peakfactor *= t/dx_sq;       
-      }     
+         peakfactor *= t/dx_sq;
+      }
    }
 
 /* Do the correction. */

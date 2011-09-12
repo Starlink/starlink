@@ -6,9 +6,9 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 
-HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel, 
-                                  int ndim, int dims[ 3 ], int skip[ 3 ], 
-                                  int slbnd[ 3 ], int index, int clbnd[ 3 ], 
+HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
+                                  int ndim, int dims[ 3 ], int skip[ 3 ],
+                                  int slbnd[ 3 ], int index, int clbnd[ 3 ],
                                   int cubnd[ 3 ], AstKeyMap *extra,
                                   HDSLoc *obj, double maxbad, int *status ){
 /*
@@ -23,33 +23,33 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidNdfClump<X>( CGEN_TYPE *ipd, int *ipa, int nel, int ndim, 
-*                            int dims[ 3 ], int skip[ 3 ], int slbnd[ 3 ], 
-*                            int index, int clbnd[ 3 ], int cubnd[ 3 ], 
+*     HDSLoc *cupidNdfClump<X>( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
+*                            int dims[ 3 ], int skip[ 3 ], int slbnd[ 3 ],
+*                            int index, int clbnd[ 3 ], int cubnd[ 3 ],
 *                            AstKeyMap *extra, HDSLoc *obj, double maxbad,
 *                            int *status )
 
 *  Description:
 *     This function cannot be used with algorithms such as GaussClumps
 *     which support overlapping clumps. Each pixel must either be associated
-*     with a single clump, or with no clump. It creates a temporary NDF and 
-*     stores the clump intensity in its Data component. The bounds of the NDF 
-*     will be the smallest possible which still encompass the clump. In 
-*     addition, if required it will create a Cupid extension in the NDF 
+*     with a single clump, or with no clump. It creates a temporary NDF and
+*     stores the clump intensity in its Data component. The bounds of the NDF
+*     will be the smallest possible which still encompass the clump. In
+*     addition, if required it will create a Cupid extension in the NDF
 *     containing any supplied extra information.
 
 *  Parameters:
 *     ipd
-*        Pointer to the start of the supplied data array. 
+*        Pointer to the start of the supplied data array.
 *     ipa
 *        Pointer to the start of the array holding the integer index
 *        (if any) associated with each pixel in the data array. This
-*        shows which clump each pixel belongs to (each clump is identified 
-*        by a unique integer index). The array should be the same shape and 
+*        shows which clump each pixel belongs to (each clump is identified
+*        by a unique integer index). The array should be the same shape and
 *        size as the data array. Pixels which have not yet been assigned
 *        to a clump are marked with the integer value CUPID__CFNULL.
 *     nel
-*        The total number of elements in the data array. 
+*        The total number of elements in the data array.
 *     ndim
 *        The number of pixel axes in the data array.
 *     dims
@@ -57,13 +57,13 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        array should have 3 elements even if "ndim" is less than 3, and
 *        the extra elements should be filled with 1's.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if "ndim" is less than 3, and
 *        the extra elements should be filled with zero's.
 *     slbnd
-*        An array holding the lower pixel index bound of the data array on 
+*        An array holding the lower pixel index bound of the data array on
 *        each axis, padded with trailing 1's.
 *     index
 *        The integer value used to represent the clump within "ipa".
@@ -89,10 +89,10 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     An HDS locator to the array of NDFs.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidNdfClump macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidNdfClump<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidNdfClump macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidNdfClump<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidNdfClump... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -190,7 +190,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Begin an NDF context */
    ndfBegin();
 
-/* Create a place holder for the new NDF within the new cell. The NDF will be 
+/* Create a place holder for the new NDF within the new cell. The NDF will be
    copied to its final resting place before the program exits. */
    ndfPlace( cloc, " ", &place, status );
 
@@ -200,7 +200,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
       ub[ i ] = cubnd[ i ] - 1 + slbnd[ i ];
    }
 
-/* Create the NDF covering the clump bounding box to receive the clump 
+/* Create the NDF covering the clump bounding box to receive the clump
    values. */
    ndfNew( "_DOUBLE", ndim, lb, ub, &place, &indf, status );
 
@@ -208,9 +208,9 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
    ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &out, &el, status );
    if( out ) {
 
-/* Find the 1D vector index within the input array of the first pixel in the 
+/* Find the 1D vector index within the input array of the first pixel in the
    clump bounding box. */
-      ivinz = ( clbnd[ 0 ] - 1 ) + dims[ 0 ]*( ( clbnd[ 1 ] - 1 ) + 
+      ivinz = ( clbnd[ 0 ] - 1 ) + dims[ 0 ]*( ( clbnd[ 1 ] - 1 ) +
                                      dims[ 1 ]*( clbnd[ 2 ] - 1 ) );
 
 /* Store a pointer to the next output pixel value */
@@ -256,7 +256,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
                   }
 
 /* If this pixel is not in the clump, store a bad value in the output.*/
-               } else {                  
+               } else {
                   *pout = VAL__BADD;
                }
 
@@ -281,11 +281,11 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
       }
    }
 
-/* If required, create a Cupid extension in the NDF, storing any extra 
+/* If required, create a Cupid extension in the NDF, storing any extra
    supplied diagnostic information. */
    if( extra ) {
-      xloc = NULL;  
-      dloc = NULL;  
+      xloc = NULL;
+      dloc = NULL;
       ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
       nex = astMapSize( extra );
       for( i = 0; i < nex; i++ ) {

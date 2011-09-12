@@ -25,9 +25,9 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
 
 *  Description:
 *     This functions finds an estimate of the RMS noise in the supplied
-*     data array. The algorithm first applies a 1D Laplace filter to each 
+*     data array. The algorithm first applies a 1D Laplace filter to each
 *     row of the data (this is equivalent to finding the difference between
-*     adjacent pixel values in the row, then finding the difference between 
+*     adjacent pixel values in the row, then finding the difference between
 *     the adjcent differences). It then estimates the RMS of the the
 *     filtered data, and rejects data values greater than 4*RMS. When a
 *     point is rejected, the 2 neighbouring points on either side are
@@ -40,10 +40,10 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
 *  Parameters:
 *     array
 *        Pointer to the data array. The elements should be stored in
-*        Fortran order. 
+*        Fortran order.
 *     nel
-*        The number of elements in the supplied array. 
-*     rowlen 
+*        The number of elements in the supplied array.
+*     rowlen
 *        The number of elements spanned by the first pixel axis.
 *     status
 *        Pointer to the inherited status value.
@@ -52,10 +52,10 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
 *     The RMS noise estimate
 
 *  Notes:
-*     - This function can be invoked using the generic cupidRms macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidRms<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidRms macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidRms<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidRms... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -125,9 +125,9 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
    if( w ) {
 
 /* Run a 1D Laplace filter (kernel = [-1,2,-1]) over the data, storing
-   the results in the work array. At the same time, find the RMS value of 
-   the filtered data. A Laplace filter picks out the noise, but will also 
-   include spikes due to sharp slopes (such as the edge of star profiles, 
+   the results in the work array. At the same time, find the RMS value of
+   the filtered data. A Laplace filter picks out the noise, but will also
+   include spikes due to sharp slopes (such as the edge of star profiles,
    etc). */
       pr = array;
       wr = w;
@@ -139,8 +139,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
          *(wr++) = CGEN_BAD;
          pr++;
          for( ipix = 1; ipix < rowlen - 1; ipix++, wr++, pr++ ){
-            if( pr[ -1 ] != CGEN_BAD && 
-                pr[ 0 ] != CGEN_BAD && 
+            if( pr[ -1 ] != CGEN_BAD &&
+                pr[ 0 ] != CGEN_BAD &&
                 pr[ 1 ] != CGEN_BAD ){
                *wr = -pr[ -1 ] + 2*pr[ 0 ] - pr[ 1 ];
                sum += ( *wr )*( *wr );
@@ -178,7 +178,7 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
 
 /* We now get rid of spikes by doing a 4-sigma clip on the residuals
    produced by the Laplace filter. In addition, set the two neighbouring
-   pixels on either side of each rejected pixel bad. We continue to do such 
+   pixels on either side of each rejected pixel bad. We continue to do such
    clipping until no further residuals are rejected. */
       nrej = 1;
       while( nrej ) {
@@ -195,7 +195,7 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
                   wr[ 0 ] = CGEN_BAD;
                   wr[ 1 ] = CGEN_BAD;
                   wr[ 2 ] = CGEN_BAD;
-                  nrej++;                                    
+                  nrej++;
                } else {
                   sum += ( *wr )*( *wr );
                   n++;
@@ -220,7 +220,7 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
 
 /* Do not allow a value of zero to be returned- use 0.001 of the data
    range instead. */
-      if( ret == 0.0 ) ret = 0.001*( maxv - minv );       
+      if( ret == 0.0 ) ret = 0.001*( maxv - minv );
 
    }
 
@@ -229,5 +229,5 @@ L999:;
    w = astFree( w );
 
 /* Return the result. */
-   return ret;  
+   return ret;
 }

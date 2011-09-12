@@ -13,7 +13,7 @@
 #define REINHOLD    3
 #define FELLWALKER  4
 
-void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, 
+void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
                                     int *lbnd, int *ubnd, int nel, HDSLoc *obj,
                                     float *rmask, void *out, const char *method,
                                     int *status ){
@@ -30,14 +30,14 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidSumClumps<X>( CGEN_TYPE *in, int ndim, int *lbnd, 
-*                             int *ubnd, int nel, HDSLoc *obj, float *rmask, 
+*     void cupidSumClumps<X>( CGEN_TYPE *in, int ndim, int *lbnd,
+*                             int *ubnd, int nel, HDSLoc *obj, float *rmask,
 *                             void *out, const char *method, int *status )
 
 *  Description:
 *     This function stores an image of the sum of all the found clumps
 *     in "out", and stores a mask in "rmask" identifying the pixels which
-*     are inside a clump. 
+*     are inside a clump.
 
 *  Parameters:
 *     in
@@ -55,14 +55,14 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
 *     rmask
 *        The array to receive the mask. A value of 1.0 will be stored in
 *        every pixel which inside a clump. All other pixels will be set
-*        to VAL__BADR. The supplied array must be the same size and shape as 
+*        to VAL__BADR. The supplied array must be the same size and shape as
 *        "out" and the pixels are assumed to be in fortran order. May be NULL.
 *     out
-*        Pointer to the start of the array to receive the sum of the clump 
-*        intensities. The supplied array must be the same size as the user 
-*        supplied NDF ("in") and the pixels are assumed to be in fortran 
-*        order. May be NULL. Note the data type for this array is determined 
-*        by the algorithm in use ("_DOUBLE" for gaussclumps, "_INTEGER" for 
+*        Pointer to the start of the array to receive the sum of the clump
+*        intensities. The supplied array must be the same size as the user
+*        supplied NDF ("in") and the pixels are assumed to be in fortran
+*        order. May be NULL. Note the data type for this array is determined
+*        by the algorithm in use ("_DOUBLE" for gaussclumps, "_INTEGER" for
 *        others), and need not be the same as the data type of "in".
 *     method
 *        The name of the algorithm being used (e.g. "CLUMPFIND", "GAUSSCLUMPS",
@@ -71,12 +71,12 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
 *        Pointer to the inherited status value.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidSumClumps macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidSumClumps<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the "in" array (i.e. 
-*     the specific cupidSumClumps... function to be invoked). This extra 
-*     parameter should be an integer and should be one of CUPID__DOUBLE, 
+*     - This function can be invoked using the generic cupidSumClumps macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidSumClumps<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the "in" array (i.e.
+*     the specific cupidSumClumps... function to be invoked). This extra
+*     parameter should be an integer and should be one of CUPID__DOUBLE,
 *     CUPID__FLOAT, etc.
 
 *  Copyright:
@@ -189,9 +189,9 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
       for( i = 0; i < nel; i++ ) *(r++) = VAL__BADR;
    }
 
-/* Set up the 1D vector step size for stepping between adjacent pixels on each 
+/* Set up the 1D vector step size for stepping between adjacent pixels on each
    axis of "in/out/rmask". */
-   step[ 0 ] = 1;   
+   step[ 0 ] = 1;
    for( k = 1; k < ndim; k++ ) {
       step[ k ] = step[ k - 1 ]*( ubnd[ k - 1 ] - lbnd[ k - 1 ] + 1 );
    }
@@ -239,8 +239,8 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
       ndfMap( indf, "DATA", "_DOUBLE", "READ", (void *) &ipd, &el, status );
       if( ipd ) {
 
-/* Initialise the n-D pixel coords of the first pixel in "ipd". Also, set 
-   the 1D vector index within "in/out/rmask" of the first pixel in 
+/* Initialise the n-D pixel coords of the first pixel in "ipd". Also, set
+   the 1D vector index within "in/out/rmask" of the first pixel in
    "ipd". This assumes fortran pixel ordering. */
          ii = 0;
          for( k = 0; k < ndim; k++ ) {
@@ -255,11 +255,11 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
 /* Skip bad pixels */
             if( *m != VAL__BADD ) {
 
-/* If we are producing an output array and if the input pixel is good, 
+/* If we are producing an output array and if the input pixel is good,
    modify the corresponding output pixel. */
                if( out && ( !in || in[ ii ] != CGEN_BAD ) ) {
 
-/* For GaussClumps, increment the current output pixel value by the model 
+/* For GaussClumps, increment the current output pixel value by the model
    value. */
                   if( alg == GAUSSCLUMPS ) {
                      pd[ ii ] += *m;
@@ -267,9 +267,9 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim,
 /* For ClumpFind, etc, store the clump index. */
                   } else {
                      pi[ ii ] = clump_index;
-                  }               
+                  }
                }
-         
+
 /* If required, store 1.0 in the "rmask" array. */
                if( rmask ) rmask[ ii ] = 1.0;
             }

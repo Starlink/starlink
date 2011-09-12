@@ -24,7 +24,7 @@ typedef struct CGEN_FUNCTION(MaxFilterBox) {
 
 
 CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
-                                           CGEN_TYPE *din, CGEN_TYPE *dout, 
+                                           CGEN_TYPE *din, CGEN_TYPE *dout,
                                            int *status ){
 /*
 *+
@@ -39,12 +39,12 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
 
 *  Synopsis:
 *     CGEN_TYPE *cupidFindback10<X>( int dim[3], int box[3],
-*                                    CGEN_TYPE *din, CGEN_TYPE *dout, 
+*                                    CGEN_TYPE *din, CGEN_TYPE *dout,
 *                                    int *status )
 
 *  Description:
 *     This function smooths the supplied array with a filter that
-*     replaces every input pixel with the maximum of the good input pixels 
+*     replaces every input pixel with the maximum of the good input pixels
 *     within a box of specified size centred on the pixel being replaced.
 
 *  Parameters:
@@ -53,7 +53,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
 *     box
 *        The dimensions of the the box filter, in pixels.
 *     din
-*        Pointer to the start of the supplied data array. 
+*        Pointer to the start of the supplied data array.
 *     dout
 *        Pointer to the start of the output data array. May be NULL, in
 *        which case a new array will be allocated, and a pointer returned
@@ -242,36 +242,36 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
 /* Now loop through all the xy planes in the cube. */
       for( iz = 1; iz <= dim[ 2 ]; iz++ ) {
 
-/* Set a flag indicating if the pixel with the maximum value in the box 
-   will pass out of the filter box as a consequence of updating the box to 
+/* Set a flag indicating if the pixel with the maximum value in the box
+   will pass out of the filter box as a consequence of updating the box to
    the new "iz" value. We also do a full check if the maximum value is
    currently undefined. */
-         full_check = ( zbox->maxval == CGEN_MIN || 
+         full_check = ( zbox->maxval == CGEN_MIN ||
                         zbox->maxpos[ 2 ] == zbox->lbndzl[ 2 ] );
 
-/* Increment the Z axis bounds of the volume containing the new pixels to be 
-   added to the filter box. This volume is a slab of pixels in the xy plane, 
+/* Increment the Z axis bounds of the volume containing the new pixels to be
+   added to the filter box. This volume is a slab of pixels in the xy plane,
    one pixel thick in the z direction. It forms the slab of pixels just
    above the upper face of the current z box volume. */
          zbox->lbndzu[ 2 ]++;
          zbox->ubndzu[ 2 ]++;
 
-/* Increment the Z axis bounds of the volume containing the old pixels to be 
-   removed from the filter box. This volume is a slab of pixels in the xy plane, 
+/* Increment the Z axis bounds of the volume containing the old pixels to be
+   removed from the filter box. This volume is a slab of pixels in the xy plane,
    one pixel thick in the z direction. It forms the slab of pixels that make up
    the lower face of the current z box volume. */
          zbox->lbndzl[ 2 ]++;
          zbox->ubndzl[ 2 ]++;
 
-/* First deal with cases where the pixel with the maximum value in the box 
-   will pass out of the filter box as a consequence of updating the box to 
+/* First deal with cases where the pixel with the maximum value in the box
+   will pass out of the filter box as a consequence of updating the box to
    the new "iz" value. */
          if( full_check ){
 
 /* Since the old maximum value has passed out of the box, we need to search
    all pixels within the new updated box for a maximum value. */
             zbox->maxval = CGEN_MIN;
-            iter = cupidBoxIterator( iter, dim, zbox->lbndzl, zbox->ubndzu, 1, 
+            iter = cupidBoxIterator( iter, dim, zbox->lbndzl, zbox->ubndzu, 1,
                                  status );
             while( cupidNextIt( iter, xx, &iv, status ) ) {
                val = din[ iv ];
@@ -283,14 +283,14 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
                }
             }
 
-/* Now deal with cases where the pixel with the maximum value in the box 
-   will not pass out of the filter box as a consequence of updating the box to 
+/* Now deal with cases where the pixel with the maximum value in the box
+   will not pass out of the filter box as a consequence of updating the box to
    the new "iz" value. */
          } else {
 
 /* Since the old maximum value is still in the box, we need only to search
    the new pixels being added to the updated box for a maximum value. */
-            iter = cupidBoxIterator( iter, dim, zbox->lbndzu, zbox->ubndzu, 1, 
+            iter = cupidBoxIterator( iter, dim, zbox->lbndzu, zbox->ubndzu, 1,
                                  status );
             while( cupidNextIt( iter, xx, &iv, status ) ) {
                val = din[ iv ];
@@ -322,36 +322,36 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
 /* Now loop through the rows in this xy plane. */
          for( iy = 1; iy <= dim[ 1 ]; iy++ ) {
 
-/* Set a flag indicating if the pixel with the maximum value in the box 
-   will pass out of the filter box as a consequence of updating the box to 
+/* Set a flag indicating if the pixel with the maximum value in the box
+   will pass out of the filter box as a consequence of updating the box to
    the new "iy" value. We also do a full check if the maximum value is
    currently undefined. */
-            full_check = ( ybox->maxval == CGEN_MIN || 
+            full_check = ( ybox->maxval == CGEN_MIN ||
                            ybox->maxpos[ 1 ] == ybox->lbndyl[ 1 ] );
 
-/* Increment the Y axis bounds of the volume containing the new pixels to be 
-   added to the filter box. This volume is a slab of pixels in the xz plane, 
+/* Increment the Y axis bounds of the volume containing the new pixels to be
+   added to the filter box. This volume is a slab of pixels in the xz plane,
    one pixel thick in the y direction. It forms the slab of pixels just
    above the upper face of the current y box volume. */
             ybox->lbndyu[ 1 ]++;
             ybox->ubndyu[ 1 ]++;
 
-/* Increment the Y axis bounds of the volume containing the old pixels to be 
-   removed from the filter box. This volume is a slab of pixels in the xz plane, 
+/* Increment the Y axis bounds of the volume containing the old pixels to be
+   removed from the filter box. This volume is a slab of pixels in the xz plane,
    one pixel thick in the y direction. It forms the slab of pixels that make up
    the lower face of the current y box volume. */
             ybox->lbndyl[ 1 ]++;
             ybox->ubndyl[ 1 ]++;
 
-/* First deal with cases where the pixel with the maximum value in the box 
-   will pass out of the filter box as a consequence of updating the box to 
+/* First deal with cases where the pixel with the maximum value in the box
+   will pass out of the filter box as a consequence of updating the box to
    the new "iy" value. */
             if( full_check ){
 
 /* Since the old maximum value has passed out of the box, we need to search
    all pixels within the new updated box for a maximum value. */
                ybox->maxval = CGEN_MIN;
-               iter = cupidBoxIterator( iter, dim, ybox->lbndyl, ybox->ubndyu, 1, 
+               iter = cupidBoxIterator( iter, dim, ybox->lbndyl, ybox->ubndyu, 1,
                                     status );
                while( cupidNextIt( iter, xx, &iv, status ) ) {
                   val = din[ iv ];
@@ -363,14 +363,14 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
                   }
                }
 
-/* Now deal with cases where the pixel with the maximum value in the box 
-   will not pass out of the filter box as a consequence of updating the box to 
+/* Now deal with cases where the pixel with the maximum value in the box
+   will not pass out of the filter box as a consequence of updating the box to
    the new "iy" value. */
             } else {
 
 /* Since the old maximum value is still in the box, we need only to search
    the new pixels being added to the updated box for a maximum value. */
-               iter = cupidBoxIterator( iter, dim, ybox->lbndyu, ybox->ubndyu, 1, 
+               iter = cupidBoxIterator( iter, dim, ybox->lbndyu, ybox->ubndyu, 1,
                                     status );
                while( cupidNextIt( iter, xx, &iv, status ) ) {
                   val = din[ iv ];
@@ -396,36 +396,36 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
 /* Now loop through the pixels in this new x row. */
             for( ix = 1; ix <= dim[ 0 ]; ix++ ) {
 
-/* Set a flag indicating if the pixel with the maximum value in the box 
-   will pass out of the filter box as a consequence of updating the box to 
+/* Set a flag indicating if the pixel with the maximum value in the box
+   will pass out of the filter box as a consequence of updating the box to
    the new "ix" value. We also do a full check if the maximum value is
    currently undefined. */
-               full_check = ( xbox->maxval == CGEN_MIN || 
+               full_check = ( xbox->maxval == CGEN_MIN ||
                               xbox->maxpos[ 0 ] == xbox->lbndxl[ 0 ] );
 
-/* Increment the X axis bounds of the volume containing the new pixels to be 
-   added to the filter box. This volume is a slab of pixels in the yz plane, 
+/* Increment the X axis bounds of the volume containing the new pixels to be
+   added to the filter box. This volume is a slab of pixels in the yz plane,
    one pixel thick in the x direction. It forms the slab of pixels just
    above the upper face of the current x box volume. */
                xbox->lbndxu[ 0 ]++;
                xbox->ubndxu[ 0 ]++;
 
-/* Increment the X axis bounds of the volume containing the old pixels to be 
-   removed from the filter box. This volume is a slab of pixels in the yz plane, 
+/* Increment the X axis bounds of the volume containing the old pixels to be
+   removed from the filter box. This volume is a slab of pixels in the yz plane,
    one pixel thick in the x direction. It forms the slab of pixels that make up
    the lower face of the current x box volume. */
                xbox->lbndxl[ 0 ]++;
                xbox->ubndxl[ 0 ]++;
 
-/* First deal with cases where the pixel with the maximum value in the box 
-   will pass out of the filter box as a consequence of updating the box to 
+/* First deal with cases where the pixel with the maximum value in the box
+   will pass out of the filter box as a consequence of updating the box to
    the new "ix" value. */
                if( full_check ){
 
 /* Since the old maximum value has passed out of the box, we need to search
    all pixels within the new updated box for a maximum value. */
                   xbox->maxval = CGEN_MIN;
-                  iter = cupidBoxIterator( iter, dim, xbox->lbndxl, xbox->ubndxu, 1, 
+                  iter = cupidBoxIterator( iter, dim, xbox->lbndxl, xbox->ubndxu, 1,
                                        status );
                   while( cupidNextIt( iter, xx, &iv, status ) ) {
                      val = din[ iv ];
@@ -437,14 +437,14 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback10)( int dim[3], int box[3],
                      }
                   }
 
-/* Now deal with cases where the pixel with the maximum value in the box 
-   will not pass out of the filter box as a consequence of updating the box to 
+/* Now deal with cases where the pixel with the maximum value in the box
+   will not pass out of the filter box as a consequence of updating the box to
    the new "ix" value. */
                } else {
 
 /* Since the old maximum value is still in the box, we need only to search
    the new pixels being added to the updated box for a maximum value. */
-                  iter = cupidBoxIterator( iter, dim, xbox->lbndxu, xbox->ubndxu, 1, 
+                  iter = cupidBoxIterator( iter, dim, xbox->lbndxu, xbox->ubndxu, 1,
                                            status );
                   while( cupidNextIt( iter, xx, &iv, status ) ) {
                      val = din[ iv ];
