@@ -1214,8 +1214,6 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
                     const char *state, const char *dattype, const int ndims,
                     const int *lbnd, const int *ubnd, int *status );
 
-int smf_get_nthread( int *status );
-
 dim_t smf_get_padding( AstKeyMap *keymap, int report,const smfHead *hdr,
                        int *status );
 

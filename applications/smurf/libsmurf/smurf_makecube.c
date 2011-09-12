@@ -1049,7 +1049,7 @@ void smurf_makecube( int *status ) {
 
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
-   wf = thrGetWorkforce( smf_get_nthread( status ), status );
+   wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
 
 /* Get a group of input files */
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );

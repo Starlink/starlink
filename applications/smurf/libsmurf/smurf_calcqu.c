@@ -278,7 +278,7 @@ void smurf_calcqu( int *status ) {
 
 /* Find the number of cores/processors available and create a work force
    holding the same number of threads. */
-   wf = thrGetWorkforce( smf_get_nthread( status ), status );
+   wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
 
 /* Get a group of input files */
    kpg1Rgndf( "IN", 0, 1, "  Give more NDFs...", &igrp, &ssize, status );

@@ -256,6 +256,10 @@
 /* Define the message reporting level to see timer messages */
 #define SMF__TIMER_MSG MSG__DEBUG
 
+/* The name of the environment variable used to get the number of worker
+threads to use. */
+#define SMF__THREADS "SMURF_THREADS"
+
 /* Different data types supported by SMURF */
 typedef enum smf_dtype {
   SMF__NULL,

@@ -355,7 +355,7 @@ void smurf_calcnoise( int *status ) {
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = thrGetWorkforce( smf_get_nthread( status ), status );
+  wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
 
   /* Get frequency range of interest for white noise measurement */
   parGdr1d( "FREQ", 2, freqdef, 0.0, 50.0, 1, freqs, status );

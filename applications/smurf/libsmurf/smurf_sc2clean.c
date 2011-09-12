@@ -271,7 +271,7 @@ void smurf_sc2clean( int *status ) {
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = thrGetWorkforce( smf_get_nthread( status ), status );
+  wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
 
   /* Read the input file */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
