@@ -110,9 +110,10 @@
 *        - Added thrGetWorkforce.
 *        - Workers now executes each job in a new AST context
 *     12-SEP-2011 (DSB):
-*        Moved from smurf (smf_threads.c) to a separate library. Symbol
+*        - Moved from smurf (smf_threads.c) to a separate library. Symbol
 *        names changed to use standard starlink formats (i.e. Capitals
 *        instead of underscores).
+*        - Incorporated the smf_get_nthread function (now thrGetNThread).
 */
 
 
@@ -124,11 +125,12 @@
 #include <string.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 /* Starlink include files */
 #include "ast.h"
 #include "sae_par.h"
-#include "ems.h"
+#include "mers.h"
 #include "ems_par.h"
 
 /* Definition of the public interface of this module */
@@ -805,6 +807,93 @@ void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status ){
 
 /* Return the required pointer. */
    return ( *status == SAI__OK ) ? job->data : NULL;
+}
+
+int thrGetNThread( const char *env, int *status ){
+/*
+*  Name:
+*     thrGetNThread
+
+*  Purpose:
+*     Determine the number of threads to use.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "thr.h"
+*     int thrGetNThread( const char *env, int *status );
+
+*  Arguments:
+*     env = const char * (Given)
+*        Pointer to the name of an environment variable which should be
+*        used to get the number of threads (e.g. "SMURF_THREADS").
+*     status = int* (Given and Returned)
+*        Pointer to inherited status.
+
+*  Returned Value:
+*     The number of threads to use. A value of 1 is returned if an error
+*     occurs.
+
+*  Description:
+*     This function returns the number of worker threads to use when
+*     dividing a task up between multiple threads. Note, a value of "1"
+*     means one worker thread in addition to the required manager thread
+*     that co-ordinates the workers (i.e. the main thread in which the
+*     application is started). The default value is the number
+*     of CPU cores available, but this can be over-ridden by setting the
+*     environment variable specified by the "env" argument to some other
+*     value.
+
+*/
+
+/* Local Variables */
+   const char *env_text = NULL;
+   int result = 1;    /* Number of threads selected */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return result;
+
+/* If the speicified environment variable has been set, use its value. */
+   env_text = getenv( env );
+   if( env_text ) {
+      result = strtol( env_text, NULL, 10 );
+      if( result < 1 ) {
+         *status = SAI__ERROR;
+         msgSetc( "S", env_text );
+         msgSetc( "E", env );
+         errRep( "", "Illegal value for environment variable ^E: '^S'.",
+                 status );
+      }
+      msgOutiff( MSG__VERB, "", "Using %d threads obtained from environment "
+                 "variable %s", status, result, env );
+
+   } else {
+#ifdef _SC_NPROCESSORS_ONLN
+/* Otherwise, use sysconf. This is fairly portable (Tru64, Linux, OSX, Solaris)
+   and supposedly POSIX compliant. */
+      result = sysconf(_SC_NPROCESSORS_ONLN);
+      msgOutiff( MSG__VERB, "", "Using %d threads derived from number of CPU cores",
+                 status, result );
+#else
+/* Otherwise, default the number of threads to 1. */
+      result = 1;
+      msgOutiff( MSG__VERB, "", "Could not determine number of thread to use; using one thread",
+                 status, result );
+#endif
+   }
+
+/* Ensure we have at least one thread. */
+   if( result < 1 ) result = 1;
+
+/* If an error has occurred, use 1 thread. */
+   if( *status != SAI__OK ) result = 1;
+
+/* Return the result */
+   return result;
 }
 
 ThrWorkForce *thrGetWorkforce( int nworker, int *status ) {

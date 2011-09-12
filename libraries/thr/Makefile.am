@@ -21,7 +21,7 @@ PUBLIC_CINCLUDES = thr.h
 TESTS = thrtest
 check_PROGRAMS = thrtest
 thrtest_SOURCES = thrtest.c
-thrtest_LDADD = libthr.la `ems_link` `ast_link`
+thrtest_LDADD = libthr.la `err_link` `ast_link`
 
 dist_pkgdata_DATA = LICENCE
 

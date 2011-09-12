@@ -116,4 +116,7 @@ void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status );
 void thrBeginJobContext( ThrWorkForce *workforce, int *status );
 void thrEndJobContext( ThrWorkForce *workforce, int *status );
 
+/* Prototypes for other public functions */
+int thrGetNThread( const char *env, int *status );
+
 #endif
