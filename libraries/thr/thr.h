@@ -114,6 +114,6 @@ int thrAddJob( ThrWorkForce *workforce, int flags, void *data,
 int thrJobWait( ThrWorkForce *workforce, int *status );
 void *thrGetJobData( int ijob, ThrWorkForce *workforce, int *status );
 void thrBeginJobContext( ThrWorkForce *workforce, int *status );
-void thrEndJobCOntext( ThrWorkForce *workforce, int *status );
+void thrEndJobContext( ThrWorkForce *workforce, int *status );
 
 #endif

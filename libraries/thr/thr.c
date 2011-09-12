@@ -397,7 +397,7 @@ void thrBeginJobContext( ThrWorkForce *workforce, int *status ){
 
 *  Description:
 *     This function indicates that all jobs created before the subsequent matching
-*     call to thrEndJobCOntext should be grouped together. This affects the
+*     call to thrEndJobContext should be grouped together. This affects the
 *     behaviour of functions thrWait and thrJobWait.
 
 */
@@ -670,10 +670,10 @@ ThrWorkForce *thrDestroyWorkforce( ThrWorkForce *workforce ) {
    return NULL;
 }
 
-void thrEndJobCOntext( ThrWorkForce *workforce, int *status ){
+void thrEndJobContext( ThrWorkForce *workforce, int *status ){
 /*
 *  Name:
-*     thrEndJobCOntext
+*     thrEndJobContext
 
 *  Purpose:
 *     End the current job context.
@@ -686,7 +686,7 @@ void thrEndJobCOntext( ThrWorkForce *workforce, int *status ){
 
 *  Invocation:
 *     #include "thr.h"
-*     void thrEndJobCOntext( ThrWorkForce *workforce, int *status )
+*     void thrEndJobContext( ThrWorkForce *workforce, int *status )
 
 *  Arguments:
 *     workforce
@@ -719,7 +719,7 @@ void thrEndJobCOntext( ThrWorkForce *workforce, int *status ){
 /* Report an error if the context depth goes negative. */
    if( workforce->condepth < 0 ) {
       *status = SAI__ERROR;
-      emsRep( "", "thrEndJobCOntext: No matching call to thrBeginJobContext.",
+      emsRep( "", "thrEndJobContext: No matching call to thrBeginJobContext.",
               status );
 
 /* Otherwise, export any remaining jobs created in the current context into the parent
