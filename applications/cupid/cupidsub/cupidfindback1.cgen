@@ -160,9 +160,22 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
    individually, the supplied RMS value may be bad, indicating that a default
    RMS value should be found and used independently for each slice. If so,
    find the RMS in the supplied array. */
-   if( rms == VAL__BADD ) {
+   if( rms == VAL__BADD && *status == SAI__OK ) {
       rms = CGEN_FUNCTION(cupidRms)( din, nel, dim[ 0 ], status );
-      msgOutiff( MSG__VERB, "", "      Using RMS=%g.", status, rms );
+
+/* If the RMS was found, report it. */
+      if( *status == SAI__OK && rms != CGEN_BAD ) {
+         msgOutiff( MSG__VERB, "", "      Using RMS=%g.", status, rms );
+
+/* If not annull th error, issue a warning, fill the returned array with
+   bad values and exit. */
+      } else {
+         if( *status != SAI__OK ) errAnnul( status );
+         msgOutiff( MSG__VERB, "", "      Cannot find RMS.", status );
+         p3 = dout;
+         for( i = 0; i < nel; i++ ) *(p3++) = CGEN_BAD;
+         return;
+      }
    }
 
 /* Filter the input data by replacing each input value by the minimum
