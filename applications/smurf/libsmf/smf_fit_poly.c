@@ -13,11 +13,11 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fit_poly( smfWorkForce *wf, smfData *data, const int order,
+*     smf_fit_poly( ThrWorkForce *wf, smfData *data, const int order,
 *                   int remove, double *poly, int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads
 *     data = smfData* (Given and Returned)
 *        Pointer to input data struct
@@ -258,7 +258,7 @@ static void smfFitPolyPar( void *job_data_ptr, int *status ) {
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fit_poly"
 
-void smf_fit_poly( smfWorkForce *wf, smfData *data, const size_t order,
+void smf_fit_poly( ThrWorkForce *wf, smfData *data, const size_t order,
                    int remove, double *poly, int *status) {
 
   /* Local variables */
@@ -364,16 +364,16 @@ void smf_fit_poly( smfWorkForce *wf, smfData *data, const size_t order,
    }
 
   /* Submit jobs to fit polynomial baselines to block of bolos */
-  smf_begin_job_context( wf, status );
+  thrBeginJobContext( wf, status );
   for( i=0; (*status==SAI__OK)&&i<njobs; i++ ) {
     pdata = job_data + i;
-    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+    pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata,
                                smfFitPolyPar, 0, NULL, status );
   }
 
   /* Wait until all of the submitted jobs have completed */
-  smf_wait( wf, status );
-  smf_end_job_context( wf, status );
+  thrWait( wf, status );
+  thrEndJobContext( wf, status );
 
   /* Free local resources. */
   job_data = astFree( job_data );

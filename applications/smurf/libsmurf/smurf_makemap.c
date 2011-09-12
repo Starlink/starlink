@@ -1149,6 +1149,7 @@
 #include "star/kaplibs.h"
 #include "star/atl.h"
 #include "star/one.h"
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -1156,7 +1157,6 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 #include "smurf_typ.h"
-#include "libsmf/smf_threads.h"
 
 #include "sc2da/sc2store_par.h"
 #include "sc2da/sc2math.h"
@@ -1253,7 +1253,7 @@ void smurf_makemap( int *status ) {
   double *weights3d = NULL;  /* Pointer to 3-D weights array */
   AstFrameSet *wcstile2d = NULL;/* WCS Frameset describing 2D spatial axes */
   int wndf = NDF__NOID;      /* NDF identifier for WEIGHTS */
-  smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+  ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
   if (*status != SAI__OK) return;
 
@@ -1268,7 +1268,7 @@ void smurf_makemap( int *status ) {
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = smf_get_workforce( smf_get_nthread( status ), status );
+  wf = thrGetWorkforce( smf_get_nthread( status ), status );
 
   /* Get group of input files */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -1741,7 +1741,7 @@ void smurf_makemap( int *status ) {
       If we close down all NDFs now, etc, we may pull the carpet out from
       underneath these running threds, resulting in them suffering a
       segmentation fault. */
-      smf_wait( wf, status );
+      thrWait( wf, status );
 
       /* If required, copy the data and variance arrays from the 3D work
          arrays into the output NDF, free the work arrays, and use the

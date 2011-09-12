@@ -152,14 +152,14 @@ void smurf_sc2pca( int *status ) {
   size_t outampsize;         /* Total number of NDF names in ocompgrp */
   size_t outcompsize;        /* Total number of NDF names in ocompgrp */
   size_t size;               /* Number of files in input group */
-  smfWorkForce *wf=NULL;     /* Pointer to a pool of worker threads */
+  ThrWorkForce *wf=NULL;     /* Pointer to a pool of worker threads */
 
   /* Main routine */
   ndfBegin();
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = smf_get_workforce( smf_get_nthread( status ), status );
+  wf = thrGetWorkforce( smf_get_nthread( status ), status );
 
   /* Get input file(s) */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );

@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_pln( smfWorkForce *wf, smfDIMMData *dat, int
+*     smf_calcmodel_pln( ThrWorkForce *wf, smfDIMMData *dat, int
 *			 chunk, AstKeyMap *keymap, smfArray
 *			 **allmodel, int flags, int *status)
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads
 *     dat = smfDIMMData * (Given)
 *        Struct of pointers to information required by model calculation
@@ -127,7 +127,7 @@ typedef struct smfCalcmodelSmoJobData {
 static void smf1_calcmodel_smo_job( void *job_data, int *status );
 
 /* Main entry point. */
-void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel,
                         int flags __attribute__((unused)),
                         int *status) {
@@ -291,10 +291,10 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
          pdata->tstride = tstride;
          pdata->tstride = tstride;
 
-         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_calcmodel_smo_job,
+         thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_calcmodel_smo_job,
                       0, NULL, status );
       }
-      smf_wait( wf, status );
+      thrWait( wf, status );
 
       /* Uncomment to aid debugging */
       /*

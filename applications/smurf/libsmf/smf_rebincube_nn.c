@@ -15,7 +15,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
+*     smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 *                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
 *                       dim_t nxy, dim_t nout, dim_t dim[3],
 *                       int badmask, int is2d, AstMapping *ssmap,
@@ -28,7 +28,7 @@
 *                       int *status );
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads that will do the re-binning.
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
@@ -227,14 +227,14 @@
 #include "prm_par.h"
 #include "star/ndg.h"
 #include "star/atl.h"
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-#include "libsmf/smf_threads.h"
 
 #define FUNC_NAME "smf_rebincube_nn"
 
-void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
+void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
                        dim_t nxy, dim_t nout, dim_t dim[3],
                        int badmask, int is2d, AstMapping *ssmap,
@@ -618,7 +618,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
 /* Add a job to the workforce's job list. This job calls smf_rebincube_paste2d
    or smf_rebincube_paste3d to paste the detector input spectrum into the
    output cube. */
-                     smf_add_job( wf, 0, detector_data + idet,
+                     thrAddJob( wf, 0, detector_data + idet,
                                   smf_rebincube_paste_thread, 0, NULL, status );
                   }
                }
@@ -630,7 +630,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
    have been pasted into the output cube. Then transfer the output values
    from the detector data structures to the returned variables. */
       if( use_threads ) {
-         smf_wait( wf, status );
+         thrWait( wf, status );
          for( idet = 0; idet < ndet; idet++ ) {
             if( detector_data[ idet ].wgt != VAL__BADD ) {
                (*nused) += detector_data[ idet ].nused;

@@ -165,7 +165,7 @@ void smurf_sc2concat( int *status ) {
   dim_t padStart=0;          /* How many samples padding at start */
   dim_t padEnd=0;            /* How many samples padding at end */
   int temp;                  /* Temporary signed integer */
-  smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+  ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
   if (*status != SAI__OK) return;
 
@@ -174,7 +174,7 @@ void smurf_sc2concat( int *status ) {
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = smf_get_workforce( smf_get_nthread( status ), status );
+  wf = thrGetWorkforce( smf_get_nthread( status ), status );
 
   /* Read the input file */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &isize, status );

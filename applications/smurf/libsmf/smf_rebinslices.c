@@ -25,7 +25,7 @@
 *  Description:
 *     This function uses astRebinSeq to paste all time slices in the
 *     current input NDF into the output image, using a simple regridding
-*     of data. This routine is designed to be used with the smf_add_job
+*     of data. This routine is designed to be used with the thrAddJob
 *     routine.
 
 *  Authors:

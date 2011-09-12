@@ -13,7 +13,7 @@
  *     C function
 
  *  Invocation:
- *     smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
+ *     smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
  *                          const smfArray *darks, const smfArray *bbms,
  *                          const smfArray *flatramps, AstKeyMap * heateffmap,
  *                          size_t whichchunk, int ensureflat, int isTordered,
@@ -24,7 +24,7 @@
  *                          int *status )
 
  *  Arguments:
- *     wf = smfWorkForce * (Given)
+ *     wf = ThrWorkForce * (Given)
  *        Pointer to a pool of worker threads (can be NULL)
  *     igrp = const smfGroup* (Given)
  *        Group of input data files
@@ -274,7 +274,7 @@
 
 #define FUNC_NAME "smf_concat_smfGroup"
 
-void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
+void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
                           const smfArray *darks, const smfArray *bbms,
                           const smfArray *flatramps, AstKeyMap * heateffmap,
                           size_t whichchunk, int ensureflat, int isTordered,
@@ -968,7 +968,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
            smfData for use by this thread, and use it in place of the
            previous smfData pointer. */
         if( j < lastpiece ) {
-           smf_wait( wf, status );
+           thrWait( wf, status );
            smf_lock_data( tmpdata_next, 1, status );
            tmpdata = tmpdata_next;
         }

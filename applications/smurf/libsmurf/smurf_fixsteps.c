@@ -216,7 +216,7 @@ void smurf_fixsteps( int *status ) {
    smfData *indata = NULL;   /* Input smfData */
    smfStepFix *newsteps = NULL; /* New step fix descriptions */
    smfStepFix *oldsteps = NULL; /* Old step fix descriptions */
-   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
+   ThrWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
 
 /* Check inherited status */
    if (*status != SAI__OK) return;
@@ -280,7 +280,7 @@ void smurf_fixsteps( int *status ) {
 
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
-   wf = smf_get_workforce( smf_get_nthread( status ), status );
+   wf = thrGetWorkforce( smf_get_nthread( status ), status );
 
 /* Fix the steps. */
    smf_fix_steps( wf, data, dcthresh, dcsmooth, dcfitbox, dcmaxsteps,

@@ -14,13 +14,13 @@
 *     C function
 
 *  Invocation:
-*     int smf_find_gains( smfWorkForce *wf, smfData *data,
+*     int smf_find_gains( ThrWorkForce *wf, smfData *data,
 *                         double *template, AstKeyMap *keymap,
 *                         smf_qual_t goodqual, smf_qual_t badqual,
 *                         smfData *gain, int *nrej, int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        The input data. Each bolometer time series will be compared to
@@ -241,7 +241,7 @@ static void smf1_find_gains_job( void *job_data, int *status );
 
 
 /* Main entry */
-int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
+int smf_find_gains( ThrWorkForce *wf, smfData *data, double *template,
                     AstKeyMap *keymap, smf_qual_t goodqual,
                     smf_qual_t badqual,
                     smfData *gain, int *nrej, int *status ){
@@ -490,10 +490,10 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
          pdata->tstride = tstride;
          pdata->converged = converged;
 
-         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_find_gains_job, 0, NULL,
+         thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_find_gains_job, 0, NULL,
                       status );
       }
-      smf_wait( wf, status );
+      thrWait( wf, status );
 
 /* For debugging purposes, we record the reasons why any bolo-blocks are
    rejected. Initialise the number of bolo-blocks rejected for each

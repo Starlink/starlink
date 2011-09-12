@@ -13,12 +13,12 @@
 *     C function
 
 *  Invocation:
-*     void smf_calc_qu( smfWorkForce *wf, smfData *data, int block_start,
+*     void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
 *                       int block_end, int ipolcrd, int qplace, int uplace,
 *                       NdgProvenance *oprov, AstFitsChan *fc, int *status );
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        Pointer to the time series data.
@@ -123,7 +123,7 @@ static void smf1_calc_qu_job( void *job_data, int *status );
 
 
 
-void smf_calc_qu( smfWorkForce *wf, smfData *data, int block_start,
+void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
                   int block_end, int ipolcrd, int qplace, int uplace,
                   NdgProvenance *oprov, AstFitsChan *fc, int *status ){
 
@@ -247,12 +247,12 @@ void smf_calc_qu( smfWorkForce *wf, smfData *data, int block_start,
          pdata->block_end = block_end;
 
 /* Pass the job to the workforce for execution. */
-         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_calc_qu_job, 0, NULL,
+         thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_calc_qu_job, 0, NULL,
                       status );
       }
 
 /* Wait for the workforce to complete all jobs. */
-      smf_wait( wf, status );
+      thrWait( wf, status );
    }
 
 /* Free the two output NDFs. */

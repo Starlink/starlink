@@ -26,7 +26,7 @@
 *  Description:
 *     This function invokes smf_rebincube_paste2d or smf_rebincube_paste3d
 *     from within a new thread. See smf_rebincube_nn. The API for this
-*     function is dictated by the smf_add_job function, so information
+*     function is dictated by the thrAddJob function, so information
 *     needed for smf_rebincube_paste2d/3d is passed into this function
 *     within a smfRebincubeNNArgs2 structure.
 

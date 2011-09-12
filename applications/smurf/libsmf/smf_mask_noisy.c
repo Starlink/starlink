@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
+*     smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
 *                     double sigcliphigh, double sigcliplow, int cliplog,
 *                     int zeropad, int * status );
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads. Can be NULL.
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
@@ -111,7 +111,7 @@
 
 #define FUNC_NAME "smf_mask_noise"
 
-void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
+void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
                      double sigcliphigh, double sigcliplow, int cliplog,
                      int zeropad, int * status ) {
 

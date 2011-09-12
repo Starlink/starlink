@@ -14,14 +14,14 @@
 *     C function
 
 *  Invocation:
-*     int smf_find_gains_array( smfWorkForce *wf, smfArray *data,
+*     int smf_find_gains_array( ThrWorkForce *wf, smfArray *data,
 *                               double *template, AstKeyMap *keymap,
 *                               smf_qual_t goodqual, smf_qual_t badqual,
 *                               smfArray *gain,
 *                               int *nrej, int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfArray * (Given)
 *        The input data. Each bolometer time series will be compared to
@@ -189,7 +189,7 @@
 #include "libsmf/smf_typ.h"
 
 /* Main entry */
-int smf_find_gains_array( smfWorkForce *wf, smfArray *data, double *template,
+int smf_find_gains_array( ThrWorkForce *wf, smfArray *data, double *template,
                           AstKeyMap *keymap, smf_qual_t goodqual,
                           smf_qual_t badqual,
                           smfArray *gain, int *nrej, int *status ){

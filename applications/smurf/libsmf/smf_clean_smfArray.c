@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
+*     smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
 *                         smfArray **noisemaps, smfArray **com, smfArray **gai,
 *                         AstKeyMap *keymap, int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads. Can be NULL.
 *     array = smfArray * (Given and Returned)
 *        The data that will be cleaned
@@ -151,12 +151,12 @@
 
 #define FUNC_NAME "smf_clean_smfArray"
 
-void smf__noisymask( smfWorkForce *wf, smfData *data, smfArray **noisemaps,
+void smf__noisymask( ThrWorkForce *wf, smfData *data, smfArray **noisemaps,
                      double noisecliphigh, double noisecliplow,
                      int zeropad, struct timeval *tv1,
                      struct timeval *tv2, int *status );
 
-void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
+void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                          smfArray **noisemaps, smfArray **com, smfArray **gai,
                          AstKeyMap *keymap, int *status ) {
 
@@ -524,7 +524,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
 }
 
 /* Private function for carrying out the noisy bolometer masking */
-void smf__noisymask( smfWorkForce *wf, smfData *data, smfArray **noisemaps,
+void smf__noisymask( ThrWorkForce *wf, smfData *data, smfArray **noisemaps,
                      double noisecliphigh, double noisecliplow,
                      int zeropad, struct timeval *tv1,
                      struct timeval *tv2, int *status ) {

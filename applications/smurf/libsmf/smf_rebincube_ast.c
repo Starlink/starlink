@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
+*     smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
 *                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
 *                        dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3],
 *                        AstMapping *ssmap, AstSkyFrame *abskyfrm,
@@ -26,7 +26,7 @@
 *                        int *status );
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads that will do the re-binning.
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
@@ -209,17 +209,17 @@
 #include "prm_par.h"
 #include "star/ndg.h"
 #include "star/atl.h"
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-#include "libsmf/smf_threads.h"
 
 #define FUNC_NAME "smf_rebincube_ast"
 
 #define MAXTHREADS 20
 
 
-void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
+void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
                       dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3],
                       AstMapping *ssmap, AstSkyFrame *abskyfrm,

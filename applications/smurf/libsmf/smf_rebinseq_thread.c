@@ -24,8 +24,8 @@
 
 *  Description:
 *     This function invokes astRebinSeqF or astRebinSeqF from within a
-*     new thread. The API for this function is dictated by the smf_add_job
-*     function (in smf_threads.c), so information needed for astRebinSeq
+*     new thread. The API for this function is dictated by the
+*     thrAddJob function, so information needed for astRebinSeq
 *     is passed into this function within a smfRebinSeqArgs structure.
 
 *  Authors:

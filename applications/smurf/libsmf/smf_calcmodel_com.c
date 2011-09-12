@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int
+*     smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int
 *			 chunk, AstKeyMap *keymap, smfArray
 *			 **allmodel, int flags, int *status)
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads
 *     dat = smfDIMMData * (Given)
 *        Struct of pointers to information required by model calculation
@@ -500,7 +500,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_calcmodel_com"
 
-void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status) {
 
@@ -881,11 +881,11 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       for( ii=0; ii<nw; ii++ ) {
         /* Submit the job */
         pdata = job_data + ii;
-        pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+        pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata,
                                    smfCalcmodelComPar, 0, NULL, status );
       }
       /* Wait until all of the submitted jobs have completed */
-      smf_wait( wf, status );
+      thrWait( wf, status );
     }
 
 
@@ -970,11 +970,11 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         for( ii=0; ii<nw; ii++ ) {
           /* Submit the job */
           pdata = job_data + ii;
-          pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+          pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata,
                                      smfCalcmodelComPar, 0, NULL, status );
         }
 
-        smf_wait( wf, status );
+        thrWait( wf, status );
       }
 
       /* Re-normalize the model, or set model bad if no data. */

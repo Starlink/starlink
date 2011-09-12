@@ -1359,7 +1359,7 @@ static char * smf__read_ocsconfig ( int ndfid, int *status) {
 }
 
 
-void smf_open_file_job( smfWorkForce *wf, int wait, const Grp *grp,
+void smf_open_file_job( ThrWorkForce *wf, int wait, const Grp *grp,
                         size_t index, const char *mode, int flags,
                         smfData **data, int *status ) {
 /*
@@ -1377,14 +1377,14 @@ void smf_open_file_job( smfWorkForce *wf, int wait, const Grp *grp,
  *     Library routine
 
  *  Invocation:
- *     smf_open_file_job( smfWorkForce *wf, int wait, const Grp *grp,
+ *     smf_open_file_job( ThrWorkForce *wf, int wait, const Grp *grp,
  *                        size_t index, const char *mode, int flags,
  *                        smfData **data, int *status )
 
  *  Arguments:
- *     wf = smfWorkForce *wf
+ *     wf = ThrWorkForce *wf
  *        Workforce to use.
- *     wait = smfWorkForce *wf
+ *     wait = ThrWorkForce *wf
  *        Should this function wait until the job has completed before
  *        returning? If not, the job is added to the current job context
  *        and the function returns immediately. Note, if "wait" is zero,
@@ -1424,7 +1424,7 @@ void smf_open_file_job( smfWorkForce *wf, int wait, const Grp *grp,
    if( *status == SAI__OK ) {
 
 /* begin a new job context. */
-      smf_begin_job_context( wf, status );
+      thrBeginJobContext( wf, status );
 
 /* Store the values needed by the smf_open_file function. */
       pdata->grp = grp;
@@ -1435,18 +1435,18 @@ void smf_open_file_job( smfWorkForce *wf, int wait, const Grp *grp,
 
 /* Submit the job, telling it to free the job data (i.e. "pdata") when the
    job is completed. */
-      smf_add_job( wf, SMF__FREE_JOBDATA, pdata, smf1_open_file_caller, 0,
+      thrAddJob( wf, THR__FREE_JOBDATA, pdata, smf1_open_file_caller, 0,
                    NULL, status );
 
 /* If required, wait for the job to complete and then lock the AST
    objects for access by the current thread. */
       if( wait ) {
-         smf_wait( wf, status );
+         thrWait( wf, status );
          smf_lock_data( *data, 1, status );
       }
 
 /* End the current job context. */
-      smf_end_job_context( wf, status );
+      thrEndJobContext( wf, status );
    }
 }
 

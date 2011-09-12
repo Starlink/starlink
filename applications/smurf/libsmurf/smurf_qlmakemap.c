@@ -362,7 +362,7 @@ void smurf_qlmakemap( int *status ) {
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance = NULL;     /* Pointer to the variance map */
   double *weights = NULL;    /* Pointer to the weights array */
-  smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+  ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
   if (*status != SAI__OK) return;
 
@@ -377,7 +377,7 @@ void smurf_qlmakemap( int *status ) {
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = smf_get_workforce( smf_get_nthread( status ), status );
+  wf = thrGetWorkforce( smf_get_nthread( status ), status );
 
   /* Get group of input files */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -567,7 +567,7 @@ void smurf_qlmakemap( int *status ) {
      If we close down all NDFs now, etc, we may pull the carpet out from
      underneath these running threds, resulting in them suffering a
      segmentation fault. */
-  smf_wait( wf, status );
+  thrWait( wf, status );
 
   overallmeansky /= (double)size;
   parPut0d("MEANSKY", overallmeansky, status);

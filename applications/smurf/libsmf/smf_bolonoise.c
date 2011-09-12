@@ -13,14 +13,14 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_bolonoise( smfWorkForce *wf, smfData *data,
+*     smf_bolonoise( ThrWorkForce *wf, smfData *data,
 *                    size_t window, double f_low,
 *                    double f_white1, double f_white2,
 *                    int nep, size_t len, double *whitenoise, double *fratio,
 *                    smfData **fftpow, int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        Pointer to the input smfData.
@@ -156,7 +156,7 @@
 
 #define FUNC_NAME "smf_bolonoise"
 
-void smf_bolonoise( smfWorkForce *wf, smfData *data,
+void smf_bolonoise( ThrWorkForce *wf, smfData *data,
                     size_t window, double f_low,
                     double f_white1, double f_white2,
                     int nep, size_t len, double *whitenoise, double *fratio,

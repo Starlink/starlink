@@ -267,7 +267,7 @@ void smurf_calcqu( int *status ) {
    smfData *data = NULL;      /* Concatenated data for one subarray */
    smfData *dkdata = NULL;    /* Concatenated dark squid data for one subarray */
    smfGroup *sgroup = NULL;   /* smfGroup corresponding to sgrp */
-   smfWorkForce *wf;          /* Pointer to a pool of worker threads */
+   ThrWorkForce *wf;          /* Pointer to a pool of worker threads */
 
 /* Check inhereited status */
    if( *status != SAI__OK ) return;
@@ -278,7 +278,7 @@ void smurf_calcqu( int *status ) {
 
 /* Find the number of cores/processors available and create a work force
    holding the same number of threads. */
-   wf = smf_get_workforce( smf_get_nthread( status ), status );
+   wf = thrGetWorkforce( smf_get_nthread( status ), status );
 
 /* Get a group of input files */
    kpg1Rgndf( "IN", 0, 1, "  Give more NDFs...", &igrp, &ssize, status );

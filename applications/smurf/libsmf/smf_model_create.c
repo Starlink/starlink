@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
+*     smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 *                       smfArray **iarray, const smfArray *darks,
 *                       const smfArray *bbms, const smfArray* flatramps,
 *                       AstKeyMap * heateffmap, const smfArray *noisemaps, dim_t nchunks,
@@ -24,7 +24,7 @@
 *                       int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     igroup = const smfGroup * (Given)
 *        NDG group identifier for input template files
@@ -262,7 +262,7 @@
 
 #define FUNC_NAME "smf_model_create"
 
-void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
+void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        smfArray **iarray, const smfArray *darks,
                        const smfArray *bbms, const smfArray *flatramps,
                        AstKeyMap * heateffmap, const smfArray *noisemaps,

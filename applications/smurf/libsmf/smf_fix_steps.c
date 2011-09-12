@@ -13,13 +13,13 @@
 *     C function
 
 *  Invocation:
-*     void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
+*     void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
 *                         dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
 *                         int dclimcorr, size_t *nrej, smfStepFix **steps,
 *                         int *nsteps, int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data that will be repaired (in-place). Locations of steps
@@ -353,7 +353,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status );
 
 /* Main entry point. */
 
-void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
+void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
                     dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
                     int dclimcorr, size_t *nrej, smfStepFix **steps,
                     int *nstep, int *status ) {
@@ -526,12 +526,12 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
                          NULL;
 
 /* Pass the job to the workforce for execution. */
-         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_fix_steps_job, 0, NULL,
+         thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_fix_steps_job, 0, NULL,
                       status );
       }
 
 /* Wait for the workforce to complete all jobs. */
-      smf_wait( wf, status );
+      thrWait( wf, status );
 
 /* Accumuate the returned values from each thread. */
       for( iworker = 0; iworker < nworker; iworker++ ) {
@@ -571,12 +571,12 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
          for( iworker = 0; iworker < nworker; iworker++ ) {
             pdata = job_data + iworker;
             pdata->bcount = bcount;
-            smf_add_job( wf, SMF__REPORT_JOB, pdata,
+            thrAddJob( wf, THR__REPORT_JOB, pdata,
                          smf1_fix_correlated_steps_job, 0, NULL, status );
          }
 
 /* Wait for the workforce to complete all jobs. */
-         smf_wait( wf, status );
+         thrWait( wf, status );
 
 /* Accumuate the returned values from each thread. */
          for( iworker = 0; iworker < nworker; iworker++ ) {

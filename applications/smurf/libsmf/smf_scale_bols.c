@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     void smf_scale_bols( smfWorkForce *wf, smfData *data, const smfData * scaledata,
+*     void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
 *                          const char *path, const char *param, int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be corrected (in-place).
@@ -109,7 +109,7 @@ typedef struct smfScaleBolsJobData {
 static void smf1_scale_bols_job( void *job_data, int *status );
 
 
-void smf_scale_bols( smfWorkForce *wf, smfData *data, const smfData * scaledata,
+void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
                      const char *path, const char *param, int *status ){
 
 /* Local Variables */
@@ -234,12 +234,12 @@ void smf_scale_bols( smfWorkForce *wf, smfData *data, const smfData * scaledata,
          pdata->corr = corr;
 
 /* Pass the job to the workforce for execution. */
-         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_scale_bols_job, 0, NULL,
+         thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_scale_bols_job, 0, NULL,
                       status );
       }
 
 /* Wait for the workforce to complete all jobs. */
-      smf_wait( wf, status );
+      thrWait( wf, status );
    }
 
 /* Free resources. */

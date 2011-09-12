@@ -14,11 +14,11 @@
 
 *  Invocation:
 
-*     smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
+*     smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
 *                         int complement, int whiten, int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be filtered (performed in-place)
@@ -37,7 +37,7 @@
 *  Description:
 *     Filter a smfData. If a pool of threads is supplied (wf), this routine
 *     will filter multiple blocks of bolometers in parallel. If a NULL pointer
-*     is supplied smf_filter_execute will not use any of the smf_threads
+*     is supplied smf_filter_execute will not use any of the "thr" threads
 *     routines. However, this function is thread safe, so that
 *     smf_filter_execute can be called as part of a higher-level parallelized
 *     routine in this case.
@@ -493,7 +493,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_filter_execute"
 
-void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
+void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
                          int complement, int whiten, int *status ) {
 
   /* Local Variables */
@@ -641,7 +641,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
 
     /* Setup forward FFT plan using guru interface. Requires protection
        with a mutex */
-    smf_mutex_lock( &smf_filter_execute_mutex, status );
+    thrMutexLock( &smf_filter_execute_mutex, status );
 
     if( *status == SAI__OK ) {
       /* Just use the data_fft_* arrays from the first chunk of job data since
@@ -655,7 +655,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
                                                           FFTW_UNALIGNED );
     }
 
-    smf_mutex_unlock( &smf_filter_execute_mutex, status );
+    thrMutexUnlock( &smf_filter_execute_mutex, status );
 
     if( !pdata->plan_forward && (*status == SAI__OK) ) {
       *status = SAI__ERROR;
@@ -665,7 +665,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
     }
 
     /* Setup inverse FFT plan using guru interface */
-    smf_mutex_lock( &smf_filter_execute_mutex, status );
+    thrMutexLock( &smf_filter_execute_mutex, status );
 
     if( *status == SAI__OK ) {
       pdata->plan_inverse = fftw_plan_guru_split_dft_c2r( 1, &dims, 0, NULL,
@@ -676,7 +676,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
                                                           FFTW_UNALIGNED);
     }
 
-    smf_mutex_unlock( &smf_filter_execute_mutex, status );
+    thrMutexUnlock( &smf_filter_execute_mutex, status );
 
     if( !pdata->plan_inverse && (*status==SAI__OK) ) {
       *status = SAI__ERROR;
@@ -690,13 +690,13 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
   /* Execute the filter */
   for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
     pdata = job_data + i;
-    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+    pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata,
                                smfFilterExecuteParallel, 0,
                                NULL, status );
   }
 
   /* Wait until all of the submitted jobs have completed */
-  smf_wait( wf, status );
+  thrWait( wf, status );
 
   /* Clean up the job data array */
   if( job_data ) {
@@ -706,10 +706,10 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
       if( pdata->data_fft_i ) pdata->data_fft_i = astFree( pdata->data_fft_i );
 
       /* Destroy the plans */
-      smf_mutex_lock( &smf_filter_execute_mutex, status );
+      thrMutexLock( &smf_filter_execute_mutex, status );
       fftw_destroy_plan( pdata->plan_forward );
       fftw_destroy_plan( pdata->plan_inverse );
-      smf_mutex_unlock( &smf_filter_execute_mutex, status );
+      thrMutexUnlock( &smf_filter_execute_mutex, status );
     }
     job_data = astFree( job_data );
   }

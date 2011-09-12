@@ -341,7 +341,7 @@ void smurf_calcnoise( int *status ) {
   size_t size;              /* Number of files in input group */
   AstKeyMap *sub_instruments=NULL; /* KeyMap holding subinstrument names */
   Grp *tsgrp = NULL;        /* Group for output cleaned time-series */
-  smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
+  ThrWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
   int zeropad;              /* Pad with zeros before FFTing? */
   double f_low = 0.5;       /* Frequency to use for noise ratio image */
   double freqdef[] = { SMF__F_WHITELO,
@@ -355,7 +355,7 @@ void smurf_calcnoise( int *status ) {
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = smf_get_workforce( smf_get_nthread( status ), status );
+  wf = thrGetWorkforce( smf_get_nthread( status ), status );
 
   /* Get frequency range of interest for white noise measurement */
   parGdr1d( "FREQ", 2, freqdef, 0.0, 50.0, 1, freqs, status );

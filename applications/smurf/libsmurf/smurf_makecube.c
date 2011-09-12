@@ -898,14 +898,13 @@
 #include "star/grp.h"
 #include "star/atl.h"
 #include "star/kaplibs.h"
-
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
 #include "smurflib.h"
 #include "libsmf/smf.h"
 #include "libsmf/smf_typ.h"
-#include "libsmf/smf_threads.h"
 
 #define FUNC_NAME "smurf_makecube"
 #define TASK_NAME "MAKECUBE"
@@ -1029,7 +1028,7 @@ void smurf_makecube( int *status ) {
    smfFile *file = NULL;      /* Pointer to data file struct */
    smfTile *tile = NULL;      /* Pointer to next output tile description */
    smfTile *tiles = NULL;     /* Pointer to array of output tile descriptions */
-   smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+   ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
    void *data_array = NULL;   /* Pointer to the rebinned map data */
    void *wgt_array = NULL;    /* Pointer to the weights map */
 
@@ -1050,7 +1049,7 @@ void smurf_makecube( int *status ) {
 
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
-   wf = smf_get_workforce( smf_get_nthread( status ), status );
+   wf = thrGetWorkforce( smf_get_nthread( status ), status );
 
 /* Get a group of input files */
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );

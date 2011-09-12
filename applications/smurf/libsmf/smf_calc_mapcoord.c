@@ -14,12 +14,12 @@
 *     C function
 
 *  Invocation:
-*     smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
+*     smf_calc_mapcoord( ThrWorkForce *wf, smfData *data, AstFrameSet *outfset,
 *                        int moving, int *lbnd_out, int *ubnd_out, int flags,
 *                        int tstep, int *status );
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData* (Given)
 *        Pointer to smfData struct
@@ -90,7 +90,7 @@
 *     2010-09-21 (COBA):
 *        Add SMF__NOCREATE_FTS
 *     2011-04-08 (DSB):
-*        Ensure smf_wait does not wait for jobs created earlier within the
+*        Ensure thrWait does not wait for jobs created earlier within the
 *        calling function.
 
 *  Notes:
@@ -250,7 +250,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_calc_mapcoord"
 
-void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
+void smf_calc_mapcoord( ThrWorkForce *wf, smfData *data, AstFrameSet *outfset,
                         int moving, int *lbnd_out, int *ubnd_out, int flags,
                         int tstep, int *status ) {
 
@@ -500,10 +500,10 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
 
       /* --- Begin parellelized portion ------------------------------------ */
 
-      /* Start a new job context. Each call to smf_wait within this
+      /* Start a new job context. Each call to thrWait within this
          context will wait until all jobs created within the context have
-         completed. Jobs created in higher contexts are ignored by smf_wait. */
-      smf_begin_job_context( wf, status );
+         completed. Jobs created in higher contexts are ignored by thrWait. */
+      thrBeginJobContext( wf, status );
 
       /* Allocate job data for threads */
       job_data = astCalloc( nw, sizeof(*job_data) );
@@ -563,17 +563,17 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
         for( ii=0; ii<nw; ii++ ) {
           /* Submit the job */
           pdata = job_data + ii;
-          pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+          pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata,
                                      smfCalcMapcoordPar, 0, NULL, status );
         }
 
         /* Wait until all of the jobs submitted within the current job
            context have completed */
-        smf_wait( wf, status );
+        thrWait( wf, status );
       }
 
       /* End the current job context. */
-      smf_end_job_context( wf, status );
+      thrEndJobContext( wf, status );
 
       /* --- End parellelized portion -------------------------------------- */
 

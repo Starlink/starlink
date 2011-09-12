@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_spikes( smfWorkForce *wf, smfData *data, smf_qual_t mask,
+*     smf_flag_spikes( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
 *                       double thresh, size_t box, size_t *nflagged,
 *                       int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged. Locations of spikes
@@ -562,7 +562,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_flag_spikes"
 
-void smf_flag_spikes( smfWorkForce *wf, smfData *data, smf_qual_t mask,
+void smf_flag_spikes( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
                       double thresh, size_t box, size_t *nflagged,
                       int *status ){
 
@@ -685,16 +685,16 @@ void smf_flag_spikes( smfWorkForce *wf, smfData *data, smf_qual_t mask,
    }
 
 /* Submit jobs to find spikes in each block of bolos */
-   smf_begin_job_context( wf, status );
+   thrBeginJobContext( wf, status );
    for( i=0; (*status==SAI__OK)&&i<njobs; i++ ) {
      pdata = job_data + i;
-     pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+     pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata,
                                 smfFlagSpikesPar, 0, NULL, status );
    }
 
 /* Wait until all of the submitted jobs have completed */
-   smf_wait( wf, status );
-   smf_end_job_context( wf, status );
+   thrWait( wf, status );
+   thrEndJobContext( wf, status );
 
 /* Count flagged samples from all of the jobs and free resources */
    nflag=0;

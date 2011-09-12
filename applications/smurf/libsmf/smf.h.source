@@ -437,9 +437,9 @@
 #include <stdint.h>      /* for int64_t */
 
 #include "ast.h"
+#include "star/thr.h"
 #include "jcmt/state.h"  /* for inst_t */
 #include "smurf_typ.h"
-#include "smf_threads.h"
 #include "smurf_par.h"
 #include "star/grp.h"
 #include "star/ndg.h"
@@ -545,7 +545,7 @@ void smf_apply_mask( smfData *indata,
 
 int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror, int *status );
 
-void smf_bolonoise( smfWorkForce *wf, smfData *data,
+void smf_bolonoise( ThrWorkForce *wf, smfData *data,
                     size_t window, double f_low,
                     double f_white1, double f_white2,
                     int nep, size_t len, double *whitenoise, double *fratio,
@@ -558,7 +558,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
                       AstMapping **specmap, AstFrame **specframe,
                       int *status );
 
-void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
+void smf_calc_mapcoord( ThrWorkForce *wf, smfData *data, AstFrameSet *outfset,
                         int moving, int *lbnd_out, int *ubnd_out, int flags,
                         int tstep, int *status );
 
@@ -573,7 +573,7 @@ void smf_calc_mmapsize( size_t headsize, const smfData * data,
 
 void smf_calc_mode( smfHead * hdr, int * status );
 
-void smf_calc_qu( smfWorkForce *wf, smfData *data, int block_start, int block_end,
+void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start, int block_end,
                   int ipolcrd, int qplace, int uplace, NdgProvenance *oprov,
                   AstFitsChan *fc, int *status );
 
@@ -604,47 +604,47 @@ float smf_calc_telres( AstFitsChan *hdr, int *status );
 double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int *status );
 
 
-void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status);
 
-void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status);
 
-void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_dks( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status);
 
-void smf_calcmodel_ext( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_ext( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
-void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
-void smf_calcmodel_gai( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_gai( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status);
 
-void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status);
 
-void smf_calcmodel_pln( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_pln( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
-void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
-void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_tmp( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
-void smf_calcmodel_two( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_two( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
@@ -707,11 +707,11 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window,
                         smfData *model, int calcdk, int nofit, int replacebad,
                         int *status );
 
-void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
+void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
                     smfData **components, smfData **amplitudes, int flagbad,
                     AstKeyMap *keymap, int *status );
 
-void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
+void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                          smfArray **noisemaps, smfArray **com, smfArray **gai,
                          AstKeyMap *keymap, int *status );
 
@@ -741,7 +741,7 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
                            double snrlim, int flagconst, smf_dtype dtype,
                            smfData **outdata, int *status );
 
-void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
+void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
                           const smfArray *darks, const smfArray *bpms,
                           const smfArray *flatramps, AstKeyMap * heateffmap,
                           size_t whichchunk, int ensureflat, int isTordered,
@@ -956,17 +956,17 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
 
 void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status );
 
-smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
+smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
                        size_t len, int *status );
 
-void  smf_fillgaps( smfWorkForce *wf, smfData *data,
+void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
                     smf_qual_t mask, int *status );
 
 void smf_filter_complement( smfFilter *filt, int *status );
 
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 
-void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
+void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
                          int complement, int whiten, int *status );
 
 void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
@@ -993,11 +993,11 @@ int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status );
 void smf_find_dateobs(  const smfHead * hdr, double *dateobs,
                         double *dateend, int *status);
 
-int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
+int smf_find_gains( ThrWorkForce *wf, smfData *data, double *template,
                     AstKeyMap *keymap, smf_qual_t goodqual, smf_qual_t badqual,
                     smfData *gai, int *nrej, int *status );
 
-int smf_find_gains_array( smfWorkForce *wf, smfArray *data, double *template,
+int smf_find_gains_array( ThrWorkForce *wf, smfArray *data, double *template,
                           AstKeyMap *keymap, smf_qual_t goodqual,
                           smf_qual_t badqual,
                           smfArray *gain, int *nrej, int *status );
@@ -1019,7 +1019,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
                          double **bincen, dim_t *nbin, int **whichbin,
                          int *status );
 
-void smf_fit_poly( smfWorkForce *wf, smfData *data, const size_t order,
+void smf_fit_poly( ThrWorkForce *wf, smfData *data, const size_t order,
                    int remove, double *poly, int *status);
 
 void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
@@ -1078,11 +1078,11 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
                          size_t *nflagged, double *average_speed,
                          int *status );
 
-void smf_flag_spikes( smfWorkForce *wf, smfData *data, smf_qual_t mask,
+void smf_flag_spikes( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
                       double thresh, size_t box, size_t *nflagged,
                       int *status );
 
-void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
+void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
                     dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
                     int dclimcorr, size_t *nrej, smfStepFix **steps,
                     int *nstep, int *status );
@@ -1289,7 +1289,7 @@ int smf_isdark( const smfData *data, int * status );
 int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo,
                dim_t *nf, int *status );
 
-void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
+void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,
                      const Grp *flagrootgrp, const Grp *samprootgrp,
                      AstKeyMap *keymap,
@@ -1340,7 +1340,7 @@ void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
                            AstFrameSet **outframeset, int *moving,
                            int *status );
 
-void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
+void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
                      double sigcliphigh, double sigcliplow, int cliplog,
                      int zeropad, int * status );
 
@@ -1352,7 +1352,7 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         smf_qual_t mask, double *out, double *w1,
                         size_t *w2, int *w3, int *status );
 
-void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
+void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        smfArray **iarray, const smfArray *darks,
                        const smfArray *bbms, const smfArray *flatramps,
                        AstKeyMap * heateffmap, const smfArray *noisemaps,
@@ -1402,7 +1402,7 @@ void smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
 void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                     int withHdr, smfData ** data, int *status);
 
-void smf_open_file_job( smfWorkForce *wf, int wait, const Grp *igrp,
+void smf_open_file_job( ThrWorkForce *wf, int wait, const Grp *igrp,
                         size_t index, const char *mode, int flags,
                         smfData **data, int *status );
 
@@ -1496,7 +1496,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
                               AstMapping *oskymap, int moving,
                               int *status );
 
-void smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
+void smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
                     int *ptime, int badmask, int is2d, AstSkyFrame *abskyfrm,
                     AstMapping *oskymap, AstFrame *ospecfrm,
                     AstMapping *ospecmap, Grp *detgrp, int moving, int usewgt,
@@ -1506,7 +1506,7 @@ void smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
                     float *teff_array, double *fcon, int *nused, int *nreject,
                     int *naccept, int *status );
 
-void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
+void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
                         int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
                         dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3],
                         AstMapping *ssmap, AstSkyFrame *abskyfrm,
@@ -1523,7 +1523,7 @@ void smf_rebincube_init( int is2d, dim_t nxy, dim_t nout, int genvar,
                          double *wgt_array, float *texp_array,
                          float *teff_array, int *nused, int *status );
 
-void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
+void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
                        dim_t nxy, dim_t nout, dim_t dim[3],
                        int badmask, int is2d, AstMapping *ssmap,
@@ -1558,7 +1558,7 @@ void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
 
 void smf_rebincube_paste_thread( void *data, int *status );
 
-void smf_rebincube_seqf( smfWorkForce *workforce, int nthreads,
+void smf_rebincube_seqf( ThrWorkForce *workforce, int nthreads,
                          double *blk_bot, AstMapping *this, double wlim,
                          int ndim_in, const int lbnd_in[], const int ubnd_in[],
                          const float in[], const float in_var[], int spread,
@@ -1576,7 +1576,7 @@ const double *smf_rebincube_tcon( smfHead *hdr, dim_t itime, double fcon,
                                   float *texp, float *teff, double *tcon,
                                   int *status );
 
-void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
+void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread,
                    const double params[], int moving, int genvar, int *lbnd_out,
                    int *ubnd_out, double *map, double *variance,
@@ -1639,7 +1639,7 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
                         Grp *detgrp, int moving, float *in_data,
                         float *out_data, int *overlap, int *status );
 
-void smf_resampmap( smfWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
+void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
                     AstMapping *sky2map, int moving, int slbnd[ 2 ],
                     int subnd[ 2 ], int interp, const double params[],
                     double sigma, double *in_data, double *out_data, int *ngood,
@@ -1657,7 +1657,7 @@ int smf_samedims_smfData( const smfData *data1, const smfData *data2,
 void smf_scale2freq( double f_edgesmall, double f_edgelarge, const smfHead *hdr,
                      double *f_edgelow, double *f_edgehigh, int *status );
 
-void smf_scale_bols( smfWorkForce *wf, smfData *data, const smfData * scaledata,
+void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
                      const char *path, const char *param, int *status );
 
 void smf_scalar_multiply( smfData * data, double dscalar, int * status );
@@ -1718,7 +1718,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
 void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
                           int *status);
 
-void smf_subtract_plane3( smfWorkForce *wf, smfData *data,
+void smf_subtract_plane3( ThrWorkForce *wf, smfData *data,
                           const dim_t mdims[],
                           const int lut[], int * status );
 

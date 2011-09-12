@@ -146,7 +146,7 @@
 *     2011-06-21 (DSB):
 *        Use astCheckMemory rather than astFlushMemory since we do not want
 *        to free the memory used to hold the singleton workforce returned by
-*        smf_get_workforce.
+*        thrGetWorkforce.
 *     2011-07-18 (COBA):
 *         Remove FTS2EQSLICED
 *         Remove FTS2SPECRE

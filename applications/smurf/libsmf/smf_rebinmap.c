@@ -13,14 +13,14 @@
 *     C function
 
 *  Invocation:
-*     smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
+*     smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
 *                   int index, int size, AstFrameSet *outfset, int spread,
 *                   const double params[], int moving, int genvar,
 *                   int *lbnd_out, int *ubnd_out, double *map, *variance,
 *                   double *weights, int *nused, int *status );
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads that will do the re-binning.
 *     data = smfData * (Given)
 *        Pointer to smfData struct holding input data. The smfData will
@@ -166,12 +166,12 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "prm_par.h"
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-#include "libsmf/smf_threads.h"
 
-void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
+void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread,
                    const double params[], int moving, int genvar,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
@@ -323,7 +323,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
    a job completes. When this happens, note the identifier for the job
    that has just completed. */
    if( pdata->ijob != -1 ) {
-      ijob = smf_job_wait( wf, status );
+      ijob = thrJobWait( wf, status );
 
 /* Find the smfRebinMapData that was used by the job that has just
    completed, and indicate it is no longer being used by setting its job
@@ -354,7 +354,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
 /* Fill in the details of the current input file, and then submit a new
    job to be performed by the work force. This job will paste the input
    file into the output array associated with the smfRebinMapData being
-   used. The smf_add_job function returns the identifier for the new job.
+   used. The thrAddJob function returns the identifier for the new job.
    Store this identifier in the smfRebinMapData to indicate that the
    smfRebinMapData is now being used. The actual work of pasting the
    slices into the output array is done by the smf_rebinslices function.
@@ -365,7 +365,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
    pdata->nused = 0;
    pdata->data = data;
    pdata->bolovar = bolovar;
-   pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smf_rebinslices,
+   pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smf_rebinslices,
                               0, NULL, status );
 
 /* Finalise things if we have just submitted a job to paste the last input
@@ -373,7 +373,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
    if( index == size ) {
 
 /* Wait until all submitted jobs have completed. */
-      smf_wait( wf, status );
+      thrWait( wf, status );
 
 /* Free the resources used by the array of smfRebinMapData structures. */
       for( j = 0; j < nw; j++ ) {

@@ -13,14 +13,14 @@
 *     C function
 
 *  Invocation:
-*     smf_resampmap( smfWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
+*     smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 *                     AstMapping *sky2map, int moving,
 *                     int slbnd[ 2 ], int subnd[ 2 ], int interp,
 *                     const double params[], double sigma, double *in_data,
 *                     double *out_data, int *ngood, int *status );
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads that will do the re-binning.
 *     data = smfData * (Given)
 *        Pointer to the smfData structure describing the template time
@@ -145,7 +145,7 @@ typedef struct smfResampMapData {
 static void smf1ResampMap( void *job_data_ptr, int *status );
 
 
-void smf_resampmap( smfWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
+void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
                     AstMapping *sky2map, int moving, int slbnd[ 2 ],
                     int subnd[ 2 ], int interp, const double params[],
                     double sigma, double *in_data, double *out_data, int *ngood,
@@ -247,11 +247,11 @@ void smf_resampmap( smfWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 /* Add each job to the job queue. */
       for( iw = 0; iw < nw; iw++ ) {
          pdata = job_data + iw;
-         (void) smf_add_job( wf, 0, pdata, smf1ResampMap, 0, NULL, status );
+         (void) thrAddJob( wf, 0, pdata, smf1ResampMap, 0, NULL, status );
       }
 
 /* Wait until all of the jobs have completed */
-      smf_wait( wf, status );
+      thrWait( wf, status );
 
 /* Free resources and count the totql number of good values in the output
    cube. */

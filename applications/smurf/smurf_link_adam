@@ -108,7 +108,7 @@
            `sla_link_adam` `shl_link_adam` `pda_link_adam` \
            `prm_link_adam` `ard_link_adam` \
            `grp_link_adam` `ndg_link_adam` `kaplibs_link_adam -nogrf` \
-           `gsd_link_adam` \
+           `gsd_link_adam` `thr_link` \
            -lgsl -lgslcblas -lfftw3_threads -lfftw3 \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

@@ -215,7 +215,6 @@
 #ifndef SMF_TYP_DEFINED
 #define SMF_TYP_DEFINED
 
-#include "smf_threads.h"
 #include "star/hds_types.h"
 #include "jcmt/state.h"
 #include "sc2da/sc2store_par.h"
@@ -225,6 +224,7 @@
 #include "prm_par.h"
 #include "ndf.h"
 #include "star/grp.h"
+#include "star/thr.h"
 #include "smurf_typ.h"
 #include "smurf_par.h"
 #include "fftw3.h"
@@ -389,7 +389,7 @@ typedef enum smf_metadata_fixups {
 
 /* Parts of the data/variance/quality components of smfData can have fixes */
 typedef enum smf_data_fixups {
-  SMF__FIXED_ROWORDER=1   /* Updated incorrect row ordering */ 
+  SMF__FIXED_ROWORDER=1   /* Updated incorrect row ordering */
 } smf_data_fixups;
 
 /* Flatfield method */
@@ -739,7 +739,7 @@ typedef struct smfDIMMData {
 
 
 /* Prototype for function pointer to different models used by DIMM */
-typedef void(*smf_calcmodelptr)( smfWorkForce*, smfDIMMData*, int, AstKeyMap*,
+typedef void(*smf_calcmodelptr)( ThrWorkForce*, smfDIMMData*, int, AstKeyMap*,
                                  smfArray**, int, int* );
 
 /* Prototype for function pointer to expand different DIMM model components */

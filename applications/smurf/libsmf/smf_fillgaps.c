@@ -13,11 +13,11 @@
 *     Library routine
 
 *  Invocation:
-*     smf_fillgaps( smfWorkForce *wf, smfData *data, smf_qual_t mask,
+*     smf_fillgaps( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
 *                   int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
@@ -151,7 +151,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status );
 
 
 
-void  smf_fillgaps( smfWorkForce *wf, smfData *data,
+void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
                     smf_qual_t mask, int *status ) {
 
 /* Local Variables */
@@ -230,7 +230,7 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data,
   }
 
   /* Begin a job context. */
-  smf_begin_job_context( wf, status );
+  thrBeginJobContext( wf, status );
 
   /* Loop over bolometer in groups of "bpt". */
   pdata = job_data;
@@ -254,13 +254,13 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data,
     pdata->mask = mask;
 
     /* Submit a job to the workforce to process this group of bolometers. */
-    (void) smf_add_job( wf, 0, pdata, smfFillGapsParallel, 0, NULL, status );
+    (void) thrAddJob( wf, 0, pdata, smfFillGapsParallel, 0, NULL, status );
   }
 
   /* Wait until all jobs in the current job context have completed, and
      then end the job context. */
-  smf_wait( wf, status );
-  smf_end_job_context( wf, status );
+  thrWait( wf, status );
+  thrEndJobContext( wf, status );
 
   /* Free resources. */
   gsl_rng_free( r );

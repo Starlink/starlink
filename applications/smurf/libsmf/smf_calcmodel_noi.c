@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int
+*     smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int
 *                        chunk, AstKeyMap *keymap, smfArray
 *                        **allmodel, int flags, int *status)
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads
 *     dat = smfDIMMData * (Given)
 *        Struct of pointers to information required by model calculation
@@ -157,7 +157,7 @@
 #define FUNC_NAME "smf_calcmodel_noi"
 
 
-void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status) {
 

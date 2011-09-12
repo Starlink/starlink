@@ -224,7 +224,7 @@ void smurf_unmakemap( int *status ) {
    size_t size;               /* Number of files in input group */
    smfData *data = NULL;      /* Pointer to reference data struct */
    smfData *odata = NULL;     /* Pointer to output data struct */
-   smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+   ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -240,7 +240,7 @@ void smurf_unmakemap( int *status ) {
 
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
-   wf = smf_get_workforce( smf_get_nthread( status ), status );
+   wf = thrGetWorkforce( smf_get_nthread( status ), status );
 
 /* Get an identifier for the input NDF. We use NDG (via kpg1Rgndf)
    instead of calling ndfAssoc directly since NDF/HDS has problems with

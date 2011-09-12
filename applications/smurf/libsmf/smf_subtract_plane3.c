@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     void smf_subtract_plane3( smfWorkForce *wf, smfData *data,
+*     void smf_subtract_plane3( ThrWorkForce *wf, smfData *data,
 *                         const dim_t mdims[],
 *                         const int lut[], int * status );
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be filtered (performed in-place)
@@ -99,7 +99,7 @@
 #include "prm_par.h"
 
 void
-smf_subtract_plane3( smfWorkForce *wf, smfData *data,
+smf_subtract_plane3( ThrWorkForce *wf, smfData *data,
                      const dim_t mdims[],
                      const int lut[], int * status ) {
 

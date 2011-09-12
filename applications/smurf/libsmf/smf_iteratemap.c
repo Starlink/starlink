@@ -15,7 +15,7 @@
 
 *  Invocation:
 
-*     smf_iteratemap(smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
+*     smf_iteratemap(ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 *                    const Grp *bolrootgrp, const Grp *shortrootgrp,
 *                    const Grp *flagrootgrp, const Grp *samprootgrp,
 *                    AstKeyMap *keymap,
@@ -29,7 +29,7 @@
 *                    int *status );
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads
 *     igrp = const Grp* (Given)
 *        Group of input data files
@@ -433,7 +433,7 @@
 #define FUNC_NAME "smf_iteratemap"
 
 /* Main routine */
-void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
+void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,
                      const Grp *flagrootgrp, const Grp *samprootgrp,
                      AstKeyMap *keymap,

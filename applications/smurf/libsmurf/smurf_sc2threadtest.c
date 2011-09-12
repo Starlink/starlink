@@ -99,6 +99,7 @@
 #include "star/kaplibs.h"
 #include "star/atl.h"
 #include "star/one.h"
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -106,7 +107,6 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 #include "smurf_typ.h"
-#include "libsmf/smf_threads.h"
 #include "libsmf/smf_typ.h"
 
 #include "sc2da/sc2store_par.h"
@@ -256,7 +256,7 @@ void smurf_sc2threadtest( int *status ) {
   int temp;                  /* Temporary integer */
   size_t tsteps;             /* How many time steps in chunk */
   struct timeval tv1, tv2;   /* Timers */
-  smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+  ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
   double *dat=NULL;
   dim_t nbolo;
@@ -330,7 +330,7 @@ void smurf_sc2threadtest( int *status ) {
           ": Starting test 1 __parallel time: dataOrder__", status );
 
   /* Create a pool of threads. */
-  wf = smf_get_workforce( nthread, status );
+  wf = thrGetWorkforce( nthread, status );
 
   /* Work out number of chunks per thread */
   joblen = nchunks/nthread;
@@ -375,13 +375,13 @@ void smurf_sc2threadtest( int *status ) {
     } else {
       /* Since we know there is one job_data per thread, just submit jobs
          immediately */
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelTime,
+      pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfParallelTime,
                                  0, NULL, status );
     }
   }
 
   /* Wait until all of the submitted jobs have completed */
-  smf_wait( wf, status );
+  thrWait( wf, status );
 
   /* Annul the bad status that we set in smfParallelTime */
   if( *status == SMF__INSMP ) {
@@ -417,13 +417,13 @@ void smurf_sc2threadtest( int *status ) {
     } else {
       /* Since we know there is one job_data per thread, just submit jobs
          immediately */
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelTime,
+      pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfParallelTime,
                                  0, NULL, status );
     }
   }
 
   /* Wait until all of the submitted jobs have completed */
-  smf_wait( wf, status );
+  thrWait( wf, status );
 
   /*** TIMER ***/
   msgOutf( "", "** %f seconds to complete test", status,
@@ -449,13 +449,13 @@ void smurf_sc2threadtest( int *status ) {
     } else {
       /* Since we know there is one job_data per thread, just submit jobs
          immediately */
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelTime,
+      pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfParallelTime,
                                  0, NULL, status );
     }
   }
 
   /* Wait until all of the submitted jobs have completed */
-  smf_wait( wf, status );
+  thrWait( wf, status );
 
   /*** TIMER ***/
   msgOutf( "", "** %f seconds to complete test", status,

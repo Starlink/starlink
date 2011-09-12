@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
+*     void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
 *                              double *blk_bot, AstMapping *this, double wlim,
 *                              int ndim_in, const int lbnd_in[],
 *                              const int ubnd_in[], const float in[],
@@ -26,7 +26,7 @@
 *                              double weights[], int *nused, int *status );
 
 *  Arguments:
-*     workforce = smfWorkForce * (Given)
+*     workforce = ThrWorkForce * (Given)
 *        Pointer to a pool of threads, between which the requested rebinning
 *        can be divided.
 *     njobs = int (Given)
@@ -106,13 +106,13 @@
 #include "ast.h"
 #include "ems.h"
 #include "sae_par.h"
+#include "star/thr.h"
 
 /* Smurf includes */
 #include "smf.h"
 #include "smf_typ.h"
-#include "smf_threads.h"
 
-void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
+void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
                          double *blk_bot, AstMapping *this, double wlim,
                          int ndim_in, const int lbnd_in[],
                          const int ubnd_in[], const float in[],
@@ -232,13 +232,13 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
    becomes available. The worker thread does its work by invoking the
    smf_rebinseq_thread function, passing it the data structure
    created above. */
-            smf_add_job( workforce, 0, data, smf_rebinseq_thread,
+            thrAddJob( workforce, 0, data, smf_rebinseq_thread,
                          0, NULL, status );
          }
 
 /* Wait until the work force has done all the re-binning. This call blocks
    until all worker threads have completed. */
-         smf_wait( workforce, status );
+         thrWait( workforce, status );
 
 /* Loop round all the jobs. */
          for( i = 0; i < njobs; i++ ) {
@@ -272,13 +272,13 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
                (data->ubnd)[ 0 ] = (int)( blk_bot[ 2*i + 2 ] - 0.5 );
 
 /* Add the new job to the workforce. */
-               smf_add_job( workforce, 0, data, smf_rebinseq_thread,
+               thrAddJob( workforce, 0, data, smf_rebinseq_thread,
                             0, NULL, status );
             }
 
 /* Wait for the work force to complete the re-binning. This call blocks until
    all worker threads have completed. */
-            smf_wait( workforce, status );
+            thrWait( workforce, status );
 
 /* All jobs are now complete. */
             for( i = 0; i < njobs; i++ ) {

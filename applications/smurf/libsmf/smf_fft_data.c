@@ -13,11 +13,11 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
+*     pntr = smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
 *                          size_t len, int *status );
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     indata = smfData * (Given)
 *        Pointer to the input smfData
@@ -75,7 +75,7 @@
 *     2008-11-20 (TIMJ):
 *        "Close" the smfData instead of "free".
 *     2009-10-8 (DSB):
-*         Use a smf job context to ensure that smf_wait only waits for the jobs
+*         Use a smf job context to ensure that thrWait only waits for the jobs
 *         submitted within this function.
 *     2009-10-28 (DSB):
 *         Use sc2ast_make_bolo_frame.
@@ -259,7 +259,7 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_fft_data"
 
-smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
+smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
                        size_t len, int *status ) {
   double *baseR=NULL;           /* base pointer to real part of transform */
   double *baseI=NULL;           /* base pointer to imag part of transform */
@@ -493,26 +493,26 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
         baseI = baseR + nf*nbolo;
         baseB = retdata->pntr[0];
 
-        smf_mutex_lock( &smf_fft_data_mutex, status );
+        thrMutexLock( &smf_fft_data_mutex, status );
         pdata->plan = fftw_plan_guru_split_dft_c2r( 1, &dims, 0, NULL,
                                                     baseR, baseI,
                                                     baseB,
                                                     FFTW_ESTIMATE |
                                                     FFTW_UNALIGNED);
-        smf_mutex_unlock( &smf_fft_data_mutex, status );
+        thrMutexUnlock( &smf_fft_data_mutex, status );
       } else {               /* Performing forward fft */
         /* Setup forward FFT plan using guru interface */
         baseB = data->pntr[0];
         baseR = retdata->pntr[0];
         baseI = baseR + nf*nbolo;
 
-        smf_mutex_lock( &smf_fft_data_mutex, status );
+        thrMutexLock( &smf_fft_data_mutex, status );
         pdata->plan = fftw_plan_guru_split_dft_r2c( 1, &dims, 0, NULL,
                                                     baseB,
                                                     baseR, baseI,
                                                     FFTW_ESTIMATE |
                                                     FFTW_UNALIGNED);
-        smf_mutex_unlock( &smf_fft_data_mutex, status );
+        thrMutexUnlock( &smf_fft_data_mutex, status );
 
         /* If doing a forward transformation, and we are handling a 3d
          data cube, create WCS information here. */
@@ -594,16 +594,16 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   }
 
   /* Do the FFTs */
-  smf_begin_job_context( wf, status );
+  thrBeginJobContext( wf, status );
   for( i=0; (*status==SAI__OK)&&i<njobs; i++ ) {
     pdata = job_data + i;
-    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+    pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata,
                                smfFFTDataParallel, 0, NULL, status );
   }
 
   /* Wait until all of the submitted jobs have completed */
-  smf_wait( wf, status );
-  smf_end_job_context( wf, status );
+  thrWait( wf, status );
+  thrEndJobContext( wf, status );
 
   /* Each sample needs to have a normalization applied if forward FFT */
   if( (*status==SAI__OK) && !inverse ) {
@@ -626,9 +626,9 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     for( i=0; i<njobs; i++ ) {
       pdata = job_data + i;
       /* Destroy the plans */
-      smf_mutex_lock( &smf_fft_data_mutex, status );
+      thrMutexLock( &smf_fft_data_mutex, status );
       fftw_destroy_plan( pdata->plan);
-      smf_mutex_unlock( &smf_fft_data_mutex, status );
+      thrMutexUnlock( &smf_fft_data_mutex, status );
     }
     job_data = astFree( job_data );
   }

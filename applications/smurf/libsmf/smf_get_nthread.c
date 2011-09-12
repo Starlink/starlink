@@ -34,7 +34,7 @@
 *     environment variable SMURF_THREADS to some other value.
 
 *  Notes:
-*     - This function is not in smf_threads.c because it does not make
+*     - This function is not in thr.c because it does not make
 *     any pthread calls.
 
 *  Authors:

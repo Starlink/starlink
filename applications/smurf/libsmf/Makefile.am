@@ -356,7 +356,6 @@ smf_summarize_obs.c \
 smf_swmode_str.c \
 smf_telpos_get.c \
 smf_terr.c \
-smf_threads.c \
 smf_timerinit.c \
 smf_timerupdate.c \
 smf_tslice_ast.c \
@@ -376,7 +375,7 @@ smf_write_smfData.c \
 smf_wvm225_to_cso225.c \
 $(BUILT_C_ROUTINES)
 
-noinst_INCLUDES = smf.h smf_typ.h smf_threads.h
+noinst_INCLUDES = smf.h smf_typ.h
 
 # fac files must be installed
 noinst_MESSAGES = smf_err.h

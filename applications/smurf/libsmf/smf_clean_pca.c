@@ -13,12 +13,12 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
+*     smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
 *                    smfData **components, smfData **amplitudes,
 *                    int flagbad, AstKeyMap *keymap, int *status )
 
 *  Arguments:
-*     wf = smfWorkForce * (Given)
+*     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        Pointer to the input smfData (assume that bolometer means have been
@@ -307,7 +307,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_clean_pca"
 
-void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
+void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
                     smfData **components, smfData **amplitudes, int flagbad,
                     AstKeyMap *keymap, int *status ) {
 
@@ -509,12 +509,12 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
     for( ii=0; ii<nw; ii++ ) {
       pdata = job_data + ii;
       pdata->operation = 0;
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
+      pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAParallel,
                                  0, NULL, status );
     }
 
     /* Wait until all of the submitted jobs have completed */
-    smf_wait( wf, status );
+    thrWait( wf, status );
 
     /* We now have to add together all of the sums from each thread and
        normalize */
@@ -568,13 +568,13 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
       pdata = job_data + ii;
       pdata->cov = cov;
       pdata->operation = 1;
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
+      pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAParallel,
                                  0, NULL, status );
     }
   }
 
   /* Wait until all of the submitted jobs have completed */
-  smf_wait( wf, status );
+  thrWait( wf, status );
 
   /* Then normalize */
   for( i=0; (*status==SAI__OK)&&(i<ngoodbolo); i++ ) {
@@ -605,13 +605,13 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
     for( ii=0; ii<nw; ii++ ) {
       pdata = job_data + ii;
       pdata->operation = 2;
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
+      pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAParallel,
                                  0, NULL, status );
     }
   }
 
   /* Wait until all of the submitted jobs have completed */
-  smf_wait( wf, status );
+  thrWait( wf, status );
 
   /* Check to see if the amplitudes are mostly negative or positive. If
      mostly negative, flip the sign of both the component and amplitudes */
@@ -792,12 +792,12 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
       pdata = job_data + ii;
       pdata->operation = 3;
       pdata->rms_amp = rms_amp;
-      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
+      pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAParallel,
                                  0, NULL, status );
     }
 
     /* Wait until all of the submitted jobs have completed */
-    smf_wait( wf, status );
+    thrWait( wf, status );
 
     rms_amp = astFree( rms_amp );
   }
