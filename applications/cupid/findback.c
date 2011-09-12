@@ -91,9 +91,16 @@ void findback( int *status ){
 *        supplied data array. The suggested default value is the square root
 *        of the mean of the values in the input NDF's Variance component.
 *        If the NDF has no Variance component, the suggested default
-*        is based on the differences between neighbouring pixel values. Any
-*        pixel-to-pixel correlation in the noise can result in this estimate
-*        being too low.
+*        is based on the differences between neighbouring pixel values,
+*        measured over the entire input NDF. If multiple slices within the
+*        NDF are to be processed independently (see parameter BOX), it
+*        may be more appropriate for a separate default RMS to be calculated
+*        for each slice. This will normally be the case if the noise could
+*        be different in each of the slices. In such cases a null (!) can
+*        be supplied for the RMS parameter, which forces a separate
+*        default RMS value to be found and used for each slice. Any
+*        pixel-to-pixel correlation in the noise can result in these
+*        defaults being too low.
 *     SUB = _LOGICAL (Read)
 *        If a TRUE value is supplied, the output NDF will contain the
 *        difference between the supplied input data and the estimated
@@ -185,6 +192,7 @@ void findback( int *status ){
    int slice_dim[ 3 ];       /* Dimensions of each significant slice axis */
    int slice_lbnd[ 3 ];      /* Lower bounds of each significant slice axis */
    int slice_size;           /* Number of pixels in each slice */
+   int state;                /* Parameter state */
    int sub;                  /* Output the background-subtracted input data? */
    int type;                 /* Integer identifier for data type */
    int ubnd[ NDF__MXDIM ];   /* Upper pixel bounds of slice */
@@ -320,40 +328,59 @@ void findback( int *status ){
    ndfMap( indf1, "Data", itype, "READ", &ipdin, &el, status );
    ndfMap( indf2, "Data", itype, "WRITE", &ipdout, &el, status );
 
+/* If the rms value is supplied on the command, there is no need to
+   calculate a default value. */
+   parState( "RMS", &state, status );
+   if( state == PAR__GROUND ) {
+
 /* Calculate the default RMS value. If the NDF has a Variance component
    it is the square root of the mean Variance value. Otherwise, it is found
    by looking at differences between adjacent pixel values in the Data
    component. */
-   ndfState( indf1, "VARIANCE", &var, status );
-   if( *status == SAI__OK && var ) {
-      ndfMap( indf1, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
+      ndfState( indf1, "VARIANCE", &var, status );
+      if( *status == SAI__OK && var ) {
+         ndfMap( indf1, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
 
-      sum = 0.0;
-      n = 0;
-      for( i = 0; i < el; i++ ) {
-         if( ipv[ i ] != VAL__BADD ) {
-            sum += ipv[ i ];
-            n++;
+         sum = 0.0;
+         n = 0;
+         for( i = 0; i < el; i++ ) {
+            if( ipv[ i ] != VAL__BADD ) {
+               sum += ipv[ i ];
+               n++;
+            }
          }
-      }
 
-      if( n > 0 ) {
-         rms = sqrt( sum/n );
+         if( n > 0 ) {
+            rms = sqrt( sum/n );
+
+         } else {
+            *status = SAI__ERROR;
+            errRep( "", "The supplied data contains insufficient "
+                    "good Variance values to continue.", status );
+         }
 
       } else {
-         *status = SAI__ERROR;
-         errRep( "", "The supplied data contains insufficient "
-                 "good Variance values to continue.", status );
+         ipv = NULL;
+         rms = cupidRms( type, ipdin, el, sdim[ 0 ], status );
       }
 
-   } else {
-      ipv = NULL;
-      rms = cupidRms( type, ipdin, el, sdim[ 0 ], status );
+/* Set the default RMS noise level. */
+      parDef0d( "RMS", rms, status );
    }
 
+/* Abort if an error has occurred. */
+   if( *status != SAI__OK ) goto L999;
+
 /* Get the RMS noise level. */
-   parDef0d( "RMS", rms, status );
    parGet0d( "RMS", &rms, status );
+
+/* Annul the error and use an RMS value of VAL__BAD if a null parameter
+   value was supplied. This causes an independent default noise estimate to
+   be used for each slice of the base NDF. */
+   if( *status == PAR__NULL ) {
+      errAnnul( status );
+      rms = VAL__BADD;
+   }
 
 /* See if any experimental algorithm variations are to be used. */
    parGet0l( "NEWALG", &newalg, status );

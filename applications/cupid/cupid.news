@@ -6,6 +6,12 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V1.5
+
+   - The RMS parameter in FINDBACK now be set to a null (!) value in
+   order to force an independent default noise value to be calculated and
+   used for each slice of supplied NDF.
+
 Changes introduced at V1.4
 
    - A bug in the GaussClumps method that could cause Gaussian model

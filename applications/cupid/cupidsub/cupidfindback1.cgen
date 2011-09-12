@@ -122,6 +122,9 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 *     1-SEP-2009 (DSB):
 *        Make dumping of debugging arrays controllable via the MSG filter
 *        level rather than requiring re-compilation of cupid.
+*     12-SEP-2011 (DSB):
+*        Allow RMS to be calculated independently for each slice of the
+*        base NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,6 +155,15 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 
 /* Get the number of pixels in the input array. */
    nel = dim[ 0 ]*dim[ 1 ]*dim[ 2 ];
+
+/* If multiple slices from the user-supplied base NDF are being processed
+   individually, the supplied RMS value may be bad, indicating that a default
+   RMS value should be found and used independently for each slice. If so,
+   find the RMS in the supplied array. */
+   if( rms == VAL__BADD ) {
+      rms = CGEN_FUNCTION(cupidRms)( din, nel, dim[ 0 ], status );
+      msgOutiff( MSG__VERB, "", "      Using RMS=%g.", status, rms );
+   }
 
 /* Filter the input data by replacing each input value by the minimum
    value in a box centred on the input pixel. The filtered data goes in
