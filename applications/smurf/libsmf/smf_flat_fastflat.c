@@ -360,26 +360,41 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
 
           /* Calculate any extrema for anchoring the fit */
           if (before_heat) {
+            int nstepsoffset;
+            int stepsize;
+            int deltaheat;
             double result = smf__calc_refheat_meas( ffdata, bol*bstride,
                                                     tstride, nframes, before_heat, heatmeas,
                                                     szfit, heatref, 1, status );
             /* push the result onto the array for fitting. Making sure we give it
-               equal weight by duplicating it. */
+               equal weight by duplicating it. The coordinate must refer to the start
+               of the time stream in indices and so be negative. */
+            stepsize = heatbounds[1] - heatbounds[0];
+            deltaheat = heatref - before_heat[0];
+            nstepsoffset = (abs(deltaheat / stepsize) -1 ) * (int)meas_per_heat;
             for (i = 0; i < meas_per_heat; i++) {
               ddata[ndata] = result;
-              dindices[ndata] = heatref;
+              dindices[ndata] = -1.0 - nstepsoffset - i;
               ndata++;
             }
           }
 
           if (after_heat) {
+            int nstepsoffset;
+            int stepsize;
+            int deltaheat;
             double result = smf__calc_refheat_meas( ffdata, bol*bstride,
                                                     tstride, nframes, after_heat, heatmeas,
                                                     szfit, heatref, 0, status );
-            /* push the result onto the array for fitting */
+            /* push the result onto the array for fitting.
+               Need to convert the heater ref value to an indices for fitting.
+             */
+            stepsize = heatbounds[1] - heatbounds[0];
+            deltaheat = heatref - after_heat[0];
+            nstepsoffset = (abs(deltaheat / stepsize) -1 ) * (int)meas_per_heat;
             for (i = 0; i < meas_per_heat; i++) {
               ddata[ndata] = result;
-              dindices[ndata] = heatref;
+              dindices[ndata] = nframes - 1.0 + nstepsoffset + i;
               ndata++;
             }
           }
