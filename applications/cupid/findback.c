@@ -4,6 +4,7 @@
 #include "star/ndg.h"
 #include "star/kaplibs.h"
 #include "star/grp.h"
+#include "star/thr.h"
 #include "par.h"
 #include "cupid.h"
 #include "prm_par.h"
@@ -153,13 +154,18 @@ void findback( int *status ){
 *        Rename ILEVEL to MSG_FILTER
 *     17-MAY-2011 (DSB):
 *        Use sqrt rather than sqrtf when calculating RMS.
+*     12-SEP-2011 (DSB):
+*        Process slices in separate threads.
 *     {enter_further_changes_here}
 
 *-
 */
 
 /* Local Variables: */
+   CupidFindback0Data *job_data; /* Pointer to data for all jobs */
+   CupidFindback0Data *pdata; /* Pointer to data for current job */
    Grp *grp;                 /* GRP identifier for configuration settings */
+   ThrWorkForce *wf;         /* Pool of persistent worker threads */
    char dtype[ 21 ];         /* HDS data type for output NDF */
    char itype[ 21 ];         /* HDS data type to use when processing */
    double *ipv;              /* Pointer to Variance array */
@@ -202,8 +208,6 @@ void findback( int *status ){
    void *ipd2;               /* Pointer to output Data array */
    void *ipdin;              /* Pointer to input Data array */
    void *ipdout;             /* Pointer to output Data array */
-   void *wa;                 /* Pointer to work array */
-   void *wb;                 /* Pointer to work array */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -214,10 +218,6 @@ void findback( int *status ){
 /* Record the existing AST status pointer, and ensure AST uses the supplied
    status pointer instead. */
    old_status = astWatch( status );
-
-/* Initialise pointer values. */
-   wa = NULL;
-   wb = NULL;
 
 /* Get an identifier for the input NDF. We use NDG (via kpg1_Rgndf)
    instead of calling ndfAssoc directly since NDF/HDS has problems with
@@ -385,50 +385,71 @@ void findback( int *status ){
 /* See if any experimental algorithm variations are to be used. */
    parGet0l( "NEWALG", &newalg, status );
 
-/* Allocate work arrays. */
-   wa = astMalloc( cupidSize( type, "findback" )*el );
-   wb = astMalloc( cupidSize( type, "findback" )*el );
+/* Create a pool of worker threads. */
+   wf = thrCreateWorkforce( thrGetNThread( "CUPID_THREADS", status ), status );
 
-/* Abort if an error has occurred. */
-   if( *status != SAI__OK ) goto L999;
+/* Get memory to hold a description of each job passed to a worker. There
+   is one job for each slice. */
+   nslice = nystep*nzstep;
+   job_data = astMalloc( nslice*sizeof( *job_data ) );
+   if( *status == SAI__OK ) {
 
 /* Loop round all slices to be processed. */
-   ipd1 = ipdin;
-   ipd2 = ipdout;
-   nslice = nystep*nzstep;
-   islice = 0;
+      ipd1 = ipdin;
+      ipd2 = ipdout;
+      islice = 0;
+      pdata = job_data;
 
-   for( izstep = 0; izstep < nzstep; izstep++ ) {
+      for( izstep = 0; izstep < nzstep ; izstep++ ) {
 
-      slice_lbnd[ 1 ] = lbnd[ 1 ];
+         slice_lbnd[ 1 ] = lbnd[ 1 ];
 
-      for( iystep = 0; iystep < nystep; iystep++, islice++ ) {
+         for( iystep = 0; iystep < nystep; iystep++, islice++,pdata++ ) {
 
-/* Report the bounds of the slice if required. */
-         msgBlankif( MSG__VERB, status );
-         msgOutiff( MSG__VERB, "", "   Processing slice %d of %d...", status,
-                    islice+1, nslice );
-         msgBlankif( MSG__VERB, status );
+/* Store the information needed by the function (cupidFindback0) that
+   does the work in a thread. */
+            pdata->islice = islice;
+            pdata->nslice = nslice;
+            pdata->type = type;
+            pdata->ndim = ndim;
+            pdata->box[ 0 ] = box[ 0 ];
+            pdata->box[ 1 ] = box[ 1 ];
+            pdata->box[ 2 ] = box[ 2 ];
+            pdata->rms = rms;
+            pdata->ipd1 = ipd1;
+            pdata->ipd2 = ipd2;
+            pdata->slice_dim[ 0 ] = slice_dim[ 0 ];
+            pdata->slice_lbnd[ 0 ] = slice_lbnd[ 0 ];
+            pdata->slice_dim[ 1 ] = slice_dim[ 1 ];
+            pdata->slice_lbnd[ 1 ] = slice_lbnd[ 1 ];
+            pdata->slice_dim[ 2 ] = slice_dim[ 2 ];
+            pdata->slice_lbnd[ 2 ] = slice_lbnd[ 2 ];
+            pdata->newalg = newalg;
+            pdata->slice_size = slice_size;
 
-/* Process this slice, then increment the pointer to the next slice. */
-         if( type == CUPID__FLOAT ) {
-            cupidFindback1F( ndim, slice_dim, slice_lbnd, box, rms, ipd1, ipd2,
-                             wa, wb, newalg, status );
-            ipd1 = ( (float *) ipd1 ) + slice_size;
-            ipd2 = ( (float *) ipd2 ) + slice_size;
-         } else {
-            cupidFindback1D( ndim, slice_dim, slice_lbnd, box, rms, ipd1, ipd2,
-                             wa, wb, newalg, status  );
-            ipd1 = ( (double *) ipd1 ) + slice_size;
-            ipd2 = ( (double *) ipd2 ) + slice_size;
-         }
+/* Submit a job to the workforce to process the current slice. */
+            thrAddJob( wf, 0, pdata, cupidFindback0, 0, NULL, status );
+
+/* Update pointers to the start of the next slice in the input and output
+   arrays. */
+            if( type == CUPID__FLOAT ) {
+               ipd1 = ( (float *) ipd1 ) + slice_size;
+               ipd2 = ( (float *) ipd2 ) + slice_size;
+            } else {
+               ipd1 = ( (double *) ipd1 ) + slice_size;
+               ipd2 = ( (double *) ipd2 ) + slice_size;
+            }
 
 /* Increment the lower bound on the 2nd pixel axis. */
-         slice_lbnd[ 1 ]++;
-      }
+            slice_lbnd[ 1 ]++;
+         }
 
 /* Increment the lower bound on the 3rd pixel axis. */
-      slice_lbnd[ 2 ]++;
+         slice_lbnd[ 2 ]++;
+      }
+
+/* Wait until all jobs have finished. */
+      thrWait( wf, status );
    }
 
 /* The output currently holds the background estimate. If the user has
@@ -465,8 +486,8 @@ L999:;
    msgBlankif( MSG__VERB, status );
 
 /* Free workspace. */
-   wa = astFree( wa );
-   wb = astFree( wb );
+   job_data = astFree( job_data );
+   wf = thrDestroyWorkforce( wf );
 
 /* Reinstate the original AST inherited status value. */
    astWatch( old_status );

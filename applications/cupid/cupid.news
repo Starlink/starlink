@@ -11,6 +11,8 @@ Changes introduced at V1.5
    - The RMS parameter in FINDBACK now be set to a null (!) value in
    order to force an independent default noise value to be calculated and
    used for each slice of supplied NDF.
+   - FINDBACK now uses mutiple processors or cores (if available) to
+   speed up the the procesing of independent slices.
 
 Changes introduced at V1.4
 

@@ -164,6 +164,22 @@ typedef struct CupidClumpInfo {
    int nwcs;           /* Number of WCS axes */
 } CupidClumpInfo;
 
+/* A structure used to store information required by cupidFindback0 (the
+   thread worker function used by the FINDBACK command). */
+typedef struct CupidFindback0Data {
+   int islice;         /* Slice index */
+   int nslice;         /* Number of slices to process */
+   int type;           /* Integer identifier for data type */
+   int ndim;           /* Total number of pixel axes in NDF */
+   int box[ 3 ];       /* Dimensions of each cell in pixels */
+   double rms;         /* Global rms error in data */
+   void *ipd1;         /* Pointer to input Data array */
+   void *ipd2;         /* Pointer to output Data array */
+   int slice_dim[ 3 ]; /* Dimensions of each significant slice axis */
+   int slice_lbnd[ 3 ];/* Lower bounds of each significant slice axis */
+   int newalg;         /* Use experimental algorithm variations? */
+   int slice_size;     /* Number of pixels in each slice */
+} CupidFindback0Data;
 
 
 
@@ -275,6 +291,7 @@ void cupidDumpD( double *, int, int *, int *, const char *, int * );
 void cupidDumpF( float *, int, int *, int *, const char *, int * );
 void cupidDumpI( int *, int, int *, int *, const char *, int * );
 void cupidEdges( float *, int, int[3], int[3], float, float, int * );
+void cupidFindback0( void *, int * );
 void cupidGCListClump( int, int, double *, double, int *, double, int * );
 void cupidGCNdfClump( HDSLoc **, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int *, AstKeyMap *, int, int * );
 void cupidGCcalcf( int, double *, int *, double * );

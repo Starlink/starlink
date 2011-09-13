@@ -29,7 +29,7 @@ cupidcflevels.c cupiddumpi.c cupidclumpdesc.c cupidcfnebs.c cupidedges.c \
 cupidcfidl.c cupidcfmakeps.c cupidreinhold.c cupidredges.c cupidrca.c \
 cupidrfillline.c cupidrfillclumps.c cupidrca2.c cupidfellwalker.c \
 cupidgcndfclump.c cupiddefminpix.c cupidretrieveconfig.c \
-cupidboxiterator.c cupidnextit.c cupidclumpinfo1.c \
+cupidboxiterator.c cupidnextit.c cupidclumpinfo1.c cupidfindback0.c \
 $(BUILT_C_ROUTINES)
 
 noinst_LTLIBRARIES = libcupidsub.la
