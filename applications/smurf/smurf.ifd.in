@@ -743,6 +743,16 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
