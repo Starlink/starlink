@@ -432,6 +432,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
           double sigma = VAL__BADD;
           size_t ngood = 0;
           size_t idx;
+          double skyoffset = 0.0;
 
           /* Get the polynomial data */
           for (idx = 0; idx <= skyorder; idx++) {
@@ -442,11 +443,11 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
           /* Obtain the measurements for that bolometer */
           for (idx = 0; idx < (size_t)nind; idx++ ) {
             size_t slice = indices[idx];
-            double poly = 0.0;
             idata[idx] = ffdata[ bol*bstride + slice*tstride ];
 
             if (idata[idx] != VAL__BADI) {
               /* calculate the reference value */
+              double poly = 0.0;
               EVALPOLY( poly, slice, skyorder, coeff );
 
               /* This section can be uncommented to help debug any issues with sky removal.
@@ -474,13 +475,19 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
             sigma = 0.1;
           }
 
+          /* Need to put the sky signal back into the data to ensure that the
+             sky offset is correctly accounted for. Use the value from the
+             polynomial from the last frame */
+          EVALPOLY(skyoffset, (nframes-1), skyorder, coeff );
+
           /* store the answer */
           idx = bol + i*nbols;
           if (sigma == VAL__BADD || sigma == 0.0) {
             bolval[ idx ] = VAL__BADD;
             bolvalvar[ idx ] = VAL__BADD;
           } else {
-            bolval[ idx ] = mean;
+
+            bolval[ idx ] = mean + skyoffset;
             bolvalvar[ idx ] = sigma * sigma;
           }
         }
