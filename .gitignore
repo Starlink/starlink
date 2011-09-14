@@ -1327,4 +1327,7 @@ libraries/sla/sla_test
 libraries/snx/snx_test
 libraries/starmem/memtest
 libraries/starutil/utiltest
+libraries/thr/sun266.tex
+libraries/thr/thr_routines.tex
+libraries/thr/thr_routines_sorted.tex
 libraries/trn/trn_test
