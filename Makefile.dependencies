@@ -3028,6 +3028,12 @@ $(MANIFESTS)/tkimg: \
 	cd thirdparty/tclsys/tkimg \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/thr: \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/ems
+	cd libraries/thr \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/trn: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
