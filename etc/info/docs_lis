@@ -1,5 +1,5 @@
                             Starlink Documentation
-Date: 4th June, 2009
+Date: 14th September, 2011
 File: /star/docs/docs_lis
 
 SC                             STARLINK COOKBOOKS                             SC
@@ -261,6 +261,7 @@ SUN                            STARLINK USER NOTES                           SUN
 263.01  2009-08-11 MJC   ??   LPG - Processing in a loop a set of NDFs or catalogues
 264.01  2009-08-26 AGG   ??   ORAC-DR - SCUBA-2 pipeline data reduction
 265.01  2011-01-20 AGG   ??   PICARD - analyze and combine reduced data
+266.01  2011-09-14 AGG   ??   THR - A Thread Management Library
 
 AUTHORS                          AUTHORS                                AUTHORS
                                      (Site code)
@@ -303,7 +304,7 @@ AUTHORS                          AUTHORS                                AUTHORS
        DLG   Dave Giaretta           (RAL)
        DLT   Dave Terrett            (RAL)
        DM    Dave Mills              (NOAO)
-       DSB   David Berry             (MAN)
+       DSB   David Berry             (JACH)
        DT    Doug Tody               (NOAO)
        DW    David Wishart           (Clustan Ltd, Edinburgh)
        DXA   David Allan             (BIR - left)
