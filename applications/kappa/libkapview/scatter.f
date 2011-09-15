@@ -34,6 +34,9 @@
 *     The supplied arrays may be compressed prior to display (see Parameter
 *     COMPRESS). This reduces the number of points in the scatter plot, and
 *     also reduces the noise in the data.
+*
+*     The Pearson correlation coefficient of the displayed scatter plot is
+*     also calculated and displayed, and written to output parameter CORR.
 
 *  Usage:
 *     scatter in1 in2 comp1 comp2 device
@@ -77,6 +80,10 @@
 *        values supplied for this parameter are 1. If the number of values
 *        supplied is smaller than the number of axes, the final value
 *        supplied is duplicated for the remaining axes.  [1]
+*     CORR = _DOUBLE (Write)
+*        The Pearson correlation coefficient of the points in the scatter
+*        plot. A value of zero is stored if the correlation coefficient
+*        cannot be calculated.
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If a
 *        null value (!) is supplied no plot will be made. [Current graphics
@@ -253,6 +260,8 @@
 *        HISTOGRAM).
 *     2011-08-22 (TIMJ):
 *        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
+*     15-SEP-2011 (DSB):
+*        Added calculation of correlation coefficient.
 *     {enter_further_changes_here}
 
 *-
@@ -285,6 +294,7 @@
       CHARACTER UNITS1*30        ! Units string from NDF IN1
       CHARACTER UNITS2*30        ! Units string from NDF IN2
       DOUBLE PRECISION BSCALE( 2 )! Scaling for plot labels
+      DOUBLE PRECISION R         ! Correlation coefficient
       INTEGER CMPRS( NDF__MXDIM )! Compression factors for each axis
       INTEGER CDIM( NDF__MXDIM ) ! Dimensions of compressed array
       INTEGER CEL                ! No of elements in compressed array
@@ -537,6 +547,19 @@
          PERV2( 2 ) = RVAL
       END IF
 
+*  Calculate the correlation coefficient.
+      CALL KPG1_CORRR( NEL, %VAL( CNF_PVAL( IPW3 ) ),
+     :                 %VAL( CNF_PVAL( IPW4 ) ), R, STATUS )
+      IF( R .NE. VAL__BADD ) THEN
+         CALL MSG_SETD( 'R', R )
+         CALL MSG_OUT( ' ', '   Correlation coefficient: ^R', STATUS )
+         CALL PAR_PUT0D( 'CORR', R, STATUS )
+      ELSE
+         CALL MSG_OUT( ' ', '   Correlation coefficient: <bad>',
+     :                 STATUS )
+         CALL PAR_PUT0D( 'CORR', 0.0D0, STATUS )
+      ENDIF
+
 *  Construct the default label for the X and Y axes. These include
 *  the NDF component name and file name, and the units (if not blank).
       CALL KPG1_NDFNM( INDF1, NDFNAM, NMLEN, STATUS )
@@ -568,13 +591,14 @@
       CALL KPG1_GRAPH( NEL, %VAL( CNF_PVAL( IPW3 ) ),
      :                 %VAL( CNF_PVAL( IPW4 ) ), 0.0, 0.0,
      :                 LAB1( : LEN1 ), LAB2( : LEN2 ), 'Scatter plot',
-     :                 'XDATA', 'YDATA', 3, .FALSE., PERV1( 1 ),
+     :                 'XDATA', 'YDATA', 3, .TRUE., PERV1( 1 ),
      :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ),
      :                 'KAPPA_SCATTER', .FALSE., .FALSE., BSCALE,
      :                 IPLOT, STATUS )
 
 *  Close the workstation.
-      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
+      IF( IPLOT .NE. AST__NULL ) CALL KPG1_PGCLS( 'DEVICE', .FALSE.,
+     :                                            STATUS )
 
 *  Tidy up from here.
  999  CONTINUE

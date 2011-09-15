@@ -6926,6 +6926,14 @@ package kappa {
             helpkey *
          }
 
+         parameter corr {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
+         }
+
          parameter device {
             position 5
             ptype DEVICE

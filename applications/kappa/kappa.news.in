@@ -61,6 +61,9 @@
       -  The default for the AXES parameter has changed so that by
       default axes are only drawn if the picture is cleared.
 
+      - The Pearson correlation coefficient of the data in the
+      scatter plot is now displayed, and written to an output parameter.
+
    o  SHOWQUAL
 
       -  Add new QNAMES output parameter to list the attribute name

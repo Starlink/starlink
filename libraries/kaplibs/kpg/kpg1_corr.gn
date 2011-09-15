@@ -1,0 +1,149 @@
+      SUBROUTINE KPG1_CORR<T>( EL, X, Y, R, STATUS )
+*+
+*  Name:
+*     KPG1_CORRx
+
+*  Purpose:
+*     Calculate the correlation coefficient between two arrays.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_CORR<T>( EL, X, Y, R, STATUS )
+
+*  Description:
+*     The routine calculates the sample Pearson correlation coefficient
+*     between the two supplied arrays.
+
+*  Arguments:
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     X( EL ) = ? (Given)
+*        First input array.
+*     Y( EL ) = ? (Given)
+*        First input array.
+*     R = DOUBLE PRECISION (Returned)
+*        The correlation coefficient.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     arrays supplied to the routine must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David S Berry (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-SEP-2011 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+
+*  Global Variables:
+
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> X( EL )
+      <TYPE> Y( EL )
+
+*  Arguments Returned:
+      DOUBLE PRECISION R
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION ALIM      ! Largest safe value
+      DOUBLE PRECISION DENOM     ! Denominator value
+      DOUBLE PRECISION SX        ! Sum of X values
+      DOUBLE PRECISION SXX       ! Sum of squared X values
+      DOUBLE PRECISION SXY       ! Sum of X*Y values
+      DOUBLE PRECISION SY        ! Sum of Y values
+      DOUBLE PRECISION SYY       ! Sum of squared Y values
+      DOUBLE PRECISION VX        ! X value
+      DOUBLE PRECISION VY        ! Y value
+      INTEGER I                  ! Loop counter for array elements
+      INTEGER N                  ! Number of summed values
+
+*.
+
+*  Initialise the returned correlation coefficient
+      R = VAL__BADD
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the upper limit on the magnitude of the values that can be used
+*  safely.
+      ALIM = SQRT( DBLE( VAL__MAX<T> )/EL )
+
+*  Intialise sums
+      SXY = 0.0D0
+      SX = 0.0D0
+      SY = 0.0D0
+      SXX = 0.0D0
+      SYY = 0.0D0
+      N = 0
+
+*  Loop round every pair of values
+      DO I = 1, EL
+
+*  Check both are good.
+         IF( X( I ) .NE. VAL__BAD<T> .AND. Y( I ) .NE. VAL__BAD<T> ) THEN
+
+*  Convert to double precision and check they  are safe to use.
+            VX = DBLE( X( I ) )
+            VY = DBLE( Y( I ) )
+            IF( ABS( VX ) .LT. ALIM .AND. ABS( VY ) .LT. ALIM ) THEN
+
+*  Increment the sums
+               SXY = SXY +VX*VY
+               SX = SX +VX
+               SY = SY +VY
+               SXX = SXX +VX*VX
+               SYY = SYY +VY*VY
+               N = N + 1
+            END IF
+         END IF
+      END DO
+
+*  Calculate the returned correlation coefficient.
+      DENOM = SQRT( N*SXX - SX*SX )*SQRT( N*SYY - SY*SY )
+      IF( DENOM .NE. 0.0 ) R = ( N*SXY - SX*SY )/DENOM
+
+      END

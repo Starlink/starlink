@@ -14622,11 +14622,12 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 }{
    \sstdescription{
       This routine finds a position which has good co-ordinates in the
-      output Frame of the given Mapping, and returns both the input and
-      output co-ordinates at this position. The position is constrained
-      to lie within a specified box within the input Frame. The first
-      point to be tested is the centre of the box. If this does not give
-      valid output co-ordinates then a set of 10000 points randomly
+      output Frame of the given Mapping, and is a significant distance
+      from the origin of both input and output Frame. It returns both the
+      input and output co-ordinates at this position. The position is
+      constrained to lie within a specified box within the input Frame.
+      The first point to be tested is the centre of the box. If this does
+      not pass the tests described above, a set of 10000 points randomly
       distributed within the box is tested. An error is reported if no
       good position can be found.
    }
@@ -19210,6 +19211,55 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 
          \sstitem
          Uses array pointers.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_CORRx
+}{
+   Calculate the correlation coefficient between two arrays
+}{
+   \sstdescription{
+      The routine calculates the sample Pearson correlation coefficient
+      between the two supplied arrays.
+   }
+   \sstinvocation{
+      CALL KPG1\_CORR$<$T$>$( EL, X, Y, R, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         Number of array elements to process.
+      }
+      \sstsubsection{
+         X( EL ) = ? (Given)
+      }{
+         First input array.
+      }
+      \sstsubsection{
+         Y( EL ) = ? (Given)
+      }{
+         First input array.
+      }
+      \sstsubsection{
+         R = DOUBLE PRECISION (Returned)
+      }{
+         The correlation coefficient.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate. The
+         arrays supplied to the routine must have the data type specified.
       }
    }
 }

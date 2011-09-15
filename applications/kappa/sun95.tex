@@ -28491,7 +28491,7 @@ scaling limits are used for both images.
          the histogram. {\tt [!]}
       }
       \sstsubsection{
-         WEIGHTSTEP = _DOUBLE (Read)
+         WEIGHTSTEP = \_DOUBLE (Read)
       }{
          Only accessed if a value is supplied for parameter WEIGHTS.
          WEIGHTSTEP is the increment in weight value that corresponds to
@@ -43680,6 +43680,9 @@ KAPPA: \htmlref{FLIP}{FLIP},
       The supplied arrays may be compressed prior to display (see Parameter
       COMPRESS).  This reduces the number of points in the scatter plot, and
       also reduces the noise in the data.
+
+      The Pearson correlation coefficient of the displayed scatter plot is
+      also calculated and displayed, and written to output parameter CORR.
    }
    \sstusage{
       scatter in1 in2 [comp1] [comp2] [device]
@@ -43737,6 +43740,13 @@ KAPPA: \htmlref{FLIP}{FLIP},
          values supplied for this parameter are 1.  If the number of values
          supplied is smaller than the number of axes, the final value
          supplied is duplicated for the remaining axes.  {\tt [1]}
+      }
+      \sstsubsection{
+         CORR = \_DOUBLE (Write)
+      }{
+         The Pearson correlation coefficient of the points in the scatter
+         plot. A value of zero is stored if the correlation coefficient
+         cannot be calculated.
       }
       \sstsubsection{
          DEVICE = \htmlref{DEVICE}{se:selgradev} (Read)
@@ -57825,6 +57835,8 @@ The following applications have been modified:
       \begin{itemize}
         \item The default for the AXES parameter has changed so that by
         default axes are only drawn if the picture is cleared.
+        \item The Pearson correlation coefficient of the data in the
+        scatter plot is now displayed, and written to an output parameter.
       \end{itemize}
 
    \item [\htmlref{SHOWQUAL}{SHOWQUAL}]\mbox{}
