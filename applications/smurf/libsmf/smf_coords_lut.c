@@ -89,10 +89,12 @@
 *        Check slice FrameSet is not null before exporting it.
 *     9-NOV-2010 (EC):
 *        Add angle to interface
+*     2011-09-15 (TIMJ):
+*        Make it work with mising TCS information.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -208,13 +210,24 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 /* We only need the following AST objects if we will be approximating
    some caclulations. */
    if( tstep > 1 ) {
+      dim_t goodindex = itime_lo;
+
+/* We need to find the first good TCS index in order to get the
+   tracking system (Which for SCUBA-2 won't be changing in the sequence) */
+      for (itime = itime_lo; itime <= itime_hi; itime++) {
+        JCMTState * slice = &((data->hdr->allState)[itime]);
+        if (!(slice->jos_drcontrol >= 0 && slice->jos_drcontrol & DRCNTRL__POSITION)) {
+          goodindex = itime;
+          break;
+        }
+      }
 
 /* We need a Frame describing absolute tracking system coords. Take a
    copy of the supplied skyframe (to inherit obslat, obslon, epoch,
    etc), and then set its system to the tracking system. */
       trfrm = astCopy( abskyfrm );
       astSetC( trfrm, "System",
-               sc2ast_convert_system( (data->hdr->allState)[0].tcs_tr_sys,
+               sc2ast_convert_system( (data->hdr->allState)[goodindex].tcs_tr_sys,
                                       status ) );
 
 /* Get the Mapping from the tracking system to the output (absolute, since
@@ -265,7 +278,8 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
         itime++,state++ ) {
 
 /* No need to get the boresight position if we are doing full
-   calculations at every time slice. */
+   calculations at every time slice. If this time slice has bad
+   TCS data then the problem will be caught in smf_rebin_totmap. */
       if( tstep > 1 ) {
 
 /* Transform the current boresight and base (if moving) positions from
