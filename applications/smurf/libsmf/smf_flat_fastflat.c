@@ -208,7 +208,6 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
       }
       if (thisheat != heatbounds[0] && heatbounds[1] == 0 ) {
         heatbounds[1] = thisheat;
-        meas_per_heat = i;
         break;
       }
     }
@@ -216,6 +215,10 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
       int thisheat = (hdr->allState)[i].sc2_heat;
       if (thisheat != heatbounds[3] && heatbounds[2] == 0 ) {
         heatbounds[2] = thisheat;
+        /* the start of a flat ramp has many more steps at the initial heater
+           setting than we really are using so derive meas_per_heat from the
+           end instead */
+        meas_per_heat = nframes - i - 1;
         break;
       }
     }
