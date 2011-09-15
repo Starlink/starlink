@@ -207,17 +207,19 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 /* Ensure tstep is at least one. */
    if( tstep < 1 ) tstep = 1;
 
+/* Get the time slice index at which to do the next full calculation. */
+   itime0 = itime_lo;
+
 /* We only need the following AST objects if we will be approximating
    some caclulations. */
    if( tstep > 1 ) {
-      dim_t goodindex = itime_lo;
 
 /* We need to find the first good TCS index in order to get the
    tracking system (Which for SCUBA-2 won't be changing in the sequence) */
       for (itime = itime_lo; itime <= itime_hi; itime++) {
         JCMTState * slice = &((data->hdr->allState)[itime]);
         if (!(slice->jos_drcontrol >= 0 && slice->jos_drcontrol & DRCNTRL__POSITION)) {
-          goodindex = itime;
+          itime0 = itime;
           break;
         }
       }
@@ -227,7 +229,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    etc), and then set its system to the tracking system. */
       trfrm = astCopy( abskyfrm );
       astSetC( trfrm, "System",
-               sc2ast_convert_system( (data->hdr->allState)[goodindex].tcs_tr_sys,
+               sc2ast_convert_system( (data->hdr->allState)[itime0].tcs_tr_sys,
                                       status ) );
 
 /* Get the Mapping from the tracking system to the output (absolute, since
@@ -268,9 +270,6 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    bsx = bsy = 0.0;
    bsx0 = bsy0 = AST__BAD;
    bsxlast = bsylast = AST__BAD;
-
-/* Get the time slice index at which to do the next full calculation. */
-   itime0 = itime_lo;
 
 /* Loop round each time slice. */
    state = data->hdr->allState + itime_lo;
@@ -328,13 +327,14 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 /* If we have reached the next full calculation... */
       if( itime == itime0 ) {
 
-/* Record the time slice at which to do the next full calculation. */
-         itime0 += tstep;
-
 /* Calculate the full bolometer to map-pixel transformation for the current
    time slice */
          fullmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving,
                                      status );
+
+/* Record the time slice at which to do the next full calculation. If this
+   was a bad time slice just try the next one. */
+         itime0 += ( fullmap ? tstep : 1 );
 
 /* If succesful, use it to transform every bolometer position from bolo
    GRID coords to output map GRID coords. */
