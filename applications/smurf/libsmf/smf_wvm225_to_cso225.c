@@ -38,11 +38,14 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     RPT: Remo Tilanus (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2011-07-20 (TIMJ):
 *        Initial version. Extracted from smf_calc_wvm
+*     2011-09-15 (RPT):
+*        Calculate new relationship. See SCUBA-2 TRAC ticket #775
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -78,16 +81,21 @@
 
 double smf_wvm225_to_cso225( double wvm225, int * status ) {
   double csotau;
+  double dwvm;
 
   if (*status != SAI__OK) return VAL__BADD;
   if (wvm225 == VAL__BADD) return VAL__BADD;
 
-  /* Corrections from RPT on July 19th 2011 */
-  if (wvm225 <= 0.1) {
-    csotau = wvm225 - (0.2857 * wvm225) + 0.0111;
+  if ( wvm225 < 0.0704 ) {
+    dwvm = -0.0019 + 0.2*wvm225 - 4.698*pow(wvm225,2.0) + 3.0*pow(wvm225,3.0);
+  } else if ( wvm225 < 0.18045 ) {
+    dwvm =  0.0357 - 1.151*wvm225 + 8.626*pow(wvm225,2.0) - 21.439*pow(wvm225,3.0);
+  } else if  (wvm225 < 0.2205 ) {
+    dwvm = -0.01 - 0.0393*wvm225;
   } else {
-    csotau = wvm225 - 0.0175;
+    dwvm =  0.01 - 0.13*wvm225;
   }
+  csotau = wvm225 + dwvm;
 
   return csotau;
 }
