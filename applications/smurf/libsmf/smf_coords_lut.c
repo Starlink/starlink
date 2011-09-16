@@ -332,13 +332,10 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
          fullmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving,
                                      status );
 
-/* Record the time slice at which to do the next full calculation. If this
-   was a bad time slice just try the next one. */
-         itime0 += ( fullmap ? tstep : 1 );
-
 /* If succesful, use it to transform every bolometer position from bolo
    GRID coords to output map GRID coords. */
          if( fullmap ) {
+            itime0 += tstep;
             astTranGrid( fullmap, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
                          2, nbolo, outmapcoord );
             fullmap = astAnnul( fullmap );
@@ -352,7 +349,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    the next node), and set the boresight position bad to indicate we
    have no mapping for this time slice. */
          } else {
-            itime0 = itime + 1;
+            itime0++;
             bsx0 = AST__BAD;
             bsy0 = AST__BAD;
          }
