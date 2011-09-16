@@ -51,6 +51,9 @@
       -  The default for the AXES parameter has changed so that by
       default axes are only drawn if the picture is cleared.
 
+      -  The new ZEROFF parameter can be set TRUE to force the fit to
+      use an offset of zero.
+
    o  PSF
 
       -  The default for the AXES parameter has changed so that by

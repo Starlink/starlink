@@ -37213,7 +37213,8 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       corresponding values in the other NDF.  A least-squares
       straight-line is then fitted to the relationship between the two
       sets of data values in order to determine the relative scale
-      factor and any zero-level offset between the NDFs.  To reduce
+      factor and any zero-level offset between the NDFs (the offset may
+      optionally be fixed at zero - see parameter ZEROFF).  To reduce
       computation time, the data points are binned according to the
       data value in the first NDF.  The mean data value within each bin
       is used to find the fit and weights are applied according to the
@@ -37446,6 +37447,12 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          the maximum data value used by the fitting algorithm from IN1
          (with a small margin).  The value supplied may be greater than or
          less than the value supplied for YBOT.  {\tt [!]}
+      }
+      \sstsubsection{
+         ZEROFF = \_LOGICAL (Read)
+      }{
+         If TRUE, the offset of the linear fit is constrained to be
+         zero. {\tt [FALSE]}
       }
    }
    \sstresparameters{
@@ -57823,6 +57830,8 @@ The following applications have been modified:
       \begin{itemize}
         \item The default for the AXES parameter has changed so that by
         default axes are only drawn if the picture is cleared.
+        \item The new ZEROFF parameter can be set TRUE to force the fit to
+        use an offset of zero.
       \end{itemize}
 
    \item [\htmlref{PSF}{PSF}]\mbox{}

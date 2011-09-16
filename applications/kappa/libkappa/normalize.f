@@ -25,7 +25,8 @@
 *     corresponding values in the other NDF.  A least-squares
 *     straight-line is then fitted to the relationship between the two
 *     sets of data values in order to determine the relative scale
-*     factor and any zero-level offset between the NDFs.  To reduce
+*     factor and any zero-level offset between the NDFs (the offset may
+*     optionally be fixed at zero - see parameter ZEROFF).  To reduce
 *     computation time, the data points are binned according to the
 *     data value in the first NDF.  The mean data value within each bin
 *     is used to find the fit and weights are applied according to the
@@ -205,6 +206,9 @@
 *        the maximum data value used by the fitting algorithm from IN1
 *        (with a small margin).  The value supplied may be greater than
 *        or less than the value supplied for YBOT.  [!]
+*     ZEROFF = _LOGICAL (Read)
+*        If TRUE, the offset of the linear fit is constrained to be
+*        zero. [FALSE]
 
 *  Examples:
 *     normalize cl123a cl123b cl123c
@@ -346,6 +350,8 @@
 *        Document temporary style attributes.
 *     2011-08-22 (TIMJ):
 *        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
+*     16-SEP-2011 (DSB):
+*        Added ZEROFF parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -406,6 +412,7 @@
       LOGICAL  DEFIND            ! NDF component is in a defined state?
       LOGICAL  OUTRQD            ! Is an output NDF is to be generated?
       LOGICAL  VAR1              ! IN1 has a defined variance component?
+      LOGICAL  ZEROFF            ! Fix fit offset at zero?
       REAL     DRANGE( 2 )       ! Limits on IN2 data values to be used
       REAL     DRDEF( 2 )        ! Suggested default limits on IN2
                                  ! values
@@ -559,16 +566,18 @@
          GOTO 999
       END IF
 
+*  See if the offset should be fixed at zero.
+      CALL PAR_GET0L( 'ZEROFF', ZEROFF, STATUS )
+
 *  Call KPS1_NMPLT to calculate the linear function which normalises
 *  IN1 to IN2.
       CALL KPS1_NMPLT( %VAL( CNF_PVAL( PNT2S( 1 ) ) ),
      :                 %VAL( CNF_PVAL( PNT1S( 1 ) ) ), NELS,
      :             DRANGE( 1 ), DRANGE( 2 ), NBIN, NITER, NSIGMA,
-     :             MINPIX, NDF2S, NDF1S, %VAL( CNF_PVAL( PNTW1 ) ),
-     :             %VAL( CNF_PVAL( PNTW2 ) ),
+     :             MINPIX, NDF2S, NDF1S, ZEROFF,
+     :             %VAL( CNF_PVAL( PNTW1 ) ), %VAL( CNF_PVAL( PNTW2 ) ),
      :             %VAL( CNF_PVAL( PNTW3 ) ), %VAL( CNF_PVAL( PNTW4 ) ),
-     :             %VAL( CNF_PVAL( PNTW5 ) ),
-     :             SLOPE, OFFSET, STATUS )
+     :             %VAL( CNF_PVAL( PNTW5 ) ), SLOPE, OFFSET, STATUS )
 
 *  Unmap and release the temporary work space.
       CALL PSX_FREE( PNTW1, STATUS )

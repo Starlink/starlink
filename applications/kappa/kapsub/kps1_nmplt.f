@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_NMPLT( VA, VB, NEL, AMIN, AMAX, NBIN, NITER,
-     :                       SIGLIM, MINPIX, NDFA, NDFB, NSUM, ASUM,
-     :                       BSUM, B2SUM, VARLIM, SLOPE, OFFSET,
+     :                       SIGLIM, MINPIX, NDFA, NDFB, ZEROFF, NSUM,
+     :                       ASUM, BSUM, B2SUM, VARLIM, SLOPE, OFFSET,
      :                       STATUS )
 *+
 *  Name:
@@ -15,8 +15,8 @@
 
 *  Invocation:
 *     CALL KPS1_NMPLT( VA, VB, NEL, AMIN, AMAX, NBIN, NITER, SIGLIM,
-*    :                 MINPIX, NDF1, NDF2, NSUM, ASUM, BSUM, B2SUM,
-*    :                 VARLIM, SLOPE, OFFSET, STATUS )
+*    :                 MINPIX, NDFA, NDFB, ZEROFF, NSUM, ASUM, BSUM,
+*    :                 B2SUM, VARLIM, SLOPE, OFFSET, STATUS )
 
 *  Description:
 *     Intensities which are valid in each input vector and lie within
@@ -61,6 +61,8 @@
 *     NDFB = INTEGER (Given)
 *        The identifier for the NDF from which the second vector was
 *        taken.
+*     ZEROFF = LOGICAL (Given)
+*        If .TRUE., the offset of the fit is contrained to be zero.
 *     NSUM( NBIN ) = INTEGER (Given and Returned)
 *        Work space.
 *     ASUM( NBIN ) = REAL (Given and Returned)
@@ -83,7 +85,7 @@
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -131,6 +133,8 @@
 *        by NORMALIZE. At some point NORMALIZE should be changed to handle
 *        data that exceeds the range of a REAL (as has been done to
 *        HISTOGRAM).
+*     16-SEP-2011 (DSB):
+*        Added argument ZEROFF.
 *     {enter_further_changes_here}
 
 *-
@@ -155,6 +159,7 @@
       INTEGER MINPIX
       INTEGER NDFA
       INTEGER NDFB
+      LOGICAL ZEROFF
 
 *  Arguments Given and Returned:
       INTEGER NSUM( NBIN )
@@ -337,22 +342,39 @@
             GO TO 10
          END IF
 
-*  If normal equations are singular, abort with STATUS = SAI__ERROR
-         DET = REAL( WTSUM * X2SUM - XSUM * XSUM )
+*  First handle cases where the offset is free to vary
+         IF( .NOT. ZEROFF ) THEN
 
-         IF ( ABS( DET ) .LE. VAL__SMLR ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP('NORMALIZE_SINGULAR',
-     :        'NORMALIZE: Unable to calculate normalization constants.',
-     :         STATUS )
-            GO TO 10
-         END IF
+*  If normal equations are singular, abort with STATUS = SAI__ERROR
+            DET = REAL( WTSUM * X2SUM - XSUM * XSUM )
+
+            IF ( ABS( DET ) .LE. VAL__SMLR ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP('NORMALIZE_SINGULAR',
+     :           'NORMALIZE: Unable to calculate normalization '//
+     :           'constants.', STATUS )
+               GO TO 10
+            END IF
 
 *  Form the straight line parameters (B=SLOPE*A+OFFSET).
-         SLOPE = REAL( WTSUM * XYSUM - XSUM * YSUM )
-         OFFSET = REAL( X2SUM * YSUM - XSUM * XYSUM )
-         SLOPE = SLOPE / DET
-         OFFSET = OFFSET / DET
+            SLOPE = REAL( WTSUM * XYSUM - XSUM * YSUM )
+            OFFSET = REAL( X2SUM * YSUM - XSUM * XYSUM )
+            SLOPE = SLOPE / DET
+            OFFSET = OFFSET / DET
+
+*  Now handle cases where the offset is fixed at zero.
+         ELSE
+            DET = REAL( X2SUM )
+            IF ( ABS( DET ) .LE. VAL__SMLR ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP('NORMALIZE_SINGULAR',
+     :           'NORMALIZE: Unable to calculate normalization slope.',
+     :            STATUS )
+               GO TO 10
+            END IF
+            SLOPE = REAL( XYSUM )/DET
+            OFFSET = 0.0
+         END IF
 
 *  Print the results of this iteration.
          CALL MSG_OUT( 'REPORT', ' ', STATUS )

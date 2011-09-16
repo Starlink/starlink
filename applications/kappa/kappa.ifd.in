@@ -14117,6 +14117,15 @@ iraf! {
             helpkey *
          }
 
+         parameter zeroff {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Should the fit offset be forced to zero?}
+            default FALSE
+            helpkey *
+         }
+
       }
 
       action numb {
