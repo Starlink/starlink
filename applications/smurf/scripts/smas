@@ -677,8 +677,13 @@ foreach n (`cat files.smas`)
                $ATOOLS_DIR/astset tf format iso.2T result=tf
                set date = `$ATOOLS_DIR/astformat tf axis=1 value=0.0`
 
-#  Write a row to the output catalogue.
-               echo "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient $row $col" >> $outtable
+#  Write a row to the output catalogue, so long as it contains no INF, NAN
+#  or BAD values
+               set text = "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient $row $col"
+               echo "$text" | grep -iq 'INF\|NAN\|BAD'
+               if( $status == 1 ) then
+                  echo "$text" >> $outtable
+               endif
             endif
 
 #  Tell the user if PSF failed.
@@ -688,7 +693,11 @@ foreach n (`cat files.smas`)
 
 #  If only the AMP, COL and ROW columsn are needed, write them to the catalogue.
       else
-         echo "$maxv $row $col" >> $outtable
+         set text = "$maxv $row $col"
+         echo "$text" | grep -iq 'INF\|NAN\|BAD'
+         if( $status == 1 ) then
+            echo "$text" >> $outtable
+         endif
       endif
 
 #  Now handle maps of the Moon.
@@ -732,7 +741,11 @@ foreach n (`cat files.smas`)
       set fsum = `$KAPPA_DIR/parget total aperadd`
 
 #  Write a row to the output catalogue.
-      echo "$fsum $row $col" >> $outtable
+      set text = "$fsum $row $col"
+      echo "$text" | grep -iq 'INF\|NAN\|BAD'
+      if( $status == 1 ) then
+         echo "$text" >> $outtable
+      endif
 
    endif
 
