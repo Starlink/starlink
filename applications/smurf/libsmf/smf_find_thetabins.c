@@ -192,14 +192,18 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
     }
   }
 
-  bc = astRealloc( bc, nb*sizeof(bc) );
+  /* if there were zero bins found (maybe all angles are bad) then
+     we have to abort. Do not complain though. */
+  if (nb == 0) goto CLEANUP;
+
+  bc = astRealloc( bc, nb*sizeof(*bc) );
 
   /* Then calculate bin edges that are equidistant between the peaks (again,
      account for wraparound */
 
   bin = astCalloc( nb, sizeof(*bin) );
 
-  if( *status == SAI__OK ) {
+  if( *status == SAI__OK) {
     /* The first bin deals with wraparound */
     dist = bc[0] + range - bc[nb-1];
 
@@ -265,6 +269,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
     }
   }
 
+ CLEANUP:
   /* Free theta if it was allocated here */
   if( nosign && theta ) theta = astFree( theta );
 
