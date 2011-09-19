@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
-*                          const char *path, const char *param, int *status )
+*                          const char *path, const char *param, int div,
+*                          int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -22,29 +23,32 @@
 *     data = smfData * (Given and Returned)
 *        The data to be corrected (in-place).
 *     scaledata = const smfData * (Given)
-*        2-D smfData with dimensions matching the dimensions of "data"
-*        and of type _DOUBLE. Each bolometer value in "data" is
-*        multiplied by the value of the same bolometer in "scaledata".
-*        Bad values are ignored (i.e. no change is made to the corresponding
-*        bolometer values - so bad values are equivalent to a value of 1.0).
+*        A 2-D smfData holding the correction values. The dimensions must
+*        match the dimensions of "data" and the type must be _DOUBLE.
+*        value of 1.0). May be NULL, in which case the correction values
+*        are obtained using "path".
 *     path = const char * (Given)
 *        The path to the NDF containing the correction factors. This
-*        should be a 2D NDF with pixel bounds (0:31,0:39). Each bolometer
-*        value in the supplied smfData is multiplied by the value of the
-*        same bolometer in the NDF. Bad values are ignored (i.e. no
-*        change is made to the corresponding bolometer values - so bad
-*        values are equivalent to a value of 1.0). Will not be accessed if
-*        "scaledata" is supplied.
+*        should be a 2D NDF with pixel bounds (0:31,0:39). Will not be
+*        accessed if "scaledata" is supplied.
 *     param = const char * (Given)
 *        The name of the configuration parameter from which the NDF path
 *        was obtained. This is included in the error message if the NDF
 *        cannot be used. May be NULL.
+*     div = int (Given)
+*        Specifies whether "data" should be divided or multipled by the
+*        values in "scaledata" or "path". If non-zero, then divide,
+*        otherwise multiply.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     Each bolometer value in the supplied smfData is multiplied by the
-*     value of the same bolometer in the supplied NDF.
+*     Each bolometer value in the supplied smfData "data" is multiplied or
+*     divided by the corresponding correction value, depending on the
+*     value of "div". The correction values can either be supplied in a
+*     smfData (specified by "scaledata") or in a named NDF (specified by
+*     "path"). If a correction value is VAL__BADD, the data value for the
+*     corresponding bolometer are left unchanged.
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
@@ -56,6 +60,8 @@
 *        Original version.
 *     2011-09-06 (TIMJ):
 *        Allow a smfData scaling array to be supplied externally.
+*     19-SEP-2011 (DSB):
+*        - Added argument "div".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,6 +107,7 @@ typedef struct smfScaleBolsJobData {
    dim_t t2;
    double *corr;
    double *dat;
+   int div;
    size_t bstride;
    size_t tstride;
 } smfScaleBolsJobData;
@@ -110,16 +117,16 @@ static void smf1_scale_bols_job( void *job_data, int *status );
 
 
 void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
-                     const char *path, const char *param, int *status ){
+                     const char *path, const char *param, int div, int *status ){
 
 /* Local Variables */
+   dim_t dcols = 0;
+   dim_t drows = 0;
    dim_t nbolo;
    dim_t ntslice;
    dim_t tstep;
    double *corr = NULL;
    double *dat = NULL;
-   dim_t drows = 0;
-   dim_t dcols = 0;
    int el;
    int indf = NDF__NOID;
    int iworker;
@@ -232,6 +239,7 @@ void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
          pdata->tstride = tstride;
          pdata->dat = dat;
          pdata->corr = corr;
+         pdata->div = div;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_scale_bols_job, 0, NULL,
@@ -329,24 +337,41 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
                  status, t1, t2 );
       smf_timerinit( &tv1, &tv2, status);
 
-/* Loop round all time slices to be processed by this thread. */
-      for( itime = t1; itime <= t2 && *status==SAI__OK; itime++ ) {
+/* First handle division. */
+      if( pdata->div ) {
 
-/* Get the pointer to the first bolometer value in the current time slice. */
-         p1 = dat + itime*tstride;
+/* Loop round all time slices to be processed by this thread. */
+         for( itime = t1; itime <= t2 && *status==SAI__OK; itime++ ) {
+
+/* Get the pointer to the first bolometer data value in the current
+   time slice. */
+            p1 = dat + itime*tstride;
 
 /* Get the pointer to the first bolometer value in the correction array. */
-         p2 = corr;
+            p2 = corr;
 
 /* Loop round every bolometer in the time slice. */
-         for( ibolo = 0; ibolo < nbolo; ibolo++,p2++ ) {
+            for( ibolo = 0; ibolo < nbolo; ibolo++,p2++ ) {
 
-/* If both bolometer and corection value are good, scale the bolometer
-   value. */
-            if( *p1 != VAL__BADD && *p2 != VAL__BADD ) *p1 *= *p2;
+/* If the correction value is good, scale the data value if it too is
+   good. If the data value or correction value is bad, leave the data
+   value unchanged. */
+               if( *p2 != VAL__BADD && *p1 != VAL__BADD ) *p1 /= *p2;
 
-/* Get a pointer to the next bolometer value. */
-            p1 += bstride;
+/* Get pointers to the next bolometer data value. */
+               p1 += bstride;
+            }
+         }
+
+/* Now handle multiplication in the same way. */
+      } else {
+         for( itime = t1; itime <= t2 && *status==SAI__OK; itime++ ) {
+            p1 = dat + itime*tstride;
+            p2 = corr;
+            for( ibolo = 0; ibolo < nbolo; ibolo++,p2++ ) {
+               if( *p2 != VAL__BADD && *p1 != VAL__BADD ) *p1 *= *p2;
+               p1 += bstride;
+            }
          }
       }
 

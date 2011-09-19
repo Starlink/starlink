@@ -69,6 +69,11 @@ optffs4b = <undef>
 optffs4c = <undef>
 optffs4d = <undef>
 
+#  If set non-zero, the bolometer data is divided by the values read from
+#  the optical flatfields. Otherwise, the bolometer data is multiplied by
+#  the values read from the optical flatfields.
+optffdiv = 1
+
 # these are analogous cleaning parameters for dark squids
 # We do not have a clever syntax for recursively reading this
 # routine with a "cleandk" prefix so we have to duplicate all

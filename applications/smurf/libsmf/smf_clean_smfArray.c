@@ -111,6 +111,8 @@
 *        Can flag noisy boloms before common-mode removal using noiseclipprecom
 *     2011-08-25 (DSB):
 *        Add optical flat-fielding option.
+*     2011-09-19 (DSB):
+*        Allow data to be divided or multiplied by the optical flat-fields.
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -180,6 +182,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
   double noisecliplow = 0;  /* Sigma clip low-noise outlier bolos */
   int noiseclipprecom = 0;  /* Noise clipping before common-mode cleaning? */
   const char *optff=NULL;   /* Pointer to optical flatfield NDF */
+  int optffdiv;             /* Divide data by the optical flat-fields? */
   int order;                /* Order of polynomial for baseline fitting */
   char param[ 20 ];         /* Buffer for config parameter name */
   double pcathresh;         /* n-sigma threshold for PCA cleaning */
@@ -339,10 +342,12 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                        status );
     astChrCase( NULL, param, 1, 0 );
     if( astMapHasKey( keymap, param ) ) {
+      astMapGet0I( keymap, "OPTFFDIV", &optffdiv );
       if ( astMapGet0C( keymap, param, &optff ) ) {
-        msgOutiff( MSG__VERB,"", FUNC_NAME ": Correcting bolometer values "
-                   "using factors read from NDF %s", status, optff );
-        smf_scale_bols( wf, data, NULL, optff, param, status );
+        msgOutiff( MSG__VERB,"", FUNC_NAME ": %s bolometer values "
+                   "by factors read from NDF %s", status,
+                   optffdiv ? "Dividing" : "Multiplying", optff );
+        smf_scale_bols( wf, data, NULL, optff, param, optffdiv, status );
       }
     }
 

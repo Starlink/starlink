@@ -158,7 +158,7 @@ void smf_flatten ( smfData *data, AstKeyMap * heateffmap, int *status ) {
           astMapGet0P( heateffmap, arrayidstr, &tmp );
           if (tmp) {
             smfData * heateff = tmp;
-            smf_scale_bols( NULL, data, heateff, NULL, "HEATEFF", status );
+            smf_scale_bols( NULL, data, heateff, NULL, "HEATEFF", 0, status );
             msgOutiff(MSG__VERB, "", "Applying heater efficiency data for array '%s'",
                       status, arrayidstr);
           }

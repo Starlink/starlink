@@ -1656,7 +1656,7 @@ void smf_scale2freq( double f_edgesmall, double f_edgelarge, const smfHead *hdr,
                      double *f_edgelow, double *f_edgehigh, int *status );
 
 void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
-                     const char *path, const char *param, int *status );
+                     const char *path, const char *param, int div, int *status );
 
 void smf_scalar_multiply( smfData * data, double dscalar, int * status );
 
