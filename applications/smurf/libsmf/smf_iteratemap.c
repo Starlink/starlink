@@ -375,6 +375,8 @@
 *        along with ncontchunks back to the caller.
 *     2011-06-29 (EC):
 *        Add sampcubes extension
+*     2011-09-19 (EC):
+*        Add ability to write ONLY the final itermap (set itermap < 0)
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1832,7 +1834,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             /* If storing each iteration in an extension do it here if this
                was the last filegroup of data to be added */
 
-            if( itermap && (i == nfilegroups-1) ) {
+            if( (itermap > 0) && (i == nfilegroups-1) ) {
               smf_write_itermap( thismap, thisvar, msize, iterrootgrp,
                                  contchunk, iter, lbnd_out, ubnd_out,
                                  outfset, res[i]->sdata[0]->hdr, qua[i],
@@ -2141,6 +2143,26 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /*** TIMER ***/
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                      ": ** %f s writing shortmap",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
+        }
+      }
+
+      /* If we're writing out only the final map from each chunk, do it here */
+      if( itermap < 0 ) {
+        /* Currently only support memiter=1 case to avoid having to do
+           a separate filegroup loop. */
+        if( !memiter ) {
+          msgOut( "", FUNC_NAME
+                  ": *** WARNING *** shortmap=1, but memiter=0", status );
+        } else {
+          smf_write_itermap( thismap, thisvar, msize, iterrootgrp,
+                             contchunk, iter, lbnd_out, ubnd_out,
+                             outfset, res[0]->sdata[0]->hdr, qua[0],
+                             status );
+
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s writing itermap",
                      status, smf_timerupdate(&tv1,&tv2,status) );
         }
       }

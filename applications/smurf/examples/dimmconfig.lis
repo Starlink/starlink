@@ -63,8 +63,12 @@ exportndf = 0
 
 #noexportsetbad = 1
 
-# Create .MORE.SMURF.ITERMAPS extensions after each iteration?
-#itermap = 1
+# Create .MORE.SMURF.ITERMAPS extensions? If this parameter is set to
+# a positive value, maps from each iteration and each chunk will be
+# written.  If this is set to a negative value, only the final
+# iteration will be written.
+# itermap = 1
+
 
 # Create .MORE.SMURF.BOLOMAPS single-beam map extensions?
 #bolomap = 1
