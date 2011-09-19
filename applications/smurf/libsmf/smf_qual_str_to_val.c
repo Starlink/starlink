@@ -49,6 +49,8 @@
 *        Add SMF__Q_EXT
 *     2011-04-15 (DSB):
 *        Add SMF__Q_LOWAP
+*     2011-09-19 (DSB):
+*        Add SMF__Q_BADEF
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -145,6 +147,9 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
     lfamily = SMF__QFAM_TCOMP;
   } else if ( strcmp(qname, "LOWAP") == 0 ) {
     retval = SMF__Q_LOWAP;
+    lfamily = SMF__QFAM_TSERIES;
+  } else if ( strcmp(qname, "BADEF") == 0 ) {
+    retval = SMF__Q_BADEF;
     lfamily = SMF__QFAM_TSERIES;
   } else {
     *status = SMF__BADQNM;

@@ -74,6 +74,8 @@
 *        Add SMF__Q_LOWAP
 *     2011-05-26 (TIMJ):
 *        Attempt to free QUAL memory even if status is bad.
+*     2011-09-19 (DSB):
+*        Add SMF__Q_BADEF
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -312,7 +314,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
             if ( qual[i] & (SMF__Q_APOD|SMF__Q_PAD) ) {
               qmap[i] |= SMF__TCOMPQ_ENDS;
             }
-            if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_FILT|SMF__Q_EXT|SMF__Q_LOWAP) ) {
+            if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_FILT|SMF__Q_EXT|SMF__Q_LOWAP|SMF__Q_BADEF) ) {
               qmap[i] |= SMF__TCOMPQ_BLIP;
             }
             if ( qual[i] & (SMF__Q_COM) ) {

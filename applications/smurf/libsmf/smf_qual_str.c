@@ -69,6 +69,8 @@
 *        Add SMF__Q_EXT
 *     2011-04-26 (DSB):(TIMJ):
 *        Add SMF__Q_LOWAP
+*     2011-09-19 (DSB):
+*        Add SMF__Q_BADEF
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Science & Technology Facilities Council.
@@ -191,6 +193,11 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
     case SMF__Q_LOWAP:
       retval = "LOWAP";
       ldescr = "Set iff apodisation factor is too low to invert";
+      break;
+
+    case SMF__Q_BADEF:
+      retval = "BADEF";
+      ldescr = "Set iff optical flatfield value is bad";
       break;
 
     default:

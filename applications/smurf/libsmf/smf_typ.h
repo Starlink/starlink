@@ -184,6 +184,8 @@
 *        Add theta (scan direction each tslice) to smfData
 *     2010-12-06 (TIMJ):
 *        Add enginerring obs types.
+*     2011-09-19 (DSB):
+*        Add SMF__Q_BADEF.
 *     {enter_further_changes_here}
 
  *  Copyright:
@@ -486,6 +488,7 @@ typedef enum {
   SMF__Q_NOISE   = BIT_TO_VAL(9),   /* Bolometer flagged because of noise constraint */
   SMF__Q_EXT     = BIT_TO_VAL(10),  /* Unable to apply extinction correction */
   SMF__Q_LOWAP   = BIT_TO_VAL(11),  /* Apodisation factor is too low to invert */
+  SMF__Q_BADEF   = BIT_TO_VAL(12),  /* Optical flat field correction is bad */
 } smf_qual_bits;
 
 /* These macros are for several commonly-used combinations of quality flags */
@@ -535,10 +538,10 @@ typedef enum {
 /* Number of quality bits in each family. SMF__NQBITS can be used
    for declaring array sizes. */
 typedef enum {
-  SMF__NQBITS_TSERIES = 12,
+  SMF__NQBITS_TSERIES = 13,
   SMF__NQBITS_MAP     = 1,
   SMF__NQBITS_TCOMP   = 5,
-  SMF__NQBITS         = 12    /* Largest number of bits in a family */
+  SMF__NQBITS         = 13    /* Largest number of bits in a family */
 } smf_qfam_count_t;
 
 
