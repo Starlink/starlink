@@ -47,9 +47,12 @@
 *     divided by the corresponding correction value, depending on the
 *     value of "div". The correction values can either be supplied in a
 *     smfData (specified by "scaledata") or in a named NDF (specified by
-*     "path"). If a correction value is VAL__BADD, all values for the
+*     "path"). If a correction value is VAL__BADD, and the supplied
+*     smfData has an associated quality array, all values for the
 *     corresponding bolometer are assigned the qualities SMF__Q_BADEF and
-*     SMF__Q_BADB, and the data value is left unchanged.
+*     SMF__Q_BADB, and the data value is left unchanged. If the supplied
+*     smfData does not have an associated quality array, the bolometer
+*     values are set to VAL__BADD.
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
@@ -151,17 +154,12 @@ void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
 /* Check we have double precision data. */
    if( !smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status ) ) return;
 
-/* Get pointers to data and quality arrays. */
+/* Get pointers to data and (optionally) quality arrays. */
    dat = data->pntr[ 0 ];
    qua = smf_select_qualpntr( data, NULL, status );
 
-/* Report an error if either are missing. */
-   if( !qua ) {
-      *status = SAI__ERROR;
-      errRep( "", "smf_scale_bols: No valid QUALITY array was provided",
-              status );
-
-   } else if( !dat ) {
+/* Report an error if the data array is missing. */
+   if( !dat ) {
       *status = SAI__ERROR;
       errRep( "", "smf_scale_bols: smfData does not contain a DATA component",
               status );
@@ -362,7 +360,7 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
 /* Get the pointer to the first bolometer data and quality value in the current
    time slice. */
             p1 = dat + itime*tstride;
-            q1 = qua + itime*tstride;
+            q1 = qua ? qua + itime*tstride : NULL;
 
 /* Get the pointer to the first bolometer value in the correction array. */
             p2 = corr;
@@ -376,15 +374,21 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
                if( *p2 != VAL__BADD ) {
                   if( *p1 != VAL__BADD ) *p1 /= *p2;
 
-/* If the correction value is bad, leave the data value unchanged but
-   assign the quality SMF__Q_BADEF and SMF__Q_BADB to the sample. */
-               } else {
+/* If the correction value is bad, and a quality array is available, leave
+   the data value unchanged but assign the quality SMF__Q_BADEF and
+   SMF__Q_BADB to the sample. */
+               } else if( q1 ) {
                   *q1 |= ( SMF__Q_BADEF | SMF__Q_BADB );
+
+/* If the correction value is bad, and no quality array is available, set
+   the data value to VAL__BADD. */
+               } else {
+                  *p1 = VAL__BADD;
                }
 
 /* Get pointers to the next bolometer data and quality value. */
                p1 += bstride;
-               q1 += bstride;
+               if( q1 ) q1 += bstride;
             }
          }
 
@@ -392,16 +396,18 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
       } else {
          for( itime = t1; itime <= t2 && *status==SAI__OK; itime++ ) {
             p1 = dat + itime*tstride;
-            q1 = qua + itime*tstride;
+            q1 = qua ? qua + itime*tstride : NULL;
             p2 = corr;
             for( ibolo = 0; ibolo < nbolo; ibolo++,p2++ ) {
                if( *p2 != VAL__BADD ) {
                   if( *p1 != VAL__BADD ) *p1 *= *p2;
-               } else {
+               } else if( q1 ) {
                   *q1 |= ( SMF__Q_BADEF | SMF__Q_BADB );
+               } else {
+                  *p1 = VAL__BADD;
                }
                p1 += bstride;
-               q1 += bstride;
+               if( q1 ) q1 += bstride;
             }
          }
       }
