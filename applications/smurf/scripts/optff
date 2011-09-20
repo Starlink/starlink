@@ -1,0 +1,71 @@
+#!/bin/tcsh
+#+
+#  Name:
+#     optff
+
+#  Purpose:
+#     Reads raw scuba-2 data for a specified list of observation
+#     from /jcmtdata/raw/scuba2, and creates a set of eight NDFs
+#     "optff-<array>.sdf" within the current directory, containing
+#     normalised efficiency values for subeach array.
+#
+#     This script invokes the optff-obs and optff-combine scripts
+#     to do most of the work.
+#
+#     Any observations for which intermediate results were created
+#     by a previous run of this script are not re-processed - the
+#     existing intermediate results are re-used. To force new
+#     intermediate results to be created, delete the subdirectory
+#     containing the existing intermediate results (./<date>/<obs>/).
+
+#  Example:
+#     optff obslist
+#        Reads lists of observations from text file "obslist" and
+#        generates corresponding optical efficiency NDFs. Each line
+#        in text file should contain an 8-digit date followed by a
+#        5-digit observation number. Blank lines and lines beginning
+#        with "#" are ignored.
+#-
+
+if( $# < 1 ) then
+   echo "Usage: optff <infile>"
+   exit
+endif
+
+if( !( -e $1 ) ) then
+   echo "Cannot find file $1"
+   exit
+endif
+
+#  Get a list of the dates
+set datelist = `grep -v \# $1 | grep 0 | awk '{print $1}'`
+
+#  Get a list of the observation numbers
+set obslist = `grep -v \# $1 | grep 0 | awk '{print $2}'`
+
+#  Check no stray dates or obs have been given.
+if( $#datelist != $#obslist ) then
+   echo "$1 contains $#datelist dates but $#obslist observation numbers"
+   exit
+endif
+
+#  Log files are stored in a separate directory
+rm -rf logs >& /dev/null
+mkdir logs
+
+#  Produce intermediate results for each observation.
+set i = 1
+foreach date ($datelist)
+   set obs = $obslist[$i]
+   echo "Creating intermediate results for $date $obs ($i of $#obslist)"
+   ./optff-obs $date $obs >! logs/${date}-${obs}.log
+   @ i = $i + 1
+end
+
+#  Combine them to produce the master efficiency NDFs
+echo "Combining intermediate results into master efficiency NDFs"
+./optff-combine >! logs/combine.log
+
+echo "Done"
+
+

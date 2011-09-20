@@ -1,0 +1,112 @@
+#!/bin/tcsh
+#+
+#  Name:
+#     optff-combine
+
+#  Purpose:
+#     Merges all the optical efficiency data to create a master
+#     efficiency NDF for each subarray. The current directory should
+#     contain directories of the form ./<date>/<obs>/ for each
+#     observation to be included. These should have been created
+#     previously using script optff-obs. All NDFs "smas-<array>.sdf"
+#     contained within these subdirectories are combined to create
+#     eight output NDFs "optff-<array>.sdf" in the current directory.
+#
+#     Normally, the "optff" script should be used rather than
+#     invoking this script directly.
+#-
+
+set wref = \!
+
+rm -rf optff-combine-workdir >& /dev/null
+mkdir optff-combine-workdir
+cd optff-combine-workdir
+
+#  Create a temporary ADAM directory within this directory.
+rm -rf adam >& /dev/null
+mkdir adam
+setenv ADAM_USER $PWD/adam
+
+foreach waveband (s4 s8)
+
+#  First we need to create an image that can be used as the reference to
+#  which other images are normalised when they are combined using makemos.
+#  This reference image is based just on those observations where all four
+#  arrays were scanned over the source together (i.e. INSTAPX/Y == 0).
+#  Find all directories that contain results for all four arrays in the
+#  current waveband.
+   rm -f dirs.lis >& /dev/null
+   foreach m (`find .. -name "smas-${waveband}.sdf"`)
+      set dir = `dirname $m`
+      set ok = 1
+      foreach a (a b c d)
+         if( !( -e "$dir/smas-${waveband}${a}.sdf" ) ) then
+            set ok = 0
+            break
+         endif
+      end
+      if( $ok == 1 ) then
+         echo "$dir" >>! dirs.lis
+      endif
+   end
+
+   if( !( -e dirs.lis ) ) then
+      exit "No directories found containing all four ${waveband} arrays"
+      exit
+   endif
+
+#  Mosaic the complete focal plane images from each of the above directories,
+#  adjusting the scale factor (but not zero offset) to normalise them to a
+#  common scale. The resulting image is used as the reference when the results
+#  for each individual array are mosaiced.
+   $CCDPACK_DIR/makemos \{^dirs.lis\}/smas-${waveband} out=ref-$waveband scale \
+                        method=median quiet
+
+#  Do all four arays in the current waveband.
+   foreach a (a b c d)
+      set array = "${waveband}${a}"
+
+#  Find all the files to be mosaiced. These will already be aligned in pixel
+#  coords.
+      find .. -name "smas-${array}.sdf" | sed -e 's/.sdf//' >! files
+
+#  But the reference image created above may have a different pixel coord
+#  system, so align it now with the first of the files to be combined.
+      set first = `head -n 1 files`
+      $KAPPA_DIR/wcsalign ref-$waveband ref=$first method=sincsinc \
+                          out=ref-$array accept
+
+#  Mosaic all the results for the individual array, adjusting the scale
+#  factors (but not zero offsets) to normalise them to the reference image.
+      $CCDPACK_DIR/makemos ^files out=mosaic-$array scale method=median \
+                           genvar quiet ref=ref-$array
+
+#  Reject locally unusual values
+      $KAPPA_DIR/ffclean in=mosaic-$array out=mosaic-${array}_FF box=3 clip=\[3,3,3\] quiet
+
+#  Gaussian smoothing
+      $KAPPA_DIR/gausmooth in=mosaic-${array}_FF out=mosaic-${array}_SM fwhm=3 wlim=0.2
+
+   end
+
+#  Normalise all results to the median value in the whole focal plane mosaic
+   $KAPPA_DIR/wcsmosaic in=mosaic-${waveband}\?_SM out=tmosaic-${waveband} ref=$wref accept
+   set wref = tmosaic-${waveband}
+
+   $KAPPA_DIR/histat tmosaic-${waveband} quiet
+   set median = `$KAPPA_DIR/parget median histat`
+   foreach a (a b c d)
+      set array = "${waveband}${a}"
+      $KAPPA_DIR/cdiv mosaic-${array}_SM scalar=$median out=aa
+
+#  Fill bad values (using variance seems to make fillbad produce silly values, so
+#  switch it off).
+      $KAPPA_DIR/fillbad aa niter=7 variance=no out=../optff-${array}
+
+   end
+
+end
+
+cd ..
+rm -rf optff-combine-workdir
+

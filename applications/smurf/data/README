@@ -3,3 +3,12 @@ Data files needed by SMURF
 *_heateff.sdf are heater efficiency files used by SCUBA-2 flatfielding. They
 will be installed into $STARLINK_DIR/share/smurf and are referenced from the
 resist.cfg configuration file.
+
+
+optff-*.sdf are the optical flatfield files that can be referred to by
+makemap and sc2clean config parameters OPTFFS8A, OPTFFS8B, etc. They are
+generated using the "opteff" script in the "scripts" directory of the
+smurf distribution.
+
+
+

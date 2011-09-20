@@ -1,0 +1,252 @@
+#!/bin/tcsh
+#+
+#  Name:
+#     optff-obs
+
+#  Purpose:
+#     Reads raw scuba-2 data for a specified observation from
+#     /jcmtdata/raw/scuba2, and uses sc2clean, findback, makemap
+#     and smas to create 8 NDFs, each of which contains the peak
+#     source value seen by each bolometer in a single sub-array.
+#     The NDFs are called "smas-<array>.sdf" where <array> is s4a,
+#     s4b, s4c, s4d, s8a, s8b, s8c and s8d. They are stored in a
+#     directory ./<date>/<obs>/ within the current directory. Any
+#     of these NDFs that already exist are not replaced.
+#
+#     Normally, the "optff" script should be used rather than
+#     invoking this script directly.
+
+#  Example:
+#     optff-obs 20110819 00019
+#        Reads data for observation 19 on 20110819, and writes NDFs
+#        smas-s4a.sdf, etc, to  directory ./20110819/00019/
+#-
+
+if( $# < 2 ) then
+   echo "Usage: optff-obs date obs"
+   exit
+endif
+
+if( ! (-d $1 ) ) then
+   mkdir $1
+endif
+cd $1
+
+if( ! (-d $2 ) ) then
+   mkdir $2
+endif
+cd $2
+
+#  Create a suitable makemap configuration file. No COM or FLT since
+#  cupid:findback is used to remove a background from each bolometer
+#  time series before making the map. Switch off cleaning since we will
+#  be using sc2clean to do the cleaning, prior to running findback.
+rm -f conf >& /dev/null
+echo "^/stardev/share/smurf/dimmconfig.lis" >! conf
+echo "numiter=-20" >> conf
+echo "bolomap=1" >> conf
+echo "doclean=0" >> conf
+echo "modelorder=(ext,ast,noi)" >> conf
+
+set root = "/jcmtdata/raw/scuba2"
+
+#  Create a temporary ADAM directory within this directory.
+rm -rf adam-optff-obs >& /dev/null
+mkdir adam-optff-obs
+setenv ADAM_USER $PWD/adam-optff-obs
+
+#  Loop over both waveband
+foreach waveband (s8 s4)
+
+#  We do not yet know the filter size to use.
+   set box = " "
+
+#  Loop over all subarrays
+   foreach anam (a b c d)
+
+#  Get the full array name
+      set array = "$waveband$anam"
+      echo
+      echo "Doing array $array"
+
+#  Get the output NDF name for this subarray
+      set out = "smas-${array}"
+
+#  Skip if this sub-scan was processed by a previous run.
+      if( -e "${out}.sdf" ) then
+         echo "   Skipping $array (already done)"
+         continue
+      endif
+
+#  Loop over all sub-scans for the current subarray in the specified obs
+      ls $root/$array/$1/$2/$array*.sdf >! scans
+      foreach n ( `cat scans` )
+         set tmp = `basename $n .sdf`
+
+#  If the subscan has SEQ_TYPE and OBS_TYPE headers, it is is usable if
+#  the values of these headers are equal
+         set usable = 0
+         set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SEQ_TYPE`
+         if( "$there" == "TRUE" ) then
+            set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=OBS_TYPE`
+            if( "$there" == "TRUE" ) then
+               set seq_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=SEQ_TYPE`
+               set obs_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=OBS_TYPE`
+               if( "$seq_type" == "$obs_type" ) then
+                  set usable = 1
+               endif
+            endif
+         endif
+
+#  If either the SEQ_TYPE or OBS_TYPE header was not found, check the file has
+#  a SHUTTER keyword in its FITS extension
+         if( "$there" != "TRUE" ) then
+            set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SHUTTER`
+            if( "$there" == "TRUE" ) then
+
+#  If the value of SHUTTER is zero, the scan is a dark (unusable).
+               set val = `$KAPPA_DIR/fitsmod $n edit=print keyword=SHUTTER`
+               if( "$val" != "0" ) then
+                  set usable = 1
+               endif
+            endif
+         endif
+
+#  Skip non-science subscans.
+         if( $usable == 1 ) then
+
+#  If the observation uses only a single array at each wavelength, see if the
+#  array currently being processed actually saw the source.
+            set val = `$KAPPA_DIR/fitsmod $n edit=print keyword=INSTAP`
+            if( "$val" != "" ) then
+               set do_array = 0
+               if( "$val" == "s8a" || "$val" == "s4d" ) then
+                  if( "$array" == "s8a" || "$array" == "s4d" ) then
+                     set do_array = 1
+                  endif
+               else if( "$val" == "s8b" || "$val" == "s4c" ) then
+                  if( "$array" == "s8b" || "$array" == "s4c" ) then
+                     set do_array = 1
+                  endif
+               else if( "$val" == "s8c" || "$val" == "s4b" ) then
+                  if( "$array" == "s8c" || "$array" == "s4b" ) then
+                     set do_array = 1
+                  endif
+               else if( "$val" == "s8d" || "$val" == "s4a" ) then
+                  if( "$array" == "s8d" || "$array" == "s4a" ) then
+                     set do_array = 1
+                  endif
+               else
+                  echo "Obs $2 on $1 uses unknown INSTAP=$val - aborting"
+                  exit
+               endif
+            else
+               set do_array = 1
+            endif
+
+#  If not already done so, determine the filter size.
+            if( "$box" == " " ) then
+
+#  Get an upper limit on the angular size of the source, in arc-sec.
+               set obj = `$KAPPA_DIR/fitsmod $n edit=print keyword=OBJECT`
+               if( "$obj" == "JUPITER" ) then
+                  set size = 50
+               else if( "$obj" == "URANUS" ) then
+                  set size = 4
+               else if( "$obj" == "SATURN" ) then
+                  set size = 21
+               else if( "$obj" == "MARS" ) then
+                  set size = 25
+               else
+                  echo "Unknown source: $obj"
+                  exit
+               endif
+
+#  Add on the airy disk radius
+               if( $waveband == "s8" ) then
+                  set airy = 14.26
+               else
+                  set airy = 7.55
+               endif
+               set size = `$KAPPA_DIR/calc "pa+pb" pa=$size pb=$airy`
+
+#  Get the number of samples taken to traverse this distance, assuming 200 Hz
+#  sampling rate. Use an additional factor of 4 for safety.
+               set scan_vel = `$KAPPA_DIR/fitsmod $n edit=print keyword=SCAN_VEL`
+               set box = `$KAPPA_DIR/calc exp="'nint(4*200*pa/pb)'" pa=$size pb=$scan_vel`
+               break
+
+            endif
+         endif
+      end
+
+#  If the current array did not see the source, continue to the next array.
+      if( $do_array == 0 ) then
+         echo "Skipping $array since INSTAP=$val"
+         continue
+      endif
+
+#  If the last subscan is a fast flat, remove it from the list of subscans
+#  since having a fast flat at the end seems to result in many bolometers
+#  being rejected by the flatfielding system due to instable flatfields.
+      set last_scan = `tail -n 1 scans`
+      set there = `$KAPPA_DIR/fitsmod $last_scan edit=exist keyword=SEQ_TYPE`
+      if( "$there" == "TRUE" ) then
+         set seq_type = `$KAPPA_DIR/fitsmod $last_scan edit=print keyword=SEQ_TYPE`
+         if( "$seq_type" == "FASTFLAT" ) then
+            grep -v $last_scan scans >! aa
+            mv -f aa scans
+         endif
+      endif
+
+#  Flatfield and clean the raw time series (but no COM removal).
+      rm -f files.cl >& /dev/null
+      $SMURF_DIR/sc2clean in=^scans out='./*_cl' outfiles=files.cl \
+                          config=^/stardev/share/smurf/dimmconfig.lis
+
+#  Process each continuous chunk
+      rm -f files.com >& /dev/null
+      foreach n (`cat files.cl`)
+
+#  FINDBACK requires the smoothing axes to be first, so permute the array
+#  to put the time axis first.
+         $KAPPA_DIR/permaxes $n ${n}_pm \[3,1,2\]
+
+#  Remove a background idependently from each individual bolometer time
+#  series. Features longer than $box time samples are removed by this
+#  filtering.
+         $CUPID_DIR/findback ${n}_pm box=\[$box,1,1\] out=${n}_fb sub rms=! quiet
+
+#  Permute the array back again.
+         $KAPPA_DIR/permaxes ${n}_fb ${n}_com \[2,3,1\]
+         echo "${n}_com" >>! files.com
+
+#  Ensure any new bad values introduced by findback have a quality of BADDA
+         $KAPPA_DIR/maths exp="'qif((ia.eq.<bad>),1,ib)'" ia=$n ib=${n}_com out=mask
+         $KAPPA_DIR/setqual ${n}_com BADDA mask=mask
+      end
+
+#  Create the bolomaps.
+      $SMURF_DIR/makemap in=^files.com out=${array}_map method=iter config=^conf \
+                         msg_filter=verb | tee makemap-${array}.log
+
+#  Runs SMAS to get an image of the source amplitude seen by each bolometer.
+      echo "${array}_map" >! inlist
+      $SMURF_DIR/smas -b -r 50 inlist ${out}.txt $out
+
+#  Use DSUTILS to create an image containing WCS for the current array, and
+#  then copy the WCS to the image created by SMAS
+      $SMURF_DIR/dsutils subarray=$array outfx=fx outfy=fy in=!
+      $KAPPA_DIR/wcscopy $out fx noconfirm
+
+   end
+end
+
+#  For each waveband, mosaic the four subarrays together.
+rm -f smas-s4.sdf smas-s8.sdf >& /dev/null
+$KAPPA_DIR/wcsmosaic in=smas-s4\* out=smas-s4 method=sincsinc ref=! accept
+$KAPPA_DIR/wcsmosaic in=smas-s8\* out=smas-s8 method=sincsinc ref=smas-s4 accept
+
+#  Clean up
+rm -rf adam-optff-obs
+
