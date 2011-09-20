@@ -62,10 +62,11 @@
 *     co-ordinates.  The pixel index of a data value is calculated
 *     using the expression
 *
-*        index = IFIX( ( x - xmin ) / scale ) + 1
+*        index = IFIX( ( x - xoff ) / scale ) + 1
 *
-*     where x is the supplied co-ordinate and xmin is the minimum
-*     supplied co-ordinate along an axis, scale is the value of
+*     where x is the supplied co-ordinate and xoff is the value of the
+*     POFFSET parameter (which defaults to the minimum supplied
+*     co-ordinate along an axis), scale is the value of
 *     parameter PSCALE, and IFIX converts from real to integer.
 *
 *     You are informed of the number of points found and the maximum
@@ -120,6 +121,12 @@
 *        values must match the number supplied to parameter SHAPE.  It
 *        is only accessed in automatic mode.  If a null (!) value is
 *        supplied, the value used is 1 along each axis. [!]
+*     POFFSET() = _REAL (Read)
+*        The supplied co-ordinates that correspond to the origin of
+*        floating point pixel co-ordinates.  It is only used in co-ordinate
+*        mode.  Its purpose is to permit an offset from some arbitrary units
+*        to pixels. If a null (!) value is supplied, the value used is the
+*        minimum supplied co-ordinate value for each dimension. [!]
 *     POSCOLS() = _INTEGER (Read)
 *        Column positions of the co-ordinates in an input record
 *        of the text file, starting from x to higher dimensions.  It
@@ -256,7 +263,7 @@
 *     Councils.
 *     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
-*     
+*
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
@@ -276,6 +283,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -300,6 +308,8 @@
 *        Use CNF_PVAL.
 *     2010 August 25 (MJC):
 *        Used KPG_DIMLS instead of old DIMLST.
+*     20-SEP-2011 (DSB):
+*        Added parameter POFFSET.
 *     {enter_further_changes_here}
 
 *-
@@ -333,12 +343,11 @@
       LOGICAL BAD                ! The output array is to be initialised
                                  ! with bad pixels? Otherwise zeroes are
                                  ! inserted
+      CHARACTER * ( 80 ) BUF     ! Text buffer for shape information
       LOGICAL CMPLET             ! Completely read the text file?
       INTEGER COUNT              ! Number of data points input
       INTEGER DLBND( DAT__MXDIM ) ! Default lower bounds of output array
       CHARACTER * ( 32 ) DIMSTR  ! Dimensions
-      REAL DIST( DAT__MXDIM )    ! Distance between lower and upper
-                                 ! bounds
       CHARACTER * ( DAT__SZTYP ) DTYPE ! HDS type of the data values
       INTEGER FD                 ! File description
       INTEGER I                  ! Loop counter
@@ -350,17 +359,19 @@
                                  ! origin co-ordinates
       INTEGER MXCOL              ! Largest column number containing
                                  ! co-ordinate data
-      INTEGER NCDIM              ! Number of characters in dimension list
+      INTEGER NC                 ! Number of characters in BUF
       INTEGER NDFOUT             ! NDF identifier
       INTEGER NDIMS              ! Number of dimensions of output array
       INTEGER NELM               ! Number of elements in the output
                                  ! array
       INTEGER ODIMS( DAT__MXDIM ) ! Dimensions of output array
+      LOGICAL OFFNUL              ! Was NULL supplied for parameter POFFSET?
       INTEGER OLBND( DAT__MXDIM ) ! Lower bounds of output array
       INTEGER OUBND( DAT__MXDIM ) ! Upper bounds of output array
       INTEGER PACKET             ! Work array initial size and
                                  ! incremental size
       INTEGER PNTRO( 1 )         ! Pointer to output DATA_ARRAY
+      REAL POFFSET( DAT__MXDIM ) ! Offset from supplied to pixel coordinates
       INTEGER POSCOD( DAT__MXDIM + 1 ) ! Positions of co-ordinates and data
                                  ! values in records respectively
       LOGICAL POSDUP             ! Column positions for co-ordinates and
@@ -503,6 +514,16 @@
          END DO
          CALL PAR_GDR1R( 'PSCALE', NDIMS, PSDEF, VAL__SMLR, VAL__MAXR,
      :                   .TRUE., PSCALE, STATUS )
+
+*  Now get the data coordinates corresponding to pixel coords
+*  (0.0,0.0,...). Set a flag if a null value is supplied, and annul
+*  the error. This flag indicates that the minimum value on each axis
+*  should be used.
+         IF( STATUS .EQ. SAI__OK ) THEN
+            CALL PAR_EXACR( 'POFFSET', NDIMS, POFFSET, STATUS )
+            OFFNUL = ( STATUS .EQ. PAR__NULL )
+            IF( OFFNUL ) CALL ERR_ANNUL( STATUS )
+         END IF
 
 *  Now get the work-array packet size.  Tuned for 512-byte blocks.
          CALL PAR_GDR0I( 'QUANTUM', 2048, 32, 2097152, .TRUE., PACKET,
@@ -651,23 +672,29 @@
             CALL MSG_OUT( 'POS_LIMITS', 'Dimension ^N: co-ordinate '/
      :        /'minimum was ^POSMIN, maximum was ^POSMAX.', STATUS )
 
-*  Now calculate distance between maximum and minimum co-ordinate
-*  points.
-            DIST( I )  =  UBND( I ) - LBND( I )
+*  Store the offset to use if a null value was given for parameter POFFSET.
+            IF( OFFNUL ) POFFSET( I ) = LBND( I )
 
-*  From these and the input pixel-to-pixel distance, we can calculate
-*  the dimensions of the output array, and hence the bounds (the lower
-*  bound being one by definition)
-            ODIMS( I )  =  INT( ( DIST( I ) / PSCALE( I ) ) + 0.5 ) + 1
-            OLBND( I ) = 1
-            OUBND( I ) = ODIMS( I )
+*  From these and the input pixel-to-pixel distance and offset, we can
+*  calculate the dimensions of the output array, and hence the bounds.
+            OLBND( I ) = INT( ( LBND( I ) - POFFSET( I ) ) /
+     :                          PSCALE( I ) ) + 1
+            OUBND( I ) = INT( ( UBND( I ) - POFFSET( I ) ) /
+     :                          PSCALE( I ) ) + 1
+            ODIMS( I ) = OUBND( I ) - OLBND( I ) + 1
          END DO
 
-*  Tell user the output array size.
-         CALL KPG_DIMLS( NDIMS, ODIMS, NCDIM, DIMSTR, STATUS )
-         CALL MSG_SETC( 'DIMSTR', DIMSTR( 1:NCDIM ) )
-         CALL MSG_OUT( 'OUT_DIMS', 'Output array dimensions are '/
-     :                 /'^DIMSTR.', STATUS )
+*  Tell user the output array bounds.
+         NC = 0
+         DO I = 1, NDIMS
+            IF ( I .GT. 1 ) CALL CHR_PUTC( ', ', BUF, NC )
+            CALL CHR_PUTI( OLBND( I ), BUF, NC )
+            CALL CHR_PUTC( ':', BUF, NC )
+            CALL CHR_PUTI( OUBND( I ), BUF, NC )
+         END DO
+         CALL MSG_SETC( 'BNDS', BUF( : NC ) )
+         CALL MSG_OUT( 'OUT_DIMS', 'Output array pixel bounds are '//
+     :                 '(^BNDS).', STATUS )
          CALL MSG_OUT( 'BLANK', ' ', STATUS )
       END IF
 
@@ -700,21 +727,21 @@
             CALL KPS1_TRNVD( NDIMS, ODIMS, COUNT,
      :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
      :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
-     :                       PSCALE, LBND,
+     :                       PSCALE, POFFSET,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_TRNVI( NDIMS, ODIMS, COUNT,
      :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
      :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
-     :                       PSCALE, LBND,
+     :                       PSCALE, POFFSET,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_TRNVR( NDIMS, ODIMS, COUNT,
      :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
      :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
-     :                       PSCALE, LBND,
+     :                       PSCALE, POFFSET,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          END IF
@@ -730,7 +757,7 @@
 *  Write a linear axis using the base and offset.  Note lower bound is
 *  floating point, not integer.
             CALL KPG1_SSCOF( ODIMS( I ), DBLE( PSCALE( I ) ),
-     :                       DBLE( LBND( I ) ) +
+     :                       DBLE( POFFSET( I ) ) +
      :                       0.5D0 * DBLE( PSCALE( I ) ),
      :                       %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), STATUS )
 

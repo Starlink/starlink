@@ -48236,11 +48236,12 @@ KAPPA: \htmlref{HISTEQ}{HISTEQ},
       co-ordinates.  The pixel index of a data value is calculated
       using the expression
 
-      \[   {\rm index} = {\rm IFIX}( ( x - xmin ) / {\rm scale} ) + 1 \]
+      \[   {\rm index} = {\rm IFIX}( ( x - xoff ) / {\rm scale} ) + 1 \]
 
-      where \textit{x} is the supplied co-ordinate and $xmin$ is the minimum
-      supplied co-ordinate along an axis, $scale$ is the value of
-      Parameter PSCALE, and IFIX converts from real to integer.
+      where \textit{x} is the supplied co-ordinate and $xoff$ is the value
+      of the POFFSET parameter (which defaults to the minimum supplied
+      co-ordinate along an axis), $scale$ is the value of
+      parameter PSCALE, and IFIX converts from real to integer.
 
       You are informed of the number of points found and the maximum
       and minimum co-ordinate values for each dimension.  There is no
@@ -48310,6 +48311,15 @@ KAPPA: \htmlref{HISTEQ}{HISTEQ},
          values must match the number supplied to Parameter SHAPE.  It
          is only accessed in automatic mode.  If a null ({\tt{!}}) value is
          supplied, the value used is 1 along each axis.  {\tt [!]}
+      }
+      \sstsubsection{
+         POFFSET() = \_REAL (Read)
+      }{
+         The supplied co-ordinates that correspond to the origin of
+         floating point pixel co-ordinates.  It is only used in co-ordinate
+         mode.  Its purpose is to permit an offset from some arbitrary units
+         to pixels. If a null ({\tt{!}}) value is supplied, the value used is
+         the minimum supplied co-ordinate value for each dimension. {\tt [!]}
       }
       \sstsubsection{
          POSCOLS() = \_INTEGER (Read)
@@ -57852,6 +57862,13 @@ The following applications have been modified:
       \begin{itemize}
         \item Add new QNAMES output parameter to list the attribute name
         associated with each QUALITY bit.
+      \end{itemize}
+
+   \item [\htmlref{TRANDAT}{TRANDAT}]\mbox{}
+      \begin{itemize}
+        \item When AUTO=FALSE, the new POFFSET parameter allows a shift to be
+         specified between the data co-ordinates in the input text file, and
+        the pixel co-ordinates in the output NDF.
       \end{itemize}
 
    \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}

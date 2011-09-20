@@ -17030,6 +17030,17 @@ iraf! {
             helpkey *
          }
 
+         parameter poffset {
+            type _REAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            prompt {Data co-ordinates at pixel co-ordinates origin}
+            helpkey *
+            default !
+            size *
+         }
+
          parameter poscols {
             position 3
             type _INTEGER
