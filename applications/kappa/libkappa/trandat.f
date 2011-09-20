@@ -328,6 +328,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER KPG1_FLOOR         ! Largest int smaller than a given float
+
 *  Local Constants:
       INTEGER MAXREC             ! Maximum number of values per record
       PARAMETER ( MAXREC = 65536 ) ! up to 65536 values per record
@@ -677,10 +680,10 @@
 
 *  From these and the input pixel-to-pixel distance and offset, we can
 *  calculate the dimensions of the output array, and hence the bounds.
-            OLBND( I ) = INT( ( LBND( I ) - POFFSET( I ) ) /
-     :                          PSCALE( I ) ) + 1
-            OUBND( I ) = INT( ( UBND( I ) - POFFSET( I ) ) /
-     :                          PSCALE( I ) ) + 1
+            OLBND( I ) = KPG1_FLOOR( ( LBND( I ) - POFFSET( I ) ) /
+     :                               PSCALE( I ) ) + 1
+            OUBND( I ) = KPG1_FLOOR( ( UBND( I ) - POFFSET( I ) ) /
+     :                               PSCALE( I ) ) + 1
             ODIMS( I ) = OUBND( I ) - OLBND( I ) + 1
          END DO
 
