@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_TRNV<T> ( NDIMS, ODIMS, NPTS, CODATA, VADATA,
-     :                         PSCALE, COMIN, OUTARR, STATUS )
+      SUBROUTINE KPS1_TRNV<T> ( NDIMS, OLBND, OUBND, NPTS, CODATA,
+     :                         VADATA, PSCALE, COMIN, OUTARR, STATUS )
 *+
 *  Name:
 *     KPS1_TRNVx
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_TRNVx( NDIMS, ODIMS, NPTS, CODATA, VADATA, PSCALE,
+*     CALL KPS1_TRNVx( NDIMS, OLBND, OUBND, NPTS, CODATA, VADATA, PSCALE,
 *    :                 COMIN, OUTARR, STATUS )
 
 *  Description:
 *     This routine transfers the supplied data values whose co-ordinates
-*     and values are known to a regularly-spaced n-dimensional output 
+*     and values are known to a regularly-spaced n-dimensional output
 *     array.  A scaling between pixel separations may be made.  The bin
 *     selected is calculated as follows:
 *        index = IFIX( ( CODATA - COMIN ) / PSCALE ) + 1
@@ -26,8 +26,11 @@
 *     NDIMS = INTEGER (Given)
 *        The number of dimensions of the output array, or in other
 *        words the number of co-ordinates.
-*     ODIMS( NDIMS ) = INTEGER (Given)
-*        The dimensions of the output array when stored as an
+*     OLBND( NDIMS ) = INTEGER (Given)
+*        The lower pixel bounds of the output array when stored as an
+*        n-dimensional array.
+*     OUBND( NDIMS ) = INTEGER (Given)
+*        The upper pixel bounds of the output array when stored as an
 *        n-dimensional array.
 *     NPTS = INTEGER (Given)
 *        The number of input data points.
@@ -40,8 +43,8 @@
 *     PSCALE( NDIMS ) = REAL (Given)
 *        Pixel-to-pixel distance in co-ordinate units.
 *     COMIN( NDIMS ) = REAL (Given)
-*        Minimum co-ordinate values.  The pixel index at a minimum
-*        co-ordinate is one.
+*        For each dimensions, this is the co-ordinate value at a pixel
+*        co-ordinate of zero.
 *     OUTARR( * ) = ? (Returned)
 *        Output array containing the input data, stored as a vector.
 *     STATUS = INTEGER (Given)
@@ -52,12 +55,12 @@
 *     the top level (i.e. TRANDAT) but for the requirement to transfer
 *     text-file data into mapped work arrays.
 *     -  There is a routine for integer and floating-point data types:
-*     replace "x" in the routine name by I, D, or R as appropriate. 
+*     replace "x" in the routine name by I, D, or R as appropriate.
 *     The OUTARR and VADATA arguments of the routine must have the data
 *     type specified.
 
 *  Prior Requirements:
-*     -  The output array should be initialised to zero or the magic 
+*     -  The output array should be initialised to zero or the magic
 *     value when created.
 
 *  Copyright:
@@ -82,6 +85,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -89,8 +93,11 @@
 *        Original loosely based on the 2-d version of the
 *        routine, then called TRNDSB (RAL::CUR).
 *     1991 May 27 (MJC):
-*        Corrected the calculation of pixel index by removing a 
+*        Corrected the calculation of pixel index by removing a
 *        superfluous + 0.5 from the IFIX calculation.
+*     20-SEP-2011 (DSB):
+*        Changed ODIMS argument to OLBND & OUBND. Modified to allow an
+*        arbitrary pixel origin.
 *     {enter_further_changes_here}
 
 *-
@@ -104,7 +111,8 @@
 
 *  Arguments Given:
       INTEGER NDIMS
-      INTEGER ODIMS( NDIMS )
+      INTEGER OLBND( NDIMS )
+      INTEGER OUBND( NDIMS )
       INTEGER NPTS
       REAL CODATA( NDIMS, NPTS )
       <TYPE> VADATA( NPTS )
@@ -137,7 +145,7 @@
       NELM = 1
       DO  J = 1, NDIMS
          FDIMS( J ) = NELM
-         NELM = NELM * ODIMS( J )
+         NELM = NELM * ( OUBND( J ) - OLBND( J ) + 1 )
       END DO
 
 *  Loop round all the points in INDATA, getting out the co-ordinate
@@ -147,16 +155,20 @@
 
             CURPOS = CODATA( J, K )
 
-*  Calculate the pixel "co-ordinate" of the current data point.
+*  Calculate the pixel index of the current data point.
             COORD = IFIX( ( ( CURPOS - COMIN( J ) ) / PSCALE( J ) ) ) +
      :              1
 
-*  Find the position within the vector.
-            IF ( J .EQ. 1 ) THEN
-               VECPOS = COORD
+*  Ignore the value if it is not inside the output array.
+            IF( COORD .GE. OLBND( J ) .AND. COORD .LE. OUBND( J ) ) THEN
 
-            ELSE
-               VECPOS = VECPOS + ( COORD - 1 ) * FDIMS( J )
+*  Find the position within the vector.
+               IF ( J .EQ. 1 ) THEN
+                  VECPOS = COORD - OLBND( J ) + 1
+
+               ELSE
+                  VECPOS = VECPOS + ( COORD - OLBND( J ) ) * FDIMS( J )
+               END IF
             END IF
          END DO
 

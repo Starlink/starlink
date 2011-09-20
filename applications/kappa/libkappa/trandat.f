@@ -727,21 +727,21 @@
 *  the input data, given co-ordinate information.  Choose the
 *  appropriate one for the data type.
          IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_TRNVD( NDIMS, ODIMS, COUNT,
+            CALL KPS1_TRNVD( NDIMS, OLBND, OUBND, COUNT,
      :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
      :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
      :                       PSCALE, POFFSET,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_TRNVI( NDIMS, ODIMS, COUNT,
+            CALL KPS1_TRNVI( NDIMS, OLBND, OUBND, COUNT,
      :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
      :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
      :                       PSCALE, POFFSET,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_TRNVR( NDIMS, ODIMS, COUNT,
+            CALL KPS1_TRNVR( NDIMS, OLBND, OUBND, COUNT,
      :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
      :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ),
      :                       PSCALE, POFFSET,
