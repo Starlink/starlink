@@ -29,7 +29,7 @@
 *        are obtained using "path".
 *     path = const char * (Given)
 *        The path to the NDF containing the correction factors. This
-*        should be a 2D NDF with pixel bounds (0:31,0:39). Will not be
+*        should be a 2D NDF with pixel bounds (1:32,1:40). Will not be
 *        accessed if "scaledata" is supplied.
 *     param = const char * (Given)
 *        The name of the configuration parameter from which the NDF path
@@ -68,7 +68,8 @@
 *        - Added argument "div".
 *        - Set quality for samples with bad corrections, rather than
 *        using an implicit correction value of 1.0.
-*     {enter_further_changes_here}
+*     20-SEP-2011 (DSB):
+*        Change expected NDF pixel bounds to the usual (1:32,1:40).
 
 *  Copyright:
 *     Copyright (C) 2011 Science & Technology Facilities Council.
@@ -198,15 +199,15 @@ void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
    array. */
      ndfOpen( NULL, path, "Read", "Old", &indf, &place, status );
      ndfBound( indf, 2, lbnd, ubnd, &ndim, status );
-     if( ( lbnd[ 0 ] != 0 || ubnd[ 0 ] != 31 ||
-           lbnd[ 1 ] != 0 || ubnd[ 1 ] != 39 ) && *status == SAI__OK ){
+     if( ( lbnd[ 0 ] != 1 || ubnd[ 0 ] != 32 ||
+           lbnd[ 1 ] != 1 || ubnd[ 1 ] != 40 ) && *status == SAI__OK ){
        *status = SAI__ERROR;
        msgSeti( "L1", lbnd[ 0 ] );
        msgSeti( "U1", ubnd[ 0 ] );
        msgSeti( "L2", lbnd[ 1 ] );
        msgSeti( "U2", ubnd[ 1 ] );
        errRep( " ", "The corrections NDF has incorrect pixel bounds "
-               "(^L1:^U1,^L2:^U2) - should be (0:31,0:39).", status );
+               "(^L1:^U1,^L2:^U2) - should be (1:32,1:40).", status );
      }
      ndfMap( indf, "Data", "_DOUBLE", "Read", (void *) &corr, &el, status );
 
