@@ -62,12 +62,13 @@
 *     co-ordinates.  The pixel index of a data value is calculated
 *     using the expression
 *
-*        index = IFIX( ( x - xoff ) / scale ) + 1
+*        index = FLOOR( ( x - xoff ) / scale ) + 1
 *
 *     where x is the supplied co-ordinate and xoff is the value of the
 *     POFFSET parameter (which defaults to the minimum supplied
-*     co-ordinate along an axis), scale is the value of
-*     parameter PSCALE, and IFIX converts from real to integer.
+*     co-ordinate along an axis), scale is the value of parameter PSCALE,
+*     and FLOOR is a function that returns the largest integer that is
+*     smaller (i.e. more negative) than its argument.
 *
 *     You are informed of the number of points found and the maximum
 *     and minimum co-ordinate values for each dimension.  There is no

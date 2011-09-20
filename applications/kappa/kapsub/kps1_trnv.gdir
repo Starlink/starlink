@@ -20,7 +20,8 @@
 *     and values are known to a regularly-spaced n-dimensional output
 *     array.  A scaling between pixel separations may be made.  The bin
 *     selected is calculated as follows:
-*        index = IFIX( ( CODATA - COMIN ) / PSCALE ) + 1
+*
+*        index = FLOOR( ( CODATA - COMIN ) / PSCALE ) + 1
 
 *  Arguments:
 *     NDIMS = INTEGER (Given)
@@ -125,6 +126,10 @@
 *  Status:
       INTEGER STATUS
 
+*  External References:
+      INTEGER KPG1_FLOOR         ! Largest integer smaller than a given
+                                 ! value
+
 *  Local Variables:
       INTEGER COORD              ! Co-ordinates of output array pixel
       REAL CURPOS                ! Current position values
@@ -134,7 +139,7 @@
       INTEGER NELM               ! Number of elements in the output array
       INTEGER VECPOS             ! Element number of the pixel in the
                                  ! vectorised array
-
+      LOGICAL OK                 ! Is the point inside the output array?
 *.
 
 *  Check the global inherted status.
@@ -151,13 +156,14 @@
 *  Loop round all the points in INDATA, getting out the co-ordinate
 *  and data values for each one.
       DO  K = 1, NPTS
-         DO  J = 1, NDIMS
 
+         OK = .TRUE.
+         DO  J = 1, NDIMS
             CURPOS = CODATA( J, K )
 
 *  Calculate the pixel index of the current data point.
-            COORD = IFIX( ( ( CURPOS - COMIN( J ) ) / PSCALE( J ) ) ) +
-     :              1
+            COORD = KPG1_FLOOR( ( ( CURPOS - COMIN( J ) ) /
+     :                          PSCALE( J ) ) ) + 1
 
 *  Ignore the value if it is not inside the output array.
             IF( COORD .GE. OLBND( J ) .AND. COORD .LE. OUBND( J ) ) THEN
@@ -169,11 +175,14 @@
                ELSE
                   VECPOS = VECPOS + ( COORD - OLBND( J ) ) * FDIMS( J )
                END IF
+
+            ELSE
+               OK = .FALSE.
             END IF
          END DO
 
 *  Now set the requisite output array pixel to the correct value.
-         OUTARR( VECPOS ) = VADATA( K )
+         IF( OK ) OUTARR( VECPOS ) = VADATA( K )
       END DO
 
       END
