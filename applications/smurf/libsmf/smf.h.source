@@ -757,11 +757,14 @@ smfDA *smf_construct_smfDA( smfDA * tofill, smfData *dksquid, double * flatcal,
                             int * status );
 
 smfData *smf_construct_smfData( smfData * tofill, smfFile * file,
-                                smfHead * hdr, smfDA * da, smfFts* fts, smf_dtype dtype,
-                                void * pntr[2], smf_qual_t * qual, smf_qfam_t qfamily,
-                                smfData * sidequal, int isTordered, const dim_t dims[],
-                                const int lbnd[], int ndims, int virtual, int ncoeff,
-                                double *poly, AstKeyMap *history, int * status );
+                                smfHead * hdr, smfDA * da, smfFts* fts,
+                                smf_dtype dtype, void * pntr[2],
+                                smf_qual_t * qual, smf_qfam_t qfamily,
+                                smfData * sidequal, int isFFT, int isTordered,
+                                const dim_t dims[], const int lbnd[],
+                                int ndims, int virtual, int ncoeff,
+                                double *poly, AstKeyMap *history,
+                                int * status );
 
 smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
                                   size_t nsampcycle, const int *jigvert,

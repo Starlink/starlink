@@ -272,9 +272,10 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   }
 
   /* Fill the smfData */
-  *data = smf_construct_smfData( *data, file, NULL, NULL, NULL, dtype, pntr, qual, SMF__QFAM_NULL,
-                                 NULL, 1, (*data)->dims, (*data)->lbnd, ndims, 0, 0, NULL, NULL,
-                                 status);
+  *data = smf_construct_smfData( *data, file, NULL, NULL, NULL, dtype, pntr,
+                                 qual, SMF__QFAM_NULL, NULL, 0, 1,
+                                 (*data)->dims, (*data)->lbnd, ndims, 0, 0,
+                                 NULL, NULL, status);
 
  CLEANUP:
   if ( *data == NULL ) {

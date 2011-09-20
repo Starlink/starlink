@@ -163,7 +163,7 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
     if (flags & SMF__MAP_QUAL) qual = astMalloc( nbols*sizeof(*qual) );
 
     *bolmap = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                     pntr, qual, SMF__QFAM_TSERIES, NULL, 0,
+                                     pntr, qual, SMF__QFAM_TSERIES, NULL, 0, 0,
                                      mydims, mylbnd, 2, 0, 0, NULL,
                                      NULL, status );
   }

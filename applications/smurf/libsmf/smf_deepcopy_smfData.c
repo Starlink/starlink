@@ -166,6 +166,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   smfFile *file = NULL;       /* New smfFile */
   smfHead *hdr = NULL;        /* New smfHead */
   size_t i;                   /* Loop counter */
+  int isFFT;                  /* Dealing with FFT data? */
   size_t j;                   /* Loop counter */
   int lbnd[NDF__MXDIM];       /* lower bounds of each axis of data array */
   dim_t nbolo;                /* number of bolometers */
@@ -197,6 +198,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   ncoeff = old->ncoeff;
   virtual = old->virtual;
   oldtype = old->dtype;
+  isFFT = old->isFFT;
   oldOrder = old->isTordered;
   newOrder = oldOrder;
 
@@ -412,7 +414,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
 
   /* Construct the new smfData */
   new = smf_construct_smfData( new, file, hdr, da, fts, newtype, pntr, qual,
-                               old->qfamily, sidequal, newOrder, dims,
+                               old->qfamily, sidequal, isFFT, newOrder, dims,
                                lbnd, ndims, virtual, ncoeff, poly, history,
                                status);
 

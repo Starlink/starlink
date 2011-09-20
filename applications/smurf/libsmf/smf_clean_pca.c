@@ -835,7 +835,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
 
     *components = smf_construct_smfData( NULL, NULL, hdr, NULL, NULL,
                                          SMF__DOUBLE, NULL, NULL,
-                                         SMF__QFAM_TSERIES, NULL,
+                                         SMF__QFAM_TSERIES, NULL, 0,
                                          1, dims, lbnd, 3, 0, 0, NULL,
                                          NULL, status );
 
@@ -884,7 +884,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
     *amplitudes = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL,
                                          SMF__DOUBLE, NULL, q,
                                          SMF__QFAM_TSERIES, NULL,
-                                         1, dims, lbnd, 3, 0, 0, NULL,
+                                         0, 1, dims, lbnd, 3, 0, 0, NULL,
                                          NULL, status );
     if( *status==SAI__OK ) {
       (*amplitudes)->pntr[0] = amp;

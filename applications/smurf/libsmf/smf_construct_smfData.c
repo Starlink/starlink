@@ -16,9 +16,10 @@
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file,
 *                      smfHead * hdr, smfDA * da, smfFts* fts, smf_dtype dtype,
 *                      void * pntr[2], smf_qual_t qual, smf_qfam_t qfamily,
-*                      smfData * sidequal, int isTordered, const dim_t dims[],
-*                      const int lbnd[], int ndims, int virtual, int ncoeff,
-*                      double * poly, AstKeyMap * history, int * status );
+*                      smfData * sidequal, int isFFT, int isTordered,
+*                      const dim_t dims[], const int lbnd[], int ndims,
+*                      int virtual, int ncoeff, double * poly,
+*                      AstKeyMap * history, int * status );
 
 *  Arguments:
 *     tofill = smfData * (Given)
@@ -52,6 +53,10 @@
 *        This pointer will be copied and it is assumed that the smfData
 *        will be freed in another location. See smf_select_qualpntr to determine
 *        which pointer to use for quality.
+*     isFFT = int (Given)
+*        Set to -1 if don't know, 0 if real-space data, value > 0 giving the
+*        length of the last transformed axis in real space if frequency-space
+*        data.
 *     isTordered = int (Given)
 *        If set, data is ICD-compliant time-ordered. Otherwise bolom-ordered.
 *     dims[] = const dim_t (Given)
@@ -121,12 +126,14 @@
 *        Do not crash if pntr[] is NULL.
 *     2010-09-17 (COBA):
 *        Add smfFts
+*     2011-09-20 (EC):
+*        Add isFFT
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science & Technology Facilities Council.
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006,2008,2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -169,10 +176,11 @@
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
                        smfDA * da, smfFts* fts, smf_dtype dtype, void * pntr[2],
-                       smf_qual_t * qual, smf_qfam_t qfamily, smfData * sidequal,
-                       int isTordered, const dim_t dims[], const int lbnd[], int ndims,
-                        int virtual, int ncoeff, double *poly, AstKeyMap *history,
-                       int * status ) {
+                       smf_qual_t * qual, smf_qfam_t qfamily,
+                       smfData * sidequal, int isFFT, int isTordered,
+                       const dim_t dims[], const int lbnd[], int ndims,
+                       int virtual, int ncoeff, double *poly,
+                       AstKeyMap *history, int * status ) {
 
   /* need to make sure that any memory we malloc will be freed on error
      so make sure we NULL all pointers first. */
@@ -249,6 +257,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       data->ncoeff = ncoeff;
       data->poly = poly;
       data->history = history;
+      data->isFFT = isFFT;
       data->isTordered = isTordered;
     }
   }

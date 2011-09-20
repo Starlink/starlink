@@ -105,11 +105,13 @@
 *        Fix stride argument to smf_dataOrder_array
 *     2011-06-25 (EC):
 *        If input data are SMF__INTEGER they will be converted to SMF__DOUBLE
+*     2011-09-20 (EC):
+*        Record whether we have FFT data or not in the FITS header
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
-*     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008,2010-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -145,6 +147,7 @@
 #include "ndf.h"
 #include "prm_par.h"
 #include "fftw3.h"
+#include "star/atl.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -548,8 +551,6 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
             specframe = astSpecFrame( "System=freq,Unit=Hz,"
                                       "StdOfRest=Topocentric" );
 
-
-
             curframe3d = astCmpFrame( specframe, curframe2d, " " );
             curframe1d = astFrame( 1, "Domain=COEFF,label=Real/Imag component");
             curframe4d = astCmpFrame( curframe3d, curframe1d, " " );
@@ -617,6 +618,20 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
     }
   }
 
+  /* If we get here with good status, set isFFT appropriately */
+  if( (*status==SAI__OK) && retdata ) {
+    if( inverse ) {
+      retdata->isFFT=-1;
+    } else {
+      retdata->isFFT = ntslice;
+    }
+
+    /* Set the FITS keyword */
+    if( retdata->hdr && retdata->hdr->fitshdr ) {
+      atlPtfti( retdata->hdr->fitshdr, "ISFFT", retdata->isFFT,
+                "-1 if real space, 0 if unknown, >0 if FFT", status );
+    }
+  }
 
  CLEANUP:
   if( data ) smf_close_file( &data, status );

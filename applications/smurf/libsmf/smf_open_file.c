@@ -792,6 +792,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
       /* Map the header */
       if ( !(flags & SMF__NOCREATE_HEAD) ) {
+        int isFFT;
 
         /* Read the units and data label */
         ndfCget( indf, "UNITS", hdr->units, SMF__CHARLABEL, status );
@@ -804,6 +805,27 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if ( *status == KPG__NOFTS ) {
           errRep("", FUNC_NAME ": File has no FITS header - continuing but "
                  "this may cause problems later", status );
+          errAnnul( status );
+        }
+
+        /* Are the data the FFT of something? If there is no FITS keyword
+           data->isFFT will be left in the unknown state of -1 */
+        smf_fits_getI( hdr, "ISFFT", &isFFT, status );
+        if( *status == SAI__OK ) {
+          (*data)->isFFT = isFFT;
+        }
+
+        /* If we have a FITS header but no keyword, that means we haven't
+           ever run these data through smf_fft_data so it is safe to assume
+           that this is not the FFT of something */
+        if( *status == SMF__NOKWRD ) {
+          (*data)->isFFT = -1;
+          errAnnul( status );
+        }
+
+        /* We simply leave isFFT in the default unknown state (-1) if there
+           was no FITS header, but we annul the bad status so we can continue */
+        if ( *status == AST__FUNDEF  ) {
           errAnnul( status );
         }
 

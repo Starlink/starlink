@@ -183,7 +183,7 @@ void smf_open_ndf( const int newndf, const char accmode[],
 
   /* And populate the new smfData */
   *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, NULL, dtype,
-                                    datarr, NULL, SMF__QFAM_NULL, NULL, 1,
+                                    datarr, NULL, SMF__QFAM_NULL, NULL, 0, 1,
                                     (*ndfdata)->dims, (*ndfdata)->lbnd, ndims, 0, 0,
                                     NULL, NULL, status );
 

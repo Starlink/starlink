@@ -186,12 +186,14 @@
 *        Add enginerring obs types.
 *     2011-09-19 (DSB):
 *        Add SMF__Q_BADEF.
+*     2011-09-20 (EC):
+*        Add isFFT to smfData
 *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
- *     Copyright (C) 2005-2010 University of British Columbia.
+ *     Copyright (C) 2005-2011 University of British Columbia.
  *     All Rights Reserved.
 
  *  Licence:
@@ -685,6 +687,7 @@ typedef struct smfData {
   smf_qfam_t qfamily;        /* Quality family used in "qual" */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
   int lbnd[NDF__MXDIM];      /* Lower PIXEL bounds of data array */
+  int isFFT;                 /* -1=not fft,0=don't know,>0 if fft data*/
   int isTordered;            /* 0=order by bolo, 1=order by tslice (default) */
   size_t ndims;              /* Number of active dimensions in "dims" */
   int refcount;              /* Reference count for data object */

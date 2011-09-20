@@ -166,6 +166,7 @@ smf_create_smfData( int flags, int * status ) {
   data->ncoeff = 0;
   data->poly = NULL;
   data->history = NULL;
+  data->isFFT = 0;
   data->isTordered = 1;
 
   for (i = 0; i < 2; i++ ) {
