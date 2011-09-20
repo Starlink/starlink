@@ -232,6 +232,9 @@
 *     5-APR-2011 (DSB):
 *        Use SUBARRAY value to determine waveband of distortion to return in
 *        OUTMAG.
+*     20-SEP-2011 (DSB):
+*        OUTFX/FY NDFs now have pixel index bounds (0:31,0:39) rather than
+*        (1:32,1:40).
 
 *  Copyright:
 *     Copyright (C) 2009-2011 Science and Technology Facilities Council.
@@ -725,10 +728,10 @@ void smurf_dsutils( int *status ) {
    }
 
 /* Get the NDFs to hold the focal plane X and Y values at every bolometer. */
-   lbnd_out[ 0 ] = 1;
-   lbnd_out[ 1 ] = 1;
-   ubnd_out[ 0 ] = 32;
-   ubnd_out[ 1 ] = 40;
+   lbnd_out[ 0 ] = 0;
+   lbnd_out[ 1 ] = 0;
+   ubnd_out[ 0 ] = 31;
+   ubnd_out[ 1 ] = 39;
    ndfCreat( "OUTFX", "_DOUBLE", 2, lbnd_out, ubnd_out, &indf1, status );
    ndfCreat( "OUTFY", "_DOUBLE", 2, lbnd_out, ubnd_out, &indf2, status );
 
