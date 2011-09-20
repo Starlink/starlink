@@ -72,6 +72,12 @@
       -  Add new QNAMES output parameter to list the attribute name
       associated with each QUALITY bit.
 
+   o  TRANDAT
+
+      -  When AUTO=FALSE, the new POFFSET parameter allows a shift to be
+      specified between the data co-ordinates in the input text file, and
+      the pixel co-ordinates in the output NDF.
+
    o  WCSALIGN
 
       -  If an input NDF has more pixel axes than the reference NDF,
