@@ -762,7 +762,8 @@ if( "$outimage" != " " ) then
       cat $outtable | grep -v \# | awk '{print $21, $22, $8}' > cat.smas
    endif
 
-   $KAPPA_DIR/trandat freename=cat.smas poscols="[1,2]" valcol=3 auto=no ndf=$outimage
+   $KAPPA_DIR/trandat freename=cat.smas poscols="[1,2]" valcol=3 auto=no \
+                      ndf=$outimage poffset=\[1.5,1.5\]
 
 #  Copy FITS headers from the first input NDF to the output NDF.
    $KAPPA_DIR/fitstext $outimage file=smas-fits.log
