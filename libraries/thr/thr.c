@@ -114,6 +114,8 @@
 *        names changed to use standard starlink formats (i.e. Capitals
 *        instead of underscores).
 *        - Incorporated the smf_get_nthread function (now thrGetNThread).
+*     2011-09-21 (TIMJ):
+*        Use ems instead of err consistently for error messages.
 */
 
 
@@ -131,6 +133,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
+#include "ems.h"
 #include "ems_par.h"
 
 /* Definition of the public interface of this module */
@@ -871,9 +874,9 @@ int thrGetNThread( const char *env, int *status ){
       result = strtol( env_text, NULL, 10 );
       if( result < 1 ) {
          *status = SAI__ERROR;
-         msgSetc( "S", env_text );
-         msgSetc( "E", env );
-         errRep( "", "Illegal value for environment variable ^E: '^S'.",
+         emsSetc( "S", env_text );
+         emsSetc( "E", env );
+         emsRep( "", "Illegal value for environment variable ^E: '^S'.",
                  status );
       }
       msgOutiff( MSG__VERB, "", "Using %d threads obtained from environment "
