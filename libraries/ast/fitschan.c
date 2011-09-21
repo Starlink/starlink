@@ -988,6 +988,11 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        - Added astWriteFits and astReadFits.
 *        - Move the deletion of tables and warnings from Delete to
 *        EmptyFits.
+*     21-SEP-2011 (DSB):
+*        In RoundFString, remember to update the pointer to the exponent.
+*        This bug caused parts of the exponent to dissappear when
+*        formatting a value that included some trailing zeros and a
+*        series of adjacent 9's.
 *class--
 */
 
@@ -24291,10 +24296,12 @@ static void RoundFString( char *text, int width, int *status ){
          if( *c == '.' ) c++;
 
 /* We put a terminator following the last non-zero character. The
-   terminator is the exponent, if there was one, or a null character. */
+   terminator is the exponent, if there was one, or a null character.
+   Remember to update the pointer to the start of the exponent. */
          c++;
          if( exp ) {
             a = exp;
+            exp = c;
             while( ( *(c++) = *(a++) ) );
          } else {
             *c = 0;
