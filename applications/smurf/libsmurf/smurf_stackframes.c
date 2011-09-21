@@ -401,6 +401,12 @@ void smurf_stackframes( int *status ) {
   for (i = 1; i <= size; i++ ) {
     smfData * data = NULL;
     smf_open_file( igrp, sortinfo[i-1].index, "READ", SMF__NOCREATE_HEAD|SMF__NOTTSERIES, &data, status );
+    if (*status == SAI__OK && !smf_dtype_check( data, NULL, outdata->dtype, status ) ) {
+      *status = SAI__ERROR;
+      errRep("", "Input data type differs from output data type. Possible programming error.",
+             status );
+    }
+
     if (*status != SAI__OK) break;
     if (dosort) times[i-1] = sortinfo[i-1].sortval;
 
