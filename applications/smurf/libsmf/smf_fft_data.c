@@ -327,10 +327,15 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
     nf = ntslice/2 + 1;
     isFFT = 0;
   } else if( (indata->ndims==4) && (indata->dims[3]==2) ) {
+    dim_t rdims[2];
+    dim_t fdims[2];
+
     /* 3-d FFT of entire subarray... always bolo ordered */
-    isFFT = smf_isfft( indata, &ntslice, &nbolo, &nf, status );
+    isFFT = smf_isfft( indata, rdims, &nbolo, fdims, NULL, status );
     nrows = indata->dims[1+SC2STORE__ROW_INDEX];
     ncols = indata->dims[1+SC2STORE__COL_INDEX];
+    ntslice = rdims[0];
+    nf = fdims[0];
   } else {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": smfData has strange dimensions", status );

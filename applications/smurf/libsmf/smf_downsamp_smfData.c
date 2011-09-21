@@ -230,6 +230,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
     if( method ) {
       /* Truncated FFT method ---------------------------------------------- */
 
+      dim_t fdims[2];
       smfData *fft_idata=NULL;
       smfData *fft_odata=NULL;
       smfData *tempdata=NULL;
@@ -238,32 +239,29 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
 
       /* Calculate the FFT of the data */
       fft_idata = smf_fft_data( NULL, idata, 0, 0, status );
-      smf_isfft( fft_idata, NULL, NULL, &nf_i, status );
+      smf_isfft( fft_idata, NULL, NULL, fdims, NULL, status );
+      nf_i = fdims[0];
+
+      /* Output data have fewer frequencies */
+      nf_o = ontslice/2 + 1;
 
       /* Create container for FFT of down-sampled data and copy over
-         up to the Nyquist frequency */
+         up to the Nyquist frequency. Note that we set the isFFT flag
+         to the correct length in time-slices for the down-sampled data
+         so that smf_isfft can get the unambiguous real-space axis length
+         when we do the inverse transform. */
+
       fft_odata = smf_deepcopy_smfData( fft_idata, 0, SMF__NOCREATE_DATA |
                                         SMF__NOCREATE_VARIANCE |
                                         SMF__NOCREATE_QUALITY |
                                         SMF__NOCREATE_FILE | SMF__NOCREATE_HEAD,
                                         0, 0, status );
 
-      nf_o = ontslice/2 + 1;
-
       if( *status == SAI__OK ) {
-
-        /* New FFT is shorter */
         fft_odata->dims[0] = nf_o;
-
+        fft_odata->isFFT = ontslice;
         fft_odata->pntr[0] = astCalloc( nf_o*nbolo*2,
                                         smf_dtype_size(fft_odata,status) );
-
-        /* A slight kludge... create a smfHead for the sole purpose of
-           setting nframes so that smf_isfft can unambigiously get the
-           right number of time-slices when we do the inverse transform
-           of the truncated data */
-        fft_odata->hdr = smf_create_smfHead( status );
-        if( fft_odata->hdr ) fft_odata->hdr->nframes = ontslice;
       }
 
       if( *status == SAI__OK ) {

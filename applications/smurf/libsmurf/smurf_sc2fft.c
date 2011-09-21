@@ -334,7 +334,7 @@ void smurf_sc2fft( int *status ) {
         }
 
         /* Check whether we need to transform the data at all */
-        isfft = smf_isfft(idata,NULL,NULL,NULL,status);
+        isfft = smf_isfft(idata,NULL,NULL,NULL,NULL,status);
 
         if( isfft && avpspec ) {
           *status = SAI__ERROR;
@@ -344,7 +344,7 @@ void smurf_sc2fft( int *status ) {
         }
 
         if( (*status == SAI__OK) &&
-            (smf_isfft(idata,NULL,NULL,NULL,status) == inverse) ) {
+            (smf_isfft(idata,NULL,NULL,NULL,NULL,status) == inverse) ) {
 
           if( avpspec ) {
             /* If calculating average power spectrum do the transforms with

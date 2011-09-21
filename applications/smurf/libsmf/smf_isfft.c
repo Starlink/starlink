@@ -4,7 +4,7 @@
 *     smf_isfft
 
 *  Purpose:
-*     Decide whether the supplied smfData is FFT'd data
+*     Decide whether the supplied smfData is FFT'd data and get dimensions
 
 *  Language:
 *     Starlink ANSI C
@@ -13,46 +13,52 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     int smf_isfft( const smfData *infile, dim_t *ntslice, dim_t *nbolo,
-*                    dim_t *nf, int * status );
+*     int smf_isfft( const smfData *indata, dim_t *rdims, dim_t *nbolo,
+*                    dim_t fdims[2], size_t *ndims, int *status );
 
 *  Arguments:
-*     infile = const smfData * (Given)
+*     indata = const smfData * (Given)
 *        smfData to test.
-*     ntslice = dim_t* (Returned)
-*        Optionally return the number of time slices in the corresponding
-*        time-series data.
+*     rdims = dim_t* (Returned)
+*        Optionally return the lengths of the real-space axes (e.g. length
+*        of the time series, or lengths of the orthogonal map axes).
+*        Unused dimensions are set to a length of 0. Can be NULL.
 *     nbolo = dim_t* (Returned)
-*        Optionally return the number of bolometers
-*     nf = dim_t* (Returned)
-*        Optionally return the number of frequencies
+*        If the data are a time-series cube, return the number
+*        of bolometers (>= 1). If we are dealing with map data nbolo is set
+*        to 0. Can be NULL.
+*     fdims = dim_t[2] (Returned)
+*        Optionally return the lengths of the transformed frequency
+*        axes (see ndims). Unused dimensions are set to a length of 0. Can
+*        be NULL.
+*     ndims = size_t* (Returned)
+*        Number of real-space dimensions. Set to 1 if transformed
+*        time-series data, or 2 if transformed map data. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Returned Value:
-*     Boolean int. True if a FFT, false if it is time-series. Status is
-*     set to SAI__ERROR if the data doesn't appear to be either.
+*     Boolean int. True if an FFT, false if it is real-space. Status
+*     is set to SAI__ERROR if it is ambiguous whether we have FFT or
+*     real-space data, and return value is 0. If the data are real-space
+*     but have dimensions that are not 2- or 3-dimensional, bad status
+*     will also be set.
 
 *  Description:
-*     Tests a smfData to see if it is FFT'd data. Also optionally returns
-*     the number of time slices that correspond to the input data. This is
-*     not the completely trivial case that ntslice = nfreq * 2 since
-*     the FFT of real data in FFTW has ntslice/2 + 1 samples. To determine
-*     whether the input had an even or odd number of samples, this routine
-*     checks the last element of the FFT to see if it is real-valued (if it
-*     is, it is the Nyquist frequency of an even-number of input samples).
-*     If data is time-domain, simply returns the known ntslice of the input.
+*     Checks the smfData.isFFT flag to decide if we have real-space
+*     (-1) or FFT data (>1). If it is set to 0 it is ambiguous, and
+*     status is set to SAI__ERROR. Also optionally returns the lengths
+*     of the frequency space and corresponding real space axes (either
+*     length of the time series, or lengths of map axes). Regardless of
+*     whether the data are real space or FFT, all of rdims, nbolo, fdims
+*     and ndims will be populated with the correct values. Finally, this
+*     function does a number of sanity checks.
 
 *  Authors:
 *     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  Notes:
-*     - Currently just checks for reasonable dimensionality, should check
-*       header as well.
-*     - The check for even/odd input length will give the wrong
-*       answer if the FFT for all of the detectors is identically 0, and
-*       the input had an even number of samples.
 
 *  History:
 *     2008-07-23 (EC):
@@ -61,10 +67,13 @@
 *        Calculate ntslice.
 *     2010-10-29 (EC):
 *        Better job of figuring out ntslice
+*     2011-09-21 (EC):
+*        Simplify behaviour now that we have smfData.isFFT, make it
+*        support FFTs of 2D maps, and return real and fourier-space dimensions
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008,2010-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -113,109 +122,142 @@
 
 #define FUNC_NAME "smf_isfft"
 
-int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo,
-               dim_t *nf, int *status ) {
-  dim_t i;                      /* Loop counter */
-  int isreal=1;                 /* Flag for real-valued Nyquist frequency */
-  dim_t nbolo0=0;               /* Number of detectors  */
-  dim_t nf0=0;                  /* Number of frequencies */
+int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
+               dim_t fdims[2], size_t *ndims, int *status ) {
+
+  dim_t fdims0[2]={0,0};        /* Lengths of frequency axes */
+  size_t i;                     /* Loop counter */
+  dim_t nbolo0=0;               /* Number of detectors if time-series cube */
+  size_t ndims0=0;              /* Number of dimensions */
+  dim_t rdims0[2]={0,0};        /* Real space dimensions */
   int retval=0;                 /* The return value */
-  double *val=NULL;             /* Pointer to element of data array */
 
-  if (*status != SAI__OK) return 0;
+  if( *status != SAI__OK ) return retval;
 
-  if (indata == NULL) {
+  if( indata == NULL ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": NULL smfData pointer provided"
             " (possible programming error)", status);
-    return 0;
+    return retval;
   }
 
-  if( (indata->dtype == SMF__DOUBLE) &&
-      ( ( (indata->ndims==2) && (indata->dims[1]==2) ) ||
-        ( (indata->ndims==4) && (indata->dims[3]==2) ) ) ) {
-    /* Looks like frequency-domain data */
+  if( !indata->isFFT ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": ambiguous whether data are real-space or FFT",
+            status);
+    return retval;
+  }
+
+  /* The possible dimensions for transformed data are:
+
+     3: the FFT of a map (2 spatial axes, and the complex components)
+     4: the FFT of a time-series cube (ntslice/2+1, nx, ny, complex components)
+
+     In all cases transformed smfData must also be of type DOUBLE.
+
+     The possible dimensions for real-space data are:
+     2: a map (2 spatial axes)
+     3: a time-series cube (nx, ny, ntslice) or (ntslice, nx, ny)
+
+     Also note that the last axis for the transform of real-spaced data
+     using the FFTW library has a length n/2 + 1 (where n is the real-space
+     length) since the other half of the data is redundant (simply complex
+     conjugate of the first half). */
+
+  if( indata->isFFT > 0 ) {
+    /* FFT data */
+
+    if( indata->dtype != SMF__DOUBLE ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME
+              ": data are flagged as FFT but not double precision", status);
+      return retval;
+    }
+
+    if( (indata->ndims < 3) || (indata->ndims > 4) ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME
+              ": data are flagged as FFT but not 3- or 4-dimensional", status);
+      return retval;
+    }
+
+    if( indata->ndims == 3 ) {
+      /* Transform of a map */
+      ndims0 = 2;
+      fdims0[0] = indata->dims[0];
+      fdims0[1] = indata->dims[1];
+      rdims0[0] = indata->dims[0];
+      rdims0[1] = (dim_t) indata->isFFT;
+    } else {
+      /* Transform of a data cube */
+      ndims0 = 1;
+      fdims0[0] = indata->dims[0];
+      rdims0[0] = (dim_t) indata->isFFT;
+      nbolo0 = indata->dims[1]*indata->dims[2];
+    }
+
+    if( fdims0[ndims0-1] != (rdims0[ndims0-1]/2 + 1) ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME
+              ": data are flagged as FFT but real/frequency axes don't match",
+              status);
+      return retval;
+    }
+
     retval = 1;
 
-    /* Check dimensions of data if requested */
-    if( ntslice || nbolo || nf ) {
-
-      /* Get numbers of detectors */
-      if( indata->ndims==2 ) {
-        nbolo0 = 1;
-      } else {
-        nbolo0 = indata->dims[1]*indata->dims[2];
-      }
-
-      /* Frequency is always the first dimension */
-      nf0 = indata->dims[0];
-
-      /* Try to figure out ntslices */
-      if( ntslice ) {
-        if( indata->hdr && indata->hdr->nframes) {
-        /* If we have a header we can try to figure out the length of the
-           time axis there */
-
-          *ntslice = indata->hdr->nframes;
-        } else if( indata->pntr[0] ) {
-          /* Otherwise check for a real value at the Nyquist frequency to
-             decide if the number of time slices is even or odd. */
-
-          val = indata->pntr[0];   /* Init pointer to last imag. of 1st bolo */
-          val += nf0*nbolo0 + (nf0-1);
-
-          for( i=0; isreal && (i<nbolo0); i++ ) {
-            if( *val ) {
-              /* If complex-valued the input array had an odd length */
-              isreal = 0;
-            }
-
-            /* Increment pointer to end of next bolo */
-            val += nf0;
-          }
-
-          *ntslice = nf0*2 - 1 - isreal;
-        } else {
-          *status = SAI__ERROR;
-          errRep( "", FUNC_NAME ": couldn't establish ntslices", status );
-        }
-      }
-
-      /* Then do nbolo and nf */
-      if( nbolo ) *nbolo = nbolo0;
-      if( nf ) *nf = nf0;
-
-    }
-
-  } else if( (indata->ndims==1) || (indata->ndims==3) ) {
-    /* Looks like time-domain data */
-    retval = 0;
-
-    /* Check dimensions of data if requested */
-
-    if( nf ) *nf = 0;
-
-    if( ntslice || nbolo ) {
-      if( indata->ndims == 1 ) {
-        if( ntslice ) *ntslice = indata->dims[0];
-        if( nbolo ) *nbolo = 1;
-      } else {
-        if( indata->isTordered ) {
-          if( ntslice ) *ntslice = indata->dims[2];
-          if( nbolo ) *nbolo = indata->dims[0]*indata->dims[1];
-        } else {
-          if( ntslice ) *ntslice = indata->dims[0];
-          if( nbolo ) *nbolo = indata->dims[1]*indata->dims[2];
-        }
-      }
-    }
   } else {
-    /* Don't know... set SMF__WDIM so that caller can trap */
-    *status = SMF__WDIM;
-    errRep( "", FUNC_NAME
-            ": Can't determine whether data are time- or frequency-domain",
-            status);
+    /* Real space data */
+
+    if( (indata->ndims < 2) || (indata->ndims > 3) ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME
+              ": data appear to be real-space but are neither 2- nor "
+              "3-dimensional", status);
+      return retval;
+    }
+
+    if( indata->ndims == 2 ) {
+      /* A 2D map */
+      ndims0 = 2;
+      rdims0[0] = indata->dims[0];
+      rdims0[1] = indata->dims[1];
+      fdims0[0] = indata->dims[0];
+      fdims0[1] = indata->dims[1]/2+1;
+    } else {
+      /* A time-series cube */
+      ndims0 = 1;
+      smf_get_dims( indata, NULL, NULL, &nbolo0, rdims0, NULL, NULL, NULL,
+                    status );
+      fdims0[0] = rdims0[0]/2+1;
+    }
+
+    retval = 0;
   }
+
+  /* Debugging messages */
+  msgOutiff( MSG__DEBUG, "", FUNC_NAME
+             ": isfft=%i ndims=%zu nbolo=%zu", status, retval, ndims0, nbolo0 );
+  for( i=0; i<ndims0; i++ ) {
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME
+               ": dim(%zu) real_len=%zu freq_len=%zu", status,
+               i, rdims0[i], fdims0[i] );
+  }
+
+  /* Return values */
+  if( rdims ) {
+    rdims[0] = rdims0[0];
+    rdims[1] = rdims0[1];
+  }
+
+  if( nbolo ) *nbolo = nbolo0;
+
+  if( fdims ) {
+    fdims[0] = fdims0[0];
+    fdims[1] = fdims0[1];
+  }
+
+  if( ndims ) *ndims = ndims0;
 
   return retval;
 }

@@ -109,12 +109,14 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
   double *baseR=NULL;           /* base pointer to real/amplitude coeff */
   double *baseI=NULL;           /* base pointer to imag/argument coeff */
   double df=1;                  /* frequency steps in Hz */
+  dim_t fdims[2];               /* Lengths of frequency-space axes */
   size_t i;                     /* Loop counter */
   double imag;                  /* Imaginary coeff */
   size_t j;                     /* Loop counter */
   dim_t nbolo=0;                /* Number of detectors  */
   dim_t nf=0;                   /* Number of frequencies in FFT */
   dim_t ntslice;                /* Number of time slices in data */
+  dim_t rdims[2];               /* Lengths of real-space axes */
   double real;                  /* Real coeff */
   double theta;                 /* Argument */
 
@@ -126,11 +128,13 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
             " (possible programming error)", status);
   }
 
-  if( !smf_isfft(data, &ntslice, &nbolo, &nf, status) ) {
+  if( !smf_isfft(data, rdims, &nbolo, fdims, NULL, status) ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": smfData provided is not FFT data"
             " (possible programming error)", status);
   }
+  ntslice = rdims[0];
+  nf = fdims[0];
 
   if( *status != SAI__OK ) return;
 

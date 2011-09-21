@@ -114,6 +114,7 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
                           size_t qstride, smf_qual_t mask, double *weights,
                           int *status ) {
 
+  dim_t fdims[2];               /* Lengths of frequency-space axes */
   size_t i;                     /* Loop counter */
   double *idptr=NULL;           /* Pointer to input data */
   double mean;                  /* Mean value at time slice */
@@ -124,6 +125,7 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
   dim_t nf=0;                   /* Number of frequencies in FFT */
   double *odptr=NULL;           /* Pointer to output data */
   double *ovptr=NULL;           /* Pointer to output variance */
+  dim_t rdims[2];               /* Lengths of real-space axes */
   smfData *retdata=NULL;        /* Returned power spectrum */
   double sigma;                 /* RMS value at time slice */
 
@@ -137,11 +139,13 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
   }
 
   /* Check that we have frequency-domain input */
-  if( !smf_isfft( pspec, &ntslice, &nbolo, &nf, status ) ) {
+  if( !smf_isfft( pspec, rdims, &nbolo, fdims, NULL, status ) ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": Input data are not FFT!", status );
     return NULL;
   }
+  ntslice = rdims[0];
+  nf = fdims[0];
 
   /* Check that we don't have a 1-d input power spectrum */
   if( pspec->ndims != 4 ) {

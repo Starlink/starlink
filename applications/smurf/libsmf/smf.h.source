@@ -1287,8 +1287,8 @@ void smf_instap_get( smfHead * hdr, int * status );
 
 int smf_isdark( const smfData *data, int * status );
 
-int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo,
-               dim_t *nf, int *status );
+int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
+               dim_t fdims[2], size_t *ndims, int *status );
 
 void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,

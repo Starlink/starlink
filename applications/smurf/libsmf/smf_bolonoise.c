@@ -217,7 +217,12 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data,
   pow = smf_fft_data( wf, data, 0, len, status );
   smf_convert_bad(  pow, status );
   smf_fft_cart2pol( pow, 0, 1, status );
-  smf_isfft( pow, NULL, NULL, &nf, status );
+
+  {
+    dim_t fdims[2];
+    smf_isfft( pow, NULL, NULL, fdims, NULL, status );
+    if( *status == SAI__OK ) nf=fdims[0];
+  }
 
   /* Check for reasonble frequencies, and integer offsets in the array */
   i_low = smf_get_findex( f_low, df, nf, status );
