@@ -88,6 +88,9 @@
 *        Fix dimensionality test.
 *     2011-01-25 (TIMJ):
 *        Add SORTBY option to sort by any FITS header.
+*     2011-09-21 (TIMJ):
+*        Force output type to be _DOUBLE because, currently, smf_open_file
+*        forces the 2D input files to be _DOUBLE regardless of type.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -369,6 +372,12 @@ void smurf_stackframes( int *status ) {
   lbnd[2] = 1;
   ubnd[2] = lbnd[2] + size - 1;
   ndfSbnd( 3, lbnd, ubnd, outndf, status );
+
+  /* Force the type of the output to _DOUBLE because
+     smf_open_file currently forces 2d files to _DOUBLE */
+  ndfStype( "_DOUBLE", outndf, "DATA", status );
+  ndfStype( "_DOUBLE", outndf, "VARIANCE", status );
+
   /* need to convince NDF that we have defined the data array
    and VARIANCE - and use the native type to avoid type conversion. */
   ndfType( outndf, "DATA", ndftype, sizeof(ndftype), status );
