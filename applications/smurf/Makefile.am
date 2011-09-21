@@ -132,7 +132,15 @@ data/sg450_m1009d1008_heateff.sdf \
 data/sg850_m0906d1005_heateff.sdf \
 data/sg850_m1002d1006_heateff.sdf \
 data/sg850_m1003d1004_heateff.sdf \
-data/sg850_m1005d1007_heateff.sdf
+data/sg850_m1005d1007_heateff.sdf \
+data/opteff-s4a.sdf \
+data/opteff-s4b.sdf \
+data/opteff-s4c.sdf \
+data/opteff-s4d.sdf \
+data/opteff-s8a.sdf \
+data/opteff-s8b.sdf \
+data/opteff-s8c.sdf \
+data/opteff-s8d.sdf
 
 # Linking
 
