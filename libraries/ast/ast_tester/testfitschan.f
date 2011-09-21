@@ -43,6 +43,11 @@ c      call ast_watchmemory( 225192 )
          call stopit( 1000, ' ', status )
       endif
 
+      if( ast_geti( fc, 'Nkey', status ) .ne. 8 ) then
+         write(*,*) ast_geti( fc, 'Nkey', status )
+         call stopit( 999, ' ', status )
+      endif
+
       call ast_clear( fc, 'Card', status )
       i = 0
       do while( ast_findfits( fc, '%f', card, .true., status ) )

@@ -123,6 +123,7 @@ f     encodings), then write operations using AST_WRITE will
 *     - FitsDigits: Digits of precision for floating-point FITS values
 *     - Iwc: Add a Frame describing Intermediate World Coords?
 *     - Ncard: Number of FITS header cards in a FitsChan
+*     - Nkey: Number of unique keywords in a FitsChan
 *     - TabOK: Should the FITS "-TAB" algorithm be recognised?
 *     - PolyTan: Use PVi_m keywords to define distorted TAN projection?
 *     - Warnings: Produces warnings about selected conditions
@@ -989,10 +990,11 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        - Move the deletion of tables and warnings from Delete to
 *        EmptyFits.
 *     21-SEP-2011 (DSB):
-*        In RoundFString, remember to update the pointer to the exponent.
+*        - In RoundFString, remember to update the pointer to the exponent.
 *        This bug caused parts of the exponent to dissappear when
 *        formatting a value that included some trailing zeros and a
 *        series of adjacent 9's.
+*        - Added Nkey attribute.
 *class--
 */
 
@@ -1628,6 +1630,7 @@ static int GetMaxI( double ****item, char, int * );
 static int GetMaxJM( double ****item, char, int * );
 static int GetMaxJMC( char *****item, char, int * );
 static int GetNcard( AstFitsChan *, int * );
+static int GetNkey( AstFitsChan *, int * );
 static int GetSkip( AstChannel *, int * );
 static int GetUsedPolyTan( AstFitsChan *, int, int, char, int * );
 static int GetValue( AstFitsChan *, const char *, int, void *, int, int, const char *, const char *, int * );
@@ -15711,6 +15714,15 @@ const char *GetAttrib( AstObject *this_object, const char *attrib, int *status )
          result = getattrib_buff;
       }
 
+/* Nkey. */
+/* ----- */
+   } else if ( !strcmp( attrib, "nkey" ) ) {
+      ival = astGetNkey( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
 /* AllWarnings */
 /* ----------- */
    } else if ( !strcmp( attrib, "allwarnings" ) ) {
@@ -16023,6 +16035,61 @@ static int GetNcard( AstFitsChan *this, int *status ){
 
 /* Return the result. */
    return astOK ? ncard : 0;
+}
+
+static int GetNkey( AstFitsChan *this, int *status ){
+
+/*
+*+
+*  Name:
+*     astGetNkey
+
+*  Purpose:
+*     Get the value of the Nkey attribute.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     int astGetNkey( AstFitsChan *this )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+*     This function returns the value of the Nkey attribute for the supplied
+*     FitsChan. This is the number of unique keywords currently in the
+*     FitsChan.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+
+*  Returned Value:
+*     The number of  unique keywords currently in the FitsChan.
+
+*  Notes:
+*     - A value of zero will be returned if an error has already
+*     occurred, or if this function should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   const char *class;      /* Pointer to class string */
+   const char *method;     /* Pointer to method string */
+   FitsCard *card0;        /* Pointer to current card on entry */
+   int ncard;              /* Number of cards so far */
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
+/* Return zero if an error has already occurred, or no FitsChan was supplied,
+   or the FitsChan is empty. */
+   if ( !astOK || !this || !this->keywords ) return 0;
+
+/* Return the size of the keywords KeyMap. */
+   return astMapSize( this->keywords );
 }
 
 static void GetNextData( AstChannel *this_channel, int skip, char **name,
@@ -16966,6 +17033,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->SetWarnings = SetWarnings;
    vtab->GetWarnings = GetWarnings;
    vtab->GetNcard = GetNcard;
+   vtab->GetNkey = GetNkey;
    vtab->GetAllWarnings = GetAllWarnings;
    vtab->ClearEncoding = ClearEncoding;
    vtab->TestEncoding = TestEncoding;
@@ -24792,6 +24860,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 /* If the attribute was not recognised, use this macro to report an error
    if a read-only attribute has been specified. */
    } else if ( MATCH( "ncard" ) ||
+               MATCH( "nkey" ) ||
                MATCH( "allwarnings" ) ){
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
@@ -30560,6 +30629,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    read-only attributes of this class. If it does, then return
    zero. */
    } else if ( !strcmp( attrib, "ncard" ) ||
+               !strcmp( attrib, "nkey" ) ||
                !strcmp( attrib, "allwarnings" ) ){
       result = 0;
 
@@ -38669,6 +38739,37 @@ astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 *att--
 */
 
+/* Nkey */
+/* ==== */
+
+/*
+*att++
+*  Name:
+*     Nkey
+
+*  Purpose:
+*     Number of unique FITS keywords in a FitsChan.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer, read-only.
+
+*  Description:
+*     This attribute gives the total number of unique FITS keywords
+*     stored in a FitsChan. It is updated as cards are added or
+*     deleted. If no keyword occurrs more than once in the FitsChan, the
+*     Ncard and Nkey attributes will be equal. If any keyword occurrs
+*     more than once, the Nkey attribute value will be smaller than
+*     the Ncard attribute value.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+
 /* Warnings. */
 /* ======== */
 
@@ -40464,6 +40565,11 @@ int astGetCard_( AstFitsChan *this, int *status ){
 int astGetNcard_( AstFitsChan *this, int *status ){
    if( !this ) return 0;
    return (**astMEMBER(this,FitsChan,GetNcard))( this, status );
+}
+
+int astGetNkey_( AstFitsChan *this, int *status ){
+   if( !this ) return 0;
+   return (**astMEMBER(this,FitsChan,GetNkey))( this, status );
 }
 
 int astGetClean_( AstFitsChan *this, int *status ){

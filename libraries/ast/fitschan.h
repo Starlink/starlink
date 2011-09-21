@@ -284,6 +284,8 @@ typedef struct AstFitsChanVtab {
 
    int (* GetNcard)( AstFitsChan *, int * );
 
+   int (* GetNkey)( AstFitsChan *, int * );
+
    int (* GetEncoding)( AstFitsChan *, int * );
    int (* TestEncoding)( AstFitsChan *, int * );
    void (* SetEncoding)( AstFitsChan *, int, int * );
@@ -522,6 +524,8 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    void astSetWarnings_( AstFitsChan *, const char *, int * );
 
    int astGetNcard_( AstFitsChan *, int * );
+
+   int astGetNkey_( AstFitsChan *, int * );
 
    int astGetEncoding_( AstFitsChan *, int * );
    int astTestEncoding_( AstFitsChan *, int * );
@@ -792,6 +796,9 @@ astINVOKE(V,astGetAllWarnings_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astGetNcard(this) \
 astINVOKE(V,astGetNcard_(astCheckFitsChan(this),STATUS_PTR))
+
+#define astGetNkey(this) \
+astINVOKE(V,astGetNkey_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astClearEncoding(this) \
 astINVOKE(V,astClearEncoding_(astCheckFitsChan(this),STATUS_PTR))
