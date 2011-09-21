@@ -65,7 +65,8 @@
       default axes are only drawn if the picture is cleared.
 
       - The Pearson correlation coefficient of the data in the
-      scatter plot is now displayed, and written to an output parameter.
+      scatter plot is now displayed, and written to an output
+      parameter.
 
    o  SHOWQUAL
 

@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.38}
 \newcommand{\stardocnumber}    {95.38}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2011 August 19}
+\newcommand{\stardocdate}      {2011 September 16}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -37214,7 +37214,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       straight-line is then fitted to the relationship between the two
       sets of data values in order to determine the relative scale
       factor and any zero-level offset between the NDFs (the offset may
-      optionally be fixed at zero - see parameter ZEROFF).  To reduce
+      optionally be fixed at zero---see Parameter ZEROFF).  To reduce
       computation time, the data points are binned according to the
       data value in the first NDF.  The mean data value within each bin
       is used to find the fit and weights are applied according to the
@@ -37452,7 +37452,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          ZEROFF = \_LOGICAL (Read)
       }{
          If TRUE, the offset of the linear fit is constrained to be
-         zero. {\tt [FALSE]}
+         zero.  {\tt [FALSE]}
       }
    }
    \sstresparameters{
@@ -43749,13 +43749,6 @@ KAPPA: \htmlref{FLIP}{FLIP},
          supplied is duplicated for the remaining axes.  {\tt [1]}
       }
       \sstsubsection{
-         CORR = \_DOUBLE (Write)
-      }{
-         The Pearson correlation coefficient of the points in the scatter
-         plot. A value of zero is stored if the correlation coefficient
-         cannot be calculated.
-      }
-      \sstsubsection{
          DEVICE = \htmlref{DEVICE}{se:selgradev} (Read)
       }{
          The graphics workstation on which to produce the plot.  If a
@@ -43778,7 +43771,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
          The widths of the margins to leave for axis annotation, given
          as fractions of the corresponding dimension of the current picture.
          Four values may be given, in the order - bottom, right, top, left.
-         If fewer  than four values are given, extra values are used equal to
+         If fewer than four values are given, extra values are used equal to
          the first supplied value.  If these margins are too narrow any axis
          annotation may be clipped.  If a null ({\tt{!}}) value is supplied, the
          value used is {\tt 0.15} (for all edges) if annotated axes are produced,
@@ -43880,6 +43873,15 @@ KAPPA: \htmlref{FLIP}{FLIP},
          If a null ({\tt{!}}) value is suplied, the value used is determined
          by Parameter PERC2.  The value supplied may be greater than or less
          than the value supplied for YBOT.  {\tt [!]}
+      }
+   }
+   \sstresparameters{
+      \sstsubsection{
+         CORR = \_DOUBLE (Write)
+      }{
+         The Pearson correlation coefficient of the points in the scatter
+         plot.  A value of zero is stored if the correlation coefficient
+         cannot be calculated.
       }
    }
    \sstexamples{

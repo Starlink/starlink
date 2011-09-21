@@ -4,7 +4,7 @@
 *     KPG1_CORRx
 
 *  Purpose:
-*     Calculate the correlation coefficient between two arrays.
+*     Calculates the correlation coefficient between two arrays.
 
 *  Language:
 *     Starlink Fortran 77
@@ -102,7 +102,7 @@
 
 *.
 
-*  Initialise the returned correlation coefficient
+*  Initialise the returned correlation coefficient.
       R = VAL__BADD
 
 *  Check inherited global status.
@@ -126,7 +126,7 @@
 *  Check both are good.
          IF( X( I ) .NE. VAL__BAD<T> .AND. Y( I ) .NE. VAL__BAD<T> ) THEN
 
-*  Convert to double precision and check they  are safe to use.
+*  Convert to double precision and check they are safe to use.
             VX = DBLE( X( I ) )
             VY = DBLE( Y( I ) )
             IF( ABS( VX ) .LT. ALIM .AND. ABS( VY ) .LT. ALIM ) THEN
