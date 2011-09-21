@@ -197,7 +197,7 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
 
     case SMF__Q_BADEF:
       retval = "BADEF";
-      ldescr = "Set iff optical flatfield value is bad";
+      ldescr = "Set iff optical efficiency value is bad";
       break;
 
     default:

@@ -488,7 +488,7 @@ typedef enum {
   SMF__Q_NOISE   = BIT_TO_VAL(9),   /* Bolometer flagged because of noise constraint */
   SMF__Q_EXT     = BIT_TO_VAL(10),  /* Unable to apply extinction correction */
   SMF__Q_LOWAP   = BIT_TO_VAL(11),  /* Apodisation factor is too low to invert */
-  SMF__Q_BADEF   = BIT_TO_VAL(12),  /* Optical flat field correction is bad */
+  SMF__Q_BADEF   = BIT_TO_VAL(12),  /* Optical efficiency correction is bad */
 } smf_qual_bits;
 
 /* These macros are for several commonly-used combinations of quality flags */

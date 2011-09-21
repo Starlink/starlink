@@ -50,7 +50,7 @@
 *     Slew speed   : FLAGSLOW, FLAGFAST
 *     Dark squids  : DKCLEAN
 *     Gap filling  : ZEROPAD
-*     Optical flat-fielding: OPTFFS8A, OPTFFS8B, ..., OPTFFS4A, OPTFFS4B, ...
+*     Optical efficiencies: OPTEFFS8A, OPTEFFS8B, ..., OPTEFFS4A, OPTEFFS4B, ...
 *     Baselines    : ORDER
 *     [Noisy Bolos]: Optionally happens here instead if "NOISECLIPPRECOM" is set
 *     Common-Mode  : COMPREPROCESS
@@ -181,8 +181,8 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
   double noisecliphigh = 0; /* Sigma clip high-noise outlier bolos */
   double noisecliplow = 0;  /* Sigma clip low-noise outlier bolos */
   int noiseclipprecom = 0;  /* Noise clipping before common-mode cleaning? */
-  const char *optff=NULL;   /* Pointer to optical flatfield NDF */
-  int optffdiv;             /* Divide data by the optical flat-fields? */
+  const char *opteff=NULL;  /* Pointer to optical efficiency NDF file name*/
+  int opteffdiv;            /* Divide data by the optical efficiencies? */
   int order;                /* Order of polynomial for baseline fitting */
   char param[ 20 ];         /* Buffer for config parameter name */
   double pcathresh;         /* n-sigma threshold for PCA cleaning */
@@ -336,18 +336,18 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                  status, smf_timerupdate(&tv1,&tv2,status) );
     }
 
-    /* Apply optical flat-fielding corrections. */
-    strcpy( param, "OPTFF" );
+    /* Apply optical efficiency corrections. */
+    strcpy( param, "OPTEFF" );
     smf_find_subarray( data->hdr, param + 5, sizeof(param) - 5, NULL,
                        status );
     astChrCase( NULL, param, 1, 0 );
     if( astMapHasKey( keymap, param ) ) {
-      astMapGet0I( keymap, "OPTFFDIV", &optffdiv );
-      if ( astMapGet0C( keymap, param, &optff ) ) {
+      astMapGet0I( keymap, "OPTEFFDIV", &opteffdiv );
+      if ( astMapGet0C( keymap, param, &opteff ) ) {
         msgOutiff( MSG__VERB,"", FUNC_NAME ": %s bolometer values "
                    "by factors read from NDF %s", status,
-                   optffdiv ? "Dividing" : "Multiplying", optff );
-        smf_scale_bols( wf, data, NULL, optff, param, optffdiv, status );
+                   opteffdiv ? "Dividing" : "Multiplying", opteff );
+        smf_scale_bols( wf, data, NULL, opteff, param, opteffdiv, status );
       }
     }
 

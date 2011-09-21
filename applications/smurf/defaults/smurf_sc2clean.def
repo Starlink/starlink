@@ -60,19 +60,19 @@ groupsubarray = 0
 
 # These are read in smf_clean_smfArray
 
-optffs8a = <undef>
-optffs8b = <undef>
-optffs8c = <undef>
-optffs8d = <undef>
-optffs4a = <undef>
-optffs4b = <undef>
-optffs4c = <undef>
-optffs4d = <undef>
+opteffs8a = <undef>
+opteffs8b = <undef>
+opteffs8c = <undef>
+opteffs8d = <undef>
+opteffs4a = <undef>
+opteffs4b = <undef>
+opteffs4c = <undef>
+opteffs4d = <undef>
 
 #  If set non-zero, the bolometer data is divided by the values read from
-#  the optical flatfields. Otherwise, the bolometer data is multiplied by
-#  the values read from the optical flatfields.
-optffdiv = 1
+#  the optical efficiency files. Otherwise, the bolometer data is multiplied by
+#  the values read from the optical efficiency files.
+opteffdiv = 1
 
 # these are analogous cleaning parameters for dark squids
 # We do not have a clever syntax for recursively reading this

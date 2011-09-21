@@ -1,7 +1,7 @@
 #!/bin/tcsh
 #+
 #  Name:
-#     optff-obs
+#     opteff-obs
 
 #  Purpose:
 #     Reads raw scuba-2 data for a specified observation from
@@ -13,17 +13,17 @@
 #     directory ./<date>/<obs>/ within the current directory. Any
 #     of these NDFs that already exist are not replaced.
 #
-#     Normally, the "optff" script should be used rather than
+#     Normally, the "opteff" script should be used rather than
 #     invoking this script directly.
 
 #  Example:
-#     optff-obs 20110819 00019
+#     opteff-obs 20110819 00019
 #        Reads data for observation 19 on 20110819, and writes NDFs
 #        smas-s4a.sdf, etc, to  directory ./20110819/00019/
 #-
 
 if( $# < 2 ) then
-   echo "Usage: optff-obs date obs"
+   echo "Usage: opteff-obs date obs"
    exit
 endif
 
@@ -51,9 +51,9 @@ echo "modelorder=(ext,ast,noi)" >> conf
 set root = "/jcmtdata/raw/scuba2"
 
 #  Create a temporary ADAM directory within this directory.
-rm -rf adam-optff-obs >& /dev/null
-mkdir adam-optff-obs
-setenv ADAM_USER $PWD/adam-optff-obs
+rm -rf adam-opteff-obs >& /dev/null
+mkdir adam-opteff-obs
+setenv ADAM_USER $PWD/adam-opteff-obs
 
 #  Loop over both waveband
 foreach waveband (s8 s4)
@@ -248,5 +248,5 @@ $KAPPA_DIR/wcsmosaic in=smas-s4\* out=smas-s4 method=sincsinc ref=! accept
 $KAPPA_DIR/wcsmosaic in=smas-s8\* out=smas-s8 method=sincsinc ref=smas-s4 accept
 
 #  Clean up
-rm -rf adam-optff-obs
+rm -rf adam-opteff-obs
 

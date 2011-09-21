@@ -1,15 +1,15 @@
 #!/bin/tcsh
 #+
 #  Name:
-#     optff
+#     opteff
 
 #  Purpose:
 #     Reads raw scuba-2 data for a specified list of observation
 #     from /jcmtdata/raw/scuba2, and creates a set of eight NDFs
-#     "optff-<array>.sdf" within the current directory, containing
+#     "opteff-<array>.sdf" within the current directory, containing
 #     normalised efficiency values for subeach array.
 #
-#     This script invokes the optff-obs and optff-combine scripts
+#     This script invokes the opteff-obs and opteff-combine scripts
 #     to do most of the work.
 #
 #     Any observations for which intermediate results were created
@@ -19,7 +19,7 @@
 #     containing the existing intermediate results (./<date>/<obs>/).
 
 #  Example:
-#     optff obslist
+#     opteff obslist
 #        Reads lists of observations from text file "obslist" and
 #        generates corresponding optical efficiency NDFs. Each line
 #        in text file should contain an 8-digit date followed by a
@@ -28,7 +28,7 @@
 #-
 
 if( $# < 1 ) then
-   echo "Usage: optff <infile>"
+   echo "Usage: opteff <infile>"
    exit
 endif
 
@@ -58,13 +58,13 @@ set i = 1
 foreach date ($datelist)
    set obs = $obslist[$i]
    echo "Creating intermediate results for $date $obs ($i of $#obslist)"
-   ./optff-obs $date $obs >! logs/${date}-${obs}.log
+   ./opteff-obs $date $obs >! logs/${date}-${obs}.log
    @ i = $i + 1
 end
 
 #  Combine them to produce the master efficiency NDFs
 echo "Combining intermediate results into master efficiency NDFs"
-./optff-combine >! logs/combine.log
+./opteff-combine >! logs/combine.log
 
 echo "Done"
 

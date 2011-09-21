@@ -1,26 +1,26 @@
 #!/bin/tcsh
 #+
 #  Name:
-#     optff-combine
+#     opteff-combine
 
 #  Purpose:
 #     Merges all the optical efficiency data to create a master
 #     efficiency NDF for each subarray. The current directory should
 #     contain directories of the form ./<date>/<obs>/ for each
 #     observation to be included. These should have been created
-#     previously using script optff-obs. All NDFs "smas-<array>.sdf"
+#     previously using script opteff-obs. All NDFs "smas-<array>.sdf"
 #     contained within these subdirectories are combined to create
-#     eight output NDFs "optff-<array>.sdf" in the current directory.
+#     eight output NDFs "opteff-<array>.sdf" in the current directory.
 #
-#     Normally, the "optff" script should be used rather than
+#     Normally, the "opteff" script should be used rather than
 #     invoking this script directly.
 #-
 
 set wref = \!
 
-rm -rf optff-combine-workdir >& /dev/null
-mkdir optff-combine-workdir
-cd optff-combine-workdir
+rm -rf opteff-combine-workdir >& /dev/null
+mkdir opteff-combine-workdir
+cd opteff-combine-workdir
 
 #  Create a temporary ADAM directory within this directory.
 rm -rf adam >& /dev/null
@@ -101,12 +101,12 @@ foreach waveband (s4 s8)
 
 #  Fill bad values (using variance seems to make fillbad produce silly values, so
 #  switch it off).
-      $KAPPA_DIR/fillbad aa niter=7 variance=no out=../optff-${array}
+      $KAPPA_DIR/fillbad aa niter=7 variance=no out=../opteff-${array}
 
    end
 
 end
 
 cd ..
-rm -rf optff-combine-workdir
+rm -rf opteff-combine-workdir
 
