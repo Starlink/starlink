@@ -313,6 +313,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   char datatype[NDF__SZTYP+1];  /* String for DATA type */
   char dtype[NDF__SZTYP+1];  /* String for DATA/VARIANCE type */
   int indf;                  /* NDF identified for input file */
+  int isFFT;                 /* FFT data? */
   int lbnd[NDF__MXDIM];      /* Lower pixel bounds of NDF */
   int ubnd[NDF__MXDIM];      /* Upper pixel bounds of NDF */
   int ndfdims[NDF__MXDIM];   /* Array containing size of each axis of array */
@@ -792,8 +793,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
       /* Map the header */
       if ( !(flags & SMF__NOCREATE_HEAD) ) {
-        int isFFT;
-
         /* Read the units and data label */
         ndfCget( indf, "UNITS", hdr->units, SMF__CHARLABEL, status );
         ndfCget( indf, "LABEL", hdr->dlabel, SMF__CHARLABEL, status );
@@ -1089,6 +1088,28 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
              In principle AzTEC data should not be compressed, in which case
              the above assertion "Instrument must be SCUBA-2" would be
              correct, and the following code is unnecessary. */
+
+          /* Are the data the FFT of something? If there is no FITS keyword
+             data->isFFT will be left in the unknown state of -1 */
+          smf_fits_getI( hdr, "ISFFT", &isFFT, status );
+          if( *status == SAI__OK ) {
+            (*data)->isFFT = isFFT;
+          }
+
+          /* If we have a FITS header but no keyword, that means we haven't
+             ever run these data through smf_fft_data so it is safe to assume
+             that this is not the FFT of something */
+          if( *status == SMF__NOKWRD ) {
+            (*data)->isFFT = -1;
+            errAnnul( status );
+          }
+
+          /* We simply leave isFFT in the default unknown state (-1) if there
+             was no FITS header, but we annul the bad status so we can
+             continue */
+          if ( *status == AST__FUNDEF  ) {
+            errAnnul( status );
+          }
 
           /* Determine the instrument */
           hdr->instrument = smf_inst_get( hdr, status );
