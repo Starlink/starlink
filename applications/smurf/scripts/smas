@@ -144,14 +144,14 @@ Usage: smas [-a diam] [-b] [-e error] [-r perc] [-p] <in-list> <out-table> [<out
           without a "perc" value), a default of 95 is used.
 
    arguments:
-      <in-list>: a text file in which each line contains the path
-          to an NDF holding a SCUBA-2 map of a point source (or
-	  the moon). If an NDF contains a MORE.SMURF.SHORTMAPS or
-	  MORE.SMURF.BOLOMAPS extension item, then the NDFs in the
-	  SHORTMAPS or BOLOMAPS array are used in place of the
-	  supplied NDF (SHORTMAPS is used in preference to BOLOMAPS
-	  if both are present). NOTE, all the data must be for the
-          same subarray.
+      <in-list>: The path to an NDF holding a SCUBA-2 map of a point
+          source (or moon). Alternativelty, a text file containing the
+	  paths to one or more such NDFs can be supplied. If an NDF
+	  contains a MORE.SMURF.SHORTMAPS or MORE.SMURF.BOLOMAPS
+	  extension item, then the NDFs in the SHORTMAPS or BOLOMAPS
+	  array are used in place of the supplied NDF (SHORTMAPS is used
+	  in preference to BOLOMAPS if both are present). NOTE, all the
+	  data must be for the same subarray.
 
       <out-table>: the name of a text file in which to store a
           catalogue containing details of the source in each
@@ -229,6 +229,15 @@ setenv ADAM_NOPROMPT 1
 #  Ensure ADAM sets the shell status variable when each command exits
 setenv ADAM_EXIT 1
 
+#  See if the first positional argument is an NDF or a text file. Attempt
+#  to open it as an NDF. If succesful, write a temporary text file containing
+#  the path to the NDF.
+$KAPPA_DIR/ndftrace $inlist quiet >& /dev/null
+if( $status == 0 ) then
+   echo $inlist >! smas-inlist.tmp
+   set inlist = "smas-inlist.tmp"
+endif
+
 # Check the input file exists
 if( ! -e "$inlist" ) then
    echo "Input file not found: $inlist"
@@ -268,6 +277,7 @@ foreach n (`cat $inlist`)
       echo "Cannot find $in.sdf"
       exit
    endif
+   echo "Processing $in.sdf"
 
 #  See this is a map of the moon.
    set object = `$KAPPA_DIR/fitsmod $in edit=print keyword=OBJECT`
@@ -284,7 +294,13 @@ foreach n (`cat $inlist`)
 
 #  Get the subarray name, and its corresponding integer index.
    set subarray = `$KAPPA_DIR/fitsmod $in edit=print keyword=SUBARRAY`
-   if( $subarray == "s8a" ) then
+   echo $subarray | grep "does not exist" >& /dev/null
+   if( $status == 0 ) then
+      echo "Cannot determine subarray"
+      echo "Does $in.sdf contain data from more than one subarray?"
+      exit
+
+   else if( $subarray == "s8a" ) then
       set array = 0
    else if( $subarray == "s8b" ) then
       set array = 1
@@ -773,6 +789,6 @@ if( "$outimage" != " " ) then
 endif
 
 # Clean up.
-rm -f cat.smas back.sdf files.smas log.smas cut-smas.sdf coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf smas-fits.log >& /dev/null
+rm -f cat.smas back.sdf files.smas log.smas cut-smas.sdf coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf smas-fits.log smas-inlist.tmp >& /dev/null
 rm -rf smas-adam
 
