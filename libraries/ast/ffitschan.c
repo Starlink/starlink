@@ -786,6 +786,7 @@ F77_LOGICAL_FUNCTION(ast_getfits##f)( INTEGER(THIS), \
    astAt( "AST_GETFITS"#F, NULL, 0 ); \
    astWatchSTATUS( \
       name = astString( NAME, NAME_length ); \
+      if( name && !strcmp( name, "." ) ) name = astFree( name ); \
       RESULT = astGetFits##X( astI2P( *THIS ), name, value ) ? \
                F77_TRUE : F77_FALSE; \
       (void) astFree( (void *) name ); \
@@ -843,6 +844,7 @@ F77_LOGICAL_FUNCTION(ast_getfits##f)( INTEGER(THIS), \
    astAt( "AST_GETFITS"#F, NULL, 0 ); \
    astWatchSTATUS( \
       name = astString( NAME, NAME_length ); \
+      if( name && !strcmp( name, "." ) ) name = astFree( name ); \
       RESULT = astGetFits##X( astI2P( *THIS ), name, value ) ? \
                F77_TRUE : F77_FALSE; \
       VALUE[ 0 ] = (F77_DOUBLE_TYPE) value[ 0 ]; \
@@ -878,6 +880,7 @@ F77_LOGICAL_FUNCTION(ast_getfits##f)( INTEGER(THIS), \
    astAt( "AST_GETFITS"#F, NULL, 0 ); \
    astWatchSTATUS( \
       name = astString( NAME, NAME_length ); \
+      if( name && !strcmp( name, "." ) ) name = astFree( name ); \
       RESULT = astGetFits##X( astI2P( *THIS ), name, &value ) ? \
                F77_TRUE : F77_FALSE; \
       if ( astOK && F77_ISTRUE(RESULT) ) { \

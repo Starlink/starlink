@@ -997,7 +997,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        series of adjacent 9's.
 *        - Added Nkey attribute.
 *     22-SEP-2011 (DSB):
-*        Added CardType attribute
+*        - Added CardType attribute
+*        - Allow GetFits to be used to get/set the value of the current
+*        card.
 *class--
 */
 
@@ -13927,11 +13929,11 @@ f     RESULT = AST_GETFITS<X>( THIS, NAME, VALUE, STATUS )
 *     FitsChan method.
 
 *  Description:
-*     This is a family of functions which gets a value for a named keyword
-*     from a FitsChan using one of several different data types. The data
-*     type of the returned value is selected by replacing <X> in the function
-*     name by one of the following strings representing the recognised FITS
-*     data types:
+*     This is a family of functions which gets a value for a named keyword,
+*     or the value of the current card, from a FitsChan using one of several
+*     different data types. The data type of the returned value is selected
+*     by replacing <X> in the function name by one of the following strings
+*     representing the recognised FITS data types:
 *
 *     - CF - Complex floating point values.
 *     - CI - Complex integer values.
@@ -13980,7 +13982,10 @@ c        Pointer to a null-terminated character string
 f        A character string
 *        containing the FITS keyword name. This may be a complete FITS
 *        header card, in which case the keyword to use is extracted from
-*        it. No more than 80 characters are read from this string.
+*        it. No more than 80 characters are read from this string. If
+c        NULL
+f        a single dot '.'
+*        is supplied, the value of the current card is returned.
 c     value
 f     VALUE = <X>type (Returned)
 c        A pointer to a
@@ -14003,11 +14008,12 @@ f        .TRUE.
 *        is returned.
 
 *  Notes:
-*     -  The card following the current card is checked first. If this is
-*     not the required card, then the rest of the FitsChan is searched,
-*     starting with the first card added to the FitsChan. Therefore cards
-*     should be accessed in the order they are stored in the FitsChan (if
-*     possible) as this will minimise the time spent searching for cards.
+*     -  If a name is supplied, the card following the current card is
+*     checked first. If this is not the required card, then the rest of the
+*     FitsChan is searched, starting with the first card added to the
+*     FitsChan. Therefore cards should be accessed in the order they are
+*     stored in the FitsChan (if possible) as this will minimise the time
+*     spent searching for cards.
 *     -  If the requested card is found, it becomes the current card,
 *     otherwise the current card is left pointing at the "end-of-file".
 *     -  If the stored keyword value is not of the requested type, it is
@@ -14066,18 +14072,25 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int 
    ret = 0; \
 \
 /* Extract the keyword name from the supplied string. */ \
-   (void) Split( name, &lname, &lvalue, &lcom, method, class, status ); \
+   if( name ) { \
+      (void) Split( name, &lname, &lvalue, &lcom, method, class, status ); \
+   } else { \
+      lname = NULL; \
+      lvalue = NULL; \
+      lcom = NULL; \
+   } \
 \
 /* Attempt to find a card in the FitsChan refering to this keyword, \
-   and make it the current card. Only proceed if a card was found. */ \
-   if( SearchCard( this, lname, method, class, status ) ){ \
+   and make it the current card. Only proceed if a card was found. No \
+   need to do the search if the value of the current card is required. */ \
+   if( !lname || SearchCard( this, lname, method, class, status ) ){ \
 \
 /* Convert the stored data value to the requested type, and store it in \
    the supplied buffer. */ \
       if( !CnvValue( this, ftype, 0, value, method, status ) && astOK ) { \
          astError( AST__FTCNV, "%s(%s): Cannot convert FITS keyword " \
                    "'%s' to %s.", status, method, class, \
-                   lname, type_names[ ftype ] ); \
+                   CardName( this, status ), type_names[ ftype ] ); \
       } \
 \
 /* If the returned value is a string containing 8 or fewer characters, \

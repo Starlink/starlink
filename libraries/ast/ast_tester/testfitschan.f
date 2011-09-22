@@ -3,7 +3,7 @@
       include 'SAE_PAR'
       include 'AST_PAR'
 
-      integer status, fs, fc, i
+      integer status, fs, fc, i, val
       character cards(10)*80, card*80
 
       status = sai__ok
@@ -29,6 +29,13 @@ c      call ast_watchmemory( 225192 )
       do i = 1, 8
          call ast_putfits( fc, cards(i), .false., status )
       end do
+
+      call ast_seti( fc, 'Card', 2, status )
+      if( .not. ast_getfitsi( fc, '.', val, status ) ) then
+         call stopit( 777, ' ', status )
+      else if( val .ne. 45 ) then
+         call stopit( 778, ' ', status )
+      endif
 
 *  Annul the fitschan. Only 1 ref so this should delete it.
       call ast_annul( fc, status )
