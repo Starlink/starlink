@@ -134,7 +134,6 @@
 #define STATUS_PTR astGetStatusPtr
 #endif
 
-#if defined(astCLASS)            /* Protected */
 #define AST__NOTYPE       -1
 #define AST__COMMENT       0
 #define AST__INT           1
@@ -145,6 +144,8 @@
 #define AST__LOGICAL       6
 #define AST__CONTINUE      7
 #define AST__UNDEF         8
+
+#if defined(astCLASS)            /* Protected */
 
 /* Define constants used to size global arrays in this module. */
 #define AST__FITSCHAN_FITSCARDLEN        80
@@ -283,6 +284,8 @@ typedef struct AstFitsChanVtab {
    void (* ClearCarLin)( AstFitsChan *, int * );
 
    int (* GetNcard)( AstFitsChan *, int * );
+
+   int (* GetCardType)( AstFitsChan *, int * );
 
    int (* GetNkey)( AstFitsChan *, int * );
 
@@ -524,6 +527,8 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    void astSetWarnings_( AstFitsChan *, const char *, int * );
 
    int astGetNcard_( AstFitsChan *, int * );
+
+   int astGetCardType_( AstFitsChan *, int * );
 
    int astGetNkey_( AstFitsChan *, int * );
 
@@ -793,6 +798,9 @@ astINVOKE(V,astTestWarnings_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astGetAllWarnings(this) \
 astINVOKE(V,astGetAllWarnings_(astCheckFitsChan(this),STATUS_PTR))
+
+#define astGetCardType(this) \
+astINVOKE(V,astGetCardType_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astGetNcard(this) \
 astINVOKE(V,astGetNcard_(astCheckFitsChan(this),STATUS_PTR))

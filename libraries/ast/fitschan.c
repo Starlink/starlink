@@ -115,6 +115,7 @@ f     encodings), then write operations using AST_WRITE will
 *
 *     - AllWarnings: A list of the available conditions
 *     - Card: Index of current FITS card in a FitsChan
+*     - CardType: The data type of the current FITS card in a FitsChan
 *     - CarLin: Ignore spherical rotations on CAR projections?
 *     - CDMatrix: Use a CD matrix instead of a PC matrix?
 *     - Clean: Remove cards used whilst reading even if an error occurs?
@@ -995,6 +996,8 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        formatting a value that included some trailing zeros and a
 *        series of adjacent 9's.
 *        - Added Nkey attribute.
+*     22-SEP-2011 (DSB):
+*        Added CardType attribute
 *class--
 */
 
@@ -1617,6 +1620,7 @@ static int FitsFromStore( AstFitsChan *, FitsStore *, int, double *, AstFrameSet
 static int FitsGetCom( AstFitsChan *, const char *, char **, int * );
 static int FitsSof( AstFitsChan *, int * );
 static int FullForm( const char *, const char *, int, int * );
+static int GetCardType( AstFitsChan *, int * );
 static int GetFiducialWCS( AstWcsMap *, AstMapping *, int, int, double *, double *, int * );
 static int GetFitsCF( AstFitsChan *, const char *, double *, int * );
 static int GetFitsCI( AstFitsChan *, const char *, int *, int * );
@@ -13927,13 +13931,7 @@ f     RESULT = AST_GETFITS<X>( THIS, NAME, VALUE, STATUS )
 *     from a FitsChan using one of several different data types. The data
 *     type of the returned value is selected by replacing <X> in the function
 *     name by one of the following strings representing the recognised FITS
-
 *     data types:
-*
-*     The data type of the returned value is selected by replacing <X> in the
-*     function name by one of the following strings representing the
-
-*     recognised FITS data types:
 *
 *     - CF - Complex floating point values.
 *     - CI - Complex integer values.
@@ -15607,6 +15605,15 @@ const char *GetAttrib( AstObject *this_object, const char *attrib, int *status )
          result = getattrib_buff;
       }
 
+/* CardType. */
+/* --------- */
+   } else if ( !strcmp( attrib, "cardtype" ) ) {
+      ival = astGetCardType( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
 /* Encoding. */
 /* --------- */
    } else if ( !strcmp( attrib, "encoding" ) ) {
@@ -15818,6 +15825,49 @@ static int GetCard( AstFitsChan *this, int *status ){
 
 /* Return the card index. */
    return index;
+}
+
+static int GetCardType( AstFitsChan *this, int *status ){
+/*
+*+
+*  Name:
+*     GetCardType
+
+*  Purpose:
+*     Get the value of the CardType attribute.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     int astGetCardType( AstFitsChan *this )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+*     This function returns the value of teh CardType attribute for the supplied
+*     FitsChan. This is the data type of the keyword value for the current card.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+
+*  Returned Value:
+*     An integer representing the data type of the current card.
+
+*  Notes:
+*     - A value of AST__NOTYPE will be returned if an error has already
+*     occurred, or if this function should fail for any reason.
+*-
+*/
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
+/* Return the data type of the current card. */
+   return CardType( this, status );
 }
 
 static int GetFull( AstChannel *this_channel, int *status ) {
@@ -17064,6 +17114,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->TestWarnings = TestWarnings;
    vtab->SetWarnings = SetWarnings;
    vtab->GetWarnings = GetWarnings;
+   vtab->GetCardType = GetCardType;
    vtab->GetNcard = GetNcard;
    vtab->GetNkey = GetNkey;
    vtab->GetAllWarnings = GetAllWarnings;
@@ -24892,6 +24943,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 /* If the attribute was not recognised, use this macro to report an error
    if a read-only attribute has been specified. */
    } else if ( MATCH( "ncard" ) ||
+               MATCH( "cardtype" ) ||
                MATCH( "nkey" ) ||
                MATCH( "allwarnings" ) ){
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
@@ -30662,6 +30714,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    zero. */
    } else if ( !strcmp( attrib, "ncard" ) ||
                !strcmp( attrib, "nkey" ) ||
+               !strcmp( attrib, "cardtype" ) ||
                !strcmp( attrib, "allwarnings" ) ){
       result = 0;
 
@@ -38743,6 +38796,36 @@ astMAKE_GET(FitsChan,FitsDigits,int,DBL_DIG,this->fitsdigits)
 astMAKE_SET(FitsChan,FitsDigits,int,fitsdigits,value)
 astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 
+/* CardType */
+/* ======== */
+
+/*
+*att++
+*  Name:
+*     CardType
+
+*  Purpose:
+*     The data type of the current card in a FitsChan.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer, read-only.
+
+*  Description:
+*     This attribute gives the data type of the keyword value for the
+*     current card of the FitsChan. It will be one of the following
+*     integer constants: AST__NOTYPE, AST__COMMENT, AST__INT, AST__FLOAT,
+*     AST__STRING, AST__COMPLEXF, AST__COMPLEXI, AST__LOGICAL,
+*     AST__CONTINUE, AST__UNDEF.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+
 /* Ncard */
 /* ===== */
 
@@ -40597,6 +40680,11 @@ int astGetCard_( AstFitsChan *this, int *status ){
 int astGetNcard_( AstFitsChan *this, int *status ){
    if( !this ) return 0;
    return (**astMEMBER(this,FitsChan,GetNcard))( this, status );
+}
+
+int astGetCardType_( AstFitsChan *this, int *status ){
+   if( !this ) return AST__NOTYPE;
+   return (**astMEMBER(this,FitsChan,GetCardType))( this, status );
 }
 
 int astGetNkey_( AstFitsChan *this, int *status ){

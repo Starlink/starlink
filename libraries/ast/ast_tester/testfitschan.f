@@ -75,8 +75,16 @@ c      call ast_watchmemory( 225192 )
          call ast_putfits( fc, cards(i), .false., status )
       end do
 
-*  Indicate that the CTYPE1 card should be retained by ast_read.
+
       call ast_clear( fc, 'Card', status )
+      if( ast_geti( fc, 'CardType', status ) .NE. AST__INT ) then
+         write(*,*) ast_geti( fc, 'CardType', status ),' should be ',
+     :              AST__STRING
+         call stopit( 993, ' ', status )
+      endif
+
+
+*  Indicate that the CTYPE1 card should be retained by ast_read.
       if( ast_findfits( fc, 'CTYPE1', card, .FALSE., status ) ) then
          call ast_retainfits( fc, status )
       endif

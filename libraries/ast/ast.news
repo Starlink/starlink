@@ -33,6 +33,9 @@ source and appends them to the end of the FitsChan.
 - The FitsChan class has a new read-only attribute called "Nkey", which
 holds the number of keywords for which values are held in a FitsChan.
 
+- The FitsChan class has a new read-only attribute called "CardType", which
+holds the data type of the keyword value for the current card.
+
 - If the FitsChan astRead method reads a FITS header that uses the
 -SIP (Spitzer) distortion code within the CTYPE values, but which does
 not provide an inverse polynomial correction, and for which the PolyTran
