@@ -16076,20 +16076,52 @@ static int GetNkey( AstFitsChan *this, int *status ){
 */
 
 /* Local Variables: */
+   AstKeyMap *km;          /* KeyMap holding unique keyword names */
+   FitsCard *card0;        /* Pointer to current card on entry */
    const char *class;      /* Pointer to class string */
    const char *method;     /* Pointer to method string */
-   FitsCard *card0;        /* Pointer to current card on entry */
-   int ncard;              /* Number of cards so far */
+   int nkey;               /* Returned Nkey value */
 
 /* Ensure the source function has been called */
    ReadFromSource( this, status );
 
 /* Return zero if an error has already occurred, or no FitsChan was supplied,
    or the FitsChan is empty. */
-   if ( !astOK || !this || !this->keywords ) return 0;
+   if ( !astOK || !this || !this->head ) return 0;
 
-/* Return the size of the keywords KeyMap. */
-   return astMapSize( this->keywords );
+/* Store the method and object class. */
+   method = "astGetNkey";
+   class = astGetClass( this );
+
+/* Create an empty KeyMap to hold the unused keyword names */
+   km = astKeyMap( " ", status );
+
+/* Save a pointer to the current card, and then reset the current card to
+   be the first card. */
+   card0 = this->card;
+   astClearCard( this );
+
+/* Loop through the cards in the FitsChan until the end of file is reached. */
+   while( astOK && this->card ){
+
+/* Get the keyword name for the current card and add it to the keymap. */
+      astMapPut0I( km, CardName( this, status ), 0, NULL );
+
+/* Move on to the next unused card. */
+      MoveCard( this, 1, method, class, status );
+   }
+
+/* Reset the current card to be the original current card. */
+   this->card = card0;
+
+/* Get the number of keywords. */
+   nkey = astMapSize( km );
+
+/* Annull the KeyMap . */
+   km = astAnnul( km );
+
+/* Return the result. */
+   return astOK ? nkey : 0;
 }
 
 static void GetNextData( AstChannel *this_channel, int skip, char **name,
