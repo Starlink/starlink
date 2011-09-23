@@ -217,8 +217,10 @@ int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
       return retval;
     }
 
-    if( indata->ndims == 2 ) {
-      /* A 2D map */
+    if( (indata->ndims == 2) ||
+        ((indata->ndims == 3) && (indata->dims[2] == 1)) ) {
+      /* A 2D map. Note that maps produced by SMURF have a 3rd
+       frequency axis of length 1 */
       ndims0 = 2;
       rdims0[0] = indata->dims[0];
       rdims0[1] = indata->dims[1];
