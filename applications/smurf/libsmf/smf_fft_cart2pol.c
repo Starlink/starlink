@@ -42,17 +42,19 @@
 *     Currently the only check for a valid input storage form is on the
 *     range of the argument (-pi,pi) in the case of polar-->cartesian
 *     conversion. Otherwise it is up to the caller to know what form
-*     their data is stored in.
+*     their data are stored in.
 
 *  History:
 *     2008-09-18 (EC):
 *        Initial version.
 *     2009-10-13 (TIMJ):
 *        Handle case where one of baseI or baseR are bad but not both.
+*     2011-09-23 (EC):
+*        Handle 2D FFTs
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
-*     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008,2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -105,7 +107,7 @@
 
 void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
 
-  double amp;                   /* Amplitude coeff */
+  double amp=0;                 /* Amplitude coeff */
   double *baseR=NULL;           /* base pointer to real/amplitude coeff */
   double *baseI=NULL;           /* base pointer to imag/argument coeff */
   double df=1;                  /* frequency steps in Hz */
@@ -114,8 +116,9 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
   double imag;                  /* Imaginary coeff */
   size_t j;                     /* Loop counter */
   dim_t nbolo=0;                /* Number of detectors  */
+  size_t ndims;                 /* Number of real-space dimensions */
+  size_t ntransforms;           /* Number of transforms in the data */
   dim_t nf=0;                   /* Number of frequencies in FFT */
-  dim_t ntslice;                /* Number of time slices in data */
   dim_t rdims[2];               /* Lengths of real-space axes */
   double real;                  /* Real coeff */
   double theta;                 /* Argument */
@@ -128,37 +131,49 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
             " (possible programming error)", status);
   }
 
-  if( !smf_isfft(data, rdims, &nbolo, fdims, NULL, status) ) {
+  if( !smf_isfft(data, rdims, &nbolo, fdims, &ndims, status) ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": smfData provided is not FFT data"
             " (possible programming error)", status);
   }
-  ntslice = rdims[0];
-  nf = fdims[0];
 
   if( *status != SAI__OK ) return;
 
+  nf = 1;
+  for( i=0; i<ndims; i++ ) nf *= fdims[i];
+
   /* Need to know df to get normalization right when dealing with PSDs */
   if( power ) {
-    if( data->hdr && data->hdr->steptime ) {
-      df = 1. / (data->hdr->steptime * (double) ntslice );
+    /* Time-series cube */
+    if( ndims == 1 ) {
+      if( data->hdr && data->hdr->steptime ) {
+        df = 1. / (data->hdr->steptime * (double) rdims[0] );
+      } else {
+        msgOut( "", FUNC_NAME ": *** Warning *** no valid steptime "
+                "encountered, so setting frequency bin width df=1 "
+                "(PSD units will be meaningless)", status );
+      }
     } else {
-      msgOut( "", FUNC_NAME ": *** Warning *** no valid steptime "
-              "encountered, so setting frequency bin width df=1 "
-              "(PSD units will be meaningless)", status );
+        msgOut( "", FUNC_NAME
+                ": WARNING! Don't currently normalize map PSDs correctly",
+                status );
     }
   }
 
 
-  /* Loop over bolometer */
+  /* Loop over bolometer if time-series, or only a single pass if we
+     are looking at the FFT of a map. */
 
-  for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
+  ntransforms = (ndims == 1) ? nbolo : 1;
+
+  for( i=0; (*status==SAI__OK)&&(i<ntransforms); i++ ) {
     /* Pointers to components of this bolo */
     baseR = data->pntr[0];
     baseR += i*nf;
-    baseI = baseR + nf*nbolo;
+    baseI = baseR + nf*ntransforms;
 
     if( inverse ) {
+
       for( j=0; (*status==SAI__OK)&&(j<nf); j++ ) {
         if( (baseR[j]!=VAL__BADD) && (baseI[j]!=VAL__BADD) ) {
           if( fabs(baseI[j]) > AST__DPI ) {
@@ -175,8 +190,8 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
                 /* Check for sqrt of negative number */
                 *status = SAI__ERROR;
                 errRep( "", FUNC_NAME
-                        ": amplitude^2 < 0. FFT data may not be in correct form",
-                        status);
+                        ": amplitude^2 < 0. FFT data may not be in correct "
+                        "form", status);
               } else {
                 amp = sqrt(baseR[j]*df);
               }
@@ -184,8 +199,8 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
               amp = baseR[j];
             }
 
-            real = baseR[j]*cos(baseI[j]);
-            imag = baseR[j]*sin(baseI[j]);
+            real = amp*cos(baseI[j]);
+            imag = amp*sin(baseI[j]);
             baseR[j] = real;
             baseI[j] = imag;
           }
@@ -222,35 +237,40 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
 
   /* Convert the units and labels of the axes using AST */
   if( data->hdr && power && (data->hdr->units[0] != '\0') ) {
-    AstFrame *unitframe = NULL;
-    char newunits[SMF__CHARLABEL];
-    char label[SMF__CHARLABEL];
+    if( ndims == 1 ) {
+      AstFrame *unitframe = NULL;
+      char newunits[SMF__CHARLABEL];
+      char label[SMF__CHARLABEL];
 
-    /* Use a frame to store the modified units which AST will then simplify */
-    unitframe = astFrame( 1, " " );
+      /* Use a frame to store the modified units which AST will then simplify */
+      unitframe = astFrame( 1, " " );
 
-    /* Get the original units */
-    one_strlcpy( newunits, "(", sizeof(newunits), status );
-    one_strlcat( newunits, data->hdr->units, sizeof(newunits), status );
+      /* Get the original units */
+      one_strlcpy( newunits, "(", sizeof(newunits), status );
+      one_strlcat( newunits, data->hdr->units, sizeof(newunits), status );
 
-    if( inverse ) {
-      /* Undo PSD units */
-      one_strlcat( newunits, "*Hz)**0.5", sizeof(newunits), status );
-      one_strlcpy( label, "Signal", sizeof(label), status );
+      if( inverse ) {
+        /* Undo PSD units */
+        one_strlcat( newunits, "*Hz)**0.5", sizeof(newunits), status );
+        one_strlcpy( label, "Signal", sizeof(label), status );
 
+      } else {
+        /* Change to PSD units */
+        one_strlcat( newunits, ")**2/Hz", sizeof(newunits), status );
+        one_strlcpy( label, "PSD", sizeof(label), status );
+      }
+
+      /* Simplify the units and store */
+      astSetC( unitframe, "Unit(1)", newunits );
+      smf_set_clabels( NULL, label, astGetC( unitframe, "NormUnit(1)" ),
+                       data->hdr, status );
+
+      /* Clean up */
+      unitframe = astAnnul( unitframe );
     } else {
-      /* Change to PSD units */
-      one_strlcat( newunits, ")**2/Hz", sizeof(newunits), status );
-      one_strlcpy( label, "PSD", sizeof(label), status );
+      msgOut( "", FUNC_NAME
+              ": WARNING! Don't currently modify units for map PSDs correctly",
+              status );
     }
-
-    /* Simplify the units and store */
-    astSetC( unitframe, "Unit(1)", newunits );
-    smf_set_clabels( NULL, label, astGetC( unitframe, "NormUnit(1)" ),
-                     data->hdr, status );
-
-    /* Clean up */
-    unitframe = astAnnul( unitframe );
   }
-
 }

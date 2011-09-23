@@ -3820,6 +3820,71 @@ package @PACKAGE@ {
 
         }
 
+        action sc2mapfft {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input NDF data structure}
+                helpkey *
+            }
+
+            parameter inverse {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Perform inverse transformation if set}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF data structure}
+                helpkey *
+            }
+
+            parameter polar {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Use polar instead of cartesian representation of FFT?}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter power {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Calculate power spectrum (in polar coordinates)?}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter zerobad {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Set bad values to 0 before calculating FFT?}
+                ppath GLOBAL CURRENT
+                default TRUE
+                helpkey *
+            }
+
+        }
+
+
         action sc2pca {
 
             helplib {$SMURF_HELP}

@@ -154,6 +154,8 @@
 *         Update FTS2PHASECORR
 *     2011-08-04 (COBA):
 *         Replaced FTS2PHASECORR with FTS2PHASECORRDS and FTS2PHASECORRSS
+*     2011-09-22 (EC):
+*         Add sc2mapfft
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -348,6 +350,8 @@ void smurf_mon( int * status ) {
     smurf_sc2expandmodel( status );
   } else if (strcmp( taskname, "SC2FFT" ) == 0 ) {
     smurf_sc2fft( status );
+  } else if (strcmp( taskname, "SC2MAPFFT" ) == 0 ) {
+    smurf_sc2mapfft( status );
   } else if (strcmp( taskname, "SC2PCA" ) == 0 ) {
     smurf_sc2pca( status );
   } else if (strcmp( taskname, "SC2SIM" ) == 0 ) {

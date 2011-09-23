@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
-*                          size_t len, int *status );
+*     pntr = smf_fft_data( ThrWorkForce *wf, const smfData *indata,
+*                          int inverse, size_t len, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -39,15 +39,18 @@
 *     transformed data.
 
 *  Description:
-*     Perform the forward or inverse FFT of a smfData. In the time
-*     domain the data are 3-d (either x,y,time or time,x,y depending
-*     on isTordered flag). The frequency domain representation of the
-*     data is 4-d (always frequency,x,y,component --
-*     i.e. bolo-ordered). Component is an axis of length 2 containing
-*     the real and imaginary parts.  Inverse transforms always leave
-*     the data in bolo-ordered format. If the data are already
-*     transformed, this routine returns a NULL pointer.  If a non-null
-*     pointer wf is supplied, tell FFW to use multiple threads.
+*     Perform the forward or inverse FFT of a smfData. In the real
+*     domain the data are 3-d time-series cube (either x,y,time or
+*     time,x,y depending on isTordered flag), or a 2-d map. The
+*     frequency domain representation of the time-series data is 4-d
+*     (always frequency,x,y,component -- i.e. bolo-ordered). Component
+*     is an axis of length 2 containing the real and imaginary parts.
+*     The frequency domain representation of a map is 3-d
+*     (x-frequency, y-frequency, component).  Inverse transforms
+*     always leave time-series data in bolo-ordered format. If the
+*     data are already transformed, this routine returns a NULL
+*     pointer.  If a non-null pointer wf is supplied, tell FFW to use
+*     multiple threads.
 
 *  Notes:
 
@@ -96,7 +99,8 @@
 *     2010-10-19 (COBA):
 *        Removed SMF__NOCREATE_FTS in order to propagate the smfFts data.
 *     2011-04-14 (DSB):
-*        Ensure gaps are filled even if apodisation and zero padding are being used.
+*        Ensure gaps are filled even if apodisation and zero padding are being
+*        used.
 *     2011-20-14 (DSB):
 *        If the input smfData is time ordered, we need to re-order the
 *        quality array when copying it into the FFTed smfData (which is
@@ -107,6 +111,8 @@
 *        If input data are SMF__INTEGER they will be converted to SMF__DOUBLE
 *     2011-09-20 (EC):
 *        Record whether we have FFT data or not in the FITS header
+*     2011-09-23 (EC):
+*        Support 2D FFTs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -173,8 +179,9 @@ typedef struct smfFFTData {
   int ijob;                     /* Job identifier */
   int inverse;                  /* Set if this is inverse transformation */
   dim_t nbolo;                  /* Number of detectors  */
-  dim_t nf;                     /* Number of frequencies in FFT */
-  dim_t ntslice;                /* Number of time slices */
+  dim_t fdims[2];               /* Lengths of frequency axes */
+  size_t ndims;                 /* Number of real space dimensions */
+  dim_t rdims[2];               /* Lengths of real-space axes */
   fftw_plan plan;               /* FFTW plan */
   smfData *retdata;             /* Pointer to returned FFT'd data */
 } smfFFTData;
@@ -184,11 +191,13 @@ typedef struct smfFFTData {
 void smfFFTDataParallel( void *job_data_ptr, int *status );
 
 void smfFFTDataParallel( void *job_data_ptr, int *status ) {
-  smfFFTData *pdata = NULL;     /* Pointer to job data */
-  double *baseR=NULL;           /* base pointer to real part of transform */
-  double *baseI=NULL;           /* base pointer to imag part of transform */
-  double *baseB=NULL;           /* base pointer to bolo in time domain */
+  double *baseR=NULL;           /* base pointer to real part of fourier data */
+  double *baseI=NULL;           /* base pointer to imag part of fourier data */
+  double *baseD=NULL;           /* base pointer to real-space data */
   dim_t i;                      /* Loop counter */
+  dim_t nf=0;
+  dim_t ntslice=0;
+  smfFFTData *pdata = NULL;     /* Pointer to job data */
 
    if( *status != SAI__OK ) return;
 
@@ -208,18 +217,28 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
     return;
   }
 
+  nf = 1;
+  for( i=0; i<pdata->ndims; i++ ) nf *= pdata->fdims[i];
+
   /* Debugging message indicating thread started work */
-  msgOutiff( MSG__DEBUG, "",
-             "smfFFTDataParallel: thread starting on bolos %zu -- %zu",
-             status, pdata->b1, pdata->b2 );
+  if( pdata->ndims == 1 ) {
+    msgOutiff( MSG__DEBUG, "",
+               "smfFFTDataParallel: thread starting on bolos %zu -- %zu",
+               status, pdata->b1, pdata->b2 );
 
 
-  /* if b1 past end of the work, nothing to do so we return */
-  if( pdata->b1 >= pdata->nbolo ) {
-    msgOutif( MSG__DEBUG, "",
-              "smfFFTDataParallel: nothing for thread to do, returning",
-              status);
-    return;
+    /* if b1 past end of the work, nothing to do so we return */
+    if( pdata->b1 >= pdata->nbolo ) {
+      msgOutif( MSG__DEBUG, "",
+                "smfFFTDataParallel: nothing for thread to do, returning",
+                status);
+      return;
+    }
+
+    ntslice = pdata->rdims[0];
+  } else {
+    msgOutif( MSG__DEBUG, "", "smfFFTDataParallel: starting FFT of map",
+              status );
   }
 
    if( pdata->inverse ) {        /* Perform inverse fft */
@@ -227,34 +246,49 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
      for( i=pdata->b1; i<=pdata->b2; i++ ) {
        /* Transform bolometers one at a time */
        baseR = pdata->data->pntr[0];
-       baseR += i*pdata->nf;
+       baseD = pdata->retdata->pntr[0];
 
-       baseI = baseR + pdata->nf*pdata->nbolo;
+       if( pdata->ndims == 1 ) {
+         /* Multiple time-series for different bolometers */
+         baseR += i*nf;
+         baseI = baseR + nf*pdata->nbolo;
+         baseD += i*ntslice;
+       } else {
+         /* Single map */
+         baseI = baseR + nf;
+       }
 
-       baseB = pdata->retdata->pntr[0];
-       baseB += i*pdata->ntslice;
-
-       fftw_execute_split_dft_c2r( pdata->plan, baseR, baseI, baseB );
+       fftw_execute_split_dft_c2r( pdata->plan, baseR, baseI, baseD );
      }
    } else {                      /* Perform forward fft */
      for( i=pdata->b1; i<=pdata->b2; i++ ) {
        /* Transform bolometers one at a time */
-       baseB = pdata->data->pntr[0];
-       baseB += i*pdata->ntslice;
-
+       baseD = pdata->data->pntr[0];
        baseR = pdata->retdata->pntr[0];
-       baseR += i*pdata->nf;
 
-       baseI = baseR + pdata->nf*pdata->nbolo;
-       fftw_execute_split_dft_r2c( pdata->plan, baseB, baseR, baseI );
+       if( pdata->ndims == 1 ) {
+         /* Multiple time-series for different bolometers */
+         baseD += i*ntslice;
+         baseR += i*nf;
+         baseI = baseR + nf*pdata->nbolo;
+       } else {
+         /* Single map */
+         baseI = baseR + nf;
+       }
+
+       fftw_execute_split_dft_r2c( pdata->plan, baseD, baseR, baseI );
      }
    }
 
    /* Debugging message indicating thread finished work */
-   msgOutiff( MSG__DEBUG, "",
-              "smfFFTDataParallel: thread finishing bolos %zu -- %zu",
-              status, pdata->b1, pdata->b2 );
-
+   if( pdata->ndims == 1 ) {
+     msgOutiff( MSG__DEBUG, "",
+                "smfFFTDataParallel: thread finishing bolos %zu -- %zu",
+                status, pdata->b1, pdata->b2 );
+   } else {
+     msgOutif( MSG__DEBUG, "", "smfFFTDataParallel: finished FFT of map",
+                status );
+   }
 }
 
 /* ------------------------------------------------------------------------ */
@@ -264,46 +298,35 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
 
 smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
                        size_t len, int *status ) {
-  double *baseR=NULL;           /* base pointer to real part of transform */
-  double *baseI=NULL;           /* base pointer to imag part of transform */
-  double *baseB=NULL;           /* base pointer to bolo in time domain */
-  AstUnitMap *cmapping=NULL;    /* Mapping from grid to curframe3d */
-  AstFrame *curframe1d=NULL;    /* Current 1d frame (real/imag coeff) */
-  AstFrame *curframe2d=NULL;    /* Current 2d frame (bolo x,y) */
-  AstCmpFrame *curframe3d=NULL; /* Current 3d frame (x,y,coeff) */
-  AstCmpFrame *curframe4d=NULL; /* Current Frame for 4-d FFT */
+  double *baseR=NULL;           /* base pointer to real part of fourier data */
+  double *baseI=NULL;           /* base pointer to imag part of fourier data */
+  double *baseD=NULL;           /* base pointer to real space data */
   smfData *data=NULL;           /* pointer to bolo-ordered data */
   double df=0;                  /* Frequency step size in Hz */
-  fftw_iodim dims;              /* I/O dimensions for transformations */
-  AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
+  fftw_iodim *dims=NULL;        /* FFTW I/O dimensions for transformations */
+  dim_t fdims[2];               /* Frequency dimensions */
   int i;                        /* Loop counter */
   size_t inbstr;                /* Bolometer stride in input data */
   size_t intstr;                /* Time slice stride in input data */
   int isFFT=0;                  /* Are the input data freq. domain? */
   size_t j;                     /* Loop counter */
   smfFFTData *job_data=NULL;    /* Array of job data for each thread */
-  AstCmpMap *mapping3d=NULL;    /* Mapping from 3d GRID to FREQ, X, Y */
   dim_t nbolo=0;                /* Number of detectors  */
-  dim_t ncols;                  /* Number of columns */
-  dim_t ndata=0;                /* Number of elements in new array */
-  dim_t nf=0;                   /* Number of frequencies in FFT */
+  dim_t ncols=0;                /* Number of columns */
+  size_t ndims;                 /* Number of real-space dimensions */
+  size_t nf=0;                  /* Number of frequencies in FFT */
   int njobs=0;                  /* Number of jobs to be processed */
   double norm=1.;               /* Normalization factor for the FFT */
-  dim_t nrows;                  /* Number of rows */
+  size_t nr=0;                  /* Number of elements in real space */
+  size_t nretdata=0;            /* Number of data points returned data array */
+  dim_t nrows=0;                /* Number of rows */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
   smfFFTData *pdata=NULL;       /* Pointer to current job data */
+  dim_t rdims[2];               /* real-space dimensions */
   smfData *retdata=NULL;        /* Pointer to new transformed smfData */
-  AstZoomMap *scalemapping=NULL;/* Scale grid coordinates by df */
-  AstSpecFrame *specframe=NULL; /* Current Frame of 1-D spectrum */
-  AstCmpMap *specmapping=NULL;  /* Mapping from GRID to FREQ */
   size_t step;                  /* step size for dividing up work */
-  double steptime;              /* Length of a sample in seconds */
-  AstFrameSet *tswcs=NULL;      /* WCS for 4d FFT data */
   double *val=NULL;             /* Element of data to be normalized */
-  double zshift;                /* Amount by which to shift freq. origin */
-  AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of freq. GRID */
-  AstMapping *zshiftmapping2=NULL; /* Map to shift origin of bolo GRID */
 
   if (*status != SAI__OK) return NULL;
 
@@ -317,28 +340,24 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
     return NULL;
   }
 
-  /* Data dimensions. Time dimensions are either 1-d or 3-d. Frequency
-     dimensions are either 2- or 4-d to store the real and imaginary
-     parts along the last index. */
+  /* Call smf_isfft to check to see if we have real-space or FFT
+     data, and obtain dimensions. */
 
-  if( indata->ndims == 3 ) {
+  isFFT = smf_isfft( indata, rdims, &nbolo, fdims, &ndims, status );
+
+  if( *status != SAI__OK ) return NULL;
+
+  nf = 1;
+  nr = 1;
+  for( j=0; j<ndims; j++ ) {
+    nf *= fdims[j];
+    nr *= rdims[j];
+  }
+
+  if( ndims == 1 ) {
+    /* Time-series data. Determine dimensions */
     smf_get_dims( indata, &nrows, &ncols, &nbolo, &ntslice, NULL, &inbstr,
                   &intstr, status );
-    nf = ntslice/2 + 1;
-    isFFT = 0;
-  } else if( (indata->ndims==4) && (indata->dims[3]==2) ) {
-    dim_t rdims[2];
-    dim_t fdims[2];
-
-    /* 3-d FFT of entire subarray... always bolo ordered */
-    isFFT = smf_isfft( indata, rdims, &nbolo, fdims, NULL, status );
-    nrows = indata->dims[1+SC2STORE__ROW_INDEX];
-    ncols = indata->dims[1+SC2STORE__COL_INDEX];
-    ntslice = rdims[0];
-    nf = fdims[0];
-  } else {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": smfData has strange dimensions", status );
   }
 
   /* If the data are already transformed to the requested domain return
@@ -366,8 +385,8 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
                                1, 0, status );
 
   /* Create some quality. We only apodize, pad or fill if we are doing a
-     forward FFT. */
-  if( !inverse ) {
+     forward FFT of time-series data. */
+  if( !inverse && (ndims == 1) ) {
     const smf_qual_t *inqual = smf_select_cqualpntr( indata, NULL, status );
 
     /* we know that "data" does not have a quality component because
@@ -376,15 +395,15 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
 
     if (inqual) {
       data->qual = smf_dataOrder_array( (void *)inqual, SMF__QUALTYPE,
-                                        SMF__QUALTYPE, nbolo*ntslice, ntslice,
-                                        nbolo, intstr, inbstr, 1, ntslice, 0, 0,
+                                        SMF__QUALTYPE, nbolo*nr, nr,
+                                        nbolo, intstr, inbstr, 1, nr, 0, 0,
                                         status );
     }
 
 
    /* If we are padding with artificial data, we must not apodise.
-      Re-create the padding based on the current contents of the smfData
-      (this also fill any gaps in the data). */
+      Re-create the padding based on the current contents of the
+      smfData (this also fill any gaps in the data). */
     if( len == SMF__BADSZT ) {
       smf_fillgaps( wf, data, SMF__Q_PAD | SMF__Q_GAP, status );
 
@@ -413,56 +432,117 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
     /* Allocate space for the transformed data */
 
     if( inverse ) {
-      /* Doing an inverse FFT to the time domain */
+      if( ndims == 1 ) {
+        /* Doing an inverse FFT to the time-domain */
         retdata->ndims = 3;
-        retdata->dims[0] = ntslice;
+        retdata->dims[0] = rdims[0];
         retdata->dims[SC2STORE__COL_INDEX+1] = ncols;
         retdata->dims[SC2STORE__ROW_INDEX+1] = nrows;
 
         retdata->lbnd[0] = 1;
         retdata->lbnd[1] = 0;
         retdata->lbnd[2] = 0;
-    } else {
-      /* Doing a forward FFT to the frequency domain */
-      retdata->ndims = 4;
-      retdata->dims[0] = nf;
-      retdata->dims[SC2STORE__COL_INDEX+1] = ncols;
-      retdata->dims[SC2STORE__ROW_INDEX+1] = nrows;
-      retdata->dims[3] = 2;
+      } else {
+        /* Doing an inverse FFT to a map */
+        retdata->ndims = 2;
+        retdata->dims[0] = rdims[0];
+        retdata->dims[1] = rdims[1];
 
-      retdata->lbnd[0] = 1;
-      retdata->lbnd[1] = 0;
-      retdata->lbnd[2] = 0;
-      retdata->lbnd[3] = 1;
+        /* Need to figure out how to store the lbnd values...
+           retdata->lbnd[0] =
+           retdata->lbnd[1] =
+        */
+      }
+    } else {
+      if( ndims == 1 ) {
+        /* Doing a forward FFT of time-series to the frequency domain */
+        retdata->ndims = 4;
+        retdata->dims[0] = nf;
+        retdata->dims[SC2STORE__COL_INDEX+1] = ncols;
+        retdata->dims[SC2STORE__ROW_INDEX+1] = nrows;
+        retdata->dims[3] = 2;
+
+        retdata->lbnd[0] = 1;
+        retdata->lbnd[1] = 0;
+        retdata->lbnd[2] = 0;
+        retdata->lbnd[3] = 1;
+      } else {
+        /* Doing a forward FFT of a map to the frequency domain */
+        retdata->ndims = 3;
+        retdata->dims[0] = fdims[0];
+        retdata->dims[1] = fdims[1];
+        retdata->dims[2] = 2;
+
+        retdata->lbnd[0] = 1;
+        retdata->lbnd[1] = 1;
+        retdata->lbnd[2] = 1;
+      }
     }
 
-    /* Returned data is always bolo-ordered */
+    /* Returned data is always bolo-ordered (ignored for maps) */
     retdata->isTordered=0;
 
-    ndata=1;
+    nretdata=1;
     for( j=0; j<retdata->ndims; j++ ) {
-      ndata *= retdata->dims[j];
+      nretdata *= retdata->dims[j];
     }
 
-    retdata->pntr[0] = astCalloc(ndata, smf_dtype_sz(retdata->dtype,status) );
+    retdata->pntr[0] = astCalloc(nretdata, smf_dtype_sz(retdata->dtype,status));
 
     /* Describe the array dimensions for FFTW guru interface
-       - dims describes the length and stepsize of time slices within bolometer
+       - dims describes the length and stepsize for both the input and
+         output axes
+       - we are using the Starlink array ordering (in case you get confused
+         by how the strides are setup compared to the "normal" FFTW way...
+         but we are using the guru interface so we can do whatever we want)
     */
 
-    dims.n = ntslice;
-    dims.is = 1;
-    dims.os = 1;
+    dims = astCalloc( ndims, sizeof(*dims) );
+    if( *status == SAI__OK ) {
+
+      /* Forward and inverse strides differ. According to the FFTW
+         docs, the lengths of the last complex (transformed) axis is
+         interpreted as dims.n/2+1 to account for the saved
+         space... but the strides themselves are interpreted literally
+         (shorter for the complex data), hence the slightly confusing
+         mixture of rdims and fdims depending on whether we are doing
+         a forward or inverse transform.
+      */
+
+      (dims[0]).n = rdims[0];
+      (dims[0]).is = 1;
+      (dims[0]).os = 1;
+
+      for( j=1; j<ndims; j++ ) {
+        (dims[j]).n = rdims[j];
+
+        if( inverse ) {
+          (dims[j]).is = fdims[j-1]*(dims[j-1]).is;
+          (dims[j]).os = rdims[j-1]*(dims[j-1]).os;
+        } else {
+          (dims[j]).is = rdims[j-1]*(dims[j-1]).is;
+          (dims[j]).os = fdims[j-1]*(dims[j-1]).os;
+        }
+      }
+
+    }
 
     /* Set up the job data */
 
-    if( nw > (int) nbolo ) {
-      step = 1;
-    } else {
-      step = nbolo/nw;
-      if( !step ) {
+    if( ndims == 1 ) {
+      /* For time-series parallellize over groups of bolometers */
+      if( nw > (int) nbolo ) {
         step = 1;
+      } else {
+        step = nbolo/nw;
+        if( !step ) {
+          step = 1;
+        }
       }
+    } else {
+      /* Otherwise transforms of maps are done in a single thread */
+      nw = 1;
+      step = 0;
     }
 
     job_data = astCalloc( nw, sizeof(*job_data) );
@@ -470,122 +550,165 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
     for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
       pdata = job_data + i;
 
-      pdata->b1 = i*step;
-      pdata->b2 = (i+1)*step-1;
+      if( ndims == 1 ) {
+        /* If time-series set up division of labour by bolo grous */
+        pdata->b1 = i*step;
+        pdata->b2 = (i+1)*step-1;
 
-      /* if b1 is greater than the number of bolometers, we've run out
-         of jobs... */
-      if( pdata->b1 >= nbolo ) {
-        break;
+        /* if b1 is greater than the number of bolometers, we've run out
+           of jobs... */
+        if( pdata->b1 >= nbolo ) {
+          break;
+        }
+
+        /* Ensure that the last thread picks up any left-over bolometers */
+        if( (i==(nw-1)) && (pdata->b1<(nbolo-1)) ) {
+          pdata->b2=nbolo-1;
+        }
+      } else {
+        /* Otherwise set bolo ranges to 0 so that we only go once through
+           the transformation loop in amfFFTDataParallel */
+        pdata->b1 = 0;
+        pdata->b2 = 0;
       }
 
       /* increase the jobs counter */
       njobs++;
 
-      /* Ensure that the last thread picks up any left-over bolometers */
-      if( (i==(nw-1)) && (pdata->b1<(nbolo-1)) ) {
-        pdata->b2=nbolo-1;
-      }
-
       pdata->data = data;
       pdata->ijob = -1;   /* Flag job as ready to start */
       pdata->inverse = inverse;
       pdata->nbolo = nbolo;
-      pdata->nf = nf;
-      pdata->ntslice = ntslice;
+      pdata->ndims = ndims;
+      memcpy( pdata->rdims, rdims, sizeof(pdata->rdims) );
+      memcpy( pdata->fdims, fdims, sizeof(pdata->fdims) );
       pdata->retdata = retdata;
 
       if( inverse ) {        /* Performing inverse fft */
         /* Setup inverse FFT plan using guru interface */
         baseR = data->pntr[0];
-        baseI = baseR + nf*nbolo;
-        baseB = retdata->pntr[0];
+        if( ndims == 1 ) baseI = baseR + nf*nbolo;
+        else baseI = baseR + nf;
+        baseD = retdata->pntr[0];
 
         thrMutexLock( &smf_fft_data_mutex, status );
-        pdata->plan = fftw_plan_guru_split_dft_c2r( 1, &dims, 0, NULL,
+
+        pdata->plan = fftw_plan_guru_split_dft_c2r( ndims, dims, 0, NULL,
                                                     baseR, baseI,
-                                                    baseB,
+                                                    baseD,
                                                     FFTW_ESTIMATE |
-                                                    FFTW_UNALIGNED);
+                                                    FFTW_UNALIGNED );
         thrMutexUnlock( &smf_fft_data_mutex, status );
       } else {               /* Performing forward fft */
         /* Setup forward FFT plan using guru interface */
-        baseB = data->pntr[0];
+        baseD = data->pntr[0];
         baseR = retdata->pntr[0];
-        baseI = baseR + nf*nbolo;
+        if( ndims == 1 ) baseI = baseR + nf*nbolo;
+        else baseI = baseR + nf;
 
         thrMutexLock( &smf_fft_data_mutex, status );
-        pdata->plan = fftw_plan_guru_split_dft_r2c( 1, &dims, 0, NULL,
-                                                    baseB,
+        pdata->plan = fftw_plan_guru_split_dft_r2c( ndims, dims, 0, NULL,
+                                                    baseD,
                                                     baseR, baseI,
                                                     FFTW_ESTIMATE |
-                                                    FFTW_UNALIGNED);
+                                                    FFTW_UNALIGNED );
         thrMutexUnlock( &smf_fft_data_mutex, status );
 
-        /* If doing a forward transformation, and we are handling a 3d
-         data cube, create WCS information here. */
 
-        if( indata->hdr && retdata->hdr && (retdata->ndims==4) ) {
-          steptime = retdata->hdr->steptime;
-          if( steptime < VAL__SMLD ) {
-            *status = SAI__ERROR;
-            errRep( "", FUNC_NAME
-                    ": FITS header error: STEPTIME must be > 0",
-                    status);
-          }
+        /* Set up WCS for Fourier Space data */
 
-          if( *status == SAI__OK ) {
-            /* Frequency steps in the FFT */
-            df = 1. / (steptime * (double) ntslice );
+        if( indata->hdr && retdata->hdr ) {
+          if( ndims == 1 ) {
+            /* Transform of a time-series cube */
 
-            /* Start an AST context */
-            astBegin;
-
-            /* Create a new astFrameSet containing a 4d base GRID frame */
-            tswcs = astFrameSet( astFrame( 4, "Domain=GRID" ), " " );
-
-            /* Get a Frame describing bolometer rows and columns, and a
-               Mapping from 2D GRID coords to this BOLO Frame. */
-            sc2ast_make_bolo_frame( &curframe2d, &zshiftmapping2, status );
-
-            /* The current frame will have frequency along the first axis,
-               x, y bolo coordinates along the second and third axes,
-               and the component along a fourth axis of length two (real,
-               imaginary coefficients). */
-
-            specframe = astSpecFrame( "System=freq,Unit=Hz,"
-                                      "StdOfRest=Topocentric" );
-
-            curframe3d = astCmpFrame( specframe, curframe2d, " " );
-            curframe1d = astFrame( 1, "Domain=COEFF,label=Real/Imag component");
-            curframe4d = astCmpFrame( curframe3d, curframe1d, " " );
-
-            /* The mapping from 4d grid coordinates to (frequency, x,
-               y, coeff) is accomplished with a shift and a zoommap
-               for the 1st dimension, and a shift for the others */
-
-            zshift = -1;
-            zshiftmapping = astShiftMap( 1, &zshift, " " );
-            scalemapping = astZoomMap( 1, df, " " );
-            specmapping = astCmpMap( zshiftmapping, scalemapping, 1, " " );
-
-            mapping3d = astCmpMap( specmapping, zshiftmapping2, 0, " " );
-
-            cmapping = astUnitMap( 1, " " );
-            fftmapping = astCmpMap( mapping3d, cmapping, 0, " " );
-
-            /* Add the curframe4d with the fftmapping to the frameset */
-            astAddFrame( tswcs, AST__BASE, fftmapping, curframe4d );
-
-            /* Export the frameset before ending the AST context */
-            astExport( tswcs );
-            astEnd;
-
-            /* Free the old TSWCS if it exists, and insert the new TSWCS */
-            if( retdata->hdr->tswcs ) {
-              retdata->hdr->tswcs = astAnnul(retdata->hdr->tswcs);
+            double steptime = retdata->hdr->steptime;
+            if( steptime < VAL__SMLD ) {
+              *status = SAI__ERROR;
+              errRep( "", FUNC_NAME
+                      ": FITS header error: STEPTIME must be > 0",
+                      status);
             }
-            retdata->hdr->tswcs = tswcs;
+
+            if( *status == SAI__OK ) {
+              AstUnitMap *cmapping=NULL;    /* Mapping grid to curframe3d */
+              AstFrame *curframe1d=NULL;    /* 1d frame (real/imag coeff) */
+              AstFrame *curframe2d=NULL;    /* 2d frame (bolo x,y) */
+              AstCmpFrame *curframe3d=NULL; /* 3d frame (x,y,coeff) */
+              AstCmpFrame *curframe4d=NULL; /* full 4-d FFT frame*/
+              AstCmpMap *fftmapping=NULL;   /* Mapping GRID to curframe2d */
+              AstCmpMap *mapping3d=NULL;    /* Mapping 3d GRID to FREQ, X, Y */
+              AstZoomMap *scalemapping=NULL;/* Scale grid coordinates by df */
+              AstSpecFrame *specframe=NULL; /* Current Frame of 1-D spectrum */
+              AstCmpMap *specmapping=NULL;  /* Mapping from GRID to FREQ */
+              AstFrameSet *tswcs=NULL;      /* WCS for 4d FFT data */
+              double zshift;                /* Amount to shift freq. origin */
+              AstShiftMap *zshiftmapping=NULL; /* shift origin of freq GRID */
+              AstMapping *zshiftmapping2=NULL; /* shift origin of bolo GRID */
+
+              /* Frequency steps in the FFT */
+              df = 1. / (steptime * (double) nr );
+
+              /* Start an AST context */
+              astBegin;
+
+              /* Create a new astFrameSet containing a 4d base GRID frame */
+              tswcs = astFrameSet( astFrame( 4, "Domain=GRID" ), " " );
+
+              /* Get a Frame describing bolometer rows and columns, and a
+                 Mapping from 2D GRID coords to this BOLO Frame. */
+              sc2ast_make_bolo_frame( &curframe2d, &zshiftmapping2, status );
+
+              /* The current frame will have frequency along the first axis,
+                 x, y bolo coordinates along the second and third axes,
+                 and the component along a fourth axis of length two (real,
+                 imaginary coefficients). */
+
+              specframe = astSpecFrame( "System=freq,Unit=Hz,"
+                                        "StdOfRest=Topocentric" );
+
+              curframe3d = astCmpFrame( specframe, curframe2d, " " );
+              curframe1d = astFrame( 1,
+                                     "Domain=COEFF,label=Real/Imag component");
+              curframe4d = astCmpFrame( curframe3d, curframe1d, " " );
+
+              /* The mapping from 4d grid coordinates to (frequency, x,
+                 y, coeff) is accomplished with a shift and a zoommap
+                 for the 1st dimension, and a shift for the others */
+
+              zshift = -1;
+              zshiftmapping = astShiftMap( 1, &zshift, " " );
+              scalemapping = astZoomMap( 1, df, " " );
+              specmapping = astCmpMap( zshiftmapping, scalemapping, 1, " " );
+
+              mapping3d = astCmpMap( specmapping, zshiftmapping2, 0, " " );
+
+              cmapping = astUnitMap( 1, " " );
+              fftmapping = astCmpMap( mapping3d, cmapping, 0, " " );
+
+              /* Add the curframe4d with the fftmapping to the frameset */
+              astAddFrame( tswcs, AST__BASE, fftmapping, curframe4d );
+
+              /* Export the frameset before ending the AST context */
+              astExport( tswcs );
+              astEnd;
+
+              /* Free the old TSWCS if it exists, and insert the new TSWCS */
+              if( retdata->hdr->tswcs ) {
+                retdata->hdr->tswcs = astAnnul(retdata->hdr->tswcs);
+              }
+              retdata->hdr->tswcs = tswcs;
+            }
+          } else if( ndims == 2 ) {
+            /* FFT of a map
+
+               Note to self: we can encode the lbnd values for the real-space
+               map as a mean phase-shift for all of the Fourier components,
+               and then recover them when we transform back.
+            */
+
+            msgOut( "", FUNC_NAME
+                    ": WARNING! WCS generation for FFT of map not currently "
+                    "implemented", status );
           }
         }
       }
@@ -613,22 +736,23 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
 
   /* Each sample needs to have a normalization applied if forward FFT */
   if( (*status==SAI__OK) && !inverse ) {
-    norm = 1. / (double) ntslice;
-
+    norm = 1. / (double) nr;
     val = retdata->pntr[0];
 
-    for( j=0; j<nf*nbolo*2; j++ ) {
+    for( j=0; j<nretdata; j++ ) {
       *val *= norm;
       val++;
     }
   }
 
-  /* If we get here with good status, set isFFT appropriately */
+  /* If we get here with good status, set isFFT to the length of the
+     last real space dimensions if doing a forward transform (and -1 if
+     inverse transform) */
   if( (*status==SAI__OK) && retdata ) {
     if( inverse ) {
       retdata->isFFT=-1;
     } else {
-      retdata->isFFT = ntslice;
+      retdata->isFFT = rdims[ndims-1];
     }
 
     /* Set the FITS keyword */

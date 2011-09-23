@@ -89,6 +89,8 @@
 *         Remove smurf_fts2_eqsliced
 *         Remove smurf_fts2_specre
 *         Add smurf_fts2_spectrum
+*     2011-09-22 (EC):
+*         Add sc2mapfft
 
 *     {enter_further_changes_here}
 
@@ -161,6 +163,7 @@ void smurf_sc2clean( int * );
 void smurf_sc2concat( int * );
 void smurf_sc2expandmodel( int * );
 void smurf_sc2fft( int * );
+void smurf_sc2mapfft( int * );
 void smurf_sc2pca( int * );
 void smurf_sc2sim( int * );
 void smurf_sc2threadtest( int * );
