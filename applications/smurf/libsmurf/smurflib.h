@@ -154,6 +154,7 @@ void smurf_qlmakemap( int * );
 void smurf_rawfixmeta( int * );
 void smurf_rawpress( int * );
 void smurf_rawrecreatewcs( int * );
+void smurf_rawrewrtsc2wcs( int * );
 void smurf_rawunpress( int * );
 void smurf_remsky( int * );
 void smurf_sc2clean( int * );

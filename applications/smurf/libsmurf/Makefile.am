@@ -37,6 +37,7 @@ smurf_makemap.c \
 smurf_qlmakemap.c \
 smurf_rawpress.c \
 smurf_rawrecreatewcs.c \
+smurf_rawrewrtsc2wcs.c \
 smurf_rawunpress.c \
 smurf_rawfixmeta.c \
 smurf_remsky.c \

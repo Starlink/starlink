@@ -3147,6 +3147,22 @@ package @PACKAGE@ {
 
         }
 
+        action rawrewrtsc2wcs {
+
+            helplib {$SMURF_HELP}
+
+            parameter ndf {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input SCUBA-2 timeseries to be fixed}
+                helpkey *
+            }
+
+        }
+
         action rawunpress {
 
             helplib {$SMURF_HELP}

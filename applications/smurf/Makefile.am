@@ -54,6 +54,7 @@ qlmakemap \
 rawfixmeta \
 rawpress \
 rawrecreatewcs \
+rawrewrtsc2wcs \
 rawunpress \
 remsky \
 sc2clean \

@@ -334,6 +334,8 @@ void smurf_mon( int * status ) {
     smurf_rawpress( status );
   } else if (strcmp( taskname, "RAWRECREATEWCS" ) == 0 ) {
     smurf_rawrecreatewcs( status );
+  } else if (strcmp( taskname, "RAWREWRTSC2WCS" ) == 0 ) {
+    smurf_rawrewrtsc2wcs( status );
   } else if (strcmp( taskname, "RAWUNPRESS" ) == 0 ) {
     smurf_rawunpress( status );
   } else if (strcmp( taskname, "REMSKY" ) == 0 ) {

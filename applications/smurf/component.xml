@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="smurf">
-  <version>1.3.7</version>
+  <version>1.3.8</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>
   <abstract><p>
