@@ -105,7 +105,7 @@ void smurf_rawrewrtsc2wcs( int * status ) {
     if (*status != SAI__OK) break;
     if (data->hdr->instrument != INST__SCUBA2) {
       isok = 0;
-      msgOut( "", "This command only works on ACSIS data files", status );
+      msgOut( "", "This command only works on SCUBA-2 data files", status );
     }
 
     /* Get a fixed WCS frameset */
