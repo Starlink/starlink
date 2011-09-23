@@ -182,6 +182,15 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
     return waschanged;
   }
 
+  /* We shouldn't be trying to change the order of FFT'd data */
+  if( smf_isfft( data, NULL, NULL, NULL, NULL, status ) ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME
+            ": Possible programming error, attempting to re-order FFT of a "
+            "2D map!", status );
+    return waschanged;
+  }
+
   /* we are going to change */
   waschanged = 1;
 

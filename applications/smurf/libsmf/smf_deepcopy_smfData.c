@@ -36,7 +36,7 @@
 *        If set, assert the data order to that specified by isTordered in
 *        the copy (if needed). More efficient use of memory than copying
 *        data and then calling smf_dataOrder. Ignored if we are not
-*        dealing with 3d data.
+*        dealing with 3d data (will also ignore FFT of a 2d map).
 *     isTordered = int (Given)
 *        Assert this data order if assertOrder set.
 *     status = int* (Given and Returned)
@@ -210,37 +210,36 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     npts *= dims[i];
   }
 
-  /* If we have 3d data and we request data re-ordering, work out
+  /* If we have 3d (non-FFT!) data and we request data re-ordering, work out
      whether we need to do re-ordering at all, and the dimensions and
      strides here */
-  if( assertOrder ) {
-    if( old->ndims == 3 ) {
-      if( old->isTordered != isTordered ) {
-        reOrder = 1;
-        newOrder = isTordered;
-        smf_get_dims( old, NULL, NULL, &nbolo, &ntslice, NULL, &bstr1, &tstr1,
-                      status );
+  if( assertOrder && (old->ndims==3) &&
+      !smf_isfft( old, NULL, NULL, NULL, NULL, status ) ) {
+    if( old->isTordered != isTordered ) {
+      reOrder = 1;
+      newOrder = isTordered;
+      smf_get_dims( old, NULL, NULL, &nbolo, &ntslice, NULL, &bstr1, &tstr1,
+                    status );
 
-        /* What will the dimensions/strides be in the newly-ordered array? */
-        if( isTordered ) {
-          dims[0] = (old->dims)[1];
-          dims[1] = (old->dims)[2];
-          dims[2] = (old->dims)[0];
-          lbnd[0] = (old->lbnd)[1];
-          lbnd[1] = (old->lbnd)[2];
-          lbnd[2] = (old->lbnd)[0];
-          bstr2 = 1;
-          tstr2 = nbolo;
-        } else {
-          dims[0] = (old->dims)[2];
-          dims[1] = (old->dims)[0];
-          dims[2] = (old->dims)[1];
-          lbnd[0] = (old->lbnd)[2];
-          lbnd[1] = (old->lbnd)[0];
-          lbnd[2] = (old->lbnd)[1];
-          bstr2 = ntslice;
-          tstr2 = 1;
-        }
+      /* What will the dimensions/strides be in the newly-ordered array? */
+      if( isTordered ) {
+        dims[0] = (old->dims)[1];
+        dims[1] = (old->dims)[2];
+        dims[2] = (old->dims)[0];
+        lbnd[0] = (old->lbnd)[1];
+        lbnd[1] = (old->lbnd)[2];
+        lbnd[2] = (old->lbnd)[0];
+        bstr2 = 1;
+        tstr2 = nbolo;
+      } else {
+        dims[0] = (old->dims)[2];
+        dims[1] = (old->dims)[0];
+        dims[2] = (old->dims)[1];
+        lbnd[0] = (old->lbnd)[2];
+        lbnd[1] = (old->lbnd)[0];
+        lbnd[2] = (old->lbnd)[1];
+        bstr2 = ntslice;
+        tstr2 = 1;
       }
     }
   }
