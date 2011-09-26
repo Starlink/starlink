@@ -428,7 +428,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    returned HDS object. The standard deviation of the new residuals is
    returned. */
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
-                                       x, rms, mlim, imax, slbnd,
+                                       x, rms, mlim, imax, peak_thresh, slbnd,
                                        &ret, iclump, excols, mean_peak,
                                        maxbad, &area, &sumclumps, status );
 

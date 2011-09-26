@@ -16,9 +16,9 @@
    cupidGaussClumps, and its contents are initialised by this function. */
 extern CupidGC cupidGC;
 
-void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, int ndim,
-                                         int *dims, double *par, double rms,
-                                         double mlim, int imax,
+void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel,
+                                         int ndim, int *dims, double *par, double rms,
+                                         double mlim, int imax, double thresh,
                                          int *lbnd, HDSLoc **ndfs, int iclump,
                                          int excols, double mean_peak,
                                          double maxbad, int *area, double *sumclumps,
@@ -38,7 +38,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel,
 *                                  int ndim, int *dims, double *par,
 *                                  double rms, double mlim, int imax,
-*                                  int *lbnd, HDSLoc **ndfs,
+*                                  double thresh, int *lbnd, HDSLoc **ndfs,
 *                                  int iclump, int excols, double mean_peak,
 *                                  double maxbad, int *area, double *sumclumps,
 *                                  int *status )
@@ -71,6 +71,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     imax
 *        Index within "res" of highest value (only used if "res" is not
 *        NULL).
+*     thresh
+*        Peaks lower than "thresh" are not include din the output
+*        catalogue or NDF. Note, "thresh" is given in units of the RMS
+*        noise.
 *     lbnd
 *        Pointer to array holding the pixel indices of the first pixel in
 *        the user-supplied NDF.
@@ -153,6 +157,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        checked when the one face itself did not rise above mlim. But
 *        extending other faces may cause such faces to include higher
 *        values, so all faces should continue to be checked.
+*     26-SEP-2011 (DSB):
+*        Add argument "thresh".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -196,6 +202,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    int lbox[ 3 ];         /* Lower bounds of model evaluation box */
    int lface[ 3 ];        /* Lower bounds of face being evaluated */
    int list_size;         /* Number of values stored in plist and mlist */
+   int lowpeak;           /* If the peak value below the supplied threshold? */
    int more;              /* Does the evaluation box need to be extended? */
    int nr;                /* Number of remaining residual values */
    int ok;                /* Is the pixel within the bounds of the NDF? */
@@ -253,6 +260,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    more = 1;
    first = 1;
    peakok = 0;
+   lowpeak = 1;
    sum = 0.0;
    *area = 0;
    area_off = 0;
@@ -353,6 +361,12 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                         pnext[ jax ] = (int) ( yy[ jax ] + 0.5 );
                      }
 
+/* Set a flag indicating if the max value in the sampled gaussian is
+   greater than the supplied lower limit. Mote, the sampled peak value
+   will be less than par[0] because it is unlikely that a pixel centre
+   will fall on the peak. */
+                     if( m > thresh ) lowpeak = 0;
+
 /* If this pixel is not within the data array, count the number of
    off-image pixels encountered. */
                   } else {
@@ -434,6 +448,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    } else if( bad > maxbad*( *area ) ) {
      msgOutif( MSG__DEBUG1, "",
                "   (the clump contains too many bad pixels)", status );
+   } else if( lowpeak ) {
+     msgOutif( MSG__DEBUG1, "",
+               "   (the clump peak is too low)", status );
    }
 
    msgSetd( "M", meanr );
@@ -451,7 +468,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
 /* If required, create an NDF holding the clump data values so long as
    the clump does not touch the edge of the data array. */
-   if( ndfs && area_off == 0 ) {
+   if( ndfs && area_off == 0 && ! lowpeak ) {
 
 /* Modify the box to exclude the border of bad pixels. */
       for( jax = 0; jax < ndim; jax++ ) {
