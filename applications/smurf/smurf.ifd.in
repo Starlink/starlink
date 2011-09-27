@@ -3824,6 +3824,15 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter azavpspec {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Calculate azimuthally averaged angular power spectrum?}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF

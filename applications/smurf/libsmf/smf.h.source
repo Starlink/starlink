@@ -953,6 +953,8 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode,
 void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                     AstKeyMap **km, int *status );
 
+smfData *smf_fft_2dazav( const smfData *data, int *status );
+
 smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
                           size_t qstride, smf_qual_t mask, double *weights,
                           int *status );

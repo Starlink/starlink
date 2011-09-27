@@ -138,6 +138,7 @@ smf_expmodel_two.c \
 smf_expmodel_init.c \
 smf_ext2km.c \
 smf_extracols.c \
+smf_fft_2dazav.c \
 smf_fft_avpspec.c \
 smf_fft_cart2pol.c \
 smf_fft_data.c \

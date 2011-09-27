@@ -33,6 +33,9 @@
 *     Transforming data loses the VARIANCE and QUALITY components.
 
 *  ADAM Parameters:
+*     AZAVPSPEC = _LOGICAL (Read)
+*          If true, calculate the azimuthally-averaged angular power
+*          power spectrum. [FALSE]
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     INVERSE = _LOGICAL (Read)
@@ -63,6 +66,8 @@
 *  History:
 *     2011-09-22 (EC):
 *        Initial version - based on sc2fft task
+*     2011-09-26 (EC):
+*        Add AZAVPSPEC option
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -117,6 +122,7 @@
 
 void smurf_sc2mapfft( int *status ) {
 
+  int azavpspec=0;          /* Flag for doing az-averaged power spectrum */
   size_t i;                 /* Loop (grp) counter */
   smfData *idata;           /* Pointer to input smfData */
   Grp *igrp = NULL;         /* Input group of files */
@@ -160,6 +166,16 @@ void smurf_sc2mapfft( int *status ) {
 
   /* Are we going to zero bad values first? */
   parGet0l( "ZEROBAD", &zerobad, status );
+
+  /* Are we calculating the azimuthally-average power spectrum? */
+  parGet0l( "AZAVPSPEC", &azavpspec, status );
+  if( azavpspec ) {
+    msgOutif( MSG__NORM, " ", TASK_NAME
+              ": azimuthally-averaged power spectrum requested so setting "
+              "POWER=TRUE", status );
+    power = 1;
+    polar = 1;
+  }
 
   /* If power is true, we must be in polar form */
   if( power && !polar) {
@@ -221,6 +237,15 @@ void smurf_sc2mapfft( int *status ) {
         smf_fft_cart2pol( odata, 0, power, status );
       }
 
+      /* Calcular azimuthally-averaged angular power spectrum if requested */
+      if( azavpspec ) {
+        smfData *tempdata=NULL;
+
+        tempdata = smf_fft_2dazav( odata, status );
+        smf_close_file( &odata, status );
+        odata = tempdata;
+      }
+
       /* Export the data to a new file */
       smf_write_smfData( odata, NULL, NULL, ogrp, i, 0, MSG__VERB, status );
     }  else {
@@ -234,6 +259,8 @@ void smurf_sc2mapfft( int *status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines */
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
+
+  smf_close_file( &odata, status );
 
   ndfEnd( status );
 
