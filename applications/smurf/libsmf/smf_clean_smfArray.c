@@ -338,8 +338,8 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
 
     /* Apply optical efficiency corrections. */
     strcpy( param, "OPTEFF" );
-    smf_find_subarray( data->hdr, param + 5, sizeof(param) - 5, NULL,
-                       status );
+    smf_find_subarray( data->hdr, param + strlen(param),
+                       sizeof(param) - strlen(param), NULL, status );
     astChrCase( NULL, param, 1, 0 );
     if( astMapHasKey( keymap, param ) ) {
       astMapGet0I( keymap, "OPTEFFDIV", &opteffdiv );
