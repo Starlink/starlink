@@ -1389,7 +1389,7 @@ static char *GetNextText( AstChannel *this, int *status ) {
 #endif
                astError( AST__RDERR, "astRead(%s): Failed to open input "
                          "SourceFile '%s' - %s.", status, astGetClass( this ),
-                         source_file, errbuf );
+                         source_file, errstat );
             } else {
                astError( AST__RDERR, "astRead(%s): Failed to open input "
                          "SourceFile '%s'.", status, astGetClass( this ),
@@ -1410,7 +1410,10 @@ static char *GetNextText( AstChannel *this, int *status ) {
    if ( !this->fd_in && this->source && this->source_wrap ) {
 
 /* About to call an externally supplied function which may not be
-   thread-safe, so lock a mutex first. */
+   thread-safe, so lock a mutex first. Also store the channel data
+   pointer in a global variable so that it can be accessed in the source
+   function using macro astChannelData. */
+      astStoreChannelData( this );
       LOCK_MUTEX3;
       line = ( *this->source_wrap )( this->source, status );
       UNLOCK_MUTEX3;
@@ -1465,7 +1468,7 @@ static char *GetNextText( AstChannel *this, int *status ) {
 #endif
             astError( AST__RDERR,
                       "astRead(%s): Read error on standard input - %s.", status,
-                      astGetClass( this ), errbuf );
+                      astGetClass( this ), errstat );
          } else {
             astError( AST__RDERR,
                       "astRead(%s): Read error on standard input.", status,
@@ -2349,7 +2352,7 @@ static void PutNextText( AstChannel *this, const char *line, int *status ) {
 #endif
                astError( AST__WRERR, "astWrite(%s): Failed to open output "
                          "SinkFile '%s' - %s.", status, astGetClass( this ),
-                         sink_file, errbuf );
+                         sink_file, errstat );
             } else {
                astError( AST__WRERR, "astWrite(%s): Failed to open output "
                          "SinkFile '%s'.", status, astGetClass( this ),
@@ -2370,8 +2373,11 @@ static void PutNextText( AstChannel *this, const char *line, int *status ) {
 /* Otherwise, if a sink function (and its wrapper function) is defined for
    the Channel, use the wrapper function to invoke the sink function to
    output the text line. Since we are about to call an externally supplied
-   function which may not be thread-safe, lock a mutex first. */
+   function which may not be thread-safe, lock a mutex first. Also store
+   the channel data pointer in a global variable so that it can be accessed
+   in the source function using macro astChannelData. */
       } else if ( this->sink && this->sink_wrap ) {
+         astStoreChannelData( this );
          LOCK_MUTEX2;
          ( *this->sink_wrap )( *this->sink, line, status );
          UNLOCK_MUTEX2;
@@ -3610,6 +3616,51 @@ static char *SourceWrap( const char *(* source)( void ), int *status ) {
 
 /* Return the result. */
    return result;
+}
+
+void astStoreChannelData_( AstChannel *this, int *status ) {
+/*
+*+
+*  Name:
+*     astStoreChannelData
+
+*  Purpose:
+*     Store the Channel's channel-data pointer in a thread-specific
+*     global variable.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "channel.h"
+*     astStoreChannelData( AstChannel *this )
+
+*  Class Membership:
+*     Channel method.
+
+*  Description:
+*     This function stores the Channel's channel-data pointer (if any)
+*     established by the previous call to astPutChannelData, in a
+*     thread-specific global variable from where the astChannelData macro
+*     can access it.
+
+*  Parameters:
+*     this
+*        Pointer to the Channel.
+*-
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the structure holding thread-specific global data. */
+   astGET_GLOBALS(this);
+
+/* Store the pointer int he global variable. */
+   channel_data = this->data;
 }
 
 static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
@@ -5409,18 +5460,15 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 */
 
 /* Local Variables: */
-   AstChannel *in;                 /* Pointer to input Channel */
    AstChannel *out;                /* Pointer to output Channel */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
 /* Obtain pointers to the input and output Channels. */
-   in = (AstChannel *) objin;
    out = (AstChannel *) objout;
 
-/* For safety, first clear any references to the input memory from
-   the output Channel. */
+/* Just clear any references to the input memory from the output Channel. */
    out->warnings = NULL;
    out->nwarn = 0;
    out->fd_in = NULL;
@@ -6269,11 +6317,8 @@ void astPutNextText_( AstChannel *this, const char *line, int *status ) {
    (**astMEMBER(this,Channel,PutNextText))( this, line, status );
 }
 AstObject *astRead_( AstChannel *this, int *status ) {
-   astDECLARE_GLOBALS
    if ( !astOK ) return NULL;
-   astGET_GLOBALS(this);
    astAddWarning( this, 0, NULL, NULL, status );
-   channel_data = this->data;
    return (**astMEMBER(this,Channel,Read))( this, status );
 }
 void astReadClassData_( AstChannel *this, const char *class, int *status ) {
@@ -6373,14 +6418,12 @@ void astAddWarning_( void *this_void, int level, const char *fmt,
 /* Count the number of times astWrite is invoked (excluding invocations
    made from within the astWriteObject method - see below). The count is
    done here so that invocations of astWrite within a sub-class will be
-   included. Also store pointer to channel data in a thread-specific global
-   variable. */
+   included. */
 int astWrite_( AstChannel *this, AstObject *object, int *status ) {
    astDECLARE_GLOBALS
    if ( !astOK ) return 0;
    astGET_GLOBALS(this);
    nwrite_invoc++;
-   channel_data = this->data;
    astAddWarning( this, 0, NULL, NULL, status );
    return (**astMEMBER(this,Channel,Write))( this, object, status );
 }
@@ -6388,15 +6431,13 @@ int astWrite_( AstChannel *this, AstObject *object, int *status ) {
 /* We do not want to count invocations of astWrite made from within the
    astWriteObject method. So decrement the number of invocations first
    (this assumes that each invocation of astWriteObject will only invoke
-   astWrite once). Also store pointer to channel data in a thread-specific
-   global variable. */
+   astWrite once). */
 void astWriteObject_( AstChannel *this, const char *name, int set,
                       int helpful, AstObject *value, const char *comment, int *status ) {
    astDECLARE_GLOBALS
    if ( !astOK ) return;
    astGET_GLOBALS(this);
    nwrite_invoc--;
-   channel_data = this->data;
    (**astMEMBER(this,Channel,WriteObject))( this, name, set, helpful, value,
                                             comment, status );
 }

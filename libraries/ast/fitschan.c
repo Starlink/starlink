@@ -12576,7 +12576,10 @@ static AstFitsTable *GetNamedTable( AstFitsChan *this, const char *extname,
    table in the FitsChan. This is an externally supplied function which may
    not be thread-safe, so lock a mutex first. Note, a cloned FitsChan pointer
    is sent to the table source function since the table source function will
-   annul the supplied FitsChan pointer. */
+   annul the supplied FitsChan pointer. Also store the channel data
+   pointer in a global variable so that it can be accessed in the source
+   function using macro astChannelData. */
+      astStoreChannelData( this );
       LOCK_MUTEX2;
       ( *this->tabsource_wrap )( this->tabsource, astClone( this ), extname,
                                  extver, extlevel, status );
@@ -24151,7 +24154,10 @@ static void ReadFromSource( AstFitsChan *this, int *status ){
 
 /* Obtain the first header card from the source function. This is an
    externally supplied function which may not be thread-safe, so lock a
-   mutex first. */
+   mutex first. Also store the channel data pointer in a global variable
+   so that it can be accessed in the source function using macro
+   astChannelData. */
+      astStoreChannelData( this );
       LOCK_MUTEX2;
       card = ( *this->source_wrap )( source, status );
       UNLOCK_MUTEX2;
@@ -24166,7 +24172,10 @@ static void ReadFromSource( AstFitsChan *this, int *status ){
 /* Free the memory holding the header card. */
          card = (char *) astFree( (void *) card );
 
-/* Obtain the next header card. */
+/* Obtain the next header card. Also store the channel data pointer in a
+   global variable so that it can be accessed in the source function using
+   macro astChannelData. */
+         astStoreChannelData( this );
          LOCK_MUTEX2;
          card = ( *this->source_wrap )( source, status );
          UNLOCK_MUTEX2;
@@ -25424,7 +25433,7 @@ static void SetSourceFile( AstChannel *this_channel, const char *source_file,
 #endif
             astError( AST__RDERR, "astSetSourceFile(%s): Failed to open input "
                       "SourceFile '%s' - %s.", status, astGetClass( this ),
-                      source_file, errbuf );
+                      source_file, errstat );
          } else {
             astError( AST__RDERR, "astSetSourceFile(%s): Failed to open input "
                       "SourceFile '%s'.", status, astGetClass( this ),
@@ -37353,7 +37362,7 @@ static void WriteToSink( AstFitsChan *this, int *status ){
 #endif
             astError( AST__WRERR, "astDelete(%s): Failed to open output "
                       "SinkFile '%s' - %s.", status, astGetClass( this ),
-                      sink_file, errbuf );
+                      sink_file, errstat );
          } else {
             astError( AST__WRERR, "astDelete(%s): Failed to open output "
                       "SinkFile '%s'.", status, astGetClass( this ),
@@ -37390,8 +37399,11 @@ static void WriteToSink( AstFitsChan *this, int *status ){
                fprintf( fd, "%s\n", card );
 
 /* Otherwise, use the isnk function. The sink function is an externally
-   supplied function which may not be thread-safe, so lock a mutex first. */
+   supplied function which may not be thread-safe, so lock a mutex first.
+   Also store the channel data pointer in a global variable so that it can
+   be accessed in the sink function using macro astChannelData. */
             } else {
+               astStoreChannelData( this );
                LOCK_MUTEX3;
                ( *this->sink_wrap )( *this->sink, card, status );
                UNLOCK_MUTEX3;
