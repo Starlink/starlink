@@ -681,7 +681,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
            at the file itself and not the result of flatfielding.
            Flatfielding creates a quality array. Without this raw data
            will not have quality values propagated. */
-        if ( j == firstpiece ) {
+        if ( j == firstpiece && refdata ) {
           havequal = ( refdata->qual != NULL );
         }
 
