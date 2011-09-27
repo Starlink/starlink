@@ -448,10 +448,8 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
         retdata->dims[0] = rdims[0];
         retdata->dims[1] = rdims[1];
 
-        /* Need to figure out how to store the lbnd values...
-           retdata->lbnd[0] =
-           retdata->lbnd[1] =
-        */
+        retdata->lbnd[0] = data->lbnd[0];
+        retdata->lbnd[1] = data->lbnd[1];
       }
     } else {
       if( ndims == 1 ) {
@@ -473,8 +471,10 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
         retdata->dims[1] = fdims[1];
         retdata->dims[2] = 2;
 
-        retdata->lbnd[0] = 1;
-        retdata->lbnd[1] = 1;
+        /* Just set the frequency axis lbnds to those in real-space so
+           that we can recover them later */
+        retdata->lbnd[0] = data->lbnd[0];
+        retdata->lbnd[1] = data->lbnd[1];
         retdata->lbnd[2] = 1;
       }
     }
