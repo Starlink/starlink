@@ -40,6 +40,8 @@
 #        First version.
 #     2011-07-15 (AGG):
 #        New fit coefficients from June 2011 data (Trac #719)
+#     2011-09-27 (AGG):
+#        New fit coefficients from 2011 data (Trac #852)
 
 #-
 
@@ -55,8 +57,8 @@
 
 # Original filters delivered for SCUBA-2. Named "450" and "850".
 
-ext.taurelation.450 = (18.585,-0.0031)
-ext.taurelation.850 =  (5.045,-0.0072)
+ext.taurelation.450 = (32.0,-0.020)
+ext.taurelation.850 =  (5.2,-0.013)
 
 # Control whether we want WVM smoothing. The value is the
 # size in seconds for the tophat function. A value of 0 disables
