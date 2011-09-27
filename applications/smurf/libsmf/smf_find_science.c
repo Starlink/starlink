@@ -599,18 +599,20 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                    We could get some memory once assuming each flat has the
                    same number of bolometers... */
                 ratio = smf_deepcopy_smfData( curresp, 0, 0, 0, 0, status );
+                if( *status == SAI__OK ) {
 
-                /* divide: smf_divide_smfData ? */
-                in1 = (curresp->pntr)[0];
-                in2 = (nextresp->pntr)[0];
-                out = (ratio->pntr)[0];
+                  /* divide: smf_divide_smfData ? */
+                  in1 = (curresp->pntr)[0];
+                  in2 = (nextresp->pntr)[0];
+                  out = (ratio->pntr)[0];
 
-                for (bol=0; bol<nbolo;bol++) {
-                  if ( in1[bol] != VAL__BADD && in1[bol] != 0.0 &&
-                       in2[bol] != VAL__BADD && in2[bol] != 0.0 ) {
-                    out[bol] = in1[bol] / in2[bol];
-                  } else {
-                    out[bol] = VAL__BADD;
+                  for (bol=0; bol<nbolo;bol++) {
+                    if ( in1[bol] != VAL__BADD && in1[bol] != 0.0 &&
+                         in2[bol] != VAL__BADD && in2[bol] != 0.0 ) {
+                      out[bol] = in1[bol] / in2[bol];
+                    } else {
+                      out[bol] = VAL__BADD;
+                    }
                   }
                 }
 
