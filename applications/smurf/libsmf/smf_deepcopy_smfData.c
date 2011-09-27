@@ -166,7 +166,8 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   smfFile *file = NULL;       /* New smfFile */
   smfHead *hdr = NULL;        /* New smfHead */
   size_t i;                   /* Loop counter */
-  int isFFT;                  /* Dealing with FFT data? */
+  int isf;                    /* Are the data fft? */
+  int isFFT;                  /* ISFFT FITS header */
   size_t j;                   /* Loop counter */
   int lbnd[NDF__MXDIM];       /* lower bounds of each axis of data array */
   dim_t nbolo;                /* number of bolometers */
@@ -176,6 +177,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   smfData *new = NULL;        /* New smfData */
   int newOrder;               /* Data order in new data buffer */
   smf_dtype newtype;          /* Data type for new smfData */
+  size_t nrdims;              /* Number of used real-space dimensions */
   int oldOrder;               /* Data order in old data buffer */
   double *outdata;            /* Pointer to output DATA */
   size_t npts;                /* Number of data points */
@@ -212,9 +214,12 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
 
   /* If we have 3d (non-FFT!) data and we request data re-ordering, work out
      whether we need to do re-ordering at all, and the dimensions and
-     strides here */
-  if( assertOrder && (old->ndims==3) &&
-      !smf_isfft( old, NULL, NULL, NULL, NULL, status ) ) {
+     strides here. The check for nrdims is needed since some maps may
+     have a 3rd axis of length 1, and smf_isfft tells us */
+
+  isf = smf_isfft( old, NULL, NULL, NULL, &nrdims, status );
+
+  if( assertOrder && (old->ndims==3) && !isf && (nrdims != 2) ) {
     if( old->isTordered != isTordered ) {
       reOrder = 1;
       newOrder = isTordered;
