@@ -14294,9 +14294,9 @@ KAPPA: \htmlref{ARDPLOT}{ARDPLOT},
       \sstsubsection{
          COMP = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
-         The NDF array component to be masked.  It may be {\tt "Data"}, or
-         {\tt "Variance"}, or {\tt "Error"} (where {\tt "Error"} is equivalent to
-         {\tt "Variance"}).  {\tt ["Data"]}
+         The NDF array component to be masked.  It may be {\tt "Data"},
+         or {\tt "Variance"}, or {\tt "Error"},  or {\tt "All"}, (where
+         {\tt "Error"} is equivalent to {\tt "Variance"}).  {\tt ["All"]}
       }
       \sstsubsection{
          CONST = LITERAL (Given)
@@ -57806,6 +57806,13 @@ The following applications have been modified:
 The following applications have been modified:
 
 \begin{description}
+   \item [\htmlref{ARDMASK}{ARDMASK}]\mbox{}
+      \begin{itemize}
+        \item The VARIANCE and DATA arrays in the NDF can now be masked
+         simultaneously by setting the COMP parameter to ``All'', which is
+         now the default value for COMP.
+      \end{itemize}
+
    \item [\htmlref{FITSMOD}{FITSMOD}]\mbox{}
       \begin{itemize}
         \item New parameter READONLY allows FITSMOD to be used to perform

@@ -7538,7 +7538,7 @@ package kappa {
             vpath DEFAULT
             prompt {NDF array component to mask}
             ppath CURRENT DEFAULT
-            default DATA
+            default ALL
             helpkey *
          }
          parameter const {

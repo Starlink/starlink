@@ -52,8 +52,8 @@
 *        in pixel co-ordinates.
 *     COMP = LITERAL (Read)
 *        The NDF array component to be masked.  It may be "Data", or
-*        "Variance", or "Error" (where "Error" is equivalent to
-*        "Variance"). ["Data"]
+*        "Variance", or "Error", or "All" (where "Error" is equivalent to
+*        "Variance"). ["All"]
 *     CONST = LITERAL (Given)
 *        The constant numerical value to assign to the region, or the string
 *        "bad". ["bad"]
@@ -169,6 +169,9 @@
 *     2-OCT-2007 (DSB):
 *        If the ARD description has one less axis than the NDF, mask each
 *        plane in the NDF independently.
+*     28-SEP-2011 (DSB):
+*        Added "All" as an option for parameter COMP, and made it the
+*        default.
 *     {enter_further_changes_here}
 
 *-
@@ -200,19 +203,21 @@
       INTEGER FD                 ! File descriptor
       INTEGER PFRM               ! Reduced PIXEL frame
       INTEGER I                  ! Loop count
+      INTEGER ICOMP              ! Component index
       INTEGER IGRP               ! Group identifier
       INTEGER INDF1              ! Identifier for the source NDF
       INTEGER INDF2              ! Identifier for the output NDF
       INTEGER INDFS              ! Identifier for the output NDF section
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
       INTEGER IPMASK             ! Pointer to ARD logical mask
-      INTEGER IPOUT              ! Pointer to data component of output NDF
+      INTEGER IPOUT( 2 )         ! Pointers to masked comp.s of o/p NDF
       INTEGER IWCS               ! NDF WCS FrameSet
       INTEGER J                  ! Loop count
       INTEGER JUNK               ! Unused Mapping
       INTEGER LBND( NDF__MXDIM ) ! Lower limit for image index
       INTEGER LBNDE( NDF__MXDIM )! Lower bounds of external array elements
       INTEGER LBNDI( NDF__MXDIM )! Lower bounds of internal array elements
+      INTEGER NCOMP              ! Number of components to mask
       INTEGER NDIM               ! Number of pixel axes in the image
       INTEGER NMASK              ! Number of masking operations
       INTEGER NWCS               ! Number of axes in the user coords system
@@ -250,19 +255,46 @@
 
 *  Determine which array component is to be masked, converting 'ERROR' into
 *  'VARIANCE'.
-      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Variance', .FALSE.,
+      CALL PAR_CHOIC( 'COMP', 'All', 'All,Data,Error,Variance', .FALSE.,
      :                COMP, STATUS )
       IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
 
+*  Assume we only have one component to map.
+      NCOMP = 1
+
 *  Check that the required component exists and report an error if it
 *  does not.
-      CALL NDF_STATE( INDF1, COMP, THERE, STATUS )
-      IF ( ( STATUS .EQ. SAI__OK ) .AND. ( .NOT. THERE ) ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETC( 'COMP', COMP )
-         CALL NDF_MSG( 'NDF', INDF1 )
-         CALL ERR_REP( 'ARDMASK_ERR1', 'The ^COMP component is '//
-     :                 'undefined in the NDF structure ^NDF', STATUS )
+      IF( COMP .NE. 'ALL' ) THEN
+         CALL NDF_STATE( INDF1, COMP, THERE, STATUS )
+         IF ( ( STATUS .EQ. SAI__OK ) .AND. ( .NOT. THERE ) ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'COMP', COMP )
+            CALL NDF_MSG( 'NDF', INDF1 )
+            CALL ERR_REP( 'ARDMASK_ERR1', 'The ^COMP component is '//
+     :                    'undefined in the NDF structure ^NDF',
+     :                    STATUS )
+         END IF
+
+*  If 'All' was supplied for COMP, get a comma separated list of the
+*  components to mask.
+      ELSE
+         CALL NDF_STATE( INDF1, 'Data', THERE, STATUS )
+         IF( THERE ) THEN
+            COMP = 'Data'
+         ELSE
+            COMP = ' '
+         END IF
+
+         CALL NDF_STATE( INDF1, 'Variance', THERE, STATUS )
+         IF( THERE ) THEN
+            IF( COMP .EQ. ' ' ) THEN
+               COMP = 'Variance'
+            ELSE
+               COMP = 'Data,Variance'
+               NCOMP = 2
+            END IF
+         END IF
+
       END IF
 
 *  Obtain the numeric type of the NDF array component to be masked.
@@ -442,44 +474,55 @@
          CALL NDF_MAP( INDFS, COMP, TYPE, 'UPDATE', IPOUT, EL,
      :                 STATUS )
 
+*  Mask each required component.
+         DO ICOMP = 1, NCOMP
+
 *  Correct the output image to have bad pixels where indicated on the
 *  mask.  Call the appropriate routine for the data type.
-         IF( TYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL,
-     :                       %VAL( CNF_PVAL( IPMASK ) ),
-     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+            IF( TYPE .EQ. '_REAL' ) THEN
+               CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL,
+     :                          %VAL( CNF_PVAL( IPMASK ) ),
+     :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
+     :                          STATUS )
 
-         ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-            CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL,
-     :                       %VAL( CNF_PVAL( IPMASK ) ),
-     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+            ELSE IF( TYPE .EQ. '_BYTE' ) THEN
+               CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL,
+     :                          %VAL( CNF_PVAL( IPMASK ) ),
+     :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
+     :                          STATUS )
 
-         ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL,
-     :                       %VAL( CNF_PVAL( IPMASK ) ),
-     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+            ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
+               CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL,
+     :                          %VAL( CNF_PVAL( IPMASK ) ),
+     :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
+     :                          STATUS )
 
-         ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL,
-     :                       %VAL( CNF_PVAL( IPMASK ) ),
-     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+            ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
+               CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL,
+     :                          %VAL( CNF_PVAL( IPMASK ) ),
+     :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
+     :                          STATUS )
 
-         ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-            CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL,
-     :                        %VAL( CNF_PVAL( IPMASK ) ),
-     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+            ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
+               CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL,
+     :                           %VAL( CNF_PVAL( IPMASK ) ),
+     :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
+     :                          STATUS )
 
-         ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-            CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL,
-     :                        %VAL( CNF_PVAL( IPMASK ) ),
-     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+            ELSE IF( TYPE .EQ. '_UWORD' ) THEN
+               CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL,
+     :                           %VAL( CNF_PVAL( IPMASK ) ),
+     :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
+     :                          STATUS )
 
-         ELSE IF( TYPE .EQ. '_WORD' ) THEN
-            CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL,
-     :                       %VAL( CNF_PVAL( IPMASK ) ),
-     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+            ELSE IF( TYPE .EQ. '_WORD' ) THEN
+               CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL,
+     :                          %VAL( CNF_PVAL( IPMASK ) ),
+     :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
+     :                          STATUS )
 
-         END IF
+            END IF
+         END DO
 
 *  Annul the section identifier.
          CALL NDF_ANNUL( INDFS, STATUS )
