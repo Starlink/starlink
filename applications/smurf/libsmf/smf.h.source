@@ -1325,6 +1325,8 @@ void smf_makefitschan( const char *system, double crpix[2], double crval[2],
 AstMapping *smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],
                             int *status );
 
+double smf_map_getpixsize( const smfData *data, int *status );
+
 void * smf_map_or_malloc( size_t nelem, smf_dtype type, int zero, int indf,
                           const char * comp, int * status );
 

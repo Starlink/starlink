@@ -640,7 +640,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
               AstZoomMap *scalemapping=NULL;/* Scale grid coordinates by df */
               AstSpecFrame *specframe=NULL; /* Current Frame of 1-D spectrum */
               AstCmpMap *specmapping=NULL;  /* Mapping from GRID to FREQ */
-              AstFrameSet *tswcs=NULL;      /* WCS for 4d FFT data */
+              AstFrameSet *fftwcs=NULL;      /* WCS for 4d FFT data */
               double zshift;                /* Amount to shift freq. origin */
               AstShiftMap *zshiftmapping=NULL; /* shift origin of freq GRID */
               AstMapping *zshiftmapping2=NULL; /* shift origin of bolo GRID */
@@ -652,7 +652,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
               astBegin;
 
               /* Create a new astFrameSet containing a 4d base GRID frame */
-              tswcs = astFrameSet( astFrame( 4, "Domain=GRID" ), " " );
+              fftwcs = astFrameSet( astFrame( 4, "Domain=GRID" ), " " );
 
               /* Get a Frame describing bolometer rows and columns, and a
                  Mapping from 2D GRID coords to this BOLO Frame. */
@@ -686,29 +686,89 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
               fftmapping = astCmpMap( mapping3d, cmapping, 0, " " );
 
               /* Add the curframe4d with the fftmapping to the frameset */
-              astAddFrame( tswcs, AST__BASE, fftmapping, curframe4d );
+              astAddFrame( fftwcs, AST__BASE, fftmapping, curframe4d );
 
               /* Export the frameset before ending the AST context */
-              astExport( tswcs );
+              astExport( fftwcs );
               astEnd;
 
-              /* Free the old TSWCS if it exists, and insert the new TSWCS */
+              /* Free the old TSWCS if it exists, and insert the new FFTWCS */
               if( retdata->hdr->tswcs ) {
                 retdata->hdr->tswcs = astAnnul(retdata->hdr->tswcs);
               }
-              retdata->hdr->tswcs = tswcs;
+              retdata->hdr->tswcs = fftwcs;
             }
-          } else if( ndims == 2 ) {
+          } else if( (ndims == 2) && (indata->hdr->wcs) ) {
+
             /* FFT of a map
 
-               Note to self: we can encode the lbnd values for the real-space
-               map as a mean phase-shift for all of the Fourier components,
-               and then recover them when we transform back.
+               Note to self: maybe we can encode the lbnd values for
+               the real-space map as a mean phase-shift for all of the
+               Fourier components, and then recover them when we
+               transform back.
             */
 
-            msgOut( "", FUNC_NAME
-                    ": WARNING! WCS generation for FFT of map not currently "
-                    "implemented", status );
+            AstCmpFrame *curframe=NULL;
+            AstFrame *curframe_c=NULL;
+            AstFrame *curframe_x=NULL;
+            AstFrame *curframe_y=NULL;
+            double df_x=0;
+            double df_y=0;
+            AstCmpMap *fftmapping=NULL;
+            AstFrameSet *fftwcs=NULL;
+            double pixsize;
+            AstUnitMap *scalemap_c=NULL;
+            AstZoomMap *scalemap_x=NULL;
+            AstZoomMap *scalemap_y=NULL;
+
+            /* Obtain the spacings in frquency space */
+
+            pixsize = smf_map_getpixsize( indata, status );
+
+            if( *status == SAI__OK ) {
+              df_x = 1. / (pixsize * (double) rdims[0]);
+              df_y = 1. / (pixsize * (double) rdims[1]);
+            }
+
+            /* Start and AST context */
+            astBegin;
+
+            /* Create a new frameset containing a 3d base GRID frame */
+            fftwcs = astFrameSet( astFrame( 3, "Domain=GRID" ), " " );
+
+            /* The current frame will consist of two spatial frequencies,
+               and a fourier component */
+            curframe_x =  astFrame( 1,"label=Spatial Frequency,Unit=1/arcsec");
+            curframe_y =  astFrame( 1,"label=Spatial Frequency,Unit=1/arcsec");
+            curframe_c =  astFrame( 1,"Domain=COEFF,label=Real/Imag component");
+
+            curframe = astCmpFrame( astCmpFrame( curframe_x, curframe_y, " " ),
+                                    curframe_c, " " );
+
+            /* The mapping will scale by the spatial frequency step sizes
+               for the first two axes, and we just use a unit mapping for
+               the component axis */
+
+            scalemap_x = astZoomMap( 1, df_x, " " );
+            scalemap_y = astZoomMap( 1, df_y, " " );
+            scalemap_c = astUnitMap( 1, " " );
+
+            fftmapping = astCmpMap( astCmpMap( scalemap_x, scalemap_y, 0, " " ),
+                                    scalemap_c, 0, " " );
+
+            /* Add curframe with the fftmapping to the frameset */
+            astAddFrame( fftwcs, AST__BASE, fftmapping, curframe );
+
+            /* Export and store it in the place of TSWCS in the header. We
+               do this so that we can preserve the 2D map WCS, and since
+               it is 3-d smf_write_smfData will use it automagically */
+            astExport( fftwcs );
+            astEnd;
+
+            if( retdata->hdr->tswcs ) {
+              retdata->hdr->tswcs = astAnnul(retdata->hdr->tswcs);
+            }
+            retdata->hdr->tswcs = fftwcs;
           }
         }
       }

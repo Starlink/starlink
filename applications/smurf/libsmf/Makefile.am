@@ -248,6 +248,7 @@ smf_lock_data.c \
 smf_lock_related.c \
 smf_makefitschan.c \
 smf_maketanmap.c \
+smf_map_getpixsize.c \
 smf_map_or_malloc.c \
 smf_map_spikes.c \
 smf_mapbounds.c \

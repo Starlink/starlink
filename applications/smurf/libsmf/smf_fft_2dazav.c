@@ -116,6 +116,7 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
   double pixsize=1.;            /* Map pixel size in arcsec */
   smfData *retdata=NULL;        /* Returned 1-d smfData */
   dim_t rdims[2];               /* Real space dimensions */
+  int whichaxis=0;              /* Which frequency axis for output */
 
   if (*status != SAI__OK) return NULL;
 
@@ -142,37 +143,7 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
   /* Work out the spatial frequency spacing along each axis in the 2-d map,
      as well as for the length and step size for the 1-d output */
   if( data->hdr && data->hdr->wcs ) {
-    double at[3]={0,0,0};
-    int naxes;
-    double pixscl[3];
-
-    /* Check number of axes in the frameset. It will usually be 3 because
-       we have a frequency axis of length 1 for normal SMURF maps */
-    naxes = astGetI( data->hdr->wcs, "naxes" );
-    if( (naxes < 2) || (naxes > 3) ) {
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME
-              ": Frameset does not appear to corresond to a 2-d map", status );
-    }
-
-    /* Take the average of the x- and y-pixel spacings in radians at the
-       centre of the map, and then convert to arcsec */
-    at[0] = -(data->lbnd[0]-1);
-    at[1] = -(data->lbnd[1]-1);
-
-    kpgPixsc( data->hdr->wcs, at, pixscl, NULL, NULL, 0, status );
-    if( *status == SAI__OK ) {
-      pixsize = (pixscl[0] + pixscl[1])/2.;
-      pixsize *= DR2AS;
-
-      msgOutiff( MSG__DEBUG, "", FUNC_NAME
-                 ": determined pixel size from WCS at map coordinates (%g,%g) "
-                 "to be %g arcsec", status, at[0], at[1], pixsize );
-    } else {
-      msgOutf( "", FUNC_NAME
-               ": WARNING! no WCS, so pixel size assumed to be %g arcsec",
-               status, pixsize );
-    }
+    pixsize = smf_map_getpixsize( data, status );
   }
 
   if( *status == SAI__OK ) {
@@ -186,8 +157,10 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
 
     if( rdims[1] > rdims[0] ) {
       df_o = df_y;
+      whichaxis = 2;
     } else {
       df_o = df_x;
+      whichaxis = 1;
     }
 
     nf_o = (sqrt(rdims[0]*rdims[0]*df_x*df_x +
@@ -257,6 +230,40 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
       if( count[i] ) odata[i] /= (double) count[i];
       else odata[i] = VAL__BADD;
     }
+  }
+
+  /* Create WCS for the data based on the input WCS if it exists */
+  if( data->hdr && data->hdr->tswcs ) {
+    AstFrame *curframe=NULL;
+    AstMapping *fftmapping=NULL;
+    AstFrameSet *fftwcs=NULL;
+    AstMapping *map_in=NULL;
+    int nout;
+
+    /* Start and AST context */
+    astBegin;
+
+    /* Create a new frameset containing a 1d base GRID frame */
+    fftwcs = astFrameSet( astFrame( 1, "Domain=GRID" ), " " );
+
+    /* The current frame will be spatial frequency */
+    curframe = astFrame( 1,"label=Spatial Frequency,Unit=1/arcsec");
+
+    /* Obtain the correct mapping from the input */
+    map_in = astGetMapping( data->hdr->tswcs, AST__BASE, AST__CURRENT );
+    astMapSplit( map_in, 1, &whichaxis, &nout, &fftmapping );
+
+    /* Add curframe with the fftmapping to the frameset */
+    astAddFrame( fftwcs, AST__BASE, fftmapping, curframe );
+
+    /* Export and store in the tswcs slot of the output smfHead */
+    astExport( fftwcs );
+    astEnd;
+
+    if( retdata->hdr->tswcs ) {
+      retdata->hdr->tswcs = astAnnul(retdata->hdr->tswcs);
+    }
+    retdata->hdr->tswcs = fftwcs;
   }
 
   /* Clean up */
