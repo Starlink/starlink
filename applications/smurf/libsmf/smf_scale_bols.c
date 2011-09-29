@@ -118,6 +118,7 @@ typedef struct smfScaleBolsJobData {
    double *dat;
    smf_qual_t *qua;
    int div;
+   int newbad;
    size_t bstride;
    size_t tstride;
 } smfScaleBolsJobData;
@@ -262,6 +263,16 @@ void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
 
 /* Wait for the workforce to complete all jobs. */
       thrWait( wf, status );
+
+/* Report the number of new BADB bolometers. */
+      if( job_data->newbad == 1 ) {
+         msgOutiff( MSG__VERB, "", "smfScaleBols: rejecting one previously "
+                    "good bolometer because of bad scaling factors", status );
+      } else if( job_data->newbad > 1 ) {
+         msgOutiff( MSG__VERB, "", "smfScaleBols: rejecting %d previously "
+                    "good bolometers because of bad scaling factors", status,
+                    job_data->newbad );
+      }
    }
 
 /* Free resources. */
@@ -321,6 +332,7 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
    double *dat;
    double *p1;
    double *p2;
+   int newbad;
    size_t bstride;
    size_t tstride;
    smfScaleBolsJobData *pdata;
@@ -345,6 +357,9 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
    dat = pdata->dat;
    qua = pdata->qua;
    corr = pdata->corr;
+
+/* Initialise number of new BADB bolometers */
+   newbad = 0;
 
 /* Check we have something to do. */
    if( t1 < ntslice ) {
@@ -379,8 +394,10 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
 
 /* If the correction value is bad, and a quality array is available, leave
    the data value unchanged but assign the quality SMF__Q_BADEF and
-   SMF__Q_BADB to the sample. */
+   SMF__Q_BADB to the sample. For the first time slice only, count the
+   number of new bolometers that are set to BADB. */
                } else if( q1 ) {
+                  if( itime == t1 && ( *q1 & SMF__Q_BADB ) ) newbad++;
                   *q1 |= ( SMF__Q_BADEF | SMF__Q_BADB );
 
 /* If the correction value is bad, and no quality array is available, set
@@ -420,4 +437,8 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
                  "smfScaleBols: thread finishing slices %zu -- %zu (%.3f sec)",
                  status, t1, t2, smf_timerupdate( &tv1, &tv2, status ) );
    }
+
+/* Return the number of bolometers set to BADB that were not previously
+   set to BADB. */
+   pdata->newbad = newbad;
 }
