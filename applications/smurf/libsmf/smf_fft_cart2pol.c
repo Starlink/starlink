@@ -51,6 +51,8 @@
 *        Handle case where one of baseI or baseR are bad but not both.
 *     2011-09-23 (EC):
 *        Handle 2D FFTs
+*     2011-09-28 (EC):
+*        Handle normalization and units of 2-d PSDs properly
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -110,7 +112,7 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
   double amp=0;                 /* Amplitude coeff */
   double *baseR=NULL;           /* base pointer to real/amplitude coeff */
   double *baseI=NULL;           /* base pointer to imag/argument coeff */
-  double df=1;                  /* frequency steps in Hz */
+  double df=1;                  /* frequency steps in Hz, or (1/arcsec)^2 */
   dim_t fdims[2];               /* Lengths of frequency-space axes */
   size_t i;                     /* Loop counter */
   double imag;                  /* Imaginary coeff */
@@ -144,8 +146,10 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
 
   /* Need to know df to get normalization right when dealing with PSDs */
   if( power ) {
-    /* Time-series cube */
+
     if( ndims == 1 ) {
+      /* Time-series cube */
+
       if( data->hdr && data->hdr->steptime ) {
         df = 1. / (data->hdr->steptime * (double) rdims[0] );
       } else {
@@ -153,10 +157,23 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
                 "encountered, so setting frequency bin width df=1 "
                 "(PSD units will be meaningless)", status );
       }
-    } else {
-        msgOut( "", FUNC_NAME
-                ": WARNING! Don't currently normalize map PSDs correctly",
-                status );
+    } else if( ndims == 2 ) {
+      /* Map */
+
+      if( data->hdr && data->hdr->wcs ) {
+        double pixsize;
+        double df_x;
+        double df_y;
+
+        pixsize = smf_map_getpixsize( data, status );
+        df_x = 1. / (pixsize * (double) rdims[0]);
+        df_y = 1. / (pixsize * (double) rdims[1]);
+        df = df_x*df_y;
+      } else {
+        msgOut( "", FUNC_NAME ": *** Warning *** no valid steptime "
+                "encountered, so setting spatial frequency bin df=1 "
+                "(PSD units will be meaningless)", status );
+      }
     }
   }
 
@@ -237,11 +254,30 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
 
   /* Convert the units and labels of the axes using AST */
   if( data->hdr && power && (data->hdr->units[0] != '\0') ) {
-    if( ndims == 1 ) {
-      AstFrame *unitframe = NULL;
-      char newunits[SMF__CHARLABEL];
-      char label[SMF__CHARLABEL];
+    AstFrame *unitframe = NULL;
+    char newunits[SMF__CHARLABEL];
+    char label[SMF__CHARLABEL];
+    char *psd_forward=NULL;
+    char *psd_inverse=NULL;
+    char psd_forward_1[] = ")**2/Hz";
+    char psd_inverse_1[] = "*Hz)**0.5";
+    char psd_forward_2[] = ")**2*arcsec**2";
+    char psd_inverse_2[] = "/arcsec**2)**0.5";
 
+
+    if( ndims == 1 ) {
+      psd_forward = psd_forward_1;
+      psd_inverse = psd_inverse_1;
+    } else if( ndims == 2 ) {
+      psd_forward = psd_forward_2;
+      psd_inverse = psd_inverse_2;
+    } else {
+      msgOut( "", FUNC_NAME
+              ": WARNING! Don't currently modify units for map PSDs "
+              "correctly", status );
+    }
+
+    if( psd_forward && psd_inverse ) {
       /* Use a frame to store the modified units which AST will then simplify */
       unitframe = astFrame( 1, " " );
 
@@ -251,12 +287,11 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
 
       if( inverse ) {
         /* Undo PSD units */
-        one_strlcat( newunits, "*Hz)**0.5", sizeof(newunits), status );
+        one_strlcat( newunits, psd_inverse, sizeof(newunits), status );
         one_strlcpy( label, "Signal", sizeof(label), status );
-
       } else {
         /* Change to PSD units */
-        one_strlcat( newunits, ")**2/Hz", sizeof(newunits), status );
+        one_strlcat( newunits, psd_forward, sizeof(newunits), status );
         one_strlcpy( label, "PSD", sizeof(label), status );
       }
 
@@ -267,10 +302,7 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
 
       /* Clean up */
       unitframe = astAnnul( unitframe );
-    } else {
-      msgOut( "", FUNC_NAME
-              ": WARNING! Don't currently modify units for map PSDs correctly",
-              status );
     }
+
   }
 }
