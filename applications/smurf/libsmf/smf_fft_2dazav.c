@@ -44,6 +44,8 @@
 *  History:
 *     2011-09-23 (EC):
 *        Initial version
+*     2011-09-30 (EC):
+*        Should only be calculated up to the Nyquist frequency
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,9 +152,9 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
     df_x = 1. / (pixsize * (double) rdims[0]);
     df_y = 1. / (pixsize * (double) rdims[1]);
 
-    /* To ensure that we hit the full range of frequencies sampled, and
-       at the highest natural resolution, we span the diagonal of the two
-       orthogonal frequency axes, in steps the size of the higher-resolution
+    /* To ensure that we hit the full range of frequencies sampled up
+       to Nyquist, and at the highest natural resolution, we span the
+       frequency axes in steps the size of the higher-resolution
        (longer spatial) axis */
 
     if( rdims[1] > rdims[0] ) {
@@ -163,8 +165,7 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
       whichaxis = 1;
     }
 
-    nf_o = (sqrt(rdims[0]*rdims[0]*df_x*df_x +
-                 rdims[1]*rdims[1]*df_y*df_y)/df_o) + 1;
+    nf_o = round((0.5/pixsize)/df_o);
   }
 
   /* Allocate space for the answer */
@@ -211,13 +212,8 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
            steps in the return array */
         d = (size_t) (sqrt(x*x + y*y) / df_o);
 
-        if( d > (nf_o-1) ) {
-          *status = SAI__ERROR;
-          errRepf( "", FUNC_NAME
-                   ": programming error, index out of bounds %zu > %zu",
-                   status, d, nf_o-1 );
-          break;
-        } else {
+        /* Only consider frequencies up to Nyquist */
+        if( d < (nf_o-1) ) {
           /* Accumulate values at this radius */
           odata[d] += idata[i+j*fdims[0]];
           count[d]++;
