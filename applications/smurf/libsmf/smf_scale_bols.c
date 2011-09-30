@@ -397,7 +397,7 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
    SMF__Q_BADB to the sample. For the first time slice only, count the
    number of new bolometers that are set to BADB. */
                } else if( q1 ) {
-                  if( itime == t1 && ( *q1 & SMF__Q_BADB ) ) newbad++;
+                  if( itime == t1 && !( *q1 & SMF__Q_BADB ) ) newbad++;
                   *q1 |= ( SMF__Q_BADEF | SMF__Q_BADB );
 
 /* If the correction value is bad, and no quality array is available, set
@@ -422,6 +422,7 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
                if( *p2 != VAL__BADD ) {
                   if( *p1 != VAL__BADD ) *p1 *= *p2;
                } else if( q1 ) {
+                  if( itime == t1 && !( *q1 & SMF__Q_BADB ) ) newbad++;
                   *q1 |= ( SMF__Q_BADEF | SMF__Q_BADB );
                } else {
                   *p1 = VAL__BADD;
