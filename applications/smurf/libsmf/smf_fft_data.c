@@ -721,7 +721,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
             AstZoomMap *scalemap_x=NULL;
             AstZoomMap *scalemap_y=NULL;
 
-            /* Obtain the spacings in frquency space */
+            /* Obtain the spacings in frequency space */
 
             pixsize = smf_map_getpixsize( indata, status );
 
@@ -730,7 +730,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
               df_y = 1. / (pixsize * (double) rdims[1]);
             }
 
-            /* Start and AST context */
+            /* Start an AST context */
             astBegin;
 
             /* Create a new frameset containing a 3d base GRID frame */
