@@ -329,8 +329,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     if (*status != SAI__OK) break;
 
     if( i==1 ) {
-      isFFT = smf_isfft( data, NULL, NULL, NULL, NULL, status );
-    } else if( smf_isfft(data, NULL, NULL, NULL, NULL, status) != isFFT ) {
+      isFFT = smf_isfft( data, NULL, NULL, NULL, NULL, NULL, status );
+    } else if( smf_isfft(data, NULL, NULL, NULL, NULL, NULL, status) != isFFT ){
       *status = SAI__ERROR;
       errRep( "", FUNC_NAME
               ": mixture of time-series and FFT data encountered!",

@@ -172,7 +172,7 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data,
   size_t j;                /* Loop counter */
   dim_t nbolo;             /* Number of bolometers */
   dim_t ndata;             /* Number of data points */
-  dim_t nf;                /* Number of frequencies */
+  dim_t nf=0;              /* Number of frequencies */
   size_t ngood;            /* Number of good samples */
   dim_t ntslice;           /* Number of time slices */
   double p_low;            /* Power at f_low */
@@ -220,7 +220,7 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data,
 
   {
     dim_t fdims[2];
-    smf_isfft( pow, NULL, NULL, fdims, NULL, status );
+    smf_isfft( pow, NULL, NULL, fdims, NULL, NULL, status );
     if( *status == SAI__OK ) nf=fdims[0];
   }
 

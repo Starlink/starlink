@@ -112,7 +112,8 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
   double amp=0;                 /* Amplitude coeff */
   double *baseR=NULL;           /* base pointer to real/amplitude coeff */
   double *baseI=NULL;           /* base pointer to imag/argument coeff */
-  double df=1;                  /* frequency steps in Hz, or (1/arcsec)^2 */
+  double df;                    /* Product of df all axes */
+  double df_data[2]={1,1};      /* frequency steps in Hz, or (1/arcsec)^2 */
   dim_t fdims[2];               /* Lengths of frequency-space axes */
   size_t i;                     /* Loop counter */
   double imag;                  /* Imaginary coeff */
@@ -133,7 +134,7 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
             " (possible programming error)", status);
   }
 
-  if( !smf_isfft(data, rdims, &nbolo, fdims, &ndims, status) ) {
+  if( !smf_isfft(data, rdims, &nbolo, fdims, df_data, &ndims, status) ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": smfData provided is not FFT data"
             " (possible programming error)", status);
@@ -141,42 +142,12 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
 
   if( *status != SAI__OK ) return;
 
-  nf = 1;
-  for( i=0; i<ndims; i++ ) nf *= fdims[i];
-
-  /* Need to know df to get normalization right when dealing with PSDs */
-  if( power ) {
-
-    if( ndims == 1 ) {
-      /* Time-series cube */
-
-      if( data->hdr && data->hdr->steptime ) {
-        df = 1. / (data->hdr->steptime * (double) rdims[0] );
-      } else {
-        msgOut( "", FUNC_NAME ": *** Warning *** no valid steptime "
-                "encountered, so setting frequency bin width df=1 "
-                "(PSD units will be meaningless)", status );
-      }
-    } else if( ndims == 2 ) {
-      /* Map */
-
-      if( data->hdr && data->hdr->wcs ) {
-        double pixsize;
-        double df_x;
-        double df_y;
-
-        pixsize = smf_map_getpixsize( data, status );
-        df_x = 1. / (pixsize * (double) rdims[0]);
-        df_y = 1. / (pixsize * (double) rdims[1]);
-        df = df_x*df_y;
-      } else {
-        msgOut( "", FUNC_NAME ": *** Warning *** no valid steptime "
-                "encountered, so setting spatial frequency bin df=1 "
-                "(PSD units will be meaningless)", status );
-      }
-    }
+  nf = fdims[0];
+  df = df_data[0];
+  for( i=1; i<ndims; i++ ) {
+    nf *= fdims[i];
+    df *= df_data[i];
   }
-
 
   /* Loop over bolometer if time-series, or only a single pass if we
      are looking at the FFT of a map. */

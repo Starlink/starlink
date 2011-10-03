@@ -150,7 +150,7 @@ void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
        ts=1;
      }
      nd = nb*nt;
-   } else if( smf_isfft( data, rdims, &nb, fdims, NULL, status ) ) {
+   } else if( smf_isfft( data, rdims, &nb, fdims, NULL, NULL, status ) ) {
      /* FFT data are basically two consecutive blocks of bolo-ordered
         data, each of length nf frequencies * nbolos, for the real and
         imaginary parts respectively */

@@ -413,8 +413,9 @@ void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
                      flags, &refdata, status );
 
       if( isFFT == -1 ) {
-        isFFT = smf_isfft(refdata, NULL, NULL, NULL, NULL, status);
-      } else if( smf_isfft(refdata, NULL, NULL, NULL, NULL, status) != isFFT ) {
+        isFFT = smf_isfft(refdata, NULL, NULL, NULL, NULL, NULL, status);
+      } else if( smf_isfft(refdata, NULL, NULL, NULL, NULL, NULL, status) !=
+                 isFFT ) {
         *status = SAI__ERROR;
         errRep( "", FUNC_NAME
                 ": mixture of time-series and FFT data encountered!",

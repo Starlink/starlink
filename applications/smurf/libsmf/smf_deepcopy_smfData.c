@@ -217,7 +217,8 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
      have a 3rd axis of length 1, and smf_isfft tells us */
 
   if( assertOrder && (old->ndims==3) &&
-      !smf_isfft( old, NULL, NULL, NULL, &nrdims, status ) && (nrdims != 2) ) {
+      !smf_isfft( old, NULL, NULL, NULL, NULL, &nrdims, status ) &&
+      (nrdims != 2) ) {
     if( old->isTordered != isTordered ) {
       reOrder = 1;
       newOrder = isTordered;

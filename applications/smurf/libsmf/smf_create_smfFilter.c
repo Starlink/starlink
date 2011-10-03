@@ -112,7 +112,6 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
   AstZoomMap *scalemapping=NULL;/* Scale grid coordinates by df */
   AstSpecFrame *specframe=NULL; /* Current Frame of 1-D spectrum */
   AstCmpMap *specmapping=NULL;  /* Mapping from GRID to FREQ */
-  double steptime;              /* Length of a sample in seconds */
   double zshift;                /* Amount by which to shift origin */
   AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of GRID */
 
@@ -131,9 +130,9 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
     return NULL;
   }
 
-  isfft = smf_isfft( template, rdims, NULL, fdims, &ndims, status );
-
   filt = astCalloc( 1, sizeof(smfFilter) );
+
+  isfft = smf_isfft( template, rdims, NULL, fdims, filt->df, &ndims, status );
 
   if( *status == SAI__OK ) {
 
@@ -150,16 +149,10 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
     if( ndims == 1 ) {
       /* --- Filter for time-series data  --- */
 
-      /* Figure out length of a sample in order to calculate df */
-      steptime = template->hdr->steptime;
-
       if( *status == SAI__OK ) {
 
         /* Start an AST context */
         astBegin;
-
-        /* Frequency step in Hz */
-        filt->df[0] = 1. / (steptime * (double) filt->rdims[0]);
 
         /* Create a new FrameSet containing a 2d base GRID frame */
 
@@ -200,18 +193,9 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
         AstFrame *curframe_x=NULL;
         AstFrame *curframe_y=NULL;
         AstCmpMap *fftmapping=NULL;
-        double pixsize;
         AstUnitMap *scalemap_c=NULL;
         AstZoomMap *scalemap_x=NULL;
         AstZoomMap *scalemap_y=NULL;
-
-         /* Obtain the spacings in frequency space */
-
-        pixsize = smf_map_getpixsize( template, status );
-        if( *status == SAI__OK ) {
-          filt->df[0] = 1. / (pixsize * (double) rdims[0]);
-          filt->df[1] = 1. / (pixsize * (double) rdims[1]);
-        }
 
         /* Start an AST context */
         astBegin;

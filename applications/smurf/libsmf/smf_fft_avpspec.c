@@ -139,7 +139,7 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
   }
 
   /* Check that we have frequency-domain input */
-  if( !smf_isfft( pspec, rdims, &nbolo, fdims, NULL, status ) ) {
+  if( !smf_isfft( pspec, rdims, &nbolo, fdims, NULL, NULL, status ) ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": Input data are not FFT!", status );
     return NULL;

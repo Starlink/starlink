@@ -302,7 +302,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
   double *baseI=NULL;           /* base pointer to imag part of fourier data */
   double *baseD=NULL;           /* base pointer to real space data */
   smfData *data=NULL;           /* pointer to bolo-ordered data */
-  double df=0;                  /* Frequency step size in Hz */
+  double df[2]={0,0};           /* Frequency step size Hz (1-d) 1/arcsec (2-d)*/
   fftw_iodim *dims=NULL;        /* FFTW I/O dimensions for transformations */
   dim_t fdims[2];               /* Frequency dimensions */
   int i;                        /* Loop counter */
@@ -343,7 +343,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
   /* Call smf_isfft to check to see if we have real-space or FFT
      data, and obtain dimensions. */
 
-  isFFT = smf_isfft( indata, rdims, &nbolo, fdims, &ndims, status );
+  isFFT = smf_isfft( indata, rdims, &nbolo, fdims, df, &ndims, status );
 
   if( *status != SAI__OK ) return NULL;
 
@@ -621,14 +621,6 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
           if( ndims == 1 ) {
             /* Transform of a time-series cube */
 
-            double steptime = retdata->hdr->steptime;
-            if( steptime < VAL__SMLD ) {
-              *status = SAI__ERROR;
-              errRep( "", FUNC_NAME
-                      ": FITS header error: STEPTIME must be > 0",
-                      status);
-            }
-
             if( *status == SAI__OK ) {
               AstUnitMap *cmapping=NULL;    /* Mapping grid to curframe3d */
               AstFrame *curframe1d=NULL;    /* 1d frame (real/imag coeff) */
@@ -644,9 +636,6 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
               double zshift;                /* Amount to shift freq. origin */
               AstShiftMap *zshiftmapping=NULL; /* shift origin of freq GRID */
               AstMapping *zshiftmapping2=NULL; /* shift origin of bolo GRID */
-
-              /* Frequency steps in the FFT */
-              df = 1. / (steptime * (double) nr );
 
               /* Start an AST context */
               astBegin;
@@ -677,7 +666,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
 
               zshift = -1;
               zshiftmapping = astShiftMap( 1, &zshift, " " );
-              scalemapping = astZoomMap( 1, df, " " );
+              scalemapping = astZoomMap( 1, df[0], " " );
               specmapping = astCmpMap( zshiftmapping, scalemapping, 1, " " );
 
               mapping3d = astCmpMap( specmapping, zshiftmapping2, 0, " " );
@@ -712,23 +701,11 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
             AstFrame *curframe_c=NULL;
             AstFrame *curframe_x=NULL;
             AstFrame *curframe_y=NULL;
-            double df_x=0;
-            double df_y=0;
             AstCmpMap *fftmapping=NULL;
             AstFrameSet *fftwcs=NULL;
-            double pixsize;
             AstUnitMap *scalemap_c=NULL;
             AstZoomMap *scalemap_x=NULL;
             AstZoomMap *scalemap_y=NULL;
-
-            /* Obtain the spacings in frequency space */
-
-            pixsize = smf_map_getpixsize( indata, status );
-
-            if( *status == SAI__OK ) {
-              df_x = 1. / (pixsize * (double) rdims[0]);
-              df_y = 1. / (pixsize * (double) rdims[1]);
-            }
 
             /* Start an AST context */
             astBegin;
@@ -749,8 +726,8 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
                for the first two axes, and we just use a unit mapping for
                the component axis */
 
-            scalemap_x = astZoomMap( 1, df_x, " " );
-            scalemap_y = astZoomMap( 1, df_y, " " );
+            scalemap_x = astZoomMap( 1, df[0], " " );
+            scalemap_y = astZoomMap( 1, df[1], " " );
             scalemap_c = astUnitMap( 1, " " );
 
             fftmapping = astCmpMap( astCmpMap( scalemap_x, scalemap_y, 0, " " ),

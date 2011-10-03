@@ -239,7 +239,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
 
       /* Calculate the FFT of the data */
       fft_idata = smf_fft_data( NULL, idata, 0, 0, status );
-      smf_isfft( fft_idata, NULL, NULL, fdims, NULL, status );
+      smf_isfft( fft_idata, NULL, NULL, fdims, NULL, NULL, status );
       nf_i = fdims[0];
 
       /* Output data have fewer frequencies */

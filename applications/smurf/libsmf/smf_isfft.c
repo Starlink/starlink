@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     int smf_isfft( const smfData *indata, dim_t *rdims, dim_t *nbolo,
-*                    dim_t fdims[2], size_t *ndims, int *status );
+*                    dim_t fdims[2], double df[2], size_t *ndims,
+*                    int *status );
 
 *  Arguments:
 *     indata = const smfData * (Given)
@@ -31,6 +32,9 @@
 *        Optionally return the lengths of the transformed frequency
 *        axes (see ndims). Unused dimensions are set to a length of 0. Can
 *        be NULL.
+*     df = double[2] (Returned)
+*        If requested, calculate frequency step sizes in the FFT (Hz if 1-d,
+*        1/arcsec is 2-d). Can be NULL.
 *     ndims = size_t* (Returned)
 *        Number of real-space dimensions. Set to 1 if transformed
 *        time-series data, or 2 if transformed map data. Can be NULL.
@@ -70,6 +74,8 @@
 *     2011-09-21 (EC):
 *        Simplify behaviour now that we have smfData.isFFT, make it
 *        support FFTs of 2D maps, and return real and fourier-space dimensions
+*     2011-10-03 (EC):
+*        Add df.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -123,7 +129,7 @@
 #define FUNC_NAME "smf_isfft"
 
 int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
-               dim_t fdims[2], size_t *ndims, int *status ) {
+               dim_t fdims[2], double df[2], size_t *ndims, int *status ) {
 
   dim_t fdims0[2]={0,0};        /* Lengths of frequency axes */
   size_t i;                     /* Loop counter */
@@ -257,6 +263,34 @@ int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
   if( fdims ) {
     fdims[0] = fdims0[0];
     fdims[1] = fdims0[1];
+  }
+
+  if( df ) {
+
+    if( indata->hdr ) {
+      df[0] = VAL__BADD;
+      df[1] = VAL__BADD;
+
+      if( ndims0 == 1 ) {
+
+      } else if( ndims0 == 2 ) {
+        double pixsize;
+
+        pixsize = smf_map_getpixsize( indata, status );
+
+        if( *status == SAI__OK ) {
+          for( i=0; i<ndims0; i++ ) {
+            df[i] = 1. / (pixsize * (double) rdims0[i]);
+          }
+        }
+      }
+    } else {
+      if( *status == SAI__OK ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME
+                ": df requested, but supplied smfData has no header", status );
+      }
+    }
   }
 
   if( ndims ) *ndims = ndims0;

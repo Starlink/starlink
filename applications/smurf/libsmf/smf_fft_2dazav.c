@@ -106,8 +106,7 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
 
   size_t *count=NULL;           /* Count of data at this radius */
   double df_o=1;                /* Spatial freq. step of output */
-  double df_x=1;                /* Spatial freq. step x-axis of map */
-  double df_y=1;                /* Spatial freq. step y-axis of map */
+  double df[2]={1,1};           /* Spatial freq. step x/y-axes of map */
   dim_t fdims[2];               /* Frequency space dimensions */
   size_t i;                     /* Loop counter */
   double *idata=NULL;           /* Input 2d data pointer */
@@ -115,7 +114,7 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
   size_t nf_o=0;                /* Length output frequency axis (to Nyquist) */
   size_t ndims;                 /* Number of real dimensions */
   double *odata=NULL;           /* Output 1d data pointer */
-  double pixsize=1.;            /* Map pixel size in arcsec */
+  double pixsize;               /* Map pixel size */
   smfData *retdata=NULL;        /* Returned 1-d smfData */
   dim_t rdims[2];               /* Real space dimensions */
   int whichaxis=0;              /* Which frequency axis for output */
@@ -130,7 +129,7 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
   }
 
   /* Check that we have frequency-domain input */
-  if( !smf_isfft( data, rdims, NULL, fdims, &ndims, status ) ) {
+  if( !smf_isfft( data, rdims, NULL, fdims, df, &ndims, status ) ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": Input data are not FFT!", status );
     return NULL;
@@ -142,26 +141,20 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
     return NULL;
   }
 
-  /* Work out the spatial frequency spacing along each axis in the 2-d map,
-     as well as for the length and step size for the 1-d output */
-  if( data->hdr && data->hdr->wcs ) {
-    pixsize = smf_map_getpixsize( data, status );
-  }
+  /* Get pixel size to help determine step size for the 1-d output */
+  pixsize = smf_map_getpixsize( data, status );
 
   if( *status == SAI__OK ) {
-    df_x = 1. / (pixsize * (double) rdims[0]);
-    df_y = 1. / (pixsize * (double) rdims[1]);
-
     /* To ensure that we hit the full range of frequencies sampled up
        to Nyquist, and at the highest natural resolution, we span the
        frequency axes in steps the size of the higher-resolution
        (longer spatial) axis */
 
     if( rdims[1] > rdims[0] ) {
-      df_o = df_y;
+      df_o = df[1];
       whichaxis = 2;
     } else {
-      df_o = df_x;
+      df_o = df[0];
       whichaxis = 1;
     }
 
@@ -205,8 +198,8 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
            indices multiplied by the frequency step size along each
            axis. */
 
-        x = FFT_INDEX_2_FREQ(i,fdims[0]) * df_x;
-        y = FFT_INDEX_2_FREQ(j,fdims[1]) * df_y;
+        x = FFT_INDEX_2_FREQ(i,fdims[0]) * df[0];
+        y = FFT_INDEX_2_FREQ(j,fdims[1]) * df[1];
 
         /* The final distance is just truncated to an integer number of
            steps in the return array */

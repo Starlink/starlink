@@ -186,7 +186,7 @@ void smurf_sc2mapfft( int *status ) {
 
   for( i=1;(*status==SAI__OK)&&i<=size; i++ ) {
     smf_open_file( igrp, i, "READ", SMF__NOTTSERIES, &idata, status );
-    isfft = smf_isfft( idata, NULL, NULL, NULL, &ndims, status);
+    isfft = smf_isfft( idata, NULL, NULL, NULL, NULL, &ndims, status);
 
     if( (*status==SAI__OK) && (ndims != 2) ) {
       *status = SAI__ERROR;
