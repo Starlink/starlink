@@ -4,7 +4,7 @@
 *     smf_filter_edge
 
 *  Purpose:
-*     Apply a hard low- or high-pass edge to a smfFilter at given frequency
+*     Apply a hard low- or high-pass edge to a 1-d smfFilter at given frequency
 
 *  Language:
 *     Starlink ANSI C
@@ -99,11 +99,18 @@ void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status ) {
   size_t iedge;         /* Index corresponding to the edge frequency */
   size_t len;           /* Length of memory to be zero'd */
 
-  if (*status != SAI__OK) return;
+  if( *status != SAI__OK ) return;
 
   if( !filt ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, "NULL smfFilter supplied.", status );
+    return;
+  }
+
+  if( filt->ndims != 1 ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": function only generates filters for time-series",
+            status );
     return;
   }
 
@@ -114,13 +121,13 @@ void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status ) {
   }
 
   /* Calculate offset of edge frequency in filter */
-  iedge = smf_get_findex( f, filt->df, filt->dim, status );
+  iedge = smf_get_findex( f, filt->df[0], filt->fdims[0], status );
 
   /* Since we're zero'ing a continuous piece of memory, just use memset */
 
   if( lowpass ) { /* Zero frequencies beyond edge */
     base = iedge;
-    len = filt->dim - iedge;
+    len = filt->fdims[0] - iedge;
   } else {        /* Zero frequencies from 0 to edge */
     base = 0;
     len = iedge + 1;

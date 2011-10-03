@@ -4,7 +4,7 @@
 *     smf_filter_fromkeymap
 
 *  Purpose:
-*     Build a smfFilter from parameters given in an astKeyMap
+*     Build a 1-d smfFilter from parameters given in an astKeyMap
 
 *  Language:
 *     Starlink ANSI C
@@ -126,7 +126,20 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
   int whitening;            /* Will we apply a whitening filter? */
 
   /* Main routine */
-  if (*status != SAI__OK) return;
+  if( *status != SAI__OK ) return;
+
+  if( !filt ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": NULL smfFilter pointer", status );
+    return;
+  }
+
+  if( filt->ndims != 1 ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": can only create time-series filters at present",
+            status );
+    return;
+  }
 
   /* Search for filtering parameters in the keymap */
   smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -183,7 +196,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
          }
 
          if( f_low != VAL__MAXD ) {
-            filt->apod_length = 0.5*filt->df*filt->ntslice/f_low;
+            filt->apod_length = 0.5*filt->df[0]*filt->rdims[0]/f_low;
          } else {
             filt->apod_length = 0;
          }

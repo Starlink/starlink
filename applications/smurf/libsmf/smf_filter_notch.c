@@ -4,7 +4,7 @@
 *     smf_filter_notch
 
 *  Purpose:
-*     Apply N hard-edged notch filters to a smfFilter
+*     Apply N hard-edged notch filters to a 1-d smfFilter
 
 *  Language:
 *     Starlink ANSI C
@@ -123,6 +123,13 @@ void smf_filter_notch( smfFilter *filt, const double f_low[],
     return;
   }
 
+  if( filt->ndims != 1 ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": can only create time-series filters at present",
+            status );
+    return;
+  }
+
   /* If filt->real is NULL, create a real identity filter first */
   if( !filt->real ) {
     smf_filter_ident( filt, 0, status );
@@ -133,11 +140,15 @@ void smf_filter_notch( smfFilter *filt, const double f_low[],
   for( i=0; (*status == SAI__OK) && i<n; i++ ) {
     /* Calculate edge offsets for notch, checking for reversed inputs */
     if( f_high[i] > f_low[i] ) {
-      iedge_low = smf_get_findex( f_low[i], filt->df, filt->dim, status );
-      iedge_high = smf_get_findex( f_high[i], filt->df, filt->dim, status );
+      iedge_low = smf_get_findex( f_low[i], filt->df[0], filt->rdims[0],
+                                  status );
+      iedge_high = smf_get_findex( f_high[i], filt->df[0], filt->rdims[0],
+                                   status );
     } else {
-      iedge_low = smf_get_findex( f_high[i], filt->df, filt->dim, status );
-      iedge_high = smf_get_findex( f_low[i], filt->df, filt->dim, status );
+      iedge_low = smf_get_findex( f_high[i], filt->df[0], filt->rdims[0],
+                                  status );
+      iedge_high = smf_get_findex( f_low[i], filt->df[0], filt->rdims[0],
+                                   status );
     }
 
     if( *status == SAI__OK ) {

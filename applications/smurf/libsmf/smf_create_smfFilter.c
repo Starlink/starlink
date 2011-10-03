@@ -51,11 +51,13 @@
 *        Generate WCS that can be used when writing filter to an NDF
 *     2008-07-29 (TIMJ):
 *        Steptime is now in smfHead.
+*     2011-10-03 (EC):
+*        Support 2-d map filters
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2008,2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -100,8 +102,13 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
   AstFrame *cframe=NULL;        /* Current real/imag frame */
   AstUnitMap *cmapping=NULL;    /* Mapping from grid to cframe */
   AstCmpFrame *curframe2d=NULL; /* Current Frame for 2-d FFT */
+  dim_t fdims[2];               /* Frequency space dimensions */
   smfFilter *filt=NULL;         /* Pointer to returned struct */
   AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
+  size_t i;                     /* Loop counter */
+  int isfft;                    /* Is the template FFT'd data? */
+  size_t ndims;                 /* Number of dimensions */
+  dim_t rdims[2];               /* Real space dimensions */
   AstZoomMap *scalemapping=NULL;/* Scale grid coordinates by df */
   AstSpecFrame *specframe=NULL; /* Current Frame of 1-D spectrum */
   AstCmpMap *specmapping=NULL;  /* Mapping from GRID to FREQ */
@@ -109,101 +116,150 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
   double zshift;                /* Amount by which to shift origin */
   AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of GRID */
 
-  if (*status != SAI__OK) return NULL;
+  if( *status != SAI__OK ) return NULL;
 
-  filt = astMalloc( 1*sizeof(smfFilter) );
+  if( !template ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": NULL template supplied", status );
+    return NULL;
+  }
+
+  if( !template->hdr ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME
+            ": no hdr in template, can't calculate frequency steps", status );
+    return NULL;
+  }
+
+  isfft = smf_isfft( template, rdims, NULL, fdims, &ndims, status );
+
+  filt = astCalloc( 1, sizeof(smfFilter) );
 
   if( *status == SAI__OK ) {
-    filt->real = NULL;
+
     filt->imag = NULL;
-    filt->isComplex = 0;
+    filt->real = NULL;
     filt->wcs = NULL;
 
-    if( template ) {
-      if( template->ndims == 3 ) {
-        if( template->isTordered ) { /* T is 3rd axis if time-ordered */
-          filt->ntslice = template->dims[2];
-        } else {                     /* T is 1st axis if time-ordered */
-          filt->ntslice = template->dims[0];
-        }
+    filt->ndims = ndims;
+    for( i=0; i<ndims; i++ ) {
+      filt->fdims[i] = fdims[i];
+      filt->rdims[i] = rdims[i];
+    }
 
-      } else if( template->ndims == 1 ) {
-        /* If 1-d data, only one axis to choose from */
-        filt->ntslice = template->dims[0];
-      } else {
-        *status = SAI__ERROR;
-        errRep( FUNC_NAME, "smfData template is not 3d", status );
-      }
+    if( ndims == 1 ) {
+      /* --- Filter for time-series data  --- */
+
+      /* Figure out length of a sample in order to calculate df */
+      steptime = template->hdr->steptime;
 
       if( *status == SAI__OK ) {
 
-        /* The actual length is ntslice/2+1 because the input bolo data is
-           real; FFTW optimizes memory usage in this case since the
-           negative frequencies in the transform contain the same
-           information as the positive frequencies */
-        filt->dim = filt->ntslice/2+1;
+        /* Start an AST context */
+        astBegin;
 
-        if( template->hdr ) {
-          /* Figure out length of a sample in order to calculate df */
-          steptime = template->hdr->steptime;
+        /* Frequency step in Hz */
+        filt->df[0] = 1. / (steptime * (double) filt->rdims[0]);
 
-          if( *status == SAI__OK ) {
+        /* Create a new FrameSet containing a 2d base GRID frame */
 
-            /* Start an AST context */
-            astBegin;
+        filt->wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), " " );
 
-            /* Frequency step in Hz */
-            filt->df = 1. / (steptime * (double) filt->ntslice);
+        /* The current frame will have freq. along first axis, and
+           real/imag coefficients along the other */
 
-            /* Create a new FrameSet containing a 2d base GRID frame */
+        specframe = astSpecFrame( "System=freq,Unit=Hz,StdOfRest=Topocentric" );
+        cframe = astFrame( 1, "Domain=GRID" );
+        curframe2d = astCmpFrame( specframe, cframe, " " );
 
-            filt->wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), " " );
+        /* The mapping from 2d grid coordinates to (frequency, coeff) is
+           accomplished with a shift and a zoommap for the 1st dimension,
+           and a unit mapping for the other */
 
-            /* The current frame will have freq. along first axis, and
-               real/imag coefficients along the other */
+        zshift = -1;
+        zshiftmapping = astShiftMap( 1, &zshift, " " );
+        scalemapping = astZoomMap( 1, filt->df[0], " " );
+        specmapping = astCmpMap( zshiftmapping, scalemapping, 1, " " );
 
-            specframe = astSpecFrame( "System=freq,Unit=Hz,StdOfRest=Topocentric" );
-            cframe = astFrame( 1, "Domain=GRID" );
-            curframe2d = astCmpFrame( specframe, cframe, " " );
+        cmapping = astUnitMap( 1, " " );
 
-            /* The mapping from 2d grid coordinates to (frequency, coeff) is
-               accomplished with a shift and a zoommap for the 1st dimension,
-               and a unit mapping for the other */
+        fftmapping = astCmpMap( specmapping, cmapping, 0, " " );
 
-            zshift = -1;
-            zshiftmapping = astShiftMap( 1, &zshift, " " );
-            scalemapping = astZoomMap( 1, filt->df, " " );
-            specmapping = astCmpMap( zshiftmapping, scalemapping, 1, " " );
+        /* Add the curframe2d with the fftmapping to the frameset */
+        astAddFrame( filt->wcs, AST__BASE, fftmapping, curframe2d );
 
-            cmapping = astUnitMap( 1, " " );
+        /* Export the frameset before ending the AST context */
+        astExport( filt->wcs );
+        astEnd;
 
-            fftmapping = astCmpMap( specmapping, cmapping, 0, " " );
+      } else if( ndims == 2 ) {
+        /* --- Filter for map data  --- */
 
-            /* Add the curframe2d with the fftmapping to the frameset */
-            astAddFrame( filt->wcs, AST__BASE, fftmapping, curframe2d );
+        AstCmpFrame *curframe=NULL;
+        AstFrame *curframe_c=NULL;
+        AstFrame *curframe_x=NULL;
+        AstFrame *curframe_y=NULL;
+        AstCmpMap *fftmapping=NULL;
+        double pixsize;
+        AstUnitMap *scalemap_c=NULL;
+        AstZoomMap *scalemap_x=NULL;
+        AstZoomMap *scalemap_y=NULL;
 
-            /* Export the frameset before ending the AST context */
-            astExport( filt->wcs );
-            astEnd;
-          }
+         /* Obtain the spacings in frequency space */
 
-
-
-        } else {
-          *status = SAI__ERROR;
-          errRep( FUNC_NAME,
-                  "No hdr associated with template, can't determine step time",
-                  status );
+        pixsize = smf_map_getpixsize( template, status );
+        if( *status == SAI__OK ) {
+          filt->df[0] = 1. / (pixsize * (double) rdims[0]);
+          filt->df[1] = 1. / (pixsize * (double) rdims[1]);
         }
+
+        /* Start an AST context */
+        astBegin;
+
+        /* Create a new frameset containing a 3d base GRID frame */
+        filt->wcs = astFrameSet( astFrame( 3, "Domain=GRID" ), " " );
+
+        /* The current frame will consist of two spatial frequencies,
+           and a fourier component */
+        curframe_x =  astFrame( 1,"label=Spatial Frequency,Unit=1/arcsec");
+        curframe_y =  astFrame( 1,"label=Spatial Frequency,Unit=1/arcsec");
+        curframe_c =  astFrame( 1,"Domain=COEFF,label=Real/Imag component");
+
+        curframe = astCmpFrame( astCmpFrame( curframe_x, curframe_y, " " ),
+                                curframe_c, " " );
+
+        /* The mapping will scale by the spatial frequency step sizes
+           for the first two axes, and we just use a unit mapping for
+           the component axis */
+
+        scalemap_x = astZoomMap( 1, filt->df[0], " " );
+        scalemap_y = astZoomMap( 1, filt->df[1], " " );
+        scalemap_c = astUnitMap( 1, " " );
+
+        fftmapping = astCmpMap( astCmpMap( scalemap_x, scalemap_y, 0, " " ),
+                                scalemap_c, 0, " " );
+
+        /* Add curframe with the fftmapping to the frameset */
+        astAddFrame( filt->wcs, AST__BASE, fftmapping, curframe );
+
+        /* Export and store it in the place of TSWCS in the header. We
+           do this so that we can preserve the 2D map WCS, and since
+           it is 3-d smf_write_smfData will use it automagically */
+        astExport( filt->wcs );
+        astEnd;
+
+
+      } else {
+        *status = SAI__ERROR;
+        errRepf( "", FUNC_NAME
+                 ": don't know how to handle template with %zu real-space dims",
+                 status, ndims );
       }
-    } else {
-      *status = SAI__ERROR;
-      errRep( FUNC_NAME, "NULL smfData template", status );
     }
   }
 
   /* If we have bad status free filt */
-  if( *status != SAI__OK ) {
+  if( (*status != SAI__OK) && filt ) {
     filt = astFree( filt );
   }
 

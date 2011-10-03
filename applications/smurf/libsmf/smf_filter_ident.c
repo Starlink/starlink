@@ -43,11 +43,13 @@
 *        Move normalization here from smf_filter_execute
 *     2008-06-12 (EC):
 *        -Switch to split real/imaginary arrays for smfFilter
+*     2011-10-03 (EC):
+*        Handle 2-d map filters
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008, 2011 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -89,6 +91,8 @@
 
 void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
   dim_t i;         /* Loop counter */
+  size_t nfdata;   /* Number of frequency-space data values */
+  size_t nrdata;   /* Number of real-space data values */
   double val;      /* Value to set each element includes normalization */
 
   if (*status != SAI__OK) return;
@@ -99,27 +103,34 @@ void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
     return;
   }
 
-  if( !filt->ntslice ) {
+  if( !filt->rdims[0] || !filt->ndims ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": 0-length smfFilter supplied.", status );
     return;
   }
 
-  /* The filter values are set to 1/ntslice -- this normalization is required
+  /* The filter values are set to 1/nrdata -- this normalization is required
      given the FFTW convention */
-  val = 1./ (double) filt->ntslice;
+  nrdata=1;
+  nfdata=1;
+  for( i=0; i<filt->ndims; i++ ) {
+    nrdata *= filt->rdims[i];
+    nfdata *= filt->fdims[i];
+  }
+
+  val = 1./ (double) nrdata;
 
   /* Allocate space for real and imaginary parts and initialize */
-  filt->real = astMalloc( (filt->dim)*sizeof(*filt->real) );
+  filt->real = astMalloc( nfdata*sizeof(*filt->real) );
 
   if( *status == SAI__OK ) {
-    for( i=0; i<filt->dim; i++ ) {
+    for( i=0; i<nfdata; i++ ) {
       filt->real[i] = val;
     }
   }
 
   if( complex ) {
-    filt->imag = astCalloc( filt->dim, sizeof(*filt->imag) );
+    filt->imag = astCalloc( nfdata, sizeof(*filt->imag) );
     filt->isComplex = 1;
   }
 }

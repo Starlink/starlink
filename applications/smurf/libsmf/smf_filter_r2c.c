@@ -40,11 +40,13 @@
 *        Initial version
 *     2008-06-12 (EC):
 *        -Switch to split real/imaginary arrays for smfFilter
+*     2011-10-03 (EC):
+*        Handle 2-d map filters
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008,2011 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -82,6 +84,9 @@
 
 void smf_filter_r2c( smfFilter *filt, int *status ) {
 
+  size_t i;
+  size_t nfdata;
+
   if (*status != SAI__OK) return;
 
   if( !filt ) {
@@ -98,7 +103,10 @@ void smf_filter_r2c( smfFilter *filt, int *status ) {
   if( filt->isComplex ) return;
 
   /* Allocate space for the imaginary part */
-  filt->imag = astCalloc( filt->dim, sizeof(*filt->imag) );
+  nfdata=1;
+  for( i=0; i>filt->ndims; i++ ) nfdata *= filt->fdims[i];
+
+  filt->imag = astCalloc( nfdata, sizeof(*filt->imag) );
 
   if( *status == SAI__OK ) {
     filt->isComplex = 1;

@@ -188,6 +188,8 @@
 *        Add SMF__Q_BADEF.
 *     2011-09-20 (EC):
 *        Add isFFT to smfData
+*     2011-10-03 (EC):
+*        Extend smfFilter to handle 2-d map filters
 *     {enter_further_changes_here}
 
  *  Copyright:
@@ -785,11 +787,12 @@ typedef struct smfTile {
 /* Structure to encapsulate frequency-domain filters implemented with FFTW. */
 typedef struct smfFilter {
   size_t apod_length;   /* apodization length */
-  double df;            /* frequency step for each sample [Hz] */
-  dim_t dim;            /* number of samples in filt */
+  double df[2];         /* frequency steps along each axis [Hz or 1/arcsec] */
+  dim_t fdims[2];       /* filter frequency dimensions */
   double *imag;         /* Imaginary part of the filter */
   int isComplex;        /* Set if filter is fftw_complex, otherwise double */
-  dim_t ntslice;        /* # of time slices in input data */
+  size_t ndims;         /* Should be 1 for time-series, or 2 for maps */
+  dim_t rdims[2];       /* corresponding real space dimensions */
   double *real;         /* Real part of the filter */
   AstFrameSet *wcs;     /* Frameset describing filter */
   double wlim;          /* Minimum weight for valid filtered values */

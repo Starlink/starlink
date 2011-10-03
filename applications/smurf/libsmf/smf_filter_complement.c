@@ -40,6 +40,8 @@
 *  History:
 *     2010-09-23 (EC):
 *        Initial version
+*     2011-10-03 (EC):
+*        Handle 2-d map filters
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -86,6 +88,8 @@
 
 void smf_filter_complement( smfFilter *filt, int *status ) {
   size_t i;         /* Loop counter */
+  size_t nrdata;    /* Number of real-space data points */
+  size_t nfdata;    /* Number of frequency-space data points */
   double ref;       /* Reference value for complement */
 
   if (*status != SAI__OK) return;
@@ -96,7 +100,7 @@ void smf_filter_complement( smfFilter *filt, int *status ) {
     return;
   }
 
-  if( !filt->ntslice ) {
+  if( !filt->rdims[0] || !filt->ndims ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": 0-length smfFilter supplied.", status );
     return;
@@ -105,15 +109,22 @@ void smf_filter_complement( smfFilter *filt, int *status ) {
   /* If this is an un-initialized filter simply return */
   if( !filt->real ) return;
 
-  /* The reference values are normalized to 1/ntslice -- by FFTW convention */
-  ref = 1./ (double) filt->ntslice;
+  /* The reference values are normalized to 1/nrdata -- by FFTW convention */
+  nrdata=1;
+  nfdata=1;
+  for( i=0; i<filt->ndims; i++ ) {
+    nrdata *= filt->rdims[i];
+    nfdata *= filt->fdims[i];
+  }
 
-  for( i=0; i<filt->dim; i++ ) {
+  ref = 1./(double) nrdata;
+
+  for( i=0; i<nfdata; i++ ) {
     filt->real[i] = ref - filt->real[i];
   }
 
   if( filt->isComplex ) {
-    for( i=0; i<filt->dim; i++ ) {
+    for( i=0; i<nfdata; i++ ) {
       filt->imag[i] = -filt->imag[i];
     }
   }

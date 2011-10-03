@@ -287,15 +287,15 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 
   /* If required, create arrays holding the inverted filter values */
   if( invert ) {
-    unit = 1.0/filt->ntslice;
+    unit = 1.0/filt->rdims[0];
 
     if( filt->isComplex ) {
 
-      inv_filt_r = astMalloc( filt->dim*sizeof( *inv_filt_r ) );
-      inv_filt_i = astMalloc( filt->dim*sizeof( *inv_filt_i ) );
+      inv_filt_r = astMalloc( filt->fdims[0]*sizeof( *inv_filt_r ) );
+      inv_filt_i = astMalloc( filt->fdims[0]*sizeof( *inv_filt_i ) );
       if( *status == SAI__OK ) {
 
-        for( j = 0; j < filt->dim; j++ ) {
+        for( j = 0; j < filt->fdims[0]; j++ ) {
           fr = filt->real[ j ];
           fi = filt->imag[ j ];
           rad = sqrt( fr*fr + fi*fi );
@@ -317,10 +317,10 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 
     } else {
 
-      inv_filt_r = astMalloc( filt->dim*sizeof( *inv_filt_r ) );
+      inv_filt_r = astMalloc( filt->fdims[0]*sizeof( *inv_filt_r ) );
       if( *status == SAI__OK ) {
 
-        for( j = 0; j < filt->dim; j++ ) {
+        for( j = 0; j < filt->fdims[0]; j++ ) {
           fr = filt->real[ j ];
           inv_filt_r[ j ] = unit - fr;
         }
@@ -393,9 +393,9 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
             normalization here if we're not applying a smfFilter to the
             data */
          if( (iloop==0) && (pdata->whiten) ) {
-           double scale = use_filt_r ? 0 : 1. / (double ) filt->ntslice;
+           double scale = use_filt_r ? 0 : 1. / (double ) filt->rdims[0];
 
-           smf_whiten( data_fft_r, data_fft_i, filt->df, filt->dim, 50,
+           smf_whiten( data_fft_r, data_fft_i, filt->df[0], filt->fdims[0], 50,
                        scale, pdata->complement, status );
          }
 
@@ -403,7 +403,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
             filter values are NULL (i.e. if we are only whitening) */
          if( use_filt_r && (*status==SAI__OK) ) {
            if( filt->isComplex ) {
-             for( j=0; j<filt->dim; j++ ) {
+             for( j=0; j<filt->fdims[0]; j++ ) {
                /* Complex times complex, using only 3 multiplies */
                ac = data_fft_r[j] * use_filt_r[j];
                bd = data_fft_i[j] * use_filt_i[j];
@@ -415,7 +415,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
                data_fft_i[j] = aPb*cPd - ac - bd;
              }
            } else {
-             for( j=0; j<filt->dim; j++ ) {
+             for( j=0; j<filt->fdims[0]; j++ ) {
                /* Complex times real */
                data_fft_r[j] *= use_filt_r[j];
                data_fft_i[j] *= use_filt_r[j];
@@ -514,19 +514,28 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* How many threads do we get to play with */
-  nw = wf ? wf->nworker : 1;
-
   /* Check for NULL pointers */
   if( !data ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": NULL smfData pointer", status );
+    return;
   }
 
   if( !filt ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": NULL smfFilter pointer", status );
+    return;
   }
+
+  if( filt->ndims != 1 ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": can only filter time-series data at present",
+            status );
+    return;
+  }
+
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
 
   /* Ensure that the smfData is ordered correctly (bolo ordered) */
   smf_dataOrder( data, 0, status );
@@ -551,10 +560,10 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     }
 
     /* Check that the filter dimensions are appropriate for the data */
-    if( ntslice != filt->ntslice ) {
+    if( ntslice != filt->rdims[0] ) {
       *status = SAI__ERROR;
       msgSeti("DATALEN",ntslice);
-      msgSeti("FILTLEN",filt->ntslice);
+      msgSeti("FILTLEN",filt->rdims[0]);
       errRep( "", FUNC_NAME
              ": Filter for length ^FILTLEN doesn't match data length ^FILTLEN",
              status);
@@ -632,8 +641,8 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     pdata->data = data;
     pdata->qua = qua;
 
-    pdata->data_fft_r = astMalloc( (filt->dim)*sizeof(*pdata->data_fft_r) );
-    pdata->data_fft_i = astMalloc( (filt->dim)*sizeof(*pdata->data_fft_i) );
+    pdata->data_fft_r = astMalloc(filt->fdims[0]*sizeof(*pdata->data_fft_r));
+    pdata->data_fft_i = astMalloc(filt->fdims[0]*sizeof(*pdata->data_fft_i));
     pdata->filt = filt;
     pdata->whiten = whiten;
     pdata->complement = complement;
