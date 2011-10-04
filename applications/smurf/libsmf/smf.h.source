@@ -972,6 +972,9 @@ void smf_filter_complement( smfFilter *filt, int *status );
 
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 
+void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
+                           int complement, int whiten, int *status );
+
 void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
                          int complement, int whiten, int *status );
 

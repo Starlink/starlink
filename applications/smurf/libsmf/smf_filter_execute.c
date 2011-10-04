@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_fft_filter
+*     smf_filter_execute
 
 *  Purpose:
 *     Filter smfData in the frequency domain using the FFTW3 library
@@ -25,9 +25,9 @@
 *     filter = smfFilter* (Given and Returned)
 *        A smfFilter to apply to the supplied data
 *     complement = int (Given)
-*        If 1 apply the complement of the filter (and whitening filter).
-*        If -1 apply the complement of the filter, and also set it back
-*        to its original state before returning.
+*        If 1 set the filter to its complement (and whitening filter
+*        if selected) before applying to the data.
+*        If -1 set the filter back to its original state, and then apply it.
 *     whiten = int (Given)
 *        If set, prior to applying the supplied filter, apply a whitening
 *        filter.
@@ -43,7 +43,6 @@
 *     routine in this case.
 
 *  Notes:
-*     Currently getting sporadic segfaults when wf != NULL
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -527,10 +526,8 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     return;
   }
 
-  if( filt->ndims != 1 ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": can only filter time-series data at present",
-            status );
+  if( filt->ndims == 2 ) {
+    smf_filter2d_execute( wf, data, filt, complement, whiten, status );
     return;
   }
 
@@ -541,34 +538,7 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
   smf_dataOrder( data, 0, status );
 
   /* Obtain the dimensions of the array being filtered */
-  if( *status == SAI__OK ) {
-    if( data->ndims == 1 ) {
-      /* If 1-dimensional assume the dimension is time */
-      ntslice = data->dims[0];
-      ndata = ntslice;
-      nbolo = 1;
-    } else if( data->ndims == 3 ) {
-      /* If 3-dimensional this should be bolo-ordered at this point */
-      ntslice = data->dims[0];
-      nbolo = data->dims[1]*data->dims[2];
-      ndata = nbolo*ntslice;
-    } else {
-      /* Can't handle other dimensions */
-      *status = SAI__ERROR;
-      msgSeti("NDIMS",data->ndims);
-      errRep( "", FUNC_NAME ": Can't handle ^NDIMS dimensions.", status);
-    }
-
-    /* Check that the filter dimensions are appropriate for the data */
-    if( ntslice != filt->rdims[0] ) {
-      *status = SAI__ERROR;
-      msgSeti("DATALEN",ntslice);
-      msgSeti("FILTLEN",filt->rdims[0]);
-      errRep( "", FUNC_NAME
-             ": Filter for length ^FILTLEN doesn't match data length ^FILTLEN",
-             status);
-    }
-  }
+  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &ndata, NULL, NULL, status);
 
   if( *status != SAI__OK ) return;
 
@@ -590,7 +560,7 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
       msgOutiff( MSG__DEBUG, "", FUNC_NAME
                  ": Using maximum apodization length, %zu samples.",
                  status, apod_length );
-    } else if( (last-first+1) < (2*apod_length) && apod_length != SMF__BADSZT ) {
+    } else if( (last-first+1) < (2*apod_length) && apod_length != SMF__BADSZT ){
       *status = SAI__ERROR;
       errRepf("", FUNC_NAME
               ": Can't apodize, not enough samples (%zu < %zu).", status,

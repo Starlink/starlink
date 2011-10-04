@@ -146,6 +146,7 @@ smf_fillgaps.c \
 smf_filter_complement.c \
 smf_filter_edge.c \
 smf_filter_execute.c \
+smf_filter2d_execute.c \
 smf_filter_fromkeymap.c \
 smf_filter_ident.c \
 smf_filter_notch.c \
