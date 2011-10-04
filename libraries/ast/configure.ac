@@ -7,7 +7,7 @@ dnl   1.5.  It should work with autoconf versions 2.50 or better, and
 dnl   automake 1.6 or better.
 
 dnl   Initialisation: package name and version number
-AC_INIT(ast, 5.7-2, ussc@star.rl.ac.uk)
+AC_INIT(ast, 5.7-3, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)

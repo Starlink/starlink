@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V5.7-2) of the Starlink AST (astrometry) library is
+   A new release (V5.7-3) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,15 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- When reading a FITS-WCS header, the FitsChan class now recognises the
+non-standard "TPV" projection code within a CTYPE keyword value. This
+code is used by SCAMP (see www.astromatic.net/software/scamp) to
+represent a distorted TAN projection.
+
+
+Main Changes in V5.7-2
+-----------------------
 
 - The PolyMap class can now use an iterative Newton-Raphson method to
 evaluate the inverse the inverse transformation if no inverse

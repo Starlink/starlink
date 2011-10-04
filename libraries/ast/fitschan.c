@@ -1000,6 +1000,10 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        - Added CardType attribute
 *        - Allow GetFits to be used to get/set the value of the current
 *        card.
+*     4-OCT-2011 (DSB):
+*        When reading a FITS-WCFS header, if the projection is TPV (as produced
+*        by SCAMP), change to TPN (the internal AST code for a distorted
+*        TAN projection).
 *class--
 */
 
@@ -27639,8 +27643,9 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *     21) CTYPE == "LAMBDA" changed to CTYPE = "WAVE"
 *
 *     22) if the projection is TAN and the PolyTan attribute is non-zero,
-*     the projection is changed to TPN (the AST code for the draft FITS-WCS
-*     paper II conventions for a distorted TAN projection).
+*     or if the projection is TPV (produced by SCAMP), the projection is
+*     changed to TPN (the AST code for the draft FITS-WCS paper II
+*     conventions for a distorted TAN projection).
 
 *  Parameters:
 *     this
@@ -28520,20 +28525,20 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 
 /* Change any TAN projection to TPN projection if the PolyTan attribute
-   is non-zero.
+   is non-zero. Also change any TPV projection to TPN projection.
    --------------------------------------------------- */
-      if( !Ustrcmp( prj, "-TAN", status ) ){
-         if( GetUsedPolyTan( this, axlat + 1, axlon + 1, s, status ) ){
-            strcpy( prj, "-TPN" );
-            strcpy( lontype + 4, "-TPN" );
-            cval = lontype;
-            SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, s, status ),
-                      (void *) &cval, AST__STRING, NULL, status );
-            strcpy( lattype + 4, "-TPN" );
-            cval = lattype;
-            SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, s, status ),
-                      (void *) &cval, AST__STRING, NULL, status );
-         }
+      if( ( !Ustrcmp( prj, "-TAN", status ) &&
+            GetUsedPolyTan( this, axlat + 1, axlon + 1, s, status ) ) ||
+          !Ustrcmp( prj, "-TPV", status ) ){
+         strcpy( prj, "-TPN" );
+         strcpy( lontype + 4, "-TPN" );
+         cval = lontype;
+         SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, s, status ),
+                   (void *) &cval, AST__STRING, NULL, status );
+         strcpy( lattype + 4, "-TPN" );
+         cval = lattype;
+         SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, s, status ),
+                   (void *) &cval, AST__STRING, NULL, status );
       }
 
 
