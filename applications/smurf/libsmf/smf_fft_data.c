@@ -14,13 +14,18 @@
 
 *  Invocation:
 *     pntr = smf_fft_data( ThrWorkForce *wf, const smfData *indata,
-*                          int inverse, size_t len, int *status );
+*                          smfData *outdata, int inverse, size_t len,
+*                          int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     indata = smfData * (Given)
 *        Pointer to the input smfData
+*     outdata = smfData * (Given)
+*        If supplied, this is a container for the output of the routine. If
+*        not supplied, a new smfData will be allocated and returned. In either
+*        case, return value is a pointer to the transformed data.
 *     inverse = int (Given)
 *        If set perform inverse transformation. Otherwise forward.
 *     len = size_t (Given)
@@ -35,8 +40,8 @@
 *        Pointer to global status.
 
 *  Return Value:
-*     Pointer to newly created smfData containing the forward or inverse
-*     transformed data.
+*     Pointer to the smfData containing the forward or inverse
+*     transformed data (newly created if outdata not specified).
 
 *  Description:
 *     Perform the forward or inverse FFT of a smfData. In the real
@@ -113,6 +118,8 @@
 *        Record whether we have FFT data or not in the FITS header
 *     2011-09-23 (EC):
 *        Support 2D FFTs
+*     2011-10-04 (EC):
+*        Add outdata
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -296,8 +303,9 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_fft_data"
 
-smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
-                       size_t len, int *status ) {
+smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
+                       smfData *outdata, int inverse, size_t len,
+                       int *status ) {
   double *baseR=NULL;           /* base pointer to real part of fourier data */
   double *baseI=NULL;           /* base pointer to imag part of fourier data */
   double *baseD=NULL;           /* base pointer to real space data */
@@ -416,78 +424,114 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
     if (data && data->qual) data->qual = astFree( data->qual );
   }
 
-  /* Create a new smfData, copying over everything except for the bolo
-     data itself */
+  if( outdata && (*status==SAI__OK) ) {
+    /* If the caller supplies the output container we check dimensions */
 
-  retdata = smf_deepcopy_smfData( data, 0,
-                                  SMF__NOCREATE_DATA |
-                                  SMF__NOCREATE_VARIANCE |
-                                  SMF__NOCREATE_QUALITY |
-                                  SMF__NOCREATE_FILE |
-                                  SMF__NOCREATE_DA,
-                                  0, 0, status );
+    size_t j;
+    dim_t o_fdims[2];
+    dim_t o_nbolo;
+    dim_t o_ndims;
+    dim_t o_rdims[2];
+    int o_isfft;
 
-  if( *status == SAI__OK ) {
+    o_isfft = smf_isfft( outdata, o_rdims, &o_nbolo, o_fdims, NULL, &o_ndims,
+                         status );
 
-    /* Allocate space for the transformed data */
+    if( o_isfft == inverse ) {
+      *status = SAI__ERROR;
+      errRepf( "", FUNC_NAME
+               ": inverse is %i but supplied output container is also %i",
+               status, inverse, o_isfft );
+    }
 
-    if( inverse ) {
-      if( ndims == 1 ) {
-        /* Doing an inverse FFT to the time-domain */
-        retdata->ndims = 3;
-        retdata->dims[0] = rdims[0];
-        retdata->dims[SC2STORE__COL_INDEX+1] = ncols;
-        retdata->dims[SC2STORE__ROW_INDEX+1] = nrows;
+    if( o_nbolo != nbolo ) *status = SAI__ERROR;
 
-        retdata->lbnd[0] = 1;
-        retdata->lbnd[1] = 0;
-        retdata->lbnd[2] = 0;
-      } else {
-        /* Doing an inverse FFT to a map */
-        retdata->ndims = 2;
-        retdata->dims[0] = rdims[0];
-        retdata->dims[1] = rdims[1];
+    for( j=0; (j<ndims) && (*status==SAI__OK); j++ ) {
+      if( o_rdims[j] != rdims[j] ) *status = SAI__ERROR;
+    }
 
-        retdata->lbnd[0] = data->lbnd[0];
-        retdata->lbnd[1] = data->lbnd[1];
-      }
+    if( *status != SAI__OK ) {
+      errRep( "", FUNC_NAME
+              ": supplied output container has incorrect dimensions", status);
     } else {
-      if( ndims == 1 ) {
-        /* Doing a forward FFT of time-series to the frequency domain */
-        retdata->ndims = 4;
-        retdata->dims[0] = nf;
-        retdata->dims[SC2STORE__COL_INDEX+1] = ncols;
-        retdata->dims[SC2STORE__ROW_INDEX+1] = nrows;
-        retdata->dims[3] = 2;
+      retdata = outdata;
+    }
+  } else {
 
-        retdata->lbnd[0] = 1;
-        retdata->lbnd[1] = 0;
-        retdata->lbnd[2] = 0;
-        retdata->lbnd[3] = 1;
+    /* Otherwise create a new smfData, copying over everything except
+       for the bolo data itself */
+
+    retdata = smf_deepcopy_smfData( data, 0,
+                                    SMF__NOCREATE_DATA |
+                                    SMF__NOCREATE_VARIANCE |
+                                    SMF__NOCREATE_QUALITY |
+                                    SMF__NOCREATE_FILE |
+                                    SMF__NOCREATE_DA,
+                                    0, 0, status );
+
+    if( *status == SAI__OK ) {
+
+      /* Allocate space for the transformed data */
+
+      if( inverse ) {
+        if( ndims == 1 ) {
+          /* Doing an inverse FFT to the time-domain */
+          retdata->ndims = 3;
+          retdata->dims[0] = rdims[0];
+          retdata->dims[SC2STORE__COL_INDEX+1] = ncols;
+          retdata->dims[SC2STORE__ROW_INDEX+1] = nrows;
+
+          retdata->lbnd[0] = 1;
+          retdata->lbnd[1] = 0;
+          retdata->lbnd[2] = 0;
+        } else {
+          /* Doing an inverse FFT to a map */
+          retdata->ndims = 2;
+          retdata->dims[0] = rdims[0];
+          retdata->dims[1] = rdims[1];
+
+          retdata->lbnd[0] = data->lbnd[0];
+          retdata->lbnd[1] = data->lbnd[1];
+        }
       } else {
-        /* Doing a forward FFT of a map to the frequency domain */
-        retdata->ndims = 3;
-        retdata->dims[0] = fdims[0];
-        retdata->dims[1] = fdims[1];
-        retdata->dims[2] = 2;
+        if( ndims == 1 ) {
+          /* Doing a forward FFT of time-series to the frequency domain */
+          retdata->ndims = 4;
+          retdata->dims[0] = nf;
+          retdata->dims[SC2STORE__COL_INDEX+1] = ncols;
+          retdata->dims[SC2STORE__ROW_INDEX+1] = nrows;
+          retdata->dims[3] = 2;
 
-        /* Just set the frequency axis lbnds to those in real-space so
-           that we can recover them later */
-        retdata->lbnd[0] = data->lbnd[0];
-        retdata->lbnd[1] = data->lbnd[1];
-        retdata->lbnd[2] = 1;
+          retdata->lbnd[0] = 1;
+          retdata->lbnd[1] = 0;
+          retdata->lbnd[2] = 0;
+          retdata->lbnd[3] = 1;
+        } else {
+          /* Doing a forward FFT of a map to the frequency domain */
+          retdata->ndims = 3;
+          retdata->dims[0] = fdims[0];
+          retdata->dims[1] = fdims[1];
+          retdata->dims[2] = 2;
+
+          /* Just set the frequency axis lbnds to those in real-space so
+             that we can recover them later */
+          retdata->lbnd[0] = data->lbnd[0];
+          retdata->lbnd[1] = data->lbnd[1];
+          retdata->lbnd[2] = 1;
+        }
       }
+
+      nretdata=1;
+      for( j=0; j<retdata->ndims; j++ ) {
+        nretdata *= retdata->dims[j];
+      }
+
+      retdata->pntr[0] = astCalloc(nretdata,
+                                   smf_dtype_sz(retdata->dtype,status));
     }
 
     /* Returned data is always bolo-ordered (ignored for maps) */
     retdata->isTordered=0;
-
-    nretdata=1;
-    for( j=0; j<retdata->ndims; j++ ) {
-      nretdata *= retdata->dims[j];
-    }
-
-    retdata->pntr[0] = astCalloc(nretdata, smf_dtype_sz(retdata->dtype,status));
 
     /* Describe the array dimensions for FFTW guru interface
        - dims describes the length and stepsize for both the input and

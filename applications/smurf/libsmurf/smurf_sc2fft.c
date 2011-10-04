@@ -436,7 +436,7 @@ void smurf_sc2fft( int *status ) {
             }
 
             /* Tranform the data */
-            odata = smf_fft_data( wf, idata, inverse, 0, status );
+            odata = smf_fft_data( wf, idata, NULL, inverse, 0, status );
             smf_convert_bad( odata, status );
 
             if( inverse ) {

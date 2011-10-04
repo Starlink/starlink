@@ -214,7 +214,7 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data,
   if( fratio ) for(i=0; i<nbolo; i++) fratio[i] = VAL__BADD;
 
   /* FFT the data and convert to polar power spectral density form */
-  pow = smf_fft_data( wf, data, 0, len, status );
+  pow = smf_fft_data( wf, data, NULL, 0, len, status );
   smf_convert_bad(  pow, status );
   smf_fft_cart2pol( pow, 0, 1, status );
 

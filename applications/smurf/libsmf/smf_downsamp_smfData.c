@@ -238,7 +238,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
       dim_t nf_o;               /* Number of frequencies in output data */
 
       /* Calculate the FFT of the data */
-      fft_idata = smf_fft_data( NULL, idata, 0, 0, status );
+      fft_idata = smf_fft_data( NULL, idata, NULL, 0, 0, status );
       smf_isfft( fft_idata, NULL, NULL, fdims, NULL, NULL, status );
       nf_i = fdims[0];
 
@@ -287,7 +287,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
 
       /* Transform back to the time-domain and convert to the same order
          as the input */
-      tempdata = smf_fft_data( NULL, fft_odata, 1, 0, status );
+      tempdata = smf_fft_data( NULL, fft_odata, NULL, 1, 0, status );
       smf_dataOrder( tempdata, idata->isTordered, status );
 
       if( *status == SAI__OK ) {

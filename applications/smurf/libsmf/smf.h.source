@@ -961,8 +961,9 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
 
 void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status );
 
-smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata, int inverse,
-                       size_t len, int *status );
+smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
+                       smfData *outdata, int inverse, size_t len,
+                       int *status );
 
 void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
                     smf_qual_t mask, int *status );
