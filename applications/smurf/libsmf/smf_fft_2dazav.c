@@ -13,11 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_fft_2dazav( const smfData *data, int *status ) {
+*     pntr = smf_fft_2dazav( const smfData *data, double *df, int *status ) {
 
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to a smfData containing the FFT of a 2-d map
+*     df = double * (Returned)
+*        Return the frequency spacing of the power spectrum. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -46,6 +48,8 @@
 *        Initial version
 *     2011-09-30 (EC):
 *        Should only be calculated up to the Nyquist frequency
+*     2011-10-05 (EC):
+*        Optionally return df.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,11 +106,11 @@
 
 #define FUNC_NAME "smf_fft_2dazav"
 
-smfData *smf_fft_2dazav( const smfData *data, int *status ) {
+smfData *smf_fft_2dazav( const smfData *data, double *df, int *status ) {
 
   size_t *count=NULL;           /* Count of data at this radius */
   double df_o=1;                /* Spatial freq. step of output */
-  double df[2]={1,1};           /* Spatial freq. step x/y-axes of map */
+  double df0[2]={1,1};          /* Spatial freq. step x/y-axes of map */
   dim_t fdims[2];               /* Frequency space dimensions */
   size_t i;                     /* Loop counter */
   double *idata=NULL;           /* Input 2d data pointer */
@@ -129,7 +133,7 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
   }
 
   /* Check that we have frequency-domain input */
-  if( !smf_isfft( data, rdims, NULL, fdims, df, &ndims, status ) ) {
+  if( !smf_isfft( data, rdims, NULL, fdims, df0, &ndims, status ) ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": Input data are not FFT!", status );
     return NULL;
@@ -151,10 +155,10 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
        (longer spatial) axis */
 
     if( rdims[1] > rdims[0] ) {
-      df_o = df[1];
+      df_o = df0[1];
       whichaxis = 2;
     } else {
-      df_o = df[0];
+      df_o = df0[0];
       whichaxis = 1;
     }
 
@@ -198,8 +202,8 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
            indices multiplied by the frequency step size along each
            axis. */
 
-        x = FFT_INDEX_2_FREQ(i,fdims[0]) * df[0];
-        y = FFT_INDEX_2_FREQ(j,fdims[1]) * df[1];
+        x = FFT_INDEX_2_FREQ(i,fdims[0]) * df0[0];
+        y = FFT_INDEX_2_FREQ(j,fdims[1]) * df0[1];
 
         /* The final distance is just truncated to an integer number of
            steps in the return array */
@@ -253,6 +257,11 @@ smfData *smf_fft_2dazav( const smfData *data, int *status ) {
       retdata->hdr->tswcs = astAnnul(retdata->hdr->tswcs);
     }
     retdata->hdr->tswcs = fftwcs;
+  }
+
+  /* Return df? */
+  if( df ) {
+    *df = df_o;
   }
 
   /* Clean up */

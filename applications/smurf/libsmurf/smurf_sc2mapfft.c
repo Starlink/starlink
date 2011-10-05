@@ -241,7 +241,7 @@ void smurf_sc2mapfft( int *status ) {
       if( azavpspec ) {
         smfData *tempdata=NULL;
 
-        tempdata = smf_fft_2dazav( odata, status );
+        tempdata = smf_fft_2dazav( odata, NULL, status );
         smf_close_file( &odata, status );
         odata = tempdata;
       }
