@@ -272,7 +272,16 @@ int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
       df[1] = VAL__BADD;
 
       if( ndims0 == 1 ) {
+        double steptime = indata->hdr->steptime;
 
+        if( steptime >= 0 ) {
+          df[0] = 1. / (steptime * (double) rdims0[0]);
+        } else if( *status == SAI__OK ) {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME
+                  ": Can't calculate df because steptime is <= 0!",
+                  status );
+        }
       } else if( ndims0 == 2 ) {
         double pixsize;
 
