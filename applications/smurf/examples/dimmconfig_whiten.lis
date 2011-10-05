@@ -1,0 +1,36 @@
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+# *** Alternative config using time-domain whitening ***
+#
+# This is an experimental config that uses the time-domain whitening
+# filter. The idea is to use common-mode removal to get rid of most
+# of the junk, and then use a whitening filter to automatically remove
+# residual low-frequency noise on a bolo-by-bolo basis. For now I
+# have turned off the GAIn component, so exactly the same ampltide common-mode
+# is removed from each bolo, and no bad-bolo flagging happens within the
+# COM model. This seems to work fairly well in that it gives flatter maps,
+# but needs a lot of iterations to get rid of bowls around bright sources.
+# Since I still don't have a good map-based convergence test I've just set
+# it to 20 for now, and turned on itermaps. Look at the .more.smurf.itermaps
+# extensions after running once to see if you need more or less iterations.
+# for the s4a Uranus observations in $STARLINK_DIR/share/smurf/s4a*.sdf I
+# only needed about 7 iterations. For some old OMC-1 data it clearly needed
+# more iterations than 50...
+#
+# One final note: on that s4a Uranus data I noticed that a bunch of
+# bolometers start going crazy around iteration 12, and the whole thing
+# blows up.
+#
+# ***********************************************************
+
+modelorder = (com,ext,flt,ast,noi)
+
+numiter=20
+
+itermap=1
+
+450.flt.filt_edge_largescale=0
+450.flt.whiten=1
+
+850.flt.filt_edge_largescale=0
+850.flt.whiten=1
