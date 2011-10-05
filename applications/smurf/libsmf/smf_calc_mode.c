@@ -165,8 +165,6 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
       swmode = SMF__SWM_PSSW;
     } else if (strcasecmp( sw_mode, "CHOP" ) == 0) {
       swmode = SMF__SWM_CHOP;
-    } else if (strcasecmp( sw_mode, "JIGGLE" ) == 0) {
-      swmode = SMF__OBS_JIGGLE;
     } else if (strcasecmp( sw_mode, "SELF" ) == 0) {
       swmode = SMF__SWM_SELF;
     } else if (strcasecmp( sw_mode, "FREQSW" ) == 0) {
