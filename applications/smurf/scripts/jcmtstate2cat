@@ -122,7 +122,7 @@ for my $f (@files) {
 
     # See if we have WVM columns
     if (exists $local{WVM_T12} && exists $local{WVM_T42} && exists $local{WVM_T78}) {
-      push(@wvmcol, "WVMTAU", "PWV");
+      push(@wvmcol, "WVMTAU", "PWVZEN", "PWVLOS");
     }
 
   }
@@ -182,7 +182,8 @@ for my $f (@files) {
       # idea for SCUBA-2 unless we are doing elevation scans)
 
       my $wvmtau = &NDF::VAL__BADD();
-      my $pwv = &NDF::VAL__BADD();
+      my $pwvlos = &NDF::VAL__BADD();
+      my $pwvzen = &NDF::VAL__BADD();
       if ($isokay) {
         # Need the ambient temperature from ATSTART and ATEND
         # SCUBA-2 does not store temperature in state
@@ -194,7 +195,8 @@ for my $f (@files) {
         my $key = $local{WVM_TIME}->[$i];
         if (exists $wvmcache{$key}) {
           $wvmtau = $wvmcache{$key}[0];
-          $pwv    = $wvmcache{$key}[1];
+          $pwvzen = $wvmcache{$key}[1];
+          $pwvlos = $wvmcache{$key}[2];
         } else {
           $wvmtau = JCMT::Tau::WVM::WVMLib::tsky2tau( $local{TCS_AIRMASS}->[$i],
                                                       $tamb,
@@ -215,18 +217,18 @@ for my $f (@files) {
           $wvmtau += $dwvm;
 
           # Now calculate the PWV
-          my $pwvlos = JCMT::Tau::WVM::WVMLib::tsky2pwv( $local{TCS_AIRMASS}->[$i],
-                                                         $tamb,
-                                                         $local{WVM_T12}->[$i],
-                                                         $local{WVM_T42}->[$i],
-                                                         $local{WVM_T78}->[$i]);
-          $pwv = JCMT::Tau::WVM::WVMLib::pwv2zen( $local{TCS_AIRMASS}->[$i],
-                                                  $pwvlos );
+          $pwvlos = JCMT::Tau::WVM::WVMLib::tsky2pwv( $local{TCS_AIRMASS}->[$i],
+                                                      $tamb,
+                                                      $local{WVM_T12}->[$i],
+                                                      $local{WVM_T42}->[$i],
+                                                      $local{WVM_T78}->[$i]);
+          $pwvzen = JCMT::Tau::WVM::WVMLib::pwv2zen( $local{TCS_AIRMASS}->[$i],
+                                                     $pwvlos );
 
-          $wvmcache{$key} = [$wvmtau, $pwv];
+          $wvmcache{$key} = [$wvmtau, $pwvzen, $pwvlos];
         }
       }
-      push(@slice, $wvmtau, $pwv );
+      push(@slice, $wvmtau, $pwvzen, $pwvlos );
     }
 
     # And append the remaining columns
