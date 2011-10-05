@@ -979,15 +979,22 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                status, maxconcat, maxconcat/srate_maxlen,
                memneeded/SMF__MIB, maxmem/SMF__MIB);
 
-      /* Try is meant to be the largest contchunk of ~equal length that fit in
-         memory */
-      try = maxconcat / ((size_t) ((double)memneeded/maxmem)+1)+1;
+      /* Try is meant to be the largest contchunk of ~equal length
+         that fits in memory. The first step uses the ratio of
+         requested to available memory (rounded up to an integral
+         number) to estimate the number of time steps for try. */
 
-      /* Round up to get integral number of files including padding at start,
-         but subtract off one file if it exceeds available memory. If we
-         don't have enough memory even for one input file we're hooped. */
+      try = (size_t) ceil(maxconcat / ceil((double)memneeded/(double)maxmem));
 
-      try = ((size_t) ((double)try/(double)maxfile + 0.5))*maxfile + pad;
+      /* Then figure out how many files this corresponds to, round up
+         to get integral number of files, and finally multiply by file
+         length and add on padding to get back into time steps */
+
+      try = (size_t) ceil((double)try/(double)maxfile)*maxfile + pad;
+
+      /*  If we exceed available memory subtract off the length of
+          one file. If we don't have enough memory even for one input
+          file we're hooped. */
 
       if( (try > (maxconcat*( (double) maxmem / (double) memneeded ))) &&
           (try > maxfile) ) {
@@ -1002,7 +1009,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       msgOutf( "", "  Will try to re-group data in chunks < %zu samples long "
                "(%lg s)",
-               status, try, (double) try/srate_maxlen );
+               status, try, ceil((double)try/srate_maxlen) );
       msgOut( " ", FUNC_NAME ": ***************", status );
 
       /* Close igroup if needed before re-running smf_grp_related */
@@ -1012,7 +1019,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
 
       smf_grp_related( igrp, isize, 1+groupsubarray, 1,
-                       (double) try/srate_maxlen, NULL, NULL,
+                       ceil((double)try/srate_maxlen), NULL, NULL,
                        &maxconcat, NULL, &igroup, NULL, NULL, status );
     }
   }
