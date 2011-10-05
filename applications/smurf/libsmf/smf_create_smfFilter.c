@@ -130,7 +130,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
     return NULL;
   }
 
-  filt = astCalloc( 1, sizeof(smfFilter) );
+  filt = astCalloc( 1, sizeof(*filt) );
 
   isfft = smf_isfft( template, rdims, NULL, fdims, filt->df, &ndims, status );
 
