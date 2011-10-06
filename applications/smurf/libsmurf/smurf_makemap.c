@@ -1317,9 +1317,14 @@ void smurf_makemap( int *status ) {
 
     if (physsize > 0 ) {
       const int min_mem = 512;
+      const int max_freemem = 4096;
 
-      /* Set default memory as 80% of physical memory */
+      /* Set default memory as 80% of physical memory, or leaving max_freemem
+         MB available for other processes, whichever is larger. */
       maxmem_default = (int) (freemem*0.80);
+      if( (freemem - maxmem) > max_freemem ) {
+        maxmem_default = freemem - max_freemem;
+      }
 
       /* Generate warning if this seems too small... */
       if( maxmem_default <= min_mem ) {
@@ -1329,7 +1334,8 @@ void smurf_makemap( int *status ) {
       }
 
       msgOutiff( MSG__VERB, "", TASK_NAME
-                 ": Default MAXMEM is %i MiB (80%% of physical memory)",
+                 ": Default MAXMEM is %i MiB (largest of 80%% of physical "
+                 "memory, or leaving 4096 MiB free)",
                  status, maxmem_default );
     } else {
       /* If smf_get_freemem can't tell us, try something safe...*/
