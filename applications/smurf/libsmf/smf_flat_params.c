@@ -221,9 +221,21 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
     const char * heateffstr = NULL;
     if (astMapGet0C( resmap, "HEATEFF", &heateffstr )) {
       Grp * heateffgrp = NULL;
+      smfData * heatefftmp = NULL;
       heateffgrp = grpNew( "heateff", status );
       grpPut1( heateffgrp, heateffstr, 0, status );
-      smf_open_file( heateffgrp, 1, "READ", SMF__NOTTSERIES|SMF__NOFIX_METADATA, heateff, status );
+      smf_open_file( heateffgrp, 1, "READ", SMF__NOTTSERIES|SMF__NOFIX_METADATA, &heatefftmp, status );
+
+      /* Divorce the smfData from the underlying file. This file stays open for the entire
+         duration of the data processing and can some times lead to issues when we attempt
+         to close it an hour after we opened it (it's usually on an NFS disk) */
+      if (*status == SAI__OK) {
+        *heateff = smf_deepcopy_smfData( heatefftmp, 0,
+                                         SMF__NOCREATE_FILE | SMF__NOCREATE_FTS |
+                                         SMF__NOCREATE_DA,
+                                         0, 0, status );
+        smf_close_file(&heatefftmp, status);
+      }
 
       /* Check the dimensions */
       if (*status == SAI__OK) {
