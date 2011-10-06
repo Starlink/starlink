@@ -678,6 +678,11 @@ f     - Title: The Plot title drawn using AST_GRID
 *        it does not gain us anything).
 *        - Slightly decrease the dynamic range of an axis needed to produce
 *        logarithmic ticks (this is to avoid problems with round errors).
+*     6-OCT-2011 (DSB):
+*        - Prevent grf qch and scales functions being called lots of times
+*        during each drawing operation (since the information returned by
+*        these functions will not change during the course of a single drawing
+*        operation).
 *class--
 */
 
@@ -1709,7 +1714,11 @@ static const char *xlbling[2] = { "interior", "exterior" };
    globals->Curve_data_t.nbrk = -1; \
    globals->GetAttrib_Buff[ 0 ] = 0; \
    globals->SplitValue_Buff[ 0 ] = 0; \
-   globals->StripEscapes_Buff[ 0 ] = 0;
+   globals->StripEscapes_Buff[ 0 ] = 0; \
+   globals->Grf_chv_t = AST__BAD; \
+   globals->Grf_chh_t = AST__BAD; \
+   globals->Grf_alpha_t = AST__BAD; \
+   globals->Grf_beta_t = AST__BAD;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(Plot)
@@ -1791,6 +1800,10 @@ astMAKE_INITGLOBALS(Plot)
 #define getattrib_buff  astGLOBAL(Plot,GetAttrib_Buff)
 #define splitvalue_buff astGLOBAL(Plot,SplitValue_Buff)
 #define stripescapes_buff astGLOBAL(Plot,StripEscapes_Buff)
+#define Grf_chv 	astGLOBAL(Plot,Grf_chv_t)
+#define Grf_chh 	astGLOBAL(Plot,Grf_chh_t)
+#define Grf_alpha 	astGLOBAL(Plot,Grf_alpha_t)
+#define Grf_beta 	astGLOBAL(Plot,Grf_beta_t)
 
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 );
@@ -1830,6 +1843,12 @@ static int Crv_nent = 0;
 static int Crv_out;
 static int Crv_clip;
 static void (*Crv_map)( int, double *, double *, double *, const char *, const char *, int * );
+
+/* A cache of information calculated by the grf module. */
+static double Grf_chv = AST__BAD;
+static double Grf_chh = AST__BAD;
+static double Grf_alpha = AST__BAD;
+static double Grf_beta = AST__BAD;
 
 /* The lower and upper bounds of the graphics coordinates enclosing all
    lines and numerical labels drawn by astGrid. */
@@ -1914,6 +1933,13 @@ static int class_init = 0;       /* Virtual function table initialised? */
 #define UNLOCK_MUTEX2
 
 #endif
+
+/* Macro to reset the cache of values caclulated by the grf module. */
+#define RESET_GRF \
+   Grf_chh = AST__BAD; \
+   Grf_chv = AST__BAD; \
+   Grf_alpha = AST__BAD; \
+   Grf_beta = AST__BAD;
 
 
 /* Prototypes for Private Member Functions. */
@@ -5093,6 +5119,11 @@ f     with STATUS set to an error value, or if it should fail for any
                 "Frame of the supplied %s is invalid - this number should "
                 "be 2.", status, method, class, naxes, class );
    }
+
+/* Indicate that the GRF module should re-calculate it's cached values
+   (in case the state of the graphics system has changed since the last
+   thing was drawn). */
+   RESET_GRF;
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
@@ -8622,6 +8653,11 @@ f     contains any coordinates with the value AST__BAD.
       Boxp_ubnd[ 0 ] = FLT_MIN;
       Boxp_ubnd[ 1 ] = FLT_MIN;
    }
+
+/* Indicate that the GRF module should re-calculate it's cached values
+   (in case the state of the graphics system has changed since the last
+   thing was drawn). */
+   RESET_GRF;
 
 /* Draw the curve. The break information is stored in an external structure
    where it can be accessed by public methods which return information
@@ -13464,10 +13500,21 @@ static void GScales( AstPlot *this, float *alpha, float *beta,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    int grf_status;          /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* if we already have the required values, return them. */
+   if( Grf_alpha != AST__BAD && Grf_beta != AST__BAD ) {
+      *alpha = Grf_alpha;
+      *beta = Grf_beta;
+      return;
+   }
 
 /* Since we are about to call an external function which may not be
    thread safe, prevent any other thread from executing the following code
@@ -13505,6 +13552,9 @@ static void GScales( AstPlot *this, float *alpha, float *beta,
       *beta = 1.0;
    }
 
+/* Store them for future use. */
+   Grf_alpha = *alpha;
+   Grf_beta = *beta;
 }
 
 static int GCap( AstPlot *this, int cap, int value, int *status ){
@@ -13684,6 +13734,11 @@ f        The global status.
          Boxp_ubnd[ 0 ] = FLT_MIN;
          Boxp_ubnd[ 1 ] = FLT_MIN;
       }
+
+/* Indicate that the GRF module should re-calculate it's cached values
+   (in case the state of the graphics system has changed since the last
+   thing was drawn). */
+      RESET_GRF;
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
@@ -14354,10 +14409,21 @@ static void GQch( AstPlot *this, float *chv, float *chh, const char *method,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    int grf_status;          /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* if we already have the required values, return them. */
+   if( Grf_chh != AST__BAD && Grf_chv != AST__BAD ) {
+      *chh = Grf_chh;
+      *chv = Grf_chv;
+      return;
+   }
 
 /* Since we are about to call an external function which may not be
    thread safe, prevent any other thread from executing the following code
@@ -14395,6 +14461,9 @@ static void GQch( AstPlot *this, float *chv, float *chh, const char *method,
       *chv = 1.0;
    }
 
+/* Store them for future use. */
+   Grf_chh = *chh;
+   Grf_chv = *chv;
 }
 
 static void GText( AstPlot *this, const char *text, float x, float y,
@@ -17486,6 +17555,11 @@ f        The global status.
    loglabelset[0] = astTestLogLabel( this_nd, 0 );
    loglabelset[1] = astTestLogLabel( this_nd, 1 );
 
+/* Indicate that the GRF module should re-calculate it's cached values
+   (in case the state of the graphics system has changed since the last
+   thing was drawn). */
+   RESET_GRF;
+
 /* Get a Plot with a 2D (or 1D) current Frame. */
    this = (AstPlot *) Fset2D( (AstFrameSet *) this_nd, AST__CURRENT, status );
 
@@ -17853,6 +17927,11 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
 
 /* Validate the axis index, converting the axis index to be zero-based. */
    (void) astValidateAxis( this, axis - 1, method );
+
+/* Indicate that the GRF module should re-calculate it's cached values
+   (in case the state of the graphics system has changed since the last
+   thing was drawn). */
+   RESET_GRF;
 
 /* Draw the curve. The break information is stored in an external structure
    where it can be accessed by public methods which return information
@@ -21946,6 +22025,11 @@ f     - If any marker position is clipped (see AST_CLIP), then the
       Boxp_ubnd[ 1 ] = FLT_MIN;
    }
 
+/* Indicate that the GRF module should re-calculate it's cached values
+   (in case the state of the graphics system has changed since the last
+   thing was drawn). */
+   RESET_GRF;
+
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
    astGrfAttrs( this, AST__MARKS_ID, 1, GRF__MARK, method, class );
@@ -23192,6 +23276,11 @@ f        The global status.
       astError( AST__DIMIN, "This should not be less than the number of "
                 "points being drawn (%d).", status, npoint );
    }
+
+/* Indicate that the GRF module should re-calculate it's cached values
+   (in case the state of the graphics system has changed since the last
+   thing was drawn). */
+   RESET_GRF;
 
 /* Allocate memory to hold the array of data pointers, the start position,
    and the end position. */
@@ -25471,6 +25560,11 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
       Boxp_ubnd[ 0 ] = FLT_MIN;
       Boxp_ubnd[ 1 ] = FLT_MIN;
    }
+
+/* Indicate that the GRF module should re-calculate it's cached values
+   (in case the state of the graphics system has changed since the last
+   thing was drawn). */
+   RESET_GRF;
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */

@@ -663,9 +663,13 @@ typedef struct AstPlotGlobals {
    AstRegion    *Map5_region_t;
    void         *Map5_statics_t;
    AstPlotCurveData Curve_data_t;
-   char GetAttrib_Buff[ 200 ];
-   char SplitValue_Buff[ 200 ];
-   char StripEscapes_Buff[ AST__PLOT_STRIPESCAPES_BUFF_LEN + 1 ];
+   char 	GetAttrib_Buff[ 200 ];
+   char 	SplitValue_Buff[ 200 ];
+   char 	StripEscapes_Buff[ AST__PLOT_STRIPESCAPES_BUFF_LEN + 1 ];
+   double 	Grf_chv_t;
+   double 	Grf_chh_t;
+   double 	Grf_alpha_t;
+   double 	Grf_beta_t;
 } AstPlotGlobals;
 
 #endif
