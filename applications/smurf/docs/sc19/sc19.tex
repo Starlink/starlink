@@ -261,6 +261,7 @@
 \newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
 \newcommand{\photom}{\xref{\textsc{Photom}}{sun45}{}}
 \newcommand{\topcat}{\htmladdnormallink{\textsc{Topcat}}{http://www.starlink.ac.uk/topcat}}
+\newcommand{\ssds}{\xref{\textsc{Starlink Standard Data Structures}}{sgp38}{}}
 
 % DR recipe names
 \newcommand{\drrecipe}[1]{\texttt{#1}}
@@ -1085,19 +1086,20 @@ SC2FFT: power spectrum requested so setting POLAR=TRUE
 \end{verbatim}
 \end{myquote}
 
- Since there is no \starlink\ standard format for storing complex
- values, \fft\ uses its own format: a 4-dimensional array, with the
- first axis indicating frequency, the second and third axes bolometer
- row and column, and the final axis containing the real and imaginary
- parts of each Fourier coefficient. By setting `power=true' it
- switches to polar power form, such that the first element of the 4th
- array axis stores the square of the amplitudes, and the second
- element stores the arguments (phases) of each Fourier coefficient. As
- with the time series data, \gaia\ may then be used to view the data
- cube. The difference is that we now specify a subset of the data so
- that the 3rd axis of the cube is the array of squared Fourier
- amplitudes for each bolometer, and ignore the phases (i.e.~we observe
- only the 1st elements along the 4th axis):
+While there is a \starlink\ standard format for storing complex values
+as described in \cite{ssds}, \fft\ uses its own local format that
+allows both for cartesian and polar forms: a 4-dimensional array, with
+the first axis indicating frequency, the second and third axes
+bolometer row and column, and the final axis containing the real and
+imaginary parts of each Fourier coefficient. By setting `power=true'
+it switches to polar power form, such that the first element of the
+4th array axis stores the square of the amplitudes, and the second
+element stores the arguments (phases) of each Fourier coefficient. As
+with the time series data, \gaia\ may then be used to view the data
+cube. The difference is that we now specify a subset of the data so
+that the 3rd axis of the cube is the array of squared Fourier
+amplitudes for each bolometer, and ignore the phases (i.e.~we observe
+only the 1st elements along the 4th axis):
 
 \begin{myquote}
 \begin{verbatim}
@@ -2421,6 +2423,9 @@ flagged and removed), and the actual responsivity image is stored in
 Chapin~E.~L., et~al., 2009, \textit{SMURF -- Sub-Millimetre User Reduction
 Facility},
 \xref{Starlink User Note 258}{sun258}{}
+
+\bibitem{ssds}
+Currie~M.~J., Wallace~P.~T., Warren-Smith~R.~F., 1989, \textit{Starlink Standard Data Structures}, \xref{Starlink General Paper 38.2}{sgp38}{}
 
 \bibitem{kappa}
 Currie~M.~J., 1997, \textit{KAPPA --- Kernel Application Package},
