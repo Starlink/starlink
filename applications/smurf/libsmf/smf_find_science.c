@@ -330,7 +330,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                          NULL, NULL, NULL, NULL, NULL, &heateff, status );
         smf_get_dims( heateff, NULL, NULL, &nbolos, NULL, NULL, NULL, NULL,
                       status );
-        astMapPut0P( heatermap, arrayidstr, heateff, NULL );
+        if (heateff) astMapPut0P( heatermap, arrayidstr, heateff, NULL );
       }
     }
 
