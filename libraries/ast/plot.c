@@ -9697,7 +9697,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
 
 /* Loop round the whole string, drawing each sub-string. */
       a = lt;
-      while( *a ) {
+      while( *a && astOK ) {
 
 /* Examine the start of the remaining string and note if it begins with
    an escape sequence. If so, the type and value of the escape sequnece
