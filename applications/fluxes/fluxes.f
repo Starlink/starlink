@@ -624,7 +624,7 @@ C     The system time in seconds
          DO JJ=1,4
             READ(FIOD2,322)DUMMY
          ENDDO
-         READ(FIOD2,124) FPLAN
+         READ(FIOD2,124) (FPLAN(II),II=1,5)
  124     FORMAT(15X,5(A7,6X))
          DO JJ=1,15
             READ(FIOD2,125)FILT,(TBNORM(JJ,II),ERROR(JJ,II),II=4,8)
