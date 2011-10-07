@@ -61,6 +61,8 @@
 *     2010-10-13 (EC):
 *        - add complement to interface
 *        - add sanity checks for 1/f fitting frequencies and exponent
+*     2011-10-06 (EC):
+*        Moved power spectrum fitting into smf_fit_pspec
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -104,28 +106,16 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
-#define SMF__WHITEN_WHITESNR 5        /* n-sigma clip for white noise level */
-#define SMF__WHITEN_KNEESNR 5         /* SNR threshold for finding 1/f knee */
-#define SMF__WHITEN_KNEETHRESH 0.25   /* fraction of samples below kneesnr */
-
 #define FUNC_NAME "smf_whiten"
 
 void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
                  double scale, int complement, int *status ) {
 
-  int converged;         /* Has white noise level calc converged? */
-  double fit[2];         /* fit coefficients */
+  double A;              /* Amplitude of 1/f component */
+  double B;              /* Exponent of 1/f component */
   size_t i;              /* Loop counter */
-  size_t i_whi;          /* Index of high-freq. edge for white-noise level */
-  size_t i_wlo;          /* Index of low-freq. edge for white-noise level */
-  size_t nbad;           /* Number of outliers in white noise calc */
   double *pspec=NULL;    /* Power spectrum of the bolometer */
-  smf_qual_t *qual=NULL; /* Quality to go with pspec */
-  double sigma;          /* Uncertainty in white noise level */
-  size_t thisnbad;       /* Outliers in white noise calc, this iteration */
   double white;          /* White noise level */
-  double *x=NULL;
-  double *y=NULL;
 
   if (*status != SAI__OK) return;
 
@@ -148,10 +138,10 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
     return;
   }
 
-  /* Calculate the power spectrum and a smoothed version. Also create a
-     quality array to go with it. */
+  /* Calculate the power spectrum and fit a model to it. Currently have
+     the white-noise measurement band hard-wired to 5--20 Hz */
+
   pspec = astMalloc( nf*sizeof(*pspec) );
-  qual = astCalloc( nf, sizeof(*qual) );
 
   if( *status == SAI__OK ) {
     for( i=0; i<nf; i++ ) {
@@ -159,163 +149,47 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
     }
   }
 
-  /* Measure the white noise level in some frequency range of the data
-     well above the 1/f knee, but below the point at which the
-     anti-aliasing filter begins to attenuate the data, using
-     iterative rejection of outliers */
-
-  i_wlo = smf_get_findex( 5, df, nf, status );
-  i_whi = smf_get_findex( 20, df, nf, status );
-
-  converged = 0;
-  nbad = 0;
-
-  while( (!converged) && (*status==SAI__OK) ) {
-    double thresh;
-
-    smf_stats1D( pspec+i_wlo, 1, i_whi-i_wlo+1, qual, 1, SMF__Q_SPIKE, &white,
-                 &sigma, NULL, NULL, status );
-
-    if( *status==SAI__OK ) {
-
-      thresh = white + SMF__WHITEN_WHITESNR*sigma;
-      thisnbad = 0;
-
-      for( i=i_wlo; i<=i_whi; i++ ) {
-        if( pspec[i] > thresh ) {
-          qual[i] = SMF__Q_SPIKE;
-          thisnbad++;
-        }
-      }
-
-      if( thisnbad==nbad ) {
-        converged = 1;
-      }
-
-      nbad = thisnbad;
-    }
-  }
-
-  /* Now identify and fit the 1/f part of the power spectrum. We use a
-     rolling box and increase the frequency of its centre until the fraction
-     of samples below some threshold above the white level is exceeded.
-     We then fit a straight line to the logarithm of the x- and y-axes. */
+  smf_fit_pspec( pspec, nf, box, df, 0, 5, 20, &A, &B, &white, status );
 
   if( *status == SAI__OK ) {
-    double A;
-    double B;
-    size_t nfit;
-    size_t ngood = 0;
-    size_t nused;
-    double thresh = white + SMF__WHITEN_KNEESNR*sigma;
+    double amp;
+    double thescale=1.;
 
-    /* Initialize ngood -- skip the DC term in the FFT */
-    for( i=1; i<(1+box); i++ ) {
-      if( pspec[i] > thresh ) {
-        ngood++;
+    /* When we divide the power spectrum by the whitening filter we
+       want it to result in the white noise level, so we divide A by
+       white to get the right final amplitude. Also, we are going to
+       whiten the FFT, not its power spectrum, so we also take the
+       square root of the fitting function */
+
+    A = sqrt(A / white);
+    B = B / 2.;
+
+    /* Now we apply the whitening, divided both the real and imaginary
+       parts by (1 + A * x^B) (and we explicitly set the 0th element to 0).
+       Also apply the scale factor here if it was requested */
+
+    re[0] = 0;
+    im[0] = 0;
+
+    if( scale ) thescale = scale;
+
+    if( complement ) {
+      /* Applying the complement of the whitening filter */
+      for( i=1; i<nf; i++ ) {
+        amp = thescale * ( 1. - 1. / (1. + A * pow( (double) i*df, B )) );
+        re[i] *= amp;
+        im[i] *= amp;
       }
-    }
-
-    /* Continuing from element 2 go until we hit the end or we reach
-       the threshold number of samples below the threshold SNR above
-       the white noise level. */
-
-    for( i=2; (i<(nf-(box-1))) && (ngood >= SMF__WHITEN_KNEETHRESH*box); i++ ) {
-      /* If the previous first element was good remove it */
-      if( pspec[i-1] >= thresh ) {
-        ngood--;
-      }
-
-      /* If the new last element is good add it */
-      if( pspec[i+box-1] >= thresh ) {
-        ngood++;
-      }
-    }
-
-    /* We will fit the power-law from elements 1 to nfit-1. We then
-       evaluate the fitted power law as
-
-                       y = A * x^B
-
-       where x is the index in the frequency array
-             A = exp( fit[0] )
-             B = fit[1]                                           */
-
-    nfit = i+box/2;
-
-    /* If we've entered the white-noise band in order to fit the 1/f
-       noise give up */
-    if( i >= i_wlo ) {
-      goto CLEANUP;
-    }
-
-    /* Now fit a straight line to the log of the two axes */
-    x = astMalloc( (nfit-1)*sizeof(*x) );
-    y = astMalloc( (nfit-1)*sizeof(*y) );
-
-    if( *status == SAI__OK ) {
-      for( i=0; i<(nfit-1); i++ ) {
-        x[i] = log(i+1);
-        y[i] = log(pspec[i+1]);
-      }
-    }
-
-    smf_fit_poly1d( 1, nfit-1, 0, x, y, NULL, NULL, fit, NULL, NULL, &nused,
-                    status );
-
-    if( *status == SAI__OK ) {
-      double amp;
-      double thescale = 1.;
-
-      A = (exp(fit[0]));
-      B = fit[1];
-
-      /* if B isn't negative the fit might be garbage, or else there just
-         isn't very much low frequency noise. In this case bail out. */
-      if( B >= 0 ) {
-        goto CLEANUP;
-      }
-
-      /* When we divide the power spectrum by the whitening filter we
-         want it to result in the white noise level, so we divide A by
-         white to get the right final amplitude. Also, we are going to
-         whiten the FFT, not its power spectrum, so we also take the
-         square root of the fitting function */
-
-      A = sqrt(A / white);
-      B = B / 2.;
-
-      /* Now we apply the whitening, divided both the real and imaginary
-         parts by (1 + A * x^B) (and we explicitly set the 0th element to 0).
-         Also apply the scale factor here if it was requested */
-
-      re[0] = 0;
-      im[0] = 0;
-
-      if( scale ) thescale = scale;
-
-      if( complement ) {
-        /* Applying the complement of the whitening filter */
-        for( i=1; i<nf; i++ ) {
-          amp = thescale * ( 1. - 1. / (1. + A * pow( (double) i, B )) );
-          re[i] *= amp;
-          im[i] *= amp;
-        }
-      } else {
-        /* Applying the whitening filter */
-        for( i=1; i<nf; i++ ) {
-          amp = thescale / (1. + A * pow( (double) i, B ));
-          re[i] *= amp;
-          im[i] *= amp;
-        }
+    } else {
+      /* Applying the whitening filter */
+      for( i=1; i<nf; i++ ) {
+        amp = thescale / (1. + A * pow( (double) i*df, B ));
+        re[i] *= amp;
+        im[i] *= amp;
       }
     }
   }
 
   /* Clean up */
- CLEANUP:
   pspec = astFree( pspec );
-  qual = astFree( qual );
-  x = astFree( x );
-  y = astFree( y );
 }

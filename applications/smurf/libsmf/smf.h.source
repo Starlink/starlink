@@ -401,6 +401,8 @@
  *        Added smf_dataOrder_ndims.c
  *     2011-06-08 (EC)
  *        Add smf_raw2current.c
+ *     2011-10-06 (EC)
+ *        Add smf_fit_pspec
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1036,6 +1038,10 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
                       const smf_qual_t qual[], double coeffs[],
                       double varcoeffs[], double polydata[], size_t * nused,
                       int *status );
+
+void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
+                    double minfreq, double whitefreq, double maxfreq,
+                    double *a, double *b, double *w, int *status );
 
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
                       int *status);
