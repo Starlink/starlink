@@ -189,13 +189,15 @@ smfData *smf_fft_2dazav( const smfData *data, double *df, int *status ) {
     odata = retdata->pntr[0];
 
     for( i=0; (*status==SAI__OK)&&(i<fdims[0]); i++ ) {
+
+      x = FFT_INDEX_TO_FREQ(i,fdims[0]) * df0[0];
+
       for( j=0; j<fdims[1]; j++ ) {
         /* Work out cartesian distance from origin (which is at 0,0
            and wraps-around the edges. x and y give the frequency
            indices multiplied by the frequency step size along each
            axis. */
 
-        x = FFT_INDEX_TO_FREQ(i,fdims[0]) * df0[0];
         y = FFT_INDEX_TO_FREQ(j,fdims[1]) * df0[1];
 
         /* The final distance is just truncated to an integer number of
