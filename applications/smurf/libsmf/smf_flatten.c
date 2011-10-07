@@ -111,93 +111,93 @@ void smf_flatten ( smfData *data, AstKeyMap * heateffmap, int *status ) {
 
   if ( *status != SAI__OK ) return;
 
+  if ( data == NULL ) {
+    *status = SAI__ERROR;
+    errRep("smf_flatten", "Null data structure passed to smf_flatten", status);
+    return;
+  }
+
   /* Check that we have actually have everything we need */
   da = data->da;
   pntr[0] = (data->pntr)[0];
   dataArr = pntr[0];
 
   if ( da == NULL ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep("smf_flatten", "No flatfield information in data structure", status);
-    }
-  } else if ( data == NULL ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep("smf_flatten", "Null data structure passed to smf_flatten", status);
-    }
-  } else if ( dataArr == NULL ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep("smf_flatten", "Null data array in data structure", status);
-    }
-  } else {
+    *status = SAI__ERROR;
+    errRep("smf_flatten", "No flatfield information in data structure", status);
+    return;
+  }
 
-    /* Calculate the number of bolometer and number of frames (timeslices) */
-    nboll = (data->dims)[0]*(data->dims)[1];
-    nframes = (data->dims)[2];
+  if ( dataArr == NULL ) {
+    *status = SAI__ERROR;
+    errRep("smf_flatten", "Null data array in data structure", status);
+    return;
+  }
 
-    /* Flatfielder */
-    sc2math_flatten( nboll, nframes, smf_flat_methstring(da->flatmeth,status), da->nflat, da->flatcal,
-		     da->flatpar, dataArr, status);
+  /* Calculate the number of bolometer and number of frames (timeslices) */
+  nboll = (data->dims)[0]*(data->dims)[1];
+  nframes = (data->dims)[2];
 
-    /* Update units and title if we have a header */
-    smf_set_clabels( "Flatfielded", NULL, SIPREFIX "W", data->hdr, status);
+  /* Flatfielder */
+  sc2math_flatten( nboll, nframes, smf_flat_methstring(da->flatmeth,status), da->nflat, da->flatcal,
+                   da->flatpar, dataArr, status);
 
-    /* Now correct for heater efficiency */
-    if (heateffmap && da->refres != VAL__BADD && *status == SAI__OK) {
-      /* Do not apply the correction if these data do not know the
-         reference resistance. We only know the refres if we have been
-         flatfielded by a system that knows we have heater efficiencies */
-      if (da->refres != VAL__BADD) {
-        char arrayidstr[32];
-        smf_fits_getS( data->hdr, "ARRAYID", arrayidstr, sizeof(arrayidstr),
-                       status );
-        if (astMapHasKey( heateffmap, arrayidstr )) {
-          void * tmp = NULL;
-          astMapGet0P( heateffmap, arrayidstr, &tmp );
-          if (tmp) {
-            smfData * heateff = tmp;
-            smf_scale_bols( NULL, data, heateff, NULL, "HEATEFF", 0, status );
-            msgOutiff(MSG__VERB, "", "Applying heater efficiency data for array '%s'",
-                      status, arrayidstr);
-          } else {
-            msgOutiff( MSG__QUIET, "", "Unable to find heater efficiency data "
-                       " for array '%s' (possible programming error)", status, arrayidstr );
-          }
+  /* Update units and title if we have a header */
+  smf_set_clabels( "Flatfielded", NULL, SIPREFIX "W", data->hdr, status);
+
+  /* Now correct for heater efficiency */
+  if (heateffmap && da->refres != VAL__BADD && *status == SAI__OK) {
+    /* Do not apply the correction if these data do not know the
+       reference resistance. We only know the refres if we have been
+       flatfielded by a system that knows we have heater efficiencies */
+    if (da->refres != VAL__BADD) {
+      char arrayidstr[32];
+      smf_fits_getS( data->hdr, "ARRAYID", arrayidstr, sizeof(arrayidstr),
+                     status );
+      if (astMapHasKey( heateffmap, arrayidstr )) {
+        void * tmp = NULL;
+        astMapGet0P( heateffmap, arrayidstr, &tmp );
+        if (tmp) {
+          smfData * heateff = tmp;
+          smf_scale_bols( NULL, data, heateff, NULL, "HEATEFF", 0, status );
+          msgOutiff(MSG__VERB, "", "Applying heater efficiency data for array '%s'",
+                    status, arrayidstr);
         } else {
-          /* Do not warn for simulated data */
-          if (strncmp( arrayidstr, "SIM", 3 ) != 0 ) {
-            msgOutiff( MSG__QUIET, "", "Unable to find heater efficiency data "
-                       " for array '%s'", status, arrayidstr );
-          }
+          msgOutiff( MSG__QUIET, "", "Unable to find heater efficiency data "
+                     " for array '%s' (possible programming error)", status, arrayidstr );
         }
       } else {
-        msgOutif(MSG__QUIET, "", "Using old-style flatfield so not applying "
-                 "heater efficiency data. Consider re-running calcflat or using a flatramp.", status );
-      }
-    }
-
-    /* Now check for a QUALITY array */
-    qual = data->qual;
-    if ( qual != NULL ) {
-      /* Check for BAD values from flatfield routine and set QUALITY
-	 accordingly. Any bad values at this point means that those
-	 samples were flagged as such by the DA system and thus should
-	 be assigned a quality value of SMF__Q_BADDA */
-      msgOutif(MSG__DEBUG, "",
-	       "smfData has a valid QUALITY array: setting SMF__Q_BADDA flags",
-	       status);
-      ndat = nboll * nframes;
-      for (i=0; i<ndat; i++) {
-	if ( dataArr[i] == VAL__BADD ) {
-	  qual[i] |= SMF__Q_BADDA;
-	}
+        /* Do not warn for simulated data */
+        if (strncmp( arrayidstr, "SIM", 3 ) != 0 ) {
+          msgOutiff( MSG__QUIET, "", "Unable to find heater efficiency data "
+                     " for array '%s'", status, arrayidstr );
+        }
       }
     } else {
-      msgOutif(MSG__DEBUG, "", "smfData has no QUALITY array", status);
+      msgOutif(MSG__QUIET, "", "Using old-style flatfield so not applying "
+               "heater efficiency data. Consider re-running calcflat or using a flatramp.", status );
     }
-
   }
+
+  /* Now check for a QUALITY array */
+  qual = data->qual;
+  if ( qual != NULL ) {
+    /* Check for BAD values from flatfield routine and set QUALITY
+       accordingly. Any bad values at this point means that those
+       samples were flagged as such by the DA system and thus should
+       be assigned a quality value of SMF__Q_BADDA */
+    msgOutif(MSG__DEBUG, "",
+             "smfData has a valid QUALITY array: setting SMF__Q_BADDA flags",
+             status);
+    ndat = nboll * nframes;
+    for (i=0; i<ndat; i++) {
+      if ( dataArr[i] == VAL__BADD ) {
+        qual[i] |= SMF__Q_BADDA;
+      }
+    }
+  } else {
+    msgOutif(MSG__DEBUG, "", "smfData has no QUALITY array", status);
+  }
+
 }
 
