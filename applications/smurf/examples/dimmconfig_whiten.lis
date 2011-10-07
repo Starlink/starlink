@@ -23,9 +23,11 @@
 #
 # ***********************************************************
 
-modelorder = (com,ext,flt,ast,noi)
+modelorder = (com,gai,ext,flt,ast,noi)
 
 numiter=20
+
+com.noflag=1
 
 itermap=1
 
