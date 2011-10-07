@@ -698,6 +698,9 @@ void sc2sim_ndfwrdata
   astSetFitsF ( fitschan, "BASETEMP", 0.1,
                 "[K] Base temperature", 0 );
 
+  astSetFitsS( fitschan, "ARRAYID", "SIMULATED",
+               "Unique array identifier", 0 );
+
   /* Convert the AstFitsChan data to a char array */
   smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
 
