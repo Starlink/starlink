@@ -1,4 +1,4 @@
-^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
 # *** Specialized config for bright, isolated compact sources ***
 #
@@ -6,8 +6,8 @@
 # particular the strategy is aimed at short scans of calibrators (which
 # may be quite bright).
 #
-# We constrain the map using ast.zero_circle=(0.01666), which sets all
-# pixels beyond 60 arcsec to zero until the last iteration.  A word of
+# We constrain the map using ast.zero_circle=(0.05), which sets all
+# pixels beyond 3 arcmin to zero until the last iteration.  A word of
 # warning: if the source is near the edge of the map (or has an extent
 # large than the size of this mask!) this configuration may give odd
 # results due to the value of ast.zero_lowhits!  If you suspect a
@@ -15,8 +15,35 @@
 # pixels (see QUALITY component of the resulting map). If the mask
 # overlaps with the source, try modifying the radius.
 #
+# Low-frequency noise is removed using both common-mode and azimuth
+# template removal, and then a whitening filter handles everything
+# that is left-over.
+#
 # ***********************************************************
 
+# 20 is enough for most things... something like Jupiter might need
+# more. For now you still need to turn on itermaps to see whether the
+# map has converged visually or not.
+
+numiter=20
+
+modelorder = (tmp,com,gai,ext,flt,ast,noi)
+
 # use boundary constraints since the source is assumed to be isolated
-ast.zero_circle = (0.0166666666)
+ast.zero_circle = (0.05)
 ast.zero_notlast = 1
+
+# common-mode will not be used to flag bad data
+com.noflag=1
+
+# use sin(azimuth) as a template to remove magnetic-field pickup
+tmp.source=state_az
+tmp.dosin=1
+
+# use a whitening filter to remove residual low-frequency junk (note that
+# we have to explicitly turn *off* the high-pass filtering in the default
+# dimmconfig.
+450.flt.filt_edge_largescale=0
+450.flt.whiten=1
+850.flt.filt_edge_largescale=0
+850.flt.whiten=1
