@@ -97,13 +97,6 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
-/* Macro to convert a pixel index in an FFT to a frequency index: if there
-   are N samples in real space, the indices up to N/2+1 in frequency space
-   are unique, and then the remaining samples are the complex conjugate of
-   the first half (negative frequencies)... thanks GM */
-
-#define FFT_INDEX_2_FREQ(index,N) ((index + (N-1)/2 % N) - (N-1)/2)
-
 #define FUNC_NAME "smf_fft_2dazav"
 
 smfData *smf_fft_2dazav( const smfData *data, double *df, int *status ) {
@@ -202,8 +195,8 @@ smfData *smf_fft_2dazav( const smfData *data, double *df, int *status ) {
            indices multiplied by the frequency step size along each
            axis. */
 
-        x = FFT_INDEX_2_FREQ(i,fdims[0]) * df0[0];
-        y = FFT_INDEX_2_FREQ(j,fdims[1]) * df0[1];
+        x = FFT_INDEX_TO_FREQ(i,fdims[0]) * df0[0];
+        y = FFT_INDEX_TO_FREQ(j,fdims[1]) * df0[1];
 
         /* The final distance is just truncated to an integer number of
            steps in the return array */

@@ -474,6 +474,13 @@
   result = _temp; \
 }
 
+/* Macro to convert a pixel index in an FFT to a frequency index: if there
+   are N samples in real space, the indices up to N/2+1 in frequency space
+   are unique, and then the remaining samples are the complex conjugate of
+   the first half (negative frequencies)... thanks GM */
+
+#define FFT_INDEX_TO_FREQ(index,N) ((index + (N-1)/2 % N) - (N-1)/2)
+
 /* These macros can be enabled to replace the AST malloc routines with
    system default routines. This can sometimes help debuggers and tools
    like valgrind. The AST malloc routine can get in the way as it uses
