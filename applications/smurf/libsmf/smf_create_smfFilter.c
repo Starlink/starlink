@@ -99,21 +99,13 @@
 
 smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
-  AstFrame *cframe=NULL;        /* Current real/imag frame */
-  AstUnitMap *cmapping=NULL;    /* Mapping from grid to cframe */
-  AstCmpFrame *curframe2d=NULL; /* Current Frame for 2-d FFT */
   dim_t fdims[2];               /* Frequency space dimensions */
-  smfFilter *filt=NULL;         /* Pointer to returned struct */
   AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
+  smfFilter *filt=NULL;         /* Pointer to returned struct */
   size_t i;                     /* Loop counter */
   int isfft;                    /* Is the template FFT'd data? */
   size_t ndims;                 /* Number of dimensions */
   dim_t rdims[2];               /* Real space dimensions */
-  AstZoomMap *scalemapping=NULL;/* Scale grid coordinates by df */
-  AstSpecFrame *specframe=NULL; /* Current Frame of 1-D spectrum */
-  AstCmpMap *specmapping=NULL;  /* Mapping from GRID to FREQ */
-  double zshift;                /* Amount by which to shift origin */
-  AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of GRID */
 
   if( *status != SAI__OK ) return NULL;
 
@@ -148,6 +140,15 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
     if( ndims == 1 ) {
       /* --- Filter for time-series data  --- */
+
+      AstFrame *cframe=NULL;        /* Current real/imag frame */
+      AstUnitMap *cmapping=NULL;    /* Mapping from grid to cframe */
+      AstCmpFrame *curframe2d=NULL; /* Current Frame for 2-d FFT */
+      AstZoomMap *scalemapping=NULL;/* Scale grid coordinates by df */
+      AstSpecFrame *specframe=NULL; /* Current Frame of 1-D spectrum */
+      AstCmpMap *specmapping=NULL;  /* Mapping from GRID to FREQ */
+      double zshift;                /* Amount by which to shift origin */
+      AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of GRID */
 
       if( *status == SAI__OK ) {
 
@@ -192,7 +193,6 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
         AstFrame *curframe_c=NULL;
         AstFrame *curframe_x=NULL;
         AstFrame *curframe_y=NULL;
-        AstCmpMap *fftmapping=NULL;
         AstUnitMap *scalemap_c=NULL;
         AstZoomMap *scalemap_x=NULL;
         AstZoomMap *scalemap_y=NULL;
