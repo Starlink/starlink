@@ -77,6 +77,8 @@
 *     2011-09-06 (TIMJ):
 *        Allow 2d data (eg responsivity images) to return the number
 *        of columns or rows.
+*     2011-10-06 (TIMJ):
+*        Check "data" is defined before dereferencing it.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,20 +119,21 @@ void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
                    size_t *bstride, size_t *tstride, int *status ) {
 
-  size_t bs;
-  size_t i;
-  dim_t nb;
-  dim_t nt;
-  dim_t nd;
-  size_t ts;
-  dim_t nr;
-  dim_t nc;
-  dim_t nf;
+  size_t bs = 0;
+  size_t i = 0;
+  dim_t nb = 0;
+  dim_t nt = 0;
+  dim_t nd = 0;
+  size_t ts = 0;
+  dim_t nr = 0;
+  dim_t nc = 0;
+  dim_t nf = 0;
   dim_t rdims[2];
   dim_t fdims[2];
 
    /* Check the inherited status */
-   if ( *status != SAI__OK ) return;
+   if ( *status != SAI__OK ) goto finalize;
+   if (!data) goto finalize;
 
    if( data->ndims == 3 || data->ndims == 2 ) {
      /* Calculate Dimensions */
@@ -169,10 +172,9 @@ void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
      errRepf(" ", FUNC_NAME
              ": Can not work out rows, columns or time slices from %d-dimensional data",
              status, (int)data->ndims);
-
-    return;
    }
 
+ finalize:
    if( nrows ) *nrows = nr;
    if( ncols ) *ncols = nc;
    if( nbolo ) *nbolo = nb;
