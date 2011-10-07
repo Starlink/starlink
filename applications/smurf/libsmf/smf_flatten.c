@@ -166,8 +166,11 @@ void smf_flatten ( smfData *data, AstKeyMap * heateffmap, int *status ) {
                        " for array '%s' (possible programming error)", status, arrayidstr );
           }
         } else {
-          msgOutiff( MSG__QUIET, "", "Unable to find heater efficiency data "
-                     " for array '%s'", status, arrayidstr );
+          /* Do not warn for simulated data */
+          if (strncmp( arrayidstr, "SIM", 3 ) != 0 ) {
+            msgOutiff( MSG__QUIET, "", "Unable to find heater efficiency data "
+                       " for array '%s'", status, arrayidstr );
+          }
         }
       } else {
         msgOutif(MSG__QUIET, "", "Using old-style flatfield so not applying "
