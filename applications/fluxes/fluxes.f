@@ -844,9 +844,9 @@ C     The system time in seconds
          CALL FIO_CLOSE(FIOD,STATUS)
          IF (SCREEN) THEN
             CALL MSG_BLANK(STATUS)
-            I=CHR_LEN(STRING1)
             STRING1='File output is in this directory.'//
      :           ' See file: '//OUTFILE
+            I=CHR_LEN(STRING1)
             CALL MSG_OUT(' ',STRING1(1:I),STATUS)
             CALL MSG_BLANK(STATUS)
          ENDIF
