@@ -161,6 +161,9 @@ void smf_flatten ( smfData *data, AstKeyMap * heateffmap, int *status ) {
             smf_scale_bols( NULL, data, heateff, NULL, "HEATEFF", 0, status );
             msgOutiff(MSG__VERB, "", "Applying heater efficiency data for array '%s'",
                       status, arrayidstr);
+          } else {
+            msgOutiff( MSG__QUIET, "", "Unable to find heater efficiency data "
+                       " for array '%s' (possible programming error)", status, arrayidstr );
           }
         } else {
           msgOutiff( MSG__QUIET, "", "Unable to find heater efficiency data "
