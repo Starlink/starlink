@@ -836,6 +836,9 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
           /* Set the data-ordering flag in the header */
           head.data.isTordered = idata->isTordered;
 
+          /* The model container is not FFT */
+          head.data.isFFT = -1;
+
           /* Other info from the header */
           if( idata->hdr ) {
             head.hdr.steptime = idata->hdr->steptime;
@@ -1215,6 +1218,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
               if( *status == SAI__OK ) {
                 data->qfamily = head.data.qfamily;
+                data->isFFT = head.data.isFFT;
                 data->isTordered = head.data.isTordered;
                 data->dtype = head.data.dtype;
                 data->ndims = head.data.ndims;
