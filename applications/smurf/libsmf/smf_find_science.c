@@ -988,6 +988,7 @@ static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
   char subarray[10];
   double shutter = 0.0;
   size_t nwrite = 0;
+  int utdate = 0;
 
   if (*status != SAI__OK) return;
   if (!hdr) return;
@@ -997,6 +998,15 @@ static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
      those to 0 */
   smf_getfitsi( hdr, "PIXHEAT", &curheat, status );
   if (*status == SMF__NOKWRD) errAnnul(status);
+
+  /* As of September 1st we heater track after doing the flat ramp.
+     This means that the heater value will have changed slightly between
+     ramp and science. */
+  smf_getfitsi( hdr, "UTDATE", &utdate, status );
+  if (utdate >= 20110901 &&
+      (hdr->obstype == SMF__TYP_SCIENCE || hdr->obstype == SMF__TYP_POINTING)) {
+    curheat = 0;
+  }
 
   smf_getfitsi( hdr, "DETBIAS", &detbias, status );
   if (*status == SMF__NOKWRD) errAnnul(status);
