@@ -683,6 +683,12 @@ f     - Title: The Plot title drawn using AST_GRID
 *        during each drawing operation (since the information returned by
 *        these functions will not change during the course of a single drawing
 *        operation).
+*     11-OCT-2011 (DSB):
+*        Combine multiple continuous polylines into a single polyline
+*        before calling the grf polyline function. Reducing the number of
+*        calls to the underlying graphics system can make a big difference
+*        if the graphics system is written in an interpreted language
+*        such as python.
 *class--
 */
 
@@ -12970,7 +12976,7 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
    return result;
 }
 
-static void Fpoly_old( AstPlot *this, const char *method, const char *class,
+static void Fpoly( AstPlot *this, const char *method, const char *class,
                    int *status ){
 /*
 *  Name:
@@ -13015,21 +13021,30 @@ static void Fpoly_old( AstPlot *this, const char *method, const char *class,
    float xmid;
    float xt;
    float ymid;
+   float *xnew;
+   float *ynew;
+   int polylen;
+   float *xp1;
+   float *xp2;
+   float *yp1;
+   float *yp2;
    float yt;
    int *ekey;
    int *p;
    int *skey;
+   int *drawn;
    int ihi;
    int ikey;
    int ilo;
    int imid;
-   int ipass1;
-   int ipass2;
+   int ipass;
    int ipoint;
    int ipoly;
    int jpoly;
    int kpoly;
-   int more;
+   int *polylist;
+   int npoly;
+   int np;
 
 /* Check the global status. */
    if( !astOK ) return;
@@ -13037,8 +13052,11 @@ static void Fpoly_old( AstPlot *this, const char *method, const char *class,
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(this);
 
+/* Output any pending polyline. */
+   Opoly( this, status );
+
 /* If there is just one polyline to output, just draw it and then free
-   the memory use to hold the polyline.  */
+   the memory used to hold the polyline.  */
    if( Poly_npoly == 1 ) {
       GLine( this, Poly_np[ 0 ], Poly_xp[ 0 ], Poly_yp[ 0 ], method, class,
              status );
@@ -13049,6 +13067,25 @@ static void Fpoly_old( AstPlot *this, const char *method, const char *class,
 /* If there are multiple polylines to output, see if any of them can be
    combined before drawing them.  */
    } else if( Poly_npoly > 1 ) {
+
+int ndrawn = 0;
+
+/* No polyline buffer allocated yet. */
+      xnew = NULL;
+      ynew = NULL;
+
+/* Allocate an array to hold the order in which polylines should be
+   concatenated. Each value in this array will be the index of one of the
+   original polylines. A positive index indicates that the polyline
+   should be appended in its original order. A negative index indicates
+   that the polyline should be appended in reversed order. Polyline zero
+   is always appended in its original order. */
+      polylist = astMalloc( Poly_npoly*sizeof( int ) );
+      npoly = 0;
+
+/* Create an array of drawn, one for each individual polyline. The flag
+   is zero if the corresponding polyline has not yet been drawn. */
+      drawn = astCalloc(  Poly_npoly, sizeof( int ) );
 
 /* Create two sorted keys for the polylines - one that sorts them into
    increasing x at the start of the polyline, and another that sorts them
@@ -13067,356 +13104,275 @@ static void Fpoly_old( AstPlot *this, const char *method, const char *class,
 
       }
 
-/* Continue to search for pairs of continuous polylines until we know
-   there are no more. */
-      more = 1;
-      while( more && astOK ) {
-         more = 0;
+/* Continue to search for separate polylines that can be combined together
+   until we know there are no more. */
+      while( astOK ) {
 
-/* Consider each polyline in turn. On each pass through this loop, we
-   look for other polylines that can be appended to the end of the
-   current polyline. If any are found, the current polyline is extended
-   and the appended polylines are freed. Thus the number of polylines can
-   be reduced within this loop. */
-         ipoly = 0;
-         while( ipoly < Poly_npoly && astOK ) {
+/* Search for the first polyline that has not already been drawn. */
+         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) {
+            if( !drawn[ ipoly ] ) break;
+         }
 
-            for( ipass1 = 0; ipass1 < 2; ipass1++ ) {
+/* Leave the loop if no more polylines remain to be plotted. */
+         if( ipoly == Poly_npoly ) break;
 
-/* On the first pass, look for another polyline that starts or ends at
-   the end of the current polyline. On the second pass, look for another
-   polyline that starts or ends at the start of the current polyline. */
-               if( ipass1 == 0 ) {
-                  xt = Poly_xp[ ipoly ][ Poly_np[ ipoly ] - 1 ];
-                  yt = Poly_yp[ ipoly ][ Poly_np[ ipoly ] - 1 ];
-               } else {
-                  xt = Poly_xp[ ipoly ][ 0 ];
-                  yt = Poly_yp[ ipoly ][ 0 ];
-               }
+/* Initialise the list of polylines to hold the polyline found above, in
+   its forward sense. */
+         polylist[ 0 ] = ipoly;
+         npoly = 1;
+         drawn[ 0 ] = 1;
+
+/* Initialise the concatenation point to be the end of the polyline found
+   above. Also, initialise the total number of points in the combined
+   polyline (polylen). */
+         ipoint = Poly_np[ ipoly ] - 1;
+         xt = Poly_xp[ ipoly ][ ipoint ];
+         yt = Poly_yp[ ipoly ][ ipoint ];
+         polylen = ipoint + 1;
+
+/* Loop until we can find no more polylines to append to the list.
+   A polyline can be appended if it starts or ends at the current
+   concatenation point. */
+         while( astOK ) {
 
 /* On the first pass through the next loop, search for a polyline that
-   starts at this position. If no such polyline is found, do a second
-   pass in which we search for a polyline that ends at this position.
-   The current polyline is not included in the search (to prevent a closed
-   polyline being appended to itself). */
-               for( ipass2 = 0; ipass2 < 2; ipass2++ ) {
+   starts at the concatenation point. If no such polyline is found, do
+   a second pass in which we search for a polyline that ends at the
+   concatenation point. Do not include any previously drawn polylines
+   in the search. */
+            for( ipass = 0; ipass < 2; ipass++ ) {
 
 /* We use a binary chop to find a polyline which starts (or ends) at the
-   x value of the current polyline. */
-                  jpoly = -1;
-                  ilo = 0;
-                  ihi = Poly_npoly - 1;
-                  while( 1 ) {
-                     imid = ( ilo + ihi )/2;
-                     if( ipass2 == 0 ) {
-                        jpoly = skey[ imid ];
-                        xmid = Poly_xp[ jpoly ][ 0 ];
-                     } else {
-                        jpoly = ekey[ imid ];
-                        xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
-                     }
-                     if( EQUAL( xmid, xt ) ) {
-                        break;
-                     } else if( xmid > xt ) {
-                        if( ihi == imid ) {
-                           if( ipass2 == 0 ) {
-                              jpoly = skey[ ilo ];
-                              xmid = Poly_xp[ jpoly ][ 0 ];
-                           } else {
-                              jpoly = ekey[ ilo ];
-                              xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
-                           }
-                           if( !EQUAL( xmid, xt ) ) jpoly = -1;
-                           break;
-                        }
-                        ihi = imid;
-                     } else {
-                        if( ilo == imid ) {
-                           if( ipass2 == 0 ) {
-                              jpoly = skey[ ihi ];
-                              xmid = Poly_xp[ jpoly ][ 0 ];
-                           } else {
-                              jpoly = ekey[ ihi ];
-                              xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
-                           }
-                           if( !EQUAL( xmid, xt ) ) jpoly = -1;
-                           break;
-                        }
-                        ilo = imid;
-                     }
+   x value of the concatenation point. */
+               jpoly = -1;
+               ilo = 0;
+               ihi = Poly_npoly - 1;
+               while( 1 ) {
+                  imid = ( ilo + ihi )/2;
+                  if( ipass == 0 ) {
+                     jpoly = skey[ imid ];
+                     xmid = Poly_xp[ jpoly ][ 0 ];
+                  } else {
+                     jpoly = ekey[ imid ];
+                     xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
                   }
-
-/* If found, there may be more than one such polyline. So we now search
-   for a polyline that also has the y value as the current polyline. */
-                  if( jpoly != -1 ) {
-
-/* If the polyline found above starts (or ends) at the same Y value as the
-   current polyline, then we have found the required polyline. */
-                     if( ipass2 == 0 ) {
-                        ymid = Poly_yp[ jpoly ][ 0 ];
-                     } else {
-                        ymid = Poly_yp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
-                     }
-                     if( EQUAL( ymid, yt ) && jpoly != ipoly ) break;
-                     jpoly = -1;
-
-/* Otherwise, search down the list, starting at the polyline found above. */
-                     if( imid > 0 ) {
-                        for( ikey = imid - 1; ikey >= 0; ikey-- ) {
-                           if( ipass2 == 0 ) {
-                              kpoly = skey[ ikey ];
-                              xmid = Poly_xp[ kpoly ][ 0 ];
-                              ymid = Poly_yp[ kpoly ][ 0 ];
-                           } else {
-                              kpoly = ekey[ ikey ];
-                              xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
-                              ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
-                           }
-                           if( EQUAL( xmid, xt ) ) {
-                              if( EQUAL( ymid, yt ) && kpoly != ipoly ) {
-                                 jpoly = kpoly;
-                                 break;
-                              }
-                           } else {
-                              break;
-                           }
+                  if( EQUAL( xmid, xt ) ) {
+                     ikey = imid;
+                     break;
+                  } else if( xmid > xt ) {
+                     if( ihi == imid ) {
+                        if( ipass == 0 ) {
+                           jpoly = skey[ ilo ];
+                           xmid = Poly_xp[ jpoly ][ 0 ];
+                        } else {
+                           jpoly = ekey[ ilo ];
+                           xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
                         }
-                        if( jpoly != -1 ) break;
+                        if( !EQUAL( xmid, xt ) ) jpoly = -1;
+                        ikey = ilo;
+                        break;
                      }
-
-/* Now search up the list, starting at the polyline found above. */
-                     if( imid < Poly_npoly - 1 ) {
-                        for( ikey = imid + 1; ikey < Poly_npoly; ikey++ ) {
-                           if( ipass2 == 0 ) {
-                              kpoly = skey[ ikey ];
-                              xmid = Poly_xp[ kpoly ][ 0 ];
-                              ymid = Poly_yp[ kpoly ][ 0 ];
-                           } else {
-                              kpoly = ekey[ ikey ];
-                              xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
-                              ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
-                           }
-                           if( EQUAL( xmid, xt ) ) {
-                              if( EQUAL( ymid, yt ) && kpoly != ipoly ) {
-                                 jpoly = kpoly;
-                                 break;
-                              }
-                           } else {
-                              break;
-                           }
+                     ihi = imid;
+                  } else {
+                     if( ilo == imid ) {
+                        if( ipass == 0 ) {
+                           jpoly = skey[ ihi ];
+                           xmid = Poly_xp[ jpoly ][ 0 ];
+                        } else {
+                           jpoly = ekey[ ihi ];
+                           xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
                         }
-                        if( jpoly != -1 ) break;
+                        if( !EQUAL( xmid, xt ) ) jpoly = -1;
+                        ikey = ihi;
+                        break;
                      }
+                     ilo = imid;
                   }
                }
 
-/* If a polyline was found that can be combined with the current
-   polyline, combine it. */
-               if( ipass2 < 2 ) {
+/* If found, there may be more than one such polyline. So we now search
+   for a polyline that also has the y value of the concatenation point. */
+               if( jpoly != -1 ) {
 
-/* Total size of the combined polyline (one less than the sum of the two
-   because we can omit the common point). */
-                  int isize =  Poly_np[ ipoly ];
-                  int jsize =  Poly_np[ jpoly ] - 1;
-                  int newsize =  isize +  jsize;
+/* If the polyline found above starts (or ends) at the same Y value as the
+   concatenation point, then we have found the required polyline. */
+                  if( ipass == 0 ) {
+                     ymid = Poly_yp[ jpoly ][ 0 ];
+                  } else {
+                     ymid = Poly_yp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
+                  }
+                  if( EQUAL( ymid, yt ) && !drawn[ jpoly ] ) break;
+                  jpoly = -1;
 
-/* Allocate memory for the combined polyline. */
-                  float *newx = astMalloc( newsize*sizeof( float ) );
-                  float *newy = astMalloc( newsize*sizeof( float ) );
-                  if( astOK ) {
-
-/* Copy the current polyline to the start of the new memory, reversing it
-   if the common point is at the start of the current polyline. */
-                     if( ipass1 == 0 ) {
-                        memcpy( newx, Poly_xp[ ipoly ], isize*sizeof( float ) );
-                        memcpy( newy, Poly_yp[ ipoly ], isize*sizeof( float ) );
-                     } else {
-                        float *xp1 = newx;
-                        float *yp1 = newy;
-                        float *xp2 = Poly_xp[ ipoly ] + isize - 1;
-                        float *yp2 = Poly_yp[ ipoly ] + isize - 1;
-                        for( ipoint = 0; ipoint < isize; ipoint++ ){
-                           *(xp1++) = *(xp2--);
-                           *(yp1++) = *(yp2--);
-                        }
-                     }
-
-/* Append the second polyline to the new memory, reversing it if the common point is
-   at the end of the second polyline. Omit the common point itself. */
-                     if( ipass2 == 0 ) {
-                        memcpy( newx + isize, Poly_xp[ jpoly ] + 1, jsize*sizeof( float ) );
-                        memcpy( newy + isize, Poly_yp[ jpoly ] + 1, jsize*sizeof( float ) );
-                     } else {
-                        float *xp1 = newx + isize;
-                        float *yp1 = newy + isize;
-                        float *xp2 = Poly_xp[ jpoly ] + jsize - 1;
-                        float *yp2 = Poly_yp[ jpoly ] + jsize - 1;
-                        for( ipoint = 0; ipoint < jsize; ipoint++ ){
-                           *(xp1++) = *(xp2--);
-                           *(yp1++) = *(yp2--);
-                        }
-                     }
-
-/* Free the original arrays for the current polyline, then store the new
-   arrays. */
-                     astFree( Poly_xp[ ipoly ] );
-                     astFree( Poly_yp[ ipoly ] );
-                     Poly_xp[ ipoly ] = newx;
-                     Poly_yp[ ipoly ] = newy;
-                     Poly_np[ ipoly ] = newsize;
-
-/* Free the polyline that was combined with the current polyline. */
-                     astFree( Poly_xp[ jpoly ] );
-                     astFree( Poly_yp[ jpoly ] );
-
-/* Shunt all later polylines down to fill the gap. */
-                     for( kpoly = jpoly + 1; kpoly < Poly_npoly; kpoly++ ) {
-                        Poly_xp[ kpoly - 1 ] = Poly_xp[ kpoly ];
-                        Poly_yp[ kpoly - 1 ] = Poly_yp[ kpoly ];
-                        Poly_np[ kpoly - 1 ] = Poly_np[ kpoly ];
-                     }
-
-/* Nullify the end slot. */
-                     Poly_xp[ Poly_npoly - 1 ] = NULL;
-                     Poly_yp[ Poly_npoly - 1 ] = NULL;
-                     Poly_np[ Poly_npoly - 1 ] = 0;
-
-/* Remove the appended polyline from the sorted keys, shuffling later
-   entries down to fill the gap. */
-                     for( ikey = 0; ikey < Poly_npoly; ikey++ ) {
-                        if( skey[ ikey ] == jpoly ) break;
-                     }
-                     for( ikey++; ikey < Poly_npoly; ikey++ ) {
-                        skey[ ikey - 1 ] = skey[ ikey ];
-                     }
-                     skey[ Poly_npoly - 1 ] = -1;
-
-                     for( ikey = 0; ikey < Poly_npoly; ikey++ ) {
-                        if( ekey[ ikey ] == jpoly ) break;
-                     }
-                     for( ikey++; ikey < Poly_npoly; ikey++ ) {
-                        ekey[ ikey - 1 ] = ekey[ ikey ];
-                     }
-                     ekey[ Poly_npoly - 1 ] = -1;
-
-/* Polylines with index higher than jpoly now have a different index,
-   so modify the values in the two keys to take account of this. Also
-   notes the position of the current polyline within the keys. */
-                     int skey0, ekey0;
-                     for( ikey = 0; ikey < Poly_npoly; ikey++ ) {
-                        if( skey[ ikey ] == ipoly ) skey0 = ikey;
-                        if( skey[ ikey ] > jpoly ) skey[ ikey ]--;
-                     }
-                     for( ikey = 0; ikey < Poly_npoly; ikey++ ) {
-                        if( ekey[ ikey ] == ipoly ) ekey0 = ikey;
-                        if( ekey[ ikey ] > jpoly ) ekey[ ikey ]--;
-                     }
-
-/* If the appended polyline was before the current polyline, decrement
-   the index of the current polyline. */
-                     if( jpoly < ipoly ) ipoly--;
-
-/* We now have one fewer polylines. */
-                     Poly_npoly--;
-
-/* Now change the location of the current polyline within the sorted keys
-   to take account of its changed starting or ending X value. The end of the
-   current polyline is now at the start or end of the appended polyline. Use
-   a binary chop to find the first polyline that has an end X value greater
-   than or equal to the new end X of the current polyline. */
-                     xt = newx[ newsize - 1 ];
-                     ilo = 0;
-                     ihi = Poly_npoly - 1;
-                     while( 1 ) {
-                        imid = ( ilo + ihi )/2;
-                        kpoly = ekey[ imid ];
-                        xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
-                        if( xt <= xmid ) {
-                           if( ihi == imid ) break;
-                           ihi = imid;
+/* Otherwise, search down the list, starting at the polyline found above. */
+                  if( imid > 0 ) {
+                     for( ikey = imid - 1; ikey >= 0; ikey-- ) {
+                        if( ipass == 0 ) {
+                           kpoly = skey[ ikey ];
+                           xmid = Poly_xp[ kpoly ][ 0 ];
+                           ymid = Poly_yp[ kpoly ][ 0 ];
                         } else {
-                           if( ilo == imid ) break;
-                           ilo = imid;
-                        }
-                     }
-
-/* Move the current polyline from its original position to its new
-   position in the sorted end key. */
-                     if( ekey0 < ihi ) {
-                        for( ikey = ekey0; ikey < ihi; ikey++ ) {
-                           ekey[ ikey ] = ekey[ ikey + 1 ];
-                        }
-                     } else {
-                        for( ikey = ekey0; ikey > ihi; ikey-- ) {
-                           ekey[ ikey ] = ekey[ ikey - 1 ];
-                        }
-                     }
-                     ekey[ ihi ] = ipoly;
-
-/* The start of the current polyline will only have changed if the common
-   point was at the start of the original current polyline. */
-                     if( ipass1 == 1 ) {
-
-/* Use a binary chop to find the first polyline that has an end X value greater
-   than or equal to the new start X of the current polyline. */
-                        xt = newx[ 0 ];
-                        ilo = 0;
-                        ihi = Poly_npoly - 1;
-                        while( 1 ) {
-                           imid = ( ilo + ihi )/2;
-                           kpoly = skey[ imid ];
+                           kpoly = ekey[ ikey ];
                            xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
-                           if( xt <= xmid ) {
-                              if( ihi == imid ) break;
-                              ihi = imid;
-                           } else {
-                              if( ilo == imid ) break;
-                              ilo = imid;
-                           }
+                           ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
                         }
-
-/* Move the current polyline from its original position to its new
-   position in the sorted start key. */
-                        if( skey0 < ihi ) {
-                           for( ikey = skey0; ikey < ihi; ikey++ ) {
-                              skey[ ikey ] = skey[ ikey + 1 ];
+                        if( EQUAL( xmid, xt ) ) {
+                           if( EQUAL( ymid, yt ) && !drawn[ kpoly ] ) {
+                              jpoly = kpoly;
+                              break;
                            }
                         } else {
-                           for( ikey = skey0; ikey > ihi; ikey-- ) {
-                              skey[ ikey ] = skey[ ikey - 1 ];
-                           }
+                           break;
                         }
-                        skey[ ihi ] = ipoly;
                      }
+                     if( jpoly != -1 ) break;
+                  }
 
-/* Ensure we re-check the earlier polylines to see if we can now append
-   other polylines together. */
-                     more = 1;
-
-/* Break out of the the "ipass1" loop. */
-                     break;
+/* Now search up the list, starting at the polyline found above. */
+                  if( imid < Poly_npoly - 1 ) {
+                     for( ikey = imid + 1; ikey < Poly_npoly; ikey++ ) {
+                        if( ipass == 0 ) {
+                           kpoly = skey[ ikey ];
+                           xmid = Poly_xp[ kpoly ][ 0 ];
+                           ymid = Poly_yp[ kpoly ][ 0 ];
+                        } else {
+                           kpoly = ekey[ ikey ];
+                           xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                           ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                        }
+                        if( EQUAL( xmid, xt ) ) {
+                           if( EQUAL( ymid, yt ) && !drawn[ kpoly ] ) {
+                              jpoly = kpoly;
+                              break;
+                           }
+                        } else {
+                           break;
+                        }
+                     }
+                     if( jpoly != -1 ) break;
                   }
                }
             }
 
-/* If no polyline was found that can be appended to the current polyline, move on
-    to check the next polyline. */
-            if( ipass1 == 2 ) ipoly++;
+/* If a polyline was found that can be combined with the total polyline,
+   increment the total number of points in the total polyline, add it to
+   the list, and update the concatenation point. Note, we can omit the
+   start or end point of the new polyline since it will already be
+   present in the total polyline, hence the " - 1 " below. */
+            if( ipass < 2 ) {
+               ipoint = Poly_np[ jpoly ] - 1;
+
+               if( ipass == 0 ) {
+                  polylist[ npoly++ ] = jpoly;
+                  xt = Poly_xp[ jpoly ][ ipoint ];
+                  yt = Poly_yp[ jpoly ][ ipoint ];
+               } else {
+                  polylist[ npoly++ ] = -jpoly;
+                  xt = Poly_xp[ jpoly ][ 0 ];
+                  yt = Poly_yp[ jpoly ][ 0 ];
+               }
+
+               polylen += ipoint;
+
+/* Indicate the polyline has been drawn. */
+               drawn[ jpoly ] = 1;
+
+/* If we cannot find any polyline that starts or ends at the
+   concatenation point, then we have completed the total polyline. So break
+   out of the loop, and move on to draw the total polyline. */
+            } else {
+               break;
+            }
+         }
+
+/* If a single polyline is to be drawn, just draw it. */
+         if( npoly == 1 ) {
+            jpoly = polylist[ 0 ];
+            GLine( this, Poly_np[ jpoly ], Poly_xp[ jpoly ],
+                   Poly_yp[ jpoly ], method, class, status );
+
+/* If more than one polyline is to be drawn, ensure we have arrays that
+   are large enough to hold all the vertices in the combined polyline. */
+         } else {
+            xnew = astRealloc( xnew, polylen*sizeof( float ) );
+            ynew = astRealloc( ynew, polylen*sizeof( float ) );
+            if( astOK ) {
+
+/* Loop round all the polylines that are to be combined to form the total
+   polyline, and copy all the vertex coordinates into the above arrays. */
+               xp1 = xnew;
+               yp1 = ynew;
+               for( ipoly = 0; ipoly < npoly; ipoly++ ) {
+
+/* Index of the next polyline to include in the total polyline. */
+                  jpoly = polylist[ ipoly ];
+
+/* The jpoly value is positive if the polylline is to be inclued in its
+   original direction. */
+                  if( jpoly >= 0 ) {
+
+/* Use the whole of the first polyline. */
+                     if( ipoly == 0 ) {
+                        np =  Poly_np[ jpoly ];
+                        xp2 = Poly_xp[ jpoly ];
+                        yp2 = Poly_yp[ jpoly ];
+
+/* Omit eh first point of subsequent polylines since it will be the same
+   as the last pointy already in the total polyline. */
+                     } else {
+                        np =  Poly_np[ jpoly ] - 1;
+                        xp2 = Poly_xp[ jpoly ] + 1;
+                        yp2 = Poly_yp[ jpoly ] + 1;
+                     }
+
+/* Copy the vertex values in their original order, and update the
+   pointers to the next element of the total polyline. */
+                     memcpy( xp1, xp2, np*sizeof(float) );
+                     memcpy( yp1, yp2, np*sizeof(float) );
+                     xp1 +=  np;
+                     yp1 +=  np;
+
+/* The jpoly value is negative if the polyline is to be included in its
+   reversed direction. */
+                  } else {
+                     jpoly = -jpoly;
+
+/* Get the number of points to copy. Omit the last point if this is not
+   the first polyline, since it is already in the total polyline. */
+                     if( ipoly == 0 ) {
+                        np =  Poly_np[ jpoly ];
+                     } else {
+                        np =  Poly_np[ jpoly ] - 1;
+                     }
+
+/* Copy the individual values in reversed order. */
+                     xp2 = Poly_xp[ jpoly ] + np - 1;
+                     yp2 = Poly_yp[ jpoly ] + np - 1;
+                     for( ipoint = 0; ipoint < np; ipoint++ ) {
+                        *(xp1++) = *(xp2--);
+                        *(yp1++) = *(yp2--);
+                     }
+                  }
+               }
+
+/* And finally, draw the total polyline. */
+               GLine( this, polylen, xnew, ynew, method, class, status );
+            }
          }
       }
 
-/* Draw and free the remaining polylines. */
-      if( astOK ) {
-         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) {
-            GLine( this, Poly_np[ ipoly ], Poly_xp[ ipoly ], Poly_yp[ ipoly ],
-                   method, class, status );
-            Poly_xp[ ipoly ] = astFree( Poly_xp[ ipoly ] );
-            Poly_yp[ ipoly ] = astFree( Poly_yp[ ipoly ] );
-            Poly_np[ ipoly ] = 0;
-         }
+/*  Free all the individual polylines. */
+      for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) {
+         Poly_xp[ ipoly ] = astFree( Poly_xp[ ipoly ] );
+         Poly_yp[ ipoly ] = astFree( Poly_yp[ ipoly ] );
+         Poly_np[ ipoly ] = 0;
       }
 
-/* Free resources. */
+/* Free other resources. */
+      polylist = astFree( polylist );
+      drawn = astFree( drawn );
+      xnew = astFree( xnew );
+      ynew = astFree( ynew );
       skey = astFree( skey );
       ekey = astFree( ekey );
    }
@@ -31906,408 +31862,4 @@ f     function is invoked with STATUS set to an error value, or if it
 
 
 
-static void Fpoly( AstPlot *this, const char *method, const char *class,
-                   int *status ){
-/*
-*  Name:
-*     Fpoly
-
-*  Purpose:
-*     Flush all stored poly lines to the graphics system.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "plot.h"
-*     void Fpoly( AstPlot *this, const char *method, const char *class,
-*                 int *status )
-
-*  Class Membership:
-*     Plot member function.
-
-*  Description:
-*     This function sends all previously drawn poly lines to the graphics
-*     system for rendering, and frees the memory used to hold the poly
-*     lines. It attempts to reduce the number of graphics calls by
-*     concatenating continuous polylines together.
-
-*  Parameters:
-*     this
-*        Pointer to the Plot.
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
-*     status
-*        Pointer to the inherited status variable.
-
-*/
-
-/* Local Variables: */
-   astDECLARE_GLOBALS
-   float xmid;
-   float xt;
-   float ymid;
-   float *xnew;
-   float *ynew;
-   int polylen;
-   float *xp1;
-   float *xp2;
-   float *yp1;
-   float *yp2;
-   float yt;
-   int *ekey;
-   int *p;
-   int *skey;
-   int *drawn;
-   int ihi;
-   int ikey;
-   int ilo;
-   int imid;
-   int ipass;
-   int ipoint;
-   int ipoly;
-   int jpoly;
-   int kpoly;
-   int *polylist;
-   int npoly;
-   int np;
-
-/* Check the global status. */
-   if( !astOK ) return;
-
-/* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(this);
-
-/* Output any pending polyline. */
-   Opoly( this, status );
-
-/* If there is just one polyline to output, just draw it and then free
-   the memory used to hold the polyline.  */
-   if( Poly_npoly == 1 ) {
-      GLine( this, Poly_np[ 0 ], Poly_xp[ 0 ], Poly_yp[ 0 ], method, class,
-             status );
-      Poly_xp[ 0 ] = astFree( Poly_xp[ 0 ] );
-      Poly_yp[ 0 ] = astFree( Poly_yp[ 0 ] );
-      Poly_np[ 0 ] = 0;
-
-/* If there are multiple polylines to output, see if any of them can be
-   combined before drawing them.  */
-   } else if( Poly_npoly > 1 ) {
-
-int ndrawn = 0;
-
-/* No polyline buffer allocated yet. */
-      xnew = NULL;
-      ynew = NULL;
-
-/* Allocate an array to hold the order in which polylines should be
-   concatenated. Each value in this array will be the index of one of the
-   original polylines. A positive index indicates that the polyline
-   should be appended in its original order. A negative index indicates
-   that the polyline should be appended in reversed order. Polyline zero
-   is always appended in its original order. */
-      polylist = astMalloc( Poly_npoly*sizeof( int ) );
-      npoly = 0;
-
-/* Create an array of drawn, one for each individual polyline. The flag
-   is zero if the corresponding polyline has not yet been drawn. */
-      drawn = astCalloc(  Poly_npoly, sizeof( int ) );
-
-/* Create two sorted keys for the polylines - one that sorts them into
-   increasing x at the start of the polyline, and another that sorts them
-   into increasing x at the end of the polyline. */
-      skey = astMalloc( Poly_npoly*sizeof( int ) );
-      ekey = astMalloc( Poly_npoly*sizeof( int ) );
-      if( astOK ) {
-
-         p = skey;
-         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) *(p++) = ipoly;
-         qsort( skey, Poly_npoly, sizeof(int), Fpoly_scmp );
-
-         p = ekey;
-         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) *(p++) = ipoly;
-         qsort( ekey, Poly_npoly, sizeof(int), Fpoly_ecmp );
-
-      }
-
-/* Continue to search for separate polylines that can be combined together
-   until we know there are no more. */
-      while( astOK ) {
-
-/* Search for the first polyline that has not already been drawn. */
-         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) {
-            if( !drawn[ ipoly ] ) break;
-         }
-
-/* Leave the loop if no more polylines remain to be plotted. */
-         if( ipoly == Poly_npoly ) break;
-
-/* Initialise the list of polylines to hold the polyline found above, in
-   its forward sense. */
-         polylist[ 0 ] = ipoly;
-         npoly = 1;
-         drawn[ 0 ] = 1;
-
-/* Initialise the concatenation point to be the end of the polyline found
-   above. Also, initialise the total number of points in the combined
-   polyline (polylen). */
-         ipoint = Poly_np[ ipoly ] - 1;
-         xt = Poly_xp[ ipoly ][ ipoint ];
-         yt = Poly_yp[ ipoly ][ ipoint ];
-         polylen = ipoint + 1;
-
-/* Loop until we can find no more polylines to append to the list.
-   A polyline can be appended if it starts or ends at the current
-   concatenation point. */
-         while( astOK ) {
-
-/* On the first pass through the next loop, search for a polyline that
-   starts at the concatenation point. If no such polyline is found, do
-   a second pass in which we search for a polyline that ends at the
-   concatenation point. Do not include any previously drawn polylines
-   in the search. */
-            for( ipass = 0; ipass < 2; ipass++ ) {
-
-/* We use a binary chop to find a polyline which starts (or ends) at the
-   x value of the concatenation point. */
-               jpoly = -1;
-               ilo = 0;
-               ihi = Poly_npoly - 1;
-               while( 1 ) {
-                  imid = ( ilo + ihi )/2;
-                  if( ipass == 0 ) {
-                     jpoly = skey[ imid ];
-                     xmid = Poly_xp[ jpoly ][ 0 ];
-                  } else {
-                     jpoly = ekey[ imid ];
-                     xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
-                  }
-                  if( EQUAL( xmid, xt ) ) {
-                     ikey = imid;
-                     break;
-                  } else if( xmid > xt ) {
-                     if( ihi == imid ) {
-                        if( ipass == 0 ) {
-                           jpoly = skey[ ilo ];
-                           xmid = Poly_xp[ jpoly ][ 0 ];
-                        } else {
-                           jpoly = ekey[ ilo ];
-                           xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
-                        }
-                        if( !EQUAL( xmid, xt ) ) jpoly = -1;
-                        ikey = ilo;
-                        break;
-                     }
-                     ihi = imid;
-                  } else {
-                     if( ilo == imid ) {
-                        if( ipass == 0 ) {
-                           jpoly = skey[ ihi ];
-                           xmid = Poly_xp[ jpoly ][ 0 ];
-                        } else {
-                           jpoly = ekey[ ihi ];
-                           xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
-                        }
-                        if( !EQUAL( xmid, xt ) ) jpoly = -1;
-                        ikey = ihi;
-                        break;
-                     }
-                     ilo = imid;
-                  }
-               }
-
-/* If found, there may be more than one such polyline. So we now search
-   for a polyline that also has the y value of the concatenation point. */
-               if( jpoly != -1 ) {
-
-/* If the polyline found above starts (or ends) at the same Y value as the
-   concatenation point, then we have found the required polyline. */
-                  if( ipass == 0 ) {
-                     ymid = Poly_yp[ jpoly ][ 0 ];
-                  } else {
-                     ymid = Poly_yp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
-                  }
-                  if( EQUAL( ymid, yt ) && !drawn[ jpoly ] ) break;
-                  jpoly = -1;
-
-/* Otherwise, search down the list, starting at the polyline found above. */
-                  if( imid > 0 ) {
-                     for( ikey = imid - 1; ikey >= 0; ikey-- ) {
-                        if( ipass == 0 ) {
-                           kpoly = skey[ ikey ];
-                           xmid = Poly_xp[ kpoly ][ 0 ];
-                           ymid = Poly_yp[ kpoly ][ 0 ];
-                        } else {
-                           kpoly = ekey[ ikey ];
-                           xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
-                           ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
-                        }
-                        if( EQUAL( xmid, xt ) ) {
-                           if( EQUAL( ymid, yt ) && !drawn[ kpoly ] ) {
-                              jpoly = kpoly;
-                              break;
-                           }
-                        } else {
-                           break;
-                        }
-                     }
-                     if( jpoly != -1 ) break;
-                  }
-
-/* Now search up the list, starting at the polyline found above. */
-                  if( imid < Poly_npoly - 1 ) {
-                     for( ikey = imid + 1; ikey < Poly_npoly; ikey++ ) {
-                        if( ipass == 0 ) {
-                           kpoly = skey[ ikey ];
-                           xmid = Poly_xp[ kpoly ][ 0 ];
-                           ymid = Poly_yp[ kpoly ][ 0 ];
-                        } else {
-                           kpoly = ekey[ ikey ];
-                           xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
-                           ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
-                        }
-                        if( EQUAL( xmid, xt ) ) {
-                           if( EQUAL( ymid, yt ) && !drawn[ kpoly ] ) {
-                              jpoly = kpoly;
-                              break;
-                           }
-                        } else {
-                           break;
-                        }
-                     }
-                     if( jpoly != -1 ) break;
-                  }
-               }
-            }
-
-/* If a polyline was found that can be combined with the total polyline,
-   increment the total number of points in the total polyline, add it to
-   the list, and update the concatenation point. Note, we can omit the
-   start or end point of the new polyline since it will already be
-   present in the total polyline, hence the " - 1 " below. */
-            if( ipass < 2 ) {
-               ipoint = Poly_np[ jpoly ] - 1;
-
-               if( ipass == 0 ) {
-                  polylist[ npoly++ ] = jpoly;
-                  xt = Poly_xp[ jpoly ][ ipoint ];
-                  yt = Poly_yp[ jpoly ][ ipoint ];
-               } else {
-                  polylist[ npoly++ ] = -jpoly;
-                  xt = Poly_xp[ jpoly ][ 0 ];
-                  yt = Poly_yp[ jpoly ][ 0 ];
-               }
-
-               polylen += ipoint;
-
-/* Indicate the polyline has been drawn. */
-               drawn[ jpoly ] = 1;
-
-/* If we cannot find any polyline that starts or ends at the
-   concatenation point, then we have completed the total polyline. So break
-   out of the loop, and move on to draw the total polyline. */
-            } else {
-               break;
-            }
-         }
-
-/* If a single polyline is to be drawn, just draw it. */
-         if( npoly == 1 ) {
-            jpoly = polylist[ 0 ];
-            GLine( this, Poly_np[ jpoly ], Poly_xp[ jpoly ],
-                   Poly_yp[ jpoly ], method, class, status );
-
-/* If more than one polyline is to be drawn, ensure we have arrays that
-   are large enough to hold all the vertices in the combined polyline. */
-         } else {
-            xnew = astRealloc( xnew, polylen*sizeof( float ) );
-            ynew = astRealloc( ynew, polylen*sizeof( float ) );
-            if( astOK ) {
-
-/* Loop round all the polylines that are to be combined to form the total
-   polyline, and copy all the vertex coordinates into the above arrays. */
-               xp1 = xnew;
-               yp1 = ynew;
-               for( ipoly = 0; ipoly < npoly; ipoly++ ) {
-
-/* Index of the next polyline to include in the total polyline. */
-                  jpoly = polylist[ ipoly ];
-
-/* The jpoly value is positive if the polylline is to be inclued in its
-   original direction. */
-                  if( jpoly >= 0 ) {
-
-/* Use the whole of the first polyline. */
-                     if( ipoly == 0 ) {
-                        np =  Poly_np[ jpoly ];
-                        xp2 = Poly_xp[ jpoly ];
-                        yp2 = Poly_yp[ jpoly ];
-
-/* Omit eh first point of subsequent polylines since it will be the same
-   as the last pointy already in the total polyline. */
-                     } else {
-                        np =  Poly_np[ jpoly ] - 1;
-                        xp2 = Poly_xp[ jpoly ] + 1;
-                        yp2 = Poly_yp[ jpoly ] + 1;
-                     }
-
-/* Copy the vertex values in their original order, and update the
-   pointers to the next element of the total polyline. */
-                     memcpy( xp1, xp2, np*sizeof(float) );
-                     memcpy( yp1, yp2, np*sizeof(float) );
-                     xp1 +=  np;
-                     yp1 +=  np;
-
-/* The jpoly value is negative if the polyline is to be included in its
-   reversed direction. */
-                  } else {
-                     jpoly = -jpoly;
-
-/* Get the number of points to copy. Omit the last point if this is not
-   the first polyline, since it is already in the total polyline. */
-                     if( ipoly == 0 ) {
-                        np =  Poly_np[ jpoly ];
-                     } else {
-                        np =  Poly_np[ jpoly ] - 1;
-                     }
-
-/* Copy the individual values in reversed order. */
-                     xp2 = Poly_xp[ jpoly ] + np - 1;
-                     yp2 = Poly_yp[ jpoly ] + np - 1;
-                     for( ipoint = 0; ipoint < np; ipoint++ ) {
-                        *(xp1++) = *(xp2--);
-                        *(yp1++) = *(yp2--);
-                     }
-                  }
-               }
-
-/* And finally, draw the total polyline. */
-               GLine( this, polylen, xnew, ynew, method, class, status );
-            }
-         }
-      }
-
-/*  Free all the individual polylines. */
-      for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) {
-         Poly_xp[ ipoly ] = astFree( Poly_xp[ ipoly ] );
-         Poly_yp[ ipoly ] = astFree( Poly_yp[ ipoly ] );
-         Poly_np[ ipoly ] = 0;
-      }
-
-/* Free other resources. */
-      polylist = astFree( polylist );
-      drawn = astFree( drawn );
-      xnew = astFree( xnew );
-      ynew = astFree( ynew );
-      skey = astFree( skey );
-      ekey = astFree( ekey );
-   }
-
-/* Indicate that all polylines have been sent to the graphics system. */
-   Poly_npoly = 0;
-}
 
