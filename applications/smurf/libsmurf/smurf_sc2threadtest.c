@@ -1,3 +1,4 @@
+
 /*
 *+
 *  Name:
@@ -311,11 +312,13 @@ void smurf_sc2threadtest( int *status ) {
         data->dims[1]=32;
         data->dims[2]=(dim_t) tsteps;
         datalen=1;
+        data->isFFT=-1;
         for( j=0; j<data->ndims; j++ ) datalen *= data->dims[j];
 
         data->hdr->steptime = 0.005;
 
         data->pntr[0] = astCalloc( datalen, smf_dtype_sz(data->dtype,status) );
+        data->qual = astCalloc( datalen, sizeof(*data->qual) );
       }
 
       smf_addto_smfArray( res[k], data, status );
@@ -429,58 +432,68 @@ void smurf_sc2threadtest( int *status ) {
   msgOutf( "", "** %f seconds to complete test", status,
            smf_timerupdate(&tv1,&tv2,status) );
 
-  /* The third test will FFT filter bolometers from time chunks in
-     parallel */
-
   msgOut( "", TASK_NAME
-          ": Starting test 3 __parallel time: FFT filter__", status );
-
-  for( i=0; (i<(size_t)nthread) && (*status==SAI__OK); i++ ) {
-    pdata = job_data + i;
-
-    pdata->type = 2;                /* FFT filter */
-
-    if( pdata->chunk1 >= nchunks ) {
-      /* Nothing for this thread to do */
-      msgSeti( "W", i+1);
-      msgOutif( MSG__DEBUG, "",
-                "-- parallel time: skipping thread ^W, nothing to do",
-                status);
-    } else {
-      /* Since we know there is one job_data per thread, just submit jobs
-         immediately */
-      pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfParallelTime,
-                                 0, NULL, status );
-    }
-  }
-
-  /* Wait until all of the submitted jobs have completed */
-  thrWait( wf, status );
-
-  /*** TIMER ***/
-  msgOutf( "", "** %f seconds to complete test", status,
-           smf_timerupdate(&tv1,&tv2,status) );
-
-
-  msgOut( "", TASK_NAME
-          ": Starting test 4 __FFTW filter using internal threading__",
+          ": *** Next 2 tests will be done twice due to FFTW planning *****",
           status );
 
-  for( i=0; (*status==SAI__OK)&&(i<nchunks); i++ ) {
-    filt = smf_create_smfFilter( res[i]->sdata[0], status );
-    smf_filter_ident( filt, 1, status );
+  for( k=0; k<2; k++ ) {
 
-    for( j=0; (*status==SAI__OK)&&(j<nsub); j++ ) {
-      msgOutiff( MSG__DEBUG, "", "  filter chunk %zu/%zu, bolo %zu/%zu",
-                 status, i+1, nchunks, j+1, nsub );
-      smf_filter_execute( wf, res[i]->sdata[j], filt, 0, 0, status );
+    /* The third test will FFT filter bolometers from time chunks in
+       parallel */
+
+    msgOut( "", TASK_NAME
+            ": Starting test 3 __parallel time: FFT filter__", status );
+
+    for( i=0; (i<(size_t)nthread) && (*status==SAI__OK); i++ ) {
+      pdata = job_data + i;
+
+      pdata->type = 2;                /* FFT filter */
+
+      if( pdata->chunk1 >= nchunks ) {
+        /* Nothing for this thread to do */
+        msgSeti( "W", i+1);
+        msgOutif( MSG__DEBUG, "",
+                  "-- parallel time: skipping thread ^W, nothing to do",
+                  status);
+      } else {
+        /* Since we know there is one job_data per thread, just submit jobs
+           immediately */
+        pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfParallelTime,
+                                 0, NULL, status );
+      }
     }
 
-    if( filt ) filt = smf_free_smfFilter( filt, status );
+    /* Wait until all of the submitted jobs have completed */
+    thrWait( wf, status );
+
+    /*** TIMER ***/
+    msgOutf( "", "** %f seconds to complete test", status,
+             smf_timerupdate(&tv1,&tv2,status) );
+
+    msgOut( "", TASK_NAME
+            ": Starting test 4 __FFTW filter using internal threading__",
+            status );
+
+    for( i=0; (*status==SAI__OK)&&(i<nchunks); i++ ) {
+      filt = smf_create_smfFilter( res[i]->sdata[0], status );
+      smf_filter_ident( filt, 1, status );
+
+      for( j=0; (*status==SAI__OK)&&(j<nsub); j++ ) {
+        msgOutiff( MSG__DEBUG, "", "  filter chunk %zu/%zu, bolo %zu/%zu",
+                   status, i+1, nchunks, j+1, nsub );
+        smf_filter_execute( wf, res[i]->sdata[j], filt, 0, 0, status );
+      }
+
+      if( filt ) filt = smf_free_smfFilter( filt, status );
+    }
+    /*** TIMER ***/
+    msgOutf( "", "** %f seconds to complete test", status,
+             smf_timerupdate(&tv1,&tv2,status) );
   }
-  /*** TIMER ***/
-  msgOutf( "", "** %f seconds to complete test", status,
-           smf_timerupdate(&tv1,&tv2,status) );
+
+  msgOut( "", TASK_NAME
+          ": **************************************************************",
+          status );
 
   /* Series of short single-thread array index tests */
   data = res[0]->sdata[0];
