@@ -684,11 +684,13 @@ f     - Title: The Plot title drawn using AST_GRID
 *        these functions will not change during the course of a single drawing
 *        operation).
 *     11-OCT-2011 (DSB):
-*        Combine multiple continuous polylines into a single polyline
+*        - Combine multiple continuous polylines into a single polyline
 *        before calling the grf polyline function. Reducing the number of
 *        calls to the underlying graphics system can make a big difference
 *        if the graphics system is written in an interpreted language
 *        such as python.
+*        - Take account of differing axis scales when rotating vectors by
+*        90 degrees.
 *class--
 */
 
@@ -2292,6 +2294,7 @@ static void PurgeCdata( AstPlotCurveData *, int * );
 static void PushGat( AstPlot *, float, const char *, const char *, int * );
 static void RemoveFrame( AstFrameSet *, int, int * );
 static void RightVector( AstPlot *, float *, float *, float *, float *, const char *, const char *, int * );
+static void RotateVector( AstPlot *, int, double, double, double *, double *, const char *, const char *, int * );
 static void SaveTick( AstPlot *, int, double, double, int, int * );
 static void SetTickValues( AstPlot *, int, int, double *, int, double *, int * );
 static void Text( AstPlot *, const char *, const double [], const float [], const char *, int * );
@@ -13068,8 +13071,6 @@ static void Fpoly( AstPlot *this, const char *method, const char *class,
    combined before drawing them.  */
    } else if( Poly_npoly > 1 ) {
 
-int ndrawn = 0;
-
 /* No polyline buffer allocated yet. */
       xnew = NULL;
       ynew = NULL;
@@ -20644,6 +20645,8 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
    double mindim;         /* Shortest dimension of plotting area */
    double offx;           /* X component of offset vector */
    double offy;           /* Y component of offset vector */
+   double rx;             /* X comp of vector perpendicular to (dx,dy) */
+   double ry;             /* Y comp of vector perpendicular to (dx,dy) */
    double sin45;          /* Sine of 45 degrees */
    double txtgap;         /* Absolute gap between labels and edges */
    double upx;            /* Text up-vector X component */
@@ -20807,7 +20810,7 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
 
 /* We now need to decide where to put the reference point for the text
    string, and what justification to use. Assuming that NumLabGap is +ve,
-   the labels are drawn on the right hand side of the axis as seen by
+   the labels are drawn on the left hand side of the axis as seen by
    someone moving along the axis in the positive direction, with an
    up-vector which is normal to the axis tangent. First, find the graphics
    coordinates at the point being labelled, and the tangent-vector parallel
@@ -20815,6 +20818,11 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
    the tangent vector used for the previous label is re-used. */
                   GVec( this, mapping, val, axis, 0.01*diff, &pset1,
                         &pset2, &gx, &gy, &dx, &dy, &flag, method, class, status );
+
+/* Get a vector perpendicular to the tangent. This vector points to the
+   left as you move along the physical axis in the positive direction. */
+                  RotateVector( this, 1, dx, dy, &rx, &ry, method, class,
+                                status );
 
 /* If we now have a tangent vector and good graphics coordinates for the
    label's reference position... */
@@ -20824,19 +20832,12 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
 /* The reference position for the text is displaced away from the
    reference position normal to the axis on the left hand side by the
    "txtgap" value. */
-                     if( ( this->xrev && this->yrev ) ||
-                         ( !this->xrev && !this->yrev ) ) {
-                        offx = -dy*txtgap;
-                        offy = dx*txtgap;
-                     } else {
-                        offx = dy*txtgap;
-                        offy = -dx*txtgap;
-                     }
-
+                     offx = rx*txtgap;
+                     offy = ry*txtgap;
                      gx += offx;
                      gy += offy;
 
-/* Reverse the vector components if the graphics axes are displayed
+/* Reverse the tangent vector components if the graphics axes are displayed
    reversed. */
                      dx2 = ( this->xrev ) ? -dx : dx;
                      dy2 = ( this->yrev ) ? -dy : dy;
@@ -20849,12 +20850,12 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
                      if( upfree ){
 
                         if( dx2 < -0.01 ){
-                           upx = dy2;
-                           upy = -dx2;
+                           upx = -rx;
+                           upy = -ry;
                            just = ( txtgap < 0.0 )? "BC" : "TC";
                         } else {
-                           upx = -dy2;
-                           upy = dx2;
+                           upx = rx;
+                           upy = ry;
                            just = ( txtgap < 0.0 )? "TC" : "BC";
                         }
                         if( txtgap == 0.0 ) just = "CC";
@@ -24513,6 +24514,101 @@ static void RightVector( AstPlot *this, float *ux, float *uy, float *rx,
    *rx /= alpha;
    *ry /= beta;
 
+}
+
+static void RotateVector( AstPlot *this, int  acw, double vx, double vy,
+                          double *px, double *py, const char *method,
+                          const char *class, int *status ) {
+/*
+*  Name:
+*     RotateVector
+
+*  Purpose:
+*     Rotates a supplied vector.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void RotateVector( AstPlot *this, int acw, double vx, double vy,
+*                        double *px, double *py, const char *method,
+*                        const char *class, int *status )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function rotates a supplied vector through 90 degrees,
+*     taking account of the potentially differing scales on the
+*     displayed X and Y axes.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     acw
+*        If non-zero rotate by 90 degs anti-clockwise. Otherwise rotate
+*        by 90 degs clockwise.
+*     vx
+*        The x component of the vector, in graphics coords.
+*     vy
+*        The Y component of the vector, in graphics coords.
+*     px
+*        Pointer to a double in which to return the X component of the
+*        rotated vector.
+*     py
+*        Pointer to a double in which to return the Y component of the
+*        rotated vector.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   float alpha;         /* Scale factor for X axis */
+   float beta;          /* Scale factor for Y axis */
+
+/* Initialise returned values. */
+   *px = vx;
+   *py = vy;
+
+/* Check the global status. */
+   if( !astOK ) return;
+
+/* Find the scale factors for the two axes which scale graphics coordinates
+   into a "standard" coordinate system in which: 1) the axes have equal scale
+   in terms of (for instance) millimetres per unit distance, 2) X values
+   increase from left to right, 3) Y values increase from bottom to top.
+   If the grf module is not capable of giving us this information, then
+   all we can do is to assume that the axes are equally scaled, except for
+   any axis reversal indicated in the supplied Plot. */
+   if( GCap( this, GRF__SCALES, 1, status ) ) {
+      GScales( this, &alpha, &beta, method, class, status );
+   } else {
+      alpha = ( this->xrev ) ? -1.0 : 1.0;
+      beta = ( this->yrev ) ? -1.0 : 1.0;
+   }
+
+/* Convert the supplied vector into this "standard" system in which the axes
+   have equal scales, and increase left-to-right, bottom-to-top, and then
+   rotate the vector. */
+   if( acw ){
+      *px = -vy*beta;
+      *py = vx*alpha;
+   } else {
+      *px = vy*beta;
+      *py = -vx*alpha;
+   }
+
+/* Un-scale the vectors back into the graphics system. */
+   *px /= alpha;
+   *py /= beta;
 }
 
 static void SaveTick( AstPlot *this, int axis, double gx, double gy,
