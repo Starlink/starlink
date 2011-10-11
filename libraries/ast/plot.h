@@ -153,7 +153,6 @@
 #define AST__TICKS_ID       24 /* Id for major and minor tick marks */
 
 /* Define constants used to size global arrays in this module. */
-#define AST__PLOT_POLY_MAX  1000 /* Max. no. of points in a poly line */
 #define AST__PLOT_CRV_MXBRK 1000 /* Max. no. of breaks allowed in a plotted curve */
 #define AST__PLOT_STRIPESCAPES_BUFF_LEN 50 /* Length of string returned by astStripEscapes */
 
@@ -623,9 +622,13 @@ typedef struct AstPlotGlobals {
    float Boxp_lbnd_t[ 2 ];
    float Boxp_ubnd_t[ 2 ];
    int Boxp_freeze_t;
-   float Poly_x_t[ AST__PLOT_POLY_MAX ];
-   float Poly_y_t[ AST__PLOT_POLY_MAX ];
-   int   Poly_n_t;
+   float 	*Poly_x_t;
+   float 	*Poly_y_t;
+   int   	 Poly_n_t;
+   float       **Poly_xp_t;
+   float       **Poly_yp_t;
+   int          *Poly_np_t;
+   int   	 Poly_npoly_t;
    int           Map1_ncoord_t;
    AstPlot      *Map1_plot_t;
    AstMapping   *Map1_map_t;

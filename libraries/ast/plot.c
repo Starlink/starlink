@@ -1711,6 +1711,12 @@ static const char *xlbling[2] = { "interior", "exterior" };
    globals->Map5_map_t = NULL; \
    globals->Map5_statics_t = NULL; \
    globals->Poly_n_t = 0; \
+   globals->Poly_x_t = NULL; \
+   globals->Poly_y_t = NULL; \
+   globals->Poly_npoly_t = 0; \
+   globals->Poly_np_t = NULL; \
+   globals->Poly_xp_t = NULL; \
+   globals->Poly_yp_t = NULL; \
    globals->Curve_data_t.nbrk = -1; \
    globals->GetAttrib_Buff[ 0 ] = 0; \
    globals->SplitValue_Buff[ 0 ] = 0; \
@@ -1760,6 +1766,10 @@ astMAKE_INITGLOBALS(Plot)
 #define Poly_x 		astGLOBAL(Plot,Poly_x_t)
 #define Poly_y 		astGLOBAL(Plot,Poly_y_t)
 #define Poly_n 		astGLOBAL(Plot,Poly_n_t)
+#define Poly_xp 	astGLOBAL(Plot,Poly_xp_t)
+#define Poly_yp 	astGLOBAL(Plot,Poly_yp_t)
+#define Poly_np 	astGLOBAL(Plot,Poly_np_t)
+#define Poly_npoly      astGLOBAL(Plot,Poly_npoly_t)
 #define Map1_ncoord 	astGLOBAL(Plot,Map1_ncoord_t)
 #define Map1_plot 	astGLOBAL(Plot,Map1_plot_t)
 #define Map1_map 	astGLOBAL(Plot,Map1_map_t)
@@ -1864,9 +1874,13 @@ static int Boxp_freeze = 0;
 
 /* Variables used to stored buffered poly lines (see functions Opoly, Bpoly
    and Apoly). */
-static float Poly_x[ AST__PLOT_POLY_MAX ];
-static float Poly_y[ AST__PLOT_POLY_MAX ];
-static int   Poly_n = 0;
+static float        *Poly_x = NULL;
+static float        *Poly_y = NULL;
+static int           Poly_n = 0;
+static float       **Poly_xp = NULL;
+static float       **Poly_yp = NULL;
+static int          *Poly_np = NULL;
+static int           Poly_npoly = 0;
 
 /* Variables used by function Map1. See the prologue of Map1 for details. */
 static int           Map1_ncoord;
@@ -2189,6 +2203,8 @@ static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int *, 
 static int FindMajTicks( AstMapping *, AstFrame *, int, double, double, double , double *, int, double *, double **, int * );
 static int FindMajTicks2( int, double, double, int, double *, double **, int * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char *, int * );
+static int Fpoly_ecmp( const void *, const void * );
+static int Fpoly_scmp( const void *, const void * );
 static int FullForm( const char *, const char *, const char *, const char *, const char *, int * );
 static int GCap( AstPlot *, int, int, int * );
 static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **, AstPointSet **, double *, double *, double *, double *, int *, const char *, const char *, int * );
@@ -2216,11 +2232,11 @@ static int Ustrcmp( const char *, const char *, int * );
 static int Ustrncmp( const char *, const char *, size_t, int * );
 static int swapEdges( AstPlot *, TickInfo **, AstPlotCurveData **, int * );
 static void AddCdt( AstPlotCurveData *, AstPlotCurveData *, const char *, const char *, int * );
-static void Apoly( AstPlot *, float, float, const char *, const char *, int * );
+static void Apoly( AstPlot *, float, float, int * );
 static void AxPlot( AstPlot *, int, const double *, double, int, AstPlotCurveData *, const char *, const char *, int * );
 static void BBuf( AstPlot *, int * );
 static void BoundingBox( AstPlot *, float[2], float[2], int * );
-static void Bpoly( AstPlot *, float, float, const char *, const char *, int * );
+static void Bpoly( AstPlot *, float, float, int * );
 static void Clip( AstPlot *, int, const double [], const double [], int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void CopyPlotDefaults( AstPlot *, int, AstPlot *, int, int * );
@@ -2234,6 +2250,7 @@ static void DrawText( AstPlot *, int, int, const char *, float, float, const cha
 static void DrawTicks( AstPlot *, TickInfo **, int, double *, double *, const char *, const char *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void EBuf( AstPlot *, int * );
+static void Fpoly( AstPlot *, const char *, const char *, int * );
 static void GAttr( AstPlot *, int, double, double *, int, const char *, const char *, int * );
 static void GBBuf( AstPlot *, const char *, const char *, int * )__attribute__((unused));
 static void GEBuf( AstPlot *, const char *, const char *, int * )__attribute__((unused));
@@ -2262,7 +2279,7 @@ static void Map5( int, double *, double *, double *, const char *, const char *,
 static void Mark( AstPlot *, int, int, int, const double *, int, int * );
 static void Mirror( AstPlot *, int, int * );
 static void Norm1( AstMapping *, int, int, double *, double, double, int * );
-static void Opoly( AstPlot *, const char *, const char *, int * );
+static void Opoly( AstPlot *, int * );
 static void PlotLabels( AstPlot *, int, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *, int * );
 static void PolyCurve( AstPlot *, int, int, int, const double *, int * );
 static void PurgeCdata( AstPlotCurveData *, int * );
@@ -4387,7 +4404,7 @@ static void AddCdt( AstPlotCurveData *cdt1, AstPlotCurveData *cdt2, const char *
 
 }
 
-static void Apoly( AstPlot *this, float x, float y, const char *method, const char *class, int *status ){
+static void Apoly( AstPlot *this, float x, float y, int *status ){
 /*
 *  Name:
 *     Apoly
@@ -4400,33 +4417,26 @@ static void Apoly( AstPlot *this, float x, float y, const char *method, const ch
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Apoly( AstPlot *this, float x, float y, const char *method, const char *class, int *status )
+*     void Apoly( AstPlot *this, float x, float y, int *status )
 
 *  Class Membership:
 *     Plot member function.
 
 *  Description:
-*     This function appends the supplied point to the current poly line. If
-*     this results in the buffer being filled, the buffer is drawn, and
-*     re-set to hold just the supplied point.
+*     This function appends the supplied point to the current poly line.
 
 *  Parameters:
 *     x
 *        The graphics x coordinate.
 *     y
 *        The graphics y coordinate.
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
 *     status
 *        Pointer to the inherited status variable.
 
 */
 
 /* Local Variables: */
+   int ipoint;
    astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
 
 /* Check the global status. */
@@ -4435,18 +4445,14 @@ static void Apoly( AstPlot *this, float x, float y, const char *method, const ch
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(this);
 
-/* If the buffer is already full, output it to the screen and re-initialise
-   it to hold just the final point. */
-   if( Poly_n == AST__PLOT_POLY_MAX ){
-      Opoly( this, method, class, status );
-      Poly_x[ 0 ] = Poly_x[ AST__PLOT_POLY_MAX - 1 ];
-      Poly_y[ 0 ] = Poly_y[ AST__PLOT_POLY_MAX - 1 ];
-      Poly_n = 1;
+/* Extend the buffers, and add the supplied point to the end. */
+   ipoint = Poly_n++;
+   Poly_x = astGrow( Poly_x, Poly_n, sizeof(*Poly_x) );
+   Poly_y = astGrow( Poly_y, Poly_n, sizeof(*Poly_y) );
+   if( astOK ) {
+      Poly_x[ ipoint ] = x;
+      Poly_y[ ipoint ] = y;
    }
-
-/* Add the supplied point to the buffer. */
-   Poly_x[ Poly_n ] = x;
-   Poly_y[ Poly_n++ ] = y;
 
 /* Update the box containing all plotted lines. */
    Box_lbnd[ 0 ] = MIN( x, Box_lbnd[ 0 ] );
@@ -4454,69 +4460,6 @@ static void Apoly( AstPlot *this, float x, float y, const char *method, const ch
    Box_lbnd[ 1 ] = MIN( y, Box_lbnd[ 1 ] );
    Box_ubnd[ 1 ] = MAX( y, Box_ubnd[ 1 ] );
 
-}
-
-static void PurgeCdata( AstPlotCurveData *cdata, int *status ){
-/*
-*
-*  Name:
-*     AstPlotCurveData
-
-*  Purpose:
-*     Remove any zero length sections from the description of a curve.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "plot.h"
-*     void PurgeCdata( AstPlotCurveData *cdata )
-
-*  Class Membership:
-*     Plot member function.
-
-*  Description:
-*     This function removes any zero length sections from the supplied
-*     AstPlotCurveData struture, which describes a multi-section curve.
-
-*  Parameters:
-*     cdata
-*        A pointer to the structure containing information about the
-*        breaks in a curve.
-
-*/
-
-/* Local Variables: */
-   int brk;                       /*Break index */
-   int i;                       /*Break index */
-
-/* Check the global error status. */
-   if ( !astOK || !cdata ) return;
-
-/* Loop round all breaks. */
-   brk = 0;
-   while( brk < cdata->nbrk ) {
-
-/* If this break and the next one are co-incident, remove both breaks. */
-      if( cdata->xbrk[ brk ] == cdata->xbrk[ brk + 1 ] &&
-          cdata->ybrk[ brk ] == cdata->ybrk[ brk + 1 ] ) {
-
-/* Shuffle down the higher elements of all the arrays in the curve data. */
-         for( i = brk + 2; i < cdata->nbrk; i++ ){
-            cdata->xbrk[ i - 2 ] = cdata->xbrk[ i ];
-            cdata->ybrk[ i - 2 ] = cdata->ybrk[ i ];
-            cdata->vxbrk[ i - 2 ] = cdata->vxbrk[ i ];
-            cdata->vybrk[ i - 2 ] = cdata->vybrk[ i ];
-         }
-
-/*  Decrement the number of breaks in the curve data. */
-         cdata->nbrk -= 2;
-
-/* If the section is not zero length, move on to the next pair of breaks. */
-      } else {
-         brk += 2;
-      }
-   }
 }
 
 static void AxPlot( AstPlot *this, int axis, const double *start, double length,
@@ -4705,7 +4648,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* End the current poly line. */
-      Opoly( this, method, class, status );
+      Opoly( this, status );
 
 /* Tidy up the static data used by Map1. */
       Map1( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
@@ -5153,6 +5096,9 @@ f     with STATUS set to an error value, or if it should fail for any
    method. */
    inval = Boundary( this, method, class, status );
 
+/* Ensure all lines are flushed to the graphics system. */
+   Fpoly( this, method, class, status );
+
 /* Re-establish the original graphical attributes. */
    astGrfAttrs( this, AST__BORDER_ID, 0, GRF__LINE, method, class );
 
@@ -5394,7 +5340,7 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy, int *status ) {
    return ret;
 }
 
-static void Bpoly( AstPlot *this, float x, float y, const char *method, const char *class, int *status ){
+static void Bpoly( AstPlot *this, float x, float y, int *status ){
 /*
 *  Name:
 *     Bpoly
@@ -5407,7 +5353,7 @@ static void Bpoly( AstPlot *this, float x, float y, const char *method, const ch
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Bpoly( AstPlot *this, float x, float y, const char *method, const char *class, int *status )
+*     void Bpoly( AstPlot *this, float x, float y, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -5421,25 +5367,38 @@ static void Bpoly( AstPlot *this, float x, float y, const char *method, const ch
 *        The graphics x coordinate.
 *     y
 *        The graphics y coordinate.
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
 *     status
 *        Pointer to the inherited status variable.
 
 */
 
+/* Local Variables: */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
+   int ignore;             /* Is the new point the end of the current polyline? */
+
 /* Check the global status. */
    if( !astOK ) return;
 
-/* Draw any existing poly line. */
-   Opoly( this, method, class, status );
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
-/* Add the supplied point into the buffer. */
-   Apoly( this, x, y, method, class, status );
+/* See if the new point is co-incident with the end of the current
+   polyline. If so we assume the current polyline is to be re-started,
+   rather than starting a new polyline. */
+   if( Poly_n > 0 ) {
+      ignore = ( EQUAL( Poly_x[ Poly_n - 1 ], x ) &&
+                 EQUAL( Poly_y[ Poly_n - 1 ], y ) );
+   } else {
+      ignore = 0;
+   }
+
+/* If the supplied point is not at the end of the current polyline, draw
+   any existing poly line. This will empty the buffer. Then add the
+   supplied point into the buffer. */
+   if( !ignore ) {
+      Opoly( this, status );
+      Apoly( this, x, y, status );
+   }
 
 }
 
@@ -8486,7 +8445,7 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
          Crv_len = (float) dl;
 
 /* Start a poly line. */
-         if( Crv_ink ) Bpoly( this, (float) xam,  (float) yam, method, class, status );
+         if( Crv_ink ) Bpoly( this, (float) xam,  (float) yam, status );
 
 /* If this is not the first line to be plotted... */
       } else {
@@ -8517,12 +8476,12 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
             }
 
 /* Start a poly line. */
-            if( Crv_ink ) Bpoly( this, (float) xam,  (float) yam, method, class, status );
+            if( Crv_ink ) Bpoly( this, (float) xam,  (float) yam, status );
           }
       }
 
 /* Append a section to the current poly line. */
-      if( Crv_ink ) Apoly( this, (float) xbm,  (float) ybm, method, class, status );
+      if( Crv_ink ) Apoly( this, (float) xbm,  (float) ybm, status );
 
 /* Save the position and vector at the end of the current line. */
       Crv_xl = xbm;
@@ -8664,9 +8623,11 @@ f     contains any coordinates with the value AST__BAD.
    about the most recently drawn curve. */
    CurvePlot( this, start, finish, 1, &Curve_data, method, class, status );
 
+/* Ensure all lines are flushed to the graphics system. */
+   Fpoly( this, method, class, status );
+
 /* Return. */
    return;
-
 }
 
 static void CurvePlot( AstPlot *this, const double *start, const double *finish,
@@ -8821,7 +8782,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
       Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* End the current poly line. */
-      Opoly( this, method, class, status );
+      Opoly( this, status );
 
 /* Tidy up the static data used by Map3. */
       Map3( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
@@ -10528,9 +10489,9 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Save and draw the tick mark. */
                         SaveTick( this, axis, x0, y0, *majflag, status );
                         if( x0 != x1 || y0 != y1 ) {
-                           Bpoly( this, (float) x0, (float) y0, method, class, status );
-                           Apoly( this, (float) x1, (float) y1, method, class, status );
-                           Opoly( this, method, class, status );
+                           Bpoly( this, (float) x0, (float) y0, status );
+                           Apoly( this, (float) x1, (float) y1, status );
+                           Opoly( this, status );
                         }
                      }
                   }
@@ -12639,7 +12600,8 @@ static int FindString( int n, const char *list[], const char *test,
 *  Synopsis:
 *     #include "plot.h"
 *     int FindString( int n, const char *list[], const char *test,
-*                     const char *text, const char *method, const char *class, int *status )
+*                     const char *text, const char *method, const char *class,
+*                     int *status )
 
 *  Class Membership:
 *     Plot method.
@@ -13005,6 +12967,583 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
    if ( !astOK ) result = NULL;
 
 /* Return the result. */
+   return result;
+}
+
+static void Fpoly_old( AstPlot *this, const char *method, const char *class,
+                   int *status ){
+/*
+*  Name:
+*     Fpoly
+
+*  Purpose:
+*     Flush all stored poly lines to the graphics system.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void Fpoly( AstPlot *this, const char *method, const char *class,
+*                 int *status )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function sends all previously drawn poly lines to the graphics
+*     system for rendering, and frees the memory used to hold the poly
+*     lines. It attempts to reduce the number of graphics calls by
+*     concatenating continuous polylines together.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS
+   float xmid;
+   float xt;
+   float ymid;
+   float yt;
+   int *ekey;
+   int *p;
+   int *skey;
+   int ihi;
+   int ikey;
+   int ilo;
+   int imid;
+   int ipass1;
+   int ipass2;
+   int ipoint;
+   int ipoly;
+   int jpoly;
+   int kpoly;
+   int more;
+
+/* Check the global status. */
+   if( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* If there is just one polyline to output, just draw it and then free
+   the memory use to hold the polyline.  */
+   if( Poly_npoly == 1 ) {
+      GLine( this, Poly_np[ 0 ], Poly_xp[ 0 ], Poly_yp[ 0 ], method, class,
+             status );
+      Poly_xp[ 0 ] = astFree( Poly_xp[ 0 ] );
+      Poly_yp[ 0 ] = astFree( Poly_yp[ 0 ] );
+      Poly_np[ 0 ] = 0;
+
+/* If there are multiple polylines to output, see if any of them can be
+   combined before drawing them.  */
+   } else if( Poly_npoly > 1 ) {
+
+/* Create two sorted keys for the polylines - one that sorts them into
+   increasing x at the start of the polyline, and another that sorts them
+   into increasing x at the end of the polyline. */
+      skey = astMalloc( Poly_npoly*sizeof( int ) );
+      ekey = astMalloc( Poly_npoly*sizeof( int ) );
+      if( astOK ) {
+
+         p = skey;
+         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) *(p++) = ipoly;
+         qsort( skey, Poly_npoly, sizeof(int), Fpoly_scmp );
+
+         p = ekey;
+         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) *(p++) = ipoly;
+         qsort( ekey, Poly_npoly, sizeof(int), Fpoly_ecmp );
+
+      }
+
+/* Continue to search for pairs of continuous polylines until we know
+   there are no more. */
+      more = 1;
+      while( more && astOK ) {
+         more = 0;
+
+/* Consider each polyline in turn. On each pass through this loop, we
+   look for other polylines that can be appended to the end of the
+   current polyline. If any are found, the current polyline is extended
+   and the appended polylines are freed. Thus the number of polylines can
+   be reduced within this loop. */
+         ipoly = 0;
+         while( ipoly < Poly_npoly && astOK ) {
+
+            for( ipass1 = 0; ipass1 < 2; ipass1++ ) {
+
+/* On the first pass, look for another polyline that starts or ends at
+   the end of the current polyline. On the second pass, look for another
+   polyline that starts or ends at the start of the current polyline. */
+               if( ipass1 == 0 ) {
+                  xt = Poly_xp[ ipoly ][ Poly_np[ ipoly ] - 1 ];
+                  yt = Poly_yp[ ipoly ][ Poly_np[ ipoly ] - 1 ];
+               } else {
+                  xt = Poly_xp[ ipoly ][ 0 ];
+                  yt = Poly_yp[ ipoly ][ 0 ];
+               }
+
+/* On the first pass through the next loop, search for a polyline that
+   starts at this position. If no such polyline is found, do a second
+   pass in which we search for a polyline that ends at this position.
+   The current polyline is not included in the search (to prevent a closed
+   polyline being appended to itself). */
+               for( ipass2 = 0; ipass2 < 2; ipass2++ ) {
+
+/* We use a binary chop to find a polyline which starts (or ends) at the
+   x value of the current polyline. */
+                  jpoly = -1;
+                  ilo = 0;
+                  ihi = Poly_npoly - 1;
+                  while( 1 ) {
+                     imid = ( ilo + ihi )/2;
+                     if( ipass2 == 0 ) {
+                        jpoly = skey[ imid ];
+                        xmid = Poly_xp[ jpoly ][ 0 ];
+                     } else {
+                        jpoly = ekey[ imid ];
+                        xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
+                     }
+                     if( EQUAL( xmid, xt ) ) {
+                        break;
+                     } else if( xmid > xt ) {
+                        if( ihi == imid ) {
+                           if( ipass2 == 0 ) {
+                              jpoly = skey[ ilo ];
+                              xmid = Poly_xp[ jpoly ][ 0 ];
+                           } else {
+                              jpoly = ekey[ ilo ];
+                              xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
+                           }
+                           if( !EQUAL( xmid, xt ) ) jpoly = -1;
+                           break;
+                        }
+                        ihi = imid;
+                     } else {
+                        if( ilo == imid ) {
+                           if( ipass2 == 0 ) {
+                              jpoly = skey[ ihi ];
+                              xmid = Poly_xp[ jpoly ][ 0 ];
+                           } else {
+                              jpoly = ekey[ ihi ];
+                              xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
+                           }
+                           if( !EQUAL( xmid, xt ) ) jpoly = -1;
+                           break;
+                        }
+                        ilo = imid;
+                     }
+                  }
+
+/* If found, there may be more than one such polyline. So we now search
+   for a polyline that also has the y value as the current polyline. */
+                  if( jpoly != -1 ) {
+
+/* If the polyline found above starts (or ends) at the same Y value as the
+   current polyline, then we have found the required polyline. */
+                     if( ipass2 == 0 ) {
+                        ymid = Poly_yp[ jpoly ][ 0 ];
+                     } else {
+                        ymid = Poly_yp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
+                     }
+                     if( EQUAL( ymid, yt ) && jpoly != ipoly ) break;
+                     jpoly = -1;
+
+/* Otherwise, search down the list, starting at the polyline found above. */
+                     if( imid > 0 ) {
+                        for( ikey = imid - 1; ikey >= 0; ikey-- ) {
+                           if( ipass2 == 0 ) {
+                              kpoly = skey[ ikey ];
+                              xmid = Poly_xp[ kpoly ][ 0 ];
+                              ymid = Poly_yp[ kpoly ][ 0 ];
+                           } else {
+                              kpoly = ekey[ ikey ];
+                              xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                              ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                           }
+                           if( EQUAL( xmid, xt ) ) {
+                              if( EQUAL( ymid, yt ) && kpoly != ipoly ) {
+                                 jpoly = kpoly;
+                                 break;
+                              }
+                           } else {
+                              break;
+                           }
+                        }
+                        if( jpoly != -1 ) break;
+                     }
+
+/* Now search up the list, starting at the polyline found above. */
+                     if( imid < Poly_npoly - 1 ) {
+                        for( ikey = imid + 1; ikey < Poly_npoly; ikey++ ) {
+                           if( ipass2 == 0 ) {
+                              kpoly = skey[ ikey ];
+                              xmid = Poly_xp[ kpoly ][ 0 ];
+                              ymid = Poly_yp[ kpoly ][ 0 ];
+                           } else {
+                              kpoly = ekey[ ikey ];
+                              xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                              ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                           }
+                           if( EQUAL( xmid, xt ) ) {
+                              if( EQUAL( ymid, yt ) && kpoly != ipoly ) {
+                                 jpoly = kpoly;
+                                 break;
+                              }
+                           } else {
+                              break;
+                           }
+                        }
+                        if( jpoly != -1 ) break;
+                     }
+                  }
+               }
+
+/* If a polyline was found that can be combined with the current
+   polyline, combine it. */
+               if( ipass2 < 2 ) {
+
+/* Total size of the combined polyline (one less than the sum of the two
+   because we can omit the common point). */
+                  int isize =  Poly_np[ ipoly ];
+                  int jsize =  Poly_np[ jpoly ] - 1;
+                  int newsize =  isize +  jsize;
+
+/* Allocate memory for the combined polyline. */
+                  float *newx = astMalloc( newsize*sizeof( float ) );
+                  float *newy = astMalloc( newsize*sizeof( float ) );
+                  if( astOK ) {
+
+/* Copy the current polyline to the start of the new memory, reversing it
+   if the common point is at the start of the current polyline. */
+                     if( ipass1 == 0 ) {
+                        memcpy( newx, Poly_xp[ ipoly ], isize*sizeof( float ) );
+                        memcpy( newy, Poly_yp[ ipoly ], isize*sizeof( float ) );
+                     } else {
+                        float *xp1 = newx;
+                        float *yp1 = newy;
+                        float *xp2 = Poly_xp[ ipoly ] + isize - 1;
+                        float *yp2 = Poly_yp[ ipoly ] + isize - 1;
+                        for( ipoint = 0; ipoint < isize; ipoint++ ){
+                           *(xp1++) = *(xp2--);
+                           *(yp1++) = *(yp2--);
+                        }
+                     }
+
+/* Append the second polyline to the new memory, reversing it if the common point is
+   at the end of the second polyline. Omit the common point itself. */
+                     if( ipass2 == 0 ) {
+                        memcpy( newx + isize, Poly_xp[ jpoly ] + 1, jsize*sizeof( float ) );
+                        memcpy( newy + isize, Poly_yp[ jpoly ] + 1, jsize*sizeof( float ) );
+                     } else {
+                        float *xp1 = newx + isize;
+                        float *yp1 = newy + isize;
+                        float *xp2 = Poly_xp[ jpoly ] + jsize - 1;
+                        float *yp2 = Poly_yp[ jpoly ] + jsize - 1;
+                        for( ipoint = 0; ipoint < jsize; ipoint++ ){
+                           *(xp1++) = *(xp2--);
+                           *(yp1++) = *(yp2--);
+                        }
+                     }
+
+/* Free the original arrays for the current polyline, then store the new
+   arrays. */
+                     astFree( Poly_xp[ ipoly ] );
+                     astFree( Poly_yp[ ipoly ] );
+                     Poly_xp[ ipoly ] = newx;
+                     Poly_yp[ ipoly ] = newy;
+                     Poly_np[ ipoly ] = newsize;
+
+/* Free the polyline that was combined with the current polyline. */
+                     astFree( Poly_xp[ jpoly ] );
+                     astFree( Poly_yp[ jpoly ] );
+
+/* Shunt all later polylines down to fill the gap. */
+                     for( kpoly = jpoly + 1; kpoly < Poly_npoly; kpoly++ ) {
+                        Poly_xp[ kpoly - 1 ] = Poly_xp[ kpoly ];
+                        Poly_yp[ kpoly - 1 ] = Poly_yp[ kpoly ];
+                        Poly_np[ kpoly - 1 ] = Poly_np[ kpoly ];
+                     }
+
+/* Nullify the end slot. */
+                     Poly_xp[ Poly_npoly - 1 ] = NULL;
+                     Poly_yp[ Poly_npoly - 1 ] = NULL;
+                     Poly_np[ Poly_npoly - 1 ] = 0;
+
+/* Remove the appended polyline from the sorted keys, shuffling later
+   entries down to fill the gap. */
+                     for( ikey = 0; ikey < Poly_npoly; ikey++ ) {
+                        if( skey[ ikey ] == jpoly ) break;
+                     }
+                     for( ikey++; ikey < Poly_npoly; ikey++ ) {
+                        skey[ ikey - 1 ] = skey[ ikey ];
+                     }
+                     skey[ Poly_npoly - 1 ] = -1;
+
+                     for( ikey = 0; ikey < Poly_npoly; ikey++ ) {
+                        if( ekey[ ikey ] == jpoly ) break;
+                     }
+                     for( ikey++; ikey < Poly_npoly; ikey++ ) {
+                        ekey[ ikey - 1 ] = ekey[ ikey ];
+                     }
+                     ekey[ Poly_npoly - 1 ] = -1;
+
+/* Polylines with index higher than jpoly now have a different index,
+   so modify the values in the two keys to take account of this. Also
+   notes the position of the current polyline within the keys. */
+                     int skey0, ekey0;
+                     for( ikey = 0; ikey < Poly_npoly; ikey++ ) {
+                        if( skey[ ikey ] == ipoly ) skey0 = ikey;
+                        if( skey[ ikey ] > jpoly ) skey[ ikey ]--;
+                     }
+                     for( ikey = 0; ikey < Poly_npoly; ikey++ ) {
+                        if( ekey[ ikey ] == ipoly ) ekey0 = ikey;
+                        if( ekey[ ikey ] > jpoly ) ekey[ ikey ]--;
+                     }
+
+/* If the appended polyline was before the current polyline, decrement
+   the index of the current polyline. */
+                     if( jpoly < ipoly ) ipoly--;
+
+/* We now have one fewer polylines. */
+                     Poly_npoly--;
+
+/* Now change the location of the current polyline within the sorted keys
+   to take account of its changed starting or ending X value. The end of the
+   current polyline is now at the start or end of the appended polyline. Use
+   a binary chop to find the first polyline that has an end X value greater
+   than or equal to the new end X of the current polyline. */
+                     xt = newx[ newsize - 1 ];
+                     ilo = 0;
+                     ihi = Poly_npoly - 1;
+                     while( 1 ) {
+                        imid = ( ilo + ihi )/2;
+                        kpoly = ekey[ imid ];
+                        xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                        if( xt <= xmid ) {
+                           if( ihi == imid ) break;
+                           ihi = imid;
+                        } else {
+                           if( ilo == imid ) break;
+                           ilo = imid;
+                        }
+                     }
+
+/* Move the current polyline from its original position to its new
+   position in the sorted end key. */
+                     if( ekey0 < ihi ) {
+                        for( ikey = ekey0; ikey < ihi; ikey++ ) {
+                           ekey[ ikey ] = ekey[ ikey + 1 ];
+                        }
+                     } else {
+                        for( ikey = ekey0; ikey > ihi; ikey-- ) {
+                           ekey[ ikey ] = ekey[ ikey - 1 ];
+                        }
+                     }
+                     ekey[ ihi ] = ipoly;
+
+/* The start of the current polyline will only have changed if the common
+   point was at the start of the original current polyline. */
+                     if( ipass1 == 1 ) {
+
+/* Use a binary chop to find the first polyline that has an end X value greater
+   than or equal to the new start X of the current polyline. */
+                        xt = newx[ 0 ];
+                        ilo = 0;
+                        ihi = Poly_npoly - 1;
+                        while( 1 ) {
+                           imid = ( ilo + ihi )/2;
+                           kpoly = skey[ imid ];
+                           xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                           if( xt <= xmid ) {
+                              if( ihi == imid ) break;
+                              ihi = imid;
+                           } else {
+                              if( ilo == imid ) break;
+                              ilo = imid;
+                           }
+                        }
+
+/* Move the current polyline from its original position to its new
+   position in the sorted start key. */
+                        if( skey0 < ihi ) {
+                           for( ikey = skey0; ikey < ihi; ikey++ ) {
+                              skey[ ikey ] = skey[ ikey + 1 ];
+                           }
+                        } else {
+                           for( ikey = skey0; ikey > ihi; ikey-- ) {
+                              skey[ ikey ] = skey[ ikey - 1 ];
+                           }
+                        }
+                        skey[ ihi ] = ipoly;
+                     }
+
+/* Ensure we re-check the earlier polylines to see if we can now append
+   other polylines together. */
+                     more = 1;
+
+/* Break out of the the "ipass1" loop. */
+                     break;
+                  }
+               }
+            }
+
+/* If no polyline was found that can be appended to the current polyline, move on
+    to check the next polyline. */
+            if( ipass1 == 2 ) ipoly++;
+         }
+      }
+
+/* Draw and free the remaining polylines. */
+      if( astOK ) {
+         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) {
+            GLine( this, Poly_np[ ipoly ], Poly_xp[ ipoly ], Poly_yp[ ipoly ],
+                   method, class, status );
+            Poly_xp[ ipoly ] = astFree( Poly_xp[ ipoly ] );
+            Poly_yp[ ipoly ] = astFree( Poly_yp[ ipoly ] );
+            Poly_np[ ipoly ] = 0;
+         }
+      }
+
+/* Free resources. */
+      skey = astFree( skey );
+      ekey = astFree( ekey );
+   }
+
+/* Indicate that all polylines have been sent to the graphics system. */
+   Poly_npoly = 0;
+}
+
+static int Fpoly_ecmp( const void *a, const void *b ){
+/*
+*  Name:
+*     Fpoly_ecmp
+
+*  Purpose:
+*     Compare two polylines ending X position
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int Fpoly_ecmp( const void *a, const void *b )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function is designed to be used as a comparison function with
+*     the "qsort" function. It is used in function Fpoly.
+*
+*     If orders the two polylines on the basis of the X coordinate at
+*     their ends.
+
+*  Parameters:
+*     a
+*       Pointer to an int holding the index of the first polyline.
+*     b
+*       Pointer to an int holding the index of the second polyline.
+
+*  Returned Value:
+*     -1 if the first polyline ends at a lower X than the second.
+*     +1 if the first polyline ends at a higher X than the second.
+*     0 if the two polylines end at the same X.
+
+*/
+
+/* Local Variables: */
+   float xa;               /* X at end of first polyline */
+   float xb;               /* X at end of second polyline */
+   int result = 0;         /* Returned value */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Get the x coord at the end of the two polylines. */
+   xa = Poly_xp[ *( (int *) a) ][ Poly_np[ *( (int *) a) ] - 1 ];
+   xb = Poly_xp[ *( (int *) b) ][ Poly_np[ *( (int *) b) ] - 1 ];
+
+/* Compare them. */
+   if( xa < xb ) {
+      result = -1;
+   } else if( xa > xb ){
+      result = 1;
+   }
+
+   return result;
+}
+
+static int Fpoly_scmp( const void *a, const void *b ){
+/*
+*  Name:
+*     Fpoly_scmp
+
+*  Purpose:
+*     Compare two polylines starting X position
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int Fpoly_scmp( const void *a, const void *b )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function is designed to be used as a comparison function with
+*     the "qsort" function. It is used in function Fpoly.
+*
+*     If orders the two polylines on the basis of the X coordinate at
+*     their starts.
+
+*  Parameters:
+*     a
+*       Pointer to an int holding the index of the first polyline.
+*     b
+*       Pointer to an int holding the index of the second polyline.
+
+*  Returned Value:
+*     -1 if the first polyline starts at a lower X than the second.
+*     +1 if the first polyline starts at a higher X than the second.
+*     0 if the two polylines starts at the same X.
+
+*/
+
+/* Local Variables: */
+   float xa;               /* X at start of first polyline */
+   float xb;               /* X at start of second polyline */
+   int result = 0;         /* Returned value */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Get the x coord at the start of the two polylines. */
+   xa = Poly_xp[ *( (int *) a) ][ 0 ];
+   xb = Poly_xp[ *( (int *) b) ][ 0 ];
+
+/* Compare them. */
+   if( xa < xb ) {
+      result = -1;
+   } else if( xa > xb ){
+      result = 1;
+   }
+
    return result;
 }
 
@@ -13785,7 +14324,7 @@ f        The global status.
       Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* End the current poly line. */
-      Opoly( this, method, class, status );
+      Opoly( this, status );
 
 /* Tidy up the static data used by Map4. */
       Map4( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
@@ -13821,9 +14360,11 @@ f        The global status.
 /* Annul the Mapping. */
       Map4_map = astAnnul( Map4_map );
 
+/* Ensure all lines are flushed to the graphics system. */
+      Fpoly( this, method, class, status );
+
 /* Re-establish the original graphical attributes. */
       astGrfAttrs( this, AST__CURVE_ID, 0, GRF__LINE, method, class );
-
    }
 
 /* Return. */
@@ -17732,6 +18273,9 @@ f        The global status.
       TextLabels( this, edgeticks, dounits, method, class, status );
    }
 
+/* Ensure all lines are flushed to the graphics system. */
+   Fpoly( this, method, class, status );
+
 /* Store the actual values used for all attributes which have dynamic
    defaults. Check the global status to ensure the pointer "grid" can be
    used without the possibility of a segmentation violation. */
@@ -17938,9 +18482,8 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
    about the most recently drawn curve. */
    AxPlot( this, axis - 1, start, length, 1, &Curve_data, method, class, status );
 
-/* Return. */
-   return;
-
+/* Ensure all lines are flushed to the graphics system. */
+   Fpoly( this, method, class, status );
 }
 
 static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
@@ -18290,6 +18833,10 @@ void astGrfAttrs_( AstPlot *this, int id, int set, int prim, const char *method,
    } else {
       grfattrs_nesting--;
    }
+
+/* If we are changing any line attributes, ensure all lines are flushed to
+   the graphics system. */
+   if( prim == GRF__LINE ) Fpoly( this, method, class, status );
 
 /* First deal with cases where we are establishing new values for the
    graphics attributes by setting them to the values of the corresponding
@@ -20601,7 +21148,7 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
    Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* End the current poly line. */
-   Opoly( this, method, class, status );
+   Opoly( this, status );
 
 /* Tidy up the static data used by Map2. */
    Map2( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
@@ -22368,7 +22915,7 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 
 }
 
-static void Opoly( AstPlot *this, const char *method, const char *class, int *status ){
+static void Opoly( AstPlot *this, int *status ){
 /*
 *  Name:
 *     Opoly
@@ -22381,7 +22928,7 @@ static void Opoly( AstPlot *this, const char *method, const char *class, int *st
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Opoly( AstPlot *this, const char *method, const char *class, int *status )
+*     void Opoly( AstPlot *this, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -22390,17 +22937,15 @@ static void Opoly( AstPlot *this, const char *method, const char *class, int *st
 *     This function draws the current poly line, and empties the buffer.
 
 *  Parameters:
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
+*     this
+*        Pointer to the Plot.
 *     status
 *        Pointer to the inherited status variable.
 
 */
 
+/* Local Variables: */
+   int ipoly;              /* Index of new polyline */
    astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
 
 /* Check the global status. */
@@ -22411,10 +22956,29 @@ static void Opoly( AstPlot *this, const char *method, const char *class, int *st
 
 /* Draw the poly-line if needed. */
    if( Poly_n > 0 ) {
-      GLine( this, Poly_n, Poly_x, Poly_y, method, class, status );
 
-/* Indicate that the poly-line buffer is now empty. */
-      Poly_n = 0;
+/* Extend the global arrays that hold pointers to the polylines already
+   drawn. */
+      ipoly = Poly_npoly++;
+      astBeginPM;
+      Poly_xp = astGrow( Poly_xp, Poly_npoly, sizeof(float*) );
+      Poly_yp = astGrow( Poly_yp, Poly_npoly, sizeof(float*) );
+      Poly_np = astGrow( Poly_np, Poly_npoly, sizeof(int) );
+      astEndPM;
+
+      if( astOK ) {
+
+/* Add pointers to the new polyline to the end of the above extended
+   arrays. */
+         Poly_xp[ ipoly ] = Poly_x;
+         Poly_yp[ ipoly ] = Poly_y;
+         Poly_np[ ipoly ] = Poly_n;
+
+/* Indicate that the current polyline is now empty. */
+         Poly_x = NULL;
+         Poly_y = NULL;
+         Poly_n = 0;
+      }
    }
 }
 
@@ -23423,14 +23987,16 @@ f        The global status.
          }
 
 /* End the last poly line. */
-         Opoly( this, method, class, status );
+         Opoly( this, status );
 
 /* Tidy up the static data used by Map3. */
          Map3( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
 
+/* Ensure all lines are flushed to the graphics system. */
+         Fpoly( this, method, class, status );
+
 /* Re-establish the original graphical attributes. */
          astGrfAttrs( this, AST__CURVE_ID, 0, GRF__LINE, method, class );
-
       }
 
 /* Annul the Frame and Mapping. */
@@ -23442,10 +24008,6 @@ f        The global status.
       start = (double *) astFree( (void *) start );
       finish = (double *) astFree( (void *) finish );
    }
-
-/* Return. */
-   return;
-
 }
 
 static int PopGat( AstPlot *this, float *rise, const char *method,
@@ -23532,6 +24094,68 @@ static int PopGat( AstPlot *this, float *rise, const char *method,
 
 }
 
+static void PurgeCdata( AstPlotCurveData *cdata, int *status ){
+/*
+*
+*  Name:
+*     AstPlotCurveData
+
+*  Purpose:
+*     Remove any zero length sections from the description of a curve.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void PurgeCdata( AstPlotCurveData *cdata )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function removes any zero length sections from the supplied
+*     AstPlotCurveData struture, which describes a multi-section curve.
+
+*  Parameters:
+*     cdata
+*        A pointer to the structure containing information about the
+*        breaks in a curve.
+
+*/
+
+/* Local Variables: */
+   int brk;                       /*Break index */
+   int i;                       /*Break index */
+
+/* Check the global error status. */
+   if ( !astOK || !cdata ) return;
+
+/* Loop round all breaks. */
+   brk = 0;
+   while( brk < cdata->nbrk ) {
+
+/* If this break and the next one are co-incident, remove both breaks. */
+      if( cdata->xbrk[ brk ] == cdata->xbrk[ brk + 1 ] &&
+          cdata->ybrk[ brk ] == cdata->ybrk[ brk + 1 ] ) {
+
+/* Shuffle down the higher elements of all the arrays in the curve data. */
+         for( i = brk + 2; i < cdata->nbrk; i++ ){
+            cdata->xbrk[ i - 2 ] = cdata->xbrk[ i ];
+            cdata->ybrk[ i - 2 ] = cdata->ybrk[ i ];
+            cdata->vxbrk[ i - 2 ] = cdata->vxbrk[ i ];
+            cdata->vybrk[ i - 2 ] = cdata->vybrk[ i ];
+         }
+
+/*  Decrement the number of breaks in the curve data. */
+         cdata->nbrk -= 2;
+
+/* If the section is not zero length, move on to the next pair of breaks. */
+      } else {
+         brk += 2;
+      }
+   }
+}
 
 static void PushGat( AstPlot *this, float rise, const char *method,
                      const char *class, int *status ) {
@@ -23731,7 +24355,7 @@ static int RegionOutline( AstPlot *this, AstFrame *frm, const char *method,
       Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* End the current poly line. */
-      Opoly( this, method, class, status );
+      Opoly( this, status );
 
 /* Tidy up the static data used by Map5. */
       Map5( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
@@ -26340,9 +26964,9 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
 /* Draw the tick mark as a straight line of the specified length. */
                if( save ) SaveTick( this, axis, *x, *y, majtick, status );
                if( *x != xe || *y != ye ) {
-                  Bpoly( this, (float) *x, (float) *y, method, class, status );
-                  Apoly( this, (float) xe, (float) ye, method, class, status );
-                  Opoly( this, method, class, status );
+                  Bpoly( this, (float) *x, (float) *y, status );
+                  Apoly( this, (float) xe, (float) ye, status );
+                  Opoly( this, status );
                }
             }
 
@@ -27041,13 +27665,13 @@ static int TraceBorder( AstPlot *this, AstMapping *map, double xlo, double xhi,
 
 /* Draw a horizontal line through the cell centre */
                      yc = 0.5*( cylo + cyhi );
-                     Bpoly( this, (float) cxlo, yc, method, class, status );
-                     Apoly( this, (float) cxhi, yc, method, class, status );
+                     Bpoly( this, (float) cxlo, yc, status );
+                     Apoly( this, (float) cxhi, yc, status );
 
 /* Draw a vertical line through the cell centre */
                      xc = 0.5*( cxlo + cxhi );
-                     Bpoly( this, xc, (float) cylo, method, class, status );
-                     Apoly( this, xc, (float) cyhi, method, class, status );
+                     Bpoly( this, xc, (float) cylo, status );
+                     Apoly( this, xc, (float) cyhi, status );
 
 /* If the boundary passes through the left hand edge, it must also have
    passed through the right edge of the previous cell in the row (unless
@@ -27057,23 +27681,23 @@ static int TraceBorder( AstPlot *this, AstMapping *map, double xlo, double xhi,
 
 /* If this is the first cell in the row, begin a new polyline. */
                      yc = 0.5*( cylo + cyhi );
-                     if( icol == 0 ) Bpoly( this, (float) cxlo, yc, method, class, status );
+                     if( icol == 0 ) Bpoly( this, (float) cxlo, yc, status );
 
 /* and through the top edge, draw a line between the centres of the left
    and top edges. */
                      if( bad2 != bad4 ) {
                         xc = 0.5*( cxlo + cxhi );
-                        Apoly( this, xc, (float) cyhi, method, class, status );
+                        Apoly( this, xc, (float) cyhi, status );
 
 /* or through the right edge, draw a line between the centres of the left
    and right edges. */
                      } else if( bad3 != bad4 ) {
-                        Apoly( this, (float) cxhi, yc, method, class, status );
+                        Apoly( this, (float) cxhi, yc, status );
 
 /* Otherwise, draw a line between the centres of the left and bottom edges. */
                      } else {
                         xc = 0.5*( cxlo + cxhi );
-                        Apoly( this, xc, (float) cylo, method, class, status );
+                        Apoly( this, xc, (float) cylo, status );
                      }
 
 /* If the boundary passes through the top edge (we do not need to check
@@ -27085,14 +27709,14 @@ static int TraceBorder( AstPlot *this, AstMapping *map, double xlo, double xhi,
                      if( bad3 != bad4 ) {
                         xc = 0.5*( cxlo + cxhi );
                         yc = 0.5*( cylo + cyhi );
-                        Bpoly( this, xc, (float) cyhi, method, class, status );
-                        Apoly( this, (float) cxhi, yc, method, class, status );
+                        Bpoly( this, xc, (float) cyhi, status );
+                        Apoly( this, (float) cxhi, yc, status );
 
 /* Otherwise, draw a line between the centres of the top and bottom edges. */
                      } else {
                         xc = 0.5*( cxlo + cxhi );
-                        Bpoly( this, xc, (float) cyhi, method, class, status );
-                        Apoly( this, xc, (float) cylo, method, class, status );
+                        Bpoly( this, xc, (float) cyhi, status );
+                        Apoly( this, xc, (float) cylo, status );
                      }
 
 /* If the boundary passes through the right edge it must also pass
@@ -27101,8 +27725,8 @@ static int TraceBorder( AstPlot *this, AstMapping *map, double xlo, double xhi,
                   } else {
                      xc = 0.5*( cxlo + cxhi );
                      yc = 0.5*( cylo + cyhi );
-                     Bpoly( this, xc, (float) cylo, method, class, status );
-                     Apoly( this, (float) cxhi, yc, method, class, status );
+                     Bpoly( this, xc, (float) cylo, status );
+                     Apoly( this, (float) cxhi, yc, status );
                   }
 
 /* If the current cell is on the edge of the grid, set flags in the
@@ -31281,4 +31905,409 @@ f     function is invoked with STATUS set to an error value, or if it
 }
 
 
+
+static void Fpoly( AstPlot *this, const char *method, const char *class,
+                   int *status ){
+/*
+*  Name:
+*     Fpoly
+
+*  Purpose:
+*     Flush all stored poly lines to the graphics system.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void Fpoly( AstPlot *this, const char *method, const char *class,
+*                 int *status )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function sends all previously drawn poly lines to the graphics
+*     system for rendering, and frees the memory used to hold the poly
+*     lines. It attempts to reduce the number of graphics calls by
+*     concatenating continuous polylines together.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS
+   float xmid;
+   float xt;
+   float ymid;
+   float *xnew;
+   float *ynew;
+   int polylen;
+   float *xp1;
+   float *xp2;
+   float *yp1;
+   float *yp2;
+   float yt;
+   int *ekey;
+   int *p;
+   int *skey;
+   int *drawn;
+   int ihi;
+   int ikey;
+   int ilo;
+   int imid;
+   int ipass;
+   int ipoint;
+   int ipoly;
+   int jpoly;
+   int kpoly;
+   int *polylist;
+   int npoly;
+   int np;
+
+/* Check the global status. */
+   if( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* Output any pending polyline. */
+   Opoly( this, status );
+
+/* If there is just one polyline to output, just draw it and then free
+   the memory used to hold the polyline.  */
+   if( Poly_npoly == 1 ) {
+      GLine( this, Poly_np[ 0 ], Poly_xp[ 0 ], Poly_yp[ 0 ], method, class,
+             status );
+      Poly_xp[ 0 ] = astFree( Poly_xp[ 0 ] );
+      Poly_yp[ 0 ] = astFree( Poly_yp[ 0 ] );
+      Poly_np[ 0 ] = 0;
+
+/* If there are multiple polylines to output, see if any of them can be
+   combined before drawing them.  */
+   } else if( Poly_npoly > 1 ) {
+
+int ndrawn = 0;
+
+/* No polyline buffer allocated yet. */
+      xnew = NULL;
+      ynew = NULL;
+
+/* Allocate an array to hold the order in which polylines should be
+   concatenated. Each value in this array will be the index of one of the
+   original polylines. A positive index indicates that the polyline
+   should be appended in its original order. A negative index indicates
+   that the polyline should be appended in reversed order. Polyline zero
+   is always appended in its original order. */
+      polylist = astMalloc( Poly_npoly*sizeof( int ) );
+      npoly = 0;
+
+/* Create an array of drawn, one for each individual polyline. The flag
+   is zero if the corresponding polyline has not yet been drawn. */
+      drawn = astCalloc(  Poly_npoly, sizeof( int ) );
+
+/* Create two sorted keys for the polylines - one that sorts them into
+   increasing x at the start of the polyline, and another that sorts them
+   into increasing x at the end of the polyline. */
+      skey = astMalloc( Poly_npoly*sizeof( int ) );
+      ekey = astMalloc( Poly_npoly*sizeof( int ) );
+      if( astOK ) {
+
+         p = skey;
+         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) *(p++) = ipoly;
+         qsort( skey, Poly_npoly, sizeof(int), Fpoly_scmp );
+
+         p = ekey;
+         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) *(p++) = ipoly;
+         qsort( ekey, Poly_npoly, sizeof(int), Fpoly_ecmp );
+
+      }
+
+/* Continue to search for separate polylines that can be combined together
+   until we know there are no more. */
+      while( astOK ) {
+
+/* Search for the first polyline that has not already been drawn. */
+         for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) {
+            if( !drawn[ ipoly ] ) break;
+         }
+
+/* Leave the loop if no more polylines remain to be plotted. */
+         if( ipoly == Poly_npoly ) break;
+
+/* Initialise the list of polylines to hold the polyline found above, in
+   its forward sense. */
+         polylist[ 0 ] = ipoly;
+         npoly = 1;
+         drawn[ 0 ] = 1;
+
+/* Initialise the concatenation point to be the end of the polyline found
+   above. Also, initialise the total number of points in the combined
+   polyline (polylen). */
+         ipoint = Poly_np[ ipoly ] - 1;
+         xt = Poly_xp[ ipoly ][ ipoint ];
+         yt = Poly_yp[ ipoly ][ ipoint ];
+         polylen = ipoint + 1;
+
+/* Loop until we can find no more polylines to append to the list.
+   A polyline can be appended if it starts or ends at the current
+   concatenation point. */
+         while( astOK ) {
+
+/* On the first pass through the next loop, search for a polyline that
+   starts at the concatenation point. If no such polyline is found, do
+   a second pass in which we search for a polyline that ends at the
+   concatenation point. Do not include any previously drawn polylines
+   in the search. */
+            for( ipass = 0; ipass < 2; ipass++ ) {
+
+/* We use a binary chop to find a polyline which starts (or ends) at the
+   x value of the concatenation point. */
+               jpoly = -1;
+               ilo = 0;
+               ihi = Poly_npoly - 1;
+               while( 1 ) {
+                  imid = ( ilo + ihi )/2;
+                  if( ipass == 0 ) {
+                     jpoly = skey[ imid ];
+                     xmid = Poly_xp[ jpoly ][ 0 ];
+                  } else {
+                     jpoly = ekey[ imid ];
+                     xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
+                  }
+                  if( EQUAL( xmid, xt ) ) {
+                     ikey = imid;
+                     break;
+                  } else if( xmid > xt ) {
+                     if( ihi == imid ) {
+                        if( ipass == 0 ) {
+                           jpoly = skey[ ilo ];
+                           xmid = Poly_xp[ jpoly ][ 0 ];
+                        } else {
+                           jpoly = ekey[ ilo ];
+                           xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
+                        }
+                        if( !EQUAL( xmid, xt ) ) jpoly = -1;
+                        ikey = ilo;
+                        break;
+                     }
+                     ihi = imid;
+                  } else {
+                     if( ilo == imid ) {
+                        if( ipass == 0 ) {
+                           jpoly = skey[ ihi ];
+                           xmid = Poly_xp[ jpoly ][ 0 ];
+                        } else {
+                           jpoly = ekey[ ihi ];
+                           xmid = Poly_xp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
+                        }
+                        if( !EQUAL( xmid, xt ) ) jpoly = -1;
+                        ikey = ihi;
+                        break;
+                     }
+                     ilo = imid;
+                  }
+               }
+
+/* If found, there may be more than one such polyline. So we now search
+   for a polyline that also has the y value of the concatenation point. */
+               if( jpoly != -1 ) {
+
+/* If the polyline found above starts (or ends) at the same Y value as the
+   concatenation point, then we have found the required polyline. */
+                  if( ipass == 0 ) {
+                     ymid = Poly_yp[ jpoly ][ 0 ];
+                  } else {
+                     ymid = Poly_yp[ jpoly ][ Poly_np[ jpoly ] - 1 ];
+                  }
+                  if( EQUAL( ymid, yt ) && !drawn[ jpoly ] ) break;
+                  jpoly = -1;
+
+/* Otherwise, search down the list, starting at the polyline found above. */
+                  if( imid > 0 ) {
+                     for( ikey = imid - 1; ikey >= 0; ikey-- ) {
+                        if( ipass == 0 ) {
+                           kpoly = skey[ ikey ];
+                           xmid = Poly_xp[ kpoly ][ 0 ];
+                           ymid = Poly_yp[ kpoly ][ 0 ];
+                        } else {
+                           kpoly = ekey[ ikey ];
+                           xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                           ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                        }
+                        if( EQUAL( xmid, xt ) ) {
+                           if( EQUAL( ymid, yt ) && !drawn[ kpoly ] ) {
+                              jpoly = kpoly;
+                              break;
+                           }
+                        } else {
+                           break;
+                        }
+                     }
+                     if( jpoly != -1 ) break;
+                  }
+
+/* Now search up the list, starting at the polyline found above. */
+                  if( imid < Poly_npoly - 1 ) {
+                     for( ikey = imid + 1; ikey < Poly_npoly; ikey++ ) {
+                        if( ipass == 0 ) {
+                           kpoly = skey[ ikey ];
+                           xmid = Poly_xp[ kpoly ][ 0 ];
+                           ymid = Poly_yp[ kpoly ][ 0 ];
+                        } else {
+                           kpoly = ekey[ ikey ];
+                           xmid = Poly_xp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                           ymid = Poly_yp[ kpoly ][ Poly_np[ kpoly ] - 1 ];
+                        }
+                        if( EQUAL( xmid, xt ) ) {
+                           if( EQUAL( ymid, yt ) && !drawn[ kpoly ] ) {
+                              jpoly = kpoly;
+                              break;
+                           }
+                        } else {
+                           break;
+                        }
+                     }
+                     if( jpoly != -1 ) break;
+                  }
+               }
+            }
+
+/* If a polyline was found that can be combined with the total polyline,
+   increment the total number of points in the total polyline, add it to
+   the list, and update the concatenation point. Note, we can omit the
+   start or end point of the new polyline since it will already be
+   present in the total polyline, hence the " - 1 " below. */
+            if( ipass < 2 ) {
+               ipoint = Poly_np[ jpoly ] - 1;
+
+               if( ipass == 0 ) {
+                  polylist[ npoly++ ] = jpoly;
+                  xt = Poly_xp[ jpoly ][ ipoint ];
+                  yt = Poly_yp[ jpoly ][ ipoint ];
+               } else {
+                  polylist[ npoly++ ] = -jpoly;
+                  xt = Poly_xp[ jpoly ][ 0 ];
+                  yt = Poly_yp[ jpoly ][ 0 ];
+               }
+
+               polylen += ipoint;
+
+/* Indicate the polyline has been drawn. */
+               drawn[ jpoly ] = 1;
+
+/* If we cannot find any polyline that starts or ends at the
+   concatenation point, then we have completed the total polyline. So break
+   out of the loop, and move on to draw the total polyline. */
+            } else {
+               break;
+            }
+         }
+
+/* If a single polyline is to be drawn, just draw it. */
+         if( npoly == 1 ) {
+            jpoly = polylist[ 0 ];
+            GLine( this, Poly_np[ jpoly ], Poly_xp[ jpoly ],
+                   Poly_yp[ jpoly ], method, class, status );
+
+/* If more than one polyline is to be drawn, ensure we have arrays that
+   are large enough to hold all the vertices in the combined polyline. */
+         } else {
+            xnew = astRealloc( xnew, polylen*sizeof( float ) );
+            ynew = astRealloc( ynew, polylen*sizeof( float ) );
+            if( astOK ) {
+
+/* Loop round all the polylines that are to be combined to form the total
+   polyline, and copy all the vertex coordinates into the above arrays. */
+               xp1 = xnew;
+               yp1 = ynew;
+               for( ipoly = 0; ipoly < npoly; ipoly++ ) {
+
+/* Index of the next polyline to include in the total polyline. */
+                  jpoly = polylist[ ipoly ];
+
+/* The jpoly value is positive if the polylline is to be inclued in its
+   original direction. */
+                  if( jpoly >= 0 ) {
+
+/* Use the whole of the first polyline. */
+                     if( ipoly == 0 ) {
+                        np =  Poly_np[ jpoly ];
+                        xp2 = Poly_xp[ jpoly ];
+                        yp2 = Poly_yp[ jpoly ];
+
+/* Omit eh first point of subsequent polylines since it will be the same
+   as the last pointy already in the total polyline. */
+                     } else {
+                        np =  Poly_np[ jpoly ] - 1;
+                        xp2 = Poly_xp[ jpoly ] + 1;
+                        yp2 = Poly_yp[ jpoly ] + 1;
+                     }
+
+/* Copy the vertex values in their original order, and update the
+   pointers to the next element of the total polyline. */
+                     memcpy( xp1, xp2, np*sizeof(float) );
+                     memcpy( yp1, yp2, np*sizeof(float) );
+                     xp1 +=  np;
+                     yp1 +=  np;
+
+/* The jpoly value is negative if the polyline is to be included in its
+   reversed direction. */
+                  } else {
+                     jpoly = -jpoly;
+
+/* Get the number of points to copy. Omit the last point if this is not
+   the first polyline, since it is already in the total polyline. */
+                     if( ipoly == 0 ) {
+                        np =  Poly_np[ jpoly ];
+                     } else {
+                        np =  Poly_np[ jpoly ] - 1;
+                     }
+
+/* Copy the individual values in reversed order. */
+                     xp2 = Poly_xp[ jpoly ] + np - 1;
+                     yp2 = Poly_yp[ jpoly ] + np - 1;
+                     for( ipoint = 0; ipoint < np; ipoint++ ) {
+                        *(xp1++) = *(xp2--);
+                        *(yp1++) = *(yp2--);
+                     }
+                  }
+               }
+
+/* And finally, draw the total polyline. */
+               GLine( this, polylen, xnew, ynew, method, class, status );
+            }
+         }
+      }
+
+/*  Free all the individual polylines. */
+      for( ipoly = 0; ipoly < Poly_npoly; ipoly++ ) {
+         Poly_xp[ ipoly ] = astFree( Poly_xp[ ipoly ] );
+         Poly_yp[ ipoly ] = astFree( Poly_yp[ ipoly ] );
+         Poly_np[ ipoly ] = 0;
+      }
+
+/* Free other resources. */
+      polylist = astFree( polylist );
+      drawn = astFree( drawn );
+      xnew = astFree( xnew );
+      ynew = astFree( ynew );
+      skey = astFree( skey );
+      ekey = astFree( ekey );
+   }
+
+/* Indicate that all polylines have been sent to the graphics system. */
+   Poly_npoly = 0;
+}
 
