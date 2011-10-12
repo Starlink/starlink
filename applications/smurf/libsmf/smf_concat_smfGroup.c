@@ -826,6 +826,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
                 /* Dimensions */
                 da->dksquid->dtype = SMF__DOUBLE;
                 da->dksquid->isTordered = 1;
+                da->dksquid->isFFT = -1;
                 da->dksquid->ndims = 3;
 
                 da->dksquid->dims[0] = ncol;

@@ -775,6 +775,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
             da->dksquid->dtype = SMF__DOUBLE;
             da->dksquid->isTordered = 1;
+            da->dksquid->isFFT = -1;
             da->dksquid->ndims = 3;
             da->dksquid->dims[0] = dkdims[0];
             da->dksquid->dims[1] = 1;
