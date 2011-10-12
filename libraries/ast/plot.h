@@ -671,8 +671,8 @@ typedef struct AstPlotGlobals {
    char 	StripEscapes_Buff[ AST__PLOT_STRIPESCAPES_BUFF_LEN + 1 ];
    double 	Grf_chv_t;
    double 	Grf_chh_t;
-   double 	Grf_alpha_t;
-   double 	Grf_beta_t;
+   float 	Grf_alpha_t;
+   float 	Grf_beta_t;
 } AstPlotGlobals;
 
 #endif

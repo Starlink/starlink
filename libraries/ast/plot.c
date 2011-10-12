@@ -692,9 +692,11 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Take account of differing axis scales when rotating vectors by
 *        90 degrees.
 *     12-OCT-2011 (DSB):
-*        Fix the change made yesterday to correct rotation of numerical axis
+*        - Fix the change made yesterday to correct rotation of numerical axis
 *        rotations. I forgot that the astGText function in the grf module
 *        expects the up vector in equally scaled coords, not graphics coords.
+*        - Take account of unequal axis scales when working out the
+*        length of each grid curve.
 *class--
 */
 
@@ -1735,8 +1737,8 @@ static const char *xlbling[2] = { "interior", "exterior" };
    globals->StripEscapes_Buff[ 0 ] = 0; \
    globals->Grf_chv_t = AST__BAD; \
    globals->Grf_chh_t = AST__BAD; \
-   globals->Grf_alpha_t = AST__BAD; \
-   globals->Grf_beta_t = AST__BAD;
+   globals->Grf_alpha_t = 0.0; \
+   globals->Grf_beta_t = 0.0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(Plot)
@@ -1869,8 +1871,8 @@ static void (*Crv_map)( int, double *, double *, double *, const char *, const c
 /* A cache of information calculated by the grf module. */
 static double Grf_chv = AST__BAD;
 static double Grf_chh = AST__BAD;
-static double Grf_alpha = AST__BAD;
-static double Grf_beta = AST__BAD;
+static float Grf_alpha = 0.0;
+static float Grf_beta = 0.0;
 
 /* The lower and upper bounds of the graphics coordinates enclosing all
    lines and numerical labels drawn by astGrid. */
@@ -1964,8 +1966,8 @@ static int class_init = 0;       /* Virtual function table initialised? */
 #define RESET_GRF \
    Grf_chh = AST__BAD; \
    Grf_chv = AST__BAD; \
-   Grf_alpha = AST__BAD; \
-   Grf_beta = AST__BAD;
+   Grf_alpha = 0.0; \
+   Grf_beta = 0.0;
 
 
 /* Prototypes for Private Member Functions. */
@@ -4598,6 +4600,10 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
          gridid = AST__GRIDLINE1_ID;
       }
       astGrfAttrs( this, gridid, 1, GRF__LINE, method, class );
+
+/* Ensure the globals holding the scaling from graphics coords to equally
+   scaled coords are available. */
+      GScales( this, NULL, NULL, method, class, status );
 
 /* Set up the externals used to communicate with the Map1 function...
    The number of axes in the physical coordinate system (i.e. the current
@@ -8284,6 +8290,12 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 *        The X component of the unit vector along the last line drawn.
 *     Crv_vyl = double (Write)
 *        The Y component of the unit vector along the last line drawn.
+*     Grf_alpha = float (Read)
+*        The factor for scaling graphics X axis values into equal scaled
+*        X axis values.
+*     Grf_beta = float (Read)
+*        The factor for scaling graphics Y axis values into equal scaled
+*        Y axis values.
 
 */
 
@@ -8365,7 +8377,7 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
             a1 = 0.0;
             a2 = 0.0;
          }
-       }
+      }
 
 /* Find the fractional distance from point A to point B at which the
    line cuts the two y bounds of the zone. */
@@ -8413,6 +8425,8 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
          plot = 1;
 
 /* Get the unit vector along the line and the length of the plotted section. */
+         dx *= Grf_alpha;
+         dy *= Grf_beta;
          dl = sqrt( dx*dx + dy*dy );
          dx /= dl;
          dy /= dl;
@@ -8433,6 +8447,8 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
       plot = 1;
 
 /* Get the length of the line and the unit vector along the line. */
+      dx *= Grf_alpha;
+      dy *= Grf_beta;
       dl = sqrt( dx*dx + dy*dy );
       dx /= dl;
       dy /= dl;
@@ -8739,6 +8755,10 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
       astGrfAttrs( this, AST__CURVE_ID, 1, GRF__LINE, method, class );
+
+/* Ensure the globals holding the scaling from graphics coords to equally
+   scaled coords are available. */
+      GScales( this, NULL, NULL, method, class, status );
 
 /* Set up the externals used to communicate with the Map3 function...
    The number of axes in the physical coordinate system (i.e. the current
@@ -14009,9 +14029,9 @@ static void GScales( AstPlot *this, float *alpha, float *beta,
    astGET_GLOBALS(this);
 
 /* if we already have the required values, return them. */
-   if( Grf_alpha != AST__BAD && Grf_beta != AST__BAD ) {
-      *alpha = Grf_alpha;
-      *beta = Grf_beta;
+   if( Grf_alpha != 0.0 && Grf_beta != 0.0 ) {
+      if( alpha ) *alpha = Grf_alpha;
+      if( beta ) *beta = Grf_beta;
       return;
    }
 
@@ -14025,21 +14045,21 @@ static void GScales( AstPlot *this, float *alpha, float *beta,
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GSCALES ] ) {
-      grf_status = ( *( this->GScales ) )( this, alpha, beta, status );
+      grf_status = ( *( this->GScales ) )( this, &Grf_alpha, &Grf_beta, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
    } else {
-      grf_status = astGScales( alpha, beta );
+      grf_status = astGScales( &Grf_alpha, &Grf_beta );
    }
 
 /* Allow the next thread to proceed. */
    UNLOCK_MUTEX2;
 
 /* Check neither value is zero. */
-   if( grf_status && ( *alpha == 0.0 || *beta == 0.0 ) ) {
+   if( grf_status && ( Grf_alpha == 0.0 || Grf_beta == 0.0 ) ) {
       astError( AST__GRFER, "astGScales: Returned axis scales are %g and %g "
-                "but zero is illegal!", status, *alpha, *beta );
+                "but zero is illegal!", status, Grf_alpha, Grf_beta );
       grf_status = 0;
    }
 
@@ -14047,13 +14067,13 @@ static void GScales( AstPlot *this, float *alpha, float *beta,
    if( !grf_status ) {
       astError( AST__GRFER, "%s(%s): Graphics error in astGScales. ", status, method,
                 class );
-      *alpha = 1.0;
-      *beta = 1.0;
+      Grf_alpha = 1.0;
+      Grf_beta = 1.0;
    }
 
 /* Store them for future use. */
-   Grf_alpha = *alpha;
-   Grf_beta = *beta;
+   if( alpha ) *alpha = Grf_alpha;
+   if( beta ) *beta = Grf_beta;
 }
 
 static int GCap( AstPlot *this, int cap, int value, int *status ){
@@ -14242,6 +14262,10 @@ f        The global status.
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
       astGrfAttrs( this, AST__CURVE_ID, 1, GRF__LINE, method, class );
+
+/* Ensure the globals holding the scaling from graphics coords to equally
+   scaled coords are available. */
+      GScales( this, NULL, NULL, method, class, status );
 
 /* Set up the externals used to communicate with the Map4 function... */
       Map4_ncoord = astGetNout( this );
@@ -21067,6 +21091,10 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 /* Convert the tolerance from relative to absolute graphics coordinates. */
    tol = astGetTol( this )*MAX( this->xhi - this->xlo, this->yhi - this->ylo );
 
+/* Ensure the globals holding the scaling from graphics coords to equally
+   scaled coords are available. */
+   GScales( this, NULL, NULL, method, class, status );
+
 /* Set up the external variables used by the Crv and CrvLine function (see
    their prologues for details). */
    Crv_scerr = ( astGetLogPlot( this, 0 ) ||
@@ -23847,6 +23875,10 @@ f        The global status.
       tol = astGetTol( this )*MAX( this->xhi - this->xlo,
                                    this->yhi - this->ylo );
 
+/* Ensure the globals holding the scaling from graphics coords to equally
+   scaled coords are available. */
+      GScales( this, NULL, NULL, method, class, status );
+
 /* Now set up the external variables used by the Crv and CrvLine function. */
       Crv_scerr = ( astGetLogPlot( this, 0 ) ||
                     astGetLogPlot( this, 1 ) ) ? 100.0 : 1.5;
@@ -24302,6 +24334,10 @@ static int RegionOutline( AstPlot *this, AstFrame *frm, const char *method,
 /* Convert the tolerance from relative to absolute graphics coordinates. */
       tol = astGetTol( this )*MAX( this->xhi - this->xlo,
                                    this->yhi - this->ylo );
+
+/* Ensure the globals holding the scaling from graphics coords to equally
+   scaled coords are available. */
+      GScales( this, NULL, NULL, method, class, status );
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
       Crv_scerr = ( astGetLogPlot( this, 0 ) ||
