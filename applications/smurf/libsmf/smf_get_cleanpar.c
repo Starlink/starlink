@@ -587,8 +587,10 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
     astMapGet0D( keymap, "DOWNSAMPSCALE", downsampscale );
 
     if( *downsampscale < 0 ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DOWNSAMPSCALE must be >= 0.", status );
+      msgOutif( MSG__DEBUG, "", FUNC_NAME
+                ": WARNING can't convert downsampscale < 0 to a frequency, "
+                "skipping.", status );
+      *downsampscale = 0;
     }
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DOWNSAMPSCALE=%f", status,
