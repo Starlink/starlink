@@ -717,16 +717,16 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            We fudge a local map smfData so that we can call
            smf_map_getpixsize */
 
-        smfData *map = NULL;
+        smfData *localmap = NULL;
         double pixsize;
 
-        map = smf_create_smfData( 0, status );
+        localmap = smf_create_smfData( 0, status );
 
-        if( map && (map->hdr) ) {
-          map->hdr->wcs = outfset;
-          memcpy( map->lbnd, lbnd_out, sizeof(map->lbnd) );
+        if( localmap && (localmap->hdr) ) {
+          localmap->hdr->wcs = outfset;
+          memcpy( localmap->lbnd, lbnd_out, sizeof(localmap->lbnd) );
 
-          pixsize = smf_map_getpixsize( map, status );
+          pixsize = smf_map_getpixsize( localmap, status );
 
           if( *status == SAI__OK ) {
             downsampscale = abs(downsampscale) * pixsize;
@@ -734,10 +734,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           }
 
           /* Set the WCS to null again to avoid freeing the memory */
-          map->hdr->wcs = NULL;
+          localmap->hdr->wcs = NULL;
         }
 
-        if( map ) smf_close_file( &map, status );
+        if( localmap ) smf_close_file( &localmap, status );
       }
 
       msgOutf( "", FUNC_NAME
