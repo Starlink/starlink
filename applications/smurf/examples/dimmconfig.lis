@@ -127,12 +127,18 @@ exportndf = 0
 # to save memory and time. This parameter controls the minimum angular
 # scale on the sky. The new sample frequency is chosen such that this
 # scale will be preserved taking into account the average slew speed and
-# the sample rate of the input files. The following defaults are to downsample
-# to the same angular scale as the default map pixel sizes in each band
-# which works out to slightly smaller than the FWHM/3:
+# the sample rate of the input files. If a positive value is selected, this
+# gives the angular scale (in arcsec) to which the new sample rate will be
+# matched. Alternatively, if a negative value is supplied, its magnitude will
+# be multiplied by the PIXSIZE for the requested map. For example, the default
+# here is to set it to -1 such that the time-series sample rate matches the
+# pixel grid (in practice, a factor of 2 might make more sense as this would
+# correspond to the Nyquist frequency of the map pixel grid).
 
 #450.downsampscale = 2
 #850.downsampscale = 4
+
+downsampscale = -1
 
 # Alternatively, if you wish to downsample to a specific sample rate it
 # can be specified with downsampfreq in Hz.

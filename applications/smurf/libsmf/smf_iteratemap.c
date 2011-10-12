@@ -711,6 +711,39 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Are we downsampling the data? */
       astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
 
+      if( (*status == SAI__OK) && (downsampscale < 0) ) {
+        /* If the user specified a value less than 0, the scale is
+           a multiple of PIXSIZE, which is obtained from the map header.
+           We fudge a local map smfData so that we can call
+           smf_map_getpixsize */
+
+        smfData *map = NULL;
+        double pixsize;
+
+        map = smf_create_smfData( 0, status );
+
+        if( map && (map->hdr) ) {
+          map->hdr->wcs = outfset;
+          memcpy( map->lbnd, lbnd_out, sizeof(map->lbnd) );
+
+          pixsize = smf_map_getpixsize( map, status );
+
+          if( *status == SAI__OK ) {
+            downsampscale = abs(downsampscale) * pixsize;
+            astMapPut0D( keymap, "DOWNSAMPSCALE", downsampscale, NULL );
+          }
+
+          /* Set the WCS to null again to avoid freeing the memory */
+          map->hdr->wcs = NULL;
+        }
+
+        if( map ) smf_close_file( &map, status );
+      }
+
+      msgOutf( "", FUNC_NAME
+               ": will down-sample data to match angular scale of %lg "
+               "arcsec", status, downsampscale );
+
       /* Adding in signal from an external fakemap? */
       astMapGet0C( keymap, "FAKEMAP", &tempstr );
       if( tempstr ) {
