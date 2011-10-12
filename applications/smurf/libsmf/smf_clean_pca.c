@@ -13,9 +13,10 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
-*                    smfData **components, smfData **amplitudes,
-*                    int flagbad, AstKeyMap *keymap, int *status )
+*     smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
+*                    size_t t_last, double thresh, smfData **components,
+*                    smfData **amplitudes, int flagbad, AstKeyMap *keymap,
+*                    int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -23,17 +24,23 @@
 *     data = smfData * (Given)
 *        Pointer to the input smfData (assume that bolometer means have been
 *        removed)
+*     t_first = size_t (Given)
+*        First time slice of the data to be analyzed.
+*     t_last = size_t (Given)
+*        Last time slice of the data to be cleaned. If set to 0, the last
+*        time slice of the smfData will be analyzed.
 *     thresh = double (Given)
 *        Outlier threshold for amplitudes to remove from data for cleaning
 *     components = smfData ** (Returned)
 *        New 3d cube of principal component time-series (ncomponents * 1 * time)
-*        Can be NULL.
+*        Can be NULL. Will only have length t_last-t_first+1.
 *     amplitudes = smfData ** (Returned)
 *        New 3d cube giving amplitudes of each component for each bolometer
 *        (bolo X * bolo Y * component amplitude). Can be NULL.
 *     flagbad = int (Given)
 *        If set, compare each bolometer to the first component as a template
-*        to decide whether the data are good or not.
+*        to decide whether the data are good or not. Not supported if t_first
+*        and t_last don't correspond to the full length of data.
 *     keymap = AstKeyMap * (Given)
 *        Keymap containing parameters that control how flagbad works. See
 *        smf_find_gains for details.
@@ -77,6 +84,8 @@
 *     2011-03-17 (EC):
 *        -Add basic header to returned components smfData
 *        -Parallelize as much as possible over exclusive time chunks
+*     2011-10-12 (EC):
+*        Add t_first, t_last
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -141,11 +150,13 @@ typedef struct smfPCAData {
   int ijob;               /* Job identifier */
   dim_t nbolo;            /* Number of detectors  */
   size_t ngoodbolo;       /* Number of good bolos */
-  dim_t ntslice;          /* Number of time slices */
+  dim_t tlen;             /* Number of time slices */
   int operation;          /* 0=covar,1=eigenvect,2=projection */
   double *rms_amp;        /* VAL__BADD where modes need to be removed */
   size_t t1;              /* Index of first time slice for chunk */
   size_t t2;              /* Index of last time slice */
+  size_t t_first;         /* First index for total data being analyzed */
+  size_t t_last;          /* Last index for total data being analyzed */
   size_t tstride;         /* time slice stride */
 } smfPCAData;
 
@@ -168,10 +179,13 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   size_t i;               /* Loop counter */
   size_t j;               /* Loop counter */
   size_t k;               /* Loop counter */
+  size_t l;               /* Loop counter */
   dim_t ngoodbolo;        /* number good bolos = number principal components */
-  dim_t ntslice;          /* number of time slices */
+  dim_t tlen;             /* number of time slices */
   smfPCAData *pdata=NULL; /* Pointer to job data */
   double *rms_amp=NULL;   /* VAL__BADD for components to remove */
+  size_t t_first;         /* First time slice being analyzed */
+  size_t t_last;          /* First time slice being analyzed */
   size_t tstride;         /* time slice stride */
 
   if( *status != SAI__OK ) return;
@@ -191,8 +205,10 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   d = pdata->data->pntr[0];
   goodbolo = pdata->goodbolo;
   ngoodbolo = pdata->ngoodbolo;
-  ntslice = pdata->ntslice;
+  tlen = pdata->tlen;
   rms_amp = pdata->rms_amp;
+  t_first = pdata->t_first;
+  t_last = pdata->t_last;
   tstride = pdata->tstride;
 
   /* Check for valid inputs */
@@ -209,7 +225,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
 
   /* if t1 past end of the work, nothing to do so we return */
-  if( pdata->t1 >= pdata->ntslice ) {
+  if( pdata->t1 >= (pdata->t_first+pdata->tlen) ) {
     msgOutif( MSG__DEBUG, "",
               "smfPCAParallel: nothing for thread to do, returning",
               status);
@@ -234,6 +250,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
         /* Store sums in work array and normalize once all threads finish */
         covwork[ i + j*ngoodbolo ] = sum_xy;
+        //printf("(%zu,%zu) %lg\n", i, j, sum_xy);
       }
     }
   } else if( (pdata->operation == 1) && (*status == SAI__OK) ) {
@@ -248,9 +265,13 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
         u = gsl_matrix_get( cov, j, i );
 
-        /* Calculate the vector */
+        /* Calculate the vector. Note that t1 and t2 are absolute time
+           pointers into the master data array, but comp only contains a
+           subset from t_first to t_last */
+
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
-          comp[i*ccompstride+k*ctstride] += d[goodbolo[j] *
+          l = k - t_first;
+          comp[i*ccompstride+l*ctstride] += d[goodbolo[j] *
                                               bstride + k*tstride] * u;
         }
       }
@@ -262,9 +283,10 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
       for( j=0; j<ngoodbolo; j++ ) {  /* loop over component */
         for( k=pdata->t1; k<=pdata->t2; k++ ) {
+          l = k - t_first;
           amp[goodbolo[i]*abstride + j*acompstride] +=
             d[goodbolo[i]*bstride + k*tstride] *
-            comp[j*ccompstride + k*ctstride];
+            comp[j*ccompstride + l*ctstride];
         }
       }
     }
@@ -283,8 +305,9 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
         for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
           a =  amp[goodbolo[i]*abstride + j*acompstride];
           for( k=pdata->t1; k<=pdata->t2; k++ ) {
+            l = k - t_first;
             d[goodbolo[i]*bstride + k*tstride] -=
-              a*comp[j*ccompstride + k*ctstride];
+              a*comp[j*ccompstride + l*ctstride];
           }
         }
       }
@@ -307,9 +330,10 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_clean_pca"
 
-void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
-                    smfData **components, smfData **amplitudes, int flagbad,
-                    AstKeyMap *keymap, int *status ) {
+void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
+                    size_t t_last, double thresh, smfData **components,
+                    smfData **amplitudes, int flagbad, AstKeyMap *keymap,
+                    int *status ) {
 
 
   double *amp=NULL;       /* matrix of components amplitudes for each bolo */
@@ -336,8 +360,9 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
   smf_qual_t *qua=NULL;   /* Pointer to quality array */
   gsl_vector *s=NULL;     /* singular values for SVD */
   size_t step;            /* step size for job division */
+  size_t tlen;            /* Length of the time-series used for PCA */
   size_t tstride;         /* time slice stride */
-  gsl_matrix *v=NULL;      /* orthogonal square matrix for SVD */
+  gsl_matrix *v=NULL;     /* orthogonal square matrix for SVD */
   gsl_vector *work=NULL;  /* workspace for SVD */
 
   if (*status != SAI__OK) return;
@@ -386,6 +411,38 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
     goto CLEANUP;
   }
 
+  if( !t_last ) t_last = ntslice-1;
+
+  if( t_first > (ntslice-1) ) {
+    *status = SAI__ERROR;
+    errRep( " ", FUNC_NAME ": t_first is set past the last time slice!",
+            status );
+    goto CLEANUP;
+  }
+
+  if( t_last > (ntslice-1) ) {
+    *status = SAI__ERROR;
+    errRep( " ", FUNC_NAME ": t_last is set past the last time slice!",
+            status );
+    goto CLEANUP;
+  }
+
+  if( (t_last < t_first) || ( (t_last - t_first) < 1 ) ) {
+    *status = SAI__ERROR;
+    errRep( " ", FUNC_NAME ": t_last - t_first must be > 1", status );
+    goto CLEANUP;
+  }
+
+  tlen = t_last - t_first + 1;
+
+  if( flagbad && (tlen != ntslice ) ) {
+    *status = SAI__ERROR;
+    errRep( " ", FUNC_NAME
+            ": flagbad unsupported if t_first/last do not span full data",
+            status );
+    goto CLEANUP;
+  }
+
   qua = smf_select_qualpntr( data, 0, status );
 
   if( qua ) {
@@ -424,7 +481,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
 
   /* Allocate arrays */
   amp = astCalloc( nbolo*nbolo, sizeof(*amp) );
-  comp = astCalloc( ngoodbolo*ntslice, sizeof(*comp) );
+  comp = astCalloc( ngoodbolo*tlen, sizeof(*comp) );
   cov = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
   s = gsl_vector_alloc( ngoodbolo );
   v = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
@@ -447,22 +504,22 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
 
   /* Set up the division of labour for threads: independent blocks of time */
 
-  if( nw > (int) ntslice ) {
+  if( nw > (int) tlen ) {
     step = 1;
   } else {
-    step = ntslice/nw;
+    step = tlen/nw;
   }
 
   for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
     pdata = job_data + ii;
 
     /* Blocks of time slices */
-    pdata->t1 = ii*step;
-    pdata->t2 = (ii+1)*step-1;
+    pdata->t1 = ii*step + t_first;
+    pdata->t2 = (ii+1)*step + t_first - 1;
 
     /* Ensure that the last thread picks up any left-over tslices */
-    if( (ii==(nw-1)) && (pdata->t1<(ntslice-1)) ) {
-      pdata->t2=ntslice-1;
+    if( (ii==(nw-1)) && (pdata->t1<(t_first+tlen-1)) ) {
+      pdata->t2 = t_first + tlen - 1;
     }
 
     /* initialize work data */
@@ -480,7 +537,9 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
     pdata->ijob = -1;
     pdata->nbolo = nbolo;
     pdata->ngoodbolo = ngoodbolo;
-    pdata->ntslice = ntslice;
+    pdata->t_first = t_first;
+    pdata->t_last = t_last;
+    pdata->tlen = tlen;
     pdata->operation = 0;
     pdata->tstride = tstride;
 
@@ -534,7 +593,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
             sum_xy += covwork[ i + j*ngoodbolo ];
           }
 
-          c = sum_xy / ((double)ntslice-1);
+          c = sum_xy / ((double)tlen-1);
 
           gsl_matrix_set( cov, i, j, c );
           gsl_matrix_set( cov, j, i, c );
@@ -580,14 +639,14 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
   for( i=0; (*status==SAI__OK)&&(i<ngoodbolo); i++ ) {
     double sigma;
 
-    smf_stats1D( comp + i*ccompstride, ctstride, ntslice, NULL, 0,
+    smf_stats1D( comp + i*ccompstride, ctstride, tlen, NULL, 0,
                  0, NULL, &sigma, NULL, NULL, status );
 
     /* Apparently we need this to get the normalization right */
-    sigma *= sqrt((double) ntslice);
+    sigma *= sqrt((double) tlen);
 
     if( *status == SAI__OK ) {
-      for( k=0; k<ntslice; k++ ) {
+      for( k=0; k<tlen; k++ ) {
         comp[i*ccompstride + k*ctstride] /= sigma;
       }
     }
@@ -632,7 +691,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
         }
 
         /* Flip sign of the component */
-        for( k=0; k<ntslice; k++ ) {
+        for( k=0; k<tlen; k++ ) {
            comp[j*ccompstride + k*ctstride] =
              -comp[j*ccompstride + k*ctstride];
         }
@@ -814,11 +873,11 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, double thresh,
     lbnd[1] = 0;
 
     if( data->isTordered ) { /* T is 3rd axis in data if time-ordered */
-      dims[2] = data->dims[2];
-      lbnd[2] = data->lbnd[2];
+      dims[2] = tlen;
+      lbnd[2] = data->lbnd[2] + t_first;
     } else {                 /* T is 1st axis in data if bolo-ordered */
-      dims[2] = data->dims[0];
-      lbnd[2] = data->lbnd[0];
+      dims[2] = tlen;
+      lbnd[2] = data->lbnd[0] + t_first;
     }
 
     /* Copy the header if one was supplied with the input data. This

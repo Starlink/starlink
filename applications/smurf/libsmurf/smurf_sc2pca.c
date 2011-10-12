@@ -200,11 +200,15 @@ void smurf_sc2pca( int *status ) {
     /* Load data, flatfielding and/or opening raw as double as necessary */
     smf_open_asdouble( igrp, i, darks, flatramps, heateffmap, ensureflat, &data, status );
 
-    /* Mask out bad bolometers - mask data array not quality array */
-    smf_apply_mask( data, bbms, SMF__BBM_DATA, 0, status );
+    /* Mask out bad bolometers */
+    smf_apply_mask( data, bbms, SMF__BBM_DATA|SMF__BBM_QUAL, 0, status );
+
+    /* Sync quality with bad values */
+    smf_update_quality( data, 1, NULL, 0, 0.05, status );
 
     /* Calculate the PCA */
-    smf_clean_pca( wf, data, 0, &components, &amplitudes, 0, NULL, status );
+    smf_clean_pca( wf, data, 0, 0, 0, &components, &amplitudes, 0, NULL,
+                   status );
 
     /* Write out to the new files */
     smf_write_smfData( amplitudes, NULL, NULL, outampgrp, i, 0, MSG__VERB,

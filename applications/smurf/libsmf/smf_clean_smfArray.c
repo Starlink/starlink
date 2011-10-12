@@ -477,14 +477,13 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
     for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
       data = array->sdata[idx];
 
-      smf_clean_pca( wf, data, pcathresh, NULL, NULL, 0, keymap, status );
+      smf_clean_pca( wf, data, 0, 0, pcathresh, NULL, NULL, 0, keymap, status );
     }
 
     /*** TIMER ***/
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s PCA cleaning",
                status, smf_timerupdate(&tv1,&tv2,status) );
   }
-
 
   /* Allocate space for noisemaps if required */
 
