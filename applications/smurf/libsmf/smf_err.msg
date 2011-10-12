@@ -23,5 +23,6 @@ BADQNM     <Unknown quality name>
 BADFLAT    <Bad flatfield data>
 NOSCI      <No science data found>
 TELSTAT    <Telescope is stationary>
+BADFIT     <Fit failed>
 
 .END

@@ -151,6 +151,16 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
 
   smf_fit_pspec( pspec, nf, box, df, 0, 5, 20, &A, &B, &white, status );
 
+  /* If the fit failed all we will do is apply the scaling factor, so
+     fudge the model fit to be flat, and annul status */
+
+  if( *status == SMF__BADFIT ) {
+    A = 1;
+    B = 0;
+    white = 1;
+    errAnnul( status );
+  }
+
   if( *status == SAI__OK ) {
     double amp;
     double thescale=1.;

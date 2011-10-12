@@ -60,11 +60,10 @@
 *     data that are mostly above W, and at frequencies <= whitefreq.
 *
 *     If an increasing power spectrum is measured at low frequencies,
-*     a warning message will be generated at b will be set to 0. If the
-*     automatic high-frequency cutoff for the 1/f fitting drifts above
-*     the lower-edge of the specified white-noise region, however, the
-*     fit will fail. In any case where the fit fails, a, b, and w will
-*     be set to VAL__BADD and bad status will be set.
+*     or if the automatic high-frequency cutoff for the 1/f fitting
+*     drifts above the lower-edge of the specified white-noise region,
+*     the fit will fail. In any case where the fit fails, a, b, and w
+*     will be set to VAL__BADD and status will be set to SMF__BADFIT.
 
 *  Notes:
 
@@ -75,6 +74,8 @@
 *  History:
 *     2011-10-05 (EC):
 *        Initial version factored out of smf_whiten
+*     2011-10-11 (EC):
+*        Set status to SMF__BADFIT if fitting fails
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -254,7 +255,7 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
     /* If we've entered the white-noise band in order to fit the 1/f
        noise give up */
     if( i >= i_wlo ) {
-      *status = SAI__ERROR;
+      *status = SMF__BADFIT;
       errRep( "", FUNC_NAME
               ": unable to fit 1/f spectrum with provided frequency ranges",
               status);
@@ -283,9 +284,11 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
          message */
 
       if( fit[1] >= 0 ) {
-        msgOutf( "", FUNC_NAME ": fit exponent was %lg, setting to 0!\n",
-                 status, fit[1] );
-        B = 0;
+        *status = SMF__BADFIT;
+        errRep( "", FUNC_NAME
+                ": fit to 1/f component encountered rising spectrum!",
+                status);
+        goto CLEANUP;
       } else {
         B = fit[1];
       }
@@ -294,12 +297,12 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
     }
   }
 
- CLEANUP:
-
   /* Return fit values */
   if( a ) *a = A;
   if( b ) *b = B;
   if( w ) *w = white;
+
+ CLEANUP:
 
   qual = astFree( qual );
   x = astFree( x );
