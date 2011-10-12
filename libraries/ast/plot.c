@@ -691,6 +691,10 @@ f     - Title: The Plot title drawn using AST_GRID
 *        such as python.
 *        - Take account of differing axis scales when rotating vectors by
 *        90 degrees.
+*     12-OCT-2011 (DSB):
+*        Fix the change made yesterday to correct rotation of numerical axis
+*        rotations. I forgot that the astGText function in the grf module
+*        expects the up vector in equally scaled coords, not graphics coords.
 *class--
 */
 
@@ -2294,7 +2298,6 @@ static void PurgeCdata( AstPlotCurveData *, int * );
 static void PushGat( AstPlot *, float, const char *, const char *, int * );
 static void RemoveFrame( AstFrameSet *, int, int * );
 static void RightVector( AstPlot *, float *, float *, float *, float *, const char *, const char *, int * );
-static void RotateVector( AstPlot *, int, double, double, double *, double *, const char *, const char *, int * );
 static void SaveTick( AstPlot *, int, double, double, int, int * );
 static void SetTickValues( AstPlot *, int, int, double *, int, double *, int * );
 static void Text( AstPlot *, const char *, const double [], const float [], const char *, int * );
@@ -20636,15 +20639,14 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
    double *used;          /* Pointer to list of used label values */
    double *value;         /* Current tick value */
    double diff;           /* Difference between adjacent major tick marks */
-   double dx2;            /* Text base-line X component after axis reversal */
    double dx;             /* Text base-line X component */
-   double dy2;            /* Text base-line Y component after axis reversal */
    double dy;             /* Text base-line Y component */
    double gx;             /* Reference position graphics X coord. */
    double gy;             /* Reference position graphics Y coord. */
    double mindim;         /* Shortest dimension of plotting area */
    double offx;           /* X component of offset vector */
    double offy;           /* Y component of offset vector */
+   double rlen;           /* Length of perpendicular vector */
    double rx;             /* X comp of vector perpendicular to (dx,dy) */
    double ry;             /* Y comp of vector perpendicular to (dx,dy) */
    double sin45;          /* Sine of 45 degrees */
@@ -20653,6 +20655,8 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
    double upy;            /* Text up-vector Y component */
    double val[ 2 ];       /* Physical coordinates */
    float *box;            /* Pointer to array of label bounding boxes */
+   float alpha;           /* Factor to convert graphics X to equal scaled X */
+   float beta;            /* Factor to convert graphics Y to equal scaled Y */
    int axis;              /* Current axis index */
    int esc;               /* Interpret escape sequences? */
    int flag;              /* Flag indicating which way the base-vector points */
@@ -20673,9 +20677,6 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
 /* See if escape sequences in text strings are to be interpreted */
    esc = astGetEscape( this );
 
-/* Get the minimum dimension of the plotting ares. */
-   mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
-
 /* Empty the list of bounding boxes kept by the Overlap function. */
    (void) Overlap( this, 0, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, NULL,
                    method, class, status );
@@ -20686,6 +20687,24 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
 
 /* Otherwise, draw labels within the interior of the plotting area. */
    } else {
+
+/* Find the scale factors for the two axes which scale graphics coordinates
+   into a "standard" equal scaled coordinate system in which: 1) the axes
+   have equal scale in terms of (for instance) millimetres per unit distance,
+   2) X values increase from left to right, 3) Y values increase from bottom
+   to top. If the grf moduleis not capable of giving us this information, then
+   just assume the the axes are equally scaled, except for any axis reversal
+   indicated in the supplied Plot. */
+      if( GCap( this, GRF__SCALES, 1, status ) ) {
+         GScales( this, &alpha, &beta, method, class, status );
+      } else {
+         alpha = ( this->xrev ) ? -1.0 : 1.0;
+         beta = ( this->yrev ) ? -1.0 : 1.0;
+      }
+
+/* Get the minimum dimension of the plotting area in equal scaled coords. */
+      mindim = MIN( fabs( alpha*(this->xhi - this->xlo) ),
+                    fabs( beta*(this->yhi - this->ylo) ) );
 
 /* Store a value for the sine of 45 degrees. */
       sin45 = 1.0/sqrt( 2.0 );
@@ -20747,7 +20766,8 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
             gx = AST__BAD;
             gy = AST__BAD;
 
-/* Store the gap to put next to the label text. */
+/* Store the gap to put next to the label text. This is in equal scaled
+   coords, not graphics coords. */
             txtgap = astGetNumLabGap( this, axis )*mindim;
 
 /* Get a pointer to the structure containing information describing the
@@ -20813,43 +20833,45 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
    the labels are drawn on the left hand side of the axis as seen by
    someone moving along the axis in the positive direction, with an
    up-vector which is normal to the axis tangent. First, find the graphics
-   coordinates at the point being labelled, and the tangent-vector parallel
-   to the axis being labelled. If the tangent vector is not defined, then
-   the tangent vector used for the previous label is re-used. */
+   coordinates at the point being labelled, and the unit tangent-vector
+   parallel to the axis being labelled. If the tangent vector is not defined,
+   then the tangent vector used for the previous label is re-used. This
+   unit tangent vector is expressed in graphics coords. */
                   GVec( this, mapping, val, axis, 0.01*diff, &pset1,
-                        &pset2, &gx, &gy, &dx, &dy, &flag, method, class, status );
-
-/* Get a vector perpendicular to the tangent. This vector points to the
-   left as you move along the physical axis in the positive direction. */
-                  RotateVector( this, 1, dx, dy, &rx, &ry, method, class,
-                                status );
+                        &pset2, &gx, &gy, &dx, &dy, &flag, method, class,
+                        status );
 
 /* If we now have a tangent vector and good graphics coordinates for the
    label's reference position... */
                   if( dx != AST__BAD && dy != AST__BAD &&
                       gx != AST__BAD && gy != AST__BAD ){
 
+/* Convert the unit tangent vector from graphics coords to equal-scaled coords. */
+                     dx *= alpha;
+                     dy *= beta;
+
+/* Rotate through 90 degrees to get a vector perpendicular to the axis in
+   equal scaled coords. This vector points to the left as you move along
+   the physical axis in the positive direction. Find its length. */
+                     rx = -dy;
+                     ry = dx;
+                     rlen = sqrt( rx*rx + ry*ry );
+
 /* The reference position for the text is displaced away from the
    reference position normal to the axis on the left hand side by the
    "txtgap" value. */
-                     offx = rx*txtgap;
-                     offy = ry*txtgap;
-                     gx += offx;
-                     gy += offy;
-
-/* Reverse the tangent vector components if the graphics axes are displayed
-   reversed. */
-                     dx2 = ( this->xrev ) ? -dx : dx;
-                     dy2 = ( this->yrev ) ? -dy : dy;
-                     offx = ( this->xrev ) ? -offx : offx;
-                     offy = ( this->yrev ) ? -offy : offy;
+                     offx = rx*txtgap/rlen;
+                     offy = ry*txtgap/rlen;
+                     gx += offx/alpha;
+                     gy += offy/beta;
 
 /* The up-vector and justification for the text depends on whether or
    not the up-vector is free to rotate. If it is free, the up-vector is
-   chosen so that the text is not upside-down. */
+   chosen so that the text is not upside-down. Note, the up-vector is
+   specified in the equally scaled coordinate system. */
                      if( upfree ){
 
-                        if( dx2 < -0.01 ){
+                        if( dx < -0.01 ){
                            upx = -rx;
                            upy = -ry;
                            just = ( txtgap < 0.0 )? "BC" : "TC";
@@ -24514,101 +24536,6 @@ static void RightVector( AstPlot *this, float *ux, float *uy, float *rx,
    *rx /= alpha;
    *ry /= beta;
 
-}
-
-static void RotateVector( AstPlot *this, int  acw, double vx, double vy,
-                          double *px, double *py, const char *method,
-                          const char *class, int *status ) {
-/*
-*  Name:
-*     RotateVector
-
-*  Purpose:
-*     Rotates a supplied vector.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "plot.h"
-*     void RotateVector( AstPlot *this, int acw, double vx, double vy,
-*                        double *px, double *py, const char *method,
-*                        const char *class, int *status )
-
-*  Class Membership:
-*     Plot member function.
-
-*  Description:
-*     This function rotates a supplied vector through 90 degrees,
-*     taking account of the potentially differing scales on the
-*     displayed X and Y axes.
-
-*  Parameters:
-*     this
-*        Pointer to the Plot.
-*     acw
-*        If non-zero rotate by 90 degs anti-clockwise. Otherwise rotate
-*        by 90 degs clockwise.
-*     vx
-*        The x component of the vector, in graphics coords.
-*     vy
-*        The Y component of the vector, in graphics coords.
-*     px
-*        Pointer to a double in which to return the X component of the
-*        rotated vector.
-*     py
-*        Pointer to a double in which to return the Y component of the
-*        rotated vector.
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
-*     status
-*        Pointer to the inherited status variable.
-
-*/
-
-/* Local Variables: */
-   float alpha;         /* Scale factor for X axis */
-   float beta;          /* Scale factor for Y axis */
-
-/* Initialise returned values. */
-   *px = vx;
-   *py = vy;
-
-/* Check the global status. */
-   if( !astOK ) return;
-
-/* Find the scale factors for the two axes which scale graphics coordinates
-   into a "standard" coordinate system in which: 1) the axes have equal scale
-   in terms of (for instance) millimetres per unit distance, 2) X values
-   increase from left to right, 3) Y values increase from bottom to top.
-   If the grf module is not capable of giving us this information, then
-   all we can do is to assume that the axes are equally scaled, except for
-   any axis reversal indicated in the supplied Plot. */
-   if( GCap( this, GRF__SCALES, 1, status ) ) {
-      GScales( this, &alpha, &beta, method, class, status );
-   } else {
-      alpha = ( this->xrev ) ? -1.0 : 1.0;
-      beta = ( this->yrev ) ? -1.0 : 1.0;
-   }
-
-/* Convert the supplied vector into this "standard" system in which the axes
-   have equal scales, and increase left-to-right, bottom-to-top, and then
-   rotate the vector. */
-   if( acw ){
-      *px = -vy*beta;
-      *py = vx*alpha;
-   } else {
-      *px = vy*beta;
-      *py = -vx*alpha;
-   }
-
-/* Un-scale the vectors back into the graphics system. */
-   *px /= alpha;
-   *py /= beta;
 }
 
 static void SaveTick( AstPlot *this, int axis, double gx, double gy,
