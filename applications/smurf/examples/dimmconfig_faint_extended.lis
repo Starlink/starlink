@@ -27,4 +27,4 @@ modelorder = (com,gai,ext,dks,ast,noi)
 450.cleandk.filt_edgehigh = 0.1
 850.cleandk.filt_edgehigh = 0.3
 
-noiseclip = 2.0
+noisecliphigh = 2.0
