@@ -95,6 +95,7 @@ examples/dimmconfig_bright_extended.lis \
 examples/dimmconfig_calcnoise.lis \
 examples/dimmconfig_calcnoise_com.lis \
 examples/dimmconfig_calcnoise_pca.lis \
+examples/dimmconfig_compact_whiten.lis \
 examples/dimmconfig_distortionmap.lis \
 examples/dimmconfig_faint_extended.lis \
 examples/dimmconfig_fridgeflat.lis \
