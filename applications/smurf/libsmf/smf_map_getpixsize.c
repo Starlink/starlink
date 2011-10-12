@@ -13,8 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     pixsize = smf_map_getpixsize( const smfData *data, double *df_x,
-*                                   double *df_y, int *status );
+*     pixsize = smf_map_getpixsize( const smfData, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -28,9 +27,7 @@
 *  Description:
 *     The pixel scale is calculated at the centre of the map using the
 *     stored WCS and the values of LBND. VAL__BADD is returned if it cannot
-*     be determined, and SAI__ERROR status will be set. Will also optionally
-*     return the spatial frequency step sizes df_x and sf_y along each axis
-*     that correpond to the FFT of the map.
+*     be determined, and SAI__ERROR status will be set.
 
 *  Notes:
 
