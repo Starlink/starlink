@@ -209,6 +209,13 @@
 
 /* Macros */
 /* ====== */
+#define AST__HRS 0
+#define AST__MIN 1
+#define AST__SEC 2
+#define AST__DEG 3
+#define AST__AMIN 4
+#define AST__ASEC 5
+
 /* Define constants used to size global arrays in this module. */
 /* Define numerical constants for use in thie module. */
 #define AST__SKYAXIS_GETAXISFORMAT_BUFF_LEN 50
@@ -279,6 +286,12 @@ typedef struct AstSkyAxisGlobals {
    char DHmsUnit_Buff[ AST__SKYAXIS_DHMSUNIT_BUFF_LEN + 1 ];
    char GetAttrib_Buff[ AST__SKYAXIS_GETATTRIB_BUFF_LEN + 1 ];
    char GetAxisFormat_Buff[ AST__SKYAXIS_GETAXISFORMAT_BUFF_LEN + 1 ];
+   char *GhDelim;
+   char *GmDelim;
+   char *GsDelim;
+   char *GdDelim;
+   char *GamDelim;
+   char *GasDelim;
 } AstSkyAxisGlobals;
 
 #endif
@@ -322,6 +335,8 @@ void astInitSkyAxisGlobals_( AstSkyAxisGlobals * );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+void astSetSkyDelim_( int, const char *, int * );
+
 #if defined(astCLASS)            /* Protected */
 int astGetAxisAsTime_( AstSkyAxis *, int * );
 int astGetAxisIsLatitude_( AstSkyAxis *, int * );
@@ -379,6 +394,9 @@ astINVOKE(O,astLoadSkyAxis_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 
 /* Interfaces to public member functions. */
 /* -------------------------------------- */
+
+#define astSetSkyDelim(field,delim) astSetSkyDelim_(field,delim,STATUS_PTR)
+
 /* Here we make use of astCheckSkyAxis to validate SkyAxis pointers
    before use. This provides a contextual error report if a pointer to
    the wrong sort of object is supplied. */

@@ -11736,6 +11736,9 @@ c        this.
 *     etc, as appropriate), but include escape sequences in the formatted
 *     value so that the Plot class will draw the separators as small
 *     super-scripts.
+c     The default escape sequences are optimised for the pgplot graphics
+c     package, but new escape sequences may be specified using function
+c     astSetSkyDelim.
 *
 *     - "d": Include a degrees field. Expressing the angle purely in
 *     degrees is also the default if none of "h", "m", "s" or "t" are
