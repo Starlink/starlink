@@ -139,7 +139,7 @@ for my $f (@files) {
   # now dump the contents
   if ($isfirst_file) {
     print "# This is a TST formatted file\n";
-    print join("\t", "Id", "RA", "DEC", "DRA", "DDEC", "AZ","EL", "DAZ", "DEL", @wvmcol, @columns) ,"\n";
+    print join("\t", "Id", "RA", "DEC", "DRA", "DDEC", "AZ","EL", "DAZ", "DEL", "TELSPEED", @wvmcol, @columns) ,"\n";
     print join("\t", map { "--" } (0..($#columns+3))),"\n";
     $isfirst_file = 0;
   }
@@ -165,6 +165,36 @@ for my $f (@files) {
 
     push(@slice, calc_pos( "TR", $i, \%local) );
     push(@slice, calc_pos( "AZ", $i, \%local) );
+
+    # Calculate telescope speed
+    my $telspeed = &NDF::VAL__BADD();
+    my @speedkeys = (qw/ TCS_TAI TCS_TR_AC1 TCS_TR_AC2 /);
+    my $isokay = 1;
+    if ($i > 0) {
+      for my $islice ( $i-1, $i ) {
+        for my $key (@speedkeys) {
+          if ($local{$key}->[$islice] < 0) {
+            # invalid non-bad position or time
+            $isokay = 0;
+            last;
+          }
+        }
+      }
+      if ($isokay) {
+        # Calculate the tangent plane distance travelled between
+        # this and previous position
+        Astro::SLA::slaDs2tp( $local{TCS_TR_AC1}->[$i], $local{TCS_TR_AC2}->[$i],
+                             $local{TCS_TR_AC1}->[$i-1], $local{TCS_TR_AC2}->[$i-1],
+                             my $xoffset, my $yoffset, my $j );
+        if ($j == 0) {
+          my $distsq = $xoffset**2 + $yoffset**2;
+          my $dist = sqrt($distsq) * Astro::SLA::DR2AS;
+          my $deltat = ( $local{TCS_TAI}->[$i] - $local{TCS_TAI}->[$i-1]) * 86400;
+          $telspeed = $dist / $deltat if $deltat > 0.0;
+        }
+      }
+    }
+    push(@slice, $telspeed);
 
     # Calculate the WVM tau
     if ( @wvmcol ) {
