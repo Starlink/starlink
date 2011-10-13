@@ -56,8 +56,11 @@
 *     2010-09-23 (EC):
 *        - rename sthresh to smin, add smax parameter
 *        - rename function from smf_flag_stationary to smf_flag_slewspeed
+*     2011-10-12 (TIMJ):
+*        Calculate steptime at each step.
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 2009-2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -126,7 +129,6 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
   double sep1;                  /* Angular separation between samples */
   double sep2;                  /* Angular separation between samples */
   double speed;                 /* Current speed */
-  double steptime=0;            /* Step time in seconds */
   size_t tstride;               /* Time stride */
 
   /* Main routine */
@@ -179,7 +181,6 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
   /* Initial conditions */
   if( *status == SAI__OK ) {
     allState = data->hdr->allState;
-    steptime = data->hdr->steptime;
     /* Use tracking coordinate system so that we are measuring motion
        relative to target. Use demand rather than actual since it is
        a cleaner data set and doesn't require filtering. */
@@ -191,6 +192,10 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
 
   /* Loop over time slice */
   for( i=1; (*status==SAI__OK)&&i<(ntslice-1); i++ ) {
+    /* Calculate new steptime */
+    double steptime1 = (allState[i].tcs_tai   - allState[i-1].tcs_tai) * SPD;
+    double steptime2 = (allState[i+1].tcs_tai - allState[i].tcs_tai) * SPD;
+
     /* Get new coordinates at third position */
     pos3_ac1 = allState[i+1].tcs_tr_dc1;
     pos3_ac2 = allState[i+1].tcs_tr_dc2;
@@ -200,10 +205,10 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
     sep2 = slaDsep( pos2_ac1, pos2_ac2, pos3_ac1, pos3_ac2 ) * DR2AS;
 
     /* Average speed in arcsec/sec */
-    speed = (sep1 + sep2)/(2*steptime);
+    speed = (sep1 + sep2)/(steptime1+steptime2);
 
     /* Acceleration magnitude in arcsec/sec^2 (currently ignored) */
-    accel = fabs( (sep2-sep1)/(steptime*steptime) );
+    accel = fabs( (sep2-sep1)/(steptime1*steptime2) );
 
     if( (smin && (speed < smin)) || (smax && (speed > smax)) ) {
       /* Does this time step need to be flagged? */
