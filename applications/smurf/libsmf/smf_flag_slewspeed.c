@@ -35,10 +35,10 @@
 *        Pointer to global status.
 
 *  Description:
-*     Portions of scan data taken while the telescope was stationary
-*     is not useful for producing maps. This routine flags data with
-*     SMF__Q_STAT that were taken when the requested speed in tracking
-*     coordinates was less than 5 arcsec/sec.
+*     Portions of scan data taken while the telescope was moving
+*     outside the range smin to smax arcsec/sec are quality flagged
+*     data with SMF__Q_STAT. The average speed is also returned
+*     optionally.
 
 *  Notes:
 
@@ -58,10 +58,12 @@
 *        - rename function from smf_flag_stationary to smf_flag_slewspeed
 *     2011-10-12 (TIMJ):
 *        Calculate steptime at each step.
+*     2011-10-13 (EC):
+*        Use actual instead of demand coordinates!
 
 *  Copyright:
 *     Copyright (C) 2011 Science & Technology Facilities Council.
-*     Copyright (C) 2009-2010 University of British Columbia.
+*     Copyright (C) 2009-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -182,12 +184,12 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
   if( *status == SAI__OK ) {
     allState = data->hdr->allState;
     /* Use tracking coordinate system so that we are measuring motion
-       relative to target. Use demand rather than actual since it is
-       a cleaner data set and doesn't require filtering. */
-    pos1_ac1 = allState[0].tcs_tr_dc1;
-    pos1_ac2 = allState[0].tcs_tr_dc2;
-    pos2_ac1 = allState[1].tcs_tr_dc1;
-    pos2_ac2 = allState[1].tcs_tr_dc2;
+       relative to target. Use actual coordinates since the telescope
+       sometimes does very odd things! */
+    pos1_ac1 = allState[0].tcs_tr_ac1;
+    pos1_ac2 = allState[0].tcs_tr_ac2;
+    pos2_ac1 = allState[1].tcs_tr_ac1;
+    pos2_ac2 = allState[1].tcs_tr_ac2;
   }
 
   /* Loop over time slice */
@@ -197,8 +199,8 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
     double steptime2 = (allState[i+1].tcs_tai - allState[i].tcs_tai) * SPD;
 
     /* Get new coordinates at third position */
-    pos3_ac1 = allState[i+1].tcs_tr_dc1;
-    pos3_ac2 = allState[i+1].tcs_tr_dc2;
+    pos3_ac1 = allState[i+1].tcs_tr_ac1;
+    pos3_ac2 = allState[i+1].tcs_tr_ac2;
 
     /* calculate angular separations between sets of positions in arcsec */
     sep1 = slaDsep( pos1_ac1, pos1_ac2, pos2_ac1, pos2_ac2 ) * DR2AS;
