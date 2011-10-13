@@ -137,6 +137,7 @@
 #define STATUS_PTR astGetStatusPtr
 #endif
 #define AST__TUNULL -99999
+#define AST__TUNULLC "<NOTUNEPAR>"
 
 /* Type definitions */
 /* ================ */

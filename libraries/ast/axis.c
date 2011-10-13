@@ -138,11 +138,6 @@ static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 
-/* Strings used as field delimiters when producing graphical labels.
-   These strings include escape sequences which the Plot class interprets
-   to produce super-scripts, sub-scripts, etc.*/
-static const char *log_esc  = "10%-%^50+%s70+";
-
 /* Plain text equivalents. */
 static const char *log_txt  = "10^";
 
@@ -470,6 +465,7 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
 */
 
 /* Local Variables: */
+   char log_esc[ 50 ];           /* Buffer for graphical delimiter string */
    const char *fmt;              /* Pointer to parsed Format string */
    const char *log_del;          /* Pointer to delimiter string */
    const char *p;                /* Pointer to next character */
@@ -537,7 +533,12 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
             }
 
 /* Select the delimter.*/
-            log_del = astEscapes( -1 ) ? log_esc : log_txt;
+            if(  astEscapes( -1 ) ) {
+               astTuneC( "exdel", NULL, log_esc, sizeof( log_esc ) );
+               log_del = log_esc;
+            } else {
+               log_del = log_txt;
+            }
 
 /* Check the remaining string starts with the correct delimiter. If
    so, store the number of characters in the first field and skip over the
@@ -665,10 +666,12 @@ static const char *AxisFormat( AstAxis *this, double value, int *status ) {
 
 /* Local Variables: */
    astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
-   char errbuf[ ERRBUF_LEN ];   /* Buffer for system error message */
    char *errstat;               /* Pointer for system error message */
+   char errbuf[ ERRBUF_LEN ];   /* Buffer for system error message */
+   char log_esc[ 50 ];          /* Buffer for graphical delimiter string */
    const char *fmt0;            /* Pointer to original Format string */
    const char *fmt;             /* Pointer to parsed Format string */
+   const char *log_del;         /* Pointer to delimiter string */
    const char *result;          /* Pointer to formatted value */
    double x;                    /* The value to be formatted by sprintf */
    int integ;                   /* Cast axis value to integer before printing? */
@@ -750,8 +753,14 @@ static const char *AxisFormat( AstAxis *this, double value, int *status ) {
                nc = 1;
             }
 
-            nc += sprintf( axisformat_buff + nc, "%s",
-                           astEscapes( -1 ) ? log_esc : log_txt );
+            if(  astEscapes( -1 ) ) {
+               astTuneC( "exdel", NULL, log_esc, sizeof( log_esc ) );
+               log_del = log_esc;
+            } else {
+               log_del = log_txt;
+            }
+
+            nc += sprintf( axisformat_buff + nc, "%s", log_del );
 
 /* Round small exponents to zero. */
             if( fabs( x ) < 1.0E-10 ) x = 0.0;

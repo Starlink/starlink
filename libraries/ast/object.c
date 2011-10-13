@@ -57,7 +57,8 @@ c     - astSet<X>: Set an attribute value for an Object
 c     - astShow: Display a textual representation of an Object on standard
 c     output
 c     - astTest: Test if an attribute value is set for an Object
-c     - astTune: Set or get an AST tuning parameter
+c     - astTune: Set or get an integer AST tuning parameter
+c     - astTuneC: Set or get a character AST tuning parameter
 c     - astUnlock: Unlock an Object for use by other threads
 c     - astFromString: Re-create an Object from an in-memory serialisation
 c     - astVersion: Return the verson of the AST library being used.
@@ -81,7 +82,8 @@ f     - AST_SET<X>: Set an attribute value for an Object
 f     - AST_SHOW: Display a textual representation of an Object on standard
 f     output
 f     - AST_TEST: Test if an attribute value is set for an Object
-f     - AST_TUNE: Set or get an AST tuning parameter
+f     - AST_TUNE: Set or get an integer AST tuning parameter
+f     - AST_TUNEC: Set or get a character AST tuning parameter
 f     - AST_VERSION: Return the verson of the AST library being used.
 
 *  Copyright:
@@ -278,6 +280,16 @@ typedef struct StringData {
    not need to be in thread-specific data. */
 /* ------------------------------------------------------------------ */
 
+/* Character-valued tuning parameters. */
+#define MAXLEN_TUNEC 200
+static char hrdel[ MAXLEN_TUNEC ] = "%-%^50+%s70+h%+";
+static char mndel[ MAXLEN_TUNEC ] = "%-%^50+%s70+m%+";
+static char scdel[ MAXLEN_TUNEC ] = "%-%^50+%s70+s%+";
+static char dgdel[ MAXLEN_TUNEC ] = "%-%^53+%s60+o%+";
+static char amdel[ MAXLEN_TUNEC ] = "%-%^20+%s85+'%+";
+static char asdel[ MAXLEN_TUNEC ] = "%-%^20+%s85+\"%+";
+static char exdel[ MAXLEN_TUNEC ] = "10%-%^50+%s70+";
+
 /* A pointer full of zeros. */
 static AstObject *zero_ptr;
 
@@ -323,6 +335,12 @@ astMAKE_INITGLOBALS(Object)
 #define class_vtab astGLOBAL(Object,Class_Vtab)
 #define nvtab astGLOBAL(Object,Nvtab)
 #define known_vtabs astGLOBAL(Object,Known_Vtabs)
+
+/* mutex1 is used to prevent tuning parameters being accessed by more
+   than one thread at any one time.  */
+static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX1 pthread_mutex_lock( &mutex1 );
+#define UNLOCK_MUTEX1 pthread_mutex_unlock( &mutex1 );
 
 /* mutex2 is used to prevent the global lists of object handles being
    accessed by more than one thread at any one time.  */
@@ -384,6 +402,8 @@ static int astgetc_istr = 0;
 static int astgetc_init = 0;
 
 /* Null macros for mutex locking and unlocking */
+#define LOCK_MUTEX1
+#define UNLOCK_MUTEX1
 #define LOCK_MUTEX2
 #define UNLOCK_MUTEX2
 #define LOCK_PMUTEX(this)
@@ -4040,7 +4060,7 @@ c     astTune
 f     AST_TUNE
 
 *  Purpose:
-*     Set or get an AST global tuning parameter.
+*     Set or get an integer-valued AST global tuning parameter.
 
 *  Type:
 *     Public function.
@@ -4054,8 +4074,11 @@ f     RESULT = AST_TUNE( NAME, VALUE, STATUS )
 *     Object function.
 
 *  Description:
-*     This function returns the current value of an AST global tuning
-*     parameter, optionally storing a new value for the parameter.
+*     This function returns the current value of an integer-valued AST
+*     global tuning parameter, optionally storing a new value for the
+*     parameter. For character-valued tuning parameters, see
+c     astTuneC.
+f     AST_TUNEC.
 
 *  Parameters:
 c     name
@@ -4115,6 +4138,8 @@ f     error value
 
    if( name ) {
 
+      LOCK_MUTEX1;
+
       if( astChrMatch( name, "ObjectCaching" ) ) {
          result = object_caching;
          if( value != AST__TUNULL ) {
@@ -4130,9 +4155,181 @@ f     error value
                    "specified \"%s\".", status, name );
       }
 
+      UNLOCK_MUTEX1;
+
    }
 
    return result;
+}
+
+void astTuneC_( const char *name, const char *value, char *buff,
+                int bufflen, int *status ) {
+/*
+*++
+*  Name:
+c     astTuneC
+f     AST_TUNEC
+
+*  Purpose:
+*     Set or get a character-valued AST global tuning parameter.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "object.h"
+c     void astTuneC( const char *name, const char *value, char *buff,
+c                    int bufflen )
+f     CALL AST_TUNEC( NAME, VALUE, BUFF, STATUS )
+
+*  Class Membership:
+*     Object function.
+
+*  Description:
+*     This function returns the current value of a character-valued
+*     AST global tuning parameter, optionally storing a new value
+*     for the parameter. For integer-valued tuning parameters, see
+c     astTune.
+f     AST_TUNE.
+
+*  Parameters:
+c     name
+f     NAME = CHARACTER * ( * ) (Given)
+*        The name of the tuning parameter (case-insensitive).
+c     value
+f     VALUE = CHARACTER * ( ) (Given)
+*        The new value for the tuning parameter. If this is
+f        AST__TUNULLC,
+c        NULL,
+*        the existing current value will be retained.
+c     buff
+f     BUFF = CHARACTER * ( ) (Given)
+*        A character string in which to return the original value of
+*        the tuning parameter. An error will be reported if the buffer
+*        is too small to hold the value.
+c        NULL may be supplied if the old value is not required.
+c     bufflen
+c        The size of the supplied "buff" array. Ignored if "buff" is NULL.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Tuning Parameters:
+*     HRDel
+*        A string to be drawn following the hours field in a formatted
+*        sky axis value when "g" format is in use (see the Format
+*        attribute). This string may include escape sequences to produce
+*        super-scripts, etc. (see the Escapes attribute for details
+*        of the escape sequences allowed). The default value is
+*        "%-%^50+%s70+h%+" which produces a super-script "h".
+*     MNDel
+*        A string to be drawn following the minutes field in a formatted
+*        sky axis value when "g" format is in use. The default value is
+*        "%-%^50+%s70+m%+" which produces a super-script "m".
+*     SCDel
+*        A string to be drawn following the seconds field in a formatted
+*        sky axis value when "g" format is in use. The default value is
+*        "%-%^50+%s70+s%+" which produces a super-script "s".
+*     DGDel
+*        A string to be drawn following the degrees field in a formatted
+*        sky axis value when "g" format is in use. The default value is
+*        "%-%^53+%s60+o%+" which produces a super-script "o".
+*     AMDel
+*        A string to be drawn following the arc-minutes field in a formatted
+*        sky axis value when "g" format is in use. The default value is
+*        "%-%^20+%s85+'%+" which produces a super-script "'" (single quote).
+*     ASDel
+*        A string to be drawn following the arc-seconds field in a formatted
+*        sky axis value when "g" format is in use. The default value is
+*        "%-%^20+%s85+\"%+" which produces a super-script """ (double quote).
+*     EXDel
+*        A string to be drawn to introduce the exponent in a value when "g"
+*        format is in use. The default value is "10%-%^50+%s70+" which
+*        produces "10" followed by the exponent as a super-script.
+
+*  Notes:
+c     - This function attempts to execute even if the AST error
+c     status is set
+f     - This routine attempts to execute even if STATUS is set to an
+f     error value
+*     on entry, although no further error report will be
+*     made if it subsequently fails under these circumstances.
+*     - All threads in a process share the same AST tuning parameters
+*     values.
+*--
+*/
+
+/* Local Variables: */
+   char *p;
+   int len;
+
+/* Check the name of a tuning parameter was supplied. */
+   if( name ) {
+
+/* Serialise access to the tuning parameters since they are common to all
+   threads. */
+      LOCK_MUTEX1;
+
+/* Get a pointer to the buffer that holds the value of the requested
+   tuning parameter. */
+      if( astChrMatch( name, "hrdel" ) ) {
+         p = hrdel;
+      } else if( astChrMatch( name, "mndel" ) ) {
+         p = mndel;
+      } else if( astChrMatch( name, "scdel" ) ) {
+         p = scdel;
+      } else if( astChrMatch( name, "dgdel" ) ) {
+         p = dgdel;
+      } else if( astChrMatch( name, "amdel" ) ) {
+         p = amdel;
+      } else if( astChrMatch( name, "asdel" ) ) {
+         p = asdel;
+      } else if( astChrMatch( name, "exdel" ) ) {
+         p = exdel;
+
+/* Report an error if an the tuning parameter name is unknown. */
+      } else if( astOK ) {
+         p = NULL;
+         astError( AST__TUNAM, "astTuneC: Unknown AST tuning parameter "
+                   "specified \"%s\".", status, name );
+      }
+
+/* If the existing value was found. */
+      if( p ) {
+
+/* And is to be returned in the supplied buffer... */
+         if( buff ) {
+
+/* Check that the buffer is long enough. If so, copy the current value
+   into the buffer, otherwise report an error. */
+            len = strlen( p ) ;
+            if( len < bufflen ) {
+               strcpy( buff, p );
+            } else {
+               astError( AST__TUNAM, "astTuneC: Supplied string variable "
+                         "is too small - the current '%s' value (%s) has "
+                         "%d characters.", status, name, p, len );
+            }
+         }
+
+/* If a new value is to be stored.... */
+         if( value ) {
+
+/* Report an error if it is too long to fit in the static buffer. */
+            len = strlen( value ) ;
+            if( len >= MAXLEN_TUNEC ) {
+               astError( AST__TUNAM, "astTuneC: Supplied value for '%s' "
+                         "(%s) is too long - must not be longer than %d "
+                         "characters.", status, name, value, MAXLEN_TUNEC );
+
+/* Otherwise, copy the new value into the static buffer. */
+            } else {
+               strcpy( p, value );
+            }
+         }
+      }
+
+      UNLOCK_MUTEX1;
+   }
 }
 
 AstObject *astFromString_( const char *string, int *status ) {

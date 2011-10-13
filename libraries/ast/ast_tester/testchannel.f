@@ -5,11 +5,22 @@
       include 'AST_ERR'
 
       integer status, ch, sf, sf2
-
+      character buff*50
       status = sai__ok
 
       call err_begin( status )
       call ast_begin( status )
+
+
+      call ast_tunec( "hrdel", AST__TUNULLC, buff, status )
+      if( buff .ne. '%-%^50+%s70+h%+' .and. status .eq. sai__ok ) then
+         call stopit( 0, status )
+      endif
+      call ast_tunec( "hrdel", "junk", buff, status )
+      call ast_tunec( "hrdel", AST__TUNULLC, buff, status )
+      if( buff .ne. 'junk' .and. status .eq. sai__ok ) then
+         call stopit( -1, status )
+      endif
 
       sf = ast_skyframe( ' ', status )
       ch = ast_channel( AST_NULL, AST_NULL, 'SinkFile=./fred.txt',

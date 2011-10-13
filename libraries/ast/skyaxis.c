@@ -110,7 +110,7 @@ f     only within textual output (e.g. from AST_WRITE).
 *        Modified AxisUnformat to allow the final numerical field to include
 *        an exponent.
 *     13-OCT-2011 (DSB):
-*        Added function astSetSkyDelim.
+*        Use tuning parameters to store graphical delimiters.
 *class--
 */
 
@@ -188,13 +188,7 @@ static double piby2;
    globals->DHmsFormat_Buff[ 0 ] = 0; \
    globals->DHmsUnit_Buff[ 0 ] = 0; \
    globals->GetAttrib_Buff[ 0 ] = 0; \
-   globals->GetAxisFormat_Buff[ 0 ] = 0; \
-   globals->GhDelim  = NULL; \
-   globals->GmDelim  = NULL; \
-   globals->GsDelim  = NULL; \
-   globals->GdDelim  = NULL; \
-   globals->GamDelim = NULL; \
-   globals->GasDelim = NULL;
+   globals->GetAxisFormat_Buff[ 0 ] = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(SkyAxis)
@@ -206,12 +200,6 @@ astMAKE_INITGLOBALS(SkyAxis)
 #define dhmsunit_buff astGLOBAL(SkyAxis,DHmsUnit_Buff)
 #define getattrib_buff astGLOBAL(SkyAxis,GetAttrib_Buff)
 #define getaxisformat_buff astGLOBAL(SkyAxis,GetAxisFormat_Buff)
-#define gh_delim  astGLOBAL(SkyAxis,GhDelim)
-#define gm_delim  astGLOBAL(SkyAxis,GmDelim)
-#define gs_delim  astGLOBAL(SkyAxis,GsDelim)
-#define gd_delim  astGLOBAL(SkyAxis,GdDelim)
-#define gam_delim astGLOBAL(SkyAxis,GamDelim)
-#define gas_delim astGLOBAL(SkyAxis,GasDelim)
 
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 );
@@ -225,16 +213,6 @@ static char dhmsformat_buff[ AST__SKYAXIS_DHMSFORMAT_BUFF_LEN + 1 ];
 static char dhmsunit_buff[ AST__SKYAXIS_DHMSUNIT_BUFF_LEN + 1 ];
 static char getattrib_buff[ AST__SKYAXIS_GETATTRIB_BUFF_LEN + 1 ];
 static char getaxisformat_buff[ AST__SKYAXIS_GETAXISFORMAT_BUFF_LEN + 1 ];
-
-/* Strings used as field delimiters when producing graphical labels.
-   These strings include escape sequences which the Plot class interprets
-   to produce super-scripts, suub-scripts, etc.*/
-static char *gh_delim  = NULL;  /* Hours separator */
-static char *gm_delim  = NULL;  /* Min.s separator */
-static char *gs_delim  = NULL;  /* Sec.s separator */
-static char *gd_delim  = NULL;  /* Deg.s separator */
-static char *gam_delim = NULL;  /* Arc-min.s separator */
-static char *gas_delim = NULL;  /* Arc-sec.s separator */
 
 /* Define the class virtual function table and its initialisation flag
    as static variables. */
@@ -550,7 +528,7 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    char sep;                     /* Field separator character */
-   char tbuf[2];                 /* Buffer for terminator string */
+   char tbuf[50];                /* Buffer for terminator string */
    char *p;                      /* Pointer to next character */
    char *t;                      /* Pointer to start of terminator string */
    char *term;                   /* Pointer to terminator string */
@@ -637,7 +615,9 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
                term = as_time ? "h" : "d";
 
             } else if( sep == 'g' ) {
-               term = as_time ? gh_delim : gd_delim;
+               astTuneC( as_time ? "hrdel":"dgdel", NULL, tbuf,
+                         sizeof( tbuf ) );
+               term = tbuf;
 
             } else {
                tbuf[ 0 ] = sep;
@@ -693,7 +673,9 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
                term = "m";
 
             } else if( sep == 'g' ) {
-               term = as_time ? gm_delim : gam_delim;
+               astTuneC( as_time ? "mndel":"amdel", NULL, tbuf,
+                         sizeof( tbuf ) );
+               term = tbuf;
 
             } else {
                tbuf[ 0 ] = sep;
@@ -744,7 +726,9 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
             if( sep == 'l' ) {
                term = "s";
             } else {
-               term = as_time ? gs_delim : gas_delim;
+               astTuneC( as_time ? "scdel":"asdel", NULL, tbuf,
+                         sizeof( tbuf ) );
+               term = tbuf;
             }
 
             t = strstr( p, term );
@@ -1504,7 +1488,9 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
 
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   char *term;                   /* Pointer to terminator string */
    char sep;                     /* Field separator character */
+   char tbuf[50];                /* Buffer for terminator string */
    const char *result;           /* Pointer to result string */
    double absvalue;              /* Absolute value in radians */
    double fract;                 /* Fractional part of final field */
@@ -1709,7 +1695,10 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
                if ( sep == 'l' ) {
                   dhmsformat_buff[ pos++ ] = ( as_time ? 'h' : 'd' );
                } else if( sep == 'g' ) {
-                  pos += sprintf( dhmsformat_buff + pos, "%s", as_time ? gh_delim : gd_delim );
+                  astTuneC( as_time ? "hrdel":"dgdel", NULL, tbuf,
+                            sizeof( tbuf ) );
+                  term = tbuf;
+                  pos += sprintf( dhmsformat_buff + pos, "%s", term );
                }
             }
          }
@@ -1730,7 +1719,10 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
                if ( sep == 'l' ) {
                   dhmsformat_buff[ pos++ ] = 'm';
                } else if( sep == 'g' ) {
-                  pos += sprintf( dhmsformat_buff + pos, "%s", as_time ? gm_delim : gam_delim );
+                  astTuneC( as_time ? "mndel":"amdel", NULL, tbuf,
+                            sizeof( tbuf ) );
+                  term = tbuf;
+                  pos += sprintf( dhmsformat_buff + pos, "%s", term );
                }
             }
          }
@@ -1760,9 +1752,11 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
             dhmsformat_buff[ pos++ ] = ( sec ? 's' : ( min ? 'm' :
                                                   ( as_time ? 'h' : 'd' ) ) );
          } else if ( sep == 'g' ) {
-            pos += sprintf( dhmsformat_buff + pos, "%s",
-                as_time ? ( sec ? gs_delim : ( min ? gm_delim : gh_delim ) ) :
-                          ( sec ? gas_delim : ( min ? gam_delim : gd_delim ) ) );
+            astTuneC( as_time ? ( sec ? "scdel" : ( min ? "mndel" : "hrdel" ) ) :
+                      ( sec ? "asdel" : ( min ? "amdel" : "dgdel" ) ),
+                      NULL, tbuf, sizeof( tbuf ) );
+            term = tbuf;
+            pos += sprintf( dhmsformat_buff + pos, "%s", term );
          }
 
 /* Terminate the result string and return a pointer to it. */
@@ -3160,18 +3154,6 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name, int *status )
    piby2 = 0.5*pi;
    UNLOCK_MUTEX2
 
-/* Initialise the (thread-specific) static variables that hold the escape
-   sequences used as graphical delimiters between feidls in formatted axis
-   values. Since the astSetSkYDelim function may have been called prior
-   to the creation of the first sky axis, do not initialise these if they
-   already have a value. */
-   if( !gh_delim ) astSetSkyDelim( AST__HRS, "%-%^50+%s70+h%+" );  /* Hours separator */
-   if( !gm_delim ) astSetSkyDelim( AST__MIN, "%-%^50+%s70+m%+" );  /* Min.s separator */
-   if( !gs_delim ) astSetSkyDelim( AST__SEC, "%-%^50+%s70+s%+" );  /* Sec.s separator */
-   if( !gd_delim ) astSetSkyDelim( AST__DEG, "%-%^53+%s60+o%+" );  /* Deg.s separator */
-   if( !gam_delim ) astSetSkyDelim( AST__AMIN, "%-%^20+%s85+'%+" ); /* Arc-min.s separator */
-   if( !gas_delim ) astSetSkyDelim( AST__ASEC, "%-%^20+%s85+\"%+" );/* Arc-sec.s separator */
-
 /* If we have just initialised the vtab for the current class, indicate
    that the vtab is now initialised, and store a pointer to the class
    identifier in the base "object" level of the vtab. */
@@ -3534,109 +3516,6 @@ static void SetAxisFormat( AstAxis *this_axis, const char *format, int *status )
 /* Store a pointer to a copy of the Format string in the SkyAxis structure. */
    this->skyformat = astStore( this->skyformat, format,
                                strlen( format ) + (size_t) 1 );
-}
-
-void astSetSkyDelim_( int field, const char *delim, int * status ) {
-/*
-c++
-*  Name:
-*     astSetSkyDelim
-
-*  Purpose:
-*     Set a new graphical delimiter for a formatted sky axis value.
-
-*  Type:
-*     Public function.
-
-*  Synopsis:
-*     #include "skyaxis.h"
-*     void astSetSkyDelim( int field, const char *delim )
-
-*  Class Membership:
-*     SkyAxis class function.
-
-*  Description:
-*     The Plot class defines a set of escape sequences which can be
-*     included within a text string in order to control the appearance of
-*     sub-strings within the text. See the Escape attribute for a
-*     description of these escape sequences. Such escape sequences can be
-*     used to produce superscript delimiters such as "h", "m", "s", etc.,
-*     within formatted sky axis values - see the description of the
-*     Format attribute (specifically, the "g" option provided by the
-*     SkyFrame class).
-*
-*     This function allows the escape sequences used for each delimeter
-*     to be changed. If it is not called, the default delimiters listed
-*     below will be used.
-
-*  Parameters:
-*     field
-*        Indicates the field for which the delimter is to be set. Must be
-*        one of AST__HRS (hours), AST__MIN (minutes), AST__SEC (seconds),
-*        AST__DEG (degrees), AST__AMIN (arc-minutes) or AST__ASEC
-*        (arc-seconds).
-*     delim
-*        The new text for the delimiter.
-
-*  Default Delimiters:
-*     - The default delimiters are optimised for use with the PGPLOT
-*     graphics package:
-*
-*        AST__HRS : %-%^50+%s70+h%+
-*
-*        AST__MIN : %-%^50+%s70+m%+
-*
-*        AST__SEC : %-%^50+%s70+s%+
-*
-*        AST__DEG : %-%^53+%s60+o%+
-*
-*        AST__AMIN: %-%^20+%s85+'%+
-*
-*        AST__ASEC: %-%^20+%s85+"%+
-
-*  Notes:
-*     - The supplied delimiter string is not verified in any way.
-c--
-*/
-
-/* Local Variables: */
-   astDECLARE_GLOBALS
-
-/* Check inherited status */
-   if( !astOK ) return;
-
-/* Get a pointer to Thread-specific global data. */
-   astGET_GLOBALS(NULL);
-
-/* Memory allocated in this function may never be released. */
-   astBeginPM;
-
-/* Store a copy of the supplied string, extending any existing memory (if
-   required) to hold it. */
-   if( field == AST__HRS ) {
-      gh_delim = astStore( gh_delim, delim, strlen( delim ) + 1 );
-
-   } else if( field == AST__MIN ) {
-      gm_delim = astStore( gm_delim, delim, strlen( delim ) + 1 );
-
-   } else if( field == AST__SEC ) {
-      gs_delim = astStore( gs_delim, delim, strlen( delim ) + 1 );
-
-   } else if( field == AST__DEG ) {
-      gd_delim = astStore( gd_delim, delim, strlen( delim ) + 1 );
-
-   } else if( field == AST__AMIN ) {
-      gam_delim = astStore( gam_delim, delim, strlen( delim ) + 1 );
-
-   } else if( field == AST__ASEC ) {
-      gas_delim = astStore( gas_delim, delim, strlen( delim ) + 1 );
-
-   } else {
-      astError( AST__FMTER, "astSetSkyDelim: Supplied field number (%d) is "
-                "illegal (possible programming error).", status, field );
-   }
-
-   astEndPM;
 }
 
 static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {

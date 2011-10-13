@@ -34,6 +34,7 @@
 *     AST_LISTISSUED   (only if macro DEBUG is defined)
 *     AST_SETWATCHID   (only if macro DEBUG is defined)
 *     AST_TUNE
+*     AST_TUNEC
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -79,6 +80,8 @@
 *        Added AST_TUNE.
 *     1-MAR-2006 (DSB):
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
+*     13-OCT-2011 (DSB):
+*        Added AST_TUNEC.
 *-
 */
 
@@ -90,6 +93,7 @@
 
 /* Header files. */
 /* ============= */
+#include <string.h>
 
 /* Configuration results. */
 /* ---------------------- */
@@ -557,6 +561,43 @@ F77_INTEGER_FUNCTION(ast_tune)( CHARACTER(NAME),
       name = astFree( name );
    )
    return RESULT;
+}
+
+F77_SUBROUTINE(ast_tunec)( CHARACTER(NAME),
+                           CHARACTER(VALUE),
+                           CHARACTER(BUFF),
+                           INTEGER(STATUS)
+                           TRAIL(NAME)
+                           TRAIL(VALUE)
+                           TRAIL(BUFF) ) {
+   GENPTR_CHARACTER(NAME)
+   GENPTR_CHARACTER(VALUE)
+   GENPTR_CHARACTER(BUFF)
+   char *name;
+   char *value;
+   char *buff;
+
+   astAt( "AST_TUNEC", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      value = astString( VALUE, VALUE_length );
+      if( value && !strcmp( value, AST__TUNULLC ) ) value = astFree( value );
+      buff = astMalloc( BUFF_length + 1 );
+
+      astTuneC( name, value, buff,  BUFF_length + 1 );
+
+      int i = 0;
+      if( astOK ) {
+         for ( ; buff[ i ] && i < BUFF_length; i++ ) {
+            BUFF[ i ] = buff[ i ];
+         }
+      }
+      while ( i < BUFF_length ) BUFF[ i++ ] = ' '; /* Pad with blanks */
+
+      buff = astFree( buff );
+      name = astFree( name );
+      value = astFree( value );
+   )
 }
 
 F77_LOGICAL_FUNCTION(ast_chrsub)( CHARACTER(TEST),

@@ -1455,6 +1455,7 @@ int astP2I_( AstObject *, int * );
 int astVersion_( int * );
 int astEscapes_( int, int * );
 int astTune_( const char *, int, int * );
+void astTuneC_( const char *, const char *, char *, int, int * );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
@@ -1585,6 +1586,7 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astVersion astVersion_(STATUS_PTR)
 #define astEscapes(int) astEscapes_(int,STATUS_PTR)
 #define astTune(name,val) astTune_(name,val,STATUS_PTR)
+#define astTuneC(name,value,buff,bufflen) astTuneC_(name,value,buff,bufflen,STATUS_PTR)
 #define astI2P(integer) ((void *)astI2P_(integer,STATUS_PTR))
 #define astMakeId(pointer) ((void *)astMakeId_((AstObject *)(pointer),STATUS_PTR))
 #define astP2I(pointer) astP2I_((AstObject *)(pointer),STATUS_PTR)

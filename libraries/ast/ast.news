@@ -26,7 +26,7 @@ incorrectly rotated numerical axis labels) if the graphics coordinates have
 unequal scales on the X and Y axes.
 
 - The graphics escape sequences used to produce graphical sky axis labels
-can now be changed using the new function astSetSkyDelim.
+can now be changed using the new function astTuneC (AST_TUNEC).
 
 Main Changes in V5.7-2
 -----------------------

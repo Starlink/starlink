@@ -209,12 +209,6 @@
 
 /* Macros */
 /* ====== */
-#define AST__HRS 0
-#define AST__MIN 1
-#define AST__SEC 2
-#define AST__DEG 3
-#define AST__AMIN 4
-#define AST__ASEC 5
 
 /* Define constants used to size global arrays in this module. */
 /* Define numerical constants for use in thie module. */
@@ -335,8 +329,6 @@ void astInitSkyAxisGlobals_( AstSkyAxisGlobals * );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astSetSkyDelim_( int, const char *, int * );
-
 #if defined(astCLASS)            /* Protected */
 int astGetAxisAsTime_( AstSkyAxis *, int * );
 int astGetAxisIsLatitude_( AstSkyAxis *, int * );
@@ -350,6 +342,7 @@ void astClearAxisCentreZero_( AstSkyAxis *, int * );
 void astSetAxisAsTime_( AstSkyAxis *, int, int * );
 void astSetAxisIsLatitude_( AstSkyAxis *, int, int * );
 void astSetAxisCentreZero_( AstSkyAxis *, int, int * );
+
 #endif
 
 /* Function interfaces. */
@@ -395,7 +388,6 @@ astINVOKE(O,astLoadSkyAxis_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 /* Interfaces to public member functions. */
 /* -------------------------------------- */
 
-#define astSetSkyDelim(field,delim) astSetSkyDelim_(field,delim,STATUS_PTR)
 
 /* Here we make use of astCheckSkyAxis to validate SkyAxis pointers
    before use. This provides a contextual error report if a pointer to
@@ -426,7 +418,6 @@ astINVOKE(V,astGetAxisCentreZero_(astCheckSkyAxis(this),STATUS_PTR))
 astINVOKE(V,astSetAxisCentreZero_(astCheckSkyAxis(this),value,STATUS_PTR))
 #define astTestAxisCentreZero(this) \
 astINVOKE(V,astTestAxisCentreZero_(astCheckSkyAxis(this),STATUS_PTR))
-
 
 #endif
 #endif
