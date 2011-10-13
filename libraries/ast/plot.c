@@ -20895,7 +20895,7 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
    specified in the equally scaled coordinate system. */
                      if( upfree ){
 
-                        if( dx < -0.01 ){
+                        if( dx < -0.01*fabs( alpha ) ){
                            upx = -rx;
                            upy = -ry;
                            just = ( txtgap < 0.0 )? "BC" : "TC";
