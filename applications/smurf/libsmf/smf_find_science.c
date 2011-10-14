@@ -489,6 +489,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
           if (calcflat) {
             size_t ngood = 0;
             smfData * curresp = NULL;
+            int utdate;
 
             if (*status == SAI__OK) {
               ngood = smf_flat_calcflat( MSG__VERB, NULL, "RESIST",
@@ -506,10 +507,15 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                 continue;
               }
 
+              /* Retrieve the UT date so we can decide whether to compare
+                 flatfields */
+              smf_getfitsi( infile->hdr, "UTDATE", &utdate, status );
+
               /* Store the responsivity data for later on and the processed
                  flatfield until we have vetted it */
               astMapPut0P( infomap, "CALCFLAT", infile, "" );
               astMapPut0P( infomap, "RESP", curresp, "" );
+              astMapPut0I( infomap, "UTDATE", utdate, "" );
               astMapPut0I( infomap, "ISGOOD", 1, "" );
               astMapPut0I( infomap, "NGOOD", ngood, "" );
               astMapPut0I( infomap, "GRPINDEX", ori_index, "" );
@@ -556,12 +562,17 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
             if (isgood) {
               /* The flatfield worked */
               int ngood = 0;
+              int utdate = 0;
+
+              /* Get the UT date - we do not compare flatfields after
+                 the time we enabled heater tracking at each sequence. */
+              astMapGet0I( infomap, "UTDATE", &utdate );
 
               /* Get the number of good bolometers at this point */
               astMapGet0I( infomap, "NGOOD", &ngood );
 
               /* Can we compare with the next flatfield? */
-              if (ngood < SMF__MINSTATSAMP ) {
+              if (ngood < SMF__MINSTATSAMP || utdate >= 20110901 ) {
                 /* no point doing all the ratio checking for this */
               } else if ( nelem - nf >= 2 ) {
                 AstKeyMap * nextmap = kmaps[nf+1];
