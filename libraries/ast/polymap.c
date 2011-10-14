@@ -210,9 +210,9 @@ AstPolyMap *astPolyMapId_( int, int, int, const double[], int, const double[], c
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstPolyMap **GetJacobian( AstPolyMap *, int * );
-static AstPolyMap *PolyTran( AstPolyMap *, int, double, double, int, double *, double *, int * );
+static AstPolyMap *PolyTran( AstPolyMap *, int, double, double, int, const double *, const double *, int * );
 static double **SamplePoly1D( AstPolyMap *, int, double **, double, double, int, int *, double[2], int * );
-static double **SamplePoly2D( AstPolyMap *, int, double **, double *, double *, int, int *, double[4], int * );
+static double **SamplePoly2D( AstPolyMap *, int, double **, const double *, const double *, int, int *, double[4], int * );
 static double *FitPoly1D( int, double, int, double **, double[2], int *, double *, int * );
 static double *FitPoly2D( int, double, int, double **, double[4], int *, double *, int * );
 static int Equal( AstObject *, AstObject *, int * );
@@ -220,7 +220,7 @@ static int GetObjSize( AstObject *, int * );
 static int GetTranForward( AstMapping *, int * );
 static int GetTranInverse( AstMapping *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
-static int ReplaceTransformation( AstPolyMap *, int, double, double, int, double *, double *, int * );
+static int ReplaceTransformation( AstPolyMap *, int, double, double, int, const double *, const double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *obj, int * );
 static void Dump( AstObject *, AstChannel *, int * );
@@ -2702,8 +2702,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 }
 
 static AstPolyMap *PolyTran( AstPolyMap *this, int forward, double acc,
-                             double maxacc, int maxorder, double *lbnd,
-                             double *ubnd, int *status ){
+                             double maxacc, int maxorder, const double *lbnd,
+                             const double *ubnd, int *status ){
 /*
 *++
 *  Name:
@@ -2719,8 +2719,8 @@ f     AST_POLYTRAN
 *  Synopsis:
 c     #include "polymap.h"
 c     AstPolyMap *astPolyTran( AstPolyMap *this, int forward, double acc,
-c                              double maxacc, int maxorder, double *lbnd,
-c                              double *ubnd )
+c                              double maxacc, int maxorder, const double *lbnd,
+c                              const double *ubnd )
 f     RESULT = AST_POLYTRAN( THIS, FORWARD, ACC, MAXACC, MAXORDER, LBND,
 f                            UBND, STATUS )
 
@@ -2894,8 +2894,8 @@ f     function is invoked with STATUS set to an error value, or if it
 }
 
 static int ReplaceTransformation( AstPolyMap *this, int forward, double acc,
-                                  double maxacc, int maxorder, double *lbnd,
-                                  double *ubnd, int *status ){
+                                  double maxacc, int maxorder, const double *lbnd,
+                                  const double *ubnd, int *status ){
 /*
 *  Name:
 *     ReplaceTransformation
@@ -2908,8 +2908,8 @@ static int ReplaceTransformation( AstPolyMap *this, int forward, double acc,
 
 *  Synopsis:
 *     int ReplaceTransformation( AstPolyMap *this, int forward, double acc,
-*                                double maxacc, int maxorder, double *lbnd,
-*                                double *ubnd, int *status )
+*                                double maxacc, int maxorder, const double *lbnd,
+*                                const double *ubnd, int *status )
 
 *  Description:
 *     This function creates a new forward or inverse transformation for
@@ -3252,8 +3252,8 @@ static double **SamplePoly1D( AstPolyMap *this, int forward, double **table,
 }
 
 static double **SamplePoly2D( AstPolyMap *this, int forward, double **table,
-                              double *lbnd, double *ubnd, int npoint, int *nsamp,
-                              double scales[4], int *status ){
+                              const double *lbnd, const double *ubnd, int npoint,
+                              int *nsamp, double scales[4], int *status ){
 /*
 *  Name:
 *     SamplePoly2D
@@ -3266,8 +3266,8 @@ static double **SamplePoly2D( AstPolyMap *this, int forward, double **table,
 
 *  Synopsis:
 *     double **SamplePoly2D( AstPolyMap *this, int forward, double **table,
-*                            double *lbnd, double *ubnd, int npoint, int *nsamp,
-*                            double scales[4], int *status )
+*                            const double *lbnd, const double *ubnd, int npoint,
+*                            int *nsamp, double scales[4], int *status )
 
 *  Description:
 *     This function creates a table containing samples of the requested
@@ -5354,8 +5354,8 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
    same interface. */
 
 AstPolyMap *astPolyTran_( AstPolyMap *this, int forward, double acc,
-                          double maxacc, int maxorder, double *lbnd,
-                          double *ubnd, int *status ){
+                          double maxacc, int maxorder, const double *lbnd,
+                          const double *ubnd, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,PolyMap,PolyTran))( this, forward, acc,
                                                 maxacc, maxorder, lbnd,

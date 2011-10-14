@@ -180,7 +180,7 @@ typedef struct AstPolyMapVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
-   AstPolyMap *(* PolyTran)( AstPolyMap *, int, double, double, int, double *, double *, int * );
+   AstPolyMap *(* PolyTran)( AstPolyMap *, int, double, double, int, const double *, const double *, int * );
    int (*GetIterInverse)( AstPolyMap *, int * );
    int (* TestIterInverse)( AstPolyMap *, int * );
    void (* ClearIterInverse)( AstPolyMap *, int * );
@@ -247,7 +247,7 @@ AstPolyMap *astLoadPolyMap_( void *, size_t, AstPolyMapVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-AstPolyMap *astPolyTran_( AstPolyMap *, int, double, double, int, double *, double *, int * );
+AstPolyMap *astPolyTran_( AstPolyMap *, int, double, double, int, const double *, const double *, int * );
 
 # if defined(astCLASS)           /* Protected */
    int astGetIterInverse_( AstPolyMap *, int * );
