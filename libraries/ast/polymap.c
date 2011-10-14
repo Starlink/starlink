@@ -2718,9 +2718,9 @@ f     AST_POLYTRAN
 
 *  Synopsis:
 c     #include "polymap.h"
-c     AstPolyMap *PolyTran( AstPolyMap *this, int forward, double acc,
-c                           double maxacc, int maxorder, double *lbnd,
-c                           double *ubnd, int *status )
+c     AstPolyMap *astPolyTran( AstPolyMap *this, int forward, double acc,
+c                              double maxacc, int maxorder, double *lbnd,
+c                              double *ubnd )
 f     RESULT = AST_POLYTRAN( THIS, FORWARD, ACC, MAXACC, MAXORDER, LBND,
 f                            UBND, STATUS )
 
