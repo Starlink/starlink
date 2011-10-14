@@ -216,6 +216,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* We need to find the first good TCS index in order to get the
    tracking system (Which for SCUBA-2 won't be changing in the sequence) */
+      itime0 = VAL__BADI;
       for (itime = itime_lo; itime <= itime_hi; itime++) {
         JCMTState * slice = &((data->hdr->allState)[itime]);
         if (!(slice->jos_drcontrol >= 0 && slice->jos_drcontrol & DRCNTRL__POSITION)) {
@@ -224,42 +225,52 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
         }
       }
 
+      if ((int)itime0 != VAL__BADI) {
+
 /* We need a Frame describing absolute tracking system coords. Take a
    copy of the supplied skyframe (to inherit obslat, obslon, epoch,
    etc), and then set its system to the tracking system. */
-      trfrm = astCopy( abskyfrm );
-      astSetC( trfrm, "System",
-               sc2ast_convert_system( (data->hdr->allState)[itime0].tcs_tr_sys,
-                                      status ) );
+        trfrm = astCopy( abskyfrm );
+        astSetC( trfrm, "System",
+                 sc2ast_convert_system( (data->hdr->allState)[itime0].tcs_tr_sys,
+                                        status ) );
 
 /* Get the Mapping from the tracking system to the output (absolute, since
    abskyfrm is absolute) sky system. */
-      fs = astConvert( trfrm, abskyfrm, " " );
-      if( !fs && *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         errRep( " ", "smf_coords_lut: Failed to convert from "
-                 "tracking system to output WCS system.", status );
-      }
-      tr2skyabs = astGetMapping( fs, AST__BASE, AST__CURRENT );
+        fs = astConvert( trfrm, abskyfrm, " " );
+        if( !fs && *status == SAI__OK ) {
+          *status = SAI__ERROR;
+          errRep( " ", "smf_coords_lut: Failed to convert from "
+                  "tracking system to output WCS system.", status );
+        }
+        tr2skyabs = astGetMapping( fs, AST__BASE, AST__CURRENT );
 
 /* For moving targets, we also need a Frame describing offset sky
    coordinates in the output map, in which the reference point is the
    current telescope base position. This will involve changing the
    SkyRef attribute of the Frame for every time slice, so take a
    copy of the supplied SkyFrame to avoid changing it. */
-      if( moving ) {
-         offsky = astCopy( abskyfrm );
-         astSet( offsky, "SkyRefIs=Origin" );
-      }
+        if( moving ) {
+          offsky = astCopy( abskyfrm );
+          astSet( offsky, "SkyRefIs=Origin" );
+        }
 
 /* Create the Mapping from offsets within the output map sky coordinate
    system output to map GRID coords to output map GRID coords. This uses a
    ShiftMap to convert from output PIXEL coords (produced by "oskymap") to
    output GRID coords. Note, if the target is moving, "oskymap" maps from
    sky *offsets* to output map PIXEL coords. */
-      shift[ 0 ] = 1.5 - olbnd[ 0 ];
-      shift[ 1 ] = 1.5 - olbnd[ 1 ];
-      bsmap = astCmpMap( oskymap, astShiftMap( 2, shift, " " ), 1, " " );
+        shift[ 0 ] = 1.5 - olbnd[ 0 ];
+        shift[ 1 ] = 1.5 - olbnd[ 1 ];
+        bsmap = astCmpMap( oskymap, astShiftMap( 2, shift, " " ), 1, " " );
+      } else {
+        /* We did not find any good TCS data so force us into tstep==1
+         case and end up with VAL__BADI for every element. */
+        tstep = 1;
+        itime0 = itime_lo;
+        msgOutiff(MSG__VERB, "", "All time slices from %zu -- %zu had bad TCS data.",
+                 status, (size_t)itime_lo, (size_t)itime_hi );
+      }
    }
 
 /* Allocate memory to hold the (x,y) output map grid coords at each bolo
