@@ -697,6 +697,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        expects the up vector in equally scaled coords, not graphics coords.
 *        - Take account of unequal axis scales when working out the
 *        length of each grid curve.
+*     15-OCT-2011 (DSB):
+*        Always check that the grf module implements the scales function
+*        before trying to invoke the scales function.
 *class--
 */
 
@@ -14035,40 +14038,51 @@ static void GScales( AstPlot *this, float *alpha, float *beta,
       return;
    }
 
+/* Check that the grf mdoule can give us scales information. */
+   if( GCap( this, GRF__SCALES, 1, status ) ) {
+
 /* Since we are about to call an external function which may not be
    thread safe, prevent any other thread from executing the following code
    until the current thread has finished executing it. */
-   LOCK_MUTEX2;
+      LOCK_MUTEX2;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
-   if( astGetGrf( this ) && this->grffun[ AST__GSCALES ] ) {
-      grf_status = ( *( this->GScales ) )( this, &Grf_alpha, &Grf_beta, status );
+      if( astGetGrf( this ) && this->grffun[ AST__GSCALES ] ) {
+         grf_status = ( *( this->GScales ) )( this, &Grf_alpha, &Grf_beta, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
-   } else {
-      grf_status = astGScales( &Grf_alpha, &Grf_beta );
-   }
+      } else {
+         grf_status = astGScales( &Grf_alpha, &Grf_beta );
+      }
 
 /* Allow the next thread to proceed. */
-   UNLOCK_MUTEX2;
+      UNLOCK_MUTEX2;
 
 /* Check neither value is zero. */
-   if( grf_status && ( Grf_alpha == 0.0 || Grf_beta == 0.0 ) ) {
-      astError( AST__GRFER, "astGScales: Returned axis scales are %g and %g "
-                "but zero is illegal!", status, Grf_alpha, Grf_beta );
-      grf_status = 0;
-   }
+      if( grf_status && ( Grf_alpha == 0.0 || Grf_beta == 0.0 ) ) {
+         astError( AST__GRFER, "astGScales: Returned axis scales are %g and %g "
+                   "but zero is illegal!", status, Grf_alpha, Grf_beta );
+         grf_status = 0;
+      }
 
 /* Report an error if anything went wrong, and return safe values. */
-   if( !grf_status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGScales. ", status, method,
-                class );
-      Grf_alpha = 1.0;
-      Grf_beta = 1.0;
+      if( !grf_status ) {
+         astError( AST__GRFER, "%s(%s): Graphics error in astGScales. ", status, method,
+                   class );
+         Grf_alpha = 1.0;
+         Grf_beta = 1.0;
+      }
+
+/* If the grf module is not capable of giving us scale information, then
+   just assume the the axes are equally scaled, except for any axis reversal
+   indicated in the supplied Plot. */
+   } else {
+      Grf_alpha = ( this->xrev ) ? -1.0 : 1.0;
+      Grf_beta = ( this->yrev ) ? -1.0 : 1.0;
    }
 
 /* Store them for future use. */
@@ -20716,15 +20730,8 @@ static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata,
    into a "standard" equal scaled coordinate system in which: 1) the axes
    have equal scale in terms of (for instance) millimetres per unit distance,
    2) X values increase from left to right, 3) Y values increase from bottom
-   to top. If the grf moduleis not capable of giving us this information, then
-   just assume the the axes are equally scaled, except for any axis reversal
-   indicated in the supplied Plot. */
-      if( GCap( this, GRF__SCALES, 1, status ) ) {
-         GScales( this, &alpha, &beta, method, class, status );
-      } else {
-         alpha = ( this->xrev ) ? -1.0 : 1.0;
-         beta = ( this->yrev ) ? -1.0 : 1.0;
-      }
+   to top. */
+      GScales( this, &alpha, &beta, method, class, status );
 
 /* Get the minimum dimension of the plotting area in equal scaled coords. */
       mindim = MIN( fabs( alpha*(this->xhi - this->xlo) ),
@@ -24523,16 +24530,8 @@ static void RightVector( AstPlot *this, float *ux, float *uy, float *rx,
 /* Find the scale factors for the two axes which scale graphics coordinates
    into a "standard" coordinate system in which: 1) the axes have equal scale
    in terms of (for instance) millimetres per unit distance, 2) X values
-   increase from left to right, 3) Y values increase from bottom to top.
-   If the grf moduleis not capable of giving us this information, then
-   just assume the the axes are equally scaled, except for any axis
-   reversal indicated in the supplied Plot. */
-   if( GCap( this, GRF__SCALES, 1, status ) ) {
-      GScales( this, &alpha, &beta, method, class, status );
-   } else {
-      alpha = ( this->xrev ) ? -1.0 : 1.0;
-      beta = ( this->yrev ) ? -1.0 : 1.0;
-   }
+   increase from left to right, 3) Y values increase from bottom to top. */
+   GScales( this, &alpha, &beta, method, class, status );
 
 /* Convert the up-vector into "standard" system in which the axes have
    equal scales, and increase left-to-right, bottom-to-top. */
