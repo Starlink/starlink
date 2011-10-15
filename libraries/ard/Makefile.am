@@ -43,8 +43,8 @@ BASIC_F_ROUTINES = \
   ard1_bxfnd.f ard1_bxor.f ard1_bxset.f ard1_bxxor.f ard1_check.f \
   ard1_cir.f ard1_cirar.f ard1_col.f ard1_colar.f ard1_copyd.f \
   ard1_cowcs.f ard1_ctov.f ard1_draw2.f ard1_ell.f ard1_ellar.f \
-  ard1_eqv.f ard1_field.f ard1_fra.f ard1_fraar.f \
-  ard1_gattr.f ard1_gline.f ard1_gtarg.f ard1_gtov.f ard1_intrb.f \
+  ard1_eqv.f ard1_field.f ard1_fra.f ard1_fraar.f ard1_gattr.f \
+  ard1_gcap.f ard1_gline.f ard1_gtarg.f ard1_gtov.f ard1_intrb.f \
   ard1_intra.f ard1_intr.f ard1_invrs.f ard1_kdraw.f ard1_keyw.f \
   ard1_lin.f ard1_lin2.f ard1_linar.f ard1_linfl.f ard1_linmp.f \
   ard1_lkr.f ard1_lnr.f ard1_lsm.f ard1_ltran.f ard1_match.f ard1_dstax.f \

@@ -96,6 +96,8 @@
 *  History:
 *     15-JUN-2001 (DSB):
 *        Original version.
+*     15-OCT-2011 (DSB):
+*        Register a GRF "capabilities" function with AST before plotting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -159,6 +161,7 @@
 *  External References:
       EXTERNAL ARD1_GLINE
       EXTERNAL ARD1_GATTR
+      EXTERNAL ARD1_GCAP
 
 *  Local Constants:
       INTEGER NLP                ! No. of subdivisions for non-2D LINE
@@ -259,6 +262,10 @@
          CALL AST_SETD( IPLOT, 'TOL', 0.2D0/DBLE(
      :    MIN( UBND( 1 ) - LBND( 1 ) + 1, UBND( 2 ) - LBND( 2 ) + 1 ) ),
      :                  STATUS )
+
+*  Indicate that the Plot class should use ARD1_GCAP to determine the
+*  capabilities of the ARD grf functions.
+      CALL AST_GRFSET( IPLOT, 'CAP', ARD1_GCAP, STATUS )
 
 *  Indicate that the Plot class should use ARD1_GLINE to "draw" lines
 *  into the B array.
