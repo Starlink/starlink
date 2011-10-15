@@ -84,6 +84,8 @@ f     - AST_POLYTRAN: Fit a PolyMap inverse or forward transformation
 *     18-JUL-2011 (DSB):
 *        - Added attributes IterInverse, NiterInverse and TolInverse.
 *        - Do not report an error if astPolyTran fails to fit an inverse.
+*     15-OCT-2011 (DSB):
+*        Improve argument checking and error reporting in PolyTran
 *class--
 */
 
@@ -3016,30 +3018,43 @@ static int ReplaceTransformation( AstPolyMap *this, int forward, double acc,
 
 /* Check the PolyMap can be used. */
    ndim = astGetNin( this );
-   if( astGetNout( this ) != ndim ) {
-      astError( AST__BADNI, "astReplaceTransformation(%s): Supplied %s has "
+   if( astGetNout( this ) != ndim && astOK ) {
+      astError( AST__BADNI, "astPolyTran(%s): Supplied %s has "
                 "different number of inputs (%d) and outputs (%d).",
                 status, astGetClass( this ), astGetClass( this ), ndim,
                 astGetNout( this ) );
 
-   } else if( ndim > 2 ) {
-      astError( AST__BADNI, "astReplaceTransformation(%s): Supplied %s has "
+   } else if( ndim > 2 && astOK ) {
+      astError( AST__BADNI, "astPolyTran(%s): Supplied %s has "
                 "too many inputs and outputs (%d) - must be 1 or 2.",
                 status, astGetClass( this ), astGetClass( this ), ndim );
    }
 
    if( forward != astGetInvert( this ) ){
-      if( ! this->ncoeff_i ) {
-         astError( AST__NODEF, "astReplaceTransformation(%s): Supplied %s has "
+      if( ! this->ncoeff_i && astOK ) {
+         astError( AST__NODEF, "astPolyTran(%s): Supplied %s has "
                    "no inverse transformation.", status, astGetClass( this ),
                    astGetClass( this ) );
       }
    } else {
-      if( ! this->ncoeff_f  ) {
-         astError( AST__NODEF, "astReplaceTransformation(%s): Supplied %s has "
+      if( ! this->ncoeff_f && astOK ) {
+         astError( AST__NODEF, "astPolyTran(%s): Supplied %s has "
                    "no forward transformation.", status, astGetClass( this ),
                    astGetClass( this ) );
       }
+   }
+
+/* Check the bounds can be used. */
+   if( lbnd[ 0 ] >= ubnd[ 0 ] && astOK ) {
+      astError( AST__NODEF, "astPolyTran(%s): Supplied upper "
+                "bound for the first axis (%g) is less than or equal to the "
+                "supplied lower bound (%g).", status, astGetClass( this ),
+                lbnd[ 0 ], ubnd[ 0 ] );
+   } else if( ndim == 2 && lbnd[ 1 ] >= ubnd[ 1 ] && astOK ) {
+      astError( AST__NODEF, "astPolyTran(%s): Supplied upper "
+                "bound for the second axis (%g) is less than or equal to the "
+                "supplied lower bound (%g).", status, astGetClass( this ),
+                lbnd[ 1 ], ubnd[ 1 ] );
    }
 
 /* Initialise pointer to work space. */
@@ -3048,6 +3063,7 @@ static int ReplaceTransformation( AstPolyMap *this, int forward, double acc,
 /* Loop over increasing polynomial orders until the required accuracy is
    achieved, up to the specified maximum order. The "order" value is one more
    than the maximum power in the polynomial (so a quadratic has "order" 3). */
+   if( maxorder < 2 ) maxorder = 2;
    for( order = 2; order <= maxorder; order++ ) {
 
 /* First do 2D PolyMaps. */
