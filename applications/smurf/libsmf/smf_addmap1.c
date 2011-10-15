@@ -139,7 +139,8 @@ void smf_addmap1( double *map1, double *mapweight1, int *hitsmap1,
       /* Add together if both maps have good pixels */
       if( (mapvar1[i]<=0) || (mapvar2[i]<=0) ) {
 	*status = SAI__ERROR;
-	errRep("", FUNC_NAME ": invalid variance(s) <=0 detected", status);
+	errRepf("", FUNC_NAME ": invalid variance(s) <=0 detected (%g and %g)", status,
+                mapvar1[i], mapvar2[i]);
 	return;
       } else {
         double w = 1./mapvar1[i] + 1./mapvar2[i];
