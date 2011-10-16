@@ -215,7 +215,7 @@ AstPolygon *astPolygonId_( void *, int, int, const double *, void *, const char 
 /* Define a macro that expands to a single prototype for function
    FindInsidePoint for a given data type and operation. */
 #define FINDINSIDEPOINT_PROTO0(X,Xtype,Oper) \
-static void FindInsidePoint##Oper##X( Xtype, const Xtype *, int[2], int[2], int *, int *, int *, int * );
+static void FindInsidePoint##Oper##X( Xtype, const Xtype *, const int[2], const int[2], int *, int *, int *, int * );
 
 /* Define a macro that expands to a set of prototypes for all operations
    for function FindInsidePoint for a given data type. */
@@ -246,7 +246,7 @@ FINDINSIDEPOINT_PROTO(F,float)
 /* Define a macro that expands to a single prototype for function
    TraceEdge for a given data type and operation. */
 #define TRACEEDGE_PROTO0(X,Xtype,Oper) \
-static AstPointSet *TraceEdge##Oper##X( Xtype, const Xtype *, int[2], int[2], int, int, int, int, int, int * );
+static AstPointSet *TraceEdge##Oper##X( Xtype, const Xtype *, const int[2], const int[2], int, int, int, int, int, int * );
 
 /* Define a macro that expands to a set of prototypes for all operations
    for function TraceEdge for a given data type. */
@@ -984,7 +984,7 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
 *  Synopsis:
 *     #include "polygon.h"
 *     void FindInsidePoint<Oper><X>( <Xtype> value, const <Xtype> array[],
-*                                    int lbnd[ 2 ], int ubnd[ 2 ],
+*                                    const int lbnd[ 2 ], const int ubnd[ 2 ],
 *                                    int *inx, int *iny, int *iv,
 *                                    int *status );
 
@@ -1031,7 +1031,7 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
    type and operation. */
 #define MAKE_FINDINSIDEPOINT(X,Xtype,Oper,OperI) \
 static void FindInsidePoint##Oper##X( Xtype value, const Xtype array[], \
-                                      int lbnd[ 2 ], int ubnd[ 2 ], \
+                                      const int lbnd[ 2 ], const int ubnd[ 2 ], \
                                       int *inx, int *iny, int *iv, \
                                       int *status ){ \
 \
@@ -1871,8 +1871,8 @@ f     AST_OUTLINE<X>
 *  Synopsis:
 c     #include "polygon.h"
 c     AstPolygon *astOutline<X>( <Xtype> value, int oper, const <Xtype> array[],
-c                                int lbnd[2], int ubnd[2], double maxerr,
-c                                int maxvert, int inside[2], int starpix )
+c                                const int lbnd[2], const int ubnd[2], double maxerr,
+c                                int maxvert, const int inside[2], int starpix )
 f     RESULT = AST_OUTLINE<X>( VALUE, OPER, ARRAY, LBND, UBND, MAXERR,
 f                              MAXVERT, INSIDE, STARPIX, STATUS )
 
@@ -2136,8 +2136,8 @@ f     only in the Fortran interface to AST).
    table is available. */
 #define MAKE_OUTLINE(X,Xtype) \
 AstPolygon *astOutline##X##_( Xtype value, int oper, const Xtype array[], \
-                              int lbnd[2], int ubnd[2], double maxerr, \
-                              int maxvert, int inside[2], int starpix, \
+                              const int lbnd[2], const int ubnd[2], double maxerr, \
+                              int maxvert, const int inside[2], int starpix, \
                               int *status ) { \
 \
 /* Local Variables: */ \
@@ -3949,9 +3949,9 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 *  Synopsis:
 *     #include "polygon.h"
 *     void TraceEdge<Oper><X>( <Xtype> value, const <Xtype> array[],
-*                              int lbnd[ 2 ], int ubnd[ 2 ], int iv0,
-*                              int ix0, int iy0, int starpix, int full,
-*                              int *status );
+*                              const int lbnd[ 2 ], const int ubnd[ 2 ],
+*                              int iv0, int ix0, int iy0, int starpix,
+*                              int full, int *status );
 
 *  Class Membership:
 *     Polygon member function
@@ -4012,7 +4012,7 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
    type and operation. */
 #define MAKE_TRACEEDGE(X,Xtype,Oper,OperI) \
 static AstPointSet *TraceEdge##Oper##X( Xtype value, const Xtype array[], \
-                                        int lbnd[ 2 ], int ubnd[ 2 ], \
+                                        const int lbnd[ 2 ], const int ubnd[ 2 ], \
                                         int iv0, int ix0, int iy0, \
                                         int starpix, int full, \
                                         int *status ){ \
