@@ -189,18 +189,18 @@ AstPolygon *astLoadPolygon_( void *, size_t, AstPolygonVtab *,
 AstPolygon *astDownsize_( AstPolygon *, double, int, int * );
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-AstPolygon *astOutlineLD_( long double, int,long double[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineLD_( long double, int, const long double[], int[2], int[2], double, int, int[2], int, int * );
 #endif
-AstPolygon *astOutlineB_( signed char, int, signed char[], int[2], int[2], double, int, int[2], int, int * );
-AstPolygon *astOutlineD_( double, int, double[], int[2], int[2], double, int, int[2], int, int * );
-AstPolygon *astOutlineF_( float, int, float[], int[2], int[2], double, int, int[2], int, int * );
-AstPolygon *astOutlineI_( int, int, int[], int[2], int[2], double, int, int[2], int, int * );
-AstPolygon *astOutlineL_( long int, int, long int[], int[2], int[2], double, int, int[2], int, int * );
-AstPolygon *astOutlineS_( short int, int, short int[], int[2], int[2], double, int, int[2], int, int * );
-AstPolygon *astOutlineUB_( unsigned char, int, unsigned char[], int[2], int[2], double, int, int[2], int, int * );
-AstPolygon *astOutlineUI_( unsigned int, int, unsigned int[], int[2], int[2], double, int, int[2], int, int * );
-AstPolygon *astOutlineUL_( unsigned long int, int, unsigned long int[], int[2], int[2], double, int, int[2], int, int * );
-AstPolygon *astOutlineUS_( unsigned short int, int, unsigned short int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineB_( signed char, int, const signed char[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineD_( double, int, const double[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineF_( float, int, const float[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineI_( int, int, const int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineL_( long int, int, const long int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineS_( short int, int, const short int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineUB_( unsigned char, int, const unsigned char[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineUI_( unsigned int, int, const unsigned int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineUL_( unsigned long int, int, const unsigned long int[], int[2], int[2], double, int, int[2], int, int * );
+AstPolygon *astOutlineUS_( unsigned short int, int, const unsigned short int[], int[2], int[2], double, int, int[2], int, int * );
 
 # if defined(astCLASS)           /* Protected */
 #endif

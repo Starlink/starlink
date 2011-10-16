@@ -215,7 +215,7 @@ AstPolygon *astPolygonId_( void *, int, int, const double *, void *, const char 
 /* Define a macro that expands to a single prototype for function
    FindInsidePoint for a given data type and operation. */
 #define FINDINSIDEPOINT_PROTO0(X,Xtype,Oper) \
-static void FindInsidePoint##Oper##X( Xtype, Xtype *, int[2], int[2], int *, int *, int *, int * );
+static void FindInsidePoint##Oper##X( Xtype, const Xtype *, int[2], int[2], int *, int *, int *, int * );
 
 /* Define a macro that expands to a set of prototypes for all operations
    for function FindInsidePoint for a given data type. */
@@ -246,7 +246,7 @@ FINDINSIDEPOINT_PROTO(F,float)
 /* Define a macro that expands to a single prototype for function
    TraceEdge for a given data type and operation. */
 #define TRACEEDGE_PROTO0(X,Xtype,Oper) \
-static AstPointSet *TraceEdge##Oper##X( Xtype, Xtype *, int[2], int[2], int, int, int, int, int, int * );
+static AstPointSet *TraceEdge##Oper##X( Xtype, const Xtype *, int[2], int[2], int, int, int, int, int, int * );
 
 /* Define a macro that expands to a set of prototypes for all operations
    for function TraceEdge for a given data type. */
@@ -983,7 +983,7 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
 
 *  Synopsis:
 *     #include "polygon.h"
-*     void FindInsidePoint<Oper><X>( <Xtype> value, <Xtype> array[],
+*     void FindInsidePoint<Oper><X>( <Xtype> value, const <Xtype> array[],
 *                                    int lbnd[ 2 ], int ubnd[ 2 ],
 *                                    int *inx, int *iny, int *iv,
 *                                    int *status );
@@ -1030,13 +1030,13 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
 /* Define a macro to implement the function for a specific data
    type and operation. */
 #define MAKE_FINDINSIDEPOINT(X,Xtype,Oper,OperI) \
-static void FindInsidePoint##Oper##X( Xtype value, Xtype array[], \
+static void FindInsidePoint##Oper##X( Xtype value, const Xtype array[], \
                                       int lbnd[ 2 ], int ubnd[ 2 ], \
                                       int *inx, int *iny, int *iv, \
                                       int *status ){ \
 \
 /* Local Variables: */ \
-   Xtype *pv;        /* Pointer to next data value to test */ \
+   const Xtype *pv;  /* Pointer to next data value to test */ \
    const char *text; /* Pointer to text describing oper */ \
    int cy;           /* Central row index */ \
    int iskin;        /* Index of spiral layer being searched */ \
@@ -1870,7 +1870,7 @@ f     AST_OUTLINE<X>
 
 *  Synopsis:
 c     #include "polygon.h"
-c     AstPolygon *astOutline<X>( <Xtype> value, int oper, <Xtype> array[],
+c     AstPolygon *astOutline<X>( <Xtype> value, int oper, const <Xtype> array[],
 c                                int lbnd[2], int ubnd[2], double maxerr,
 c                                int maxvert, int inside[2], int starpix )
 f     RESULT = AST_OUTLINE<X>( VALUE, OPER, ARRAY, LBND, UBND, MAXERR,
@@ -2135,7 +2135,7 @@ f     only in the Fortran interface to AST).
    argument list does not include a Polygon, and so no virtual function
    table is available. */
 #define MAKE_OUTLINE(X,Xtype) \
-AstPolygon *astOutline##X##_( Xtype value, int oper, Xtype array[], \
+AstPolygon *astOutline##X##_( Xtype value, int oper, const Xtype array[], \
                               int lbnd[2], int ubnd[2], double maxerr, \
                               int maxvert, int inside[2], int starpix, \
                               int *status ) { \
@@ -2145,7 +2145,7 @@ AstPolygon *astOutline##X##_( Xtype value, int oper, Xtype array[], \
    AstPointSet *candidate;   /* Candidate polygon vertices */ \
    AstPointSet *pset;        /* PointSet holding downsized polygon vertices */ \
    AstPolygon *result;       /* Result value to return */ \
-   Xtype *pv;                /* Pointer to next test point */ \
+   const Xtype *pv;          /* Pointer to next test point */ \
    Xtype v;                  /* Value of current pixel */ \
    double **ptr;             /* Pointers to PointSet arrays */ \
    int boxsize;              /* Half width of smoothign box in vertices */ \
@@ -3948,7 +3948,7 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 
 *  Synopsis:
 *     #include "polygon.h"
-*     void TraceEdge<Oper><X>( <Xtype> value, <Xtype> array[],
+*     void TraceEdge<Oper><X>( <Xtype> value, const <Xtype> array[],
 *                              int lbnd[ 2 ], int ubnd[ 2 ], int iv0,
 *                              int ix0, int iy0, int starpix, int full,
 *                              int *status );
@@ -4011,7 +4011,7 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
 /* Define a macro to implement the function for a specific data
    type and operation. */
 #define MAKE_TRACEEDGE(X,Xtype,Oper,OperI) \
-static AstPointSet *TraceEdge##Oper##X( Xtype value, Xtype array[], \
+static AstPointSet *TraceEdge##Oper##X( Xtype value, const Xtype array[], \
                                         int lbnd[ 2 ], int ubnd[ 2 ], \
                                         int iv0, int ix0, int iy0, \
                                         int starpix, int full, \
@@ -4019,9 +4019,9 @@ static AstPointSet *TraceEdge##Oper##X( Xtype value, Xtype array[], \
 \
 /* Local Variables: */ \
    AstPointSet *result; /* Pointer to text describing oper */ \
-   Xtype *pa;           /* Pointer to current valid pixel value */ \
-   Xtype *pb;           /* Pointer to neigbouring valid pixel value */ \
-   Xtype *pc;           /* Pointer to neigbouring valid pixel value */ \
+   const Xtype *pa;     /* Pointer to current valid pixel value */ \
+   const Xtype *pb;     /* Pointer to neigbouring valid pixel value */ \
+   const Xtype *pc;     /* Pointer to neigbouring valid pixel value */ \
    double *ptr[ 2 ];    /* PointSet data pointers */ \
    double *xvert;       /* Pointer to array holding vertex X axis values */ \
    double *yvert;       /* Pointer to array holding vertex Y axis values */ \
