@@ -4487,6 +4487,7 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
 /* Release resources. */
             map2b = astAnnul( map2b );
             tperm = astFree( tperm );
+            tmap0 = astAnnul( tmap0 );
          }
 
 /* Release resources. */
