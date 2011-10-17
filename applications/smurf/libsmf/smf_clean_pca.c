@@ -309,7 +309,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       }
     }
 
-    for( i=0; i<(1280l*1280l); i++ ) check += amp[i];
+    for( i=0; i<(1280l*ngoodbolo); i++ ) check += amp[i];
 
     printf("--- check %i: %lf\n", pdata->operation, check);
 
@@ -502,7 +502,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   }
 
   /* Allocate arrays */
-  amp = astCalloc( nbolo*nbolo, sizeof(*amp) );
+  amp = astCalloc( nbolo*ngoodbolo, sizeof(*amp) );
   comp = astCalloc( ngoodbolo*tlen, sizeof(*comp) );
   cov = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
   s = gsl_vector_alloc( ngoodbolo );
@@ -545,7 +545,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
 
     /* initialize work data */
-    pdata->amp = amp;
+    pdata->amp = NULL;
     pdata->abstride = abstride;
     pdata->acompstride = acompstride;
     pdata->bstride = bstride;
@@ -564,6 +564,10 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     pdata->tlen = tlen;
     pdata->operation = 0;
     pdata->tstride = tstride;
+
+    /* Each thread will accumulate the projection of its own portion of
+       the time-series. We'll add them to the master amp at the end */
+    pdata->amp = astCalloc( nbolo*ngoodbolo, sizeof(*(pdata->amp)) );
 
     /* Each thread will accumulate sums of x, y, and x*y for each bolo when
        calculating the covariance matrix */
@@ -715,6 +719,35 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   /* Wait until all of the submitted jobs have completed */
   thrWait( wf, status );
 
+  /* Add all of the amp arrays together from the threads, and then copy
+     back into the worker data so that it is available for cleaning */
+  if( *status == SAI__OK ) {
+    size_t index;
+    for( ii=0; ii<nw; ii++ ) {
+      pdata = job_data + ii;
+
+      for( i=0; i<nbolo; i++ ) {            /* Loop over bolo */
+        for( j=0; j<ngoodbolo; j++ ) {      /* Loop over component */
+          index = goodbolo[i]*abstride + j*acompstride;
+          amp[index] += pdata->amp[index];
+        }
+      }
+    }
+
+    for( ii=0; ii<nw; ii++ ) {
+      memcpy( pdata->amp, amp, sizeof(*(pdata->amp))*nbolo*ngoodbolo );
+    }
+  }
+
+  {
+    double check=0;
+
+    for( i=0; i<nbolo*ngoodbolo; i++ ) {
+      check += amp[i];
+    }
+    printf("--- check combined amp: %lf\n", check);
+  }
+
   {
     double check=0;
     for( i=0; i<ngoodbolo*tlen; i++ ) {
@@ -726,7 +759,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
 
   /* Check to see if the amplitudes are mostly negative or positive. If
      mostly negative, flip the sign of both the component and amplitudes */
-  if( 0 && (*status == SAI__OK) ) {
+  if( *status == SAI__OK ) {
     double total;
     for( j=0; j<ngoodbolo; j++ ) {    /* loop over component */
       total = 0;
@@ -1036,6 +1069,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
       pdata = job_data + ii;
       if( pdata->goodbolo ) pdata->goodbolo = astFree( pdata->goodbolo );
       if( pdata->covwork ) pdata->covwork = astFree( pdata->covwork );
+      if( pdata->amp ) pdata->amp = astFree( pdata->amp );
     }
     job_data = astFree(job_data);
   }
