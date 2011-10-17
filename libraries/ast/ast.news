@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V5.7-3) of the Starlink AST (astrometry) library is
+   A new release (V6.0) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,9 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- This version of AST is the first that can be used with the Python
+AST wrapper module, starlink.Ast, available at http://github.com/timj/starlink-pyast.
 
 - When reading a FITS-WCS header, the FitsChan class now recognises the
 non-standard "TPV" projection code within a CTYPE keyword value. This

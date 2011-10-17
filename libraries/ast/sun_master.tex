@@ -22569,13 +22569,16 @@ evaluate the inverse correction for each point transformed.
 \end{enumerate}
 
 \subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.7-3}
+Introduced in V6.0}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V5.7-2 and V5.7-3 (the
+occurred in the AST library between versions V5.7-2 and V6.0 (the
 current version):
 
 \begin{enumerate}
+
+\item This version of AST is the first that can be used with the Python
+AST wrapper module, starlink.Ast, available at http://github.com/timj/starlink-pyast.
 
 \item When reading a FITS-WCS header, the FitsChan class now recognises the
 non-standard ``TPV'' projection code within a CTYPE keyword value. This
