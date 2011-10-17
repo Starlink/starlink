@@ -54,7 +54,7 @@
 *     Baselines    : ORDER
 *     [Noisy Bolos]: Optionally happens here instead if "NOISECLIPPRECOM" is set
 *     Common-Mode  : COMPREPROCESS
-*     PCA          : PCATHRESH
+*     PCA          : PCALEN, PCATHRESH
 *     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW,
 *                    FILT_NOTCHHIGH, APOD, FILT_WLIM, WHITEN
 *     Noisy Bolos  : NOISECLIPHIGH, NOISECLIPLOW, NOISECLIPPRECOM
@@ -113,6 +113,8 @@
 *        Add optical flat-fielding option.
 *     2011-09-19 (DSB):
 *        Allow data to be divided or multiplied by the optical flat-fields.
+*     2011-10-17 (EC):
+*        Add PCA cleaning in chunks (PCALEN parameter)
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -185,6 +187,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
   int opteffdiv;            /* Divide data by the optical efficiencies? */
   int order;                /* Order of polynomial for baseline fitting */
   char param[ 20 ];         /* Buffer for config parameter name */
+  size_t pcalen;            /* Chunk length for PCA cleaning */
   double pcathresh;         /* n-sigma threshold for PCA cleaning */
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikebox=0;        /* Box size for spike finder */
@@ -224,7 +227,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                     NULL, &zeropad, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
                     &spikethresh, &spikebox, &noisecliphigh, &noisecliplow,
-                    NULL, &compreprocess, &pcathresh, NULL, NULL, NULL,
+                    NULL, &compreprocess, &pcalen, &pcathresh, NULL, NULL, NULL,
                     &noiseclipprecom, status );
 
   /* Loop over subarray */
@@ -477,7 +480,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
     for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
       data = array->sdata[idx];
 
-      smf_clean_pca( wf, data, 0, 0, pcathresh, NULL, NULL, 0, keymap, status );
+      smf_clean_pca_chunks( wf, data, pcalen, pcathresh, keymap, status );
     }
 
     /*** TIMER ***/

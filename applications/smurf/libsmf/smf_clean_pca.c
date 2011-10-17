@@ -188,6 +188,8 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   size_t t_last;          /* First time slice being analyzed */
   size_t tstride;         /* time slice stride */
 
+  double check=0;
+
   if( *status != SAI__OK ) return;
 
   /* Pointer to the data that this thread will process */
@@ -235,6 +237,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   if( (pdata->operation == 0) && (*status==SAI__OK) ) {
     /* Operation 0: accumulate sums for covariance calculation -------------- */
 
+    check = 0;
     for( i=0; i<ngoodbolo; i++ ) {
       double sum_xy;
 
@@ -251,10 +254,17 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
         /* Store sums in work array and normalize once all threads finish */
         covwork[ i + j*ngoodbolo ] = sum_xy;
         //printf("(%zu,%zu) %lg\n", i, j, sum_xy);
+
+        check += sum_xy;
       }
     }
+
+    printf("--- check %i: %lf\n", pdata->operation, check);
+
   } else if( (pdata->operation == 1) && (*status == SAI__OK) ) {
     /* Operation 1: normalized eigenvectors --------------------------------- */
+
+    check = 0;
 
     for( i=0; i<ngoodbolo; i++ ) {   /* loop over comp */
       double u;
@@ -273,11 +283,18 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
           l = k - t_first;
           comp[i*ccompstride+l*ctstride] += d[goodbolo[j] *
                                               bstride + k*tstride] * u;
+
+          check += d[goodbolo[j] * bstride + k*tstride] * u;
         }
       }
     }
+
+    printf("--- check %i: %lf\n", pdata->operation, check);
+
   } else if( (pdata->operation == 2) && (*status == SAI__OK) ) {
     /* Operation 2: project data along eigenvectors ------------------------- */
+
+    check = 0;
 
     for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
       /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
@@ -287,9 +304,14 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
           amp[goodbolo[i]*abstride + j*acompstride] +=
             d[goodbolo[i]*bstride + k*tstride] *
             comp[j*ccompstride + l*ctstride];
+
         }
       }
     }
+
+    for( i=0; i<(1280l*1280l); i++ ) check += amp[i];
+
+    printf("--- check %i: %lf\n", pdata->operation, check);
 
   } else if( (pdata->operation == 3) && (*status == SAI__OK) ) {
     /* Operation 3: clean --------------------------------------------------- */
@@ -382,7 +404,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   if( thresh < 0 ) {
     *status = SAI__ERROR;
     errRep( " ", FUNC_NAME
-            ": possible programming error, thresh < 0", status );
+            ": thresh < 0", status );
     return;
   }
 
@@ -612,6 +634,18 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     gsl_linalg_SV_decomp( cov, v, s, work );
   }
 
+  {
+    double check=0;
+
+    for( i=0; i<ngoodbolo; i++ ) {
+      for( j=0; j<ngoodbolo; j++ ) {
+        check += gsl_matrix_get( cov, i, j );
+      }
+    }
+
+    printf("--- check inverted: %lf\n", check);
+  }
+
   /* Calculate normalized eigenvectors with parallel code --------------------*/
 
   msgOutif( MSG__VERB, "", FUNC_NAME
@@ -636,22 +670,31 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   thrWait( wf, status );
 
   /* Then normalize */
-  for( i=0; (*status==SAI__OK)&&(i<ngoodbolo); i++ ) {
-    double sigma;
+  {
+    double check = 0;
 
-    smf_stats1D( comp + i*ccompstride, ctstride, tlen, NULL, 0,
-                 0, NULL, &sigma, NULL, NULL, status );
+    for( i=0; (*status==SAI__OK)&&(i<ngoodbolo); i++ ) {
+      double sigma;
 
-    /* Apparently we need this to get the normalization right */
-    sigma *= sqrt((double) tlen);
+      smf_stats1D( comp + i*ccompstride, ctstride, tlen, NULL, 0,
+                   0, NULL, &sigma, NULL, NULL, status );
 
-    if( *status == SAI__OK ) {
-      for( k=0; k<tlen; k++ ) {
-        comp[i*ccompstride + k*ctstride] /= sigma;
+      /* Apparently we need this to get the normalization right */
+      sigma *= sqrt((double) tlen);
+
+      if( *status == SAI__OK ) {
+        for( k=0; k<tlen; k++ ) {
+          comp[i*ccompstride + k*ctstride] /= sigma;
+        }
       }
     }
-  }
 
+    for( i=0; i<ngoodbolo*tlen; i++ ) {
+      check += comp[i];
+    }
+
+    printf("--- check component: %lf\n", check);
+  }
   /* Now project the data along each of these normalized basis vectors
      to figure out the amplitudes of the components in each bolometer
      time series. ------------------------------------------------------------*/
@@ -672,9 +715,18 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   /* Wait until all of the submitted jobs have completed */
   thrWait( wf, status );
 
+  {
+    double check=0;
+    for( i=0; i<ngoodbolo*tlen; i++ ) {
+      check += comp[i];
+    }
+
+    printf("--- check component A: %lf\n", check);
+  }
+
   /* Check to see if the amplitudes are mostly negative or positive. If
      mostly negative, flip the sign of both the component and amplitudes */
-  if( *status == SAI__OK ) {
+  if( 0 && (*status == SAI__OK) ) {
     double total;
     for( j=0; j<ngoodbolo; j++ ) {    /* loop over component */
       total = 0;
@@ -697,6 +749,15 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
         }
       }
     }
+  }
+
+  {
+    double check=0;
+    for( i=0; i<ngoodbolo*tlen; i++ ) {
+      check += comp[i];
+    }
+
+    printf("--- check component B: %lf\n", check);
   }
 
   /* Flag outlier bolometers if requested ------------------------------------*/
@@ -949,6 +1010,15 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
       (*amplitudes)->pntr[0] = amp;
       amp = NULL;  /* Set to NULL to avoid freeing before exiting */
     }
+  }
+
+  {
+    double check=0;
+    for( i=0; i<ngoodbolo*tlen; i++ ) {
+      check += comp[i];
+    }
+
+    printf("--- check component again: %lf\n", check);
   }
 
   /* Clean up */

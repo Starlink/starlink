@@ -71,6 +71,7 @@ smf_clipnoise.c \
 smf_clipped_stats1D.c \
 smf_clean_dksquid.c \
 smf_clean_pca.c \
+smf_clean_pca_chunks.c \
 smf_clean_smfArray.c \
 smf_clone_data.c \
 smf_close_file.c \

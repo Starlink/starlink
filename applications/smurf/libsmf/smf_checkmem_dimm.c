@@ -219,7 +219,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &dofft,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                    NULL, NULL, NULL, NULL, NULL, status );
+                    NULL, NULL, NULL, NULL, NULL, NULL, status );
 
   /* Calculate memory usage of static model components: -------------------- */
 

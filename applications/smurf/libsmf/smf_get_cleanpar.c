@@ -24,7 +24,7 @@
 *                       double *flagfast, int *order, double *spikethresh,
 *                       size_t *spikebox, double *noisecliphigh,
 *                       double *noisecliplow, int *whiten, int *compreprocess,
-*                       double *pcathresh, int groupsubarray,
+*                       size_t *pcalen, double *pcathresh, int groupsubarray,
 *                       double *downsampscale, double *downsampfreq,
 *                       int *noiseclipprecom, int *status )
 
@@ -104,7 +104,10 @@
 *        Apply a whitening filter to the data?
 *     compreprocess = int * (Returned)
 *        If set do common-mode rejection and bad-data rejection.
-*     pcathresh = double (Returned)
+*     pcalen = size_t * (Returned)
+*        Chunk length for PCA cleaning in time slices (if 0 default to full
+*        length of the data)
+*     pcathresh = double * (Returned)
 *        Outlier threshold for PCA amplitudes to remove from data for cleaning
 *     groupsubarray = int * (Returned)
 *        If set, handle subarrays separately instead of grouping data at same
@@ -181,6 +184,8 @@
 *        noisecliphigh and noisecliplow instead of noiseclip
 *     2011-08-09 (EC):
 *        Add noiseclipprecom
+*     2011-10-17 (EC):
+*        Add pcalen
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -239,7 +244,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        double *flagslow, double *flagfast, int *order,
                        double *spikethresh, size_t *spikebox,
                        double *noisecliphigh, double *noisecliplow, int *whiten,
-                       int *compreprocess, double *pcathresh,
+                       int *compreprocess, size_t *pcalen, double *pcathresh,
                        int *groupsubarray, double *downsampscale,
                        double *downsampfreq, int *noiseclipprecom,
                        int *status ) {
@@ -552,6 +557,20 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
     astMapGet0I( keymap, "COMPREPROCESS", compreprocess );
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": COMPREPROCESS is %s", status,
                (*compreprocess ? "enabled" : "disabled") );
+  }
+
+  if( pcalen ) {
+    *pcalen = 0;
+    astMapGet0I( keymap, "PCALEN", &temp );
+    if( temp < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "pcalen cannot be < 0.", status );
+    } else {
+      *pcalen = (size_t) temp;
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": PCALEN=%zu", status,
+               *pcalen );
   }
 
   if( pcathresh ) {

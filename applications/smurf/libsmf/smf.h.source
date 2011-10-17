@@ -721,6 +721,9 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
                     smfData **amplitudes, int flagbad, AstKeyMap *keymap,
                     int *status );
 
+void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
+                           double thresh, AstKeyMap *keymap, int *status );
+
 void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                          smfArray **noisemaps, smfArray **com, smfArray **gai,
                          AstKeyMap *keymap, int *status );
@@ -1203,10 +1206,10 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        int *dofilt, double *flagslow, double *flagfast,
                        int *order, double *spikethresh, size_t *spikeiter,
                        double *noisecliphigh, double *noisecliplow,
-                       int *whiten, int *compreprocess, double *pcathresh,
-                       int *groupsubarray, double *downsampscale,
-                       double *downsampfreq, int *noiseclipprecom,
-                       int *status );
+                       int *whiten, int *compreprocess, size_t *pcalen,
+                       double *pcathresh, int *groupsubarray,
+                       double *downsampscale, double *downsampfreq,
+                       int *noiseclipprecom, int *status );
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,

@@ -55,6 +55,7 @@ spikebox = 50
 noisecliphigh = 0
 noisecliplow = 0
 noiseclipprecom = 0
+pcalen = 0
 pcathresh = 0
 groupsubarray = 0
 

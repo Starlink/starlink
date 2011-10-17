@@ -248,7 +248,7 @@ flagslow = 30
 # removed (i.e., order=0), as this assumption is used to speed up the
 # calculation.
 #
-# The single parameter to the PCA cleaning is the threshold above
+# The main parameter for PCA cleaning is the threshold above
 # which components will be removed from the bolometer time-series. For
 # each component, the RMS amplitude across all bolometers is
 # calculated -- a single positive number related to the average
@@ -258,8 +258,16 @@ flagslow = 30
 # for some test data. Be warned that this statistical black box will remove
 # real correlated astronomical signals as well! As with common-mode removal,
 # the actual impact on science will need to be calibrated with simulations.
+# If this parameter is set to 0 no pca cleaning will occur.
+#
+# The other parameter is pcalen. Since the noise properties vary with time,
+# pca cleaning seems to work better on shorter bits of data. pcalen specifies
+# the chunk length that will be cleaned as a number of time slices (be
+# careful if you have down-sampling turned on!). If set to 0 it will
+# default to the length of the full time-series.
 
 pcathresh = 0
+pcalen = 0
 
 # S/N threshold to detect DC steps. Note, this refers to the noise level
 # in the bolometer data after it has been smoothed with a median filter of
