@@ -723,10 +723,11 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
      back into the worker data so that it is available for cleaning */
   if( *status == SAI__OK ) {
     size_t index;
+
     for( ii=0; ii<nw; ii++ ) {
       pdata = job_data + ii;
 
-      for( i=0; i<nbolo; i++ ) {            /* Loop over bolo */
+      for( i=0; i<ngoodbolo; i++ ) {        /* Loop over good bolo */
         for( j=0; j<ngoodbolo; j++ ) {      /* Loop over component */
           index = goodbolo[i]*abstride + j*acompstride;
           amp[index] += pdata->amp[index];
@@ -735,6 +736,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
 
     for( ii=0; ii<nw; ii++ ) {
+      pdata = job_data + ii;
       memcpy( pdata->amp, amp, sizeof(*(pdata->amp))*nbolo*ngoodbolo );
     }
   }
@@ -1045,7 +1047,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
   }
 
-  {
+  if( comp ) {
     double check=0;
     for( i=0; i<ngoodbolo*tlen; i++ ) {
       check += comp[i];
