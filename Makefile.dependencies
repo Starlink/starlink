@@ -80,7 +80,6 @@ $(MANIFESTS)/ard: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -138,7 +137,6 @@ $(MANIFESTS)/atl: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -467,7 +465,6 @@ $(MANIFESTS)/ctg: \
 		$(MANIFESTS)/htx \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -530,6 +527,7 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/cupid \
@@ -1086,7 +1084,6 @@ $(MANIFESTS)/grp: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1378,7 +1375,6 @@ $(MANIFESTS)/irq: \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1491,7 +1487,6 @@ $(MANIFESTS)/kaplibs: \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1656,7 +1651,6 @@ $(MANIFESTS)/lpg: \
 		$(MANIFESTS)/htx \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1785,7 +1779,6 @@ $(MANIFESTS)/ndg: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1836,6 +1829,7 @@ $(MANIFESTS)/one: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/prm \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
@@ -3015,6 +3009,17 @@ $(MANIFESTS)/tdom: \
 	cd thirdparty/tclsys/tdom \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/thr: \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sla \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
+	cd libraries/thr \
+	  && $(MAKE_CPT)
+
 # Component tk is a configure dependency, so is configurable in place.
 $(MANIFESTS)/tk: \
 		$(MANIFESTS)/tcl
@@ -3026,12 +3031,6 @@ $(MANIFESTS)/tkimg: \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk
 	cd thirdparty/tclsys/tkimg \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/thr: \
-		$(MANIFESTS)/ast \
-		$(MANIFESTS)/ems
-	cd libraries/thr \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/trn: \
@@ -3262,6 +3261,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sun91 \
 	$(MANIFESTS)/sun93 \
 	$(MANIFESTS)/surf \
+	$(MANIFESTS)/thr \
 	$(MANIFESTS)/trn \
 	$(MANIFESTS)/xdisplay
 
