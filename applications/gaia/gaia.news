@@ -2,6 +2,13 @@
     Version 4.4-3
     =============
 
+    A snapshot can now be taken of the whole image, including the off-screen
+    parts, so it is now possible to capture a graphic of the whole image at
+    full or higher resolution when it is larger than the main window. This is
+    in the main window "File" menu as "Full snapshot...". Note that the
+    default graphics format is now PNG (GIF no longer works when there are
+    overlay graphics).
+
     The "Intensity Map:" selector in the main panel has been replaced
     by a "Color Scale:" selector. This still provides linear and log-like
     intensity mapping of the displayed image, so no features have been

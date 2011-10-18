@@ -12,6 +12,12 @@
       main window -- printing to postscript (which can be sent to a local
       printer or captured to a file) and taking a <tt>snapshot</tt> which 
       can be saved in GIF, JPEG, TIFF or PNG formats.
+    <p>
+      To get a copy of the whole image, including any parts that are
+      off-screen, you can only use a <tt>snapshot</tt>, but this option does
+      allow images to be captured at full, or greater, resolution.
+    </p>
+
     </p>
     <h3>Getting a snapshot of the image and overlay graphics</h3>
     <p>
@@ -19,10 +25,15 @@
       GIMP, so requires that the window is unobscured and only creates
       graphics at the same resolution as the screen (printing to postscript
       does not have this limitation for overlay graphics), to do that select
-      the "Snapshot..." item in the "File" menu.  The format of the graphics
-      file produced is GIF by default, but will be one of the other supported
-      formats if the selected filename has a known extension (<tt>.jpeg</tt>,
-      <tt>.jpg</tt>, <tt>.png</tt>, <tt>.tiff</tt> or <tt>.tif</tt>).
+      the "Visible snapshot..." or "Full snapshot..." items in the "File"
+      menu, depending on whether you want just the visible parts or all the
+      image and off-screen graphics.
+    </p>
+    <p>
+      The format of the graphics file produced is PNG by default, but will be
+      one of the other supported formats if the selected filename has a known
+      extension (<tt>.gif</tt>, <tt>.jpeg</tt>, <tt>.jpg</tt>, <tt>.png</tt>,
+      <tt>.tiff</tt> or <tt>.tif</tt>).
     </p>
 
     <h3>Postscript print of image and overlay graphics</h3> 

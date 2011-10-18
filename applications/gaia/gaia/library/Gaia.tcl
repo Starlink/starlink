@@ -706,10 +706,15 @@ itcl::class gaia::Gaia {
          {Print annotated postscript copy of colour ramp to file or printer} \
          -command [code $this print_ramp_]
 
-      #  Capture main window to a graphics format. Named export by popular demand.
-      insert_menuitem $m $index command "Snapshot..." \
-         {Capture main window to a graphic format, GIF, JPEG, PNG, TIFF} \
-         -command [code $image_ capture]
+      #  Capture main window to a graphics format.
+      insert_menuitem $m $index command "Visible snapshot..." \
+         {Capture visible image to a graphic format: GIF, JPEG, PNG, TIFF} \
+         -command [code $image_ capture 0]
+      incr index
+      insert_menuitem $m $index command "Full snapshot..." \
+         {Capture image, including offscreen parts, to a graphic format:
+            GIF, JPEG, PNG, TIFF (can be slow for large images)} \
+         -command [code $image_ capture 1]
 
       #  Shortcuts for closing window.
       bind $w_  <Control-n> [code $this clone]

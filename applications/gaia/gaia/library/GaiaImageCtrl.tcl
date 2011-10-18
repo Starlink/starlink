@@ -443,15 +443,16 @@ itcl::class gaia::GaiaImageCtrl {
    }
 
    #  Capture a copy of the main window to a graphics file. Requires
-   #  that the tkimg package is installed.
-   public method capture {} {
+   #  that the tkimg package is installed. If all is true then off-screen
+   #  image and graphics will fail (this doesn't work well for GIF as
+   #  seems to need more than 256 colours).
+   public method capture {all} {
       if { [$image_ isclear] } {
          warning_dialog "No image is currently loaded" $w_
          return
       }
 
-      #  Get a file name and a format. XXX add additional options to
-      #  define the format and add some JPEG options (-quality -progressive).
+      #  Get a file name and a format.
       utilReUseWidget util::FileSelect $w_.capture \
          -title "Select or name a graphics file" \
          -dir "." \
@@ -465,16 +466,18 @@ itcl::class gaia::GaiaImageCtrl {
       if { [$w_.capture activate] } {
          set filename [$w_.capture get]
          set type [::file extension $filename]
-         set format "gif"
          switch -glob $type {
-            j* {
+            .gif* {
+               set format "gif"
+            }
+            .jp* {
                set format "jpeg"
             }
-            p* {
-               set format "png"
-            }
-            t* {
+            .tif* {
                set format "tiff"
+            }
+            default {
+               set format "png"
             }
          }
 
@@ -483,7 +486,6 @@ itcl::class gaia::GaiaImageCtrl {
          #  is unobscured (uses an X11 snap), so attempt to raise it and make
          #  sure everything is up to date.
          busy {
-            set image [::image create photo]
 
             #  Attempt to unobscure.
             ::raise $w_
@@ -491,27 +493,93 @@ itcl::class gaia::GaiaImageCtrl {
             ::after 500
             ::update
 
-            #  And capture.
-            blt::winop snap $canvas_ $image
-
             #  Load all the required tkimg packages.
             if { $format != "gif" } {
                package require img::jpeg
                package require img::png
                package require img::tiff
             }
+            package require img::window
+
+            #  And capture.
+            if { $all } { 
+               set image [all_canvas_to_photo_]
+            } else {
+               set image [image create photo -format window -data $canvas_]
+            }
 
             #  Write to disk file. This can fail if the window is still
             #  obscured. So trap and complain.
             if { [catch {$image write $filename -format $format} msg ] } {
                if { $msg == "too many colors" } {
-                  info_dialog "The image display window must not be obscured,
-move any overlapping windows and try again"
+                  info_dialog \
+                     "The image display window must not be obscured, \
+                      move any overlapping windows and try again. \
+                      If that fails try a non-GIF format"
                }
             }
          }
          ::image delete $image
       }
+   }
+
+   #  From http://wiki.tcl.tk/1404. Capture all canvas, includes off screen
+   #  image and graphics.
+   protected method all_canvas_to_photo_ {} {
+
+      # Ensure that the window is on top of everything else, so as not to get
+      # white ranges in the image, due to overlapped portions of the window
+      # with other windows...
+      ::raise [winfo toplevel $canvas_]
+      ::update
+      set border [expr {[$canvas_ cget -borderwidth] +
+                        [$canvas_ cget -highlightthickness]}]
+      set view_height [expr {[winfo height $canvas_]-2*$border}]
+      set view_width  [expr {[winfo width  $canvas_]-2*$border}]
+      foreach {x1 y1 x2 y2} [$canvas_ bbox all] {break}
+      set x1 [expr {int($x1-10)}]
+      set y1 [expr {int($y1-10)}]
+      set x2 [expr {int($x2+10)}]
+      set y2 [expr {int($y2+10)}]
+      set width  [expr {$x2-$x1}]
+      set height [expr {$y2-$y1}]
+      set image [image create photo -height $height -width $width]
+
+      # Arrange the scrollregion of the canvas to get the whole window
+      # visible, so as to grab it into an image...
+      set scrollregion [$canvas_ cget -scrollregion]
+      set xscrollcommand [$canvas_ cget -xscrollcommand]
+      set yscrollcommand [$canvas_ cget -yscrollcommand]
+      $canvas_ configure -xscrollcommand {}
+      $canvas_ configure -yscrollcommand {}
+      set grabbed_x $x1
+      set grabbed_y $y1
+      set image_x 0
+      set image_y 0
+      while {$grabbed_y < $y2} {
+         while {$grabbed_x < $x2} {
+            $canvas_ configure -scrollregion [list $grabbed_x $grabbed_y \
+                                                [expr {$grabbed_x + $view_width}] [expr {$grabbed_y + $view_height}]]
+            ::update
+
+            # Take a screenshot of the visible canvas part...
+            set tmpimg [image create photo -format window -data $canvas_]
+
+            # Copy the screenshot to the target image...
+            $image copy $tmpimg \
+               -to $image_x $image_y -from $border $border
+            incr grabbed_x $view_width
+            incr image_x   $view_width
+         }
+         set grabbed_x $x1
+         set image_x 0
+         incr grabbed_y $view_height
+         incr image_y   $view_height
+      }
+      $canvas_ configure -scrollregion $scrollregion
+      $canvas_ configure -xscrollcommand $xscrollcommand
+      $canvas_ configure -yscrollcommand $yscrollcommand
+      return $image
    }
 
    #  Create a graph to display the image data values along the line
