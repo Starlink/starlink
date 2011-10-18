@@ -60,6 +60,8 @@
 *        Calculate steptime at each step.
 *     2011-10-13 (EC):
 *        Use actual instead of demand coordinates!
+*     2011-10-18 (EC):
+*        Catch floating-point exceptions when calculating average_speed
 
 *  Copyright:
 *     Copyright (C) 2011 Science & Technology Facilities Council.
@@ -215,8 +217,11 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
     if( (smin && (speed < smin)) || (smax && (speed > smax)) ) {
       /* Does this time step need to be flagged? */
       flag[i] = 1;
-    } else {
-      /* Update measurement of avspeed */
+    } else if( isfinite(speed) ) {
+      /* Update measurement of avspeed if it is sensible (we could have
+         strange values if there are repeated pointing header values...
+         don't necessarily need to flag the bolo data as bad, but they
+         shouldn't get added to our speed estimates! */
       avspeed += speed;
       navspeed ++;
     }
