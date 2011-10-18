@@ -267,7 +267,9 @@ flagslow = 30
 # default to the length of the full time-series.
 
 pcathresh = 0
-pcalen = 0
+
+# *** pcalen is currently buggy, don't use! ***
+#pcalen = 0
 
 # S/N threshold to detect DC steps. Note, this refers to the noise level
 # in the bolometer data after it has been smoothed with a median filter of

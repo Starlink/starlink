@@ -213,6 +213,16 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   t_last = pdata->t_last;
   tstride = pdata->tstride;
 
+  /*
+  printf("----------------------\n\n");
+  printf("t_first=%zu t_last=%zu tlen=%zu\n", t_first, t_last, tlen);
+  printf("t1=%zu t2=%zu\n", pdata->t1, pdata->t2);
+  printf("bstride=%zu tstride=%zu\n", bstride, tstride);
+  printf("abstride=%zu acompstride=%zu\n", abstride, acompstride);
+  printf("ctstride=%zu ccompstride=%zu\n", ctstride, ccompstride);
+  printf("\n----------------------\n");
+  */
+
   /* Check for valid inputs */
   if( !pdata ) {
     *status = SAI__ERROR;
@@ -259,7 +269,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       }
     }
 
-    printf("--- check %i: %lf\n", pdata->operation, check);
+    //printf("--- check %i: %lf\n", pdata->operation, check);
 
   } else if( (pdata->operation == 1) && (*status == SAI__OK) ) {
     /* Operation 1: normalized eigenvectors --------------------------------- */
@@ -289,12 +299,16 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       }
     }
 
-    printf("--- check %i: %lf\n", pdata->operation, check);
+    //printf("--- check %i: %lf\n", pdata->operation, check);
 
   } else if( (pdata->operation == 2) && (*status == SAI__OK) ) {
     /* Operation 2: project data along eigenvectors ------------------------- */
 
+    size_t counter=0;
+
     check = 0;
+
+    //printf("t1=%zu t2=%zu\n", pdata->t1, pdata->t2);
 
     for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
       /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
@@ -304,14 +318,15 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
           amp[goodbolo[i]*abstride + j*acompstride] +=
             d[goodbolo[i]*bstride + k*tstride] *
             comp[j*ccompstride + l*ctstride];
-
         }
       }
     }
 
     for( i=0; i<(1280l*ngoodbolo); i++ ) check += amp[i];
 
-    printf("--- check %i: %lf\n", pdata->operation, check);
+    //printf(" counter=%zu\n", counter );
+
+    //printf("--- check %i: %lf\n", pdata->operation, check);
 
   } else if( (pdata->operation == 3) && (*status == SAI__OK) ) {
     /* Operation 3: clean --------------------------------------------------- */
@@ -647,7 +662,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
       }
     }
 
-    printf("--- check inverted: %lf\n", check);
+    //printf("--- check inverted: %lf\n", check);
   }
 
   /* Calculate normalized eigenvectors with parallel code --------------------*/
@@ -697,7 +712,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
       check += comp[i];
     }
 
-    printf("--- check component: %lf\n", check);
+    //printf("--- check component: %lf\n", check);
   }
   /* Now project the data along each of these normalized basis vectors
      to figure out the amplitudes of the components in each bolometer
@@ -719,8 +734,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   /* Wait until all of the submitted jobs have completed */
   thrWait( wf, status );
 
-  /* Add all of the amp arrays together from the threads, and then copy
-     back into the worker data so that it is available for cleaning */
+  /* Add all of the amp arrays together from the threads */
   if( *status == SAI__OK ) {
     size_t index;
 
@@ -734,11 +748,6 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
         }
       }
     }
-
-    for( ii=0; ii<nw; ii++ ) {
-      pdata = job_data + ii;
-      memcpy( pdata->amp, amp, sizeof(*(pdata->amp))*nbolo*ngoodbolo );
-    }
   }
 
   {
@@ -747,7 +756,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     for( i=0; i<nbolo*ngoodbolo; i++ ) {
       check += amp[i];
     }
-    printf("--- check combined amp: %lf\n", check);
+    //printf("--- check combined amp: %lf\n", check);
   }
 
   {
@@ -756,7 +765,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
       check += comp[i];
     }
 
-    printf("--- check component A: %lf\n", check);
+    //printf("--- check component A: %lf\n", check);
   }
 
   /* Check to see if the amplitudes are mostly negative or positive. If
@@ -786,13 +795,22 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     }
   }
 
+  /* Finally, copy the master amp array back into the workspace for
+     each thread */
+  if( *status == SAI__OK ) {
+    for( ii=0; ii<nw; ii++ ) {
+      pdata = job_data + ii;
+      memcpy( pdata->amp, amp, sizeof(*(pdata->amp))*nbolo*ngoodbolo );
+    }
+  }
+
   {
     double check=0;
     for( i=0; i<ngoodbolo*tlen; i++ ) {
       check += comp[i];
     }
 
-    printf("--- check component B: %lf\n", check);
+    //printf("--- check component B: %lf\n", check);
   }
 
   /* Flag outlier bolometers if requested ------------------------------------*/
@@ -1053,7 +1071,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
       check += comp[i];
     }
 
-    printf("--- check component again: %lf\n", check);
+    //printf("--- check component again: %lf\n", check);
   }
 
   /* Clean up */
