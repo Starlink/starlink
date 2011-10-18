@@ -426,8 +426,6 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
 
   if( outdata && (*status==SAI__OK) ) {
     /* If the caller supplies the output container we check dimensions */
-
-    size_t j;
     dim_t o_fdims[2];
     dim_t o_nbolo;
     size_t o_ndims;

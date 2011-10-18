@@ -306,8 +306,8 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
           if( (*odata)->dims[i] != tempdata->dims[i] ) {
             *status = SAI__ERROR;
             errRepf( "", FUNC_NAME ": programming error, dim(%zu) don't match! "
-                     "got %zu, should be %zu", status, i, (*odata)->dims[i],
-                     tempdata->dims[i] );
+                     "got %" DIM_T_FMT ", should be %" DIM_T_FMT, status, i,
+                     (*odata)->dims[i], tempdata->dims[i] );
           }
         }
       }
