@@ -27,6 +27,14 @@
 *          Input files to be transformed.
 *     OUT = NDF (Write)
 *          Output files.
+*     ZEROPAD = LOGICAL (Read)
+*          Determines whether to zeropad.
+*     RESOLUTION = _INTEGER (Read)
+*          Spectral Grid Resolution.
+*          0 : Low Resolution
+*          1 : Medium Resolution
+*          Any other value : High Resolution
+*          Default behaviour is the High Resolution
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
@@ -34,6 +42,10 @@
 *  History :
 *     2011-06-24 (COBA):
 *        Original version.
+*     2011-08-16 (COBA):
+*        Add Zero-Padding.
+*     2011-10-18 (COBA):
+*        Add subarray check.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -95,6 +107,11 @@ void smurf_fts2_spectrum(int* status)
 
   const char*  dataLabel  = "Spectrum";
 
+  // ADAM VARIABLES
+  int       ZEROPAD       = 1;    // Determines whether to zeropad
+  int       RESOLUTION    = 2;    // Spectral Resolution, 0=LOW, 1=MEDIUM, *=HIGH
+
+  // INTERNAL VARIABLES
   Grp*      grpInput      = NULL; // Input group
   Grp*      grpOutput     = NULL; // Output group
   smfData*  inputData     = NULL; // Pointer to input data
@@ -114,15 +131,39 @@ void smurf_fts2_spectrum(int* status)
   int       bolIndex      = 0;    // Bolometer index
   int       zpdIndex      = 0;    // Frame index at ZPD
   int       outN          = 0;    // Output spectrum length
+  double    DSIGMA        = 0.0;  // Spectral Sampling Interval
   double*   IFG           = NULL; // Interferogram
   fftw_complex* SPEC      = NULL; // Spectrum
   fftw_plan plan 			    = NULL; // fftw plan
+  sc2ast_subarray_t srcSubnum   = 0; // Source subarray ID
 
   // GROUPS
   kpg1Rgndf("IN", 0, 1, "", &grpInput, &numInputFile, status);
   kpg1Wgndf("OUT", grpOutput, numInputFile, numInputFile,
             "Equal number of input and output files expected!",
             &grpOutput, &numOutputFile, status);
+
+  // READ IN ADAM PARAMETERS
+  parGet0i("ZEROPAD", &ZEROPAD, status);
+  parGet0i("RESOLUTION", &RESOLUTION, status);
+
+  switch(RESOLUTION) {
+    case 0:
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Specified resolution is NOT supported!", status);
+      goto CLEANUP;
+      // DSIGMA = SMF__FTS2_LOWRES_SSI;
+      // break;
+    case 1:
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Specified resolution is NOT supported!", status);
+      goto CLEANUP;
+      // DSIGMA = SMF__FTS2_MEDRES_SSI;
+      // break;
+    default:
+      DSIGMA = SMF__FTS2_HIGHRES_SSI;
+      break;
+  }
 
   // BEGIN NDF
   ndfBegin();
@@ -146,6 +187,16 @@ void smurf_fts2_spectrum(int* status)
     }
     zpdData = inputData->fts->zpd;
 
+    // GET SOURCE SUBARRAY ID
+    smf_find_subarray(inputData->hdr, NULL, 0, &srcSubnum, status);
+    if( srcSubnum == SC2AST__NULLSUB ||
+        srcSubnum == S8A || srcSubnum == S8B ||
+        srcSubnum == S4C || srcSubnum == S4D) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Source has invalid subarray ID!", status);
+      goto CLEANUP;
+    }
+
     // INPUT FILE DIMENSIONS
     srcW   = inputData->dims[0];
     srcH   = inputData->dims[1];
@@ -157,20 +208,26 @@ void smurf_fts2_spectrum(int* status)
       for(j = 0; j < srcW; j++) {
         bolIndex = i + j * srcH;
         int z = *((int*)(zpdData->pntr[0]) + bolIndex);
-        if(z < zMin) {
-          zMin = z;
-        }
+        if(z < zMin) { zMin = z; }
       }
     }
 
-    int N2 = srcN - zMin + 1;   // FFT READY INTERFEROGRAM HALF-LENGTH
-    int N  = N2 << 1;           // FFT READY INTERFEROGRAM LENGTH
-
-    outN = N2 + 1;
-
+    // GET NYQUIST FREQUENCY
     double FNYQUIST = 0.0;
     smf_fits_getD(inputData->hdr, "FNYQUIST", &FNYQUIST, status);
-    smf_fits_updateD(inputData->hdr, "WNFACT", FNYQUIST / (outN - 1), "Wavenumber factor", status);
+    if(*status != SAI__OK) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to find the Nyquist frequency in FITS header!", status);
+      goto CLEANUP;
+    }
+
+    // INTERFEROGRAM HALF-LENGTH
+    int N2 = (ZEROPAD > 0) ? ceil(FNYQUIST / DSIGMA) : (srcN - zMin + 1);
+    int N = N2 << 1;  // INTERFEROGRAM LENGTH
+    outN = N2 + 1;    // SPECTRUM LENGTH
+
+    // SAVE ACTUAL WAVENUMBER FACTOR (REQUIRES NO ZERO PADDING)
+    smf_fits_updateD(inputData->hdr, "WNFACT", FNYQUIST / N2, "Wavenumber factor", status);
 
     // ALLOCATE MEMORY FOR THE ARRAYS
     IFG  = astMalloc(N * sizeof(*IFG));
@@ -181,10 +238,7 @@ void smurf_fts2_spectrum(int* status)
 
     // SET DATA LABEL
     if (dataLabel) {
-      one_strlcpy(  outputData->hdr->dlabel,
-                    dataLabel,
-                    sizeof(outputData->hdr->dlabel),
-                    status );
+      one_strlcpy(outputData->hdr->dlabel, dataLabel, sizeof(outputData->hdr->dlabel), status );
     }
 
     // DATA ARRAY
@@ -202,35 +256,34 @@ void smurf_fts2_spectrum(int* status)
       for(j = 0; j < srcW; j++) { // LOOP THROUGH COLUMNS
         bolIndex = i + j * srcH;
 
-        //
-        // INTERFEROGRAM
-        //
-
         // GET ZPD INDEX
         zpdIndex = *((int*)(zpdData->pntr[0]) + bolIndex);
 
-        // EXTRACT FFT READY INTERFEROGRAM
+        // BUTTERFLIED INTERFEROGRAM
         for(k = 0; k <= N2; k++) {
           m = zpdIndex + k;
           index = bolIndex + numBol * m;
           IFG[k] = (m < srcN) ? *((double*)(inputData->pntr[0]) + index) : 0.0;
         }
-        for(k = N2 + 1; k < N; k++) {
-          IFG[k] = IFG[N - k];
-        }
-
-        //
-        // SPECTRUM
-        //
+        for(k = N2 + 1; k < N; k++) { IFG[k] = IFG[N - k]; }
 
         // FORWARD FFT INTERFEROGRAM
 	      plan = fftw_plan_dft_r2c_1d(N, IFG, SPEC, FFTW_ESTIMATE);
 	      fftw_execute(plan);
 
-        // WRITE OUT REAL COMPONENT OF THE SPECTRUM
-        for(k = 0; k < outN; k++) {
-          index = bolIndex + numBol * k;
-          *((double*)(outputData->pntr[0]) + index) = fabs(SPEC[k][0]);
+        // WRITE OUT THE REAL COMPONENT OF THE SPECTRUM
+        // SUBARRAYS S8C AND S8D ARE COMPLEMENTARY TO S4A AND S4B, RESPECTIVELY.
+        // THE INTERFEROGRAMS ARE FLIPPED AND HENCE THE SPECTRUM.
+        if( srcSubnum == S8C || srcSubnum == S8D ) {
+          for(k = 0; k < outN; k++) {
+            index = bolIndex + numBol * k;
+            *((double*)(outputData->pntr[0]) + index) = SPEC[k][0];
+          }
+        } else {
+          for(k = 0; k < outN; k++) {
+            index = bolIndex + numBol * k;
+            *((double*)(outputData->pntr[0]) + index) = -SPEC[k][0];
+          }
         }
       } // END FOR LOOP - COLUMNS
     } // END FOR LOOP - ROWS
@@ -243,9 +296,9 @@ void smurf_fts2_spectrum(int* status)
 	  if(SPEC){ fftw_free(SPEC); SPEC = NULL; }
 
     // WRITE OUTPUT
-    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0,
-                      MSG__VERB, status);
+    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0, MSG__VERB, status);
     smf_close_file(&outputData, status);
+
   } // END FOR LOOP - FILES
 
   CLEANUP:

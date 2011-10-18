@@ -12,16 +12,33 @@
 *  Type of Module:
 
 *  Invocation:
+*     fts2_arrayquicksort(array, size, start, end, ascending, status);
 
 *  Description:
 *     Sorts the given array between the specified start and end positions.
 
+*  Arguments:
+*     array = double* (Given)
+*       Pointer to array.
+*     size = int (Given)
+*       Array length
+*     start  = int (Given)
+*       Index to start sorting.
+*     end = int (Given)
+*       Index to stop sorting.
+*     ascending = int (Given)
+*       Determines whether to sort in ascending (>0) order or descending (<= 0)
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
 *  Authors:
-*     Coskun (Josh) OBA (UoL)
+*     Coskun OBA (UoL)
 
 *  History :
-*     2010-08-26 (OBA):
+*     2010-08-26 (COBA):
 *        Original.
+*     2011-10-13 (COBA):
+*        Added status information.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -48,100 +65,64 @@
 *-
 */
 
-/* STANDARD INCLUDES */
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
+// STARLINK INCLUDES
+#include "sae_par.h"
 
-/* STARLINK INCLUDES */
-#include "ast.h"
-
-/* SMURF INCLUDES */
+// SMURF INCLUDES
 #include "fts2.h"
 
 void fts2_arrayquicksort(
-    double* array, 
-    int size, 
-    int start, 
-    int end, 
-    int ascending)
+    double* array,    // Array to sort
+    int size,         // Array size
+    int start,        // Index to start sorting
+    int end,          // Index to stop sorting
+    int ascending,    // Is it in ascending order?
+    int* status)      // Status
 {
+  if(*status != SAI__OK) { return; }
+
 	int i = 0;
 	int j = 0;
 	double tmp = 0.0;
 	double midVal = 0.0;
-	
-  if( array == NULL || 
-      size < 2 || 
-      start < 0 || 
-      start > (size - 1) || 
-      end <= start)
-	{
+
+  if( array == NULL || size < 2 ||  start < 0 || start > (size - 1) || end <= start) {
+    *status = SAI__ERROR;
 	  return;
 	}
 
-	if(end >= size) 
-	{ 
-	  end = size - 1; 
-	}
+	if(end >= size) { end = size - 1; }
 
 	i = start;
 	j = end;
 	tmp = 0;
 	midVal = array[(start + end) >> 1];
-  if(ascending > 0)
-  {
-    do
- 	  {
-		  while(array[i] < midVal) 
-		  { 
-		    i++; 
-		  }
-      while(array[j] > midVal) 
-      { 
-        j--; 
-      }
-      
-      if(i <= j)
-      {
+  if(ascending > 0) {
+    do {
+		  while(array[i] < midVal) { i++; }
+      while(array[j] > midVal) { j--; }
+      if(i <= j) {
         tmp = array[i];
         array[i] = array[j];
         array[j] = tmp;
-        i++; 
+        i++;
         j--;
       }
     } while(i <= j);
-  }
-  else
-  {
-    do
-    {
-      while(array[i] > midVal) 
-      { 
-        i++; 
-      }
-      while(array[j] < midVal) 
-      { 
-        j--; 
-      }
-      
-      if(i <= j)
-      {
+  } else {
+    do {
+      while(array[i] > midVal) { i++; }
+      while(array[j] < midVal) { j--; }
+      if(i <= j) {
         tmp = array[i];
         array[i] = array[j];
         array[j] = tmp;
-        i++; 
+        i++;
         j--;
       }
     } while(i <= j);
   }
 
-  if(start < j) 
-  { 
-    fts2_arrayquicksort(array, size, start, j, ascending); 
-  }
-  if(i < end) 
-  { 
-    fts2_arrayquicksort(array, size, i, end, ascending); 
-  }
+  if(start < j) { fts2_arrayquicksort(array, size, start, j, ascending, status); }
+  if(i < end)   { fts2_arrayquicksort(array, size, i, end, ascending, status); }
 }

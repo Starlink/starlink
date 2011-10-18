@@ -38,6 +38,9 @@
 *        - Add fts2_getmirrorpositions
 *        - Remove fts2_deglitch
 *        - Remove fts2_phasecorrection
+*     2011-10-18 (COBA):
+*        - Defined SMF__FTS2_(LOW/MED/HIGH)RES_SSI
+*        - Add fts2_apodization
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -64,28 +67,42 @@
 *-
 */
 
-/* STARLINK INCLUDES */
+// STARLINK INCLUDES
 #include "jcmt/state.h"
 #include "sc2da/sc2ast.h"
 
-/* SMURF INCLUDES */
+// SMURF INCLUDES
 #include "fts2_type.h"
 #include "libsmf/smf_typ.h"
 
-#ifndef MM2RAD /* scale at array in radians */
+// SCALE AT ARRAY IN RADIANS
+#ifndef MM2RAD
 #define MM2RAD (0.92 * 2.4945e-5)
 #endif
 
-#ifndef PIX2MM /* pixel interval in mm */
+// PIXEL INTERVAL IN MM
+#ifndef PIX2MM
 #define PIX2MM 1.135
 #endif
 
-#ifndef SMF__DEGLITCH_THRESHOLD
-#define SMF__DEGLITCH_THRESHOLD 1.0e-9
+// LOW RESOLUTION SPECTRAL SAMPLING INTERVAL
+#ifndef SMF__FTS2_LOWRES_SSI
+#define SMF__FTS2_LOWRES_SSI 0.25
 #endif
 
-#ifndef SMF__FLAT_THRESHOLD
-#define SMF__FLAT_THRESHOLD 1.0e-10
+// MEDIUM RESOLUTION SPECTRAL SAMPLING INTERVAL
+#ifndef SMF__FTS2_MEDRES_SSI
+#define SMF__FTS2_MEDRES_SSI 0.1
+#endif
+
+// HIGH RESOLUTION SPECTRAL SAMPLING INTERVAL
+#ifndef SMF__FTS2_HIGHRES_SSI
+#define SMF__FTS2_HIGHRES_SSI 0.02
+#endif
+
+// DEGLITCH THRESHOLD
+#ifndef SMF__DEGLITCH_THRESHOLD
+#define SMF__DEGLITCH_THRESHOLD 1.0e-9
 #endif
 
 void fts2_arraycopy(
@@ -95,14 +112,16 @@ void fts2_arraycopy(
     int destinationSize,
     int sourceStart,
     int destinationStart,
-    int count);
+    int count,
+    int* status);
 
 void fts2_arrayquicksort(
     double* array,
     int size,
     int start,
     int end,
-    int ascending);
+    int ascending,
+    int* status);
 
 int fts2_getsplineindex(
     double* x,
@@ -139,4 +158,13 @@ void fts2_getmirrorpositions(
     smfData* data,
     double* positions,
     int* size,
+    int* status);
+
+void fts2_apodization(
+    double* signal,
+    int size,
+    double a,
+    double b,
+    double* window,
+    int apodization,
     int* status);

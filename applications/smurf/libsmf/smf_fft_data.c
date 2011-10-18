@@ -430,7 +430,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
     size_t j;
     dim_t o_fdims[2];
     dim_t o_nbolo;
-    dim_t o_ndims;
+    size_t o_ndims;
     dim_t o_rdims[2];
     int o_isfft;
 

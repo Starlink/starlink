@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     FTS2PHASECORRSS
+*     FTS2PHASECORR
 
 *  Purpose:
 *     Given a 3D data cube of single-sided interferograms, applies phase
@@ -25,10 +25,6 @@
 *     correction and outputs the corresponding 3D interferogram cube.
 *     Although double-sided 3D interferogram cubes can be ingested, it is
 *     recommended that the FTS2PHASECORRDS task is utilized to process them.
-*     IMPORTANT NOTE: Unlike FTS2PHASECORRDS which outputs the 3D spectrum cube,
-*     FTS2PHASECORRSS does NOT output the spectrum cube, instead, it phase
-*     corrects the interferograms but does NOT compute the spectrum.
-*     Hence outputs a 3D phase-corrected interferogram cube.
 
 *  ADAM Parameters:
 *     DEGREE = _INTEGER (Read)
@@ -45,6 +41,8 @@
 *          The lower bound of the wavenumber range
 *     WNUBOUND = _DOUBLE (Read)
 *          The upper bound of the wavenumber range
+*     APODIZATION
+*          Apodization Method
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
@@ -52,6 +50,9 @@
 *  History :
 *     2011-06-20 (COBA):
 *        New version.
+*     2011-10-18 (COBA):
+*        Updated the algorithm. Includes apodization of the phase correction
+*        function
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -103,19 +104,20 @@
 /* FFTW INCLUDES */
 #include <fftw3.h>
 
-#define FUNC_NAME "smurf_fts2_phasecorrss"
-#define TASK_NAME "FTS2PHASECORRSS"
+#define FUNC_NAME "smurf_fts2_phasecorr"
+#define TASK_NAME "FTS2PHASECORR"
 
-void smurf_fts2_phasecorrss(int* status)
+void smurf_fts2_phasecorr(int* status)
 {
   if(*status != SAI__OK) { return; }
 
   // ADAM VARIABLES
-  int       pDegree       = 0;    // Degree of the polynomial used to fit phase
-  int       dsLength2     = 0;    // Half-Length of double-sided interferogram
-  int       pcfLength2    = 0;    // Half-Length of phase correction function
-  double    wnLower       = 0.0;  // Lower bound of wave number range
-  double    wnUpper       = 0.0;  // Upper bound of wave number range
+  int       PDEGREE       = 0;    // Degree of the polynomial used to fit phase
+  int       DSLENGTH2     = 0;    // Half-Length of double-sided interferogram
+  int       PCFLENGTH2    = 0;    // Half-Length of phase correction function
+  double    WNLOWER       = 0.0;  // Lower limit of the band, wavenumber
+  double    WNUPPER       = 0.0;  // Upper limit of the band, wavenumber
+  int       APODIZATION   = -1;   // SMF__FTS2_APODIZATION_NONE  = -1
 
   // INTERNAL VARIABLES
   Grp*      grpInput      = NULL; // Input group
@@ -130,12 +132,12 @@ void smurf_fts2_phasecorrss(int* status)
   int       srcW          = 0;    // Subarray Width
   int       srcN          = 0;    // Source interferogram length
   int       numBol        = 0;    // Number of bolometers in the subarray
+  int       coeffLength   = 0;    // Length of the COEFFS array
   int       pcfLength     = 0;    // Phase correction function size
   int       dsLength      = 0;    // Length of the double-sided interferogram
   int       outN          = 0;    // Output interferogram length
   int       wnL           = 0;    // Index for the lower limit of the band
   int       wnU           = 0;    // Index for the upper limit of the band
-  int       coeffLength   = 0;    // Length of the COEFFS array
   int       i             = 0;    // Row index
   int       j             = 0;    // Column index
   int       k             = 0;    // Frame index
@@ -154,6 +156,7 @@ void smurf_fts2_phasecorrss(int* status)
 	double*   WN            = NULL; // Wavenumbers
   double*   TMPPHASE      = NULL; // Temporary phase
 	double*   FIT           = NULL; // Fitted phase
+	double*   WINDOW        = NULL; // Apodization function
   fftw_plan planA			    = NULL; // fftw plan
   fftw_plan planB			    = NULL; // fftw plan
   fftw_complex* DSIN      = NULL; // Double-Sided interferogram, FFT input
@@ -168,17 +171,18 @@ void smurf_fts2_phasecorrss(int* status)
             &grpOutput, &numOutputFile, status);
 
   // READ IN ADAM PARAMETERS
-  parGet0i("DEGREE",        &pDegree,    status);
-  parGet0i("DSHALFLENGTH",  &dsLength2,  status);
-  parGet0i("PCFHALFLENGTH", &pcfLength2, status);
-  parGet0d("WNLBOUND",      &wnLower,    status);
-  parGet0d("WNUBOUND",      &wnUpper,    status);
+  parGet0i("DEGREE",        &PDEGREE,    status);
+  parGet0i("DSHALFLENGTH",  &DSLENGTH2,  status);
+  parGet0i("PCFHALFLENGTH", &PCFLENGTH2, status);
+  parGet0d("WNLBOUND",      &WNLOWER,    status);
+  parGet0d("WNUBOUND",      &WNUPPER,    status);
+  parGet0i("APODIZATION",   &APODIZATION,status);
 
   // SET ARRAY LENGTHS
-  coeffLength = pDegree + 1;
-  pcfLength2  = (pcfLength2 > dsLength2) ? dsLength2 : pcfLength2;
-  dsLength    = dsLength2 << 1;
-  pcfLength   = pcfLength2 << 1;
+  coeffLength = PDEGREE + 1;
+  PCFLENGTH2  = (PCFLENGTH2 > DSLENGTH2) ? DSLENGTH2 : PCFLENGTH2;
+  dsLength    = DSLENGTH2 << 1;
+  pcfLength   = PCFLENGTH2 << 1;
 
   // BEGIN NDF
   ndfBegin();
@@ -187,6 +191,7 @@ void smurf_fts2_phasecorrss(int* status)
   // LOOP THROUGH EACH INPUT FILE
   // ===========================================================================
   for(fileIndex = 1; fileIndex <= numInputFile; fileIndex++) {
+    // OPEN FILE
     smf_open_file(grpInput, fileIndex, "READ", 0, &inputData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
@@ -197,9 +202,7 @@ void smurf_fts2_phasecorrss(int* status)
     // CHECK FOR ZPD
     if(!(inputData->fts) || !(inputData->fts->zpd)) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME,
-              "The file is NOT initialized for FTS2 data reduction!",
-              status);
+      errRep( FUNC_NAME, "The file is NOT initialized for FTS2 data reduction!", status);
       goto CLEANUP;
     }
     zpdData = inputData->fts->zpd;
@@ -209,30 +212,24 @@ void smurf_fts2_phasecorrss(int* status)
     srcH   = inputData->dims[1];
     srcN   = inputData->dims[2];
     numBol = srcW * srcH;  // NUMBER OF BOLOMETERS IN THE SUBARRAY
-
-    outN = srcN - pcfLength + 1;
+    outN   = srcN - pcfLength + 1;
 
     // GET SOURCE MIRROR POSITIONS
+    POS     = astMalloc(srcN * sizeof(*POS));
     int num = 0;
-    POS = astMalloc(srcN * sizeof(*POS));
     fts2_getmirrorpositions(inputData, POS, &num, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to get the source mirror positions!", status);
       goto CLEANUP;
     }
-    double dz = 4.0 * (POS[1] - POS[0]);  // Sampling Interval in OPD
-    double fs = 1.0 / dz;                 // Sampling Frequency
-    double fnyq = fs / 2.0;               // Nyquist Frequency
-    double df = fnyq / dsLength2;
-    smf_fits_updateD(inputData->hdr, "FNYQUIST", fnyq, "Nyquist Frequency", status);
+    double FNYQUIST   = 1.0 / (8.0 * (POS[1] - POS[0]));
+    double DSIGMA     = FNYQUIST / DSLENGTH2;
+    smf_fits_updateD(inputData->hdr, "FNYQUIST", FNYQUIST, "Nyquist Frequency", status);
     if(POS) { astFree(POS); POS = NULL; }
 
-    // WAVENUMBER INDICES
-    wnL = (int) (dsLength2 * wnLower / fnyq);
-    wnU = (int) (dsLength2 * wnUpper / fnyq);
-
-    // OUTPUT SMFDATA
+    // READY OUTPUT FILE
+    // =========================================================================
     smfData* outputData = smf_deepcopy_smfData( inputData, 0,
                                                 SMF__NOCREATE_DATA |
                                                 SMF__NOCREATE_FTS, 0, 0,
@@ -244,7 +241,6 @@ void smurf_fts2_phasecorrss(int* status)
     outputData->dims[1] = srcH;
     outputData->dims[2] = outN;
     outputData->pntr[0] = (double*) astMalloc((numBol * outN) * sizeof(double));
-
     // MORE.FTS2.ZPD, NEW ZPD INDICES
     smfData* zpd = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
     zpd->dtype   = SMF__INTEGER;
@@ -252,7 +248,6 @@ void smurf_fts2_phasecorrss(int* status)
     zpd->dims[0] = srcW;
     zpd->dims[1] = srcH;
     zpd->pntr[0] = (int*) astMalloc(numBol * sizeof(int));
-
     // MORE.FTS2.FPM, POLYNOM COEFFICIENTS THAT FITS THE PHASE
     smfData* fpm = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
     fpm->dtype   = SMF__DOUBLE;
@@ -261,7 +256,6 @@ void smurf_fts2_phasecorrss(int* status)
     fpm->dims[1] = srcH;
     fpm->dims[2] = coeffLength;
     fpm->pntr[0] = (double*) astCalloc( (numBol * coeffLength), sizeof(double));
-
     // MORE.FTS2.SIGMA, STANDARD DEVIATIONS
     smfData* sigma = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
     sigma->dtype   = SMF__DOUBLE;
@@ -269,23 +263,8 @@ void smurf_fts2_phasecorrss(int* status)
     sigma->dims[0] = srcW;
     sigma->dims[1] = srcH;
     sigma->pntr[0] = (double*) astCalloc(numBol, sizeof(double));
-
-    // ALLOCATE MEMORY FOR ARRAYS
-    IFG      = astMalloc(srcN            * sizeof(*IFG));
-    PHASE    = astMalloc(dsLength        * sizeof(*PHASE));
-    DS       = astMalloc(dsLength        * sizeof(*DS));
-	  DSIN     = fftw_malloc(dsLength      * sizeof(*DSIN));
-	  DSOUT    = fftw_malloc(dsLength      * sizeof(*DSOUT));
-    PCF      = astMalloc(pcfLength       * sizeof(*PCF));
-    PCFIN    = fftw_malloc(dsLength      * sizeof(*PCFIN));
-    PCFOUT   = fftw_malloc(dsLength      * sizeof(*PCFOUT));
-    COEFFS   = astMalloc(coeffLength     * sizeof(*COEFFS));
-    TMPPHASE = astMalloc((dsLength2 + 1) * sizeof(*TMPPHASE));
-    WN       = astMalloc((dsLength2 + 1) * sizeof(*WN));
-    WEIGHTS  = astMalloc((dsLength2 + 1) * sizeof(*WEIGHTS));
-    FIT      = astMalloc((dsLength2 + 1) * sizeof(*FIT));
-
     // =========================================================================
+
     // LOOP THROUGH EACH PIXEL IN THE SUBARRAY
     // =========================================================================
     for(i = 0; i < srcH; i++) { // LOOP THROUGH ROWS
@@ -294,45 +273,58 @@ void smurf_fts2_phasecorrss(int* status)
 
         // GET ZPD INDEX
         zpdIndex = *((int*)(zpdData->pntr[0]) + bolIndex);
+        // ENSURE THAT DSLENGTH2 <= ZPDINDEX
+        DSLENGTH2  = (DSLENGTH2 < zpdIndex) ? DSLENGTH2 : zpdIndex;
+        PCFLENGTH2 = (PCFLENGTH2 > DSLENGTH2) ? DSLENGTH2 : PCFLENGTH2;
+        dsLength   = DSLENGTH2 << 1;
+        pcfLength  = PCFLENGTH2 << 1;
 
-        //
-        // INTERFEROGRAM
-        //
+        // WAVENUMBER INDICES
+        wnL = (int) (DSLENGTH2 * WNLOWER / FNYQUIST);
+        wnU = (int) (DSLENGTH2 * WNUPPER / FNYQUIST);
 
-        // GET SOURCE INTERFEROGRAM
+        // ### ALLOCATE MEMORY
+        IFG       = astMalloc(srcN            * sizeof(*IFG));
+        DS        = astMalloc(dsLength        * sizeof(*DS));
+        PHASE     = astMalloc(dsLength        * sizeof(*PHASE));
+        COEFFS    = astMalloc(coeffLength     * sizeof(*COEFFS));
+        PCF       = astMalloc(pcfLength       * sizeof(*PCF));
+        WN        = astMalloc((DSLENGTH2 + 1) * sizeof(*WN));
+        WEIGHTS   = astMalloc((DSLENGTH2 + 1) * sizeof(*WEIGHTS));
+        FIT       = astMalloc((DSLENGTH2 + 1) * sizeof(*FIT));
+        TMPPHASE  = astMalloc((DSLENGTH2 + 1) * sizeof(*TMPPHASE));
+	      DSIN      = fftw_malloc(dsLength      * sizeof(*DSIN));
+	      DSOUT     = fftw_malloc(dsLength      * sizeof(*DSOUT));
+        PCFIN     = fftw_malloc(dsLength      * sizeof(*PCFIN));
+        PCFOUT    = fftw_malloc(dsLength      * sizeof(*PCFOUT));
+
+        // ### INGEST INTERFEROGRAM FOR THE CURRENT PIXEL
         for(k = 0; k < srcN; k++) {
-          index = bolIndex + numBol * k;
-          IFG[k] = *((double*)(inputData->pntr[0]) + index);
+          IFG[k] = *((double*)(inputData->pntr[0]) + (bolIndex + numBol * k));
         }
 
-        // EXTRACT DOUBLE-SIDED INTERFEROGRAM FOR FFT
-        fts2_arraycopy(IFG, srcN, DS, dsLength, zpdIndex - 1, 0, dsLength2 + 1);
-        fts2_arraycopy(IFG, srcN, DS, dsLength, zpdIndex - dsLength2,
-                        dsLength2 + 1, dsLength2 - 1);
-
-        // TO COMPLEX FOR FFT, FOR NOW C2C FFT
+        // ### EXTRACT DOUBLE-SIDED BUTTERFLIED INTERFEROGRAM
         for(k = 0; k < dsLength; k++) {
-          DSIN[k][0] = DS[k];
-          DSIN[k][1] = 0.0;
+          DS[k] = (k < (zpdIndex - 1)) ? IFG[zpdIndex + k - 1] : IFG[k - zpdIndex + 1];
         }
+        // COMPLEX DOUBLE-SIDED BUTTERFLIED INTERFEROGRAM
+        for(k = 0; k < dsLength; k++) { DSIN[k][0] = DS[k]; DSIN[k][1] = 0.0; }
 
-        // FORWARD FFT DOUBLE-SIDED INTERFEROGRAM
+        // ### FORWARD FFT DOUBLE-SIDED INTERFEROGRAM
 	      planA = fftw_plan_dft_1d(dsLength, DSIN, DSOUT, FFTW_FORWARD, FFTW_ESTIMATE);
 	      fftw_execute(planA);
 
-        //
-        // PHASE
-        //
-
-        // COMPUTE PHASE
+        // ### PHASE
 	      for(k = 0; k < dsLength; k++) { PHASE[k] = atan2(DSOUT[k][1], DSOUT[k][0]); }
 
-        // WAVENUMBERS [0, FNYQ]
-        for(k = 0; k <= dsLength2; k++) { WN[k] = k * df; }
+        // ### WAVENUMBERS [0, FNYQ]
+        for(k = 0; k <= DSLENGTH2; k++) { WN[k] = k * DSIGMA; }
 
-        // WEIGHTS [0, FNYQ]
+        // ### WEIGHTS [0, FNYQ]
+        wnL = (int) (DSLENGTH2 * WNLOWER / FNYQUIST);
+        wnU = (int) (DSLENGTH2 * WNUPPER / FNYQUIST);
 	      double maxWeight = NUM__MIND;
-        for(k = 0; k <= dsLength2; k++) {
+        for(k = 0; k <= DSLENGTH2; k++) {
           if(k < wnL || k > wnU) { WEIGHTS[k] = 0.0; }
           else {
             WEIGHTS[k] = DSOUT[k][0] * DSOUT[k][0] + DSOUT[k][1] * DSOUT[k][1];
@@ -342,82 +334,68 @@ void smurf_fts2_phasecorrss(int* status)
         }
         // NORMALIZE WEIGHTS
 	      if(maxWeight <= 0) { maxWeight = 1; }
-	      for(k = 0; k <= dsLength2; k++) { WEIGHTS[k] /= maxWeight; }
-	      WEIGHTS[0] = WEIGHTS[dsLength2] = 0.0;
+	      for(k = 0; k <= DSLENGTH2; k++) { WEIGHTS[k] /= maxWeight; }
+	      WEIGHTS[0] = WEIGHTS[DSLENGTH2] = 0.0;
 
-        // PHASE [0, FNYQ]
-	      for(k = 0; k <= dsLength2; k++) { TMPPHASE[k] = PHASE[k]; }
-
-	      // PHASE FIT
-        smf_fit_poly1d(pDegree, dsLength2 + 1, CLIP, WN, TMPPHASE, WEIGHTS,
-                       NULL, COEFFS, NULL, FIT, &nUsed, status);
-
-        // STANDARD DEVIATION, MORE.FTS2.SIGMA
+	      // ### PHASE FIT
+	      for(k = 0; k <= DSLENGTH2; k++) { TMPPHASE[k] = PHASE[k]; }
+        smf_fit_poly1d(PDEGREE, DSLENGTH2 + 1, CLIP, WN, TMPPHASE, WEIGHTS, NULL, COEFFS, NULL, FIT, &nUsed, status);
+        // MORE.FTS2.SIGMA, STANDARD DEVIATION,
         double sum   = 0.0;
         double error = 0.0;
-        for(k = 0; k <= dsLength2; k++) {
+        for(k = 0; k <= DSLENGTH2; k++) {
           error += WEIGHTS[k] * (PHASE[k] - FIT[k]) * (PHASE[k] - FIT[k]);
           sum   += WEIGHTS[k];
         }
         *((double*)(sigma->pntr[0]) + bolIndex) = sqrt(error / sum);
-
-        // POLYNOMIAL COEFFICIENTS, MORE.FTS2.FPM
-        for(k = 0; k < coeffLength; k++) {
-          index = bolIndex + numBol * k;
-          *((double*) (fpm->pntr[0]) + index) = COEFFS[k];
-        }
-
-        // NEW ZPD INDICES, MORE.FTS2.ZPD
-        *((int*) (zpd->pntr[0]) + bolIndex) = zpdIndex - pcfLength2 + 1;
-
+        // MORE.FTS2.FPM, POLYNOMIAL COEFFICIENTS
+        for(k = 0; k < coeffLength; k++) { *((double*) (fpm->pntr[0]) + (bolIndex + numBol * k)) = COEFFS[k]; }
+        // MORE.FTS2.ZPD, NEW ZPD INDICES
+        *((int*) (zpd->pntr[0]) + bolIndex) = zpdIndex - PCFLENGTH2 + 1;
         // POLYNOMIAL FITTED PHASE
-        for(k = 0; k < dsLength2; k++) { EVALPOLY(PHASE[k], WN[k], pDegree, COEFFS); }
-        // PHASE(-k) = -PHASE(k)
-        for(k = 1; k < dsLength2; k++) { PHASE[dsLength2 + k] = -PHASE[dsLength2 - k]; }
-        PHASE[0] = PHASE[dsLength2] = 0.0;
+        for(k = 0; k < DSLENGTH2; k++) { EVALPOLY(PHASE[k], WN[k], PDEGREE, COEFFS); }
+        for(k = 1; k < DSLENGTH2; k++) { PHASE[DSLENGTH2 + k] = -PHASE[DSLENGTH2 - k]; } // PHASE(-k) = -PHASE(k)
+        PHASE[0] = PHASE[DSLENGTH2] = 0.0;
 
-        //
-	      // PHASE CORRECTION FUNCTION, PCF
-	      //
-
+        // ### PHASE CORRECTION FUNCTION, PCF
 	      // EXP(-iPHASE)
 	      for(k = 0; k < dsLength; k++) {
 	        PCFIN[k][0] =  cos(PHASE[k]);
 	        PCFIN[k][1] = -sin(PHASE[k]);
 	      }
-
 	      // COMPUTE PCF, INVERSE FFT OF EXP(-iPHASE)
 	      planB = fftw_plan_dft_1d(dsLength, PCFIN, PCFOUT, FFTW_BACKWARD, FFTW_ESTIMATE);
 	      fftw_execute(planB);
-
 	      // NORMALIZE PCF - REAL COMPONENT
 	      for(k = 0; k < dsLength; k++) { PCFOUT[k][0] /= dsLength; }
-
-	      // SHIFT PCF - REAL COMPONENT BY HALF
-	      for(k = 0; k < dsLength2; k++) {
+        // SHIFT PCF - REAL COMPONENT BY HALF
+	      for(k = 0; k < DSLENGTH2; k++) {
 	        double t = PCFOUT[dsLength - 1][0];
 	        for(n = 1; n < dsLength; n++) {
 	          PCFOUT[dsLength - n][0] = PCFOUT[dsLength - (n + 1)][0];
 	        }
 	        PCFOUT[0][0] = t;
 	      }
-
 	      // TRUNCATE PCF - REAL COMPONENT
-	      int M = dsLength2 - pcfLength2;
+	      int M = DSLENGTH2 - PCFLENGTH2;
         for(k = 0; k < pcfLength; k++) { PCF[k] = PCFOUT[M + k][0]; }
-
         // REVERSE PCF FOR CONVOLUTION
-        for(k = 0; k < pcfLength2; k++) {
+        for(k = 0; k < PCFLENGTH2; k++) {
           double t = PCF[k];
           PCF[k] = PCF[pcfLength - k - 1];
           PCF[pcfLength - k - 1] = t;
         }
 
-        //
-        // CONVOLUTION
-        //
+        // ### APODIZE PCF
+        WINDOW = astMalloc(pcfLength * sizeof(*WINDOW));
+        fts2_apodization(PCF, pcfLength, -1.0, 1.0, WINDOW, APODIZATION, status);
+        if(*status != SAI__OK) {
+          *status = SAI__ERROR;
+          errRep(FUNC_NAME, "Unable to apodize phase correction function!", status);
+          goto CLEANUP;
+        }
 
-        // CONVOLVE SOURCE INTERFEROGRAM WITH PCF & UPDATE OUTPUT
+        // ### CONVOLVE SOURCE INTERFEROGRAM WITH PCF & UPDATE OUTPUT
         for(k = 0; k < outN; k++) {
           double t = 0.0;
           for(n = 0; n < pcfLength; n++) {
@@ -426,40 +404,39 @@ void smurf_fts2_phasecorrss(int* status)
           index = bolIndex + numBol * k;
           *((double*)(outputData->pntr[0]) + index) = t;
         }
-      } // END FOR LOOP - COLUMNS
-    } // END FOR LOOP - ROWS
+
+        // ### FREE RESOURCES
+        if(IFG)      { astFree(IFG);              IFG       = NULL; }
+        if(DS)       { astFree(DS);               DS        = NULL; }
+        if(PHASE)    { astFree(PHASE);            PHASE     = NULL; }
+        if(PCF)      { astFree(PCF);              PCF       = NULL; }
+        if(COEFFS)   { astFree(COEFFS);           COEFFS    = NULL; }
+        if(TMPPHASE) { astFree(TMPPHASE);         TMPPHASE  = NULL; }
+        if(WN)       { astFree(WN);               WN        = NULL; }
+        if(WEIGHTS)  { astFree(WEIGHTS);          WEIGHTS   = NULL; }
+        if(FIT)      { astFree(FIT);              FIT       = NULL; }
+        if(WINDOW)   { astFree(WINDOW);           WINDOW    = NULL; }
+        if(DSIN)     { fftw_free(DSIN);           DSIN      = NULL; }
+        if(DSOUT)    { fftw_free(DSOUT);          DSOUT     = NULL; }
+	      if(PCFIN)    { fftw_free(PCFIN);          PCFIN     = NULL; }
+	      if(PCFOUT)   { fftw_free(PCFOUT);         PCFOUT    = NULL; }
+      } // END LOOP THROUGH COLUMNS
+    } // END LOOP THROUGH ROWS
 
     // CLOSE FILE
     if(inputData) { smf_close_file(&inputData, status); }
-
-    // FREE RESOURCES
-    if(IFG)      { astFree(IFG);              IFG       = NULL; }
-    if(DS)       { astFree(DS);               DS        = NULL; }
-    if(PHASE)    { astFree(PHASE);            PHASE     = NULL; }
-    if(PCF)      { astFree(PCF);              PCF       = NULL; }
-    if(COEFFS)   { astFree(COEFFS);           COEFFS    = NULL; }
-    if(TMPPHASE) { astFree(TMPPHASE);         TMPPHASE  = NULL; }
-    if(WN)       { astFree(WN);               WN        = NULL; }
-    if(WEIGHTS)  { astFree(WEIGHTS);          WEIGHTS   = NULL; }
-    if(FIT)      { astFree(FIT);              FIT       = NULL; }
-    if(POS)      { astFree(POS);              POS       = NULL; }
-
-    if(DSIN)     { fftw_free(DSIN);           DSIN      = NULL; }
-    if(DSOUT)    { fftw_free(DSOUT);          DSOUT     = NULL; }
-	  if(PCFIN)    { fftw_free(PCFIN);          PCFIN     = NULL; }
-	  if(PCFOUT)   { fftw_free(PCFOUT);         PCFOUT    = NULL; }
-	  if(planA)    { fftw_destroy_plan(planA);  planA     = NULL; }
-	  if(planB)    { fftw_destroy_plan(planB);  planB     = NULL; }
+	  if(planA)     { fftw_destroy_plan(planA);  planA     = NULL; }
+	  if(planB)     { fftw_destroy_plan(planB);  planB     = NULL; }
 
     // WRITE OUTPUT
     outputData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0,
-                      MSG__VERB, status);
+    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0, MSG__VERB, status);
     smf_close_file(&outputData, status);
-  } // END FOR LOOP - FILES
+  } // END FILE LOOP
 
   CLEANUP:
     // FREE RESOURCES
+    if(POS)      { astFree(POS);              POS       = NULL; }
     if(IFG)      { astFree(IFG);              IFG       = NULL; }
     if(DS)       { astFree(DS);               DS        = NULL; }
     if(PHASE)    { astFree(PHASE);            PHASE     = NULL; }
@@ -469,8 +446,7 @@ void smurf_fts2_phasecorrss(int* status)
     if(WN)       { astFree(WN);               WN        = NULL; }
     if(WEIGHTS)  { astFree(WEIGHTS);          WEIGHTS   = NULL; }
     if(FIT)      { astFree(FIT);              FIT       = NULL; }
-    if(POS)      { astFree(POS);              POS       = NULL; }
-
+    if(WINDOW)   { astFree(WINDOW);           WINDOW    = NULL; }
     if(DSIN)     { fftw_free(DSIN);           DSIN      = NULL; }
     if(DSOUT)    { fftw_free(DSOUT);          DSOUT     = NULL; }
 	  if(PCFIN)    { fftw_free(PCFIN);          PCFIN     = NULL; }
@@ -480,7 +456,7 @@ void smurf_fts2_phasecorrss(int* status)
 	  fftw_cleanup();
 
     // CLOSE FILE
-    if(inputData) { smf_close_file(&inputData, status); }
+    if(inputData)  { smf_close_file(&inputData, status); }
 
     // END NDF
     ndfEnd(status);

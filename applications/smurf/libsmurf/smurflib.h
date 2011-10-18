@@ -91,6 +91,8 @@
 *         Add smurf_fts2_spectrum
 *     2011-09-22 (EC):
 *         Add sc2mapfft
+*     2011-11-18 (COBA):
+*         Rename smurf_fts2_phasecorrss
 
 *     {enter_further_changes_here}
 
@@ -140,8 +142,8 @@ void smurf_fts2_deglitch( int * );
 void smurf_fts2_flatfield( int * );
 void smurf_fts2_freqcorr( int * );
 void smurf_fts2_init( int * );
+void smurf_fts2_phasecorr( int * );
 void smurf_fts2_phasecorrds( int * );
-void smurf_fts2_phasecorrss( int * );
 void smurf_fts2_portimbal( int * );
 void smurf_fts2_removebse( int * );
 void smurf_fts2_spatialwcs( int * );

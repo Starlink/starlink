@@ -254,6 +254,8 @@
 #        On balance I think the RESIST parameter should always use the default
 #        unless there is a specific override. Silently reusing an old value
 #        can be confusing.
+#     2011-10-18 (COBA):
+#         Updated FTS2PHASECORR, FTS2PHASECORRDS and FTS2SPECTRUM
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1755,62 +1757,7 @@ package @PACKAGE@ {
             }
         }
 
-        action fts2phasecorrds {
-
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                prompt {Input data files}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                prompt {Output data files}
-                helpkey *
-            }
-
-            parameter degree {
-                type _INTEGER
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {Fitting polynomial degree}
-                default 1
-                helpkey *
-            }
-
-            parameter wnlbound {
-                type _DOUBLE
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {The lower bound of the wavenumber range}
-                default 0
-                helpkey *
-            }
-
-            parameter wnubound {
-                type _DOUBLE
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {The upper bound of the wavenumber range}
-                default 0
-                helpkey *
-            }
-        }
-
-        action fts2phasecorrss {
+        action fts2phasecorr {
 
             helplib {$SMURF_HELP}
 
@@ -1861,6 +1808,71 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 prompt {Phase correction function half-length}
                 default 128
+                helpkey *
+            }
+
+            parameter wnlbound {
+                type _DOUBLE
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {The lower bound of the wavenumber range}
+                default 0
+                helpkey *
+            }
+
+            parameter wnubound {
+                type _DOUBLE
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {The upper bound of the wavenumber range}
+                default 0
+                helpkey *
+            }
+
+            parameter apodization {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Apodization method}
+                default 0
+                helpkey *
+            }
+        }
+
+        action fts2phasecorrds {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+
+            parameter degree {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Fitting polynomial degree}
+                default 1
                 helpkey *
             }
 
@@ -1966,6 +1978,26 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {Output data files}
+                helpkey *
+            }
+
+            parameter zeropad {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Zero padding}
+                default 1
+                helpkey *
+            }
+
+            parameter resolution {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Spectral Resolution: 0=LowRes, 1=MediumRes, Any=HighRes}
+                default 2
                 helpkey *
             }
         }

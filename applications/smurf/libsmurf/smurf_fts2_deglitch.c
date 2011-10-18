@@ -56,6 +56,8 @@
 *     2011-05-10 (COBA):
 *        - Deglitching of core and tails done within the function
 *        - Look for glitches in core and tail sections of the interferogram
+*     2011-10-18 (COBA):
+*        - Update sorting
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -174,8 +176,7 @@ void smurf_fts2_deglitch(int* status)
   // LOOP THROUGH EACH NDF FILE IN THE INPUT GROUP
   // ===========================================================================
   for(fileIndex = 1; fileIndex <= numInputFile; fileIndex++) {
-    smf_open_and_flatfield(grpInput, grpOutput, fileIndex, NULL, NULL,
-                           NULL, &inputData, status);
+    smf_open_and_flatfield(grpInput, grpOutput, fileIndex, NULL, NULL, NULL, &inputData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
@@ -333,7 +334,12 @@ void smurf_fts2_deglitch(int* status)
             cSDEV[ii] = sqrt(cSDEV[ii] / tcSize);
           }
           // SORT CLUSTER STANDARD DEVIATIONS IN ASCENDING ORDER
-          fts2_arrayquicksort(cSDEV, numCluster, 0, numCluster - 1, 1);
+          fts2_arrayquicksort(cSDEV, numCluster, 0, numCluster - 1, 1, status);
+          if(*status != SAI__OK) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "Unable to sort cluster!", status);
+            goto CLEANUP;
+          }
           avgSDEV = 0.0;
           START = 0;
           STOP  = numCluster * tcSigma;
@@ -401,7 +407,12 @@ void smurf_fts2_deglitch(int* status)
             cSDEV[ii] = sqrt(cSDEV[ii] / tcSize);
           }
           // SORT CLUSTER STANDARD DEVIATIONS IN ASCENDING ORDER
-          fts2_arrayquicksort(cSDEV, numCluster, 0, numCluster - 1, 1);
+          fts2_arrayquicksort(cSDEV, numCluster, 0, numCluster - 1, 1, status);
+          if(*status != SAI__OK) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "Unable to sort cluster!", status);
+            goto CLEANUP;
+          }
           avgSDEV = 0.0;
           START = 0;
           STOP  = numCluster * tcSigma;

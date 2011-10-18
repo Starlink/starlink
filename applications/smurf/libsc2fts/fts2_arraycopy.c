@@ -12,16 +12,39 @@
 *  Type of Module:
 
 *  Invocation:
+*     fts2_arraycopy(source, sourceSize, destination, destinationSize,
+*                    sourceStart, destinationStart, count, status);
 
 *  Description:
-*     Copies the source into the destination with the specified constraints.
+*     Copies a specified number of elements from a starting index in source array
+*     to a destination array with an index to start copy to.
+
+*  Arguments:
+*     source = double* (Given)
+*       Pointer to source array.
+*     sourceSize = int (Given)
+*       Source array length
+*     destination = double* (Given and Returned)
+*        Pointer to destination array.
+*     destinationSize  = int (Given)
+*       Destination array length
+*     sourceStart = int (Given)
+*       Index of the Source array to start copy from
+*     destinationStart = int (Given)
+*       Index of the Destination array to start copy to
+*     count = int (Given)
+*       Number of elements to copy
+*     status = int* (Given and Returned)
+*        Pointer to global status.
 
 *  Authors:
-*     Coskun (Josh) OBA (UoL)
+*     Coskun OBA (UoL)
 
 *  History :
-*     2010-08-26 (OBA):
+*     2010-08-26 (COBA):
 *        Original.
+*     2011-10-13 (COBA):
+*        Added status information.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -48,39 +71,33 @@
 *-
 */
 
-/* STANDARD INCLUDES */
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
+// STARLINK INCLUDES
+#include "sae_par.h"
 
-/* STARLINK INCLUDES */
-#include "ast.h"
-
-/* SMURF INCLUDES */
+// SMURF INCLUDES
 #include "fts2.h"
 
 void fts2_arraycopy(
-    double* source,
-    int sourceSize,
-    double* destination,
-    int destinationSize,
-    int sourceStart,
-    int destinationStart,
-    int count)
+    double* source,       // Source Array
+    int sourceSize,       // Source Array Length
+    double* destination,  // Destination Array
+    int destinationSize,  // Destination Array Length
+    int sourceStart,      // Index of the Source Array to start copy from
+    int destinationStart, // Index of the Destination Array to start copy to
+    int count,            // Number of elements to copy
+    int* status)          // SAI__OK if copy issuccessful, SAI__ERROR otherwise.
 {
-  int i = 0;
-  int j = 0;
-  int k = 0;
+  if(*status != SAI__OK) { return; }
 
-  if( source && destination &&
-      sourceSize > 0 && destinationSize > 0 &&
-      count > 0) {
-    i = sourceStart;
-    j = destinationStart;
-    k = 1;
+  if( source && destination && sourceSize > 0 && destinationSize > 0 && count > 0) {
+    int i = sourceStart;
+    int j = destinationStart;
+    int k = 1;
     while(i < sourceSize && j < destinationSize && k <= count) {
       destination[j++] = source[i++];
       k++;
     }
+  } else {
+    *status = SAI__ERROR;
   }
 }

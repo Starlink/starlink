@@ -156,6 +156,8 @@
 *         Replaced FTS2PHASECORR with FTS2PHASECORRDS and FTS2PHASECORRSS
 *     2011-09-22 (EC):
 *         Add sc2mapfft
+*     2011-08-04 (COBA):
+*         Updated FTS2PHASECORR
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -306,10 +308,10 @@ void smurf_mon( int * status ) {
     smurf_fts2_init( status );
   } else if (strcmp( taskname, "FTS2OPCORR" ) == 0 ) {
     smurf_fts2_spatialwcs( status );
+  } else if (strcmp( taskname, "FTS2PHASECORR" ) == 0 ) {
+    smurf_fts2_phasecorr( status );
   } else if (strcmp( taskname, "FTS2PHASECORRDS" ) == 0 ) {
     smurf_fts2_phasecorrds( status );
-  } else if (strcmp( taskname, "FTS2PHASECORRSS" ) == 0 ) {
-    smurf_fts2_phasecorrss( status );
   } else if (strcmp( taskname, "FTS2PORTIMBAL" ) == 0 ) {
     smurf_fts2_portimbal( status );
   } else if (strcmp( taskname, "FTS2REMOVEBSE" ) == 0 ) {
