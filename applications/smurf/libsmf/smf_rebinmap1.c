@@ -113,18 +113,16 @@
 *        Add weightnorm to interface
 *     2010-11-15 (EC):
 *        Add whichmap to interface
+*     2011-10-18 (EC):
+*        Change to "weighted incremental" from "naive" variance algorithms
 *     {enter_further_changes_here}
 
 *  Notes:
 *     If the variance map is calculated from the scatter of data in
 *     each pixel, rather than using the Gaussian error propagation
-*     formula, the expression used is the "biased weighted sample
-*     variance" divided by the number samples used for the average
-*     (the un-biased estimate is not used since it makes almost no
-*     difference but requires the accumulation of an additional map of
-*     sums --- however, see
-*     __SMF_REBINMAP__UNBIASED_WEIGHTED_SAMPLE_VARIANCE definition
-*     below):
+*     formula, the expression used is the "weighted sample variance"
+*     divided by the number samples used. Naively the calculation
+*     would be something like
 *
 *                  sigma^2 =  sum(w_i)*sum(w_i*x_i^2) - [sum(w_i*x_i)]^2
 *                             ------------------------------------------
@@ -134,9 +132,43 @@
 *                w_i = i'th sample weight (1/variance if supplied, 1 otherwise)
 *                x_i = i'th data sample
 *                  N = number of samples in this pixel
+*
+
+*     However, this algorithm can be numerically unstable because of
+*     the difference of two potentially very large numbers. Therefore
+*     in practice we use something called the "weighted incremental
+*     algorithm" to obtain the population variance estimate, and then
+*     we divide the final answer by N to get the variance of the
+*     mean. The algorithm as described in Wikipedia
+*     http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Weighted_incremental_algorithm
+*     and attributed to D.H.D. West, 1979, Communications of the ACM,
+*     22, 9, 532-535, "Updating Mean and Variance Estimates: An
+*     Improved Method" goes like this:
+*
+*     sumweight = 0
+*     mean = 0
+*     M2 = 0
+*
+*     loop over data samples and weights x_i and w_i:
+*         temp = sumweight + w_i
+*         delta = x_i - mean
+*         R = delta * w_i / temp
+*         mean = mean + R
+*         M2 = M2 + sumweight * delta * R
+*         sumweight = temp
+*
+*     variance_n = M2/sumweight
+*     variance = variance_n * N / (N-1)
+*
+*     Where N is the number of samples, and we set the map pixel value
+*     to mean, and its variance to... variance.
+*
+*     Since changing to this algorithm from the naive one we now calculate
+*     an un-used sum "mapweightsq". At some point we should drop it from
+*     the interface, but for now it is left in for compatibility.
 
 *  Copyright:
-*     Copyright (C) 2006-2010 University of British Columbia
+*     Copyright (C) 2006-2011 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -159,13 +191,6 @@
 *     {note_any_bugs_here}
 *-
 */
-
-
-/* Define the following if we want to use the un-biased weighted sample variance
-   instead. */
-
-/* #define __SMF_REBINMAP__UNBIASED_WEIGHTED_SAMPLE_VARIANCE */
-
 
 
 #include <stdio.h>
@@ -194,6 +219,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   /* Local Variables */
   double *dat=NULL;          /* Pointer to data array */
   size_t dbstride;           /* bolo stride of data */
+  double delta;              /* Offset for weighted mean */
   dim_t di;                  /* data array index */
   size_t dtstride;           /* tstride of data */
   size_t i;                  /* Loop counter */
@@ -203,9 +229,11 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   dim_t nbolo;               /* number of bolos */
   dim_t ntslice;             /* number of time slices */
   smf_qual_t * qual = NULL;  /* Quality pointer */
+  double R;                  /* Another temp variable for variance calc */
   double scalevar;           /* variance scale factor */
   double scaleweight;        /* weights for calculating scalevar */
   size_t t1, t2;             /* range of time slices to re-grid */
+  double temp;               /* Temporary calculation */
   double thisweight;         /* The weight at this point */
   double *var=NULL;          /* Pointer to variance array */
   size_t vbstride;           /* bolo stride of variance */
@@ -213,7 +241,6 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   dim_t vnbolo;              /* number of bolos in variance */
   dim_t vntslice;            /* number of bolos in variance */
   size_t vtstride;           /* tstride of variance */
-
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -296,6 +323,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
     /* Accumulate data and weights in the case that variances are given*/
 
     if( sampvar ) {
+
       /* Measure weighted sample variance for varmap */
       if( qual ) {       /* QUALITY checking version */
 
@@ -316,15 +344,20 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && !(qual[di]&mask) &&
                 (var[vi] != 0) && (mapoff != SMF__BADDIMT) ) {
-
-              thisweight = 1/var[vi];
-              map[mapoff+lut[di]] += thisweight*dat[di];
-              mapweight[mapoff+lut[di]] += thisweight;
-              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
               hitsmap[mapoff+lut[di]] ++;
+              thisweight = 1/var[vi];
 
-              /* Calculate this sum to estimate E(x^2) */
-              mapvar[mapoff+lut[di]] += thisweight*dat[di]*dat[di];
+              /* Weighted incremental algorithm */
+              temp = mapweight[mapoff+lut[di]] + thisweight;
+              delta = dat[di] - map[mapoff+lut[di]];
+              R = delta * thisweight / temp;
+              map[mapoff+lut[di]] += R;
+              mapvar[mapoff+lut[di]] += mapweight[mapoff+lut[di]]*delta*R;
+              mapweight[mapoff+lut[di]] = temp;
+
+              /* We don't need this sum anymore, but calculate it for
+                 consistency with the interface */
+              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
             }
           }
         }
@@ -348,14 +381,20 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                 (var[vi] != VAL__BADD) && (var[vi] != 0) &&
                 (mapoff != SMF__BADDIMT) ) {
 
-              thisweight = 1/var[vi];
-              map[mapoff+lut[di]] += thisweight*dat[di];
-              mapweight[mapoff+lut[di]] += thisweight;
-              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
               hitsmap[mapoff+lut[di]] ++;
+              thisweight = 1/var[vi];
 
-              /* Calculate this sum to estimate E(x^2) */
-              mapvar[mapoff+lut[di]] += thisweight*dat[di]*dat[di];
+              /* Weighted incremental algorithm */
+              temp = mapweight[mapoff+lut[di]] + thisweight;
+              delta = dat[di] - map[mapoff+lut[di]];
+              R = delta * thisweight / temp;
+              map[mapoff+lut[di]] += R;
+              mapvar[mapoff+lut[di]] += mapweight[mapoff+lut[di]]*delta*R;
+              mapweight[mapoff+lut[di]] = temp;
+
+              /* We don't need this sum anymore, but calculate it for
+                 consistency with the interface */
+              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
             }
           }
 	}
@@ -365,6 +404,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
       /* Otherwise use simple error propagation for varmap */
 
       if( qual ) {       /* QUALITY checking version */
+
 	for( i=0; i<nbolo; i++ ) {
           if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=t1; j<=t2; j++ ) {
 
@@ -499,21 +539,15 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
           map[i] = VAL__BADD;
           mapvar[i] = VAL__BADD;
 	} else {
-	  /* Otherwise re-normalize */
-          double tempmap = map[i];
-	  thisweight = 1/mapweight[i];
-	  map[i] *= thisweight;
+	  /* Otherwise re-normalize... although variance only reliable
+             if we had enough samples */
 
-          /* variance only reliable if we had enough samples */
           if( hitsmap[i] >= SMF__MINSTATSAMP ) {
+            double variance_n;
 
-#ifdef __SMF_REBINMAP__UNBIASED_WEIGHTED_SAMPLE_VARIANCE
-            mapvar[i] = (mapweight[i]*mapvar[i] - tempmap*tempmap) /
-              (hitsmap[i]*(mapweight[i]*mapweight[i] - mapweightsq[i]));
-#else
-            mapvar[i] = (mapweight[i]*mapvar[i] - tempmap*tempmap) /
-              (hitsmap[i]*mapweight[i]*mapweight[i]);
-#endif
+            variance_n = mapvar[i] / mapweight[i];
+            mapvar[i] = variance_n  / ((double)hitsmap[i]-1);
+
             /* Work out average scale factor so that supplied weights
                would produce the same map variance estimate as the
                sample variance calculation that we just did. The average
