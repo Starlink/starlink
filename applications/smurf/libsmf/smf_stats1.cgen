@@ -4,8 +4,8 @@
 *     smf_stats1
 
 *  Purpose:
-*     Low-level routine for calculating mean and standard deviation of
-*     a data array.
+*     Low-level routine for calculating mean, median and standard
+*     deviation of a data array.
 
 *  Language:
 *     Starlink ANSI C
