@@ -271,7 +271,7 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
       }
 
       pdata->data = data;
-      pdata->keymap = keymap;
+      pdata->keymap = astCopy(keymap);
       pdata->thresh = thresh;
 
       pdata->ijob = thrAddJob( wf, THR__REPORT_JOB, pdata, smfPCAChunkParallel,
@@ -283,6 +283,12 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
   }
 
  CLEANUP:
-  if( job_data ) job_data = astFree(job_data);
+  if( job_data ) {
+    for( i=0; (i<nchunks); i++ ) {
+      pdata = job_data + i;
+      if( pdata->keymap ) pdata->keymap = astAnnul( pdata->keymap );
+    }
+    job_data = astFree(job_data);
+  }
 
 }
