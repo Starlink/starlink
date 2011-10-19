@@ -1043,6 +1043,7 @@ libraries/kaplibs/kpg/kpg1_cmpk.f
 libraries/kaplibs/kpg/kpg1_cmul.f
 libraries/kaplibs/kpg/kpg1_cmvd.f
 libraries/kaplibs/kpg/kpg1_cmvv.f
+libraries/kaplibs/kpg/kpg1_corr.f
 libraries/kaplibs/kpg/kpg1_cpbd.f
 libraries/kaplibs/kpg/kpg1_cpnd.f
 libraries/kaplibs/kpg/kpg1_cpnt.f
