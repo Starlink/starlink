@@ -14,6 +14,7 @@
 
 *  Description:
 *     Start the ERR system (switches on message deferral).
+*     Enable MSG tuning by users.
 *     Tune the MAXWPL parameter of HDS
 *     Tune the SHELL parameter of HDS - Allow environment variable to
 *     override the ADAM default of C-shell (Note the HDS default is Bourne
@@ -30,8 +31,11 @@
 
 *  Copyright:
 *     Copyright (C) 1991, 1993-1994 Science & Engineering Research
-*     Council. Copyright (C) 1996, 1998 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Council.
+*     Copyright (C) 1996, 1998 Central Laboratory of the Research
+*     Councils.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -51,6 +55,7 @@
 
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
+*     MJC: Malcolm J. Currie (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,8 +73,10 @@
 *       Change HDS shell value from 2 (tcsh) to 1 (csh) as HDS doesn't
 *       fall through to lower numbers if shell unavailable
 *     14-SEP-1998 (AJC):
-*       Indicate succes or failure on exit (subject to ADAM_EXIT set).
-*     {enter_changes_here}
+*       Indicate success or failure on exit (subject to ADAM_EXIT set).
+*     2011 October 18 (MJC):
+*       Added MSG_TUNE to permit user control of MSG tuning parameters.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -105,6 +112,9 @@
 
 *  Initialise task status
       STATUS = SAI__OK
+
+*  Permit users to set MSG tuning via environment variables.
+      CALL MSG_TUNE( 'ENVIRONMENT', 0, STATUS )
 
 *  Increase HDS's maximum working page list size (MAXWPL) from the default
       CALL HDS_TUNE ( 'MAXWPL', PAGE_NUM, STATUS )

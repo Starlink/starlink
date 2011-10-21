@@ -481,6 +481,10 @@ ifelse(__SCRIPTNAME, alink,
 *
       CALL MSG_IFGET( STATUS )
 *
+*  Permit users to set MSG tuning via environment variables.
+*
+      CALL MSG_TUNE( 'ENVIRONMENT', 0, STATUS )
+*
 *   Call the application routine.
 *
       CALL $PROGNAME ( STATUS )
