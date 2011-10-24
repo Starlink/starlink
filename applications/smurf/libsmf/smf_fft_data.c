@@ -453,6 +453,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
               ": supplied output container has incorrect dimensions", status);
     } else {
       retdata = outdata;
+      printf(" outdata container is supplied\n");
     }
   } else {
 
@@ -530,43 +531,42 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
 
     /* Returned data is always bolo-ordered (ignored for maps) */
     retdata->isTordered=0;
+  }
 
-    /* Describe the array dimensions for FFTW guru interface
-       - dims describes the length and stepsize for both the input and
-         output axes
-       - we are using the Starlink array ordering (in case you get confused
-         by how the strides are setup compared to the "normal" FFTW way...
-         but we are using the guru interface so we can do whatever we want)
+  /* Describe the array dimensions for FFTW guru interface
+     - dims describes the length and stepsize for both the input and
+     output axes
+     - we are using the Starlink array ordering (in case you get confused
+     by how the strides are setup compared to the "normal" FFTW way...
+     but we are using the guru interface so we can do whatever we want)
+  */
+
+  dims = astCalloc( ndims, sizeof(*dims) );
+  if( *status == SAI__OK ) {
+
+    /* Forward and inverse strides differ. According to the FFTW
+       docs, the lengths of the last complex (transformed) axis is
+       interpreted as dims.n/2+1 to account for the saved
+       space... but the strides themselves are interpreted literally
+       (shorter for the complex data), hence the slightly confusing
+       mixture of rdims and fdims depending on whether we are doing
+       a forward or inverse transform.
     */
 
-    dims = astCalloc( ndims, sizeof(*dims) );
-    if( *status == SAI__OK ) {
+    (dims[0]).n = rdims[0];
+    (dims[0]).is = 1;
+    (dims[0]).os = 1;
 
-      /* Forward and inverse strides differ. According to the FFTW
-         docs, the lengths of the last complex (transformed) axis is
-         interpreted as dims.n/2+1 to account for the saved
-         space... but the strides themselves are interpreted literally
-         (shorter for the complex data), hence the slightly confusing
-         mixture of rdims and fdims depending on whether we are doing
-         a forward or inverse transform.
-      */
+    for( j=1; j<ndims; j++ ) {
+      (dims[j]).n = rdims[j];
 
-      (dims[0]).n = rdims[0];
-      (dims[0]).is = 1;
-      (dims[0]).os = 1;
-
-      for( j=1; j<ndims; j++ ) {
-        (dims[j]).n = rdims[j];
-
-        if( inverse ) {
-          (dims[j]).is = fdims[j-1]*(dims[j-1]).is;
-          (dims[j]).os = rdims[j-1]*(dims[j-1]).os;
-        } else {
-          (dims[j]).is = rdims[j-1]*(dims[j-1]).is;
-          (dims[j]).os = fdims[j-1]*(dims[j-1]).os;
-        }
+      if( inverse ) {
+        (dims[j]).is = fdims[j-1]*(dims[j-1]).is;
+        (dims[j]).os = rdims[j-1]*(dims[j-1]).os;
+      } else {
+        (dims[j]).is = rdims[j-1]*(dims[j-1]).is;
+        (dims[j]).os = fdims[j-1]*(dims[j-1]).os;
       }
-
     }
 
     /* Set up the job data */
