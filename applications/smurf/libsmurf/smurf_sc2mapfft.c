@@ -35,7 +35,7 @@
 *  ADAM Parameters:
 *     AZAVPSPEC = _LOGICAL (Read)
 *          If true, calculate the azimuthally-averaged angular power
-*          power spectrum. [FALSE]
+*          power spectrum. POLAR and POWER are set implicitly. [FALSE]
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     INVERSE = _LOGICAL (Read)
@@ -46,10 +46,10 @@
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output transformed files.
-*     POLAR = _LOGICAL (Read)
+*     POLAR = _LOGICAL (Update)
 *          Use polar representation (amplitude, argument) of
 *          FFT. [FALSE]
-*     POWER = _LOGICAL (Read)
+*     POWER = _LOGICAL (Update)
 *          Use polar representation of FFT with squared
 *          amplitudes divided by the frequency bin spacing (gives a
 *          power spectral density, PSD). [FALSE]
@@ -158,31 +158,33 @@ void smurf_sc2mapfft( int *status ) {
   /* Are we doing an inverse transform? */
   parGet0l( "INVERSE", &inverse, status );
 
-  /* Are we using polar coordinates instead of cartesian for the FFT? */
-  parGet0l( "POLAR", &polar, status );
+  /* Are we calculating the azimuthally-average power spectrum? */
+  parGet0l( "AZAVPSPEC", &azavpspec, status );
+  if( azavpspec ) {
+    /* If azavpec set we also set power and polar */
+    msgOutif( MSG__NORM, "", TASK_NAME ": AZAVPSPEC implies POWER", status );
+    parPut0l( "POWER", 1, status );
+    power = 1;
+  } else {
+    /* Are we calculating the power spectrum? */
+    parGet0l( "POWER", &power, status );
+  }
 
-  /* Are we going to assume amplitudes are squared? */
-  parGet0l( "POWER", &power, status );
+  if( power ) {
+    /* If power set we also set polar */
+    msgOutif( MSG__NORM, "", TASK_NAME ": POWER implies POLAR", status );
+    parPut0l( "POLAR", 1, status );
+     polar = 1;
+  } else {
+    /* Are we calculating FFT in polar form? */
+    parGet0l( "POLAR", &polar, status );
+   }
 
   /* Are we going to zero bad values first? */
   parGet0l( "ZEROBAD", &zerobad, status );
 
-  /* Are we calculating the azimuthally-average power spectrum? */
-  parGet0l( "AZAVPSPEC", &azavpspec, status );
-  if( azavpspec ) {
-    msgOutif( MSG__NORM, " ", TASK_NAME
-              ": azimuthally-averaged power spectrum requested so setting "
-              "POWER=TRUE", status );
-    power = 1;
-    polar = 1;
-  }
 
-  /* If power is true, we must be in polar form */
-  if( power && !polar) {
-    msgOutif( MSG__NORM, " ", TASK_NAME
-              ": power spectrum requested so setting POLAR=TRUE", status );
-    polar = 1;
-  }
+
 
   for( i=1;(*status==SAI__OK)&&i<=size; i++ ) {
     smf_open_file( igrp, i, "READ", SMF__NOTTSERIES, &idata, status );
@@ -195,7 +197,7 @@ void smurf_sc2mapfft( int *status ) {
       break;
     }
 
-    /* If zeroing VAL__BADD make a local copy that we can modify */
+    /* If zeroing VAL__BADD, make a local copy that we can modify */
     if( (*status==SAI__OK) && zerobad ) {
       double *d=NULL;
       smfData *tempdata=NULL;
@@ -237,7 +239,7 @@ void smurf_sc2mapfft( int *status ) {
         smf_fft_cart2pol( odata, 0, power, status );
       }
 
-      /* Calcular azimuthally-averaged angular power spectrum if requested */
+      /* Calculate azimuthally-averaged angular power spectrum if requested */
       if( azavpspec ) {
         smfData *tempdata=NULL;
 
