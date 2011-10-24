@@ -190,7 +190,7 @@ smfData *smf_fft_2dazav( const smfData *data, double *df, int *status ) {
 
     for( i=0; (*status==SAI__OK)&&(i<fdims[0]); i++ ) {
 
-      x = FFT_INDEX_TO_FREQ(i,fdims[0]) * df0[0];
+      x = FFT_INDEX_TO_FREQ(i,rdims[0]) * df0[0];
 
       for( j=0; j<fdims[1]; j++ ) {
         /* Work out cartesian distance from origin (which is at 0,0
@@ -198,14 +198,14 @@ smfData *smf_fft_2dazav( const smfData *data, double *df, int *status ) {
            indices multiplied by the frequency step size along each
            axis. */
 
-        y = FFT_INDEX_TO_FREQ(j,fdims[1]) * df0[1];
+        y = FFT_INDEX_TO_FREQ(j,rdims[1]) * df0[1];
 
         /* The final distance is just truncated to an integer number of
            steps in the return array */
         d = (size_t) (sqrt(x*x + y*y) / df_o);
 
         /* Only consider frequencies up to Nyquist */
-        if( d < (nf_o-1) ) {
+        if( d < nf_o ) {
           /* Accumulate values at this radius */
           odata[d] += idata[i+j*fdims[0]];
           count[d]++;
