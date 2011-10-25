@@ -157,7 +157,13 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
   /* Convert frequencies to array indices (but only consider above DC) */
   i_flo = smf_get_findex( minfreq, df, nf, status );
   i_wlo = smf_get_findex( whitefreq, df, nf, status );
-  i_whi = smf_get_findex( maxfreq, df, nf, status );
+
+  if( !maxfreq ) {
+    /* If maxfreq is 0 set to Nyquist */
+    i_whi = nf-1;
+  } else {
+    i_whi = smf_get_findex( maxfreq, df, nf, status );
+  }
 
   if( i_flo+box*2 > nf ) {
     *status = SAI__ERROR;
@@ -173,7 +179,9 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
 
   if( (*status==SAI__OK) && ((i_flo > i_wlo) || (i_wlo > i_whi)) ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": must have maxfreq > whitefreq > minfreq", status );
+    errRepf( "", FUNC_NAME
+            ": must have i_maxfreq (%zu) > i_whitefreq (%zu) > "
+             "i_minfreq (%zu)", status, i_whi, i_wlo, i_flo );
   }
 
   /* Calculate the white noise level */
@@ -251,6 +259,11 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
              B = fit[1]                                           */
 
     nfit = i+box/2-i_flo;
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME
+               ": i_flow=%zu nfit=%zu i_wlo=%zu i_whi=%zu\n", status,
+               i_flo, nfit-1, i_wlo, i_whi);
+
 
     /* If we've entered the white-noise band in order to fit the 1/f
        noise give up */
