@@ -55,10 +55,11 @@
 *     1 good sample. If requested, medians are calculated by sorting
 *     the data with the system qsort routine and picking off the
 *     central value. However, status is set to SMF__INSMP if there are
-*     not at least SMF__MINSTATSAMP good samples.
+*     not at least SMF__MINSTATSAMP good samples. If a quality array is
+*     supplied but it does not flag bad values, it should be caught by a
+*     final check for finite values and bad status will be set.
 
 *  Notes:
-
 *     The median is calculated using the system qsort.  The mean and
 *     variance are calculated using the "on-line" algorithm for
 *     improved numerical stability over naive algorithms as described
@@ -172,6 +173,7 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
   /* Local variables */
   size_t count=0;             /* Number of samples in estimate */
   double delta;               /* Work variable for variance */
+  int failed=0;               /* Flag indicating that we failed */
   size_t i;                   /* Loop counter */
   size_t j;                   /* Loop counter */
   double mu=0;                /* Estimate of the mean */
@@ -324,6 +326,24 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
 
   }
 
+  /* Trap junk values: this can happen if the user provided a quality
+     array that missed some bad values. */
+  if( median && !isfinite(*median) ) {
+    *median = CGEN_BAD;
+    failed = 1;
+  }
+
+  if( !isfinite(mu) || !isfinite(mu) ) {
+    failed = 1;
+  }
+
+  if( failed ) {
+    count = 0;
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": programming error, non-finite value ecountered",
+            status );
+  }
+
   /* Calculate numbers as long as count > 0 */
   if( count > 0 ) {
     if( mean ) *mean = mu;
@@ -335,7 +355,7 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
   if( ngood ) *ngood = count;
 
   /* Enough samples? */
-  if( count < SMF__MINSTATSAMP ) {
+  if( (*status == SAI__OK) && (count < SMF__MINSTATSAMP) ) {
     *status = SMF__INSMP;
     msgSeti("MIN",SMF__MINSTATSAMP);
     msgSeti("N", count );
@@ -343,7 +363,6 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
     errRep( "", FUNC_NAME
             ": Insufficient number of good samples (^N<^MIN out of ^MX) for "
             "statistics", status );
-    return;
   }
 
 }
