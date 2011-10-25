@@ -3852,13 +3852,71 @@ package @PACKAGE@ {
 
         }
 
+        action sc2filtermap {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input NDF data structure}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF data structure}
+                helpkey *
+            }
+
+            parameter whiten {
+                type _LOGICAL
+                access UPDATE
+                vpath {DEFAULT }
+                prompt {Whiten the map power spectrum?}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter whiterefmap {
+                type NDF
+                access READ
+                vpath {DEFAULT }
+                prompt {Reference map for whitening filter}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter zerobad {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Set bad values to 0 before calculating FFT?}
+                ppath GLOBAL CURRENT
+                default TRUE
+                helpkey *
+            }
+
+        }
+
         action sc2mapfft {
 
             helplib {$SMURF_HELP}
 
             parameter azavpspec {
                 type _LOGICAL
-                vpath {DEFAULT }
+                access READ
+                vpath {DEFAULT}
                 prompt {Calculate azimuthally averaged angular power spectrum?}
                 ppath GLOBAL CURRENT
                 default FALSE
@@ -3898,6 +3956,7 @@ package @PACKAGE@ {
 
             parameter polar {
                 type _LOGICAL
+                access UPDATE
                 vpath {DEFAULT }
                 prompt {Use polar instead of cartesian representation of FFT?}
                 ppath GLOBAL CURRENT
@@ -3907,6 +3966,7 @@ package @PACKAGE@ {
 
             parameter power {
                 type _LOGICAL
+                access UPDATE
                 vpath {DEFAULT }
                 prompt {Calculate power spectrum (in polar coordinates)?}
                 ppath GLOBAL CURRENT
@@ -3924,7 +3984,6 @@ package @PACKAGE@ {
             }
 
         }
-
 
         action sc2pca {
 

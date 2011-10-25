@@ -91,8 +91,10 @@
 *         Add smurf_fts2_spectrum
 *     2011-09-22 (EC):
 *         Add sc2mapfft
-*     2011-11-18 (COBA):
+*     2011-10-18 (COBA):
 *         Rename smurf_fts2_phasecorrss
+*     2011-10-24 (EC):
+*         Add sc2filtermap
 
 *     {enter_further_changes_here}
 
@@ -165,6 +167,7 @@ void smurf_sc2clean( int * );
 void smurf_sc2concat( int * );
 void smurf_sc2expandmodel( int * );
 void smurf_sc2fft( int * );
+void smurf_sc2filtermap( int * );
 void smurf_sc2mapfft( int * );
 void smurf_sc2pca( int * );
 void smurf_sc2sim( int * );

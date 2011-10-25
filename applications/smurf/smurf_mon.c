@@ -158,6 +158,8 @@
 *         Add sc2mapfft
 *     2011-08-04 (COBA):
 *         Updated FTS2PHASECORR
+*     2010-10-24 (EC):
+*         Add sc2filtermap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -352,6 +354,8 @@ void smurf_mon( int * status ) {
     smurf_sc2expandmodel( status );
   } else if (strcmp( taskname, "SC2FFT" ) == 0 ) {
     smurf_sc2fft( status );
+  } else if (strcmp( taskname, "SC2FILTERMAP" ) == 0 ) {
+    smurf_sc2filtermap( status );
   } else if (strcmp( taskname, "SC2MAPFFT" ) == 0 ) {
     smurf_sc2mapfft( status );
   } else if (strcmp( taskname, "SC2PCA" ) == 0 ) {

@@ -15,7 +15,7 @@
 *  Invocation:
 
 *     smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
-*                           int complement, int whiten, int *status )
+*                           int complement, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -25,12 +25,8 @@
 *     filter = smfFilter* (Given and Returned)
 *        A smfFilter to apply to the supplied data
 *     complement = int (Given)
-*        If 1 set the filter to its complement (and whitening filter
-*        if selected) before applying to the data.
+*        If 1 set the filter to its complement before applying to the data.
 *        If -1 set the filter back to its original state, and then apply it.
-*     whiten = int (Given)
-*        If set, prior to applying the supplied filter, apply a whitening
-*        filter.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -92,7 +88,7 @@
 #define FUNC_NAME "smf_filter2d_execute"
 
 void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
-                           int complement, int whiten, int *status ) {
+                           int complement, int *status ) {
 
   double *data_i=NULL;          /* Imaginary part of the transformed data */
   double *data_r=NULL;          /* Real part of the transformed data */
@@ -184,7 +180,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     } else {
       for( i=0; i<nfdata; i++ ) {
         data_r[i] *= filt->real[i];
-        data_i[i] *= filt->imag[i];
+        data_i[i] *= filt->real[i];
       }
     }
   }

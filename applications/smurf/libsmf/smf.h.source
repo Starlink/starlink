@@ -477,9 +477,11 @@
 /* Macro to convert a pixel index in an FFT to a frequency index: if there
    are N samples in real space, the indices up to N/2+1 in frequency space
    are unique, and then the remaining samples are the complex conjugate of
-   the first half (negative frequencies)... thanks GM */
+   the first half (negative frequencies). Since the return value can be
+   negative we type cast everything as a signed int. thanks GM */
 
-#define FFT_INDEX_TO_FREQ(index,N) ((index + (N-1)/2 % N) - (N-1)/2)
+#define FFT_INDEX_TO_FREQ(index,N) \
+  ((((int)index + ((int)N-1)/2) % (int)N) - ((int)N-1)/2)
 
 /* These macros can be enabled to replace the AST malloc routines with
    system default routines. This can sometimes help debuggers and tools
@@ -986,7 +988,10 @@ void smf_filter_complement( smfFilter *filt, int *status );
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 
 void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
-                           int complement, int whiten, int *status );
+                           int complement, int *status );
+
+void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
+                          double minfreq, double maxfreq, int *status );
 
 void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
                          int complement, int whiten, int *status );

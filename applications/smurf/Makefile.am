@@ -61,6 +61,7 @@ sc2clean \
 sc2concat \
 sc2expandmodel \
 sc2fft \
+sc2filtermap \
 sc2mapfft \
 sc2pca \
 sc2sim \

@@ -30,7 +30,7 @@
 *        If -1 set the filter back to its original state, and then apply it.
 *     whiten = int (Given)
 *        If set, prior to applying the supplied filter, apply a whitening
-*        filter.
+*        filter to each bolometer,
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -40,7 +40,9 @@
 *     is supplied smf_filter_execute will not use any of the "thr" threads
 *     routines. However, this function is thread safe, so that
 *     smf_filter_execute can be called as part of a higher-level parallelized
-*     routine in this case.
+*     routine in this case. If a 2d map is supplied, the data and filter will
+*     be passed gracefully to smf_filter2d_execute, and the "whiten" parameter
+*     will be ignored.
 
 *  Notes:
 
@@ -527,7 +529,7 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
   }
 
   if( filt->ndims == 2 ) {
-    smf_filter2d_execute( wf, data, filt, complement, whiten, status );
+    smf_filter2d_execute( wf, data, filt, complement, status );
     return;
   }
 
