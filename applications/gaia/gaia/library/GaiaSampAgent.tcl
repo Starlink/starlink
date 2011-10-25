@@ -61,7 +61,6 @@ itcl::class gaia::GaiaSampAgent {
       return {
          image.load.fits
          coord.pointAt.sky
-         gaia.execute.tcl
          table.load.votable
          table.select.rowList
          table.highlight.row
@@ -123,12 +122,16 @@ itcl::class gaia::GaiaSampAgent {
    #
    #  If an error is encountered while executing the script, a SAMP error
    #  response will result.
-   public method gaia.execute.tcl {sender_id param_list} {
-      array set params $param_list
-      set script $params(script)
-      set result(value) [eval $script]
-      return [array get result]
-   }
+   #
+   #  Withdrawn as potential security risk, made worse by SAMP opening
+   #  up to web-applications.
+   #
+   #public method gaia.execute.tcl {sender_id param_list} {
+   #   array set params $param_list
+   #   set script $params(script)
+   #   set result(value) [eval $script]
+   #   return [array get result]
+   #}
 
    #  Load a VOTable as a catalogue.
    public method table.load.votable {sender_id param_list} {
