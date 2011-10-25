@@ -453,7 +453,6 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
               ": supplied output container has incorrect dimensions", status);
     } else {
       retdata = outdata;
-      printf(" outdata container is supplied\n");
     }
   } else {
 
