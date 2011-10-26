@@ -77,7 +77,7 @@
 *     VARIANCE (N_MEASUREMENTS) = REAL (Given)
 *              the variance on DATA
 *     SUB_WAVELENGTH            = REAL (Given)
-*              the wavelength of the measurements
+*              the wavelength of the measurements in microns
 *     SUB_INSTRUMENT            = CHARACTER*(*) (Given)
 *              the name of the sub-instrument used
 *     SUB_FILTER                = CHARACTER*(*) (Given)
