@@ -3856,6 +3856,26 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter filt_edgehigh {
+                type _REAL
+                access UPDATE
+                vpath {DEFAULT }
+                prompt {High-pass filter frequency (1/arcsec)?}
+                ppath GLOBAL CURRENT
+                default 0
+                helpkey *
+            }
+
+            parameter filt_edgelow {
+                type _REAL
+                access UPDATE
+                vpath {DEFAULT }
+                prompt {Low-pass filter frequency (1/arcsec)?}
+                ppath GLOBAL CURRENT
+                default 0
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -3875,6 +3895,16 @@ package @PACKAGE@ {
                 ppath GLOBAL CURRENT
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Output NDF data structure}
+                helpkey *
+            }
+
+            parameter outfilter {
+                type NDF
+                access WRITE
+                vpath {DEFAULT }
+                ppath GLOBAL CURRENT
+                prompt {Output NDF container for filter}
+                default !
                 helpkey *
             }
 

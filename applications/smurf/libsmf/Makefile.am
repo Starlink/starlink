@@ -147,6 +147,7 @@ smf_fillgaps.c \
 smf_filter_complement.c \
 smf_filter_edge.c \
 smf_filter_execute.c \
+smf_filter2d_edge.c \
 smf_filter2d_execute.c \
 smf_filter2d_whiten.c \
 smf_filter_fromkeymap.c \
@@ -377,6 +378,7 @@ smf_write_itermap.c \
 smf_write_sampcube.c \
 smf_write_shortmap.c \
 smf_write_smfData.c \
+smf_write_smfFilter.c \
 smf_wvm225_to_cso225.c \
 $(BUILT_C_ROUTINES)
 

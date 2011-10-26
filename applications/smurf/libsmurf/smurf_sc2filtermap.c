@@ -29,6 +29,10 @@
 *     Transforming data loses the VARIANCE and QUALITY components.
 
 *  ADAM Parameters:
+*     FILT_EDGEHIGH = _REAL (Write)
+*          High-pass filter frequency (1/arcsec)
+*     FILT_EDGELOW = _REAL (Write)
+*          Low-pass filter frequency (1/arcsec)
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     MSG_FILTER = _CHAR (Read)
@@ -37,6 +41,8 @@
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output transformed files.
+*     OUTFILTER = NDF (Write)
+*          Optional NDF for the filter.
 *     WHITEN = _LOGICAL (Read)
 *          If selected, measure azimuthally-averaged angular power
 *          spectrum in WHITEREFMAP, fit a model A/F^B + W, and apply
@@ -111,7 +117,11 @@
 
 void smurf_sc2filtermap( int *status ) {
 
+  Grp *fgrp = NULL;         /* Output filter group */
   smfFilter *filt=NULL;     /* Filter */
+  double filt_edgehigh=0;   /* High-pass filter */
+  double filt_edgelow=0;    /* Low-pass filter */
+  size_t fsize;             /* Number of files in fgrp */
   size_t i;                 /* Loop (grp) counter */
   smfData *idata;           /* Pointer to input smfData */
   Grp *igrp = NULL;         /* Input group of files */
@@ -140,13 +150,29 @@ void smurf_sc2filtermap( int *status ) {
   size = grpGrpsz( igrp, status );
 
   if (size > 0) {
+    int parstate=0;           /* ADAM parameter state */
+
     /* Get output file(s) */
     kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
                &ogrp, &outsize, status );
+
+    /* Write out the filter? */
+    parState( "OUTFILTER", &parstate, status );
+    if( parstate != PAR__GROUND ) {
+      printf("here.... %i\n", parstate);
+      kpg1Wgndf( "OUTFILTER", igrp, size, size,
+                 "More output filter files required...",
+                 &fgrp, &fsize, status );
+    }
+
   }
 
   /* Are we going to zero bad values first? */
   parGet0l( "ZEROBAD", &zerobad, status );
+
+  /* High/low-pass filters? */
+  parGet0d( "FILT_EDGEHIGH", &filt_edgehigh, status );
+  parGet0d( "FILT_EDGELOW", &filt_edgelow, status );
 
   /* Are we applying a spatial whitening filter? */
   parGet0l( "WHITEN", &whiten, status );
@@ -240,22 +266,40 @@ void smurf_sc2filtermap( int *status ) {
 
     filt = smf_create_smfFilter( idata, status );
     /* Set to the identity in case no whitening is applied */
+    msgOut( "", TASK_NAME ": initializing filter", status );
     smf_filter_ident( filt, 0, status );
 
     if( whiten ) {
+      msgOut( "", TASK_NAME ": whitening the filter", status );
       smf_filter2d_whiten( wf, filt, wrefmap, 0, 0, status );
+    }
+
+    if( filt_edgelow ) {
+      msgOutf( "", TASK_NAME ": applying low-pass at < %lg 1/arcsec", status,
+               filt_edgelow );
+      smf_filter2d_edge( filt, filt_edgelow, 1, status );
+    }
+
+    if( filt_edgehigh ) {
+      msgOutf( "", TASK_NAME ": applying high-pass at >= %lg 1/arcsec", status,
+               filt_edgehigh );
+      smf_filter2d_edge( filt, filt_edgehigh, 0, status );
     }
 
     smf_filter_execute( wf, odata, filt, 0, 0, status );
 
+    /* Export the data to a new file */
+    smf_write_smfData( odata, NULL, NULL, ogrp, i, 0, MSG__NORM, status );
+
+    /* Write out filters? */
+    if( fgrp ) smf_write_smfFilter( filt, NULL, fgrp, i, status );
     if( filt ) smf_free_smfFilter( filt, status );
 
-    /* Export the data to a new file */
-    smf_write_smfData( odata, NULL, NULL, ogrp, i, 0, MSG__VERB, status );
   }
 
   /* Tidy up after ourselves */
 
+  if( fgrp ) grpDelet( &fgrp, status);
   if( igrp ) grpDelet( &igrp, status);
   if( ogrp ) grpDelet( &ogrp, status);
   if( wgrp ) grpDelet( &wgrp, status );
