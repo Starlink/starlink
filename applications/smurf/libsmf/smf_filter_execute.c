@@ -96,6 +96,8 @@
 *        - Use smf_apodize to apodise the data.
 *     2011-04-26 (DSB):
 *        Remove the effects of apodisation from the filtered data.
+*     2011-10-26 (EC):
+*        Once again apply normalization here immediately after transforms
 
 *  Copyright:
 *     Copyright (C) 2011 Science & Technology Facilities Council.
@@ -288,7 +290,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 
   /* If required, create arrays holding the inverted filter values */
   if( invert ) {
-    unit = 1.0/filt->rdims[0];
+    unit = 1.0;
 
     if( filt->isComplex ) {
 
@@ -390,14 +392,19 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
          fftw_execute_split_dft_r2c( pdata->plan_forward, base,
                                      data_fft_r, data_fft_i );
 
-         /* Whiten the power spectrum if requested. Also do 1/ntslice
-            normalization here if we're not applying a smfFilter to the
-            data */
-         if( (iloop==0) && (pdata->whiten) ) {
-           double scale = use_filt_r ? 0 : 1. / (double ) filt->rdims[0];
+         /* Apply 1/N normalization */
+         if( *status == SAI__OK ) {
+           double val = 1. / (double) filt->rdims[0];
+           for( j=0; j<filt->fdims[0]; j++ ) {
+             data_fft_r[j] *= val;
+             data_fft_i[j] *= val;
+           }
+         }
 
+         /* Whiten the power spectrum if requested. */
+         if( (iloop==0) && (pdata->whiten) ) {
            smf_whiten( data_fft_r, data_fft_i, filt->df[0], filt->fdims[0], 50,
-                       scale, pdata->complement, status );
+                       pdata->complement, status );
          }
 
          /* Apply the frequency-domain filter. Skip this step if the

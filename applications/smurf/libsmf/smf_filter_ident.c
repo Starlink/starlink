@@ -45,6 +45,8 @@
 *        -Switch to split real/imaginary arrays for smfFilter
 *     2011-10-03 (EC):
 *        Handle 2-d map filters
+*     2011-10-26 (EC):
+*        Once again move normalization back to smf_filter_execute for clarity
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,8 +94,6 @@
 void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
   dim_t i;         /* Loop counter */
   size_t nfdata;   /* Number of frequency-space data values */
-  size_t nrdata;   /* Number of real-space data values */
-  double val;      /* Value to set each element includes normalization */
 
   if (*status != SAI__OK) return;
 
@@ -109,23 +109,17 @@ void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
     return;
   }
 
-  /* The filter values are set to 1/nrdata -- this normalization is required
-     given the FFTW convention */
-  nrdata=1;
+  /* The filter values are initialized to a real value of 1 */
   nfdata=1;
   for( i=0; i<filt->ndims; i++ ) {
-    nrdata *= filt->rdims[i];
     nfdata *= filt->fdims[i];
   }
 
-  val = 1./ (double) nrdata;
-
-  /* Allocate space for real and imaginary parts and initialize */
   filt->real = astMalloc( nfdata*sizeof(*filt->real) );
 
   if( *status == SAI__OK ) {
     for( i=0; i<nfdata; i++ ) {
-      filt->real[i] = val;
+      filt->real[i] = 1;
     }
   }
 

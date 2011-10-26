@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
-*                 double scale, int complement, int *status );
+*                 int complement, int *status );
 
 *  Arguments:
 *     re = double * (Given and Returned)
@@ -27,13 +27,8 @@
 *        number of frequencies in the FFT
 *     box = size_t (Given)
 *        rolling box size for identifying 1/f region
-*     scale = double (Given)
-*        If non-zero apply this scale factor to the amplitude of each element
-*        in the FFT (e.g. the 1/ntslice normalization required if no smfFilter
-*        is being applied to the data.)
 *     complement = int (Given)
-*        If set, apply the complement of the whitening filter, where the
-*        reference value is taken to be the value of scale (1 otherwise).
+*        If set, apply the complement of the whitening filter.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -63,6 +58,8 @@
 *        - add sanity checks for 1/f fitting frequencies and exponent
 *     2011-10-06 (EC):
 *        Moved power spectrum fitting into smf_fit_pspec
+*     2011-10-26 (EC):
+*        Remove scale from interface as it is no longer needed
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,7 +106,7 @@
 #define FUNC_NAME "smf_whiten"
 
 void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
-                 double scale, int complement, int *status ) {
+                 int complement, int *status ) {
 
   double A;              /* Amplitude of 1/f component */
   double B;              /* Exponent of 1/f component */
@@ -151,8 +148,7 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
 
   smf_fit_pspec( pspec, nf, box, df, 0, 5, 20, &A, &B, &white, status );
 
-  /* If the fit failed all we will do is apply the scaling factor, so
-     fudge the model fit to be flat, and annul status */
+  /* If the fit failed all we will do is multiply by 1 */
 
   if( *status == SMF__BADFIT ) {
     A = 1;
@@ -163,7 +159,6 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
 
   if( *status == SAI__OK ) {
     double amp;
-    double thescale=1.;
 
     /* When we divide the power spectrum by the whitening filter we
        want it to result in the white noise level, so we divide A by
@@ -175,25 +170,23 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
     B = B / 2.;
 
     /* Now we apply the whitening, divided both the real and imaginary
-       parts by (1 + A * x^B) (and we explicitly set the 0th element to 0).
-       Also apply the scale factor here if it was requested */
+       parts by (1 + A * x^B) (and we explicitly set the 0th element
+       to 0). */
 
     re[0] = 0;
     im[0] = 0;
 
-    if( scale ) thescale = scale;
-
     if( complement ) {
       /* Applying the complement of the whitening filter */
       for( i=1; i<nf; i++ ) {
-        amp = thescale * ( 1. - 1. / (1. + A * pow( (double) i*df, B )) );
+        amp = 1. - 1. / (1. + A * pow( (double) i*df, B ));
         re[i] *= amp;
         im[i] *= amp;
       }
     } else {
       /* Applying the whitening filter */
       for( i=1; i<nf; i++ ) {
-        amp = thescale / (1. + A * pow( (double) i*df, B ));
+        amp = 1. / (1. + A * pow( (double) i*df, B ));
         re[i] *= amp;
         im[i] *= amp;
       }

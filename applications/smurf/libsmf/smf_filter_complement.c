@@ -25,11 +25,9 @@
 
 *  Description:
 *     This function calculates the complementary filter as
-*               new_k = ( 1/ntslice - old_k ),
-*     where new_k is the new filter value at frequency k, and old_k is the
-*     previous value. 1/ntslice is the reference value because it is how
-*     the identity filter values are normalized. The data type will be
-*     preserved.
+*               new_k = ( 1 - old_k ),
+*     where new_k is the new filter value at frequency k, and old_k is
+*     the previous value. The data type will be preserved.
 
 *  Notes:
 
@@ -42,6 +40,8 @@
 *        Initial version
 *     2011-10-03 (EC):
 *        Handle 2-d map filters
+*     2011-10-26 (EC):
+*        smfFilters no longer perform the normalization of the FFT
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,7 +88,6 @@
 
 void smf_filter_complement( smfFilter *filt, int *status ) {
   size_t i;         /* Loop counter */
-  size_t nrdata;    /* Number of real-space data points */
   size_t nfdata;    /* Number of frequency-space data points */
   double ref;       /* Reference value for complement */
 
@@ -109,15 +108,13 @@ void smf_filter_complement( smfFilter *filt, int *status ) {
   /* If this is an un-initialized filter simply return */
   if( !filt->real ) return;
 
-  /* The reference values are normalized to 1/nrdata -- by FFTW convention */
-  nrdata=1;
+  /* The reference value for the complement is 1 */
   nfdata=1;
   for( i=0; i<filt->ndims; i++ ) {
-    nrdata *= filt->rdims[i];
     nfdata *= filt->fdims[i];
   }
 
-  ref = 1./(double) nrdata;
+  ref = 1.;
 
   for( i=0; i<nfdata; i++ ) {
     filt->real[i] = ref - filt->real[i];
