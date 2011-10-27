@@ -376,6 +376,12 @@ C     Get the wavelength from the FITS header. Needed in microns
      :        IN_AX_PTR, ITEMP, STATUS )
       END IF
 
+*     Basic sanity checking of data. The sky temperatures should not be
+*     negative and the sky temp of the highest airmass reading should
+*     be higher than the sky temp of the lowest airmass
+      CALL SCULIB__CHECK_DATA( N_POS, %VAL(CNF_PVAL(IN_DATA_PTR)),
+     :     %VAL(CNF_PVAL(IN_AX_PTR)), STATUS )
+
 *     Copy to fitting arrays checking for bad values
       IF (N_POS .GT. MAX_FIT_DATA) THEN
          CALL MSG_SETI( 'NMAX', MAX_FIT_DATA )
@@ -566,5 +572,83 @@ C     Get the wavelength from the FITS header. Needed in microns
             OUTAXIS(I) = INAXIS(I)
          END IF
       END DO
+
+      END
+
+      SUBROUTINE SCULIB__CHECK_DATA( N_POS, INDATA, INAXIS,
+     :     STATUS )
+
+      IMPLICIT NONE
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+
+      INTEGER N_POS
+      REAL INDATA(N_POS)
+      REAL INAXIS(N_POS)
+      INTEGER STATUS
+
+      INTEGER I
+      REAL AMSTART
+      REAL AMEND
+      REAL JSKYSTART
+      REAL JSKYEND
+
+      REAL JSKYLO
+      REAL JSKYHI
+
+      JSKYSTART = VAL__BADR
+      JSKYEND = VAL__BADR
+      AMSTART = VAL__BADR
+      AMEND = VAL__BADR
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      DO I = 1, N_POS
+         IF (INDATA(I) .NE. VAL__BADR
+     :        .AND. INDATA(I) .LT. 0.0) THEN
+            IF (STATUS .EQ. SAI__OK) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( ' ',
+     :              'Negative sky temperatures in input data.'/
+     :              /' Please check data.',
+     :              STATUS )
+            END IF
+         END IF
+
+C     Read the first and last values of airmass and sky temp
+         IF (JSKYSTART .EQ. VAL__BADR) THEN
+            AMSTART = INAXIS(I)
+            JSKYSTART = INDATA(I)
+         END IF
+
+         AMEND = INAXIS(I)
+         JSKYEND = INDATA(I)
+
+      END DO
+
+C     Low airmass point should have a lower sky temp than high
+C     airmass point
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (JSKYSTART .NE. VAL__BADR .AND.
+     :        JSKYEND .NE. VAL__BADR) THEN
+            IF (AMSTART .GT. AMEND) THEN
+               JSKYHI = JSKYSTART
+               JSKYLO = JSKYEND
+            ELSE
+               JSKYLO = JSKYSTART
+               JSKYHI = JSKYEND
+            END IF
+
+            IF ( JSKYHI .LT. JSKYLO ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( ' ',
+     :              'Input data are suspect. Low airmass point has '/
+     :              /'higher sky temp than low airmass point.',
+     :              STATUS )
+            END IF
+
+         END IF
+      END IF
 
       END
