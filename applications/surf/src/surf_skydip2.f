@@ -286,7 +286,7 @@
 C     Do not average the start/end value yet
 C     This could be done in the routine that forms the input file
          TAMBKEY    = 'ATSTART'
-         TTELKEY    = 'FRLEGTST'
+         TTELKEY    = 'FRLEGST'
          WAVE2MICRONS = 1.0D6   ! Convert WAVE in m to microns
          TOFFSET    = 273.15    ! Convert header to kelvin
       END IF
