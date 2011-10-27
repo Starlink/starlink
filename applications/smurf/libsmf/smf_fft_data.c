@@ -842,6 +842,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
 
  CLEANUP:
   if( data ) smf_close_file( &data, status );
+  if( dims ) dims = astFree( dims );
 
   /* Clean up the job data array */
   if( job_data ) {
