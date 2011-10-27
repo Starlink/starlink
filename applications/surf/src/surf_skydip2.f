@@ -152,6 +152,8 @@
       PARAMETER (TSKNAME = 'SKYDIP2')
       INTEGER MAX_FIT_DATA              ! Max number of points
       PARAMETER (MAX_FIT_DATA = 2048)   ! allowed in input data
+      DOUBLE PRECISION DEGTOK           ! Degree C to K offset
+      PARAMETER (DEGTOK = 273.15D0)
       REAL DEFVAR                       ! Default variance if no variance
       PARAMETER (DEFVAR = 1.0)
 
@@ -288,7 +290,7 @@ C     This could be done in the routine that forms the input file
          TAMBKEY    = 'ATSTART'
          TTELKEY    = 'FRLEGST'
          WAVE2MICRONS = 1.0D6   ! Convert WAVE in m to microns
-         TOFFSET    = 273.15    ! Convert header to kelvin
+         TOFFSET    = DEGTOK    ! Convert header to kelvin
       END IF
 
       SUBNAME = ' '
@@ -409,10 +411,26 @@ C     Get the wavelength from the FITS header. Needed in microns
 
 *     Get the temperatures from the FITS extension
 
-      DUMMY = AST_GETFITSF( FCHAN, TAMBKEY, T_AMB, STATUS )
-      DUMMY = AST_GETFITSF( FCHAN, TTELKEY, T_TEL, STATUS )
-      T_TEL = T_TEL + TOFFSET
-      T_AMB = T_AMB + TOFFSET
+      IF (AST_GETFITSF( FCHAN, TAMBKEY, T_AMB, STATUS ) ) THEN
+         T_AMB = T_AMB + TOFFSET
+      ELSE
+         T_AMB = DEGTOK
+         CALL MSG_OUTIF( MSG__QUIET, ' ',
+     :        'WARNING: Could not determine T_AMB. Using 0 C',
+     :        STATUS )
+      END IF
+
+
+      IF (AST_GETFITSF( FCHAN, TTELKEY, T_TEL, STATUS ) ) THEN
+         T_TEL = T_TEL + TOFFSET
+      ELSE
+         T_TEL = DEGTOK
+         CALL MSG_OUTIF( MSG__QUIET, ' ',
+     :        'WARNING: Could not determine T_AMB. Using 0 C',
+     :        STATUS )
+      END IF
+
+
 
 *     ETA TEL from the header
       DEFAULT_ETA_TEL = -1.0D0
