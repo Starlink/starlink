@@ -1,4 +1,3 @@
-
 /*
 *+
 *  Name:
@@ -431,6 +430,20 @@
 /* Other includes */
 #include "sys/time.h"
 
+
+/* define __ITERATEMAP_SHOW_MEM to display memory usage... and also
+   configure AST using --with-memdebug */
+/*#define __ITERATEMAP_SHOW_MEM*/
+
+#ifdef __ITERATEMAP_SHOW_MEM
+void _smf_iteratemap_showmem( int *status );
+void _smf_iteratemap_showmem( int *status ) {
+  size_t memcurrent,mempeak;
+  astMemoryStats( 0, &mempeak, &memcurrent );
+  msgOutf( "", "SMURF: === current /peak memory usage: %zu / %zu MiB ===",
+           status, memcurrent/SMF__MIB, mempeak/SMF__MIB );
+}
+#endif
 
 #define FUNC_NAME "smf_iteratemap"
 
@@ -998,10 +1011,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                        nmodels, msize, keymap, maxmem-mapmem, maxfile,
                        &memneeded, status );
 
-    msgOutf( "", FUNC_NAME ": map-making requires %zu MiB "
-             "(map=%zu MiB model calc=%zu MiB)", status,
-             (mapmem+memneeded)/SMF__MIB, mapmem/SMF__MIB, memneeded/SMF__MIB );
-
     if( *status == SMF__NOMEM ) {
       /* If we need too much memory, generate a warning message and then try
          to re-group the files using smaller contchunks */
@@ -1052,9 +1061,20 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
 
       smf_grp_related( igrp, isize, 1+groupsubarray, 1,
-                       ceil((double)try/srate_maxlen), NULL, NULL,
+                       ceil((double)try/srate_maxlen), NULL, keymap,
                        &maxconcat, NULL, &igroup, NULL, NULL, status );
+
+      /* Re-check memory usage using shorter chunks */
+
+      smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
+                         nmodels, msize, keymap, maxmem-mapmem, maxfile,
+                         &memneeded, status );
+
     }
+
+    msgOutf( "", FUNC_NAME ": map-making requires %zu MiB "
+             "(map=%zu MiB model calc=%zu MiB)", status,
+             (mapmem+memneeded)/SMF__MIB, mapmem/SMF__MIB, memneeded/SMF__MIB );
   }
 
   if( *status == SAI__OK ) {
@@ -1165,6 +1185,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     smfArray *noisemaps=NULL;/* Array of noise maps for current chunk */
 
+
+#ifdef __ITERATEMAP_SHOW_MEM
+    _smf_iteratemap_showmem(status);
+#endif
+
     if( memiter ) {
       msgSeti("CHUNK", contchunk+1);
       msgSeti("NUMCHUNK", ncontchunks);
@@ -1229,6 +1254,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": ** %f s concatenating data",
                    status, smf_timerupdate(&tv1,&tv2,status) );
+
+#ifdef __ITERATEMAP_SHOW_MEM
+        _smf_iteratemap_showmem(status);
+#endif
+
       } else {
         if( !ensureflat ) {
           msgOut( "", FUNC_NAME ": *** WARNING: ensureflat=0 not supported "
@@ -1332,6 +1362,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                    ": ** %f s creating first set of static models",
                    status, smf_timerupdate(&tv1,&tv2,status) );
 
+#ifdef __ITERATEMAP_SHOW_MEM
+        _smf_iteratemap_showmem(status);
+#endif
+
         /* We now have RES, LUT, and EXT loaded into memory. Add fake
            astronomical signal to RES at this stage if requested */
 
@@ -1414,6 +1448,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                    ": ** %f s creating last set of static models",
                    status, smf_timerupdate(&tv1,&tv2,status) );
 
+#ifdef __ITERATEMAP_SHOW_MEM
+        _smf_iteratemap_showmem(status);
+#endif
+
       } else {
 
         /* If iterating using disk i/o need to create res and other
@@ -1445,6 +1483,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                    ": ** %f s creating static models",
                    status, smf_timerupdate(&tv1,&tv2,status) );
+
+#ifdef __ITERATEMAP_SHOW_MEM
+        _smf_iteratemap_showmem(status);
+#endif
+
       }
     }
 
@@ -1490,6 +1533,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     /*** TIMER ***/
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME": ** %f s creating dynamic models",
                status, smf_timerupdate(&tv1,&tv2,status) );
+
+#ifdef __ITERATEMAP_SHOW_MEM
+    _smf_iteratemap_showmem(status);
+#endif
 
     if( *status == SAI__OK ) {
 
@@ -1647,6 +1694,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                          ": ** %f s pre-conditioning data",
                          status, smf_timerupdate(&tv1,&tv2,status) );
+
+#ifdef __ITERATEMAP_SHOW_MEM
+              _smf_iteratemap_showmem(status);
+#endif
             }
 
             /* Continue with other model components */
@@ -1803,6 +1854,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                          ": ** %f s calculating model %s",
                          status, smf_timerupdate(&tv1,&tv2,status),
                          smf_model_getname(modeltyps[j], status) );
+
+#ifdef __ITERATEMAP_SHOW_MEM
+              _smf_iteratemap_showmem(status);
+#endif
             }
           }
 
@@ -2014,6 +2069,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                        ": ** %f s calculating AST",
                        status, smf_timerupdate(&tv1,&tv2,status) );
 
+#ifdef __ITERATEMAP_SHOW_MEM
+            _smf_iteratemap_showmem(status);
+#endif
 
             /* report on the quality flags for this iterations before closing
              the quality */
@@ -2500,6 +2558,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         errEnd( status );
       }
     }
+
+#ifdef __ITERATEMAP_SHOW_MEM
+    _smf_iteratemap_showmem(status);
+#endif
 
     /* If we get here and there is a SMF__INSMP we probably flagged
        all of the data as bad for some reason. In a multi-contchunk
