@@ -152,6 +152,8 @@
       PARAMETER (TSKNAME = 'SKYDIP2')
       INTEGER MAX_FIT_DATA              ! Max number of points
       PARAMETER (MAX_FIT_DATA = 2048)   ! allowed in input data
+      REAL DEFVAR                       ! Default variance if no variance
+      PARAMETER (DEFVAR = 1.0)
 
 *    Local variables:
       REAL    AIR_MODEL(N_MODEL)        ! Airmass values for MODEL
@@ -349,11 +351,11 @@ C     Get the wavelength from the FITS header. Needed in microns
          CALL NDF_MAP( IN_NDF, 'VARIANCE', '_REAL', 'READ',
      :        IN_VAR_PTR, ITEMP, STATUS )
       ELSE
-*     Get dummy variance memory and fill with zeroes
+*     Get dummy variance memory and fill with default error
          CALL SCULIB_MALLOC(N_POS * VAL__NBR, IN_VAR_PTR,
      :        DUM_VAR_PTR_END, STATUS)
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_CFILLR(N_POS, 0.0,
+            CALL SCULIB_CFILLR(N_POS, DEFVAR,
      :           %VAL(CNF_PVAL(IN_VAR_PTR)))
          END IF
       END IF
