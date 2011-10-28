@@ -149,6 +149,7 @@ smf_filter_edge.c \
 smf_filter_execute.c \
 smf_filter2d_edge.c \
 smf_filter2d_execute.c \
+smf_filter2d_gauss.c \
 smf_filter2d_whiten.c \
 smf_filter_fromkeymap.c \
 smf_filter_ident.c \
