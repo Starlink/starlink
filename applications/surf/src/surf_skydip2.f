@@ -471,7 +471,7 @@ C     Get the wavelength from the FITS header. Needed in microns
 
       IF (STATUS .EQ. SAI__OK) THEN
 
-         CALL SCULIB_FIT_SKYDIP (CVAR, NKEPT, AIRMASS, JSKY, JSKY_VAR,
+         CALL SCULIB_FIT_SKYDIP_GSL (CVAR, NKEPT, AIRMASS,JSKY,JSKY_VAR,
      :        REAL(WAVE), SUBNAME, FILT, REAL(T_TEL), REAL(T_AMB),
      :        ETA_TEL, B, ETA_TEL_FIT,
      :        B_FIT, TAUZ_FIT, REXISQ, TAU_ERROR, ETA_ERROR, B_ERROR,
