@@ -37,8 +37,8 @@ STAR_CHECK_PROGS( hlib )
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [sae prm pcs mers ndf])
-STAR_DECLARE_DEPENDENCIES([link], [ndf fio sla hlp pda prm agi kaplibs pgplot grp ndg])
+STAR_DECLARE_DEPENDENCIES([build], [sae prm pcs mers ndf gsl])
+STAR_DECLARE_DEPENDENCIES([link], [ndf fio sla hlp pda prm agi kaplibs pgplot grp ndg gsl])
 dnl    No use dependencies
 
 dnl Documentation

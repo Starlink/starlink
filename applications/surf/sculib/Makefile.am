@@ -2,10 +2,12 @@
 
 noinst_LTLIBRARIES = libsculib.la
 
-libsculib_la_SOURCES = $(F_ROUTINES)  $(FPP_ROUTINES)
+libsculib_la_SOURCES = $(F_ROUTINES)  $(FPP_ROUTINES) $(C_ROUTINES)
 
 # Need SURF_PAR
 AM_FCFLAGS = -I../src
+
+C_ROUTINES = sculib_fit_skydip_gsl.c
 
 F_ROUTINES = sculib_1d2_jiggle.f sculib_2pos_deconv.f		       \
 sculib_3pos_deconv.f sculib_analyse_photom_jiggle.f sculib_remsky.f    \
