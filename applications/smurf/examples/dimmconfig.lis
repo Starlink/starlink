@@ -523,7 +523,16 @@ ext.taumethod =adaptive
 
 #gai.flatfield = 1
 
-# Constrain regions of the map to 0.
+# Large-scale degenerate structures can grow in the maps with iterations and
+# so some constraints are required.
+#
+# One method is to use an FFT-base high-pass filter after each
+# iteration.  Using ast.gaussbg will effectively smooth the map with a
+# Gaussian of the supplied FWHM and subtract this background from the
+# map after each iteration.  This has the nice property that it is a
+# fairly easily understood linear filtering operation.
+#
+# Another method is to constrain regions of the map to 0.
 #
 # Using ast.zero_lowhits will set a threshold region where
 # the hits are this fraction lower than the mean.
@@ -546,6 +555,7 @@ ext.taumethod =adaptive
 # is not as important, but keeping as much data around the edges of
 # the map is.
 
+#ast.gaussbg = 120
 #ast.zero_circle = (70.72333,36.115,0.0083333)
 #ast.zero_lowhits = 0.1
 #ast.zero_notlast = 1

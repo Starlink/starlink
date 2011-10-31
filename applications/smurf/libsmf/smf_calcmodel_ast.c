@@ -93,10 +93,12 @@
 *        The circular region should have centre (0,0) for moving sources.
 *     2010-09-24 (EC):
 *        Add map-based despiker
+*     2011-10-28 (EC):
+*        Add gaussbg background suppression
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006-2010 University of British Columbia.
+*     Copyright (C) 2006-2011 University of British Columbia.
 *     Copyright (C) 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -143,6 +145,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   size_t bstride;               /* bolo stride */
   double dchisq=0;              /* this - last model residual chi^2 */
   int dozero=0;                 /* zero boundaries on last iter? */
+  double gaussbg;               /* gaussian background filter */
   int *hitsmap;                 /* Pointer to hitsmap data */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
@@ -204,6 +207,13 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   }
 
   /* Parse parameters */
+
+  /* Will we apply a smoothing constraint? */
+  astMapGet0D( kmap, "GAUSSBG", &gaussbg );
+  if( gaussbg < 0 ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": AST.GAUSSBG cannot be < 0.", status );
+  }
 
   /* Will we apply lowhits boundary condition to map? */
   astMapGet0D( kmap, "ZERO_LOWHITS", &zero_lowhits );
@@ -296,7 +306,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     return;
   }
 
-
   /* Before applying boundary conditions, removing AST signal from residuals
      etc., flag spikes using map */
 
@@ -317,14 +326,58 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
               status, nflagged);
   }
 
-  /* Proceed if we need to do masking */
-  if( zero_notlast && (flags&SMF__DIMM_LASTITER) ) dozero = 0;
-  else if( zero_snr || zero_lowhits || dat->zeromask ) dozero = 1;
-
   /* Constrain map. We don't if this is the very last iteration, and
      if zero_notlast is set. */
 
-  if( (*status == SAI__OK) && dozero ) {
+  if( gaussbg && !(zero_notlast && (flags&SMF__DIMM_LASTITER)) ) {
+    /* Calculate and remove a background using a simple Gaussian filter...
+       the idea is to help remove saddles. Maybe this should go after
+       zero_lowhits? Really there should be some sort of map apodization
+       routine */
+
+    smfData *filtermap=NULL;
+    smfFilter *filt=NULL;
+
+    /* Put the map data in a smfData wrapper */
+    filtermap = smf_create_smfData( 0, status );
+    if( *status == SAI__OK ) {
+      filtermap->isFFT = -1;
+      filtermap->dtype = SMF__DOUBLE;
+      filtermap->pntr[0] = map;
+      filtermap->ndims = 2;
+      filtermap->dims[0] = dat->ubnd_out[0]-dat->lbnd_out[0]+1;
+      filtermap->dims[1] = dat->ubnd_out[1]-dat->lbnd_out[1]+1;
+      filtermap->hdr->wcs = dat->outfset;
+
+      /* Set bad values to 0... should really be some sort of apodization */
+      for( i=0; i<dat->msize; i++ ) {
+        if( map[i] == VAL__BADD ) map[i] = 0;
+      }
+
+      /* Create and apply a Gaussian filter to remove large-scale
+         structures -- we do this by taking the complement of a
+         Gaussian smoothing filter to turn it into a smooth
+         high-pass filter */
+
+      filt = smf_create_smfFilter( filtermap, status );
+      smf_filter2d_gauss( filt, gaussbg, status );
+      smf_filter_complement( filt, status );
+      smf_filter_execute( wf, filtermap, filt, 0, 0, status );
+
+      /* Unset pointers to avoid freeing them */
+      filtermap->hdr->wcs = NULL;
+      filtermap->pntr[0] = NULL;
+    }
+
+    smf_close_file( &filtermap, status );
+    filt = smf_free_smfFilter( filt, status );
+  }
+
+  /* Proceed if we need to do zero-masking */
+  if( zero_notlast && (flags&SMF__DIMM_LASTITER) ) dozero = 0;
+  else if( zero_snr || zero_lowhits || dat->zeromask ) dozero = 1;
+
+  if( (*status == SAI__OK) && (dozero) ) {
 
     /* Reset the SMF__MAPQ_ZERO bit */
     for( i=0; i<dat->msize; i++ ) {
