@@ -134,7 +134,6 @@ void smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
   size_t idx=0;                 /* index within subgroup */
   size_t istart;                /* First useful timeslice */
   size_t iend;                  /* Last useful timeslice */
-  size_t k;                     /* loop counter */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   char name[GRP__SZNAM+1];      /* Buffer for storing names */
   size_t nshort=0;              /* Number of short maps */
@@ -158,7 +157,6 @@ void smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
     errRep( "", FUNC_NAME ": NULL inputs supplied", status );
     return;
   }
-
 
   if( !res || !res->sdata || !res->sdata[idx] || !res->sdata[idx]->hdr ||
       !res->sdata[idx]->hdr->allState ) {
@@ -245,11 +243,37 @@ void smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
                        ubnd_out, SMF__MAP_VAR, &mapdata,
                        status);
 
-    /* Loop over subgroup index (subarray) -- only continue if
-       nshort > 0! */
+    /* Time slice indices for start and end of short map -- common to
+       all subarrays */
 
-    for( idx=0; (idx<res->ndat)&&(nshort)&&(*status==SAI__OK);
-         idx++ ){
+    if( shortmap > 0) {
+      /* Evenly-spaced shortmaps in time */
+      shortstart = istart+sc*shortmap;
+      shortend = istart+(sc+1)*shortmap-1;
+    } else {
+      /* One map each time TCS_INDEX increments -- just uses header
+         for the first subarray */
+      for(i=shortstart+1; (i<=iend) &&
+            (res->sdata[0]->hdr->allState[i].tcs_index ==
+             res->sdata[0]->hdr->allState[shortstart].tcs_index);
+          i++ );
+      shortend = i-1;
+    }
+
+    /* Bad status if we have invalid shortmap ranges. This might
+       happen if there is ever a jump in TCS_INDEX for the shortmap=-1
+       case since the total number of shortmaps is calculated simply
+       as the difference between the first and final TCS indices. */
+
+    if( !nshort || (iend<istart) || (iend>=ntslice) ) {
+      *status = SAI__ERROR;
+      errRepf( "", FUNC_NAME ": invalid shortmap range (%zu--%zu, ntslice=%zu)"
+               "encountered", status, istart, iend, ntslice );
+      break;
+    }
+
+    /* Loop over subgroup index (subarray) */
+    for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
       int rebinflag = 0;
 
       /* Pointers to everything we need */
@@ -267,20 +291,6 @@ void smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
 
       if( idx == (res->ndat-1) ) {
         rebinflag |= AST__REBINEND;
-      }
-
-      /* Time slices indices for start and end of short map */
-      if( shortmap > 0) {
-        /* Evenly-spaced shortmaps in time */
-        shortstart = istart+sc*shortmap;
-        shortend = istart+(sc+1)*shortmap-1;
-      } else {
-        /* One map each time TCS_INDEX increments */
-        for(i=shortstart+1; (i<=iend) &&
-              (res->sdata[idx]->hdr->allState[i].tcs_index ==
-               res->sdata[idx]->hdr->allState[shortstart].tcs_index);
-            i++ );
-        shortend = i-1;
       }
 
       smf_rebinmap1( res->sdata[idx],
@@ -319,10 +329,10 @@ void smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
 
         if( fitschan ) fitschan = astAnnul( fitschan );
       }
-
-      /* Update shortstart in case we are counting steps in TCS_INDEX */
-      shortstart = shortend+1;
     }
+
+    /* Update shortstart in case we are counting steps in TCS_INDEX */
+    shortstart = shortend+1;
 
     /* Write WCS */
     smf_set_moving(outfset,NULL,status);
