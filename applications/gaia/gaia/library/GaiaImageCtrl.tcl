@@ -92,6 +92,12 @@ itcl::class gaia::GaiaImageCtrl {
    #  Constructor: create a new instance of this class.
    constructor {args} {
 
+      #  Load all the required tkimg packages.
+      package require img::window
+      package require img::jpeg
+      package require img::png
+      package require img::tiff
+
       #  Record toplevel window name.
       set top_ [winfo toplevel $w_]
 
@@ -444,8 +450,7 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Capture a copy of the main window to a graphics file. Requires
    #  that the tkimg package is installed. If all is true then off-screen
-   #  image and graphics will fail (this doesn't work well for GIF as
-   #  seems to need more than 256 colours).
+   #  image and graphics will also be captured.
    public method capture {all} {
       if { [$image_ isclear] } {
          warning_dialog "No image is currently loaded" $w_
@@ -482,9 +487,9 @@ itcl::class gaia::GaiaImageCtrl {
          }
 
          #  The graphic is created by making a copy of the window in another
-         #  image and writing that out. The copy requires that the main window
-         #  is unobscured (uses an X11 snap), so attempt to raise it and make
-         #  sure everything is up to date.
+         #  image and writing that out. The copy needs the main window
+         #  unobscured, so attempt to raise it and make sure everything is
+         #  up to date.
          busy {
 
             #  Attempt to unobscure.
@@ -493,33 +498,43 @@ itcl::class gaia::GaiaImageCtrl {
             ::after 500
             ::update
 
-            #  Load all the required tkimg packages.
-            if { $format != "gif" } {
-               package require img::jpeg
-               package require img::png
-               package require img::tiff
-            }
-            package require img::window
-
-            #  And capture.
-            if { $all } { 
+            #  Now do the capture.
+            if { $all } {
                set image [all_canvas_to_photo_]
             } else {
                set image [image create photo -format window -data $canvas_]
             }
 
-            #  Write to disk file. This can fail if the window is still
-            #  obscured. So trap and complain.
+            #  Write to disk file. This can fail if this is GIF format and we
+            #  have too many colors (usually caused by anti-aliased fonts).
             if { [catch {$image write $filename -format $format} msg ] } {
-               if { $msg == "too many colors" } {
-                  info_dialog \
-                     "The image display window must not be obscured, \
-                      move any overlapping windows and try again. \
-                      If that fails try a non-GIF format"
+               if { $msg == "too many colors" && $format == "gif" } {
+                  reduce_colours_ $image $filename
+               } else {
+                  info_dialog "Failed to save snapshot: $msg"
                }
             }
          }
          ::image delete $image
+      }
+   }
+
+   #  Reduce the number of colours in the given image to 256 and write to the
+   #  given filename in GIF. Would like to use Tk extension but nothing seems
+   #  to work (like blt::winop quantize), so offer this facility if the "djpeg"
+   #  program is available.
+   protected method reduce_colours_ {image filename} {
+      if { [auto_execok djpeg] != {} } {
+         set tmpfile \
+            [gaia::GaiaTempName::make_name GaiaTempImage [pid] ".jpeg"]
+
+         #  Save as JPEG with no losses and convert to GIF.
+         $image write $tmpfile -format "jpeg -quality 100"
+         ::exec djpeg -gif -colors 256 -outfile $filename $tmpfile
+         ::file delete -force $tmpfile
+      } else {
+         info_dialog "Failed to save snapshot: too many colors \
+                      and no djpeg command available"
       }
    }
 

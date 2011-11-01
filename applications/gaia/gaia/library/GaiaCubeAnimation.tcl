@@ -393,7 +393,7 @@ itcl::class gaia::GaiaCubeAnimation {
 
          if { $loop_ == "capture" } {
             if { ! [capture_] } {
-               #  Didn't work, probably obscured. Tidy up and stop.
+               #  Didn't work. Tidy up and stop.
                set nfrm [llength $capframes_]
                for { set i 0 } { $i < $nfrm } { incr i } {
                   ::file delete -force [lindex $capframes_ $i]
@@ -462,23 +462,46 @@ itcl::class gaia::GaiaCubeAnimation {
       }
    }
 
+   #  Reduce the number of colours in the given image to 256 and write to the
+   #  given filename in GIF. Would like to use Tk extension but nothing seems
+   #  to work (like blt::winop quantize), so offer this facility if the "djpeg"
+   #  program is available.
+   protected method reduce_colours_ {image filename} {
+      if { [auto_execok djpeg] != {} } {
+         set tmpfile \
+            [gaia::GaiaTempName::make_name GaiaTempImage [pid] ".jpeg"]
+
+         #  Save as JPEG with no losses and convert to GIF.
+         $image write $tmpfile -format "jpeg -quality 100"
+         ::exec djpeg -gif -colors 256 -outfile $filename $tmpfile
+         ::file delete -force $tmpfile
+      } else {
+         info_dialog "Failed to save snapshot: too many colors \
+                      and no djpeg command available"
+         return 0
+      }
+      return 1
+   }
+
    #  Capture the current image to a GIF.
    protected method capture_ {} {
-      set image [::image create photo]
+
+      #  Do snapshot.
       set canvas [$itk_option(-gaiacube) cget -canvas]
-      blt::winop snap $canvas $image
+      set image [::image create photo -format window -data $canvas]
       incr capcount_
       set gif [gaia::GaiaTempName::make_name \
                   "GaiaTempAnimation" $capcount_ ".gif"]
       lappend capframes_ $gif
 
-      #  This can fail if the window is obscured. Trap and complain.
+      #  This can fail if their aretoo many colors. In that case attempt
+      #  to reduce the number of colours before giving up.
       if { [catch {$image write $gif -format gif} msg ] } {
          if { $msg == "too many colors" } {
-            info_dialog "The image display window must not be obscured,
-move any overlapping windows and try again"
-            ::image delete $image
-            return 0
+            if { [reduce_colours_ $image $gif] == 0 } {
+               ::image delete $image
+               return 0
+            }
          }
       }
       ::image delete $image
