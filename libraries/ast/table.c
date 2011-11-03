@@ -928,7 +928,7 @@ f     AST_COLUMNSHAPE
 *  Synopsis:
 c     #include "table.h"
 c     void astColumnShape( AstTable *this, const char *column, int mxdim,
-c                          int *ndim, int *dims, int *status )
+c                          int *ndim, int *dims )
 f     CALL AST_COLUMNSHAPE( THIS, COLUMN, MXDIM, NDIM, DIMS, STATUS )
 
 *  Class Membership:
@@ -1932,7 +1932,7 @@ f     AST_HASCOLUMN
 
 *  Synopsis:
 c     #include "table.h"
-c     int astHasColumn( AstTable *this, const char *column, int *status )
+c     int astHasColumn( AstTable *this, const char *column )
 f     RESULT = AST_HASCOLUMN( THIS, COLUMN, STATUS )
 
 *  Class Membership:
@@ -2005,7 +2005,7 @@ f     AST_HASPARAMETER
 
 *  Synopsis:
 c     #include "table.h"
-c     int astHasParameter( AstTable *this, const char *parameter, int *status )
+c     int astHasParameter( AstTable *this, const char *parameter )
 f     RESULT = AST_HASPARAMETER( THIS, PARAMETER, STATUS )
 
 *  Class Membership:

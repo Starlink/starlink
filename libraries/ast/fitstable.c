@@ -1130,7 +1130,7 @@ f     AST_GETCOLUMNDATA
 c     #include "frameset.h"
 c     void astGetColumnData( AstFitsTable *this, const char *column,
 c                            float fnull, double dnull, size_t mxsize,
-c                            void *coldata, int *nelem, int *status )
+c                            void *coldata, int *nelem )
 f     CALL AST_GETCOLUMNDATA( THIS, COLUMN, RNULL, DNULL, MXSIZE,
 f                             COLDATA, NELEM, STATUS )
 
@@ -1869,7 +1869,7 @@ c     astPutColumnData
 f     AST_PUTCOLUMNDATA
 
 *  Purpose:
-*     Retrieve all the data values stored in a column.
+*     Store new data values for all rows of a column.
 
 *  Type:
 *     Public virtual function.
