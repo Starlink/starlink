@@ -23557,6 +23557,9 @@ f     TABLE = INTEGER (Given)
 *        it is replaced with the new one. A deep copy of the FitsTable is
 *        stored in the FitsChan, so any subsequent changes made to the
 *        FitsTable will have no effect on the behaviour of the FitsChan.
+c     extnam
+f     EXTNAM = CHARACTER * ( * ) (Given)
+*        The name of the FITS extension associated with the table.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -29916,8 +29919,7 @@ f     Register a source routine for accessing tables in FITS files.
 c     #include "fitschan.h"
 c     void astTableSource( AstFitsChan *this,
 c                          void (* tabsource)( AstFitsChan *, const char *,
-c                                              int, int, int * ),
-c                          int *status )
+c                                              int, int, int * ) )
 f     CALL AST_TABLESOURCE( THIS, TABSOURCE, STATUS )
 
 *  Class Membership:
