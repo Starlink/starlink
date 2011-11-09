@@ -197,6 +197,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "sae_par.h"
+#include "par.h"
 #include "par_par.h"
 #include "mers.h"
 #include "f77.h"
@@ -417,6 +418,11 @@ void smurf_mon( int * status ) {
     msgBlank(status);
   }
   errEnd( status );
+
+  /* For some reason, we need to cancel the REF parameter, otherwise
+     some HDS locators for the associated NDF object are left dangling
+     (e.g. within smf_getrefwcs.c */
+  parCancl( "REF", status );
 
   /* Check for HDS leaks Do this in a new error reporting context so
    * that we get the correct value even if an error has occurred. */

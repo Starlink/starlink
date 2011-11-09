@@ -131,11 +131,8 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
    } else {
       ndfGtwcs( refndf, &refwcs, status );
 
-/* We no longer need the NDF so annul it. For some reason, we also need
-   to cancel the parameter, otherwise some HDS locators for the NDF object
-   are left dangling. */
+/* We no longer need the NDF so annul it. */
       ndfAnnul( &refndf, status );
-      parCancl( param, status );
 
 /* We want astFindFrame to return us the conversion from PIXEL coords to
    celestial or spectral coords, so we need to make the PIXEL Frame the
