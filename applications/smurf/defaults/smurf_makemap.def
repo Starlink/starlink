@@ -107,6 +107,7 @@ ast.zero_lowhits = 0
 ast.zero_notlast = 1
 ast.zero_circle = <undef>
 ast.zero_snr = <undef>
+ast.zero_mask = <undef>
 ast.mapspike = 0
 
 # smf_calcmodel_com -- these are defined in smurf_sc2clean.def

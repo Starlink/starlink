@@ -1,4 +1,4 @@
-/*
+ /*
 *+
 *  Name:
 *     smf_calcmodel_ast
@@ -95,6 +95,8 @@
 *        Add map-based despiker
 *     2011-10-28 (EC):
 *        Add gaussbg background suppression
+*     2011-11-08 (EC):
+*        Add zero_mask externally supplied mask image
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -130,6 +132,7 @@
 #include "star/ndg.h"
 #include "prm_par.h"
 #include "par_par.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -222,23 +225,84 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status );
   }
 
-  /* Will we apply a circular boundary condition? Initialize the mask
-     if it has not been previously set. */
-  if( (astMapType( kmap, "ZERO_CIRCLE" ) != AST__BADTYPE) &&
-      (dat->zeromask == NULL) ) {
+  /* Static masking constraints: circular region, or an external mask file */
+  if( ( (astMapType( kmap, "ZERO_CIRCLE" ) != AST__BADTYPE) ||
+        (astMapType( kmap, "ZERO_MASK" ) != AST__BADTYPE) ) &&
+      (dat->zeromask == NULL) && (*status == SAI__OK) ) {
 
-    double centre[2];
-    AstCircle *circle=NULL;
-    int docirc;
-    int lbnd_grid[2];
-    int ubnd_grid[2];
-    double radius[1];
+    const char *tempstr=NULL;
     int zero_c_n;                 /* Number of zero circle parameters read */
     double zero_circle[3];        /* LON/LAT/Radius of circular mask */
 
-    docirc = astMapGet1D( kmap, "ZERO_CIRCLE", 3, &zero_c_n, zero_circle );
+    /* Initialize the mask */
+    dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask) );
 
-    if( docirc ) {
+    /* User supplied an external mask? */
+    if( astMapGet0C( kmap, "ZERO_MASK", &tempstr ) && tempstr ) {
+      double *maskdata=NULL;
+      Grp *fname=NULL;
+      int nfdims;
+      int fdims[NDF__MXDIM];
+      int nmap;
+      void *ptr;
+      char *zeromaskfile=NULL;
+      int zerondf=NDF__NOID;
+
+      zeromaskfile = astCalloc( 255, 1 );
+      one_strlcpy( zeromaskfile, tempstr, 255, status );
+
+      msgOutf( "", "   loading zero mask `%s'", status, zeromaskfile );
+
+      fname = grpNew( "zeromaskfilename", status );
+      grpPut1( fname, zeromaskfile, 0, status );
+
+      ndgNdfas( fname, 1, "READ", &zerondf, status );
+      ndfDim( zerondf, NDF__MXDIM, fdims, &nfdims, status );
+
+      /* Ensure that the map dimensions are correct */
+      if( *status == SAI__OK ) {
+        if( !((nfdims == 2) ||
+              ((nfdims == 3) && (fdims[2] == 1))) ) {
+          *status = SAI__ERROR;
+          errRepf( "", FUNC_NAME
+                   ": supplied zero mask %s is not 2-dimensional!",
+                   status, zeromaskfile );
+        } else if((fdims[0] != (dat->ubnd_out[0]-dat->lbnd_out[0]+1)) ||
+                  (fdims[1] != (dat->ubnd_out[1]-dat->lbnd_out[1]+1))) {
+          *status = SAI__ERROR;
+          errRepf( "", FUNC_NAME ": supplied zeromaskfile %s does not have the "
+                   "required dimensions %i x %i", status, zeromaskfile,
+                   dat->ubnd_out[0]-dat->lbnd_out[0]+1,
+                   dat->ubnd_out[1]-dat->lbnd_out[1]+1 );
+        }
+      }
+
+      /* Map the data as double precision */
+      ndfMap( zerondf, "DATA", "_DOUBLE", "READ", &ptr, &nmap, status );
+      maskdata = ptr;
+
+      /* Identify bad pixels in maskdata and set those pixels in zeromask */
+      if( *status == SAI__OK ) {
+        for( i=0; i<dat->msize; i++ ) {
+          if( maskdata[i] == VAL__BADD ) {
+            dat->zeromask[i] = 1;
+          }
+        }
+      }
+
+      /* Free resources */
+      if( zeromaskfile ) zeromaskfile = astFree( zeromaskfile );
+      if( fname ) grpDelet( &fname, status );
+      if( zerondf != NDF__NOID ) ndfAnnul( &zerondf, status );
+    }
+
+    /* Apply a circular boundary condition? */
+    if( astMapGet1D( kmap, "ZERO_CIRCLE", 3, &zero_c_n, zero_circle ) ) {
+      double centre[2];
+      AstCircle *circle=NULL;
+      int lbnd_grid[2];
+      int ubnd_grid[2];
+      double radius[1];
 
       /* If only one parameter supplied it is radius, assume reference
          LON/LAT from the frameset to get the centre. If the SkyFrame
@@ -263,9 +327,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
       }
 
       if( zero_c_n==3 ) {
-        /* Allocate space for the zeromask */
-        dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask) );
-
         /* The supplied bounds are for pixel coordinates... we need bounds
            for grid coordinates which have an offset */
         lbnd_grid[0] = 1;

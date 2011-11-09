@@ -534,6 +534,15 @@ ext.taumethod =adaptive
 #
 # Another method is to constrain regions of the map to 0.
 #
+# Using ast.zero_mask an external image containing a user-defined mask
+# can be supplied. As with fakemap (see above), the map must have the
+# same pixel dimensions as the real map, although a fully-parsed ndf
+# identifier is used, meaning that re-sizing can be done on-the-fly
+# (however, makemap will have to be run at least once in advance to
+# see how big a map it produces. The pixels in the map that are to be
+# constrained to 0 should be set to the bad value. All other pixels
+# will be allowed to vary during map-making.
+#
 # Using ast.zero_lowhits will set a threshold region where
 # the hits are this fraction lower than the mean.
 #
@@ -556,6 +565,7 @@ ext.taumethod =adaptive
 # the map is.
 
 #ast.gaussbg = 120
+#ast.zero_mask = maskfile.sdf
 #ast.zero_circle = (70.72333,36.115,0.0083333)
 #ast.zero_lowhits = 0.1
 #ast.zero_notlast = 1
