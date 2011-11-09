@@ -97,6 +97,8 @@
 *        Add gaussbg background suppression
 *     2011-11-08 (EC):
 *        Add zero_mask externally supplied mask image
+*     2011-11-09 (EC):
+*        Use the REF image for zero_mask to ensure matching pixel grids
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -230,7 +232,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
         (astMapType( kmap, "ZERO_MASK" ) != AST__BADTYPE) ) &&
       (dat->zeromask == NULL) && (*status == SAI__OK) ) {
 
-    const char *tempstr=NULL;
+    int refmask=0;                /* REF image supplies mask? */
     int zero_c_n;                 /* Number of zero circle parameters read */
     double zero_circle[3];        /* LON/LAT/Radius of circular mask */
 
@@ -238,51 +240,26 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask) );
 
     /* User supplied an external mask? */
-    if( astMapGet0C( kmap, "ZERO_MASK", &tempstr ) && tempstr ) {
-      double *maskdata=NULL;
-      Grp *fname=NULL;
-      int nfdims;
-      int fdims[NDF__MXDIM];
+    if( astMapGet0I( kmap, "ZERO_MASK", &refmask ) && refmask ) {
       int nmap;
       void *ptr;
-      char *zeromaskfile=NULL;
+      int refndf=NDF__NOID;
       int zerondf=NDF__NOID;
 
-      zeromaskfile = astCalloc( 255, 1 );
-      one_strlcpy( zeromaskfile, tempstr, 255, status );
+      ndfBegin();
 
-      msgOutf( "", "   loading zero mask `%s'", status, zeromaskfile );
+      /* Obtain NDF identifier for the reference image*/
+      ndfAssoc( "REF", "READ", &refndf, status );
 
-      fname = grpNew( "zeromaskfilename", status );
-      grpPut1( fname, zeromaskfile, 0, status );
-
-      ndgNdfas( fname, 1, "READ", &zerondf, status );
-      ndfDim( zerondf, NDF__MXDIM, fdims, &nfdims, status );
-
-      /* Ensure that the map dimensions are correct */
-      if( *status == SAI__OK ) {
-        if( !((nfdims == 2) ||
-              ((nfdims == 3) && (fdims[2] == 1))) ) {
-          *status = SAI__ERROR;
-          errRepf( "", FUNC_NAME
-                   ": supplied zero mask %s is not 2-dimensional!",
-                   status, zeromaskfile );
-        } else if((fdims[0] != (dat->ubnd_out[0]-dat->lbnd_out[0]+1)) ||
-                  (fdims[1] != (dat->ubnd_out[1]-dat->lbnd_out[1]+1))) {
-          *status = SAI__ERROR;
-          errRepf( "", FUNC_NAME ": supplied zeromaskfile %s does not have the "
-                   "required dimensions %i x %i", status, zeromaskfile,
-                   dat->ubnd_out[0]-dat->lbnd_out[0]+1,
-                   dat->ubnd_out[1]-dat->lbnd_out[1]+1 );
-        }
-      }
+      /* Obtain an NDF section with bounds that match our map */
+      ndfSect( refndf, 2, dat->lbnd_out, dat->ubnd_out, &zerondf, status );
 
       /* Map the data as double precision */
       ndfMap( zerondf, "DATA", "_DOUBLE", "READ", &ptr, &nmap, status );
-      maskdata = ptr;
 
       /* Identify bad pixels in maskdata and set those pixels in zeromask */
       if( *status == SAI__OK ) {
+        double *maskdata = ptr;
         for( i=0; i<dat->msize; i++ ) {
           if( maskdata[i] == VAL__BADD ) {
             dat->zeromask[i] = 1;
@@ -290,10 +267,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
         }
       }
 
-      /* Free resources */
-      if( zeromaskfile ) zeromaskfile = astFree( zeromaskfile );
-      if( fname ) grpDelet( &fname, status );
-      if( zerondf != NDF__NOID ) ndfAnnul( &zerondf, status );
+      ndfEnd( status );
     }
 
     /* Apply a circular boundary condition? */
