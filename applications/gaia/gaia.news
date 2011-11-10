@@ -26,6 +26,14 @@
     discontinous change that could show up as a false contour (this has been
     present for many years).
 
+    When connecting the coordinate system of a catalogue to that of the 
+    displayed image the current coordinate system will now always be used
+    in preference to any other available system. Previously if you had another
+    celestial coordinate system in addition to the current one, that would be
+    used in preference to the current one. This avoids problems with secondary
+    coordinate systems that are incorrect or not as accurate as the current
+    one.
+
     Version 4.4-2
     =============
 

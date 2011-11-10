@@ -1314,9 +1314,26 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
             //  assumes we have a StarRtdImage instance not Skycat.
             StarWCS *wcs = (StarWCS *) image->image()->wcs().rep();
             AstFrameSet *imagewcs = (AstFrameSet *) wcs->astWCSCopy();
-            frmset = (AstFrameSet *) astConvert( imagewcs, catwcs, "SKY" );
+
+            //  Slight wart. When connecting these the current frame will
+            //  actually be the last one tested, usually that doesn't make
+            //  sense as we are going from SKY to SKY. Short circuit this (and
+            //  coincidently miss out all those other SKY based systems that
+            //  tend to be incorrect, like initial pointings).
+            AstFrame *current = (AstFrame *) astGetFrame( imagewcs,
+                                                          AST__CURRENT );
+            if ( astIsASkyFrame( current ) ) {
+                frmset = (AstFrameSet *) astConvert( current, catwcs, "SKY" );
+            }
+            else {
+                //  Not a SkyFrame so search FrameSet for one.
+                frmset = (AstFrameSet *) astConvert( imagewcs, catwcs, "SKY" );
+            }
             if ( imagewcs != NULL ) {
                 imagewcs = (AstFrameSet *) astAnnul( imagewcs );
+            }
+            if ( current != NULL ) {
+                current = (AstFrame *) astAnnul( current );
             }
             if ( ! astOK ) {
                 if ( frmset != NULL ) {
