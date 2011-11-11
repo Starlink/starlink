@@ -203,9 +203,9 @@ $NDF_FORMATS_OUT',FITSGZ(.fts.gz),FITSGZ(.fits.gz)'
 #  as input, NDF_TEMP_FITS must specify an alternative to the default
 #  HDS scratch file.
 if ( $?HDS_SCRATCH ) then
-   setenv NDF_TEMP_FITS "$HDS_SCRATCH/temp_fits_^name^fxscl"
+   setenv NDF_TEMP_FITS "$HDS_SCRATCH/temp_fits_^namecl^fxscl"
 else
-   setenv NDF_TEMP_FITS 'temp_fits_^name^fxscl'
+   setenv NDF_TEMP_FITS 'temp_fits_^namecl^fxscl'
 endif
 
 setenv NDF_FROM_FITS \
@@ -339,9 +339,9 @@ setenv NDF_TO_COMPRESSED \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 if ( $?HDS_SCRATCH ) then
-   setenv NDF_TEMP_COMPRESSED "$HDS_SCRATCH/temp_Z_^name"
+   setenv NDF_TEMP_COMPRESSED "$HDS_SCRATCH/temp_Z_^namecl"
 else
-   setenv NDF_TEMP_COMPRESSED 'temp_Z_^name'
+   setenv NDF_TEMP_COMPRESSED 'temp_Z_^namecl'
 endif
 
 #  GZIP compression conversions
@@ -355,9 +355,9 @@ setenv NDF_TO_GZIP \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 if ( $?HDS_SCRATCH ) then
-   setenv NDF_TEMP_GZIP "$HDS_SCRATCH/temp_gz_^name"
+   setenv NDF_TEMP_GZIP "$HDS_SCRATCH/temp_gz_^namecl"
 else
-   setenv NDF_TEMP_GZIP 'temp_gz_^name'
+   setenv NDF_TEMP_GZIP 'temp_gz_^namecl'
 endif
 
 #  FITSGZ FITS compression conversions
@@ -371,9 +371,9 @@ setenv NDF_TO_FITSGZ \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 if ( $?HDS_SCRATCH ) then
-   setenv NDF_TEMP_FITSGZ "$HDS_SCRATCH/temp_fgz_^name"
+   setenv NDF_TEMP_FITSGZ "$HDS_SCRATCH/temp_fgz_^namecl"
 else
-   setenv NDF_TEMP_FITSGZ 'temp_fgz_^name'
+   setenv NDF_TEMP_FITSGZ 'temp_fgz_^namecl'
 endif
 
 #  DEBUG

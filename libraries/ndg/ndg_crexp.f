@@ -296,7 +296,7 @@
 
 *  Split this up into directory, basename, suffix and NDF section (not
 *  used).
-         CALL NDG1_FPARS( NAME, DIR1, BN1, SUF1, SEC1, STATUS )
+         CALL NDG1_FPARS( NAME, 0, DIR1, BN1, SUF1, SEC1, STATUS )
 
 *  Get the index of the name within the basis group from which the new
 *  name was derived. If the new name was not specified by a

@@ -59,6 +59,10 @@
 *           Name of the foreign file format (upper case).
 *        NDF
 *           Full name of the native NDF data structure.
+*        NAMECL
+*           The name of the foreign file but containing only characters
+*           accptable within an HDS name. Any other characters are
+*           replaced by an underscore.
 
 *  Notes:
 *      -  If IFMT is zero, then the DIR, NAME, TYPE and VERS tokens will
@@ -105,6 +109,8 @@
 *        Leave tokens that are not required undefined.
 *     17-JUL-2000 (DSB):
 *        Added foreign extension field, and tokens FXS & FXSCL.
+*     11-NOV-2011 (DSB):
+*        Added NAMECL token.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -195,6 +201,19 @@
                CALL MSG_SETC( 'NAME', FORFIL( N1 : N2 ) )
             ELSE
                CALL MSG_SETC( 'NAME', ' ' )
+            END IF
+
+*  Define the cleaned foreign file name token.
+            IF ( N1 .LE. N2 ) THEN
+               DO I = N1, N2
+                  IF( CHR_ISALM( FORFIL( I : I ) ) ) THEN
+                     CALL MSG_SETC( 'NAMECL', FORFIL( I : I ) )
+                  ELSE
+                     CALL MSG_SETC( 'NAMECL', '_' )
+                  END IF
+               END DO
+            ELSE
+               CALL MSG_SETC( 'NAMECL', ' ' )
             END IF
 
 *  Define the foreign file type token.

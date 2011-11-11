@@ -116,7 +116,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find the directory spec, the container file name and the component path.
-      CALL NDG1_FPARS( NAME, DIR, BN, PATH, SEC, STATUS )
+      CALL NDG1_FPARS( NAME, 0, DIR, BN, PATH, SEC, STATUS )
 
 *  If there is no component path, then the structure must already exist,
 *  so do nothing more.

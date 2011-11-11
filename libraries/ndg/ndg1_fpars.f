@@ -1,4 +1,4 @@
-      SUBROUTINE NDG1_FPARS( SPEC, DIR, BN, SUF, SEC, STATUS )
+      SUBROUTINE NDG1_FPARS( SPEC, NDOT, DIR, BN, SUF, SEC, STATUS )
 *+
 *  Name:
 *     NDG1_FPARS
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDG1_FPARS( SPEC, DIR, BN, SUF, SEC, STATUS )
+*     CALL NDG1_FPARS( SPEC, NDOT, DIR, BN, SUF, SEC, STATUS )
 
 *  Description:
 *     This routine extracts and returned fields from the supplied NDF
@@ -19,6 +19,9 @@
 *  Arguments:
 *     SPEC = CHARACTER * ( * ) (Given)
 *        The full NDF file spec.
+*     NDOT = INTEGER (Given)
+*        The number of dots expected within the file basename. This should
+*        be zero for all native NDFs, but may be non-zero for foreign files.
 *     DIR = CHARACTER * ( * ) (Returned)
 *        The directory path (ending at the final "\" in the spec).
 *     BN = CHARACTER * ( * ) (Returned)
@@ -68,6 +71,8 @@
 *        foreign extension specified if it ocurs at the end of the file basename
 *        or after the file type. Such strings occurring within the file
 *        basename will be treated as a globbing wildcard pattern.
+*     11-NOV-2011 (DSB):
+*        Added NDOT argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,6 +88,7 @@
 
 *  Arguments Given:
       CHARACTER SPEC*(*)
+      INTEGER NDOT
 
 *  Arguments Returned:
       CHARACTER DIR*(*)
@@ -101,6 +107,8 @@
       INTEGER BNEND              ! Index of last character in base name
       INTEGER DIRBEG             ! Index of first character in directory
       INTEGER DIREND             ! Index of last character in directory
+      INTEGER DOT                ! Position of next dot in basename
+      INTEGER IDOT               ! Index of next dot in basename
       INTEGER LSPEC              ! Length of spec
       INTEGER SECBEG             ! Index of first character in section
       INTEGER SECEND             ! Index of last character in section
@@ -144,8 +152,20 @@
       END IF
 
 *  Find the first dot following the start of the basename.
-      SUFBEG = INDEX( SPEC( BNBEG : LSPEC ), '.' )
-      SUFEND = -1
+      DOT = 0
+      DO IDOT = 0, NDOT
+         IF( DOT .GE. 0 ) THEN
+            SUFBEG = INDEX( SPEC( BNBEG + DOT : LSPEC ), '.' )
+            IF( SUFBEG .GT. 0 ) THEN
+               DOT = DOT + SUFBEG
+            ELSE
+               DOT = -1
+            END IF
+         END IF
+      END DO
+
+      SUFBEG = DOT
+      SUFEND = -2
 
 *  If a dot was found it marks the start of the suffix, which extends to
 *  the end of the remaining string.

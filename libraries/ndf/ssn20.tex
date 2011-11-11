@@ -1666,6 +1666,8 @@ library in format conversion commands, \st{etc:}
 \hline\hline
 {\bf dir}  & Directory in which the foreign file resides\\
 {\bf name} & Foreign file name (without directory or extension)\\
+{\bf namecl} & Cleaned version of {\bf name} (all non-alphanumeric characters
+replaced by underscores)\\
 {\bf type} & Foreign file extension (with leading `.')\\
 {\bf vers} & Foreign file version number (blank if not supported)\\
 {\bf fxs}  & Foreign extension specifier (see \S\ref{sect:fxs} )\\
@@ -1696,16 +1698,16 @@ are defined for use within each context:
 \begin{tabular}{r|l|ccccccccc|}
 \multicolumn{2}{c}{}&\multicolumn{9}{c}{\st{Token}}\\
 \cline{3-11}
-\multicolumn{2}{c|}{}&{\bf dir}&{\bf name}&{\bf type}&{\bf vers}
+\multicolumn{2}{c|}{}&{\bf dir}&{\bf name}&{\bf namecl}&{\bf type}&{\bf vers}
 &{\bf fxs}&{\bf fxscl}&{\bf fmt}&{\bf ndf}&{\bf xtn}\\
 \cline{2-11}
 &{\bf FROM} & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \no \\
-&{\bf TO}   & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \no \\
-&{\bf DEL}  & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \no  & \no \\
-\st{Context} &{\bf KEEP} & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \no  & \no \\
-&{\bf TEMP} & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \no & \no \\
-&{\bf IMP}  & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes \\
-&{\bf EXP}  & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes \\
+&{\bf TO}   & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \no \\
+&{\bf DEL}  & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \no  & \no \\
+\st{Context} &{\bf KEEP} & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \no  & \no \\
+&{\bf TEMP} & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \no & \no \\
+&{\bf IMP}  & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes \\
+&{\bf EXP}  & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes & \yes \\
 \cline{2-11}
 \end{tabular}
 \end{center}

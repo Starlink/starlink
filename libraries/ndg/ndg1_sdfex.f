@@ -233,7 +233,7 @@
 *  Split the object path up into directory, basename, suffix and section
 *  (the section specified will be blank since DAT_MSG does not know about
 *  NDF sections).
-               CALL NDG1_FPARS( PATH2( : LPATH2 ), DIR2, BN2, SUF2,
+               CALL NDG1_FPARS( PATH2( : LPATH2 ), 0, DIR2, BN2, SUF2,
      :                          SEC2, STATUS )
 
 *  DAT_MSG always puts in a full directory specification, even if the NDF

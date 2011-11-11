@@ -210,7 +210,8 @@
       CALL MSG_LOAD( ' ', '^NDF', NDFNAM, NDFLEN, STATUS )
 
 *  Split the file spec into directory, basename, suffix and section.
-      CALL NDG1_FPARS( NDFNAM( : NDFLEN ), DIR, NAM, TYP, SEC, STATUS )
+      CALL NDG1_FPARS( NDFNAM( : NDFLEN ), 0, DIR, NAM, TYP, SEC,
+     :                 STATUS )
 
 *  We want the whole of each NDF, not just a section matching the
 *  supplied NDF, so blank out the section string obtained form the supplied
