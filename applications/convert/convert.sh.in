@@ -66,6 +66,8 @@
 #        Change various -z tests to -n, logic was reversed.
 #     2009 July 30 (PWD):
 #        Convert to Bourne shell syntax. Fix problem with FITSGZ temp files.
+#     2011 November 11 (TIMJ):
+#        Use namecl token for temp file names.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -206,9 +208,9 @@ export NDF_FORMATS_OUT
 #  as input, NDF_TEMP_FITS must specify an alternative to the default
 #  HDS scratch file.
 if test -n "$HDS_SCRATCH"; then
-   NDF_TEMP_FITS="$HDS_SCRATCH/temp_fits_^name^fxscl"
+   NDF_TEMP_FITS="$HDS_SCRATCH/temp_fits_^namecl^fxscl"
 else
-   NDF_TEMP_FITS='temp_fits_^name^fxscl'
+   NDF_TEMP_FITS='temp_fits_^namecl^fxscl'
 fi
 export NDF_TEMP_FITS
 
@@ -319,9 +321,9 @@ NDF_TO_COMPRESSED="\$CONVERT_DIR/convertndf to '^fmt' '^dir' '^name' '^type' '^f
 export NDF_TO_COMPRESSED
 
 if test -n "$HDS_SCRATCH"; then
-   NDF_TEMP_COMPRESSED="$HDS_SCRATCH/temp_Z_^name"
+   NDF_TEMP_COMPRESSED="$HDS_SCRATCH/temp_Z_^namecl"
 else
-   NDF_TEMP_COMPRESSED='temp_Z_^name'
+   NDF_TEMP_COMPRESSED='temp_Z_^namecl'
 fi
 export NDF_TEMP_COMPRESSED
 
@@ -334,9 +336,9 @@ NDF_TO_GZIP="\$CONVERT_DIR/convertndf to '^fmt' '^dir' '^name' '^type' '^fxs' '^
 export NDF_TO_GZIP
 
 if test -n "$HDS_SCRATCH"; then
-   NDF_TEMP_GZIP="$HDS_SCRATCH/temp_gz_^name"
+   NDF_TEMP_GZIP="$HDS_SCRATCH/temp_gz_^namecl"
 else
-   NDF_TEMP_GZIP='temp_gz_^name'
+   NDF_TEMP_GZIP='temp_gz_^namecl'
 fi
 export NDF_TEMP_GZIP
 
@@ -349,9 +351,9 @@ NDF_TO_FITSGZ="\$CONVERT_DIR/convertndf to '^fmt' '^dir' '^name' '^type' '^fxs' 
 export NDF_TO_FITSGZ
 
 if test -n "$HDS_SCRATCH"; then
-   NDF_TEMP_FITSGZ="$HDS_SCRATCH/temp_fgz_^name"
+   NDF_TEMP_FITSGZ="$HDS_SCRATCH/temp_fgz_^namecl"
 else
-   NDF_TEMP_FITSGZ='temp_fgz_^name'
+   NDF_TEMP_FITSGZ='temp_fgz_^namecl'
 fi
 export NDF_TEMP_GZIP
 
