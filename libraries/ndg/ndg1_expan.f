@@ -336,7 +336,8 @@
 *  some foreign formats defined.
          NDOT = 0
          SUF = '.'
-         DO WHILE( SUF .NE. ' ' .AND.
+         SUFF = ' '
+         DO WHILE( SUF .NE. ' ' .AND. SUFF .NE. NDG__NDFTP .AND.
      :             ( NDOT .EQ. 0 .OR. NFMT .GT. 0 ) .AND.
      :             STATUS .EQ. SAI__OK )
             CALL NDG1_FPARS( TMPLT2 ( : J ), NDOT, DIR, BN, SUF, SEC,
@@ -495,6 +496,8 @@
 
          END DO
 
+*  Only look for one dot if the standard NDF suffix was found.
+         IF ( SUFF .EQ. NDG__NDFTP ) NDOT = 0
       END IF
 
 *  Get the number of potentially matching files.
