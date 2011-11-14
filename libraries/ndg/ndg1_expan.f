@@ -71,7 +71,7 @@
 *  Copyright:
 *     Copyright (C) 1999 CLRC
 *     Copyright (C) 2005, 2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009,2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -133,6 +133,8 @@
 *        Do not escape spaces within NDF section strings.
 *     26-JUN-2009 (TIMJ):
 *        RPOS should be zero when using CHR_APPND otherwise you get a leading space.
+*     14-NOV-2011 (DSB):
+*        Allow foreign files to have dots in the file basename.
 *     {enter_further_changes_here}
 
 *-
@@ -169,6 +171,8 @@
 *  Local Constants:
       INTEGER MXSRCH             ! Max length of search list string
       PARAMETER ( MXSRCH = 2048 )
+      INTEGER MAXDOT             ! Max no. of dots in file basename
+      PARAMETER ( MAXDOT = 100 )
 
 *  Some compilers need '\\' to get '\', which isn't a problem as Fortran
 *  will truncate the string '\\' to '\' on the occasions when that isn't
@@ -197,6 +201,7 @@
       CHARACTER TMPLT2*(GRP__SZNAM)! File basename
       CHARACTER TYP*(GRP__SZNAM)   ! File type field
       INTEGER F                  ! Index of first non-blank character
+      INTEGER FSTDOT( 0:MAXDOT ) ! Index of 1st IGRP2 entry with NDOT dots in basename
       INTEGER G2SIZ              ! Size of IGRP2 group
       INTEGER G2SIZ0             ! Original size of IGRP2 group
       INTEGER I                  ! Loop count
@@ -330,18 +335,22 @@
 *  Split the template into directory, basename, suffix and section. On
 *  the first pass the suffix is assumed to start at the first dot, but
 *  the basename may contain a dot. So another pass is made in which the
-*  suffix is assumed to start at the second dot (if any). This loop 
-*  continues, using one extra dot on each pass, until we exceed the 
-*  number of dots in the template. Only loop more than once if we have 
+*  suffix is assumed to start at the second dot (if any). This loop
+*  continues, using one extra dot on each pass, until we exceed the
+*  number of dots in the template. Only loop more than once if we have
 *  some foreign formats defined.
          NDOT = 0
          SUF = '.'
-         SUFF = ' '
-         DO WHILE( SUF .NE. ' ' .AND. SUFF .NE. NDG__NDFTP .AND.
+         DO WHILE( SUF .NE. ' ' .AND. NDOT .LE. MAXDOT .AND.
      :             ( NDOT .EQ. 0 .OR. NFMT .GT. 0 ) .AND.
      :             STATUS .EQ. SAI__OK )
             CALL NDG1_FPARS( TMPLT2 ( : J ), NDOT, DIR, BN, SUF, SEC,
      :                       STATUS )
+
+*  Store the index within IGRP2 of the first matching file spec that
+*  contains "NDOT" dots in the basename.
+            CALL GRP_GRPSZ( IGRP2, G2SIZ, STATUS )
+            FSTDOT( NDOT ) = G2SIZ + 1
 
 *  Increment the number of dots expected in the file basename in
 *  preparation for the next pass round this loop.
@@ -496,8 +505,6 @@
 
          END DO
 
-*  Only look for one dot if the standard NDF suffix was found.
-         IF ( SUFF .EQ. NDG__NDFTP ) NDOT = 0
       END IF
 
 *  Get the number of potentially matching files.
@@ -528,6 +535,9 @@
 *  the file spec ontains any spaces.
       CALL HDS_TUNE( 'SHELL', -1, STATUS )
 
+*  The first matches have zero dots in the basename.
+      NDOT = 0
+
 *  Check each one.
       DO I = 1, NMATCH
 
@@ -535,6 +545,11 @@
 *  potential match.
          CALL GRP_GET( IGRP2, I, 1, SPEC, STATUS )
          CALL GRP_GET( IGRP3, I, 1, REST, STATUS )
+
+*  Get the number of dots in the basename.
+         DO WHILE( I .EQ. FSTDOT( NDOT + 1 ) )
+            NDOT = NDOT + 1
+         END DO
 
 *  Split the file spec into directory, basename, suffix and section.
          CALL NDG1_FPARS( SPEC, NDOT, DIR, NAM, TYP, SEC, STATUS )
