@@ -535,6 +535,9 @@
 *  the file spec ontains any spaces.
       CALL HDS_TUNE( 'SHELL', -1, STATUS )
 
+*  Put a sentinel value at the end of the FSTDOT array.
+      FSTDOT( NDOT ) = NMATCH + 1
+
 *  The first matches have zero dots in the basename.
       NDOT = 0
 
