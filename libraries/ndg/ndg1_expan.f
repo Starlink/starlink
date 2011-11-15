@@ -174,12 +174,6 @@
       INTEGER MAXDOT             ! Max no. of dots in file basename
       PARAMETER ( MAXDOT = 100 )
 
-*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
-*  will truncate the string '\\' to '\' on the occasions when that isn't
-*  needed.
-      CHARACTER*1 ESC            ! An escape character
-      PARAMETER (ESC = '\\')
-
 *  Local Variables:
       CHARACTER BN*(GRP__SZNAM)    ! File basename
       CHARACTER BNM*(GRP__SZNAM)   ! Modified file basename
@@ -328,7 +322,7 @@
          J = 1
          DO I = F, L
             IF( TEMPLT( I : I ) .EQ. ' ' .AND. I .LT. LEND ) THEN
-               TMPLT2( J : J ) = ESC
+               TMPLT2( J : J ) = NDG__BKSLH
                J = J + 1
             END IF
             TMPLT2( J : J ) = TEMPLT( I : I )
