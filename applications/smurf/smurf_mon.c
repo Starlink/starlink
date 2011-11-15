@@ -422,7 +422,10 @@ void smurf_mon( int * status ) {
   /* For some reason, we need to cancel the REF parameter, otherwise
      some HDS locators for the associated NDF object are left dangling
      (e.g. within smf_getrefwcs.c */
-  parCancl( "REF", status );
+  if (*status == SAI__OK) {
+    parCancl( "REF", status );
+    if (*status != SAI__OK) errAnnul( status );
+  }
 
   /* Check for HDS leaks Do this in a new error reporting context so
    * that we get the correct value even if an error has occurred. */
