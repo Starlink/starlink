@@ -235,6 +235,9 @@
 *  yet been found.
       FOUND = .FALSE.
 
+*  Placate the compiler
+      PURGE = .FALSE.
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
