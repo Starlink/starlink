@@ -59,7 +59,7 @@ CPPFLAGS="$CPPFLAGS $X_CFLAGS -I/usr/X11/include"
 
 dnl   Add the png driver if the PNG header and library are available.
 AC_CHECK_HEADER(png.h,
-                AC_CHECK_LIB(png, png_info_init,
+                AC_CHECK_LIB(png, png_create_write_struct,
                              [LIBS="$LIBS -lpng";common_built_drivers="$common_built_drivers pndriv.lo"],
                              [AC_MSG_WARN(PNG libraries not found)],
                              [-lz]))
