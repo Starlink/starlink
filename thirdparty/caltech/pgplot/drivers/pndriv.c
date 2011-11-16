@@ -222,7 +222,7 @@ static void write_image_file(DeviceData *dev) {
 	return;
   }
 
-  if (setjmp(png_ptr->jmpbuf)) { /* not really sure what I'm doing here... */
+  if (setjmp(png_jmpbuf(png_ptr))) { /* not really sure what I'm doing here... */
 	fprintf(stderr,"%s: error in libpng while writing file %s, plotting disabled\n", png_ident, filename);
 	png_destroy_write_struct(&png_ptr,&info_ptr);
 	dev->error = true;
