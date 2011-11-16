@@ -10,10 +10,6 @@
      - Display CCD Mosaics with correct orientations (using a tiling
        scheme of some kind), again partially done.
 
-  o FITS images
-
-     - Add warnings or other work around for multiple period names.
-
   o Add facilities to replace INSPECT
 
       - Histograms of regions
@@ -25,15 +21,6 @@
       - LUT creation/manpulation
 
   o Astrometry solutions
-
-      - Add facilities for doing plate solutions (i.e. distorted
-        ones), probably using the new AUTOASTROM. Done.
-
-      - Display displacement vectors to display fit quality
-
-      - Support latest FITS-WCS projections, on-going.
- 
-      - Read TAB tables directly
 
       - Import columns by property not order (do not assume ID RA DEC...).
 
@@ -59,16 +46,10 @@
 
   o Printing
 
-      - Add ability to print whole of image/graphics, not just displayed
-        part. This is needed so that large images can be printed at pixel
-        resolution.
-
       - Create and display true-colour images (from several images in
         different filters)
 
   o Variants
-
-      - Do HP/UX port -- of USSC to merge support for GAIA plugin
 
       - Create production standalone version (includes parts of other
         packages as necessary).
@@ -89,8 +70,6 @@
 
       - Bias subtraction code
 
-      - Selection of 2D image planes from 3D arrays (WFI images)
-
   o Catalogues
 
       - Release CDS interface
@@ -98,9 +77,6 @@
       - Increase search box maximum
 
       - Add Landolt catalogue
-
-      - Open binary FITS tables using Skycat methods (avoids problems
-        when file has multiple periods which CAT doesn't like).
 
   o Regions
        
@@ -119,10 +95,6 @@
 
       - add image orientation/rescaling facilities (geometric
         resampling). 
-
-  o Blinking:
-
-      - pre-align images. Done.
 
   o Photom toolbox
      
@@ -150,5 +122,3 @@
 
       - make it possible to load more than one catalogue.
 
-      - make it possible to load more than one image. Done see
-        "gaiadispmany" command.

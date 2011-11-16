@@ -34,6 +34,11 @@
     coordinate systems that are incorrect or not as accurate as the current
     one.
 
+    FITS files with more than one period in their names will now be handled
+    by the analysis toolboxes. Previously names like "a.b.c.d.fits" would 
+    give an error when a conversion to the NDF format was attempted. This
+    uses enhancements to the CONVERT package.
+
     Version 4.4-2
     =============
 
