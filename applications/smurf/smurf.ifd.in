@@ -3914,7 +3914,6 @@ package @PACKAGE@ {
                 vpath {DEFAULT }
                 prompt {Whiten the map power spectrum?}
                 ppath GLOBAL CURRENT
-                default FALSE
                 helpkey *
             }
 
