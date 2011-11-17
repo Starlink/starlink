@@ -757,7 +757,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                 if (allseqs) allseqs = astFree(allseqs);
 
                 if (needed) {
-                  *status = SAI__ERROR;
+                  *status = SMF__BADFLAT;
                   errRepf( "", "Flatfield from %s failed to process but this is "
                            "required for science processing", status, fname );
                 }
