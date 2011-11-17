@@ -36897,7 +36897,7 @@ static void WriteFits( AstFitsChan *this, int *status ){
 *++
 *  Name:
 c     astWriteFits
-f     AST_WriteFits
+f     AST_WRITEFITS
 
 *  Purpose:
 *     Write out all cards in a FitsChan to the sink function.
@@ -36908,7 +36908,7 @@ f     AST_WriteFits
 *  Synopsis:
 c     #include "fitschan.h"
 c     void astWriteFits( AstFitsChan *this )
-f     CALL AST_WriteFits( THIS, STATUS )
+f     CALL AST_WRITEFITS( THIS, STATUS )
 
 *  Class Membership:
 *     FitsChan method.

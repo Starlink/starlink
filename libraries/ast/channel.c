@@ -4946,8 +4946,8 @@ f     AST_READ
 *  Notes:
 *     - Any open SourceFile is closed when the Channel is deleted.
 *     - If the Channel is copied or dumped
-c     (using astCopy or astDump)
-f     (using AST_COPY or AST_DUMP)
+c     (using astCopy or astShow)
+f     (using AST_COPY or AST_SHOW)
 *     the SourceFile attribute is left in a cleared state in the output
 *     Channel (i.e. the value of the SourceFile attribute is not copied).
 
@@ -5027,8 +5027,8 @@ f     AST_WRITE
 *     error will be reported.
 *     - Any open SinkFile is closed when the Channel is deleted.
 *     - If the Channel is copied or dumped
-c     (using astCopy or astDump)
-f     (using AST_COPY or AST_DUMP)
+c     (using astCopy or astShow)
+f     (using AST_COPY or AST_SHOW)
 *     the SinkFile attribute is left in a cleared state in the output
 *     Channel (i.e. the value of the SinkFile attribute is not copied).
 
