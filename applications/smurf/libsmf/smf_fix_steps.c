@@ -300,7 +300,16 @@ typedef struct Step {
 
 #ifdef DEBUG_STEPS
 
-#define RECORD_BOLO (ibolo==779)
+#ifdef RECORDED_BOLO
+static int debug_bolo = RECORDED_BOLO;
+#else
+static int debug_bolo = -1;
+#endif
+static int get_debug_bolo( void );
+
+#define RECORD_BOLO (get_debug_bolo()==ibolo)
+
+
 #define RECORD_BOLO2 (1)
 
 #define TOPCAT(fd, x) \
@@ -2362,3 +2371,14 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
    pdata->nfixed = nfixed;
 
 }
+
+
+#ifdef DEBUG_STEPS
+static int get_debug_bolo( void ) {
+   while( debug_bolo < 0 ) {
+      printf("Enter zero-based index of bolometer to record: ");
+      scanf( "%d", &debug_bolo );
+   }
+   return debug_bolo;
+}
+#endif
