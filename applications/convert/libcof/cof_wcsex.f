@@ -129,6 +129,8 @@
 *        does not support spectral axes).
 *     2011 March 2 (MJC):
 *        Added EXCLUD argument.
+*     2011 November 17 (MJC):
+*        Fixed reinstatement of current Frame.
 *     {enter_further_changes_here}
 
 *-
@@ -373,7 +375,10 @@
          IFRAC = AST_GETI( IWCS, 'CURRENT', STATUS )
          IF( IFRAC .NE. ICURR0 ) THEN
             CALL AST_REMOVEFRAME( IWCS, IFRAC, STATUS )
-            ICURR0 = AST_GETI( IWCS, 'CURRENT', STATUS )
+
+            IF ( ICURR0 .GT. IFRAC .AND. ICURR0 .NE. AST__NOFRAME ) THEN
+               ICURR0 = ICURR0 - 1
+            END IF
          END IF
       END IF
 
@@ -452,11 +457,6 @@
          IPIXEL = AST__NOFRAME
       END IF
 
-*  Reinstate the original current Frame if it is still there.
-      IF( ICURR0 .NE. AST__NOFRAME ) THEN
-         CALL AST_SETI( IWCS, 'CURRENT', ICURR0, STATUS )
-      END IF
-
 *  The AST FitsChan class (used by the AST_WRITE method) uses the Symbol
 *  attributes of the AXIS Frame as the value for the FITS CTYPE keyword.
 *  But the NDF library always sets these to "a1" "a2" etc, which is not
@@ -532,11 +532,18 @@
      :                            EXCNAM, STATUS ) .NE. AST__NULL ) THEN
                   EXCFRM = AST_GETI( IWCS, 'CURRENT', STATUS )
 
-*  If found, remove the chosen Frame from the FrameSet, correct the AXIS
-*  Frame index, the current Frame index, and invalidate the PIXEL Frame
-*  index. If the PIXEL Frame was the original Current Frame, then make
-*  the AXIS Frame the current Frame.
+*  If found, remove the chosen Frame from the FrameSet.  Shift the
+*  original current Frame as necessary.
                   CALL AST_REMOVEFRAME( IWCS, EXCFRM, STATUS )
+                  IF ( EXCFRM .NE. ICURR0 ) THEN
+                     IF ( ICURR0 .GT. EXCFRM .AND.
+     :                    ICURR0 .NE. AST__NOFRAME ) THEN
+                        ICURR0 = ICURR0 - 1
+                     END IF
+                  ELSE
+                     ICURR0 = AST__NOFRAME
+                  END IF
+
                END IF
             END IF
 
@@ -546,6 +553,11 @@
                START = IAT
             END IF
          END DO
+      END IF
+
+*  Reinstate the original current Frame if it is still there.
+      IF ( ICURR0 .NE. AST__NOFRAME ) THEN
+         CALL AST_SETI( IWCS, 'CURRENT', ICURR0, STATUS )
       END IF
 
 *  Write out any remaining WCS information.
