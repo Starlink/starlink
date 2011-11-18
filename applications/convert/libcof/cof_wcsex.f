@@ -640,7 +640,7 @@
                IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to write the FrameSet to the FitsChan. If it was written
-*  succesfully, inrement the number of encodings written to the header
+*  successfully, increment the number of encodings written to the header
 *  and leave the encodings loop.
                IF( AST_WRITE( FC, IWCS, STATUS ) .EQ. 1 ) THEN
                   COF_WCSEX = COF_WCSEX + 1
