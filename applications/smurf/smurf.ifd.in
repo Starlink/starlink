@@ -3914,6 +3914,7 @@ package @PACKAGE@ {
                 vpath {DEFAULT }
                 prompt {Whiten the map power spectrum?}
                 ppath GLOBAL CURRENT
+                default FALSE
                 helpkey *
             }
 
@@ -3923,7 +3924,6 @@ package @PACKAGE@ {
                 vpath {DEFAULT }
                 prompt {Reference map for whitening filter}
                 ppath GLOBAL CURRENT
-                default FALSE
                 helpkey *
             }
 
