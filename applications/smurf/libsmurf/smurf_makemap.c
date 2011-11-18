@@ -1186,6 +1186,7 @@ void smurf_makemap( int *status ) {
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int first;                 /* Is this the first input file? */
   smfArray *flatramps = NULL;/* Flatfield ramps */
+  int gotbadflat = 0;        /* Was one of the required flats bad? */
   AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   int *histogram = NULL;     /* Histogram for calculating exposure statistics */
   int *hitsmap;              /* Hitsmap array calculated in ITERATE method */
@@ -1295,6 +1296,14 @@ void smurf_makemap( int *status ) {
               status );
     }
     goto L998;
+  }
+
+  /* if we ended up with bad flat field data we may still want to
+     calculate the bounds of the output map using OUT=!. */
+  if (*status == SMF__BADFLAT) {
+    gotbadflat = 1;
+    errMark();
+    errAnnul(status);
   }
 
   /* Get group of bolometer masks and read them into a smfArray */
@@ -1488,12 +1497,21 @@ void smurf_makemap( int *status ) {
     /* If OUT is NULL annul the bad status but set a flag so that we
        know to skip memory checks and actual map-making */
     if( *status == PAR__NULL ) {
+      if (gotbadflat) errRlse();
       errAnnul( status );
       goto L998;
     }
 
     /* Expand the group to hold an output NDF name for each tile. */
     smf_expand_tilegroup( ogrp, ntile, 0, &outsize, status );
+  }
+
+  /* now we want that bad status from a bad flat to trigger */
+  if (gotbadflat) {
+    errRlse();
+    *status = SMF__BADFLAT;
+    errRep("", "Flatfield data not trusted so can not proceed to map-making",
+           status );
   }
 
   /* Create the output map using the chosen METHOD */
