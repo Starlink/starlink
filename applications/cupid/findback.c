@@ -64,7 +64,7 @@ void findback( int *status ){
 *     to obtain the output NDF.
 
 *  Usage:
-*     findback in out box ilevel
+*     findback in out box
 
 *  ADAM Parameters:
 *     BOX() = _INTEGER (Read)
