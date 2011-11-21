@@ -120,7 +120,10 @@ STAR_LARGEFILE_SUPPORT
 dnl    Need libtool for linking.
 AC_CHECK_PROGS([LIBTOOL],[libtool])
 
-PKG_LIBS="${PKG_LIBS} -lxerces-c"
+PKG_LIBS="${PKG_LIBS} -lxerces-c `starX_link`"
+SHLIB_PKG_LIBS="${PKG_LIBS}"
+AC_SUBST(PKG_LIBS)
+AC_SUBST(SHLIB_PKG_LIBS)
 
 #  Restore full tcl.m4 CFLAGS.
 CFLAGS="$old_CFLAGS"
