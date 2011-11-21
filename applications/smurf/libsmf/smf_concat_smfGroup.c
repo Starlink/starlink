@@ -609,8 +609,8 @@ void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
           outgrp = smf_grp_new( igrp->grp, "GRP", status );
 
           ndgCpsup( igrp->grp, igrp->subgroups[j][i], ingrp, status );
-          ndgCrexp( "./*_con" SMF__DIMM_SUFFIX "|.sdf||", ingrp, &outgrp,
-                    &outgrpsize, &flag, status );
+          ndgCrexp( "./*_" SMF__CON_SUFFIX SMF__DIMM_SUFFIX "|.sdf||", ingrp,
+                    &outgrp, &outgrpsize, &flag, status );
 
           pname = filename;
           grpGet( outgrp, 1, 1, &pname, SMF_PATH_MAX, status);

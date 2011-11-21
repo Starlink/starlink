@@ -415,6 +415,9 @@ static const size_t SMF__BADIDX = (size_t)-1;
 /* suffix for simple binary files that store DIMM model components */
 #define SMF__DIMM_SUFFIX ".dimm"
 
+/* suffix for filename of concatenated data (residual files) */
+#define SMF__CON_SUFFIX "con"
+
 /* SMURF NDF extension name and type */
 #define SMURF__EXTNAME "SMURF"
 #define SMURF__EXTTYPE "SMURF_EXT"

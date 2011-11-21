@@ -376,6 +376,8 @@
 *        Add sampcubes extension
 *     2011-09-19 (EC):
 *        Add ability to write ONLY the final itermap (set itermap < 0)
+*     2011-11-21 (EC):
+*        Use map directly instead of 3d cube projection for AST
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -462,9 +464,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      size_t *numcnvg, int *status ) {
 
   /* Local Variables */
-  smfArray **ast=NULL;          /* Astronomical signal */
-  double *ast_data=NULL;        /* Pointer to DATA component of ast */
-  smfGroup *astgroup=NULL;      /* smfGroup of ast model files */
   int bolomap=0;                /* If set, produce single bolo maps */
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
@@ -1301,7 +1300,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* there is one smfArray for LUT, AST and QUA for each filegroup */
       lut = astCalloc( nfilegroups, sizeof(*lut) );
-      ast = astCalloc( nfilegroups, sizeof(*ast) );
       qua = astCalloc( nfilegroups, sizeof(*qua) );
 
       if( memiter ) {
@@ -1432,17 +1430,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                    ": ** %f s pre-conditioning data",
                    status, smf_timerupdate(&tv1,&tv2,status) );
 
-        /* Continue with other static model. */
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap, NULL,
-                          nfilegroups, SMF__AST, 0, NULL, 0, NULL, NULL,
-                          NULL, memiter, memiter, ast, keymap, status );
-
-        /* Also associate quality with AST model. */
-        for( idx=0; (*status==SAI__OK)&&(idx<ast[0]->ndat); idx++ ) {
-          smfData *thisqua = qua[0]->sdata[idx];
-          ast[0]->sdata[idx]->sidequal = thisqua;
-        }
-
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                    ": ** %f s creating last set of static models",
@@ -1470,10 +1457,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
                           NULL, 0, SMF__LUT, 0, outfset, moving, lbnd_out, ubnd_out,
                           &lutgroup, memiter, memiter, lut, keymap, status );
-
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
-                          NULL, 0, SMF__AST, 0, NULL, 0, NULL, NULL,
-                          &astgroup, memiter, memiter, ast, keymap, status );
 
         smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
                           NULL, 0, SMF__QUA, 0, NULL, 0, NULL, NULL,
@@ -1702,13 +1685,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* Continue with other model components */
             smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
-            smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
-
-            /* Associate quality model with the ast model */
-            for( idx=0; idx<ast[i]->ndat; idx++ ) {
-              smfData *thisqua = qua[i]->sdata[idx];
-              ast[i]->sdata[idx]->sidequal = thisqua;
-            }
 
             for( j=0; j<nmodels; j++ ) {
               smf_open_related_model( modelgroups[j], i, "UPDATE",
@@ -1748,8 +1724,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 data = res[i]->sdata[idx];
 
                 /* create a file name with "_res_cln" suffix */
-                smf_model_stripsuffix( res[i]->sdata[idx]->file->name,
-                                       name, status );
+                smf_stripsuffix( res[i]->sdata[idx]->file->name,
+                                 SMF__DIMM_SUFFIX, name, status );
 
                 if( memiter ) {
                   /* if memiter=1, need to append "_res" to the name */
@@ -1872,15 +1848,14 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           if( *status == SAI__OK ) {
 
-            /* Ensure we use the AST model ordering */
+            /* Ensure we use the RES model ordering */
             smf_model_dataOrder( &dat, NULL, i, SMF__RES|SMF__LUT|SMF__QUA,
-                                 ast[i]->sdata[0]->isTordered, status );
+                                 res[i]->sdata[0]->isTordered, status );
 
             /* Loop over subgroup index (subarray) */
             for( idx=0; idx<res[i]->ndat; idx++ ) {
 
               /* Add last iter. of astronomical signal back in to residual */
-              ast_data = (ast[i]->sdata[idx]->pntr)[0];
               res_data = (res[i]->sdata[idx]->pntr)[0];
               lut_data = (lut[i]->sdata[idx]->pntr)[0];
               qua_data = (qua[i]->sdata[idx]->pntr)[0];
@@ -1891,12 +1866,15 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 var_data = NULL;
               }
 
-              smf_get_dims( ast[i]->sdata[idx], NULL, NULL, NULL, NULL, &dsize,
+              smf_get_dims( res[i]->sdata[idx], NULL, NULL, NULL, NULL, &dsize,
                             NULL, NULL, status );
 
               for( k=0; k<dsize; k++ ) {
-                if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
-                  res_data[k] += ast_data[k];
+                if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ) {
+                  double ast_data = map[lut_data[k]];
+                  if( ast_data != VAL__BADD ) {
+                    res_data[k] += ast_data;
+                  }
                 }
               }
 
@@ -1946,7 +1924,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           if( !memiter ) {
             smf_close_related( &res[i], status );
-            smf_close_related( &ast[i], status );
             smf_close_related( &lut[i], status );
             smf_close_related( &qua[i], status );
 
@@ -2043,7 +2020,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             /* Open files if memiter not set - otherwise they are still open
                from earlier call */
             if( !memiter ) {
-              smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
               smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
               smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
               smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
@@ -2062,7 +2038,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             dimmflags=0;
             if( quit == 0 ) dimmflags |= SMF__DIMM_LASTITER;
-            smf_calcmodel_ast( wf, &dat, i, keymap, ast, dimmflags, status );
+            smf_calcmodel_ast( wf, &dat, i, keymap, NULL, dimmflags, status );
 
             /*** TIMER ***/
             msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
@@ -2102,7 +2078,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* Close files if memiter not set */
             if( !memiter ) {
-              smf_close_related( &ast[i], status );
               smf_close_related( &res[i], status );
               smf_close_related( &lut[i], status );
               smf_close_related( &qua[i], status );
@@ -2194,15 +2169,19 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                         &dsize, NULL, NULL, status );
 
           res_data = res[0]->sdata[idx]->pntr[0];
-          ast_data = ast[0]->sdata[idx]->pntr[0];
+          lut_data = lut[0]->sdata[idx]->pntr[0];
           qua_data = qua[0]->sdata[idx]->pntr[0];
 
           /* Add ast back into res. Mask should match ast_calcmodel_ast. */
           for( k=0; k<dsize; k++ ) {
-            if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
-              res_data[k] += ast_data[k];
+            if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ) {
+              double ast_data = map[lut_data[k]];
+              if( ast_data != VAL__BADD ) {
+                res_data[k] += ast_data;
+              }
             }
           }
+
         }
       }
 
@@ -2294,15 +2273,19 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                         &dsize, NULL, NULL, status );
 
           res_data = res[0]->sdata[idx]->pntr[0];
-          ast_data = ast[0]->sdata[idx]->pntr[0];
+          lut_data = lut[0]->sdata[idx]->pntr[0];
           qua_data = qua[0]->sdata[idx]->pntr[0];
 
           /* Add ast back into res. Mask should match ast_calcmodel_ast. */
           for( k=0; k<dsize; k++ ) {
-            if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
-              res_data[k] -= ast_data[k];
+            if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ) {
+              double ast_data = map[lut_data[k]];
+              if( ast_data != VAL__BADD ) {
+                res_data[k] -= ast_data;
+              }
             }
           }
+
         }
       }
       /* ---------------------------------------------------------------- */
@@ -2354,7 +2337,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             /* Fixed components */
             smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
             smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
-            smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
 
             /* Dynamic components */
             for( j=0; j<nmodels; j++ ) {
@@ -2369,7 +2351,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           for( idx=0; idx<res[i]->ndat; idx++ ) {
             smf_dataOrder( qua[i]->sdata[idx], 1, status );
             smf_dataOrder( res[i]->sdata[idx], 1, status );
-            smf_dataOrder( ast[i]->sdata[idx], 1, status );
+            smf_dataOrder( lut[i]->sdata[idx], 1, status );
 
             /* Get quality array strides for smf_update_valbad */
             smf_get_dims( qua[i]->sdata[idx], NULL, NULL, &nbolo, &ntslice,
@@ -2421,8 +2403,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 if( (res[i]->sdata[idx]->file->name)[0] ) {
                   smf_model_createHdr( res[i]->sdata[idx], SMF__RES, refdata,
                                        status );
-                  smf_model_stripsuffix( res[i]->sdata[idx]->file->name,
-                                         name, status );
+                  smf_stripsuffix( res[i]->sdata[idx]->file->name,
+                                   SMF__DIMM_SUFFIX, name, status );
 
                   /* if memiter=1, need to append "_res" to the name */
                   if( memiter ) {
@@ -2447,26 +2429,79 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               }
 
               if( exportNDF_which[whichast] ) {
+                /* Create a smfData to hold the map projected into a data
+                   cube and then write it out. */
 
-                if( (ast[i]->sdata[idx]->file->name)[0] ) {
-                  smf_model_createHdr( ast[i]->sdata[idx], SMF__AST, refdata,
-                                       status );
-                  smf_model_stripsuffix( ast[i]->sdata[idx]->file->name,
-                                         name, status );
+                if( (res[i]->sdata[idx]->file->name)[0] ) {
+                  smfData *ast=NULL;
+                  double *ast_data=NULL;
+                  const char *astname=NULL;
+                  const char *resname=NULL;
+                  char workstr[GRP__SZNAM+1];
 
-                  if( !noexportsetbad ) {
-                    smf_update_valbad( ast[i]->sdata[idx], SMF__NUL,
-                                       NULL, 0, 0, SMF__Q_BADB, status );
+                  /* Since AST only exists as a time-series model if exporting,
+                     we work out the AST container filename based on RES here */
+
+                  astname = smf_model_getname( SMF__AST, status );
+                  resname = smf_model_getname( SMF__RES, status );
+
+                  smf_stripsuffix( res[i]->sdata[idx]->file->name,
+                                   SMF__DIMM_SUFFIX, workstr, status );
+                  smf_stripsuffix( workstr, resname, name, status );
+
+                  one_strlcat( name, "_" , sizeof(name), status );
+                  one_strlcat( name, astname, sizeof(name), status );
+
+                  /* Create the smfData, fill it with the projected
+                     map data, create its header, associate a quality
+                     array, and set bad values */
+
+                  ast = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL,
+                                               SMF__DOUBLE, NULL, NULL,
+                                               SMF__QFAM_NULL,
+                                               qua[i]->sdata[idx], 0, 1,
+                                               res[i]->sdata[idx]->dims,
+                                               res[i]->sdata[idx]->lbnd,
+                                               res[i]->sdata[idx]->ndims,
+                                               0, 0, NULL, NULL, status );
+
+                  smf_get_dims( ast, NULL, NULL, NULL, NULL, &dsize,
+                                NULL, NULL, status );
+
+                  ast->pntr[0] = astCalloc( dsize, smf_dtype_size(ast,status) );
+
+                  if( *status == SAI__OK ) {
+                    ast_data = ast->pntr[0];
+                    lut_data = (lut[i]->sdata[idx]->pntr)[0];
+
+                    for( j=0; j<dsize; j++ ) {
+                      if( lut_data[j] != VAL__BADI ) {
+                        ast_data[j] = map[lut_data[j]];
+                      } else {
+                        ast_data[j] = VAL__BADD;
+                      }
+                    }
                   }
 
-                  /* Also export QUAlity if requested */
-                  smf_write_smfData( ast[i]->sdata[idx], NULL, name,
-                                     NULL, 0, NDF__NOID, MSG__VERB, status );
+                  smf_model_createHdr( ast, SMF__AST, refdata, status );
+
+                  if( !noexportsetbad ) {
+                    smf_update_valbad( ast, SMF__NUL, NULL, 0, 0, SMF__Q_BADB,
+                                       status );
+                  }
+
+                  /* Export AST */
+                  smf_write_smfData( ast, NULL, name, NULL, 0, NDF__NOID,
+                                     MSG__VERB, status );
+
+                  /* Clean up */
+                  smf_close_file( &ast, status );
                 } else {
                   msgOut( " ",
                           "SMF__ITERATEMAP: Can't export AST -- NULL filename",
                           status);
                 }
+
               }
             }
 
@@ -2481,8 +2516,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                   smf_model_createHdr( model[j][i]->sdata[idx], modeltyps[j],
                                        refdata,status );
-                  smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name,
-                                         name, status );
+                  smf_stripsuffix( model[j][i]->sdata[idx]->file->name,
+                                   SMF__DIMM_SUFFIX, name, status );
 
                   if( !noexportsetbad ) {
                     smf_update_valbad( model[j][i]->sdata[idx], modeltyps[j],
@@ -2542,7 +2577,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           if( !memiter ) { /* Close files if doing disk i/o */
             smf_close_related( &res[i], status );
             smf_close_related( &qua[i], status );
-            smf_close_related( &ast[i], status );
 
             for( j=0; j<nmodels; j++ ) {
               smf_close_related( &model[j][i], status );
@@ -2643,14 +2677,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           }
         }
 
-        for( j=0; (astgroup)&&(j<astgroup->nrelated); j++ ) {
-          grpGet( astgroup->grp, astgroup->subgroups[i][j], 1, &pname,
-                  GRP__SZNAM, status );
-          if( *status == SAI__OK ) {
-            remove(name);
-          }
-        }
-
         for( j=0; (quagroup)&&(j<quagroup->nrelated); j++ ) {
           grpGet( quagroup->grp, quagroup->subgroups[i][j], 1, &pname,
                   GRP__SZNAM, status );
@@ -2674,7 +2700,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* fixed model smfGroups */
     if( resgroup ) smf_close_smfGroup( &resgroup, status );
-    if( astgroup ) smf_close_smfGroup( &astgroup, status );
     if( lutgroup ) smf_close_smfGroup( &lutgroup, status );
     if( quagroup ) smf_close_smfGroup( &quagroup, status );
 
@@ -2684,13 +2709,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( res[i] ) smf_close_related( &res[i], status );
       }
       res = astFree( res );
-    }
-
-    if( ast ) {
-      for( i=0; i<nfilegroups; i++ ) {
-        if( ast[i] ) smf_close_related( &ast[i], status );
-      }
-      ast = astFree( ast );
     }
 
     if( lut ) {

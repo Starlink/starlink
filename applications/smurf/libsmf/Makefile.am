@@ -269,7 +269,6 @@ smf_model_getexpptr.c \
 smf_model_getname.c \
 smf_model_getptr.c \
 smf_model_gettype.c \
-smf_model_stripsuffix.c \
 smf_ndg_copy.c \
 smf_obsmap_fill.c \
 smf_obsmap_report.c \
@@ -351,6 +350,7 @@ smf_spreadwidth.c \
 smf_store_image.c \
 smf_store_outputbounds.c \
 smf_string_to_dtype.c \
+smf_stripsuffix.c \
 smf_subinst_keymap.c \
 smf_subinst_str.c \
 smf_subtract_dark.c \

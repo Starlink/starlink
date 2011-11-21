@@ -99,6 +99,8 @@
 *        Add zero_mask externally supplied mask image
 *     2011-11-09 (EC):
 *        Use the REF image for zero_mask to ensure matching pixel grids
+*     2011-11-21 (EC):
+*        Just use map itself instead of 3d cube to store AST model data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -144,11 +146,11 @@
 void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
                         smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap __attribute__((unused)),
-                        smfArray **allmodel, int flags, int *status) {
+                        smfArray **allmodel __attribute__((unused)),
+                        int flags, int *status) {
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
-  double dchisq=0;              /* this - last model residual chi^2 */
   int dozero=0;                 /* zero boundaries on last iter? */
   double gaussbg;               /* gaussian background filter */
   int *hitsmap;                 /* Pointer to hitsmap data */
@@ -163,11 +165,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   double *map;                  /* Pointer to map data */
   double mapspike;              /* Threshold SNR to detect map spikes */
   double meanhits;              /* Mean hits in the map */
-  smfArray *model=NULL;         /* Pointer to model at chunk */
-  double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
-  size_t ndchisq=0;             /* number of elements contributing to dchisq */
   size_t newzero;               /* number new pixels zeroed */
   size_t ngood;                 /* Number good samples for stats */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
@@ -206,7 +205,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   mapvar = dat->mapvar;
   mapweight = dat->mapweight;
   mapweightsq = dat->mapweightsq;
-  model = allmodel[chunk];
   if(dat->noi) {
     noi = dat->noi[chunk];
   }
@@ -485,7 +483,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   }
 
   /* Ensure everything is in the same data order */
-  smf_model_dataOrder( dat, allmodel, chunk,SMF__LUT|SMF__RES|SMF__QUA|SMF__NOI,
+  smf_model_dataOrder( dat, NULL, chunk,SMF__LUT|SMF__RES|SMF__QUA|SMF__NOI,
                        lut->sdata[0]->isTordered, status );
 
   /* Loop over index in subgrp (subarray) */
@@ -494,7 +492,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     /* Get pointers to DATA components */
     res_data = (res->sdata[idx]->pntr)[0];
     lut_data = (lut->sdata[idx]->pntr)[0];
-    model_data = (model->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
     if( noi ) {
       smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
@@ -502,8 +499,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
       noi_data = (double *)(noi->sdata[idx]->pntr)[0];
     }
 
-    if( (res_data == NULL) || (lut_data == NULL) || (model_data == NULL) ||
-	(qua_data == NULL) ) {
+    if( (res_data == NULL) || (lut_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Null data in inputs", status);
     } else {
@@ -518,7 +514,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
         ii = i*bstride+j*tstride;
 
-	if( (lut_data[ii] != VAL__BADI) && (model_data[ii] != VAL__BADD) ) {
+	if( lut_data[ii] != VAL__BADI ) {
 
 	  /* calculate new model value using the map/LUT */
           m = map[lut_data[ii]];
@@ -530,16 +526,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
             m = 0;
           }
 
-          /* measure contribution to dchisq (samples that would go in map) */
-          if( noi && !(qua_data[ii]&SMF__Q_GOOD) ) {
-            dchisq += (m - model_data[ii])*(m - model_data[ii]) /
-              noi_data[i*noibstride + (j%nointslice)*noitstride];
-            ndchisq++;
-          }
-
-          /* update model container with new value */
-	  model_data[ii] = m;
-
 	  /* update the residual model.
              ***NOTE: unlike other model components we do *not* first
                       add the previous realization back in. This is
@@ -547,18 +533,11 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
                       before calling smf_rebinmap1. */
 
 	  if( !(qua_data[ii]&SMF__Q_MOD) ) {
-	    res_data[ii] -= model_data[ii];
+	    res_data[ii] -= m;
           }
 	}
       }
     }
-  }
-
-  /* Print normalized residual chisq for this model */
-  if( (*status==SAI__OK) && noi && (ndchisq>0) ) {
-    dchisq /= (double) ndchisq;
-    msgOutiff( MSG__VERB, "", "    normalized change in model: %lf", status,
-               dchisq );
   }
 
   if( kmap ) kmap = astAnnul( kmap );

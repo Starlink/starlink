@@ -426,8 +426,8 @@ void smurf_sc2clean( int *status ) {
           for( idx=0; (*status==SAI__OK)&&(idx<com->ndat); idx++ ) {
             smf_model_createHdr( com->sdata[idx], SMF__COM, concat->sdata[idx],
                                  status );
-            smf_model_stripsuffix( com->sdata[idx]->file->name, filename,
-                                   status );
+            smf_stripsuffix( com->sdata[idx]->file->name,
+                             SMF__DIMM_SUFFIX, filename, status );
 
             smf_dataOrder( com->sdata[idx], 1, status );
 
@@ -440,8 +440,8 @@ void smurf_sc2clean( int *status ) {
           for( idx=0; (*status==SAI__OK)&&(idx<gai->ndat); idx++ ) {
             smf_model_createHdr( gai->sdata[idx], SMF__GAI, concat->sdata[idx],
                                  status );
-            smf_model_stripsuffix( gai->sdata[idx]->file->name, filename,
-                                   status );
+            smf_stripsuffix( gai->sdata[idx]->file->name,
+                             SMF__DIMM_SUFFIX, filename, status );
 
             smf_dataOrder( gai->sdata[idx], 1, status );
             smf_write_smfData( gai->sdata[idx], NULL, filename, NULL, 0,

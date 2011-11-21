@@ -1412,8 +1412,6 @@ smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status);
 
 smf_modeltype smf_model_gettype( const char *modelname, int *status );
 
-void smf_model_stripsuffix( const char *instr, char *outstr, int *status );
-
 Grp *smf_ndg_copy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, int *status );
 
 void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap,
@@ -1734,6 +1732,9 @@ void smf_store_outputbounds (int updatepars, const int lbnd_out[3],
 
 void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype,
                            int * status );
+
+void smf_stripsuffix( const char *instr, const char *suffix, char *outstr,
+                      int *status );
 
 AstKeyMap *smf_subinst_keymap( smf_subinst_t subinst, const smfData * indata,
                                const Grp * igrp, size_t index, int * status );
