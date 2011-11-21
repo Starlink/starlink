@@ -145,6 +145,8 @@
 *     21-JUN-2011 (DSB):
 *        Added astCheckMemory - an alternative to astFlushMemory that does
 *        not free any memory.
+*     21-NOV-2011 (DSB):
+*        Correct matchend value returned by astChrSplitRE.
 */
 
 /* Configuration results. */
@@ -2592,7 +2594,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
                if( matches[ nmatch ] ) {
                   matches[ nmatch ][ matchlen ] = 0;
                   nmatch++;
-                  if( matchend ) *matchend = a + 1;
+                  if( matchend ) *matchend = a;
                }
             }
 
@@ -2721,7 +2723,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
             if( matches[ nmatch ] ) {
                matches[ nmatch ][ matchlen ] = 0;
                nmatch++;
-               if( matchend ) *matchend = a + 1;
+               if( matchend ) *matchend = a;
             }
          }
 
