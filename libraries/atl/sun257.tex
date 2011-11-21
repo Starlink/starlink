@@ -698,6 +698,71 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
+   ATL\_CHRSPLITRE
+}{
+   Extract sub-strings matching a specified regular expression
+}{
+   \sstdescription{
+      This routine compares the supplied string with the supplied
+      regular expression. If they match, each section of the test string
+      that corresponds to a parenthesised sub-string in the regular
+      expression is copied and stored in the returned GRP group.
+   }
+   \sstinvocation{
+      CALL ATL\_CHRSPLITRE( STR, REGEXP, MATCHEND, IGRP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Pointer to the string to be split.
+      }
+      \sstsubsection{
+         REGEXP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The regular expression. See {\tt "}Template Syntax:{\tt "} in the astChrSub
+         prologue. Note, this function differs from astChrSub in that any
+         equals signs (=) in the regular expression are treated literally.
+      }
+      \sstsubsection{
+         MATCHEND = INTEGER (Returned)
+      }{
+         The index of the character that follows the last character within
+         the supplied test string (STR) that matched any parenthesises
+         sub-section of {\tt "}regexp{\tt "}. A value of 0 is returned if no matches
+         were found.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given and Returned)
+      }{
+         An identifier for an existing GRP group, or GRP\_\_NOID. If
+         GRP\_\_NOID is supplied a new empty group is created and its
+         identifier returned. On exit, the group is extended by appending
+         to it a copy of each sub-string extracted from the supplied string.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine is just a wrapper around the C function atlChrSplitRE.
+
+         \sstitem
+         If a parenthesised sub-string in the regular expression is matched
+         by more than one sub-string within the test string, then only the
+         first is returned. To return multiple matches, the regular
+         expression should include multiple copies of the parenthesised
+         sub-string (for instance, separated by {\tt "}.$+$?{\tt "} if the intervening
+         string is immaterial).
+      }
+   }
+}
+\sstroutine{
    ATL\_CPPLA
 }{
    Copy attributes from one Plot to another
