@@ -85,6 +85,9 @@
 *        We are using MiB not Mb (or MB)
 *     2010-10-26 (EC):
 *        Add memory for fakemaps
+*     2011-11-21 (EC):
+*        No more need for AST contrib. to static memory usage since we
+*        now just use the map everywhere.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -93,7 +96,7 @@
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2009 University of British Columbia.
+*     Copyright (C) 2005-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -225,7 +228,6 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 
   if( *status == SAI__OK ) {
     total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;   /* RES */
-    total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;   /* AST */
     total += nsamp*smf_dtype_sz(SMF__INTEGER,status)*nrelated;  /* LUT */
     total += nsamp*smf_dtype_sz(SMF__QUALTYPE,status)*nrelated; /* QUA */
   }
@@ -317,12 +319,12 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           /* Mostly accounted for as static memory usage above, but add space
              for zeromask if required */
           {
-             int zero_c_n;
-             double zero_circle[3];
-
              astMapGet0A( keymap, "AST", &kmap );
-             astMapGet1D(kmap, "ZERO_CIRCLE", 3, &zero_c_n, zero_circle);
-             if( zero_c_n == 3 ) {
+
+             if( ( (astMapType( kmap, "ZERO_CIRCLE" ) != AST__BADTYPE) ||
+                   (astMapType( kmap, "ZERO_MASK" ) != AST__BADTYPE) ) &&
+                 (*status == SAI__OK) ) {
+
                total += msize*sizeof(unsigned char);
              }
              if( kmap ) kmap = astAnnul( kmap );
