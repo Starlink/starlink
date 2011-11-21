@@ -1633,6 +1633,10 @@ fi
 # this whole area probably needs rethinking as g95 also has a g95_runtime_stop()
 # function, that should be called.
 #
+# At gfortran 4.6 the call sequence stopped allowing a NULL argv, so a dummy
+# version had to be added. The argv[0] value is always de-referenced in an
+# an attempt to get the program name.
+#
 # Intel Fortran needs the for_rtl_init_ function, there is also a
 # for_rtl_finish_ to run during closedown. The intel compiler signature
 # is to have "IFORT" in the --version string.
@@ -1677,7 +1681,7 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
         ;;
       gfortran-setarg)
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
-                  [{extern void _gfortran_set_args(int,char**); _gfortran_set_args(argc, argv);}])
+                  [{extern void _gfortran_set_args(int,char**); if (argv == NULL) {static char *sc_dummy[[]]={NULL};_gfortran_set_args(0,sc_dummy);} else {_gfortran_set_args(argc,argv);}}])
         ;;
       ifort-setarg)
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
