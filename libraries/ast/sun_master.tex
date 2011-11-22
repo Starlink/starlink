@@ -22568,12 +22568,10 @@ evaluate the inverse correction for each point transformed.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V6.0}
+\subsection{Changes Introduced in V6.0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V5.7-2 and V6.0 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V5.7-2 and V6.0:
 
 \begin{enumerate}
 
@@ -22600,6 +22598,20 @@ f-
 
 \end{enumerate}
 
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V6.0-1}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V6.0 and V6.0-1 (the
+current version):
+
+\begin{enumerate}
+
+\item The FitsChan class now recognises the Spitzer ``-SIP'' distortion
+code within FITS headers that describe non-celestial axes, as well as
+celestial axes.
+
+\end{enumerate}
 
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
