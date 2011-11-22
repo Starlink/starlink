@@ -136,9 +136,10 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
 
     /* Determine memory required by all arrays with mapsize
        elements. smurf_makemap always needs double precision arrays
-       for MAP, VARIANCE, WEIGHTS, EXP_TIME  */
+       for MAP, VARIANCE, WEIGHTS, EXP_TIME. Also need space for lastmap
+       and mapchange to test convergence. */
 
-    total = 4*sizeof(double)*mapsize;
+    total = 6*sizeof(double)*mapsize;
 
     if( rebin ) {
       /* For method=rebin we also need space for weights3d */

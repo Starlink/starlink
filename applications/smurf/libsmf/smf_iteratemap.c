@@ -377,7 +377,8 @@
 *     2011-09-19 (EC):
 *        Add ability to write ONLY the final itermap (set itermap < 0)
 *     2011-11-21 (EC):
-*        Use map directly instead of 3d cube projection for AST
+*        -Use map directly instead of 3d cube projection for AST
+*        -Check convergence of map in addition to chi^2
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -507,9 +508,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t k;                     /* Loop counter */
   size_t l;                     /* Loop counter */
   double *lastchisquared=NULL;  /* chisquared for last iter */
+  double *lastmap=NULL;         /* map from the last iter */
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
+  double *mapchange=NULL;       /* Array storing change (map - lastmap)/sigma*/
+  double mapchange_mean=0;      /* Mean change in map */
+  double mapchange_max=0;       /* Maximum change in the map */
   double *mapweightsq=NULL;     /* map weight squared */
   dim_t maxconcat;              /* Longest continuous chunk that fits in mem.*/
   dim_t maxfile;                /* Longest file length in time samples*/
@@ -592,6 +597,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   mdims[0] = ubnd_out[0] - lbnd_out[0] + 1;
   mdims[1] = ubnd_out[1] - lbnd_out[1] + 1;
   msize = mdims[0] * mdims[1];
+
+  /* Allocate space for the previous map and difference for convergence tests */
+  lastmap = astCalloc( msize, sizeof(*lastmap) );
+  mapchange = astCalloc( msize, sizeof(*lastmap) );
 
   /* Always need to initialize this zeromask. The buffer will get
      allocated in smf_calcmodel_ast if ast.zero_circle was set. */
@@ -1147,7 +1156,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     if( fname ) grpDelet( &fname, status );
   }
-
 
 
 
@@ -1939,59 +1947,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           /* Set exit condition if bad status was set */
           if( *status != SAI__OK ) i=isize+1;
-
-          /* If NOI was present, we now have an estimate of chisquared */
-          if( (*status==SAI__OK) && chisquared ) {
-
-            if( (iter==0) && (whichnoi>whichast) ) {
-              /* If NOI comes after AST in MODELORDER we can't check chi^2 or
-                 convergence until next iteration. */
-              msgOut( "",
-                      FUNC_NAME ": Will calculate chi^2 next iteration",
-                      status );
-            } else {
-              msgSeti("FILEGROUP",i+1);
-              msgSetd("CHISQ",chisquared[i]);
-              msgOut( " ",
-                      FUNC_NAME ": *** CHISQUARED = ^CHISQ for filegroup "
-                      "^FILEGROUP", status);
-
-              if( ((iter > 0)&&(whichnoi<whichast)) ||
-                  ((iter > 1)&&(whichnoi>whichast)) ) {
-                /* Again, we have to check if NOI was calculated at least
-                   twice, which depends on NOI and AST in MODELORDER */
-
-                double chidiff;   /* temporary variable to store diff */
-
-                chidiff = chisquared[i]-lastchisquared[i];
-
-                msgSetd("DIFF", chidiff);
-                msgOut( " ",
-                        FUNC_NAME ": *** change: ^DIFF", status );
-
-                if( chidiff > 0 ) {
-                  msgOut( " ", FUNC_NAME
-                          ": ****** WARNING! CHISQUARED Increased ******",
-                          status );
-                }
-
-                /* Check for the stopping criterion */
-                if( untilconverge ) {
-                  if( (chidiff > 0) || (-chidiff > chitol) ) {
-                    /* Found a chunk that isn't converged yet */
-                    converged=0;
-                  }
-                }
-              } else {
-                /* Can't converge until at least 2 consecutive chi^2... */
-                converged=0;
-              }
-
-              /* Update lastchisquared */
-              lastchisquared[i] = chisquared[i];
-
-            }
-          }
         }
 
 
@@ -2001,15 +1956,23 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
-        /* *********************************************************************
-           Calculate the AST model component.
 
-           When we get here we have calculated all of the model components up
-           to, but not including AST (for all filegroups). In addition, the
-           previous iteration of AST has been placed back into the residual,
-           and a map has been estimated. So, we are now in a position to
-           take the current estimate of the map and project it back into
-           the time domain to estimate the new AST.
+
+
+
+
+        /* *********************************************************************
+           Calculate the AST model component and check map convergence
+
+           When we get here we have calculated all of the model
+           components up to, but not including AST (for all
+           filegroups). In addition, the previous iteration of AST has
+           been placed back into the residual, and a map has been
+           estimated. So, we are now in a position to take the current
+           estimate of the map and project it back into the time
+           domain to estimate the new AST. Finally, we look at the
+           change in chisquared and we compare the current map with
+           that of the previous iteration as a convergence tests.
         ********************************************************************* */
 
         if( *status == SAI__OK ) {
@@ -2087,7 +2050,95 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                          ": ** %f s closing models files for this filegroup",
                          status, smf_timerupdate(&tv1,&tv2,status) );
             }
+
+            /* If NOI was present, we now have an estimate of chisquared */
+            if( (*status==SAI__OK) && chisquared ) {
+
+              if( (iter==0) && (whichnoi>whichast) ) {
+                /* If NOI comes after AST in MODELORDER we can't check chi^2 or
+                   convergence until next iteration. */
+                msgOut( "",
+                        FUNC_NAME ": Will calculate chi^2 next iteration",
+                        status );
+              } else {
+                msgSeti("FILEGROUP",i+1);
+                msgSetd("CHISQ",chisquared[i]);
+                msgOut( " ",
+                        FUNC_NAME ": *** CHISQUARED = ^CHISQ for filegroup "
+                        "^FILEGROUP", status);
+
+                if( ((iter > 0)&&(whichnoi<whichast)) ||
+                    ((iter > 1)&&(whichnoi>whichast)) ) {
+                  /* Again, we have to check if NOI was calculated at least
+                     twice, which depends on NOI and AST in MODELORDER */
+
+                  double chidiff;   /* temporary variable to store diff */
+
+                  chidiff = chisquared[i]-lastchisquared[i];
+
+                  msgSetd("DIFF", chidiff);
+                  msgOut( " ",
+                          FUNC_NAME ": *** change: ^DIFF", status );
+
+                  if( chidiff > 0 ) {
+                    msgOut( " ", FUNC_NAME
+                            ": ****** WARNING! CHISQUARED Increased ******",
+                            status );
+                  }
+
+                  /* Check for the stopping criterion */
+                  if( untilconverge ) {
+                    if( (chidiff > 0) || (-chidiff > chitol) ) {
+                      /* Found a chunk that isn't converged yet */
+                      converged=0;
+                    }
+                  }
+                } else {
+                  /* Can't converge until at least 2 consecutive chi^2... */
+                  converged=0;
+                }
+
+                /* Update lastchisquared */
+                lastchisquared[i] = chisquared[i];
+
+              }
+            }
           }
+        }
+
+        /* Calculate the absolute difference between the previous and
+           current map pixels normalized by the map standard
+           deviations. Once we're done, update lastmap to the current
+           map. Ignore bad and zero-constrained pixels. */
+
+        if( *status == SAI__OK ) {
+          mapchange_max = 0;
+          for( i=0; i<msize; i++ ) {
+            if( !(thisqual[i]&SMF__MAPQ_ZERO) && (thismap[i] != VAL__BADD) &&
+                (lastmap[i] != VAL__BADD) && (thisvar[i] != VAL__BADD) &&
+                (thisvar[i] > 0) ) {
+
+              mapchange[i] = fabs(thismap[i] - lastmap[i]) / sqrt(thisvar[i]);
+
+              /* Update max */
+              if( mapchange[i] > mapchange_max ) mapchange_max = mapchange[i];
+            } else {
+              mapchange[i] = VAL__BADD;
+            }
+          }
+
+          /* Calculate the mean change */
+          smf_stats1D( mapchange, 1, msize, NULL, 0, 0, &mapchange_mean, NULL,
+                       NULL, NULL, status );
+
+          memcpy( lastmap, map, msize*sizeof(*lastmap) );
+
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s calculating change in the map",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
+
+          msgOutf( "", FUNC_NAME ": *** NORMALIZED MAP CHANGE: %lg (mean) "
+                   "%lg (max)", status, mapchange_mean, mapchange_max );
         }
 
         /* Increment iteration counter */
@@ -2821,6 +2872,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   fakemap = astFree( fakemap );
   if( fakendf != NDF__NOID ) ndfAnnul( &fakendf, status );
+
+  if( lastmap ) lastmap = astFree( lastmap );
+  if( mapchange ) mapchange = astFree( mapchange );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();
