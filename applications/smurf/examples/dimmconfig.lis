@@ -1,10 +1,23 @@
 # Number of iterations
 #  postive number  = fixed number of iterations
-#  negative number = maximum iterations if using chi^2 stopping criteria
+#  negative number = max iterations if using chi^2 and/or map stopping criteria
 numiter = -5
 
-# chi^2 tolerance in negative-numiter case (requires noi model component)
+# Two convergence tests are available (used only if numiter is set to
+# a negative value). They may be used simultaneously.
+#
+# chitol: threshold change in reduced chi^2 in subsequent iterations (requires
+#         noi to be a component of modelorder). If there are any degeneracies
+#         between model components (even if the map is reasonably constrained)
+#         this is a bad test.
+#
+# maptop: threshold chance in the mean absolute difference between map pixels
+#         in subsequent iterations, normalized by the estimated map RMS. This
+#         is much more like a "by eye" test, that will stop the solution
+#         when the map stops changing.
+
 chitol = 1e-3
+#maptol = 0.02
 
 # method of estimating variance map
 #  0 = propagate from the time-domain noise (requires noi model component)

@@ -468,7 +468,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int bolomap=0;                /* If set, produce single bolo maps */
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
-  double chitol=0;              /* chisquared change tolerance for stopping */
+  double chitol=VAL__BADD;      /* chisquared change tolerance for stopping */
   size_t contchunk;             /* Continuous chunk in outer loop counter */
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
@@ -515,6 +515,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double *mapchange=NULL;       /* Array storing change (map - lastmap)/sigma*/
   double mapchange_mean=0;      /* Mean change in map */
   double mapchange_max=0;       /* Maximum change in the map */
+  double maptol=VAL__BADD;      /* map change tolerance for stopping */
   double *mapweightsq=NULL;     /* map weight squared */
   dim_t maxconcat;              /* Longest continuous chunk that fits in mem.*/
   dim_t maxfile;                /* Longest file length in time samples*/
@@ -626,24 +627,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   *************************************************************************** */
 
   if( *status == SAI__OK ) {
-    /* Number of iterations */
-    astMapGet0I( keymap, "NUMITER", &numiter );
-    if( numiter == 0 ) {
-      *status = SAI__ERROR;
-      errRep("", FUNC_NAME ": NUMITER cannot be 0", status);
-    } else {
-      if( numiter < 0 ) {
-        /* If negative, iterate to convergence or abs(numiter), whichever comes
-           first */
-        maxiter = abs(numiter);
-        untilconverge = 1;
-      } else {
-        /* Otherwise iterate a fixed number of times */
-        maxiter = numiter;
-        untilconverge = 0;
-      }
-    }
-
     if( *status == SAI__OK ) {
       /* Required positional accuracy, in output map pixels. */
       astMapGet0I( keymap, "TSTEP", &tstep );
@@ -651,12 +634,42 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Chisquared change tolerance for stopping */
       astMapGet0D( keymap, "CHITOL", &chitol );
 
-      if( chitol <= 0 ) {
+      if( (chitol != VAL__BADD) && (chitol <= 0) ) {
         *status = SAI__ERROR;
         msgSetd("CHITOL",chitol);
         errRep(FUNC_NAME,
                FUNC_NAME ": CHITOL is ^CHITOL, must be > 0", status);
       }
+
+      /* Normalized map pixel change tolerance for stopping */
+      astMapGet0D( keymap, "MAPTOL", &maptol );
+
+      if( (maptol != VAL__BADD) && (maptol <= 0) ) {
+        *status = SAI__ERROR;
+        msgSetd("MAPTOL",maptol);
+        errRep(FUNC_NAME,
+               FUNC_NAME ": MAPTOL is ^MAPTOL, must be > 0", status);
+      }
+
+      /* Number of iterations */
+      astMapGet0I( keymap, "NUMITER", &numiter );
+      if( numiter == 0 ) {
+        *status = SAI__ERROR;
+        errRep("", FUNC_NAME ": NUMITER cannot be 0", status);
+      } else {
+        if( (numiter < 0) && ((chitol != VAL__BADD)||(maptol != VAL__BADD)) ) {
+          /* If negative, iterate to convergence or abs(numiter),
+             whichever comes first -- if we have provided a stopping
+             criterion */
+          maxiter = abs(numiter);
+          untilconverge = 1;
+        } else {
+          /* Otherwise iterate a fixed number of times */
+          maxiter = numiter;
+          untilconverge = 0;
+        }
+      }
+
     }
 
     /* Do iterations completely in memory - minimize disk I/O */
@@ -932,10 +945,16 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     msgOut(" ",
            FUNC_NAME ": Iterate to convergence (max ^MAX)",
            status );
-    msgSetd("CHITOL",chitol);
-    msgOut(" ",
-           FUNC_NAME ": Stopping criteria is a change in chi^2 < ^CHITOL",
-           status);
+
+    if( chitol != VAL__BADD ) {
+      msgOutf( "", FUNC_NAME ": stop when change in chi^2 < %lg", status,
+               chitol );
+    }
+
+    if( maptol != VAL__BADD ) {
+      msgOutf( "", FUNC_NAME ": stop when mean normalized map change < %lg",
+               status, maptol );
+    }
   } else {
     msgSeti("MAX",maxiter);
     msgOut(" ", FUNC_NAME ": ^MAX Iterations", status );
@@ -2086,8 +2105,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                             status );
                   }
 
-                  /* Check for the stopping criterion */
-                  if( untilconverge ) {
+                  /* Check for the chi^2 stopping criterion */
+                  if( untilconverge && (chitol!=VAL__BADD) ) {
                     if( (chidiff > 0) || (-chidiff > chitol) ) {
                       /* Found a chunk that isn't converged yet */
                       converged=0;
@@ -2139,6 +2158,14 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           msgOutf( "", FUNC_NAME ": *** NORMALIZED MAP CHANGE: %lg (mean) "
                    "%lg (max)", status, mapchange_mean, mapchange_max );
+
+          /* Check for the map change stopping criterion */
+          if( untilconverge && (maptol!=VAL__BADD) &&
+              (mapchange_mean > maptol) ) {
+            /* Map hasn't converged yet */
+            converged=0;
+          }
+
         }
 
         /* Increment iteration counter */

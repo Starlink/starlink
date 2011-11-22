@@ -39,7 +39,8 @@
 
 numiter = -5
 tstep = 100
-chitol = 1e-4
+chitol = <undef>
+maptol = <undef>
 
 memiter = 1
 deldimm = 1
