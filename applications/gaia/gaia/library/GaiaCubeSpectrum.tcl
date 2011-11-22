@@ -1261,11 +1261,18 @@ itcl::class gaia::GaiaCubeSpectrum {
                }
 
                #  Get extraction position in degrees (again), and work out
-               #  the offsets to this reference position.
-               $rtdimage_ convert coords $iix $iiy image pra pdec deg
-               set drefra [angdiff_ $pra $rra]
-               set drefdec [angdiff_ $pdec $rdec]
-
+               #  the offsets to this reference position. If the coordinate
+               #  system is measuring offset sky coordinates then we handle
+               #  those differently.
+               if { [$rtdimage_ astget "SkyRefIs"] != "Ignored" } {
+                  lassign [$rtdimage_ astpix2wcs $iix $iiy 1 0] pra pdec
+                  set drefra [angdiff_ $pra 0.0]
+                  set drefdec [angdiff_ $pdec 0.0]
+               } else {
+                  $rtdimage_ convert coords $iix $iiy image pra pdec deg
+                  set drefra [angdiff_ $pra $rra]
+                  set drefdec [angdiff_ $pdec $rdec]
+               }
                set drefra [format "%f" \
                               [expr $drefra*3600.0*cos($pdec*$PI_/180.0)]]
                set drefdec [format "%f" [expr $drefdec*3600.0]]
