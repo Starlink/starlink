@@ -200,6 +200,9 @@
 *     29-APR-2011 (DSB):
 *        Assign Q_JUMP to bolometers that are totally rejected (as well
 *        as Q_BADB).
+*     23-NOV-2011 (DSB):
+*        Made changes so that steps that are close together (within a few
+*        hundred samples) get handled better.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -388,11 +391,11 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
 /* The minimum number of samples between steps. Large differences that
    are separated by less than "dcfill" samples are considered to be part of
    the same jump. */
-   int dcfill = 40;
+   int dcfill = 100;
 
 /* The maximum width of a step. Candidate steps that are wider than this
    number of samples are left uncorrected. */
-   int dcmaxwidth = 60;
+   int dcmaxwidth = 2*dcfill;
 
 /* The size of the median filter to use when estimating the local RMS at
    each point. */
@@ -1490,7 +1493,9 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    int count;
    int ibstep;
    int jhi;
+   int jhilim;
    int jlo;
+   int jlolim;
    int jmax;
    int jmin;
    int jtime;
@@ -1533,6 +1538,28 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 /* Note the step centre for later use. */
       step_centre = ( step->start + step->end )/2;
 
+/* Note the bounds of the section of the time stream between the previous
+   and next steps. */
+      if( ibstep > 0 ) {
+         jlolim = bsteps[ ibstep - 1 ].end + dcpeakminwidth;
+         if( jlolim > step->start - 2*dcfitbox ) {
+            jlolim = step->start - 2*dcfitbox;
+            if( jlolim < 0 ) jlolim = 0;
+         }
+      } else {
+         jlolim = 0;
+      }
+
+      if( ibstep < nbstep - 1 ) {
+         jhilim = bsteps[ ibstep + 1 ].start - dcpeakminwidth;
+         if( jhilim < step->end + 2*dcfitbox ) {
+            jhilim = step->end + 2*dcfitbox;
+            if( jhilim >= ntslice ) jhilim = ntslice - 1;
+         }
+      } else {
+         jhilim =  ntslice - 1;
+      }
+
 /* The supplied start and end times are the times at which the SNR peak
    exceeds "dcthresh". If an snr array was supplied, we now extend these
    to include lower SNR values down to "dcsiglow". First work downwards
@@ -1542,7 +1569,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
          psnr = snr + step->start;
          jtime = step->start;
          count = 0;
-         while( --jtime >= 0 ){
+         while( --jtime >= jlolim ){
             if( ( snrv = *(--psnr) ) != VAL__BADD ) {
                if( fabs( snrv ) < dcsiglow ) {
                   if( ++count == dcnlow ) break;
@@ -1559,7 +1586,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
          psnr = snr + step->end;
          jtime = step->end;
          count = 0;
-         while( ++jtime < (int) ntslice ){
+         while( ++jtime <= jhilim ){
             if( ( snrv = *(++psnr) ) != VAL__BADD ) {
                if( fabs( snrv ) < dcsiglow ) {
                   if( ++count == dcnlow ) break;
@@ -1582,9 +1609,9 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    that occur close to bright sources. First, find the maximum bolometer
    value within a range of dcpeakoff on either side of the step. */
       jlo = step_start - dcpeakoff;
-      if( jlo < 0 ) jlo = 0;
+      if( jlo < jlolim  ) jlo = jlolim;
       jhi = step_end + dcpeakoff;
-      if( jhi >= (int) ntslice ) jhi = ntslice - 1;
+      if( jhi > jhilim ) jhi = jhilim;
 
       dmax = VAL__MIND;
       jmax = -1;
@@ -1605,8 +1632,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 /* Find the mean of the 3 samples centred on the maximum value. */
       jlo = jmax - 1;
       jhi = jmax + 1;
-      if( jlo < 0 ) jlo = 0;
-      if( jhi >= (int) ntslice ) jhi = ntslice - 1;
+      if( jlo < jlolim ) jlo = jlolim;
+      if( jhi > jhilim ) jhi = jhilim;
 
       sum1 = 0.0;
       nsum = 0;
@@ -1624,7 +1651,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 
 /* Find the smallest bolometer value in a small box just before the peak. */
       jlo = jmax - dcpeakwidth/2;
-      if( jlo < 0 ) jlo = 0;
+      if( jlo < jlolim ) jlo = jlolim;
 
       jmin = jmax;
       dminlo = dmax;
@@ -1649,8 +1676,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    the peak. */
          jlo = jmin - 2;
          jhi = jmin + 2;
-         if( jlo < 0 ) jlo = 0;
-         if( jhi >= (int) ntslice ) jhi = ntslice - 1;
+         if( jlo < jlolim ) jlo = jlolim;
+         if( jhi > jhilim ) jhi = jhilim;
 
          sum1 = 0.0;
          nsum = 0;
@@ -1668,7 +1695,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 
 /* Find the smallest bolometer value in a small box just after the peak. */
          jhi = jmax + dcpeakwidth/2;
-         if( jhi >= (int) ntslice) jhi = ntslice - 1;
+         if( jhi > jhilim ) jhi = jhilim;
 
          jmin = jmax;
          dminhi = dmax;
@@ -1692,8 +1719,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    the peak. */
             jlo = jmin - 2;
             jhi = jmin + 2;
-            if( jlo < 0 ) jlo = 0;
-            if( jhi >= (int) ntslice ) jhi = ntslice - 1;
+            if( jlo < jlolim ) jlo = jlolim;
+            if( jhi > jhilim ) jhi = jhilim;
 
             sum1 = 0.0;
             nsum = 0;
@@ -1717,7 +1744,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 
             if( dminlo < dminhi && dminlo < dmax) {
                jhi = jmax + dcpeakwidth/2;
-               if( jhi >= (int) ntslice) jhi = ntslice - 1;
+               if( jhi > jhilim ) jhi = jhilim;
                for( jtime = jmax; jtime <= jhi; jtime++ ) {
                   if( !(*pq2 & SMF__Q_GOOD ) && *pd2 != VAL__BADD ) {
                      if( *pd2 <= dminhi ) {
@@ -1731,7 +1758,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 
             } else if( dminhi < dminlo && dminhi < dmax) {
                jlo = jmax - dcpeakwidth/2;
-               if( jlo < 0 ) jlo = 0;
+               if( jlo < jlolim ) jlo = jlolim;
                for( jtime = jmax; jtime >= jlo; jtime-- ) {
                   if( !(*pq2 & SMF__Q_GOOD ) && *pd2 != VAL__BADD ) {
                      if( *pd2 <= dminlo ) {
@@ -1806,35 +1833,43 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 /* Perform linear least squares fits to the median-smoothed data for a
    range of adjacent samples prior to the start of the step found above. */
          jhi = step_start - dcfitbox;
-         jlo = jhi - 3*dcfitbox;
-         smf_rolling_fit( dcfitbox, 0.1, ntslice, jlo, jhi, median, grad,
-                          off, NULL, status );
+         jlo = jhi - 3.5*dcfitbox;
+         if( jlo < jlolim ) jlo = jlolim;
+         jlo += 0.5*dcfitbox;
+         if( jlo < jhi - 2 ) {
+            smf_rolling_fit( dcfitbox, 0.1, ntslice, jlo, jhi, median, grad,
+                             off, NULL, status );
 
 /* Use each of the fits created above to estimate the data value at the
    centre of the jump, and find the the mean and variance of these
    estimates. */
-         sum1 = 0.0;
-         sum2 = 0.0;
-         nsum = 0;
-         vlo = 0.0;
+            sum1 = 0.0;
+            sum2 = 0.0;
+            nsum = 0;
+            vlo = 0.0;
 
-         pg = grad;
-         po = off;
-         for( jtime = jlo; jtime <= jhi; jtime++,po++,pg++ ) {
-            if( *pg != VAL__BADD && *po != VAL__BADD ) {
-               v = ( (int) step_centre - jtime )*( *pg ) + ( *po );
-               sum1 += v;
-               sum2 += v*v;
-               nsum++;
-               vlo = v;
+            pg = grad;
+            po = off;
+            for( jtime = jlo; jtime <= jhi; jtime++,po++,pg++ ) {
+               if( *pg != VAL__BADD && *po != VAL__BADD ) {
+                  v = ( (int) step_centre - jtime )*( *pg ) + ( *po );
+                  sum1 += v;
+                  sum2 += v*v;
+                  nsum++;
+                  vlo = v;
+               }
             }
-         }
 
-         if( nsum > 0 ) {
-            vlo_mean = sum1/nsum;
-            vlo_var = sum2/nsum - vlo_mean*vlo_mean;
-            err0 = vlo - vlo_mean;
-            vlo_var += err0*err0;
+            if( nsum > 0 ) {
+               vlo_mean = sum1/nsum;
+               vlo_var = sum2/nsum - vlo_mean*vlo_mean;
+               err0 = vlo - vlo_mean;
+               vlo_var += err0*err0;
+            } else {
+               vlo_mean = VAL__BADD;
+               vlo_var = VAL__BADD;
+            }
+
          } else {
             vlo_mean = VAL__BADD;
             vlo_var = VAL__BADD;
@@ -1843,35 +1878,44 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 /* Perform linear least squares fits to the median-smoothed data for a
    range of adjacent samples after to the step. */
          jlo = step_end + dcfitbox;
-         jhi = jlo + 3*dcfitbox;
-         smf_rolling_fit( dcfitbox, 0.1, ntslice, jlo, jhi, median, grad,
-                          off, NULL, status );
+         jhi = jlo + 3.5*dcfitbox;
+         if( jhi > jhilim ) jhi = jhilim;
+         jhi -= 0.5*dcfitbox;
+
+         if( jlo < jhi - 2 ) {
+            smf_rolling_fit( dcfitbox, 0.1, ntslice, jlo, jhi, median, grad,
+                             off, NULL, status );
 
 /* Use each of the fits created above to estimate the data value at the
    centre of the jump, and find the the mean and variance of these
    estimates. */
-         sum1 = 0.0;
-         sum2 = 0.0;
-         nsum = 0;
-         vhi = VAL__BADD;
+            sum1 = 0.0;
+            sum2 = 0.0;
+            nsum = 0;
+            vhi = VAL__BADD;
 
-         pg = grad;
-         po = off;
-         for( jtime = jlo; jtime <= jhi; jtime++,po++,pg++ ) {
-            if( *pg != VAL__BADD && *po != VAL__BADD ) {
-               v = ( (int) step_centre - jtime )*( *pg ) + ( *po );
-               sum1 += v;
-               sum2 += v*v;
-               nsum++;
-               if( vhi == VAL__BADD ) vhi = v;
+            pg = grad;
+            po = off;
+            for( jtime = jlo; jtime <= jhi; jtime++,po++,pg++ ) {
+               if( *pg != VAL__BADD && *po != VAL__BADD ) {
+                  v = ( (int) step_centre - jtime )*( *pg ) + ( *po );
+                  sum1 += v;
+                  sum2 += v*v;
+                  nsum++;
+                  if( vhi == VAL__BADD ) vhi = v;
+               }
             }
-         }
 
-         if( nsum > 0 ) {
-            vhi_mean = sum1/nsum;
-            vhi_var = sum2/nsum - vhi_mean*vhi_mean;
-            err0 = vhi - vhi_mean;
-            vhi_var += err0*err0;
+            if( nsum > 0 ) {
+               vhi_mean = sum1/nsum;
+               vhi_var = sum2/nsum - vhi_mean*vhi_mean;
+               err0 = vhi - vhi_mean;
+               vhi_var += err0*err0;
+            } else {
+               vhi_mean = VAL__BADD;
+               vhi_var = VAL__BADD;
+            }
+
          } else {
             vhi_mean = VAL__BADD;
             vhi_var = VAL__BADD;
