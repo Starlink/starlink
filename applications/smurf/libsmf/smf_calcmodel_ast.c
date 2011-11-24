@@ -516,25 +516,18 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
 	if( lut_data[ii] != VAL__BADI ) {
 
-	  /* calculate new model value using the map/LUT */
           m = map[lut_data[ii]];
 
-          if( m==VAL__BADD ){
-            /* We can get here if no data we regridded into the map at
-               this particular pixel (so it is un-defined). Set the value to 0
-               to avoid propagating the undefined value. */
-            m = 0;
-          }
-
-	  /* update the residual model.
+	  /* update the residual model provided that we have a good map
+             values.
              ***NOTE: unlike other model components we do *not* first
                       add the previous realization back in. This is
                       because we've already done this in smf_iteratemap
                       before calling smf_rebinmap1. */
-
-	  if( !(qua_data[ii]&SMF__Q_MOD) ) {
-	    res_data[ii] -= m;
+          if( (m!=VAL__BADD) && !(qua_data[ii]&SMF__Q_MOD)  ){
+            res_data[ii] -= m;
           }
+
 	}
       }
     }

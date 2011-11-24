@@ -1898,7 +1898,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               for( k=0; k<dsize; k++ ) {
                 if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ) {
-                  double ast_data = map[lut_data[k]];
+                  double ast_data = thismap[lut_data[k]];
                   if( ast_data != VAL__BADD ) {
                     res_data[k] += ast_data;
                   }
@@ -2242,6 +2242,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          do these operations only if memiter is true. */
 
       if( memiter && (bolomap || shortmap || sampcube) ) {
+
+        /* Ensure we use the RES model ordering */
+        smf_model_dataOrder( &dat, NULL, i, SMF__RES|SMF__LUT|SMF__QUA,
+                             res[i]->sdata[0]->isTordered, status );
+
         for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
           smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
                         &dsize, NULL, NULL, status );
@@ -2253,7 +2258,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* Add ast back into res. Mask should match ast_calcmodel_ast. */
           for( k=0; k<dsize; k++ ) {
             if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ) {
-              double ast_data = map[lut_data[k]];
+              double ast_data = thismap[lut_data[k]];
               if( ast_data != VAL__BADD ) {
                 res_data[k] += ast_data;
               }
@@ -2346,6 +2351,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Now we can remove AST from RES again before continuing */
 
       if( memiter && (bolomap || shortmap || sampcube) ) {
+
+        /* Ensure we use the RES model ordering */
+        smf_model_dataOrder( &dat, NULL, i, SMF__RES|SMF__LUT|SMF__QUA,
+                             res[i]->sdata[0]->isTordered, status );
+
         for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
           smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
                         &dsize, NULL, NULL, status );
@@ -2357,7 +2367,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* Add ast back into res. Mask should match ast_calcmodel_ast. */
           for( k=0; k<dsize; k++ ) {
             if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ) {
-              double ast_data = map[lut_data[k]];
+              double ast_data = thismap[lut_data[k]];
               if( ast_data != VAL__BADD ) {
                 res_data[k] -= ast_data;
               }
@@ -2554,7 +2564,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                     for( j=0; j<dsize; j++ ) {
                       if( lut_data[j] != VAL__BADI ) {
-                        ast_data[j] = map[lut_data[j]];
+                        ast_data[j] = thismap[lut_data[j]];
                       } else {
                         ast_data[j] = VAL__BADD;
                       }
