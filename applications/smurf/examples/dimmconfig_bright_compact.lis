@@ -17,6 +17,15 @@
 #
 # ***********************************************************
 
+# these set up map-based convergence tests: a maximum of 40 iterations,
+# but it will stop if there is a mean absolute change in the map between
+# subsequent iterations of less than 5% (note also that we explicitly
+# turn the chi^2 test off).
+
+numiter=-40
+chitol=<undef>
+maptol=0.05
+
 # use boundary constraints since the source is assumed to be isolated
 ast.zero_circle = (0.0166666666)
 ast.zero_notlast = 1

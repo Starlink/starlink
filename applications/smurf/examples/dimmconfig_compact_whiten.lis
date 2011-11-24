@@ -20,12 +20,16 @@
 #
 # ***********************************************************
 
+# these set up map-based convergence tests: a maximum of 40 iterations,
+# but it will stop if there is a mean absolute change in the map between
+# subsequent iterations of less than 5% (note also that we explicitly
+# turn the chi^2 test off).
 
-# 20 is enough for most things... something like Jupiter might need
-# more. For now you still need to turn on itermaps to see whether the
-# map has converged visually or not.
+numiter=-40
+chitol=<undef>
+maptol=0.05
 
-numiter=20
+# note that we've added the TMP model for good measure
 
 modelorder = (tmp,com,gai,ext,flt,ast,noi)
 

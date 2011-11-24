@@ -8,5 +8,14 @@
 #
 # ****************************************************************
 
+# these set up map-based convergence tests: a maximum of 40 iterations,
+# but it will stop if there is a mean absolute change in the map between
+# subsequent iterations of less than 5% (note also that we explicitly
+# turn the chi^2 test off).
+
+numiter=-40
+chitol=<undef>
+maptol=0.05
+
 ast.zero_notlast = 1
 ast.zero_snr = 5
