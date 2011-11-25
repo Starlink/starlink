@@ -92,9 +92,9 @@
 *          REFPIX1/REFPIX2, they should be copies of the values written to
 *          output parameter PIXREF by a previous run of MAKECUBE. The
 *          REFPIX and PIXREF parameters allow an initial run of MAKECUBE
-*          with AUTGRID=YES to generate projection parameters that can
+*          with AUTOGRID=YES to generate projection parameters that can
 *          then be re-used in subsequent runs of MAKECUBE with
-*          AUTOGFRID=NO in order to force MAKECUBE to use the same pixel
+*          AUTOGRID=NO in order to force MAKECUBE to use the same pixel
 *          grid. If a null (!) value is supplied, default values will be
 *          used for REFPIX1/2 - either the autogrid values (if AUTOGRID=YES)
 *          or (0,0) (if AUTOGRID=NO). [!]
