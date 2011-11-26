@@ -2159,7 +2159,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           smf_stats1D( mapchange, 1, msize, NULL, 0, 0, &mapchange_mean, NULL,
                        NULL, NULL, status );
 
-          memcpy( lastmap, map, msize*sizeof(*lastmap) );
+          memcpy( lastmap, thismap, msize*sizeof(*lastmap) );
 
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                      ": ** %f s calculating change in the map",
