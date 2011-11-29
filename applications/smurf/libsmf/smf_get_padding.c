@@ -66,6 +66,8 @@
 *        Trap for a stationary telescope when working out padding.
 *     2011-06-22 (EC):
 *        Don't need downsampscale since it is in the keymap
+*     29-NOV-2011 (DSB):
+*        Correct handling of errors caused by missing items.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -172,19 +174,16 @@ dim_t smf_get_padding( AstKeyMap *keymap, int report, const smfHead *hdr,
                 status );
       }
 
-/* If none were found, annul the error and return a padding length of
-   zero. */
-      if( *status == AST__MPKER ) {
-         errAnnul( status );
-      } else {
+/* If any were not found, annul the error and continue with those that
+   were found (plus defaults for the others). */
+      if( *status == AST__MPKER ) errAnnul( status );
+      if( *status == SAI__OK ) {
 
 /* Modify edge filters if spatial scales were requested */
-         if( *status == SAI__OK ) {
-            smf_scale2freq( filt_edgesmall, filt_edgelarge, hdr, &filt_edgelow,
-                            &filt_edgehigh, status );
-            if( *status == SMF__TELSTAT ) {
-              errAnnul( status );
-            }
+         smf_scale2freq( filt_edgesmall, filt_edgelarge, hdr, &filt_edgelow,
+                         &filt_edgehigh, status );
+         if( *status == SMF__TELSTAT ) {
+           errAnnul( status );
          }
 
 /* Find the lowest of these frequencies. The lowest frequency will give
