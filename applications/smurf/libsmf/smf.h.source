@@ -1250,7 +1250,7 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
                     const int *lbnd, const int *ubnd, int *status );
 
 dim_t smf_get_padding( AstKeyMap *keymap, int report,const smfHead *hdr,
-                       int *status );
+                       double, int *status );
 
 void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
                       int moving, int autogrid,

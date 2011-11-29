@@ -499,7 +499,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
       /* Work out the padding needed for this file including downsampling. */
       if( keymap ) {
-        thispad = smf_get_padding( keymap, 0, data->hdr, status );
+        thispad = smf_get_padding( keymap, 0, data->hdr, VAL__BADD, status );
         if( thispad > maxpad ) maxpad = thispad;
       } else {
         thispad = 0;

@@ -514,7 +514,7 @@ void smurf_calcnoise( int *status ) {
       astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
 
       /* Get the padding to use. */
-      pad = smf_get_padding( keymap, 0, firstdata->hdr, status );
+      pad = smf_get_padding( keymap, 0, firstdata->hdr, VAL__BADD, status );
 
       /* Free the first smfData. */
       smf_close_file( &firstdata, status );

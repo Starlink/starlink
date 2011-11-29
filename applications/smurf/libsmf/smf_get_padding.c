@@ -15,7 +15,8 @@
 
 *  Invocation:
 *     result = smf_get_padding( AstKeyMap *keymap, int report,
-*                               const smfHead *hdr, int *status )
+*                               const smfHead *hdr, double steptime,
+*                               int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -25,6 +26,8 @@
 *     hdr = smfHead *(Given)
 *        Used to determine the step size, and the scan velocity when
 *        converting spatial scales to frequencies.
+*     steptime = double (Given)
+*        The step time, in seconds.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -67,7 +70,8 @@
 *     2011-06-22 (EC):
 *        Don't need downsampscale since it is in the keymap
 *     29-NOV-2011 (DSB):
-*        Correct handling of errors caused by missing items.
+*        - Correct handling of errors caused by missing items.
+*        - Handle downsampli7ng correctly.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -111,7 +115,7 @@
 #define FUNC_NAME "smf_get_padding"
 
 dim_t smf_get_padding( AstKeyMap *keymap, int report, const smfHead *hdr,
-                       int *status ) {
+                       double steptime, int *status ) {
 
 /* Local Variables: */
    AstObject *obj;
@@ -124,7 +128,6 @@ dim_t smf_get_padding( AstKeyMap *keymap, int report, const smfHead *hdr,
    double filt_edgelow;
    double filt_edgesmall;
    double filt_notchlow[ SMF__MXNOTCH ];
-   double steptime;
    int f_nnotch;
    int iel;
    int nel;
@@ -194,16 +197,12 @@ dim_t smf_get_padding( AstKeyMap *keymap, int report, const smfHead *hdr,
            if( filt_notchlow[ iel ] > 0.0 && filt_notchlow[ iel ] < f_low ) f_low = filt_notchlow[ iel ];
          }
 
-/* Get the step time from the header. */
-         steptime = hdr->steptime;
-
 /* If any down-sampling is occurring, set the step time to value implied by
    the requested downsampling factor. This should match the calculation in
    smf_grp_related */
-
          if( downsampscale || downsampfreq ) {
            if( downsampscale ) {
-             scalelen = steptime * hdr->scanvel / downsampscale;
+             scalelen = hdr->steptime * hdr->scanvel / downsampscale;
            } else {
              if( hdr->steptime ) {
                scalelen = downsampfreq / (1./hdr->steptime);
@@ -216,7 +215,12 @@ dim_t smf_get_padding( AstKeyMap *keymap, int report, const smfHead *hdr,
            }
 
            if( (*status==SAI__OK) && (scalelen<=SMF__DOWNSAMPLIMIT) )
-               steptime = steptime/scalelen;
+               steptime = hdr->steptime/scalelen;
+
+/* If no downsampling is happening, use the steptime in the header unless
+   another steptime was supplied. */
+         } else if( steptime == VAL__BADD ) {
+            steptime = hdr->steptime;
          }
 
 /* Find the corresponding padding. */
@@ -242,7 +246,7 @@ dim_t smf_get_padding( AstKeyMap *keymap, int report, const smfHead *hdr,
 
 /* Call this function to get the padding implied by the sub-KeyMap. */
                pad = smf_get_padding( (AstKeyMap *) obj, report, hdr,
-                                      status );
+                                      steptime, status );
 
 /* Use the larger of the two paddings. */
                if( pad > result ) result = pad;
