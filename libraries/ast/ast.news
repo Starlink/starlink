@@ -19,6 +19,9 @@ Main Changes in this Version
 - The Spitzer "-SIP" distortion code is now recognised within FITS
 headers that describe non-celestial axes, as well as celestial axes.
 
+- A bug has been fixed that could cause inappropriate equinox values to
+be used when aligning SkyFrames if the AlignSystem attribute is set.
+
 Main Changes in V6.0
 -----------------------
 
