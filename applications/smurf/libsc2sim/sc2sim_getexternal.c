@@ -81,6 +81,7 @@ void sc2sim_getexternal
  )
 
 {
+  int frame;          /* frame counter */
   Grp *igrp=NULL;     /* declare a Grp for holding file names */
   smfData *data=NULL; /* declare a smfData pointer */
   AstFitsChan *fc=NULL;           /* FITS channels for tanplane projection */
@@ -108,7 +109,7 @@ void sc2sim_getexternal
  
  
   /* Get the scan positions */
-  for (int frame = 0; frame < *scancount; frame++)
+  for (frame = 0; frame < *scancount; frame++)
   { 
     /* Calculate the coordinate transformation */
     fc = astFitsChan ( NULL, NULL, " " );
