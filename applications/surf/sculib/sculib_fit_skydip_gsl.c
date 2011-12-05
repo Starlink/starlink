@@ -284,9 +284,9 @@ sculib__skydip_f (const gsl_vector * x, void *data,
   int status = SAI__OK; /* Assume everything is ok inside minimizer */
 
   const double B_MIN = 0.25;
-  const double B_MAX = 0.9999;
+  const double B_MAX = 1.0;
   const double ETA_MIN = 0.25;
-  const double ETA_MAX = 0.9999;
+  const double ETA_MAX = 1.0;
   const double TAU_MIN = 0.001;
   const double TAU_MAX = 5.0;
 
