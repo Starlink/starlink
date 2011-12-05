@@ -294,6 +294,15 @@ sculib__skydip_f (const gsl_vector * x, void *data,
                           &eta_l, &b, &tau,
                           NULL, NULL, NULL );
 
+  /* If any of the parameters are out of range we return a huge number */
+  if ( b < B_MIN || b > B_MAX || eta_l < ETA_MIN || eta_l > ETA_MAX ||
+       tau < TAU_MIN) {
+    for (i=0; i<n; i++) {
+      gsl_vector_set (f, i, VAL__BADD);
+    }
+    return GSL_SUCCESS;
+  }
+
   for (i = 0; i < n; i++)
     {
       double j_theory;
@@ -302,15 +311,6 @@ sculib__skydip_f (const gsl_vector * x, void *data,
       j_theory = sculib__skydip_func( airmass[i], j_tel, j_amb, eta_l, b, tau );
 
       sigma = ( j_sky_sigma[i] > MINERR ? j_sky_sigma[i] : MINERR );
-
-      /* If any of the parameters are out of range we penalise j_theory
-         with increasing severity as we go over the boundary. */
-      if (b < B_MIN) j_theory += exp(10.0*fabs(b-B_MIN));
-      if (b > B_MAX) j_theory += exp(10.0*fabs(b-B_MAX));
-      if (eta_l < B_MIN) j_theory += exp(10.0*fabs(eta_l - ETA_MIN));
-      if (eta_l > B_MAX) j_theory += exp(10.0*fabs(eta_l - ETA_MAX));
-      if (tau > TAU_MAX) j_theory += exp(10.0*fabs(tau - TAU_MAX ));
-      if (tau < TAU_MIN) j_theory += exp(10.0*fabs(tau - TAU_MIN));
 
       msgOutiff(MSG__DEBUG, "",
                 "iter %zu  theory %g - data %g = %g", &status,
