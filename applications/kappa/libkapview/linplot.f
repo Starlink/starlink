@@ -664,6 +664,12 @@
 *        The new mode renamed to GapHistogram.
 *     2010 October 14 (MJC):
 *        Permit temporary style attributes without using TEMPSTYLE.
+*     5-DEC-2011 (DSB):
+*        Only use AXIS Centre values to define pixel positions if
+*        horizontal error bars are required or mode is STEP. Otherwise,
+*        pixel positions are defined by integer values in GRID coords.
+*        Without this change, a non-monotonic AXIS array would prevent
+*        a plot being created even if the current WCS Frame is not AXIS.
 *     {enter_further_changes_here}
 
 *-
@@ -911,57 +917,96 @@
          END DO
       END IF
 
-*  If there is an axis structure in the NDF, get a mapping from the AXIS
-*  Frame to the GRID Frame.  If no AXIS structure exists NDF AXIS
-*  routines will use a default one, but AST may use an AXIS Frame in the
-*  WCS component stored by a previous application.  Therefore, we use
-*  the mapping from PIXEL Frame (the Frame corresponding to the default
-*  NDF AXIS structure) to GRID Frame if no AXIS structure is present.
-*  This ensures that the mapping can be used to map Axis values returned
-*  by NDF_AMAP into GRID co-ordinates.
-      CALL NDF_STATE( INDF, 'AXIS', THERE, STATUS )
-      IF( THERE ) THEN
-         CALL KPG1_ASFFR( IWCS, 'AXIS', IAXFR, STATUS )
+*  See if error bars are required.
+      CALL PAR_GET0L( 'ERRBAR', ERRBAR, STATUS )
+
+*  Get the length of the horizontal error bars, in standard deviations.
+      IF( ERRBAR ) THEN
+         CALL PAR_GET0R( 'XSIGMA', XSIGMA, STATUS )
+         XSIGMA = ABS( XSIGMA )
       ELSE
-         CALL KPG1_ASFFR( IWCS, 'PIXEL', IAXFR, STATUS )
+         XSIGMA = 0.0
       END IF
 
-      AXMAP = AST_GETMAPPING( IWCS, IAXFR, AST__BASE, STATUS )
+*  Get the plotting mode.
+      CALL PAR_CHOIC( 'MODE', 'Line',
+     :                'Histogram,GapHistogram,Line,Point,Mark,Step,'/
+     :                /'Chain', .FALSE., TEXT, STATUS )
+
+*  Get an identifier for the mode, and get the marker type if required.
+      IF( TEXT .EQ. 'HISTOGRAM' ) THEN
+         IMODE = 1
+      ELSE IF( TEXT .EQ. 'GAPHISTOGRAM' ) THEN
+         IMODE = 6
+      ELSE IF( TEXT .EQ. 'LINE' ) THEN
+         IMODE = 2
+      ELSE IF( TEXT .EQ. 'POINT' ) THEN
+         IMODE = 3
+         MTYPE = -1
+      ELSE IF( TEXT .EQ. 'MARK' ) THEN
+         IMODE = 3
+         CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
+      ELSE IF( TEXT .EQ. 'STEP' ) THEN
+         IMODE = 4
+      ELSE IF( TEXT .EQ. 'CHAIN' ) THEN
+         IMODE = 5
+         CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
+      ELSE
+         IMODE = 6
+      ENDIF
+
+*  The length of horizontal error bars are defined in the AXIS Frame by the
+*  values in the AXIS VARIANCE array. Likewise, pixel widths are defined in
+*  the AXIS Frame by the AXIS WIDTH array. So if horizontal error bars are to
+*  be drawn, or MODE=STEP, then we need to know how to transform AXIS values
+*  into GRID values.
+      IF( XSIGMA .GT. 0.0 .OR. IMODE .EQ. 4 ) THEN
+
+*  Get the Mapping from AXIS to GRID.
+         CALL KPG1_ASFFR( IWCS, 'AXIS', IAXFR, STATUS )
+         AXMAP = AST_GETMAPPING( IWCS, IAXFR, AST__BASE, STATUS )
 
 *  If the base NDF has more than one pixel axis (e.g. if a
 *  one-dimensional section from a two-dimensional NDF was supplied), we
 *  need to modify the above mapping to have one input corresponding to
 *  the significant axis.
-      NAXNDF = AST_GETI( AXMAP, 'NIN', STATUS )
-      IF( NAXNDF .GT. 1 ) THEN
+         NAXNDF = AST_GETI( AXMAP, 'NIN', STATUS )
+         IF( NAXNDF .GT. 1 ) THEN
 
 *  Create a PermMap with 1 input and an output for each NDF pixel axis.
 *  Connect the one input to the output for the significant NDF
 *  dimension.
-         DO I = 1, NAXNDF
-            PERM( I ) = 0
-         END DO
-         PERM( SDIM( 1 ) ) = 1
+            DO I = 1, NAXNDF
+               PERM( I ) = 0
+            END DO
+            PERM( SDIM( 1 ) ) = 1
 
-         PMAP = AST_PERMMAP( 1, SDIM( 1 ), NAXNDF, PERM, 0.0D0, ' ',
-     :                       STATUS )
+            PMAP = AST_PERMMAP( 1, SDIM( 1 ), NAXNDF, PERM, 0.0D0, ' ',
+     :                          STATUS )
 
 *  Put this PermMap in front of the Mapping found above.  The resulting
 *  Mapping has one input (the AXIS value on the significant NDF axis)
 *  and one output (the one-dimensional GRID co-ordinate).
-         AXMAP = AST_CMPMAP( PMAP, AXMAP, .TRUE., ' ', STATUS )
+            AXMAP = AST_CMPMAP( PMAP, AXMAP, .TRUE., ' ', STATUS )
 
-      END IF
+         END IF
 
 * Check the axis map is defined in both directions.
-      IF( .NOT. AST_GETL( AXMAP, 'TRANFORWARD', STATUS ) .OR.
-     :    .NOT. AST_GETL( AXMAP, 'TRANINVERSE', STATUS ) ) THEN
-         IF( STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'LINPLOT_ERR', 'One or more of the input '//
-     :                    'AXIS arrays is non-monotonic.', STATUS )
-            GO TO 999
+         IF( .NOT. AST_GETL( AXMAP, 'TRANFORWARD', STATUS ) .OR.
+     :       .NOT. AST_GETL( AXMAP, 'TRANINVERSE', STATUS ) ) THEN
+            IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'LINPLOT_ERR', 'One or more of the input'//
+     :                       ' AXIS arrays is non-monotonic.', STATUS )
+               GO TO 999
+            END IF
          END IF
+
+*  In all other case, we do not need the pixel widths or variances, so we
+*  can defined their positions in the GRID Frame rather than the AXIS
+*  Frame, meaning we do not need to know the AXIS->GRID mapping.
+      ELSE
+         AXMAP = AST__NULL
       END IF
 
 *  See how the X and Y axes are to be mapped on to the screen.
@@ -996,10 +1041,7 @@
 *  Get some other parameter values.
 *  ================================
 
-*  See if error bars are required.
-      CALL PAR_GET0L( 'ERRBAR', ERRBAR, STATUS )
-
-*  If so...
+*  If error bars are required.
       IF( ERRBAR ) THEN
 
 *  Obtain the shape of error bar to plot.
@@ -1021,65 +1063,48 @@
 
       END IF
 
-*  Get the plotting mode.
-      CALL PAR_CHOIC( 'MODE', 'Line',
-     :                'Histogram,GapHistogram,Line,Point,Mark,Step,'/
-     :                /'Chain', .FALSE., TEXT, STATUS )
-
-*  Get an identifier for the mode, and get the marker type if required.
-      IF( TEXT .EQ. 'HISTOGRAM' ) THEN
-         IMODE = 1
-      ELSE IF( TEXT .EQ. 'GAPHISTOGRAM' ) THEN
-         IMODE = 6
-      ELSE IF( TEXT .EQ. 'LINE' ) THEN
-         IMODE = 2
-      ELSE IF( TEXT .EQ. 'POINT' ) THEN
-         IMODE = 3
-         MTYPE = -1
-      ELSE IF( TEXT .EQ. 'MARK' ) THEN
-         IMODE = 3
-         CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
-      ELSE IF( TEXT .EQ. 'STEP' ) THEN
-         IMODE = 4
-      ELSE IF( TEXT .EQ. 'CHAIN' ) THEN
-         IMODE = 5
-         CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
-      ELSE
-         IMODE = 6
-      ENDIF
-
 *  Ensure marker type (if used) is legal.
       MTYPE = MAX( -31, MTYPE )
 
 *  Map the required NDF arrays, and get some work space.
 *  =====================================================
 
-*  Map the NDF AXIS-centre values in double precision.
-      CALL NDF_AMAP( INDF, 'CENTRE', SDIM( 1 ), '_DOUBLE', 'READ',
-     :               IPXDAT, EL, STATUS )
+*  If required, map the NDF AXIS-centre values in double precision.
+      IF( AXMAP .NE. AST__NULL ) THEN
+         CALL NDF_AMAP( INDF, 'CENTRE', SDIM( 1 ), '_DOUBLE', 'READ',
+     :                  IPXDAT, EL, STATUS )
+
+*  Otherwise, the pixel centres are defined in GRID cooordinates and
+*  stored in work space.
+      ELSE
+         EL = DIM
+         CALL PSX_CALLOC( EL, '_DOUBLE', IPXDAT, STATUS )
+         CALL KPG1_FIGRD( 1, EL, EL, %VAL( CNF_PVAL( IPXDAT ) ),
+     :                    STATUS )
+      END IF
 
 *  Allocate work space to hold the corresponding values to be displayed
 *  on the horizontal axis of the Plot.
       CALL PSX_CALLOC( EL, '_DOUBLE', IPXCEN, STATUS )
       FRXCEN = ( STATUS .EQ. SAI__OK )
 
-*  We only use variances on the X axis if error bars are required, and
-*  if axis variances are available.
-      IF( .NOT. ERRBAR ) THEN
+*  We only use variances on the X axis if error bars are required, an
+*  AXIS->GRID Mapping is available, and axis variances are available.
+      IF( .NOT. ERRBAR .OR. AXMAP .EQ. AST__NULL ) THEN
          XVAR = .FALSE.
       ELSE
          CALL NDF_ASTAT( INDF, 'VARIANCE', SDIM( 1 ), XVAR, STATUS )
+         IF( .NOT. XVAR ) THEN
+            CALL MSG_OUT( ' ', '  Horizontal error bars cannot be '//
+     :                    'displayed as there are no positional '//
+     :                    'errors in the NDF.', STATUS )
+         END IF
       END IF
 
 *  If X-axis variance values are required map them.
       IF( XVAR ) THEN
          CALL NDF_AMAP( INDF, 'VARIANCE', SDIM( 1 ), '_DOUBLE', 'READ',
      :                  IPXVAR, EL, STATUS )
-
-*  See how many standard deviations are to be used for a horizontal
-*  error bar.
-         CALL PAR_GET0R( 'XSIGMA', XSIGMA, STATUS )
-         XSIGMA = ABS( XSIGMA )
 
 *  Tell the user what XSIGMA value we are using.
          CALL MSG_BLANK( STATUS )
@@ -1099,7 +1124,7 @@
       END IF
 
 *  If the mode is "STEP"...
-      IF( IMODE .EQ. 4 ) THEN
+      IF( IMODE .EQ. 4 .AND. AXMAP .NE. AST__NULL ) THEN
 
 *  Map the axis widths.
          CALL NDF_AMAP( INDF, 'WIDTH', SDIM( 1 ), '_DOUBLE', 'READ',
@@ -1892,6 +1917,7 @@
       IF( FRXCEN ) CALL PSX_FREE( IPXCEN, STATUS )
       IF( FRYBAR ) CALL PSX_FREE( IPYBAR, STATUS )
       IF( FRYCEN ) CALL PSX_FREE( IPYCEN, STATUS )
+      IF( AXMAP .EQ. AST__NULL )  CALL PSX_FREE( IPXDAT, STATUS )
 
 *  Shutdown PGPLOT and the graphics database.
       CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
