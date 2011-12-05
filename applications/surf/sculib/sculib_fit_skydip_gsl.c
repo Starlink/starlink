@@ -684,7 +684,7 @@ sculib_fit_skydip_gsl( int cvar, int n_measurements, const float airmass[],
     msgOutf( "", " eta = %.5f +/- %.5f b = %.5f +/- %.5f tau = %.5f +/- %.5f",
              status, eta_l_final, eta_l_err_final, b_final, b_err_final,
              tau_final, tau_err_final );
-    msgOutf( "", "Standard Deviation of fit residual = %.2f K (X = %.2f N = %zu)",
+    msgOutf( "", "Standard Deviation of fit residual = %.2f K (X = %.3f N = %zu)",
              status, sqrt(var), drexisq, iter );
     msgOutf( "", "Residual of fit: %.2f K", status, dresidual );
 
