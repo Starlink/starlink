@@ -173,7 +173,7 @@ for my $f (@files) {
     if ($i > 0) {
       for my $islice ( $i-1, $i ) {
         for my $key (@speedkeys) {
-          if ($local{$key}->[$islice] < 0) {
+          if ($local{$key}->[$islice] == &NDF::VAL__BADD()) {
             # invalid non-bad position or time
             $isokay = 0;
             last;
