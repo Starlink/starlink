@@ -1836,4 +1836,3 @@ void smf_write_smfFilter( const smfFilter *filt, const char *filename,
                           const Grp * igrp, size_t grpindex,
                           int *status );
 
-double smf_wvm225_to_cso225( double wvm225, int * status );

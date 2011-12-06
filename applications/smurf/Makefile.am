@@ -81,7 +81,8 @@ unmakemap
 DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/smurf_ers.c \
 sc2da/sc2ast.c
 
-WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c wvm/wvmCal.c
+WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c \
+wvm/Axb.c wvm/lmbc.c wvm/misc.c
 
 EXAMPLE_FILES = \
 examples/README \

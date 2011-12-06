@@ -380,7 +380,6 @@ smf_write_sampcube.c \
 smf_write_shortmap.c \
 smf_write_smfData.c \
 smf_write_smfFilter.c \
-smf_wvm225_to_cso225.c \
 $(BUILT_C_ROUTINES)
 
 noinst_INCLUDES = smf.h smf_typ.h

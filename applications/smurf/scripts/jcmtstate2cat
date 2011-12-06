@@ -78,7 +78,7 @@ use Astro::SLA;
 use Getopt::Long;
 use Pod::Usage;
 use JSA::Headers ();
-use JCMT::Tau::WVM::WVMLib;
+use JCMT::Tau::WVM::WVMLib 1.10;
 use Astro::FITS::Header::NDF;
 use NDF; # For VAL__BADD
 use Scalar::Util qw/ looks_like_number /;
@@ -233,18 +233,6 @@ for my $f (@files) {
                                                       $local{WVM_T12}->[$i],
                                                       $local{WVM_T42}->[$i],
                                                       $local{WVM_T78}->[$i]);
-          # Convert to CSO scale as done in libsmf
-          my $dwvm = 0;
-          if ( $wvmtau < 0.0704 ) {
-            $dwvm = -0.0019 + 0.2*$wvmtau - 4.698*($wvmtau ** 2.0) + 3.0*($wvmtau ** 3.0);
-          } elsif ( $wvmtau < 0.18045 ) {
-            $dwvm =  0.0357 - 1.151*$wvmtau + 8.626*($wvmtau ** 2.0) - 21.439*($wvmtau ** 3.0);
-          } elsif  ($wvmtau < 0.2205 ) {
-            $dwvm = -0.01 - 0.0393*$wvmtau;
-          } else {
-            $dwvm =  0.01 - 0.13*$wvmtau;
-          }
-          $wvmtau += $dwvm;
 
           # Now calculate the PWV
           $pwvlos = JCMT::Tau::WVM::WVMLib::tsky2pwv( $local{TCS_AIRMASS}->[$i],

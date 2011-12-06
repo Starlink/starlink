@@ -183,18 +183,17 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
       errRep( "", "Unable to determine airmass so can not calculate WVM opacity at zenith",
               status);
     } else {
+      float rms;
 
       /* Get the pwv for this airmass */
-      wvmOpt( (float)airmass, (float)tamb, wvm, &pwv, &tau0, &twater);
+      wvmOpt( (float)airmass, (float)tamb, wvm, &pwv, &tau0, &twater, &rms);
 
       /* Convert to zenith pwv */
       pwv /= airmass;
 
       /* convert zenith pwv to zenith tau */
-      tau225 = pwv2tau( airmass, pwv );
+      tau225 = pwv2tau( pwv );
 
-      /* and correct the calibration */
-      tau225 = smf_wvm225_to_cso225( tau225, status );
     }
   }
 

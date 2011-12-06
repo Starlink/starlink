@@ -376,7 +376,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                        int *status ) {
 
   double accel[2];                /* telescope accelerations (arcsec) */
-  float aeff[3];                  /* output of wvmOpt */
+  double aeff[3];                  /* output of wvmOpt */
   double *airmass=NULL;           /* mean airmass of observation */
   double amprms[21];              /* AMPRMS parameters for SLALIB routines */
   smfData *astdata=NULL;          /* pointer to SCUBA2 data struct */
@@ -504,8 +504,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int subscanno = 0;              /* Sub-scan number (last number in output filanem)*/
   double taiutc;                  /* Difference between TAI and UTC time (TAI-UTC s) */
   double tauCSO=0;                /* CSO zenith optical depth */
-  float tbri[3];                  /* simulated wvm measurements */
-  float teff[3];                  /* output of wvmOpt */
+  double tbri[3];                  /* simulated wvm measurements */
+  double teff[3];                  /* output of wvmOpt */
   double temp1;                   /* store temporary values */
   double temp2;                   /* store temporary values */
   double temp3;                   /* store temporary values */
@@ -513,7 +513,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double totaltime;               /* Total integration time */
   double tt;                      /* Terrestrial Time (TT) for
                                      calculating planet position */
-  float ttau[3];                  /* output of wvmOpt */
+  double ttau[3];                  /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
   char utdate[SZFITSCARD+1] = "\0";        /* UT date in YYYYMMDD form */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
@@ -1482,8 +1482,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               sinx->airmass = airmass[frame-1];
 
               /* Calculate `mean' tau CSO from the pwv */
-              tauCSO = 0.5 * ( pwv2tau(airmass[0],pwvzen) +
-                               pwv2tau(airmass[frame-1],pwvzen) );
+              tauCSO = pwv2tau(pwvzen);
 
             }/* if not hits-only */
 
