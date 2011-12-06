@@ -76,6 +76,7 @@
 *  Authors :
 *     PWD: Peter W. Draper (STARLINK - Durham University)
 *     AA: Alasdair Allan (STARLINK - Exeter University)
+*     EUS: Eduardo Unda-Sanzana
 *     {enter_new_authors_here}
 *
 *  History :
@@ -88,6 +89,8 @@
 *        Bug fix, signal was corrected for exposure time, but the error wasn't
 *     17-JUN-2010 (Andy Gibb, UBC):
 *        Write sky/signal values <1e-2 in E11.4 format
+*     2011-12-06 (EUS):
+*        Use 5 decimal places for MAG and MAGERR
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -264,7 +267,7 @@
       IF ( MAGS ) THEN
          IF ( ( FACTOR .GT. 5.0D0 ) .OR. ERFLAG ) THEN
             MAG = SKYMAG
-            ERRMAG = 99.999D0
+            ERRMAG = 99.99999D0
             CODE = '?'
          ENDIF
       ELSE
@@ -283,10 +286,10 @@
       WRITE( CYCEN, '( F9.2 )' ) YCEN + REAL( ORIGIN( 2 ) - 1 )
 
 *   Mag
-      WRITE( CMAG, '( F9.3 )' ) MAG
+      WRITE( CMAG, '( F9.5 )' ) MAG
 
 *   Mag error
-      WRITE( CERRMG, '( F9.3 )' ) ERRMAG
+      WRITE( CERRMG, '( F9.5 )' ) ERRMAG
 
 *   Sky - use E format if number is too large or too small
       PSKY = SKY * PADU

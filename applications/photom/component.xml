@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="photom" support="S">
-  <version>1.12-0</version>
+  <version>1.12-1</version>
   <path>applications/photom</path>
   <description>PHOTOM - A Photometry Package</description>
   <abstract><p>PHOTOM is a package for measuring the sky corrected
