@@ -190,7 +190,7 @@
 *
 *        - "Gauss" -- Uses the exp(-k*x*x) kernel.  The FWHM of the
 *        Gaussian is given by Parameter PARAMS(2), and the point at
-*        which to truncate the Gaussian to zero is given by parameter
+*        which to truncate the Gaussian to zero is given by Parameter
 *        PARAMS(1).
 *
 *        All methods propagate variances from input to output, but the
@@ -215,7 +215,7 @@
 *        will terminate early without creating an output cube, but
 *        without reporting an error. Note, the pixel bounds which the
 *        output cube would have had will still be written to output
-*        parameters LBOUND and UBOUND, even if a null value is supplied
+*        Parameters LBOUND and UBOUND, even if a null value is supplied
 *        for OUT.
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *        An optional array which consists of additional parameters
@@ -506,7 +506,7 @@
          END DO
       END IF
 
-*  Write the output pixel bounds to output parameters LBOUND and UBOUND.
+*  Write the output pixel bounds to output Parameters LBOUND and UBOUND.
       CALL PAR_PUT1I( 'LBOUND', NDIM, LBND, STATUS )
       CALL PAR_PUT1I( 'UBOUND', NDIM, UBND, STATUS )
 

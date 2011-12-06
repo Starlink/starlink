@@ -34,7 +34,7 @@
 *     by the REBIN parameter).
 *
 *     The Mapping to use can be supplied in several different ways (see
-*     parameter MAPPING).
+*     Parameter MAPPING).
 
 *  Usage:
 *     regrid in out [method]
@@ -133,7 +133,7 @@
 *        - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good
 *        results can be obtained by matching the FWHM of the
 *        envelope function to the point-spread function of the
-*        input data (see parameter PARAMS).
+*        input data (see Parameter PARAMS).
 *
 *        - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
 *        offset from the interpolation point (resampling) or transformed
@@ -145,10 +145,10 @@
 *        scheme is similar to the "SincCos" scheme.
 *
 *        - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian
-*        is given by parameter PARAMS(2), and the point at which to
-*        truncate the Gaussian to zero is given by parameter PARAMS(1).
+*        is given by Parameter PARAMS(2), and the point at which to
+*        truncate the Gaussian to zero is given by Parameter PARAMS(1).
 *
-*        -  "BlockAve"  -- Block averaging over all pixels in the
+*        - "BlockAve"  -- Block averaging over all pixels in the
 *        surrounding N-dimensional cube. This option is only available
 *        when resampling (i.e. if REBIN is set to FALSE).
 *
@@ -210,7 +210,7 @@
 *        transformed input co-ordinate axis values would be multiplied
 *        by these factors to obtain the corresponding output pixel
 *        co-ordinates.  If a null (!) value is supplied for SCALE, then
-*        default values are used which depends on the value of parameter
+*        default values are used which depends on the value of Parameter
 *        MAPPING.  If a null value is supplied for MAPPING then the
 *        default scaling factors are chosen so that pixels retain their
 *        original size (very roughly) after transformation.  If as
@@ -389,7 +389,7 @@
 *     approximate flux conservation.
 *
 *     - The approximation of the Mapping using a piece-wise linear
-*     transformation (controlled by parameter TOL) can produce artefacts
+*     transformation (controlled by Parameter TOL) can produce artefacts
 *     at the joints between the panels of the approximation.  These can
 *     occur when using the rebinning algorithm, or when using the
 *     resampling algorithm with CONSERVE set to TRUE.  They are caused
@@ -679,7 +679,7 @@
             CALL MSG_OUT( ' ', 'Method "BlockAve" cannot be used '//
      :                    'because REBIN is set true.', STATUS )
             CALL MSG_OUT( ' ', 'Please supply a new value for '//
-     :                    'parameter METHOD.', STATUS )
+     :                    'Parameter METHOD.', STATUS )
             CALL PAR_CANCL( 'METHOD', STATUS )
 
          ELSE
@@ -767,7 +767,7 @@
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
-*  If we are using a Mapping specified by parameter MAPPING, the default
+*  If we are using a Mapping specified by Parameter MAPPING, the default
 *  scaling factor is unity on all axes. Otherwise, we need to calculate
 *  suitable default values.
          IF( .NOT. CURENT ) THEN

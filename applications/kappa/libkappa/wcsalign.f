@@ -44,7 +44,7 @@
 *     the REBIN parameter).
 *
 *     Two methods exist for determining the bounds of the output NDFs.
-*     First you can give values for parameters LBND and UBND
+*     First you can give values for Parameters LBND and UBND
 *     which are then used as the pixel index bounds for all output
 *     NDFs. Second, if a null value is given for LBND or UBND,
 *     default values are generated separately for each output NDF so
@@ -131,11 +131,11 @@
 *        axis for the output NDFs. The number of values supplied should
 *        equal the number of axes in the reference NDF. The given values
 *        are used for all output NDFs.  If a null value (!) is given for
-*        this parameter or for parameter UBND, then separate default
+*        this parameter or for Parameter UBND, then separate default
 *        values are calculated for each output NDF which result in the
 *        output NDF just encompassing the corresponding input NDF. The
 *        suggested defaults are the lower pixel-index bounds from the
-*        reference NDF (see parameter REF).
+*        reference NDF (see Parameter REF).
 *     MAXPIX = _INTEGER (Read)
 *        A value which specifies an initial scale size in pixels for the
 *        adaptive algorithm which approximates non-linear Mappings with
@@ -183,7 +183,7 @@
 *        - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel. Good
 *        results can be obtained by matching the FWHM of the
 *        envelope function to the point-spread function of the
-*        input data (see parameter PARAMS).
+*        input data (see Parameter PARAMS).
 *
 *        - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
 *        offset from the interpolation point (resampling) or transformed
@@ -196,9 +196,9 @@
 *
 *        - "Gauss" -- Uses the exp(-k*x*x) kernel. This option is only
 *        available when rebinning (i.e. if REBIN is set to TRUE).
-*        The FWHM of the Gaussian is given by parameter PARAMS(2), and
+*        The FWHM of the Gaussian is given by Parameter PARAMS(2), and
 *        the point at which to truncate the Gaussian to zero is given by
-*        parameter PARAMS(1).
+*        Parameter PARAMS(1).
 *
 *        All methods propagate variances from input to output, but the
 *        variance estimates produced by interpolation schemes other than
@@ -219,7 +219,7 @@
 *        "SincSinc".  [current value]
 *     OUT = NDF (Write)
 *        A group of output NDFs corresponding one-for-one with the list
-*        of input NDFs given for parameter IN. This should be given as
+*        of input NDFs given for Parameter IN. This should be given as
 *        a comma-separated list, in which each list element can be:
 *
 *        - an NDF name. If the name contains an asterisk character "*",
@@ -282,17 +282,17 @@
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned. If a
 *        null value is supplied for this parameter, the first NDF
-*        supplied for parameter IN is used.
+*        supplied for Parameter IN is used.
 *     UBND() = _INTEGER (Read)
 *        An array of values giving the upper pixel-index bound on each
 *        axis for the output NDFs. The number of values supplied should
 *        equal the number of axes in the reference NDF. The given values
 *        are used for all output NDFs.  If a null value (!) is given for
-*        this parameter or for parameter LBND, then separate default
+*        this parameter or for Parameter LBND, then separate default
 *        values are calculated for each output NDF which result in the
 *        output NDF just encompassing the corresponding input NDF. The
 *        suggested defaults are the upper pixel-index bounds from the
-*        reference NDF (see parameter REF).
+*        reference NDF (see Parameter REF).
 *     WLIM = _REAL (Read)
 *        This parameter is only used if REBIN is set TRUE. It specifies
 *        the minimum number of good pixels which must contribute to an
@@ -324,7 +324,7 @@
 *  Notes:
 *     -  WCS information (including the current co-ordinate Frame) is
 *     propagated from the reference NDF to all output NDFs.
-*     -  QUALITY is propagated from input to output only if parameter
+*     -  QUALITY is propagated from input to output only if Parameter
 *     METHOD is set to "Nearest" and REBIN is set to FALSE.
 
 *  Related Applications:
@@ -632,7 +632,7 @@
             CALL MSG_OUT( ' ', 'Method "Gauss" cannot be used '//
      :                    'because REBIN is set false.', STATUS )
             CALL MSG_OUT( ' ', 'Please supply a new value for '//
-     :                    'parameter METHOD.', STATUS )
+     :                    'Parameter METHOD.', STATUS )
             CALL PAR_CANCL( 'METHOD', STATUS )
          ELSE
             MORE = .FALSE.
