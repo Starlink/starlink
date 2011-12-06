@@ -191,11 +191,12 @@
 *        envelope of the function goes to zero.  The minimum value is
 *        1.0, and the run-time default value is 2.0.  For the Gauss and
 *        SincGauss scheme, it specifies the full-width at half-maximum
-*        (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
-*        the run-time default is 1.0.  On astronomical images and
-*        spectra, good results are often obtained by approximately
-*        matching the FWHM of the envelope function, given by PARAMS(2),
-*        to the point-spread function of the input data.  []
+*        (FWHM) of the Gaussian envelope measured in output pixels.
+*        The minimum value is 0.1, and the run-time default is 1.0.  On
+*        astronomical images and spectra, good results are often
+*        obtained by approximately matching the FWHM of the envelope
+*        function, given by PARAMS(2), to the point-spread function of
+*        the input data.  []
 *     REBIN = _LOGICAL (Read)
 *        Determines the algorithm used to calculate the output pixel
 *        values.  If a TRUE value is given, a rebinning algorithm is

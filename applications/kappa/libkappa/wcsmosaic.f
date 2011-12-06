@@ -236,8 +236,9 @@
 *        which the envelope of the function goes to zero.  The minimum
 *        value is 1.0, and the run-time default value is 2.0.  For the
 *        Gauss and SincGauss scheme, it specifies the full-width at
-*        half-maximum (FWHM) of the Gaussian envelope.  The minimum
-*        value is 0.1, and the run-time default is 1.0.  []
+*        half-maximum (FWHM) of the Gaussian envelope measured in
+*        output pixels.  The minimum value is 0.1, and the run-time
+*        default is 1.0.  []
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned.  If a
 *        null value is supplied for this parameter, the first NDF
