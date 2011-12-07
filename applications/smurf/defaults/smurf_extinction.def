@@ -57,8 +57,8 @@
 
 # Original filters delivered for SCUBA-2. Named "450" and "850".
 
-ext.taurelation.450 = (32.0,-0.020)
-ext.taurelation.850 =  (5.2,-0.013)
+ext.taurelation.450 = (25.8,-0.010)
+ext.taurelation.850 =  (4.8,-0.006666)
 
 # Control whether we want WVM smoothing. The value is the
 # size in seconds for the tophat function. A value of 0 disables

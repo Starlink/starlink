@@ -17,6 +17,9 @@
   History:
 
 	$Log: wvmTau.c,v $
+	Revision 1.10  2011/12/07 21:52:30  timj
+	Updated pwv to tau coefficients from RPT
+	
 	Revision 1.9  2011/12/02 21:54:14  timj
 	New simpler pwv to tau polynomial
 	
@@ -65,16 +68,16 @@
 /* PWV to CSO TAU */
 #define WVM_COEFF_SIZE 2
 static const double wvm_cso_coefs[WVM_COEFF_SIZE] = {
-  0.018,
-  1./25.317
+  0.017,
+  0.04
 };
 
 /* CSO TAU to PWV */
 /* This is a simple inverse of the linear fit */
 #define TAU2PWV_COEFF_SIZE 2
 static const double tau2pwv_coefs[TAU2PWV_COEFF_SIZE] = {
-  -0.45567,
-  25.317
+  -0.425,
+  25.0
 };
 
 
