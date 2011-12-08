@@ -1264,12 +1264,11 @@ itcl::class gaia::GaiaCubeSpectrum {
                #  the offsets to this reference position. If the coordinate
                #  system is measuring offset sky coordinates then we handle
                #  those differently.
+               lassign [$rtdimage_ astpix2wcs $iix $iiy 1 0] pra pdec
                if { [$rtdimage_ astget "SkyRefIs"] != "Ignored" } {
-                  lassign [$rtdimage_ astpix2wcs $iix $iiy 1 0] pra pdec
                   set drefra [angdiff_ $pra 0.0]
                   set drefdec [angdiff_ $pdec 0.0]
                } else {
-                  $rtdimage_ convert coords $iix $iiy image pra pdec deg
                   set drefra [angdiff_ $pra $rra]
                   set drefdec [angdiff_ $pdec $rdec]
                }
