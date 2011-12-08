@@ -94,6 +94,8 @@
 *     2011-05-10 (DSB):
 *        If REFPIX1 or REFPIX2 is null, ensure both par[0] and par[1]
 *        retain their original values.
+*     2011-12-08 (TIMJ):
+*        Increase number of digits in DEFLON/DEFLAT string
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -270,6 +272,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
    projection, then get the parameters describing the projection, using the
    defaults calculated above. */
       if( !sparse && *status == SAI__OK ) {
+         const int ndigits = 8; /* Number of digits for deflat/deflon precision */
 
 /* If the target is moving, display the tracking centre coordinates for
    the first time slice. */
@@ -317,14 +320,22 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
 /* Get the sky coords reference position strings. Use the returned SkyFrame
    to format and unformat them. */
          if( par[ 2 ] != AST__BAD ) {
+            int curdigits;
+            curdigits = astGetI( skyframe, "digits(1)" );
+            astSetI( skyframe, "digits(1)", ndigits );
             deflon = astFormat( skyframe, 1, par[ 2 ] );
+            astSetI( skyframe, "digits(1)", curdigits );
             parDef0c( "REFLON", deflon, status );
          } else {
             deflon = NULL;
          }
 
          if( par[ 3 ] != AST__BAD ) {
+            int curdigits;
+            curdigits = astGetI( skyframe, "digits(2)" );
+            astSetI( skyframe, "digits(2)", ndigits );
             deflat = astFormat( skyframe, 2, par[ 3 ] );
+            astSetI( skyframe, "digits(2)", curdigits );
             parDef0c( "REFLAT", deflat, status );
          } else {
             deflat = NULL;
