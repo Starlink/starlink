@@ -15,8 +15,8 @@
 *  Invocation:
 *     void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
 *                         dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
-*                         int dclimcorr, size_t *nrej, smfStepFix **steps,
-*                         int *nsteps, int *status )
+*                         int dclimcorr, int meanshift, size_t *nrej,
+*                         smfStepFix **steps, int *nsteps, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -49,6 +49,16 @@
 *        the same time in more than "dclimcorr" bolometers, then all
 *        bolometers are assumed to have a step at that time, and the step
 *        is fixed no matter how small it is.
+*     meanshift = int (Given)
+*        If non-zero, smooth each bolometer times stream using a mean-shift
+*        filter before doing anything else. A mean-shift filter is an
+*        edge-preserving smooth. It can help to identify smaller steps,
+*        but does not work well if there are strong gradients in the
+*        bolometer time stream. Therefore, "meanshift" should only be
+*        used once the common-mode signal has been subtracted. The
+*        spatial width of the filter is given by dcsmooth, and the range of
+*        data values accepted by the filter is 5 times the local RMS in
+*        the original time stream.
 *     nrej = size_t * (Returned)
 *        The number of bolometers rejected due to having too many steps.
 *     steps = smfStepFix ** (Returned)
@@ -203,6 +213,8 @@
 *     23-NOV-2011 (DSB):
 *        Made changes so that steps that are close together (within a few
 *        hundred samples) get handled better.
+*     9-DEC-2011 (DSB):
+*        Added mean shift filter option.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -262,6 +274,7 @@ typedef struct smfFixStepsJobData {
    int dcmaxsteps;
    int dcmaxwidth;
    int dcsmooth2;
+   int meanshift;
    int nfixed;
    int nstep;
    size_t bstride;
@@ -269,6 +282,7 @@ typedef struct smfFixStepsJobData {
    size_t tstride;
    smfStepFix *steps;
    smf_qual_t *qua;
+   smfData *data;
 } smfFixStepsJobData;
 
 
@@ -329,6 +343,7 @@ typedef struct TimeData {
    int outquality;
    int ibolo;
    double median;
+   double meanshift;
    double diff;
    double thresh;
    double sdiff;
@@ -354,7 +369,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
                                size_t tstride, double *median, double *snr,
                                dim_t dcfitbox, double dcthresh2,
                                int nbstep, Step *bsteps, int ibolo,
-                               smfStepFix **steps, int *nsteps,
+                               int meanshift, smfStepFix **steps, int *nsteps,
                                double *grad, double *off, int *bcount,
                                int *status );
 
@@ -367,8 +382,8 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status );
 
 void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
                     dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
-                    int dclimcorr, size_t *nrej, smfStepFix **steps,
-                    int *nstep, int *status ) {
+                    int dclimcorr, int meanshift, size_t *nrej,
+                    smfStepFix **steps, int *nstep, int *status ) {
 
 /* Local Variables */
    dim_t itime;
@@ -411,7 +426,7 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
 
 /* The smallest jump to be corrected, as a factor of the local RMS
    noise in the bolometer data. */
-   double dcthresh3 = 4.0;
+   double dcthresh3 = meanshift ? 0.4 : 4.0;
 
 /* Initialise... */
    if( nstep ) *nstep = 0;
@@ -512,6 +527,7 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
 
          pdata->bstride = bstride;
          pdata->bolonoise = bolonoise;
+         pdata->data = data;
          pdata->dat = dat;
          pdata->dccut = dccut;
          pdata->dcfill = dcfill;
@@ -524,6 +540,7 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
          pdata->dcsmooth2 = dcsmooth2;
          pdata->dcthresh2 = dcthresh2;
          pdata->dcthresh3 = dcthresh3;
+         pdata->meanshift = meanshift;
          pdata->nbolo = nbolo;
          pdata->ntslice = ntslice;
          pdata->qua = qua;
@@ -713,6 +730,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    int lbad;
    int maxsteps;
    int mbstep;
+   int meanshift;
    int msize;
    int nbstep;
    int nfixed;
@@ -728,10 +746,12 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    size_t base;
    size_t bstride;
    size_t tstride;
+   smfData *data = NULL;
    smfFixStepsJobData *pdata;
    smfStepFix *steps;
    smf_qual_t *pq;
    smf_qual_t *qua = NULL;
+   smf_qual_t *wq = NULL;
    struct timeval tv1;
    struct timeval tv2;
 
@@ -749,6 +769,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    bstride = pdata->bstride;
    bcount = pdata->bcount;
    dat = pdata->dat;
+   data = pdata->data;
    dccut = pdata->dccut;
    dcfill = pdata->dcfill;
    dcfitbox = pdata->dcfitbox;
@@ -759,6 +780,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    dcthresh = pdata->dcthresh;
    dcthresh2 = pdata->dcthresh2;
    dcthresh3 = pdata->dcthresh3;
+   meanshift = pdata->meanshift;
    nbolo = pdata->nbolo;
    ntslice = pdata->ntslice;
    qua = pdata->qua;
@@ -782,7 +804,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
 
 #ifdef DEBUG_STEPS
    FILE *fd2 = fopen( "timedata.asc", "w" );
-   fprintf( fd2, "# itime indata inquality outdata outquality ibolo median "
+   fprintf( fd2, "# itime indata inquality outdata outquality ibolo meanshift median "
             "diff thresh sdiff rdiff mdiff mdiff2 diff2 rms instep step_width total snr\n");
 
    FILE *fd3 = fopen( "stepdata.asc", "w" );
@@ -803,6 +825,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
       w3 = astMalloc( sizeof( *w3 )*msize );
       w4 = astMalloc( sizeof( *w4 )*msize );
       w5 = astMalloc( sizeof( *w5 )*msize );
+      if( tstride > 1 && meanshift ) wq =  astMalloc( sizeof( *wq )*msize );
 
       msize = dcsmooth;
       if( dcsmooth2 > msize ) msize = dcsmooth2;
@@ -817,6 +840,19 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
          pq = qua + base;
          if( !(*pq & SMF__Q_BADB) ) {
 
+/* Get a contiguous copy of the quality array. Only needed if doing a
+   mean shift filter. */
+            if( meanshift ) {
+               if( tstride > 1 ) {
+                  for( itime = 0; itime < ntslice - 1; itime++ ) {
+                     wq[ itime ] = *pq;
+                     pq += tstride;
+                  }
+               } else {
+                  wq = pq;
+               }
+            }
+
 #ifdef DEBUG_STEPS
 
    if( RECORD_BOLO ) {
@@ -829,6 +865,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
          timedata[ kk ].outdata = VAL__BADD;
          timedata[ kk ].outquality = 0;
          timedata[ kk ].ibolo = ibolo;
+         timedata[ kk ].meanshift = VAL__BADD;
          timedata[ kk ].median = VAL__BADD;
          timedata[ kk ].diff = VAL__BADD;
          timedata[ kk ].thresh = VAL__BADD;
@@ -851,10 +888,54 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
 
 #endif
 
-/* Median smooth the input data, putting the results in w1. */
-            smf_median_smooth( dcsmooth, SMF__FILT_MEDIAN, -1.0, ntslice,
-                               dat + base, qua + base, tstride, SMF__Q_GOOD,
-                               w1, mw1, mw2, mw3, status );
+
+
+/* Get an estimate of the noise in the bolometer. Use zero if the
+   bolometer has insufficient good samples. */
+            if( *status == SAI__OK ) {
+               rms = smf_quick_noise( data, ibolo, 20, 50, SMF__Q_GOOD, status );
+               if( *status != SAI__OK ) {
+                  rms = 0.0;
+                  errAnnul( status );
+               }
+            }
+
+/* Smooth the input data with an edge-preserving mean-shift filter, putting
+   the results in w5. */
+            if( meanshift ) {
+               smf_meanshift( dat + base, w5, ntslice, tstride, dcsmooth, 5*rms,
+                              qua + base, SMF__Q_GOOD, 0.0, status );
+
+#ifdef DEBUG_STEPS
+if( RECORD_BOLO ) {
+   printf("Quick RMS is %g\n", rms );
+   for( itime = 1; itime < ntslice - 1; itime++ ) {
+      timedata[ itime ].meanshift = w5[itime];
+   }
+}
+#endif
+
+/* Median smooth the above data, putting the results in w1. */
+               smf_median_smooth( dcsmooth, SMF__FILT_MEDIAN, -1.0, ntslice,
+                                  w5, wq, 1, SMF__Q_GOOD, w1, mw1, mw2, mw3,
+                                  status );
+
+/* If mean-shift filter is not required, just median filter. */
+            } else {
+               smf_median_smooth( dcsmooth, SMF__FILT_MEDIAN, -1.0, ntslice,
+                                  dat + base, qua + base, tstride, SMF__Q_GOOD,
+                                  w1, mw1, mw2, mw3, status );
+            }
+
+#ifdef DEBUG_STEPS
+if( RECORD_BOLO ) {
+   printf("Quick RMS is %g\n", rms );
+   for( itime = 1; itime < ntslice - 1; itime++ ) {
+      timedata[ itime ].median = w1[itime];
+   }
+}
+#endif
+
 
 /* Into each sample of w2 put the difference between the two adjacent
    median smoothed data values. Store a copy of these differences in w3.
@@ -882,7 +963,6 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
 
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO ) {
-      timedata[ itime ].median = w1[itime];
       timedata[ itime ].diff = diff;
    }
 #endif
@@ -1113,6 +1193,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
             step_limit = -1;
             total = 0.0;
             max_snr_jump = 0.0;
+            diff2 = 0.0;
 
             pw2 = w2;
             pw3 = w3;
@@ -1120,13 +1201,18 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
             for( itime = 0; itime < ntslice; itime++,pw2++,pw3++,pw4++ ) {
 
                diff = *pw2;
-               diff2 = *pw4;
+
+/* Median smoothed data values can be identical over a range of samples,
+   leading to zero noise. If there is zero noise, use the most recent
+   non-zero estimate of the noise. */
+               if( *pw4 > 0.0 ) diff2 = *pw4;
+
                if( diff != VAL__BADD && diff2 != VAL__BADD &&
                    diff2 > 0.0 ) {
 
 /* Get the RMS of the residual differences around the current sample, and
    store the signal to noise ratio for the step in w3. */
-                  rms = sqrt( *pw4 );
+                  rms = sqrt( diff2 );
                   *pw3 = diff/rms;
 
 #ifdef DEBUG_STEPS
@@ -1227,7 +1313,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    correct the bolometer data for each succesfully measured step. */
             mbstep = smf1_correct_steps( ntslice, dat + base, qua + base,
                                          tstride, w1, w3, dcfitbox, dcthresh2,
-                                         nbstep, bsteps, ibolo,
+                                         nbstep, bsteps, ibolo, meanshift,
                                          (pdata->nstep)?&steps:NULL,
                                          (pdata->nstep)?&nstep:NULL,
                                          w4, w5, bcount, status );
@@ -1298,6 +1384,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
          TOPCAT( fd2, timedata[itime].outdata );
          fprintf( fd2, "%d ", timedata[itime].outquality);
          fprintf( fd2, "%d ", timedata[itime].ibolo);
+         TOPCAT( fd2, timedata[ itime ].meanshift );
          TOPCAT( fd2, timedata[ itime ].median );
          TOPCAT( fd2, timedata[ itime ].diff );
          TOPCAT( fd2, timedata[ itime ].thresh );
@@ -1330,6 +1417,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
       mw1 = astFree( mw1 );
       mw2 = astFree( mw2 );
       mw3 = astFree( mw3 );
+      if( tstride > 1 && meanshift ) wq = astFree( wq );
 
 /* Report the time taken in this thread. */
       msgOutiff( SMF__TIMER_MSG, "",
@@ -1358,8 +1446,8 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
 
 static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
                                size_t tstride, double *median, double *snr,
-                               dim_t dcfitbox, double dcthresh2,
-                               int nbstep, Step *bsteps, int ibolo,
+                               dim_t dcfitbox, double dcthresh2, int nbstep,
+                               Step *bsteps, int ibolo, int meanshift,
                                smfStepFix **steps, int *nsteps,
                                double *grad, double *off, int *bcount,
                                int *status ){
@@ -1374,8 +1462,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *  Invocation:
 *     int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *                             size_t tstride, double *median, double *snr,
-*                             dim_t dcfitbox, double dcthresh2,
-*                             int nbstep, Step *bsteps, int ibolo,
+*                             dim_t dcfitbox, double dcthresh2, int nbstep,
+*                             Step *bsteps, int ibolo, int meanshift,
 *                             smfStepFix **steps, int *nsteps, double *grad,
 *                             double *off, int *bcount, int *status )
 
@@ -1412,6 +1500,16 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *        An array of structures describing each candidate step.
 *     ibolo = int (Given)
 *        The index of the bolometer being fixed.
+*     meanshift = int (Given)
+*        If non-zero, smooth each bolometer times stream using a mean-shift
+*        filter before doing anything else. A mean-shift filter is an
+*        edge-preserving smooth. It can help to identify smaller steps,
+*        but does not work well if there are strong gradients in the
+*        bolometer time stream. Therefore, "meanshift" should only be
+*        used once the common-mode signal has been subtracted. The
+*        spatial width of the filter is given by dcsmooth, and the range of
+*        data values accepted by the filter is 5 times the local RMS in
+*        the original time stream.
 *     steps = smfStepFix ** (Given and Returned)
 *        An address at which to store a pointer to an array holding a
 *        description of each sucessfully fixed step. The supplied array
@@ -1512,7 +1610,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    double dcsiglow = 8.0;
    int dcpeakoff = 20;
    int dcpeakwidth = 150;
-   double dcpeakthresh1 = 1.0;
+   double dcpeakthresh1 = meanshift ? 10.0 : 1.0;
    double dcpeakthresh2 = 2.5;
    int dcpeakminwidth = 5;
 
@@ -2084,6 +2182,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
    double *w5;
    double dcthresh2;
    double dcthresh3;
+   double rms;
    int *bcount;
    int *mw3;
    int *pbc;
@@ -2092,6 +2191,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
    int dcmaxwidth;
    int ibstep;
    int mbstep;
+   int meanshift;
    int msize;
    int nbstep;
    int nfixed;
@@ -2105,10 +2205,12 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
    size_t base;
    size_t bstride;
    size_t tstride;
+   smfData *data;
    smfFixStepsJobData *pdata;
    smfStepFix *steps;
    smf_qual_t *pq;
    smf_qual_t *qua = NULL;
+   smf_qual_t *wq = NULL;
 
    double dcgaincorr = 5.0;
 
@@ -2132,10 +2234,12 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
    dcsmooth = pdata->dcsmooth;
    dcthresh2 = 0.2*pdata->dcthresh2;
    dcthresh3 = 0.2*pdata->dcthresh3;
+   meanshift = pdata->meanshift;
    nbolo = pdata->nbolo;
    ntslice = pdata->ntslice;
    qua = pdata->qua;
    tstride = pdata->tstride;
+   data = pdata->data;
 
 /* Initialise the returned values. */
    bsteps = NULL;
@@ -2145,7 +2249,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
 
 #ifdef DEBUG_STEPS
    FILE *fd2 = fopen( "timedata_c.asc", "w" );
-   fprintf( fd2, "# itime indata inquality outdata outquality ibolo median "
+   fprintf( fd2, "# itime indata inquality outdata outquality ibolo meanshift median "
             "diff thresh sdiff rdiff mdiff mdiff2 diff2 rms instep step_width total snr\n");
 
    FILE *fd3 = fopen( "stepdata_c.asc", "w" );
@@ -2172,6 +2276,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
       w1 = astMalloc( sizeof( *w1 )*msize );
       w4 = astMalloc( sizeof( *w4 )*msize );
       w5 = astMalloc( sizeof( *w5 )*msize );
+      if( tstride > 1 && meanshift ) wq =  astMalloc( sizeof( *wq )*msize );
 
       mw1 = astMalloc( sizeof( *mw1 )*dcsmooth );
       mw2 = astMalloc( sizeof( *mw2 )*dcsmooth );
@@ -2183,6 +2288,21 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
          base = ibolo*bstride;
          pq = qua + base;
          if( !(*pq & SMF__Q_BADB) ) {
+
+/* Get a contiguous copy of the quality array. Only needed if doing a
+   mean shift filter. */
+            if( meanshift ) {
+               if( tstride > 1 ) {
+                  for( itime = 0; itime < ntslice - 1; itime++ ) {
+                     wq[ itime ] = *pq;
+                     pq += tstride;
+                  }
+               } else {
+                  wq = pq;
+               }
+            }
+
+
 
 #ifdef DEBUG_STEPS
 
@@ -2196,6 +2316,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
          timedata[ kk ].outdata = VAL__BADD;
          timedata[ kk ].outquality = 0;
          timedata[ kk ].ibolo = ibolo;
+         timedata[ kk ].meanshift = VAL__BADD;
          timedata[ kk ].median = VAL__BADD;
          timedata[ kk ].diff = VAL__BADD;
          timedata[ kk ].thresh = VAL__BADD;
@@ -2218,20 +2339,44 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
 
 #endif
 
-/* Median smooth the input data, putting the results in w1. */
-            smf_median_smooth( dcsmooth, SMF__FILT_MEDIAN, -1.0, ntslice,
-                               dat + base, qua + base, tstride, SMF__Q_GOOD,
-                               w1, mw1, mw2, mw3, status );
+/* Get an estimate of the noise in the bolometer. */
+            rms = smf_quick_noise( data, ibolo, 20, 50, SMF__Q_GOOD, status );
 
+/* Smooth the input data with an edge-preserving mean-shift filter, putting
+   the results in w5. */
+            if( meanshift ) {
+               smf_meanshift( dat + base, w5, ntslice, tstride, dcsmooth, 5*rms,
+                              qua + base, SMF__Q_GOOD, 0.0, status );
 
 #ifdef DEBUG_STEPS
-   if( RECORD_BOLO ) {
-      for( itime = 0; itime < ntslice; itime++ ) {
-         timedata[ itime ].median = w1[itime];
-      }
+if( RECORD_BOLO ) {
+   printf("Quick RMS is %g\n", rms );
+   for( itime = 1; itime < ntslice - 1; itime++ ) {
+      timedata[ itime ].meanshift = w5[itime];
    }
+}
 #endif
 
+/* Median smooth the above data, putting the results in w1. */
+               smf_median_smooth( dcsmooth, SMF__FILT_MEDIAN, -1.0, ntslice,
+                                  w5, wq, 1, SMF__Q_GOOD, w1, mw1, mw2, mw3,
+                                  status );
+
+/* If mean-shift filter is not required, just median filter. */
+            } else {
+               smf_median_smooth( dcsmooth, SMF__FILT_MEDIAN, -1.0, ntslice,
+                                  dat + base, qua + base, tstride, SMF__Q_GOOD,
+                                  w1, mw1, mw2, mw3, status );
+            }
+
+#ifdef DEBUG_STEPS
+if( RECORD_BOLO ) {
+   printf("Quick RMS is %g\n", rms );
+   for( itime = 1; itime < ntslice - 1; itime++ ) {
+      timedata[ itime ].median = w1[itime];
+   }
+}
+#endif
 
 
 /* Find the start and end of each block of contiguous high bolometer
@@ -2328,6 +2473,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
             mbstep = smf1_correct_steps( ntslice, dat + base, qua + base,
                                          tstride, w1, NULL, dcfitbox,
                                          dcthresh2, nbstep, bsteps, ibolo,
+                                         meanshift,
                                          (pdata->nstep)?&steps:NULL,
                                          (pdata->nstep)?&nstep:NULL,
                                          w4, w5, bcount, status );
@@ -2370,6 +2516,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
          TOPCAT( fd2, timedata[itime].outdata );
          fprintf( fd2, "%d ", timedata[itime].outquality);
          fprintf( fd2, "%d ", timedata[itime].ibolo);
+         TOPCAT( fd2, timedata[ itime ].meanshift );
          TOPCAT( fd2, timedata[ itime ].median );
          TOPCAT( fd2, timedata[ itime ].diff );
          TOPCAT( fd2, timedata[ itime ].thresh );
@@ -2401,6 +2548,7 @@ static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
       mw1 = astFree( mw1 );
       mw2 = astFree( mw2 );
       mw3 = astFree( mw3 );
+      if( tstride > 1 && meanshift ) wq = astFree( wq );
    }
 
 #ifdef DEBUG_STEPS

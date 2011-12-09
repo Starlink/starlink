@@ -114,6 +114,11 @@
 *     2011-05-16 (TIMJ):
 *        Fix memory leak. We were allocating memory inside a loop but
 *        freeing it outside the loop.
+*     2011-12-9 (DSB):
+*        Ensure a mean-shift filter is used when fixing DC steps. A
+*        mean-shift filter should work OK here since the COM signal will
+*        already have been removed and so the residuals should be
+*        basically flat.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -288,7 +293,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
         if( dcthresh && dcfitbox ) {
           smf_fix_steps( wf, res->sdata[idx], dcthresh, dcsmooth,
-                         dcfitbox, dcmaxsteps, dclimcorr, &nflag, NULL,
+                         dcfitbox, dcmaxsteps, dclimcorr, 1, &nflag, NULL,
                          NULL, status );
           msgOutiff(MSG__VERB, "","   detected %zu bolos with DC steps\n",
                     status, nflag);

@@ -84,6 +84,15 @@
 *     IN = NDF (Read)
 *        The time series cube to be fixed. Note, the data must be time
 *        ordered (like the original raw data), not bolometer ordered.
+*     MEANSHIFT = _LOGICAL (Read)
+*        Use a mean shift filter prior to step fixing? A mean-shift filter
+*        is an edge-preserving smooth. It can help to identify smaller
+*        steps, but does not work well if there are strong gradients in
+*        the bolometer time stream. Therefore, MEANSHIFT should only
+*        be used if the common-mode signal has been subtracted. The
+*        spatial width of the filter is given by DCSMOOTH, and the range
+*        of data values accepted by the filter is 5 times the local RMS
+*        in the original time stream. [FALSE]
 *     NEWSTEPS = FILENAME (Write)
 *        Name of a text file to create, holding a description of each
 *        step that was fixed by the step fixing algorithm. The created
@@ -116,6 +125,8 @@
 *  History:
 *     6-JUL-2010 (DSB):
 *        Initial version.
+*     9-DEC-2011 (DSB):
+*        Added MEANSHIFT parameter.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -207,6 +218,7 @@ void smurf_fixsteps( int *status ) {
    int dcmaxsteps;           /* DCMAXSTEPS config parameter */
    int first;                /* Index of first change to report */
    int itemp;                /* Intermediate value */
+   int meanshift;            /* Use a mean shift filter? */
    int nnew;                 /* Number of new step fixes */
    int nold;                 /* Number of old step fixes */
    size_t nrej;              /* Number of rejected bolometers */
@@ -278,13 +290,15 @@ void smurf_fixsteps( int *status ) {
 
    parGet0d( "DCTHRESH", &dcthresh, status );
 
+   parGet0l( "MEANSHIFT", &meanshift, status );
+
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
    wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
 
 /* Fix the steps. */
    smf_fix_steps( wf, data, dcthresh, dcsmooth, dcfitbox, dcmaxsteps,
-                  dclimcorr, &nrej, &newsteps, &nnew, status );
+                  dclimcorr, meanshift, &nrej, &newsteps, &nnew, status );
 
 /* Display a summary of what was done by the step fixer. */
    msgBlank( status );

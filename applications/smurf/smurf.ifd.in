@@ -1409,6 +1409,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter meanshift {
+                type _LOGICAL
+                prompt {Use a mean-shift filter before fixing steps?}
+                ppath DEFAULT
+                default NO
+                helpkey *
+            }
+
             parameter newsteps {
                 type LITERAL
                 prompt {Name of output text file holding new step descriptions}

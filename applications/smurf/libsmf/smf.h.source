@@ -1119,8 +1119,8 @@ void smf_flag_spikes( ThrWorkForce *wf, smfData *data, smf_qual_t mask,
 
 void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
                     dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
-                    int dclimcorr, size_t *nrej, smfStepFix **steps,
-                    int *nstep, int *status );
+                    int dclimcorr, int meanshift, size_t *nrej,
+                    smfStepFix **steps, int *nstep, int *status );
 
 void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, double refres,
                        const smfData * powval, const smfData * bolval,
@@ -1380,6 +1380,10 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
                      int zeropad, int * status );
 
 void smf_maskacsis( int indf, int *mask, int *status );
+
+void smf_meanshift( double *indata, double *outdata, int nel, int stride, int box1,
+                    double box2, smf_qual_t *qual, smf_qual_t mask, float wlim,
+                    int *status );
 
 void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         dim_t el, const double *dat,

@@ -60,6 +60,8 @@
 *        Improved range checking on inputs
 *     2009-11-17 (EC):
 *        Add ability to skip padding/apodization at time stream ends
+*     2011-12-02 (DSB):
+*        Can now work with bolometer or time ordered data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,6 +113,7 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
 			smf_qual_t mask, int *status ) {
 
   /* Local variables */
+  size_t bstride;               /* Stride between bolometers */
   double *dat=NULL;             /* Pointer to bolo data */
   double goodfrac;              /* Fraction of good samples */
   dim_t i;                      /* Loop counter */
@@ -124,16 +127,10 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
   const smf_qual_t *qua=NULL;   /* Pointer to quality flags */
   double retval=0;              /* Return value */
   double sig;                   /* r.m.s. of this chunk */
+  size_t tstride;               /* Stride between time slices */
 
   /* Check status */
   if (*status != SAI__OK) return retval;
-
-  /* Check for bolo-ordered data */
-  if( data->isTordered ) {
-    *status = SMF__TORDB;
-    errRep( FUNC_NAME, "Data is time-ordered, must be bolo-ordered", status );
-    return retval;
-  }
 
   /* Check for double-precision data */
   if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status )) return retval;
@@ -142,7 +139,8 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
   qua = smf_select_cqualpntr( data, NULL, status );
 
   /* Obtain data dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, status );
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride, &tstride,
+                status );
 
   /* Check for reasonable bolo/nsamp/nchunk */
   if( bolo >= nbolo ) {
@@ -191,7 +189,8 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
      with length nsamp, and skipping over padding/apodization */
 
   if( qua ) {
-    smf_get_goodrange( qua, ntslice, 1, SMF__Q_BOUND, &istart, &iend, status );
+    smf_get_goodrange( qua, ntslice, tstride, SMF__Q_BOUND, &istart, &iend,
+                       status );
   } else {
     istart = 0;
     iend = ntslice-1;
@@ -203,9 +202,9 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
 
   for( i=0; i<nchunk; i++ ) {
     /* Calculate the r.m.s. of this chunk */
-    smf_stats1D( dat+bolo*ntslice+istart+i*len/(nchunk-1), 1, nsamp,
-                 qua+bolo*ntslice+istart+i*len/(nchunk-1), 0, mask, NULL, &sig,
-                 NULL, &ngood, status );
+    smf_stats1D( dat+bolo*bstride+(istart+i*len/(nchunk-1))*tstride,
+                 tstride, nsamp, qua+bolo*bstride+(istart+i*len/(nchunk-1))*tstride,
+                 0, mask, NULL, &sig, NULL, &ngood, status );
 
     if( *status == SMF__INSMP ) {
       /* Annul the bad status; there simply weren't enough samples for
