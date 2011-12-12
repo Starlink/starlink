@@ -34,7 +34,11 @@
 #ifdef _MSC_VER
 #define LM_FINITE _finite /* MSVC */
 #elif defined(__ICC) || defined(__INTEL_COMPILER) || defined(__GNUC__)
+#ifdef isfinite
+#define LM_FINITE isfinite /* C99 */
+#else
 #define LM_FINITE finite /* ICC, GCC*/
+#endif
 #else
 #define LM_FINITE finite /* other than MSVC, ICC, GCC, let's hope this will work*/
 #endif 
