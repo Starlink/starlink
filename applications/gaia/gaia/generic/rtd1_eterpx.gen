@@ -41,8 +41,8 @@ C     GNU General Public License for more details.
 C
 C     You should have received a copy of the GNU General Public License
 C     along with this program; if not, write to the Free Software
-C     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-C     02111-1307, USA
+C     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+C     02110-1301, USA
 C
 C-----------------------------------------------------------------------
       IMPLICIT NONE

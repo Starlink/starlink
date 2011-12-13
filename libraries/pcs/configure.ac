@@ -57,7 +57,7 @@ AC_DEFUN([MP_WITH_CURSES],
    if test "$with_ncurses" != yes
    then
      AC_CACHE_CHECK([for working curses], mp_cv_curses,
-       [LIBS="$LIBS -lcurses"
+       [LIBS="$LIBS -lcurses -ltinfo"
         AC_TRY_LINK(
           [#include <curses.h>],
           [chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr(); ],
@@ -65,7 +65,7 @@ AC_DEFUN([MP_WITH_CURSES],
      if test "$mp_cv_curses" = yes
      then
        AC_DEFINE(HAVE_CURSES_H, 1, [Define to 1 if you have the <curses.h> header file available])
-       CURSES_LIB="-lcurses"
+       CURSES_LIB="-lcurses -ltinfo"
      fi
    fi
    if test ! "$CURSES_LIB"

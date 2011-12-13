@@ -49,8 +49,8 @@ f     The PermMap class does not define any new routines beyond those
 *
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
