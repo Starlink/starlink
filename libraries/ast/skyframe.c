@@ -11119,7 +11119,7 @@ astMAKE_GET(SkyFrame,SkyRefIs,int,IGNORED_REF,(this->skyrefis == BAD_REF ? IGNOR
 *     floating point axis value, in radians, when setting a value for the
 *     attribute, and will be returned in the same form when getting the value
 *     of the attribute. In this case the integer axis index should be "1"
-*     or "2" (the values to use for longitude and latitue axes are
+*     or "2" (the values to use for longitude and latitude axes are
 *     given by the LonAxis and LatAxis attributes).
 *
 *     If no axis index is included in the attribute name (e.g. "SkyRef") then
@@ -11206,7 +11206,7 @@ MAKE_GET(SkyRef,double,0.0,((this->skyref[axis_p]!=AST__BAD)?this->skyref[axis_p
 *     floating point axis value, in radians, when setting a value for the
 *     attribute, and will be returned in the same form when getting the value
 *     of the attribute. In this case the integer axis index should be "1"
-*     or "2" (the values to use for longitude and latitue axes are
+*     or "2" (the values to use for longitude and latitude axes are
 *     given by the LonAxis and LatAxis attributes).
 *
 *     If no axis index is included in the attribute name (e.g. "SkyRefP") then
