@@ -29,12 +29,13 @@
 *  Description:
 *     Strip suffix from instr and store in outstr.  The longest
 *     this string may be be is GRP__SZNAM+1 (including NULL
-*     termination).
+*     termination). It also removes any leading directory specificication.
 
 *  Notes:
 
 *  Authors:
-*     Edward Chapin (UBC)
+*     EC: Edward Chapin (UBC)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,8 @@
 *     2011-11-21 (EC):
 *        Add arbitrary suffix parameter, rename to smf_stripsuffix from
 *        smf_model_stripsuffix
+*     2011-12-13 (DSB):
+*        Strip any directory prefix from the input string.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -83,6 +86,7 @@
 
 /* Other includes */
 #include <stdio.h>
+#include <string.h>
 
 #define FUNC_NAME "smf_stripsuffix"
 
@@ -98,13 +102,23 @@ void smf_stripsuffix( const char *instr, const char *suffix,
   size_t msize;                 /* Size of group */
   Grp *outname = NULL;          /* 1-element group to hold output string */
   char *pname=NULL;             /* Poiner to name */
+  const char *p;                /* Pointer to first character after next "/" */
+  const char *q;                /* Pointer to next "/" */
 
   /* Main routine */
   if (*status != SAI__OK) return;
 
   inname = grpNew( "GRP", status );
   outname = grpNew( "GRP", status );
-  grpPut1( inname, instr, 1, status );
+
+  p = instr;
+  q = strchr( p, '/' );
+  while( q ) {
+     p = q + 1;
+     q = strchr( p, '/' );
+  }
+
+  grpPut1( inname, p, 1, status );
 
   len = sizeof(grpex);
   one_strlcpy( grpex, "*|", len, status );

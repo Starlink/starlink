@@ -32,6 +32,8 @@
 #        Added two.amap, two.bmap
 #     2010-06-13 (DSB):
 #        Added com.offset_is_zero
+#     2010-12-13 (DSB):
+#        Added dump_lonlat
 
 #-
 
@@ -70,6 +72,9 @@ exportndf = 0
 
 # can turn off initial cleaning by setting this to 0
 doclean = 1
+
+# export lon/lat values for every sample?
+exportlonlat = 0
 
 # export raw data immediately after cleaning?
 exportclean = 0

@@ -18,7 +18,7 @@
 *                          dim_t itime_hi, AstSkyFrame *abskyfrm,
 *                          AstMapping *oskymap, int moving, int olbnd[ 2 ],
 *                          int oubnd[ 2 ], int *lut, double *angle,
-*                          int *status );
+*                          double *lon, double *lat, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -58,6 +58,14 @@
 *        The scan angle for the boresight in GRID coordinates at every time
 *        slice. Similar to lut, the first value (at itime_lo) is written to
 *        element 0. Can be NULL.
+*     lon = double * (Given & Returned)
+*        A pointer to a (nbolo,ntslice) array in which to return the
+*        longitude value (degs) at all samples between and including itime_lo
+*        and itime_hi. May be NULL.
+*     lat = double * (Returned)
+*        A pointer to a (nbolo,ntslice) array in which to return the
+*        latitude value (degs) at all samples between and including itime_lo
+*        and itime_hi. May be NULL.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -91,6 +99,8 @@
 *        Add angle to interface
 *     2011-09-15 (TIMJ):
 *        Make it work with mising TCS information.
+*     12-DEC-2011 (DSB):
+*        Add lon and lat to interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -132,7 +142,8 @@
 void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
                      dim_t itime_hi, AstSkyFrame *abskyfrm,
                      AstMapping *oskymap, int moving, int olbnd[ 2 ],
-                     int oubnd[ 2 ], int *lut, double *angle, int *status ) {
+                     int oubnd[ 2 ], int *lut, double *angle,
+                     double *lon, double *lat, int *status ) {
 
 /* Local Variables */
    AstCmpMap *bsmap = NULL;     /* Tracking -> output grid Mapping */
@@ -153,6 +164,10 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    double *outmapcoord;  /* Array holding output map GRID coords */
    double *px;           /* Pointer to next output map X GRID coord */
    double *py;           /* Pointer to next output map Y GRID coord */
+   double *pgx;          /* Pointer to next X output grid coords */
+   double *pgy;          /* Pointer to next Y output grid coords */
+   double *wgx = NULL;   /* Work space to hold X output grid coords */
+   double *wgy = NULL;   /* Work space to hold Y output grid coords */
    double bsx0;          /* Boresight output map GRID X at previous full calc */
    double bsx;           /* Boresight output map GRID X at current time slice */
    double bsxlast;       /* Boresight output map GRID X at previous time slice*/
@@ -282,6 +297,13 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    bsx0 = bsy0 = AST__BAD;
    bsxlast = bsylast = AST__BAD;
 
+/* If lon and lat arrays are to be returned, allocate memory to hold the grid
+   coords of every bolometer for a single sample. */
+   if( lon && lat ) {
+      wgx = astMalloc( nbolo*sizeof( *wgx ) );
+      wgy = astMalloc( nbolo*sizeof( *wgy ) );
+   }
+
 /* Loop round each time slice. */
    state = data->hdr->allState + itime_lo;
    for( itime = itime_lo; itime <= itime_hi && *status == SAI__OK;
@@ -395,6 +417,11 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
         bsylast = bsy;
       }
 
+/* Initialise pointers to the place to store the final grid coords for
+   each bolometer. */
+      pgx = wgx;
+      pgy = wgy;
+
 /*   Loop round all bolometers. */
       px = outmapcoord;
       py = outmapcoord + nbolo;
@@ -404,6 +431,13 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
          if( dx != AST__BAD && dy != AST__BAD ) {
             x = *(px++) + dx;
             y = *(py++) + dy;
+
+/* If required, store them so that we can convert them into lon/lat
+   values later. */
+            if( pgx && pgy ) {
+               *(pgx++) = x;
+               *(pgy++) = y;
+            }
 
 /* Find the grid indices (minus one) of the output map pixel containing the
    mapped bolo grid coords. One is subtracted in order to simplify the
@@ -428,6 +462,30 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
             lut[ ilut++ ] = VAL__BADI;
             px++;
             py++;
+            if( pgx && pgy ) {
+               *(pgx++) = AST__BAD;
+               *(pgy++) = AST__BAD;
+            }
+         }
+      }
+
+/* If required transform the grid coords into (lon,lat) coords and store in
+   the relevant elements of the supplied "lon" and "lat" arrays. */
+      if( wgx && wgy ) {
+         astTran2( oskymap, nbolo, wgx, wgy, 0, lon + itime*nbolo,
+                   lat + itime*nbolo );
+
+/* Convert from rads to degs. */
+         pgx = lon + itime*nbolo;
+         pgy = lat + itime*nbolo;
+         for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+            if( *pgx != AST__BAD && *pgy != AST__BAD ) {
+               *(pgx++) *= AST__DR2D;
+               *(pgy++) *= AST__DR2D;
+            } else {
+               pgx++;
+               pgy++;
+            }
          }
       }
    }
@@ -440,6 +498,8 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* Free remaining work space. */
    outmapcoord = astFree( outmapcoord );
+   wgx = astFree( wgx );
+   wgy = astFree( wgy );
 
 /* Export the WCS pointer in the data header since it will be annulled at
    a higher level. Note the FrameSet pointer may be null if the last

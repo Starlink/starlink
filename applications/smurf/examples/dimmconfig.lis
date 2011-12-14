@@ -76,6 +76,14 @@ exportndf = 0
 
 #noexportsetbad = 1
 
+# Export the logitude/latitude of every sample into a pair of NDFs?
+# The file names will be the same as model components, except with
+# sufficies equal to the AST "Symbol" attribute associated with the
+# celestial axes ("ra"/"dec", "glon"/"glat", etc).
+
+#exportlonlat = 1
+
+
 # Create .MORE.SMURF.ITERMAPS extensions? If this parameter is set to
 # a positive value, maps from each iteration and each chunk will be
 # written.  If this is set to a negative value, only the final

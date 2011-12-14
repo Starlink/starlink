@@ -20,8 +20,8 @@
  *                          AstFrameSet *outfset, int moving,
  *                          int *lbnd_out, int *ubnd_out, dim_t req_padStart,
  *                          dim_t req_padEnd, int flags, int tstep,
- *                          smfArray **concat, smfData **first,
- *                          int *status )
+ *                          int exportlonlat, smfArray **concat,
+ *                          smfData **first, int *status )
 
  *  Arguments:
  *     wf = ThrWorkForce * (Given)
@@ -69,6 +69,9 @@
  *     tstep = int (Given)
  *        The increment in time slices between full Mapping calculations.
  *        The Mapping for intermediate time slices will be approximated.
+ *     exportlonlat = int (Given)
+ *        If non-zero, the longitude and latitude values of every sample
+ *        are dumped to a pair of 2D NDFs with suffices "_lon" and "_lat".
  *     concat = smfArray ** (Returned)
  *        smfArray containing concatenated data for each subarray. The
  *        supplied pointer may be NULL, in which case "first" argument
@@ -223,6 +226,8 @@
  *        Set SMF__Q_BADDA if ensureflat=0 and SMF__NOCREATE_QUALITY not set
  *     2011-05-04 (DSB):
  *        Set data values to VAL__BADD if they are assigned a qualitu of BADDA.
+ *     2011-12-13 (DSB):
+ *        Added exportlonlat to API.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -281,7 +286,8 @@ void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t req_padStart,
                           dim_t req_padEnd, int flags, int tstep,
-                          smfArray **concat, smfData **first, int *status ) {
+                          int exportlonlat, smfArray **concat, smfData **first,
+                          int *status ) {
 
   /* Local Variables */
   size_t bstr;                  /* Concatenated bolo stride */
@@ -701,7 +707,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
              performed by the workforce (e.g. opening the next file) do
              not cause the call to block.  */
           smf_calc_mapcoord( wf, refdata, outfset, moving, lbnd_out, ubnd_out,
-                             SMF__NOCREATE_FILE, tstep, status );
+                             SMF__NOCREATE_FILE, tstep, exportlonlat, status );
         } else {
           havelut = 0;
         }

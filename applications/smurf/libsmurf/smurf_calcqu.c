@@ -335,7 +335,7 @@ void smurf_calcqu( int *status ) {
    subarray. */
          smf_concat_smfGroup( wf, sgroup, darks, NULL, flatramps,
                               heateffmap, ichunk, 1, 1, NULL, 0, NULL, NULL,
-                              0, 0, 0, 1, &concat, NULL, status );
+                              0, 0, 0, 1, 0, &concat, NULL, status );
 
 /* Get a KeyMap holding values for the configuration parameters. Since we
    sorted by wavelength when calling smf_grp_related, we know that all

@@ -479,6 +479,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int dimmflags;                /* Control flags for DIMM model components */
   int doclean=1;                /* Are we doing data pre-processing? */
   dim_t dsize;                  /* Size of data arrays in containers */
+  int exportlonlat=0;            /* Dump lon/lat of every sample to a pair of NDFs? */
   int ensureflat=1;             /* flatfield data as they are loaded */
   int exportclean=0;            /* Are we doing to export clean data? */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
@@ -630,6 +631,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     if( *status == SAI__OK ) {
       /* Required positional accuracy, in output map pixels. */
       astMapGet0I( keymap, "TSTEP", &tstep );
+
+      /* Whether to dump the lon/lat of every sample. */
+      astMapGet0I( keymap, "EXPORTLONLAT", &exportlonlat );
 
       /* Chisquared change tolerance for stopping */
       astMapGet0D( keymap, "CHITOL", &chitol );
@@ -1269,7 +1273,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, heateffmap, contchunk,
                              ensureflat, 0, outfset, moving, lbnd_out,
                              ubnd_out, pad, pad, SMF__NOCREATE_VARIANCE, tstep,
-                             &res[0], NULL, status );
+                             exportlonlat, &res[0], NULL, status );
 
         /* Assign each time slice to a scan angle bin */
         if (*status == SAI__OK) {
@@ -1337,8 +1341,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            the concatenation stage. */
 
         smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap, NULL,
-                          nfilegroups, SMF__QUA, 0, NULL, 0, NULL, NULL,
-                          NULL, memiter, memiter, qua, keymap, status );
+                          nfilegroups, SMF__QUA, 0, exportlonlat, NULL, 0, NULL,
+                          NULL, NULL, memiter, memiter, qua, keymap, status );
 
         /* Associate quality with the res model, and do cleaning
            before we start using more memory for other things. Note that
@@ -1361,8 +1365,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            the LUT model and then free it */
 
         smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap, NULL,
-                          nfilegroups, SMF__LUT, 0, NULL, 0, NULL, NULL,
-                          NULL, memiter, memiter, lut, keymap, status );
+                          nfilegroups, SMF__LUT, 0, exportlonlat, NULL, 0, NULL,
+                          NULL, NULL, memiter, memiter, lut, keymap, status );
 
         for( i=0; (*status==SAI__OK)&&(i<res[0]->ndat); i++ ) {
           if( res[0]->sdata[i] ) {
@@ -1376,10 +1380,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            it again later! */
 
         if( haveext ) {
-          smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap, noisemaps,
-                            nfilegroups, modeltyps[whichext], 0, NULL, 0, NULL,
-                            NULL, NULL, memiter, memiter, model[whichext],
-                            keymap, status);
+          smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
+                            noisemaps, nfilegroups, modeltyps[whichext], 0,
+                            exportlonlat, NULL, 0, NULL, NULL, NULL, memiter,
+                            memiter, model[whichext], keymap, status);
         }
 
         /*** TIMER ***/
@@ -1478,16 +1482,18 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         res = astCalloc( nfilegroups, sizeof(*res) );
 
         smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
-                          NULL, 0, SMF__RES, 0, NULL, 0, NULL, NULL,
-                          &resgroup, memiter, memiter, res, keymap, status );
+                          NULL, 0, SMF__RES, 0, exportlonlat, NULL, 0, NULL,
+                          NULL, &resgroup, memiter, memiter, res, keymap, status );
 
         smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
-                          NULL, 0, SMF__LUT, 0, outfset, moving, lbnd_out, ubnd_out,
-                          &lutgroup, memiter, memiter, lut, keymap, status );
+                          NULL, 0, SMF__LUT, 0, exportlonlat, outfset, moving,
+                          lbnd_out, ubnd_out, &lutgroup, memiter, memiter,
+                          lut, keymap, status );
 
         smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
-                          NULL, 0, SMF__QUA, 0, NULL, 0, NULL, NULL,
-                          &quagroup, memiter, memiter, qua, keymap, status );
+                          NULL, 0, SMF__QUA, 0, exportlonlat, NULL, 0, NULL,
+                          NULL, &quagroup, memiter, memiter, qua, keymap,
+                          status );
 
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
@@ -1519,8 +1525,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* Don't do SMF__LUT or SMF__EXT as they were handled earlier */
           if( (modeltyps[i] != SMF__LUT) && (modeltyps[i] != SMF__EXT) ) {
             smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
-                              noisemaps, nfilegroups, modeltyps[i], 0, NULL, 0, NULL,
-                              NULL, NULL, memiter, memiter, model[i], keymap, status);
+                              noisemaps, nfilegroups, modeltyps[i], 0, exportlonlat,
+                              NULL, 0, NULL, NULL, NULL, memiter, memiter,
+                              model[i], keymap, status);
           }
 
           /* Associate quality with some models */
@@ -1533,9 +1540,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         } else {
           smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, heateffmap,
-                            noisemaps, 0, modeltyps[i], 0, NULL, 0, NULL, NULL,
-                            &modelgroups[i], memiter, memiter, model[i], keymap,
-                            status );
+                            noisemaps, 0, modeltyps[i], 0, exportlonlat, NULL,
+                            0, NULL, NULL, &modelgroups[i], memiter, memiter,
+                            model[i], keymap, status );
         }
       }
     }

@@ -297,7 +297,7 @@ void smurf_sc2fft( int *status ) {
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
     smf_concat_smfGroup( wf, igroup, darks, NULL, flatramps, heateffmap, contchunk,
-                         ensureflat, 1, NULL, 0, NULL, NULL, 0, 0, 0, 1,
+                         ensureflat, 1, NULL, 0, NULL, NULL, 0, 0, 0, 1, 0,
                          &concat, NULL, status );
 
     /* Now loop over each subarray */

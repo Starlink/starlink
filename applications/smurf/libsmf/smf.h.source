@@ -571,7 +571,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
 
 void smf_calc_mapcoord( ThrWorkForce *wf, smfData *data, AstFrameSet *outfset,
                         int moving, int *lbnd_out, int *ubnd_out, int flags,
-                        int tstep, int *status );
+                        int tstep, int exportlonlat, int *status );
 
 double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
                        int *status );
@@ -763,7 +763,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
                           dim_t padEnd, int flags,  int tstep,
-                          smfArray **concat, smfData **first,
+                          int exportlonlat, smfArray **concat, smfData **first,
                           int *status );
 
 smfDA *smf_construct_smfDA( smfDA * tofill, smfData *dksquid, double * flatcal,
@@ -818,7 +818,8 @@ void smf_convert_bad( smfData *data, int *status );
 void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
                      dim_t itime_hi, AstSkyFrame *abskyfrm,
                      AstMapping *oskymap, int moving, int olbnd[ 2 ],
-                     int oubnd[ 2 ], int *lut, double *angle, int *status );
+                     int oubnd[ 2 ], int *lut, double *angle, double *lon,
+                     double *lat, int *status );
 
 void smf_copytime( struct timeval *target, struct timeval *source,
                    int *status);
@@ -1396,7 +1397,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        const smfArray *bbms, const smfArray *flatramps,
                        AstKeyMap * heateffmap, const smfArray *noisemaps,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
-                       AstFrameSet *outfset, int moving,
+                       int exportlonlat, AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
                        AstKeyMap *keymap, int *status );
