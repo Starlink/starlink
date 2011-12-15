@@ -275,12 +275,14 @@ void findclumps( int *status ) {
 *
 *        The "size" of the clump on an axis is the RMS deviation of each
 *        pixel centre from the clump centroid, where each pixel is weighted
-*        by the corresponding pixel data value (optionally with the
-*        background removed - see parameter BACKOFF). If parameter DECONV is
-*        set TRUE, the values stored for "Size..." and "Peak" are corrected
-*        to take account of the smoothing introduced by the instrumental
-*        beam. These corrections reduced the "size..." values and
-*        increase the peak value. Beam sizes are specified by configuration
+*        by the corresponding pixel data value. For a Gaussian profile,
+*        this "size" value is equal to the standard deviation of the Gaussian.
+*        Optionally, the weights can be be based on the pixel data value
+*        after removal of the background - see parameter BACKOFF). If
+*        parameter DECONV is set TRUE, the values stored for "Size..." and
+*        "Peak" are corrected to take account of the smoothing introduced by
+*        the instrumental beam. These corrections reduced the "size..." values
+*        and increase the peak value. Beam sizes are specified by configuration
 *        parameters FWHMBeam and VeloRes.
 *
 *        For the GaussClump algorithm, the Sum and Volume values refer

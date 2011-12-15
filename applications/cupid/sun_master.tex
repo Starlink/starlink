@@ -1273,11 +1273,12 @@ storage in the catalogue if WCSPAR is TRUE):
 \end{eqnarray*}
 \end{myquote}
 
-The clump sizes are the standard deviation of the pixel co-ordinate values
-about the centroid position, weighted by the pixel values, then corrected
-to remove the effect of the instrumental smoothing specified by the
-{\tt FwhmBeam} and {\tt VeloRes} configuration parameters (assuming the DECONV
-parameter is set to TRUE):
+The clump sizes are the standard deviation of the pixel co-ordinate
+values about the centroid position, weighted by the pixel values. For a
+Gaussian profile, this size value is equal to the standard deviation of the
+Gaussian. These sizes are then corrected to remove the effect of the
+instrumental smoothing specified by the {\tt FwhmBeam} and {\tt VeloRes}
+configuration parameters (assuming the DECONV parameter is set to TRUE):
 
 \begin{myquote}
 \begin{eqnarray*}
