@@ -15,7 +15,7 @@
 *     including the file config.h, which defines macros PACKAGE_STRING,
 *     PACKAGE_VERSION and (equivalently to the latter) VERSION.
 *
-*     For example, the version string `3.2-1' corresponds to major version
+*     For example, the version string `3.2.1' corresponds to major version
 *     3, minor version 2, release 1.
 
 *  Macros defined:

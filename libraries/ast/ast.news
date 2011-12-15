@@ -22,6 +22,9 @@ headers that describe non-celestial axes, as well as celestial axes.
 - A bug has been fixed that could cause inappropriate equinox values to
 be used when aligning SkyFrames if the AlignSystem attribute is set.
 
+- The format of the version string for AST has changed from 
+"<major>.<minor>-<release>" to "<major>.<minor>.<release>".
+
 Main Changes in V6.0
 -----------------------
 

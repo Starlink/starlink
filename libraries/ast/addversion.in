@@ -1,9 +1,9 @@
 
 vers="@PACKAGE_VERSION@"
-versno="`echo "${vers}" | sed -e 's/\-.*$//'`"
-majversno="`echo "${versno}" | sed -e 's/\..*$//'`"
-minversno="`echo "${versno}" | sed -e 's/^.*\.//'`"
-relsno="`echo "${vers}" | sed -e 's/^.*-//'`"
+majversno="`echo "${vers}" | awk -F . '{print $1;}'`"
+minversno="`echo "${vers}" | awk -F . '{print $2;}'`"
+relsno="`echo "${vers}" | awk -F . '{print $3;}'`"
+versno="${majversno}.${minversno}"
 sed -e 's/<VERSION_NUMBER>/'"${versno}"'/g' \
     -e 's/<MAJOR_VERSION_NUMBER>/'"${majversno}"'/g' \
     -e 's/<MINOR_VERSION_NUMBER>/'"${minversno}"'/g' \
