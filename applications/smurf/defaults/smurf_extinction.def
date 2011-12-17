@@ -35,6 +35,7 @@
 
 #  Authors:
 #     TIMJ: Tim Jenness (JAC, Hawaii)
+#     RPT: Remo Tilanus (JAC, Hawaii)
 
 #     2010-06-02 (TIMJ):
 #        First version.
@@ -42,6 +43,8 @@
 #        New fit coefficients from June 2011 data (Trac #719)
 #     2011-09-27 (AGG):
 #        New fit coefficients from 2011 data (Trac #852)
+#     2011-12-16 (RPT):
+#        New 850 coefficients
 
 #-
 
@@ -58,7 +61,7 @@
 # Original filters delivered for SCUBA-2. Named "450" and "850".
 
 ext.taurelation.450 = (25.8,-0.010)
-ext.taurelation.850 =  (4.8,-0.006666)
+ext.taurelation.850 =  (4.4,-0.004444)
 
 # Control whether we want WVM smoothing. The value is the
 # size in seconds for the tophat function. A value of 0 disables
