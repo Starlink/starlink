@@ -8,7 +8,7 @@
 \newcommand{\stardocnumber}    {27.5}
 \newcommand{\stardocauthors}   {P N Daly}
 \newcommand{\stardocaddress}   {pnd$@$jach.hawaii.edu}
-\newcommand{\stardocdate}      {17 July 1996}
+\newcommand{\stardocdate}      {9 September 1996}
 \newcommand{\stardoctitle}     {Portable--CGS4DR \\
                                 CGS4 Data Reduction}
 \newcommand{\stardocversion}   {Version V1.3-0}
@@ -2719,11 +2719,11 @@ messages of any type. It is not writeable by the user but may be
 cleared from the {\sf Options} menu using {\sf Clear Text Widget}.
 
 \subsection{Changing X Defaults}
-Portable-CGS4DR now features customizable X defaults located in the file \$CGS4DR\_ROOT/cgs4dr.xopts.
+Portable-CGS4DR now features customizable X defaults in the file \$CGS4DR\_CONFIGS/cgs4dr.xopts.
 This is a simple {\sc ascii} text file and features can be removed by preceding any line with the
 comment character (\#). New lines may be added using the same style contained within the file.
 
-Upon startup, a default file is copied to \$CGS4DR\_ROOT/cgs4dr.xopts if none exists.
+Upon startup, a default file is copied to \$CGS4DR\_CONFIGS/cgs4dr.xopts if none exists.
 
 \subsection{The Widget Tree}
 The widget tree is specific to each task. They are dealt with in separate chapters.
@@ -2816,21 +2816,12 @@ recommended:
 \begin{quote}
   \%  source \ \ /star/etc/login \\
   \%  source \ \ /star/etc/cshrc \\
-  \%  start\_adamnet \\
   \%  cgs4dr\_ukirt \\
   \%
 \end{quote}
 \end{minipage}
 
 The alias {\it cgs4dr\_ukirt} points to the correct directory and UT-date.
-When the night's observing is finished, you should remember to kill ADAMnet with:
-
-\begin{minipage}{120mm}
-\begin{quote}
-  \%  stop\_adamnet \\
-  \%
-\end{quote}
-\end{minipage}
 
 \section{Common Problems Upon Startup}
 \begin{description}
@@ -3323,6 +3314,12 @@ If you encounter several problems and wish to revert to a known state, do the fo
   \% \ cgs4dr\_kill \\
   \% \ rm -f \ $\sim$/adam/* \\
   \% \ rm -f \ $\sim$/cgs4dr\_configs/*
+\end{quote}
+
+At UKIRT, you can execute the following command:
+
+\begin{quote}
+  \% \ cgs4dr\_nuke
 \end{quote}
 
 %%-----------------------------------------------------------------------------

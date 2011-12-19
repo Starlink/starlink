@@ -131,8 +131,8 @@ proc red4TwoLineFit {taskname type} {
     set Red4Widgets(RO)      [string trim [$Red4Widgets(TLF_ENT01) get]]
     set Red4Widgets(TLF_DRS) [string trim [$Red4Widgets(TLF_ENT02) get]]
     set Red4Widgets(TLF_DRE) [string trim [$Red4Widgets(TLF_ENT03) get]]
-    set Red4Widgets(TLD_DXS) [string trim [$Red4Widgets(TLF_ENT04) get]]
-    set Red4Widgets(TLD_DXE) [string trim [$Red4Widgets(TLF_ENT05) get]]
+    set Red4Widgets(TLF_DXS) [string trim [$Red4Widgets(TLF_ENT04) get]]
+    set Red4Widgets(TLF_DXE) [string trim [$Red4Widgets(TLF_ENT05) get]]
 
 # Abort if dataset is garbage
    set uspos [string first "_" $Red4Widgets(RO)]
