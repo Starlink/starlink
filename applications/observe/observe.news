@@ -1,5 +1,9 @@
 1 OBSERVE - Star observability
 
+ v2.3-2
+
+  Now uses PGPLOT for plotting. The device driver names will have changed.
+
  v2.3-1 news:
 
   The list of observatories has been extended to match the current SLALIB
