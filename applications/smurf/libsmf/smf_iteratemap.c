@@ -2259,9 +2259,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       if( memiter && (bolomap || shortmap || sampcube) ) {
 
-        /* Ensure we use the RES model ordering */
-        smf_model_dataOrder( &dat, NULL, i, SMF__RES|SMF__LUT|SMF__QUA,
-                             res[i]->sdata[0]->isTordered, status );
+        /* Ensure we use the RES model ordering. nfilegroups==1 by definition */
+        smf_model_dataOrder( &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+                             res[0]->sdata[0]->isTordered, status );
 
         for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
           smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
@@ -2368,9 +2368,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       if( memiter && (bolomap || shortmap || sampcube) ) {
 
-        /* Ensure we use the RES model ordering */
-        smf_model_dataOrder( &dat, NULL, i, SMF__RES|SMF__LUT|SMF__QUA,
-                             res[i]->sdata[0]->isTordered, status );
+        /* Ensure we use the RES model ordering. nfilegroups==1 by definition. */
+        smf_model_dataOrder( &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+                             res[0]->sdata[0]->isTordered, status );
 
         for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
           smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
