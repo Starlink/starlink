@@ -29,3 +29,8 @@ maptol=0.05
 # use boundary constraints since the source is assumed to be isolated
 ast.zero_circle = (0.0166666666)
 ast.zero_notlast = 1
+
+# we can get away with harsher filtering since the boundary conditions are
+# quite tight
+450.flt.filt_edge_largescale=200
+850.flt.filt_edge_largescale=200
