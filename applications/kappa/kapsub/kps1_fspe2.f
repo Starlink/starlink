@@ -181,7 +181,7 @@
 *  The evaluation routine works for a series of X co-ordinates at
 *  a constant Y co-ordinate.  Now it could be called for each position
 *  but that could be quite inefficient for large arrays.  The
-*  folloeing identifies a run of pixels at the same Y co-ordinate.
+*  following identifies a run of pixels at the same Y co-ordinate.
 *  If the pixels are higgledy-piggledy then the following slows it
 *  down further, however in the vast majority of cases it will save
 *  time.

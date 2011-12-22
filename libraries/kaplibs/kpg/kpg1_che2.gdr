@@ -50,10 +50,10 @@
 *        The degree of the polynomial along the first dimension.
 *     YDEG = INTEGER (Given)
 *        The degree of the polynomial along the second dimension.
-*     MCOEF = INTEGER (Given)
+*     NCOEF = INTEGER (Given)
 *        The number of coefficients.  This must be at least the product
 *        of (XDEG+1) * (YDEG+1).
-*     CC( MCOEF ) = ? (Given)
+*     CC( NCOEF ) = ? (Given)
 *        The Chebyshev coefficients.  These should be the order such
 *        that CCij is in CC( i*(YDEG+1)+j+1 ) for i=0,XDEG; j=0,YDEG.
 *        In other words the opposite order to Fortran standard.
