@@ -725,7 +725,7 @@
          CALL KPS1_FSPE2( NGOOD, %VAL( CNF_PVAL( XPTR ) ),
      :                    %VAL( CNF_PVAL( YPTR ) ),
      :                    %VAL( CNF_PVAL( ZPTR ) ), DXMIN, DXMAX, DYMIN,
-     :                    DYMAX, NXPAR, NYPAR, MCHOEF, CHCOEF, NCOEF,
+     :                    DYMAX, NXPAR, NYPAR, MCHOEF, CHCOEF,
      :                    %VAL( CNF_PVAL( FTPTR ) ),
      :                    %VAL( CNF_PVAL( RSPTR ) ), DRMS, STATUS )
          RMS = SNGL( DRMS )
