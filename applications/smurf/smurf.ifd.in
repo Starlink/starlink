@@ -4356,6 +4356,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
             parameter slice {
                 position 3
                 type _INTEGER
