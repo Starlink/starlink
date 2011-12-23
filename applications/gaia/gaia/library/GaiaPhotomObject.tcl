@@ -358,7 +358,7 @@ itcl::class gaia::GaiaPhotomObject {
       set maj [image_dist $major]
       set ang [image_angle $angle]
       set description \
-         "[format {%10d %10f %10f %10f %10f %10f %14f %10s %10f %10f %10f} \
+         "[format {%10d %10f %10f %12g %12g %12g %16g %10s %10f %10f %10f} \
              $index $x $y $mag $magerr $sky $signal $code $maj \
              $eccen $ang]"
       if { $mode == "all" } {
@@ -388,7 +388,7 @@ itcl::class gaia::GaiaPhotomObject {
    protected method getoptvals_ {mode} {
       lassign [image_coord $xpos $ypos] x y
       set description \
-         "[format {%10d %10f %10f %10f %10f %10f %10f %10s %10s} \
+         "[format {%10d %10f %10f %12g %12g %12g %12g %10s %10s} \
              $index $x $y $mag $magerr $sky $signal $code $positions]"
       if { $mode == "all" } {
          append description "\n[list_sky_]"
@@ -1274,24 +1274,24 @@ itcl::class gaia::GaiaPhotomObject {
       if { $phottype == "aperture" } {
          if { "$mode" == "all" } {
             if { $usemags } {
-               return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
+               return [format {%10s %10s %10s %12s %12s %12s %16s %10s \
                                   %10s %10s %10s %10s %10s} \
                           Index Xpos Ypos Mag Magerr Sky Signal Code \
                           Major Eccen Angle Positions Shape]
             } else {
-               return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
+               return [format {%10s %10s %10s %12s %12s %12s %16s %10s \
                                   %10s %10s %10s %10s %10s} \
                           Index Xpos Ypos Count Counterr Sky Signal Code \
                           Major Eccen Angle Positions Shape]
             }
          } else {
             if { $usemags } {
-               return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
+               return [format {%10s %10s %10s %12s %12s %12s %16s %10s \
                                   %10s %10s %10s} \
                           Index Xpos Ypos Mag Magerr Sky Signal Code \
                           Major Eccen Angle]
             } else {
-               return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
+               return [format {%10s %10s %10s %12s %12s %12s %16s %10s \
                                   %10s %10s %10s} \
                           Index Xpos Ypos Count Counterr Sky Signal Code \
                           Major Eccen Angle]
@@ -1303,10 +1303,10 @@ itcl::class gaia::GaiaPhotomObject {
                        Index Xpos Ypos Fwhm1 Fwhm2 Rot Code Clip Seeing Positions]
          } else {
             if { $usemags } {
-               return [format {%10s %10s %10s %10s %10s %10s %10s %10s %10s} \
+               return [format {%10s %10s %10s %12s %12s %12s %12s %10s %10s} \
                           Index Xpos Ypos Mag Magerr Sky Signal Code Positions]
             } else {
-               return [format {%10s %10s %10s %10s %10s %10s %10s %10s %10s} \
+               return [format {%10s %10s %10s %12s %12s %12s %12s %10s %10s} \
                           Index Xpos Ypos Count Counterr Sky Signal Code Positions]
             }
          }
