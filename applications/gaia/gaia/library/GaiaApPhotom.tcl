@@ -289,7 +289,13 @@ itcl::class gaia::GaiaApPhotom {
       #  Create a GaiaPhotomExtras object to deal with any additional
       #  parameters for autophotom.
       itk_component add Extras {
-         GaiaPhotomExtras $child_(params).extras
+         if { $usemags_ } {
+            GaiaPhotomExtras $child_(params).extras
+         } else {
+            # For counts we assume gaussian sky is more plausible than
+            # photon statistics
+            GaiaPhotomExtras $child_(params).extras -photon_errors "gaussian sky"
+         }
       }
 
       #  Add an options menu for setting options that should probably
