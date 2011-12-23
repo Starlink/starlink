@@ -7,7 +7,9 @@
 
   Major Changes
   -------------
+
    v 1.10
+   ------
     A new aperture photometry error estimator has been added. This
     uses the variance in the sky regions to estimate a gaussian noise
     for the object measurement. This does not require that the PADU and
@@ -16,13 +18,15 @@
     only give guidance for an upper limit on the error.
 
     v 1.9
-    PSF algorithim changes, algorithim should be more robust.
+    -----
+    PSF algorithm changes, algorithm should be more robust.
 
        Alasdair Allan  (STARLINK, Exeter University)
        20th August 2002
 
     v 1.8
-    The option to use the optimal extraction algorithim has been added
+    -----
+    The option to use the optimal-extraction algorithm has been added
     to both PHOTOM and AUTOPHOTOM. The additional parameters OPTIMA,
     CLIP and SEE have been added to support this facility.
 
@@ -30,6 +34,7 @@
        9th February 1999
 
     v 1.7
+    -----
     The PHOTOM application AUTOPHOTOM has been extended so that
     annular sky regions may also be defined in pixels (in addition
     to the existing method of two scale factors).
@@ -43,18 +48,18 @@
     v 1.12
     ------
     A error in the gaussian error calculations has been corrected.
-    Previously these over estimated the error by a factor sqrt(N).
+    Previously these over-estimated the error by a factor sqrt(N).
 
 
     v 1.11
-    -----------
+    ------
 
     The FWHM reported for the PSF star during optimal photometry has
     been increased by a factor 1.665. The previous value reported
     was sqrt(2)*sigma.
 
     v 1.10
-    -----------
+    ------
 
     A bug in the PHOTOM interface stopped the PHOTON parameter from being
     greater than 2 (excluding the options for estimating errors from the
@@ -71,17 +76,17 @@
     the edges of the image has been fixed. Various initialisation issues have
     also been fixed.
 
-    AUTOASTROM: extended error messages when parsing bad input catalogues
+    AUTOPHOTOM: extended error messages when parsing bad input catalogues
     have been added (previously unspecific error reports where made).
     The input description file may now contain tab character between
     the various fields.
 
     v 1.9
-    ----------
+    -----
 
     Problem with PSF star centroiding resolved.
 
-    Increased robustness of centroiding algorithim for extreme cases.
+    Increased robustness of centroiding algorithm for extreme cases.
 
     Bug in handling position files with PHOTOM under optimal extraction
     resolved.
@@ -90,7 +95,7 @@
     final fitted $X,Y$ co-ordinatles.
 
     v 1.8
-    -----------
+    -----
 
     Fixed a bug which meant that the error in the flux was not corrected
     for the exposure time, although the flux itself had been.
@@ -113,7 +118,7 @@
       30th December 2000
 
     v 1.7
-    -----------
+    -----
 
     A harmless FIO__EOF message, which appeared in PHOTOM's automatic
     mode has been stopped.

@@ -265,7 +265,7 @@
          END IF
       END IF
 
-*   If there is no signal or an error has occured, give it a nominal value
+*   If there is no signal or an error has occurred, give it a nominal value
       IF ( MAGS ) THEN
          IF ( ( FACTOR .GT. 1.0D0 ) .OR. ERFLAG ) THEN
             MAG = SKYMAG
