@@ -605,7 +605,7 @@ itcl::class gaia::GaiaPhotomExtras {
    itk_option define -sky_value sky_value Sky_value {0} {
       $itk_component(Sky) configure -value $itk_option(-sky_value)
    }
-   itk_option define -sky_estimator sky_estimator Sky_estimator {mean} {
+   itk_option define -sky_estimator sky_estimator Sky_estimator {clipped_mean} {
       switch $itk_option(-sky_estimator) {
          mean {
             $itk_component(Skyest) configure -value mean
