@@ -77,6 +77,7 @@
 *     PWD: Peter W. Draper (STARLINK - Durham University)
 *     AA: Alasdair Allan (STARLINK - Exeter University)
 *     EUS: Eduardo Unda-Sanzana
+*     MJC: Malcolm J. Currie (JAC)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -90,8 +91,11 @@
 *     17-JUN-2010 (Andy Gibb, UBC):
 *        Write sky/signal values <1e-2 in E11.4 format
 *     2011-12-06 (EUS):
-*        Use 5 decimal places for MAG and MAGERR
-*     {enter_changes_here}
+*        Use 5 decimal places for MAG and MAGERR.
+*     2011 December 22 (MJC):
+*        Use G-format for counts mean and its error, and for sky and
+*        signal.  Increase the format width for magnitudes.
+*     {enter_further_changes_here}
 *
 *  Bugs :
 *     {note_any_bugs_here}
@@ -138,9 +142,11 @@
       DOUBLE PRECISION FACTOR   ! Used in error in magnitude calcs
       DOUBLE PRECISION ERRMAG   ! Error in magnitude
       DOUBLE PRECISION PSKY     ! Corrected sky value
-      CHARACTER * ( 9 ) CXCEN, CYCEN, CMAG, CERRMG
+      CHARACTER * ( 9 ) CXCEN, CYCEN
+      CHARACTER * ( 13 ) CMAG, CERRMG
       CHARACTER * ( 5 ) CA, CE, CT
-      CHARACTER * ( 11 ) CSKY, CSIG
+      CHARACTER * ( 15 ) CSKY, CSIG
+      CHARACTER * ( 9 ) MAGFMT
       DOUBLE PRECISION PADU, STAR, AREA, VSTAR, SKY, SKYARE, SIGMA,
      :                 VSKY, SKYMAG, BIASLE, ETIME ! Local DBLE variables
 *.
@@ -285,28 +291,27 @@
 *   Ycen
       WRITE( CYCEN, '( F9.2 )' ) YCEN + REAL( ORIGIN( 2 ) - 1 )
 
+*   Counts may cover a wide range of values so use G format.
+      IF ( MAGS ) THEN
+         MAGFMT = '(F11.5)'
+      ELSE
+         MAGFMT = '(G13.5)'
+      END IF
+
 *   Mag
-      WRITE( CMAG, '( F9.5 )' ) MAG
+      WRITE( CMAG, MAGFMT ) MAG
 
 *   Mag error
-      WRITE( CERRMG, '( F9.5 )' ) ERRMAG
+      WRITE( CERRMG, MAGFMT ) ERRMAG
 
-*   Sky - use E format if number is too large or too small
+*   Sky - use G format to cope with all values to at least five
+*   significant figures.
       PSKY = SKY * PADU
-      IF ( ( PSKY .GT. 1.0E6 ) .OR. ( PSKY .LT. -1.0E6 )
-     :     .OR. ((PSKY .LT. 1.0E-2) .AND. (PSKY .GT. -1.0E-2)) ) THEN
-         WRITE( CSKY, '( E11.4 )' ) PSKY
-      ELSE
-         WRITE( CSKY, '( F11.3 )' ) PSKY
-      ENDIF
+      WRITE( CSKY, '( G15.5 )' ) PSKY
 
-*   Signal - use E format if number is too large or too small
-      IF ( ( SIGNAL .GT. 1.0E6 ) .OR. ( SIGNAL .LT. -1.0E6 )
-     :    .OR. ((SIGNAL .LT. 1.0E-2) .AND. (SIGNAL .GT. -1.0E-2)) ) THEN
-         WRITE( CSIG, '( E11.4 )' ) SIGNAL
-      ELSE
-         WRITE( CSIG, '( F11.3 )' ) SIGNAL
-      ENDIF
+*   Signal - use G format to cope with all values to at least five
+*   significant figures.
+      WRITE( CSIG, '( G15.5 )' ) SIGNAL
 
 *   Shape
       WRITE( CA, '( F5.1 )' ) MAJOR

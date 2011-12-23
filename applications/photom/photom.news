@@ -50,6 +50,13 @@
     A error in the gaussian error calculations has been corrected.
     Previously these over-estimated the error by a factor sqrt(N).
 
+    The output from AUTOPHOTOM offers more decimal places (5) for the
+    magnitude/mean count and its error, and for the sky and signal
+    sums.  The formatting now presents small-valued results in
+    exponential rather than decimal form, and thus enables photometry
+    of non-counting detectors such as SCUBA-2.  Scripts or tasks
+    that read the AUTOPHOTOM results file may need modification
+    depending how the fields are read.
 
     v 1.11
     ------

@@ -77,6 +77,7 @@
 *     PWD: Peter W. Draper (Durham University)
 *     AA: Alasdair Allan (Starlink, Keele University)
 *     EUS: Eduardo Unda-Sanzana
+*     MJC: Malcolm J. Currie (JAC)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -85,8 +86,11 @@
 *     21-FEB-2008 (PWD):
 *        Stop using internal writes to copy constant strings.
 *     2011-12-06 (EUS):
-*        Use 5 decimal places for MAG and MAGERR
-*     {enter_changes_here}
+*        Use 5 decimal places for MAG and MAGERR.
+*     2011 December 22 (MJC):
+*        Use G-format for counts mean and its error, and for sky and
+*        signal.  Increase the format width for magnitudes.
+*     {enter_further_changes_here}
 *
 *  Bugs :
 *     {note_any_bugs_here}
@@ -133,9 +137,10 @@
       DOUBLE PRECISION PADU, STAR, AREA, VSTAR, SKY, SKYARE, SIGMA,
      :                 VSKY, SKYMAG, BIASLE, ETIME
 
-      CHARACTER CINDEX * 5, CXCEN * 9, CYCEN * 9, CMAG * 9, CERRMG * 9
-      CHARACTER CSKY * 11, CSIG * 11, CA * 5, CE * 5, CT * 5
+      CHARACTER CINDEX * 5, CXCEN * 9, CYCEN * 9, CMAG * 13, CERRMG * 13
+      CHARACTER CSKY * 15, CSIG * 15, CA * 5, CE * 5, CT * 5
       CHARACTER TEXT * 80
+      CHARACTER MAGFMT * 9
 *.
 *   Check status on entry
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -227,26 +232,27 @@
 *   Ycen
       WRITE( CYCEN, '( F9.2 )' ) YCEN + REAL( ORIGIN( 2 ) - 1 )
 
+*   Counts may cover a wide range of values so use G format.
+      IF ( MAGS ) THEN
+         MAGFMT = '( F11.5 )'
+      ELSE
+         MAGFMT = '( G13.5 )'
+      END IF
+
 *   Mag
-      WRITE( CMAG, '( F9.5 )' ) MAG
+      WRITE( CMAG, MAGFMT ) MAG
 
 *   Mag error
-      WRITE( CERRMG, '( F9.5 )' ) ERRMAG
+      WRITE( CERRMG, MAGFMT ) ERRMAG
 
-*   Sky - use E format if number is too large
+*   Sky - use G format to cope with all values to at least five
+*   significant figures.
       PSKY = SKY * PADU
-      IF ( ( PSKY .GT. 1.0E6 ) .OR. ( PSKY .LT. -1.0E6 ) ) THEN
-         WRITE( CSKY, '( E11.4 )' ) PSKY
-      ELSE
-         WRITE( CSKY, '( F11.3 )' ) PSKY
-      ENDIF
+      WRITE( CSKY, '( G15.5 )' ) PSKY
 
-*   Signal - use E format if number is too large
-      IF ( ( SIGNAL .GT. 1.0E6 ) .OR. ( SIGNAL .LT. -1.0E6 ) ) THEN
-         WRITE( CSIG, '( E11.4 )' ) SIGNAL
-      ELSE
-         WRITE( CSIG, '( F11.3 )' ) SIGNAL
-      ENDIF
+*   Signal - use G format to cope with all values to at least five
+*   significant figures.
+      WRITE( CSIG, '( G15.5 )' ) SIGNAL
 
 *   Concatenate these into the output strings
       TEXT = CINDEX//CXCEN//CYCEN//CMAG//CERRMG//CSKY//CSIG//' '//CODE
