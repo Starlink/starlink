@@ -10,10 +10,7 @@
 # applied at the start, and no other iterative filtering is
 # performed. A harsher high-pass filter is applied than in the default
 # configuration since no appreciable large-scale structure is
-# expected. Similarly, ast.zero_lowhits and ast.zero_notlast are used
-# to help constrain the solution to a flat map until the final
-# iteration.  Harsher bad-bolo rejection is implemented, and a lower
-# threshold on spikes is also used.
+# expected.
 #
 # When reducing a large data set it might be useful to write out the
 # maps from each iteration/chunk by setting itermap=1.  This will
@@ -37,7 +34,7 @@
 #
 # ***********************************************************
 
-numiter = -5
+numiter = 4
 
 modelorder = (com,ext,ast,noi)
 
@@ -53,13 +50,6 @@ spikebox = 50
 
 450.filt_edge_largescale = 200
 850.filt_edge_largescale = 200
-
-# can constrain much of the map to be zero until the final iteration
-# since the structure is very low S/N and we are after point sources,
-# not extended structure.
-
-ast.zero_lowhits = 1
-ast.zero_notlast = 1
 
 # Deal with 4 min. of data at a time. This gives a slightly smaller
 # RMS, probably because the noise level in the detectors changes over
