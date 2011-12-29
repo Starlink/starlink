@@ -1902,12 +1902,19 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                               &dsize, NULL, NULL, status );
 
                 if( j == 0 ) {
-                  /* Add last iter. of astronomical signal back in to residual*/
-                  for( k=0; k<dsize; k++ ) {
-                    if( !(qua_data[k]&SMF__Q_MOD) && (lut_data[k]!=VAL__BADI) ){
-                      double ast_data = thismap[lut_data[k]];
-                      if( ast_data != VAL__BADD ) {
-                        res_data[k] += ast_data;
+                  /* Add last iter. of astronomical signal back in to residual.
+                     Note that if this is the first iteration we do not yet
+                     have a map estimate so we skip this step (in multiple
+                     chunk case thismap will still contain the old map from
+                     the previous chunk). */
+                  if( iter > 0 ) {
+                    for( k=0; k<dsize; k++ ) {
+                      if( !(qua_data[k]&SMF__Q_MOD) &&
+                          (lut_data[k]!=VAL__BADI) ) {
+                        double ast_data = thismap[lut_data[k]];
+                        if( ast_data != VAL__BADD ) {
+                          res_data[k] += ast_data;
+                        }
                       }
                     }
                   }
@@ -2743,11 +2750,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           }
         }
       }
-
     }
-
-
-
 
     /* *************************************************************************
        Clean up temporary resources associated with this continuous chunk
