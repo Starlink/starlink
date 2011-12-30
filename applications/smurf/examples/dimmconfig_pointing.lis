@@ -1,9 +1,7 @@
 # Special configuration for pointing observations
-# Similar to bright_compact except that we use the
-# non-apodising filter since pointings tend to be short.
-# We also use COM on the first pass.
+# Similar to bright_compact except that we lower the speed limit
 
-^$STARLINK_DIR/share/smurf/dimmconfig_newfilt.lis
+^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
 
 # Some pointings are done with slow speeds so tweak the lower
 # limit. An example of this is 20091208#55 where 60% of the data
@@ -12,10 +10,3 @@
 # flagslow of 30 using this config.
 flagslow = 20
 
-# In case of poor crosslinking. For pointings this won't
-# take very long
-numiter=10
-
-# Circular boundary constraints
-ast.zero_circle = (0.016666666)
-ast.zero_notlast = 1
