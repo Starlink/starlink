@@ -1,7 +1,6 @@
       SUBROUTINE PHO1_GOPT( MAGS, XCEN, YCEN, ORIGIN, LPADU, LSTAR,
-     :                      LVSTAR, LSKY, LSIGMA,
-     :                      LVSKY, LSKYMAG, PHOTON, LBIASLE, CLIP,
-     :                      SEE, CODE, LETIME, BUFFER, STATUS)
+     :                      LVSTAR, LSKY, LSIGMA, LSKYMG, CLIP,
+     :                      SEE, CODE, LETIME, BUFFER, STATUS )
 
 *+
 *  Name :
@@ -13,11 +12,10 @@
 *  Language :
 *     Starlink Fortran-77
 *
-*  Invocation :
-*     CALL PHO1_GOPT( MAGS, XCEN, YCEN, ORIGIN, LPADU, LSTAR,
-*     :               LVSTAR, LSKY, LSIGMA,
-*     :               LVSKY, LSKYMAG, PHOTON, LBIASLE, CLIP,
-*     :               SEE, CODE, LETIME, BUFFER, STATUS)
+*  Invocation:
+*     CALL PHO1_GOPT( MAGS, XCEN, YCEN, ORIGIN, LPADU, LSTAR, LVSTAR,
+*    :                LSKY, LSIGMA, LSKYMG, CLIP, SEE, CODE, LETIME,
+*    :                BUFFER, STATUS )
 *
 *  Description :
 *     Calculates the final measurements for an aperture and writes the
@@ -28,6 +26,7 @@
 *
 *  Authors :
 *     AA: Alasdair Allan (STARLINK - Keele University)
+*     MJC: Malcolm J. Currie (JAC)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -55,10 +54,9 @@
       REAL LVSTAR
       REAL LSKY
       REAL LSIGMA
-      REAL LVSKY
-      REAL LSKYMAG
-      INTEGER PHOTON
-      REAL LBIASLE
+      REAL LSKYMG
+      REAL CLIP
+      REAL SEE
       CHARACTER * ( 2 ) CODE
       REAL LETIME
       CHARACTER * ( * ) BUFFER
@@ -90,14 +88,11 @@
       STAR = DBLE( LSTAR )
       VSTAR = DBLE( LVSTAR )
       SKY = DBLE( LSKY )
-      SIGMA = DBLE( LSIGMA )
-      VSKY = DBLE( LVSKY )
-      SKYMAG = DBLE( LSKYMAG )
-      BIASLE = DBLE( LBIASLE )
-      ETIME  = DBLE( LETIME )
+      SKYMAG = DBLE( LSKYMG )
+      ETIME = DBLE( LETIME )
 
-*   Initialise the error flag
-      IF ( SIGMA .LT. 0.0D0 ) THEN
+*  Initialise the error flag.
+      IF ( DBLE( LSIGMA ) .LT. 0.0D0 ) THEN
          ERFLAG = .TRUE.
       ELSE
          ERFLAG = .FALSE.

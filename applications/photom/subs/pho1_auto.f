@@ -895,9 +895,8 @@
      :       CODE .NE. 'E' .AND. CODE .NE. '?' ) CODE = 'OK'
          BUFFER = ' '
          CALL PHO1_GOPT( MAGS, XFIT, YFIT, ORIGIN, PADU, STAR,
-     :                   VSTAR, LOCSKY, SIGMA, VSKY, SKYMAG,
-     :                   PHOTON, BIASLE, CLIP, SEE, CODE, ETIME,
-     :                   BUFFER, STATUS )
+     :                   VSTAR, LOCSKY, SIGMA, SKYMAG,
+     :                   CLIP, SEE, CODE, ETIME, BUFFER, STATUS )
          IAT = CHR_LEN( BUFFER ) + 2
          BUFFER( IAT:IAT ) = ' '
          IAT = IAT + 1
