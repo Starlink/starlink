@@ -1,9 +1,6 @@
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
 
-# For very short scans of things like planet don't filter
-# and back off on bad data flagging even more.
-
-modelorder = (com,gai,smo,ext,ast,noi)
+# back off on bad data flagging even more.
 
 noisecliphigh=20
 
@@ -14,5 +11,3 @@ com.corr_abstol = 0.01
 com.gain_tol = 20
 com.gain_abstol = 20
 com.gain_rat = 100
-
-smo.type = mean
