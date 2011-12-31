@@ -37,10 +37,20 @@
 *
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *
 *  History:
 *     25-OCT-1999 (MBT):
 *        Original version.
+*     30-DEC-2011 (TIMJ):
+*        Use KPG1_SCALE for pixel scale calculation rather than
+*        calculating the value directly in ESP.
+
+*  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 1999 Council for the Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
 *-
 
 *  Type definitions:                  ! No implicit typing
@@ -61,34 +71,19 @@
       INTEGER STATUS
 
 *  Local variables:
-      INTEGER IPERM(2)                ! Indices for PermMap
       INTEGER IWCS                    ! AST pointer to WCS component of NDF
       INTEGER JGRID                   ! Index of GRID-domain frame in frameset
       INTEGER JSKY                    ! Index of SKY-domain frame in frameset
-      INTEGER DIM(2)                  ! Lower bounds of NDF
-      INTEGER FSET                    ! AST pointer to conversion frameset
-      INTEGER GSMAP                   ! AST pointer to GRID->SKY frame mapping
-      INTEGER MAP                     ! AST pointer to normalised mapping
+      INTEGER LBND(2)                 ! Lower bounds of NDF
       INTEGER NDIM                    ! Number of dimensions of NDF
-      INTEGER OPERM(2)                ! Indices for PermMap
-      INTEGER PMAP                    ! AST pointer to permutation mapping
       INTEGER SKYFRM                  ! AST pointer to SkyFrame
       INTEGER STATE                   ! Initial state of PSIZE parameter
+      INTEGER UBND(2)                 ! Upper bounds of NDF
       LOGICAL INOKAY                  ! Have we got a good value for PSIZE?
-      LOGICAL SWAP                    ! Have SkyFrames axes been swapped?
-      DOUBLE PRECISION ARCSEC         ! Size of an arcsecond in radians
-      DOUBLE PRECISION CENX           ! X position of NDF centre in Sky coords
-      DOUBLE PRECISION CENY           ! Y position of NDF centre in Sky coords
-      DOUBLE PRECISION DISTY          ! Y dimension of transformed box in radian
-      DOUBLE PRECISION PI             ! Pi
-      DOUBLE PRECISION TRANX(2)       ! X coords of transformed points
-      DOUBLE PRECISION TRANY(2)       ! Y coords of transformed points
-      DOUBLE PRECISION UNITX(2)       ! X coords of untransformed points
-      DOUBLE PRECISION UNITY(2)       ! Y coords of untransformed points
+      DOUBLE PRECISION SCALE(2)       ! Pixel scales in radians
+      CHARACTER *15 UNIT(2)           ! Unit string of each axis
+      CHARACTER *15 VALUE(2)          ! String form of pixel scales
 
-      DATA CENX,CENY /0D0,0D0/        ! Prevent arithmetic exceptions in
-      DATA TRANX /0D0,0D0/            ! event of failure.
-      DATA TRANY /0D0,0D0/            !
 *.
 
 *   Check the inherited global status.
@@ -131,71 +126,14 @@
 *      If there is a sky frame, use it to work out pixel size.
          IF (SKYFRM.NE.AST__NULL .AND. JGRID.NE.AST__NOFRAME) THEN
 
-*         Work out whether the SkyFrame has had its axes swapped over.
-*         Normally the first axis is longitude and the second is
-*         latitude.  However it may have had them swapped over.
-*         This code is pinched from KAPPA, where it is commented that
-*         doing this is more complicated than it ought to be.
-*         We compare it with a newly created SkyFrame to see if the
-*         axes have been swapped.
-            FSET=AST_FINDFRAME(SKYFRM,AST_SKYFRAME(' ',STATUS),' ',
-     :                         STATUS)
-            SWAP=.NOT.AST_ISAUNITMAP(AST_GETMAPPING(FSET,AST__BASE,
-     :                                              AST__CURRENT,
-     :                                              STATUS),
-     :                               STATUS)
+*         Get the bounds of the NDF
+            CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM, STATUS )
 
-*         Construct a suitable PermMap (i.e. one which either does or
-*         does not switch the Sky axes around) so that in either case
-*         the mapping we have looks like it's to a SkyFrame with axes
-*         in the conventional order.
-            IF (SWAP) THEN
-               IPERM(1)=2
-               IPERM(2)=1
-            ELSE
-               IPERM(1)=1
-               IPERM(2)=2
-            END IF
-            OPERM(1)=IPERM(1)
-            OPERM(2)=IPERM(2)
-            PMAP=AST_PERMMAP(2,IPERM,2,OPERM,0D0,' ',STATUS)
+            CALL KPG1_SCALE( IWCS, LBND, UBND, SCALE, VALUE,
+     :           UNIT, STATUS )
 
-*         Get the mapping from the GRID domain to the SKY domain frames.
-            GSMAP=AST_GETMAPPING(IWCS,JGRID,JSKY,STATUS)
-
-*         Combine and simplify the mappings so we have one which maps
-*         from the GRID domain to a normalised (latitude=second axis)
-*         SkyFrame.
-            MAP=AST_SIMPLIFY(AST_CMPMAP(GSMAP,PMAP,.TRUE.,' ',STATUS),
-     :                       STATUS)
-
-*         Find the bounds of the NDF.
-            CALL NDF_DIM(INDF,2,DIM,NDIM,STATUS)
-
-*         Find the centre of the NDF in SKY coordinates.
-            CALL AST_TRAN2(MAP,1,DBLE(DIM(1)/2),DBLE(DIM(2)/2),.TRUE.,
-     :                     CENX,CENY,STATUS)
-
-*         Get the size of an arcsecond in radians.
-            PI=4D0*ATAN(1D0)
-            ARCSEC=2D0*PI/(36D1*6D1*6D1)
-
-*         Construct two points an arcsecond away from each other in
-*         latitude near the centre of the NDF.
-            UNITX(1)=CENX
-            UNITY(1)=CENY
-            UNITX(2)=CENX
-            UNITY(2)=CENY+ARCSEC
-
-*         Transform the points from SKY to GRID coordinates.
-            CALL AST_TRAN2(MAP,2,UNITX,UNITY,.FALSE.,TRANX,TRANY,STATUS)
-
-*         Work out the distance in pixels that one arcsecond in latitude
-*         transforms to.
-            DISTY=SQRT((TRANX(2)-TRANX(1))**2 + (TRANY(2)-TRANY(1))**2)
-
-*         Get the pixel size in arcseconds.
-            PSIZE=1D0/DISTY
+*         Get the mean pixel size in arcseconds.
+            PSIZE= AST__DR2D * 3600.0D0 * (SCALE(1) + SCALE(2)) / 2.0D0
 
 *         Inform the user what size the pixels are.
             CALL MSG_FMTR('PSIZE','G10.3',PSIZE)
