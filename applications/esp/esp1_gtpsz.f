@@ -22,10 +22,7 @@
 *     one exists it will work out a value from this.  Failing either
 *     of these, the user will be prompted for a value.
 *
-*     The pixels are assumed to be square.  If the WCS component
-*     indicates that they are in fact not square (have an aspect ratio
-*     outside the range 0.95-1.05) then the user is warned of this,
-*     but no further action is taken.
+*     The pixels are assumed to be square.
 *
 *  Arguments:
 *     INDF = INTEGER (Given)
