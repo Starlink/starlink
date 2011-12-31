@@ -1,5 +1,5 @@
-      SUBROUTINE PHO1_GPSF( XCEN, YCEN, SHAPE, CODE, CLIP, SEE, PADU,
-     :                       ORIGIN, BUFFER, STATUS)
+      SUBROUTINE PHO1_GPSF( XCEN, YCEN, SHAPE, CODE, CLIP, SEE,
+     :                      ORIGIN, BUFFER, STATUS )
 
 *+
 *  Name :
@@ -11,9 +11,9 @@
 *  Language :
 *     Starlink Fortran-77
 *
-*  Invocation :
-*     CALL PHO1_GPSF( XCEN, YCEN, SHAPE, CODE, CLIP, SEE, PADU,
-*     :                    ORIGIN, BUFFER, STATUS)
+*  Invocation:
+*     CALL PHO1_GPSF( XCEN, YCEN, SHAPE, CODE, CLIP, SEE,
+*    :                ORIGIN, BUFFER, STATUS )
 *
 *  Description :
 *     Calculates the final measurements for a PSF star and writes the
@@ -33,9 +33,9 @@
 *     CLIP = REAL (Given)
 *        Clipping radius for weight map
 *     SEE = REAL (Given)
-*        Approx seeing in pixels
-*     PADU = REAL (Given)
-*        Conversion factor for values to photons.
+*        Seeing in pixels.
+*     ORIGIN( 2 ) = INTEGER (Given)
+*        Origin of NDF axes.
 *     BUFFER = CHARACTER * ( * ) (Returned)
 *        The aperture measurements formatted into a string. The output
 *        contains the following fields:
@@ -53,7 +53,9 @@
 *         Original version
 *     17-JUN-2008 (PWD):
 *         Scale "FWHM" by 1.665, corrects from gaussian sigma to FWHM.
-*     {enter_changes_here}
+*     2011 December 23 (MJC)
+*        Tidied to near SGP/16 standard.  Removed unused PADU argument.
+*     {enter_further_changes_here}
 *
 *  Bugs :
 *     {note_any_bugs_here}
@@ -71,7 +73,10 @@
       REAL SHAPE(3)
       INTEGER ORIGIN( 2 )
       CHARACTER * ( 2 ) CODE
-      REAL CLIP, SEE, PADU
+      REAL CLIP
+      REAL SEE
+
+* Arguments Returned:
       CHARACTER * ( * ) BUFFER
 
 *  Status :

@@ -584,7 +584,7 @@
          ENDIF
 
          BUFFER = ' '
-         CALL PHO1_GPSF( XFINAL, YFINAL, SHAPE, CODE, CLIP, SEE, PADU,
+         CALL PHO1_GPSF( XFINAL, YFINAL, SHAPE, CODE, CLIP, SEE,
      :                   ORIGIN, BUFFER, STATUS )
          IAT = CHR_LEN( BUFFER ) + 2
          BUFFER( IAT:IAT ) = ' '
