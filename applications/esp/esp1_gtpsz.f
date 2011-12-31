@@ -123,7 +123,7 @@
 *      it's been mislabelled and we can't use it).
          IF (JSKY.NE.AST__NOFRAME) THEN
             SKYFRM=AST_GETFRAME(IWCS,JSKY,STATUS)
-            IF (.NOT.AST_ISASKYFRAME(SKYFRM)) SKYFRM=AST__NULL
+            IF (.NOT.AST_ISASKYFRAME(SKYFRM,STATUS)) SKYFRM=AST__NULL
          ELSE
             SKYFRM=AST__NULL
          END IF
