@@ -151,7 +151,7 @@ Usage: smas [-a diam] [-b] [-e error] [-r perc] [-p] <in-list> <out-table> [<out
 	  extension item, then the NDFs in the SHORTMAPS or BOLOMAPS
 	  array are used in place of the supplied NDF (SHORTMAPS is used
 	  in preference to BOLOMAPS if both are present). NOTE, all the
-	  data must be for the same subarray.
+	  data must be for the same wavelength.
 
       <out-table>: the name of a text file in which to store a
           catalogue containing details of the source in each
@@ -163,7 +163,9 @@ Usage: smas [-a diam] [-b] [-e error] [-r perc] [-p] <in-list> <out-table> [<out
           a 2D NDF containing the SUM (or AMP if the "-b" option is used)
           values for each bolometer is created with the name given by
           <out-image>. The FITS headers from the first input NDF are
-          copied to the output NDF.
+          copied to the output NDF. If the supplied data contains values
+          from more than one subarray, the name of the subarray is appended
+          the end of each output NDF name.
 
    Description:
 
@@ -196,6 +198,7 @@ Usage: smas [-a diam] [-b] [-e error] [-r perc] [-p] <in-list> <out-table> [<out
       - NDF: The path to the NDF
       - ROW: The row number for the bolometer (if known)
       - COL: The column number for the bolometer (if known)
+      - ARRAY: The array name for the bolometer (if known)
 
       For comparison, a set of extra columns is appended to these
       that give the source properties as calculated by KAPPA:BEAMFIT
@@ -214,6 +217,7 @@ Usage: smas [-a diam] [-b] [-e error] [-r perc] [-p] <in-list> <out-table> [<out
         centred on (0,0)
       - ROW: The row number for the bolometer (if known)
       - COL: The column number for the bolometer (if known)
+      - ARRAY: The array name for the bolometer (if known)
 
 FOO
 
@@ -292,32 +296,11 @@ foreach n (`cat $inlist`)
       endif
    endif
 
-#  Get the subarray name, and its corresponding integer index.
-   set subarray = `$KAPPA_DIR/fitsmod $in edit=print keyword=SUBARRAY`
-   echo $subarray | grep "does not exist" >& /dev/null
+#  Get the wavelength ("0.00045" or "0.00085" ).
+   set wavelen = `$KAPPA_DIR/fitsmod $in edit=print keyword=WAVELEN`
+   echo $wavelen | grep "does not exist" >& /dev/null
    if( $status == 0 ) then
-      echo "Cannot determine subarray"
-      echo "Does $in.sdf contain data from more than one subarray?"
-      exit
-
-   else if( $subarray == "s8a" ) then
-      set array = 0
-   else if( $subarray == "s8b" ) then
-      set array = 1
-   else if( $subarray == "s8c" ) then
-      set array = 2
-   else if( $subarray == "s8d" ) then
-      set array = 3
-   else if( $subarray == "s4a" ) then
-      set array = 4
-   else if( $subarray == "s4b" ) then
-      set array = 5
-   else if( $subarray == "s4c" ) then
-      set array = 6
-   else if( $subarray == "s4d" ) then
-      set array = 7
-   else
-      echo "Unknown subarray - $subarray"
+      echo "Cannot determine wavelength"
       exit
    endif
 
@@ -339,13 +322,13 @@ foreach n (`cat $inlist`)
 #  the FITS headers from the first input file to a text file (they will later be
 #  stored in the output image).
    if( $sar == -1 ) then
-      set sar = $array
+      set sar = $wavelen
       rm -f smas-fits.log >& /dev/null
       $KAPPA_DIR/fitslist $in smas-fits.log
       set system0 = $system
    else
-      if( $array != $sar ) then
-         echo "$n is for subarray $subarray, which is not the same as the first NDF"
+      if( $wavelen != $sar ) then
+         echo "$n is for wavelength $wavelen, which is not the same as the first NDF"
          exit
       endif
       if( $system != $system0 ) then
@@ -424,14 +407,14 @@ end
 #  names in the output catalogue.
 echo "# SYSTEM = $system" > $outtable
 if( $moon == 1 ) then
-   echo "# SUM ROW COL" >> $outtable
+   echo "# SUM ROW COL ARRAY" >> $outtable
 else if( $amp_only == 1 ) then
-   echo "# AMP ROW COL" >> $outtable
+   echo "# AMP ROW COL ARRAY" >> $outtable
 else
-   echo "# TAI UTC SEQSTART SEQEND DLON DLAT AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" >> $outtable
+   echo "# TAI UTC SEQSTART SEQEND DLON DLAT AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL ARRAY" >> $outtable
 endif
 
-# Get he number of good pixels required for each source.
+# Get the number of good pixels required for each source.
 set box = 20
 set mingood = `$KAPPA_DIR/calc "nint(pa*pa*pb/100.0)" pa=$box pb=$perc`
 
@@ -440,13 +423,15 @@ set first = 1
 foreach n (`cat files.smas`)
    echo "Doing $n"
 
-#  For bolomaps, get the row and column name from the NDF name. Record the max and min row and
-#  column index.
+#  For bolomaps, get the array, row and column name from the NDF name. Record the max
+#  and min row and column index.
    if( $bolomaps == 1 ) then
-      set rc = `echo $n | sed -e 's/.*C\([0-9]\{2\}\)R\([0-9]\{2\}\)/\1 \2/'`
-      set row = `echo $rc[1] | sed -e 's/0\([0-9]\)/\1/'`
-      set col = `echo $rc[2] | sed -e 's/0\([0-9]\)/\1/'`
+      set rc = `echo $n | sed -e 's/.*\(S[48][ABCD]\)C\([0-9]\{2\}\)R\([0-9]\{2\}\)/\1 \2 \3/'`
+      set array = $rc[1]
+      set row = `echo $rc[2] | sed -e 's/0\([0-9]\)/\1/'`
+      set col = `echo $rc[3] | sed -e 's/0\([0-9]\)/\1/'`
    else
+      set array = null
       set row = null
       set col = null
    endif
@@ -482,17 +467,8 @@ foreach n (`cat files.smas`)
          $KAPPA_DIR/wcsattrib $ndf set 'format(2)' s.2
       endif
 
-#  Find the offset sky coords at the centre of the feature. The feature is
-#  nominally at the reference point and so should, in the absence of errors,
-#  have coords (0.0,0.0). PSF fails unless a good central position is
-#  supplied, so first find the peak value in a box centred on (0,0)
+# Get stats for the central region of the NDF.
       $KAPPA_DIR/stats $ndf\(0~$box,0~$box\) quiet
-      set maxco = `$KAPPA_DIR/parget maxwcs stats`
-      rm -f coin.smas > /dev/null
-      echo $maxco > coin.smas
-
-#  Get the maximum value in the box.
-      set maxv = `$KAPPA_DIR/parget maximum stats`
 
 #  Check that the box contains at least 95% good pixels.
       set numgood = `$KAPPA_DIR/parget numgood stats`
@@ -501,6 +477,17 @@ foreach n (`cat files.smas`)
          echo "  Insufficient good data ($pc %) found around expected source position"
          continue
       endif
+
+#  Note the offset sky coords at the centre of the feature. The feature is
+#  nominally at the reference point and so should, in the absence of errors,
+#  have coords (0.0,0.0). PSF fails unless a good central position is
+#  supplied, so first find the peak value in a box centred on (0,0)
+      set maxco = `$KAPPA_DIR/parget maxwcs stats`
+      rm -f coin.smas > /dev/null
+      echo $maxco > coin.smas
+
+#  Get the maximum value in the box.
+      set maxv = `$KAPPA_DIR/parget maximum stats`
 
 #  If required, determine the source parameters using kappa:beamfit
       if( $amp_only == 0 ) then
@@ -599,10 +586,13 @@ foreach n (`cat files.smas`)
 #  Choose the aperture size in pixels (60 arc-secs assuming default makemap
 #  pixel sizes of 2 and 4 arc-seconds)..
                   if( "$diam" == " " ) then
-                     if( $sar > 3 ) then
+                     if( $sar == "0.00045" ) then
                         set diam = 30
-                     else
+                     else if( $sar == "0.00085" ) then
                         set diam = 15
+                     else
+                        echo "Unknown wavelength - $sar "
+                        exit
                      endif
                   endif
 
@@ -695,7 +685,7 @@ foreach n (`cat files.smas`)
 
 #  Write a row to the output catalogue, so long as it contains no INF, NAN
 #  or BAD values
-               set text = "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient $row $col"
+               set text = "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient $row $col $array"
                echo "$text" | grep -iq 'INF\|NAN\|BAD'
                if( $status == 1 ) then
                   echo "$text" >> $outtable
@@ -707,9 +697,9 @@ foreach n (`cat files.smas`)
             echo "  psf failure"
          endif
 
-#  If only the AMP, COL and ROW columsn are needed, write them to the catalogue.
+#  If only the AMP, COL, ROw and ARRAY columns are needed, write them to the catalogue.
       else
-         set text = "$maxv $row $col"
+         set text = "$maxv $row $col $array"
          echo "$text" | grep -iq 'INF\|NAN\|BAD'
          if( $status == 1 ) then
             echo "$text" >> $outtable
@@ -757,7 +747,7 @@ foreach n (`cat files.smas`)
       set fsum = `$KAPPA_DIR/parget total aperadd`
 
 #  Write a row to the output catalogue.
-      set text = "$fsum $row $col"
+      set text = "$fsum $row $col $array"
       echo "$text" | grep -iq 'INF\|NAN\|BAD'
       if( $status == 1 ) then
          echo "$text" >> $outtable
@@ -772,20 +762,46 @@ end
 #  TRANDAT fails if the file contains any non-numeric column values, so first
 #  copy the required columns from the returned catalogue into a separate file.
 if( "$outimage" != " " ) then
-   if( $moon == 1 || $amp_only == 1 ) then
-      cat $outtable | grep -v \# | awk '{print $2, $3, $1}' > cat.smas
-   else
-      cat $outtable | grep -v \# | awk '{print $21, $22, $8}' > cat.smas
-   endif
 
-   $KAPPA_DIR/trandat freename=cat.smas poscols="[1,2]" valcol=3 auto=no \
-                      ndf=$outimage poffset=\[1.5,1.5\]
+#  Initialise the number of subarrays processed.
+   set nsub = 0
+
+#  Produce a separate output image for each subarray
+   foreach ar (S4A S4B S4C S4D S8A S8B S8C S8D)
+      set outndf = "${outimage}-${ar}"
+
+      if( $moon == 1 || $amp_only == 1 ) then
+         cat $outtable | grep $ar | grep -v \# | awk '{print $2, $3, $1}' > cat.smas
+      else
+         cat $outtable | grep $ar | grep -v \# | awk '{print $21, $22, $8}' > cat.smas
+      endif
+
+#  Check we have some data for the current subarray
+      set vals = `wc cat.smas`
+      if( $vals[1] > 0 ) then
+         $KAPPA_DIR/trandat freename=cat.smas poscols="[1,2]" valcol=3 auto=no \
+                            ndf=$outndf poffset=\[1.5,1.5\]
 
 #  Ensure the image is has the expected pixel bounds
-   $KAPPA_DIR/setbound $outimage\(0:31,0:39\)
+         $KAPPA_DIR/setbound $outndf\(0:31,0:39\)
 
 #  Copy FITS headers from the first input NDF to the output NDF.
-   $KAPPA_DIR/fitstext $outimage file=smas-fits.log
+         $KAPPA_DIR/fitstext $outndf file=smas-fits.log
+
+#  Increment the number of subarrays processed, and record the last NDF created.
+         @ nsub = $nsub + 1
+         set lastndf = $outndf
+      endif
+
+   end
+
+#  If only one subarray was processed, remove the subarray name from the
+#  end of the NDF name.
+   if( $nsub == 1 ) then
+      $KAPPA_DIR/ndfcopy $lastndf $outimage
+      rm -f $lastndf.sdf
+   endif
+
 endif
 
 # Clean up.
