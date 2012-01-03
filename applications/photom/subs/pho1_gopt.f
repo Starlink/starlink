@@ -41,8 +41,9 @@
 *  Type Definitions :
       IMPLICIT NONE
 
-*  Global Constants :
-      INCLUDE 'SAE_PAR'
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Global SSE definitions
+      INCLUDE 'PRM_PAR'          ! VAL__ public constants
 
 *  Arguments Given :
       LOGICAL MAGS
@@ -109,7 +110,7 @@
 *   FALSE then we do not want a magnitude conversion.
       FACTOR = 0.0
       IF ( MAGS ) THEN
-         IF ( ABS( SIGNAL ) .GT. 1.0D-6 ) THEN
+         IF ( ABS( SIGNAL ) .GT. VAL__SMLD ) THEN
             FACTOR = ABS( ERRSIG / SIGNAL )
             ERRMAG = 1.08574D0 * FACTOR
          ELSE
