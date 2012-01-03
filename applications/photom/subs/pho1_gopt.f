@@ -66,18 +66,26 @@
 *  Status :
       INTEGER STATUS
 
-*  Local Variables :
-      LOGICAL ERFLAG            ! Local error flag
-      DOUBLE PRECISION SIGNAL   ! Total counts in aperture
-      DOUBLE PRECISION ERRSIG   ! Error in aperture count
-      DOUBLE PRECISION MAG      ! Magnitude of count in aperture
-      DOUBLE PRECISION FACTOR   ! Used in error in magnitude calcs
-      DOUBLE PRECISION ERRMAG   ! Error in magnitude
-      DOUBLE PRECISION PSKY     ! Corrected sky value
-      CHARACTER * ( 9 ) CXCEN, CYCEN, CMAG, CERRMG
-      CHARACTER * ( 11 ) CSKY, CSIG
-      DOUBLE PRECISION PADU, STAR, VSTAR, SKY, SIGMA,
-     :                 VSKY, SKYMAG, BIASLE, ETIME ! Local DBLE variables
+*  Local Variables:
+      LOGICAL ERFLAG             ! Local error flag
+      DOUBLE PRECISION ERRMAG    ! Error in magnitude
+      DOUBLE PRECISION ERRSIG    ! Error in aperture count
+      DOUBLE PRECISION ETIME     ! Exposure time
+      DOUBLE PRECISION FACTOR    ! Used in error in magnitude calcs
+      DOUBLE PRECISION MAG       ! Magnitude of count in aperture
+      DOUBLE PRECISION PADU      ! Photons per data unit
+      DOUBLE PRECISION PSKY      ! Corrected sky value
+      DOUBLE PRECISION SIGNAL    ! Total counts in aperture
+      DOUBLE PRECISION SKY       ! Sky value per pixel
+      DOUBLE PRECISION SKYMAG    ! Magnitude of sky
+      CHARACTER*13 CERRMG        ! Error in mag/mean formatted in string
+      CHARACTER*13 CMAG          ! Mag/mean value formatted in string
+      CHARACTER*13 CSIG          ! Signal formatted in string
+      CHARACTER*13 CSKY          ! Sky flux formatted in string
+      CHARACTER*9 CXCEN          ! X centroid formatted in string
+      CHARACTER*9 CYCEN          ! Y centroid formatted in string
+      CHARACTER*9 MAGFMT         ! Format for magnitudes/mean count
+
 *.
 
 *   Check status on entry
@@ -161,27 +169,29 @@
 *   Ycen
       WRITE( CYCEN, '( F9.2 )' ) YCEN + REAL( ORIGIN( 2 ) - 1 )
 
-*   Mag
-      WRITE( CMAG, '( F9.3 )' ) MAG
+*  Counts may cover a wide range of values so use G format.
+      IF ( MAGS ) THEN
+         MAGFMT = '( F11.5 )'
+      ELSE
+         MAGFMT = '( G13.5 )'
+      END IF
 
-*   Mag error
-      WRITE( CERRMG, '( F9.3 )' ) ERRMAG
+*  Mag
+      WRITE( CMAG, MAGFMT ) MAG
 
-*   Sky - use E format if number is too large
+*  Mag error
+      WRITE( CERRMG, MAGFMT ) ERRMAG
+
+*  Sky - use G format to cope with all values to at least five
+*  significant figures.  Limit to 13 instead of 15 to squeeze in
+*  an 80-character buffer, thus some values may be written in
+*  exponential form.
       PSKY = SKY * PADU
-      IF ( ( PSKY .GT. 1.0E6 ) .OR. ( PSKY .LT. -1.0E6 ) ) THEN
-         WRITE( CSKY, '( E11.4 )' ) PSKY
-      ELSE
-         WRITE( CSKY, '( F11.3 )' ) PSKY
-      ENDIF
+      WRITE( CSKY, '( G13.5 )' ) PSKY
 
-*   Signal - use E format if number is too large
-      IF ( ( SIGNAL .GT. 1.0E6 ) .OR. ( SIGNAL .LT. -1.0E6 ) ) THEN
-         WRITE( CSIG, '( E11.4 )' ) SIGNAL
-      ELSE
-         WRITE( CSIG, '( F11.3 )' ) SIGNAL
-      ENDIF
-
+*  Signal - use G format to cope with all values to at least five
+*  significant figures.
+      WRITE( CSIG, '( G13.5 )' ) SIGNAL
 
 *   Concatenate these into the output string.
       BUFFER = CXCEN//' '//CYCEN//' '//CMAG//' '//CERRMG//' '//CSKY//' '
