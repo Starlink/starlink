@@ -35,6 +35,7 @@
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *
 *  History:
 *     25-OCT-1999 (MBT):
@@ -42,9 +43,11 @@
 *     30-DEC-2011 (TIMJ):
 *        Use KPG1_SCALE for pixel scale calculation rather than
 *        calculating the value directly in ESP.
+*     3-JAN-2012 (DSB):
+*        KPG1_SCALE requires double precision (not integer) bounds.
 
 *  Copyright:
-*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2011-2012 Science & Technology Facilities Council.
 *     Copyright (C) 1999 Council for the Central Laboratory of the
 *     Research Councils. All Rights Reserved.
 
@@ -77,6 +80,8 @@
       INTEGER STATE                   ! Initial state of PSIZE parameter
       INTEGER UBND(2)                 ! Upper bounds of NDF
       LOGICAL INOKAY                  ! Have we got a good value for PSIZE?
+      DOUBLE PRECISION DLBND(2)       ! Double precision lower bounds
+      DOUBLE PRECISION DUBND(2)       ! Double precision upper bounds
       DOUBLE PRECISION SCALE(2)       ! Pixel scales in radians
       CHARACTER *15 UNIT(2)           ! Unit string of each axis
       CHARACTER *15 VALUE(2)          ! String form of pixel scales
@@ -123,10 +128,14 @@
 *      If there is a sky frame, use it to work out pixel size.
          IF (SKYFRM.NE.AST__NULL .AND. JGRID.NE.AST__NOFRAME) THEN
 
-*         Get the bounds of the NDF
+*         Get the double precision pixel coordinate bounds of the NDF
             CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM, STATUS )
+            DLBND( 1 ) = DBLE( LBND( 1 ) ) - 1.0D0
+            DUBND( 1 ) = DBLE( UBND( 1 ) )
+            DLBND( 2 ) = DBLE( LBND( 2 ) ) - 1.0D0
+            DUBND( 2 ) = DBLE( UBND( 2 ) )
 
-            CALL KPG1_SCALE( IWCS, LBND, UBND, SCALE, VALUE,
+            CALL KPG1_SCALE( IWCS, DLBND, DUBND, SCALE, VALUE,
      :           UNIT, STATUS )
 
 *         Get the mean pixel size in arcseconds.
