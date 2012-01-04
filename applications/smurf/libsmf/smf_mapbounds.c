@@ -30,7 +30,7 @@
 *     size = int (Given)
 *        Number of elements in igrp
 *     system = const char* (Given)
-*        String indicating the type of projection (e.g. "icrs")
+*        String indicating the sky coordinate system (e.g. "icrs")
 *     spacerefwcs = const AstFrameSet * (Given)
 *        Frameset corresponding to a reference WCS that should be
 *        used to define the output pixel grid. Can be NULL.
@@ -226,6 +226,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   double dlbnd[ 2 ];    /* Floating point lower bounds for output map */
   drcntrl_bits drcntrl_mask = 0;/* Mask to use for DRCONTROL on this instrument */
   double dubnd[ 2 ];    /* Floating point upper bounds for output map */
+  AstMapping *fast_map = NULL; /* Mapping from tracking to absolute map coords */
   smfFile *file = NULL;        /* SCUBA2 data file information */
   AstFitsChan *fitschan = NULL;/* Fits channels to construct WCS header */
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
@@ -245,6 +246,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                                   Sky <> PIXEL mapping in output
                                   FrameSet */
   AstSkyFrame *oskyframe = NULL;/* Output SkyFrame */
+  char *refsys = NULL;         /* Sky system from supplied reference FrameSet */
   dim_t textreme[4];           /* Time index corresponding to minmax TCS posn */
   AstFrame *skyin = NULL;      /* Sky Frame in input FrameSet */
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
@@ -275,8 +277,15 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   dubnd[ 1 ] = VAL__MIND;
 
   /* If we have a supplied reference WCS we can use that directly
-     without having to calculate it from the data */
-  if (spacerefwcs) oskyframe = astGetFrame( spacerefwcs, AST__CURRENT );
+     without having to calculate it from the data. Replace the requested
+     system with the system from the reference FrameSet (take a copy of the
+     string since astGetC may re-use its buffer). */
+  if (spacerefwcs) {
+     oskyframe = astGetFrame( spacerefwcs, AST__CURRENT );
+     int nc = 0;
+     refsys = astAppendString( NULL, &nc, astGetC( oskyframe, "System" ) );
+     system = refsys;
+  }
 
   /* Create array of returned smfBox structures and store a pointer
      to the next one to be initialised. */
@@ -300,7 +309,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
     if (*status != SAI__OK) {
       msgSeti( "I", i );
-      errRep( "smf_mapbounds", "Couldn ot open data file no ^I.", status );
+      errRep( "smf_mapbounds", "Could not open data file no ^I.", status );
       break;
     } else {
       if( *status == SAI__OK ) {
@@ -489,11 +498,6 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           /* Tidy up */
           fs = astAnnul( fs );
         }
-        /* Get a copy of the output SkyFrame and ensure it represents
-           absolute coords rather than offset coords. */
-        abskyframe = astCopy( oskyframe );
-        astClear( abskyframe, "SkyRefIs" );
-        astClear( abskyframe, "AlignOffset" );
 
         /* Create the output FrameSet */
         *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), " " );
@@ -504,6 +508,12 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         astInvert( oskymap );
 
       } /* End WCS FrameSet construction */
+
+      /* Get a copy of the output SkyFrame and ensure it represents
+         absolute coords rather than offset coords. */
+      abskyframe = astCopy( oskyframe );
+      astClear( abskyframe, "SkyRefIs" );
+      astClear( abskyframe, "AlignOffset" );
 
       maxloop = (data->dims)[2];
       if (fast) {
@@ -529,9 +539,20 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           fubnd[ 1 ] = VAL__MIND;
           for (j=0; j<4; j++) { textreme[j] = (dim_t)VAL__BADI; }
 
-          /* see if the input frame is moving but the output is not */
+          /* If the output and tracking systems are different, get a
+             Mapping between them. */
           tracksys = sc2ast_convert_system( (hdr->allState)[goodidx].tcs_tr_sys,
                                             status );
+          if( strcmp( system, tracksys ) ) {
+             AstSkyFrame *tempsf = astCopy( abskyframe );
+             astSetC( tempsf, "System", tracksys );
+             AstFrameSet *tempfs = astConvert( tempsf, abskyframe, "" );
+             fast_map = astGetMapping( tempfs, AST__BASE, AST__CURRENT );
+             tempsf = astAnnul( tempsf );
+             tempfs = astAnnul( tempfs );
+          }
+
+          /* see if the input frame is moving but the output is not */
           if (strcmp(tracksys, "GAPPT") == 0 ||
               strcmp(tracksys, "AZEL") == 0) {
             if (strcmp(system, "APP") != 0 &&
@@ -539,6 +560,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
               usefixedbase = 1;
               bc1 = (hdr->allState)[goodidx].tcs_tr_bc1;
               bc2 = (hdr->allState)[goodidx].tcs_tr_bc2;
+              if( fast_map ) astTran2( fast_map, 1, &bc1, &bc2, 1, &bc1, &bc2 );
             }
           }
 
@@ -568,7 +590,12 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
             if (!usefixedbase) {
               bc1 = state.tcs_tr_bc1;
               bc2 = state.tcs_tr_bc2;
+              if( fast_map ) astTran2( fast_map, 1, &bc1, &bc2, 1, &bc1, &bc2 );
             }
+
+            /* If required, map actual position into absolute output
+               coords. */
+            if( fast_map ) astTran2( fast_map, 1, &ac1, &ac2, 1, &ac1, &ac2 );
 
             /* calculate the separation of ACTUAL from BASE */
             slaDs2tp(ac1,ac2,bc1,bc2, &offx, &offy, &jstat );
@@ -785,6 +812,8 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
   if( data != NULL )
     smf_close_file( &data, status );
+
+  refsys = astFree( refsys );
 
   astEnd;
 

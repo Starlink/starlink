@@ -297,7 +297,8 @@
 *          ICRS, GAPPT, FK5, FK4, FK4-NO-E, AZEL, GALACTIC, ECLIPTIC. It
 *          can also be given the value "TRACKING", in which case the
 *          system used will be which ever system was used as the tracking
-*          system during the observation.
+*          system during the observation. The supplied value is ignored
+*          if a value is supplied for parameter "REF".
 *
 *          The choice of system also determines if the telescope is
 *          considered to be tracking a moving object such as a planet or
