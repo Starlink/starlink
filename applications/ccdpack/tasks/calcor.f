@@ -313,6 +313,13 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     14-FEB-2001 (MBT):
 *        Upgraded for use with Sets.
+*     4-JAN-2012 (DSB):
+*        Store provenance info explicitly in each output NDF, rather than
+*        relying on the provenance block within the monolith routine.
+*        This is needed because the loop over output NDF is done within
+*        this subroutine rather than within the monolith (as is done for
+*        instance in KAPPA). This causes all input NDFs to be recorded as
+*        ancestors of all output NDFs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -345,6 +352,7 @@
       DOUBLE PRECISION EFACT( CCD1__MXNDF ) ! Exposure factors for subgroup
       DOUBLE PRECISION EXPOSE    ! Exposure factor (dark or flash).
       DOUBLE PRECISION SATVAL    ! Saturation value
+      INTEGER ANCS( 2 )          ! Ancestor NDFs
       INTEGER CALGRP             ! GRP identifier for CAL NDFs
       INTEGER EL                 ! Number of elements in input array components
       INTEGER GIDIN              ! Group identifier for input NDFs
@@ -708,6 +716,18 @@
                CALL CCD1_TOUCH( IDOUT, 'FLASHCOR', STATUS )
             END IF
             CALL CCD1_TOUCH( IDOUT, 'CALCOR', STATUS )
+
+*  We cannot rely on the NDG provenance block established in the CCDPACK
+*  monolith routine, since it would make all output NDFs depend on all
+*  input NDFs. Instead, we store provenance info in the output NDF
+*  explicitly, by copying provenance info from just the current input NDF
+*  and the calibration frame to the output NDF. When the provenance block
+*  established in the monolith routine ends, the presence of this provenance
+*  in the output NDF will prevent any further provenance being added to the
+*  output NDF.
+            ANCS( 1 ) = IDIN
+            ANCS( 2 ) = IDCAL
+            CALL NDG_ADDPROV( IDOUT, 'CCDPACK:CALCOR', 2, ANCS, STATUS )
 
 *  Write terminator for Processing NDF: message.
             CALL CCD1_MSG( ' ', '  ---',STATUS )
