@@ -37,6 +37,7 @@
 *     "NDG" string (C and F77 versions are documented individually in
 *     separate prologues below):
 *
+*     - ndfAddProv: Record multiple input NDFs as ancestors in an output NDF.
 *     - ndgCopyProv: Create a deep copy of a provenance structure.
 *     - ndgCountProv: Return the number of ancestors in a provenance structure.
 *     - ndgFormatProv: Format all the information in a provenance structure.
@@ -144,7 +145,7 @@
 *     software that performed the action.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -268,6 +269,8 @@
 *         - Change ndg1TheSame to compare equivalent parents. Previously,
 *         this depended on the parents being stored in the same order in
 *         the two Provs being compared. But the order is arbitrary.
+*      4-JAN-2012 (DSB):
+*         Added ndgAddProv/NDF_ADDPROV.
 */
 
 
@@ -497,6 +500,62 @@ static void Issue( Prov * );
 
 /* Public F77 wrapper functions. */
 /* ============================= */
+
+F77_SUBROUTINE(ndg_addprov)( INTEGER(indf), CHARACTER(fcreator), INTEGER(nndf),
+                             INTEGER_ARRAY(ndfs), INTEGER(status)
+                             TRAIL(fcreator) ){
+/*
+*+
+*  Name:
+*     NDG_ADDPROV
+
+*  Purpose:
+*     Record multiple input NDFs as ancestors in an output NDF.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_ADDPROV( INDF, CREATOR, NNDF, NDFS, STATUS )
+
+*  Description:
+*     This routine reads provenance from the specified output NDF, and
+*     then records each of the specified input NDFs as ancestors within
+*     the output provenance. It then writes the modified provenance back
+*     out to the output NDF.
+*
+*     It is a simplified wrapper for NDG_READPROV, NDG_PUTPROV AND
+*     NDG_WRITEPROV. It is more restrictive than use of NDF_PUTPROV
+*     since it stores no extra information ("MORE") with any of the
+*     ancestors, and does not force any of the ancestors to be root
+*     ancestors.
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        An identifier for the output NDF.
+*     CREATOR = CHARACTER * ( * ) (Given)
+*        A text identifier for the software that created INDF (usually the
+*        name of the calling application). The format of the identifier
+*        is arbitrary, but the form "PACKAGE:COMMAND" is recommended.
+*     NNDF = INTEGER (Given)
+*        The number of input NDFs.
+*     NDFS( NNDF ) = INTEGER (Given)
+*        An array of identifiers for the input NDFs.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+*-
+*/
+   GENPTR_INTEGER(indf)
+   GENPTR_CHARACTER(fcreator)
+   GENPTR_INTEGER(nndf)
+   GENPTR_INTEGER_ARRAY(ndfs)
+   GENPTR_INTEGER(status)
+   char *creator = NULL;
+
+   creator = cnfCreim( fcreator, fcreator_length );
+   ndgAddProv( *indf, creator, *nndf, ndfs, status );
+   cnfFree( creator );
+}
 
 F77_SUBROUTINE(ndg_antmp)( CHARACTER(floc), INTEGER(status) TRAIL(floc) ){
 /*
@@ -1420,6 +1479,74 @@ F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(whdef),
 
 /* Public C functions. */
 /* =================== */
+
+void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs,
+                 int *status ){
+/*
+*+
+*  Name:
+*     ndgPutProv
+
+*  Purpose:
+*     Record multiple input NDFs as ancestors in an output NDF.
+
+*  Invocation:
+*     ndgAddProv( int indf, const char *creator, int nndf, int *ndfs,
+*                 int *status )
+
+*  Description:
+*     This routine reads provenance from the specified output NDF, and
+*     then records each of the specified input NDFs as ancestors within
+*     the output provenance. It then writes the modified provenance back
+*     out to the output NDF.
+*
+*     It is a simplified wrapper for ndgReadProv, ndgPutProv and
+*     ndgWriteProv. It is more restrictive than use of ndgPutProv
+*     since it stores no extra information ("MORE") with any of the
+*     ancestors, and does not force any of the ancestors to be root
+*     ancestors.
+
+*  Arguments:
+*     indf
+*        An identifier for the output NDF.
+*     creator
+*        A text identifier for the software that created INDF (usually the
+*        name of the calling application). The format of the identifier
+*        is arbitrary, but the form "PACKAGE:COMMAND" is recommended.
+*        This value is only used if the the NDF does not contain any
+*        existing provenance information.
+*     nndf
+*        The number of input NDFs.
+*     ndfs
+*        A pointer to an array of identifiers for the input NDFs.
+*     status
+*        The global status.
+*-
+*/
+
+/* Local Variables: */
+   NdgProvenance *prov;
+   int i;
+
+/* Return if an error has occurred. */
+   if( *status != SAI__OK ) return;
+
+/* Get the provenance info from the output NDF. */
+   prov = ndgReadProv( indf, creator, status );
+
+/* Loop round, adding each input NDF as an ancestor into the output
+   provenance info. */
+   for( i = 0; i < nndf; i++ ) {
+      ndgPutProv( prov, ndfs[ i ], NULL, NULL, 0, status );
+   }
+
+/* Write the provenance info back out to the output NDF. Ensure default
+   NDF history is written to the NDF before writing the provenance info. */
+   ndgWriteProv( prov, indf, 1, status );
+
+/* Free the provenance info. */
+   prov = ndgFreeProv( prov, status );
+}
 
 void ndgAntmp( HDSLoc **loc, int *status ){
 /*
