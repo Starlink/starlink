@@ -996,7 +996,8 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
 void smf_filter2d_gauss( smfFilter *filt, double fwhm, int *status );
 
 void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
-                          double minfreq, double maxfreq, int *status );
+                          double minfreq, double maxfreq, size_t smooth,
+                          int *status );
 
 void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
                          int complement, int whiten, int *status );

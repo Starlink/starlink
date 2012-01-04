@@ -159,7 +159,6 @@ void smurf_sc2filtermap( int *status ) {
     /* Write out the filter? */
     parState( "OUTFILTER", &parstate, status );
     if( parstate != PAR__GROUND ) {
-      printf("here.... %i\n", parstate);
       kpg1Wgndf( "OUTFILTER", igrp, size, size,
                  "More output filter files required...",
                  &fgrp, &fsize, status );
@@ -271,7 +270,7 @@ void smurf_sc2filtermap( int *status ) {
 
     if( whiten ) {
       msgOut( "", TASK_NAME ": whitening the filter", status );
-      smf_filter2d_whiten( wf, filt, wrefmap, 0, 0, status );
+      smf_filter2d_whiten( wf, filt, wrefmap, 0, 0, 3, status );
     }
 
     if( filt_edgelow ) {

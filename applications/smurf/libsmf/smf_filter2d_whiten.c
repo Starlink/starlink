@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
-*                          double minfreq, double maxfreq, int *status );
+*                          double minfreq, double maxfreq, size_t smooth,
+*                          int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -29,6 +30,10 @@
 *        Maximum spatial frequency to consider for the fit. If 0 assumed
 *        to be Nyquist frequency. If greater than Nyquist it will automatically
 *        be truncated to Nyquist. (1/arcsec)
+*     size_t smooth (Given)
+*        If set, instead of using fitted model, smooth azimuthally-averaged
+*        angular power spectrum by box of this size and use that to estimate
+*        the whitening filter.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -37,11 +42,17 @@
 *  Description:
 *     This function calculates the azimuthally-averaged angular power
 *     spectrum, and then fits a white component + 1/f component within
-*     the spatial frequency range indicated by minfreq and maxfreq. The
-*     complement of this spectrum is then applied to the supplied filter.
-*     The supplied "map" does not need to have the same dimensions as the
-*     map to which "filt" will ultimately be applied as it is simply used
-*     to fit the coefficients for the model spectrum.
+*     the spatial frequency range indicated by minfreq and
+*     maxfreq. The complement of this spectrum is then applied to the
+*     supplied filter.  The supplied "map" does not need to have the
+*     same dimensions as the map to which "filt" will ultimately be
+*     applied as it is simply used to fit the coefficients for the
+*     model spectrum. An alternative is to set smooth, and then the
+*     whitening filter will be taken literally as the complement of
+*     the (square root) of the smoothed azimuthally-average power
+*     spectrum. Good if the simple model is not a good fit. Note that
+*     the normalization in this case is still taken as the white noise
+*     level from the fitted model.
 
 *  Notes:
 
@@ -52,10 +63,12 @@
 *  History:
 *     2011-10-04 (EC):
 *        Initial version
+*     2012-01-04 (EC):
+*        Add "smooth" option
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011University of British Columbia.
+*     Copyright (C) 2011-2012 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -97,8 +110,11 @@
 
 #define FUNC_NAME "smf_filter2d_whiten"
 
+#define WHITEN_BOX 3
+
 void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
-                          double minfreq, double maxfreq, int *status ) {
+                          double minfreq, double maxfreq, size_t smooth,
+                          int *status ) {
 
   double A;                     /* Amplitude 1/f component */
   double B;                     /* exponent of 1/f component */
@@ -106,8 +122,10 @@ void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
   size_t i;                     /* Loop counter */
   size_t j;                     /* Loop counter */
   size_t ndims=0;               /* Number of real-space dimensions */
+  size_t nf=0;                  /* Number of frequencies */
   smfData *map_fft=NULL;        /* FFT of the map */
   smfData *pspec=NULL;          /* Az-averaged PSPEC of map */
+  double *smoothed_filter=NULL; /* Smoothed power spectrum */
   double W;                     /* White noise level */
 
   if( *status != SAI__OK ) return;
@@ -132,8 +150,9 @@ void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
     return;
   }
 
-  /* Check for reasonable frequencies */
-  if( maxfreq < minfreq ) {
+  /* Check for reasonable frequencies -- noting that maxfreq=0 defaults to
+     nyquist. */
+  if( maxfreq && (maxfreq < minfreq) ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": maxfreq < minfreq!", status );
     return;
@@ -143,42 +162,105 @@ void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
   map_fft = smf_fft_data( wf, map, NULL, 0, 0, status );
   smf_fft_cart2pol( map_fft, 0, 1, status );
   pspec = smf_fft_2dazav( map_fft, &df, status );
+  if( *status == SAI__OK ) nf = pspec->dims[0];
   smf_close_file( &map_fft, status );
 
-  /* Fit model */
-  smf_fit_pspec( pspec->pntr[0], pspec->dims[0], 10, df, minfreq, 0.1, maxfreq,
-                 &A, &B, &W, status );
+  /* Fit power-law + white level model */
+  smf_fit_pspec( pspec->pntr[0], pspec->dims[0], 10, df, minfreq, 0.1,
+                 maxfreq, &A, &B, &W, status );
 
   msgOutiff( MSG__DEBUG, "", FUNC_NAME
              ": P(f) = %lg*f^%lg + %lg\n", status, A, B, W );
 
-  /* Apply complement of model to the supplied filter */
-  if( *status == SAI__OK ) {
-    double d;
-    double model;
-    double x;
-    double y;
+  if( smooth ) {
+    /* Smooth pspec to estimate the radial power spectrum, but normalize
+       by the white-noise level from the fit to preserve
+       normalization -------------------------------------------------------- */
 
-    /* We fit a model to the power spectrum, but we want to apply its
-       complement to the FFT of the data. So we normalize by the
-       white-noise level, and take the square root of the model before
-       writing its complement to the filter buffer */
+    smoothed_filter = astMalloc( nf*sizeof(*smoothed_filter) );
 
-    A = sqrt(A / W);
-    B = B / 2.;
+    if( *status == SAI__OK ) {
+      memcpy( smoothed_filter, pspec->pntr[0], nf*sizeof(smoothed_filter) );
+    }
 
-    for( i=0; i<filt->fdims[0]; i++ ) {
-      x =  FFT_INDEX_TO_FREQ(i,filt->rdims[0]) * filt->df[0];
+    smf_tophat1D( smoothed_filter, nf, smooth, NULL, 0, 0.5, status );
 
-      for( j=0; j<filt->fdims[1]; j++ ) {
-        y =  FFT_INDEX_TO_FREQ(j,filt->rdims[1]) * filt->df[1];
-        d = sqrt(x*x + y*y);
-        model = 1. + A * pow(d,B);
+    /* Replace bad values (where not enough values to calculate median) with
+       the original values. Then normalize by the white noise level,
+       and take inverse square root */
+    if( *status == SAI__OK ) {
+      for( i=0; i<nf; i++ ) {
+        if( smoothed_filter[i] != VAL__BADD ) {
+          smoothed_filter[i] = 1./sqrt(smoothed_filter[i]/W);
+        } else if( i < smooth ) {
+          /* Filter to 0 at low frequencies where we can't estimate median */
+          smoothed_filter[i] = 0;
+        } else {
+          /* Close to Nyquist we set the filter gain to 1 so that it doesn't
+             do anything */
+          smoothed_filter[i] = 1;
+        }
+      }
+    }
 
-        filt->real[i + j*filt->fdims[0]] /= model;
-        if( filt->imag ) filt->imag[i + j*filt->fdims[0]] /= model;
+    /* Copy radial filter into 2d filter */
+    if( *status == SAI__OK ) {
+      double d;
+      double model;
+      double x;
+      double y;
+
+      for( i=0; i<filt->fdims[0]; i++ ) {
+        x =  FFT_INDEX_TO_FREQ(i,filt->rdims[0]) * filt->df[0];
+
+        for( j=0; j<filt->fdims[1]; j++ ) {
+          y =  FFT_INDEX_TO_FREQ(j,filt->rdims[1]) * filt->df[1];
+          d = round(sqrt(x*x + y*y)/df);
+
+          if( d < nf) {
+            model = smoothed_filter[ (size_t) d];
+          } else {
+            model = 1;
+          }
+
+          filt->real[i + j*filt->fdims[0]] *= model;
+          if( filt->imag ) filt->imag[i + j*filt->fdims[0]] *= model;
+        }
+      }
+    }
+  } else {
+    /* --- otherwise use the smooth fitted model ---------------------------- */
+
+    if( *status == SAI__OK ) {
+      double d;
+      double model;
+      double x;
+      double y;
+
+      /* We fit a model to the power spectrum, but we want to apply its
+         complement to the FFT of the data. So we normalize by the
+         white-noise level, and take the square root of the model before
+         writing its complement to the filter buffer */
+
+      A = sqrt(A / W);
+      B = B / 2.;
+
+      for( i=0; i<filt->fdims[0]; i++ ) {
+        x =  FFT_INDEX_TO_FREQ(i,filt->rdims[0]) * filt->df[0];
+
+        for( j=0; j<filt->fdims[1]; j++ ) {
+          y =  FFT_INDEX_TO_FREQ(j,filt->rdims[1]) * filt->df[1];
+          d = sqrt(x*x + y*y);
+          model = 1. + A * pow(d,B);
+
+          filt->real[i + j*filt->fdims[0]] /= model;
+          if( filt->imag ) filt->imag[i + j*filt->fdims[0]] /= model;
+        }
       }
     }
   }
 
+  /* Clean up */
+  if( pspec ) smf_close_file( &pspec, status );
+  if( smoothed_filter ) smoothed_filter = astFree( smoothed_filter );
 }
