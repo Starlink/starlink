@@ -26,7 +26,8 @@
 *        Override VARIANCE component of data with variance stored as the
 *        main data array of a second smfData called variance. variance
 *        can have the length of the time dimension be 0 in which case it
-*        is replicated at each time slice in the output file.
+*        is replicated at each time slice in the output file. Only works
+*        for 3d time-series data.
 *     filename = const char * (Given)
 *        Name of output NDF if non-NULL. If NULL the filename is obtained
 *        from the group.
@@ -100,11 +101,13 @@
 *        can be a null pointer. Use grpMsg.
 *     2011-08-08 (EC):
 *        Added msglev
+*     2012-01-04 (EC):
+*        Try to writing wcs if tswcs doesn't exist to handle images
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
-*     Copyright (C) 2008-2011 University of British Columbia.
+*     Copyright (C) 2008-2012 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -229,7 +232,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     smf_get_dims( data, NULL, &ncols, &nbolo, &ntslice, &nelem, &dbstride,
                   &dtstride, status );
 
-    /* Only handle variance for 3d data */
+    /* Only handle variance override for 3d data */
     if( variance ) {
       var = variance->pntr[0];
 
@@ -329,7 +332,6 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
 
     /* header information */
     if (inhdr && *status == SAI__OK) {
-
       /* FITS header */
       if (inhdr->fitshdr) kpgPtfts( outfile->ndfid, inhdr->fitshdr, status );
 
@@ -341,12 +343,24 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
       if ( strlen(inhdr->dlabel) ) ndfCput( inhdr->dlabel, outfile->ndfid,
                                            "Label", status );
 
-      /* WCS */
+      /* WCS: if tswcs exists use it, otherwise wcs to handle 2d images */
       if( inhdr->tswcs ) {
         ndfPtwcs( inhdr->tswcs, outfile->ndfid, status );
         /* annul bad status caused by dimension mismatch */
         if( *status == NDF__NAXIN ) {
           errAnnul( status );
+          msgOutif( MSG__VERB, "", FUNC_NAME
+                    ": warning, tswcs not written due to dimension mismatch",
+                    status );
+        }
+      } else if( inhdr->wcs ) {
+        ndfPtwcs( inhdr->wcs, outfile->ndfid, status );
+        /* annul bad status caused by dimension mismatch */
+        if( *status == NDF__NAXIN ) {
+          errAnnul( status );
+          msgOutif( MSG__VERB, "", FUNC_NAME
+                    ": warning, wcs not written due to dimension mismatch",
+                    status );
         }
       }
 

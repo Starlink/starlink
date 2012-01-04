@@ -43,6 +43,9 @@
 *  History:
 *     2011-10-03 (EC):
 *        Initial version based on smf_filter_execute
+*     2012-01-04 (EC):
+*        Use WCS from original image since smf_fft_data doesn't calculate
+*        it for the inverse transform.
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -97,6 +100,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
   size_t i;                     /* loop counter */
   size_t ndims=0;               /* Number of real-space dimensions */
   size_t nfdata;                /* Total number of frequency data points */
+  AstFrameSet *wcs=NULL;        /* Copy of real-space WCS */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -160,6 +164,11 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
   /* Using complement of the filter? */
   if( complement ) smf_filter_complement( filt, status );
 
+  /* Get a copy of the wcs of the input map */
+  if( data->hdr && data->hdr->wcs ) {
+    wcs = astCopy( data->hdr->wcs );
+  }
+
   /* Transform the data */
   fdata = smf_fft_data( wf, data, NULL, 0, 0, status );
 
@@ -187,6 +196,19 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
 
   /* Transform back */
   smf_fft_data( wf, fdata, data, 1, 0, status );
+
+  /* Insert the copy of original real-space WCS into the smfHead since
+     smf_fft_data does not currently calculate it for inverse
+     transforms. */
+
+  if( data->hdr ) {
+    /* Annul current wcs if it exists */
+    if( data->hdr->wcs ) {
+      data->hdr->wcs = astAnnul( data->hdr->wcs );
+    }
+    data->hdr->wcs = wcs;
+  }
+
 
   /* Return the filter to its original state if required */
   if( complement == -1 ) smf_filter_complement( filt, status );

@@ -58,6 +58,7 @@
 *     multiple threads.
 
 *  Notes:
+*     No WCS is produced for inverse transformed data.
 
 *  Authors:
 *     Ed Chapin (UBC)
