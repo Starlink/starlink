@@ -1095,6 +1095,9 @@ int smf_fits_updateD( smfHead * hdr, const char * name, double value,
 int smf_fits_updateI( smfHead * hdr, const char * name, int value,
                       const char * comment, int *status );
 
+int smf_fits_updateL( smfHead * hdr, const char * name, int value,
+                      const char * comment, int *status );
+
 int smf_fits_updateS( smfHead * hdr, const char * name, const char * value,
                       const char * comment, int *status );
 

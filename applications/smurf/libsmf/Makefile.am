@@ -178,6 +178,7 @@ smf_fits_getS.c \
 smf_fits_outhdr.c \
 smf_fits_updateD.c \
 smf_fits_updateI.c \
+smf_fits_updateL.c \
 smf_fits_updateS.c \
 smf_fits_updateU.c \
 smf_fix_data.c \
