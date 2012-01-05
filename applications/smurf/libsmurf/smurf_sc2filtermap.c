@@ -126,6 +126,8 @@ void smurf_sc2filtermap( int *status ) {
   smfData *idata;           /* Pointer to input smfData */
   Grp *igrp = NULL;         /* Input group of files */
   int isfft=0;              /* Are data fft or real space? */
+  int *mask=NULL;           /* Mask indicating where bad data are */
+  size_t ndata=0;           /* Number of pixels in the map */
   size_t ndims;             /* Number of real space dimensions */
   smfData *odata=NULL;      /* Pointer to output smfData to be exported */
   Grp *ogrp = NULL;         /* Output group of files */
@@ -197,7 +199,6 @@ void smurf_sc2filtermap( int *status ) {
     if( (*status==SAI__OK) && zerobad ) {
       double *d=NULL;
       size_t j;
-      size_t ndata;
 
       ndata=1;
       for( j=0; j<wrefmap->ndims; j++ ) ndata *= wrefmap->dims[j];
@@ -242,19 +243,23 @@ void smurf_sc2filtermap( int *status ) {
     if( (*status==SAI__OK) && zerobad ) {
       double *d=NULL;
       size_t j, k;
-      size_t ndata;
 
       ndata=1;
       for( j=0; j<odata->ndims; j++ ) ndata *= odata->dims[j];
 
-      /* Do both DATA and VARIANCE */
-      for( k=0; k<2; k++ ) {
-        d = odata->pntr[k];
+      mask = astCalloc( ndata, sizeof(*mask) );
 
-        if( d ) {
-          for( j=0; j<ndata; j++ ) {
-            if( d[j] == VAL__BADD ) {
-              d[j] = 0;
+      /* Do both DATA and VARIANCE */
+      if( *status == SAI__OK ) {
+        for( k=0; k<2; k++ ) {
+          d = odata->pntr[k];
+
+          if( d ) {
+            for( j=0; j<ndata; j++ ) {
+              if( d[j] == VAL__BADD ) {
+                d[j] = 0;
+                mask[j] = 1;
+              }
             }
           }
         }
@@ -291,6 +296,25 @@ void smurf_sc2filtermap( int *status ) {
 
     smf_filter_execute( wf, odata, filt, 0, 0, status );
 
+    /* Set bad values from the mask */
+    if( mask ) {
+      double *d=NULL;
+      size_t j, k;
+
+      /* Do both DATA and VARIANCE */
+      for( k=0; k<2; k++ ) {
+        d = odata->pntr[k];
+
+        if( d ) {
+          for( j=0; j<ndata; j++ ) {
+            if( mask[j] ) {
+              d[j] = VAL__BADD;
+            }
+          }
+        }
+      }
+    }
+
     /* Export the data to a new file */
     smf_write_smfData( odata, NULL, NULL, ogrp, i, 0, MSG__NORM, status );
 
@@ -309,6 +333,8 @@ void smurf_sc2filtermap( int *status ) {
 
   if( odata ) smf_close_file( &odata, status );
   if( wrefmap ) smf_close_file( &wrefmap, status );
+
+  if( mask ) mask = astFree( mask );
 
   ndfEnd( status );
 
