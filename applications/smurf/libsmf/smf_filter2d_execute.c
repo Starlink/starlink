@@ -44,11 +44,12 @@
 *     2011-10-03 (EC):
 *        Initial version based on smf_filter_execute
 *     2012-01-04 (EC):
-*        Use WCS from original image since smf_fft_data doesn't calculate
-*        it for the inverse transform.
-
+*        -Use WCS from original image since smf_fft_data doesn't calculate
+*         it for the inverse transform.
+*        -Apply filter to the VARIANCE component if it is supplied
+*
 *  Copyright:
-*     Copyright (C) 2011 University of British Columbia.
+*     Copyright (C) 2011-2012 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -100,6 +101,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
   size_t i;                     /* loop counter */
   size_t ndims=0;               /* Number of real-space dimensions */
   size_t nfdata;                /* Total number of frequency data points */
+  smfData *varfilt=NULL; /* real-space square of supplied filter for var */
   AstFrameSet *wcs=NULL;        /* Copy of real-space WCS */
 
   /* Main routine */
@@ -172,6 +174,16 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
   /* Transform the data */
   fdata = smf_fft_data( wf, data, NULL, 0, 0, status );
 
+  /* Copy the FFT of the data if we will also be filtering the VARIANCE
+     since this will get us a useful container of the correct dimensions
+     for the squared filter */
+  if( data->pntr[1] ) {
+    varfilt = smf_deepcopy_smfData( fdata, 0, SMF__NOCREATE_VARIANCE |
+                                    SMF__NOCREATE_QUALITY |
+                                    SMF__NOCREATE_FILE |
+                                    SMF__NOCREATE_DA, 0, 0, status );
+  }
+
   /* Apply the frequency-domain filter. */
   if( *status == SAI__OK ) {
     data_r = fdata->pntr[0];
@@ -209,8 +221,106 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     data->hdr->wcs = wcs;
   }
 
+  /* If we have a VARIANCE component we also need to smooth it. This
+     is slightly complicated because we have to do the equivalent of a
+     real-space convolution between the variance map and the
+     element-wise square of the real-space filter. So we first stuff
+     the supplied filter into a smfData (frequency space), take its
+     inverse to real space and square it. We then transform back to
+     frequency space, and run it through smf_filter2d_execute to apply
+     it to the VARIANCE map (which is also stuffed into its own
+     smfData and then copied into the correct location of the supplied
+     smfData when finished. */
+
+  if( (data->pntr[1]) && (*status==SAI__OK) ) {
+    size_t ndata;
+    double *ptr=NULL;
+    smfData *realfilter=NULL; /* Real space smfData container for var filter */
+    smfData *vardata=NULL;    /* smfData container for variance only */
+    smfFilter *vfilt=NULL;    /* The var filter */
+
+    /* Copy the filter into the smfData container and transform into the
+       time domain. */
+    ptr = varfilt->pntr[0];
+    memcpy(ptr, filt->real, nfdata*sizeof(*ptr));
+    if( filt->imag) {
+      memcpy(ptr+nfdata, filt->imag, nfdata*sizeof(*ptr));
+    } else {
+      memset(ptr+nfdata, 0, nfdata*sizeof(*ptr));
+    }
+
+    realfilter = smf_fft_data( wf, varfilt, NULL, 1, 0, status );
+    smf_close_file( &varfilt, status );
+
+    /* Square each element of the real-space filter and then transform
+       back to the frequency domain and stuff into a smfFilter
+       (vfilt). We just point the real and imaginary parts of the
+       smfFilter to the respective regions of the smfData to save
+       memory/time, but we need to be careful when freeing at the
+       end. */
+
+    if( *status == SAI__OK ) {
+      ptr = realfilter->pntr[0];
+
+      smf_get_dims( realfilter, NULL, NULL, NULL, NULL, &ndata, NULL, NULL,
+                    status );
+
+      if( *status == SAI__OK ) {
+        double norm = 1. / (double) ndata;
+        for(i=0; i<ndata; i++) {
+          /* Note that we need an additional normalization of N samples */
+          ptr[i] *= ptr[i] * norm;
+        }
+      }
+    }
+
+    varfilt =  smf_fft_data( wf, realfilter, NULL, 0, 0, status );
+
+    if( *status == SAI__OK ) {
+      ptr = varfilt->pntr[0];
+      vfilt = smf_create_smfFilter( data, status );
+      vfilt->real = ptr;
+      if( filt->isComplex ) {
+        /* Only worry about imaginary part if the original filter was
+           complex. */
+        vfilt->isComplex = 1;
+        vfilt->imag = ptr + nfdata;
+      }
+    }
+
+    /* Now stuff the variance array into a smfData and filter it. */
+    vardata = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_VARIANCE |
+                                    SMF__NOCREATE_QUALITY |
+                                    SMF__NOCREATE_FILE |
+                                    SMF__NOCREATE_DA, 0, 0, status );
+
+    if( *status == SAI__OK ) {
+      ptr = vardata->pntr[0];
+      memcpy( ptr, data->pntr[1], ndata*sizeof(*ptr) );
+      smf_filter2d_execute( wf, vardata, vfilt, 0, status );
+    }
+
+    /* Finally, copy the filtered variance into our output filtered smfData */
+    if( *status == SAI__OK ) {
+      ptr = data->pntr[1];
+      memcpy( ptr, vardata->pntr[0], ndata*sizeof(*ptr) );
+    }
+
+    /* Clean up */
+    if( realfilter ) smf_close_file( &realfilter, status );
+    if( vardata ) smf_close_file( &vardata, status );
+    if( vfilt ) {
+      vfilt->real = NULL;
+      vfilt->imag = NULL;
+      vfilt = smf_free_smfFilter( vfilt, status );
+    }
+
+  }
+
 
   /* Return the filter to its original state if required */
   if( complement == -1 ) smf_filter_complement( filt, status );
 
+  /* Clean up */
+  if( varfilt ) smf_close_file( &varfilt, status );
 }

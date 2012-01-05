@@ -241,21 +241,25 @@ void smurf_sc2filtermap( int *status ) {
     /* Set VAL__BADD to zero if requested */
     if( (*status==SAI__OK) && zerobad ) {
       double *d=NULL;
-      size_t j;
+      size_t j, k;
       size_t ndata;
 
       ndata=1;
       for( j=0; j<odata->ndims; j++ ) ndata *= odata->dims[j];
 
-      d = odata->pntr[0];
+      /* Do both DATA and VARIANCE */
+      for( k=0; k<2; k++ ) {
+        d = odata->pntr[k];
 
-      if( d ) {
-        for( j=0; j<ndata; j++ ) {
-          if( d[j] == VAL__BADD ) {
-            d[j] = 0;
+        if( d ) {
+          for( j=0; j<ndata; j++ ) {
+            if( d[j] == VAL__BADD ) {
+              d[j] = 0;
+            }
           }
         }
       }
+
     }
 
     /* Measure and apply the whitening filter. We need to do this
