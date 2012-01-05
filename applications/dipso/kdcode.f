@@ -118,8 +118,8 @@ C
       IF(IOP.EQ.2) T=-T
       F1=T
       GO TO 1000
-  990 WRITE(6,200) KARD(K1), BLEEP
-  200 FORMAT('   ELFINP:  illegal character ',A1,A1)
+  990 WRITE(6,200) CHAR(KARD(K1)), BLEEP
+  200 FORMAT('   ELFINP:  unexpected character "',A,'"',A1)
       GO TO 999
 !
   980 CONTINUE
