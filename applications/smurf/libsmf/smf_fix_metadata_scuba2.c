@@ -377,5 +377,42 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     have_fixed |= SMF__FIXED_FITSHDR;
   }
 
+  /* The second half of observation 14 on 20111215 (scuba2_00014_20111215T061536)
+     has a elevation pointing shift */
+  if (fitsvals.utdate == 20111215) {
+    char obsid[81];
+    const char fitskey[] = "FIXPCORR";
+    smf_getobsidss( hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status);
+
+    if (strcmp(obsid, "scuba2_00014_20111215T061536") == 0 ) {
+      int seqcount;
+      smf_getfitsi( hdr, "SEQCOUNT", &seqcount, status );
+      if (seqcount == 5) {
+        int have_fixed_pntg = 0;
+        smf_fits_getL( hdr, fitskey, &have_fixed_pntg, status );
+        if (*status == SMF__NOKWRD) {
+          have_fixed = 0;
+          errAnnul( status );
+        }
+        if (!have_fixed_pntg) {
+          size_t nframes = hdr->nframes;
+          size_t i;
+          const double dlon = 0.0;
+          const double dlat = -16.83; /* From making maps of each half */
+          /* Correct the pointing */
+          msgOutif( msglev, "", INDENT "Applying pointing anomaly correction", status );
+          for (i=0;i<nframes;i++) {
+            JCMTState * curstate = &((hdr->allState)[i]);
+            /* This is an AZEL correction */
+            smf_add_smu_pcorr( curstate, 1, dlon, dlat, status );
+          }
+          smf_fits_updateL(hdr, fitskey, 1, "Applied internal pointing correction", status);
+          have_fixed |= SMF__FIXED_JCMTSTATE;
+        }
+      }
+    }
+
+  }
+
   return have_fixed;
 }
