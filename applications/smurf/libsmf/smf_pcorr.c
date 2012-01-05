@@ -36,15 +36,18 @@
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     17-MAY-2011 (DSB):
 *        Original version.
+*     2012-01-04 (TIMJ):
+*        Move the SMU correction code to smf_add_smu_pcorr.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2012, 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -181,43 +184,10 @@ void smf_pcorr( smfHead *head, const Grp *igrp, int *status ){
          for( iframe = 0; iframe < head->nframes ; iframe++ ){
             state = head->allState + iframe;
 
-/* Get the rotation, in rads, from tracking north to elevation, measured
-   positive from tracking north to tracking east. */
-            rot = state->tcs_az_ang - state->tcs_tr_ang;
-            cosrot = cos( rot );
-            sinrot = sin( rot );
+/* Apply the correction */
+            smf_add_smu_pcorr( state, azel, dlon[ iframe ],
+                               dlat[ iframe ], status );
 
-/* Get the DLON/DLAT values in tracking and in azel. */
-            if( azel ) {
-               dlon_az = dlon[ iframe ];
-               dlat_az = dlat[ iframe ];
-               dlon_tr = -dlon_az*cosrot + dlat_az*sinrot;
-               dlat_tr =  dlon_az*sinrot + dlat_az*cosrot;
-
-            } else {
-               dlon_tr = dlon[ iframe ];
-               dlat_tr = dlat[ iframe ];
-               dlon_az = -dlon_tr*cosrot + dlat_tr*sinrot;
-               dlat_az =  dlon_tr*sinrot + dlat_tr*cosrot;
-            }
-
-/* Add the dlon and dlat values onto the SMU jiggle positions (note, these
-   are in units of arc-seconds, not radians). */
-            if(  state->smu_az_jig_x != VAL__BADD ) {
-               state->smu_az_jig_x -= dlon_az;
-            }
-
-            if(  state->smu_az_jig_y != VAL__BADD ) {
-               state->smu_az_jig_y -= dlat_az;
-            }
-
-            if(  state->smu_tr_jig_x != VAL__BADD ) {
-               state->smu_tr_jig_x -= dlon_tr;
-            }
-
-            if(  state->smu_tr_jig_y != VAL__BADD ) {
-               state->smu_tr_jig_y -= dlat_tr;
-            }
          }
       }
 

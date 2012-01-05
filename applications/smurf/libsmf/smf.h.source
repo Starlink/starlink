@@ -536,6 +536,9 @@ void smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
 void smf_add_grp_metadata( Grp *grp, const char *name, const char *value,
                            int *status );
 
+void smf_add_smu_pcorr( JCMTState *state, int isazel, double dlon,
+                        double dlat, int *status);
+
 void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status );
 
 void smf_addmap1( double *map1, double *mapweight1, int *hitsmap1,
