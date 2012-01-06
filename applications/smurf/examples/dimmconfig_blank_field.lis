@@ -28,9 +28,12 @@
 # you can identify the input files from the FITS header of the
 # extension, and remove them.
 #
+# If you only want to see a single itermap written for the final iteration
+# of each chunk set itermap=-1
+#
 # Setting shortmap=1 will give similar information, except now writing
 # out a map each time a single time around the scan pattern has been
-# completed.
+# completed (only for the final iteration).
 #
 # ***********************************************************
 
@@ -51,10 +54,3 @@ spikebox = 50
 450.filt_edge_largescale = 200
 850.filt_edge_largescale = 200
 
-# Deal with 4 min. of data at a time. This gives a slightly smaller
-# RMS, probably because the noise level in the detectors changes over
-# time; by handling smaller pieces a more accurate weighting will be
-# used. 4 min. should be plenty of time to complete at least a few
-# maps for all of the deep blank-field SRO projects.
-
-maxlen = 240
