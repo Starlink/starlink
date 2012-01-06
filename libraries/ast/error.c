@@ -144,7 +144,9 @@
 
 /* Configuration results. */
 /* ---------------------- */
+#if HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 /* Select the appropriate memory management functions. These will be the
    system's malloc, free and realloc unless AST was configured with the
