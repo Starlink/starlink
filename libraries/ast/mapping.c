@@ -328,7 +328,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 
 /* Configuration results  */
 /* ---------------------- */
-#include "config.h"
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 /* Interface definitions. */
 /* ---------------------- */
