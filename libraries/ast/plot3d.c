@@ -48,6 +48,8 @@ f     AST_PLOT3D
 *     class. The results of each plotting operation are automatically
 *     transformed into 3D graphical coordinates before being plotted
 *     using the facilities of the grf3d module linked into the application.
+*     Note, at least one of the three axes of the current Frame must be
+*     independent of the other two current Frame axes.
 *
 *     You may select different physical coordinate systems in which to
 *     plot (including the native graphical coordinate system itself)
@@ -8277,6 +8279,8 @@ f     - If a FrameSet is supplied (via the FRAME pointer), then
 *     all the Frames within this FrameSet become part of the new Plot3D
 *     (where their Frame indices are increased by 1), with the
 *     FrameSet's current Frame becoming the current Frame of the Plot3D.
+*     - At least one of the three axes of the current Frame must be
+*     independent of the other two current Frame axes.
 *     - If a null Object pointer (AST__NULL) is supplied (via the
 c     "frame" pointer), then the returned Plot3D will contain two
 f     FRAME pointer), then the returned Plot3D will contain two
