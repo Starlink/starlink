@@ -4,7 +4,7 @@
 *     Plot3D
 
 *  Purpose:
-*     Provide facilities for 2D graphical output.
+*     Provide facilities for 3D graphical output.
 
 *  Constructor Function:
 c     astPlot3D
@@ -4134,7 +4134,7 @@ static int Plot3DAttr( AstKeyMap *grfconID, int attr, double value,
 *     Plot3DAttr
 
 *  Purpose:
-*     Get or set the value of a 2D grf attribute.
+*     Get or set the value of a 3D grf attribute.
 
 *  Type:
 *     Private function.
@@ -4208,7 +4208,7 @@ static int Plot3DCap( AstKeyMap *grfconID, int cap, int value ){
 *     Plot3DCap
 
 *  Purpose:
-*     Determine if the 2D grf module has a given capability.
+*     Determine if the 3D grf module has a given capability.
 
 *  Type:
 *     Private function.
