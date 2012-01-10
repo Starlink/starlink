@@ -1,0 +1,33 @@
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+# *** Config for exporting SCUBA-2 data to process with other software ***
+#
+# In order to process SCUBA-2 data using other software there are several
+# specialized tasks that SMURF is well-suited for, in particular applying
+# the flatfields, and fixing / flagging some of the major glitches. This
+#
+# Config file:
+#
+#    1. Flags bad bolometers, fixes DC steps, and applies the flatfield
+#    2. Down-samples the data to a frequency appropriate for the scan speed
+#       and either 2 or 4-arcsec pixels at 450 and 850um respectively
+#    2. Exports these cleaned data to a file
+#    3. Runs a short 2-iteration map using generic settings in order to
+#       use the map-based despiker to generate a QUALITY array
+#    4. Exports the residual model component including the QUALITY array
+#    5. Writes-out the RA and DEC of every data sample
+#
+# ************************************************************************
+
+# Two iterations: just enough to get reasonable bolometer weights and estimate
+# a single map in which we can look for spikes
+numiter=2
+
+# write out the cleaned data prior to map-making
+exportclean=1
+
+# write out the pointing infortmation
+exportlonlat=1
+
+# write out the residual with the quality component
+exportndf = (res,qua)
