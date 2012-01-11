@@ -550,7 +550,7 @@
       ELSE
 
 *  Move to the next HDU.
-         OPEN = FOPEN
+         OPEN = .TRUE.
       END IF
 
 *  Validate the NDF identifier.
