@@ -14,8 +14,8 @@
 *   General Public License for more details.
 *
 *   You should have received a copy of the GNU Library General Public License
-*   along with this library; if not, write to the Free Software Foundation,
-*   Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*   along with this library; if not, write to the Free Software Foundation, 
+*   Inc., 51 Franklin Street,Fifth Floor, Boston, MA 02110-1301, USA
 *
 *   Correspondence concerning WCSLIB may be directed to:
 *      Internet email: mcalabre@atnf.csiro.au
