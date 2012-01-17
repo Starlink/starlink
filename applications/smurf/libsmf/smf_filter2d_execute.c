@@ -47,6 +47,8 @@
 *        -Use WCS from original image since smf_fft_data doesn't calculate
 *         it for the inverse transform.
 *        -Apply filter to the VARIANCE component if it is supplied
+*     2012-01-16 (DSB):
+*        Fix a memory leak (fdata was not closed).
 *
 *  Copyright:
 *     Copyright (C) 2011-2012 University of British Columbia.
@@ -323,4 +325,6 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
 
   /* Clean up */
   if( varfilt ) smf_close_file( &varfilt, status );
+  if( fdata ) smf_close_file( &fdata, status );
+
 }

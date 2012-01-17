@@ -379,6 +379,8 @@
 *     2011-11-21 (EC):
 *        -Use map directly instead of 3d cube projection for AST
 *        -Check convergence of map in addition to chi^2
+*     2012-01-16 (DSB):
+*        Fix a memory leak (zeromask was freed at the wrong time).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -2707,6 +2709,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         errEnd( status );
       }
+
+/* Free the zero mask. */
+      dat.zeromask = astFree( dat.zeromask );
     }
 
 #ifdef __ITERATEMAP_SHOW_MEM
@@ -2928,8 +2933,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   if( igroup ) {
     smf_close_smfGroup( &igroup, status );
   }
-
-  if( dat.zeromask ) dat.zeromask = astFree( dat.zeromask );
 
   fakemap = astFree( fakemap );
   if( fakendf != NDF__NOID ) ndfAnnul( &fakendf, status );
