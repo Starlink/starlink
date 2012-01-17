@@ -577,6 +577,13 @@ ext.taumethod =adaptive
 # example, if it is set to 5, after each iteration all pixels with a
 # SNR below this threshold will be set to 0.
 #
+# The ast.zero_snr_fwhm gives the FWHM of a Gaussian (in arcsec) with which
+# to smooth the mask specified by the ast.zero_snr value. If it is set to
+# zero, no smoothing is performed.
+#
+# The ast.zero_snr_low gives the value (in the range 0.0 to 1.0) at which
+# to threshold the smoothed mask specified by ast.zero_snr_fwhm.
+#
 # If ast.zero_notlast is set, on the final iteration this boundary
 # condition will not be applied. This feature will probably be useful
 # for deep point-source observations for which the large-scale noise
@@ -589,6 +596,8 @@ ext.taumethod =adaptive
 #ast.zero_lowhits = 0.1
 #ast.zero_notlast = 1
 #ast.zero_snr = 5
+#ast.zero_snr_fwhm = 30
+#ast.zero_snr_low = 0.05
 
 # The AST model can also perform map-based de-spiking after the first
 # iteration provided that there is also a NOI model present. The value

@@ -113,6 +113,8 @@ ast.zero_lowhits = 0
 ast.zero_notlast = 1
 ast.zero_circle = <undef>
 ast.zero_snr = <undef>
+ast.zero_snr_fwhm = 0
+ast.zero_snr_low = 0.05
 ast.zero_mask = <undef>
 ast.mapspike = 0
 

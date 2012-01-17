@@ -101,11 +101,13 @@
 *        Use the REF image for zero_mask to ensure matching pixel grids
 *     2011-11-21 (EC):
 *        Just use map itself instead of 3d cube to store AST model data
+*     2012-1-16 (DSB):
+*        Allow the SNR mask to be smoothed before bing used.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006-2011 University of British Columbia.
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -151,6 +153,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
+  double *dmask = NULL;         /* Pointer to floating point mask image */
   int dozero=0;                 /* zero boundaries on last iter? */
   double gaussbg;               /* gaussian background filter */
   int *hitsmap;                 /* Pointer to hitsmap data */
@@ -188,6 +191,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   double zero_lowhits=0;        /* Zero regions with low hit count? */
   int zero_notlast=0;           /* Don't zero on last iteration? */
   double zero_snr=0;            /* Zero regions with low SNR */
+  double zero_snr_low=0.05;     /* Low limit for smoothed SNR values */
+  double zero_snr_fwhm=0.0;     /* FWHM of smoothing kernel for SNR mask (arcsec) */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -332,6 +337,15 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
      some threshold? */
   astMapGet0D( kmap, "ZERO_SNR", &zero_snr );
 
+  /* If so, see if the SNR mask is to be smoothed. The zero_snr_fwhm
+     value is the FWHM of the smoothing Gaussian in arcsec. The
+     zero_snr_low value is the lower threshold for smoothed values that
+     are to be retained in the map. It should be in the range 0.0 to 1.0. */
+  if( zero_snr != 0.0 ) {
+    astMapGet0D( kmap, "ZERO_SNR_FWHM", &zero_snr_fwhm );
+    astMapGet0D( kmap, "ZERO_SNR_LOW", &zero_snr_low );
+  }
+
   /* Will we apply boundary conditions on last iteration ? */
   astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
 
@@ -380,7 +394,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
       filtermap->ndims = 2;
       filtermap->dims[0] = dat->ubnd_out[0]-dat->lbnd_out[0]+1;
       filtermap->dims[1] = dat->ubnd_out[1]-dat->lbnd_out[1]+1;
-      filtermap->hdr->wcs = dat->outfset;
+      filtermap->hdr->wcs = astClone( dat->outfset );
 
       /* Set bad values to 0... should really be some sort of apodization */
       for( i=0; i<dat->msize; i++ ) {
@@ -398,7 +412,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
       smf_filter_execute( wf, filtermap, filt, 0, 0, status );
 
       /* Unset pointers to avoid freeing them */
-      filtermap->hdr->wcs = NULL;
       filtermap->pntr[0] = NULL;
     }
 
@@ -452,15 +465,101 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     /* Zero regions below the cut in SNR */
 
     if( zero_snr ) {
-      for( i=0; i<dat->msize; i++ ) {
-        if( (map[i] != VAL__BADD) && (mapvar[i] != VAL__BADD) &&
-            (mapvar[i] > 0) && (map[i]/sqrt(mapvar[i]) < zero_snr) ) {
-          map[i] = 0;
-          mapweight[i] = VAL__BADD;
-          mapweightsq[i] = VAL__BADD;
-          mapvar[i] = VAL__BADD;
-          mapqual[i] |= SMF__MAPQ_ZERO;
-          newzero ++;
+
+      /* First handle the case where the mask is based on the unsmoothed
+         SNR values (using a sepaerate case is faster and requires less
+         memory). */
+      if( zero_snr_fwhm == 0.0 ) {
+        for( i=0; i<dat->msize; i++ ) {
+          if( (map[i] != VAL__BADD) && (mapvar[i] != VAL__BADD) &&
+              (mapvar[i] > 0) && (map[i]/sqrt(mapvar[i]) < zero_snr) ) {
+            map[i] = 0;
+            mapweight[i] = VAL__BADD;
+            mapweightsq[i] = VAL__BADD;
+            mapvar[i] = VAL__BADD;
+            mapqual[i] |= SMF__MAPQ_ZERO;
+            newzero ++;
+          }
+        }
+
+      /* Now handle cases where the mask is based on smoothed SNR
+         values. */
+      } else {
+
+        /* Allocate an array to hold the unsmoothed mask values (zero
+           or one). */
+        dmask = astMalloc( dat->msize*sizeof(*dmask) );
+        if( dmask ) {
+
+          /* Calculate the SNR value at every map pixel. If it is larger
+             than the threshold (zero_snr), store a 1 in the mask.
+             Otherwise store a zero in the mask. */
+          for( i = 0; i < dat->msize; i++ ) {
+            if( map[ i ] != VAL__BADD &&
+                mapvar[ i ] != VAL__BADD && mapvar[ i ] > 0.0 &&
+                map[ i ]/sqrt( mapvar[ i ] ) < zero_snr ) {
+               dmask[ i ] = 1.0;
+            } else {
+               dmask[ i ] = 0.0;
+            }
+          }
+
+          /* Put the mask into a smfData wrapper */
+          smfData *filtermap = smf_create_smfData( 0, status );
+          if( *status == SAI__OK ) {
+            filtermap->isFFT = -1;
+            filtermap->dtype = SMF__DOUBLE;
+            filtermap->pntr[0] = dmask;
+            filtermap->ndims = 2;
+            filtermap->dims[0] = dat->ubnd_out[0]-dat->lbnd_out[0]+1;
+            filtermap->dims[1] = dat->ubnd_out[1]-dat->lbnd_out[1]+1;
+            filtermap->hdr->wcs = astClone( dat->outfset );
+
+
+
+
+
+
+
+smf_write_smfData( filtermap, NULL, "Before", NULL, 0, 0, MSG__QUIET, status );
+
+
+
+
+
+
+            /* Create a Gaussian filter to smooth the mask. */
+            smfFilter *filt = smf_create_smfFilter( filtermap, status );
+            smf_filter2d_gauss( filt, zero_snr_fwhm, status );
+
+            /* Smooth the mask, and free the filter. */
+            smf_filter_execute( wf, filtermap, filt, 0, 0, status );
+            filt = smf_free_smfFilter( filt, status );
+
+
+
+
+smf_write_smfData( filtermap, NULL, "After", NULL, 0, 0, MSG__QUIET, status );
+
+
+
+            /* Unset pointers to avoid freeing them */
+            filtermap->pntr[0] = NULL;
+
+            /* Threshold the smoothed mask, and apply to the map. */
+            for( i = 0; i < dat->msize; i++ ) {
+              if( dmask[ i ] < zero_snr_low ) {
+                map[i] = 0;
+                mapweight[i] = VAL__BADD;
+                mapweightsq[i] = VAL__BADD;
+                mapvar[i] = VAL__BADD;
+                mapqual[i] |= SMF__MAPQ_ZERO;
+                newzero ++;
+              }
+            }
+          }
+          smf_close_file( &filtermap, status );
+          dmask = astFree( dmask );
         }
       }
     }
