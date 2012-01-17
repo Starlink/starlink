@@ -1260,11 +1260,25 @@ itcl::class gaia::GaiaCubeSpectrum {
                   set rdec [expr $rdec*180.0/$PI_]
                }
 
+               #  Are axes interchanged?
+               if { [$rtdimage_ astget "astime(2)"] } {
+                  set raindex 2
+                  set decindex 1
+               } else {
+                  set raindex 1
+                  set decindex 2
+               }
+
                #  Get extraction position in degrees (again), and work out
                #  the offsets to this reference position. If the coordinate
                #  system is measuring offset sky coordinates then we handle
                #  those differently.
-               lassign [$rtdimage_ astpix2wcs $iix $iiy 1 0] pra pdec
+               if { $raindex == 2 } {
+                  lassign [$rtdimage_ astpix2wcs $iix $iiy 1 0] pdec pra
+               } else {
+                  lassign [$rtdimage_ astpix2wcs $iix $iiy 1 0] pra pdec
+               }
+
                if { [$rtdimage_ astget "SkyRefIs"] != "Ignored" } {
                   set drefra [angdiff_ $pra 0.0]
                   set drefdec [angdiff_ $pdec 0.0]
@@ -1279,9 +1293,9 @@ itcl::class gaia::GaiaCubeSpectrum {
                #  Format reference RA and Dec.
                set skyframe [gaiautils::astskyframe "System=FK5,Digits=9"]
                set refra \
-                  [gaiautils::astformat $skyframe 1 [expr $rra*$PI_/180.0]]
+                  [gaiautils::astformat $skyframe $raindex [expr $rra*$PI_/180.0]]
                set refdec \
-                  [gaiautils::astformat $skyframe 2 [expr $rdec*$PI_/180.0]]
+                  [gaiautils::astformat $skyframe $decindex [expr $rdec*$PI_/180.0]]
                gaiautils::astannul $skyframe
             } msg
          }
