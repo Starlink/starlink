@@ -96,8 +96,6 @@ const char * smf_qfamily_str( smf_qfam_t qfamily, int * status ) {
   case SMF__QFAM_TCOMP:
     retval = "compressed time series";
     break;
-  default:
-    retval = NULL;
   }
 
   return retval;

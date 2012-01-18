@@ -109,7 +109,6 @@ void smf_meanshift( double *indata, double *outdata, int nel, int stride,
    int icentral;            /* Index of central element in current filter box */
    int iout;                /* Index of current output element */
    int isum;                /* Sum of index values in the box */
-   int isum2;               /* Sum of index values in the box */
    int iter;                /* Iteration count */
    int j;                   /* Index of box element */
    int jhi;                 /* Highest index of elements in box*/

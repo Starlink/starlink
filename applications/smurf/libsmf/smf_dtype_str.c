@@ -110,8 +110,6 @@ const char * smf_dtype_str( smf_dtype type, int * status ) {
   case SMF__UBYTE:
     retval = "_UBYTE";
     break;
-  default:
-    retval = NULL;
   }
 
   return retval;

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_apply_mask( smfData *indata,
-*                          const smfArray *bbms, smf_dark_sub_meth method,
+*                          const smfArray *bbms, smf_bbm_meth method,
 *                          smf_qual_t addqual, int *status)
 
 *  Arguments:
@@ -111,7 +111,7 @@
 #define FUNC_NAME "smf_apply_mask"
 
 void smf_apply_mask( smfData *indata,
-                     const smfArray *bbms, smf_dark_sub_meth method,
+                     const smfArray *bbms, smf_bbm_meth method,
                      smf_qual_t addqual, int *status) {
 
   size_t previdx;

@@ -106,8 +106,6 @@ const char * smf_swmode_str( smf_swmode mode, int * status ) {
   case SMF__SWM_SELF:
     retval = "self";
     break;
-  default:
-    retval = NULL;
   }
 
   return retval;

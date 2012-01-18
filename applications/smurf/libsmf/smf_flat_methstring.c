@@ -95,8 +95,6 @@ const char * smf_flat_methstring( smf_flatmeth flatmeth, int * status ) {
   case SMF__FLATMETH_POLY:
     retval = "POLYNOMIAL";
     break;
-  default:
-    retval = NULL;
   }
 
   return retval;

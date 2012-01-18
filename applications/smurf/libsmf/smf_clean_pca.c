@@ -304,8 +304,6 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   } else if( (pdata->operation == 2) && (*status == SAI__OK) ) {
     /* Operation 2: project data along eigenvectors ------------------------- */
 
-    size_t counter=0;
-
     check = 0;
 
     //printf("t1=%zu t2=%zu\n", pdata->t1, pdata->t2);

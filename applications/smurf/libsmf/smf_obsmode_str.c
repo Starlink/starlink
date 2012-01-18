@@ -111,8 +111,6 @@ const char * smf_obsmode_str( smf_obsmode mode, int * status ) {
   case SMF__OBS_JIGGLE:
     retval = "jiggle";
     break;
-  default:
-    retval = NULL;
   }
 
   return retval;

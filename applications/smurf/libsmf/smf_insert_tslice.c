@@ -102,6 +102,8 @@ void smf_insert_tslice (smfData **idata, smfData *tdata, int index, int *status 
   double *indataArr;
   double *tdataArr;
 
+  if (*status != SAI__OK) return;
+
   /* Number of points in time slice */
   npts = (tdata->dims)[0] * (tdata->dims)[1];
 

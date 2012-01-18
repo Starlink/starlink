@@ -93,13 +93,10 @@ void smf_pcorr( smfHead *head, const Grp *igrp, int *status ){
    double *dlat;
    double *dlon;
    double *tai;
-   double cosrot;
    double dlat_az;
    double dlat_tr;
    double dlon_az;
    double dlon_tr;
-   double rot;
-   double sinrot;
    int azel;
    void *p;
 
