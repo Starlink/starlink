@@ -1318,9 +1318,6 @@ void smf_history_write( const smfData* data, int *status);
 void
 smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int * status );
 
-void smf_insert_tslice ( smfData **idata, smfData *tdata, int index,
-                         int *status );
-
 inst_t smf_inst_get( const smfHead * hdr, int * status );
 
 void smf_instap_get( smfHead * hdr, int * status );
