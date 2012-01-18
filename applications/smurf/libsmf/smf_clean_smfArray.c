@@ -148,6 +148,7 @@
 #include "star/ndg.h"
 #include "prm_par.h"
 #include "par_par.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -340,7 +341,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
     }
 
     /* Apply optical efficiency corrections. */
-    strcpy( param, "OPTEFF" );
+    one_strlcpy( param, "OPTEFF", sizeof(param), status );
     smf_find_subarray( data->hdr, param + strlen(param),
                        sizeof(param) - strlen(param), NULL, status );
     astChrCase( NULL, param, 1, 0 );

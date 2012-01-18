@@ -279,6 +279,7 @@
 #include "star/atl.h"
 #include "star/kaplibs.h"
 #include "prm_par.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smurf_typ.h"
@@ -2348,7 +2349,7 @@ static AstKeyMap *GetHeader( FILE *fp, int *status ) {
 
 /* Otherwise take a copy of the line, minus the leading #. */
       } else {
-         strcpy( tbuf, buf + 1 );
+         one_strlcpy( tbuf, buf + 1, sizeof(tbuf), status );
       }
    }
 
