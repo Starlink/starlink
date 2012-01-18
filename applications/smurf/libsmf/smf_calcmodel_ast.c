@@ -105,6 +105,9 @@
 *        Allow the SNR mask to be smoothed before bing used.
 *     2012-1-17 (DSB):
 *        Prevent the SNR mask changing after a given number of iterations.
+*     2012-1-18 (DSB):
+*        ZERO_MASK and ZERO_CIRLE are of type AST__UNDEFTYPE, not
+*        AST__BADTYPE, when not set.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -237,8 +240,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   }
 
   /* Static masking constraints: circular region, or an external mask file */
-  if( ( (astMapType( kmap, "ZERO_CIRCLE" ) != AST__BADTYPE) ||
-        (astMapType( kmap, "ZERO_MASK" ) != AST__BADTYPE) ) &&
+  if( ( (astMapType( kmap, "ZERO_CIRCLE" ) != AST__UNDEFTYPE) ||
+        (astMapType( kmap, "ZERO_MASK" ) != AST__UNDEFTYPE) ) &&
       (dat->zeromask == NULL) && (*status == SAI__OK) ) {
 
     int refmask=0;                /* REF image supplies mask? */
