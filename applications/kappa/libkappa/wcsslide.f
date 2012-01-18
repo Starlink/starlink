@@ -112,6 +112,11 @@
 *        Original Version.
 *     25-FEB-2010 (DSB):
 *        Fix nasty bug in calculation of shifts when using ABS parameter.
+*     18-JAN-2012 (DSB):
+*        Ensure P2 is always offset in the positive direction from P1,
+*        regardless of the sign of P1. For instance, this bug caused
+*        positions with negative RA values to be offset in the negative
+*        direction.
 *     {enter_further_changes_here}
 
 *-
@@ -216,8 +221,9 @@
 *  axis.
          DO I = 1, NWCS
 
-*  Move the geodesic end-point along the I'th axis by a small amount.
-            P2( I ) = 1.001*P1( I )
+*  Move the geodesic end-point along the I'th axis (in the positive
+*  direction) by a small amount.
+            P2( I ) = P1( I ) + 0.001*ABS( P1( I ) )
             IF( P2( I ) .EQ. P1( I ) ) P2( I ) = 1.0
 
 *  Move away from P1 towards P2, by the distance given by SHIFT(I). The
