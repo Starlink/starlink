@@ -103,6 +103,8 @@
 *        Just use map itself instead of 3d cube to store AST model data
 *     2012-1-16 (DSB):
 *        Allow the SNR mask to be smoothed before bing used.
+*     2012-1-17 (DSB):
+*        Prevent the SNR mask changing after a given number of iterations.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -130,6 +132,9 @@
 *     {note_any_bugs_here}
 *-
 */
+
+/* System includes */
+#include <limits.h>
 
 /* Starlink includes */
 #include "mers.h"
@@ -193,6 +198,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   double zero_snr=0;            /* Zero regions with low SNR */
   double zero_snr_low=0.05;     /* Low limit for smoothed SNR values */
   double zero_snr_fwhm=0.0;     /* FWHM of smoothing kernel for SNR mask (arcsec) */
+  int zero_snr_freeze = INT_MAX;/* No. of iterations over which SNR mask can change */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -344,6 +350,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   if( zero_snr != 0.0 ) {
     astMapGet0D( kmap, "ZERO_SNR_FWHM", &zero_snr_fwhm );
     astMapGet0D( kmap, "ZERO_SNR_LOW", &zero_snr_low );
+    astMapGet0I( kmap, "ZERO_SNR_FREEZE", &zero_snr_freeze );
   }
 
   /* Will we apply boundary conditions on last iteration ? */
@@ -392,6 +399,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
       filtermap->dtype = SMF__DOUBLE;
       filtermap->pntr[0] = map;
       filtermap->ndims = 2;
+      filtermap->lbnd[0] = dat->lbnd_out[0];
+      filtermap->lbnd[1] = dat->lbnd_out[1];
       filtermap->dims[0] = dat->ubnd_out[0]-dat->lbnd_out[0]+1;
       filtermap->dims[1] = dat->ubnd_out[1]-dat->lbnd_out[1]+1;
       filtermap->hdr->wcs = astClone( dat->outfset );
@@ -462,12 +471,24 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
       }
     }
 
-    /* Zero regions below the cut in SNR */
+    /* Zero regions below the cut in SNR. We freeze the mask after a
+       small number of iterations in order to aid convergence. To freeze
+       the mask we take a copy of the mask and put it in dat->zeromask.
+       So only calculate a new SNR mask if there is no mask currently in
+       dat->zeromask. */
+    if( zero_snr && !dat->zeromask) {
 
-    if( zero_snr ) {
+      /* If the time has come to freeze the SNR mask, allocate memory to
+         store the frozen mask, initialising it to hold zeros. */
+      if( dat->iter == zero_snr_freeze ) {
+         dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask) );
+         msgOutiff( MSG__DEBUG, "", FUNC_NAME ": freezing SNR mask", status );
+      } else {
+         msgOutiff( MSG__DEBUG, "", FUNC_NAME ": calculating new SNR mask", status );
+      }
 
       /* First handle the case where the mask is based on the unsmoothed
-         SNR values (using a sepaerate case is faster and requires less
+         SNR values (using a separate case is faster and requires less
          memory). */
       if( zero_snr_fwhm == 0.0 ) {
         for( i=0; i<dat->msize; i++ ) {
@@ -479,6 +500,11 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
             mapvar[i] = VAL__BADD;
             mapqual[i] |= SMF__MAPQ_ZERO;
             newzero ++;
+
+          /* Store the usable mask positions if we are recording the
+             current SNR mask for future use. */
+          } else if( dat->zeromask ) {
+            (dat->zeromask)[i] = 1;
           }
         }
 
@@ -498,9 +524,9 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
             if( map[ i ] != VAL__BADD &&
                 mapvar[ i ] != VAL__BADD && mapvar[ i ] > 0.0 &&
                 map[ i ]/sqrt( mapvar[ i ] ) < zero_snr ) {
-               dmask[ i ] = 1.0;
-            } else {
                dmask[ i ] = 0.0;
+            } else {
+               dmask[ i ] = 1.0;
             }
           }
 
@@ -515,19 +541,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
             filtermap->dims[1] = dat->ubnd_out[1]-dat->lbnd_out[1]+1;
             filtermap->hdr->wcs = astClone( dat->outfset );
 
-
-
-
-
-
-
-smf_write_smfData( filtermap, NULL, "Before", NULL, 0, 0, MSG__QUIET, status );
-
-
-
-
-
-
             /* Create a Gaussian filter to smooth the mask. */
             smfFilter *filt = smf_create_smfFilter( filtermap, status );
             smf_filter2d_gauss( filt, zero_snr_fwhm, status );
@@ -535,13 +548,6 @@ smf_write_smfData( filtermap, NULL, "Before", NULL, 0, 0, MSG__QUIET, status );
             /* Smooth the mask, and free the filter. */
             smf_filter_execute( wf, filtermap, filt, 0, 0, status );
             filt = smf_free_smfFilter( filt, status );
-
-
-
-
-smf_write_smfData( filtermap, NULL, "After", NULL, 0, 0, MSG__QUIET, status );
-
-
 
             /* Unset pointers to avoid freeing them */
             filtermap->pntr[0] = NULL;
@@ -555,6 +561,11 @@ smf_write_smfData( filtermap, NULL, "After", NULL, 0, 0, MSG__QUIET, status );
                 mapvar[i] = VAL__BADD;
                 mapqual[i] |= SMF__MAPQ_ZERO;
                 newzero ++;
+
+          /* Store the usable mask positions if we are recording the
+             current SNR mask for future use. */
+              } else if( dat->zeromask ) {
+                (dat->zeromask)[i] = 1;
               }
             }
           }
