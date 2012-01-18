@@ -1,0 +1,3 @@
+gcc -g -o simtest simtest.c -DTHREAD_SAFE -I/data/git/starlink/libraries/ast -L/star/lib `chr_link` `ast_link -ems` `err_link`
+
+
