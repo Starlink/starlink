@@ -39,7 +39,8 @@
 #     -i filename
 #       The name of an existing three-dimensional (RA,Dec,vel) cube.
 #       The script will prompt for the input file if not supplied on
-#       the command line.
+#       the command line.  The current co-ordinate Frame must be
+#       SKY-SPECTRUM or SKY-DSBSPECTRUM.
 #     -o filename
 #       The name of the NDF in which to store the velocity-position
 #       slice.  The script will prompt for this NDF if it is not
@@ -86,11 +87,12 @@
 
 #  Implementation Deficiencies:
 #     -  There is no validation that the supplied NDF is indeed a
-#     (RA,Dec,vel) cube, only that it exists and is a cube.
+#     (RA,Dec,vel) cube, only that it exists, it is a cube, and has
+#     an appropriate co-ordinate system.
 #     -  There is no control of scaling limits in the displays.
 
 #  Copyright:
-#     Copyright (C) 2010 Science and Technology Facilities Council.
+#     Copyright (C) 2010, 2012 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -130,7 +132,8 @@
 #        the annotation colour.
 #    2012 January 18 (MJC):
 #        Added -p option.  Ensure the bounds of the extracted slice go
-#        from lower to higher.
+#        from lower to higher. Check that the current Frame of the input
+#        file is suitable.
 #     {enter_further_changes_here}
 
 #-
@@ -208,6 +211,21 @@ if ( ${gotoutfile} == "FALSE" ) then
    echo -n "NDF output slice: "
    set outfile = $<
    echo " "
+endif
+
+# Check that the current AST Frame is of the required domain.
+$KAPPA_DIR/ndftrace $infile > /dev/null
+set frameid = `$KAPPA_DIR/parget current ndftrace`
+set domains = `$KAPPA_DIR/parget fdomain ndftrace`
+set domain = $domains[$frameid]
+if ( $domain != SKY-SPECTRUM && $domain != "SKY-DSBSPECTRUM" ) then
+   echo "Err: The current co-ordinate Frame in $infile is not SKY-SPECTRUM or"
+   echo "     SKY-DSBSPECTRUM.  Use KAPPA:WCSFRAME to select either of these domains,"
+   echo "     if available."
+
+# Prevent a "No match" error during the clean up.
+   touch pvslice_tempcat$$
+   goto cleanup
 endif
 
 # Obtain the spatial positions of the slice
