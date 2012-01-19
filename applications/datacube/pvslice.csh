@@ -14,13 +14,13 @@
 #     C-shell script
 
 #  Usage:
-#     pvslice -i filename -o filename [-ci index]
+#     pvslice -i filename -o filename [-ci index] [-p plane]
 
 #  Description:
 #     This script extracts and displays a slice from a position-velocity
 #     cube.  The slice need not be parallel to either spatial pixel axis.
 #
-#     The script displays the middle spatial plane from the supplied cube
+#     The script displays a chosen spatial plane from the supplied cube
 #     in the left half of the current graphics device.  You are then invited
 #     to select two spatial positions within the displayed plane using the
 #     cursor.  A two-dimensional slice is then extracted from the cube that
@@ -44,12 +44,20 @@
 #       The name of the NDF in which to store the velocity-position
 #       slice.  The script will prompt for this NDF if it is not
 #       supplied via this option.
+#     -p plane
+#       Velocity or pixel index of the plane to display to enable cursor
+#       selection of the slice end points.  To specify a velocity
+#       supply a floating-point value such as 2.0; for an index supply
+#       an integer.  [0]
 
 #  Examples:
 #     pvslice -i orion_masked -o orion_pvmap
 #        This extracts a user-selected plane from the cube NDF called
 #        orion_masked, and saves it to NDF orion_pvmap.  The slice is
 #        shown to the right of the spatial image.
+#     pvslice -i orion_masked -o orion_pvmap -p 1.5
+#        As above but slice selection is from the velocity plane at
+#        1.5 as opposed to the middle index.
 
 #  Notes:
 #     -  The WCS in the returned NDF is somewhat complex; it has a
@@ -120,6 +128,8 @@
 #        Moved from KAPPA to DATACUBE so replace positional parameters
 #        IN and OUT with C-shell options.  Added an option to specify
 #        the annotation colour.
+#    2012 January 18 (MJC):
+#        Added -p option.
 #     {enter_further_changes_here}
 
 #-
@@ -140,6 +150,7 @@ set gotoutfile = "FALSE"
 # Handle the command-line arguments.
 set args = ($argv[1-])
 set ci = red
+set plane = 0
 while ( $#args > 0 )
    switch ($args[1])
    case -ci:    # colour index of annotation
@@ -172,6 +183,11 @@ while ( $#args > 0 )
       set outfile = $args[1]
       shift args
       breaksw
+   case -p:    # velocity plane to display
+      shift args
+      set plane = $args[1]
+      shift args
+      breaksw
    case *:     # rubbish disposal
       shift args
       breaksw
@@ -199,7 +215,7 @@ endif
 # Display the middle slice of the cube on the left of the screen.
 $KAPPA_DIR/gdclear
 $KAPPA_DIR/picdef mode=a xpic=2 ypic=1 prefix=a
-$KAPPA_DIR/display $infile'(,,0)' mode=perc percentiles=\[5,95\] quiet
+$KAPPA_DIR/display $infile"(,,$plane)" mode=perc percentiles=\[5,95\] quiet
 
 # Get a FITS catalogue holding the pixel co-ordinates at the start and
 # end of the line.
