@@ -214,7 +214,7 @@ if ( ${gotoutfile} == "FALSE" ) then
 endif
 
 # Check that the current AST Frame is of the required domain.
-$KAPPA_DIR/ndftrace $infile > /dev/null
+$KAPPA_DIR/ndftrace $infile quiet
 set frameid = `$KAPPA_DIR/parget current ndftrace`
 set domains = `$KAPPA_DIR/parget fdomain ndftrace`
 set domain = $domains[$frameid]
