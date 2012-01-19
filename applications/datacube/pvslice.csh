@@ -129,7 +129,8 @@
 #        IN and OUT with C-shell options.  Added an option to specify
 #        the annotation colour.
 #    2012 January 18 (MJC):
-#        Added -p option.
+#        Added -p option.  Ensure the bounds of the extracted slice go
+#        from lower to higher.
 #     {enter_further_changes_here}
 
 #-
@@ -314,6 +315,11 @@ set y1 = `$KAPPA_DIR/calc exp="nint(pa+0.5)" pa=$pos[2]`
 $KAPPA_DIR/wcstran pvslice_tempcube$$ posin=\'$amer\,$bmer\' framein=sky frameout=pixel quiet
 set pos = `$KAPPA_DIR/parget posout wcstran`
 set y2 = `$KAPPA_DIR/calc exp="nint(pa+0.5)" pa=$pos[2]`
+if ( $y2 < $y1 ) then
+   set swap = $y1
+   set y1 = $y2
+   set y2 = $swap
+endif
 
 # Extract the slice.
 $KAPPA_DIR/ndfcopy pvslice_tempcube$$\(0,$y1\:$y2,\) $outfile trimbad
