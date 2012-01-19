@@ -302,7 +302,7 @@ int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
     coords_in[axis-1] -= 1.0;
     astTranN( frameset, 1, ncoords_in, 1, coords_in, 1, ncoords_out, 1, out2 );
 
-    /*  Select the axis with the largest shift as equivalent */
+    /*  Select the axis with the largest shift as equivalent. */
     caxis = axis;
     diff = 0.0;
     for ( i = 0; i < ncoords_out; i++ ) {
@@ -313,9 +313,12 @@ int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
         }
     }
 
+
     /*  Format the value along that axis, if requested, otherwise just write
      *  out the double. */
     if ( formatted ) {
+        /*  Normalise the axis into standard range. */
+        astNorm( frameset, out2 );
         *coord = (char *) astFormat( frameset, caxis, out2[caxis - 1] );
     }
     else {

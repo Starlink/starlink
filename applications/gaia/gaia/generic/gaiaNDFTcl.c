@@ -965,7 +965,7 @@ static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
  * The second argument is the NDF handle, the third the index of the axis,
  * and the fourth a list of all the pixel indices needed to identify the
  * coordinate (so the list must have a number for each dimension of the NDF if
- * that isn'r true then any extra dimensions will be given the coordinate
+ * that isn't true then any extra dimensions will be given the coordinate
  * AST__BAD).  The fifth argument defines whether to format the result (using
  * astFormat), otherwise it is returned as a double. The final two arguments
  * are booleans to switch on the addition of trailing label and units strings
