@@ -1,4 +1,4 @@
-#!/bin/tcsh -xv
+#!/bin/tcsh
 
 #+
 #  Name:
