@@ -27,7 +27,7 @@
 #     passes through the two selected spatial positions.  The first axis in
 #     this slice measures spatial distance along the line, and the second axis
 #     is the velocity axis.  This slice appears in the right-hand side of
-#     the current graphics device, and seved to the specified output NDF.
+#     the current graphics device, and saved to the specified output NDF.
 
 #  Command-line Arguments:
 #     -ci index
