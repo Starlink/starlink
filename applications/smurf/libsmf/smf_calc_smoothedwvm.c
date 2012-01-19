@@ -13,11 +13,13 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calc_smoothedwvm ( const smfArray * alldata, const smfData * adata,
-*                            AstKeyMap* extpars, double **wvmtau,
+*     smf_calc_smoothedwvm ( ThrWorkForce * wf, const smfArray * alldata,
+*                            const smfData * adata, AstKeyMap* extpars, double **wvmtau,
 *                            size_t *nframes, size_t *ngood, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     alldata = const smfArray * (Given)
 *        Related smfDatas assumed to cover the same time range. A
 *        single WVM tau will be calculated for all input smfDatas.
@@ -101,11 +103,27 @@
 #include "smurf_par.h"
 
 #include <math.h>
+#include <sys/time.h>
 
-void smf_calc_smoothedwvm ( const smfArray * alldata, const smfData * adata,
-                            AstKeyMap* extpars, double **wvmtau,
+/* Local data type */
+typedef struct {
+  double airmass;
+  smfArray * thesedata;
+  AstKeyMap * extpars;
+  double *taudata;
+  size_t ngood;
+  dim_t t1;
+  dim_t t2;
+  dim_t nframes;
+} smfCalcWvmJobData;
+
+void smf__calc_wvm_job( void *job_data, int *status );
+
+#define FUNC_NAME "smf_calc_smoothedwvm"
+
+void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
+                            const smfData * adata, AstKeyMap* extpars, double **wvmtau,
                             size_t *nelems, size_t *ngoodvals, int * status ) {
-
   size_t i;
   size_t nrelated = 0;          /* Number of entries in smfArray */
   size_t nframes = 0;           /* Number of timeslices */
@@ -193,32 +211,14 @@ void smf_calc_smoothedwvm ( const smfArray * alldata, const smfData * adata,
 
   taudata = astCalloc( nframes, sizeof(*taudata) );
 
-  /* Macro to find a smfData in the smfGroup that contains valid
-     data at this time slice */
-#define SELECT_DATA( ALLDATA, SMFDATA, BADVAL, ITEM, INDEX )     \
-  {                                                              \
-    size_t _ii;                                                  \
-    SMFDATA = NULL;                                              \
-    for (_ii=0; _ii<nrelated; _ii++) {                           \
-      smfData *DATA = (ALLDATA->sdata)[_ii];                     \
-      smf_tslice_ast( DATA, INDEX, 0, status );                  \
-      if ( DATA->hdr->state->ITEM != BADVAL ) {                  \
-        SMFDATA = DATA;                                          \
-        break;                                                   \
-      }                                                          \
-    }                                                            \
-  }
-
   if (*status == SAI__OK) {
-    smfData *curdata = NULL;
-    double prevtime = VAL__BADD;
-    double prevtau = VAL__BADD;
     double amprev = VAL__BADD;
-    double lastgoodtau = VAL__BADD;   /* most recent good tau */
-    size_t lastgoodidx = SMF__BADSZT; /* index of most recent good value */
-    size_t nbadidx = 0;    /* number of time slices in the current gap */
     double steptime;
     size_t maxgap;
+    struct timeval tv1;
+    struct timeval tv2;
+    smfCalcWvmJobData *job_data = NULL;
+    int nworker;
 
     /* We need to know the steptime so we can define the max good gap
        in seconds and convert it to steps*/
@@ -229,124 +229,97 @@ void smf_calc_smoothedwvm ( const smfArray * alldata, const smfData * adata,
     /* Assume all files have the same airmass information */
     smf_find_airmass_interval( (thesedata->sdata)[0]->hdr, &amprev, NULL, NULL, NULL, status );
 
-    for (i=0; i<nframes; i++) {
+    smf_timerinit( &tv1, &tv2, status );
 
-      if (!curdata) {
-        SELECT_DATA( thesedata, curdata, VAL__BADD, wvm_time, i );
-      }
 
-      if (curdata) smf_tslice_ast( curdata, i, 0, status );
+    /* Create structures used to pass information to the worker threads. */
+    nworker = wf ? wf->nworker : 1;
+     job_data = astMalloc( nworker*sizeof( *job_data ) );
 
-      if ( !curdata || curdata->hdr->state->wvm_time == VAL__BADD ) {
-        /* Try the other datas */
-        SELECT_DATA( thesedata, curdata, VAL__BADD, wvm_time, i );
-      }
-      if (*status != SAI__OK) break;
+    if (*status == SAI__OK) {
+      dim_t tstep;
+      int iworker;
+      smfCalcWvmJobData *pdata = NULL;
 
-      /* if we have no good data we store a bad value */
-      if (!curdata) {
-        prevtau = VAL__BADD;
+      /* Get the number of time slices to process in each thread. */
+      if( nworker > (int) nframes ) {
+        tstep = 1;
       } else {
-        const JCMTState * state = NULL;
-        state = curdata->hdr->state;
-
-        /* if we have old values from the WVM or no value we don't trust them */
-        if ( state->wvm_time != VAL__BADD &&
-             (fabs(state->wvm_time - state->rts_end) * SPD) < 60.0 ) {
-          /* Only calculate a tau when we have new values */
-          if ( prevtime != state->wvm_time ) {
-            float twvm[3]; /* WVM temperatures */
-            double thistau = VAL__BADD;
-            double airmass = VAL__BADD;
-
-            prevtime = state->wvm_time;
-            twvm[0] = state->wvm_t12;
-            twvm[1] = state->wvm_t42;
-            twvm[2] = state->wvm_t78;
-
-            airmass = state->tcs_airmass;
-            if (airmass == VAL__BADD) {
-              airmass = amprev;
-            } else {
-              amprev = airmass;
-            }
-
-            thistau = smf_calc_wvm( curdata->hdr, airmass, extpars, status );
-
-            /* Check status and/or value of tau */
-            if ( thistau == VAL__BADD ) {
-              if ( *status == SAI__OK ) {
-                *status = SAI__ERROR;
-                errRepf("", "Error calculating tau from WVM temperatures at time slice %zu",
-                        status, i);
-              }
-            } else if ( thistau < 0.0 ) {
-              msgOutiff( MSG__QUIET, "", "WARNING: Negative WVM tau calculated (%g). Ignoring.",
-                         status, thistau );
-              prevtau = VAL__BADD;
-            } else {
-              prevtau = thistau;
-            }
-          } else {
-            /* We use the previous tau since we should have calculated it earlier */
-          }
-        } else {
-          /* No good reading so tau is bad */
-          prevtau = VAL__BADD;
-        }
+        tstep = nframes/nworker;
       }
 
-      /* Prevtau is the tau that should be assigned to the current position */
-
-      /* see about gaps */
-      if (prevtau == VAL__BADD) {
-        nbadidx++;
-      } else {
-        /* we have a good value so we now have to see if there is a gap to fill */
-        if (i > 0 && lastgoodidx != (i-1) ) {
-          /* the previous value was bad so we may have to patch up if small */
-          if ( nbadidx < maxgap ) {
-            size_t j;
-            if (lastgoodidx == SMF__BADSZT) {
-              /* gap is at the start so fill with current value */
-              for (j=0; j<i;j++) {
-                taudata[j] = prevtau;
-                ngood++;
-              }
-            } else {
-              /* replace with mean value */
-              double meantau = (lastgoodtau + prevtau) / 2.0;
-              for (j=lastgoodidx+1; j<i; j++) {
-                taudata[j] = meantau;
-                ngood++;
-              }
-            }
-          }
-        }
-
-        /* we know this index was good */
-        lastgoodidx = i;
-        lastgoodtau = prevtau;
-        nbadidx = 0;
-        ngood++;
-
+      for( iworker = 0; iworker < nworker; iworker++ ) {
+         pdata = job_data + iworker;
+         pdata->t1 = iworker*tstep;
+         pdata->t2 = pdata->t1 + tstep - 1;
       }
 
-      /* Store the current tau value */
-      taudata[i] = prevtau;
+      /* Ensure that the last thread picks up any left-over time slices */
+      pdata->t2 = nframes - 1;
 
-    }
+      /* Store all the other info needed by the worker threads, and submit the
+         jobs to fix the steps in each bolo, and then wait for them to complete. */
+      for( iworker = 0; iworker < nworker; iworker++ ) {
+        smfArray *thrdata = NULL;
+        pdata = job_data + iworker;
 
-    /* if the last value in the time series was bad we need to see about
-       filling with the last good value */
-    if (*status == SAI__OK && nbadidx > 0 && nbadidx < maxgap) {
-      for (i=lastgoodidx+1; i<nframes; i++) {
-        taudata[i] = lastgoodtau;
-        ngood++;
+        pdata->nframes = nframes;
+        pdata->airmass = amprev; /* really need to get it from the start of each chunk */
+        pdata->taudata = taudata;
+
+        /* Need to copy the smfDatas and create a new smfArray for each
+           thread */
+        thrdata = smf_create_smfArray( status );
+        for (i=0;i<nrelated;i++) {
+          smfData *tmpdata = NULL;
+          tmpdata = smf_deepcopy_smfData( (thesedata->sdata)[i], 0, SMF__NOCREATE_FILE |
+                                          SMF__NOCREATE_DA |
+                                          SMF__NOCREATE_FTS |
+                                          SMF__NOCREATE_DATA |
+                                          SMF__NOCREATE_VARIANCE |
+                                          SMF__NOCREATE_QUALITY, 0, 0,
+                                          status );
+          smf_lock_data( tmpdata, 0, status );
+          smf_addto_smfArray( thrdata, tmpdata, status );
+        }
+        pdata->thesedata = thrdata;
+
+        /* Need to do a deep copy of ast data and unlock them */
+        pdata->extpars = astCopy(extpars);
+        astUnlock( pdata->extpars, 1 );
+
+        /* Pass the job to the workforce for execution. */
+        thrAddJob( wf, THR__REPORT_JOB, pdata, smf__calc_wvm_job, 0, NULL,
+                   status );
+      }
+
+      /* Wait for the workforce to complete all jobs. */
+      thrWait( wf, status );
+
+      /* Now free the resources we allocated during job creation
+         and calculate the number of good values */
+      for( iworker = 0; iworker < nworker; iworker++ ) {
+        smfArray * thrdata;
+        pdata = job_data + iworker;
+        astLock( pdata->extpars, 0 );
+        pdata->extpars = astAnnul( pdata->extpars );
+        thrdata = pdata->thesedata;
+        for (i=0;i<thrdata->ndat;i++) {
+          smf_lock_data( (thrdata->sdata)[i], 1, status );
+        }
+        smf_close_related( &thrdata, status );
+        ngood += pdata->ngood;
       }
     }
+    job_data = astFree( job_data );
+
+    msgOutiff( MSG__NORM, "", FUNC_NAME ": %f s to calculate unsmoothed WVM tau values",
+               status, smf_timerupdate(&tv1,&tv2,status) );
 
   }
+
+
+
 
   if (*status == SAI__OK && extpars) {
     /* Read extpars to see if we need to smooth */
@@ -399,6 +372,207 @@ void smf_calc_smoothedwvm ( const smfArray * alldata, const smfData * adata,
     *wvmtau = taudata;
     *nelems = nframes;
     *ngoodvals = ngood;
+  }
+
+}
+
+/* Routine called by thread queue to calculate a chunk of WVM data.
+   Actual arguments are passed in through job_data struct defined
+   above. */
+
+void smf__calc_wvm_job( void *job_data, int *status ) {
+
+  struct timeval tv1;
+  struct timeval tv2;
+  smfData * curdata = NULL;
+  smfArray * thesedata;
+  double prevtime = VAL__BADD;
+  double prevtau = VAL__BADD;
+  double lastgoodtau = VAL__BADD;   /* most recent good tau */
+  size_t lastgoodidx = SMF__BADSZT; /* index of most recent good value */
+  size_t nbadidx = 0;    /* number of time slices in the current gap */
+  size_t maxgap;
+  dim_t t1;
+  dim_t t2;
+  size_t nrelated;
+
+  double * taudata = NULL;
+  size_t ngood = 0;
+  dim_t i;
+  dim_t nframes;
+  smfCalcWvmJobData *pdata;
+  double amprev;
+  AstKeyMap * extpars;
+
+  if (*status != SAI__OK) return;
+
+  pdata = (smfCalcWvmJobData *)job_data;
+  t1 = pdata->t1;
+  t2 = pdata->t2;
+  amprev = pdata->airmass;
+  nframes = pdata->nframes;
+  thesedata = pdata->thesedata;
+  taudata = pdata->taudata;
+  nrelated = thesedata->ndat;
+  extpars = pdata->extpars;
+
+  /* Lock the AST pointers to this thread */
+  astLock( extpars, 0 );
+  for (i=0;i<thesedata->ndat;i++) {
+    smf_lock_data( (thesedata->sdata)[i], 1, status );
+  }
+
+/* Debugging message indicating thread started work */
+  msgOutiff( MSG__DEBUG, "", "smfCalcSmoothedWVM: thread starting on slices %zu -- %zu",
+             status, t1, t2 );
+  smf_timerinit( &tv1, &tv2, status);
+
+  /* Macro to find a smfData in the smfGroup that contains valid
+     data at this time slice */
+#define SELECT_DATA( ALLDATA, SMFDATA, BADVAL, ITEM, INDEX )     \
+  {                                                              \
+    size_t _ii;                                                  \
+    SMFDATA = NULL;                                              \
+    for (_ii=0; _ii<nrelated; _ii++) {                           \
+      smfData *DATA = (ALLDATA->sdata)[_ii];                     \
+      smf_tslice_ast( DATA, INDEX, 0, status );                  \
+      if ( DATA->hdr->state->ITEM != BADVAL ) {                  \
+        SMFDATA = DATA;                                          \
+        break;                                                   \
+      }                                                          \
+    }                                                            \
+  }
+
+
+  for (i=t1; i<t2; i++) {
+
+    if (!curdata) {
+      SELECT_DATA( thesedata, curdata, VAL__BADD, wvm_time, i );
+    }
+
+    if (curdata) smf_tslice_ast( curdata, i, 0, status );
+
+    if ( !curdata || curdata->hdr->state->wvm_time == VAL__BADD ) {
+      /* Try the other datas */
+      SELECT_DATA( thesedata, curdata, VAL__BADD, wvm_time, i );
+    }
+    if (*status != SAI__OK) break;
+
+    /* if we have no good data we store a bad value */
+    if (!curdata) {
+      prevtau = VAL__BADD;
+    } else {
+      const JCMTState * state = NULL;
+      state = curdata->hdr->state;
+
+      /* if we have old values from the WVM or no value we don't trust them */
+      if ( state->wvm_time != VAL__BADD &&
+           (fabs(state->wvm_time - state->rts_end) * SPD) < 60.0 ) {
+        /* Only calculate a tau when we have new values */
+        if ( prevtime != state->wvm_time ) {
+          float twvm[3]; /* WVM temperatures */
+          double thistau = VAL__BADD;
+          double airmass = VAL__BADD;
+
+          prevtime = state->wvm_time;
+          twvm[0] = state->wvm_t12;
+          twvm[1] = state->wvm_t42;
+          twvm[2] = state->wvm_t78;
+
+          airmass = state->tcs_airmass;
+          if (airmass == VAL__BADD) {
+            airmass = amprev;
+          } else {
+            amprev = airmass;
+          }
+
+          thistau = smf_calc_wvm( curdata->hdr, airmass, extpars, status );
+
+          /* Check status and/or value of tau */
+          if ( thistau == VAL__BADD ) {
+            if ( *status == SAI__OK ) {
+              *status = SAI__ERROR;
+              errRepf("", "Error calculating tau from WVM temperatures at time slice %zu",
+                      status, i);
+            }
+          } else if ( thistau < 0.0 ) {
+            msgOutiff( MSG__QUIET, "", "WARNING: Negative WVM tau calculated (%g). Ignoring.",
+                       status, thistau );
+            prevtau = VAL__BADD;
+          } else {
+            prevtau = thistau;
+          }
+        } else {
+          /* We use the previous tau since we should have calculated it earlier */
+        }
+      } else {
+        /* No good reading so tau is bad */
+        prevtau = VAL__BADD;
+      }
+    }
+
+    /* Prevtau is the tau that should be assigned to the current position */
+
+    /* see about gaps */
+    if (prevtau == VAL__BADD) {
+      nbadidx++;
+    } else {
+      /* we have a good value so we now have to see if there is a gap to fill */
+      if (i > 0 && lastgoodidx != (i-1) ) {
+        /* the previous value was bad so we may have to patch up if small */
+        if ( nbadidx < maxgap ) {
+          size_t j;
+          if (lastgoodidx == SMF__BADSZT) {
+            /* gap is at the start so fill with current value */
+            for (j=0; j<i;j++) {
+              taudata[j] = prevtau;
+              ngood++;
+            }
+          } else {
+            /* replace with mean value */
+            double meantau = (lastgoodtau + prevtau) / 2.0;
+            for (j=lastgoodidx+1; j<i; j++) {
+              taudata[j] = meantau;
+              ngood++;
+            }
+          }
+        }
+      }
+
+      /* we know this index was good */
+      lastgoodidx = i;
+      lastgoodtau = prevtau;
+      nbadidx = 0;
+      ngood++;
+
+    }
+
+    /* Store the current tau value */
+    taudata[i] = prevtau;
+
+  }
+
+  /* if the last value in the time series was bad we need to see about
+     filling with the last good value */
+  if (*status == SAI__OK && nbadidx > 0 && nbadidx < maxgap) {
+    for (i=lastgoodidx+1; i<nframes; i++) {
+      taudata[i] = lastgoodtau;
+      ngood++;
+    }
+  }
+
+/* Report the time taken in this thread. */
+  msgOutiff( SMF__TIMER_MSG, "",
+             "smfCalcSmoothedWVM: thread finishing slices %zu -- %zu (%.3f sec)",
+             status, t1, t2, smf_timerupdate( &tv1, &tv2, status ) );
+
+  /* Store number of good values */
+  pdata->ngood = ngood;
+
+  /* Unlock the AST pointers from this thread */
+  astUnlock( extpars, 1 );
+  for (i=0;i<thesedata->ndat;i++) {
+    smf_lock_data( (thesedata->sdata)[i], 0, status );
   }
 
 }

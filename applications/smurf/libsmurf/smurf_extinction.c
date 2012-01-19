@@ -249,9 +249,16 @@ void smurf_extinction( int * status ) {
   size_t outsize;            /* Total number of NDF names in the output group */
   size_t size;               /* Number of files in input group */
   double tau = 0.0;          /* Zenith tau at this wavelength */
+  ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+
+  if (*status != SAI__OK) return;
 
   /* Main routine */
   ndfBegin();
+
+  /* Find the number of cores/processors available and create a pool of
+     threads of the same size. */
+  wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
 
   /* Read the input file */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -368,7 +375,7 @@ void smurf_extinction( int * status ) {
     /* Apply extinction correction - note that a check is made to
        determine whether the data have already been extinction
        corrected */
-    smf_correct_extinction( odata, tausrc, extmeth, extpars, tau, NULL, status );
+    smf_correct_extinction( wf, odata, tausrc, extmeth, extpars, tau, NULL, status );
 
     /* Set character labels */
     smf_set_clabels( "Extinction corrected",NULL, NULL, odata->hdr, status);

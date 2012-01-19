@@ -13,11 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_correct_extinction(smfData *data, smf_tausrc tausrc,
+*     smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc,
 *                            smf_extmeth method, AstKeyMap * extpars, double tau,
 *                            double *allextcorr, int *status);
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData* (Given)
 *        smfData struct
 *     tausrc = smf_tausrc (Given)
@@ -221,7 +223,7 @@ static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_correct_extinction"
 
-void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method,
+void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, smf_extmeth method,
                             AstKeyMap * extpars, double tau, double *allextcorr, int *status) {
 
   /* Local variables */
@@ -330,7 +332,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   if (tausrc == SMF__TAUSRC_WVMRAW) {
     size_t ntotaltau = 0;
     size_t ngoodtau = 0;
-    smf_calc_smoothedwvm( NULL, data, extpars, &wvmtau, &ntotaltau,
+    smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
                           &ngoodtau, status );
     smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
     msgOutiff( MSG__VERB, "", "Using WVM mode for extinction correction of ^FILE"
@@ -351,7 +353,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       size_t ntotaltau = 0;
       double percentgood = 0.0;
 
-      smf_calc_smoothedwvm( NULL, data, extpars, &wvmtau, &ntotaltau,
+      smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
                             &ngoodtau, status );
       percentgood = 100.0 * ((double)ngoodtau / (double)ntotaltau);
 

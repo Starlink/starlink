@@ -1061,7 +1061,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                          status );
               }
 
-              smf_correct_extinction( idata, tausrc, extmeth, kmap, tau,
+              smf_correct_extinction( wf, idata, tausrc, extmeth, kmap, tau,
                                       (double *) dataptr, status );
 
               kmap = astAnnul( kmap );

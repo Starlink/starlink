@@ -597,8 +597,8 @@ void smf_calc_skyframe( const AstFrame * skyin,
                         double skyref[2],
                         int * moving, int * status );
 
-void smf_calc_smoothedwvm ( const smfArray * alldata, const smfData * adata,
-                            AstKeyMap* extpars, double **wvmtau,
+void smf_calc_smoothedwvm ( ThrWorkForce * wf, const smfArray * alldata,
+                            const smfData * adata, AstKeyMap* extpars, double **wvmtau,
                             size_t *nelems, size_t *ngood, int * status );
 
 void smf_calc_stareimage( smfData *data, const int naver, int *status);
@@ -827,7 +827,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 void smf_copytime( struct timeval *target, struct timeval *source,
                    int *status);
 
-void smf_correct_extinction( smfData *data, smf_tausrc tausrc,
+void smf_correct_extinction( ThrWorkForce * wf, smfData *data, smf_tausrc tausrc,
                              smf_extmeth method, AstKeyMap * extpars, double tau,
                              double *allextcorr, int *status);
 
