@@ -39,6 +39,8 @@
 #define LINSOLVERS_RETAIN_MEMORY /* comment this if you don't want routines in Axb.c retain working memory between calls */
 #endif
 
+#undef LINSOLVERS_RETAIN_MEMORY
+
 /* determine the precision variants to be build. Default settings build
  * both the single and double precision routines
  */
