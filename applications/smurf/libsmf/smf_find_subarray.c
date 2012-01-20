@@ -89,6 +89,10 @@ void smf_find_subarray ( const smfHead * hdr, char subarray[],
                          size_t buflen, sc2ast_subarray_t *subnum, int *status ) {
   char buffer[81];  /* for FITS header */
 
+  /* Fill in some defaults */
+  if (subnum) *subnum = SC2AST__NSUB; /* Not NULLSUB since we do not need to free cache */
+  if (subarray) subarray[0] = '\0';
+
   if (*status != SAI__OK) return;
 
   if (subnum == NULL && subarray == NULL) {
