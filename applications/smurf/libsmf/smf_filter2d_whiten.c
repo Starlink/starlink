@@ -31,9 +31,10 @@
 *        to be Nyquist frequency. If greater than Nyquist it will automatically
 *        be truncated to Nyquist. (1/arcsec)
 *     size_t smooth (Given)
-*        If set, instead of using fitted model, smooth azimuthally-averaged
-*        angular power spectrum by box of this size and use that to estimate
-*        the whitening filter.
+*        If set, instead of using fitted model, smooth
+*        azimuthally-averaged angular power spectrum (at resolution of
+*        the filter, not the reference map) by box of this size and
+*        use that to estimate the whitening filter.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -65,6 +66,8 @@
 *        Initial version
 *     2012-01-04 (EC):
 *        Add "smooth" option
+*     2012-01-20 (EC):
+*        First place pspec in high-res array, then do the smooth
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -110,21 +113,20 @@
 
 #define FUNC_NAME "smf_filter2d_whiten"
 
-#define WHITEN_BOX 3
-
 void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
                           double minfreq, double maxfreq, size_t smooth,
                           int *status ) {
 
   double A;                     /* Amplitude 1/f component */
   double B;                     /* exponent of 1/f component */
-  double df;                    /* Frequency spacing */
+  double df;                    /* Frequency spacing in ref pspec */
   size_t i;                     /* Loop counter */
   size_t j;                     /* Loop counter */
   size_t ndims=0;               /* Number of real-space dimensions */
-  size_t nf=0;                  /* Number of frequencies */
+  size_t nf=0;                  /* Number of frequencies in ref pspec */
   smfData *map_fft=NULL;        /* FFT of the map */
   smfData *pspec=NULL;          /* Az-averaged PSPEC of map */
+  double *pspec_data=NULL;      /* Pointer to DATA comp. of pspec */
   double *smoothed_filter=NULL; /* Smoothed power spectrum */
   double W;                     /* White noise level */
 
@@ -162,34 +164,57 @@ void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
   map_fft = smf_fft_data( wf, map, NULL, 0, 0, status );
   smf_fft_cart2pol( map_fft, 0, 1, status );
   pspec = smf_fft_2dazav( map_fft, &df, status );
-  if( *status == SAI__OK ) nf = pspec->dims[0];
+  if( *status == SAI__OK ) {
+    nf = pspec->dims[0];
+    pspec_data = pspec->pntr[0];
+  }
   smf_close_file( &map_fft, status );
 
   /* Fit power-law + white level model */
-  smf_fit_pspec( pspec->pntr[0], pspec->dims[0], 10, df, minfreq, 0.1,
+  smf_fit_pspec( pspec_data, pspec->dims[0], 10, df, minfreq, 0.1,
                  maxfreq, &A, &B, &W, status );
 
   msgOutiff( MSG__DEBUG, "", FUNC_NAME
              ": P(f) = %lg*f^%lg + %lg\n", status, A, B, W );
 
   if( smooth ) {
+    int whichaxis=0; /* index of higher-resolution axis */
+    double df_s;     /* Frequency spacing of smoothed_filter */
+    double nf_s;     /* Size of the smoothed 1-d filter */
+
+    /* Re-sample the radial power spectrum measured in the map on to
+       an array that corresponds to the highest-resolution (longer
+       real-space) dimension of the supplied filter */
+
+    if( filt->rdims[1] > filt->rdims[0] ) {
+      whichaxis = 1;
+    }
+
+    df_s = filt->df[whichaxis];
+    nf_s = filt->rdims[whichaxis]/2 + 1;
+
+    smoothed_filter = astMalloc( nf_s*sizeof(*smoothed_filter) );
+
+    if( *status == SAI__OK ) {
+      /* Nearest-neighbour... */
+      for( i=0; i<nf_s; i++ ) {
+        size_t nearest = round(i * df_s / df );
+        if( nearest >= nf ) nearest = nf-1;
+        smoothed_filter[i] = pspec_data[nearest];
+      }
+    }
+
     /* Smooth pspec to estimate the radial power spectrum, but normalize
        by the white-noise level from the fit to preserve
        normalization -------------------------------------------------------- */
 
-    smoothed_filter = astMalloc( nf*sizeof(*smoothed_filter) );
-
-    if( *status == SAI__OK ) {
-      memcpy( smoothed_filter, pspec->pntr[0], nf*sizeof(smoothed_filter) );
-    }
-
-    smf_tophat1D( smoothed_filter, nf, smooth, NULL, 0, 0.5, status );
+    smf_tophat1D( smoothed_filter, nf_s, smooth, NULL, 0, 0.5, status );
 
     /* Replace bad values (where not enough values to calculate median) with
        the original values. Then normalize by the white noise level,
        and take inverse square root */
     if( *status == SAI__OK ) {
-      for( i=0; i<nf; i++ ) {
+      for( i=0; i<nf_s; i++ ) {
         if( smoothed_filter[i] != VAL__BADD ) {
           smoothed_filter[i] = 1./sqrt(smoothed_filter[i]/W);
         } else if( i < smooth ) {
@@ -205,20 +230,20 @@ void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
 
     /* Copy radial filter into 2d filter */
     if( *status == SAI__OK ) {
-      double d;
-      double model;
-      double x;
-      double y;
+      size_t d;       /* radial distance (FFT pixels) in smoothed filter */
+      double model;   /* the value of the model (smoothed filter) at d */
+      double x;       /* x- spatial frequency */
+      double y;       /* y- spatial frequency */
 
       for( i=0; i<filt->fdims[0]; i++ ) {
         x =  FFT_INDEX_TO_FREQ(i,filt->rdims[0]) * filt->df[0];
 
         for( j=0; j<filt->fdims[1]; j++ ) {
           y =  FFT_INDEX_TO_FREQ(j,filt->rdims[1]) * filt->df[1];
-          d = round(sqrt(x*x + y*y)/df);
+          d = (size_t) round(sqrt(x*x + y*y)/df_s);
 
-          if( d < nf) {
-            model = smoothed_filter[ (size_t) d];
+          if( d < nf_s) {
+            model = smoothed_filter[d];
           } else {
             model = 1;
           }
