@@ -17,7 +17,7 @@
 *                            int inbytestride, size_t inlen, void *out,
 *                            size_t outstride, int outbytestride,
 *                            size_t outlen, int todouble, int init,
-*                            int *status )
+*                            int isang, int *status )
 
 *  Arguments:
 *     in = const CGEN_TYPE* (Given)
@@ -44,6 +44,9 @@
 *        If set the output is typecast to double
 *     init = int (Given)
 *        If set out needs to be initialized to 0.
+*     isang = int (Given)
+*        If true output will be constrained to 0 to 2PI radians and
+*        a 0 to 2PI transition on input will be trapped.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -75,6 +78,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -84,9 +88,12 @@
 *        -Check for VAL__BAD*
 *        -optional strides in bytes to enable resample of JCMTState arrays
 *        -optionally initialize buffer to 0 if needed
+*     2012-01-19 (TIMJ):
+*        Handle 0 to 360 angle crossover
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -145,7 +152,7 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
                                    int inbytestride, size_t inlen, void *out,
                                    size_t outstride, int outbytestride,
                                    size_t outlen, int todouble, int init,
-                                   int *status ) {
+                                   int isang, int *status ) {
 
   /* Local variables */
   size_t i;                   /* High-res index */
@@ -165,6 +172,8 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
   double s2;                  /* part of s that goes at location jf2 */
   double step;                /* Number of low-res samples per high-res samp */
   CGEN_TYPE val;              /* current value from in */
+  CGEN_TYPE prevval;          /* Previous value of val */
+  int gotstep = 0;            /* Corrected a 0 to 360 step */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -225,6 +234,7 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
        low-res sample */
 
     outbuf[0] = in[0];
+    prevval = in[0];
 
     /*outbuf[(outlen-1)*outstride] += in[(inlen-1)*instride];*/
 
@@ -266,6 +276,17 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
         *po = CGEN_BAD;
 
       } else {
+
+        if (isang && fabs(val-prevval) > M_PI) {
+          gotstep = 1;
+          if (val-prevval > 0) {
+            val -= D2PI;
+          } else {
+            val += D2PI;
+          }
+          prevval = val;
+        }
+
         s = (double) val;
 
         if( jf1 == jf2 ) {
@@ -298,12 +319,34 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
       j1 = j2;
     }
 
+    /* If the penultimate input value has a jump compared
+       to the final measurement we need to correct the final
+       measurement by D2PI */
+    if (isang) {
+      pi = PTROFF(in,inlen-1,ibstride);
+
+      if( *pi != CGEN_BAD ) {
+        po = PTROFF(outbuf,outlen-1,obstride);
+        val = *pi;
+        if (fabs(val-prevval) > M_PI) {
+          gotstep = 1;
+          if (val-prevval > 0) {
+            *po -= D2PI;
+          } else {
+            *po += D2PI;
+          }
+        }
+      }
+    }
+
+
     /* Normalize the output */
     for( i=0; i<outlen; i++ ) {
       po = PTROFF(outbuf,i,obstride);
 
       if( *po != CGEN_BAD ) {
         *po *= step;
+        if (gotstep && isang && *po < 0.0) *po += D2PI;
       }
     }
 
@@ -331,6 +374,7 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
     }
 
     outbufd[0] = in[0];
+    prevval = in[0];
 
     /*outbufd[(outlen-1)*outstride] += in[(inlen-1)*instride];*/
 
@@ -370,6 +414,17 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
         *pod = VAL__BADD;
 
       } else {
+
+        if (isang && fabs(val-prevval) > M_PI) {
+          gotstep = 1;
+          if (val-prevval > 0) {
+            val -= D2PI;
+          } else {
+            val += D2PI;
+          }
+          prevval = val;
+        }
+
         s = (double) val;
 
         if( jf1 == jf2 ) {
@@ -405,12 +460,34 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
       j1 = j2;
     }
 
+    /* If the penultimate input value has a jump compared
+       to the final measurement we need to correct the final
+       measurement by D2PI */
+    if (isang) {
+      pi = PTROFF(in,inlen-1,ibstride);
+      if( *pi != CGEN_BAD ) {
+        pod = PTROFFD(outbufd,outlen-1,obstride);
+        val = (double)*pi;
+        if (fabs(val-prevval) > M_PI) {
+          gotstep = 1;
+          if (val-prevval > 0) {
+            *pod -= D2PI;
+          } else {
+            *pod += D2PI;
+          }
+        }
+      }
+    }
+
     /* Normalize the output */
     for( i=0; i<outlen; i++ ) {
       pod = PTROFFD(outbufd,i,obstride);
 
       if( *pod != VAL__BADD ) {
         *pod *= step;
+        if (gotstep && isang && *pod < 0.0) {
+          *pod += D2PI;
+        }
       }
     }
   }

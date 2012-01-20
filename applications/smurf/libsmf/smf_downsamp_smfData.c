@@ -109,7 +109,7 @@
 
 /* Macro to simplify resampling of individual JCMTState fields */
 
-#define RESAMPSTATE(in,out,member,intslice,ontslice) smf_downsamp1D( &(in->member),sizeof(JCMTState),1,intslice,&(out->member), sizeof(JCMTState),1,ontslice,1,1,status );
+#define RESAMPSTATE(in,out,member,intslice,ontslice,isang) smf_downsamp1D( &(in->member),sizeof(JCMTState),1,intslice,&(out->member), sizeof(JCMTState),1,ontslice,1,1,isang,status );
 
 #define FUNC_NAME "smf_downsamp_smfData"
 
@@ -332,7 +332,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
           for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
             smf_downsamp1D( idat+i*ibstride, itstride, 0, intslice,
                             odat+i*obstride, otstride, 0, ontslice, 1, 0,
-                            status );
+                            0, status );
           }
         } else if( idata->dtype==SMF__INTEGER ) {
           /* Input data are integers */
@@ -348,7 +348,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
             for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
               smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
                               odat+i*obstride, otstride, 0, ontslice, 1, 0,
-                              status);
+                              0, status);
             }
           } else {
             /* output will also be int */
@@ -357,7 +357,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
             for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
               smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
                               odat+i*obstride, otstride, 0, ontslice, 0, 0,
-                              status);
+                              0, status);
             }
           }
         } else {
@@ -396,41 +396,43 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
            are approximate values there already we need to explicitly
            re-initialize to 0. */
 
-        RESAMPSTATE(instate, outstate, rts_end, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, rts_end, intslice, ontslice, 0);
 
-        RESAMPSTATE(instate, outstate, smu_az_jig_x, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, smu_az_jig_y, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, smu_az_chop_x, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, smu_az_chop_y, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, smu_tr_jig_x, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, smu_tr_jig_y, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, smu_tr_chop_x, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, smu_tr_chop_y, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, smu_az_jig_x, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, smu_az_jig_y, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, smu_az_chop_x, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, smu_az_chop_y, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, smu_tr_jig_x, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, smu_tr_jig_y, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, smu_tr_chop_x, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, smu_tr_chop_y, intslice, ontslice, 0);
 
-        RESAMPSTATE(instate, outstate, tcs_tai, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_airmass, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_tai, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, tcs_airmass, intslice, ontslice, 0);
 
-        RESAMPSTATE(instate, outstate, tcs_az_ang, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_az_ac1, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_az_ac2, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_az_dc1, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_az_dc2, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_az_bc1, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_az_bc2, intslice, ontslice);
+        /* Second coordinates (Dec, El etc) can not wrap 0 to 360 so we
+           do not need to test for those cases */
+        RESAMPSTATE(instate, outstate, tcs_az_ang, intslice, ontslice, 1);
+        RESAMPSTATE(instate, outstate, tcs_az_ac1, intslice, ontslice, 1);
+        RESAMPSTATE(instate, outstate, tcs_az_ac2, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, tcs_az_dc1, intslice, ontslice, 1);
+        RESAMPSTATE(instate, outstate, tcs_az_dc2, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, tcs_az_bc1, intslice, ontslice, 1);
+        RESAMPSTATE(instate, outstate, tcs_az_bc2, intslice, ontslice, 0);
 
-        RESAMPSTATE(instate, outstate, tcs_tr_ang, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_tr_ac1, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_tr_ac2, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_tr_dc1, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_tr_dc2, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_tr_bc1, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_tr_bc2, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_tr_ang, intslice, ontslice, 1);
+        RESAMPSTATE(instate, outstate, tcs_tr_ac1, intslice, ontslice, 1);
+        RESAMPSTATE(instate, outstate, tcs_tr_ac2, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, tcs_tr_dc1, intslice, ontslice, 1);
+        RESAMPSTATE(instate, outstate, tcs_tr_dc2, intslice, ontslice, 0);
+        RESAMPSTATE(instate, outstate, tcs_tr_bc1, intslice, ontslice, 1);
+        RESAMPSTATE(instate, outstate, tcs_tr_bc2, intslice, ontslice, 0);
 
-        RESAMPSTATE(instate, outstate, tcs_en_dc1, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_en_dc2, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_en_dc1, intslice, ontslice, 1);
+        RESAMPSTATE(instate, outstate, tcs_en_dc2, intslice, ontslice, 0);
 
-        RESAMPSTATE(instate, outstate, tcs_dm_abs, intslice, ontslice);
-        RESAMPSTATE(instate, outstate, tcs_dm_rel, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_dm_abs, intslice, ontslice, 1);
+        RESAMPSTATE(instate, outstate, tcs_dm_rel, intslice, ontslice, 0);
       }
 
     }
