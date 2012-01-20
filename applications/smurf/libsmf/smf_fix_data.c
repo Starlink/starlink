@@ -326,7 +326,8 @@ int smf_fix_data ( msglev_t msglev, smfData * data, int * status ) {
   }
 
   /* Set FITS header so that we know smf_fix_data was run */
-  smf_fits_updateI( hdr, SMFFIXDATA, have_fixed, "Data have been fixed",
+  smf_fits_updateL( hdr, SMFFIXDATA, have_fixed,
+                    (have_fixed ? "Data have been fixed" : "Data do not require fixing"),
                     status );
 
   return have_fixed;
