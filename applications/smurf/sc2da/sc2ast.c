@@ -1144,7 +1144,7 @@ int *status             /* global status (given and returned) */
 
       return NULL;
 
-   } else if ( subnum < 0 || subnum >= SC2AST__NSUB ) {
+   } else if ( subnum < 0 || subnum >= SC2AST__NSUB && *status == SAI__OK ) {
      *status = SAI__ERROR;
      sprintf( errmess, "Sub array number '%d' out of range\n", subnum );
      ErsRep( 0, status, errmess );
