@@ -44,10 +44,15 @@
 *        Tweak for new sc2store interface.
 *     2007-10-31 (TIMJ):
 *        Use size_t to match sc2store.
+*     2012-01-20 (TIMJ):
+*        Some files have many consecutive blank lines that make the
+*        header longer than sc2store can handle. We give ourselves
+*        some breathing space by stripping out duplicate blank lines
+*        in the FitsChan.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007, 2012 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -82,6 +87,7 @@
 #include "mers.h"
 #include "msg_par.h"
 #include "prm_par.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -95,43 +101,80 @@ void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards,
                           int *status ) {
 
   /* Local variables */
-  char *outpos = NULL;    /* current position in output buffer */
+  char blank[SZFITSCARD]; /* Reference blank card */
   char card[SZFITSCARD];  /* temporary buffer for current card */
   int found;              /* Boolean to indicate if a card was found */
   size_t i;               /* Loop counter */
+  size_t ncopied = 0;     /* How many cards were copied */
+  size_t numcards = 0;    /* How many cards are in the FitsChan */
+  char *outpos = NULL;    /* current position in output buffer */
+  int prevblank = 0;      /* Was this previously blank? */
+  char *tempfits = NULL;  /* intermediate buffer for FITS cards */
 
   *ncards = 0;
   /* Check status */
   if (*status != SAI__OK) return;
 
-  /* Find the number of cards in this AstFitsChan, and make
-     sure that it is no larger than the maximum allowed */
-   *ncards = astGetI ( fitschan, "Ncard" );
-   if ( *ncards > SC2STORE__MAXFITS ) {
-      *status = SAI__ERROR;
-      msgSeti("NC", (int)*ncards);
-      msgSeti("MC", SC2STORE__MAXFITS);
-      errRep( FUNC_NAME,
-              "Number of FITS cards ^NC exceeds maximum allowed (^MC)",
-              status );
-      return;
-   }
+  /* Fill the blank card */
+  for (i=0; i<SZFITSCARD;i++) {
+    blank[i] = ' ';
+  }
+  blank[SZFITSCARD-1] = '\0';
+
+  /* Find the number of cards in this AstFitsChan and create a
+     buffer for internal use. We do not yet worry about the allocated
+     size of fitsrec because we might be compressing the array to
+     get rid of multiple blank lines */
+  numcards = astGetI ( fitschan, "Ncard" );
+  tempfits = astMalloc( ( 1 + numcards * (SZFITSCARD-1) ) * sizeof(*tempfits) );
 
    /* Rewind */
    astClear ( fitschan, "Card");
 
-   /* Retrieve all the FITS headers and store them in the character array */
-   outpos = fitsrec;
-   for ( i = 0; i <= *ncards; i++ ) {
-      found = astFindFits ( fitschan, "%f", card, 1 );
-      if ( found ) {
-	 strncpy ( outpos, card, SZFITSCARD );
-	 outpos += 80;
-      } else {
-	break;
-      }
+   if (*status == SAI__OK) {
+     /* Retrieve all the FITS headers and store them in the character array.
+        We compress consecutive blank cards. */
+     ncopied = 0;
+     outpos = tempfits;
+     prevblank = 0;
+     for ( i = 0; i <= numcards; i++ ) {
+       found = astFindFits ( fitschan, "%f", card, 1 );
+       if ( found ) {
+         int isblank = 0;
+         if (strncmp( card, blank, SZFITSCARD ) == 0 ) isblank = 1;
+
+         /* skip if this is blank and before was */
+         if (isblank && prevblank) continue;
+         prevblank = isblank;
+
+         /* Now copy in the card and increment the pointer */
+         strncpy ( outpos, card, SZFITSCARD );
+         ncopied++;
+         outpos += 80;
+       } else {
+         break;
+       }
+     }
+
+     /* Guarantee to terminate the buffer */
+     *outpos = '\0';
+
+     /* make sure that it is no larger than the maximum allowed */
+     if ( ncopied > SC2STORE__MAXFITS ) {
+       *status = SAI__ERROR;
+       msgSeti("NC", (int)numcards);
+       msgSeti("MC", SC2STORE__MAXFITS);
+       errRep( FUNC_NAME,
+               "Number of FITS cards ^NC exceeds maximum allowed (^MC)",
+               status );
+       tempfits = astFree( tempfits );
+       return;
+     }
+
+     /* Copy into the output buffer */
+     one_strlcpy( fitsrec, tempfits, SZFITSCARD * SC2STORE__MAXFITS + 1, status );
    }
 
-   /* Guarantee to terminate the buffer */
-   *outpos = '\0';
+   tempfits = astFree(tempfits);
+   *ncards = ncopied;
 }
