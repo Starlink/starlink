@@ -343,7 +343,7 @@ void sc2sim_ndfwrdata
   int dims[2];                    /* Extent of output image */
   AstFitsChan *fitschan;          /* FITS headers */
   int fitsfind;
-  char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
+  char fitsrec[SC2STORE__MAXFITS*SZFITSCARD+1]; /* Store for FITS records */
   int framesize;                  /* Number of points in a single `frame' */
   size_t i;                       /* Loop counter */
   double instap[2];               /* Instrument aperture */
@@ -377,7 +377,7 @@ void sc2sim_ndfwrdata
   JCMTState state;                /* Dummy JCMT state structure for creating WCS */
   sc2ast_subarray_t subnum;       /* sub array index */
   AstFrameSet *wcs;               /* WCS frameset for output image */
-  char weightsname[SZFITSCARD];   /* Name of weights file for DREAM
+  char weightsname[SZFITSTR];     /* Name of weights file for DREAM
                                      reconstruction */
   double x_max = -1.0e38;         /* X extent of pointing centre offsets */
   double x_min =  1.0e38;         /* X extent of pointing centre offsets */

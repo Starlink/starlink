@@ -169,7 +169,7 @@ void smf_write_itermap( const double *map, const double *mapvar, dim_t msize,
     AstFitsChan *fitschan=NULL;
     JCMTState *allState = hdr->allState;
     char *obsidss=NULL;
-    char obsidssbuf[SZFITSCARD+1];
+    char obsidssbuf[SZFITSTR];
     double iter_nboloeff;
     size_t nmap;
     size_t ngood_tslices;

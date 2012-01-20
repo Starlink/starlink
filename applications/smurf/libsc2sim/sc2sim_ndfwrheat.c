@@ -159,9 +159,9 @@ void sc2sim_ndfwrheat
 
 {
   /* Local variables */
-  char dateobs[SZFITSCARD+1] = "\0"; /* DATE-OBS string for observation */
+  char dateobs[SZFITSTR] = "\0";   /* DATE-OBS string for observation */
   AstFitsChan *fitschan;           /* FITS headers */
-  char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
+  char fitsrec[SC2STORE__MAXFITS*SZFITSCARD+1]; /* Store for FITS records */
   int jigvert[SC2SIM__MXVERT][2]; /* Temp array to jig_vert */
   size_t nrec = 0;                 /* number of FITS header records */
   sc2ast_subarray_t subnum;        /* subarray index */

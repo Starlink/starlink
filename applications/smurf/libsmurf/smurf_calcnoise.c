@@ -948,7 +948,7 @@ smf__write_effnoise( const smfData * data, const char * noisekey,
 
   double noiseeff = 0.0;
   AstFitsChan * fchan = NULL;
-  char noisecom[80];
+  char noisecom[SZFITSTR];
 
   if (*status != SAI__OK) return;
   if (!smf_validate_smfData( data, 1, 1, status )) return;

@@ -153,7 +153,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   double coordOut[3];         /* output coordinates from transformation */
   double crpix[3];            /* pixel centres of data */
   AstKeyMap *datePointing;    /* Ast KeyMap for pointing and times */
-  char dateString[SZFITSCARD];/* temporary string for date conversions. */
+  char dateString[SZFITSTR];  /* temporary string for date conversions. */
   int day;                    /* days */
   double dLST;                /* difference in LSTs */
   double dut1;                /* UT1-UTC correction */

@@ -213,7 +213,7 @@ void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily, int nopad,
             status );
     for( i=0; (i<nqbits)&&(*status==SAI__OK); i++ ) {
 
-      char scalestr[80];
+      char scalestr[SZFITSTR];
 
       /* Do not report anything when there is nothing to say */
       if ( qcount[i] == 0 ) continue;

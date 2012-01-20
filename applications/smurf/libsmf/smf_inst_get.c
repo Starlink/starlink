@@ -82,14 +82,12 @@
 
 #define FUNC_NAME "smf_inst_get"
 
-#define SZFITSCARD 81
-
 inst_t
 smf_inst_get( const smfHead * hdr, int * status ) {
 
   /* Variables */
-  char instrume[SZFITSCARD];     /* contents of INSTRUME header */
-  char backend[SZFITSCARD];      /* contents of BACKEND header */
+  char instrume[SZFITSTR];     /* contents of INSTRUME header */
+  char backend[SZFITSTR];      /* contents of BACKEND header */
 
   /* Program logic */
 
@@ -107,14 +105,14 @@ smf_inst_get( const smfHead * hdr, int * status ) {
 
   /* we need the INSTRUME keyword and possibly the backend card */
   astClear( hdr->fitshdr, "Card" );
-  smf_fits_getS( hdr, "INSTRUME", instrume, SZFITSCARD, status );
+  smf_fits_getS( hdr, "INSTRUME", instrume, sizeof(instrume), status );
 
   if (*status == SAI__OK) {
-    if ( strncmp( instrume, "SCUBA-2", SZFITSCARD) == 0 ) {
+    if ( strncmp( instrume, "SCUBA-2", sizeof(instrume) ) == 0 ) {
       msgOutif( MSG__DEBUG, " ", "Data file contains SCUBA-2 data",
 		status );
       return INST__SCUBA2;
-    } else if ( strncmp( instrume, "AZTEC", SZFITSCARD ) == 0 ) {
+    } else if ( strncmp( instrume, "AZTEC", sizeof(instrume) ) == 0 ) {
       msgOutif( MSG__DEBUG, " ", "Data file contains AzTEC data",
 		status );
       return INST__AZTEC;
@@ -127,15 +125,15 @@ smf_inst_get( const smfHead * hdr, int * status ) {
   /* try the backend */
   if (*status == SAI__OK) {
     astClear(hdr->fitshdr, "Card" );
-    smf_fits_getS( hdr, "BACKEND", backend, SZFITSCARD, status );
+    smf_fits_getS( hdr, "BACKEND", backend, sizeof(backend), status );
 
     /* did we get something? */
     if (*status == SAI__OK) {
-      if (strncmp( backend, "ACSIS", SZFITSCARD) == 0) {
+      if (strncmp( backend, "ACSIS", sizeof(backend) ) == 0) {
 	msgOutif( MSG__DEBUG, " ", "Data file contains ACSIS data",
 		  status );
 	return INST__ACSIS;
-      } else if (strncmp( backend, "DAS", SZFITSCARD) == 0) {
+      } else if (strncmp( backend, "DAS", sizeof(backend)) == 0) {
 	msgOutif( MSG__DEBUG, " ",
                   "Data file contains DAS data, treating as ACSIS",
 		  status );

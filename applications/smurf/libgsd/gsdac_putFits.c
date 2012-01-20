@@ -187,15 +187,15 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* Local variables */
 
-  char bwMode[SZFITSCARD];    /* ACSIS total bandwidth setup */
+  char bwMode[SZFITSTR];      /* ACSIS total bandwidth setup */
   char curChar;               /* character pointer */
   int day;                    /* days for time conversion. */
-  char doppler[SZFITSCARD];   /* doppler velocity definition */
+  char doppler[SZFITSTR];     /* doppler velocity definition */
   double etal;                /* telescope efficiency */
   int hour;                   /* hours for time conversion. */
   int i;                      /* loop counter */
   float IFchanSp;             /* TOPO IF channel spacing (Hz) */
-  char instrume[SZFITSCARD];  /* front-end receiver */
+  char instrume[SZFITSTR];    /* front-end receiver */
   double intTime;             /* total time spent integrating (s) */
   int josMult;                /* times around the jiggle (i.e. 1) */
   int josMin;                 /* minimum step time psw */
@@ -204,26 +204,26 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   int month;                  /* months for time conversion. */
   int nMix;                   /* number of mixers */
   double nRefStep;            /* number of nod sets repeated */
-  char object[SZFITSCARD];    /* object of interest */
-  char object2[SZFITSCARD];   /* object of interest (second half of name) */
+  char object[SZFITSTR];      /* object of interest */
+  char object2[SZFITSTR];     /* object of interest (second half of name) */
   double obsgeo[3];           /* cartesian coordinates of telescope */
-  char obsIDSS[SZFITSCARD];   /* unique observation number + subsystem
+  char obsIDSS[SZFITSTR];     /* unique observation number + subsystem
                                  number in format
                                  INSTR_NNNNN_YYYYMMDDTHHMMSS_N */
-  char obsSB[SZFITSCARD];     /* observed sideband */
+  char obsSB[SZFITSTR];       /* observed sideband */
   int parse;                  /* flag for incorrect date string. */
-  char recptors[SZFITSCARD];  /* active FE receptor IDs for this obs */
+  char recptors[SZFITSTR];    /* active FE receptor IDs for this obs */
   double refChan;             /* reference IF channel no. */
-  char seeDatSt[SZFITSCARD];  /* time of seeingSt in format
+  char seeDatSt[SZFITSTR];    /* time of seeingSt in format
                                  YYYY-MM-DDTHH:MM:SS */
-  char sSysObs[SZFITSCARD];   /* spectral ref. frame during observation */
+  char sSysObs[SZFITSTR];     /* spectral ref. frame during observation */
   int standard;               /* true for spectral line standards */
   int startIdx;               /* index in pattern at start of observation */
   int stBetRef;               /* max number of steps between refs */
   int stBetRef_defined;       /* Use the stBetRef value? */
   double stepTime;            /* RTS step time */
-  char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
-  char tauDatSt[SZFITSCARD];  /* time of tau225St observation in
+  char subBands[SZFITSTR];    /* ACSIS sub-band set-up */
+  char tauDatSt[SZFITSTR];    /* time of tau225St observation in
                                  format YYYY-MM-DDTHH:MM:SS */
   const char *transiti;       /* target transition for molecule */
   int year;                   /* year for time conversion. */

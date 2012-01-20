@@ -146,7 +146,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
   size_t k;                  /* Index into gridpts array */
   int ndfid;                 /* NDf identifier for current component */
   size_t nelem;              /* Size of data array to be allocated */
-  char weightsfile[SZFITSCARD]; /* Name of weights file */
+  char weightsfile[SZFITSTR]; /* Name of weights file */
   smfData *wtdata = NULL;    /* smfData for weights file */
   smfFile *wtfile = NULL;    /* smfFile for weights file */
   Grp *wtgrp = NULL;         /* Grp containing name of weights file */

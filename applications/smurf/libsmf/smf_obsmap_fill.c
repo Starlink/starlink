@@ -106,10 +106,10 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
                       int * status ) {
 
   double dateobs = 0.0;    /* MJD UTC of start of observation */
-  char object[SZFITSCARD]; /* Object name */
-  char obsid[SZFITSCARD]; /* Observation ID */
-  char inbeam[SZFITSCARD]; /* Anything in beam */
-  char instrume[SZFITSCARD]; /* instrument name */
+  char object[SZFITSTR];   /* Object name */
+  char obsid[SZFITSTR];    /* Observation ID */
+  char inbeam[SZFITSTR];   /* Anything in beam */
+  char instrume[SZFITSTR]; /* instrument name */
   AstKeyMap * obsinfo = NULL; /* observation information */
 
 

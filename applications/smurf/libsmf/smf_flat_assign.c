@@ -198,7 +198,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, double inrefres,
 
     /* if we have a filename in bolval copy it to the FLAT FITS header */
     if ( bolval->file && strlen(bolval->file->name) && updata->hdr && updata->hdr->fitshdr ) {
-      char buffer[80];
+      char buffer[SZFITSTR];
       int oplen = 0;
       errMark();
       smf_smfFile_msg( bolval->file, "FILE", 1, "<none>" );

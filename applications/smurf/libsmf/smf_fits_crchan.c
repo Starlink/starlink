@@ -114,21 +114,21 @@ void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
 
   len = strlen( headrec );
 
-  if ( len <= 81 ) {
+  if ( len <= SZFITSCARD + 1 ) {
     /* individually terminated or a single string */
-    step = 81;
+    step = SZFITSCARD + 1;
     single_buffer = 0;
 
     /* nfits can not be trusted */
     if (nfits == 0) nfits = 1;
 
   } else {
-    step = 80;
+    step = SZFITSCARD;
     single_buffer = 1;
 
     /* check nfits */
-    if ( (nfits * 80) > len ) nfits = 0;
-    if (nfits == 0) nfits = (int)len / 80;
+    if ( (nfits * SZFITSCARD) > len ) nfits = 0;
+    if (nfits == 0) nfits = (int)len / SZFITSCARD;
   }
 
   /* Create the empty fitschan. */

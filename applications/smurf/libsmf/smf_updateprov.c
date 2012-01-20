@@ -136,7 +136,7 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
    AstKeyMap *tkm = NULL;       /* KeyMap holding contents of MORE */
    NdgProvenance *prov = NULL;  /* Pointer to input provenance structure */
    char *obsidss = NULL;        /* Pointer to OBSIDSS buffer */
-   char obsidssbuf[SZFITSCARD]; /* OBSIDSS value in input file */
+   char obsidssbuf[SZFITSTR];   /* OBSIDSS value in input file */
    const char *vptr = NULL;     /* Pointer to OBSIDSS string */
    int found;                   /* Was OBSIDSS value found in an input ancestor? */
    int ianc;                    /* Ancestor index */

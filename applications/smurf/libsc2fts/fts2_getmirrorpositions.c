@@ -81,7 +81,7 @@ void fts2_getmirrorpositions(smfData* data, double* positions, int* size, int* s
 {
   if(*status != SAI__OK) { return; }
 
-  char ftsMode[SZFITSCARD+1];
+  char ftsMode[SZFITSTR];
   size_t count      = 0;    /* Size */
   HDSLoc* hdsLoc    = NULL; /* Pointer to HDS location */
   HDSLoc* hdsLocPos = NULL; /* Pointer to mirror positions */

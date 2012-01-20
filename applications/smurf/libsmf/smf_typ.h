@@ -625,7 +625,7 @@ typedef struct smfHead {
   char units[SMF__CHARLABEL]; /* Data units */
   char dlabel[SMF__CHARLABEL];/* Label associated with data */
   char title[SMF__CHARLABEL]; /* Title associated with data */
-  char obsidss[SZFITSCARD];   /* Unique observation subsys id */
+  char obsidss[SZFITSTR];     /* Unique observation subsys id */
   smf_modeltype mtype;        /* type if iterative map-maker model container */
 } smfHead;
 

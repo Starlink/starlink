@@ -97,11 +97,11 @@ static smf_obstype smf__parse_obstype ( char obs_type[], int *status );
 
 void smf_calc_mode ( smfHead * hdr, int * status ) {
 
-  char sam_mode[SZFITSCARD+1];   /* Value of SAM_MODE header */
-  char obs_type[SZFITSCARD+1];   /* value of OBS_TYPE header */
-  char sw_mode[SZFITSCARD+1];    /* value of SW_MODE header */
-  char seq_type[SZFITSCARD+1];   /* value of SEQ_TYPE header */
-  char inbeamstr[SZFITSCARD+1];  /* value of INBEAM header */
+  char sam_mode[SZFITSTR];   /* Value of SAM_MODE header */
+  char obs_type[SZFITSTR];   /* value of OBS_TYPE header */
+  char sw_mode[SZFITSTR];    /* value of SW_MODE header */
+  char seq_type[SZFITSTR];   /* value of SEQ_TYPE header */
+  char inbeamstr[SZFITSTR];  /* value of INBEAM header */
 
   smf_obstype type = SMF__TYP_NULL;   /* temporary type */
   smf_obstype stype = SMF__TYP_NULL;   /* temporary seq type */

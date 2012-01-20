@@ -187,8 +187,12 @@ error can not determine PI
 
 /* Length of string for various `methods' */
 #define LEN__METHOD 20
-/* Length of a FITS record, includes trailing nul */
-#define SZFITSCARD 81
+/* Length of a FITS record, does not include nul */
+#define SZFITSCARD 80
+
+/* Length of a string that can be read from a FITS record.
+   Includes NUL */
+#define SZFITSTR 70
 
 /* SI prefix and multiplied for output data. Used for Watts and Amps calculations
   Set to 1e12 if you want all output in pico amps and pico watts.

@@ -157,7 +157,7 @@ void smurf_rawpress( int *status ) {
     dim_t colsize;
     smfData *data = NULL;     /* Pointer to input data struct */
     char filename[GRP__SZNAM+1]; /* Input filename, derived from GRP */
-    char fitsrec[SC2STORE__MAXFITS*80+1];
+    char fitsrec[SC2STORE__MAXFITS*SZFITSCARD+1];
     int jig_vert[1][2];       /* dummy jiggle vertices */
     double jig_path[1][2];    /* dummy jiggle path */
     int * idksquid = NULL;

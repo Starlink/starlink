@@ -73,8 +73,6 @@
 
 #define FUNC_NAME "smf_instap_get"
 
-#define SZFITSCARD 81
-
 void smf_instap_get( smfHead * hdr, int * status ) {
 
   /* Variables */

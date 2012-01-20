@@ -139,8 +139,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   float amStart = 0.0;        /* airmass at start of observation */
   double azEnd = -1.0;        /* Azimuth at observation end (deg) */
   double azStart = -1.0;      /* Azimuth at observation start (deg) */
-  char backend[SZFITSCARD];   /* name of the backend */
-  char card[81];              /* FITS card for updating headers */
+  char backend[SZFITSTR];     /* name of the backend */
+  char card[SZFITSCARD+1];    /* FITS card for updating headers */
   dateVars dateVars;          /* date/time variables */
   double elEnd = -1.0;        /* elevation at observation end (deg) */
   double elStart = -1.0;      /* elevation at observation start (deg) */
@@ -156,14 +156,14 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   double mem;                 /* amount of memory for spectrum */
   int nSubsys;                /* number of subsystems */
   int obsNum;                 /* current observation number */
-  char obsType[SZFITSCARD];   /* type of observation */
+  char obsType[SZFITSTR];     /* type of observation */
   char *OCSConfig = NULL;     /* OCS configuration XML */
   JCMTState *record = NULL;   /* JCMT state information for the
                                  current spectrum */
   int recepFlags[MAXRECEP];   /* flags for which receptors were used */
   char *recepNames[MAXRECEP]; /* names of the receptors */
   int recepsUsed;             /* number of used receptors */
-  char samMode[SZFITSCARD];   /* sampling mode (raster or grid) */
+  char samMode[SZFITSTR];     /* sampling mode (raster or grid) */
   ACSISSpecHdr *specHdr;      /* ACSIS spectrum-specific information */
   unsigned long specIndex;    /* index into spectral data */
   long spectrumSize;          /* size of spectrum data */

@@ -135,6 +135,8 @@
 #ifndef SC2SIM_STRUCT_DEFINED
 #define SC2SIM_STRUCT_DEFINED
 
+#include "smurf_par.h"
+
 struct bolpix             /* pixel location of bolometer */
        {
             int quad;     /* array quadrant, 0-3 */
@@ -164,7 +166,7 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
 				 3 - sinc(dx).sinc(dy) after first 1.0
 				 4 - bessel tapered */
   double conv_sig;            /* convolution function parameter */
-  char coordframe[80];        /* Map coord. frame (nas/azel/radec) */
+  char coordframe[SZFITSTR];  /* Map coord. frame (nas/azel/radec) */
   double dec;                 /* declination in radians */
   double distfac;             /* distortion factor (0=no distortion) */
   double dut1;                /* Value of UT1 - UTC for current date */
@@ -204,15 +206,15 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   int nmicstep;               /* number of microsteps */
   int numsamples;             /* number of samples in STARE */
   size_t nvert;               /* Nr of vertices in the Jiggle pattern */
-  char obsmode[80];           /* Observation mode (DREAM, STARE, PONG etc) */
-  char externobs[80];         /* filename of an external SCUBA2 observation used to generate a scan pattern */
-  char obstype[80];           /* Observation type (POINT, FOCUS or SCIENCE) */
+  char obsmode[SZFITSTR];     /* Observation mode (DREAM, STARE, PONG etc) */
+  char externobs[SC2SIM__FLEN];/* filename of an external SCUBA2 observation used to generate a scan pattern */
+  char obstype[SZFITSTR];     /* Observation type (POINT, FOCUS or SCIENCE) */
   int planetnum;              /* Number corresponding to a planet */
   int platenum;               /* number of waveplate rotations */
   double platerev;            /* waveplate rotation rev/sec */
   double pong_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise */
-  char pong_type[80];         /* Type of PONG scan (straight or curve) */
+  char pong_type[SZFITSTR];   /* Type of PONG scan (straight or curve) */
   double pong_vmax;           /* Telescope max velocities (arcsec/sec) */
   double ra;                  /* right ascension in radians */
   double scan_angle;          /* angle of pattern relative to telescope

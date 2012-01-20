@@ -121,7 +121,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int dims[2];                     /* Dimensions of output image */
   smfDream *dream = NULL;          /* DREAM parameters */
   HDSLoc *drmloc;                  /* Locator to DEAM extension */
-  char drmwghts[SZFITSCARD+1];     /* Name of DREAM weights file */
+  char drmwghts[SZFITSTR];         /* Name of DREAM weights file */
   int *gridext = NULL;             /* Pointer to grid min/max X/Y extent */
   int gridndf;                     /* NDF identifier for GRID parameters */
   void *gridpntr[3];               /* Mapped pointers */

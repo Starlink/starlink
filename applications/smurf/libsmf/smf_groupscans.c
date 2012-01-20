@@ -116,9 +116,9 @@ AstKeyMap *smf_groupscans( const Grp *igrp,  int size, int *maxsyspop,
    char *pname = NULL;
    char filename[GRP__SZNAM + 1];
    const char *key = NULL;
-   char obsid[SZFITSCARD];
-   char obsidss[SZFITSCARD];
-   char subsysnr[SZFITSCARD];
+   char obsid[SZFITSTR];
+   char obsidss[SZFITSTR];
+   char subsysnr[SZFITSTR];
    int ifile;
    int indf1;
    int iobs;

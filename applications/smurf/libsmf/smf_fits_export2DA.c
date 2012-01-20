@@ -101,8 +101,8 @@ void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards,
                           int *status ) {
 
   /* Local variables */
-  char blank[SZFITSCARD]; /* Reference blank card */
-  char card[SZFITSCARD];  /* temporary buffer for current card */
+  char blank[SZFITSCARD+1];/* Reference blank card */
+  char card[SZFITSCARD+1];/* temporary buffer for current card */
   int found;              /* Boolean to indicate if a card was found */
   size_t i;               /* Loop counter */
   size_t ncopied = 0;     /* How many cards were copied */
@@ -119,14 +119,14 @@ void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards,
   for (i=0; i<SZFITSCARD;i++) {
     blank[i] = ' ';
   }
-  blank[SZFITSCARD-1] = '\0';
+  blank[SZFITSCARD] = '\0';
 
   /* Find the number of cards in this AstFitsChan and create a
      buffer for internal use. We do not yet worry about the allocated
      size of fitsrec because we might be compressing the array to
      get rid of multiple blank lines */
   numcards = astGetI ( fitschan, "Ncard" );
-  tempfits = astMalloc( ( 1 + numcards * (SZFITSCARD-1) ) * sizeof(*tempfits) );
+  tempfits = astMalloc( ( 1 + numcards * SZFITSCARD ) * sizeof(*tempfits) );
 
    /* Rewind */
    astClear ( fitschan, "Card");
@@ -150,7 +150,7 @@ void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards,
          /* Now copy in the card and increment the pointer */
          strncpy ( outpos, card, SZFITSCARD );
          ncopied++;
-         outpos += 80;
+         outpos += SZFITSCARD;
        } else {
          break;
        }

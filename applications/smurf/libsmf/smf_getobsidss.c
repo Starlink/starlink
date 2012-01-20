@@ -99,7 +99,7 @@ char *smf_getobsidss( AstFitsChan *hdr, char * obsid, size_t szobs,
                       char * obsidss, size_t szss, int *status ) {
 
 /* Local Variables: */
-  char lobsid[SZFITSCARD];/* somewhere to put the obsid */
+  char lobsid[SZFITSTR];  /* somewhere to put the obsid */
   char *obspnt = NULL;    /* Local buffer or supplied buffer */
   size_t size;            /* Size of obsid buffer */
   char *value = NULL;     /* Pointer to static buffer containing header value */

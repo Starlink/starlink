@@ -368,7 +368,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
   /* Pasted from readsc2ndf */
   size_t colsize;               /* number of pixels in column */
-  char fitsrec[SC2STORE__MAXFITS*80+1];   /* FITS headers read from sc2store */
+  char fitsrec[SC2STORE__MAXFITS*SZFITSCARD+1];   /* FITS headers read from sc2store */
   size_t nfits;              /* number of FITS headers */
   size_t nframes;            /* number of frames */
   size_t rowsize;            /* number of pixels in row (returned) */

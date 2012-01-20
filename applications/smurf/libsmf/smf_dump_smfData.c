@@ -125,7 +125,7 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
   smfDream *dream;              /* DREAM struct within smfData */
   size_t i;                     /* Loop counter */
   size_t ndims;                 /* Number of dimensions in data */
-  char string[SZFITSCARD];      /* General purpose string used for printing */
+  char string[SZFITSTR];        /* General purpose string used for printing */
   const char * tempstr = NULL;  /* temp string for obsmode and type */
 
   /* Check status */

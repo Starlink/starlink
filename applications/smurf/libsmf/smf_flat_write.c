@@ -137,7 +137,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   size_t colsize;              /* number of columns */
   double *dbuf = NULL;         /* input double buffer for mean data */
   double *dvar = NULL;         /* input double buffer for variance of data */
-  char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
+  char fitsrec[SC2STORE__MAXFITS*SZFITSCARD+1]; /* Store for FITS records */
   int *ibuf = NULL;            /* int buffer for mean data */
   int indf = NDF__NOID;        /* NDF identifier for output file */
   size_t ncards;               /* number of fits cards */

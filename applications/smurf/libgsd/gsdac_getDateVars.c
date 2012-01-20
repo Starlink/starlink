@@ -104,7 +104,7 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
 {
 
   /* Local variables */
-  char dateString[SZFITSCARD];/* temporary string for date conversions. */
+  char dateString[SZFITSTR];  /* temporary string for date conversions. */
   int day;                    /* days */
   double dLST;                /* difference in LST */
   double dut1;                /* UT1-UTC correction */

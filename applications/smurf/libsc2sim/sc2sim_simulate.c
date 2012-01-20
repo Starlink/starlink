@@ -410,7 +410,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int curframe;                   /* current frame in context of entire
                                      simulation (not just this chunk) */
   int curms;                      /* current microstep (loop counter) */
-  char dateobs[SZFITSCARD+1] = "\0";       /* DATE-OBS string for observation */
+  char dateobs[SZFITSTR] = "\0";  /* DATE-OBS string for observation */
   int date_da;                    /* day corresponding to MJD */
   double date_df;                 /* day fraction corresponding to MJD */
   int date_mo;                    /* month corresponding to MJD */
@@ -461,10 +461,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *jig_x_hor=NULL;         /* jiggle x-horizontal tanplane offset (radians) */
   int k;                          /* loop counter */
   int lastframe;                  /* number of frames in the last chunk */
-  char loclcrd[SZFITSCARD+1] = "\0";       /* Coordinate frame */
+  char loclcrd[SZFITSTR] = "\0";  /* Coordinate frame */
   double *lst=NULL;               /* local appar. sidereal time at time step */
-  char lstend[SZFITSCARD+1] = "\0";        /* LST at end of sub-scan */
-  char lststart[SZFITSCARD+1] = "\0";      /* LST at start of sub-scan */
+  char lstend[SZFITSTR] = "\0";   /* LST at end of sub-scan */
+  char lststart[SZFITSTR] = "\0"; /* LST at start of sub-scan */
   double meanatm;                 /* Atmos. emission at start airmass */
   double *mjuldate=NULL;          /* Modified Julian date each sample - UT1 */
   size_t nflat[8];                /* number of flat coeffs per bol */
@@ -474,8 +474,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int nterms=0;                   /* number of 1/f noise frequencies */
   int obsend = 0;                 /* Flag to indicate whether current file is last in
                                      observation */
-  char obsid[80];                 /* OBSID for each observation */
-  char obstype[SZFITSCARD+1];     /* Observation type, e.g. SCIENCE */
+  char obsid[SZFITSTR];           /* OBSID for each observation */
+  char obstype[SZFITSTR];         /* Observation type, e.g. SCIENCE */
   FILE *ofile = NULL;             /* File pointer to check for existing files*/
   double phi;                     /* latitude (radians) */
   int planet = 0;                 /* Flag to indicate planet observation */
@@ -487,7 +487,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double raapp1;                  /* Recalculated apparent RA */
   double refres[8];               /* Reference resistance used for flatfield */
   size_t rowsize;                 /* row size for flatfield */
-  char scancrd[SZFITSCARD+1];     /* SCAN coordinate frame */
+  char scancrd[SZFITSTR];         /* SCAN coordinate frame */
   double sigma;                   /* instrumental white noise */
   char sign[2];                   /* Sign of angle (+/-) */
   Grp *skygrp = NULL;             /* Group of input files */
@@ -515,7 +515,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                                      calculating planet position */
   double ttau[3];                  /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
-  char utdate[SZFITSCARD+1] = "\0";        /* UT date in YYYYMMDD form */
+  char utdate[SZFITSTR] = "\0";   /* UT date in YYYYMMDD form */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
   double zenatm;                  /* zenith atmospheric emission */
 
