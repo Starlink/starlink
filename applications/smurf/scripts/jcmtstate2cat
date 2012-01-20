@@ -256,6 +256,12 @@ for my $f (@files) {
                                      ( $value == &NDF::VAL__BADI() || $value == &NDF::VAL__BADR() ));
       push(@slice, $value);
     }
+    # Replace bad values with NaN
+    for my $i (0..$#slice) {
+      $slice[$i] = "NaN" if (looks_like_number($slice[$i]) &&
+                             ($slice[$i] == &NDF::VAL__BADR() || $slice[$i] == &NDF::VAL__BADD()));
+    }
+
     print join("\t",@slice)."\n";
   }
 }
