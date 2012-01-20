@@ -106,8 +106,10 @@
 *     2012-1-17 (DSB):
 *        Prevent the SNR mask changing after a given number of iterations.
 *     2012-1-18 (DSB):
-*        ZERO_MASK and ZERO_CIRLE are of type AST__UNDEFTYPE, not
+*        - ZERO_MASK and ZERO_CIRLE are of type AST__UNDEFTYPE, not
 *        AST__BADTYPE, when not set.
+*     2012-1-19 (DSB):
+*        - Set bad pixels to zero in the SNR mask prior to smoothing the mask.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -525,11 +527,14 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
              Otherwise store a zero in the mask. */
           for( i = 0; i < dat->msize; i++ ) {
             if( map[ i ] != VAL__BADD &&
-                mapvar[ i ] != VAL__BADD && mapvar[ i ] > 0.0 &&
-                map[ i ]/sqrt( mapvar[ i ] ) < zero_snr ) {
-               dmask[ i ] = 0.0;
+                mapvar[ i ] != VAL__BADD && mapvar[ i ] > 0.0 ){
+              if( map[ i ]/sqrt( mapvar[ i ] ) < zero_snr ) {
+                dmask[ i ] = 0.0;
+              } else {
+                dmask[ i ] = 1.0;
+              }
             } else {
-               dmask[ i ] = 1.0;
+               dmask[ i ] = 0.0;
             }
           }
 
