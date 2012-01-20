@@ -313,12 +313,12 @@ int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
         }
     }
 
+    /*  Normalise the axis into standard range, necessary for sky coordinates. */
+    astNorm( frameset, out2 );
 
     /*  Format the value along that axis, if requested, otherwise just write
      *  out the double. */
     if ( formatted ) {
-        /*  Normalise the axis into standard range. */
-        astNorm( frameset, out2 );
         *coord = (char *) astFormat( frameset, caxis, out2[caxis - 1] );
     }
     else {

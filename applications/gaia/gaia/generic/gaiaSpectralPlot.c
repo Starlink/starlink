@@ -1884,11 +1884,22 @@ static void MakeSpectral( SPItem *spPtr )
         coords = malloc( sizeof(double) * spPtr->numPoints * nout );
         lutcoords = malloc( sizeof(double) * spPtr->numPoints );
 
-        /* Generate dim positions stepped along the GRID axis pixels */
+        /*  Generate GRID positions along the WCS axis (assumes these are axes
+         *  aligned to the GRID axes, otherwise the range of coordinates will
+         *  vary for each extraction).
+         */
         for ( i = 0; i < spPtr->numPoints; i++ ) {
+
+            /*  Each other axis starts at pixel 1. XXX could use given values
+             *  then axes alignment assumption is not as strong (at least then
+             *  we have the full range of the WCS axes along this GRID
+             *  axis). */
             for ( j = 0; j < nin; j++ ) {
-                grid[spPtr->numPoints*j+i] = i + 1;
+                grid[spPtr->numPoints*j+i] = 1;
             }
+
+            /*  Step along WCS/GRID axis. */
+            grid[spPtr->numPoints * (spPtr->axis-1) + i] = i + 1;
         }
 
         /* Transform these GRID positions into the current frame. */
@@ -1902,7 +1913,8 @@ static void MakeSpectral( SPItem *spPtr )
             }
             astNorm( cfrm, work );
 
-            /*  Store the selected coordinate */
+            /*  Store the selected coordinate, repeats WCS/GRID axes alignment
+             *  assumption. */
             lutcoords[i] = work[spPtr->axis - 1];
         }
         spPtr->mapping = (AstMapping *) astLutMap( spPtr->numPoints,
