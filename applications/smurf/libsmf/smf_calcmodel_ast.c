@@ -110,6 +110,8 @@
 *        AST__BADTYPE, when not set.
 *     2012-1-19 (DSB):
 *        - Set bad pixels to zero in the SNR mask prior to smoothing the mask.
+*        - "dat->zeromask" contains 0 for pixels to be used and 1 for
+*        pixels to be masked, not the other way round.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -484,9 +486,10 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     if( zero_snr && !dat->zeromask) {
 
       /* If the time has come to freeze the SNR mask, allocate memory to
-         store the frozen mask, initialising it to hold zeros. */
+         store the frozen mask. Fill it with 1.0 values (=> "low SNR pixel"). */
       if( dat->iter == zero_snr_freeze ) {
-         dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask) );
+         dat->zeromask = astMalloc( dat->msize*sizeof(*dat->zeromask) );
+         for( i=0; i<dat->msize; i++ ) (dat->zeromask)[ i ] = 1.0;
          msgOutiff( MSG__DEBUG, "", FUNC_NAME ": freezing SNR mask", status );
       } else {
          msgOutiff( MSG__DEBUG, "", FUNC_NAME ": calculating new SNR mask", status );
@@ -509,7 +512,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
           /* Store the usable mask positions if we are recording the
              current SNR mask for future use. */
           } else if( dat->zeromask ) {
-            (dat->zeromask)[i] = 1;
+            (dat->zeromask)[i] = 0;
           }
         }
 
@@ -573,7 +576,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
           /* Store the usable mask positions if we are recording the
              current SNR mask for future use. */
               } else if( dat->zeromask ) {
-                (dat->zeromask)[i] = 1;
+                (dat->zeromask)[i] = 0;
               }
             }
           }
