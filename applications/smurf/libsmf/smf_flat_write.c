@@ -84,10 +84,12 @@
 *        code with smf_flat_fastflat and smf_flat_mergedata.
 *     2011-09-08 (TIMJ):
 *        Add refres argument.
+*     2012-01-20 (TIMJ):
+*        Protect pointer dereference
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008,2010-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008,2010-2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -200,19 +202,21 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   dbuf = (bolval->pntr)[0];
   dvar = (bolval->pntr)[1];
 
-  for (j = 0; j < (nframes * numbols); j++) {
-    /* These started off as integers so the mean value must fit in
-       an integer */
-    if ( dbuf[j] == VAL__BADD) {
-      ibuf[j] = VAL__BADI;
-    } else {
-      ibuf[j] = (int)dbuf[j];
-    }
-    /* Same data type so no need to convert bad values */
-    if (dvar) {
-      outvar[j] = dvar[j];
-    } else {
-      outvar[j] = VAL__BADD;
+  if (*status == SAI__OK) {
+    for (j = 0; j < (nframes * numbols); j++) {
+      /* These started off as integers so the mean value must fit in
+         an integer */
+      if ( dbuf[j] == VAL__BADD) {
+        ibuf[j] = VAL__BADI;
+      } else {
+        ibuf[j] = (int)dbuf[j];
+      }
+      /* Same data type so no need to convert bad values */
+      if (dvar) {
+        outvar[j] = dvar[j];
+      } else {
+        outvar[j] = VAL__BADD;
+      }
     }
   }
 
