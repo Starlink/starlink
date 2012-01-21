@@ -410,8 +410,18 @@ void smurf_calcflat( int *status ) {
     if (bolval) {
       smf_fits_getI( bolval->hdr, "UTDATE", &utdate, status );
       smf_fits_getI( bolval->hdr, "OBSNUM", &obsnum, status );
-      snprintf( defname, sizeof(defname), "%s%08d_%05d_flat",
-                subarray, utdate, obsnum );
+
+      /* FastRamps need to preserve the subscan number */
+      if (isfastramp) {
+        int subscan;
+        smf_fits_getI( bolval->hdr, "NSUBSCAN", &subscan, status );
+        snprintf( defname, sizeof(defname), "%s%08d_%05d_%04d_flat",
+                  subarray, utdate, obsnum, subscan );
+      } else {
+        snprintf( defname, sizeof(defname), "%s%08d_%05d_flat",
+                  subarray, utdate, obsnum );
+      }
+
     } else {
       defname[0] = '\0';
     }
