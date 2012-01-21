@@ -377,6 +377,30 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     have_fixed |= SMF__FIXED_FITSHDR;
   }
 
+  /* The telescope goes crazy at the end of observation 56 on 20110530. Null
+     the telescope data for subscans 30, 31 and 32 */
+  if (fitsvals.utdate == 20110530) {
+    char obsid[81];
+    const char fitskey[] = "FIXPCORR";
+    smf_getobsidss( hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status);
+
+    if (strcmp(obsid, "scuba2_00056_20110530T135530") == 0 ) {
+      int subscan;
+      smf_getfitsi( hdr, "NSUBSCAN", &subscan, status );
+      if (subscan == 30 || subscan == 31 || subscan == 32) {
+        size_t nframes = hdr->nframes;
+        JCMTState * curstate;
+        size_t i;
+        for ( i=0; i<nframes; i++ ) {
+          curstate = &((hdr->allState)[i]);
+          curstate->jos_drcontrol |= DRCNTRL__PTCS_BIT;
+        }
+        msgOutif( msglev, "", INDENT "Blanking telescope data due to extreme excursion", status );
+        have_fixed |= SMF__FIXED_JCMTSTATE;
+      }
+    }
+  }
+
   /* The second half of observation 14 on 20111215 (scuba2_00014_20111215T061536)
      has a elevation pointing shift */
   if (fitsvals.utdate == 20111215) {
