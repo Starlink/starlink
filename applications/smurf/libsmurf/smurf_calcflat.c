@@ -197,7 +197,6 @@ void smurf_calcflat( int *status ) {
   size_t nflatfiles;        /* Number of flatfield files to process */
   size_t ngood;             /* Number of good responsivities */
   int obsnum;               /* Observation number */
-  Grp *ogrp = NULL;         /* Output group of files */
   double *pixheat = NULL;   /* Pixel heater settings for each input file */
   char *pname = NULL;       /* Temporary pointer */
 
@@ -440,7 +439,6 @@ void smurf_calcflat( int *status ) {
   if (fflats) smf_close_related( &fflats, status );
   if (flatfiles) smf_close_related( &flatfiles, status );
   if (igrp) grpDelet( &igrp, status);
-  if (ogrp) grpDelet( &ogrp, status);
   if (fgrp) grpDelet( &fgrp, status);
   if (ffgrp) grpDelet( &ffgrp, status);
   if (dkgrp) grpDelet( &dkgrp, status );
