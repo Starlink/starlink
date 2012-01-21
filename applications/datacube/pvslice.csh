@@ -134,6 +134,8 @@
 #        Added -p option.  Ensure the bounds of the extracted slice go
 #        from lower to higher. Check that the current Frame of the input
 #        file is suitable.
+#     2012 January 20 (MJC):
+#        Fix bug so that the rotated slice is actually used.
 #     {enter_further_changes_here}
 
 #-
@@ -319,18 +321,18 @@ $KAPPA_DIR/setorigin pvslice_tempcube$$ origin=\[$ra_origin,$dec_origin,$vel_ori
 # pixel origin which is now at the start of the line.  It rotates the
 # cube so that the requested line is parallel to the second pixel axis.
 echo "   Rotating cube..."
-$KAPPA_DIR/rotate pvslice_tempcube$$ makepv_temp angle=$angle
+$KAPPA_DIR/rotate pvslice_tempcube$$ pvslice_plane$$ angle=$angle
 
 # Extract and display the slice
 # =============================
 
 # Get the pixel co-ordinates of the start and end of the line in the rotated
 # cube.
-$KAPPA_DIR/wcstran pvslice_tempcube$$ posin=\'$aref\,$bref\' framein=sky frameout=pixel quiet
+$KAPPA_DIR/wcstran pvslice_plane$$ posin=\'$aref\,$bref\' framein=sky frameout=pixel quiet
 set pos = `$KAPPA_DIR/parget posout wcstran`
 set y1 = `$KAPPA_DIR/calc exp="nint(pa+0.5)" pa=$pos[2]`
 
-$KAPPA_DIR/wcstran pvslice_tempcube$$ posin=\'$amer\,$bmer\' framein=sky frameout=pixel quiet
+$KAPPA_DIR/wcstran pvslice_plane$$ posin=\'$amer\,$bmer\' framein=sky frameout=pixel quiet
 set pos = `$KAPPA_DIR/parget posout wcstran`
 set y2 = `$KAPPA_DIR/calc exp="nint(pa+0.5)" pa=$pos[2]`
 if ( $y2 < $y1 ) then
@@ -340,7 +342,7 @@ if ( $y2 < $y1 ) then
 endif
 
 # Extract the slice.
-$KAPPA_DIR/ndfcopy pvslice_tempcube$$\(0,$y1\:$y2,\) $outfile trimbad
+$KAPPA_DIR/ndfcopy pvslice_plane$$\(0,$y1\:$y2,\) $outfile trimbad
 
 # Set a more-useful axis label.
 $KAPPA_DIR/wcsattrib $outfile set Label'(2)' "'Offset from start'"
