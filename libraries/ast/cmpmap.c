@@ -3276,11 +3276,11 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
             wlen2 = PatternCheck( nmap, wlen1, &nlist, &nlist_len, status );
             if( wlen1 && wlen2 ) {
 
-/* Ensure wlen2 is larger tnan or equal to wlen1. */
+/* Ensure wlen2 is larger than or equal to wlen1. */
                if( wlen1 > wlen2 ) {
                   t = wlen1;
                   wlen1 = wlen2;
-                  wlen2 = wlen1;
+                  wlen2 = t;
                }
 
 /* See if wlen2 is an integer multiple of wlen1. If not, ignore the
