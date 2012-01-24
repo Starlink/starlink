@@ -140,6 +140,9 @@ f     The CmpMap class does not define any new routines beyond those
 *        Improve simplification of serial combinations of parellel CmpMaps.
 *     25-JAN-2011 (DSB):
 *        Big improvement to the efficiency of the astMapSplit method.
+*     24-JAN-2012 (DSB):
+*        If efficient MapSplit fails to split (e.g. due to the presence
+*        of PermMaps), then revert to the older slower method.
 *class--
 */
 
@@ -245,7 +248,9 @@ static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static double Rate( AstMapping *, double *, int, int, int * );
 static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
+static int *MapSplit0( AstMapping *, int, const int *, AstMapping **, int, int * );
 static int *MapSplit1( AstMapping *, int, const int *, AstMapping **, int * );
+static int *MapSplit2( AstMapping *, int, const int *, AstMapping **, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetIsLinear( AstMapping *, int * );
 static int MapList( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
@@ -2100,7 +2105,91 @@ static int *MapSplit1( AstMapping *this, int nin, const int *in, AstMapping **ma
 *     This function performs the work for the astMapSplit method. It
 *     first invokes the astMapSplit method to see if the forward
 *     transformation of the supplied Mapping (not necessarily a CmpMap)
-*     can be split as requested. If this is not possible it attempts an
+*     can be split as requested. If this is not possible it invokes MapSplit2
+*     which attempts an inverse approach to the problem. For each possible
+*     sub-sets of the Mapping outputs it call astMapSplit to see if the
+*     sub-set of outputs are generated from the selected inputs.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping to be split. It is not assumed to be a CmpMap.
+*     nin
+*        The number of inputs to pick from "this".
+*     in
+*        Pointer to an array of indices (zero based) for the inputs which
+*        are to be picked. This array should have "nin" elements. If "Nin"
+*        is the number of inputs of the supplied Mapping, then each element
+*        should have a value in the range zero to Nin-1.
+*     map
+*        Address of a location at which to return a pointer to the new
+*        Mapping. This Mapping will have "nin" inputs (the number of
+*        outputs may be different to "nin"). A NULL pointer will be
+*        returned if the supplied Mapping has no subset of outputs which
+*        depend only on the selected inputs.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array of ints. The number of
+*     elements in this array will equal the number of outputs for the
+*     returned Mapping. Each element will hold the index of the
+*     corresponding output in the supplied Mapping. The array should be
+*     freed using astFree when no longer needed. A NULL pointer will
+*     be returned if no output Mapping can be created.
+
+*  Notes:
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then NULL values will be
+*     returned as the function value and for the "map" pointer.
+*/
+
+/* Local Variables: */
+   int *result;       /* Axis order to return */
+
+/* Initialise */
+   result = NULL;
+   *map = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* First see if the forward transformation can be split as requested. */
+   result = astMapSplit( this, nin, in, map );
+
+/* If forward transformation could not be split, we attempt to split the
+   inverse transformation by selecting every possible sub-set of Mapping
+   outputs until one is found which is fed by the requested mapping inputs. */
+   if( !result ) result = MapSplit2( this, nin, in, map, status );
+
+/* Free returned resources if an error has occurred. */
+   if( !astOK ) {
+      result = astFree( result );
+      *map = astAnnul( *map );
+   }
+
+/* Return the list of output indices. */
+   return result;
+}
+
+static int *MapSplit2( AstMapping *this, int nin, const int *in, AstMapping **map, int *status ){
+/*
+*  Name:
+*     MapSplit2
+
+*  Purpose:
+*     Create a Mapping representing a subset of the inputs of an existing
+*     Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpmap.h"
+*     int *MapSplit2( AstMapping *this, int nin, const int *in, AstMapping **map )
+
+*  Class Membership:
+*     CmpMap method
+
+*  Description:
+*     This function attempts to split the supplied Mapping using an
 *     inverse approach to the problem. For each possible sub-sets of the
 *     Mapping outputs it call astMapSplit to see if the sub-set of outputs
 *     are generated from the selected inputs.
@@ -2143,6 +2232,7 @@ static int *MapSplit1( AstMapping *this, int nin, const int *in, AstMapping **ma
    int *result;       /* Axis order to return */
    int *result2;      /* Axis order for current output subset */
    int i;             /* Loop count */
+   int iscmp;         /* Is "this" a CmpMap? */
    int j;             /* Loop count */
    int mout;          /* Number of selected outputs */
    int nin2;          /* Number of inputs fed by current outputs */
@@ -2156,111 +2246,109 @@ static int *MapSplit1( AstMapping *this, int nin, const int *in, AstMapping **ma
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* First see if the forward transformation can be split as requested. */
-   result = astMapSplit( this, nin, in, map );
-
-/* If forward transformation could not be split, we attempt to split the
-   inverse transformation by selecting every possible sub-set of Mapping
-   outputs until one is found which is fed by the requested mapping inputs. */
-   if( !result ) {
-
 /* Get the number of Mapping outputs. */
-      nout = astGetNout( this );
+   nout = astGetNout( this );
 
 /* Get an inverted copy of the Mapping. We do this rather than inverting
    the supplied Maping in case an error occurs which may leave the
    supplied Mapping inverted. */
-      this2 = astCopy( this );
-      astInvert( this2 );
+   this2 = astCopy( this );
+   astInvert( this2 );
+
+/* Note if the Mapping is a CmpMap. */
+   iscmp = astIsACmpMap( this );
 
 /* Allocate memory to hold the selected output indices. */
-      out = astMalloc( nout*sizeof( int ) );
+   out = astMalloc( nout*sizeof( int ) );
 
 /* Loop round all useful subset sizes. */
-      if( out ) {
-         for( mout = 1; mout < nout && !result; mout++ ) {
+   if( out ) {
+      for( mout = 1; mout < nout && !result; mout++ ) {
 
 /* Initialise the first subset of outputs to check at the current subset
    size. */
-            for( i = 0; i < mout; i++ ) out[ i ] = 0;
+         for( i = 0; i < mout; i++ ) out[ i ] = 0;
 
 /* Loop round all ways of picking a subset of "mout" outputs from the total
    available "nout" outputs. */
-            while( ! result ) {
+         while( ! result ) {
 
 /* Skip this subset if it refers to any axis index more than once. */
-               ok = 1;
-               for( i = 1; i < mout && ok; i++ ) {
-                  for( j = 0; j < i; j++ ) {
-                     if( out[ i ] == out[ j ] ) {
-                        ok = 0;
-                        break;
-                     }
+            ok = 1;
+            for( i = 1; i < mout && ok; i++ ) {
+               for( j = 0; j < i; j++ ) {
+                  if( out[ i ] == out[ j ] ) {
+                     ok = 0;
+                     break;
                   }
                }
-               if( ok ) {
+            }
+            if( ok ) {
 
 /* Attempt to split the inverted Mapping using the current subset of
-   outputs. */
+   outputs. Take care to avoid an infinite loop if "this" is a CmpMap. */
+               if( iscmp ) {
+                  result2 = MapSplit0( this2, mout, out, &map2, 1, status );
+               } else {
                   result2 = astMapSplit( this2, mout, out, &map2 );
+               }
 
 /* If succesful... */
-                  if( result2 ) {
+               if( result2 ) {
 
 /* See if the inputs that feed the current subset of outputs are the same
    as the inputs specified by the caller (and in the same order). */
-                     nin2 = astGetNout( map2 );
-                     ok = ( nin2 == nin );
-                     if( ok ) {
-                        for( i = 0; i < nin; i++ ) {
-                           if( in[ i ] != result2[ i ] ) {
-                              ok = 0;
-                              break;
-                           }
+                  nin2 = astGetNout( map2 );
+                  ok = ( nin2 == nin );
+                  if( ok ) {
+                     for( i = 0; i < nin; i++ ) {
+                        if( in[ i ] != result2[ i ] ) {
+                           ok = 0;
+                           break;
                         }
                      }
+                  }
 
 /* If so, set up the values returned to the caller. */
-                     if( ok ) {
-                        result = astStore( result, out, mout*sizeof(int) );
-                        astInvert( map2 );
-                        *map = astClone( map2 );
-                     }
+                  if( ok ) {
+                     result = astStore( result, out, mout*sizeof(int) );
+                     astInvert( map2 );
+                     *map = astClone( map2 );
+                  }
 
 /* Free resources. */
-                     result2 = astFree( result2 );
-                     map2 = astAnnul( map2 );
-                  }
+                  result2 = astFree( result2 );
+                  map2 = astAnnul( map2 );
                }
+            }
 
 /* Increment the first axis index. */
-               i = 0;
-               out[ i ]++;
+            i = 0;
+            out[ i ]++;
 
 /* If the incremented axis index is now too high, reset it to zero and
    increment the next higher axis index. Do this until an incremented axis
    index is not too high. */
-               while( out[ i ] == nout ) {
-                  out[ i++ ] = 0;
+            while( out[ i ] == nout ) {
+               out[ i++ ] = 0;
 
-                  if( i < mout ) {
-                     out[ i ]++;
-                  } else {
-                     break;
-                  }
+               if( i < mout ) {
+                  out[ i ]++;
+               } else {
+                  break;
                }
+            }
 
 /* If all subsets have been checked break out of the loop. */
-               if( i == mout ) break;
+            if( i == mout ) break;
 
-            }
          }
       }
+   }
 
 /* Free resources. */
-      out = astFree( out );
-      this2 = astAnnul( this2 );
-   }
+   out = astFree( out );
+   this2 = astAnnul( this2 );
 
 /* Free returned resources if an error has occurred. */
    if( !astOK ) {
@@ -2272,11 +2360,11 @@ static int *MapSplit1( AstMapping *this, int nin, const int *in, AstMapping **ma
    return result;
 }
 
-static int *MapSplit( AstMapping *this_mapping, int nin, const int *in,
-                      AstMapping **map, int *status ){
+static int *MapSplit0( AstMapping *this_mapping, int nin, const int *in,
+                       AstMapping **map, int reentry, int *status ){
 /*
 *  Name:
-*     MapSplit
+*     MapSplit0
 
 *  Purpose:
 *     Create a Mapping representing a subset of the inputs of an existing
@@ -2287,12 +2375,11 @@ static int *MapSplit( AstMapping *this_mapping, int nin, const int *in,
 
 *  Synopsis:
 *     #include "cmpmap.h"
-*     int *MapSplit( AstMapping *this, int nin, const int *in,
-*                    AstMapping **map, int *status )
+*     int *MapSplit0( AstMapping *this, int nin, const int *in,
+*                     AstMapping **map, int reentry, int *status )
 
 *  Class Membership:
-*     CmpMap method (over-rides the protected astMapSplit method
-*     inherited from the Mapping class).
+*     CmpMap method
 
 *  Description:
 *     This function creates a new Mapping by picking specified inputs from
@@ -2320,6 +2407,9 @@ static int *MapSplit( AstMapping *this_mapping, int nin, const int *in,
 *        outputs may be different to "nin"). A NULL pointer will be
 *        returned if the supplied CmpMap has no subset of outputs which
 *        depend only on the selected inputs.
+*     reentry
+*        Set to zero if this is a top level entry, and non-zero if it is
+*        a recursive entry.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -2629,6 +2719,12 @@ static int *MapSplit( AstMapping *this_mapping, int nin, const int *in,
 /* Mappings that have no outputs cannot be used. */
    if( !result && *map ) *map = astAnnul( *map );
 
+/* If the above method failed to split the CmpMap, we attempt to split the
+   inverse transformation by selecting every possible sub-set of Mapping
+   outputs until one is found which is fed by the requested mapping inputs. */
+   if( !result && !reentry ) result = MapSplit2( this_mapping, nin, in, map,
+                                                 status );
+
 /* Free returned resources if an error has occurred. */
    if( !astOK ) {
       result = astFree( result );
@@ -2637,6 +2733,69 @@ static int *MapSplit( AstMapping *this_mapping, int nin, const int *in,
 
 /* Return the list of output indices. */
    return result;
+}
+
+static int *MapSplit( AstMapping *this, int nin, const int *in,
+                      AstMapping **map, int *status ){
+/*
+*  Name:
+*     MapSplit
+
+*  Purpose:
+*     Create a Mapping representing a subset of the inputs of an existing
+*     CmpMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpmap.h"
+*     int *MapSplit( AstMapping *this, int nin, const int *in,
+*                    AstMapping **map, int *status )
+
+*  Class Membership:
+*     CmpMap method (over-rides the protected astMapSplit method
+*     inherited from the Mapping class).
+
+*  Description:
+*     This function is the main entry point for the astMapSplit method.
+*     It is a simple wrapper for MapSplit0 which calls MapSplit0
+*     indicating that this is a top-level entry.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpMap to be split (the CmpMap is not actually
+*        modified by this function).
+*     nin
+*        The number of inputs to pick from "this".
+*     in
+*        Pointer to an array of indices (zero based) for the inputs which
+*        are to be picked. This array should have "nin" elements. If "Nin"
+*        is the number of inputs of the supplied CmpMap, then each element
+*        should have a value in the range zero to Nin-1.
+*     map
+*        Address of a location at which to return a pointer to the new
+*        Mapping. This Mapping will have "nin" inputs (the number of
+*        outputs may be different to "nin"). A NULL pointer will be
+*        returned if the supplied CmpMap has no subset of outputs which
+*        depend only on the selected inputs.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array of ints. The number of
+*     elements in this array will equal the number of outputs for the
+*     returned Mapping. Each element will hold the index of the
+*     corresponding output in the supplied CmpMap. The array should be
+*     freed using astFree when no longer needed. A NULL pointer will
+*     be returned if no output Mapping can be created.
+
+*  Notes:
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then NULL values will be
+*     returned as the function value and for the "map" pointer.
+*/
+   return MapSplit0( this, nin, in, map, 0, status );
 }
 
 static int PatternCheck( int val, int check, int **list, int *list_len, int *status ){
