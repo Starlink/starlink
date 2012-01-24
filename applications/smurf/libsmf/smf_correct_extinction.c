@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc,
 *                            smf_extmeth method, AstKeyMap * extpars, double tau,
-*                            double *allextcorr, int *status);
+*                            double *allextcorr, double ** wvmtaucache, int *status);
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -46,6 +46,11 @@
 *     allextcorr = double* (Given and Returned)
 *        If given, store calculated corrections for each bolo/time slice. Must
 *        have same dimensions as bolos in *data
+*     wvmtaucache = double ** (Given and Returned)
+*        If *wvmtaucache is non-null the cache will assumed to contain the appropriately
+*        smoothed WVM tau data, else WVM tau will be calculated by this routine.
+*        If WVM tau was calculated this pointer is updated to point to the WVM tau data.
+*        Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -67,6 +72,10 @@
 *
 *     If the wvm values are bad then the previous tau value is used. This should only occur
 *     when the data acquisition has failed and many JCMTSTATE entries are missing.
+
+*     To speed up calculation an external CSO tau scale array may be provided. For example
+*     the tau calculated from the first subarray can be provided to the other 3 related
+*     subarrays.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -224,7 +233,8 @@ static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
 #define FUNC_NAME "smf_correct_extinction"
 
 void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, smf_extmeth method,
-                            AstKeyMap * extpars, double tau, double *allextcorr, int *status) {
+                            AstKeyMap * extpars, double tau, double *allextcorr,
+                            double **wvmtaucache, int *status) {
 
   /* Local variables */
   double airmass;          /* Airmass */
@@ -332,12 +342,20 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
   if (tausrc == SMF__TAUSRC_WVMRAW) {
     size_t ntotaltau = 0;
     size_t ngoodtau = 0;
-    smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
-                          &ngoodtau, status );
-    smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
-    msgOutiff( MSG__VERB, "", "Using WVM mode for extinction correction of ^FILE"
-               " %.0f %% of WVM data are present", status,
-               (double)(100.0*(double)ngoodtau/(double)ntotaltau) );
+    /* calculate WVM unless we have external values */
+    if (wvmtaucache && *wvmtaucache) {
+      wvmtau = *wvmtaucache;
+      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+      msgOutiff( MSG__VERB, "", "Using cached WVM data for extinction correction of ^FILE",
+                 status);
+    } else {
+      smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
+                            &ngoodtau, status );
+      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+      msgOutiff( MSG__VERB, "", "Using WVM mode for extinction correction of ^FILE"
+                 " %.0f %% of WVM data are present", status,
+                 (double)(100.0*(double)ngoodtau/(double)ntotaltau) );
+    }
   }
 
   /* Check auto mode */
@@ -353,17 +371,25 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
       size_t ntotaltau = 0;
       double percentgood = 0.0;
 
-      smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
-                            &ngoodtau, status );
-      percentgood = 100.0 * ((double)ngoodtau / (double)ntotaltau);
-
-      if ( percentgood > 80.0) {
+      if (wvmtaucache && *wvmtaucache) {
+        wvmtau = *wvmtaucache;
         tausrc = SMF__TAUSRC_WVMRAW;
-        msgOutiff( MSG__VERB, "", "Selecting WVM mode for extinction correction of ^FILE."
-                   " %.0f %% of WVM data are present", status, percentgood );
+        smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+        msgOutiff( MSG__VERB, "", "Using cached WVM data for extinction correction of ^FILE",
+                   status );
       } else {
-        tausrc = SMF__TAUSRC_CSOTAU;
-        if (wvmtau) wvmtau = astFree( wvmtau );
+        smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
+                              &ngoodtau, status );
+        percentgood = 100.0 * ((double)ngoodtau / (double)ntotaltau);
+
+        if ( percentgood > 80.0) {
+          tausrc = SMF__TAUSRC_WVMRAW;
+          msgOutiff( MSG__VERB, "", "Selecting WVM mode for extinction correction of ^FILE."
+                     " %.0f %% of WVM data are present", status, percentgood );
+        } else {
+          tausrc = SMF__TAUSRC_CSOTAU;
+          if (wvmtau) wvmtau = astFree( wvmtau );
+        }
       }
     }
     if (tausrc == SMF__TAUSRC_CSOTAU) {
@@ -600,8 +626,13 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
 
  CLEANUP:
   if (azel) azel = astFree( azel );
-  if (wvmtau) wvmtau = astFree( wvmtau );
-
+  if (wvmtaucache) {
+    if (!*wvmtaucache) {
+      *wvmtaucache = wvmtau;
+    }
+  } else {
+    wvmtau = astFree( wvmtau );
+  }
 }
 
 /* Add footprint to the reference elevation and compare it to the reference airmass.

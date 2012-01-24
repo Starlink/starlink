@@ -528,7 +528,7 @@ void smurf_qlmakemap( int *status ) {
     /* Correct for atmospheric extinction using the mean WVM-derived
        225-GHz optical depth */
     smf_correct_extinction( wf, data, SMF__TAUSRC_WVMRAW, SMF__EXTMETH_SINGLE,
-                            extpars, VAL__BADD, NULL, status );
+                            extpars, VAL__BADD, NULL, NULL, status );
 
     /* Calculate Noise */
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Measuring Noise",

@@ -829,7 +829,7 @@ void smf_copytime( struct timeval *target, struct timeval *source,
 
 void smf_correct_extinction( ThrWorkForce * wf, smfData *data, smf_tausrc tausrc,
                              smf_extmeth method, AstKeyMap * extpars, double tau,
-                             double *allextcorr, int *status);
+                             double *allextcorr, double **wvmtaucache, int *status);
 
 void smf_create_bolfile( const Grp * rgrp, size_t index,
                          const smfData* refdata, const char * datalabel,

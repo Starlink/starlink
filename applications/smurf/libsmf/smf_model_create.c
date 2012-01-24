@@ -426,6 +426,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   /* Loop over time chunks */
   if( *status == SAI__OK ) for( i=0; i<nchunks; i++ ) {
 
+      double * wvmtaucache = NULL; /* WVM tau cache if using EXT model */
+
       /* For models that only have one file per subgroup fix up
          mgroup such that only the first filename in each subgroup
          is used. Do this by setting remaining elements of mgroup->subgroups
@@ -1062,7 +1064,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
               }
 
               smf_correct_extinction( wf, idata, tausrc, extmeth, kmap, tau,
-                                      (double *) dataptr, status );
+                                      (double *) dataptr, &wvmtaucache, status );
 
               kmap = astAnnul( kmap );
 
@@ -1288,6 +1290,11 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
       if( *status != SAI__OK ) {
         i = nchunks;
       }
+
+      /* End of this group of related elements so free any wvm tau cache
+         we have sitting around */
+      wvmtaucache = astFree( wvmtaucache );
+
     }
 
   msgOutiff( SMF__TIMER_MSG, "",
