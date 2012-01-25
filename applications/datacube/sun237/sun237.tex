@@ -1203,17 +1203,17 @@ co-operation and contributions.
       This script extracts and displays a slice from a position-velocity
       cube.  The slice need not be parallel to either spatial pixel axis.
 
-      The script displays the middle spatial plane from the supplied cube
+      The script displays a chosen spatial plane from the supplied cube
       in the left half of the current graphics device.  You are then invited
       to select two spatial positions within the displayed plane using the
       cursor.  A two-dimensional slice is then extracted from the cube that
       passes through the two selected spatial positions.  The first axis in
       this slice measures spatial distance along the line, and the second axis
       is the velocity axis.  This slice appears in the right-hand side of
-      the current graphics device, and seved to the specified output NDF.
+      the current graphics device, and saved to the specified output NDF.
    }
    \sstusage{
-      pvslice -i filename -o filename [-ci index]
+      pvslice -i filename -o filename [-ci index] [-p plane]
    }
    \sstdiytopic{
       Command-line Arguments
@@ -1237,6 +1237,14 @@ co-operation and contributions.
            The name of the NDF in which to store the velocity-position
            slice.  The script will prompt for this NDF if it is not
            supplied via this option.
+
+         \sstitem
+         {\bf{\tt{-p}}} {\em plane}\\
+           Velocity or pixel index of the plane to display to enable cursor
+           selection of the slice end points.  To specify a velocity
+           supply a floating-point value such as 2.0; for an index supply
+           an integer.  {\tt [0]}
+
       }
    }
    \sstexamples{
@@ -1246,6 +1254,12 @@ co-operation and contributions.
          This extracts a user-selected plane from the cube NDF called
          orion\_masked, and saves it to NDF orion\_pvmap.  The slice is
          shown to the right of the spatial image.
+      }
+      \sstexamplesubsection{
+         pvslice -i orion\_masked -o orion\_pvmap -p 1.5
+      }{
+         As above but slice selection is from the velocity plane at
+         1.5 as opposed to the middle index.
       }
    }
    \sstnotes{
