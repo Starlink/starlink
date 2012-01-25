@@ -130,7 +130,7 @@
 #        Moved from KAPPA to DATACUBE so replace positional parameters
 #        IN and OUT with C-shell options.  Added an option to specify
 #        the annotation colour.
-#    2012 January 18 (MJC):
+#     2012 January 18 (MJC):
 #        Added -p option.  Ensure the bounds of the extracted slice go
 #        from lower to higher. Check that the current Frame of the input
 #        file is suitable.
