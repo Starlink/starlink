@@ -235,7 +235,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
      smfData when finished. */
 
   if( (data->pntr[1]) && (*status==SAI__OK) ) {
-    size_t ndata;
+    dim_t ndata;
     double *ptr=NULL;
     smfData *realfilter=NULL; /* Real space smfData container for var filter */
     smfData *vardata=NULL;    /* smfData container for variance only */
