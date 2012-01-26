@@ -76,8 +76,8 @@
 typedef enum {DAS_NONE, DAS_TP, DAS_CONT_CAL, DAS_CROSS_CORR} dasFlag;
 
 /* Enumerated type for DAS file type */
-enum {COORD_AZ = 1, COORD_EQ = 3, COORD_RD = 4,
-      COORD_RB = 6, COORD_RJ = 7, COORD_GA = 8};
+typedef enum {COORD_AZ = 1, COORD_EQ = 3, COORD_RD = 4,
+              COORD_RB = 6, COORD_RJ = 7, COORD_GA = 8} gsdCoordType;
 
 /* Enumerated type for GSD headers and arrays (data types). */
 typedef enum {GSD_INT = 1, GSD_DOUBLE = 2, GSD_FLOAT = 3, GSD_CHAR = 4, GSD_CHARPTR = 5} gsdDType;
@@ -114,7 +114,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   char calSource[MAXSTRING];  /* calibration source */
   float *calTemps;            /* calibration temperatures */
   char calType[MAXSTRING];    /* type of calibration */
-  int cellCode;               /* code for cell coordinate frame */
+  gsdCoordType cellCode;      /* code for cell coordinate frame */
   char cellCoords[MAXSTRING]; /* cell coordinate frame */
   char cellUnit[MAXSTRING];   /* units of cell and mapping */
   double cellV2X;             /* scanning angle from local vertical to
@@ -126,7 +126,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
                                  (degrees CCW) */
   double cellY;               /* height of cells (arcsec) */
   double centreAz;            /* Az of centre at obs date (degrees) */
-  int centreCode;             /* code for centre coordinate frame */
+  gsdCoordType centreCode;    /* code for centre coordinate frame */
   char centreCoords[MAXSTRING]; /* centre coordinate frame */
   double centreDec;           /* Dec of centre (degrees) */
   double centreDec1950;       /* 1950 Dec of centre (degrees) */

@@ -97,6 +97,7 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
 
   /* Local variables.*/
   long i;                     /* loop counter */
+  int gsdcode;                /* Coordinate code integer */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -120,7 +121,8 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   gsdac_get0c ( gsd, "C4CSC", gsdVars->centreCoords, status );
 
   /* Get the centre code. */
-  gsdac_get0i ( gsd, "C4CECO", &(gsdVars->centreCode), status );
+  gsdac_get0i ( gsd, "C4CECO", &gsdcode, status );
+  gsdVars->centreCode = gsdcode;
 
   /* Get the epoch type. */
   gsdac_get0c ( gsd, "C4EPT", gsdVars->epochType, status );
@@ -155,7 +157,8 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   gsdac_get0c ( gsd, "C4LSC", gsdVars->cellCoords, status );
 
   /* Get the cell code. */
-  gsdac_get0i ( gsd, "C6FC", &(gsdVars->cellCode), status );
+  gsdac_get0i ( gsd, "C6FC", &gsdcode, status );
+  gsdVars->cellCode = gsdcode;
 
   /* Get the units of cell and mapping. */
   gsdac_get0c ( gsd, "C4ODCO", gsdVars->cellUnit, status );
