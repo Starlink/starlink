@@ -17,7 +17,7 @@ numiter = -5
 #         when the map stops changing.
 
 chitol = 1e-3
-#maptol = 0.02
+#maptol = 0.05
 
 # method of estimating variance map
 #  0 = propagate from the time-domain noise (requires noi model component)
