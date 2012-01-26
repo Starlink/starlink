@@ -213,11 +213,11 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
      record -> acs_offexposure = (double)(gsdVars->scanTime) / 2.0;
 }
 
-  record->acs_no_prev_ref = VAL__BADI;
+  record->acs_no_prev_ref = VAL__BADW;
 
-  record->acs_no_next_ref = VAL__BADI;
+  record->acs_no_next_ref = VAL__BADW;
 
-  record->acs_no_ons = VAL__BADI;
+  record->acs_no_ons = VAL__BADW;
 
   strncpy( record->acs_source_ro, "SPECTRUM_RESULT", 16 );
 
