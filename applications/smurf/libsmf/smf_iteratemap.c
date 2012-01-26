@@ -1034,19 +1034,22 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      add in the extra length required for padding. */
 
   if( *status == SAI__OK ) {
-    size_t mapmem;
+    size_t mapmem;  /* memory needed for map */
+    size_t maxdimm; /* maximum memory available just for model components */
 
     /* Add on the padding */
     maxconcat += 2*pad;
     msgOutiff( MSG__VERB," ", FUNC_NAME ": Each time stream will be padded "
               "with %" DIM_T_FMT "  samples at start and end.", status, pad );
 
-    /* First check memory for the map */
+    /* First check memory for the map and subtract off total memory to
+       see what is available for model components. */
     smf_checkmem_map( lbnd_out, ubnd_out, 0, maxmem, &mapmem, status );
+    maxdimm = maxmem-mapmem;
 
     /* Then the iterative components that are proportional to time */
     smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
-                       nmodels, msize, keymap, maxmem-mapmem, maxfile,
+                       nmodels, msize, keymap, maxdimm, maxfile,
                        &memneeded, status );
 
     if( *status == SMF__NOMEM ) {
@@ -1057,14 +1060,14 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       msgOutf( " ", FUNC_NAME ": *** WARNING ***\n  %zu continuous samples "
                "(%lg s, including padding) require %zu MiB > %zu MiB",
                status, maxconcat, maxconcat/srate_maxlen,
-               memneeded/SMF__MIB, maxmem/SMF__MIB);
+               memneeded/SMF__MIB, maxdimm/SMF__MIB);
 
       /* Try is meant to be the largest contchunk of ~equal length
          that fits in memory. The first step uses the ratio of
          requested to available memory (rounded up to an integral
          number) to estimate the number of time steps for try. */
 
-      try = (size_t) ceil(maxconcat / ceil((double)memneeded/(double)maxmem));
+      try = (size_t) ceil(maxconcat / ceil((double)memneeded/(double)maxdimm));
 
       /* Then figure out how many files this corresponds to, round up
          to get integral number of files, and finally multiply by file
@@ -1076,7 +1079,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           one file. If we don't have enough memory even for one input
           file we're hooped. */
 
-      if( (try > (maxconcat*( (double) maxmem / (double) memneeded ))) &&
+      if( (try > (maxconcat*( (double) maxdimm / (double) memneeded ))) &&
           (try > maxfile) ) {
         try -= maxfile;
       }
@@ -1105,7 +1108,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Re-check memory usage using shorter chunks */
 
       smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
-                         nmodels, msize, keymap, maxmem-mapmem, maxfile,
+                         nmodels, msize, keymap, maxdimm, maxfile,
                          &memneeded, status );
 
     }
