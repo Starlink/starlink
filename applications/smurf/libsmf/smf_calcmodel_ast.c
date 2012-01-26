@@ -112,6 +112,9 @@
 *        - Set bad pixels to zero in the SNR mask prior to smoothing the mask.
 *        - "dat->zeromask" contains 0 for pixels to be used and 1 for
 *        pixels to be masked, not the other way round.
+*     2012-1-26 (DSB):
+*        Avoid allocating a static mask array if ast.zero_mask is set to
+*        0 in the config file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -192,6 +195,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   dim_t ntslice=0;              /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
+  int refmask=0;                /* REF image supplies mask? */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   const char *skyrefis;         /* Pointer to SkyRefIs attribute value */
@@ -200,6 +204,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   double *mapvar = NULL;        /* Variance map */
   double *mapweight = NULL;     /* Weight map */
   double *mapweightsq = NULL;   /* Weight map squared */
+  int zero_c_n;                 /* Number of zero circle parameters read */
+  double zero_circle[3];        /* LON/LAT/Radius of circular mask */
   double zero_lowhits=0;        /* Zero regions with low hit count? */
   int zero_notlast=0;           /* Don't zero on last iteration? */
   double zero_snr=0;            /* Zero regions with low SNR */
@@ -243,20 +249,23 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status );
   }
 
-  /* Static masking constraints: circular region, or an external mask file */
-  if( ( (astMapType( kmap, "ZERO_CIRCLE" ) != AST__UNDEFTYPE) ||
-        (astMapType( kmap, "ZERO_MASK" ) != AST__UNDEFTYPE) ) &&
-      (dat->zeromask == NULL) && (*status == SAI__OK) ) {
+  /* Will we use a user-supplied mask? */
+  astMapGet0I( kmap, "ZERO_MASK", &refmask );
 
-    int refmask=0;                /* REF image supplies mask? */
-    int zero_c_n;                 /* Number of zero circle parameters read */
-    double zero_circle[3];        /* LON/LAT/Radius of circular mask */
+  /* Will we use a circular mask? Get the centre lon/lat and radius.  */
+  zero_circle[ 2 ] = -1.0;
+  astMapGet1D( kmap, "ZERO_CIRCLE", 3, &zero_c_n, zero_circle );
 
-    /* Initialize the mask */
+  /* Static masking constraints: circular region, or an external mask file.
+     Create the mask array if it has not already been created.  */
+  if( ( zero_circle[ 2 ] > 0.0 || refmask ) && (dat->zeromask == NULL) &&
+      (*status == SAI__OK) ) {
+
+    /* Allocate and initialize the mask */
     dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask) );
 
     /* User supplied an external mask? */
-    if( astMapGet0I( kmap, "ZERO_MASK", &refmask ) && refmask ) {
+    if( refmask ) {
       int nmap;
       void *ptr;
       int refndf=NDF__NOID;
@@ -287,7 +296,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     }
 
     /* Apply a circular boundary condition? */
-    if( astMapGet1D( kmap, "ZERO_CIRCLE", 3, &zero_c_n, zero_circle ) ) {
+    if( zero_circle[ 2 ] > 0.0 ) {
       double centre[2];
       AstCircle *circle=NULL;
       int lbnd_grid[2];
