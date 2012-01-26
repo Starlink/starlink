@@ -134,7 +134,7 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   strncpy( record->smu_chop_phase, "M", 2 );
 
-  record->smu_jig_index = VAL__BADI;
+  record->smu_jig_index = -1; /* JCMT bad index */
 
   record->smu_az_jig_x = 0.0;
 
