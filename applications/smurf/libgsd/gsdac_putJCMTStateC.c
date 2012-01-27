@@ -100,6 +100,7 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "mers.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "gsdac.h"
@@ -111,6 +112,8 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
                            const char *backend, const dasFlag dasFlag,
                            struct JCMTState *record, int *status )
 {
+
+  const char * tr_sys;
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -157,36 +160,13 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
   strncpy( record->tcs_source, "SCIENCE", 8 );
 
   /* Get the tracking coordinate system. */
-  switch ( gsdVars->centreCode ) {
-
-    case COORD_AZ:
-      strcpy ( record->tcs_tr_sys, "AZEL" );
-      break;
-    case COORD_EQ:
-      *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Equatorial coordinates not supported", status );
-      return;
-      /*strcpy ( record->tcs_tr_sys, "HADEC" ); */
-      /* break; */
-    case COORD_RD:
-      strcpy ( record->tcs_tr_sys, "APP" );
-      break;
-    case COORD_RB:
-      strcpy ( record->tcs_tr_sys, "B1950" );
-      break;
-    case COORD_RJ:
-      strcpy ( record->tcs_tr_sys, "J2000" );
-      break;
-    case COORD_GA:
-      strcpy ( record->tcs_tr_sys, "GAL" );
-      break;
-    default:
-      strcpy ( record->tcs_tr_sys, "" );
-      msgOutif(MSG__VERB," ",
-               "Couldn't identify tracking coordinates, continuing anyway", status);
-      break;
-
+  tr_sys = gsdac_code2tcssys( gsdVars->centreCode, status );
+  if (*status == SAI__OK && strlen(tr_sys) == 0) {
+    msgOutif(MSG__VERB," ",
+             "Couldn't identify tracking coordinates, continuing anyway", status);
   }
+  one_strlcpy( record->tcs_tr_sys, tr_sys,
+               sizeof(record->tcs_tr_sys), status );
 
   record->jos_drcontrol = 0;
 

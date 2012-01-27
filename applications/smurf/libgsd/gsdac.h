@@ -427,4 +427,10 @@ const dasFlag dasFlag,  /* DAS file structure flag (given) */
 int *status          /* pointer to global status (given and returned) */
 );
 
+const char * gsdac_code2tcssys
+(
+ gsdCoordType code, /* coordinate code to translate */
+ int *status        /* inherited status */
+);
+
 #endif /* GSDAC_DEFINED */

@@ -86,6 +86,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "mers.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "gsdac.h"
@@ -96,6 +97,8 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
                         mapVars *mapVars, int *status )
 
 {
+
+  const char * cell_sys;
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -171,36 +174,13 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
   }
 
   /* Get the local offset coordinate system. */
-  switch ( gsdVars->cellCode ) {
-
-    case COORD_AZ:
-      strcpy ( mapVars->loclCrd, "AZEL" );
-      break;
-    case COORD_EQ:
-      *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Equatorial coordinates not supported", status );
-      return;
-      /*strcpy ( mapVars->loclCrd, "HADEC" ); */
-      /*break;*/
-    case COORD_RD:
-      strcpy ( mapVars->loclCrd, "APP" );
-      break;
-    case COORD_RB:
-      strcpy ( mapVars->loclCrd, "B1950" );
-      break;
-    case COORD_RJ:
-      strcpy ( mapVars->loclCrd, "J2000" );
-      break;
-    case COORD_GA:
-      strcpy ( mapVars->loclCrd, "GAL" );
-      break;
-    default:
-      strcpy ( mapVars->loclCrd, "" );
-      msgOutif(MSG__VERB," ",
-               "Couldn't identify local map coordinates, continuing anyway", status);
-      break;
-
+  cell_sys = gsdac_code2tcssys( gsdVars->cellCode, status );
+  if (*status == SAI__OK && strlen(cell_sys) == 0) {
+    msgOutif(MSG__VERB," ",
+             "Couldn't identify cell coordinates, continuing anyway", status);
   }
+  one_strlcpy( mapVars->loclCrd, cell_sys,
+               sizeof(mapVars->loclCrd), status );
 
   /* Convert to ACSIS formatted string. */
   sprintf ( mapVars->skyRefX, "[OFFSET] %.0f [%s]",
