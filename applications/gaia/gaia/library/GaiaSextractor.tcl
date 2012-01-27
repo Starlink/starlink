@@ -2189,8 +2189,8 @@ itcl::class gaia::GaiaSextractor {
 
       #  Memory parameters. These are not optional and may be changed
       #  using the local default.sex file.
-      set values_(memory_objstack) 2000
-      set values_(memory_pixstack) 100000
+      set values_(memory_objstack) 3000
+      set values_(memory_pixstack) 300000
       set values_(memory_bufsize) 1024
 
       #  Verbosity. Not used, but may be modified using local
