@@ -335,7 +335,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
         /* Fill the FITS headers. */
         gsdac_putFits ( gsdVars, subBandNum, nSubsys, obsNum, utDate, nSteps,
                         backend, recepsUsed, recepNames, samMode, obsType,
-                        &dateVars, &mapVars, lineFreqs, IFFreqs,
+                        &dateVars, &mapVars, lineFreqs, IFFreqs, &wcs,
                         fitschan[subBandNum % nSubsys], status );
 
         /* Write the WCSFrame information to the fitschan. */

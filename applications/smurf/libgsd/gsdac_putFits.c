@@ -21,7 +21,7 @@
 *                     char *recepNames[], const char *samMode,
 *                     const char *obsType, const dateVars *dateVars,
 *                     const mapVars *mapVars, const double *lineFreqs,
-*                     const double *IFFreqs,
+*                     const double *IFFreqs, const gsdWCS *wcs,
 *                     AstFitsChan *fitschan, int *status )
 
 *  Arguments:
@@ -55,6 +55,8 @@
 *        Frequencies for line transitions for each subband.
 *     IFFreqs = const double* (Given)
 *        IFs for each subband.
+*     wcs = const *gsdWCS (Given)
+*        pointing and time values
 *     fitschan = AstFitsChan* (Given and Returned)
 *        FITS headers.
 *     status = int* (Given and Returned)
@@ -131,9 +133,11 @@
 *        Fix (mainly) JOS FITS headers
 *     2010-07-22 (VT):
 *        Added SPECID FITS header.
+*     2012-01-26 (TIMJ):
+*        Reinstate WCS arg for BASE position
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -180,7 +184,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                      char *recepNames[], const char *samMode,
                      const char *obsType, const dateVars *dateVars,
                      const mapVars *mapVars, const double *lineFreqs,
-                     const double *IFFreqs,
+                     const double *IFFreqs, const gsdWCS *wcs,
                      AstFitsChan *fitschan, int *status )
 
 {
@@ -558,6 +562,15 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsU ( fitschan, "ELSTART", "[deg] Elevation at start of observation", 0 );
 
   astSetFitsU ( fitschan, "ELEND", "[deg] Elevation at end of observation", 0 );
+
+  /* Base position in tracking coordinates */
+  astSetFitsS( fitschan, "TRACKSYS", gsdac_code2tcssys(gsdVars->centreCode, status),
+               "TCS tracking coordinate system", 0 );
+  astSetFitsF ( fitschan, "BASEC1", wcs->baseTr1 * AST__DR2D,
+                "[deg] TCS BASE position (longitude) in TRACKSYS", 0 );
+  astSetFitsF ( fitschan, "BASEC2", wcs->baseTr2 * AST__DR2D,
+                "[deg] TCS BASE position (latitude) in TRACKSYS", 0 );
+
 
   astSetFitsS ( fitschan, "HSTSTART", dateVars->HSTstart,
                 "HST at start of observation", 0 );

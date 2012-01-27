@@ -364,6 +364,7 @@ const dateVars *dateVars, /* date/time variables (given) */
 const mapVars *mapVars, /* map/chop/scan variables (given) */
 const double *lineFreqs, /* line frequencies of each subband (given) */
 const double *IFFreqs, /* IF of each subband (given) */
+const gsdWCS *wcs,     /* pointing and time values (given) */
 AstFitsChan *fitschan,  /* FITS headers (given and returned) */
 int *status          /* pointer to global status (given and returned) */
 );
