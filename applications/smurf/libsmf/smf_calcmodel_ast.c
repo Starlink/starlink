@@ -115,6 +115,11 @@
 *     2012-1-26 (DSB):
 *        Avoid allocating a static mask array if ast.zero_mask is set to
 *        0 in the config file.
+*     2012-1-31 (DSB):
+*        Back out of the previous mask smoothing and freezing changes, in
+*        favour of using a smoothed mask calculated in smf_iteratemap and
+*        passed into this function using the ZERO_MASK_POINTER entry in the
+*        keymap.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,9 +148,6 @@
 *-
 */
 
-/* System includes */
-#include <limits.h>
-
 /* Starlink includes */
 #include "mers.h"
 #include "ndf.h"
@@ -168,7 +170,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
-  double *dmask = NULL;         /* Pointer to floating point mask image */
   int dozero=0;                 /* zero boundaries on last iter? */
   double gaussbg;               /* gaussian background filter */
   int *hitsmap;                 /* Pointer to hitsmap data */
@@ -193,9 +194,9 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   dim_t nointslice;             /* number of time slices for noise */
   size_t noitstride;            /* Time stride for noise */
   dim_t ntslice=0;              /* Number of time slices */
+  void *ptr = NULL;             /* Pointer to floating point mask array */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
-  int refmask=0;                /* REF image supplies mask? */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   const char *skyrefis;         /* Pointer to SkyRefIs attribute value */
@@ -204,14 +205,9 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   double *mapvar = NULL;        /* Variance map */
   double *mapweight = NULL;     /* Weight map */
   double *mapweightsq = NULL;   /* Weight map squared */
-  int zero_c_n;                 /* Number of zero circle parameters read */
-  double zero_circle[3];        /* LON/LAT/Radius of circular mask */
   double zero_lowhits=0;        /* Zero regions with low hit count? */
   int zero_notlast=0;           /* Don't zero on last iteration? */
   double zero_snr=0;            /* Zero regions with low SNR */
-  double zero_snr_low=0.05;     /* Low limit for smoothed SNR values */
-  double zero_snr_fwhm=0.0;     /* FWHM of smoothing kernel for SNR mask (arcsec) */
-  int zero_snr_freeze = INT_MAX;/* No. of iterations over which SNR mask can change */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -249,38 +245,57 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status );
   }
 
-  /* Will we use a user-supplied mask? */
-  astMapGet0I( kmap, "ZERO_MASK", &refmask );
+  /* See if the KeyMap contains a pointer to a pre-calculated mask (for
+     instance, calculated by smoothing the final SNR mask produced by
+     a previous run of smf_iteratemap). If such a mask exists, it will be
+     a floating-point array such as would be read in from an NDF via
+     "ZERO_MASK". This mask takes precedence over all other forms of mask. */
+  int premask = 0;
+  if( astMapHasKey(  kmap, "ZERO_MASK_POINTER" ) ) {
+     astMapGet0P( kmap, "ZERO_MASK_POINTER", &ptr );
+     if( ptr ) {
+        premask = 1;
+        gaussbg = 0;
+        zero_lowhits = 0;
+     }
+  }
 
-  /* Will we use a circular mask? Get the centre lon/lat and radius.  */
-  zero_circle[ 2 ] = -1.0;
-  astMapGet1D( kmap, "ZERO_CIRCLE", 3, &zero_c_n, zero_circle );
+  /* Static masking constraints: pre-defined mask created by a previous
+     call to smf_iteratemap, circular region, or an external mask file */
+  if( ( premask || (astMapHasKey( kmap, "ZERO_CIRCLE" ) != AST__UNDEFTYPE) ||
+       (astMapType( kmap, "ZERO_MASK" ) != AST__UNDEFTYPE) ) &&
+      (dat->zeromask == NULL) && (*status == SAI__OK) ) {
 
-  /* Static masking constraints: circular region, or an external mask file.
-     Create the mask array if it has not already been created.  */
-  if( ( zero_circle[ 2 ] > 0.0 || refmask ) && (dat->zeromask == NULL) &&
-      (*status == SAI__OK) ) {
+    int refmask=0;                /* REF image supplies mask? */
+    int zero_c_n;                 /* Number of zero circle parameters read */
+    double zero_circle[3];        /* LON/LAT/Radius of circular mask */
 
-    /* Allocate and initialize the mask */
+    /* Initialize the mask */
     dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask) );
 
-    /* User supplied an external mask? */
-    if( refmask ) {
+    /* User supplied an external mask, or a predefined mask was found in
+       the KeyMap? */
+    if( premask ||
+        ( astMapGet0I( kmap, "ZERO_MASK", &refmask ) && refmask ) ) {
       int nmap;
-      void *ptr;
       int refndf=NDF__NOID;
       int zerondf=NDF__NOID;
 
       ndfBegin();
 
-      /* Obtain NDF identifier for the reference image*/
-      ndfAssoc( "REF", "READ", &refndf, status );
+      /* If a predefined mask was found, use it. Otherwise use the specified
+         NDF. */
+      if( !premask ) {
 
-      /* Obtain an NDF section with bounds that match our map */
-      ndfSect( refndf, 2, dat->lbnd_out, dat->ubnd_out, &zerondf, status );
+        /* Obtain NDF identifier for the reference image*/
+        ndfAssoc( "REF", "READ", &refndf, status );
 
-      /* Map the data as double precision */
-      ndfMap( zerondf, "DATA", "_DOUBLE", "READ", &ptr, &nmap, status );
+        /* Obtain an NDF section with bounds that match our map */
+        ndfSect( refndf, 2, dat->lbnd_out, dat->ubnd_out, &zerondf, status );
+
+        /* Map the data as double precision */
+        ndfMap( zerondf, "DATA", "_DOUBLE", "READ", &ptr, &nmap, status );
+      }
 
       /* Identify bad pixels in maskdata and set those pixels in zeromask */
       if( *status == SAI__OK ) {
@@ -296,7 +311,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     }
 
     /* Apply a circular boundary condition? */
-    if( zero_circle[ 2 ] > 0.0 ) {
+    if( !premask && astMapGet1D( kmap, "ZERO_CIRCLE", 3, &zero_c_n,
+                                 zero_circle ) ) {
       double centre[2];
       AstCircle *circle=NULL;
       int lbnd_grid[2];
@@ -358,16 +374,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   /* Will we apply a boundary condition based on map pixels that lie below
      some threshold? */
   astMapGet0D( kmap, "ZERO_SNR", &zero_snr );
-
-  /* If so, see if the SNR mask is to be smoothed. The zero_snr_fwhm
-     value is the FWHM of the smoothing Gaussian in arcsec. The
-     zero_snr_low value is the lower threshold for smoothed values that
-     are to be retained in the map. It should be in the range 0.0 to 1.0. */
-  if( zero_snr != 0.0 ) {
-    astMapGet0D( kmap, "ZERO_SNR_FWHM", &zero_snr_fwhm );
-    astMapGet0D( kmap, "ZERO_SNR_LOW", &zero_snr_low );
-    astMapGet0I( kmap, "ZERO_SNR_FREEZE", &zero_snr_freeze );
-  }
+  if( premask ) zero_snr = 0.0;
 
   /* Will we apply boundary conditions on last iteration ? */
   astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
@@ -487,110 +494,23 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
       }
     }
 
-    /* Zero regions below the cut in SNR. We freeze the mask after a
-       small number of iterations in order to aid convergence. To freeze
-       the mask we take a copy of the mask and put it in dat->zeromask.
-       So only calculate a new SNR mask if there is no mask currently in
-       dat->zeromask. */
-    if( zero_snr && !dat->zeromask) {
+    /* Zero regions below the cut in SNR */
 
-      /* If the time has come to freeze the SNR mask, allocate memory to
-         store the frozen mask. Fill it with 1.0 values (=> "low SNR pixel"). */
-      if( dat->iter == zero_snr_freeze ) {
-         dat->zeromask = astMalloc( dat->msize*sizeof(*dat->zeromask) );
-         for( i=0; i<dat->msize; i++ ) (dat->zeromask)[ i ] = 1.0;
-         msgOutiff( MSG__DEBUG, "", FUNC_NAME ": freezing SNR mask", status );
-      } else {
-         msgOutiff( MSG__DEBUG, "", FUNC_NAME ": calculating new SNR mask", status );
-      }
+    if( zero_snr ) {
+      for( i=0; i<dat->msize; i++ ) {
 
-      /* First handle the case where the mask is based on the unsmoothed
-         SNR values (using a separate case is faster and requires less
-         memory). */
-      if( zero_snr_fwhm == 0.0 ) {
-        for( i=0; i<dat->msize; i++ ) {
-          if( (map[i] != VAL__BADD) && (mapvar[i] != VAL__BADD) &&
-              (mapvar[i] > 0) && (map[i]/sqrt(mapvar[i]) < zero_snr) ) {
-            map[i] = 0;
-            mapweight[i] = VAL__BADD;
-            mapweightsq[i] = VAL__BADD;
-            mapvar[i] = VAL__BADD;
-            mapqual[i] |= SMF__MAPQ_ZERO;
-            newzero ++;
+        if( map[i] == VAL__BADD ||
+            mapvar[i] == VAL__BADD ||
+            mapvar[i] <= 0.0 ) {
+          mapqual[i] |= SMF__MAPQ_ZERO;
 
-          /* Store the usable mask positions if we are recording the
-             current SNR mask for future use. */
-          } else if( dat->zeromask ) {
-            (dat->zeromask)[i] = 0;
-          }
-        }
-
-      /* Now handle cases where the mask is based on smoothed SNR
-         values. */
-      } else {
-
-        /* Allocate an array to hold the unsmoothed mask values (zero
-           or one). */
-        dmask = astMalloc( dat->msize*sizeof(*dmask) );
-        if( dmask ) {
-
-          /* Calculate the SNR value at every map pixel. If it is larger
-             than the threshold (zero_snr), store a 1 in the mask.
-             Otherwise store a zero in the mask. */
-          for( i = 0; i < dat->msize; i++ ) {
-            if( map[ i ] != VAL__BADD &&
-                mapvar[ i ] != VAL__BADD && mapvar[ i ] > 0.0 ){
-              if( map[ i ]/sqrt( mapvar[ i ] ) < zero_snr ) {
-                dmask[ i ] = 0.0;
-              } else {
-                dmask[ i ] = 1.0;
-              }
-            } else {
-               dmask[ i ] = 0.0;
-            }
-          }
-
-          /* Put the mask into a smfData wrapper */
-          smfData *filtermap = smf_create_smfData( 0, status );
-          if( *status == SAI__OK ) {
-            filtermap->isFFT = -1;
-            filtermap->dtype = SMF__DOUBLE;
-            filtermap->pntr[0] = dmask;
-            filtermap->ndims = 2;
-            filtermap->dims[0] = dat->ubnd_out[0]-dat->lbnd_out[0]+1;
-            filtermap->dims[1] = dat->ubnd_out[1]-dat->lbnd_out[1]+1;
-            filtermap->hdr->wcs = astClone( dat->outfset );
-
-            /* Create a Gaussian filter to smooth the mask. */
-            smfFilter *filt = smf_create_smfFilter( filtermap, status );
-            smf_filter2d_gauss( filt, zero_snr_fwhm, status );
-
-            /* Smooth the mask, and free the filter. */
-            smf_filter_execute( wf, filtermap, filt, 0, 0, status );
-            filt = smf_free_smfFilter( filt, status );
-
-            /* Unset pointers to avoid freeing them */
-            filtermap->pntr[0] = NULL;
-
-            /* Threshold the smoothed mask, and apply to the map. */
-            for( i = 0; i < dat->msize; i++ ) {
-              if( dmask[ i ] < zero_snr_low ) {
-                map[i] = 0;
-                mapweight[i] = VAL__BADD;
-                mapweightsq[i] = VAL__BADD;
-                mapvar[i] = VAL__BADD;
-                mapqual[i] |= SMF__MAPQ_ZERO;
-                newzero ++;
-
-          /* Store the usable mask positions if we are recording the
-             current SNR mask for future use. */
-              } else if( dat->zeromask ) {
-                (dat->zeromask)[i] = 0;
-              }
-            }
-          }
-          smf_close_file( &filtermap, status );
-          dmask = astFree( dmask );
+        } else if( map[i]/sqrt(mapvar[i]) < zero_snr ) {
+          map[i] = 0;
+          mapweight[i] = VAL__BADD;
+          mapweightsq[i] = VAL__BADD;
+          mapvar[i] = VAL__BADD;
+          mapqual[i] |= SMF__MAPQ_ZERO;
+          newzero ++;
         }
       }
     }

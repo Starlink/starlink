@@ -17,7 +17,7 @@
 *     smf_iteratemap(ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 *                    const Grp *bolrootgrp, const Grp *shortrootgrp,
 *                    const Grp *flagrootgrp, const Grp *samprootgrp,
-*                    AstKeyMap *keymap,
+*                    AstKeyMap *akeymap,
 *                    const smfArray * darks, const smfArray *bbms,
 *                    const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
 *                    int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
@@ -47,7 +47,7 @@
 *     samprootgrp = const Grp * (Given)
 *        Root name to use for sample output cubes (if required). Can be a
 *        path to an HDS container.
-*     keymap = AstKeyMap* (Given)
+*     akeymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
 *     darks = const smfArray * (Given)
 *        Collection of dark frames. Can be NULL.
@@ -381,6 +381,10 @@
 *        -Check convergence of map in addition to chi^2
 *     2012-01-16 (DSB):
 *        Fix a memory leak (zeromask was freed at the wrong time).
+*     2012-01-31 (DSB):
+*        - Ensure the supplied KeyMap is unchanged on exit, so that we can 
+*        re-run smf_iteratemap a second time if required.
+*        - Ensure all AST objects created in this function are deleted before leaving.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -456,7 +460,7 @@ void _smf_iteratemap_showmem( int *status ) {
 void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,
                      const Grp *flagrootgrp, const Grp *samprootgrp,
-                     AstKeyMap *keymap,
+                     AstKeyMap *akeymap,
                      const smfArray *darks, const smfArray *bbms,
                      const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
                      int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
@@ -467,6 +471,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      size_t *numcnvg, int *status ) {
 
   /* Local Variables */
+  AstKeyMap *astkmap=NULL;      /* keymap for AST model */
   int bolomap=0;                /* If set, produce single bolo maps */
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
@@ -509,6 +514,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int itermap=0;                /* If set, produce maps each iteration */
   size_t j;                     /* Loop counter */
   size_t k;                     /* Loop counter */
+  AstKeyMap *keymap=NULL;       /* Copy of supplied keymap */
   size_t l;                     /* Loop counter */
   double *lastchisquared=NULL;  /* chisquared for last iter */
   double *lastmap=NULL;         /* map from the last iter */
@@ -586,6 +592,15 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Begin an AST context so all AST objects created in (or under) this
+     function are automatically annulled by the call to astEnd at the end of
+     this function. */
+  astBegin;
+
+  /* This function modifies the contents of the config keymap. So take a
+     copy of the supplied keymap to avoid modifying it. */
+  keymap = astCopy( akeymap );
 
   /* Calculate number of elements in the map */
   if( (ubnd_out[0]-lbnd_out[0] < 0) || (ubnd_out[1]-lbnd_out[1] < 0) ) {
@@ -2967,4 +2982,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   if( numcontchunks) *numcontchunks = ncontchunks;
   if( numinsmp ) *numinsmp = count_minsmp;
   if( numcnvg ) *numcnvg = count_mcnvg;
+
+
+  /* Annull all AST objects created in (or under) this function. */
+  astEnd;
+
 }

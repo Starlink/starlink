@@ -578,17 +578,20 @@ ext.taumethod =adaptive
 # SNR below this threshold will be set to 0.
 #
 # The ast.zero_snr_fwhm parameter gives the FWHM of a Gaussian (in arcsec)
-# with which to smooth the mask specified by the ast.zero_snr value. If it
-# is set to zero, no smoothing is performed.
+# with which to smooth the final mask produced as a consequence of setting 
+# the ast.zero_snr value. If it is set to zero, no smoothing is performed. 
+# The smoothing occurs once all chunks of the map have converged, and a new
+# map is then created using the smoothed mask as if it had been supplied via
+# "ast.zero_mask". Consequently, setting ast.zero_snr_fwhm causes the time 
+# taken to create the final map to nearly double.
 #
 # The ast.zero_snr_low parameter gives the value (in the range 0.0 to 1.0)
-# at which to threshold the smoothed mask specified by ast.zero_snr_fwhm.
+# at which to threshold the smoothed mask specified by ast.zero_snr_fwhm. 
+# If it is negative, the value is taken as the max smoothed value of a blob 
+# containing "ast.zero_snr_low" pixels. Thus a value of "-1.1" will cut at 
+# a height just sufficient to remove blobs of a single pixel form the mask.
+# A value of "-2.1" would remove blobs of two pixels form the mask, etc.
 #
-# The ast.zero_snr_freeze parameter gives the number of iterations over
-# which the SNR mask is allowed to change. The SNR mask used for the last
-# of these iterations is then frozen and re-used for all subsequent
-# iterations. If ast.zero_snr_freeze is undefined, the SNR mask is never
-# frozen.
 #
 # If ast.zero_notlast is set, on the final iteration this boundary
 # condition will not be applied. This feature will probably be useful
@@ -602,9 +605,8 @@ ext.taumethod =adaptive
 #ast.zero_lowhits = 0.1
 #ast.zero_notlast = 1
 #ast.zero_snr = 5
-#ast.zero_snr_fwhm = 30
-#ast.zero_snr_low = 0.05
-#ast.zero_snr_freeze = 10
+#ast.zero_snr_fwhm = 60
+#ast.zero_snr_low = -1.1
 
 # The AST model can also perform map-based de-spiking after the first
 # iteration provided that there is also a NOI model present. The value

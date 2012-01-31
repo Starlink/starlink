@@ -1720,6 +1720,10 @@ void smf_set_moving( AstFrameSet* wcs, AstFitsChan * fchan, int *status );
 void smf_smfFile_msg( const smfFile * file, const char token[],
                       int strip, const char fallback[] );
 
+double *smf_smoothmask( ThrWorkForce * wf, smf_qual_t qual, const smf_qual_t *mapqual, int
+                        dim0, int dim1, AstFrameSet *fset, double fwhm,
+                        double low, int *status );
+
 int smf_sort_bydouble ( const void *in1, const void *in2 );
 
 void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,

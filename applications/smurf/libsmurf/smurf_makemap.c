@@ -1096,6 +1096,10 @@
 *        Added NCONTCHUNK, NMINSMP, NMCNVG
 *     2011-06-29 (EC):
 *        Added sampcubes extensions to iterative map-maker
+*     2012-01-31 (DSB):
+*        Run smf_iteratemap twice if ast.zero_snr_fwhm is set. The second
+*        run uses a static zero mask produced by smoothing the final mask
+*        in use at the end of the first run.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -2033,13 +2037,73 @@ void smurf_makemap( int *status ) {
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": %f s setting up provenance",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
-    /* Call the low-level iterative map-maker */
+    /* We can unlock the config KeyMap now since we have got the user's
+       configuration (the point of locking it was to allow the user to
+       get error messages describing any unknown parameters the supplied
+       config). Unlocking it allows us to use the KeyMap to communicate
+       values into the model calculators. */
+    astSetI( keymap, "MapLocked", 0 );
 
-    smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
-                    flagrootgrp, samprootgrp, keymap, NULL, bbms, flatramps,
-                    heateffmap, outfset, moving, lbnd_out, ubnd_out, maxmem-mapmem,
-                    map, hitsmap, exp_time, variance, mapqual, weights, data_units,
-                    &nboloeff, &ncontchunks, &ninsmp, &ncnvg, status );
+    /* See if we should re-run iteratemap a second time using the mask
+       determined from the first run. This is the case if AST.ZERO_SNR_FWHM
+       and AST.ZERO_SNR are both non-zero. */
+    AstObject *obj = NULL;
+    astMapGet0A( keymap, "AST", &obj );
+    AstKeyMap *astkmap = (AstKeyMap *) obj;
+    double zero_snr_fwhm = -1.0;
+    double zero_snr = 0.0;
+    double zero_snr_low = -1.1;
+    astMapGet0D( astkmap, "ZERO_SNR_FWHM", &zero_snr_fwhm );
+    astMapGet0D( astkmap, "ZERO_SNR", &zero_snr );
+    astMapGet0D( astkmap, "ZERO_SNR_LOW", &zero_snr_low );
+
+    /* Perform the required number of calls to smf_iteratemap - one
+    normally, but two if we want to re-run with a smoothed SNR mask. */
+    int nrun = ( zero_snr > 0.0 && zero_snr_fwhm > 0.0 ) ? 2 : 1;
+    double *snr_mask = NULL;
+    int irun;
+    for( irun = 0; irun < nrun; irun++ ) {
+
+      /* Call the low-level iterative map-maker */
+      smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
+                      flagrootgrp, samprootgrp, keymap, NULL, bbms, flatramps,
+                      heateffmap, outfset, moving, lbnd_out, ubnd_out, maxmem-mapmem,
+                      map, hitsmap, exp_time, variance, mapqual, weights, data_units,
+                      &nboloeff, &ncontchunks, &ninsmp, &ncnvg, status );
+
+      /* If we have just run smf_iteratemap for the second time, free the
+         snr mask allocated after the first run. */
+      if( irun == 1 ) {
+         snr_mask = astFree( snr_mask );
+
+      /* Otherwise, if we will be running smf_iteratemap again, create a
+         smoothed copy of the SNR mask. */
+      } else if( nrun == 2 ) {
+         snr_mask = smf_smoothmask( wf, SMF__MAPQ_ZERO, mapqual,
+                                    ubnd_out[0] - lbnd_out[0] + 1,
+                                    ubnd_out[1] - lbnd_out[1] + 1, outfset,
+                                    zero_snr_fwhm, zero_snr_low, status );
+
+        /* Store a pointer to the smoothed mask in the KeyMap so that
+           smf_calcmodel_ast can pick it up and use it in the same way
+           that a  user-supplied mask is used. */
+        astMapPut0P( astkmap, "ZERO_MASK_POINTER", snr_mask, NULL );
+
+        /* Re-initialise all the output arrays. */
+        memset( map, 0, nxy*sizeof(*map) );
+        memset( hitsmap, 0, nxy*sizeof(*hitsmap) );
+        memset( exp_time, 0, nxy*sizeof(*exp_time) );
+        memset( variance, 0, nxy*sizeof(*map) );
+        memset( mapqual, 0, nxy*sizeof(*mapqual) );
+        memset( weights, 0, nxy*sizeof(*weights) );
+
+        /* Tell the user we are about to start all over again... */
+        msgOutiff( MSG__DEBUG, "", "\n\n" FUNC_NAME ": making a new "
+                   "map using the smoothed SNR mask from the first "
+                   "map.\n\n", status );
+      }
+    }
+
 
     parPut0i( "NCONTCHUNK", (int) ncontchunks, status );
     parPut0i( "NMINSMP", (int) ninsmp, status );
