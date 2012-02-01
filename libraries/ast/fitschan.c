@@ -33592,6 +33592,11 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
          val = GetItem( &(store->mjdavg), 0, 0, ' ', NULL, method, class, status );
          if( val != AST__BAD ) SetValue( this, "MJD-AVG", &val, AST__FLOAT,
                                          "Average Modified Julian Date of observation", status );
+
+/* Store the timescale in TIMESYS. */
+         cval = GetItemC( &(store->timesys), 0, 0, s, NULL, method, class, status );
+         if( cval ) SetValue( this, "TIMESYS", &cval, AST__STRING,
+                              "Timescale for MJD-OBS/MJD-AVG values", status );
       }
 
 /* Numerical projection parameters */
