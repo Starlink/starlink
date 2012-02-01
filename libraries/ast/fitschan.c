@@ -1006,6 +1006,10 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        TAN projection).
 *     22-NOV-2011 (DSB):
 *        Allow the "-SIP" code to be used with non-celestial axes.
+*     1-FEB-2012 (DSB):
+*        Write out MJD-OBS in the timescale specified by any TIMESYS
+*        keyword in the FitsChan, and ensure the TIMESYS value is included
+*        in the output header.
 *class--
 */
 
@@ -1252,6 +1256,7 @@ typedef struct FitsStore {
    char ****specsys;
    char ****ssyssrc;
    char ****ps;
+   char ****timesys;
    double ***pc;
    double ***cdelt;
    double ***crpix;
@@ -1278,7 +1283,6 @@ typedef struct FitsStore {
    double ***imagfreq;
    double ***axref;
    int naxis;
-   AstTimeScaleType timesys;
    AstKeyMap *tables;
 } FitsStore;
 
@@ -1596,7 +1600,7 @@ static double **OrthVectorSet( int, int, double **, int * );
 static double *FitLine( AstMapping *, double *, double *, double *, double, double *, int * );
 static double *OrthVector( int, int, double **, int * );
 static double *ReadCrval( AstFitsChan *, AstFrame *, char, const char *, const char *, int * );
-static double ChooseEpoch( FitsStore *, char, const char *, const char *, int * );
+static double ChooseEpoch( AstFitsChan *, FitsStore *, char, const char *, const char *, int * );
 static double DateObs( const char *, int * );
 static double GetItem( double ****, int, int, char, char *, const char *method, const char *class, int * );
 static double NearestPix( AstMapping *, double, int, int * );
@@ -1665,7 +1669,7 @@ static int PCFromStore( AstFitsChan *, FitsStore *, const char *, const char *, 
 static int SearchCard( AstFitsChan *, const char *, const char *, const char *, int * );
 static int SetFits( AstFitsChan *, const char *, void *, int, const char *, int, int * );
 static int Similar( const char *, const char *, int * );
-static int SkySys( AstSkyFrame *, int, int, FitsStore *, int, int, char c, const char *, const char *, int * );
+static int SkySys( AstFitsChan *, AstSkyFrame *, int, int, FitsStore *, int, int, char c, const char *, const char *, int * );
 static int Split( const char *, char **, char **, char **, const char *, const char *, int * );
 static int SplitMap( AstMapping *, int, int, int, AstMapping **, AstWcsMap **, AstMapping **, int * );
 static int SplitMap2( AstMapping *, int, AstMapping **, AstWcsMap **, AstMapping **, int * );
@@ -4293,7 +4297,7 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
             }
 
 /* Store the CTYPE, CNAME, EQUINOX, MJDOBS, and RADESYS values. */
-            SkySys( skyfrm, 1, astGetWcsType( map2 ), store, fits_ilon,
+            SkySys( this, skyfrm, 1, astGetWcsType( map2 ), store, fits_ilon,
                     fits_ilat, s, method, class, status );
 
 /* Store the LONPOLE and LATPOLE values in the FitsStore. */
@@ -4520,7 +4524,7 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
          if( tmap0 ) {
 
 /* Store the CTYPE, CNAME, EQUINOX, MJDOBS, and RADESYS values. */
-            SkySys( skyfrm, 0, 0, store, fits_ilon, fits_ilat, s, method,
+            SkySys( this, skyfrm, 0, 0, store, fits_ilon, fits_ilat, s, method,
                     class, status );
 
 /* If possible, choose the two CRVAL values (which are values on the psi
@@ -5155,8 +5159,8 @@ static void CheckZero( char *text, double value, int width, int *status ){
    }
 }
 
-static double ChooseEpoch( FitsStore *store, char s, const char *method,
-                           const char *class, int *status ){
+static double ChooseEpoch( AstFitsChan *this, FitsStore *store, char s,
+                           const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     ChooseEpoch
@@ -5168,8 +5172,8 @@ static double ChooseEpoch( FitsStore *store, char s, const char *method,
 *     Private function.
 
 *  Synopsis:
-*     double ChooseEpoch( FitsStore *store, char s, const char *method,
-*                         const char *class, int *status )
+*     double ChooseEpoch( AstFitsChan *this, FitsStore *store, char s,
+*                         const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     FitsChan
@@ -5182,6 +5186,8 @@ static double ChooseEpoch( FitsStore *store, char s, const char *method,
 *     keywords by the SpecTrans function before this function is called.
 
 *  Parameters:
+*     this
+*        Pointer to the FitsChan.
 *     store
 *        A structure containing values for FITS keywords relating to
 *        the World Coordinate System.
@@ -5205,7 +5211,8 @@ static double ChooseEpoch( FitsStore *store, char s, const char *method,
 */
 
 /* Local Variables: */
-   double mjd;         /* The returned MJD */
+   const char *timesys;  /* The TIMESYS value in the FitsStore */
+   double mjd;           /* The returned MJD */
 
 /* Initialise the returned value. */
    mjd = AST__BAD;
@@ -5230,7 +5237,9 @@ static double ChooseEpoch( FitsStore *store, char s, const char *method,
                                         method, class, status );
 
 /* Now convert the MJD value to the TDB timescale. */
-   mjd = TDBConv( mjd, store->timesys, 0, method, class, status );
+   timesys = GetItemC( &(store->timesys), 0, 0, ' ', NULL, method, class, status );
+   mjd = TDBConv( mjd, TimeSysToAst( this, timesys, method, class, status ),
+                  0, method, class, status );
 
 /* Return the answer. */
    return mjd;
@@ -9778,6 +9787,7 @@ static void FindWcs( AstFitsChan *this, int last, int all, int rewind,
              Match( keyname, "EQUINOX%0c", 0, NULL, &nfld, method, class, status ) ||
              Match( keyname, "MJD-OBS",  0, NULL, &nfld, method, class, status ) ||
              Match( keyname, "DATE-OBS", 0, NULL, &nfld, method, class, status ) ||
+             Match( keyname, "TIMESYS", 0, NULL, &nfld, method, class, status ) ||
              Match( keyname, "RADECSYS", 0, NULL, &nfld, method, class, status ) ||
              Match( keyname, "RADESYS%0c", 0, NULL, &nfld, method, class, status ) ||
              Match( keyname, "C%1dVAL%d", 0, NULL, &nfld, method, class, status ) ||
@@ -10218,7 +10228,7 @@ static FitsStore *FitsToStore( AstFitsChan *this, int encoding,
       ret->imagfreq = NULL;
       ret->axref = NULL;
       ret->naxis = 0;
-      ret->timesys = AST__UTC;
+      ret->timesys = NULL;
       ret->tables = astKeyMap( "", status );
    }
 
@@ -10493,6 +10503,7 @@ static FitsStore *FreeStore( FitsStore *store, int *status ){
    FreeItemC( &(store->specsys), status );
    FreeItemC( &(store->ssyssrc), status );
    FreeItemC( &(store->ps), status );
+   FreeItemC( &(store->timesys), status );
    FreeItem( &(store->pc), status );
    FreeItem( &(store->cdelt), status );
    FreeItem( &(store->crpix), status );
@@ -10909,7 +10920,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
       ret->imagfreq = NULL;
       ret->axref = NULL;
       ret->naxis = naxis;
-      ret->timesys = AST__UTC;
+      ret->timesys = NULL;
       ret->tables = astKeyMap( "", status );
 
 /* Obtain the index of the Base Frame (i.e. the pixel frame ). */
@@ -15125,7 +15136,6 @@ static void FixUsed( AstFitsChan *this, int reset, int used, int remove,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     void FixUsed( AstFitsChan *this, int reset, int used, int remove,
 *                   const char *method, const char *class, int *status )
 
@@ -16672,7 +16682,6 @@ static int GetSkip( AstChannel *this_channel, int *status ) {
 static int GetValue( AstFitsChan *this, const char *keyname, int type,
                      void *value, int report, int mark, const char *method,
                      const char *class, int *status ){
-
 /*
 *  Name:
 *     GetValue
@@ -16684,7 +16693,6 @@ static int GetValue( AstFitsChan *this, const char *keyname, int type,
 *     Private function.
 
 *  Synopsis:
-
 *     int GetValue( AstFitsChan *this, const char *keyname, int type, void *value,
 *                   int report, int mark, const char *method, const char *class, int *status )
 
@@ -19557,7 +19565,7 @@ static AstFrameSet *MakeFitsFrameSet( AstFrameSet *fset, int ipix, int iwcs, int
             astAddFrame( ret, AST__BASE, map, wcsfrm );
 
 /* If we have a celestial reference position for the spectral axis, ensure
-   it is descirbed correctly by a pair of celestial axes. */
+   it is described correctly by a pair of celestial axes. */
          } else {
 
 /* If the WCS Frame does not contain any celestial axes, we add some now. */
@@ -25541,7 +25549,6 @@ static void SetValue( AstFitsChan *this, const char *keyname, void *value,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     void SetValue( AstFitsChan *this, char *keyname, void *value,
 *                    int type, const char *comment, int *status )
 
@@ -26420,8 +26427,8 @@ static void SkyPole( AstWcsMap *map2, AstMapping *map3, int ilon, int ilat,
    }
 }
 
-static int SkySys( AstSkyFrame *skyfrm, int wcstype, int wcsproj,
-                   FitsStore *store, int axlon, int axlat, char s,
+static int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
+                   int wcsproj, FitsStore *store, int axlon, int axlat, char s,
                    const char *method, const char *class, int *status ){
 /*
 *  Name:
@@ -26435,8 +26442,8 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, int wcsproj,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int SkySys( AstSkyFrame *skyfrm, int wcstype, int wcsproj,
-*                 FitsStore *store, int axlon, int axlat, char s,
+*     int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
+*                 int wcsproj, FitsStore *store, int axlon, int axlat, char s,
 *                 const char *method, const char *class, int *status )
 
 *  Class Membership:
@@ -26444,11 +26451,13 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, int wcsproj,
 
 *  Description:
 *     This function sets values for the following FITS-WCS keywords
-*     within the supplied FitsStore structure: CTYPE, CNAME, RADECSYS, EQUINOX,
+*     within the supplied FitsStore structure: CTYPE, CNAME, RADESYS, EQUINOX,
 *     MJDOBS, CUNIT, OBSGEO-X/Y/Z. The values are derived from the supplied
 *     SkyFrame and WcsMap.
 
 *  Parameters:
+*     this
+*        Pointer to the FitsChan.
 *     skyfrm
 *        A pointer to the SkyFrame to be described.
 *     wcstype
@@ -26482,6 +26491,7 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, int wcsproj,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS     /* Declare the thread specific global data */
    char *label;             /* Pointer to axis label string */
    char lattype[MXCTYPELEN];/* Latitude axis CTYPE value */
    char lontype[MXCTYPELEN];/* Longitude axis CTYPE value */
@@ -26489,7 +26499,10 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, int wcsproj,
    const char *lonsym;      /* SkyFrame longitude axis symbol */
    const char *prj_name;    /* Pointer to projection name string */
    const char *sys;         /* Celestal coordinate system */
-   double ep;               /* Epoch of observation (MJD) */
+   const char *timesys;     /* Timescale specified in FitsChan */
+   double ep;               /* Epoch of observation in required timescale (MJD) */
+   double ep_tdb;           /* Epoch of observation in TDB timescale (MJD) */
+   double ep_utc;           /* Epoch of observation in UTC timescale (MJD) */
    double eq;               /* Epoch of reference equinox (MJD) */
    double h;                /* Geodetic altitude of observer (metres) */
    double geolat;           /* Geodetic latitude of observer (radians) */
@@ -26501,11 +26514,15 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, int wcsproj,
    int isys;                /* Celestial coordinate system */
    int latax;               /* Index of latitude axis in SkyFrame */
    int lonax;               /* Index of longitude axis in SkyFrame */
+   int old_ignore_used;     /* Original setting of external ignore_used variable */
    int radesys;             /* RA/DEC reference frame */
    int ret;                 /* Returned flag */
 
 /* Check the status. */
    if( !astOK ) return 0;
+
+/* Get a pointer to the structure holding thread-specific global data. */
+   astGET_GLOBALS(this);
 
 /* Check we have a SkyFrame. */
    if( !astIsASkyFrame( skyfrm ) ) return 0;
@@ -26513,14 +26530,38 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, int wcsproj,
 /* Initialise */
    ret = 1;
 
-/* Get the equinox, epoch of observation, and system of the SkyFrame. */
+/* Get the equinox, epoch of observation, and system of the SkyFrame. The epoch
+   is in TDB. It is assumed the Equinox is in UTC. */
    eq = astGetEquinox( skyfrm );
-   if( astTestEpoch( skyfrm ) ) {
-      ep = TDBConv( astGetEpoch( skyfrm ), AST__UTC, 1, method, class, status );
-   } else {
-      ep = AST__BAD;
-   }
    sys = astGetC( skyfrm, "system" );
+   ep_tdb = astTestEpoch( skyfrm ) ? astGetEpoch( skyfrm ) : AST__BAD;
+
+/* Convert the epoch to UTC. */
+   ep_utc = TDBConv( ep_tdb, AST__UTC, 1, method, class, status );
+
+/* See if the FitsChan contains a value for the TIMESYS keyword (include
+   previously used cards in the search). If so, and if it is not UTC, convert
+   the epoch to the specified time scale, and store a TIMESYS value in the
+   FitsStore. */
+   old_ignore_used = ignore_used;
+   ignore_used = 0;
+   if( GetValue( this, "TIMESYS", AST__STRING, (void *) &timesys, 0, 0, method,
+                 class, status ) && strcmp( timesys, "UTC" ) ) {
+      ep = TDBConv( ep_tdb, TimeSysToAst( this, timesys, method, class,
+                                          status ),
+                    1, method, class, status );
+      SetItemC( &(store->timesys), 0, 0, s, timesys, status );
+
+/* If no TIMESYS keyword was found in the FitsChan, or the timesys was
+   UTC, we use the UTC epoch value found above. In this case no TIMESYS value
+   need be stored in the FitsSTore since UTC is the default for TIMESYS. */
+   } else {
+      ep = ep_utc;
+   }
+
+/* Reinstate the original value for the flag that indicates whether keywords
+   in the FitsChan that have been used previously should be ignored. */
+   ignore_used = old_ignore_used;
 
 /* The MJD-OBS and DATE-OBS keywords default to the epoch of the
    reference equinox if not supplied. Therefore MJD-OBS and DATE-OBS do
@@ -26529,7 +26570,7 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, int wcsproj,
    producing FITS headers which say unlikely things like
    DATE-OBS = "01/01/50". Set a flag indicating if MJD-OBS and DATE-OBS
    can be defaulted. */
-   defdate = EQUAL( ep, eq );
+   defdate = EQUAL( ep_utc, eq );
 
 /* Convert the equinox to a Julian or Besselian epoch. Also get the
    reference frame and standard system. */
@@ -30576,9 +30617,9 @@ static double TDBConv( double mjd, int timescale, int fromTDB,
 *        Indicates the direction of the required conversion. If non-zero,
 *        the supplied "mjd" value should be in the TDB timescale, and the
 *        returned value will be in the timescale specified by "timescale".
-*        Indicates the direction of the required conversion. If zero,
-*        the supplied "mjd" value should be in the timescale specified by
-*        "timescale", and the returned value will be in the TDB timescale.
+*        If zero, the supplied "mjd" value should be in the timescale
+*        specified by "timescale", and the returned value will be in the
+*        TDB timescale.
 *     method
 *        The calling method. Used only in error messages.
 *     class
@@ -30597,8 +30638,8 @@ static double TDBConv( double mjd, int timescale, int fromTDB,
 /* Initialise */
    ret = AST__BAD;
 
-/* Check inherited status */
-   if( !astOK ) return ret;
+/* Check inherited status and supplied TDB value. */
+   if( !astOK || mjd == AST__BAD ) return ret;
 
 /* Return the supplied value if no conversion is needed. */
    if( timescale == AST__TDB ) {
@@ -31000,7 +31041,8 @@ static AstTimeScaleType TimeSysToAst( AstFitsChan *this, const char *timesys,
 *     this
 *        Pointer to the FitsChan.
 *     timesys
-*        Pointer to the string holding the TIMESYS value.
+*        Pointer to the string holding the TIMESYS value. A NULL pointer
+*        returns the default timescale of UTC.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -31023,7 +31065,9 @@ static AstTimeScaleType TimeSysToAst( AstFitsChan *this, const char *timesys,
 
 /* Check the inherited status. */
    if( !astOK ) return result;
-   if( !strcmp( timesys, "UTC" ) ) {
+   if( !timesys ) {
+      result = AST__UTC;
+   } else if( !strcmp( timesys, "UTC" ) ) {
       result = AST__UTC;
    } else if( !strcmp( timesys, "UT" ) ) {
       result = AST__UTC;
@@ -33093,16 +33137,11 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
 
 /* Is this a TIMESYS keyword? */
       } else if( Match( keynam, "TIMESYS", 0, fld, &nfld, method, class, status ) ){
-         item = NULL;
-         if( CnvValue( fc, AST__STRING, 0, &cval, method, status ) ) {
-            store->timesys = TimeSysToAst( fc, cval, method, class, status );
-            MarkCard( fc, status );
-         } else {
-            sprintf( buf, "The original FITS header contained a value for "
-                     "keyword TIMESYS which could not be converted to a "
-                     "character string." );
-            Warn( fc, "badval", buf, method, class, status );
-         }
+         item = &(store->timesys);
+         type = AST__STRING;
+         i = 0;
+         jm = 0;
+         s = ' ';
 
 /* Following keywords are used to describe "-SIP" distortion as used by
    the Spitzer project... */
@@ -33227,7 +33266,6 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
 *     Private function.
 
 *  Synopsis:
-
 *     int WcsFromStore( AstFitsChan *this, FitsStore *store,
 *                       const char *method, const char *class, int *status )
 
@@ -35424,7 +35462,7 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
 
 /* Get a value for the Epoch attribute. If no value is available, use
    EQUINOX and issue a warning. */
-   mjdobs = ChooseEpoch( store, s, method, class, status );
+   mjdobs = ChooseEpoch( this, store, s, method, class, status );
    if( mjdobs == AST__BAD ) {
       mjdobs = eqmjd;
       if( mjdobs != AST__BAD ) {
@@ -35693,7 +35731,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
             astSetUnit( iwcfrm, i, cunit );
 
 /* Get a value for the Epoch attribute (the date of observation). */
-            mjd = ChooseEpoch( store, s, method, class, status );
+            mjd = ChooseEpoch( this, store, s, method, class, status );
             if( mjd != AST__BAD ) astSetEpoch( specfrm, mjd );
 
 /* Set the rest frequency. Use the RESTFRQ keyword (assumed to be in Hz),
