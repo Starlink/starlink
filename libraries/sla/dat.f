@@ -64,6 +64,10 @@
 *  preamble comments appropriately.           *
 * - - - - - - - - - - - - - - - - - - - - - - *
 
+*     2012 July 1
+      ELSE IF (UTC.GE.56109D0) THEN
+         DT=35D0
+
 *     2009 January 1
       ELSE IF (UTC.GE.54832D0) THEN
          DT=34D0
