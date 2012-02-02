@@ -39,7 +39,7 @@
 *     :     occasion that a leap second is      :
 *     :                announced                :
 *     :                                         :
-*     :  Latest leap second:  2009 January 1    :
+*     :  Latest leap second:  2012 July 1       :
 *     :                                         :
 *     :-----------------------------------------:
 *
