@@ -418,11 +418,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     /* now open the flats and store them if requested */
     if (*status == SAI__OK && array && ffcount) {
       size_t start_ffcount = ffcount;
-      smfArray * resps = NULL;
       AstKeyMap * flatmap = NULL;
 
       if (calcflat) {
-        resps = smf_create_smfArray( status );
         /* Use AgeUp so that we get the keys out in the sorted order
            that allfflats used */
         flatmap = astKeyMap( "KeyCase=0,KeyError=1,SortBy=AgeDown" );
