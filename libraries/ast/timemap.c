@@ -1461,7 +1461,7 @@ double astDat_( double in, int forward, int *status ){
 
 
 /* 2012 July 1 */
-      if( in >= 56109.0 + 34.0/SPD ) {
+      if( in >= 56109.0 + 35.0/SPD ) {
          result = -35.0;
 
 /* 2009 January 1 */
