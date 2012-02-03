@@ -1119,8 +1119,10 @@ void smurf_timesort( int *status ) {
             if( !astMapGet1I( km1, "RTS_NUM", nts_in, &nts_in, rts ) ) {
                if( *status == SAI__OK ) {
                   *status = SAI__ERROR;
-                  errRep( "", "The first input NDF (and maybe others) did not "
-                          "contain a JCMTSTATE.RTS_NUM array.", status );
+                  errRep( "", "The first input NDF (and maybe others) did "
+                          "not contain a JCMTSTATE.RTS_NUM array, or the "
+                          "length of the array is different to that of "
+                          "the NDF time axis.", status );
                }
             }
 
