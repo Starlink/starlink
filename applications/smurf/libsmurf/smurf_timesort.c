@@ -962,14 +962,20 @@ void smurf_timesort( int *status ) {
                           *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   ndfMsg( "NDF", indf1 );
-                  errRep( "", "The spectral channel bounds in '^NDF' differs "
-                          "from the first NDF.", status );
+                  msgSeti( "LC", lchan );
+                  msgSeti( "UC", uchan );
+                  msgSeti( "LB", lbnd[ 0 ] );
+                  msgSeti( "UB", ubnd[ 0 ] );
+                  errRep( "", "The spectral channel bounds (^LB,^UB) of '^NDF' differ "
+                          "from (^LC,^UC) of the first NDF.", status );
 
                } else if( dims[ 1 ] != ndet && *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   ndfMsg( "NDF", indf1 );
-                  errRep( "", "The number of receptors in '^NDF' differs "
-                          "from the first NDF.", status );
+                  msgSeti( "D", dims[ 1 ] );
+                  msgSeti( "N", ndet );
+                  errRep( "", "The number of receptors (^D) in '^NDF' differs "
+                          "from the first NDF (^N).", status );
                }
 
 /* If all input NDFs read so far have a Variance array, see if this one
@@ -1121,7 +1127,7 @@ void smurf_timesort( int *status ) {
                   *status = SAI__ERROR;
                   errRep( "", "The first input NDF (and maybe others) did "
                           "not contain a JCMTSTATE.RTS_NUM array, or the "
-                          "length of the array is different to that of "
+                          "length of the array is different from that of "
                           "the NDF time axis.", status );
                }
             }
