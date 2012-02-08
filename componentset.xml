@@ -989,7 +989,7 @@ them.
 </component>
 
 <component id="observe" support="U">
-  <version>2.3-1</version>
+  <version>2.3-2</version>
   <path>applications/observe</path>
   <description>OBSERVE --- Check Star Observability</description>
   <abstract><p>
@@ -1340,7 +1340,7 @@ A software package designed to search for periodicities in data.
 </component>
 
 <component id="photom" support="S">
-  <version>1.12-0</version>
+  <version>1.12-2</version>
   <path>applications/photom</path>
   <description>PHOTOM - A Photometry Package</description>
   <abstract><p>PHOTOM is a package for measuring the sky corrected
@@ -1837,7 +1837,7 @@ the James Clerk Maxwell Telescope. The tasks allows one to completely
 re-reduce your SCUBA data.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>sae</build><build>prm</build><build>pcs</build><build>mers</build><build>ndf</build><link>ndf</link><link>fio</link><link>sla</link><link>hlp</link><link>pda</link><link>prm</link><link>agi</link><link>kaplibs</link><link>pgplot</link><link>grp</link><link>ndg</link><sourceset>star2html</sourceset>
+    <build>pcs</build><build>sae</build><build>prm</build><build>pcs</build><build>mers</build><build>ndf</build><build>gsl</build><link>ndf</link><link>fio</link><link>sla</link><link>hlp</link><link>pda</link><link>prm</link><link>agi</link><link>kaplibs</link><link>pgplot</link><link>grp</link><link>ndg</link><link>gsl</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -4862,7 +4862,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>6.0</version>
+  <version>6.0.1</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
