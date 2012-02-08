@@ -235,26 +235,26 @@
 *     lutview
 *        Draws an annotated colour table at a position selected via
 *        the cursor on the current image-display device.
-*     lutview style='form=hist,logpop=1'
+*     lutview style="form=hist,logpop=1"
 *        As above, but the key has the form of a coloured histogram of
 *        the pen numbers in the most recently displayed image.  The
 *        second axis displays the logarithm (base 10) of the bin
 *        population.
-*     lutview style='form=graph,pennums=1'
+*     lutview style="form=graph,pennums=1"
 *        The key is drawn as a set of three (or one if a monochrome
 *        colour table is in use) curves indicating the red, green and
 *        blue intensity for each pen. The first axis is annotated with
 *        pen numbers instead of data values.
-*     lutview style="'edge(1)=right,label(1)=Data value in m31'"
+*     lutview style="edge(1)=right,label(1)=Data value in m31"
 *        As above, but the data values are labelled on the right edge of
 *        the box, and the values are labelled with the string
 *        "Data value in m31".
-*     lutview style='"textlab(1)=0,width(border)=3,colour(border)=white"'
+*     lutview style="textlab(1)=0,width(border)=3,colour(border)=white"
 *        No textual label is drawn for the data values, and a thicker
 *        than usual white box is drawn around the colour ramp.
-*     lutview style="'textlab(1)=0,numlab(1)=0,majticklen(1)=0'"
+*     lutview style="textlab(1)=0,numlab(1)=0,majticklen(1)=0"
 *        Only the border is drawn around the colour ramp.
-*     lutview style="'textlab(1)=0,numlab(1)=0,majticklen(1)=0,border=0'"
+*     lutview style="textlab(1)=0,numlab(1)=0,majticklen(1)=0,border=0"
 *        No annotation at all is drawn.
 *     lutview p
 *        Draws a colour table that fills the current picture on the
