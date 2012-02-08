@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.38}
 \newcommand{\stardocnumber}    {95.38}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2011 September 16}
+\newcommand{\stardocdate}      {2012 February 7}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -1274,8 +1274,8 @@ backslash is a {\em metacharacter\/}, and so must be `escaped' to
 treat the character literally.  One way is to place a {\tt
 $\backslash$} before each metacharacter.  You can escape a series of
 characters by placing them inside single quotes {\tt ' '}.  Other
-metacharacters to watch out for when using \KAPPA\ include {\tt
-[]()"}.
+metacharacters to watch out for when using \KAPPA\ include
+{\tt \verb+[]()\"*?$+}.
 
 Next we want to make the image colourful.  There are a number of
 predefined lookup tables, or you may create and modify your own.  Here
@@ -13464,18 +13464,27 @@ specified (MODE~=~{\tt "Linear"} or {\tt "Magnitude"}).  Note that there
 are other modes that do not require additional information, and hence no
 more parameters.
 
-There is also an {\em Examples\/} section. \label{ap:example}  This
+There is also an {\em Examples\/} section. \label{ap:example} This
 shows how to run the application from the command line.  More often
 you'll enter the command name and just some of the parameters, and be
-prompted for the rest.  {\em Note that from the C-shell you must escape
-any special characters that appear in these examples.} For instance,
-the fourth example of COMPAVE would be written like this
+prompted for the rest.  {\em Note that the examples are the strings
+expected by the tasks.} They are operating-system neutral as
+\KAPPA\ has run on several different operating systems.  {\em UNIX shells
+or operating-system command languages will often interpret as special
+characters some or all of \verb+[]()\^~"'$*?+ that may form part of
+the \KAPPA\ command-line syntax.  So in practice you should escape any
+such special characters that appear in these examples, as appropriate
+to your command language or shell.} For instance, from the C-shell the
+fourth example of COMPAVE could be written like the following.
 
 \begin{verbatim}
      compave cosmos galaxy '[4,3]' weight title='"COSMOS compressed"'
+     compave cosmos galaxy \[4,3\] weight title=\"COSMOS compressed\"
 \end{verbatim}
 
-from the C-shell.
+Backslash escapes individual special characters, whereas quotes placed
+around text escape all occurrences of special characters within the
+quotes.
 
 \medskip
 
