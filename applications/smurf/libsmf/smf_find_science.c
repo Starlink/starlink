@@ -262,7 +262,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
   if (darkgrp) *darkgrp = NULL;
   if (darks) *darks = NULL;
   if (fflats) *fflats = NULL;
-  if (heatermap) *heateffmap = NULL;
+  if (heateffmap) *heateffmap = NULL;
 
   if (*status != SAI__OK) return;
 
@@ -318,8 +318,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     /* Fill in the keymap with observation details */
     smf_obsmap_fill( infile, obsmap, objmap, status );
 
-    /* Find the heater efficiency map */
-    if (*status == SAI__OK) {
+    /* Find the heater efficiency map if required */
+    if (*status == SAI__OK && heateffmap) {
       char arrayidstr[32];
       smf_fits_getS( infile->hdr, "ARRAYID", arrayidstr, sizeof(arrayidstr),
                      status );
