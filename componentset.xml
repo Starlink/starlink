@@ -6787,6 +6787,26 @@ and some distortion.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+<component id="sofa" support="U">
+  <version>2010-12-01</version>
+  <path>libraries/starutil</path>
+  <description>Standards of Fundamental Astronomy</description>
+  <abstract><p>
+    This library is the official IAU SOFA implementation.
+    </p></abstract>
+  <dependencies >
+
+  </dependencies>
+  <developers>
+    <person>
+      <name>SOFA Board</name>
+      <uname>sofa@star.rl.ac.uk</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>sofa@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="blt" support="U">
   <version>2.5.2</version>
   <path>thirdparty/tclsys/blt</path>

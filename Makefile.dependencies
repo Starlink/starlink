@@ -2499,6 +2499,10 @@ $(MANIFESTS)/snx: \
 	cd libraries/snx \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sofa:
+	cd thirdparty/sofa/sofa \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/specx: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \

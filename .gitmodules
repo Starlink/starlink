@@ -88,3 +88,6 @@
 [submodule "thirdparty/tclsys/blt/wizeblt"]
 	path = thirdparty/tclsys/blt/wizeblt
 	url = ../wizeblt.git
+[submodule "thirdparty/sofa/sofa"]
+	path = thirdparty/sofa/sofa
+	url = ../sofa.git
