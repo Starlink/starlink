@@ -1,0 +1,11 @@
+Some SLA routines migrate directly to SOFA so are not included in PAL
+
+slaDranrm => iauAnp
+slaDrange => iauAnpm
+
+
+Some SLA routines are close to the same but have different arguments
+so a PAL routine is provided although it is probably best to port software
+to the SOFA variant:
+
+slaDat =>palDat => iauDat

@@ -1152,6 +1152,8 @@ libraries/nbs/nbsc.c
 libraries/nbs/nbsclow.c
 libraries/nbs/nbtrace
 
+libraries/pal/palTest
+
 libraries/par/par_def0.f
 libraries/par/par_def1.f
 libraries/par/par_defn.f

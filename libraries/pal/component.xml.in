@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" support="S">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/pal</path>
+  <description>Position Astronomy Library</description>
+  <abstract><p>
+    This library is a collection of code designed to aid in
+    replacing the SLA library with code from NOVAS and
+    SOFA.
+
+    Where possible the API is similar to the C SLA API
+    except for the use of a "pal" prefix.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>t.jenness@jach.hawaii.edu</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

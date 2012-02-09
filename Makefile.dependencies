@@ -1837,6 +1837,11 @@ $(MANIFESTS)/one: \
 	cd libraries/one \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/pal: \
+		$(MANIFESTS)/sofa
+	cd libraries/pal \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/pamela: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
@@ -3151,6 +3156,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/ndf \
 	$(MANIFESTS)/ndg \
 	$(MANIFESTS)/news \
+	$(MANIFESTS)/pal \
 	$(MANIFESTS)/pamela \
 	$(MANIFESTS)/par \
 	$(MANIFESTS)/pcs \

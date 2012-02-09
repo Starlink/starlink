@@ -1,0 +1,33 @@
+## Process this file with automake to produce Makefile.in
+
+lib_LTLIBRARIES = libpal.la
+
+libpal_la_SOURCES = $(PUBLIC_C_FILES)
+
+# Force a link against SOFA
+libpal_la_LIBADD = $(libdir)/libsofa_c.la
+
+# Make all library code position independent. This is handy for creating
+# shareable libraries from the static ones (Java JNI libraries).
+if !NOPIC
+libpal_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+endif
+
+# install pal as "star/pal.h"
+cincludedir = $(includedir)/star
+cinclude_HEADERS = pal.h palmac.h
+
+PUBLIC_C_FILES = \
+palDe2h.c \
+palDh2e.c \
+palDs2tp.c \
+palDat.c \
+palDtp2s.c \
+palDtps2c.c \
+palDtt.c
+
+TESTS = palTest
+
+check_PROGRAMS = palTest
+palTest_SOURCES = palTest.c
+palTest_LDADD = libpal.la
