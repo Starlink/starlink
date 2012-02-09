@@ -2981,6 +2981,7 @@ $(MANIFESTS)/surf: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \

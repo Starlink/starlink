@@ -6814,7 +6814,7 @@ and some distortion.
 
 <component id="sofa" support="U">
   <version>2010-12-01</version>
-  <path>libraries/starutil</path>
+  <path>thirdparty/sofa/sofa</path>
   <description>Standards of Fundamental Astronomy</description>
   <abstract><p>
     This library is the official IAU SOFA implementation.
