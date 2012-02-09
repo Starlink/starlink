@@ -19,6 +19,7 @@ cinclude_HEADERS = pal.h palmac.h
 
 PUBLIC_C_FILES = \
 palDe2h.c \
+palDeuler.c \
 palDh2e.c \
 palDs2tp.c \
 palDat.c \
