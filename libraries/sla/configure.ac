@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(sla, 2.5-5, ussc@star.rl.ac.uk)
+AC_INIT(sla, 2.5-6, ussc@star.rl.ac.uk)
 # Version-info specifications.  See SSN/78 for guidelines, and update the table
 # below for ANY change of version number.
 #
