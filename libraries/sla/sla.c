@@ -100,10 +100,6 @@
 /* Functions needed to avoid a dependence on CNF. */
 /* ============================================== */
 
-static void slaStringExport( const char *, char *, int );
-static void slaStringImport( const char *source_f, int source_len,
-			     char *dest_c );
-
 static void slaStringExport( const char *source_c, char *dest_f, int dest_len ) {
 /*
 *+
@@ -161,7 +157,7 @@ static void slaStringExport( const char *source_c, char *dest_f, int dest_len ) 
    for ( ; i < dest_len; i++ ) dest_f[ i ] = ' ';
 }
 
-void slaStringImport( const char *source_f, int source_len, char *dest_c )
+static void slaStringImport( const char *source_f, int source_len, char *dest_c )
 
 /*
 *+
@@ -251,7 +247,7 @@ void slaStringImport( const char *source_f, int source_len, char *dest_c )
    See cnfCref for more details.
 */
 
-F77_CHARACTER_ARG_TYPE *slaStringCreate( int length ) {
+static F77_CHARACTER_ARG_TYPE *slaStringCreate( int length ) {
   /* Local Variables:                                                         */
    F77_CHARACTER_ARG_TYPE *ptr;  /* A pointer to the string allocated       */
 
@@ -270,7 +266,7 @@ F77_CHARACTER_ARG_TYPE *slaStringCreate( int length ) {
 
 /* Free space allocate by slaStringCreate. Take from cnfFreef */
 
-void slaStringFree ( F77_CHARACTER_ARG_TYPE * temp ) {
+static void slaStringFree ( F77_CHARACTER_ARG_TYPE * temp ) {
   free( temp );
 }
 
