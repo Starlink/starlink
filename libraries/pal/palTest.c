@@ -219,6 +219,24 @@ static void t_vecmat( int * status ) {
 
 }
 
+static void t_ecmat( int *status ) {
+   int i, j;
+   char buf[10];
+   double rmat[3][3];
+   double expected[3][3] = {
+                   1.0,                    0.0,                   0.0,
+                   0.0, 0.91749307789883549624, 0.3977517467060596168,
+                   0.0, -0.3977517467060596168, 0.91749307789883549624 };
+
+   palEcmat( 55966.46, rmat );
+
+   for( i = 0; i < 3; i++ ) {
+      for( j = 0; j < 3; j++ ) {
+         sprintf( buf, "%d,%d", i, j );
+         vvd( rmat[i][j], expected[i][j], 1e-12, "palEcmat", buf, status );
+      }
+   }
+}
 
 /**********************************************************************/
 
@@ -227,6 +245,7 @@ int main (void) {
   /* Use the SLA and SOFA conventions */
   int status = 0; /* Unix and SAE convention */
 
+  t_ecmat(&status);
   t_e2h(&status);
   t_tp(&status);
   t_vecmat(&status);
