@@ -84,6 +84,8 @@
 *        Allowed to use const.
 *     30-JUL-2008 (TIMJ):
 *        Add slaDs2tp
+*     10-FEB-2012 (DSB):
+*        Added slaPvobs
 *-
 */
 
@@ -2262,3 +2264,27 @@ void slaPreces ( const char sys[3], double ep0, double ep1,
   *dc = DC;
 
 }
+
+
+F77_SUBROUTINE(sla_pvobs)( DOUBLE(P),
+			   DOUBLE(H),
+                           DOUBLE(STL),
+                           DOUBLE_ARRAY(PV) );
+
+void slaPvobs( double p, double h, double stl, double pv[6] ){
+   DECLARE_DOUBLE(P);
+   DECLARE_DOUBLE(H);
+   DECLARE_DOUBLE(STL);
+   DECLARE_DOUBLE_ARRAY(PV,6);
+
+   int i;
+   P = p;
+   H = h;
+   STL = stl;
+   F77_LOCK( F77_CALL(sla_pvobs)( DOUBLE_ARG(&P),
+                                  DOUBLE_ARG(&H),
+                                  DOUBLE_ARG(&STL),
+                                  DOUBLE_ARRAY_ARG(PV) ); )
+   for( i = 0; i < 6; i++ ) pv[ i ] = PV[ i ];
+}
+
