@@ -238,6 +238,26 @@ static void t_ecmat( int *status ) {
    }
 }
 
+static void t_prec( int *status ) {
+   int i, j;
+   char buf[10];
+   double rmat[3][3];
+   double expected[3][3] = {
+       0.9999856154510, -0.0049192906204,    -0.0021376320580,
+       0.0049192906805,  0.9999879002027,    -5.2297405698747e-06,
+       0.0021376319197, -5.2859681191735e-06, 0.9999977152483 };
+
+   palPrec( 1990.0, 2012.0, rmat );
+
+   for( i = 0; i < 3; i++ ) {
+      for( j = 0; j < 3; j++ ) {
+         sprintf( buf, "%d,%d", i, j );
+         vvd( rmat[i][j], expected[i][j], 1e-12, "palPrec", buf, status );
+      }
+   }
+
+}
+
 /**********************************************************************/
 
 int main (void) {
@@ -245,6 +265,7 @@ int main (void) {
   /* Use the SLA and SOFA conventions */
   int status = 0; /* Unix and SAE convention */
 
+  t_prec(&status);
   t_ecmat(&status);
   t_e2h(&status);
   t_tp(&status);

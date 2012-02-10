@@ -26,7 +26,8 @@ palDat.c \
 palDtp2s.c \
 palDtps2c.c \
 palDtt.c \
-palEcmat.c
+palEcmat.c \
+palPrec.c
 
 TESTS = palTest
 
