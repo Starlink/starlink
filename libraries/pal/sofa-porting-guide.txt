@@ -1,7 +1,35 @@
-Some SLA routines migrate directly to SOFA so are not included in PAL
+Some SLA routines migrate directly to SOFA. Simple PAL wrappers are
+made available using the SLA name but new code should use the SOFA
+variant directly. The PAL routines should not be called internally
+by other PAL routines.
 
-slaDranrm => iauAnp
-slaDrange => iauAnpm
+Daf2r  => Af2a
+Dav2m  => Rv2m
+Dcc2s  => C2s
+Dcs2c  => S2c
+Dd2tf  => D2tf
+Dimxv  => Trxp
+Djcl   => Jd2cal
+Dmxm   => Rxr
+Dmxv   => Rxp
+Dm2av  => Rm2v
+Dranrm => Anp
+Drange => Anpm
+Dsep   => Seps
+Dsepv  => Sepp
+Dtf2d  => Tf2d
+Dtf2r  => Tf2a
+Dvdv   => Pdp
+Dvn    => Pn
+Dvxv   => Pxp
+Epb    => Epb
+Epb2d  => Epb2jd
+Epj    => Epj
+Epj2d  => Epj2jd
+Eqeqx  => Ee06a
+Fk5hz  => Fk5hz
+Gmst   => Gmst06
+Hfk5z  => Hfk5z
 
 
 Some SLA routines are close to the same but have different arguments
@@ -9,3 +37,6 @@ so a PAL routine is provided although it is probably best to port software
 to the SOFA variant:
 
 slaDat =>palDat => iauDat
+
+slaGeoc has different arguments and uses the WGS84 model. The code is not
+quite one-to-one.

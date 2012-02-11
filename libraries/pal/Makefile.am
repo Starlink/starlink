@@ -18,6 +18,7 @@ cincludedir = $(includedir)/star
 cinclude_HEADERS = pal.h palmac.h
 
 PUBLIC_C_FILES = \
+palOne2One.c \
 palDe2h.c \
 palDeuler.c \
 palDh2e.c \

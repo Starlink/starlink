@@ -61,6 +61,9 @@
 /* 2Pi */
 #define PAL__D2PI (6.283185307179586476925287)
 
+/* pi/180:  degrees to radians */
+#define PAL__DD2R 0.017453292519943295769236907684886127134428718885417
+
 /* Start of SLA modified Julian date epoch */
 #define PAL__MJD0 2400000.5
 
