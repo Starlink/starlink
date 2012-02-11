@@ -22,6 +22,7 @@ palOne2One.c \
 palDe2h.c \
 palDeuler.c \
 palDh2e.c \
+palDjcal.c \
 palDs2tp.c \
 palDat.c \
 palDtp2s.c \

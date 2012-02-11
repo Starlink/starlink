@@ -67,4 +67,8 @@
 /* Start of SLA modified Julian date epoch */
 #define PAL__MJD0 2400000.5
 
+/* DNINT(A) - round to nearest whole number (double) */
+#define DNINT(A) ((A)<0.0?ceil((A)-0.5):floor((A)+0.5))
+
+
 #endif

@@ -222,14 +222,12 @@ static void t_djcal( int *status ) {
   int j;
   double f;
 
-  /* Later
   palDjcal ( 4, djm, iydmf, &j );
   viv ( iydmf[0], 1996, "palDjcal", "Y", status );
   viv ( iydmf[1], 2, "palDjcal", "M", status );
   viv ( iydmf[2], 10, "palDjcal", "D", status );
   viv ( iydmf[3], 9999, "palDjcal", "F", status );
   viv ( j, 0, "palDjcal", "J", status );
-  */
 
   palDjcl ( djm, &iy, &im, &id, &f, &j );
   viv ( iy, 1996, "palDjcl", "Y", status );
