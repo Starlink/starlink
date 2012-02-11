@@ -283,6 +283,14 @@ static void t_epj2d( int *status ) {
         1e-6, "palEpj2d", " ", status );
 }
 
+/* Equation of the equinoxes */
+
+/* Use SOFA test because of change in precession model */
+static void t_eqeqx (int *status ) {
+  vvd ( palEqeqx( 53736. ), -0.8834195072043790156e-5,
+        1e-15, "palEqeqx", " ", status );
+}
+
 /* Geocentric coordinates */
 
 /* This is not from sla_test.f */
@@ -550,6 +558,7 @@ int main (void) {
   t_epb2d(&status);
   t_epj(&status);
   t_epj2d(&status);
+  t_eqeqx(&status);
   t_geoc(&status);
   t_gmst(&status);
   t_fk52h(&status);
