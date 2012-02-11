@@ -132,6 +132,21 @@ static void vvd(double val, double valok, double dval,
    return;
 }
 
+/* Verify the 3x3 rmat matrix */
+static void
+vrmat( double rmat[3][3], double expected[3][3], const char * func,
+       int * status ) {
+  int i;
+  char buf[10];
+  for( i = 0; i < 3; i++ ) {
+    int j;
+    for( j = 0; j < 3; j++ ) {
+      sprintf( buf, "%d,%d", i, j );
+      vvd( rmat[i][j], expected[i][j], 1e-12, func, buf, status );
+    }
+  }
+}
+
 /******************************************************************/
 /*          TEST FUNCTIONS          */
 
@@ -220,8 +235,6 @@ static void t_vecmat( int * status ) {
 }
 
 static void t_ecmat( int *status ) {
-   int i, j;
-   char buf[10];
    double rmat[3][3];
    double expected[3][3] = {
      { 1.0,                    0.0,                   0.0 },
@@ -229,18 +242,10 @@ static void t_ecmat( int *status ) {
      { 0.0, -0.3977517467060596168, 0.91749307789883549624 } };
 
    palEcmat( 55966.46, rmat );
-
-   for( i = 0; i < 3; i++ ) {
-      for( j = 0; j < 3; j++ ) {
-         sprintf( buf, "%d,%d", i, j );
-         vvd( rmat[i][j], expected[i][j], 1e-12, "palEcmat", buf, status );
-      }
-   }
+   vrmat( rmat, expected, "palEcmat", status );
 }
 
 static void t_prec( int *status ) {
-   int i, j;
-   char buf[10];
    double rmat[3][3];
    double expected[3][3] = {
      { 0.9999856154510, -0.0049192906204,    -0.0021376320580 },
@@ -248,14 +253,7 @@ static void t_prec( int *status ) {
      { 0.0021376319197, -5.2859681191735e-06, 0.9999977152483 } };
 
    palPrec( 1990.0, 2012.0, rmat );
-
-   for( i = 0; i < 3; i++ ) {
-      for( j = 0; j < 3; j++ ) {
-         sprintf( buf, "%d,%d", i, j );
-         vvd( rmat[i][j], expected[i][j], 1e-12, "palPrec", buf, status );
-      }
-   }
-
+   vrmat( rmat, expected, "palPrec", status );
 }
 
 /**********************************************************************/
