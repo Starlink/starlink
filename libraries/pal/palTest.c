@@ -210,28 +210,14 @@ static void t_tp( int *status ) {
 static void t_vecmat( int * status ) {
 
   double drm2[3][3];
+  double deuler_expected[3][3] = {
+    { -0.1681574770810878,  0.1981362273264315,  0.9656423242187410 },
+    { -0.2285369373983370,  0.9450659587140423, -0.2337117924378156 },
+    { -0.9589024617479674, -0.2599853247796050, -0.1136384607117296 } };
 
   /* Test palDeuler */
   palDeuler( "YZY", 2.345, -0.333, 2.222, drm2 );
-  vvd( drm2[0][0],  -0.1681574770810878, 1e-12,
-       "palDeuler", "11", status );
-  vvd( drm2[0][1], 0.1981362273264315, 1e-12,
-             "palDeuler", "12", status );
-  vvd( drm2[0][2], 0.9656423242187410, 1e-12,
-       "palDeuler", "13", status );
-  vvd( drm2[1][0], -0.2285369373983370, 1e-12,
-       "palDeuler", "21", status );
-  vvd( drm2[1][1], 0.9450659587140423, 1e-12,
-       "palDeuler", "22", status );
-  vvd( drm2[1][2], -0.2337117924378156, 1e-12,
-       "palDeuler", "23", status );
-  vvd( drm2[2][0], -0.9589024617479674, 1e-12,
-       "palDeuler", "31", status );
-  vvd( drm2[2][1], -0.2599853247796050, 1e-12,
-       "palDeuler", "32", status );
-  vvd( drm2[2][2], -0.1136384607117296, 1e-12,
-       "palDeuler", "33", status );
-
+  vrmat( drm2, deuler_expected, "palDeuler", status );
 }
 
 static void t_ecmat( int *status ) {
