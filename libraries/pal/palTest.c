@@ -281,6 +281,52 @@ static void t_djcal( int *status ) {
 
 }
 
+/* Matrix inversion */
+
+static void t_dmat( int *status ) {
+  int j;
+  int iw[3];
+  double dd;
+  double da[9] = {
+    2.22,     1.6578,     1.380522,
+    1.6578,   1.380522,   1.22548578,
+    1.380522, 1.22548578, 1.1356276122
+  };
+  double dv[3] = {
+    2.28625, 1.7128825, 1.429432225
+  };
+
+  palDmat( 3, da, dv, &dd, &j, iw );
+  vvd ( da[0], 18.02550629769198,
+	1e-10, "palDmat", "a[0]", status );
+  vvd ( da[1], -52.16386644917280607,
+	1e-10, "palDmat", "a[1]", status );
+  vvd ( da[2], 34.37875949717850495,
+	1e-10, "palDmat", "a[2]", status );
+  vvd ( da[3], -52.16386644917280607,
+	1e-10, "palDmat", "a[3]", status );
+  vvd ( da[4], 168.1778099099805627,
+	1e-10, "palDmat", "a[4]", status );
+  vvd ( da[5], -118.0722869694232670,
+	1e-10, "palDmat", "a[5]", status );
+  vvd ( da[6], 34.37875949717850495,
+	1e-10, "palDmat", "a[6]", status );
+  vvd ( da[7], -118.0722869694232670,
+	1e-10, "palDmat", "a[7]", status );
+  vvd ( da[8], 86.50307003740151262,
+	1e-10, "palDmat", "a[8]", status );
+  vvd ( dv[0], 1.002346480763383,
+	1e-12, "palDmat", "v[0]", status );
+  vvd ( dv[1], 0.03285594016974583489,
+	1e-12, "palDmat", "v[1]", status );
+  vvd ( dv[2], 0.004760688414885247309,
+	1e-12, "palDmat", "v[2]", status );
+  vvd ( dd, 0.003658344147359863,
+	1e-12, "palDmat", "D", status );
+  viv ( j, 0, "palDmat", "J", status );
+
+}
+
 /* Test palDe2h and palDh2e routines */
 
 static void t_e2h( int *status ) {
@@ -598,6 +644,7 @@ int main (void) {
   t_ctf2d(&status);
   t_ctf2r(&status);
   t_djcal(&status);
+  t_dmat(&status);
   t_epb(&status);
   t_epb2d(&status);
   t_epj(&status);
