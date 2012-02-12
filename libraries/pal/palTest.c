@@ -151,6 +151,27 @@ vrmat( double rmat[3][3], double expected[3][3], const char * func,
 /******************************************************************/
 /*          TEST FUNCTIONS          */
 
+/* Bearings */
+
+static void t_bear( int *status ) {
+  double a1 = 1.234;
+  double b1 = -0.123;
+  double a2 = 2.345;
+  double b2 = 0.789;
+
+  double d1[3];
+  double d2[3];
+
+  vvd ( palDbear ( a1, b1, a2, b2 ), 0.7045970341781791,
+	1e-12, "palDbear", " ", status );
+  palDcs2c ( a1, b1, d1 );
+  palDcs2c ( a2, b2, d2 );
+
+  vvd ( palDpav ( d1, d2 ), 0.7045970341781791,
+	1e-12, "palDpav", " ", status );
+
+}
+
 /* Calendar to MJD */
 
 static void t_caldj( int *status ) {
@@ -568,6 +589,7 @@ int main (void) {
   /* Use the SLA and SOFA conventions */
   int status = 0; /* Unix and SAE convention */
 
+  t_bear(&status);
   t_caf2r(&status);
   t_caldj(&status);
   t_cc2s(&status);

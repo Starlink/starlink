@@ -71,6 +71,10 @@ void palCldj ( int iy, int im, int id, double *djm, int *j ) {
   *j = iauCal2jd( iy, im, id, &djm0, djm );
 }
 
+double palDbear ( double a1, double b1, double a2, double b2 ) {
+  return iauPas( a1, b1, a2, b2 );
+}
+
 /* Arguments differ slightly. Assumes that the sign is always positive
    and dealt with externally. */
 void palDaf2r ( int ideg, int iamin, double asec, double *rad, int *j ) {
@@ -112,6 +116,10 @@ void palDmxm ( double a[3][3], double b[3][3], double c[3][3] ) {
 
 void palDmxv ( double dm[3][3], double va[3], double vb[3] ) {
   iauRxp( dm, va, vb );
+}
+
+double palDpav ( double v1[3], double v2[3] ) {
+  return iauPap( v1, v2 );
 }
 
 double palDrange ( double angle ) {
