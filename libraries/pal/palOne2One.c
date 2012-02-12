@@ -66,6 +66,11 @@
 #include "palmac.h"
 #include "sofa.h"
 
+void palCldj ( int iy, int im, int id, double *djm, int *j ) {
+  double djm0;
+  *j = iauCal2jd( iy, im, id, &djm0, djm );
+}
+
 /* Arguments differ slightly. Assumes that the sign is always positive
    and dealt with externally. */
 void palDaf2r ( int ideg, int iamin, double asec, double *rad, int *j ) {

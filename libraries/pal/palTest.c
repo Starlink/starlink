@@ -151,6 +151,17 @@ vrmat( double rmat[3][3], double expected[3][3], const char * func,
 /******************************************************************/
 /*          TEST FUNCTIONS          */
 
+/* Calendar to MJD */
+
+static void t_caldj( int *status ) {
+  int j;
+  double djm;
+
+  palCaldj ( 1999, 12, 31, &djm, &j );
+  vvd ( djm, 51543, 0, "palCaldj", " ", status );
+  viv ( j, 0, "palCaldj", "J", status );
+}
+
 /* palDaf2r */
 
 static void t_caf2r( int * status ) {
@@ -188,6 +199,17 @@ static void t_cd2tf( int *status ) {
   viv ( ihmsf[1], 42, "palDd2tf", "(2)", status );
   viv ( ihmsf[2], 13, "palDd2tf", "(3)", status );
   viv ( ihmsf[3], 3333, "palDd2tf", "(4)", status );
+}
+
+/* Calendar to MJD */
+
+static void t_cldj( int *status ) {
+  double d;
+  int j;
+
+  palCldj ( 1899, 12, 31, &d, &j );
+  vvd ( d, 15019, 0, "palCldj", "D", status );
+  viv ( j, 0, "palCldj", "J", status );
 }
 
 /* palDtf2d */
@@ -547,8 +569,10 @@ int main (void) {
   int status = 0; /* Unix and SAE convention */
 
   t_caf2r(&status);
+  t_caldj(&status);
   t_cc2s(&status);
   t_cd2tf(&status);
+  t_cldj(&status);
   t_ctf2d(&status);
   t_ctf2r(&status);
   t_djcal(&status);
