@@ -80,7 +80,7 @@
 #include "pal.h"
 #include "sofa.h"
 
-void slbAmpqk ( double ra, double da, double amprms[21], double *rm,
+void palAmpqk ( double ra, double da, double amprms[21], double *rm,
                 double *dm ){
 
 /* Local Variables: */

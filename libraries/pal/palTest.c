@@ -767,7 +767,49 @@ static void t_evp( int *status ) {
 
 
 
+static void t_mappa( int *status ) {
+   double amprms[21];
+   double expected[21] = {1.9986310746064646082,
+                          -0.1728200754134739392,
+                          0.88745394651412767839,
+                          0.38472374350184274094,
+                          -0.17245634725219796679,
+                          0.90374808622520386159,
+                          0.3917884696321610738,
+                          0.0,
+                          -9.9464149073251757597e-05,
+                          -1.6125306981057062306e-05,
+                          -6.9897255793245634435e-06,
+                          0.99999999489900059935,
+                          0.99999983777998024959,
+                          -0.00052248206600935195865,
+                          -0.00022683144398381763045,
+                          0.00052248547063364874764,
+                          0.99999986339269864022,
+                          1.4950491424992534218e-05,
+                          0.00022682360163333854623,
+                          -1.5069005133483779417e-05,
+                          0.99999997416198904698};
 
+   palMappa( 2010.0, 55927.0, amprms );
+   vvec( 21, amprms, expected, "palMappa", status );
+}
+
+static void t_mapqkz( int *status ) {
+   double amprms[21],  ra, da;
+   palMappa( 2010.0, 55927.0, amprms );
+   palMapqkz( 1.234, -0.567, amprms, &ra, &da );
+   vvd( ra, 1.2344879748414849807, 1.0E-12, "palMapqkz", "ra", status );
+   vvd( da, -0.56697099554368701746, 1.0E-12, "palMapqkz", "da", status );
+}
+
+static void t_ampqk( int *status ) {
+   double amprms[21],  rm, dm;
+   palMappa( 2010.0, 55927.0, amprms );
+   palAmpqk( 1.234, -0.567, amprms, &rm, &dm );
+   vvd( rm, 1.2335120411026936349, 1.0E-12, "palAmpqk", "rm", status );
+   vvd( dm, -0.56702908706930343907, 1.0E-12, "palAmpqk", "dm", status );
+}
 
 
 
@@ -785,6 +827,7 @@ int main (void) {
   int status = 0; /* Unix and SAE convention */
 
   t_addet(&status);
+  t_ampqk(&status);
   t_bear(&status);
   t_caf2r(&status);
   t_caldj(&status);
@@ -811,6 +854,8 @@ int main (void) {
   t_prec(&status);
   t_ecmat(&status);
   t_e2h(&status);
+  t_mappa(&status);
+  t_mapqkz(&status);
   t_prebn(&status);
   t_range(&status);
   t_ranorm(&status);

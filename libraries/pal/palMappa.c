@@ -87,11 +87,16 @@
 #include "palmac.h"
 #include "sofa.h"
 
+#include <string.h>
+
 void palMappa( double eq, double date, double amprms[21] ){
 
 /* Local Variables; */
    int i;
    double ebd[ 3 ], ehd[ 3 ], eh[ 3 ], e, vn[ 3 ], vm;
+
+/* Initialise so that unsused values are returned holding zero */
+   memset( amprms, 0, 21*sizeof( *amprms ) );
 
 /* Time interval for proper motion correction. */
    amprms[ 0 ] = iauEpj( PAL__MJD0, date ) - eq;
