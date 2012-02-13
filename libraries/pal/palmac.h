@@ -76,8 +76,14 @@ static const double PAL__MJD0 = 2400000.5;
 /* Light time for 1 AU (sec) */
 static const double PAL__CR = 499.004782;
 
+/*  Radians per year to arcsec per century. This needs to be a macro since it
+    is an expression including other constants. */
+#define PAL__PMF (100.0*60.0*60.0*360.0/PAL__D2PI);
+
 /* DNINT(A) - round to nearest whole number (double) */
 #define DNINT(A) ((A)<0.0?ceil((A)-0.5):floor((A)+0.5))
+
+
 
 
 #endif

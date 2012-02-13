@@ -811,8 +811,12 @@ static void t_ampqk( int *status ) {
    vvd( dm, -0.56702908706930343907, 1.0E-12, "palAmpqk", "dm", status );
 }
 
-
-
+static void t_fk45z( int *status ) {
+   double r2000, d2000;
+   palFk45z( 1.2, -0.3, 1960.0, &r2000, &d2000 );
+   vvd( r2000, 1.2097812228966762227, 1.0E-12, "palFk45z", "r2000", status );
+   vvd( d2000, -0.29826111711331398935, 1.0E-12, "palFk45z", "d2000", status );
+}
 
 
 
@@ -846,6 +850,7 @@ int main (void) {
   t_etrms(&status);
   t_eqgal(&status);
   t_evp(&status);
+  t_fk45z(&status);
   t_galeq(&status);
   t_galsup(&status);
   t_geoc(&status);
