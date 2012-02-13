@@ -56,16 +56,16 @@
 */
 
 /* Pi */
-#define PAL__DPI (3.141592653589793238462643)
+static const double PAL__DPI = 3.1415926535897932384626433832795028841971693993751;
 
 /* 2Pi */
-#define PAL__D2PI (6.283185307179586476925287)
+static const double PAL__D2PI = 6.2831853071795864769252867665590057683943387987502;
 
 /* pi/180:  degrees to radians */
-#define PAL__DD2R 0.017453292519943295769236907684886127134428718885417
+static const double  PAL__DD2R = 0.017453292519943295769236907684886127134428718885417;
 
 /* Start of SLA modified Julian date epoch */
-#define PAL__MJD0 2400000.5
+static const double PAL__MJD0 = 2400000.5;
 
 /* DNINT(A) - round to nearest whole number (double) */
 #define DNINT(A) ((A)<0.0?ceil((A)-0.5):floor((A)+0.5))
