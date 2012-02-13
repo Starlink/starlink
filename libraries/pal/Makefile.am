@@ -33,6 +33,7 @@ palDtps2c.c \
 palDtt.c \
 palEcmat.c \
 palEtrms.c \
+palEqgal.c \
 palGaleq.c \
 palGalsup.c \
 palPrebn.c \
