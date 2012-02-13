@@ -76,6 +76,10 @@ static const double PAL__MJD0 = 2400000.5;
 /* Light time for 1 AU (sec) */
 static const double PAL__CR = 499.004782;
 
+/* Km per sec to AU per tropical century
+   = 86400 * 36524.2198782 / 149597870 */
+static const double PAL__VF = 21.095;
+
 /*  Radians per year to arcsec per century. This needs to be a macro since it
     is an expression including other constants. */
 #define PAL__PMF (100.0*60.0*60.0*360.0/PAL__D2PI);

@@ -37,6 +37,8 @@ palEtrms.c \
 palEqgal.c \
 palEvp.c \
 palFk45z.c \
+palFk524.c \
+palFk54z.c \
 palGaleq.c \
 palGalsup.c \
 palMappa.c \

@@ -818,6 +818,15 @@ static void t_fk45z( int *status ) {
    vvd( d2000, -0.29826111711331398935, 1.0E-12, "palFk45z", "d2000", status );
 }
 
+static void t_fk54z( int *status ) {
+   double r1950, d1950, dr1950, dd1950;
+   palFk54z( 1.2, -0.3, 1960.0, &r1950, &d1950, &dr1950, &dd1950 );
+   vvd( r1950, 1.1902221805755279771, 1.0E-12, "palFk54z", "r1950", status );
+   vvd( d1950, -0.30178317645793828472, 1.0E-12, "palFk54z", "d1950", status );
+   vvd( dr1950, -1.7830874775952945507e-08, 1.0E-12, "palFk54z", "dr1950", status );
+   vvd( dd1950, 7.196059425334821089e-09, 1.0E-12, "palFk54z", "dd1950", status );
+}
+
 
 
 
@@ -851,6 +860,7 @@ int main (void) {
   t_eqgal(&status);
   t_evp(&status);
   t_fk45z(&status);
+  t_fk54z(&status);
   t_galeq(&status);
   t_galsup(&status);
   t_geoc(&status);
