@@ -148,6 +148,18 @@ vrmat( double rmat[3][3], double expected[3][3], const char * func,
   }
 }
 
+/* Verify a vector */
+static void
+vvec( int len, double *vec, double *expected, const char *func,
+      int *status ) {
+  int i;
+  char buf[10];
+  for( i = 0; i < len; i++ ) {
+    sprintf( buf, "%d", i );
+    vvd( vec[i], expected[i], 1e-12, func, buf, status );
+  }
+}
+
 /******************************************************************/
 /*          TEST FUNCTIONS          */
 
@@ -730,6 +742,41 @@ static void t_prec( int *status ) {
    vrmat( rmat, expected, "palPrec", status );
 }
 
+static void t_evp( int *status ) {
+   double dvb[3],dpb[3],dvh[3],dph[3];
+   double vbex[3] = { 1.6957348127008098514e-07,
+                     -9.1093446116039685966e-08,
+                     -3.9528532243991863036e-08 };
+   double pbex[3] = {-0.49771075259730546136,
+                     -0.80273812396332311359,
+                     -0.34851593942866060383  };
+   double vhex[3] = { 1.6964379181455713805e-07,
+                     -9.1147224045727438391e-08,
+                     -3.9553158272334222497e-08 };
+   double phex[3] = { -0.50169124421419830639,
+                      -0.80650980174901798492,
+                      -0.34997162028527262212 };
+
+   palEvp( 2010.0, 2012.0, dvb, dpb, dvh, dph );
+
+   vvec( 3, dvb, vbex, "palEvp", status );
+   vvec( 3, dpb, pbex, "palEvp", status );
+   vvec( 3, dvh, vhex, "palEvp", status );
+   vvec( 3, dph, phex, "palEvp", status );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**********************************************************************/
 
 int main (void) {
@@ -755,6 +802,7 @@ int main (void) {
   t_eqeqx(&status);
   t_etrms(&status);
   t_eqgal(&status);
+  t_evp(&status);
   t_galeq(&status);
   t_galsup(&status);
   t_geoc(&status);

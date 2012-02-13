@@ -34,6 +34,7 @@ palDtt.c \
 palEcmat.c \
 palEtrms.c \
 palEqgal.c \
+palEvp.c \
 palGaleq.c \
 palGalsup.c \
 palPrebn.c \
