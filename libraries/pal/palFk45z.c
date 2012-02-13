@@ -156,7 +156,7 @@ void palFk45z( double r1950, double d1950, double bepoch, double *r2000,
    }
 
 /* Remove e-terms. */
-   w = r0[ 1 ]*a1[ 1 ] + r0[ 2 ]*a1[ 2 ] + r0[ 3 ]*a1[ 3 ];
+   w = r0[ 0 ]*a1[ 0 ] + r0[ 1 ]*a1[ 1 ] + r0[ 2 ]*a1[ 2 ];
    for( i = 0; i < 3; i++ ) {
       v1[ i ] = r0[ i ] - a1[ i ] + w*r0[ i ];
    }
