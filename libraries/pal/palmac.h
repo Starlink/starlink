@@ -80,9 +80,8 @@ static const double PAL__CR = 499.004782;
    = 86400 * 36524.2198782 / 149597870 */
 static const double PAL__VF = 21.095;
 
-/*  Radians per year to arcsec per century. This needs to be a macro since it
-    is an expression including other constants. */
-#define PAL__PMF (100.0*60.0*60.0*360.0/PAL__D2PI);
+/*  Radians per year to arcsec per century. */
+static const double PAL__PMF = (100.0*60.0*60.0*360.0/PAL__D2PI);
 
 /* DNINT(A) - round to nearest whole number (double) */
 #define DNINT(A) ((A)<0.0?ceil((A)-0.5):floor((A)+0.5))
