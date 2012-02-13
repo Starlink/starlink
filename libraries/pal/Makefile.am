@@ -37,8 +37,10 @@ palEqgal.c \
 palEvp.c \
 palGaleq.c \
 palGalsup.c \
+palMappa.c \
 palPrebn.c \
 palPrec.c \
+palPrenut.c \
 palSubet.c \
 palSupgal.c
 
