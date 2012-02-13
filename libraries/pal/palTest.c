@@ -463,6 +463,20 @@ static void t_fk52h ( int *status ) {
 
 }
 
+/* palPrebn */
+
+static void t_prebn( int *status ) {
+  double rmatp[3][3];
+  double prebn_expected[3][3] = {
+    { 9.999257613786738e-1, -1.117444640880939e-2, -4.858341150654265e-3 },
+    { 1.117444639746558e-2,  9.999375635561940e-1, -2.714797892626396e-5 },
+    { 4.858341176745641e-3, -2.714330927085065e-5,  9.999881978224798e-1 },
+  };
+
+  palPrebn ( 1925., 1975., rmatp );
+  vrmat( rmatp, prebn_expected, "palPrebn", status );
+}
+
 /* Range */
 
 static void t_range( int *status ) {
@@ -694,6 +708,7 @@ int main (void) {
   t_prec(&status);
   t_ecmat(&status);
   t_e2h(&status);
+  t_prebn(&status);
   t_range(&status);
   t_ranorm(&status);
   t_sep(&status);
