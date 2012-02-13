@@ -75,7 +75,6 @@
 */
 
 #include "pal.h"
-#include "palmac.h"
 #include "sofa.h"
 
 void palSupgal ( double dsl, double dsb, double *dl, double *db ) {
