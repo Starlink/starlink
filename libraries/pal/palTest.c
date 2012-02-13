@@ -151,6 +151,27 @@ vrmat( double rmat[3][3], double expected[3][3], const char * func,
 /******************************************************************/
 /*          TEST FUNCTIONS          */
 
+/* Adding E-terms */
+
+static void t_addet( int *status ) {
+  double r1,d1,r2,d2;
+  double rm = 2.;
+  double dm = -1.;
+  double eq = 1975.;
+
+
+  palAddet ( rm, dm, eq, &r1, &d1 );
+  vvd ( r1 - rm, 2.983864874295250e-6, 1e-12, "palAddet",
+	"R", status );
+  vvd ( d1 - dm, 2.379650804185118e-7, 1e-12, "palAddet",
+	"D", status );
+
+  palSubet ( r1, d1, eq, &r2, &d2 );
+  vvd ( r2 - rm, 0, 1e-12, "palSubet", "R", status );
+  vvd ( d2 - dm, 0, 1e-12, "palSubet", "D", status );
+
+}
+
 /* Bearings */
 
 static void t_bear( int *status ) {
@@ -376,6 +397,21 @@ static void t_epj2d( int *status ) {
 static void t_eqeqx (int *status ) {
   vvd ( palEqeqx( 53736. ), -0.8834195072043790156e-5,
         1e-15, "palEqeqx", " ", status );
+}
+
+/* E-terms */
+
+static void t_etrms( int * status ) {
+  double ev[3];
+
+  palEtrms ( 1976.9, ev );
+
+  vvd ( ev[0], -1.621617102537041e-6, 1e-18, "palEtrms",
+	"X", status );
+  vvd ( ev[1], -3.310070088507914e-7, 1e-18, "palEtrms",
+	"Y", status );
+  vvd ( ev[2], -1.435296627515719e-7, 1e-18, "palEtrms",
+	"Z", status );
 }
 
 /* Geocentric coordinates */
@@ -635,6 +671,7 @@ int main (void) {
   /* Use the SLA and SOFA conventions */
   int status = 0; /* Unix and SAE convention */
 
+  t_addet(&status);
   t_bear(&status);
   t_caf2r(&status);
   t_caldj(&status);
@@ -650,6 +687,7 @@ int main (void) {
   t_epj(&status);
   t_epj2d(&status);
   t_eqeqx(&status);
+  t_etrms(&status);
   t_geoc(&status);
   t_gmst(&status);
   t_fk52h(&status);

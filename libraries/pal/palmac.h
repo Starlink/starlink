@@ -64,6 +64,12 @@ static const double PAL__D2PI = 6.2831853071795864769252867665590057683943387987
 /* pi/180:  degrees to radians */
 static const double  PAL__DD2R = 0.017453292519943295769236907684886127134428718885417;
 
+/* Radians to arcseconds */
+static const double PAL__DR2AS = 2.0626480624709635515647335733077861319665970087963e5;
+
+/* Arcseconds to radians */
+static const double PAL__DAS2R = 4.8481368110953599358991410235794797595635330237270e-6;
+
 /* Start of SLA modified Julian date epoch */
 static const double PAL__MJD0 = 2400000.5;
 

@@ -19,6 +19,7 @@ cinclude_HEADERS = pal.h palmac.h
 
 PUBLIC_C_FILES = \
 palOne2One.c \
+palAddet.c \
 palCaldj.c \
 palDe2h.c \
 palDeuler.c \
@@ -31,7 +32,9 @@ palDtp2s.c \
 palDtps2c.c \
 palDtt.c \
 palEcmat.c \
-palPrec.c
+palEtrms.c \
+palPrec.c \
+palSubet.c
 
 TESTS = palTest
 
