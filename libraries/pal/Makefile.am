@@ -35,7 +35,8 @@ palEcmat.c \
 palEtrms.c \
 palPrebn.c \
 palPrec.c \
-palSubet.c
+palSubet.c \
+palSupgal.c
 
 TESTS = palTest
 

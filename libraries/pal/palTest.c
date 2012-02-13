@@ -506,6 +506,20 @@ static void t_sep( int *status ) {
 
 }
 
+/* Supergalactic */
+
+static void t_supgal( int *status ) {
+  double dl, db;
+
+  palSupgal ( 6.1, -1.4, &dl, &db );
+
+  vvd ( dl, 3.798775860769474, 1e-12, "palSupgal",
+	"DL", status );
+  vvd ( db, -0.1397070490669407, 1e-12, "palSupgal",
+	"DB", status );
+
+}
+
 /* Test spherical tangent-plane-projection routines */
 static void t_tp( int *status ) {
 
@@ -712,6 +726,7 @@ int main (void) {
   t_range(&status);
   t_ranorm(&status);
   t_sep(&status);
+  t_supgal(&status);
   t_tp(&status);
   t_vecmat(&status);
   return status;
