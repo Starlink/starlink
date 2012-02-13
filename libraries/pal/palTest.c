@@ -414,6 +414,19 @@ static void t_etrms( int * status ) {
 	"Z", status );
 }
 
+/* Galactic to J2000 equatorial */
+
+static void t_galeq( int *status ) {
+  double dr, dd;
+
+  palGaleq ( 5.67, -1.23, &dr, &dd );
+
+  vvd ( dr, 0.04729270418071426, 1e-12, "palGaleq",
+	"DR", status );
+  vvd ( dd, -0.7834003666745548, 1e-12, "palGaleq",
+	"DD", status );
+}
+
 /* Galactic to supergalactic */
 static void t_galsup(int *status ) {
   double dsl, dsb;
@@ -728,6 +741,7 @@ int main (void) {
   t_epj2d(&status);
   t_eqeqx(&status);
   t_etrms(&status);
+  t_galeq(&status);
   t_galsup(&status);
   t_geoc(&status);
   t_gmst(&status);
