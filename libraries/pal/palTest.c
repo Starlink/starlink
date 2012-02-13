@@ -414,6 +414,18 @@ static void t_etrms( int * status ) {
 	"Z", status );
 }
 
+/* Galactic to supergalactic */
+static void t_galsup(int *status ) {
+  double dsl, dsb;
+
+  palGalsup ( 6.1, -1.4, &dsl, &dsb );
+
+  vvd ( dsl, 4.567933268859171, 1e-12, "palGalsup",
+	"DSL", status );
+  vvd ( dsb, -0.01862369899731829, 1e-12, "palGalsup",
+	"DSB", status );
+}
+
 /* Geocentric coordinates */
 
 /* This is not from sla_test.f */
@@ -716,6 +728,7 @@ int main (void) {
   t_epj2d(&status);
   t_eqeqx(&status);
   t_etrms(&status);
+  t_galsup(&status);
   t_geoc(&status);
   t_gmst(&status);
   t_fk52h(&status);
