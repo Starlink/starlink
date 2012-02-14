@@ -11,9 +11,9 @@ int *status            /* global status (given and returned) */
 
 void sock_connect
 (
-int sock,                       /* Socket for connection (given) */
-struct sockaddr *connect_addr,  /* socket info */
-int *status                     /* global status (given and returned) */
+int sock,                             /* Socket for connection (given) */
+const struct sockaddr *connect_addr,  /* socket info */
+int *status                           /* global status (given and returned) */
 );
 
 /*+  SOCK_GHBA - get host detail by address */
@@ -61,7 +61,7 @@ void sock_write
 (
 int write_socket,     /* Socket on which to write the data (given) */
 int length_to_send,   /* Length of the message to be sent (given) */
-char *buffer,         /* Buffer containing the data (returned) */
+const char *buffer,   /* Buffer containing the data (given) */
 int *status           /* global status (given and returned) */
 );
 

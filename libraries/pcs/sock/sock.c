@@ -20,6 +20,8 @@
 #include "sae_par.h"
 #include "sock_err.h"
 
+#include "sock.h"
+
 /* int getpeername ( int s, struct sockaddr *name, int *namelen );
 struct hostent *gethostbyname ( const char *name );
 struct hostent *gethostbyaddr ( const char *addr, int len, int type );
@@ -74,6 +76,8 @@ int *status            /* global status (given and returned) */
 *  History:
 *     06-MAY-1994 (REVAD::BDK):
 *        Original
+*     2012-02-13 (TIMJ):
+*        Fix type of namelen
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,14 +87,12 @@ int *status            /* global status (given and returned) */
 */
 
 {
-   struct sockaddr_in client_address; /* incoming connection details */
-   int namelen;                       /* size of address */
-
    if ( *status != SAI__OK ) return;
 
    for ( ; ; )
    {
-      namelen = sizeof ( client_address );
+      struct sockaddr_in client_address; /* incoming connection details */
+      socklen_t namelen = sizeof ( client_address ); /* size of address */
       *new_socket = accept ( listen_socket,
         ( struct sockaddr * ) &client_address, &namelen );
 
@@ -113,9 +115,9 @@ int *status            /* global status (given and returned) */
 
 void sock_connect
 (
-int sock,                       /* Socket for connection (given) */
-struct sockaddr *connect_addr,  /* socket info */
-int *status                     /* global status (given and returned) */
+int sock,                             /* Socket for connection (given) */
+const struct sockaddr *connect_addr,  /* socket info */
+int *status                           /* global status (given and returned) */
 )
 
 /*
@@ -465,6 +467,8 @@ int *status            /* global status (given and returned) */
 *  History:
 *     06-MAY-1994 (REVAD::BDK):
 *        Original
+*     2012-02-13 (TIMJ):
+*        Fix type of namelen
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -475,13 +479,12 @@ int *status            /* global status (given and returned) */
 
 {
    int istat;            /* local status */
-   int addrlen;          /* size of structure */
-
+ 
    if ( *status != SAI__OK ) return;
 
    for ( ; ; )
    {
-      addrlen = sizeof ( struct sockaddr_in );
+      socklen_t addrlen = sizeof ( struct sockaddr_in ); /* size of structure */
       istat = getpeername ( channel, (struct sockaddr *)peer, &addrlen );
 
       if ( istat != -1 )
@@ -611,7 +614,7 @@ void sock_write
 (
 int write_socket,     /* Socket on which to write the data (given) */
 int length_to_send,   /* Length of the message to be sent (given) */
-char *buffer,         /* Buffer containing the data (returned) */
+const char *buffer,   /* Buffer containing the data (given) */
 int *status           /* global status (given and returned) */
 )
 
