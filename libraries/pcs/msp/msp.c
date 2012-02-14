@@ -168,7 +168,7 @@ static char my_name[32];                    /* name of this task */
 *     C
 
 *  Invocation:
-*     int msp1_mkdir( char *dir )
+*     int msp1_mkdir( const char *dir )
 
 *  Description:
 *     Creates the required directory if possible. No error is reported if
@@ -178,7 +178,7 @@ static char my_name[32];                    /* name of this task */
 *     are reported using EMS and non-zero returned.
 
 *  Arguments:
-*     dir = *char (Given)
+*     dir = const char * (Given)
 *        String containing the directory name
 
 *  Copyright:
@@ -220,7 +220,7 @@ static char my_name[32];                    /* name of this task */
 *-
 */
 
-int msp1_mkdir( char *dir )
+static int msp1_mkdir( const char *dir )
 {
 char *buff;
 int status;
@@ -303,7 +303,7 @@ struct stat statb;
 *     If neither of these are successful, a null string is returned.
 
 *  Arguments:
-*     admusr = *char (Given)
+*     admusr = const char * (Given)
 *        Pointer to string where the definition of the ADAM_USER directory
 *
 *     aulen = int (Given)
@@ -348,7 +348,7 @@ struct stat statb;
 *-
 */
 
-int msp1_admus( char *admusr, int aulen )
+static int msp1_admus( const char *admusr, int aulen )
 {
 
 int status;
@@ -411,7 +411,7 @@ struct stat statb;
 *     C
 
 *  Invocation:
-*     int msp1_mkrvous( char *fname )
+*     int msp1_mkrvous( const char *fname )
 
 *  Description:
 *     Creates the given file which should be the name of a rendezvous
@@ -423,7 +423,7 @@ struct stat statb;
 *     If succesful 0 is returned, otherwise a -1 is returned.
 
 *  Arguments:
-*     fname = *char (Given)
+*     fname = const char * (Given)
 *        String containing the full file name.
 
 *  Copyright:
@@ -464,7 +464,7 @@ struct stat statb;
 
 *-
  */
-int msp1_mkrvous( const char *fname )
+static int msp1_mkrvous( const char *fname )
 {
    FILE* fd;
 
@@ -1096,7 +1096,7 @@ int *status         /* global status (given and returned) */
 
 void msp_enter_task
 (
-char *task_name,         /* name of this task (given) */
+const char *task_name,   /* name of this task (given) */
 receiveq_type *commandq, /* command queue for this task (returned) */
 int *status              /* global status (given and returned) */
 )
@@ -1368,8 +1368,8 @@ void
 
 static void msp_get_taskport
 (
-char *filedir,        /* name of directory for rendezvous files (given) */
-char *taskname,       /* task name (given) */
+const char *filedir,  /* name of directory for rendezvous files (given) */
+const char *taskname, /* task name (given) */
 int *taskport,        /* port number of task (returned) */
 int *status           /* global status (given and returned) */
 )
@@ -1472,9 +1472,9 @@ int *status           /* global status (given and returned) */
 
 void msp_get_task_queue
 (
-char *task_name,    /* name of task (given) */
-sendq_type *qid,    /* task command queue (returned) */
-int *status         /* global status (given and returned) */
+const char *task_name, /* name of task (given) */
+sendq_type *qid,       /* task command queue (returned) */
+int *status            /* global status (given and returned) */
 )
 
 /*
@@ -1956,7 +1956,7 @@ int *status           /* global status (given and returned) */
 
 void msp_receive_message
 (
-receiveq_type *qarr,  /* array of queue identifiers (given) */
+const receiveq_type *qarr,  /* array of queue identifiers (given) */
 int nqueues,          /* number of queues (given) */
 int waitflag,         /* wait flag (given) */
 int maxlen,           /* maximum length of message (given) */
@@ -2286,7 +2286,7 @@ int *status           /* global status (given and returned) */
 
 void msp_send_message
 (
-char msgbody[],        /* message to be sent (given) */
+const char msgbody[],  /* message to be sent (given) */
 int msglen,            /* length of message to be sent (given) */
 sendq_type sendq,      /* queue identifer to be used (given) */
 receiveq_type replyq,  /* reply queue to be associated with the message

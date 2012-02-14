@@ -17,8 +17,8 @@ int *status          /* global status (given and returned) */
 
 static void msp_get_taskport
 (
-char *filedir,        /* name of directory for rendezvous files (given) */
-char *taskname,       /* task name (given) */
+const char *filedir,  /* name of directory for rendezvous files (given) */
+const char *taskname, /* task name (given) */
 int *taskport,        /* port number of task (returned) */
 int *status           /* global status (given and returned) */
 );

@@ -35,7 +35,7 @@ int *status         /* global status (given and returned) */
 
 void msp_enter_task
 (
-char *task_name,         /* name of this task (given) */
+const char *task_name,   /* name of this task (given) */
 receiveq_type *commandq, /* command queue for this task (returned) */
 int *status              /* global status (given and returned) */
 );
@@ -51,9 +51,9 @@ void
 
 void msp_get_task_queue
 (
-char *task_name,    /* name of task (given) */
-sendq_type *qid,    /* task command queue (returned) */
-int *status         /* global status (given and returned) */
+const char *task_name, /* name of task (given) */
+sendq_type *qid,       /* task command queue (returned) */
+int *status            /* global status (given and returned) */
 );
 
 /*+  MSP_MKCOMQ - return a task's command q given any send q */
@@ -79,7 +79,7 @@ int *status           /* global status (given and returned) */
 
 void msp_receive_message
 (
-receiveq_type *qarr,  /* array of queue identifiers (given) */
+const receiveq_type *qarr, /* array of queue identifiers (given) */
 int nqueues,          /* number of queues (given) */
 int waitflag,         /* wait flag (given) */
 int maxlen,           /* maximum length of message (given) */
@@ -94,7 +94,7 @@ int *status           /* global status (given and returned) */
 
 void msp_send_message
 (
-char msgbody[],        /* message to be sent (given) */
+const char msgbody[],  /* message to be sent (given) */
 int msglen,            /* length of message to be sent (given) */
 sendq_type sendq,      /* queue identifer to be used (given) */
 receiveq_type replyq,  /* reply queue to be associated with the message
