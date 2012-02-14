@@ -2357,6 +2357,7 @@ int *status            /* global status (given and returned) */
 
    if ( msglen <= MSP__MXMSGSZ )
    {
+      memset( &message, 0, sizeof(message) );
       message.msg_size = msglen;
       message.reply_q.ack_queue = replyq;
       message.destination_q = sendq.ack_queue;
