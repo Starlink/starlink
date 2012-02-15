@@ -4012,7 +4012,11 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
     }
 
     //  Get distance between endpoints (add a little to be safe).
-    int x0 = int(rx0), y0 = int(ry0), x1 = int(rx1), y1 = int(ry1);
+    //  Round to nearest integer to respect pixel boundaries.
+    int x0 = int(rx0+0.5);
+    int y0 = int(ry0+0.5);
+    int x1 = int(rx1+0.5);
+    int y1 = int(ry1+0.5);
     int w = abs(x1-x0) + 1;
     int h = abs(y1-y0) + 1;
     int dist = (int)sqrt((double)w*w + (double)h*h) + 4;

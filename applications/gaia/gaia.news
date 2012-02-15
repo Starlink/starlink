@@ -39,6 +39,11 @@
     give an error when a conversion to the NDF format was attempted. This
     uses enhancements to the CONVERT package.
 
+    Image slices will now use start and end points anywhere within the
+    region of the displayed pixel. Previously the region of the end points
+    started at the middle of the previous pixel and extended in the middle
+    of the selected pixel.
+
     Version 4.4-2
     =============
 
