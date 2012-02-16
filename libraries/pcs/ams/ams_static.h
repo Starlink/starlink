@@ -2,8 +2,8 @@
 
 static void ams_accept
 (
-struct a_loc_init_in * loc_init_in,  /* the message requesting
-                                        initialisation (given) */
+const struct a_loc_init_in * loc_init_in,  /* the message requesting
+                                              initialisation (given) */
 sendq_type ackq,                     /* queue for returning
                                         acknowledgement (given) */
 int *status                          /* global status (given and
@@ -14,7 +14,7 @@ int *status                          /* global status (given and
 
 static void ams_addrest
 (
-struct a_loc_ack_in * loc_ack_in,  /* received ack_in structure (given) */
+const struct a_loc_ack_in * loc_ack_in,  /* received ack_in structure (given) */
 int path,                          /* path of init transaction (given) */
 int messid,                        /* messid of init transaction (given) */
 sendq_type reply_q,                /* queue for sending rejection (given)
@@ -26,7 +26,7 @@ int *status                        /* global status (given and returned) */
 
 static void ams_analysename
 (
-char *name,       /* full taskname (given) */
+const char *name,  /* full taskname (given) */
 int *netind,      /* index to network type (returned) */
 char *task,       /* task name (returned) */
 char *mach,       /* machine name (returned) */
@@ -38,7 +38,7 @@ int *status       /* global status (given and returned) */
 
 static void ams_call_out
 (
-char *machname,    /* name of remote machine (given) */
+const char *machname,    /* name of remote machine (given) */
 int netind,        /* index to network parameters (given) */
 int *machnum,      /* number allocated to machine in MESSYS common blocks
                       (returned) */
@@ -49,8 +49,8 @@ int *status        /* global status (given and returned) */
 
 static void ams_endtrans
 (
-struct a_loc_msg_in * loc_msg_in,  /* the end-transaction message in
-                                      internal format (given) */
+const struct a_loc_msg_in * loc_msg_in,  /* the end-transaction message in
+                                            internal format (given) */
 int *path,                         /* the communications path to the
                                       other task (returned) */
 int *messid,                       /* the transaction end index for this
@@ -114,7 +114,7 @@ int *status        /* global status (given and returned) */
 
 static void ams_getmachnum
 (
-char *machinename,      /* name of machine (given) */
+const char *machinename,/* name of machine (given) */
 int *machinenumber,     /* index to machine (returned) */
 int *added,             /* flag for if new entry added (returned) */
 int *status             /* global status (given and returned) */
@@ -124,7 +124,7 @@ int *status             /* global status (given and returned) */
 
 static void ams_nalookup
 (
-char *name,        /* full machine/task name (given) */
+const char *name,  /* full machine/task name (given) */
 int *path,         /* path number for communication to task (returned) */
 int *netind,       /* index to network type (returned) */
 char *task,        /* task part of name (returned) */
@@ -137,7 +137,7 @@ int *status        /* global status (given and returned) */
 
 static void ams_newtrans
 (
-struct a_loc_gsoc_start_in *loc_gsoc_start_in,
+const struct a_loc_gsoc_start_in *loc_gsoc_start_in,
                                    /* start-transaction message in internal
                                       format (given) */
 sendq_type reply_q,                /* queue for sending rejection (given) */
@@ -159,7 +159,7 @@ int *status                        /* global status (given and returned) */
 
 static void ams_nlookup
 (
-char *name,       /* task name (given) */
+const char *name, /* task name (given) */
 int *path,        /* path number for communication to task (returned) */
 int *status       /* global status (given and returned) */
 );
@@ -168,7 +168,7 @@ int *status       /* global status (given and returned) */
 
 static void ams_raccept
 (
-struct a_rem_init_in *rem_init_in, /* init request (given) */
+const struct a_rem_init_in *rem_init_in, /* init request (given) */
 sendq_type ackq,                   /* acknowledgement queue (given) */
 int *status                        /* global status (given and returned) */
 );
@@ -177,7 +177,7 @@ int *status                        /* global status (given and returned) */
 
 static void ams_raddrest
 (
-struct a_rem_ack_in *rem_ack_in,  /* received ack_in structure (given) */
+const struct a_rem_ack_in *rem_ack_in,  /* received ack_in structure (given) */
 int path,                         /* path of init transaction (given) */
 int messid,                       /* messid of init transaction (given) */
 sendq_type replyq,                /* queue for sending rejections (given)
@@ -189,7 +189,7 @@ int *status                       /* global status (given and returned) */
 
 static void ams_reject
 (
-struct a_loc_ack_in *loc_ack_in,   /* received ack_in structure (given) */
+const struct a_loc_ack_in *loc_ack_in,   /* received ack_in structure (given) */
 sendq_type reply_q,                /* queue for sending reply (given) */
 int *status                        /* global status (given and returned) */
 );
@@ -205,8 +205,8 @@ int pathnum              /* path number (given) */
 
 static void ams_rendtrans
 (
-struct a_rem_msg_in *rem_msg_in,  /* the end-transaction message in
-                                     internal format (given) */
+const struct a_rem_msg_in *rem_msg_in,  /* the end-transaction message in
+                                           internal format (given) */
 int *path,                        /* the communications path to the other
                                      task (returned) */
 int *messid,                      /* the message identifier for this
@@ -225,7 +225,7 @@ int *status                       /* global status (given and returned) */
 
 static void ams_rnewtrans
 (
-struct a_rem_gsoc_start_in *rem_gsoc_start_in,
+const struct a_rem_gsoc_start_in *rem_gsoc_start_in,
                                    /* the initialize-transaction message in
                                       internal format (given) */
 sendq_type reply_q,                /* queue for sending rejection (given) */
@@ -247,7 +247,7 @@ int *status                        /* global status (given and returned) */
 
 static void ams_rreject
 (
-struct a_rem_ack_in *rem_ack_in,   /* received ack_in structure (given) */
+const struct a_rem_ack_in *rem_ack_in,   /* received ack_in structure (given) */
 sendq_type reply_q,                /* queue for sending rejection (given) */
 int *status                        /* global status (given and returned) */
 );
@@ -256,8 +256,8 @@ int *status                        /* global status (given and returned) */
 
 static void ams_rtranslate
 (
-struct a_rem_msg_in *rem_msg_in,  /* the message in internal format
-                                     (given) */
+const struct a_rem_msg_in *rem_msg_in,  /* the message in internal format
+                                           (given) */
 sendq_type reply_q,               /* reply queue (given) */
 int *path,                        /* the communications path to the other
                                      task (returned) */
@@ -293,10 +293,10 @@ sendq_type targetq,     /* queue for sending message (given) */
 int tttn,               /* this task transaction number (given) */
 int ottn,               /* other task transaction number (given) */
 int gflag,              /* gsoc flag (given) */
-char *gname,            /* message name field (given) */
+const char *gname,      /* message name field (given) */
 int glen,               /* length of message value (given) */
 int gstatus,            /* message status (given) */
-char *gvalue,           /* message value field (given) */
+const char *gvalue,     /* message value field (given) */
 int *status             /* global status (given and returned) */
 );
 
@@ -308,9 +308,9 @@ int path,               /* path number (given) */
 int messid,             /* transaction number (given) */
 int message_status,     /* message status (given) */
 int message_context,    /* message context (given) */
-char *message_name,     /* message name (given) */
+const char *message_name,     /* message name (given) */
 int message_length,     /* length of value (given) */
-char *message_value,    /* message value (given) */
+const char *message_value,    /* message value (given) */
 int *status             /* global status (given and returned) */
 );
 
@@ -342,9 +342,9 @@ int path,                /* path number (given) */
 int messid,              /* transaction number (given) */
 int message_status,      /* message status (given) */
 int message_context,     /* message context (given) */
-char *message_name,      /* message name (given) */
+const char *message_name,      /* message name (given) */
 int message_length,      /* length of value (given) */
-char *message_value,     /* message value (given) */
+const char *message_value,     /* message value (given) */
 int *status              /* global status (given and returned) */
 );
 
@@ -353,9 +353,9 @@ int *status              /* global status (given and returned) */
 static void ams_sendobey
 (
 sendq_type targetq,    /* target queue identifier (given) */
-char *name,            /* qualifier of message (given) */
+const char *name,      /* qualifier of message (given) */
 int length,            /* number of significant bytes in value (given) */
-char *value,           /* message to be passed to main-line code (given) */
+const char *value,     /* message to be passed to main-line code (given) */
 int *status            /* global status (given and returned) */
 );
 
@@ -378,8 +378,8 @@ int parm                          /* the timeout parameter (given) */
 
 static void ams_translate
 (
-struct a_loc_msg_in *loc_msg_in,  /* the message in internal format
-                                     (given) */
+const struct a_loc_msg_in *loc_msg_in,  /* the message in internal format
+                                           (given) */
 sendq_type reply_q,               /* reply queue (given) */
 int *path,                        /* the communications path to the other
                                      task (returned) */
@@ -399,7 +399,7 @@ int *status                       /* global status (given and returned) */
 
 static void ams_unpacklocgsoc
 (
-struct a_loc_gsoc_start_in *localmess, /* internal format (given) */
+const struct a_loc_gsoc_start_in *localmess, /* internal format (given) */
 int message_name_s,                    /* space for name (given) */
 int message_value_s,                   /* space for value (given) */
 int *message_status,                   /* message status (returned) */
@@ -414,7 +414,7 @@ int *status                            /* global status (given and returned) */
 
 static void ams_unpacklocmsg
 (
-struct a_loc_msg_in *localmess,        /* internal format (given) */
+const struct a_loc_msg_in *localmess,  /* internal format (given) */
 int message_name_s,                    /* space for name (given) */
 int message_value_s,                   /* space for value (given) */
 int *message_status,                   /* message status (returned) */
@@ -429,7 +429,7 @@ int *status                            /* global status (given and returned) */
 
 static void ams_unpackremgsoc
 (
-struct a_rem_gsoc_start_in *remotemess, /* internal format (given) */
+const struct a_rem_gsoc_start_in *remotemess, /* internal format (given) */
 int message_name_s,                    /* space for name (given) */
 int message_value_s,                   /* space for value (given) */
 int *message_status,                   /* message status (returned) */
@@ -444,7 +444,7 @@ int *status                            /* global status (given and returned) */
 
 static void ams_unpackremmsg
 (
-struct a_rem_msg_in *remotemess,       /* internal format (given) */
+const struct a_rem_msg_in *remotemess, /* internal format (given) */
 int message_name_s,                    /* space for name (given) */
 int message_value_s,                   /* space for value (given) */
 int *message_status,                   /* message status (returned) */

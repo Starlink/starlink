@@ -9,9 +9,9 @@ int *status         /* global status (given and returned) */
 
 void ams_astmsg
 (
-char *name,       /* name of the action to be rescheduled (given) */
+const char *name, /* name of the action to be rescheduled (given) */
 int length,       /* number of significant bytes in value (given) */
-char *value,      /* message to be passed to main-line code (given) */
+const char *value,/* message to be passed to main-line code (given) */
 int *status       /* global status (given and returned) */
 );
 
@@ -50,7 +50,7 @@ int *status               /* global status (given and returned) */
 
 void ams_init
 (
-char *own_name,      /* name of this task (given) */
+const char *own_name,     /* name of this task (given) */
 int *status
 );
 
@@ -58,7 +58,7 @@ int *status
 
 void ams_initeh
 (
-char *own_name,      /* name of this task (given) */
+const char *own_name,/* name of this task (given) */
 int eh,              /* register exit handler */
 int *status
 );
@@ -66,9 +66,9 @@ int *status
 /*+  AMS_KICK - send a message to this task's kick queue */
 void ams_kick
 (
-char *name,       /* name of the action to be rescheduled (given) */
+const char *name, /* name of the action to be rescheduled (given) */
 int length,       /* number of significant bytes in value (given) */
-char *value,      /* message to be passed to application code (given) */
+const char *value,/* message to be passed to application code (given) */
 int *status       /* global status (given and returned) */
 );
 
@@ -76,7 +76,7 @@ int *status       /* global status (given and returned) */
 
 void ams_path
 (
-char *other_task_name,  /* name of task to which path is required (given)
+const char *other_task_name,  /* name of task to which path is required (given)
                            */
 int *path,              /* pointer to the path (returned) */
 int *status             /* global status (given and returned) */
@@ -118,9 +118,9 @@ int messid,             /* the number identifying the transaction (given) */
 int message_function,   /* message function (given) */
 int message_status,     /* message status (given) */
 int message_context,    /* message context (given) */
-char *message_name,     /* message name (given) */
+const char *message_name,/* message name (given) */
 int message_length,     /* length of value (given) */
-char *message_value,    /* message value (given) */
+const char *message_value,/* message value (given) */
 int *status             /* global status (given and returned) */
 );
 
@@ -129,7 +129,7 @@ int *status             /* global status (given and returned) */
 void ams_resmsg
 (
 int length,        /* number of significant bytes in value (given) */
-char *value,       /* message to be passed to main-line code (given) */
+const char *value, /* message to be passed to main-line code (given) */
 int *status        /* global status (given and returned) */
 );
 
@@ -141,9 +141,9 @@ int path,               /* pointer to the path (given) */
 int message_function,   /* message function (given) */
 int message_status,     /* message status (given) */
 int message_context,    /* message context (given) */
-char *message_name,     /* message name (given) */
+const char *message_name,/* message name (given) */
 int message_length,     /* length of value (given) */
-char *message_value,    /* message value (given) */
+const char *message_value,/* message value (given) */
 int *messid,            /* message number issued by this task (returned) */
 int *status             /* global status (given and returned) */
 );
