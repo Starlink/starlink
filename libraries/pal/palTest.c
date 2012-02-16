@@ -839,6 +839,13 @@ static void t_pvobs( int *status ) {
    vvec( 6, pv, expected, "palPvobs", status );
 }
 
+static void t_rvgalc( int *status ) {
+   double r2000, d2000, rv;
+   rv = palRvgalc( 2.7, -1.0 );
+   vvd( rv, 213.98084425751144977, 1.0E-12, "palRvgalc", "rv", status );
+}
+
+
 
 
 
@@ -887,6 +894,7 @@ int main (void) {
   t_pvobs(&status);
   t_range(&status);
   t_ranorm(&status);
+  t_rvgalc(&status);
   t_sep(&status);
   t_supgal(&status);
   t_tp(&status);

@@ -467,7 +467,7 @@ void palRefz ( double zu, double refa, double refb, double *zr );
 
 float palRverot ( float phi, float ra, float da, float st );
 
-float palRvgalc ( float r2000, float d2000 );
+double palRvgalc ( double r2000, double d2000 );
 
 float palRvlg ( float r2000, float d2000 );
 
