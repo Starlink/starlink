@@ -83,6 +83,10 @@ static const double PAL__VF = 21.095;
 /*  Radians per year to arcsec per century. */
 static const double PAL__PMF = (100.0*60.0*60.0*360.0/PAL__D2PI);
 
+/* Mean sidereal rate - the rotational angular velocity of Earth
+   in radians/sec from IERS Conventions (2003). */
+static const double PAL__SR = 7.2921150e-5;
+
 /* DNINT(A) - round to nearest whole number (double) */
 #define DNINT(A) ((A)<0.0?ceil((A)-0.5):floor((A)+0.5))
 

@@ -827,6 +827,18 @@ static void t_fk54z( int *status ) {
    vvd( dd1950, 7.196059425334821089e-09, 1.0E-12, "palFk54z", "dd1950", status );
 }
 
+static void t_pvobs( int *status ) {
+   double pv[6];
+   double expected[6] = { -4.7683600138836167813e-06,
+                           1.0419056712717953176e-05,
+                           4.099831053320363277e-05,
+                          -7.5976959740661272483e-10,
+                          -3.4771429582640930371e-10,
+                           0.0};
+   palPvobs( 1.3, 10000.0, 2.0, pv );
+   vvec( 6, pv, expected, "palPvobs", status );
+}
+
 
 
 
@@ -872,6 +884,7 @@ int main (void) {
   t_mappa(&status);
   t_mapqkz(&status);
   t_prebn(&status);
+  t_pvobs(&status);
   t_range(&status);
   t_ranorm(&status);
   t_sep(&status);
