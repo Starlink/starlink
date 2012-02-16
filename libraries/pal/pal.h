@@ -469,7 +469,7 @@ float palRverot ( float phi, float ra, float da, float st );
 
 double palRvgalc ( double r2000, double d2000 );
 
-float palRvlg ( float r2000, float d2000 );
+double palRvlg ( double r2000, double d2000 );
 
 float palRvlsrd ( float r2000, float d2000 );
 

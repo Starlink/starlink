@@ -48,6 +48,7 @@ palPrec.c \
 palPrenut.c \
 palPvobs.c \
 palRvgalc.c \
+palRvlg.c \
 palSubet.c \
 palSupgal.c
 
