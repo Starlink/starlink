@@ -840,25 +840,25 @@ static void t_pvobs( int *status ) {
 }
 
 static void t_rvgalc( int *status ) {
-   double r2000, d2000, rv;
+   double rv;
    rv = palRvgalc( 2.7, -1.0 );
    vvd( rv, 213.98084425751144977, 1.0E-12, "palRvgalc", "rv", status );
 }
 
 static void t_rvlg( int *status ) {
-   double r2000, d2000, rv;
+   double rv;
    rv = palRvlg( 2.7, -1.0 );
    vvd( rv, 291.79205281252404802, 1.0E-12, "palRvlg", "rv", status );
 }
 
 static void t_rvlsrd( int *status ) {
-   double r2000, d2000, rv;
+   double rv;
    rv = palRvlsrd( 2.7, -1.0 );
    vvd( rv, 9.620674692097630043, 1.0E-12, "palRvlsrd", "rv", status );
 }
 
 static void t_rvlsrk( int *status ) {
-   double r2000, d2000, rv;
+   double rv;
    rv = palRvlsrk( 2.7, -1.0 );
    vvd( rv, 12.556356851411955233, 1.0E-12, "palRvlsrk", "rv", status );
 }
