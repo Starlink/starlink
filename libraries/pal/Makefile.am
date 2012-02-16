@@ -50,6 +50,7 @@ palPvobs.c \
 palRvgalc.c \
 palRvlg.c \
 palRvlsrd.c \
+palRvlsrk.c \
 palSubet.c \
 palSupgal.c
 

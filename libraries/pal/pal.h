@@ -473,7 +473,7 @@ double palRvlg ( double r2000, double d2000 );
 
 double palRvlsrd ( double r2000, double d2000 );
 
-float palRvlsrk ( float r2000, float d2000 );
+double palRvlsrk ( double r2000, double d2000 );
 
 void palS2tp ( float ra, float dec, float raz, float decz,
                float *xi, float *eta, int *j );
