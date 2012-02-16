@@ -712,7 +712,7 @@ c
       else
          xin = 53991.675D0
          call ast_tran1( fs, 1, xin, .true., xout, status )
-         if( abs(xout - 53998.6534462938D0) .gt. 1.0D-8 ) then
+         if( abs(xout - 53998.65344633732D0) .gt. 1.0D-8 ) then
             write(*,*) xout
             call stopit( status, 'error 50' )
          end if

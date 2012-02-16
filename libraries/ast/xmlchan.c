@@ -2918,7 +2918,7 @@ static AstRegion *ConstraintReader( AstXmlChan *this, AstXmlElement *elem,
       vec[1] = 0.0;
       vec[2] = 0.0;
       ElemListD( this, scan->el[0][0], 3, vec, status );
-      palSlaDcc2s( vec, cen, cen + 1 );
+      palDcc2s( vec, cen, cen + 1 );
 
 /* Get the offset, and convert to a radial distance in radians. */
       rad = acos( ElemValueD( this, scan->el[1][0], 1.0, status ) );
@@ -4702,7 +4702,7 @@ static void Geod( double lat, double lon, double *phi, double *lambda, int *stat
    earth, Z axis going through the north pole, X axis at (long,lat)=(0,0),
    and Y axis at (long,lat) = (E90,0). Assume an equatorial sea level
    position. */
-   palSlaDcs2c( lon, lat, pos );
+   palDcs2c( lon, lat, pos );
    pos[ 0 ] *= A0;
    pos[ 1 ] *= A0;
    pos[ 2 ] *= A0;

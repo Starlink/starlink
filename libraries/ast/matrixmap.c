@@ -1362,9 +1362,9 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix, int *
    double det;                    /* Determinant of supplied matrix */
    double mval;                   /* Matrix element value */
    double *out;                   /* Pointer to returned inverse matrix */
-   double *vector;                /* Pointer to vector used by palSlaDmat */
+   double *vector;                /* Pointer to vector used by palDmat */
    int i;                         /* Matrix element number */
-   int *iw;                       /* Pointer to workspace used by palSlaDmat */
+   int *iw;                       /* Pointer to workspace used by palDmat */
    int nel;                       /* No. of elements in square matrix */
    int ndiag;                     /* No. of diagonal elements */
    int ok;                        /* Zero if any bad matrix values found */
@@ -1444,7 +1444,7 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix, int *
 /* Obtain work space and attempt to invert the matrix using SLALIB, then
    free the work space. */
                iw = (int *) astMalloc( sizeof(int)*(size_t) nrow );
-               if( astOK ) palSlaDmat( nrow, out, vector, &det, &sing, iw );
+               if( astOK ) palDmat( nrow, out, vector, &det, &sing, iw );
                iw = (int *) astFree( (void *) iw );
 
             }

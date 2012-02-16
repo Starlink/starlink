@@ -1180,14 +1180,14 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
 
 /* Convert the MJD into a set of numeric date fields, plus day fraction,
    and format them. */
-            palSlaDjcl( mjd, &iy, &im, &id, &fd, &j );
+            palDjcl( mjd, &iy, &im, &id, &fd, &j );
             d = format_buff;
             d += sprintf( d, "%4d-%2.2d-%2.2d", iy, im, id );
 
 /* If required, convert the day fraction into a set of numerical time
    fields. */
             if( ndp >= 0 ) {
-               palSlaDd2tf( ndp, fd, sign, ihmsf );
+               palDd2tf( ndp, fd, sign, ihmsf );
 
 /* Format the time fields. */
                if( ndp > 0 ) {

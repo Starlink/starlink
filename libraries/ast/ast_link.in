@@ -116,19 +116,15 @@
 #     result in an error at run time if AST routines are invoked that
 #     attempt to generate graphical output.
 
-#  SLALIB:
-#     The AST distribution includes a cut down subset of the C version of
-#     the SLALIB library written by Pat Wallace. This subset contains only
-#     the functions needed by the AST library. It is built as part of the
-#     process of building AST and is distributed under GPL (and is thus
-#     compatible with the AST license). Previous version of this script
-#     allowed AST applications to be linked against external SLALIB
-#     libraries (either Fortran or C) rather than the internal version.
-#     The current version of this script does not provide this option,
-#     and always uses the internal SLALIB library. However, for backward
-#     compatibility, this script still allows the "-fsla" and "-csla" flags
-#     (previously used for selecting which version of SLALIB to use) to be
-#     specified, but they will be ignored.
+#  SOFA & PAL:
+#     The AST distribution includes bundled copies of the IAU SOFA and
+#     Starlink PAL libraries. These will be used for fundamental
+#     positional astronomy calculations unless the "--with-external_pal"
+#     option was used when AST was configured. If "--with-external_pal"
+#     is used, this script will include "-lpal" in the returned list of
+#     linking options, and the user should then ensure that extrnal copies
+#     of the PAL and SOFA libraries are available (SOFA functions are used
+#     within PAL).
 
 #  Examples:
 #c     cc display.c -L/star/lib `ast_link -pgplot` -o display
@@ -336,21 +332,18 @@
 #  "wcslib" module, and the "levmar" module.
       args='-last -last_wcslib -last_levmar'
 
-#  Generate arguments for linking SLALIB.
-#  --------------------------------------
-      case "${sla}" in
+#  Generate arguments for linking PAL.
+#  -----------------------------------
 
-#  The full proprietary C version of SLALIB has no link script, so simply
-#  specify the library itself.
-      c) args="${args} -lsla";;
+      case "@EXTERNAL_PAL@" in
 
-#  For Fortran, link with the AST SLALIB interface and the Fortran library via
-#  the SLALIB link script (if found).
-      f) args="${args} `\`find sla_link\``"
-         f77='y';;
+#  If we configured --with-external_pal include a link option to pick up
+#  an external PAL library.
+      1) args="${args} -lpal";;
 
-#  Otherwise, link with the internal GPLed cut down C version of SLALIB.
+#  Otherwise, use the internal PAL & SOFA libraries.
       *) args="${args} -last_pal";;
+
       esac
 
 #  Generate arguments for linking the 2D graphics system.

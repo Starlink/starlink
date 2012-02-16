@@ -8229,7 +8229,7 @@ static double MatrixDet( int ndim, const double *matrix, int *status ){
       y = astMalloc( sizeof( double )*(size_t) ndim );
       if( y ) {
          for( i = 0; i < ndim; i++ ) y[ i ] = 1.0;
-         palSlaDmat( ndim, a, y, &result, &jf, iw );
+         palDmat( ndim, a, y, &result, &jf, iw );
       }
       y = astFree( y );
       iw = astFree( iw );
@@ -8851,7 +8851,7 @@ f     - A value of .FALSE.
 
 /* Now find the solution vector (the solution over-writes teh current
    contents of "ofit"). */
-         palSlaDmat( 6, mat, ofit, &det, &sing, iw );
+         palDmat( 6, mat, ofit, &det, &sing, iw );
 
 /* If the fit failed, fill the coefficient array with bad values. */
          if( sing != 0 ) {

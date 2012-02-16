@@ -447,7 +447,7 @@ static double AxisDistance( AstAxis *this_axis, double v1, double v2, int *statu
 
 /* Check both axis values are OK, and form the returned increment,
    normalizing it into the range +PI to -PI. */
-   if( v1 != AST__BAD && v2 != AST__BAD ) result = palSlaDrange( v2 - v1 );
+   if( v1 != AST__BAD && v2 != AST__BAD ) result = palDrange( v2 - v1 );
 
 /* Return the result. */
    return result;
@@ -1093,8 +1093,8 @@ static void AxisNorm( AstAxis *this_axis, double *value, int *status ) {
       centrezero = astGetAxisCentreZero( this );
 
 /* Wrap the value into the appropriate range. */
-      if ( astOK ) *value = centrezero ? palSlaDrange( *value ) :
-                                         palSlaDranrm( *value );
+      if ( astOK ) *value = centrezero ? palDrange( *value ) :
+                                         palDranrm( *value );
    }
 }
 
@@ -3148,9 +3148,9 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name, int *status )
 
 /* Initialize constants for converting between hours, degrees and radians. */
    LOCK_MUTEX2
-   palSlaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
-   palSlaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
-   palSlaDaf2r( 180, 0, 0.0, &pi, &stat );
+   palDtf2r( 1, 0, 0.0, &hr2rad, &stat );
+   palDaf2r( 1, 0, 0.0, &deg2rad, &stat );
+   palDaf2r( 180, 0, 0.0, &pi, &stat );
    piby2 = 0.5*pi;
    UNLOCK_MUTEX2
 

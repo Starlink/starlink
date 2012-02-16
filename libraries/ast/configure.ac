@@ -7,7 +7,7 @@ dnl   1.5.  It should work with autoconf versions 2.50 or better, and
 dnl   automake 1.6 or better.
 
 dnl   Initialisation: package name and version number
-AC_INIT(ast, 6.0.1, ussc@star.rl.ac.uk)
+AC_INIT(ast, 7.0.0, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -38,6 +38,27 @@ AC_ARG_WITH(
                      [enable AST memory leak debugging functions]),
       AC_DEFINE([MEM_DEBUG],[1],[enable AST memory leak debugging functions in memory.c]),
 )
+
+#   See if the --with-external_pal option has been provided. This sets the
+#   preprocesor macro EXTERNAL_PAL which prevents use of the PAL & SOFA
+#   library functions that are include din the AST distribution. Suitable
+#   link options are used within ast_link(_adam) scripts to pull in libpal.
+AC_ARG_WITH([external_pal],
+            [ --with-external_pal   Use external PAL and SOFA libraries],
+        if test "$withval" = "yes"; then
+           external_pal="1"
+        else
+           external_pal="0"
+        fi,
+        external_pal="0")
+AC_SUBST( EXTERNAL_PAL, $external_pal )
+if test "$external_pal" = "1"; then
+   AC_SUBST( LIBPAL, "-lpal" )
+   AC_DEFINE([EXTERNAL_PAL],[1],[use external PAL and SOFA libraries]),
+else
+   AC_SUBST( LIBPAL, "" )
+fi
+
 
 #   Checks for programs
 AC_PROG_CC
@@ -151,7 +172,7 @@ STAR_CHECK_PROGS(prolat, sst)   # prolat is part of SST
 
 AC_CONFIG_HEADERS(config.h)
 
-AC_CONFIG_FILES(Makefile component.xml ast_link object.h f77.h)
+AC_CONFIG_FILES(Makefile component.xml ast_link ast_link_adam object.h f77.h)
 AC_CONFIG_FILES([ast_cpp], [chmod +x ast_cpp])
 #   Following are files which are substituted by the Makefile at
 #   distribution time, rather than by configure.  They are not distributed.

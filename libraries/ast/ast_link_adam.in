@@ -293,20 +293,18 @@
 #  "wcslib" module and the "levmar" module.
       args='-last -last_wcslib -last_levmar'
 
-#  Generate arguments for linking SLALIB.
-#  --------------------------------------
-      case "${sla}" in
+#  Generate arguments for linking PAL.
+#  -----------------------------------
 
-#  The full proprietary C version of SLALIB has no link script, so simply
-#  specify the library itself.
-      c) args="${args} -lsla";;
+      case "@EXTERNAL_PAL@" in
 
-#  For Fortran, link with the AST SLALIB interface and the Fortran library via
-#  the SLALIB link script (if found).
-      f) args="${args} -last_slalib `sla_link_adam`";;
+#  If we configured --with-external_pal include a link option to pick up
+#  an external PAL library.
+      1) args="${args} -lpal";;
 
-#  Otherwise, link with the internal GPLed cut down C version of SLALIB.
+#  Otherwise, use the internal PAL & SOFA libraries.
       *) args="${args} -last_pal";;
+
       esac
 
 #  Generate arguments for linking the 2D graphics system.

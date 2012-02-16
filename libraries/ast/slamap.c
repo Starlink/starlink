@@ -74,7 +74,7 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *     25-APR-1996 (RFWS):
 *        Original version.
 *     28-MAY-1996 (RFWS):
-*        Fixed bug in argument order to palSlaMappa for AST__SLA_AMP case.
+*        Fixed bug in argument order to palMappa for AST__SLA_AMP case.
 *     26-SEP-1996 (RFWS):
 *        Added external interface and I/O facilities.
 *     23-MAY-1997 (RFWS):
@@ -98,7 +98,7 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
 *     22-FEB-2006 (DSB):
-*        Cache results returned by palSlaMappa in order to increase speed.
+*        Cache results returned by palMappa in order to increase speed.
 *     10-MAY-2006 (DSB):
 *        Override astEqual.
 *     31-AUG-2007 (DSB):
@@ -186,6 +186,7 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Sets of points/coordinates */
 #include "mapping.h"             /* Coordinate Mappings (parent class) */
+#include "wcsmap.h"              /* Required for AST__DPI */
 #include "unitmap.h"             /* Unit (null) Mappings */
 #include "slamap.h"              /* Interface definition for this class */
 
@@ -237,7 +238,7 @@ astMAKE_INITGLOBALS(SlaMap)
    variables. */
 #else
 
-/* A cache used to store the most recent results from palSlaMappa in order
+/* A cache used to store the most recent results from palMappa in order
    to avoid continuously recalculating the same values. */
 static double eq_cache = AST__BAD;
 static double ep_cache = AST__BAD;
@@ -267,6 +268,8 @@ static int Equal( AstObject *, AstObject *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static void AddSlaCvt( AstSlaMap *, int, const double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
+static void De2h( double, double, double, double, double *, double *, int * );
+static void Dh2e( double, double, double, double, double *, double *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void Earth( double, double[3], int * );
@@ -282,8 +285,139 @@ static void STPConv( double, int, int, int, double[3], double *[3], int, double[
 static void J2000H( int, int, double *, double *, int * );
 
 static int GetObjSize( AstObject *, int * );
+
 /* Member functions. */
 /* ================= */
+
+static void De2h( double ha, double dec, double phi, double diurab,
+                  double *az, double *el, int *status ){
+
+/* Not quite like slaDe2h since it converts from apparent (ha,dec) to
+   topocentric (az,el). This includes a correction for diurnal
+   aberration. The magnitude of the diurnal aberration vector should be
+   supplied in parameter "diurab". The extra code is taken from the
+   Fortran routine SLA_AOPQK. */
+
+/* Local Variables: */
+   double a;
+   double cd;
+   double ch;
+   double cp;
+   double f;
+   double r;
+   double sd;
+   double sh;
+   double sp;
+   double x;
+   double xhd;
+   double xhdt;
+   double y;
+   double yhd;
+   double yhdt;
+   double z;
+   double zhd;
+   double zhdt;
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* Pre-compute common values */
+   sh = sin( ha );
+   ch = cos( ha );
+   sd = sin( dec );
+   cd = cos( dec );
+   sp = sin( phi );
+   cp = cos( phi );
+
+/* Components of cartesian (-ha,dec) vector. */
+   xhd = ch*cd;
+   yhd = -sh*cd;
+   zhd = sd;
+
+/* Modify the above vector to apply diurnal aberration. */
+   f = ( 1.0 - diurab*yhd );
+   xhdt = f*xhd;
+   yhdt = f*( yhd + diurab );
+   zhdt = f*zhd;
+
+/* Convert to cartesian (az,el). */
+   x = -xhdt*sp + zhdt*cp;
+   y = yhdt;
+   z = xhdt*cp + zhdt*sp;
+
+/* Convert to spherical (az,el). */
+   r = sqrt( x*x + y*y );
+   if( r == 0.0 ) {
+      a = 0.0;
+   } else {
+      a = atan2( y, x );
+   }
+
+   while( a < 0.0 ) a += 2*AST__DPI;
+
+   *az = a;
+   *el = atan2( z, r );
+}
+
+static void Dh2e( double az, double el, double phi, double diurab, double *ha,
+                  double *dec, int *status ){
+
+/* Not quite like slaDh2e since it converts from topocentric (az,el) to
+   apparent (ha,dec). This includes a correction for diurnal aberration.
+   The magnitude of the diurnal aberration vector should be supplied in
+   parameter "diurab". The extra code is taken from the Fortran routine
+   SLA_OAPQK. */
+
+/* Local Variables: */
+   double ca;
+   double ce;
+   double cp;
+   double f;
+   double r;
+   double sa;
+   double se;
+   double sp;
+   double x;
+   double xmhda;
+   double y;
+   double ymhda;
+   double z;
+   double zmhda;
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* Pre-compute common values. */
+   sa = sin( az );
+   ca = cos( az );
+   se = sin( el );
+   ce = cos( el );
+   sp = sin( phi );
+   cp = cos( phi );
+
+/* Cartesian (az,el) to Cartesian (ha,dec) - note, +ha, not -ha. */
+   xmhda = -ca*ce*sp + se*cp;
+   ymhda = -sa*ce;
+   zmhda = ca*ce*cp + se*sp;
+
+/* Correct this vector for diurnal aberration. Since the above
+   expressions produce +ha rather than -ha, we do not negate "diurab"
+   before using it. Compare this to SLA_AOPQK. */
+   f = ( 1 - diurab*ymhda );
+   x = f*xmhda;
+   y = f*( ymhda + diurab );
+   z = f*zmhda;
+
+/* Cartesian (ha,dec) to spherical (ha,dec). */
+   r = sqrt( x*x + y*y );
+   if( r == 0.0 ) {
+      *ha = 0.0;
+   } else {
+      *ha = atan2( y, x );
+   }
+   *dec = atan2( z, r );
+}
+
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
@@ -1130,11 +1264,11 @@ static void Earth( double mjd, double earth[3], int *status ) {
 
 /* Get the position of the earth at the given date in the AST__HAQC coord
    system (dph). */
-   palSlaEvp( mjd, 2000.0, dvb, dpb, dvh, dph );
+   palEvp( mjd, 2000.0, dvb, dpb, dvh, dph );
 
 /* Now rotate the earths position vector into AST__HAEC coords. */
-   palSlaEcmat( palSlaEpj2d( 2000.0 ), ecmat );
-   palSlaDmxv( ecmat, dph, earth );
+   palEcmat( palEpj2d( 2000.0 ), ecmat );
+   palDmxv( ecmat, dph, earth );
 
 /* Convert from AU to metres. */
    earth[0] *= AST__AU;
@@ -1214,11 +1348,11 @@ static void Hgc( double mjd, double mat[3][3], double offset[3], int *status ) {
 /* The HG Y axis is perpendicular to both the polar axis and the
    sun-earth line. Obtain a Y vector by taking the cross product of the
    two vectors, and then normalize it into a unit vector. */
-   palSlaDvxv( zhg, earth, ytemp );
-   palSlaDvn( ytemp, yhg, &len );
+   palDvxv( zhg, earth, ytemp );
+   palDvn( ytemp, yhg, &len );
 
 /* The HG X axis is perpendicular to both Z and Y, */
-   palSlaDvxv( yhg, zhg, xhg );
+   palDvxv( yhg, zhg, xhg );
 
 /* The HG X, Y and Z unit vectors form the columns of the required matrix.
    The origins of the two systems are co-incident, so return the zero offset
@@ -1299,7 +1433,7 @@ static void Gsec( double mjd, double mat[3][3], double offset[3], int *status ) 
    in terms of the AST__HAEC (X,Y,Z) axes. The GSEC X axis starts at the
    earth and passes through the centre of the sun. This is just the
    normalized opposite of the earth's position vector. */
-   palSlaDvn( earth, xgs, &len );
+   palDvn( earth, xgs, &len );
    xgs[0] *= -1.0;
    xgs[1] *= -1.0;
    xgs[2] *= -1.0;
@@ -1313,15 +1447,15 @@ static void Gsec( double mjd, double mat[3][3], double offset[3], int *status ) 
 /* Find the GSEC Y axis by taking the vector product of the X axis and
    the ecliptic north pole vector, and then normalize it into a unit
    vector. */
-   palSlaDvxv( pole, xgs, ytemp );
-   palSlaDvn( ytemp, ygs, &len );
+   palDvxv( pole, xgs, ytemp );
+   palDvn( ytemp, ygs, &len );
 
 /* The GSEC Z axis is perpendicular to both X and Y axis, and forms a
    right-handed system. The resulting vector will be of unit length
    since the x and y vectors are both of unit length, and are
    perpendicular to each other. It therefore does not need to be
    normalized.*/
-   palSlaDvxv( xgs, ygs, zgs );
+   palDvxv( xgs, ygs, zgs );
 
 /* The GSEC X, Y and Z unit vectors form the columns of the required matrix. */
    for( i = 0; i < 3; i++ ) {
@@ -1439,7 +1573,7 @@ static void Haqc( double mjd, double mat[3][3], double offset[3], int *status ) 
    if ( !astOK ) return;
 
 /* Return the required matrix. */
-   palSlaEcmat( palSlaEpj2d( 2000.0 ), mat );
+   palEcmat( palEpj2d( 2000.0 ), mat );
    return;
 }
 
@@ -1518,7 +1652,7 @@ static void Hpcc( double mjd, double obs[3], double mat[3][3], double offset[3],
    in terms of the AST__HAEC (X,Y,Z) axes. The HPCC X axis starts at the
    observer and passes through the centre of the sun. This is just the
    normalized opposite of the supplied observer's position vector. */
-   palSlaDvn( obs, xhpc, &len );
+   palDvn( obs, xhpc, &len );
    xhpc[0] *= -1.0;
    xhpc[1] *= -1.0;
    xhpc[2] *= -1.0;
@@ -1530,15 +1664,15 @@ static void Hpcc( double mjd, double obs[3], double mat[3][3], double offset[3],
 /* Find the HPC Y axis by taking the vector product of the X axis and
    the solar north pole vector, and then normalize it into a unit vector.
    Note, HPC (X,Y,Z) axes form a left-handed system! */
-   palSlaDvxv( xhpc, pole, ytemp );
-   palSlaDvn( ytemp, yhpc, &len );
+   palDvxv( xhpc, pole, ytemp );
+   palDvn( ytemp, yhpc, &len );
 
 /* The HPC Z axis is perpendicular to both X and Y axis, and forms a
    left-handed system. The resulting vector will be of unit length
    since the x and y vectors are both of unit length, and are
    perpendicular to each other. It therefore does not need to be
    normalized.*/
-   palSlaDvxv( yhpc, xhpc, zhpc );
+   palDvxv( yhpc, xhpc, zhpc );
 
 /* The HPC X, Y and Z unit vectors form the columns of the required matrix. */
    for( i = 0; i < 3; i++ ) {
@@ -1625,7 +1759,7 @@ static void Hprc( double mjd, double obs[3], double mat[3][3], double offset[3],
    in terms of the AST__HAEC (X,Y,Z) axes. The HPRC Z axis starts at the
    observer and passes through the centre of the sun. This is just the
    normalized opposite of the supplied observer's position vector. */
-   palSlaDvn( obs, zhpr, &len );
+   palDvn( obs, zhpr, &len );
    zhpr[0] *= -1.0;
    zhpr[1] *= -1.0;
    zhpr[2] *= -1.0;
@@ -1637,15 +1771,15 @@ static void Hprc( double mjd, double obs[3], double mat[3][3], double offset[3],
 /* Find the HPR Y axis by taking the vector product of the Z axis and
    the solar north pole vector, and then normalize it into a unit vector.
    Note, HPR (X,Y,Z) axes form a left-handed system! */
-   palSlaDvxv( pole, zhpr, ytemp );
-   palSlaDvn( ytemp, yhpr, &len );
+   palDvxv( pole, zhpr, ytemp );
+   palDvn( ytemp, yhpr, &len );
 
 /* The HPRC X axis is perpendicular to both Y and Z axis, and forms a
    left-handed system. The resulting vector will be of unit length
    since the y and z vectors are both of unit length, and are
    perpendicular to each other. It therefore does not need to be
    normalized.*/
-   palSlaDvxv( zhpr, yhpr, xhpr );
+   palDvxv( zhpr, yhpr, xhpr );
 
 /* The HPRC X, Y and Z unit vectors form the columns of the required matrix. */
    for( i = 0; i < 3; i++ ) {
@@ -1701,24 +1835,24 @@ static void J2000H( int forward, int npoint, double *alpha, double *delta, int *
    if ( !astOK ) return;
 
 /* Get the J2000 to ICRS rotation matrix (supplied by P.T. Wallace) */
-   palSlaDeuler( "XYZ", -0.0068192*AS2R, 0.0166172*AS2R, 0.0146000*AS2R,
+   palDeuler( "XYZ", -0.0068192*AS2R, 0.0166172*AS2R, 0.0146000*AS2R,
               rmat );
 
 /* Loop round all points. */
    for( i = 0; i < npoint; i++ ) {
 
 /* Convert from (alpha,delta) to 3-vector */
-      palSlaDcs2c( alpha[ i ], delta[ i ], v1 );
+      palDcs2c( alpha[ i ], delta[ i ], v1 );
 
 /* Rotate the 3-vector */
       if( forward ) {
-         palSlaDmxv( rmat, v1, v2 );
+         palDmxv( rmat, v1, v2 );
       } else {
-         palSlaDimxv( rmat, v1, v2 );
+         palDimxv( rmat, v1, v2 );
       }
 
 /* Convert from 3-vector to (alpha,delta) */
-      palSlaDcc2s( v2, alpha + i, delta + i );
+      palDcc2s( v2, alpha + i, delta + i );
    }
 }
 
@@ -2101,7 +2235,7 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
             if( p[ 0 ] != AST__BAD &&
                 p[ 1 ] != AST__BAD &&
                 p[ 2 ] != AST__BAD ) {
-                palSlaDcs2c( p[ 0 ], p[ 1 ], q );
+                palDcs2c( p[ 0 ], p[ 1 ], q );
                 *(px++) = q[ 0 ]*p[ 2 ];
                 *(py++) = q[ 1 ]*p[ 2 ];
                 *(pz++) = q[ 2 ]*p[ 2 ];
@@ -2216,12 +2350,12 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
             off4[ 1 ] = 0.0;
             off4[ 2 ] = 0.0;
          } else {
-            palSlaDmxv( mat3, off3, off4 );
+            palDmxv( mat3, off3, off4 );
          }
 
 /* Concatentate the two matrices to get the matrix which rotates from the
    current system to the output cartesian system. */
-         palSlaDmxm( mat3, mat1, mat4 );
+         palDmxm( mat3, mat1, mat4 );
 
 /* Use the matrix and offset to convert current positions to output
    cartesian positions. */
@@ -2237,7 +2371,7 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
             if( p[ 0 ] != AST__BAD &&
                 p[ 1 ] != AST__BAD &&
                 p[ 2 ] != AST__BAD ) {
-               palSlaDmxv( mat4, p, q );
+               palDmxv( mat4, p, q );
                *(px++) = q[ 0 ] + off4[ 0 ];
                *(py++) = q[ 1 ] + off4[ 1 ];
                *(pz++) = q[ 2 ] + off4[ 2 ];
@@ -2271,9 +2405,9 @@ static void STPConv( double mjd, int ignore_origins, int n, int in_sys,
          if( p[ 0 ] != AST__BAD &&
              p[ 1 ] != AST__BAD &&
              p[ 2 ] != AST__BAD ) {
-             palSlaDvn( p, q, &radius );
-             palSlaDcc2s( q, &lng, &lat );
-             *(px++) = palSlaDranrm( lng );
+             palDvn( p, q, &radius );
+             palDcc2s( q, &lng, &lat );
+             *(px++) = palDranrm( lng );
              *(py++) = lat;
              *(pz++) = radius;
          } else {
@@ -3294,7 +3428,7 @@ static void SolarPole( double mjd, double pole[3], int *status ) {
    J2000. We assume T is in days. The text does not explicitly say so,
    but we assume that this longitude value (Omega) is with respect to the
    mean equinox of J2000.0. */
-   omega = 75.76 + 0.01397*( palSlaEpj(mjd) - 2000.0 );
+   omega = 75.76 + 0.01397*( palEpj(mjd) - 2000.0 );
 
 /* Convert this to the ecliptic longitude of the projection of the sun's
    north pole onto the ecliptic, in radians. */
@@ -3475,11 +3609,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    in turn, returning the results to the same arrays. */
             case AST__SLA_ADDET:
                if ( forward ) {
-                  TRAN_ARRAY(palSlaAddet( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palAddet( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point );)
 	       } else {
-                  TRAN_ARRAY(palSlaSubet( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palSubet( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point );)
                }
@@ -3491,11 +3625,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    transposed. */
             case AST__SLA_SUBET:
                if ( forward ) {
-                  TRAN_ARRAY(palSlaSubet( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palSubet( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point );)
 	       } else {
-                  TRAN_ARRAY(palSlaAddet( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palAddet( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point );)
 	       }
@@ -3513,16 +3647,16 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   double precess_matrix[ 3 ][ 3 ];
                   double vec1[ 3 ];
                   double vec2[ 3 ];
-                  palSlaPrebn( epoch1, epoch2, precess_matrix );
+                  palPrebn( epoch1, epoch2, precess_matrix );
 
 /* For each point in the (alpha,delta) arrays, convert to Cartesian
    coordinates, apply the precession matrix, convert back to polar coordinates
    and then constrain the longitude result to lie in the range 0 to 2*pi
-   (palSlaDcc2s doesn't do this itself). */
-                  TRAN_ARRAY(palSlaDcs2c( alpha[ point ], delta[ point ], vec1 );
-                             palSlaDmxv( precess_matrix, vec1, vec2 );
-                             palSlaDcc2s( vec2, alpha + point, delta + point );
-                             alpha[ point ] = palSlaDranrm( alpha[ point ] );)
+   (palDcc2s doesn't do this itself). */
+                  TRAN_ARRAY(palDcs2c( alpha[ point ], delta[ point ], vec1 );
+                             palDmxv( precess_matrix, vec1, vec2 );
+                             palDcc2s( vec2, alpha + point, delta + point );
+                             alpha[ point ] = palDranrm( alpha[ point ] );)
 	       }
                break;
 
@@ -3537,11 +3671,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   double precess_matrix[ 3 ][ 3 ];
                   double vec1[ 3 ];
                   double vec2[ 3 ];
-                  palSlaPrec( epoch1, epoch2, precess_matrix );
-                  TRAN_ARRAY(palSlaDcs2c( alpha[ point ], delta[ point ], vec1 );
-                             palSlaDmxv( precess_matrix, vec1, vec2 );
-                             palSlaDcc2s( vec2, alpha + point, delta + point );
-                             alpha[ point ] = palSlaDranrm( alpha[ point ] );)
+                  palPrec( epoch1, epoch2, precess_matrix );
+                  TRAN_ARRAY(palDcs2c( alpha[ point ], delta[ point ], vec1 );
+                             palDmxv( precess_matrix, vec1, vec2 );
+                             palDcc2s( vec2, alpha + point, delta + point );
+                             alpha[ point ] = palDranrm( alpha[ point ] );)
 	       }
                break;
 
@@ -3550,7 +3684,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Apply the conversion to each point. */
 	    case AST__SLA_FK45Z:
                if ( forward ) {
-                  TRAN_ARRAY(palSlaFk45z( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palFk45z( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point );)
 
@@ -3559,7 +3693,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 	       } else {
                   double dr1950;
                   double dd1950;
-                  TRAN_ARRAY(palSlaFk54z( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palFk54z( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point,
                                        &dr1950, &dd1950 );)
@@ -3574,12 +3708,12 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   double dr1950;
                   double dd1950;
-                  TRAN_ARRAY(palSlaFk54z( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palFk54z( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point,
                                        &dr1950, &dd1950 );)
 	       } else {
-                  TRAN_ARRAY(palSlaFk45z( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palFk45z( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point );)
                }
@@ -3598,7 +3732,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                          args[ 0 ] != ep_cache ) {
                         eq_cache = args[ 1 ];
                         ep_cache = args[ 0 ];
-                        palSlaMappa( eq_cache, ep_cache, amprms_cache );
+                        palMappa( eq_cache, ep_cache, amprms_cache );
                      }
 
                      extra = astStore( NULL, amprms_cache,
@@ -3607,14 +3741,14 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   }
 
                   if ( forward ) {
-                     TRAN_ARRAY(palSlaAmpqk( alpha[ point ], delta[ point ],
+                     TRAN_ARRAY(palAmpqk( alpha[ point ], delta[ point ],
                                           extra,
                                           alpha + point, delta + point );)
 
 /* The inverse uses the same parameter array but converts from mean place
    to geocentric apparent. */
                   } else {
-                     TRAN_ARRAY(palSlaMapqkz( alpha[ point ], delta[ point ],
+                     TRAN_ARRAY(palMapqkz( alpha[ point ], delta[ point ],
                                            extra,
                                            alpha + point, delta + point );)
 		  }
@@ -3633,7 +3767,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                          args[ 1 ] != ep_cache ) {
                         eq_cache = args[ 0 ];
                         ep_cache = args[ 1 ];
-                        palSlaMappa( eq_cache, ep_cache, amprms_cache );
+                        palMappa( eq_cache, ep_cache, amprms_cache );
                      }
 
                      extra = astStore( NULL, amprms_cache,
@@ -3642,11 +3776,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   }
 
                   if ( forward ) {
-                     TRAN_ARRAY(palSlaMapqkz( alpha[ point ], delta[ point ],
+                     TRAN_ARRAY(palMapqkz( alpha[ point ], delta[ point ],
                                            extra,
                                            alpha + point, delta + point );)
                   } else {
-                     TRAN_ARRAY(palSlaAmpqk( alpha[ point ], delta[ point ],
+                     TRAN_ARRAY(palAmpqk( alpha[ point ], delta[ point ],
                                           extra,
                                           alpha + point, delta + point );)
 		  }
@@ -3668,33 +3802,33 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Obtain the matrix that precesses equatorial coordinates from J2000.0 to the
    required date. Also obtain the rotation matrix that converts from
    equatorial to ecliptic coordinates.  */
-                  palSlaPrec( 2000.0, palSlaEpj( args[ 0 ] ), precess_matrix );
-                  palSlaEcmat( args[ 0 ], rotate_matrix );
+                  palPrec( 2000.0, palEpj( args[ 0 ] ), precess_matrix );
+                  palEcmat( args[ 0 ], rotate_matrix );
 
 /* Multiply these matrices to give the overall matrix that converts from
    equatorial J2000.0 coordinates to ecliptic coordinates for the required
    date. */
-                  palSlaDmxm( rotate_matrix, precess_matrix, convert_matrix );
+                  palDmxm( rotate_matrix, precess_matrix, convert_matrix );
 
 /* Apply the conversion by transforming from polar to Cartesian coordinates,
    multiplying by the inverse conversion matrix and converting back to polar
    coordinates. Then constrain the longitude result to lie in the range
-   0 to 2*pi (palSlaDcc2s doesn't do this itself). */
+   0 to 2*pi (palDcc2s doesn't do this itself). */
                   if ( forward ) {
-                     TRAN_ARRAY(palSlaDcs2c( alpha[ point ], delta[ point ],
+                     TRAN_ARRAY(palDcs2c( alpha[ point ], delta[ point ],
                                           vec1 );
-                                palSlaDimxv( convert_matrix, vec1, vec2 );
-                                palSlaDcc2s( vec2, alpha + point, delta + point );
-                                alpha[ point ] = palSlaDranrm ( alpha[ point ] );)
+                                palDimxv( convert_matrix, vec1, vec2 );
+                                palDcc2s( vec2, alpha + point, delta + point );
+                                alpha[ point ] = palDranrm ( alpha[ point ] );)
 
 /* The inverse conversion is the same except that we multiply by the forward
-   conversion matrix (palSlaDmxv instead of palSlaDimxv). */
+   conversion matrix (palDmxv instead of palDimxv). */
                   } else {
-                     TRAN_ARRAY(palSlaDcs2c( alpha[ point ], delta[ point ],
+                     TRAN_ARRAY(palDcs2c( alpha[ point ], delta[ point ],
                                           vec1 );
-                                palSlaDmxv( convert_matrix, vec1, vec2 );
-                                palSlaDcc2s( vec2, alpha + point, delta + point );
-                                alpha[ point ] = palSlaDranrm ( alpha[ point ] );)
+                                palDmxv( convert_matrix, vec1, vec2 );
+                                palDcc2s( vec2, alpha + point, delta + point );
+                                alpha[ point ] = palDranrm ( alpha[ point ] );)
                   }
 	       }
                break;
@@ -3712,23 +3846,23 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   double vec2[ 3 ];
 
 /* Create the conversion matrix. */
-                  palSlaPrec( 2000.0, palSlaEpj( args[ 0 ] ), precess_matrix );
-                  palSlaEcmat( args[ 0 ], rotate_matrix );
-                  palSlaDmxm( rotate_matrix, precess_matrix, convert_matrix );
+                  palPrec( 2000.0, palEpj( args[ 0 ] ), precess_matrix );
+                  palEcmat( args[ 0 ], rotate_matrix );
+                  palDmxm( rotate_matrix, precess_matrix, convert_matrix );
 
 /* Apply it. */
                   if ( forward ) {
-                     TRAN_ARRAY(palSlaDcs2c( alpha[ point ], delta[ point ],
+                     TRAN_ARRAY(palDcs2c( alpha[ point ], delta[ point ],
                                           vec1 );
-                                palSlaDmxv( convert_matrix, vec1, vec2 );
-                                palSlaDcc2s( vec2, alpha + point, delta + point );
-                                alpha[ point ] = palSlaDranrm ( alpha[ point ] );)
+                                palDmxv( convert_matrix, vec1, vec2 );
+                                palDcc2s( vec2, alpha + point, delta + point );
+                                alpha[ point ] = palDranrm ( alpha[ point ] );)
                   } else {
-                     TRAN_ARRAY(palSlaDcs2c( alpha[ point ], delta[ point ],
+                     TRAN_ARRAY(palDcs2c( alpha[ point ], delta[ point ],
                                           vec1 );
-                                palSlaDimxv( convert_matrix, vec1, vec2 );
-                                palSlaDcc2s( vec2, alpha + point, delta + point );
-                                alpha[ point ] = palSlaDranrm ( alpha[ point ] );)
+                                palDimxv( convert_matrix, vec1, vec2 );
+                                palDcc2s( vec2, alpha + point, delta + point );
+                                alpha[ point ] = palDranrm ( alpha[ point ] );)
                   }
 	       }
                break;
@@ -3740,14 +3874,14 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   double dr5;
                   double dd5;
-                  TRAN_ARRAY(palSlaHfk5z( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palHfk5z( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point,
                                        &dr5, &dd5 );)
 
 /* The inverse simply uses the inverse SLALIB function. */
 	       } else {
-                  TRAN_ARRAY(palSlaFk5hz( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palFk5hz( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point );)
 	       }
@@ -3759,7 +3893,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    transposed. */
 	    case AST__SLA_FK5HZ:
                if ( forward ) {
-                  TRAN_ARRAY(palSlaFk5hz( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palFk5hz( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point );)
 
@@ -3767,7 +3901,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 	       } else {
                   double dr5;
                   double dd5;
-                  TRAN_ARRAY(palSlaHfk5z( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palHfk5z( alpha[ point ], delta[ point ],
                                        args[ 0 ],
                                        alpha + point, delta + point,
                                        &dr5, &dd5 );)
@@ -3779,15 +3913,15 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Apply the conversion to each point. */
 	    case AST__SLA_DH2E:
                if ( forward ) {
-                  TRAN_ARRAY(palSlaDh2e( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(Dh2e( alpha[ point ], delta[ point ],
                                       args[ 0 ], args[ 1 ],
-                                      alpha + point, delta + point );)
+                                      alpha + point, delta + point, status );)
 
 /* The inverse simply uses the inverse SLALIB function. */
 	       } else {
-                  TRAN_ARRAY(palSlaDe2h( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(De2h( alpha[ point ], delta[ point ],
                                       args[ 0 ], args[ 1 ],
-                                      alpha + point, delta + point );)
+                                      alpha + point, delta + point, status );)
 	       }
                break;
 
@@ -3797,15 +3931,15 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    transposed. */
 	    case AST__SLA_DE2H:
                if ( forward ) {
-                  TRAN_ARRAY(palSlaDe2h( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(De2h( alpha[ point ], delta[ point ],
                                       args[ 0 ], args[ 1 ],
-                                      alpha + point, delta + point );)
+                                      alpha + point, delta + point, status );)
 
 /* The inverse simply uses the inverse SLALIB function. */
 	       } else {
-                  TRAN_ARRAY(palSlaDh2e( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(Dh2e( alpha[ point ], delta[ point ],
                                       args[ 0 ], args[ 1 ],
-                                      alpha + point, delta + point );)
+                                      alpha + point, delta + point, status );)
 	       }
                break;
 
@@ -3814,12 +3948,12 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Apply the conversion to each point. */
 	    case AST__SLA_GALEQ:
                if ( forward ) {
-                  TRAN_ARRAY(palSlaGaleq( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palGaleq( alpha[ point ], delta[ point ],
                                        alpha + point, delta + point );)
 
 /* The inverse simply uses the inverse SLALIB function. */
 	       } else {
-                  TRAN_ARRAY(palSlaEqgal( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palEqgal( alpha[ point ], delta[ point ],
                                        alpha + point, delta + point );)
 	       }
                break;
@@ -3830,10 +3964,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    transposed. */
 	    case AST__SLA_EQGAL:
                if ( forward ) {
-                  TRAN_ARRAY(palSlaEqgal( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palEqgal( alpha[ point ], delta[ point ],
                                        alpha + point, delta + point );)
 	       } else {
-                  TRAN_ARRAY(palSlaGaleq( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palGaleq( alpha[ point ], delta[ point ],
                                        alpha + point, delta + point );)
                }
                break;
@@ -3843,12 +3977,12 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Apply the conversion to each point. */
 	    case AST__SLA_GALSUP:
                if ( forward ) {
-                  TRAN_ARRAY(palSlaGalsup( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palGalsup( alpha[ point ], delta[ point ],
                                         alpha + point, delta + point );)
 
 /* The inverse simply uses the inverse SLALIB function. */
                } else {
-                  TRAN_ARRAY(palSlaSupgal( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palSupgal( alpha[ point ], delta[ point ],
                                         alpha + point, delta + point );)
                }
                break;
@@ -3859,10 +3993,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    transposed. */
 	    case AST__SLA_SUPGAL:
                if ( forward ) {
-                  TRAN_ARRAY(palSlaSupgal( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palSupgal( alpha[ point ], delta[ point ],
                                         alpha + point, delta + point );)
                } else {
-                  TRAN_ARRAY(palSlaGalsup( alpha[ point ], delta[ point ],
+                  TRAN_ARRAY(palGalsup( alpha[ point ], delta[ point ],
                                         alpha + point, delta + point );)
                }
                break;

@@ -221,9 +221,9 @@ GRP_C_INCLUDE_FILES = \
     grf3d.h \
     pg3d.h \
     loader.h \
+    pal2ast.h \
     skyaxis.h \
-    pal.h \
-    slamac.h \
+    sofa2ast.h \
     stc.h \
     stcresourceprofile.h \
     stcsearchlocation.h \
@@ -283,16 +283,244 @@ WCSLIB_FILES = \
     wcsmath.h \
     wcstrig.h
 
-PAL_FILES = \
-    COPYING.LIB \
-    pal.c \
-    pal.h \
-    slamac.h
-
 LEVMAR_FILES = \
     levmar.c \
     levmar.h
 
+STAR_PAL_FILES = \
+    pal/pal.h \
+    pal/palAddet.c \
+    pal/palAmpqk.c \
+    pal/palCaldj.c \
+    pal/palDat.c \
+    pal/palDe2h.c \
+    pal/palDeuler.c \
+    pal/palDh2e.c \
+    pal/palDjcal.c \
+    pal/palDmat.c \
+    pal/palDs2tp.c \
+    pal/palDtp2s.c \
+    pal/palDtps2c.c \
+    pal/palDtt.c \
+    pal/palEcmat.c \
+    pal/palEqgal.c \
+    pal/palEtrms.c \
+    pal/palEvp.c \
+    pal/palFk45z.c \
+    pal/palFk524.c \
+    pal/palFk54z.c \
+    pal/palGaleq.c \
+    pal/palGalsup.c \
+    pal/palMappa.c \
+    pal/palMapqkz.c \
+    pal/palOne2One.c \
+    pal/palPrebn.c \
+    pal/palPrec.c \
+    pal/palPrenut.c \
+    pal/palPvobs.c \
+    pal/palRvgalc.c \
+    pal/palRvlg.c \
+    pal/palRvlsrd.c \
+    pal/palRvlsrk.c \
+    pal/palSubet.c \
+    pal/palSupgal.c \
+    pal/palmac.h
+
+IAU_SOFA_FILES = \
+    sofa/00READ.ME \
+    sofa/sofa.h \
+    sofa/sofam.h \
+    sofa/a2af.c \
+    sofa/a2tf.c \
+    sofa/af2a.c \
+    sofa/anp.c \
+    sofa/anpm.c \
+    sofa/bi00.c \
+    sofa/bp00.c \
+    sofa/bp06.c \
+    sofa/bpn2xy.c \
+    sofa/c2i00a.c \
+    sofa/c2i00b.c \
+    sofa/c2i06a.c \
+    sofa/c2ibpn.c \
+    sofa/c2ixy.c \
+    sofa/c2ixys.c \
+    sofa/c2s.c \
+    sofa/c2t00a.c \
+    sofa/c2t00b.c \
+    sofa/c2t06a.c \
+    sofa/c2tcio.c \
+    sofa/c2teqx.c \
+    sofa/c2tpe.c \
+    sofa/c2txy.c \
+    sofa/cal2jd.c \
+    sofa/cp.c \
+    sofa/cpv.c \
+    sofa/cr.c \
+    sofa/d2dtf.c \
+    sofa/d2tf.c \
+    sofa/dat.c \
+    sofa/dtdb.c \
+    sofa/dtf2d.c \
+    sofa/ee00.c \
+    sofa/ee00a.c \
+    sofa/ee00b.c \
+    sofa/ee06a.c \
+    sofa/eect00.c \
+    sofa/eform.c \
+    sofa/eo06a.c \
+    sofa/eors.c \
+    sofa/epb.c \
+    sofa/epb2jd.c \
+    sofa/epj.c \
+    sofa/epj2jd.c \
+    sofa/epv00.c \
+    sofa/eqeq94.c \
+    sofa/era00.c \
+    sofa/fad03.c \
+    sofa/fae03.c \
+    sofa/faf03.c \
+    sofa/faju03.c \
+    sofa/fal03.c \
+    sofa/falp03.c \
+    sofa/fama03.c \
+    sofa/fame03.c \
+    sofa/fane03.c \
+    sofa/faom03.c \
+    sofa/fapa03.c \
+    sofa/fasa03.c \
+    sofa/faur03.c \
+    sofa/fave03.c \
+    sofa/fk52h.c \
+    sofa/fk5hip.c \
+    sofa/fk5hz.c \
+    sofa/fw2m.c \
+    sofa/fw2xy.c \
+    sofa/gc2gd.c \
+    sofa/gc2gde.c \
+    sofa/gd2gc.c \
+    sofa/gd2gce.c \
+    sofa/gmst00.c \
+    sofa/gmst06.c \
+    sofa/gmst82.c \
+    sofa/gst00a.c \
+    sofa/gst00b.c \
+    sofa/gst06.c \
+    sofa/gst06a.c \
+    sofa/gst94.c \
+    sofa/h2fk5.c \
+    sofa/hfk5z.c \
+    sofa/ir.c \
+    sofa/jd2cal.c \
+    sofa/jdcalf.c \
+    sofa/num00a.c \
+    sofa/num00b.c \
+    sofa/num06a.c \
+    sofa/numat.c \
+    sofa/nut00a.c \
+    sofa/nut00b.c \
+    sofa/nut06a.c \
+    sofa/nut80.c \
+    sofa/nutm80.c \
+    sofa/obl06.c \
+    sofa/obl80.c \
+    sofa/p06e.c \
+    sofa/p2pv.c \
+    sofa/p2s.c \
+    sofa/pap.c \
+    sofa/pas.c \
+    sofa/pb06.c \
+    sofa/pdp.c \
+    sofa/pfw06.c \
+    sofa/plan94.c \
+    sofa/pm.c \
+    sofa/pmat00.c \
+    sofa/pmat06.c \
+    sofa/pmat76.c \
+    sofa/pmp.c \
+    sofa/pn.c \
+    sofa/pn00.c \
+    sofa/pn00a.c \
+    sofa/pn00b.c \
+    sofa/pn06.c \
+    sofa/pn06a.c \
+    sofa/pnm00a.c \
+    sofa/pnm00b.c \
+    sofa/pnm06a.c \
+    sofa/pnm80.c \
+    sofa/pom00.c \
+    sofa/ppp.c \
+    sofa/ppsp.c \
+    sofa/pr00.c \
+    sofa/prec76.c \
+    sofa/pv2p.c \
+    sofa/pv2s.c \
+    sofa/pvdpv.c \
+    sofa/pvm.c \
+    sofa/pvmpv.c \
+    sofa/pvppv.c \
+    sofa/pvstar.c \
+    sofa/pvu.c \
+    sofa/pvup.c \
+    sofa/pvxpv.c \
+    sofa/pxp.c \
+    sofa/rm2v.c \
+    sofa/rv2m.c \
+    sofa/rx.c \
+    sofa/rxp.c \
+    sofa/rxpv.c \
+    sofa/rxr.c \
+    sofa/ry.c \
+    sofa/rz.c \
+    sofa/s00.c \
+    sofa/s00a.c \
+    sofa/s00b.c \
+    sofa/s06.c \
+    sofa/s06a.c \
+    sofa/s2c.c \
+    sofa/s2p.c \
+    sofa/s2pv.c \
+    sofa/s2xpv.c \
+    sofa/sepp.c \
+    sofa/seps.c \
+    sofa/sp00.c \
+    sofa/starpm.c \
+    sofa/starpv.c \
+    sofa/sxp.c \
+    sofa/sxpv.c \
+    sofa/taitt.c \
+    sofa/taiut1.c \
+    sofa/taiutc.c \
+    sofa/tcbtdb.c \
+    sofa/tcgtt.c \
+    sofa/tdbtcb.c \
+    sofa/tdbtt.c \
+    sofa/tf2a.c \
+    sofa/tf2d.c \
+    sofa/tr.c \
+    sofa/trxp.c \
+    sofa/trxpv.c \
+    sofa/tttai.c \
+    sofa/tttcg.c \
+    sofa/tttdb.c \
+    sofa/ttut1.c \
+    sofa/ut1tai.c \
+    sofa/ut1tt.c \
+    sofa/ut1utc.c \
+    sofa/utctai.c \
+    sofa/utcut1.c \
+    sofa/xy06.c \
+    sofa/xys00a.c \
+    sofa/xys00b.c \
+    sofa/xys06a.c \
+    sofa/zp.c \
+    sofa/zpv.c \
+    sofa/zr.c
+
+PAL_FILES = \
+    COPYING.LIB \
+    pal.c \
+    pal.h
 
 bin_SCRIPTS = ast_link
 dist_bin_SCRIPTS = ast_link_adam
@@ -417,7 +645,7 @@ libast_wcslib_la_SOURCES = proj.c wcstrig.c tpn.c
 libast_levmar_la_SOURCES = levmar.c
 
 #  Modules supplied by tpoint.
-libast_pal_la_SOURCES = pal.c
+libast_pal_la_SOURCES = $(PAL_FILES)
 
 # The following files are built by the targets in this makefile.
 MAINTAINERCLEANFILES = version.h builddocs addversion \
@@ -444,7 +672,7 @@ AST_PAR: ast_par.source astbad
 # configure.ac, and so is not distributed automatically.
 #
 # makeh is required in order to build ast.h after distribution (see below).
-EXTRA_DIST = ast_par.source sun210_figures sun211_figures
+EXTRA_DIST = ast_par.source sun210_figures sun211_figures pal sofa
 
 # ast.h depends on the error-facility files.  ast.h _could_ be made
 # before distribution, but since it's generated from other distributed
@@ -522,4 +750,4 @@ ast_test_SOURCES = ast_test.c
 
 #ast_test_LDADD = `ast_link`
 # Expand ast_link to avoid libast_pass2, which causes problems for Solaris
-ast_test_LDADD = libast.la libast_pal.la libast_grf_3.2.la libast_grf_5.6.la libast_wcslib.la libast_levmar.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm
+ast_test_LDADD = @LIBPAL@ libast.la libast_pal.la libast_grf_3.2.la libast_grf_5.6.la libast_wcslib.la libast_levmar.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm

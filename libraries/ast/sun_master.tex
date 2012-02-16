@@ -18,18 +18,18 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.26}
+\newcommand{\stardocnumber}    {211.27}
 c-
 f+
-\newcommand{\stardocnumber}    {210.26}
+\newcommand{\stardocnumber}    {210.27}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {4th October 2011}
+\newcommand{\stardocdate}      {16th February 2012}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 2009 Science \& Technology Facilities Council}
+\newcommand{\stardoccopyright} {Copyright (C) 2012 Science \& Technology Facilities Council}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
 \newcommand{\stardocversion}   {V<VERSION_NUMBER>}
@@ -814,10 +814,11 @@ are described here:
 
 \begin{enumerate}
 \item {\bf{Minimum Software Dependencies.}}
-The AST library depends on no other other software\footnote{It now comes with a
-minimal cut-down version of the widely-available SLALIB positional astronomy
-library (\xref{SUN/67}{sun67}{}), including just those functions needed
-by AST, and the previous dependency on SLALIB is no longer present}.
+The AST library depends on no other other software\footnote{It comes with
+bundled copies of the IAU SOFA and Starlink PAL libraries which are built
+at the same time as the other AST internal libraries. Alternatively, external
+PAL and SOFA libraries may be used by specifying the ``{\tt
+--with-external\_pal}'' option when configuring AST}.
 
 \item {\bf{Environment Independence.}}
 AST is designed so that it can operate in a variety of ``programming
@@ -22598,12 +22599,10 @@ f-
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V6.0-1}
+\subsection{Changes Introduced in V6.0-1}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V6.0 and V6.0-1 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V6.0 and V6.0-1:
 
 \begin{enumerate}
 
@@ -22616,6 +22615,25 @@ be used when aligning SkyFrames if the AlignSystem attribute is set.
 
 \item The versioning string for AST has changed from
 ``$<major>.<minor>-<release>$'' to ``$<major>.<minor>.<release>$''.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V7.0.0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V6.0-1 and V7.0.0 (the
+current version):
+
+\begin{enumerate}
+
+\item Fundamental positional astronomy calculations are now performed
+using the IAU SOFA library where possible, and the Starlink PAL library
+otherwise (the PAL library contains a subset of the Fortran Starlink SLALIB
+library re-written in C). Copies of these libraries are bundled with AST
+and so do not need to be obtained or built separately, although external
+copies of SOFA and PAL can be used if necessary by including the
+``{\tt --with-external\_pal}'' option when configuring AST.
 
 \end{enumerate}
 

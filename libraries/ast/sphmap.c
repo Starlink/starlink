@@ -1079,7 +1079,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Otherwise use a SLALIB function to do the conversion (SLALIB always
    returns zero at either pole which is why we make the above check). */
                } else {
-                  palSlaDcc2s( v, q0++, q1++ );
+                  palDcc2s( v, q0++, q1++ );
                }
 
             } else {
@@ -1106,7 +1106,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Apply the mapping to every point. */
          for( point = 0; point < npoint; point++ ){
             if( *q0 != AST__BAD && *q1 != AST__BAD ){
-               palSlaDcs2c( *q0, *q1, v );
+               palDcs2c( *q0, *q1, v );
                *(p0++) = v[ 0 ];
                *(p1++) = v[ 1 ];
                *(p2++) = v[ 2 ];

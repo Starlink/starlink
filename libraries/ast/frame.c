@@ -1241,7 +1241,7 @@ f     invoked with STATUS set to an error value, or if it should fail for
             angc = atan2( cb[ 0 ], cb[ 1 ] );
 
 /* Find the difference, folded into the range +/- PI. */
-            result = palSlaDrange( angc - anga );
+            result = palDrange( angc - anga );
 
 /* Now deal with Frames with more than 2 axes. */
          } else {
@@ -4620,8 +4620,8 @@ L1:
 
 /* Format the Epoch as decimal years. Use a Besselian epoch if it will
    be less than 1984.0, otherwise use a Julian epoch. */
-         result = astFmtDecimalYr( ( epoch < palSlaEpj2d( 1984.0 ) ) ?
-                                   palSlaEpb( epoch ) : palSlaEpj( epoch ), DBL_DIG );
+         result = astFmtDecimalYr( ( epoch < palEpj2d( 1984.0 ) ) ?
+                                   palEpb( epoch ) : palEpj( epoch ), DBL_DIG );
       }
 
 /* Top(axis). */
@@ -4806,7 +4806,7 @@ L1:
       if ( astOK ) {
 
 /* Put into range +/- PI. */
-         dval = palSlaDrange( dval );
+         dval = palDrange( dval );
 
 /* If not already created, create an FK5 J2000 SkyFrame which will be used
    for formatting and unformatting ObsLon and ObsLat values. */
@@ -8144,7 +8144,7 @@ double astReadDateTime_( const char *value, int *status ) {
         && ( nc >= len ) ) {
 
 /* Convert to Modified Julian Date. */
-      result = palSlaEpb2d( epoch );
+      result = palEpb2d( epoch );
 
 /* Julian epoch in decimal years (e.g. "J2000.0"). */
 /* =============================================== */
@@ -8153,7 +8153,7 @@ double astReadDateTime_( const char *value, int *status ) {
                && ( nc >= len ) ) {
 
 /* Convert to Modified Julian Date. */
-      result = palSlaEpj2d( epoch );
+      result = palEpj2d( epoch );
 
 /* Decimal years (e.g. "1976.2"). */
 /* ============================== */
@@ -8163,7 +8163,7 @@ double astReadDateTime_( const char *value, int *status ) {
 
 /* Convert to Modified Julian Date, treating the epoch as Julian or Besselian
    depending on whether it is 1984.0 or later. */
-      result = ( epoch < 1984.0 ) ? palSlaEpb2d( epoch ) : palSlaEpj2d( epoch );
+      result = ( epoch < 1984.0 ) ? palEpb2d( epoch ) : palEpj2d( epoch );
 
 /* Modified Julian Date (e.g. "MJD 54321.0"). */
 /* ============================================ */
@@ -8396,7 +8396,7 @@ double astReadDateTime_( const char *value, int *status ) {
    to a Modified Julian Date. */
          if ( astOK ) {
             iday = (int) day;
-            palSlaCaldj( year, month, iday, &mjd, &stat );
+            palCaldj( year, month, iday, &mjd, &stat );
 
 /* Examine the return status from the conversion and report an appropriate
    error if necessary. */
@@ -8419,7 +8419,7 @@ double astReadDateTime_( const char *value, int *status ) {
 
 /* Convert hours, minutes and seconds to a fraction of a day (this will give
    zero if none of these quantities was supplied). */
-               palSlaDtf2d( hour, minute, sec, &hms, &stat );
+               palDtf2d( hour, minute, sec, &hms, &stat );
 
 /* Examine the return status from the conversion and report an appropriate
    error if necessary. */
@@ -11563,7 +11563,7 @@ astMAKE_CLEAR(Frame,Epoch,epoch,AST__BAD)
 
 /* Provide a default value of J2000.0 setting. */
 astMAKE_GET(Frame,Epoch,double,AST__BAD,(
-           ( this->epoch != AST__BAD ) ? this->epoch : palSlaEpj2d( 2000.0 )))
+           ( this->epoch != AST__BAD ) ? this->epoch : palEpj2d( 2000.0 )))
 
 /* Allow any Epoch value to be set. */
 astMAKE_SET(Frame,Epoch,double,epoch,value)
@@ -13277,8 +13277,8 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       dval = set ? GetEpoch( this, status ) : astGetEpoch( this );
 
 /* Convert MJD to Besselian or Julian years, depending on the value. */
-      bessyr = ( dval < palSlaEpj2d( 1984.0 ) );
-      dval = bessyr ? palSlaEpb( dval ) : palSlaEpj( dval );
+      bessyr = ( dval < palEpj2d( 1984.0 ) );
+      dval = bessyr ? palEpb( dval ) : palEpj( dval );
       astWriteDouble( channel, "Epoch", set, !isFrame, dval,
                       bessyr ? "Besselian epoch of observation" :
                                "Julian epoch of observation" );
@@ -14145,8 +14145,8 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
 /* Interpret this as Besselian or Julian depending on its value. */
          new->epoch = astReadDouble( channel, "epoch", AST__BAD );
          if ( TestEpoch( new, status ) ) {
-            SetEpoch( new, ( new->epoch < 1984.0 ) ? palSlaEpb2d( new->epoch ) :
-                                                     palSlaEpj2d( new->epoch ), status );
+            SetEpoch( new, ( new->epoch < 1984.0 ) ? palEpb2d( new->epoch ) :
+                                                     palEpj2d( new->epoch ), status );
          }
 
 /* Digits. */

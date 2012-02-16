@@ -1777,7 +1777,7 @@ static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result
 /* Allocate memory to hold the offset vector. */
    vec = astMalloc( sizeof( double )*ncoord );
 
-/* Allocate memory to hold work space for palSlaDmat. */
+/* Allocate memory to hold work space for palDmat. */
    iw = astMalloc( sizeof( int )*ncoord );
 
 /* Check pointers can be used safely. */
@@ -1862,7 +1862,7 @@ static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result
 
 /* Find the corresponding offset from the current input position to the required
    input position. */
-               palSlaDmat( ncoord, mat, vec, &det, &sing, iw );
+               palDmat( ncoord, mat, vec, &det, &sing, iw );
 
 /* If the matrix was singular, the input position cannot be evaluated so
    store a bad value for it and indicate it has converged. */

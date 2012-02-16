@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V6.0-1) of the Starlink AST (astrometry) library is
+   A new release (V7.0.0) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -16,13 +16,25 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- Fundamental positional astronomy calculations are now performed
+using the IAU SOFA library where possible, and the Starlink PAL library
+otherwise (the PAL library contains a subset of the Fortran Starlink SLALIB
+library re-written in C). Copies of these libraries are bundled with AST
+and so do not need to be obtained or built separately, although external
+copies of SOFA and PAL can be used if necessary by including the
+"--with-external_pal" option when configuring AST.
+
+
+Main Changes in V6.0-1
+-----------------------
+
 - The Spitzer "-SIP" distortion code is now recognised within FITS
 headers that describe non-celestial axes, as well as celestial axes.
 
 - A bug has been fixed that could cause inappropriate equinox values to
 be used when aligning SkyFrames if the AlignSystem attribute is set.
 
-- The format of the version string for AST has changed from 
+- The format of the version string for AST has changed from
 "<major>.<minor>-<release>" to "<major>.<minor>.<release>".
 
 Main Changes in V6.0
