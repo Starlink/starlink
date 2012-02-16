@@ -702,6 +702,7 @@ int *status        /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
+   memset( &mess_out, 0, sizeof(mess_out));
    timer_set = false;
    ams_getmachnum ( machname, machnum, &added, status );
    if ( *status != SAI__OK )
@@ -3946,6 +3947,7 @@ int *status             /* global status (given and returned) */
    int istat;                             /* local status */
 
    if ( *status != SAI__OK ) return;
+   memset( &mess_out, 0, sizeof(mess_out));
 
    if (local)
    {
@@ -4085,6 +4087,9 @@ int *status             /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
+   /* initialise the struct before filling it */
+   memset( &mess_out, 0, sizeof(mess_out) );
+
    local = (t_paths[path].machine_num == MESSYS__NULL_M);
 
    if (local)
@@ -4213,6 +4218,8 @@ int *status         /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
+   /* initialise the struct */
+   memset( &mess_out, 0, sizeof(mess_out) );
 
    if ( t_paths[path].machine_num == MESSYS__NULL_M )
    {
@@ -4326,6 +4333,7 @@ int *status           /* global status (give and returned) */
 
    if ( *status != SAI__OK ) return;
 
+   memset( &mess_out, 0, sizeof(mess_out));
 
    if (local)
    {
@@ -4472,6 +4480,7 @@ int *status              /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
+   memset( &mess_out, 0, sizeof(mess_out));
    local = (t_paths[path].machine_num == MESSYS__NULL_M);
    targetq = t_trans[messid].other_task_ack_q;
    sourcestatus = message_status;
@@ -4597,6 +4606,7 @@ int *status            /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
+   memset( &mess_out, 0, sizeof(mess_out));
    mess_out.mess_out_type = C_LOC_MSG_OUT;
    mess_out.u.loc_msg_out.other_task_t_trans_num = MESSYS__NULL_T;
    mess_out.u.loc_msg_out.this_task_t_trans_num = MESSYS__NULL_T;
@@ -4739,6 +4749,7 @@ int parm                          /* the timeout parameter (given) */
 
 /*   Build a timeout message */
 
+   memset( &mess_out, 0, sizeof(mess_out));
    mess_out.mess_out_type = C_LOC_MSG_OUT;
    mess_out.u.loc_msg_out.other_task_t_trans_num = MESSYS__NULL_T;
    mess_out.u.loc_msg_out.this_task_t_trans_num = MESSYS__NULL_T;
