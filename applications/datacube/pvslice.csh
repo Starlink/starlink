@@ -2,13 +2,10 @@
 
 #+
 #  Name:
-#     PVSLICE
+#     pvslice.csh
 
 #  Purpose:
 #     Extracts and displays a velocity-position slice from an (RA,Dec,vel) cube
-
-#  Language:
-#     C-shell
 
 #  Type of Module:
 #     C-shell script
