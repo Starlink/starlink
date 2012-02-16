@@ -133,6 +133,8 @@
 #        file is suitable.
 #     2012 January 20 (MJC):
 #        Fix bug so that the rotated slice is actually used.
+#     2012 February 15 (MJC):
+#        Set the graphics device explicitly.
 #     {enter_further_changes_here}
 
 #-
@@ -154,6 +156,8 @@ set gotoutfile = "FALSE"
 set args = ($argv[1-])
 set ci = red
 set plane = 0
+set plotdev = "xwin"
+
 while ( $#args > 0 )
    switch ($args[1])
    case -ci:    # colour index of annotation
@@ -231,16 +235,17 @@ endif
 # =========================================
 
 # Display the middle slice of the cube on the left of the screen.
-$KAPPA_DIR/gdclear
-$KAPPA_DIR/picdef mode=a xpic=2 ypic=1 prefix=a
-$KAPPA_DIR/display $infile"(,,$plane)" mode=perc percentiles=\[5,95\] quiet
+$KAPPA_DIR/gdclear device=${plotdev}
+$KAPPA_DIR/picdef mode=a xpic=2 ypic=1 prefix=a device=${plotdev}
+$KAPPA_DIR/display $infile"(,,$plane)" mode=perc percentiles=\[5,95\] \
+                   device=${plotdev} quiet
 
 # Get a FITS catalogue holding the pixel co-ordinates at the start and
 # end of the line.
 echo " "
 echo "   Use the cursor to left click on the start and end of the slice to be extracted..."
 $KAPPA_DIR/cursor quiet outcat=pvslice_tempcat$$ frame=pixel maxpos=2 minpos=2 \
-                  plot=chain style="colour=${ci}"
+                  plot=chain style="colour=${ci}" device=${plotdev}
 echo " "
 
 # Extract the pixel co-ordinates at the start into shell variables x1
@@ -347,7 +352,8 @@ $KAPPA_DIR/wcsattrib $outfile set Label'(2)' "'Offset from start'"
 #  Display the slice on the right of the screen.
 echo "   Displaying slice..."
 $KAPPA_DIR/picsel a2
-$KAPPA_DIR/display $outfile fill mode=perc percentiles=\[5,95\] useaxis=\'2\,3\' quiet
+$KAPPA_DIR/display $outfile fill mode=perc percentiles=\[5,95\] useaxis=\'2\,3\' \
+                   device=${plotdev} quiet
 
 #  Set AXIS arrays.
 $KAPPA_DIR/setaxis $outfile 1 wcs
