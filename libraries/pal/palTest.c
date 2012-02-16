@@ -851,6 +851,12 @@ static void t_rvlg( int *status ) {
    vvd( rv, 291.79205281252404802, 1.0E-12, "palRvlg", "rv", status );
 }
 
+static void t_rvlsrd( int *status ) {
+   double r2000, d2000, rv;
+   rv = palRvlsrd( 2.7, -1.0 );
+   vvd( rv, 9.620674692097630043, 1.0E-12, "palRvlsrd", "rv", status );
+}
+
 
 
 
@@ -902,6 +908,7 @@ int main (void) {
   t_ranorm(&status);
   t_rvgalc(&status);
   t_rvlg(&status);
+  t_rvlsrd(&status);
   t_sep(&status);
   t_supgal(&status);
   t_tp(&status);

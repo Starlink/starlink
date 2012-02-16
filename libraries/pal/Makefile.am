@@ -49,6 +49,7 @@ palPrenut.c \
 palPvobs.c \
 palRvgalc.c \
 palRvlg.c \
+palRvlsrd.c \
 palSubet.c \
 palSupgal.c
 

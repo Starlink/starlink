@@ -471,7 +471,7 @@ double palRvgalc ( double r2000, double d2000 );
 
 double palRvlg ( double r2000, double d2000 );
 
-float palRvlsrd ( float r2000, float d2000 );
+double palRvlsrd ( double r2000, double d2000 );
 
 float palRvlsrk ( float r2000, float d2000 );
 
