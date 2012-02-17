@@ -12,10 +12,10 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.38}
-\newcommand{\stardocnumber}    {95.38}
+\newcommand{\stardocsource}    {sun95.39}
+\newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2012 February 7}
+\newcommand{\stardocdate}      {2012 February 17}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -7943,8 +7943,8 @@ example:
     % wcsattrib fred remap=no set RefRA '"10:12:24.2"'
     % wcsattrib fred remap=no set RefDec '"-32:10:14"'
     % wcsattrib fred remap=no set Epoch '"2003-10-2 12:13:00"'
-    % wcsattrib fred remap=no set GeoLat '"N19:49:33"'
-    % wcsattrib fred remap=no set GeoLon '"W155:28:47"'
+    % wcsattrib fred remap=no set ObsLat '"N19:49:33"'
+    % wcsattrib fred remap=no set ObsLon '"W155:28:47"'
 \end{verbatim}
 \latex{\normalsize}
 
@@ -8183,6 +8183,57 @@ attribute of the sky Frame, we could say:
    }
 }
 
+\sstattribute{
+   DSBCentre
+}{
+   The central position of interest in a dual sideband spectrum
+   (DSBSpecFrames only)
+}{
+   \sstdescription{
+      This attribute specifies the central position of interest in a
+      \xref{dual sideband spectrum}{sun210}{DSBSpecFrame}. Its sole use
+      is to determine the local oscillator frequency (the frequency which
+      marks the boundary between the lower and upper sidebands). See the
+      description of the IF (intermediate frequency) attribute for
+      details of how the local oscillator frequency is calculated. The
+      sideband containing this central position is referred to as the
+      {\tt{"}}observed{\tt{"}} sideband, and the other sideband as the
+      {\tt{"}}image{\tt{"}} sideband.
+
+      The value is accessed as a position in the spectral system
+      specified by the System attribute, but is stored internally as
+      topocentric frequency. Thus, if the System attribute of the
+      DSBSpecFrame is set to {\tt{"}}VRAD{\tt{"}}, the Unit attribute
+      set to {\tt{"}}m/s{\tt{"}} and the StdOfRest attribute set to
+      {\tt{"}}LSRK{\tt{"}}, then values for the DSBCentre attribute
+      should be supplied as radio velocity in units of
+      {\tt{"}}m/s{\tt{"}} relative to the kinematic LSR (alternative
+      units may be used by appending a suitable units string to the end
+      of the value). This value is then converted to topocentric
+      frequency and stored. If (say) the Unit attribute is subsequently
+      changed to {\tt{"}}km/s{\tt{"}} before retrieving the current value
+      of the DSBCentre attribute, the stored topocentric frequency will
+      be converted back to LSRK radio velocity, this time in units of
+      {\tt{"}}km/s{\tt{"}}, before being returned.
+
+      The default value for this attribute is 30 GHz.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstdiytopic{
+      Note
+   }{
+      \sstitemlist{
+
+         \sstitem
+         The attributes which define the transformation to or from topocentric
+         frequency should be assigned their correct values before accessing
+         this attribute. These potentially include System, Unit, StdOfRest,
+         ObsLon, ObsLat, ObsAlt, Epoch, RefRA, RefDec and RestFreq.
+      }
+   }
+}
 \sstattribute{
    Epoch
 }{
@@ -8491,63 +8542,69 @@ attribute of the sky Frame, we could say:
 }
 
 \sstattribute{
-   GeoLat
+   IF
 }{
-   The geodetic latitude of the observer (SpecFrames only)
+   The intermediate frequency in a dual sideband spectrum (DSBSpecFrames only)
+
 }{
    \sstdescription{
-      This attribute specifies the geodetic latitude of the observer, in
-      degrees.  Together with the \htmlattref{GeoLon}{GeoLon},
-      \htmlattref{Epoch}{Epoch}, \htmlattref{RefRA}{RefRA}, and
-      \htmlattref{RefDec}{RefDec}~ attributes, it defines the Doppler
-      shift introduced by the observers diurnal motion around the
-      Earth's axis, which is needed when converting
-      \xref{SpecFrames}{sun210}{SpecFrame}~ to or from the topocentric
-      standard of rest.  The maximum velocity error, which can be
-      caused by an incorrect value, is 0.5~km/s.  The default value for
-      the attribute is zero.
+      This attribute specifies the (topocentric) intermediate frequency
+      in a \xref{dual sideband spectrum}{sun210}{DSBSpecFrame}. Its sole
+      use is to determine the local oscillator (LO) frequency (the
+      frequency which marks the boundary between the lower and upper
+      sidebands). The LO frequency is equal to the sum of the centre
+      frequency and the intermediate frequency. Here, the {\tt{"}}centre
+      frequency{\tt{"}} is the topocentric frequency in Hz corresponding
+      to the current value of the DSBCentre attribute. The value of the
+      IF attribute may be positive or negative: a positive value results
+      in the LO frequency being above the central frequency, whilst a
+      negative IF value results in the LO frequency being below the
+      central frequency. The sign of the IF attribute value determines
+      the default value for the SideBand attribute.
 
-      The value is stored internally in radians, but is converted to
-      and from a degrees string for access.  Some example input
-      formats are: {\tt "22:19:23.2"}, {\tt "22 19 23.2"}, {\tt
-      "22:19.387"}, {\tt "22.32311"}, {\tt "N22.32311"}, {\tt"-45.6"},
-      {\tt"S45.6"}.  As indicated, the sign of the latitude can
-      optionally be indicated using characters {\tt "N"} and {\tt "S"}
-      in place of the usual {\tt "$+$"} and {\tt "-"}.
-      When converting the stored value to a string, the format
-      {\tt{"}}[s]dd:mm:ss.s{\tt{"}} is used, when {\tt "[s]"} is {\tt "N"}
-      or {\tt "S"}.
+      When setting a new value for this attribute, the units in which the
+      frequency value is supplied may be indicated by appending a
+      suitable string to the end of the formatted value. If the units are
+      not specified, then the supplied value is assumed to be in units of
+      GHz. For instance, the following strings all result in an IF of 4
+      GHz being used: {\tt{"}}4.0{\tt{"}}, {\tt{"}}4.0 GHz{\tt{"}},
+      {\tt{"}}4.0E9 Hz{\tt{"}}, \emph{etc.}
+
+      When getting the value of this attribute, the returned value is
+      always in units of GHz. The default value for this attribute is 4 GHz.
    }
    \sstattributetype{
-      String.
+      Floating point.
    }
 }
+
 \sstattribute{
-   GeoLon
+   ImagFreq
 }{
-   The geodetic longitude of the observer (\xref{SpecFrames}{sun210}{SpecFrame}~ only)
+   The image sideband equivalent of the rest frequency (DSBSpecFrames only)
 }{
    \sstdescription{
-      This attribute specifies the geodetic (or equivalently, geocentric)
-      longitude of the observer, in degrees, measured positive eastwards.
-      See also attribute \htmlattref{GeoLat}{GeoLat}.  The default value is zero.
+      This is a read-only attribute of a \xref{dual sideband
+      spectrum}{sun210}{DSBSpecFrame} that gives the frequency
+      corresponding to the rest frequency, but in the opposite sideband.
 
-      The value is stored internally in radians, but is converted to
-      and from a degrees string for access.  Some example input
-      formats are: {\tt "155:19:23.2"}, {\tt "155 19 23.2"}, {\tt
-      "155:19.387"}, {\tt "155.32311"}, {\tt "E155.32311"}, {\tt
-      "-204.67689"}, {\tt "W204.67689"}.  As indicated, the sign of
-      the longitude can optionally be indicated using characters {\tt
-      "E"} and {\tt "W"} in place of the usual {\tt"$+$"} and
-      {\tt"-"}.  When converting the stored value to a string, the
-      format {\tt{"}}[s]ddd:mm:ss.s{\tt{"}} is used, when {\tt "[s]"}
-      is {\tt "E"} or {\tt "W"} and the numerical value is chosen to
-      be less than 180 degrees.
+      The value is calculated by first transforming the rest frequency
+      (given by the RestFreq attribute) from the standard of rest of the
+      source (given by the SourceVel and SourceVRF attributes) to the
+      standard of rest of the observer (i.e. the topocentric standard of
+      rest). The resulting topocentric frequency is assumed to be in the
+      same sideband as the value given for the DSBCentre attribute (the
+      {\tt{"}}observed{\tt{"}} sideband), and is transformed to the other
+      sideband (the {\tt{"}}image{\tt{"}} sideband). The new frequency is
+      converted back to the standard of rest of the source, and the
+      resulting value is returned as the attribute value, in units of
+      GHz.
    }
    \sstattributetype{
-      String.
+      Floating point, read-only.
    }
 }
+
 \sstattribute{
    Label(axis)
 }{
@@ -8599,6 +8656,23 @@ attribute of the sky Frame, we could say:
 }
 
 \sstattribute{
+   LTOffset
+}{
+   The offset from UTC to Local Time, in hours (TimeFrames only)
+}{
+   \sstdescription{
+      This specifies the offset from UTC to Local Time, in hours, for a
+      \xref{TimeFrame}{sun210}{TimeFrame}. Fractional hours can be
+      supplied. It is positive for time zones east of Greenwich. AST uses
+      the figure as given, without making any attempt to correct for
+      daylight saving. The default value is zero.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+}
+
+\sstattribute{
    Naxes
 }{
    Number of Frame axes
@@ -8619,6 +8693,65 @@ attribute of the sky Frame, we could say:
          This displays the number of axes in the current Frame of the NDF
          called {\tt my\_data}.
       }
+   }
+}
+
+\sstattribute{
+   ObsLat
+}{
+   The geodetic latitude of the observer (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute specifies the geodetic latitude of the observer, in
+      degrees.  Together with the \htmlattref{ObsLon}{ObsLon},
+      \htmlattref{Epoch}{Epoch}, \htmlattref{RefRA}{RefRA}, and
+      \htmlattref{RefDec}{RefDec}~ attributes, it defines the Doppler
+      shift introduced by the observers diurnal motion around the
+      Earth's axis, which is needed when converting
+      \xref{SpecFrames}{sun210}{SpecFrame}~ to or from the topocentric
+      standard of rest.  The maximum velocity error, which can be
+      caused by an incorrect value, is 0.5~km/s.  The default value for
+      the attribute is zero.
+
+      The value is stored internally in radians, but is converted to
+      and from a degrees string for access.  Some example input
+      formats are: {\tt "22:19:23.2"}, {\tt "22 19 23.2"}, {\tt
+      "22:19.387"}, {\tt "22.32311"}, {\tt "N22.32311"}, {\tt"-45.6"},
+      {\tt"S45.6"}.  As indicated, the sign of the latitude can
+      optionally be indicated using characters {\tt "N"} and {\tt "S"}
+      in place of the usual {\tt "$+$"} and {\tt "-"}.
+      When converting the stored value to a string, the format
+      {\tt{"}}[s]dd:mm:ss.s{\tt{"}} is used, when {\tt "[s]"} is {\tt "N"}
+      or {\tt "S"}.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+\sstattribute{
+   ObsLon
+}{
+   The geodetic longitude of the observer (\xref{SpecFrames}{sun210}{SpecFrame}~ only)
+}{
+   \sstdescription{
+      This attribute specifies the geodetic (or equivalently, geocentric)
+      longitude of the observer, in degrees, measured positive eastwards.
+      See also attribute \htmlattref{ObsLat}{ObsLat}.  The default value is zero.
+
+      The value is stored internally in radians, but is converted to
+      and from a degrees string for access.  Some example input
+      formats are: {\tt "155:19:23.2"}, {\tt "155 19 23.2"}, {\tt
+      "155:19.387"}, {\tt "155.32311"}, {\tt "E155.32311"}, {\tt
+      "-204.67689"}, {\tt "W204.67689"}.  As indicated, the sign of
+      the longitude can optionally be indicated using characters {\tt
+      "E"} and {\tt "W"} in place of the usual {\tt"$+$"} and
+      {\tt"-"}.  When converting the stored value to a string, the
+      format {\tt{"}}[s]ddd:mm:ss.s{\tt{"}} is used, when {\tt "[s]"}
+      is {\tt "E"} or {\tt "W"} and the numerical value is chosen to
+      be less than 180 degrees.
+   }
+   \sstattributetype{
+      String.
    }
 }
 
@@ -8695,6 +8828,33 @@ attribute of the sky Frame, we could say:
    }
    \sstattributetype{
       Floating point.
+   }
+}
+\sstattribute{
+   SideBand
+}{
+   Indicates which sideband a dual sideband spectrum represents (DSBSpecFrames only)
+}{
+   \sstdescription{
+      This attribute indicates whether a \xref{dual sideband
+      spectrum}{sun210}{DSBSpecFrame} currently represents its lower or
+      upper sideband, or an offset from the local oscillator frequency.
+      When querying the current value, the returned string is always one
+      of {\tt{"}}usb{\tt{"}} (for upper sideband), {\tt{"}}lsb{\tt{"}}
+      (for lower sideband), or {\tt{"}}lo{\tt{"}} (for offset from the
+      local oscillator frequency). When setting a new value, any of the
+      strings {\tt{"}}lsb{\tt{"}}, {\tt{"}}usb{\tt{"}},
+      {\tt{"}}observed{\tt{"}}, {\tt{"}}image{\tt{"}} or
+      {\tt{"}}lo{\tt{"}} may be supplied (case insensitive). The
+      {\tt{"}}observed{\tt{"}} sideband is which ever sideband (upper or
+      lower) contains the central spectral position given by attribute
+      DSBCentre, and the {\tt{"}}image{\tt{"}} sideband is the other
+      sideband. It is the sign of the IF attribute which determines if
+      the observed sideband is the upper or lower sideband. The default
+      value for SideBand is the observed sideband.
+   }
+   \sstattributetype{
+      String.
    }
 }
 \sstattribute{
@@ -8782,8 +8942,8 @@ attribute of the sky Frame, we could say:
          to be on the surface of the earth).  Spectra recorded in this standard of
          rest suffer a Doppler shift which varies over the course of a day
          because of the rotation of the observer around the axis of the earth.
-         This standard of rest must be qualified using the \htmlattref{GeoLat}{GeoLat},
-         \htmlattref{GeoLon}{GeoLon}, \htmlattref{Epoch}{Epoch},
+         This standard of rest must be qualified using the \htmlattref{ObsLat}{ObsLat},
+         \htmlattref{ObsLon}{ObsLon}, \htmlattref{Epoch}{Epoch},
          \htmlattref{RefRA}{RefRA}, and \htmlattref{RefDec}{RefDec}~ attributes.
 
          \sstitem
@@ -8999,9 +9159,9 @@ attribute of the sky Frame, we could say:
       \sstsubsection{
          SpecFrame
       }{
-         The \xref{SpecFrame class}{sun210}{SpecFrame}~ supports the following {\att System}
-         values and associated spectral co-ordinate systems (the default is {\tt "WAVE"} ---
-         wavelength):
+         The \xref{SpecFrame}{sun210}{SpecFrame}~ \xref{DSBSpecFrame}{sun210}{DSBSpecFrame}~
+         classes supports the following {\att System} values and associated spectral co-ordinate
+         systems (the default is {\tt "WAVE"} --- wavelength):
 
          \ssthitemlist{
 
@@ -9042,6 +9202,218 @@ attribute of the sky Frame, we could say:
          from pixel to spectral co-ordinates being modified in order
          to reflect the change in units.
       }
+
+      \label{system:TimeFrame}
+      \sstsubsection{
+         TimeFrame
+      }{
+         The TimeFrame class supports the following System values and
+         associated coordinate systems (the default is {\tt{"}}MJD{\tt{"}}):
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt{"}}MJD{\tt{"}}: Modified Julian Date (d)
+
+            \sstitem
+            {\tt{"}}JD{\tt{"}}: Julian Date (d)
+
+            \sstitem
+            {\tt{"}}JEPOCH{\tt{"}}: Julian epoch (yr)
+
+            \sstitem
+            {\tt{"}}BEPOCH{\tt{"}}: Besselian (yr)
+
+         }
+
+         The default value for the Unit attribute for each system is
+	 shown in parentheses. Strictly, these systems should not allow
+	 changes to be made to the units. For instance, the usual
+	 definition of {\tt{"}}MJD{\tt{"}} and {\tt{"}}JD{\tt{"}} include
+	 the statement that the values will be in units of days. However,
+	 AST does allow the use of other units with all the above
+	 supported systems (except BEPOCH), on the understanding that
+	 conversion to the {\tt{"}}correct{\tt{"}} units involves nothing
+	 more than a simple scaling (1 yr = 365.25 d, 1 d = 24 h, 1 h =
+	 60 min, 1 min = 60 s). Besselian epoch values are defined in
+	 terms of tropical years of 365.2422 days, rather than the usual
+	 Julian year of 365.25 days. Therefore, to avoid any confusion,
+	 the Unit attribute is automatically cleared to
+	 {\tt{"}}yr{\tt{"}} when a System value of BEPOCH System is
+	 selected, and an error is reported if any attempt is
+	 subsequently made to change the Unit attribute.
+      }
+   }
+}
+\sstattribute{
+   TimeOrigin
+}{
+   The zero point for TimeFrame axis values (TimeFrames only)
+}{
+   \sstdescription{
+      This specifies the origin from which all time values are measured
+      within a \xref{TimeFrame}{sun210}{TimeFrame}.
+      The default value (zero) results in the TimeFrame describing
+      absolute time values in the system given by the System attribute
+      (e.g. MJD, Julian epoch, etc). If a TimeFrame is to be used to
+      describe elapsed time since some origin, the TimeOrigin attribute
+      should be set to hold the required origin value. The TimeOrigin value
+      stored inside the TimeFrame structure is modified whenever TimeFrame
+      attribute values are changed so that it refers to the original moment
+      in time.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstdiytopic{
+      Input Formats
+   }{
+      The formats accepted when setting a TimeOrigin value are listed
+      below. They are all case-insensitive and are generally tolerant
+      of extra white space and alternative field delimiters:
+
+      \sstitemlist{
+
+         \sstitem
+         Besselian Epoch: Expressed in decimal years, with or without
+         decimal places ({\tt{"}}B1950{\tt{"}} or {\tt{"}}B1976.13{\tt{"}} for example).
+
+         \sstitem
+         Julian Epoch: Expressed in decimal years, with or without
+         decimal places ({\tt{"}}J2000{\tt{"}} or {\tt{"}}J2100.9{\tt{"}} for example).
+
+         \sstitem
+         Units: An unqualified decimal value is interpreted as a value in
+         the system specified by the TimeFrame's System attribute, in the
+         units given by the TimeFrame's Unit attribute. Alternatively, an
+         appropriate unit string can be appended to the end of the floating
+         point value ({\tt{"}}123.4 d{\tt{"}} for example), in which case the supplied value
+         is scaled into the units specified by the Unit attribute.
+
+         \sstitem
+         Julian Date: With or without decimal places ({\tt{"}}JD 2454321.9{\tt{"}} for
+         example).
+
+         \sstitem
+         Modified Julian Date: With or without decimal places
+         ({\tt{"}}MJD 54321.4{\tt{"}} for example).
+
+         \sstitem
+         Gregorian Calendar Date: With the month expressed either as an
+         integer or a 3-character abbreviation, and with optional decimal
+         places to represent a fraction of a day ({\tt{"}}1996-10-2{\tt{"}} or
+         {\tt{"}}1996-Oct-2.6{\tt{"}} for example). If no fractional part of a day is
+         given, the time refers to the start of the day (zero hours).
+
+         \sstitem
+         Gregorian Date and Time: Any calendar date (as above) but with
+         a fraction of a day expressed as hours, minutes and seconds
+         ({\tt{"}}1996-Oct-2 12:13:56.985{\tt{"}} for example). The date and time can be
+         separated by a space or by a {\tt{"}}T{\tt{"}} (as used by ISO8601 format).
+      }
+   }
+   \sstdiytopic{
+      Output Format
+   }{
+      When enquiring TimeOrigin values, the returned formatted floating
+      point value represents a value in the TimeFrame's System, in the unit
+      specified by the TimeFrame's Unit attribute.
+   }
+}
+\sstattribute{
+   TimeScale
+}{
+   Time scale (TimeFrames only)
+}{
+   \sstdescription{
+      This attribute identifies the time scale to which the time axis
+      values of a \xref{TimeFrame}{sun210}{TimeFrame} refer, and may take
+      any of the values listed in the {\tt{"}}Time Scales{\tt{"}} section
+      (below).
+
+      The default TimeScale value depends on the current System value; if
+      the current TimeFrame system is {\tt{"}}Besselian epoch{\tt{"}} the
+      default is {\tt{"}}TT{\tt{"}}, otherwise it is {\tt{"}}TAI{\tt{"}}.
+      Note, if the System attribute is set so that the TimeFrame
+      represents Besselian Epoch, then an error will be reported if an
+      attempt is made to set the TimeScale to anything other than TT.
+
+      Note, the supported time scales fall into two groups. The first
+      group containing UT1, GMST, LAST and LMST define time in terms of
+      the orientation of the earth. The second group (containing all the
+      remaining time scales) define time in terms of an atomic process.
+      Since the rate of rotation of the earth varies in an unpredictable
+      way, conversion between two timescales in different groups relies
+      on a value being supplied for the Dut1 attribute. This attribute
+      specifies the difference between the UT1 and UTC time scales, in
+      seconds, and defaults to zero. See the \ref{documentation for the Dut1
+      attribute}{sun210}{DUT1} in SUN/210 for further details.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstdiytopic{
+      Time Scales
+   }{
+      The TimeFrame class supports the following TimeScale values (all are
+      case-insensitive):
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}TAI{\tt{"}} - International Atomic Time
+
+         \sstitem
+         {\tt{"}}UTC{\tt{"}} - Coordinated Universal Time
+
+         \sstitem
+         {\tt{"}}UT1{\tt{"}} - Universal Time
+
+         \sstitem
+         {\tt{"}}GMST{\tt{"}} - Greenwich Mean Sidereal Time
+
+         \sstitem
+         {\tt{"}}LAST{\tt{"}} - Local Apparent Sidereal Time
+
+         \sstitem
+         {\tt{"}}LMST{\tt{"}} - Local Mean Sidereal Time
+
+         \sstitem
+         {\tt{"}}TT{\tt{"}} - Terrestrial Time
+
+         \sstitem
+         {\tt{"}}TDB{\tt{"}} - Barycentric Dynamical Time
+
+         \sstitem
+         {\tt{"}}TCB{\tt{"}} - Barycentric Coordinate Time
+
+         \sstitem
+         {\tt{"}}TCG{\tt{"}} - Geocentric Coordinate Time
+
+         \sstitem
+         {\tt{"}}LT{\tt{"}} - Local Time (the offset from UTC is given by
+          attribute LTOffset)
+
+      }
+      An very informative description of these and other time scales is
+      available at http://www.ucolick.org/$\sim$sla/leapsecs/timescales.html.
+   }
+   \sstdiytopic{
+      UTC Warnings
+   }{
+      UTC should ideally be expressed using separate hours, minutes and
+      seconds fields (or at least in seconds for a given date) if leap seconds
+      are to be taken into account. Since the TimeFrame class represents
+      each moment in time using a single floating point number (the axis value)
+      there will be an ambiguity during a leap second. Thus an error of up to
+      1 second can result when using AST to convert a UTC time to another
+      time scale if the time occurs within a leap second. Leap seconds
+      occur at most twice a year, and are introduced to take account of
+      variation in the rotation of the earth. The most recent leap second
+      occurred on 1st January 1999. Although in the vast majority of cases
+      leap second ambiguities won't matter, there are potential problems in
+      on-line data acquisition systems and in critical applications involving
+      taking the difference between two times.
    }
 }
 \sstattribute{
