@@ -78,6 +78,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/observe \
 	$(MANIFESTS)/one \
 	$(MANIFESTS)/pamela \
+	$(MANIFESTS)/pal \
 	$(MANIFESTS)/par \
 	$(MANIFESTS)/period \
 	$(MANIFESTS)/pcs \
