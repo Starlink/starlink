@@ -53,6 +53,7 @@ f     The UnitMap class does not define any new routines beyond those
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S Berry (JAC, Hawaii)
 
 *  History:
 *     7-FEB-1996 (RFWS):
@@ -64,6 +65,9 @@ f     The UnitMap class does not define any new routines beyond those
 *        method.
 *     10-MAY-2006 (DSB):
 *        Override astEqual.
+*     17-FEB-2012 (DSB):
+*        In Transform, do not copy the coordinate values if the input and
+*        output array are the same.
 *class--
 */
 
@@ -889,11 +893,14 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* --------------------------- */
    if ( astOK ) {
 
-/* Loop to copy the values for each coordinate. Use a memory copy for speed. */
+/* Loop to copy the values for each coordinate. Use a memory copy for speed.
+   Do not do the copy if the input and output arrays are the same. */
       for ( coord = 0; coord < ncoord_in; coord++ ) {
-         (void) memcpy( (void *) ptr_out[ coord ],
-                        (const void *) ptr_in[ coord ],
-                        sizeof( double ) * (size_t) npoint );
+         if( ptr_out[ coord ] != ptr_in[ coord ] ) {
+            (void) memcpy( (void *) ptr_out[ coord ],
+                           (const void *) ptr_in[ coord ],
+                           sizeof( double ) * (size_t) npoint );
+         }
       }
    }
 
