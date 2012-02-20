@@ -585,6 +585,30 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  /* Obtain pointers to relevant smfArrays for this chunk */
+  res = dat->res[chunk];
+  qua = dat->qua[chunk];
+  model = allmodel[chunk];
+  if(dat->gai) {
+    gai = dat->gai[chunk];
+
+    /* Make a copy of gai_data (each subarray) for calculating convergence */
+    gai_data_copy = astMalloc( (gai->ndat)*sizeof(*gai_data_copy) );
+    for( idx=0; (idx<gai->ndat)&&(*status==SAI__OK); idx++ ) {
+
+      smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL,
+                    &thisndata, NULL, NULL, status);
+
+      gai_data_copy[idx] = astMalloc( thisndata*sizeof(*gai_data_copy[idx]) );
+
+      gai_data = (gai->sdata[idx]->pntr)[0];
+
+      memcpy( gai_data_copy[idx], gai_data, thisndata *
+              sizeof(*gai_data_copy[idx]) );
+    }
+  }
+  if(dat->noi) noi = dat->noi[chunk];
+
   /* Obtain pointer to sub-keymap containing COM parameters */
   astMapGet0A( keymap, "COM", &obj );
   kmap = (AstKeyMap *) obj;
@@ -595,8 +619,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   gkmap = (AstKeyMap *) obj;
 
   /* Get the number of time slices per block. */
-  astMapGet0I( kmap, "GAIN_BOX", &ival );
-  gain_box = ival;
+  smf_get_nsamp( kmap, "GAIN_BOX", res->sdata[0], &gain_box, status );
 
   /* See if gains and/or offsets are to be forced to default values. */
   astMapGet0I( kmap, "GAIN_IS_ONE", &nogains );
@@ -660,29 +683,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smf_model_dataOrder( dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__GAI|SMF__NOI, 0,
                        status );
 
-  /* Obtain pointers to relevant smfArrays for this chunk */
-  res = dat->res[chunk];
-  qua = dat->qua[chunk];
-  model = allmodel[chunk];
-  if(dat->gai) {
-    gai = dat->gai[chunk];
-
-    /* Make a copy of gai_data (each subarray) for calculating convergence */
-    gai_data_copy = astMalloc( (gai->ndat)*sizeof(*gai_data_copy) );
-    for( idx=0; (idx<gai->ndat)&&(*status==SAI__OK); idx++ ) {
-
-      smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL,
-                    &thisndata, NULL, NULL, status);
-
-      gai_data_copy[idx] = astMalloc( thisndata*sizeof(*gai_data_copy[idx]) );
-
-      gai_data = (gai->sdata[idx]->pntr)[0];
-
-      memcpy( gai_data_copy[idx], gai_data, thisndata *
-              sizeof(*gai_data_copy[idx]) );
-    }
-  }
-  if(dat->noi) noi = dat->noi[chunk];
 
   /* Use separate common modes for each sub-array? */
   astMapGet0I( kmap, "PERARRAY", &perarray );

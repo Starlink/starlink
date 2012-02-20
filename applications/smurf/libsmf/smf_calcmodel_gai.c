@@ -149,22 +149,21 @@ void smf_calcmodel_gai( ThrWorkForce *wf __attribute__((unused)),
   /* Only have to do something if gai.flatfield set */
   if( !gflat ) return;
 
-  /* Get the number of blocks into which to split each time series. Each box
-     (except possibly the last one contains "gain_box" time slices. */
-  astMapGet0A( keymap, "COM", &kmap );
-  astMapGet0I( kmap, "GAIN_BOX", &ival );
-  gain_box = ival;
-  if (kmap) kmap = astAnnul( kmap );
-  if (*status != SAI__OK) return;
-
-  /* Ensure everything is in bolo-order */
-  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0, status );
-
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
   model = allmodel[chunk];
   if(dat->noi) noi = dat->noi[chunk];
+
+  /* Get the number of blocks into which to split each time series. Each box
+     (except possibly the last one contains "gain_box" time slices. */
+  astMapGet0A( keymap, "COM", &kmap );
+  smf_get_nsamp( kmap, "GAIN_BOX", res->sdata[0], &gain_box, status );
+  if (kmap) kmap = astAnnul( kmap );
+  if (*status != SAI__OK) return;
+
+  /* Ensure everything is in bolo-order */
+  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0, status );
 
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {

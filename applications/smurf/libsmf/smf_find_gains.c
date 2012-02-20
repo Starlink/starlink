@@ -379,8 +379,8 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, double *template,
    astMapGet0D( keymap, "GAIN_ABSTOL", &gain_abstol );
    astMapGet0I( keymap, "GAIN_IS_ONE", &nogains );
    astMapGet0I( keymap, "OFFSET_IS_ZERO", &nooffs );
-   astMapGet0I( keymap, "GAIN_BOX", &ival );
-   gain_box = ival;
+   smf_get_nsamp( keymap, "GAIN_BOX", data, &gain_box, status );
+
    if( *status == SAI__OK && gain_box == 0 ) {
      *status = SAI__ERROR;
      errRep( "", "GAIN_BOX must be greater than 0", status );
