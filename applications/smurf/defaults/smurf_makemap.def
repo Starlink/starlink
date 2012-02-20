@@ -40,7 +40,7 @@
 # These come from smf_iteratemap
 
 numiter = -5
-tstep = 100
+tstep = -0.5       # negative, so interpreted as seconds
 chitol = <undef>
 maptol = <undef>
 

@@ -14,13 +14,18 @@
 *     C function
 
 *  Invocation:
-*     smf_calc_mapcoord( ThrWorkForce *wf, smfData *data, AstFrameSet *outfset,
-*                        int moving, int *lbnd_out, int *ubnd_out, int flags,
-*                        int tstep, int exportlonlat, int *status );
+*     smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
+*                        AstFrameSet *outfset, int moving, int *lbnd_out,
+*                        int *ubnd_out, int flags, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
+*     config = AstKeyMap * (Given)
+*        Pointer to a KeyMap holding configuration parameters. May
+*        be NULL, in which case hard-wired defaults are used for any
+*        configuration parameters that are needed (currently just
+*        TSIZE=1 and EXPORTLONLAT=0).
 *     data = smfData* (Given)
 *        Pointer to smfData struct
 *     outfset = AstFrameSet* (Given)
@@ -34,13 +39,6 @@
 *     flags = int (Given)
 *        If set to SMF__NOCREATE_FILE don't attempt to write extension
 *        to file.
-*     tstep = int (Given)
-*        The increment in time slices between full Mapping calculations.
-*        The Mapping for intermediate time slices will be approximated.
-*     exportlonlat = int (Given)
-*        If non-zero, the longitude and latitude values are dumped to a
-*        pair of 2D NDFs with suffices equal to the AST symbols
-*        associated with the two celestial axes.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -98,6 +96,8 @@
 *        calling function.
 *     2011-12-13 (DSB):
 *        Added exportlonlat to API.
+*     2012-02-20 (DSB):
+*        Added "config" to API, and removed "tstep" and "exportlonlat".
 
 *  Notes:
 *     This routines asserts ICD data order.
@@ -261,9 +261,9 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_calc_mapcoord"
 
-void smf_calc_mapcoord( ThrWorkForce *wf, smfData *data, AstFrameSet *outfset,
-                        int moving, int *lbnd_out, int *ubnd_out, int flags,
-                        int tstep, int exportlonlat, int *status ) {
+void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
+                        AstFrameSet *outfset, int moving, int *lbnd_out,
+                        int *ubnd_out, int flags, int *status ) {
 
   /* Local Variables */
 
@@ -304,6 +304,8 @@ void smf_calc_mapcoord( ThrWorkForce *wf, smfData *data, AstFrameSet *outfset,
   AstCmpMap *testcmpmap=NULL;  /* Combined forward/inverse mapping */
   AstMapping *testsimpmap=NULL;/* Simplified testcmpmap */
   double *theta = NULL;        /* Scan direction at each time slice */
+  int tstep;                   /* Time slices between full Mapping calculations */
+  int exportlonlat;            /* Dump longitude and latitude values? */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -467,6 +469,11 @@ void smf_calc_mapcoord( ThrWorkForce *wf, smfData *data, AstFrameSet *outfset,
     msgOutif(MSG__VERB," ", FUNC_NAME ": Calculate new LUT",
              status);
 
+    /* Get the increment in time slices between full Mapping calculations.
+       The Mapping for intermediate time slices will be approximated. */
+    smf_get_nsamp( config, "TSTEP", data, &tstep, status );
+
+    /* Get space for the LUT */
     if( doextension ) {
       /* Map the LUT array */
       ndfMap( lutndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap,
@@ -492,11 +499,14 @@ void smf_calc_mapcoord( ThrWorkForce *wf, smfData *data, AstFrameSet *outfset,
 
     /* If the longitude and latitude is being dumped, create new NDFs to
        hold them, and map them. */
-    if( exportlonlat ) {
-       lon_ptr = smf1_calc_mapcoord1( data, nbolo, ntslice, oskyfrm,
-                                      &indf_lon, 1, status );
-       lat_ptr = smf1_calc_mapcoord1( data, nbolo, ntslice, oskyfrm,
-                                      &indf_lat, 2, status );
+    if( config ) {
+       astMapGet0I( config, "EXPORTLONLAT", &exportlonlat );
+       if( exportlonlat ) {
+          lon_ptr = smf1_calc_mapcoord1( data, nbolo, ntslice, oskyfrm,
+                                         &indf_lon, 1, status );
+          lat_ptr = smf1_calc_mapcoord1( data, nbolo, ntslice, oskyfrm,
+                                         &indf_lat, 2, status );
+       }
     }
 
     /* Invert the mapping to get Output SKY to output map coordinates */

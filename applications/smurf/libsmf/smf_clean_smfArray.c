@@ -405,11 +405,11 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
 
     /* Create model containers for COM, GAI */
     smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, NULL, 1, SMF__COM,
-                      0, 0, NULL, 0, NULL, NULL, &comgroup, 1, 1, &comdata, keymap,
+                      0, NULL, 0, NULL, NULL, &comgroup, 1, 1, &comdata, keymap,
                       status );
 
     smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, NULL, 1, SMF__GAI,
-                      0, 0, NULL, 0, NULL, NULL, &gaigroup, 1, 1, &gaidata, keymap,
+                      0, NULL, 0, NULL, NULL, &gaigroup, 1, 1, &gaidata, keymap,
                       status );
 
     /* Manually create quadata to share memory with the quality already

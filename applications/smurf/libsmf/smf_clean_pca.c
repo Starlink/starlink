@@ -846,7 +846,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     smf_addto_smfArray( data_array, data, status );
 
     smf_model_create( wf, NULL, &data_array, NULL, NULL, NULL,NULL, NULL, 1,
-                      SMF__GAI, data->isTordered, 0, NULL, 0, NULL, NULL,
+                      SMF__GAI, data->isTordered, NULL, 0, NULL, NULL,
                       &gain_group, 1, 1, &gain_array, keymap, status );
 
     /* Compare bolometers to the template in order to flag outliers */

@@ -369,9 +369,9 @@ void smurf_sc2clean( int *status ) {
                      &maxconcat, NULL, &igroup, &basegrp, NULL, status );
 
     /* Concatenate this continuous chunk */
-    smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, bbms, flatramps,
+    smf_concat_smfGroup( wf, NULL, igroup, usedarks ? darks:NULL, bbms, flatramps,
                          heateffmap, contchunk, ensureflat, 1, NULL, 0, NULL,
-                         NULL, padStart, padEnd, 0, 1, 0, &concat, NULL, status );
+                         NULL, padStart, padEnd, 0, &concat, NULL, status );
 
     if( *status == SAI__OK) {
       /* clean the dark squids now since we might need to use them

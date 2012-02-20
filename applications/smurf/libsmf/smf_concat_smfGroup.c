@@ -13,19 +13,24 @@
  *     C function
 
  *  Invocation:
- *     smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
- *                          const smfArray *darks, const smfArray *bbms,
- *                          const smfArray *flatramps, AstKeyMap * heateffmap,
- *                          size_t whichchunk, int ensureflat, int isTordered,
- *                          AstFrameSet *outfset, int moving,
- *                          int *lbnd_out, int *ubnd_out, dim_t req_padStart,
- *                          dim_t req_padEnd, int flags, int tstep,
- *                          int exportlonlat, smfArray **concat,
+ *     smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config,
+ *                          const smfGroup *igrp, const smfArray *darks,
+ *                          const smfArray *bbms, const smfArray *flatramps,
+ *                          AstKeyMap * heateffmap, size_t whichchunk,
+ *                          int ensureflat, int isTordered,
+ *                          AstFrameSet *outfset, int moving, int *lbnd_out,
+ *                          int *ubnd_out, dim_t req_padStart,
+ *                          dim_t req_padEnd, int flags, smfArray **concat,
  *                          smfData **first, int *status )
 
  *  Arguments:
  *     wf = ThrWorkForce * (Given)
  *        Pointer to a pool of worker threads (can be NULL)
+ *     config = AstKeyMap * (Given)
+ *        Pointer to a KeyMap holding configuration parameters. May
+ *        be NULL, in which case hard-wired defaults are used for any
+ *        configuration parameters that are needed (currently just
+ *        TSIZE=1 and EXPORTLONLAT=0).
  *     igrp = const smfGroup* (Given)
  *        Group of input data files
  *     darks = const smfArray * (Given)
@@ -66,12 +71,6 @@
  *     flags = int (Given)
  *        Additional flags to control processing of individual data files
  *        as they are being concatenated.
- *     tstep = int (Given)
- *        The increment in time slices between full Mapping calculations.
- *        The Mapping for intermediate time slices will be approximated.
- *     exportlonlat = int (Given)
- *        If non-zero, the longitude and latitude values of every sample
- *        are dumped to a pair of 2D NDFs with suffices "_lon" and "_lat".
  *     concat = smfArray ** (Returned)
  *        smfArray containing concatenated data for each subarray. The
  *        supplied pointer may be NULL, in which case "first" argument
@@ -228,11 +227,13 @@
  *        Set data values to VAL__BADD if they are assigned a qualitu of BADDA.
  *     2011-12-13 (DSB):
  *        Added exportlonlat to API.
+ *     2012-02-20 (DSB):
+ *        Added "config" to API, and removed "tstep" and "exportlonlat".
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2007-2011 University of British Columbia.
- *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2012 Science and Technology Facilities Council.
  *
  *     All Rights Reserved.
 
@@ -279,15 +280,14 @@
 
 #define FUNC_NAME "smf_concat_smfGroup"
 
-void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
+void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *igrp,
                           const smfArray *darks, const smfArray *bbms,
-                          const smfArray *flatramps, AstKeyMap * heateffmap,
+                          const smfArray *flatramps, AstKeyMap *heateffmap,
                           size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t req_padStart,
-                          dim_t req_padEnd, int flags, int tstep,
-                          int exportlonlat, smfArray **concat, smfData **first,
-                          int *status ) {
+                          dim_t req_padEnd, int flags, smfArray **concat,
+                          smfData **first, int *status ) {
 
   /* Local Variables */
   size_t bstr;                  /* Concatenated bolo stride */
@@ -706,8 +706,8 @@ void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
              separate job context so that any other jobs currently being
              performed by the workforce (e.g. opening the next file) do
              not cause the call to block.  */
-          smf_calc_mapcoord( wf, refdata, outfset, moving, lbnd_out, ubnd_out,
-                             SMF__NOCREATE_FILE, tstep, exportlonlat, status );
+          smf_calc_mapcoord( wf, config, refdata, outfset, moving, lbnd_out,
+                             ubnd_out, SMF__NOCREATE_FILE, status );
         } else {
           havelut = 0;
         }

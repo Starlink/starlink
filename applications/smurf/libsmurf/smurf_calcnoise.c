@@ -493,8 +493,8 @@ void smurf_calcnoise( int *status ) {
     if (doclean) {
       /* Get the first smfData that will contribute to this continuous chunk,
          but do not concatenate the data just yet. */
-      smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, NULL, contchunk, 0, 1,
-                           NULL, 0, NULL, NULL, 0, 0, 0, 1, 0, NULL, &firstdata,
+      smf_concat_smfGroup( wf, NULL, igroup, NULL, NULL, NULL, NULL, contchunk,
+                           0, 1, NULL, 0, NULL, NULL, 0, 0, 0, NULL, &firstdata,
                            status );
 
       /* Get the configuration parameters to use, selecting the values
@@ -526,8 +526,8 @@ void smurf_calcnoise( int *status ) {
 
     /* Now that we have the padding, concatenate this continuous chunk but
        forcing a raw data read. We will need quality. */
-    smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, NULL, contchunk, 0, 1,
-                         NULL, 0, NULL, NULL, pad, pad, 0, 1, 0, &concat, NULL,
+    smf_concat_smfGroup( wf, keymap, igroup, NULL, NULL, NULL, NULL, contchunk,
+                         0, 1, NULL, 0, NULL, NULL, pad, pad, 0, &concat, NULL,
                          status );
 
     if (doclean) {

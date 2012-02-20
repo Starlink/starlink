@@ -17,7 +17,7 @@
 *                       smfArray **iarray, const smfArray *darks,
 *                       const smfArray *bbms, const smfArray* flatramps,
 *                       AstKeyMap * heateffmap, const smfArray *noisemaps, dim_t nchunks,
-*                       smf_modeltype mtype, int isTordered, int exportlonlat,
+*                       smf_modeltype mtype, int isTordered,
 *                       AstFrameSet *outfset, int moving, int *lbnd_out,
 *                       int *ubnd_out, smfGroup **mgroup, int nofile,
 *                       int leaveopen, smfArray **mdata, AstKeyMap *keymap,
@@ -52,9 +52,6 @@
 *        If 0, ensure template data is ordered by bolometer. If 1 ensure
 *        template data is ordered by time slice (default ICD ordering).
 *        Ignored if not creating SMF__LUT.
-*     exportlonlat = int (Given)
-*        If non-zero, the longitude and latitude values are dumped to a
-*        pair of 2D NDFs with suffices "_lon" and "_lat"..
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping if calculating
 *        pointing LUT on-the-fly. Ignored if not creating SMF__LUT.
@@ -212,6 +209,8 @@
 *        Optionally, create one smfData per subarray for SMF__COM models.
 *     2011-12-13 (DSB):
 *        Added exportlonlat to API.
+*     2012-02-20 (DSB):
+*        Removed exportlonlat from API.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -272,7 +271,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        const smfArray *bbms, const smfArray *flatramps,
                        AstKeyMap * heateffmap, const smfArray *noisemaps,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
-                       int exportlonlat, AstFrameSet *outfset, int moving,
+                       AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
                        AstKeyMap *keymap, int *status ) {
@@ -500,11 +499,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
             /* Calculate the LUT if necessary */
 
             if( mtype == SMF__LUT ) {
-              int tstep = 0;
-              astMapGet0I( keymap, "TSTEP", &tstep );
-              smf_calc_mapcoord( wf, idata, outfset, moving, lbnd_out,
-                                 ubnd_out, SMF__NOCREATE_FILE, tstep,
-                                 exportlonlat, status );
+              smf_calc_mapcoord( wf, keymap, idata, outfset, moving, lbnd_out,
+                                 ubnd_out, SMF__NOCREATE_FILE, status );
             }
 
           }

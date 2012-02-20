@@ -133,16 +133,17 @@ exportndf = 0
 
 # ensureflat=0
 
-# The gap (in time slices) between full calculations of the output map
-# bolometer positions. Setting a larger value for this will speed up
-# the map maker but will introduce larger spatial errors. The default
-# value of 100 seems to produce spatial errors of under 0.1 arc-sec. This
+# The gap (in time slices if positive and seconds if negative) between full
+# calculations of the output map bolometer positions. Setting a larger value
+# for this will speed up the map maker but will introduce larger spatial
+# errors. The default value of -0.5 (i.e. 100 samples at a sample rate of
+# 200 Hz) seems to produce spatial errors of under 0.1 arc-sec. This
 # level of errors seems to cause about 1% of bolometers samples to be
 # pushed into a neighouring map pixel. For tstep=100, the calculation of
 # bolometer positions speeds up by about a factor of 60. Setting tstep to
 # 1 (or zero) causes all bolometer positions to be calculated in full,
 # without any approximation.
-#tstep = 100
+#tstep = -0.5
 
 # If the telescope is scanning slowly the data may be safely down-sampled
 # to save memory and time. This parameter controls the minimum angular
@@ -578,17 +579,17 @@ ext.taumethod =adaptive
 # SNR below this threshold will be set to 0.
 #
 # The ast.zero_snr_fwhm parameter gives the FWHM of a Gaussian (in arcsec)
-# with which to smooth the final mask produced as a consequence of setting 
-# the ast.zero_snr value. If it is set to zero, no smoothing is performed. 
+# with which to smooth the final mask produced as a consequence of setting
+# the ast.zero_snr value. If it is set to zero, no smoothing is performed.
 # The smoothing occurs once all chunks of the map have converged, and a new
 # map is then created using the smoothed mask as if it had been supplied via
-# "ast.zero_mask". Consequently, setting ast.zero_snr_fwhm causes the time 
+# "ast.zero_mask". Consequently, setting ast.zero_snr_fwhm causes the time
 # taken to create the final map to nearly double.
 #
 # The ast.zero_snr_low parameter gives the value (in the range 0.0 to 1.0)
-# at which to threshold the smoothed mask specified by ast.zero_snr_fwhm. 
-# If it is negative, the value is taken as the max smoothed value of a blob 
-# containing "ast.zero_snr_low" pixels. Thus a value of "-1.1" will cut at 
+# at which to threshold the smoothed mask specified by ast.zero_snr_fwhm.
+# If it is negative, the value is taken as the max smoothed value of a blob
+# containing "ast.zero_snr_low" pixels. Thus a value of "-1.1" will cut at
 # a height just sufficient to remove blobs of a single pixel form the mask.
 # A value of "-2.1" would remove blobs of two pixels form the mask, etc.
 #

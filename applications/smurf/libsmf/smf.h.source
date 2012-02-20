@@ -572,9 +572,9 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
                       AstMapping **specmap, AstFrame **specframe,
                       int *status );
 
-void smf_calc_mapcoord( ThrWorkForce *wf, smfData *data, AstFrameSet *outfset,
-                        int moving, int *lbnd_out, int *ubnd_out, int flags,
-                        int tstep, int exportlonlat, int *status );
+void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
+                        AstFrameSet *outfset, int moving, int *lbnd_out,
+                        int *ubnd_out, int flags, int *status );
 
 double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
                        int *status );
@@ -759,15 +759,14 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
                            double snrlim, int flagconst, smf_dtype dtype,
                            smfData **outdata, int *status );
 
-void smf_concat_smfGroup( ThrWorkForce *wf, const smfGroup *igrp,
+void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *keymap, const smfGroup *igrp,
                           const smfArray *darks, const smfArray *bpms,
                           const smfArray *flatramps, AstKeyMap * heateffmap,
                           size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
-                          dim_t padEnd, int flags,  int tstep,
-                          int exportlonlat, smfArray **concat, smfData **first,
-                          int *status );
+                          dim_t padEnd, int flags, smfArray **concat,
+                          smfData **first, int *status );
 
 smfDA *smf_construct_smfDA( smfDA * tofill, smfData *dksquid, double * flatcal,
                             double * flatpar, smf_flatmeth flatmeth,
@@ -1257,6 +1256,9 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
                     const char *state, const char *dattype, const int ndims,
                     const int *lbnd, const int *ubnd, int *status );
 
+double smf_get_nsamp( AstKeyMap *keymap, const char *name,
+                      const smfData *data, int *nsamp, int *status );
+
 dim_t smf_get_padding( AstKeyMap *keymap, int report,const smfHead *hdr,
                        double, int *status );
 
@@ -1401,7 +1403,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        const smfArray *bbms, const smfArray *flatramps,
                        AstKeyMap * heateffmap, const smfArray *noisemaps,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
-                       int exportlonlat, AstFrameSet *outfset, int moving,
+                       AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
                        AstKeyMap *keymap, int *status );
