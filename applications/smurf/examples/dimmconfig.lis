@@ -97,8 +97,10 @@ exportndf = 0
 # Create .MORE.SMURF.SHORTMAPS extensions containing maps of every "shortmap"
 # time slices? Alternatively, set to -1 to produce a map each time TCS_INDEX
 # is incremented (i.e., each time a full pass through the scan pattern has
-# been completed).
-#shortmap=1000
+# been completed). Any other negative value is interpreted as a duration
+# in seconds, and is converted to time slices using the (possibly
+# down-sampled) sample frequency of the data being mapped.
+#shortmap=-5.0  # This is 5 seconds, i.e. 1000 samples at 200 Hz sample rate
 
 # Create .MORE.SMURF.FLAGMAPS extensions? To enable this feature set flagmap
 # to an array containing a subset of the following bit flags. Each flagmap

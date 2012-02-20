@@ -714,9 +714,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Are we going to produce maps for each iteration? */
       astMapGet0I( keymap, "ITERMAP", &itermap );
 
-      /* Are we going to produce short maps every SHORTMAP time slices? */
-      astMapGet0I( keymap, "SHORTMAP", &shortmap );
-
       /* Are we going to produce flagmaps? */
       if( astMapGet1C(keymap, "FLAGMAP", SMF_QSTR_MAX, SMF__NQBITS, &nflags,
                       flagnames) ) {
@@ -2277,6 +2274,15 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          We also add the map estimated from this contchunk to those from
          previous contchunks if necessary.
       *********************************************************************** */
+
+      /* Are we going to produce short maps every SHORTMAP time slices?
+         If the user supplies -1, this will be interpreted as "1.0
+         seconds", so trap this and revert to the -1 value used to
+         indicate that a map should be created each time a full pass
+         through the scan pattern has # been completed. */
+      if( smf_get_nsamp( keymap, "SHORTMAP", res[0]->sdata[0], &shortmap,
+                         status ) == -1.0 ) shortmap = -1;
+
 
       /* ---------------------------------------------------------------- */
       /* All of bolomap, shortmap and sampcube require AST to be added back
