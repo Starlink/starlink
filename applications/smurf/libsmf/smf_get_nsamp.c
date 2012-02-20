@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     double smf_get_nsamp( AstKeyMap *keymap, const char *name,
-*                           const smfData *data, int *nsamp, int *status )
+*                           const smfData *data, dim_t *nsamp, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap * (Given)
@@ -28,7 +28,7 @@
 *        conversion is possible and so the value of the parameter in the
 *        KeyMap must be in time slices, and an error is reported if the
 *        KeyMap contaions a value in seconds.
-*     nsamp = int * (Returned)
+*     nsamp = dim_t * (Returned)
 *        The value of the requested configuration parameter, in units of
 *        time-samples. If an error occurs, the value on entry is left
 *        unchanged.
@@ -93,7 +93,7 @@
 #include "libsmf/smf_typ.h"
 
 double smf_get_nsamp( AstKeyMap *keymap, const char *name,
-                      const smfData *data, int *nsamp, int *status ){
+                      const smfData *data, dim_t *nsamp, int *status ){
 
 
 /* Local Variables */

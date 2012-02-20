@@ -471,7 +471,9 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
 
     /* Get the increment in time slices between full Mapping calculations.
        The Mapping for intermediate time slices will be approximated. */
-    smf_get_nsamp( config, "TSTEP", data, &tstep, status );
+    dim_t dimval;
+    smf_get_nsamp( config, "TSTEP", data, &dimval, status );
+    tstep = dimval;
 
     /* Get space for the LUT */
     if( doextension ) {

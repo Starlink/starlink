@@ -2280,9 +2280,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          seconds", so trap this and revert to the -1 value used to
          indicate that a map should be created each time a full pass
          through the scan pattern has # been completed. */
-      if( smf_get_nsamp( keymap, "SHORTMAP", res[0]->sdata[0], &shortmap,
-                         status ) == -1.0 ) shortmap = -1;
-
+      dim_t dimval;
+      if( smf_get_nsamp( keymap, "SHORTMAP", res[0]->sdata[0], &dimval,
+                         status ) == -1.0 ) {
+         shortmap = -1;
+      } else {
+         shortmap = dimval;
+      }
 
       /* ---------------------------------------------------------------- */
       /* All of bolomap, shortmap and sampcube require AST to be added back

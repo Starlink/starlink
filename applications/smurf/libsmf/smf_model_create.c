@@ -687,8 +687,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                contains "gain_box" time slices. */
 
             astMapGet0A( keymap, "COM", &kmap );
-            astMapGet0I( kmap, "GAIN_BOX", &ival );
-            gain_box = ival;
+            smf_get_nsamp( kmap, "GAIN_BOX", idata, &gain_box, status );
             kmap = astAnnul( kmap );
 
             if( isTordered ) {

@@ -1257,7 +1257,7 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
                     const int *lbnd, const int *ubnd, int *status );
 
 double smf_get_nsamp( AstKeyMap *keymap, const char *name,
-                      const smfData *data, int *nsamp, int *status );
+                      const smfData *data, dim_t *nsamp, int *status );
 
 dim_t smf_get_padding( AstKeyMap *keymap, int report,const smfHead *hdr,
                        double, int *status );
