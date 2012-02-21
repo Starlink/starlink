@@ -162,10 +162,12 @@ dim_t smf_get_padding( AstKeyMap *keymap, int report, const smfHead *hdr,
    values that can be used to calculate a default PAD value. */
       if( *status == AST__MPKER ) errAnnul( status );
 
-/* Search for filtering parameters in the keymap */
+/* Search for filtering parameters in the keymap. None of these parameters
+   represent a number of time clies, so we can set the smfData (the 2nd
+   argument) to NULL. */
       f_nnotch = 0;
       smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        NULL, &filt_edgelow, &filt_edgehigh, &filt_edgesmall,
+                        NULL, NULL, &filt_edgelow, &filt_edgehigh, &filt_edgesmall,
                         &filt_edgelarge, filt_notchlow, NULL, &f_nnotch, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, NULL, &downsampscale, &downsampfreq, NULL,

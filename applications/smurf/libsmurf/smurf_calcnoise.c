@@ -533,10 +533,11 @@ void smurf_calcnoise( int *status ) {
     if (doclean) {
       /* Clean the dark squids now since we might need to use them
          to clean the bolometer data */
-      smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, &dkclean,
-                        NULL, &zeropad, NULL, NULL, NULL, NULL, NULL, NULL,
+      smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                        &dkclean, NULL, &zeropad, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, status);
+                        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                        status);
 
       for( idx=0; dkclean&&(*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
         odata = concat->sdata[idx];

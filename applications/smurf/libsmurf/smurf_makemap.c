@@ -576,12 +576,14 @@
 *       COM/GAI as model components in the iterative solution. [0]
 *     DCFITBOX = INTEGER
 *       Number of samples (box size) used on either side of a DC step to
-*       estimate the height of the step. [0]
+*       estimate the height of the step. If negative, it is taken as a
+*       duration in seconds, which is converted to a number of samples
+*       using the data sample rate. [0]
 *     DCLIMCORR = INTEGER
-*      If more than DCLIMCORR bolometer have a step at a given time,
-*      then all bolometers are corrected for a step at that time,
-*      using lower thresholds.  Setting it to zero here switches off
-*      the correction of correlated steps. [10]
+*       If more than DCLIMCORR bolometer have a step at a given time,
+*       then all bolometers are corrected for a step at that time,
+*       using lower thresholds.  Setting it to zero here switches off
+*       the correction of correlated steps. [10]
 *     DCMAXSTEPS = INTEGER
 *       The maximum number of steps that can be corrected in each minute of
 *       good data (i.e. per 12000 samples) from a bolometer before the entire
@@ -590,8 +592,10 @@
 *     DCTHRESH = DOUBLE
 *       Threshold standard deviations from median for step detection. [25.0]
 *     DCSMOOTH = INTEGER
-*       The width of the median filter used to smooth a bolometer data stream
-*       prior to finding DC steps. [50]
+*       The number of samples in the median filter used to smooth a bolometer
+*       data stream prior to finding DC steps. If negative, it is taken as a
+*       duration in seconds, which is converted to a number of samples
+*       using the data sample rate. [50]
 *     DCTHRESH = REAL
 *       Threshold S/N to detect and flag DC (baseline) steps. [25.0]
 *     DKCLEAN = LOGICAL
@@ -651,7 +655,9 @@
 *     SPIKETHRESH = REAL
 *       Threshold S/N to flag spikes using time-series sigma-clipper. [0]
 *     SPIKEBOX = INTEGER
-*       The size of the time-series sigma-clipper filter box. [50]
+*       The size of the time-series sigma-clipper filter box. If negative,
+*       it is taken as a duration in seconds, which is converted to a number
+*       of samples using the data sample rate. [50]
 *     WHITEN = LOGICAL
 *       If set, a whitening filter is applied to flatten-out the 1/f part
 *       of the bolometer spectra. [0]

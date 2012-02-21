@@ -141,8 +141,10 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
     return;
   }
 
-  /* Search for filtering parameters in the keymap */
-  smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+  /* Search for filtering parameters in the keymap. None of these
+     parameters represent a number of time clies, so we can set the
+     smfData (the 2nd argument) to NULL. */
+  smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, &f_edgelow, &f_edgehigh, &f_edgesmall,
                     &f_edgelarge, f_notchlow, f_notchhigh, &f_nnotch, &dofft,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, &whitening, NULL,

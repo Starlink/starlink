@@ -112,15 +112,19 @@
 *        in a detector time series were flagged as bad by the DA system.
 *     DCFITBOX = REAL
 *        Number of samples (box size) used on either side of a DC step to
-*        estimate the height of the step.
+*        estimate the height of the step. If negative, it is taken as a
+*        duration in seconds, which is converted to a number of samples
+*        using the data sample rate.
 *     DCMAXSTEPS = INTEGER
 *        The maximum number of steps that can be corrected in each minute of
 *        good data (i.e. per 12000 samples) from a bolometer before the entire
 *        bolometer is flagged as bad. A value of zero will cause a bolometer to
 *        be rejected if any steps are found in the bolometer data stream.
 *     DCSMOOTH = INTEGER
-*        The width of the median filter used to smooth a bolometer data stream
-*        prior to finding DC steps.
+*        The number of samples in the median filter used to smooth a bolometer
+*        data stream prior to finding DC steps. If negative, it is taken as a
+*        duration in seconds, which is converted to a number of samples
+*        using the data sample rate.
 *     DCTHRESH = REAL
 *        Threshold S/N to detect and flag DC (baseline) steps.
 *     DKCLEAN = LOGICAL
@@ -147,7 +151,9 @@
 *     ORDER = INTEGER
 *        Subtract a fitted baseline polynomial of this order (0 to remove mean).
 *     SPIKEBOX = INTEGER
-*        The size of the filter box for the sigma-clipper.
+*        The size of the filter box for the sigma-clipper. If negative, it is
+*        taken as a duration in seconds, which is converted to a number of
+*        samples using the data sample rate.
 *     SPIKETHRESH = REAL
 *        Threshold S/N to flag spikes using sigma-clipper.
 *     ZEROPAD = LOGICAL

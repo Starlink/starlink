@@ -223,7 +223,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
   }
 
   /* Get cleaning parameters */
-  smf_get_cleanpar( keymap, &badfrac, &dcfitbox, &dcmaxsteps,
+  smf_get_cleanpar( keymap, array->sdata[0], &badfrac, &dcfitbox, &dcmaxsteps,
                     &dcthresh, &dcsmooth, &dclimcorr, &dkclean,
                     NULL, &zeropad, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,

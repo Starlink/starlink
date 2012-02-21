@@ -1212,7 +1212,7 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
 
 void smf_geod( const double pos[3], double *phi, double *h, double *lambda );
 
-void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
+void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
                        dim_t *dcbox, int *dcbad, double *dcthresh,
                        dim_t *dcsmooth, int *dclimcorr, int *dkclean,
                        int *fillgaps, int *zeropad, double *filt_edgelow,

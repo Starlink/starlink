@@ -301,8 +301,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                      NULL, NULL, NULL, &downsampscale, &downsampfreq, NULL,
-                      status );
+                      NULL, NULL, NULL, NULL, &downsampscale, &downsampfreq,
+                      NULL, status );
 
     if( downsampscale && downsampfreq ) {
       *status = SAI__ERROR;

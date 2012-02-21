@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
+*     smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
 *                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
 *                       dim_t *dcsmooth, int *dclimcorr, int *dkclean,
 *                       int *fillgaps, int *zeropad, double *filt_edgelow,
@@ -31,6 +31,11 @@
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters
+*     data = const smfData  * (Given)
+*        Pointer to a smfData that is used to define the sample rate
+*        needed when converting parameter values form seconds to time
+*        slices. If NULL is supplied, a default sample rate of 200 Hz is
+*        used.
 *     badfrac = double* (Returned)
 *        Fraction of bad samples in order for entire bolometer to be
 *        flagged as bad (NULL:0)
@@ -186,6 +191,9 @@
 *        Add noiseclipprecom
 *     2011-10-17 (EC):
 *        Add pcalen
+*     2012-02-21 (EC):
+*        Add argument "data" and allow parameters that represent a number
+*        of time slices to be given in units of seconds instead.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -234,10 +242,10 @@
 
 #define FUNC_NAME "smf_get_cleanpar"
 
-void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
-                       int *dcmaxsteps, double *dcthresh, dim_t *dcsmooth,
-                       int *dclimcorr, int *dkclean, int *fillgaps,
-                       int *zeropad, double *filt_edgelow,
+void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
+                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
+                       dim_t *dcsmooth, int *dclimcorr, int *dkclean,
+                       int *fillgaps, int *zeropad, double *filt_edgelow,
                        double *filt_edgehigh, double *filt_edge_smallscale,
                        double *filt_edge_largescale, double *filt_notchlow,
                        double *filt_notchhigh, int *filt_nnotch, int *dofilt,
@@ -270,14 +278,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
 
   if( dcfitbox ) {
     *dcfitbox = 0;
-    astMapGet0I( keymap, "DCFITBOX", &temp );
-    if( temp < 0 ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "dcfitbox cannot be < 0.", status );
-    } else {
-      *dcfitbox = (dim_t) temp;
-    }
-
+    smf_get_nsamp( keymap, "DCFITBOX", data, dcfitbox, status );
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCFITBOX=%" DIM_T_FMT, status,
                *dcfitbox );
   }
@@ -322,9 +323,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
 
   if( dcsmooth ) {
     *dcsmooth = 0;
-    astMapGet0I( keymap, "DCSMOOTH", &temp );
-    *dcsmooth = temp;
-
+    smf_get_nsamp( keymap, "DCSMOOTH", data, dcsmooth, status );
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCSMOOTH=%" DIM_T_FMT, status,
                *dcsmooth );
   }
@@ -529,14 +528,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
 
   if( spikebox ) {
     *spikebox = 0;
-    if( astMapGet0I( keymap, "SPIKEBOX", &temp ) ) {
-      if( temp < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "spikebox cannot be < 0.", status );
-      } else {
-        *spikebox = (size_t) temp;
-      }
-    }
+    smf_get_nsamp( keymap, "SPIKEBOX", data, spikebox, status );
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKEBOX=%zu", status,
                *spikebox );
   }
@@ -561,14 +553,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
 
   if( pcalen ) {
     *pcalen = 0;
-    astMapGet0I( keymap, "PCALEN", &temp );
-    if( temp < 0 ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "pcalen cannot be < 0.", status );
-    } else {
-      *pcalen = (size_t) temp;
-    }
-
+    smf_get_nsamp( keymap, "PCALEN", data, pcalen, status );
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": PCALEN=%zu", status,
                *pcalen );
   }

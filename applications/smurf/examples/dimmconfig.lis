@@ -305,7 +305,8 @@ pcathresh = 0
 dcthresh = 25.0
 
 # box size over which to fit data with a straight line on either side of
-# a potential DC jump.
+# a potential DC jump. If positive, in units of samples. If negative, in
+# units of seconds.
 dcfitbox = 30
 
 # The maximum number of steps that can be corrected in each minute of
@@ -321,13 +322,15 @@ dcmaxsteps = 10
 dclimcorr = 0
 
 # The width of the median filter used to smooth a bolometer data stream
-# prior to finding DC jumps
+# prior to finding DC jumps. If positive, in units of samples. If negative,
+# in units of seconds.
 dcsmooth = 50
 
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5
 
-# Size of filter box for sigma-clipper
+# Size of filter box for sigma-clipper, in units of samples if positive
+# and seconds if negative.
 # spikebox = 50
 
 # Fill vicinity of spikes / DC steps with constrained realization of
@@ -493,7 +496,9 @@ dks.replacebad = 0
 
 # additional despiking / DC step finding after each iteration within noi
 # calculation. Setting noi.spikebox to 50 will check for excursions
-# from a rolling median filter in a box of length 50 samples.
+# from a rolling median filter in a box of length 50 samples (negative 
+# values are interpreted as seconds and converted to samples using the 
+# sample rate).
 #noi.spikethresh = 10
 #noi.spikebox = 50
 noi.fillgaps = 1
