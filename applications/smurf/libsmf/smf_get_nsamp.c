@@ -24,10 +24,8 @@
 *        The name of the configuration parameter.
 *     data = const smfData * (Given)
 *        If not NULL, the step-time in the supplied data is used to
-*        convert between seconds and time-samples. If NULL, then no
-*        conversion is possible and so the value of the parameter in the
-*        KeyMap must be in time slices, and an error is reported if the
-*        KeyMap contaions a value in seconds.
+*        convert between seconds and time-samples. If NULL, then a
+*        time step of 0.005 seconds (ie. 200 Hz sample rate) is assumed.
 *     nsamp = dim_t * (Returned)
 *        The value of the requested configuration parameter, in units of
 *        time-samples. If an error occurs, the value on entry is left
@@ -116,12 +114,14 @@ double smf_get_nsamp( AstKeyMap *keymap, const char *name,
    seconds. */
       if( result < 0.0 ) {
 
-/* Get the steptime from the supplied smfData. */
-         steptime = 0.0;
+/* Set the default step time corresponding to 200 Hz sample rate. */
+         steptime = 0.005;
+
+/* Override this with the steptime from the supplied smfData, if any. */
          if( data ) {
             if( data->hdr ) {
                steptime = data->hdr->steptime;
-               if( steptime <= 0.0 ) {
+               if( steptime <= 0.0 && *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   errRepf( " ", "smf_get_nsamp: The steptime value in the "
                            "supplied smfData (%g) is negative or zero.",
@@ -134,19 +134,8 @@ double smf_get_nsamp( AstKeyMap *keymap, const char *name,
             }
          }
 
-/* If the steptime is non-zero, we can do the conversion from (negative)
-   seconds, to (positive) time slices. */
-         if( steptime > 0.0 ) {
-            dval = -result/steptime;
-
-/* otherwise, the conversion is not possible so report an error. */
-         } else if( *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            errRepf( " ", "The configuration parameter '%s' has a "
-                     "negative value (%g) - it should be positive (i.e. "
-                     "in units of time slices rather than seconds).",
-                     status, name, result );
-         }
+/* Do the conversion from (negative) seconds, to (positive) time slices. */
+         if( steptime > 0.0 ) dval = -result/steptime;
 
 /* If the value in the KeyMap is positive, we assume it is in units of
    time slices. */

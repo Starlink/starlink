@@ -281,22 +281,19 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
             nrelated;
           break;
         case SMF__GAI:
-
-          /* Every COM.GAIN_BOX samples there are 3 planes of data corresponding
-             to each bolometer in the subarray. Assume a sample rate of 200 Hz. */
-          data = smf_create_smfData( SMF__NOCREATE_FILE & SMF__NOCREATE_DA,
-                                     status );
-          if( *status == SAI__OK ) {
-             data->hdr->steptime = 1.0/200.0;
-             astMapGet0A( keymap, "COM", &kmap );
-             smf_get_nsamp( kmap, "GAIN_BOX", data, &gain_box, status );
+          /* Every COM.GAIN_BOX samples there are 3 planes of data
+             corresponding to each bolometer in the subarray. The
+             conversion of COM.GAIN_BOX from seconds to samples within
+             smf_get_nsamp assumes a sample rate of 200 Hz. Later
+             downsampling may result in a lower sample rate, but at least
+             we are erring on the conservative side by assuming 200 Hz. */
+          if( astMapGet0A( keymap, "COM", &kmap ) ) {
+             smf_get_nsamp( kmap, "GAIN_BOX", NULL, &gain_box, status );
              nblock = maxlen/gain_box;
              if( nblock == 0 ) nblock = 1;
              total += nblock*3*nrow*ncol*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
-             if( kmap ) kmap = astAnnul( kmap );
-             smf_close_file( &data, status );
+             kmap = astAnnul( kmap );
           }
-
           break;
         case SMF__FLT:
           /* Presently the filter temporarily transforms the entire
