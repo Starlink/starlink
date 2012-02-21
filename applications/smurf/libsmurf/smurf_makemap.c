@@ -856,8 +856,8 @@
 *       If true the PLN model will not be executed in the first
 *       iteration. [0]
 *     SMO.BOXCAR = INTEGER
-*       Number of samples to use for box car smoothing
-*       filter. [2000]
+*       Number of samples  (if positive) or seconds (if negative) to use
+*       for box car smoothing filter. [-10]
 *     SMO.NOTFIRST = LOGICAL
 *       If true the SMO model will not be executed in the first
 *       iteration. [0]

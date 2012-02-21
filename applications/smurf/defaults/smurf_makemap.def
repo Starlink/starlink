@@ -178,7 +178,7 @@ pln.notfirst = 0
 # Time Series Smoothing
 
 smo.notfirst = 0
-smo.boxcar = 2000
+smo.boxcar = -10
 smo.type = mean
 
 # Two component common-mode

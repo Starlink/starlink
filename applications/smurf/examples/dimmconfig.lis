@@ -637,9 +637,10 @@ smo.type = median
 
 # width of smoothing box (roughly equivalent to FLT with a high-pass
 # filter at cutoff frequencies 0.1 and 0.3 Hz for 450 and 850
-# respectively)
-450.smo.boxcar = 2000
-850.smo.boxcar = 600
+# respectively). If positive, value is in samples. If negative, value is
+# in seconds.
+450.smo.boxcar = -10
+850.smo.boxcar = -3
 
 # The TMP model fits an externally defined template to each bolometer
 # time-series. The only parameter defines what that template

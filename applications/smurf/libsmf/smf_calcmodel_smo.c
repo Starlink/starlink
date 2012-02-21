@@ -134,8 +134,7 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
-  size_t boxcar = 0;            /* size of boxcar smooth window */
-  int boxcar_i=0;               /* width in samples of boxcar filter */
+  dim_t boxcar = 0;             /* size of boxcar smooth window */
   smf_filt_t filter_type;       /* The type of smoothing to perform */
   size_t i;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
@@ -176,15 +175,7 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   /* Get the boxcar size */
-  if( kmap && astMapGet0I( kmap, "BOXCAR", &boxcar_i) ) {
-    if( boxcar_i >= 0 ) boxcar = (size_t) boxcar_i;
-    else {
-      *status = SAI__ERROR;
-      msgSeti("BOX",boxcar_i);
-      errRep("", FUNC_NAME ": SMO.BOXCAR in config file (^BOX) must be >= 0.",
-             status);
-    }
-  }
+  if( kmap ) smf_get_nsamp( kmap, "BOXCAR", res->sdata[0], &boxcar, status );
 
   /* Get the type of smoothing filter to use. Anthing that is not "MEDIAN" is mean */
   filter_type = SMF__FILT_MEAN;
