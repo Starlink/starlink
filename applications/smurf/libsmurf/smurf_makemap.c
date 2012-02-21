@@ -723,10 +723,11 @@
 *     COM.GAIN_ABSTOL = REAL
 *       Absolute factor away from mean gain coefficient tolerance. [3.0]
 *     COM.GAIN_BOX = INTEGER
-*       If COM.FIT_BOX is not set this is the number of samples to use when
-*       calculating a common mode signal to calculate a correlation coefficient
-*       when rejecting bolometers. If COM.FIT_BOX is non-zero this is the step
-*       used when calculating the correlation coefficient. [6000]
+*       If COM.FIT_BOX is not set this is the number of samples (or
+*       seconds if negative) to use when calculating a common mode signal
+*       to calculate a correlation coefficient when rejecting bolometers.
+*       If COM.FIT_BOX is non-zero this is the step used when calculating
+*       the correlation coefficient. [-30.0]
 *     COM.GAIN_FGOOD = REAL
 *       Minimum fraction of good boxes for a usable bolometer. [0.25]
 *     COM.GAIN_IS_ONE = LOGICAL

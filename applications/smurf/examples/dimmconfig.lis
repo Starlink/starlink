@@ -460,7 +460,7 @@ cleandk.order = 0
 # simply set com.noflag=1
 #
 # com.noflag: if set, disable flagging of bad bolos using common-mode
-# com.gain_box: the number of time slices in a box
+# com.gain_box: the number of time slices (or seconds if negative) in a box
 # com.corr_tol: n-sigma away from mean correlation coefficient tolerance
 # com.corr_abstol: the absolute lower limit of acceptable correlation
 # com.gain_tol: n-sigma away from mean gain coefficient tolerance
@@ -477,9 +477,9 @@ com.gain_abstol = 3
 # this parameter is set to 0 negative values will be allowed
 #com.gain_positive = 0
 
-# Do not set com.gain_box lower than about 6000 which corresponds to
+# Do not set com.gain_box lower than about 6000 (or -30) which corresponds to
 # 30s, or roughly the fridge oscillation period.
-com.gain_box = 6000
+com.gain_box = -30.0
 #com.corr_abstol = 0.2
 #com.gain_fgood = 0.25
 #com.gain_rat = 4.0

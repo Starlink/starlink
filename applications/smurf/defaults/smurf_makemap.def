@@ -89,7 +89,7 @@ fakescale = 1
 # tstep = 100
 
 # Also read in smf_calcmodel_com
-# com.gain_box = 6000
+# com.gain_box = -30.0
 
 # Load the tau relations from a separate config file
 # Also load this before any other "ext" defaults in case
