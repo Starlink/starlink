@@ -485,7 +485,8 @@ com.gain_box = 6000
 #com.gain_rat = 4.0
 
 # low-pass filter dark squid signals using boxcar of this width (if dks
-# model is specified)
+# model is specified). Value is in samples (after any downsampling) if
+# positive and seconds if negative.
 dks.boxcar = 100
 
 # if set, replace dead dark squids with average of working dark squids

@@ -754,8 +754,8 @@
 *       all available subarrays. [0]
 *     DKS.BOXCAR = INTEGER
 *       If DKS (dark squid) model component requested, boxcar the dark squid
-*       signal by this many samples before fitting/removing from each detector
-*       in the same column. [0]
+*       signal by this many samples (if positive) or seconds (if negative)
+*       before fitting/removing from each detector in the same column. [0]
 *     DKS.REPLACEBAD = INTEGER
 *       If true, bad dark squids will be replaced by the mean of the working
 *       dark squids. [0]

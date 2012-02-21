@@ -171,11 +171,11 @@ void smf_calcmodel_dks( ThrWorkForce *wf __attribute__((unused)),
   }
 
   /* Check for dark squid smoothing parameter in the CONFIG file */
-  if( kmap && astMapGet0I( kmap, "BOXCAR", &boxcar_i) ) {
-    if( boxcar_i >= 0 ) boxcar = (size_t) boxcar_i;
-    else {
+  if( kmap ) {
+    smf_get_nsamp( kmap, "BOXCAR", res->sdata[0], &boxcar, status );
+    if( boxcar < 0 && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      msgSeti("BOX",boxcar_i);
+      msgSeti("BOX",boxcar);
       errRep("", FUNC_NAME ": DKS.BOXCAR in config file (^BOX) must be >= 0.",
              status);
     }
