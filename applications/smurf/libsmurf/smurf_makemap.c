@@ -717,9 +717,10 @@
 *     COM.CORR_TOL = REAL
 *       N-sigma away from mean correlation coefficient tolerance. [5.0]
 *     COM.FIT_BOX = INTEGER
-*       If defined, this is the number of samples to use when calculating the
-*       correlation coefficient to compare bolometers. It is identical to
-*       COM.GAIN_BOX when COM.FIT_BOX is undefined. [undef]
+*       If defined, this is the number of samples (if positive) or seconds
+*       (if negative) to use when calculating the correlation coefficient
+*       to compare bolometers. It is identical to COM.GAIN_BOX when
+*       COM.FIT_BOX is undefined. [undef]
 *     COM.GAIN_ABSTOL = REAL
 *       Absolute factor away from mean gain coefficient tolerance. [3.0]
 *     COM.GAIN_BOX = INTEGER

@@ -42,9 +42,9 @@
 *        "corr_abstol" are removed before finding the mean and standard
 *        deviation of the correlation coefficients.
 *
-*        - fit_box (int): The number of adjacent time slices that are
-*        to be used when fitting the data to the template. fit_box should
-*        be no smaller than gain_box.
+*        - fit_box (int): The number of adjacent time slices (or seconds
+*        if negative) that are to be used when fitting the data to the
+*        template. fit_box should be no smaller than gain_box.
 *
 *        - gain_abstol (double): A bolometer is rejected if its log(gain)
 *        value more than gain_abstol from the mean log(gain) value. Note, all
@@ -380,21 +380,19 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, double *template,
    astMapGet0I( keymap, "GAIN_IS_ONE", &nogains );
    astMapGet0I( keymap, "OFFSET_IS_ZERO", &nooffs );
    smf_get_nsamp( keymap, "GAIN_BOX", data, &gain_box, status );
-
    if( *status == SAI__OK && gain_box == 0 ) {
      *status = SAI__ERROR;
      errRep( "", "GAIN_BOX must be greater than 0", status );
    }
 
 /* FIT_BOX defaults to GAIN_BOX (it should be null in the defaults file). */
-   if( astMapGet0I( keymap, "FIT_BOX", &ival ) ) {
-      fit_box = ival;
+   if( smf_get_nsamp( keymap, "FIT_BOX", data, &flt_box, status ) > 0.0 ) {
       if( fit_box < gain_box && *status == SAI__OK ) {
          *status = SAI__ERROR;
         msgSeti( "F", (int) fit_box );
         msgSeti( "G", (int) gain_box );
-        errRep( "", "FIT_BOX (^F) must not be smaller than GAIN_BOX "
-                "(^G)", status );
+        errRep( "", "FIT_BOX (^F samples) must not be smaller than GAIN_BOX "
+                "(^G samples)", status );
       }
    } else {
       fit_box = gain_box;
