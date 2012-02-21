@@ -102,8 +102,7 @@ void smf_calcmodel_dks( ThrWorkForce *wf __attribute__((unused)),
 
   /* Local Variables */
   size_t bolcounter;            /* bolometer counter */
-  int boxcar_i=0;               /* width in samples of boxcar filter */
-  size_t boxcar=0;              /* Size of boxcar smooth window */
+  dim_t boxcar=0;               /* Size of boxcar smooth window */
   size_t bstride;               /* bolo stride */
   double *cdksquid=NULL;        /* Pointer to current dark squid (copy) */
   double *corrbuf=NULL;         /* Array of corr coeffs all bolos in this col */
@@ -171,15 +170,7 @@ void smf_calcmodel_dks( ThrWorkForce *wf __attribute__((unused)),
   }
 
   /* Check for dark squid smoothing parameter in the CONFIG file */
-  if( kmap ) {
-    smf_get_nsamp( kmap, "BOXCAR", res->sdata[0], &boxcar, status );
-    if( boxcar < 0 && *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      msgSeti("BOX",boxcar);
-      errRep("", FUNC_NAME ": DKS.BOXCAR in config file (^BOX) must be >= 0.",
-             status);
-    }
-  }
+  if( kmap ) smf_get_nsamp( kmap, "BOXCAR", res->sdata[0], &boxcar, status );
 
   /* Loop over index in subgrp (subarray) */
   for( idx=0; (*status==SAI__OK)&&(idx<res->ndat); idx++ ) {
@@ -241,7 +232,8 @@ void smf_calcmodel_dks( ThrWorkForce *wf __attribute__((unused)),
         /* For the first iteration we need to do some pre-processing */
         if( (flags&SMF__DIMM_FIRSTITER) ) {
           /* boxcar smooth */
-          smf_tophat1D( &dksquid[jt1], ntot, boxcar, NULL, 0, 0.0, status );
+          smf_tophat1D( &dksquid[jt1], ntot, (int) boxcar, NULL, 0, 0.0,
+                        status );
         }
 
         /* Loop over rows */
