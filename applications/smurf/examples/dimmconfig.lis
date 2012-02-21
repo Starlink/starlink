@@ -438,7 +438,10 @@ cleandk.order = 0
 
 # low-pass boxcarfilter on COM (samples) to assist with convergence
 # if boxfact set reduce width of boxcar by this factor each iteration
-# boxmin specifies a minimum width below which it can't be reduced
+# boxmin specifies a minimum width below which it can't be reduced.
+# Positive values for com.boxcar are interpreted as a number of samples,
+# and negative values as a number of seconds (converted to samples using
+# the downsampled sample rate).
 
 #com.boxcar = 10
 #com.boxcar  = 400
@@ -496,9 +499,9 @@ dks.replacebad = 0
 
 # additional despiking / DC step finding after each iteration within noi
 # calculation. Setting noi.spikebox to 50 will check for excursions
-# from a rolling median filter in a box of length 50 samples (negative 
-# values are interpreted as seconds and converted to samples using the 
-# sample rate).
+# from a rolling median filter in a box of length 50 samples (negative
+# values are interpreted as seconds and converted to samples using the
+# downsampled sample rate).
 #noi.spikethresh = 10
 #noi.spikebox = 50
 noi.fillgaps = 1

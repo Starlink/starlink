@@ -506,7 +506,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
-  int boxcar=0;                 /* width in samples of boxcar filter */
+  dim_t boxcar=0;               /* width in samples of boxcar filter */
   double boxcard=0;             /* double precision version of boxcar */
   double boxfact=0;             /* Box width damping parameter */
   int boxmin=0;                 /* Min boxcar width if boxfact set */
@@ -531,7 +531,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t iblock;                 /* Index of time block */
   int icom;                     /* Index of current COM model */
   int ii;                       /* Loop counter */
-  int ival = 0;                 /* Integer value */
   dim_t idx_hi;                 /* Highest subarray index in current COM model */
   dim_t idx_lo;                 /* Lowest subarray index in current COM model */
   dim_t idx=0;                  /* Index within subgroup */
@@ -626,7 +625,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   astMapGet0I( kmap, "OFFSET_IS_ZERO", &nooffs );
 
   /* Check for smoothing parameters in the CONFIG file */
-  astMapGet0I( kmap, "BOXCAR", &boxcar);
+  smf_get_nsamp( kmap, "BOXCAR", res->sdata[0], &boxcar, status );
   if( boxcar > 0 ) {
     do_boxcar = 1;
     msgSeti("BOX",boxcar);
@@ -644,7 +643,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Use damped boxcar for smoothing width */
   astMapGet0D( kmap, "BOXCARD", &boxcard);
-  boxcar = (int) boxcard;
+  boxcar = (dim_t) boxcard;
 
   /* Check for minimum boxcar width*/
   astMapGet0I( kmap, "BOXMIN", &boxmin);
@@ -987,7 +986,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       }
 
       /* boxcar smooth if desired */
-      if( do_boxcar ) smf_tophat1D( model_data, ntslice, boxcar, NULL, 0,
+      if( do_boxcar ) smf_tophat1D( model_data, ntslice, (int) boxcar, NULL, 0,
                                     0.0, status );
 
       /* Now try to fit the remaining bolometer data to the new common mode

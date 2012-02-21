@@ -705,7 +705,7 @@
 *       threshold. [0]
 *     COM.BOXCAR = INTEGER
 *       If COM model component specified, boxcar smooth by this number of
-*       samples before removing it. [0]
+*       samples (if positive) or seconds (if negative) before removing it. [0]
 *     COM.BOXFACT = REAL
 *       If specified, reduce length of boxcar filter after each iteration by
 *       this factor. [0]
