@@ -288,7 +288,6 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, double *template,
    int ib_hi;
    int ib_lo;
    int ireason;
-   int ival;
    int iworker;
    int nbad;
    int nboff;
@@ -386,7 +385,7 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, double *template,
    }
 
 /* FIT_BOX defaults to GAIN_BOX (it should be null in the defaults file). */
-   if( smf_get_nsamp( keymap, "FIT_BOX", data, &flt_box, status ) > 0.0 ) {
+   if( smf_get_nsamp( keymap, "FIT_BOX", data, &fit_box, status ) > 0.0 ) {
       if( fit_box < gain_box && *status == SAI__OK ) {
          *status = SAI__ERROR;
         msgSeti( "F", (int) fit_box );
