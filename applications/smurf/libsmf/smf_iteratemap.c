@@ -386,7 +386,8 @@
 *        re-run smf_iteratemap a second time if required.
 *        - Ensure all AST objects created in this function are deleted before leaving.
 *     2012-02-22 (DSB):
-*        Refactor j-loop that puts AST back into the residuals. Ticket #932.
+*        - Refactor j-loop that puts AST back into the residuals. Ticket #932.
+*        - Allow fakemap to have arbitrary pixel bounds. Ticket #930.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -473,7 +474,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      size_t *numcnvg, int *status ) {
 
   /* Local Variables */
-  AstKeyMap *astkmap=NULL;      /* keymap for AST model */
   int bolomap=0;                /* If set, produce single bolo maps */
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
@@ -1159,42 +1159,19 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   /* Load in the fakemap */
   if( fakemap && (*status==SAI__OK) ) {
-    Grp *fname=NULL;
-    int nfdims;
-    int fdims[NDF__MXDIM];
-    int nmap;
+    int nmap, tndf;
     void *ptr;
-
     msgOutf( "", FUNC_NAME ": loading external fakemap `%s'", status, fakemap );
 
-    fname = grpNew( "fakemapfilename", status );
-    grpPut1( fname, fakemap, 0, status );
-
-    ndgNdfas( fname, 1, "READ", &fakendf, status );
-    ndfDim( fakendf, NDF__MXDIM, fdims, &nfdims, status );
-
-    /* Ensure that the map dimensions are correct */
-    if( *status == SAI__OK ) {
-      if( !((nfdims == 2) ||
-            ((nfdims == 3) && (fdims[2] == 1))) ) {
-        *status = SAI__ERROR;
-        errRepf( "", FUNC_NAME
-                 ": supplied fakemap %s is not 2-dimensional!",
-                 status, fakemap );
-      } else if((fdims[0] != (ubnd_out[0]-lbnd_out[0]+1)) ||
-                (fdims[1] != (ubnd_out[1]-lbnd_out[1]+1))) {
-        *status = SAI__ERROR;
-        errRepf( "", FUNC_NAME ": supplied fakemap %s does not have the "
-                 "required dimensions %i x %i", status, fakemap,
-                 ubnd_out[0]-lbnd_out[0]+1, ubnd_out[1]-lbnd_out[1]+1 );
-      }
-    }
+    /* Open the NDF, get a section from it matching the bounds of the
+       output map, then close the original NDF - retaining the section. .  */
+    ndfFind( NULL, fakemap, &tndf, status );
+    ndfSect( tndf, 2, lbnd_out, ubnd_out, &fakendf, status );
+    ndfAnnul( &tndf, status );
 
     /* Map the data as double precision */
     ndfMap( fakendf, "DATA", "_DOUBLE", "READ", &ptr, &nmap, status );
     fmapdata = ptr;
-
-    if( fname ) grpDelet( &fname, status );
   }
 
 
