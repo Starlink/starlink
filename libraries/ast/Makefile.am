@@ -601,9 +601,9 @@ libast_la_SOURCES = \
     $(GRP_F_INCLUDE_FILES) \
     ast_err.h
 
-# Ensure libast links against libraries containing functions used within 
-# libast. If AST is configured --with-external-pal, then the internal 
-# libast_pal library will be empty, and we link to an external PAL 
+# Ensure libast links against libraries containing functions used within
+# libast. If AST is configured --with-external-pal, then the internal
+# libast_pal library will be empty, and we link to an external PAL
 # library instead.
 if EXTERNAL_PAL
 libast_la_LIBADD = $(libdir)/libpal.la $(libdir)/libast_wcslib.la \
@@ -708,12 +708,15 @@ ast.h: $(AST_H_FILES) ast_err.h makeh config.h
 # It's most straightforward to build it at the beginning.
 BUILT_SOURCES = AST_ERR ast_err.h version.h
 
-#  Form second links to the main object library (static and shared). This is
-#  used when a second pass through the library is needed during linking.
-#  Do not forget to change the contents of the libast_pass2.la file to refer
-#  to the pass2 libraries rather than the original libraries. Use target
-#  install-exec-hook rather than install-exec-local so that the soft links
-#  and files are created *after* the main library has been installed.
+#  Form a second link to the main object library (static and shared). This
+#  is used when a second pass through the library is needed during linking
+#  to resolve references made within other AST libraries (e.g. the grf
+#  modules, etc), to functions defined within libast (e.g. memory management
+#  and error reporting functions). Do not forget to change the contents of
+#  the libast_pass2.la file to refer to libast_pass2.* rather than libast.*.
+#  Use target install-exec-hook rather than install-exec-local so that the
+#  soft links and files are created *after* the main library has been
+#  installed.
 install-exec-hook: libast.la
 	$(mkdir_p) $(DESTDIR)$(libdir)
 	cd $(DESTDIR)$(libdir); \
@@ -725,7 +728,7 @@ install-exec-hook: libast.la
 	done; \
 	if test -f "libast.la"; then \
 	   if test -f "libast_pass2.la"; then rm "libast_pass2.la"; fi; \
-	   sed -e 's/libast/libast_pass2/g' libast.la > libast_pass2.la; \
+	   sed -e 's/libast\./libast_pass2\./g' libast.la > libast_pass2.la; \
 	fi
 
 # Make pre-distribution files.  These are files which are required for
