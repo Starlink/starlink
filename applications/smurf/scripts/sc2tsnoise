@@ -70,14 +70,14 @@ if ( ($#argv < 3) || ($#argv > 10) ) then
     echo " o normally the <dimmconfig> parameter for -config will probably"
     echo "   require the redirection symbol, e.g. -config ^dimmconfig.lis."
     echo "   The default is to use common-mode cleaning:"
-    echo "   ^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise_com.lis"
+    echo "   ^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise.lis"
     echo " "
     echo "example:"
     echo " "
     echo "    ls -d /jcmtdata/raw/scuba2/s4?/2011????/0???? > obsdir.txt"
     echo " "
     echo "    sc2tsnoise obsdir.txt effnep_450_2011.txt out \\"
-    echo "      -config ^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise.lis"
+    echo "      -config ^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise_nocom.lis"
     echo " "
 
     goto done
@@ -97,7 +97,7 @@ set writepspec = 0   # write out power spectra?
 set cleanout = 0     # clean outdir before starting?
 
 # use common-mode cleaning as the default
-set dimmconfig = "^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise_com.lis"
+set dimmconfig = "^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise.lis"
 
 # analyze first 2000 samples by default
 set len_default = 2000

@@ -1,81 +1,31 @@
-^$STARLINK_DIR/share/smurf/dimmconfig.lis
+^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise_nocom.lis
 
-# *** Specialized config for CALCNOISE ***
+# *** Specialized config for CALCNOISE with common-mode subtraction ***
 #
-# The purpose of CALCNOISE is to estimate the white noise level of the
-# bolometers using cleaning steps that are similar to those used by
-# MAKEMAP. This configuration ensures that DC step correction is
-# applied.  A low-order polynomial is also removed from the
-# time-series to avoid ringing in the FFTs. This method is quite
-# robust for short time-series (less than 30 seconds or so) in the
-# sense that it will give a decent answer for even poor data sets
-# although there is a potential for the answer to be a bit high due to
-# correlated noise getting through the polynomial baseline removal in
-# the measurement band (default 2--10 Hz). This is probably the best
-# method to use in the pipeline. Alternative methods for removing
-# correlated noise are using common-mode subtraction (see
-# dimmconfig_calcnoise_com.lis) and PCA cleaning (see
-# dimmconfig_calcnoise_pca.lis). We don't turn off the excessively
-# noisy bolometers since we want to measure the properties of as many
-# bolometers as possible rather than make a map. We also turn off
-# flagging of data taken while the telescope is moving too fast or too
-# slow.
+# This variant on the CALCNOISE cleaning configuration uses
+# common-mode subtraction instead of polynomials. We don't let the
+# common-mode removal flag outlier bolometers because it is not very
+# robust for short time-series (there isn't much low-frequency
+# structure for it to fit), so we introduce clipping of extremely
+# noisy bolometers prior to the common-mode removal. We also turn off
+# boxcar smoothing so that the common-mode removal has the potential
+# to remove correlated noise at higher frequencies (i.e., in the white
+# noise measurement band of 2--10 Hz).
 #
 # ***********************************************************************
 
-# Remove baseline drift
-order = 3
+# Just remove the mean
+order = 0
 
-# turn off noise clipping during pre-processing since CALCNOISE has its
-# own ADAM parameters to control clipping
-noisecliphigh = 0
-noisecliplow = 0
+# clip really noisy bolos prior to common-mode removal
+noiseclipprecom=1
+noisecliphigh=10
 
-# don't flag data where the telescope is moving slowly
-450.flagslow = 0
-450.flagfast = 0
-850.flagslow = 0
-850.flagfast = 0
+# use common-mode removal
+compreprocess=1
 
-# ensure that no other filtering happens
-modelorder = <undef>
+# don't flag outlier bolos
+com.noflag=1
 
-450.apod = 0
-450.zeropad = 0
-450.filt_edgelow = 0
-450.filt_edgehigh = 0
-450.filt_edge_smallscale = 0
-450.filt_edge_largescale = 0
-450.filt_notchlow = <undef>
-450.filt_notchhigh = <undef>
-450.whiten = 0
-
-850.apod = 0
-850.zeropad = 0
-850.filt_edgelow = 0
-850.filt_edgehigh = 0
-850.filt_edge_smallscale = 0
-850.filt_edge_largescale = 0
-850.filt_notchlow = <undef>
-850.filt_notchhigh = <undef>
-850.whiten = 0
-
-450.flt.apod = 0
-450.flt.zeropad = 0
-450.flt.filt_edgelow = 0
-450.flt.filt_edgehigh = 0
-450.flt.filt_edge_smallscale = 0
-450.flt.filt_edge_largescale = 0
-450.flt.filt_notchlow = <undef>
-450.flt.filt_notchhigh = <undef>
-450.flt.whiten = 0
-
-850.flt.apod = 0
-850.flt.zeropad = 0
-850.flt.filt_edgelow = 0
-850.flt.filt_edgehigh = 0
-850.flt.filt_edge_smallscale = 0
-850.flt.filt_edge_largescale = 0
-850.flt.filt_notchlow = <undef>
-850.flt.filt_notchhigh = <undef>
-850.flt.whiten = 0
+# don't smooth the common-mode
+com.boxcar=0
