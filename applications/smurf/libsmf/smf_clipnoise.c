@@ -144,7 +144,7 @@ void smf_clipnoise( double *clipdata, size_t ndata, int cliplog,
       msgOutif(MSG__NORM, "",
                "Noise clipping disabled as there are too few bolometers",
                status );
-      return;
+      goto CLEANUP;
     }
 
     sigma *= 1.85;
@@ -190,6 +190,7 @@ void smf_clipnoise( double *clipdata, size_t ndata, int cliplog,
     /* Return number of clipped values */
     if( nclipped ) *nclipped = nhigh+nlow;
 
+  CLEANUP:
     /* Free temporary buffer */
     if( work ) work = astFree( work );
   }
