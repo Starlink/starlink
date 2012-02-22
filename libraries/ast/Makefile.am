@@ -601,6 +601,18 @@ libast_la_SOURCES = \
     $(GRP_F_INCLUDE_FILES) \
     ast_err.h
 
+# Ensure libast links against libraries containing functions used within 
+# libast. If AST is configured --with-external-pal, then the internal 
+# libast_pal library will be empty, and we link to an external PAL 
+# library instead.
+if EXTERNAL_PAL
+libast_la_LIBADD = $(libdir)/libpal.la $(libdir)/libast_wcslib.la \
+                   $(libdir)/libast_levmar.la
+else
+libast_la_LIBADD = $(libdir)/libast_pal.la $(libdir)/libast_wcslib.la \
+                   $(libdir)/libast_levmar.la
+endif
+
 # AST_PAR is really part of GRP_F_INCLUDE_FILES, but it must not be
 # distributed, so list it separately.
 nodist_libast_la_SOURCES = \

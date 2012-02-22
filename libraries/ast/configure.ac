@@ -58,6 +58,7 @@ if test "$external_pal" = "1"; then
 else
    AC_SUBST( LIBPAL, "" )
 fi
+AM_CONDITIONAL(EXTERNAL_PAL, test x$external_pal = x1)
 
 
 #   Checks for programs
