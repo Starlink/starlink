@@ -113,7 +113,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   size_t bol;               /* bolometer index */
   double * bolval = NULL;   /* Pointer to bolvald smfData */
   double * bolvar = NULL;   /* Pointer to bolvald variance */
-  const double CLIP = 3.0;  /* Sigma clipping for polynomial fit */
+  const double CLIP = 10.0;  /* Sigma clipping for polynomial fit */
   double * coptr = NULL;    /* pointer to coefficients data array */
   double * corrs = NULL;    /* correlation coefficients for each bolometer */
   double corr_thresh = 0.0; /* threshold for correlation coefficient thresholding */
@@ -266,9 +266,22 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
         double gain;
         double offset;
         double corr;
+        int usevar = 0;
 
-        smf_fit_poly1d( order, nrgood, CLIP, goodht, scan, scanvar, NULL,
-                        scoeff, scoeffvar, poly, &nused, status);
+        /* if all the variances are identical we do an unweighted fit.
+         This is mainly for TABLE data after writing to flat files where
+         we will not have any variance */
+        refvar = scanvar[0];
+        for (i=0; i<nrgood; i++) {
+          double mydiff = fabs(scanvar[i] - refvar);
+          if (mydiff > 1e-12) {
+            usevar = 1;
+            break;
+          }
+        }
+
+        smf_fit_poly1d( order, nrgood, CLIP, goodht, scan, (usevar ? scanvar : NULL),
+                        NULL, scoeff, scoeffvar, poly, &nused, status);
 
         /* and calculate the fitted polynomial */
         if (polybol) {
