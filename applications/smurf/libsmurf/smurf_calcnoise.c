@@ -29,8 +29,10 @@
 *  ADAM Parameters:
 *     CONFIG = GROUP (Read)
 *          Specifies values for the cleaning parameters. If the string
-*          "def" (case-insensitive) or a null (!) value is supplied, a
+*          "def" (case-insensitive) is supplied, a
 *          set of default configuration parameter values will be used.
+*          CONFIG=! disables all cleaning and simply applies apodisation.
+*          This is generally not a recommended use of calcnoise.
 *
 *          The supplied value should be either a comma-separated list of
 *          strings or the name of a text file preceded by an up-arrow
