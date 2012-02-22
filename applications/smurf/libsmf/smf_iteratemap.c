@@ -385,12 +385,14 @@
 *        - Ensure the supplied KeyMap is unchanged on exit, so that we can
 *        re-run smf_iteratemap a second time if required.
 *        - Ensure all AST objects created in this function are deleted before leaving.
+*     2012-02-22 (DSB):
+*        Refactor j-loop that puts AST back into the residuals. Ticket #932.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2012 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006-2011 University of British Columbia.
 *     All Rights Reserved.
@@ -1902,67 +1904,72 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             smf_model_dataOrder( &dat, NULL, i, SMF__RES|SMF__LUT|SMF__QUA,
                                  res[i]->sdata[0]->isTordered, status );
 
-            /* Outer loop twice: (inner loop over subgroup index (subarray))
-               0: place last map estimate (AST) into RES
-               1: rebin and calculate the new map */
+            /* Loop over subgroup index (subarray), placing last map
+               estimate (AST) into RES. */
+            for( idx=0; idx<res[i]->ndat; idx++ ) {
 
-            for( j=0; j<2; j++ ) {
-              /* Loop over subgroup index (subarray) */
-              for( idx=0; idx<res[i]->ndat; idx++ ) {
+              res_data = (res[i]->sdata[idx]->pntr)[0];
+              lut_data = (lut[i]->sdata[idx]->pntr)[0];
+              qua_data = (qua[i]->sdata[idx]->pntr)[0];
 
-                res_data = (res[i]->sdata[idx]->pntr)[0];
-                lut_data = (lut[i]->sdata[idx]->pntr)[0];
-                qua_data = (qua[i]->sdata[idx]->pntr)[0];
+              smf_get_dims( res[i]->sdata[idx], NULL, NULL, NULL, NULL,
+                            &dsize, NULL, NULL, status );
 
-                smf_get_dims( res[i]->sdata[idx], NULL, NULL, NULL, NULL,
-                              &dsize, NULL, NULL, status );
-
-                if( j == 0 ) {
-                  /* Add last iter. of astronomical signal back in to residual.
-                     Note that if this is the first iteration we do not yet
-                     have a map estimate so we skip this step (in multiple
-                     chunk case thismap will still contain the old map from
-                     the previous chunk). */
-                  if( iter > 0 ) {
-                    for( k=0; k<dsize; k++ ) {
-                      if( !(qua_data[k]&SMF__Q_MOD) &&
-                          (lut_data[k]!=VAL__BADI) ) {
-                        double ast_data = thismap[lut_data[k]];
-                        if( ast_data != VAL__BADD ) {
-                          res_data[k] += ast_data;
-                        }
-                      }
+              /* Add last iter. of astronomical signal back in to residual.
+                 Note that if this is the first iteration we do not yet
+                 have a map estimate so we skip this step (in multiple
+                 chunk case thismap will still contain the old map from
+                 the previous chunk). */
+              if( iter > 0 ) {
+                for( k=0; k<dsize; k++ ) {
+                  if( !(qua_data[k]&SMF__Q_MOD) &&
+                      (lut_data[k]!=VAL__BADI) ) {
+                    double ast_data = thismap[lut_data[k]];
+                    if( ast_data != VAL__BADD ) {
+                      res_data[k] += ast_data;
                     }
                   }
-                } else {
-                  /* Rebin to make new map estimate */
-                  if( havenoi ) {
-                    var_data = (dat.noi[i]->sdata[idx]->pntr)[0];
-                  } else {
-                    var_data = NULL;
-                  }
-
-                  /* Setup rebin flags */
-                  rebinflags = 0;
-                  if( (i == 0) && (idx == 0) ) {
-                    /* First call to rebin clears the arrays */
-                    rebinflags = rebinflags | AST__REBININIT;
-                  }
-
-                  if( (i == nfilegroups-1) && (idx == res[i]->ndat-1) ) {
-                    /* Final call to rebin re-normalizes */
-                    rebinflags = rebinflags | AST__REBINEND;
-                  }
-
-                  /* Rebin the residual + astronomical signal into a map */
-                  smf_rebinmap1( res[i]->sdata[idx],
-                                 dat.noi ? dat.noi[i]->sdata[idx] : NULL,
-                                 lut_data, 0, 0, 0, NULL, 0, SMF__Q_GOOD,
-                                 varmapmethod, rebinflags, thismap, thisweight,
-                                 thisweightsq, thishits, thisvar, msize,
-                                 &scalevar, status );
                 }
               }
+            }
+
+            /* Loop over subgroup index (subarray) again. This time rebin and
+               calculate the new map. */
+            for( idx=0; idx<res[i]->ndat; idx++ ) {
+
+              res_data = (res[i]->sdata[idx]->pntr)[0];
+              lut_data = (lut[i]->sdata[idx]->pntr)[0];
+              qua_data = (qua[i]->sdata[idx]->pntr)[0];
+
+              smf_get_dims( res[i]->sdata[idx], NULL, NULL, NULL, NULL,
+                            &dsize, NULL, NULL, status );
+
+              /* Rebin to make new map estimate */
+              if( havenoi ) {
+                var_data = (dat.noi[i]->sdata[idx]->pntr)[0];
+              } else {
+                var_data = NULL;
+              }
+
+              /* Setup rebin flags */
+              rebinflags = 0;
+              if( (i == 0) && (idx == 0) ) {
+                /* First call to rebin clears the arrays */
+                rebinflags = rebinflags | AST__REBININIT;
+              }
+
+              if( (i == nfilegroups-1) && (idx == res[i]->ndat-1) ) {
+                /* Final call to rebin re-normalizes */
+                rebinflags = rebinflags | AST__REBINEND;
+              }
+
+              /* Rebin the residual + astronomical signal into a map */
+              smf_rebinmap1( res[i]->sdata[idx],
+                             dat.noi ? dat.noi[i]->sdata[idx] : NULL,
+                             lut_data, 0, 0, 0, NULL, 0, SMF__Q_GOOD,
+                             varmapmethod, rebinflags, thismap, thisweight,
+                             thisweightsq, thishits, thisvar, msize,
+                             &scalevar, status );
             }
 
             /*** TIMER ***/
