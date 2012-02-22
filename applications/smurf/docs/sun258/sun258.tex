@@ -1809,11 +1809,10 @@ below:
 \item[1. Concatenate:] The \makemap\ task typically takes raw SCUBA-2
   data as its input. The best maps are produced by first concatenating
   as much data from a given observation as possible into single
-  continuous data streams in memory. This step is optional, and is
-  controlled by the \cparam{MEMITER} and \cparam{MAXLEN} configuration
-  file parameters, as well as the \makemap\ parameter
-  \aparam{MAXMEM}. When the files are concatenated, it is also
-  possible to add extra padding at the beginning and end of the
+  continuous data streams in memory. This step is controlled by the
+  \cparam{MAXLEN} configuration file parameter, as well as the \makemap\
+  parameter \aparam{MAXMEM}. When the files are concatenated, it is
+  also possible to add extra padding at the beginning and end of the
   data streams to facilitate filtering (see the \cparam{PAD} and
   \cparam{ZEROPAD} configuration file parameters). This operation is
   equivalent to using the \concat\ task.
@@ -1911,39 +1910,6 @@ below:
 
 \end{description}
 
-\subsubsection{Processing time}
-
-The \cparam{MEMITER} parameter (Table \ref{tab:dimmconfig}) influences
-the time it takes the iterative algorithm to generate a solution. It
-determines whether:
-\begin{enumerate}
-\item Iterations are performed in memory (\cparam{MEMITER}=1)
-\item Component values are written to a file after each iteration
-  (\cparam{MEMITER}=0)
-\end{enumerate}
-
-For the first option, the algorithm loads as many data files as
-possible into memory and processes the data in a single, continuous
-chunk. Once the algorithm has estimated a map, it saves the map and
-loads the next continuous chunk of data. When all the data are
-processed, the routine combines the maps from each continuous chunk
-into one image.
-
-For the second option, the algorithm loads one data file (or file
-chunk) into memory, processes the file, saves the map, and moves onto
-the next file. This method uses less memory, but it takes much longer,
-because of the extra time spent writing files to disk. It will also
-give poorer results since operations like filtering require
-apodization and padding at the ends of each data stream to minimize
-ringing. By processing small data files a large fraction of the data
-may not be used.
-
-If your computer has enough random access memory (RAM), it is
-recommended that \cparam{MEMITER} is set to 1 in the configuration
-file, and allow the iterative algorithm to process as much data as
-possible. However, the size of the continuous chunk can still be
-limited by using the \makemap\ parameter \aparam{MAXMEM}.
-
 \subsubsection{Example image}
 
 \begin{figure}[htb]
@@ -2018,9 +1984,6 @@ varmapmethod     & Method of estimating variance map. If equal to zero, then use
                  & spread of values from the time-series (i.e. the raw data). If equal & \\
                  & to 1, then it samples the variance of data that land in each output & \\
                  & map pixel.                                                          & \\
-memiter          & Either perform the iterations in memory (=1) or write the           &    1 \\
-                 & component values to a file (=0).                                    & \\
-deldimm          & Delete `.dimm' (temporary model) files upon completion            & 1 (do delete)\\
 maxlen           & If performing the iterations in memory, this is the maximum         &    0 \\
                  & length (seconds) for concatenated data. If equal to zero, then      & \\
                  & attempt to concatenate entire continuous chunks.                    & \\

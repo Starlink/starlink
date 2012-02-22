@@ -382,9 +382,6 @@
 *     CHITOL = REAL
 *       Maximum difference in chi^2 between subsequent iterations required
 *       to stop if NUMITER is negative. [1e-3]
-*     DELDIMM = LOGICAL
-*       If 1 delete temporary files produced by the dynamic iterative
-*       map maker when memoiter=0 (with a ".dimm" extension). [1]
 *     DOWNSAMPSCALE = REAL
 *       The sample rate of the data need only ensure that the angular scale
 *       is adequately sampled given the telescope slew rate. Usually the
@@ -443,18 +440,7 @@
 *       If true each iteration is written to the output file in the
 *       .MORE.SMURF.ITERMAPS extension. [0]
 *     MAXLEN = REAL
-*       Maximum number of seconds of data to be loaded at once if
-*       MEMITER=1.  [0]
-*     MEMITER = LOGICAL
-*       If 1, load data and perform iterations entirely in memory
-*       (limited by MAXMEM ADAM parameter, and MAXLEN Config
-*       parameter). Otherwise visit each file on disk for each
-*       iteration. This latter choice is not memory limited, but much
-*       slower, and will not produce as good a final map, because
-*       discontinuities exist at each file boundary (since, for
-*       example, operations like FFT filtering will pad part of the
-*       boundary around file edges). Creates temporary files with a ".dimm"
-*       extension (see DELDIMM). [1]
+*       Maximum number of seconds of data to be loaded at once. [0]
 *     MODELORDER( ) = STRING
 *       An ordered list of model components to be fit by the iterative
 *       map-maker, e.g. "(com,gai,ext,ast,flt,noi)". Each component has a
@@ -470,12 +456,8 @@
 *         - flt = apply filter to time streams
 *         - noi = estimate time-domain variance
 *
-*       If MEMITER=0 files will be produced of the form "[input
-*       filename]_[model component].dimm", but will be deleted upon
-*       completion of the map if DELDIMM is set. Set EXPORTNDF
-*       to produce Starlink ".sdf" files that can be viewed using
-*       tools such as KAPPA and Gaia regardless of the value of MEMITER.
-*       [(com,gai,ext,flt,ast,noi)]
+*       Set EXPORTNDF to produce Starlink ".sdf" files that can be viewed
+*       using tools such as KAPPA and Gaia. [(com,gai,ext,flt,ast,noi)]
 *     NOEXPORTSETBAD = LOGICAL
 *       If true, the output models from the map-maker will not be modified
 *       to use bad values wherever the bolometer is known to be bad. [0]

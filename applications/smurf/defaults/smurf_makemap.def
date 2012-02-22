@@ -44,9 +44,6 @@ tstep = -0.5       # negative, so interpreted as seconds
 chitol = <undef>
 maptol = <undef>
 
-memiter = 1
-deldimm = 1
-
 bolomap = 0
 itermap = 0
 shortmap = 0

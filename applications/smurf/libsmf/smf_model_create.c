@@ -16,12 +16,11 @@
 *     smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 *                       smfArray **iarray, const smfArray *darks,
 *                       const smfArray *bbms, const smfArray* flatramps,
-*                       AstKeyMap * heateffmap, const smfArray *noisemaps, dim_t nchunks,
-*                       smf_modeltype mtype, int isTordered,
+*                       AstKeyMap * heateffmap, const smfArray *noisemaps,
+*                       dim_t nchunks, smf_modeltype mtype, int isTordered,
 *                       AstFrameSet *outfset, int moving, int *lbnd_out,
-*                       int *ubnd_out, smfGroup **mgroup, int nofile,
-*                       int leaveopen, smfArray **mdata, AstKeyMap *keymap,
-*                       int *status )
+*                       int *ubnd_out, smfGroup **mgroup, smfArray **mdata,
+*                       AstKeyMap *keymap, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -65,16 +64,10 @@
 *        (if outfset specified)
 *     mgroup = smfGroup ** (Returned)
 *        Pointer to smfGroup pointer that will contain model file names
-*     nofile = int (Given)
-*        If set don't create a file on disk - just create the smfArray. In
-*        this case leaveopen is implied (and overrides user supplied value)
-*     leaveopen = int (Given)
-*        If true, don't close files once created and store in mdata
 *     mdata = smfArray ** (Given and Returned)
-*        Container to store data if leaveopen is set: array of
-*        smfArray pointers. The top-level array must already be
-*        allocated (same number of elements as ngroups in igroup), but
-*        the individual smfArrays get allocated here.
+*        Container to store data: array of smfArray pointers. The top-level
+*        array must already be allocated (same number of elements as ngroups
+*        in igroup), but the individual smfArrays get allocated here.
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
 *     status = int* (Given and Returned)
@@ -211,6 +204,9 @@
 *        Added exportlonlat to API.
 *     2012-02-20 (DSB):
 *        Removed exportlonlat from API.
+*     2012-02-20 (DSB):
+*        Removed "nofile" and "leaveopen" as memiter=0 case is no
+*        longer supported.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -273,25 +269,21 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
                        AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
-                       int nofile, int leaveopen, smfArray **mdata,
-                       AstKeyMap *keymap, int *status ) {
+                       smfArray **mdata, AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
-  void *buf=NULL;               /* Pointer to total container buffer */
   size_t buflen = 0;            /* datalen + headlen */
   int copyinput=0;              /* If set, container is copy of input */
   smfData *data = NULL;         /* Data struct for file */
   size_t datalen=0;             /* Size of data buffer in bytes */
   void *dataptr=NULL;           /* Pointer to data portion of buffer */
   smf_extmeth extmeth;          /* method of extinction correction */
-  int fd=0;                     /* File descriptor */
   int flag=0;                   /* Flag */
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
   dim_t gain_box=0;             /* No. of time slices in a block */
   smfDIMMHead head;             /* Header for the file */
   size_t headlen=0;             /* Size of header in bytes */
-  void *headptr=NULL;           /* Pointer to header portion of buffer */
   dim_t i;                      /* Loop counter */
   dim_t ibase;                  /* Base offset */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
@@ -299,7 +291,6 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   int init_mem = 0;             /* Do we initialise the memory ? */
   size_t isize=0;               /* Number of files in input group */
   int is_initialised = 0;       /* Is buffer initialised ? */
-  int ival;                     /* Integer value */
   dim_t j;                      /* Loop counter */
   size_t k;                     /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
@@ -345,8 +336,6 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
              "iarray specified but invalid number of chunks, ^NCHUNKS",
              status);
     } else {
-      /* Since we're using smfArrays as template, no associated files */
-      nofile = 1;
 
       /* We have at most SMF__MXSMF related objects (subarrays) at each time
          chunk */
@@ -360,9 +349,6 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
     nchunks = igroup->ngroups;
     nrel = igroup->nrelated;
   }
-
-  /* If nofile is set, leaveopen=0 is meaningless */
-  if( nofile ) leaveopen = 1;
 
   /* See if a separate COM model is to be created for each subarray. */
   astMapGet0A( keymap, "COM", &kmap );
@@ -902,56 +888,14 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
              important for the mmap case */
           is_initialised = 0;
 
-          if( nofile ) {
-            /* If there is no file associated with the data, use calloc
-               to allocate memory. It's much faster than malloc+memset
-               for very large blocks so we initialise here rather than
-               later. */
-            if( init_mem ) {
-               dataptr = astCalloc( datalen, 1 );
-            } else {
-               dataptr = astMalloc( datalen );
-            }
-            is_initialised = init_mem;
-
+          /* Use calloc to allocate memory. It's much faster than malloc+memset
+             for very large blocks so we initialise here rather than later. */
+          if( init_mem ) {
+             dataptr = astCalloc( datalen, 1 );
           } else {
-            /* If we are writing a file create and map it here */
-
-            if( (fd = open( name, O_RDWR | O_CREAT | O_TRUNC,
-                            S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH )) == -1 ) {
-              *status = SAI__ERROR;
-              errRep( FUNC_NAME, "Unable to open model container file",
-                      status );
-            }
-
-            /* First truncate the file to make it the correct size, and then
-               map it (without the ftruncate bus errors are generated under
-               linux when the memory is subsequently accessed...) */
-
-            if( *status == SAI__OK ) {
-              if( ftruncate( fd, buflen ) == -1 ) {
-                *status = SAI__ERROR;
-                errRep( FUNC_NAME, "Unable to re-size container file",
-                        status );
-              } else if( (buf = mmap( 0, buflen,
-                                      PROT_READ | PROT_WRITE,
-                                      MAP_SHARED, fd, 0 ) ) == MAP_FAILED ) {
-                *status = SAI__ERROR;
-                errRep( FUNC_NAME, "Unable to map model container file",
-                        status );
-              }
-            }
-
-            if( *status == SAI__OK ) {
-              headptr = buf;
-              dataptr = (char *)buf + headlen;
-
-              /* Fill the header. memset to 0 first since much of this space is
-                 padding to make it a multiple of the page size */
-              memset( headptr, 0, headlen );
-              memcpy( headptr, &head, sizeof(head) );
-            }
+             dataptr = astMalloc( datalen );
           }
+          is_initialised = init_mem;
 
           /* Initialize the data buffer */
           if( *status == SAI__OK ) {
@@ -1204,68 +1148,39 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
           if( *status == SAI__OK ) {
 
-            /* If leaveopen set, pack the data into a smfArray */
-            if( leaveopen ) {
+            /* Pack the data into a smfArray. If this is the first
+               element of the subgroup create the smfArray */
+            if( j == 0 ) {
+              mdata[i] = smf_create_smfArray( status );
+            }
 
-              /* If this is the first element of the subgroup create
-                 the smfArray */
-              if( j == 0 ) {
-                mdata[i] = smf_create_smfArray( status );
-              }
+            /* Create a smfData for this element of the subgroup */
+            flag = SMF__NOCREATE_DA;
 
-              /* Create a smfData for this element of the subgroup */
-              flag = SMF__NOCREATE_DA;
+            data = smf_create_smfData( flag, status );
 
-              data = smf_create_smfData( flag, status );
+            if( *status == SAI__OK ) {
+              data->qfamily = head.data.qfamily;
+              data->isFFT = head.data.isFFT;
+              data->isTordered = head.data.isTordered;
+              data->dtype = head.data.dtype;
+              data->ndims = head.data.ndims;
+              memcpy( data->dims, head.data.dims, sizeof( head.data.dims ) );
+              memcpy( data->lbnd, head.data.lbnd, sizeof( head.data.lbnd ) );
+              data->hdr->steptime = head.hdr.steptime;
 
-              if( *status == SAI__OK ) {
-                data->qfamily = head.data.qfamily;
-                data->isFFT = head.data.isFFT;
-                data->isTordered = head.data.isTordered;
-                data->dtype = head.data.dtype;
-                data->ndims = head.data.ndims;
-                memcpy( data->dims, head.data.dims, sizeof( head.data.dims ) );
-                memcpy( data->lbnd, head.data.lbnd, sizeof( head.data.lbnd ) );
-                data->hdr->steptime = head.hdr.steptime;
+              /* Data pointer points to mmap'd memory AFTER HEADER */
+              data->pntr[0] = dataptr;
 
-                /* Data pointer points to mmap'd memory AFTER HEADER */
-                data->pntr[0] = dataptr;
+              /* Copy the DIMM filename into the smfFile. Even though
+                 there may not be an associated file on disk we store
+                 the name here in case we wish to export the data
+                 to an NDF file at a later point. */
+              one_strlcpy( data->file->name, name, sizeof(data->file->name),
+                           status );
 
-                /* Store the file descriptor to enable us to unmap when we
-                   close */
-                if( !nofile ) {
-                  data->file->fd = fd;
-                }
-
-                /* Copy the DIMM filename into the smfFile. Even though
-                   there may not be an associated file on disk we store
-                   the name here in case we wish to export the data
-                   to an NDF file at a later point. */
-                one_strlcpy( data->file->name, name, sizeof(data->file->name),
-                             status );
-
-                /* Add the smfData to the smfArray */
-                smf_addto_smfArray( mdata[i], data, status );
-              }
-
-            } else if (!nofile) {
-
-              /* If leaveopen not set (and there is a file) write buffer to
-                 file and close container */
-
-              if( msync( buf, buflen, MS_ASYNC ) == -1 ) {
-                *status = SAI__ERROR;
-                errRep( FUNC_NAME, "Unable to sync model container file",
-                        status );
-              } else if( munmap( buf, buflen ) == -1 ) {
-                *status = SAI__ERROR;
-                errRep( FUNC_NAME, "Unable to unmap model container file",
-                        status );
-              } else if( close( fd ) == -1 ) {
-                *status = SAI__ERROR;
-                errRep( FUNC_NAME, "Unable to close model container file",
-                        status );
-              }
+              /* Add the smfData to the smfArray */
+              smf_addto_smfArray( mdata[i], data, status );
             }
           }
 

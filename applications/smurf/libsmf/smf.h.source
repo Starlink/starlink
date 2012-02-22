@@ -1405,8 +1405,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
                        AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
-                       int nofile, int leaveopen, smfArray **mdata,
-                       AstKeyMap *keymap, int *status );
+                       smfArray **mdata, AstKeyMap *keymap, int *status );
 
 void smf_model_createHdr( smfData *model, smf_modeltype type,
                           smfData *refdata, int *status );
