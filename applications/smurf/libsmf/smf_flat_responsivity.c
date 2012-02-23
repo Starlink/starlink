@@ -147,8 +147,6 @@
 #include "prm_par.h"
 #include "sae_par.h"
 
-#include "gsl/gsl_fit.h"
-
 size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
                                size_t order, const smfData * powvald, const smfData * bolvald,
                                smfData ** polyfit, int *status ) {
