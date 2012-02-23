@@ -1,3 +1,5 @@
+#if !defined( PAL_INCLUDED )  /* Include this file only once */
+#define PAL_INCLUDED
 /*
 *  Name:
 *     pal.c
@@ -290,5 +292,7 @@
 #include "sofa/zp.c"
 #include "sofa/zpv.c"
 #include "sofa/zr.c"
+
+#endif
 
 #endif

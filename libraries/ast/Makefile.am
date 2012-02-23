@@ -520,7 +520,8 @@ IAU_SOFA_FILES = \
 PAL_FILES = \
     COPYING.LIB \
     pal.c \
-    pal.h
+    pal.h \
+    sofa.h
 
 bin_SCRIPTS = ast_link
 dist_bin_SCRIPTS = ast_link_adam
@@ -656,7 +657,7 @@ libast_wcslib_la_SOURCES = proj.c wcstrig.c tpn.c
 #  Modules adapted from the levmar library.
 libast_levmar_la_SOURCES = levmar.c
 
-#  Modules supplied by tpoint.
+#  Positional astronomy libraries.
 libast_pal_la_SOURCES = $(PAL_FILES)
 
 # The following files are built by the targets in this makefile.

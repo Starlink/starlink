@@ -1010,6 +1010,8 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        Write out MJD-OBS in the timescale specified by any TIMESYS
 *        keyword in the FitsChan, and ensure the TIMESYS value is included
 *        in the output header.
+*     23-FEB-2012 (DSB):
+*        Use iauGd2gc in place of palGeoc where is saves some calculations.
 *class--
 */
 
@@ -1197,6 +1199,7 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 #include "timeframe.h"
 #include "keymap.h"
 #include "pal.h"
+#include "sofa.h"
 #include "slamap.h"
 #include "specframe.h"
 #include "dsbspecframe.h"
@@ -26507,8 +26510,7 @@ static int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
    double h;                /* Geodetic altitude of observer (metres) */
    double geolat;           /* Geodetic latitude of observer (radians) */
    double geolon;           /* Geodetic longitude of observer (radians) */
-   double r;                /* Distance (in AU) from earth axis */
-   double z;                /* Distance (in AU) above earth equator */
+   double xyz[3];           /* Geocentric position vector (in m) */
    int defdate;             /* Can the date keywords be defaulted? */
    int i;                   /* Character count */
    int isys;                /* Celestial coordinate system */
@@ -26715,11 +26717,10 @@ static int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
       geolat = astGetObsLat( skyfrm );
       h = astGetObsAlt( skyfrm );
       if( geolat != AST__BAD && geolon != AST__BAD && h != AST__BAD ) {
-         palGeoc( geolat, h, &r, &z );
-         r *= AST__AU;
-         SetItem( &(store->obsgeox), 0, 0, ' ', r*cos( geolon ), status );
-         SetItem( &(store->obsgeoy), 0, 0, ' ', r*sin( geolon ), status );
-         SetItem( &(store->obsgeoz), 0, 0, ' ', z*AST__AU, status );
+         iauGd2gc( 1, geolon, geolat, h, xyz );
+         SetItem( &(store->obsgeox), 0, 0, ' ', xyz[0], status );
+         SetItem( &(store->obsgeoy), 0, 0, ' ', xyz[1], status );
+         SetItem( &(store->obsgeoz), 0, 0, ' ', xyz[2], status );
       }
    }
    if( !astOK ) ret = 0;
@@ -26937,12 +26938,11 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
    double imagfreq;        /* Image sideband equivalent to the rest frequency (Hz) */
    double lbnd_s;          /* Lower bound on spectral axis */
    double pv;              /* Value of projection parameter */
-   double r;               /* Distance (in AU) from earth axis */
    double restfreq;        /* Rest frequency (Hz) */
    double ubnd_s;          /* Upper bound on spectral axis */
    double vsource;         /* Rel.vel. of source (m/s) */
    double xval;            /* Value of "X" system at reference point  */
-   double z;               /* Distance (in AU) above earth equator */
+   double xyz[3];          /* Geocentric position vector (in m) */
    double zsource;         /* Redshift of source */
    int *inperm;            /* Pointer to permutation array for input axes */
    int *outperm;           /* Pointer to permutation array for output axes */
@@ -27477,11 +27477,10 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
                   geolat = astGetObsLat( specfrm );
                   h = astGetObsAlt( specfrm );
                   if( geolat != AST__BAD && geolon != AST__BAD && h != AST__BAD ) {
-                     palGeoc( geolat, h, &r, &z );
-                     r *= AST__AU;
-                     SetItem( &(store->obsgeox), 0, 0, ' ', r*cos( geolon ), status );
-                     SetItem( &(store->obsgeoy), 0, 0, ' ', r*sin( geolon ), status );
-                     SetItem( &(store->obsgeoz), 0, 0, ' ', z*AST__AU, status );
+                     iauGd2gc( 1, geolon, geolat, h, xyz );
+                     SetItem( &(store->obsgeox), 0, 0, ' ', xyz[0], status );
+                     SetItem( &(store->obsgeoy), 0, 0, ' ', xyz[1], status );
+                     SetItem( &(store->obsgeoz), 0, 0, ' ', xyz[2], status );
                   }
                }
                if( astTestRestFreq( specfrm ) ) {

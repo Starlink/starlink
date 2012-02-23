@@ -1,3 +1,5 @@
+#if !defined( PAL2AST_INCLUDED )  /* Include this file only once */
+#define PAL2AST_INCLUDED
 /*
 *  Name:
 *     pal2ast.h
@@ -129,3 +131,4 @@
 #define PAL__SR    AST__PALSR
 
 
+#endif

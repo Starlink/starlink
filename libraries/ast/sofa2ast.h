@@ -1,3 +1,5 @@
+#if !defined( SOFA2AST_INCLUDED )  /* Include this file only once */
+#define SOFA2AST_INCLUDED
 /*
 *  Name:
 *     sofa2ast.h
@@ -242,4 +244,4 @@
 #define iauZpv	   astIauZpv
 #define iauZr      astIaunZr
 
-
+#endif
