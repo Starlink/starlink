@@ -113,7 +113,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   size_t bol;               /* bolometer index */
   double * bolval = NULL;   /* Pointer to bolvald smfData */
   double * bolvar = NULL;   /* Pointer to bolvald variance */
-  const double CLIP = 10.0;  /* Sigma clipping for polynomial fit */
+  const double CLIP = 3.0;  /* Sigma clipping for polynomial fit */
   double * coptr = NULL;    /* pointer to coefficients data array */
   double * corrs = NULL;    /* correlation coefficients for each bolometer */
   double corr_thresh = 0.0; /* threshold for correlation coefficient thresholding */
