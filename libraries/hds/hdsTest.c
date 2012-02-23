@@ -63,18 +63,19 @@
 #include "dat_err.h"
 #include <stdio.h>
 
-int main () {
+int main (void) {
 
   /*  Local Variables: */
   const char path[] = "hds_ctest";
   int status = DAT__OK;
   hdsdim dim[] = { 10, 20 };
   hdsdim dimd[1];
-  char *chararr[] = { "TEST1", "TEST2", "Longish String" };
+  const char * chararr[] = { "TEST1", "TEST2", "Longish String" };
   char *retchararr[4];
   char buffer[1024];  /* plenty large enough */
   double darr[] = { 4.5, 2.5 };
   double retdarr[2];
+  void *mapv;    /* Mapped void* */
   double *mapd;  /* Mapped _DOUBLE */
   float  *mapf;  /* Mapped _REAL */
   int *mapi;     /* Mapped _INTEGER */
@@ -85,7 +86,8 @@ int main () {
   size_t nel;
   size_t nelt;
   size_t nbytes;
-  int i;
+  size_t i;
+  int n;
   double sumd;
   int sumi;
 
@@ -179,7 +181,8 @@ int main () {
 
   /* Find and map DATA_ARRAY */
   datFind( loc1, "DATA_ARRAY", &loc2, &status );
-  datMapV( loc2, "_REAL", "WRITE", (void**)&mapf, &nel, &status );
+  datMapV( loc2, "_REAL", "WRITE", &mapv, &nel, &status );
+  mapf = mapv;
   if (status == DAT__OK) {
     nelt = dim[0] * dim[1];
     if ( nelt != nel) {
@@ -227,12 +230,13 @@ int main () {
   /* Try hdsShow */
   hdsShow("LOCATORS", &status);
   hdsShow("FILES", &status);
-  hdsInfoI(NULL, "LOCATORS", "!HDS_TEST.,YYY", &i, &status );
-  hdsInfoI(NULL, "FILES", NULL, &i, &status );
+  hdsInfoI(NULL, "LOCATORS", "!HDS_TEST.,YYY", &n, &status );
+  hdsInfoI(NULL, "FILES", NULL, &n, &status );
 
   datAnnul( &loc3, &status );
 
-  datMapV( loc2, "_INTEGER", "READ", (void**)&mapi, &nel, &status );
+  datMapV( loc2, "_INTEGER", "READ", &mapv, &nel, &status );
+  mapi = mapv;
   if (status == DAT__OK) {
     nelt = dim[0] * dim[1];
     if ( nelt != nel) {
