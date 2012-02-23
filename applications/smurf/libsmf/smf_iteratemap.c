@@ -994,10 +994,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             "number of samples is <= 0", status );
   }
 
-  msgOutf( " ", FUNC_NAME ": provided data are in %" DIM_T_FMT
-           " continuous chunks, the largest of which has %zu samples "
-           "(%lg s)", status, igroup->chunk[igroup->ngroups-1]+1, maxconcat,
-           maxconcat/srate_maxlen );
+  if (igroup) {
+    msgOutf( " ", FUNC_NAME ": provided data are in %" DIM_T_FMT
+             " continuous chunks, the largest of which has %zu samples "
+             "(%lg s)", status, igroup->chunk[igroup->ngroups-1]+1, maxconcat,
+             maxconcat/srate_maxlen );
+  }
 
   /* Once we've run smf_grp_related we know how many subarrays there
      are.  We also know the maximum length of a concatenated piece of
