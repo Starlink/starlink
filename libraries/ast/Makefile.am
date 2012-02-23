@@ -518,10 +518,10 @@ IAU_SOFA_FILES = \
     sofa/zr.c
 
 PAL_FILES = \
-    COPYING.LIB \
     pal.c \
     pal.h \
-    sofa.h
+    sofa.h \
+    sofam.h
 
 bin_SCRIPTS = ast_link
 dist_bin_SCRIPTS = ast_link_adam
