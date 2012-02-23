@@ -163,7 +163,7 @@ void datMsg( const char * token, const HDSLoc * loc ) {
     }
 
     /*  If the file name is not odd, then omit the file extension. */
-    if (!odd) file[ncf-4] = '\0';
+    if (!odd) file[ncf-DAT__SZFLX] = '\0';
 
     /*  Enter the file name into the buffer, surrounding it in quotes if it
      *  is odd. */
