@@ -281,6 +281,13 @@ datGet0I( const HDSLoc * loc, int * value, int * status );
 int
 datGet0W( const HDSLoc * loc, short * value, int * status );
 
+/*=============================================*/
+/* datGet0UW - Read scalar unsigned short integer value  */
+/*=============================================*/
+
+int
+datGet0UW( const HDSLoc * loc, unsigned short * value, int * status );
+
 /*=======================================*/
 /* datGet0L - Read scalar logical value  */
 /*=======================================*/
