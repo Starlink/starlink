@@ -403,13 +403,13 @@ F77_SUBROUTINE(dat_ermsg)( F77_INTEGER_TYPE *status,
 /*============================================================*/
 
 /* Local variables.     */
-   char *msg_c;
+   char msg_c[EMS__SZMSG+1];
    size_t length_c;
 
 /* Enter routine.	*/
 
 /* Call pure C routine                                       */
-   datErmsg( *status, &length_c, &msg_c );
+   datErmsg( *status, &length_c, msg_c );
 
 /* Export the returned C string to FORTRAN variable    */
    *length = (F77_INTEGER_TYPE)length_c;
@@ -3578,14 +3578,14 @@ F77_SUBROUTINE(dat_ertxt)(CHARACTER(text), INTEGER(status) TRAIL(text) )
 /*==================================================*/
 
    /* Local Variables: */
-   char *msg;   /* Pointer to static buffer */
+   char msg[EMS__SZMSG+1];   /* Pointer error buffer */
    size_t lmsg;    /* Length of error message */
    char *text_c; /* Input text */
 
    text_c = cnfCreim( text, text_length );
 
    /* Get textual translation of the error code */
-   datErmsg( *status, &lmsg, &msg );
+   datErmsg( *status, &lmsg, msg );
 
    /*  Mark the EMS error stack to prevent interaction with any message
     *  tokens already defined and define a token for the text and the error
@@ -3611,7 +3611,7 @@ F77_SUBROUTINE(dat_erdsc)( CHARACTER(locator), INTEGER(status) TRAIL(locator) )
 /*    Local variables : */
   HDSLoc locator_c;
   char file[EMS__SZMSG+1];  /* Container file name */
-  char *msg = NULL;         /* Error message */
+  char msg[EMS__SZMSG+1];         /* Error message */
   char name[EMS__SZMSG+1];  /* Object pathname */
   int  lstat;               /* Local status */
   size_t lmsg;              /* Length of error message */
@@ -3636,7 +3636,7 @@ F77_SUBROUTINE(dat_erdsc)( CHARACTER(locator), INTEGER(status) TRAIL(locator) )
   }
 
   /*  Obtain a textual translation of the error code. */
-  datErmsg( *status, &lmsg, &msg );
+  datErmsg( *status, &lmsg, msg );
 
   /*  Define tokens for the object name and the error message. */
   emsSetc( "NAME", name );
@@ -3661,7 +3661,7 @@ F77_SUBROUTINE(dat_erdsn)( CHARACTER(locator), CHARACTER(cmp),
   HDSLoc locator_c;
   char cmp_c[DAT__SZNAM+1];
   char file[EMS__SZMSG+1];  /* Container file name */
-  char *msg = NULL;         /* Error message */
+  char msg[EMS__SZMSG+1];   /* Error message */
   char name[EMS__SZMSG+1];  /* Object pathname */
   int  lstat;               /* Local status */
   size_t lmsg;              /* Length of error message */
@@ -3689,7 +3689,7 @@ F77_SUBROUTINE(dat_erdsn)( CHARACTER(locator), CHARACTER(cmp),
   }
 
   /*  Obtain a textual translation of the error code. */
-  datErmsg( *status, &lmsg, &msg );
+  datErmsg( *status, &lmsg, msg );
 
   /*  Define tokens for the object name, component name and the error message. */
   emsSetc( "NAME", name );

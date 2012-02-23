@@ -144,7 +144,7 @@ datErase(const HDSLoc   *locator,
 int
 datErmsg(int      status,
          size_t   *len,
-         char     **msg_str);
+         char     *msg_str);
 
 /*================================*/
 /* datFind - Find named component */

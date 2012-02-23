@@ -13,6 +13,8 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 /* F77_INTEGER_FUNCTION(dat_ermsg)( const F77_INTEGER_TYPE *status,
  *                                  F77_INTEGER_TYPE *len,
  *                                  struct STR *msg_str
@@ -22,7 +24,7 @@
 int
 datErmsg(int  status,
          size_t *len,
-         char **msg_str)
+         char *msg_str)
 {
 /*
 *+
@@ -55,20 +57,13 @@ datErmsg(int  status,
 *        the length of the character variable supplied for the MSG
 *        argument.
 *     MSG = CHARACTER * ( * ) (Returned)
-*        The error message.
+*        Buffer of at least EMS__SZMSG+1 bytes to receive the error message.
 
 *  Notes:
-*     -  If the variable supplied for the MSG argument is not long
-*     enough to accommodate the error message, then the message will be
-*     truncated and the returned value of LENGTH will reflect the
-*     truncated length.
 *     -  No returned error message will contain more significant
 *     characters than the value of the EMS__SZMSG symbolic constant.
 *     This constant is defined in the include file EMS_PAR.
-*     - The C interface stores a pointer to a static buffer in the
-*     return argument. Additional calls to this routine may change
-*     the value so a copy should be taken if a permanent record is
-*     required.
+*     - The C interface does not check the length of MSG.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -98,6 +93,9 @@ datErmsg(int  status,
 *        No reason to pass in a pointer to status.
 *        Initialise trans. Use size_t for len arg.
 *        Use modern ems interface.
+*     2012-02-23 (TIMJ):
+*        Fill a supplied buffer rather than returning a pointer to
+*        stack storage.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,8 +105,7 @@ datErmsg(int  status,
 */
 
 /* Local Variables:                                                         */
-   char sysbuf[ EMS__SZMSG + 1 ];    /* Buffer for system translation       */
-   char *trans = NULL;               /* Pointer to translation text         */
+   const char *trans = NULL;         /* Pointer to translation text         */
    int lstat;                        /* Local status variable               */
    int emslen;                       /* Length from EMS                     */
 
@@ -267,8 +264,8 @@ datErmsg(int  status,
 /* characters to be returned and copy them to the output string.            */
    if ( trans != NULL )
    {
-      *msg_str = trans;
-      *len = strlen( *msg_str );
+      strcpy( msg_str, trans );
+      *len = strlen( msg_str );
    }
 
 /* If the error code is not a DAT__ error code, then use ems_ to translate  */
@@ -279,10 +276,9 @@ datErmsg(int  status,
       lstat = DAT__OK;
       emsMark( );
       emsSyser( "MESSAGE", status );
-      emsMload( " ", "^MESSAGE", sysbuf, &emslen, &lstat );
+      emsMload( " ", "^MESSAGE", msg_str, &emslen, &lstat );
       *len = emslen;
       emsRlse( );
-      *msg_str = sysbuf;
    }
 
 /* Exit the routine.                                                        */
