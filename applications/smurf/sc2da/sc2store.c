@@ -21,6 +21,7 @@
     22Sep2010 : Add sc2_bias and sc2_fputemp (timj)
     09Nov2010 : Add delta compression option (dsb)
     11Jan2011 : Compress JCMTSTATE using simple compression scheme (timj)
+    23Feb2012 : Add sc2_1kntdtemp (timj)
 */
 
 #define _POSIX_C_SOURCE 200112L
@@ -819,6 +820,7 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( sc2_bias, SC2_BIAS, unsigned short, VAL__BADUW );
    RETRIEVE_STATE( sc2_mixtemp, SC2_MIXTEMP, float, VAL__BADR );
    RETRIEVE_STATE( sc2_fputemp, SC2_FPUTEMP, float, VAL__BADR );
+   RETRIEVE_STATE( sc2_1kntdtemp, SC2_1KNTDTEMP, float, VAL__BADR );
 
    RETRIEVE_STATE( acs_exposure, ACS_EXPOSURE, float, VAL__BADR );
    RETRIEVE_STATE( acs_offexposure, ACS_OFFEXPOSURE, float, VAL__BADR );
@@ -1072,6 +1074,7 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( sc2_bias, SC2_BIAS, unsigned short );
    STORE_STATE( sc2_mixtemp, SC2_MIXTEMP, float );
    STORE_STATE( sc2_fputemp, SC2_FPUTEMP, float );
+   STORE_STATE( sc2_1kntdtemp, SC2_1KNTDTEMP, float );
 
    /* FTS and polarimeter */
    STORE_STATE( fts_pos, FTS_POS, float );
@@ -3168,6 +3171,7 @@ int *status                 /* global status (given and returned) */
   STORE_STATE( sc2_bias, "SC2_BIAS", "_UWORD", unsigned short, usbuff, 0 );
   STORE_STATE( sc2_mixtemp, "SC2_MIXTEMP", "_REAL", float, fbuff, 0 );
   STORE_STATE( sc2_fputemp, "SC2_FPUTEMP", "_REAL", float, fbuff, 0 );
+  STORE_STATE( sc2_1kntdtemp, "SC2_1KNTDTEMP", "_REAL", float, fbuff, 0 );
 
   STORE_STATE( pol_ang, "POL_ANG", "_DOUBLE", double, dbuff, 0 );
   STORE_STATE( fts_pos, "FTS_POS", "_REAL", float, fbuff, 0 );

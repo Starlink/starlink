@@ -62,10 +62,12 @@
 *        Add SC2_BIAS and SC2_FPUTEMP
 *     2010-11-19 (TIMJ):
 *        Some of the integer entries in JCMTState are now shorts.
+*     2012-02-23 (TIMJ):
+*        Add SC2_1KNTDTEMP
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -197,6 +199,7 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                CHECK_ITEM("SC2_BIAS",AST__SINTTYPE,sizeof(unsigned short),sc2_bias)
                CHECK_ITEM("SC2_MIXTEMP",AST__FLOATTYPE,sizeof(float),sc2_mixtemp)
                CHECK_ITEM("SC2_FPUTEMP",AST__FLOATTYPE,sizeof(float),sc2_fputemp)
+               CHECK_ITEM("SC2_1KNTDTEMP",AST__FLOATTYPE,sizeof(float),sc2_1kntdtemp)
                CHECK_ITEM("SMU_AZ_CHOP_X",AST__DOUBLETYPE,sizeof(double),smu_az_chop_x)
                CHECK_ITEM("SMU_AZ_CHOP_Y",AST__DOUBLETYPE,sizeof(double),smu_az_chop_y)
                CHECK_ITEM("SMU_AZ_JIG_X",AST__DOUBLETYPE,sizeof(double),smu_az_jig_x)
