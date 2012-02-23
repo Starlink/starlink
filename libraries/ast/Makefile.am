@@ -607,11 +607,9 @@ libast_la_SOURCES = \
 # libast_pal library will be empty, and we link to an external PAL
 # library instead.
 if EXTERNAL_PAL
-libast_la_LIBADD = $(libdir)/libpal.la $(libdir)/libast_wcslib.la \
-                   $(libdir)/libast_levmar.la
+libast_la_LIBADD =  $(libdir)/libpal.la libast_wcslib.la libast_levmar.la
 else
-libast_la_LIBADD = $(libdir)/libast_pal.la $(libdir)/libast_wcslib.la \
-                   $(libdir)/libast_levmar.la
+libast_la_LIBADD = libast_pal.la libast_wcslib.la libast_levmar.la
 endif
 
 # AST_PAR is really part of GRP_F_INCLUDE_FILES, but it must not be
