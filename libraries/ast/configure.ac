@@ -113,7 +113,6 @@ AC_CHECK_FUNCS([isnan])
 AC_CHECK_DECLS([isnan],,,[#include <math.h>
                          ])
 STAR_DECLARE_DEPENDENCIES(sourceset, [sst htx])
-STAR_DECLARE_DEPENDENCIES(build, sla)
 
 #  Perform the check that configures f77.h.in for the return type of REAL
 #  Fortran functions. On 64-bit g77 with f2c compatibility this is double

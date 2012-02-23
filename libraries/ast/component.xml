@@ -16,7 +16,7 @@
       is portable and environment-independent.</p>
   </abstract>
   <dependencies >
-    <sourceset>sst</sourceset><sourceset>htx</sourceset><build>sla</build><sourceset>messgen</sourceset>
+    <sourceset>sst</sourceset><sourceset>htx</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
