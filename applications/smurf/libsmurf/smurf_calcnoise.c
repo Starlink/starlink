@@ -709,11 +709,13 @@ void smurf_calcnoise( int *status ) {
               smfData * powval;
               smfData * bolval;
               smf_flatmeth flatmethod;
+              double refres;
               smf_flat_override( flatramps, thedata, status );
-              smf_flat_smfData( thedata, &flatmethod, &powval, &bolval,
+              smf_flat_smfData( thedata, &flatmethod, &refres, &powval, &bolval,
                                 status );
               ngood = smf_flat_responsivity( flatmethod, respmap, 5.0, 1,
-                                             powval, bolval, NULL, status);
+                                             powval, bolval, refres,
+                                             NULL, status);
               if (powval) smf_close_file( &powval, status );
               if (bolval) smf_close_file( &bolval, status );
             }

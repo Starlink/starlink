@@ -15,7 +15,7 @@
 *  Invocation:
 *     size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
 *                                    size_t order, const smfData * powval, const smfData * bolval,
-*                                    smfData ** polyfit, int *status );
+*                                    double refres, smfData ** polyfit, int *status );
 
 *  Arguments:
 *     method = smf_flatmeth (Given)
@@ -37,6 +37,10 @@
 *        Response of each bolometer to powval. Dimensioned as number of
 *        number of bolometers (size of respmap) times number of heater
 *        measurements (size of powval).
+*     refres = double (Given)
+*        Reference resistance. Whilst the value is not used directly the
+*        heater efficiencies are only corrected if the reference resistance
+*        is defined to some value other than VAL__BADD.
 *     polyfit = smfData ** (Returned)
 *        If a polynomial is being fitted this is the polynomial expansion
 *        for each powval coordinate for direct comparison with "bolval".
@@ -149,7 +153,7 @@
 
 size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
                                size_t order, const smfData * powvald, const smfData * bolvald,
-                               smfData ** polyfit, int *status ) {
+                               double refres, smfData ** polyfit, int *status ) {
 
   size_t bol;                  /* Bolometer offset into array */
   double * bolval = NULL;      /* pointer to data in smfData */
@@ -208,11 +212,13 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
 
   }
 
-  /* Get the heater efficiency file */
-  smf_flat_params( respmap, "RESIST", NULL, NULL, NULL, NULL, NULL,
-                   NULL, NULL, NULL, NULL, NULL, &heateff, status );
+  /* Get the heater efficiency file if we are going to be using it */
+  if (refres != VAL__BADD) {
+    smf_flat_params( respmap, "RESIST", NULL, NULL, NULL, NULL, NULL,
+                     NULL, NULL, NULL, NULL, NULL, &heateff, status );
 
-  if (heateff) heateffdata = (heateff->pntr)[0];
+    if (heateff) heateffdata = (heateff->pntr)[0];
+  }
 
   /* Polynomial fit of  POWER = f( DAC units ) so we calculate the gradient
      for the reference value (stored in coefficient [1]) and reciprocate it. We do

@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_flat_smfData ( const smfData *data, smf_flatmeth * flatmethod,
-*                        smfData **powval, smfData **bolval, int *status );
+*                        double * refres, smfData **powval, smfData **bolval,
+*                        int *status );
 
 *  Arguments:
 *     data = const smfData * (Given)
@@ -22,6 +23,8 @@
 *     flatmethod = smf_flatmeth * (Returned)
 *        Flatfield method used for bolval. SMF__FLATMETH_TABLE or
 *        SMF__FLATMETH_POLY.
+*     refres = double * (Returned)
+*        Reference resistance in ohms.
 *     powval = smfData ** (Returned)
 *        Resistance input powers. Will be returned NULL on error or if
 *        no DA extension is present.
@@ -52,6 +55,8 @@
 *        Use smf_flat_malloc
 *     2010-03-05 (TIMJ):
 *        Use a smf_flatmeth type for flatfield method.
+*     2012-02-22 (TIMJ):
+*        Add refres argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -89,7 +94,7 @@
 #include "sae_par.h"
 
 void smf_flat_smfData ( const smfData *data, smf_flatmeth * flatmethod,
-                        smfData ** powval, smfData **bolval,
+                        double * refres, smfData ** powval, smfData **bolval,
                         int *status ) {
   smfDA * da = NULL;
 
@@ -117,6 +122,7 @@ void smf_flat_smfData ( const smfData *data, smf_flatmeth * flatmethod,
   }
 
   *flatmethod = da->flatmeth;
+  *refres = da->refres;
 
   if (*status != SAI__OK) {
     if (*bolval) smf_close_file( bolval, status );
