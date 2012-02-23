@@ -4,6 +4,7 @@
 
 #include "dat_err.h"             /* DAT__ error code definitions            */
 #include "hds1.h"                /* Global definitions for HDS              */
+#include "rec1.h"
 
    int rec1_unpack_chain( const unsigned char pchain[], int extended,
                           INT_BIG *chain )

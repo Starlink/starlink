@@ -8,6 +8,7 @@
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+#include "hds.h"
 
 /*===========================*/
 /* DAT_ANNUL - Annul locator */

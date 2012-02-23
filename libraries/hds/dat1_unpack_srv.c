@@ -5,6 +5,7 @@
 #include "hds1.h"                /* Global definitions for HDS              */
 #include "rec.h"                 /* Public rec_ definitions                 */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+#include "dat1.h"
 
    int dat1_unpack_srv( const unsigned char psrv[], struct RID *rid )
    {

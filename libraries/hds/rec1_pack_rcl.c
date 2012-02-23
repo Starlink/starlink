@@ -5,6 +5,7 @@
 #include "hds1.h"		 /* Global definitions for HDS		    */
 #include "rec.h"		 /* Public rec_ definitions		    */
 #include "dat_err.h"		 /* DAT__ error code definitions	    */
+#include "rec1.h"
 
    int rec1_pack_rcl( const struct RCL *rcl,
 		      unsigned char prcl[] )

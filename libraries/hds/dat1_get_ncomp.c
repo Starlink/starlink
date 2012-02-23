@@ -7,6 +7,7 @@
 #include "rec.h"                 /* Public rec_ definitions                 */
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+#include "dat1.h"
 
    int dat1_get_ncomp( const struct HAN *han, int *ncomp )
    {
