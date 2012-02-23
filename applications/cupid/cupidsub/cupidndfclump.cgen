@@ -130,6 +130,8 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        AllowEdge may be set non-zero, so test if the clump touches the
 *        edge of the data array before accessing neighbouring pixels
 *        (which may potentially be off the edge of the array).
+*     2012-02-22 (TIMJ):
+*        Fix casting of int to size_t
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -161,7 +163,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
    int lb[ 3 ];              /* Lower pixel index bounds of NDF */
    int nex;                  /* No. of extra items of information */
    int place;                /* NDF place holder */
-   int size;                 /* No.of NDFs in array */
+   hdsdim size[1];           /* No.of NDFs in array */
    int ub[ 3 ];              /* Upper pixel index bounds of NDF */
 
 /* Initialise */
@@ -172,20 +174,21 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* If no array was supplied create one of length 1. */
    if( !ret ) {
-      size = 1;
-      datTemp( "NDF", 1, &size, &ret, status );
+      size[0] = 1;
+      datTemp( "NDF", 1, size, &ret, status );
 
 /* Otherwise, get the number of NDFs already in the supplied array of
    NDFs, and increase it by 1. */
    } else {
-      datSize( ret, (size_t *) &size, status );
-      size++;
-      datAlter( ret, 1, &size, status );
+      size_t nelems;
+      datSize( ret, &nelems, status );
+      size[0] = nelems + 1;
+      datAlter( ret, 1, size, status );
    }
 
 /* Get a locator for the new cell. */
    cloc = NULL;
-   datCell( ret, 1, &size, &cloc, status );
+   datCell( ret, 1, size, &cloc, status );
 
 /* Begin an NDF context */
    ndfBegin();
