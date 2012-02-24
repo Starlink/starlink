@@ -749,7 +749,8 @@ typedef struct smfDIMMData {
   AstFrameSet *outfset;      /* contains map->sky transformation */
   int *lbnd_out;             /* map lower bounds */
   int *ubnd_out;             /* map upper bounds */
-  unsigned char *zeromask;   /* Map indicating region to be masked in ast */
+  unsigned char *ast_mask;   /* Map indicating region to be masked in ast */
+  unsigned char *com_mask;   /* Map indicating region to be masked in com */
   int iter;                  /* Iteration number */
 } smfDIMMData;
 

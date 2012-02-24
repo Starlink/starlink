@@ -180,6 +180,8 @@
 *     2010-08-16 (DSB)
 *        - Add "perarray" config parameter - if non-zero, a separate COM
 *        model is calculated for each subarray.
+*     2012-02-23 (DSB):
+*        Add facility to exclude masked regions from COM estimate.
 
 *  Copyright:
 *     Copyright (C) 2006-2010 University of British Columbia.
@@ -238,11 +240,12 @@ typedef struct smfCalcmodelComData {
   int gflat;               /* correct flatfield using GAI */
   dim_t idx;               /* Index within subgroup */
   int ijob;                /* Job identifier */
+  int *lut_data;           /* Array holding themap index for each sample */
+  unsigned char *mask;    /* Pointer to 2D mask map */
   double *model_data;      /* pointer to common mode data */
   dim_t nblock;            /* No of time slice blocks per bolometer */
   dim_t nbolo;             /* number of bolometers */
   int nogains;             /* Force all gains to unity? */
-  int nooffs;              /* Force all offsets to zero? */
   dim_t ntslice;           /* number of time slices */
   int operation;           /* 0=undo COM, 1=new COM, 2=fit COM */
   double *res_data;        /* Pointer to common residual data */
@@ -266,15 +269,15 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   dim_t gain_box;          /* Nominal number of time slices per block */
   size_t gbstride;         /* gain bolo stride */
   size_t gcstride;         /* gain coefficient stride */
-  int gflat;               /* correct flatfield using GAI */
   size_t i;                /* Loop counter */
   dim_t idx;               /* Index within subgroup */
   size_t j;                /* Loop counter */
+  int *lut_data;           /* Array holding themap index for each sample */
+  unsigned char *mask;     /* Pointer to 2D mask map */
   double *model_data;      /* pointer to common mode data */
   dim_t nbolo;             /* number of bolometers */
   dim_t nblock;            /* Number of time blocks */
   int nogains;             /* Force all gains to unity? */
-  int nooffs;              /* Force all offsets to zero? */
   dim_t nsum;              /* Number of values summed in "sum" */
   dim_t ntslice;           /* number of time slices */
   smfCalcmodelComData *pdata=NULL; /* Pointer to job data */
@@ -306,7 +309,6 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   gai_data = pdata->gai_data;
   gbstride = pdata->gbstride;
   gcstride = pdata->gcstride;
-  gflat = pdata->gflat;
   idx = pdata->idx;
   model_data = pdata->model_data; /* Careful! */
   nbolo = pdata->nbolo;
@@ -317,8 +319,9 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   weight = pdata->weight;
   gain_box = pdata->gain_box;
   nogains = pdata->nogains;
-  nooffs = pdata->nooffs;
   nblock = pdata->nblock;
+  mask = pdata->mask;
+  lut_data = pdata->lut_data;
 
 
   /* Undo the previous iteration of the model, each thread handles a
@@ -471,8 +474,13 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
              gain. Otherwise, increment the running sums. */
           if( !( qua_data[ ijindex ] & SMF__Q_FIT ) &&
                  model_data[ i ] != VAL__BADD ) {
-            model_data[ i ] += res_data[ ijindex ];
-            weight[ i ]++;
+
+            /* Do not include samples that fall within the "source"
+               areas of the map, as identified by a supplied mask. */
+            if( !mask || mask[ lut_data[ ijindex ] ] ) {
+              model_data[ i ] += res_data[ ijindex ];
+              weight[ i ]++;
+            }
           }
 
           /* Advance to next element of res_data and qua_data arrays. */
@@ -513,9 +521,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   int do_boxcar=0;              /* flag to do boxcar smooth */
   int do_boxfact=0;             /* flag to damp boxcar width */
   int do_boxmin=0;              /* flag for minimum boxcar */
-  dim_t corr_offset=0;          /* Offset from gain to correlation value */
   int fillgaps;                 /* Are there any new gaps to fill? */
-  int first;                    /* First pass round loop? */
   dim_t gain_box;               /* Time slices per block */
   int gflat=0;                  /* If set use GAIn to adjust flatfield */
   double g=0;                   /* temporary gain */
@@ -538,6 +544,9 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smfCalcmodelComData *job_data=NULL; /* Array of job data */
   AstKeyMap *kmap=NULL;         /* Local keymap */
   double dchisq=0;              /* this - last model residual chi^2 */
+  smfArray *lut=NULL;           /* Pointer to LUT at chunk */
+  int *lut_data;                /* Array holding themap index for each sample */
+  unsigned char *mask;          /* Pointer to 2D mask map */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   double *model_data_copy=NULL; /* Copy of model_data */
@@ -548,7 +557,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t ndata=0;                /* Total number of data points */
   int *nrej=NULL;               /* Array holding no. of rejections per block */
   int nogains;                  /* Force all gains to unity? */
-  int nooffs;                   /* Force all offsets to zero? */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
   size_t noibstride;            /* bolo stride for noise */
@@ -561,7 +569,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   int nw;                       /* Number of worker threads */
   AstObject *obj=NULL;          /* Used to avoid "type-punned" compiler warnings */
   double off=0;                 /* Temporary offset */
-  dim_t off_offset=0;           /* Offset from offset to correlation value */
   double off_copy=0;            /* copy of off */
   smfCalcmodelComData *pdata=NULL; /* Pointer to job data */
   int perarray;                 /* Use a separate common mode for each array? */
@@ -587,6 +594,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
+  lut = dat->lut[chunk];
   model = allmodel[chunk];
   if(dat->gai) {
     gai = dat->gai[chunk];
@@ -620,9 +628,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Get the number of time slices per block. */
   smf_get_nsamp( kmap, "GAIN_BOX", res->sdata[0], &gain_box, status );
 
-  /* See if gains and/or offsets are to be forced to default values. */
+  /* See if gain is to be forced to default values. */
   astMapGet0I( kmap, "GAIN_IS_ONE", &nogains );
-  astMapGet0I( kmap, "OFFSET_IS_ZERO", &nooffs );
 
   /* Check for smoothing parameters in the CONFIG file */
   smf_get_nsamp( kmap, "BOXCAR", res->sdata[0], &boxcar, status );
@@ -768,12 +775,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       smf_get_dims( res->sdata[idx],  NULL, NULL, &thisnbolo, &thisntslice,
                     &thisndata, &bstride, &tstride, status);
 
-      if(gai) {
-        smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
-                      &gbstride, &gcstride, status);
-        off_offset = 1*nblock*gcstride;
-        corr_offset = 2*nblock*gcstride;
-      }
+      if(gai) smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
+                            &gbstride, &gcstride, status);
 
       if( idx == 0 ) {
         /* Store dimensions of the first file */
@@ -838,9 +841,14 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
         }
       }
 
-      /* Get pointers to data/quality/model */
+      /* See if a mask should be used to exclude bright source areas from
+         the COM model. */
+      mask = smf_get_mask( SMF__COM, keymap, dat, flags, status );
+
+      /* Get pointers to data/quality/lut/model */
       res_data = (res->sdata[idx]->pntr)[0];
       qua_data = (qua->sdata[idx]->pntr)[0];
+      lut_data = (lut->sdata[idx]->pntr)[0];
       if( gai ) {
         gai_data = (gai->sdata[idx]->pntr)[0];
       }
@@ -872,8 +880,9 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
           pdata->weight = weight;
           pdata->gain_box = gain_box;
           pdata->nogains = nogains;
-          pdata->nooffs = nooffs;
           pdata->nblock = nblock;
+          pdata->mask = mask;
+          pdata->lut_data = lut_data;
         }
       }
 
@@ -922,7 +931,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
        template fits settle down to a list with no N-sigma outliers. */
 
     fillgaps = 0;
-    first = 1;
     quit = 0;
     while( !quit && (*status==SAI__OK) ) {
 

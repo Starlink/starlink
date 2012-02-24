@@ -221,6 +221,7 @@ smf_get_freemem.c \
 smf_get_goodrange.c \
 smf_get_gridcoords.c \
 smf_get_grp_metadata.c \
+smf_get_mask.c \
 smf_get_moltrans.c \
 smf_get_ndfid.c \
 smf_get_nsamp.c \

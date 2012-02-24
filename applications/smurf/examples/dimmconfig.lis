@@ -614,6 +614,20 @@ ext.taumethod =adaptive
 #ast.zero_snr_fwhm = 60
 #ast.zero_snr_low = -1.1
 
+# The common-mode can also be masked to exclude known source areas
+# from the common-mode estimation. The zero of parameters are directly
+# analogous to those for applying a zero constraint to the map. Theonly
+# difference is that the zero_snr and zero_lowhits constrinats will be
+# ignored on the first iteration since they require an estimate of the map
+# to be available.
+#com.zero_mask = 1
+#com.zero_circle = (70.72333,36.115,0.0083333)
+#com.zero_lowhits = 0.1
+#com.zero_notlast = 1
+#com.zero_snr = 5
+#com.zero_snr_fwhm = 60
+#com.zero_snr_low = -1.1
+
 # The AST model can also perform map-based de-spiking after the first
 # iteration provided that there is also a NOI model present. The value
 # of ast.mapspike indicates a SNR threshold sigma-clip based on the

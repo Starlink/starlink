@@ -140,6 +140,25 @@
 
 #define CHECKMEM_FUDGE 1.5 /* Fudge estimate by this empirical factor */
 
+
+/* Macro to check if a mask is required, and update the total memory
+   requirement accordingly. */
+#define CHECK_MASK(model) { \
+    int use_mask = 0; \
+    double dval = 0.0; \
+    astMapGet0A( keymap, model, &kmap ); \
+    astMapGet0D( kmap, "ZERO_LOWHITS", &dval ); \
+    if( dval > 0.0 ) use_mask = 1; \
+    astMapGet0D( kmap, "ZERO_SNR", &dval ); \
+    if( dval > 0.0 ) use_mask = 1; \
+    if( astMapType( kmap, "ZERO_CIRCLE" ) != AST__BADTYPE || \
+        astMapType( kmap, "ZERO_MASK" ) != AST__BADTYPE ) use_mask = 1; \
+    if( use_mask ) total += msize*sizeof(unsigned char); \
+    kmap = astAnnul( kmap ); \
+}
+
+
+
 void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 			smf_modeltype *modeltyps, dim_t nmodels, dim_t msize,
                         AstKeyMap *keymap, size_t available, dim_t maxfilelen,
@@ -147,10 +166,8 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 
 
   /* Local Variables */
-  smfData *data = NULL;        /* Temp smfData used to define a sample rate */
   int dofft=0;                 /* flag if we need temp space for FFTs */
   dim_t i;                     /* Loop counter */
-  int ival;                    /* Temporary integer */
   dim_t gain_box;              /* Length of blocks for GAI/COM model */
   AstKeyMap *kmap=NULL;        /* Local keymap */
   dim_t nblock;                /* Number of blocks for GAI/COM model */
@@ -271,6 +288,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           total += ndet*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
 	  break;
 	case SMF__COM:
+          CHECK_MASK("COM")
 	  total += maxlen*smf_dtype_sz(SMF__DOUBLE,status);
 	  break;
 	case SMF__EXT:
@@ -322,18 +340,8 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           break;
         case SMF__AST:
           /* Mostly accounted for as static memory usage above, but add space
-             for zeromask if required */
-          {
-             astMapGet0A( keymap, "AST", &kmap );
-
-             if( ( (astMapType( kmap, "ZERO_CIRCLE" ) != AST__BADTYPE) ||
-                   (astMapType( kmap, "ZERO_MASK" ) != AST__BADTYPE) ) &&
-                 (*status == SAI__OK) ) {
-
-               total += msize*sizeof(unsigned char);
-             }
-             if( kmap ) kmap = astAnnul( kmap );
-          }
+             for mask if required */
+          CHECK_MASK("AST")
           break;
 	default:
 	  *status = SAI__ERROR;

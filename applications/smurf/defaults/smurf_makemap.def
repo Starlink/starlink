@@ -34,6 +34,8 @@
 #        Added com.offset_is_zero
 #     2010-12-13 (DSB):
 #        Added dump_lonlat
+#     2012-02-24 (DSB):
+#        Added COM zero masking options.
 
 #-
 
@@ -87,6 +89,14 @@ fakescale = 1
 
 # Also read in smf_calcmodel_com
 # com.gain_box = -30.0
+
+com.zero_lowhits = 0
+com.zero_notlast = 1
+com.zero_circle = <undef>
+com.zero_snr = <undef>
+com.zero_snr_fwhm = 0
+com.zero_snr_low = -1.1
+com.zero_mask = <undef>
 
 # Load the tau relations from a separate config file
 # Also load this before any other "ext" defaults in case

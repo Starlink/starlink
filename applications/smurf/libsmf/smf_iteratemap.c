@@ -607,9 +607,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   lastmap = astCalloc( msize, sizeof(*lastmap) );
   mapchange = astCalloc( msize, sizeof(*lastmap) );
 
-  /* Always need to initialize this zeromask. The buffer will get
-     allocated in smf_calcmodel_ast if ast.zero_circle was set. */
-  dat.zeromask = NULL;
+  /* Always need to initialize these masks. The buffers will get
+     allocated in smf_get_mask if ast.zero_circle (etc) was set. */
+  dat.ast_mask = NULL;
+  dat.com_mask = NULL;
 
   /* Get size of the input group */
   isize = grpGrpsz( igrp, status );
@@ -2433,8 +2434,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         errEnd( status );
       }
 
-/* Free the zero mask. */
-      dat.zeromask = astFree( dat.zeromask );
+/* Free the zero masks. */
+      dat.ast_mask = astFree( dat.ast_mask );
+      dat.com_mask = astFree( dat.com_mask );
     }
 
 #ifdef __ITERATEMAP_SHOW_MEM

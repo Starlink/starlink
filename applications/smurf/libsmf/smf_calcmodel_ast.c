@@ -120,6 +120,9 @@
 *        favour of using a smoothed mask calculated in smf_iteratemap and
 *        passed into this function using the ZERO_MASK_POINTER entry in the
 *        keymap.
+*     2012-2-24 (DSB):
+*        Refactor mask-creation code into smf_get_mask so that it can be
+*        re-used for masking the COM model.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -170,7 +173,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
-  int dozero=0;                 /* zero boundaries on last iter? */
   double gaussbg;               /* gaussian background filter */
   int *hitsmap;                 /* Pointer to hitsmap data */
   dim_t i;                      /* Loop counter */
@@ -183,31 +185,22 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   double m;                     /* Hold temporary value of m */
   double *map;                  /* Pointer to map data */
   double mapspike;              /* Threshold SNR to detect map spikes */
-  double meanhits;              /* Mean hits in the map */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   size_t newzero;               /* number new pixels zeroed */
-  size_t ngood;                 /* Number good samples for stats */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
-  double *noi_data=NULL;        /* Pointer to DATA component of model */
-  size_t noibstride;            /* bolo stride for noise */
-  dim_t nointslice;             /* number of time slices for noise */
-  size_t noitstride;            /* Time stride for noise */
   dim_t ntslice=0;              /* Number of time slices */
-  void *ptr = NULL;             /* Pointer to floating point mask array */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  const char *skyrefis;         /* Pointer to SkyRefIs attribute value */
   size_t tstride;               /* Time slice stride in data array */
   smf_qual_t *mapqual = NULL;/* Quality map */
   double *mapvar = NULL;        /* Variance map */
   double *mapweight = NULL;     /* Weight map */
   double *mapweightsq = NULL;   /* Weight map squared */
-  double zero_lowhits=0;        /* Zero regions with low hit count? */
-  int zero_notlast=0;           /* Don't zero on last iteration? */
-  double zero_snr=0;            /* Zero regions with low SNR */
+  int zero_notlast;             /* Don't zero on last iteration? */
+  unsigned char *zmask = NULL;  /* Pointer to map mask */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -238,151 +231,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     errRep( "", FUNC_NAME ": AST.GAUSSBG cannot be < 0.", status );
   }
 
-  /* Will we apply lowhits boundary condition to map? */
-  astMapGet0D( kmap, "ZERO_LOWHITS", &zero_lowhits );
-  if( zero_lowhits < 0 ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status );
-  }
-
-  /* See if the KeyMap contains a pointer to a pre-calculated mask (for
-     instance, calculated by smoothing the final SNR mask produced by
-     a previous run of smf_iteratemap). If such a mask exists, it will be
-     a floating-point array such as would be read in from an NDF via
-     "ZERO_MASK". This mask takes precedence over all other forms of mask. */
-  int premask = 0;
-  if( astMapHasKey(  kmap, "ZERO_MASK_POINTER" ) ) {
-     astMapGet0P( kmap, "ZERO_MASK_POINTER", &ptr );
-     if( ptr ) {
-        premask = 1;
-        gaussbg = 0;
-        zero_lowhits = 0;
-     }
-  }
-
-  /* Static masking constraints: pre-defined mask created by a previous
-     call to smf_iteratemap, circular region, or an external mask file */
-  if( ( premask || (astMapHasKey( kmap, "ZERO_CIRCLE" ) != AST__UNDEFTYPE) ||
-       (astMapType( kmap, "ZERO_MASK" ) != AST__UNDEFTYPE) ) &&
-      (dat->zeromask == NULL) && (*status == SAI__OK) ) {
-
-    int refmask=0;                /* REF image supplies mask? */
-    int zero_c_n;                 /* Number of zero circle parameters read */
-    double zero_circle[3];        /* LON/LAT/Radius of circular mask */
-
-    /* Initialize the mask */
-    dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask) );
-
-    /* User supplied an external mask, or a predefined mask was found in
-       the KeyMap? */
-    if( premask ||
-        ( astMapGet0I( kmap, "ZERO_MASK", &refmask ) && refmask ) ) {
-      int nmap;
-      int refndf=NDF__NOID;
-      int zerondf=NDF__NOID;
-
-      ndfBegin();
-
-      /* If a predefined mask was found, use it. Otherwise use the specified
-         NDF. */
-      if( !premask ) {
-
-        /* Obtain NDF identifier for the reference image*/
-        ndfAssoc( "REF", "READ", &refndf, status );
-
-        /* Obtain an NDF section with bounds that match our map */
-        ndfSect( refndf, 2, dat->lbnd_out, dat->ubnd_out, &zerondf, status );
-
-        /* Map the data as double precision */
-        ndfMap( zerondf, "DATA", "_DOUBLE", "READ", &ptr, &nmap, status );
-      }
-
-      /* Identify bad pixels in maskdata and set those pixels in zeromask */
-      if( *status == SAI__OK ) {
-        double *maskdata = ptr;
-        for( i=0; i<dat->msize; i++ ) {
-          if( maskdata[i] == VAL__BADD ) {
-            dat->zeromask[i] = 1;
-          }
-        }
-      }
-
-      ndfEnd( status );
-    }
-
-    /* Apply a circular boundary condition? */
-    if( !premask && astMapGet1D( kmap, "ZERO_CIRCLE", 3, &zero_c_n,
-                                 zero_circle ) ) {
-      double centre[2];
-      AstCircle *circle=NULL;
-      int lbnd_grid[2];
-      int ubnd_grid[2];
-      double radius[1];
-
-      /* If only one parameter supplied it is radius, assume reference
-         LON/LAT from the frameset to get the centre. If the SkyFrame
-         represents offsets from the reference position (i.e. the source
-         is moving), assume the circle is to be centred on the origin.  */
-      if( zero_c_n == 1 ) {
-        zero_circle[2] = zero_circle[0];
-
-        skyrefis = astGetC( dat->outfset, "SkyRefIs" );
-        if( skyrefis && !strcmp( skyrefis, "Origin" ) ) {
-           zero_circle[0] = 0.0;
-           zero_circle[1] = 0.0;
-        } else {
-           zero_circle[0] = astGetD( dat->outfset, "SkyRef(1)" );
-           zero_circle[1] = astGetD( dat->outfset, "SkyRef(2)" );
-        }
-
-        zero_circle[0] *= AST__DR2D;
-        zero_circle[1] *= AST__DR2D;
-
-        zero_c_n = 3;
-      }
-
-      if( zero_c_n==3 ) {
-        /* The supplied bounds are for pixel coordinates... we need bounds
-           for grid coordinates which have an offset */
-        lbnd_grid[0] = 1;
-        lbnd_grid[1] = 1;
-        ubnd_grid[0] = dat->ubnd_out[0] - dat->lbnd_out[0] + 1;
-        ubnd_grid[1] = dat->ubnd_out[1] - dat->lbnd_out[1] + 1;
-
-        /* Coordinates & radius of the circular region converted from degrees
-           to radians */
-        centre[0] = zero_circle[0]*AST__DD2R;
-        centre[1] = zero_circle[1]*AST__DD2R;
-        radius[0] = zero_circle[2]*AST__DD2R;
-
-        /* Last frame is the sky frame, where the circle is defined */
-        circle = astCircle( astGetFrame(dat->outfset, AST__CURRENT), 1, centre,
-                            radius, NULL, " " );
-
-        /* Get the mapping from the sky frame (last) to the grid frame (first),
-           and then set the zeromask to 1 for all of the values outside of
-           this circle */
-
-        astMaskUB(circle, astGetMapping(dat->outfset, AST__CURRENT, AST__BASE),
-                  0, 2, lbnd_grid, ubnd_grid, dat->zeromask, 1);
-
-        circle = astAnnul( circle );
-      }
-    }
-  }
-
-  /* Will we apply a boundary condition based on map pixels that lie below
-     some threshold? */
-  astMapGet0D( kmap, "ZERO_SNR", &zero_snr );
-  if( premask ) zero_snr = 0.0;
-
-  /* Will we apply boundary conditions on last iteration ? */
-  astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
-
-  if( *status != SAI__OK ) {
-    return;
-  }
-
   /* Before applying boundary conditions, removing AST signal from residuals
      etc., flag spikes using map */
 
@@ -406,6 +254,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   /* Constrain map. We don't if this is the very last iteration, and
      if zero_notlast is set. */
 
+  zero_notlast = 0;
+  astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
   if( gaussbg && !(zero_notlast && (flags&SMF__DIMM_LASTITER)) ) {
     /* Calculate and remove a background using a simple Gaussian filter...
        the idea is to help remove saddles. Maybe this should go after
@@ -451,89 +301,38 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     filt = smf_free_smfFilter( filt, status );
   }
 
-  /* Proceed if we need to do zero-masking */
-  if( zero_notlast && (flags&SMF__DIMM_LASTITER) ) dozero = 0;
-  else if( zero_snr || zero_lowhits || dat->zeromask ) dozero = 1;
+  /* Get a mask to apply to the map. This is determined by the "Zero_..."
+     parameters in the configuration KeyMap. */
+   zmask = smf_get_mask( SMF__AST, keymap, dat, flags, status );
 
-  if( (*status == SAI__OK) && (dozero) ) {
+  /* Proceed if we need to do zero-masking */
+  if( zmask ) {
 
     /* Reset the SMF__MAPQ_ZERO bit */
     for( i=0; i<dat->msize; i++ ) {
       mapqual[i] &= ~SMF__MAPQ_ZERO;
     }
 
-    /* Zero regions of low hits around the edges (this can change each
-       iteration as samples are dropped) */
+    /* Zero background regions in the map (usually round the edges). */
+    newzero = 0;
+    for( i=0; i<dat->msize; i++ ) {
 
-    if( zero_lowhits ) {
-      /* Set hits pixels with 0 hits to VAL__BADI so that stats1 ignores them */
-      for( i=0; i<dat->msize; i++ ) {
-        if( hitsmap[i] == 0 ) {
-          hitsmap[i] = VAL__BADI;
-        }
-      }
-
-      /* Find the mean hits in the map */
-      smf_stats1I( hitsmap, 1, dat->msize, NULL, 0, 0, &meanhits, NULL, NULL,
-                   &ngood, status );
-
-      msgOutiff( MSG__DEBUG, "", FUNC_NAME
-                 ": mean hits = %lf, ngood = %zd", status, meanhits, ngood );
-
-      /* Apply boundary condition */
-      newzero = 0;
-      for( i=0; i<dat->msize; i++ ) {
-        if((hitsmap[i] != VAL__BADI) && (hitsmap[i] < meanhits*zero_lowhits)) {
-          map[i] = 0;
-          mapweight[i] = VAL__BADD;
-          mapweightsq[i] = VAL__BADD;
-          mapvar[i] = VAL__BADD;
-          mapqual[i] |= SMF__MAPQ_ZERO;
-          newzero ++;
-        }
-      }
-    }
-
-    /* Zero regions below the cut in SNR */
-
-    if( zero_snr ) {
-      for( i=0; i<dat->msize; i++ ) {
-
-        if( map[i] == VAL__BADD ||
-            mapvar[i] == VAL__BADD ||
-            mapvar[i] <= 0.0 ) {
+      if( map[i] == VAL__BADD || mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) {
           mapqual[i] |= SMF__MAPQ_ZERO;
 
-        } else if( map[i]/sqrt(mapvar[i]) < zero_snr ) {
-          map[i] = 0;
-          mapweight[i] = VAL__BADD;
-          mapweightsq[i] = VAL__BADD;
-          mapvar[i] = VAL__BADD;
-          mapqual[i] |= SMF__MAPQ_ZERO;
-          newzero ++;
-        }
-      }
-    }
-
-    /* Any other boundary constraints are static. We just check for the
-       existence of zeromask */
-    if( dat->zeromask ) {
-
-      for( i=0; i<dat->msize; i++ ) {
-        if( dat->zeromask[i]) {
-          map[i] = 0;
-          mapweight[i] = VAL__BADD;
-          mapweightsq[i] = VAL__BADD;
-          mapvar[i] = VAL__BADD;
-          mapqual[i] |= SMF__MAPQ_ZERO;
-          newzero ++;
-        }
+      } else if( zmask[i] ) {
+        map[i] = 0;
+        mapweight[i] = VAL__BADD;
+        mapweightsq[i] = VAL__BADD;
+        mapvar[i] = VAL__BADD;
+        mapqual[i] |= SMF__MAPQ_ZERO;
+        newzero ++;
       }
     }
   }
 
   /* Ensure everything is in the same data order */
-  smf_model_dataOrder( dat, NULL, chunk,SMF__LUT|SMF__RES|SMF__QUA|SMF__NOI,
+  smf_model_dataOrder( dat, NULL, chunk,SMF__LUT|SMF__RES|SMF__QUA,
                        lut->sdata[0]->isTordered, status );
 
   /* Loop over index in subgrp (subarray) */
@@ -543,11 +342,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     res_data = (res->sdata[idx]->pntr)[0];
     lut_data = (lut->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
-    if( noi ) {
-      smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
-                    NULL, &noibstride, &noitstride, status);
-      noi_data = (double *)(noi->sdata[idx]->pntr)[0];
-    }
 
     if( (res_data == NULL) || (lut_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;

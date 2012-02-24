@@ -675,6 +675,10 @@
 *     AST.ZERO_LOWHITS = REAL
 *       Constrain boundary regions with low hit count to 0. The threshold
 *       is where the hits are this fraction lower than the mean. [0]
+*     AST.ZERO_MASK = INTEGER
+*       Constrain map so that pixels that are bad in the reference NDF
+*       are forced to zero in the map. The reference NDF is accessed
+*       using the ADAM parameter "REF". [0]
 *     AST.ZERO_NOTLAST = LOGICAL
 *       If ast.zero_notlast is set, on the final iteration the
 *       AST.ZERO_LOWHITS boundary condition will not be applied. This
@@ -736,6 +740,20 @@
 *       If true, a separate common-mode will be estimated for each
 *       sub-array. Otherwise, a single common mode will be estimated from
 *       all available subarrays. [0]
+*     COM.ZERO_CIRCLE = REAL
+*       Exclude samples within this radius in degrees from the map centre
+*       when calculating the common mode signal. [0]
+*     COM.ZERO_LOWHITS = REAL
+*       Exclude samples contained within regions with high hit count when
+*       calculating the common mode signal. The threshold is where the hits
+*       are this fraction lower than the mean. [0]
+*     COM.ZERO_MASK = INTEGER
+*       Exclude samples from the estimation of the common-mode signal
+*       if the corresponding pixel has a good value in the reference NDF.
+*       The reference NDF is accessed using the ADAM parameter "REF". [0]
+*     COM.ZERO_SNR = REAL
+*       Exclude samples from the estimation of the common-mode signal
+*       wherever the map SNR is higher than this threshold. [0]
 *     DKS.BOXCAR = INTEGER
 *       If DKS (dark squid) model component requested, boxcar the dark squid
 *       signal by this many samples (if positive) or seconds (if negative)
