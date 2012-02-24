@@ -132,7 +132,7 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap,
    int ncomp;
    int ndim;
    int nentry;
-   int ntime;
+   int ntime = 0;
    int prim;
    int there;
    int ubnd[ NDF__MXDIM ];
