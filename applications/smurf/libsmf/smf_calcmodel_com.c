@@ -545,7 +545,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   AstKeyMap *kmap=NULL;         /* Local keymap */
   double dchisq=0;              /* this - last model residual chi^2 */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
-  int *lut_data;                /* Array holding themap index for each sample */
+  int *lut_data = NULL;         /* Array holding themap index for each sample */
   unsigned char *mask;          /* Pointer to 2D mask map */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -594,7 +594,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
-  lut = dat->lut[chunk];
+  if (dat->lut) lut = dat->lut[chunk];
   model = allmodel[chunk];
   if(dat->gai) {
     gai = dat->gai[chunk];
@@ -848,7 +848,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Get pointers to data/quality/lut/model */
       res_data = (res->sdata[idx]->pntr)[0];
       qua_data = (qua->sdata[idx]->pntr)[0];
-      lut_data = (lut->sdata[idx]->pntr)[0];
+      if (lut) lut_data = (lut->sdata[idx]->pntr)[0];
       if( gai ) {
         gai_data = (gai->sdata[idx]->pntr)[0];
       }
