@@ -1012,6 +1012,13 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        in the output header.
 *     23-FEB-2012 (DSB):
 *        Use iauGd2gc in place of palGeoc where is saves some calculations.
+*     24-FEB-2012 (DSB):
+*        Move invocation of AddEncodingFrame from Write to end of
+*        MakeFitsFrameSet. This is so that AddEncodingFrame can take
+*        advantage of any standardisations (such as adding celestial axes)
+*        performed by MakeFItsFrameSet. Without this, a FRameSet contain
+*        a 1D SpecFrame (no celestial axes) would fail to be exported using
+*        FITS-CLASS encoding.
 *class--
 */
 
@@ -1550,7 +1557,7 @@ static int TestWarnings( AstFitsChan *, int * );
 static void SetWarnings( AstFitsChan *, const char *, int * );
 static AstFitsChan *SpecTrans( AstFitsChan *, int, const char *, const char *, int * );
 static AstFitsTable *GetNamedTable( AstFitsChan *, const char *, int, int, int, const char *, int * );
-static AstFrameSet *MakeFitsFrameSet( AstFrameSet *, int, int, int * );
+static AstFrameSet *MakeFitsFrameSet( AstFitsChan *, AstFrameSet *, int, int, int, const char *, const char *, int * );
 static AstGrismMap *ExtractGrismMap( AstMapping *, int, AstMapping **, int * );
 static AstKeyMap *GetTables( AstFitsChan *, int * );
 static AstMapping *AddUnitMaps( AstMapping *, int, int, int * );
@@ -1585,7 +1592,7 @@ static AstWinMap *WcsShift( FitsStore *, char, int, const char *, const char *, 
 static FitsCard *GetLink( FitsCard *, int, const char *, const char *, int * );
 static FitsStore *FitsToStore( AstFitsChan *, int, const char *, const char *, int * );
 static FitsStore *FreeStore( FitsStore *, int * );
-static FitsStore *FsetToStore( AstFitsChan *, AstFrameSet *, int, double *, const char *, const char *, int * );
+static FitsStore *FsetToStore( AstFitsChan *, AstFrameSet *, int, double *, int, const char *, const char *, int * );
 static char *CardComm( AstFitsChan *, int * );
 static char *CardName( AstFitsChan *, int * );
 static double *Cheb2Poly( double *, int, int, double, double, double, double, int * );
@@ -1612,7 +1619,7 @@ static int *CardFlags( AstFitsChan *, int * );
 static int AIPSFromStore( AstFitsChan *, FitsStore *, const char *, const char *, int * );
 static int AIPSPPFromStore( AstFitsChan *, FitsStore *, const char *, const char *, int * );
 static int AddEncodingFrame( AstFitsChan *, AstFrameSet *, int, const char *, const char *, int * );
-static int AddVersion( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, double *, char, const char *, const char *, int * );
+static int AddVersion( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, double *, char, int, const char *, const char *, int * );
 static int CLASSFromStore( AstFitsChan *, FitsStore *, AstFrameSet *, double *, const char *, const char *, int * );
 static int CardType( AstFitsChan *, int * );
 static int CheckFitsName( const char *, const char *, const char *, int * );
@@ -1979,7 +1986,6 @@ static int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding,
 *     Private function.
 
 *  Synopsis:
-
 *     int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding,
 *                           const char *method, const char *class, int *status )
 
@@ -2244,7 +2250,7 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
 }
 
 static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
-                       FitsStore *store, double *dim, char s,
+                       FitsStore *store, double *dim, char s, int encoding,
                        const char *method, const char *class, int *status ){
 
 /*
@@ -2259,9 +2265,8 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
-*                     FitsStore *store, double *dim, char s,
+*                     FitsStore *store, double *dim, char s, int encoding,
 *                     const char *method, const char *class, int *status )
 
 *  Class Membership:
@@ -2294,6 +2299,8 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
 *        The co-ordinate version character. A space means the primary
 *        axis descriptions. Otherwise the supplied character should be
 *        an upper case alphabetical character ('A' to 'Z').
+*     encoding
+*        The encoding being used.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -2378,7 +2385,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    position (SpecFrame attributes RefRA and RefDec), then FITS-WCS paper
    III requires there to be a pair of celestial axes in the WCS Frame in
    which the celestial reference point for the spectral axis is defined. */
-   fset = MakeFitsFrameSet( fs, ipix, iwcs, status );
+   fset = MakeFitsFrameSet( this, fs, ipix, iwcs, encoding, method, class, status );
 
 /* Abort if the FrameSet could not be produced. */
    if( !fset ) return ret;
@@ -10795,7 +10802,7 @@ static AstObject *FsetFromStore( AstFitsChan *this, FitsStore *store,
 }
 
 static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
-                               double *dim, const char *class,
+                               double *dim, int encoding, const char *class,
                                const char *method, int *status ){
 
 /*
@@ -10812,7 +10819,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
 *  Synopsis:
 
 *     FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
-*                             double *dim, const char *class,
+*                             double *dim, int encoding, const char *class,
 *                             const char *method, int *status )
 
 *  Class Membership:
@@ -10841,6 +10848,8 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
 *     dim
 *        Pointer to an array of pixel axis dimensions. Individual elements
 *        will be AST__BAD if dimensions are not known.
+*     encoding
+*        The encoding being used.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -10935,8 +10944,8 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
 
 /* Add a description of the primary axes to the FitsStore, based on the
    Current Frame in the FrameSet. */
-      primok = AddVersion( this, fset, ibase, icurr, ret, dim, ' ', method,
-                           class, status );
+      primok = AddVersion( this, fset, ibase, icurr, ret, dim, ' ',
+                           encoding, method, class, status );
 
 /* Do not add any alternate axis descriptions if the primary axis
    descriptions could not be produced. */
@@ -11005,7 +11014,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
             s = sid[ ifrm ];
             if( s != 0 && s != 1 ) {
                secok = AddVersion( this, fset, ibase, ifrm, ret, dim,
-                                   s, method, class, status );
+                                   s, encoding, method, class, status );
             }
          }
 
@@ -19386,7 +19395,10 @@ static AstMapping *MakeColumnMap( AstFitsTable *table, const char *col,
    return result;
 }
 
-static AstFrameSet *MakeFitsFrameSet( AstFrameSet *fset, int ipix, int iwcs, int *status ) {
+static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
+                                      int ipix, int iwcs, int encoding,
+                                      const char *method, const char *class,
+                                      int *status ) {
 /*
 *  Name:
 *     MakeFitsFrameSet
@@ -19400,7 +19412,10 @@ static AstFrameSet *MakeFitsFrameSet( AstFrameSet *fset, int ipix, int iwcs, int
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     AstFrameSet *MakeFitsFrameSet( AstFrameSet *fset, int ipix, int iwcs, int *status )
+*     AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
+*                                    int ipix, int iwcs, int encoding,
+*                                    const char *method, const char *class,
+*                                    int *status )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -19430,12 +19445,22 @@ static AstFrameSet *MakeFitsFrameSet( AstFrameSet *fset, int ipix, int iwcs, int
 *     celestial axes.
 
 *  Parameters:
+*     this
+*        The FitsChan.
 *     fset
 *        The FrameSet to check.
 *     ipix
 *        The index of the FITS pixel Frame within "fset".
 *     iwcs
 *        The index of the WCS Frame within "fset".
+*     encoding
+*        The encoding in use.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -19469,13 +19494,14 @@ static AstFrameSet *MakeFitsFrameSet( AstFrameSet *fset, int ipix, int iwcs, int
    char card[ AST__FITSCHAN_FITSCARDLEN + 1 ]; /* A FITS header card */
    char equinox_attr[ 13 ];/* Name of Equinox attribute for sky axes */
    char system_attr[ 12 ]; /* Name of System attribute for sky axes */
-   const char *eqn;              /* Pointer to original sky Equinox value */
+   const char *eqn;        /* Pointer to original sky Equinox value */
    const char *skysys;     /* Pointer to original sky System value */
    double con;             /* Constant axis value */
    double reflat;          /* Celestial latitude at reference point */
    double reflon;          /* Celestial longitude at reference point */
    int *perm;              /* Pointer to axis permutation array */
    int iax;                /* Axis inex */
+   int icurr;              /* Index of original current Frame in returned FrameSet */
    int ilat;               /* Celestial latitude index within WCS Frame */
    int ilon;               /* Celestial longitude index within WCS Frame */
    int ispec;              /* SpecFrame axis index within WCS Frame */
@@ -19722,6 +19748,14 @@ static AstFrameSet *MakeFitsFrameSet( AstFrameSet *fset, int ipix, int iwcs, int
          }
       }
    }
+
+/* Add a new current Frame into the FrameSet which increases the chances of
+   the requested encoding being usable. The index of the original current
+   Frame is returned, or AST__NOFRAME if no new Frame was added. */
+   icurr = AddEncodingFrame( this, ret, encoding, method, class, status );
+
+/* If a new Frame was added, remove the original current Frame. */
+   if( icurr != AST__NOFRAME ) astRemoveFrame( ret, icurr );
 
 /* Free resources. */
    if( specfrm ) specfrm = astAnnul( specfrm );
@@ -36474,7 +36508,6 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
    int comm;                     /* Value of Comm attribute */
    int encoding;                 /* FITS encoding scheme to use */
    int i;                        /* Axis index */
-   int icurr;                    /* Original current Frame index */
    int naxis;                    /* No. of pixel axes */
    int ret;                      /* Number of objects read */
 
@@ -36589,24 +36622,11 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
                                  dim + i ) ) dim[ i ] = AST__BAD;
             }
 
-/* Add a new current Frame into the FrameSet which increases the chances of
-   the requested encoding being usable. The index of the original current
-   Frame is returned, or AST__NOFRAME if no new Frame was added. */
-            icurr = AddEncodingFrame( this, (AstFrameSet *) object,
-                                      encoding, method, class, status );
-
 /* Extract the required information from the FrameSet into a standard
    intermediary structure called a FitsStore. The indices of any
    celestial axes are returned. */
             store = FsetToStore( this, (AstFrameSet *) object, naxis, dim,
-                                 method, class, status );
-
-/* Remove the Frame (if any) added above, and re-instate the original current
-   Frame. */
-            if( icurr != AST__NOFRAME ) {
-               astRemoveFrame( (AstFrameSet *) object, AST__CURRENT );
-               astSetCurrent( (AstFrameSet *) object, icurr );
-            }
+                                 encoding, method, class, status );
 
 /* If the FrameSet cannot be described in terms of any of the supported
    FITS encodings, a null pointer will have been returned. */
