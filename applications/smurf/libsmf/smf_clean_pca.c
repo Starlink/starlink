@@ -180,7 +180,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   size_t j;               /* Loop counter */
   size_t k;               /* Loop counter */
   size_t l;               /* Loop counter */
-  dim_t ngoodbolo;        /* number good bolos = number principal components */
+  size_t ngoodbolo;       /* number good bolos = number principal components */
   dim_t tlen;             /* number of time slices */
   smfPCAData *pdata=NULL; /* Pointer to job data */
   double *rms_amp=NULL;   /* VAL__BADD for components to remove */
@@ -388,7 +388,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   size_t *goodbolo=NULL;  /* Indices of the good bolometers for analysis */
   dim_t nbolo;            /* number of bolos */
   dim_t ndata;            /* number of samples in data */
-  dim_t ngoodbolo;        /* number good bolos = number principal components */
+  size_t ngoodbolo;       /* number good bolos = number principal components */
   dim_t ntslice;          /* number of time slices */
   int nw;                 /* total available worker threads */
   smfPCAData *pdata=NULL; /* Pointer to job data */

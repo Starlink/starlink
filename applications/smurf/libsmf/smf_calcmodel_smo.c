@@ -198,7 +198,8 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   model = allmodel[chunk];
 
-  msgOutiff(MSG__VERB, "", "    Calculating smoothed model using boxcar of width %zu time slices",
+  msgOutiff(MSG__VERB, "",
+            "    Calculating smoothed model using boxcar of width %" DIM_T_FMT " time slices",
             status, boxcar);
 
   /* Create structures used to pass information to the worker threads. */

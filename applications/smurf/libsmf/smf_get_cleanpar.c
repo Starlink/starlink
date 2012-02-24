@@ -24,7 +24,7 @@
 *                       double *flagfast, int *order, double *spikethresh,
 *                       size_t *spikebox, double *noisecliphigh,
 *                       double *noisecliplow, int *whiten, int *compreprocess,
-*                       size_t *pcalen, double *pcathresh, int groupsubarray,
+*                       dim_t *pcalen, double *pcathresh, int groupsubarray,
 *                       double *downsampscale, double *downsampfreq,
 *                       int *noiseclipprecom, int *status )
 
@@ -95,7 +95,7 @@
 *        Fit and remove polynomial baselines of this order (NULL:-1)
 *     spikethresh = double* (Returned)
 *        Flag spikes SPIKETHRESH-sigma away from mean (NULL:0)
-*     spikebox = size_t* (Returned)
+*     spikebox = dim_t* (Returned)
 *        The size of the filter box used for flagging spikes.
 *     noisecliphigh = double * (Returned)
 *        Number of standard deviations to clip the upper bound
@@ -109,7 +109,7 @@
 *        Apply a whitening filter to the data?
 *     compreprocess = int * (Returned)
 *        If set do common-mode rejection and bad-data rejection.
-*     pcalen = size_t * (Returned)
+*     pcalen = dim_t * (Returned)
 *        Chunk length for PCA cleaning in time slices (if 0 default to full
 *        length of the data)
 *     pcathresh = double * (Returned)
@@ -250,9 +250,9 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
                        double *filt_edge_largescale, double *filt_notchlow,
                        double *filt_notchhigh, int *filt_nnotch, int *dofilt,
                        double *flagslow, double *flagfast, int *order,
-                       double *spikethresh, size_t *spikebox,
+                       double *spikethresh, dim_t *spikebox,
                        double *noisecliphigh, double *noisecliplow, int *whiten,
-                       int *compreprocess, size_t *pcalen, double *pcathresh,
+                       int *compreprocess, dim_t *pcalen, double *pcathresh,
                        int *groupsubarray, double *downsampscale,
                        double *downsampfreq, int *noiseclipprecom,
                        int *status ) {
@@ -529,7 +529,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
   if( spikebox ) {
     *spikebox = 0;
     smf_get_nsamp( keymap, "SPIKEBOX", data, spikebox, status );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKEBOX=%zu", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKEBOX=%" DIM_T_FMT, status,
                *spikebox );
   }
 
@@ -554,7 +554,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
   if( pcalen ) {
     *pcalen = 0;
     smf_get_nsamp( keymap, "PCALEN", data, pcalen, status );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": PCALEN=%zu", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": PCALEN=%" DIM_T_FMT, status,
                *pcalen );
   }
 

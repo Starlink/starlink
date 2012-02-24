@@ -471,7 +471,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
             maxlen = round(maxlen*scalelen);
             maxlen_scaled = 1;
             msgOutiff( MSG__VERB, "", FUNC_NAME
-                       ": requested maxlen %g seconds = %zu down-sampled "
+                       ": requested maxlen %g seconds = %" DIM_T_FMT " down-sampled "
                        "time-slices", status, maxlen_s, maxlen );
 
             /* Return updated srate_maxlen for down-sampling if requested */
