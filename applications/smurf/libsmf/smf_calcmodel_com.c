@@ -323,6 +323,8 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   mask = pdata->mask;
   lut_data = pdata->lut_data;
 
+  /* Cannot apply a mask if there is no LUT. */
+  if( !lut_data ) mask = NULL;
 
   /* Undo the previous iteration of the model, each thread handles a
      block of bolos */

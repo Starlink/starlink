@@ -138,8 +138,8 @@ unsigned char *smf_get_mask( smf_modeltype mtype, AstKeyMap *config,
 /* Initialise returned values */
    result = NULL;
 
-/* Check inherited status */
-   if( *status != SAI__OK ) return result;
+/* Check inherited status. Also check that a map is being created.  */
+   if( *status != SAI__OK || !dat || !dat->map ) return result;
 
 /* Begin an AST context. */
    astBegin;
