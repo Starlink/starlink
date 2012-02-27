@@ -295,8 +295,8 @@ void smf_calcmodel_tmp( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
         if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
           double g, o, corr;
           /* Gain and offset */
-          smf_templateFit1D( res_data+i*bstride, qua_data+i*bstride,
-                             SMF__Q_GOOD, SMF__Q_MOD, ntslice, tstride,
+          smf_templateFit1D( res_data+i*bstride, qua_data+i*bstride, NULL,
+                             NULL, SMF__Q_GOOD, SMF__Q_MOD, ntslice, tstride,
                              template, 1, 1, &g, &o, &corr, status );
 
           model_data[i*mbstride+0*mcstride] = g;

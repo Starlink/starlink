@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     void smf_templateFit1<X>( CGEN_TYPE *data, smf_qual_t *qual,
-*                               smf_qual_t mask_meas,
-*                               smf_qual_t mask_cor, const size_t n,
-*                               const size_t stride,
+*                               const unsigned char *mask, const int *lut,
+*                               smf_qual_t mask_meas, smf_qual_t mask_cor,
+*                               const size_t n, const size_t stride,
 *                               const double *template, int remove,
 *                               int nooffset, double *gain, double *offset,
 *                               double *corr, int *status )
@@ -28,6 +28,14 @@
 *        If specified, use this QUALITY array to decide which data samples
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to VAL__BADD.
+*     mask = const unsigned char * (Given)
+*        Pointer to a 2D mask of boolean values. May be NULL. If supplied,
+*        the mask should have the bounds of the output map. And time
+*        samples in "data" that correspond to zero-valued pixels in this
+*        mask are excluded from the fitting process.
+*     lut = const int * (Given)
+*        The index of the corresponding pixel within "mask" for each sample
+*        in "data". Only used if "mask" is not NULL.
 *     mask_meas = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in calculation of template fit.
@@ -88,6 +96,8 @@
 *        Use two quality masks: one for measuremnt, one for template removal
 *     2010-06-01 (EC):
 *        Add nooffset parameter
+*     2012-02-27 (DSB):
+*        Added args "mask" and "lut".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -136,8 +146,26 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_templateFit1"
 
+/* Macro to calculate the reuqired sums, using a generic sample inclusion
+   criterion. */
+#define FIND_SUMS \
+      off = 0; \
+      for( i=0; i<n; i++ ) { \
+        if( GOOD_VAL && template[i] != VAL__BADD ) { \
+          s_d += data[off]; \
+          s_dsq += data[off]*data[off]; \
+          s_dt += data[off]*template[i]; \
+          s_t += template[i]; \
+          s_tsq += template[i]*template[i]; \
+          ngood ++; \
+        } \
+        off += stride; \
+      } \
+
+
 void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, smf_qual_t *qual,
-                                      smf_qual_t mask_meas,
+                                      const unsigned char *mask,
+                                      const int *lut, smf_qual_t mask_meas,
                                       smf_qual_t mask_cor, const size_t n,
                                       const size_t stride,
                                       const double *template, int remove,
@@ -185,35 +213,33 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, smf_qual_t *qual,
   if( offset ) *offset = VAL__BADD;
   if( corr ) *corr = VAL__BADD;
 
-  if( qual ) {  /* QUALITY checking version */
-    /* Calculate sums in case of non-contiguous data */
-    off = 0;
-    for( i=0; i<n; i++ ) {
-      if( !(qual[off]&mask_meas) && (template[i] != VAL__BADD) ) {
-        s_d += data[off];
-        s_dsq += data[off]*data[off];
-        s_dt += data[off]*template[i];
-        s_t += template[i];
-        s_tsq += template[i]*template[i];
-        ngood ++;
-      }
-      off += stride;
+  /* Find the required sums. First handle cases with no masking */
+  if( !mask || !lut ) {
+    if( qual ) {  /* QUALITY checking version */
+      #define GOOD_VAL ( !(qual[off]&mask_meas) )
+      FIND_SUMS
+      #undef GOOD_VAL
+
+    } else {      /* VAL__BAD checking version */
+      #define GOOD_VAL ( data[off] != CGEN_BAD )
+      FIND_SUMS
+      #undef GOOD_VAL
     }
-  } else {      /* VAL__BAD checking version */
-    /* Calculate sums in case of non-contiguous data */
-    off = 0;
-    for( i=0; i<n; i++ ) {
-      if( (data[off] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
-        s_d += data[off];
-        s_dsq += data[off]*data[off];
-        s_dt += data[off]*template[i];
-        s_t += template[i];
-        s_tsq += template[i]*template[i];
-        ngood ++;
-      }
-      off += stride;
+
+  /* Now handle cases with masking */
+  } else {
+    if( qual ) {  /* QUALITY checking version */
+      #define GOOD_VAL ( !(qual[off]&mask_meas) && mask[lut[off]] )
+      FIND_SUMS
+      #undef GOOD_VAL
+
+    } else {      /* VAL__BAD checking version */
+      #define GOOD_VAL ( data[off] != CGEN_BAD  && mask[lut[off]] )
+      FIND_SUMS
+      #undef GOOD_VAL
     }
   }
+
 
   /* Check for divide-by-zero */
   if( ngood >= 3 ) {

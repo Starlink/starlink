@@ -350,17 +350,17 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
             case SMF__DOUBLE:
               d_d = (double *) indata->pntr[0];
               smf_templateFit1D( &d_d[b*bstride+jf1*tstride],
-                                 &qua[b*bstride+jf1*tstride], mask, mask,
-                                 nfit, tstride, &dksquid[jf1], 1, 1, &gain,
-                                 &offset, &corr, status );
+                                 &qua[b*bstride+jf1*tstride], NULL, NULL,
+                                 mask, mask, nfit, tstride, &dksquid[jf1], 1,
+                                 1, &gain, &offset, &corr, status );
               break;
 
             case SMF__INTEGER:
               d_i = (int *) indata->pntr[0];
               smf_templateFit1I( &d_i[b*bstride+jf1*tstride],
-                                 &qua[b*bstride+jf1*tstride], mask, mask,
-                                 nfit, tstride, &dksquid[jf1], 1, 1, &gain,
-                                 &offset, &corr, status );
+                                 &qua[b*bstride+jf1*tstride], NULL, NULL, mask,
+                                 mask, nfit, tstride, &dksquid[jf1], 1, 1,
+                                 &gain, &offset, &corr, status );
               break;
 
             default:

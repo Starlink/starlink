@@ -850,7 +850,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Get pointers to data/quality/lut/model */
       res_data = (res->sdata[idx]->pntr)[0];
       qua_data = (qua->sdata[idx]->pntr)[0];
-      if (lut) lut_data = (lut->sdata[idx]->pntr)[0];
       if( gai ) {
         gai_data = (gai->sdata[idx]->pntr)[0];
       }
@@ -883,8 +882,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
           pdata->gain_box = gain_box;
           pdata->nogains = nogains;
           pdata->nblock = nblock;
-          pdata->mask = mask;
-          pdata->lut_data = lut_data;
         }
       }
 
@@ -951,6 +948,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
         res_data = (res->sdata[idx]->pntr)[0];
         qua_data = (qua->sdata[idx]->pntr)[0];
         if( gai ) gai_data = (gai->sdata[idx]->pntr)[0];
+        if (lut) lut_data = (lut->sdata[idx]->pntr)[0];
 
         /* Set up the job data to update "model_data" and "weight" to
            include the contribution from the current sub-array. */
@@ -972,6 +970,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
           pdata->qua_data = qua_data;
           pdata->ijob = -1;
           pdata->weight = weight;
+          pdata->mask = mask;
+          pdata->lut_data = lut_data;
         }
 
         /* Submit the jobs to the workforce and Wait until they have all
@@ -1006,12 +1006,15 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          estimate. This also rejects aberrant bolometers from all sub-arrays.
          If we do not have a GAI model, then zero bolometers are rejected. */
       if( perarray ) {
-         nbad = gai ? smf_find_gains( wf, res->sdata[icom], model_data, kmap,
-                                      SMF__Q_GOOD, SMF__Q_COM, gai->sdata[icom],
-                                      nrej, status ) : 0;
+
+         nbad = gai ? smf_find_gains( wf, res->sdata[icom], mask,
+                                      lut ? lut->sdata[icom] : NULL,
+                                      model_data, kmap, SMF__Q_GOOD,
+                                      SMF__Q_COM, gai->sdata[icom], nrej,
+                                      status ) : 0;
       } else {
-         nbad = gai ? smf_find_gains_array( wf, res, model_data, kmap,
-                                            SMF__Q_GOOD, SMF__Q_COM,
+         nbad = gai ? smf_find_gains_array( wf, res, mask, lut, model_data,
+                                            kmap, SMF__Q_GOOD, SMF__Q_COM,
                                             gai, nrej, status ) : 0;
       }
 

@@ -15,6 +15,7 @@
 
 *  Invocation:
 *     int smf_find_gains_array( ThrWorkForce *wf, smfArray *data,
+*                               const unsigned char *mask, smfArray *lut,
 *                               double *template, AstKeyMap *keymap,
 *                               smf_qual_t goodqual, smf_qual_t badqual,
 *                               smfArray *gain,
@@ -26,6 +27,14 @@
 *     data = smfArray * (Given)
 *        The input data. Each bolometer time series will be compared to
 *        the template.
+*     mask = const unsigned char * (Given)
+*        Pointer to a 2D mask of boolean values. May be NULL. If supplied,
+*        the mask should have the bounds of the output map. And time
+*        samples in "data" that correspond to zero-valued pixels in this
+*        mask are excluded from the fitting process.
+*     lut = smfData * (Given)
+*        The index of the corresponding pixel within "mask" for each sample
+*        in "data". Only used if "mask" is not NULL.
 *     template = double * (Given)
 *        The 1-dimensional template. The length of this array should
 *        equal the number of time slices in "data".
@@ -153,6 +162,8 @@
 *  History:
 *     16-JUN-2010 (DSB):
 *        Original version.
+*     27-FEB-2012 (DSB):
+*        Add args "mask" and "lut".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -189,9 +200,10 @@
 #include "libsmf/smf_typ.h"
 
 /* Main entry */
-int smf_find_gains_array( ThrWorkForce *wf, smfArray *data, double *template,
-                          AstKeyMap *keymap, smf_qual_t goodqual,
-                          smf_qual_t badqual,
+int smf_find_gains_array( ThrWorkForce *wf, smfArray *data,
+                          const unsigned char *mask, smfArray *lut,
+                          double *template, AstKeyMap *keymap,
+                          smf_qual_t goodqual, smf_qual_t badqual,
                           smfArray *gain, int *nrej, int *status ){
 
 /* Local Variables: */
@@ -217,7 +229,8 @@ int smf_find_gains_array( ThrWorkForce *wf, smfArray *data, double *template,
 
 /* If there is only one sub-array, just call smf_find_gains. */
    if( nsub == 1 ) {
-      nbad = smf_find_gains( wf, data->sdata[ 0 ], template,
+      nbad = smf_find_gains( wf, data->sdata[ 0 ], mask,
+                             lut ? lut->sdata[0] : NULL, template,
                              keymap, goodqual, badqual,
                              gain->sdata[ 0 ], nrej, status );
 
@@ -254,8 +267,9 @@ int smf_find_gains_array( ThrWorkForce *wf, smfArray *data, double *template,
 
 /* Call smf_find_gains to process the sub-array. This puts the number
    of sub-array bolometers rejected from each block into "nrej_in". */
-            nbad += smf_find_gains( wf, data->sdata[ isub ], template,
-                                    keymap, goodqual, badqual,
+            nbad += smf_find_gains( wf, data->sdata[ isub ], mask,
+                                    lut ? lut->sdata[ isub ] : NULL,
+                                    template, keymap, goodqual, badqual,
                                     gain->sdata[ isub ], nrej_in, status );
 
 /* Update the total number of bolometers rejected from each block, summed

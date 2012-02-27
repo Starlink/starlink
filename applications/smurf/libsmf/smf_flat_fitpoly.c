@@ -316,8 +316,8 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
            passed. */
 
         if (c0 != VAL__BADD && c1 != VAL__BADD) {
-          smf_templateFit1D( scan, NULL, 0, 0, nrgood, 1, poly, 0, 0,
-                             &gain, &offset, &corr, status );
+          smf_templateFit1D( scan, NULL, NULL, NULL, 0, 0, nrgood, 1, poly, 0,
+                             0, &gain, &offset, &corr, status );
           msgOutiff(MSG__DEBUG20, "",
                     " Template: Bol %zd Gain = %g offset = %g corr = %g",
                     status, bol, gain, offset, corr );

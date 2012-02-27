@@ -15,6 +15,7 @@
 
 *  Invocation:
 *     int smf_find_gains( ThrWorkForce *wf, smfData *data,
+*                         const unsigned char *mask, smfData *lut,
 *                         double *template, AstKeyMap *keymap,
 *                         smf_qual_t goodqual, smf_qual_t badqual,
 *                         smfData *gain, int *nrej, int *status )
@@ -24,7 +25,16 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        The input data. Each bolometer time series will be compared to
-*        the template. Samples rejected as aberrant will be flagged using "badqual".
+*        the template. Samples rejected as aberrant will be flagged using
+*        "badqual".
+*     mask = const unsigned char * (Given)
+*        Pointer to a 2D mask of boolean values. May be NULL. If supplied,
+*        the mask should have the bounds of the output map. And time
+*        samples in "data" that correspond to zero-valued pixels in this
+*        mask are excluded from the fitting process.
+*     lut = smfData * (Given)
+*        The index of the corresponding pixel within "mask" for each sample
+*        in "data". Only used if "mask" is not NULL.
 *     template = double * (Given)
 *        The 1-dimensional template. The length of this array should
 *        equal the number of time slices in "data".
@@ -145,9 +155,10 @@
 *     Each bolometer time series in the supplied smfData is split into
 *     blocks, and each block that corresponds to a non-zero value in "nrej"
 *     (or a non-zero neighbouring value in "nrej") is compared against the
-*     corresponding samples in the supplied template. The number of
-*     blocks into which each bolometer time series is to be split is given
-*     by config parameter GAIN_BOX (read from the supplied KeyMap)
+*     corresponding samples in the supplied template (after any masking
+*     specified by "mask" and "lut"). The number of blocks into which each
+*     bolometer time series is to be split is given by config parameter
+*     GAIN_BOX (read from the supplied KeyMap)
 *
 *     Each such comparison performs a least square linear fit relating the
 *     template values to the bolometer values, and gain, offset and
@@ -169,10 +180,12 @@
 *        Add gain_positive flag
 *     08-AUG-2011 (EC):
 *        Add noflag keymap option to skip bad bolo flagging
+*     27-FEB-2012 (DSB):
+*        Add args "mask" and "lut".
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2012 Science & Technology Facilities Council.
 *     Copyright (C) 2011 University of British Columbia.
 *     All Rights Reserved.
 
@@ -233,6 +246,8 @@ typedef struct smfFindGainsJobData {
    smf_qual_t *qua;
    double *template;
    size_t tstride;
+   const unsigned char *mask;
+   const int *lut_data;
 } smfFindGainsJobData;
 
 
@@ -241,12 +256,13 @@ static void smf1_find_gains_job( void *job_data, int *status );
 
 
 /* Main entry */
-int smf_find_gains( ThrWorkForce *wf, smfData *data, double *template,
-                    AstKeyMap *keymap, smf_qual_t goodqual,
-                    smf_qual_t badqual,
-                    smfData *gain, int *nrej, int *status ){
+int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
+                    smfData *lut, double *template, AstKeyMap *keymap,
+                    smf_qual_t goodqual, smf_qual_t badqual, smfData *gain,
+                    int *nrej, int *status ){
 
 /* Local Variables: */
+   const int *lut_data = NULL;
    dim_t block_size;
    dim_t corr_offset;
    dim_t fit_box;
@@ -338,6 +354,7 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, double *template,
    dat = data->pntr[ 0 ];
    qua = smf_select_qualpntr( data, NULL, status );
    gai = gain->pntr[ 0 ];
+   lut_data = ( lut && mask ) ? lut->pntr[ 0 ] : NULL;
 
 /* Report an error if any are missing. */
    if( !qua ) {
@@ -486,6 +503,8 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, double *template,
          pdata->template = template;
          pdata->tstride = tstride;
          pdata->converged = converged;
+         pdata->mask = mask;
+         pdata->lut_data = lut_data;
 
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_find_gains_job, 0, NULL,
                       status );
@@ -586,6 +605,8 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, double *template,
                          status );
             smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, NULL,&cgood,
                          status );
+            msgOutiff( MSG__DEBUG, " ", "Block %d: (Mean,Std.dev) of corr. "
+                       "coefficients: (%g,%g)", status, iblock, cmean, csig );
 
 /* If there are insufficient usable bolometers left to find the statistics,
    annull the error and set all gain values bad. */
@@ -854,6 +875,8 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
 */
 
 /* Local Variables: */
+   const int *lut_data;
+   const unsigned char *mask;
    dim_t b1;
    dim_t b2;
    dim_t block_cstride;
@@ -921,6 +944,8 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
    qua = pdata->qua;
    template = pdata->template;
    tstride = pdata->tstride;
+   mask = pdata->mask;
+   lut_data = pdata->lut_data;
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
@@ -995,9 +1020,10 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
                   m_box = m - fit_off;
 
 /* Do the fit. */
-                  smf_templateFit1D( dat + ibase_box, qua + ibase_box,
-                                     goodqual, 0, fit_size, tstride, m_box, 0,
-                                     nooffs, gai + igbase,
+                  smf_templateFit1D( dat + ibase_box, qua + ibase_box, mask,
+                                     lut_data ? lut_data + ibase_box : NULL,
+                                     goodqual, 0, fit_size, tstride, m_box,
+                                     0, nooffs, gai + igbase,
                                      gai + block_cstride + igbase,
                                      gai + 2*block_cstride + igbase, status );
 
