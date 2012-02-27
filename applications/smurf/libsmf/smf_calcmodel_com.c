@@ -593,6 +593,10 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  /* See if a mask should be used to exclude bright source areas from
+     the COM model. */
+  mask = smf_get_mask( SMF__COM, keymap, dat, flags, status );
+
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
@@ -842,10 +846,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                   status);
         }
       }
-
-      /* See if a mask should be used to exclude bright source areas from
-         the COM model. */
-      mask = smf_get_mask( SMF__COM, keymap, dat, flags, status );
 
       /* Get pointers to data/quality/lut/model */
       res_data = (res->sdata[idx]->pntr)[0];
