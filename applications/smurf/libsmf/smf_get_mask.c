@@ -317,17 +317,17 @@ unsigned char *smf_get_mask( smf_modeltype mtype, AstKeyMap *config,
                   astMaskUB( circle, astGetMapping( dat->outfset, AST__CURRENT,
                                                     AST__BASE ),
                              0, 2, lbnd_grid, ubnd_grid, *mask, 1 );
-               }
 
 /* Report masking info. */
-               msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model will"
-                          " be masked on each iteration using a circle of "
-                          "radius %g arc-secs, centred at %s=%s, %s=%s.",
-                          status, modname, radius[0]*AST__DR2D*3600,
-                          astGetC( dat->outfset, "Symbol(1)" ),
-                          astFormat( dat->outfset, 1, centre[ 0 ] ),
-                          astGetC( dat->outfset, "Symbol(2)" ),
-                          astFormat( dat->outfset, 2, centre[ 1 ] ) );
+                  msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model will"
+                             " be masked on each iteration using a circle of "
+                             "radius %g arc-secs, centred at %s=%s, %s=%s.",
+                             status, modname, radius[0]*AST__DR2D*3600,
+                             astGetC( dat->outfset, "Symbol(1)" ),
+                             astFormat( dat->outfset, 1, centre[ 0 ] ),
+                             astGetC( dat->outfset, "Symbol(2)" ),
+                             astFormat( dat->outfset, 2, centre[ 1 ] ) );
+               }
 
 /* Reference NDF masking... */
             } else if( mask_type == REFNDF ) {
