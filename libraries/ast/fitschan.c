@@ -4167,6 +4167,10 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
 /* Initialise */
    ret = NULL;
 
+/* Other initialisation to avoid compiler warnings. */
+   mlon = 0;
+   mlat = 0;
+
 /* Check the inherited status. */
    if( !astOK ) return ret;
 
@@ -5541,6 +5545,10 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    int naxis;          /* No. of axes */
    int ok;             /* Is FitsSTore OK for IRAF encoding? */
    int prj;            /* Projection type */
+
+/* Other initialisation to avoid compiler warnings. */
+   lonval = 0.0;
+   latval = 0.0;
 
 /* Check the inherited status. */
    if( !astOK ) return 0;
@@ -10322,6 +10330,9 @@ static void FreeItem( double ****item, int *status ){
    int oldstatus;        /* Old error status value */
    int oldreport;        /* Old error reporting value */
 
+/* Other initialisation to avoid compiler warnings. */
+   oldreport = 0;
+
 /* Check the supplied pointer */
    if( item && *item ){
 
@@ -10413,6 +10424,9 @@ static void FreeItemC( char *****item, int *status ){
    int jm;               /* Pixel co-ordinate axis or parameter index */
    int oldstatus;        /* Old error status value */
    int oldreport;        /* Old error reporting value */
+
+/* Other initialisation to avoid compiler warnings. */
+   oldreport = 0;
 
 /* Check the supplied pointer */
    if( item && *item ){
@@ -31712,6 +31726,13 @@ static int WATCoeffs( const char *watstr, int iaxis, double **cvals,
    *cvals = NULL;
    *ok = 1;
 
+/* Other initialisation to avoid compiler warnings. */
+   etamin = 0.0;
+   etamin = 0.0;
+   ximax = 0.0;
+   ximin = 0.0;
+   order = 0;
+
 /* Check the global status. */
    if ( !astOK || !watstr ) return result;
 
@@ -32109,6 +32130,9 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    *reflon = AST__BAD;
    *reflat = AST__BAD;
    *reffrm = NULL;
+
+/* Other initialisation to avoid compiler warnings. */
+   map1 = NULL;
 
 /* Check the global status. */
    if ( !astOK ) return ret;
@@ -33363,9 +33387,11 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
    int prj;            /* Projection type */
    int ret;            /* Returned value */
 
-
 /* Initialise */
    ret = 0;
+
+/* Other initialisation to avoid compiler warnings. */
+   tabaxis = NULL;
 
 /* Check the inherited status. */
    if( !astOK ) return ret;
@@ -36088,8 +36114,11 @@ static int WorldAxes( AstFitsChan *this, AstMapping *cmap, double *dim, int *per
    int retain;
    int used;
 
-/* Initialise */
+/* Initialise returned value */
    ret = 0;
+
+/* Other initialisation to avoid compiler warnings. */
+   retain = 0;
 
 /* Check the status */
    if( !astOK ) return ret;
