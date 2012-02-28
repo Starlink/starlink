@@ -14,8 +14,8 @@
 #
 # ***********************************************************************
 
-# Just remove the mean
-order = 0
+# Just remove a linear drift
+order = 1
 
 # clip really noisy bolos prior to common-mode removal
 noiseclipprecom=1

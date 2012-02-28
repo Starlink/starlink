@@ -201,7 +201,7 @@ downsampscale = -1
 # --- Mean subtraction is fairly useful ---
 
 # subtract a baseline polynomial of this order
-order = 0
+order = 1
 
 # Use default apodisation based on filter frequency. This over-rides
 # the default of zero in smurf_sc2clean.def. Keep the <undef> default
@@ -402,7 +402,7 @@ cleandk.fillgaps = 1
 #cleandk.noisecliplow = 0.0
 #cleandk.noiseclipprecom = 0
 #cleandk.whiten = 0
-cleandk.order = 0
+cleandk.order = 1
 #cleandk.spikethresh = 0
 #cleandk.spikebox = 50
 #cleandk.zeropad = 1
