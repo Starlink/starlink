@@ -106,6 +106,7 @@ cleandk.whiten = 0
 cleandk.flagslow = 0
 cleandk.flagfast = 0
 cleandk.compreprocess = 0
+cleandk.pcalen = 0
 cleandk.pcathresh = 0
 
 # the following two parameters are included because the same
