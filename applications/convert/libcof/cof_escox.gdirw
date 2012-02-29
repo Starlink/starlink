@@ -44,12 +44,11 @@
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by D, R, I, W, UW, B or UB as appropriate. The
 *     array supplied to the routine must have the data type specified.
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
-*     Copyright (C) 1994 Science & Engineering Research Council. All
-*     Rights Reserved.
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 2009, 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -76,10 +75,13 @@
 *        Original version.
 *     2009 June 30 (MJC):
 *        Replaced call to cloned routine with originals from KAPLIBS.
+*     2012 February 28 (MJC):
+*        Avoid scaling when the range of data values lies within the
+*        scaled type's data range.
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -120,7 +122,11 @@
       CALL KPG1_MXMN<T>( BAD, EL, ARRAY, NINVAL, MAXV, MINV, MAXPOS,
      :                   MINPOS, STATUS )
 
-      IF ( MAXV .NE. MINV ) THEN
+*  There is no need to scale if the actual data values lie within the
+*  range of values for the data type.
+      IF ( MAXV .NE. MINV .AND.
+     :     ( NUM_<T>TOD( MAXV ) .GT. MAXVAL .OR.
+     :       NUM_<T>TOD( MINV ) .LT. MINVAL ) ) THEN
 
 *  Derive the scale factor by differencing the simultaneous equations.
 *  Note the halving is done to prevent overflows.  Try to defeat the
