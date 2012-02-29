@@ -1019,6 +1019,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        performed by MakeFItsFrameSet. Without this, a FRameSet contain
 *        a 1D SpecFrame (no celestial axes) would fail to be exported using
 *        FITS-CLASS encoding.
+*     29-FEB-2012 (DSB):
+*        Fix bug in CLASSFromStore that caused spatial axes added by
+*        MakeFitsFrameSet to be ignored.
 *class--
 */
 
@@ -5725,9 +5728,10 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 /* Save the number of WCS axes */
    naxis = GetMaxJM( &(store->crpix), ' ', status ) + 1;
 
-/* If this is larger than the number of pixel axes, ignore the surplus
-   WCS axes. */
-   if( naxis > store->naxis ) naxis = store->naxis;
+/* If this is larger than 3, ignore the surplus WCS axes. Note, the
+   above code has cjhecked that the spatial and spectral axes are 
+   WCS axes 0, 1 and 2. */
+   if( naxis > 3 ) naxis = 3;
 
 /* Allocate memory to store the CDELT values */
    if( ok ) {
