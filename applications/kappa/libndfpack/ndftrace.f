@@ -332,6 +332,10 @@
 *        Change call to KPG1_DSFRM so that the displayed pixel scales
 *        are the median values taken at a range of different positions in
 *        the NDF, rather than just being the scales at the first pixel.
+*     29-FEB-2012 (DSB):
+*        If an error occurs whilst displaying information about a WCS
+*        Frame, annull or flush the error and continue to display
+*        information about any remaining frames.
 *     {enter_further_changes_here}
 
 *-
@@ -1067,6 +1071,9 @@
             UBIN( IAXIS ) = DBLE( DIM( IAXIS ) ) + 0.5D0
  301     CONTINUE
 
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Loop round each co-ordinate system.
          DO 304 IFRAME = 1, NFRAME
 
@@ -1192,6 +1199,26 @@
                END IF
             END IF
 
+*  If an error occurred displaying information about the Frame, flush the
+*  error and attempt to display information about any remaining Frames.
+*  If we are not displaying the Frame info, annull the error rather than
+*  flushing it.
+            IF( STATUS .NE. SAI__OK ) THEN
+               IF( FULLWC .OR. IFRAME .EQ. ICURR ) THEN
+                  CALL ERR_FLUSH( STATUS )
+                  IF( IFRAME .LT. NFRAME .AND. IFRAME .NE. ICURR ) THEN
+                     CALL MSG_BLANK( STATUS )
+                     CALL MSG_SETI( 'I', IFRAME )
+                     CALL MSG_OUT( ' ', 'Failed to get information '//
+     :                             'about Frame ^I - continuing with '//
+     :                             'remaining Frames.', STATUS )
+                  END IF
+                  CALL MSG_BLANK( STATUS )
+               ELSE
+                  CALL ERR_ANNUL( STATUS )
+               END IF
+            END IF
+
  304     CONTINUE
 
 *  Re-instate the original current Frame.
@@ -1294,6 +1321,8 @@
 
 *  Clean up:
 *  ========
+ 999  CONTINUE
+
 *  Annul the NDF identifier.
       CALL NDF_ANNUL( INDF, STATUS )
 
