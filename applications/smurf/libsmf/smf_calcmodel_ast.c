@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int
-*			 chunk, AstKeyMap *keymap, smfArray
-*			 **allmodel, int flags, int *status)
+*                        chunk, AstKeyMap *keymap, smfArray
+*                        **allmodel, int flags, int *status)
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -123,6 +123,9 @@
 *     2012-2-24 (DSB):
 *        Refactor mask-creation code into smf_get_mask so that it can be
 *        re-used for masking the COM model.
+*     2012-2-29 (DSB):
+*        Do not modify the values of masked map pixels - just flag them
+*        in mapqual.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -187,7 +190,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   double mapspike;              /* Threshold SNR to detect map spikes */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
-  size_t newzero;               /* number new pixels zeroed */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   dim_t ntslice=0;              /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
@@ -313,20 +315,14 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
       mapqual[i] &= ~SMF__MAPQ_ZERO;
     }
 
-    /* Zero background regions in the map (usually round the edges). */
-    newzero = 0;
+    /* Flag background regions in the map (usually round the edges). */
     for( i=0; i<dat->msize; i++ ) {
 
       if( map[i] == VAL__BADD || mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) {
-          mapqual[i] |= SMF__MAPQ_ZERO;
+        mapqual[i] |= SMF__MAPQ_ZERO;
 
       } else if( zmask[i] ) {
-        map[i] = 0;
-        mapweight[i] = VAL__BADD;
-        mapweightsq[i] = VAL__BADD;
-        mapvar[i] = VAL__BADD;
         mapqual[i] |= SMF__MAPQ_ZERO;
-        newzero ++;
       }
     }
   }
@@ -358,21 +354,27 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
         ii = i*bstride+j*tstride;
 
-	if( lut_data[ii] != VAL__BADI ) {
+        if( lut_data[ii] != VAL__BADI ) {
 
-          m = map[lut_data[ii]];
 
-	  /* update the residual model provided that we have a good map
-             values.
+          /* update the residual model provided that we have a good map
+             value which is not constrained to zero by the mask.
              ***NOTE: unlike other model components we do *not* first
                       add the previous realization back in. This is
                       because we've already done this in smf_iteratemap
                       before calling smf_rebinmap1. */
-          if( (m!=VAL__BADD) && !(qua_data[ii]&SMF__Q_MOD)  ){
+
+          if( zmask && zmask[ lut_data[ii] ] ) {
+             m = VAL__BADD;
+          } else {
+             m = map[lut_data[ii]];
+          }
+
+          if( (m!=VAL__BADD) && !(qua_data[ii]&SMF__Q_MOD) ){
             res_data[ii] -= m;
           }
 
-	}
+        }
       }
     }
   }

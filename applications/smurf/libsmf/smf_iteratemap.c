@@ -1755,13 +1755,15 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                Note that if this is the first iteration we do not yet
                have a map estimate so we skip this step (in multiple
                chunk case thismap will still contain the old map from
-               the previous chunk). */
+               the previous chunk). Ignore map pixels that have been 
+               constrained to zero. */
             if( iter > 0 ) {
               for( k=0; k<dsize; k++ ) {
                 if( !(qua_data[k]&SMF__Q_MOD) &&
                     (lut_data[k]!=VAL__BADI) ) {
                   double ast_data = thismap[lut_data[k]];
-                  if( ast_data != VAL__BADD ) {
+                  if( ast_data != VAL__BADD &&
+                      !(thisqual[lut_data[k]] & SMF__MAPQ_ZERO ) ) {
                     res_data[k] += ast_data;
                   }
                 }
