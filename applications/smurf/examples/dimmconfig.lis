@@ -412,10 +412,9 @@ cleandk.order = 1
 # ----------------------------------------------------------------------------
 
 # Set this flag to calculate a separate common-mode signal for each
-# subarray, rather than the default which considers all subarrays at a
-# given wavelength simultaneously
-
-#com.perarray = 1
+# subarray. If not set, a single common-mode signal will be calculated from
+# all subarrays at a given wavelength simultaneously.
+com.perarray = 1
 
 # delay calculation of COM until after the first iteration? (good if
 # the astronomical signal is expected to dominate the sky signal)

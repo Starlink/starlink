@@ -40,6 +40,9 @@ ast.zero_notlast = 1
 # common-mode will not be used to flag bad data
 com.noflag=1
 
+#  Ignore samples that see the source when calculating the common-mode
+com.zero_circle = 0.025
+
 # use sin(azimuth) as a template to remove magnetic-field pickup
 tmp.source=state_az
 tmp.dosin=1

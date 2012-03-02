@@ -30,6 +30,10 @@ maptol=0.05
 ast.zero_circle = (0.0166666666)
 ast.zero_notlast = 1
 
+# also use the same mask to ignore samples that see the source when
+# calculating and fitting the common-mode signal.
+com.zero_circle = 0.0166666666
+
 # we can get away with harsher filtering since the boundary conditions are
 # quite tight
 450.flt.filt_edge_largescale=200
