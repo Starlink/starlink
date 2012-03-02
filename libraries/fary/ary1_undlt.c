@@ -30,7 +30,8 @@
 /* Type for the compression function that accepts void * pointers for
    arrays. */
 typedef  void (*undelt_fun_type)( void *, size_t, size_t, void *, void *,
-                                  void *, int *, void *, size_t, int *, int * );
+                                  void *, int *, void *, size_t, int *,
+                                  size_t *, size_t *, size_t *, int * );
 
 
 /* Prototypes for private functions defined within this file. */
@@ -49,7 +50,8 @@ typedef  void (*undelt_fun_type)( void *, size_t, size_t, void *, void *,
                                             outtype *zero, vtype *pvalue, \
                                             int *prepeat, outtype *pout, \
                                             size_t stride, int *bad, \
-                                            int *status );
+                                            size_t *ndata_used, size_t *nvalue_used, \
+                                            size_t *nrepeat_used, int *status );
 
 /* Use the above macro to define the functions for both scaled and
    unscaled versions for a specific input and output data type. */
@@ -331,6 +333,10 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
 *  History:
 *     11-OCT-2010 (DSB):
 *        Original version.
+*     2-MAR-2012 (DSB):
+*        Add checks that the number of VALUE, REPEAT and DATA values used 
+*        when uncompressing a section of the array are equal to the number
+*        implied by the FIRST_DATA, FIRRST_REPEAT and FIRST_VALUE arrays.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -353,7 +359,6 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
 
 /* Local Variables; */
    HDSLoc *loc1 = NULL;
-   HDSLoc *loc_badpixel = NULL;
    HDSLoc *loc_data = NULL;
    HDSLoc *loc_firstd = NULL;
    HDSLoc *loc_firstr = NULL;
@@ -396,6 +401,7 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
    int *ptr_repeat = NULL;
    int bad;
    int idim;
+   int is_invalid;
    int ndim;
    int ndim_firstr;
    int ndim_firstv;
@@ -410,6 +416,7 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
    size_t iv_section;
    size_t last_csection;
    size_t ndata;
+   size_t ndata_used;
    size_t nel_csection;
    size_t nel_data;
    size_t nel_firstd;
@@ -418,6 +425,9 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
    size_t nel_out;
    size_t nel_repeat;
    size_t nel_value;
+   size_t nprovided;
+   size_t nrepeat_used;
+   size_t nvalue_used;
    size_t offset;
    size_t size_intype;
    size_t size_outtype;
@@ -711,12 +721,50 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
    values in the output DATA array. */
    if( whole && zaxis == 0 ) {
       (*undelt_fun)( ptr_data, 0, nel_out - 1, scale_buf, zero_buf, ptr_value,
-                     ptr_repeat, ptr_out, 1, &bad, STATUS );
+                     ptr_repeat, ptr_out, 1, &bad, &ndata_used, &nvalue_used,
+                     &nrepeat_used, STATUS );
+
+/* Issue a warning if the number of values supplied in the DATA array is
+   different to the number required to uncompress the data array. */
+      if( ndata_used != nel_data ) {
+         datMsg( "A", loc1 );
+         msgSeti( "N", (int) nel_data );
+         msgSeti( "M", (int) ndata_used );
+         msgOut( "", "Warning: The compressed array '^A' appears to be "
+                 "invalid - the number of compressed values (^N) does "
+                 "not equal the number referenced in the array (^M).",
+                 STATUS );
+
+/* Issue a warning if the number of values supplied in the VALUE array is
+   different to the number required to uncompress the data array. */
+      } else if( nvalue_used != nel_value ) {
+         datMsg( "A", loc1 );
+         msgSeti( "N", (int) nel_value );
+         msgSeti( "M", (int) nvalue_used );
+         msgOut( "", "Warning: The compressed array '^A' appears to be "
+                 "invalid - the number of explicitly supplied uncompressed "
+                 "values (^N) does not equal the number referenced in the "
+                 "array (^M).", STATUS );
+
+/* Issue a warning if the number of values supplied in the REPEAT array is
+   different to the number required to uncompress the data array. */
+      } else if( nrepeat_used != nel_repeat ) {
+         datMsg( "A", loc1 );
+         msgSeti( "N", (int) nel_repeat );
+         msgSeti( "M", (int) nrepeat_used );
+         msgOut( "", "Warning: The compressed array '^A' appears to be "
+                 "invalid - the number of stored repeat counts (^N) does "
+                 "not equal the number referenced in the array (^M).",
+                 STATUS );
+      }
 
 /* If only part of the array is being uncompressed, we decompress just
    those hyper-rows that pass through the required section of the
    uncompressed array. */
    } else {
+
+/* So far we have no evidence that the file is invalid. */
+      is_invalid = 0;
 
 /* We now know we need to map the FIRST_DATA array. */
       datMapV( loc_firstd, "_INTEGER", "READ", (void **) &ptr_firstd,
@@ -923,10 +971,54 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
          (*undelt_fun)( pdata, (size_t) LBND[ zaxis ] - 1,
                         (size_t) UBND[ zaxis ] - 1, scale_buf, zero_buf,
                         pvalue, prepeat, ptr_out + iv_section, zstride,
-                        &bad, STATUS );
+                        &bad, &ndata_used, &nvalue_used, &nrepeat_used,
+                        STATUS );
 
 /* Annul any DATA slice locator. */
          if( loc_slice ) datAnnul( &loc_slice, STATUS );
+
+/* Issue a warning if the number of values supplied in the DATA array is
+   different to the number required to uncompress the data array. */
+         if( !is_invalid ) {
+            nprovided = ( iv_cwhole + 1 < nel_firstd ) ? ptr_firstd[ iv_cwhole + 1 ] : nel_data;
+            nprovided -= ptr_firstd[ iv_cwhole ];
+            if( ndata_used != nprovided ) {
+               is_invalid = 1;  /* Prevents multiple warning messages */
+               datMsg( "A", loc1 );
+               msgOut( "", "Warning: The compressed array '^A' appears to be "
+                       "invalid - the number of compressed values does not "
+                       "equal the number referenced in the array.", STATUS );
+            }
+         }
+
+/* Issue a warning if the number of values supplied in the VALUE array is
+   different to the number required to uncompress the data array. */
+         if( !is_invalid ) {
+            nprovided = ( iv_cwhole + 1 < nel_firstv ) ? ptr_firstv[ iv_cwhole + 1 ] : nel_value;
+            nprovided -= ptr_firstv[ iv_cwhole ];
+            if( nvalue_used != nprovided ) {
+               is_invalid = 1;  /* Prevents multiple warning messages */
+               datMsg( "A", loc1 );
+               msgOut( "", "Warning: The compressed array '^A' appears to be "
+                       "invalid - the number of explicitly supplied uncompressed "
+                       "values does not equal the number referenced in the array.",
+                       STATUS );
+            }
+         }
+
+/* Issue a warning if the number of values supplied in the REPEAT array is
+   different to the number required to uncompress the data array. */
+         if( !is_invalid && ptr_repeat ) {
+            nprovided = ( iv_cwhole + 1 < nel_firstr ) ? ptr_firstr[ iv_cwhole + 1 ] : nel_repeat;
+            nprovided -= ptr_firstr[ iv_cwhole ];
+            if( nrepeat_used != nprovided ) {
+                  is_invalid = 1;  /* Prevents multiple warning messages */
+               datMsg( "A", loc1 );
+               msgOut( "", "Warning: The compressed array '^A' appears to be "
+                       "invalid - the number of stored repeat counts does "
+                       "not equal the number referenced in the array.", STATUS );
+            }
+         }
 
 /* Update the pixel indices at the start of the row so that they refer
    to the next row. Also update the vector indicies into the full (i.e. not
@@ -991,7 +1083,9 @@ L999:
 *                                        size_t row_ubnd, <TOUT> *pscale,
 *                                        <TOUT> *pzero, <TVAL> *pvalue,
 *                                        int *prepeat, <TOUT> *poutdata,
-*                                        size_t stride, int *bad, int *status )
+*                                        size_t stride, int *bad, size_t *ndata_used,
+*                                        size_t *nvalue_used, size_t *nrepeat_used,
+*                                        int *status )
 
 *  Description:
 *     This family of functions uncompresses a continuous run of delta
@@ -1038,6 +1132,15 @@ L999:
 *     bad = int *
 *        A pointer to an int in which to return a flag indicating if any
 *        VAL__BAD<TOUT> values were stored in the output array.
+*     ndata_used = size_t *
+*        A pointer to an size_t in which to return the number of values read
+*        from "pindata".
+*     nvalue_used = size_t *
+*        A pointer to an size_t in which to return the number of values read
+*        from "pvalue".
+*     nrepeat_used = size_t *
+*        A pointer to an size_t in which to return the number of values read
+*        from "prepeat".
 *     status
 *        Pointer to the global status.
 
@@ -1066,17 +1169,26 @@ static void ary1Undelt##incode##outcode##vcode##scale( intype *pindata, size_t r
                                             size_t row_ubnd, outtype *pscale, \
                                             outtype *pzero, vtype *pvalue, \
                                             int *prepeat, outtype *poutdata, \
-                                            size_t stride, int *bad, \
+                                            size_t stride, int *bad, size_t *ndata_used, \
+                                            size_t *nvalue_used, size_t *nrepeat_used, \
                                             int *status ){ \
 \
 /* Local Variables: */ \
+   int *prepeat_orig; \
    int dim; \
    int nleft;  \
-   vtype temp_val; \
-   vtype previous_val; \
+   intype * pindata_orig; \
    size_t irepeat; \
    size_t nrepeat; \
    size_t nwrite;  \
+   vtype *pvalue_orig; \
+   vtype previous_val; \
+   vtype temp_val; \
+\
+/* Initialise number of values used from supplied arrays. */ \
+   *ndata_used = 0; \
+   *nvalue_used = 0; \
+   *nrepeat_used = 0; \
 \
 /* Check inherited status. */ \
    if( *status != SAI__OK ) return; \
@@ -1084,6 +1196,12 @@ static void ary1Undelt##incode##outcode##vcode##scale( intype *pindata, size_t r
 /* Store the number of uncompressed values required along the output \
    compression axis. */ \
    dim = row_ubnd - row_lbnd + 1; \
+\
+/* Store the supplied pointer values, so that we can work out how many \
+   elements have been used from these arrays before returning. */ \
+   pindata_orig = pindata; \
+   pvalue_orig = pvalue; \
+   prepeat_orig = prepeat; \
 \
 /* Indicate we do not currently know the value of the previous uncompressed \
    output value. */ \
@@ -1296,6 +1414,12 @@ static void ary1Undelt##incode##outcode##vcode##scale( intype *pindata, size_t r
 /* Move on to read the next compressed input value */ \
       pindata++; \
    } \
+\
+/* Return the number of values used from the supplied arrays. */ \
+   *ndata_used = pindata - pindata_orig; \
+   *nvalue_used = pvalue - pvalue_orig; \
+   *nrepeat_used = prepeat - prepeat_orig; \
+\
 }
 
 /* Use the above macro to define the functions for both scaled and
