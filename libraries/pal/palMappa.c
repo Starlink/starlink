@@ -25,7 +25,7 @@
 *        (0)      time interval for proper motion (Julian years)
 *        (1-3)    barycentric position of the Earth (AU)
 *        (4-6)    heliocentric direction of the Earth (unit vector)
-*        (7)      not used
+*        (7)      (grav rad Sun)*2/(Sun-Earth distance)
 *        (8-10)   abv: barycentric Earth velocity in units of c
 *        (11)     sqrt(1-v**2) where v=modulus(abv)
 *        (12-20)  precession/nutation (3,3) matrix
@@ -91,6 +91,11 @@
 
 void palMappa( double eq, double date, double amprms[21] ){
 
+/* Local constants */
+
+/*  Gravitational radius of the Sun x 2 (2*mu/c**2, AU) */
+  const double GR2 = 2.0 * 9.87063e-9;
+
 /* Local Variables; */
    int i;
    double ebd[ 3 ], ehd[ 3 ], eh[ 3 ], e, vn[ 3 ], vm;
@@ -106,6 +111,9 @@ void palMappa( double eq, double date, double amprms[21] ){
 
 /* Heliocentric direction of Earth (normalized) and modulus. */
    iauPn( eh, &e, &amprms[ 4 ] );
+
+/* Light deflection parameter */
+   amprms[7] = GR2 / e;
 
 /* Aberration parameters. */
    for( i = 0; i < 3; i++ ) {
