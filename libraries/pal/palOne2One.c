@@ -29,7 +29,6 @@
 *       version instead of the SOFA version.
 *     - Routines that take MJDs have SOFA equivalents that have an explicit
 *       MJD offset included.
-*     - palGeoc uses the WGS84 model.
 *     - palGmst uses the IAU 2006 precession.
 
 *  History:
@@ -196,16 +195,6 @@ void palFk5hz ( double r5, double d5, double epoch,
   double date1, date2;
   iauEpj2jd( epoch, &date1, &date2 );
   iauFk5hz( r5, d5, date1, date2, rh, dh );
-}
-
-void palGeoc ( double p, double h, double *r, double *z ) {
-  double xyz[3];
-  const double elong = 0.0;   /* Use zero longitude */
-  const double AU = 1.49597870E11;
-  /* WGS84 looks to be the closest match */
-  iauGd2gc( 1, elong, p, h, xyz );
-  *r = xyz[0] / (AU * cos(elong) );
-  *z = xyz[2] / AU;
 }
 
 /* Note that SOFA has more accurate time arguments and we use the 2006 precession model */
