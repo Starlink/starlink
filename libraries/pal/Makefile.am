@@ -43,6 +43,7 @@ palFk54z.c \
 palGaleq.c \
 palGalsup.c \
 palGeoc.c \
+palMap.c \
 palMappa.c \
 palMapqk.c \
 palMapqkz.c \

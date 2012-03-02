@@ -774,7 +774,19 @@ static void t_evp( int *status ) {
    vvec( 3, dph, phex, "palEvp", status );
 }
 
+static void t_map( int *status ) {
+  double ra, da;
+  palMap ( 6.123, -0.999, 1.23e-5, -0.987e-5,
+           0.123, 32.1, 1999, 43210.9, &ra, &da );
 
+  /* These are the SLA tests but and they agree to 0.1 arcsec
+     with PAL/SOFA. We expect a slight difference from the change
+     to nutation models. */
+  vvd ( ra, 6.117130429775647, 1e-6, "palMap",
+          "RA", status );
+  vvd ( da, -1.000880769038632, 1e-8, "palMap",
+        "DA", status );
+}
 
 static void t_mappa( int *status ) {
    double amprms[21];
@@ -922,6 +934,7 @@ int main (void) {
   t_prec(&status);
   t_ecmat(&status);
   t_e2h(&status);
+  t_map(&status);
   t_mappa(&status);
   t_mapqkz(&status);
   t_prebn(&status);
