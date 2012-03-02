@@ -393,6 +393,15 @@ static void t_epb2d( int *status ) {
         "palEpb2d", " ", status );
 }
 
+static void t_epco( int *status ) {
+  vvd ( palEpco ( 'B', 'J', 2000 ), 2000.001277513665,
+        1e-7, "palEpco", "BJ", status );
+  vvd ( palEpco ( 'J', 'B', 1950 ), 1949.999790442300,
+        1e-7, "palEpco", "JB", status );
+  vvd ( palEpco ( 'J', 'j', 2000 ), 2000,
+        1e-7, "palEpco", "JJ", status );
+}
+
 static void t_epj( int *status ) {
   vvd ( palEpj( 42999 ), 1976.603696098563,
         1e-7, "palEpj", " ", status );
@@ -890,6 +899,7 @@ int main (void) {
   t_dmat(&status);
   t_epb(&status);
   t_epb2d(&status);
+  t_epco(&status);
   t_epj(&status);
   t_epj2d(&status);
   t_eqeqx(&status);
