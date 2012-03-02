@@ -30,17 +30,17 @@
 *        J2000.0 FK5 parallax (arcsec)
 *     v2000 = double (Given)
 *         J2000.0 FK5 radial velocity (km/s, +ve = moving away)
-*     r2000 = double * (Returned)
+*     r1950 = double * (Returned)
 *        B1950.0 FK4 RA (radians).
-*     d2000 = double * (Returned)
+*     d1950 = double * (Returned)
 *        B1950.0 FK4 Dec (radians).
-*     dr2000 = double * (Returned)
+*     dr1950 = double * (Returned)
 *        B1950.0 FK4 RA proper motion (rad/Jul.yr)
-*     dd2000 = double * (Returned)
+*     dd1950 = double * (Returned)
 *        B1950.0 FK4 Dec proper motion (rad/Jul.yr)
-*     p2000 = double * (Returned)
+*     p1950 = double * (Returned)
 *        B1950.0 FK4 parallax (arcsec)
-*     v2000 = double * (Returned)q
+*     v1950 = double * (Returned)
 *         B1950.0 FK4 radial velocity (km/s, +ve = moving away)
 
 *  Description:
