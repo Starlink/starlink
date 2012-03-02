@@ -1163,6 +1163,49 @@ void slaMapqkz ( double rm, double dm, double amprms[21],
    *da = DA;
 }
 
+F77_SUBROUTINE(sla_mapqk)( DOUBLE(RM),
+                           DOUBLE(DM),
+                           DOUBLE(PR),
+                           DOUBLE(PD),
+                           DOUBLE(PX),
+                           DOUBLE(RV),
+                           DOUBLE_ARRAY(AMPRMS),
+                           DOUBLE(RA),
+                           DOUBLE(DA) );
+
+void slaMapqk ( double rm, double dm, double pr, double pd,
+                double px, double rv, double amprms[21],
+                double *ra, double *da ) {
+   DECLARE_DOUBLE(RM);
+   DECLARE_DOUBLE(DM);
+   DECLARE_DOUBLE(PR);
+   DECLARE_DOUBLE(PD);
+   DECLARE_DOUBLE(PX);
+   DECLARE_DOUBLE(RV);
+   DECLARE_DOUBLE_ARRAY(AMPRMS,21);
+   DECLARE_DOUBLE(RA);
+   DECLARE_DOUBLE(DA);
+   int i;
+   RM = rm;
+   DM = dm;
+   PR = pr;
+   PD = pd;
+   PX = px;
+   RV = rv;
+   for ( i = 0; i < 21; i++ ) AMPRMS[ i ] = amprms[ i ];
+   F77_LOCK( F77_CALL(sla_mapqk)( DOUBLE_ARG(&RM),
+                         DOUBLE_ARG(&DM),
+                         DOUBLE_ARG(&PR),
+                         DOUBLE_ARG(&PD),
+                         DOUBLE_ARG(&PX),
+                         DOUBLE_ARG(&RV),
+                         DOUBLE_ARRAY_ARG(AMPRMS),
+                         DOUBLE_ARG(&RA),
+                         DOUBLE_ARG(&DA) ); )
+   *ra = RA;
+   *da = DA;
+}
+
 F77_SUBROUTINE(sla_prebn)( DOUBLE(BEP0),
                            DOUBLE(BEP1),
                            DOUBLE_ARRAY(RMATP) );
