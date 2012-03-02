@@ -810,6 +810,12 @@ static void t_mapqkz( int *status ) {
    palMapqkz( 1.234, -0.567, amprms, &ra, &da );
    vvd( ra, 1.2344879748414849807, 1.0E-12, "palMapqkz", "ra", status );
    vvd( da, -0.56697099554368701746, 1.0E-12, "palMapqkz", "da", status );
+
+   /* Try the same with palMapqk and zero parallax and proper motion */
+   palMapqk( 1.234, -0.567, 0., 0., 0., 0., amprms, &ra, &da );
+   vvd( ra, 1.2344879748414849807, 1.0E-7, "palMapqkz", "ra", status );
+   vvd( da, -0.56697099554368701746, 1.0E-7, "palMapqkz", "da", status );
+
 }
 
 static void t_ampqk( int *status ) {

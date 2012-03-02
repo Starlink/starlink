@@ -44,6 +44,7 @@ palGaleq.c \
 palGalsup.c \
 palGeoc.c \
 palMappa.c \
+palMapqk.c \
 palMapqkz.c \
 palPrebn.c \
 palPrec.c \
