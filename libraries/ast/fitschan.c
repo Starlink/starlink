@@ -1022,6 +1022,10 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     29-FEB-2012 (DSB):
 *        Fix bug in CLASSFromStore that caused spatial axes added by
 *        MakeFitsFrameSet to be ignored.
+*     2-MAR-2012 (DSB):
+*        - In CLASSFromSTore, ensure NAXIS2/3 values are stored in teh FitsChan,
+*        and cater for FrameSets that have only a apectral axis and no celestial 
+*        axes (this prevented the VELO_LSR keyword being created)..
 *class--
 */
 
@@ -5582,7 +5586,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 /* If the spatial pixel axes are degenerate (i.e. span only a single
    pixel), modify the CRPIX and CRVAL values in the FitsStore to put
    the reference point at the centre of the one and only spatial pixel. */
-      if( dim[ axlon ] == 1.0 && dim[ axlat ] == 1.0 ){
+      if( store->naxis >= 3 && dim[ axlon ] == 1.0 && dim[ axlat ] == 1.0 ){
          xin[ 0 ] = 1.0;
          xin[ 1 ] = 1.0;
          xin[ 2 ] = 1.0;
@@ -5729,7 +5733,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    naxis = GetMaxJM( &(store->crpix), ' ', status ) + 1;
 
 /* If this is larger than 3, ignore the surplus WCS axes. Note, the
-   above code has cjhecked that the spatial and spectral axes are 
+   above code has checked that the spatial and spectral axes are
    WCS axes 0, 1 and 2. */
    if( naxis > 3 ) naxis = 3;
 
@@ -5820,6 +5824,26 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 /* Only create the keywords if the FitsStore conforms to the requirements
    of the FITS-CLASS encoding. */
    if( ok ) {
+
+/* If celestial axes were added by MakeFitsFrameSet, we need to ensure
+   the header contains 3 main array axes. This is because the CLASS
+   encoding does not support the WCSAXES keyword. */
+      if( store->naxis == 1 ) {
+
+/* Update the "NAXIS" value to 3 or put a new card in at the start. */
+         astClearCard( this );
+         i = 3;
+         SetValue( this, "NAXIS", &i, AST__INT, NULL, status );
+
+/* Put NAXIS2/3 after NAXIS1, or after NAXIS if the FitsChan does not contain
+   NAXIS1. These are set to 1 since the spatial axes are degenerate. */
+         if( FindKeyCard( this, "NAXIS1",  method, class, status ) ) {
+            MoveCard( this, 1, method, class, status );
+         }
+         i = 1;
+         SetValue( this, "NAXIS2", &i, AST__INT, NULL, status );
+         SetValue( this, "NAXIS3", &i, AST__INT, NULL, status );
+      }
 
 /* Find the last WCS related card. */
       FindWcs( this, 1, 1, 0, method, class, status );
@@ -5946,10 +5970,10 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    to get the value for VELO-LSR. Create a SpecFrame describing the
    required frame (other attributes such as Epoch etc are left unset and
    so will be picked up from the supplied FrameSet). We set MinAxes
-   and MaxAxes so that the Frame can be used as a template to match the 3D
-   current Frame in the supplied FrameSet. */
+   and MaxAxes so that the Frame can be used as a template to match the
+   1D or 3D current Frame in the supplied FrameSet. */
       velofrm = (AstFrame *) astSpecFrame( "System=vrad,StdOfRest=lsrk,"
-                                           "Unit=m/s,MinAxes=3,MaxAxes=3", status );
+                                           "Unit=m/s,MinAxes=1,MaxAxes=3", status );
 
 /* Find the spectral axis within the current Frame of the supplied
    FrameSet, using the above "velofrm" as a template. */
