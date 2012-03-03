@@ -37,6 +37,7 @@ palDtt.c \
 palEcmat.c \
 palEpco.c \
 palEtrms.c \
+palEqecl.c \
 palEqgal.c \
 palEvp.c \
 palFk45z.c \

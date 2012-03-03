@@ -792,6 +792,17 @@ static void t_ecmat( int *status ) {
    vrmat( rmat, expected, "palEcmat", status );
 }
 
+static void t_eqecl ( int *status ) {
+  double dl, db;
+  palEqecl ( 0.789, -0.123, 46555, &dl, &db );
+
+  /* Slight changes from SLA for 2006 precession/nutation */
+  vvd ( dl, 0.7036566430349022, 1e-6, "palEqecl",
+        "L", status );
+  vvd ( db, -0.4036047164116848, 1e-6, "palEqecl",
+        "B", status );
+}
+
 static void t_prec( int *status ) {
    double rmat[3][3];
    double expected[3][3] = {
@@ -1058,6 +1069,7 @@ int main (void) {
   t_epco(&status);
   t_epj(&status);
   t_epj2d(&status);
+  t_eqecl(&status);
   t_eqeqx(&status);
   t_etrms(&status);
   t_eqgal(&status);
