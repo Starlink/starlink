@@ -21,6 +21,7 @@ PUBLIC_C_FILES = \
 palOne2One.c \
 palAddet.c \
 palAirmas.c \
+palAmp.c \
 palAmpqk.c \
 palCaldj.c \
 palDe2h.c \

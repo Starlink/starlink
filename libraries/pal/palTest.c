@@ -191,6 +191,24 @@ static void t_airmas( int *status ) {
         1e-12, "palAirmas", " ", status );
 }
 
+/* Apparent to mean place */
+
+static void t_amp ( int *status ) {
+  double rm, dm;
+
+  /* Original SLA test is not accurate since palMapqk
+     differs from slaMapqk */
+  palAmp ( 2.345, -1.234, 50100, 1990, &rm, &dm );
+  vvd ( rm, 2.344472180027961, 1e-6, "palAmp", "R",
+        status );
+  vvd ( dm, -1.233573099847705, 1e-7, "palAmp", "D",
+        status );
+
+  /* This is the palMapqk test */
+  palAmp( 1.234, -0.567, 55927.0, 2010.0, &rm, &dm );
+  vvd( rm, 1.2335120411026936349, 1.0E-12, "palAmp", "rm", status );
+  vvd( dm, -0.56702908706930343907, 1.0E-12, "palAmp", "dm", status );
+}
 
 /* Bearings */
 
@@ -952,6 +970,7 @@ int main (void) {
   t_addet(&status);
   t_ampqk(&status);
   t_airmas(&status);
+  t_amp(&status);
   t_bear(&status);
   t_caf2r(&status);
   t_caldj(&status);
