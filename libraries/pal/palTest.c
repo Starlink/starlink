@@ -803,6 +803,29 @@ static void t_prec( int *status ) {
    vrmat( rmat, expected, "palPrec", status );
 }
 
+static void t_preces( int *status ) {
+  double ra;
+  double dc;
+  ra = 6.28;
+  dc = -1.123;
+  palPreces ( "FK4", 1925, 1950, &ra, &dc );
+  vvd ( ra,  0.002403604864728447, 1e-12, "palPreces",
+        "R", status );
+  vvd ( dc, -1.120570643322045, 1e-12, "palPreces",
+        "D", status );
+
+  /* This is the SLA test but PAL now uses the IAU 2006
+     precession model so we need to loosen the comparison */
+  ra = 0.0123;
+  dc = 1.0987;
+  palPreces ( "FK5", 2050, 1990, &ra, &dc );
+  vvd ( ra, 6.282003602708382, 1e-6, "palPreces",
+        "R", status );
+  vvd ( dc, 1.092870326188383, 1e-6, "palPreces",
+        "D", status );
+
+}
+
 static void t_evp( int *status ) {
    double dvb[3],dpb[3],dvh[3],dph[3];
    double vbex[3] = { 1.6957348127008098514e-07,
@@ -1047,6 +1070,7 @@ int main (void) {
   t_gmst(&status);
   t_fk52h(&status);
   t_prec(&status);
+  t_preces(&status);
   t_ecmat(&status);
   t_e2h(&status);
   t_map(&status);
