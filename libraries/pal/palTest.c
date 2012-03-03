@@ -184,6 +184,14 @@ static void t_addet( int *status ) {
 
 }
 
+/* Airmass */
+
+static void t_airmas( int *status ) {
+  vvd ( palAirmas ( 1.2354 ), 3.015698990074724,
+        1e-12, "palAirmas", " ", status );
+}
+
+
 /* Bearings */
 
 static void t_bear( int *status ) {
@@ -943,6 +951,7 @@ int main (void) {
 
   t_addet(&status);
   t_ampqk(&status);
+  t_airmas(&status);
   t_bear(&status);
   t_caf2r(&status);
   t_caldj(&status);
