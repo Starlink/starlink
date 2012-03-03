@@ -55,6 +55,7 @@ palPrebn.c \
 palPrec.c \
 palPrenut.c \
 palPvobs.c \
+palRverot.c \
 palRvgalc.c \
 palRvlg.c \
 palRvlsrd.c \

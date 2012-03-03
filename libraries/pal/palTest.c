@@ -963,6 +963,20 @@ static void t_pvobs( int *status ) {
    vvec( 6, pv, expected, "palPvobs", status );
 }
 
+static void t_rv( int *status ) {
+  vvd ( palRverot ( -0.777, 5.67, -0.3, 3.19 ),
+        -0.1948098355075913, 1e-6,
+        "palRverot", " ", status );
+  vvd ( palRvgalc ( 1.11E0, -0.99E0 ),
+        158.9630759840254, 1e-3, "palRvgalc", " ", status );
+  vvd ( palRvlg ( 3.97E0, 1.09E0 ),
+        -197.818762175363, 1e-3, "palRvlg", " ", status );
+  vvd ( palRvlsrd ( 6.01E0, 0.1E0 ),
+        -4.082811335150567, 1e-4, "palRvlsrd", " ", status );
+  vvd ( palRvlsrk ( 6.01E0, 0.1E0 ),
+        -5.925180579830265, 1e-4, "palRvlsrk", " ", status );
+}
+
 static void t_rvgalc( int *status ) {
    double rv;
    rv = palRvgalc( 2.7, -1.0 );
@@ -1044,6 +1058,7 @@ int main (void) {
   t_pvobs(&status);
   t_range(&status);
   t_ranorm(&status);
+  t_rv(&status);
   t_rvgalc(&status);
   t_rvlg(&status);
   t_rvlsrd(&status);
