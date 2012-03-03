@@ -906,6 +906,13 @@ static void t_fk54z( int *status ) {
    vvd( dd1950, 7.196059425334821089e-09, 1.0E-12, "palFk54z", "dd1950", status );
 }
 
+static void t_pa( int *status ) {
+  vvd ( palPa ( -1.567, 1.5123, 0.987 ),
+        -1.486288540423851, 1e-12, "palPa", " ", status );
+  vvd ( palPa ( 0, 0.789, 0.789 ),
+        0, 0, "palPa", "zenith", status );
+}
+
 static void t_pm( int * status ) {
   double ra2, dec2;
   double ra1, dec1, pmr1, pmd1, px1, rv1;
@@ -1031,6 +1038,7 @@ int main (void) {
   t_map(&status);
   t_mappa(&status);
   t_mapqkz(&status);
+  t_pa(&status);
   t_pm(&status);
   t_prebn(&status);
   t_pvobs(&status);
