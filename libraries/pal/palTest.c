@@ -292,6 +292,19 @@ static void t_cldj( int *status ) {
   viv ( j, 0, "palCldj", "J", status );
 }
 
+/* palDr2af */
+
+static void t_cr2af( int *status ) {
+  char s;
+  int idmsf[4];
+  palDr2af ( 4, 2.345, &s, idmsf );
+  viv ( s, '+', "palDr2af", "S", status );
+  viv ( idmsf[0], 134, "palDr2af", "(1)", status );
+  viv ( idmsf[1], 21, "palDr2af", "(2)", status );
+  viv ( idmsf[2], 30, "palDr2af", "(3)", status );
+  viv ( idmsf[3], 9706, "palDr2af", "(4)", status );
+}
+
 /* palDtf2d */
 
 static void t_ctf2d( int *status ) {
@@ -977,6 +990,7 @@ int main (void) {
   t_cc2s(&status);
   t_cd2tf(&status);
   t_cldj(&status);
+  t_cr2af(&status);
   t_ctf2d(&status);
   t_ctf2r(&status);
   t_djcal(&status);

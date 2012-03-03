@@ -121,6 +121,10 @@ double palDpav ( double v1[3], double v2[3] ) {
   return iauPap( v1, v2 );
 }
 
+void palDr2af ( int ndp, double angle, char *sign, int idmsf[4] ) {
+  iauA2af( ndp, angle, sign, idmsf );
+}
+
 double palDrange ( double angle ) {
   return iauAnpm( angle );
 }
