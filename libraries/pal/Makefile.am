@@ -47,6 +47,7 @@ palMap.c \
 palMappa.c \
 palMapqk.c \
 palMapqkz.c \
+palPm.c \
 palPrebn.c \
 palPrec.c \
 palPrenut.c \

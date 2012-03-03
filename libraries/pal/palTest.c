@@ -854,6 +854,44 @@ static void t_fk54z( int *status ) {
    vvd( dd1950, 7.196059425334821089e-09, 1.0E-12, "palFk54z", "dd1950", status );
 }
 
+static void t_pm( int * status ) {
+  double ra2, dec2;
+  double ra1, dec1, pmr1, pmd1, px1, rv1;
+
+  ra1 = 5.43;
+  dec1 = -0.87;
+  pmr1 = -0.33e-5;
+  pmd1 = 0.77e-5;
+  px1 = 0.7;
+  rv1 = 50.3*365.2422/365.25;
+
+  palPm ( ra1, dec1, pmr1, pmd1, px1, rv1,
+          1899, 1943,
+          &ra2, &dec2 );
+  vvd ( ra2, 5.429855087793875, 1e-10, "palPm",
+        "R", status );
+  vvd ( dec2, -0.8696617307805072, 1e-10, "palPm",
+        "D", status );
+
+  /* SOFA test */
+  ra1 =   0.01686756;
+  dec1 = -1.093989828;
+  pmr1 = -1.78323516e-5;
+  pmd1 =  2.336024047e-6;
+  px1 =   0.74723;
+  rv1 = -21.6;
+
+  palPm(ra1, dec1, pmr1, pmd1, px1, rv1,
+        palEpj(50083.0), palEpj(53736.0),
+        &ra2, &dec2);
+  vvd(ra2, 0.01668919069414242368, 1e-13,
+      "palPm", "ra", status);
+  vvd(dec2, -1.093966454217127879, 1e-13,
+      "palPm", "dec", status);
+
+
+}
+
 static void t_pvobs( int *status ) {
    double pv[6];
    double expected[6] = { -4.7683600138836167813e-06,
@@ -937,6 +975,7 @@ int main (void) {
   t_map(&status);
   t_mappa(&status);
   t_mapqkz(&status);
+  t_pm(&status);
   t_prebn(&status);
   t_pvobs(&status);
   t_range(&status);
