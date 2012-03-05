@@ -259,7 +259,7 @@ void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily, int nopad,
                   100. * (double) qcount[i] / (double) ndata,
                   scalestr,
                   (long) qcount[i] - (long) last_qcount[i],
-                  ((long) qcount[i] - (long) last_qcount[i]) ?
+                  ((long) qcount[i] - (long) last_qcount[i] && last_qcount[i] != 0 ) ?
                   100. * ((double) qcount[i] - (double) last_qcount[i]) /
                   (double) last_qcount[i] : 0 );
       }
