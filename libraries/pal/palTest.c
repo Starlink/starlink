@@ -574,6 +574,23 @@ static void t_fk52h ( int *status ) {
 
 }
 
+/* Nutation */
+
+static void t_nut( int *status ) {
+  double dpsi, deps, eps0;
+
+  /* Use the SOFA tests */
+  palNutc( 54388.0, &dpsi, &deps, &eps0 );
+  vvd( eps0, 0.4090749229387258204, 1e-14,
+      "palNutc", "eps0", status);
+
+  palNutc( 53736.0, &dpsi, &deps, &eps0 );
+   vvd(dpsi, -0.9630912025820308797e-5, 1e-13,
+       "palNutc", "dpsi", status);
+   vvd(deps,  0.4063238496887249798e-4, 1e-13,
+       "palNutc", "deps", status);
+}
+
 /* palPrebn */
 
 static void t_prebn( int *status ) {
@@ -1088,6 +1105,7 @@ int main (void) {
   t_map(&status);
   t_mappa(&status);
   t_mapqkz(&status);
+  t_nut(&status);
   t_pa(&status);
   t_pm(&status);
   t_prebn(&status);
