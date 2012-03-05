@@ -78,6 +78,9 @@
 *        values in the cubic interpolation.
 *     2010-10-19 (DSB):
 *        Do not attempt to fill the padded area if the bolometer has no good values.
+*     2012-03-05 (DSB):
+*        Fix bug which prevented the last sample being filled if it was a 
+*        single isolated flagged value.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -418,6 +421,13 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
              jend = j - 1;
           }
           inside = 0;
+          count = 0;
+
+        /* If the  current (flagged) sample is the last sample, and it is
+           preceeded by an unflagged sample, then indicate that we have a
+           1-sample block to fill. */
+        } else if( flagged ) {
+          jstart = jend = j;
           count = 0;
         }
 
