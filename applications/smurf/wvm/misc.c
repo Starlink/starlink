@@ -630,9 +630,11 @@ LM_REAL fact;
    rnk=m; /* assume full rank */
 #endif /* HAVE_LAPACK */
 
-   fact=sumsq/(LM_REAL)(n-rnk);
-   for(i=0; i<m*m; ++i)
-     C[i]*=fact;
+   if( n != rnk ) {
+      fact=sumsq/(LM_REAL)(n-rnk);
+      for(i=0; i<m*m; ++i)
+        C[i]*=fact;
+   }
 
    return rnk;
 }
