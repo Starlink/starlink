@@ -121,6 +121,9 @@
 *        Support 2D FFTs
 *     2011-10-04 (EC):
 *        Add outdata
+*     2011-03-05 (DSB):
+*        Do not attempt to take the FFT of bad bolometer time streams since
+*        they generate NaNs in FFTW.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -284,7 +287,15 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
          baseI = baseR + nf;
        }
 
-       fftw_execute_split_dft_r2c( pdata->plan, baseD, baseR, baseI );
+       /* Skip bad bolometers. These will have been filled with bad values. */
+       if( baseD[ 0 ] != VAL__BADD ) {
+         fftw_execute_split_dft_r2c( pdata->plan, baseD, baseR, baseI );
+
+       /* For safety, fill thre returned arrays with zeros for bad bolometers. */
+       } else {
+         memset( baseR, 0, sizeof(*baseR)*nf );
+         memset( baseI, 0, sizeof(*baseR)*nf );
+       }
      }
    }
 
@@ -314,6 +325,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
   double df[2]={0,0};           /* Frequency step size Hz (1-d) 1/arcsec (2-d)*/
   fftw_iodim *dims=NULL;        /* FFTW I/O dimensions for transformations */
   dim_t fdims[2];               /* Frequency dimensions */
+  dim_t ibolo;                  /* Bolometer counter */
   int i;                        /* Loop counter */
   size_t inbstr;                /* Bolometer stride in input data */
   size_t intstr;                /* Time slice stride in input data */
@@ -420,6 +432,14 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
     } else if( len > 0 ) {
       smf_fillgaps( wf, data, SMF__Q_GAP, status );
       smf_apodize( data, len, 1, status );
+    }
+
+    /* Put a bad value at the start of each bad bolometer so that they can
+       be identified in the worker thread. */
+    for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+      if( (data->qual)[ ibolo*inbstr ] & SMF__Q_BADB ) {
+         ((double*)(data->pntr[0]))[ ibolo*inbstr ] = VAL__BADD;
+      }
     }
 
     if (data && data->qual) data->qual = astFree( data->qual );
