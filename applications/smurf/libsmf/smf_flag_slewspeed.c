@@ -210,6 +210,9 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
     sep1 = slaDsep( pos1_ac1, pos1_ac2, pos2_ac1, pos2_ac2 ) * DR2AS;
     sep2 = slaDsep( pos2_ac1, pos2_ac2, pos3_ac1, pos3_ac2 ) * DR2AS;
 
+    /* Check for zero step time. These can occur at the start and end of
+       the timstream because padding samples are given identical TCS_TAI
+       values by smf_concat smfGroup. */
     if( steptime1 > 0.0 && steptime2 > 0.0 ) {
 
     /* Average speed in arcsec/sec */
