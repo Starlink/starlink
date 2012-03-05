@@ -62,6 +62,8 @@
 *        Use actual instead of demand coordinates!
 *     2011-10-18 (EC):
 *        Catch floating-point exceptions when calculating average_speed
+*     2012-03-05 (DSB):
+*        Guard against divide by zero if step time is zero.
 
 *  Copyright:
 *     Copyright (C) 2011 Science & Technology Facilities Council.
@@ -208,11 +210,16 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
     sep1 = slaDsep( pos1_ac1, pos1_ac2, pos2_ac1, pos2_ac2 ) * DR2AS;
     sep2 = slaDsep( pos2_ac1, pos2_ac2, pos3_ac1, pos3_ac2 ) * DR2AS;
 
+    if( steptime1 > 0.0 && steptime2 > 0.0 ) {
+
     /* Average speed in arcsec/sec */
-    speed = (sep1 + sep2)/(steptime1+steptime2);
+      speed = (sep1 + sep2)/(steptime1+steptime2);
 
     /* Acceleration magnitude in arcsec/sec^2 (currently ignored) */
-    accel = fabs( (sep2-sep1)/(steptime1*steptime2) );
+      accel = fabs( (sep2-sep1)/(steptime1*steptime2) );
+    } else {
+      accel = speed = 0.0;
+    }
 
     if( (smin && (speed < smin)) || (smax && (speed > smax)) ) {
       /* Does this time step need to be flagged? */
