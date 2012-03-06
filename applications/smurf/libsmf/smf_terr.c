@@ -29,14 +29,22 @@
 *     pos
 *        Array holding the returned (x,y,z) values, in metres.
 
+*  Notes:
+*     This routine is a thin wrapper around the SOFA function. It exists
+*     simply to enforce the use of WGS84 reference ellipsoid.
+
 *  Authors:
 *     EC: Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     23-MAY-2007 (EC):
 *        Initial version (copied from ast/fitschan.c).
+*     2012-03-06 (TIMJ):
+*        Replace with call to SOFA iauGd2gc using WGS84 reference ellipsoid.
 
 *  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -65,6 +73,7 @@
 /* Starlink includes */
 #include "ast.h"
 #include "star/slalib.h"
+#include "sofa.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -74,18 +83,11 @@
 
 void smf_terr( double phi, double h, double lambda, double pos[3] ) {
 
-  /* Local Variables... */
-  double r, z;
-
   /* Check the global status. */
   if( !astOK ) return;
 
   /* Calculate cartesian coordinates in metres */
-  slaGeoc( phi, h, &r, &z );
-  r *= AST__AU; /* covert AU to metres */
-  pos[0] = r*cos( lambda );
-  pos[1] = r*sin( lambda );
-  pos[2] = z*AST__AU;
+  iauGd2gc( 1 /* WGS84 */, lambda, phi, h, pos );
 
 }
 

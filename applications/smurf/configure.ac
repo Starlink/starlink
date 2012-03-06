@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(smurf, 1.3.8, t.jenness@jach.hawaii.edu)
+AC_INIT(smurf, 1.3.9, t.jenness@jach.hawaii.edu)
 PACKAGE_UPCASE='SMURF'
 AC_DEFINE( [PACKAGE_UPCASE], "SMURF", [Upper cased package name] )
 AC_SUBST(PACKAGE_UPCASE)
@@ -109,8 +109,8 @@ AC_CHECK_HEADERS(mach/mach.h)
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl gsl ndg fftw ard kaplibs pda gsd irq])
-STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl pda gsd irq])
+STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl gsl ndg fftw ard kaplibs pda gsd irq sofa])
+STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl pda gsd irq sofa])
 dnl We use the sst package to build documentation (prohlp and prolat)
 STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
 

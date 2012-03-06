@@ -2479,6 +2479,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/shl \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/snx \
+		$(MANIFESTS)/sofa \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \

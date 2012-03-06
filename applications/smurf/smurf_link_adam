@@ -32,7 +32,7 @@
 #     needed because there would be too many references before the awk
 #     script could reduce them.
 
-#  Copyright:msgOutif(MSG__VERB," ","0", statu
+#  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999,2005 Particle Physics and Astronomy
 #     Research Council. All Rights Reserved.
 
@@ -99,6 +99,8 @@
 #        Add fftw3
 #     2009 April 23 (EC)
 #        Link against multi-threaded fftw3 library
+#     2012-03-06 (TIMJ):
+#        Add sofa
 #     {enter_further_changes_here}
 
 #-
@@ -109,7 +111,7 @@
            `prm_link_adam` `ard_link_adam` \
            `grp_link_adam` `ndg_link_adam` `kaplibs_link_adam -nogrf` \
            `gsd_link_adam` `thr_link_adam` \
-           -lgsl -lgslcblas -lfftw3_threads -lfftw3 \
+           -lgsl -lgslcblas -lfftw3_threads -lfftw3 -lsofa_c \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

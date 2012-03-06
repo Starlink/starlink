@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="smurf">
-  <version>1.3.8</version>
+  <version>1.3.9</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>
   <abstract><p>
@@ -14,7 +14,7 @@ reduce your SCUBA-2 data. It can also be used to make maps obtained
 with the ACSIS correlator at JCMT.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><build>irq</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><link>irq</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><build>irq</build><build>sofa</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><link>irq</link><link>sofa</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

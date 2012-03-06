@@ -18,9 +18,6 @@
 *     (long,lat)=(0,0), and Y axis at (long,lat) = (E90,0).
 *
 *     The inverse of this function is smf_terr.
-*
-*     The algorithm is due to Borkowski, and is described in the
-*     Explanatory Supplement to the Astronomical Almanac (p206).
 
 *  Parameters:
 *     const pos
@@ -37,14 +34,22 @@
 
 *  Authors:
 *     DSB: David Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
+*  Notes:
+*     This routine is a thin wrapper around the SOFA function. It exists
+*     simply to enforce the use of WGS84 reference ellipsoid.
 
 *  History:
 *     2-NOV-2006 (DSB):
 *        Initial version (copied from ast/fitschan.c).
 *     7-JUL-2008 (TIMJ):
 *        Use const.
+*     2012-03-06 (TIMJ):
+*        Now uses iauGc2gd with WGS84 reference ellipsoid.
 
 *  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -73,83 +78,19 @@
 /* SMURF includes */
 #include "smurf_par.h"
 #include "smf.h"
+#include "sofa.h"
 
 /* Constants */
 #define FUNC_NAME "smf_geod"
-#define FL  1.0/298.257  /*  Reference spheroid flattening factor */
-#define A0  6378140.0    /*  Earth equatorial radius (metres) */
 
 void smf_geod( const double pos[3], double *phi, double *h, double *lambda ){
+  /* SOFA does not like to const */
+  double lpos[3];
 
-/* Local Variables... */
-   double r, e, f, p, q, d, n, g, t, rp, rd, sn, b0, boa, ab2oa;
+  lpos[0] = pos[0];
+  lpos[1] = pos[1];
+  lpos[2] = pos[2];
 
-/* Initialise */
-   *phi = 0.0;
-   *h = 0.0;
-   *lambda = 0.0;
-
-/* Check the global status. */
-   if( !astOK ) return;
-
-/* Earth polar radius (metres) */
-   b0 = A0*( 1.0 - FL );
-
-/* Useful functions */
-   boa = b0/A0;
-   ab2oa = ( A0*A0 - b0*b0)/A0;
-
-/* To obtain the proper sign and polynomial solution, the sign of b is
-   set to that of z. Note the sign of z. */
-   if( pos[ 2 ] > 0.0 ) {
-      sn = 1.0;
-   } else {
-      sn = -1.0;
-   }
-
-/* If the supplied position is on the polar axis, the returned values are
-   trivial. We check this case because it corresponds to a singularity in
-   the main algorithm. */
-   r = sqrt( pos[ 0 ]*pos[ 0 ] + pos[ 1 ]*pos[ 1 ] );
-   if( r == 0 ) {
-      *lambda = 0.0;
-      *phi = M_PI_2;
-      *h = pos[ 2 ] - sn*b0;
-
-   } else {
-
-/* The longitude is simple. */
-      *lambda = atan2( pos[ 1 ], pos[ 0 ] );
-
-/* The equator is also a singularity in the main algorithm. If the
-   supplied point is on the equator, the answers are trivial. */
-      if( pos[ 2 ] == 0.0 ) {
-         *phi = 0.0;
-         *h = r - A0;
-
-/* For all other cases, use the main Borkowski algorithm. */
-      } else {
-         e = ( sn*boa*pos[ 2 ] - ab2oa )/r;
-         f = ( sn*boa*pos[ 2 ] + ab2oa )/r;
-         p = 4.0*( e*f + 1.0 )/3.0;
-         q = 2.0*( e*e - f*f );
-         d = p*p*p + q*q;
-
-         if( d < 0.0 ) {
-            rp = sqrt( -p );
-            n = 2.0*rp*cos( acos( q/(p*rp) )/3.0 );
-         } else {
-            rd = sqrt( d );
-            n = pow( ( rd - q ), 1.0/3.0 ) - pow( (rd + q ), 1.0/3.0 );
-         }
-
-         g = 0.5* ( sqrt( e*e + n ) + e );
-         t = sqrt( g*g + ( f - n*g )/( 2*g - e ) ) - g;
-
-         *phi = atan( A0*( 1.0 - t*t  )/( 2.0*sn*b0*t ) );
-         *h = ( r - A0*t )*cos( *phi ) + ( pos[ 2 ] - sn*b0 )*sin( *phi );
-
-      }
-   }
+  iauGc2gd( 1 /* WGS84 */, lpos, lambda, phi, h );
 }
 
