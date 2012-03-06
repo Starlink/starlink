@@ -43,6 +43,10 @@ com.noflag=1
 #  Ignore samples that see the source when calculating the common-mode
 com.zero_circle = 0.025
 
+# Per array common-mode should be fine here since we are dealing with
+# a compact source. It seems to make things more stable.
+com.perarray = 1
+
 # use sin(azimuth) as a template to remove magnetic-field pickup
 tmp.source=state_az
 tmp.dosin=1

@@ -34,6 +34,10 @@ ast.zero_notlast = 1
 # calculating and fitting the common-mode signal.
 com.zero_circle = 0.0166666666
 
+# Per array common-mode should be fine here since we are dealing with
+# a compact source. It seems to make things more stable.
+com.perarray = 1
+
 # we can get away with harsher filtering since the boundary conditions are
 # quite tight
 450.flt.filt_edge_largescale=200
