@@ -76,6 +76,9 @@ static const double PAL__MJD0 = 2400000.5;
 /* Light time for 1 AU (sec) */
 static const double PAL__CR = 499.004782;
 
+/* Seconds per day */
+static const double PAL__SPD = 86400.0;
+
 /* Km per sec to AU per tropical century
    = 86400 * 36524.2198782 / 149597870 */
 static const double PAL__VF = 21.095;
