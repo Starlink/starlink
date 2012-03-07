@@ -1839,6 +1839,7 @@ $(MANIFESTS)/one: \
 
 $(MANIFESTS)/pal: \
 		$(MANIFESTS)/sofa
+		$(MANIFESTS)/starutil
 	cd libraries/pal \
 	  && $(MAKE_CPT)
 

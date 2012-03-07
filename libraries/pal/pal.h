@@ -61,6 +61,7 @@ extern "C" {
 #endif
 
 #include <math.h>
+#include <stdlib.h>
 
 void palAddet ( double rm, double dm, double eq, double *rc, double *dc );
 
@@ -370,7 +371,10 @@ void palOap ( const char *type, double ob1, double ob2, double date,
 void palOapqk ( const char *type, double ob1, double ob2, double aoprms[14],
                 double *rap, double *dap );
 
-void palObs ( int n, char *c, char *name, double *w, double *p, double *h );
+int palObs( size_t n, const char * c,
+            char * ident, size_t identlen,
+            char * name, size_t namelen,
+            double * w, double * p, double * h );
 
 double palPa ( double ha, double dec, double phi );
 

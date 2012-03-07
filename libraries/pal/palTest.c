@@ -51,6 +51,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "pal.h"
 #include "palmac.h"
@@ -131,6 +132,23 @@ static void vvd(double val, double valok, double dval,
              func, test, valok, val);
    }
    return;
+}
+
+/* Verify a string */
+static void vcs( const char * val, const char * valok,
+                 const char * func, const char * test,
+                 int *status ) {
+
+  if (strcmp(val, valok) != 0) {
+    *status = 1;
+    printf("%s failed: %s want %s got %s\n",
+           func, test, valok, val );
+  } else if (verbose) {
+    printf("%s passed: %s want %s got %s\n",
+           func, test, valok, val );
+  }
+  return;
+
 }
 
 /* Verify the 3x3 rmat matrix */
@@ -957,6 +975,61 @@ static void t_fk54z( int *status ) {
    vvd( dd1950, 7.196059425334821089e-09, 1.0E-12, "palFk54z", "dd1950", status );
 }
 
+static void t_obs( int * status ) {
+
+  char shortname[11];
+  char longname[41];
+  double w, p, h;
+  int lstat;
+
+  lstat = palObs( 0, "MMT", shortname, sizeof(shortname),
+                  longname, sizeof(longname), &w, &p, &h );
+  vcs ( shortname, "MMT", "palObs", "1/C", status );
+  vcs ( longname, "MMT 6.5m, Mt Hopkins", "palObs", "1/NAME",
+        status );
+  vvd ( w, 1.935300584055477, 1e-8, "palObs",
+        "1/W", status );
+  vvd ( p, 0.5530735081550342238, 1e-10, "palObs",
+        "1/P", status );
+  vvd ( h, 2608, 1e-10, "palObs",
+        "1/H", status );
+  viv( lstat, 0, "palObs", "retval", status );
+
+  lstat = palObs ( 61, NULL, shortname, sizeof(shortname),
+                   longname, sizeof(longname), &w, &p, &h );
+  vcs ( shortname, "KECK1", "palObs", "2/C", status );
+  vcs ( longname, "Keck 10m Telescope #1", "palObs",
+        "2/NAME", status );
+  vvd ( w, 2.713545757918895, 1e-8, "palObs",
+        "2/W", status );
+  vvd ( p, 0.3460280563536619, 1e-8, "palObs",
+        "2/P", status );
+  vvd ( h, 4160, 1e-10, "palObs",
+        "2/H", status );
+  viv( lstat, 0, "palObs", "retval", status );
+
+  lstat = palObs ( 83, NULL, shortname, sizeof(shortname),
+                   longname, sizeof(longname), &w, &p, &h );
+  vcs ( shortname, "MAGELLAN2", "palObs", "3/C", status );
+  vcs ( longname, "Magellan 2, 6.5m, Las Campanas",
+        "palObs", "3/NAME", status );
+  vvd ( w, 1.233819305534497, 1e-8, "palObs",
+        "3/W", status );
+  vvd ( p, -0.506389344359954, 1e-8, "palObs",
+        "3/P", status );
+  vvd ( h, 2408, 1e-10, "palObs",
+        "3/H", status );
+  viv( lstat, 0, "palObs", "retval", status );
+
+  lstat = palObs ( 84, NULL, shortname, sizeof(shortname),
+                   longname, sizeof(longname), &w, &p, &h );
+  vcs ( longname, "?", "palObs", "4/NAME", status );
+  viv( lstat, -1, "palObs", "retval", status );
+
+
+
+}
+
 static void t_pa( int *status ) {
   vvd ( palPa ( -1.567, 1.5123, 0.987 ),
         -1.486288540423851, 1e-12, "palPa", " ", status );
@@ -1106,6 +1179,7 @@ int main (void) {
   t_mappa(&status);
   t_mapqkz(&status);
   t_nut(&status);
+  t_obs(&status);
   t_pa(&status);
   t_pm(&status);
   t_prebn(&status);

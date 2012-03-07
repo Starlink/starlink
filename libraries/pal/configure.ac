@@ -25,8 +25,8 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [sofa])
-STAR_DECLARE_DEPENDENCIES(link,  [sofa])
+STAR_DECLARE_DEPENDENCIES(build, [sofa starutil])
+STAR_DECLARE_DEPENDENCIES(link,  [sofa starutil])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.

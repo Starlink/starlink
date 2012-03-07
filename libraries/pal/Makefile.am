@@ -5,7 +5,7 @@ lib_LTLIBRARIES = libpal.la
 libpal_la_SOURCES = $(PUBLIC_C_FILES)
 
 # Force a link against SOFA
-libpal_la_LIBADD = $(libdir)/libsofa_c.la
+libpal_la_LIBADD = $(libdir)/libsofa_c.la $(libdir)/libstarutil.la
 
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
@@ -51,6 +51,7 @@ palMappa.c \
 palMapqk.c \
 palMapqkz.c \
 palNutc.c \
+palObs.c \
 palPa.c \
 palPm.c \
 palPrebn.c \

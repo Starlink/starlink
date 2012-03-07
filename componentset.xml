@@ -5775,7 +5775,7 @@ Ultrix and for SunOS and may still work for them.
     except for the use of a "pal" prefix.
     </p></abstract>
   <dependencies >
-    <build>sofa</build><link>sofa</link>
+    <build>sofa</build><build>starutil</build><link>sofa</link><link>starutil</link>
   </dependencies>
   <developers>
     <person>
