@@ -1031,6 +1031,19 @@ static void t_obs( int * status ) {
   vcs ( longname, "?", "palObs", "5/NAME", status );
   viv( lstat, -1, "palObs", "retval", status );
 
+  lstat = palObs( 0, "mmt", shortname, sizeof(shortname),
+                  longname, sizeof(longname), &w, &p, &h );
+  vcs ( shortname, "MMT", "palObs", "6/C", status );
+  vcs ( longname, "MMT 6.5m, Mt Hopkins", "palObs", "6/NAME",
+        status );
+  vvd ( w, 1.935300584055477, 1e-8, "palObs",
+        "6/W", status );
+  vvd ( p, 0.5530735081550342238, 1e-10, "palObs",
+        "6/P", status );
+  vvd ( h, 2608, 1e-10, "palObs",
+        "6/H", status );
+  viv( lstat, 0, "palObs", "retval", status );
+
 }
 
 static void t_pa( int *status ) {
