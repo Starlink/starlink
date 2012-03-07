@@ -597,6 +597,18 @@ static void t_fk52h ( int *status ) {
 static void t_nut( int *status ) {
   double dpsi, deps, eps0;
 
+  double expected[3][3] = {
+    {  9.999999969492166e-1, 7.166577986249302e-5,  3.107382973077677e-5 },
+    { -7.166503970900504e-5, 9.999999971483732e-1, -2.381965032461830e-5 },
+    { -3.107553669598237e-5, 2.381742334472628e-5,  9.999999992335206818e-1 }
+  };
+
+  double rmatn[3][3];
+
+  /* SLA tests with low precision */
+  palNut( 46012.32, rmatn );
+  vrmat( rmatn, expected, "palNut", 1.0e-3, status );
+
   /* Use the SOFA tests */
   palNutc( 54388.0, &dpsi, &deps, &eps0 );
   vvd( eps0, 0.4090749229387258204, 1e-14,

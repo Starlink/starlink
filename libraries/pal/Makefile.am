@@ -50,6 +50,7 @@ palMap.c \
 palMappa.c \
 palMapqk.c \
 palMapqkz.c \
+palNut.c \
 palNutc.c \
 palObs.c \
 palPa.c \
