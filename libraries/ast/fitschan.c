@@ -1024,8 +1024,10 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        MakeFitsFrameSet to be ignored.
 *     2-MAR-2012 (DSB):
 *        - In CLASSFromSTore, ensure NAXIS2/3 values are stored in teh FitsChan,
-*        and cater for FrameSets that have only a apectral axis and no celestial 
+*        and cater for FrameSets that have only a apectral axis and no celestial
 *        axes (this prevented the VELO_LSR keyword being created)..
+*     7-MAR-2012 (DSB):
+*        Use iauGc2gd in place of Geod.
 *class--
 */
 
@@ -1726,7 +1728,6 @@ static void FixUsed( AstFitsChan *, int, int, int, const char *, const char *, i
 static void FormatCard( AstFitsChan *, char *, const char *, int * );
 static void FreeItem( double ****, int * );
 static void FreeItemC( char *****, int * );
-static void Geod( double[3], double *, double *, double *, int * );
 static void GetFiducialNSC( AstWcsMap *, double *, double *, int * );
 static void GetFiducialPPC( AstWcsMap *, double *, double *, int * );
 static void GetNextData( AstChannel *, int, char **, char **, int * );
@@ -11071,117 +11072,6 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
 
 /* Return the answer. */
    return ret;
-}
-
-static void Geod( double pos[3], double *phi, double *h, double *lambda, int *status ){
-/*
-*  Name:
-*     Geod
-
-*  Purpose:
-*     Convert a terrestrial Cartesian (x,y,z) position to geodetic lat/long
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "fitschan.h"
-*     void Geod( double pos[3], double *phi, double *h, double *lambda, int *status )
-
-*  Class Membership:
-*     FitsChan member function.
-
-*  Description:
-*     This function converts a position supplied as terrestrial Cartesian
-*     (x,y,z) values into geodetic longitude, latitude and height above the
-*     reference spheroid. The (x,y,z) system has origin at the centre of
-*     the earth, Z axis going through the north pole, X axis at
-*     (long,lat)=(0,0), and Y axis at (long,lat) = (E90,0).
-*
-*     The algorithm is due to Borkowski, and is described in the
-*     Explanatory Supplement to the Astronomical Almanac (p206).
-
-*  Parameters:
-*     pos
-*        Array holding the (x,y,z) values, in metres.
-*     phi
-*        Pointer at a location at which to return the geodetic latitude,
-*        in radians.
-*     h
-*        Pointer at a location at which to return the height above the
-*        reference spheroid (geodetic, metres).
-*     lambda
-*        Pointer at a location at which to return the geodetic longitude,
-*        in radians, positive east.
-*     status
-*        Pointer to the inherited status variable.
-*/
-
-/* Local Variables... */
-   double r, e, f, p, q, d, n, g, t, rp, rd, sn, b0, boa, ab2oa;
-
-/* Initialise */
-   *phi = 0.0;
-   *h = 0.0;
-   *lambda = 0.0;
-
-/* Check the global status. */
-   if( !astOK ) return;
-
-/* Earth polar radius (metres) */
-   b0 = A0*( 1.0 - FL );
-
-/* Useful functions */
-   boa = b0/A0;
-   ab2oa = ( A0*A0 - b0*b0)/A0;
-
-/* To obtain the proper sign and polynomial solution, the sign of b is
-   set to that of z. Note the sign of z. */
-   if( pos[ 2 ] > 0.0 ) {
-      sn = 1.0;
-   } else {
-      sn = -1.0;
-   }
-
-/* If the supplied position is on the polar axis, the returned values are
-   trivial. We check this case because it corresponds to a singularity in
-   the main algorithm. */
-   r = sqrt( pos[ 0 ]*pos[ 0 ] + pos[ 1 ]*pos[ 1 ] );
-   if( r == 0 ) {
-      *lambda = 0.0;
-      *phi = AST__DPIBY2;
-      *h = pos[ 2 ] - sn*b0;
-   } else {
-
-/* The longitude is simple. */
-      *lambda = atan2( pos[ 1 ], pos[ 0 ] );
-
-/* The equator is also a singularity in the main algorithm. If the
-   supplied point is on the equator, the answers are trivial. */
-      if( pos[ 2 ] == 0.0 ) {
-         *phi = 0.0;
-         *h = r - A0;
-
-/* For all other cases, use the main Borkowski algorithm. */
-      } else {
-         e = ( sn*boa*pos[ 2 ] - ab2oa )/r;
-         f = ( sn*boa*pos[ 2 ] + ab2oa )/r;
-         p = 4.0*( e*f + 1.0 )/3.0;
-         q = 2.0*( e*e - f*f );
-         d = p*p*p + q*q;
-         if( d < 0.0 ) {
-            rp = sqrt( -p );
-            n = 2.0*rp*cos( acos( q/(p*rp) )/3.0 );
-         } else {
-            rd = sqrt( d );
-            n = pow( ( rd - q ), 1.0/3.0 ) - pow( (rd + q ), 1.0/3.0 );
-         }
-         g = 0.5* ( sqrt( e*e + n ) + e );
-         t = sqrt( g*g + ( f - n*g )/( 2*g - e ) ) - g;
-         *phi = atan( A0*( 1.0 - t*t  )/( 2.0*sn*b0*t ) );
-         *h = ( r - A0*t )*cos( *phi ) + ( pos[ 2 ] - sn*b0 )*sin( *phi );
-      }
-   }
 }
 
 static int GetClean( AstFitsChan *this, int *status ) {
@@ -35653,7 +35543,7 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
       if( obsgeo[ 0 ] != AST__BAD &&
           obsgeo[ 1 ] != AST__BAD &&
           obsgeo[ 2 ] != AST__BAD ) {
-         Geod( obsgeo, &geolat, &h, &geolon, status );
+         iauGc2gd( 1, obsgeo, &geolon, &geolat, &h );
          astSetObsLat( ret, geolat );
          astSetObsLon( ret, geolon );
          astSetObsAlt( ret, h );
@@ -35844,7 +35734,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
             if( obsgeo[ 0 ] != AST__BAD &&
                 obsgeo[ 1 ] != AST__BAD &&
                 obsgeo[ 2 ] != AST__BAD ) {
-               Geod( obsgeo, &geolat, &h, &geolon, status );
+               iauGc2gd( 1, obsgeo, &geolon, &geolat, &h );
                astSetObsLat( specfrm, geolat );
                astSetObsLon( specfrm, geolon );
                astSetObsAlt( specfrm, h );

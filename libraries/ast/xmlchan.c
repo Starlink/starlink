@@ -222,6 +222,7 @@ f     The XmlChan class does not define any new routines beyond those
 #include "object.h"              /* Base Object class */
 #include "wcsmap.h"              /* Angular conversion constants */
 #include "xml.h"                 /* AST XML facilities */
+#include "sofa.h"                /* IAU SOFA functions */
 #include "stcresourceprofile.h"  /* IVOA StcResourceProfile class */
 #include "stcsearchlocation.h"   /* IVOA SearchLocation class */
 #include "stccatalogentrylocation.h"/* IVOA CatalogEntryLocation class */
@@ -428,7 +429,6 @@ static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void FillAndLims( AstXmlChan *, AstXmlElement *, AstRegion *, int * );
-static void Geod( double, double, double *, double *, int * );
 static void OutputText( AstXmlChan *, const char *, int, int * );
 static void ReCentreAnc( AstRegion *, int, AstKeyMap **, int * );
 static void ReadClassData( AstChannel *, const char *, int * );
@@ -4643,130 +4643,6 @@ static IVOAScan *FreeIVOAScan( IVOAScan *in, int *status ){
    return NULL;
 }
 
-static void Geod( double lat, double lon, double *phi, double *lambda, int *status ){
-/*
-*  Name:
-*     Geod
-
-*  Purpose:
-*     Convert a geocentric lat/long to geodetic lat/long at sea level.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "xmlchan.h"
-*     void Geod( double lat, double lon, double *phi, double *lambda, int *status )
-
-*  Class Membership:
-*     FitsChan member function.
-
-*  Description:
-*     This function converts a position supplied as geocentric lat/lon at
-*     sea level into geodetic longitude, latitude. The algorithm is due to
-*     Borkowski, and is described in the Explanatory Supplement to the
-*     Astronomical Almanac (p206).
-
-*  Parameters:
-*     lat
-*        Geocentric latitude (radians)
-*     lon
-*        Geocentric longitude (radians).
-*     phi
-*        Pointer at a location at which to return the geodetic latitude,
-*        in radians.
-*     lambda
-*        Pointer at a location at which to return the geodetic longitude,
-*        in radians.
-*     status
-*        Pointer to the inherited status variable.
-*/
-
-/* Local Constants... */
-#define FL  1.0/298.257  /*  Reference spheroid flattening factor */
-#define A0  6378140.0    /*  Earth equatorial radius (metres) */
-
-/* Local Variables... */
-   double r, e, f, p, q, d, n, g, t, rp, rd, sn, b0, boa, ab2oa;
-   double pos[3];
-
-/* Initialise */
-   *phi = 0.0;
-   *lambda = 0.0;
-
-/* Check the global status. */
-   if( !astOK ) return;
-
-/* Convert the supplied geocentric lon/lat to terrestrial Cartesian
-   (x,y,z) values. The (x,y,z) system has origin at the centre of the
-   earth, Z axis going through the north pole, X axis at (long,lat)=(0,0),
-   and Y axis at (long,lat) = (E90,0). Assume an equatorial sea level
-   position. */
-   palDcs2c( lon, lat, pos );
-   pos[ 0 ] *= A0;
-   pos[ 1 ] *= A0;
-   pos[ 2 ] *= A0;
-
-/* Earth polar radius (metres) */
-   b0 = A0*( 1.0 - FL );
-
-/* Useful functions */
-   boa = b0/A0;
-   ab2oa = ( A0*A0 - b0*b0)/A0;
-
-/* To obtain the proper sign and polynomial solution, the sign of b is
-   set to that of z. Note the sign of z. */
-   if( pos[ 2 ] > 0.0 ) {
-      sn = 1.0;
-   } else {
-      sn = -1.0;
-   }
-
-/* If the supplied position is on the polar axis, the returned values are
-   trivial. We check this case because it corresponds to a singularity in
-   the main algorithm. */
-   r = sqrt( pos[ 0 ]*pos[ 0 ] + pos[ 1 ]*pos[ 1 ] );
-   if( r == 0 ) {
-      *lambda = 0.0;
-      *phi = AST__DPIBY2;
-
-   } else {
-
-/* The longitude is unchanged. */
-      *lambda = lon;
-
-/* The equator is also a singularity in the main algorithm. If the
-   supplied point is on the equator, the answers are trivial. */
-      if( pos[ 2 ] == 0.0 ) {
-         *phi = 0.0;
-
-/* For all other cases, use the main Borkowski algorithm. */
-      } else {
-         e = ( sn*boa*pos[ 2 ] - ab2oa )/r;
-         f = ( sn*boa*pos[ 2 ] + ab2oa )/r;
-         p = 4.0*( e*f + 1.0 )/3.0;
-         q = 2.0*( e*e - f*f );
-         d = p*p*p + q*q;
-
-         if( d < 0.0 ) {
-            rp = sqrt( -p );
-            n = 2.0*rp*cos( acos( q/(p*rp) )/3.0 );
-         } else {
-            rd = sqrt( d );
-            n = pow( ( rd - q ), 1.0/3.0 ) - pow( (rd + q ), 1.0/3.0 );
-         }
-
-         g = 0.5* ( sqrt( e*e + n ) + e );
-         t = sqrt( g*g + ( f - n*g )/( 2*g - e ) ) - g;
-
-         *phi = atan( A0*( 1.0 - t*t  )/( 2.0*sn*b0*t ) );
-
-      }
-   }
-}
-#undef FL
-#undef A0
-
 static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
@@ -5933,6 +5809,9 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
 
 */
 
+/* Local Constants: */
+#define A0  6378140.0            /* Earth equatorial radius (metres) */
+
 /* Local Variables: */
    AstFrame *frm;                /* Pointer to obsvtory lon/lat Frame */
    AstFrame *obs_frm;            /* Pointer to obsvation lon/lat Frame */
@@ -6034,7 +5913,23 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
          pfrm = astAnnul( pfrm );
       }
 
-      if( lon != AST__BAD ) Geod( lat, lon, &phi, &lambda, status );
+/* If required, convert from geocentric lon/lat to geodetic lon/lat. */
+      if( lon != AST__BAD ) {
+         double pos[ 3 ], height;
+
+/* Convert the supplied geocentric lon/lat to terrestrial Cartesian
+   (x,y,z) values. The (x,y,z) system has origin at the centre of the
+   earth, Z axis going through the north pole, X axis at (long,lat)=(0,0),
+   and Y axis at (long,lat) = (E90,0). Assume an equatorial sea level
+   position. */
+         palDcs2c( lon, lat, pos );
+         pos[ 0 ] *= A0;
+         pos[ 1 ] *= A0;
+         pos[ 2 ] *= A0;
+
+/* Get the corresponding geodetic lon/lat. */
+         iauGc2gd( 1, pos, &lambda, &phi, &height );
+      }
 
       if( lambda != AST__BAD ) {
          obs_frm = astGetFrame( ((AstRegion *) obs)->frameset, AST__CURRENT );
@@ -6068,6 +5963,7 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
 /* Return the pointer to the new Region. */
    return (AstPointList *) new;
 }
+#undef A0
 
 static void OutputText( AstXmlChan *this, const char *text, int mxlen, int *status ) {
 /*
