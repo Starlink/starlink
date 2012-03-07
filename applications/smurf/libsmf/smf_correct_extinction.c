@@ -179,10 +179,12 @@
 *     2010-12-21 (TIMJ):
 *        Trap 0 airmass in same manner as VAL__BADD airmass. Fall back to using
 *        TCS_AZ_AC2.
+*     2012-03-06 (TIMJ):
+*        Use PAL instead of SLA.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010, 2012 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British
 *     Columbia. All Rights Reserved.
@@ -218,7 +220,7 @@
 #include "mers.h"
 #include "msg_par.h"
 #include "prm_par.h"
-#include "star/slalib.h"
+#include "star/pal.h"
 #include "star/one.h"
 
 /* SMURF includes */
@@ -517,7 +519,7 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
       if (airmass == VAL__BADD || airmass == 0.0 ) {
         if ( hdr->state->tcs_az_ac2 != VAL__BADD ) {
           /* try the elevation */
-          airmass = slaAirmas( M_PI_2 - hdr->state->tcs_az_ac2 );
+          airmass = palAirmas( M_PI_2 - hdr->state->tcs_az_ac2 );
         } else {
           airmass = amprev;
           quick = 1;
@@ -586,7 +588,7 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
         if (tau != VAL__BADD) {
           double zd;
           zd = M_PI_2 - azel[npts+i];
-          airmass = slaAirmas( zd );
+          airmass = palAirmas( zd );
           extcorr = exp(airmass*tau);
         } else {
           extcorr = VAL__BADD;
@@ -660,7 +662,7 @@ static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
   */
 
   elevation2 = elevation1 - footprint;  /* want smaller el for larger am */
-  airmass2 = slaAirmas( M_PI_2 - elevation2 );
+  airmass2 = palAirmas( M_PI_2 - elevation2 );
   delta = fabs(airmass1-airmass2) * tau;
   if (delta > corrthresh) {
     return 1;

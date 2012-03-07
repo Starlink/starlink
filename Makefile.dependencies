@@ -2469,6 +2469,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
 		$(MANIFESTS)/one \
+		$(MANIFESTS)/pal \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \

@@ -70,10 +70,12 @@
 *        TCS_AZ_AC2.
 *     2011-04-12 (TIMJ):
 *        Return 225 GHz tau if not extinction parameters supplied.
+*     2012-03-06 (TIMJ):
+*        Use PAL instead of SLA.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2012 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council.  Copyright (C) 2006-2008 University of British
 *     Columbia.  All Rights Reserved.
@@ -108,7 +110,7 @@
 #include "mers.h"
 #include "msg_par.h"
 #include "prm_par.h"
-#include "star/slalib.h"
+#include "star/pal.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -153,7 +155,7 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
   if (airmass == VAL__BADD || airmass == 0.0 ) {
     /* try the tcs elevation value */
     if ( state->tcs_az_ac2 != VAL__BADD ) {
-      airmass = slaAirmas( M_PI_2 - state->tcs_az_ac2 );
+      airmass = palAirmas( M_PI_2 - state->tcs_az_ac2 );
     } else if ( approxam != VAL__BADD && approxam > 0) {
       airmass = approxam;
     } else {

@@ -93,8 +93,11 @@
 *        Fix calculation of TCS_TR_ANG.
 *     2008-04-25 (JB):
 *        Update TCS_TAI to match frameset.
+*     2012-03-06 (TIMJ):
+*        Use PAL instead of SOFA
 
 *  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -125,7 +128,7 @@
 /* Starlink includes */
 #include "ast.h"
 #include "sae_par.h"
-#include "star/slalib.h"
+#include "star/pal.h"
 #include "mers.h"
 #include "star/atl.h"
 
@@ -485,7 +488,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   wcs->acEl = coordOut[1];
 
   /* Calculate airmass from El of current cell. */
-  wcs->airmass = slaAirmas( AST__DPIBY2 - wcs->acEl );
+  wcs->airmass = palAirmas( AST__DPIBY2 - wcs->acEl );
 
   /* Focal plane is AZEL so AZ angle is 0. */
   wcs->azAng = 0.0;
