@@ -1026,7 +1026,10 @@ static void t_obs( int * status ) {
   vcs ( longname, "?", "palObs", "4/NAME", status );
   viv( lstat, -1, "palObs", "retval", status );
 
-
+  lstat = palObs ( 0, "MISSING", shortname, sizeof(shortname),
+                   longname, sizeof(longname), &w, &p, &h );
+  vcs ( longname, "?", "palObs", "5/NAME", status );
+  viv( lstat, -1, "palObs", "retval", status );
 
 }
 

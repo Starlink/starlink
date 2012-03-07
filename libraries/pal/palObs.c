@@ -840,12 +840,11 @@ int palObs( size_t n, const char * c,
   /* Work out the number of telescopes */
   const size_t NTEL = sizeof(telData) / sizeof(struct telData);
 
+  /* Prefill the return buffer in a pessimistic manner */
+  star_strellcpy( name, "?", namelen );
+
   if (n > 0) {
-    if (n > NTEL) {
-      /* Out of bounds */
-      star_strellcpy( name, "?", namelen );
-      retval = -1; /* just to be sure */
-    } else {
+    if (n <= NTEL) {
       /* Index into telData with correction for zero-based indexing */
       struct telData thistel;
       thistel = telData[n-1];
