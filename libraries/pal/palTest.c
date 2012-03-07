@@ -154,14 +154,14 @@ static void vcs( const char * val, const char * valok,
 /* Verify the 3x3 rmat matrix */
 static void
 vrmat( double rmat[3][3], double expected[3][3], const char * func,
-       int * status ) {
+       double dval, int * status ) {
   int i;
   char buf[10];
   for( i = 0; i < 3; i++ ) {
     int j;
     for( j = 0; j < 3; j++ ) {
       sprintf( buf, "%d,%d", i, j );
-      vvd( rmat[i][j], expected[i][j], 1e-12, func, buf, status );
+      vvd( rmat[i][j], expected[i][j], dval, func, buf, status );
     }
   }
 }
@@ -620,7 +620,7 @@ static void t_prebn( int *status ) {
   };
 
   palPrebn ( 1925., 1975., rmatp );
-  vrmat( rmatp, prebn_expected, "palPrebn", status );
+  vrmat( rmatp, prebn_expected, "palPrebn", 1.0e-12, status );
 }
 
 /* Range */
@@ -740,15 +740,15 @@ static void t_vecmat( int * status ) {
 
   /* palDav2m */
   palDav2m( dav, drm1 );
-  vrmat( drm1, dav2m_expected, "palDav2m", status );
+  vrmat( drm1, dav2m_expected, "palDav2m", 1.0e-12, status );
 
   /* Test palDeuler */
   palDeuler( "YZY", 2.345, -0.333, 2.222, drm2 );
-  vrmat( drm2, deuler_expected, "palDeuler", status );
+  vrmat( drm2, deuler_expected, "palDeuler", 1.0e-12, status );
 
   /* palDmxm */
   palDmxm( drm2, drm1, drm );
-  vrmat( drm, dmxm_expected, "palDmxm", status );
+  vrmat( drm, dmxm_expected, "palDmxm", 1.0e-12, status );
 
   /* palDcs2c */
   palDcs2c( 3.0123, -0.999, dv1 );
@@ -824,7 +824,7 @@ static void t_ecmat( int *status ) {
      { 0.0, -0.3977517467060596168, 0.91749307789883549624 } };
 
    palEcmat( 55966.46, rmat );
-   vrmat( rmat, expected, "palEcmat", status );
+   vrmat( rmat, expected, "palEcmat", 1.0e-12, status );
 }
 
 static void t_eqecl ( int *status ) {
@@ -846,7 +846,7 @@ static void t_prec( int *status ) {
      { 0.0021376319197, -5.2859681191735e-06, 0.9999977152483 } };
 
    palPrec( 1990.0, 2012.0, rmat );
-   vrmat( rmat, expected, "palPrec", status );
+   vrmat( rmat, expected, "palPrec", 1.0e-12, status );
 }
 
 static void t_preces( int *status ) {
