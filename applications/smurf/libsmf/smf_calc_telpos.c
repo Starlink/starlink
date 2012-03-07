@@ -31,11 +31,11 @@
 *        Inherited status.
 
 *  Notes:
-*     -  The conversion from obsgeo has not yet been implemented.
 
 *  Authors:
 *     EC: Edward Chapin (UBC)
 *     DSB: David Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     6-SEPT-2006 (EC):
@@ -44,9 +44,11 @@
 *        Added support for calculation based on supplied obsgeo values.
 *     7-JUL-2008 (TIMJ):
 *        Use const.
+*     2012-03-07 (TIMJ):
+*        Use PAL instead of SLA.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2012 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -74,7 +76,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "mers.h"
-#include "star/slalib.h"
+#include "star/pal.h"
 #include "star/one.h"
 
 /* SMURF includes */
@@ -94,8 +96,6 @@ void smf_calc_telpos( const double obsgeo[3], const char telName[],
   double height;        /* Height above sea-level (metres) */
   double lat;           /* Latitude (rad) */
   double lon;           /* West Longitude (rad) */
-  char retname[41];     /* Returned name of the telescope */
-  char name[11];      /* name for supplied buffer */
 
   if (*status != SAI__OK) return;
 
@@ -114,11 +114,13 @@ void smf_calc_telpos( const double obsgeo[3], const char telName[],
 
   /* Otherwise, calculate telpos from telName */
   } else if( telName != NULL ) {
-    /* Note that slaObs does not promise constness */
-    one_strlcpy( name, telName, 11, status );
-    slaObs( 0, name, retname, &lon, &lat, &height );
+    char retname[41];
+    char shortname[11];
+    int obstat;
+    obstat = palObs( 0, telName, shortname, sizeof(shortname), retname,
+                     sizeof(retname), &lon, &lat, &height);
 
-    if( retname[0] == '?' ) {
+    if( obstat == -1 ) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Telescope name was not recognized.", status );
     }
