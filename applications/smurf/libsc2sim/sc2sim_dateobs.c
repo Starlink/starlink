@@ -36,6 +36,7 @@
 
  *  Authors:
  *     Andy Gibb (UBC)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -45,9 +46,12 @@
  *        String written with a single sprintf
  *     2006-12-08 (JB):
  *        Date for current chunk is precalculated by calling function.
+ *     2012-03-06 (TIMJ):
+ *        Replace SLA with SOFA.
  *     {enter_further_changes_here}
 
  *  Copyright:
+ *     Copyright (C) 2012 Science & Technology Facilities Council.
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *     University of British Columbia. All Rights Reserved.
 
@@ -86,7 +90,8 @@
 /* STARLINK includes */
 #include "mers.h"
 #include "sae_par.h"
-#include "star/slalib.h"
+#include "sofa.h"
+#include "sofam.h"
 #include "f77.h"
 
 /* Simulator includes */
@@ -108,10 +113,10 @@ void sc2sim_dateobs ( double mjdaystart, char *dateobs, int *status ) {
   if ( *status != SAI__OK) return;
 
   /* Convert this MJD to something more readable */
-  slaDjcl( mjdaystart, &yy, &mm, &dd, &df, &date_status );
+  date_status = iauJd2cal( DJM0, mjdaystart, &yy, &mm, &dd, &df );
 
   /* Convert day fraction to hh:mm:ss */
-  slaDd2tf( 3, df, sign, ihmsf );
+  iauD2tf( 3, df, sign, ihmsf );
 
   /* Store this in dateobs as YYYY-MM-DDThh:mm:ss.sss */
   sprintf( dateobs, "%d-%02d-%02dT%02d:%02d:%02d.%03d",

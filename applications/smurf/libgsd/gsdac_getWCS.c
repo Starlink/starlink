@@ -389,7 +389,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   if ( subBandNum == 0 && DEBUGON )
     printf("Epoch = %s MJD=%f\n",astGetC(*WCSFrame,"Epoch"),
-            slaEpj2d(astGetD(*WCSFrame,"Epoch")));
+            palEpj2d(astGetD(*WCSFrame,"Epoch")));
 
   /* Update TCS_TAI to match frameset. */
   TAIFrame = astTimeFrame ( "TimeScale=TDB,System=JEPOCH" );
@@ -503,6 +503,6 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  wcs->trAng = slaPa( coordOut[0], coordOut[1], gsdVars->telLatitude );
+  wcs->trAng = palPa( coordOut[0], coordOut[1], gsdVars->telLatitude );
 
 }

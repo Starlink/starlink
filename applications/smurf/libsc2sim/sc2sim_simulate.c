@@ -104,7 +104,7 @@
  *     RTS_END is the TAI at the end of the current sample. The sample
  *     length (steptime) is also taken to be in units of UTC seconds
  *     (which are the same as TAI but NOT the same as the UT/UT1
- *     second). See the documentation for SLALIB for further
+ *     second). See the documentation for SOFA for further
  *     information on astronomical time systems.
 
  *  Authors:
@@ -283,10 +283,12 @@
  *        Use AST to determine pixel scale of astronomical image.
  *     2009-11-24 (DSB):
  *        Assign values to state.tcs_az_bc1/2 before calling sc2ast_createwcs.
+ *     2012-03-06 (TIMJ):
+ *        Use PAL+SOFA instead of SLA for all SLA routines except slaRdplan.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2009, 2012 Science and Technology Facilities Council.
  *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
  *     Council.
  *     Copyright (C) 2006-2008 University of British Columbia. All
@@ -337,6 +339,9 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "star/one.h"
+#include "star/pal.h"
+#include "sofa.h"
+#include "sofam.h"
 #include "f77.h"
 
 /* JCMT includes */
@@ -534,8 +539,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   if( *status == SAI__OK ) {
     /* Calculate year/month/day corresponding to MJD at start.
        Remember that inx->mjdaystart is a UTC date */
-    slaDjcl( inx->mjdaystart, &date_yr, &date_mo, &date_da, &date_df,
-             &date_status );
+    date_status = iauJd2cal( DJM0, inx->mjdaystart, &date_yr, &date_mo,
+                             &date_da, &date_df );
     if( date_status ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Couldn't calculate calendar date from MJD", status);
@@ -602,7 +607,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     /* Set the PLANET flag */
     if ( inx->planetnum != -1 ) {
       planet = 1;
-      dtt = slaDtt( start_time ); /* start_time is UTC */
+      dtt = palDtt( start_time ); /* start_time is UTC */
     } else {
       planet = 0;
     }
@@ -978,7 +983,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
      parameters. The time parameter should be a TDB but UTC should be
      good enough, according to SUN/67. These vary very slowly so doing
      the calculation once per simulation should be fine */
-  slaMappa( 2000.0, inx->mjdaystart, amprms );
+  palMappa( 2000.0, inx->mjdaystart, amprms );
 
   /* Telescope latitude */
   phi = DD2R*(sinx->telpos)[1];
@@ -1041,7 +1046,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         totaltime = ((double)(curms * frmperms + curchunk * maxwrite))
           * samptime;
         start_time = inx->mjdaystart + (totaltime / SPD);
-        taiutc = slaDat( start_time );
+        taiutc = palDat( start_time );
         sc2sim_calctime( (sinx->telpos[0])*DD2R, start_time, inx->dut1, samptime,
                          lastframe, mjuldate, lst, status );
 
@@ -1050,7 +1055,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         if ( !planet ) {
           /* Convert BASE RA, Dec to apparent RA, Dec for current epoch.
              Use quick conversion - should be more than good enough */
-          slaMapqkz( inx->ra, inx->dec, amprms, &raapp, &decapp );
+          palMapqkz( inx->ra, inx->dec, amprms, &raapp, &decapp );
         }
 
         /* Retrieve the values for this chunk */
@@ -1066,7 +1071,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
              100 frames or 0.5 sec, else use the previous one */
           if ( planet ) {
             if ( frame%100 == 0 ) {
-              /* Calculate the TT from UT1 mjuldate, DUT1 and TT-UTC from slaDtt */
+              /* Calculate the TT from UT1 mjuldate, DUT1 and TT-UTC from palDtt */
               tt = mjuldate[frame] + ((dtt - inx->dut1) / SPD);
 
               slaRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0],
@@ -1095,7 +1100,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           hourangle = lst[frame] - raapp;
 
           /* Calculate the az/el corresponding to the map centre (base) */
-          slaDe2h ( hourangle, decapp, phi, &temp1, &temp2 );
+          palDe2h ( hourangle, decapp, phi, &temp1, &temp2 );
 
           /* Issue an error if the source is below 20 degrees */
           if ( temp2 < 0.349066 ) {
@@ -1108,7 +1113,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           }
 
           /* Parallactic angle */
-          temp3 = slaPa ( hourangle, decapp, phi );
+          temp3 = palPa ( hourangle, decapp, phi );
 
           if( *status == SAI__OK ) {
             base_az[frame] = temp1;
@@ -1250,10 +1255,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               airmass[frame] = 3283.0;
             }
             /* Calculate equatorial from horizontal */
-            slaDh2e( bor_az[frame], bor_el[frame], phi, &raapp1, &decapp1 );
+            palDh2e( bor_az[frame], bor_el[frame], phi, &raapp1, &decapp1 );
             raapp1 = fmod(lst[frame] - raapp1 + D2PI, D2PI );
             /* Convert apparent RA Dec to Mean RA, Dec for current epoch */
-            slaAmpqk( raapp1, decapp1, amprms, &temp1, &temp2 );
+            palAmpqk( raapp1, decapp1, amprms, &temp1, &temp2 );
             /* Store the mean RA, Dec */
             bor_ra[frame] = temp1;
             bor_dec[frame] = temp2;
@@ -1570,10 +1575,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                   nimage = maxwrite / 200;
                 }
                 /* LST start/end */
-                slaDr2tf(4, lst[0], sign, ihmsf);
+                iauA2tf(4, lst[0], sign, ihmsf);
                 sprintf( lststart, "%02d:%02d:%02d.%04d",
                          ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
-                slaDr2tf(4, lst[lastframe-1], sign, ihmsf);
+                iauA2tf(4, lst[lastframe-1], sign, ihmsf);
                 sprintf( lstend, "%02d:%02d:%02d.%04d",
                          ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
                 /* HST start/end */

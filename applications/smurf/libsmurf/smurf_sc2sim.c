@@ -583,7 +583,6 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "star/kaplibs.h"
-#include "star/slalib.h"
 #include "star/ard.h"
 
 /* SC2DA includes */
@@ -601,10 +600,6 @@
 
 #include "wvm/wvmCal.h" /* Water Vapor Monitor routines */
 #include "f77.h"
-
-/* prototype for slalib routine that calculates mjd -> calendar date */
-/*void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);*/
-
 
 #define FUNC_NAME "smurf_sc2sim"
 #define TASK_NAME "SC2SIM"

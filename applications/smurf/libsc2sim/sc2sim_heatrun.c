@@ -95,12 +95,14 @@
  *     2009-10-15 (TJ):
  *        Initialise sc2store in heatrun simulation, otherwise you get
  *        an emsLevel warning on completion.
- *     200910-16 (AGG):
+ *     2009-10-16 (AGG):
  *        Include sc2store functions, remove unused variable
+ *     2012-03-06 (TIMJ):
+ *         Replace SLA with SOFA.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+ *     Copyright (C) 2006,2009,2012 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2009 Science and Technology Facilities Council.
  *     Copyright (C) 2006-2009 University of British Columbia. All
  *     Rights Reserved.
@@ -147,7 +149,8 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
-#include "star/slalib.h"
+#include "sofa.h"
+#include "sofam.h"
 
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
@@ -205,8 +208,8 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
   sc2store_force_initialised( status );
 
   /* Calculate year/month/day corresponding to MJD at start */
-  slaDjcl( inx->mjdaystart, &date_yr, &date_mo, &date_da, &date_df,
-           &date_status );
+  date_status = iauJd2cal( DJM0, inx->mjdaystart, &date_yr, &date_mo,
+                           &date_da, &date_df );
 
   numsamples = inx->heatnum;
 

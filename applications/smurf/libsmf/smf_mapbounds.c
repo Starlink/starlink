@@ -159,13 +159,15 @@
 *        - Report an error if the extreme positions cannot be found.
 *     2011-05-19 (TIMJ):
 *        Find the first valid TCS position when building up framesets.
+*     2012-03-06 (TIMJ):
+*        Use PAL instead of SLA.
 *     {enter_further_changes_here}
 
 *  Notes:
 *     The par[7] array used in this routine is documented in smf_get_projpar.c
 
 *  Copyright:
-*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2012 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -200,7 +202,7 @@
 #include "sae_par.h"
 #include "par.h"
 #include "star/ndg.h"
-#include "star/slalib.h"
+#include "star/pal.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -598,7 +600,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
             if( fast_map ) astTran2( fast_map, 1, &ac1, &ac2, 1, &ac1, &ac2 );
 
             /* calculate the separation of ACTUAL from BASE */
-            slaDs2tp(ac1,ac2,bc1,bc2, &offx, &offy, &jstat );
+            palDs2tp(ac1,ac2,bc1,bc2, &offx, &offy, &jstat );
 
             /* add on the smu tangent plane correction */
             if (state.smu_tr_jig_x != VAL__BADD) offx += state.smu_tr_jig_x * DAS2R;

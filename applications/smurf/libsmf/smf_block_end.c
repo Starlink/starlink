@@ -49,15 +49,18 @@
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1-FEB-2011 (DSB):
 *        Original version.
+*     2012-03-06 (TIMJ):
+*        Use SOFA instead of SLA.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011 Science and Technology Facilities Council.
+*     Copyright (C) 2011-2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -84,7 +87,7 @@
 #include <stdio.h>
 
 /* Starlink includes */
-#include "star/slalib.h"
+#include "sofa.h"
 #include "sae_par.h"
 
 /* SMURF includes */
@@ -96,7 +99,7 @@
    is not more than "arcerror", and check that he focal plane has not rotated
    by more than "angle". */
 #define FPMOVED ( \
-     slaDsep( ac1_start, ac2_start, state->tcs_tr_ac1, state->tcs_tr_ac2 ) \
+     iauSeps( ac1_start, ac2_start, state->tcs_tr_ac1, state->tcs_tr_ac2 ) \
      > arcerror || \
        fabs( ang_start - state->tcs_tr_ang ) > angle )
 

@@ -49,6 +49,7 @@
  *     E. Chapin (UBC)
  *     J. Balfour (UBC)
  *     A.G. Gibb (UBC)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History :
@@ -70,8 +71,11 @@
  *        Fix bug in calculating LAST due to misplaced eqeqx.
  *     2006-12-18 (AGG):
  *        Add DUT1 as argument, call slaDtt, update prologue
+ *     2012-03-06 (TIMJ):
+ *        Replace SLA with PAL.
 
  *  Copyright:
+ *     Copyright (C) 2012 Science & Technology Facilities Council.
  *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
  *     Council. University of British Columbia. All Rights Reserved.
 
@@ -101,7 +105,7 @@
 
 /* Starlink includes */
 #include "ast.h"
-#include "star/slalib.h"
+#include "star/pal.h"
 #include "mers.h"
 #include "sae_par.h"
 
@@ -155,13 +159,13 @@ void sc2sim_calctime
     /* Calculate the TT-UTC difference in days, assume TT is equivalent
        to TDB (needed below). Assume it doesn't change significantly
        over an observation. */
-    dttd = slaDtt( mjdaystart ) / SPD;
+    dttd = palDtt( mjdaystart ) / SPD;
 
     /* Calculate the equation of the equinoxes: input time must be TDB
        (= TT above). This only needs to be done once per simulation as
        the change over a minute is of order microarcsec.
        TDB = TT = START_TIME (UTC) + (TT-UTC) */
-    eqeqx = slaEqeqx( mjdaystart + dttd );
+    eqeqx = palEqeqx( mjdaystart + dttd );
 
     /* Loop over each time step, calculate UT1 and then calculate
        Greenwich mean sidereal time using slalib routine slaGmst and
@@ -171,7 +175,7 @@ void sc2sim_calctime
          significantly over the course of a simulation */
       ut[i] = start_ut1 + ((double) i)*sampday;
 
-      gmst = slaGmst( ut[i] );
+      gmst = palGmst( ut[i] );
 
       /* Calculate LAST from GMST using telescope longitude and equation
          of equinoxes */

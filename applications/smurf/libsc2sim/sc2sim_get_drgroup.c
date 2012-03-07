@@ -49,9 +49,11 @@
  *        Original
  *     2008-07-11 (TIMJ):
  *        Use strl*
+ *     2012-03-06 (TIMJ):
+ *        Replace SLA with SOFA.
 
  *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008,2012 Science and Technology Facilities Council.
  *     Copyright (C) 2008 University of British Columbia. All Rights Reserved.
 
  *  Licence:
@@ -83,7 +85,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "ast.h"
-#include "star/slalib.h"
+#include "sofa.h"
 #include "star/one.h"
 #include "one_err.h"
 #include "mers.h"
@@ -110,10 +112,10 @@ void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filte
   if ( inx->planetnum < 0 ) {
     /* We have a fixed target so use RA, Dec */
     /* Return RA as HHMMSS - first arg means zero dp */
-    slaDr2tf( 0, inx->ra, sign, iamsf );
+    iauA2tf( 0, inx->ra, sign, iamsf );
     sprintf( drgroup, "%02d%02d%02d", iamsf[0], iamsf[1], iamsf[2] );
     /* Return Dec as DDMMSS */
-    slaDr2af( 0, inx->dec, sign, iamsf );
+    iauA2af( 0, inx->dec, sign, iamsf );
     one_strlcat( drgroup, sign, maxlen, status );
     sprintf( decstr, "%02d%02d%02d", iamsf[0], iamsf[1], iamsf[2] );
     one_strlcat( drgroup, decstr, maxlen, status);

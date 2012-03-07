@@ -152,6 +152,7 @@
 #include "prm_par.h"
 #include "ndf.h"
 #include "sae_par.h"
+#include "star/pal.h"
 #include "star/slalib.h"
 #include "star/kaplibs.h"
 #include "star/one.h"
@@ -283,7 +284,7 @@ void smurf_impaztec( int *status ) {
   int startframe;               /* frame at which observation starts */
   double telpos[3];            /* Geodetic location of the telescope */
   double *tempbuff = NULL;     /* throwaway buffer for using calctime */
-  double tmp;                  /* throwaway variable for using slaDh2e */
+  double tmp;                  /* throwaway variable for using palDh2e */
   double *time = NULL;         /* arrays for storing per-frame header data */
   char time_str[MAXSTRING];
   double *trackactc1 = NULL;
@@ -419,7 +420,7 @@ void smurf_impaztec( int *status ) {
     printf("IMPAZTEC date yr: %i mo: %i day: %i\n", yr, month, day);
 
     /* Calculate the base modified julian date */
-    slaCaldj ( yr, month, day, &djm, &date_status );
+    palCaldj ( yr, month, day, &djm, &date_status );
 
     /* Get the hours, minutes, and seconds */
 
@@ -510,7 +511,7 @@ void smurf_impaztec( int *status ) {
     printf("Error in LST = %f sec\n", lst_err  );
 
     /* calculate offset for UT1 */
-    lst_err += slaDtt( mjuldate[0] );
+    lst_err += palDtt( mjuldate[0] );
 
     /* correct to TAI */
     lst_err -= 32.184;
@@ -522,7 +523,7 @@ void smurf_impaztec( int *status ) {
     /* and then to a fraction of a day */
     lst_err /= SPD;
 
-    /* with correction of lst_diff - slaDtt =  -1058 arcsec error
+    /* with correction of lst_diff - palDtt =  -1058 arcsec error
     // with no correction error = 141 arcsec
     // with just DTT (64 sec) = -1108
     // with correction of 157 error = -2506
@@ -575,7 +576,7 @@ void smurf_impaztec( int *status ) {
         trackbasec1[i] = ra;
         trackbasec2[i] = dec;
 
-        slaMap( ra, dec, 0., 0., 0., 0., 2000., mjuldate[i],
+        palMap( ra, dec, 0., 0., 0., 0., 2000., mjuldate[i],
                 &(ra_app[i]), &(dec_app[i]));
 
       }
@@ -584,7 +585,7 @@ void smurf_impaztec( int *status ) {
 
     /* now convert base RA/Dec to azel - there will be a slight
        error because AST and TCS take into account more effects
-       than are handled by slaDe2h */
+       than are handled by palDe2h */
 
 
     for (i=0; i< nframes; i++) {
@@ -595,7 +596,7 @@ void smurf_impaztec( int *status ) {
       hourangle = tel_lst[i] - ra_app[i];
 
       /* Calculate the az/el corresponding to the map centre (base) */
-      slaDe2h ( hourangle, dec_app[i], phi, &(azelbasec1[i]),&(azelbasec2[i]));
+      palDe2h ( hourangle, dec_app[i], phi, &(azelbasec1[i]),&(azelbasec2[i]));
 
     }
 
@@ -620,7 +621,7 @@ void smurf_impaztec( int *status ) {
     for ( i = 0; i < nframes; i++ ) {
 
       lst_coord_prev = lst_coord;
-      slaDh2e( azelactc1[i], azelactc2[i], telpos[1]*2*3.1415926536/360.0,
+      palDh2e( azelactc1[i], azelactc2[i], telpos[1]*2*3.1415926536/360.0,
                &ha, &tmp);
       lst_coord = ha + trackactc1[i]; /* LST derived from coordinates */
       /* (az, el, and ra) */
@@ -657,7 +658,7 @@ void smurf_impaztec( int *status ) {
     /* DIAGNOSTIC */
     double tel_lat, lst, ha_azel, ha_tr, dec_fr_azel;
     tel_lat = telpos[1]*2*3.1415926536/360.0; /* telescope lat in radians */
-    slaDh2e(azelactc1[startframe], azelactc2[startframe], tel_lat,
+    palDh2e(azelactc1[startframe], azelactc2[startframe], tel_lat,
             &ha_azel, &dec_fr_azel);
     lst = tempbuff[startframe];
     ha_tr = lst - trackactc1[startframe];

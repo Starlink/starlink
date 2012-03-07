@@ -36,8 +36,11 @@
  *        Added RECEPTORS.
  *     13-DEC-2006 (DSB):
  *        Added TSYS.
+ *     2012-03-06 (TIMJ):
+ *        Use SOFA instead of SLA.
 
  *  Copyright:
+ *     Copyright (C) 2012 Science & Technology Facilities Council.
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *     All Rights Reserved.
 
@@ -69,7 +72,7 @@
 #include "mers.h"
 #include "star/hds.h"
 #include "ndf.h"
-#include "star/slalib.h"
+#include "sofa.h"
 
 #include "libsmf/smf.h"
 #include "smurf_par.h"
@@ -310,8 +313,8 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
 
     /* Find the arc-distance between the receppos position and the tr_AC1
        position. */
-                trd = slaDsep( rx, ry, trac1, trac2 );
-                azd = slaDsep( rx, ry, azac1, azac2 );
+                trd = iauSeps( rx, ry, trac1, trac2 );
+                azd = iauSeps( rx, ry, azac1, azac2 );
 
     /* If the receppos values are closer to the TRACKING values, then
        set a flag indicating that the receppos values should be treated
