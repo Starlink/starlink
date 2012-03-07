@@ -1065,6 +1065,52 @@ static void t_pa( int *status ) {
         0, 0, "palPa", "zenith", status );
 }
 
+static void t_planet( int * status ) {
+  int j;
+  double pv[6];
+  double expected1[6] = { 0., 0., 0., 0., 0., 0. };
+
+  palPlanet( 1e6, 0, pv, &j );
+  vvec( 6, pv, expected1, "palPlanet 1", status );
+  viv ( j, -1, "palPlanet", "J 1", status );
+
+  palPlanet( 1e6, 9, pv, &j);
+  viv ( j, -1, "palPlanet", "J 2", status );
+
+  palPlanet ( -320000, 3, pv, &j );
+  vvd ( pv[0], 0.9308038666827242603, 1e-11, "palPlanet",
+        "pv[0] 3", status );
+  vvd ( pv[1], 0.3258319040252137618, 1e-11, "palPlanet",
+        "pv[1] 3", status );
+  vvd ( pv[2], 0.1422794544477122021, 1e-11, "palPlanet",
+        "pv[2] 3", status );
+  vvd ( pv[3], -7.441503423889371696e-8, 1e-17, "palPlanet",
+        "pv[3] 3", status );
+  vvd ( pv[4], 1.699734557528650689e-7, 1e-17, "palPlanet",
+        "pv[4] 3", status );
+  vvd ( pv[5], 7.415505123001430864e-8, 1e-17, "palPlanet",
+        "pv[5] 3", status );
+  viv ( j, 1, "palPlanet", "J 3", status );
+
+  palPlanet ( 43999.9, 1, pv, &j );
+  vvd ( pv[0], 0.2945293959257422246, 1e-11, "palPlanet",
+        "pv[0] 4", status );
+  vvd ( pv[1], -0.2452204176601052181, 1e-11, "palPlanet",
+        "pv[1] 4", status );
+  vvd ( pv[2], -0.1615427700571978643, 1e-11, "palPlanet",
+        "pv[2] 4", status );
+  vvd ( pv[3], 1.636421147459047057e-7, 1e-18, "palPlanet",
+        "pv[3] 4", status );
+  vvd ( pv[4], 2.252949422574889753e-7, 1e-18, "palPlanet",
+        "pv[4] 4", status );
+  vvd ( pv[5], 1.033542799062371839e-7, 1e-18, "palPlanet",
+        "pv[5] 4", status );
+  viv ( j, 0, "palPlanet", "J 4", status );
+
+
+
+}
+
 static void t_pm( int * status ) {
   double ra2, dec2;
   double ra1, dec1, pmr1, pmd1, px1, rv1;
@@ -1209,6 +1255,7 @@ int main (void) {
   t_nut(&status);
   t_obs(&status);
   t_pa(&status);
+  t_planet(&status);
   t_pm(&status);
   t_prebn(&status);
   t_pvobs(&status);

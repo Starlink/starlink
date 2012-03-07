@@ -54,6 +54,7 @@ palNut.c \
 palNutc.c \
 palObs.c \
 palPa.c \
+palPlanet.c \
 palPm.c \
 palPrebn.c \
 palPrec.c \
