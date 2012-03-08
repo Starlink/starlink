@@ -153,7 +153,6 @@
 #include "ndf.h"
 #include "sae_par.h"
 #include "star/pal.h"
-#include "star/slalib.h"
 #include "star/kaplibs.h"
 #include "star/one.h"
 
@@ -566,10 +565,10 @@ void smurf_impaztec( int *status ) {
 
       /* convert to radians */
       nstrt = 1;
-      slaDafin( ra_str, &nstrt, &ra, &jrslt );
+      palDafin( ra_str, &nstrt, &ra, &jrslt );
       ra *= 15.0;
       nstrt = 1;
-      slaDafin( dec_str, &nstrt, &dec, &jrslt );
+      palDafin( dec_str, &nstrt, &dec, &jrslt );
 
       /* store base position in ra/dec and calculate apparent */
       for (i = 0; i < nframes ; i++ ) {
