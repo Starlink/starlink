@@ -327,7 +327,6 @@
 #include <time.h>
 
 /* STARLINK includes */
-#include "star/slalib.h"
 #include "ast.h"
 #include "mers.h"
 #include "par.h"
@@ -1074,7 +1073,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               /* Calculate the TT from UT1 mjuldate, DUT1 and TT-UTC from palDtt */
               tt = mjuldate[frame] + ((dtt - inx->dut1) / SPD);
 
-              slaRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0],
+              palRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0],
                          phi, &raapp, &decapp, &diam );
 
               /* Store RA Dec in inx struct so they can be written as FITS
