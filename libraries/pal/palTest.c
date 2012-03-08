@@ -592,6 +592,26 @@ static void t_fk52h ( int *status ) {
 
 }
 
+/* Moon */
+
+static void t_moon ( int *status ) {
+  double pv[6];
+
+  double expected1[] = {
+    0.00229161514616454,
+    0.000973912029208393,
+    0.000669931538978146,
+    -3.44709700068209e-09,
+    5.44477533462392e-09,
+    2.11785724844417e-09
+  };
+
+  /* SLA test only include slaMoon so we use the
+     example from SUN/67 */
+  palDmoon( 48634.4687174074, pv );
+  vvec( 6, pv, expected1, "palDmoon", status );
+}
+
 /* Nutation */
 
 static void t_nut( int *status ) {
@@ -1252,6 +1272,7 @@ int main (void) {
   t_map(&status);
   t_mappa(&status);
   t_mapqkz(&status);
+  t_moon(&status);
   t_nut(&status);
   t_obs(&status);
   t_pa(&status);
