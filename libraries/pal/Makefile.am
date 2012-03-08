@@ -26,6 +26,7 @@ palAmpqk.c \
 palCaldj.c \
 palDe2h.c \
 palDeuler.c \
+palDfltin.c \
 palDh2e.c \
 palDjcal.c \
 palDmat.c \

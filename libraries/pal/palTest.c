@@ -1020,6 +1020,58 @@ static void t_fk54z( int *status ) {
    vvd( dd1950, 7.196059425334821089e-09, 1.0E-12, "palFk54z", "dd1950", status );
 }
 
+static void t_flotin( int * status ) {
+
+  int j;
+  const char * s = "  12.345, , -0 1E3-4 2000  E     ";
+  /*                123456789012345678901234567890123 */
+  int i = 1;
+  double dv = 0.0;
+
+  palDfltin ( s, &i, &dv, &j );
+  viv ( i, 10, "palDfltin", "I1", status );
+  vvd ( dv, 12.345, 1e-12, "palDfltin", "V1", status );
+  viv ( j, 0, "palDfltin", "J1", status );
+
+  palDfltin ( s, &i, &dv, &j );
+  viv ( i, 12, "palDfltin", "I2", status );
+  vvd ( dv, 12.345, 1e-12, "palDfltin", "V2", status );
+  viv ( j, 1, "palDfltin", "J2", status );
+
+  palDfltin ( s, &i, &dv, &j );
+  viv ( i, 16, "palDfltin", "I3", status );
+  vvd ( dv, 0, 0, "palDfltin", "V3", status );
+  viv ( j, -1, "palDfltin", "J3", status );
+
+  palDfltin ( s, &i, &dv, &j );
+  viv ( i, 19, "palDfltin", "I4", status );
+  vvd ( dv, 1000, 0, "palDfltin", "V4", status );
+  viv ( j, 0, "palDfltin", "J4", status );
+
+  palDfltin ( s, &i, &dv, &j );
+  viv ( i, 22, "palDfltin", "I5", status );
+  vvd ( dv, -4, 0, "palDfltin", "V5", status );
+  viv ( j, -1, "palDfltin", "J5", status );
+
+  palDfltin ( s, &i, &dv, &j );
+  viv ( i, 28, "palDfltin", "I6", status );
+  vvd ( dv, 2000, 0, "palDfltin", "V6", status );
+  viv ( j, 0, "palDfltin", "J6", status );
+
+  palDfltin ( s, &i, &dv, &j );
+  viv ( i, 34, "palDfltin", "I7", status );
+  vvd ( dv, 2000, 0, "palDfltin", "V7", status );
+  viv ( j, 1, "palDfltin", "J7", status ); /* differs from slaDfltin */
+
+  /* Now test overflow and underflow */
+  i = 1;
+  palDfltin( " 1D600 ", &i, &dv, &j );
+  viv ( i, 8, "palDfltin", "I8", status );
+  vvd ( dv, HUGE_VAL, 0, "palDfltin", "V8", status );
+  viv ( j, 2, "palDfltin", "J8", status );
+
+}
+
 static void t_obs( int * status ) {
 
   char shortname[11];
@@ -1338,6 +1390,7 @@ int main (void) {
   t_evp(&status);
   t_fk45z(&status);
   t_fk54z(&status);
+  t_flotin(&status);
   t_galeq(&status);
   t_galsup(&status);
   t_geoc(&status);
