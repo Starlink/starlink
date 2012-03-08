@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "star/slalib.h"
+#include "star/pal.h"
 #include "sae_par.h"
 #include "prm_par.h"
 #include "mers.h"
@@ -2026,9 +2026,6 @@ int *status              /* global status (given and returned) */
    AstWcsMap *wcsmap;
    double mat[ 3 ][ 3 ];
 
-/* SLA does not use const so we have to copy from const to a temporary */
-   char eul[4];
-
 /* Check the inherited status. */
    if ( *status != SAI__OK ) return NULL;
 
@@ -2066,8 +2063,7 @@ int *status              /* global status (given and returned) */
    pole, the X axis points to (lon,lat)=(0,0) and the Y axis points to
    (lon,lat) = (90 degs,0) (the slalib convention). */
 
-   strcpy(eul, "ZYZ" );
-   slaDeuler( eul, 0.0, -(PIBY2-lat), -lon, mat );
+   palDeuler( "ZYZ", 0.0, -(PIBY2-lat), -lon, mat );
    matmap = astMatrixMap( 3, 3, 0, (double *) mat, " " );
 
 /* Create the required compound Mapping. */
