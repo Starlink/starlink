@@ -23,7 +23,6 @@
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
-#include "f77.h"
 #include "sc2math.h"
 #include "dream_par.h"
 

@@ -341,7 +341,6 @@
 #include "star/pal.h"
 #include "sofa.h"
 #include "sofam.h"
-#include "f77.h"
 
 /* JCMT includes */
 #include "jcmt/state.h"

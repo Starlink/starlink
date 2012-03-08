@@ -150,7 +150,6 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "star/ndg.h"
-#include "star/slalib.h"
 #include "par.h"
 
 /* SMURF includes */

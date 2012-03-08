@@ -93,7 +93,6 @@
 #include <stdio.h>
 
 /* Starlink includes */
-#include "star/slalib.h"
 #include "sae_par.h"
 #include "mers.h"
 

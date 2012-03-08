@@ -110,7 +110,6 @@
 #include "mers.h"
 #include "par.h"
 #include "sae_par.h"
-#include "star/slalib.h"
 #include "star/grp.h"
 #include "star/ndg.h"
 

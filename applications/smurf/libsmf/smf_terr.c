@@ -68,15 +68,11 @@
 */
 
 /* System includes */
-#include <math.h>
 
 /* Starlink includes */
-#include "ast.h"
-#include "star/slalib.h"
 #include "sofa.h"
 
 /* SMURF includes */
-#include "smurf_par.h"
 #include "smf.h"
 
 #define FUNC_NAME "smf_terr"

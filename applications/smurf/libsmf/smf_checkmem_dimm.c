@@ -127,7 +127,6 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "star/ndg.h"
-#include "star/slalib.h"
 
 /* SMURF includes */
 #include "smurf_par.h"

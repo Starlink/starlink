@@ -598,9 +598,6 @@
 #include "libsmf/smf.h"
 #include "libsc2sim/sc2sim.h"
 
-#include "wvm/wvmCal.h" /* Water Vapor Monitor routines */
-#include "f77.h"
-
 #define FUNC_NAME "smurf_sc2sim"
 #define TASK_NAME "SC2SIM"
 #define LEN__METHOD 20

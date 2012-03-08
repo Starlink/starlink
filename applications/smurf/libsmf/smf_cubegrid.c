@@ -232,7 +232,6 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "star/ndg.h"
-#include "star/slalib.h"
 #include "star/kaplibs.h"
 
 /* SMURF includes */

@@ -84,15 +84,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <time.h>
 
 /* STARLINK includes */
-#include "mers.h"
 #include "sae_par.h"
 #include "sofa.h"
 #include "sofam.h"
-#include "f77.h"
 
 /* Simulator includes */
 #include "sc2sim.h"

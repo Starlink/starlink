@@ -200,7 +200,6 @@
 #include "par.h"
 #include "par_par.h"
 #include "mers.h"
-#include "f77.h"
 #include "ndf.h"
 #include "star/grp.h"
 #include "star/hds.h"

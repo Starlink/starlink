@@ -79,7 +79,6 @@
 
 /* Starlink includes */
 #include "ast.h"
-#include "star/slalib.h"
 #include "mers.h"
 #include "sae_par.h"
 
