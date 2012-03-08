@@ -83,9 +83,6 @@
 
 void smf_terr( double phi, double h, double lambda, double pos[3] ) {
 
-  /* Check the global status. */
-  if( !astOK ) return;
-
   /* Calculate cartesian coordinates in metres */
   iauGd2gc( 1 /* WGS84 */, lambda, phi, h, pos );
 
