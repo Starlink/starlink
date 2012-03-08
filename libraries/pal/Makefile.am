@@ -63,6 +63,7 @@ palPrec.c \
 palPreces.c \
 palPrenut.c \
 palPvobs.c \
+palRdplan.c \
 palRverot.c \
 palRvgalc.c \
 palRvlg.c \

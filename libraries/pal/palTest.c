@@ -1102,6 +1102,7 @@ static void t_planet( int * status ) {
   int j;
   double pv[6];
   double expected1[6] = { 0., 0., 0., 0., 0., 0. };
+  double ra,dec,diam;
 
   palPlanet( 1e6, 0, pv, &j );
   vvec( 6, pv, expected1, "palPlanet 1", status );
@@ -1140,7 +1141,70 @@ static void t_planet( int * status ) {
         "pv[5] 4", status );
   viv ( j, 0, "palPlanet", "J 4", status );
 
-
+  /* Planets */
+  palRdplan ( 40999.9, 0, 0.1, -0.9, &ra, &dec, &diam );
+  vvd ( ra, 5.772270359389275837, 1e-6, "palRdplan",
+        "ra 0", status );
+  vvd ( dec, -0.2089207338795416192, 1e-7, "palRdplan",
+        "dec 0", status );
+  vvd ( diam, 9.415338935229717875e-3, 1e-10, "palRdplan",
+        "diam 0", status );
+  palRdplan ( 41999.9, 1, 1.1, -0.9, &ra, &dec, &diam );
+  vvd ( ra, 3.866363420052936653, 1e-6, "palRdplan",
+        "ra 1", status );
+  vvd ( dec, -0.2594430577550113130, 1e-7, "palRdplan",
+        "dec 1", status );
+  vvd ( diam, 4.638468996795023071e-5, 1e-14, "palRdplan",
+        "diam 1", status );
+  palRdplan ( 42999.9, 2, 2.1, 0.9, &ra, &dec, &diam );
+  vvd ( ra, 2.695383203184077378, 1e-6, "palRdplan",
+        "ra 2", status );
+  vvd ( dec, 0.2124044506294805126, 1e-7, "palRdplan",
+        "dec 2", status );
+  vvd ( diam, 4.892222838681000389e-5, 1e-14, "palRdplan",
+        "diam 2", status );
+  palRdplan ( 43999.9, 3, 3.1, 0.9, &ra, &dec, &diam );
+  vvd ( ra, 2.908326678461540165, 1e-7, "palRdplan",
+        "ra 3", status );
+  vvd ( dec, 0.08729783126905579385, 1e-7, "palRdplan",
+        "dec 3", status );
+  vvd ( diam, 8.581305866034962476e-3, 1e-7, "palRdplan",
+        "diam 3", status );
+  palRdplan ( 44999.9, 4, -0.1, 1.1, &ra, &dec, &diam );
+  vvd ( ra, 3.429840787472851721, 1e-6, "palRdplan",
+        "ra 4", status );
+  vvd ( dec, -0.06979851055261161013, 1e-7, "palRdplan",
+        "dec 4", status );
+  vvd ( diam, 4.540536678439300199e-5, 1e-14, "palRdplan",
+        "diam 4", status );
+  palRdplan ( 45999.9, 5, -1.1, 0.1, &ra, &dec, &diam );
+  vvd ( ra, 4.864669466449422548, 1e-6, "palRdplan",
+        "ra 5", status );
+  vvd ( dec, -0.4077714497908953354, 1e-7, "palRdplan",
+        "dec 5", status );
+  vvd ( diam, 1.727945579027815576e-4, 1e-14, "palRdplan",
+        "diam 5", status );
+  palRdplan ( 46999.9, 6, -2.1, -0.1, &ra, &dec, &diam );
+  vvd ( ra, 4.432929829176388766, 1e-6, "palRdplan",
+        "ra 6", status );
+  vvd ( dec, -0.3682820877854730530, 1e-7, "palRdplan",
+        "dec 6", status );
+  vvd ( diam, 8.670829016099083311e-5, 1e-14, "palRdplan",
+        "diam 6", status );
+  palRdplan ( 47999.9, 7, -3.1, -1.1, &ra, &dec, &diam );
+  vvd ( ra, 4.894972492286818487, 1e-6, "palRdplan",
+        "ra 7", status );
+  vvd ( dec, -0.4084068901053653125, 1e-7, "palRdplan",
+        "dec 7", status );
+  vvd ( diam, 1.793916783975974163e-5, 1e-14, "palRdplan",
+        "diam 7", status );
+  palRdplan ( 48999.9, 8, 0, 0, &ra, &dec, &diam );
+  vvd ( ra, 5.066050284760144000, 1e-6, "palRdplan",
+        "ra 8", status );
+  vvd ( dec, -0.3744690779683850609, 1e-7, "palRdplan",
+        "dec 8", status );
+  vvd ( diam, 1.062210086082700563e-5, 1e-14, "palRdplan",
+        "diam 8", status );
 
 }
 
