@@ -36,6 +36,7 @@
 *       de-rotation from smurf_maketanmap and do it here instead.
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2008 University of Lethbridge. All Rights Reserved.
 
@@ -67,7 +68,6 @@
 #include <stdlib.h>
 
 /* STARLINK INCLUDES */
-#include "star/slalib.h"
 #include "sae_par.h"
 #include "ast.h"
 #include "ndf.h"
