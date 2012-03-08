@@ -1904,6 +1904,27 @@ to handle data from a variety of different instruments.
   <documentation> sun129</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
+<!--
+ !  Copyright:
+ !     Copyright (C) 2003-2005 Council for the Central Laboratory of the
+ !     Research Councils
+ !
+ !  Licence:
+ !     This program is free software; you can redistribute it and/or
+ !     modify it under the terms of the GNU General Public Licence as
+ !     published by the Free Software Foundation; either version 2 of
+ !     the Licence, or (at your option) any later version.
+ !
+ !     This program is distributed in the hope that it will be
+ !     useful,but WITHOUT ANY WARRANTY; without even the implied
+ !     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ !     PURPOSE. See the GNU General Public Licence for more details.
+ !
+ !     You should have received a copy of the GNU General Public Licence
+ !     along with this program; if not, write to the Free Software
+ !     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+ !     02110-1301, USA
+ -->
 
 <component id="starconf" buildsupport="yes" support="U">
   <version>1.3</version>
@@ -4862,7 +4883,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>6.0.1</version>
+  <version>7.0.0</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -4876,7 +4897,7 @@ to handle data from a variety of different instruments.
       is portable and environment-independent.</p>
   </abstract>
   <dependencies >
-    <sourceset>sst</sourceset><sourceset>htx</sourceset><build>sla</build><sourceset>messgen</sourceset>
+    <sourceset>sst</sourceset><sourceset>htx</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
