@@ -24,6 +24,7 @@ palAirmas.c \
 palAmp.c \
 palAmpqk.c \
 palCaldj.c \
+palDafin.c \
 palDe2h.c \
 palDeuler.c \
 palDfltin.c \

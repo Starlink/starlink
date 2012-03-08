@@ -202,6 +202,20 @@ static void t_addet( int *status ) {
 
 }
 
+static void t_afin( int * status ) {
+
+  int j;
+  int i = 1;
+  double d = 0.0;
+  const char * s = "12 34 56.7 |";
+
+  palDafin (s, &i, &d, &j);
+  viv ( i, 12, "palDafin", "I", status );
+  vvd ( d, 0.2196045986911432, 1e-12, "palDafin", "A",
+        status );
+  viv ( j, 0, "palDafin", "J", status );
+}
+
 /* Airmass */
 
 static void t_airmas( int *status ) {
@@ -1362,6 +1376,7 @@ int main (void) {
   int status = 0; /* Unix and SAE convention */
 
   t_addet(&status);
+  t_afin(&status);
   t_ampqk(&status);
   t_airmas(&status);
   t_amp(&status);
