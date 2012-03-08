@@ -32,6 +32,7 @@ palDmat.c \
 palDs2tp.c \
 palDat.c \
 palDmoon.c \
+palDt.c \
 palDtp2s.c \
 palDtps2c.c \
 palDtt.c \

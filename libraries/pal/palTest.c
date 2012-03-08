@@ -359,6 +359,19 @@ static void t_ctf2r( int *status ) {
   viv ( j, 0, "palDtf2r", "J", status );
 }
 
+static void t_dat ( int *status ) {
+  vvd ( palDat ( 43900 ), 18, 0, "palDat",
+        " ", status );
+  vvd ( palDtt ( 40404 ), 39.709746, 1e-12, "palDtt",
+        " ", status );
+  vvd ( palDt ( 500 ), 4686.7, 1e-10, "palDt",
+        "500", status );
+  vvd ( palDt ( 1400 ), 408, 1e-11, "palDt",
+        "1400", status );
+  vvd ( palDt ( 1950 ), 27.99145626, 1e-12, "palDt",
+        "1950", status );
+}
+
 /* Dates */
 
 static void t_djcal( int *status ) {
@@ -1246,6 +1259,7 @@ int main (void) {
   t_cr2tf(&status);
   t_ctf2d(&status);
   t_ctf2r(&status);
+  t_dat(&status);
   t_djcal(&status);
   t_dmat(&status);
   t_epb(&status);
