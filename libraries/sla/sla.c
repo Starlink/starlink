@@ -1634,32 +1634,41 @@ void slaGeoc ( double p, double h, double *r, double *z ) {
    *z = Z;
 }
 
+F77_SUBROUTINE(sla_deuler)( CHARACTER(ORDER),
+                            DOUBLE(PHI),
+                            DOUBLE(THETA),
+                            DOUBLE(PSI),
+                            DOUBLE_ARRAY(RMAT)
+                            TRAIL(ORDER) );
 
-/* This is the obfusticated C version of slaDeuler. It is used in
-   preference to a wrapper around the Fortran SLA_DEULER routine in order
-   to ensure it is thread safe. */
+void slaDeuler ( const char *order, double phi, double theta, double psi,
+                 double rmat[3][3] ) {
 
-void slaDeuler( const char *Q0, double FoO, double BAR, double Q1, double
-baz[3][3]) { int fobar, fOObaR, Q2, FoBaz, q3; double q4[3][3], Q5[3][3],
-q6, q7, Q8, foobaz, Q9[3][3]; char q10; for (fobar = 0; fobar < 3;
-fobar++) { for (fOObaR = 0; fOObaR < 3; fOObaR++) { q4[fOObaR][fobar] =
-(fOObaR == fobar) ? 1.0 : 0.0; } } Q2 = strlen(Q0); for (FoBaz = 0; FoBaz
-< 3; FoBaz++) { if (FoBaz <= Q2) { for (fobar = 0; fobar < 3; fobar++) {
-for (fOObaR = 0; fOObaR < 3; fOObaR++) { Q5[fOObaR][fobar] = (fOObaR ==
-fobar) ? 1.0 : 0.0; } } switch (FoBaz) { case 0: q6 = FoO; break; case 1:
-q6 = BAR; break; default: q6 = Q1; break; } q7 = sin(q6); Q8 = cos(q6);
-q10 = Q0[FoBaz]; if ((q10 == 'X') || (q10 == 'x') || (q10 == '1')) {
-Q5[1][1] = Q8; Q5[1][2] = q7; Q5[2][1] = -q7; Q5[2][2] = Q8; } else if
-((q10 == 'Y') || (q10 == 'y') || (q10 == '2')) { Q5[0][0] = Q8; Q5[0][2]
-= -q7; Q5[2][0] = q7; Q5[2][2] = Q8; } else if ((q10 == 'Z') || (q10 ==
-'z') || (q10 == '3')) { Q5[0][0] = Q8; Q5[0][1] = q7; Q5[1][0] = -q7;
-Q5[1][1] = Q8; } else { Q2 = 0; } for (fOObaR = 0; fOObaR < 3; fOObaR++)
-{ for (fobar = 0; fobar < 3; fobar++) { foobaz = 0.0; for (q3 = 0; q3 <
-3; q3++) { foobaz += Q5[fOObaR][q3] * q4[q3][fobar]; } Q9[fOObaR][fobar]
-= foobaz; } } for (fobar = 0; fobar < 3; fobar++) { for (fOObaR = 0;
-fOObaR < 3; fOObaR++) { q4[fOObaR][fobar] = Q9[fOObaR][fobar]; } } } }
-for (fobar = 0; fobar < 3; fobar++) { for (fOObaR = 0; fOObaR < 3;
-fOObaR++) { baz[fOObaR][fobar] = q4[fOObaR][fobar]; } } }
+   DECLARE_CHARACTER(ORDER,4);
+   DECLARE_DOUBLE(PHI);
+   DECLARE_DOUBLE(THETA);
+   DECLARE_DOUBLE(PSI);
+   DECLARE_DOUBLE_ARRAY(RMAT,9);
+   int i,j;
+
+   PHI   = phi;
+   THETA = theta;
+   PSI   = psi;
+
+   slaStringExport( order, ORDER, 4 );
+
+   F77_LOCK( F77_CALL (sla_deuler) ( CHARACTER_ARG(ORDER),
+                           DOUBLE_ARG(&PHI),
+                           DOUBLE_ARG(&THETA),
+                           DOUBLE_ARG(&PSI),
+                           DOUBLE_ARRAY_ARG(RMAT)
+                           TRAIL_ARG(ORDER) ); )
+
+   for ( i = 0; i < 3; i++ ) {
+      for ( j = 0; j < 3; j++ ) rmat[ i ][ j ] = RMAT[ i + 3 * j ];
+   }
+
+}
 
 F77_SUBROUTINE(sla_de2h)( DOUBLE(HA),
                           DOUBLE(DEC),
