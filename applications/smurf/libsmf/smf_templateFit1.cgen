@@ -229,12 +229,12 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, smf_qual_t *qual,
   /* Now handle cases with masking */
   } else {
     if( qual ) {  /* QUALITY checking version */
-      #define GOOD_VAL ( !(qual[off]&mask_meas) && mask[lut[off]] )
+      #define GOOD_VAL ( !(qual[off]&mask_meas) && lut[off] != VAL__BADI && mask[lut[off]] )
       FIND_SUMS
       #undef GOOD_VAL
 
     } else {      /* VAL__BAD checking version */
-      #define GOOD_VAL ( data[off] != CGEN_BAD  && mask[lut[off]] )
+      #define GOOD_VAL ( data[off] != CGEN_BAD  && lut[off] != VAL__BADI && mask[lut[off]] )
       FIND_SUMS
       #undef GOOD_VAL
     }
