@@ -479,7 +479,8 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
             /* Do not include samples that fall within the "source"
                areas of the map, as identified by a supplied mask. */
-            if( !mask || mask[ lut_data[ ijindex ] ] ) {
+            int ilut = lut_data[ ijindex ];
+            if( !mask || ilut == VAL__BADI || mask[ lut_data[ ijindex ] ] ) {
               model_data[ i ] += res_data[ ijindex ];
               weight[ i ]++;
             }
