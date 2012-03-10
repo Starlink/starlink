@@ -112,11 +112,8 @@
 void palPv2ue( const double pv[6], double date, double pmass,
                double u[13], int * jstat ) {
 
-  /*  Gaussian gravitational constant (exact) */
-  const double GCON = 0.01720209895;
-
   /*  Canonical days to seconds */
-  const double CD2S = GCON / PAL__SPD;
+  const double CD2S = PAL__GCON / PAL__SPD;
 
   /*  Minimum allowed distance (AU) and speed (AU per canonical day) */
   const double RMIN = 1e-3;

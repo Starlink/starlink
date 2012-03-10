@@ -119,11 +119,8 @@
 
 void palUe2pv( double date, double u[13], double pv[6], int *jstat ) {
 
-  /*  Gaussian gravitational constant (exact) */
-  double const GCON = 0.01720209895;
-
   /*  Canonical days to seconds */
-  const double CD2S = GCON / PAL__SPD;
+  const double CD2S = PAL__GCON / PAL__SPD;
 
   /*  Test value for solution and maximum number of iterations */
   const double TEST = 1e-13;
@@ -148,11 +145,11 @@ void palUe2pv( double date, double u[13], double pv[6], int *jstat ) {
   PSI = u[12];
 
   /*  Approximately update the universal eccentric anomaly. */
-  PSI = PSI+(date-T)*GCON/R0;
+  PSI = PSI+(date-T)*PAL__GCON/R0;
 
   /*  Time from reference epoch to date (in Canonical Days: a canonical
-   *  day is 58.1324409... days, defined as 1/GCON). */
-  DT = (date-T0)*GCON;
+   *  day is 58.1324409... days, defined as 1/PAL__GCON). */
+  DT = (date-T0)*PAL__GCON;
 
   /*  Refine the universal eccentric anomaly, psi. */
   NIT = 1;
