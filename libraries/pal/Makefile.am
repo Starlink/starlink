@@ -64,6 +64,7 @@ palPrebn.c \
 palPrec.c \
 palPreces.c \
 palPrenut.c \
+palPv2ue.c \
 palPvobs.c \
 palRdplan.c \
 palRverot.c \
@@ -72,7 +73,8 @@ palRvlg.c \
 palRvlsrd.c \
 palRvlsrk.c \
 palSubet.c \
-palSupgal.c
+palSupgal.c \
+palUe2pv.c
 
 TESTS = palTest
 

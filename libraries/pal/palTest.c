@@ -1167,7 +1167,19 @@ static void t_pa( int *status ) {
 static void t_planet( int * status ) {
   int j;
   double pv[6];
+  double u[13];
   double expected1[6] = { 0., 0., 0., 0., 0., 0. };
+  double expectedue[13] = {
+    1.00006, -4.856142884511782, 50000., 0.3, -0.2,
+    0.1,  -0.4520378601821727,  0.4018114312730424,
+    -.3515850023639121, 0.3741657386773941,
+    -0.2511321445456515, 50000., 0.
+  };
+  double expectedpv[6] = {
+    0.07944764084631667011, -0.04118141077419014775,
+    0.002915180702063625400, -0.6890132370721108608e-6,
+    0.4326690733487621457e-6, -0.1763249096254134306e-6,
+  };
   double ra,dec,diam;
 
   palPlanet( 1e6, 0, pv, &j );
@@ -1206,6 +1218,24 @@ static void t_planet( int * status ) {
   vvd ( pv[5], 1.033542799062371839e-7, 1e-18, "palPlanet",
         "pv[5] 4", status );
   viv ( j, 0, "palPlanet", "J 4", status );
+
+  /* palPlante test would go here */
+
+  /* palPlantu */
+
+  /* palPv2el */
+
+  pv[0] = 0.3;
+  pv[1] = -0.2;
+  pv[2] = 0.1;
+  pv[3] = -0.9e-7;
+  pv[4] = 0.8e-7;
+  pv[5] = -0.7e-7;
+
+  /* palPv2ue */
+  palPv2ue ( pv, 50000., 0.00006, u, &j );
+  vvec( 13, u, expectedue, "palPv2ue", status );
+  viv ( j, 0, "palPv2ue", "J", status );
 
   /* Planets */
   palRdplan ( 40999.9, 0, 0.1, -0.9, &ra, &dec, &diam );
@@ -1271,6 +1301,19 @@ static void t_planet( int * status ) {
         "dec 8", status );
   vvd ( diam, 1.062210086082700563e-5, 1e-14, "palRdplan",
         "diam 8", status );
+
+  /* palUe2el */
+
+  /* palUe2pv */
+  palUe2pv( 50010., u, pv, &j );
+
+  /* Update the final two elements of the expecte UE array */
+  expectedue[11] = 50010.;
+  expectedue[12] = 0.7194308220038886856;
+
+  vvec( 13, u, expectedue, "palUe2pv", status );
+  vvec( 6, pv, expectedpv, "palU2pv", status );
+  viv ( j, 0, "palUe2pv", "J", status );
 
 }
 

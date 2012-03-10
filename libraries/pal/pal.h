@@ -431,12 +431,12 @@ void palPreces ( const char sys[3], double ep0, double ep1,
 
 void palPrenut ( double epoch, double date, double rmatpn[3][3] );
 
-void palPv2el ( double pv[], double date, double pmass, int jformr,
+void palPv2el ( const double pv[], double date, double pmass, int jformr,
                 int *jform, double *epoch, double *orbinc,
                 double *anode, double *perih, double *aorq, double *e,
                 double *aorl, double *dm, int *jstat );
 
-void palPv2ue ( double pv[], double date, double pmass,
+void palPv2ue ( const double pv[], double date, double pmass,
                 double u[], int *jstat );
 
 void palPvobs ( double p, double h, double stl, double pv[6] );
