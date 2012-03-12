@@ -97,7 +97,8 @@ static const double PAL__GCON = 0.01720209895;
 /* DNINT(A) - round to nearest whole number (double) */
 #define DNINT(A) ((A)<0.0?ceil((A)-0.5):floor((A)+0.5))
 
-
+/* DMAX(A,B) - return maximum value - evaluates arguments multiple times */
+#define DMAX(A,B) (A > B ? A : B )
 
 
 #endif

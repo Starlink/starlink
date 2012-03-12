@@ -1181,6 +1181,9 @@ static void t_planet( int * status ) {
     0.4326690733487621457e-6, -0.1763249096254134306e-6,
   };
   double ra,dec,diam;
+  int jform;
+  double epoch, orbinc, anode, perih, aorq, e, aorl,
+    dm;
 
   palPlanet( 1e6, 0, pv, &j );
   vvec( 6, pv, expected1, "palPlanet 1", status );
@@ -1231,6 +1234,28 @@ static void t_planet( int * status ) {
   pv[3] = -0.9e-7;
   pv[4] = 0.8e-7;
   pv[5] = -0.7e-7;
+
+  palPv2el ( pv, 50000, 0.00006, 1,
+             &jform, &epoch, &orbinc, &anode, &perih,
+             &aorq, &e, &aorl, &dm, &j );
+  viv ( jform, 1, "palPv2el", "JFORM", status );
+  vvd ( epoch, 50000, 1e-10, "palPv2el",
+        "EPOCH", status );
+  vvd ( orbinc, 1.52099895268912, 1e-12, "palPv2el",
+        "ORBINC", status );
+  vvd ( anode, 2.720503180538650, 1e-12, "palPv2el",
+        "ANODE", status );
+  vvd ( perih, 2.194081512031836, 1e-12, "palPv2el",
+        "PERIH", status );
+  vvd ( aorq, 0.2059371035373771, 1e-12, "palPv2el",
+        "AORQ", status );
+  vvd ( e, 0.9866822985810528, 1e-12, "palPv2el",
+        "E", status );
+  vvd ( aorl, 0.2012758344836794, 1e-12, "palPv2el",
+        "AORL", status );
+  vvd ( dm, 0.1840740507951820, 1e-12, "palPv2el",
+        "DM", status );
+  viv ( j, 0, "palPv2el", "J", status );
 
   /* palPv2ue */
   palPv2ue ( pv, 50000., 0.00006, u, &j );
@@ -1303,6 +1328,26 @@ static void t_planet( int * status ) {
         "diam 8", status );
 
   /* palUe2el */
+  palUe2el ( u, 1, &jform, &epoch, &orbinc, &anode, &perih,
+             &aorq, &e, &aorl, &dm, &j );
+  viv ( jform, 1, "palUe2el", "JFORM", status );
+  vvd ( epoch, 50000.00000000000, 1e-10, "palUe2el",
+        "EPOCH", status );
+  vvd ( orbinc, 1.520998952689120, 1e-12, "palUe2el",
+        "ORBINC", status );
+  vvd ( anode, 2.720503180538650, 1e-12, "palUe2el",
+        "ANODE", status );
+  vvd ( perih, 2.194081512031836, 1e-12, "palUe2el",
+        "PERIH", status );
+  vvd ( aorq, 0.2059371035373771, 1e-12, "palUe2el",
+        "AORQ", status );
+  vvd ( e, 0.9866822985810528, 1e-12, "palUe2el",
+        "E", status );
+  vvd ( aorl, 0.2012758344836794, 1e-12, "palUe2el",
+        "AORL", status );
+  viv ( j, 0, "palUe2el", "J", status );
+
+
 
   /* palUe2pv */
   palUe2pv( 50010., u, pv, &j );
@@ -1312,7 +1357,7 @@ static void t_planet( int * status ) {
   expectedue[12] = 0.7194308220038886856;
 
   vvec( 13, u, expectedue, "palUe2pv", status );
-  vvec( 6, pv, expectedpv, "palU2pv", status );
+  vvec( 6, pv, expectedpv, "palUe2pv", status );
   viv ( j, 0, "palUe2pv", "J", status );
 
 }
