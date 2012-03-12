@@ -250,7 +250,7 @@ void palEg50 ( double dr, double dd, double *dl, double *db );
 
 void palEl2ue ( double date, int jform, double epoch, double orbinc,
                 double anode, double perih, double aorq, double e,
-                double aorl, double dm, double u[], int *jstat );
+                double aorl, double dm, double u[13], int *jstat );
 
 double palEpb ( double date );
 
@@ -431,13 +431,13 @@ void palPreces ( const char sys[3], double ep0, double ep1,
 
 void palPrenut ( double epoch, double date, double rmatpn[3][3] );
 
-void palPv2el ( const double pv[], double date, double pmass, int jformr,
+void palPv2el ( const double pv[6], double date, double pmass, int jformr,
                 int *jform, double *epoch, double *orbinc,
                 double *anode, double *perih, double *aorq, double *e,
                 double *aorl, double *dm, int *jstat );
 
-void palPv2ue ( const double pv[], double date, double pmass,
-                double u[], int *jstat );
+void palPv2ue ( const double pv[6], double date, double pmass,
+                double u[13], int *jstat );
 
 void palPvobs ( double p, double h, double stl, double pv[6] );
 
@@ -516,12 +516,12 @@ void palTps2c ( float xi, float eta, float ra, float dec,
 void palTpv2c ( float xi, float eta, float v[3],
                 float v01[3], float v02[3], int *n );
 
-void palUe2el ( double u[], int jformr,
+void palUe2el ( const double u[13], int jformr,
                 int *jform, double *epoch, double *orbinc,
                 double *anode, double *perih, double *aorq, double *e,
                 double *aorl, double *dm, int *jstat );
 
-void palUe2pv ( double date, double u[], double pv[], int *jstat );
+void palUe2pv ( double date, double u[13], double pv[], int *jstat );
 
 void palUnpcd ( double disco, double *x, double *y );
 
