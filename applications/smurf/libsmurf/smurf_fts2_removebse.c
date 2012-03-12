@@ -33,7 +33,7 @@
 *  Authors:
 *     COBA: Coskun Oba (UoL)
 
-*  History :
+*  History:
 *     2010-06-13 (COBA):
 *        Original version.
 *     2010-09-21 (COBA):
@@ -53,10 +53,10 @@
 *     Copyright (C) 2010 Science and Technology Facilities Council.
 *     Copyright (C) 2010 University of Lethbridge. All Rights Reserved.
 
-*  License:
+*  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
+*     published by the Free Software Foundation; either Version 3 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -67,7 +67,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-*     MA 02110-1301, USA
+*     MA 02110-1301, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
