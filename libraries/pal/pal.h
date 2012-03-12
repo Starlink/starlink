@@ -262,6 +262,9 @@ double palEpj ( double date );
 
 double palEpj2d ( double epj );
 
+void palEpv( double date, double ph[3], double vh[3],
+             double pb[3], double vb[3] );
+
 void palEqecl ( double dr, double dd, double date, double *dl, double *db );
 
 double palEqeqx ( double date );

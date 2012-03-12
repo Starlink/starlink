@@ -946,12 +946,41 @@ static void t_evp( int *status ) {
                       -0.80650980174901798492,
                       -0.34997162028527262212 };
 
+   double vbex2[3] = {
+     -0.0109187426811683,
+     -0.0124652546173285,
+     -0.0054047731809662
+   };
+   double pbex2[3] = {
+     -0.7714104440491060,
+     +0.5598412061824225,
+     +0.2425996277722475
+   };
+   double vhex2[3] = {
+     -0.0109189182414732,
+     -0.0124718726844084,
+     -0.0054075694180650
+   };
+   double phex2[3] = {
+     -0.7757238809297653,
+     +0.5598052241363390,
+     +0.2426998466481708
+   };
+
    palEvp( 2010.0, 2012.0, dvb, dpb, dvh, dph );
 
    vvec( 3, dvb, vbex, "palEvp", status );
    vvec( 3, dpb, pbex, "palEvp", status );
    vvec( 3, dvh, vhex, "palEvp", status );
    vvec( 3, dph, phex, "palEvp", status );
+
+   palEpv ( 53411.52501161, dph, dvh, dpb, dvb );
+
+   vvec( 3, dvb, vbex2, "palEpv", status );
+   vvec( 3, dpb, pbex2, "palEpv", status );
+   vvec( 3, dvh, vhex2, "palEpv", status );
+   vvec( 3, dph, phex2, "palEpv", status );
+
 }
 
 static void t_map( int *status ) {

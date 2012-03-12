@@ -41,6 +41,7 @@ palDtt.c \
 palEcmat.c \
 palEl2ue.c \
 palEpco.c \
+palEpv.c \
 palEtrms.c \
 palEqecl.c \
 palEqgal.c \
