@@ -1169,7 +1169,14 @@ static void t_planet( int * status ) {
   double pv[6];
   double u[13];
   double expected1[6] = { 0., 0., 0., 0., 0., 0. };
-  double expectedue[13] = {
+  double expectedue1[13] = {
+     1.000878908362435284,  -0.3336263027874777288,  50000.,
+     2.840425801310305210,   0.1264380368035014224, -0.2287711835229143197,
+    -0.01301062595106185195, 0.5657102158104651697,  0.2189745287281794885,
+     2.852427310959998500,  -0.01552349065435120900,
+     50000., 0.0
+  };
+  double expectedue2[13] = {
     1.00006, -4.856142884511782, 50000., 0.3, -0.2,
     0.1,  -0.4520378601821727,  0.4018114312730424,
     -.3515850023639121, 0.3741657386773941,
@@ -1184,6 +1191,20 @@ static void t_planet( int * status ) {
   int jform;
   double epoch, orbinc, anode, perih, aorq, e, aorl,
     dm;
+
+  /* palEl2ue */
+  palEl2ue ( 50000, 1, 49000, 0.1, 2, 0.2,
+             3, 0.05, 3, 0.003312, u, &j );
+  vvec( 13, u, expectedue1, "palEl2ue", status );
+  viv ( j, 0, "palEl2ue", "J", status );
+
+  /* palPertel */
+
+  /* palPertue */
+
+  /* palPlanel */
+
+  /* palPlanet */
 
   palPlanet( 1e6, 0, pv, &j );
   vvec( 6, pv, expected1, "palPlanet 1", status );
@@ -1259,7 +1280,7 @@ static void t_planet( int * status ) {
 
   /* palPv2ue */
   palPv2ue ( pv, 50000., 0.00006, u, &j );
-  vvec( 13, u, expectedue, "palPv2ue", status );
+  vvec( 13, u, expectedue2, "palPv2ue", status );
   viv ( j, 0, "palPv2ue", "J", status );
 
   /* Planets */
@@ -1347,16 +1368,14 @@ static void t_planet( int * status ) {
         "AORL", status );
   viv ( j, 0, "palUe2el", "J", status );
 
-
-
   /* palUe2pv */
   palUe2pv( 50010., u, pv, &j );
 
   /* Update the final two elements of the expecte UE array */
-  expectedue[11] = 50010.;
-  expectedue[12] = 0.7194308220038886856;
+  expectedue2[11] = 50010.;
+  expectedue2[12] = 0.7194308220038886856;
 
-  vvec( 13, u, expectedue, "palUe2pv", status );
+  vvec( 13, u, expectedue2, "palUe2pv", status );
   vvec( 6, pv, expectedpv, "palUe2pv", status );
   viv ( j, 0, "palUe2pv", "J", status );
 

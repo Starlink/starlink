@@ -39,6 +39,7 @@ palDtp2s.c \
 palDtps2c.c \
 palDtt.c \
 palEcmat.c \
+palEl2ue.c \
 palEpco.c \
 palEtrms.c \
 palEqecl.c \
