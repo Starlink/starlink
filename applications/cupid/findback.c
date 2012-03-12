@@ -165,7 +165,7 @@ void findback( int *status ){
    CupidFindback0Data *job_data; /* Pointer to data for all jobs */
    CupidFindback0Data *pdata; /* Pointer to data for current job */
    Grp *grp;                 /* GRP identifier for configuration settings */
-   ThrWorkForce *wf;         /* Pool of persistent worker threads */
+   ThrWorkForce *wf = NULL;  /* Pool of persistent worker threads */
    char dtype[ 21 ];         /* HDS data type for output NDF */
    char itype[ 21 ];         /* HDS data type to use when processing */
    double *ipv;              /* Pointer to Variance array */
