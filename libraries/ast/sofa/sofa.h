@@ -11,11 +11,11 @@
 **  This file is part of the International Astronomical Union's
 **  SOFA (Standards Of Fundamental Astronomy) software collection.
 **
-**  This revision:   2010 September 10
+**  This revision:   2012 February 23
 **
-**  SOFA release YYYY-MM-DD
+**  SOFA release 2012-03-01
 **
-**  Copyright (C) 2010 IAU SOFA Board.  See notes at end.
+**  Copyright (C) 2012 IAU SOFA Board.  See notes at end.
 */
 
 #include "math.h"
@@ -215,12 +215,12 @@ int iauGd2gce(double a, double f,
               double elong, double phi, double height, double xyz[3]);
 
 /* Astronomy/Timescales */
-int iauD2dtf(char *scale, int ndp, double d1, double d2,
+int iauD2dtf(const char *scale, int ndp, double d1, double d2,
              int *iy, int *im, int *id, int ihmsf[4]);
 int iauDat(int iy, int im, int id, double fd, double *deltat);
 double iauDtdb(double date1, double date2,
                double ut, double elong, double u, double v);
-int iauDtf2d(char *scale, int iy, int im, int id,
+int iauDtf2d(const char *scale, int iy, int im, int id,
              int ihr, int imn, double sec, double *d1, double *d2);
 int iauTaitt(double tai1, double tai2, double *tt1, double *tt2);
 int iauTaiut1(double tai1, double tai2, double dta,
@@ -250,12 +250,12 @@ int iauUtcut1(double utc1, double utc2, double dut1,
 /* VectorMatrix/AngleOps */
 void iauA2af(int ndp, double angle, char *sign, int idmsf[4]);
 void iauA2tf(int ndp, double angle, char *sign, int ihmsf[4]);
-int iauAf2a(int s, int ideg, int iamin, double asec, double *rad);
+int iauAf2a(char s, int ideg, int iamin, double asec, double *rad);
 double iauAnp(double a);
 double iauAnpm(double a);
 void iauD2tf(int ndp, double days, char *sign, int ihmsf[4]);
-int iauTf2a(int s, int ihour, int imin, double sec, double *rad);
-int iauTf2d(int s, int ihour, int imin, double sec, double *days);
+int iauTf2a(char s, int ihour, int imin, double sec, double *rad);
+int iauTf2d(char s, int ihour, int imin, double sec, double *days);
 
 /* VectorMatrix/BuildRotations */
 void iauRx(double phi, double r[3][3]);
@@ -334,7 +334,7 @@ void iauSxpv(double s, double pv[2][3], double spv[2][3]);
 
 /*----------------------------------------------------------------------
 **
-**  Copyright (C) 2010
+**  Copyright (C) 2012
 **  Standards Of Fundamental Astronomy Board
 **  of the International Astronomical Union.
 **
@@ -344,8 +344,8 @@ void iauSxpv(double s, double pv[2][3], double spv[2][3]);
 **
 **  NOTICE TO USER:
 **
-**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
-**  WHICH APPLY TO ITS USE.
+**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING SIX TERMS AND
+**  CONDITIONS WHICH APPLY TO ITS USE.
 **
 **  1. The Software is owned by the IAU SOFA Board ("SOFA").
 **
@@ -371,8 +371,9 @@ void iauSxpv(double s, double pv[2][3], double spv[2][3]);
 **        of how the derived work is based upon, contains and/or differs
 **        from the original SOFA software.
 **
-**     c) The name(s) of all routine(s) in your derived work shall not
-**        include the prefix "iau".
+**     c) The names of all routines in your derived work shall not
+**        include the prefix "iau" or "sofa" or trivial modifications
+**        thereof such as changes of case.
 **
 **     d) The origin of the SOFA components of your derived work must
 **        not be misrepresented;  you must not claim that you wrote the
@@ -390,16 +391,11 @@ void iauSxpv(double s, double pv[2][3], double spv[2][3]);
 **     variations, no matter how minor, must be explicitly marked as
 **     such, as explained above.
 **
-**  4. In any published work or commercial products which includes
-**     results achieved by using the SOFA software, you shall
-**     acknowledge that the SOFA software was used in obtaining those
-**     results.
-**
-**  5. You shall not cause the SOFA software to be brought into
+**  4. You shall not cause the SOFA software to be brought into
 **     disrepute, either by misuse, or use for inappropriate tasks, or
 **     by inappropriate modification.
 **
-**  6. The SOFA software is provided "as is" and SOFA makes no warranty
+**  5. The SOFA software is provided "as is" and SOFA makes no warranty
 **     as to its use or performance.   SOFA does not and cannot warrant
 **     the performance or results which the user may obtain by using the
 **     SOFA software.  SOFA makes no warranties, express or implied, as
@@ -410,10 +406,14 @@ void iauSxpv(double s, double pv[2][3], double spv[2][3]);
 **     SOFA representative has been advised of such damages, or for any
 **     claim by any third party.
 **
-**  7. The provision of any version of the SOFA software under the terms
+**  6. The provision of any version of the SOFA software under the terms
 **     and conditions specified herein does not imply that future
 **     versions will also be made available under the same terms and
 **     conditions.
+*
+**  In any published work or commercial product which uses the SOFA
+**  software directly, acknowledgement (see www.iausofa.org) is
+**  appreciated.
 **
 **  Correspondence concerning SOFA software should be addressed as
 **  follows:

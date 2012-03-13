@@ -51,13 +51,13 @@ void iauD2tf(int ndp, double days, char *sign, int ihmsf[4])
 **  3) The absolute value of days may exceed 1.0.  In cases where it
 **     does not, it is up to the caller to test for and handle the
 **     case where days is very nearly 1.0 and rounds up to 24 hours,
-**     by testing for ihms[0]=24 and setting ihmsf[0-3] to zero.
+**     by testing for ihmsf[0]=24 and setting ihmsf[0-3] to zero.
 **
-**  This revision:  2008 May 11
+**  This revision:  2008 May 17
 **
-**  SOFA release 2010-12-01
+**  SOFA release 2012-03-01
 **
-**  Copyright (C) 2010 IAU SOFA Board.  See notes at end.
+**  Copyright (C) 2012 IAU SOFA Board.  See notes at end.
 */
 {
    int nrs, n;
@@ -114,7 +114,7 @@ void iauD2tf(int ndp, double days, char *sign, int ihmsf[4])
 
 /*----------------------------------------------------------------------
 **
-**  Copyright (C) 2010
+**  Copyright (C) 2012
 **  Standards Of Fundamental Astronomy Board
 **  of the International Astronomical Union.
 **
@@ -124,8 +124,8 @@ void iauD2tf(int ndp, double days, char *sign, int ihmsf[4])
 **
 **  NOTICE TO USER:
 **
-**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
-**  WHICH APPLY TO ITS USE.
+**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING SIX TERMS AND
+**  CONDITIONS WHICH APPLY TO ITS USE.
 **
 **  1. The Software is owned by the IAU SOFA Board ("SOFA").
 **
@@ -151,8 +151,9 @@ void iauD2tf(int ndp, double days, char *sign, int ihmsf[4])
 **        of how the derived work is based upon, contains and/or differs
 **        from the original SOFA software.
 **
-**     c) The name(s) of all routine(s) in your derived work shall not
-**        include the prefix "iau".
+**     c) The names of all routines in your derived work shall not
+**        include the prefix "iau" or "sofa" or trivial modifications
+**        thereof such as changes of case.
 **
 **     d) The origin of the SOFA components of your derived work must
 **        not be misrepresented;  you must not claim that you wrote the
@@ -170,16 +171,11 @@ void iauD2tf(int ndp, double days, char *sign, int ihmsf[4])
 **     variations, no matter how minor, must be explicitly marked as
 **     such, as explained above.
 **
-**  4. In any published work or commercial products which includes
-**     results achieved by using the SOFA software, you shall
-**     acknowledge that the SOFA software was used in obtaining those
-**     results.
-**
-**  5. You shall not cause the SOFA software to be brought into
+**  4. You shall not cause the SOFA software to be brought into
 **     disrepute, either by misuse, or use for inappropriate tasks, or
 **     by inappropriate modification.
 **
-**  6. The SOFA software is provided "as is" and SOFA makes no warranty
+**  5. The SOFA software is provided "as is" and SOFA makes no warranty
 **     as to its use or performance.   SOFA does not and cannot warrant
 **     the performance or results which the user may obtain by using the
 **     SOFA software.  SOFA makes no warranties, express or implied, as
@@ -190,10 +186,14 @@ void iauD2tf(int ndp, double days, char *sign, int ihmsf[4])
 **     SOFA representative has been advised of such damages, or for any
 **     claim by any third party.
 **
-**  7. The provision of any version of the SOFA software under the terms
+**  6. The provision of any version of the SOFA software under the terms
 **     and conditions specified herein does not imply that future
 **     versions will also be made available under the same terms and
 **     conditions.
+*
+**  In any published work or commercial product which uses the SOFA
+**  software directly, acknowledgement (see www.iausofa.org) is
+**  appreciated.
 **
 **  Correspondence concerning SOFA software should be addressed as
 **  follows:

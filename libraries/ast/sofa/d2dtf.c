@@ -1,7 +1,7 @@
 #include "sofam.h"
 #include <string.h>
 
-int iauD2dtf(char *scale, int ndp, double d1, double d2,
+int iauD2dtf(const char *scale, int ndp, double d1, double d2,
              int *iy, int *im, int *id, int ihmsf[4])
 /*
 **  - - - - - - - - -
@@ -26,9 +26,9 @@ int iauD2dtf(char *scale, int ndp, double d1, double d2,
 **     ihmsf     int[4]  hours, minutes, seconds, fraction (Note 1)
 **
 **  Returned (function value):
-**                int       status: +1 = dubious year (Note 5)
-**                                   0 = OK
-**                                  -1 = unacceptable date (Note 6)
+**               int     status: +1 = dubious year (Note 5)
+**                                0 = OK
+**                               -1 = unacceptable date (Note 6)
 **
 **  Notes:
 **
@@ -73,11 +73,11 @@ int iauD2dtf(char *scale, int ndp, double d1, double d2,
 **     iauD2tf      decompose days to hms
 **     iauDat       delta(AT) = TAI-UTC
 **
-**  This revision:  2010 September 7
+**  This revision:  2012 February 12
 **
-**  SOFA release 2010-12-01
+**  SOFA release 2012-03-01
 **
-**  Copyright (C) 2010 IAU SOFA Board.  See notes at end.
+**  Copyright (C) 2012 IAU SOFA Board.  See notes at end.
 */
 {
    int leap;
@@ -160,7 +160,7 @@ int iauD2dtf(char *scale, int ndp, double d1, double d2,
 
 /*----------------------------------------------------------------------
 **
-**  Copyright (C) 2010
+**  Copyright (C) 2012
 **  Standards Of Fundamental Astronomy Board
 **  of the International Astronomical Union.
 **
@@ -170,8 +170,8 @@ int iauD2dtf(char *scale, int ndp, double d1, double d2,
 **
 **  NOTICE TO USER:
 **
-**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
-**  WHICH APPLY TO ITS USE.
+**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING SIX TERMS AND
+**  CONDITIONS WHICH APPLY TO ITS USE.
 **
 **  1. The Software is owned by the IAU SOFA Board ("SOFA").
 **
@@ -197,8 +197,9 @@ int iauD2dtf(char *scale, int ndp, double d1, double d2,
 **        of how the derived work is based upon, contains and/or differs
 **        from the original SOFA software.
 **
-**     c) The name(s) of all routine(s) in your derived work shall not
-**        include the prefix "iau".
+**     c) The names of all routines in your derived work shall not
+**        include the prefix "iau" or "sofa" or trivial modifications
+**        thereof such as changes of case.
 **
 **     d) The origin of the SOFA components of your derived work must
 **        not be misrepresented;  you must not claim that you wrote the
@@ -216,16 +217,11 @@ int iauD2dtf(char *scale, int ndp, double d1, double d2,
 **     variations, no matter how minor, must be explicitly marked as
 **     such, as explained above.
 **
-**  4. In any published work or commercial products which includes
-**     results achieved by using the SOFA software, you shall
-**     acknowledge that the SOFA software was used in obtaining those
-**     results.
-**
-**  5. You shall not cause the SOFA software to be brought into
+**  4. You shall not cause the SOFA software to be brought into
 **     disrepute, either by misuse, or use for inappropriate tasks, or
 **     by inappropriate modification.
 **
-**  6. The SOFA software is provided "as is" and SOFA makes no warranty
+**  5. The SOFA software is provided "as is" and SOFA makes no warranty
 **     as to its use or performance.   SOFA does not and cannot warrant
 **     the performance or results which the user may obtain by using the
 **     SOFA software.  SOFA makes no warranties, express or implied, as
@@ -236,10 +232,14 @@ int iauD2dtf(char *scale, int ndp, double d1, double d2,
 **     SOFA representative has been advised of such damages, or for any
 **     claim by any third party.
 **
-**  7. The provision of any version of the SOFA software under the terms
+**  6. The provision of any version of the SOFA software under the terms
 **     and conditions specified herein does not imply that future
 **     versions will also be made available under the same terms and
 **     conditions.
+*
+**  In any published work or commercial product which uses the SOFA
+**  software directly, acknowledgement (see www.iausofa.org) is
+**  appreciated.
 **
 **  Correspondence concerning SOFA software should be addressed as
 **  follows:

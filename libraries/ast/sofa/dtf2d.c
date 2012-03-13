@@ -1,7 +1,7 @@
 #include "sofam.h"
 #include <string.h>
 
-int iauDtf2d(char *scale, int iy, int im, int id,
+int iauDtf2d(const char *scale, int iy, int im, int id,
              int ihr, int imn, double sec, double *d1, double *d2)
 /*
 **  - - - - - - - - -
@@ -24,7 +24,7 @@ int iauDtf2d(char *scale, int iy, int im, int id,
 **     sec       double  seconds
 **
 **  Returned:
-**     dj1,dj2   double  2-part Julian Date (Notes 3,4)
+**     d1,d2     double  2-part Julian Date (Notes 3,4)
 **
 **  Returned (function value):
 **               int     status: +3 = both of next two
@@ -66,7 +66,7 @@ int iauDtf2d(char *scale, int iy, int im, int id,
 **     to be trusted.  See iauDat for further details.
 **
 **  7) Only in the case of continuous and regular time scales (TAI, TT,
-**     TCG, TCB and TDB) is the result DJ1+DJ2 a Julian Date, strictly
+**     TCG, TCB and TDB) is the result d1+d2 a Julian Date, strictly
 **     speaking.  In the other cases (UT1 and UTC) the result must be
 **     used with circumspection;  in particular the difference between
 **     two such results cannot be interpreted as a precise time
@@ -77,11 +77,11 @@ int iauDtf2d(char *scale, int iy, int im, int id,
 **     iauDat       delta(AT) = TAI-UTC
 **     iauJd2cal    JD to Gregorian calendar
 **
-**  This revision:  2010 September 7
+**  This revision:  2012 February 12
 **
-**  SOFA release 2010-12-01
+**  SOFA release 2012-03-01
 **
-**  Copyright (C) 2010 IAU SOFA Board.  See notes at end.
+**  Copyright (C) 2012 IAU SOFA Board.  See notes at end.
 */
 {
    int js, iy2, im2, id2;
@@ -150,7 +150,7 @@ int iauDtf2d(char *scale, int iy, int im, int id,
 
 /*----------------------------------------------------------------------
 **
-**  Copyright (C) 2010
+**  Copyright (C) 2012
 **  Standards Of Fundamental Astronomy Board
 **  of the International Astronomical Union.
 **
@@ -160,8 +160,8 @@ int iauDtf2d(char *scale, int iy, int im, int id,
 **
 **  NOTICE TO USER:
 **
-**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
-**  WHICH APPLY TO ITS USE.
+**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING SIX TERMS AND
+**  CONDITIONS WHICH APPLY TO ITS USE.
 **
 **  1. The Software is owned by the IAU SOFA Board ("SOFA").
 **
@@ -187,8 +187,9 @@ int iauDtf2d(char *scale, int iy, int im, int id,
 **        of how the derived work is based upon, contains and/or differs
 **        from the original SOFA software.
 **
-**     c) The name(s) of all routine(s) in your derived work shall not
-**        include the prefix "iau".
+**     c) The names of all routines in your derived work shall not
+**        include the prefix "iau" or "sofa" or trivial modifications
+**        thereof such as changes of case.
 **
 **     d) The origin of the SOFA components of your derived work must
 **        not be misrepresented;  you must not claim that you wrote the
@@ -206,16 +207,11 @@ int iauDtf2d(char *scale, int iy, int im, int id,
 **     variations, no matter how minor, must be explicitly marked as
 **     such, as explained above.
 **
-**  4. In any published work or commercial products which includes
-**     results achieved by using the SOFA software, you shall
-**     acknowledge that the SOFA software was used in obtaining those
-**     results.
-**
-**  5. You shall not cause the SOFA software to be brought into
+**  4. You shall not cause the SOFA software to be brought into
 **     disrepute, either by misuse, or use for inappropriate tasks, or
 **     by inappropriate modification.
 **
-**  6. The SOFA software is provided "as is" and SOFA makes no warranty
+**  5. The SOFA software is provided "as is" and SOFA makes no warranty
 **     as to its use or performance.   SOFA does not and cannot warrant
 **     the performance or results which the user may obtain by using the
 **     SOFA software.  SOFA makes no warranties, express or implied, as
@@ -226,10 +222,14 @@ int iauDtf2d(char *scale, int iy, int im, int id,
 **     SOFA representative has been advised of such damages, or for any
 **     claim by any third party.
 **
-**  7. The provision of any version of the SOFA software under the terms
+**  6. The provision of any version of the SOFA software under the terms
 **     and conditions specified herein does not imply that future
 **     versions will also be made available under the same terms and
 **     conditions.
+*
+**  In any published work or commercial product which uses the SOFA
+**  software directly, acknowledgement (see www.iausofa.org) is
+**  appreciated.
 **
 **  Correspondence concerning SOFA software should be addressed as
 **  follows:

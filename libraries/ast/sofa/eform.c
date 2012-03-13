@@ -14,29 +14,29 @@ int iauEform ( int n, double *a, double *f )
 **  Status:  canonical.
 **
 **  Given:
-**     n       int      ellipsoid identifier (Note 1)
+**     n    int         ellipsoid identifier (Note 1)
 **
 **  Returned:
-**     a       double   equatorial radius (meters, Note 2)
-**     f       double   flattening (Note 2)
+**     a    double      equatorial radius (meters, Note 2)
+**     f    double      flattening (Note 2)
 **
 **  Returned (function value):
-**            int       status:
-**                          0 = OK
-**                         -1 = illegal identifier (Note 3)
+**          int         status:  0 = OK
+**                              -1 = illegal identifier (Note 3)
 **
 **  Notes:
 **
 **  1) The identifier n is a number that specifies the choice of
 **     reference ellipsoid.  The following are supported:
 **
-**        n   ellipsoid
+**        n    ellipsoid
 **
-**        1    WGS84
-**        2    GRS80
-**        3    WGS72
+**        1     WGS84
+**        2     GRS80
+**        3     WGS72
 **
-**     The number n has no significance outside the SOFA software.
+**     The n value has no significance outside the SOFA software.  For
+**     convenience, symbols WGS84 etc. are defined in sofam.h.
 **
 **  2) The ellipsoid parameters are returned in the form of equatorial
 **     radius in meters (a) and flattening (f).  The latter is a number
@@ -60,33 +60,28 @@ int iauEform ( int n, double *a, double *f )
 **     P. Kenneth Seidelmann (ed), University Science Books (1992),
 **     p220.
 **
-**  This revision:  2010 January 18
+**  This revision:  2012 February 23
 **
-**  SOFA release 2010-12-01
+**  SOFA release 2012-03-01
 **
-**  Copyright (C) 2010 IAU SOFA Board.  See notes at end.
+**  Copyright (C) 2012 IAU SOFA Board.  See notes at end.
 */
 {
 
 /* Look up a and f for the specified reference ellipsoid. */
    switch ( n ) {
-   case 1:
 
-   /* WGS84. */
+   case WGS84:
       *a = 6378137.0;
       *f = 1.0 / 298.257223563;
       break;
 
-   case 2:
-
-   /* GRS80. */
+   case GRS80:
       *a = 6378137.0;
       *f = 1.0 / 298.257222101;
       break;
 
-   case 3:
-
-   /* WGS72. */
+   case WGS72:
       *a = 6378135.0;
       *f = 1.0 / 298.26;
       break;
@@ -105,7 +100,7 @@ int iauEform ( int n, double *a, double *f )
 
 /*----------------------------------------------------------------------
 **
-**  Copyright (C) 2010
+**  Copyright (C) 2012
 **  Standards Of Fundamental Astronomy Board
 **  of the International Astronomical Union.
 **
@@ -115,8 +110,8 @@ int iauEform ( int n, double *a, double *f )
 **
 **  NOTICE TO USER:
 **
-**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
-**  WHICH APPLY TO ITS USE.
+**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING SIX TERMS AND
+**  CONDITIONS WHICH APPLY TO ITS USE.
 **
 **  1. The Software is owned by the IAU SOFA Board ("SOFA").
 **
@@ -142,8 +137,9 @@ int iauEform ( int n, double *a, double *f )
 **        of how the derived work is based upon, contains and/or differs
 **        from the original SOFA software.
 **
-**     c) The name(s) of all routine(s) in your derived work shall not
-**        include the prefix "iau".
+**     c) The names of all routines in your derived work shall not
+**        include the prefix "iau" or "sofa" or trivial modifications
+**        thereof such as changes of case.
 **
 **     d) The origin of the SOFA components of your derived work must
 **        not be misrepresented;  you must not claim that you wrote the
@@ -161,16 +157,11 @@ int iauEform ( int n, double *a, double *f )
 **     variations, no matter how minor, must be explicitly marked as
 **     such, as explained above.
 **
-**  4. In any published work or commercial products which includes
-**     results achieved by using the SOFA software, you shall
-**     acknowledge that the SOFA software was used in obtaining those
-**     results.
-**
-**  5. You shall not cause the SOFA software to be brought into
+**  4. You shall not cause the SOFA software to be brought into
 **     disrepute, either by misuse, or use for inappropriate tasks, or
 **     by inappropriate modification.
 **
-**  6. The SOFA software is provided "as is" and SOFA makes no warranty
+**  5. The SOFA software is provided "as is" and SOFA makes no warranty
 **     as to its use or performance.   SOFA does not and cannot warrant
 **     the performance or results which the user may obtain by using the
 **     SOFA software.  SOFA makes no warranties, express or implied, as
@@ -181,10 +172,14 @@ int iauEform ( int n, double *a, double *f )
 **     SOFA representative has been advised of such damages, or for any
 **     claim by any third party.
 **
-**  7. The provision of any version of the SOFA software under the terms
+**  6. The provision of any version of the SOFA software under the terms
 **     and conditions specified herein does not imply that future
 **     versions will also be made available under the same terms and
 **     conditions.
+*
+**  In any published work or commercial product which uses the SOFA
+**  software directly, acknowledgement (see www.iausofa.org) is
+**  appreciated.
 **
 **  Correspondence concerning SOFA software should be addressed as
 **  follows:

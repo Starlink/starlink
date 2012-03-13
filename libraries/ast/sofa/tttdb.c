@@ -27,12 +27,12 @@ int iauTttdb(double tt1, double tt2, double dtr,
 **
 **  Notes:
 **
-**  1  tt1+tt2 is Julian Date, apportioned in any convenient way between
+**  1) tt1+tt2 is Julian Date, apportioned in any convenient way between
 **     the two arguments, for example where tt1 is the Julian Day Number
 **     and tt2 is the fraction of a day.  The returned tdb1,tdb2 follow
 **     suit.
 **
-**  2  The argument dtr represents the quasi-periodic component of the
+**  2) The argument dtr represents the quasi-periodic component of the
 **     GR transformation between TT and TCB.  It is dependent upon the
 **     adopted solar-system ephemeris, and can be obtained by numerical
 **     integration, by interrogating a precomputed time ephemeris or by
@@ -40,7 +40,7 @@ int iauTttdb(double tt1, double tt2, double dtr,
 **     iauDtdb.   The quantity is dominated by an annual term of 1.7 ms
 **     amplitude.
 **
-**  3  TDB is essentially the same as Teph, the time argument for the JPL
+**  3) TDB is essentially the same as Teph, the time argument for the JPL
 **     solar system ephemerides.
 **
 **  References:
@@ -50,11 +50,11 @@ int iauTttdb(double tt1, double tt2, double dtr,
 **
 **     IAU 2006 Resolution 3
 **
-**  This revision:  2010 May 13
+**  This revision:  2011 May 14
 **
-**  SOFA release 2010-12-01
+**  SOFA release 2012-03-01
 **
-**  Copyright (C) 2010 IAU SOFA Board.  See notes at end.
+**  Copyright (C) 2012 IAU SOFA Board.  See notes at end.
 */
 {
    double dtrd;
@@ -75,7 +75,7 @@ int iauTttdb(double tt1, double tt2, double dtr,
 
 /*----------------------------------------------------------------------
 **
-**  Copyright (C) 2010
+**  Copyright (C) 2012
 **  Standards Of Fundamental Astronomy Board
 **  of the International Astronomical Union.
 **
@@ -85,8 +85,8 @@ int iauTttdb(double tt1, double tt2, double dtr,
 **
 **  NOTICE TO USER:
 **
-**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
-**  WHICH APPLY TO ITS USE.
+**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING SIX TERMS AND
+**  CONDITIONS WHICH APPLY TO ITS USE.
 **
 **  1. The Software is owned by the IAU SOFA Board ("SOFA").
 **
@@ -112,8 +112,9 @@ int iauTttdb(double tt1, double tt2, double dtr,
 **        of how the derived work is based upon, contains and/or differs
 **        from the original SOFA software.
 **
-**     c) The name(s) of all routine(s) in your derived work shall not
-**        include the prefix "iau".
+**     c) The names of all routines in your derived work shall not
+**        include the prefix "iau" or "sofa" or trivial modifications
+**        thereof such as changes of case.
 **
 **     d) The origin of the SOFA components of your derived work must
 **        not be misrepresented;  you must not claim that you wrote the
@@ -131,16 +132,11 @@ int iauTttdb(double tt1, double tt2, double dtr,
 **     variations, no matter how minor, must be explicitly marked as
 **     such, as explained above.
 **
-**  4. In any published work or commercial products which includes
-**     results achieved by using the SOFA software, you shall
-**     acknowledge that the SOFA software was used in obtaining those
-**     results.
-**
-**  5. You shall not cause the SOFA software to be brought into
+**  4. You shall not cause the SOFA software to be brought into
 **     disrepute, either by misuse, or use for inappropriate tasks, or
 **     by inappropriate modification.
 **
-**  6. The SOFA software is provided "as is" and SOFA makes no warranty
+**  5. The SOFA software is provided "as is" and SOFA makes no warranty
 **     as to its use or performance.   SOFA does not and cannot warrant
 **     the performance or results which the user may obtain by using the
 **     SOFA software.  SOFA makes no warranties, express or implied, as
@@ -151,10 +147,14 @@ int iauTttdb(double tt1, double tt2, double dtr,
 **     SOFA representative has been advised of such damages, or for any
 **     claim by any third party.
 **
-**  7. The provision of any version of the SOFA software under the terms
+**  6. The provision of any version of the SOFA software under the terms
 **     and conditions specified herein does not imply that future
 **     versions will also be made available under the same terms and
 **     conditions.
+*
+**  In any published work or commercial product which uses the SOFA
+**  software directly, acknowledgement (see www.iausofa.org) is
+**  appreciated.
 **
 **  Correspondence concerning SOFA software should be addressed as
 **  follows:
