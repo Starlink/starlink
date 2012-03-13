@@ -1211,6 +1211,20 @@ static void t_planet( int * status ) {
     -.3515850023639121, 0.3741657386773941,
     -0.2511321445456515, 50000., 0.
   };
+  double expectedue3[13] = {
+    1.000000000000000,
+    -0.3329769417028020949,
+    50100.,
+    2.638884303608524597,
+    1.070994304747824305,
+    0.1544112080167568589,
+    -0.2188240619161439344,
+    0.5207557453451906385,
+    0.2217782439275216936,
+    2.852118859689216658,
+    0.01452010174371893229,
+    50100.
+  };
   double expectedpv[6] = {
     0.07944764084631667011, -0.04118141077419014775,
     0.002915180702063625400, -0.6890132370721108608e-6,
@@ -1228,8 +1242,29 @@ static void t_planet( int * status ) {
   viv ( j, 0, "palEl2ue", "J", status );
 
   /* palPertel */
+  palPertel ( 2, 43000., 43200., 43000.,
+              0.2, 3, 4, 5, 0.02, 6,
+              &epoch, &orbinc, &anode, &perih, &aorq, &e, &aorl, &j );
+  vvd ( epoch, 43200., 1e-10, "palPertel",
+        "EPOCH", status );
+  vvd ( orbinc, 0.1995661466545422381, 1e-7, "palPertel",
+        "ORBINC", status );
+  vvd ( anode, 2.998052737821591215, 1e-7, "palPertel",
+        "ANODE", status );
+  vvd ( perih, 4.009516448441143636, 1e-6, "palPertel",
+        "PERIH", status );
+  vvd ( aorq, 5.014216294790922323, 1e-7, "palPertel",
+        "AORQ", status );
+  vvd ( e, 0.02281386258309823607, 1e-7, "palPertel",
+        "E", status );
+  vvd ( aorl, 0.01735248648779583748, 1e-6, "palPertel",
+        "AORL", status );
+  viv ( j, 0, "palPertel", "J", status );
 
   /* palPertue */
+  palPertue ( 50100, u, &j );
+  vvec( 13, u, expectedue3, "palPertue", status );
+  viv ( j, 0, "palPertue", "J", status );
 
   /* palPlanel */
 

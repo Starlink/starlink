@@ -60,6 +60,8 @@ palNut.c \
 palNutc.c \
 palObs.c \
 palPa.c \
+palPertel.c \
+palPertue.c \
 palPlanet.c \
 palPm.c \
 palPrebn.c \
