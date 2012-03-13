@@ -62,7 +62,10 @@ palObs.c \
 palPa.c \
 palPertel.c \
 palPertue.c \
+palPlanel.c \
 palPlanet.c \
+palPlante.c \
+palPlantu.c \
 palPm.c \
 palPrebn.c \
 palPrec.c \

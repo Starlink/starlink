@@ -1230,7 +1230,16 @@ static void t_planet( int * status ) {
     0.002915180702063625400, -0.6890132370721108608e-6,
     0.4326690733487621457e-6, -0.1763249096254134306e-6,
   };
-  double ra,dec,diam;
+  double expectedpv2[6] = {
+    1.947628959288897677,
+    -1.013736058752235271,
+    -0.3536409947732733647,
+    2.742247411571786194e-8,
+    1.170467244079075911e-7,
+    3.709878268217564005e-8
+  };
+
+  double ra,dec,diam, r;
   int jform;
   double epoch, orbinc, anode, perih, aorq, e, aorl,
     dm;
@@ -1267,6 +1276,10 @@ static void t_planet( int * status ) {
   viv ( j, 0, "palPertue", "J", status );
 
   /* palPlanel */
+  palPlanel ( 50600, 2, 50500, 0.1, 3, 5,
+	      2, 0.3, 4, 0, pv, &j );
+  vvec( 6, pv, expectedpv2, "palPlanel", status );
+  viv ( j, 0, "palPlanel", "J", status );
 
   /* palPlanet */
 
@@ -1309,7 +1322,41 @@ static void t_planet( int * status ) {
 
   /* palPlante test would go here */
 
+  palPlante ( 50600., -1.23, 0.456, 2, 50500.,
+	      0.1, 3., 5., 2., 0.3, 4.,
+	      0., &ra, &dec, &r, &j );
+  vvd ( ra, 6.222958101333794007, 1e-6, "palPlante",
+	"RA", status );
+  vvd ( dec, 0.01142220305739771601, 1e-6, "palPlante",
+	"DEC", status );
+  vvd ( r, 2.288902494080167624, 1e-8, "palPlante",
+	"R", status );
+  viv ( j, 0, "palPlante", "J", status );
+
+  u[0] = 1.0005;
+  u[1] = -0.3;
+  u[2] = 55000.;
+  u[3] = 2.8;
+  u[4] = 0.1;
+  u[5] = -0.2;
+  u[6] = -0.01;
+  u[7] = 0.5;
+  u[8] = 0.22;
+  u[9] = 2.8;
+  u[10] = -0.015;
+  u[11] = 55001.;
+  u[12] = 0;
+
   /* palPlantu */
+
+  palPlantu ( 55001., -1.23, 0.456, u, &ra, &dec, &r, &j );
+  vvd ( ra, 0.3531814831241686647, 1e-6, "palPlantu",
+	"RA", status );
+  vvd ( dec, 0.06940344580567131328, 1e-6, "palPlantu",
+	"DEC", status );
+  vvd ( r, 3.031687170873274464, 1e-8, "palPlantu",
+	"R", status );
+  viv ( j, 0, "palPlantu", "J", status );
 
   /* palPv2el */
 

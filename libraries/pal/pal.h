@@ -400,7 +400,7 @@ void palPertel (int jform, double date0, double date1,
                 double *perih1, double *aorq1, double *e1, double *am1,
                 int *jstat );
 
-void palPertue ( double date, double u[], int *jstat );
+void palPertue ( double date, double u[13], int *jstat );
 
 void palPlanel ( double date, int jform, double epoch, double orbinc,
                  double anode, double perih, double aorq,  double e,
@@ -413,7 +413,7 @@ void palPlante ( double date, double elong, double phi, int jform,
                  double aorq, double e, double aorl, double dm,
                  double *ra, double *dec, double *r, int *jstat );
 
-void palPlantu ( double date, double elong, double phi, double u[],
+void palPlantu ( double date, double elong, double phi, const double u[13],
                  double *ra, double *dec, double *r, int *jstat );
 
 void palPm ( double r0, double d0, double pr, double pd,
