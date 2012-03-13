@@ -129,7 +129,10 @@ void palUe2pv( double date, double u[13], double pv[6], int *jstat ) {
   int I, NIT, N;
   double CM,ALPHA,T0,P0[3],V0[3],R0,SIGMA0,T,PSI,DT,W,
     TOL,PSJ,PSJ2,BETA,S0,S1,S2,S3,
-    FF,R,FLAST,PLAST,F,G,FD,GD;
+    FF,R,F,G,FD,GD;
+
+  double PLAST = 0.0;
+  double FLAST = 0.0;
 
   /*  Unpack the parameters. */
   CM = u[0];

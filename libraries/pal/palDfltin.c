@@ -82,6 +82,10 @@
 *-
 */
 
+/* Shenanigans for isblank() which is C99 only */
+#define _POSIX_C_SOURCE 200112L
+#define _ISOC99_SOURCE
+
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -104,7 +108,7 @@ void palDfltin( const char * string, int *nstrt,
   char tempbuf[256];
 
   /* Correct for SLA use of fortran convention */
-  strlcpy( tempbuf, &(string[*nstrt-1]), sizeof(tempbuf) );
+  star_strlcpy( tempbuf, &(string[*nstrt-1]), sizeof(tempbuf) );
 
   /* Convert d or D to E */
   ctemp = tempbuf;
