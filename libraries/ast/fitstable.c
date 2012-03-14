@@ -989,6 +989,7 @@ static void GenerateColumns( AstFitsTable *this, AstFitsChan *header,
          type = AST__STRINGTYPE;
 
       } else if( astOK ){
+         type = AST__BADTYPE;
          astError( AST__BDFTS, "astFitsTable: Keyword '%s' in supplied FITS "
                    "binary table header has unsupported value '%s'.", status,
                    keyword, cval );
@@ -1262,6 +1263,7 @@ f     AST_COLUMNNULL functiom.
       nb = sizeof( char );
 
    } else if( astOK ) {
+      nb = 0;
       astError( AST__INTER, "astGetColumnData(%s): Unsupported column type "
                 "%d (internal AST programming error).", status,
                 astGetClass( this ), type );
@@ -1347,6 +1349,9 @@ f     AST_COLUMNNULL functiom.
 /* Copy the strings returned by astMapGet1C into the returned array,
    omitting the trailing null at the end of each string. */
          CopyStrings( nval, nb, cbuf, pout, status );
+
+      } else {
+         ok = 0;
       }
 
 /* If the cell could not be found, return a suitable number of column null
@@ -1966,6 +1971,7 @@ f        The global status.
       nb = sizeof( char );
 
    } else if( astOK ) {
+      nb = 0;
       astError( AST__INTER, "astPutColumnData(%s): Unsupported column type "
                 "%d (internal AST programming error).", status,
                 astGetClass( this ), type );
@@ -2208,6 +2214,8 @@ static void UpdateHeader( AstFitsTable *this, const char *method,
 
 /* Get the FITS code that describes the column data type. Also increment
    the number of bytes (rowsize) used to describe a whole row. */
+         slen = 0;
+         code = ' ';
          if( type == AST__BYTETYPE ) {
             code = 'B';
             rowsize += nel;
@@ -2239,7 +2247,6 @@ static void UpdateHeader( AstFitsTable *this, const char *method,
 
 /* Report an error if the data type is not supported by FITS. */
          } else if( astOK ) {
-            code = ' ';
             astError( AST__INTER, "%s(%s): Illegal type %d for column '%s' "
                       "in a %s (internal AST programming error).", status,
                       method, astGetClass( this ), type, name,

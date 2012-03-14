@@ -3741,6 +3741,7 @@ f        The global status.
 
 /* Loop round all columns in the Table. */
       ncol = astGetNcolumn( this );
+      inew = nrow;
       for( icol = 1; icol <= ncol; icol++ ) {
 
 /* Get the column name */

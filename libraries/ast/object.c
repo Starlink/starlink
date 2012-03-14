@@ -4261,7 +4261,7 @@ f     error value
 */
 
 /* Local Variables: */
-   char *p;
+   char *p = NULL;
    int len;
 
 /* Check the name of a tuning parameter was supplied. */

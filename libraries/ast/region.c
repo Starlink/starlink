@@ -7339,6 +7339,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
 
 /* Loop until we have a grid of nearly the right size. Make at most three
    attempts. */
+      ipr = 0;
       np = meshsize;
       ntry = 0;
       while( ntry++ < 3 ) {

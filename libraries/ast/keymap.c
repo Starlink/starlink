@@ -1426,6 +1426,9 @@ static int CompareEntries( const void *first_void, const void *second_void ) {
    int result;           /* Returned value */
    int sortby;           /* Sorting method */
 
+/* Initialise returned value */
+   result = 0;
+
 /* Get pointers to the MapEntry structures, and get the sorting method. */
    first = *( (AstMapEntry **) first_void );
    second = *( (AstMapEntry **) second_void );
@@ -7170,8 +7173,8 @@ c        This does not include the trailing null character.
 
 /* Go through the motions of formatting the value. We do not actually
    need the formatted string (just its length) so we provide a NULL pointer
-   for the output buffer. The entry is ignored if it cannot be formatted. 
-   Note, the length returned by ConvertValue includes the terminating null, 
+   for the output buffer. The entry is ignored if it cannot be formatted.
+   Note, the length returned by ConvertValue includes the terminating null,
    so decrement it first. */
             l = ConvertValue( raw, raw_type, NULL, AST__STRINGTYPE, status );
             if( --l > result ) result = l;
