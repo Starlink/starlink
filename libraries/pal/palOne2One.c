@@ -210,6 +210,13 @@ double palGmst ( double ut1 ) {
   return iauGmst06( PAL__MJD0, ut1, PAL__MJD0, ut1 );
 }
 
+/* Slightly better but still not as accurate as SOFA */
+
+double palGmsta( double date, double ut ) {
+  date += PAL__MJD0;
+  return iauGmst06( date, ut, date, ut );
+}
+
 void palHfk5z ( double rh, double dh, double epoch,
                 double *r5, double *d5, double *dr5, double *dd5 ) {
   /* Need to convert epoch to Julian date first */

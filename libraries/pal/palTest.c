@@ -597,6 +597,9 @@ static void t_geoc( int *status ) {
 static void t_gmst( int *status ) {
   vvd ( palGmst( 53736. ), 1.754174971870091203,
         1e-12, "palGmst", " ", status );
+
+  vvd ( palGmsta( 53736., 0.0 ), 1.754174971870091203,
+        1e-12, "palGmsta", " ", status );
 }
 
 /* FK5 */
