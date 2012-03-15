@@ -653,6 +653,9 @@
 *        complex WCS Mappings producing shifts of whole pixels.
 *     2010 October 14 (MJC):
 *        Permit temporary style attributes.
+*     15-MAR-2012 (DSB):
+*        When getting WCS from the NDF, always ensure the current Frame
+*        is 2-dimensional.
 *     {enter_further_changes_here}
 
 *-
@@ -819,13 +822,14 @@
       CALL PAR_GET0L( 'BORDER', BORDER, STATUS )
 
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
-*  present in the NDF's WCS component.  If axes or borders are being
-*  drawn, modify  it to ensure that the Base, PIXEL and Current frames
-*  all have two dimensions.  The NDF must have no more than two
-*  significant pixel axes (i.e. pixel axes spanning more than one
-*  pixel).  A single significant pixel axis is allowed.
-      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., AXES .OR. BORDER,
-     :                 AXES, SDIM, SLBND, SUBND, IWCS, STATUS )
+*  present in the NDF's WCS component.  Always ensure that the Base,
+*  PIXEL and Current frames all have two dimensions.  The NDF must
+*  have no more than two significant pixel axes (i.e. pixel axes
+*  spanning more than one pixel).  A single significant pixel axis
+*  is allowed. If axes are not being drawn, it is permissible for the
+*  WCS to have no inverse transformation.
+      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., .TRUE., AXES, SDIM, SLBND,
+     :                 SUBND, IWCS, STATUS )
 
 *  Store the number of current Frame axes.
       NCUR = AST_GETI( IWCS, 'NAXES', STATUS )
