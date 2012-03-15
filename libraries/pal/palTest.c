@@ -622,6 +622,41 @@ static void t_fk52h ( int *status ) {
 
 }
 
+static void t_intin( int *status ) {
+  const char s[] = "  -12345, , -0  2000  +     ";
+  /*                1234567890123456789012345678 */
+  int i = 1;
+  long n = 0;
+  int j;
+
+  palIntin ( s, &i, &n, &j );
+  viv ( i, 10, "palIntin", "I1", status );
+  viv ( n, -12345, "palIntin", "V1", status );
+  viv ( j, -1, "palIntin", "J1", status );
+
+  palIntin ( s, &i, &n, &j );
+  viv ( i, 12, "palIntin", "I2", status );
+  viv ( n, -12345, "palIntin", "V2", status );
+  viv ( j, 1, "palIntin", "J2", status );
+
+  palIntin ( s, &i, &n, &j );
+  viv ( i, 17, "palIntin", "I3", status );
+  viv ( n, 0, "palIntin", "V3", status );
+  viv ( j, -1, "palIntin", "J3", status );
+
+  palIntin ( s, &i, &n, &j );
+  viv ( i, 23, "palIntin", "I4", status );
+  viv ( n, 2000, "palIntin", "V4", status );
+  viv ( j, 0, "palIntin", "J4", status );
+
+  palIntin ( s, &i, &n, &j );
+  viv ( i, 29, "palIntin", "I5", status );
+  viv ( n, 2000, "palIntin", "V5", status );
+  viv ( j, 1, "palIntin", "J5", status ); /* Note that strtol does not care about a + */
+
+}
+
+
 /* Moon */
 
 static void t_moon ( int *status ) {
@@ -1632,6 +1667,7 @@ int main (void) {
   t_geoc(&status);
   t_gmst(&status);
   t_fk52h(&status);
+  t_intin(&status);
   t_prec(&status);
   t_preces(&status);
   t_ecmat(&status);

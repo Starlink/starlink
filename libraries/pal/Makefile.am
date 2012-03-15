@@ -52,6 +52,7 @@ palFk54z.c \
 palGaleq.c \
 palGalsup.c \
 palGeoc.c \
+palIntin.c \
 palMap.c \
 palMappa.c \
 palMapqk.c \
