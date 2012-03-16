@@ -208,10 +208,18 @@ static void t_afin( int * status ) {
   int i = 1;
   double d = 0.0;
   const char * s = "12 34 56.7 |";
+  const char * s2 = "45 00 00.000 ";
 
   palDafin (s, &i, &d, &j);
   viv ( i, 12, "palDafin", "I", status );
   vvd ( d, 0.2196045986911432, 1e-12, "palDafin", "A",
+        status );
+  viv ( j, 0, "palDafin", "J", status );
+
+  i = 1;
+  palDafin (s2, &i, &d, &j);
+  viv ( i, 14, "palDafin", "I", status );
+  vvd ( d, PAL__DPI/4.0, 1e-12, "palDafin", "A",
         status );
   viv ( j, 0, "palDafin", "J", status );
 }

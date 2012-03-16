@@ -149,11 +149,16 @@ void palDfltin( const char * string, int *nstrt,
   } else if ( errno == ERANGE ) {
     *jflag = 2;
   } else {
-    if ( retval < 0 ) {
+    if ( retval < 0.0 ) {
       *jflag = -1;
-    } else if (retval == -0.0) {
-      retval = 0.0;
-      *jflag = -1;
+    } else if ( retval == 0.0 ) {
+      /* Need to distinguish -0 from +0 */
+      double test = copysign( 1.0, retval );
+      if ( test < 0.0 ) {
+        *jflag = -1;
+      } else {
+        *jflag = 0;
+      }
     } else {
       *jflag = 0;
     }
