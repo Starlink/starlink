@@ -92,7 +92,12 @@
 #include <ctype.h>
 
 #include "pal.h"
-#include "star/util.h"
+
+/* We prefer to use the starutil package */
+#if NOSTARUTIL
+#else
+# include "star/util.h"
+#endif
 
 void palDfltin( const char * string, int *nstrt,
                 double *dreslt, int *jflag ) {
@@ -108,7 +113,13 @@ void palDfltin( const char * string, int *nstrt,
   char tempbuf[256];
 
   /* Correct for SLA use of fortran convention */
+#if NOSTARUTIL
+  /* Use standard C interface */
+  strncpy( tempbuf, &(string[*nstrt-1]), sizeof(tempbuf));
+  tempbuf[sizeof(tempbuf)-1] = '\0';
+#else
   star_strlcpy( tempbuf, &(string[*nstrt-1]), sizeof(tempbuf) );
+#endif
 
   /* Convert d or D to E */
   ctemp = tempbuf;

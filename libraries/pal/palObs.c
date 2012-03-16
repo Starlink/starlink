@@ -122,11 +122,28 @@
 *-
 */
 
+#include <string.h>
+
+/* We prefer to use the starutil package. This compiler option is for
+   standalone builds where starutil may not be available. This would
+   require additions to the configure script to set automatically.
+*/
+#if NOSTARUTIL
+
+/* This version is just a straight copy without putting ellipsis on the end. */
+static void star__strellcpy( char * dest, const char * src, size_t size ) {
+  strncpy( dest, src, size );
+  dest[size-1] = '\0';
+}
+
+#define star_strellcpy(dest, src, size) star__strellcpy(dest, src, size)
+
+#else
 #include "star/util.h"
+#endif
+
 #include "pal.h"
 #include "palmac.h"
-
-#include <string.h>
 
 /* Helper macros to convert degrees to radians in longitude and latitude */
 #define WEST(ID,IAM,AS) PAL__DAS2R*((60.0*(60.0*(double)ID+(double)IAM))+(double)AS)
