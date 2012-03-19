@@ -100,7 +100,7 @@
 
 #  History:
 #     14-MAR-1995 (PWD):
-#     	 Original version.
+#        Original version.
 #     4-MAY-1995 (PWD):
 #        Started move to Tk4. Commented out ::rename in destructor, no
 #        longer needed.
@@ -128,7 +128,7 @@ itcl::class gaia::ScrollText {
 
       #  Create text widget.
       itk_component add Text {
-         text $w_.text
+         ::text $w_.text
       } {
          keep -width -height -exportselection -font -foreground -background
       }
@@ -190,14 +190,11 @@ itcl::class gaia::ScrollText {
 
    #  Get information back from the text widget.
    method get { index } {
-      set contents ""
       if { $index != "all" } {
-         set contents [$itk_component(Text) get $index]
+         set contents [$itk_component(Text) get ${index}.0 ${index}.end]
       } else {
-         set size [$itk_component(Text) size]
-         for { set i 0 } { $i < $size } { incr i } {
-            lappend contents [$itk_component(Text) get $i]
-         }
+         set text [$itk_component(Text) get 1.0 end]
+         set contents [split $text "\n"]
       }
       return $contents
    }

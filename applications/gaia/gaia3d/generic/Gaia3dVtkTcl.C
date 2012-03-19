@@ -603,6 +603,7 @@ static int Gaia3dVtkAstGrid( ClientData clientData, Tcl_Interp *interp,
             sprintf( buf, "Failed to apply AST attributes to plot: %s",
                      Tcl_GetString( objv[3] ) );
             Tcl_SetResult( interp, buf, TCL_VOLATILE );
+            astClearStatus;
             return TCL_ERROR;
         }
     }
@@ -612,6 +613,7 @@ static int Gaia3dVtkAstGrid( ClientData clientData, Tcl_Interp *interp,
 
     if ( ! astOK ) {
         Tcl_SetResult( interp, "Failed to draw 3D grid", TCL_VOLATILE );
+        astClearStatus;
         return TCL_ERROR;
     }
     return TCL_OK;

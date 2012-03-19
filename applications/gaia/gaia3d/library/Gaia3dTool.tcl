@@ -360,6 +360,9 @@ itcl::class gaia3d::Gaia3dTool {
       #  Add CUPID import controls.
       add_cupid_controls_
 
+      #  Add AST attribute controls.
+      add_ast_controls_
+
       #  Switch on bad pixel replacement, or not.
       itk_component add replacebad {
          gaia::StarLabelCheck $itk_component(controls).replacebad \
@@ -640,6 +643,47 @@ itcl::class gaia3d::Gaia3dTool {
       }
       pack $itk_component(pixelmask) -side top -fill x -expand 0
       add_short_help $itk_component(pixelmask) {Display pixel masks}
+   }
+
+
+   #  Controls for CUPID catalogue options.
+   protected method add_ast_controls_ {} {
+
+      $itk_component(tab) add -label {Axes attributes}
+      set w [$itk_component(tab) childsite {Axes attributes}]
+
+      itk_component add astframe {
+         frame $w.astframe
+      }
+      pack $itk_component(astframe) -side top -fill x -expand 0
+
+      itk_component add astrule {
+         LabelRule $itk_component(astframe).astrule \
+            -text "AST attributes for axes:"
+      }
+      pack $itk_component(astrule) -side top -fill x -expand 1
+
+      itk_component add asttext {
+         gaia::ScrollText $itk_component(astframe).text
+      }
+      pack $itk_component(asttext) -side top -fill both -expand 1
+
+      set lwidth 21
+   }
+
+   #  Gather AST attributes. If these change we need to re-generate the plot.
+   protected method gather_axes_attributes_ {} {
+      set content [$itk_component(asttext) get all]
+      set result ""
+      foreach line $content {
+         if { $line != {} } {
+            append result "$line,"
+         }
+      }
+      if { $result != $astatts_ } {
+         set astatts_ $result
+         free_plot3d_
+      }
    }
 
    #  Control extra cubes isosurface toolbox.
@@ -1292,13 +1336,13 @@ itcl::class gaia3d::Gaia3dTool {
    #  Free the current Plot3D.
    protected method free_plot3d_ {} {
       if { $plot_ != {} } {
-         gaiautils::astannul $plot_
+         catch {gaiautils::astannul $plot_}
          set plot_ {}
       }
 
       #  Also release the context. A new one will be created for the new plot.
       if { $grf_context_ != {} } {
-         gvtk::grffreecontext $grf_context_
+         catch {gvtk::grffreecontext $grf_context_}
          set grf_context_ {}
       }
    }
@@ -1324,8 +1368,20 @@ itcl::class gaia3d::Gaia3dTool {
    #  Draw a grid using the Plot3D.
    protected method grid_plot3d_ {} {
       if { $plot_ != {} } {
-         gvtk::astgrid $plot_ $ast_textscale_ \
-            "colour(numlab)=$ast_textcolour_,colour(textlab)=$ast_textcolour_"
+
+         #  Gather any user attributes. Need new plot if any attributes have
+         #  changed.
+         gather_axes_attributes_
+         if { $plot_ == {} } {
+            create_plot3d_
+         }
+
+         #  And UI preferences.
+         set atts "colour(numlab)=$ast_textcolour_"
+         append atts ",colour(textlab)=$ast_textcolour_,"
+         append atts "$astatts_"
+
+         gvtk::astgrid $plot_ $ast_textscale_ $atts
       }
    }
 
@@ -1613,6 +1669,10 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Whether user preference for handling masks has changed.
    protected variable changed_mask_ 0
+
+   #  Last set of AST attributes applied. If these change then a new 
+   #  plot is required.
+   protected variable astatts_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
