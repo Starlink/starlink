@@ -556,7 +556,12 @@ static int Gaia3dVtkAstPlot( ClientData clientData, Tcl_Interp *interp,
         atts = Tcl_GetString( objv[3] );
     }
 
-    AstPlot3D *plot = astPlot3D( wcs, graphbox, basebox, atts );
+    /* Use a copy of the main AST FrameSet so we do not make any permanent
+     * modifications (that cannot be undone).
+     */
+    AstFrameSet *copy = (AstFrameSet *) astCopy( wcs );
+    AstPlot3D *plot = astPlot3D( copy, graphbox, basebox, atts );
+    copy = (AstFrameSet *) astAnnul( copy );
     if ( !plot || ! astOK ) {
         if ( !astOK ) astClearStatus;
         Tcl_SetResult( interp, "Failed to create Plot3D", TCL_VOLATILE );
@@ -726,7 +731,7 @@ static int Gaia3dVtkColourMap( ClientData clientData, Tcl_Interp *interp,
         Tcl_SetResult( interp, (char *) os.str().c_str(), TCL_VOLATILE );
         return TCL_OK;
     }
-    else if ( objc != 4  & objc != 6 ) {
+    else if ( objc != 4 && objc != 6 ) {
         Tcl_WrongNumArgs( interp, 1, objv, usage );
         return TCL_ERROR;
     }
