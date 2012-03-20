@@ -512,8 +512,10 @@ itcl::class gaia::GaiaCubeApps {
       Mode ""
       Median ""
       Absdev {Mean absolute deviation}
+      CMean {Clipped mean}
       Comax {Co-ordinate of the maximum value}
       Comin {Co-ordinate of the minimum value}
+      CSigma {Clipped standard deviation}
       Integ {Integrated value}
       Iwc {Intensity-weighted co-ordinate}
       Iwd {Intensity-weighted dispersion}
