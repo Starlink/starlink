@@ -982,7 +982,7 @@ itcl::class gaia3d::Gaia3dTool {
       set spectral_colour_ [gaia::AstColours::lookup_colour 5]
       changed_spectral_colour_
 
-      set ast_textscale_ 5.0
+      set ast_textscale_ 5
       changed_ast_textscale_
 
       set ast_textcolour_ 1
@@ -1625,7 +1625,7 @@ itcl::class gaia3d::Gaia3dTool {
    protected variable spectral_colour_menu_ {}
 
    #  The AST axes text scale.
-   protected variable ast_textscale_ 5.0
+   protected variable ast_textscale_ 5
 
    #  The colour of the AST axes text. AST index.
    protected variable ast_textcolour_ 1
