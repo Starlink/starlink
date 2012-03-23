@@ -183,7 +183,6 @@
 #include "pal.h"
 #include "palmac.h"
 #include "sofa.h"
-#include "sofam.h"
 
 /* Only needed in one place */
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -345,7 +344,7 @@ void palPertue( double date, double u[13], int *jstat ) {
   if (fabs(TSPAN) > 36525.0) *jstat=101;
 
   /*  Time direction: +1 for forwards, -1 for backwards. */
-  FB = dsign(1.0,TSPAN);
+  FB = copysign(1.0,TSPAN);
 
   /*  Initialize relative epoch for start of current timestep. */
   RTN = 0.0;
