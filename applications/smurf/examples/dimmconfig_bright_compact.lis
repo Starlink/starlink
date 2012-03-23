@@ -30,10 +30,6 @@ maptol=0.05
 ast.zero_circle = (0.0166666666)
 ast.zero_notlast = 1
 
-# also use the same mask to ignore samples that see the source when
-# calculating and fitting the common-mode signal.
-com.zero_circle = 0.0166666666
-
 # Per array common-mode should be fine here since we are dealing with
 # a compact source. It seems to make things more stable.
 com.perarray = 1

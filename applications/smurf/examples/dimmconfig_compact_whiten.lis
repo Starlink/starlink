@@ -40,9 +40,6 @@ ast.zero_notlast = 1
 # common-mode will not be used to flag bad data
 com.noflag=1
 
-#  Ignore samples that see the source when calculating the common-mode
-com.zero_circle = 0.025
-
 # Per array common-mode should be fine here since we are dealing with
 # a compact source. It seems to make things more stable.
 com.perarray = 1
