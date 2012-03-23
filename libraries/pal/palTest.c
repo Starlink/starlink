@@ -597,6 +597,19 @@ static void t_geoc( int *status ) {
 
 }
 
+/* Galactic to Fk4 */
+
+static void t_ge50 ( int *status ) {
+  double dr, dd;
+  palGe50( 6.1, -1.55, &dr, &dd );
+  vvd ( dr, 0.1966825219934508, 1e-12, "palGe50",
+        "DR", status );
+  vvd ( dd, -0.4924752701678960, 1e-12, "palGe50",
+        "DD", status );
+
+
+}
+
 /* GMST */
 
 /* We use the SOFA test values rather than the values from SLA
@@ -1672,6 +1685,7 @@ int main (void) {
   t_flotin(&status);
   t_galeq(&status);
   t_galsup(&status);
+  t_ge50(&status);
   t_geoc(&status);
   t_gmst(&status);
   t_fk52h(&status);
