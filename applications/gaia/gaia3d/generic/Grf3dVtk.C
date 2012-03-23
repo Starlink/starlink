@@ -1425,7 +1425,8 @@ static void TextOrientation( float ref[3], float up[3], float norm[3],
      * viewed "normally" on the screen. If the existing vectors cause the text
      * to be viewed from the back rather than the front, reverse the rx and rz
      * vectors so that the text is viewed from the front. */
-    if ( vtkMath::Dot( rz, eye ) < 0.0f ) {
+    if ( vtkMath::Dot( rz, eye ) <= 0.0f ) {
+
          rz[0] = -rz[0];
          rz[1] = -rz[1];
          rz[2] = -rz[2];
@@ -1452,7 +1453,8 @@ static void TextOrientation( float ref[3], float up[3], float norm[3],
     vup[0] = (float) dvup[0];
     vup[1] = (float) dvup[1];
     vup[2] = (float) dvup[2];
-    if ( vtkMath::Dot( ry, vup ) < 0.0 ) {
+    if ( vtkMath::Dot( ry, vup ) <= 0.0 ) {
+
         ry[0] = -ry[0];
         ry[1] = -ry[1];
         ry[2] = -ry[2];
