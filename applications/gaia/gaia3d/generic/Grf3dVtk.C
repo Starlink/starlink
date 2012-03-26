@@ -45,7 +45,7 @@
 #define MAXCOLOURS 64
 #define MAXTYPES 10
 #define MAXSTIPPLES 4
-#define TEXTFUDGE 1.4
+#define TEXTFUDGE 1.0            /* No longer used */
 
 /* Header files. */
 /* ============= */
