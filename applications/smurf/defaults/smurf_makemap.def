@@ -166,6 +166,16 @@ flt.filt_wlim = <undef>
 # smf_calcmodel_noi
 noi.calcfirst = 0
 
+#  Determines the number of time slices in a box used to determine the
+#  noise level in a section of a bolometer time stream. If zero, then
+#  the whole bolometer time stream is used, and each bolometer has only
+#  one variance value. If non-zero, the time stream is divided up into
+#  boxes, and a separate variance found for each box. Each bolometer then
+#  has a variance value for every time slice. Negative values are
+#  interpreted as number of seconds, and positive values as a number of
+#  down-sampled time slices.
+noi.box_size = 0
+
 # these are a subset of smf_get_cleanpar options
 
 noi.dcfitbox = 0

@@ -119,6 +119,8 @@
 *        mean-shift filter should work OK here since the COM signal will
 *        already have been removed and so the residuals should be
 *        basically flat.
+*     2012-03-27 (DSB):
+*        Modified to allow separate noise estimates for blocks of time slices.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -167,6 +169,8 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status) {
 
   /* Local Variables */
+  dim_t boxsize;                /* No. of time slices in each noise box */
+  smfData *box = NULL;          /* SmfData holding one box of input data */
   size_t bstride;               /* bolometer stride */
   int calcfirst=0;              /* Were bolo noises already measured? */
   int dclimcorr;                /* Min number of correlated steps */
@@ -174,11 +178,17 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t dcfitbox;               /* Width of box for DC step detection */
   double dcthresh;              /* Threshold for DC step detection */
   dim_t dcsmooth;               /* Width of median filter in DC step detection*/
+  double *din;                  /* Pointer to next input value */
+  double *dout;                 /* Pointer to next output value */
   int fillgaps;                 /* If set perform gap filling */
   dim_t i;                      /* Loop counter */
+  dim_t ibolo;                  /* Bolometer index */
+  int ibox;                     /* Index of current noise box */
+  dim_t itime;                  /* Time slice index */
   dim_t id;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   dim_t im;                     /* Loop counter */
+  JCMTState *instate=NULL;      /* Pointer to input JCMTState */
   dim_t j;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
   size_t mbstride;              /* model bolometer stride */
@@ -187,18 +197,28 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
+  int nbox = 0;                 /* Number of noise boxes */
   size_t nchisq;                /* Number of data points in chisq calc */
+  dim_t nelbox;                 /* Number of data points in a noise box */
   dim_t ndata;                  /* Total number of data points */
   size_t nflag;                 /* Number of new flags */
+  int nleft;                    /* Number of samples not in a noise box */
   dim_t ntslice;                /* Number of time slices */
+  size_t pend;                  /* Last non-PAD sample */
+  size_t pstart;                /* First non-PAD sample */
+  smf_qual_t *qin;              /* Pointer to next input quality value */
+  smf_qual_t *qout;             /* Pointer to next output quality value */
   smfArray *qua=NULL;           /* Pointer to RES at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to RES at chunk */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t spikebox=0;            /* Box size for spike detection */
   double spikethresh=0;         /* Threshold for spike detection */
+  size_t tend;                  /* Last input sample to copy */
+  size_t tstart;                /* First input sample to copy */
   size_t tstride;               /* time slice stride */
   double *var=NULL;             /* Sample variance */
+  size_t xbstride;              /* Box bolometer stride */
   int zeropad;                  /* Pad with zeros? */
 
   /* Main routine */
@@ -261,23 +281,171 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
       if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) ) {
 
-        var = astMalloc( nbolo*sizeof(*var) );
+        /* There are two forms for the NOI model: one constant noise value
+           for each bolometer, or "ntslice" noise values for each bolometer.
+           Handle the first case now. */
+        if( mntslice == 1 ) {
 
-        if (var) {
+          var = astMalloc( nbolo*sizeof(*var) );
 
-          /* Measure the noise from power spectra */
-          smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
-                         SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
-                         var, NULL, NULL, status );
+          if (var) {
 
-          for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
-              /* Loop over time and store the variance for each sample */
-              for( j=0; j<mntslice; j++ ) {
-                model_data[i*mbstride+(j%mntslice)*mtstride] = var[i];
+            /* Measure the noise from power spectra */
+            smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
+                           SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
+                           var, NULL, NULL, status );
+
+            for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+                /* Loop over time and store the variance for each sample */
+                for( j=0; j<mntslice; j++ ) {
+                  model_data[i*mbstride+(j%mntslice)*mtstride] = var[i];
+                }
               }
+
+            var = astFree( var );
+          }
+
+
+        /* If the NOI model is of the second form, the noise is estimated
+           in boxes of samples lasting "NOI.BOX_SIZE" seconds, and then the
+           noise level in the box is assigned to all samples in the box. */
+        } else if( mntslice == ntslice ) {
+
+          /* If not already done, get NOI.BOX_SIZE and convert from seconds to
+             samples. */
+          if( idx == 0 ) {
+            boxsize = 0;
+            smf_get_nsamp( kmap, "BOX_SIZE", res->sdata[0], &boxsize, status );
+
+            msgOutf( "", FUNC_NAME ": Calculating a NOI variance for each "
+                     "box of %d samples.", status, (int) boxsize );
+
+            /* Find the indices of the first and last non-PAD sample. */
+            smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD,
+                               &pstart, &pend, status );
+
+            /* How many whole boxes fit into this range? */
+            nbox = ( pend - pstart + 1 ) / boxsize;
+            if( nbox == 0 ) nbox = 1;
+
+            /* How many samples would be left over at the end if we used this
+               many boxes? */
+            nleft = ( pend - pstart + 1 ) - nbox*boxsize;
+
+            /* Increase "boxsize" to reduce this number as far as possible.
+               Any samples that are left over after this increase of boxsize
+               will not be used when calculating the noise levels in each
+               bolometer. */
+            boxsize += nleft/nbox;
+
+            /* Create a smfData to hold one box-worth of input data. We
+               do not need to copy jcmtstate information. */
+            if( res->sdata[idx]->hdr ) {
+               instate = res->sdata[idx]->hdr->allState;
+               res->sdata[idx]->hdr->allState = NULL;
+            }
+            box = smf_deepcopy_smfData( res->sdata[idx], 0,
+                                        SMF__NOCREATE_DATA |
+                                        SMF__NOCREATE_VARIANCE |
+                                        SMF__NOCREATE_QUALITY,
+                                        0, 0, status );
+            if( instate ) res->sdata[idx]->hdr->allState = instate;
+
+            /* Set the length of the time axis to the box size plus padding,
+               and create empty data and quality arrays for it. */
+            if( *status == SAI__OK ) {
+               box->dims[  box->isTordered?2:0 ] = boxsize + pstart + (ntslice - pend - 1);
+               smf_get_dims( box, NULL, NULL, NULL, NULL, &nelbox,
+                             &xbstride, NULL, status );
+               box->pntr[0] = astMalloc( sizeof( double )*nelbox );
+               box->qual = astMalloc( sizeof( smf_qual_t )*nelbox );
+
+               /* For every bolometer, flag the start and end of the quality
+                  array as padding, and store zeros in the data array. */
+               for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+                  dout = ((double *) box->pntr[0]) + xbstride*ibolo;
+                  qout = box->qual + xbstride*ibolo;
+                  for( itime = 0; itime < pstart; itime++ ) {
+                     *(qout++) = SMF__Q_PAD;
+                     *(dout++) = 0.0;
+                  }
+
+                  dout = ((double *) box->pntr[0]) + xbstride*ibolo + pstart + boxsize;;
+                  qout = box->qual + xbstride*ibolo + pstart + boxsize;
+                  for( itime = pend + 1; itime < ntslice; itime++ ) {
+                     *(qout++) = SMF__Q_PAD;
+                     *(dout++) = 0.0;
+                  }
+               }
+            }
+          }
+
+          /* Work space to hold the variance for each bolometer in a box */
+          var = astMalloc( nbolo*sizeof(*var) );
+          if( *status == SAI__OK ) {
+
+            /* Index of the first time slice within the input smfData
+               that is included in the first box. */
+            tstart = pstart;
+
+            /* Loop round each noise box */
+            for( ibox = 0; ibox < nbox; ibox++ ) {
+
+               /* Copy the data and quality values for this box from the
+                 input smfData into "box", leaving room for padding at
+                 both ends of box. Note, data is bolo-ordered so we
+                 can assume that "tstride" is 1. */
+               din = ((double *)(res->sdata[idx]->pntr[0])) + tstart;
+               dout = ((double *)(box->pntr[0])) + pstart;
+               qin = qua_data + tstart;
+               qout = box->qual + pstart;
+
+               for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+                  memcpy( dout, din, boxsize*sizeof( *din ) );
+                  memcpy( qout, qin, boxsize*sizeof( *qin ) );
+                  din += bstride;
+                  dout += xbstride;
+                  qin += bstride;
+                  qout += xbstride;
+               }
+
+               /* Measure the noise from power spectra in the box. */
+               smf_bolonoise( wf, box, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI,
+                              0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT, var,
+                              NULL, NULL, status );
+
+               /* Loop over time and store the variance for each sample in
+                  the NOI model. On the last box, pick up any left over time
+                  slices. */
+               if( ibox < nbox - 1 ) {
+                  tend = tstart + boxsize - 1;
+               } else {
+                  tend = pend;
+               }
+
+               for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+                  if( !( qua_data[ ibolo*bstride ] & SMF__Q_BADB ) ) {
+                     dout =  model_data + ibolo*bstride + tstart;
+                     for( itime = tstart; itime <= tend; itime++ ) {
+                        *(dout++) = var[ ibolo ];
+                     }
+                  }
+               }
+
+               /* Update the index of the first time slice within the input
+                  smfData that is included in the next box. */
+               tstart += boxsize;
             }
 
-          var = astFree( var );
+            var = astFree( var );
+          }
+
+        /* Report an error if the number of samples for each bolometer in
+           the NOI model is not 1 or "ntslice". */
+        } else if( *status == SAI__OK ) {
+           *status = SAI__ERROR;
+           errRepf( "", FUNC_NAME ": NOI model has %d samples - should be "
+                    "%d or 1.", status, (int) mntslice, (int) ntslice);
         }
       }
 
@@ -317,6 +485,13 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
         }
       }
     }
+  }
+
+  /* Free resources */
+  if( box ) {
+     box->pntr[0] = astFree( box->pntr[0] );
+     box->qual = astFree( box->qual );
+     smf_close_file( &box, status );
   }
 
   /* Normalize chisquared for this chunk */

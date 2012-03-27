@@ -41,7 +41,7 @@
 *        Details of heater efficiency data to be applied during flatfielding.
 *     noisemaps = const smfArray * (Given)
 *        smfArray of 2d smfData's containing externally-calculated noise maps
-*        which, if supplied, are ued to initialize the NOI model.
+*        which, if supplied, are used to initialize the NOI model.
 *     nchunks = dim_t (Given)
 *        If iarray specified instead of igroup, nchunks gives number of
 *        smfArrays in iarray (otherwise it is derived from igroup).
@@ -274,6 +274,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
   size_t buflen = 0;            /* datalen + headlen */
+  int calcfirst = 0;            /* Value of NOI.CALCFIRST */
   int copyinput=0;              /* If set, container is copy of input */
   smfData *data = NULL;         /* Data struct for file */
   size_t datalen=0;             /* Size of data buffer in bytes */
@@ -586,7 +587,25 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
             break;
 
           case SMF__NOI: /* Noise model */
-            /* Currently just one variance for each bolometer */
+
+            /* Get the number of variance values per bolometer. This is
+               one, unless NOI.BOX_SIZE is set non-zero in which case it
+               is "ntslice". */
+            astMapGet0A( keymap, "NOI", &kmap );
+            dim_t boxsize = 0;
+            smf_get_nsamp( kmap, "BOX_SIZE", idata, &boxsize, status );
+            astMapGet0I( kmap, "CALCFIRST", &calcfirst );
+            kmap = astAnnul( kmap );
+            if( boxsize ) {
+               if( calcfirst && *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRep( " ", FUNC_NAME ": Configuration parameters "
+                          "NOI.CALCFIRST and NOI.BOX_SIZE are both "
+                          "non-zero - this is not allowed.", status );
+               }
+            }
+            dim_t nointslice = boxsize ? idata->dims[isTordered?2:0] : 1;
+
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
             if (idata && idata->hdr) {
@@ -598,13 +617,13 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
             if( isTordered )  { /* T is 3rd axis if time-ordered */
               head.data.dims[0] = (idata->dims)[0];
               head.data.dims[1] = (idata->dims)[1];
-              head.data.dims[2] = 1;
+              head.data.dims[2] = nointslice;
 
               head.data.lbnd[0] = (idata->lbnd)[0];
               head.data.lbnd[1] = (idata->lbnd)[1];
               head.data.lbnd[2] = 1;
             } else {           /* T is 1st axis if bolo-ordered */
-              head.data.dims[0] = 1;
+              head.data.dims[0] = nointslice;
               head.data.dims[1] = (idata->dims)[1];
               head.data.dims[2] = (idata->dims)[2];
 
@@ -915,10 +934,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
               }
 
             } else if( mtype == SMF__NOI ) {
-              int calcfirst;
 
               astMapGet0A( keymap, "NOI", &kmap );
-              astMapGet0I( kmap, "CALCFIRST", &calcfirst );
               astMapGet0I( kmap, "ZEROPAD", &zeropad );
               kmap = astAnnul( kmap );
 
@@ -926,7 +943,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                             NULL, NULL, status);
 
               if( calcfirst ) {
-                /* If calcfirst flag is set, initialize NOI using noise
+                /* If calcfirst flag is set, we know that there is one
+                   variance for each bolometer. initialize NOI using noise
                    measured in the bolometer now (i.e. before the first
                    iteration). Use externally-supplied noise values
                    if provided. */

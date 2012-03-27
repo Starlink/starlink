@@ -491,6 +491,17 @@ dks.replacebad = 0
 # share a single FFT.
 #noi.calcfirst = 1
 
+#  Determines the number of time slices used to determine the noise level
+#  in a section of a bolometer time stream. If zero, then the whole bolometer
+#  time stream is used, and each bolometer has only one variance value. If
+#  non-zero, each bolometer time stream is divided up into boxes
+#  containing the specified number of time slices, and a separate variance
+#  is found for each box. This variance is then used for each sample in the
+#  box, so each bolometer ends up with a variance for every time slice.
+#  Negative values are interpreted as number of seconds, and positive values
+#  as a number of down-sampled time slices. The default is zero.
+#  noi.box_size = -30.0
+
 # additional despiking / DC step finding after each iteration within noi
 # calculation. Setting noi.spikebox to 50 will check for excursions
 # from a rolling median filter in a box of length 50 samples (negative
