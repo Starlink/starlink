@@ -48,9 +48,9 @@
 *        daily motion (radians, JFORM=1 only)
 *     jstat = int * (Returned)
 *        status:  0 = OK
-*                -1 = illegal PMASS
-*                -2 = illegal JFORMR
-*                -3 = position/velocity out of range
+*               - -1 = illegal PMASS
+*               - -2 = illegal JFORMR
+*               - -3 = position/velocity out of range
 
 *  Description:
 *     Heliocentric osculating elements obtained from instantaneous position

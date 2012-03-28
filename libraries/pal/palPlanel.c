@@ -51,11 +51,11 @@
 *           (12)  universal eccentric anomaly (psi) of date, approx
 *     jstat = int * (Returned)
 *        status:  0 = OK
-*                -1 = illegal JFORM
-*                -2 = illegal E
-*                -3 = illegal AORQ
-*                -4 = illegal DM
-*                -5 = numerical error
+*              - -1 = illegal JFORM
+*              - -2 = illegal E
+*              - -3 = illegal AORQ
+*              - -4 = illegal DM
+*              - -5 = numerical error
 
 *  Description:
 *     Heliocentric position and velocity of a planet, asteroid or comet,

@@ -25,10 +25,10 @@
 *        heliocentric x,y,z,xdot,ydot,zdot, J2000, equatorial triad
 *        in units AU and AU/s.
 *     j = int * (Returned)
-*        -2 = solution didn't converge.
-*        -1 = illegal np (1-8)
-*         0 = OK
-*        +1 = warning: year outside 1000-3000
+*        - -2 = solution didn't converge.
+*        - -1 = illegal np (1-8)
+*        -  0 = OK
+*        - +1 = warning: year outside 1000-3000
 
 *  Description:
 *     Calculates the approximate heliocentric position and velocity of

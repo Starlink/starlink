@@ -56,11 +56,11 @@
 *        Distance from observer (AU)
 *     jstat = int * (Returned)
 *        status: 0 = OK
-*               -1 = illegal jform
-*               -2 = illegal e
-*               -3 = illegal aorq
-*               -4 = illegal dm
-*               -5 = numerical error
+*             - -1 = illegal jform
+*             - -2 = illegal e
+*             - -3 = illegal aorq
+*             - -4 = illegal dm
+*             - -5 = numerical error
 
 *  Authors:
 *     PTW: Pat Wallace (STFC)

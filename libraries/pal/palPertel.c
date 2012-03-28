@@ -56,15 +56,16 @@
 *     am1 = double * (Returned)
 *        mean anomaly (radians, JFORM=2 only)
 *     jstat = int * (Returned)
-*        status:  +102 = warning, distant epoch
-*                 +101 = warning, large timespan ( > 100 years)
-*            +1 to +10 = coincident with planet (Note 6)
-*                    0 = OK
-*                   -1 = illegal JFORM
-*                   -2 = illegal E0
-*                   -3 = illegal AORQ0
-*                   -4 = internal error
-*                   -5 = numerical error
+*        status:
+*          -      +102 = warning, distant epoch
+*          -      +101 = warning, large timespan ( > 100 years)
+*          - +1 to +10 = coincident with planet (Note 6)
+*          -         0 = OK
+*          -        -1 = illegal JFORM
+*          -        -2 = illegal E0
+*          -        -3 = illegal AORQ0
+*          -        -4 = internal error
+*          -        -5 = numerical error
 
 *  Description:
 *     Update the osculating orbital elements of an asteroid or comet by

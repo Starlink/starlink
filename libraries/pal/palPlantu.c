@@ -29,15 +29,15 @@
 *        Observer's geodetic latitude (radians)
 *     u = const double [13] (Given)
 *        Universal orbital elements
-*            (0)  combined mass (M+m)
-*            (1)  total energy of the orbit (alpha)
-*            (2)  reference (osculating) epoch (t0)
-*          (3-5)  position at reference epoch (r0)
-*          (6-8)  velocity at reference epoch (v0)
-*            (9)  heliocentric distance at reference epoch
-*           (10)  r0.v0
-*           (11)  date (t)
-*           (12)  universal eccentric anomaly (psi) of date, approx
+*          -   (0)  combined mass (M+m)
+*          -   (1)  total energy of the orbit (alpha)
+*          -   (2)  reference (osculating) epoch (t0)
+*          - (3-5)  position at reference epoch (r0)
+*          - (6-8)  velocity at reference epoch (v0)
+*          -   (9)  heliocentric distance at reference epoch
+*          -  (10)  r0.v0
+*          -  (11)  date (t)
+*          -  (12)  universal eccentric anomaly (psi) of date, approx
 *     ra = double * (Returned)
 *        Topocentric apparent RA (radians)
 *     dec = double * (Returned)
@@ -46,8 +46,8 @@
 *        Distance from observer (AU)
 *     jstat = int * (Returned)
 *        status: 0 = OK
-*               -1 = radius vector zero
-*               -2 = failed to converge
+*             - -1 = radius vector zero
+*             - -2 = failed to converge
 
 *  Authors:
 *     PTW: Pat Wallace (STFC)

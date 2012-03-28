@@ -40,22 +40,22 @@
 *        daily motion (radians, JFORM=1 only)
 *     u = double [13] (Returned)
 *        Universal orbital elements (Note 1)
-*            (0)  combined mass (M+m)
-*            (1)  total energy of the orbit (alpha)
-*            (2)  reference (osculating) epoch (t0)
-*          (3-5)  position at reference epoch (r0)
-*          (6-8)  velocity at reference epoch (v0)
-*            (9)  heliocentric distance at reference epoch
-*           (10)  r0.v0
-*           (11)  date (t)
-*           (12)  universal eccentric anomaly (psi) of date, approx
+*          -   (0)  combined mass (M+m)
+*          -   (1)  total energy of the orbit (alpha)
+*          -   (2)  reference (osculating) epoch (t0)
+*          - (3-5)  position at reference epoch (r0)
+*          - (6-8)  velocity at reference epoch (v0)
+*          -   (9)  heliocentric distance at reference epoch
+*          -  (10)  r0.v0
+*          -  (11)  date (t)
+*          -  (12)  universal eccentric anomaly (psi) of date, approx
 *     jstat = int * (Returned)
 *        status:  0 = OK
-*                -1 = illegal JFORM
-*                -2 = illegal E
-*                -3 = illegal AORQ
-*                -4 = illegal DM
-*                -5 = numerical error
+*              - -1 = illegal JFORM
+*              - -2 = illegal E
+*              - -3 = illegal AORQ
+*              - -4 = illegal DM
+*              - -5 = numerical error
 
 *  Description:
 *      Transform conventional osculating elements into "universal" form.
