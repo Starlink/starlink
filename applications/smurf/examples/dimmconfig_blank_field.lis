@@ -54,3 +54,6 @@ spikebox = 50
 450.filt_edge_largescale = 200
 850.filt_edge_largescale = 200
 
+# Large-scale structure is not an issue so treat each subarray independently
+# for common-mode removal
+com.perarray = 1
