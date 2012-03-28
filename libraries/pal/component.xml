@@ -15,7 +15,7 @@
     except for the use of a "pal" prefix.
     </p></abstract>
   <dependencies >
-    <build>sofa</build><build>starutil</build><link>sofa</link><link>starutil</link>
+    <build>sofa</build><build>starutil</build><link>sofa</link><link>starutil</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -23,7 +23,7 @@
       <uname>t.jenness@jach.hawaii.edu</uname>
     </person>
   </developers>
-  <documentation></documentation>
+  <documentation> sun267</documentation>
   <bugreports>stardev@jiscmail.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

@@ -1,0 +1,6075 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2012 Science and Technology Facilities Council}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {267.1}
+\newcommand{\stardocauthors}   {Tim Jenness}
+\newcommand{\stardocdate}      {2012 March 23}
+\newcommand{\stardoctitle}     {PAL --- Positional Astronomy Library}
+\newcommand{\stardocversion}   {0.1.0}
+\newcommand{\stardocmanual}    {Programmer's Manual}
+\newcommand{\stardocabstract}  {
+PAL provides a subset of the Fortran SLALIB library but written in C
+using the SLALIB C API. Where possible the PAL routines are
+implemented using the C SOFA library. It is provided with a GPL license.
+}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+%+
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty 
+%     on your TEXINPUTS path (and including the name as part of the  
+%     documentstyle declaration).
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+%     MJC: Malcolm J. Currie (STARLINK)
+%     DSB: David Berry (STARLINK)
+%     TIMJ: Tim Jenness (JAC)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     1995 October 4 (MJC):
+%        Added goodbreaks and pagebreak[3] in various places to improve
+%        pages breaking before headings, not immediately after.
+%        Corrected banner width.
+%     1996 March 7 (MJC):
+%        Mark document name on both sides of an sstroutine.
+%     2-DEC-1998 (DSB):
+%        Added sstattributetype (copied from sun210.tex).
+%     2004 August 6 (MJC):
+%        Added sstattribute.
+%     21-JUL-2009 (TIMJ):
+%        Added \sstdiylist{}{} as used when a Parameters section is located that
+%        is not "ADAM Parameters".
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+% Frame attributes fount.  Need to find a way for these to stand out.
+% San serif doesn't work by default.  Also without the \rm the
+% san serif continues after \sstatt hyperlinks.  Extra braces
+% failed to prevent \sstattribute from using roman fount for its 
+% headings.  The current lash up appears to work, but needs further 
+% investigation or a TeX wizard.
+\newcommand{\sstatt}[1]{\sf #1}
+\begin{htmlonly}
+  \newcommand{\sstatt}[1]{\large{\tt #1}}
+\end{htmlonly}
+
+%  Define a command to produce an attribute header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstattribute}[3]{
+   \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\sstatt #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.9pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\sstatt #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\sstatt #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\goodbreak \item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the attribute data type section.
+\newcommand{\sstattributetype}[1]{
+   \item[Type:] \mbox{} \\
+      #1
+}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \goodbreak 
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the applicability section.
+\newcommand{\sstapplicability}[1]{
+   \item[Class Applicability:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \goodbreak
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\goodbreak \item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
+
+%  Format the a generic section as a list
+\newcommand{\sstdiylist}[2]{
+   \item[#1:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #2
+   \end{description}
+}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstattribute. Note the further level of subsectioning.
+   \newcommand{\sstattribute}[3]{
+      \subsubsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+      \\
+   }
+
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstapplicability
+   \newcommand{\sstapplicability}[1]{%
+      \item[Class Applicability:]
+       \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2\\}
+
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+      \\
+   }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
+\end{htmlonly}
+
+%  End of sst.tex layout definitions.
+%.
+
+
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   \textsc{Joint Astronomy Centre} \hfill \textbf{\stardocname}\\
+   {\large Science \& Technology Facilities Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{Joint Astronomy Centre}
+                        {http://www.jach.hawaii.edu} \\
+      \htmladdnormallink{Science \& Technology Facilities Council}
+                        {http://www.scitech.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+%  \newpage
+ % \begin{latexonly}
+  %  \setlength{\parskip}{0mm}
+   % \tableofcontents
+   % \setlength{\parskip}{\medskipamount}
+   % \markboth{\stardocname}{\stardocname}
+  %\end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+
+\section{Introduction}
+
+This library provides a C library designed as a API-compatible
+replacement for the C SLALIB library () and uses a GPL licence so is
+freely redistributable. Where possible the functions call equivalent
+SOFA routines and use current IAU 2006 standards. This means that any
+functions that rely on nutation or precession will return slightly
+different answers to the SLA functions.
+
+\clearpage
+\appendix
+\section{\label{APP:SPEC}Function Descriptions}
+
+\subsection{SOFA Mappings}
+
+The following table lists PAL/SLA functions that have direct
+replacements in SOFA. Whilst these routines are implemented in the PAL
+library using SOFA new code should probably call SOFA directly.
+
+\begin{tabular}{ll}
+SLA/PAL &  SOFA \\
+\texttt{palCldj} & \texttt{iauCal2jd} \\
+\texttt{palDbear} & \texttt{iauPas} \\
+\texttt{palDaf2r} & \texttt{iauAf2a} \\
+\texttt{palDav2m} &  \texttt{iauRv2m} \\
+\texttt{palDcc2s} &  \texttt{iauC2s} \\
+\texttt{palDcs2c} & \texttt{iauS2c} \\
+\texttt{palDd2tf} & \texttt{iauD2tf}\\
+\texttt{palDimxv} & \texttt{iauTrxp}\\
+\texttt{palDm2av} & \texttt{iauRm2v}\\
+\texttt{palDjcl} & \texttt{iauJd2cal}\\
+\texttt{palDmxm} & \texttt{iauRxr}\\
+\texttt{palDmxv} & \texttt{iauRxp}\\
+\texttt{palDpav} & \texttt{iauPap}\\
+\texttt{palDr2af} & \texttt{iauA2af}\\
+\texttt{palDr2tf} & \texttt{iauA2tf}\\
+\texttt{palDrange} & \texttt{iauAnpm}\\
+\texttt{palDranrm} & \texttt{iauAnp}\\
+\texttt{palDsep} & \texttt{iauSeps}\\
+\texttt{palDsepv} & \texttt{iauSepp}\\
+\texttt{palDtf2d} & \texttt{iauTf2d}\\
+\texttt{palDtf2r} & \texttt{iauTf2a}\\
+\texttt{palDvdv} & \texttt{iauPdp}\\
+\texttt{palDvn} & \texttt{iauPn}\\
+\texttt{palDvxv} & \texttt{iauPxp}\\
+\texttt{palEpb} & \texttt{iauEpb}\\
+\texttt{palEpb2d} & \texttt{iauEpb2d}\\
+\texttt{palEpj} & \texttt{iauEpj}\\
+\texttt{palEpj2d} & \texttt{iauEpj2jd}\\
+\texttt{palEqeqx} & \texttt{iauEe06a}\\
+\texttt{palFk5hz} & \texttt{iauFk5hz} \textit{also calls iauEpj2jd}\\
+\texttt{palGmst} & \texttt{iauGmst06}\\
+\texttt{palGmsta} & \texttt{iauGmst06}\\
+\texttt{palHfk5z} & \texttt{iauHfk5z} \textit{also calls iauEpj2jd}\\
+\end{tabular}
+
+
+\subsection{More complex functions}
+
+These functions do not have a simple equivalent in SOFA so are
+reimplemented either completely standalone or using multiple
+SOFA functions.
+
+%% Regenerate everything after this from the prologues using SST by
+%% running "make palsun.tex". We do not build this automatically as
+%% there is no particular need for an SST dependency.
+
+%% Some manual tweaking is required after creating the SST tex.
+
+\sstroutine{
+   palAddet
+}{
+   Add the E-terms to a pre IAU 1976 mean place
+}{
+   \sstdescription{
+      Add the E-terms (elliptic component of annual aberration)
+      to a pre IAU 1976 mean place to conform to the old
+      catalogue convention.
+   }
+   \sstinvocation{
+      void palAddet ( double rm, double dm, double eq,
+                      double $*$rc, double $*$dc );
+   }
+   \sstarguments{
+      \sstsubsection{
+         rm = double (Given)
+      }{
+         RA without E-terms (radians)
+      }
+      \sstsubsection{
+         dm = double (Given)
+      }{
+         Dec without E-terms (radians)
+      }
+      \sstsubsection{
+         eq = double (Given)
+      }{
+         Besselian epoch of mean equator and equinox
+      }
+      \sstsubsection{
+         rc = double $*$ (Returned)
+      }{
+         RA with E-terms included (radians)
+      }
+      \sstsubsection{
+         dc = double $*$ (Returned)
+      }{
+         Dec with E-terms included (radians)
+      }
+   }
+   \sstnotes{
+      Most star positions from pre-1984 optical catalogues (or
+      derived from astrometry using such stars) embody the
+      E-terms.  If it is necessary to convert a formal mean
+      place (for example a pulsar timing position) to one
+      consistent with such a star catalogue, then the RA,Dec
+      should be adjusted using this routine.
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      Explanatory Supplement to the Astronomical Ephemeris,
+      section 2D, page 48.
+   }
+}
+\sstroutine{
+   palAirmas
+}{
+   Air mass at given zenith distance
+}{
+   \sstdescription{
+      Calculates the airmass at the observed zenith distance.
+   }
+   \sstinvocation{
+      double palAirmas( double zd );
+   }
+   \sstarguments{
+      \sstsubsection{
+         zd = double (Given)
+      }{
+         Observed zenith distance (radians)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The {\tt "}observed{\tt "} zenith distance referred to above means {\tt "}as
+           affected by refraction{\tt "}.
+
+         \sstitem
+         Uses Hardie{\tt '}s (1962) polynomial fit to Bemporad{\tt '}s data for
+           the relative air mass, X, in units of thickness at the zenith
+           as tabulated by Schoenberg (1929). This is adequate for all
+           normal needs as it is accurate to better than 0.1\% up to X =
+           6.8 and better than 1\% up to X = 10. Bemporad{\tt '}s tabulated
+           values are unlikely to be trustworthy to such accuracy
+           because of variations in density, pressure and other
+           conditions in the atmosphere from those assumed in his work.
+
+         \sstitem
+         The sign of the ZD is ignored.
+
+         \sstitem
+         At zenith distances greater than about ZD = 87 degrees the
+           air mass is held constant to avoid arithmetic overflows.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      \sstitemlist{
+
+         \sstitem
+         Hardie, R.H., 1962, in {\tt "}Astronomical Techniques{\tt "}
+             ed. W.A. Hiltner, University of Chicago Press, p180.
+
+         \sstitem
+         Schoenberg, E., 1929, Hdb. d. Ap.,
+             Berlin, Julius Springer, 2, 268.
+      }
+   }
+}
+\sstroutine{
+   palAmp
+}{
+   Convert star RA,Dec from geocentric apparaent to mean place
+}{
+   \sstdescription{
+      Convert star RA,Dec from geocentric apparent to mean place. The
+      mean coordinate system is close to ICRS. See palAmpqk for details.
+   }
+   \sstinvocation{
+      void palAmp ( double ra, double da, double date, double eq,
+                    double $*$rm, double $*$dm );
+   }
+   \sstarguments{
+      \sstsubsection{
+         ra = double (Given)
+      }{
+         Apparent RA (radians)
+      }
+      \sstsubsection{
+         dec = double (Given)
+      }{
+         Apparent Dec (radians)
+      }
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TDB for apparent place (JD-2400000.5)
+      }
+      \sstsubsection{
+         eq = double (Given)
+      }{
+         Equinox: Julian epoch of mean place.
+      }
+      \sstsubsection{
+         rm = double $*$ (Returned)
+      }{
+         Mean RA (radians)
+      }
+      \sstsubsection{
+         dm = double $*$ (Returned)
+      }{
+         Mean Dec (radians)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         See palMappa and palAmpqk for details.
+      }
+   }
+}
+\sstroutine{
+   palAmpqk
+}{
+   Convert star RA,Dec from geocentric apparent to mean place
+}{
+   \sstdescription{
+      Convert star RA,Dec from geocentric apparent to mean place. The {\tt "}mean{\tt "}
+      coordinate system is in fact close to ICRS. Use of this function
+      is appropriate when efficiency is important and where many star
+      positions are all to be transformed for one epoch and equinox.  The
+      star-independent parameters can be obtained by calling the palMappa
+      function.
+   }
+   \sstinvocation{
+      void palAmpqk ( double ra, double da, double amprms[21],
+                      double $*$rm, double $*$dm )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ra = double (Given)
+      }{
+         Apparent RA (radians).
+      }
+      \sstsubsection{
+         da = double (Given)
+      }{
+         Apparent Dec (radians).
+      }
+      \sstsubsection{
+         amprms = double[21] (Given)
+      }{
+         Star-independent mean-to-apparent parameters (see palMappa):
+         (0)      time interval for proper motion (Julian years)
+         (1-3)    barycentric position of the Earth (AU)
+         (4-6)    not used
+         (7)      not used
+         (8-10)   abv: barycentric Earth velocity in units of c
+         (11)     sqrt(1-v$*$v) where v=modulus(abv)
+         (12-20)  precession/nutation (3,3) matrix
+      }
+      \sstsubsection{
+         rm = double (Returned)
+      }{
+         Mean RA (radians).
+      }
+      \sstsubsection{
+         dm = double (Returned)
+      }{
+         Mean Dec (radians).
+      }
+   }
+}
+\sstroutine{
+   palCaldj
+}{
+   Gregorian Calendar to Modified Julian Date
+}{
+   \sstdescription{
+      Modified Julian Date to Gregorian Calendar with special
+      behaviour for 2-digit years relating to 1950 to 2049.
+   }
+   \sstinvocation{
+      void palCaldj ( int iy, int im, int id, double $*$djm, int $*$j );
+   }
+   \sstarguments{
+      \sstsubsection{
+         iy = int (Given)
+      }{
+         Year in the Gregorian calendar
+      }
+      \sstsubsection{
+         im = int (Given)
+      }{
+         Month in the Gergorian calendar
+      }
+      \sstsubsection{
+         id = int (Given)
+      }{
+         Day in the Gregorian calendar
+      }
+      \sstsubsection{
+         djm = double $*$ (Returned)
+      }{
+         Modified Julian Date (JD-2400000.5) for 0 hrs
+      }
+      \sstsubsection{
+         j = status (Returned)
+      }{
+         0 = OK. See iauCal2jd for other values.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Uses iauCal2jd
+
+         \sstitem
+         Unlike iauCal2jd this routine treats the years 0-100 as
+           referring to the end of the 20th Century and beginning of
+           the 21st Century. If this behaviour is not acceptable
+           use the SOFA routine directly or palCldj.
+           Acceptable years are 00-49, interpreted as 2000-2049,
+                                50-99,     {\tt "}       {\tt "}  1950-1999,
+                                all others, interpreted literally.
+
+         \sstitem
+         Unlike SLA this routine will work with negative years.
+      }
+   }
+}
+\sstroutine{
+   palDafin
+}{
+   Sexagesimal character string to angle
+}{
+   \sstdescription{
+      Extracts an angle from a sexagesimal string with degrees, arcmin,
+      arcsec fields using space or comma delimiters.
+   }
+   \sstinvocation{
+      void palDafin ( const char $*$string, int $*$ipos, double $*$a, int $*$j );
+   }
+   \sstarguments{
+      \sstsubsection{
+         string = const char $*$ (Given)
+      }{
+         String containing deg, arcmin, arcsec fields
+      }
+      \sstsubsection{
+         ipos = int $*$ (Given \& Returned)
+      }{
+         Position to start decoding {\tt "}string{\tt "}. First character
+         is position 1 for compatibility with SLA. After
+         calling this routine {\tt "}iptr{\tt "} will be positioned after
+         the sexagesimal string.
+      }
+      \sstsubsection{
+         a = double $*$ (Returned)
+      }{
+         Angle in radians.
+      }
+      \sstsubsection{
+         j = int $*$ (Returned)
+      }{
+         status:  0 = OK
+                 $+$1 = default, A unchanged
+         \sstitemlist{
+
+            \sstitem
+                    1 = bad degrees      )
+
+            \sstitem
+                    2 = bad arcminutes   )  (note 3)
+
+            \sstitem
+                    3 = bad arcseconds   )
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The first three {\tt "}fields{\tt "} in STRING are degrees, arcminutes,
+           arcseconds, separated by spaces or commas.  The degrees field
+           may be signed, but not the others.  The decoding is carried
+           out by the palDfltin routine and is free-format.
+
+         \sstitem
+         Successive fields may be absent, defaulting to zero.  For
+           zero status, the only combinations allowed are degrees alone,
+           degrees and arcminutes, and all three fields present.  If all
+           three fields are omitted, a status of $+$1 is returned and A is
+           unchanged.  In all other cases A is changed.
+
+         \sstitem
+         Range checking:
+
+      }
+            The degrees field is not range checked.  However, it is
+            expected to be integral unless the other two fields are absent.
+
+            The arcminutes field is expected to be 0-59, and integral if
+            the arcseconds field is present.  If the arcseconds field
+            is absent, the arcminutes is expected to be 0-59.9999...
+
+            The arcseconds field is expected to be 0-59.9999...
+
+      \sstitemlist{
+
+         \sstitem
+         Decoding continues even when a check has failed.  Under these
+           circumstances the field takes the supplied value, defaulting
+           to zero, and the result A is computed and returned.
+
+         \sstitem
+         Further fields after the three expected ones are not treated
+           as an error.  The pointer IPOS is left in the correct state
+           for further decoding with the present routine or with palDfltin
+           etc. See the example, above.
+
+         \sstitem
+         If STRING contains hours, minutes, seconds instead of degrees
+           etc, or if the required units are turns (or days) instead of
+           radians, the result A should be multiplied as follows:
+
+      }
+            for        to obtain    multiply
+            STRING     A in         A by
+
+            d {\tt '} {\tt "}      radians      1       =  1.0
+            d {\tt '} {\tt "}      turns        1/2pi   =  0.1591549430918953358
+            h m s      radians      15      =  15.0
+            h m s      days         15/2pi  =  2.3873241463784300365
+   }
+   \sstdiytopic{
+      Example
+   }{
+      argument    before                           after
+
+      STRING      {\tt '}-57 17 44.806  12 34 56.7{\tt '}      unchanged
+      IPTR        1                                16 (points to 12...)
+      A           ?                                -1.00000D0
+      J           ?                                0
+   }
+}
+\sstroutine{
+   palDe2h
+}{
+   Equatorial to horizon coordinates: HA,Dec to Az,E
+}{
+   \sstdescription{
+      Convert equatorial to horizon coordinates.
+   }
+   \sstinvocation{
+      palDe2h( double ha, double dec, double phi, double $*$ az, double $*$ el );
+   }
+   \sstarguments{
+      \sstsubsection{
+         ha = double $*$ (Given)
+      }{
+         Hour angle (radians)
+      }
+      \sstsubsection{
+         dec = double $*$ (Given)
+      }{
+         Declination (radians)
+      }
+      \sstsubsection{
+         phi = double (Given)
+      }{
+         Observatory latitude (radians)
+      }
+      \sstsubsection{
+         az = double $*$ (Returned)
+      }{
+         Azimuth (radians)
+      }
+      \sstsubsection{
+         el = double $*$ (Returned)
+      }{
+         Elevation (radians)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         All the arguments are angles in radians.
+
+         \sstitem
+         Azimuth is returned in the range 0-2pi;  north is zero,
+           and east is $+$pi/2.  Elevation is returned in the range
+           $+$/-pi/2.
+
+         \sstitem
+         The latitude must be geodetic.  In critical applications,
+           corrections for polar motion should be applied.
+
+         \sstitem
+         In some applications it will be important to specify the
+           correct type of hour angle and declination in order to
+           produce the required type of azimuth and elevation.  In
+           particular, it may be important to distinguish between
+           elevation as affected by refraction, which would
+           require the {\tt "}observed{\tt "} HA,Dec, and the elevation
+           in vacuo, which would require the {\tt "}topocentric{\tt "} HA,Dec.
+           If the effects of diurnal aberration can be neglected, the
+           {\tt "}apparent{\tt "} HA,Dec may be used instead of the topocentric
+           HA,Dec.
+
+         \sstitem
+         No range checking of arguments is carried out.
+
+         \sstitem
+         In applications which involve many such calculations, rather
+           than calling the present routine it will be more efficient to
+           use inline code, having previously computed fixed terms such
+           as sine and cosine of latitude, and (for tracking a star)
+           sine and cosine of declination.
+      }
+   }
+}
+\sstroutine{
+   palDeuler
+}{
+   Form a rotation matrix from the Euler angles
+}{
+   \sstdescription{
+      A rotation is positive when the reference frame rotates
+      anticlockwise as seen looking towards the origin from the
+      positive region of the specified axis.
+
+      The characters of ORDER define which axes the three successive
+      rotations are about.  A typical value is {\tt '}ZXZ{\tt '}, indicating that
+      RMAT is to become the direction cosine matrix corresponding to
+      rotations of the reference frame through PHI radians about the
+      old Z-axis, followed by THETA radians about the resulting X-axis,
+      then PSI radians about the resulting Z-axis.
+
+      The axis names can be any of the following, in any order or
+      combination:  X, Y, Z, uppercase or lowercase, 1, 2, 3.  Normal
+      axis labelling/numbering conventions apply;  the xyz (=123)
+      triad is right-handed.  Thus, the {\tt '}ZXZ{\tt '} example given above
+      could be written {\tt '}zxz{\tt '} or {\tt '}313{\tt '} (or even {\tt '}ZxZ{\tt '} or {\tt '}3xZ{\tt '}).  ORDER
+      is terminated by length or by the first unrecognized character.
+
+      Fewer than three rotations are acceptable, in which case the later
+      angle arguments are ignored.  If all rotations are zero, the
+      identity matrix is produced.
+   }
+   \sstinvocation{
+      void palDeuler ( const char $*$order, double phi, double theta, double psi,
+                       double rmat[3][3] );
+   }
+   \sstarguments{
+      \sstsubsection{
+         order = const char[] (Given)
+      }{
+         Specifies about which axes the rotation occurs
+      }
+      \sstsubsection{
+         phi = double (Given)
+      }{
+         1st rotation (radians)
+      }
+      \sstsubsection{
+         theta = double (Given)
+      }{
+         2nd rotation (radians)
+      }
+      \sstsubsection{
+         psi = double (Given)
+      }{
+         3rd rotation (radians)
+      }
+      \sstsubsection{
+         rmat = double[3][3] (Given \& Returned)
+      }{
+         Rotation matrix
+      }
+   }
+}
+\sstroutine{
+   palDfltin
+}{
+   Convert free-format input into double precision floating point
+}{
+   \sstdescription{
+      Extracts a number from an input string starting at the specified
+      index.
+   }
+   \sstinvocation{
+      void palDfltin( const char $*$ string, int $*$nstrt,
+                      double $*$dreslt, int $*$jflag );
+   }
+   \sstarguments{
+      \sstsubsection{
+         string = const char $*$ (Given)
+      }{
+         String containing number to be decoded.
+      }
+      \sstsubsection{
+         nstrt = int $*$ (Given and Returned)
+      }{
+         Character number indicating where decoding should start.
+         On output its value is updated to be the location of the
+         possible next value. For compatibility with SLA the first
+         character is index 1.
+      }
+      \sstsubsection{
+         dreslt = double $*$ (Returned)
+      }{
+         Result. Not updated when jflag=1.
+      }
+      \sstsubsection{
+         jflag = int $*$ (Returned)
+      }{
+         status: -1 = -OK, 0 = $+$OK, 1 = null, 2 = error
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Uses the strtod() system call to do the parsing. This may lead to
+           subtle differences when compared to the SLA/F parsing.
+
+         \sstitem
+         All {\tt "}D{\tt "} characters are converted to {\tt "}E{\tt "} to handle fortran exponents.
+
+         \sstitem
+         Commas are recognized as a special case and are skipped if one happens
+           to be the next character when updating nstrt. Additionally the output
+           nstrt position will skip past any trailing space.
+
+         \sstitem
+         If no number can be found flag will be set to 1.
+
+         \sstitem
+         If the number overflows or underflows jflag will be set to 2. For overflow
+           the returned result will have the value HUGE\_VAL, for underflow it
+           will have the value 0.0.
+
+         \sstitem
+         For compatiblity with SLA/F -0 will be returned as {\tt "}0{\tt "} with jflag == -1.
+
+         \sstitem
+         Unlike slaDfltin a standalone {\tt "}E{\tt "} will return status 1 (could not find
+           a number) rather than 2 (bad number).
+      }
+   }
+}
+\sstroutine{
+   palDh2e
+}{
+   Horizon to equatorial coordinates: Az,El to HA,Dec
+}{
+   \sstdescription{
+      Convert horizon to equatorial coordinates.
+   }
+   \sstinvocation{
+      palDh2e( double az, double el, double phi, double $*$ ha, double $*$ dec );
+   }
+   \sstarguments{
+      \sstsubsection{
+         az = double (Given)
+      }{
+         Azimuth (radians)
+      }
+      \sstsubsection{
+         el = double (Given)
+      }{
+         Elevation (radians)
+      }
+      \sstsubsection{
+         phi = double (Given)
+      }{
+         Observatory latitude (radians)
+      }
+      \sstsubsection{
+         ha = double $*$ (Returned)
+      }{
+         Hour angle (radians)
+      }
+      \sstsubsection{
+         dec = double $*$ (Returned)
+      }{
+         Declination (radians)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         All the arguments are angles in radians.
+
+         \sstitem
+         The sign convention for azimuth is north zero, east $+$pi/2.
+
+         \sstitem
+         HA is returned in the range $+$/-pi.  Declination is returned
+           in the range $+$/-pi/2.
+
+         \sstitem
+         The latitude is (in principle) geodetic.  In critical
+           applications, corrections for polar motion should be applied.
+
+         \sstitem
+         In some applications it will be important to specify the
+           correct type of elevation in order to produce the required
+           type of HA,Dec.  In particular, it may be important to
+           distinguish between the elevation as affected by refraction,
+           which will yield the {\tt "}observed{\tt "} HA,Dec, and the elevation
+           in vacuo, which will yield the {\tt "}topocentric{\tt "} HA,Dec.  If the
+           effects of diurnal aberration can be neglected, the
+           topocentric HA,Dec may be used as an approximation to the
+           {\tt "}apparent{\tt "} HA,Dec.
+
+         \sstitem
+         No range checking of arguments is done.
+
+         \sstitem
+         In applications which involve many such calculations, rather
+           than calling the present routine it will be more efficient to
+           use inline code, having previously computed fixed terms such
+           as sine and cosine of latitude.
+      }
+   }
+}
+\sstroutine{
+   palDjcal
+}{
+   Modified Julian Date to Gregorian Calendar
+}{
+   \sstdescription{
+      Modified Julian Date to Gregorian Calendar, expressed
+      in a form convenient for formatting messages (namely
+      rounded to a specified precision, and with the fields
+      stored in a single array)
+   }
+   \sstinvocation{
+      void palDjcal ( int ndp, double djm, int iymdf[4], int $*$j );
+   }
+   \sstarguments{
+      \sstsubsection{
+         ndp = int (Given)
+      }{
+         Number of decimal places of days in fraction.
+      }
+      \sstsubsection{
+         djm = double (Given)
+      }{
+         Modified Julian Date (JD-2400000.5)
+      }
+      \sstsubsection{
+         iymdf[4] = int[] (Returned)
+      }{
+         Year, month, day, fraction in Gregorian calendar.
+      }
+      \sstsubsection{
+         j = status (Returned)
+      }{
+         0 = OK. See iauJd2cal for other values.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Uses iauJd2cal
+      }
+   }
+}
+\sstroutine{
+   palDmat
+}{
+   Matrix inversion \& solution of simultaneous equations
+}{
+   \sstdescription{
+      Matrix inversion \& solution of simultaneous equations
+      For the set of n simultaneous equations in n unknowns:
+           A.Y = X
+      this routine calculates the inverse of A, the determinant
+      of matrix A and the vector of N unknowns.
+   }
+   \sstinvocation{
+      void palDmat( int n, double $*$a, double $*$y, double $*$d, int $*$jf,
+                     int $*$iw );
+   }
+   \sstarguments{
+      \sstsubsection{
+         n = int (Given)
+      }{
+         Number of simultaneous equations and number of unknowns.
+      }
+      \sstsubsection{
+         a = double[] (Given \& Returned)
+      }{
+         A non-singular NxN matrix (implemented as a contiguous block
+         of memory). After calling this routine {\tt "}a{\tt "} contains the
+         inverse of the matrix.
+      }
+      \sstsubsection{
+         y = double[] (Given \& Returned)
+      }{
+         The vector of N unknowns. On exit this vector contains the
+         N solutions.
+      }
+      \sstsubsection{
+         d = double $*$ (Returned)
+      }{
+         The determinant.
+      }
+      \sstsubsection{
+         jf = int $*$ (Returned)
+      }{
+         The singularity flag.  If the matrix is non-singular, jf=0
+         is returned.  If the matrix is singular, jf=-1 \& d=0.0 are
+         returned.  In the latter case, the contents of array {\tt "}a{\tt "} on
+         return are undefined.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Implemented using Gaussian elimination with partial pivoting.
+
+         \sstitem
+         Optimized for speed rather than accuracy with errors 1 to 4
+           times those of routines optimized for accuracy.
+      }
+   }
+}
+\sstroutine{
+   palDs2tp
+}{
+   Spherical to tangent plane projection
+}{
+   \sstdescription{
+      Projection of spherical coordinates onto tangent plane:
+      {\tt "}gnomonic{\tt "} projection - {\tt "}standard coordinates{\tt "}
+   }
+   \sstinvocation{
+      palDs2tp( double ra, double dec, double raz, double decz,
+                double $*$xi, double $*$eta, int $*$j );
+   }
+   \sstarguments{
+      \sstsubsection{
+         ra = double (Given)
+      }{
+         RA spherical coordinate of point to be projected (radians)
+      }
+      \sstsubsection{
+         dec = double (Given)
+      }{
+         Dec spherical coordinate of point to be projected (radians)
+      }
+      \sstsubsection{
+         raz = double (Given)
+      }{
+         RA spherical coordinate of tangent point (radians)
+      }
+      \sstsubsection{
+         decz = double (Given)
+      }{
+         Dec spherical coordinate of tangent point (radians)
+      }
+      \sstsubsection{
+         xi = double $*$ (Returned)
+      }{
+         First rectangular coordinate on tangent plane (radians)
+      }
+      \sstsubsection{
+         eta = double $*$ (Returned)
+      }{
+         Second rectangular coordinate on tangent plane (radians)
+      }
+      \sstsubsection{
+         j = int $*$ (Returned)
+      }{
+         status: 0 = OK, star on tangent plane
+                 1 = error, star too far from axis
+                 2 = error, antistar on tangent plane
+                 3 = error, antistar too far from axis
+      }
+   }
+}
+\sstroutine{
+   palDtt
+}{
+   Return offset between UTC and TT
+}{
+   \sstdescription{
+      Increment to be applied to Coordinated Universal Time UTC to give
+      International Atomic Time (TAI).
+   }
+   \sstinvocation{
+      dat = palDat( double utc );
+   }
+   \sstarguments{
+      \sstsubsection{
+         utc = double (Given)
+      }{
+         UTC date as a modified JD (JD-2400000.5)
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         dat = double
+      }{
+         TAI-UTC in seconds
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine converts the MJD argument to calendar date before calling
+           the SOFA iauDat function.
+
+         \sstitem
+         This routine matches the slaDat interface which differs from the iauDat
+           interface. Consider coding directly to the SOFA interface.
+
+         \sstitem
+         See iauDat for a description of error conditions when calling this function
+           with a time outside of the UTC range.
+
+         \sstitem
+         The status argument from iauDat is ignored. This is reasonable since the
+           error codes are mainly related to incorrect calendar dates when calculating
+           the JD internally.
+      }
+   }
+}
+\sstroutine{
+   palDmoon
+}{
+   Approximate geocentric position and velocity of the Moon
+}{
+   \sstdescription{
+      Calculate the approximate geocentric position of the Moon
+      using a full implementation of the algorithm published by
+      Meeus (l{\tt '}Astronomie, June 1984, p348).
+   }
+   \sstinvocation{
+      void palDmoon( double date, double pv[6] );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TDB as a Modified Julian Date (JD-2400000.5)
+      }
+      \sstsubsection{
+         pv = double [6] (Returned)
+      }{
+         Moon x,y,z,xdot,ydot,zdot, mean equator and
+         equinox of date (AU, AU/s)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Meeus quotes accuracies of 10 arcsec in longitude, 3 arcsec in
+           latitude and 0.2 arcsec in HP (equivalent to about 20 km in
+           distance).  Comparison with JPL DE200 over the interval
+           1960-2025 gives RMS errors of 3.7 arcsec and 83 mas/hour in
+           longitude, 2.3 arcsec and 48 mas/hour in latitude, 11 km
+           and 81 mm/s in distance.  The maximum errors over the same
+           interval are 18 arcsec and 0.50 arcsec/hour in longitude,
+           11 arcsec and 0.24 arcsec/hour in latitude, 40 km and 0.29 m/s
+           in distance.
+
+         \sstitem
+         The original algorithm is expressed in terms of the obsolete
+           timescale Ephemeris Time.  Either TDB or TT can be used, but
+           not UT without incurring significant errors (30 arcsec at
+           the present time) due to the Moon{\tt '}s 0.5 arcsec/sec movement.
+
+         \sstitem
+         The algorithm is based on pre IAU 1976 standards.  However,
+           the result has been moved onto the new (FK5) equinox, an
+           adjustment which is in any case much smaller than the
+           intrinsic accuracy of the procedure.
+
+         \sstitem
+         Velocity is obtained by a complete analytical differentiation
+           of the Meeus model.
+      }
+   }
+}
+\sstroutine{
+   palDt
+}{
+   Estimate the offset between dynamical time and UT
+}{
+   \sstdescription{
+      Estimate the offset between dynamical time and Universal Time
+      for a given historical epoch.
+   }
+   \sstinvocation{
+      double palDt( double epoch );
+   }
+   \sstarguments{
+      \sstsubsection{
+         epoch = double (Given)
+      }{
+         Julian epoch (e.g. 1850.0)
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         palDt = double
+      }{
+         Rough estimate of ET-UT (after 1984, TT-UT) at the
+         given epoch, in seconds.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Depending on the epoch, one of three parabolic approximations
+           is used:
+
+      }
+          before 979    Stephenson \& Morrison{\tt '}s 390 BC to AD 948 model
+          979 to 1708   Stephenson \& Morrison{\tt '}s 948 to 1600 model
+          after 1708    McCarthy \& Babcock{\tt '}s post-1650 model
+
+        The breakpoints are chosen to ensure continuity:  they occur
+        at places where the adjacent models give the same answer as
+        each other.
+      \sstitemlist{
+
+         \sstitem
+         The accuracy is modest, with errors of up to 20 sec during
+           the interval since 1650, rising to perhaps 30 min by 1000 BC.
+           Comparatively accurate values from AD 1600 are tabulated in
+           the Astronomical Almanac (see section K8 of the 1995 AA).
+
+         \sstitem
+         The use of double-precision for both argument and result is
+           purely for compatibility with other SLALIB time routines.
+
+         \sstitem
+         The models used are based on a lunar tidal acceleration value
+           of -26.00 arcsec per century.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      Explanatory Supplement to the Astronomical Almanac,
+      ed P.K.Seidelmann, University Science Books (1992),
+      section 2.553, p83.  This contains references to
+      the Stephenson \& Morrison and McCarthy \& Babcock
+      papers.
+   }
+}
+\sstroutine{
+   palDtp2s
+}{
+   Tangent plane to spherical coordinates
+}{
+   \sstdescription{
+      Transform tangent plane coordinates into spherical.
+   }
+   \sstinvocation{
+      palDtp2s( double xi, double eta, double raz, double decz,
+                double $*$ra, double $*$dec);
+   }
+   \sstarguments{
+      \sstsubsection{
+         xi = double (Given)
+      }{
+         First rectangular coordinate on tangent plane (radians)
+      }
+      \sstsubsection{
+         eta = double (Given)
+      }{
+         Second rectangular coordinate on tangent plane (radians)
+      }
+      \sstsubsection{
+         raz = double (Given)
+      }{
+         RA spherical coordinate of tangent point (radians)
+      }
+      \sstsubsection{
+         decz = double (Given)
+      }{
+         Dec spherical coordinate of tangent point (radians)
+      }
+      \sstsubsection{
+         ra = double $*$ (Returned)
+      }{
+         RA spherical coordinate of point to be projected (radians)
+      }
+      \sstsubsection{
+         dec = double $*$ (Returned)
+      }{
+         Dec spherical coordinate of point to be projected (radians)
+      }
+   }
+}
+\sstroutine{
+   palDtps2c
+}{
+   Determine RA,Dec of tangent point from coordinates
+}{
+   \sstdescription{
+      From the tangent plane coordinates of a star of known RA,Dec,
+      determine the RA,Dec of the tangent point.
+   }
+   \sstinvocation{
+      palDtps2c( double xi, double eta, double ra, double dec,
+                 double $*$ raz1, double decz1,
+                 double $*$ raz2, double decz2, int $*$n);
+   }
+   \sstarguments{
+      \sstsubsection{
+         xi = double (Given)
+      }{
+         First rectangular coordinate on tangent plane (radians)
+      }
+      \sstsubsection{
+         eta = double (Given)
+      }{
+         Second rectangular coordinate on tangent plane (radians)
+      }
+      \sstsubsection{
+         ra = double (Given)
+      }{
+         RA spherical coordinate of star (radians)
+      }
+      \sstsubsection{
+         dec = double (Given)
+      }{
+         Dec spherical coordinate of star (radians)
+      }
+      \sstsubsection{
+         raz1 = double $*$ (Returned)
+      }{
+         RA spherical coordinate of tangent point, solution 1 (radians)
+      }
+      \sstsubsection{
+         decz1 = double $*$ (Returned)
+      }{
+         Dec spherical coordinate of tangent point, solution 1 (radians)
+      }
+      \sstsubsection{
+         raz2 = double $*$ (Returned)
+      }{
+         RA spherical coordinate of tangent point, solution 2 (radians)
+      }
+      \sstsubsection{
+         decz2 = double $*$ (Returned)
+      }{
+         Dec spherical coordinate of tangent point, solution 2 (radians)
+      }
+      \sstsubsection{
+         n = int $*$ (Returned)
+      }{
+         number of solutions: 0 = no solutions returned (note 2)
+                              1 = only the first solution is useful (note 3)
+                              2 = both solutions are useful (note 3)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The RAZ1 and RAZ2 values are returned in the range 0-2pi.
+
+         \sstitem
+         Cases where there is no solution can only arise near the poles.
+           For example, it is clearly impossible for a star at the pole
+           itself to have a non-zero XI value, and hence it is
+           meaningless to ask where the tangent point would have to be
+           to bring about this combination of XI and DEC.
+
+         \sstitem
+         Also near the poles, cases can arise where there are two useful
+           solutions.  The argument N indicates whether the second of the
+           two solutions returned is useful.  N=1 indicates only one useful
+           solution, the usual case;  under these circumstances, the second
+           solution corresponds to the {\tt "}over-the-pole{\tt "} case, and this is
+           reflected in the values of RAZ2 and DECZ2 which are returned.
+
+         \sstitem
+         The DECZ1 and DECZ2 values are returned in the range $+$/-pi, but
+           in the usual, non-pole-crossing, case, the range is $+$/-pi/2.
+
+         \sstitem
+         This routine is the spherical equivalent of the routine sla\_DTPV2C.
+      }
+   }
+}
+\sstroutine{
+   palDtt
+}{
+   Return offset between UTC and TT
+}{
+   \sstdescription{
+      Increment to be applied to Coordinated Universal Time UTC to give
+      Terrestrial Time TT (formerly Ephemeris Time ET)
+   }
+   \sstinvocation{
+      dtt = palDtt( double utc );
+   }
+   \sstarguments{
+      \sstsubsection{
+         utc = double (Given)
+      }{
+         UTC date as a modified JD (JD-2400000.5)
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         dtt = double
+      }{
+         TT-UTC in seconds
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Consider a comprehensive upgrade to use the time transformations in SOFA{\tt '}s time
+           cookbook:  http://www.iausofa.org/sofa\_ts\_c.pdf.
+
+         \sstitem
+         See iauDat for a description of error conditions when calling this function
+           with a time outside of the UTC range. This behaviour differs from slaDtt.
+      }
+   }
+}
+\sstroutine{
+   palEcmat
+}{
+   Form the equatorial to ecliptic rotation matrix - IAU 2006
+   precession model
+}{
+   \sstdescription{
+      The equatorial to ecliptic rotation matrix is found and returned.
+      The matrix is in the sense   V(ecl)  =  RMAT $*$ V(equ);  the
+      equator, equinox and ecliptic are mean of date.
+   }
+   \sstinvocation{
+      palEcmat( double date, double rmat[3][3] )
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TT as Modified Julian Date (JD-2400000.5). The difference
+         between TT and TDB is of the order of a millisecond or two
+         (i.e. about 0.02 arc-seconds).
+      }
+      \sstsubsection{
+         rmat = double[3][3] (Returned)
+      }{
+         Rotation matrix
+      }
+   }
+}
+\sstroutine{
+   palEl2ue
+}{
+   Transform conventional elements into {\tt "}universal{\tt "} form
+}{
+   \sstdescription{
+      Transform conventional osculating elements into {\tt "}universal{\tt "} form.
+   }
+   \sstinvocation{
+      void palEl2ue ( double date, int jform, double epoch, double orbinc,
+                      double anode, double perih, double aorq, double e,
+                      double aorl, double dm, double u[13], int $*$jstat );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         Epoch (TT MJD) of osculation (Note 3)
+      }
+      \sstsubsection{
+         jform = int (Given)
+      }{
+         Element set actually returned (1-3; Note 6)
+      }
+      \sstsubsection{
+         epoch = double (Given)
+      }{
+         Epoch of elements (TT MJD)
+      }
+      \sstsubsection{
+         orbinc = double (Given)
+      }{
+         inclination (radians)
+      }
+      \sstsubsection{
+         anode = double (Given)
+      }{
+         longitude of the ascending node (radians)
+      }
+      \sstsubsection{
+         perih = double (Given)
+      }{
+         longitude or argument of perihelion (radians)
+      }
+      \sstsubsection{
+         aorq = double (Given)
+      }{
+         mean distance or perihelion distance (AU)
+      }
+      \sstsubsection{
+         e = double (Given)
+      }{
+         eccentricity
+      }
+      \sstsubsection{
+         aorl = double (Given)
+      }{
+         mean anomaly or longitude (radians, JFORM=1,2 only)
+      }
+      \sstsubsection{
+         dm = double (Given)
+      }{
+         daily motion (radians, JFORM=1 only)
+      }
+      \sstsubsection{
+         u = double [13] (Returned)
+      }{
+         Universal orbital elements (Note 1)
+             (0)  combined mass (M$+$m)
+             (1)  total energy of the orbit (alpha)
+             (2)  reference (osculating) epoch (t0)
+           (3-5)  position at reference epoch (r0)
+           (6-8)  velocity at reference epoch (v0)
+             (9)  heliocentric distance at reference epoch
+            (10)  r0.v0
+            (11)  date (t)
+            (12)  universal eccentric anomaly (psi) of date, approx
+      }
+      \sstsubsection{
+         jstat = int $*$ (Returned)
+      }{
+         status:  0 = OK
+         \sstitemlist{
+
+            \sstitem
+                    1 = illegal JFORM
+
+            \sstitem
+                    2 = illegal E
+
+            \sstitem
+                    3 = illegal AORQ
+
+            \sstitem
+                    4 = illegal DM
+
+            \sstitem
+                    5 = numerical error
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The {\tt "}universal{\tt "} elements are those which define the orbit for the
+           purposes of the method of universal variables (see reference).
+           They consist of the combined mass of the two bodies, an epoch,
+           and the position and velocity vectors (arbitrary reference frame)
+           at that epoch.  The parameter set used here includes also various
+           quantities that can, in fact, be derived from the other
+           information.  This approach is taken to avoiding unnecessary
+           computation and loss of accuracy.  The supplementary quantities
+           are (i) alpha, which is proportional to the total energy of the
+           orbit, (ii) the heliocentric distance at epoch, (iii) the
+           outwards component of the velocity at the given epoch, (iv) an
+           estimate of psi, the {\tt "}universal eccentric anomaly{\tt "} at a given
+           date and (v) that date.
+
+         \sstitem
+         The companion routine is palUe2pv.  This takes the set of numbers
+           that the present routine outputs and uses them to derive the
+           object{\tt '}s position and velocity.  A single prediction requires one
+           call to the present routine followed by one call to palUe2pv;
+           for convenience, the two calls are packaged as the routine
+           palPlanel.  Multiple predictions may be made by again calling the
+           present routine once, but then calling palUe2pv multiple times,
+           which is faster than multiple calls to palPlanel.
+
+         \sstitem
+         DATE is the epoch of osculation.  It is in the TT timescale
+           (formerly Ephemeris Time, ET) and is a Modified Julian Date
+           (JD-2400000.5).
+
+         \sstitem
+         The supplied orbital elements are with respect to the J2000
+           ecliptic and equinox.  The position and velocity parameters
+           returned in the array U are with respect to the mean equator and
+           equinox of epoch J2000, and are for the perihelion prior to the
+           specified epoch.
+
+         \sstitem
+         The universal elements returned in the array U are in canonical
+           units (solar masses, AU and canonical days).
+
+         \sstitem
+         Three different element-format options are available:
+
+      }
+        Option JFORM=1, suitable for the major planets:
+
+        EPOCH  = epoch of elements (TT MJD)
+        ORBINC = inclination i (radians)
+        ANODE  = longitude of the ascending node, big omega (radians)
+        PERIH  = longitude of perihelion, curly pi (radians)
+        AORQ   = mean distance, a (AU)
+        E      = eccentricity, e (range 0 to $<$1)
+        AORL   = mean longitude L (radians)
+        DM     = daily motion (radians)
+
+        Option JFORM=2, suitable for minor planets:
+
+        EPOCH  = epoch of elements (TT MJD)
+        ORBINC = inclination i (radians)
+        ANODE  = longitude of the ascending node, big omega (radians)
+        PERIH  = argument of perihelion, little omega (radians)
+        AORQ   = mean distance, a (AU)
+        E      = eccentricity, e (range 0 to $<$1)
+        AORL   = mean anomaly M (radians)
+
+        Option JFORM=3, suitable for comets:
+
+        EPOCH  = epoch of perihelion (TT MJD)
+        ORBINC = inclination i (radians)
+        ANODE  = longitude of the ascending node, big omega (radians)
+        PERIH  = argument of perihelion, little omega (radians)
+        AORQ   = perihelion distance, q (AU)
+        E      = eccentricity, e (range 0 to 10)
+
+      \sstitemlist{
+
+         \sstitem
+         Unused elements (DM for JFORM=2, AORL and DM for JFORM=3) are
+           not accessed.
+
+         \sstitem
+         The algorithm was originally adapted from the EPHSLA program of
+           D.H.P.Jones (private communication, 1996).  The method is based
+           on Stumpff{\tt '}s Universal Variables.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      Everhart \& Pitkin, Am.J.Phys. 51, 712 (1983).
+   }
+}
+\sstroutine{
+   palEpco
+}{
+   Convert an epoch into the appropriate form - {\tt '}B{\tt '} or {\tt '}J{\tt '}
+}{
+   \sstdescription{
+      Converts a Besselian or Julian epoch to a Julian or Besselian
+      epoch.
+   }
+   \sstinvocation{
+      double palEpco( char k0, char k, double e );
+   }
+   \sstarguments{
+      \sstsubsection{
+         k0 = char (Given)
+      }{
+         Form of result: {\tt '}B{\tt '}=Besselian, {\tt '}J{\tt '}=Julian
+      }
+      \sstsubsection{
+         k = char (Given)
+      }{
+         Form of given epoch: {\tt '}B{\tt '} or {\tt '}J{\tt '}.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The result is always either equal to or very close to
+           the given epoch E.  The routine is required only in
+           applications where punctilious treatment of heterogeneous
+           mixtures of star positions is necessary.
+
+         \sstitem
+         k and k0 are case insensitive. This differes slightly from the
+           Fortran SLA implementation.
+
+         \sstitem
+         k and k0 are not validated. They are interpreted as follows:
+           o If k0 and k are the same the result is e
+           o If k0 is {\tt '}b{\tt '} or {\tt '}B{\tt '} and k isn{\tt '}t the conversion is J to B.
+           o In all other cases, the conversion is B to J.
+      }
+   }
+}
+\sstroutine{
+   palEpv
+}{
+   Earth position and velocity with respect to the BCRS
+}{
+   \sstdescription{
+      Earth position and velocity, heliocentric and barycentric, with
+      respect to the Barycentric Celestial Reference System.
+   }
+   \sstinvocation{
+      void palEpv( double date, double ph[3], double vh[3],
+                   double pb[3], double vb[3] );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         Date, TDB Modified Julian Date (JD-2400000.5)
+      }
+      \sstsubsection{
+         ph = double [3] (Returned)
+      }{
+         Heliocentric Earth position (AU)
+      }
+      \sstsubsection{
+         vh = double [3] (Returned)
+      }{
+         Heliocentric Earth velocity (AU/day)
+      }
+      \sstsubsection{
+         pb = double [3] (Returned)
+      }{
+         Barycentric Earth position (AU)
+      }
+      \sstsubsection{
+         vb = double [3] (Returned)
+      }{
+         Barycentric Earth velocity (AU/day)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         See iauEpv00 for details on accuracy
+
+         \sstitem
+         Note that the status argument from iauEpv00 is ignored
+      }
+   }
+}
+\sstroutine{
+   palEtrms
+}{
+   Compute the E-terms vector
+}{
+   \sstdescription{
+      Computes the E-terms (elliptic component of annual aberration)
+      vector.
+
+      Note the use of the J2000 aberration constant (20.49552 arcsec).
+      This is a reflection of the fact that the E-terms embodied in
+      existing star catalogues were computed from a variety of
+      aberration constants.  Rather than adopting one of the old
+      constants the latest value is used here.
+   }
+   \sstinvocation{
+      void palEtrms ( double ep, double ev[3] );
+   }
+   \sstarguments{
+      \sstsubsection{
+         ep = double (Given)
+      }{
+         Besselian epoch
+      }
+      \sstsubsection{
+         ev = double [3] (Returned)
+      }{
+         E-terms as (dx,dy,dz)
+      }
+   }
+   \sstdiytopic{
+      See also
+   }{
+      \sstitemlist{
+
+         \sstitem
+         Smith, C.A. et al., 1989.  Astr.J. 97, 265.
+
+         \sstitem
+         Yallop, B.D. et al., 1989.  Astr.J. 97, 274.
+      }
+   }
+}
+\sstroutine{
+   palEqecl
+}{
+   Transform from J2000.0 equatorial coordinates to ecliptic coordinates
+}{
+   \sstdescription{
+      Transform from J2000.0 equatorial coordinates to ecliptic coordinates.
+   }
+   \sstinvocation{
+      void palEqecl( double dr, double dd, double date,
+                     double $*$dl, double $*$db);
+   }
+   \sstarguments{
+      \sstsubsection{
+         dr = double (Given)
+      }{
+         J2000.0 mean RA (radians)
+      }
+      \sstsubsection{
+         dd = double (Given)
+      }{
+         J2000.0 mean Dec (Radians)
+      }
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TT as Modified Julian Date (JD-2400000.5). The difference
+         between TT and TDB is of the order of a millisecond or two
+         (i.e. about 0.02 arc-seconds).
+      }
+      \sstsubsection{
+         dl = double $*$ (Returned)
+      }{
+         Ecliptic longitude (mean of date, IAU 1980 theory, radians)
+      }
+      \sstsubsection{
+         db = double $*$ (Returned)
+      }{
+         Ecliptic latitude (mean of date, IAU 1980 theory, radians)
+      }
+   }
+}
+\sstroutine{
+   palEqgal
+}{
+   Convert from J2000.0 equatorial coordinates to Galactic
+}{
+   \sstdescription{
+      Transformation from J2000.0 equatorial coordinates
+      to IAU 1958 galactic coordinates.
+   }
+   \sstinvocation{
+      void palEqgal ( double dr, double dd, double $*$dl, double $*$db );
+   }
+   \sstarguments{
+      \sstsubsection{
+         dr = double (Given)
+      }{
+         J2000.0 RA (radians)
+      }
+      \sstsubsection{
+         dd = double (Given)
+      }{
+         J2000.0 Dec (radians
+      }
+      \sstsubsection{
+         dl = double $*$ (Returned)
+      }{
+         Galactic longitude (radians).
+      }
+      \sstsubsection{
+         db = double $*$ (Returned)
+      }{
+         Galactic latitude (radians).
+      }
+   }
+   \sstnotes{
+      The equatorial coordinates are J2000.0.  Use the routine
+      palGe50 if conversion to B1950.0 {\tt '}FK4{\tt '} coordinates is
+      required.
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
+   }
+}
+\sstroutine{
+   palEvp
+}{
+   Returns the barycentric and heliocentric velocity and position of the
+   Earth
+}{
+   \sstdescription{
+      Returns the barycentric and heliocentric velocity and position of the
+      Earth at a given epoch, given with respect to a specified equinox.
+      For information about accuracy, see the function iauEpv00.
+   }
+   \sstinvocation{
+      void palEvp( double date, double deqx, double dvb[3], double dpb[3],
+                   double dvh[3], double dph[3] )
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TDB (loosely ET) as a Modified Julian Date (JD-2400000.5)
+      }
+      \sstsubsection{
+         deqx = double (Given)
+      }{
+         Julian epoch (e.g. 2000.0) of mean equator and equinox of the
+         vectors returned.  If deqx $<$= 0.0, all vectors are referred to the
+         mean equator and equinox (FK5) of epoch date.
+      }
+      \sstsubsection{
+         dvb = double[3] (Returned)
+      }{
+         Barycentric velocity (AU/s, AU)
+      }
+      \sstsubsection{
+         dpb = double[3] (Returned)
+      }{
+         Barycentric position (AU/s, AU)
+      }
+      \sstsubsection{
+         dvh = double[3] (Returned)
+      }{
+         heliocentric velocity (AU/s, AU)
+      }
+      \sstsubsection{
+         dph = double[3] (Returned)
+      }{
+         Heliocentric position (AU/s, AU)
+      }
+   }
+}
+\sstroutine{
+   palFk45z
+}{
+   Convert B1950.0 FK4 star data to J2000.0 FK5 assuming zero
+   proper motion in the FK5 frame
+}{
+   \sstdescription{
+      Convert B1950.0 FK4 star data to J2000.0 FK5 assuming zero
+      proper motion in the FK5 frame (double precision)
+
+      This function converts stars from the Bessel-Newcomb, FK4
+      system to the IAU 1976, FK5, Fricke system, in such a
+      way that the FK5 proper motion is zero.  Because such a star
+      has, in general, a non-zero proper motion in the FK4 system,
+      the routine requires the epoch at which the position in the
+      FK4 system was determined.
+
+      The method is from Appendix 2 of Ref 1, but using the constants
+      of Ref 4.
+   }
+   \sstinvocation{
+      palFk45z( double r1950, double d1950, double bepoch, double $*$r2000,
+                double $*$d2000 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         r1950 = double (Given)
+      }{
+         B1950.0 FK4 RA at epoch (radians).
+      }
+      \sstsubsection{
+         d1950 = double (Given)
+      }{
+         B1950.0 FK4 Dec at epoch (radians).
+      }
+      \sstsubsection{
+         bepoch = double (Given)
+      }{
+         Besselian epoch (e.g. 1979.3)
+      }
+      \sstsubsection{
+         r2000 = double (Returned)
+      }{
+         J2000.0 FK5 RA (Radians).
+      }
+      \sstsubsection{
+         d2000 = double (Returned)
+      }{
+         J2000.0 FK5 Dec(Radians).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The epoch BEPOCH is strictly speaking Besselian, but if a
+         Julian epoch is supplied the result will be affected only to
+         a negligible extent.
+
+         \sstitem
+         Conversion from Besselian epoch 1950.0 to Julian epoch 2000.0
+         only is provided for.  Conversions involving other epochs will
+         require use of the appropriate precession, proper motion, and
+         E-terms routines before and/or after palFk45z is called.
+
+         \sstitem
+         In the FK4 catalogue the proper motions of stars within 10
+         degrees of the poles do not embody the differential E-term effect
+         and should, strictly speaking, be handled in a different manner
+         from stars outside these regions. However, given the general lack
+         of homogeneity of the star data available for routine astrometry,
+         the difficulties of handling positions that may have been
+         determined from astrometric fields spanning the polar and non-polar
+         regions, the likelihood that the differential E-terms effect was not
+         taken into account when allowing for proper motion in past
+         astrometry, and the undesirability of a discontinuity in the
+         algorithm, the decision has been made in this routine to include the
+         effect of differential E-terms on the proper motions for all stars,
+         whether polar or not.  At epoch 2000, and measuring on the sky rather
+         than in terms of dRA, the errors resulting from this simplification
+         are less than 1 milliarcsecond in position and 1 milliarcsecond per
+         century in proper motion.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         Aoki,S., et al, 1983.  Astron.Astrophys., 128, 263.
+
+         \sstitem
+         Smith, C.A. et al, 1989.  {\tt "}The transformation of astrometric
+           catalog systems to the equinox J2000.0{\tt "}.  Astron.J. 97, 265.
+
+         \sstitem
+         Yallop, B.D. et al, 1989.  {\tt "}Transformation of mean star places
+           from FK4 B1950.0 to FK5 J2000.0 using matrices in 6-space{\tt "}.
+           Astron.J. 97, 274.
+
+         \sstitem
+         Seidelmann, P.K. (ed), 1992.  {\tt "}Explanatory Supplement to
+           the Astronomical Almanac{\tt "}, ISBN 0-935702-68-7.
+      }
+   }
+}
+\sstroutine{
+   palFk524
+}{
+   Convert J2000.0 FK5 star data to B1950.0 FK4
+}{
+   \sstdescription{
+      This function converts stars from the IAU 1976, FK5, Fricke
+      system, to the Bessel-Newcomb, FK4 system.  The precepts
+      of Smith et al (Ref 1) are followed, using the implementation
+      by Yallop et al (Ref 2) of a matrix method due to Standish.
+      Kinoshita{\tt '}s development of Andoyer{\tt '}s post-Newcomb precession is
+      used.  The numerical constants from Seidelmann et al (Ref 3) are
+      used canonically.
+   }
+   \sstinvocation{
+      palFk524( double r2000, double d2000, double dr2000, double dd2000,
+                double p2000, double v2000, double $*$r1950, double $*$d1950,
+                double $*$dr1950, double $*$dd1950, double $*$p1950, double $*$v1950 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         r2000 = double (Given)
+      }{
+         J2000.0 FK5 RA (radians).
+      }
+      \sstsubsection{
+         d2000 = double (Given)
+      }{
+         J2000.0 FK5 Dec (radians).
+      }
+      \sstsubsection{
+         dr2000 = double (Given)
+      }{
+         J2000.0 FK5 RA proper motion (rad/Jul.yr)
+      }
+      \sstsubsection{
+         dd2000 = double (Given)
+      }{
+         J2000.0 FK5 Dec proper motion (rad/Jul.yr)
+      }
+      \sstsubsection{
+         p2000 = double (Given)
+      }{
+         J2000.0 FK5 parallax (arcsec)
+      }
+      \sstsubsection{
+         v2000 = double (Given)
+      }{
+         J2000.0 FK5 radial velocity (km/s, $+$ve = moving away)
+      }
+      \sstsubsection{
+         r1950 = double $*$ (Returned)
+      }{
+         B1950.0 FK4 RA (radians).
+      }
+      \sstsubsection{
+         d1950 = double $*$ (Returned)
+      }{
+         B1950.0 FK4 Dec (radians).
+      }
+      \sstsubsection{
+         dr1950 = double $*$ (Returned)
+      }{
+         B1950.0 FK4 RA proper motion (rad/Jul.yr)
+      }
+      \sstsubsection{
+         dd1950 = double $*$ (Returned)
+      }{
+         B1950.0 FK4 Dec proper motion (rad/Jul.yr)
+      }
+      \sstsubsection{
+         p1950 = double $*$ (Returned)
+      }{
+         B1950.0 FK4 parallax (arcsec)
+      }
+      \sstsubsection{
+         v1950 = double $*$ (Returned)
+      }{
+         B1950.0 FK4 radial velocity (km/s, $+$ve = moving away)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The proper motions in RA are dRA/dt rather than
+         cos(Dec)$*$dRA/dt, and are per year rather than per century.
+
+         \sstitem
+         Note that conversion from Julian epoch 2000.0 to Besselian
+         epoch 1950.0 only is provided for.  Conversions involving
+         other epochs will require use of the appropriate precession,
+         proper motion, and E-terms routines before and/or after
+         FK524 is called.
+
+         \sstitem
+         In the FK4 catalogue the proper motions of stars within
+         10 degrees of the poles do not embody the differential
+         E-term effect and should, strictly speaking, be handled
+         in a different manner from stars outside these regions.
+         However, given the general lack of homogeneity of the star
+         data available for routine astrometry, the difficulties of
+         handling positions that may have been determined from
+         astrometric fields spanning the polar and non-polar regions,
+         the likelihood that the differential E-terms effect was not
+         taken into account when allowing for proper motion in past
+         astrometry, and the undesirability of a discontinuity in
+         the algorithm, the decision has been made in this routine to
+         include the effect of differential E-terms on the proper
+         motions for all stars, whether polar or not.  At epoch 2000,
+         and measuring on the sky rather than in terms of dRA, the
+         errors resulting from this simplification are less than
+         1 milliarcsecond in position and 1 milliarcsecond per
+         century in proper motion.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         Smith, C.A. et al, 1989.  {\tt "}The transformation of astrometric
+           catalog systems to the equinox J2000.0{\tt "}.  Astron.J. 97, 265.
+
+         \sstitem
+         Yallop, B.D. et al, 1989.  {\tt "}Transformation of mean star places
+           from FK4 B1950.0 to FK5 J2000.0 using matrices in 6-space{\tt "}.
+           Astron.J. 97, 274.
+
+         \sstitem
+         Seidelmann, P.K. (ed), 1992.  {\tt "}Explanatory Supplement to
+           the Astronomical Almanac{\tt "}, ISBN 0-935702-68-7.
+      }
+   }
+}
+\sstroutine{
+   palFk54z
+}{
+   Convert a J2000.0 FK5 star position to B1950.0 FK4 assuming
+   zero proper motion and parallax
+}{
+   \sstdescription{
+      This function converts star positions from the IAU 1976,
+      FK5, Fricke system to the Bessel-Newcomb, FK4 system.
+   }
+   \sstinvocation{
+      palFk54z( double r2000, double d2000, double bepoch, double $*$r1950,
+                double $*$d1950, double $*$dr1950, double $*$dd1950 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         r2000 = double (Given)
+      }{
+         J2000.0 FK5 RA (radians).
+      }
+      \sstsubsection{
+         d2000 = double (Given)
+      }{
+         J2000.0 FK5 Dec (radians).
+      }
+      \sstsubsection{
+         bepoch = double (Given)
+      }{
+         Besselian epoch (e.g. 1950.0).
+      }
+      \sstsubsection{
+         r1950 = double $*$ (Returned)
+      }{
+         B1950 FK4 RA (radians) at epoch {\tt "}bepoch{\tt "}.
+      }
+      \sstsubsection{
+         d1950 = double $*$ (Returned)
+      }{
+         B1950 FK4 Dec (radians) at epoch {\tt "}bepoch{\tt "}.
+      }
+      \sstsubsection{
+         dr1950 = double $*$ (Returned)
+      }{
+         B1950 FK4 proper motion (RA) (radians/trop.yr)).
+      }
+      \sstsubsection{
+         dr1950 = double $*$ (Returned)
+      }{
+         B1950 FK4 proper motion (Dec) (radians/trop.yr)).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The proper motion in RA is dRA/dt rather than cos(Dec)$*$dRA/dt.
+
+         \sstitem
+         Conversion from Julian epoch 2000.0 to Besselian epoch 1950.0
+         only is provided for.  Conversions involving other epochs will
+         require use of the appropriate precession functions before and
+         after this function is called.
+
+         \sstitem
+         The FK5 proper motions, the parallax and the radial velocity
+          are presumed zero.
+
+         \sstitem
+         It is the intention that FK5 should be a close approximation
+         to an inertial frame, so that distant objects have zero proper
+         motion;  such objects have (in general) non-zero proper motion
+         in FK4, and this function returns those fictitious proper
+         motions.
+
+         \sstitem
+         The position returned by this function is in the B1950
+         reference frame but at Besselian epoch BEPOCH.  For comparison
+         with catalogues the {\tt "}bepoch{\tt "} argument will frequently be 1950.0.
+      }
+   }
+}
+\sstroutine{
+   palGaleq
+}{
+   Convert from galactic to J2000.0 equatorial coordinates
+}{
+   \sstdescription{
+      Transformation from IAU 1958 galactic coordinates to
+      J2000.0 equatorial coordinates.
+   }
+   \sstinvocation{
+      void palGaleq ( double dl, double db, double $*$dr, double $*$dd );
+   }
+   \sstarguments{
+      \sstsubsection{
+         dl = double (Given)
+      }{
+         Galactic longitude (radians).
+      }
+      \sstsubsection{
+         db = double (Given)
+      }{
+         Galactic latitude (radians).
+      }
+      \sstsubsection{
+         dr = double $*$ (Returned)
+      }{
+         J2000.0 RA (radians)
+      }
+      \sstsubsection{
+         dd = double $*$ (Returned)
+      }{
+         J2000.0 Dec (radians)
+      }
+   }
+   \sstnotes{
+      The equatorial coordinates are J2000.0.  Use the routine
+      palGe50 if conversion to B1950.0 {\tt '}FK4{\tt '} coordinates is
+      required.
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
+   }
+}
+\sstroutine{
+   palGalsup
+}{
+   Convert from galactic to supergalactic coordinates
+}{
+   \sstdescription{
+      Transformation from IAU 1958 galactic coordinates to
+      de Vaucouleurs supergalactic coordinates.
+   }
+   \sstinvocation{
+      void palGalsup ( double dl, double db, double $*$dsl, double $*$dsb );
+   }
+   \sstarguments{
+      \sstsubsection{
+         dl = double (Given)
+      }{
+         Galactic longitude.
+      }
+      \sstsubsection{
+         db = double (Given)
+      }{
+         Galactic latitude.
+      }
+      \sstsubsection{
+         dsl = double $*$ (Returned)
+      }{
+         Supergalactic longitude.
+      }
+      \sstsubsection{
+         dsb = double $*$ (Returned)
+      }{
+         Supergalactic latitude.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      \sstitemlist{
+
+         \sstitem
+          de Vaucouleurs, de Vaucouleurs, \& Corwin, Second Reference
+            Catalogue of Bright Galaxies, U. Texas, page 8.
+
+         \sstitem
+          Systems \& Applied Sciences Corp., Documentation for the
+            machine-readable version of the above catalogue,
+            Contract NAS 5-26490.
+
+      }
+      (These two references give different values for the galactic
+       longitude of the supergalactic origin.  Both are wrong;  the
+       correct value is L2=137.37.)
+   }
+}
+\sstroutine{
+   palGe50
+}{
+   Transform Galactic Coordinate to B1950 FK4
+}{
+   \sstdescription{
+      Transformation from IAU 1958 galactic coordinates to
+      B1950.0 {\tt '}FK4{\tt '} equatorial coordinates.
+   }
+   \sstinvocation{
+      palGe50( double dl, double db, double $*$dr, double $*$dd );
+   }
+   \sstarguments{
+      \sstsubsection{
+         dl = double (Given)
+      }{
+         Galactic longitude (radians)
+      }
+      \sstsubsection{
+         db = double (Given)
+      }{
+         Galactic latitude (radians)
+      }
+      \sstsubsection{
+         dr = double $*$ (Returned)
+      }{
+         B9150.0 FK4 RA.
+      }
+      \sstsubsection{
+         dd = double $*$ (Returned)
+      }{
+         B1950.0 FK4 Dec.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The equatorial coordinates are B1950.0 {\tt '}FK4{\tt '}. Use the routine
+         palGaleq if conversion to J2000.0 coordinates is required.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      \sstitemlist{
+
+         \sstitem
+         Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
+      }
+   }
+}
+\sstroutine{
+   palGeoc
+}{
+   Convert geodetic position to geocentric
+}{
+   \sstdescription{
+      Convert geodetic position to geocentric.
+   }
+   \sstinvocation{
+      void palGeoc( double p, double h, double $*$ r, double $*$z );
+   }
+   \sstarguments{
+      \sstsubsection{
+         p = double (Given)
+      }{
+         latitude (radians)
+      }
+      \sstsubsection{
+         h = double (Given)
+      }{
+         height above reference spheroid (geodetic, metres)
+      }
+      \sstsubsection{
+         r = double $*$ (Returned)
+      }{
+         distance from Earth axis (AU)
+      }
+      \sstsubsection{
+         z = double $*$ (Returned)
+      }{
+         distance from plane of Earth equator (AU)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Geocentric latitude can be obtained by evaluating atan2(z,r)
+
+         \sstitem
+         Uses WGS84 reference ellipsoid and calls iauGd2gc
+      }
+   }
+}
+\sstroutine{
+   palIntin
+}{
+   Convert free-format input into an integer
+}{
+   \sstdescription{
+      Extracts a number from an input string starting at the specified
+      index.
+   }
+   \sstinvocation{
+      void palIntin( const char $*$ string, int $*$nstrt,
+                      long $*$ireslt, int $*$jflag );
+   }
+   \sstarguments{
+      \sstsubsection{
+         string = const char $*$ (Given)
+      }{
+         String containing number to be decoded.
+      }
+      \sstsubsection{
+         nstrt = int $*$ (Given and Returned)
+      }{
+         Character number indicating where decoding should start.
+         On output its value is updated to be the location of the
+         possible next value. For compatibility with SLA the first
+         character is index 1.
+      }
+      \sstsubsection{
+         ireslt = long $*$ (Returned)
+      }{
+         Result. Not updated when jflag=1.
+      }
+      \sstsubsection{
+         jflag = int $*$ (Returned)
+      }{
+         status: -1 = -OK, 0 = $+$OK, 1 = null, 2 = error
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Uses the strtol() system call to do the parsing. This may lead to
+           subtle differences when compared to the SLA/F parsing.
+
+         \sstitem
+         Commas are recognized as a special case and are skipped if one happens
+           to be the next character when updating nstrt. Additionally the output
+           nstrt position will skip past any trailing space.
+
+         \sstitem
+         If no number can be found flag will be set to 1.
+
+         \sstitem
+         If the number overflows or underflows jflag will be set to 2. For overflow
+           the returned result will have the value LONG\_MAX, for underflow it
+           will have the value LONG\_MIN.
+      }
+   }
+}
+\sstroutine{
+   palMap
+}{
+   Convert star RA,Dec from mean place to geocentric apparent
+}{
+   \sstdescription{
+      Convert star RA,Dec from mean place to geocentric apparent.
+   }
+   \sstinvocation{
+      void palMap( double rm, double dm, double pr, double pd,
+                   double px, double rv, double eq, double date,
+                   double $*$ra, double $*$da );
+   }
+   \sstarguments{
+      \sstsubsection{
+         rm = double (Given)
+      }{
+         Mean RA (radians)
+      }
+      \sstsubsection{
+         dm = double (Given)
+      }{
+         Mean declination (radians)
+      }
+      \sstsubsection{
+         pr = double (Given)
+      }{
+         RA proper motion, changes per Julian year (radians)
+      }
+      \sstsubsection{
+         pd = double (Given)
+      }{
+         Dec proper motion, changes per Julian year (radians)
+      }
+      \sstsubsection{
+         px = double (Given)
+      }{
+         Parallax (arcsec)
+      }
+      \sstsubsection{
+         rv = double (Given)
+      }{
+         Radial velocity (km/s, $+$ve if receding)
+      }
+      \sstsubsection{
+         eq = double (Given)
+      }{
+         Epoch and equinox of star data (Julian)
+      }
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TDB for apparent place (JD-2400000.5)
+      }
+      \sstsubsection{
+         ra = double $*$ (Returned)
+      }{
+         Apparent RA (radians)
+      }
+      \sstsubsection{
+         dec = double $*$ (Returned)
+      }{
+         Apparent dec (radians)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Calls palMappa and palMapqk
+
+         \sstitem
+         The reference systems and timescales used are IAU 2006.
+      }
+   }
+}
+\sstroutine{
+   palMappa
+}{
+   Compute parameters needed by palAmpqk and palMapqk
+}{
+   \sstdescription{
+      Compute star-independent parameters in preparation for
+      transformations between mean place and geocentric apparent place.
+
+      The parameters produced by this function are required in the
+      parallax, aberration, and nutation/bias/precession parts of the
+      mean/apparent transformations.
+
+      The reference systems and timescales used are IAU 2006.
+   }
+   \sstinvocation{
+      void palMappa( double eq, double date, double amprms[21] )
+   }
+   \sstarguments{
+      \sstsubsection{
+         eq = double (Given)
+      }{
+         epoch of mean equinox to be used (Julian)
+      }
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TDB (JD-2400000.5)
+      }
+      \sstsubsection{
+         amprms =   double[21]  (Returned)
+      }{
+         star-independent mean-to-apparent parameters:
+         \sstitemlist{
+
+            \sstitem
+            (0)      time interval for proper motion (Julian years)
+
+            \sstitem
+            (1-3)    barycentric position of the Earth (AU)
+
+            \sstitem
+            (4-6)    heliocentric direction of the Earth (unit vector)
+
+            \sstitem
+            (7)      (grav rad Sun)$*$2/(Sun-Earth distance)
+
+            \sstitem
+            (8-10)   abv: barycentric Earth velocity in units of c
+
+            \sstitem
+            (11)     sqrt(1-v$*$$*$2) where v=modulus(abv)
+
+            \sstitem
+            (12-20)  precession/nutation (3,3) matrix
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         For date, the distinction between the required TDB and TT
+         is always negligible.  Moreover, for all but the most
+         critical applications UTC is adequate.
+
+         \sstitem
+         The vector amprms(1-3) is referred to the mean equinox and
+         equator of epoch eq.
+
+         \sstitem
+         The parameters amprms produced by this function are used by
+         palAmpqk, palMapqk and palMapqkz.
+      }
+   }
+}
+\sstroutine{
+   palMapqk
+}{
+   Quick mean to apparent place
+}{
+   \sstdescription{
+      Quick mean to apparent place:  transform a star RA,Dec from
+      mean place to geocentric apparent place, given the
+      star-independent parameters.
+
+      Use of this routine is appropriate when efficiency is important
+      and where many star positions, all referred to the same equator
+      and equinox, are to be transformed for one epoch.  The
+      star-independent parameters can be obtained by calling the
+      palMappa routine.
+
+      If the parallax and proper motions are zero the palMapqkz
+      routine can be used instead.
+   }
+   \sstinvocation{
+      void palMapqk ( double rm, double dm, double pr, double pd,
+                      double px, double rv, double amprms[21],
+                      double $*$ra, double $*$da );
+   }
+   \sstarguments{
+      \sstsubsection{
+         rm = double (Given)
+      }{
+         Mean RA (radians)
+      }
+      \sstsubsection{
+         dm = double (Given)
+      }{
+         Mean declination (radians)
+      }
+      \sstsubsection{
+         pr = double (Given)
+      }{
+         RA proper motion, changes per Julian year (radians)
+      }
+      \sstsubsection{
+         pd = double (Given)
+      }{
+         Dec proper motion, changes per Julian year (radians)
+      }
+      \sstsubsection{
+         px = double (Given)
+      }{
+         Parallax (arcsec)
+      }
+      \sstsubsection{
+         rv = double (Given)
+      }{
+         Radial velocity (km/s, $+$ve if receding)
+      }
+      \sstsubsection{
+         amprms = double [21] (Given)
+      }{
+         Star-independent mean-to-apparent parameters (see palMappa).
+      }
+      \sstsubsection{
+         ra = double $*$ (Returned)
+      }{
+         Apparent RA (radians)
+      }
+      \sstsubsection{
+         dec = double $*$ (Returned)
+      }{
+         Apparent dec (radians)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The reference frames and timescales used are post IAU 2006.
+      }
+   }
+}
+\sstroutine{
+   palMapqkz
+}{
+   Quick mean to apparent place
+}{
+   \sstdescription{
+      Quick mean to apparent place:  transform a star RA,dec from
+      mean place to geocentric apparent place, given the
+      star-independent parameters, and assuming zero parallax
+      and proper motion.
+
+      Use of this function is appropriate when efficiency is important
+      and where many star positions, all with parallax and proper
+      motion either zero or already allowed for, and all referred to
+      the same equator and equinox, are to be transformed for one
+      epoch.  The star-independent parameters can be obtained by
+      calling the palMappa function.
+
+      The corresponding function for the case of non-zero parallax
+      and proper motion is palMapqk.
+
+      The reference systems and timescales used are IAU 2006.
+
+      Strictly speaking, the function is not valid for solar-system
+      sources, though the error will usually be extremely small.
+   }
+   \sstinvocation{
+      void palMapqkz( double rm, double dm, double amprms[21],
+                      double $*$ra, double $*$da )
+   }
+   \sstarguments{
+      \sstsubsection{
+         rm = double (Given)
+      }{
+         Mean RA (radians).
+      }
+      \sstsubsection{
+         dm = double (Given)
+      }{
+         Mean Dec (radians).
+      }
+      \sstsubsection{
+         amprms = double[21] (Given)
+      }{
+         Star-independent mean-to-apparent parameters (see palMappa):
+         (0-3)    not used
+         (4-6)    not used
+         (7)      not used
+         (8-10)   abv: barycentric Earth velocity in units of c
+         (11)     sqrt(1-v$*$$*$2) where v=modulus(abv)
+         (12-20)  precession/nutation (3,3) matrix
+      }
+      \sstsubsection{
+         ra = double $*$ (Returned)
+      }{
+         Apparent RA (radians).
+      }
+      \sstsubsection{
+         da = double $*$ (Returned)
+      }{
+         Apparent Dec (radians).
+      }
+   }
+}
+\sstroutine{
+   palNut
+}{
+   Form the matrix of nutation
+}{
+   \sstdescription{
+      Form the matrix of nutation for a given date using
+      the IAU 2006 nutation model and palDeuler.
+   }
+   \sstinvocation{
+      void palNut( double date, double rmatn[3][3] );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TT as modified Julian date (JD-2400000.5)
+      }
+      \sstsubsection{
+         rmatn = double [3][3] (Returned)
+      }{
+         Nutation matrix in the sense v(true)=rmatn $*$ v(mean)
+         where v(true) is the star vector relative to the
+         true equator and equinox of date and v(mean) is the
+         star vector relative to the mean equator and equinox
+         of date.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Uses iauNut06a via palNutc
+
+         \sstitem
+         The distinction between TDB and TT is negligible. For all but
+           the most critical applications UTC is adequate.
+      }
+   }
+}
+\sstroutine{
+   palNutc
+}{
+   Calculate nutation longitude \& obliquoty components
+}{
+   \sstdescription{
+      Calculates the longitude $*$ obliquity components and mean obliquity
+      using the SOFA library.
+   }
+   \sstinvocation{
+      void palNutc( double date, double $*$ dpsi, double $*$deps, double $*$eps0 );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TT as modified Julian date (JD-2400000.5)
+      }
+      \sstsubsection{
+         dpsi = double $*$ (Returned)
+      }{
+         Nutation in longitude
+      }
+      \sstsubsection{
+         deps = double $*$ (Returned)
+      }{
+         Nutation in obliquity
+      }
+      \sstsubsection{
+         eps0 = double $*$ (Returned)
+      }{
+         Mean obliquity.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Calls iauObl06 and iauNut06a and therefore uses the IAU 206
+           precession/nutation model.
+
+         \sstitem
+         Note the change from SLA/F regarding the date. TT is used
+           rather than TDB.
+      }
+   }
+}
+\sstroutine{
+   palObs
+}{
+   Parameters of selected ground-based observing stations
+}{
+   \sstdescription{
+      Station numbers, identifiers, names and other details are
+      subject to change and should not be hardwired into
+      application programs.
+
+      All characters in {\tt "}c{\tt "} up to the first space are
+      checked;  thus an abbreviated ID will return the parameters
+      for the first station in the list which matches the
+      abbreviation supplied, and no station in the list will ever
+      contain embedded spaces. {\tt "}c{\tt "} must not have leading spaces.
+
+      IMPORTANT -- BEWARE OF THE LONGITUDE SIGN CONVENTION.  The
+      longitude returned by sla\_OBS is west-positive in accordance
+      with astronomical usage.  However, this sign convention is
+      left-handed and is the opposite of the one used by geographers;
+      elsewhere in PAL the preferable east-positive convention is
+      used.  In particular, note that for use in palAop, palAoppa
+      and palOap the sign of the longitude must be reversed.
+
+      Users are urged to inform the author of any improvements
+      they would like to see made.  For example:
+
+          typographical corrections
+          more accurate parameters
+          better station identifiers or names
+          additional stations
+   }
+   \sstinvocation{
+      int palObs( size\_t n, const char $*$ c,
+                  char $*$ ident, size\_t identlen,
+                  char $*$ name, size\_t namelen,
+                  double $*$ w, double $*$ p, double $*$ h );
+   }
+   \sstarguments{
+      \sstsubsection{
+         n = size\_t (Given)
+      }{
+         Number specifying the observing station. If 0
+         the identifier in {\tt "}c{\tt "} is used to determine the
+         observing station to use.
+      }
+      \sstsubsection{
+         c = const char $*$ (Given)
+      }{
+         Identifier specifying the observing station for
+         which the parameters should be returned. Only used
+         if n is 0. Can be NULL for n$>$0. Case insensitive.
+      }
+      \sstsubsection{
+         ident = char $*$ (Returned)
+      }{
+         Identifier of the observing station selected. Will be
+         identical to {\tt "}c{\tt "} if n==0. Unchanged if {\tt "}n{\tt "} or {\tt "}c{\tt "}
+         do not match an observing station. Should be at least
+         11 characters (including the trailing nul).
+      }
+      \sstsubsection{
+         identlen = size\_t (Given)
+      }{
+         Size of the buffer {\tt "}ident{\tt "} including trailing nul.
+      }
+      \sstsubsection{
+         name = char $*$ (Returned)
+      }{
+         Full name of the specified observing station. Contains {\tt "}?{\tt "}
+         if {\tt "}n{\tt "} or {\tt "}c{\tt "} did not correspond to a valid station. Should
+         be at least 41 characters (including the trailing nul).
+      }
+      \sstsubsection{
+         w = double $*$ (Returned)
+      }{
+         Longitude (radians, West $+$ve). Unchanged if observing
+         station could not be identified.
+      }
+      \sstsubsection{
+         p = double $*$ (Returned)
+      }{
+         Geodetic latitude (radians, North $+$ve). Unchanged if observing
+         station could not be identified.
+      }
+      \sstsubsection{
+         h = double $*$ (Returned)
+      }{
+         Height above sea level (metres). Unchanged if observing
+         station could not be identified.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         palObs = int
+      }{
+         0 if an observing station was returned. -1 if no match was
+         found.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Differs from the SLA interface in that the output short name
+           is not the same variable as the input short name. This simplifies
+           consting. Additionally the size of the output buffers are now
+           specified in the API and a status integer is returned.
+      }
+   }
+}
+\sstroutine{
+   palPa
+}{
+   HA, Dec to Parallactic Angle
+}{
+   \sstdescription{
+      Converts HA, Dec to Parallactic Angle.
+   }
+   \sstinvocation{
+      double palPa( double ha, double dec, double phi );
+   }
+   \sstarguments{
+      \sstsubsection{
+         ha = double (Given)
+      }{
+         Hour angle in radians (Geocentric apparent)
+      }
+      \sstsubsection{
+         dec = double (Given)
+      }{
+         Declination in radians (Geocentric apparent)
+      }
+      \sstsubsection{
+         phi = double (Given)
+      }{
+         Observatory latitude in radians (geodetic)
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         palPa = double
+      }{
+         Parallactic angle in the range -pi to $+$pi.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The parallactic angle at a point in the sky is the position
+           angle of the vertical, i.e. the angle between the direction to
+           the pole and to the zenith.  In precise applications care must
+           be taken only to use geocentric apparent HA,Dec and to consider
+           separately the effects of atmospheric refraction and telescope
+           mount errors.
+
+         \sstitem
+         At the pole a zero result is returned.
+      }
+   }
+}
+\sstroutine{
+   palPertel
+}{
+   Update elements by applying planetary perturbations
+}{
+   \sstdescription{
+      Update the osculating orbital elements of an asteroid or comet by
+      applying planetary perturbations.
+   }
+   \sstinvocation{
+      void palPertel (int jform, double date0, double date1,
+                      double epoch0, double orbi0, double anode0,
+                      double perih0, double aorq0, double e0, double am0,
+                      double $*$epoch1, double $*$orbi1, double $*$anode1,
+                      double $*$perih1, double $*$aorq1, double $*$e1, double $*$am1,
+                      int $*$jstat );
+   }
+   \sstarguments{
+      \sstsubsection{
+         jform = int (Given)
+      }{
+         Element set actually returned (1-3; Note 6)
+      }
+      \sstsubsection{
+         date0 = double (Given)
+      }{
+         Date of osculation (TT MJD) for the given elements.
+      }
+      \sstsubsection{
+         date1 = double (Given)
+      }{
+         Date of osculation (TT MJD) for the updated elements.
+      }
+      \sstsubsection{
+         epoch0 = double (Given)
+      }{
+         Epoch of elements (TT MJD)
+      }
+      \sstsubsection{
+         orbi0 = double (Given)
+      }{
+         inclination (radians)
+      }
+      \sstsubsection{
+         anode0 = double (Given)
+      }{
+         longitude of the ascending node (radians)
+      }
+      \sstsubsection{
+         perih0 = double (Given)
+      }{
+         longitude or argument of perihelion (radians)
+      }
+      \sstsubsection{
+         aorq0 = double (Given)
+      }{
+         mean distance or perihelion distance (AU)
+      }
+      \sstsubsection{
+         e0 = double (Given)
+      }{
+         eccentricity
+      }
+      \sstsubsection{
+         am0 = double (Given)
+      }{
+         mean anomaly (radians, JFORM=2 only)
+      }
+      \sstsubsection{
+         epoch1 = double $*$ (Returned)
+      }{
+         Epoch of elements (TT MJD)
+      }
+      \sstsubsection{
+         orbi1 = double $*$ (Returned)
+      }{
+         inclination (radians)
+      }
+      \sstsubsection{
+         anode1 = double $*$ (Returned)
+      }{
+         longitude of the ascending node (radians)
+      }
+      \sstsubsection{
+         perih1 = double $*$ (Returned)
+      }{
+         longitude or argument of perihelion (radians)
+      }
+      \sstsubsection{
+         aorq1 = double $*$ (Returned)
+      }{
+         mean distance or perihelion distance (AU)
+      }
+      \sstsubsection{
+         e1 = double $*$ (Returned)
+      }{
+         eccentricity
+      }
+      \sstsubsection{
+         am1 = double $*$ (Returned)
+      }{
+         mean anomaly (radians, JFORM=2 only)
+      }
+      \sstsubsection{
+         jstat = int $*$ (Returned)
+      }{
+         status:
+         \sstitemlist{
+
+            \sstitem
+              $+$102 = warning, distant epoch
+
+            \sstitem
+              $+$101 = warning, large timespan ( $>$ 100 years)
+
+            \sstitem
+              $+$1 to $+$10 = coincident with planet (Note 6)
+
+            \sstitem
+              0 = OK
+
+            \sstitem
+              -1 = illegal JFORM
+
+            \sstitem
+              -2 = illegal E0
+
+            \sstitem
+              -3 = illegal AORQ0
+
+            \sstitem
+              -4 = internal error
+
+            \sstitem
+              -5 = numerical error
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Two different element-format options are available:
+
+      }
+        Option JFORM=2, suitable for minor planets:
+
+        EPOCH   = epoch of elements (TT MJD)
+        ORBI    = inclination i (radians)
+        ANODE   = longitude of the ascending node, big omega (radians)
+        PERIH   = argument of perihelion, little omega (radians)
+        AORQ    = mean distance, a (AU)
+        E       = eccentricity, e
+        AM      = mean anomaly M (radians)
+
+        Option JFORM=3, suitable for comets:
+
+        EPOCH   = epoch of perihelion (TT MJD)
+        ORBI    = inclination i (radians)
+        ANODE   = longitude of the ascending node, big omega (radians)
+        PERIH   = argument of perihelion, little omega (radians)
+        AORQ    = perihelion distance, q (AU)
+        E       = eccentricity, e
+
+      \sstitemlist{
+
+         \sstitem
+         DATE0, DATE1, EPOCH0 and EPOCH1 are all instants of time in
+           the TT timescale (formerly Ephemeris Time, ET), expressed
+           as Modified Julian Dates (JD-2400000.5).
+
+      }
+        DATE0 is the instant at which the given (i.e. unperturbed)
+        osculating elements are correct.
+
+        DATE1 is the specified instant at which the updated osculating
+        elements are correct.
+
+        EPOCH0 and EPOCH1 will be the same as DATE0 and DATE1
+        (respectively) for the JFORM=2 case, normally used for minor
+        planets.  For the JFORM=3 case, the two epochs will refer to
+        perihelion passage and so will not, in general, be the same as
+        DATE0 and/or DATE1 though they may be similar to one another.
+      \sstitemlist{
+
+         \sstitem
+         The elements are with respect to the J2000 ecliptic and equinox.
+
+         \sstitem
+         Unused elements (AM0 and AM1 for JFORM=3) are not accessed.
+
+         \sstitem
+         See the palPertue routine for details of the algorithm used.
+
+         \sstitem
+         This routine is not intended to be used for major planets, which
+           is why JFORM=1 is not available and why there is no opportunity
+           to specify either the longitude of perihelion or the daily
+           motion.  However, if JFORM=2 elements are somehow obtained for a
+           major planet and supplied to the routine, sensible results will,
+           in fact, be produced.  This happens because the sla\_PERTUE routine
+           that is called to perform the calculations checks the separation
+           between the body and each of the planets and interprets a
+           suspiciously small value (0.001 AU) as an attempt to apply it to
+           the planet concerned.  If this condition is detected, the
+           contribution from that planet is ignored, and the status is set to
+           the planet number (1-10 = Mercury, Venus, EMB, Mars, Jupiter,
+           Saturn, Uranus, Neptune, Earth, Moon) as a warning.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      \sstitemlist{
+
+         \sstitem
+         Sterne, Theodore E., {\tt "}An Introduction to Celestial Mechanics{\tt "},
+           Interscience Publishers Inc., 1960.  Section 6.7, p199.
+      }
+   }
+}
+\sstroutine{
+   palPertue
+}{
+   Update the universal elements by applying planetary perturbations
+}{
+   \sstdescription{
+      Update the universal elements of an asteroid or comet by applying
+      planetary perturbations.
+   }
+   \sstinvocation{
+      void palPertue( double date, double u[13], int $*$jstat );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         Final epoch (TT MJD) for the update elements.
+      }
+      \sstsubsection{
+         u = const double [13] (Given \& Returned)
+      }{
+         Universal orbital elements (Note 1)
+             (0)  combined mass (M$+$m)
+             (1)  total energy of the orbit (alpha)
+             (2)  reference (osculating) epoch (t0)
+           (3-5)  position at reference epoch (r0)
+           (6-8)  velocity at reference epoch (v0)
+             (9)  heliocentric distance at reference epoch
+            (10)  r0.v0
+            (11)  date (t)
+            (12)  universal eccentric anomaly (psi) of date, approx
+      }
+      \sstsubsection{
+         jstat = int $*$ (Returned)
+      }{
+         status:
+                    $+$102 = warning, distant epoch
+                    $+$101 = warning, large timespan ( $>$ 100 years)
+               $+$1 to $+$10 = coincident with major planet (Note 5)
+                       0 = OK
+         \sstitemlist{
+
+            \sstitem
+                         1 = numerical error
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The {\tt "}universal{\tt "} elements are those which define the orbit for the
+           purposes of the method of universal variables (see reference 2).
+           They consist of the combined mass of the two bodies, an epoch,
+           and the position and velocity vectors (arbitrary reference frame)
+           at that epoch.  The parameter set used here includes also various
+           quantities that can, in fact, be derived from the other
+           information.  This approach is taken to avoiding unnecessary
+           computation and loss of accuracy.  The supplementary quantities
+           are (i) alpha, which is proportional to the total energy of the
+           orbit, (ii) the heliocentric distance at epoch, (iii) the
+           outwards component of the velocity at the given epoch, (iv) an
+           estimate of psi, the {\tt "}universal eccentric anomaly{\tt "} at a given
+           date and (v) that date.
+
+         \sstitem
+         The universal elements are with respect to the J2000 equator and
+           equinox.
+
+         \sstitem
+         The epochs DATE, U(3) and U(12) are all Modified Julian Dates
+           (JD-2400000.5).
+
+         \sstitem
+         The algorithm is a simplified form of Encke{\tt '}s method.  It takes as
+           a basis the unperturbed motion of the body, and numerically
+           integrates the perturbing accelerations from the major planets.
+           The expression used is essentially Sterne{\tt '}s 6.7-2 (reference 1).
+           Everhart and Pitkin (reference 2) suggest rectifying the orbit at
+           each integration step by propagating the new perturbed position
+           and velocity as the new universal variables.  In the present
+           routine the orbit is rectified less frequently than this, in order
+           to gain a slight speed advantage.  However, the rectification is
+           done directly in terms of position and velocity, as suggested by
+           Everhart and Pitkin, bypassing the use of conventional orbital
+           elements.
+
+      }
+        The f(q) part of the full Encke method is not used.  The purpose
+        of this part is to avoid subtracting two nearly equal quantities
+        when calculating the {\tt "}indirect member{\tt "}, which takes account of the
+        small change in the Sun{\tt '}s attraction due to the slightly displaced
+        position of the perturbed body.  A simpler, direct calculation in
+        double precision proves to be faster and not significantly less
+        accurate.
+
+        Apart from employing a variable timestep, and occasionally
+        {\tt "}rectifying the orbit{\tt "} to keep the indirect member small, the
+        integration is done in a fairly straightforward way.  The
+        acceleration estimated for the middle of the timestep is assumed
+        to apply throughout that timestep;  it is also used in the
+        extrapolation of the perturbations to the middle of the next
+        timestep, to predict the new disturbed position.  There is no
+        iteration within a timestep.
+
+        Measures are taken to reach a compromise between execution time
+        and accuracy.  The starting-point is the goal of achieving
+        arcsecond accuracy for ordinary minor planets over a ten-year
+        timespan.  This goal dictates how large the timesteps can be,
+        which in turn dictates how frequently the unperturbed motion has
+        to be recalculated from the osculating elements.
+
+        Within predetermined limits, the timestep for the numerical
+        integration is varied in length in inverse proportion to the
+        magnitude of the net acceleration on the body from the major
+        planets.
+
+        The numerical integration requires estimates of the major-planet
+        motions.  Approximate positions for the major planets (Pluto
+        alone is omitted) are obtained from the routine palPlanet.  Two
+        levels of interpolation are used, to enhance speed without
+        significantly degrading accuracy.  At a low frequency, the routine
+        palPlanet is called to generate updated position$+$velocity {\tt "}state
+        vectors{\tt "}.  The only task remaining to be carried out at the full
+        frequency (i.e. at each integration step) is to use the state
+        vectors to extrapolate the planetary positions.  In place of a
+        strictly linear extrapolation, some allowance is made for the
+        curvature of the orbit by scaling back the radius vector as the
+        linear extrapolation goes off at a tangent.
+
+        Various other approximations are made.  For example, perturbations
+        by Pluto and the minor planets are neglected and relativistic
+        effects are not taken into account.
+
+        In the interests of simplicity, the background calculations for
+        the major planets are carried out en masse.  The mean elements and
+        state vectors for all the planets are refreshed at the same time,
+        without regard for orbit curvature, mass or proximity.
+
+        The Earth-Moon system is treated as a single body when the body is
+        distant but as separate bodies when closer to the EMB than the
+        parameter RNE, which incurs a time penalty but improves accuracy
+        for near-Earth objects.
+
+      \sstitemlist{
+
+         \sstitem
+         This routine is not intended to be used for major planets.
+           However, if major-planet elements are supplied, sensible results
+           will, in fact, be produced.  This happens because the routine
+           checks the separation between the body and each of the planets and
+           interprets a suspiciously small value (0.001 AU) as an attempt to
+           apply the routine to the planet concerned.  If this condition is
+           detected, the contribution from that planet is ignored, and the
+           status is set to the planet number (1-10 = Mercury, Venus, EMB,
+           Mars, Jupiter, Saturn, Uranus, Neptune, Earth, Moon) as a warning.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      \sstitemlist{
+
+         \sstitem
+         Sterne, Theodore E., {\tt "}An Introduction to Celestial Mechanics{\tt "},
+           Interscience Publishers Inc., 1960.  Section 6.7, p199.
+
+         \sstitem
+         Everhart, E. \& Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
+      }
+   }
+}
+\sstroutine{
+   palPlanel
+}{
+   Transform conventional elements into position and velocity
+}{
+   \sstdescription{
+      Heliocentric position and velocity of a planet, asteroid or comet,
+      starting from orbital elements.
+   }
+   \sstinvocation{
+      void palPlanel ( double date, int jform, double epoch, double orbinc,
+                       double anode, double perih, double aorq, double e,
+                       double aorl, double dm, double pv[6], int $*$jstat );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         Epoch (TT MJD) of osculation (Note 1)
+      }
+      \sstsubsection{
+         jform = int (Given)
+      }{
+         Element set actually returned (1-3; Note 3)
+      }
+      \sstsubsection{
+         epoch = double (Given)
+      }{
+         Epoch of elements (TT MJD) (Note 4)
+      }
+      \sstsubsection{
+         orbinc = double (Given)
+      }{
+         inclination (radians)
+      }
+      \sstsubsection{
+         anode = double (Given)
+      }{
+         longitude of the ascending node (radians)
+      }
+      \sstsubsection{
+         perih = double (Given)
+      }{
+         longitude or argument of perihelion (radians)
+      }
+      \sstsubsection{
+         aorq = double (Given)
+      }{
+         mean distance or perihelion distance (AU)
+      }
+      \sstsubsection{
+         e = double (Given)
+      }{
+         eccentricity
+      }
+      \sstsubsection{
+         aorl = double (Given)
+      }{
+         mean anomaly or longitude (radians, JFORM=1,2 only)
+      }
+      \sstsubsection{
+         dm = double (Given)
+      }{
+         daily motion (radians, JFORM=1 only)
+      }
+      \sstsubsection{
+         u = double [13] (Returned)
+      }{
+         Universal orbital elements (Note 1)
+             (0)  combined mass (M$+$m)
+             (1)  total energy of the orbit (alpha)
+             (2)  reference (osculating) epoch (t0)
+           (3-5)  position at reference epoch (r0)
+           (6-8)  velocity at reference epoch (v0)
+             (9)  heliocentric distance at reference epoch
+            (10)  r0.v0
+            (11)  date (t)
+            (12)  universal eccentric anomaly (psi) of date, approx
+      }
+      \sstsubsection{
+         jstat = int $*$ (Returned)
+      }{
+         status:  0 = OK
+         \sstitemlist{
+
+            \sstitem
+                  -1 = illegal JFORM
+
+            \sstitem
+                  -2 = illegal E
+
+            \sstitem
+                  -3 = illegal AORQ
+
+            \sstitem
+                  -4 = illegal DM
+
+            \sstitem
+                  -5 = numerical error
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         DATE is the instant for which the prediction is required.  It is
+           in the TT timescale (formerly Ephemeris Time, ET) and is a
+           Modified Julian Date (JD-2400000.5).
+
+         \sstitem
+         The elements are with respect to the J2000 ecliptic and equinox.
+
+         \sstitem
+         A choice of three different element-set options is available:
+
+      }
+        Option JFORM = 1, suitable for the major planets:
+
+          EPOCH  = epoch of elements (TT MJD)
+          ORBINC = inclination i (radians)
+          ANODE  = longitude of the ascending node, big omega (radians)
+          PERIH  = longitude of perihelion, curly pi (radians)
+          AORQ   = mean distance, a (AU)
+          E      = eccentricity, e (range 0 to $<$1)
+          AORL   = mean longitude L (radians)
+          DM     = daily motion (radians)
+
+        Option JFORM = 2, suitable for minor planets:
+
+          EPOCH  = epoch of elements (TT MJD)
+          ORBINC = inclination i (radians)
+          ANODE  = longitude of the ascending node, big omega (radians)
+          PERIH  = argument of perihelion, little omega (radians)
+          AORQ   = mean distance, a (AU)
+          E      = eccentricity, e (range 0 to $<$1)
+          AORL   = mean anomaly M (radians)
+
+        Option JFORM = 3, suitable for comets:
+
+          EPOCH  = epoch of elements and perihelion (TT MJD)
+          ORBINC = inclination i (radians)
+          ANODE  = longitude of the ascending node, big omega (radians)
+          PERIH  = argument of perihelion, little omega (radians)
+          AORQ   = perihelion distance, q (AU)
+          E      = eccentricity, e (range 0 to 10)
+
+        Unused arguments (DM for JFORM=2, AORL and DM for JFORM=3) are not
+        accessed.
+      \sstitemlist{
+
+         \sstitem
+         Each of the three element sets defines an unperturbed heliocentric
+           orbit.  For a given epoch of observation, the position of the body
+           in its orbit can be predicted from these elements, which are
+           called {\tt "}osculating elements{\tt "}, using standard two-body analytical
+           solutions.  However, due to planetary perturbations, a given set
+           of osculating elements remains usable for only as long as the
+           unperturbed orbit that it describes is an adequate approximation
+           to reality.  Attached to such a set of elements is a date called
+           the {\tt "}osculating epoch{\tt "}, at which the elements are, momentarily,
+           a perfect representation of the instantaneous position and
+           velocity of the body.
+
+      }
+        Therefore, for any given problem there are up to three different
+        epochs in play, and it is vital to distinguish clearly between
+        them:
+
+        . The epoch of observation:  the moment in time for which the
+          position of the body is to be predicted.
+
+        . The epoch defining the position of the body:  the moment in time
+          at which, in the absence of purturbations, the specified
+          position (mean longitude, mean anomaly, or perihelion) is
+          reached.
+
+        . The osculating epoch:  the moment in time at which the given
+          elements are correct.
+
+        For the major-planet and minor-planet cases it is usual to make
+        the epoch that defines the position of the body the same as the
+        epoch of osculation.  Thus, only two different epochs are
+        involved:  the epoch of the elements and the epoch of observation.
+
+        For comets, the epoch of perihelion fixes the position in the
+        orbit and in general a different epoch of osculation will be
+        chosen.  Thus, all three types of epoch are involved.
+
+        For the present routine:
+
+        . The epoch of observation is the argument DATE.
+
+        . The epoch defining the position of the body is the argument
+          EPOCH.
+
+        . The osculating epoch is not used and is assumed to be close
+          enough to the epoch of observation to deliver adequate accuracy.
+          If not, a preliminary call to sla\_PERTEL may be used to update
+          the element-set (and its associated osculating epoch) by
+          applying planetary perturbations.
+      \sstitemlist{
+
+         \sstitem
+         The reference frame for the result is with respect to the mean
+           equator and equinox of epoch J2000.
+
+         \sstitem
+         The algorithm was originally adapted from the EPHSLA program of
+           D.H.P.Jones (private communication, 1996).  The method is based
+           on Stumpff{\tt '}s Universal Variables.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      Everhart, E. \& Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
+   }
+}
+\sstroutine{
+   palPlanet
+}{
+   Approximate heliocentric position and velocity of major planet
+}{
+   \sstdescription{
+      Calculates the approximate heliocentric position and velocity of
+      the specified major planet.
+   }
+   \sstinvocation{
+      void palPlanet ( double date, int np, double pv[6], int $*$j );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TDB Modified Julian Date (JD-2400000.5).
+      }
+      \sstsubsection{
+         np = int (Given)
+      }{
+         planet (1=Mercury, 2=Venus, 3=EMB, 4=Mars,
+                 5=Jupiter, 6=Saturn, 7=Uranus, 8=Neptune)
+      }
+      \sstsubsection{
+         pv = double [6] (Returned)
+      }{
+         heliocentric x,y,z,xdot,ydot,zdot, J2000, equatorial triad
+         in units AU and AU/s.
+      }
+      \sstsubsection{
+         j = int $*$ (Returned)
+      }{
+         \sstitemlist{
+
+            \sstitem
+            -2 = solution didn{\tt '}t converge.
+
+            \sstitem
+            -1 = illegal np (1-8)
+
+            \sstitem
+            0 = OK
+
+            \sstitem
+            $+$1 = warning: year outside 1000-3000
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         See SOFA iauPlan94 for details
+
+         \sstitem
+         Note that Pluto is supported in SLA/F but not in this routine
+
+         \sstitem
+         Status -2 is equivalent to iauPlan94 status $+$2.
+
+         \sstitem
+         Note that velocity units here match the SLA/F documentation.
+      }
+   }
+}
+\sstroutine{
+   palPlante
+}{
+   Topocentric RA,Dec of a Solar-System object from heliocentric orbital elements
+}{
+   \sstdescription{
+      Topocentric apparent RA,Dec of a Solar-System object whose
+      heliocentric orbital elements are known.
+   }
+   \sstinvocation{
+      void palPlante ( double date, double elong, double phi, int jform,
+                       double epoch, double orbinc, double anode, double perih,
+                       double aorq, double e, double aorl, double dm,
+                       double $*$ra, double $*$dec, double $*$r, int $*$jstat );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TT MJD of observation (JD-2400000.5)
+      }
+      \sstsubsection{
+         elong = double (Given)
+      }{
+         Observer{\tt '}s east longitude (radians)
+      }
+      \sstsubsection{
+         phi = double (Given)
+      }{
+         Observer{\tt '}s geodetic latitude (radians)
+      }
+      \sstsubsection{
+         jform = int (Given)
+      }{
+         Element set actually returned (1-3; Note 6)
+      }
+      \sstsubsection{
+         epoch = double (Given)
+      }{
+         Epoch of elements (TT MJD)
+      }
+      \sstsubsection{
+         orbinc = double (Given)
+      }{
+         inclination (radians)
+      }
+      \sstsubsection{
+         anode = double (Given)
+      }{
+         longitude of the ascending node (radians)
+      }
+      \sstsubsection{
+         perih = double (Given)
+      }{
+         longitude or argument of perihelion (radians)
+      }
+      \sstsubsection{
+         aorq = double (Given)
+      }{
+         mean distance or perihelion distance (AU)
+      }
+      \sstsubsection{
+         e = double (Given)
+      }{
+         eccentricity
+      }
+      \sstsubsection{
+         aorl = double (Given)
+      }{
+         mean anomaly or longitude (radians, JFORM=1,2 only)
+      }
+      \sstsubsection{
+         dm = double (Given)
+      }{
+         daily motion (radians, JFORM=1 only)
+      }
+      \sstsubsection{
+         ra = double $*$ (Returned)
+      }{
+         Topocentric apparent RA (radians)
+      }
+      \sstsubsection{
+         dec = double $*$ (Returned)
+      }{
+         Topocentric apparent Dec (radians)
+      }
+      \sstsubsection{
+         r = double $*$ (Returned)
+      }{
+         Distance from observer (AU)
+      }
+      \sstsubsection{
+         jstat = int $*$ (Returned)
+      }{
+         status: 0 = OK
+         \sstitemlist{
+
+            \sstitem
+                 -1 = illegal jform
+
+            \sstitem
+                 -2 = illegal e
+
+            \sstitem
+                 -3 = illegal aorq
+
+            \sstitem
+                 -4 = illegal dm
+
+            \sstitem
+                 -5 = numerical error
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         DATE is the instant for which the prediction is required.  It is
+           in the TT timescale (formerly Ephemeris Time, ET) and is a
+           Modified Julian Date (JD-2400000.5).
+
+         \sstitem
+         The longitude and latitude allow correction for geocentric
+           parallax.  This is usually a small effect, but can become
+           important for near-Earth asteroids.  Geocentric positions can be
+           generated by appropriate use of routines palEpv (or palEvp) and
+           palUe2pv.
+
+         \sstitem
+         The elements are with respect to the J2000 ecliptic and equinox.
+
+         \sstitem
+         A choice of three different element-set options is available:
+
+      }
+        Option JFORM = 1, suitable for the major planets:
+
+          EPOCH  = epoch of elements (TT MJD)
+          ORBINC = inclination i (radians)
+          ANODE  = longitude of the ascending node, big omega (radians)
+          PERIH  = longitude of perihelion, curly pi (radians)
+          AORQ   = mean distance, a (AU)
+          E      = eccentricity, e (range 0 to $<$1)
+          AORL   = mean longitude L (radians)
+          DM     = daily motion (radians)
+
+        Option JFORM = 2, suitable for minor planets:
+
+          EPOCH  = epoch of elements (TT MJD)
+          ORBINC = inclination i (radians)
+          ANODE  = longitude of the ascending node, big omega (radians)
+          PERIH  = argument of perihelion, little omega (radians)
+          AORQ   = mean distance, a (AU)
+          E      = eccentricity, e (range 0 to $<$1)
+          AORL   = mean anomaly M (radians)
+
+        Option JFORM = 3, suitable for comets:
+
+          EPOCH  = epoch of elements and perihelion (TT MJD)
+          ORBINC = inclination i (radians)
+          ANODE  = longitude of the ascending node, big omega (radians)
+          PERIH  = argument of perihelion, little omega (radians)
+          AORQ   = perihelion distance, q (AU)
+          E      = eccentricity, e (range 0 to 10)
+
+        Unused arguments (DM for JFORM=2, AORL and DM for JFORM=3) are not
+        accessed.
+      \sstitemlist{
+
+         \sstitem
+         Each of the three element sets defines an unperturbed heliocentric
+           orbit.  For a given epoch of observation, the position of the body
+           in its orbit can be predicted from these elements, which are
+           called {\tt "}osculating elements{\tt "}, using standard two-body analytical
+           solutions.  However, due to planetary perturbations, a given set
+           of osculating elements remains usable for only as long as the
+           unperturbed orbit that it describes is an adequate approximation
+           to reality.  Attached to such a set of elements is a date called
+           the {\tt "}osculating epoch{\tt "}, at which the elements are, momentarily,
+           a perfect representation of the instantaneous position and
+           velocity of the body.
+
+      }
+        Therefore, for any given problem there are up to three different
+        epochs in play, and it is vital to distinguish clearly between
+        them:
+
+        . The epoch of observation:  the moment in time for which the
+          position of the body is to be predicted.
+
+        . The epoch defining the position of the body:  the moment in time
+          at which, in the absence of purturbations, the specified
+          position (mean longitude, mean anomaly, or perihelion) is
+          reached.
+
+        . The osculating epoch:  the moment in time at which the given
+          elements are correct.
+
+        For the major-planet and minor-planet cases it is usual to make
+        the epoch that defines the position of the body the same as the
+        epoch of osculation.  Thus, only two different epochs are
+        involved:  the epoch of the elements and the epoch of observation.
+
+        For comets, the epoch of perihelion fixes the position in the
+        orbit and in general a different epoch of osculation will be
+        chosen.  Thus, all three types of epoch are involved.
+
+        For the present routine:
+
+        . The epoch of observation is the argument DATE.
+
+        . The epoch defining the position of the body is the argument
+          EPOCH.
+
+        . The osculating epoch is not used and is assumed to be close
+          enough to the epoch of observation to deliver adequate accuracy.
+          If not, a preliminary call to sla\_PERTEL may be used to update
+          the element-set (and its associated osculating epoch) by
+          applying planetary perturbations.
+      \sstitemlist{
+
+         \sstitem
+         Two important sources for orbital elements are Horizons, operated
+           by the Jet Propulsion Laboratory, Pasadena, and the Minor Planet
+           Center, operated by the Center for Astrophysics, Harvard.
+
+      }
+        The JPL Horizons elements (heliocentric, J2000 ecliptic and
+        equinox) correspond to SLALIB arguments as follows.
+
+         Major planets:
+
+          JFORM  = 1
+          EPOCH  = JDCT-2400000.5
+          ORBINC = IN (in radians)
+          ANODE  = OM (in radians)
+          PERIH  = OM$+$W (in radians)
+          AORQ   = A
+          E      = EC
+          AORL   = MA$+$OM$+$W (in radians)
+          DM     = N (in radians)
+
+          Epoch of osculation = JDCT-2400000.5
+
+         Minor planets:
+
+          JFORM  = 2
+          EPOCH  = JDCT-2400000.5
+          ORBINC = IN (in radians)
+          ANODE  = OM (in radians)
+          PERIH  = W (in radians)
+          AORQ   = A
+          E      = EC
+          AORL   = MA (in radians)
+
+          Epoch of osculation = JDCT-2400000.5
+
+         Comets:
+
+          JFORM  = 3
+          EPOCH  = Tp-2400000.5
+          ORBINC = IN (in radians)
+          ANODE  = OM (in radians)
+          PERIH  = W (in radians)
+          AORQ   = QR
+          E      = EC
+
+          Epoch of osculation = JDCT-2400000.5
+
+       The MPC elements correspond to SLALIB arguments as follows.
+
+         Minor planets:
+
+          JFORM  = 2
+          EPOCH  = Epoch-2400000.5
+          ORBINC = Incl. (in radians)
+          ANODE  = Node (in radians)
+          PERIH  = Perih. (in radians)
+          AORQ   = a
+          E      = e
+          AORL   = M (in radians)
+
+          Epoch of osculation = Epoch-2400000.5
+
+        Comets:
+
+          JFORM  = 3
+          EPOCH  = T-2400000.5
+          ORBINC = Incl. (in radians)
+          ANODE  = Node. (in radians)
+          PERIH  = Perih. (in radians)
+          AORQ   = q
+          E      = e
+
+          Epoch of osculation = Epoch-2400000.5
+   }
+}
+\sstroutine{
+   palPlantu
+}{
+   Topocentric RA,Dec of a Solar-System object from universal elements
+}{
+   \sstdescription{
+      Topocentric apparent RA,Dec of a Solar-System object whose
+      heliocentric universal elements are known.
+   }
+   \sstinvocation{
+      void palPlantu ( double date, double elong, double phi, const double u[13],
+                       double $*$ra, double $*$dec, double $*$r, int $*$jstat ) \{
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TT MJD of observation (JD-2400000.5)
+      }
+      \sstsubsection{
+         elong = double (Given)
+      }{
+         Observer{\tt '}s east longitude (radians)
+      }
+      \sstsubsection{
+         phi = double (Given)
+      }{
+         Observer{\tt '}s geodetic latitude (radians)
+      }
+      \sstsubsection{
+         u = const double [13] (Given)
+      }{
+         Universal orbital elements
+         \sstitemlist{
+
+            \sstitem
+              (0)  combined mass (M$+$m)
+
+            \sstitem
+              (1)  total energy of the orbit (alpha)
+
+            \sstitem
+              (2)  reference (osculating) epoch (t0)
+
+            \sstitem
+              (3-5)  position at reference epoch (r0)
+
+            \sstitem
+              (6-8)  velocity at reference epoch (v0)
+
+            \sstitem
+              (9)  heliocentric distance at reference epoch
+
+            \sstitem
+              (10)  r0.v0
+
+            \sstitem
+              (11)  date (t)
+
+            \sstitem
+              (12)  universal eccentric anomaly (psi) of date, approx
+         }
+      }
+      \sstsubsection{
+         ra = double $*$ (Returned)
+      }{
+         Topocentric apparent RA (radians)
+      }
+      \sstsubsection{
+         dec = double $*$ (Returned)
+      }{
+         Topocentric apparent Dec (radians)
+      }
+      \sstsubsection{
+         r = double $*$ (Returned)
+      }{
+         Distance from observer (AU)
+      }
+      \sstsubsection{
+         jstat = int $*$ (Returned)
+      }{
+         status: 0 = OK
+         \sstitemlist{
+
+            \sstitem
+                 -1 = radius vector zero
+
+            \sstitem
+                 -2 = failed to converge
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         DATE is the instant for which the prediction is required.  It is
+           in the TT timescale (formerly Ephemeris Time, ET) and is a
+           Modified Julian Date (JD-2400000.5).
+
+         \sstitem
+         The longitude and latitude allow correction for geocentric
+           parallax.  This is usually a small effect, but can become
+           important for near-Earth asteroids.  Geocentric positions can be
+           generated by appropriate use of routines palEpv (or palEvp) and
+           palUe2pv.
+
+         \sstitem
+         The {\tt "}universal{\tt "} elements are those which define the orbit for the
+           purposes of the method of universal variables (see reference 2).
+           They consist of the combined mass of the two bodies, an epoch,
+           and the position and velocity vectors (arbitrary reference frame)
+           at that epoch.  The parameter set used here includes also various
+           quantities that can, in fact, be derived from the other
+           information.  This approach is taken to avoiding unnecessary
+           computation and loss of accuracy.  The supplementary quantities
+           are (i) alpha, which is proportional to the total energy of the
+           orbit, (ii) the heliocentric distance at epoch, (iii) the
+           outwards component of the velocity at the given epoch, (iv) an
+           estimate of psi, the {\tt "}universal eccentric anomaly{\tt "} at a given
+           date and (v) that date.
+
+         \sstitem
+         The universal elements are with respect to the J2000 equator and
+           equinox.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      \sstitemlist{
+
+         \sstitem
+         Sterne, Theodore E., {\tt "}An Introduction to Celestial Mechanics{\tt "},
+           Interscience Publishers Inc., 1960.  Section 6.7, p199.
+
+         \sstitem
+         Everhart, E. \& Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
+      }
+   }
+}
+\sstroutine{
+   palPm
+}{
+   Apply corrections for proper motion a star RA,Dec
+}{
+   \sstdescription{
+      Apply corrections for proper motion to a star RA,Dec using the
+      SOFA routine iauStarpm.
+   }
+   \sstinvocation{
+      void palPm ( double r0, double d0, double pr, double pd,
+                   double px, double rv, double ep0, double ep1,
+                   double $*$r1, double $*$d1 );
+   }
+   \sstarguments{
+      \sstsubsection{
+         r0 = double (Given)
+      }{
+         RA at epoch ep0 (radians)
+      }
+      \sstsubsection{
+         d0 = double (Given)
+      }{
+         Dec at epoch ep0 (radians)
+      }
+      \sstsubsection{
+         pr = double (Given)
+      }{
+         RA proper motion in radians per year.
+      }
+      \sstsubsection{
+         pd = double (Given)
+      }{
+         Dec proper motion in radians per year.
+      }
+      \sstsubsection{
+         px = double (Given)
+      }{
+         Parallax (arcsec)
+      }
+      \sstsubsection{
+         rv = double (Given)
+      }{
+         Radial velocity (km/sec $+$ve if receding)
+      }
+      \sstsubsection{
+         ep0 = double (Given)
+      }{
+         Start epoch in years, assumed to be Julian.
+      }
+      \sstsubsection{
+         ep1 = double (Given)
+      }{
+         End epoch in years, assumed to be Julian.
+      }
+      \sstsubsection{
+         r1 = double $*$ (Returned)
+      }{
+         RA at epoch ep1 (radians)
+      }
+      \sstsubsection{
+         d1 = double $*$ (Returned)
+      }{
+         Dec at epoch ep1 (radians)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Uses iauStarpm but ignores the status returns from that routine.
+           In particular note that parallax should not be zero when the
+           proper motions are non-zero. SLA/F allows parallax to be zero.
+
+         \sstitem
+         Assumes all epochs are Julian epochs.
+      }
+   }
+}
+\sstroutine{
+   palPrebn
+}{
+   Generate the matrix of precession between two objects (old)
+}{
+   \sstdescription{
+      Generate the matrix of precession between two epochs,
+      using the old, pre-IAU1976, Bessel-Newcomb model, using
+      Kinoshita{\tt '}s formulation
+   }
+   \sstinvocation{
+      void palPrebn ( double bep0, double bep1, double rmatp[3][3] );
+   }
+   \sstarguments{
+      \sstsubsection{
+         bep0 = double (Given)
+      }{
+         Beginning Besselian epoch.
+      }
+      \sstsubsection{
+         bep1 = double (Given)
+      }{
+         Ending Besselian epoch
+      }
+      \sstsubsection{
+         rmatp = double[3][3] (Returned)
+      }{
+         precession matrix in the sense V(BEP1) = RMATP $*$ V(BEP0)
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      Kinoshita, H. (1975) {\tt '}Formulas for precession{\tt '}, SAO Special
+      Report No. 364, Smithsonian Institution Astrophysical
+      Observatory, Cambridge, Massachusetts.
+   }
+}
+\sstroutine{
+   palPrec
+}{
+   Form the matrix of precession between two epochs (IAU 2006)
+}{
+   \sstdescription{
+      The IAU 2006 precession matrix from ep0 to ep1 is found and
+      returned. The matrix is in the sense  V(EP1)  =  RMATP $*$ V(EP0).
+      The epochs are TDB (loosely TT) Julian epochs.
+
+      Though the matrix method itself is rigorous, the precession
+      angles are expressed through canonical polynomials which are
+      valid only for a limited time span of a few hundred years around
+      the current epoch.
+   }
+   \sstinvocation{
+      palPrec( double ep0, double ep1, double rmatp[3][3] )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ep0 = double (Given)
+      }{
+         Beginning epoch
+      }
+      \sstsubsection{
+         ep1 = double (Given)
+      }{
+         Ending epoch
+      }
+      \sstsubsection{
+         rmatp = double[3][3] (Returned)
+      }{
+         Precession matrix
+      }
+   }
+}
+\sstroutine{
+   palPreces
+}{
+   Precession - either FK4 or FK5 as required
+}{
+   \sstdescription{
+      Precess coordinates using the appropriate system and epochs.
+   }
+   \sstinvocation{
+      void palPreces ( const char sys[3], double ep0, double ep1,
+                       double $*$ra, double $*$dc );
+   }
+   \sstarguments{
+      \sstsubsection{
+         sys = const char [3] (Given)
+      }{
+         Precession to be applied: FK4 or FK5. Case insensitive.
+      }
+      \sstsubsection{
+         ep0 = double (Given)
+      }{
+         Starting epoch.
+      }
+      \sstsubsection{
+         ep1 = double (Given)
+      }{
+         Ending epoch
+      }
+      \sstsubsection{
+         ra = double $*$ (Given \& Returned)
+      }{
+         On input the RA mean equator \& equinox at epoch ep0. On exit
+         the RA mean equator \& equinox of epoch ep1.
+      }
+      \sstsubsection{
+         dec = double $*$ (Given \& Returned)
+      }{
+         On input the dec mean equator \& equinox at epoch ep0. On exit
+         the dec mean equator \& equinox of epoch ep1.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Uses palPrec for FK5 data and palPrebn for FK4 data.
+
+         \sstitem
+         The epochs are Besselian if SYSTEM={\tt '}FK4{\tt '} and Julian if {\tt '}FK5{\tt '}.
+            For example, to precess coordinates in the old system from
+            equinox 1900.0 to 1950.0 the call would be:
+                 palPreces( {\tt "}FK4{\tt "}, 1900.0, 1950.0, \&ra, \&dc );
+
+         \sstitem
+         This routine will NOT correctly convert between the old and
+           the new systems - for example conversion from B1950 to J2000.
+           For these purposes see palFk425, palFk524, palFk45z and
+           palFk54z.
+
+         \sstitem
+         If an invalid SYSTEM is supplied, values of -99D0,-99D0 will
+           be returned for both RA and DC.
+      }
+   }
+}
+\sstroutine{
+   palPrenut
+}{
+   Form the matrix of bias-precession-nutation (IAU 2006/2000A)
+}{
+   \sstdescription{
+      Form the matrix of bias-precession-nutation (IAU 2006/2000A).
+      The epoch and date are TT (but TDB is usually close enough).
+      The matrix is in the sense   v(true)  =  rmatpn $*$ v(mean).
+   }
+   \sstinvocation{
+      void palPrenut( double epoch, double date, double rmatpn[3][3] )
+   }
+   \sstarguments{
+      \sstsubsection{
+         epoch = double (Returned)
+      }{
+         Julian epoch for mean coordinates.
+      }
+      \sstsubsection{
+         date = double (Returned)
+      }{
+         Modified Julian Date (JD-2400000.5) for true coordinates.
+      }
+      \sstsubsection{
+         rmatpn = double[3][3] (Returned)
+      }{
+         combined NPB matrix
+      }
+   }
+}
+\sstroutine{
+   palPv2el
+}{
+   Position velocity to heliocentirc osculating elements
+}{
+   \sstdescription{
+      Heliocentric osculating elements obtained from instantaneous position
+      and velocity.
+   }
+   \sstinvocation{
+      void palPv2el ( const double pv[6], double date, double pmass, int jformr,
+                      int $*$jform, double $*$epoch, double $*$orbinc,
+                      double $*$anode, double $*$perih, double $*$aorq, double $*$e,
+                      double $*$aorl, double $*$dm, int $*$jstat );
+   }
+   \sstarguments{
+      \sstsubsection{
+         pv = const double [6] (Given)
+      }{
+         Heliocentric x,y,z,xdot,ydot,zdot of date,
+         J2000 equatorial triad (AU,AU/s; Note 1)
+      }
+      \sstsubsection{
+         date = double (Given)
+      }{
+         Date (TT Modified Julian Date = JD-2400000.5)
+      }
+      \sstsubsection{
+         pmass = double (Given)
+      }{
+         Mass of the planet (Sun=1; Note 2)
+      }
+      \sstsubsection{
+         jformr = int (Given)
+      }{
+         Requested element set (1-3; Note 3)
+      }
+      \sstsubsection{
+         jform = int $*$ (Returned)
+      }{
+         Element set actually returned (1-3; Note 4)
+      }
+      \sstsubsection{
+         epoch = double $*$ (Returned)
+      }{
+         Epoch of elements (TT MJD)
+      }
+      \sstsubsection{
+         orbinc = double $*$ (Returned)
+      }{
+         inclination (radians)
+      }
+      \sstsubsection{
+         anode = double $*$ (Returned)
+      }{
+         longitude of the ascending node (radians)
+      }
+      \sstsubsection{
+         perih = double $*$ (Returned)
+      }{
+         longitude or argument of perihelion (radians)
+      }
+      \sstsubsection{
+         aorq = double $*$ (Returned)
+      }{
+         mean distance or perihelion distance (AU)
+      }
+      \sstsubsection{
+         e = double $*$ (Returned)
+      }{
+         eccentricity
+      }
+      \sstsubsection{
+         aorl = double $*$ (Returned)
+      }{
+         mean anomaly or longitude (radians, JFORM=1,2 only)
+      }
+      \sstsubsection{
+         dm = double $*$ (Returned)
+      }{
+         daily motion (radians, JFORM=1 only)
+      }
+      \sstsubsection{
+         jstat = int $*$ (Returned)
+      }{
+         status:  0 = OK
+         \sstitemlist{
+
+            \sstitem
+                   -1 = illegal PMASS
+
+            \sstitem
+                   -2 = illegal JFORMR
+
+            \sstitem
+                   -3 = position/velocity out of range
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The PV 6-vector is with respect to the mean equator and equinox of
+           epoch J2000.  The orbital elements produced are with respect to
+           the J2000 ecliptic and mean equinox.
+
+         \sstitem
+         The mass, PMASS, is important only for the larger planets.  For
+           most purposes (e.g. asteroids) use 0D0.  Values less than zero
+           are illegal.
+
+         \sstitem
+         Three different element-format options are supported:
+
+      }
+        Option JFORM=1, suitable for the major planets:
+
+        EPOCH  = epoch of elements (TT MJD)
+        ORBINC = inclination i (radians)
+        ANODE  = longitude of the ascending node, big omega (radians)
+        PERIH  = longitude of perihelion, curly pi (radians)
+        AORQ   = mean distance, a (AU)
+        E      = eccentricity, e
+        AORL   = mean longitude L (radians)
+        DM     = daily motion (radians)
+
+        Option JFORM=2, suitable for minor planets:
+
+        EPOCH  = epoch of elements (TT MJD)
+        ORBINC = inclination i (radians)
+        ANODE  = longitude of the ascending node, big omega (radians)
+        PERIH  = argument of perihelion, little omega (radians)
+        AORQ   = mean distance, a (AU)
+        E      = eccentricity, e
+        AORL   = mean anomaly M (radians)
+
+        Option JFORM=3, suitable for comets:
+
+        EPOCH  = epoch of perihelion (TT MJD)
+        ORBINC = inclination i (radians)
+        ANODE  = longitude of the ascending node, big omega (radians)
+        PERIH  = argument of perihelion, little omega (radians)
+        AORQ   = perihelion distance, q (AU)
+        E      = eccentricity, e
+
+      \sstitemlist{
+
+         \sstitem
+         It may not be possible to generate elements in the form
+           requested through JFORMR.  The caller is notified of the form
+           of elements actually returned by means of the JFORM argument:
+
+      }
+         JFORMR   JFORM     meaning
+
+           1        1       OK - elements are in the requested format
+           1        2       never happens
+           1        3       orbit not elliptical
+
+           2        1       never happens
+           2        2       OK - elements are in the requested format
+           2        3       orbit not elliptical
+
+           3        1       never happens
+           3        2       never happens
+           3        3       OK - elements are in the requested format
+
+      \sstitemlist{
+
+         \sstitem
+         The arguments returned for each value of JFORM (cf Note 5: JFORM
+           may not be the same as JFORMR) are as follows:
+
+      }
+          JFORM         1              2              3
+          EPOCH         t0             t0             T
+          ORBINC        i              i              i
+          ANODE         Omega          Omega          Omega
+          PERIH         curly pi       omega          omega
+          AORQ          a              a              q
+          E             e              e              e
+          AORL          L              M              -
+          DM            n              -              -
+
+        where:
+
+          t0           is the epoch of the elements (MJD, TT)
+          T              {\tt "}    epoch of perihelion (MJD, TT)
+          i              {\tt "}    inclination (radians)
+          Omega          {\tt "}    longitude of the ascending node (radians)
+          curly pi       {\tt "}    longitude of perihelion (radians)
+          omega          {\tt "}    argument of perihelion (radians)
+          a              {\tt "}    mean distance (AU)
+          q              {\tt "}    perihelion distance (AU)
+          e              {\tt "}    eccentricity
+          L              {\tt "}    longitude (radians, 0-2pi)
+          M              {\tt "}    mean anomaly (radians, 0-2pi)
+          n              {\tt "}    daily motion (radians)
+      \sstitemlist{
+
+         \sstitem
+             means no value is set
+
+         \sstitem
+         At very small inclinations, the longitude of the ascending node
+           ANODE becomes indeterminate and under some circumstances may be
+           set arbitrarily to zero.  Similarly, if the orbit is close to
+           circular, the true anomaly becomes indeterminate and under some
+           circumstances may be set arbitrarily to zero.  In such cases,
+           the other elements are automatically adjusted to compensate,
+           and so the elements remain a valid description of the orbit.
+
+         \sstitem
+         The osculating epoch for the returned elements is the argument
+           DATE.
+
+         \sstitem
+         Reference:  Sterne, Theodore E., {\tt "}An Introduction to Celestial
+                       Mechanics{\tt "}, Interscience Publishers, 1960
+      }
+   }
+}
+\sstroutine{
+   palPv2ue
+}{
+   Universal elements to position and velocity
+}{
+   \sstdescription{
+      Construct a universal element set based on an instantaneous position
+      and velocity.
+   }
+   \sstinvocation{
+      void palPv2ue( const double pv[6], double date, double pmass,
+                     double u[13], int $*$ jstat );
+   }
+   \sstarguments{
+      \sstsubsection{
+         pv = double [6] (Given)
+      }{
+         Heliocentric x,y,z,xdot,ydot,zdot of date, (AU,AU/s; Note 1)
+      }
+      \sstsubsection{
+         date = double (Given)
+      }{
+         Date (TT modified Julian Date = JD-2400000.5)
+      }
+      \sstsubsection{
+         pmass = double (Given)
+      }{
+         Mass of the planet (Sun=1; note 2)
+      }
+      \sstsubsection{
+         u = double [13] (Returned)
+      }{
+         Universal orbital elements (Note 3)
+
+         \sstitemlist{
+
+            \sstitem
+              (0)  combined mass (M$+$m)
+
+            \sstitem
+              (1)  total energy of the orbit (alpha)
+
+            \sstitem
+              (2)  reference (osculating) epoch (t0)
+
+            \sstitem
+              (3-5)  position at reference epoch (r0)
+
+            \sstitem
+              (6-8)  velocity at reference epoch (v0)
+
+            \sstitem
+              (9)  heliocentric distance at reference epoch
+
+            \sstitem
+              (10)  r0.v0
+
+            \sstitem
+              (11)  date (t)
+
+            \sstitem
+              (12)  universal eccentric anomaly (psi) of date, approx
+         }
+      }
+      \sstsubsection{
+         jstat = int $*$ (Returned)
+      }{
+         status: 0 = OK
+         \sstitemlist{
+
+            \sstitem
+                   -1 = illegal PMASS
+
+            \sstitem
+                   -2 = too close to Sun
+
+            \sstitem
+                   -3 = too slow
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The PV 6-vector can be with respect to any chosen inertial frame,
+           and the resulting universal-element set will be with respect to
+           the same frame.  A common choice will be mean equator and ecliptic
+           of epoch J2000.
+
+         \sstitem
+         The mass, PMASS, is important only for the larger planets.  For
+           most purposes (e.g. asteroids) use 0D0.  Values less than zero
+           are illegal.
+
+         \sstitem
+         The {\tt "}universal{\tt "} elements are those which define the orbit for the
+           purposes of the method of universal variables (see reference).
+           They consist of the combined mass of the two bodies, an epoch,
+           and the position and velocity vectors (arbitrary reference frame)
+           at that epoch.  The parameter set used here includes also various
+           quantities that can, in fact, be derived from the other
+           information.  This approach is taken to avoiding unnecessary
+           computation and loss of accuracy.  The supplementary quantities
+           are (i) alpha, which is proportional to the total energy of the
+           orbit, (ii) the heliocentric distance at epoch, (iii) the
+           outwards component of the velocity at the given epoch, (iv) an
+           estimate of psi, the {\tt "}universal eccentric anomaly{\tt "} at a given
+           date and (v) that date.
+
+         \sstitem
+         Reference:  Everhart, E. \& Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
+      }
+   }
+}
+\sstroutine{
+   palPvobs
+}{
+   Position and velocity of an observing station
+}{
+   \sstdescription{
+      Returns the position and velocity of an observing station.
+   }
+   \sstinvocation{
+      palPvobs( double p, double h, double stl, double pv[6] )
+   }
+   \sstarguments{
+      \sstsubsection{
+         p = double (Given)
+      }{
+         Latitude (geodetic, radians).
+      }
+      \sstsubsection{
+         h = double (Given)
+      }{
+         Height above reference spheroid (geodetic, metres).
+      }
+      \sstsubsection{
+         stl = double (Given)
+      }{
+         Local apparent sidereal time (radians).
+      }
+      \sstsubsection{
+         pv = double[ 6 ] (Returned)
+      }{
+         position/velocity 6-vector (AU, AU/s, true equator
+                                     and equinox of date).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The WGS84 reference ellipsoid is used.
+      }
+   }
+}
+\sstroutine{
+   palRdplan
+}{
+   Approximate topocentric apparent RA,Dec of a planet
+}{
+   \sstdescription{
+      Approximate topocentric apparent RA,Dec of a planet, and its
+      angular diameter.
+   }
+   \sstinvocation{
+      void palRdplan( double date, int np, double elong, double phi,
+                      double $*$ ra, double $*$ dec, double $*$ diam );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         MJD of observation (JD-2400000.5) in TDB. For all practical
+         purposes TT can be used instead of TDB, and for many applications
+         UT will do (except for the Moon).
+      }
+      \sstsubsection{
+         np = int (Given)
+      }{
+         Planet: 1 = Mercury
+                 2 = Venus
+                 3 = Moon
+                 4 = Mars
+                 5 = Jupiter
+                 6 = Saturn
+                 7 = Uranus
+                 8 = Neptune
+              else = Sun
+      }
+      \sstsubsection{
+         elong = double (Given)
+      }{
+         Observer{\tt '}s east longitude (radians)
+      }
+      \sstsubsection{
+         phi = double (Given)
+      }{
+         Observer{\tt '}s geodetic latitude (radians)
+      }
+      \sstsubsection{
+         ra = double $*$ (Returned)
+      }{
+         RA (topocentric apparent, radians)
+      }
+      \sstsubsection{
+         dec = double $*$ (Returned)
+      }{
+         Dec (topocentric apparent, radians)
+      }
+      \sstsubsection{
+         diam = double $*$ (Returned)
+      }{
+         Angular diameter (equatorial, radians)
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Unlike with slaRdplan, Pluto is not supported.
+
+         \sstitem
+         The longitude and latitude allow correction for geocentric
+           parallax.  This is a major effect for the Moon, but in the
+           context of the limited accuracy of the present routine its
+           effect on planetary positions is small (negligible for the
+           outer planets).  Geocentric positions can be generated by
+           appropriate use of the routines palDmoon and iauPlan94.
+      }
+   }
+}
+\sstroutine{
+   palRverot
+}{
+   Velocity component in a given direction due to Earth rotation
+}{
+   \sstdescription{
+      Calculate the velocity component in a given direction due to Earth
+      rotation.
+
+      The simple algorithm used assumes a spherical Earth, of
+      a radius chosen to give results accurate to about 0.0005 km/s
+      for observing stations at typical latitudes and heights.  For
+      applications requiring greater precision, use the routine
+      palPvobs.
+   }
+   \sstinvocation{
+      double palRverot ( double phi, double ra, double da, double st );
+   }
+   \sstarguments{
+      \sstsubsection{
+         phi = double (Given)
+      }{
+         latitude of observing station (geodetic) (radians)
+      }
+      \sstsubsection{
+         ra = double (Given)
+      }{
+         apparent RA (radians)
+      }
+      \sstsubsection{
+         da = double (Given)
+      }{
+         apparent Dec (radians)
+      }
+      \sstsubsection{
+         st = double (Given)
+      }{
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         palRverot = double
+      }{
+         Component of Earth rotation in direction RA,DA (km/s).
+         The result is $+$ve when the observatory is receding from the
+         given point on the sky.
+      }
+   }
+}
+\sstroutine{
+   palRvgalc
+}{
+   Velocity component in a given direction due to the rotation
+   of the Galaxy
+}{
+   \sstdescription{
+      This function returns the Component of dynamical LSR motion in
+      the direction of R2000,D2000. The result is $+$ve when the dynamical
+      LSR is receding from the given point on the sky.
+   }
+   \sstinvocation{
+      double palRvgalc( double r2000, double d2000 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         r2000 = double (Given)
+      }{
+         J2000.0 mean RA (radians)
+      }
+      \sstsubsection{
+         d2000 = double (Given)
+      }{
+         J2000.0 mean Dec (radians)
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Component of dynamical LSR motion in direction R2000,D2000 (km/s).
+      }{
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The Local Standard of Rest used here is a point in the
+         vicinity of the Sun which is in a circular orbit around
+         the Galactic centre.  Sometimes called the {\tt "}dynamical{\tt "} LSR,
+         it is not to be confused with a {\tt "}kinematical{\tt "} LSR, which
+         is the mean standard of rest of star catalogues or stellar
+         populations.
+      }
+   }
+   \sstdiytopic{
+      Reference
+   }{
+      \sstitemlist{
+
+         \sstitem
+         The orbital speed of 220 km/s used here comes from Kerr \&
+         Lynden-Bell (1986), MNRAS, 221, p1023.
+      }
+   }
+}
+\sstroutine{
+   palRvlg
+}{
+   Velocity component in a given direction due to Galactic rotation
+   and motion of the local group
+}{
+   \sstdescription{
+      This function returns the velocity component in a given
+      direction due to the combination of the rotation of the
+      Galaxy and the motion of the Galaxy relative to the mean
+      motion of the local group. The result is $+$ve when the Sun
+      is receding from the given point on the sky.
+   }
+   \sstinvocation{
+      double palRvlg( double r2000, double d2000 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         r2000 = double (Given)
+      }{
+         J2000.0 mean RA (radians)
+      }
+      \sstsubsection{
+         d2000 = double (Given)
+      }{
+         J2000.0 mean Dec (radians)
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Component of SOLAR motion in direction R2000,D2000 (km/s).
+      }{
+      }
+   }
+   \sstdiytopic{
+      Reference
+   }{
+      \sstitemlist{
+
+         \sstitem
+         IAU Trans 1976, 168, p201.
+      }
+   }
+}
+\sstroutine{
+   palRvlsrd
+}{
+   Velocity component in a given direction due to the Sun{\tt '}s motion
+   with respect to the dynamical Local Standard of Rest
+}{
+   \sstdescription{
+      This function returns the velocity component in a given direction
+      due to the Sun{\tt '}s motion with respect to the dynamical Local Standard
+      of Rest. The result is $+$ve when the Sun is receding from the given
+      point on the sky.
+   }
+   \sstinvocation{
+      double palRvlsrd( double r2000, double d2000 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         r2000 = double (Given)
+      }{
+         J2000.0 mean RA (radians)
+      }
+      \sstsubsection{
+         d2000 = double (Given)
+      }{
+         J2000.0 mean Dec (radians)
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Component of {\tt "}peculiar{\tt "} solar motion in direction R2000,D2000 (km/s).
+      }{
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The Local Standard of Rest used here is the {\tt "}dynamical{\tt "} LSR,
+         a point in the vicinity of the Sun which is in a circular orbit
+         around the Galactic centre.  The Sun{\tt '}s motion with respect to the
+         dynamical LSR is called the {\tt "}peculiar{\tt "} solar motion.
+
+         \sstitem
+         There is another type of LSR, called a {\tt "}kinematical{\tt "} LSR.  A
+         kinematical LSR is the mean standard of rest of specified star
+         catalogues or stellar populations, and several slightly different
+         kinematical LSRs are in use.  The Sun{\tt '}s motion with respect to an
+         agreed kinematical LSR is known as the {\tt "}standard{\tt "} solar motion.
+         To obtain a radial velocity correction with respect to an adopted
+         kinematical LSR use the routine sla\_RVLSRK.
+      }
+   }
+   \sstdiytopic{
+      Reference
+   }{
+      \sstitemlist{
+
+         \sstitem
+         Delhaye (1965), in {\tt "}Stars and Stellar Systems{\tt "}, vol 5, p73.
+      }
+   }
+}
+\sstroutine{
+   palRvlsrk
+}{
+   Velocity component in a given direction due to the Sun{\tt '}s motion
+   with respect to an adopted kinematic Local Standard of Rest
+}{
+   \sstdescription{
+      This function returns the velocity component in a given direction
+      due to the Sun{\tt '}s motion with respect to an adopted kinematic
+      Local Standard of Rest. The result is $+$ve when the Sun is receding
+      from the given point on the sky.
+   }
+   \sstinvocation{
+      double palRvlsrk( double r2000, double d2000 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         r2000 = double (Given)
+      }{
+         J2000.0 mean RA (radians)
+      }
+      \sstsubsection{
+         d2000 = double (Given)
+      }{
+         J2000.0 mean Dec (radians)
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Component of {\tt "}standard{\tt "} solar motion in direction R2000,D2000 (km/s).
+      }{
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The Local Standard of Rest used here is one of several
+         {\tt "}kinematical{\tt "} LSRs in common use.  A kinematical LSR is the mean
+         standard of rest of specified star catalogues or stellar
+         populations.  The Sun{\tt '}s motion with respect to a kinematical LSR
+         is known as the {\tt "}standard{\tt "} solar motion.
+
+         \sstitem
+         There is another sort of LSR, the {\tt "}dynamical{\tt "} LSR, which is a
+         point in the vicinity of the Sun which is in a circular orbit
+         around the Galactic centre.  The Sun{\tt '}s motion with respect to
+         the dynamical LSR is called the {\tt "}peculiar{\tt "} solar motion.  To
+         obtain a radial velocity correction with respect to the
+         dynamical LSR use the routine sla\_RVLSRD.
+      }
+   }
+   \sstdiytopic{
+      Reference
+   }{
+      \sstitemlist{
+
+         \sstitem
+         Delhaye (1965), in {\tt "}Stars and Stellar Systems{\tt "}, vol 5, p73.
+      }
+   }
+}
+\sstroutine{
+   palSubet
+}{
+   Remove the E-terms from a pre IAU 1976 catalogue RA,Dec
+}{
+   \sstdescription{
+      Remove the E-terms (elliptic component of annual aberration)
+      from a pre IAU 1976 catalogue RA,Dec to give a mean place.
+   }
+   \sstinvocation{
+      void palSubet ( double rc, double dc, double eq,
+                      double $*$rm, double $*$dm );
+   }
+   \sstarguments{
+      \sstsubsection{
+         rc = double (Given)
+      }{
+         RA with E-terms included (radians)
+      }
+      \sstsubsection{
+         dc = double (Given)
+      }{
+         Dec with E-terms included (radians)
+      }
+      \sstsubsection{
+         eq = double (Given)
+      }{
+         Besselian epoch of mean equator and equinox
+      }
+      \sstsubsection{
+         rm = double $*$ (Returned)
+      }{
+         RA without E-terms (radians)
+      }
+      \sstsubsection{
+         dm = double $*$ (Returned)
+      }{
+         Dec without E-terms (radians)
+      }
+   }
+   \sstnotes{
+      Most star positions from pre-1984 optical catalogues (or
+      derived from astrometry using such stars) embody the
+      E-terms.  This routine converts such a position to a
+      formal mean place (allowing, for example, comparison with a
+      pulsar timing position).
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      Explanatory Supplement to the Astronomical Ephemeris,
+      section 2D, page 48.
+   }
+}
+\sstroutine{
+   palSupgal
+}{
+   Convert from supergalactic to galactic coordinates
+}{
+   \sstdescription{
+      Transformation from de Vaucouleurs supergalactic coordinates
+      to IAU 1958 galactic coordinates
+   }
+   \sstinvocation{
+      void palSupgal ( double dsl, double dsb, double $*$dl, double $*$db );
+   }
+   \sstarguments{
+      \sstsubsection{
+         dsl = double (Given)
+      }{
+         Supergalactic longitude.
+      }
+      \sstsubsection{
+         dsb = double (Given)
+      }{
+         Supergalactic latitude.
+      }
+      \sstsubsection{
+         dl = double $*$ (Returned)
+      }{
+         Galactic longitude.
+      }
+      \sstsubsection{
+         db = double $*$ (Returned)
+      }{
+         Galactic latitude.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      \sstitemlist{
+
+         \sstitem
+          de Vaucouleurs, de Vaucouleurs, \& Corwin, Second Reference
+            Catalogue of Bright Galaxies, U. Texas, page 8.
+
+         \sstitem
+          Systems \& Applied Sciences Corp., Documentation for the
+            machine-readable version of the above catalogue,
+            Contract NAS 5-26490.
+
+      }
+      (These two references give different values for the galactic
+       longitude of the supergalactic origin.  Both are wrong;  the
+       correct value is L2=137.37.)
+   }
+}
+\sstroutine{
+   palUe2el
+}{
+   Universal elements to heliocentric osculating elements
+}{
+   \sstdescription{
+      Transform universal elements into conventional heliocentric
+      osculating elements.
+   }
+   \sstinvocation{
+      void palUe2el ( const double u[13], int jformr,
+                      int $*$jform, double $*$epoch, double $*$orbinc,
+                      double $*$anode, double $*$perih, double $*$aorq, double $*$e,
+                      double $*$aorl, double $*$dm, int $*$jstat );
+   }
+   \sstarguments{
+      \sstsubsection{
+         u = const double [13] (Given)
+      }{
+         Universal orbital elements (Note 1)
+             (0)  combined mass (M$+$m)
+             (1)  total energy of the orbit (alpha)
+             (2)  reference (osculating) epoch (t0)
+           (3-5)  position at reference epoch (r0)
+           (6-8)  velocity at reference epoch (v0)
+             (9)  heliocentric distance at reference epoch
+            (10)  r0.v0
+            (11)  date (t)
+            (12)  universal eccentric anomaly (psi) of date, approx
+      }
+      \sstsubsection{
+         jformr = int (Given)
+      }{
+         Requested element set (1-3; Note 3)
+      }
+      \sstsubsection{
+         jform = int $*$ (Returned)
+      }{
+         Element set actually returned (1-3; Note 4)
+      }
+      \sstsubsection{
+         epoch = double $*$ (Returned)
+      }{
+         Epoch of elements (TT MJD)
+      }
+      \sstsubsection{
+         orbinc = double $*$ (Returned)
+      }{
+         inclination (radians)
+      }
+      \sstsubsection{
+         anode = double $*$ (Returned)
+      }{
+         longitude of the ascending node (radians)
+      }
+      \sstsubsection{
+         perih = double $*$ (Returned)
+      }{
+         longitude or argument of perihelion (radians)
+      }
+      \sstsubsection{
+         aorq = double $*$ (Returned)
+      }{
+         mean distance or perihelion distance (AU)
+      }
+      \sstsubsection{
+         e = double $*$ (Returned)
+      }{
+         eccentricity
+      }
+      \sstsubsection{
+         aorl = double $*$ (Returned)
+      }{
+         mean anomaly or longitude (radians, JFORM=1,2 only)
+      }
+      \sstsubsection{
+         dm = double $*$ (Returned)
+      }{
+         daily motion (radians, JFORM=1 only)
+      }
+      \sstsubsection{
+         jstat = int $*$ (Returned)
+      }{
+         status:  0 = OK
+         \sstitemlist{
+
+            \sstitem
+                    1 = illegal combined mass
+
+            \sstitem
+                    2 = illegal JFORMR
+
+            \sstitem
+                    3 = position/velocity out of range
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+           The {\tt "}universal{\tt "} elements are those which define the orbit for the
+             purposes of the method of universal variables (see reference 2).
+             They consist of the combined mass of the two bodies, an epoch,
+             and the position and velocity vectors (arbitrary reference frame)
+             at that epoch.  The parameter set used here includes also various
+             quantities that can, in fact, be derived from the other
+             information.  This approach is taken to avoiding unnecessary
+             computation and loss of accuracy.  The supplementary quantities
+             are (i) alpha, which is proportional to the total energy of the
+             orbit, (ii) the heliocentric distance at epoch, (iii) the
+             outwards component of the velocity at the given epoch, (iv) an
+             estimate of psi, the {\tt "}universal eccentric anomaly{\tt "} at a given
+             date and (v) that date.
+
+         \sstitem
+           The universal elements are with respect to the mean equator and
+             equinox of epoch J2000.  The orbital elements produced are with
+             respect to the J2000 ecliptic and mean equinox.
+
+         \sstitem
+           Three different element-format options are supported:
+
+      }
+           Option JFORM=1, suitable for the major planets:
+
+           EPOCH  = epoch of elements (TT MJD)
+           ORBINC = inclination i (radians)
+           ANODE  = longitude of the ascending node, big omega (radians)
+           PERIH  = longitude of perihelion, curly pi (radians)
+           AORQ   = mean distance, a (AU)
+           E      = eccentricity, e
+           AORL   = mean longitude L (radians)
+           DM     = daily motion (radians)
+
+           Option JFORM=2, suitable for minor planets:
+
+           EPOCH  = epoch of elements (TT MJD)
+           ORBINC = inclination i (radians)
+           ANODE  = longitude of the ascending node, big omega (radians)
+           PERIH  = argument of perihelion, little omega (radians)
+           AORQ   = mean distance, a (AU)
+           E      = eccentricity, e
+           AORL   = mean anomaly M (radians)
+
+           Option JFORM=3, suitable for comets:
+
+           EPOCH  = epoch of perihelion (TT MJD)
+           ORBINC = inclination i (radians)
+           ANODE  = longitude of the ascending node, big omega (radians)
+           PERIH  = argument of perihelion, little omega (radians)
+           AORQ   = perihelion distance, q (AU)
+           E      = eccentricity, e
+
+      \sstitemlist{
+
+         \sstitem
+           It may not be possible to generate elements in the form
+             requested through JFORMR.  The caller is notified of the form
+             of elements actually returned by means of the JFORM argument:
+
+      }
+           JFORMR   JFORM     meaning
+
+             1        1       OK - elements are in the requested format
+             1        2       never happens
+             1        3       orbit not elliptical
+
+             2        1       never happens
+             2        2       OK - elements are in the requested format
+             2        3       orbit not elliptical
+
+             3        1       never happens
+             3        2       never happens
+             3        3       OK - elements are in the requested format
+
+      \sstitemlist{
+
+         \sstitem
+           The arguments returned for each value of JFORM (cf Note 6: JFORM
+             may not be the same as JFORMR) are as follows:
+
+      }
+            JFORM         1              2              3
+            EPOCH         t0             t0             T
+            ORBINC        i              i              i
+            ANODE         Omega          Omega          Omega
+            PERIH         curly pi       omega          omega
+            AORQ          a              a              q
+            E             e              e              e
+            AORL          L              M              -
+            DM            n              -              -
+
+        where:
+
+            t0           is the epoch of the elements (MJD, TT)
+            T              {\tt "}    epoch of perihelion (MJD, TT)
+            i              {\tt "}    inclination (radians)
+            Omega          {\tt "}    longitude of the ascending node (radians)
+            curly pi       {\tt "}    longitude of perihelion (radians)
+            omega          {\tt "}    argument of perihelion (radians)
+            a              {\tt "}    mean distance (AU)
+            q              {\tt "}    perihelion distance (AU)
+            e              {\tt "}    eccentricity
+            L              {\tt "}    longitude (radians, 0-2pi)
+            M              {\tt "}    mean anomaly (radians, 0-2pi)
+            n              {\tt "}    daily motion (radians)
+      \sstitemlist{
+
+         \sstitem
+               means no value is set
+
+         \sstitem
+           At very small inclinations, the longitude of the ascending node
+             ANODE becomes indeterminate and under some circumstances may be
+             set arbitrarily to zero.  Similarly, if the orbit is close to
+             circular, the true anomaly becomes indeterminate and under some
+             circumstances may be set arbitrarily to zero.  In such cases,
+             the other elements are automatically adjusted to compensate,
+             and so the elements remain a valid description of the orbit.
+
+      }
+      See Also:
+      \sstitemlist{
+
+         \sstitem
+           Sterne, Theodore E., {\tt "}An Introduction to Celestial Mechanics{\tt "},
+             Interscience Publishers Inc., 1960.  Section 6.7, p199.
+
+         \sstitem
+           Everhart, E. \& Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
+      }
+   }
+}
+\sstroutine{
+   palUe2pv
+}{
+   Heliocentric position and velocity of a planet, asteroid or comet, from universal elements
+}{
+   \sstdescription{
+      Heliocentric position and velocity of a planet, asteroid or comet,
+      starting from orbital elements in the {\tt "}universal variables{\tt "} form.
+   }
+   \sstinvocation{
+      void palUe2pv( double date, double u[13], double pv[6], int $*$jstat );
+   }
+   \sstarguments{
+      \sstsubsection{
+         date = double (Given)
+      }{
+         TT Modified Julian date (JD-2400000.5).
+      }
+      \sstsubsection{
+         u = double [13] (Given \& Returned)
+      }{
+          Universal orbital elements (updated, see note 1)
+          given    (0)   combined mass (M$+$m)
+            {\tt "}      (1)   total energy of the orbit (alpha)
+            {\tt "}      (2)   reference (osculating) epoch (t0)
+            {\tt "}    (3-5)   position at reference epoch (r0)
+            {\tt "}    (6-8)   velocity at reference epoch (v0)
+            {\tt "}      (9)   heliocentric distance at reference epoch
+            {\tt "}     (10)   r0.v0
+         returned (11)   date (t)
+            {\tt "}     (12)   universal eccentric anomaly (psi) of date
+      }
+      \sstsubsection{
+         jstat = int $*$ (Returned)
+      }{
+         status:  0 = OK
+         \sstitemlist{
+
+            \sstitem
+                    1 = radius vector zero
+
+            \sstitem
+                    2 = failed to converge
+         }
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The {\tt "}universal{\tt "} elements are those which define the orbit for the
+           purposes of the method of universal variables (see reference).
+           They consist of the combined mass of the two bodies, an epoch,
+           and the position and velocity vectors (arbitrary reference frame)
+           at that epoch.  The parameter set used here includes also various
+           quantities that can, in fact, be derived from the other
+           information.  This approach is taken to avoiding unnecessary
+           computation and loss of accuracy.  The supplementary quantities
+           are (i) alpha, which is proportional to the total energy of the
+           orbit, (ii) the heliocentric distance at epoch, (iii) the
+           outwards component of the velocity at the given epoch, (iv) an
+           estimate of psi, the {\tt "}universal eccentric anomaly{\tt "} at a given
+           date and (v) that date.
+
+         \sstitem
+         The companion routine is palEl2ue.  This takes the conventional
+           orbital elements and transforms them into the set of numbers
+           needed by the present routine.  A single prediction requires one
+           one call to palEl2ue followed by one call to the present routine;
+           for convenience, the two calls are packaged as the routine
+           sla\_PLANEL.  Multiple predictions may be made by again
+           calling palEl2ue once, but then calling the present routine
+           multiple times, which is faster than multiple calls to palPlanel.
+
+         \sstitem
+         It is not obligatory to use palEl2ue to obtain the parameters.
+           However, it should be noted that because palEl2ue performs its
+           own validation, no checks on the contents of the array U are made
+           by the present routine.
+           in the TT timescale (formerly Ephemeris Time, ET) and is a
+           Modified Julian Date (JD-2400000.5).
+           units (solar masses, AU and canonical days).  The position and
+           velocity are not sensitive to the choice of reference frame.  The
+           palEl2ue routine in fact produces coordinates with respect to the
+           J2000 equator and equinox.
+
+         \sstitem
+         The algorithm was originally adapted from the EPHSLA program of
+           D.H.P.Jones (private communication, 1996).  The method is based
+           on Stumpff{\tt '}s Universal Variables.
+
+         \sstitem
+         Reference:  Everhart, E. \& Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
+      }
+   }
+}
+
+
+% ? End of main text
+\end{document}

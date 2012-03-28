@@ -30,7 +30,7 @@ STAR_DECLARE_DEPENDENCIES(link,  [sofa starutil])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
-# STAR_LATEX_DOCUMENTATION(sunXXX)
+STAR_LATEX_DOCUMENTATION(sun267)
  
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

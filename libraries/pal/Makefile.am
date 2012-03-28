@@ -2,7 +2,9 @@
 
 lib_LTLIBRARIES = libpal.la
 
-libpal_la_SOURCES = $(PUBLIC_C_FILES)
+
+# Include palOne2One.c separately since it is a combo file
+libpal_la_SOURCES = $(PUBLIC_C_FILES) palOne2One.c
 
 # Force a link against SOFA
 libpal_la_LIBADD = $(libdir)/libsofa_c.la $(libdir)/libstarutil.la
@@ -18,7 +20,6 @@ cincludedir = $(includedir)/star
 cinclude_HEADERS = pal.h palmac.h
 
 PUBLIC_C_FILES = \
-palOne2One.c \
 palAddet.c \
 palAirmas.c \
 palAmp.c \
@@ -92,3 +93,10 @@ TESTS = palTest
 check_PROGRAMS = palTest
 palTest_SOURCES = palTest.c
 palTest_LDADD = libpal.la
+
+# A target for making the SUN documentation. We do not do this automatically
+palsun.tex: $(PUBLIC_C_FILES)
+	-rm -f palsun.tex all.c
+	cat $(PUBLIC_C_FILES) > all.c
+	${STARLINK_DIR}/bin/sst/prolat in=all.c out=palsun.tex single=no page=no atask=no document=no
+	-rm all.c
