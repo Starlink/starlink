@@ -88,6 +88,8 @@ palSupgal.c \
 palUe2el.c \
 palUe2pv.c
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 TESTS = palTest
 
 check_PROGRAMS = palTest
