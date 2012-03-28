@@ -212,7 +212,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smf_qual_t *qua_data=NULL; /* Pointer to RES at chunk */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  size_t spikebox=0;            /* Box size for spike detection */
+  dim_t spikebox=0;             /* Box size for spike detection */
   double spikethresh=0;         /* Threshold for spike detection */
   size_t tend;                  /* Last input sample to copy */
   size_t tstart;                /* First input sample to copy */

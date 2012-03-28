@@ -22,7 +22,7 @@
 *                       double *filt_notchlow, double *filt_notchhigh,
 *                       int *filt_nnotch, int *dofilt, double *flagslow,
 *                       double *flagfast, int *order, double *spikethresh,
-*                       size_t *spikebox, double *noisecliphigh,
+*                       dim_t *spikebox, double *noisecliphigh,
 *                       double *noisecliplow, int *whiten, int *compreprocess,
 *                       dim_t *pcalen, double *pcathresh, int groupsubarray,
 *                       double *downsampscale, double *downsampfreq,
