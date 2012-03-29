@@ -1251,8 +1251,9 @@ void smf_get_gridcoords( double *row, double *col, int nrow, int ncol,
 void smf_get_grp_metadata( const Grp *grp, const char *name, char *value,
                            int *status );
 
-unsigned char *smf_get_mask( smf_modeltype mtype, AstKeyMap *config,
-                             smfDIMMData *dat, int flags, int *status );
+unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
+                             AstKeyMap *config, smfDIMMData *dat, int flags,
+                             int *status );
 
 void smf_get_moltrans ( double restFreq, const char **molecule,
                         const char **transition, int *status );
@@ -1729,6 +1730,10 @@ void smf_smfFile_msg( const smfFile * file, const char token[],
 double *smf_smoothmask( ThrWorkForce * wf, smf_qual_t qual, const smf_qual_t *mapqual, int
                         dim0, int dim1, AstFrameSet *fset, double fwhm,
                         double low, int *status );
+
+void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
+                  const dim_t *dims, double snr_hi, double snr_lo,
+                  unsigned char *mask, int *status );
 
 int smf_sort_bydouble ( const void *in1, const void *in2 );
 

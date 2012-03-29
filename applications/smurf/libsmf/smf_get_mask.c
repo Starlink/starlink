@@ -13,10 +13,13 @@
 *     C function
 
 *  Invocation:
-*     unsigned char *smf_get_mask( smf_modeltype mtype, AstKeyMap *config,
-*                                  smfDIMMData *dat, int flags, int *status )
+*     unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
+*                                  AstKeyMap *config, smfDIMMData *dat,
+*                                  int flags, int *status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     mtype = (Given)
 *        The type of model (COM, FLT or AST) for which the mask is required.
 *     config = AstKeyMap * (Given)
@@ -101,8 +104,9 @@
 #define PREDEFINED 5  /* Use a mask created on an earlier run of smf_iteratemap */
 
 
-unsigned char *smf_get_mask( smf_modeltype mtype, AstKeyMap *config,
-                             smfDIMMData *dat, int flags, int *status ) {
+unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
+                             AstKeyMap *config, smfDIMMData *dat, int flags,
+                             int *status ) {
 
 /* Local Variables: */
    AstCircle *circle;         /* AST Region used to mask a circular area */
@@ -120,7 +124,8 @@ unsigned char *smf_get_mask( smf_modeltype mtype, AstKeyMap *config,
    double radius[ 1 ];        /* Radius of circle in radians */
    double zero_circle[ 3 ];   /* LON/LAT/Radius of circular mask */
    double zero_lowhits;       /* Fraction of mean hits at which to threshold */
-   double zero_snr;           /* SNR at which to threshold */
+   double zero_snr;           /* Higher SNR at which to threshold */
+   double zero_snrlo;         /* Lower SNR at which to threshold */
    int *ph;                   /* Pointer to next hits value */
    int have_mask;             /* Did a mask already exist on entry? */
    int indf1;                 /* Id. for supplied reference NDF */
@@ -403,25 +408,61 @@ unsigned char *smf_get_mask( smf_modeltype mtype, AstKeyMap *config,
 /* SNR masking... */
                } else if( mask_type == SNR ) {
 
-/* Form the mask by thresholding the SNR values at the value of "zero_snr". */
-                  pd = dat->map;
-                  pv = dat->mapvar;
-                  pm = *mask;
-                  for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
-                     *(pm++) = ( *pd != VAL__BADI && *pv != VAL__BADI &&
-                                 *pv >= 0.0 && *pd < zero_snr*sqrt( *pv ) ) ? 1 : 0;
+/* Get the lower SNR limit. */
+                  zero_snrlo = 0.0;
+                  astMapGet0D( subkm, "ZERO_SNRLO", &zero_snrlo );
+                  if( zero_snrlo <= 0.0 ) {
+                     zero_snrlo = zero_snr;
+                  } else if( zero_snrlo > zero_snr && *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     errRepf( " ", "Bad value for config parameter "
+                              "%s.ZERO_SNRLO (%g) - it must not be higher "
+                              "than %s.ZERO_SNR (%g).", status, modname,
+                              zero_snrlo, modname, zero_snr );
                   }
 
-/* Report masking info. */
-                  if( !have_mask ) {
-                     if( zero_niter == 0 ) {
-                        sprintf( words, "on each iteration" );
-                     } else {
-                        sprintf( words, "for %d iterations", zero_niter );
+/* If the higher and lower SNR limits are equal, just do a simple
+   threshold on the SNR values to get the mask. */
+                  if( zero_snr == zero_snrlo ) {
+                     pd = dat->map;
+                     pv = dat->mapvar;
+                     pm = *mask;
+                     for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
+                        *(pm++) = ( *pd != VAL__BADI && *pv != VAL__BADI &&
+                                    *pv >= 0.0 && *pd < zero_snr*sqrt( *pv ) ) ? 1 : 0;
                      }
-                     msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
-                                "will be masked %s using an SNR limit of %g.",
-                                status, modname, words, zero_snr );
+
+/* Report masking info. */
+                     if( !have_mask ) {
+                        if( zero_niter == 0 ) {
+                           sprintf( words, "on each iteration" );
+                        } else {
+                           sprintf( words, "for %d iterations", zero_niter );
+                        }
+                        msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
+                                   "will be masked %s using an SNR limit of %g.",
+                                   status, modname, words, zero_snr );
+                     }
+
+/* If the higher and lower SNR limits are different, create an initial
+   mask by thresholding at the ZERO_SNR value, and then extend the source
+   areas within the mask down to an SNR limit of ZERO_SNRLO. */
+                  } else {
+                     smf_snrmask( wf, dat->map, dat->mapvar, dat->mdims,
+                                  zero_snr, zero_snrlo, *mask, status );
+
+/* Report masking info. */
+                     if( !have_mask ) {
+                        if( zero_niter == 0 ) {
+                           sprintf( words, "on each iteration" );
+                        } else {
+                           sprintf( words, "for %d iterations", zero_niter );
+                        }
+                        msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
+                                   "will be masked %s using an SNR limit of %g "
+                                   "extended down to %g.", status, modname,
+                                   words, zero_snr, zero_snrlo );
+                     }
                   }
 
 /* Predefined masking... */

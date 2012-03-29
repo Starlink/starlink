@@ -157,7 +157,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* See if a mask should be used to exclude bright source areas from
      the FLT model. */
-  mask = smf_get_mask( SMF__FLT, keymap, dat, flags, status );
+  mask = smf_get_mask( wf, SMF__FLT, keymap, dat, flags, status );
 
   /* Obtain pointer to sub-keymap containing FLT filter
      parameters. Something will always be available.*/

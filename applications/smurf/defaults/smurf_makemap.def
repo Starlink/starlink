@@ -94,6 +94,7 @@ com.zero_lowhits = 0
 com.zero_notlast = 1
 com.zero_circle = <undef>
 com.zero_snr = <undef>
+com.zero_snrlo = <undef>
 com.zero_mask = <undef>
 com.zero_niter = 0
 
@@ -101,6 +102,7 @@ flt.zero_lowhits = 0
 flt.zero_notlast = 1
 flt.zero_circle = <undef>
 flt.zero_snr = <undef>
+flt.zero_snrlo = <undef>
 flt.zero_mask = <undef>
 flt.zero_niter = 0
 
@@ -126,6 +128,7 @@ ast.zero_lowhits = 0
 ast.zero_notlast = 1
 ast.zero_circle = <undef>
 ast.zero_snr = <undef>
+ast.zero_snrlo = <undef>
 ast.zero_snr_fwhm = 0
 ast.zero_snr_low = -1.1
 ast.zero_mask = <undef>

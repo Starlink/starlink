@@ -347,6 +347,7 @@ smf_select_cqualpntr.c \
 smf_select_qualpntr.c \
 smf_set_clabels.c \
 smf_set_moving.c \
+smf_snrmask.c \
 smf_smfFile_msg.c \
 smf_smoothmask.c \
 smf_sort_bydouble.c \

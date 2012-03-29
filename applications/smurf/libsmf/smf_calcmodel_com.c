@@ -598,7 +598,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* See if a mask should be used to exclude bright source areas from
      the COM model. */
-  mask = smf_get_mask( SMF__COM, keymap, dat, flags, status );
+  mask = smf_get_mask( wf, SMF__COM, keymap, dat, flags, status );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -720,7 +720,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   /* Loop round creating each COM model. */
-  for( icom = 0; icom < ncom; icom++ ) {
+  for( icom = 0; icom < ncom && *status == SAI__OK; icom++ ) {
 
     /* Set the index of the first and last subarray that contributes to the
        current COM model. */

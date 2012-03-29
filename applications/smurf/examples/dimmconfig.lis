@@ -591,7 +591,14 @@ ext.taumethod =adaptive
 #
 # The ast.zero_snr parameter will create a mask based on map SNR. For
 # example, if it is set to 5, after each iteration all pixels with a
-# SNR below this threshold will be set to 0.
+# SNR below this threshold will be set to 1 (other pixels are left at zero).
+# Each contiguous clump of zero-valued pixels (i.e. "source" pixels) in
+# this basic mask can then be expanded to encompass adjacent pixels that
+# are above a second, lower, SNR threshold given by ast.zero_snrlo. So
+# for instance, setting ast.zero_snrlo to 1 will cause the basic mask
+# thresholded at SNR = 5 to be expanded down to an SNR of 1. This dual
+# thresholding system prevents noise spikes above the lower threshold being
+# interpreted as source pixels.
 #
 # The ast.zero_snr_fwhm parameter gives the FWHM of a Gaussian (in arcsec)
 # with which to smooth the final mask produced as a consequence of setting
@@ -622,6 +629,7 @@ ext.taumethod =adaptive
 #ast.zero_lowhits = 0.1
 #ast.zero_notlast = 1
 #ast.zero_snr = 5
+#ast.zero_snrlo = 1
 #ast.zero_snr_fwhm = 60
 #ast.zero_snr_low = -1.1
 
@@ -636,6 +644,7 @@ ext.taumethod =adaptive
 #com.zero_lowhits = 0.1
 #com.zero_notlast = 1
 #com.zero_snr = 5
+#com.zero_snrlo = 1
 
 # The FLT model can also be masked to exclude known source areas. This can
 # reduce the number of iterations needed for convergence, and may also
@@ -649,6 +658,7 @@ ext.taumethod =adaptive
 #flt.zero_lowhits = 0.1
 #flt.zero_notlast = 1
 #flt.zero_snr = 5
+#flt.zero_snrlo = 1
 flt.zero_niter = 2
 
 # The AST model can also perform map-based de-spiking after the first

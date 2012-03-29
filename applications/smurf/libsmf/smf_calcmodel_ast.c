@@ -200,7 +200,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   smf_qual_t *mapqual = NULL;/* Quality map */
   double *mapvar = NULL;        /* Variance map */
   double *mapweight = NULL;     /* Weight map */
-  double *mapweightsq = NULL;   /* Weight map squared */
   int zero_notlast;             /* Don't zero on last iteration? */
   unsigned char *zmask = NULL;  /* Pointer to map mask */
 
@@ -219,7 +218,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   mapqual = dat->mapqual;
   mapvar = dat->mapvar;
   mapweight = dat->mapweight;
-  mapweightsq = dat->mapweightsq;
   if(dat->noi) {
     noi = dat->noi[chunk];
   }
@@ -305,7 +303,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
   /* Get a mask to apply to the map. This is determined by the "Zero_..."
      parameters in the configuration KeyMap. */
-   zmask = smf_get_mask( SMF__AST, keymap, dat, flags, status );
+   zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
 
   /* Proceed if we need to do zero-masking */
   if( zmask ) {
