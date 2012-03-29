@@ -275,7 +275,6 @@ POSTSCRIPT_FIGURES = \
     simpexamp.eps
 
 WCSLIB_FILES = \
-    COPYING.LIB \
     proj.c \
     tpn.c \
     proj.h \
@@ -542,6 +541,7 @@ nodist_include_HEADERS = ast.h AST_PAR
 include_MESSAGES = AST_ERR ast_err.h
 
 lib_LTLIBRARIES = \
+    libast_pal.la \
     libast.la \
     libast_err.la \
     libast_ems.la \
@@ -551,11 +551,7 @@ lib_LTLIBRARIES = \
     libast_grf_3.2.la \
     libast_grf_5.6.la \
     libast_pgplot.la \
-    libast_pgplot3d.la \
-    libast_pal.la \
-    libast_wcslib.la \
-    libast_levmar.la
-
+    libast_pgplot3d.la
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 dist_starnews_DATA = ast.news
@@ -591,8 +587,6 @@ libast_grf_5_6_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pgplot_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pgplot3d_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pal_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
-libast_wcslib_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
-libast_levmar_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
 
 #  The module containing the main AST classes
@@ -600,6 +594,8 @@ libast_la_SOURCES = \
     $(GRP_C_ROUTINES) \
     $(GRP_C_INCLUDE_FILES) \
     $(GRP_F_INCLUDE_FILES) \
+    $(LEVMAR_FILES) \
+    $(WCSLIB_FILES) \
     ast_err.h
 
 # Ensure libast links against libraries containing functions used within
@@ -607,9 +603,9 @@ libast_la_SOURCES = \
 # libast_pal library will be empty, and we link to an external PAL
 # library instead.
 if EXTERNAL_PAL
-libast_la_LIBADD =  $(libdir)/libpal.la libast_wcslib.la libast_levmar.la
+libast_la_LIBADD =  $(libdir)/libpal.la
 else
-libast_la_LIBADD = libast_pal.la libast_wcslib.la libast_levmar.la
+libast_la_LIBADD = libast_pal.la
 endif
 
 # AST_PAR is really part of GRP_F_INCLUDE_FILES, but it must not be
@@ -648,12 +644,6 @@ libast_pgplot_la_SOURCES = grf_pgplot.c
 
 #  The graphics module that uses PGPLOT for 3D graphical output.
 libast_pgplot3d_la_SOURCES = grf3d_pgplot.c
-
-#  Modules adapted from the wcslib library.
-libast_wcslib_la_SOURCES = proj.c wcstrig.c tpn.c
-
-#  Modules adapted from the levmar library.
-libast_levmar_la_SOURCES = levmar.c
 
 #  Positional astronomy libraries.
 libast_pal_la_SOURCES = $(PAL_FILES)
@@ -764,4 +754,4 @@ ast_test_SOURCES = ast_test.c
 
 #ast_test_LDADD = `ast_link`
 # Expand ast_link to avoid libast_pass2, which causes problems for Solaris
-ast_test_LDADD = @LIBPAL@ libast.la libast_pal.la libast_grf_3.2.la libast_grf_5.6.la libast_wcslib.la libast_levmar.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm
+ast_test_LDADD = @LIBPAL@ libast.la libast_pal.la libast_grf_3.2.la libast_grf_5.6.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm

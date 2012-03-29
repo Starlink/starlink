@@ -289,9 +289,8 @@
 
 #  Link with the main AST library.
 #  -------------------------------
-#  Start forming the list of arguments with the main AST library itself, the
-#  "wcslib" module and the "levmar" module.
-      args='-last -last_wcslib -last_levmar'
+#  Start forming the list of arguments with the main AST library itself.
+      args='-last'
 
 #  Generate arguments for linking PAL.
 #  -----------------------------------
