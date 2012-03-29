@@ -608,12 +608,13 @@ ext.taumethod =adaptive
 # a height just sufficient to remove blobs of a single pixel form the mask.
 # A value of "-2.1" would remove blobs of two pixels form the mask, etc.
 #
-#
-# If ast.zero_notlast is set, on the final iteration this boundary
-# condition will not be applied. This feature will probably be useful
-# for deep point-source observations for which the large-scale noise
-# is not as important, but keeping as much data around the edges of
-# the map is.
+# If ast.zero_niter is set, it gives the number of iterations for which
+# the AST model should be masked. The default is zero, which means "mask
+# on all iterations". However, if ast.zero_notlast is set, the mask will
+# will not be applied on the last iteration, even if ast.zero_niter is zero.
+# This feature will probably be useful for deep point-source observations
+# for which the large-scale noise is not as important, but keeping as much
+# data around the edges of the map is.
 
 #ast.gaussbg = 120
 #ast.zero_mask = 1
@@ -626,8 +627,8 @@ ext.taumethod =adaptive
 
 # The common-mode can also be masked to exclude known source areas
 # from the common-mode estimation. The zero of parameters are directly
-# analogous to those for applying a zero constraint to the map. Theonly
-# difference is that the zero_snr and zero_lowhits constrinats will be
+# analogous to those for applying a zero constraint to the map. The only
+# difference is that the zero_snr and zero_lowhits constraints will be
 # ignored on the first iteration since they require an estimate of the map
 # to be available.
 #com.zero_mask = 1
@@ -635,8 +636,20 @@ ext.taumethod =adaptive
 #com.zero_lowhits = 0.1
 #com.zero_notlast = 1
 #com.zero_snr = 5
-#com.zero_snr_fwhm = 60
-#com.zero_snr_low = -1.1
+
+# The FLT model can also be masked to exclude known source areas. This can
+# reduce the number of iterations needed for convergence, and may also
+# reduce the noise in the final map, and reduce ringing and "bowls" around
+# bright sources. The parameters are directly analogous to those for applying
+# a zero constraint to the map. The only difference is that the zero_snr and
+# zero_lowhits constriants will be ignored on the first iteration since they
+# require an estimate of the map to be available. Note
+#flt.zero_mask = 1
+#flt.zero_circle = (70.72333,36.115,0.0083333)
+#flt.zero_lowhits = 0.1
+#flt.zero_notlast = 1
+#flt.zero_snr = 5
+flt.zero_niter = 2
 
 # The AST model can also perform map-based de-spiking after the first
 # iteration provided that there is also a NOI model present. The value

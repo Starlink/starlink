@@ -30,6 +30,12 @@ maptol=0.05
 ast.zero_circle = (0.0166666666)
 ast.zero_notlast = 1
 
+#  Mask the data when forming th FLT model in order to exclude the
+#  source, but only on the first two iterations. This usually speeds up
+#  convergence.
+flt.zero_circle = (0.0166666666)
+flt.zero_niter = 2
+
 # Per array common-mode should be fine here since we are dealing with
 # a compact source. It seems to make things more stable.
 com.perarray = 1

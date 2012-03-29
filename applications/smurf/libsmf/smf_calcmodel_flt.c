@@ -69,6 +69,8 @@
 *        Move calculation of complementary filter into smf_filter_execute
 *     2011-04-14 (DSB):
 *        Remove gap filling since it is now done in smf_filter_execute.
+*     2012-03-16 (DSB):
+*        Allow FLT model to be masked.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,6 +128,9 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t idx=0;                  /* Index within subgroup */
   size_t j;                     /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Pointer to FLT-specific keys */
+  smfArray *lut=NULL;           /* Pointer to LUT at chunk */
+  int *lut_data = NULL;         /* Array holding themap index for each sample */
+  unsigned char *mask;          /* Pointer to 2D mask map */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   double *model_data_copy=NULL; /* Copy of model_data for one bolo */
@@ -150,6 +155,10 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  /* See if a mask should be used to exclude bright source areas from
+     the FLT model. */
+  mask = smf_get_mask( SMF__FLT, keymap, dat, flags, status );
+
   /* Obtain pointer to sub-keymap containing FLT filter
      parameters. Something will always be available.*/
   astMapGet0A( keymap, "FLT", &kmap );
@@ -173,6 +182,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
+  if (dat->lut) lut = dat->lut[chunk];
 
   smf_get_dims( res->sdata[0],  NULL, NULL, NULL, NULL,
                 &ndata, NULL, NULL, status);
@@ -195,6 +205,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
     res_data = (res->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
     model_data = (model->sdata[idx]->pntr)[0];
+    if (lut) lut_data = (lut->sdata[idx]->pntr)[0];
 
     if( noi ) {
       smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
@@ -244,6 +255,38 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
            filtered again in this iteration. */
         memcpy( model_data, res_data,
                 ndata*smf_dtype_size(res->sdata[idx],status) );
+
+        /* Set samples bad that correspond to source pixels in the mask map.
+           This seems to improve the speed of convergence and could reduce
+           ringing caused by bright sources. */
+        if( mask && lut ) {
+
+          /* We do not allow the masking to extend close to the start or
+             end of the time stream since this would mean that the FLT
+             model is poorly constrained in the masked area. "Close" is
+             defined as "napod + 2*npad" samples from either end, where
+             "napod" is the number of apodised samples and "npad" is the
+             number of padded samples at each end. */
+          size_t npad, npad_or_apod, nclose;
+          smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD |
+                             SMF__Q_APOD, &npad_or_apod, NULL, status );
+          smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD,
+                             &npad, NULL, status );
+          nclose = npad + npad_or_apod;
+
+          /* Do the masking. Bad values are filled by smf_fillgaps, regardless
+             of quality, so we just set the model values bad. */
+          for( i=0; i<nbolo; i++ ) {
+            if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+              for( j=nclose; j < ntslice-nclose; j++ ) {
+                int iii = lut_data[ i*bstride+j*tstride ];
+                if( iii != VAL__BADI && !mask[ iii ] ) {
+                   model_data[ i*bstride+j*tstride ] = VAL__BADD;
+                }
+              }
+            }
+          }
+        }
       }
 
       /* Apply the complementary filter to the copy of the
@@ -266,7 +309,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
             res_data[ii] -= model_data[ii];
 
             /* also measure contribution to dchisq */
-            if( noi && !(qua_data[i*bstride]&SMF__Q_GOOD) ) {
+            if( noi && !(qua_data[ii]&SMF__Q_GOOD) ) {
               dchisq += (model_data[ii] - model_data_copy[ii]) *
                 (model_data[ii] - model_data_copy[ii]) /
                 noi_data[i*noibstride + (j%nointslice)*noitstride];
@@ -284,7 +327,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Print normalized residual chisq for this model */
   if( (*status==SAI__OK) && noi && (ndchisq>0) ) {
     dchisq /= (double) ndchisq;
-    msgOutiff( MSG__VERB, "", "    normalized change in model: %lf", status,
+    msgOutiff( MSG__VERB, "", "    normalized change in FLT model: %lg", status,
                dchisq );
   }
 

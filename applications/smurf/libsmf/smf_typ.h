@@ -751,6 +751,7 @@ typedef struct smfDIMMData {
   int *ubnd_out;             /* map upper bounds */
   unsigned char *ast_mask;   /* Map indicating region to be masked in ast */
   unsigned char *com_mask;   /* Map indicating region to be masked in com */
+  unsigned char *flt_mask;   /* Map indicating region to be masked in flt */
   int iter;                  /* Iteration number */
 } smfDIMMData;
 

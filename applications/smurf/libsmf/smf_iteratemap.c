@@ -611,6 +611,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      allocated in smf_get_mask if ast.zero_circle (etc) was set. */
   dat.ast_mask = NULL;
   dat.com_mask = NULL;
+  dat.flt_mask = NULL;
 
   /* Get size of the input group */
   isize = grpGrpsz( igrp, status );
@@ -1708,6 +1709,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                  until the start of the second iteration. */
               dimmflags |= SMF__DIMM_FIRSTITER;
             }
+            if( quit == 0 ) dimmflags |= SMF__DIMM_LASTITER;
 
             if( *status == SAI__OK ) {
               (*modelptr)( wf, &dat, 0, keymap, model[j], dimmflags, status );
@@ -1755,7 +1757,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                Note that if this is the first iteration we do not yet
                have a map estimate so we skip this step (in multiple
                chunk case thismap will still contain the old map from
-               the previous chunk). Ignore map pixels that have been 
+               the previous chunk). Ignore map pixels that have been
                constrained to zero. */
             if( iter > 0 ) {
               for( k=0; k<dsize; k++ ) {
@@ -1873,6 +1875,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              each filegroup in the main model component loop */
 
           dimmflags=0;
+          if( iter==0 ) dimmflags |= SMF__DIMM_FIRSTITER;
           if( quit == 0 ) dimmflags |= SMF__DIMM_LASTITER;
           smf_calcmodel_ast( wf, &dat, 0, keymap, NULL, dimmflags, status );
 
@@ -2439,6 +2442,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 /* Free the zero masks. */
       dat.ast_mask = astFree( dat.ast_mask );
       dat.com_mask = astFree( dat.com_mask );
+      dat.flt_mask = astFree( dat.flt_mask );
     }
 
 #ifdef __ITERATEMAP_SHOW_MEM

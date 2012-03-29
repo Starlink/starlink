@@ -317,6 +317,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
              data cube into a second array. We therefore need to
              ensure enough memory to temporarily store the data cube
              twice. */
+          CHECK_MASK("FLT")
           dofft = 1;
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
