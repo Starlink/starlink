@@ -27,7 +27,7 @@
 *     will be performed on the data.
 
 *  Notes:
-*     - Darks will be subtracted prior to flatfielding.
+*     - Darks will be ignored.
 *     - At the moment an output file is propagated regardless of
 *     whether the input data are already flatfielded or not. This is
 *     clearly a waste of disk space.
@@ -42,7 +42,7 @@
 *          supplied. [!]
 *     IN = NDF (Read)
 *          Input files to be uncompressed and flatfielded. Any darks provided
-*          will be subtracted prior to flatfielding.
+*          will be ignored.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -94,10 +94,12 @@
 *        Change BPM to BBM.
 *     2010-03-11 (TIMJ):
 *        Support flatfield ramps.
+*     2012-03-28 (TIMJ):
+*        Ignore darks.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010, 2012 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006-2010 University of British Columbia.
 *     All Rights Reserved.
@@ -151,7 +153,6 @@
 void smurf_flatfield( int *status ) {
 
   smfArray *bbms = NULL;     /* Bad bolometer masks */
-  smfArray *darks = NULL;   /* Dark data */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   smfArray *flatramps = NULL;/* Flatfield ramps */
@@ -169,7 +170,7 @@ void smurf_flatfield( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -197,7 +198,7 @@ void smurf_flatfield( int *status ) {
     if (*status != SAI__OK) break;
 
     /* Call flatfield routine */
-    didflat = smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps,
+    didflat = smf_open_and_flatfield(igrp, ogrp, i, NULL, flatramps,
                                      heateffmap, &ffdata, status);
 
     /* Report failure by adding a message indicating which file failed */
@@ -233,7 +234,6 @@ void smurf_flatfield( int *status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
-  if (darks) smf_close_related( &darks, status );
   if (bbms) smf_close_related( &bbms, status );
   if( flatramps ) smf_close_related( &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
