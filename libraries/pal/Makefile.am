@@ -9,6 +9,10 @@ libpal_la_SOURCES = $(PUBLIC_C_FILES) palOne2One.c
 # Force a link against SOFA
 libpal_la_LIBADD = $(libdir)/libsofa_c.la $(libdir)/libstarutil.la
 
+# Misc files
+dist_starnews_DATA = pal.news
+dist_pkgdata_DATA = LICENCE
+
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
