@@ -41,7 +41,7 @@ AC_ARG_WITH(
 
 #   See if the --with-external_pal option has been provided. This sets the
 #   preprocesor macro EXTERNAL_PAL which prevents use of the PAL & SOFA
-#   library functions that are include din the AST distribution. Suitable
+#   library functions that are included in the AST distribution. Suitable
 #   link options are used within ast_link(_adam) scripts to pull in libpal.
 AC_ARG_WITH([external_pal],
             [ --with-external_pal   Use external PAL and SOFA libraries],

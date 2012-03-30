@@ -540,8 +540,14 @@ include_HEADERS = GRF_PAR grf.h
 nodist_include_HEADERS = ast.h AST_PAR
 include_MESSAGES = AST_ERR ast_err.h
 
+if EXTERNAL_PAL
+PAL_LIB =
+else
+PAL_LIB = libast_pal.la
+endif
+
 lib_LTLIBRARIES = \
-    libast_pal.la \
+    $(PAL_LIB) \
     libast.la \
     libast_err.la \
     libast_ems.la \
