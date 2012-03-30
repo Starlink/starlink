@@ -476,7 +476,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
 
                if( nin != nax ){
                   astError( AST__RDERR, "Inverse PermMap produces %d inputs, but the "
-                            "preceeding MatrixMap has %d outputs\n", status, nin, nax );
+                            "preceding MatrixMap has %d outputs\n", status, nin, nax );
                   ret = 0;
                }
 
