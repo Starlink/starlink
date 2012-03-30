@@ -3579,7 +3579,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == SPACE_IDENTIFIER ) {
 /* ------------------------------------------------------------------ */
 
-/* Indicate we have finished any preceeding time sub-phrase. */
+/* Indicate we have finished any preceding time sub-phrase. */
          timeid = NULL_ID;
 
 /* Now check the word to see if it a known space sub-phrase identifier. */
@@ -3618,7 +3618,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == VELOCITY_IDENTIFIER ) {
 /* ------------------------------------------------------------------ */
 
-/* Indicate we have finished any preceededing space sub-phrase. */
+/* Indicate we have finished any preceding space sub-phrase. */
          spaceid = NULL_ID;
 
 /* Now check the word to see if it a known velocity sub-phrase identifier. */
@@ -3656,7 +3656,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == SPECTRAL_IDENTIFIER ) {
 /* ------------------------------------------------------------------ */
 
-/* Indicate we have finished any preceededing velocity sub-phrase. */
+/* Indicate we have finished any preceding velocity sub-phrase. */
          velid = NULL_ID;
 
 /* Now check the word to see if it a known spectral sub-phrase identifier. */
@@ -3695,7 +3695,7 @@ static AstKeyMap *ReadProps( AstStcsChan *this, int *status ) {
       } else if( look_for == REDSHIFT_IDENTIFIER ) {
 /* ------------------------------------------------------------------ */
 
-/* Indicate we have finished any preceeding spectral sub-phrase. */
+/* Indicate we have finished any preceding spectral sub-phrase. */
          specid = NULL_ID;
 
 /* Now check the word to see if it a known spectral sub-phrase identifier. */

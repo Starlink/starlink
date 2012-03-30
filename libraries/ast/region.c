@@ -9893,7 +9893,7 @@ f     This routine
 *     each axis in the Frame encapsulated by the Region. The number of
 *     points in the mesh is determined by the MeshSize attribute.
 *
-*     The table is preceeded by a given title string, and followed by a
+*     The table is preceded by a given title string, and followed by a
 *     single line containing the word "ENDMESH".
 
 *  Parameters:

@@ -4790,7 +4790,7 @@ L1:
             astEndPM;
          }
 
-/* Display absolute value preceeded by "N" or "S" as appropriate. */
+/* Display absolute value preceded by "N" or "S" as appropriate. */
          if( dval < 0 ) {
             (void) sprintf( getattrib_buff, "S%s",  astFormat( skyframe, 1, -dval ) );
          } else {
@@ -4816,7 +4816,7 @@ L1:
             astEndPM;
          }
 
-/* Display absolute value preceeded by "E" or "W" as appropriate. */
+/* Display absolute value preceded by "E" or "W" as appropriate. */
          if( dval < 0 ) {
             (void) sprintf( getattrib_buff, "W%s",  astFormat( skyframe, 1, -dval ) );
          } else {

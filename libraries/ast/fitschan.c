@@ -10615,7 +10615,7 @@ static char *FormatKey( const char *key, int c1, int c2, char s, int *status ){
 *        less than zero.
 *     c2
 *        A second integer value to append to the end of the keyword. Ignored if
-*        less than zero. This second integer is preceeded by an underscore.
+*        less than zero. This second integer is preceded by an underscore.
 *     s
 *        The co-ordinate version character to append to the end of the
 *        final string. Ignored if blank.
@@ -10661,7 +10661,7 @@ static char *FormatKey( const char *key, int c1, int c2, char s, int *status ){
       }
 
 /* If index c2 has been supplied, append it to the end of the string,
-   preceeded by an underscore. */
+   preceded by an underscore. */
       if( c2 >= 0 ) {
          if( len >= 0 && ( nc = sprintf( formatkey_buff + len, "_%d", c2 ) ) >= 0 ){
             len += nc;
@@ -27585,7 +27585,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *        is also done for CmPIXi, CmYPEi, and CmNITi. CmELTi is converted
 *        to a CDj_is array.
 *
-*     7) EQUINOX keywords with string values equal to a date preceeded
+*     7) EQUINOX keywords with string values equal to a date preceded
 *        by the leter B or J (eg "B1995.0"). These are converted to the
 *        corresponding Julian floating point value without any epoch
 *        specifier.

@@ -2896,7 +2896,7 @@ static int PatternCheck( int val, int check, int **list, int *list_len, int *sta
             if( (*list)[ jat ] == val ) {
 
 /* When an earlier occurrence of "val" is found, see if the values
-   which preceed it are the same as the values which preceed the new
+   which precede it are the same as the values which precede the new
    element if "list" added by this invocation. We use 3 complete
    patterns as evidence of looping, unless the wavelength is 1 in which
    case we use 30 patterns (this is because wavelengths of 1 can occur

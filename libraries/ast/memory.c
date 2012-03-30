@@ -1350,7 +1350,7 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
 *     of dynamically allocated strings. The delimiter character itself
 *     is not included in the returned strings.
 *
-*     Delimiter characters that are preceeded by "\" are not used as
+*     Delimiter characters that are preceded by "\" are not used as
 *     delimiters but are included in the returned word instead (without
 *     the "\").
 
@@ -1404,7 +1404,7 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
 
 /* If it is escaped, it does not mark the end of a word. Put it into the
    current output buffer instead, overwriting the escape character that
-   preceeded it. */
+   preceded it. */
          if( escaped ) {
             word[ wordlen - 1 ] = c;
 
@@ -1801,7 +1801,7 @@ f     PATTERN = CHARACTER * ( * ) (Given)
 *        case, substitution strings may be specified by appended them to
 *        the end of the "pattern" string, separated by "=" characters.
 *        Note, if you need to include a literal "=" character in the
-*        pattern, preceed it by an escape "\" character.
+*        pattern, precede it by an escape "\" character.
 *     nsub
 *        The number of substitution strings supplied in array "subs".
 f     RESULT = CHARACTER * ( * ) (Returned)
@@ -4025,7 +4025,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
                           ptr[15], ptr[16], ptr[17], ptr[18], ptr[19] );
 
 /* Now look through the original format string for conversions specifiers.
-   If any %n conversions are found which are preceeded by a space, then
+   If any %n conversions are found which are preceded by a space, then
    correct the returned character counts to include any spaces following the
    corresponding point in the scanned string. */
             nfld = 0;
@@ -4054,7 +4054,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
                         if( *c != 'n' ) {
                            nfld++;
 
-/* If the % sign is followed by a "n", and was preceeded by a space, we
+/* If the % sign is followed by a "n", and was preceded by a space, we
    may need to correct the returned character count. */
                         } else if( c > fmt + 1 && *(c-2) == ' ' ) {
 
@@ -4137,7 +4137,7 @@ void astActiveMemory_( const char *label ) {
 *  Description:
 *     This function displays a list of the identifiers for all currently
 *     active AST memory chunks. The list is written to standard output
-*     using "printf", preceeded by the supplied text.
+*     using "printf", preceded by the supplied text.
 
 *  Parameters:
 *     label
@@ -5155,7 +5155,7 @@ static AstTimer *ReportTimer( AstTimer *t, int ind, AstTimer **flat,
    if( *status != 0 ) return NULL;
 
 /* Display a single line of text containing the times stored in the supplied
-   timer, preceeded by the requested number of spaces. */
+   timer, preceded by the requested number of spaces. */
    for( i = 0; i < ind; i++ ) printf(" ");
    printf( "%s (%s:%d): ", t->name, t->file, t->line );
 

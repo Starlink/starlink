@@ -1715,7 +1715,7 @@ const char *astXmlGetAttributeValue_( AstXmlElement *this, const char *name, int
 *        The pointer to the XmlElement.
 *     name
 *        Pointer to a string holding the name of the attribute. The name
-*        may be preceeded with a "prefix:" string, in which case the
+*        may be preceded with a "prefix:" string, in which case the
 *        prefix will also be matched. If no prefix is included, the first
 *        attribute with the specified name is returned, regardless of
 *        its prefix.
@@ -2979,7 +2979,7 @@ const char *astXmlShow_( AstXmlObject *this, int *status ) {
 *     containing a textual representation of the supplied XmlObject.
 *     Newline characters are added to the string if needed to ensure that
 *     each item of content within an element starts on a new line, and all
-*     tags are preceeded by an indentation string consisting of a number
+*     tags are preceded by an indentation string consisting of a number
 *     of spaces.
 
 *  Parameters:
@@ -3842,7 +3842,7 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0,
 *        The pointer to the XmlElement.
 *     name0
 *        Pointer to a string holding the name of the attribute. The name
-*        may be preceeded with a "prefix:" string, in which case the
+*        may be preceded with a "prefix:" string, in which case the
 *        prefix will also be matched. If no prefix is included, the first
 *        attribute with the specified name is returned, regardless of
 *        its prefix.

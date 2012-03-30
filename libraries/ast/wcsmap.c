@@ -1073,8 +1073,8 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
    intrinsically simpler than the original mappings. */
             if( ret ) {
 
-/* If the PermMap preceeds the WcsMap, this will be the case if the PermMap
-   has more outputs than inputs. If the WcsMap preceeds the PermMap, this
+/* If the PermMap precedes the WcsMap, this will be the case if the PermMap
+   has more outputs than inputs. If the WcsMap precedes the PermMap, this
    will be the case if the PermMap has more inputs than outputs. */
                *simpler = ( nowcs == map1 ) ? nout > nin : nin > nout;
             }
@@ -4695,7 +4695,7 @@ astMAKE_TEST(WcsMap,FITSProj,( this->fits_proj != -INT_MAX ))
 *     version of FITS-WCS paper II. If it is zero, then the TAN
 *     projection from (psi,theta) to (xi,eta) is replaced by a unit
 *     transformation, so that the WcsMap implements the polynomial
-*     transformation only, without any preceeding TAN projection.
+*     transformation only, without any preceding TAN projection.
 *
 *     In addition if the TPNTan value is zero, then the WcsMap
 *     assumes that the input and output values are in degrees rather

@@ -449,7 +449,7 @@ static const char *CleanExp( const char *exp, int *status ) {
          l = 2;
          t = astFree( t );
 
-/* If the word ends with "JY" and is preceeded by a single character, change
+/* If the word ends with "JY" and is preceded by a single character, change
    to "<start>Jy". Should be OK for things like "MJY". */
       } else if( l == 3 && !strcmp( t + 1, "JY" ) ) {
          tok[ i ][ 2 ] = 'y';
@@ -3502,7 +3502,7 @@ static UnitNode *MakeLabelTree( const char *lab, int nc, int *status ){
       result = NewNode( NULL, op, status );
       if( astOK ) {
 
-/* Create a tree of unit nodes from the string which preceeds the binary
+/* Create a tree of unit nodes from the string which precedes the binary
    operator. Report an error if it cannot be done. */
         result->arg[ 0 ] = MakeLabelTree( exp, i, status );
         if( !result->arg[ 0 ] && astOK ) {
@@ -3698,8 +3698,8 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
          }
 
 /* An opening parenthesis at level zero must always be either the first
-   character in the string, or be preceeded by the name of a function, or
-   be preceeded by an operator. If none of these are true, assume there is
+   character in the string, or be preceded by the name of a function, or
+   be preceded by an operator. If none of these are true, assume there is
    an implicit multiplication operator before the parenthesis. */
          if( depth == 0 && i > 0 ) {
             d = *( c - 1 );
@@ -3784,7 +3784,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
       result = NewNode( NULL, op, status );
       if( astOK ) {
 
-/* Create a tree of unit nodes from the string which preceeds the binary
+/* Create a tree of unit nodes from the string which precedes the binary
    operator. Report an error if it cannot be done. */
          result->arg[ 0 ] = MakeTree( exp, i, lock, status );
          if( !result->arg[ 0 ] && astOK ) {
@@ -3862,7 +3862,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
          result = NewNode( NULL, op, status );
          if( astOK ) {
 
-/* Create a tree of unit nodes from the string which preceeds the binary
+/* Create a tree of unit nodes from the string which precedes the binary
    operator. Report an error if it cannot be done. */
             result->arg[ 0 ] = MakeTree( exp, i, lock, status );
             if( !result->arg[ 0 ] && astOK ) {
@@ -4043,7 +4043,7 @@ static UnitNode *MakeTree( const char *exp, int nc, int lock, int *status ){
                }
 
 /* If no known unit and multiplier combination was found, we assume the
-   string represents a new user-defined basic unit, possibly preceeded by a
+   string represents a new user-defined basic unit, possibly preceded by a
    standard multiplier prefix. */
             } else {
 
@@ -5408,7 +5408,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     In addition, any other unknown unit symbol may be used (but of course
 *     no mapping will be possible between unknown units).
 *
-*     Unit symbols may be preceeded with a numerical constant (for
+*     Unit symbols may be preceded with a numerical constant (for
 *     instance "1000 m") or a standard multiplier symbol (for instance "km")
 *     to represent some multiple of the unit. The following standard
 *     multipliers are recognised:

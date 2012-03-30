@@ -19805,7 +19805,7 @@ static void InterpEscape( AstPlot *this, int type, double value, float *x,
 *     This function modifies the current graphics attributes, the supplied
 *     reference position, in preparation for drawing another sub-string
 *     from a string containing graphics escape sequences. The type and
-*     value of an escape sequence preceededing the substring is supplied.
+*     value of an escape sequence preceding the substring is supplied.
 *     Note, this function ignored escape sequences which represent an
 *     escaped percent sign. Such escape sequences are drawn as normal
 *     text by the claling function.

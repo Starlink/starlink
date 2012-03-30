@@ -404,8 +404,8 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
    intrinsically simpler than the original mappings. */
             if( ret ) {
 
-/* If the PermMap preceeds the WinMap, this will be the case if the PermMap
-   has more outputs than inputs. If the WinMap preceeds the PermMap, this
+/* If the PermMap precedes the WinMap, this will be the case if the PermMap
+   has more outputs than inputs. If the WinMap precedes the PermMap, this
    will be the case if the PermMap has more inputs than outputs. */
                *simpler = ( nowin == map1 ) ? nout > nin : nin > nout;
             }
