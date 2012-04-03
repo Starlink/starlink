@@ -48,10 +48,12 @@
 *        Renamed SMF__Q_BADS to SMF__Q_BADDA
 *     2011-09-07 (TIMJ):
 *        Apply heater efficiency data after flatfielding.
+*     2012-04-03 (TIMJ):
+*        Report cases where all bolometers are disabled by flatfielding.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2012 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
 *     2005-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -106,6 +108,7 @@ void smf_flatten ( smfData *data, AstKeyMap * heateffmap, int *status ) {
   size_t ndat;                 /* Total number of data points */
   int nboll;                   /* Number of bolometers */
   int nframes;                 /* Number of frames (timeslices) */
+  int ngood;                   /* Number of good bolometers in flatfield */
   void *pntr[3];               /* Array of pointers for DATA, QUALITY & VARIANCE */
   smf_qual_t *qual;         /* Pointer to quality array */
 
@@ -139,8 +142,19 @@ void smf_flatten ( smfData *data, AstKeyMap * heateffmap, int *status ) {
   nframes = (data->dims)[2];
 
   /* Flatfielder */
-  sc2math_flatten( nboll, nframes, smf_flat_methstring(da->flatmeth,status), da->nflat, da->flatcal,
-                   da->flatpar, dataArr, status);
+  ngood = sc2math_flatten( nboll, nframes, smf_flat_methstring(da->flatmeth,status), da->nflat, da->flatcal,
+                           da->flatpar, dataArr, status);
+
+  if (ngood == 0) {
+    msgOutif( MSG__QUIET, "",
+              "         **************************************", status );
+    smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+    msgOutif( MSG__QUIET, "",
+              "WARNING: All bolos in ^FILE disabled with bad flatfield.",
+              status );
+    msgOutif( MSG__QUIET, "",
+              "         **************************************", status );
+  }
 
   /* Update units and title if we have a header */
   smf_set_clabels( "Flatfielded", NULL, SIPREFIX "W", data->hdr, status);
