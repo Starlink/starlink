@@ -1287,7 +1287,7 @@ int *status               /* global status (given and returned) */
 
 /*+ sc2math_flatten - apply flat field correction to set of frames */
 
-void sc2math_flatten
+int sc2math_flatten
 (
 int nboll,                /* number of bolometers (given) */
 int nframes,              /* number of frames in scan (given) */
@@ -1307,6 +1307,8 @@ int *status               /* global status (given and returned) */
 
     "TABLE" means use the fcal values for any bolometer as an
      interpolation table to determine the corresponding fpar value.
+
+    Returns the number of good bolometers in the flatfield.
 
    Authors :
     B.D.Kelly (bdk@roe.ac.uk)
@@ -1328,12 +1330,17 @@ int *status               /* global status (given and returned) */
   double lincal[2];   /* interpolation coeffs for a bolometer */
   double t;           /* intermediate result */
   double *temp;       /* pointer to storage for a single bolometer */
-
+  int ngood = 0;   /* number of bolometers flatfielded */
 
   if ( !StatusOkP(status) ) return;
 
   if ( strcmp ( "POLYNOMIAL", flatname ) == 0 )
     {
+      /* Count number of good bolometers */
+      for ( i=0; i<nboll; i++ ) {
+        if (fcal[i] != VAL__BADD) ngood++;
+      }
+
       for ( j=0; j<nframes; j++ )
         {
 
@@ -1400,7 +1407,7 @@ int *status               /* global status (given and returned) */
             {
 
               /* apply flatfield for this bolometer in each frame */
-
+              ngood++;
               for ( j=0; j<nframes; j++ )
                 {
                   if (temp[j] != VAL__BADD)
@@ -1422,6 +1429,7 @@ int *status               /* global status (given and returned) */
   else if ( strcmp ( "NULL", flatname ) == 0 )
     {
       /* Do nothing - just return the data unchanged */
+      ngood = nboll;
     }
   else
     {
@@ -1431,6 +1439,7 @@ int *status               /* global status (given and returned) */
       ErsRep ( 0, status, errmess );
     }
 
+  return ngood;
 }
 
 

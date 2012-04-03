@@ -177,7 +177,7 @@ int *status               /* global status (given and returned) */
 
 /*+ sc2math_flatten - apply flat field correction to set of frames */
 
-void sc2math_flatten
+int sc2math_flatten
 (
 int nboll,                /* number of bolometers (given) */
 int nframes,              /* number of frames in scan (given) */
