@@ -162,6 +162,9 @@
 *        Revamp flatfield handling to ensure that ratios are taken properly
 *        for multiple subarrays and to determine if a failed flatfield was
 *        required. We only ignore a bad flat if it was not going to be used.
+*     2012-04-03 (TIMJ):
+*        No longer set status to bad if we have a bad flat. Report the problem
+*        and rely on downstream to complain.
 
 *  Copyright:
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
@@ -682,14 +685,32 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                  where expect some configurations to give zero bolometers */
               if (ngood < SMF__MINSTATSAMP) {
                 const char *fname = NULL;
+                void * tmpvar = NULL;
                 int smftyp = 0;
+                smfData * curflat = NULL;
                 astMapGet0I( infomap, "SMFTYP", &smftyp );
                 astMapGet0C( infomap, "FILENAME", &fname );
                 if (smftyp != SMF__TYP_NEP) {
                   msgOutiff( MSG__QUIET, "",
-                            "Flatfield ramp file %s only has %zu good bolometer%s.",
-                             status, fname, ngood, (ngood == 1 ? "" : "s") );
+                            "Flatfield %s has %zu good bolometer%s.%s",
+                             status, fname, ngood, (ngood == 1 ? "" : "s"),
+                             ( ngood == 0 ? "" : " Keeping none.") );
                   isgood = 0;
+
+                  /* Make sure that everything is blanked. */
+                  if (ngood > 0) {
+                    astMapGet0P( infomap, "CALCFLAT", &tmpvar );
+                    curflat = tmpvar;
+                    if (curflat && curflat->da) {
+                      size_t bol;
+                      size_t nbolo = (curflat->dims)[0] * (curflat->dims)[1];
+                      double *flatcal = curflat->da->flatcal;
+                      for (bol=0; bol<nbolo; bol++) {
+                        /* Just need to set the first element to bad */
+                        flatcal[bol] = VAL__BADD;
+                      }
+                    }
+                  }
 
                 } else {
                   msgOutiff( MSG__NORM, "",
@@ -710,9 +731,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
             } /* End of isgood comparison */
 
-            /* Now we may have lost a previously good flat so we test again
-               before storing the result */
-            if (isgood) {
+            /* We are storing flats even if they failed. Let the downstream
+               software worry about it */
+            {
               int ori_index;
               smfData * flatfile = NULL;
               void *tmpvar = NULL;
@@ -726,55 +747,6 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
               astMapRemove( infomap, "CALCFLAT" );
               flatfile = tmpvar;
               smf_addto_smfArray( array, flatfile, status );
-
-            } else {
-              /* The flatfield failed - do we care? */
-              const char * fname = NULL;
-              astMapGet0C( infomap, "FILENAME", &fname );
-
-              /* See if there is the same key in scimap */
-              if (astMapHasKey( scimap, key ) ) {
-                int refseq = 0;
-                int *allseqs = NULL;  /* List of sequence counters to compare */
-                int nseq = astMapLength( scimap, key );
-                int needed = 0;
-                int ns = 0;
-                astMapGet0I( infomap, "SEQCOUNT", &refseq );
-
-                allseqs = astMalloc( sizeof(*allseqs) * nseq);
-                if (allseqs) {
-                  astMapGet1I( scimap, key, nseq, &nseq, allseqs );
-
-                  for (ns = 0; ns < nseq; ns++) {
-                    if ( abs( allseqs[ns] - refseq ) == 1 ) {
-                      needed = 1;
-                      break;
-                    }
-                  }
-                }
-                if (allseqs) allseqs = astFree(allseqs);
-
-                if (needed) {
-                  *status = SMF__BADFLAT;
-                  errRepf( "", "Flatfield from %s failed to process but this is "
-                           "required for science processing", status, fname );
-                }
-
-              }
-
-              /* Free the flat if we have a flat to free */
-                  /* free the flatfield data since we are not storing it */
-              if (astMapHasKey( infomap, "CALCFLAT" ) ) {
-                smfData * flatfile = NULL;
-                void *tmpvar = NULL;
-                astMapGet0P( infomap, "CALCFLAT", &tmpvar );
-                flatfile = tmpvar;
-                if (flatfile) smf_close_file( &flatfile, status );
-              }
-
-              /* if status is still okay then we will print a message */
-              msgOutiff(MSG__NORM, "", "Flatfield from %s failed to process but "
-                        "it does not seem to be required", status, fname );
             }
 
             /* Free the object as we go */
