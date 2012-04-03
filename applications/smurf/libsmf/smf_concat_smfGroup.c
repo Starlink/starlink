@@ -229,6 +229,9 @@
  *        Added exportlonlat to API.
  *     2012-02-20 (DSB):
  *        Added "config" to API, and removed "tstep" and "exportlonlat".
+ *     2012-04-03 (TIMJ):
+ *        Copy smfFile in deepcopy so that flatfielding can tell the file name
+ *        when reporting an error.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -664,9 +667,10 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
           smf_close_file( &tmpdata, status );
 
         /* Otherwise, if the data is raw, convert it to double precision
-           then release the original. */
+           then release the original. We copy the smfFile so that the
+           flatfielding can report a file name associated with any failure. */
         } else if( israw ) {
-          refdata = smf_deepcopy_smfData( tmpdata, 1,  SMF__NOCREATE_FILE, 0, 0,
+          refdata = smf_deepcopy_smfData( tmpdata, 1,  0, 0, 0,
                                           status );
           smf_close_file( &tmpdata, status );
 
