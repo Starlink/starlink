@@ -562,7 +562,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
             if (isgood) {
               /* The flatfield worked */
-              int ngood = 0;
+              size_t ngood = 0;
+              int itemp;
               int utdate = 0;
 
               /* Get the UT date - we do not compare flatfields after
@@ -570,7 +571,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
               astMapGet0I( infomap, "UTDATE", &utdate );
 
               /* Get the number of good bolometers at this point */
-              astMapGet0I( infomap, "NGOOD", &ngood );
+              astMapGet0I( infomap, "NGOOD", &itemp );
+              ngood = itemp;
 
               /* Can we compare with the next flatfield? */
               if (ngood < SMF__MINSTATSAMP || utdate >= 20110901 ) {
