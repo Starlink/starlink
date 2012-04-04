@@ -167,7 +167,6 @@ void smurf_sc2concat( int *status ) {
   smfArray *concat=NULL;     /* Pointer to a smfArray */
   size_t contchunk;          /* Continuous chunk counter */
   smfArray *darks = NULL;    /* dark frames */
-  smfData *data=NULL;        /* Pointer to a smfData */
   int ensureflat;            /* Flag for flatfielding data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   smfArray * flatramps = NULL; /* Flatfield ramps */
