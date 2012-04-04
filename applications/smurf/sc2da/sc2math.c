@@ -1332,7 +1332,7 @@ int *status               /* global status (given and returned) */
   double *temp;       /* pointer to storage for a single bolometer */
   int ngood = 0;   /* number of bolometers flatfielded */
 
-  if ( !StatusOkP(status) ) return;
+  if ( !StatusOkP(status) ) return 0;
 
   if ( strcmp ( "POLYNOMIAL", flatname ) == 0 )
     {
