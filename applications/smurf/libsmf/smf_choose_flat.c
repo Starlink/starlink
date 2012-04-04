@@ -53,9 +53,11 @@
 *        Choose closest previous flat rather than first previous flat.
 *     2010-12-07 (TIMJ):
 *        Check SHUTTER
+*     2012-04-03 (TIMJ):
+*        Can not use a following flat after 20110901
 
 *  Copyright:
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010, 2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -96,6 +98,7 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
   int refseq;        /* Sequence count of input science data */
   double refshut = 0.0;        /* Shutter values of science data */
   sc2ast_subarray_t refsubnum; /* Subarray number of science data */
+  int utdate = 0;    /* UT date of observation */
 
   *flatidx = SMF__BADIDX;
 
@@ -107,6 +110,7 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
   smf_find_seqcount( indata->hdr, &refseq, status );
   smf_find_subarray( indata->hdr, NULL, (size_t)0, &refsubnum, status );
   smf_fits_getD( indata->hdr, "SHUTTER", &refshut, status );
+  smf_fits_getI( indata->hdr, "UTDATE", &utdate, status );
 
   msgOutiff( MSG__DEBUG, "", "Flatfield search: %s subarray %d shutter %g (seq=%d)",
              status, indata->hdr->obsidss, refsubnum, refshut, refseq);
@@ -147,7 +151,9 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
         /* Valid next flat which we will want to use if we could not
            find a previous match. Only select it if it is from the
            sequence that follows immediately afterwards. */
-        if (seqdiff == -1) {
+        /* Note that after 20110901 we can not use a following flat ramp.
+           See similar check in smf_find_science */
+        if (seqdiff == -1 && utdate < 20110901 ) {
           *flatidx = i;
           matchseq = thisseq;
         }
