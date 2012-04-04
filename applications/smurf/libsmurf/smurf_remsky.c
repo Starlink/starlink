@@ -35,6 +35,18 @@
 *          Type of fit to be carried out for the PLANE sky removal
 *          method. Choices are Mean, Slope (to fit in elevation only)
 *          or Plane. No default.
+*     FLATMETH = _CHAR (Read)
+*          Method to use to calculate the flatfield solution. Options
+*          are POLYNOMIAL and TABLE. Polynomial fits a polynomial to
+*          the measured signal. Table uses an interpolation scheme
+*          between the measurements to determine the power. [POLYNOMIAL]
+*     FLATORDER = _INTEGER (Read)
+*          The order of polynomial to use when choosing POLYNOMIAL method.
+*          [1]
+*     FLATSNR = _DOUBLE (Read)
+*          Signal-to-noise ratio threshold to use when filtering the
+*          responsivity data to determine valid bolometers for the
+*          flatfield. [3.0]
 *     GROUP = _LOGICAL (Read)
 *          If true, group related files together for processing as a
 *          single data set, else process each file independently. [FALSE]
@@ -52,6 +64,15 @@
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
+*     RESIST = GROUP (Read)
+*          A group expression containing the resistor settings for
+*          each bolometer.  Usually specified as a text file using "^"
+*          syntax. An example can be found in
+*          $STARLINK_DIR/share/smurf/resist.cfg
+*          [$STARLINK_DIR/share/smurf/resist.cfg]
+*     RESPMASK = _LOGICAL (Read)
+*          If true, responsivity data will be used to mask bolometer data
+*          when calculating the flatfield. [TRUE]
 
 *  Related Applications:
 *     SMURF: EXTINCTION, MAKEMAP;

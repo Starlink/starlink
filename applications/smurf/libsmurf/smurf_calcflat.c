@@ -77,7 +77,7 @@
 *     SNRMIN = _DOUBLE (Read)
 *          Signal-to-noise ratio threshold to use when filtering the
 *          responsivity data to determine valid bolometers for the
-*          flatfield. Only used in TABLE mode. [3.0]
+*          flatfield. [3.0]
 
 *  Related Applications:
 *     SMURF: CALCRESP, FLATFIELD

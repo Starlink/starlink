@@ -108,6 +108,18 @@
 *          even if no output cube is created. Celestial axis values will
 *          be in units of radians.  The parameter is named to be
 *          consistent with KAPPA:NDFTRACE output.
+*     FLATMETH = _CHAR (Read)
+*          Method to use to calculate the flatfield solution. Options
+*          are POLYNOMIAL and TABLE. Polynomial fits a polynomial to
+*          the measured signal. Table uses an interpolation scheme
+*          between the measurements to determine the power. [POLYNOMIAL]
+*     FLATORDER = _INTEGER (Read)
+*          The order of polynomial to use when choosing POLYNOMIAL method.
+*          [1]
+*     FLATSNR = _DOUBLE (Read)
+*          Signal-to-noise ratio threshold to use when filtering the
+*          responsivity data to determine valid bolometers for the
+*          flatfield. [3.0]
 *     FTL( ) = _DOUBLE (Write)
 *          Sky coordinates (radians) of the top left corner of the
 *          output map (the corner with the smallest PIXEL dimension for
@@ -242,8 +254,16 @@
 *          The formatted celestial longitude value at the tangent point of
 *          the spatial projection in the output cube. This should be provided
 *          in the system specified by parameter SYSTEM.
+*     RESIST = GROUP (Read)
+*          A group expression containing the resistor settings for
+*          each bolometer.  Usually specified as a text file using "^"
+*          syntax. An example can be found in
+*          $STARLINK_DIR/share/smurf/resist.cfg
+*          [$STARLINK_DIR/share/smurf/resist.cfg]
+*     RESPMASK = _LOGICAL (Read)
+*          If true, responsivity data will be used to mask bolometer data
+*          when calculating the flatfield. [TRUE]
 *     SPREAD = LITERAL (Read)
-
 *          The method to use when spreading each input pixel value out
 *          between a group of neighbouring output pixels if using
 *          METHOD=REBIN (for METHOD=ITERATE nearest-neighbour

@@ -47,6 +47,18 @@
 *     FLAT = _LOGICAL (Read)
 *          If set ensure data are flatfielded. If not set do not scale the
 *          data in any way (but convert to DOUBLE). [TRUE]
+*     FLATMETH = _CHAR (Read)
+*          Method to use to calculate the flatfield solution. Options
+*          are POLYNOMIAL and TABLE. Polynomial fits a polynomial to
+*          the measured signal. Table uses an interpolation scheme
+*          between the measurements to determine the power. [POLYNOMIAL]
+*     FLATORDER = _INTEGER (Read)
+*          The order of polynomial to use when choosing POLYNOMIAL method.
+*          [1]
+*     FLATSNR = _DOUBLE (Read)
+*          Signal-to-noise ratio threshold to use when filtering the
+*          responsivity data to determine valid bolometers for the
+*          flatfield. [3.0]
 *     IN = NDF (Read)
 *          Input files to be uncompressed and flatfielded. Any darks provided
 *          will be subtracted prior to flatfielding.
@@ -70,6 +82,15 @@
 *          of all the output component NDFs created by this
 *          application (one per line). If a NULL (!) value is supplied
 *          no file is created. [!]
+*     RESIST = GROUP (Read)
+*          A group expression containing the resistor settings for
+*          each bolometer.  Usually specified as a text file using "^"
+*          syntax. An example can be found in
+*          $STARLINK_DIR/share/smurf/resist.cfg
+*          [$STARLINK_DIR/share/smurf/resist.cfg]
+*     RESPMASK = _LOGICAL (Read)
+*          If true, responsivity data will be used to mask bolometer data
+*          when calculating the flatfield. [TRUE]
 
 *  Related Applications:
 *     SMURF: SC2CLEAN, SC2FFT

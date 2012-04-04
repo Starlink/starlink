@@ -88,7 +88,7 @@
 *     FLATSNR = _DOUBLE (Read)
 *          Signal-to-noise ratio threshold to use when filtering the
 *          responsivity data to determine valid bolometers for the
-*          flatfield. Only used in TABLE mode. [10.0]
+*          flatfield. [3.0]
 *     FLOW = _DOUBLE (Given)
 *          Frequency to use when determining noise ratio image. The noise
 *          ratio image is determined by dividing the power at this frequency

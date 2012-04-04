@@ -49,6 +49,18 @@
 *     FLAT = _LOGICAL (Read)
 *          If set ensure data are flatfielded. If not set do not scale the
 *          data in any way (but convert to DOUBLE). [TRUE]
+*     FLATMETH = _CHAR (Read)
+*          Method to use to calculate the flatfield solution. Options
+*          are POLYNOMIAL and TABLE. Polynomial fits a polynomial to
+*          the measured signal. Table uses an interpolation scheme
+*          between the measurements to determine the power. [POLYNOMIAL]
+*     FLATORDER = _INTEGER (Read)
+*          The order of polynomial to use when choosing POLYNOMIAL method.
+*          [1]
+*     FLATSNR = _DOUBLE (Read)
+*          Signal-to-noise ratio threshold to use when filtering the
+*          responsivity data to determine valid bolometers for the
+*          flatfield. [3.0]
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     INVERSE = _LOGICAL (Read)
@@ -76,6 +88,15 @@
 *          Use polar representation of FFT with squared
 *          amplitudes divided by the frequency bin spacing (gives a
 *          power spectral density, PSD). [FALSE]
+*     RESIST = GROUP (Read)
+*          A group expression containing the resistor settings for
+*          each bolometer.  Usually specified as a text file using "^"
+*          syntax. An example can be found in
+*          $STARLINK_DIR/share/smurf/resist.cfg
+*          [$STARLINK_DIR/share/smurf/resist.cfg]
+*     RESPMASK = _LOGICAL (Read)
+*          If true, responsivity data will be used to mask bolometer data
+*          when calculating the flatfield. [TRUE]
 *     WEIGHTAVPSPEC = _LOGICAL (Read)
 *          If set, weight power spectrum of each bolo by 1/noise^2 when
 *          calculating the average (estimated from 2--20 Hz spectrum). [TRUE]
