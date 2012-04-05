@@ -4,7 +4,7 @@
 *     RAWRECREATEWCS
 
 *  Purpose:
-*     Fix broken raw ACSIS files by enablign the spectral WCS to be reconstructed
+*     Fix broken raw ACSIS files by enabling the spectral WCS to be reconstructed
 
 *  Language:
 *     Starlink ANSI C

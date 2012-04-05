@@ -272,8 +272,8 @@
 *       -   LISS : Simulates mapping a rectangular area of
 *                 sky by filling the box with a Lissajous
 *                 pattern.
-*	-   EXTERN : Recreates the scanning pattern of a real
-*   		  SCUBA2 observation.
+*       -   EXTERN : Recreates the scanning pattern of a real
+*                   SCUBA2 observation.
 *
 *       [PONG]
 *     platenum (INTEGER)
