@@ -52,6 +52,12 @@
 *     NGOOD() = _INTEGER (Write)
 *          Number of bolometers with good responsivities. Integer array, one
 *          entry for each input file.
+*     RESIST = GROUP (Read)
+*          A group expression containing the resistor settings for
+*          each bolometer.  Usually specified as a text file using "^"
+*          syntax. An example can be found in
+*          $STARLINK_DIR/share/smurf/resist.cfg
+*          [$STARLINK_DIR/share/smurf/resist.cfg]
 *     OUT = NDF (Write)
 *          Output responsivity images.  If the input files were each taken with
 *          the same stored FLATFIELD solution the output responsivity images
