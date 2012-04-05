@@ -2713,6 +2713,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter nboloeff {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
             parameter ncontchunk {
                 type _INTEGER
                 access WRITE

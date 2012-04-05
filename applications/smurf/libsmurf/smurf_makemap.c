@@ -170,6 +170,9 @@
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
+*     NBOLOEFF = _DOUBLE (Write)
+*          Effective number of bolometers in the output map when
+*          METHOD=iterate. [!]
 *     NCONTCHUNK = _INTEGER (Write)
 *          Total number of continuous data chunks processed by makemap
 *          when METHOD=iterate. [!]
@@ -2242,7 +2245,8 @@ void smurf_makemap( int *status ) {
       }
     }
 
-
+    /* Write ADAM parameters */
+    parPut0d( "NBOLOEFF", nboloeff, status );
     parPut0i( "NCONTCHUNK", (int) ncontchunks, status );
     parPut0i( "NMINSMP", (int) ninsmp, status );
     parPut0i( "NMCNVG", (int) ncnvg, status );
