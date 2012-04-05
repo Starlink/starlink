@@ -401,7 +401,10 @@
 *       extension. [0]
 *     CHITOL = REAL
 *       Maximum difference in chi^2 between subsequent iterations required
-*       to stop if NUMITER is negative. [1e-3]
+*       to stop if NUMITER is negative. See also MAPTOL. [1e-3]
+*     DOWNSAMPFREQ = REAL
+*       Downsample to a specific sample rate in Hz. An alternative
+*       to DOWNSAMPSCALE.
 *     DOWNSAMPSCALE = REAL
 *       The sample rate of the data need only ensure that the angular scale
 *       is adequately sampled given the telescope slew rate. Usually the
@@ -418,6 +421,12 @@
 *       flatfielded this will be acceptable. This can be used to
 *       investigate flatfielding errors in conjunction with the
 *       BOLOMAP parameter. [1]
+*     EXPORTLONLAT = LOGICAL
+*       Export the longitude/latitude of every sample into a pair of
+*       NDFs?  The file names will be the same as model components,
+*       except with sufficies equal to the AST "Symbol" attribute
+*       associated with the celestial axes ("ra"/"dec", "glon"/"glat",
+*       etc). [0]
 *     EXPORTNDF( ) = STRING
 *       Export model components to Starlink ".sdf" files. Specify 1 or
 *       0 to export all or none of the components respectively. One
@@ -459,6 +468,11 @@
 *     ITERMAP = LOGICAL
 *       If true each iteration is written to the output file in the
 *       .MORE.SMURF.ITERMAPS extension. [0]
+*     MAPTOL = REAL
+*       Threshold chance in the mean absolute difference between map pixels
+*       in subsequent iterations, normalized by the estimated map RMS. This
+*       is much more like a "by eye" test, that will stop the solution
+*       when the map stops changing. See also CHITOL.
 *     MAXLEN = REAL
 *       Maximum number of seconds of data to be loaded at once. [0]
 *     MODELORDER( ) = STRING
@@ -497,21 +511,26 @@
 *       A positive value if a set number of iterations are desired. A
 *       negative number indicates the maximum number of iterations allowed if
 *       CHITOL is being used for the stopping criterion. [-5]
+*     SAMPCUBE = LOGICAL
+*       If true, create a .MORE.SMURF.SAMPCUBES extension providing data
+*       cubes of data samples that go into each map pixel. [0]
 *     SHORTMAP = INTEGER
 *       If non-zero a map is made of every SHORTMAP samples and
 *       written to the output file in the .MORE.SMURF.SHORTMAPS
 *       extension. This can be used to investigate pointing
 *       fluctuations when making maps of bright sources. [0]
-*     TSTEP = INTEGER
-*       The gap (in time slices) between full calculations of the output map
-*       bolometer positions. Setting a larger value for this will speed up
-*       the map maker but will introduce larger spatial errors. The default
-*       value of 100 seems to produce spatial errors of under 0.1 arc-sec. This
-*       level of errors seems to cause about 1% of bolometers samples to be
-*       pushed into a neighouring map pixel. For tstep=100, the calculation of
-*       bolometer positions speeds up by about a factor of 60. Setting tstep to
-*       1 (or zero) causes all bolometer positions to be calculated in full,
-*       without any approximation. [100]
+*     TSTEP = REAL
+*       The gap (in time slices if positive, seconds if negative)
+*       between full calculations of the output map bolometer
+*       positions. Setting a larger value for this will speed up the
+*       map maker but will introduce larger spatial errors. The
+*       default value of 100 seems to produce spatial errors of under
+*       0.1 arc-sec. This level of errors seems to cause about 1% of
+*       bolometers samples to be pushed into a neighouring map
+*       pixel. For tstep=100, the calculation of bolometer positions
+*       speeds up by about a factor of 60. Setting tstep to 1 (or
+*       zero) causes all bolometer positions to be calculated in full,
+*       without any approximation. [-0.5]
 *     VARMAPMETHOD = LOGICAL
 *       Method of estimating the variance map. If 0 calculate theoretical
 *       uncertainties propagated from the time-domain noise measurements. If
@@ -639,12 +658,19 @@
 *       an array of upper-edge frequencies (Hz). If 0 unused. [0]
 *     FILT_NOTCHLOW( ) = REAL
 *       Array of lower-edge frequencies corresponding to FILT_NOTCHHIGH. [0]
+*     OPTEFFDIV = LOGICAL
+*       If non-zero the bolometer data are divided by the optical efficiency
+*       values. Else they are multiplied [1]
+*     OPTEFFS[48][abcd] = STRING
+*       Name of the optical efficiency file to use. [<undef>]
 *     ORDER = INTEGER
 *       Subtract a fitted baseline polynomial of this order (0 to
 *       remove mean, -1 to turn off feature). [-1]
 *     PAD = INTEGER
 *       Number of samples of padding to add to start and end before filtering.
 *       The nature of this padding is determined by ZEROPAD. [undef]
+*     PCALEN = REAL
+*       Do not use.
 *     PCATHRESH = REAL
 *       If set, principal component analysis is used to identify a set of
 *       NBOLO new statistically un-correlated basis vectors to represent the
@@ -682,6 +708,12 @@
 *
 *     iii) Parameters controlling the calculation of model components.
 *
+*     AST.GAUSSBG = REAL
+*       If enabled, this will effectively smooth the map with a
+*       Gaussian of the supplied FWHM and subtract this background
+*       from the map after each iteration. This has the nice property
+*       that it is a fairly easily understood linear filtering
+*       operation. [0.0]
 *     AST.MAPSPIKE = REAL
 *       Alternative method of despiking the time-series using the
 *       map. Identify samples that are this number of standard
@@ -699,8 +731,17 @@
 *       Constrain map so that pixels that are bad in the reference NDF
 *       are forced to zero in the map. The reference NDF is accessed
 *       using the ADAM parameter "REF". [0]
+*     AST.ZERO_NITER = INTEGER
+*       The number of iterations for which the AST model should be
+*       masked. The default is zero, which means "mask on all
+*       iterations". However, if ast.zero_notlast is set, the mask
+*       will not be applied on the last iteration, even if
+*       AST.ZERO_NITER is zero.  This feature will probably be useful
+*       for deep point-source observations for which the large-scale
+*       noise is not as important, but keeping as much data around the
+*       edges of the map is. [0]
 *     AST.ZERO_NOTLAST = LOGICAL
-*       If ast.zero_notlast is set, on the final iteration the
+*       If AST.ZERO_NOTLAST is set, on the final iteration the
 *       AST.ZERO_LOWHITS boundary condition will not be applied. This
 *       will probably be useful for deep point-source observations for
 *       which the large-scale noise is not as important, but keeping
@@ -709,6 +750,31 @@
 *     AST.ZERO_SNR = REAL
 *       Constrain map to 0 wherever the map SNR is lower than this
 *       threshold. [0]
+*     AST.ZERO_SNRLO = REAL
+*       A second, lower, SNR threshold applied after AST.ZERO_SNR. So
+*       for instance, setting ast.zero_snrlo to 1 will cause the basic
+*       mask thresholded at SNR = 5 to be expanded down to an SNR of
+*       1. This dual thresholding system prevents noise spikes above
+*       the lower threshold being interpreted as source pixels
+*     AST.ZERO_SNR_FWHM = REAL
+*       The AST.ZERO_SNR_FWHM parameter gives the FWHM of a Gaussian
+*       (in arcsec) with which to smooth the final mask produced as a
+*       consequence of setting the AST.ZERO_SNR value. If it is set to
+*       zero, no smoothing is performed.  The smoothing occurs once
+*       all chunks of the map have converged, and a new map is then
+*       created using the smoothed mask as if it had been supplied via
+*       "AST.ZERO_MASK". Consequently, setting AST.ZERO_SNR_FWHM
+*       causes the time taken to create the final map to nearly
+*       double.
+*     AST.ZERO_SNR_LOW = REAL
+*       The AST.ZERO_SNR_LOW parameter gives the value (in the range
+*       0.0 to 1.0) at which to threshold the smoothed mask specified
+*       by AST.ZERO_SNR_FWHM.  If it is negative, the value is taken
+*       as the max smoothed value of a blob containing
+*       "AST.ZERO_SNR_LOW" pixels. Thus a value of "-1.1" will cut at
+*       a height just sufficient to remove blobs of a single pixel
+*       form the mask.  A value of "-2.1" would remove blobs of two
+*       pixels form the mask, etc.
 *     COM.BOXCAR = INTEGER
 *       If COM model component specified, boxcar smooth by this number of
 *       samples (if positive) or seconds (if negative) before removing it. [0]
@@ -729,7 +795,7 @@
 *       COM.FIT_BOX is undefined. [undef]
 *     COM.GAIN_ABSTOL = REAL
 *       Absolute factor away from mean gain coefficient tolerance. [3.0]
-*     COM.GAIN_BOX = INTEGER
+*     COM.GAIN_BOX = REAL
 *       If COM.FIT_BOX is not set this is the number of samples (or
 *       seconds if negative) to use when calculating a common mode signal
 *       to calculate a correlation coefficient when rejecting bolometers.
@@ -740,6 +806,10 @@
 *     COM.GAIN_IS_ONE = LOGICAL
 *       Setting com.gain_is_one non-zero causes all bolometer gains to be
 *       forced to 1.0. [0]
+*     COM.GAIN_POSITIVE = LOGICAL
+*       By default negative gains are used to flag bad bolometer
+*       data. However, if this parameter is set to 0 negative values
+*       will be allowed. [1]
 *     COM.GAIN_RAT = REAL
 *       Ratio of largest usable gain to mean gain for a bolometer. [4.0]
 *     COM.GAIN_TOL = REAL
@@ -761,19 +831,19 @@
 *       sub-array. Otherwise, a single common mode will be estimated from
 *       all available subarrays. [0]
 *     COM.ZERO_CIRCLE = REAL
-*       Exclude samples within this radius in degrees from the map centre
-*       when calculating the common mode signal. [0]
+*       See AST.ZERO_CIRCLE.
 *     COM.ZERO_LOWHITS = REAL
-*       Exclude samples contained within regions with high hit count when
-*       calculating the common mode signal. The threshold is where the hits
-*       are this fraction lower than the mean. [0]
+*       See AST.ZERO_LOWHITS.
 *     COM.ZERO_MASK = INTEGER
-*       Exclude samples from the estimation of the common-mode signal
-*       if the corresponding pixel has a good value in the reference NDF.
-*       The reference NDF is accessed using the ADAM parameter "REF". [0]
+*       See AST.ZERO_MASK.
+*     COM.ZERO_NITER = INTEGER
+*       See AST.ZERO_NITER.
+*     COM.ZERO_NOTLAST = LOGICAL
+*       See AST.ZERO_NOTLAST.
 *     COM.ZERO_SNR = REAL
-*       Exclude samples from the estimation of the common-mode signal
-*       wherever the map SNR is higher than this threshold. [0]
+*       See AST.ZERO_SNR.
+*     COM.ZERO_SNRLO = REAL
+*       See AST.ZERO_SNRLO.
 *     DKS.BOXCAR = INTEGER
 *       If DKS (dark squid) model component requested, boxcar the dark squid
 *       signal by this many samples (if positive) or seconds (if negative)
@@ -842,11 +912,37 @@
 *     FLT.NOTFIRST = LOGICAL
 *       If true the filter model will not be executed for the first
 *       iteration. [0]
+*     FLT.ZERO_CIRCLE = REAL
+*       See AST.ZERO_CIRCLE.
+*     FLT.ZERO_LOWHITS = REAL
+*       See AST.ZERO_LOWHITS.
+*     FLT.ZERO_MASK = INTEGER
+*       See AST.ZERO_MASK.
+*     FLT.ZERO_NITER = INTEGER
+*       See AST.ZERO_NITER.
+*     FLT.ZERO_NOTLAST = LOGICAL
+*       See AST.ZERO_NOTLAST.
+*     FLT.ZERO_SNR = REAL
+*       See AST.ZERO_SNR.
+*     FLT.ZERO_SNRLO = REAL
+*       See AST.ZERO_SNRLO.
 *     GAI.FLATFIELD = LOGICAL
 *       Use the GAIn/COMmon mode to re-calculate the flatfield? A
 *       reasonable option in many cases, but potentially dangerous for
 *       short scans of very bright sources because the astronomical
 *       signal may completely dominate sky signal. [0]
+*     NOI.BOX_SIZE = REAL
+*       Determines the number of time slices used to determine the
+*       noise level in a section of a bolometer time stream. If zero,
+*       then the whole bolometer time stream is used, and each
+*       bolometer has only one variance value. If non-zero, each
+*       bolometer time stream is divided up into boxes containing the
+*       specified number of time slices, and a separate variance is
+*       found for each box. This variance is then used for each sample
+*       in the box, so each bolometer ends up with a variance for
+*       every time slice.  Negative values are interpreted as number
+*       of seconds, and positive values as a number of down-sampled
+*       time slices. [0]
 *     NOI.CALCFIRST = LOGICAL
 *       Normally bolometer weights calculated after first
 *       iteration. Setting this flag will instead calculated weights
@@ -877,7 +973,7 @@
 *     PLN.NOTFIRST = LOGICAL
 *       If true the PLN model will not be executed in the first
 *       iteration. [0]
-*     SMO.BOXCAR = INTEGER
+*     SMO.BOXCAR = REAL
 *       Number of samples  (if positive) or seconds (if negative) to use
 *       for box car smoothing filter. [-10]
 *     SMO.NOTFIRST = LOGICAL
@@ -886,6 +982,20 @@
 *     SMO.TYPE = STRING
 *       Type of filter to remove. Current options are "mean" and
 *       "median". [mean]
+*     TMP.DOCOS = LOGICAL
+*        If true declare that the model is cos(TMP.SOURCE). [0]
+*     TMP.DOSIN = LOGICAL
+*       If true declare that the model is sine(TMP.SOURCE). [0]
+*     TMP.TRIGOFFSET = REAL
+*       Add this offset to the model. Assumed to be radians. [0].
+*     TMP.SOURCE = STRING
+*       The TMP model fits an externally defined template to each
+*       bolometer time-series. The only parameter defines what that
+*       template is. Presently the only two valid options are
+*       "state_az" and "state_el" to use the telescope azimuth and
+*       elevation respectively. The former seems to be a good way for
+*       removing magnetic field pickup. [<undef>]
+
 *  Related Applications:
 *     SMURF: QLMAKEMAP
 

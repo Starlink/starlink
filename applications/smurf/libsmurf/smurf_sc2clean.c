@@ -77,10 +77,10 @@
 *          The available parameters are identical to the cleaning
 *          parameters used by the iterative map-maker (method=ITER)
 *          and the list of parameters is explained in the
-*          "Configuration Parameters" section and can be found, with
-*          defaults, in $SMURF_DIR/smurf_sc2clean.def.  Default values
-*          will be used for any unspecified parameters. Assigning the
-*          value "<def>" (case insensitive) to a keyword has the
+*          "Configuration Parameters" section of the MAKEMAP documentation
+*          and can be found, with defaults, in $SMURF_DIR/smurf_sc2clean.def.
+*          Default valueswill be used for any unspecified parameters. Assigning
+*          the value "<def>" (case insensitive) to a keyword has the
 *          effect of resetting it to its default value. Options
 *          available to the map-maker but not understood by SC2CLEAN
 *          will be ignored. Parameters not understood will trigger an
