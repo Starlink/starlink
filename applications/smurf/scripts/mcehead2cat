@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-mcehead2cat - convert JCMT state structure into TST format
+mcehead2cat - convert SCUBA-2 MCE header information to TST format
 
 =head1 SYNOPSIS
 
@@ -12,17 +12,18 @@ mcehead2cat - convert JCMT state structure into TST format
 
 =head1 DESCRIPTION
 
-Reads a set of SCUBA-2 and writes catalogues of the mcehead information
+Reads a set of SCUBA-2 files and writes catalogues of the mcehead information
 to files. The output files are in TST format and can be read into the
 TOPCAT application (but may require that TOPCAT is told explicitly that
 the catalogue is in TST format, e.g. with the "-f tst" command line option).
 
-Multiple output files are created since the data is stored with
+Multiple output files are created since the data are stored with
 different dimensionality. The "root" name for the output files can be
 specified using the -out parameter (default: uses the s??ddmmyyyy_#####
-part of the input file name or the basename of the filename is different).
+part of the input file name or the basename of the filename if different).
 
 Output files (suffix: tst) are as follows:
+
       "root"_gen:  parameters that have a single value
                    (includes the 10 values for psc_status_psc which
                     don't fit the scheme)
@@ -68,13 +69,14 @@ file is the desired list of item names with one item per line.
 =head1 NOTES
 
 For SCUBA-2 raw files, the program will only process the first file of
-any observation and skip all others. Assuming there are 10 observations
-for the night:
+any observation and skip all others. This is because the MCE
+configuration is only updated at the start of an observation. Assuming
+there are 10 observations for the night:
 
-    mcehead2cat /jcmtdata/raw/scuba2/s4a/20110524/*/*.sdf 
+    mcehead2cat /jcmtdata/raw/scuba2/s4a/20110524/*/*.sdf
 
 will only process 10 files, not all x-nr sdf files that may be there.
-It will produce 10 sets of output files unless -out has been specified, 
+It will produce 10 sets of output files unless -out has been specified,
 in which case the mceheaders from the 10 files will be written to a
 single set of output files.
 
@@ -434,12 +436,13 @@ sub read_mcehead {
 
 =head1 AUTHOR
 
-Remo Tilanus E<lt>r.tilanus@jach.hawaii.eduE<gt>
+Remo Tilanus E<lt>r.tilanus@jach.hawaii.eduE<gt>,
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>.
 
 =head1 COPYRIGHT
 
 Copyright (C) 2007 Particle Physics and Astronomy Research Council.
-Copyright (C) 2007-2011 Science and Technology Facilities Council.
+Copyright (C) 2007-2012 Science and Technology Facilities Council.
 All Rights Reserved.
 
 =head1 LICENCE
