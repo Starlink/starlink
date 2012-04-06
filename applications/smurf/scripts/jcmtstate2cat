@@ -44,7 +44,8 @@ Include SCUBA-2 MCE information in output table. This adds a lot of data to
 the output files and much of it is constant for the observation. Default
 is not to add this option. This option only works for data prior to summer
 of 2010 (which essentially means S2SRO data). After that date MCE data
-is written in a different form and is not supported.
+is written in a different form and is not supported. For modern data
+use the separate MCEHEAD2CAT command.
 
 =back
 
@@ -575,6 +576,10 @@ sub ver6slot40 {
   return (PSUCCurr4 => $unpack[0],
 	  PSUCCurr5 => $unpack[1]);
 }
+
+=head1 SEE ALSO
+
+SMURF: MCEHEAD2CAT
 
 =head1 AUTHOR
 
