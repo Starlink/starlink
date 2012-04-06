@@ -124,8 +124,7 @@ pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose =>2) if $man;
 
 if ($version) {
-  my $id = '$Id$';
-  print "mcehead2cat - convert SCUBA2 MCEHEAD information to catalog\n";
+  print "mcehead2cat - convert SCUBA-2 MCEHEAD information to catalog\n";
   print "              version 1.0";
   exit;
 }
@@ -151,15 +150,15 @@ if ( defined $itms ) {
   $itms =~ s/\s+//g;
   if ( $itms =~ /^\^(.+)/ ) {
     my $itemsfile = $1;
-    open ITM, "<${itemsfile}" ||
+    open ( my $ITM, "<", $itemsfile ) ||
       die "Failed to open items file '$itemsfile': $!";
-    while ( <ITM> ) {
+    while ( <$ITM> ) {
       my $item = $_;
       chomp($item);
       $item =~ s/\s+//g;
       push @items, $item;
     }
-    close ITM;
+    close $ITM;
   } else {
     @items = split /\,/, $itms;
   }
@@ -283,8 +282,8 @@ for my $f ( @files ) {
     for ( my $i = 0; $i < $ndim; $i++ ) {
       my $id = sprintf("%s%2.2d", $prtid[$idim], $i+1);
       my $fid = sprintf("%4.4d", $file_id);
-      $header .= sprintf join("\t", $fid, $subarray, $id, $date_obs,
-			      $date_end, $obsnum);
+      $header .= join("\t", $id, $fid, $subarray, $i+1, $date_obs,
+                      $date_end, $obsnum);
       foreach my $col ( @columns ) {
 	my $val = ${ $local{$col}->{values} }[$i];
 	if ($local{$col}->{type} =~ /^_(DOUBLE|REAL)$/) {
@@ -296,24 +295,26 @@ for my $f ( @files ) {
 	}
       }
 
-      $header .= sprintf "\n";
+      $header .= "\n";
     }
 
     # Write or append to file if there is anything to write
+    my $OUT;
+    my $outfile = "${oroot}_${prtid[$idim]}.tst";
     if ( $isfirst_file || not $single_file ) {
-      open OUT,">${oroot}_${prtid[$idim]}.tst" ||
-	die "Failed to output file '${oroot}_${prtid[$idim]}.tst': $!";
+      open $OUT, ">", $outfile ||
+	die "Failed to output file '$outfile': $!";
 
-      print OUT "# This is a TST formatted file\n";
-      print OUT
-	join("\t", "FILE", "ARRAY", "ID", "START", "END", "OBSNUM", @columns) ,"\n";
-      print OUT join("\t", map { "--" } (0..($#columns+6))),"\n";
+      print $OUT "# This is a TST formatted file\n";
+      print $OUT
+	join("\t", "ID", "FILE", "ARRAY", uc(${prtid[$idim]}), "START", "END", "OBSNUM", @columns) ,"\n";
+      print $OUT join("\t", map { "--" } (0..($#columns+7))),"\n";
     } else {
-      open OUT,">>${oroot}_${prtid[$idim]}.tst" ||
-	die "Failed to output file '${oroot}_${prtid[$idim]}.tst': $!";
+      open $OUT, ">>", $outfile ||
+	die "Failed to output file '$outfile': $!";
     }
-    print OUT "$header";
-    close OUT;
+    print $OUT "$header";
+    close $OUT;
 
   }
 
