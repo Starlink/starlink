@@ -121,7 +121,6 @@ my $ostatus = GetOptions( "help" => \$help,
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose =>2) if $man;
 if ($version) {
-  my $id = '$Id$';
   print "jcmtstate2cat - convert JCMT State information to catalog\n";
   exit;
 }
