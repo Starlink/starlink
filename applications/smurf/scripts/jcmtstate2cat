@@ -73,7 +73,7 @@ use strict;
 use warnings;
 use NDF;
 use Astro::Coords::Angle::Hour;
-use Astro::SLA;
+use Astro::PAL;
 
 use Getopt::Long;
 use Pod::Usage;
@@ -183,12 +183,11 @@ for my $f (@files) {
       if ($isokay) {
         # Calculate the tangent plane distance travelled between
         # this and previous position
-        Astro::SLA::slaDs2tp( $local{TCS_TR_AC1}->[$i], $local{TCS_TR_AC2}->[$i],
-                             $local{TCS_TR_AC1}->[$i-1], $local{TCS_TR_AC2}->[$i-1],
-                             my $xoffset, my $yoffset, my $j );
+        my ($xoffset, $yoffset, $j) = Astro::PAL::palDs2tp( $local{TCS_TR_AC1}->[$i], $local{TCS_TR_AC2}->[$i],
+                                                            $local{TCS_TR_AC1}->[$i-1], $local{TCS_TR_AC2}->[$i-1]);
         if ($j == 0) {
           my $distsq = $xoffset**2 + $yoffset**2;
-          my $dist = sqrt($distsq) * Astro::SLA::DR2AS;
+          my $dist = sqrt($distsq) * Astro::PAL::DR2AS;
           my $deltat = ( $local{TCS_TAI}->[$i] - $local{TCS_TAI}->[$i-1]) * 86400;
           $telspeed = $dist / $deltat if $deltat > 0.0;
         }
@@ -302,11 +301,10 @@ sub calc_pos {
 
   # Calculate the tangent plane offset of Actual from Base
   # and convert to arcsec
-  Astro::SLA::slaDs2tp( $local{TCS_XX_AC1}, $local{TCS_XX_AC2},
-			$local{TCS_XX_BC1}, $local{TCS_XX_BC2},
-			my $xoffset, my $yoffset, my $j );
-  $xoffset *= Astro::SLA::DR2AS;
-  $yoffset *= Astro::SLA::DR2AS;
+  my ($xoffset, $yoffset, $j) = Astro::PAL::palDs2tp( $local{TCS_XX_AC1}, $local{TCS_XX_AC2},
+                                                      $local{TCS_XX_BC1}, $local{TCS_XX_BC2} );
+  $xoffset *= Astro::PAL::DR2AS;
+  $yoffset *= Astro::PAL::DR2AS;
 
   # These are natively in arcsec in the state structure
   my $xoffset_jc = $local{SMU_XX_JIG_X} + $local{SMU_XX_CHOP_X};
@@ -317,12 +315,12 @@ sub calc_pos {
   $dy = $yoffset + $yoffset_jc;
 
   # Convert jiggle/chop offset to radians
-  $xoffset_jc *= Astro::SLA::DAS2R;
-  $yoffset_jc *= Astro::SLA::DAS2R;
+  $xoffset_jc *= Astro::PAL::DAS2R;
+  $yoffset_jc *= Astro::PAL::DAS2R;
 
   # Calculate spherical coordinate including jiggle/chop offset
-  Astro::SLA::slaDtp2s( $xoffset_jc, $yoffset_jc,
-			$local{TCS_XX_AC1}, $local{TCS_XX_AC2}, $x, $y );
+  ($x, $y) = Astro::PAL::palDtp2s( $xoffset_jc, $yoffset_jc,
+                                   $local{TCS_XX_AC1}, $local{TCS_XX_AC2} );
   $x = Astro::Coords::Angle->new( $x )->degrees;
   $y = Astro::Coords::Angle->new( $y )->degrees;
 
@@ -557,7 +555,7 @@ Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 =head1 COPYRIGHT
 
 Copyright (C) 2007 Particle Physics and Astronomy Research Council.
-Copyright (C) 2007-2009 Science and Technology Facilities Council.
+Copyright (C) 2007-2012 Science and Technology Facilities Council.
 All Rights Reserved.
 
 =head1 LICENCE
