@@ -42,30 +42,59 @@ Print the full documentation to STDOUT.
 
 Include SCUBA-2 MCE information in output table. This adds a lot of data to
 the output files and much of it is constant for the observation. Default
-is not to add this option.
+is not to add this option. This option only works for data prior to summer
+of 2010 (which essentially means S2SRO data). After that date MCE data
+is written in a different form and is not supported.
 
 =back
 
 =head1 NOTES
 
-Eight columns are generated in addition to writing the simple contents
-of the JCMT state structure. All are a combination of the telescope
-position and secondary mirror. "ra" and "dec" contain the tracking
-coordinates (noting that if the tracking system is GALACTIC the columns
-will still be called "ra" and "dec"). "dra" and "ddec" are the tracking
-offsets from the base position in arcseconds. "az" and "el" contain the
-(moving) azimuth and elevation. "daz" and "del" are the azimuth and
-elevation offsets from the base position in arcseconds. AZEL coordinates
-are calculated directly from the state information without converting
-first to RA/Dec.
+Additional derived columns are included in addition to those stored
+directly in the JCMTSTATE extension. All telescope values include
+a correction for motion of the secondary mirror.
+
+=over 4
+
+=item B<RA/DEC>
+
+Tracking coordinates in degrees. The columns will have the same name
+even if the telescope was tracking in GALACTIC.
+
+=item B<DRA/DDEC>
+
+Tracking offsets from the base position in arcsec.
+
+=item B<AZ/EL>
+
+Azimuth and elevation in degrees. Calculated directly from JCMTSTATE
+without being converted to RA/Dec.
+
+=item B<DAZ/DEL>
+
+Azimuth and elevation offsets from the base position in arcsec.
+
+=item B<TELSPEED>
+
+Instantaneous telescope speed in arcsec/sec.
+
+=item B<WVMTAU>
+
+Zenith 225 GHz opacity derived from the water vapor radiometer.
+
+=item B<PWVZEN>
+
+Precipitable water vapor at the zenith in mm.
+
+=item B<PWVLOS>
+
+Precipitable water vaport in the line of sight in mm.
+
+=back
 
 Note that information from the ACSIS extension is not included at this
 time. This is partly because this extension can change in shape
 between observations.
-
-MCE header information is included for SCUBA-2 data files taken before
-summer 2010. After December 2010 MCE data is stored in a different
-way in the files and is not currently supported by this command.
 
 =cut
 
