@@ -75,10 +75,12 @@
 *          when calculating the flatfield. [TRUE]
 
 *  Related Applications:
-*     SMURF: EXTINCTION, MAKEMAP;
+*     SMURF: EXTINCTION, MAKEMAP, SC2CLEAN;
 *     SURF: REMSKY
 
 *  Notes:
+*     - SC2CLEAN can calculate the common-mode signal much more accurately than
+*     the naive algorithm implemented in this routine.
 *     - The iterative map-maker will calculate the sky signal itself and this
 *     command should not be used if that variant of the map-maker is to be used.
 

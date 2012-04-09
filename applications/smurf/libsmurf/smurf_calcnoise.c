@@ -159,9 +159,9 @@
 *       NOISERATIO images will be masked by the flatfield bad
 *       bolometer mask.  The mask can be removed using SETQUAL or
 *       SETBB (clear the bad bits mask).
-*     - [NOISE/NEP]CLIP[LOW/HIGH] are done independently for the NOISE
-*       and NEP images (so a bolometer may be clipped in one, but not
-*       the other).
+*     - NOICLIP[LOW/HIGH] and NEPCLIP[LOW/HIGH] are done independently
+*       for the NOISE and NEP images (so a bolometer may be clipped in one,
+*       but not the other).
 
 *  Related Applications:
 *     SMURF: SC2CONCAT, SC2CLEAN, SC2FFT
