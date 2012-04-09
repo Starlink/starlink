@@ -899,6 +899,16 @@ itcl::class gaia::GaiaImageCtrl {
          -command [code $itk_component(info) updateValues]
    }
 
+   #  Pop up a window to control bias subtraction, only
+   #  works for FITS images.
+   public method set_bias {} {
+      if { [$image_ isfits] } {
+         RtdImageCtrl::set_bias
+         return
+      }
+      warning_dialog "Only enabled for FITS data"
+   }
+
    #  Clear the current image display and remove any windows that
    #  access it (extend parent class version to also deal with
    #  temporary images).
