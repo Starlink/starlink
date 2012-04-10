@@ -126,6 +126,7 @@ smf_dream_calcweights.c \
 smf_dream_getgrid.c \
 smf_dream_setjig.c \
 smf_dreamsolve.c \
+smf_dtype_arraycopy.c \
 smf_dtype_check.c \
 smf_dtype_check_fatal.c \
 smf_dtype_fromstring.c \
@@ -170,6 +171,7 @@ smf_find_thetabins.c \
 smf_fit_poly.c \
 smf_fit_poly1d.c \
 smf_fit_pspec.c \
+smf_fit_profile.c \
 smf_fits_crchan.c \
 smf_fits_export2DA.c \
 smf_fits_getD.c \
@@ -212,6 +214,7 @@ smf_free_smfFilter.c \
 smf_freepolbins.c \
 smf_freetiles.c \
 smf_gandoff.c \
+smf_gauest.c \
 smf_geod.c \
 smf_get_cleanpar.c \
 smf_get_dims.c \
@@ -255,9 +258,14 @@ smf_kmmerge.c \
 smf_labelunit.c \
 smf_lock_data.c \
 smf_lock_related.c \
+smf_lsqfit.c \
 smf_makefitschan.c \
 smf_maketanmap.c \
 smf_map_getpixsize.c \
+smf_math_functions.c \
+smf_math_fvalue.c \
+smf_math_fpderv.c \
+smf_math_fnpar.c \
 smf_map_or_malloc.c \
 smf_map_spikes.c \
 smf_mapbounds.c \

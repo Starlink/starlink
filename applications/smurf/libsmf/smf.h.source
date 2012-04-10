@@ -399,6 +399,15 @@
  *        Add smf_downsamp_smfData
  *     2010-10-06 (RPT)
  *        Added smf_dataOrder_ndims.c
+ *     2010-10-05 (RPT)
+ *        Added smf_fit_profile and smf_lsqfit
+ *     2010-10-19 (RPT)
+ *        Added smf_gauest.c
+ *     2011-02-02 (RPT)
+ *        Added smf_math_functions, smf_math_fvalue, smf_math_fpderv,
+ *              smf_math_fnpar
+ *     2011-02-16 (RPT)
+ *        Added smf_dtype_arraycopy
  *     2011-06-08 (EC)
  *        Add smf_raw2current.c
  *     2011-10-06 (EC)
@@ -938,6 +947,10 @@ void smf_dream_setjig( char subarray[], int nsampcycle, double gridstep,
 
 void smf_dreamsolve( smfData *data, int *status );
 
+void smf_dtype_arraycopy( void *ary_out, const smf_dtype dtype_out,
+                          void *ary_in, const smf_dtype dtype_in,
+                          int nelem, int *status );
+
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
                      int *status );
 
@@ -1068,6 +1081,9 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
 void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
                     double minfreq, double whitefreq, double maxfreq,
                     double *a, double *b, double *w, int *status );
+
+void smf_fit_profile(  smfData *data, int axis, int *range, int ncomp,
+		       smfArray *pardata, void *pfcntrl, int *status );
 
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
                       int *status);
@@ -1211,6 +1227,9 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
                   dim_t gbstride, dim_t gcstride, double *gai_data,
                   dim_t nblock, dim_t gain_box, double *wg, double *woff,
                   int *status );
+
+int  smf_gauest( double *y, int *n, double *p, int *np, double *rms,
+                 double *cutamp, double *cutsig, int *q );
 
 void smf_geod( const double pos[3], double *phi, double *h, double *lambda );
 
@@ -1361,6 +1380,11 @@ void smf_lock_data( smfData *data, int lock, int *status );
 
 void smf_lock_related( smfArray *data, int lock, int *status );
 
+int  smf_lsqfit( int *fid, double *xdat, int *xdim, double *ydat, float *wdat,
+                 int *ndat, double *fpar, double *epar, int *mpar,
+                 int *npar, int *ncomp, float *tol, int *its, float *lab,
+                 int *iopt, double *dopt );
+
 void smf_makefitschan( const char *system, double crpix[2], double crval[2],
                        double cdelt[2], double crota2, AstFitsChan *fc,
                        int *status );
@@ -1394,9 +1418,22 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
 
 void smf_maskacsis( int indf, int *mask, int *status );
 
+
 void smf_meanshift( double *indata, double *outdata, int nel, int stride, int box1,
                     double box2, smf_qual_t *qual, smf_qual_t mask, float wlim,
                     int *status );
+
+void smf_math_functions( int *fid, double *xdat, double *fpar, int *ncomp,
+			 double *value, double *pderv, int *npar,
+			 int *iopt, double *dopt __attribute__((unused)) );
+
+double smf_math_fvalue( int *fid, double *xdat, double *fpar, int *ncomp,
+			int *iopt, double *dopt );
+
+void smf_math_fpderv( int *fid, double *xdat, double *fpar, int *ncomp,
+		      double *epar, int *iopt, double *dopt );
+
+int smf_math_fnpar( int *fid );
 
 void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         dim_t el, const double *dat,

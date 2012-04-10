@@ -16,6 +16,7 @@ smurf_dreamsolve.c \
 smurf_dreamweights.c \
 smurf_dsutils.c \
 smurf_extinction.c \
+smurf_fit1d.c \
 smurf_fixsteps.c \
 smurf_flatfield.c \
 smurf_fts2_deglitch.c \

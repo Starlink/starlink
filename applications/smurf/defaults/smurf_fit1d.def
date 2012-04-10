@@ -1,0 +1,86 @@
+#+
+#  Name:
+#     smurf_fit1d.def
+
+#  Purpose:
+#     Default parameters for SMURF application FIT1D.
+
+#  Description:
+
+#     This file specifies the default parameters for the FIT1D iterative
+#     map-maker.  It contains the effective defaults. In addition it sets
+#     an initial state for all parameters and to define all the allowed
+#     parameters so that a user will be notified in case of spelling
+#     mistakes.
+
+#  Notes:
+
+#  Authors:
+#     RPT: Remo Tilanus (JAC, Hawaii)
+
+#  History:
+#     2011-01-15 (RPT):
+#        Original version.
+
+#-
+
+# Axis the fit along (nr starting at 1). '0' translates fit along
+# highest dimension i.e. Vlsr in a Ra, Dec, Vlsr cube.
+
+axis = 0
+
+# Range along axis to find and fit profiles. The format is (x1, x2)
+# including the (). E.g. Vlsr -20 35: (-20,35). Default is to use the
+# full extent of the axis.
+
+range = <undef>
+
+# Function to fit. See documentation: currently implemented are gaussian,
+# gausshermite1, gausshermite2, voigt, polynomial.
+
+function = gauss
+
+# Maximum number of 'component' functions to fit to each profile, e.g.
+# a multi-component spectrum of max. 3 gaussians. [Note: The complete fit
+# of the gaussians and an optional zerolevel is done concurrently, not
+# iteratively starting e.g. with the strongest component]. The routine
+# will try to find and fit ncomp functions along each profile, but may
+# settle for less.
+
+ncomp = 3
+
+# RMS to use for the input data set in terms of data units.
+rms = 0.8
+
+# Minimum value for the Amplitude to accepts as a genuine fit in terms
+# of the rms. Based on the amplitude alone, at 3-sigma 5% of the profiles
+# selected for fitting can be expected to be noise spikes. This value drops
+# to 2% for 5-sigma. All assuming gaussian statistics of course.
+# Applies to Gauss* and Voigt fits only.
+
+minamp = 3
+
+# Minimum value for the  FHWM (~2.35*Dispersion) to accepts as a genuine
+# fit in terms of ==PIXELS== (!).
+# Applies to Gauss* and Voigt fits only.
+
+minfwhm = 1.88
+
+# Two options that bypass the actual fitting:
+#
+# - estimate_only: The output cube will have the results from the
+#                  initial estimates routine instead of the the fit.
+#                  Good initial estimates are critical for the fit
+#                  and checking and/or fixing initial estimates may
+#                  help solve problems.
+#
+# - model_only:    Bypass both the initial estimates and fitting routine
+#                  and generate profiles directly from the supplied input
+#                  parameter cube(s) and/or user supplied fixed values.
+#                  Not supplying all parameters will generate an error.
+
+estimate_only = 0
+#estimate_only = 1
+
+model_only = 0
+# model_only = 1

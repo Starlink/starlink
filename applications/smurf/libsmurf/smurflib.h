@@ -23,6 +23,7 @@
 *     Andy Gibb (UBC)
 *     Edward Chapin (UBC)
 *     COBA: Coskun Oba (UoL)
+*     Remo Tilanus (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +76,8 @@
 *         Remove smurf_sc2fts( int * )
 *     2010-09-17 (COBA):
 *         Add FTS2_PHASECORR
+*     2010-09-29 (RPT):
+*         Add smurf_fit1d
 *     2010-09-30 (COBA):
 *         Add FTS2_EQSLICED
 *     2010-11-03 (COBA):
@@ -139,6 +142,7 @@ void smurf_dreamweights( int * );
 void smurf_dsutils( int * );
 void smurf_extinction( int * );
 void smurf_flatfield( int * );
+void smurf_fit1d( int * );
 void smurf_fixsteps( int * );
 void smurf_fts2_deglitch( int * );
 void smurf_fts2_flatfield( int * );
