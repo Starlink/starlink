@@ -740,7 +740,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
    result = NULL;
 
 /* Validate the axis index. */
-   astValidateAxis( this, axis, "astGetLabel" );
+   astValidateAxis( this, axis, 1, "astGetLabel" );
 
 /* Invoke the parent astGetLabel method to obtain a pointer to it. */
    result = (*parent_getlabel)( this, axis, status );

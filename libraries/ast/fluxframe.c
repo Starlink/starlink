@@ -452,7 +452,7 @@ static void ClearUnit( AstFrame *this_frame, int axis, int *status ) {
    this = (AstFluxFrame *) this_frame;
 
 /* Validate the axis index. */
-   astValidateAxis( this, axis, "astClearUnit" );
+   astValidateAxis( this, axis, 1, "astClearUnit" );
 
 /* Clear the UsedUnit item for the current System, if current set. */
    system = (int) astGetSystem( this );
@@ -1171,7 +1171,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
    result = NULL;
 
 /* Validate the axis index. */
-   astValidateAxis( this, axis, "astGetLabel" );
+   astValidateAxis( this, axis, 1, "astGetLabel" );
 
 /* Check if a value has been set for the required axis label string. If so,
    invoke the parent astGetLabel method to obtain a pointer to it. */
@@ -1342,7 +1342,7 @@ static const char *GetSymbol( AstFrame *this, int axis, int *status ) {
    result = NULL;
 
 /* Validate the axis index. */
-   astValidateAxis( this, axis, "astGetSymbol" );
+   astValidateAxis( this, axis, 1, "astGetSymbol" );
 
 /* Check if a value has been set for the required axis symbol string. If so,
    invoke the parent astGetSymbol method to obtain a pointer to it. */
@@ -1706,7 +1706,7 @@ static const char *GetUnit( AstFrame *this_frame, int axis, int *status ) {
    this = (AstFluxFrame *) this_frame;
 
 /* Validate the axis index. */
-   astValidateAxis( this, axis, "astGetUnit" );
+   astValidateAxis( this, axis, 1, "astGetUnit" );
 
 /* If a value has been set for the Unit attribute, use the parent
    GetUnit method to return a pointer to the required Unit string. */
@@ -2860,7 +2860,7 @@ static void SetUnit( AstFrame *this_frame, int axis, const char *value, int *sta
    this = (AstFluxFrame *) this_frame;
 
 /* Validate the axis index. */
-   astValidateAxis( this, axis, "astSetUnit" );
+   astValidateAxis( this, axis, 1, "astSetUnit" );
 
 /* If the new units are appropriate for the current System, store the
    supplied value as the UsedUnit for the current System. First ensure the

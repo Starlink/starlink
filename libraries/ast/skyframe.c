@@ -409,7 +409,7 @@ static void Clear##attr( AstSkyFrame *this, int axis, int *status ) { \
    if ( !astOK ) return; \
 \
 /* Validate and permute the axis index. */ \
-   axis_p = astValidateAxis( this, axis, "astClear" #attr ); \
+   axis_p = astValidateAxis( this, axis, 1, "astClear" #attr ); \
 \
 /* Assign the "clear" value. */ \
    if( astOK ) { \
@@ -499,7 +499,7 @@ static type Get##attr( AstSkyFrame *this, int axis, int *status ) { \
    if ( !astOK ) return result; \
 \
 /* Validate and permute the axis index. */ \
-   axis_p = astValidateAxis( this, axis, "astGet" #attr ); \
+   axis_p = astValidateAxis( this, axis, 1, "astGet" #attr ); \
 \
 /* Assign the result value. */ \
    if( astOK ) { \
@@ -591,7 +591,7 @@ static void Set##attr( AstSkyFrame *this, int axis, type value, int *status ) { 
    if ( !astOK ) return; \
 \
 /* Validate and permute the axis index. */ \
-   axis_p = astValidateAxis( this, axis, "astSet" #attr ); \
+   axis_p = astValidateAxis( this, axis, 1, "astSet" #attr ); \
 \
 /* Store the new value in the structure component. */ \
    if( astOK ) { \
@@ -677,7 +677,7 @@ static int Test##attr( AstSkyFrame *this, int axis, int *status ) { \
    if ( !astOK ) return result; \
 \
 /* Validate and permute the axis index. */ \
-   axis_p = astValidateAxis( this, axis, "astTest" #attr ); \
+   axis_p = astValidateAxis( this, axis, 1, "astTest" #attr ); \
 \
 /* Assign the result value. */ \
    if( astOK ) { \
@@ -1298,7 +1298,7 @@ static void ClearAsTime( AstSkyFrame *this, int axis, int *status ) {
    if ( !astOK ) return;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astClearAsTime" );
+   (void) astValidateAxis( this, axis, 1, "astClearAsTime" );
 
 /* Obtain a pointer to the Axis object. */
    ax = astGetAxis( this, axis );
@@ -1969,7 +1969,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
    this = (AstSkyFrame *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astFormat" );
+   (void) astValidateAxis( this, axis, 1, "astFormat" );
 
 /* Determine if a Format value has been set for the axis and set a temporary
    value if it has not. Use the GetFormat member function for this class
@@ -2262,7 +2262,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
    this = (AstSkyFrame *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astGap" );
+   (void) astValidateAxis( this, axis, 1, "astGap" );
 
 /* Determine if a Format value has been set for the axis and set a
    temporary value if it has not. Use the GetFormat member function
@@ -2441,7 +2441,7 @@ static int GetAsTime( AstSkyFrame *this, int axis, int *status ) {
    result = 0;
 
 /* Validate and permute the axis index. */
-   axis_p = astValidateAxis( this, axis, "astGetAsTime" );
+   axis_p = astValidateAxis( this, axis, 1, "astGetAsTime" );
 
 /* Obtain a pointer to the required Axis object. */
    ax = astGetAxis( this, axis );
@@ -2769,7 +2769,7 @@ static int GetDirection( AstFrame *this_frame, int axis, int *status ) {
    this = (AstSkyFrame *) this_frame;
 
 /* Validate and permute the axis index. */
-   axis_p = astValidateAxis( this, axis, "astGetDirection" );
+   axis_p = astValidateAxis( this, axis, 1, "astGetDirection" );
 
 /* Check if a value has been set for the axis Direction attribute. If so,
    obtain its value. */
@@ -2848,7 +2848,7 @@ static double GetBottom( AstFrame *this_frame, int axis, int *status ) {
    this = (AstSkyFrame *) this_frame;
 
 /* Validate and permute the axis index. */
-   axis_p = astValidateAxis( this, axis, "astGetBottom" );
+   axis_p = astValidateAxis( this, axis, 1, "astGetBottom" );
 
 /* Check if a value has been set for the axis Bottom attribute. If so,
    obtain its value. */
@@ -3169,7 +3169,7 @@ static double GetTop( AstFrame *this_frame, int axis, int *status ) {
    this = (AstSkyFrame *) this_frame;
 
 /* Validate and permute the axis index. */
-   axis_p = astValidateAxis( this, axis, "astGetTop" );
+   axis_p = astValidateAxis( this, axis, 1, "astGetTop" );
 
 /* Check if a value has been set for the axis Top attribute. If so,
    obtain its value. */
@@ -3335,7 +3335,7 @@ static const char *GetFormat( AstFrame *this_frame, int axis, int *status ) {
    this = (AstSkyFrame *) this_frame;
 
 /* Validate and permute the axis index. */
-   axis_p = astValidateAxis( this, axis, "astGetFormat" );
+   axis_p = astValidateAxis( this, axis, 1, "astGetFormat" );
 
 /* Obtain a pointer to the Axis structure. */
    ax = astGetAxis( this, axis );
@@ -3500,7 +3500,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
    result = NULL;
 
 /* Validate and permute the axis index. */
-   axis_p = astValidateAxis( this, axis, "astGetLabel" );
+   axis_p = astValidateAxis( this, axis, 1, "astGetLabel" );
 
 /* Check if a value has been set for the required axis label string. If so,
    invoke the parent astGetLabel method to obtain a pointer to it. */
@@ -4010,7 +4010,7 @@ static double GetSkyRefP( AstSkyFrame *this, int axis, int *status ) {
    if ( !astOK ) return result;
 
 /* Validate and permute the axis index. */
-   axis_p = astValidateAxis( this, axis, "astGetSkyRefP" );
+   axis_p = astValidateAxis( this, axis, 1, "astGetSkyRefP" );
 
 /* Check if a value has been set for the required axis. If so, return it. */
    if( this->skyrefp[ axis_p ] != AST__BAD ) {
@@ -4096,7 +4096,7 @@ static const char *GetSymbol( AstFrame *this, int axis, int *status ) {
    result = NULL;
 
 /* Validate and permute the axis index. */
-   axis_p = astValidateAxis( this, axis, "astGetSymbol" );
+   axis_p = astValidateAxis( this, axis, 1, "astGetSymbol" );
 
 /* Check if a value has been set for the required axis symbol string. If so,
    invoke the parent astGetSymbol method to obtain a pointer to it. */
@@ -4608,7 +4608,7 @@ static const char *GetUnit( AstFrame *this_frame, int axis, int *status ) {
    this = (AstSkyFrame *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astGetUnit" );
+   (void) astValidateAxis( this, axis, 1, "astGetUnit" );
 
 /* The Unit value may depend on the value of the Format attribute, so
    determine if a Format value has been set for the axis and set a
@@ -6645,7 +6645,7 @@ static int Match( AstFrame *template_frame, AstFrame *target, int matchsub,
    SkyFrame (whose method we are executing) causes an axis
    reversal. Determine this by permuting axis index zero. */
    if ( astOK && match ) {
-      swap1 = ( astValidateAxis( template, 0, "astMatch" ) != 0 );
+      swap1 = ( astValidateAxis( template, 0, 1, "astMatch" ) != 0 );
 
 /* The second factor depends on whether the axes of the underlying
    primary SkyFrame are reversed when seen in the target Frame. */
@@ -8373,7 +8373,7 @@ static void SetAsTime( AstSkyFrame *this, int axis, int value, int *status ) {
    if ( !astOK ) return;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astSetAsTime" );
+   (void) astValidateAxis( this, axis, 1, "astSetAsTime" );
 
 /* Obtain a pointer to the Axis object. */
    ax = astGetAxis( this, axis );
@@ -9701,7 +9701,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    supplied in (longitude,latitude) pairs. Test whether we need to swap the
    order of the target SkyFrame coordinates to conform with this. */
       if ( astOK && match ) {
-         target_swap = ( astValidateAxis( target, 0, "astSubFrame" ) != 0 );
+         target_swap = ( astValidateAxis( target, 0, 1, "astSubFrame" ) != 0 );
 
 /* Coordinates will also be delivered in (longitude,latitude) pairs, so check
    to see whether the result SkyFrame coordinate order should be swapped. */
@@ -9788,7 +9788,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
          ax = astGetAxis( temp, target_axis );
 
 /* Set an explicit value for the IsLatitude and CentreZero attributes. */
-         if( astValidateAxis( temp, target_axis, "astSubFrame" ) == 1 ) {
+         if( astValidateAxis( temp, target_axis, 1, "astSubFrame" ) == 1 ) {
             astSetAxisIsLatitude( ax, 1 );
             astSetAxisCentreZero( ax, 1 );
 
@@ -10132,7 +10132,7 @@ static int TestAsTime( AstSkyFrame *this, int axis, int *status ) {
    if ( !astOK ) return 0;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astTestAsTime" );
+   (void) astValidateAxis( this, axis, 1, "astTestAsTime" );
 
 /* Obtain a pointer to the Axis object. */
    ax = astGetAxis( this, axis );
@@ -10367,7 +10367,7 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
    this = (AstSkyFrame *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astUnformat" );
+   (void) astValidateAxis( this, axis, 1, "astUnformat" );
 
 /* Determine if a Format value has been set for the axis and set a
    temporary value if it has not. Use the GetFormat member function

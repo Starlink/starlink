@@ -490,7 +490,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
    if ( !astOK ) return result;
 
 /* Validate the axis index. */
-   astValidateAxis( this_frame, axis, "astAbbrev" );
+   astValidateAxis( this_frame, axis, 1, "astAbbrev" );
 
 /* Use the parent astAbbrev function unless the Format attribute indicates
    that axis values are to be formatted as multi-field date/time strings. */
@@ -1146,7 +1146,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
    this = (AstTimeFrame *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astFormat" );
+   (void) astValidateAxis( this, axis, 1, "astFormat" );
 
 /* Check if a bad coordinate value was supplied and return a pointer to an
    appropriate string if necessary. */
@@ -1374,7 +1374,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
    if ( !astOK ) return result;
 
 /* Validate the axis index. */
-   astValidateAxis( this_frame, axis, "astGap" );
+   astValidateAxis( this_frame, axis, 1, "astGap" );
 
 /* Obtain a pointer to the TimeFrame structure. */
    this = (AstTimeFrame *) this_frame;
@@ -2089,7 +2089,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
    result = NULL;
 
 /* Validate the axis index. */
-   astValidateAxis( this, axis, "astGetLabel" );
+   astValidateAxis( this, axis, 1, "astGetLabel" );
 
 /* Check if a value has been set for the required axis label string. If so,
    invoke the parent astGetLabel method to obtain a pointer to it. */
@@ -2246,7 +2246,7 @@ static const char *GetSymbol( AstFrame *this, int axis, int *status ) {
    result = NULL;
 
 /* Validate the axis index. */
-   astValidateAxis( this, axis, "astGetSymbol" );
+   astValidateAxis( this, axis, 1, "astGetSymbol" );
 
 /* Check if a value has been set for the required axis symbol string. If so,
    invoke the parent astGetSymbol method to obtain a pointer to it. */
@@ -2750,7 +2750,7 @@ static const char *GetUnit( AstFrame *this_frame, int axis, int *status ) {
    this = (AstTimeFrame *) this_frame;
 
 /* Validate the axis index. */
-   astValidateAxis( this, axis, "astGetUnit" );
+   astValidateAxis( this, axis, 1, "astGetUnit" );
 
 /* If a value has been set for the Unit attribute, use the parent
    GetUnit method to return a pointer to the required Unit string. */
@@ -4445,7 +4445,7 @@ static void SetUnit( AstFrame *this_frame, int axis, const char *value, int *sta
    this = (AstTimeFrame *) this_frame;
 
 /* Validate the axis index. */
-   astValidateAxis( this, axis, "astSetUnit" );
+   astValidateAxis( this, axis, 1, "astSetUnit" );
 
 /* Report an error if System is set to BEPOCH and an in appropriate
    Unit was supplied. */
@@ -5597,7 +5597,7 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
    this = (AstTimeFrame *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astUnformat" );
+   (void) astValidateAxis( this, axis, 1, "astUnformat" );
 
 /* First attempt to read the value using the parent unformat method, and
    note how many characters were used. We temporarily clear the Format

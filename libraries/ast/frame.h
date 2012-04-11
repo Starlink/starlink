@@ -709,7 +709,7 @@ typedef struct AstFrameVtab {
    int (* TestTitle)( AstFrame *, int * );
    int (* TestUnit)( AstFrame *, int, int * );
    int (* Unformat)( AstFrame *, int, const char *, double *, int * );
-   int (* ValidateAxis)( AstFrame *, int, const char *, int * );
+   int (* ValidateAxis)( AstFrame *, int, int, const char *, int * );
    AstSystemType (* ValidateSystem)( AstFrame *, AstSystemType, const char *, int * );
    AstSystemType (* SystemCode)( AstFrame *, const char *, int * );
    const char *(* SystemString)( AstFrame *, AstSystemType, int * );
@@ -954,7 +954,7 @@ int astTestPreserveAxes_( AstFrame *, int * );
 int astTestSymbol_( AstFrame *, int, int * );
 int astTestTitle_( AstFrame *, int * );
 int astTestUnit_( AstFrame *, int, int * );
-int astValidateAxis_( AstFrame *, int, const char *, int * );
+int astValidateAxis_( AstFrame *, int, int, const char *, int * );
 AstSystemType astValidateSystem_( AstFrame *, AstSystemType, const char *, int * );
 AstSystemType astSystemCode_( AstFrame *, const char *, int * );
 const char *astSystemString_( AstFrame *, AstSystemType, int * );
@@ -1292,8 +1292,8 @@ astINVOKE(V,astTestSymbol_(astCheckFrame(this),axis,STATUS_PTR))
 astINVOKE(V,astTestTitle_(astCheckFrame(this),STATUS_PTR))
 #define astTestUnit(this,axis) \
 astINVOKE(V,astTestUnit_(astCheckFrame(this),axis,STATUS_PTR))
-#define astValidateAxis(this,axis,method) \
-astINVOKE(V,astValidateAxis_(astCheckFrame(this),axis,method,STATUS_PTR))
+#define astValidateAxis(this,axis,fwd,method) \
+astINVOKE(V,astValidateAxis_(astCheckFrame(this),axis,fwd,method,STATUS_PTR))
 #define astValidateAxisSelection(this,naxes,axes,method) \
 astINVOKE(V,astValidateAxisSelection_(astCheckFrame(this),naxes,axes,method,STATUS_PTR))
 

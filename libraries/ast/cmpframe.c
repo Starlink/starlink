@@ -250,7 +250,7 @@ static void Clear##attribute( AstFrame *this_frame, int axis, int *status ) { \
    this = (AstCmpFrame *) this_frame; \
 \
 /* Validate and alidateAxispermute the axis index supplied. */ \
-   axis = astValidateAxis( this, axis, "astSet" #attribute ); \
+   axis = astValidateAxis( this, axis, 1, "astSet" #attribute ); \
 \
 /* Determine the number of axes in the first component Frame. */ \
    naxes1 = astGetNaxes( this->frame1 ); \
@@ -346,7 +346,7 @@ static type Get##attribute( AstFrame *this_frame, int axis, int *status ) { \
    this = (AstCmpFrame *) this_frame; \
 \
 /* Validate and permute the axis index supplied. */ \
-   axis_p = astValidateAxis( this, axis, "astGet" #attribute ); \
+   axis_p = astValidateAxis( this, axis, 1, "astGet" #attribute ); \
 \
 /* Determine the number of axes in the first component Frame. */ \
    naxes1 = astGetNaxes( this->frame1 ); \
@@ -442,7 +442,7 @@ static void Set##attribute( AstFrame *this_frame, int axis, type value, int *sta
    this = (AstCmpFrame *) this_frame; \
 \
 /* Validate and permute the axis index supplied. */ \
-   axis = astValidateAxis( this, axis, "astSet" #attribute ); \
+   axis = astValidateAxis( this, axis, 1, "astSet" #attribute ); \
 \
 /* Determine the number of axes in the first component Frame. */ \
    naxes1 = astGetNaxes( this->frame1 ); \
@@ -516,7 +516,7 @@ static int Test##attribute( AstFrame *this_frame, int axis, int *status ) { \
    this = (AstCmpFrame *) this_frame; \
 \
 /* Validate and permute the axis index supplied. */ \
-   axis = astValidateAxis( this, axis, "astSet" #attribute ); \
+   axis = astValidateAxis( this, axis, 1, "astSet" #attribute ); \
 \
 /* Determine the number of axes in the first component Frame. */ \
    naxes1 = astGetNaxes( this->frame1 ); \
@@ -870,7 +870,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
    this = (AstCmpFrame *) this_frame;
 
 /* Validate and permute the axis index supplied. */
-   axis = astValidateAxis( this, axis, "astAbbrev" );
+   axis = astValidateAxis( this, axis, 1, "astAbbrev" );
 
 /* Determine the number of axes in the first component Frame. */
    naxes1 = astGetNaxes( this->frame1 );
@@ -1482,6 +1482,13 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* Find the primary Frame containing the specified axis. */
             astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
             if( astOK ) {
+
+/* astPrimaryFrame returns the original - unpermuted - axis index within
+   the primary Frame. So we need to take into account any axis permutation
+   which has been applied to the primary Frame when forming the attribute name
+   to use below. Find the permuted (external) axis index which corresponds to
+   the internal (unpermuted) axis index "paxis". */
+               paxis = astValidateAxis( pfrm, paxis, 0, "astClear" );
 
 /* Create a new attribute with the same name but with the axis index
    appropriate to the primary Frame. */
@@ -2459,7 +2466,7 @@ static int Fields( AstFrame *this_frame, int axis, const char *fmt,
    this = (AstCmpFrame *) this_frame;
 
 /* Validate and permute the axis index supplied. */
-   axis = astValidateAxis( this, axis, "astFields" );
+   axis = astValidateAxis( this, axis, 1, "astFields" );
 
 /* Determine the number of axes in the first component Frame. */
    naxes1 = astGetNaxes( this->frame1 );
@@ -2546,7 +2553,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
    this = (AstCmpFrame *) this_frame;
 
 /* Validate and permute the axis index supplied. */
-   axis = astValidateAxis( this, axis, "astFormat" );
+   axis = astValidateAxis( this, axis, 1, "astFormat" );
 
 /* Determine the number of axes in the first component Frame. */
    naxes1 = astGetNaxes( this->frame1 );
@@ -2841,7 +2848,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
    this = (AstCmpFrame *) this_frame;
 
 /* Validate and permute the axis index supplied. */
-   axis = astValidateAxis( this, axis, "astGap" );
+   axis = astValidateAxis( this, axis, 1, "astGap" );
 
 /* Determine the number of axes in the first component Frame. */
    naxes1 = astGetNaxes( this->frame1 );
@@ -3053,16 +3060,16 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 
 /* Local Variables: */
    AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    char buf1[80];                /* For for un-indexed attribute name */
    char buf2[80];                /* For for indexed attribute name */
    const char *result;           /* Pointer value to return */
-   AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    int axis;                     /* Supplied (1-base) axis index */
-   int paxis;                    /* Index of primary Frame axis */
    int len;                      /* Length of attrib string */
    int nc;                       /* Length of string used so far */
-   int oldrep;                   /* Original error reporting state */
    int ok;                       /* Has the attribute been accessed succesfully? */
+   int oldrep;                   /* Original error reporting state */
+   int paxis;                    /* Index of primary Frame axis */
 
 /* Initialise. */
    result = NULL;
@@ -3104,6 +3111,13 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Find the primary Frame containing the specified axis. */
          astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
          if( astOK ) {
+
+/* astPrimaryFrame returns the original - unpermuted - axis index within
+   the primary Frame. So we need to take into account any axis permutation
+   which has been applied to the primary Frame when forming the attribute name
+   to use below. Find the permuted (external) axis index which corresponds to
+   the internal (unpermuted) axis index "paxis". */
+            paxis = astValidateAxis( pfrm, paxis, 0, "astGet" );
 
 /* Create a new attribute with the same name but with the axis index
    appropriate to the primary Frame. */
@@ -3336,7 +3350,7 @@ static AstAxis *GetAxis( AstFrame *this_frame, int axis, int *status ) {
    this = (AstCmpFrame *) this_frame;
 
 /* Validate and permute the axis index supplied. */
-   axis = astValidateAxis( this, axis, "astGetAxis" );
+   axis = astValidateAxis( this, axis, 1, "astGetAxis" );
 
 /* Obtain the number of axes for frame1. */
    naxes1 = astGetNaxes( this->frame1 );
@@ -6990,7 +7004,7 @@ static void PrimaryFrame( AstFrame *this_frame, int axis1,
    this = (AstCmpFrame *) this_frame;
 
 /* Validate and permute the axis index supplied. */
-   axis1 = astValidateAxis( this, axis1, "astPrimaryFrame" );
+   axis1 = astValidateAxis( this, axis1, 1, "astPrimaryFrame" );
 
 /* Obtain the number of axes in the first component Frame. */
    naxes1 = astGetNaxes( this->frame1 );
@@ -8029,6 +8043,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
             astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
             if( astOK ) {
 
+/* astPrimaryFrame returns the original - unpermuted - axis index within
+   the primary Frame. So we need to take into account any axis permutation
+   which has been applied to the primary Frame when forming the attribute name
+   to use below. Find the permuted (external) axis index which corresponds to
+   the internal (unpermuted) axis index "paxis". */
+               paxis = astValidateAxis( pfrm, paxis, 0, "astSet" );
+
 /* Create a new setting with the same name but with the axis index
    appropriate to the primary Frame. */
                sprintf( buf2, "%s(%d)=%s", buf1, paxis + 1, setting+value );
@@ -8145,7 +8166,7 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis, int *stat
    this = (AstCmpFrame *) this_frame;
 
 /* Validate and permute the axis index supplied. */
-   axis = astValidateAxis( this, axis, "astSetAxis" );
+   axis = astValidateAxis( this, axis, 1, "astSetAxis" );
 
 /* Determine the number of axes in the first component Frame. */
    naxes1 = astGetNaxes( this->frame1 );
@@ -9267,6 +9288,13 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
             astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
             if( astOK ) {
 
+/* astPrimaryFrame returns the original - unpermuted - axis index within
+   the primary Frame. So we need to take into account any axis permutation
+   which has been applied to the primary Frame when forming the attribute name
+   to use below. Find the permuted (external) axis index which corresponds to
+   the internal (unpermuted) axis index "paxis". */
+               paxis = astValidateAxis( pfrm, paxis, 0, "astTest" );
+
 /* Create a new attribute with the same name but with the axis index
    appropriate to the primary Frame. */
                sprintf( buf2, "%s(%d)", buf1, paxis + 1 );
@@ -9564,7 +9592,7 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
    this = (AstCmpFrame *) this_frame;
 
 /* Validate and permute the axis index supplied. */
-   axis = astValidateAxis( this, axis, "astUnformat" );
+   axis = astValidateAxis( this, axis, 1, "astUnformat" );
 
 /* Determine the number of axes in the first component Frame. */
    naxes1 = astGetNaxes( this->frame1 );

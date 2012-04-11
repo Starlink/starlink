@@ -352,7 +352,7 @@ static void Clear##attribute( AstFrame *this_frame, int axis, int *status ) { \
    this = (AstFrameSet *) this_frame; \
 \
 /* Validate the axis index supplied. */ \
-   (void) astValidateAxis( this, axis, "astClear" #attribute ); \
+   (void) astValidateAxis( this, axis, 1, "astClear" #attribute ); \
 \
 /* Obtain a pointer to the FrameSet's current Frame and invoke its \
    astClear<Attribute> method. Annul the Frame pointer afterwards. */ \
@@ -474,7 +474,7 @@ static type Get##attribute( AstFrame *this_frame, int axis, int *status ) { \
    this = (AstFrameSet *) this_frame; \
 \
 /* Validate the axis index supplied. */ \
-   (void) astValidateAxis( this, axis, "astGet" #attribute ); \
+   (void) astValidateAxis( this, axis, 1, "astGet" #attribute ); \
 \
 /* Obtain a pointer to the FrameSet's current Frame and invoke its \
    astGet<Attribute> method.  Annul the Frame pointer afterwards. */ \
@@ -594,7 +594,7 @@ static void Set##attribute( AstFrame *this_frame, int axis, type value, int *sta
    this = (AstFrameSet *) this_frame; \
 \
 /* Validate the axis index supplied. */ \
-   (void) astValidateAxis( this, axis, "astSet" #attribute ); \
+   (void) astValidateAxis( this, axis, 1, "astSet" #attribute ); \
 \
 /* Obtain a pointer to the FrameSet's current Frame and invoke its \
    astSet<Attribute> method.  Annul the Frame pointer afterwards. */ \
@@ -714,7 +714,7 @@ static int Test##attribute( AstFrame *this_frame, int axis, int *status ) { \
    this = (AstFrameSet *) this_frame; \
 \
 /* Validate the axis index supplied. */ \
-   (void) astValidateAxis( this, axis, "astTest" #attribute ); \
+   (void) astValidateAxis( this, axis, 1, "astTest" #attribute ); \
 \
 /* Obtain a pointer to the FrameSet's current Frame and invoke its \
    astTest<Attribute> method.  Annul the Frame pointer afterwards. */ \
@@ -910,7 +910,7 @@ static int TestSymbol( AstFrame *, int, int * );
 static int TestTitle( AstFrame *, int * );
 static int TestUnit( AstFrame *, int, int * );
 static int Unformat( AstFrame *, int, const char *, double *, int * );
-static int ValidateAxis( AstFrame *, int, const char *, int * );
+static int ValidateAxis( AstFrame *, int, int, const char *, int * );
 static int ValidateFrameIndex( AstFrameSet *, int, const char *, int * );
 static void AddFrame( AstFrameSet *, int, AstMapping *, AstFrame *, int * );
 static void AppendAxes( AstFrameSet *, AstFrame *, int * );
@@ -1096,7 +1096,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astAbbrev" );
+   (void) astValidateAxis( this, axis, 1, "astAbbrev" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke this
    Frame's astAbbrev method to perform the processing. Annul the Frame
@@ -1783,7 +1783,7 @@ static double AxAngle( AstFrame *this_frame, const double a[], const double b[],
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis - 1, "astAxAngle" );
+   (void) astValidateAxis( this, axis - 1, 1, "astAxAngle" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke the
    astAxAngle method for this Frame. Annul the Frame pointer
@@ -1862,7 +1862,7 @@ static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2, 
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis - 1, "astAxDistance" );
+   (void) astValidateAxis( this, axis - 1, 1, "astAxDistance" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke the
    astAxDistance method for this Frame. Annul the Frame pointer
@@ -1941,7 +1941,7 @@ static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist, 
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis - 1, "astAxOffset" );
+   (void) astValidateAxis( this, axis - 1, 1, "astAxOffset" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke the
    astAxOffset method for this Frame. Annul the Frame pointer
@@ -3241,7 +3241,7 @@ static int Fields( AstFrame *this_frame, int axis, const char *fmt,
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astFields" );
+   (void) astValidateAxis( this, axis, 1, "astFields" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke this
    Frame's astFields method to perform the processing. Annul the Frame
@@ -3728,7 +3728,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astFormat" );
+   (void) astValidateAxis( this, axis, 1, "astFormat" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke the
    astFormat method for this Frame. Annul the Frame pointer
@@ -3806,7 +3806,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astGap" );
+   (void) astValidateAxis( this, axis, 1, "astGap" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke this
    Frame's astGap method to obtain the required gap value. Annul the
@@ -4176,7 +4176,7 @@ static AstAxis *GetAxis( AstFrame *this_frame, int axis, int *status ) {
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astGetAxis" );
+   (void) astValidateAxis( this, axis, 1, "astGetAxis" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke this
    Frame's astGetAxis method to obtain the required Axis
@@ -7007,7 +7007,7 @@ static void PrimaryFrame( AstFrame *this_frame, int axis1,
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index supplied. */
-   (void) astValidateAxis( this, axis1, "astPrimaryFrame" );
+   (void) astValidateAxis( this, axis1, 1, "astPrimaryFrame" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke its
    astPrimaryFrame method. Annul the Frame pointer afterwards. */
@@ -8301,7 +8301,7 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis, int *stat
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index supplied. */
-   (void) astValidateAxis( this, axis, "astSetAxis" );
+   (void) astValidateAxis( this, axis, 1, "astSetAxis" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke this
    Frame's astSetAxis method to assign the new Axis object. Annul the
@@ -9650,7 +9650,7 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astUnformat" );
+   (void) astValidateAxis( this, axis, 1, "astUnformat" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke the
    astUnformat method for this Frame. Annul the Frame pointer
@@ -9672,7 +9672,8 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
    return nc;
 }
 
-static int ValidateAxis( AstFrame *this_frame, int axis, const char *method, int *status ) {
+static int ValidateAxis( AstFrame *this_frame, int axis, int fwd,
+                         const char *method, int *status ) {
 /*
 *  Name:
 *     ValidateAxis
@@ -9685,7 +9686,8 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method, int
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int ValidateAxis( AstFrame *this, int axis, const char *method, int *status )
+*     int ValidateAxis( AstFrame *this, int axis, int fwd, const char *method,
+*                       int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected
@@ -9709,6 +9711,13 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method, int
 *        must lie between zero and (naxes-1) inclusive, where "naxes"
 *        is the number of coordinate axes associated with the
 *        FrameSet's current Frame.
+*     fwd
+*        If non-zero, the suppplied axis index is assumed to be an
+*        "external" axis index, and the corresponding "internal" axis index
+*        is returned as the function value. Otherwise, the suppplied axis
+*        index is assumed to be an "internal" axis index, and the
+*        corresponding "external" axis index is returned as the function
+*        value.
 *     method
 *        Pointer to a constant null-terminated character string
 *        containing the name of the method that invoked this function
@@ -9718,7 +9727,8 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method, int
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     The permuted axis index.
+*     The permuted axis index - either "internal" or "external" as
+*     specified by "fwd".
 
 *  Notes:
 *     - A value of zero will be returned if this function is invoked
@@ -9765,7 +9775,7 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method, int
    afterwards. */
       } else {
          fr = astGetFrame( this, AST__CURRENT );
-         result = astValidateAxis( fr, axis, "astValidateAxis" );
+         result = astValidateAxis( fr, axis, fwd, "astValidateAxis" );
          fr = astAnnul( fr );
       }
    }

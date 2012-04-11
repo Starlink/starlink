@@ -18468,7 +18468,7 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
    }
 
 /* Validate the axis index, converting the axis index to be zero-based. */
-   (void) astValidateAxis( this, axis - 1, method );
+   (void) astValidateAxis( this, axis - 1, 1, method );
 
 /* Indicate that the GRF module should re-calculate it's cached values
    (in case the state of the graphics system has changed since the last

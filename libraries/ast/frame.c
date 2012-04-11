@@ -266,6 +266,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     29-APR-2011 (DSB):
 *        Prevent astFindFrame from matching a subclass template against a
 *        superclass target.
+*     11-APR-2012 (DSB):
+*        Change astValidateAxis so that it can permute in either direction.
 *class--
 */
 
@@ -347,7 +349,7 @@ static void Clear##attribute( AstFrame *this, int axis, int *status ) { \
    if ( !astOK ) return; \
 \
 /* Validate the axis index and obtain a pointer to the required Axis. */ \
-   (void) astValidateAxis( this, axis, "astClear" #attribute ); \
+   (void) astValidateAxis( this, axis, 1, "astClear" #attribute ); \
    ax = astGetAxis( this, axis ); \
 \
 /* Clear the Axis attribute. */ \
@@ -448,7 +450,7 @@ static type Get##attribute( AstFrame *this, int axis, int *status ) { \
 /* Validate and permute the axis index and obtain a pointer to the required \
    Axis. */ \
    old_axis = axis; \
-   axis = astValidateAxis( this, axis, "astGet" #attribute ); \
+   axis = astValidateAxis( this, axis, 1, "astGet" #attribute ); \
    ax = astGetAxis( this, old_axis ); \
 \
 /* Since the Axis is "managed" by the enclosing Frame, we next test if any \
@@ -551,7 +553,7 @@ static void Set##attribute( AstFrame *this, int axis, type value, int *status ) 
    if ( !astOK ) return; \
 \
 /* Validate the axis index and obtain a pointer to the required Axis. */ \
-   (void) astValidateAxis( this, axis, "astSet" #attribute ); \
+   (void) astValidateAxis( this, axis, 1, "astSet" #attribute ); \
    ax = astGetAxis( this, axis ); \
 \
 /* Set the Axis attribute value. */ \
@@ -630,7 +632,7 @@ static int Test##attribute( AstFrame *this, int axis, int *status ) { \
    if ( !astOK ) return 0; \
 \
 /* Validate the axis index and obtain a pointer to the required Axis. */ \
-   (void) astValidateAxis( this, axis, "astTest" #attribute ); \
+   (void) astValidateAxis( this, axis, 1, "astTest" #attribute ); \
    ax = astGetAxis( this, axis ); \
 \
 /* Test if the attribute has been set. */ \
@@ -912,7 +914,7 @@ static int TestTitle( AstFrame *, int * );
 static int TestUnit( AstFrame *, int, int * );
 static int IsUnitFrame( AstFrame *, int * );
 static int Unformat( AstFrame *, int, const char *, double *, int * );
-static int ValidateAxis( AstFrame *, int, const char *, int * );
+static int ValidateAxis( AstFrame *, int, int, const char *, int * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char *, int * );
 static AstSystemType SystemCode( AstFrame *, const char *, int * );
 static const char *SystemString( AstFrame *, AstSystemType, int * );
@@ -1046,7 +1048,7 @@ static const char *Abbrev( AstFrame *this, int axis,  const char *fmt,
 
 /* Validate the axis index and obtain a pointer to the required
    Axis. */
-   (void) astValidateAxis( this, axis, "astAbbrev" );
+   (void) astValidateAxis( this, axis, 1, "astAbbrev" );
    ax = astGetAxis( this, axis );
 
 /* Invoke the Axis astAxisAbbrev method to perform the processing. */
@@ -1360,7 +1362,7 @@ f     AST_DISTANCE function.
    if ( !astOK ) return result;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis - 1, "astAxAngle" );
+   (void) astValidateAxis( this, axis - 1, 1, "astAxAngle" );
 
 /* Obtain the number of Frame axes. */
    naxes = astGetNaxes( this );
@@ -1494,7 +1496,7 @@ f     invoked with STATUS set to an error value, or if it should fail for
    if ( !astOK ) return result;
 
 /* Validate the axis index and obtain a pointer to the required Axis. */
-   (void) astValidateAxis( this, axis - 1, "astAxDistance" );
+   (void) astValidateAxis( this, axis - 1, 1, "astAxDistance" );
    ax = astGetAxis( this, axis - 1 );
 
 /* Use the AxisDistance method associated with the Axis. */
@@ -1654,7 +1656,7 @@ f     invoked with STATUS set to an error value, or if it should fail for
    if ( !astOK ) return result;
 
 /* Validate the axis index and obtain a pointer to the required Axis. */
-   (void) astValidateAxis( this, axis - 1, "astAxOffset" );
+   (void) astValidateAxis( this, axis - 1, 1, "astAxOffset" );
    ax = astGetAxis( this, axis - 1 );
 
 /* Use the AxisOffset method associated with the Axis. */
@@ -1995,7 +1997,7 @@ L1:
 /* There is no function to clear the Digits attribute for an axis
    directly, so obtain a pointer to the Axis and use this to clear the
    attribute. */
-      (void) astValidateAxis( this, axis - 1, "astClearDigits(axis)" );
+      (void) astValidateAxis( this, axis - 1, 1, "astClearDigits(axis)" );
       ax = astGetAxis( this, axis - 1 );
       astClearAxisDigits( ax );
       ax = astAnnul( ax );
@@ -2140,7 +2142,7 @@ L1:
                && ( nc >= len ) ) ) {
 
 /* Validate the axis index and extract the attribute name. */
-      (void) astValidateAxis( this, axis - 1, "astClear" );
+      (void) astValidateAxis( this, axis - 1, 1, "astClear" );
       axis_attrib = astString( attrib, axis_nc );
 
 /* Obtain a pointer to the Axis object. */
@@ -2173,6 +2175,13 @@ L1:
 /* Only attempt to use the primary Frame if it is not the same as "this"
    - otherwise we could end up in an infinite loop. */
             if( pfrm != this ) {
+
+/* astPrimaryFrame returns the original - unpermuted - axis index within
+   the primary Frame. So we need to take into account any axis permutation
+   which has been applied to the primary Frame when forming the attribute name
+   to use below. Find the permuted (external) axis index which corresponds to
+   the internal (unpermuted) axis index "paxis". */
+               paxis = astValidateAxis( pfrm, paxis, 0, "astClear" );
 
 /* Modify the attribute name to refer to the axis numbering of the
    primary frame. */
@@ -2308,7 +2317,7 @@ static void ClearUnit( AstFrame *this, int axis, int *status ) {
    if ( !astOK ) return;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astSetUnit" );
+   (void) astValidateAxis( this, axis, 1, "astSetUnit" );
 
 /* Do nothing more if the attribute is already cleared. */
    if( astTestUnit( this, axis ) ) {
@@ -3428,7 +3437,7 @@ static int Fields( AstFrame *this, int axis, const char *fmt,
 
 /* Validate the axis index and obtain a pointer to the required
    Axis. */
-   (void) astValidateAxis( this, axis, "astFields" );
+   (void) astValidateAxis( this, axis, 1, "astFields" );
    ax = astGetAxis( this, axis );
 
 /* Invoke the Axis astAxisFields method to perform the processing. */
@@ -3941,7 +3950,6 @@ const char *astFmtDecimalYr_( double year, int digits, int *status ) {
 
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Declare the thread specific global data */
-   const char *result;           /* Pointer value to return */
    int nc;                       /* Number of characters in buffer */
 
 /* Check the global error status. */
@@ -3956,9 +3964,6 @@ const char *astFmtDecimalYr_( double year, int digits, int *status ) {
 /* Format the year value. Use "g" format to avoid buffer overflow and
    to get useful diagnostic output if a silly value is given. */
    nc = sprintf( astfmtdecimalyr_buff, "%#.*g", digits, year );
-
-/* Set the result value. */
-   result = astfmtdecimalyr_buff;
 
 /* Loop to remove redundant zeros from the end of the result. */
    while ( astfmtdecimalyr_buff[ --nc ] == '0' ) astfmtdecimalyr_buff[ nc ] = '\0';
@@ -4041,7 +4046,7 @@ static const char *Format( AstFrame *this, int axis, double value, int *status )
    if ( !astOK ) return NULL;
 
 /* Validate the axis index and obtain a pointer to the required Axis. */
-   (void) astValidateAxis( this, axis, "astFormat" );
+   (void) astValidateAxis( this, axis, 1, "astFormat" );
    ax = astGetAxis( this, axis );
 
 /* Test if any Axis attributes which may affect the result are undefined (i.e.
@@ -4348,7 +4353,7 @@ static double Gap( AstFrame *this, int axis, double gap, int *ntick, int *status
 
 /* Validate the axis index and obtain a pointer to the required
    Axis. */
-   (void) astValidateAxis( this, axis, "astGap" );
+   (void) astValidateAxis( this, axis, 1, "astGap" );
    ax = astGetAxis( this, axis );
 
 /* Find the gap. */
@@ -4587,7 +4592,7 @@ L1:
    axis directly, so obtain a pointer to the Axis and use this to
    obtain the value. Use the Frame's Digits attribute instead if the
    Axis attribute value is not set. */
-      (void) astValidateAxis( this, axis - 1, "astGetDigits(axis)" );
+      (void) astValidateAxis( this, axis - 1, 1, "astGetDigits(axis)" );
       ax = astGetAxis( this, axis - 1 );
       if ( astTestAxisDigits( ax ) ) {
          digits = astGetAxisDigits( ax );
@@ -4855,7 +4860,7 @@ L1:
                && ( nc >= len ) ) ) {
 
 /* Validate the axis index and extract the attribute name. */
-      (void) astValidateAxis( this, axis - 1, "astGet" );
+      (void) astValidateAxis( this, axis - 1, 1, "astGet" );
       axis_attrib = astString( attrib, axis_nc );
 
 /* Obtain a pointer to the Axis object. */
@@ -4888,6 +4893,13 @@ L1:
 /* Only attempt to use the primary Frame if it is not the same as "this"
    - otherwise we could end up in an infinite loop. */
             if( pfrm != this ) {
+
+/* astPrimaryFrame returns the original - unpermuted - axis index within
+   the primary Frame. So we need to take into account any axis permutation
+   which has been applied to the primary Frame when forming the attribute name
+   to use below. Find the permuted (external) axis index which corresponds to
+   the internal (unpermuted) axis index "paxis". */
+               paxis = astValidateAxis( pfrm, paxis, 0, "astGet" );
 
 /* Modify the attribute name to refer to the axis numbering of the
    primary frame. */
@@ -5035,7 +5047,7 @@ static AstAxis *GetAxis( AstFrame *this, int axis, int *status ) {
    result = NULL;
 
 /* Validate and permute the axis index. */
-   axis = astValidateAxis( this, axis, "astGetAxis" );
+   axis = astValidateAxis( this, axis, 1, "astGetAxis" );
 
 /* If OK, clone the required Axis pointer. */
    if ( astOK ) result = astClone( this->axis[ axis ] );
@@ -8014,7 +8026,7 @@ static void PrimaryFrame( AstFrame *this, int axis1,
    *axis2 = 0;
 
 /* Validate and permute the axis index supplied. */
-   axis1 = astValidateAxis( this, axis1, "astPrimaryFrame" );
+   axis1 = astValidateAxis( this, axis1, 1, "astPrimaryFrame" );
 
 /* Since "this" is a primary Frame (i.e. is not compound), simply clone a
    pointer to it. */
@@ -9297,7 +9309,7 @@ L1:
 /* There is no function to set the Digits attribute value for an axis
    directly, so obtain a pointer to the Axis and use this to set the
    attribute. */
-      (void) astValidateAxis( this, axis - 1, "astSetDigits(axis)" );
+      (void) astValidateAxis( this, axis - 1, 1, "astSetDigits(axis)" );
       ax = astGetAxis( this, axis - 1 );
       astSetAxisDigits( ax, digits );
       ax = astAnnul( ax );
@@ -9584,7 +9596,7 @@ L1:
                && ( nc >= len ) ) ) {
 
 /* Validate the axis index and copy the attribute setting string. */
-      (void) astValidateAxis( this, axis - 1, "astSet" );
+      (void) astValidateAxis( this, axis - 1, 1, "astSet" );
       axis_setting = astString( setting, len );
       if ( astOK ) {
 
@@ -9623,6 +9635,13 @@ L1:
 /* Only attempt to use the primary Frame if it is not the same as "this"
    - otherwise we could end up in an infinite loop. */
                if( pfrm != this ) {
+
+/* astPrimaryFrame returns the original - unpermuted - axis index within
+   the primary Frame. So we need to take into account any axis permutation
+   which has been applied to the primary Frame when forming the attribute name
+   to use below. Find the permuted (external) axis index which corresponds to
+   the internal (unpermuted) axis index "paxis". */
+                  paxis = astValidateAxis( pfrm, paxis, 0, "astSet" );
 
 /* Modify the attribute name to refer to the axis numbering of the
    primary frame. */
@@ -9774,7 +9793,7 @@ static void SetAxis( AstFrame *this, int axis, AstAxis *newaxis, int *status ) {
    if ( !astOK ) return;
 
 /* Validate and permute the axis index supplied. */
-   axis = astValidateAxis( this, axis, "astSetAxis" );
+   axis = astValidateAxis( this, axis, 1, "astSetAxis" );
 
 /* If OK, annul the Frame's pointer to the old Axis object and clone a pointer
    to the new one to replace it. */
@@ -9880,7 +9899,7 @@ static void SetUnit( AstFrame *this, int axis, const char *unit, int *status ) {
       c[ l ] = 0;
 
 /* Validate the axis index and obtain a pointer to the required Axis. */
-   (void) astValidateAxis( this, axis, "astSetUnit" );
+   (void) astValidateAxis( this, axis, 1, "astSetUnit" );
       ax = astGetAxis( this, axis );
 
 /* The new unit may require the Label and/or Symbol to be changed, but
@@ -10521,7 +10540,7 @@ L1:
 /* There is no function to test the Digits attribute for an axis
    directly, so obtain a pointer to the Axis and use this to test the
    attribute. */
-      (void) astValidateAxis( this, axis - 1, "astTestDigits(axis)" );
+      (void) astValidateAxis( this, axis - 1, 1, "astTestDigits(axis)" );
       ax = astGetAxis( this, axis - 1 );
       result = astTestAxisDigits( ax );
       ax = astAnnul( ax );
@@ -10664,7 +10683,7 @@ L1:
                && ( nc >= len ) ) ) {
 
 /* Validate the axis index and extract the attribute name. */
-      (void) astValidateAxis( this, axis - 1, "astTest" );
+      (void) astValidateAxis( this, axis - 1, 1, "astTest" );
       axis_attrib = astString( attrib, axis_nc );
 
 /* Obtain a pointer to the Axis object. */
@@ -10697,6 +10716,13 @@ L1:
 /* Only attempt to use the primary Frame if it is not the same as "this"
    - otherwise we could end up in an infinite loop. */
             if( pfrm != this ) {
+
+/* astPrimaryFrame returns the original - unpermuted - axis index within
+   the primary Frame. So we need to take into account any axis permutation
+   which has been applied to the primary Frame when forming the attribute name
+   to use below. Find the permuted (external) axis index which corresponds to
+   the internal (unpermuted) axis index "paxis". */
+               paxis = astValidateAxis( pfrm, paxis, 0, "astTest" );
 
 /* Modify the attribute name to refer to the axis numbering of the
    primary frame. */
@@ -10961,7 +10987,7 @@ static int Unformat( AstFrame *this, int axis, const char *string,
    if ( !astOK ) return nc;
 
 /* Validate the axis index and obtain a pointer to the required Axis. */
-   (void) astValidateAxis( this, axis, "astUnformat" );
+   (void) astValidateAxis( this, axis, 1, "astUnformat" );
    ax = astGetAxis( this, axis );
 
 /* Test if any Axis attributes which may affect the result are
@@ -11009,7 +11035,8 @@ static int Unformat( AstFrame *this, int axis, const char *string,
    return nc;
 }
 
-static int ValidateAxis( AstFrame *this, int axis, const char *method, int *status ) {
+static int ValidateAxis( AstFrame *this, int axis, int fwd, const char *method,
+                         int *status ) {
 /*
 *+
 *  Name:
@@ -11023,7 +11050,8 @@ static int ValidateAxis( AstFrame *this, int axis, const char *method, int *stat
 
 *  Synopsis:
 *     #include "frame.h"
-*     int astValidateAxis( AstFrame *this, int axis, const char *method )
+*     int astValidateAxis( AstFrame *this, int axis, int fwd,
+*                          const char *method )
 
 *  Class Membership:
 *     Frame method.
@@ -11045,6 +11073,13 @@ static int ValidateAxis( AstFrame *this, int axis, const char *method, int *stat
 *        The axis index (zero-based) to be checked. To be valid, it
 *        must lie between zero and (naxes-1) inclusive, where "naxes"
 *        is the number of coordinate axes associated with the Frame.
+*     fwd
+*        If non-zero, the suppplied axis index is assumed to be an
+*        "external" axis index, and the corresponding "internal" axis index
+*        is returned as the function value. Otherwise, the suppplied axis
+*        index is assumed to be an "internal" axis index, and the
+*        corresponding "external" axis index is returned as the function
+*        value.
 *     method
 *        Pointer to a constant null-terminated character string
 *        containing the name of the method that invoked this function
@@ -11052,15 +11087,16 @@ static int ValidateAxis( AstFrame *this, int axis, const char *method, int *stat
 *        for constructing error messages.
 
 *  Returned Value:
-*     The permuted axis index.
+*     The permuted axis index - either "internal" or "external" as
+*     specified by "fwd".
 
 *  Notes:
 *     - A value of zero will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
-*     - Error messages issued by this function refer to the external
-*     (public) numbering system used for axes (which is one-based),
-*     whereas zero-based axis indices are used internally.
+*     - Error messages issued by this function refer to the public
+*     numbering system used for axes which is one-based (zero-based axis
+*     indices are used internally).
 *-
 */
 
@@ -11094,7 +11130,19 @@ static int ValidateAxis( AstFrame *this, int axis, const char *method, int *stat
    use this to generate the permuted axis value. */
       } else {
          perm = astGetPerm( this );
-         if( perm ) result = perm[ axis ];
+         if( perm ) {
+
+/* External to internal is a simple look-up. */
+            if( fwd ) {
+               result = perm[ axis ];
+
+/* Internal to external requires a search through the permutation array. */
+            } else {
+               for( result = 0; result < naxes; result++ ) {
+                  if( perm[ result ] == axis ) break;
+               }
+            }
+         }
       }
    }
 
@@ -14532,9 +14580,9 @@ int astUnformat_( AstFrame *this, int axis, const char *string,
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Frame,Unformat))( this, axis, string, value, status );
 }
-int astValidateAxis_( AstFrame *this, int axis, const char *method, int *status ) {
+int astValidateAxis_( AstFrame *this, int axis, int fwd, const char *method, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Frame,ValidateAxis))( this, axis, method, status );
+   return (**astMEMBER(this,Frame,ValidateAxis))( this, axis, fwd, method, status );
 }
 void astValidateAxisSelection_( AstFrame *this, int naxes, const int *axes,
                                 const char *method, int *status ) {

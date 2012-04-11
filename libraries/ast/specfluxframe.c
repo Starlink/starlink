@@ -1360,11 +1360,11 @@ static int Match( AstFrame *template_frame, AstFrame *target, int matchsub,
    first depends on whether the axis permutation array for the template
    SpecFluxFrame (whose method we are executing) causes an axis
    reversal. Determine this by permuting axis index zero. */
-      swap1 = ( astValidateAxis( template, 0, "astMatch" ) != 0 );
+      swap1 = ( astValidateAxis( template, 0, 1, "astMatch" ) != 0 );
 
 /* The second factor depends on whether the axes of the target SpecFluxFrame
    causes an axis reversal. Determine this by permuting axis index zero. */
-      swap2 = ( astValidateAxis( target, 0, "astMatch" ) != 0 );
+      swap2 = ( astValidateAxis( target, 0, 1, "astMatch" ) != 0 );
 
 /* Combine these to determine if an additional axis swap will be
    needed. */
@@ -1574,7 +1574,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    supplied in (flux,spec) pairs. Test whether we need to swap the
    order of the target SpecFluxFrame coordinates to conform with this. */
       if ( astOK && match ) {
-         target_swap = ( astValidateAxis( target, 0, "astSubFrame" ) != 0 );
+         target_swap = ( astValidateAxis( target, 0, 1, "astSubFrame" ) != 0 );
 
 /* Coordinates will also be delivered in (flux,spec) pairs, so check
    to see whether the result SpecFluxFrame coordinate order should be

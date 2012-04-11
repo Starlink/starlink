@@ -22618,12 +22618,10 @@ be used when aligning SkyFrames if the AlignSystem attribute is set.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V7.0.0}
+\subsection{Changes Introduced in V7.0.0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V6.0-1 and V7.0.0 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V6.0-1 and V7.0.0:
 
 \begin{enumerate}
 
@@ -22634,6 +22632,45 @@ library re-written in C). Copies of these libraries are bundled with AST
 and so do not need to be obtained or built separately, although external
 copies of SOFA and PAL can be used if necessary by including the
 ``{\tt --with-external\_pal}'' option when configuring AST.
+
+\end{enumerate}
+
+\subsection{Changes Introduced in V7.0.1}
+
+The following describes the most significant changes which
+occurred in the AST library between versions V7.0.0 and V7.0.1:
+
+\begin{enumerate}
+
+\item The levmar and wcslib code distributed within AST is now stored in the
+main AST library (libast.so) rather than in separate libraries.
+
+\end{enumerate}
+
+\subsection{Changes Introduced in V7.0.2}
+
+The following describes the most significant changes which
+occurred in the AST library between versions V7.0.1 and V7.0.2:
+
+\begin{enumerate}
+
+\item The libast\_pal library is no longer built if the
+``--with-external\_pal'' option is used when AST is configured.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V7.0.3}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V7.0.2 and V7.0.3 (the
+current version):
+
+\begin{enumerate}
+
+\item A bug has been fixed which could cause an incorrect axis to be used when
+accessing axis attributes within CmpFrames. This could happen if axes
+within the CmpFrame have been permuted.
 
 \end{enumerate}
 
