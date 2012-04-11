@@ -16,13 +16,13 @@
 *     Subroutine
 
 *  Invocation:
-*    (int) smf_gauest( double *y,  int *n, double *p, int *np,
-*          double *rms, double *cutamp, double *cutsig, int *q )
+*    (int) smf_gauest( const double y[],  int n, double *p, int np,
+*          double rms, double cutamp, double cutsig, int q )
 
 *  Arguments:
-*     y = double* (Given)
+*     y = const double [] (Given)
 *        Data points on profile (dimension N).
-*     n = int* (Given)
+*     n = int (Given)
 *         Number of points in profile (dimension of Y).
 *     p = double* (Returned)
 *         Contains the estimated gaussian parameters on output. The
@@ -34,14 +34,14 @@
 *         is in pixels [1..n].
 *     np = int* (Given)
 *         Maximum number of parameters which can be stored in P.
-*     rms = double* (Given)
+*     rms = double (Given)
 *         The  r.m.s. noise level of the profile.
-*     cutamp = double* (Given)
+*     cutamp = double (Given)
 *         Critical amplitude of gaussian. Gaussians below this amplitude
 *         will be discarded.
-*     cutsig = double* (Given)
+*     cutsig = double (Given)
 *         Critical dispersion of gaussian.
-*     q = int* (Given)
+*     q = int (Given)
 *         Smoothing parameter used in calculating the second
 *         derivative of the profile. Q must be greater than zero.
 
@@ -65,17 +65,19 @@
 *  Authors:
 *     Kor Begeman  (Kapteyn Institute, Groningen)
 *     Remo Tilanus (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*   1990-05-07 (KGB)
-*     Initial version for GIPSY
-*   2010-10-19 (RPT)
-*     Adapted for SMURF
+*     1990-05-07 (KGB)
+*        Initial version for GIPSY
+*     2010-10-19 (RPT)
+*        Adapted for SMURF
+*     2012-04-11 (TIMJ):
+*        Consting and removal of pointers
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2010,2012 Science and Technology Facilities Council.
 *     Copyright (c) Kapteyn Laboratorium Groningen 1990
 *     All Rights Reserved.
 
@@ -165,7 +167,7 @@ static int compar( const void *v1, const void *v2 )
  * window.
  */
 
-static int window( double  y[],                 /* the profile */
+static int window( const double  y[],           /* the profile */
                    int     n,                   /* length of profile */
                    double  cutoff,              /* the critical level */
                    double  rms,                 /* nois level in profile */
@@ -230,7 +232,7 @@ static int window( double  y[],                 /* the profile */
  * number of points used for the fit: np = 2*q + 1,
  */
 
-static void findc2( double  y[],                /* the profile */
+static void findc2( const double  y[],          /* the profile */
                     double  work[],             /* the derivative */
                     int     n,                  /* length of profile */
                     int     iwlo,               /* start of window */
@@ -271,7 +273,7 @@ static void findc2( double  y[],                /* the profile */
  * gaussians found.
  */
 
-static int findga( double  y[],                 /* the profile */
+static int findga( const double  y[],           /* the profile */
                    double  work[],             /* the derivative */
                    int     n,                   /* length of profile */
                    int     iwlo,                /* start of window */
@@ -366,14 +368,14 @@ static int findga( double  y[],                 /* the profile */
  * the works
  */
 
-int smf_gauest( double   *y,                   /* profile data */
-                int      *n,                   /* number of points */
+int smf_gauest( const double    y[],                 /* profile data */
+                int       n,                   /* number of points */
                 double   *p,                   /* parameter estimates */
-                int      *np,                  /* number of parameters */
-                double   *rms,                 /* rms noise level */
-                double   *cutoff,              /* cutoff level */
-                double   *minsig,              /* minimum width of gaussians */
-                int      *q )                  /* smoothing parameter */
+                int       np,                  /* number of parameters */
+                double    rms,                 /* rms noise level */
+                double    cutoff,              /* cutoff level */
+                double    minsig,              /* minimum width of gaussians */
+                int       q )                  /* smoothing parameter */
 {
    int          iwhi, iwlo;                    /* window limits */
    int          l, m;                          /* loop counters */
@@ -382,26 +384,26 @@ int smf_gauest( double   *y,                   /* profile data */
    double       *work;                         /* Work array for 2nd derv */
 
 #ifdef  WITHWINDOW
-   if (!window( y, *n, *cutoff, *rms, &iwlo, &iwhi )) {
+   if (!window( y, n, cutoff, rms, &iwlo, &iwhi )) {
       return( r );                              /* no signal in profile */
    }
-   iwhi = MYMIN( iwhi + (*q),  (*n) - 1 );      /* extend window with ... */
-   iwlo = MYMAX( iwlo - (*q),  0 );             /* smoothing parameter */
+   iwhi = MYMIN( iwhi + q,  n - 1 );      /* extend window with ... */
+   iwlo = MYMAX( iwlo - q,  0 );             /* smoothing parameter */
 #endif
 
 #if defined (TESTBED)
-   work = calloc( *n, sizeof(double) );
+   work = calloc( n, sizeof(double) );
 #else
-   work = astCalloc( *n, sizeof(double) );
+   work = astCalloc( n, sizeof(double) );
 #endif
 
-   iwhi = *n - 1;
+   iwhi = n - 1;
    iwlo = 0;
-   findc2( y, work, *n, iwlo, iwhi, *q );       /* get second derivative */
-   r = findga( y, work, *n, iwlo, iwhi, *cutoff, *minsig, pars );
+   findc2( y, work, n, iwlo, iwhi, q );       /* get second derivative */
+   r = findga( y, work, n, iwlo, iwhi, cutoff, minsig, pars );
    if (r > MAXPAR) r = MAXPAR;                  /* this  should neven happen */
    if (r > 1) qsort( pars, r, sizeof( par_struct ), compar );
-   for (l = 0, m = 0; m < (*np); l++) {
+   for (l = 0, m = 0; m < np; l++) {
       if (l < r) {                              /* still something in list */
          p[m++] = pars[l].a;                    /* the amplitude */
          p[m++] = pars[l].c+1;                  /* the centre 1..n */
@@ -458,7 +460,7 @@ int    main( )
          }
       }
    }
-   r = smf_gauest( y, &n, par, &np, &rms, &cutoff, &minsig, &q );
+   r = smf_gauest( y, n, par, np, rms, cutoff, minsig, q );
    printf( "gauest = %d\n", r );
    if (r > 0) {
       int       i;

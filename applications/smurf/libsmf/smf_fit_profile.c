@@ -1176,13 +1176,13 @@ static int getestimates( int fid, double *fdata, float *weight, int npts,
 	    double  zeroamp = 0.0, zerodisp = 0.0;
 	    gaussiansfound = smf_gauest(
 		   work,
-		   &npts,
+		   npts,
                    Destimates,           /* Output parameter estimates */
-                   &maxparameters,       /* 3 * ncomps */
-                   &rms,
-                   &zeroamp,
-                   &zerodisp,
-                   &Q );
+                   maxparameters,       /* 3 * ncomps */
+                   rms,
+                   zeroamp,
+                   zerodisp,
+                   Q );
 	    gaussiansfound = MYMIN( gaussiansfound, ncomp );
 	    if (gaussiansfound > 0) {
 	      residual = getresidual( fid, work, npts, gaussiansfound,
@@ -1227,13 +1227,13 @@ static int getestimates( int fid, double *fdata, float *weight, int npts,
 
 	gaussiansfound = smf_gauest(
 		   work,
-                   &npts,
+                   npts,
                    Destimates,           /* Output parameter estimates */
-                   &maxparameters,       /* 3 * ncomps */
-                   &rms,
-                   &critamp,
-                   &critdisp,
-                   &(smoothingpar[minindx]) );
+                   maxparameters,       /* 3 * ncomps */
+                   rms,
+                   critamp,
+                   critdisp,
+                   smoothingpar[minindx] );
 	gaussiansfound = MYMIN( gaussiansfound, ncomp );
 
 	/* Correct number if more were found than wanted */

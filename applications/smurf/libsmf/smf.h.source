@@ -1228,8 +1228,8 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
                   dim_t nblock, dim_t gain_box, double *wg, double *woff,
                   int *status );
 
-int  smf_gauest( double *y, int *n, double *p, int *np, double *rms,
-                 double *cutamp, double *cutsig, int *q );
+int  smf_gauest( const double y[], int n, double *p, int np, double rms,
+                 double cutamp, double cutsig, int q );
 
 void smf_geod( const double pos[3], double *phi, double *h, double *lambda );
 
