@@ -849,6 +849,10 @@
 *     20-MAY-2011 (DSB)
 *        If TRIM is TRUE, annul error caused by empty output tiles, and
 *        proceed to produce remaining tiles.
+*     11-APR-2012 (DSB):
+*        If an output NDF is not created because it contains no good
+*        data, then remove it's name from the group written to the text file
+*        specified by the OUTFILES parameter.
 
 *  Copyright:
 *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
@@ -2055,9 +2059,13 @@ void smurf_makecube( int *status ) {
                }
             }
 
-/* Delete or annul the NDF as required. */
+/* Delete (and remove the name from the group of output NDF names) or annul
+   the NDF as required. */
             if( delete ) {
                ndfDelet( &tndf, status );
+               Grp *tgrp = grpRemov( igrp4, basename, status );
+               grpDelet( &igrp4, status);
+               igrp4 = tgrp;
             } else {
                ndfAnnul( &tndf, status );
             }
