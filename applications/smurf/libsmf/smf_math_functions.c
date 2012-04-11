@@ -14,18 +14,18 @@
 *     Subroutine
 
 *  Invocation:
-*       void  smf_math_functions( int *fid, double *xdat, double *fpar,
-*             int *ncomp, double *value, double *deriv, int *npar,
-*             int *iopt, double *dopt );
+*       void  smf_math_functions( int fid, double xdat, const double fpar[],
+*             int ncomp, double *value, double *deriv, int *npar,
+*             const int iopt[], const double dopt[] );
 
 *  Arguments:
-*     fid  = int* Given
+*     fid  = int Given
 *        function identifier
-*     xdat = double* Given
+*     xdat = double Given
 *        coordinate to evaluate function at
-*     fpar = double* Given
+*     fpar = const double[] Given
 *        function parameters (depends on function called)
-*     ncomp = int* Given
+*     ncomp = int Given
 *        number of components (see below) or order for polynomial.
 *     value = double* Returned
 *        function value at xdat
@@ -33,10 +33,10 @@
 *        array of partial derivatives to parameters at xdat
 *     npar = int* Returned
 *        number of parameters associated with function
-*     iopt = int* Given
+*     iopt = const int[] Given
 *        optional integer parameter(s) to be passed-through to
 *        the called function or derivate subroutine.
-*     dopt = double* Given
+*     dopt = const double[] Given
 *        optional double parameter(s) to be passed-through to
 *        the called function or derivate subroutine.
 
@@ -71,10 +71,10 @@
 *     NULL in the iopt location.
 *
 *  Example calculate a single gaussian at 'x':
-*        int *fid = 0;
-*        double *xdat = x;
-*        int *ncomp = 1;
-*        int *iopt = 1;
+*        int fid = 0;
+*        double xdat = x;
+*        int ncomp = 1;
+*        int iopt[] = { 1 };
 *                       Amp Xcen Disp  z0  z1  z2
 *        double fpar = { 10,  2,  2.5,  3,  1,  2 };
 *
@@ -104,11 +104,11 @@
 *     i.e. for a function that consists of 4 gaussians and a baseline
 *     that will be 4 * 3 + 3 = 15. The baseline term will be omitted
 *     (i.e. set to 0) if iopt = NULL or iopt[0] = 0. Likewise ncomp will
-*     be assumed to be 1 if ncomp = NULL. Thus
+*     be assumed to be 1 if ncomp = 0. Thus
 *
 *     int npar;
 *     int fid = 0;
-*     smf_math_func( &fid, NULL, NULL, NULL, NULL, NULL, &npar,
+*     smf_math_func( fid, NULL, NULL, NULL, NULL, NULL, &npar,
 *                    NULL, NULL );
 *     will return npar = 3 as the number of parameters of a single
 *     gaussian without a baseline.
@@ -174,16 +174,18 @@
 *  Authors:
 *     Remo Tilanus (JAC, Hawaii)
 *     Kor Begeman, Hans Terlouw, Martin Vogelaar (Kapteyn Institute, Groningen)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-09-27 (RPT):
 *        Starlink version
+*     2012-04-10 (TIMJ):
+*        Use const and stop using unnecessary pointers.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2010, 2012 Science and Technology Facilities Council.
 *     Copyright (C) Kapteyn Laboratorium Groningen 2001
 *     All Rights Reserved.
 
@@ -234,46 +236,46 @@
 #define FUNC_NAME "smf_math_functions_lib"
 
 /* Gaussian */
-static double gauss( double  X, double *fpar, int *ncomp, int *iopt);
-static void gaussderv( double  X, double *fpar, double *epar, int *ncomp,
-		       int *iopt);
+static double gauss( double  X, const double fpar[], int ncomp, const int iopt[]);
+static void gaussderv( double  X, const double fpar[], double *epar, int ncomp,
+		       const int iopt[]);
 
 /* Gaussian-Hermite "1" */
-static double gausshermiteh3( double  X, double *fpar, int *ncomp, int *iopt);
-static void gausshermiteh3derv( double  X, double *fpar, double *epar,
-                                int *ncomp, int *iopt);
+static double gausshermiteh3( double  X, const double fpar[], int ncomp, const int iopt[]);
+static void gausshermiteh3derv( double  X, const double fpar[], double *epar,
+                                int ncomp, const int iopt[]);
 
 /* Gaussian-Hermite "2" */
-static double gausshermiteh3h4( double  X, double *fpar, int *ncomp,
-				int *iopt);
-static void gausshermiteh3h4derv( double  X, double *fpar, double *epar,
-				  int *ncomp, int *iopt);
+static double gausshermiteh3h4( double  X, const double fpar[], int ncomp,
+				const int iopt[]);
+static void gausshermiteh3h4derv( double  X, const double fpar[], double *epar,
+				  int ncomp, const int iopt[]);
 /* Voigt plus helper function w*/
-static double voigt( double  X, double *fpar, int *ncomp, int *iopt);
-static void   voigtderv( double  X, double *fpar, double *epar, int *ncomp,
-			 int *iopt);
+static double voigt( double  X, const double fpar[], int ncomp, const int iopt[]);
+static void   voigtderv( double  X, const double fpar[], double *epar, int ncomp,
+			 const int iopt[]);
 static void w( double, double, double *, double * );
 
 /* Polynomial */
-static double polynomial( double  X, double *fpar, int *ncomp, int *iopt);
-static void polyderv( double  X, double *epar, int *ncomp);
+static double polynomial( double  X, const double fpar[], int ncomp, const int iopt[]);
+static void polyderv( double  X, double *epar, int ncomp);
 
 
 /* Histogram: semi-poisson distribution */
-static double histogram( double  X, double *fpar, int *ncomp, int *iopt);
-static void histderv( double  X, double *fpar, double *epar, int *ncomp);
+static double histogram( double  X, const double fpar[], int ncomp, const int iopt[]);
+static void histderv( double  X, const double fpar[], double *epar, int ncomp);
 
 
 /* Returns function value at xdat */
-void smf_math_functions( int    *fid,
-			 double *xdat,
-			 double *fpar,
-			 int    *ncomp,
+void smf_math_functions( int     fid,
+			 double  xdat,
+			 const double fpar[],
+			 int     ncomp,
 			 double *value,
 			 double *pderv,
 			 int    *npar,
-			 int    *iopt,
-			 double *dopt __attribute__((unused)) )
+			 const int     iopt[],
+			 const double  dopt[] __attribute__((unused)) )
 /*--------------------------------------------------------------------
 **
 ** Returns the value at xdat of the function identified by fid.
@@ -285,49 +287,50 @@ void smf_math_functions( int    *fid,
   double   X;
   int      nopt;
 
-  if ( xdat != NULL )
-    X = xdat[0];
-  else
-    X = 0;
+  if ( xdat != VAL__BADD ) {
+    X = xdat;
+  } else {
+    X = 0.0;
+  }
 
   nopt = -1;
 
   if ( npar != NULL ) {
 
     /* Get number of parameters for basic function */
-    if (*fid == GAUSSHERMITE1)
+    if (fid == GAUSSHERMITE1)
       *npar = (int) ( gausshermiteh3( X, fpar, ncomp, &nopt ) + 0.5 );
-    else if (*fid == GAUSSHERMITE2)
+    else if (fid == GAUSSHERMITE2)
       *npar = (int) ( gausshermiteh3h4( X, fpar, ncomp, &nopt ) + 0.5 );
-    else if (*fid == VOIGT)
+    else if (fid == VOIGT)
       *npar = (int) ( voigt( X, fpar, ncomp, &nopt ) + 0.5 );
-    else if (*fid == POLYNOMIAL)
+    else if (fid == POLYNOMIAL)
       *npar = (int) ( polynomial( X, fpar, ncomp, &nopt ) + 0.5 );
-    else if (*fid == HISTOGRAM)
+    else if (fid == HISTOGRAM)
       *npar = (int) ( histogram( X, fpar, ncomp, &nopt ) + 0.5 );
     else
       /* default to GAUSS */
       *npar = (int) ( gauss( X, fpar, ncomp, &nopt ) + 0.5 );
 
     /* Multiple with the number of instances of the function */
-    if ( ncomp != NULL && *fid != POLYNOMIAL ) *npar *= *ncomp;
+    if ( ncomp > 0 && fid != POLYNOMIAL ) *npar *= ncomp;
 
     if ( iopt != NULL && iopt[0] == 1 &&
-         *fid != POLYNOMIAL && *fid != HISTOGRAM ) *npar += 3;
+         fid != POLYNOMIAL && fid != HISTOGRAM ) *npar += 3;
 
   }
 
   if ( value != NULL ) {
 
-    if (*fid == GAUSSHERMITE1)
+    if (fid == GAUSSHERMITE1)
       *value = gausshermiteh3( X, fpar, ncomp, iopt );
-    else if (*fid == GAUSSHERMITE2)
+    else if (fid == GAUSSHERMITE2)
       *value = gausshermiteh3h4( X, fpar, ncomp, iopt );
-    else if (*fid == VOIGT)
+    else if (fid == VOIGT)
       *value = voigt( X, fpar, ncomp, iopt );
-    else if (*fid == POLYNOMIAL)
+    else if (fid == POLYNOMIAL)
       *value = polynomial( X, fpar, ncomp, iopt );
-    else if (*fid == HISTOGRAM)
+    else if (fid == HISTOGRAM)
       *value = histogram( X, fpar, ncomp, iopt );
     else
       /* default to GAUSS */
@@ -337,15 +340,15 @@ void smf_math_functions( int    *fid,
 
   if ( pderv != NULL ) {
 
-    if (*fid == GAUSSHERMITE1)
+    if (fid == GAUSSHERMITE1)
       gausshermiteh3derv( X, fpar, pderv, ncomp, iopt );
-    else if (*fid == GAUSSHERMITE2)
+    else if (fid == GAUSSHERMITE2)
       gausshermiteh3h4derv( X, fpar, pderv, ncomp, iopt );
-    else if (*fid == VOIGT)
+    else if (fid == VOIGT)
       voigtderv( X, fpar, pderv, ncomp, iopt );
-    else if (*fid == POLYNOMIAL)
+    else if (fid == POLYNOMIAL)
       polyderv( X, pderv, ncomp );
-    else if (*fid == HISTOGRAM)
+    else if (fid == HISTOGRAM)
       histderv( X, fpar, pderv, ncomp );
     else
       /* default to GAUSS */
@@ -360,9 +363,9 @@ void smf_math_functions( int    *fid,
 
 
 static double gauss( double  X,
-                     double *fpar,
-                     int    *ncomp,
-                     int    *iopt )
+                     const double fpar[],
+                     int    ncomp,
+                     const int    iopt[] )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate Gaussian at X.                          */
 /*                                                            */
@@ -388,7 +391,7 @@ static double gauss( double  X,
    int      npar = 3;                  /* 3 components for 1 Gauss */
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    if ( iopt != NULL && iopt[0] == -1 ) return(npar);
 
@@ -422,10 +425,10 @@ static double gauss( double  X,
 
 
 static void gaussderv( double  X,
-                       double *fpar,
+                       const double fpar[],
                        double *epar,
-                       int    *ncomp,
-		       int    *iopt )
+                       int     ncomp,
+		       const int iopt[] )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate Gaussian derivatives at X.              */
 /*                                                            */
@@ -457,7 +460,7 @@ static void gaussderv( double  X,
    int      npar = 3;                  /* 3 components for 1 Gauss */
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    for (i = 0; i < nfunc; i++)
    {
@@ -505,9 +508,9 @@ static void gaussderv( double  X,
 
 
 static double gausshermiteh3( double  X,
-                              double *fpar,
-                              int    *ncomp,
-			      int    *iopt )
+                              const double fpar[],
+                              int     ncomp,
+			      const int iopt[] )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate Hermite polynomial at X.               */
 /*                                                            */
@@ -530,7 +533,7 @@ static double gausshermiteh3( double  X,
    double  c3 = 2.0*sqrt(3.0)/3.0;
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    if ( iopt != NULL && iopt[0] == -1 ) return(npar);
 
@@ -573,10 +576,10 @@ static double gausshermiteh3( double  X,
 
 
 static void gausshermiteh3derv( double  X,
-                                double *fpar,
+                                const double fpar[],
                                 double *epar,
-                                int    *ncomp,
-				int    *iopt )
+                                int     ncomp,
+				const int iopt[] )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate the derivatives for a skewed gauss at X */
 /*------------------------------------------------------------*/
@@ -588,7 +591,7 @@ static void gausshermiteh3derv( double  X,
    double  X_X0 = 0.0;
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    for (i = 0; i < nfunc; i++)
    {
@@ -647,9 +650,9 @@ static void gausshermiteh3derv( double  X,
 
 
 double gausshermiteh3h4( double  X,
-                         double *fpar,
-                         int    *ncomp,
-			 int    *iopt )
+                         const double fpar[],
+                         int     ncomp,
+			 const int iopt[] )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate Hermite polynomial at X.                */
 /*                                                            */
@@ -678,7 +681,7 @@ double gausshermiteh3h4( double  X,
    double  c4 = sqrt(6.0)/3.0;
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    if ( iopt != NULL && iopt[0] == -1 ) return(npar);
 
@@ -722,10 +725,10 @@ double gausshermiteh3h4( double  X,
 
 
 static void gausshermiteh3h4derv( double  X,
-                                double   *fpar,
+                                const double fpar[],
                                 double   *epar,
-				  int    *ncomp,
-				  int    *iopt )
+				  int     ncomp,
+				  const int iopt[] )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate the derivatives for a skewed gauss at X */
 /*------------------------------------------------------------*/
@@ -740,7 +743,7 @@ static void gausshermiteh3h4derv( double  X,
    double  c4 = sqrt(6.0)/3.0;
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    for (i = 0; i < nfunc; i++)
    {
@@ -917,9 +920,9 @@ static void w( double Rz,
 
 
 static double voigt( double  X,
-                     double *fpar,
-                     int    *ncomp,
-		     int    *iopt )
+                     const double fpar[],
+                     int     ncomp,
+		     const int iopt[] )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate Voigt function at X.                    */
 /*                                                            */
@@ -945,7 +948,7 @@ static double voigt( double  X,
    double   X_X0 = 0.0;
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    if ( iopt != NULL && iopt[0] == -1 ) return(npar);
 
@@ -985,10 +988,10 @@ static double voigt( double  X,
 
 
 static void   voigtderv( double  X,
-                         double *fpar,
+                         const double fpar[],
                          double *epar,
-                         int    *ncomp,
-			 int    *iopt )
+                         int     ncomp,
+			 const int iopt[] )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate Voigt derivatives at X.                 */
 /*------------------------------------------------------------*/
@@ -1001,7 +1004,7 @@ static void   voigtderv( double  X,
    double   sqpi = sqrt(M_PI);
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    for (i = 0; i < nfunc; i++)
    {
@@ -1054,9 +1057,9 @@ static void   voigtderv( double  X,
 
 /* Polynomial */
 static double polynomial( double  X,
-			  double *fpar,
-			  int    *ncomp,
-                          int    *iopt )
+			  const double fpar[],
+			  int     ncomp,
+                          const int iopt[] )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate Polynomial function at X.               */
 /*                                                            */
@@ -1071,15 +1074,15 @@ static double polynomial( double  X,
    double result;
 
    if ( iopt != NULL && iopt[0] == -1 ) {
-     if ( ncomp != NULL ) {
-       return( *ncomp );
+     if ( ncomp > 0 ) {
+       return( ncomp );
      } else {
        return( -1 );
      }
    }
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    result = fpar[0];
    x_n = 1;
@@ -1094,7 +1097,7 @@ static double polynomial( double  X,
 
 static void polyderv( double  X,
 		      double *epar,
-		      int    *ncomp )
+		      int     ncomp )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate Polynomial derivatives at X.            */
 /*------------------------------------------------------------*/
@@ -1103,7 +1106,7 @@ static void polyderv( double  X,
    double x_n;
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    x_n = 1;
    for ( n = 0; n < nfunc; n++ ) {
@@ -1114,9 +1117,9 @@ static void polyderv( double  X,
 
 
 static double histogram( double  X,
-                         double *fpar,
-			 int    *ncomp,
-			 int    *iopt )
+                         const double fpar[],
+			 int     ncomp,
+			 const int iopt[] )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate Histogram function at X.                */
 /*                                                            */
@@ -1134,7 +1137,7 @@ static double histogram( double  X,
   int      npar = 3;               /* 3 components for 1 Hist */
 
   int nfunc = 1;
-  if ( ncomp != NULL ) nfunc = *ncomp;
+  if ( ncomp > 0 ) nfunc = ncomp;
 
   if ( iopt != NULL && iopt[0] == -1 ) return(npar);
 
@@ -1166,9 +1169,9 @@ static double histogram( double  X,
 }
 
 static void histderv( double  X,
-                      double *fpar,
+                      const double fpar[],
                       double *epar,
-                      int    *ncomp )
+                      int     ncomp )
 /*------------------------------------------------------------*/
 /* PURPOSE: Calculate Histogram derivatives at X.             */
 /*------------------------------------------------------------*/
@@ -1178,7 +1181,7 @@ static void histderv( double  X,
    int      npar = 3;                  /* 3 components for 1 Hist */
 
    int nfunc = 1;
-   if ( ncomp != NULL ) nfunc = *ncomp;
+   if ( ncomp > 0 ) nfunc = ncomp;
 
    for (i = 0; i < nfunc; i++)
    {

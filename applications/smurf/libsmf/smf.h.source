@@ -1380,10 +1380,10 @@ void smf_lock_data( smfData *data, int lock, int *status );
 
 void smf_lock_related( smfArray *data, int lock, int *status );
 
-int  smf_lsqfit( int *fid, double *xdat, int *xdim, double *ydat, float *wdat,
-                 int *ndat, double *fpar, double *epar, int *mpar,
-                 int *npar, int *ncomp, float *tol, int *its, float *lab,
-                 int *iopt, double *dopt );
+int  smf_lsqfit( int fid, const double xdat[], int xdim, const double ydat[], const float wdat[],
+                 int ndat, double *fpar, double *epar, const int mpar[],
+                 int npar, int ncomp, float tol, int its, float lab,
+                 const int iopt[], const double dopt[] );
 
 void smf_makefitschan( const char *system, double crpix[2], double crval[2],
                        double cdelt[2], double crota2, AstFitsChan *fc,
@@ -1423,17 +1423,17 @@ void smf_meanshift( double *indata, double *outdata, int nel, int stride, int bo
                     double box2, smf_qual_t *qual, smf_qual_t mask, float wlim,
                     int *status );
 
-void smf_math_functions( int *fid, double *xdat, double *fpar, int *ncomp,
+void smf_math_functions( int fid, double xdat, const double fpar[], int ncomp,
 			 double *value, double *pderv, int *npar,
-			 int *iopt, double *dopt __attribute__((unused)) );
+			 const int iopt[], const double dopt[] __attribute__((unused)) );
 
-double smf_math_fvalue( int *fid, double *xdat, double *fpar, int *ncomp,
-			int *iopt, double *dopt );
+double smf_math_fvalue( int fid, double xdat, const double fpar[], int ncomp,
+			const int iopt[], const double dopt[] );
 
-void smf_math_fpderv( int *fid, double *xdat, double *fpar, int *ncomp,
-		      double *epar, int *iopt, double *dopt );
+void smf_math_fpderv( int fid, double xdat, const double fpar[], int ncomp,
+		      double *epar, const int iopt[], const double dopt[] );
 
-int smf_math_fnpar( int *fid );
+int smf_math_fnpar( int fid );
 
 void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         dim_t el, const double *dat,

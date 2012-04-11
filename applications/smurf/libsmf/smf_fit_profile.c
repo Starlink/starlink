@@ -19,7 +19,7 @@
 *        Pointer to input data struct
 *     axis = int (Given)
 *        Axis to fit along
-*     range = int* (Given)
+*     range = int * (Given & Returned)
 *        Range of pixels to use in fit (default all: 1..ndim)
 *     ncomp = int (Given)
 *        Number of functions to fit along each profile
@@ -78,17 +78,19 @@
 
 *  Authors:
 *     Remo Tilanus (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     Kor Begeman, Hans Terlouw, Martin Vogelaar (Kapteyn Institute, Groningen)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-09-27 (RPT):
 *        Starlink version
+*     2012-04-10 (TIMJ):
+*        Use const and stop using unnecessary pointers.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2010,2012 Science and Technology Facilities Council.
 *     Copyright (C) Kapteyn Laboratorium Groningen 2001
 *     All Rights Reserved.
 
@@ -196,7 +198,7 @@ static double getresidual( int fid, double *fdata, int ndat,
 
 
 
-void smf_fit_profile( smfData  *data, int axis, int *range, int ncomp,
+void smf_fit_profile( smfData  *data, int axis, int range[], int ncomp,
 		      smfArray *pardata, void *pfcntrl, int *status )
 /* Top-level subroutine to fite profiles in a data cube along the specified
 ** axis. The routine will slice up the data into chucks to be process
@@ -556,7 +558,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
   indata = data->pntr[0];
 
   /* Get nr parameters associated with function */
-  npar = smf_math_fnpar ( &fid );
+  npar = smf_math_fnpar ( fid );
 
   msgOutiff(MSG__DEBUG, " ",
 	    "(FitProfileThread %d) ...Function %s (fid %d) npar = %d",
@@ -868,7 +870,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 	coord = (double) (i+1);
 
         if ( iters >= 0 ) {
-	  value = (double) smf_math_fvalue( &fid, &coord, parlist, &ncomp,
+	  value = (double) smf_math_fvalue( fid, coord, parlist, ncomp,
 					    NULL, NULL );
 	} else {
 	  value = 0.0;
@@ -954,9 +956,9 @@ static int dolsqfit(  int fid, double *pcoord, double *fdata,
    }
 
 
-   iters  = smf_lsqfit ( &fid, pcoord, &xdim, fdata, weight, &ndat,
-			 parlist, errlist, fitmask, &tpar, &nfound,
-			 &tolerance, &maxits, &mixingpar, fitopt, NULL );
+   iters  = smf_lsqfit ( fid, pcoord, xdim, fdata, weight, ndat,
+			 parlist, errlist, fitmask, tpar, nfound,
+			 tolerance, maxits, mixingpar, fitopt, NULL );
 
    /*----------------------------------------------------------*/
    /* THE ARRAY PARLIST[] NOW CONTAINS FITTED PARAMETERS!      */
@@ -1526,7 +1528,7 @@ static double getresidual( int         fid,
 
       if (Yi != VAL__BADD)
       {
-	delta = Yi - smf_math_fvalue( &fid, &Xi, Destimates, &nvar,
+	delta = Yi - smf_math_fvalue( fid, Xi, Destimates, nvar,
 				      iopt, NULL );
          chi2 += delta * delta;
       }

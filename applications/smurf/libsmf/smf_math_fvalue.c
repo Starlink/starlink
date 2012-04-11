@@ -12,22 +12,22 @@
 *     Subroutine
 
 *  Invocation:
-*       double smf_math_fvalue( int *fid, double *xdat, double *fpar,
-*                               int *ncomp, int *iopt, double *dopt );
+*       double smf_math_fvalue( int fid, double xdat, const double fpar[],
+*                               int ncomp, const int iopt[], double dopt[] );
 
 *  Arguments:
-*     fid  = int* Given
+*     fid  = int Given
 *        function identifier
-*     xdat = double* Given
+*     xdat = double Given
 *        coordinate to evaluate function at
-*     fpar = double* Given
+*     fpar = const double [] Given
 *        function parameters (depends on function called)
-*     ncomp = int* Given
+*     ncomp = int Given
 *        number of components (see below)
-*     iopt = int* Given
+*     iopt = const int [] Given
 *        optional integer parameter(s) to be passed-through to
 *        the called function or derivate subroutine.
-*     dopt = double* Given
+*     dopt = const double [] Given
 *        optional double parameter(s) to be passed-through to
 *        the called function or derivate subroutine.
 
@@ -40,16 +40,18 @@
 
 *  Authors:
 *     Remo Tilanus (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-02-03 (RPT):
 *        Starlink version
+*     2012-04-10 (TIMJ):
+*        Use const and stop using unnecessary pointers.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2010, 2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -92,8 +94,8 @@
 #include "smurf_par.h"
 #include "smurf_typ.h"
 
-double smf_math_fvalue( int *fid, double *xdat, double *fpar, int *ncomp,
-			int *iopt, double *dopt )
+double smf_math_fvalue( int fid, double xdat, const double fpar[], int ncomp,
+			const int iopt[], const double dopt[] )
 /*--------------------------------------------------------------------
 **
 ** Returns the value at xdat of the function identified by fid.

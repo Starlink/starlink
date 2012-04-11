@@ -15,58 +15,57 @@
 *     Subroutine
 
 *  Invocation:
-*       (int) smf_lsqfit(  int *fid, double *xdat, int *xdim, double *ydat,
-*             float *wdat, int *ndat, double *fpar, double *epar,
-*             int *mpar, int *npar, int *ncomp, float *tol, int *its,
-*             float *lab, int *iopt, double *dopt )
+*       (int) smf_lsqfit( int fid, const double xdat[], int xdim, const double ydat[],
+*             const float wdat[], int ndat, double *fpar, double *epar,
+*             const int mpar[], int npar, int ncomp, float tol, int its,
+*             float lab, const int iopt[], const double dopt[] )
 
 *  Arguments:
-*     fid  = int*       (Given)
+*     fid  = int       (Given)
 *        Function id (see smf_math_functions.c)
-*     ydat = smfData*  (Given and Returned)
-*        Pointer to input data struct (DOUBLE)
-*     xdat = double*   (Given)
-*        Contains coordinates of data points (DOUBLE). The fitted FWHM
+*     xdat = const double []   (Given)
+*        Contains coordinates of data points. The fitted FWHM
 *        and CENTRE will be expressed in these coordinates, but for
 *        a simple fit this can be the pixel coordinates of the points.
-*     xdim = int*      (Given)
+*     xdim = int       (Given)
 *        Dimension of fit (INT). E.g. spectrum = 1, map = 2, etc.
-*     wdat = float*    (Given)
+*     ydat = const double []  (Given)
+*        Pointer to input data
+*     wdat = const float []    (Given)
 *        Contains weigths for data points.
-*     ndat = int*      (Given)
+*     ndat = int       (Given)
 *        Number of data points.
 *     fpar = double*   (Given and Returned)
 *        On input contains initial estimates of the parameters for
 *        non-linear fits, on output the fitted parameters.
 *     epar = double*   (Returned)
 *        Contains estimates of errors in fitted parameters.
-*     mpar = int*      (Given)
+*     mpar = const int []      (Given)
 *        Logical mask telling which parameters are free
 *        (MPAR(J)=non-zero) and which parameters are fixed
 *        (MPAR(J)=0).
-*     npar = int*      (Given)
+*     npar = int       (Given)
 *        Number of parameter (fixed+free)
-*     ncomp = int*      (Given)
+*     ncomp = int      (Given)
 *        Number of components.
-*     tol = float*     (Given)
-*     tol = float*     (Given)
+*     tol = float      (Given)
 *        Relative tolerance. smf_lsqfit stops successive iterations
 *        fail to produce a decrement in reduced chi-squared less than
 *        TOL. If TOL is less than the minimum tolerance possible, TOL
 *        will be set to this value. This means that maximum accuracy
 *        can be obtained by setting TOL=0.0.
-*     its = int*       (Given)
+*     its = int        (Given)
 *        Maximum number of iterations.
-*     lab = float*     (Given)
+*     lab = float      (Given)
 *        Mixing parameter, LAB determines the initial weight of
 *        steepest descent method relative to the Taylor method. LAB
 *        should be a small value (i.e. 0.01). LAB can only be zero
 *        when the partial derivatives are independent of the
 *        parameters. In fact in this case LAB should be exactly equal
 *        to zero.
-*     iopt = int*      (Given)
+*     iopt = const int []      (Given)
 *        An int array which is passed unmodified to smf_math_... (see below).
-*     dopt = double*   (Given)
+*     dopt = const double []   (Given)
 *        A double array which is passed unmodified to smf_math_... (see below).
 
 *  Returned value:
@@ -128,6 +127,7 @@
 *  Authors:
 *     Kor Begeman  (Kapteyn Institute, Groningen)
 *     Remo Tilanus (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -135,10 +135,11 @@
 *     Initial version for GIPSY
 *   2010-09-24 (RPT)
 *     Adapted for SMURF
+*   2012-04-10 (TIMJ):
+*        Use const and stop using unnecessary pointers.
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2010,2012 Science and Technology Facilities Council.
 *     Copyright (c) Kapteyn Laboratorium Groningen 1990
 *     All Rights Reserved.
 
@@ -171,22 +172,22 @@
 
 #if defined (TESTBED)
 
-static double smf_math_fvalue( int    *fid,
-			       double *xdat,
-			       double *fpar,
-			       int    *ncomp,
-			       int    *iopt,
-			       double *dopt __attribute__((unused)) );
+static double smf_math_fvalue( int    fid,
+			       double xdat,
+			       const double fpar[],
+			       int    ncomp,
+			       const int    iopt[],
+			       const double dopt[] __attribute__((unused)) );
 
-static void smf_math_fpderv( int *fid,
-			     double *xdat,
-			     double *fpar,
-			     int    *ncomp,
+static void smf_math_fpderv( int fid,
+			     double xdat,
+			     const double fpar[],
+			     int    ncomp,
 			     double *epar,
-			     int    *iopt __attribute__((unused)),
-			     double *dopt __attribute__((unused)) );
+			     const int    iopt[] __attribute__((unused)),
+			     const double dopt[] __attribute__((unused)) );
 
-static int smf_math_fnpar( int *fid );
+static int smf_math_fnpar( int fid );
 
 #else
 
@@ -291,19 +292,19 @@ static int  invmat( lsqData *lsq )
    return( 0 );					/* all is well */
 }
 
-static void getmat( int     *fid ,
+static void getmat( int      fid ,
                     lsqData *lsq ,
-                    double *xdat ,
-                    int    *xdim ,
-                    double *ydat ,
-                    float  *wdat ,
-                    int    *ndat ,
-                    double *fpar ,
-                    double *epar ,
-                    int    *npar ,
-                    int    *ncomp ,
-                    int    *iopt ,
-                    double *dopt )
+                    const double   xdat[] ,
+                    int      xdim ,
+                    const double   ydat[] ,
+                    const float    wdat[] ,
+                    int      ndat ,
+                    const double   fpar[] ,
+                    double  *epar ,
+                    int      npar ,
+                    int      ncomp ,
+                    const int    iopt[] ,
+                    const double dopt[] )
 /*
  * getmat builds the matrix.
  */
@@ -322,12 +323,12 @@ static void getmat( int     *fid ,
       }
    }
    lsq->chi2 = 0.0;				/* reset reduced chi-squared */
-   for (n = 0; n < (*ndat); n++) {		/* loop trough data points */
+   for (n = 0; n < ndat; n++) {		/* loop trough data points */
       wn = wdat[n];
       if (wn > 0.0) {				/* legal weight ? */
-	yd = ydat[n] - smf_math_fvalue( fid, &xdat[(*xdim) * n], fpar, ncomp,
+	yd = ydat[n] - smf_math_fvalue( fid, xdat[xdim * n], fpar, ncomp,
 				      iopt, dopt );
-	 smf_math_fpderv( fid, &xdat[(*xdim) * n], fpar, ncomp, epar,
+	 smf_math_fpderv( fid, xdat[xdim * n], fpar, ncomp, epar,
 			  iopt, dopt );
          lsq->chi2 += yd * yd * wn;		/* add to chi-squared */
          for (j = 0; j < lsq->nfree; j++) {
@@ -341,19 +342,19 @@ static void getmat( int     *fid ,
    }
 }
 
-static int  getvec( int    *fid ,
+static int  getvec( int    fid ,
                     lsqData *lsq ,
-                    double *xdat ,
-                    int    *xdim ,
-                    double *ydat ,
-                    float  *wdat ,
-                    int    *ndat ,
-                    double *fpar ,
+                    const double xdat[] ,
+                    int    xdim ,
+                    const double ydat[] ,
+                    const float  wdat[] ,
+                    int    ndat ,
+                    const double fpar[] ,
                     double *epar ,
-                    int    *npar ,
-                    int    *ncomp ,
-                    int    *iopt ,
-                    double *dopt )
+                    int    npar ,
+                    int    ncomp ,
+                    const int    iopt[] ,
+                    const double dopt[] )
 /*
  * getvec calculates the correction vector. The matrix has been built by
  * getmat, we only have to rescale it for the current value for labda.
@@ -384,7 +385,7 @@ static int  getvec( int    *fid ,
       lsq->matrix2[j][j] = 1.0 + lsq->labda;	/* scaled value on diagonal */
    }
    if ( (r = invmat( lsq )) ) return( r );      /* invert matrix inlace */
-   for (i = 0; i < (*npar); i++) epar[i] = fpar[i];
+   for (i = 0; i < npar; i++) epar[i] = fpar[i];
    for (j = 0; j < lsq->nfree; j++) {		/* loop to calculate ... */
       dj = 0.0;					/* correction lsq->vector */
       mjj = lsq->matrix1[j][j];
@@ -399,10 +400,10 @@ static int  getvec( int    *fid ,
       epar[lsq->parptr[j]] += dj;		/* new parameters */
    }
    lsq->chi1 = 0.0;				/* reset reduced chi-squared */
-   for (n = 0; n < (*ndat); n++) {		/* loop through data points */
+   for (n = 0; n < ndat; n++) {		/* loop through data points */
       wn = wdat[n];				/* get weight */
       if (wn > 0.0) {				/* legal weight */
-	dy = ydat[n] - smf_math_fvalue( fid, &xdat[(*xdim) * n], epar, ncomp,
+	dy = ydat[n] - smf_math_fvalue( fid, xdat[xdim * n], epar, ncomp,
 				      iopt, dopt );
          lsq->chi1 += wdat[n] * dy * dy;
       }
@@ -410,22 +411,22 @@ static int  getvec( int    *fid ,
    return( 0 );
 }
 
-int  smf_lsqfit( int    *fid ,
-		 double *xdat ,
-		 int    *xdim ,
-		 double *ydat ,
-		 float  *wdat ,
-		 int    *ndat ,
-		 double *fpar ,
+int  smf_lsqfit( int    fid ,
+		 const double xdat[] ,
+		 int    xdim ,
+		 const double ydat[] ,
+		 const float  wdat[] ,
+		 int    ndat ,
+		 double fpar[] ,
 		 double *epar ,
-		 int    *mpar ,
-                 int    *npar ,
-		 int    *ncomp ,
-		 float  *tol  ,
-		 int    *its  ,
-		 float  *lab  ,
-		 int    *iopt ,
-		 double *dopt )
+		 const int    mpar[] ,
+                 int    npar ,
+		 int    ncomp ,
+		 float  tol  ,
+		 int    its  ,
+		 float  lab  ,
+		 const int    iopt[] ,
+		 const double dopt[] )
 /*
  * smf_lsqfit is exported, and callable from C as well as Fortran.
  */
@@ -444,20 +445,20 @@ int  smf_lsqfit( int    *fid ,
    lsq->nfree = 0;				/* number of free parameters */
    lsq->nuse = 0;				/* nr of legal data points */
 
-   if (*tol < (FLT_EPSILON * 10.0)) {
+   if (tol < (FLT_EPSILON * 10.0)) {
       lsq->tolerance = FLT_EPSILON * 10.0;	/* default tolerance */
    } else {
-      lsq->tolerance = *tol;			/* tolerance */
+      lsq->tolerance = tol;			/* tolerance */
    }
-   lsq->labda = fabs( *lab ) * LABFAC;	/* start value for mixing parameter */
-   for (i = 0; i < (*npar); i++) {
+   lsq->labda = fabs( lab ) * LABFAC;	/* start value for mixing parameter */
+   for (i = 0; i < npar; i++) {
       if (mpar[i]) {
          if (lsq->nfree > MAXPAR) return( -1 );	/* too many free parameters */
          lsq->parptr[lsq->nfree++] = i;		/* a free parameter */
       }
    }
    if (lsq->nfree == 0) return( -2 );	/* no free parameters */
-   for (n = 0; n < (*ndat); n++) {
+   for (n = 0; n < ndat; n++) {
       if (wdat[n] > 0.0) lsq->nuse++;	/* legal weight */
    }
 
@@ -469,7 +470,7 @@ int  smf_lsqfit( int    *fid ,
       r = getvec( fid, lsq, xdat, xdim, ydat, wdat, ndat, fpar, epar, npar,
 		  ncomp, iopt, dopt );
       if (r) return( r );		/* error */
-      for (i = 0; i < (*npar); i++) {
+      for (i = 0; i < npar; i++) {
          fpar[i] = epar[i];		/* save new parameters */
          epar[i] = 0.0;			/* and set errors to zero */
       }
@@ -497,7 +498,7 @@ int  smf_lsqfit( int    *fid ,
        * errors of the fitted parameters.
        */
       while (!lsq->found) {			       /* iteration loop */
-         if (lsq->itc++ == (*its))
+         if (lsq->itc++ == its)
 	   return( -4 );    /* increase iteration counter */
 	 getmat( fid, lsq, xdat, xdim, ydat, wdat, ndat, fpar, epar, npar,
 		 ncomp, iopt, dopt );
@@ -525,7 +526,7 @@ int  smf_lsqfit( int    *fid ,
             if (r) return( r );		/* error */
          }
          if (lsq->labda <= LABMAX) {		/* save old parameters */
-            for (i = 0; i < (*npar); i++) fpar[i] = epar[i];
+            for (i = 0; i < npar; i++) fpar[i] = epar[i];
          }
          if (fabs( lsq->chi2 - lsq->chi1 ) <= (lsq->tolerance * lsq->chi1)
 	     || (lsq->labda > LABMAX)) {
@@ -542,7 +543,7 @@ int  smf_lsqfit( int    *fid ,
 			npar, ncomp, iopt, dopt );
 
             if (r) return( r );		/* error */
-            for (i = 0; i < (*npar); i++) {
+            for (i = 0; i < npar; i++) {
                epar[i] = 0.0;		/* and set error to zero */
             }
             lsq->chi2 = sqrt( lsq->chi2 /
@@ -711,7 +712,7 @@ int main( )
          double rndm;
          xdat[n] = (float) n;
          wdat[n] = 1.0;
-         ydat[n] = smf_math_fvalue( &fid, &xdat[n], fpar, &ncomp, NULL, NULL );
+         ydat[n] = smf_math_fvalue( &fid, xdat[n], fpar, &ncomp, NULL, NULL );
          if ( fitmax == 1)
 	   printf("%2d: %6.2f", n+1, ydat[n]);
          rndm = ((float) ( rand( ) - RAND_MAX / 2 )) / (double) RAND_MAX * 1.0;

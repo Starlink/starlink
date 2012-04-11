@@ -15,7 +15,7 @@
 *       int smf_math_fnpar( int fid );
 
 *  Arguments:
-*     fid  = int* Given
+*     fid  = int Given
 *        function identifier
 
 *  Description:
@@ -27,16 +27,18 @@
 
 *  Authors:
 *     Remo Tilanus (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-02-03 (RPT):
 *        Starlink version
+*     2012-04-10 (TIMJ):
+*        Use const and stop using unnecessary pointers.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2010, 2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,7 +81,7 @@
 #include "smurf_par.h"
 #include "smurf_typ.h"
 
-int smf_math_fnpar( int *fid )
+int smf_math_fnpar( int fid )
 /*--------------------------------------------------------------------
 **
 ** Returns the value at xdat of the function identified by fid.
@@ -88,7 +90,7 @@ int smf_math_fnpar( int *fid )
 {
   int npar;
 
-  smf_math_functions( fid, NULL, NULL, NULL, NULL, NULL, &npar,
+  smf_math_functions( fid, VAL__BADD, NULL, 0, NULL, NULL, &npar,
                       NULL, NULL );
 
   return( npar );
