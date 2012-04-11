@@ -167,21 +167,21 @@ qsortstruct;
 
 static void FitProfileThread( void *job_data_ptr, int *status );
 
-static int getestimates( int fid, double *fdata, float *weight, int ndat,
+static int getestimates( int fid, const double fdata[], const float weight[], int ndat,
                          double *parlist, int npar, int ncomp, double rms,
                          double critamp, double critdisp,
-                         int *smoothingpar, int numq );
+                         const int smoothingpar[], int numq );
 
-static int dolsqfit(  int fid, double *pcoord, double *fdata,
+static int dolsqfit(  int fid, const double pcoord[], const double fdata[],
                       float *weight,  int npts, double *parlist,
-		      double *errlist, int *fitmask, int npar, int *ncomp,
+		      double *errlist, const int fitmask[], int npar, int *ncomp,
 		      double critamp, double critdisp,
 		      float tol, int its, float lab, int *fitopt );
 
 static void adjustestimates( int fid, int nfound, double *parlist,
 			     int npar );
 
-static int fillfromparndf( smfArray *pardata, int pbase, int dstride,
+static int fillfromparndf( const smfArray *pardata, int pbase, int dstride,
 			   int nfound, double *parlist, double *errlist,
 			   int npar );
 
@@ -192,7 +192,7 @@ int comp1( const void *s1, const void *s2 );
 int comp2( const void *s1, const void *s2 );
 int comp3( const void *s1, const void *s2 );
 
-static double getresidual( int fid, double *fdata, int ndat,
+static double getresidual( int fid, const double fdata[], int ndat,
 			   int gaussiansfound, double *Destimates,
 			   double zerolev );
 
@@ -914,9 +914,9 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 }
 
 
-static int dolsqfit(  int fid, double *pcoord, double *fdata,
+static int dolsqfit(  int fid, const double pcoord[], const double fdata[],
                       float *weight,  int npts, double *parlist,
-		      double *errlist, int *fitmask, int npar, int *ncomp,
+		      double *errlist, const int fitmask[], int npar, int *ncomp,
 		      double critamp, double critdisp,
 		      float tol, int its, float lab, int *fitopt )
 /*------------------------------------------------------------*/
@@ -1026,10 +1026,10 @@ static int dolsqfit(  int fid, double *pcoord, double *fdata,
 }
 
 
-static int getestimates( int fid, double *fdata, float *weight, int npts,
+static int getestimates( int fid, const double fdata[], const float weight[], int npts,
 			 double *parlist, int npar, int ncomp,
 			 double rms, double critamp, double critdisp,
-			 int *smoothingpar, int numq)
+			 const int smoothingpar[], int numq)
 /*------------------------------------------------------------*/
 /* PURPOSE: Get initial estimates for gaussian profiles       */
 /* This is a wrapper routine to drive smf_gauest              */
@@ -1325,7 +1325,7 @@ static void adjustestimates( int fid, int nfound, double *parlist,
    }
 }
 
-static int fillfromparndf( smfArray *pardata, int pbase, int dstride,
+static int fillfromparndf( const smfArray *pardata, int pbase, int dstride,
 			   int nfound, double *parlist, double *errlist,
 			   int npar )
 /*------------------------------------------------------------*/
@@ -1487,7 +1487,7 @@ static void mysort( int sortopt, double refpix, double *parlist,
 
 
 static double getresidual( int         fid,
-			   double     *fdata,
+			   const double fdata[],
                            int         npts,
                            int         gaussiansfound,
                            double     *Destimates,
