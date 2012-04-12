@@ -15,9 +15,9 @@
 *  Invocation:
 
 *     newbuf =  smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype,
-*                                    size_t ndata, size_t ndims, 
-*                                    size_t * dims, size_t * perm, 
-*                                    int inPlace, int freeOld, 
+*                                    size_t ndata, size_t ndims,
+*                                    size_t * dims, size_t * perm,
+*                                    int inPlace, int freeOld,
 *                                    int * status )
 
 *  Arguments:
@@ -31,7 +31,7 @@
 *     ndims = size_t (Given)
 *        Number of dimensions
 *     dims = size_t * (Given)
-*        Number of pixels along each dimension in input data. Array 
+*        Number of pixels along each dimension in input data. Array
 *        of dimension ndims.
 *     perm = size_t * (Given)
 *        Permutation array: new order of dimensions in terms
@@ -106,9 +106,9 @@
 
 #define FUNC_NAME "smf_dataOrder_ndims"
 
-void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata, 
-			    size_t ndims, size_t * dims, size_t * perm, 
-			    int inPlace, int freeOld, int * status ) {
+void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
+                            size_t ndims, size_t * dims, size_t * perm,
+                            int inPlace, int freeOld, int * status ) {
 
   size_t sz = 0;        /* Size of data type */
   void * newbuf = NULL; /* Space to do the reordering */
@@ -130,15 +130,15 @@ void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
 
   msgOutif( MSG__DEBUG, "","SMF_dataOrder_ndims:", status);
   msgOutiff( MSG__DEBUG, "",
-	   "...dtype: %s, ndata: %d, ndims: %d, inPlace: %d, freeOld %d",
-	     status, smf_dtype_str(dtype, status), (int) ndata, 
-	     (int) ndims, (int) inPlace, (int) freeOld ); 
+             "...dtype: %s, ndata: %d, ndims: %d, inPlace: %d, freeOld %d",
+             status, smf_dtype_str(dtype, status), (int) ndata,
+             (int) ndims, (int) inPlace, (int) freeOld );
   for ( i=0; i<ndims; i++ ) {
-    msgOutiff(  MSG__DEBUG, "","...new axis %d will be original axis %d size %d", 
-		status, (int) (i+1), (int) perm[i], (int) dims[(perm[i]-1)] );
+    msgOutiff(  MSG__DEBUG, "","...new axis %d will be original axis %d size %d",
+                status, (int) (i+1), (int) perm[i], (int) dims[(perm[i]-1)] );
     if ( perm[i] < 1 || perm[i] > ndims ) {
-      msgOutf( "","Permutation axis %d value %d not in range 1..%d", 
-	       status, (int) (i+1), (int) perm[i], (int) ndims );
+      msgOutf( "","Permutation axis %d value %d not in range 1..%d",
+               status, (int) (i+1), (int) perm[i], (int) ndims );
       *status = SAI__ERROR;
     }
   }
@@ -156,7 +156,7 @@ void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
   if( *status == SAI__OK ) {
 
     /* Find the vector steps within the input array for unit increment along
-       each input axis, and  initialise the indices of the current output 
+       each input axis, and  initialise the indices of the current output
        pixel. */
 
     j = 1;
@@ -169,14 +169,14 @@ void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
     iout[ndims] = 1;
     odim[ndims] = 1;
 
-    /* Permute the step array so that it is indexed by output axis instead 
+    /* Permute the step array so that it is indexed by output axis instead
        of input axis. */
     for ( i = 0; i < ndims; i++ ) {
       step[i] = stepi[(perm[i]-1) ];
     }
     step[ndims] = ndata;
 
-    /* initialise the vector index within the input array of the current 
+    /* initialise the vector index within the input array of the current
        output pixel. */
     k = 0;
 
@@ -187,27 +187,27 @@ void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
 
       switch( dtype ) {
       case SMF__INTEGER:
-	((int *)newbuf)[j] = ((int *)oldbuf)[k];
-	break;
+        ((int *)newbuf)[j] = ((int *)oldbuf)[k];
+        break;
       case SMF__FLOAT:
-	((float *)newbuf)[j] = ((float *)oldbuf)[k];
-	break;
+        ((float *)newbuf)[j] = ((float *)oldbuf)[k];
+        break;
       case SMF__DOUBLE:
-	((double *)newbuf)[j] = ((double *)oldbuf)[k];
-	break;
+        ((double *)newbuf)[j] = ((double *)oldbuf)[k];
+        break;
       case SMF__USHORT:
-	((unsigned short *)newbuf)[j] =
-	  ((unsigned short *)oldbuf)[k];
-	break;
+        ((unsigned short *)newbuf)[j] =
+          ((unsigned short *)oldbuf)[k];
+        break;
       case SMF__UBYTE:
-	((unsigned char *)newbuf)[j] =
-	  ((unsigned char *)oldbuf)[k];
-	break;
+        ((unsigned char *)newbuf)[j] =
+          ((unsigned char *)oldbuf)[k];
+        break;
       default:
-	msgSetc("DTYPE",smf_dtype_str(dtype, status));
-	*status = SAI__ERROR;
-	errRep( FUNC_NAME,
-		": Don't know how to handle ^DTYPE type.", status);
+        msgSetc("DTYPE",smf_dtype_str(dtype, status));
+        *status = SAI__ERROR;
+        errRep( FUNC_NAME,
+                ": Don't know how to handle ^DTYPE type.", status);
       }
 
       /* Increment the indices of the current output pixel, and update the
@@ -216,11 +216,11 @@ void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
       iout[0] += 1;
       k += step[0];
       while( (iout[i] > odim[i]) && (j < ndata-1) ) {
-	iout[i] = 1;
-	k -= (odim[i] * step[i]);
-	i++;
-	iout[i] += 1;
-	k += step[i];
+        iout[i] = 1;
+        k -= (odim[i] * step[i]);
+        i++;
+        iout[i] += 1;
+        k += step[i];
       }
 
     }
