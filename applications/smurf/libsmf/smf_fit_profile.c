@@ -258,14 +258,8 @@ void smf_fit_profile( smfData  *data, int axis, int range[], int ncomp,
     range[1] = npts;
   }
 
-  /* Check that nr of points does not exceed maximum */
-  if ( npts > NMAX ) {
-    msgOutf(" ","Number of points (%d) in profile exceeds maximum (%d)",
-	    status, (int) npts, (int) NMAX);
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-            "Use smaller NDF section if possible", status );
-  } else if ( (ABS(range[1]-range[0])+1) < 2 ) {
+  /* Sanity check */
+  if ( (ABS(range[1]-range[0])+1) < 2 ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME,
             "Number of points to fit along 1 or less", status );
@@ -515,9 +509,9 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
   int             its  = 50;         /* Number iterations */
   float           tol  = 0.01;       /* Accuracy */
   float           lab  = LAMBDA;     /* Non-linear mixing paramter */
-  double          fdata[NMAX];       /* Data array to be fitted */
-  double          pcoord[NMAX];      /* Coordinate array e.g. pixel value */
-  float           weight[NMAX];      /* Weights */
+  double         *fdata = NULL;      /* Data array to be fitted */
+  double         *pcoord = NULL;     /* Coordinate array e.g. pixel value */
+  float          *weight = NULL;     /* Weights */
   double          coord;             /* Coordinate */
   int             npar = 3;          /* Number of parameters in the fit */
   double          parlist[MAXPAR];   /* Fitted parameters */
@@ -572,6 +566,11 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
      *status = SAI__ERROR;
      return;
   }
+
+  /* Allocate some workspace */
+  fdata = astMalloc( sizeof(*fdata) * npts );
+  pcoord = astMalloc( sizeof(*pcoord) * npts );
+  weight = astMalloc( sizeof(*weight) * npts );
 
   /* Loop over subcubes */
   nsubcubes = (int) (nprofiles/dstride+0.5);
@@ -668,7 +667,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
               status);
 	}
 
-        if ( *status != SAI__OK ) return;
+        if ( *status != SAI__OK ) goto CLEANUP;
 
         value = fdata[i];
         if (value != VAL__BADD) {
@@ -911,6 +910,12 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
   msgOutiff( MSG__DEBUG, "",
              "(FitProfileThread %d): thread finished fitting profiles",
              status, ijob );
+
+ CLEANUP:
+  fdata = astFree( fdata );
+  pcoord = astFree( pcoord );
+  weight = astFree( weight );
+
 }
 
 

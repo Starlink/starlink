@@ -15,7 +15,6 @@
 #define FWHM2DISP(a)   ( a / 2.0*sqrt(2.0*log(2.0)) )
 
 /* Max array sizes */
-#define NMAX       32768     /* Maximum number of pixels to be fitted */
 #define MAXGAUSS      10     /* Max. gaussians in estimates routine */
 #define MAXPAR        53     /* Maximum number of parameters to be fitted */
 
