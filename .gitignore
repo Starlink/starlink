@@ -832,6 +832,7 @@ libraries/ast/ast.h
 libraries/ast/astbad
 libraries/ast/ast_cpp
 libraries/ast/ast_link
+libraries/ast/ast_link_adam
 libraries/ast/builddocs
 libraries/ast/f77.h
 libraries/ast/object.h
