@@ -88,6 +88,8 @@
 smf_dtype
 smf_dtype_fromstring( const char * dtype, int * status ) {
   smf_dtype itype = SMF__NULL;
+  if (*status != SAI__OK) return itype;
+  if (!dtype) return itype;
 
   if ( strncmp(dtype, "_DOUBLE", 7 ) == 0 ){
     itype = SMF__DOUBLE;
