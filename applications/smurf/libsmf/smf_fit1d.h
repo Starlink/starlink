@@ -31,12 +31,6 @@ static const char *FUNCTIONS[NFUNC] = { "GAUSS",
 					"VOIGT",
 					"POLYNOMIAL",
 					"HISTOGRAM" };
-#define GAUSS          1
-#define GAUSSHERMITE1  2
-#define GAUSSHERMITE2  3
-#define VOIGT          4
-#define POLYNOMIAL     5
-#define HISTOGRAM      6
 
 /* Number of planes in the FIT1D parameter files; use a fixed rather
    than dynamic number so that fits of different types can be combined */
@@ -44,7 +38,7 @@ static const char *FUNCTIONS[NFUNC] = { "GAUSS",
 
 /* Fit control struct */
 typedef struct {
-  int    fid;                     /* Function identifier */
+  smf_math_function fid;          /* Function identifier */
   char   function[LEN__FUNC];     /* Function name */
   int    fitmask[MAXPAR];         /* Fit mask: 1: fit; 0: fixed */
   double clip[2];                 /* Clip levels for data */

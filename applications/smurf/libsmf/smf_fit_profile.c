@@ -167,18 +167,18 @@ qsortstruct;
 
 static void FitProfileThread( void *job_data_ptr, int *status );
 
-static int getestimates( int fid, const double fdata[], const float weight[], int ndat,
+static int getestimates( smf_math_function fid, const double fdata[], const float weight[], int ndat,
                          double *parlist, int npar, int ncomp, double rms,
                          double critamp, double critdisp,
                          const int smoothingpar[], int numq );
 
-static int dolsqfit(  int fid, const double pcoord[], const double fdata[],
+static int dolsqfit(  smf_math_function fid, const double pcoord[], const double fdata[],
                       float *weight,  int npts, double *parlist,
 		      double *errlist, const int fitmask[], int npar, int *ncomp,
 		      double critamp, double critdisp,
 		      float tol, int its, float lab, int *fitopt );
 
-static void adjustestimates( int fid, int nfound, double *parlist,
+static void adjustestimates( smf_math_function fid, int nfound, double *parlist,
 			     int npar );
 
 static int fillfromparndf( const smfArray *pardata, int pbase, int dstride,
@@ -192,7 +192,7 @@ int comp1( const void *s1, const void *s2 );
 int comp2( const void *s1, const void *s2 );
 int comp3( const void *s1, const void *s2 );
 
-static double getresidual( int fid, const double fdata[], int ndat,
+static double getresidual( smf_math_function fid, const double fdata[], int ndat,
 			   int gaussiansfound, double *Destimates,
 			   double zerolev );
 
@@ -475,7 +475,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
   int             istart = 0;        /* Index number into data for thread */
   int             range[2];          /* Pixel range to fit over */
   char            function[LEN__FUNC];    /* Function to fit */
-  int             fid;               /* Integer id for function */
+  smf_math_function fid;             /* Integer id for function */
   int             ncomp = 1;         /* Number of functions in each profile */
   smfArray       *pardata = NULL;    /* Array with parameter data pointers */
   double         *fitval, *fiterr;   /* Pointers into parameter data */
@@ -919,7 +919,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 }
 
 
-static int dolsqfit(  int fid, const double pcoord[], const double fdata[],
+static int dolsqfit(  smf_math_function fid, const double pcoord[], const double fdata[],
                       float *weight,  int npts, double *parlist,
 		      double *errlist, const int fitmask[], int npar, int *ncomp,
 		      double critamp, double critdisp,
@@ -1031,7 +1031,7 @@ static int dolsqfit(  int fid, const double pcoord[], const double fdata[],
 }
 
 
-static int getestimates( int fid, const double fdata[], const float weight[], int npts,
+static int getestimates( smf_math_function fid, const double fdata[], const float weight[], int npts,
 			 double *parlist, int npar, int ncomp,
 			 double rms, double critamp, double critdisp,
 			 const int smoothingpar[], int numq)
@@ -1295,7 +1295,7 @@ CLEANUP:
 }
 
 
-static void adjustestimates( int fid, int nfound, double *parlist,
+static void adjustestimates( smf_math_function fid, int nfound, double *parlist,
 			     int npar )
 /*------------------------------------------------------------*/
 /* PURPOSE: Adjust the guesses into the estimates array.      */
@@ -1305,19 +1305,19 @@ static void adjustestimates( int fid, int nfound, double *parlist,
   double h4 = 0.0;
   double lorentz = 0.0;
 
-  if (fid == GAUSS) {
+  if (fid == SMF__MATH_GAUSS) {
     return;
   } else {
     int i;
     for (i = 0; i < nfound; i++) {
 	int   offset = i*npar;
-	if (fid == GAUSSHERMITE1)
+	if (fid == SMF__MATH_GAUSSHERMITE1)
 	  parlist[offset+3] = h3;
-	if (fid == GAUSSHERMITE2) {
+	if (fid == SMF__MATH_GAUSSHERMITE2) {
             parlist[offset+3] = h3;
             parlist[offset+4] = h4;
 	}
-	if (fid == VOIGT) {
+	if (fid == SMF__MATH_VOIGT) {
 	  /* First estimate is area instead of amplitude */
 	  double amp   = parlist[offset+0];
 	  double sigma = parlist[offset+2];
@@ -1491,7 +1491,7 @@ static void mysort( int sortopt, double refpix, double *parlist,
 }
 
 
-static double getresidual( int         fid,
+static double getresidual( smf_math_function fid,
 			   const double fdata[],
                            int         npts,
                            int         gaussiansfound,

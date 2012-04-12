@@ -953,5 +953,15 @@ typedef enum {
   SMF__FILT_MIN       /* min of the local values */
 } smf_filt_t;
 
+/* Math functions for fitting */
+
+typedef enum {
+  SMF__MATH_GAUSS         = 1,
+  SMF__MATH_GAUSSHERMITE1 = 2,
+  SMF__MATH_GAUSSHERMITE2 = 3,
+  SMF__MATH_VOIGT         = 4,
+  SMF__MATH_POLYNOMIAL    = 5,
+  SMF__MATH_HISTOGRAM     = 6
+} smf_math_function;
 
 #endif /* SMF_TYP_DEFINED */

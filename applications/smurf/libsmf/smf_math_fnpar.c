@@ -12,10 +12,10 @@
 *     Subroutine
 
 *  Invocation:
-*       int smf_math_fnpar( int fid );
+*       int smf_math_fnpar( smf_math_function fid );
 
 *  Arguments:
-*     fid  = int Given
+*     fid  = smf_math_function Given
 *        function identifier
 
 *  Description:
@@ -81,7 +81,7 @@
 #include "smurf_par.h"
 #include "smurf_typ.h"
 
-int smf_math_fnpar( int fid )
+int smf_math_fnpar( smf_math_function fid )
 /*--------------------------------------------------------------------
 **
 ** Returns the value at xdat of the function identified by fid.

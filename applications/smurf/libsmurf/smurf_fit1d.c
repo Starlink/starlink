@@ -161,11 +161,11 @@
 #define FIT1D__EXTTYPE  "SMURF_FIT1D"
 
 static void get_fit1par( int *axis, double *range,
-		      char *function, int *fid, int *ncomp, double *rms,
+		      char *function, smf_math_function *fid, int *ncomp, double *rms,
 		      double *critamp, double *critdisp,
 		      int *estimate_only, int *model_only, int *status );
 
-static void get_userval ( int in, int fid, int ncomp, AstKeyMap **usrvalmap,
+static void get_userval ( int in, smf_math_function fid, int ncomp, AstKeyMap **usrvalmap,
 			  smfArray *pardata, int *status );
 
 static void map_axis_to_wcs ( smfData *data, int axis, AstMapping **wcsmap,
@@ -218,7 +218,7 @@ void smurf_fit1d( int * status )
   int      axis = 0;             /* Axis to fit along */
   int      iaxis = 0;            /* 0-based axis nr to fit along */
   char     function[LEN__FUNC];  /* Function name */
-  int      fid;                  /* Function id */
+  smf_math_function fid;         /* Function id */
   int      lbnd[ NDF__MXDIM ];   /* Lower NDF pixel bounds */
   int      ubnd[ NDF__MXDIM ];   /* Upper NDF pixel bounds */
   double   range[2] = {0.0,0.0}; /* Range of coordinates to fit over */
@@ -444,7 +444,7 @@ void smurf_fit1d( int * status )
 
 
 static void get_fit1par( int *axis, double *range, char *function,
-                         int *fid, int *ncomp, double *rms,
+                         smf_math_function *fid, int *ncomp, double *rms,
                          double *critamp, double *critdisp,
                          int *estimate_only, int *model_only, int *status )
 /*
@@ -643,7 +643,7 @@ static void get_fit1par( int *axis, double *range, char *function,
 }
 
 
-static void get_userval ( int in, int fid, int ncomp, AstKeyMap **usrvalmap,
+static void get_userval ( int in, smf_math_function fid, int ncomp, AstKeyMap **usrvalmap,
 			  smfArray *pardata, int *status )
 /*
 ** User supplied values. The routine opens a keymap file with parameters
@@ -732,7 +732,7 @@ static void get_userval ( int in, int fid, int ncomp, AstKeyMap **usrvalmap,
 	msgOutiff( MSG__VERB, "", "... %c%d=%f  %d", status,
 		   cpar, icomp, (float) dval[0], (int) dval[1] );
       }
-      if ( fid != POLYNOMIAL ) {
+      if ( fid != SMF__MATH_POLYNOMIAL ) {
 	/*          indf =
 	** iplane = ploc[ipar];
 	** fill_parndfs_plane();

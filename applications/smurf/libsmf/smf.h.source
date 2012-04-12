@@ -1380,7 +1380,7 @@ void smf_lock_data( smfData *data, int lock, int *status );
 
 void smf_lock_related( smfArray *data, int lock, int *status );
 
-int  smf_lsqfit( int fid, const double xdat[], int xdim, const double ydat[], const float wdat[],
+int  smf_lsqfit( smf_math_function fid, const double xdat[], int xdim, const double ydat[], const float wdat[],
                  int ndat, double *fpar, double *epar, const int mpar[],
                  int npar, int ncomp, float tol, int its, float lab,
                  const int iopt[], const double dopt[] );
@@ -1423,17 +1423,17 @@ void smf_meanshift( double *indata, double *outdata, int nel, int stride, int bo
                     double box2, smf_qual_t *qual, smf_qual_t mask, float wlim,
                     int *status );
 
-void smf_math_functions( int fid, double xdat, const double fpar[], int ncomp,
+void smf_math_functions( smf_math_function fid, double xdat, const double fpar[], int ncomp,
 			 double *value, double *pderv, int *npar,
 			 const int iopt[], const double dopt[] __attribute__((unused)) );
 
-double smf_math_fvalue( int fid, double xdat, const double fpar[], int ncomp,
+double smf_math_fvalue( smf_math_function fid, double xdat, const double fpar[], int ncomp,
 			const int iopt[], const double dopt[] );
 
-void smf_math_fpderv( int fid, double xdat, const double fpar[], int ncomp,
+void smf_math_fpderv( smf_math_function fid, double xdat, const double fpar[], int ncomp,
 		      double *epar, const int iopt[], const double dopt[] );
 
-int smf_math_fnpar( int fid );
+int smf_math_fnpar( smf_math_function fid );
 
 void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         dim_t el, const double *dat,

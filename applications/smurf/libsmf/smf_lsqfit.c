@@ -15,13 +15,13 @@
 *     Subroutine
 
 *  Invocation:
-*       (int) smf_lsqfit( int fid, const double xdat[], int xdim, const double ydat[],
+*       (int) smf_lsqfit( smf_math_function fid, const double xdat[], int xdim, const double ydat[],
 *             const float wdat[], int ndat, double *fpar, double *epar,
 *             const int mpar[], int npar, int ncomp, float tol, int its,
 *             float lab, const int iopt[], const double dopt[] )
 
 *  Arguments:
-*     fid  = int       (Given)
+*     fid  = smf_math_function (Given)
 *        Function id (see smf_math_functions.c)
 *     xdat = const double []   (Given)
 *        Contains coordinates of data points. The fitted FWHM
@@ -172,14 +172,14 @@
 
 #if defined (TESTBED)
 
-static double smf_math_fvalue( int    fid,
+static double smf_math_fvalue( smf_math_function fid,
 			       double xdat,
 			       const double fpar[],
 			       int    ncomp,
 			       const int    iopt[],
 			       const double dopt[] __attribute__((unused)) );
 
-static void smf_math_fpderv( int fid,
+static void smf_math_fpderv( smf_math_function fid,
 			     double xdat,
 			     const double fpar[],
 			     int    ncomp,
@@ -187,7 +187,7 @@ static void smf_math_fpderv( int fid,
 			     const int    iopt[] __attribute__((unused)),
 			     const double dopt[] __attribute__((unused)) );
 
-static int smf_math_fnpar( int fid );
+static int smf_math_fnpar( smf_math_function fid );
 
 #else
 
@@ -292,7 +292,7 @@ static int  invmat( lsqData *lsq )
    return( 0 );					/* all is well */
 }
 
-static void getmat( int      fid ,
+static void getmat( smf_math_function fid ,
                     lsqData *lsq ,
                     const double   xdat[] ,
                     int      xdim ,
@@ -342,7 +342,7 @@ static void getmat( int      fid ,
    }
 }
 
-static int  getvec( int    fid ,
+static int  getvec( smf_math_function fid ,
                     lsqData *lsq ,
                     const double xdat[] ,
                     int    xdim ,
@@ -411,7 +411,7 @@ static int  getvec( int    fid ,
    return( 0 );
 }
 
-int  smf_lsqfit( int    fid ,
+int  smf_lsqfit( smf_math_function fid ,
 		 const double xdat[] ,
 		 int    xdim ,
 		 const double ydat[] ,
@@ -572,23 +572,23 @@ int  smf_lsqfit( int    fid ,
  * is developped for Gaussian noise patterns, it should not cause to
  * much problems. For Poison noise the algorithm is not suitable!
  */
-static double smf_math_fvalue( int    *fid,
+static double smf_math_fvalue( smf_math_function fid,
                       double *xdat,
                       double *fpar,
                       int    *ncomp,
                       int    *iopt,
                       double *dopt __attribute__((unused)) )
 /*
- * if *fid == 1:
+ * if fid == 1:
  * f(x) = a * exp( -1/2 * (x - b)^2 / s^2 ) + d (one-dimension Gauss)
- * if *fid == 2:
+ * if fid == 2:
  * f(x) = c0 + c1*x +  c2*x^2 + c3*x^3         (polynomial)
  */
 {
    double arg;
    double x = *xdat;
 
-   if (*fid == 1) {
+   if (fid == 1) {
       double a = fpar[1] - xdat[0];
       double b = fpar[2];
 
@@ -597,7 +597,7 @@ static double smf_math_fvalue( int    *fid,
    } else if (*fid == 2) {
 
       return( fpar[0] + fpar[1] * x + fpar[2] * x * x + fpar[3] * x * x * x );
-   } else if (*fid == 3) {
+   } else if (fid == 3) {
 
      /*      f = c * (x/a)^(b-1) * exp((-x/a)^b); Weibull curve */
 
@@ -608,7 +608,7 @@ static double smf_math_fvalue( int    *fid,
    return( 0.0 );
 }
 
-static void smf_math_fpderv( int    *fid,
+static void smf_math_fpderv( smf_math_function fid,
 		      double *xdat,
 		      double *fpar,
 		      int    *ncomp,
@@ -619,7 +619,7 @@ static void smf_math_fpderv( int    *fid,
    double arg;
    double x = *xdat;
 
-   if (*fid == 1) {
+   if (fid == 1) {
       double a = fpar[1] - xdat[0];
       double b = fpar[2];
 
@@ -628,13 +628,13 @@ static void smf_math_fpderv( int    *fid,
       epar[1] = -fpar[0] * epar[0] * a / b / b;
       epar[2] = fpar[0] * epar[0] * a * a / b / b / b;
       epar[3] = 1.0;
-   } else if (*fid == 2) {
+   } else if (fid == 2) {
 
       epar[0] = 1.0;
       epar[1] = x;
       epar[2] = x * x;
       epar[3] = x * x * x;
-   } else if (*fid == 3) {
+   } else if (fid == 3) {
 
       arg = fpar[2] * x;
       double f = fpar[0] +pow(x,fpar[1]) * exp( -arg );
@@ -645,8 +645,8 @@ static void smf_math_fpderv( int    *fid,
 }
 
 
-static int smf_math_fnpar( int *fid ) {
-  if (*fid < 3 )
+static int smf_math_fnpar( smf_math_function fid ) {
+  if (fid < 3 )
     return(4);
   else
     return(3);
@@ -660,7 +660,7 @@ int main( )
    int   its = 50;
    int   ndat = 30;
    int   nfit;
-   int   fid = 1;
+   smf_math_function fid = 1;
 #if defined (POLY)
    fid = 2;
 #endif

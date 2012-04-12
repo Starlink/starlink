@@ -14,12 +14,12 @@
 *     Subroutine
 
 *  Invocation:
-*       void  smf_math_functions( int fid, double xdat, const double fpar[],
+*       void  smf_math_functions( smf_math_function fid, double xdat, const double fpar[],
 *             int ncomp, double *value, double *deriv, int *npar,
 *             const int iopt[], const double dopt[] );
 
 *  Arguments:
-*     fid  = int Given
+*     fid  = smf_math_function Given
 *        function identifier
 *     xdat = double Given
 *        coordinate to evaluate function at
@@ -47,13 +47,12 @@
 *     function (see below).
 *
 *     Currently the following functions are supported:
-*        fid
-*         1 = 1-D Gaussian,
-*         2 = 1-D Gaussian-hermite 1 (skewed gaussian),
-*         3 = 1-D Gaussian-Hermite 2 (skewed and peaky gaussian),
-*         4 = 1-D Voigt  (Gaussian+Lorentzian)
-*         5 = 1-D Histogram (semi-Poisson)
-*         6 = 1-D Polynomial
+*         SMF__MATH_GAUSS         = 1-D Gaussian,
+*         SMF__MATH_GAUSSHERMITE1 = 1-D Gaussian-hermite 1 (skewed gaussian),
+*         SMF__MATH_GAUSSHERMITE2 = 1-D Gaussian-Hermite 2 (skewed and peaky gaussian),
+*         SMF__MATH_VOIGT         = 1-D Voigt  (Gaussian+Lorentzian)
+*         SMF__MATH_HISTOGRAM     = 1-D Histogram (semi-Poisson)
+*         SMF__MATH_POLYNOMIAL    = 1-D Polynomial
 *
 *     Ncomp can be used to evaluate Sum(function): a profile that
 *     consists of e.g. multiple gaussians. In that case fpar should have
@@ -71,7 +70,7 @@
 *     NULL in the iopt location.
 *
 *  Example calculate a single gaussian at 'x':
-*        int fid = 0;
+*        int fid = SMF__MATH_GAUSS;
 *        double xdat = x;
 *        int ncomp = 1;
 *        int iopt[] = { 1 };
@@ -107,7 +106,7 @@
 *     be assumed to be 1 if ncomp = 0. Thus
 *
 *     int npar;
-*     int fid = 0;
+*     int fid = SMF__MATH_GAUSS;
 *     smf_math_func( fid, NULL, NULL, NULL, NULL, NULL, &npar,
 *                    NULL, NULL );
 *     will return npar = 3 as the number of parameters of a single
@@ -120,13 +119,13 @@
 *   DISP * 2.0*sqrt[2.0*log(2.0)] for a Gaussian -- )
 *
 *
-*     - Gaussian (fid=0 ):
+*     - Gaussian (fid=SMF__MATH_GAUSS ):
 *              fpar = { Amp A, Xcen xc, Disp s }
 *                 g = (x-xc)/s
 *                 f = A * Exp[ -0.5 * g^2 ]
 *
 *
-*     - Gaussian-Hermite "1" (fid=1):
+*     - Gaussian-Hermite "1" (fid=SMF__MATH_GAUSSHERMITE1):
 *              fpar = { Amp A, Xcen xc, Disp s, herm3 h3  }
 *                 g = (x-xc)/s
 *                 f =  A * Exp[ -0.5 * g^2 ] *
@@ -134,7 +133,7 @@
 *              with c1 =-sqrt(3.0), c3 = 2.0*sqrt(3.0)/3.0,
 *
 *
-*     - Gaussian-Hermite "2" (fid=2):
+*     - Gaussian-Hermite "2" (fid=SMF__MATH_GAUSSHERMITE2):
 *              fpar = { Amp A, Xcen xc, Disp s, herm3 h3, herm4 h4 }
 *                 g = (x-xc)/s
 *                 f = A * Exp[ 0.5 * g^2 ] *
@@ -144,7 +143,7 @@
 *              c0 = sqrt(6.0)/4.0, c2 = -sqrt(6.0), c4 = sqrt(6.0)/3.0
 *
 *
-*     - Voit (fid=3):
+*     - Voit (fid=SMF__MATH_VOIGT):
 *              fpar = { Amp A, Xcen xc, Disp s, Lor l  }
 *                 V = Integral {Gaussian * Lorentzian }
 *                 g = (x-xc)/s
@@ -152,7 +151,7 @@
 *                 Lorentzian = l / pi*(g^2+l^2)
 *
 *
-*    - Polynomial (fid = 4):
+*    - Polynomial (fid=SMF__MATH_POLYNOMIAL):
 *              fpar = { c0, c1, c2, c3, c4, ....)
 *                 f = c0 + c1*x + c2*x^2 + c3*x^3 + ....
 *      Note: ncomp = order of the polynomial(!). For compatibility
@@ -160,7 +159,7 @@
 *      it will return -1.
 *
 *
-*    - Histogram (fid=5):
+*    - Histogram (fid=SMF__MATH_HISTOGRAM):
 *              fpar = { Amp A, Nu n, Beta a }
 *                 f = A * x^n * exp(-b * x)
 *      Values for iopt other than -1 will be ignored.
@@ -182,6 +181,8 @@
 *        Starlink version
 *     2012-04-10 (TIMJ):
 *        Use const and stop using unnecessary pointers.
+*     2012-04-11 (TIMJ):
+*        Use an enum for fid values.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -267,7 +268,7 @@ static void histderv( double  X, const double fpar[], double *epar, int ncomp);
 
 
 /* Returns function value at xdat */
-void smf_math_functions( int     fid,
+void smf_math_functions( smf_math_function fid,
 			 double  xdat,
 			 const double fpar[],
 			 int     ncomp,
@@ -298,39 +299,39 @@ void smf_math_functions( int     fid,
   if ( npar != NULL ) {
 
     /* Get number of parameters for basic function */
-    if (fid == GAUSSHERMITE1)
+    if (fid == SMF__MATH_GAUSSHERMITE1)
       *npar = (int) ( gausshermiteh3( X, fpar, ncomp, &nopt ) + 0.5 );
-    else if (fid == GAUSSHERMITE2)
+    else if (fid == SMF__MATH_GAUSSHERMITE2)
       *npar = (int) ( gausshermiteh3h4( X, fpar, ncomp, &nopt ) + 0.5 );
-    else if (fid == VOIGT)
+    else if (fid == SMF__MATH_VOIGT)
       *npar = (int) ( voigt( X, fpar, ncomp, &nopt ) + 0.5 );
-    else if (fid == POLYNOMIAL)
+    else if (fid == SMF__MATH_POLYNOMIAL)
       *npar = (int) ( polynomial( X, fpar, ncomp, &nopt ) + 0.5 );
-    else if (fid == HISTOGRAM)
+    else if (fid == SMF__MATH_HISTOGRAM)
       *npar = (int) ( histogram( X, fpar, ncomp, &nopt ) + 0.5 );
     else
       /* default to GAUSS */
       *npar = (int) ( gauss( X, fpar, ncomp, &nopt ) + 0.5 );
 
     /* Multiple with the number of instances of the function */
-    if ( ncomp > 0 && fid != POLYNOMIAL ) *npar *= ncomp;
+    if ( ncomp > 0 && fid != SMF__MATH_POLYNOMIAL ) *npar *= ncomp;
 
     if ( iopt != NULL && iopt[0] == 1 &&
-         fid != POLYNOMIAL && fid != HISTOGRAM ) *npar += 3;
+         fid != SMF__MATH_POLYNOMIAL && fid != SMF__MATH_HISTOGRAM ) *npar += 3;
 
   }
 
   if ( value != NULL ) {
 
-    if (fid == GAUSSHERMITE1)
+    if (fid == SMF__MATH_GAUSSHERMITE1)
       *value = gausshermiteh3( X, fpar, ncomp, iopt );
-    else if (fid == GAUSSHERMITE2)
+    else if (fid == SMF__MATH_GAUSSHERMITE2)
       *value = gausshermiteh3h4( X, fpar, ncomp, iopt );
-    else if (fid == VOIGT)
+    else if (fid == SMF__MATH_VOIGT)
       *value = voigt( X, fpar, ncomp, iopt );
-    else if (fid == POLYNOMIAL)
+    else if (fid == SMF__MATH_POLYNOMIAL)
       *value = polynomial( X, fpar, ncomp, iopt );
-    else if (fid == HISTOGRAM)
+    else if (fid == SMF__MATH_HISTOGRAM)
       *value = histogram( X, fpar, ncomp, iopt );
     else
       /* default to GAUSS */
@@ -340,15 +341,15 @@ void smf_math_functions( int     fid,
 
   if ( pderv != NULL ) {
 
-    if (fid == GAUSSHERMITE1)
+    if (fid == SMF__MATH_GAUSSHERMITE1)
       gausshermiteh3derv( X, fpar, pderv, ncomp, iopt );
-    else if (fid == GAUSSHERMITE2)
+    else if (fid == SMF__MATH_GAUSSHERMITE2)
       gausshermiteh3h4derv( X, fpar, pderv, ncomp, iopt );
-    else if (fid == VOIGT)
+    else if (fid == SMF__MATH_VOIGT)
       voigtderv( X, fpar, pderv, ncomp, iopt );
-    else if (fid == POLYNOMIAL)
+    else if (fid == SMF__MATH_POLYNOMIAL)
       polyderv( X, pderv, ncomp );
-    else if (fid == HISTOGRAM)
+    else if (fid == SMF__MATH_HISTOGRAM)
       histderv( X, fpar, pderv, ncomp );
     else
       /* default to GAUSS */

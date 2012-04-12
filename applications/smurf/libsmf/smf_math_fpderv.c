@@ -12,11 +12,11 @@
 *     Subroutine
 
 *  Invocation:
-*       void smf_math_fpderv( int fid, double xdat, const double fpar[], int ncomp,
+*       void smf_math_fpderv( smf_math_function fid, double xdat, const double fpar[], int ncomp,
 *                             double *epar, const int iopt[], double dopt[] );
 
 *  Arguments:
-*     fid  = int Given
+*     fid  = smf_math_function Given
 *        function identifier
 *     xdat = double Given
 *        coordinate to evaluate function at
@@ -96,7 +96,7 @@
 #include "smurf_par.h"
 #include "smurf_typ.h"
 
-void smf_math_fpderv( int fid, double xdat, const double fpar[], int ncomp,
+void smf_math_fpderv( smf_math_function fid, double xdat, const double fpar[], int ncomp,
 		      double *epar, const int iopt[], const double dopt[] )
 /*--------------------------------------------------------------------
 **
