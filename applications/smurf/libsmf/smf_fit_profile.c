@@ -267,7 +267,8 @@ void smf_fit_profile( smfData  *data, int axis, int range[], int ncomp,
 
   /* Tell user what we're fitting */
   msgOutiff(MSG__VERB," ", "Fitting data using %d %s(s) over [%d,%d]",
-	    status, ncomp, fcntrl->function, range[0],range[1]);
+	    status, ncomp, smf_mathfunc_str(fcntrl->fid, status),
+            range[0],range[1]);
 
   /* Pointer to first parameter NDF data struct */
   cdata = pardata->sdata[0];
@@ -474,7 +475,6 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
   void           *indata;            /* Pointer to sdata array */
   int             istart = 0;        /* Index number into data for thread */
   int             range[2];          /* Pixel range to fit over */
-  char            function[LEN__FUNC];    /* Function to fit */
   smf_math_function fid;             /* Integer id for function */
   int             ncomp = 1;         /* Number of functions in each profile */
   smfArray       *pardata = NULL;    /* Array with parameter data pointers */
@@ -541,7 +541,6 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
   fcntrl    = jdata->fcntrl;
   pardata   = jdata->pardata;
 
-  star_strlcpy(function, fcntrl->function,LEN__FUNC);
   fid           = fcntrl->fid;
   rms           = fcntrl->rms;
   critamp       = fcntrl->critamp;
@@ -556,7 +555,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 
   msgOutiff(MSG__DEBUG, " ",
 	    "(FitProfileThread %d) ...Function %s (fid %d) npar = %d",
-	    status, ijob, function, (int) fid, (int) npar);
+	    status, ijob, smf_mathfunc_str(fid,status), (int) fid, (int) npar);
 
   /* Check the job nr and dstride */
   if ( (ijob > 1) && (dstride != 1 ) ) {

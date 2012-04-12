@@ -22,9 +22,6 @@
 /* The exp(arg) will be set to 0.0 for arg smaller than this */
 #define MINARG        -16
 
-/* FUNCTIONS */
-#define LEN__FUNC      20     /* Max strlen for function name */
-
 /* Number of planes in the FIT1D parameter files; use a fixed rather
    than dynamic number so that fits of different types can be combined */
 #define NPAR           7
@@ -32,7 +29,6 @@
 /* Fit control struct */
 typedef struct {
   smf_math_function fid;          /* Function identifier */
-  char   function[LEN__FUNC];     /* Function name */
   int    fitmask[MAXPAR];         /* Fit mask: 1: fit; 0: fixed */
   double clip[2];                 /* Clip levels for data */
   double rms;                     /* RMS in data */

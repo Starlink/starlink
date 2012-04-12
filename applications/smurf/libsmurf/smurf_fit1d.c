@@ -161,7 +161,7 @@
 #define FIT1D__EXTTYPE  "SMURF_FIT1D"
 
 static void get_fit1par( int *axis, double *range,
-		      char *function, smf_math_function *fid, int *ncomp, double *rms,
+		      smf_math_function *fid, int *ncomp, double *rms,
 		      double *critamp, double *critdisp,
 		      int *estimate_only, int *model_only, int *status );
 
@@ -187,7 +187,7 @@ static void setup_parameter_ndfs ( smfData *data, int axis, int ncomp,
 
 static void copy_parameter_ndfs ( smfArray *pardata, int *status );
 
-static void convert_fitted_values( smfData *data, const char *function,
+static void convert_fitted_values( smfData *data,
                             int axis, int ncomp, AstMapping **wcsmap,
                             smfArray *pardata, int *status );
 
@@ -217,7 +217,6 @@ void smurf_fit1d( int * status )
 
   int      axis = 0;             /* Axis to fit along */
   int      iaxis = 0;            /* 0-based axis nr to fit along */
-  char     function[LEN__FUNC];  /* Function name */
   smf_math_function fid;         /* Function id */
   int      lbnd[ NDF__MXDIM ];   /* Lower NDF pixel bounds */
   int      ubnd[ NDF__MXDIM ];   /* Upper NDF pixel bounds */
@@ -258,7 +257,7 @@ void smurf_fit1d( int * status )
   if (*status != SAI__OK) goto CLEANUP;
 
   /* Extract read user supplied values using a keymap */
-  get_fit1par( &axis, range, function, &fid, &ncomp,
+  get_fit1par( &axis, range, &fid, &ncomp,
 		   &rms, &critamp, &critdisp, &estimate_only, &model_only,
 		   status );
 
@@ -371,7 +370,6 @@ void smurf_fit1d( int * status )
     msgOutiff(MSG__DEBUG, " ", "Populate %s control struct", status,
 	      FUNC_NAME);
 
-    star_strlcpy( fcntrl.function, function, LEN__FUNC);
     fcntrl.fid      = fid;
     for (i = 0; i < MAXPAR; i++) {
       fcntrl.fitmask[i] = 1;
@@ -395,7 +393,7 @@ void smurf_fit1d( int * status )
     /* The fit returns results (centre, dispersion) in pixels. Convert
        those back to coordinates */
     msgOutiff(MSG__VERB, " ", "Converting fitted values", status);
-    convert_fitted_values( data, function, (int) axis, (int) ncomp,
+    convert_fitted_values( data, (int) axis, (int) ncomp,
 			   &wcsmap, pardata, status );
 
     /* Set character labels */
@@ -443,7 +441,7 @@ void smurf_fit1d( int * status )
 /* *** END OF MAIN *** */
 
 
-static void get_fit1par( int *axis, double *range, char *function,
+static void get_fit1par( int *axis, double *range,
                          smf_math_function *fid, int *ncomp, double *rms,
                          double *critamp, double *critdisp,
                          int *estimate_only, int *model_only, int *status )
@@ -503,15 +501,13 @@ static void get_fit1par( int *axis, double *range, char *function,
     range[1] = VAL__BADD;
   }
 
-  if ( function ) {
+  {
     const char * strpntr = NULL;
     astMapGet0C( keymap, "FUNCTION", &strpntr );
     if (*status == SAI__OK && strpntr ) {
       *fid = smf_mathfunc_fromstring( strpntr, status );
-      one_strlcpy( function, smf_mathfunc_str( *fid, status ),
-                   LEN__FUNC, status );
       msgOutiff( MSG__VERB, "", "... FUNCTION=%s (id: %d)", status,
-                 function, *fid );
+                 smf_mathfunc_str( *fid, status ), *fid );
     } else {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Failed to get parameter FUNCTION from config file",
@@ -1129,7 +1125,7 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
 }
 
 
-static void convert_fitted_values( smfData *data, const char *function,
+static void convert_fitted_values( smfData *data,
 			  int axis, int ncomp, AstMapping **wcsmap,
 			  smfArray *pardata, int *status )
 /*
