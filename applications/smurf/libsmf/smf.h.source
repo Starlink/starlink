@@ -898,7 +898,7 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype oldtype, smf_dtype newtype,
                             int freeOld, int * status );
 
 void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
-			    size_t ndims, size_t * dims, size_t * perm,
+			    size_t ndims, dim_t * dims, size_t * perm,
 			    int inPlace, int freeOld, int * status );
 
 smfDA * smf_deepcopy_smfDA ( const smfData *old, int cpdks, int * status);

@@ -16,7 +16,7 @@
 
 *     newbuf =  smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype,
 *                                    size_t ndata, size_t ndims,
-*                                    size_t * dims, size_t * perm,
+*                                    dim_t * dims, size_t * perm,
 *                                    int inPlace, int freeOld,
 *                                    int * status )
 
@@ -30,7 +30,7 @@
 *        Number of elements in oldbuf
 *     ndims = size_t (Given)
 *        Number of dimensions
-*     dims = size_t * (Given)
+*     dims = dim_t * (Given)
 *        Number of pixels along each dimension in input data. Array
 *        of dimension ndims.
 *     perm = size_t * (Given)
@@ -107,7 +107,7 @@
 #define FUNC_NAME "smf_dataOrder_ndims"
 
 void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
-                            size_t ndims, size_t * dims, size_t * perm,
+                            size_t ndims, dim_t * dims, size_t * perm,
                             int inPlace, int freeOld, int * status ) {
 
   size_t sz = 0;        /* Size of data type */
