@@ -1,4 +1,5 @@
-#!/usr/bin/env starperl   # -*- cperl -*-
+#!/local/perl/bin/perl
+##/usr/bin/env starperl   # -*- cperl -*-
 
 =head1 NAME
 
@@ -103,10 +104,12 @@ use warnings;
 use File::Basename;
 use File::Find;
 use File::Spec;
+use DateTime;
 use Cwd;
 
 # Load in the SDF module
 use Astro::FITS::Header::NDF;
+use Astro::FITS::HdrTrans qw/ translate_from_FITS /;
 use NDF;
 
 # Astrometry
@@ -373,6 +376,7 @@ sub sdf_header {
 # Branch between SCUBA, SCUBA2 and ACSIS
 
     my $cur_obs = "";
+
     if ($fitsitem->{INSTRUME} =~ /^scuba$/i) {
       print "SCUBA observation\n" if ($debug);
       $cur_obs =
@@ -382,40 +386,61 @@ sub sdf_header {
 
       print "SCUBA-2 observation\n" if ($debug);
 
-      # Find sub-files of observation
-      opendir( my $ODIR,"${path}" ) or die "Can't open observation '${path}'! : $!\n";
-      my @subfiles = sort
-          grep( /s\d\w\d{8}_\d{5}_\d{4}/,grep(/sdf/, readdir($ODIR)) );
-      closedir($ODIR);
+      my $fitsitem2;
 
-      # Skip the initial DARK
-      if ($#subfiles > 0) {
-        my $basename = $subfiles[1];
-        $basename =~ s/\.sdf$//;
-        $sdffile = File::Spec->catfile($path, $basename);
-        print "Read non-dark file: $sdffile\n" if ($debug);
-        $fitsitem = read_fits_header($sdffile);
-        return "" unless defined $fitsitem;
-      }
+      # No need to scan the directory for these types with abrev. headers
+      if ( $fitsitem->{OBS_TYPE} =~ /^ramp$/i or
+           $fitsitem->{OBS_TYPE} =~ /^setup$/i or
+           ($fitsitem->{OBS_TYPE} =~ /^noise$/i and
+            $fitsitem->{OBJECT} =~ /^dark$/i ) ) {
 
-      # Try reading the last non-DARK file as well
-      my $fitsitem2 = $fitsitem;
-      my $listlast = $#subfiles;
-      my $found = 0;
-      while ($found == 0 && $listlast > 0 &&
-             $fitsitem->{OBS_TYPE} ne "flatfield" ) {
-        my $basename2 = $subfiles[$listlast];
-        $basename2 =~ s/\.sdf$//;
-        my $sdffile2 = File::Spec->catfile($path, $basename2);
-        print "Read last non-dark file: $sdffile2\n" if ($debug);
-        $fitsitem2 = read_fits_header( $sdffile2 );
-        if (defined $fitsitem2) {
-          if ( $fitsitem2->{AZEND} &&
-               $fitsitem2->{ELEND}) {
-            $found = 1;
+        print "Read header non-science file: $sdffile\n" if ($debug);
+        $fitsitem2 = $fitsitem;
+
+      } else {
+
+        # Find sub-files of observation
+        opendir( my $ODIR,"${path}" ) or die "Can't open observation '${path}'! : $!\n";
+        my @subfiles = sort
+            grep( /s\d\w\d{8}_\d{5}_\d{4}/,grep(/sdf/, readdir($ODIR)) );
+        closedir($ODIR);
+
+        # Try reading the first "science" file
+        my $listfirst = 0;
+        my $found = 0;
+        while ( $found == 0 && $listfirst <= $#subfiles ) {
+          my $basename = $subfiles[$listfirst];
+          $basename =~ s/\.sdf$//;
+          my $sdffile = File::Spec->catfile($path, $basename);
+          print "Read header first science file: $sdffile" if ($debug);
+          $fitsitem = read_fits_header( $sdffile );
+          if (defined $fitsitem) {
+            $found = 1 if ( $fitsitem->{AZSTART} && $fitsitem->{ELSTART} );
+            print " ... (FOUND= $found)\n" if($debug);
 	  }
-	}
-        $listlast--;
+          $listfirst++;
+        }
+
+        # Try reading the last "science" file as well
+        $fitsitem2 = $fitsitem;
+
+        if ( $found ) {
+
+          my $listlast = $#subfiles;
+          $found = 0;
+          while ( $found == 0 && $listlast > 0 ) {
+            my $basename2 = $subfiles[$listlast];
+            $basename2 =~ s/\.sdf$//;
+            my $sdffile2 = File::Spec->catfile($path, $basename2);
+            print "Read header last science file: $sdffile2" if ($debug);
+            $fitsitem2 = read_fits_header( $sdffile2 );
+            if (defined $fitsitem2) {
+              $found = 1 if ( $fitsitem2->{AZEND} && $fitsitem2->{ELEND} );
+              print " ... (FOUND= $found)\n" if($debug);
+	    }
+            $listlast--;
+          }
+        }
       }
 
       $cur_obs =
@@ -483,13 +508,19 @@ sub acsis_header {
     do {foreach (keys %$fitsitem) { print "$_\n";}} if (defined $debug && $debug > 1);
 
     my $rx     = lc($fitsitem->{INSTRUME});
-    $rx     =~ s/harpb/harp/;
+    $rx     =~ s/harpb/ha/;
     $rx     =~ s/^fe_//;
     $rx     =~ s/^rx//i;
     $rx     =~ s/^scuba-2/scu/i;
     my $freq   = sprintf("%.1f", $fitsitem->{RESTFREQ});
     my $cfreq  = "${rx}/${freq}";
     my $fmt = '%.2f';
+    if ($fitsitem->{VELOCITY} < 0.0 ) {
+      $fmt = '%.1f';
+    }
+    if ($fitsitem->{VELOCITY} > 100.0 ) {
+      $fmt = '%.1f';
+    }
     if ($fitsitem->{VELOCITY} > 1000.0 ) {
       $fmt = '%.0f';
     }
@@ -521,22 +552,22 @@ sub acsis_header {
 
     # Declare formats here since it has to be in scope of the lexical variables
 format STDOUT_SHORT_ACS =
-@<<<<< UT  Projid     Mode     Source  Intt/Stp Tau  WVM  Rx/Freq   Vel/Velsys
+@<<<<< UT  Projid     Mode     Source  Intt/Stp  Tau  WVM  Rx/Freq   Vel/Velsys
 $origin
 .
 
 format STDOUT_LONG_ACS =
-@<<<<< UT  Projid     Mode     Source  Intt/Stp Tau   WVM   Rx/Freq   Vel/Velsys   Az    El    Uaz   Uel   Bwmode
+@<<<<< UT  Projid     Mode     Source               Intt/Stp   Tau   WVM  Rx/Freq   Vel/Velsys    Az    El   Uaz    Uel  Bwmode
 $origin
 .
 
 format SHORT_ACS =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @>>>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @>>>/@<< @<<< @<<< @<<<<<<< @>>>>>>>>>>>
 $A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{OBJECT}, $intt, $step, $A{CSOTAU}, $A{WVMTAU}, $cfreq, $cvref
 .
 
 format LONG_ACS =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<< @>>>>>>>>>>>
+@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<<<<<<<<<<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<< @>>>>>>>>>>> @<<<< @<<<< @<<<<< @<<<<< @>>>>>>>>>>>
 $A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{OBJECT}, $intt, $step, $A{LCSOTAU}, $A{LWVMTAU}, $cfreq, $cvref, $A{AZ}, $A{EL}, $A{UAZ}, $A{UEL}, $bwmode
 .
 
@@ -581,8 +612,8 @@ sub scuba2_header {
     my $sdffile = File::Spec->catfile($path, $basename);
     do {foreach (keys %$fitsitem) { print "$_\n";}} if (defined $debug && $debug > 1);
 
-    my $filter  = $fitsitem->{FILTER};
-    my $step = int(1000*$fitsitem->{STEPTIME}) . "ms";
+#    my $filter  = $fitsitem->{FILTER};
+#    my $step = int(1000*$fitsitem->{STEPTIME}) . "ms";
 
     my ($mapx, $mapy);
     my $mpx = $fitsitem->{MAP_WDTH};
@@ -610,7 +641,7 @@ sub scuba2_header {
     $mapx =~ s/^\s+// if $mapx;
     $mapy =~ s/^\s+// if $mapy;
 
-    my $map = "";
+    my $map = "    n/a";
     $map = sprintf "%5sx%-5s", $mapx, $mapy if (defined $mapx && defined $mapy);
 
     my %S = calc_shared_scuba2_acsis( $fitsitem, $fitsitem2 );
@@ -628,25 +659,26 @@ sub scuba2_header {
 
 #    print "$S{RUN} $mode $S{UT} \'$S{OBJECT}\' $S{PROJECT} $rx $boloms $filter $S{CSOTAU} $S{SEEING}\n";
 
-    # Declare formats here since it has to be in scope of the lexical variables
-format SHORT_SCU2 =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @<<<<<<<<<<< @<<<< @<<< @<<< @<<<  @<<<<
-$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $S{OBJECT}, $map, $step, $S{CSOTAU}, $S{WVMTAU},$S{SEEING}, $filter
-.
-
-format LONG_SCU2 =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<< @<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<  @<<<<< @<<<< @<<<< @<<<< @<<<<
-$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $S{OBJECT}, $map, $step, $S{LCSOTAU}, $S{LWVMTAU}, $S{LSEEING}, $filter, $S{AZ}, $S{EL}, $S{UAZ}, $S{UEL}
-.
 
 format STDOUT_SHORT_SCU2 =
-@<<<<< UT  Projid     Mode     Source      Map      Step  Tau  WVM  See  Fltr
+@<<<<< UT  Projid     Mode      Source            Map     Secs  Tau    WVM  See
 $origin
 .
 
 format STDOUT_LONG_SCU2 =
-@<<<<< UT  Projid     Mode     Source      Map     Step  Tau   WVM   See   Fltr    Az    El    Uaz   Uel
+@<<<<< UT  Projid     Mode      Source                   Map       Secs   Tau     WVM  See       Az    El   Uaz    Uel
 $origin
+.
+
+    # Declare formats here since it has to be in scope of the lexical variables
+format SHORT_SCU2 =
+@<< @<<<<< @<<<<<<<<< @<<<<<<<  @<<<<<<<<<<<< @<<<<<<<<<< @<<<< @<<<< @<<< @<<<
+$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $S{OBJECT}, $map, $S{OBSTIME}, $S{CSOTAU}, $S{WVMTAU},$S{SEEING}
+.
+
+format LONG_SCU2 =
+@<< @<<<<< @<<<<<<<<< @<<<<<<<  @<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<< @<<<< @<<<<  @<<<< @<<<<  @<<<<< @<<<< @<<<<< @<<<<<
+$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $S{OBJECT}, $map, $S{OBSTIME}, $S{LCSOTAU}, $S{LWVMTAU}, $S{LSEEING}, $S{AZ}, $S{EL}, $S{UAZ}, $S{UEL}
 .
 
     # Set format
@@ -719,7 +751,7 @@ sub scuba_header {
 
     # Set format
 format STDOUT_LONG_SCU =
-@<<<<< UT Mode     Projid   Source    Me/Int Tau  See  Filter    Bolometers      Az    El    Uaz   Uel
+@<<<<< UT Mode     Projid   Source    Me/Int Tau  See  Filter    Bolometers      Az    El    Uaz    Uel
 $origin
 .
 format STDOUT_SHORT_SCU =
@@ -740,17 +772,17 @@ format SHORT_SKYDIP =
 $run, $ut, $mode, $projid, $n_meas, $n_int, $csotau, $seeing, $filter
 .
 format LONG_SCU =
-@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
+@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<< @<<<< @<<<< @<<<<< @<<<<<
 $run, $ut, $mode, $projid, $object, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms, $az, $el, $uaz, $uel
 .
 
 format LONG_NOISE =
-@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
+@<< @<<<< @<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<<<<< @<<<< @<<<< @<<<<< @<<<<<
 $run, $ut, $mode, $projid, $fitsitem->{OBJ_TYPE}, $n_meas, $n_int, $csotau, $seeing, $filter, $boloms, $az, $el, $uaz, $uel
 .
 
 format LONG_SKYDIP =
-@<< @<<<< @<<<<<<< @<<<<<<< SKY       @>/@<< @<<< @<<< @<<<<<<<< PHOT. PIXELS    @<<<< @<<<< @<<<< @<<<<
+@<< @<<<< @<<<<<<< @<<<<<<< SKY       @>/@<< @<<< @<<< @<<<<<<<< PHOT. PIXELS    @<<<< @<<<< @<<<<< @<<<<<
 $run, $ut, $mode, $projid, $n_meas, $n_int, $csotau, $seeing, $filter, $az, $el, $uaz, $uel
 .
 
@@ -854,6 +886,7 @@ sub gsd_header {
       $freq   = 0.01 * int(100.0*$gsditem{C12RF}->[0]+0.5);
     }
     my $cfreq  = "${rx}/$freq";
+
     my $vel    = 0.01 * int(100.0*$gsditem{C7VR}+0.5);
     my $cvref = "$vel" . "/" . substr(lc($gsditem{C12VDEF}),0,3) .
 	lc($gsditem{C12VREF});
@@ -878,12 +911,12 @@ $origin
 .
 
 format STDOUT_LONG_HET =
-@<<<<<<<< UT       Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys   Az    El    Uaz   Uel
+@<<<<<<<< UT       Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys   Az    El    Uaz    Uel
 $origin
 .
 
 format STDOUT_LONG_HET2 =
-@<<<<< UT  Projid     Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys   Az    El    Uaz   Uel
+@<<<<< UT  Projid     Mode     Source   Sec/Cyc Tau  See  Rx/Freq   Vel/Velsys   Az    El    Uaz    Uel
 $origin
 .
 
@@ -898,12 +931,12 @@ $run, substr($ut,9,5), $projid, $mode, $object, $n_meas, $n_int, $csotau, $seein
 .
 
 format LONG_HET =
-@<< @<<<<<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
+@<< @<<<<<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<<< @<<<<<
 $run, $ut, $mode, $object, $n_meas, $n_int, $csotau, $seeing, $cfreq, $cvref, $az, $el, $uaz, $uel
 .
 
 format LONG_HET2 =
-@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<< @<<<<
+@<< @<<<<< @<<<<<<<<< @<<<<<<< @<<<<<<<< @>/@<< @<<< @<<< @<<<<<<<< @<<<<<<<<<<< @<<<< @<<<< @<<<<< @<<<<<
 $run, substr($ut,9,5), $projid, $mode, $object, $n_meas, $n_int, $csotau, $seeing, $cfreq, $cvref, $az, $el, $uaz, $uel
 .
 
@@ -1011,24 +1044,38 @@ sub calc_shared_scuba2_acsis {
   $results{DATETIME} = "$date $results{UT}";
   $results{OBSTYPE}  = uc($fitsitem->{OBS_TYPE});
   $results{OBJECT}   = (defined $fitsitem->{OBJECT} ? lc($fitsitem->{OBJECT}) : "");
+  $results{OBJECT} =~ s/\s+//g;
 
   my $az     = (defined $fitsitem->{AZSTART} ?
-                0.5*($fitsitem->{AZSTART}+$fitsitem2->{AZEND}) : "" );
+                sprintf("%6.2f",0.5*($fitsitem->{AZSTART}+$fitsitem2->{AZEND})) :
+                sprintf("%6s","n/a") );
   my $el     = (defined $fitsitem->{ELSTART} ?
-                0.5*($fitsitem->{ELSTART}+$fitsitem2->{ELEND}) : "" );
+                sprintf("%5.2f",0.5*($fitsitem->{ELSTART}+$fitsitem2->{ELEND})) :
+                sprintf("%5s","n/a") );
 
   $results{AZ}     = $az;
   $results{EL}     = $el;
-  $results{UAZ}    = (defined $fitsitem->{UAZ} ? $fitsitem->{UAZ} : "" );
-  $results{UEL}    = (defined $fitsitem->{UEL} ? $fitsitem->{UEL} : "" );
+  $results{UAZ}    = (defined $fitsitem->{UAZ} ?
+                      sprintf("%5.1f",1.0*$fitsitem->{UAZ}) :
+                      sprintf("%5s","n/a") );
+  $results{UEL}    = (defined $fitsitem->{UEL} ?
+                      sprintf("%5.1f",1.0*$fitsitem->{UEL}) :
+                      sprintf("%5s","n/a") );
 
-  my $seeing = " n/a";
-  my $csotau = " n/a";
-  my $wvmtau = " n/a";
+  # Convert timestamps
+  my %genitem  = translate_from_FITS( $fitsitem );
+  my %genitem2 = translate_from_FITS( $fitsitem2 );
+
+  my $obstime = " n/a";
+  my $seeing  = " n/a";
+  my $csotau  = " n/a";
+  my $wvmtau  = " n/a";
   my $lseeing = " n/a";
   my $lcsotau = " n/a";
   my $lwvmtau = " n/a";
 
+  $obstime = $genitem2{UTEND} - $genitem{UTSTART}
+    if (defined $genitem2{UTEND} and defined $genitem{UTSTART});
   $seeing = 0.01 * int(100.0*
                        0.5*($fitsitem->{SEEINGST}+$fitsitem2->{SEEINGEN})+0.5)
     if defined $fitsitem->{SEEINGST};
@@ -1049,6 +1096,7 @@ sub calc_shared_scuba2_acsis {
     if defined $fitsitem->{WVMTAUST};
 
   %results = ( %results,
+               OBSTIME => sprintf("%4d",$obstime),
                SEEING => $seeing,
                CSOTAU => $csotau,
                WVMTAU => $wvmtau,
