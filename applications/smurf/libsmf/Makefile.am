@@ -262,6 +262,8 @@ smf_lsqfit.c \
 smf_makefitschan.c \
 smf_maketanmap.c \
 smf_map_getpixsize.c \
+smf_mathfunc_fromstring.c \
+smf_mathfunc_str.c \
 smf_math_functions.c \
 smf_math_fvalue.c \
 smf_math_fpderv.c \

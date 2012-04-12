@@ -24,13 +24,6 @@
 
 /* FUNCTIONS */
 #define LEN__FUNC      20     /* Max strlen for function name */
-#define NFUNC           6     /* Number of defined functions */
-static const char *FUNCTIONS[NFUNC] = { "GAUSS",
-					"GAUSSHERMITE1",
-					"GAUSSHERMITE2",
-					"VOIGT",
-					"POLYNOMIAL",
-					"HISTOGRAM" };
 
 /* Number of planes in the FIT1D parameter files; use a fixed rather
    than dynamic number so that fits of different types can be combined */

@@ -506,28 +506,12 @@ static void get_fit1par( int *axis, double *range, char *function,
   if ( function ) {
     const char * strpntr = NULL;
     astMapGet0C( keymap, "FUNCTION", &strpntr );
-    *fid = 0;
-    if ( *status == SAI__OK && strpntr) {
-      star_strlcpy( function, strpntr, LEN__FUNC );
-      int found = 0;
-      for ( int i = 0; i < NFUNC && found == NO; i++ ) {
-	if ( strlen(function) == strlen(FUNCTIONS[i]) &&
-	     strcasecmp( function, FUNCTIONS[i] ) == 0 ) {
-          star_strlcpy( function, FUNCTIONS[i], LEN__FUNC );
-	  found = 1;
-          *fid = i+1;
-	}
-      }
-      if ( found == YES ) {
-	msgOutiff( MSG__VERB, "", "... FUNCTION=%s (id: %d)", status,
-		   function, *fid );
-      } else {
-	*status = SAI__ERROR;
-	msgSetc("M", function);
-	errRep(FUNC_NAME, "Unsupported function: '^M'.",
-	       status);
-	return;
-      }
+    if (*status == SAI__OK && strpntr ) {
+      *fid = smf_mathfunc_fromstring( strpntr, status );
+      one_strlcpy( function, smf_mathfunc_str( *fid, status ),
+                   LEN__FUNC, status );
+      msgOutiff( MSG__VERB, "", "... FUNCTION=%s (id: %d)", status,
+                 function, *fid );
     } else {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Failed to get parameter FUNCTION from config file",

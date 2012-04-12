@@ -1423,6 +1423,11 @@ void smf_meanshift( double *indata, double *outdata, int nel, int stride, int bo
                     double box2, smf_qual_t *qual, smf_qual_t mask, float wlim,
                     int *status );
 
+smf_math_function
+smf_mathfunc_fromstring( const char * mathfunc, int * status );
+
+const char * smf_mathfunc_str( smf_math_function type, int * status );
+
 void smf_math_functions( smf_math_function fid, double xdat, const double fpar[], int ncomp,
 			 double *value, double *pderv, int *npar,
 			 const int iopt[], const double dopt[] __attribute__((unused)) );

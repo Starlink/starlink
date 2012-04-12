@@ -956,6 +956,7 @@ typedef enum {
 /* Math functions for fitting */
 
 typedef enum {
+  SMF__MATH_NULL          = 0,
   SMF__MATH_GAUSS         = 1,
   SMF__MATH_GAUSSHERMITE1 = 2,
   SMF__MATH_GAUSSHERMITE2 = 3,
