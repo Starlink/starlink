@@ -254,6 +254,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    plist = astMalloc( psize*cupidGC.nel );
    list_size = 0;
 
+/* Scale the supplied threshold to be in data units rather than in units
+   of RMS */
+   thresh *= rms;
+
 /* Now loop over increasingly larger layers until a layer is found over which
    the model Gaussian does not exceed the user-supplied limit. */
    bad = 0;
@@ -362,7 +366,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                      }
 
 /* Set a flag indicating if the max value in the sampled gaussian is
-   greater than the supplied lower limit. Mote, the sampled peak value
+   greater than the supplied lower limit. Note, the sampled peak value
    will be less than par[0] because it is unlikely that a pixel centre
    will fall on the peak. */
                      if( m > thresh ) lowpeak = 0;

@@ -6,6 +6,11 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V1.6
+
+   - A bug in the GaussClumps method has been fixed which could cause
+    clumps to be incorrectly rejected due to being too low.
+
 Changes introduced at V1.5
 
    - The RMS parameter in FINDBACK now be set to a null (!) value in
