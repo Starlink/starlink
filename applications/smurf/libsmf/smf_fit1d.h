@@ -6,10 +6,6 @@
 #define MYMIN(a,b)     ( (a) > (b) ? (b) : (a) )
 #define BETWEEN(a,b,c) ( (a) < (b) ? (b) : ((a) > (c) ? (c) : (a) ) )
 /* #define NINT(a)        ( (a) < 0 ? (int)((a)-.5) : (int)((a)+.5) ) */
-#define ABS(a)         ( (a) < 0 ? (-(a)) : (a) )
-#define PI             3.141592653589793
-#define RAD(a)         ( (a) * 0.017453292519943295769237 )
-#define DEG(a)         ( (a) * 57.295779513082320876798155 )
 
 #define DISP2FWHM(a)   ( a * 2.0*sqrt(2.0*log(2.0)) )
 #define FWHM2DISP(a)   ( a / 2.0*sqrt(2.0*log(2.0)) )

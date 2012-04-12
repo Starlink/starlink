@@ -259,7 +259,7 @@ void smf_fit_profile( smfData  *data, int axis, int range[], int ncomp,
   }
 
   /* Sanity check */
-  if ( (ABS(range[1]-range[0])+1) < 2 ) {
+  if ( (abs(range[1]-range[0])+1) < 2 ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME,
             "Number of points to fit along 1 or less", status );
@@ -942,7 +942,7 @@ static int dolsqfit(  int fid, const double pcoord[], const double fdata[],
    int          sortopt = 0;
 
    tolerance = MYMAX( tol, 0.0 );
-   mixingpar = ABS( lab );
+   mixingpar = fabsf( lab );
    maxits    = MYMIN( its, MAXITERS );
 
 
@@ -1072,7 +1072,7 @@ static int getestimates( int fid, const double fdata[], const float weight[], in
    /* Get constant zerolevel */
    zerolev = parlist[ncomp*npar+0];
 
-   rms = ABS( rms );
+   rms = fabs( rms );
    usedQ = VAL__BADR;
    /*--------------------------------------------------*/
    /* Next, check the other parameters. The critical   */
@@ -1081,7 +1081,7 @@ static int getestimates( int fid, const double fdata[], const float weight[], in
 
    /* Be more lenient on estimates! */
    maxgaussians = BETWEEN( maxgaussians, 1, MAXGAUSS );
-   critamp      = 0.5* ABS( critamp );
+   critamp      = 0.5* fabs( critamp );
    critdisp     /= 3;
 
    gaussiansfound = 0;
@@ -1321,7 +1321,7 @@ static void adjustestimates( int fid, int nfound, double *parlist,
 	  /* First estimate is area instead of amplitude */
 	  double amp   = parlist[offset+0];
 	  double sigma = parlist[offset+2];
-	  parlist[offset+0] = amp * sigma * sqrt( 2.0*PI ); /* A->Area */
+	  parlist[offset+0] = amp * sigma * sqrt( 2.0*M_PI ); /* A->Area */
 	  sigma = DISP2FWHM( sigma );                       /* FWHM */
 	  parlist[offset+2] = 0.5 * sigma;                  /* HWHM */
 	  parlist[offset+3] = lorentz;
