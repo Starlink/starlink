@@ -77,7 +77,7 @@
 */
 
 /* System includes */
-#include <string.h>
+#include <strings.h>
 
 /* Starlink includes */
 #include "ast.h"
