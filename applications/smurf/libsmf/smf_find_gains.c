@@ -605,7 +605,7 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
                          status );
             smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, NULL,&cgood,
                          status );
-            msgOutiff( MSG__DEBUG, " ", "Block %d: (Mean,Std.dev) of corr. "
+            msgOutiff( MSG__DEBUG, " ", "Block %"DIM_T_FMT": (Mean,Std.dev) of corr. "
                        "coefficients: (%g,%g)", status, iblock, cmean, csig );
 
 /* If there are insufficient usable bolometers left to find the statistics,

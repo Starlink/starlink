@@ -112,6 +112,7 @@ typedef struct {
   AstKeyMap * extpars;
   double *taudata;
   size_t ngood;
+  size_t maxgap;
   dim_t t1;
   dim_t t2;
   dim_t nframes;
@@ -266,6 +267,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
         pdata->nframes = nframes;
         pdata->airmass = amprev; /* really need to get it from the start of each chunk */
         pdata->taudata = taudata;
+        pdata->maxgap = maxgap;
 
         /* Need to copy the smfDatas and create a new smfArray for each
            thread */
@@ -415,6 +417,7 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
   taudata = pdata->taudata;
   nrelated = thesedata->ndat;
   extpars = pdata->extpars;
+  maxgap = pdata->maxgap;
 
   /* Lock the AST pointers to this thread */
   astLock( extpars, 0 );
@@ -423,7 +426,8 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
   }
 
 /* Debugging message indicating thread started work */
-  msgOutiff( MSG__DEBUG, "", "smfCalcSmoothedWVM: thread starting on slices %zu -- %zu",
+  msgOutiff( MSG__DEBUG, "", "smfCalcSmoothedWVM: thread starting on slices %" DIM_T_FMT
+             " -- %" DIM_T_FMT,
              status, t1, t2 );
   smf_timerinit( &tv1, &tv2, status);
 
@@ -492,7 +496,7 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
           if ( thistau == VAL__BADD ) {
             if ( *status == SAI__OK ) {
               *status = SAI__ERROR;
-              errRepf("", "Error calculating tau from WVM temperatures at time slice %zu",
+              errRepf("", "Error calculating tau from WVM temperatures at time slice %" DIM_T_FMT,
                       status, i);
             }
           } else if ( thistau < 0.0 ) {
@@ -563,7 +567,8 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
 
 /* Report the time taken in this thread. */
   msgOutiff( SMF__TIMER_MSG, "",
-             "smfCalcSmoothedWVM: thread finishing slices %zu -- %zu (%.3f sec)",
+             "smfCalcSmoothedWVM: thread finishing slices %" DIM_T_FMT
+             " -- %" DIM_T_FMT " (%.3f sec)",
              status, t1, t2, smf_timerupdate( &tv1, &tv2, status ) );
 
   /* Store number of good values */
