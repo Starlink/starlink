@@ -112,6 +112,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *     8-MAR-2005 (DSB):
 *        Initilaise "hiwid" and "lowid" in case no other suitable values
 *        are found.
+*     12-APR-2012 (DSB):
+*        Improve method for estimating FWHM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,23 +123,23 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 */
 
 /* Local Variables: */
-   double clump_sum;     /* Sum of pixel values in clump */
+   double hgt;           /* Height of the Gaussian above the background */
    double prev;          /* Previous data value */
    double ret;           /* Sum of weighted axis values */
+   double sigma;         /* As ingle estimate of the stdnard deviation */
+   double ssum;          /* Sum of all estimates of the standard deviation */
    double sum;           /* Sum of pixel values found since the last minimum */
    double v1low;         /* Lowest data value found so far */
    double v2low;         /* Lowest data value found so far */
    double v;             /* Mean value at two profile points */
-   int hiwid;            /* Half width on higher axis values */
+   double vmax;          /* The maximum value in the clump */
+   double vnorm;         /* The normalised value - 0 = background, 1 = peak */
    int i1;               /* Vector index at lower of two profile points */
-   int i1low;            /* Vtecor index at lowest pixel */
    int i2;               /* Vector index at upper of two profile points */
-   int i2low;            /* Vtecor index at lowest pixel */
    int j1;               /* Axis value at lower of two profile points */
    int j1low;            /* Radius at lowest pixel */
    int j2;               /* Axis value at upper of two profile points */
    int j2low;            /* Radius at lowest pixel */
-   int lowid;            /* Half width on lower axis values */
    int nsum;             /* No. of pixel values summed in "sum" */
    int step;             /* Vector step between adjacent pixels on an axis */
 
@@ -159,6 +161,9 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 
    }
 
+/* Get the maximum value in the clump. */
+   vmax = (double) array[ imax ];
+
 /* First move out away from the peak to higher axis values, looking for a
    significant minimum in the data value along the axis. Initialise the GRID
    axis value and vector index of the current pixel to be the pixel next
@@ -167,17 +172,13 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    i2 = imax + 1;
 
 /* Initialise the lowest value found so far in the profile. */
-   v2low = (double) array[ imax ];
+   v2low = vmax;
    j2low = 0;
 
 /* Initialise the sum of all pixel values subsequent to the most recent
    minimum value. Also set the number of values summed in "sum" to zero. */
    sum = 0.0;
    nsum = 0;
-
-/* Initialise the total data value in the clump up to the current minimum
-   pixel. */
-   clump_sum = 0.0;
 
 /* We have no previous value as yet. */
    prev = VAL__BADD;
@@ -189,9 +190,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 /* Ignore bad pixels */
       if( array[ i2 ] != CGEN_BAD ) {
 
-/* Get the pixel value, and increment the clump sum. */
+/* Get the pixel value. */
          v = (double) array[ i2 ];
-         clump_sum += v;
 
 /* If this value is lower than the previous lowest value, but not more
    than 1.5*rms lower than the previous value, remember it. Also reset the
@@ -200,7 +200,6 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
          if( v < v2low && prev != VAL__BADD && prev - v < 1.5*rms) {
             v2low = v;
             j2low = j2;
-            i2low = i2;
             sum = 0.0;
             nsum = 0;
 
@@ -231,40 +230,16 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    }
 
 /* The lowest pixel value will underestimate the background. Add on the
-   noise level to provide som ecorrection for this. */
+   noise level to provide some correction for this. */
    v2low += rms;
-
-/* Correct the clump sum by removing the sum of the pixels subsequent to
-   the minimum pixel value. */
-   clump_sum -= sum;
-
-/* Find the radial point that contains 76% of the clump data sum (this
-   corresponds to the FWHM point in a Gaussian). */
-   hiwid = j2low - ax_max[ ax ];
-   j2 = ax_max[ ax ] + 1;
-   i2 = imax + 1;
-   sum = 0.0;
-   clump_sum *= 0.76;
-   while( j2 <= j2low ) {
-      if( array[ i2 ] != CGEN_BAD ) {
-         sum += (double) array[ i2 ];
-         if( sum > clump_sum ) {
-            hiwid = j2 - ax_max[ ax ];
-            break;
-         }
-      }
-      j2++;
-      i2 += step;
-   }
 
 /* Do the same working downwards from the peak to lower axis values. */
    j1 = ax_max[ ax ] - 1;
    i1 = imax - 1;
 
-   v1low = (double) array[ imax ];
+   v1low = vmax;
    j1low = 0;
 
-   clump_sum = 0.0;
    sum = 0.0;
    nsum = 0;
 
@@ -274,12 +249,10 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 
       if( array[ i1 ] != CGEN_BAD ) {
          v = (double) array[ i1 ];
-         clump_sum += v;
 
          if( v < v1low && prev != VAL__BADD && prev - v < 1.5*rms) {
             v1low = v;
             j1low = j1;
-            i1low = i1;
             sum = 0.0;
             nsum = 0;
 
@@ -303,39 +276,101 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 
    v1low += rms;
 
-   clump_sum -= sum;
-
-   lowid = ax_max[ ax ] - j1low;
-   j1 = ax_max[ ax ] - 1;
-   i1 = imax - 1;
-   sum = 0.0;
-   clump_sum *= 0.76;
-   while( j1 >= j1low ) {
-      if( array[ i1 ] != CGEN_BAD ) {
-         sum += (double) array[ i1 ];
-         if( sum > clump_sum ) {
-            lowid = ax_max[ ax ] - j1;
-            break;
-         }
-      }
-      j1--;
-      i1 -= step;
-   }
-
-/* Form the total width at half max. */
-   ret = lowid + hiwid;
-
-/* Increment the sum of the offsets using the mean of the two minimum
+/* Increment the sum of the offsets using the lower of the two minimum
    values. */
-   *off += 0.5*( v1low + v2low );
    if( v1low < v2low ) {
-      if ( *off > v1low + rms ) *off = v1low + rms;
+      *off += v1low + rms;
    } else {
-      if ( *off > v2low + rms ) *off = v2low + rms;
+      *off += v2low + rms;
    }
 
 /* Return the supplied central position. */
    *cen = ax_max[ ax ];
+
+/* We form the FWHM estimate from the side of th peak which goes down to
+   lower values (the other side may be polluted by an adjancet source).
+   First handle cases where the high side goes down to lower data values... */
+   if( v2low < v1low ) {
+
+/* Establish a default value for the returned FWHM in case no better
+   value can be found. */
+      ret = ( j2low - ax_max[ ax ] )/2;
+
+/* We form an estimate of the standard deviation of the Gaussian from each
+   point in a set of points about half way from the peak to the minimum of
+   the profile. The returned FWHM is derived from the mean of these
+   standard deviations. First zero the running sums used to find the mean. */
+      ssum = 0.0;
+      nsum = 0;
+
+/* Get the height of the Gaussian above the background (v2low). */
+      hgt = vmax - v2low;
+
+/* Set the initial axis value at the peak and the correspoinding vector index. */
+      j2 = ax_max[ ax ] + 1;
+      i2 = imax + 1;
+
+/* Loop round all samples. */
+      while( j2 <= j2low ) {
+
+/* Get the data value at this sample, and check it is good. */
+         v = (double) array[ i2 ];
+         if( v != CGEN_BAD  ) {
+
+/* Get the height of the data value above the background normalised to
+   the amplitude of the peak. */
+            vnorm = ( v - v2low )/hgt;
+
+/* Only use samples in the middle portion of the Gauusoan - the ends are
+   subject to high errors. */
+            if( vnorm > 0.25 && vnorm < 0.75 ) {
+
+/* For an estimate of the standard deviation from the current value and
+   axis offset. */
+               sigma = ( ax_max[ ax ] - j2 ) / log( vnorm );
+
+/* Increment the running sums. */
+               ssum += sigma;
+               nsum++;
+            }
+         }
+
+/* Prepare for the next sample. */
+         j2++;
+         i2 += step;
+      }
+
+
+/* Now handle cases where the low side goes down to lower data values. Do
+   exactly the same, but reversed...  */
+   } else {
+      ret = ( ax_max[ ax ] - j1low )/2;
+      ssum = 0.0;
+      nsum = 0;
+
+      hgt = vmax - v1low;
+
+      j1 = ax_max[ ax ] - 1;
+      i1 = imax -1;
+
+      while( j1 >= j1low ) {
+         v = (double) array[ i1 ];
+         if( v != CGEN_BAD  ) {
+            vnorm = ( v - v1low )/hgt;
+            if( vnorm > 0.25 && vnorm < 0.75 ) {
+               sigma = ( j1 - ax_max[ ax ] ) / log( vnorm );
+               ssum += sigma;
+               nsum++;
+            }
+         }
+         j1--;
+         i1 -= step;
+      }
+   }
+
+/* Find the mean standard deviation and convert to an FWHM. If no better
+   value is found, use the default value established above. */
+   if( nsum > 0 ) ret = 1.665*( ssum/nsum );
 
 /* Return the result. */
    return ret;

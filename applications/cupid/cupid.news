@@ -9,7 +9,10 @@
 Changes introduced at V1.6
 
    - A bug in the GaussClumps method has been fixed which could cause
-    clumps to be incorrectly rejected due to being too low.
+   clumps to be incorrectly rejected due to being too low.
+   - Improvements to the initial guess at the Gaussian parameters of each
+   clump has improved the ability of the GaussClumps algorithm to fit
+   merged clumps.
 
 Changes introduced at V1.5
 
