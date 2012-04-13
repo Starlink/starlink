@@ -188,10 +188,10 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
   int opteffdiv;            /* Divide data by the optical efficiencies? */
   int order;                /* Order of polynomial for baseline fitting */
   char param[ 20 ];         /* Buffer for config parameter name */
-  size_t pcalen;            /* Chunk length for PCA cleaning */
+  dim_t pcalen;             /* Chunk length for PCA cleaning */
   double pcathresh;         /* n-sigma threshold for PCA cleaning */
   double spikethresh;       /* Threshold for finding spikes */
-  size_t spikebox=0;        /* Box size for spike finder */
+  dim_t spikebox=0;         /* Box size for spike finder */
   struct timeval tv1, tv2;  /* Timers */
   int whiten;               /* Apply whitening filter? */
   int zeropad;              /* Pad with zeros? */

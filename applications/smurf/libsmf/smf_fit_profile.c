@@ -226,8 +226,8 @@ void smf_fit_profile( smfData  *data, int axis, int range[], int ncomp,
   fitProfileData *jdata=NULL;         /* Pointer to job data */
   size_t          step;               /* step size for dividing up work */
   size_t          perm[NDF__MXDIM];   /* Axes permutation array */
-  size_t          pdims[NDF__MXDIM];  /* Dimensions permutated data */
-  size_t          cdims[NDF__MXDIM];  /* Dimensions permutated param data */
+  dim_t           pdims[NDF__MXDIM];  /* Dimensions permutated data */
+  dim_t           cdims[NDF__MXDIM];  /* Dimensions permutated param data */
 
 
   /* Check status */
