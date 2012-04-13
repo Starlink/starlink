@@ -20,6 +20,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -28,6 +29,8 @@
 *  History:
 *     2012-02-08 (TIMJ):
 *        Initial version.
+*     2012-04-13 (DSB):
+*        Added PAL__DR2H and PAL__DR2S
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -69,6 +72,12 @@ static const double PAL__DR2AS = 2.062648062470963551564733573307786131966597008
 
 /* Arcseconds to radians */
 static const double PAL__DAS2R = 4.8481368110953599358991410235794797595635330237270e-6;
+
+/* Radians to hours */
+static const double PAL__DR2H = 3.8197186342054880584532103209403446888270314977709;
+
+/* Radians to seconds of time */
+static const double PAL__DR2S = 1.3750987083139757010431557155385240879777313391975e4;
 
 /* Start of SLA modified Julian date epoch */
 static const double PAL__MJD0 = 2400000.5;

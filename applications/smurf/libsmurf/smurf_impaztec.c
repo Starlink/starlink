@@ -153,6 +153,7 @@
 #include "ndf.h"
 #include "sae_par.h"
 #include "star/pal.h"
+#include "star/palmac.h"
 #include "star/kaplibs.h"
 #include "star/one.h"
 
@@ -489,7 +490,7 @@ void smurf_impaztec( int *status ) {
       range = tempbuff[nframes-1] - tempbuff[0]; /* range in decimal hours */
       range /= (int)nframes;  /* length of frame */
       range /= SOLSID; /* UT */
-      range *= DR2H;
+      range *= PAL__DR2H;
       range /= 24.0;  /* fraction of day */
       range *= SPD;  /* seconds */
       printf("length of step = %f\n",range);
@@ -505,7 +506,7 @@ void smurf_impaztec( int *status ) {
     lst_err /= SOLSID;
 
     /* convert the error to seconds */
-    lst_err *= DR2S;
+    lst_err *= PAL__DR2S;
 
     printf("Error in LST = %f sec\n", lst_err  );
 
@@ -720,9 +721,9 @@ void smurf_impaztec( int *status ) {
                  xout, yout );
 
           radiff = head[i_good].tcs_tr_ac1 - xout ;
-          radiff *= cos(head[i_good].tcs_tr_ac2) * DR2AS;
+          radiff *= cos(head[i_good].tcs_tr_ac2) * PAL__DR2AS;
           decdiff = head[i_good].tcs_tr_ac2 - yout ;
-          decdiff *= DR2AS;
+          decdiff *= PAL__DR2AS;
 
           printf("Diff = %f , %f \n", radiff, decdiff);
 
