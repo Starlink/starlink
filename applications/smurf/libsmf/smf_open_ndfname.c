@@ -215,7 +215,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[],
   }
 
   /* Convert the data type string to SMURF dtype */
-  smf_string_to_dtype ( dattype, &dtype, status );
+  dtype = smf_dtype_fromstring( dattype, status );
 
   /* First step is to create an empty smfData with no extra components */
   flags |= SMF__NOCREATE_DA;

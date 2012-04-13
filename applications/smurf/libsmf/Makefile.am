@@ -365,7 +365,6 @@ smf_sparsebounds.c \
 smf_spreadwidth.c \
 smf_store_image.c \
 smf_store_outputbounds.c \
-smf_string_to_dtype.c \
 smf_stripsuffix.c \
 smf_subinst_keymap.c \
 smf_subinst_str.c \

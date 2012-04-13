@@ -1796,9 +1796,6 @@ void smf_store_outputbounds (int updatepars, const int lbnd_out[3],
                              const AstSkyFrame *oskyfrm,
                              const AstMapping *oskymap, int *status);
 
-void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype,
-                           int * status );
-
 void smf_stripsuffix( const char *instr, const char *suffix, char *outstr,
                       int *status );
 
