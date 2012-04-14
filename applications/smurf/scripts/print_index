@@ -7,7 +7,7 @@ print_index - Provide a listing of SCUBA-2 or ACSIS data files in a directory
 
 =head1 SYNOPSIS
 
-  scuba2_index  [-v | -h | -d | -o] [-a] [-e] [-f] [datadir] [scuba2_array]
+  scuba2_index  [-v | -h | -d | -o] [-a] [-c] [-e] [-f] [datadir] [scuba2_array]
   acsis_index   [-v | -h | -d | -o] [-a] [-c] [-e] [-f] [-t/T -r/R -s/S]
                   [datadir]
 
@@ -24,7 +24,7 @@ The following options are supported:
 
 =over 4
 
-=item B<all>
+=item B<-all>
 
 Print information on all files even if the headers are identical. For example,
 include multiple subbands (subsystems) and sub-scans.
@@ -55,6 +55,10 @@ Print the full documentation to STDOUT.
 
 Print the OCS configuration XML file.
 
+=item B<-cal>
+
+Only print calibration observations.
+
 =item B<-version>
 
 Print version information.
@@ -65,21 +69,17 @@ ACSIS-specific options:
 
 =over 4
 
-=item B<-cal>
-
-Only print calibration observations.
-
 =item B<-skip>
 
 Skip observation information when printing Tsys or Trx
 
 =item B<-stdev>
 
-Include the standard deviation when print Tsys or Trx.
+Include the standard deviation when printing Tsys or Trx.
 
 =item B<-trx>
 
-Print media receiver temperature.
+Print median receiver temperature.
 
 =item B<-tsys>
 
@@ -1109,6 +1109,10 @@ sub calc_shared_scuba2_acsis {
 
 }
 
+=head1 SEE ALSO
+
+SMURF: gettsys
+
 =head1 AUTHOR
 
 Remo Tilanus E<lt>r.tilanus@jach.hawaii.eduE<gt>,
@@ -1117,7 +1121,7 @@ Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 =head1 COPYRIGHT
 
 Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
-Copyright (C) 2007-2010 Science and Technology Facilities Council.
+Copyright (C) 2007-2012 Science and Technology Facilities Council.
 All Rights Reserved.
 
 =head1 LICENCE
