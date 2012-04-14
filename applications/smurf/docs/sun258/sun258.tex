@@ -2286,6 +2286,92 @@ Van Engelen~A., Scott~D., 2005, {\it A Correlation Study using SCUBA
 
 \section{Release Notes}
 
+\subsection{kaulia}
+
+Supports compressed SCUBA-2 data files taken since February 2011.
+
+\begin{itemize}
+\item CALCQU - a new command to create Q and U values from SCUBA-2
+  fast-spinning polarimeter time-series data files.
+\item MAKECUBE
+\begin{itemize}
+\item Now allows the spatial reference pixel in the output cube to be
+  specified by the user.
+\item Setting \texttt{TRIM=YES} now modifies any user-supplied
+  \texttt{LBND}/\texttt{UBND} values to remove borders of bad pixels.
+\end{itemize}
+\item MAKEMAP
+\begin{itemize}
+\item The loading and flatfielding of raw data on multi-core systems
+  is now faster.
+\item The focal plane distortion model has been updated to cover the
+  entire focal plane.
+\item A new parameter (\texttt{TRIM}) has been added to allow borders
+  of blank pixels to be removed from the output map.
+\item A bug has been fixed so that a request to perform just one
+  iteration (\texttt{numiter=1}) is honoured.
+\end{itemize}
+\end{itemize}
+
+\subsection{namaka}
+
+Major updates to SMURF to support SCUBA-2 data processing.
+
+\begin{itemize}
+\item Polynomial fitting to flatfield data is now the default.
+\item Fast flatfield ramps are now supported. These are taken at the
+  start of every observation.
+\item New scripts: smas analyzes "short maps" to investigate high
+  frequency seeing/pointing variations
+\end{itemize}
+
+\subsubsection{MAKEMAP (iterative)}
+
+\begin{itemize}
+\item Maps from small chunks of the time series can now be written
+  out. Specify the ``shortmap'' parameter.
+\item Typos in config parameters are now trapped and the defaults can
+  be seen in file \texttt{smurf\_makemap.def} in
+  \texttt{\$SMURF\_DIR}. The actual parameters that are used (the
+  merge of the supplied dimmconfig and the defaults) are now stored in
+  the history of the output map.
+\item Enhanced common-mode removal algorithm which can now break the
+  time series into smaller chunks.
+\item Enhanced spike removal using a rolling median calculation
+\item Enhanced step correction.
+\item Output map now includes QUALITY flags to indicate areas that
+  have been set to 0 by the map-maker.
+\item The map-maker now reports the details of the flagging every iteration.
+\item Config files have been re-written to include the standard config
+  with explicit overrides. This makes it easier to see what is being
+  changed.
+\item Major improvement to the speed of calculating the world
+  coordinates of every bolometer.
+\item Correctly switch to the CSO tau fits header in the absence of WVM data.
+\end{itemize}
+
+\subsubsection{SC2CLEAN}
+
+\begin{itemize}
+\item The parameter DCBOX has been renamed DCFITBOX.
+\item DCBAD and DCFLAGALL parameters have been removed.
+\end{itemize}
+
+\subsubsection{SC2FFT}
+
+\begin{itemize}
+\item Add NGOOD parameter.
+\item Can now calculate an average power spectrum.
+\end{itemize}
+
+\subsubsection{STACKFRAMES}
+
+\begin{itemize}
+\item Fix some bugs associated with maps of different sizes and with
+  missing metadata.
+\item Propagate QUALITY properly.
+\end{itemize}
+
 \subsection{V1.0.0 (hawaiki)}
 
 First official release supporting SCUBA-2 raw data (rather than simulated data).
