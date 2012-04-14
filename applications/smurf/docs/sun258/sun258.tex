@@ -14,14 +14,14 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright}
-{Copyright \copyright\ 2010 University of British Columbia \& the Science \& Technology Facilities Council}
+{Copyright \copyright\ 2012 University of British Columbia \& the Science \& Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {258.2}
 \newcommand{\stardocauthors}   {Edward Chapin, Andrew G. Gibb, Tim Jenness, David S. Berry  \& Douglas Scott}
-\newcommand{\stardocdate}      {18 January 2010}
+\newcommand{\stardocdate}      {30 April 2012}
 \newcommand{\stardoctitle}     {SMURF -- the Sub-Millimetre User Reduction Facillity}
-\newcommand{\stardocversion}   {Version 1.0.0}
+\newcommand{\stardocversion}   {Version 1.4.0}
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {
 
@@ -2363,14 +2363,18 @@ First official release supporting SCUBA-2 raw data (rather than simulated data).
 \begin{description}
 \end{htmlonly}
 
+\menuitem{ACSIS\_INDEX}{
+  Provide a listing of ACSIS data files in a directory.}
 \menuitem{BADBOLOS}{
-  Generate a map of random dead bolometers and add it as an NDF extension to the input file.}
+  Generate a map of random dead bolometers and store in extension of the input file.}
 \menuitem{CALCDARK}{
  Calculate the 2d dark frame from a dark observation.}
 \menuitem{CALCFLAT}{
  Calculate a flatfield solution.}
 \menuitem{CALCNOISE}{
 Calculate the noise properties of a SCUBA-2 observation.}
+\menuitem{CALCQU}{
+Calculate Q and U images from a set of SCUBA-2 time-series data files.}
 \menuitem{CALCRESP}{
  Calculate bolometer responsivity from stored flatfield solution.}
 \menuitem{COPYFLAT}{
@@ -2385,6 +2389,8 @@ Utility functions for estimating focal plane distortions.}
 Retrieve OCS XML configuration used to generate the raw data.}
 \menuitem{EXTINCTION}{
  Extinction correct SCUBA-2 data.}
+\menuitem{FIXSTEPS}{
+Fix DC steps in a supplied SCUBA-2 time-series NDF.}
 \menuitem{FLATFIELD}{
  Flatfield SCUBA-2 data.}
 \menuitem{GETTSYS}{
@@ -2401,28 +2407,46 @@ Dump JCMTSTATE information to ASCII table.}
  Regrid ACSIS spectra into a data cube.}
 \menuitem{MAKEMAP}{
  Regrid SCUBA-2 data into a map.}
+\menuitem{MCEHEAD2CAT}{
+ Dump the MCE data header of SCUBA-2 files.}
 \menuitem{QLMAKEMAP}{
-  Quick-Look SCUBA-2 map maker.}
-\menuitem{RAWUNPRESS}{
-  Uncompress raw SCUBA-2 data.}
+  Quick-Look SCUBA-2 map maker. (deprecated)}
 \menuitem{RAWFIXMETA}{
  Report metadata issues with ACSIS data files.}
+\menuitem{RAWPRESS}{
+Compress raw data that have not previously been compressed. (test routine)}
+\menuitem{RAWRECREATEWCS}{
+Attempt to fix corrupt spectral metadata in ACSIS data.}
+\menuitem{RAWREWRTSC2WCS}{
+Attempt to fix corrupt WCS in raw SCUBA-2 data.}
+\menuitem{RAWUNPRESS}{
+Uncompress raw SCUBA-2 data.}
 \menuitem{REMSKY}{
   Remove Sky signal from SCUBA-2 observations.}
 \menuitem{SC2CLEAN}{
  Clean-up SCUBA-2 time series.}
 \menuitem{SC2CONCAT}{
  Concatenate files from a single observation into a single file.}
+\menuitem{SC2EXPANDMODEL}{
+Expand a DIMM model component into a full time-series data cube.}
 \menuitem{SC2FFT}{
  Perform a forward or inverse FFT on SCUBA-2 data.}
-\menuitem{SC2FTS}{
- FTS-2 data processing (disabled).}
+\menuitem{SC2FILTERMAP}{
+Filter a 2-D map.}
+\menuitem{SC2MAPFFT}{
+Fourier transform 2-D maps.}
+\menuitem{SC2PCA}{
+Use principal component analysis to identify correlated SCUBA-2 signals.}
 \menuitem{SC2SIM}{
 SCUBA-2 simulator.}
 \menuitem{SCANFIT}{
   Fit a sky signal to each SCUBA-2 scan.}
+\menuitem{SCUBA2\_INDEX}{
+  Provide a listing of SCUBA-2 data files in a directory.}
 \menuitem{SKYNOISE}{
  Generate a simulated sky background.}
+\menuitem{SMAS}{
+  Analyse shortmaps from the map-maker.}
 \menuitem{SMURFCOPY}{
 Copy a 2d image out of a time series file.}
 \menuitem{SMURFHELP}{
@@ -2435,6 +2459,8 @@ Stack multiple 2-d images into a 3d cube, optionally sorted by time.}
  Re-order time slices in a raw data cube into increasing time.}
 \menuitem{UNMAKECUBE}{
  Produce simulated time series data from a regridded ACSIS data cube.}
+\menuitem{UNMAKEMAP}{
+Produce simulated time-series data from a SCUBA-2 map.}
 \begin{htmlonly}
 \end{description}
 \end{htmlonly}
@@ -2476,6 +2502,8 @@ Stack multiple 2-d images into a 3d cube, optionally sorted by time.
  Calculate a flatfield solution.
 \classitem{CALCNOISE}
 Calculate the noise properties of a SCUBA-2 observation.
+\classitem{CALCQU}
+Calculate Q and U images from a set of SCUBA-2 time-series data files.
 \classitem{CALCRESP}
  Calculate bolometer responsivity from stored flatfield solution.
 \classitem{COPYFLAT}
@@ -2488,12 +2516,22 @@ Copy the flatfield solution from one SCUBA-2 observation to another.
 Utility functions for estimating focal plane distortions.
 \classitem{EXTINCTION}
  Extinction correct SCUBA-2 data.
+\classitem{FIXSTEPS}
+Fix DC steps in a supplied SCUBA-2 time-series NDF.
 \classitem{FLATFIELD}
  Flatfield SCUBA-2 data.
 \classitem{MAKEMAP}
  Regrid SCUBA-2 data into a map.
+\classitem{MCEHEAD2CAT}
+ Dump the MCE data header of SCUBA-2 files.
 \classitem{QLMAKEMAP}
-  Quick-Look SCUBA-2 map maker.
+  Quick-Look SCUBA-2 map maker. (deprecated)
+\classitem{RAWPRESS}
+  Compress raw data that have not previously been compressed. (test routine)
+\classitem{RAWRECREATEWCS}
+  Attempt to fix corrupt spectral metadata in ACSIS data.
+\classitem{RAWREWRTSC2WCS}
+  Attempt to fix corrupt WCS in raw SCUBA-2 data.
 \classitem{RAWUNPRESS}
   Uncompress raw SCUBA-2 data.
 \classitem{REMSKY}
@@ -2502,16 +2540,28 @@ Utility functions for estimating focal plane distortions.
  Clean-up SCUBA-2 time series.
 \classitem{SC2CONCAT}
  Concatenate files from a single observation into a single file.
+\classitem{SC2EXPANDMODEL}
+  Expand a DIMM model component into a full time-series data cube.
 \classitem{SC2FFT}
  Perform a forward or inverse FFT on SCUBA-2 data.
-\classitem{SC2FTS}
- FTS-2 data processing (disabled).
+\classitem{SC2FILTERMAP}
+  Filter a 2-D map.
+\classitem{SC2MAPFFT}
+  Fourier transform 2-D maps.
+\classitem{SC2PCA}
+  Use principal component analysis to identify correlated SCUBA-2 signals.
 \classitem{SCANFIT}
   Fit a sky signal to each SCUBA-2 scan.
+\classitem{SCUBA2\_INDEX}
+  Provide a listing of SCUBA-2 data files in a directory.
+\classitem{SMAS}
+  Analyse shortmaps from the map-maker.
 \classitem{SMURFCOPY}
 Copy a 2d image out of a time series file.
 \classitem{STARECALC}
  Calculate a map from a STARE-mode observation.
+\classitem{UNMAKEMAP}
+  Produce simulated time-series data from a SCUBA-2 map.
 \end{description}
 
 {\large
@@ -2521,6 +2571,8 @@ Copy a 2d image out of a time series file.
 }
 
 \begin{description}
+\classitem{ACSIS\_INDEX}
+  Provide a listing of ACSIS data files in a directory.
 \classitem{GETTSYS}
 Retrieve TSYS (or TRX) from ACSIS data files.
 \classitem{MAKECUBE}
@@ -2582,6 +2634,105 @@ number within those parentheses indicates the size of the array.
 
 %% These are currently generated manually
 
+\sstroutine{
+  ACSIS\_INDEX
+}{
+  Provide a listing of ACSIS data files in a directory
+}{
+  \sstdescription{
+    Reads ACSIS observation files in a directory and creates an
+    index. Standard JCMT directory layout is supported.
+  }
+  \sstusage{
+    acsis\_index   [-v | -h | -d | -o] [-a] [-c] [-e] [-f] [-t/T -r/R -s/S]
+         [datadir]
+  }
+  \sstparameters{
+    \sstsubsection{
+      $-$all
+    }{
+      Print information on all files even if the headers are identical. For example,
+      include multiple subbands (subsystems) and sub-scans.
+    }
+    \sstsubsection{
+      $-$debug
+    }{
+      Print debugging information.
+    }
+    \sstsubsection{
+      $-$extended
+    }{
+      Print extended lines. Can add AZ, EL, pointing offsets and bandwidth.
+    }
+    \sstsubsection{
+      $-$force
+    }{
+      Force a subdirectory search. If no files are found in the
+      directory itself, as would be the case for a raw data tree, the
+      program will automatically search subdirecties. This option
+      forces the subdirectory search.
+    }
+     \sstsubsection{
+       $-$help
+      }{
+        Print help information.
+      }
+      \sstsubsection{
+        $-$version
+       }{
+         Print version information.
+       }
+       \sstsubsection{
+         $-$man
+       }{
+         Print the full documentation to STDOUT.
+       }
+       \sstsubsection{
+         $-$ocscfg
+       }{
+         Print the OCS configuration XML file.
+       }
+       \sstsubsection{
+         $-$cal
+       }{
+         Only print calibration observations.
+       }
+       \sstsubsection{
+         $-$skip
+       }{
+         Skip observation information when printing Tsys or Trx
+       }
+       \sstsubsection{
+         $-$stdev
+       }{
+         Include the standard deviation when printing Tsys or Trx.
+       }
+       \sstsubsection{
+         $-$trx
+       }{
+         Print median receiver temperature.
+       }
+       \sstsubsection{
+         $-$tsys
+       }{
+         Print median system temperature.
+       }
+
+  }
+  \sstnotes{
+    The primary argument is the data directory to index. If a \texttt{yyyymmdd} string is
+    given it will default to the ACSIS data for the specified data unless
+    there is a local subdirectory named \texttt{yyyymmdd}. Will default to the value of the
+    \textsc{\$datadir} environment variable if set.
+  }
+  \sstdiytopic{
+    Related Applications
+  }{
+    SMURF: SCUBA2\_INDEX, GETTSYS
+  }
+}
+
+\clearpage
 \sstroutine{
    DUMPOCSCFG
 }{
@@ -2713,34 +2864,391 @@ as additional lines of median, mean and standard deviation.
       \sstsubsection{
          $-$$-$with$-$mce
        }{
-            Include SCUBA-2 MCE information in output table. This adds a
-            lot of data to the output files and much of it is constant for
-            the observation.
+            Include SCUBA-2 MCE information in output table. This adds a lot of data to
+            the output files and much of it is constant for the observation. Default
+            is not to add this option. This option only works for data prior to summer
+            of 2010 (which essentially means S2SRO data). After that date MCE data
+            is written in a different form and is not supported. For modern data
+            use the separate MCEHEAD2CAT command.
       }
    }
    \sstnotes{
-    \sstitemlist{
-      \sstitem Eight columns are generated in addition to writing the simple
-      contents of the JCMT state structure. All are a combination of the
-      telescope position and secondary mirror. {\tt "}ra{\tt "} and {\tt "}dec{\tt "} contain
-      the tracking coordinates (noting that if the tracking system is
-      GALACTIC the columns will still be called {\tt "}ra{\tt "} and {\tt "}dec{\tt "}). {\tt "}dra{\tt "}
-      and {\tt "}ddec{\tt "} are the tracking offsets from the base position in
-      arcseconds. {\tt "}az{\tt "} and {\tt "}el{\tt "} contain the (moving) azimuth and
-      elevation. {\tt "}daz{\tt "} and {\tt "}del{\tt "} are the azimuth and elevation offsets
-      from the base position in arcseconds. AZEL coordinates are
-      calculated directly from the state information without converting
-      first to RA/Dec.
 
-      \sstitem Note that information from the ACSIS extension is not included at
-      this time. This is partly because this extension can change in
-      shape between observations.
-      MCE header information is included for SCUBA-2 data files.
+    Additional derived columns are included in addition to those stored
+    directly in the JCMTSTATE extension. All telescope values include
+    a correction for motion of the secondary mirror.
+
+    \sstitemlist{
+
+      \sstitem \texttt{RA/DEC}
+
+      Tracking coordinates in degrees. The columns will have the same name
+      even if the telescope was tracking in GALACTIC.
+
+      \sstitem \texttt{DRA/DDEC}
+
+      Tracking offsets from the base position in arcsec.
+
+      \sstitem \texttt{AZ/EL}
+
+      Azimuth and elevation in degrees. Calculated directly from JCMTSTATE
+      without being converted to RA/Dec.
+
+      \sstitem \texttt{DAZ/DEL}
+
+      Azimuth and elevation offsets from the base position in arcsec.
+
+      \sstitem \texttt{TELSPEED}
+
+      Instantaneous telescope speed in arcsec/sec.
+
+      \sstitem \texttt{WVMTAU}
+
+      Zenith 225 GHz opacity derived from the water vapor radiometer.
+
+      \sstitem \texttt{PWVZEN}
+
+      Precipitable water vapor at the zenith in mm.
+
+      \sstitem \texttt{PWVLOS}
+
+      Precipitable water vaport in the line of sight in mm.
+
+    }
+
+    Note that information from the ACSIS extension is not included at
+    this time. This is partly because this extension can change in
+    shape between observations.
+    MCE header information is included for SCUBA-2 data files.
+  }
+}
+
+\clearpage
+\sstroutine{
+  MCEHEAD2CAT
+}{
+  Convert SCUBA-2 MCE header information to TST format
+}{
+  \sstdescription{
+
+    Reads a set of SCUBA-2 files and writes catalogues of the mcehead information
+    to files. The output files are in TST format and can be read into the
+    TOPCAT application (but may require that TOPCAT is told explicitly that
+    the catalogue is in TST format, e.g. with the \texttt{-f tst} command line option).
+
+    Multiple output files are created since the data are stored with
+    different dimensionality. The \textit{root} name for the output files can be
+    specified using the $-$\texttt{out} parameter (default: uses the  \texttt{s??ddmmyyyy\_nnnnn}
+    part of the input file name or the basename of the filename if different).
+
+    Output files (suffix: \texttt{tst}) are as follows:
+
+    \sstitemlist{
+      \sstitem \texttt{\_gen}:
+
+      parameters that have a single value
+      (includes the 10 values for \texttt{psc\_status\_psc} which
+      don't fit the scheme)
+
+      \sstitem \texttt{\_crd}:
+
+      parameters that have 4 values
+
+      \sstitem \texttt{\_col}:
+
+      parameters that have 32 values
+      (includes parameters that have 8 values since they
+      always come in sets of 4).
+
+      \sstitem \texttt{\_row}:
+
+      parameters that have 41 values
+
+    }
+     If $-$\texttt{out} is used to specify the root output file name, out from all
+     input files will be concatinated into a single set of output files.
+  }
+
+  \sstusage{
+    mcehead2cat *.sdf
+
+    mcehead2cat *.sdf -out="outroot" -item=par1,par2
+
+    mcehead2cat *.sdf -item=\^list.in
+  }
+  \sstparameters{
+    \sstsubsection{
+      $-$help
+    }{
+      Print help information.
+    }
+    \sstsubsection{
+      $-$version
+    }{
+      Print version information.
+    }
+    \sstsubsection{
+      $-$man
+    }{
+      Print the full documentation to STDOUT.
+    }
+    \sstsubsection{
+      $-$out
+    }{
+      Optional root name for the output files.
+    }
+    \sstsubsection{
+      $-$items
+    }{
+      Optional comma-separated list of header items to print. Instead a filename
+      listing the item names can be given as \texttt{-item=\^file}. The format of the
+      file is the desired list of item names with one item per line.
     }
   }
 
+  \sstnotes{
+    For SCUBA-2 raw files, the program will only process the first file of
+    any observation and skip all others. This is because the MCE
+    configuration is only updated at the start of an observation. Assuming
+    there are 10 observations for the night:
+
+    \texttt{mcehead2cat /jcmtdata/raw/scuba2/s4a/20110524/*/*.sdf }
+
+    will only process 10 files, not all x-nr sdf files that may be there.
+    It will produce 10 sets of output files unless $-$\texttt{out} has been specified,
+    in which case the mceheaders from the 10 files will be written to a
+    single set of output files.
+
+  }
 }
 
+\clearpage
+\sstroutine{
+  SCUBA2\_INDEX
+}{
+  Provide a listing of SCUBA-2 data files in a directory
+}{
+  \sstdescription{
+    Reads ACSIS observation files in a directory and creates an
+    index. Standard JCMT directory layout is supported.
+  }
+  \sstusage{
+    scuba2\_index  [-v | -h | -d | -o] [-a] [-c] [-e] [-f] [datadir] [scuba2\_array]
+  }
+  \sstparameters{
+    \sstsubsection{
+      $-$all
+    }{
+      Print information on all files even if the headers are identical. For example,
+      include multiple subbands (subsystems) and sub-scans.
+    }
+    \sstsubsection{
+      $-$debug
+    }{
+      Print debugging information.
+    }
+    \sstsubsection{
+      $-$extended
+    }{
+      Print extended lines. Can add AZ, EL, pointing offsets and bandwidth.
+    }
+    \sstsubsection{
+      $-$force
+    }{
+      Force a subdirectory search. If no files are found in the
+      directory itself, as would be the case for a raw data tree, the
+      program will automatically search subdirecties. This option
+      forces the subdirectory search.
+    }
+     \sstsubsection{
+       $-$help
+      }{
+        Print help information.
+      }
+      \sstsubsection{
+        $-$version
+       }{
+         Print version information.
+       }
+       \sstsubsection{
+         $-$man
+       }{
+         Print the full documentation to STDOUT.
+       }
+       \sstsubsection{
+         $-$ocscfg
+       }{
+         Print the OCS configuration XML file.
+       }
+       \sstsubsection{
+         $-$cal
+       }{
+         Only print calibration observations.
+       }
+  }
+  \sstnotes{
+    The primary argument is the data directory to index. If a \texttt{yyyymmdd} string is
+    given it will default to the SCUBA-2 data for the specified data unless
+    there is a local subdirectory named \texttt{yyyymmdd}. Will default to the value of the
+    \textsc{\$datadir} environment variable if set.
+
+    This command can take a specific sub-array directory to index. Defaults to s8d.
+  }
+  \sstdiytopic{
+    Related Applications
+  }{
+    SMURF: ACSIS\_INDEX, GETTSYS
+  }
+}
+
+\clearpage
+\sstroutine{
+  SMAS
+}{
+  Short Map Analysis Script
+}{
+  \sstdescription{
+    With the exception of Moon maps, each NDF is processed in the
+    same way. The KAPPA:PSF command is used to locate the accurate
+    source centre and fit it using an elliptical Gaussian-like
+    model. The details of the model are then appended to an output
+    text file as a new row.
+
+    The resulting output catalogue has a row for every input NDF,
+    and contains the following columns:
+
+    \sstitemlist{
+      \sstitem \texttt{TAI}: The MJD (in the TAI timescale) associated with the NDF
+      \sstitem \texttt{UTC}: The UTC date and time string associated with the NDF
+      \sstitem \texttt{SEQSTART} - RTS index number of first frame
+      \sstitem \texttt{SEQEND} - RTS index number of last frame
+      \sstitem \texttt{DLON}: The longitude offset at the centre of the source, in arc-seconds
+      \sstitem \texttt{DLAT}: The latitude offset at the centre of the source, in arc-seconds
+      \sstitem \texttt{AMP}: The peak value in the source
+      \sstitem \texttt{SUM}: The total data sum in the source. This is the integral
+      of the Gaussian-like model calculated by KAPPA:PSF
+      \sstitem \texttt{FWHM}: The seeing-disc size: the full width at half maximum
+      across the minor axis of the source (arc-seconds)
+      \sstitem \texttt{AXISR}: The axis ratio of the source: the ratio of the major
+      axis length to that of the minor axis.
+      \sstitem \texttt{GAMMA}: The radial fall-off parameter of the source. A gamma
+      of two would be a Gaussian.
+      \sstitem \texttt{ORIENT}: The position angle (measured from north through east)
+      of the major axis of the source, in degrees.
+      \sstitem \texttt{NDF}: The path to the NDF
+      \sstitem \texttt{ROW}: The row number for the bolometer (if known)
+      \sstitem \texttt{COL}: The column number for the bolometer (if known)
+      \sstitem \texttt{ARRAY}: The array name for the bolometer (if known)
+    }
+
+    For comparison, a set of extra columns is appended to these
+    that give the source properties as calculated by KAPPA:BEAMFIT
+    rather than KAPPA:PSF. These columns have the same names, but
+    are prefixed by the letter B. Note, BEAMFIT assumes a gamma
+    value of 2.0  (i.e. a pure Gaussian) and so there is no \texttt{BGAMMA}
+    column in the output catalogue.
+
+    The \texttt{SEQSTART} and \texttt{SEQEND} columns will be set to `null' if the
+    supplied map does not contain these FITS headers.
+
+    If the supplied data is for the Moon, then all the above is
+    ignored and the output contains the following columns:
+
+    \sstitemlist{
+      \sstitem \texttt{SUM}: The integrated value within a 35 arc-minute aperture
+      centred on (0,0)
+      \sstitem \texttt{ROW}: The row number for the bolometer (if known)
+      \sstitem \texttt{COL}: The column number for the bolometer (if known)
+      \sstitem \texttt{ARRAY}: The array name for the bolometer (if known)
+    }
+  }
+  \sstusage{
+    smas [-a diam] [-b] [-e error] [-r perc] [-p] <in-list> <out-table> [<out-image>]
+  }
+  \sstparameters{
+    \sstsubsection{
+      $-$a
+    }{
+      Specifies that the catalogue \texttt{SUM} column values (the total
+      data sum) should be the integrated data value within a
+      circular aperture centred on the source peak position,
+      with radius specified by ``diam'' (a numerical value in
+      arc-seconds). This is calculated using KAPPA:APERADD.
+      If this option is not supplied, the \texttt{SUM} value is the
+      integrated value under the model source calculated by
+      KAPPA:PSF. If ``diam'' is not supplied, defaults of 30 and
+      15 are used for 850 and 450\,$\mu$m data respectively.
+    }
+    \sstsubsection{
+      $-$b
+    }{
+      Specifies that the catalogue should contain only \texttt{ROW}, \texttt{COL} and
+      \texttt{AMP} only. Using this option also implies the ``$-$p'' option.
+      This reduces the run-time for script significantly.
+    }
+    \sstsubsection{
+      $-$e
+    }{
+      Specifies the maximum allowed error (in arc-seconds) between the
+      source position as determined by KAPPA:BEAMFIT and KAPPA:PSF.
+      If the discrepancy in X or Y is greater than this value, then
+      the shortmap or bolomap is not included in the returned catalogue
+      or image. If the $-$e option is unspecified, then no sources are
+      rejected. If no ``error'' value is supplied, a default of 1
+      arc-second is used.
+    }
+    \sstsubsection{
+      $-$p
+    }{
+      Specifies that the catalogue \texttt{AMP} column values (the peak
+      value in the source) should be the maximum data value within
+      a box of size 20 pixels centred on the expected source position.
+      If this option is not supplied, the \texttt{AMP} value is the peak value
+      of the model source calculated by KAPPA:PSF.
+    }
+    \sstsubsection{
+      $-$r
+    }{
+      The following number (``perc'') specifies the minimum percentage of
+      good pixel values in a small box around the expected source position.
+      Sources that have insufficient good pixels in the box are reported
+      and then ignored. If the ``-r'' option is not supplied (or is supplied
+      without a "perc" value), a default of 95 is used.
+    }
+    \sstsubsection{
+      $<$in-list$>$
+    }{
+      The path to an NDF holding a SCUBA-2 map of a point
+      source (or Moon). Alternativelty, a text file containing the
+      paths to one or more such NDFs can be supplied. If an NDF
+      contains a \texttt{MORE.SMURF.SHORTMAPS} or \texttt{MORE.SMURF.BOLOMAPS}
+      extension item, then the NDFs in the \texttt{SHORTMAPS} or \texttt{BOLOMAPS}
+      array are used in place of the supplied NDF (\texttt{SHORTMAPS} is used
+      in preference to \texttt{BOLOMAPS} if both are present). \textit{Note}, all the
+      data must be for the same wavelength.
+    }
+    \sstsubsection{
+      $<$out-table$>$
+    }{
+      The name of a text file in which to store a
+      catalogue containing details of the source in each
+      supplied map, as described below. This catalogue can
+      be displayed and analysed using \texttt{topcat -f ascii
+        $<$out-table$>$}.
+    }
+    \sstsubsection{
+      $<$out-image$>$
+    }{
+      If supplied, and if the input data contains bolomaps,
+      a 2D NDF containing the \texttt{SUM} (or \texttt{AMP} if the ``$-$b'' option is used)
+      values for each bolometer is created with the name given by
+      $<$out-image$>$. The FITS headers from the first input NDF are
+      copied to the output NDF. If the supplied data contains values
+      from more than one subarray, the name of the subarray is appended
+      the end of each output NDF name.
+    }
+  }
+}
 
 \end{document}
 
