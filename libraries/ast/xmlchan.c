@@ -8849,7 +8849,6 @@ static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
 */
 
 /* Local Variables: */
-   char buff[300];            /* Message buffer */
    char *text;                /* Pointer to tformatted element text */
    const char *name;          /* Element name */
 
@@ -8859,10 +8858,9 @@ static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
 
    if( severity == WARNING && !astGetStrict( this ) ) {
       name = astXmlGetName( elem );
-      sprintf( buff, "astRead(%s): Warning whilst reading %s %s element: %s",
-               astGetClass( this ), ANA(name), name, msg );
-      astAddWarning( this, 1, buff, "astRead", status );
-
+      astAddWarning( this, 1, "astRead(%s): Warning whilst reading %s %s "
+                     "element: %s", "astRead", status, astGetClass( this ),
+                     ANA(name), name, msg );
    } else {
       text = (char *) astXmlGetTag( elem, 1 );
       astError( AST__BADIN, "astRead(%s): Failed to read %s element: %s", status,

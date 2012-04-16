@@ -31443,7 +31443,7 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text,
    if( FullForm( astGetWarnings( this ), condition, 0, status ) >= 0 ){
 
 /* If found, store the warning in the parent Channel structure. */
-      astAddWarning( this, 1, text, method, status );
+      astAddWarning( this, 1, "%s", method, status, text );
 
 /* For historical reasons, warnings are also stored in the FitsChan as a
    set of FITS cards... First save the current card index, and rewind the
