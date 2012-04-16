@@ -242,7 +242,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
             t = par[ 8 ]*par[ 8 ];
             dx_sq = cupidGC.velres_sq + t;
             peakfactor *= t/dx_sq;
-            f8 = par[ 0 ]*cupidGC.beam_sq/( par[ 8 ]*dx_sq );
+            f8 = par[ 0 ]*cupidGC.velres_sq/( par[ 8 ]*dx_sq );
          }
       }
 
