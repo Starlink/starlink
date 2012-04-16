@@ -239,6 +239,12 @@ itcl::class gaia::Gaia {
 
       eval itk_initialize $args
 
+      #  Set the default application icon.
+      global ::gaia_library
+      set default_icon [image create photo .gaia_logo -format gif \
+                           -file $::gaia_library/gaia_small_logo.gif]
+      wm iconphoto . -default $default_icon
+
       #  Override about_skycat message.
       global ::about_skycat ::about_gaia ::gaia_bugs
       global ::about_ukirt_ql ::ukirt_ql_bugs
