@@ -178,7 +178,7 @@ static void smfFitPolyPar( void *job_data_ptr, int *status ) {
   ncoeff = pdata->order + 1;
 
   /* Debugging message indicating thread started work */
-  msgOutiff( MSG__DEBUG, "",
+  msgOutiff( SMF__TIMER_MSG, "",
              "smfFitPolyPar: thread starting on bolos %zu -- %zu",
              status, pdata->b1, pdata->b2 );
 
@@ -248,7 +248,7 @@ static void smfFitPolyPar( void *job_data_ptr, int *status ) {
   curpolydata = astFree( curpolydata );
 
   /* Debugging message indicating thread finished work */
-  msgOutiff( MSG__DEBUG, "",
+  msgOutiff( SMF__TIMER_MSG, "",
              "smfFitPolyPar: thread finishing bolos %zu -- %zu",
              status, pdata->b1, pdata->b2 );
 }

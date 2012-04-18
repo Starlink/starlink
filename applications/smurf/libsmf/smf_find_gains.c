@@ -605,7 +605,7 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
                          status );
             smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, NULL,&cgood,
                          status );
-            msgOutiff( MSG__DEBUG, " ", "Block %"DIM_T_FMT": (Mean,Std.dev) of corr. "
+            msgOutiff( MSG__DEBUG1, " ", "Block %"DIM_T_FMT": (Mean,Std.dev) of corr. "
                        "coefficients: (%g,%g)", status, iblock, cmean, csig );
 
 /* If there are insufficient usable bolometers left to find the statistics,
@@ -951,7 +951,7 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
    if( b1 < nbolo ) {
 
 /* Debugging message indicating thread started work */
-      msgOutiff( MSG__DEBUG, "", "smfFindGains: thread starting on bolos %" DIM_T_FMT
+      msgOutiff( SMF__TIMER_MSG, "", "smfFindGains: thread starting on bolos %" DIM_T_FMT
                  " -- %" DIM_T_FMT, status, b1, b2 );
       smf_timerinit( &tv1, &tv2, status);
 

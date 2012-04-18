@@ -387,7 +387,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     }
     memcpy( poly, old->poly, npolypts*sizeof(double));
   } else {
-    msgOutif(MSG__DEBUG," ",
+    msgOutif(MSG__DEBUG1," ",
              "Skipping copy of SCANFIT coefficients, ncoeff = 0", status);
   }
 

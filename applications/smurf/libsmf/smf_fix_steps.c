@@ -798,7 +798,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    if( b1 < nbolo ) {
 
 /* Debugging message indicating thread started work */
-      msgOutiff( MSG__DEBUG, "", "smfFixSteps: thread starting on bolos %zu -- %zu",
+      msgOutiff( SMF__TIMER_MSG, "", "smfFixSteps: thread starting on bolos %zu -- %zu",
                  status, b1, b2 );
       smf_timerinit( &tv1, &tv2, status);
 

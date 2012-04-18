@@ -192,7 +192,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
    tstride = pdata->tstride;
 
 /* Debugging message indicating thread started work */
-   msgOutiff( MSG__DEBUG, "",
+   msgOutiff(  SMF__TIMER_MSG, "",
               "smfFlagSpikesPar: thread starting on bolos %zu -- %zu",
               status, pdata->b1, pdata->b2 );
 
@@ -553,7 +553,7 @@ static void smfFlagSpikesPar( void *job_data_ptr, int *status ) {
    pdata->nflag = nflag;
 
 /* Debugging message indicating thread finished work */
-   msgOutiff( MSG__DEBUG, "",
+   msgOutiff( SMF__TIMER_MSG, "",
               "smfFlagSpikesPar: thread finishing bolos %zu -- %zu",
               status, pdata->b1, pdata->b2 );
 }

@@ -382,7 +382,7 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
    if( b1 < nbolo ) {
 
       /* Debugging message indicating thread started work */
-      msgOutiff( MSG__DEBUG, "", "smf_calcmodel_smo: thread starting on bolos %" DIM_T_FMT
+      msgOutiff( SMF__TIMER_MSG, "", "smf_calcmodel_smo: thread starting on bolos %" DIM_T_FMT
                  " -- %" DIM_T_FMT,
                  status, b1, b2 );
       smf_timerinit( &tv1, &tv2, status);

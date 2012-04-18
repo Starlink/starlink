@@ -426,7 +426,7 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
   }
 
 /* Debugging message indicating thread started work */
-  msgOutiff( MSG__DEBUG, "", "smfCalcSmoothedWVM: thread starting on slices %" DIM_T_FMT
+  msgOutiff( SMF__TIMER_MSG, "", "smfCalcSmoothedWVM: thread starting on slices %" DIM_T_FMT
              " -- %" DIM_T_FMT,
              status, t1, t2 );
   smf_timerinit( &tv1, &tv2, status);

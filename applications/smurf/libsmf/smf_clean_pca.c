@@ -231,14 +231,14 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   }
 
   /* Debugging message indicating thread started work */
-  msgOutiff( MSG__DEBUG, "",
+  msgOutiff( SMF__TIMER_MSG, "",
              "smfPCAParallel: op=%i thread starting on time slices %zu -- %zu",
              status, pdata->operation, pdata->t1, pdata->t2 );
 
 
   /* if t1 past end of the work, nothing to do so we return */
   if( pdata->t1 >= (pdata->t_first+pdata->tlen) ) {
-    msgOutif( MSG__DEBUG, "",
+    msgOutif( SMF__TIMER_MSG, "",
               "smfPCAParallel: nothing for thread to do, returning",
               status);
     return;
@@ -355,7 +355,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   }
 
   /* Debugging message indicating thread finished work */
-  msgOutiff( MSG__DEBUG, "",
+  msgOutiff( SMF__TIMER_MSG, "",
              "smfPCAParallel: op=%i thread finishing time slices %zu -- %zu",
              status, pdata->operation, pdata->t1, pdata->t2 );
 }

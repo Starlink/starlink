@@ -217,14 +217,14 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
 
   /* if t1 past end of the work, nothing to do so we return */
   if( pdata->t1 >= ntslice ) {
-    msgOutif( MSG__DEBUG, "",
+    msgOutif( SMF__TIMER_MSG, "",
                "smfCalcMapcoordPar: nothing for thread to do, returning",
                status);
     return;
   }
 
   /* Debugging message indicating thread started work */
-  msgOutiff( MSG__DEBUG, "",
+  msgOutiff( SMF__TIMER_MSG, "",
              "smfCalcMapcoordPar: thread starting on tslices %zu -- %zu",
              status, pdata->t1, pdata->t2 );
   smf_timerinit( &tv1, &tv2, status );

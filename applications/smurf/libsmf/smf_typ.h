@@ -260,7 +260,7 @@
 #define SMF__CHARLABEL  80
 
 /* Define the message reporting level to see timer messages */
-#define SMF__TIMER_MSG MSG__DEBUG
+#define SMF__TIMER_MSG MSG__DEBUG1
 
 /* The name of the environment variable used to get the number of worker
 threads to use. */

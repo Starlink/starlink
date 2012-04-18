@@ -365,7 +365,7 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
    if( t1 < ntslice ) {
 
 /* Debugging message indicating thread started work */
-      msgOutiff( MSG__DEBUG, "", "smfScaleBols: thread starting on slices %zu -- %zu",
+      msgOutiff( SMF__TIMER_MSG, "", "smfScaleBols: thread starting on slices %zu -- %zu",
                  status, t1, t2 );
       smf_timerinit( &tv1, &tv2, status);
 

@@ -1382,7 +1382,7 @@ int *status             /* global status (given and returned) */
 
 /* Report the distorion. */
       msgSetc( "C", used_distortion );
-      msgOutif( MSG__DEBUG, " ", "sc2ast: Using ^C distortion map\n", status );
+      msgOutif( MSG__DEBUG1, " ", "sc2ast: Using ^C distortion map\n", status );
 
 /* The mapping from pixel numbers to millimetres is a simple scaling,
    because the pixel separation is the same in both coordinates and is

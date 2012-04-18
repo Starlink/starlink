@@ -242,7 +242,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   }
 
   /* Debugging message indicating thread started work */
-  msgOutiff( MSG__DEBUG, "",
+  msgOutiff( SMF__TIMER_MSG, "",
              "smfFilterExecuteParallel: thread starting on bolos %zu -- %zu",
              status, pdata->b1, pdata->b2 );
 
@@ -253,7 +253,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 
   /* if b1 past end of the work, nothing to do so we return */
   if( pdata->b1 >= nbolo ) {
-    msgOutif( MSG__DEBUG, "",
+    msgOutif( SMF__TIMER_MSG, "",
                "smfFilterExecuteParallel: nothing for thread to do, returning",
                status);
     return;
@@ -491,7 +491,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
      inv_filt_i = astFree( inv_filt_i );
   }
 
-  msgOutiff( MSG__DEBUG, "",
+  msgOutiff( SMF__TIMER_MSG, "",
              "smfFilterExecuteParallel: thread finishing bolos %zu -- %zu",
              status, pdata->b1, pdata->b2 );
 
