@@ -393,13 +393,13 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
                 corrbuf[j] = corr;
               }
 
-              if( msgFlevok( MSG__DEBUG, status ) ) {
+              if( msgFlevok( MSG__DEBUG1, status ) ) {
                 msgSeti( "COL", i );
                 msgSeti( "ROW", j );
                 msgSetd( "GAI", gain );
                 msgSetd( "OFF", offset );
                 msgSetd( "CORR", corr );
-                msgOutif( MSG__DEBUG, "", FUNC_NAME
+                msgOutif( MSG__DEBUG1, "", FUNC_NAME
                           ": ROW,COL (^ROW,^COL) GAIN,OFFSET,CORR "
                           "(^GAI,^OFF,^CORR)", status );
               }
