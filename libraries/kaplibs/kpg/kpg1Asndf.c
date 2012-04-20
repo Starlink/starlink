@@ -68,6 +68,7 @@ void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,7 +76,9 @@ void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
 *        Original version.
 *     19-AUG-2010 (DSB):
 *        Added DIM argument.
-*     {enter_changes_here}
+*     2012 April 18 (MJC):
+*        Limit axis copying to existing axes.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -83,15 +86,21 @@ void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
 */
 
 /* Local Variables: */
-   int place;         /* Place holder for temporary NDF */
+   int adim;          /* Number of dimensions of input NDF */
+   int dims[ NDF__MXDIM ]; /* Dimension sizes of input NDF */
    int idim;          /* Axis index */
    int indf2;         /* Identifier for temporary NDF */
+   int place;         /* Place holder for temporary NDF */
 
 /* Initialise */
    *iwcs = NULL;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
+
+/* Obtain the actual dimension of the input NDF. */
+   ndfDim( indf, NDF__MXDIM, &dims, &adim, status );
+   adim = ( adim < ndim ) ? adim : ndim; 
 
 /* Create a place-holder for a temporary NDF. */
    ndfTemp( &place, status );
@@ -102,7 +111,7 @@ void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
 /* If an input NDF was supplied, copy the required AXIS structures to the
    new NDF. */
    if( indf != NDF__NOID ) {
-      for( idim = 0; idim < ndim; idim++ ) {
+      for( idim = 0; idim < adim; idim++ ) {
          kpg1Axcpy( indf, indf2, dim[ idim ], idim + 1, status );
       }
    }

@@ -60,12 +60,15 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-AUG-2010 (DSB):
 *        Original version.
-*     {enter_changes_here}
+*     2012 April 18 (MJC):
+*        Test for character-component existence.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -89,6 +92,7 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
    int lbnd1[ NDF__MXDIM ];
    int lbnd2[ NDF__MXDIM ];
    int ndim;
+   int there;
    int ubnd1[ NDF__MXDIM ];
    int ubnd2[ NDF__MXDIM ];
    size_t size;
@@ -101,8 +105,11 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
 /* First copy all the character components. */
    cval[ 0 ] = 0;
    for( icomp = 0; icomp < NCCOMP; icomp++ ) {
-      ndfAcget( indf1, ccomp[ icomp ], ax1, cval, CHARSIZE, status );
-      ndfAcput( cval, indf2, ccomp[ icomp ], ax2, status );
+      ndfAstat( indf1, ccomp[ icomp ], ax1, &there, status );
+      if ( there == 1 ) {
+         ndfAcget( indf1, ccomp[ icomp ], ax1, cval, CHARSIZE, status );
+         ndfAcput( cval, indf2, ccomp[ icomp ], ax2, status );
+      }
    }
 
 /* Get the output NDF pixel bounds. */
