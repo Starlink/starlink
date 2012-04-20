@@ -4,7 +4,7 @@
 *     LOOK
 
 *  Purpose:
-*     List pixel values in a 2-dimensional NDF.
+*     Lists pixel values in a one- or two-dimensional NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,12 +21,12 @@
 
 *  Description:
 *     This application lists pixel values within a region of a
-*     two-dimensional NDF. The listing may be displayed on the screen
+*     two-dimensional NDF.  The listing may be displayed on the screen
 *     and logged in a text file (see Parameter LOGFILE).  The region
 *     to be listed can be specified either by giving its centre and
 *     size or its corners, or by giving an `ARD Description' for the
 *     region (see Parameter MODE). The top-right pixel value is also
-*     written to an output Parameter (VALUE). The listing may be
+*     written to an output Parameter (VALUE).  The listing may be
 *     produced in several different formats (see Parameter FORMAT), and
 *     the format of each individual displayed data value can be
 *     controlled using Parameter STYLE.
@@ -42,31 +42,31 @@
 *  ADAM Parameters:
 *     AGAIN = _LOGICAL (Read)
 *        If TRUE, the user is prompted for further regions to list until
-*        a FALSE value is obtained. [FALSE]
+*        a FALSE value is obtained.  [FALSE]
 *     ARDDESC = LITERAL (Read)
 *        An `ARD Description' for the parts of the image to be listed.
 *        Multiple lines can be supplied by ending each line with a
 *        hyphen, in which case further prompts for ARDDESC are made
-*        until a value is supplied which does not end with a hyphen. All
-*        the supplied values are then concatenated together (after
+*        until a value is supplied which does not end with a hyphen.
+*        All the supplied values are then concatenated together (after
 *        removal of the trailing minus signs).  ARDDESC is only accessed
 *        if MODE is "ARD". Positions in the ARD description are assumed
 *        to be in the current co-ordinate Frame of the NDF unless there
 *        are COFRAME or WCS statements which indicate a different
-*        system. See "Notes" below.
+*        system.  See "Notes" below.
 *     ARDFILE = FILENAME (Read)
 *        The name of an existing text file containing an `ARD
 *        Description' for the parts of the image to be listed.  ARDFILE
 *        is only accessed if MODE is "ARDFile". Positions in the ARD
 *        description are assumed to be in pixel co-ordinates unless
 *        there are COFRAME or WCS statements that indicate a different
-*        system. See "Notes" below.
+*        system.  See "Notes" below.
 *     CENTRE = LITERAL (Read)
 *        The co-ordinates of the data pixel at the centre of the area to
 *        be displayed, in the current co-ordinate Frame of the NDF
 *        (supplying a colon ":" will display details of the current
 *        co-ordinate Frame).  The position should be supplied as a list
-*        of formatted axis values separated by spaces or commas. See
+*        of formatted axis values separated by spaces or commas.  See
 *        also Parameter USEAXIS. CENTRE is only acessed if MODE is
 *        "Centre".
 *     COMP = LITERAL (Read)
@@ -91,7 +91,7 @@
 *        - "clist" -- Each row of textual output consists of an X pixel
 *        index, followed by a Y pixel index, followed by the pixel data
 *        value. No headers or blank lines are included. The pixels are
-*        listed in "Fortran order" - the lower left pixel first, and the
+*        listed in "Fortran order"---the lower left pixel first, and the
 *        upper right pixel last.
 *
 *        - "cglist" -- Like "clist" except bad pixels are omitted from
@@ -99,8 +99,8 @@
 *
 *        - "wlist" -- Each row of textual output consists of the WCS
 *        co-ordinates of the pixel, followed by the pixel data value. No
-*        headers or blank lines are included. The pixels are listed in
-*        "Fortran order" - the lower left pixel first, and the upper
+*        headers or blank lines are included.  The pixels are listed in
+*        "Fortran order"---the lower left pixel first, and the upper
 *        right pixel last.
 *
 *        - "wglist" -- Like "wlist" except bad pixels are omitted from
@@ -108,21 +108,21 @@
 *
 *        - "vlist" -- Each row of textual output consists of just the
 *        pixel data value. No headers or blank lines are included. The
-*        pixels are listed in "Fortran order" - the lower-left pixel
+*        pixels are listed in "Fortran order"---the lower-left pixel
 *        first, and the upper-right pixel last.
 *
 *        - "region" -- The pixel data values are listed as a
-*        two-dimensional region. Each row of textual output contains a
-*        whole row of data values. The textual output may be truncated
-*        if it is too wide. The lowest row is listed first.
+*        two-dimensional region.  Each row of textual output contains a
+*        whole row of data values.  The textual output may be truncated
+*        if it is too wide.  The lowest row is listed first.
 *
 *        In all cases, adjacent values are separated by spaces, and bad
-*        pixel values are represented by the string "BAD". ["strips"]
+*        pixel values are represented by the string "BAD".  ["strips"]
 *     LBOUND = LITERAL (Read)
 *        The co-ordinates of the data pixel at the bottom-left of the
 *        area to be displayed, in the current co-ordinate Frame of the
 *        NDF (supplying a colon ":" will display details of the current
-*        co-ordinate Frame). The position should be supplied as a list
+*        co-ordinate Frame).  The position should be supplied as a list
 *        of  formatted axis values separated by spaces or commas. See
 *        also Parameter USEAXIS.  A null (!) value causes the
 *        bottom-left corner of the supplied NDF to be used.  LBOUND is
@@ -134,7 +134,7 @@
 *     MAXLEN = _INTEGER (Read)
 *        The maximum number of characters in a line of textual output.
 *        The line is truncated after the last complete value if it would
-*        extend beyond this value. [80]
+*        extend beyond this value.  [80]
 *     MODE = LITERAL (Read)
 *        Indicates how the region to be listed will be specified:
 *
@@ -169,23 +169,23 @@
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
-*        file preceded by an up-arrow character "^". Such text files
+*        file preceded by an up-arrow character "^".  Such text files
 *        should contain further comma-separated lists which will be
-*        read and interpreted in the same manner. Attribute settings are
-*        applied in the order in which they occur within the list, with
-*        later settings over-riding any earlier settings given for the
-*        same attribute.
+*        read and interpreted in the same manner.  Attribute settings
+*        are applied in the order in which they occur within the list,
+*        with later settings over-riding any earlier settings given for
+*        the same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *
 *        where <name> is the name of a Frame attribute, and <value> is
-*        the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied. See Section
+*        the value to assign to the attribute.  Default values will be
+*        used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!) is supplied.  See Section
 *        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes. Any unrecognised attributes are ignored
+*        available attributes.  Any unrecognised attributes are ignored
 *        (no error is reported).
 *
 *        Data values are formatted using attributes Format(1) and
@@ -194,14 +194,14 @@
 *        The co-ordinates of the data pixel at the top-right corner of
 *        the  area to be displayed, in the current co-ordinate Frame of
 *        the NDF (supplying a colon ":" will display details of the
-*        current co-ordinate Frame). The position should be supplied as
+*        current co-ordinate Frame).  The position should be supplied as
 *        a list of formatted axis values separated by spaces or commas.
 *        See also Parameter USEAXIS.  A null (!) value causes the
 *        top-right corner of the supplied NDF to be used.  UBOUND is
 *        only accessed if MODE is "Bounds".
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the current co-ordinate Frame of
-*        the NDF has more than two axes. A group of two strings should
+*        the NDF has more than two axes.  A group of two strings should
 *        be supplied specifying the two axes which are to be used when
 *        supplying positions for parameters CENTRE, LBOUND and UBOUND.
 *        Each axis can be specified using one of the following options.
