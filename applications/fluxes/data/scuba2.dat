@@ -21,8 +21,8 @@
  Planetary temperatures and errors:
 
                Mars         Jupiter      Saturn       Uranus       Neptune
- 850          0.0   0.0  163.8   4.0  124.3   5.0   85.9   1.7   81.3   2.0
- 450          0.0   0.0  148.5   5.0  111.0   5.0   69.9   1.7   66.2   2.0
+ 850          0.0   0.0  163.8   4.0  124.3   5.0   82.7   1.0   78.1   5.0
+ 450          0.0   0.0  148.5   5.0  111.0   5.0   68.4   0.5   65.6   3.0
               0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
               0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
               0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
@@ -37,11 +37,20 @@
               0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
               0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
 
-Notes (these are revised numbers as of 7 Aug 1992):
+Notes (these are revised numbers as of 20 Apr 2012):
 
-The planetary brightness temperatures used are obtained from the measurements 
-of Griffin et al. (1986, Icarus 65, 244), Orton et al. (1986, Icarus 67, 289),
-and Griffin & Orton (1993, Icarus, 105, 537). The errors in brightness tempera-
+The Uranus and Neptune brightness temperatures are from Moreno,
+R. 2010, "Neptune and Uranus planetary brightness temperature
+tabulation, available from ESA Herschel Science Centre." The errors in
+brightness temperature are simply an estimate from the variation over
+the filters and are not used by FLUXES. The Herschel calibration data
+indicate that the SCUBA-2 filters are coincident with strong
+absorption lines. A more detailed analysis of the SCUBA-2 filters in
+combination with the Neptune brightness temperatures is required
+before Neptune should be used for calibration.
+
+The Jupiter brightness temperatures are obtained from the measurements of
+Griffin et al. (1986, Icarus 65, 244). The errors in brightness tempera-
 tures are the rms internal errors of the observations. For MJD's between 46040
 through 50000 the Martian temperatures are derived from the model developed by
 Wright (1976, Ap.J., 210, 250). Outside these MJD's (i.e., in particular after 
@@ -58,11 +67,4 @@ should not be used as a calibration object. Individuals using these data in
 published works should reference the appropriate papers as noted above.
 
 The filter frequencies are the effective frequencies for 1mm of water vapour. 
-These are the SCUBA filters (effective from 23-May-1996).
-
-Version 27-October-1995 (HEM)
-SCUBA Version 25-July-1996 (WSH)
-
-23-July-2003 (TJ) - Add THUMPER
-18-March-2005 (TJ) - Add THUMPER properly
-30-August-2011 (TJ) - SCUBA-2 clone
+These are the SCUBA-2 filters.
