@@ -35,7 +35,6 @@ smurf_gsdshow.c \
 smurf_impaztec.c \
 smurf_makecube.c \
 smurf_makemap.c \
-smurf_qlmakemap.c \
 smurf_rawpress.c \
 smurf_rawrecreatewcs.c \
 smurf_rawrewrtsc2wcs.c \

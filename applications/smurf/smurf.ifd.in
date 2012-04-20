@@ -256,6 +256,8 @@
 #        can be confusing.
 #     2011-10-18 (COBA):
 #         Updated FTS2PHASECORR, FTS2PHASECORRDS and FTS2SPECTRUM
+#     2012-04-20 (TIMJ):
+#        Remove QLMAKEMAP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -3135,141 +3137,6 @@ package @PACKAGE@ {
                 vpath CURRENT DEFAULT
                 ppath CURRENT DEFAULT
                 default TRUE
-                helpkey *
-            }
-
-        }
-
-        action qlmakemap {
-
-            helplib {$SMURF_HELP}
-
-            parameter bbm {
-                type NDF
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Bad bolometer masks}
-                default !
-                helpkey *
-            }
-
-            parameter crota {
-                type _REAL
-                prompt {Position angle of second pixel axis in output (degs)}
-                ppath DYNAMIC
-                vpath DYNAMIC
-                helpkey *
-            }
-
-            parameter genvar {
-                type _LOGICAL
-                vpath DEFAULT
-                default 0
-                helpkey *
-            }
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input NDF data structure}
-                helpkey *
-            }
-
-            parameter meansky {
-                type _DOUBLE
-                access WRITE
-                vpath DEFAULT
-                default 0.0
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Output NDF data structure}
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter params {
-                size *
-                type _DOUBLE
-                vpath PROMPT
-                ppath CURRENT
-                prompt {Auxiliary rebinning parameters}
-                helpkey *
-            }
-
-            parameter pixsize {
-                position 3
-                type _REAL
-                ppath DYNAMIC DEFAULT
-                vpath DYNAMIC
-                prompt {Output map pixel size in arcsec}
-                default 3.0
-                helpkey *
-            }
-
-            parameter reflat {
-                type LITERAL
-                access READ
-                ppath DYNAMIC
-                vpath DYNAMIC
-                prompt {Celestial latitude at output reference point}
-                helpkey *
-            }
-
-            parameter reflon {
-                type LITERAL
-                access READ
-                ppath DYNAMIC
-                vpath DYNAMIC
-                prompt {Celestial longitude at output reference point}
-                helpkey *
-            }
-
-            parameter spread {
-                type LITERAL
-                vpath DEFAULT
-                ppath DEFAULT
-                prompt {Pixel spreading method}
-                helpkey *
-                default {Nearest}
-            }
-
-            parameter system {
-                position 4
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Celestial coord system for output map}
-                default TRACKING
-                helpkey *
-            }
-
-            parameter taurel {
-                type LITERAL
-                default !
-                prompt {Group containing tau relationships}
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
                 helpkey *
             }
 

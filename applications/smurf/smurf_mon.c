@@ -160,10 +160,12 @@
 *         Updated FTS2PHASECORR
 *     2010-10-24 (EC):
 *         Add sc2filtermap
+*     2012-04-20 (TIMJ):
+*        Remove QLMAKEMAP
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2012 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2008,2010-2011 University of British Columbia.
 *     All Rights Reserved.
@@ -334,8 +336,6 @@ void smurf_mon( int * status ) {
     smurf_makecube( status );
   } else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
     smurf_makemap( status );
-  } else if (strcmp( taskname, "QLMAKEMAP" ) == 0 ) {
-    smurf_qlmakemap( status );
   } else if (strcmp( taskname, "RAWFIXMETA" ) == 0 ) {
     smurf_rawfixmeta( status );
   } else if (strcmp( taskname, "RAWPRESS" ) == 0 ) {

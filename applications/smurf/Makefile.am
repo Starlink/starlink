@@ -51,7 +51,6 @@ gsdshow \
 impaztec \
 makecube \
 makemap \
-qlmakemap \
 rawfixmeta \
 rawpress \
 rawrecreatewcs \
