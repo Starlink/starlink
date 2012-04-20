@@ -28,7 +28,7 @@
 *     two-dimensional array.
 *
 *     If EXACT is .FALSE. an error is only reported if the number of
-*     significant dimensions is higher than NDIM.  If there are less than
+*     significant dimensions is higher than NDIM.  If there are fewer than
 *     NDIM significant dimensions then the insignificant dimensions are
 *     used (starting from the lowest) to ensure that the required number
 *     of dimensions are returned. This mode is intended for cases where (say)
@@ -53,7 +53,7 @@
 *     Frame, assigning the value AST__BAD to the axes which have not been
 *     chosen.
 *
-*     If the original Current Frame has less than NDIM axes, then simple
+*     If the original Current Frame has fewer than NDIM axes, then simple
 *     axes are added into the new Current Frame to make up a total of
 *     NDIM. These axes are given the value 1.0.
 *
