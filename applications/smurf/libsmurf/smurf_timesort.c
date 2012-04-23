@@ -216,9 +216,12 @@
 *     1-JUL-2009 (DSB):
 *        The merging of extension items (i.e. smf_kmmerge) is now outside the
 *        time slice loop. This makes it much more efficient.
+*     23-APR-2012 (DSB):
+*        If an input NDF has different numbers of receptors to the first
+*        input NDF, use a section that matches the first input NDF.
 
 *  Copyright:
-*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009,2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -306,15 +309,15 @@ void smurf_timesort( int *status ) {
    char basename[ GRP__SZNAM + 1 ];
    char fullname[ GRP__SZNAM + 10 ];
    char ltbuf[ 11 ];
+   char timeorg[32];
+   char timescl[32];
+   char timesys[32];
+   char timeunt[32];
    char type[ DAT__SZTYP + 1 ];
    const char *comps = NULL;
    const char *dom = NULL;
    const char *key = NULL;
    const char *lab = NULL;
-   char timeorg[32];
-   char timescl[32];
-   char timesys[32];
-   char timeunt[32];
    const double *tsys;
    dim_t irec;
    dim_t jrec;
@@ -340,8 +343,8 @@ void smurf_timesort( int *status ) {
    int **sysrts = NULL;
    int *file_index = NULL;
    int *first = NULL;
-   int *good_dets = NULL;
    int *good_det = NULL;
+   int *good_dets = NULL;
    int *index = NULL;
    int *itimeout = NULL;
    int *mask = NULL;
@@ -373,13 +376,14 @@ void smurf_timesort( int *status ) {
    int ioutname;
    int isubscan;
    int isubsys;
-   int j;
    int j0;
+   int j;
    int jel;
    int k;
    int l;
    int lbnd[ 3 ];
    int lchan;
+   int ldet;
    int maxsyspop;
    int merge;
    int nbaddet;
@@ -411,6 +415,7 @@ void smurf_timesort( int *status ) {
    int tslimit;
    int ubnd[ 3 ];
    int uchan;
+   int udet;
    size_t len;
    size_t ndetgrp;
    size_t ntai;
@@ -948,16 +953,18 @@ void smurf_timesort( int *status ) {
                dims[ 1 ] = ubnd[ 1 ] - lbnd[ 1 ] + 1;
                dims[ 2 ] = ubnd[ 2 ] - lbnd[ 2 ] + 1;
 
-/* If this is the first input file, store the channel number bounds and the
-   number of detectors in the data. */
+/* If this is the first input file, store the channel number and detector
+   bounds, and the number of detectors in the data. */
                if( isubscan == 0 ) {
                   lchan = lbnd[ 0 ];
                   uchan = ubnd[ 0 ];
                   nchan = uchan - lchan + 1;
+                  ldet = lbnd[ 1 ];
+                  udet = ubnd[ 1 ];
                   ndet = dims[ 1 ];
 
-/* If this is not the first input file, check the channel number bounds and
-   detectors are the same as in the first input NDF. */
+/* If this is not the first input file, check the channel number bounds
+   are the same as in the first input NDF. Report an error if not. */
                } else if( ( lchan != lbnd[ 0 ] || uchan != ubnd[ 0 ] ) &&
                           *status == SAI__OK ) {
                   *status = SAI__ERROR;
@@ -969,13 +976,20 @@ void smurf_timesort( int *status ) {
                   errRep( "", "The spectral channel bounds (^LB,^UB) of '^NDF' differ "
                           "from (^LC,^UC) of the first NDF.", status );
 
-               } else if( dims[ 1 ] != ndet && *status == SAI__OK ) {
-                  *status = SAI__ERROR;
-                  ndfMsg( "NDF", indf1 );
-                  msgSeti( "D", dims[ 1 ] );
-                  msgSeti( "N", ndet );
-                  errRep( "", "The number of receptors (^D) in '^NDF' differs "
-                          "from the first NDF (^N).", status );
+/* If this is not the first input file, check the detector index bounds
+   are the same as in the first input NDF. If not, use a section that
+   matches the first NDF on the detector index axis. */
+               } else if( ldet != lbnd[ 1 ] || udet != ubnd[ 1 ] ) {
+                  slbnd[ 0 ] = lbnd[ 0 ];
+                  slbnd[ 1 ] = ldet;
+                  slbnd[ 2 ] = lbnd[ 2 ];
+                  subnd[ 0 ] = ubnd[ 0 ];
+                  subnd[ 1 ] = udet;
+                  subnd[ 2 ] = ubnd[ 2 ];
+                  ndfSect( indf1, 3, slbnd, subnd, &indf1s, status );
+                  ndfAnnul( &indf1, status );
+                  indf1 = indf1s;
+                  ndfid[ isubscan ] = indf1s;
                }
 
 /* If all input NDFs read so far have a Variance array, see if this one
