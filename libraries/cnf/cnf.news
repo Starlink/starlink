@@ -1,5 +1,9 @@
 1 CNF_update
 
+ CNF Version 5.1
+
+ o Add INTEGER*8 definitions. e.g. F77_INTEGER8_TYPE
+
  CNF Version 5.0
 
  o New macro F77_LOCK allows invocation of Fortran code from C to be

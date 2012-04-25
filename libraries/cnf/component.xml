@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cnf" support="S">
-  <version>5.0-0</version>
+  <version>5.1-0</version>
   <path>libraries/cnf</path>
   <description>Mixed Language Programming -- FORTRAN and C</description>
   <abstract><p>The CNF package comprises two sets of software which
