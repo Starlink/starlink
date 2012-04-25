@@ -390,3 +390,19 @@ unsigned short int num1_itouw_( int *num_argi )
 }
 
 #endif /* !HAVE_INTRINSIC_IZEXT */
+
+/* Handle the INTEGER*8 conversions here */
+
+#include <inttypes.h>
+#include <prm_par.h>
+
+int num1_ktoi_( int64_t *num_argk ) {
+  int64_t inval = *num_argk;
+  printf("Go a K int of %"PRIi64" to convert\n", inval );
+  if ( inval > VAL__MAXI || inval < VAL__MINI ) {
+    return VAL__BADI;
+  } else {
+    int outval = inval;
+    return outval;
+  }
+}

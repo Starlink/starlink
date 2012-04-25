@@ -49,9 +49,13 @@
       INTEGER NUM1_UBTOI
       INTEGER NUM1_UWTOI
       INTEGER NUM1_WTOI
+      INTEGER * 8 NUM1_KTOI
       REAL NUM1_ITOR
       REAL NUM1_WTOR
  
+
+*   INTEGER * 8 dummy arguments
+      INTEGER * 8 NUM_ARGK
 
 *   BYTE dummy arguments.
       BYTE NUM_ARGB
@@ -131,7 +135,7 @@
       INTEGER NUM_RTOI
       INTEGER NUM_UWTOI
       INTEGER NUM_WTOI
- 
+      INTEGER NUM_KTOI
  
 *   REAL dummy arguments.
       REAL NUM_ARGR

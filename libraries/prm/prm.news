@@ -1,7 +1,11 @@
 1 PRIMDAT - numerical data processing primatives
                                                         Expires: **.**.**
 
- A new version (v1.4) of PRIMDAT has been released.
+ A new version (v1.5) of PRIMDAT has been released.
+
+ v1.5
+    Add support for 64-bit INTEGER data types. These have a type
+    suffix of "K".
 
  v1.4
     The NUM_CMN common block is no longer a public include file since it

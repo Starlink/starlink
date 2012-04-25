@@ -177,6 +177,8 @@
 
       NUM_UWTOI( NUM_ARGUW )  = NUM1_UWTOI( NUM_ARGUW )
 
+      NUM_KTOI( NUM_ARGK )    = NUM1_KTOI( NUM_ARGK )
+
 
 *  Functions resulting in REAL.
 *  ===========================

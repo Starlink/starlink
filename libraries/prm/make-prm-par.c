@@ -19,6 +19,7 @@
  *        UW    _UWORD 	    (unsigned word)     INTEGER*2
  *        W     _WORD 	    (word)              INTEGER*2
  *        I     _INTEGER    (integer)           INTEGER
+ *        K     _INT64      (int64_t)           INTEGER*8
  *        R     _REAL 	    (real)              REAL
  *        D     _DOUBLE     (double precision)  DOUBLE PRECISION
  *
@@ -92,16 +93,18 @@
  *     12-OCT-2010 (DSB):
  *        Added VAL__NAM<X> constants which hold character strings "_DOUBLE",
  *        "_REAL" etc.
+*      20-APR-2012 (TIMJ):
+*         Add _INT64
 
  *  Copyright:
- *     Copyright (C) 2009-2010 Science and Technology Facilities Council.
+ *     Copyright (C) 2009-2010,2012 Science and Technology Facilities Council.
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2004-2005 Council for the Central Laboratory of the Research Councils
 
  *-
  */
 
-char copyright_string[] = "Copyright 1988, 1991, 1992, 1995, 2004, 2005, Council for the Central Laboratory of the Research Councils";
+char copyright_string[] = "Copyright 1988, 1991, 1992, 1995, 2004, 2005, CCLRC 2012 STFC";
 
 
 #include <config.h>
@@ -329,7 +332,7 @@ FILE* TestOutput;
 
 
 void comment(const char* comment);
-void par_i(const int size, const char* name, int val);
+void par_i(const int size, const char* name, int64_t val);
 void par_fp(const int size, const char* name, void* val);
 void par_f(const char* name, float val);
 void par_d(const char* name, double val);
@@ -639,6 +642,7 @@ int main (int argc, char **argv)
     par_c( "VAL__NAMW",  "_WORD" );
     par_c( "VAL__NAMUW",  "_UWORD" );
     par_c( "VAL__NAMI",  "_INTEGER" );
+    par_c( "VAL__NAMK", "_INT64" );
     par_c( "VAL__NAMR",  "_REAL" );
     par_c( "VAL__NAMD",  "_DOUBLE" );
 
@@ -648,6 +652,7 @@ int main (int argc, char **argv)
     par_i(+2, "VAL__BADUW", UINT16_MAX);
     par_i(-2, "VAL__BADW",   INT16_MIN);
     par_i(-4, "VAL__BADI",   INT32_MIN);
+    par_i(8, "VAL__BADK", INT64_MIN);
     par_f("VAL__BADR", -FLT_MAX);
     par_d("VAL__BADD", -DBL_MAX);
 
@@ -657,6 +662,7 @@ int main (int argc, char **argv)
     par_i(2, "VAL__EPSUW", 1);
     par_i(2, "VAL__EPSW", 1);
     par_i(4, "VAL__EPSI", 1);
+    par_i(8, "VAL__EPSK", 1);
     par_f("VAL__EPSR", FLT_EPSILON);
     par_d("VAL__EPSD", DBL_EPSILON);
 
@@ -666,6 +672,7 @@ int main (int argc, char **argv)
     par_i(2, "VAL__MAXUW", UINT16_MAX-1);
     par_i(2, "VAL__MAXW",   INT16_MAX);
     par_i(4, "VAL__MAXI",   INT32_MAX);
+    par_i(8, "VAL__MAXK", INT64_MAX);
     par_f("VAL__MAXR",     FLT_MAX);
     par_d("VAL__MAXD",     DBL_MAX);
 
@@ -675,6 +682,7 @@ int main (int argc, char **argv)
     par_i(2, "NUM__MAXUW", UINT16_MAX);
     par_i(2, "NUM__MAXW",   INT16_MAX);
     par_i(4, "NUM__MAXI",   INT32_MAX);
+    par_i(8, "NUM__MAXK", INT64_MAX);
     par_f("NUM__MAXR",     FLT_MAX);
     par_d("NUM__MAXD",     DBL_MAX);
 
@@ -684,6 +692,7 @@ int main (int argc, char **argv)
     par_i(2, "VAL__MINUW", 0);
     par_i(2, "VAL__MINW",  INT16_MIN+1);
     par_i(4, "VAL__MINI",  INT32_MIN+1);
+    par_i(8, "VAL__MINK",  INT64_MIN+1);
     par_f("VAL__MINR",  nextafterf(-FLT_MAX, 0));
     par_d("VAL__MIND",  nextafter(-DBL_MAX, 0));
 
@@ -693,6 +702,7 @@ int main (int argc, char **argv)
     par_i(2, "NUM__MINUW", 0);
     par_i(2, "NUM__MINW",  INT16_MIN);
     par_i(4, "NUM__MINI",  INT32_MIN);
+    par_i(8, "NUM__MINK",INT64_MIN);
     par_f("NUM__MINR",  -FLT_MAX);
     par_d("NUM__MIND",  -DBL_MAX);
 
@@ -702,6 +712,7 @@ int main (int argc, char **argv)
     par_i(-4, "VAL__NBUW", 2);
     par_i(-4, "VAL__NBW",  2);
     par_i(-4, "VAL__NBI",  4);
+    par_i(-4, "VAL__NBK",8);
     par_i(-4, "VAL__NBR",  sizeof(float));
     par_i(-4, "VAL__NBD",  sizeof(double));
 
@@ -711,6 +722,7 @@ int main (int argc, char **argv)
     par_i(-2, "VAL__SMLUW", 1);
     par_i(-2, "VAL__SMLW", 1);
     par_i(-4, "VAL__SMLI", 1);
+    par_i(-8, "VAL__SMLK", 1);
 #if FLOAT_IS_IEEE
     /* Note that the following are potentially denormalised numbers:
        this is not epsilon */
@@ -737,6 +749,7 @@ int main (int argc, char **argv)
     par_i(-4, "VAL__SZUW", 5);
     par_i(-4, "VAL__SZW",  6);
     par_i(-4, "VAL__SZI",  11);
+    par_i(-4, "VAL__SZK",20);
     /* -x.<float_precision-1>e+xx */
     par_i(-4, "VAL__SZR",  float_precision-1+7);
     /* -x.<double_precision-1>e+xxx */
@@ -773,7 +786,7 @@ void par_c(const char* name, const char* val)
 {
     if (FortranOutput) {
        fprintf(FortranOutput,
-               FLINE("CHARACTER*%d %s")
+               FLINE("CHARACTER*%zu %s")
                FLINE("PARAMETER ( %s = '%s' )"),
                     strlen(val), name, name, val);
     }
@@ -784,7 +797,7 @@ void par_c(const char* name, const char* val)
 }
 
 /*
- * Print out an integer.  The `size' parameter is 1, 2 or 4; any
+ * Print out an integer.  The `size' parameter is 1, 2, 4 or 8; any
  * other value causes a message to be printed out and we exit with a
  * non-zero status.
  *
@@ -792,10 +805,10 @@ void par_c(const char* name, const char* val)
  * type.  If this is negative, then its absolute value is the required
  * size, but avoid writing the number out as hex.
  */
-void par_i(const int size, const char* name, int val)
+void par_i(const int size, const char* name, int64_t val)
 {
     const char *type = NULL;
-    int min = 0;
+    int64_t min = 0;
 
     switch (size) {
       case 1:
@@ -813,10 +826,15 @@ void par_i(const int size, const char* name, int val)
         type = "INTEGER";
         min = INT32_MIN;
         break;
+      case 8:
+      case -8:
+        type = "INTEGER*8";
+        min = INT64_MIN;
+        break;
       default:
         {
             char msg[80];
-            sprintf(msg, "can handle 1-, 2-, or 4-byte integers, but not %d-byte ones\n",
+            sprintf(msg, "can handle 1-, 2-, 4- or 8-byte integers, but not %d-byte ones\n",
                     size);
             assumption(0, msg);
         }
@@ -831,27 +849,27 @@ void par_i(const int size, const char* name, int val)
                matter how cunningly you cast the values.  At least with
                the tohex() function, we know _exactly_ what we're getting. */
             Number N;
-            N.v.i = val;
+            N.v.i8 = val;
 	    N.nbytes = size;
             fprintf(FortranOutput,
                     FLINE("%s %s")
                     FLINE("PARAMETER ( %s = '%s'%s )")
-                    "*     [In decimal: %d]\n\n",
+                    "*     [In decimal: %"PRId64"]\n\n",
                     type, name, name, tohex(&N), BOZCODE, val);
         }
         else if ( HAVE_TYPELESS_BOZ && size > 0) {
             Number N;
-            N.v.i = val;
+            N.v.i8 = val;
 	    N.nbytes = size;
             fprintf(FortranOutput,
                     FLINE("%s %s")
                     FLINE("PARAMETER ( %s = %s'%s' )")
-                    "*     [In decimal: %d]\n\n",
+                    "*     [In decimal: %"PRId64"]\n\n",
                     type, name, name, BOZCODE, tohex(&N), val);
         } else {
             fprintf(FortranOutput,
                     FLINE("%s %s")
-                    FLINE("PARAMETER ( %s = %d )") "\n",
+                    FLINE("PARAMETER ( %s = %"PRId64" )") "\n",
                     type, name, name, val);
         }
     }
@@ -876,7 +894,7 @@ void par_i(const int size, const char* name, int val)
 
     if (COutput) {
         if (val >= 0)
-            fprintf(COutput, "#define %s %d\n", name, val);
+            fprintf(COutput, "#define %s %"PRId64"\n", name, val);
         else {
             /* Output negative numbers in brackets, to guarantee no
                parsing surprises.  Also, write numbers like INT_MIN as
@@ -886,9 +904,9 @@ void par_i(const int size, const char* name, int val)
                (sometimes?) parsed as a positive number plus a
                negation.  I admit there's a hint of voodoo here. */
             if (val == min)
-                fprintf(COutput, "#define %s (%d - 1)\n", name, val+1);
+                fprintf(COutput, "#define %s (%"PRId64" - 1)\n", name, val+1);
             else
-                fprintf(COutput, "#define %s (%d)\n", name, val);
+                fprintf(COutput, "#define %s (%"PRId64")\n", name, val);
         }
     }
 }
@@ -1144,7 +1162,7 @@ const char* tohex(Number* p)
     static char c[17];
     int i;
     int size = p->nbytes;
-    static char *hexdigits = "0123456789ABCDEF";
+    static const char *hexdigits = "0123456789ABCDEF";
     unsigned char *bp;
 
     assumption(sizeof(int64_t) <= 17-1,
