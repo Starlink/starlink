@@ -1,6 +1,6 @@
 /*+
  *  Name:
- *     emsSeti64
+ *     emsSetk
 
  *  Purpose:
  *     Assign a signed 64bit int value to a message token (concise).
@@ -9,7 +9,7 @@
  *     Starlink ANSI C
 
  *  Invocation:
- *     emsSeti64( token, ivalue )
+ *     emsSetk( token, ivalue )
 
  *  Description:
  *     The given 64-bit int value is encoded using a concise format and the
@@ -24,9 +24,11 @@
  *        The 64-bit integer value to be assigned to the message token.
 
 *  Copyright:
+*     Copyright (C) 2012 Science and Technology Facilities Council.
 *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+
 *     All Rights Reserved.
 
 *  Licence:
@@ -69,6 +71,8 @@
  *        Copy from emsSeti
  *      8-MAR-2006 (TIMJ):
  *        Use C99 formats
+ *     24-APR-2012 (TIMJ):
+ *        Change name to match "k" syntax for 64-bit integer.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -97,13 +101,13 @@
 #endif
 
 /* Function Definitons: */
-void emsSeti64( const char *token, int64_t ivalue ){
+void emsSetk( const char *token, int64_t ivalue ){
 
 /* Local Type Definitions: */
    char str[EMS__SZTOK+1];
 
-   TRACE("emsSeti64");
-   DEBUG("emsSeti64","emsSeti64: %" EMSFMT, ivalue);
+   TRACE("emsSetk");
+   DEBUG("emsSetk","emsSetk: %" EMSFMT, ivalue);
 
 /*  Construct the message token string. */
    sprintf( str, "%" EMSFMT, ivalue );

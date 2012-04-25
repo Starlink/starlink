@@ -35,7 +35,7 @@ PRIVATE_INCLUDES = ems_sys.h ems1.h ems_defs.h ems_f77.h
 C_ROUTINES = emsAnnul.c emsBegin.c emsEload.c emsEnd.c emsErrno.c \
              emsExpnd.c emsFacer.c emsLevel.c emsMark.c emsMload.c \
              emsRenew.c emsRep.c emsRlse.c emsSetc.c emsSetd.c \
-             emsSeti.c emsSeti64.c emsSetl.c emsSetnc.c emsSetp.c \
+             emsSeti.c emsSetk.c emsSetl.c emsSetnc.c emsSetp.c \
              emsSetr.c emsSetu.c emsStat.c emsSyser.c emsTune.c \
 	     emsGtune.c emsStune.c \
              emsSet.c emsSetv.c \
@@ -52,7 +52,7 @@ CF_ROUTINES = ems_annul.c ems_begin.c ems_eload.c ems_end.c ems_expnd.c \
               ems_facer.c ems_level.c ems_mark.c ems_mload.c ems_renew.c \
               ems_rep.c ems_rlse.c ems_setc.c ems_setd.c ems_seti.c \
               ems_setl.c ems_setr.c ems_stat.c ems_syser.c ems_tune.c \
-	      ems_gtune.c
+	      ems_gtune.c ems_setk.c
 
 #  List of platform specific Fortran interface routines.  The distribution
 #  will contain a version of these files for each set of platforms.  The names

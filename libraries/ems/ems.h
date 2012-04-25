@@ -152,8 +152,8 @@ void emsSetd( const char *token,
 void emsSeti( const char *token,
               int ivalue );
 
-void emsSeti64( const char *token,
-                int64_t ivalue );
+void emsSetk( const char *token,
+              int64_t ivalue );
 
 void emsSetl( const char *token,
               int lvalue );

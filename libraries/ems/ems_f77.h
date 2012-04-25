@@ -133,6 +133,10 @@ F77_SUBROUTINE(ems_seti) ( CHARACTER(token),
                            INTEGER(ivalue)
                            TRAIL( tlength ) );
 
+F77_SUBROUTINE(ems_setk) ( CHARACTER(token),
+                           INTEGER8(ivalue)
+                           TRAIL( tlength ) );
+
 F77_SUBROUTINE(ems_setl) ( CHARACTER(token),
                            INTEGER(lvalue)
                            TRAIL( tlength ) );

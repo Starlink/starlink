@@ -1,3 +1,11 @@
+2.4-0
+
+   * Rename emsSeti64 to emsSetk. This makes the name consistent
+     with the broader 64-bit integer support being added to Starlink.
+     "K" is also the FITS symbol for 64-bit integers.
+
+   * Add EMS_SETK Fortran interface for an INTEGER*8.
+
 2.3-0
 
    * Add emsRepf routine to allow sprintf format specifiers to be used for
