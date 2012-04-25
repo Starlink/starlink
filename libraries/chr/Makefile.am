@@ -40,7 +40,7 @@ F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
         chr1_wild3.f chr1_wild4.f chr1_wild5.f chr1_wild6.f chr1_wild7.f \
         chr_fparx.f chr_lasto.f
 
-C_ROUTINES = chr_etom.c chr_mtoe.c
+C_ROUTINES = chr_etom.c chr_mtoe.c chr_ktoc.c
 
 BUILT_SOURCES = $(include_MESSAGES)
 
