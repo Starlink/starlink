@@ -38,6 +38,11 @@
 #include "generic_func.cgen"
 #undef CGEN_CODE_TYPE
 
+#define CGEN_CODE_TYPE CGEN_INT64_TYPE
+#include "cgeneric_defs.h"
+#include "generic_func.cgen"
+#undef CGEN_CODE_TYPE
+
 int main( int argc, char *argv[] )
 {
     int status = 1;
@@ -48,6 +53,7 @@ int main( int argc, char *argv[] )
     status = status && kpg1_callUW( "unsigned word" );
     status = status && kpg1_callB( "byte" );
     status = status && kpg1_callUB( "unsigned byte" );
+    status = status && kpg1_callK( "64-bit int" );
     return (status == 0);
 }
 

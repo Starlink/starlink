@@ -1,0 +1,12 @@
+s/<T>/K/g
+s/<TYPE>/INTEGER*8/g
+s/<LTYPE>/INTEGER*8/g
+s/<CONST>/ /g
+s/<HTYPE>/_INT64/g
+s/<COMM>/INTEGER*8/g
+s/<t>/K/g
+s/<type>/INTEGER*8/g
+s/<ltype>/INTEGER*8/g
+s/<const>/ /g
+s/<htype>/_INT64/g
+s/<comm>/INTEGER*8/g

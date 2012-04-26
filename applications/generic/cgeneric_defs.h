@@ -59,6 +59,8 @@
 *        Added CGEN_HDS_TYPE.
 *     12-DEC-2008 (TIMJ):
 *        Added CGEN_BIG_TYPE
+*     2012-04-23 (TIMJ):
+*        Add INT64
 *     {enter_further_changes_here}
 
 *-
@@ -110,6 +112,15 @@
 #define CGEN_CODE I
 #define CGEN_PRM_TYPE I
 #define CGEN_HDS_TYPE "_INTEGER"
+
+#elif CGEN_CODE_TYPE == CGEN_INT64_TYPE
+
+#include <inttypes.h>
+#define CGEN_TYPE int64_t
+#define CGEN_BIG_TYPE int64_t
+#define CGEN_CODE K
+#define CGEN_PRM_TYPE K
+#define CGEN_HDS_TYPE "_INT64"
 
 /* short int */
 #elif CGEN_CODE_TYPE == CGEN_WORD_TYPE

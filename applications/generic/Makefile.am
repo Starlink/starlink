@@ -19,7 +19,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 AUX_FILES = byte byte_asterix \
 	character character_asterix \
 	double double_asterix \
-	integer integer_asterix \
+	integer integer8 integer_asterix \
 	logical logical_asterix \
 	real real_asterix \
 	ubyte ubyte_asterix \

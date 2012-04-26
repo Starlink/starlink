@@ -49,8 +49,8 @@
 *          against the BAD value contant.
 *
 *          The value of CGEN_TYPE will be set to the C type, that is
-*          double, float, int, short int, unsigned short int, char
-*          and unsigned char, as appropriate.
+*          double, float, int, short int, unsigned short int, char,
+*          unsigned char, and int64_t as appropriate.
 *
 *          The value of CGEN_BAD will be set to one of the PRM constants
 *          VAL__BADD, VAL__BADR etc. as appropriate. Likewise, CGEN_MAX
@@ -61,7 +61,7 @@
 *
 *          The value of CGEN_HDS_TYPE will be set to the HDS type of the
 *          current type, one of "_DOUBLE", "_REAL", "_INTEGER", "_WORD"
-*          "_UWORD", "_BYTE" or "_UBYTE".
+*          "_UWORD", "_BYTE", "_UBYTE" or "_INT64".
 *
 *          CGEN_BIG_TYPE is a type that is fundamentally the same type
 *          as CGEN_TYPE but can have more precision. For example, int vs
@@ -75,7 +75,7 @@
 *
 *             CGEN_DOUBLE_TYPE, CGEN_FLOAT_TYPE, CGEN_INT_TYPE,
 *             CGEN_WORD_TYPE, CGEN_UWORD_TYPE, CGEN_BYTE_TYPE
-*             CGEN_UBYTE_TYPE
+*             CGEN_UBYTE_TYPE, CGEN_INT64_TYPE
 *
 *          to select the data type required. Then include the file
 *          "cgeneric_defs.h" followed by your generic include file,
@@ -99,7 +99,7 @@
 *
 *        - Use the generic routines. The function names will
 *          have the character codes "D", "F", "I", "W", "UW",
-*          "B" and "UB" appended to their declared names. So
+*          "B", "UB", and "K" appended to their declared names. So
 *          for our example "kpg1_bad", we have the two functions
 *          "kpg1_badD" and "kpg1_badI".
 
@@ -107,6 +107,7 @@
 *     Should look at how to declare prototypes.
 
 *  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -129,6 +130,7 @@
 *  Authors:
 *     PWD: Peter W. Draper (JAC, Durham University)
 *     DSB: David S. Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -136,6 +138,8 @@
 *        Original version.
 *     31-AUG-2006 (DSB):
 *        Add CGEN_MAX and CGEN_MIN.
+*     2012-04-23 (TIMJ):
+*        Add INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -177,5 +181,6 @@
 #define CGEN_UWORD_TYPE 5
 #define CGEN_BYTE_TYPE 6
 #define CGEN_UBYTE_TYPE 7
+#define CGEN_INT64_TYPE 8
 
 #endif /* _CGENERIC_H_ */

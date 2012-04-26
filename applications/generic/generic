@@ -35,12 +35,13 @@
 #           c = character
 #           d= double precision
 #           i = integer
+#           k = 64-bit integer
 #           l = logical
 #           r = real
 #           w = word
 #           W = unsigned word
 #        Other recognised types are
-#           n = numeric types (b, B, d, i, r, w and W)
+#           n = numeric types (b, B, d, i, k, r, w and W)
 #           a = all types
 #        The list of types to be processed can be specified by the
 #        environment variable GENERIC_TYPES.  If GENERIC_TYPES is defined
@@ -130,6 +131,7 @@
 #     one.
 
 #  Copyright:
+#     Copyright (C) 2012 Science & Technology Facilities Council.
 #     Copyright (C) 1992-1994 Science & Engineering Research Council.
 #     Copyright (C) 2000, 2004 Central Laboratory of the Research
 #     Councils. All Rights Reserved.
@@ -153,6 +155,7 @@
 #  Authors:
 #     PMA: Peter Allan (Starlink, RAL)
 #     MJC: Malcolm J. Currie (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -189,6 +192,8 @@
 #        Augment examples.
 #     2004 October 5 (TIMJ):
 #        File suffices were overriding an explicit -t
+#     2012-04-23 (TIMJ):
+#        Add 64-bit integer support (K)
 #     {enter_further_changes_here}
 
 #-
@@ -283,7 +288,7 @@ if ( $?types == 0 ) then
       set types = $GENERIC_TYPES
       set settypes = 1
    else
-      set types = "bBcdirlwW"
+      set types = "bBcdikrlwW"
    endif
 endif
 
@@ -334,13 +339,13 @@ foreach fname ($gfiles[1-])
 # See if all numeric types should be generated.
 
       if ( `echo $types | grep n` != "" ) then
-         set types = $types"bBdirwW"
+         set types = $types"bBdikrwW"
       endif
 
 # See if all types should be generated.
 
       if ( `echo $types | grep a` != "" ) then
-         set types = "bBcdirlwW"
+         set types = "bBcdikrlwW"
       endif
 
 # Remove the trailing x character of the file name, when the -x option
@@ -446,6 +451,23 @@ foreach fname ($gfiles[1-])
             >$tempfile
          else
             sed -f $GENERIC_DIR/integer $fname >$tempfile
+         endif
+         if ( $sepflag ) then
+            awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}i.f
+         else
+            awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
+         endif
+         if ( -f $tempfile ) \rm $tempfile
+      endsw
+
+      switch (k)
+      case [$types]:
+         if ( $astflag ) then
+            sed -f $GENERIC_DIR/integer8 $fname \
+            | sed -f $GENERIC_DIR/integer8 \
+            >$tempfile
+         else
+            sed -f $GENERIC_DIR/integer8 $fname >$tempfile
          endif
          if ( $sepflag ) then
             awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}i.f

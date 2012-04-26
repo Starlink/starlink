@@ -1,5 +1,5 @@
 
-int CGEN_FUNCTION(kpg1_call) ( char *type )
+int CGEN_FUNCTION(kpg1_call) ( const char *type )
 {
     CGEN_TYPE ltype = CGEN_BAD;
     printf( "type = %s \n", type );
