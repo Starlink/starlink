@@ -123,7 +123,6 @@ static int vtkG3DText( const char *, float[3], const char *, float[3],
 static int vtkG3DTxExt( const char *, float[3], const char *, float[3],
                         float[3], float *, float *, float *, float[3] );
 
-
 /* Static variables. */
 /* ================= */
 
@@ -569,9 +568,9 @@ static int vtkG3DAttr( int attr, double value, double *old_value, int prim )
         /* If required retrieve the current character size, and set a
            new size.  The attribute value should be a factor by which
            to multiply the default character size. */
-        if ( old_value ) *old_value = currentGC->configInfo.size;
+        if ( old_value ) *old_value = currentGC->textScale;
         if ( value != AST__BAD ){
-            currentGC->configInfo.size = value;
+            currentGC->textScale = value;
         }
     }
     else if ( attr == GRF__FONT ) {
@@ -1102,11 +1101,6 @@ static int vtkG3DTxExt( const char *text, float ref[3], const char *just,
     yb[3] = tx[1]*txlo + ty[1]*tyhi + ref[1];
     zb[3] = tx[2]*txlo + ty[2]*tyhi + ref[2];
 
-    xb[0] -= 10.0;
-    xb[1] -= 10.0;
-    xb[2] -= 10.0;
-    xb[3] -= 10.0;
-
     /* Also transform the text plane coordinates at the bottom left of the
      * text baseline into 3D world coordinates. */
     bl[0] = tx[0]*txlo + ty[0]*tyzero + ref[0];
@@ -1300,23 +1294,32 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
     /* Adjust initial position for justification. */
     double *bounds = prop->GetBounds();
     double *centre = prop->GetCenter();
+    double origin[3];
     if ( newjust[0] == 'C' && newjust[1] == 'C' ) {
-        prop->SetOrigin( centre[0], centre[1], centre[2] );
+        origin[0] = centre[0];
+        origin[1] = centre[1];
+        origin[2] = centre[2];
     }
     else {
-        double origin[3];
-        origin[2] = bounds[4];
+        // Z position is fixed (at zero?).
+        origin[2] = 0.0; // bounds[4];
 
+        // Y position.
         if ( newjust[0] == 'C' ) {
             origin[1] = centre[1];
         }
-        else if ( newjust[0] == 'B' || newjust[0] == 'M' ) {
+        else if ( newjust[0] == 'B' ) {
+            origin[1] = 0.0;
+        }
+        else if (newjust[0] == 'M' ) {
             origin[1] = bounds[2];
         }
         else {
+            // Top.
             origin[1] = bounds[3];
         }
 
+        //  X position.
         if ( newjust[1] == 'C' ) {
             origin[0] = centre[0];
         }
@@ -1324,10 +1327,11 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
             origin[0] = bounds[0];
         }
         else {
+            // Right.
             origin[0] = bounds[1];
         }
-        prop->SetOrigin( origin[0], origin[1], origin[2] );
     }
+    prop->SetOrigin( origin[0], origin[1], origin[2] );
 
     /* Now apply rotation of text plane. */
     prop->SetOrientation( orient );
@@ -1337,7 +1341,9 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
                     currentGC->textScale );
 
     /* Final position of text. */
-    prop->SetPosition( (double) ref[0], (double) ref[1], (double) ref[2] );
+    prop->SetPosition( (double) (ref[0]-origin[0]),
+                       (double) (ref[1]-origin[1]),
+                       (double) (ref[2]-origin[2]) );
 
     /*  Release unneeded references. */
     vtext->Delete();
