@@ -304,9 +304,12 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        do not assume inappropriate default equinox values for systems
 *        that are not referred to the equinox specified by the Equinox attribute.
 *     26-APR-2012 (DSB):
-*        Correct Dump function so that any axis permutation is taken into
+*        - Correct Dump function so that any axis permutation is taken into
 *        account when dumping SkyFrame attributes that have a separate value
 *        for each axis (e.g. SkyRef and SkyRefP).
+*        - Take axis permutation into account when setting a new value
+*        for attributes that have a separate value for each axis (e.g.
+*        SkyRef and SkyRefP).
 *class--
 */
 
@@ -599,7 +602,7 @@ static void Set##attr( AstSkyFrame *this, int axis, type value, int *status ) { 
 \
 /* Store the new value in the structure component. */ \
    if( astOK ) { \
-      this->component[ axis ] = (assign); \
+      this->component[ axis_p ] = (assign); \
    } \
 } \
 \
