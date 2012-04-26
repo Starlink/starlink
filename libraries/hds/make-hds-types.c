@@ -265,6 +265,7 @@ int main (int argc, char ** argv ) {
 #endif
 #if HAVE_INTTYPES_H
   fprintf(POutputFile, "#include <inttypes.h>\n\n" );
+  fprintf(OutputFile, "#include <inttypes.h>\n\n" );
 #else
 # if HAVE_STDINT_H
   fprintf(POutputFile, "#include <stdint.h>\n\n" );
@@ -286,6 +287,12 @@ int main (int argc, char ** argv ) {
 	  "#define HDS_INT_BIG_S \"%s\"\n"
 	  "#define HDS_INT_BIG_U \"%s\"\n\n",
 	  INT_BIG, UINT_BIG, INT_BIG_S, INT_BIG_U);
+
+  /* Make sure that int64_t is defined to something */
+#if !HAVE_INT64_T
+  fprintf(OutputFile, "/* standardise 64-bit integer for API */\n");
+  fprintf(OutputFile, "typedef %s int64_t\n\n", INT_BIG );
+#endif
 
   /* Note that we do not make public a true struct LOC since that would require that
      struct LCP is also made public. We simply create a struct that has the same sized
