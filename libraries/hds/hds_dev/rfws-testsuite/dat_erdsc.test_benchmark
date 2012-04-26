@@ -1,0 +1,29 @@
+Operation to perform: erdsc
+
+Report error about an object...
+Status code: 147358555
+<Unknown object>: File invalid (DAT__FILIN)
+File invalid (DAT__FILIN)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: x
+Number of dimensions: 0
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: erdsc
+
+Report error about an object...
+Status code: 147358563
+HDS_SCRATCH.TEMP_1: Object invalid (DAT__OBJIN)
+Object invalid (DAT__OBJIN)
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: quit
+
+Quit...

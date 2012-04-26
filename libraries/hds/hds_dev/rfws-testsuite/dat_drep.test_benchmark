@@ -1,0 +1,187 @@
+Operation to perform: temp
+
+Create temporary object...
+Data type: _real
+Number of dimensions: 0
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_S', order = 'MSB'.
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _double
+Number of dimensions: 0
+
+Current object is no. 2: HDS_SCRATCH.TEMP_2, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_D', order = 'MSB'.
+
+Current object is no. 2: HDS_SCRATCH.TEMP_2, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _integer
+Number of dimensions: 0
+
+Current object is no. 3: HDS_SCRATCH.TEMP_3, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 3: HDS_SCRATCH.TEMP_3, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _word
+Number of dimensions: 0
+
+Current object is no. 4: HDS_SCRATCH.TEMP_4, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 4: HDS_SCRATCH.TEMP_4, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _uword
+Number of dimensions: 0
+
+Current object is no. 5: HDS_SCRATCH.TEMP_5, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'BINARY', order = 'MSB'.
+
+Current object is no. 5: HDS_SCRATCH.TEMP_5, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _byte
+Number of dimensions: 0
+
+Current object is no. 6: HDS_SCRATCH.TEMP_6, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 6: HDS_SCRATCH.TEMP_6, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _ubyte
+Number of dimensions: 0
+
+Current object is no. 7: HDS_SCRATCH.TEMP_7, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'BINARY', order = 'MSB'.
+
+Current object is no. 7: HDS_SCRATCH.TEMP_7, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _logical
+Number of dimensions: 0
+
+Current object is no. 8: HDS_SCRATCH.TEMP_8, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'NZ', order = 'MSB'.
+
+Current object is no. 8: HDS_SCRATCH.TEMP_8, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _char
+Number of dimensions: 0
+
+Current object is no. 9: HDS_SCRATCH.TEMP_9, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'ASCII', order = 'MSB'.
+
+Current object is no. 9: HDS_SCRATCH.TEMP_9, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _char*17
+Number of dimensions: 0
+
+Current object is no. 10: HDS_SCRATCH.TEMP_10, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'ASCII', order = 'MSB'.
+
+Current object is no. 10: HDS_SCRATCH.TEMP_10, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _real
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 11: HDS_SCRATCH.TEMP_11, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_S', order = 'MSB'.
+
+Current object is no. 11: HDS_SCRATCH.TEMP_11, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: junk
+Number of dimensions: 0
+
+Current object is no. 12: HDS_SCRATCH.TEMP_12, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Object is not primitive; its data representation is not defined (possible programming error).
+DAT_DREP: Error obtaining data representation information for an HDS primitive.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 12: HDS_SCRATCH.TEMP_12, nested at level 2
+
+Operation to perform: quit
+
+Quit...

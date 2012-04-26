@@ -1,0 +1,106 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'TEST'
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: a
+Number of dimensions: 0
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'A'
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: c
+Number of dimensions: 2
+Dimension: 2
+Dimension: 5
+
+Current object is no. 3: TEST.A.Z, nested at level 3
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'Z'
+
+Current object is no. 3: TEST.A.Z, nested at level 3
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 2
+Subscript: 1
+Subscript: 4
+
+Current object is no. 4: TEST.A.Z(1,4), nested at level 3
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'Z'
+
+Current object is no. 4: TEST.A.Z(1,4), nested at level 3
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: asdfghjkloiuytr
+Component type: 
+Number of dimensions: 0
+
+Current object is no. 5: TEST.ASDFGHJKLOIUYTR, nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'ASDFGHJKLOIUYTR'
+
+Current object is no. 5: TEST.ASDFGHJKLOIUYTR, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

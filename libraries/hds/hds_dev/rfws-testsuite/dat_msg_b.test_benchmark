@@ -1,0 +1,349 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: x
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 1: X, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/test
+
+Current object is no. 1: X, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test.sdf
+Object name: x
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/test
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test.sdg
+Object name: x
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 3: X, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.sdg"
+
+Current object is no. 3: X, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: y
+Component type: y
+Number of dimensions: 0
+
+Current object is no. 4: X.Y, nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.sdg".Y
+
+Current object is no. 4: X.Y, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 3
+
+Current object is no. 3: X, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test.
+Object name: x
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 5: X, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test"
+
+Current object is no. 5: X, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test..
+Object name: x
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 6: X, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test."
+
+Current object is no. 6: X, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: d
+Component type: d
+Number of dimensions: 0
+
+Current object is no. 7: X.D, nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.".D
+
+Current object is no. 7: X.D, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 6
+
+Current object is no. 6: X, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: .sdf
+Object name: sdf
+Object type: sdf
+Number of dimensions: 0
+
+Current object is no. 8: SDF, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/
+
+Current object is no. 8: SDF, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: data
+Component type: x
+Number of dimensions: 0
+
+Current object is no. 9: SDF.DATA, nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/.DATA
+
+Current object is no. 9: SDF.DATA, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 8
+
+Current object is no. 8: SDF, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 8, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test.Sdf
+Object name: c
+Object type: c
+Number of dimensions: 0
+
+Current object is no. 10: C, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.Sdf"
+
+Current object is no. 10: C, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: x
+Number of dimensions: 0
+
+Current object is no. 11: C.X, nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.Sdf".X
+
+Current object is no. 11: C.X, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 10
+
+Current object is no. 10: C, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 10, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: .test
+Object name: test
+Object type: test
+Number of dimensions: 2
+Dimension: 3
+Dimension: 4
+
+Current object is no. 12: TEST, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/.test"
+
+Current object is no. 12: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 2
+Subscript: 2
+Subscript: 3
+
+Current object is no. 13: TEST(2,3), nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/.test"(2,3)
+
+Current object is no. 13: TEST(2,3), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: data_array
+Component type: _ubyte
+Number of dimensions: 3
+Dimension: 4
+Dimension: 5
+Dimension: 6
+
+Current object is no. 14: TEST(2,3).DATA_ARRAY, nested at level 2
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 3
+Lower bound: 2
+Upper bound: 3
+Lower bound: 3
+Upper bound: 4
+Lower bound: 1
+Upper bound: 3
+
+Current object is no. 15: TEST(2,3).DATA_ARRAY(2:3,3:4,1:3), nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/.test"(2,3).DATA_ARRAY(2:3,3:4,1:3)
+
+Current object is no. 15: TEST(2,3).DATA_ARRAY(2:3,3:4,1:3), nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 16: TEST(2,3), nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/.test"(2,3)
+
+Current object is no. 16: TEST(2,3), nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 12
+
+Current object is no. 12: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 12, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

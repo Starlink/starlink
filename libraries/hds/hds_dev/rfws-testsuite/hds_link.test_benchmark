@@ -1,0 +1,60 @@
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: x
+HDS locator invalid: value=' ', length=15 (possible programming error).
+HDS_LINK: Error linking a locator to an HDS group.
+Locator invalid (DAT__LOCIN)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: 
+HDS_LINK: Error linking a locator to an HDS group.
+Group invalid (DAT__GRPIN)
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: _...&^%$
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = '_...&^%$'
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: ?
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = '?'
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: quit
+
+Quit...

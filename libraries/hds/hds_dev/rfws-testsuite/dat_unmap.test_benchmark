@@ -1,0 +1,60 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: _real
+Number of dimensions: 1
+Dimension: 100
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+DAT_BASIC: Error mapping an HDS primitive as basic machine units.
+Primitive data undefined (DAT__UNSET)
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: w
+400 machine elements mapped
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 3
+Increment: 0
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: quit
+
+Quit...

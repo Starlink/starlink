@@ -1,0 +1,152 @@
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 0
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: -1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = -1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 0
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 0
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shel
+New value: -2
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shel
+Value of tuning setting = 0
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shel
+New value: 1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shel
+New value: 2
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 2
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shel
+New value: 3
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shel
+Value of tuning setting = 0
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: she
+New value: 1
+Unknown tuning parameter name 'she' specified (possible programming error).
+HDS_TUNE: Error setting a new value for an HDS tuning parameter.
+Name invalid (DAT__NAMIN)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_shell
+
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shel
+Value of tuning setting = 0
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: she
+New value: 3
+Unknown tuning parameter name 'she' specified (possible programming error).
+HDS_TUNE: Error setting a new value for an HDS tuning parameter.
+Name invalid (DAT__NAMIN)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: she
+Unknown tuning parameter name 'she' specified (possible programming error).
+HDS_GTUNE: Error obtaining the value of an HDS tuning parameter.
+Name invalid (DAT__NAMIN)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: quit
+
+Quit...

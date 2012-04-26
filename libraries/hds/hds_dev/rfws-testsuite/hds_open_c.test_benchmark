@@ -1,0 +1,35 @@
+Operation to perform: hds_new
+ 
+Create new container file...
+Container file name: test
+Object name: x
+Object type: 0
+Number of dimensions: 0
+ 
+Current object is no. 1: X, nested at level 1
+ 
+Operation to perform: hds_open
+ 
+Open an HDS container file...
+Container file name: test
+Access mode: w
+ 
+Current object is no. 2: X, nested at level 1
+ 
+Operation to perform: hds_erase
+ 
+Erase container file...
+ 
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+ 
+Operation to perform: hds_open
+ 
+Open an HDS container file...
+Container file name: test
+Access mode: r
+ 
+Current object is no. 3: X, nested at level 1
+ 
+Operation to perform: quit
+ 
+Quit...

@@ -1,0 +1,99 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: test
+Number of dimensions: 1
+Dimension: 512
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 1
+
+Current object is no. 2: TEST(1), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: a
+Number of dimensions: 0
+
+Current object is no. 3: TEST(1).A, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 4: TEST(2), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: b
+Component type: b
+Number of dimensions: 0
+
+Current object is no. 5: TEST(2).B, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 1
+
+Current object is no. 6: TEST(1), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 6: TEST(1), nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 7: TEST(2), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 7: TEST(2), nested at level 1
+
+Operation to perform: quit
+
+Quit...

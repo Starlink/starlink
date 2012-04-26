@@ -1,0 +1,109 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: a
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: _real
+Number of dimensions: 0
+
+Current object is no. 2: TEST.Z, nested at level 2
+
+Operation to perform: clone
+
+Clone locator...
+
+Current object is no. 3: TEST.Z, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current object is no. 2: TEST.Z, nested at level 2
+
+Operation to perform: hds_trace
+
+Trace object path...
+Nesting level = 2
+Path name = 'TEST.Z'
+File name = '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.sdf'
+
+Current object is no. 2: TEST.Z, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   Z <_REAL>
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: erase
+
+Erase component...
+Name of component: z
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current locator is no. 2, value is '<junk>' (not valid).
+
+Operation to perform: hds_trace
+
+Trace object path...
+Locator refers to an object 'Z' which no longer exists (possible programming error or corrupted HDS container file).
+HDS_TRACE: Error tracing the path name of an HDS object.
+Integrity check (DAT__INCHK)
+
+Current locator is no. 2, value is '<junk>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 3
+
+Current locator is no. 3, value is '<junk>' (not valid).
+
+Operation to perform: hds_trace
+
+Trace object path...
+Locator refers to an object 'Z' which no longer exists (possible programming error or corrupted HDS container file).
+HDS_TRACE: Error tracing the path name of an HDS object.
+Integrity check (DAT__INCHK)
+
+Current locator is no. 3, value is '<junk>' (not valid).
+
+Operation to perform: quit
+
+Quit...

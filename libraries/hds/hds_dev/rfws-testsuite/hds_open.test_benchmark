@@ -1,0 +1,129 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: r
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: bogglers
+Access mode: r
+Error accessing file '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/bogglers.sdf' - No such file or directory
+HDS_OPEN: Error opening an HDS container file.
+File not found (DAT__FILNF)
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: fred
+Invalid access mode 'fred' specified (possible programming error).
+HDS_OPEN: Error opening an HDS container file.
+Mode invalid (DAT__MODIN)
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: w
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'TEST'
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'JUNK'
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: uPDAte
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: reaD
+Access mode: test
+Invalid access mode 'test' specified (possible programming error).
+HDS_OPEN: Error opening an HDS container file.
+Mode invalid (DAT__MODIN)
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: reaD
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: quit
+
+Quit...

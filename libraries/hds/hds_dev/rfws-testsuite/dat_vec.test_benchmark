@@ -1,0 +1,279 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: a
+Number of dimensions: 2
+Dimension: 3
+Dimension: 9
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 3
+Dimension 2 = 9
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: vec
+
+Vectorise object...
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 27
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 14
+
+Current object is no. 3: TEST(2,5), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: x
+Number of dimensions: 0
+
+Current object is no. 4: TEST(2,5).X, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 3
+Dimension 2 = 9
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 2
+Subscript: 2
+Subscript: 5
+
+Current object is no. 5: TEST(2,5), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 5: TEST(2,5), nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   X <X>
+
+Current object is no. 5: TEST(2,5), nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: _ubyte
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 7: TEST.A, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: w
+100 machine elements mapped
+
+Current object is no. 7: TEST.A, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 0
+
+Current object is no. 7: TEST.A, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+
+Current object is no. 7: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 7: TEST.A, nested at level 2
+
+Operation to perform: vec
+
+Vectorise object...
+
+Current object is no. 8: TEST.A, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 100
+
+Current object is no. 8: TEST.A, nested at level 2
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 1
+Lower bound: 3
+Upper bound: 17
+
+Current object is no. 9: TEST.A(3:17), nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 15
+
+Current object is no. 9: TEST.A(3:17), nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: u
+15 machine elements mapped
+
+Current object is no. 9: TEST.A(3:17), nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 5
+Increment: 1
+
+Current object is no. 9: TEST.A(3:17), nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+
+
+Current object is no. 9: TEST.A(3:17), nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 9: TEST.A(3:17), nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 7
+
+Current object is no. 7: TEST.A, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+100 machine elements mapped
+
+Current object is no. 7: TEST.A, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 0 5 6 7 8 9 10 11 12
+
+13 14 15 16 17 18 19 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0
+
+
+Current object is no. 7: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 7: TEST.A, nested at level 2
+
+Operation to perform: quit
+
+Quit...

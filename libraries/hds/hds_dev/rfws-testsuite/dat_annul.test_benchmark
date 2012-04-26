@@ -1,0 +1,117 @@
+Operation to perform: annul
+
+Annul locator...
+HDS locator invalid: value=' ', length=15 (possible programming error).
+DAT_ANNUL: Error annulling an HDS locator.
+Locator invalid (DAT__LOCIN)
+
+Current locator is no. 0, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: a
+Object type: a
+Number of dimensions: 0
+
+Current object is no. 1: A, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: a
+Object type: a
+Number of dimensions: 0
+
+Current object is no. 2: A, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: data
+Component type: _real
+Number of dimensions: 1
+Dimension: 100
+
+Current object is no. 3: A.DATA, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: w
+400 machine elements mapped
+
+Current object is no. 3: A.DATA, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: annul
+
+Annul locator...
+HDS locator invalid: value='<NOT A LOCATOR>', length=15 (possible programming error).
+DAT_ANNUL: Error annulling an HDS locator.
+Locator invalid (DAT__LOCIN)
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current object is no. 2: A, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: data
+
+Current object is no. 4: A.DATA, nested at level 2
+
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: junk
+
+Current object is no. 4: A.DATA, nested at level 2
+
+Operation to perform: hds_flush
+
+Flush locator group...
+Name of group: junk
+
+Current locator is no. 4, value is '<junk>' (not valid).
+
+Operation to perform: annul
+
+Annul locator...
+HDS locator invalid: value='', length=15 (possible programming error).
+DAT_ANNUL: Error annulling an HDS locator.
+Locator invalid (DAT__LOCIN)
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: annul
+
+Annul locator...
+HDS locator invalid: value='<NOT A LOCATOR>', length=15 (possible programming error).
+DAT_ANNUL: Error annulling an HDS locator.
+Locator invalid (DAT__LOCIN)
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

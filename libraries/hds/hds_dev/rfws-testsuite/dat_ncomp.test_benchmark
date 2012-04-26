@@ -1,0 +1,275 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: 0
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: a
+Number of dimensions: 0
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: pncomp
+
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 0
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: _real
+Number of dimensions: 0
+
+Current object is no. 4: TEST.Z, nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+DAT_NCOMP: Error enquiring the number of components in an HDS structure.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 4: TEST.Z, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 2
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   A <A>
+   Z <_REAL>
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: alpha_beta
+Component type: _byte
+Number of dimensions: 2
+Dimension: 10
+Dimension: 30
+
+Current object is no. 6: TEST.ALPHA_BETA, nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 2
+Subscript: 4
+Subscript: 15
+
+Current object is no. 7: TEST.ALPHA_BETA(4,15), nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+DAT_NCOMP: Error enquiring the number of components in an HDS structure.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 7: TEST.ALPHA_BETA(4,15), nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 3
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: d
+Component type: d
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 9: TEST.D, nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+DAT_NCOMP: Error enquiring the number of components in an HDS structure.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 9: TEST.D, nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 1
+
+Current object is no. 10: TEST.D(1), nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 0
+
+Current object is no. 10: TEST.D(1), nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 4
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   A <A>
+   Z <_REAL>
+   ALPHA_BETA(10,30) <_BYTE>
+   D(3) <D>
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: erase
+
+Erase component...
+Name of component: z
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 3
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   A <A>
+   ALPHA_BETA(10,30) <_BYTE>
+   D(3) <D>
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: erase
+
+Erase component...
+Name of component: d
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 2
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   A <A>
+   ALPHA_BETA(10,30) <_BYTE>
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: erase
+
+Erase component...
+Name of component: a
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   ALPHA_BETA(10,30) <_BYTE>
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: erase
+
+Erase component...
+Name of component: alpha_beta
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 0
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: quit
+
+Quit...

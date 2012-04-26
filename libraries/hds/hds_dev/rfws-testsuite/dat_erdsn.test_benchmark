@@ -1,0 +1,31 @@
+Operation to perform: erdsn
+
+Report error about a component...
+Component name: TEST
+Status code: 147358555
+<Unknown structure>.TEST: File invalid (DAT__FILIN)
+File invalid (DAT__FILIN)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: x
+Number of dimensions: 0
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: erdsn
+
+Report error about a component...
+Component name: 147358563
+Status code: 147358563
+HDS_SCRATCH.TEMP_1.147358563: Object invalid (DAT__OBJIN)
+Object invalid (DAT__OBJIN)
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: quit
+
+Quit...

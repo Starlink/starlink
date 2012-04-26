@@ -1,0 +1,164 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: _integer
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _integer
+Access mode: w
+10 elements mapped
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 100
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 100 200 300 400 500 600 700 800 900
+
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+10 elements mapped
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '100' '200' '300' '400' '500' '600' '700' '800' '900'
+
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char*3
+Access mode: r
+10 elements mapped
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '100' '200' '300' '400' '500' '600' '700' '800' '900'
+
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char*2
+Access mode: r
+A total of 9 data conversion error(s) occurred.
+DAT_MAP: Error mapping an HDS primitive.
+Conversion error (DAT__CONER)
+10 elements mapped
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '**' '**' '**' '**' '**' '**' '**' '**' '**'
+
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char*1
+Access mode: r
+A total of 9 data conversion error(s) occurred.
+DAT_MAP: Error mapping an HDS primitive.
+Conversion error (DAT__CONER)
+10 elements mapped
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '*' '*' '*' '*' '*' '*' '*' '*' '*'
+
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

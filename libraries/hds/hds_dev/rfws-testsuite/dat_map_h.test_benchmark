@@ -1,0 +1,113 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _logical
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _integer
+Access mode: w
+10 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: sset
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+10 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: update
+10 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'FALSE' 'TRUE' 'FALSE' 'TRUE' 'FALSE' 'TRUE' 'FALSE' 'TRUE' 'FALSE' 'TRUE'
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+10 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: quit
+
+Quit...

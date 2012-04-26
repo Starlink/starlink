@@ -1,0 +1,125 @@
+Operation to perform: hds_new
+ 
+Create new container file...
+Container file name: test
+Object name: t
+Object type: t
+Number of dimensions: 0
+ 
+Current object is no. 1: T, nested at level 1
+ 
+Operation to perform: refct
+ 
+Obtain reference count...
+Reference count: 1
+ 
+Current object is no. 1: T, nested at level 1
+ 
+Operation to perform: clone
+ 
+Clone locator...
+ 
+Current object is no. 2: T, nested at level 1
+ 
+Operation to perform: refct
+ 
+Obtain reference count...
+Reference count: 1
+ 
+Current object is no. 2: T, nested at level 1
+ 
+Operation to perform: new
+ 
+Create new component...
+Component name: x
+Component type: x
+Number of dimensions: 0
+ 
+Current object is no. 3: T.X, nested at level 2
+ 
+Operation to perform: refct
+ 
+Obtain reference count...
+Reference count: 1
+ 
+Current object is no. 3: T.X, nested at level 2
+ 
+Operation to perform: hds_open
+ 
+Open an HDS container file...
+Container file name: test
+Access mode: read
+ 
+Current object is no. 4: T, nested at level 1
+ 
+Operation to perform: refct
+ 
+Obtain reference count...
+Reference count: 2
+ 
+Current object is no. 4: T, nested at level 1
+ 
+Operation to perform: go
+ 
+Go to nominated locator...
+Locator number: 1
+ 
+Current object is no. 1: T, nested at level 1
+ 
+Operation to perform: hds_erase
+ 
+Erase container file...
+ 
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+ 
+Operation to perform: go
+ 
+Go to nominated locator...
+Locator number: 2
+ 
+Current object is no. 2: T, nested at level 1
+ 
+Operation to perform: refct
+ 
+Obtain reference count...
+Reference count: 1
+ 
+Current object is no. 2: T, nested at level 1
+ 
+Operation to perform: annul
+ 
+Annul locator...
+ 
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+ 
+Operation to perform: go
+ 
+Go to nominated locator...
+Locator number: 3
+ 
+Current object is no. 3: T.X, nested at level 2
+ 
+Operation to perform: refct
+ 
+Obtain reference count...
+Reference count: 1
+ 
+Current object is no. 3: T.X, nested at level 2
+ 
+Operation to perform: annul
+ 
+Annul locator...
+ 
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+ 
+Operation to perform: hds_open
+ 
+Open an HDS container file...
+Container file name: test
+Access mode: read
+ 
+Current object is no. 5: T, nested at level 1
+ 
+Operation to perform: quit
+ 
+Quit...

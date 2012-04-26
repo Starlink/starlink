@@ -1,0 +1,217 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: data
+Component type: _real
+Number of dimensions: 2
+Dimension: 10
+Dimension: 5
+
+Current object is no. 2: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 5
+
+Current object is no. 2: TEST.DATA, nested at level 2
+
+Operation to perform: mould
+
+Alter object shape...
+Number of dimensions: 2
+Dimension: 5
+Dimension: 10
+
+Current object is no. 2: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 5
+Dimension 2 = 10
+
+Current object is no. 2: TEST.DATA, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   DATA(5,10) <_REAL>
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: data
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 5
+Dimension 2 = 10
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: mould
+
+Alter object shape...
+Number of dimensions: 2
+Dimension: 2
+Dimension: 25
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 2
+Dimension 2 = 25
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: mould
+
+Alter object shape...
+Number of dimensions: 3
+Dimension: 2
+Dimension: 25
+Dimension: 1
+DAT_MOULD: Error altering the shape of an HDS object.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: mould
+
+Alter object shape...
+Number of dimensions: 2
+Dimension: 15
+Dimension: 3
+DAT_MOULD: Error altering the shape of an HDS object.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: mould
+
+Alter object shape...
+Number of dimensions: 2
+Dimension: 50
+Dimension: 1
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: mould
+
+Alter object shape...
+Number of dimensions: 1
+Dimension: 50
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 50
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: mould
+
+Alter object shape...
+Number of dimensions: 2
+Dimension: 25
+Dimension: 2
+DAT_MOULD: Error altering the shape of an HDS object.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 2
+Dimension: 50
+Dimension: 1
+DAT_ALTER: Error altering the size of an HDS object.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 4: TEST.DATA, nested at level 2
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 3
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 50
+Dimension 2 = 1
+Dimension 3 = 1
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: mould
+
+Alter object shape...
+Number of dimensions: 2
+Dimension: 25
+Dimension: 2
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 25
+Dimension 2 = 2
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: quit
+
+Quit...

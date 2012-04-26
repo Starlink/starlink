@@ -1,0 +1,251 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: ndf
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: data_array
+Component type: array
+Number of dimensions: 0
+
+Current object is no. 2: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: data
+Component type: _real
+Number of dimensions: 1
+Dimension: 100
+
+Current object is no. 3: TEST.DATA_ARRAY.DATA, nested at level 3
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: w
+400 machine elements mapped
+
+Current object is no. 3: TEST.DATA_ARRAY.DATA, nested at level 3
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 13
+Increment: 0
+
+Current object is no. 3: TEST.DATA_ARRAY.DATA, nested at level 3
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 3: TEST.DATA_ARRAY.DATA, nested at level 3
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 4: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: _uword
+Number of dimensions: 2
+Dimension: 34
+Dimension: 18
+
+Current object is no. 6: TEST.Z, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   DATA_ARRAY <ARRAY>
+   Z(34,18) <_UWORD>
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: data_array
+
+Current object is no. 8: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: hds_copy
+
+Copy object to container file...
+Container file name: test1
+Component name: data_array
+
+Current object is no. 9: DATA_ARRAY, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   DATA(100) <_REAL>
+
+Current object is no. 9: DATA_ARRAY, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: data
+
+Current object is no. 10: DATA_ARRAY.DATA, nested at level 2
+
+Operation to perform: state
+
+Enquire object state...
+Object state = TRUE
+
+Current object is no. 10: DATA_ARRAY.DATA, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+400 machine elements mapped
+
+Current object is no. 10: DATA_ARRAY.DATA, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13...
+
+
+Current object is no. 10: DATA_ARRAY.DATA, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 10: DATA_ARRAY.DATA, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_copy
+
+Copy object to container file...
+Container file name: test2
+Component name: test
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'NDF'
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   DATA_ARRAY <ARRAY>
+   Z(34,18) <_UWORD>
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: data_array
+
+Current object is no. 12: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: ls
+
+List structure components...
+   DATA(100) <_REAL>
+
+Current object is no. 12: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   DATA_ARRAY <ARRAY>
+   Z(34,18) <_UWORD>
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: z
+
+Current object is no. 13: TEST.Z, nested at level 2
+
+Operation to perform: hds_copy
+
+Copy object to container file...
+Container file name: test3
+Component name: z
+
+Current object is no. 14: Z, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = '_UWORD'
+
+Current object is no. 14: Z, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 34
+Dimension 2 = 18
+
+Current object is no. 14: Z, nested at level 1
+
+Operation to perform: quit
+
+Quit...

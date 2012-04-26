@@ -1,0 +1,1459 @@
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: sun4_test_data
+Access mode: r
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   B1(10) <_BYTE>
+   B2(10) <_BYTE>
+   B3(10) <_BYTE>
+   B4(10) <_BYTE>
+   UB1(10) <_UBYTE>
+   UB2(10) <_UBYTE>
+   UB3(10) <_UBYTE>
+   UB4(10) <_UBYTE>
+   C1(10) <_CHAR*30>
+   R1(10) <_REAL>
+   R2(10) <_REAL>
+   R3(10) <_REAL>
+   R4(10) <_REAL>
+   R5(10) <_REAL>
+   D1(10) <_DOUBLE>
+   D2(10) <_DOUBLE>
+   D3(10) <_DOUBLE>
+   D4(10) <_DOUBLE>
+   D5(10) <_DOUBLE>
+   I1(10) <_INTEGER>
+   I2(10) <_INTEGER>
+   I3(10) <_INTEGER>
+   I4(10) <_INTEGER>
+   W1(10) <_WORD>
+   W2(10) <_WORD>
+   W3(10) <_WORD>
+   W4(10) <_WORD>
+   UW1(10) <_UWORD>
+   UW2(10) <_UWORD>
+   UW3(10) <_UWORD>
+   UW4(10) <_UWORD>
+   L1(10) <_LOGICAL>
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: d1
+
+Current object is no. 2: VMSDATA.D1, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_D', order = 'MSB'.
+
+Current object is no. 2: VMSDATA.D1, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _double
+Access mode: r
+10 elements mapped
+
+Current object is no. 2: VMSDATA.D1, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+
+Current object is no. 2: VMSDATA.D1, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: d2
+
+Current object is no. 3: VMSDATA.D2, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_D', order = 'MSB'.
+
+Current object is no. 3: VMSDATA.D2, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _double
+Access mode: r
+10 elements mapped
+
+Current object is no. 3: VMSDATA.D2, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-1000000 -800000 -600000 -400000 -200000 0 200000 400000 600000 800000
+
+
+Current object is no. 3: VMSDATA.D2, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: d3
+
+Current object is no. 4: VMSDATA.D3, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_D', order = 'MSB'.
+
+Current object is no. 4: VMSDATA.D3, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _double
+Access mode: r
+10 elements mapped
+
+Current object is no. 4: VMSDATA.D3, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-9.99999968028569E37 -8.99999981366917E37 -7.99999994705265E37 -6.99999957337589
+E37 -5.99999970675937E37 -4.99999984014285E37 -3.99999946646608E37 -2.9999995998
+4956E37 -1.99999973323304E37 -9.99999...
+
+
+Current object is no. 4: VMSDATA.D3, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: d4
+
+Current object is no. 5: VMSDATA.D4, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_D', order = 'MSB'.
+
+Current object is no. 5: VMSDATA.D4, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _double
+Access mode: r
+10 elements mapped
+
+Current object is no. 5: VMSDATA.D4, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1.00000000511056E-38 2.00000001022113E-38 3.00000008539661E-38 4.0000000204422
+5E-38 4.99999995548789E-38 6.00000017079323E-38 6.99999982557918E-38 8.000000040
+88451E-38 9.00000025618984E-38
+
+
+Current object is no. 5: VMSDATA.D4, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: d5
+
+Current object is no. 6: VMSDATA.D5, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_D', order = 'MSB'.
+
+Current object is no. 6: VMSDATA.D5, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _double
+Access mode: r
+10 elements mapped
+
+Current object is no. 6: VMSDATA.D5, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-0.012345679104 0.08641975373 0.185185194016 0.28395062685 0.382716059685 0.4814
+81492519 0.580246925354 0.679012358189 0.777777791023 0.876543223858
+
+
+Current object is no. 6: VMSDATA.D5, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: r1
+
+Current object is no. 7: VMSDATA.R1, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_S', order = 'MSB'.
+
+Current object is no. 7: VMSDATA.R1, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _real
+Access mode: r
+10 elements mapped
+
+Current object is no. 7: VMSDATA.R1, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+1 2 3 4 5 6 7 8 9 10
+
+
+Current object is no. 7: VMSDATA.R1, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: r2
+
+Current object is no. 8: VMSDATA.R2, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_S', order = 'MSB'.
+
+Current object is no. 8: VMSDATA.R2, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _real
+Access mode: r
+10 elements mapped
+
+Current object is no. 8: VMSDATA.R2, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-1.E6 -8.E5 -6.E5 -4.E5 -2.E5 0 2.E5 4.E5 6.E5 8.E5
+
+
+Current object is no. 8: VMSDATA.R2, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 8, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: r3
+
+Current object is no. 9: VMSDATA.R3, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_S', order = 'MSB'.
+
+Current object is no. 9: VMSDATA.R3, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _real
+Access mode: r
+10 elements mapped
+
+Current object is no. 9: VMSDATA.R3, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-9.9999997E37 -8.9999998E37 -7.9999999E37 -6.9999996E37 -5.9999997E37 -4.9999998
+E37 -3.9999995E37 -2.9999996E37 -1.9999997E37 -9.9999987E36
+
+
+Current object is no. 9: VMSDATA.R3, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 9, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: r4
+
+Current object is no. 10: VMSDATA.R4, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_S', order = 'MSB'.
+
+Current object is no. 10: VMSDATA.R4, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _real
+Access mode: r
+10 elements mapped
+
+Current object is no. 10: VMSDATA.R4, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 9.9999994E-39 2.E-38 3.0000001E-38 4.E-38 5.E-38 6.0000002E-38 6.9999998E-38 8
+.E-38 9.0000003E-38
+
+
+Current object is no. 10: VMSDATA.R4, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 10, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: r5
+
+Current object is no. 11: VMSDATA.R5, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'IEEE_S', order = 'MSB'.
+
+Current object is no. 11: VMSDATA.R5, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _real
+Access mode: r
+10 elements mapped
+
+Current object is no. 11: VMSDATA.R5, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-0.012346 0.08642 0.185185 0.283951 0.382716 0.481481 0.580247 0.679012 0.777778
+ 0.876543
+
+
+Current object is no. 11: VMSDATA.R5, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 11, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: i1
+
+Current object is no. 12: VMSDATA.I1, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 12: VMSDATA.I1, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _integer
+Access mode: r
+10 elements mapped
+
+Current object is no. 12: VMSDATA.I1, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+1 2 3 4 5 6 7 8 9 10
+
+
+Current object is no. 12: VMSDATA.I1, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 12, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: i2
+
+Current object is no. 13: VMSDATA.I2, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 13: VMSDATA.I2, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _integer
+Access mode: r
+10 elements mapped
+
+Current object is no. 13: VMSDATA.I2, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-1000000 -900000 -800000 -700000 -600000 -500000 -400000 -300000 -200000 -100000
+
+
+Current object is no. 13: VMSDATA.I2, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 13, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: i3
+
+Current object is no. 14: VMSDATA.I3, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 14: VMSDATA.I3, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _integer
+Access mode: r
+10 elements mapped
+
+Current object is no. 14: VMSDATA.I3, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-2147483648 -2147483648 -2147483648 -2147483648 -2147483648 -2147483648 -2147483
+648 -2147483648 -2147483648 -2147483648
+
+
+Current object is no. 14: VMSDATA.I3, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 14, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: i4
+
+Current object is no. 15: VMSDATA.I4, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 15: VMSDATA.I4, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _integer
+Access mode: r
+10 elements mapped
+
+Current object is no. 15: VMSDATA.I4, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+10000000 9999999 9999998 9999997 9999996 9999995 9999994 9999993 9999992 9999991
+
+
+Current object is no. 15: VMSDATA.I4, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 15, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: w1
+
+Current object is no. 16: VMSDATA.W1, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 16: VMSDATA.W1, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _word
+Access mode: r
+10 elements mapped
+
+Current object is no. 16: VMSDATA.W1, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+
+Current object is no. 16: VMSDATA.W1, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 16, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: w2
+
+Current object is no. 17: VMSDATA.W2, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 17: VMSDATA.W2, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _word
+Access mode: r
+10 elements mapped
+
+Current object is no. 17: VMSDATA.W2, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-50 -40 -30 -20 -10 0 10 20 30 40
+
+
+Current object is no. 17: VMSDATA.W2, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 17, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: w3
+
+Current object is no. 18: VMSDATA.W3, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 18: VMSDATA.W3, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _word
+Access mode: r
+10 elements mapped
+
+Current object is no. 18: VMSDATA.W3, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-32767 -27767 -22767 -17767 -12767 -7767 -2767 2233 7233 12233
+
+
+Current object is no. 18: VMSDATA.W3, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 18, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: w4
+
+Current object is no. 19: VMSDATA.W4, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 19: VMSDATA.W4, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _word
+Access mode: r
+10 elements mapped
+
+Current object is no. 19: VMSDATA.W4, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+32767 25767 18767 11767 4767 -2233 -9233 -16233 -23233 -30233
+
+
+Current object is no. 19: VMSDATA.W4, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 19, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: uw1
+
+Current object is no. 20: VMSDATA.UW1, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'BINARY', order = 'MSB'.
+
+Current object is no. 20: VMSDATA.UW1, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _uword
+Access mode: r
+10 elements mapped
+
+Current object is no. 20: VMSDATA.UW1, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+
+Current object is no. 20: VMSDATA.UW1, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 20, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: uw2
+
+Current object is no. 21: VMSDATA.UW2, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'BINARY', order = 'MSB'.
+
+Current object is no. 21: VMSDATA.UW2, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _uword
+Access mode: r
+10 elements mapped
+
+Current object is no. 21: VMSDATA.UW2, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 6000 12000 18000 24000 30000 36000 42000 48000 54000
+
+
+Current object is no. 21: VMSDATA.UW2, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 21, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: uw3
+
+Current object is no. 22: VMSDATA.UW3, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'BINARY', order = 'MSB'.
+
+Current object is no. 22: VMSDATA.UW3, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _uword
+Access mode: r
+10 elements mapped
+
+Current object is no. 22: VMSDATA.UW3, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+65535 65534 65533 65532 65531 65530 65529 65528 65527 65526
+
+
+Current object is no. 22: VMSDATA.UW3, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 22, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: uw4
+
+Current object is no. 23: VMSDATA.UW4, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'BINARY', order = 'MSB'.
+
+Current object is no. 23: VMSDATA.UW4, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _uword
+Access mode: r
+10 elements mapped
+
+Current object is no. 23: VMSDATA.UW4, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+65535 59535 53535 47535 41535 35535 29535 23535 17535 11535
+
+
+Current object is no. 23: VMSDATA.UW4, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 23, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: b1
+
+Current object is no. 24: VMSDATA.B1, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 24: VMSDATA.B1, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _byte
+Access mode: r
+10 elements mapped
+
+Current object is no. 24: VMSDATA.B1, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+
+Current object is no. 24: VMSDATA.B1, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 24, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: b2
+
+Current object is no. 25: VMSDATA.B2, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 25: VMSDATA.B2, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _byte
+Access mode: r
+10 elements mapped
+
+Current object is no. 25: VMSDATA.B2, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+127 107 87 67 47 27 7 -13 -33 -53
+
+
+Current object is no. 25: VMSDATA.B2, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 25, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: b3
+
+Current object is no. 26: VMSDATA.B3, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 26: VMSDATA.B3, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _byte
+Access mode: r
+10 elements mapped
+
+Current object is no. 26: VMSDATA.B3, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 -1 -2 -3 -4 -5 -6 -7 -8 -9
+
+
+Current object is no. 26: VMSDATA.B3, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 26, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: b4
+
+Current object is no. 27: VMSDATA.B4, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = '2COMP', order = 'MSB'.
+
+Current object is no. 27: VMSDATA.B4, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _byte
+Access mode: r
+10 elements mapped
+
+Current object is no. 27: VMSDATA.B4, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-128 -108 -88 -68 -48 -28 -8 12 32 52
+
+
+Current object is no. 27: VMSDATA.B4, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 27, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: ub1
+
+Current object is no. 28: VMSDATA.UB1, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'BINARY', order = 'MSB'.
+
+Current object is no. 28: VMSDATA.UB1, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _ubyte
+Access mode: r
+10 elements mapped
+
+Current object is no. 28: VMSDATA.UB1, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+
+Current object is no. 28: VMSDATA.UB1, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 28, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: ub2
+
+Current object is no. 29: VMSDATA.UB2, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'BINARY', order = 'MSB'.
+
+Current object is no. 29: VMSDATA.UB2, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _ubyte
+Access mode: r
+10 elements mapped
+
+Current object is no. 29: VMSDATA.UB2, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 20 40 60 80 100 120 140 160 180
+
+
+Current object is no. 29: VMSDATA.UB2, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 29, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: ub3
+
+Current object is no. 30: VMSDATA.UB3, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'BINARY', order = 'MSB'.
+
+Current object is no. 30: VMSDATA.UB3, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _ubyte
+Access mode: r
+10 elements mapped
+
+Current object is no. 30: VMSDATA.UB3, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+255 254 253 252 251 250 249 248 247 246
+
+
+Current object is no. 30: VMSDATA.UB3, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 30, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: ub4
+
+Current object is no. 31: VMSDATA.UB4, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'BINARY', order = 'MSB'.
+
+Current object is no. 31: VMSDATA.UB4, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _ubyte
+Access mode: r
+10 elements mapped
+
+Current object is no. 31: VMSDATA.UB4, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+255 235 215 195 175 155 135 115 95 75
+
+
+Current object is no. 31: VMSDATA.UB4, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 31, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: l1
+
+Current object is no. 32: VMSDATA.L1, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'NZ', order = 'MSB'.
+
+Current object is no. 32: VMSDATA.L1, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+10 elements mapped
+
+Current object is no. 32: VMSDATA.L1, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 32: VMSDATA.L1, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 32, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: VMSDATA, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: c1
+
+Current object is no. 33: VMSDATA.C1, nested at level 2
+
+Operation to perform: drep
+
+Obtain data representation...
+Format = 'ASCII', order = 'MSB'.
+
+Current object is no. 33: VMSDATA.C1, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+10 elements mapped
+
+Current object is no. 33: VMSDATA.C1, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '12345' '24690' '37035' '49380' '61725' '74070' '86415' '98760' '111105'
+
+
+Current object is no. 33: VMSDATA.C1, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 33, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

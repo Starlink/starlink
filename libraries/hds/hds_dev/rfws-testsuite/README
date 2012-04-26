@@ -1,5 +1,5 @@
 
-This is the HDS testsuite as obtained from RFWS (hds_testsuite.tar). 
+This is the HDS testsuite as obtained from RFWS.
 This contains a FORTRAN program 'exercise.f', a series of '_input' files to 
 be fed to this program and reference outputs (the _output files) obtained 
 from running these tests on an unknown system (Solaris?).

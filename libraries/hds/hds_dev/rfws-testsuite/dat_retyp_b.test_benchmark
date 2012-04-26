@@ -1,0 +1,261 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _word
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _word
+Access mode: w
+1 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: -1
+Increment: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+-1
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _uword
+Access mode: r
+A total of 1 data conversion error(s) occurred.
+DAT_MAP: Error mapping an HDS primitive.
+Conversion error (DAT__CONER)
+1 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+65535
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _uword
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _uword
+Access mode: r
+1 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+65535
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _real
+Invalid new data type '_real' specified; implies a change in object size (possible programming error).
+DAT_RETYP: Error changing the type of an HDS object.
+Type invalid (DAT__TYPIN)
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _byte
+Invalid new data type '_byte' specified; implies a change in object size (possible programming error).
+DAT_RETYP: Error changing the type of an HDS object.
+Type invalid (DAT__TYPIN)
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test1
+Object name: x
+Object type: _byte
+Number of dimensions: 0
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _byte
+Access mode: w
+1 elements mapped
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 0
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0
+
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _ubyte
+Access mode: u
+1 elements mapped
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0
+
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 255
+Increment: 0
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+A total of 1 data conversion error(s) occurred.
+DAT_UNMAP: Error unmapping an HDS primitive.
+Conversion error (DAT__CONER)
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _byte
+Access mode: r
+1 elements mapped
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+-128
+
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: stype
+
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: _ubyte
+
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _ubyte
+Access mode: r
+A total of 1 data conversion error(s) occurred.
+DAT_MAP: Error mapping an HDS primitive.
+Conversion error (DAT__CONER)
+1 elements mapped
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+255
+
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = '_BYTE'
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: quit
+
+Quit...

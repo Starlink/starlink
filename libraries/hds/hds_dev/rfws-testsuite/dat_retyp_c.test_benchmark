@@ -1,0 +1,268 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: _word
+Number of dimensions: 0
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _word
+Access mode: w
+1 elements mapped
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 3
+Increment: 0
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+3
+
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _uword
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: r
+Access mode: read
+DAT_MAP: Error mapping an HDS primitive.
+Type invalid (DAT__TYPIN)
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _uword
+Access mode: r
+1 elements mapped
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+3
+
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _word
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _word
+Access mode: w
+1 elements mapped
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: -2
+Increment: 0
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-2
+
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _uword
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _uword
+Access mode: r
+1 elements mapped
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+65534
+
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _uword
+Access mode: w
+1 elements mapped
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 32768
+Increment: 0
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+32768
+
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _word
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _word
+Access mode: r
+1 elements mapped
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+-32768
+
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: _char
+Number of dimensions: 0
+
+Current object is no. 4: TEST.Z, nested at level 2
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _byte
+
+Current object is no. 4: TEST.Z, nested at level 2
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _ubyte
+
+Current object is no. 4: TEST.Z, nested at level 2
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _char*1
+
+Current object is no. 4: TEST.Z, nested at level 2
+
+Operation to perform: retyp
+
+Change object type...
+New object type: _char*2
+Invalid new data type '_char*2' specified; implies a change in object size (possible programming error).
+DAT_RETYP: Error changing the type of an HDS object.
+Type invalid (DAT__TYPIN)
+
+Current object is no. 4: TEST.Z, nested at level 2
+
+Operation to perform: quit
+
+Quit...

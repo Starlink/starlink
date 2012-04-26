@@ -1,0 +1,130 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: test
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: _double
+Number of dimensions: 2
+Dimension: 10
+Dimension: 2
+
+Current object is no. 2: TEST.Z, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _real
+Access mode: w
+20 elements mapped
+
+Current object is no. 2: TEST.Z, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 100
+Increment: -4
+
+Current object is no. 2: TEST.Z, nested at level 2
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: r
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: locators
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: locators
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 3
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: locators
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: r
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: z
+
+Current object is no. 5: TEST.Z, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _double
+Access mode: r
+20 elements mapped
+
+Current object is no. 5: TEST.Z, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+100 96 92 88 84 80 76 72 68 64
+
+60 56 52 48 44 40 36 32 28 24
+
+
+Current object is no. 5: TEST.Z, nested at level 2
+
+Operation to perform: quit
+
+Quit...

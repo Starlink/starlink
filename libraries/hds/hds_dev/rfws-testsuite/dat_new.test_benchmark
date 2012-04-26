@@ -1,0 +1,547 @@
+Operation to perform: HDS_NEW
+
+Create new container file...
+Container file name: TEST
+Object name: TEST
+Object type: JUNK
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: abcdefghijklmno
+Component type: a
+Number of dimensions: 0
+
+Current object is no. 2: TEST.ABCDEFGHIJKLMNO, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: ABCDEFGhijklmNO
+Component type: X
+Number of dimensions: 1
+Dimension: 1
+DAT_NEW: Error creating a new HDS component.
+Component already exists (DAT__COMEX)
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: X
+Component type: X
+Number of dimensions: 7
+Dimension: 1
+Dimension: 2
+Dimension: 1
+Dimension: 2
+Dimension: 1
+Dimension: 2
+Dimension: 1
+
+Current object is no. 4: TEST.X, nested at level 2
+
+Operation to perform: SHAPE
+
+Enquire object shape...
+Dimension 1 = 1
+Dimension 2 = 2
+Dimension 3 = 1
+Dimension 4 = 2
+Dimension 5 = 1
+Dimension 6 = 2
+Dimension 7 = 1
+
+Current object is no. 4: TEST.X, nested at level 2
+
+Operation to perform: PAREN
+
+Locate parent...
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: QWERTYUIOPLKJHG
+Component type: 
+Number of dimensions: 0
+
+Current object is no. 6: TEST.QWERTYUIOPLKJHG, nested at level 2
+
+Operation to perform: PAREN
+
+Locate parent...
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: ABCD
+Component type: *
+Number of dimensions: 0
+Invalid name string 'ABC D' specified; contains illegal character (code=24 decimal) at position 4 (possible programming error).
+DAT_NEW: Error creating a new HDS component.
+Name invalid (DAT__NAMIN)
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: PAREN
+
+Locate parent...
+Object is a top-level object and has no parent structure (possible programming error).
+DAT_PAREN: Error locating the parent structure of an HDS object.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: 
+Component type: 7
+Number of dimensions: 0
+Invalid blank name string specified (possible programming error).
+DAT_NEW: Error creating a new HDS component.
+Name invalid (DAT__NAMIN)
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: A
+Component type: _REAL
+Number of dimensions: 6
+Dimension: 2
+Dimension: 3
+Dimension: 1
+Dimension: 2
+Dimension: 3
+Dimension: 1
+
+Current object is no. 8: TEST.A, nested at level 2
+
+Operation to perform: SHAPE
+
+Enquire object shape...
+Dimension 1 = 2
+Dimension 2 = 3
+Dimension 3 = 1
+Dimension 4 = 2
+Dimension 5 = 3
+Dimension 6 = 1
+
+Current object is no. 8: TEST.A, nested at level 2
+
+Operation to perform: SIZE
+
+Enquire object size...
+Object size = 36
+
+Current object is no. 8: TEST.A, nested at level 2
+
+Operation to perform: PAREN
+
+Locate parent...
+
+Current object is no. 9: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: HJ
+Component type: _GT
+Number of dimensions: 1
+Dimension: 4
+Invalid primitive data type '_GT' specified (possible programming error).
+DAT_NEW: Error creating a new HDS component.
+Type invalid (DAT__TYPIN)
+
+Current object is no. 9: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: HH
+Component type: ?
+Number of dimensions: 0
+
+Current object is no. 10: TEST.HH, nested at level 2
+
+Operation to perform: TYPE
+
+Enquire object type...
+Data type = '?'
+
+Current object is no. 10: TEST.HH, nested at level 2
+
+Operation to perform: PAREN
+
+Locate parent...
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: DFR
+Component type: QWERTYUIOPLKJHG
+Number of dimensions: 0
+
+Current object is no. 12: TEST.DFR, nested at level 2
+
+Operation to perform: TYPE
+
+Enquire object type...
+Data type = 'QWERTYUIOPLKJHG'
+
+Current object is no. 12: TEST.DFR, nested at level 2
+
+Operation to perform: PAREN
+
+Locate parent...
+
+Current object is no. 13: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: S
+Component type: S
+Number of dimensions: -1
+DAT_NEW: Error creating a new HDS component.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 13: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: S
+Component type: S
+Number of dimensions: 7
+Dimension: 1
+Dimension: 1
+Dimension: 1
+Dimension: 1
+Dimension: 1
+Dimension: 1
+Dimension: 1
+
+Current object is no. 14: TEST.S, nested at level 2
+
+Operation to perform: PAREN
+
+Locate parent...
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: SS
+Component type: SS
+Number of dimensions: 7
+Dimension: 2
+Dimension: 3
+Dimension: 4
+Dimension: 5
+Dimension: 6
+Dimension: 7
+Dimension: -1
+DAT_NEW: Error creating a new HDS component.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: LS
+
+List structure components...
+   ABCDEFGHIJKLMNO <A>
+   X(1,2,1,2,1,2,1) <X>
+   QWERTYUIOPLKJHG < >
+   A(2,3,1,2,3,1) <_REAL>
+   HH <?>
+   DFR <QWERTYUIOPLKJHG>
+   S(1,1,1,1,1,1,1) <S>
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: D
+Component type: _DOUBLE
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 16: TEST.D, nested at level 2
+
+Operation to perform: TYPE
+
+Enquire object type...
+Data type = '_DOUBLE'
+
+Current object is no. 16: TEST.D, nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: ccc
+Component type: junk
+Number of dimensions: 0
+DAT_NEW: Error creating a new HDS component.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 16: TEST.D, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: char
+Component type: _char
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 18: TEST.CHAR, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 3
+
+Current object is no. 18: TEST.CHAR, nested at level 2
+
+Operation to perform: type
+
+Enquire object type...
+Data type = '_CHAR*1'
+
+Current object is no. 18: TEST.CHAR, nested at level 2
+
+Operation to perform: len
+
+Inquire primitive precision...
+Precision = 1
+
+Current object is no. 18: TEST.CHAR, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+Storage precision = 1
+
+Current object is no. 18: TEST.CHAR, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 19: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: ght
+Component type: _char*d
+Number of dimensions: 0
+Invalid length encountered in the character type specification '_char*d'; should be in the range 1 to 65535 (possible programming error).
+DAT_NEW: Error creating a new HDS component.
+Type invalid (DAT__TYPIN)
+
+Current object is no. 19: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: hgf
+Component type: _chAR*136
+Number of dimensions: 2
+Dimension: 2
+Dimension: 3
+
+Current object is no. 20: TEST.HGF, nested at level 2
+
+Operation to perform: NAME
+
+Enquire object name...
+Object name = 'HGF'
+
+Current object is no. 20: TEST.HGF, nested at level 2
+
+Operation to perform: SHAPE
+
+Enquire object shape...
+Dimension 1 = 2
+Dimension 2 = 3
+
+Current object is no. 20: TEST.HGF, nested at level 2
+
+Operation to perform: TYPE
+
+Enquire object type...
+Data type = '_CHAR*136'
+
+Current object is no. 20: TEST.HGF, nested at level 2
+
+Operation to perform: LEN
+
+Inquire primitive precision...
+Precision = 136
+
+Current object is no. 20: TEST.HGF, nested at level 2
+
+Operation to perform: PAREN
+
+Locate parent...
+
+Current object is no. 21: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: LL
+Component type: _LOGICAL
+Number of dimensions: 1
+Dimension: 4
+
+Current object is no. 22: TEST.LL, nested at level 2
+
+Operation to perform: STATE
+
+Enquire object state...
+Object state = FALSE
+
+Current object is no. 22: TEST.LL, nested at level 2
+
+Operation to perform: TYPE
+
+Enquire object type...
+Data type = '_LOGICAL'
+
+Current object is no. 22: TEST.LL, nested at level 2
+
+Operation to perform: SHAPE
+
+Enquire object shape...
+Dimension 1 = 4
+
+Current object is no. 22: TEST.LL, nested at level 2
+
+Operation to perform: PAREN
+
+Locate parent...
+
+Current object is no. 23: TEST, nested at level 1
+
+Operation to perform: NEW
+
+Create new component...
+Component name: bbb-b
+Component type: _uword
+Number of dimensions: 3
+Dimension: 3
+Dimension: 3
+Dimension: 3
+
+Current object is no. 24: TEST.BBB-B, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 3
+Dimension 2 = 3
+Dimension 3 = 3
+
+Current object is no. 24: TEST.BBB-B, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 25: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   ABCDEFGHIJKLMNO <A>
+   X(1,2,1,2,1,2,1) <X>
+   QWERTYUIOPLKJHG < >
+   A(2,3,1,2,3,1) <_REAL>
+   HH <?>
+   DFR <QWERTYUIOPLKJHG>
+   S(1,1,1,1,1,1,1) <S>
+   D(3) <_DOUBLE>
+   CHAR(3) <_CHAR*1>
+   HGF(2,3) <_CHAR*136>
+   LL(4) <_LOGICAL>
+   BBB-B(3,3,3) <_UWORD>
+
+Current object is no. 25: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: TEST
+Access mode: r
+
+Current object is no. 26: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   ABCDEFGHIJKLMNO <A>
+   X(1,2,1,2,1,2,1) <X>
+   QWERTYUIOPLKJHG < >
+   A(2,3,1,2,3,1) <_REAL>
+   HH <?>
+   DFR <QWERTYUIOPLKJHG>
+   S(1,1,1,1,1,1,1) <S>
+   D(3) <_DOUBLE>
+   CHAR(3) <_CHAR*1>
+   HGF(2,3) <_CHAR*136>
+   LL(4) <_LOGICAL>
+   BBB-B(3,3,3) <_UWORD>
+
+Current object is no. 26: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 26, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

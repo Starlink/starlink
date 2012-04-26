@@ -1,0 +1,92 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: data_array
+Component type: _real
+Number of dimensions: 1
+Dimension: 1024
+
+Current object is no. 2: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: w
+4096 machine elements mapped
+
+Current object is no. 2: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 4
+Increment: 0.02
+
+Current object is no. 2: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6...
+
+
+Current object is no. 2: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: hds_free
+
+Free container file...
+HDS_FREE: Error releasing locks on an HDS container file.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 2: TEST.DATA_ARRAY, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: hds_free
+
+Free container file...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_free
+
+Free container file...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

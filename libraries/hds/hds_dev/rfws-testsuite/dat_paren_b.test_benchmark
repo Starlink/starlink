@@ -1,0 +1,134 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: ndf
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: axis
+Component type: axis
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 2: TEST.AXIS, nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 3: TEST.AXIS(2), nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: data
+Component type: array
+Number of dimensions: 0
+
+Current object is no. 4: TEST.AXIS(2).DATA, nested at level 3
+
+Operation to perform: new
+
+Create new component...
+Component name: data_array
+Component type: _real
+Number of dimensions: 1
+Dimension: 1024
+
+Current object is no. 5: TEST.AXIS(2).DATA.DATA_ARRAY, nested at level 4
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: axis
+
+Current object is no. 6: TEST.AXIS, nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 7: TEST.AXIS(2), nested at level 2
+
+Operation to perform: ls
+
+List structure components...
+   DATA <ARRAY>
+
+Current object is no. 7: TEST.AXIS(2), nested at level 2
+
+Operation to perform: find
+
+Find named component...
+Component name: data
+
+Current object is no. 8: TEST.AXIS(2).DATA, nested at level 3
+
+Operation to perform: ls
+
+List structure components...
+   DATA_ARRAY(1024) <_REAL>
+
+Current object is no. 8: TEST.AXIS(2).DATA, nested at level 3
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 9: TEST.AXIS(2), nested at level 2
+
+Operation to perform: erase
+
+Erase component...
+Name of component: data
+
+Current object is no. 9: TEST.AXIS(2), nested at level 2
+
+Operation to perform: ls
+
+List structure components...
+
+Current object is no. 9: TEST.AXIS(2), nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: data
+Component type: _real
+Number of dimensions: 1
+Dimension: 1024
+
+Current object is no. 10: TEST.AXIS(2).DATA, nested at level 3
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 11: TEST.AXIS(2), nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 12: TEST, nested at level 1
+
+Operation to perform: quit
+
+Quit...

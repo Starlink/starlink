@@ -1,0 +1,37 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: a
+Object type: a
+Number of dimensions: 0
+
+Current object is no. 1: A, nested at level 1
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: testx
+Object name: b
+Object type: b
+Number of dimensions: 0
+
+Current object is no. 2: B, nested at level 1
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: locators
+
+Current object is no. 2: B, nested at level 1
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: files
+
+Current object is no. 2: B, nested at level 1
+
+Operation to perform: quit
+
+Quit...

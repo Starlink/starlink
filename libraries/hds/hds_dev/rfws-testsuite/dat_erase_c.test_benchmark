@@ -1,0 +1,73 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: a
+Number of dimensions: 1
+Dimension: 20
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 10
+
+Current object is no. 2: TEST(10), nested at level 1
+
+Operation to perform: erase
+
+Erase component...
+Name of component: x
+DAT_ERASE: Error erasing an HDS structure component.
+Object not found (DAT__OBJNF)
+
+Current object is no. 2: TEST(10), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: x
+Number of dimensions: 0
+
+Current object is no. 3: TEST(10).X, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current object is no. 2: TEST(10), nested at level 1
+
+Operation to perform: clone
+
+Clone locator...
+
+Current object is no. 4: TEST(10), nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   X <X>
+
+Current object is no. 4: TEST(10), nested at level 1
+
+Operation to perform: erase
+
+Erase component...
+Name of component: x
+
+Current object is no. 4: TEST(10), nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+
+Current object is no. 4: TEST(10), nested at level 1
+
+Operation to perform: quit
+
+Quit...

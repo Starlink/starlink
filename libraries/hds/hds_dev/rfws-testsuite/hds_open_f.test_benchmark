@@ -1,0 +1,162 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test.
+Object name: x
+Object type: 0
+Number of dimensions: 0
+
+Current object is no. 1: X, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test.
+Access mode: r
+
+Current object is no. 2: X, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: te*t.
+Access mode: r
+
+Current object is no. 3: X, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: -1
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: te*t.
+Access mode: r
+Error accessing file '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/te*t' - No such file or directory
+HDS_OPEN: Error opening an HDS container file.
+File not found (DAT__FILNF)
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 1
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: te*t.
+Access mode: r
+
+Current object is no. 4: X, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hdss_tune
+
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 2
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: te*t.
+Access mode: r
+
+Current object is no. 5: X, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 0
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name:  test.
+Access mode: r
+
+Current object is no. 6: X, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name:             test.       		
+Access mode: w
+
+Current object is no. 7: X, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: 			  		
+Access mode: r
+Invalid blank file name given.
+HDS_OPEN: Error opening an HDS container file.
+File not found (DAT__FILNF)
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

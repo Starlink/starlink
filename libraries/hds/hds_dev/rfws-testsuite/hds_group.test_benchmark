@@ -1,0 +1,72 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = ' '
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: asdfghjkloiuytr
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'ASDFGHJKLOIUYTR'
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: xxxxx
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'XXXXX'
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: a
+Number of dimensions: 0
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_group
+
+Enquire locator group...
+HDS locator invalid: value='<NOT A LOCATOR>', length=15 (possible programming error).
+HDS_GROUP: Error enquiring the group membership of an HDS locator.
+Locator invalid (DAT__LOCIN)
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

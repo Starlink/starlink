@@ -1,0 +1,36 @@
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: 
+Access mode: r
+Invalid blank file name given.
+HDS_OPEN: Error opening an HDS container file.
+File not found (DAT__FILNF)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: sqrtx*bigz
+Access mode: r
+Error accessing file '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/sqrtx*bigz.sdf' - No such file or directory
+HDS_OPEN: Error opening an HDS container file.
+File not found (DAT__FILNF)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: sqrtxbigz
+Access mode: r
+Error accessing file '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/sqrtxbigz.sdf' - No such file or directory
+HDS_OPEN: Error opening an HDS container file.
+File not found (DAT__FILNF)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: quit
+
+Quit...

@@ -1,0 +1,421 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: a
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: a
+Number of dimensions: 0
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: alpha
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'A'
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'A'
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'ALPHA'
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: clone
+
+Clone locator...
+
+Current object is no. 3: TEST.A, nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'A'
+
+Current object is no. 3: TEST.A, nested at level 2
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'A'
+
+Current object is no. 3: TEST.A, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 3: TEST.A, nested at level 2
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'ALPHA'
+
+Current object is no. 3: TEST.A, nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: b
+Component type: b
+Number of dimensions: 0
+
+Current object is no. 4: TEST.A.B, nested at level 3
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 5: TEST.A, nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 5: TEST.A, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: find
+
+Find named component...
+Component name: b
+
+Current object is no. 6: TEST.A.B, nested at level 3
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'B'
+
+Current object is no. 6: TEST.A.B, nested at level 3
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'B'
+
+Current object is no. 6: TEST.A.B, nested at level 3
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 6: TEST.A.B, nested at level 3
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: b
+Component type: b
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 7: TEST.B, nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 8: TEST.B(2), nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'B'
+
+Current object is no. 8: TEST.B(2), nested at level 2
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'B'
+
+Current object is no. 8: TEST.B(2), nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 8: TEST.B(2), nested at level 2
+
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: beta
+
+Current object is no. 8: TEST.B(2), nested at level 2
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'BETA'
+
+Current object is no. 8: TEST.B(2), nested at level 2
+
+Operation to perform: clone
+
+Clone locator...
+
+Current object is no. 9: TEST.B(2), nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'B'
+
+Current object is no. 9: TEST.B(2), nested at level 2
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'B'
+
+Current object is no. 9: TEST.B(2), nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 9: TEST.B(2), nested at level 2
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'BETA'
+
+Current object is no. 9: TEST.B(2), nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: _byte
+Number of dimensions: 1
+Dimension: 20
+
+Current object is no. 10: TEST.B(2).Z, nested at level 3
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 11: TEST.B(2), nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 9
+
+Current object is no. 9: TEST.B(2), nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 9: TEST.B(2), nested at level 2
+
+Operation to perform: index
+
+Index into component list...
+Component number: 1
+
+Current object is no. 12: TEST.B(2).Z, nested at level 3
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: c
+Component type: _double
+Number of dimensions: 1
+Dimension: 5
+
+Current object is no. 13: TEST.C, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: w
+40 machine elements mapped
+
+Current object is no. 13: TEST.C, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 50
+Increment: -1
+
+Current object is no. 13: TEST.C, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11
+
+
+Current object is no. 13: TEST.C, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 13: TEST.C, nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 3
+
+Current object is no. 14: TEST.C(3), nested at level 2
+
+Operation to perform: clone
+
+Clone locator...
+
+Current object is no. 15: TEST.C(3), nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: u
+8 machine elements mapped
+
+Current object is no. 15: TEST.C(3), nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+34 33 32 31 30 29 28 27
+
+
+Current object is no. 15: TEST.C(3), nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 9
+Increment: 3
+
+Current object is no. 15: TEST.C(3), nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 15: TEST.C(3), nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: c
+
+Current object is no. 16: TEST.C, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+40 machine elements mapped
+
+Current object is no. 16: TEST.C, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 9 12 15 18 21 24 27 30 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11
+
+
+Current object is no. 16: TEST.C, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 16: TEST.C, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

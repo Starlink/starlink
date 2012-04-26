@@ -1,0 +1,112 @@
+Operation to perform: temp
+
+Create temporary object...
+Data type: x
+Number of dimensions: 0
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: y
+Number of dimensions: 0
+
+Current object is no. 2: HDS_SCRATCH.TEMP_2, nested at level 2
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 2: HDS_SCRATCH.TEMP_2, nested at level 2
+
+Operation to perform: prmry
+
+Set or inquire primary/secondary locator status...
+Set(1) or inquire(0) locator status?: 0
+Locator primary = FALSE
+
+Current object is no. 2: HDS_SCRATCH.TEMP_2, nested at level 2
+
+Operation to perform: prmry
+
+Set or inquire primary/secondary locator status...
+Set(1) or inquire(0) locator status?: 1
+Set primary(1) or secondary(0) status?: 1
+
+Current object is no. 2: HDS_SCRATCH.TEMP_2, nested at level 2
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 2
+
+Current object is no. 2: HDS_SCRATCH.TEMP_2, nested at level 2
+
+Operation to perform: prmry
+
+Set or inquire primary/secondary locator status...
+Set(1) or inquire(0) locator status?: 1
+Set primary(1) or secondary(0) status?: 0
+
+Current object is no. 2: HDS_SCRATCH.TEMP_2, nested at level 2
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 2: HDS_SCRATCH.TEMP_2, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: z
+Number of dimensions: 0
+
+Current object is no. 3: HDS_SCRATCH.TEMP_3, nested at level 2
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 3: HDS_SCRATCH.TEMP_3, nested at level 2
+
+Operation to perform: quit
+
+Quit...

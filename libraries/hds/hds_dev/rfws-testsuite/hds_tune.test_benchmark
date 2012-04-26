@@ -1,0 +1,81 @@
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: MAXWPL
+New value: 512
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: HDS_TUNE
+
+Tune HDS parameter...
+Parameter: INALQ
+New value: 200
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: HDS_TUNE
+
+Tune HDS parameter...
+Parameter: NBLOCKS
+New value: 127
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: HDS_TUNE
+
+Tune HDS parameter...
+Parameter: WAIT
+New value: 1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: HDS_TUNE
+
+Tune HDS parameter...
+Parameter: SYSLCK
+New value: 1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: HDS_TUNE
+
+Tune HDS parameter...
+Parameter: NCOMP
+New value: 107
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: HDS_NEW
+
+Create new container file...
+Container file name: TEST
+Object name: A
+Object type: A
+Number of dimensions: 0
+
+Current object is no. 1: A, nested at level 1
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'A'
+
+Current object is no. 1: A, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'A'
+
+Current object is no. 1: A, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 1: A, nested at level 1
+
+Operation to perform: quit
+
+Quit...

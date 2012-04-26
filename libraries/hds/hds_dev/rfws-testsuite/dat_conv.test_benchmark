@@ -1,0 +1,79 @@
+Operation to perform: conv
+
+Inquire conversion possible...
+New type required: _real
+HDS locator invalid: value=' ', length=15 (possible programming error).
+DAT_CONV: Error determining whether type conversion is possible.
+Locator invalid (DAT__LOCIN)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _byte
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: conv
+
+Inquire conversion possible...
+New type required: _real
+Conversion possible = TRUE
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: conv
+
+Inquire conversion possible...
+New type required: _double
+Conversion possible = TRUE
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: conv
+
+Inquire conversion possible...
+New type required: junk
+DAT_CONV: Error determining whether type conversion is possible.
+Type invalid (DAT__TYPIN)
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: z
+Number of dimensions: 0
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: conv
+
+Inquire conversion possible...
+New type required: _word
+DAT_CONV: Error determining whether type conversion is possible.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

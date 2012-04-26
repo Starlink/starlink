@@ -1,0 +1,253 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: test
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/test
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: x
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: mssg
+
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.X
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 3: TEST.X(2), nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.X(2)
+
+Current object is no. 3: TEST.X(2), nested at level 2
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test1
+Object name: test1
+Object type: test1
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 4: TEST1, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/test1
+
+Current object is no. 4: TEST1, nested at level 1
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 1
+Lower bound: 2
+Upper bound: 3
+
+Current object is no. 5: TEST1(2:3), nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/test1(2:3)
+
+Current object is no. 5: TEST1(2:3), nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 1
+
+Current object is no. 6: TEST1(2), nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/test1(2)
+
+Current object is no. 6: TEST1(2), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: z
+Number of dimensions: 0
+
+Current object is no. 7: TEST1(2).Z, nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/test1(2).Z
+
+Current object is no. 7: TEST1(2).Z, nested at level 2
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test.xxx
+Object name: test
+Object type: test
+Number of dimensions: 1
+Dimension: 5
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.xxx"
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 9: TEST(2), nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.xxx"(2)
+
+Current object is no. 9: TEST(2), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: p
+Component type: p
+Number of dimensions: 0
+
+Current object is no. 10: TEST(2).P, nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.xxx"(2).P
+
+Current object is no. 10: TEST(2).P, nested at level 2
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: testp
+Object name: fred
+Object type: c
+Number of dimensions: 0
+
+Current object is no. 11: FRED, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/testp
+
+Current object is no. 11: FRED, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: z
+Number of dimensions: 0
+
+Current object is no. 12: FRED.Z, nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: /tmp_mnt/soft2/rfws/testsuite/test_work_dir/testp.Z
+
+Current object is no. 12: FRED.Z, nested at level 2
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test.yyy
+Object name: fred
+Object type: c
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 13: FRED, nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.yyy"
+
+Current object is no. 13: FRED, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 14: FRED(2), nested at level 1
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.yyy"(2)
+
+Current object is no. 14: FRED(2), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: q
+Component type: q
+Number of dimensions: 0
+
+Current object is no. 15: FRED(2).Q, nested at level 2
+
+Operation to perform: msg
+
+Assign object name to message token...
+Object is: "/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.yyy"(2).Q
+
+Current object is no. 15: FRED(2).Q, nested at level 2
+
+Operation to perform: quit
+
+Quit...
