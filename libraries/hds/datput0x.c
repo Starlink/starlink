@@ -29,6 +29,7 @@
  *        datPut0D    DOUBLE PRECISION
  *        datPut0R    REAL / FLOAT
  *        datPut0I    INTEGER
+ *        datPut0K  INT64
  *        datPut0W    WORD / SHORT
  *        datPut0UW   UWORD / unsigned short
  *        datPut0L    LOGICAL
@@ -137,6 +138,18 @@ int datPut0I ( const HDSLoc * loc, int value, int * status ) {
   if ( *status != DAT__OK ) return *status;
 
   datPutI( loc, ndims, dim, &value, status );
+
+  return *status;
+}
+
+int datPut0K ( const HDSLoc * loc, int64_t value, int * status ) {
+
+  int ndims = 0;
+  hdsdim dim[] = { 0 };
+
+  if ( *status != DAT__OK ) return *status;
+
+  datPutK( loc, ndims, dim, &value, status );
 
   return *status;
 }

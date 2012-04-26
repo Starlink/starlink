@@ -71,6 +71,8 @@
 *      blocks.
 *     23-NOV-2007 (TIMJ):
 *      Abort the dump if the HCB is corrupt.
+*     25-APR-2012 (TIMJ):
+*      Add _INT64 support
 *     {enter_further_changes_here}
 
 *-
@@ -368,7 +370,7 @@ decode_type( int type, char **string)
 void
 decode_pdd( struct PDD *pdd )
 {
-   char *string;
+   const char *string;
 
    switch (pdd->dtype) {
       case DAT__B:
@@ -397,6 +399,9 @@ decode_pdd( struct PDD *pdd )
           break;
       case DAT__W:
           string = "_WORD";
+          break;
+      case DAT__K:
+          string = "_INT64";
           break;
       default:
           string = "Unknown!!";

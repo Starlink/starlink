@@ -1,5 +1,12 @@
 HDS Library
 -----------
+
+   Version 5.1-1
+   =============
+
+   Add _INT64 data type corresponding to 64-bit integers
+   (INTEGER*8 in Fortran and int64_t in C).
+
    Version 5.0-6
    =============
 

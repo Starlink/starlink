@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(hds, 5.0-6, ussc@star.rl.ac.uk)
+AC_INIT(hds, 5.1-1, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -75,6 +75,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(stddef.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS([sys/param.h])
+AC_CHECK_HEADERS(inttypes.h)
 
 dnl    Look for missing declarations
 AC_CHECK_DECLS(confstr)

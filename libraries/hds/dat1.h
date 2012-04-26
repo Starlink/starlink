@@ -7,6 +7,15 @@
 
 #include "f77.h"		 /* Fortran <=> C macro definitions	    */
 
+/* We may need a configure test for this */
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#if HAVE_INTTYPES_H
+#include <inttypes.h>            /* int64_t                                 */
+#endif
+
 /* Global Constants:							    */
 /* ================							    */
 /* The following are "public" values. Copies are made available externally  */
@@ -61,8 +70,9 @@
 #define DAT__UB 6		 /* _UBYTE				    */
 #define DAT__UW 7		 /* _UWORD				    */
 #define DAT__W 8		 /* _WORD                                   */
+#define DAT__K 9                 /* _INT64                                  */
 
-#define DAT__MXPRM 9		 /* Number of primitive data types	    */
+#define DAT__MXPRM 10		 /* Number of primitive data types	    */
 
 /* Primitive data storage order:					    */
 /* =============================					    */
@@ -107,6 +117,13 @@
 #define _UWORD unsigned F77_WORD_TYPE
 #endif
 #define _WORD F77_WORD_TYPE
+
+/* 64-bit integer type */
+#ifdef F77_INTEGER8_TYPE
+#define _INT64 F77_INTEGER8_TYPE
+#else
+#define _INT64 int64_t
+#endif
 
 /* Workaround until this definition is added to f77.h:			    */
 #if !defined( F77_POINTER_TYPE )
@@ -221,6 +238,7 @@ if (!_ok(*status))\
 	 _UWORD UW;
 	 _WORD W;
          _CHAR C;
+         _INT64 K;
       };
 
 /* NDR - Native data representation.					    */

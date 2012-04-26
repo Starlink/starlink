@@ -125,6 +125,12 @@ datType(const HDSLoc *locator,
            break;
          }
 
+         case DAT__K:
+         {
+           _chcopy( 6, "_INT64", ' ', type.length, type.body );
+           break;
+         }
+
          case DAT__W:
          {
             _chcopy( 5, "_WORD", ' ', type.length, type.body );

@@ -88,6 +88,8 @@
 /*       to prevent unwanted compiler optimisation.                         */
 /*    03-JAN-2005 (TIMJ):                                                   */
 /*       Turn on 'long double' code via autoconf tests                      */
+/*    25-APR-2012 (TIMJ):                                                   */
+/*       Add _INT64 support.                                                */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -110,6 +112,8 @@
          ULONGTYPE,
          FLTTYPE,
          DBLTYPE,
+         I64TYPE,
+         UI64TYPE,
          LDBLTYPE
       };
       union TYP {                /* Union for holding any C arithmetic type */
@@ -127,6 +131,8 @@
          unsigned long int ulongval;
          float fltval;
          double dblval;
+         int64_t i64val;
+         uint64_t ui64val;
 #if HAVE_LONG_DOUBLE
          long double ldblval;
 #endif
@@ -179,6 +185,7 @@
       dat_gl_ndr[ DAT__I ].name =  "_INTEGER";
       dat_gl_ndr[ DAT__R ].name =  "_REAL";
       dat_gl_ndr[ DAT__D ].name =  "_DOUBLE";
+      dat_gl_ndr[ DAT__K ].name =  "_INT64";
 
 /* Set up the length of each primitive data type.                           */
 /* =============================================                            */
@@ -191,6 +198,7 @@
       dat_gl_ndr[ DAT__I ].length =  sizeof( _INTEGER );
       dat_gl_ndr[ DAT__R ].length =  sizeof( _REAL );
       dat_gl_ndr[ DAT__D ].length =  sizeof( _DOUBLE );
+      dat_gl_ndr[ DAT__K ].length =  sizeof( _INT64 );
 
 /* Identify the format used for each C floating-point type.                 */
 /* =======================================================                  */
@@ -441,6 +449,20 @@
                lo.ulongval = (unsigned long int) 0;\
                hi.ulongval = ULONG_MAX;\
             }\
+            else if ( ( sizeof( dtype ) == sizeof( int64_t ) ) &&\
+                        _signed( dtype ) )\
+            {\
+               id = I64TYPE;\
+               lo.i64val = INT64_MIN;\
+               hi.i64val = INT64_MAX;\
+            }\
+            else if ( ( sizeof( dtype ) == sizeof( uint64_t ) ) &&\
+                        !_signed( dtype ) )\
+            {\
+               id = UI64TYPE;\
+               lo.ui64val = (uint64_t) 0;\
+               hi.ui64val = UINT64_MAX;\
+            }\
 \
 /* If a primitive data type cannot be identified, then report an error.     */\
             else\
@@ -510,6 +532,18 @@ require modification for use on this machine.",\
                {\
                   (min) = (dtype) lo.ulongval;\
                   (max) = (dtype) hi.ulongval;\
+                  break;\
+               }\
+               case I64TYPE:\
+               {\
+                  (min) = (dtype) lo.i64val;\
+                  (max) = (dtype) hi.i64val;\
+                  break;\
+               }\
+               case UI64TYPE:\
+               {\
+                  (min) = (dtype) lo.ui64val;\
+                  (max) = (dtype) hi.ui64val;\
                   break;\
                }\
 	    default:\
@@ -712,6 +746,9 @@ may require modification for use on this machine.",\
       _limitsi( _INTEGER,
                 dat_gl_ndr[ DAT__I ].min.I,
                 dat_gl_ndr[ DAT__I ].max.I )
+      _limitsi( _INT64,
+                dat_gl_ndr[ DAT__K ].min.K,
+                dat_gl_ndr[ DAT__K ].max.K )
       _limitsf( _REAL,
                 dat_gl_ndr[ DAT__R ].min.R,
                 dat_gl_ndr[ DAT__R ].max.R,
@@ -746,6 +783,7 @@ may require modification for use on this machine.",\
          dat_gl_ndr[ DAT__I ].bad.I =    dat_gl_ndr[ DAT__I ].min.I;
          dat_gl_ndr[ DAT__R ].bad.R =    dat_gl_ndr[ DAT__R ].min.R;
          dat_gl_ndr[ DAT__D ].bad.D =    dat_gl_ndr[ DAT__D ].min.D;
+         dat_gl_ndr[ DAT__K ].bad.K =    dat_gl_ndr[ DAT__K ].min.K;
       }
 
 /* Determine the byte storage order for each primitive data type.           */
@@ -805,6 +843,7 @@ may require modification for use on this machine.",\
          _order( _WORD,    0,    1,   dat_gl_ndr[ DAT__W ].order )
          _order( _UWORD,   0,    1,   dat_gl_ndr[ DAT__UW ].order )
          _order( _INTEGER, 0,    1,   dat_gl_ndr[ DAT__I ].order )
+         _order( _INT64,   0,    1,   dat_gl_ndr[ DAT__K ].order )
 #if HAVE_LONG_DOUBLE
          _order( _REAL,    1.0L, ( 1.0L + eps_REAL ),
                                       dat_gl_ndr[ DAT__R ].order )
@@ -892,6 +931,11 @@ may require modification for use on this machine.",\
                     dat_gl_ndr[ DAT__I ].max.I,
                     dat_gl_ndr[ DAT__I ].txtsize,
                     dat_gl_ndr[ DAT__I ].digits )
+         _txtsizei( _INT64,
+                    dat_gl_ndr[ DAT__K ].min.K,
+                    dat_gl_ndr[ DAT__K ].max.K,
+                    dat_gl_ndr[ DAT__K ].txtsize,
+                    dat_gl_ndr[ DAT__K ].digits )
      }
 
 /* Define a macro to format the minimum floating point values using a       */
@@ -1135,6 +1179,11 @@ may require modification for use on this machine.",\
                   dat_gl_ndr[ DAT__I ].min.I,
                   dat_gl_ndr[ DAT__I ].max.I,
                   dat_gl_ndr[ DAT__I ].format )
+         _format( _INT64,
+                  dat_gl_ndr[ DAT__K ].order,
+                  dat_gl_ndr[ DAT__K ].min.K,
+                  dat_gl_ndr[ DAT__K ].max.K,
+                  dat_gl_ndr[ DAT__K ].format )
 
 /* Assign the floating-point format codes determined earlier.               */
          dat_gl_ndr[ DAT__R ].format = format_REAL;

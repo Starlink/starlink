@@ -196,6 +196,31 @@ datPutI(const HDSLoc   *locator,
    return hds_gl_status;
 }
 
+/*========================================*/
+/* DAT_PUTK - Write 64-bit Integer data */
+/*========================================*/
+int
+datPutK(const HDSLoc   *locator,
+         int     ndim,
+        const HDS_PTYPE dims[],
+        const int64_t     values[],
+         int     *status)
+{
+#undef context_name
+#undef context_message
+#define context_name "DAT_PUTK_ERR"
+#define context_message\
+        "DAT_PUTK: Error writing 64-bit integer values to an HDS primitive."
+
+   datPut(locator,
+          "_INT64",
+          ndim,
+          dims,
+          values,
+          status);
+   return hds_gl_status;
+}
+
 /*=====================================*/
 /* DAT_PUTW - Write Short Integer data */
 /*=====================================*/
@@ -416,6 +441,32 @@ datPut1I( const HDSLoc * locator,
   return *status;
 }
 
+/*=================================*/
+/* DAT_PUT1K - Write 1D 64-bit int array */
+/*=================================*/
+
+int
+datPut1K( const HDSLoc * locator,
+	  size_t nval,
+	  const int64_t values[],
+	  int * status ) {
+  size_t size;
+  hdsdim dim[1];
+
+  if ( *status != DAT__OK ) return *status;
+  datSize( locator, &size, status );
+  if ( *status == DAT__OK && size != nval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)nval );
+    emsSeti( "SZ", (int)size );
+    emsRep( "DAT_PUT1K_ERR", "Bounds mismatch: ^IN != ^SZ", status);
+  } else {
+    dim[0] = (hdsdim)size;
+    datPutK( locator, 1, dim, values, status );
+  }
+  return *status;
+}
+
 /*======================================*/
 /* DAT_PUT1W - Write 1D short int array */
 /*======================================*/
@@ -550,6 +601,22 @@ datPutVI( const HDSLoc * locator,
   HDSLoc *vec = NULL;
   datVec( locator, &vec, status );
   datPut1I( vec, nval, values, status );
+  datAnnul( &vec, status );
+  return *status;
+}
+
+/*====================================*/
+/* DAT_PUTVK - Write vectorized int64 */
+/*====================================*/
+
+int
+datPutVK( const HDSLoc * locator,
+	    size_t nval,
+	    const int64_t values[],
+	    int *status ) {
+  HDSLoc *vec = NULL;
+  datVec( locator, &vec, status );
+  datPut1K( vec, nval, values, status );
   datAnnul( &vec, status );
   return *status;
 }

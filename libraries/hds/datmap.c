@@ -272,6 +272,27 @@ datMapI(const HDSLoc    *locator,
 }
 
 /*=============================*/
+/* datMapK - Map INT64 data */
+/*=============================*/
+int
+datMapK(const HDSLoc    *locator,
+          const char      *mode_str,
+          int       ndim,
+          const HDS_PTYPE dims[],
+          int       **pntr,
+          int       *status )
+{
+#undef context_name
+#undef context_message
+#define context_name "DAT_MAPK_ERR"
+#define context_message\
+        "DAT_MAPK: Error mapping HDS primitive as 64-bit int values."
+   datMap( locator, "_INT64", mode_str, ndim, dims,
+           (void**)pntr, status );
+   return hds_gl_status;
+}
+
+/*=============================*/
 /* DAT_MAPR - Map REAL data */
 /*=============================*/
 int

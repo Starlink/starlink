@@ -103,6 +103,7 @@ int datNew0( const HDSLoc* locator, const char * name, const char * type, int *s
 /*
   DAT_NEW0D
   DAT_NEW0I
+  DAT_NEW0K
   DAT_NEW0W
   DAT_NEW0UW
   DAT_NEW0L
@@ -116,6 +117,11 @@ int datNew0D( const HDSLoc * locator, const char * name, int * status ) {
 
 int datNew0I( const HDSLoc * locator, const char * name, int * status ) {
   datNew0( locator, name, "_INTEGER", status );
+  return *status;
+}
+
+int datNew0K( const HDSLoc * locator, const char * name, int * status ) {
+  datNew0( locator, name, "_INT64", status );
   return *status;
 }
 

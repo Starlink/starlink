@@ -197,6 +197,13 @@ F77_SUBROUTINE(dat_geti)( CHARACTER(locator),
                           F77_INTEGER_TYPE *status
                           TRAIL(locator) );
 
+F77_SUBROUTINE(dat_getk)( CHARACTER(locator),
+                           F77_INTEGER_TYPE *ndim,
+                           FORTRAN_INDEX_TYPE dims[],
+                           F77_INTEGER8_TYPE *values,
+                           F77_INTEGER_TYPE *status
+                           TRAIL(locator) );
+
 F77_SUBROUTINE(dat_getl)( CHARACTER(locator),
                           F77_INTEGER_TYPE *ndim,
                           FORTRAN_INDEX_TYPE dims[],
@@ -236,6 +243,11 @@ F77_SUBROUTINE(dat_get0i)( CHARACTER(locator),
 			   INTEGER(status)
 			   TRAIL(locator) );
 
+F77_SUBROUTINE(dat_get0k)( CHARACTER(locator),
+			   INTEGER8(value),
+			   INTEGER(status)
+			   TRAIL(locator) );
+
 F77_SUBROUTINE(dat_get0l)( CHARACTER(locator),
 			   LOGICAL(value),
 			   INTEGER(status)
@@ -263,6 +275,13 @@ F77_SUBROUTINE(dat_get1d)( CHARACTER(locator),
 F77_SUBROUTINE(dat_get1i)( CHARACTER(locator),
 			   INTEGER(maxval),
 			   F77_INTEGER_TYPE *values,
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator) );
+
+F77_SUBROUTINE(dat_get1k)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   F77_INTEGER8_TYPE *values,
 			   INTEGER(actval),
 			   INTEGER(status)
 			   TRAIL(locator) );
@@ -295,6 +314,13 @@ F77_SUBROUTINE(dat_getvd)( CHARACTER(locator),
 F77_SUBROUTINE(dat_getvi)( CHARACTER(locator),
 			   INTEGER(maxval),
 			   F77_INTEGER_TYPE *values,
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator) );
+
+F77_SUBROUTINE(dat_getvk)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   F77_INTEGER8_TYPE *values,
 			   INTEGER(actval),
 			   INTEGER(status)
 			   TRAIL(locator) );
@@ -370,6 +396,15 @@ F77_SUBROUTINE(dat_mapi)( CHARACTER(locator),
                           F77_INTEGER_TYPE *status
                           TRAIL(locator)
                           TRAIL(mode) );
+
+F77_SUBROUTINE(dat_mapk)( CHARACTER(locator),
+                           CHARACTER(mode),
+                           F77_INTEGER_TYPE *ndim,
+                           FORTRAN_INDEX_TYPE dims[],
+                           F77_POINTER_TYPE *pntr,
+                           F77_INTEGER_TYPE *status
+                           TRAIL(locator)
+                           TRAIL(mode) );
 
 F77_SUBROUTINE(dat_mapl)( CHARACTER(locator),
                           CHARACTER(mode),
@@ -477,6 +512,12 @@ F77_SUBROUTINE(dat_new0i)( CHARACTER(locator),
                           TRAIL(locator)
 			   TRAIL(name) );
 
+F77_SUBROUTINE(dat_new0k)( CHARACTER(locator),
+                            CHARACTER(name),
+                            INTEGER(status)
+                            TRAIL(locator)
+			    TRAIL(name) );
+
 F77_SUBROUTINE(dat_new0r)( CHARACTER(locator),
                           CHARACTER(name),
                           INTEGER(status)
@@ -518,6 +559,13 @@ F77_SUBROUTINE(dat_new1i)( CHARACTER(locator),
 			   INTEGER(status)
 			   TRAIL(locator)
 			   TRAIL(name) );
+
+F77_SUBROUTINE(dat_new1k)( CHARACTER(locator),
+			    CHARACTER(name),
+			    INTEGER(len),
+			    INTEGER(status)
+			    TRAIL(locator)
+			    TRAIL(name) );
 
 F77_SUBROUTINE(dat_new1l)( CHARACTER(locator),
 			   CHARACTER(name),
@@ -585,6 +633,13 @@ F77_SUBROUTINE(dat_puti)( CHARACTER(locator),
                           F77_INTEGER_TYPE *status
                           TRAIL(locator) );
 
+F77_SUBROUTINE(dat_putk)( CHARACTER(locator),
+                           F77_INTEGER_TYPE *ndim,
+                           FORTRAN_INDEX_TYPE dims[],
+                           F77_INTEGER8_TYPE *values,
+                           F77_INTEGER_TYPE *status
+                           TRAIL(locator) );
+
 F77_SUBROUTINE(dat_putr)( CHARACTER(locator),
                           F77_INTEGER_TYPE *ndim,
                           FORTRAN_INDEX_TYPE dims[],
@@ -630,6 +685,12 @@ F77_SUBROUTINE(dat_put1i)( CHARACTER(locator),
 			   INTEGER(status)
 			   TRAIL(locator) );
 
+F77_SUBROUTINE(dat_put1k)( CHARACTER(locator),
+			    INTEGER(nval),
+			    F77_INTEGER8_TYPE *values,
+			    INTEGER(status)
+			    TRAIL(locator) );
+
 F77_SUBROUTINE(dat_put1r)( CHARACTER(locator),
 			   INTEGER(nval),
 			   F77_REAL_TYPE *values,
@@ -653,6 +714,12 @@ F77_SUBROUTINE(dat_putvi)( CHARACTER(locator),
 			   F77_INTEGER_TYPE *values,
 			   INTEGER(status)
 			   TRAIL(locator) );
+
+F77_SUBROUTINE(dat_putvk)( CHARACTER(locator),
+			    INTEGER(nval),
+			    F77_INTEGER8_TYPE *values,
+			    INTEGER(status)
+			    TRAIL(locator) );
 
 F77_SUBROUTINE(dat_putvr)( CHARACTER(locator),
 			   INTEGER(nval),
@@ -692,6 +759,11 @@ F77_SUBROUTINE(dat_put0i)( CHARACTER(locator),
 			   INTEGER(value),
 			   INTEGER(status)
 			   TRAIL(locator) );
+
+F77_SUBROUTINE(dat_put0k)( CHARACTER(locator),
+			    INTEGER8(value),
+			    INTEGER(status)
+			    TRAIL(locator) );
 
 F77_SUBROUTINE(dat_put0l)( CHARACTER(locator),
 			   LOGICAL(value),

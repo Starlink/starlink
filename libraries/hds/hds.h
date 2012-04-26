@@ -202,6 +202,17 @@ datGetI(const HDSLoc    *locator,
         int       values[],
         int       *status);
 
+/*======================================*/
+/* datGetK - Read _INT64 primitive(s) */
+/*======================================*/
+
+int
+datGetK(const HDSLoc    *locator,
+        int       ndim,
+        const hdsdim    dims[],
+        int64_t    values[],
+        int       *status);
+
 /*===================================*/
 /* datGetW - Read _WORD primitive(s) */
 /*===================================*/
@@ -274,6 +285,13 @@ datGet0R( const HDSLoc * loc, float * value, int * status );
 int
 datGet0I( const HDSLoc * loc, int * value, int * status );
 
+/*================================================*/
+/* datGet0K - Read scalar 64-bit integer value  */
+/*================================================*/
+
+int
+datGet0K( const HDSLoc * loc, int64_t * value, int * status );
+
 /*=============================================*/
 /* datGet0W - Read scalar short integer value  */
 /*=============================================*/
@@ -327,6 +345,17 @@ int
 datGet1I( const HDSLoc * locator,
 	  size_t maxval,
 	  int values[],
+	  size_t *actval,
+	  int * status );
+
+/*============================================*/
+/* DAT_GET1K - Read 1D 64-bit Integer array */
+/*============================================*/
+
+int
+datGet1K( const HDSLoc * locator,
+	  size_t maxval,
+	  int64_t values[],
 	  size_t *actval,
 	  int * status );
 
@@ -409,6 +438,17 @@ datGetVI( const HDSLoc * locator,
 	  int values[],
 	  size_t *actval,
 	  int * status );
+
+/*==========================================*/
+/* DAT_GETVK - Read vectorized Int64 array */
+/*==========================================*/
+
+int
+datGetVK( const HDSLoc * locator,
+	    size_t maxval,
+	    int64_t values[],
+	    size_t *actval,
+	    int * status );
 
 /*==========================================*/
 /* DAT_GETVR - Read vectorized REAL array */
@@ -495,6 +535,18 @@ datMapD(const HDSLoc    *locator,
 
 int
 datMapI(const HDSLoc    *locator,
+        const char      *mode_str,
+        int       ndim,
+        const hdsdim    dims[],
+        int       **pntr,
+        int       *status );
+
+/*=====================================*/
+/* datMapK - Map _INT64 primitive(s) */
+/*=====================================*/
+
+int
+datMapK(const HDSLoc    *locator,
         const char      *mode_str,
         int       ndim,
         const hdsdim    dims[],
@@ -650,6 +702,15 @@ datNew0I( const HDSLoc    *locator,
         const char      *name_str,
         int       *status);
 
+/*=========================================================*/
+/* datNew0K - Create new scalar 64-bit integer component */
+/*=========================================================*/
+
+int
+datNew0K( const HDSLoc    *locator,
+            const char      *name_str,
+            int       *status);
+
 /*======================================================*/
 /* datNew0W - Create new scalar short integer component */
 /*======================================================*/
@@ -736,6 +797,16 @@ datNew1D( const HDSLoc    *locator,
 
 int
 datNew1I( const HDSLoc    *locator,
+	 const char      *name_str,
+	 size_t          len,
+	 int       *status);
+
+/*================================================*/
+/* datNew1K - Create new vector 64-bit integer  */
+/*================================================*/
+
+int
+datNew1K( const HDSLoc    *locator,
 	 const char      *name_str,
 	 size_t          len,
 	 int       *status);
@@ -853,6 +924,17 @@ datPutI( const HDSLoc *locator,
          int     *status);
 
 /*=====================================*/
+/* datPutK - Write _INT64 primitives */
+/*=====================================*/
+
+int
+datPutK( const HDSLoc *locator,
+         int     ndim,
+         const hdsdim dims[],
+         const int64_t values[],
+         int     *status);
+
+/*=====================================*/
 /* datPutW - Write _WORD primitives */
 /*=====================================*/
 
@@ -936,6 +1018,13 @@ datPut0R( const HDSLoc * loc, float value, int * status );
 int
 datPut0I( const HDSLoc * loc, int value, int * status );
 
+/*========================================*/
+/* datPut0I - Write scalar 64-bit integer value  */
+/*========================================*/
+
+int
+datPut0K( const HDSLoc * loc, int64_t value, int * status );
+
 /*==============================================*/
 /* datPut0W - Write scalar short integer value  */
 /*===============================================*/
@@ -985,6 +1074,16 @@ int
 datPut1I( const HDSLoc * loc,
 	  size_t nval,
 	  const int values[],
+	  int * status );
+
+/*========================================*/
+/* datPut1K - Write 1D 64-bit int array */
+/*========================================*/
+
+int
+datPut1K( const HDSLoc * loc,
+	  size_t nval,
+	  const int64_t values[],
 	  int * status );
 
 /*===========================================*/
@@ -1046,6 +1145,16 @@ datPutVI( const HDSLoc * loc,
 	  size_t nval,
 	  const int values[],
 	  int * status );
+
+/*================================================*/
+/* datPutVI - Write vectorized int64 array       */
+/*================================================*/
+
+int
+datPutVK( const HDSLoc * loc,
+	    size_t nval,
+	    const int64_t values[],
+	    int * status );
 
 /*================================================*/
 /* datPutVR - Write vectorized REAL/float array       */

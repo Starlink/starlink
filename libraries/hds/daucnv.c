@@ -87,6 +87,15 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
                dau_move_data(nval, imp, exp);
                break;
 
+            case DAT__K:
+               {
+                  _INTEGER *src = (_INTEGER *) imp->body;
+                  _INT64 *des = (_INT64 *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     des[n] = (_INT64) src[n];
+                  break;
+               }
+
             case DAT__R:
                {
                   _INTEGER *src = (_INTEGER *) imp->body;
@@ -200,6 +209,15 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
                   _INTEGER *des = (_INTEGER *) exp->body;
                   for (n = 0; n < nval; n++)
                      des[n] = (_INTEGER) src[n];        /* Overflow? */
+                  break;
+               }
+
+            case DAT__K:
+               {
+                  _REAL *src = (_REAL *) imp->body;
+                  _INT64 *des = (_INT64 *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     des[n] = (_INT64) src[n];        /* Overflow? */
                   break;
                }
 
@@ -324,6 +342,15 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
                   _INTEGER *des = (_INTEGER *) exp->body;
                   for (n = 0; n < nval; n++)
                      des[n] = (_INTEGER) src[n];        /* Overflow? */
+                  break;
+               }
+
+            case DAT__K:
+               {
+                  _DOUBLE *src = (_DOUBLE *) imp->body;
+                  _INT64 *des = (_INT64 *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     des[n] = (_INT64) src[n];        /* Overflow? */
                   break;
                }
 
@@ -459,6 +486,18 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
                {
                   _LOGICAL *src = (_LOGICAL *) imp->body;
                   _INTEGER *des = (_INTEGER *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     if ( F77_ISTRUE( src[n] ) )
+                        des[n] = 1;
+                     else
+                        des[n] = 0;
+                  break;
+               }
+
+            case DAT__K:
+               {
+                  _LOGICAL *src = (_LOGICAL *) imp->body;
+                  _INT64 *des = (_INT64 *) exp->body;
                   for (n = 0; n < nval; n++)
                      if ( F77_ISTRUE( src[n] ) )
                         des[n] = 1;
@@ -613,6 +652,15 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
                   break;
                }
 
+            case DAT__K:
+               {
+                  _BYTE *src = (_BYTE *) imp->body;
+                  _INT64 *des = (_INT64 *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     des[n] = (_INT64) src[n];
+                  break;
+               }
+
             case DAT__R:
                {
                   _BYTE *src = (_BYTE *) imp->body;
@@ -711,6 +759,15 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
                   break;
                }
 
+            case DAT__K:
+               {
+                  _UBYTE *src = (_UBYTE *) imp->body;
+                  _INT64 *des = (_INT64 *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     des[n] = (_INT64) src[n];
+                  break;
+               }
+
             case DAT__R:
                {
                   _UBYTE *src = (_UBYTE *) imp->body;
@@ -803,6 +860,15 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
                   _INTEGER *des = (_INTEGER *) exp->body;
                   for (n = 0; n < nval; n++)
                      des[n] = (_INTEGER) src[n];
+                  break;
+               }
+
+            case DAT__K:
+               {
+                  _WORD *src = (_WORD *) imp->body;
+                  _INT64 *des = (_INT64 *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     des[n] = (_INT64) src[n];
                   break;
                }
 
@@ -900,6 +966,134 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
          }
          break;
 
+      case DAT__K:
+         switch (exp->dtype)
+         {
+            case DAT__K:
+               dau_move_data(nval, imp, exp);
+               break;
+
+            case DAT__I:
+              {
+                  _INT64 *src = (_INT64 *) imp->body;
+                  _INTEGER *des = (_INTEGER *) exp->body;
+                  for (n = 0; n < nval; n++)
+                  {
+                     des[n] = (_INTEGER) src[n];
+                     if (des[n] != src[n])
+                     {
+                        (*nbad)++;
+                        des[n] = dat_gl_ndr[ DAT__I ].bad.I;
+                        hds_gl_status = DAT__CONER;
+                     }
+                  }
+                  break;
+               }
+
+            case DAT__R:
+               {
+                  _INT64 *src = (_INT64 *) imp->body;
+                  _REAL *des = (_REAL *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     des[n] = (_REAL) src[n];
+                  break;
+               }
+
+            case DAT__D:
+               {
+                  _INT64 *src = (_INT64 *) imp->body;
+                  _DOUBLE *des = (_DOUBLE *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     des[n] = (_DOUBLE) src[n];
+                  break;
+               }
+
+            case DAT__L:
+               {
+                  _INT64 *src = (_INT64 *) imp->body;
+                  _LOGICAL *des = (_LOGICAL *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     if (src[n] & 1)
+                        des[n] = F77_TRUE;
+                     else
+                        des[n] = F77_FALSE;
+                  break;
+               }
+
+            case DAT__C:
+               dat1_cvt_char(bad, nval, imp, exp, nbad);
+               break;
+
+            case DAT__B:
+               {
+                  _INT64 *src = (_INT64 *) imp->body;
+                  _BYTE *des = (_BYTE *) exp->body;
+                  for (n = 0; n < nval; n++)
+                  {
+                     des[n] = (_BYTE) src[n];
+                     if (des[n] != src[n])
+                     {
+                        (*nbad)++;
+                        des[n] = dat_gl_ndr[ DAT__B ].bad.B;
+                        hds_gl_status = DAT__CONER;
+                     }
+                  }
+                  break;
+               }
+
+            case DAT__UB:
+               {
+                  _INT64 *src = (_INT64 *) imp->body;
+                  _UBYTE *des = (_UBYTE *) exp->body;
+                  for (n = 0; n < nval; n++)
+                  {
+                     des[n] = (_UBYTE) src[n];
+                     if (des[n] != src[n])
+                     {
+                        (*nbad)++;
+                        des[n] = dat_gl_ndr[ DAT__UB ].bad.UB;
+                        hds_gl_status = DAT__CONER;
+                     }
+                  }
+                  break;
+               }
+
+            case DAT__W:
+               {
+                  _INT64 *src = (_INT64 *) imp->body;
+                  _WORD *des = (_WORD *) exp->body;
+                  for (n = 0; n < nval; n++)
+                  {
+                     des[n] = (_WORD) src[n];
+                     if (des[n] != src[n])
+                     {
+                        (*nbad)++;
+                        des[n] = dat_gl_ndr[ DAT__W ].bad.W;
+                        hds_gl_status = DAT__CONER;
+                     }
+                  }
+                  break;
+               }
+
+            case DAT__UW:
+               {
+                  _INT64 *src = (_INT64 *) imp->body;
+                  _UWORD *des = (_UWORD *) exp->body;
+                  for (n = 0; n < nval; n++)
+                  {
+                     des[n] = (_UWORD) src[n];
+                     if (des[n] != src[n])
+                     {
+                        (*nbad)++;
+                        des[n] = dat_gl_ndr[ DAT__UW ].bad.UW;
+                        hds_gl_status = DAT__CONER;
+                     }
+                  }
+                  break;
+               }
+         }
+         break;
+
       case DAT__UW:
          switch (exp->dtype)
          {
@@ -909,6 +1103,15 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
                   _INTEGER *des = (_INTEGER *) exp->body;
                   for (n = 0; n < nval; n++)
                      des[n] = (_INTEGER) src[n];
+                  break;
+               }
+
+            case DAT__K:
+               {
+                  _UWORD *src = (_UWORD *) imp->body;
+                  _INT64 *des = (_INT64 *) exp->body;
+                  for (n = 0; n < nval; n++)
+                     des[n] = (_INT64) src[n];
                   break;
                }
 

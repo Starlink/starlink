@@ -287,6 +287,21 @@ datNew1I( const HDSLoc * locator,
   return *status;
 }
 
+/*========================================================*/
+/* DAT_NEW1K - Create a vector 64-bit integer component */
+/*========================================================*/
+
+int
+datNew1K( const HDSLoc * locator,
+	 const char * name,
+	 size_t len,
+	 int * status )
+{
+  if (*status != DAT__OK) return *status;
+  datNew1( locator, name, "_INT64", len, status );
+  return *status;
+}
+
 /*======================================================*/
 /* DAT_NEW1W - Create a vector short integer  component */
 /*======================================================*/

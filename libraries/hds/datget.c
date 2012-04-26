@@ -223,6 +223,28 @@ datGetI(const HDSLoc    *locator,
    return hds_gl_status;
 }
 
+/*=======================================*/
+/* DAT_GETK - Read 64-bit Integer data */
+/*=======================================*/
+int
+datGetK(const HDSLoc    *locator,
+        int       ndim,
+        const HDS_PTYPE dims[],
+        int64_t   values[],
+        int       *status)
+{
+#undef context_name
+#undef context_message
+#define context_name "DAT_GETK_ERR"
+#define context_message\
+        "DAT_GETK: Error reading 64-bit integer value(s) from an HDS primitive."
+
+   datGet(locator, "_INT64", ndim, dims,
+                     values, status );
+
+   return hds_gl_status;
+}
+
 /*====================================*/
 /* DAT_GETW - Read Short Integer data */
 /*====================================*/
@@ -393,7 +415,7 @@ datGet1D( const HDSLoc * locator,
 }
 
 /*==================================*/
-/* DAT_GET1I - Read 1D Double array */
+/* DAT_GET1I - Read 1D Integer array */
 /*==================================*/
 
 int
@@ -417,6 +439,35 @@ datGet1I( const HDSLoc * locator,
   } else {
     dims[0] = *actval;
     datGetI( locator, 1, dims, values, status );
+  }
+  return *status;
+}
+
+/*==================================*/
+/* DAT_GET1K - Read 1D 64-bit int array */
+/*==================================*/
+
+int
+datGet1K( const HDSLoc * locator,
+	  size_t maxval,
+	  int64_t values[],
+	  size_t *actval,
+	  int * status ) {
+
+  hdsdim dims[1];
+
+  if (*status != DAT__OK) return *status;
+
+  datSize( locator, actval, status );
+
+  if ( *status == DAT__OK && maxval < *actval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)maxval );
+    emsSeti( "SZ", (int)*actval );
+    emsRep( "DAT_GET1I_ERR", "datGet1K: Bounds mismatch: ^IN < ^SZ", status);
+  } else {
+    dims[0] = *actval;
+    datGetK( locator, 1, dims, values, status );
   }
   return *status;
 }
@@ -503,7 +554,7 @@ datGetVD( const HDSLoc * locator,
   return *status;
 }
 /*==========================================*/
-/* DAT_GETVD - Read vectorized Double array */
+/* DAT_GETVI - Read vectorized Integer array */
 /*==========================================*/
 
 int
@@ -516,6 +567,24 @@ datGetVI( const HDSLoc * locator,
   if (*status != DAT__OK) return *status;
   datVec(locator, &vec, status );
   datGet1I( vec, maxval, values, actval, status );
+  datAnnul( &vec, status );
+  return *status;
+}
+
+/*==========================================*/
+/* DAT_GETVK - Read vectorized Int64 array  */
+/*==========================================*/
+
+int
+datGetVK( const HDSLoc * locator,
+	    size_t maxval,
+	    int64_t values[],
+	    size_t *actval,
+	    int * status ) {
+  HDSLoc * vec = NULL;
+  if (*status != DAT__OK) return *status;
+  datVec(locator, &vec, status );
+  datGet1K( vec, maxval, values, actval, status );
   datAnnul( &vec, status );
   return *status;
 }

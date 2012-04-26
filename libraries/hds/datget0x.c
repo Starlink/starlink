@@ -170,6 +170,18 @@ int datGet0I ( const HDSLoc * loc, int * value, int * status ) {
   return *status;
 }
 
+int datGet0K ( const HDSLoc * loc, int64_t * value, int * status ) {
+
+  int ndims = 0;
+  hdsdim dim[] = { 0 };
+
+  if ( *status != DAT__OK ) return *status;
+
+  datGetK( loc, ndims, dim, value, status );
+
+  return *status;
+}
+
 int datGet0W ( const HDSLoc * loc, short * value, int * status ) {
 
   int ndims = 0;

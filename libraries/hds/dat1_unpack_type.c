@@ -43,6 +43,7 @@
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -50,6 +51,8 @@
 /*       Original version.                                                  */
 /*    10-SEP-1992 (RFWS):                                                   */
 /*       Added writing of format string for use by sscanf.                  */
+/*    20-APR-2012 (TIMJ):                                                   */
+/*       Add _INT64 support.                                                */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -112,6 +115,16 @@
             pdd->class = DAT__PRIMITIVE;
             pdd->length = 4;
             pdd->dtype = DAT__I;
+            pdd->format = DAT__2COMP; /* 2's complement signed integer      */
+            pdd->order = DAT__LSB;
+         }
+
+/* _INT64                                                                   */
+         else if ( strncmp( ptype + 1, "INT64", 5 ) == 0 )
+         {
+            pdd->class = DAT__PRIMITIVE;
+            pdd->length = 8;
+            pdd->dtype = DAT__K;
             pdd->format = DAT__2COMP; /* 2's complement signed integer      */
             pdd->order = DAT__LSB;
          }

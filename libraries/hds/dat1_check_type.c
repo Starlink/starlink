@@ -59,6 +59,8 @@
 /*    14-SEP-2005 (TIMJ):                                                   */
 /*       Initialise ptype on entry to stop it accessing uninitialised       */
 /*       memory.                                                            */
+/*    20-APR-2012 (TIMJ):                                                   */
+/*       Add _INT64 support.                                                */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -220,6 +222,13 @@ error).",
                       ( strncmp( ptype, "_LOGICAL", 8 ) == 0 ) )
             {
                dtype = DAT__L;
+            }
+
+/* _INT64                                                                   */
+            else if ( ( n == 6 ) &&
+                      ( strncmp( ptype, "_INT64", 6 ) == 0 ) )
+            {
+               dtype = DAT__K;
             }
 
 /* _CHAR                                                                    */

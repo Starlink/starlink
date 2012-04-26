@@ -48,6 +48,7 @@
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -55,6 +56,8 @@
 /*       Original version.                                                  */
 /*    5-OCT-1992 (RFWS):                                                    */
 /*       Changed to display and use decimal digits of precision value.      */
+/*    20-APR-2012 (TIMJ):                                                   */
+/*       Add _INT64 support.                                                */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -276,6 +279,7 @@
             case DAT__W:  _showi( _WORD,    W )  break;
             case DAT__UW: _showi( _UWORD,   UW ) break;
             case DAT__I:  _showi( _INTEGER, I )  break;
+            case DAT__K:  _showi( _INT64, K )  break;
             case DAT__R:  _showf( _REAL,    R )  break;
             case DAT__D:  _showf( _DOUBLE,  D )  break;
          }

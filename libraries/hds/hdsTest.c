@@ -62,6 +62,7 @@
 #include "ems.h"
 #include "dat_err.h"
 #include <stdio.h>
+#include <inttypes.h>
 
 int main (void) {
 
@@ -79,6 +80,7 @@ int main (void) {
   double *mapd;  /* Mapped _DOUBLE */
   float  *mapf;  /* Mapped _REAL */
   int *mapi;     /* Mapped _INTEGER */
+  int64_t *mapi64; /* Mapped _INT64 */
   HDSLoc * loc1 = NULL;
   HDSLoc * loc2 = NULL;
   HDSLoc * loc3 = NULL;
@@ -90,6 +92,10 @@ int main (void) {
   int n;
   double sumd;
   int sumi;
+  int64_t sumi64;
+  int64_t test64;
+  int64_t testin64;
+  const int64_t VAL__BADK = (-9223372036854775807 - 1);
 
   emsBegin(&status);
 
@@ -103,8 +109,35 @@ int main (void) {
   datNew( loc1, "DATA_ARRAY", "_INTEGER", 2, dim, &status );
   datNew1C( loc1, "ONEDCHAR", 14, 3, &status );
   datNew1D( loc1, "ONEDD", 2, &status );
+  datNew0K( loc1, "TESTI64", &status );
+  datNew0K( loc1, "TESTBADI64", &status );
 
   /* Populate */
+  testin64 = 9223372036854775800;
+  datFind( loc1, "TESTI64", &loc2, &status );
+  datPut0K( loc2, testin64, &status );
+  datGet0K( loc2, &test64, &status );
+  datAnnul( &loc2, &status );
+  if (status == DAT__OK) {
+    if ( test64 != testin64 ) {
+      status = DAT__FATAL;
+      emsRepf( "TESTI64", "Test _INT64 value %" PRIi64 " did not match expected %"PRIi64,
+               &status, test64, testin64 );
+    }
+  }
+
+  datFind( loc1, "TESTBADI64", &loc2, &status );
+  datPut0K( loc2, VAL__BADK, &status );
+  datGet0K( loc2, &test64, &status );
+  datAnnul( &loc2, &status );
+  if (status == DAT__OK) {
+    if ( test64 != VAL__BADK ) {
+      status = DAT__FATAL;
+      emsRepf( "TESTBADI64", "Test _INT64 value %" PRIi64 " did not match expected VAL__BADK",
+               &status, test64 );
+    }
+  }
+
   datFind( loc1, "ONEDCHAR", &loc2, &status );
   datPutVC( loc2, 3, chararr, &status );
 
@@ -250,6 +283,7 @@ int main (void) {
   for (i = 0; i < nel; i++) {
     sumi += mapi[i];
   }
+  datUnmap( loc2, &status );
 
   if (status == DAT__OK) {
     if (sumi != (int)sumd) {
@@ -259,6 +293,34 @@ int main (void) {
       emsRep("SUM","Sum was not correct. Got ^I rather than ^D", &status );
     }
   }
+
+  /* _INT64 test */
+  datMapV( loc2, "_INT64", "READ", &mapv, &nel, &status );
+  mapi64 = mapv;
+  if (status == DAT__OK) {
+    nelt = dim[0] * dim[1];
+    if ( nelt != nel) {
+      status = DAT__FATAL;
+      emsSeti( "NEL", (int)nel );
+      emsSeti( "NORI", (int)nelt );
+      emsRep( "SIZE","Number of elements originally (^NORI) not the same as now (^NEL)", &status);
+    }
+  }
+  sumi64 = 0;
+  for (i = 0; i < nel; i++) {
+    sumi64 += mapi64[i];
+  }
+  datUnmap( loc2, &status );
+
+  if (status == DAT__OK) {
+    if (sumi64 != (int)sumd) {
+      status = DAT__FATAL;
+      emsSeti( "I", (int)sumi64 );
+      emsSeti( "D", (int)sumd );
+      emsRep("SUM","Sum was not correct. Got ^I rather than ^D", &status );
+    }
+  }
+
 
   /* Tidy up and close */
   hdsErase( &loc1, &status );
