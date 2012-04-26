@@ -393,6 +393,7 @@
 *             there are no conversions from the byte and word data
 *             types, these must be handled as integers.
 
+               STR = '!'
                IF ( BWTYPE ) THEN
                   DUMMY = NUM_<T>TOI( VALUES( IVALUE ) )
                   CALL CHR_ITOC( DUMMY, STR, NCHAR )
@@ -402,6 +403,8 @@
                   CALL CHR_RTOC( VALUES( IVALUE ), STR, NCHAR )
                ELSE IF ( '<T>' .EQ. 'D' ) THEN
                   CALL CHR_DTOC( VALUES( IVALUE ), STR, NCHAR )
+               ELSE IF ( '<T>' .EQ. 'K' ) THEN
+                  CALL CHR_KTOC( VALUES( IVALUE ), STR, NCHAR )
                END IF
             END IF
 
@@ -534,6 +537,7 @@
 *             there are no conversions from the byte and word data
 *             types, these must be handled as integers.
 
+                  STR = '!'
                   IF ( BWTYPE ) THEN
                      DUMMY = NUM_<T>TOI( VALUES( FVALUE ) )
                      CALL CHR_ITOC( DUMMY, STR, NCHAR )
@@ -543,6 +547,8 @@
                      CALL CHR_RTOC( VALUES( FVALUE ), STR, NCHAR )
                   ELSE IF ( '<T>' .EQ. 'D' ) THEN
                      CALL CHR_DTOC( VALUES( FVALUE ), STR, NCHAR )
+                  ELSE IF ( '<T>' .EQ. 'K' ) THEN
+                     CALL CHR_KTOC( VALUES( FVALUE ), STR, NCHAR )
                   END IF
                   BAD = .FALSE.
                END IF
@@ -605,6 +611,10 @@
                                  CALL CHR_DTOC( VALUES( FVALUE ),
      :                                          LINE( 1 + SZELIP +
      :                                          INDENT:CPOS ), I )
+                              ELSE IF ( '<T>' .EQ. 'K' ) THEN
+                                 CALL CHR_KTOC( VALUES( FVALUE ),
+     :                                          LINE( 1 + SZELIP +
+     :                                          INDENT:CPOS ), I )
                               END IF
 
 *                            Insert the ellipsis into the output line.
@@ -654,6 +664,9 @@
      :                                       LINE( INDENT:CPOS ), I )
                            ELSE IF ( '<T>' .EQ. 'D' ) THEN
                               CALL CHR_DTOC( VALUES( FVALUE ),
+     :                                       LINE( INDENT:CPOS ), I )
+                           ELSE IF ( '<T>' .EQ. 'K' ) THEN
+                              CALL CHR_KTOC( VALUES( FVALUE ),
      :                                       LINE( INDENT:CPOS ), I )
                            END IF
 

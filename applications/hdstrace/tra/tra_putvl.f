@@ -177,6 +177,13 @@
          CALL TRA_PUTI( OBJLOC, NDIM, DIMS, SIZE, NLINES, INDENT,
      :                  LOGEXM, FD, LINE, LENG, STATUS )
 
+      ELSE IF ( CHR_SIMLR( TYPE, '_INT64' ) ) THEN
+
+*      Integer*8.
+
+         CALL TRA_PUTK( OBJLOC, NDIM, DIMS, SIZE, NLINES, INDENT,
+     :                  LOGEXM, FD, LINE, LENG, STATUS )
+
       ELSE IF ( CHR_SIMLR( TYPE,  '_WORD' ) ) THEN
 
 *      Word.
