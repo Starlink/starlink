@@ -303,6 +303,10 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        When aligning two SkyFrames in the system specified by AlignSystem,
 *        do not assume inappropriate default equinox values for systems
 *        that are not referred to the equinox specified by the Equinox attribute.
+*     26-APR-2012 (DSB):
+*        Correct Dump function so that any axis permutation is taken into
+*        account when dumping SkyFrame attributes that have a separate value
+*        for each axis (e.g. SkyRef and SkyRefP).
 *class--
 */
 
@@ -11371,19 +11375,37 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* Local Variables: */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
    AstSystemType system;         /* System attribute value */
-   const char *sval;             /* Pointer to string value */
    char buf[ 100 ];              /* Comment buffer */
+   char key[ 10 ];               /* Buffer for keywords */
+   const char *sval;             /* Pointer to string value */
+   const int *perm;              /* Pointer to axis permutation array */
    double dval;                  /* Double value */
    int bessyr;                   /* Use a Besselian year value ?*/
    int helpful;                  /* Helpful to display un-set value? */
+   int invperm[ 2 ];             /* Inverse permutation array */
    int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
+   int axis;                     /* External (i.e. permuted) zero-based axis index */
+   int axis_p;                   /* Internal zero-based axis index */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_object;
+
+/* Get a pointer to the SkyFrame's axis permutation array (using a method,
+   to allow for any over-ride by a derived class). */
+   perm = astGetPerm( this );
+
+/* Generate an inverse axis permutation array from the forward permutation
+   values. This will be used to determine which axis should be enquired
+   about (using possibly over-ridden methods) to obtain data to
+   correspond with a particular internal value (i.e. instance variable)
+   relating to an axis. This step is needed so that the effect of any
+   axis permutation can be un-done before values are written out, as
+   output values are written by this function in un-permuted order. */
+   for ( axis = 0; axis < 2; axis++ ) invperm[ perm[ axis ] ] = axis;
 
 /* Write out values representing the instance variables for the
    SkyFrame class.  Accompany these with appropriate comment strings,
@@ -11455,27 +11477,33 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* SkyRef. */
 /* ------- */
-   set = TestSkyRef( this, 0, status );
-   dval = set ? GetSkyRef( this, 0, status ) : astGetSkyRef( this, 0 );
-   sprintf( buf, "Ref. pos. %s %s", astGetSymbol( this, 0 ), astFormat( this, 0, dval ) );
-   astWriteDouble( channel, "SRef1", set, 0, dval, buf );
+/* The inverse axis permutation array is used to obtain the axis index
+   to use when accessing the SkyRef attribute. This reverses the effect
+   of the SkyFrame's axis permutation array and yields a value appropriate
+   to the axis with internal index "axis". */
+   for ( axis_p = 0; axis_p < 2; axis_p++ ) {
+      axis = invperm[ axis_p ];
 
-   set = TestSkyRef( this, 1, status );
-   dval = set ? GetSkyRef( this, 1, status ) : astGetSkyRef( this, 1 );
-   sprintf( buf, "Ref. pos. %s %s", astGetSymbol( this, 1 ), astFormat( this, 1, dval ) );
-   astWriteDouble( channel, "SRef2", set, 0, dval, buf );
+      set = TestSkyRef( this, axis, status );
+      dval = set ? GetSkyRef( this, axis, status ) : astGetSkyRef( this, axis );
+      sprintf( buf, "Ref. pos. %s %s", astGetSymbol( this, axis ),
+               astFormat( this, axis, dval ) );
+      sprintf( key, "SRef%d", axis_p + 1 );
+      astWriteDouble( channel, key, set, 0, dval, buf );
+   }
 
 /* SkyRefP. */
 /* -------- */
-   set = TestSkyRefP( this, 0, status );
-   dval = set ? GetSkyRefP( this, 0, status ) : astGetSkyRefP( this, 0 );
-   sprintf( buf, "Ref. north %s %s", astGetSymbol( this, 0 ), astFormat( this, 0, dval ) );
-   astWriteDouble( channel, "SRefP1", set, 0, dval, buf );
+   for ( axis_p = 0; axis_p < 2; axis_p++ ) {
+      axis = invperm[ axis_p ];
 
-   set = TestSkyRefP( this, 1, status );
-   dval = set ? GetSkyRefP( this, 1, status ) : astGetSkyRefP( this, 1 );
-   sprintf( buf, "Ref. north %s %s", astGetSymbol( this, 1 ), astFormat( this, 1, dval ) );
-   astWriteDouble( channel, "SRefP2", set, 0, dval, buf );
+      set = TestSkyRefP( this, axis, status );
+      dval = set ? GetSkyRefP( this, axis, status ) : astGetSkyRefP( this, axis );
+      sprintf( buf, "Ref. north %s %s", astGetSymbol( this, axis ),
+               astFormat( this, axis, dval ) );
+      sprintf( key, "SRefP%d", axis_p + 1 );
+      astWriteDouble( channel, key, set, 0, dval, buf );
+   }
 
 /* AlignOffset. */
 /* ------------ */
