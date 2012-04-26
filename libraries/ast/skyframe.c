@@ -310,6 +310,9 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        - Take axis permutation into account when setting a new value
 *        for attributes that have a separate value for each axis (e.g.
 *        SkyRef and SkyRefP).
+*        - Remove the code that overrides ClearEpoch and SetEpoch (these
+*        overrides have not been needed since the changes made on
+*        24/11/2009).
 *class--
 */
 
@@ -803,7 +806,6 @@ static int (* parent_testformat)( AstFrame *, int, int * );
 static int (* parent_unformat)( AstFrame *, int, const char *, double *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_cleardut1)( AstFrame *, int * );
-static void (* parent_clearepoch)( AstFrame *, int * );
 static void (* parent_clearformat)( AstFrame *, int, int * );
 static void (* parent_clearobsalt)( AstFrame *, int * );
 static void (* parent_clearobslat)( AstFrame *, int * );
@@ -812,7 +814,6 @@ static void (* parent_clearsystem)( AstFrame *, int * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 static void (* parent_setdut1)( AstFrame *, double, int * );
-static void (* parent_setepoch)( AstFrame *, double, int * );
 static void (* parent_setformat)( AstFrame *, int, const char *, int * );
 static void (* parent_setobsalt)( AstFrame *, double, int * );
 static void (* parent_setobslat)( AstFrame *, double, int * );
@@ -960,7 +961,6 @@ static int Unformat( AstFrame *, int, const char *, double *, int * );
 static void ClearAsTime( AstSkyFrame *, int, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void ClearDut1( AstFrame *, int * );
-static void ClearEpoch( AstFrame *, int * );
 static void ClearEquinox( AstSkyFrame *, int * );
 static void ClearNegLon( AstSkyFrame *, int * );
 static void ClearObsAlt( AstFrame *, int * );
@@ -982,7 +982,6 @@ static void Resolve( AstFrame *, const double [], const double [], const double 
 static void SetAsTime( AstSkyFrame *, int, int, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 static void SetDut1( AstFrame *, double, int * );
-static void SetEpoch( AstFrame *, double, int * );
 static void SetEquinox( AstSkyFrame *, double, int * );
 static void SetNegLon( AstSkyFrame *, int, int * );
 static void SetObsAlt( AstFrame *, double, int * );
@@ -1499,55 +1498,6 @@ static void ClearDut1( AstFrame *this, int *status ) {
       ( (AstSkyFrame *) this )->eplast = AST__BAD;
       ( (AstSkyFrame *) this )->klast = AST__BAD;
    }
-}
-
-static void ClearEpoch( AstFrame *this_frame, int *status ) {
-/*
-*  Name:
-*     ClearEpoch
-
-*  Purpose:
-*     Clear the value of the Epoch attribute for a SkyFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "skyframe.h"
-*     void ClearEpoch( AstFrame *this, int *status )
-
-*  Class Membership:
-*     SkyFrame member function (over-rides the astClearEpoch method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function clears the Epoch value and updates the LAST value
-*     stored in the SkyFrame.
-
-*  Parameters:
-*     this
-*        Pointer to the SkyFrame.
-*     status
-*        Pointer to the inherited status variable.
-
-*/
-
-/* Local Variables: */
-   AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
-   double orig;                  /* Original epoch */
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Obtain a pointer to the SkyFrame structure. */
-   this = (AstSkyFrame *) this_frame;
-
-/* Save ther original epoch */
-   orig = astGetEpoch( this_frame );
-
-/* Invoke the parent method to clear the Frame epoch. */
-   (*parent_clearepoch)( this_frame, status );
-
 }
 
 static void ClearObsAlt( AstFrame *this, int *status ) {
@@ -4826,12 +4776,6 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    frame->SubFrame = SubFrame;
    parent_unformat = frame->Unformat;
    frame->Unformat = Unformat;
-
-   parent_setepoch = frame->SetEpoch;
-   frame->SetEpoch = SetEpoch;
-
-   parent_clearepoch = frame->ClearEpoch;
-   frame->ClearEpoch = ClearEpoch;
 
    parent_setdut1 = frame->SetDut1;
    frame->SetDut1 = SetDut1;
@@ -8875,57 +8819,6 @@ static void SetDut1( AstFrame *this_frame, double val, int *status ) {
       this->eplast = AST__BAD;
       this->klast = AST__BAD;
    }
-}
-
-static void SetEpoch( AstFrame *this_frame, double val, int *status ) {
-/*
-*  Name:
-*     SetEpoch
-
-*  Purpose:
-*     Set the value of the Epoch attribute for a SkyFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "skyframe.h"
-*     void SetEpoch( AstFrame *this, double val, int *status )
-
-*  Class Membership:
-*     SkyFrame member function (over-rides the astSetEpoch method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function clears the Epoch value and updates the LAST value
-*     stored in the SkyFrame.
-
-*  Parameters:
-*     this
-*        Pointer to the SkyFrame.
-*     val
-*        New Epoch value.
-*     status
-*        Pointer to the inherited status variable.
-
-*/
-
-/* Local Variables: */
-   AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
-   double orig;                  /* Original epoch value */
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Obtain a pointer to the SkyFrame structure. */
-   this = (AstSkyFrame *) this_frame;
-
-/* Save the old epoch. */
-   orig = astGetEpoch( this );
-
-/* Invoke the parent method to set the Frame epoch. */
-   (*parent_setepoch)( this_frame, val, status );
-
 }
 
 static void SetLast( AstSkyFrame *this, int *status ) {
