@@ -1,0 +1,56 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: _real
+Number of dimensions: 2
+Dimension: 10
+Dimension: 20
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 2
+Lower bound: 5
+Upper bound: 9
+Lower bound: 2
+Upper bound: 15
+
+Current object is no. 3: TEST.A(5:9,2:15), nested at level 2
+
+Operation to perform: size
+
+Enquire object size...
+Object size = 70
+
+Current object is no. 3: TEST.A(5:9,2:15), nested at level 2
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 3
+
+Current object is no. 4: TEST.A, nested at level 2
+
+Operation to perform: size
+
+Enquire object size...
+Object size = 70
+
+Current object is no. 4: TEST.A, nested at level 2
+
+Operation to perform: quit
+
+Quit...

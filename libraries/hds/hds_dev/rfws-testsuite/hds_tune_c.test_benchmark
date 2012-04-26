@@ -1,0 +1,96 @@
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: map
+Value of tuning setting = 1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: map
+New value: 0
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: map
+Value of tuning setting = 0
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: map
+New value: 2
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: map
+Value of tuning setting = 1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: map
+New value: -1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: map
+Value of tuning setting = 1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: map
+New value: -2
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hsa_gtune
+
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: map
+Value of tuning setting = 1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: map
+New value: -3
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: map
+Value of tuning setting = 1
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: quit
+
+Quit...

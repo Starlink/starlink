@@ -1,0 +1,107 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: a
+Number of dimensions: 7
+Dimension: 2
+Dimension: 3
+Dimension: 2
+Dimension: 3
+Dimension: 1
+Dimension: 2
+Dimension: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 2
+Dimension 2 = 3
+Dimension 3 = 2
+Dimension 4 = 3
+Dimension 5 = 1
+Dimension 6 = 2
+Dimension 7 = 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 7
+Subscript: 2
+Subscript: 3
+Subscript: 2
+Subscript: 3
+Subscript: 1
+Subscript: 2
+Subscript: 1
+
+Current object is no. 2: TEST(2,3,2,3,1,2,1), nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 2: TEST(2,3,2,3,1,2,1), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: dd
+Component type: _double
+Number of dimensions: 0
+
+Current object is no. 3: TEST(2,3,2,3,1,2,1).DD, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 3: TEST(2,3,2,3,1,2,1).DD, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current object is no. 2: TEST(2,3,2,3,1,2,1), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: asdf
+Number of dimensions: 1
+Dimension: 5
+
+Current object is no. 4: TEST(2,3,2,3,1,2,1).X, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 5
+
+Current object is no. 4: TEST(2,3,2,3,1,2,1).X, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current object is no. 2: TEST(2,3,2,3,1,2,1), nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   DD <_DOUBLE>
+   X(5) <ASDF>
+
+Current object is no. 2: TEST(2,3,2,3,1,2,1), nested at level 1
+
+Operation to perform: quit
+
+Quit...

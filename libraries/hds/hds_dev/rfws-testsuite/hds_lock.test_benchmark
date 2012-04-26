@@ -1,0 +1,87 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_lock
+
+Lock container file...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_free
+
+Free container file...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_lock
+
+Lock container file...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_lock
+
+Lock container file...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: a
+Number of dimensions: 0
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: hds_free
+
+Free container file...
+HDS_FREE: Error releasing locks on an HDS container file.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: hds_lock
+
+Lock container file...
+HDS_LOCK: Error locking an HDS container file.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_lock
+
+Lock container file...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_free
+
+Free container file...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

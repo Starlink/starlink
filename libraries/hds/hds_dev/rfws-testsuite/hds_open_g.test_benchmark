@@ -1,0 +1,91 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: a1
+Object name: a1
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 1: A1, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: a2
+Object name: a2
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 2: A2, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: a*
+Access mode: r
+
+Current object is no. 3: A1, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: a*
+Access mode: w
+
+Current object is no. 4: A1, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 4: A1, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: a*
+Access mode: w
+
+Current object is no. 5: A2, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 5: A2, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

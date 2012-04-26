@@ -1,0 +1,76 @@
+hds_new
+x.any
+x
+x
+0
+annul
+hds_new
+y.any
+y
+y
+0
+annul
+hds_new
+testz.
+testz
+z
+0
+annul
+hds_wild
+*.any
+r
+annul
+hds_wild
+	te*tz.
+r
+annul
+hds_tune
+shell
+-1
+hds_wild
+*.any
+r
+annul
+hds_wild
+	tes*z.
+r
+annul
+hds_tune
+shell
+1
+hdss_wild
+hds_wild
+		*.any		
+r
+annul
+hds_wild
+	tes*z.
+r
+annul
+hds_tune
+shell
+2
+hds_wild
+  	 *.any		
+r
+annul
+hds_wild
+		 	tes*t.
+r
+hds_wild
+		 tes*z.
+r
+annul
+hds_open
+testz.
+w
+hds_erase
+hds_open
+x.any
+w
+hds_erase
+hds_open
+y.any
+w
+hds_erase
+quit

@@ -1,0 +1,48 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: t
+Object type: 0
+Number of dimensions: 0
+
+Current object is no. 1: T, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: t
+Object type: t
+Number of dimensions: 0
+
+Current object is no. 2: T, nested at level 1
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: t
+Object type: t
+Number of dimensions: 0
+The file /tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.sdf is already in use by HDS; this name cannot be used to create a new container file.
+HDS_NEW: Error creating a new HDS container file.
+File invalid (DAT__FILIN)
+
+Current object is no. 2: T, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

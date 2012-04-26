@@ -1,0 +1,113 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: alpha
+Object type: beta
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 1: ALPHA, nested at level 1
+
+Operation to perform: hds_trace
+
+Trace object path...
+Nesting level = 1
+Path name = 'ALPHA'
+File name = '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.sdf'
+
+Current object is no. 1: ALPHA, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 2: ALPHA(2), nested at level 1
+
+Operation to perform: hds_trace
+
+Trace object path...
+Nesting level = 1
+Path name = 'ALPHA(2)'
+File name = '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.sdf'
+
+Current object is no. 2: ALPHA(2), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: _real
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 3: ALPHA(2).X, nested at level 2
+
+Operation to perform: hds_trace
+
+Trace object path...
+Nesting level = 2
+Path name = 'ALPHA(2).X'
+File name = '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.sdf'
+
+Current object is no. 3: ALPHA(2).X, nested at level 2
+
+Operation to perform: vec
+
+Vectorise object...
+
+Current object is no. 4: ALPHA(2).X, nested at level 2
+
+Operation to perform: hds_trace
+
+Trace object path...
+Nesting level = 2
+Path name = 'ALPHA(2).X'
+File name = '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.sdf'
+
+Current object is no. 4: ALPHA(2).X, nested at level 2
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 2
+Lower bound: 3
+Upper bound: 5
+Lower bound: 2
+Upper bound: 7
+DAT_SLICE: Error obtaining a locator to a slice of an HDS array.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 4: ALPHA(2).X, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 100
+
+Current object is no. 4: ALPHA(2).X, nested at level 2
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 1
+Lower bound: 3
+Upper bound: 14
+
+Current object is no. 5: ALPHA(2).X(3:14), nested at level 2
+
+Operation to perform: hds_trace
+
+Trace object path...
+Nesting level = 2
+Path name = 'ALPHA(2).X(3:14)'
+File name = '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/test.sdf'
+
+Current object is no. 5: ALPHA(2).X(3:14), nested at level 2
+
+Operation to perform: quit
+
+Quit...

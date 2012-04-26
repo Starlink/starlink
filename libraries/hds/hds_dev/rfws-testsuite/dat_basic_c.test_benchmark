@@ -1,0 +1,507 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _word
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: w
+200 machine elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 1
+Increment: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+
+21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+
+41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60
+
+61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80
+
+81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100
+
+101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120
+
+121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140
+
+141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160
+
+161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180
+
+181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+200 machine elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+
+21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+
+41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60
+
+61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80
+
+81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100
+
+101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120
+
+121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140
+
+141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160
+
+161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180
+
+181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 2
+Lower bound: 1
+Upper bound: 10
+Lower bound: 1
+Upper bound: 1
+
+Current object is no. 2: TEST(1:10,1:1), nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+20 machine elements mapped
+
+Current object is no. 2: TEST(1:10,1:1), nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+
+
+Current object is no. 2: TEST(1:10,1:1), nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST(1:10,1:1), nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 2
+Lower bound: 1
+Upper bound: 10
+Lower bound: 10
+Upper bound: 10
+
+Current object is no. 3: TEST(1:10,10:10), nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+20 machine elements mapped
+
+Current object is no. 3: TEST(1:10,10:10), nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200
+
+
+Current object is no. 3: TEST(1:10,10:10), nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 3: TEST(1:10,10:10), nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 2
+Lower bound: 1
+Upper bound: 10
+Lower bound: 5
+Upper bound: 7
+
+Current object is no. 4: TEST(1:10,5:7), nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: u
+60 machine elements mapped
+
+Current object is no. 4: TEST(1:10,5:7), nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100
+
+101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120
+
+121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140
+
+
+Current object is no. 4: TEST(1:10,5:7), nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 255
+Increment: -2
+
+Current object is no. 4: TEST(1:10,5:7), nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+255 253 251 249 247 245 243 241 239 237 235 233 231 229 227 225 223 221 219 217
+
+215 213 211 209 207 205 203 201 199 197 195 193 191 189 187 185 183 181 179 177
+
+175 173 171 169 167 165 163 161 159 157 155 153 151 149 147 145 143 141 139 137
+
+
+Current object is no. 4: TEST(1:10,5:7), nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 4: TEST(1:10,5:7), nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+200 machine elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+
+21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+
+41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60
+
+61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80
+
+255 253 251 249 247 245 243 241 239 237 235 233 231 229 227 225 223 221 219 217
+
+215 213 211 209 207 205 203 201 199 197 195 193 191 189 187 185 183 181 179 177
+
+175 173 171 169 167 165 163 161 159 157 155 153 151 149 147 145 143 141 139 137
+
+141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160
+
+161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180
+
+181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 2
+Lower bound: 4
+Upper bound: 6
+Lower bound: 1
+Upper bound: 10
+
+Current object is no. 5: TEST(4:6,1:10), nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+60 machine elements mapped
+
+Current object is no. 5: TEST(4:6,1:10), nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+7 8 9 10 11 12
+
+27 28 29 30 31 32
+
+47 48 49 50 51 52
+
+67 68 69 70 71 72
+
+243 241 239 237 235 233
+
+203 201 199 197 195 193
+
+163 161 159 157 155 153
+
+147 148 149 150 151 152
+
+167 168 169 170 171 172
+
+187 188 189 190 191 192
+
+
+Current object is no. 5: TEST(4:6,1:10), nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 5: TEST(4:6,1:10), nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: u
+60 machine elements mapped
+
+Current object is no. 5: TEST(4:6,1:10), nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+7 8 9 10 11 12
+
+27 28 29 30 31 32
+
+47 48 49 50 51 52
+
+67 68 69 70 71 72
+
+243 241 239 237 235 233
+
+203 201 199 197 195 193
+
+163 161 159 157 155 153
+
+147 148 149 150 151 152
+
+167 168 169 170 171 172
+
+187 188 189 190 191 192
+
+
+Current object is no. 5: TEST(4:6,1:10), nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 100
+Increment: 1
+
+Current object is no. 5: TEST(4:6,1:10), nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+100 101 102 103 104 105
+
+106 107 108 109 110 111
+
+112 113 114 115 116 117
+
+118 119 120 121 122 123
+
+124 125 126 127 128 129
+
+130 131 132 133 134 135
+
+136 137 138 139 140 141
+
+142 143 144 145 146 147
+
+148 149 150 151 152 153
+
+154 155 156 157 158 159
+
+
+Current object is no. 5: TEST(4:6,1:10), nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 5: TEST(4:6,1:10), nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+200 machine elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+1 2 3 4 5 6 100 101 102 103 104 105 13 14 15 16 17 18 19 20
+
+21 22 23 24 25 26 106 107 108 109 110 111 33 34 35 36 37 38 39 40
+
+41 42 43 44 45 46 112 113 114 115 116 117 53 54 55 56 57 58 59 60
+
+61 62 63 64 65 66 118 119 120 121 122 123 73 74 75 76 77 78 79 80
+
+255 253 251 249 247 245 124 125 126 127 128 129 231 229 227 225 223 221 219 217
+
+215 213 211 209 207 205 130 131 132 133 134 135 191 189 187 185 183 181 179 177
+
+175 173 171 169 167 165 136 137 138 139 140 141 151 149 147 145 143 141 139 137
+
+141 142 143 144 145 146 142 143 144 145 146 147 153 154 155 156 157 158 159 160
+
+161 162 163 164 165 166 148 149 150 151 152 153 173 174 175 176 177 178 179 180
+
+181 182 183 184 185 186 154 155 156 157 158 159 193 194 195 196 197 198 199 200
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: r
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+200 machine elements mapped
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+1 2 3 4 5 6 100 101 102 103 104 105 13 14 15 16 17 18 19 20
+
+21 22 23 24 25 26 106 107 108 109 110 111 33 34 35 36 37 38 39 40
+
+41 42 43 44 45 46 112 113 114 115 116 117 53 54 55 56 57 58 59 60
+
+61 62 63 64 65 66 118 119 120 121 122 123 73 74 75 76 77 78 79 80
+
+255 253 251 249 247 245 124 125 126 127 128 129 231 229 227 225 223 221 219 217
+
+215 213 211 209 207 205 130 131 132 133 134 135 191 189 187 185 183 181 179 177
+
+175 173 171 169 167 165 136 137 138 139 140 141 151 149 147 145 143 141 139 137
+
+141 142 143 144 145 146 142 143 144 145 146 147 153 154 155 156 157 158 159 160
+
+161 162 163 164 165 166 148 149 150 151 152 153 173 174 175 176 177 178 179 180
+
+181 182 183 184 185 186 154 155 156 157 158 159 193 194 195 196 197 198 199 200
+
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

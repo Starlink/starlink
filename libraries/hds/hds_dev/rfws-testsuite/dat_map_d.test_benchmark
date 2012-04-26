@@ -1,0 +1,2285 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _BYTE
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _BYTE
+Access mode: w
+100 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _BYTE
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _BYTE
+Access mode: w
+100 elements mapped
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _UBYTE
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _UBYTE
+Access mode: w
+100 elements mapped
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _UBYTE
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _UBYTE
+Access mode: w
+100 elements mapped
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 8, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _DOUBLE
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 9: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _DOUBLE
+Access mode: w
+100 elements mapped
+
+Current object is no. 9: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 9: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 9: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 9: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 9: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 9: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 9: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 9, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 10: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 10: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 10: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 10: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 10, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _DOUBLE
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _DOUBLE
+Access mode: w
+100 elements mapped
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 11: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 11, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 12: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 12: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 12: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 12: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 12, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _INTEGER
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 13: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _INTEGER
+Access mode: w
+100 elements mapped
+
+Current object is no. 13: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 13: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 13: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 13: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 13: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 13: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 13: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 13, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 14: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 14: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 14: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 14: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 14, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _INTEGER
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _INTEGER
+Access mode: w
+100 elements mapped
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 15: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 15, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 16: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 16: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 16: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 16: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 16, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _REAL
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _REAL
+Access mode: w
+100 elements mapped
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 17, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 18: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 18: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 18: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 18: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 18, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _REAL
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 19: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _REAL
+Access mode: w
+100 elements mapped
+
+Current object is no. 19: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 19: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 19: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 19: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 19: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 19: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 19: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 19, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 20: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 20: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 20: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 20: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 20, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _WORD
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 21: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _WORD
+Access mode: w
+100 elements mapped
+
+Current object is no. 21: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 21: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 21: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 21: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 21: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 21: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 21: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 21, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 22: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 22: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 22: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 22: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 22, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _WORD
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 23: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _WORD
+Access mode: w
+100 elements mapped
+
+Current object is no. 23: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 23: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 23: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 23: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 23: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 23: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 23: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 23, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 24: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 24: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 24: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 24: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 24, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _UWORD
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 25: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _UWORD
+Access mode: w
+100 elements mapped
+
+Current object is no. 25: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 25: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 25: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 25: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 25: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 25: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 25: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 25, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 26: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+100 elements mapped
+
+Current object is no. 26: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 26: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 26: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 26, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _UWORD
+Number of dimensions: 2
+Dimension: 10
+Dimension: 10
+
+Current object is no. 27: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _UWORD
+Access mode: w
+100 elements mapped
+
+Current object is no. 27: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 27: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+10 11 12 13 14 15 16 17 18 19
+
+20 21 22 23 24 25 26 27 28 29
+
+30 31 32 33 34 35 36 37 38 39
+
+40 41 42 43 44 45 46 47 48 49
+
+50 51 52 53 54 55 56 57 58 59
+
+60 61 62 63 64 65 66 67 68 69
+
+70 71 72 73 74 75 76 77 78 79
+
+80 81 82 83 84 85 86 87 88 89
+
+90 91 92 93 94 95 96 97 98 99
+
+
+Current object is no. 27: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 27: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 27: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 27: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 27: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 27, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 28: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+100 elements mapped
+
+Current object is no. 28: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+
+'10' '11' '12' '13' '14' '15' '16' '17' '18' '19'
+
+'20' '21' '22' '23' '24' '25' '26' '27' '28' '29'
+
+'30' '31' '32' '33' '34' '35' '36' '37' '38' '39'
+
+'40' '41' '42' '43' '44' '45' '46' '47' '48' '49'
+
+'50' '51' '52' '53' '54' '55' '56' '57' '58' '59'
+
+'60' '61' '62' '63' '64' '65' '66' '67' '68' '69'
+
+'70' '71' '72' '73' '74' '75' '76' '77' '78' '79'
+
+'80' '81' '82' '83' '84' '85' '86' '87' '88' '89'
+
+'90' '91' '92' '93' '94' '95' '96' '97' '98' '99'
+
+
+Current object is no. 28: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 28: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 28, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

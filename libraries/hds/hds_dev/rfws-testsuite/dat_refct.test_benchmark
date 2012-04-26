@@ -1,0 +1,146 @@
+Operation to perform: refct
+
+Obtain reference count...
+HDS locator invalid: value=' ', length=15 (possible programming error).
+DAT_REFCT: Error enquiring the reference count for a container file.
+Locator invalid (DAT__LOCIN)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: t
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: clone
+
+Clone locator...
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: read
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 2
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 3
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current locator is no. 2, value is '<junk>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: read
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: file
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: file
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

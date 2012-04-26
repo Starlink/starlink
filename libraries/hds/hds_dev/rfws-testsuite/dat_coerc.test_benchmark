@@ -1,0 +1,341 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _real
+Number of dimensions: 2
+Dimension: 10
+Dimension: 20
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 20
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = '_REAL'
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: beta
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'BETA'
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 3
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 20
+Dimension 3 = 1
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = '_REAL'
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'TEST'
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'BETA'
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 7
+DAT_COERC: Error coercing an HDS object to change its shape.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 20
+Dimension 3 = 1
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 4
+DAT_COERC: Error coercing an HDS object to change its shape.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 2
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 20
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'BETA'
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'TEST'
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 1
+DAT_COERC: Error coercing an HDS object to change its shape.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 3
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: w
+800 machine elements mapped
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 14
+Increment: 0
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 20
+Dimension 3 = 1
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 2
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+800 machine elements mapped
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = '_REAL'
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14
+
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 5: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 2
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 1
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: coerc
+
+Coerce object shape...
+New number of dimensions: 1
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'JUNK'
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_close
+
+Close container file...
+HDS locator invalid: value='<NOT A LOCATOR>', length=15 (possible programming error).
+HDS_CLOSE: Error closing an HDS container file.
+Locator invalid (DAT__LOCIN)
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

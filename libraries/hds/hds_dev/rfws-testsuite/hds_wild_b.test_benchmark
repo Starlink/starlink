@@ -1,0 +1,274 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: x.any
+Object name: x
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 1: X, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: y.any
+Object name: y
+Object type: y
+Number of dimensions: 0
+
+Current object is no. 2: Y, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: testz.
+Object name: testz
+Object type: z
+Number of dimensions: 0
+
+Current object is no. 3: TESTZ, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: *.any
+Access mode: r
+Container files found...
+   Object = X
+   Object = Y
+   Annulled context = DAT__NOWLD
+
+Current object is no. 4: Y, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: 	te*tz.
+Access mode: r
+Container files found...
+   Object = TESTZ
+   Annulled context = DAT__NOWLD
+
+Current object is no. 5: TESTZ, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: -1
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: *.any
+Access mode: r
+Container files found...
+   Object = X
+   Object = Y
+   Annulled context = DAT__NOWLD
+
+Current object is no. 6: Y, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: 	tes*z.
+Access mode: r
+Container files found...
+   Object = TESTZ
+   Annulled context = DAT__NOWLD
+
+Current object is no. 7: TESTZ, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 1
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hdss_wild
+
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: 		*.any		
+Access mode: r
+Container files found...
+   Object = X
+   Object = Y
+   Annulled context = DAT__NOWLD
+
+Current object is no. 8: Y, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 8, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: 	tes*z.
+Access mode: r
+Container files found...
+   Object = TESTZ
+   Annulled context = DAT__NOWLD
+
+Current object is no. 9: TESTZ, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 9, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 2
+
+Current locator is no. 9, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec:   	 *.any		
+Access mode: r
+Container files found...
+   Object = X
+   Object = Y
+   Annulled context = DAT__NOWLD
+
+Current object is no. 10: Y, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 10, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: 		 	tes*t.
+Access mode: r
+Container files found...
+No files found matching the file specification 'tes*t.'.
+HDS_WILD: Error performing a wild-card search for HDS container files.
+File not found (DAT__FILNF)
+
+Current locator is no. 10, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: 		 tes*z.
+Access mode: r
+Container files found...
+   Object = TESTZ
+   Annulled context = DAT__NOWLD
+
+Current object is no. 11: TESTZ, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 11, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testz.
+Access mode: w
+
+Current object is no. 12: TESTZ, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 12, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: x.any
+Access mode: w
+
+Current object is no. 13: X, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 13, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: y.any
+Access mode: w
+
+Current object is no. 14: Y, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 14, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

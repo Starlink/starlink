@@ -1,0 +1,237 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: t
+Object type: t
+Number of dimensions: 0
+
+Current object is no. 1: T, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: _real
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 2: T.X, nested at level 2
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test1
+Object name: t
+Object type: t
+Number of dimensions: 0
+
+Current object is no. 3: T, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current object is no. 2: T.X, nested at level 2
+
+Operation to perform: move
+
+Move object...
+Locator no. of destination structure: 3
+New component name: s
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: T, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 1: T, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+
+Current object is no. 1: T, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 3
+
+Current object is no. 3: T, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 3: T, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   S(10) <_REAL>
+
+Current object is no. 3: T, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: T, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: q
+Component type: _double
+Number of dimensions: 2
+Dimension: 2
+Dimension: 3
+
+Current object is no. 4: T.Q, nested at level 2
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 4: T.Q, nested at level 2
+
+Operation to perform: prmry
+
+Set or inquire primary/secondary locator status...
+Set(1) or inquire(0) locator status?: 1
+Set primary(1) or secondary(0) status?: 1
+
+Current object is no. 4: T.Q, nested at level 2
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 2
+
+Current object is no. 4: T.Q, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: T, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 4
+
+Current object is no. 4: T.Q, nested at level 2
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 4: T.Q, nested at level 2
+
+Operation to perform: move
+
+Move object...
+Locator no. of destination structure: 1
+New component name: 1
+HDS locator invalid: value='<NOT A LOCATOR>', length=15 (possible programming error).
+DAT_MOVE: Error moving an HDS object to a new location.
+Locator invalid (DAT__LOCIN)
+
+Current object is no. 4: T.Q, nested at level 2
+
+Operation to perform: clone
+
+Clone locator...
+
+Current object is no. 5: T.Q, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 4
+
+Current object is no. 4: T.Q, nested at level 2
+
+Operation to perform: move
+
+Move object...
+Locator no. of destination structure: 3
+New component name: qq
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 5
+
+Current locator is no. 5, value is '<junk>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 3
+
+Current object is no. 3: T, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 3: T, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   S(10) <_REAL>
+   QQ(2,3) <_DOUBLE>
+
+Current object is no. 3: T, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: write
+
+Current object is no. 6: T, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

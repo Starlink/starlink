@@ -1,0 +1,146 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: _real
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: word
+Access mode: e
+Invalid access mode 'e' specified (possible programming error).
+DAT_MAP: Error mapping an HDS primitive.
+Mode invalid (DAT__MODIN)
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _alpha
+Access mode: u
+Invalid primitive data type '_alpha' specified (possible programming error).
+DAT_MAP: Error mapping an HDS primitive.
+Type invalid (DAT__TYPIN)
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _real
+Access mode: r
+DAT_MAP: Error mapping an HDS primitive.
+Primitive data undefined (DAT__UNSET)
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _byte
+Access mode: f
+Invalid access mode 'f' specified (possible programming error).
+DAT_MAP: Error mapping an HDS primitive.
+Mode invalid (DAT__MODIN)
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _ubyte
+Access mode: u
+DAT_MAP: Error mapping an HDS primitive.
+Primitive data undefined (DAT__UNSET)
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: __real
+Access mode: write
+Invalid primitive data type '__real' specified (possible programming error).
+DAT_MAP: Error mapping an HDS primitive.
+Type invalid (DAT__TYPIN)
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: state
+
+Enquire object state...
+Object state = FALSE
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _double
+Access mode: write
+10 elements mapped
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: state
+
+Enquire object state...
+Object state = FALSE
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 3
+Increment: 100
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+3 103 203 303 403 503 603 703 803 903
+
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: state
+
+Enquire object state...
+Object state = FALSE
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: state
+
+Enquire object state...
+Object state = TRUE
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: quit
+
+Quit...

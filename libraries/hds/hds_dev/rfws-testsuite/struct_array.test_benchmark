@@ -1,0 +1,182 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: test
+Number of dimensions: 1
+Dimension: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 512
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 511
+
+Current object is no. 2: TEST(511), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: a
+Number of dimensions: 0
+
+Current object is no. 3: TEST(511).A, nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'A'
+
+Current object is no. 3: TEST(511).A, nested at level 2
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'A'
+
+Current object is no. 3: TEST(511).A, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 511
+
+Current object is no. 4: TEST(511), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 4: TEST(511), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: b
+Component type: b
+Number of dimensions: 0
+
+Current object is no. 5: TEST(511).B, nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'B'
+
+Current object is no. 5: TEST(511).B, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 511
+
+Current object is no. 6: TEST(511), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 2
+
+Current object is no. 6: TEST(511), nested at level 1
+
+Operation to perform: index
+
+Index into component list...
+Component number: 2
+
+Current object is no. 7: TEST(511).B, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 1
+
+Current object is no. 8: TEST(1), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 0
+
+Current object is no. 8: TEST(1), nested at level 1
+
+Operation to perform: index
+
+Index into component list...
+Component number: 1
+DAT_INDEX: Error indexing into the component list of an HDS structure.
+Object not found (DAT__OBJNF)
+
+Current object is no. 8: TEST(1), nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 512
+
+Current object is no. 9: TEST(512), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 0
+
+Current object is no. 9: TEST(512), nested at level 1
+
+Operation to perform: index
+
+Index into component list...
+Component number: 1
+DAT_INDEX: Error indexing into the component list of an HDS structure.
+Object not found (DAT__OBJNF)
+
+Current object is no. 9: TEST(512), nested at level 1
+
+Operation to perform: quit
+
+Quit...

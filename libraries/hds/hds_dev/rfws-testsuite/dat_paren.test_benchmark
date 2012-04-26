@@ -1,0 +1,317 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: paren
+
+Locate parent...
+Object is a top-level object and has no parent structure (possible programming error).
+DAT_PAREN: Error locating the parent structure of an HDS object.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: x
+Number of dimensions: 0
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'JUNK'
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'TEST'
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: y
+Component type: y
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 4: TEST.Y, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+
+Current object is no. 4: TEST.Y, nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 4
+
+Current object is no. 5: TEST.Y(4), nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: z
+Number of dimensions: 0
+
+Current object is no. 6: TEST.Y(4).Z, nested at level 3
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 7: TEST.Y(4), nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 7: TEST.Y(4), nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 7: TEST.Y(4), nested at level 2
+
+Operation to perform: ls
+
+List structure components...
+   Z <Z>
+
+Current object is no. 7: TEST.Y(4), nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'TEST'
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'JUNK'
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: y
+
+Current object is no. 9: TEST.Y, nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'Y'
+
+Current object is no. 9: TEST.Y, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+
+Current object is no. 9: TEST.Y, nested at level 2
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'Y'
+
+Current object is no. 9: TEST.Y, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 10: TEST, nested at level 1
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'TEST'
+
+Current object is no. 10: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 10: TEST, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'JUNK'
+
+Current object is no. 10: TEST, nested at level 1
+
+Operation to perform: paren
+
+Locate parent...
+Object is a top-level object and has no parent structure (possible programming error).
+DAT_PAREN: Error locating the parent structure of an HDS object.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 10: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: y
+
+Current object is no. 11: TEST.Y, nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 10
+
+Current object is no. 12: TEST.Y(10), nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 0
+
+Current object is no. 12: TEST.Y(10), nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: pp
+Component type: _real
+Number of dimensions: 2
+Dimension: 10
+Dimension: 20
+
+Current object is no. 13: TEST.Y(10).PP, nested at level 3
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 14: TEST.Y(10), nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'Y'
+
+Current object is no. 14: TEST.Y(10), nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 14: TEST.Y(10), nested at level 2
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'Y'
+
+Current object is no. 14: TEST.Y(10), nested at level 2
+
+Operation to perform: ncom
+
+
+Current object is no. 14: TEST.Y(10), nested at level 2
+
+Operation to perform: find
+
+Find named component...
+Component name: pp
+
+Current object is no. 15: TEST.Y(10).PP, nested at level 3
+
+Operation to perform: hds_link
+
+Link locator into group...
+Group name: test_group
+
+Current object is no. 15: TEST.Y(10).PP, nested at level 3
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'TEST_GROUP'
+
+Current object is no. 15: TEST.Y(10).PP, nested at level 3
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 16: TEST.Y(10), nested at level 2
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'TEST_GROUP'
+
+Current object is no. 16: TEST.Y(10), nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: hds_group
+
+Enquire locator group...
+Group = 'TEST_GROUP'
+
+Current object is no. 17: TEST, nested at level 1
+
+Operation to perform: quit
+
+Quit...

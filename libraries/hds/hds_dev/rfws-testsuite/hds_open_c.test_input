@@ -1,0 +1,13 @@
+hds_new
+test
+x
+0
+0
+hds_open
+test
+w
+hds_erase
+hds_open
+test
+r
+quit

@@ -1,0 +1,104 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 2: TEST(2), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: a
+Number of dimensions: 0
+
+Current object is no. 3: TEST(2).A, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test1
+Object name: a
+Object type: a
+Number of dimensions: 0
+
+Current object is no. 4: A, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 2
+
+Current object is no. 5: TEST(2), nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   A <A>
+
+Current object is no. 5: TEST(2), nested at level 1
+
+Operation to perform: rcopy
+
+Recursive copy...
+Locator no. of destination structure: 4
+New component name: f
+Input object is an array cell and cannot be copied (possible programming error).
+DAT_COPY: Error copying an HDS object to a new structure component.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 5: TEST(2), nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   A <A>
+
+Current object is no. 5: TEST(2), nested at level 1
+
+Operation to perform: paren
+
+Locate parent...
+Object is a top-level object and has no parent structure (possible programming error).
+DAT_PAREN: Error locating the parent structure of an HDS object.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 5: TEST(2), nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   A <A>
+
+Current object is no. 5: TEST(2), nested at level 1
+
+Operation to perform: quit
+
+Quit...

@@ -1,0 +1,91 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: valid
+
+Enquire locator valid...
+Locator valid = TRUE
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: valid
+
+Enquire locator valid...
+Locator valid = FALSE
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: valid
+
+Enquire locator valid...
+Locator valid = TRUE
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: x
+Number of dimensions: 0
+
+Current object is no. 3: TEST.X, nested at level 2
+
+Operation to perform: valid
+
+Enquire locator valid...
+Locator valid = TRUE
+
+Current object is no. 3: TEST.X, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: erase
+
+Erase component...
+Name of component: x
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 3
+
+Current locator is no. 3, value is '<junk>' (not valid).
+
+Operation to perform: valid
+
+Enquire locator valid...
+Locator valid = FALSE
+
+Current locator is no. 3, value is '<junk>' (not valid).
+
+Operation to perform: quit
+
+Quit...

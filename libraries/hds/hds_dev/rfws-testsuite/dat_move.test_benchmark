@@ -1,0 +1,187 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: a
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: x
+Number of dimensions: 0
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test1
+Object name: test1
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 3: TEST1, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 2
+
+Current object is no. 2: TEST.X, nested at level 2
+
+Operation to perform: move
+
+Move object...
+Locator no. of destination structure: 3
+New component name: yy
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 3
+
+Current object is no. 3: TEST1, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   YY <X>
+
+Current object is no. 3: TEST1, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: yy
+
+Current object is no. 4: TEST1.YY, nested at level 2
+
+Operation to perform: move
+
+Move object...
+Locator no. of destination structure: 1
+New component name: zz
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 3
+
+Current object is no. 3: TEST1, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+
+Current object is no. 3: TEST1, nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   ZZ <X>
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: a
+Number of dimensions: 0
+
+Current object is no. 5: TEST.A, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: zz
+
+Current object is no. 7: TEST.ZZ, nested at level 2
+
+Operation to perform: move
+
+Move object...
+Locator no. of destination structure: 5
+New component name: pp
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   A <A>
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: a
+
+Current object is no. 8: TEST.A, nested at level 2
+
+Operation to perform: ls
+
+List structure components...
+   PP <X>
+
+Current object is no. 8: TEST.A, nested at level 2
+
+Operation to perform: find
+
+Find named component...
+Component name: pp
+
+Current object is no. 9: TEST.A.PP, nested at level 3
+
+Operation to perform: ls
+
+List structure components...
+
+Current object is no. 9: TEST.A.PP, nested at level 3
+
+Operation to perform: quit
+
+Quit...

@@ -1,0 +1,120 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _real
+Number of dimensions: 1
+Dimension: 100
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _real
+Access mode: w
+100 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 1000
+Increment: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+1000 1001 1002 1003 1004 1005 1006 1007 1008 1009 1010 1011 1012 1013 1014 1015 1016 1017 1018 1019 1020 1021 1022 1023 1024 1025 1026 1027 1028 1029 1030 1031 1032 1033 1034 1035 1036 1037 1038 10...
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _byte
+Access mode: r
+A total of 100 data conversion error(s) occurred.
+DAT_MAP: Error mapping an HDS primitive.
+Conversion error (DAT__CONER)
+100 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _byte
+Number of dimensions: 1
+Dimension: 100
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _real
+Access mode: w
+100 elements mapped
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 1000
+Increment: 1
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+1000 1001 1002 1003 1004 1005 1006 1007 1008 1009 1010 1011 1012 1013 1014 1015 1016 1017 1018 1019 1020 1021 1022 1023 1024 1025 1026 1027 1028 1029 1030 1031 1032 1033 1034 1035 1036 1037 1038 10...
+
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+A total of 100 data conversion error(s) occurred.
+DAT_UNMAP: Error unmapping an HDS primitive.
+Conversion error (DAT__CONER)
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

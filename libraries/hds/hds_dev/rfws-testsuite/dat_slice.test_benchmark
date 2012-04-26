@@ -1,0 +1,342 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: _word
+Number of dimensions: 2
+Dimension: 10
+Dimension: 20
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: w
+400 machine elements mapped
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 0
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 2
+Lower bound: 5
+Upper bound: 10
+Lower bound: 10
+Upper bound: 15
+
+Current object is no. 3: TEST.A(5:10,10:15), nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 6
+Dimension 2 = 6
+
+Current object is no. 3: TEST.A(5:10,10:15), nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: u
+72 machine elements mapped
+
+Current object is no. 3: TEST.A(5:10,10:15), nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 1
+Increment: 1
+
+Current object is no. 3: TEST.A(5:10,10:15), nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+1 2 3 4 5 6 7 8 9 10 11 12
+
+13 14 15 16 17 18 19 20 21 22 23 24
+
+25 26 27 28 29 30 31 32 33 34 35 36
+
+37 38 39 40 41 42 43 44 45 46 47 48
+
+49 50 51 52 53 54 55 56 57 58 59 60
+
+61 62 63 64 65 66 67 68 69 70 71 72
+
+
+Current object is no. 3: TEST.A(5:10,10:15), nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 3: TEST.A(5:10,10:15), nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: aa
+Object 'AA' not found.
+DAT_FIND: Error finding a named component in an HDS structure.
+Object not found (DAT__OBJNF)
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: a
+
+Current object is no. 5: TEST.A, nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+400 machine elements mapped
+
+Current object is no. 5: TEST.A, nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 1 2 3 4 5 6 7 8 9 10 11 12
+
+0 0 0 0 0 0 0 0 13 14 15 16 17 18 19 20 21 22 23 24
+
+0 0 0 0 0 0 0 0 25 26 27 28 29 30 31 32 33 34 35 36
+
+0 0 0 0 0 0 0 0 37 38 39 40 41 42 43 44 45 46 47 48
+
+0 0 0 0 0 0 0 0 49 50 51 52 53 54 55 56 57 58 59 60
+
+0 0 0 0 0 0 0 0 61 62 63 64 65 66 67 68 69 70 71 72
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+
+Current object is no. 5: TEST.A, nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 5: TEST.A, nested at level 2
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 2
+Lower bound: 10
+Upper bound: 10
+Lower bound: 10
+Upper bound: 20
+
+Current object is no. 6: TEST.A(10:10,10:20), nested at level 2
+
+Operation to perform: basic
+
+Map primitive as basic units...
+Access mode: r
+22 machine elements mapped
+
+Current object is no. 6: TEST.A(10:10,10:20), nested at level 2
+
+Operation to perform: ex
+
+Examine mapped values...
+11 12
+
+23 24
+
+35 36
+
+47 48
+
+59 60
+
+71 72
+
+0 0
+
+0 0
+
+0 0
+
+0 0
+
+0 0
+
+
+Current object is no. 6: TEST.A(10:10,10:20), nested at level 2
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 6: TEST.A(10:10,10:20), nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 7: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: s
+Component type: s
+Number of dimensions: 2
+Dimension: 10
+Dimension: 20
+
+Current object is no. 8: TEST.S, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 20
+
+Current object is no. 8: TEST.S, nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 2
+Subscript: 5
+Subscript: 5
+
+Current object is no. 9: TEST.S(5,5), nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 9: TEST.S(5,5), nested at level 2
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 0
+
+Current object is no. 9: TEST.S(5,5), nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: surprise
+Component type: b
+Number of dimensions: 0
+
+Current object is no. 10: TEST.S(5,5).SURPRISE, nested at level 3
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 8
+
+Current object is no. 8: TEST.S, nested at level 2
+
+Operation to perform: ls
+
+List structure components...
+DAT_NCOMP: Error enquiring the number of components in an HDS structure.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 8: TEST.S, nested at level 2
+
+Operation to perform: slice
+
+Locate slice...
+Number of dimensions: 2
+Lower bound: 5
+Upper bound: 7
+Lower bound: 5
+Upper bound: 14
+
+Current object is no. 11: TEST.S(5:7,5:14), nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 3
+Dimension 2 = 10
+
+Current object is no. 11: TEST.S(5:7,5:14), nested at level 2
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 2
+Subscript: 1
+Subscript: 1
+DAT_CELL: Error obtaining a locator to a cell of an HDS array.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 11: TEST.S(5:7,5:14), nested at level 2
+
+Operation to perform: quit
+
+Quit...

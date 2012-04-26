@@ -1,0 +1,563 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _real
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 1000
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 1000
+
+Current object is no. 2: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 1000
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 1
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 1
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 10000
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 517
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 2
+Dimension: 1
+Dimension: 2
+DAT_ALTER: Error altering the size of an HDS object.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 3: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: a
+Number of dimensions: 0
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: data
+Component type: _word
+Number of dimensions: 2
+Dimension: 10
+Dimension: 20
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 20
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 2
+Dimension: 10
+Dimension: 1
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 1
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 2
+Dimension: 10
+Dimension: 517
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 517
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 2
+Dimension: 11
+Dimension: 517
+DAT_ALTER: Error altering the size of an HDS object.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 10
+DAT_ALTER: Error altering the size of an HDS object.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 3
+Dimension: 10
+Dimension: 517
+Dimension: 1
+DAT_ALTER: Error altering the size of an HDS object.
+Dimensions invalid (DAT__DIMIN)
+
+Current object is no. 5: TEST.DATA, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 4
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: data
+
+Current object is no. 7: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 517
+
+Current object is no. 7: TEST.DATA, nested at level 2
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 2
+Dimension: 10
+Dimension: 517
+
+Current object is no. 7: TEST.DATA, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 517
+
+Current object is no. 7: TEST.DATA, nested at level 2
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 6
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: struct_array
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 3
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 1
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 1
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 1
+
+Current object is no. 9: TEST(1), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: junk
+Component type: junk
+Number of dimensions: 0
+
+Current object is no. 10: TEST(1).JUNK, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 8
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 5
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 5
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 512
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 512
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 511
+
+Current object is no. 11: TEST(511), nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: junk511
+Component type: junk511
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 12: TEST(511).JUNK511, nested at level 2
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 12: TEST(511).JUNK511, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 8
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 512
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 511
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 510
+DAT_ALTER: Error altering the size of an HDS object.
+Deletion invalid (DAT__DELIN)
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: alter
+
+Alter object size...
+Number of dimensions: 1
+Dimension: 513
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 513
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 512
+
+Current object is no. 13: TEST(512), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 0
+
+Current object is no. 13: TEST(512), nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 8
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 513
+
+Current object is no. 14: TEST(513), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 0
+
+Current object is no. 14: TEST(513), nested at level 1
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 8
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 511
+
+Current object is no. 15: TEST(511), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 15: TEST(511), nested at level 1
+
+Operation to perform: index
+
+Index into component list...
+Component number: 1
+
+Current object is no. 16: TEST(511).JUNK511, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 8
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 511
+
+Current object is no. 17: TEST(511), nested at level 1
+
+Operation to perform: ncomp
+
+Enquire number of components...
+Number of components = 1
+
+Current object is no. 17: TEST(511), nested at level 1
+
+Operation to perform: index
+
+Index into component list...
+Component number: 2
+DAT_INDEX: Error indexing into the component list of an HDS structure.
+Object not found (DAT__OBJNF)
+
+Current object is no. 17: TEST(511), nested at level 1
+
+Operation to perform: quit
+
+Quit...

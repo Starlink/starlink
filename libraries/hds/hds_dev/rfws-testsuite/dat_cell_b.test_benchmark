@@ -1,0 +1,14 @@
+Operation to perform: cell
+
+Locate cell...
+Number of dimensions: 1
+Subscript: 1
+HDS locator invalid: value=' ', length=15 (possible programming error).
+DAT_CELL: Error obtaining a locator to a cell of an HDS array.
+Locator invalid (DAT__LOCIN)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: quit
+
+Quit...

@@ -1,0 +1,197 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: a
+Object type: b
+Number of dimensions: 0
+
+Current object is no. 1: A, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 2: A, nested at level 1
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'A'
+
+Current object is no. 2: A, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'B'
+
+Current object is no. 2: A, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 2: A, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: abcdefghijklmno
+Object type: _real
+Number of dimensions: 7
+Dimension: 2
+Dimension: 1
+Dimension: 2
+Dimension: 1
+Dimension: 2
+Dimension: 1
+Dimension: 3
+
+Current object is no. 3: ABCDEFGHIJKLMNO, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 2
+Dimension 2 = 1
+Dimension 3 = 2
+Dimension 4 = 1
+Dimension 5 = 2
+Dimension 6 = 1
+Dimension 7 = 3
+
+Current object is no. 3: ABCDEFGHIJKLMNO, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = '_REAL'
+
+Current object is no. 3: ABCDEFGHIJKLMNO, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test
+Access mode: u
+
+Current object is no. 4: ABCDEFGHIJKLMNO, nested at level 1
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'ABCDEFGHIJKLMNO'
+
+Current object is no. 4: ABCDEFGHIJKLMNO, nested at level 1
+
+Operation to perform: type
+
+Enquire object type...
+Data type = '_REAL'
+
+Current object is no. 4: ABCDEFGHIJKLMNO, nested at level 1
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 2
+Dimension 2 = 1
+Dimension 3 = 2
+Dimension 4 = 1
+Dimension 5 = 2
+Dimension 6 = 1
+Dimension 7 = 3
+
+Current object is no. 4: ABCDEFGHIJKLMNO, nested at level 1
+
+Operation to perform: state
+
+Enquire object state...
+Object state = FALSE
+
+Current object is no. 4: ABCDEFGHIJKLMNO, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: ??ng%%$*&**^%#*$
+Access mode: r
+No files found matching the file specification '??ng%%$*&**^%#*$'.
+HDS_OPEN: Error opening an HDS container file.
+File not found (DAT__FILNF)
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: ____
+Object type: ____
+Number of dimensions: 1
+Dimension: 2
+Invalid primitive data type '____' specified (possible programming error).
+HDS_NEW: Error creating a new HDS container file.
+Type invalid (DAT__TYPIN)
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: 
+Object type: 
+Number of dimensions: 0
+Invalid blank name string specified (possible programming error).
+HDS_NEW: Error creating a new HDS container file.
+Name invalid (DAT__NAMIN)
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: hds_new
+Object name: test
+Object type: asdfr
+Number of dimensions: 2
+Dimension: 3
+Dimension: 4
+Invalid type string 'asdf r' specified; contains illegal character (code=24 decimal) at position 5 (possible programming error).
+HDS_NEW: Error creating a new HDS container file.
+Type invalid (DAT__TYPIN)
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

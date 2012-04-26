@@ -1,0 +1,166 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: _logical
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _byte
+Access mode: w
+10 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 0
+Increment: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+0 1 2 3 4 5 6 7 8 9
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _logical
+Access mode: r
+10 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE FALSE TRUE
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char
+Access mode: r
+10 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'FALSE' 'TRUE' 'FALSE' 'TRUE' 'FALSE' 'TRUE' 'FALSE' 'TRUE' 'FALSE' 'TRUE'
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char*4
+Access mode: r
+10 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'FALS' 'TRUE' 'FALS' 'TRUE' 'FALS' 'TRUE' 'FALS' 'TRUE' 'FALS' 'TRUE'
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char*1
+Access mode: r
+10 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'F' 'T' 'F' 'T' 'F' 'T' 'F' 'T' 'F' 'T'
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: map
+
+Map primitive...
+Data type: _char*5
+Access mode: r
+10 elements mapped
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: ex
+
+Examine mapped values...
+'FALSE' 'TRUE' 'FALSE' 'TRUE' 'FALSE' 'TRUE' 'FALSE' 'TRUE' 'FALSE' 'TRUE'
+
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: unmap
+
+Unmap object...
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

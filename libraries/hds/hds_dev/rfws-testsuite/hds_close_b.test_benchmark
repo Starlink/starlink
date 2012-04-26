@@ -1,0 +1,128 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: t1
+Object type: t1
+Number of dimensions: 0
+
+Current object is no. 1: T1, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: x
+Component type: _real
+Number of dimensions: 1
+Dimension: 10
+
+Current object is no. 2: T1.X, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _real
+Access mode: w
+10 elements mapped
+
+Current object is no. 2: T1.X, nested at level 2
+
+Operation to perform: set
+
+Set mapped array values...
+Starting value: 1
+Increment: 0
+
+Current object is no. 2: T1.X, nested at level 2
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test2
+Object name: t2
+Object type: t2
+Number of dimensions: 1
+Dimension: 1
+
+Current object is no. 3: T2, nested at level 1
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test3
+Object name: t3
+Object type: t3
+Number of dimensions: 0
+
+Current object is no. 4: T3, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: yyy
+Component type: _integer
+Number of dimensions: 2
+Dimension: 10
+Dimension: 12
+
+Current object is no. 5: T3.YYY, nested at level 2
+
+Operation to perform: map
+
+Map primitive...
+Data type: _byte
+Access mode: w
+120 elements mapped
+
+Current object is no. 5: T3.YYY, nested at level 2
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: locators
+
+Current object is no. 5: T3.YYY, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: T1, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: locators
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 4
+
+Current object is no. 4: T3, nested at level 1
+
+Operation to perform: hds_close
+
+Close container file...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: locators
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

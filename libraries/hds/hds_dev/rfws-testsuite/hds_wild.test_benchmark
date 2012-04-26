@@ -1,0 +1,553 @@
+Operation to perform: purge
+
+Erase a wild-carded set of HDS container files...
+File spec: *.*
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: atest1a
+Object name: atest1a
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 1: ATEST1A, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: atest1b
+Object name: atest1b
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 2: ATEST1B, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: atest2a
+Object name: atest2a
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 3: ATEST2A, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: atest2b
+Object name: atest2b
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 4: ATEST2B, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hdss_new
+
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hdss_new
+
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: btestx
+Object name: btestx
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 5: BTESTX, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: btesty
+Object name: btesty
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 6: BTESTY, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_shell
+
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 0
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: atest*
+Access mode: r
+Container files found...
+   Object = ATEST1A
+   Object = ATEST1B
+   Object = ATEST2A
+   Object = ATEST2B
+   Annulled context = DAT__NOWLD
+
+Current object is no. 7: ATEST2B, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: btest*
+Access mode: w
+Container files found...
+   Object = BTESTX
+   Object = BTESTY
+   Annulled context = DAT__NOWLD
+
+Current object is no. 8: BTESTY, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 8, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: *test*b
+Access mode: r
+Container files found...
+   Object = ATEST1B
+   Object = ATEST2B
+   Annulled context = DAT__NOWLD
+
+Current object is no. 9: ATEST2B, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 9, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: -1
+
+Current locator is no. 9, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = -1
+
+Current locator is no. 9, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: atest*
+Access mode: r
+Container files found...
+   Object = ATEST1A
+   Object = ATEST1B
+   Object = ATEST2A
+   Object = ATEST2B
+   Annulled context = DAT__NOWLD
+
+Current object is no. 10: ATEST2B, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 10, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: atest1*
+Access mode: w
+Container files found...
+   Object = ATEST1A
+   Object = ATEST1B
+   Annulled context = DAT__NOWLD
+
+Current object is no. 11: ATEST1B, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 11, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: *test2*
+Access mode: r
+Container files found...
+   Object = ATEST2A
+   Object = ATEST2B
+   Annulled context = DAT__NOWLD
+
+Current object is no. 12: ATEST2B, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 12: ATEST2B, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 12, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 1
+
+Current locator is no. 12, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 1
+
+Current locator is no. 12, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: *est1*
+Access mode: r
+Container files found...
+   Object = ATEST1A
+   Object = ATEST1B
+   Annulled context = DAT__NOWLD
+
+Current object is no. 13: ATEST1B, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 13, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: btest*
+Access mode: r
+Container files found...
+   Object = BTESTX
+   Object = BTESTY
+   Annulled context = DAT__NOWLD
+
+Current object is no. 14: BTESTY, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 14, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 2
+
+Current locator is no. 14, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 2
+
+Current locator is no. 14, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: *test*b
+Access mode: w
+Container files found...
+   Object = ATEST1B
+   Object = ATEST2B
+   Annulled context = DAT__NOWLD
+
+Current object is no. 15: ATEST2B, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 15, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: *test*x
+Access mode: r
+Container files found...
+   Object = BTESTX
+   Annulled context = DAT__NOWLD
+
+Current object is no. 16: BTESTX, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 16, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: *test2*
+Access mode: r
+Container files found...
+   Object = ATEST2A
+   Object = ATEST2B
+   Annulled context = DAT__NOWLD
+
+Current object is no. 17: ATEST2B, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 17, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 0
+
+Current locator is no. 17, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 0
+
+Current locator is no. 17, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: a*1a
+Access mode: w
+Container files found...
+   Object = ATEST1A
+   Annulled context = DAT__NOWLD
+
+Current object is no. 18: ATEST1A, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 18, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: a*1b
+Access mode: w
+Container files found...
+   Object = ATEST1B
+   Annulled context = DAT__NOWLD
+
+Current object is no. 19: ATEST1B, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 19, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: a*a
+Access mode: w
+Container files found...
+   Object = ATEST2A
+   Annulled context = DAT__NOWLD
+
+Current object is no. 20: ATEST2A, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 20, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: a*b
+Access mode: w
+Container files found...
+   Object = ATEST2B
+   Annulled context = DAT__NOWLD
+
+Current object is no. 21: ATEST2B, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 21, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: b*x
+Access mode: w
+Container files found...
+   Object = BTESTX
+   Annulled context = DAT__NOWLD
+
+Current object is no. 22: BTESTX, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 22, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: b*y
+Access mode: r
+Container files found...
+   Object = BTESTY
+   Annulled context = DAT__NOWLD
+
+Current object is no. 23: BTESTY, nested at level 1
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: btest*
+Access mode: w
+Container files found...
+   Object = BTESTY
+   Annulled context = DAT__NOWLD
+
+Current object is no. 24: BTESTY, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 2
+
+Current object is no. 24: BTESTY, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 24, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 23
+
+Current object is no. 23: BTESTY, nested at level 1
+
+Operation to perform: refct
+
+Obtain reference count...
+Reference count: 1
+
+Current object is no. 23: BTESTY, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 23, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_wild
+
+Perform wild-card search for container files...
+File spec: btest*
+Access mode: r
+Container files found...
+No files found matching the file specification 'btest*'.
+HDS_WILD: Error performing a wild-card search for HDS container files.
+File not found (DAT__FILNF)
+
+Current locator is no. 23, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

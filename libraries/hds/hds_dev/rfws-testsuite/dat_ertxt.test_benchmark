@@ -1,0 +1,31 @@
+Operation to perform: ertxt
+
+Report textual error message...
+Error text: An error has occurred
+Status code: 147358555
+An error has occurred: File invalid (DAT__FILIN)
+File invalid (DAT__FILIN)
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: x
+Number of dimensions: 0
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: ertxt
+
+Report textual error message...
+Error text: Whoops - gone wrong
+Status code: 147358563
+Whoops - gone wrong: Object invalid (DAT__OBJIN)
+Object invalid (DAT__OBJIN)
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: quit
+
+Quit...

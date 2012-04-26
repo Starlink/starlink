@@ -1,0 +1,276 @@
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: test
+Object name: test
+Object type: junk
+Number of dimensions: 0
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: prec
+
+Enquire storage precision...
+DAT_LEN: Error enquiring the element length of an HDS primitive.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: a
+Component type: a
+Number of dimensions: 3
+Dimension: 1
+Dimension: 2
+Dimension: 3
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+DAT_LEN: Error enquiring the element length of an HDS primitive.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 2: TEST.A, nested at level 2
+
+Operation to perform: go
+
+Go to nominated locator...
+Locator number: 1
+
+Current object is no. 1: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: b
+Component type: _real
+Number of dimensions: 1
+Dimension: 1
+
+Current object is no. 3: TEST.B, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+Storage precision = 4
+
+Current object is no. 3: TEST.B, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 4: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: c
+Component type: _double
+Number of dimensions: 1
+Dimension: 2
+
+Current object is no. 5: TEST.C, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+Storage precision = 8
+
+Current object is no. 5: TEST.C, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 6: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: d
+Component type: _word
+Number of dimensions: 0
+
+Current object is no. 7: TEST.D, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+Storage precision = 2
+
+Current object is no. 7: TEST.D, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 8: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: f
+Component type: _uword
+Number of dimensions: 0
+
+Current object is no. 9: TEST.F, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+Storage precision = 2
+
+Current object is no. 9: TEST.F, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 10: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: g
+Component type: _byte
+Number of dimensions: 0
+
+Current object is no. 11: TEST.G, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+Storage precision = 1
+
+Current object is no. 11: TEST.G, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 12: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: h
+Component type: _ubyte
+Number of dimensions: 2
+Dimension: 3
+Dimension: 3
+
+Current object is no. 13: TEST.H, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+Storage precision = 1
+
+Current object is no. 13: TEST.H, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 14: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: i
+Component type: _logical
+Number of dimensions: 1
+Dimension: 2
+
+Current object is no. 15: TEST.I, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+Storage precision = 4
+
+Current object is no. 15: TEST.I, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 16: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: _char*1
+Component type: _char*1
+Number of dimensions: 0
+
+Current object is no. 17: TEST._CHAR*1, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+Storage precision = 1
+
+Current object is no. 17: TEST._CHAR*1, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 18: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: z
+Component type: _char*37
+Number of dimensions: 1
+Dimension: 3
+
+Current object is no. 19: TEST.Z, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+Storage precision = 37
+
+Current object is no. 19: TEST.Z, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 20: TEST, nested at level 1
+
+Operation to perform: new
+
+Create new component...
+Component name: w
+Component type: w
+Number of dimensions: 7
+Dimension: 1
+Dimension: 1
+Dimension: 1
+Dimension: 1
+Dimension: 1
+Dimension: 1
+Dimension: 1
+
+Current object is no. 21: TEST.W, nested at level 2
+
+Operation to perform: prec
+
+Enquire storage precision...
+DAT_LEN: Error enquiring the element length of an HDS primitive.
+Object invalid (DAT__OBJIN)
+
+Current object is no. 21: TEST.W, nested at level 2
+
+Operation to perform: quit
+
+Quit...

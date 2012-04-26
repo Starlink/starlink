@@ -1,0 +1,140 @@
+Operation to perform: temp
+
+Create temporary object...
+Data type: junk
+Number of dimensions: 0
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'TEMP_1'
+
+Current object is no. 1: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: a
+Number of dimensions: 2
+Dimension: 5
+Dimension: 5
+
+Current object is no. 2: HDS_SCRATCH.TEMP_2, nested at level 2
+
+Operation to perform: temp
+
+Create temporary object...
+Data type: _real
+Number of dimensions: 1
+Dimension: 100
+
+Current object is no. 3: HDS_SCRATCH.TEMP_3, nested at level 2
+
+Operation to perform: type
+
+Enquire object type...
+Data type = '_REAL'
+
+Current object is no. 3: HDS_SCRATCH.TEMP_3, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 100
+
+Current object is no. 3: HDS_SCRATCH.TEMP_3, nested at level 2
+
+Operation to perform: paren
+
+Locate parent...
+
+Current object is no. 4: HDS_SCRATCH, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   TEMP_1 <JUNK>
+   TEMP_2(5,5) <A>
+   TEMP_3(100) <_REAL>
+
+Current object is no. 4: HDS_SCRATCH, nested at level 1
+
+Operation to perform: erase
+
+Erase component...
+Name of component: temp_2
+
+Current object is no. 4: HDS_SCRATCH, nested at level 1
+
+Operation to perform: ls
+
+List structure components...
+   TEMP_1 <JUNK>
+   TEMP_3(100) <_REAL>
+
+Current object is no. 4: HDS_SCRATCH, nested at level 1
+
+Operation to perform: hds_show
+
+Show HDS statistics...
+Statistic to show: FILE
+
+Current object is no. 4: HDS_SCRATCH, nested at level 1
+
+Operation to perform: find
+
+Find named component...
+Component name: temp_1
+
+Current object is no. 5: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: type
+
+Enquire object type...
+Data type = 'JUNK'
+
+Current object is no. 5: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: shape
+
+Enquire object shape...
+
+Current object is no. 5: HDS_SCRATCH.TEMP_1, nested at level 2
+
+Operation to perform: new
+
+Create new component...
+Component name: fred
+Component type: _byte
+Number of dimensions: 2
+Dimension: 10
+Dimension: 15
+
+Current object is no. 6: HDS_SCRATCH.TEMP_1.FRED, nested at level 3
+
+Operation to perform: shape
+
+Enquire object shape...
+Dimension 1 = 10
+Dimension 2 = 15
+
+Current object is no. 6: HDS_SCRATCH.TEMP_1.FRED, nested at level 3
+
+Operation to perform: name
+
+Enquire object name...
+Object name = 'FRED'
+
+Current object is no. 6: HDS_SCRATCH.TEMP_1.FRED, nested at level 3
+
+Operation to perform: quit
+
+Quit...

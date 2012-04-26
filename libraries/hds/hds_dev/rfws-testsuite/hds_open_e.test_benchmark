@@ -1,0 +1,526 @@
+Operation to perform: purge
+
+Erase a wild-carded set of HDS container files...
+File spec: *.*
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: testalpha
+Object name: alpha
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 1: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 1, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_new
+
+Create new container file...
+Container file name: testbeta.any
+Object name: testbeta
+Object type: x
+Number of dimensions: 0
+
+Current object is no. 2: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 0
+
+Current locator is no. 2, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha
+Access mode: r
+
+Current object is no. 3: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 3, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha.sdf
+Access mode: r
+
+Current object is no. 4: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 4, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha.*
+Access mode: r
+
+Current object is no. 5: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 5, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test*.s*
+Access mode: w
+
+Current object is no. 6: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 6, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: *.any
+Access mode: r
+
+Current object is no. 7: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 7, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testbeta.*
+Access mode: r
+
+Current object is no. 8: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 8, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: *.any
+Access mode: r
+
+Current object is no. 9: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 9, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: *beta.a*
+Access mode: r
+
+Current object is no. 10: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 10, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 1
+
+Current locator is no. 10, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 1
+
+Current locator is no. 10, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha
+Access mode: r
+
+Current object is no. 11: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 11, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha.sdf
+Access mode: r
+
+Current object is no. 12: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 12, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha.*
+Access mode: r
+
+Current object is no. 13: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 13, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test*.s*
+Access mode: w
+
+Current object is no. 14: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 14, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: *.any
+Access mode: r
+
+Current object is no. 15: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 15, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testbeta.*
+Access mode: r
+
+Current object is no. 16: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 16, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: *.any
+Access mode: r
+
+Current object is no. 17: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 17, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: *beta.a*
+Access mode: r
+
+Current object is no. 18: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 18, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: 2
+
+Current locator is no. 18, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = 2
+
+Current locator is no. 18, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha
+Access mode: r
+
+Current object is no. 19: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 19, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha.sdf
+Access mode: r
+
+Current object is no. 20: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 20, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha.*
+Access mode: r
+
+Current object is no. 21: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 21, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: test*.s*
+Access mode: w
+
+Current object is no. 22: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 22, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: *.any
+Access mode: r
+
+Current object is no. 23: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 23, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testbeta.*
+Access mode: r
+
+Current object is no. 24: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 24, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: *.any
+Access mode: r
+
+Current object is no. 25: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 25, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: *beta.a*
+Access mode: r
+
+Current object is no. 26: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 26, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_tune
+
+Tune HDS parameter...
+Parameter: shell
+New value: -1
+
+Current locator is no. 26, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_gtune
+
+Get value of tuning setting...
+Parameter: shell
+Value of tuning setting = -1
+
+Current locator is no. 26, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha
+Access mode: r
+
+Current object is no. 27: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 27, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha.sdf
+Access mode: r
+
+Current object is no. 28: ALPHA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 28, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha.*
+Access mode: r
+Error accessing file '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/testalpha.*' - No such file or directory
+HDS_OPEN: Error opening an HDS container file.
+File not found (DAT__FILNF)
+
+Current locator is no. 28, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testbeta.any
+Access mode: r
+
+Current object is no. 29: TESTBETA, nested at level 1
+
+Operation to perform: annul
+
+Annul locator...
+
+Current locator is no. 29, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: *.any
+Access mode: r
+Error accessing file '/tmp_mnt/soft2/rfws/testsuite/test_work_dir/*.any' - No such file or directory
+HDS_OPEN: Error opening an HDS container file.
+File not found (DAT__FILNF)
+
+Current locator is no. 29, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testalpha
+Access mode: w
+
+Current object is no. 30: ALPHA, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 30, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: hds_open
+
+Open an HDS container file...
+Container file name: testbeta.any
+Access mode: w
+
+Current object is no. 31: TESTBETA, nested at level 1
+
+Operation to perform: hds_erase
+
+Erase container file...
+
+Current locator is no. 31, value is '<NOT A LOCATOR>' (not valid).
+
+Operation to perform: quit
+
+Quit...

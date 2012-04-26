@@ -1,0 +1,21 @@
+Operation to perform: ermsg
+
+Translate status value into an error message...
+Code to translate: 147358515
+Message is 'Name invalid (DAT__NAMIN)'
+Length = 25
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: ermsg
+
+Translate status value into an error message...
+Code to translate: 147358803
+Message is 'File mapping error (DAT__FILMP)'
+Length = 31
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: quit
+
+Quit...

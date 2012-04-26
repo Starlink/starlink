@@ -1,0 +1,72 @@
+Operation to perform: hds_run
+
+Run application subroutine...
+HDS state in application = TRUE
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_state
+
+Enquire HDS state...
+HDS active = FALSE
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_run
+
+Run application subroutine...
+HDS state in application = TRUE
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_state
+
+Enquire HDS state...
+HDS active = FALSE
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_run
+
+Run application subroutine...
+HDS state in application = TRUE
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_run
+
+Run application subroutine...
+HDS state in application = TRUE
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_state
+
+Enquire HDS state...
+HDS active = FALSE
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_start
+
+Startup locator facility...
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_run
+
+Run application subroutine...
+HDS state in application = TRUE
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: hds_state
+
+Enquire HDS state...
+HDS active = FALSE
+
+Current locator is no. 0, value is '<junk>' (not valid).
+
+Operation to perform: quit
+
+Quit...
