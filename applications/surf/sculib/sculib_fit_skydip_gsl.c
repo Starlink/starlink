@@ -288,7 +288,6 @@ sculib__skydip_f (const gsl_vector * x, void *data,
   const double ETA_MIN = 0.25;
   const double ETA_MAX = 1.0;
   const double TAU_MIN = 0.001;
-  const double TAU_MAX = 5.0;
 
   sculib__get_fit_values( x, data, NULL,
                           &eta_l, &b, &tau,
@@ -656,7 +655,7 @@ sculib_fit_skydip_gsl( int cvar, int n_measurements, const float airmass[],
     errRepf( "", " GSL error status = %s",
              status, gsl_strerror(gslstatus));
     errRepf( "", " - final fit values were: eta = %g b = %g tau = %g  X= %g N = %zu",
-             status, eta_l_final, b_final, tau_final, rexisq, iter );
+             status, eta_l_final, b_final, tau_final, drexisq, iter );
 
   } else {
     double var = 0.0;
@@ -737,15 +736,15 @@ F77_SUBROUTINE(sculib_fit_skydip_gsl)( LOGICAL(CVAR), INTEGER(N_MEASUREMENTS),
   float t_amb;
   float eta_l_in;
   float b_in;
-  float eta_l_fit;
-  float b_fit;
-  float tauz_fit;
-  float rexisq;
-  float tau_error;
-  float eta_error;
-  float b_error;
-  double residual;
-  double sigma;
+  float eta_l_fit = VAL__BADR;
+  float b_fit = VAL__BADR;
+  float tauz_fit = VAL__BADR;
+  float rexisq = VAL__BADR;
+  float tau_error = VAL__BADR;
+  float eta_error = VAL__BADR;
+  float b_error = VAL__BADR;
+  double residual = VAL__BADD;
+  double sigma = VAL__BADD;
 
   F77_IMPORT_INTEGER( *STATUS, status );
   if (status != SAI__OK) return;
