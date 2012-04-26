@@ -9,6 +9,10 @@
     default graphics format is now PNG (GIF no longer works when there are
     overlay graphics).
 
+    Several issues with the axes plotting in the 3D visualisation toolboxes
+    have been fixed. A free form entry area for AST attributes has also been
+    introduced so that the axes can be configured.
+
     The "Intensity Map:" selector in the main panel has been replaced
     by a "Color Scale:" selector. This still provides linear and log-like
     intensity mapping of the displayed image, so no features have been
