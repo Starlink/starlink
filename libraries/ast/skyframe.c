@@ -313,6 +313,10 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        - Remove the code that overrides ClearEpoch and SetEpoch (these
 *        overrides have not been needed since the changes made on
 *        24/11/2009).
+*     27-APR-2012 (DSB):
+*        - Correct astLoadSkyFrame function so that any axis permutation is
+*        taken into account when loading SkyFrame attributes that have a
+*        separate value for each axis.
 *class--
 */
 
@@ -11695,10 +11699,13 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSkyFrame *new;             /* Pointer to the new SkyFrame */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    char *sval;                   /* Pointer to string value */
+   const int *perm;              /* Pointer to axis permutation array */
    double dval;                  /* Floating point attribute value */
+   int axis;                     /* External axis index */
+   int invperm[ 2 ];             /* Inverse permutation array */
 
 /* Initialise. */
    new = NULL;
@@ -11732,6 +11739,19 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
                        channel );
 
    if ( astOK ) {
+
+/* Get a pointer to the SkyFrame's axis permutation array (using a method,
+   to allow for any over-ride by a derived class). */
+      perm = astGetPerm( new );
+
+/* Generate an inverse axis permutation array from the forward permutation
+   values. This will be used to determine which axis should be enquired
+   about (using possibly over-ridden methods) to obtain data to
+   correspond with a particular internal value (i.e. instance variable)
+   relating to an axis. This step is needed so that the effect of any
+   axis permutation can be un-done before values are written out, as
+   output values are written by this function in un-permuted order. */
+      for( axis = 0; axis < 2; axis++ ) invperm[ perm[ axis ] ] = axis;
 
 /* Read input data. */
 /* ================ */
@@ -11777,19 +11797,22 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* SkyRef. */
 /* ------- */
       new->skyref[ 0 ] = astReadDouble( channel, "sref1", AST__BAD );
-      if ( TestSkyRef( new, 0, status ) ) SetSkyRef( new, 0, new->skyref[ 0 ], status );
+      axis = invperm[ 0 ];
+      if ( TestSkyRef( new, axis, status ) ) SetSkyRef( new, axis, new->skyref[ 0 ], status );
 
       new->skyref[ 1 ] = astReadDouble( channel, "sref2", AST__BAD );
-      if ( TestSkyRef( new, 1, status ) ) SetSkyRef( new, 1, new->skyref[ 1 ], status );
+      axis = invperm[ 1 ];
+      if ( TestSkyRef( new, axis, status ) ) SetSkyRef( new, axis, new->skyref[ 1 ], status );
 
 /* SkyRefP. */
 /* -------- */
       new->skyrefp[ 0 ] = astReadDouble( channel, "srefp1", AST__BAD );
-      if ( TestSkyRefP( new, 0, status ) ) SetSkyRefP( new, 0, new->skyrefp[ 0 ], status );
+      axis = invperm[ 0 ];
+      if ( TestSkyRefP( new, axis, status ) ) SetSkyRefP( new, axis, new->skyrefp[ 0 ], status );
 
       new->skyrefp[ 1 ] = astReadDouble( channel, "srefp2", AST__BAD );
-      if ( TestSkyRefP( new, 1, status ) ) SetSkyRefP( new, 1, new->skyrefp[ 1 ], status );
-
+      axis = invperm[ 1 ];
+      if ( TestSkyRefP( new, axis, status ) ) SetSkyRefP( new, axis, new->skyrefp[ 1 ], status );
 
 /* System. */
 /* ------- */
