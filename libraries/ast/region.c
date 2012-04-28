@@ -202,6 +202,12 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *     17-MAY-2011 (DSB):
 *        In RegBaseGrid, accept the final try even if it is not within 5%
 *        of the required meshsize.
+*     27-APR-2012 (DSB):
+*        Store a negated copy of itself with each Region. Changing the Negated 
+*        attribute of a Region causes the cached information to be reset, and
+*        re-calculating it can be an expensive operation. So instead of changing
+*        "Negatated" in "this", access the negated copy of "this" using the
+*        new protected method astGetNegation.
 *class--
 
 *  Implementation Notes:
@@ -952,6 +958,7 @@ static void SetAxis( AstFrame *, int, AstAxis *, int * );
 static void SetRegFS( AstRegion *, AstFrame *, int * );
 static void ShowMesh( AstRegion *, int, const char *, int * );
 static void ValidateAxisSelection( AstFrame *, int, const int *, const char *, int * );
+static AstRegion *GetNegation( AstRegion *, int * );
 
 static int GetBounded( AstRegion *, int * );
 static AstRegion *GetDefUnc( AstRegion *, int * );
@@ -1991,16 +1998,12 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 
 /* Local Variables: */
    AstRegion *this;            /* Pointer to the Region structure */
-   int len;                    /* Length of attrib string */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
 /* Obtain a pointer to the Region structure. */
    this = (AstRegion *) this_object;
-
-/* Obtain the length of the "attrib" string. */
-   len = strlen( attrib );
 
 /* Check the attribute name and clear the appropriate attribute. */
 
@@ -2885,6 +2888,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    result += astGetObjSize( this->basemesh );
    result += astGetObjSize( this->basegrid );
    result += astGetObjSize( this->unc );
+   result += astGetObjSize( this->negation );
    result += astGetObjSize( this->defunc );
 
 /* If an error occurred, clear the result value. */
@@ -2949,7 +2953,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    const char *result;           /* Pointer value to return */
    double dval;                  /* Floating point attribute value */
    int ival;                     /* Integer attribute value */
-   int len;                      /* Length of attrib string */
 
 /* Initialise. */
    result = NULL;
@@ -2962,9 +2965,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 
 /* Obtain a pointer to the Region structure. */
    this = (AstRegion *) this_object;
-
-/* Obtain the length of the attrib string. */
-   len = strlen( attrib );
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
@@ -3349,6 +3349,59 @@ static AstRegion *GetDefUnc( AstRegion *this, int *status ) {
 
 /* Return the required pointer. */
    return result;
+}
+
+static AstRegion *GetNegation( AstRegion *this, int *status ) {
+/*
+*+
+*  Name:
+*     astGetNegation
+
+*  Purpose:
+*     Obtain a pointer to a negated copy of the supplied Region.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstRegion *GetNegation( AstRegion *this, int *status )
+
+*  Class Membership:
+*     Region virtual function.
+
+*  Description:
+*     This function returns a pointer to a Region which is a negated
+*     copy of "this". The copy is cached in the Region structure for
+*     future use.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+
+*  Returned Value:
+*     A pointer to the Region. This should be annulled (using astAnnul)
+*     when no longer needed.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* If the Region struture does not contain a pointer to a negated copy of
+   itself, create one now. */
+   if( ! this->negation ) {
+      this->negation = astCopy( this );
+      astNegate( this->negation );
+   }
+
+/* Return a clone of the negation pointer. */
+   return astClone( this->negation );
 }
 
 static AstFrameSet *GetRegFS( AstRegion *this, int *status ) {
@@ -4286,6 +4339,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    vtab->RegClearAttrib = RegClearAttrib;
    vtab->RegSetAttrib = RegSetAttrib;
    vtab->GetDefUnc = GetDefUnc;
+   vtab->GetNegation = GetNegation;
    vtab->GetUncFrm = GetUncFrm;
    vtab->SetUnc = SetUnc;
    vtab->GetUnc = GetUnc;
@@ -5005,6 +5059,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
    if( !result ) result = astManageLock( this->frameset, mode, extra, fail );
    if( !result ) result = astManageLock( this->points, mode, extra, fail );
    if( !result ) result = astManageLock( this->unc, mode, extra, fail );
+   if( !result ) result = astManageLock( this->negation, mode, extra, fail );
    if( !result ) result = astManageLock( this->defunc, mode, extra, fail );
    if( !result ) result = astManageLock( this->basemesh, mode, extra, fail );
    if( !result ) result = astManageLock( this->basegrid, mode, extra, fail );
@@ -9190,6 +9245,7 @@ static void ResetCache( AstRegion *this, int *status ){
    if( this ) {
       if( this->basemesh ) this->basemesh = astAnnul( this->basemesh );
       if( this->basegrid ) this->basegrid = astAnnul( this->basegrid );
+      if( this->negation ) this->negation = astAnnul( this->negation );
    }
 }
 
@@ -11864,6 +11920,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->frameset = NULL;
    out->points = NULL;
    out->unc = NULL;
+   out->negation = NULL;
    out->defunc = NULL;
 
 /* Now copy each of the above structures. */
@@ -11872,6 +11929,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    if( in->basemesh ) out->basemesh = astCopy( in->basemesh );
    if( in->basegrid ) out->basegrid = astCopy( in->basegrid );
    if( in->unc ) out->unc = astCopy( in->unc );
+   if( in->negation ) out->negation = astCopy( in->negation );
    if( in->defunc ) out->defunc = astCopy( in->defunc );
 }
 
@@ -11918,6 +11976,7 @@ static void Delete( AstObject *obj, int *status ) {
    if( this->basemesh ) this->basemesh = astAnnul( this->basemesh );
    if( this->basegrid ) this->basegrid = astAnnul( this->basegrid );
    if( this->unc ) this->unc = astAnnul( this->unc );
+   if( this->negation ) this->negation = astAnnul( this->negation );
    if( this->defunc ) this->defunc = astAnnul( this->defunc );
 }
 
@@ -12240,6 +12299,7 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
       new->fillfactor = AST__BAD;
       new->defunc = NULL;
       new->nomap = 0;
+      new->negation = NULL;
 
 /* If the supplied Frame is a Region, gets its encapsulated Frame. If a
    FrameSet was supplied, use its current Frame, otherwise use the
@@ -12702,6 +12762,10 @@ double *astRegCentre_( AstRegion *this, double *cen, double **ptr, int index,
                        int ifrm, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Region,RegCentre))( this, cen, ptr, index, ifrm, status );
+}
+AstRegion *astGetNegation_( AstRegion *this, int *status ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,GetNegation))( this, status );
 }
 AstRegion *astGetUncFrm_( AstRegion *this, int ifrm, int *status ){
    if ( !astOK ) return NULL;
