@@ -100,6 +100,11 @@ f     The CmpRegion class does not define any new routines beyond those
 *        - Added astCmpRegionList
 *        - Added support for XOR
 *        - Override astGetObjSize.
+*     27-APR-2012 (DSB):
+*        - Cache the bounded property.
+*        - Speed up plotting of CmpRegions by using the cached negation 
+*        of a Region instead of setting the Regions's Negated flag (which 
+*        causes the Region's cache to be cleared).
 *class--
 */
 
@@ -140,6 +145,7 @@ f     The CmpRegion class does not define any new routines beyond those
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
+#include <limits.h>
 
 /* Module Variables. */
 /* ================= */
@@ -729,9 +735,7 @@ static int GetBounded( AstRegion *this_region, int *status ) {
    AstRegion *reg1;           /* Pointer to first component Region */
    AstRegion *reg2;           /* Pointer to second component Region */
    int neg1;                  /* Negated flag to use with first component */
-   int neg1_old;              /* Original Negated flag for first component */
    int neg2;                  /* Negated flag to use with second component */
-   int neg2_old;              /* Original Negated flag for second component */
    int oper;                  /* Combination operator */
    int overlap;               /* Nature of overlap between components */
    int reg1b;                 /* Is the first component Region bounded?*/
@@ -747,69 +751,87 @@ static int GetBounded( AstRegion *this_region, int *status ) {
 /* Get a pointer to the CmpRegion structure. */
    this = (AstCmpRegion *) this_region;
 
+/* Only calculated a new value if there is no cached value in the Region. */
+   if( this->bounded == -INT_MAX ) {
+
 /* Get the component Regions, how they should be combined, and the
    Negated values which should be used with them. The returned values
    take account of whether the supplied CmpRegion has itself been Negated
    or not. The returned Regions represent regions within the base Frame
    of the FrameSet encapsulated by the parent Region structure. */
-   GetRegions( this, &reg1, &reg2, &oper, &neg1, &neg2, status );
+      GetRegions( this, &reg1, &reg2, &oper, &neg1, &neg2, status );
 
-/* Temporarily set their Negated attributes to the required values.*/
-   neg1_old = astGetNegated( reg1 );
-   neg2_old = astGetNegated( reg2 );
-   astSetNegated( reg1, neg1 );
-   astSetNegated( reg2, neg2 );
+/* If the first component Region does not have the required value for
+   its "Negated" attribute, use the negation of "reg1" in place of "reg1"
+   itself. */
+      if( neg1 != astGetNegated( reg1 ) ) {
+         AstRegion *tmp = astGetNegation( reg1 );
+         (void) astAnnul( reg1 );
+         reg1 = tmp;
+      }
+
+/* If the second component Region does not have the required value for
+   its "Negated" attribute, use the negation of "reg2" in place of "reg2"
+   itself. */
+      if( neg2 != astGetNegated( reg2 ) ) {
+         AstRegion *tmp = astGetNegation( reg2 );
+         (void) astAnnul( reg2 );
+         reg2 = tmp;
+      }
 
 /* See if either of the component Regions is bounded. */
-   reg1b = astGetBounded( reg1 );
-   reg2b = astGetBounded( reg2 );
+      reg1b = astGetBounded( reg1 );
+      reg2b = astGetBounded( reg2 );
 
 /* If the regions are ANDed... */
-   if( oper == AST__AND ) {
+      if( oper == AST__AND ) {
 
 /* If either one of the two components are bounded, then the AND region is
    bounded. */
-      if( reg1b || reg2b ) {
-         result = 1;
+         if( reg1b || reg2b ) {
+            result = 1;
 
 /* If neither of the two components is bounded, then the AND region is
    unbounded if there is partial or no overlap between them and is bounded
    otherwise. */
+         } else {
+            overlap = astOverlap( reg1, reg2 );
+            if( overlap == 1 || overlap == 4 || overlap == 6 ) {
+               result = 0;
+            } else {
+               result = 1;
+            }
+         }
+
+/* If the regions are ORed... */
       } else {
-         overlap = astOverlap( reg1, reg2 );
-         if( overlap == 1 || overlap == 4 || overlap == 6 ) {
+
+/* If either one of the two components is unbounded, then the OR region is
+   unbounded. */
+         if( !reg1b || !reg2b ) {
             result = 0;
+
+/* If both of the two components are bounded, then the OR region is also
+   bounded. */
          } else {
             result = 1;
          }
       }
 
-/* If the regions are ORed... */
-   } else {
+/* Free resources. */
+      reg1 = astAnnul( reg1 );
+      reg2 = astAnnul( reg2 );
 
-/* If either one of the two components is unbounded, then the OR region is
-   unbounded. */
-      if( !reg1b || !reg2b ) {
-         result = 0;
-
-/* If both of the two components are bounded, then the OR region is also
-   bounded. */
-      } else {
-         result = 1;
-      }
+/* Cache the value in the CmpRegion. */
+      this->bounded = astOK ? result : -INT_MAX;
    }
 
-/* Re-instate the original values for the Negated attributes of the two
-   component Regions. */
-   if( reg1 ) astSetNegated( reg1, neg1_old );
-   if( reg2 ) astSetNegated( reg2, neg2_old );
-
-/* Free resources. */
-   reg1 = astAnnul( reg1 );
-   reg2 = astAnnul( reg2 );
-
-/* Return zero if an error occurred. */
-   if( !astOK ) result = 0;
+/* Return zero if an error occurred. Otherwise, return the cached value. */
+   if( astOK ) {
+      result = ( this->bounded == -INT_MAX ) ? 0 : this->bounded;
+   } else {
+      result = 0;
+   }
 
 /* Return the required pointer. */
    return result;
@@ -2507,6 +2529,8 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
    AstMapping *map;
    AstPointSet *bpset;
    AstPointSet *cpset;
+   AstRegion *ureg1;
+   AstRegion *ureg2;
    double **bptr;
    int i;
    int j;
@@ -2665,18 +2689,18 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
          if( astGetBounded( this->region1 ) ) {
             (void) astRegTrace( this->region1, r1n, r1d, r1ptr );
          } else {
-            astNegate( this->region1 );
-            (void) astRegTrace( this->region1, r1n, r1d, r1ptr );
-            astNegate( this->region1 );
+            AstRegion *negation = astGetNegation( this->region1 );
+            (void) astRegTrace( negation, r1n, r1d, r1ptr );
+            negation = astAnnul( negation );
          }
 
 /* Do the same for the second component Region. */
          if( astGetBounded( this->region2 ) ) {
             (void) astRegTrace( this->region2, r2n, r2d, r2ptr );
          } else {
-            astNegate( this->region2 );
-            (void) astRegTrace( this->region2, r2n, r2d, r2ptr );
-            astNegate( this->region2 );
+            AstRegion *negation = astGetNegation( this->region2 );
+            (void) astRegTrace( negation, r2n, r2d, r2ptr );
+            negation = astAnnul( negation );
          }
 
 /* If the two component Regions are ANDed together, we want to remove the
@@ -2686,8 +2710,11 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
    remove the position that fall within (rather than outside) the other
    Region. To do this we need to negate the other region  first. */
          if( this->oper == AST__OR ) {
-            astNegate( this->region1 );
-            astNegate( this->region2 );
+            ureg1 = astGetNegation( this->region1 );
+            ureg2 = astGetNegation( this->region2 );
+         } else {
+            ureg1 = astClone( this->region1 );
+            ureg2 = astClone( this->region2 );
          }
 
 /* Now transform the points on the boundary of the first Region in order
@@ -2696,7 +2723,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
          if( r1n > 0 ) {
             r1pset = astPointSet( r1n, 2, " ", status );
             astSetPoints( r1pset, r1ptr );
-            r1psetb = astTransform( this->region2, r1pset, 1, NULL );
+            r1psetb = astTransform( ureg2, r1pset, 1, NULL );
             r1ptrb = astGetPoints( r1psetb );
          } else {
             r1pset = NULL;
@@ -2710,7 +2737,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
          if( r2n > 0 ) {
             r2pset = astPointSet( r2n, 2, " ", status );
             astSetPoints( r2pset, r2ptr );
-            r2psetb = astTransform( this->region1, r2pset, 1, NULL );
+            r2psetb = astTransform( ureg1, r2pset, 1, NULL );
             r2ptrb = astGetPoints( r2psetb );
          } else {
             r2pset = NULL;
@@ -2718,11 +2745,9 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
             r2ptrb = NULL;
          }
 
-/* Re-instate the original Negated values */
-         if( this->oper == AST__OR ) {
-            astNegate( this->region1 );
-            astNegate( this->region2 );
-         }
+/* Free the begation pointers. */
+         ureg1 = astAnnul( ureg1 );
+         ureg2 = astAnnul( ureg2 );
 
 /* Check pointer can be used safely. */
          if( astOK ) {
@@ -2907,6 +2932,8 @@ static void ResetCache( AstRegion *this_region, int *status ){
          this->d0[ i ] = AST__BAD;
       }
 
+      this->bounded = -INT_MAX;
+
 /* Clear information cached in the component regions. */
       if( this->region1 ) astResetCache( this->region1 );
       if( this->region2 ) astResetCache( this->region2 );
@@ -2982,6 +3009,7 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
    AstPointSet *pset1;
    AstPointSet *pset2;
    AstRegion *other;
+   AstRegion *uother;
    AstRegion *reg;
    double **ptr1;
    double **ptr2;
@@ -3038,9 +3066,9 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
             if( astGetBounded( reg ) ) {
                (void) astRegTrace( reg, NP, d, ptr1 );
             } else {
-               astNegate( reg );
-               (void) astRegTrace( reg, NP, d, ptr1 );
-               astNegate( reg );
+               AstRegion *negation = astGetNegation( reg );
+               (void) astRegTrace( negation, NP, d, ptr1 );
+               negation = astAnnul( negation );
             }
 
 /* Get a pointer to the other component Region. */
@@ -3052,15 +3080,19 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
    as a Mapping. If the two component Regions are ORed together, we want to
    remove the position that fall within (rather than outside) the other
    Region. To do this we need to negate the other region  first. */
-            if( this->oper == AST__OR ) astNegate( other );
+            if( this->oper == AST__OR ) {
+               uother = astGetNegation( other );
+            } else {
+               uother = astClone( other );
+            }
 
 /* Now transform the points on the boundary of the selected Region in
    order to set invalid those positions which are not on the boundary of
    the supplied CmpRegion. */
-            pset2 = astTransform( other, pset1, 1, NULL );
+            pset2 = astTransform( uother, pset1, 1, NULL );
 
-/* Negate the other region again to revert it to is original state */
-            if( this->oper == AST__OR ) astNegate( other );
+/* Annul the negation pointer */
+            uother = astAnnul( uother );
 
 /* Modify the distance array by setting invalid each element that is not
    on the boundary of the CmpRegion. */
@@ -3282,14 +3314,10 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    AstRegion *sreg1;             /* Simplified first component Region */
    AstRegion *sreg2;             /* Simplified second component Region */
    int neg1;                     /* Negated flag to use with first component */
-   int neg1_old;                 /* Original Negated flag for first component */
    int neg2;                     /* Negated flag to use with second component */
-   int neg2_old;                 /* Original Negated flag for second component */
    int oper;                     /* Boolean operator used to combine components */
    int overlap;                  /* Nature of overlap between components */
-   int rep;                      /* Original error reporting status */
    int simpler;                  /* Has any simplification taken place? */
-   int status_value;                   /* AST status value */
 
 /* Initialise. */
    result = NULL;
@@ -3324,11 +3352,23 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    of the FrameSet encapsulated by the parent Region structure. */
    GetRegions( newc, &reg1, &reg2, &oper, &neg1, &neg2, status );
 
-/* Temporarily set their Negated attributes to the required values.*/
-   neg1_old = astGetNegated( reg1 );
-   neg2_old = astGetNegated( reg2 );
-   astSetNegated( reg1, neg1 );
-   astSetNegated( reg2, neg2 );
+/* If the first component Region does not have the required value for
+   its "Negated" attribute, use the negation of "reg1" in place of "reg1"
+   itself. */
+   if( neg1 != astGetNegated( reg1 ) ) {
+      AstRegion *tmp = astGetNegation( reg1 );
+      (void) astAnnul( reg1 );
+      reg1 = tmp;
+   }
+
+/* If the second component Region does not have the required value for
+   its "Negated" attribute, use the negation of "reg2" in place of "reg2"
+   itself. */
+   if( neg2 != astGetNegated( reg2 ) ) {
+      AstRegion *tmp = astGetNegation( reg2 );
+      (void) astAnnul( reg2 );
+      reg2 = tmp;
+   }
 
 /* Simplify each of the two components. */
    sreg1 = astSimplify( reg1 );
@@ -3450,16 +3490,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
       }
    }
 
-/* Re-instate the original values for the Negated attributes of the two
-   component Regions. Do this even if an error has occurred. */
-   status_value = astStatus;
-   astClearStatus;
-   rep = astReporting( 0 );
-   if( reg1 ) astSetNegated( reg1, neg1_old );
-   if( reg2 ) astSetNegated( reg2, neg2_old );
-   astReporting( rep );
-   astSetStatus( status_value );
-
 /* If any simplification took place, decide whether to use the "newc" or
    "newb" pointer for the returned Mapping. If "newb" is non-NULL we use
    it, otherwise we use "newc". If "newb" is used we must first map the
@@ -3568,14 +3598,10 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    int ncoord_out;               /* No. of coordinates per output point */
    int ncoord_tmp;               /* No. of coordinates per base Frame point */
    int neg1;                     /* Negated value for first component Region */
-   int neg1_old;                 /* Original Negated flag for first component */
    int neg2;                     /* Negated value for second component Region */
-   int neg2_old;                 /* Original Negated flag for second component */
    int npoint;                   /* No. of points */
    int oper;                     /* Boolean operator to use */
    int point;                    /* Loop counter for points */
-   int rep;                      /* Original error reporting status */
-   int status_value;                   /* AST status value */
 
 /* Initialise. */
    result = NULL;
@@ -3593,11 +3619,23 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    of the FrameSet encapsulated by the parent Region structure. */
    GetRegions( this, &reg1, &reg2, &oper, &neg1, &neg2, status );
 
-/* Temporarily set their Negated attributes to the required values.*/
-   neg1_old = astGetNegated( reg1 );
-   neg2_old = astGetNegated( reg2 );
-   astSetNegated( reg1, neg1 );
-   astSetNegated( reg2, neg2 );
+/* If the first component Region does not have the required value for
+   its "Negated" attribute, use the negation of "reg1" in place of "reg1"
+   itself. */
+   if( neg1 != astGetNegated( reg1 ) ) {
+      AstRegion *tmp = astGetNegation( reg1 );
+      (void) astAnnul( reg1 );
+      reg1 = tmp;
+   }
+
+/* If the second component Region does not have the required value for
+   its "Negated" attribute, use the negation of "reg2" in place of "reg2"
+   itself. */
+   if( neg2 != astGetNegated( reg2 ) ) {
+      AstRegion *tmp = astGetNegation( reg2 );
+      (void) astAnnul( reg2 );
+      reg2 = tmp;
+   }
 
 /* Apply the parent mapping using the stored pointer to the Transform member
    function inherited from the parent Region class. This function validates
@@ -3683,16 +3721,6 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                     astGetClass( this ), oper );
       }
    }
-
-/* Re-instate the original values for the Negated attributes of the two
-   component Regions. Do this even if an error has occurred. */
-   status_value = astStatus;
-   astClearStatus;
-   rep = astReporting( 0 );
-   if( reg1 ) astSetNegated( reg1, neg1_old );
-   if( reg2 ) astSetNegated( reg2, neg2_old );
-   astReporting( rep );
-   astSetStatus( status_value );
 
 /* Free resources. */
    reg1 = astAnnul( reg1 );
@@ -3864,6 +3892,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->region2 = NULL;
    out->xor1 = NULL;
    out->xor2 = NULL;
+   out->bounded = -INT_MAX;
 
    for( i = 0; i < 2; i++ ) {
       out->rvals[ i ] = NULL;
@@ -4553,6 +4582,7 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
          new->nbreak[ i ] = 0;
          new->d0[ i ] = AST__BAD;
       }
+      new->bounded = -INT_MAX;
 
 /* If the base->current Mapping in the FrameSet within each component Region
    is a UnitMap, then the FrameSet does not need to be included in the
@@ -4745,6 +4775,7 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
          new->nbreak[ i ] = 0;
          new->d0[ i ] = AST__BAD;
       }
+      new->bounded = -INT_MAX;
 
 /* The CmpRegion class does not implement XOR directly (as it does for
    AND and OR). Instead, when requested to create an XOR CmpRegion, it

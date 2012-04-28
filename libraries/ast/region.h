@@ -101,6 +101,7 @@ typedef struct AstRegion {
    AstPointSet *basegrid;     /* Base frame grid covering the boundary */
    int adaptive;              /* Does the Region adapt to coord sys changes? */
    int nomap;                 /* Ignore the Region's FrameSet? */
+   struct AstRegion *negation;/* Negated copy of "this" */
 } AstRegion;
 
 /* Virtual function table. */
@@ -148,6 +149,7 @@ typedef struct AstRegionVtab {
    AstPointSet *(* RegBaseGrid)( AstRegion *, int * );
    AstPointSet *(* BndBaseMesh)( AstRegion *, double *, double *, int * );
    AstPointSet *(* BndMesh)( AstRegion *, double *, double *, int * );
+   AstRegion *(* GetNegation)( AstRegion *, int * );
    AstRegion *(* GetUncFrm)( AstRegion *, int, int * );
    AstRegion *(* GetUnc)( AstRegion *, int, int * );
    AstRegion *(* GetDefUnc)( AstRegion *, int * );
@@ -264,6 +266,7 @@ int astMaskUI_( AstRegion *, AstMapping *, int, int, const int[], const int[], u
 int astMaskUL_( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned long int[], unsigned long int, int * );
 int astMaskUS_( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned short int[], unsigned short int, int * );
 void astSetUnc_( AstRegion *, AstRegion *, int * );
+AstRegion *astGetNegation_( AstRegion *, int * );
 AstRegion *astGetUnc_( AstRegion *, int, int * );
 void astGetRegionBounds_( AstRegion *, double *, double *, int * );
 void astShowMesh_( AstRegion *, int, const char *, int * );
@@ -421,6 +424,7 @@ astINVOKE(V,astGetRegionPoints_(astCheckRegion(this),maxpoint,maxcoord,npoint,po
 /* ----------------------------------------- */
 #if defined(astCLASS)            /* Protected */
 
+#define astGetNegation(this) astINVOKE(O,astGetNegation_(astCheckRegion(this),STATUS_PTR))
 #define astGetRegionBounds2(this,lbnd,ubnd) astINVOKE(V,astGetRegionBounds2_(astCheckRegion(this),lbnd,ubnd,STATUS_PTR))
 #define astClearUnc(this) astINVOKE(V,astClearUnc_(astCheckRegion(this),STATUS_PTR))
 #define astGetBounded(this) astINVOKE(V,astGetBounded_(astCheckRegion(this),STATUS_PTR))

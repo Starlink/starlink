@@ -117,7 +117,7 @@ typedef struct AstCmpRegion {
    double d0[ 2 ];               /* Total used boundary length */
    AstRegion *xor1;              /* First XORed Region */
    AstRegion *xor2;              /* Second XORed Region */
-
+   int bounded;                  /* Is this CmpRegion bounded? */
 } AstCmpRegion;
 
 /* Virtual function table. */
