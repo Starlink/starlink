@@ -55,11 +55,14 @@
 
 #  Authors:
 #     PWD: Peter Draper (STARLINK - Durham University)
+#     MJC: Malcolm J. Currie (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     08-OCT-2004 (PWD):
 #        Original version.
+#     2012 April 20 (MJC):
+#        Added support for standards of rest.
 #     {enter_further_changes_here}
 
 #-
@@ -230,16 +233,20 @@ itcl::class gaia::GaiaCube {
 
       #  Add the coordinate selection menu (use global variable so we can
       #  share this).
-      set SpectralCoords [add_menubutton "Coords"]
-      configure_menubutton "Coords" -underline 0
+      set SpectralCoords [add_menubutton "Coords/StdOfRest"]
+      configure_menubutton "Coords/StdOfRest" -underline 0
       $SpectralCoords add command \
-         -label "Change coordinates..." \
+         -label "Change coordinates or standard or rest..." \
          -command [code $this show_builtin_toolbox_]
 
       #  Spectral and time coordinates handler.
       set spec_coords_ [uplevel \#0 GaiaSpecCoords \#auto]
       $spec_coords_ configure -change_cmd [code $this coords_changed_]
       $spec_coords_ add_menu $SpectralCoords
+
+      #  Spectral standard-of-rest handler.
+      set spec_sor_ [uplevel \#0 GaiaSpecCoords \#auto]
+      $spec_sor_ configure -change_cmd [code $this coords_changed_]
 
       #  Add the "Go" menu to switch back and forth between cubes that have
       #  been loaded.
@@ -365,6 +372,7 @@ itcl::class gaia::GaiaCube {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -spec_coords [code $spec_coords_] \
+            -spec_sor [code $spec_sor_] \
             -component [get_component_] \
             -transient_spectralplot $itk_option(-transient_spectralplot) \
             -notify_cmd [code $this spectrum_moved_]
@@ -715,9 +723,15 @@ itcl::class gaia::GaiaCube {
       #  Set up object to control units. Do this before axis change
       #  so that cube is available for units query.
       $spec_coords_ configure -accessor $cubeaccessor_
+      $spec_sor_ configure -accessor $cubeaccessor_
 
       #  Now apply axis change.
       $spec_coords_ configure -axis $axis
+      $itk_component(axis) configure -value $axis
+      set_step_axis_ $axis
+
+      #  Now apply axis change.
+      $spec_sor_ configure -axis $axis
       $itk_component(axis) configure -value $axis
       set_step_axis_ $axis
 
@@ -813,6 +827,22 @@ itcl::class gaia::GaiaCube {
    #  actual change.
    protected method coords_changed_ {} {
       $itk_component(spectrum) coord_system_changed
+
+      set value $axis_
+      incr axis_
+      set_step_axis_ $value 0
+
+      #  Change catalogues to match coordinate system.
+      if { [winfo exists $w_.cupidimporter] } {
+         $w_.cupidimporter attach_coords
+      }
+   }
+
+   #  Handle a change in the standard of rest.  This requires all the local
+   #  coordinates to be updated. Same as changing the axis, but without an
+   #  actual change.
+   protected method sor_changed_ {} {
+      $itk_component(spectrum) sor_changed
 
       set value $axis_
       incr axis_
@@ -1384,6 +1414,11 @@ itcl::class gaia::GaiaCube {
    #  Return object for controlling the spectral coordinates.
    public method get_spec_coords {} {
       return $spec_coords_
+   }
+
+   #  Return object for controlling the standards of rest.
+   public method get_spec_sor {} {
+      return $spec_sor_
    }
 
    #  Return the spectral extraction limits in pixel indices. Empty string if
@@ -1980,6 +2015,9 @@ itcl::class gaia::GaiaCube {
 
    #  Object for controlling the spectral coordinates.
    protected variable spec_coords_ {}
+
+   #  Object for controlling the spectral standard of rest.
+   protected variable spec_sor_ {}
 
    #  Array of index-based controls for the reference lines. These are indexed
    #  by their ref_id.

@@ -11,9 +11,10 @@
 #  Description:
 
 #     This class populates menus with preset selections for the various
-#     coordinates systems that the spectral or time axis of a AST FrameSet
-#     might take (assuming the FrameSet contains an axis with has a
-#     SpecFrame). The FrameSet is accessed using an GaiaNDAccess instance.
+#     coordinates systems and standard of rest that the spectral or time
+#     axis of a AST FrameSet might take (assuming the FrameSet contains
+#     an axis with has a SpecFrame).  The FrameSet is accessed using a
+#     GaiaNDAccess instance.
 #
 #     The disposition of the menu items can be changed to match those of
 #     a new GaiaNDAccess instance, these will be greyed by setting to
@@ -48,7 +49,7 @@
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-#     Copyright (C) 2008 Science and Technology Facilities Council.
+#     Copyright (C) 2008, 2012 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -69,11 +70,14 @@
 
 #  Authors:
 #     PWD: Peter Draper (STARLINK - Durham University)
+#     MJC: Malcolm J. Currie (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     12-MAY-2006 (PWD):
 #        Original version.
+#     2012 April 20 (MJC):
+#        Created support to modify the standard of rest.
 #     {enter_further_changes_here}
 
 #-
@@ -130,6 +134,10 @@ itcl::class gaia::GaiaSpecCoords {
             $menu add command -label "$descr" \
                -command [code $this set_timescale "$timescale" 0]
          }
+         foreach {descr sor} $standards_of_rest_ {
+            $menu add command -label "$descr" \
+               -command [code $this set_sor "$sor" 0]
+         }
       }
    }
 
@@ -154,8 +162,14 @@ itcl::class gaia::GaiaSpecCoords {
                foreach {descr unit system} $simple_systems_ {
                   $menu entryconfigure "$descr" -state normal
                }
+               foreach {descr sor} $standards_of_rest_ {
+                  $menu entryconfigure "$descr" -state normal
+               }
             } else {
                foreach {descr unit system} $simple_systems_ {
+                  $menu entryconfigure "$descr" -state disabled
+               }
+                foreach {descr sor} $standards_of_rest_ {
                   $menu entryconfigure "$descr" -state disabled
                }
             }
@@ -190,8 +204,10 @@ itcl::class gaia::GaiaSpecCoords {
       if { $accessor != {} } {
          if { $system == "default" } {
 
-            #  If this isn't set then no specframe (or timeframe), so at
-            #  default already and nothing to do.
+            #  If there is no local SpecFrame (or TimeFrame), which is true
+            #  when default_system_($axis) is not set, then clearly we are
+            #  using the default system, i.e. the one of the underlying
+            #  data and there's nothing to do.
             if { [info exists default_system_($axis)] } {
 
                #  If time_ is set then we're using offset time. Undo that.
@@ -206,6 +222,31 @@ itcl::class gaia::GaiaSpecCoords {
                #  Unit-less system.
                $accessor astset "System($axis)=$system"
             }
+         }
+
+         if { ! $quiet && $change_cmd != {} } {
+            eval $change_cmd
+         }
+      }
+   }
+
+   #  Set the StdOfRest of the AST FrameSet. Also eval the change_cmd if
+   #  we have one and it is requested (quiet false).
+   public method set_sor {sor {quiet 0} } {
+      if { $accessor != {} } {
+         if { $sor == "default" } {
+
+            #  If there is no local standard of rest, which is true when
+            #  default_sor_ is not set, then clearly we are using the
+            #  default standard of rest, i.e. the one of the underlying
+            #  data and there is nothing to do.
+            if { [info exists default_sor_] } {
+
+               $accessor astset $default_sor_
+            }
+
+         } else {
+            $accessor astset "StdOfRest=$sor"
          }
 
          if { ! $quiet && $change_cmd != {} } {
@@ -275,7 +316,7 @@ itcl::class gaia::GaiaSpecCoords {
    }
 
    #  Return a list containing the current system and units. If this isn't
-   #  a specframe then no system and units are returned. If the system is the
+   #  a SpecFrame then no system and units are returned. If the system is the
    #  default one then the string "default" is returned.
    public method get_system {} {
       if { $accessor != {} } {
@@ -288,6 +329,25 @@ itcl::class gaia::GaiaSpecCoords {
                return "$system $units"
             }
             return [list "default" "default"]
+         }
+      }
+      return [list "" ""]
+   }
+
+   #  Return a list containing the current standard of rest.  If this
+   #  is not a SpecFrame then no standard of rest is returned.  If the
+   #  standard of rest is the default one then the string "default" is
+   #  returned.
+   public method get_sor {} {
+      if { $accessor != {} } {
+         if { [$accessor isaxisframetype $axis "specframe"] } {
+            set sor [$accessor astget "StdOfRest"]
+            set astatt "StdOfRest=$sor"
+            if { [info exists default_sor_] &&
+                 $astatt != $default_sor_ } {
+               return "$sor"
+            }
+            return [list "default"]
          }
       }
       return [list "" ""]
@@ -310,6 +370,18 @@ itcl::class gaia::GaiaSpecCoords {
       }
    }
 
+   #  Record the default sor for a particular axis of an accessor.
+   protected method record_default_sor_ {} {
+      if { $accessor != {} && ! [info exists default_sor_] } {
+         if { [$accessor isaxisframetype $axis "specframe"] } {
+            set sor [$accessor astget "StdOfRest"]
+            set default_sor_ "StdOfRest=$sor"
+         } else {
+            catch {unset default_sor_(axis)}
+         }
+      }
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -319,6 +391,8 @@ itcl::class gaia::GaiaSpecCoords {
       if { $last_accessor_ != $accessor } {
          catch {unset default_system_}
          record_default_system_
+         catch {unset default_sor_}
+         record_default_sor_
          set last_accessor_ $accessor
       }
       reconfigure_menus_
@@ -327,6 +401,7 @@ itcl::class gaia::GaiaSpecCoords {
    #  The spectral axis (AST index). Updates the default system if needed.
    public variable axis 3 {
       record_default_system_
+      record_default_sor_
    }
 
    #  The last value for accessor, stops changes when is same.
@@ -344,6 +419,10 @@ itcl::class gaia::GaiaSpecCoords {
    #  The default (that's initial) values for System and Unit for each axis.
    #  Note initially unset array indexed by $axis.
    protected variable default_system_
+
+   #  The default (that's initial) values for StdOfRest for each axis.
+   #  Note initially unset array indexed by $axis.
+   protected variable default_sor_
 
    #  Default attributes for the time axis.
    protected variable time_
@@ -393,4 +472,18 @@ itcl::class gaia::GaiaSpecCoords {
       "Geocentric Coordinate Time (TCG)" "TCG"
       "Local Time" "LT"
    }
+
+   common standards_of_rest_ {
+      "Topocentric" "TOPO"
+      "Default (StdOfRest)" "default"
+      "Geocentric" "GEO"
+      "Barycentric" "BARY"
+      "Heliocentric" "HELIO"
+      "Kinematic Local" "LSRK"
+      "Dynamical Local" "LSRD"
+      "Galactic" "GAL"
+      "Local_group" "LG"
+      "Source" "SRC"
+   }
+
 }

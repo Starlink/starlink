@@ -52,7 +52,7 @@
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-#     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+#     Copyright (C) 2008-2009, 2012 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -73,11 +73,14 @@
 
 #  Authors:
 #     PWD: Peter Draper (STARLINK - Durham University)
+#     MJC: Malcolm J. Currie (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     06-MAR-2006 (PWD):
 #        Original version.
+#     2012 April 20 (MJC):
+#        Add standard-of-rest menu.
 #     {enter_further_changes_here}
 
 #-
@@ -407,8 +410,8 @@ itcl::class gaia::GaiaSpectralPlot {
       #  If we have a GaiaSpecCoords instance use that to create a menu for
       #  selecting a coordinate system.
       if { $itk_option(-spec_coords) != {} } {
-         set SpectralCoords [add_menubutton "Coords"]
-         configure_menubutton "Coords" -underline 0
+         set SpectralCoords [add_menubutton "Coords/StdOfRest"]
+         configure_menubutton "Coords/StdOfRest" -underline 0
          $itk_option(-spec_coords) add_menu $SpectralCoords
       }
 
@@ -1523,6 +1526,10 @@ itcl::class gaia::GaiaSpectralPlot {
    #  A GaiaSpecCoords object for controlling the coordinate systems.
    #  Actual control is handled by the GaiaCube instance.
    itk_option define -spec_coords spec_coords Spec_Coords {}
+
+   #  A GaiaSpecCoords object for controlling the coordinate systems.
+   #  Actual control is handled by the GaiaCube instance.
+   itk_option define -spec_sor spec_sor Spec_Coords {}
 
    #  A GaiaSpecWriter object for controlling saving spectra to disk.
    #  This is done by re-visiting the cube, which we do not keep locally,
