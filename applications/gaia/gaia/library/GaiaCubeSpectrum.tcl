@@ -389,6 +389,7 @@ itcl::class gaia::GaiaCubeSpectrum {
                 -number [$itk_option(-gaia) cget -number] \
                 -gaiacubespectrum $this \
                 -spec_coords $itk_option(-spec_coords) \
+                -spec_sor $itk_option(-spec_sor) \
                 -spec_writer [code $spec_writer_] \
                 -ref_line_changed_cmd [code $cube ref_line_moved_] \
                 -ref_range_changed_cmd [code $cube ref_range_moved_] \
@@ -1417,6 +1418,9 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  GaiaSpecCoords instance used by related GaiaCube.
    itk_option define -spec_coords spec_coords Spec_Coords {}
+
+   #  GaiaSpecStdOfRest instance used by related GaiaCube.
+   itk_option define -spec_sor spec_sor Spec_Coords {}
 
    #  Fix the spectral plot data range. Otherwise use min/max.
    itk_option define -fix_data_range fix_data_range Fix_Data_Range 0

@@ -59,11 +59,14 @@
 
 #  Authors:
 #     PWD: Peter Draper (STARLINK - Durham University)
+#     MJC: Malcolm J. Currie (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     07-FEB-2007 (PWD):
 #        Original version.
+#     2012 April 20 (MJC):
+#        Added support for standard of rest.
 #     {enter_further_changes_here}
 
 #-
@@ -494,6 +497,10 @@ itcl::class gaia::GaiaCubeFilter {
    #  The GaiaSpecCoords instance used to define the current coordinate
    #  system.
    itk_option define -spec_coords spec_coords Spec_Coords {}
+
+   #  The GaiaSpecStdOfRest instance used to define the current standard
+   #  of rest.
+   itk_option define -spec_sor spec_sor Spec_Coords {}
 
    #  Width of labels.
    itk_option define -labelwidth labelwidth LabelWidth 20
