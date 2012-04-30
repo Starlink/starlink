@@ -651,7 +651,7 @@ sub scuba2_header {
     my $mode = $S{OBSTYPE};
     if ($mode =~ /science/i) {
       $mode = uc($fitsitem->{SAM_MODE});
-      $mode = uc($fitsitem->{SCAN_PAT}) if ($mode eq "SCAN");
+      $mode = uc($fitsitem->{SCAN_PAT}) if ($mode eq "SCAN" && defined $fitsitem->{SCAN_PAT});
       $mode =~ s/CURVY_PONG/CRVYPONG/i;
     } else {
       $mode =~ s/FIELD/FLD/i;
