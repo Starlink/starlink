@@ -23,6 +23,10 @@ within the CmpFrame have been permuted.
 - A bug has been fixed in the SKyFrame class that could cause the two
 values of the SkyRef and/or SkyRefP attributes to be reversed.
 
+- Bugs have been fixed in the CmpRegion class that should allow the border
+around a compound Region to be plotted more quickly, and more accurately.
+Previously, component Regions nested deeply inside a CmpRegion may have
+been completely or partially ignored.
 
 Main Changes in V7.0.2
 ----------------------
