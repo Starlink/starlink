@@ -102,9 +102,15 @@ f     The CmpRegion class does not define any new routines beyond those
 *        - Override astGetObjSize.
 *     27-APR-2012 (DSB):
 *        - Cache the bounded property.
-*        - Speed up plotting of CmpRegions by using the cached negation 
-*        of a Region instead of setting the Regions's Negated flag (which 
+*        - Speed up plotting of CmpRegions by using the cached negation
+*        of a Region instead of setting the Regions's Negated flag (which
 *        causes the Region's cache to be cleared).
+*     30-APR-2012 (DSB):
+*        Use geodesic distance to measure distances around the two component
+*        Regions when tracing the border. Previously, a distance normalised
+*        from zero to one was used for both component Regions, but this gives
+*        greater priority to Regions higher in the CmpRegion nesting order,
+*        resulting in a high chance that lower Regions will not be seen.
 *class--
 */
 
@@ -1192,7 +1198,6 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
 
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
-   AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
@@ -1227,7 +1232,6 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
    region = (AstRegionVtab *) vtab;
-   frame = (AstFrameVtab *) vtab;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
@@ -1621,12 +1625,6 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 
 /* Loop round every axis. */
          for( i = 0; i < nax; i++ ) {
-            double ub1, lb1;
-            double ub2, lb2;
-            lb1 = clbnd1[ i ];
-            ub1 = cubnd1[ i ];
-            lb2 = clbnd2[ i ];
-            ub2 = cubnd2[ i ];
 
 /* If the first component Region has been negated, the lower and upper
    bounds from the first component are the bounds of an *excluded* axis
@@ -2520,6 +2518,13 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 *     Non-zero if the astRegTrace method is implemented by the class
 *     of Region supplied, and zero if not.
 
+*  Notes:
+*    - The current algorithm results in the boundary of the CmpRegion
+*    being dis-contiguous - supplied distance values from zero up to some
+*    mid-value correspond to positions on the first component Region, and
+*    higher distance (up to 1.0) correspond to points on the second
+*    component Region.
+
 *-
 */
 
@@ -2608,7 +2613,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
 
 /* Get the constants needed to convert the supplied distances (normalised
    so that the border of the entire CmpRegion has a length of 1.0), into
-   distances around the border of each component Region. */
+   geodesic distances around the border of each component Region. */
       dtot = this->d0[ 0 ] + this->d0[ 1 ];
       dbreak = this->d0[ 0 ]/dtot;
 
@@ -2645,8 +2650,8 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
                }
 
 /* Store this as the next distance to move around the second component
-   Region. */
-               r2d[ r2n++ ] = x;
+   Region, normalising it to the range 0 to 1 as required by astRegTrace. */
+               r2d[ r2n++ ] = x/this->dtot[ 1 ];
 
 /* Now we do the same if the current distance corresponds to a position
    in the first component Region. */
@@ -2663,7 +2668,7 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
                   x += *off;
                }
 
-               r1d[ r1n++ ] = x;
+               r1d[ r1n++ ] = x/this->dtot[ 0 ];
 
             }
 
@@ -2703,7 +2708,15 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
             negation = astAnnul( negation );
          }
 
-/* If the two component Regions are ANDed together, we want to remove the
+/* The arrays of positions returned by the above calls to astRegTrace may
+   include points that should not be there (e.g. points on the boundary
+   of one component region that should have been blanked due to being inside
+   the second component region - if the regions are ORed together). This
+   is a consequence of the relatively low value of the "NP" local constant
+   in function SetBreakInfo. So we now refine the positions to exclude
+   any such unwanted positions.
+
+   If the two component Regions are ANDed together, we want to remove the
    positions from the boundary of the required component Region that fall
    outside the other region. We can do this by simply using the other Region
    as a Mapping. If the two component Regions are ORed together, we want to
@@ -2775,7 +2788,6 @@ static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
          if( r2psetb ) r2psetb = astAnnul( r2psetb );
 
       }
-
 
 /* If required, transform the base frame positions into the current
    Frame of the CmpRegion, storing them in the supplied array. Then
@@ -2930,6 +2942,7 @@ static void ResetCache( AstRegion *this_region, int *status ){
          this->offs[ i ] = astFree(  this->offs[ i ] );
          this->nbreak[ i ] = 0;
          this->d0[ i ] = AST__BAD;
+         this->dtot[ i ] = AST__BAD;
       }
 
       this->bounded = -INT_MAX;
@@ -2976,20 +2989,21 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
 *     stores information about the breaks between these sections.
 *
 *     The complete boundary of a component Region is parameterised by a
-*     distance that goes from 0.0 to 1.0. This function find the ranges
-*     of this parameter that correspond to the sections of the boundary that
-*     are also on the CmpRegion boundary, and thus finds the total length
-*     that the component boundary contributes to the CmpRegion boundary.
-*     This length is stored in "this->d0" (a two element array, one for
-*     each component Region).
+*     geodesic distance that goes from 0.0 to the value found by this
+*     function and stored in this->dtot (the total geodesic distance
+*     around the border). This function find the ranges of this parameter
+*     that correspond to the sections of the boundary that are also on the
+*     CmpRegion boundary, and thus finds the total length that the component
+*     boundary contributes to the CmpRegion boundary. This length is stored
+*     in "this->d0" (a two element array, one for each component Region).
 *
 *     It also find two arrays "this->rvals" and "this->offs" that allow a
 *     distance value in the range 0.0 to "this->d0" (i.e. a distance
 *     measured by skipping over the parts of the component boundary that
 *     are not on the CmpRegion boundary), to be converted into the
-*     corresponding distance value in the range 0.0 to 1.0 (i.e. a distance
-*     measured round the complete component boundary, including the parts
-*     not on the CmpRegion boundary).
+*     corresponding distance value in the range 0.0 to "this->dtot" (i.e. a
+*     distance measured round the complete component boundary, including the
+*     parts not on the CmpRegion boundary).
 
 *  Parameters:
 *     this
@@ -3006,23 +3020,30 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
 #define NP 101
 
 /* Local Variables: */
+   AstFrame *frm;
    AstPointSet *pset1;
    AstPointSet *pset2;
    AstRegion *other;
-   AstRegion *uother;
    AstRegion *reg;
-   double **ptr1;
+   AstRegion *uother;
    double **ptr2;
+   double **ptr1;
    double *d;
    double *offs;
+   double *p0;
+   double *p1;
    double *p;
    double *q;
    double *rvals;
    double delta;
+   double dist;
+   double pnt1[ 2 ];
+   double pnt2[ 2 ];
+   double rbad;
    double rval;
+   double totdist;
    int i;
    int j;
-   double rbad;
    int nn;
    int prevgood;
 
@@ -3052,8 +3073,9 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
 /* Check pointers can be used safely. */
          if( astOK ) {
 
-/* Get the distance increment between points (the entire boundary has
-   unit length). */
+/* Get the distance increment between points (at this point the distances
+   are normalised so that the entire boundary has unit length, as
+   required by astRegTrace). */
             delta = 1.0/( NP - 1 );
 
 /* Set up the array of evenly spaced distances around the boundary of the
@@ -3120,13 +3142,36 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
                   }
                }
 
+/* Find the total geodesic distance around the border. This is only an
+   approximation but it is only used to give a relative weight to this
+   component within the CmpFrame, and so does not need to be very accurate. */
+               frm = astGetFrame( reg->frameset, AST__CURRENT );
+               p0 = ptr1[ 0 ];
+               p1 = ptr1[ 1 ];
+               totdist = 0;
+               pnt1[ 0 ] = *(p0++);
+               pnt1[ 1 ] = *(p1++);
+               for( i = 1; i < NP; i++ ) {
+                  pnt2[ 0 ] = *(p0++);
+                  pnt2[ 1 ] = *(p1++);
+                  dist = astDistance( frm, pnt1, pnt2 );
+                  if( dist != AST__BAD ) totdist += dist;
+                  pnt1[ 0 ] = pnt2[ 0 ];
+                  pnt1[ 1 ] = pnt2[ 1 ];
+               }
+
+/* Change delta so that it represents a geodesic distance, rather than a
+   normalised distance in the range zero to one. Working in geodesic distance
+   (e.g. Radians on a SkyFrame) prevents Regions higher up in a complex nested
+   CmpRegion being given higher priority than a lower Region. */
+               delta *= totdist;
+
 /* Now create two arrays - "rvals" holds the distance travelled around
    the used parts of the border at which breaks occur, "offs" holds the jump
    in distance around the complete border at each break. The distance
    around the complete border is normalised to the range [0.0,1.0].
    Therefore the total distance around the used parts of the border will in
    general be less than 1.0 */
-
                if( d[ 0 ] == AST__BAD ) {
                   nn = 1;
                   j = 0;
@@ -3183,6 +3228,7 @@ static void SetBreakInfo( AstCmpRegion *this, int comp, int *status ){
                this->offs[ comp ] = offs;
                this->nbreak[ comp ] = nn;
                this->d0[ comp ] = rval;
+               this->dtot[ comp ] = totdist;
             }
 
 /* Free resources. */
@@ -3886,19 +3932,16 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    in = (AstCmpRegion *) objin;
    out = (AstCmpRegion *) objout;
 
-/* For safety, start by clearing any references to the input component
-   Regions from the output CmpRegion. */
+/* For safety, start by clearing any memory references in the output
+   Region that were copied from the input Region. */
    out->region1 = NULL;
    out->region2 = NULL;
    out->xor1 = NULL;
    out->xor2 = NULL;
-   out->bounded = -INT_MAX;
 
    for( i = 0; i < 2; i++ ) {
       out->rvals[ i ] = NULL;
       out->offs[ i ] = NULL;
-      out->nbreak[ i ] = 0;
-      out->d0[ i ] = AST__BAD;
    }
 
 /* Make copies of these Regions and store pointers to them in the output
@@ -3907,6 +3950,12 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->region2 = astCopy( in->region2 );
    if( in->xor1 ) out->xor1 = astCopy( in->xor1 );
    if( in->xor2 ) out->xor2 = astCopy( in->xor2 );
+
+/* Copy cached arrays. */
+   for( i = 0; i < 2; i++ ) {
+      out->rvals[ i ] = astStore( NULL, in->rvals[ i ], in->nbreak[ i ]*sizeof( **in->rvals ) );
+      out->offs[ i ] = astStore( NULL, in->offs[ i ], in->nbreak[ i ]*sizeof( **in->offs ) );
+   }
 }
 
 /* Destructor. */
@@ -4581,6 +4630,7 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
          new->offs[ i ] = NULL;
          new->nbreak[ i ] = 0;
          new->d0[ i ] = AST__BAD;
+         new->dtot[ i ] = AST__BAD;
       }
       new->bounded = -INT_MAX;
 
@@ -4774,6 +4824,7 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
          new->offs[ i ] = NULL;
          new->nbreak[ i ] = 0;
          new->d0[ i ] = AST__BAD;
+         new->dtot[ i ] = AST__BAD;
       }
       new->bounded = -INT_MAX;
 
