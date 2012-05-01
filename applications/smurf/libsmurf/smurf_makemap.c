@@ -513,7 +513,9 @@
 *     NUMITER = INTEGER
 *       A positive value if a set number of iterations are desired. A
 *       negative number indicates the maximum number of iterations allowed if
-*       CHITOL is being used for the stopping criterion. [-5]
+*       CHITOL is being used for the stopping criterion. The algorithm
+*       can be terminated prematurely in a controlled manner by pressing Control-C
+*       - see "Notes" below. [-5]
 *     SAMPCUBE = LOGICAL
 *       If true, create a .MORE.SMURF.SAMPCUBES extension providing data
 *       cubes of data samples that go into each map pixel. [0]
@@ -1003,6 +1005,11 @@
 *     SMURF: QLMAKEMAP
 
 *  Notes:
+*     - The iterative algorithm can be terminated prematurely by pressing
+*     control-C at any time. If this is done, the next iteration of the
+*     current chunk will be completed and a map created. The application
+*     will then terminate. If control-C is pressed a second time, thw
+*     application will abort immediately.
 *     - A FITS extension is added to the output NDF containing any keywords
 *     that are common to all input NDFs. To be included in the output
 *     FITS extension, a FITS keyword must be present in the NDF extension
@@ -1241,12 +1248,15 @@
 *        Run smf_iteratemap twice if ast.zero_snr_fwhm is set. The second
 *        run uses a static zero mask produced by smoothing the final mask
 *        in use at the end of the first run.
+*     2012-05-01 (DSB):
+*        Allow premature termination of iterative algorithm by pressing
+*        control-C.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2010 University of British Columbia.
-*     Copyright (C) 2007-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:

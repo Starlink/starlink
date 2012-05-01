@@ -1333,6 +1333,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
                       dim_t *maxfilelen, smfGroup **group,
                       Grp **basegrp, dim_t *pad, int *status );
 
+void smf_handler( int sig );
+
 void smf_history_add( smfData* data, const char * appl,
                       int *status);
 
