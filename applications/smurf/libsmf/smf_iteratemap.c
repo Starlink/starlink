@@ -413,6 +413,9 @@
 /* Need sigaction to be prototyped */
 #define _POSIX_C_SOURCE 200809L
 
+/* Some compilers need this to get SA_RESTART */
+#define _BSD_SOURCE
+
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
