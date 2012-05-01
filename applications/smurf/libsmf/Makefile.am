@@ -243,6 +243,7 @@ smf_getspectralwcs.c \
 smf_groupscans.c \
 smf_grp_new.c \
 smf_grp_related.c \
+smf_handler.c \
 smf_history_add.c \
 smf_history_check.c \
 smf_history_read.c \

@@ -377,6 +377,8 @@
 *        - Refactor j-loop that puts AST back into the residuals. Ticket #932.
 *        - Allow fakemap to have arbitrary pixel bounds. Ticket #930.
 *        - Remove memiter=0 case. Ticket #885.
+*     2012-05-01 (DSB):
+*        Add control-C handler to allow controlled premature exit.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -408,7 +410,12 @@
 *-
 */
 
+/* Need sigaction to be prototyped */
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
 
 /* Starlink includes */
 #include "ast.h"
@@ -447,6 +454,9 @@ void _smf_iteratemap_showmem( int *status ) {
 #endif
 
 #define FUNC_NAME "smf_iteratemap"
+
+/* A flag used to indicate that an interupt has occurred. */
+volatile sig_atomic_t smf_interupt = 0;
 
 /* Main routine */
 void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
@@ -583,6 +593,16 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      function are automatically annulled by the call to astEnd at the end of
      this function. */
   astBegin;
+
+  /* If this is an interactive session, establish an interupt handler that
+     sets the smf_interupt flag non-zero when an interupt occurs. */
+  if( isatty( STDIN_FILENO ) ) {
+    struct sigaction action;
+    action.sa_handler = smf_handler;
+    sigemptyset( &action.sa_mask );
+    action.sa_flags = SA_RESTART;
+    sigaction( SIGINT, &action, NULL );
+  }
 
   /* This function modifies the contents of the config keymap. So take a
      copy of the supplied keymap to avoid modifying it. */
@@ -1146,7 +1166,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      These are called "contchunk".
    *************************************************************************** */
 
-  for( contchunk=0; contchunk<ncontchunks; contchunk++ ) {
+  for( contchunk=0; contchunk<ncontchunks  && !smf_interupt; contchunk++ ) {
 
     size_t ntgood = 0;       /* Number of good time slices in this chunk */
     size_t nsamples = 0;     /* Number of good samples in this chunk */
@@ -2030,6 +2050,21 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             /* Check for convergence */
             if( untilconverge && converged ) {
               quit = 0;
+            }
+
+            /* Check to see if a forced exit is required as a result of an
+               interupt. If so, indicate that one last iteration should be
+               performed before terminating. */
+            if( smf_interupt ) {
+               msgBlank( status );
+               msgBlank( status );
+               msgOut( "", ">>>> Interupt detected!!! the current map will be "
+                       "finalised before terminating.", status );
+               msgOut( "", "Another interupt will abort the application "
+                       "immediately without creating an output map", status );
+               msgBlank( status );
+               msgBlank( status );
+               quit = 0;
             }
           }
 
