@@ -141,6 +141,7 @@
 
       NUM_UWTOB( NUM_ARGUW )  = NUM1_UWTOI( NUM_ARGUW )
 
+      NUM_KTOB( NUM_ARGK )    = NUM1_KTOB( NUM_ARGK )
 
 *  Functions resulting in DOUBLE PRECISION.
 *  =======================================
@@ -158,6 +159,8 @@
       NUM_WTOD( NUM_ARGW )    = DBLE( NUM_ARGW )
 
       NUM_UWTOD( NUM_ARGUW )  = DBLE( NUM1_UWTOI( NUM_ARGUW ) )
+
+      NUM_KTOD( NUM_ARGK )    = DBLE( NUM_ARGK )
 
 
 *  Functions resulting in INTEGER.
@@ -179,6 +182,25 @@
 
       NUM_KTOI( NUM_ARGK )    = NUM1_KTOI( NUM_ARGK )
 
+*  Functions resulting in INTEGER*8.
+*  ================================
+
+      NUM_BTOK( NUM_ARGB )    = NUM_ARGB
+
+      NUM_UBTOK( NUM_ARGUB )  = NUM1_UBTOI( NUM_ARGUB )
+
+      NUM_DTOK( NUM_ARGD )    = xNINT( NUM_ARGD )
+
+      NUM_ITOK( NUM_ARGI )    = NUM_ARGI
+
+      NUM_RTOK( NUM_ARGR )    = xNINT( NUM_ARGR )
+
+      NUM_WTOK( NUM_ARGW )    = NUM_ARGW
+
+      NUM_UWTOK( NUM_ARGUW )  = NUM1_UWTOI( NUM_ARGUW )
+
+      NUM_KTOK( NUM_ARGK )    = NUM_ARGK
+
 
 *  Functions resulting in REAL.
 *  ===========================
@@ -197,6 +219,7 @@
 
       NUM_UWTOR( NUM_ARGUW )  = REAL( NUM1_UWTOI( NUM_ARGUW ) )
 
+      NUM_KTOR( NUM_ARGK )    = REAL ( NUM_ARGK )
 
 *  Functions resulting in WORD.
 *  ===========================
@@ -214,6 +237,8 @@
       NUM_WTOW( NUM_ARGW )    = NUM_ARGW
 
       NUM_UWTOW( NUM_ARGUW )  = NUM1_UWTOI( NUM_ARGUW )
+
+      NUM_KTOW( NUM_ARGK )    = NUM1_KTOW( NUM_ARGK )
 
 
 *  Functions resulting in UNSIGNED BYTE.
@@ -238,6 +263,9 @@
       NUM_UWTOUB( NUM_ARGUW ) =
      :                         NUM_WTOUB( NUM_UWTOW( NUM_ARGUW ) )
 
+      NUM_KTOUB( NUM_ARGUW )  =
+     :                         NUM_WTOUB( NUM_KTOW( NUM_ARGK ) )
+
 
 *  Functions resulting in UNSIGNED WORD.
 *  ====================================
@@ -259,5 +287,7 @@
      :                         NUM_ITOUW( NUM_WTOI( NUM_ARGW ) )
 
       NUM_UWTOUW( NUM_ARGUW ) = NUM_ARGUW
+
+      NUM_KTOUW( NUM_ARGK )   = NUM1_KTOUW( NUM_ARGK )
 
 *.

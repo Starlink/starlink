@@ -1,0 +1,86 @@
+*+
+*  Name:
+*     NUM_DEC_K
+
+*  Purpose:
+*     Declarations for NUM_ INTEGER*8 functions
+
+*  Copyright:
+*     Copyright (C) 2012 Science and Technology Facilities Council.
+*     Copyright (C) 1988 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (DUVAD::RFWS)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
+*  History:
+*     16-AUG-1988 (RFWS):
+*         Original version
+*     26-APR-2012 (TIMJ):
+*         INTEGER*8 version converted from INTEGER file.
+
+*-
+
+
+*   INTEGER*8 arithmetic functions.
+      INTEGER*8 NUM_ADDK
+      INTEGER*8 NUM_SUBK
+      INTEGER*8 NUM_MULK
+      INTEGER*8 NUM_DIVK
+      INTEGER*8 NUM_IDVK
+      INTEGER*8 NUM_PWRK
+      INTEGER*8 NUM_NEGK
+
+
+*   INTEGER*8 functions with a single INTEGER*8 argument.
+      INTEGER*8 NUM_SQRTK
+      INTEGER*8 NUM_LOGK
+      INTEGER*8 NUM_LG10K
+      INTEGER*8 NUM_EXPK
+      INTEGER*8 NUM_ABSK
+      INTEGER*8 NUM_NINTK
+      INTEGER*8 NUM_INTK
+
+
+*   INTEGER*8 functions with two INTEGER*8 arguments.
+      INTEGER*8 NUM_MINK
+      INTEGER*8 NUM_MAXK
+      INTEGER*8 NUM_DIMK
+      INTEGER*8 NUM_MODK
+      INTEGER*8 NUM_SIGNK
+
+
+*   Logical functions comparing two INTEGER*8 numbers.
+      LOGICAL NUM_EQK
+      LOGICAL NUM_NEK
+      LOGICAL NUM_GTK
+      LOGICAL NUM_GEK
+      LOGICAL NUM_LTK
+      LOGICAL NUM_LEK
+
+
+
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*              Declarations for NUM_ INTEGER*8 functions                 *
+*                                                                      *
+*                               END                                    *
+************************************************************************

@@ -40,16 +40,20 @@
 *  important conversions.
       BYTE NUM1_RTOB
       BYTE NUM1_WTOUB
+      BYTE NUM1_KTOUB
+      BYTE NUM1_KTOB
       INTEGER * 2 NUM1_ITOUW
       INTEGER * 2 NUM1_ITOW
       INTEGER * 2 NUM1_RTOW
       INTEGER * 2 NUM1_UBTOUW
       INTEGER * 2 NUM1_UBTOW
+      INTEGER * 2 NUM1_KTOUW
+      INTEGER * 2 NUM1_KTOW
       INTEGER NUM1_BTOI
       INTEGER NUM1_UBTOI
       INTEGER NUM1_UWTOI
       INTEGER NUM1_WTOI
-      INTEGER * 8 NUM1_KTOI
+      INTEGER NUM1_KTOI
       REAL NUM1_ITOR
       REAL NUM1_WTOR
  
@@ -71,6 +75,7 @@
       BYTE NUM_RTOB
       BYTE NUM_UWTOB
       BYTE NUM_WTOB
+      BYTE NUM_KTOB
  
  
 *   UNSIGNED BYTE dummy arguments.
@@ -87,6 +92,7 @@
       BYTE NUM_RTOUB
       BYTE NUM_UWTOUB
       BYTE NUM_WTOUB
+      BYTE NUM_KTOUB
  
  
 *   WORD dummy arguments.
@@ -103,6 +109,7 @@
       INTEGER*2 NUM_RTOW
       INTEGER*2 NUM_UWTOW
       INTEGER*2 NUM_WTOW
+      INTEGER*2 NUM_KTOW
  
  
 *   UNSIGNED WORD dummy arguments.
@@ -119,6 +126,7 @@
       INTEGER*2 NUM_RTOUW
       INTEGER*2 NUM_UWTOUW
       INTEGER*2 NUM_WTOUW
+      INTEGER*2 NUM_KTOUW
  
  
 *   INTEGER dummy arguments.
@@ -136,6 +144,16 @@
       INTEGER NUM_UWTOI
       INTEGER NUM_WTOI
       INTEGER NUM_KTOI
+
+*   Functions for data type conversion to INTEGER*8.
+      INTEGER*8 NUM_BTOK
+      INTEGER*8 NUM_UBTOK
+      INTEGER*8 NUM_DTOK
+      INTEGER*8 NUM_ITOK
+      INTEGER*8 NUM_RTOK
+      INTEGER*8 NUM_UWTOK
+      INTEGER*8 NUM_WTOK
+      INTEGER*8 NUM_KTOK
  
 *   REAL dummy arguments.
       REAL NUM_ARGR
@@ -151,6 +169,7 @@
       REAL NUM_RTOR
       REAL NUM_UWTOR
       REAL NUM_WTOR
+      REAL NUM_KTOR
  
  
 *   DOUBLE PRECISION dummy arguments.
@@ -167,6 +186,7 @@
       DOUBLE PRECISION NUM_RTOD
       DOUBLE PRECISION NUM_UWTOD
       DOUBLE PRECISION NUM_WTOD
+      DOUBLE PRECISION NUM_KTOD
  
 
  

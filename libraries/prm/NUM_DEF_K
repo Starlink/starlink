@@ -1,0 +1,163 @@
+*+
+*  Name:
+*     NUM_DEF_K
+
+*  Purpose:
+*     Defintions of NUM_ INTEGER*8 functions
+
+*  Copyright:
+*     Copyright (C) 1988 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (DUVAD::RFWS)
+
+*  History:
+*     16-AUG-1988 (RFWS):
+*         Original version
+
+*-
+
+**********************************************
+*   Arithmetic between two INTEGER numbers   *
+**********************************************
+
+ sdfsdf
+*   Add.
+      NUM_ADDK( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          NUM_ARGI1 + NUM_ARGI2
+
+*   Subtract.
+      NUM_SUBI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          NUM_ARGI1 - NUM_ARGI2
+
+*   Floating multiply.
+      NUM_MULI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          NUM_ARGI1 * NUM_ARGI2
+
+*   Floating divide.
+      NUM_DIVI( NUM_ARGI1, NUM_ARGI2 ) = NUM_RTOI(
+     :                          NUM_ITOR( NUM_ARGI1 ) /
+     :                          NUM_ITOR( NUM_ARGI2 ) )
+
+*   Integer divide.
+      NUM_IDVI( NUM_ARGI1, NUM_ARGI2 ) = NUM_ARGI1 / NUM_ARGI2
+
+*   Raise to power.
+      NUM_PWRI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          NUM_ARGI1 ** NUM_ARGI2
+
+
+
+********************************************************
+*   INTEGER functions with a single INTEGER argument   *
+********************************************************
+
+
+*   Negate argument.
+      NUM_NEGI( NUM_ARGI ) = - NUM_ARGI
+
+*   Square root.
+      NUM_SQRTI( NUM_ARGI ) = NUM_RTOI( SQRT( NUM_ITOR( NUM_ARGI ) ) )
+
+*   Natural logarithm (base e).
+      NUM_LOGI( NUM_ARGI ) = NUM_RTOI( LOG( NUM_ITOR( NUM_ARGI ) ) )
+
+*   Common logarithm (base 10).
+      NUM_LG10I( NUM_ARGI ) = NUM_RTOI( LOG10( NUM_ITOR( NUM_ARGI ) ) )
+
+*   Exponential function.
+      NUM_EXPI( NUM_ARGI ) = NUM_RTOI( EXP( NUM_ITOR( NUM_ARGI ) ) )
+
+*   Absolute (positive) value.
+      NUM_ABSI( NUM_ARGI ) = ABS( NUM_ARGI )
+
+*   Nearest integer.
+      NUM_NINTI( NUM_ARGI ) = NUM_ARGI
+
+*   Truncation to integer.
+      NUM_INTI( NUM_ARGI ) = NUM_ARGI
+
+
+
+***************************************************
+*  INTEGER functions with two INTEGER arguments   *
+***************************************************
+
+
+*   Minimum of two numbers.
+      NUM_MINI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          MIN( NUM_ARGI1, NUM_ARGI2 )
+
+*   Maximum of two numbers.
+      NUM_MAXI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          MAX( NUM_ARGI1, NUM_ARGI2 )
+
+*   Fortran DIM (positive difference) function.
+      NUM_DIMI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          DIM( NUM_ARGI1, NUM_ARGI2 )
+
+*   Fortran MOD (remainder) function.
+      NUM_MODI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          MOD( NUM_ARGI1, NUM_ARGI2 )
+
+*   Fortran SIGN (transfer of sign) function.
+      NUM_SIGNI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          SIGN( NUM_ARGI1, NUM_ARGI2 )
+
+
+
+*******************************************************
+*   Logical functions comparing two INTEGER numbers   *
+*******************************************************
+
+
+*   Equality.
+      NUM_EQI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          NUM_ARGI1 .EQ. NUM_ARGI2
+
+*   Inequality.
+      NUM_NEI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          NUM_ARGI1 .NE. NUM_ARGI2
+
+*   Greater than.
+      NUM_GTI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          NUM_ARGI1 .GT. NUM_ARGI2
+
+*   Greater than or equal.
+      NUM_GEI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          NUM_ARGI1 .GE. NUM_ARGI2
+
+*   Less than.
+      NUM_LTI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          NUM_ARGI1 .LT. NUM_ARGI2
+
+*   Less than or equal.
+      NUM_LEI( NUM_ARGI1, NUM_ARGI2 ) =
+     :                          NUM_ARGI1 .LE. NUM_ARGI2
+
+
+
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*              Definitions of NUM_ INTEGER functions                   *
+*                                                                      *
+*                               END                                    *
+************************************************************************
