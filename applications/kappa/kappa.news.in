@@ -74,6 +74,15 @@
       scatter plot is now displayed, and written to an output
       parameter.
 
+   o  SETAXIS
+
+      - "Linear_WCS" is a new MODE option.  It is a variant of "WCS"
+      where the axis centres are set to the least-squares linear fit
+      to the values of the selected axis.  This is useful for
+      exporting co-ordinates to software with limited FITS WCS
+      capabilities, such as no -TAB support, and when the
+      non-linearity is small.
+                        
    o  SHOWQUAL
 
       -  Add new QNAMES output parameter to list the attribute name
@@ -218,10 +227,10 @@
 
 2 Global_changes
 
-   o  Control of the verbosity of informational messages is now
+   o Control of the verbosity of informational messages is now
    possible through the environment variable MSG_FILTER.  ILEVEL
-   and QUIET parameters that previously controlled messaging are no
-   longer used.  See Modified_applications for details.
+   and QUIET parameters that previously controlled messaging are
+   no longer used.  See Modified_applications for details.
 
    o  Added support and documentation for the new FRACTION Frame
    supplied with every NDF. Documented how NDF sections can now be
