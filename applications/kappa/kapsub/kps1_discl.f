@@ -263,6 +263,8 @@
       CALL PGQVP( 3, X1, X2, Y1, Y2 )
       NXP = NINT( X2 - X1 )
       NYP = NINT( Y2 - Y1 )
+      IF( NXP .LE. 0 ) NXP = 1
+      IF( NYP .LE. 0 ) NYP = 1
 
 *  Calculate the compression factors. Compression is possible when the factor
 *  is two or greater.
