@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.39}
 \newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2012 February 17}
+\newcommand{\stardocdate}      {2012 May 1}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -44882,6 +44882,15 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
                             free-format text file.
 
             \sstitem
+            {\tt "Linear\_WCS"} --- The axis centres are set to the least-squares
+                            linear fit to the values of the selected axis
+                            in the current co-ordinate Frame of the NDF.
+                            This is useful for exporting to packages with
+                            limited FITS WCS compatibility and when the
+                            non-linearity is small.  {\tt "Linear\_WCS"} is only
+                            available when COMP={\tt "Data"} or {\tt "Centre"}.
+
+            \sstitem
             {\tt "Pixel"} --- The axis centres are set to pixel
                             co-ordinates.  This is only available when
                             COMP={\tt "Data"} or {\tt "Centre"}.
@@ -58251,6 +58260,16 @@ The following applications have been modified:
         default axes are only drawn if the picture is cleared.
         \item The Pearson correlation coefficient of the data in the
         scatter plot is now displayed, and written to an output parameter.
+      \end{itemize}
+
+   \item [\htmlref{SETAXIS}{SETAXIS}]\mbox{}
+      \begin{itemize}
+        \item {\tt "Linear\_WCS"} is a new MODE option.  It is a variant
+        of {\tt "WCS"} where the axis centres are set to the least-squares
+        linear fit to the values of the selected axis.  This is useful for
+        exporting co-ordinates to software with limited FITS WCS
+        capabilities, such as no -TAB support, and when the non-linearity
+        is small.
       \end{itemize}
 
    \item [\htmlref{SHOWQUAL}{SHOWQUAL}]\mbox{}

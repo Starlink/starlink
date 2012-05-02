@@ -112,6 +112,13 @@
 *                          the array values.  See parameter EXPRS.
 *           "File"       - The array values are read in from a
 *                          free-format text file.
+*           "Linear_WCS" - The axis centres are set to the least-squares
+*                          linear fit to the values of the selected axis
+*                          in the current co-ordinate Frame of the NDF.
+*                          This is useful for exporting to packages with
+*                          limited FITS WCS compatibility and when the
+*                          non-linearity is small.  "Linear_WCS" is only
+*                          available when COMP="Data" or "Centre".
 *           "Pixel"      - The axis centres are set to pixel
 *                          co-ordinates.  This is only available when
 *                          COMP="Data" or "Centre".
@@ -260,8 +267,10 @@
 *     21-JUL-2009 (DSB):
 *        Scale SKY axes from radians to degrees in WCS mode.
 *     5-SEP-2011 (DSB):
-*        Change WCS mode so that it does not assume that corresponding 
-*        pixel and WCS axes have the same index. 
+*        Change WCS mode so that it does not assume that corresponding
+*        pixel and WCS axes have the same index.
+*     2012 May 1 (MJC):
+*        Add Linear_WCS mode.
 *     {enter_further_changes_here}
 
 *-
@@ -304,11 +313,13 @@
       CHARACTER MCOMP*8          ! Component name for mapping arrays
       CHARACTER MODE*10          ! Mode of the modification
       CHARACTER SUGDEF*4         ! Suggested default
-      CHARACTER TYPE*( NDF__SZTYP )  ! Numeric type for processing
+      CHARACTER TYPE*( NDF__SZTYP ) ! Numeric type for processing
       CHARACTER UNIT*50          ! Units for new axis
       DOUBLE PRECISION CONST( NDF__MXDIM )! Constant axis values
       DOUBLE PRECISION DVALUE    ! Replacement value for d.p. data
+      DOUBLE PRECISION DWORK( 2 )! Work array for linear fitting
       INTEGER ACTVAL             ! State of parameter NEWVAL
+      INTEGER ADIMS( NDF__MXDIM )! Axis dimensions
       INTEGER AXPNTR( 1 )        ! Pointer to mapped array component
       INTEGER EL                 ! Number of mapped values
       INTEGER FD                 ! File descriptor
@@ -320,7 +331,10 @@
       INTEGER IERR               ! First conversion error (dummy=0)
       INTEGER IMAP               ! Compiled mapping identifier
       INTEGER INPRM( NDF__MXDIM )! Input axis permutation array
+      INTEGER IPAS               ! Pointer to workspace
+      INTEGER IPBS               ! Pointer to coefficients
       INTEGER IWCS               ! AST pointer to WCS FrameSet from NDF
+      INTEGER IWORK( 2 )         ! Work array for linear fitting
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of the NDF
       INTEGER LCOMP              ! Length of component name
       INTEGER LEXP               ! Length of expression
@@ -340,6 +354,7 @@
       INTEGER PMAP1              ! PermMap to select 1 input axis from MAP0
       INTEGER PMAP2              ! PermMap to select 1 output axis from MAP0
       INTEGER PNTRW              ! Pointer to mapped pixel indices and/or axis centres (work space)
+      INTEGER RANGES( 2 )        ! The linear fit ranges in pixels
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the NDF
       LOGICAL LOOP               ! Loop for another section to replace
       LOGICAL SUBCEN             ! Substitute array centres in exprs?
@@ -399,8 +414,8 @@
 *  is only available for the axis centres.
          IF ( COMP .EQ. 'CENTRE' .OR. COMP .EQ. 'DATA' ) THEN
             CALL PAR_CHOIC( 'MODE', 'Expression', 'Delete,Edit,'/
-     :                      /'Expression,File,Pixel,WCS', .FALSE., MODE,
-     :                      STATUS )
+     :                      /'Expression,File,Linear_WCS,Pixel,WCS',
+     :                      .FALSE., MODE, STATUS )
          ELSE
             CALL PAR_CHOIC( 'MODE', 'Expression', 'Delete,Edit,'/
      :                      /'Expression,File', .FALSE., MODE, STATUS )
@@ -852,7 +867,7 @@
 
 *  WCS mode.
 *  =========
-         ELSE IF ( MODE .EQ. 'WCS' ) THEN
+         ELSE IF ( MODE .EQ. 'WCS' .OR. MODE .EQ. 'LINEAR_WCS' ) THEN
 
 *  Get the WCS FrameSet from the NDF.
             CALL KPG1_GTWCS( NDF, IWCS, STATUS )
@@ -898,7 +913,7 @@
                INPRM( 1 ) = IAXIS
                DO I = 1, NIN
                   OUTPRM( I ) = -I
-                  CONST( I ) = 0.5D0*( UBND( I ) - LBND( I ) + 1 )
+                  CONST( I ) = 0.5D0 * ( UBND( I ) - LBND( I ) + 1 )
                END DO
                OUTPRM( IAXIS ) = 1
                PMAP1 = AST_PERMMAP( 1, INPRM, NIN, OUTPRM, CONST, ' ',
@@ -978,6 +993,42 @@
 
 *  If any values are not bad, copy them into the AXIS array.
             ELSE
+
+               IF ( MODE .EQ. 'LINEAR_WCS' ) THEN
+
+*  Obtain workspace for fitting and storage of coefficients.  The 2 is
+*  is the order plus 1.
+                  CALL PSX_CALLOC( EL * 4, '_DOUBLE', IPAS, STATUS )
+                  CALL PSX_CALLOC( EL * 2, '_DOUBLE', IPBS, STATUS )
+
+*  Fill dimensions.
+                  ADIMS( 1 ) = EL
+                  DO I = 2, NDF__MXDIM
+                     ADIMS( I ) = 1
+                  END DO
+
+*  Use the full data range.
+                  RANGES( 1 ) = 1
+                  RANGES( 2 ) = EL
+
+*  Perform the fit witout masking and variance, but test for bad values.
+                  CALL KPS1_LFTD( 1, 1, 2, RANGES,
+     :                            .FALSE., %VAL( CNF_PVAL( PNTRW ) ),
+     :                            .FALSE., %VAL( CNF_PVAL( PNTRW ) ),
+     :                            ADIMS, %VAL( CNF_PVAL( PNTRW ) ),
+     :                            %VAL( CNF_PVAL( IPAS ) ),
+     :                            %VAL( CNF_PVAL( IPBS ) ), DWORK,
+     :                            IWORK, STATUS )
+
+*  Free up the workspace at the earliest opportunity.
+                  CALL PSX_FREE( IPAS, STATUS )
+
+*  Evaluate the linear fit and store in the original array ready to be
+*  copied to the AXIS array.
+                  CALL KPS1_LFTSD( 1, 1, .FALSE., ADIMS,
+     :                             %VAL( CNF_PVAL( IPBS ) ),
+     :                             %VAL( CNF_PVAL( PNTRW ) ), STATUS )
+               END IF
 
 *  Set the data type of any pre-existing axis-array component to _DOUBLE.
                CALL NDF_ASTYP( '_DOUBLE', NDF, COMP, IAXIS, STATUS )
