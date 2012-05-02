@@ -386,9 +386,13 @@
 
 *  First get a section identifier for the whole of the input NDF. We
 *  need to do this so that we can change the NDFs origin without
-*  affecting the input NDF on disk.
+*  affecting the input NDF on disk. Note, if more shifts have been
+*  supplied than there are pixel axes, then we need to increase the
+*  number of pixel axes in the sectiin to match the number of shifts
+*  supplied.
                CALL NDF_BOUND( NDFI( I ), NDF__MXDIM, LBND, UBND, NDIM,
      :                         STATUS )
+               IF( NDIM .LT. NSHIFT ) NDIM = NSHIFT
                CALL NDF_SECT( NDFI( I ), NDIM, LBND, UBND, NDFS,
      :                        STATUS )
 
