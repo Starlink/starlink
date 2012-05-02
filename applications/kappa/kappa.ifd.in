@@ -14623,6 +14623,16 @@ iraf! {
             helpkey *
          }
 
+         parameter shift {
+            size *
+            type _INTEGER
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Incremental shift of pixel origin between input NDFs}
+            default !
+            helpkey *
+         }
+
          parameter title {
             type LITERAL
             vpath DEFAULT
