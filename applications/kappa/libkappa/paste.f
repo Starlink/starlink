@@ -35,6 +35,9 @@
 *
 *     Bad values in the pasted NDFs are by default transparent, so the
 *     underlying data are not replaced during the copying.
+*
+*     Input NDFs can be shifted in pixel space before pasting them into
+*     the output NDF (see parameter SHIFT).
 
 *  Usage:
 *     paste in p1 [p2] ... [p25] out=?
@@ -87,6 +90,18 @@
 *
 *        P1 to P25 are ignored if the group specified through parameter IN
 *        comprises more than one NDF.
+*     SHIFT( * ) = _INTEGER (Read)
+*        An incremental shift to apply to the pixel origin of each input
+*        NDF before pasting it into the output NDF. If supplied, this
+*        parameter allows a set of NDFs with the same pixel bounds to be
+*        placed "side-by-side" in the output NDF. For instance, this
+*        allows a set of images to be pasted into a cube. The first input
+*        NDF is not shifted. The pixel origin of the second NDF is shifted
+*        by the number of pixels given in SHIFT. The pixel origin of the
+*        third NDF is shifted by twice the number of pixels given in
+*        SHIFT. Each subsequent input NDF is shifted by a further
+*        multiple of SHIFT. If null (!) is supplied, no shifts are
+*        applied. (!)
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the base NDF to the output NDF. [!]
@@ -138,7 +153,9 @@
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1998, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -177,6 +194,8 @@
 *     2010 December 15 (MJC):
 *        Increase maximum number of NDFs defined through Parameter IN
 *        to 1000.
+*     2-MAY-2012 (DSB):
+*        Added parameter SHIFT.
 *     {enter_further_changes_here}
 
 *-
@@ -237,7 +256,9 @@
       INTEGER NDFIP              ! Identifier for cloned principal input
                                  ! NDF
       INTEGER NDFO               ! Identifier for output NDF
+      INTEGER NDFS               ! Identifier for input NDF section
       INTEGER NDIM               ! Number of dimensions (not used)
+      INTEGER NSHIFT             ! Number of axes with supplied shifts
       INTEGER NUMNDF             ! Number of input NDFs
       INTEGER ODIMS( NDF__MXDIM ) ! Dimensions of output array
       INTEGER OFFSET( NDF__MXDIM ) ! Offsets of an input NDF wrt output
@@ -250,8 +271,12 @@
       INTEGER PNTROQ( 1 )        ! Pointer to output quality component
       INTEGER PNTROV( 1 )        ! Pointer to output variance component
       LOGICAL QUAPRS             ! Variance is present in the NDF
+      INTEGER SHIFT( NDF__MXDIM )! The shift of origin between each pair
+                                 ! of adjacent input NDFs
       LOGICAL TRANSP             ! Bad values in the input NDFs are
                                  ! transparent when pasted
+      INTEGER TSHIFT( NDF__MXDIM )! The total shift of origin for the
+                                 ! next input NDF
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of an input NDF
       INTEGER UBNDI( NDF__MXDIM, NDFMAX ) ! Upper bounds of input NDFs
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
@@ -333,6 +358,54 @@
 *  Obtain identifiers for each NDF.
             CALL NDG_NDFAS( GRPIN, I, 'READ', NDFI( I ), STATUS )
          END DO
+      END IF
+
+
+*  Apply any requested shifts of origin to the input NDFs.
+*  ======================================================
+
+* Get the incremental shift of origin to apply to each sucessive input
+* NDF. If a null value is supplied annull the error and continue.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_GET1I( 'SHIFT', NDF__MXDIM, SHIFT, NSHIFT, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+
+*  If shifts were supplied, shift each input NDF in turn, except for
+*  the first one. Initialise the shift and then loop over NDFs.
+         ELSE
+            DO J = 1, NSHIFT
+               TSHIFT( J ) = SHIFT( J )
+            END DO
+
+            DO J = NSHIFT + 1, NDF__MXDIM
+               TSHIFT( J ) = 0
+            END DO
+
+            DO I = 2, NUMNDF
+
+*  First get a section identifier for the whole of the input NDF. We
+*  need to do this so that we can change the NDFs origin without
+*  affecting the input NDF on disk.
+               CALL NDF_BOUND( NDFI( I ), NDF__MXDIM, LBND, UBND, NDIM,
+     :                         STATUS )
+               CALL NDF_SECT( NDFI( I ), NDIM, LBND, UBND, NDFS,
+     :                        STATUS )
+
+*  Apply the shift
+               CALL NDF_SHIFT( NDIM, TSHIFT, NDFS, STATUS )
+
+*  Replace the stored input NDF identifier with the shifted section
+*  identifier. We rely on the NDF context to annul the original identifier.
+               NDFI( I ) = NDFS
+
+*  Get the shift for the next input NDF.
+               DO J = 1, NSHIFT
+                  TSHIFT( J ) = I*SHIFT( J )
+               END DO
+
+            END DO
+         END IF
       END IF
 
 *  Determine the bounds of the output NDF.
