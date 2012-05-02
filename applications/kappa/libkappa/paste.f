@@ -207,6 +207,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF public constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
+      INCLUDE 'AST_PAR'          ! AST parameters and functions
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
@@ -240,6 +241,7 @@
                                  ! bounds of the output NDF
       INTEGER GRPIN              ! GRP id. for group holding input NDFs
       INTEGER I                  ! Loop counter
+      INTEGER IWCS               ! WCS FrameSet
       INTEGER J                  ! Loop counter
       INTEGER IDIMS( NDF__MXDIM ) ! Dimensions of an input array
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Processing type of the data
@@ -258,6 +260,8 @@
       INTEGER NDFO               ! Identifier for output NDF
       INTEGER NDFS               ! Identifier for input NDF section
       INTEGER NDIM               ! Number of dimensions (not used)
+      INTEGER NDIMO              ! Number of dimensions in output NDF
+      INTEGER NDIMP              ! Number of dimensions in principal NDF
       INTEGER NSHIFT             ! Number of axes with supplied shifts
       INTEGER NUMNDF             ! Number of input NDFs
       INTEGER ODIMS( NDF__MXDIM ) ! Dimensions of output array
@@ -294,6 +298,9 @@
 *  Determine whether the output NDF's bounds are to be constrained to
 *  those of the principal (first or BASE) NDF.
       CALL PAR_GTD0L( 'CONFINE', .FALSE., .FALSE., CONFIN, STATUS )
+
+*  Start an AST context
+      CALL AST_BEGIN( STATUS )
 
 *  Start an NDF context.
       CALL NDF_BEGIN
@@ -412,6 +419,10 @@
          END IF
       END IF
 
+*  Find the bounds and WCS of the principal input NDF.
+      CALL KPG1_GTWCS( NDFI( 1 ), IWCS, STATUS )
+      CALL NDF_BOUND( NDFI( 1 ), NDF__MXDIM, LBND, UBND, NDIMP, STATUS )
+
 *  Determine the bounds of the output NDF.
 *  =======================================
 *
@@ -519,10 +530,10 @@
 *  have the bounds of the output pasted NDF.  Want to propagate from
 *  the principal array.
       IF ( CONFIN ) THEN
-         CALL LPG_PROP( NDFI( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO,
+         CALL LPG_PROP( NDFI( 1 ), 'AXIS,UNITS', 'OUT', NDFO,
      :                  STATUS )
       ELSE
-         CALL LPG_PROP( NDFIC( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO,
+         CALL LPG_PROP( NDFIC( 1 ), 'AXIS,UNITS', 'OUT', NDFO,
      :                  STATUS )
       END IF
 
@@ -531,7 +542,7 @@
       IF ( VARPRS ) CALL NDF_STYPE( DTYPEV, NDFO, 'Variance', STATUS )
 
 *  Find the bounds and dimensions of the output NDF.
-      CALL NDF_BOUND( NDFO, NDF__MXDIM, LBNDO, UBNDO, NDIM, STATUS )
+      CALL NDF_BOUND( NDFO, NDF__MXDIM, LBNDO, UBNDO, NDIMO, STATUS )
 
       DO J = 1, NDF__MXDIM
          ODIMS( J ) = UBNDO( J ) - LBNDO( J ) + 1
@@ -728,11 +739,46 @@
          CALL NDF_ANNUL( NDFI( I ), STATUS )
       END DO
 
+*  If the number of pixel axes in the first input and the output are
+*  equal, just store the WCS from the first input in the output.
+      IF( NDIMO .EQ. NDIMP ) THEN
+         CALL NDF_PTWCS( IWCS, NDFO, STATUS )
+
+*  If there are more pixel axes in the output than in the first input,
+*  then we add in some extra default WCS axes that just replicate the
+*  values of the extra output GRID axes.
+      ELSE IF( NDIMO. GT. NDIMP ) THEN
+
+*  Number of new WCS axes.
+         NDIM = NDIMO - NDIMP
+
+*  Store the pixel bounds for each new axis.
+         DO I = 1, NDIM
+            LBND( I ) = LBNDO( NDIMP + I )
+            UBND( I ) = UBNDO( NDIMP + I )
+         END DO
+
+*  Add the new axes to the WCS FrameSet inherited from the principal
+*  input NDF. Use a UnitMap to connect the new WCS axes to the corresponding
+*  new GRID axes in the output NDF. We know nothing about the new WCS axes
+*  so describe them using a default basic Frame.
+         CALL ATL_ADDWCSAXIS( IWCS, AST_UNITMAP( NDIM, ' ', STATUS ),
+     :                        AST_FRAME( NDIM, ' ', STATUS ), LBND, 
+     :                        UBND, STATUS )
+
+*  Store the modified WCS FrameSet in the output NDF.
+         CALL NDF_PTWCS( IWCS, NDFO, STATUS )
+
+      END IF
+
 *  Delete the group.
       CALL GRP_DELET( GRPIN, STATUS )
 
 *  Tidy the NDF system.
       CALL NDF_END( STATUS )
+
+*  Tidy the AST system.
+      CALL AST_END( STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
