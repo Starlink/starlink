@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.39}
 \newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2012 May 1}
+\newcommand{\stardocdate}      {2012 May 2}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -38797,6 +38797,9 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
 
       Bad values in the pasted NDFs are by default transparent, so the
       underlying data are not replaced during the copying.
+
+      Input NDFs can be shifted in pixel space before pasting them into
+      the output NDF (see Parameter SHIFT).
    }
    \sstusage{
       paste in p1 [p2] ... [p25] out=?
@@ -38864,6 +38867,21 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
 
          P1 to P25 are ignored if the group specified through Parameter IN
          comprises more than one NDF.
+      }
+      \sstsubsection{
+         SHIFT( * ) = \_INTEGER (Read)
+      }{
+         An incremental shift to apply to the pixel origin of each input
+         NDF before pasting it into the output NDF.  If supplied, this
+         parameter allows a set of NDFs with the same pixel bounds to be
+         placed `side-by-side' in the output NDF.  For instance, this
+         allows a set of images to be pasted into a cube.  The first
+         input NDF is not shifted.  The pixel origin of the second NDF
+         is shifted by the number of pixels given in SHIFT.  The pixel
+         origin of the third NDF is shifted by twice the number of
+         pixels given in SHIFT.  Each subsequent input NDF is shifted by
+         a further multiple of SHIFT.  If null ({\tt{!}}) is supplied, no
+         shifts are applied.  {\tt [!]}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -58246,6 +58264,12 @@ The following applications have been modified:
         default axes are only drawn if the picture is cleared.
         \item The new ZEROFF parameter can be set TRUE to force the fit to
         use an offset of zero.
+      \end{itemize}
+
+   \item [\htmlref{PASTE}{PASTE}]\mbox{}
+      \begin{itemize}
+        \item There is a new SHIFT parameter that applies constant shifts of
+        origin between successive pasted data.
       \end{itemize}
 
    \item [\htmlref{PSF}{PSF}]\mbox{}

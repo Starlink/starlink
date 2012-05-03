@@ -60,6 +60,11 @@
       -  The new ZEROFF parameter can be set TRUE to force the fit to
       use an offset of zero.
 
+   o  PASTE
+
+      -  There is a new SHIFT parameter that applies constant shifts
+      of origin between successive pasted data.
+
    o  PSF
 
       -  The default for the AXES parameter has changed so that by
@@ -82,7 +87,7 @@
       exporting co-ordinates to software with limited FITS WCS
       capabilities, such as no -TAB support, and when the
       non-linearity is small.
-                        
+
    o  SHOWQUAL
 
       -  Add new QNAMES output parameter to list the attribute name
