@@ -53,8 +53,8 @@ ADAM_C_ROUTINES = kaplibs_adam.c kpg1Config.c
 ADAM_GRAPHIC_F_ROUTINES = $(KPG_GRAPHIC_ADAM_NONGEN)
 
 GEN_F_ROUTINES = $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
-        $(KPG_DI_GEN:.gdi=.f) \
-	$(KPG_DIR_GEN:.gdir=.f) $(KPG_NXD_GEN:.gnxd=.f) \
+        $(KPG_DI_GEN:.gdi=.f) $(KPG_DIR_GEN:.gdir=.f) \
+        $(KPG_DIKR_GEN:.gdikr=.f) $(KPG_NXD_GEN:.gnxd=.f) \
 	$(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_NXB_GEN:.gnxb=.f) \
 	$(KPG_XC_GEN:.gxc=.f) $(KPG_XL_GEN:.gxl=.f) \
 	$(KPG_BIRW_GEN:.gbirw=.f) $(KPG_IR_GEN:.gir=.f)
@@ -124,7 +124,9 @@ kpg1_xyzw.gdr kpg1_ker1.gdr kpg_blon.gdr  kpg_bmdn.gdr
 KPG_DI_GEN = kpg1_ctcp.gdi
 
 KPG_DIR_GEN = kpg1_chel.gdir kpg1_figr.gdir \
-kpg1_prsa.gdir kpg1_mul.gdir kpg1_sqsu.gdir
+kpg1_mul.gdir kpg1_sqsu.gdir
+
+KPG_DIKR_GEN = kpg1_prsa.gdikr
 
 KPG_IR_GEN =
 
@@ -423,6 +425,9 @@ kpg1_pltln.f
 	$(FGENERIC) $(<)
 
 .gdir.f:
+	$(FGENERIC) $(<)
+
+.gdikr.f:
 	$(FGENERIC) $(<)
 
 .gbdirw.f:

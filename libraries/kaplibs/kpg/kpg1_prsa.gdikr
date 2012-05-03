@@ -32,14 +32,15 @@
 *        The global status.
 
 *  Notes:
-*     -  There is a routine for each numeric data type: replace "x"
-*     in the routine name by D, I, or R as appropriate.  The array 
-*     returned from the routine must have the data type specified.  The 
+*     -  There is a routine for four numeric data type: replace "x"
+*     in the routine name by D, I, K, or R as appropriate.  The array
+*     returned from the routine must have the data type specified.  The
 *     limitation on other integer types is because there are no
 *     conversion routines between them and character in the CHR library.
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -47,12 +48,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
@@ -65,10 +66,12 @@
 *  History:
 *     1990 Jun 12 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2012 April 30 (MJC):
+*        Add 64-bit integers.
+*     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -124,7 +127,7 @@
          INDEXE = INDEXS
          CALL CHR_FIWE( BUFFER, INDEXE, STATUS )
 
-*  Watch for the case where the word terminates the line.  Since this 
+*  Watch for the case where the word terminates the line.  Since this
 *  is quite normal, the error should be annulled.
          IF ( STATUS .EQ. CHR__ENDOFSENT ) CALL ERR_ANNUL( STATUS )
 
@@ -134,10 +137,10 @@
      :                    STATUS )
       END DO
 
-*  Should an error have occurred in extracting the data values, it 
-*  either came from finding the value or converting it from characters. 
-*  If it was the latter then number of values is correct, otherwise if 
-*  the word was not found and therefore the number of values must be 
+*  Should an error have occurred in extracting the data values, it
+*  either came from finding the value or converting it from characters.
+*  If it was the latter then number of values is correct, otherwise if
+*  the word was not found and therefore the number of values must be
 *  decremented since it is not an abnormal way to exit the loop.
       IF ( STATUS .NE. SAI__OK ) THEN
          IF ( STATUS .EQ. CHR__WRDNOTFND )  THEN
@@ -151,7 +154,7 @@
      :        STATUS )
          END IF
       END IF
- 
+
 * Release the error context.
       CALL ERR_RLSE
 
