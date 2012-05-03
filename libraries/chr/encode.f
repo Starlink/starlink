@@ -51,6 +51,8 @@
 *        Original version.
 *     02-MAR-1994 (ACC)
 *        Broke into separate routines for each routine tested.
+*     2012-05-03 (TIMJ):
+*        Test CHR_KTOC
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -59,7 +61,7 @@
 *  Subprograms called:
 *     TEST_DTOAN, TEST_DTOC, TEST_ITOB, TEST_ITOC, TEST_ITOH,
 *     TEST_ITOO, TEST_LTOC, TEST_PUTC, TEST_PUTD, TEST_PUTI,
-*     TEST_PUTL, TEST_PUTR, TEST_RTOAN, TEST_RTOC
+*     TEST_PUTL, TEST_PUTR, TEST_RTOAN, TEST_RTOC, TEST_KTOC
 *
 
 *-
@@ -115,6 +117,14 @@
 
       ISTAT = SAI__OK
       CALL TEST_ITOC(ISTAT)
+      IF (ISTAT .NE. SAI__OK) THEN
+         STATUS = SAI__ERROR
+      END IF
+
+*    Test CHR_KTOC
+
+      ISTAT = SAI__OK
+      CALL TEST_KTOC(ISTAT)
       IF (ISTAT .NE. SAI__OK) THEN
          STATUS = SAI__ERROR
       END IF

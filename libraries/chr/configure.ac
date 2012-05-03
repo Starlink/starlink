@@ -2,7 +2,7 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT(chr, 2.4-0, ussc@star.rl.ac.uk)
+AC_INIT(chr, 2.4-1, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -22,6 +22,9 @@ dnl   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 STAR_CNF_COMPATIBLE_SYMBOLS
+
+dnl We need to be compatible with PRM for the INTEGER*8 tests
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 STAR_DECLARE_DEPENDENCIES([build], [sae cnf])
 

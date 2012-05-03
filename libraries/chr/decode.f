@@ -50,6 +50,8 @@
 *        Original version.
 *     01-MAR-1994 (ACC)
 *        Broke into separate routines for each routine tested.
+*     2012-05-03 (TIMJ):
+*        Test CHR_CTOK
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -57,7 +59,7 @@
 
 *  Subprograms called:
 *     TEST_BTOI, TEST_CTOC, TEST_CTOD, TEST_CTOI, TEST_CTOL,
-*     TEST_CTOR, TEST_HTOI, TEST_OTOI
+*     TEST_CTOR, TEST_HTOI, TEST_OTOI, TEST_CTOK
 
 *-
 
@@ -112,6 +114,14 @@
 
       ISTAT = SAI__OK
       CALL TEST_CTOI(ISTAT)
+      IF (ISTAT .NE. SAI__OK) THEN
+         STATUS = SAI__ERROR
+      END IF
+
+*    Test CHR_CTOK
+
+      ISTAT = SAI__OK
+      CALL TEST_CTOK(ISTAT)
       IF (ISTAT .NE. SAI__OK) THEN
          STATUS = SAI__ERROR
       END IF

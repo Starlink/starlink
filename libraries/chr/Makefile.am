@@ -24,7 +24,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
         chr_atom.f  chr_btoi.f  chr_clean.f chr_copy.f  chr_ctoc.f \
-        chr_ctod.f  chr_ctoi.f  chr_ctol.f  chr_ctor.f  chr_dcwrd.f \
+        chr_ctod.f  chr_ctoi.f  chr_ctok.f chr_ctol.f  chr_ctor.f  chr_dcwrd.f \
         chr_delim.f chr_dtoan.f chr_dtoc.f  chr_equal.f \
         chr_fandl.f chr_fill.f  chr_find.f  chr_fiwe.f  chr_fiws.f \
         chr_htoi.f  chr_iachr.f chr_index.f chr_inset.f chr_isalf.f \
@@ -60,13 +60,14 @@ TEST_ROUTINES = case.f compare.f decode.f edit.f \
         test_rjust.f test_rmblk.f test_rmchr.f test_rtoan.f test_rtoc.f \
         test_scomp.f test_simlr.f test_size.f  test_skchr.f test_sort.f \
         test_swap.f  test_term.f  test_tochr.f test_trchr.f test_trunc.f \
-        test_ucase.f test_upper.f test_wild.f  test_lasto.f
+        test_ucase.f test_upper.f test_wild.f  test_lasto.f \
+	test_ctok.f test_ktoc.f
 
 TESTS = chr_test
 check_PROGRAMS = chr_test
 
 chr_test_SOURCES = chr_test.f $(TEST_ROUTINES)
-chr_test_LDADD = libchr.la
+chr_test_LDADD = libchr.la `cnf_link`
 
 dist_starnews_DATA = chr.news
 dist_pkgdata_DATA = LICENCE
