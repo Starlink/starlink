@@ -92,6 +92,8 @@
 *        possible.
 *     24-AUG-2007 (DSB):
 *        Display the SkyRef position even if it is ignored.
+*     3-MAY-2012 (DSB):
+*        Include axis symbols in sky reference position label.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -308,8 +310,14 @@
             ELSE IF( AST_TEST( FRM, 'SkyRef', STATUS ) ) THEN
                POSBUF = ' '
                IAT = 0
-               CALL CHR_APPND( 'Ref. position', POSBUF, IAT )
-               IAT = 20
+               CALL CHR_APPND( 'Ref. position (', POSBUF, IAT )
+               CALL CHR_APPND( AST_GETC( FRM, 'Symbol(1)', STATUS ),
+     :                         POSBUF, IAT )
+               CALL CHR_APPND( ',', POSBUF, IAT )
+               CALL CHR_APPND( AST_GETC( FRM, 'Symbol(2)', STATUS ),
+     :                         POSBUF, IAT )
+               CALL CHR_APPND( ')', POSBUF, IAT )
+               if( IAT .LT. 20 ) IAT = 20
                CALL CHR_APPND( ':', POSBUF, IAT )
 
                CALL MSG_SETC( 'LAB', POSBUF( :IAT ) )
