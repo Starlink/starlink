@@ -98,6 +98,13 @@ AC_CHECK_FUNCS([strerror_r strtok_r])
 #  See if we have long doubles (used by the Mapping and Region classes)
 AC_CHECK_TYPES([long double])
 
+#  See if we have 64 bit integers.
+AC_CHECK_TYPES([int64_t, uint64_t])
+
+# Calculate alternative 64 bit integer sizes
+AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(long long)
+
 #   ast_link needs to be able to link against the Fortran runtime if
 #   necessary
 AC_FC_LIBRARY_LDFLAGS

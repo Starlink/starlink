@@ -73,7 +73,7 @@ end
 
 foreach prog (testobject testconvert testlevmar)
 
-gcc -o $prog $prog.c -I.. -L/star/lib `ast_link`
+gcc -o $prog $prog.c -I.. -DHAVE_CONFIG_H -L/star/lib `ast_link`
 
 $prog
 rm $prog

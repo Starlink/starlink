@@ -382,6 +382,27 @@
 #define AST__SOMB (12)           /* somp(pi*x) interpolation */
 #define AST__SOMBCOS (13)        /* somp(pi*x)*cos(k*pi*x) interpolation */
 
+/* 64 bit types */
+#if HAVE_INT64_T && HAVE_UINT64_T
+#include <stdint.h>
+typedef int64_t INT_BIG;
+typedef uint64_t UINT_BIG;
+
+#elif SIZEOF_LONG == 8
+typedef long int INT_BIG;
+typedef unsigned long int UINT_BIG;
+
+#elif SIZEOF_LONG_LONG == 8
+typedef long long int INT_BIG;
+typedef unsigned long long int UINT_BIG;
+
+#else
+#define INT_BIG  "no int64_t type available"
+#define UINT_BIG "no uint64_t type available"
+#endif
+
+
+
 /* Type Definitions. */
 /* ================= */
 /* Mapping structure. */
@@ -417,12 +438,6 @@ typedef struct AstMappingVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
-#if HAVE_LONG_DOUBLE     /* Not normally implemented */
-   int (* ResampleLD)( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(void), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], int * );
-   void (* RebinLD)( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], int * );
-   void (* RebinSeqLD)( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [], int *, int * );
-#endif
-
    AstMapping *(* RemoveRegions)( AstMapping *, int * );
    AstMapping *(* Simplify)( AstMapping *, int * );
    AstPointSet *(* Transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
@@ -438,22 +453,6 @@ typedef struct AstMappingVtab {
    int (* LinearApprox)( AstMapping *, const double *, const double *, double, double *, int * );
    int (* MapMerge)( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
    int (* QuadApprox)( AstMapping *, const double[2], const double[2], int, int, double *, double *, int * );
-   void (* RebinD)( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
-   void (* RebinF)( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
-   void (* RebinI)( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
-   void (* RebinSeqD)( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], double [], int *, int * );
-   void (* RebinSeqF)( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], double [], int *, int * );
-   void (* RebinSeqI)( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], double [], int *, int * );
-   int (* ResampleB)( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(void), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [], int * );
-   int (* ResampleD)( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(void), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
-   int (* ResampleF)( AstMapping *, int, const int [], const int [], const float [], const float [], int, void (*)(void), const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
-   int (* ResampleI)( AstMapping *, int, const int [], const int [], const int [], const int [], int, void (*)(void), const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
-   int (* ResampleL)( AstMapping *, int, const int [], const int [], const long int [], const long int [], int, void (*)(void), const double [], int, double, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [], int * );
-   int (* ResampleS)( AstMapping *, int, const int [], const int [], const short int [], const short int [], int, void (*)(void), const double [], int, double, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [], int * );
-   int (* ResampleUB)( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], int, void (*)(void), const double [], int, double, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [], int * );
-   int (* ResampleUI)( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], int, void (*)(void), const double [], int, double, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [], int * );
-   int (* ResampleUL)( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(void), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [], int * );
-   int (* ResampleUS)( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(void), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [], int * );
    int (* TestInvert)( AstMapping *, int * );
    int (* TestReport)( AstMapping *, int * );
    void (* ClearInvert)( AstMapping *, int * );
@@ -471,6 +470,54 @@ typedef struct AstMappingVtab {
    void (* TranGrid)( AstMapping *, int, const int[], const int[], double, int, int, int, int, double *, int * );
    void (* TranN)( AstMapping *, int, int, int, const double *, int, int, int, double *, int * );
    void (* TranP)( AstMapping *, int, int, const double *[], int, int, double *[], int * );
+
+#define DECLARE_GENERIC_ALL(X,Xtype) \
+   int (* Resample##X)( AstMapping *, int, const int [], const int [], \
+                        const Xtype [], const Xtype [], int, \
+                        void (*)(), const double [], int, double, int, \
+                        Xtype, int, const int [], const int [], \
+                        const int [], const int [], Xtype [], Xtype [], int * ); \
+
+DECLARE_GENERIC_ALL(B,signed char)
+DECLARE_GENERIC_ALL(D,double)
+DECLARE_GENERIC_ALL(F,float)
+DECLARE_GENERIC_ALL(I,int)
+DECLARE_GENERIC_ALL(K,INT_BIG)
+DECLARE_GENERIC_ALL(L,long int)
+DECLARE_GENERIC_ALL(S,short int)
+DECLARE_GENERIC_ALL(UB,unsigned char)
+DECLARE_GENERIC_ALL(UI,unsigned int)
+DECLARE_GENERIC_ALL(UK,UINT_BIG)
+DECLARE_GENERIC_ALL(UL,unsigned long int)
+DECLARE_GENERIC_ALL(US,unsigned short int)
+
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+DECLARE_GENERIC_ALL(LD,long double)
+#endif
+
+#undef DECLARE_GENERIC_ALL
+
+#define DECLARE_GENERIC_DFI(X,Xtype) \
+   void (* Rebin##X)( AstMapping *, double, int, const int [], const int [], \
+                      const Xtype [], const Xtype [], int, const double [], int, \
+                      double, int, Xtype, int, const int [], const int [], \
+                      const int [], const int [], Xtype [], Xtype [], int * ); \
+   void (* RebinSeq##X)( AstMapping *, double, int, const int [], const int [], \
+                         const Xtype [], const Xtype [], int, const double [], \
+                         int, double, int, Xtype, int, const int [], \
+                         const int [], const int [], const int [], Xtype [], \
+                         Xtype [], double [], int *, int * );
+
+DECLARE_GENERIC_DFI(D,double)
+DECLARE_GENERIC_DFI(F,float)
+DECLARE_GENERIC_DFI(I,int)
+
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+DECLARE_GENERIC_DFI(LD,long double)
+#endif
+
+#undef DECLARE_GENERIC_DFI
+
 } AstMappingVtab;
 
 
@@ -523,30 +570,55 @@ void astInitMappingGlobals_( AstMappingGlobals * );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+#define PROTO_GENERIC_ALL(X,Xtype) \
+   int astResample##X##_( AstMapping *, int, const int [], const int [], \
+                        const Xtype [], const Xtype [], int, \
+                        void (*)(), const double [], int, double, int, \
+                        Xtype, int, const int [], const int [], \
+                        const int [], const int [], Xtype [], Xtype [], int * ); \
+
+PROTO_GENERIC_ALL(B,signed char)
+PROTO_GENERIC_ALL(D,double)
+PROTO_GENERIC_ALL(F,float)
+PROTO_GENERIC_ALL(I,int)
+PROTO_GENERIC_ALL(K,INT_BIG)
+PROTO_GENERIC_ALL(L,long int)
+PROTO_GENERIC_ALL(S,short int)
+PROTO_GENERIC_ALL(UB,unsigned char)
+PROTO_GENERIC_ALL(UI,unsigned int)
+PROTO_GENERIC_ALL(UK,UINT_BIG)
+PROTO_GENERIC_ALL(UL,unsigned long int)
+PROTO_GENERIC_ALL(US,unsigned short int)
+
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-int astResampleLD_( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(void), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], int * );
-void astRebinLD_( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], int * );
-void astRebinSeqLD_( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [], int *, int * );
+PROTO_GENERIC_ALL(LD,long double)
 #endif
+
+#undef PROTO_GENERIC_ALL
+
+#define PROTO_GENERIC_DFI(X,Xtype) \
+   void astRebin##X##_( AstMapping *, double, int, const int [], const int [], \
+                      const Xtype [], const Xtype [], int, const double [], int, \
+                      double, int, Xtype, int, const int [], const int [], \
+                      const int [], const int [], Xtype [], Xtype [], int * ); \
+   void astRebinSeq##X##_( AstMapping *, double, int, const int [], const int [], \
+                         const Xtype [], const Xtype [], int, const double [], \
+                         int, double, int, Xtype, int, const int [], \
+                         const int [], const int [], const int [], Xtype [], \
+                         Xtype [], double [], int *, int * );
+
+PROTO_GENERIC_DFI(D,double)
+PROTO_GENERIC_DFI(F,float)
+PROTO_GENERIC_DFI(I,int)
+
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+PROTO_GENERIC_DFI(LD,long double)
+#endif
+
+#undef PROTO_GENERIC_DFI
 
 AstMapping *astRemoveRegions_( AstMapping *, int * );
 AstMapping *astSimplify_( AstMapping *, int * );
-void astRebinD_( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
-void astRebinF_( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
-void astRebinI_( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
-void astRebinSeqD_( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], double [], int *, int * );
-void astRebinSeqF_( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], double [], int *, int * );
-void astRebinSeqI_( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], double [], int *, int * );
-int astResampleB_( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(void), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [], int * );
-int astResampleD_( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(void), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
-int astResampleF_( AstMapping *, int, const int [], const int [], const float [], const float [], int, void (*)(void), const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
-int astResampleI_( AstMapping *, int, const int [], const int [], const int [], const int [], int, void (*)(void), const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
-int astResampleL_( AstMapping *, int, const int [], const int [], const long int [], const long int [], int, void (*)(void), const double [], int, double, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [], int * );
-int astResampleS_( AstMapping *, int, const int [], const int [], const short int [], const short int [], int, void (*)(void), const double [], int, double, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [], int * );
-int astResampleUB_( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], int, void (*)(void), const double [], int, double, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [], int * );
-int astResampleUI_( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], int, void (*)(void), const double [], int, double, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [], int * );
-int astResampleUL_( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(void), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [], int * );
-int astResampleUS_( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(void), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [], int * );
 void astInvert_( AstMapping *, int * );
 int astLinearApprox_( AstMapping *, const double *, const double *, double, double *, int * );
 int astQuadApprox_( AstMapping *, const double[2], const double[2], int, int, double *, double *, int * );
@@ -632,10 +704,6 @@ astINVOKE(O,astLoadMapping_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 #define astResampleLD(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
 astINVOKE(V,astResampleLD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
-#define astRebinLD(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
-astINVOKE(V,astRebinLD_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
-#define astRebinSeqLD(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused) \
-astINVOKE(V,astRebinSeqLD_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused,STATUS_PTR))
 #endif
 
 #define astInvert(this) \
@@ -668,6 +736,10 @@ astINVOKE(V,astResampleUL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_v
 astINVOKE(V,astResampleI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
 #define astResampleUI(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
 astINVOKE(V,astResampleUI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
+#define astResampleK(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleK_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
+#define astResampleUK(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleUK_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
 #define astResampleS(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
 astINVOKE(V,astResampleS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
 #define astResampleUS(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \

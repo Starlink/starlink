@@ -373,6 +373,8 @@ typedef enum DataType {
    TYPE_F,
    TYPE_L,
    TYPE_UL,
+   TYPE_K,
+   TYPE_UK,
    TYPE_I,
    TYPE_UI,
    TYPE_S,
@@ -488,19 +490,104 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Prototypes for private member functions. */
 /* ======================================== */
+
+#define DECLARE_GENERIC(X,Xtype) \
+static int InterpolateKernel1##X( AstMapping *, int, const int *, const int *, \
+                                  const Xtype *, const Xtype *, int, \
+                                  const int *, const double *const *, \
+                                  void (*)( double, const double *, int, \
+                                            double *, int * ), \
+                                  void (*)( double, const double *, int, \
+                                            double * ), \
+                                  int, const double *, int, Xtype, \
+                                  Xtype *, Xtype *, int * );\
+\
+static int InterpolateLinear##X( int, const int *, const int *, const Xtype *, \
+                                 const Xtype *, int, const int *, \
+                                 const double *const *, int, Xtype, Xtype *, \
+                                 Xtype *, int * ); \
+\
+static int InterpolateNearest##X( int, const int *, const int *, const Xtype *, \
+                                  const Xtype *, int, const int *, \
+                                  const double *const *, int, Xtype, Xtype *, \
+                                  Xtype *, int * ); \
+\
+static int Resample##X( AstMapping *, int, const int [], const int [], \
+                        const Xtype [], const Xtype [], int, \
+                        void (*)(), const double [], int, double, int, \
+                        Xtype, int, const int [], const int [], \
+                        const int [], const int [], Xtype [], Xtype [], int * ); \
+\
+static void ConserveFlux##X( double, int, const int *, Xtype, Xtype *, Xtype *, \
+                             int * ); \
+\
+static void InterpolateBlockAverage##X( int, const int[], const int[], \
+                             const Xtype [], const Xtype [], int, const int[], \
+                             const double *const[], const double[], int, \
+                             Xtype, Xtype *, Xtype *, int * );
+
+DECLARE_GENERIC(B,signed char)
+DECLARE_GENERIC(D,double)
+DECLARE_GENERIC(F,float)
+DECLARE_GENERIC(I,int)
+DECLARE_GENERIC(K,INT_BIG)
+DECLARE_GENERIC(L,long int)
+DECLARE_GENERIC(S,short int)
+DECLARE_GENERIC(UB,unsigned char)
+DECLARE_GENERIC(UI,unsigned int)
+DECLARE_GENERIC(UK,UINT_BIG)
+DECLARE_GENERIC(UL,unsigned long int)
+DECLARE_GENERIC(US,unsigned short int)
+
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-static void InterpolateBlockAverageLD( int, const int[], const int[], const long double [], const long double [], int, const int[], const double *const[], const double[], int, long double, long double *, long double *, int * );
-static int InterpolateKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double *), int, const double *, int, long double, long double *, long double *, int * );
-static int InterpolateLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double *, int * );
-static int InterpolateNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double *, int * );
-static void SpreadKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, long double, int, long double *, long double *, double *, int *, int * );
-static void SpreadLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, long double *, long double *, double *, int *, int * );
-static void SpreadNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, long double *, long double *, double *, int *, int * );
-static int ResampleLD( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], int * );
-static void RebinLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], int * );
-static void RebinSeqLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [], int *, int * );
-static void ConserveFluxLD( double, int, const int *, long double, long double *, long double *, int * );
+DECLARE_GENERIC(LD,long double)
 #endif
+
+#undef DECLARE_GENERIC
+
+#define DECLARE_GENERIC(X,Xtype) \
+static void Rebin##X( AstMapping *, double, int, const int [], const int [], \
+                      const Xtype [], const Xtype [], int, const double [], int, \
+                      double, int, Xtype, int, const int [], const int [], \
+                      const int [], const int [], Xtype [], Xtype [], int * ); \
+\
+static void RebinSeq##X( AstMapping *, double, int, const int [], const int [], \
+                         const Xtype [], const Xtype [], int, const double [], \
+                         int, double, int, Xtype, int, const int [], \
+                         const int [], const int [], const int [], Xtype [], \
+                         Xtype [], double [], int *, int * ); \
+\
+static void SpreadKernel1##X( AstMapping *, int, const int *, const int *, \
+                         const Xtype *, const Xtype *, int, const int *, \
+                         const double *const *, \
+                         void (*)( double, const double *, int, double *, int * ), \
+                         int, const double *, int, Xtype, int, Xtype *, \
+                         Xtype *, double *, int *, int * ); \
+\
+static void SpreadLinear##X( int, const int *, const int *, const Xtype *, \
+                             const Xtype *, int, const int *, const double *const *, \
+                             int, Xtype, int, Xtype *, Xtype *, double *, int *, \
+                             int * ); \
+\
+static void SpreadNearest##X( int, const int *, const int *, const Xtype *, \
+                              const Xtype *, int, const int *, const double *const *, \
+                              int, Xtype, int, Xtype *, Xtype *, double *, \
+                              int *, int * );
+
+DECLARE_GENERIC(D,double)
+DECLARE_GENERIC(F,float)
+DECLARE_GENERIC(I,int)
+
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+DECLARE_GENERIC(LD,long double)
+#endif
+
+#undef DECLARE_GENERIC
+
+
+
+
+
 
 static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
@@ -529,36 +616,6 @@ static int GetReport( AstMapping *, int * );
 static int GetIsLinear( AstMapping *, int * );
 static int GetTranForward( AstMapping *, int * );
 static int GetTranInverse( AstMapping *, int * );
-static int InterpolateKernel1B( AstMapping *, int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, signed char, signed char *, signed char *, int * );
-static int InterpolateKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, double, double *, double *, int * );
-static int InterpolateKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, float, float *, float *, int * );
-static int InterpolateKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, int, int *, int *, int * );
-static int InterpolateKernel1L( AstMapping *, int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, long int, long int *, long int *, int * );
-static int InterpolateKernel1S( AstMapping *, int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, short int, short int *, short int *, int * );
-static int InterpolateKernel1UB( AstMapping *, int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned char, unsigned char *, unsigned char *, int * );
-static int InterpolateKernel1UI( AstMapping *, int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned int, unsigned int *, unsigned int *, int * );
-static int InterpolateKernel1UL( AstMapping *, int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned long int, unsigned long int *, unsigned long int *, int * );
-static int InterpolateKernel1US( AstMapping *, int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned short int, unsigned short int *, unsigned short int *, int * );
-static int InterpolateLinearB( int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, int, signed char, signed char *, signed char *, int * );
-static int InterpolateLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, int * );
-static int InterpolateLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, int * );
-static int InterpolateLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, int * );
-static int InterpolateLinearL( int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, int, long int, long int *, long int *, int * );
-static int InterpolateLinearS( int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, int, short int, short int *, short int *, int * );
-static int InterpolateLinearUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, int, unsigned char, unsigned char *, unsigned char *, int * );
-static int InterpolateLinearUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, int, unsigned int, unsigned int *, unsigned int *, int * );
-static int InterpolateLinearUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, int, unsigned long int, unsigned long int *, unsigned long int *, int * );
-static int InterpolateLinearUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, int, unsigned short int, unsigned short int *, unsigned short int *, int * );
-static int InterpolateNearestB( int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, int, signed char, signed char *, signed char *, int * );
-static int InterpolateNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, int * );
-static int InterpolateNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, int * );
-static int InterpolateNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, int * );
-static int InterpolateNearestL( int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, int, long int, long int *, long int *, int * );
-static int InterpolateNearestS( int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, int, short int, short int *, short int *, int * );
-static int InterpolateNearestUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, int, unsigned char, unsigned char *, unsigned char *, int * );
-static int InterpolateNearestUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, int, unsigned int, unsigned int *, unsigned int *, int * );
-static int InterpolateNearestUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, int, unsigned long int, unsigned long int *, unsigned long int *, int * );
-static int InterpolateNearestUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, int, unsigned short int, unsigned short int *, unsigned short int *, int * );
 static int LinearApprox( AstMapping *, const double *, const double *, double, double *, int * );
 static int MapList( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
@@ -566,17 +623,7 @@ static int MaxI( int, int, int * );
 static int MinI( int, int, int * );
 static int QuadApprox( AstMapping *, const double[2], const double[2], int, int, double *, double *, int * );
 static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
-static int ResampleB( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [], int * );
-static int ResampleD( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
-static int ResampleF( AstMapping *, int, const int [], const int [], const float [], const float [], int, void (*)(), const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
-static int ResampleI( AstMapping *, int, const int [], const int [], const int [], const int [], int, void (*)(), const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
-static int ResampleL( AstMapping *, int, const int [], const int [], const long int [], const long int [], int, void (*)(), const double [], int, double, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [], int * );
-static int ResampleS( AstMapping *, int, const int [], const int [], const short int [], const short int [], int, void (*)(), const double [], int, double, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [], int * );
 static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
-static int ResampleUB( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], int, void (*)(), const double [], int, double, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [], int * );
-static int ResampleUI( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], int, void (*)(), const double [], int, double, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [], int * );
-static int ResampleUL( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [], int * );
-static int ResampleUS( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [], int * );
 static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
 static int SpecialBounds( const MapData *, double *, double *, double [], double [], int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -586,16 +633,6 @@ static void ClearAttrib( AstObject *, const char *, int * );
 static void ClearInvert( AstMapping *, int * );
 static void ClearReport( AstMapping *, int * );
 static void CombinePN( PN *, PN *, int * );
-static void ConserveFluxB( double, int, const int *, signed char, signed char *, signed char *, int * );
-static void ConserveFluxD( double, int, const int *, double, double *, double *, int * );
-static void ConserveFluxF( double, int, const int *, float, float *, float *, int * );
-static void ConserveFluxI( double, int, const int *, int, int *, int *, int * );
-static void ConserveFluxL( double, int, const int *, long int, long int *, long int *, int * );
-static void ConserveFluxS( double, int, const int *, short int, short int *, short int *, int * );
-static void ConserveFluxUB( double, int, const int *, unsigned char, unsigned char *, unsigned char *, int * );
-static void ConserveFluxUI( double, int, const int *, unsigned int, unsigned int *, unsigned int *, int * );
-static void ConserveFluxUL( double, int, const int *, unsigned long int, unsigned long int *, unsigned long int *, int * );
-static void ConserveFluxUS( double, int, const int *, unsigned short int, unsigned short int *, unsigned short int *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 static void Delete( AstObject *, int * );
@@ -603,25 +640,9 @@ static void Dump( AstObject *, AstChannel *, int * );
 static void FunPN( AstMapping *, double *, int, int, int, double *, double *, int * );
 static void Gauss( double, const double [], int, double *, int * );
 static void GlobalBounds( MapData *, double *, double *, double [], double [], int * );
-static void InterpolateBlockAverageB( int, const int[], const int[], const signed char [], const signed char [], int, const int[], const double *const[], const double[], int, signed char, signed char *, signed char *, int * );
-static void InterpolateBlockAverageD( int, const int[], const int[], const double [], const double [], int, const int[], const double *const[], const double[], int, double, double *, double *, int * );
-static void InterpolateBlockAverageF( int, const int[], const int[], const float [], const float [], int, const int[], const double *const[], const double[], int, float, float *, float *, int * );
-static void InterpolateBlockAverageI( int, const int[], const int[], const int [], const int [], int, const int[], const double *const[], const double[], int, int, int *, int *, int * );
-static void InterpolateBlockAverageL( int, const int[], const int[], const long int [], const long int [], int, const int[], const double *const[], const double[], int, long int, long int *, long int *, int * );
-static void InterpolateBlockAverageS( int, const int[], const int[], const short int [], const short int [], int, const int[], const double *const[], const double[], int, short int, short int *, short int *, int * );
-static void InterpolateBlockAverageUB( int, const int[], const int[], const unsigned char [], const unsigned char [], int, const int[], const double *const[], const double[], int, unsigned char, unsigned char *, unsigned char *, int * );
-static void InterpolateBlockAverageUI( int, const int[], const int[], const unsigned int [], const unsigned int [], int, const int[], const double *const[], const double[], int, unsigned int, unsigned int *, unsigned int *, int * );
-static void InterpolateBlockAverageUL( int, const int[], const int[], const unsigned long int [], const unsigned long int [], int, const int[], const double *const[], const double[], int, unsigned long int, unsigned long int *, unsigned long int *, int * );
-static void InterpolateBlockAverageUS( int, const int[], const int[], const unsigned short int [], const unsigned short int [], int, const int[], const double *const[], const double[], int, unsigned short int, unsigned short int *, unsigned short int *, int * );
 static void Invert( AstMapping *, int * );
 static void MapBox( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [], int * );
 static void RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int *, int * );
-static void RebinD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
-static void RebinF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
-static void RebinI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
-static void RebinSeqD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], double [], int *, int * );
-static void RebinSeqF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], double [], int *, int * );
-static void RebinSeqI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], double [], int *, int * );
 static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int *, int * );
 static void RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int *, int * );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet *, int * );
@@ -634,15 +655,6 @@ static void SincGauss( double, const double [], int, double *, int * );
 static void SincSinc( double, const double [], int, double *, int * );
 static void Somb( double, const double [], int, double *, int * );
 static void SombCos( double, const double [], int, double *, int * );
-static void SpreadKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, double, int, double *, double *, double *, int *, int * );
-static void SpreadKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, float, int, float *, float *, double *, int *, int * );
-static void SpreadKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, int, int, int *, int *, double *, int *, int * );
-static void SpreadLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, int, double *, double *, double *, int *, int * );
-static void SpreadLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, int, float *, float *, double *, int *, int * );
-static void SpreadLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int, int *, int *, double *, int *, int * );
-static void SpreadNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, int, double *, double *, double *, int *, int * );
-static void SpreadNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, int, float *, float *, double *, int *, int * );
-static void SpreadNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int, int *, int *, double *, int *, int * );
 static void Tran1( AstMapping *, int, const double [], int, double [], int * );
 static void Tran2( AstMapping *, int, const double [], const double [], int, double [], double [], int * );
 static void TranGrid( AstMapping *, int, const int[], const int[], double, int, int, int, int, double *, int * );
@@ -896,12 +908,14 @@ MAKE_CONSERVEFLUX(LD,long double)
 #endif
 MAKE_CONSERVEFLUX(D,double)
 MAKE_CONSERVEFLUX(F,float)
+MAKE_CONSERVEFLUX(K,INT_BIG)
 MAKE_CONSERVEFLUX(L,long int)
 MAKE_CONSERVEFLUX(I,int)
 MAKE_CONSERVEFLUX(S,short int)
 MAKE_CONSERVEFLUX(B,signed char)
 MAKE_CONSERVEFLUX(UL,unsigned long int)
 MAKE_CONSERVEFLUX(UI,unsigned int)
+MAKE_CONSERVEFLUX(UK,UINT_BIG)
 MAKE_CONSERVEFLUX(US,unsigned short int)
 MAKE_CONSERVEFLUX(UB,unsigned char)
 
@@ -2181,7 +2195,6 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    int done_max;                 /* Satisfactory global maximum found? */
    int done_min;                 /* Satisfactory global minimum found? */
    int iter;                     /* Loop counter for iterations */
-   int ncall;                    /* Number of Mapping function calls (junk) */
    int ncoord;                   /* Number of coordinates in search space */
    int nmax;                     /* Number of local maxima found */
    int nmin;                     /* Number of local minima found */
@@ -2195,7 +2208,6 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 /* Initialise. */
    done_max = 0;
    done_min = 0;
-   ncall = 0;
    nmax = 0;
    nmin = 0;
    nsame_max = 0;
@@ -2736,11 +2748,43 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name, int *status )
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+#define VTAB_GENERIC(X) \
+   vtab->Resample##X = Resample##X;
+
+VTAB_GENERIC(B)
+VTAB_GENERIC(D)
+VTAB_GENERIC(F)
+VTAB_GENERIC(I)
+VTAB_GENERIC(K)
+VTAB_GENERIC(L)
+VTAB_GENERIC(S)
+VTAB_GENERIC(UB)
+VTAB_GENERIC(UI)
+VTAB_GENERIC(UK)
+VTAB_GENERIC(UL)
+VTAB_GENERIC(US)
+
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-   vtab->ResampleLD = ResampleLD;
-   vtab->RebinLD = RebinLD;
-   vtab->RebinSeqLD = RebinSeqLD;
+VTAB_GENERIC(LD)
 #endif
+
+#undef VTAB_GENERIC
+
+#define VTAB_GENERIC(X) \
+   vtab->Rebin##X = Rebin##X; \
+   vtab->RebinSeq##X = RebinSeq##X;
+
+VTAB_GENERIC(D)
+VTAB_GENERIC(F)
+VTAB_GENERIC(I)
+
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+VTAB_GENERIC(LD)
+#endif
+
+#undef VTAB_GENERIC
+
+
    vtab->ClearInvert = ClearInvert;
    vtab->ClearReport = ClearReport;
    vtab->Decompose = Decompose;
@@ -2761,23 +2805,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name, int *status )
    vtab->QuadApprox = QuadApprox;
    vtab->Rate = Rate;
    vtab->ReportPoints = ReportPoints;
-   vtab->RebinD = RebinD;
-   vtab->RebinF = RebinF;
-   vtab->RebinI = RebinI;
-   vtab->RebinSeqD = RebinSeqD;
-   vtab->RebinSeqF = RebinSeqF;
-   vtab->RebinSeqI = RebinSeqI;
    vtab->RemoveRegions = RemoveRegions;
-   vtab->ResampleB = ResampleB;
-   vtab->ResampleD = ResampleD;
-   vtab->ResampleF = ResampleF;
-   vtab->ResampleI = ResampleI;
-   vtab->ResampleL = ResampleL;
-   vtab->ResampleS = ResampleS;
-   vtab->ResampleUB = ResampleUB;
-   vtab->ResampleUI = ResampleUI;
-   vtab->ResampleUL = ResampleUL;
-   vtab->ResampleUS = ResampleUS;
    vtab->SetInvert = SetInvert;
    vtab->SetReport = SetReport;
    vtab->Simplify = Simplify;
@@ -3883,16 +3911,25 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
 #define LO_F ( 0.0f )
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
+#define HI_K   ( 0.5L + (long double) LONG_MAX )
+#define LO_K  ( -0.5L + (long double) LONG_MIN )
+#define HI_UK  ( 0.5L + (long double) ULONG_MAX )
+#define LO_UK ( -0.5L )
 #define HI_L   ( 0.5L + (long double) LONG_MAX )
 #define LO_L  ( -0.5L + (long double) LONG_MIN )
 #define HI_UL  ( 0.5L + (long double) ULONG_MAX )
 #define LO_UL ( -0.5L )
 #else
+#define HI_K   ( 0.5 + (double) LONG_MAX )
+#define LO_K  ( -0.5 + (double) LONG_MIN )
+#define HI_UK  ( 0.5 + (double) ULONG_MAX )
+#define LO_UK ( -0.5 )
 #define HI_L   ( 0.5 + (double) LONG_MAX )
 #define LO_L  ( -0.5 + (double) LONG_MIN )
 #define HI_UL  ( 0.5 + (double) ULONG_MAX )
 #define LO_UL ( -0.5 )
 #endif
+
 #define HI_I   ( 0.5 + (double) INT_MAX )
 #define LO_I  ( -0.5 + (double) INT_MIN )
 #define HI_UI  ( 0.5 + (double) UINT_MAX )
@@ -3916,8 +3953,10 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_KERNEL1(LD,long double,1,long double,1)
 MAKE_INTERPOLATE_KERNEL1(L,long int,0,long double,1)
+MAKE_INTERPOLATE_KERNEL1(K,INT_BIG,0,long double,1)
 #else
 MAKE_INTERPOLATE_KERNEL1(L,long int,0,double,1)
+MAKE_INTERPOLATE_KERNEL1(K,INT_BIG,0,double,1)
 #endif
 MAKE_INTERPOLATE_KERNEL1(D,double,1,double,1)
 MAKE_INTERPOLATE_KERNEL1(F,float,1,float,1)
@@ -3934,8 +3973,10 @@ MAKE_INTERPOLATE_KERNEL1(B,signed char,0,float,1)
    required unsigned data type. */
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_KERNEL1(UL,unsigned long int,0,long double,0)
+MAKE_INTERPOLATE_KERNEL1(UK,UINT_BIG,0,long double,0)
 #else
 MAKE_INTERPOLATE_KERNEL1(UL,unsigned long int,0,double,0)
+MAKE_INTERPOLATE_KERNEL1(UK,UINT_BIG,0,double,0)
 #endif
 MAKE_INTERPOLATE_KERNEL1(UI,unsigned int,0,double,0)
 MAKE_INTERPOLATE_KERNEL1(US,unsigned short int,0,float,0)
@@ -3955,6 +3996,10 @@ MAKE_INTERPOLATE_KERNEL1(UB,unsigned char,0,float,0)
 #undef LO_L
 #undef HI_UL
 #undef LO_UL
+#undef HI_K
+#undef LO_K
+#undef HI_UK
+#undef LO_UK
 #undef HI_I
 #undef LO_I
 #undef HI_UI
@@ -4879,8 +4924,10 @@ static int InterpolateLinear##X( int ndim_in, \
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_LINEAR(LD,long double,1,long double,1)
 MAKE_INTERPOLATE_LINEAR(L,long int,0,long double,1)
+MAKE_INTERPOLATE_LINEAR(K,INT_BIG,0,long double,1)
 #else
 MAKE_INTERPOLATE_LINEAR(L,long int,0,double,1)
+MAKE_INTERPOLATE_LINEAR(K,INT_BIG,0,double,1)
 #endif
 MAKE_INTERPOLATE_LINEAR(D,double,1,double,1)
 MAKE_INTERPOLATE_LINEAR(F,float,1,float,1)
@@ -4897,8 +4944,10 @@ MAKE_INTERPOLATE_LINEAR(B,signed char,0,float,1)
    required unsigned data type. */
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_LINEAR(UL,unsigned long int,0,long double,0)
+MAKE_INTERPOLATE_LINEAR(UK,UINT_BIG,0,long double,0)
 #else
 MAKE_INTERPOLATE_LINEAR(UL,unsigned long int,0,double,0)
+MAKE_INTERPOLATE_LINEAR(UK,UINT_BIG,0,double,0)
 #endif
 MAKE_INTERPOLATE_LINEAR(UI,unsigned int,0,double,0)
 MAKE_INTERPOLATE_LINEAR(US,unsigned short int,0,float,0)
@@ -5496,6 +5545,7 @@ MAKE_INTERPOLATE_NEAREST(LD,long double,1)
 MAKE_INTERPOLATE_NEAREST(D,double,1)
 MAKE_INTERPOLATE_NEAREST(F,float,1)
 MAKE_INTERPOLATE_NEAREST(L,long int,1)
+MAKE_INTERPOLATE_NEAREST(K,INT_BIG,1)
 MAKE_INTERPOLATE_NEAREST(I,int,1)
 MAKE_INTERPOLATE_NEAREST(S,short int,1)
 MAKE_INTERPOLATE_NEAREST(B,signed char,1)
@@ -5507,6 +5557,7 @@ MAKE_INTERPOLATE_NEAREST(B,signed char,1)
 
 /* Expand the main macro above to generate a function for each
    required unsigned data type. */
+MAKE_INTERPOLATE_NEAREST(UK,UINT_BIG,0)
 MAKE_INTERPOLATE_NEAREST(UL,unsigned long int,0)
 MAKE_INTERPOLATE_NEAREST(UI,unsigned int,0)
 MAKE_INTERPOLATE_NEAREST(US,unsigned short int,0)
@@ -6369,11 +6420,19 @@ static void InterpolateBlockAverage##X( int ndim_in, \
 #define LO_L  ( -0.5L + (long double) LONG_MIN )
 #define HI_UL  ( 0.5L + (long double) ULONG_MAX )
 #define LO_UL ( -0.5L )
+#define HI_K   ( 0.5L + (long double) LONG_MAX )
+#define LO_K  ( -0.5L + (long double) LONG_MIN )
+#define HI_UK  ( 0.5L + (long double) ULONG_MAX )
+#define LO_UK ( -0.5L )
 #else
 #define HI_L   ( 0.5 + (double) LONG_MAX )
 #define LO_L  ( -0.5 + (double) LONG_MIN )
 #define HI_UL  ( 0.5 + (double) ULONG_MAX )
 #define LO_UL ( -0.5 )
+#define HI_K   ( 0.5 + (double) LONG_MAX )
+#define LO_K  ( -0.5 + (double) LONG_MIN )
+#define HI_UK  ( 0.5 + (double) ULONG_MAX )
+#define LO_UK ( -0.5 )
 #endif
 #define HI_I   ( 0.5 + (double) INT_MAX )
 #define LO_I  ( -0.5 + (double) INT_MIN )
@@ -6398,8 +6457,10 @@ static void InterpolateBlockAverage##X( int ndim_in, \
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_BLOCKAVE(LD,long double,1,long double,1)
 MAKE_INTERPOLATE_BLOCKAVE(L,long int,0,long double,1)
+MAKE_INTERPOLATE_BLOCKAVE(K,INT_BIG,0,long double,1)
 #else
 MAKE_INTERPOLATE_BLOCKAVE(L,long int,0,double,1)
+MAKE_INTERPOLATE_BLOCKAVE(K,INT_BIG,0,double,1)
 #endif
 MAKE_INTERPOLATE_BLOCKAVE(D,double,1,double,1)
 MAKE_INTERPOLATE_BLOCKAVE(F,float,1,float,1)
@@ -6416,8 +6477,10 @@ MAKE_INTERPOLATE_BLOCKAVE(B,signed char,0,float,1)
    required unsigned data type. */
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_BLOCKAVE(UL,unsigned long int,0,long double,0)
+MAKE_INTERPOLATE_BLOCKAVE(UK,UINT_BIG,0,long double,0)
 #else
 MAKE_INTERPOLATE_BLOCKAVE(UL,unsigned long int,0,double,0)
+MAKE_INTERPOLATE_BLOCKAVE(UK,UINT_BIG,0,double,0)
 #endif
 MAKE_INTERPOLATE_BLOCKAVE(UI,unsigned int,0,double,0)
 MAKE_INTERPOLATE_BLOCKAVE(US,unsigned short int,0,float,0)
@@ -6437,6 +6500,10 @@ MAKE_INTERPOLATE_BLOCKAVE(UB,unsigned char,0,float,0)
 #undef LO_L
 #undef HI_UL
 #undef LO_UL
+#undef HI_K
+#undef LO_K
+#undef HI_UK
+#undef LO_UK
 #undef HI_I
 #undef LO_I
 #undef HI_UI
@@ -11100,10 +11167,12 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_NEAREST(I,int)
 
                case ( TYPE_L ): break;
+               case ( TYPE_K ): break;
                case ( TYPE_B ): break;
                case ( TYPE_S ): break;
                case ( TYPE_UL ): break;
                case ( TYPE_UI ): break;
+               case ( TYPE_UK ): break;
                case ( TYPE_US ): break;
                case ( TYPE_UB ): break;
             }
@@ -11141,10 +11210,12 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_LINEAR(I,int)
 
                case ( TYPE_L ): break;
+               case ( TYPE_K ): break;
                case ( TYPE_B ): break;
                case ( TYPE_S ): break;
                case ( TYPE_UL ): break;
                case ( TYPE_UI ): break;
+               case ( TYPE_UK ): break;
                case ( TYPE_US ): break;
                case ( TYPE_UB ): break;
             }
@@ -11337,10 +11408,12 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_KERNEL1(I,int)
 
                case ( TYPE_L ): break;
+               case ( TYPE_K ): break;
                case ( TYPE_B ): break;
                case ( TYPE_S ): break;
                case ( TYPE_UL ): break;
                case ( TYPE_UI ): break;
+               case ( TYPE_UK ): break;
                case ( TYPE_US ): break;
                case ( TYPE_UB ): break;
             }
@@ -11372,10 +11445,12 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_ERROR(I)
 
                case ( TYPE_L ): break;
+               case ( TYPE_K ): break;
                case ( TYPE_B ): break;
                case ( TYPE_S ): break;
                case ( TYPE_UL ): break;
                case ( TYPE_UI ): break;
+               case ( TYPE_UK ): break;
                case ( TYPE_US ): break;
                case ( TYPE_UB ): break;
             }
@@ -13277,8 +13352,10 @@ f     replace <X> in the generic function name AST_RESAMPLE<X> with a
 *     type <Xtype> of the data you are processing, as follows:
 c     - D: double
 c     - F: float
-c     - L: long int
-c     - UL: unsigned long int
+c     - L: long int (may be 32 or 64 bit)
+c     - K: 64 bit int
+c     - UL: unsigned long int (may be 32 or 64 bit)
+c     - UK: unsigned 64 bit int
 c     - I: int
 c     - UI: unsigned int
 c     - S: short int
@@ -13932,6 +14009,8 @@ MAKE_RESAMPLE(D,double)
 MAKE_RESAMPLE(F,float)
 MAKE_RESAMPLE(L,long int)
 MAKE_RESAMPLE(UL,unsigned long int)
+MAKE_RESAMPLE(K,INT_BIG)
+MAKE_RESAMPLE(UK,UINT_BIG)
 MAKE_RESAMPLE(I,int)
 MAKE_RESAMPLE(UI,unsigned int)
 MAKE_RESAMPLE(S,short int)
@@ -15008,6 +15087,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                CASE_NEAREST(F,float)
                CASE_NEAREST(L,long int)
                CASE_NEAREST(UL,unsigned long int)
+               CASE_NEAREST(K,INT_BIG)
+               CASE_NEAREST(UK,UINT_BIG)
                CASE_NEAREST(I,int)
                CASE_NEAREST(UI,unsigned int)
                CASE_NEAREST(S,short int)
@@ -15048,6 +15129,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                CASE_LINEAR(F,float)
                CASE_LINEAR(L,long int)
                CASE_LINEAR(UL,unsigned long int)
+               CASE_LINEAR(K,INT_BIG)
+               CASE_LINEAR(UK,UINT_BIG)
                CASE_LINEAR(I,int)
                CASE_LINEAR(UI,unsigned int)
                CASE_LINEAR(S,short int)
@@ -15258,6 +15341,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                CASE_KERNEL1(F,float)
                CASE_KERNEL1(L,long int)
                CASE_KERNEL1(UL,unsigned long int)
+               CASE_KERNEL1(K,INT_BIG)
+               CASE_KERNEL1(UK,UINT_BIG)
                CASE_KERNEL1(I,int)
                CASE_KERNEL1(UI,unsigned int)
                CASE_KERNEL1(S,short int)
@@ -15343,6 +15428,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                CASE_GINTERP(F,float)
                CASE_GINTERP(L,long int)
                CASE_GINTERP(UL,unsigned long int)
+               CASE_GINTERP(K,INT_BIG)
+               CASE_GINTERP(UK,UINT_BIG)
                CASE_GINTERP(I,int)
                CASE_GINTERP(UI,unsigned int)
                CASE_GINTERP(S,short int)
@@ -15377,6 +15464,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                CASE_ERROR(F)
                CASE_ERROR(L)
                CASE_ERROR(UL)
+               CASE_ERROR(K)
+               CASE_ERROR(UK)
                CASE_ERROR(I)
                CASE_ERROR(UI)
                CASE_ERROR(S)
@@ -15414,6 +15503,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
          CASE_CONSERVE(F,float)
          CASE_CONSERVE(L,long int)
          CASE_CONSERVE(UL,unsigned long int)
+         CASE_CONSERVE(K,INT_BIG)
+         CASE_CONSERVE(UK,UINT_BIG)
          CASE_CONSERVE(I,int)
          CASE_CONSERVE(UI,unsigned int)
          CASE_CONSERVE(S,short int)
@@ -17025,7 +17116,6 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    double *wtprod;               /* Accumulated weight value array pointer */ \
    double *xfilter;              /* Pointer to 1d array of x axis filter values */ \
    double *xnl;                  /* Pointer to previous ofset array (n-d) */ \
-   double error; \
    double pixwt;                 /* Weight to apply to individual pixel */ \
    double sum;                   /* Sum of all filter values */ \
    double wgt;                   /* Weight for input value */ \
@@ -17494,7 +17584,6 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Loop round all input points which are to be rebinned. */ \
    for( point = 0; point < npoint; point++ ) { \
-      error = 0.0; \
 \
 /* Obtain the input data value which is to be added into the output array. */ \
       off_in = offset[ point ]; \
@@ -18239,7 +18328,6 @@ static void SpreadLinear##X( int ndim_out, \
    int *lo;                      /* Pointer to array of lower indices */ \
    int *stride;                  /* Pointer to array of dimension strides */ \
    int bad;                      /* Output pixel bad? */ \
-   int bad_var;                  /* Output variance bad? */ \
    int done;                     /* All pixel indices done? */ \
    int genvar;                   /* Generate output variances? */ \
    int hi_x;                     /* Upper pixel index (x dimension) */ \
@@ -18266,7 +18354,6 @@ static void SpreadLinear##X( int ndim_out, \
 /* Initialise variables to avoid "used of uninitialised variable" \
    messages from dumb compilers. */ \
    bad = 0; \
-   bad_var = 0; \
 \
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
@@ -20660,7 +20747,6 @@ static void TranGridSection( AstMapping *this, const double *linear_fit,
    int idim;                     /* Loop counter for dimensions */
    int ix;                       /* Loop counter for output x coordinate */
    int iy;                       /* Loop counter for output y coordinate */
-   int neighb;                   /* Number of neighbouring pixels */
    int npoint;                   /* Number of output points (pixels) */
    int off1;                     /* Interim pixel offset into output array */
    int off2;                     /* Interim pixel offset into output array */
@@ -20676,7 +20762,6 @@ static void TranGridSection( AstMapping *this, const double *linear_fit,
    ptr_in = NULL;
    ptr_out = NULL;
    pset_out = NULL;
-   neighb = 0;
 
 /* Calculate the number of input points, as given by the product of
    the input grid dimensions. */
@@ -23594,6 +23679,8 @@ MAKE_RESAMPLE_(L,long int)
 MAKE_RESAMPLE_(UL,unsigned long int)
 MAKE_RESAMPLE_(I,int)
 MAKE_RESAMPLE_(UI,unsigned int)
+MAKE_RESAMPLE_(K,INT_BIG)
+MAKE_RESAMPLE_(UK,UINT_BIG)
 MAKE_RESAMPLE_(S,short int)
 MAKE_RESAMPLE_(US,unsigned short int)
 MAKE_RESAMPLE_(B,signed char)
