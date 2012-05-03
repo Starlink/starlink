@@ -51,8 +51,10 @@
 *        should disappear as ANSI compilers become the default.
 
 *  Copyright:
-*     Copyright (C) 1991, 1993 Science & Engineering Research Council
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council
+*     Copyright (C) 1991, 1993 Science & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007,2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -73,6 +75,7 @@
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC)
 *     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
@@ -192,14 +195,26 @@
 *      7-JAN-2000 (AJC):
 *        Correct omission of F77_ASSOC_UBYTE_ARRAY
 *        Correct F77_EXPORT_UWORD_ARRAY
+*      25-AUG-2005 (TIMJ):
+*        Add cnfInitRTL
+*      23-FEB-2006 (TIMJ):
+*        Add cnfRealloc
+*        Use starMalloc rather than malloc in F77_CREATE_POINTER_ARRAY
+*        (since it needs to match what goes on in cnfFree)
 *      21-JUN-2006 (PWD):
 *        Changed to use a different return type for REAL functions. This
 *        effects g77 under 64-bit, when the f2c bindings expect the return
-*        value of a REAL function to be a double, not a float. Note this
-*        file is now a branch of the CNF version (no starmem dependency).
+*        value of a REAL function to be a double, not a float.
+*      25-SEP-2006 (PWD):
+*        Introduced F77_CREATE_IMPORT_CHARACTER. Match length of
+*        F77_CREATE_CHARACTER to result from cnfCref.
 *      13-JUL-2007 (PWD):
 *        Parameterise the type of Fortran character string lengths. Can
 *        be long.
+*      7-OCT-2008 (TIMJ):
+*        Initialise pointers.
+*      11-MAY-2011 (DSB):
+*        Added F77_LOCK
 *     {enter_further_changes_here}
 *
 
@@ -213,13 +228,14 @@
 #define CNF_MACROS
 
 #include <stdlib.h>
+#include <string.h>
+#include "star/mem.h"
 /*  This initial sections defines values for all macros. These are the	    */
 /*  values that are generally appropriate to an ANSI C compiler on Unix.    */
 /*  For macros that have different values on other systems, the macros	    */
 /*  should be undefined and then redefined in the system specific sections. */
 /*  At the end of this section, some macros are redefined if the compiler   */
 /*  is non-ANSI.							    */
-
 
 #if defined(__STDC__) || defined(VMS)
 #define CNF_CONST const
@@ -257,7 +273,7 @@
 
 /*  Macros used in referring to FORTRAN common blocks.			    */
 
-#define F77_BLANK_COMMON                _BLNK__
+#define F77_BLANK_COMMON                @BLANK_COMMON_SYMBOL@
 #define F77_NAMED_COMMON(B)             F77_EXTERNAL_NAME(B)
 
 
@@ -472,23 +488,23 @@
    const int X##_length = L
 
 /*  ---  Declare and construct dynamic CHARACTER arguments ---                      */
-#define DECLARE_CHARACTER_DYN(X)   F77_CHARACTER_TYPE *X;\
-   int X##_length
+#define DECLARE_CHARACTER_DYN(X)   F77_CHARACTER_TYPE *X = NULL;\
+   int X##_length = 0
 #define F77_CREATE_CHARACTER(X,L)  X=cnfCref(L);\
-   X##_length = L
+   X##_length = (L>0?L:1)
 
 /* Declare Dynamic Fortran arrays */
-#define DECLARE_INTEGER_ARRAY_DYN(X) F77_INTEGER_TYPE *X
-#define DECLARE_REAL_ARRAY_DYN(X)    F77_REAL_TYPE *X
-#define DECLARE_DOUBLE_ARRAY_DYN(X)  F77_DOUBLE_TYPE *X
-#define DECLARE_LOGICAL_ARRAY_DYN(X) F77_LOGICAL_TYPE *X
-#define DECLARE_BYTE_ARRAY_DYN(X)    F77_BYTE_TYPE *X
-#define DECLARE_WORD_ARRAY_DYN(X)    F77_WORD_TYPE *X
-#define DECLARE_UBYTE_ARRAY_DYN(X)   F77_UBYTE_TYPE *X
-#define DECLARE_UWORD_ARRAY_DYN(X)   F77_UWORD_TYPE *X
-#define DECLARE_POINTER_ARRAY_DYN(X) F77_POINTER_TYPE *X
-#define DECLARE_CHARACTER_ARRAY_DYN(X)   F77_CHARACTER_TYPE *X;\
-   int X##_length
+#define DECLARE_INTEGER_ARRAY_DYN(X) F77_INTEGER_TYPE *X = NULL
+#define DECLARE_REAL_ARRAY_DYN(X)    F77_REAL_TYPE *X = NULL
+#define DECLARE_DOUBLE_ARRAY_DYN(X)  F77_DOUBLE_TYPE *X = NULL
+#define DECLARE_LOGICAL_ARRAY_DYN(X) F77_LOGICAL_TYPE *X = NULL
+#define DECLARE_BYTE_ARRAY_DYN(X)    F77_BYTE_TYPE *X = NULL
+#define DECLARE_WORD_ARRAY_DYN(X)    F77_WORD_TYPE *X = NULL
+#define DECLARE_UBYTE_ARRAY_DYN(X)   F77_UBYTE_TYPE *X = NULL
+#define DECLARE_UWORD_ARRAY_DYN(X)   F77_UWORD_TYPE *X = NULL
+#define DECLARE_POINTER_ARRAY_DYN(X) F77_POINTER_TYPE *X = NULL
+#define DECLARE_CHARACTER_ARRAY_DYN(X)   F77_CHARACTER_TYPE *X = NULL;\
+   int X##_length = 0
 
 /* Create arrays dynamic Fortran arrays for those types which require */
 /* Separate space for Fortran and C arrays                            */
@@ -509,7 +525,7 @@
 #define F77_CREATE_WORD_ARRAY(X,N)
 #define F77_CREATE_UWORD_ARRAY(X,N)
 #define F77_CREATE_POINTER_ARRAY(X,N)\
-        X=(F77_POINTER_TYPE *) malloc(N*sizeof(F77_POINTER_TYPE))
+        X=(F77_POINTER_TYPE *) starMalloc(N*sizeof(F77_POINTER_TYPE))
 
 /* Associate Fortran arrays with C arrays                             */
 /* These macros ensure that there is space somewhere for the Fortran  */
@@ -552,6 +568,17 @@
 #define F77_EXPORT_UWORD(C,F) F=C
 #define F77_EXPORT_POINTER(C,F) F=cnfFptr(C)
 #define F77_EXPORT_LOCATOR(C,F) cnfExpch(C,F,DAT__SZLOC)
+
+/* Allow for character strings to be NULL, protects strlen. Note this
+ * does not allow lengths to differ. */
+#define F77_CREATE_EXPORT_CHARACTER(C,F) \
+     if (C) { \
+        F77_CREATE_CHARACTER(F,strlen(C)); \
+        F77_EXPORT_CHARACTER(C,F,F##_length); \
+     } else { \
+        F77_CREATE_CHARACTER(F,1); \
+        F77_EXPORT_CHARACTER(" ",F,F##_length); \
+     }
 
 /* Export C arrays to Fortran */
 /* Arrays are assumed to be 1-d so just the number of elements is given  */
@@ -617,6 +644,12 @@
 #define F77_CALL(X)  F77_EXTERNAL_NAME(X)
 
 
+/*  ---  Execute code synchronised by the CNF global mutex                  */
+#define F77_LOCK(code) \
+   cnfLock(); \
+   code \
+   cnfUnlock();
+
 /*  ---  Pass arguments to a FORTRAN routine  ---			    */
 
 #define INTEGER_ARG(X)   X
@@ -654,6 +687,28 @@
 #define POINTER_ARRAY_ARG(X)   (F77_POINTER_TYPE *)X
 #define CHARACTER_ARRAY_ARG(X) (F77_CHARACTER_ARRAY_ARG_TYPE *)X
 
+/* Put the 64-bit INT support in one place */
+#define F77_INTEGER8_TYPE     int64_t
+#define F77_INTEGER8_FUNCTION(X)   F77_INTEGER8_TYPE F77_EXTERNAL_NAME(X)
+#define INTEGER8(X)     F77_INTEGER8_TYPE *CNF_CONST X
+#define INTEGER8_FUNCTION(X)  F77_INTEGER8_TYPE (*X)()
+#define INTEGER8_ARRAY(X)     F77_INTEGER8_TYPE *CNF_CONST X
+#define GENPTR_INTEGER8(X)
+#define GENPTR_INTEGER8_ARRAY(X)
+#define GENPTR_INTEGER8_FUNCTION(X)
+#define DECLARE_INTEGER8(X) F77_INTEGER8_TYPE X
+#define DECLARE_INTEGER8_ARRAY(X,D) F77_INTEGER8_TYPE X[D]
+#define DECLARE_INTEGER8_ARRAY_DYN(X) F77_INTEGER8_TYPE *X = NULL
+#define F77_CREATE_INTEGER8_ARRAY(X,N)
+#define F77_ASSOC_INTEGER8_ARRAY(F,C) F=C
+#define F77_FREE_INTEGER8(X)
+#define F77_EXPORT_INTEGER8(C,F) F=C
+#define F77_EXPORT_INTEGER8_ARRAY(C,F,N) F=(F77_INTEGER8_TYPE *)C
+#define F77_IMPORT_INTEGER8(F,C) C=F
+#define F77_IMPORT_INTEGER8_ARRAY(F,C,N)
+#define INTEGER8_ARG(X)   X
+#define INTEGER8_FUNCTION_ARG(X)  X
+#define INTEGER8_ARRAY_ARG(X)   (F77_INTEGER8_TYPE *)X
 
 /* ------------------------ Non-ansi section ------------------------------ */
 
@@ -960,6 +1015,7 @@
 *-
 ------------------------------------------------------------------------------
 */
+void cnfInitRTL( int, char** );
 void *cnfCalloc( size_t, size_t );
 void cnfCopyf( const char *source_f, int source_len, char *dest_f,
                 int dest_len );
@@ -996,8 +1052,11 @@ void cnfImprtap( const char *source_f, int source_len, char *const *dest_c,
 int cnfLenc( const char *source_c );
 int cnfLenf( const char *source_f, int source_len );
 void *cnfMalloc( size_t );
+void *cnfRealloc( void *, size_t );
 int cnfRegp( void * );
 void cnfUregp( void * );
+void cnfLock( void );
+void cnfUnlock( void );
 #endif
 
 #ifndef CNF_OLD_DEFINED
@@ -1035,4 +1094,4 @@ void cnfUregp( void * );
 #define cnf_regp cnfRegp
 #define cnf_uregp cnfUregp
 
-#endif
+#endif /* CNF_MACROS */
