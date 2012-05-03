@@ -138,6 +138,9 @@
 *        the order given on the NDF called canvas.  Bad values are
 *        transparent.  The bounds of NDF collage match those of NDF
 *        canvas.
+*     paste in=^planes out=cube shift=[0,0,1]
+*        Assuming the text file planes contains a list of two-dimensional
+*        NDFs, this arranges them into a cube, one behind the other.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
