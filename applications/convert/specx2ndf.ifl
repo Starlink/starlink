@@ -26,7 +26,7 @@ interface SPECX2NDF
 
    helplib 'CONVERT_HELP:'
 
-   parameter AXIS                      # Create AXIS structures?
+   parameter      AXIS           # Create AXIS structures?
       type        '_LOGICAL'
       access      'READ'
       vpath       'DEFAULT'
@@ -36,47 +36,47 @@ interface SPECX2NDF
       helpkey     '*'
    endparameter
 
-   parameter GRIDFILE                     # Flag; write map schematic?
-      position 3
-      type     'LITERAL'
-      default  !
-      vpath    'DEFAULT'
-      ppath    'DEFAULT'
-      prompt   'Map schematic file'
-      helpkey  '*'
+   parameter      GRIDFILE       # Flag; write map schematic?
+      position    3
+      type        'LITERAL'
+      default     !
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Map schematic file'
+      helpkey     '*'
    endparameter
 
-   parameter IN                          # Name of the input SPECX map.
-      position 1
-      type     'NDF'
-      access   'READ'
-      ppath    'CURRENT'
-      vpath    'DEFAULT'
-      prompt   'Input SPECX map'
-      helpkey  '*'
+   parameter      IN             # Name of the input SPECX map
+      position    1
+      type        'NDF'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'DEFAULT'
+      prompt      'Input SPECX map'
+      helpkey     '*'
    endparameter
 
-   parameter LATITUDE                 # Latitude of telescope.
-      position 5
-      type     'LITERAL'
-      default  '19:49:33'
-      vpath    'DEFAULT'
-      ppath    'DEFAULT'
-      prompt   'Geodetic (geographic) latitude of telescope'
-      helpkey  '*'
+   parameter      LATITUDE       # Latitude of telescope
+      position    5
+      type        'LITERAL'
+      default     '19:49:33'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Geodetic (geographic) latitude of telescope'
+      helpkey     '*'
    endparameter
 
-   parameter LONGITUDE                 # Longitude of telescope.
-      position 6
-      type     'LITERAL'
-      default  '155:28:47'
-      vpath    'DEFAULT'
-      ppath    'DEFAULT'
-      prompt   'Geodetic (geographic) longitude of telescope'
-      helpkey  '*'
+   parameter      LONGITUDE      # Longitude of telescope
+      position    6
+      type        'LITERAL'
+      default     '155:28:47'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Geodetic (geographic) longitude of telescope'
+      helpkey     '*'
    endparameter
 
-   parameter OUT                         # Name of the output cube.
+   parameter      OUT            # Name of the output cube
       position    2
       type        'NDF'
       access      'WRITE'
