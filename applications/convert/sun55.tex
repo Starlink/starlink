@@ -7588,4 +7588,10 @@ Support for 64-bit integers is now available in
 \htmlref{NDF2DA}{NDF2DA}, \htmlref{NDF2FITS}{NDF2FITS},
 \htmlref{NDF2UNF}{NDF2UNF}, and \htmlref{UNF2NDF}{UNF2NDF}.
 
+NDF2FITS now avoids scaling when the range of data values lies within
+the scaled type's range, such as double to single precision.
+
+\htmlref{SPECX2NDF}{SPECX2NDF} has a new SYSTEM parameter that
+specifies the NDF's co-ordinate system.
+
 \end{document}
