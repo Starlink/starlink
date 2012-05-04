@@ -138,6 +138,8 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 *        Re-code the astGrid function.
 *     12-NOV-2007 (DSB):
 *        Clear up compiler warnings.
+*     4-MAY-2012 (DSB):
+*        Avoid segvio in Grid if no ticks are drawn.
 *class--
 */
 
@@ -3407,14 +3409,25 @@ static void Grid( AstPlot *this_plot, int *status ) {
    bounds of the plot. This ensures that the curves on the other axis
    extend the full width of the plot. */
    tmp = astGetDrawnTicks( baseplot, base_wax2d, 1 );
-   majticks = ExtendTicks( baseplot, tmp, status );
-   nmaj = astGetNpoint( majticks );
-   ptrmaj = astGetPoints( majticks );
+   if( tmp ) {
+      majticks = ExtendTicks( baseplot, tmp, status );
+      nmaj = astGetNpoint( majticks );
+      ptrmaj = astGetPoints( majticks );
+      tmp = astAnnul( tmp );
+   } else {
+      majticks = NULL;
+      nmaj = 0;
+      ptrmaj = NULL;
+   }
 
-   if( tmp ) tmp = astAnnul( tmp );
    minticks = astGetDrawnTicks( baseplot, base_wax2d, 0 );
-   nmin = astGetNpoint( minticks );
-   ptrmin = astGetPoints( minticks );
+   if( minticks ) {
+      nmin = astGetNpoint( minticks );
+      ptrmin = astGetPoints( minticks );
+   } else {
+      nmin = 0;
+      ptrmin = NULL;
+   }
 
 /* All the tick marks will have a constant value for the 2D graphics axis
    that is not being ticked (axis 1 at the moment). Change this constant
@@ -3428,14 +3441,14 @@ static void Grid( AstPlot *this_plot, int *status ) {
    if( new_gaxis != 0 ) {
       perm[ 0 ] = 1;
       perm[ 1 ] = 0;
-      astPermPoints( majticks, 1, perm );
-      astPermPoints( minticks, 1, perm );
+      if( majticks ) astPermPoints( majticks, 1, perm );
+      if( minticks ) astPermPoints( minticks, 1, perm );
    }
 
 /* Transform the tick mark positions from 2D graphics coords to 2D WCS
    coords. */
-   wcsmajticks = astTransform( plot, majticks, 1, NULL );
-   wcsminticks = astTransform( plot, minticks, 1, NULL );
+   wcsmajticks = majticks ? astTransform( plot, majticks, 1, NULL ) : NULL;
+   wcsminticks = minticks ? astTransform( plot, minticks, 1, NULL ) : NULL;
 
 /* Find the index of the 2D WCS axis that will be labelled on the bottom
    or top edge (i.e. 2D graphics axis zero) of the new Plot. */
@@ -3451,8 +3464,8 @@ static void Grid( AstPlot *this_plot, int *status ) {
    if( new_gaxis == 1 ) new_wax2d = 1 - new_wax2d;
 
 /* Store the tick mark values to be used on this WCS axis. */
-   ptrmaj = astGetPoints( wcsmajticks );
-   ptrmin = astGetPoints( wcsminticks );
+   ptrmaj = wcsmajticks ? astGetPoints( wcsmajticks ) : NULL;
+   ptrmin = wcsminticks ? astGetPoints( wcsminticks ) : NULL;
    if( ptrmaj && ptrmin ) {
       astSetTickValues( plot, new_wax2d, nmaj, ptrmaj[ new_gaxis ],
                                          nmin, ptrmin[ new_gaxis ] );
@@ -3501,14 +3514,25 @@ static void Grid( AstPlot *this_plot, int *status ) {
    bounds of the plot. This ensures that the curves on the other axis
    extend the full width of the plot. */
    tmp = astGetDrawnTicks( baseplot, base_wax2d, 1 );
-   majticks = ExtendTicks( baseplot, tmp, status );
-   nmaj = astGetNpoint( majticks );
-   ptrmaj = astGetPoints( majticks );
+   if( tmp ) {
+      majticks = ExtendTicks( baseplot, tmp, status );
+      nmaj = astGetNpoint( majticks );
+      ptrmaj = astGetPoints( majticks );
+      tmp = astAnnul( tmp );
+   } else {
+      majticks = NULL;
+      nmaj = 0;
+      ptrmaj = NULL;
+   }
 
-   if( tmp ) tmp = astAnnul( tmp );
    minticks = astGetDrawnTicks( baseplot, base_wax2d, 0 );
-   nmin = astGetNpoint( minticks );
-   ptrmin = astGetPoints( minticks );
+   if( minticks ) {
+      nmin = astGetNpoint( minticks );
+      ptrmin = astGetPoints( minticks );
+   } else {
+      nmin = 0;
+      ptrmin = NULL;
+   }
 
 /* All the tick marks will have a constant value for the 2D graphics axis
    that is not being ticked (axis 0 at the moment). Change this constant
@@ -3522,14 +3546,14 @@ static void Grid( AstPlot *this_plot, int *status ) {
    if( new_gaxis != 1 ) {
       perm[ 0 ] = 1;
       perm[ 1 ] = 0;
-      astPermPoints( majticks, 1, perm );
-      astPermPoints( minticks, 1, perm );
+      if( majticks ) astPermPoints( majticks, 1, perm );
+      if( minticks ) astPermPoints( minticks, 1, perm );
    }
 
 /* Transform the tick mark positions from 2D graphics coords to 2D WCS
    coords. */
-   wcsmajticks = astTransform( plot, majticks, 1, NULL );
-   wcsminticks = astTransform( plot, minticks, 1, NULL );
+   wcsmajticks = majticks ? astTransform( plot, majticks, 1, NULL ) : NULL;
+   wcsminticks = minticks ? astTransform( plot, minticks, 1, NULL ) : NULL;
 
 /* Find the index of the 2D WCS axis that will be labelled on the bottom
    or top edge (i.e. 2D graphics axis zero) of the new Plot. */
@@ -3545,8 +3569,8 @@ static void Grid( AstPlot *this_plot, int *status ) {
    if( new_gaxis == 1 ) new_wax2d = 1 - new_wax2d;
 
 /* Store the tick mark values to be used on this WCS axis. */
-   ptrmaj = astGetPoints( wcsmajticks );
-   ptrmin = astGetPoints( wcsminticks );
+   ptrmaj = wcsmajticks ? astGetPoints( wcsmajticks ) : NULL;
+   ptrmin = wcsminticks ? astGetPoints( wcsminticks ) : NULL;
    if( ptrmaj && ptrmin ) {
       astSetTickValues( plot, new_wax2d, nmaj, ptrmaj[ new_gaxis ],
                                          nmin, ptrmin[ new_gaxis ] );

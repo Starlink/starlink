@@ -28,6 +28,12 @@ around a compound Region to be plotted more quickly, and more accurately.
 Previously, component Regions nested deeply inside a CmpRegion may have
 been completely or partially ignored.
 
+- A bug has been fixed in the Plot3D class that caused a sementation
+violation if the MinTick attribute was set to zero.
+
+- The astResampleX set of methods now includes astResampleK and
+astResampleUK that handles 64 bit integer data.
+
 Main Changes in V7.0.2
 ----------------------
 
