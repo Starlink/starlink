@@ -1,25 +1,25 @@
-      SUBROUTINE ARY1_PTNI( BAD, NDIM, LBNDA, UBNDA, ARRAY, LSUB,
+      SUBROUTINE ARY1_PTN<T>( BAD, NDIM, LBNDA, UBNDA, ARRAY, LSUB,
      :                        USUB, LBNDD, UBNDD, HTYPE, LOC, DCE,
      :                        STATUS )
 *+
 *  Name:
-*     ARY1_PTNI
+*     ARY1_PTN<T>
 
 *  Purpose:
-*     Write INTEGER values to an n-dimensional subregion of an HDS
+*     Write <COMM> values to an n-dimensional subregion of an HDS
 *     object.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_PTNI( BAD, NDIM, LBNDA, UBNDA, ARRAY, LSUB, USUB,
+*     CALL ARY1_PTN<T>( BAD, NDIM, LBNDA, UBNDA, ARRAY, LSUB, USUB,
 *     LBNDD, UBNDD, HTYPE, LOC, DCE, STATUS )
 
 *  Description:
 *     The routine writes to an n-dimensional subregion of a numeric HDS
 *     array, taking the data from an n-dimensional subregion of a
-*     INTEGER Fortran array and making use of lower and upper bounds
+*     <COMM> Fortran array and making use of lower and upper bounds
 *     information for both arrays. Data type conversion is performed if
 *     necessary, with bad pixel testing if required.
 
@@ -33,8 +33,8 @@
 *        Lower bounds of input array.
 *     UBNDA( NDIM ) = INTEGER (Given)
 *        Upper bounds of input array.
-*     ARRAY( * ) = INTEGER (Given)
-*        Input INTEGER array.
+*     ARRAY( * ) = <TYPE> (Given)
+*        Input <COMM> array.
 *     LSUB( NDIM ) = INTEGER (Given)
 *        Lower bounds of subregion to be written.
 *     USUB( NDIM ) = INTEGER (Given)
@@ -182,7 +182,7 @@
       INTEGER NDIM
       INTEGER LBNDA( NDIM )
       INTEGER UBNDA( NDIM )
-      INTEGER ARRAY( * )
+      <TYPE> ARRAY( * )
       INTEGER LSUB( NDIM )
       INTEGER USUB( NDIM )
       INTEGER LBNDD( NDIM )
@@ -225,9 +225,9 @@
          CALL CHR_UCASE( TYPE )
       ELSE
          STATUS = ARY__FATIN
-         CALL MSG_SETC( 'ROUTINE', 'ARY1_PTNI' )
+         CALL MSG_SETC( 'ROUTINE', 'ARY1_PTN<T>' )
          CALL MSG_SETC( 'BADHTYPE', HTYPE )
-         CALL ERR_REP( 'ARY1_PTNI_TYP',
+         CALL ERR_REP( 'ARY1_PTN<T>_TYP',
      :   'Routine ^ROUTINE called with an invalid HTYPE ' //
      :   'argument of ''^BADHTYPE'' (internal programming error).',
      :   STATUS )
@@ -322,7 +322,7 @@
 
 *  Transfer the data from the appropriate part of the input array and
 *  annul the slice. Note if a data conversion error occurred.
-            CALL ARY1_PT1I( BAD, NCONTG, ARRAY( EA + 1 ), TYPE, SLICE,
+            CALL ARY1_PT1<T>( BAD, NCONTG, ARRAY( EA + 1 ), TYPE, SLICE,
      :                        DCESLC, STATUS )
             CALL DAT_ANNUL( SLICE, STATUS )
             SLICE = ARY__NOLOC
@@ -386,7 +386,7 @@
       VEC = ARY__NOLOC
 
 *  Call error tracing routine and exit.
-      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_PTNI',
+      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_PTN<T>',
      :STATUS )
 
       END

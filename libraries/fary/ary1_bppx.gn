@@ -1,34 +1,39 @@
-      SUBROUTINE ARY1_ZERD( N, ARGV, STATUS )
+      SUBROUTINE ARY1_BPP<T>( EL, ARRAY, BAD, STATUS )
 *+
 *  Name:
-*     ARY1_ZERD
+*     ARY1_BPP<T>
 
 *  Purpose:
-*     Set all elements of a vectorized DOUBLE PRECISION array to zero.
+*     Determine if bad pixels are present in a vectorised <COMM> array.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_ZERD( N, ARGV, STATUS )
+*     CALL ARY1_BPP<T>( EL, ARRAY, BAD, STATUS )
 
 *  Description:
-*     The routine sets all the elements of the DOUBLE PRECISION array supplied to
-*     zero.
+*     The routine examines the values in a vectorised <COMM> array and
+*     returns a logical result BAD indicating whether any element of the
+*     array contains the "bad" pixel value VAL__BAD<T>.
 
 *  Arguments:
-*     N = INTEGER (Given)
-*        Number of elements in the array.
-*     ARGV( N ) = DOUBLE PRECISION (Returned)
-*        The vectorised DOUBLE PRECISION array to be set to zero.
+*     EL = INTEGER (Given)
+*        Number of elements in the vectorised array.
+*     ARRAY( EL ) = <TYPE> (Given)
+*        The array to be examined.
+*     BAD = LOGICAL (Returned)
+*        Whether any ARRAY element had the value VAL__BAD<T>.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Algorithm:
-*     -  Set each array element to zero with an assignment statement.
+*     -  Initialise.
+*     -  Loop to examine each array element.
+*     -  If a bad value is found, then set BAD=.TRUE. and quit checking.
 
 *  Copyright:
-*     Copyright (C) 1989, 1990 Science & Engineering Research Council.
+*     Copyright (C) 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -52,40 +57,34 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     8-JUN-1989  (RFWS):
+*     21-NOV-1989 (RFWS):
 *        Original version.
-*     30-AUG-1989 (RFWS):
-*        Changed name to conform to prefix plus 5 character convention.
-*     13-MAR-1990 (RFWS):
-*        Renamed from VEC_ZERD to ARY1_ZERD.
-*     {enter_further_changes_here}
+*     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
 
-*  Type definitions:
+*  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
 
 *  Arguments Given:
-      INTEGER N
+      INTEGER EL
+      <TYPE> ARRAY( EL )
 
 *  Arguments Returned:
-      DOUBLE PRECISION ARGV( N )
+      LOGICAL BAD
 
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants:
-      DOUBLE PRECISION ZERO                ! Zero
-      PARAMETER ( ZERO = 0.0D0 )
-
-*  Local variables:
+*  Local Variables:
       INTEGER I                  ! Loop counter for array elements
 
 *.
@@ -93,9 +92,22 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Assign the value ZERO to each array element.
-      DO 1 I = 1, N
-         ARGV( I ) = ZERO
+*  Initialise.
+      BAD = .FALSE.
+
+*  Loop to examine each array element.
+      DO 1 I = 1, EL
+
+*  If a bad value is found, set BAD=.TRUE. and quit checking.
+         IF ( ARRAY( I ) .EQ. VAL__BAD<T> ) THEN
+            BAD = .TRUE.
+            GO TO 2
+         END IF
 1     CONTINUE
+2     CONTINUE
+
+*  Call error tracing routine and exit.
+      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_BPP<T>',
+     :                                            STATUS )
 
       END

@@ -1,20 +1,20 @@
-      SUBROUTINE ARY1_CVTR( BAD, N, TYPE, PNTR, RESULT, DCE, STATUS )
+      SUBROUTINE ARY1_CVT<T>( BAD, N, TYPE, PNTR, RESULT, DCE, STATUS )
 *+
 *  Name:
-*     ARY1_CVTR
+*     ARY1_CVT<T>
 
 *  Purpose:
-*     Convert a vectorised array to REAL.
+*     Convert a vectorised array to <COMM>.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_CVTR( BAD, N, TYPE, PNTR, RESULT, DCE, STATUS )
+*     CALL ARY1_CVT<T>( BAD, N, TYPE, PNTR, RESULT, DCE, STATUS )
 
 *  Description:
 *     The routine converts a vectorised array of any primitive numeric
-*     type to a data type of REAL, checking for the presence of bad
+*     type to a data type of <COMM>, checking for the presence of bad
 *     pixels if required. The input array is passed by pointer; the
 *     output array is passed directly.
 
@@ -29,8 +29,8 @@
 *        supplied in upper case.
 *     PNTR = INTEGER (Given)
 *        Pointer to the input vectorised array.
-*     RESULT( N ) = REAL (Returned)
-*        The output REAL vectorised array, to contain the converted
+*     RESULT( N ) = <TYPE> (Returned)
+*        The output <COMM> vectorised array, to contain the converted
 *        values.
 *     DCE = LOGICAL (Returned)
 *        Whether any data conversion errors occurred (bad values are
@@ -103,7 +103,7 @@
       INTEGER PNTR
 
 *  Arguments Returned:
-      REAL RESULT
+      <TYPE> RESULT
       LOGICAL DCE
 
 *  Status:
@@ -127,32 +127,32 @@
 *  Test for each valid input data type in turn and call the appropriate
 *  conversion routine.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL VEC_BTOR( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
-     :                  NERR, STATUS )
+         CALL VEC_BTO<T>( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT,
+     :                   IERR, NERR, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL VEC_UBTOR( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
-     :                   NERR, STATUS )
+         CALL VEC_UBTO<T>( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT,
+     :                    IERR, NERR, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL VEC_DTOR( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
-     :                  NERR, STATUS )
+         CALL VEC_DTO<T>( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT,
+     :                   IERR, NERR, STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL VEC_ITOR( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
-     :                  NERR, STATUS )
+         CALL VEC_ITO<T>( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT,
+     :                   IERR, NERR, STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL VEC_RTOR( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
-     :                  NERR, STATUS )
+         CALL VEC_RTO<T>( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT,
+     :                   IERR, NERR, STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL VEC_WTOR( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
-     :                  NERR, STATUS )
+         CALL VEC_WTO<T>( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT,
+     :                   IERR, NERR, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL VEC_UWTOR( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT, IERR,
-     :                   NERR, STATUS )
+         CALL VEC_UWTO<T>( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT,
+     :                    IERR, NERR, STATUS )
 
 *  Note if the input data type specified is not valid.
       ELSE
@@ -169,9 +169,9 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
          IF( .NOT. TYPOK ) THEN
             STATUS = ARY__FATIN
-            CALL MSG_SETC( 'ROUTINE', 'ARY1_CVTR' )
+            CALL MSG_SETC( 'ROUTINE', 'ARY1_CVT<T>' )
             CALL MSG_SETC( 'BADTYPE', TYPE )
-            CALL ERR_REP( 'ARY1_CVTR_TYPE',
+            CALL ERR_REP( 'ARY1_CVT<T>_TYPE',
      :      'Routine ^ROUTINE called with an invalid TYPE ' //
      :      'argument of ''^BADTYPE'' (internal programming error).',
      :      STATUS )
@@ -179,7 +179,7 @@
       END IF
 
 *  Call error tracing routine and exit.
-      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_CVTR',
+      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_CVT<T>',
      :STATUS )
 
       END
