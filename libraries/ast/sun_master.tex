@@ -778,7 +778,7 @@ numbering and labelling curvilinear axes is rarely straightforward.
 for use with curvilinear coordinate systems. These include the
 plotting of axes and complete labelled coordinate grids.  A large
 number of options are provided for tailoring the output to your
-specific needs.
+specific needs. Three dimensional coordinate grids can also be produced.
 
 \item[4. Aligning Data from Different Sources]\mbox{}\\
 One of the main uses of coordinate systems is to facilitate the
@@ -1449,11 +1449,15 @@ in \appref{ss:classdescriptions} and the Encoding entry in
 
 \subsection{Producing Graphical Output}
 
-Graphical output is supported by a specialised form of FrameSet called
+Two dimensional graphical output is supported by a specialised form of
+FrameSet called
 a Plot, whose base Frame corresponds with the native coordinates of
 the underlying graphics system.  Plotting operations are specified in
 {\em{physical coordinates}} which correspond with the Plot's current
 Frame. Typically, this might be a celestial coordinate system.
+
+Three dimensional plotting is also supported, via the Plot3D class -
+sub-class of Plot.
 
 Operations, such as drawing lines, are automatically transformed from
 physical to graphical coordinates before plotting, using an adaptive
@@ -18986,7 +18990,8 @@ Object             - Base class for all AST Objects
             SpecFluxFrame - Observed value versus spectral position
          FluxFrame - Observed value at a given fixed spectral position
          FrameSet  - Set of inter-related coordinate systems
-            Plot   - Provide facilities for graphical output
+            Plot   - Provide facilities for 2D graphical output
+               Plot3D - Provide facilities for 3D graphical output
          Region    - Specify areas within a coordinate system
             Box    - A box region with sides parallel to the axes of a Frame
             Circle - A circular or spherical region within a Frame
