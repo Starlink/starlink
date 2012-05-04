@@ -39,11 +39,9 @@
 
 *  Notes:
 *     -  There is a routine for _CHAR, _LOGICAL, _INTEGER, _REAL, and
-*     _DOUBLE data types: replace "x" in the routine name by C, L, W,
+*     _DOUBLE data types: replace "x" in the routine name by C, L,
 *     I, R, D as appropriate.  Argument VALUE supplied to the routine
 *     must have the data type specified.
-*
-*     [optional_subroutine_items]...
 
 *  Copyright:
 *     Copyright (C) 1996-1997, 2004 Central Laboratory of the Research
@@ -77,7 +75,7 @@
 *        Added COMENT argument.
 *     2004 September 10 (TIMJ):
 *        Fix valgrind warning with uninitialised COMENT on entry
-*        to fitsio routine
+*        to fitsio routine.
 *     {enter_further_changes_here}
 
 *-
