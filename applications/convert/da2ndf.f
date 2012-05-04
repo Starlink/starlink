@@ -33,7 +33,7 @@
 *     COMP = LITERAL (Read)
 *        The NDF component to be copied.  It may be "Data", "Quality"
 *        or "Variance".  To create a variance or quality array the NDF
-*        must already exist. ["Data"]
+*        must already exist.  ["Data"]
 *     IN = FILENAME (Read)
 *        Name of the input direct-access unformatted file.
 *     NOPEREC = _INTEGER (Read)

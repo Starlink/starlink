@@ -34,7 +34,7 @@
 *  ADAM Parameters:
 *     COMP = LITERAL (Read)
 *        The NDF component to be copied.  It may be "Data", "Quality"
-*        or "Variance". ["Data"]
+*        or "Variance".  ["Data"]
 *     FITS = _LOGICAL (Read)
 *        If TRUE, any FITS extension is written to start of the output
 *        file, unless there is no extension whereupon a minimal FITS
@@ -627,13 +627,11 @@
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL CON_OAFFD( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                   FIXED, NCPVAL,
-     :                   NUMPRE, RECL, STATUS )
+     :                   FIXED, NCPVAL, NUMPRE, RECL, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL CON_OAFFR( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                   FIXED, NCPVAL,
-     :                   NUMPRE, RECL, STATUS )
+     :                   FIXED, NCPVAL, NUMPRE, RECL, STATUS )
 
       END IF
 
@@ -653,4 +651,3 @@
       END IF
 
       END
-

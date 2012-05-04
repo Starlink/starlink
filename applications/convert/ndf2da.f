@@ -31,7 +31,7 @@
 *  ADAM Parameters:
 *     COMP = LITERAL (Read)
 *        The NDF component to be copied.  It may be "Data", "Quality"
-*        or "Variance". ["Data"]
+*        or "Variance".  ["Data"]
 *     IN = NDF (Read)
 *        Input NDF data structure.  The suggested default is the current
 *        NDF if one exists, otherwise it is the current value.
@@ -313,4 +313,3 @@
       END IF
 
       END
-

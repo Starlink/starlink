@@ -34,7 +34,7 @@
 *     COMP = LITERAL (Read)
 *        The NDF component to be copied.  It may be "Data", "Quality"
 *        or "Variance".  To create a variance or quality array the NDF
-*        must already exist. ["Data"]
+*        must already exist.  ["Data"]
 *     FITS = _LOGICAL (Read)
 *        If TRUE, the initial records of the unformatted file are
 *        interpreted as a FITS header (with one card image per record)
