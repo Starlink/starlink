@@ -514,7 +514,7 @@ static int InterpolateNearest##X( int, const int *, const int *, const Xtype *, 
 \
 static int Resample##X( AstMapping *, int, const int [], const int [], \
                         const Xtype [], const Xtype [], int, \
-                        void (*)(), const double [], int, double, int, \
+                        void (*)( void ), const double [], int, double, int, \
                         Xtype, int, const int [], const int [], \
                         const int [], const int [], Xtype [], Xtype [], int * ); \
 \
@@ -622,9 +622,9 @@ static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int 
 static int MaxI( int, int, int * );
 static int MinI( int, int, int * );
 static int QuadApprox( AstMapping *, const double[2], const double[2], int, int, double *, double *, int * );
-static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
-static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
-static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
+static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)( void ), const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
+static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)( void ), const double *, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
+static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)( void ), const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
 static int SpecialBounds( const MapData *, double *, double *, double [], double [], int * );
 static int TestAttrib( AstObject *, const char *, int * );
 static int TestInvert( AstMapping *, int * );
@@ -12927,7 +12927,7 @@ c     #include "mapping.h"
 c     int astResample<X>( AstMapping *this, int ndim_in,
 c                         const int lbnd_in[], const int ubnd_in[],
 c                         const <Xtype> in[], const <Xtype> in_var[],
-c                         int interp, void (* finterp)(),
+c                         int interp, void (* finterp)( void ),
 c                         const double params[], int flags,
 c                         double tol, int maxpix,
 c                         <Xtype> badval, int ndim_out,
@@ -13792,7 +13792,7 @@ f     BADVAL
 static int Resample##X( AstMapping *this, int ndim_in, \
                         const int lbnd_in[], const int ubnd_in[], \
                         const Xtype in[], const Xtype in_var[], \
-                        int interp, void (* finterp)(), \
+                        int interp, void (* finterp)( void ), \
                         const double params[], int flags, double tol, \
                         int maxpix, Xtype badval, \
                         int ndim_out, const int lbnd_out[], \
@@ -14024,7 +14024,7 @@ MAKE_RESAMPLE(UB,unsigned char)
 static int ResampleAdaptively( AstMapping *this, int ndim_in,
                                const int *lbnd_in, const int *ubnd_in,
                                const void *in, const void *in_var,
-                               DataType type, int interp, void (* finterp)(),
+                               DataType type, int interp, void (* finterp)( void ),
                                const double *params, int flags, double tol,
                                int maxpix, const void *badval_ptr,
                                int ndim_out, const int *lbnd_out,
@@ -14045,7 +14045,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *     int ResampleAdaptively( AstMapping *this, int ndim_in,
 *                             const int *lbnd_in, const int *ubnd_in,
 *                             const void *in, const void *in_var,
-*                             DataType type, int interp, void (* finterp)(),
+*                             DataType type, int interp, void (* finterp)( void ),
 *                             const double *params, int flags, double tol,
 *                             int maxpix, const void *badval_ptr,
 *                             int ndim_out, const int *lbnd_out,
@@ -14463,7 +14463,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                             int ndim_in,
                             const int *lbnd_in, const int *ubnd_in,
                             const void *in, const void *in_var,
-                            DataType type, int interp, void (* finterp)(),
+                            DataType type, int interp, void (* finterp)( void ),
                             const double *params, double factor, int flags,
                             const void *badval_ptr, int ndim_out,
                             const int *lbnd_out, const int *ubnd_out,
@@ -14484,7 +14484,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *     int ResampleSection( AstMapping *this, const double *linear_fit,
 *                          int ndim_in, const int *lbnd_in, const int *ubnd_in,
 *                          const void *in, const void *in_var,
-*                          DataType type, int interp, void (* finterp)(),
+*                          DataType type, int interp, void (* finterp)( void ),
 *                          const double *params, double factor, int flags,
 *                          const void *badval_ptr, int ndim_out,
 *                          const int *lbnd_out, const int *ubnd_out,
@@ -14698,7 +14698,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    int result;                   /* Result value to be returned */
    int s;                        /* Temporary variable for strides */
    int usevar;                   /* Process variance array? */
-   void (* gifunc)();            /* General interpolation function */
+   void (* gifunc)( void );      /* General interpolation function */
    void (* kernel)( double, const double [], int, double *, int * ); /* Kernel fn. */
    void (* fkernel)( double, const double [], int, double * ); /* User kernel fn. */
 
@@ -15374,13 +15374,13 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Block averaging interpolation. */ \
 /* ------------------------------ */ \
                      case AST__BLOCKAVE: \
-                        gifunc = (void (*)()) InterpolateBlockAverage##X; \
+                        gifunc = (void (*)( void )) InterpolateBlockAverage##X; \
                         break; \
 \
 /* User-supplied sub-pixel interpolation function. */ \
 /* ----------------------------------------------- */ \
                      case AST__UINTERP: \
-                        gifunc = (void (*)()) finterp; \
+                        gifunc = (void (*)( void )) finterp; \
                         break; \
                   } \
 \
@@ -15535,7 +15535,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
                                  int ndim_in,
                                  const int *lbnd_in, const int *ubnd_in,
                                  const void *in, const void *in_var,
-                                 DataType type, int interp, void (* finterp)(),
+                                 DataType type, int interp, void (* finterp)( void ),
                                  const double *params, int flags,
                                  const void *badval_ptr, int ndim_out,
                                  const int *lbnd_out, const int *ubnd_out,
@@ -15557,7 +15557,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *                               int ndim_in,
 *                               const int *lbnd_in, const int *ubnd_in,
 *                               const void *in, const void *in_var,
-*                               DataType type, int interp, void (* finterp)(),
+*                               DataType type, int interp, void (* finterp)( void ),
 *                               const double *params, int flags,
 *                               const void *badval_ptr, int ndim_out,
 *                               const int *lbnd_out, const int *ubnd_out,
@@ -23654,7 +23654,7 @@ void astReportPoints_( AstMapping *this, int forward,
 int astResample##X##_( AstMapping *this, int ndim_in, const int *lbnd_in, \
                        const int *ubnd_in, const Xtype *in, \
                        const Xtype *in_var, int interp, \
-                       void (* finterp)(), const double *params, \
+                       void (* finterp)( void ), const double *params, \
                        int flags, double tol, int maxpix, Xtype badval, \
                        int ndim_out, \
                        const int *lbnd_out, const int *ubnd_out, \

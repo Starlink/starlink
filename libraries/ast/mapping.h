@@ -474,7 +474,7 @@ typedef struct AstMappingVtab {
 #define DECLARE_GENERIC_ALL(X,Xtype) \
    int (* Resample##X)( AstMapping *, int, const int [], const int [], \
                         const Xtype [], const Xtype [], int, \
-                        void (*)(), const double [], int, double, int, \
+                        void (*)( void ), const double [], int, double, int, \
                         Xtype, int, const int [], const int [], \
                         const int [], const int [], Xtype [], Xtype [], int * ); \
 
@@ -573,7 +573,7 @@ void astInitMappingGlobals_( AstMappingGlobals * );
 #define PROTO_GENERIC_ALL(X,Xtype) \
    int astResample##X##_( AstMapping *, int, const int [], const int [], \
                         const Xtype [], const Xtype [], int, \
-                        void (*)(), const double [], int, double, int, \
+                        void (*)( void ), const double [], int, double, int, \
                         Xtype, int, const int [], const int [], \
                         const int [], const int [], Xtype [], Xtype [], int * ); \
 
