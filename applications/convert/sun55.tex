@@ -6076,6 +6076,34 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          included since it is appended automatically by the application.
       }
       \sstsubsection{
+         SYSTEM = LITERAL (Read)
+      }{
+         Celestial co-ordinate system for output cube.  SPECX files do
+         not record the co-ordinate system for any offsets.  The
+         recognised options are as follows.
+
+         \ssthitemlist{
+
+         \sstitem
+            \texttt{"AZ"} --- azimuth and elevation
+
+         \sstitem
+            \texttt{"GA"} --- galactic
+
+         \sstitem
+            \texttt{"RB"} --- B1950
+
+         \sstitem
+            \texttt{"RD"} --- equatorial of date
+
+         \sstitem
+            \texttt{"RJ"} --- J2000
+         }
+
+         SYSTEM needs to be used to set manually the correct
+         co-ordinates for a map file.  \texttt{["RJ"]}
+      }
+      \sstsubsection{
          TELESCOPE  =  LITERAL (Read)
       }{
          The name of the telescope where the observation was made.
