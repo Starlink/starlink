@@ -45,11 +45,11 @@
 *        is the minimum that prevents any loss of precision, and hence
 *        is dependent on the data type of the NDF array.  These widths
 *        in characters for each HDS data type are as follows: _UBYTE, 3;
-*        _BYTE, 4; _UWORD, 5; _WORD, 6; _INTEGER, 11; _REAL, 16; and
-*        _DOUBLE, 24.  The record length is the product of the number
-*        of characters per value plus one (for a delimiting space),
-*        times the number of values per record given by parameter
-*        NOPEREC, up to a maximum of 512.
+*        _BYTE, 4; _UWORD, 5; _WORD, 6; _INTEGER, 11; _INT64, 20;
+*        _REAL, 16; and _DOUBLE, 24.  The record length is the product
+*        of the number of characters per value plus one (for a
+*        delimiting space), times the number of values per record given
+*        by parameter NOPEREC, up to a maximum of 512.
 *
 *        When FIXED is FALSE, data values are packed as efficiently as
 *        possible within each record.  The length of each record is
@@ -174,7 +174,9 @@
 *  Copyright:
 *     Copyright (C) 1991-1992 Science & Engineering Research Council.
 *     Copyright (C) 1996-1997, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -210,7 +212,9 @@
 *        Reduced the maximum record length to 512, and the default
 *        RECLEN to 132.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 April 30 (MJC):
+*        Add _INT64 type.
 *     {enter_further_changes_here}
 
 *-
@@ -376,6 +380,9 @@
 
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
             NCPVAL = VAL__SZI
+
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            NCPVAL = VAL__SZK
 
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
             NCPVAL = VAL__SZR
@@ -597,8 +604,8 @@
 *  ========================
 
 *  Obtain the implementation type.
-      CALL NDF_MTYPE( '_INTEGER,_REAL,_DOUBLE', NDF, NDF, COMP, ITYPE,
-     :                DTYPE, STATUS )
+      CALL NDF_MTYPE( '_INTEGER,_INT64,_REAL,_DOUBLE', NDF, NDF, COMP,
+     :                ITYPE, DTYPE, STATUS )
 
 *  Map the input data array using the implementation data type.
       CALL NDF_MAP( NDF, COMP, ITYPE, 'READ', PNTR, EL, STATUS )
@@ -612,8 +619,11 @@
 *  array is unmapped.
       IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL CON_OAFFI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                   FIXED, NCPVAL,
-     :                   NUMPRE, RECL, STATUS )
+     :                   FIXED, NCPVAL, NUMPRE, RECL, STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL CON_OAFFK( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   FIXED, NCPVAL, NUMPRE, RECL, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL CON_OAFFD( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),

@@ -53,14 +53,14 @@
 *     TYPE = LITERAL (Read)
 *        The data type of the direct-access file and the NDF.  It must
 *        be one of the following HDS types: "_BYTE", "_WORD", "_REAL",
-*        "_INTEGER", "_DOUBLE", "_UBYTE", "_UWORD" corresponding to
-*        signed byte, signed word, real, integer, double precision,
-*        unsigned byte, and unsigned word respectively.  See SUN/92 for
-*        further details.  An unambiguous abbreviation may be given.
-*        TYPE is ignored when COMP = "Quality" since the QUALITY
-*        component must comprise unsigned bytes (equivalent to TYPE =
-*        "_UBYTE") to be a valid NDF. The suggested default is the
-*        current value. ["_REAL"]
+*        "_INTEGER", "_INT64", "_DOUBLE", "_UBYTE", "_UWORD"
+*        corresponding to signed byte, signed word, real, integer,
+*        64-bit integers, double precision, unsigned byte, and unsigned
+*        word respectively.  See SUN/92 for further details.  An
+*        unambiguous abbreviation may be given.  TYPE is ignored when
+*        COMP = "Quality" since the QUALITY component must comprise
+*        unsigned bytes (equivalent to TYPE = "_UBYTE") to be a valid
+*        NDF.  The suggested default is the current value. ["_REAL"]
 
 *  Examples:
 *     da2ndf ngc253.dat ngc253 shape=[100,60] noperec=8
@@ -97,8 +97,8 @@
 
 *  Copyright:
 *     Copyright (C) 1996, 2004 Central Laboratory of the Research
-*     Councils.  Copyright (C) 2011 Science & Technology Facilities
-*     Council.  All Rights Reserved.
+*     Councils.  Copyright (C) 2011-2012 Science & Technology
+*     Facilities Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -128,6 +128,8 @@
 *        Use CNF_PVAL.
 *     2011 January 12 (MJC):
 *        Use KPG_TYPSZ instead of COF_TYPSZ.
+*     2012 April 30 (MJC):
+*        Add _INT64 type.
 *     {enter_further_changes_here}
 
 *-
@@ -202,8 +204,8 @@
 
       ELSE
          CALL PAR_CHOIC( 'TYPE', '_REAL', '_BYTE,_DOUBLE,_INTEGER,'/
-     :                   /'_REAL,_UBYTE,_UWORD,_WORD', .FALSE., TYPE,
-     :                   STATUS )
+     :                   /'_INT64,_REAL,_UBYTE,_UWORD,_WORD', .FALSE.,
+     :                   TYPE, STATUS )
       END IF
 
 *  Obtain the number of bytes corresponding to the chosen data type.
@@ -310,6 +312,11 @@
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          CALL CON_IUDAI( FD, EL, NUMPRE, 0,
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   STATUS )
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL CON_IUDAK( FD, EL, NUMPRE, 0,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 

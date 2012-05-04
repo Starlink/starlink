@@ -69,7 +69,7 @@
 
 *  Copyright:
 *     Copyright (C) 1996, 2004 Central Laboratory of the Research
-*     Councils.  Copyright (C) 2011 Science & Technology Facilities
+*     Councils.  Copyright (C) 2011-2012 Science & Technology Facilities
 *     Council.  All Rights Reserved.
 
 *  Licence:
@@ -100,6 +100,8 @@
 *        Use CNF_PVAL.
 *     2011 January 12 (MJC):
 *        Use KPG_TYPSZ instead of COF_TYPSZ.
+*     2012 April 30 (MJC):
+*        Add _INT64 type.
 *     {enter_further_changes_here}
 
 *-
@@ -227,6 +229,9 @@
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          RECL = NUMPRE * VAL__NBI
 
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         RECL = NUMPRE * VAL__NBK
+
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
          RECL = NUMPRE * VAL__NBUW
 
@@ -268,6 +273,10 @@
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          CALL CON_OUDAI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   NUMPRE, STATUS )
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL CON_OUDAK( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN

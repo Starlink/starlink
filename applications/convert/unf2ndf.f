@@ -67,15 +67,16 @@
 *        [0]
 *     TYPE = LITERAL (Read)
 *        The data type of the input file and output NDF. It must be one
-*        of the following HDS types: "_BYTE", "_WORD", "_REAL", "_INTEGER",
-*        "_DOUBLE", "_UBYTE", "_UWORD" corresponding to signed byte,
-*        signed word, real, integer, double precision, unsigned byte,
-*        and unsigned word.  See SUN/92 for further details.  An
-*        unambiguous abbreviation may be given.  TYPE is ignored when
+*        of the following HDS types: "_BYTE", "_WORD", "_REAL",
+*        "_INTEGER", "_INT64", "_DOUBLE", "_UBYTE", "_UWORD"
+*        corresponding to signed byte, signed word, real, integer,
+*        64-bit integer, double precision, unsigned byte, and unsigned
+*        word.  See SUN/92 for further details.  An unambiguous
+*        abbreviation may be given.  TYPE is ignored when
 *        COMP = "Quality" since the QUALITY component must comprise
 *        unsigned bytes (equivalent to TYPE = "_UBYTE") to be a valid
 *        NDF. The suggested default is the current value.  TYPE is
-*        also only accessed when FITS is FALSE. ["_REAL"]
+*        also only accessed when FITS is FALSE.  ["_REAL"]
 
 *  Examples:
 *     unf2ndf ngc253.dat ngc253 shape=[100,60] noperec=8
@@ -138,15 +139,16 @@
 *        -  The FITS-like header defines the properties of the NDF as
 *        follows:
 *           o  BITPIX defines the data type: 8 gives _BYTE, 16 produces
-*           _WORD, 32 makes _INTEGER, -32 gives _REAL, and -64 generates
-*           _DOUBLE.  For the first two, if there is an extra header
-*           record with the keyword UNSIGNED and logical value T, these
-*           types become _UBYTE and _UWORD respectively.  UNSIGNED is
-*           non-standard, since unsigned integers would not follow in a
-*           proper FITS file.  However, here it is useful to enable
-*           unsigned types to be input into an NDF.  UNSIGNED may be
-*           created by this application's sister, NDF2UNF.  BITPIX is
-*           ignored for QUALITY data; type _UBYTE is used.
+*           _WORD, 32 makes _INTEGER, 64 creates _INT64, -32 gives
+*           _REAL, and -64 generates _DOUBLE.  For the first two, if
+*           there is an extra header record with the keyword UNSIGNED
+*           and logical value T, these types become _UBYTE and _UWORD
+*           respectively.  UNSIGNED is non-standard, since unsigned
+*           integers would not follow in a proper FITS file.  However,
+*           here it is useful to enable unsigned types to be input into
+*           an NDF.  UNSIGNED may be created by this application's
+*           sister, NDF2UNF.  BITPIX is ignored for QUALITY data; type
+*           _UBYTE is used.
 *           o  NAXIS, and NAXISn define the shape of the NDF.
 *           o  The TITLE, LABEL, and BUNIT are copied to the NDF
 *           TITLE, LABEL, and UNITS NDF components respectively.
@@ -173,7 +175,9 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 1996, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -203,7 +207,9 @@
 *        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
 *        for axis units.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 April 30 (MJC):
+*        Add _INT64 type.
 *     {enter_further_changes_here}
 
 *-
@@ -332,8 +338,8 @@
             TYPE = '_UBYTE'
          ELSE
             CALL PAR_CHOIC( 'TYPE', '_REAL', '_BYTE,_DOUBLE,_INTEGER,'/
-     :                      /'_REAL,_UBYTE,_UWORD,_WORD', .FALSE., TYPE,
-     :                      STATUS )
+     :                      /'_INT64,_REAL,_UBYTE,_UWORD,_WORD',
+     :                      .FALSE., TYPE, STATUS )
          END IF
       END IF
 
@@ -512,6 +518,11 @@
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          CALL CON_IFUFI( FD, EL, NUMPRE, SKIP,
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   STATUS )
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL CON_IFUFK( FD, EL, NUMPRE, SKIP,
      :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 

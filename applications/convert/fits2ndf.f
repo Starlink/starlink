@@ -401,15 +401,16 @@
 *     TYPE = LITERAL (Read)
 *        The data type of the output NDF's data and variance arrays.  It
 *        is normally one of the following HDS types: "_BYTE", "_WORD",
-*        "_REAL", "_INTEGER", "_DOUBLE", "_UBYTE", "_UWORD"
+*        "_REAL", "_INTEGER", "_INT64", "_DOUBLE", "_UBYTE", "_UWORD"
 *        corresponding to signed byte, signed word, real, integer,
-*        double precision, unsigned byte, and unsigned word.  See SUN/92
-*        for further details.  An unambiguous abbreviation may be given.
-*        TYPE is ignored when COMP = "Quality" since the QUALITY
-*        component must comprise unsigned bytes (equivalent to
-*        TYPE = "_UBYTE") to be a valid NDF.  The suggested default is
-*        the current value.  Note that setting TYPE may result in a loss
-*        of precision, and should be used with care.
+*        64-bit integer, double precision, unsigned byte, and unsigned
+*        word.  See SUN/92 for further details.  An unambiguous
+*        abbreviation may be given.  TYPE is ignored when
+*        COMP = "Quality" since the QUALITY component must comprise
+*        unsigned bytes (equivalent to TYPE = "_UBYTE") to be a valid
+*        NDF.  The suggested default is the current value.  Note that
+*        setting TYPE may result in a loss of precision, and should be
+*        used with care.
 *
 *        A null value (!) or blank requests that the type be propagated
 *        from the FITS (using the BITPIX keyword); or if FMTCNV is
@@ -646,7 +647,7 @@
 *     not duplicated in each SMURF-extension NDF.
 *
 *     -  When CONTAINER is TRUE, a former UKIRT_HDS container file,
-*     identified by the presence and values of HDSNAME and HDSTYPE 
+*     identified by the presence and values of HDSNAME and HDSTYPE
 *     keywords, may be recreated.  The container file has the original
 *     structure including the NDFs' names, unless an EXTABLE is used.
 *

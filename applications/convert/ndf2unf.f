@@ -143,7 +143,9 @@
 *  Copyright:
 *     Copyright (C) 1992-1993 Science & Engineering Research Council.
 *     Copyright (C) 1995-1996, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -179,7 +181,9 @@
 *        for axis units.  Also writes CRPIXn FITS keyword when the NDF
 *        has linear axis centres.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 April 30 (MJC):
+*        Add _INT64 type.
 *     {enter_further_changes_here}
 
 *-
@@ -349,6 +353,9 @@
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          NUMMAX = 32764 / VAL__NBI
 
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         NUMMAX = 32764 / VAL__NBK
+
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
          NUMMAX = 32764 / VAL__NBUW
 
@@ -381,6 +388,9 @@
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          RECL = NUMPRE * VAL__NBI
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         RECL = NUMPRE * VAL__NBK
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
          RECL = NUMPRE * VAL__NBUW
@@ -617,6 +627,10 @@
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          CALL CON_OFUFI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   NUMPRE, STATUS )
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL CON_OFUFK( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN

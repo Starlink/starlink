@@ -48,8 +48,8 @@
 *        The FITS bits-per-pixel (BITPIX) value for each conversion.
 *        This specifies the data type of the output FITS file.
 *        Permitted values are: 8 for unsigned byte, 16 for signed word,
-*        32 for integer, -32 for real, -64 for double precision.  There
-*        are three other special values.
+*        32 for integer, 64 for 64-bit integer, -32 for real, -64 for 
+*        double precision.  There are three other special values.
 *
 *        -- BITPIX=0 will cause the output file to have the data type
 *           equivalent to that of the input NDF.
@@ -1019,8 +1019,8 @@
          GOOD = .TRUE.
 
 *  Validate the values.  First get each value, convert it to an integer,
-*  and then testing that is has one of the acceptable values (-1,0,1,8,
-*  16, 32,-32,-64).
+*  and then testing that is has one of the acceptable values (-1, 0, 1,
+*  8, 16, 32, 64, -32, and -64).
          DO I = 1, NBP
             CALL GRP_GET( BPGRP, I, 1, CBP, STATUS )
             CALL CHR_UCASE( CBP )
@@ -1028,7 +1028,7 @@
             CALL CHR_CTOI( CBP, BITPIX, STATUS )
             IF ( ( BITPIX .NE. -1 .AND. BITPIX .NE. 1
      :             .AND. MOD( BITPIX, 8 ) .NE. 0 )
-     :           .OR. BITPIX .LT. -64 .OR. BITPIX .GT. 32
+     :           .OR. BITPIX .LT. -64 .OR. BITPIX .GT. 64
      :           .OR. STATUS .NE. SAI__OK ) THEN
 
 *  Report an error.  When there has been a status error during
@@ -1043,7 +1043,7 @@
                END IF
                CALL MSG_OUT( 'BITPIX_ERR',
      :           'The ^I^TH value "^GM" is not one of the acceptable '/
-     :           /'BITPIX values: Native,0,-1,8,16,32,-32,-64.',
+     :           /'BITPIX values: Native,0,-1,8,16,32,64,-32,-64.',
      :           STATUS )
 
 *  Let the user have another go.  So cancel the parameter value and
