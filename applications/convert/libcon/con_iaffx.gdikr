@@ -35,10 +35,11 @@
 
 *  Notes:
 *     -  There is a routine for integer and floating-point data types:
-*     replace "x" in the routine name by I, D, or R as appropriate.  The
-*     array returned from the routine must have the data type specified.
-*     The limitation on other integer types is because there are no
-*     conversion routines between them and character in the CHR library.
+*     replace "x" in the routine name by I, K, D, or R as appropriate.
+*     The array returned from the routine must have the data type
+*     specified.  The limitation on other integer types is because there
+*     are no conversion routines between them and character in the CHR
+*     library.
 
 *  Prior Requirements:
 *     The ASCII file must be open for read access.
@@ -46,6 +47,7 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     Copyright (C) 2012 Science & Technology Facility Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -74,6 +76,8 @@
 *     1997 December 2 (MJC):
 *        Pass an additional argument to set the maximum buffer for
 *        efficiency when processing short records.
+*     2012 April 30 (MJC):
+*        Added 64-bit integers.
 *     {enter_further_changes_here}
 
 *-

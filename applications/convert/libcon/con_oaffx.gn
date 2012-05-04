@@ -53,7 +53,7 @@
 
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     the routine name by D, R, K, I, W, UW, B or UB as appropriate. The
 *     array supplied to the routine must have the data type specified.
 
 *  Implementation Deficiencies:
@@ -187,10 +187,12 @@
 
 *  Convert the value to a character string.  Note that all the integer
 *  types use a single conversion routine, and hence a token cannot be
-*  used. Allow room for a space.
+*  used.  Allow room for a space.
                   IF ( INTCON ) THEN
                      CALL CHR_ITOC( NUM_<T>TOI( A( K ) ),
      :                              CVAL( :NCPVAL ), NC )
+                  ELSE IF ( '<T>' .EQ. 'K' ) THEN
+                     CALL CHR_KTOC( A( K ), CVAL( :NCPVAL ), NC )
                   ELSE IF ( SINGLE ) THEN
                      CALL CHR_RTOC( A( K ), CVAL( :NCPVAL ), NC )
                   ELSE
@@ -234,6 +236,8 @@
 *  used.
             IF ( INTCON ) THEN
                CALL CHR_ITOC( NUM_<T>TOI( A( I ) ), CVAL, NCV )
+            ELSE IF ( '<T>' .EQ. 'K' ) THEN
+               CALL CHR_KTOC( A( I ), CVAL, NCV )
             ELSE IF ( SINGLE ) THEN
                CALL CHR_RTOC( A( I ), CVAL, NCV )
             ELSE

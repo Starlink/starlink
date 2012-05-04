@@ -24,7 +24,7 @@ GEN_ROUTINES = $(DR_GEN_ROUTINES) $(WR_GEN_ROUTINES) $(DIR_GEN_ROUTINES) \
  $(I_GEN_ROUTINES) $(D_GEN_ROUTINES)
 
 F_GEN_FILES = $(DR_GEN_ROUTINES:.gen=.f) $(WR_GEN_ROUTINES:.gwr=.f) \
- $(DIR_GEN_ROUTINES:.gdir=.f) $(DRLI_GEN_ROUTINES:.gdrli=.f) \
+ $(DIKR_GEN_ROUTINES:.gdikr=.f) $(DRLI_GEN_ROUTINES:.gdrli=.f) \
  $(N_GEN_ROUTINES:.gn=.f) $(DLR_GEN_ROUTINES:.gdlr=.f) \
  $(I_GEN_ROUTINES:.gi=.f) $(D_GEN_ROUTINES:.gd=.f)
 
@@ -37,13 +37,13 @@ DR_GEN_ROUTINES =
 WR_GEN_ROUTINES = con_cd2ix.gwr con_ci2dx.f
 
 ##  Double integer and real.
-DIR_GEN_ROUTINES = con_iaffx.gdir con_oaffx.gdir con_trndx.gdir
+DIKR_GEN_ROUTINES = con_iaffx.gdikr con_trndx.gdikr
 
 ##  Double, real, logical and integer.
 DRLI_GEN_ROUTINES =
 
 ##  All numeric types.
-N_GEN_ROUTINES = con_ifufx.gn con_iudax.gn con_ofufx.gn con_oudax.gn
+N_GEN_ROUTINES = con_ifufx.gn con_iudax.gn con_oaffx.gn con_ofufx.gn con_oudax.gn
 
 ##  Double, logical and real.
 DLR_GEN_ROUTINES = con_consx.gdlr
@@ -65,10 +65,10 @@ FGENERIC=@FGENERIC@
 	$(FGENERIC) -t wr $(<:.gwr=.gen)
 	$(RM) $(<:.gwr=.gen)
 
-.gdir.f:
-	$(LN_S) $< $(<:.gdir=.gen)
-	$(FGENERIC) -t dir $(<:.gdir=.gen)
-	$(RM) $(<:.gdir=.gen)
+.gdikr.f:
+	$(LN_S) $< $(<:.gdikr=.gen)
+	$(FGENERIC) -t dikr $(<:.gdikr=.gen)
+	$(RM) $(<:.gdikr=.gen)
 
 .gdrli.f:
 	$(LN_S) $< $(<:.gdrli=.gen)
