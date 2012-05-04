@@ -364,7 +364,7 @@
      :                   %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
 
          ELSE IF ( CTYPE .EQ. '_INT64' ) THEN
-            CALL FTGCVK( FUNITD, COLNUM, 1, 1, NV, VAL__BADI,
+            CALL FTGCVK( FUNITD, COLNUM, 1, 1, NV, VAL__BADK,
      :                   %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
 
          ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
