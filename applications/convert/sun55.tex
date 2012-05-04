@@ -17,16 +17,16 @@
 {Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {55.28}
+\newcommand{\stardocnumber}    {55.29}
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2011 March 2}
+\newcommand{\stardocdate}      {2012 May 1}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.6-2}
+\newcommand{\stardocversion}   {Version 1.7}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -1473,10 +1473,10 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       }{
          The data type of the output NDF.  It must be one of the
          following HDS types: \texttt{"\_BYTE"}, \texttt{"\_WORD"},
-         \texttt{"\_REAL"},
-         \texttt{"\_INTEGER"}, \texttt{"\_DOUBLE"}, \texttt{"\_UBYTE"},
-         \texttt{"\_UWORD"} corresponding to signed byte,
-         signed word, real, integer, double precision, unsigned byte,
+         \texttt{"\_REAL"}, \texttt{"\_INTEGER"},
+         \texttt{"\_INT64"}, \texttt{"\_DOUBLE"}, \texttt{"\_UBYTE"},
+         \texttt{"\_UWORD"} corresponding to signed byte, signed word,
+         real, integer, 64-bit integer, double precision, unsigned byte,
          and unsigned word.  See \xref{SUN/92}{sun92}{} for further details.
          An unambiguous abbreviation may be given.  TYPE is ignored when
          COMP = \texttt{"Quality"} since the QUALITY component must comprise
@@ -1565,7 +1565,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             follows:
             \begin{itemize}
             \item BITPIX defines the data type: 8 gives \_BYTE, 16 produces
-            \_WORD, 32 makes \_INTEGER, $-$32 gives \_REAL, and $-$64 generates
+            \_WORD, 32 makes \_INTEGER, 64 creates \_INT64, $-$32 gives
+            \_REAL, and $-$64 generates
             \_DOUBLE.  For the first two, if there is an extra header
             record with the keyword UNSIGNED and logical value T, these
             types become \_UBYTE and \_UWORD respectively.  UNSIGNED is
@@ -1750,13 +1751,12 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       }{
          The data type of the direct-access file and the NDF.  It must
          be one of the following HDS types: \texttt{"\_BYTE"},
-         \texttt{"\_WORD"},
-         \texttt{"\_REAL"}, \texttt{"\_INTEGER"}, \texttt{"\_DOUBLE"},
-         \texttt{"\_UBYTE"}, \texttt{"\_UWORD"} corresponding to
-         signed byte, signed word, real, integer, double precision,
-         unsigned byte, and unsigned word respectively.  See
-         \xref{SUN/92}{sun92}{} for further details.  An unambiguous
-         abbreviation may be given.
+         \texttt{"\_WORD"}, \texttt{"\_REAL"}, \texttt{"\_INTEGER"},
+         \texttt{"\_INT64"}, \texttt{"\_DOUBLE"}, \texttt{"\_UBYTE"},
+         \texttt{"\_UWORD"} corresponding to signed byte, signed word, real,
+         64-bit integer, integer, double precision, unsigned byte, and
+         unsigned word respectively.  See \xref{SUN/92}{sun92}{} for further
+         details.  An unambiguous abbreviation may be given.
          TYPE is ignored when COMP = \texttt{"Quality"} since the QUALITY
          component must comprise unsigned bytes (equivalent to TYPE =
          \texttt{"\_UBYTE"}) to be a valid NDF. The suggested default is the
@@ -2448,9 +2448,10 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          The data type of the output NDF's data and variance arrays.
 	 It is normally one of the following HDS types: \texttt{"\_BYTE"},
 	 \texttt{"\_WORD"}, \texttt{"\_REAL"}, \texttt{"\_INTEGER"},
+         \texttt{"\_INT64"},
 	 \texttt{"\_DOUBLE"}, \texttt{"\_UBYTE"}, \texttt{"\_UWORD"}
 	 corresponding to signed byte, signed word, real, integer,
-	 double precision, unsigned byte, and unsigned word.  See
+         64-bit integer, double precision, unsigned byte, and unsigned word.  See
 	 \xref{SUN/92}{sun92}{} for further details.  An unambiguous
 	 abbreviation may be given.  TYPE is ignored when COMP =
 	 \texttt{"Quality"} since the QUALITY component must comprise
@@ -3851,9 +3852,9 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          is the minimum that prevents any loss of precision, and hence
          is dependent on the data type of the NDF array.  These widths
          in characters for each HDS data type are as follows: \_UBYTE, 3;
-         \_BYTE, 4; \_UWORD, 5; \_WORD, 6; \_INTEGER, 11; \_REAL, 16; and
-         \_DOUBLE, 24.  The record length is the product of the number
-         of characters per value plus one (for a delimiting space),
+         \_BYTE, 4; \_UWORD, 5; \_WORD, 6; \_INTEGER, 11; \_INT64, 20;
+         \_REAL, 16; and \_DOUBLE, 24.  The record length is the product of
+         the number of characters per value plus one (for a delimiting space),
          times the number of values per record given by parameter
          NOPEREC, up to a maximum of 512.
 
@@ -4281,8 +4282,9 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          The FITS bits-per-pixel (BITPIX) value for each conversion.
          This specifies the data type of the output FITS file.  Permitted
          values are: \texttt{8} for unsigned byte, \texttt{16} for signed word,
-         \texttt{32} for integer, \texttt{-32} for real, \texttt{-64} for double
-         precision.  There are three other special values.
+         \texttt{32} for integer, \texttt{64} for 64-bit integer,
+         \texttt{-32} for real, \texttt{-64} for double precision.  There
+         are three other special values.
          \ssthitemlist{
 
          \sstitem
@@ -6387,8 +6389,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          The data type of the input file and output NDF.
          It must be one of the
          following HDS types: \texttt{"\_BYTE"}, \texttt{"\_WORD"},
-         \texttt{"\_REAL"},
-         \texttt{"\_INTEGER"}, \texttt{"\_DOUBLE"}, \texttt{"\_UBYTE"},
+         \texttt{"\_REAL"}, \texttt{"\_INTEGER"}, \texttt{"\_INT64"},
+         \texttt{"\_DOUBLE"}, \texttt{"\_UBYTE"},
          \texttt{"\_UWORD"} corresponding to signed byte,
          signed word, real, integer, double precision, unsigned byte,
          and unsigned word.  See \xref{SUN/92}{sun92}{} for further details.
@@ -6487,7 +6489,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             follows:
             \begin{itemize}
             \item BITPIX defines the data type: 8 gives \_BYTE, 16 produces
-            \_WORD, 32 makes \_INTEGER, $-$32 gives \_REAL, and $-$64 generates
+            \_WORD, 32 makes \_INTEGER, 64 creates \_INT64, $-$32 gives
+            \_REAL, and $-$64 generates
             \_DOUBLE.  For the first two, if there is an extra header
             record with the keyword UNSIGNED and logical value T, these
             types become \_UBYTE and \_UWORD respectively.  UNSIGNED is
@@ -7576,5 +7579,13 @@ co-ordinates if a WCS component exists in the NDF.
 
 Changed the default ORIGIN keyword from \texttt{Starlink Project,
 U.K.} to \texttt{Starlink Software} in NDF2FITS.
+
+\subsection{Release Notes -- V1.7}
+
+Support for 64-bit integers is now available in
+\htmlref{ASCII2NDF}{ASCII2NDF}, \htmlref{DA2NDF}{DA2NDF},
+\htmlref{FITS2NDF}{FITS2NDF}, \htmlref{NDF2ASCII}{NDF2ASCII},
+\htmlref{NDF2DA}{NDF2DA}, \htmlref{NDF2FITS}{NDF2FITS},
+\htmlref{NDF2UNF}{NDF2UNF}, and \htmlref{UNF2NDF}{UNF2NDF}.
 
 \end{document}
