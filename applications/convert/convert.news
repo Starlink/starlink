@@ -1,3 +1,8 @@
+1 CONVERT_Version_1.7
+
+  Support for 64-bit integers is now available in ASCII2NDF, DA2NDF,
+  FITS2NDF, NDF2ASCII, NDF2DA, NDF2FITS, NDF2UNF, and UNF2NDF.
+
 1 CONVERT_Version_1.6
 
  Support for FITS -TAB projection type added.
