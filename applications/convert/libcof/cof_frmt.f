@@ -40,8 +40,9 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1990 Science & Engineering Research Council. All
-*     Rights Reserved.
+*     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -66,7 +67,9 @@
 *  History:
 *     1990 November 18 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2012 April 30 (MJC):
+*        Add 64-bit integer.
+*     {enter_further_changes_here}
 
 *-
 
@@ -125,6 +128,8 @@
              FMTIN = '_WORD'
           ELSE IF ( BPV .EQ. 4 ) THEN
              FMTIN = '_INTEGER'
+          ELSE IF ( BPV .EQ. 8 ) THEN
+             FMTIN = '_INT64'
           ELSE
              STATUS = SAI__ERROR
              CALL ERR_REP( 'INVTYP',

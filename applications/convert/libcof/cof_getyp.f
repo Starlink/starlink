@@ -51,6 +51,7 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -76,6 +77,8 @@
 *  History:
 *     2006 April 7 (MJC):
 *        Original version.
+*     2012 April 30 (MJC):
+*        Add 64-bit integer.
 *     {enter_further_changes_here}
 
 *-
@@ -165,8 +168,8 @@
 *  and abbreviations.
             IF ( HTYPE .NE. ' ' ) THEN
                CALL PAR1_MENU( HTYPE, '_BYTE,_DOUBLE,_INTEGER,_REAL,'/
-     :                         /',_UBYTE,_UWORD,_WORD', ',', 1, TYPE,
-     :                         NC, PENALT, STATUS )
+     :                         /',_UBYTE,_UWORD,_WORD,_INT64', ',', 1,
+     :                         TYPE, NC, PENALT, STATUS )
                IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Annul the error status.

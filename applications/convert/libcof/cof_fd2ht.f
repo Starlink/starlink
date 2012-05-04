@@ -32,13 +32,13 @@
 *  Notes:
 *     The supported datacode type codes and their equivalent HDS types
 *     are: 1, _UBYTE; 11, _UBYTE; 14, _LOGICAL; 16, _CHAR; 21, _WORD;
-*     41, _INTEGER; 42, _REAL; and 82, _DOUBLE.
-*
-*     [optional_subroutine_items]...
+*     41, _INTEGER; 81, _INT*64; 82, _REAL; and 82, _DOUBLE.
 
 *  Copyright:
 *     Copyright (C) 1996, 1998 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -65,6 +65,8 @@
 *        Original version.
 *     1998 January 22 (MJC):
 *        Made 82 _DOUBLE (used to be 81).
+*     2012 April 30 (MJC):
+*        Added _INT64.
 *     {enter_further_changes_here}
 
 *-
@@ -102,6 +104,9 @@
 
       ELSE IF ( DATCOD .EQ. 42 ) THEN
          TYPE = '_REAL'
+
+      ELSE IF ( DATCOD .EQ. 81 ) THEN
+         TYPE = '_INT64'
 
       ELSE IF ( DATCOD .EQ. 82 ) THEN
          TYPE = '_DOUBLE'

@@ -26,14 +26,16 @@
 
 *  Notes:
 *     The supported TFORM type codes and their equivalent HDS types are:
-*     Iw, _INTEGER; Ew.d or Fw.d, _REAL; Dw.d, _DOUBLE and A[w], _CHAR[*w].
+*     Iw, _INTEGER; Kw, _INT64; Ew.d or Fw.d, _REAL; Dw.d, _DOUBLE;
+*     and A[w], _CHAR[*w].
 *
 *     Formerly routine COF_BN2HT was used for this purpose but that gave
 *     HDS type _WORD for TFORM I and so was wrong if the data contained
-*     integers larger than 16bits.
+*     integers larger than 16 bits.
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -54,12 +56,15 @@
 
 *  Authors:
 *     AJC: Alan J Chipperfield (Starlink, RAL)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *      1-SEP-2000 (AJC):
 *        Original version.
-*     {enter_changes_here}
+*     2012 April 30 (MJC):
+*        Add 64-bit integer.
+*     {enter_further_changes_here}
 
 *-
 
@@ -101,6 +106,9 @@
 *  Check for each case.
       IF ( TCODE .EQ. 'I' ) THEN
          TYPE = '_INTEGER'
+
+      ELSE IF ( TCODE .EQ. 'K' ) THEN
+         TYPE = '_INT64'
 
       ELSE IF ( TCODE .EQ. 'E' .OR. TCODE .EQ. 'F' ) THEN
          TYPE = '_REAL'

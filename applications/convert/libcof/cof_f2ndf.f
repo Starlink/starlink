@@ -308,7 +308,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1997-2004 Central Laboratory of the Research
 *     Councils.  Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council.  Copyright (C) 2007-2008, 2010-2011 Science
+*     Research Council.  Copyright (C) 2007-2008, 2010-2012 Science
 *     & Technology Facilities Council.  All Rights Reserved.
 
 *  Licence:
@@ -429,6 +429,8 @@
 *        Use KPG_TYPSZ instead of COF_TYPSZ.
 *     2011 February 24 (MJC):
 *        Add WCSCMP argument.
+*     2012 April 30 (MJC):
+*        Add _INT64 support writing array components.
 *     {enter_further_changes_here}
 
 *-
@@ -1338,6 +1340,11 @@
 
                      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                         CALL FTGPVJ( FUNITD, IGROUP, 1, EL, VAL__BADI,
+     :                               %VAL( CNF_PVAL( PNTR(1) ) ), BAD,
+     :                               FSTAT )
+
+                     ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                        CALL FTGPVK( FUNITD, IGROUP, 1, EL, VAL__BADI,
      :                               %VAL( CNF_PVAL( PNTR(1) ) ), BAD,
      :                               FSTAT )
 

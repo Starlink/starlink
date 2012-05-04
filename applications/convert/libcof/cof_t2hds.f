@@ -37,7 +37,8 @@
 *  Copyright:
 *     Copyright (C) 1997, 2002, 2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2008, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2010, 2012 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -81,6 +82,8 @@
 *        While there is no need to use TDIMn for a one-dimensional
 *        character array---most writers would use just TFORMn='rAw'---it
 *        is part of the standard.
+*     2012 April 30 (MJC):
+*        Add _INT64.
 *     {enter_further_changes_here}
 
 *-
@@ -308,6 +311,10 @@
 
             ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                CALL FTGCVJ( FUNIT, COLNUM, 1, 1, NV, VAL__BADI,
+     :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
+
+            ELSE IF ( CTYPE .EQ. '_INT64' ) THEN
+               CALL FTGCVK( FUNIT, COLNUM, 1, 1, NV, VAL__BADI,
      :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
 
             ELSE IF ( CTYPE .EQ. '_REAL' ) THEN

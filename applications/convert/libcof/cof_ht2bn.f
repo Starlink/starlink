@@ -27,10 +27,10 @@
 *        The number of elements in the array.
 *     BNTYPE = CHARACTER * ( * ) (Returned)
 *        The FITS binary table form for the given size and HDS data
-*        type.  It is one of the following: rL, rB, rI, rJ, rA, rAw, rE,
-*        rD; where r is the repeat count for an array.  Note that the
-*        supplied length must be adequate to hold large repeat counts.
-*        Nine chacters should suffice.
+*        type.  It is one of the following: rL, rB, rI, rJ, rK, rA, rAw,
+*        rE, rD; where r is the repeat count for an array.  Note that
+*        the supplied length must be adequate to hold large repeat
+*        counts.  Nine chacters should suffice.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 *
@@ -39,6 +39,7 @@
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -67,6 +68,8 @@
 *     1996 July 23 ({author_identifier}):
 *        Fixed bug arising out of HEASARC rAw extension, because r is
 *        not the repeat count but the total width.
+*     2012 April 30 (MJC):
+*        Add 64-bit integer.
 *     {enter_further_changes_here}
 
 *-
@@ -115,6 +118,9 @@
 
       ELSE IF ( TYPE .EQ. '_UWORD' .OR. TYPE .EQ. '_INTEGER' ) THEN
          CALL CHR_APPND( 'J', CSIZE, NC )
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL CHR_APPND( 'K', CSIZE, NC )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
          CALL CHR_APPND( 'E', CSIZE, NC )

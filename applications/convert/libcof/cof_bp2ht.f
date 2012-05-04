@@ -28,14 +28,14 @@
 
 *  Notes:
 *     The supported BITPIX type codes and their equivalent HDS types
-*     are: 8, _UBYTE; 16, _WORD; 32, _INTEGER; -32, _REAL; and
-*     -64, _DOUBLE.
-*
-*     [optional_subroutine_items]...
+*     are: 8, _UBYTE; 16, _WORD; 32, _INTEGER; 64, _INT64; -32, _REAL;
+*     and -64, _DOUBLE.
 
 *  Copyright:
 *     Copyright (C) 1996, 1999 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -63,6 +63,8 @@
 *        Original version.
 *     8-JAN-1999 (DSB):
 *        Added FMTCNV argument.
+*     2012 April 30 (MJC):
+*        Add 64-bit integer.
 *     {enter_further_changes_here}
 
 *-
@@ -99,6 +101,9 @@
 
          ELSE IF ( BITPIX .EQ. 32 ) THEN
             TYPE = '_DOUBLE'
+
+         ELSE IF ( BITPIX .EQ. 64 ) THEN
+            TYPE = '_INT64'
 
          ELSE IF ( BITPIX .EQ. -32 ) THEN
             TYPE = '_REAL'

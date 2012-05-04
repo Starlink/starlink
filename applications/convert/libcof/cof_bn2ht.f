@@ -27,14 +27,14 @@
 
 *  Notes:
 *     The supported TFORM type codes and their equivalent HDS types are:
-*     B, _UBYTE; I, _WORD; J, _INTEGER; E or F, _REAL; D, _DOUBLE; and
-*     A[n], _CHAR[*n].
-*
-*     [optional_subroutine_items]...
+*     B, _UBYTE; I, _WORD; J, _INTEGER; K, _INT64; E or F, _REAL;
+*     D, _DOUBLE; and A[n], _CHAR[*n].
 
 *  Copyright:
 *     Copyright (C) 1996-1997 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -62,6 +62,8 @@
 *     1997 November 12 (MJC):
 *        Added _LOGICAL.  (This was originally done in 1996, but
 *        appears not to have made it into V1.0.)
+*     2012 April 30 (MJC):
+*        Added _INT64.
 *     {enter_further_changes_here}
 
 *-
@@ -115,6 +117,9 @@
 
       ELSE IF ( TCODE .EQ. 'J' ) THEN
          TYPE = '_INTEGER'
+
+      ELSE IF ( TCODE .EQ. 'K' ) THEN
+         TYPE = '_INT64'
 
       ELSE IF ( TCODE .EQ. 'E' .OR. TCODE .EQ. 'F' ) THEN
          TYPE = '_REAL'

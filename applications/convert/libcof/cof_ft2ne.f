@@ -38,8 +38,8 @@
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008, 2009, 2011 Science & Technology Facilities
-*     Council.
+*     Copyright (C) 2008, 2009, 2011, 2012 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -84,6 +84,8 @@
 *        extensions - for instance, NDF2FITS can create a "WCS-TAB"
 *        extension to holds columns of WCS values. So do not report an
 *        error if the extension holds WCS values.
+*     2012 April 30 (MJC):
+*        Add 64-bit integer.
 *     {enter_further_changes_here}
 
 *-
@@ -184,6 +186,7 @@
       PRIMEX = CHR_SIMLR( EXTYPE, '_REAL' ) .OR.
      :         CHR_SIMLR( EXTYPE, '_DOUBLE' ) .OR.
      :         CHR_SIMLR( EXTYPE, '_INTEGER' ) .OR.
+     :         CHR_SIMLR( EXTYPE, '_INT64' ) .OR.
      :         CHR_SIMLR( EXTYPE, '_WORD' ) .OR.
      :         CHR_SIMLR( EXTYPE, '_UWORD' ) .OR.
      :         CHR_SIMLR( EXTYPE, '_BYTE' ) .OR.

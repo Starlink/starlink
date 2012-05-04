@@ -47,7 +47,9 @@
 
 *  Copyright:
 *     Copyright (C) 1996, 1998, 2000, 2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -86,6 +88,8 @@
 *          FITS format I -> _INTEGER not _WORD
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
+*     2012 April 30 (MJC):
+*        Add 64-bit integer.
 *     {enter_further_changes_here}
 
 *-
@@ -357,6 +361,10 @@
 
          ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
             CALL FTGCVJ( FUNITD, COLNUM, 1, 1, NV, VAL__BADI,
+     :                   %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
+
+         ELSE IF ( CTYPE .EQ. '_INT64' ) THEN
+            CALL FTGCVK( FUNITD, COLNUM, 1, 1, NV, VAL__BADI,
      :                   %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
 
          ELSE IF ( CTYPE .EQ. '_REAL' ) THEN

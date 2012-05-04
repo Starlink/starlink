@@ -258,7 +258,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995-2000, 2003-2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. Copyright (C) 2007-2009, 2011
+*     Astronomy Research Council. Copyright (C) 2007-2009, 2011, 2012
 *     Science & Technology Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -377,6 +377,8 @@
 *        Use KPG_TYPSZ instead of COF_TYPSZ.
 *     2011 February 24 (MJC):
 *        Add USEAXS argument.
+*     2012 April 30 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -460,6 +462,7 @@
       INTEGER IDEL               ! Increment to reduce an integer
                                  ! scaling range
       INTEGER IPNTR              ! Pointer to input array
+      INTEGER KBLANK             ! Data blank for 64-bit integer arrays
       DOUBLE PRECISION MAXV      ! Max. value to appear in scaled array
       DOUBLE PRECISION MINV      ! Min. value to appear in scaled array
       LOGICAL MULTIN             ! Multi-NDF container?
@@ -480,6 +483,7 @@
       LOGICAL OPEN               ! FITS file exists?
       LOGICAL PROPEX             ! Propagate FITS extension for the
                                  ! current header?
+      CHARACTER*6 ROUTIN         ! FITSIO routine name for error report
       INTEGER SBYTES             ! No. of bytes per scaled array value
       LOGICAL SCALE              ! The array is to be scaled?
       CHARACTER*( DAT__SZTYP ) SCTYPE ! Data type for scaled arrays
@@ -872,6 +876,9 @@
                IF ( TYPE .EQ. '_INTEGER' ) THEN
                   BLANK = VAL__BADI
 
+               ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                  KBLANK = VAL__BADK
+
                ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                   BLANK = NUM_WTOI( VAL__BADW )
 
@@ -890,14 +897,20 @@
      :           ARRNAM( ICOMP ) .NE. 'QUALITY' ) THEN
 
 *  The header should already contain a BLANK keyword.
-*  Reset the BLANK keyword in the header. Ampersand instructs the
+*  Reset the BLANK keyword in the header.  Ampersand instructs the
 *  routine not to modify the comment of the BLANK header card.
-               CALL FTMKYJ( FUNIT, 'BLANK', BLANK, '&', FSTAT )
+               IF ( TYPE .EQ. '_INT64' ) THEN
+                  CALL FTMKYK( FUNIT, 'BLANK', KBLANK, '&', FSTAT )
+                  ROUTIN = 'FTMKYK'
+               ELSE
+                  CALL FTMKYJ( FUNIT, 'BLANK', BLANK, '&', FSTAT )
+                  ROUTIN = 'FTMKYJ'
+               END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
                IF ( FSTAT .GT. FITSOK ) THEN
-                  CALL COF_FIOER( FSTAT, 'COF_NDF2F_BLANK1', 'FTMKYJ',
+                  CALL COF_FIOER( FSTAT, 'COF_NDF2F_BLANK1', ROUTIN,
      :              'Error modifying the BLANK header card.', STATUS )
                   GOTO 999
                END IF

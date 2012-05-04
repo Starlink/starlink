@@ -53,8 +53,8 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1997, 1999, 2002, 2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. Copyright (C) 2008, 2009 Science &
-*     Technology Facilities Council. All Rights Reserved.
+*     Astronomy Research Council. Copyright (C) 2008, 2009, 2012 Science
+*     & Technology Facilities Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -102,6 +102,8 @@
 *        Only attempt to write null value for integer-valued columns.
 *     2009 November 25 (MJC):
 *        Allow for long extension names.
+*     2012 April 30 (MJC):
+*        Added handling of 64-bit integers.
 *     {enter_further_changes_here}
 
 *-
@@ -169,6 +171,9 @@
       INTEGER ICOMP( MXOBJ )     ! Column numbers of integer components
       INTEGER INULL              ! Integer null value
       INTEGER IVALUE             ! Integer component value
+      INTEGER KCOMP( MXOBJ )     ! Column no.s 64-bit integer components
+      INTEGER*8 KNULL            ! 64-bit integer null value
+      INTEGER*8 KVALUE           ! 64-bit integer component value
       CHARACTER * ( DAT__SZLOC ) LCMP ! Component locator
       INTEGER LEL                ! Loop counter for undefined logicals
       LOGICAL LVALUE             ! Logical component value
@@ -183,7 +188,8 @@
       INTEGER NLEV               ! Number of hierarchical levels
       INTEGER NOPRIM             ! Number of primitive component
       INTEGER NICOL              ! Number of integer columns
-      INTEGER NMDCOL              ! Number of multi-dimensional columns
+      INTEGER NKCOL              ! Number of 64-bit integer columns
+      INTEGER NMDCOL             ! Number of multi-dimensional columns
       INTEGER OPNTR              ! Pointer to a mapped component
       INTEGER PRECOL             ! Number of component dimensions
       LOGICAL PRIM               ! Object primitive?
@@ -355,6 +361,29 @@
      :           STATUS )
                GOTO 999
             END IF
+
+*  Repeat as for other integer tpyes but using the 64-bit values and
+*  routine.
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+
+*  Set the location where to insert the header.
+            CDUMMY = ' '        ! valgrind
+            CALL FTGCRD( FUNIT, 'TFORM1', CDUMMY, FSTAT )
+
+*  Insert the TNULL1 card.
+            KNULL = VAL__BADK
+            CALL FTIKYK( FUNIT, 'TNULL1', KNULL,
+     :                   'Starlink bad value', FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+            IF ( FSTAT .GT. FITSOK ) THEN
+               CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR7', 'FTIKYK',
+     :           'Error writing TNULL1 card for a binary table.',
+     :           STATUS )
+               GOTO 999
+            END IF
+
          END IF
 
 *  Write the TDIM1 card for a multi-dimensional column.
@@ -531,13 +560,56 @@
                  ELSE
 
 *  Copy the integer value to the FITS binary table.
-                    CALL FTPCLI( FUNIT, 1, 1, 1, 1, IVALUE, FSTAT )
-                    ROUTIN = 'FTPCLI'
-                 END IF
+                  CALL FTPCLI( FUNIT, 1, 1, 1, 1, IVALUE, FSTAT )
+                  ROUTIN = 'FTPCLI'
+               END IF
 
-*  Obtain a short string.
-              ELSE IF ( TYPE( 1:5 ) .EQ. '_CHAR' .AND.
-     :                  STRLEN .LE. MXSLEN ) THEN
+*  64-bit integer.
+*  ---------------
+            ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+
+*  Set the current null value for undefined values.
+               CALL FTPNULLL( FUNIT, 1, KNULL, FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+               IF ( FSTAT .GT. FITSOK ) THEN
+                  CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTPNULLL',
+     :              'Error setting null value for a binary-table '/
+     :              /'column.', STATUS )
+                  GOTO 999
+               END IF
+
+*  Obtain a 64-bit integer scalar value.
+               CALL DAT_GET0K( LOC, KVALUE, STATUS )
+
+*  Check for an HDS undefined value.
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+
+*  Annul the bad status as we can cope with the error.
+                  CALL ERR_ANNUL( STATUS )
+
+*  Set the binary-table entry to be undefined in this case.
+                  CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                  ROUTIN = 'FTPCLU'
+
+*  Check for a bad (undefined value) of the appropriate data type; set
+*  the table entry to be undefined in this case.
+               ELSE IF ( KVALUE .EQ. VAL__BADK ) THEN
+                  CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
+
+*  Copy the 64-bit integer value to the FITS binary table.
+                  CALL FTPCLK( FUNIT, 1, 1, 1, 1, KVALUE, FSTAT )
+                  ROUTIN = 'FTPCLK'
+               END IF
+
+
+*  Short string
+*  ------------
+            ELSE IF ( TYPE( 1:5 ) .EQ. '_CHAR' .AND.
+     :                STRLEN .LE. MXSLEN ) THEN
 
 *  Start a new error context as we wish to annul an error status if the
 *  value is undefined.  Get the value.
@@ -686,6 +758,21 @@
      :              /'binary-table column.', STATUS )
                   GOTO 999
                END IF
+
+*  An integer type must have its null value defined before it is used.
+            ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+
+*  Set the current null value for undefined values.
+               CALL FTPNULLL( FUNIT, 1, KNULL, FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+               IF ( FSTAT .GT. FITSOK ) THEN
+                  CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTPNULLL',
+     :              'Error setting null value for a '/
+     :              /'binary-table column.', STATUS )
+                  GOTO 999
+               END IF
             END IF
 
 *  Map each array using the appropriate type and write it to the
@@ -769,6 +856,21 @@
      :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         VAL__BADI, FSTAT )
                   ROUTIN = 'FTPCNJ'
+               END IF
+
+*  Copy a 64-bit integer array to the binary table.
+            ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+               CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
+
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
+                  CALL FTPCNK( FUNIT, 1, 1, 1, EL,
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
+     :                         VAL__BADK, FSTAT )
+                  ROUTIN = 'FTPCNK'
                END IF
 
 *  Copy a string array to the binary table.
@@ -875,6 +977,7 @@
 
 *  Loop through all objects within this structure.
                NICOL = 0
+               NKCOL = 0
                NMDCOL = 0
                NOPRIM = 0
                DO IC = 1, NCMP
@@ -907,6 +1010,10 @@
      :                    TYPE .EQ. '_INTEGER' ) THEN
                         NICOL = NICOL + 1
                         ICOMP( NICOL ) = NOPRIM
+
+                     ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                        NKCOL = NKCOL + 1
+                        KCOMP( NKCOL ) = NOPRIM
                      END IF
 
 *  Inquire the component's size.
@@ -1099,12 +1206,64 @@
                      END DO
                   END IF
 
+*  This is only necessary when there is at least one column that has the
+*  64-bit integer type.
+                  IF ( NKCOL .GT. 0 ) THEN
+                     DO ICI = 1, NKCOL
+
+*  Convert the column number into character form.
+                        CALL CHR_ITOC( KCOMP( ICI ), CN, NC )
+
+*  Form the name of the keyword which will immediately precede the
+*  inserted TNULLn card.
+                        NC = 5
+                        CRDNAM = 'TFORM'
+                        CALL CHR_APPND( CN, CRDNAM, NC )
+
+*  FITSIO does not permit cards to be placed after a named card;
+*  it requires that we read that named card first.
+                        CDUMMY = ' ' ! valgrind
+                        CALL FTGCRD( FUNIT, CRDNAM, CDUMMY, FSTAT )
+
+*  Get a locator to the object so that we can determine its data type.
+*  This information was obtained before, but inquiring again avoids
+*  having a large character array.  Release the locator at the end.
+                        CALL DAT_INDEX( LOC, KCOMP( ICI ), LCMP,
+     :                                  STATUS )
+                        CALL DAT_TYPE( LCMP, TYPE, STATUS )
+                        CALL DAT_ANNUL( LCMP, STATUS )
+
+*  An integer type must have its null value defined before it is used.
+                        KNULL = VAL__BADK
+
+*  Form the name of the TNULLn keyword.
+                        NC = 5
+                        CRDNAM = 'TNULL'
+                        CALL CHR_APPND( CN, CRDNAM, NC )
+
+*  Insert the TNULLn card.
+                        CALL FTIKYK( FUNIT, CRDNAM, KNULL,
+     :                               'Starlink bad value', FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+                        IF ( FSTAT .GT. FITSOK ) THEN
+                           CALL COF_FIOER( FSTAT,
+     :                       'COF_H2BIN_ERR7', 'FTIKYK',
+     :                       'Error writing '//CRDNAM( :NC )//' '/
+     :                       /'card for a binary table.', STATUS )
+                            GOTO 999
+                        END IF
+                     END DO
+                  END IF
+
 *  Write the TDIMn cards for any multi-dimensional columns.
 *  ========================================================
 
 *  This is only necessary when the object is multi-dimensional.
                   IF ( NMDCOL .GT. 0 ) THEN
                      DO ICMD = 1, NMDCOL
+
 *  Convert the column number into character form.
                         CALL CHR_ITOC( MDCOMP( ICMD ), CN, NC )
 
@@ -1357,7 +1516,58 @@
                                  ROUTIN = 'FTPCLI'
                               END IF
 
-*  Obtain a short string.
+*  64-bit integer
+*  --------------
+                           ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+
+*  Assign the bad value for the data type.
+                              KNULL = VAL__BADK
+
+*  Set the current null value for undefined values.
+                              CALL FTPNULLL( FUNIT, NOPRIM, KNULL,
+     :                                       FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+                              IF ( FSTAT .GT. FITSOK ) THEN
+                                 CALL COF_FIOER( FSTAT,
+     :                             'COF_H2BIN_ERR6', 'FTPNULLL',
+     :                             'Error setting null value for a '/
+     :                             /'binary-table column.', STATUS )
+                                 GOTO 999
+                              END IF
+
+*  Obtain a 64-bit integer scalar value.
+                              CALL DAT_GET0K( LCMP, KVALUE, STATUS )
+
+*  Check for an HDS undefined value.
+                              IF ( STATUS .EQ. DAT__UNSET ) THEN
+
+*  Annul the bad status as we can cope with the error.
+                                 CALL ERR_ANNUL( STATUS )
+
+*  Set the binary-table entry to be undefined in this case.
+                                 CALL FTPCLU( FUNIT, NOPRIM, 1, 1, 1,
+     :                                        FSTAT )
+                                 ROUTIN = 'FTPCLU'
+
+*  Check for a bad (undefined value) and set the table entry to be
+*  undefined in this case.
+                              ELSE IF ( KVALUE .EQ. VAL__BADK ) THEN
+
+                                 CALL FTPCLU( FUNIT, NOPRIM, 1, 1, 1,
+     :                                        FSTAT )
+                                 ROUTIN = 'FTPCLU'
+                              ELSE
+
+*  Copy the 64-bit integer value to the FITS binary table.
+                                 CALL FTPCLK( FUNIT, NOPRIM, 1, 1, 1,
+     :                                        KVALUE, FSTAT )
+                                 ROUTIN = 'FTPCLK'
+                              END IF
+
+*  Short string
+*  ------------
                            ELSE IF ( TYPE( 1:5 ) .EQ. '_CHAR' .AND.
      :                               STRLEN .LE. MXSLEN ) THEN
 
@@ -1533,6 +1743,24 @@
      :                             /'binary-table column.', STATUS )
                                  GOTO 999
                               END IF
+
+                           ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+
+*  Set the current null value for undefined values.
+                              KNULL = VAL__BADK
+                              CALL FTPNULLL( FUNIT, NOPRIM, KNULL,
+     :                                       FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+                              IF ( FSTAT .GT. FITSOK ) THEN
+                                 CALL COF_FIOER( FSTAT,
+     :                             'COF_H2BIN_ERR6', 'FTPNULLL',
+     :                             'Error setting null value for a '/
+     :                             /'binary-table column.', STATUS )
+                                 GOTO 999
+                              END IF
+
                            END IF
 
 *  Map each array using the appropriate type and write it to the binary
@@ -1629,6 +1857,23 @@
      :                                        VAL__BADI,
      :                                        FSTAT )
                                  ROUTIN = 'FTPCNJ'
+                              END IF
+
+*  Copy a 64-bit integer array to the binary table.
+                           ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                              CALL DAT_MAPV( LCMP, TYPE, 'READ',
+     :                                       OPNTR, EL, STATUS )
+
+                              IF ( STATUS .EQ. DAT__UNSET ) THEN
+                                 CALL ERR_ANNUL( STATUS )
+                                 CALL FTPCLU( FUNIT, NOPRIM, 1, 1, EL,
+     :                                        FSTAT )
+                                 ROUTIN = 'FTPCLU'
+                              ELSE
+                                 CALL FTPCNK( FUNIT, NOPRIM, 1, 1, EL,
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
+     :                                        VAL__BADK, FSTAT )
+                                 ROUTIN = 'FTPCNK'
                               END IF
 
 *  Copy a string array to the binary table.
