@@ -825,6 +825,13 @@ libraries/ary/ary1_gt1x.f
 libraries/ary/ary1_gtnx.f
 libraries/ary/ary_gtszx.f
 libraries/ary/ary_ptszx.f
+libraries/ary/ary1_badx.f
+libraries/ary/ary1_bppx.f
+libraries/ary/ary1_cvfx.f
+libraries/ary/ary1_cvtx.f
+libraries/ary/ary1_pt1x.f
+libraries/ary/ary1_ptnx.f
+libraries/ary/ary1_zerx.f
 
 libraries/ast/AST_PAR
 libraries/ast/addversion

@@ -41,20 +41,18 @@ GEN_F_ROUTINES = $(ARY_N_GEN:.gn=.f)
 
 F_ROUTINES = $(NONGEN_F_ROUTINES) $(GEN_F_ROUTINES)
 
-ARY_N_GEN = ary_ptszx.gn ary_gtszx.gn ary1_gtnx.gn ary1_gt1x.gn
+ARY_N_GEN = ary_ptszx.gn ary_gtszx.gn ary1_badx.gn ary1_bppx.gn        \
+ary1_gtnx.gn ary1_gt1x.gn ary1_cvfx.gn ary1_cvtx.gn ary1_pt1x.gn       \
+ary1_ptnx.gn ary1_zerx.gn
 
 C_ROUTINES = ary1_s2dlt.c ary1_undlt.c
 
 NONGEN_F_ROUTINES = ary1_init.f ary1_accok.f ary1_adiag.f ary1_anl.f   \
-ary1_annpl.f ary1_antmp.f ary1_bad.f ary1_badb.f ary1_badd.f	       \
-ary1_badi.f ary1_badr.f ary1_badub.f ary1_baduw.f ary1_badw.f	       \
-ary1_bpp.f ary1_bppb.f ary1_bppd.f ary1_bppi.f ary1_bppr.f	       \
-ary1_bppub.f ary1_bppuw.f ary1_bppw.f ary1_ccpy.f ary1_chacc.f	       \
+ary1_annpl.f ary1_antmp.f ary1_bad.f \
+ary1_bpp.f ary1_ccpy.f ary1_chacc.f	      		               \
 ary1_chbpp.f ary1_chcma.f ary1_chmod.f ary1_chscn.f ary1_chsta.f       \
 ary1_cln.f ary1_cmtmp.f ary1_cpy.f ary1_cpync.f ary1_crnba.f	       \
-ary1_cut.f ary1_cvfb.f ary1_cvfd.f ary1_cvfi.f ary1_cvfr.f	       \
-ary1_cvfub.f ary1_cvfuw.f ary1_cvfw.f ary1_cvtb.f ary1_cvtd.f	       \
-ary1_cvti.f ary1_cvtr.f ary1_cvtub.f ary1_cvtuw.f ary1_cvtw.f	       \
+ary1_cut.f \
 ary1_danl.f ary1_dbad.f ary1_dbnd.f ary1_dcpy.f ary1_dcre.f	       \
 ary1_dcrep.f ary1_ddiag.f ary1_del.f ary1_dfrm.f ary1_diag.f	       \
 ary1_dimp.f ary1_dmod.f ary1_dp2s.f ary1_drst.f ary1_ds2p.f	       \
@@ -64,15 +62,11 @@ ary1_dobj.f ary1_gmrb.f ary1_gtn.f ary1_defr.f ary1_dfppl.f \
 ary1_hunmp.f ary1_id2ac.f ary1_imp.f ary1_impid.f	       \
 ary1_imppl.f ary1_inbnd.f ary1_intyp.f ary1_iobw.f ary1_maps.f	       \
 ary1_mdiag.f ary1_mpsr.f ary1_mpsw.f ary1_nel.f ary1_nxtsl.f	       \
-ary1_pbnd.f ary1_pt1b.f ary1_pt1d.f ary1_pt1i.f ary1_pt1r.f	       \
-ary1_pt1ub.f ary1_pt1uw.f ary1_pt1w.f ary1_ptn.f ary1_ptnb.f	       \
-ary1_ptnd.f ary1_ptni.f ary1_ptnr.f ary1_ptnub.f ary1_ptnuw.f	       \
-ary1_ptnw.f ary1_rebnd.f ary1_retyp.f ary1_rls.f ary1_sbd.f	       \
+ary1_pbnd.f ary1_ptn.f ary1_rebnd.f ary1_retyp.f ary1_rls.f ary1_sbd.f \
 ary1_sbnd.f ary1_setc.f ary1_sft.f ary1_stp.f ary1_tcnam.f ary1_temp.f \
 ary1_trace.f ary1_ump.f ary1_umps.f ary1_upsr.f ary1_upsw.f	       \
 ary1_vbad.f ary1_vbnd.f ary1_vftp.f ary1_vmmd.f ary1_vtyp.f	       \
-ary1_vzero.f ary1_xsbnd.f ary1_zerb.f ary1_zerd.f ary1_zeri.f	       \
-ary1_zerr.f ary1_zerub.f ary1_zeruw.f ary1_zerw.f ary_annul.f	       \
+ary1_vzero.f ary1_xsbnd.f ary_annul.f	       \
 ary_bad.f ary_base.f ary_bound.f ary_clone.f ary_cmplx.f ary_copy.f    \
 ary_delet.f ary_dim.f ary_dupe.f ary_find.f ary_form.f ary_ftype.f     \
 ary_imprt.f ary_isacc.f ary_isbas.f ary_ismap.f ary_istmp.f ary_map.f  \

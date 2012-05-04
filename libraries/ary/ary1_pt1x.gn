@@ -1,19 +1,19 @@
-      SUBROUTINE ARY1_PT1I( BAD, EL, ARRAY, TYPE, LOC, DCE, STATUS )
+      SUBROUTINE ARY1_PT1<T>( BAD, EL, ARRAY, TYPE, LOC, DCE, STATUS )
 *+
 *  Name:
-*     ARY1_PT1I
+*     ARY1_PT1<T>
 
 *  Purpose:
-*     Write a 1-dimensional array of INTEGER values to an HDS object.
+*     Write a 1-dimensional array of <COMM> values to an HDS object.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_PT1I( BAD, EL, ARRAY, TYPE, LOC, DCE, STATUS )
+*     CALL ARY1_PT1<T>( BAD, EL, ARRAY, TYPE, LOC, DCE, STATUS )
 
 *  Description:
-*     The routine writes a 1-dimensional array of INTEGER values to an
+*     The routine writes a 1-dimensional array of <COMM> values to an
 *     HDS object. The object must be 1-dimensional and must contain
 *     exactly the number of elements to be written. Data type
 *     conversion to any numeric data type is performed if necessary,
@@ -24,8 +24,8 @@
 *        Whether to test for bad pixel values.
 *     EL = INTEGER (Given)
 *        Number of array elements to be written.
-*     ARRAY( N ) = INTEGER (Given)
-*        The array of INTEGER values.
+*     ARRAY( N ) = <TYPE> (Given)
+*        The array of <COMM> values.
 *     TYPE = CHARACTER * ( * ) (Given)
 *        HDS data type of the object to be written. This must be in
 *        upper case.
@@ -93,7 +93,7 @@
 *  Arguments Given:
       LOGICAL BAD
       INTEGER EL
-      INTEGER ARRAY
+      <TYPE> ARRAY
       CHARACTER * ( * ) TYPE
       CHARACTER * ( * ) LOC
 
@@ -117,21 +117,21 @@
 
 *  If no data type conversion is required, then write the data values
 *  directly.
-      IF ( TYPE .EQ. '_INTEGER' ) THEN
+      IF ( TYPE .EQ. '<HTYPE>' ) THEN
          DCE = .FALSE.
-         CALL DAT_PUT( LOC, '_INTEGER', 1, DIM, ARRAY, STATUS )
+         CALL DAT_PUT( LOC, '<HTYPE>', 1, DIM, ARRAY, STATUS )
 
 *  If type conversion is required, then map the data without type
 *  conversion, perform the type conversion explicitly and unmap the
 *  data.
       ELSE
          CALL DAT_MAP( LOC, TYPE, 'WRITE', 1, DIM, PNTR, STATUS )
-         CALL ARY1_CVFI( BAD, EL, ARRAY, TYPE, PNTR, DCE, STATUS )
+         CALL ARY1_CVF<T>( BAD, EL, ARRAY, TYPE, PNTR, DCE, STATUS )
          CALL ARY1_HUNMP( LOC, STATUS )
       END IF
 
 *  Call error tracing routine and exit.
-      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_PT1I',
+      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_PT1<T>',
      :STATUS )
 
       END

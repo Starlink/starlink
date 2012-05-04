@@ -1,26 +1,26 @@
-      SUBROUTINE ARY1_ZERW( N, ARGV, STATUS )
+      SUBROUTINE ARY1_ZER<T>( N, ARGV, STATUS )
 *+
 *  Name:
-*     ARY1_ZERW
+*     ARY1_ZER<T>
 
 *  Purpose:
-*     Set all elements of a vectorized WORD array to zero.
+*     Set all elements of a vectorized <COMM> array to zero.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_ZERW( N, ARGV, STATUS )
+*     CALL ARY1_ZER<T>( N, ARGV, STATUS )
 
 *  Description:
-*     The routine sets all the elements of the WORD array supplied to
+*     The routine sets all the elements of the <COMM> array supplied to
 *     zero.
 
 *  Arguments:
 *     N = INTEGER (Given)
 *        Number of elements in the array.
-*     ARGV( N ) = INTEGER*2 (Returned)
-*        The vectorised WORD array to be set to zero.
+*     ARGV( N ) = <TYPE> (Returned)
+*        The vectorised <COMM> array to be set to zero.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -57,7 +57,7 @@
 *     30-AUG-1989 (RFWS):
 *        Changed name to conform to prefix plus 5 character convention.
 *     13-MAR-1990 (RFWS):
-*        Renamed from VEC_ZERW to ARY1_ZERW.
+*        Renamed from VEC_ZER<T> to ARY1_ZER<T>.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,14 +76,14 @@
       INTEGER N
 
 *  Arguments Returned:
-      INTEGER*2 ARGV( N )
+      <TYPE> ARGV( N )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER*2 ZERO                ! Zero
-      PARAMETER ( ZERO = 0  )
+      <TYPE> ZERO                ! Zero
+      PARAMETER ( ZERO = 0<CONST>  )
 
 *  Local variables:
       INTEGER I                  ! Loop counter for array elements
