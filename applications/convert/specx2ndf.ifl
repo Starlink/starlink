@@ -7,11 +7,19 @@
 #
 #  Authors:
 #     ACD: A C Davenhall (Edinburgh)
+#     MJC: Malcolm J. Currie (JAC, Hawaii)
 #
 #  History:
-#     25/6/97 (ACD): Original version.
-#     8/1/98  (ACD): First stable version.
-#     6/3/03 (DSB): Removed several parameters.
+#     25/6/97 (ACD):
+#        Original version.
+#     8/1/98 (ACD):
+#        First stable version.
+#     6/3/03 (DSB):
+#        Removed several parameters.
+#     2012 May 3 (MJC):
+#        Prettyprinted and put in alphabetical order.  Switch SYSTEM
+#        default to one of the recognised options.
+#
 #-
 
 interface SPECX2NDF
@@ -78,23 +86,23 @@ interface SPECX2NDF
       helpkey     '*'
    endparameter
 
-   parameter TELESCOPE                 # Name of the telescope.
-      position 4
-      type     'LITERAL'
-      default  'JCMT'
-      vpath    'DEFAULT'
-      ppath    'DEFAULT'
-      prompt   'Telescope'
-      helpkey  '*'
-   endparameter
-
-   parameter SYSTEM
+   parameter      SYSTEM         # Co-ordinate system for NDF
       type        LITERAL
       access      'READ'
       vpath       'DEFAULT'
-      prompt      'Celestial coord system for output cube'
+      prompt      'Celestial co-ordinate system for output cube'
       ppath       'CURRENT,DEFAULT'
-      default     'TRACKING'
+      default     'RJ'
+      helpkey     '*'
+   endparameter
+
+   parameter      TELESCOPE      # Name of the telescope
+      position    4
+      type        'LITERAL'
+      default     'JCMT'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Telescope'
       helpkey     '*'
    endparameter
 

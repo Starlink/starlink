@@ -52,12 +52,6 @@
 *        containing the schematic is not to be written reply with an
 *        exclamation mark ("!").  See Section 'Schematic of the map
 *        grid' (below) for further details.  [!]
-*     SYSTEM = LITERAL (Read)
-*         Celestial coord system for output cube. SPECX files do not
-*         record the coordinate system for any offsets. By default
-*         these are assumed to be RJ. SYSTEM needs to be used to manually
-*         set the correct coordinates for a map file.
-*         (AZ=azel, RD=radec of date, RJ=j2000, RB=b1950, GA=galactic)
 *     IN  =  NDF (Read)
 *        The name of the input SPECX map, or container file.  The file
 *        extension ('.sdf') should not be included since it is appended
@@ -82,6 +76,19 @@
 *        written by the application.  The file extension ('.sdf') should
 *        not be included since it is appended automatically by the
 *        application.
+*     SYSTEM = LITERAL (Read)
+*        Celestial co-ordinate system for output cube.  SPECX files do
+*        not record the co-ordinate system for any offsets.  The
+*        recognised options are as follows.
+*
+*        "AZ" -- azimuth and elevation
+*        "GA" -- galactic
+*        "RB" -- B1950
+*        "RD" -- equatorial of date
+*        "RJ" -- J2000
+*
+*        SYSTEM needs to be used to set manually the correct
+*        co-ordinates for a map file.  ["RJ"]
 *     TELESCOPE  =  LITERAL (Read)
 *        The name of the telescope where the observation was made.
 *        This parameter is used to look up the geodetic (geographical)
@@ -211,8 +218,8 @@
 
 *  Copyright:
 *     Copyright (C) 1997-1998, 2003-2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2008 Science & Technology
-*     Facilities Council. All Rights Reserved.
+*     Research Councils. Copyright (C) 2008, 2010-2012 Science &
+*     Technology Facilities Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -234,6 +241,8 @@
 *     ACD: A C Davenhall (Edinburgh)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     RPT: Remo Tilanus (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -259,6 +268,11 @@
 *     2010-06-24 (TIMJ):
 *        GSD bad value is 9999 so convert that to VAL__BADR when
 *        copying to the output.
+*     2011-05-24 (RPT):
+*        Allow the co-ordinate system of the NDF to be specified through
+*        the new SYSTEM parameter.
+*     2012 May 3 (MJC):
+*        Clarify SYSTEM documentation, and tidy.
 *     {enter_further_changes_here}
 
 *-
@@ -373,9 +387,9 @@
          GOTMAP = .FALSE.
       END IF
 
-*  Get the desired coordinate system for the output map
-      CALL PAR_GET0C( 'SYSTEM', SYSTEM, STATUS )
-      CALL CHR_UCASE( SYSTEM )
+*  Get the desired co-ordinate system for the output map.
+      CALL PAR_CHOIC( 'SYSTEM', 'RJ', 'AZ,GA,RB,RD,RJ',
+     :                .FALSE., SYSTEM, STATUS )
       CELLCODE = 6
       IF ( SYSTEM .EQ. 'AZ' ) THEN
         SYSTEM = 'AZEL'
@@ -390,14 +404,9 @@
         SYSTEM = 'J2000'
         CELLCODE = 7
       ELSE IF ( SYSTEM .EQ. 'GA' ) THEN
-        SYSTEM = 'GAL'
-        CELLCODE = 8
-      ELSE
-        STATUS = SAI__ERROR
-        CALL MSG_SETC( 'SYSTEM', SYSTEM )
-        CALL ERR_REP( 'SPECX2NDF_SYS', 'The given SYSTEM '//
-     :                '(^SYSTEM) is unknown.', STATUS )
-      ENDIF
+         SYSTEM = 'GAL'
+         CELLCODE = 8
+      END IF
 
 *  Determine the geodetic longitude and latitude of the observer.
       CALL PAR_GET0C( 'TELESCOPE', TELSCP, STATUS )
