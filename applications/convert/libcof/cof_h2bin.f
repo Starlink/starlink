@@ -476,6 +476,9 @@
 *  Deal with vectors and scalars separately.  First scalars.
          IF ( NDIM .EQ. 0 ) THEN
 
+*  Integer
+*  -------
+
 *  Obtain each value using the appropriate type and write it to the
 *  binary table.  Certain data types (_BYTE and _UWORD) are not
 *  available in FITS.  These must be converted to the next higher
@@ -526,9 +529,9 @@
      :                 ( IVALUE .EQ. VAL__BADI .AND.
      :                   TYPE .EQ. '_INTEGER' ) ) THEN
 
-                    CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
-                    ROUTIN = 'FTPCLU'
-                 ELSE
+                  CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
 
 *  Copy the integer value to the FITS binary table.
                     CALL FTPCLI( FUNIT, 1, 1, 1, 1, IVALUE, FSTAT )
@@ -541,134 +544,142 @@
 
 *  Start a new error context as we wish to annul an error status if the
 *  value is undefined.  Get the value.
-                 CALL ERR_MARK
-                 CALL DAT_GET0C( LOC, CVALUE, STATUS )
+               CALL ERR_MARK
+               CALL DAT_GET0C( LOC, CVALUE, STATUS )
 
 *  Check for an undefined object.
-                 IF ( STATUS .EQ. DAT__UNSET ) THEN
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
 
 *  Annul the error but record the setting the value to be null, i.e.
 *  a blank string.
-                    CALL ERR_ANNUL( STATUS )
-                    CVALUE = ' '
-                 END IF
+                  CALL ERR_ANNUL( STATUS )
+                  CVALUE = ' '
+               END IF
 
 *  Release the new error context.
-                 CALL ERR_RLSE
+               CALL ERR_RLSE
 
 *  Copy the value to the binary-table.
-                 CALL FTPCLS( FUNIT, 1, 1, 1, 1, CVALUE ( :STRLEN ),
-     :                        FSTAT )
-                 ROUTIN = 'FTPCLS'
+               CALL FTPCLS( FUNIT, 1, 1, 1, 1, CVALUE ( :STRLEN ),
+     :                      FSTAT )
+               ROUTIN = 'FTPCLS'
+
+*  String
+*  ------
 
 *  Obtain a string.  Copy it to the FITS binary table.  Start a new
 *  error context as we wish to annul an error status if the value is
 *  undefined.  Get the value.  Only MXSLEN characters can be stored in
 *  the character variable so for long strings map the array.
-              ELSE IF ( TYPE( 1:5 ) .EQ. '_CHAR' .AND.
-     :                  STRLEN .GT. MXSLEN ) THEN
-                 CALL ERR_MARK
-                 CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
+            ELSE IF ( TYPE( 1:5 ) .EQ. '_CHAR' .AND.
+     :                STRLEN .GT. MXSLEN ) THEN
+               CALL ERR_MARK
+               CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
 
 *  Check for an undefined object.
-                 IF ( STATUS .EQ. DAT__UNSET ) THEN
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
 
 *  Annul the error but record the setting the value to be null, i.e.
 *  a blank string.  Copy this blank string to the binary table.
-                    CALL ERR_ANNUL( STATUS )
-                    CVALUE = ' '
-                    CALL FTPCLS( FUNIT, 1, 1, 1, EL, CVALUE,
-     :                           FSTAT )
-                 ELSE
+                  CALL ERR_ANNUL( STATUS )
+                  CVALUE = ' '
+                  CALL FTPCLS( FUNIT, 1, 1, 1, EL, CVALUE, FSTAT )
+               ELSE
 
 *  Copy the mapped value to the binary table.
-                    CALL FTPCLS( FUNIT, 1, 1, 1, EL,
-     :                           %VAL( CNF_PVAL( OPNTR ) ),
-     :                           FSTAT, %VAL( CNF_CVAL( STRLEN ) ) )
-                 END IF
+                  CALL FTPCLS( FUNIT, 1, 1, 1, EL,
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
+     :                         FSTAT, %VAL( CNF_CVAL( STRLEN ) ) )
+               END IF
 
 *  Release the new error context.
-                 CALL ERR_RLSE
+               CALL ERR_RLSE
 
 *  Record the routine name in case of error and unmap the value.
-                 ROUTIN = 'FTPCLS'
-                 CALL DAT_UNMAP( LOC, STATUS )
+               ROUTIN = 'FTPCLS'
+               CALL DAT_UNMAP( LOC, STATUS )
 
-*  Obtain a real scalar value.
-              ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                 CALL DAT_GET0R( LOC, RVALUE, STATUS )
+*  Real scalar value.
+*  ------------------
+            ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+               CALL DAT_GET0R( LOC, RVALUE, STATUS )
 
 *  Check for an HDS-undefined value.  Set the table entry to be
 *  undefined in this case, and annul the error.
-                IF ( STATUS .EQ. DAT__UNSET ) THEN
-                   CALL ERR_ANNUL( STATUS )
-                   CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
-                   ROUTIN = 'FTPCLU'
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                  ROUTIN = 'FTPCLU'
 
 *  Check for a bad (undefined value); set the table entry to be
 *  undefined in this case.
-                ELSE IF ( RVALUE .EQ. VAL__BADR ) THEN
-                   CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
-                   ROUTIN = 'FTPCLU'
-                ELSE
+               ELSE IF ( RVALUE .EQ. VAL__BADR ) THEN
+                  CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
 
 *  Copy the real value to the FITS binary table.
                    CALL FTPCLE( FUNIT, 1, 1, 1, 1, RVALUE, FSTAT )
                    ROUTIN = 'FTPCLE'
                 END IF
 
-*  Obtain a double-precision scalar value.
-             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+*  Double-precision scalar value
+*  -----------------------------
+            ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
 
 *  Check for an HDS-undefined value.  Set the table entry to be
 *  undefined in this case, and annul the error.
-                IF ( STATUS .EQ. DAT__UNSET ) THEN
-                   CALL ERR_ANNUL( STATUS )
-                   CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
-                   ROUTIN = 'FTPCLU'
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                  ROUTIN = 'FTPCLU'
 
 *  Check for a bad (undefined value); set the table entry to be
 *  undefined in this case.
-                ELSE IF ( DVALUE .EQ. VAL__BADD ) THEN
-                   CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
-                   ROUTIN = 'FTPCLU'
+               ELSE IF ( DVALUE .EQ. VAL__BADD ) THEN
+                  CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                  ROUTIN = 'FTPCLU'
 
-                ELSE
+               ELSE
 
 *  Copy the double-precision value to the FITS binary table.
-                   CALL FTPCLD( FUNIT, 1, 1, 1, 1, DVALUE, FSTAT )
-                   ROUTIN = 'FTPCLD'
-                END IF
+                  CALL FTPCLD( FUNIT, 1, 1, 1, 1, DVALUE, FSTAT )
+                  ROUTIN = 'FTPCLD'
+               END IF
 
-*  Obtain a logical scalar value.
-             ELSE IF ( TYPE .EQ. '_LOGICAL' ) THEN
-                CALL DAT_GET0L( LOC, LVALUE, STATUS )
+*  Logical scalar value
+*  --------------------
+            ELSE IF ( TYPE .EQ. '_LOGICAL' ) THEN
+               CALL DAT_GET0L( LOC, LVALUE, STATUS )
 
 *  Check for an HDS-undefined value.  Since there is no logical null
 *  value, by convention it is set to be true, and annul the error.
-                IF ( STATUS .EQ. DAT__UNSET ) THEN
-                   CALL ERR_ANNUL( STATUS )
-                   LVALUE = .TRUE.
-                END IF
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  LVALUE = .TRUE.
+               END IF
 
 *  Copy the logical value to the FITS binary table.
-                CALL FTPCLL( FUNIT, 1, 1, 1, 1, LVALUE, FSTAT )
-                ROUTIN = 'FTPCLL'
-             END IF
+               CALL FTPCLL( FUNIT, 1, 1, 1, 1, LVALUE, FSTAT )
+               ROUTIN = 'FTPCLL'
+            END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
-             IF ( FSTAT .GT. FITSOK ) THEN
-                CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR4', ROUTIN,
-     :            'Error copying scalar value to the binary table.',
-     :            STATUS )
-                GOTO 999
-             END IF
+            IF ( FSTAT .GT. FITSOK ) THEN
+               CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR4', ROUTIN,
+     :           'Error copying scalar value to the binary table.',
+     :           STATUS )
+               GOTO 999
+            END IF
 
-          ELSE
+         ELSE
 
 *  Copy an array to the table.
 *  ===========================
+
+*  Integers
+*  --------
 
 *  An integer type must have its null value defined before it is used.
             IF ( TYPE .EQ. '_BYTE' .OR. TYPE .EQ. '_UBYTE' .OR.
@@ -866,6 +877,7 @@
 *  Structure
 *  =========
       ELSE
+
 *  Determine how many components the structure has.
          CALL DAT_NCOMP( LOC, NCMP, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -1383,6 +1395,9 @@
      :                                     CVALUE ( :STRLEN ), FSTAT )
                               ROUTIN = 'FTPCLS'
 
+*  String
+*  ------
+
 *  Obtain a string.  Copy it to the FITS binary table.  Start a new
 *  error context as we wish to annul an error status if the value is
 *  undefined.  Get the value.  Only MXSLEN characters can be stored in
@@ -1418,7 +1433,8 @@
                               ROUTIN = 'FTPCLS'
                               CALL DAT_UNMAP( LCMP, STATUS )
 
-*  Obtain a real scalar value.
+*  Real scalar value
+*  -----------------
                            ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                               CALL DAT_GET0R( LCMP, RVALUE, STATUS )
 
@@ -1444,7 +1460,8 @@
                                  ROUTIN = 'FTPCLE'
                               END IF
 
-*  Obtain a double-precision scalar value.
+*  Double-precision scalar value.
+*  ------------------------------
                            ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
 
 *  Check for an HDS-undefined value.  Set the table entry to be
@@ -1470,7 +1487,8 @@
                                  ROUTIN = 'FTPCLD'
                               END IF
 
-*  Obtain a logical scalar value.
+*  Logical scalar value
+*  --------------------
                            ELSE IF ( TYPE .EQ. '_LOGICAL' ) THEN
                               CALL DAT_GET0L( LCMP, LVALUE, STATUS )
 
@@ -1590,8 +1608,7 @@
                               ELSE
                                  CALL FTPCNI( FUNIT, NOPRIM, 1, 1, EL,
      :                                        %VAL( CNF_PVAL( OPNTR ) ),
-     :                                        VAL__BADW,
-     :                                        FSTAT )
+     :                                        VAL__BADW, FSTAT )
                                  ROUTIN = 'FTPCNI'
                               END IF
 
@@ -1626,8 +1643,7 @@
                               ELSE
                                  CALL FTPCNJ( FUNIT, NOPRIM, 1, 1, EL,
      :                                        %VAL( CNF_PVAL( OPNTR ) ),
-     :                                        VAL__BADI,
-     :                                        FSTAT )
+     :                                        VAL__BADI, FSTAT )
                                  ROUTIN = 'FTPCNJ'
                               END IF
 
@@ -1669,8 +1685,7 @@
                               ELSE
                                  CALL FTPCNE( FUNIT, NOPRIM, 1, 1, EL,
      :                                        %VAL( CNF_PVAL( OPNTR ) ),
-     :                                        VAL__BADR,
-     :                                        FSTAT )
+     :                                        VAL__BADR, FSTAT )
                                  ROUTIN = 'FTPCNE'
                               END IF
 
@@ -1687,8 +1702,7 @@
                               ELSE
                                  CALL FTPCND( FUNIT, NOPRIM, 1, 1, EL,
      :                                        %VAL( CNF_PVAL( OPNTR ) ),
-     :                                        VAL__BADD,
-     :                                        FSTAT )
+     :                                        VAL__BADD, FSTAT )
                                  ROUTIN = 'FTPCND'
                               END IF
 
