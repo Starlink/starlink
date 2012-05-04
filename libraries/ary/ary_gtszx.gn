@@ -106,8 +106,8 @@
 
 *  If the array is primitive or scaled, return 1.0 and 0.0. 
       IF ( DCB_FRM( IDCB ) .NE. 'SCALED' ) THEN
-         SCALE = 1.0
-         ZERO = 0.0
+         SCALE = 1<CONST>
+         ZERO = 0<CONST>
 
 *  For scaled arrays, ensure scaling information is available.
       ELSE
