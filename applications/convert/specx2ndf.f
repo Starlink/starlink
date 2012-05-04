@@ -44,7 +44,7 @@
 *  ADAM Parameters:
 *     AXIS =  _LOGICAL (Read)
 *        AXIS structures will be added to the output NDF if and only if
-*        AXIS is set TRUE. [FALSE]
+*        AXIS is set TRUE.  [FALSE]
 *     GRIDFILE  =  LITERAL (Read)
 *        The name of a text file to which a schematic of the SPECX map
 *        will be written.  This schematic shows those positions in the
@@ -148,8 +148,8 @@
 *     cube is usually larger than the original map file.
 *
 *     The created NDF cube has a WCS component in which Axes 1 and 2 are
-*     RA and DEC, and Axis 3 is frequency in units of GHz.  The nature of
-*     these axes can be changed if necessary by subsequent use of the
+*     RA and DEC, and Axis 3 is frequency in units of GHz.  The nature
+*     of these axes can be changed if necessary by subsequent use of the
 *     WCSATTRIB application within the KAPPA package.  For compatibility
 *     with older applications, AXIS structures may also be added to the
 *     output cube (see parameter AXIS). Axes 1 and 2 are offsets from
@@ -260,9 +260,9 @@
 *     11-AUG-2004 (TIMJ):
 *        Fix NDF label for spectra as well as maps.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     8-FEB-2008 (DSB):
-*        Add a variance component to the output NDF.
+*        Add a VARIANCE component to the output NDF.
 *     21-APR-2008 (DSB):
 *        Add AXIS parameter.
 *     2010-06-24 (TIMJ):
@@ -299,65 +299,64 @@
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
-      INTEGER NCOMP
-      INTEGER I
-      INTEGER PLACE
-      INTEGER IPIN
-      INTEGER IPOUT
-      INTEGER EL
-      INTEGER IERR
-      INTEGER NDIM
+      LOGICAL APPHST             ! Append history to output cube?
+      INTEGER CELLCODE           ! 1: AZ, 4: RD, 6: RB, 7: RJ, 8: GA
+      CHARACTER*12 CLAT          ! Geodetic latitude (sexagesimal)
+      CHARACTER*12 CLONG         ! Geodetic longitude (sexagesimal)
+      INTEGER CLWBND(3)          ! Lower bounds for the data cube
+      INTEGER CUPBND(3)          ! Upper bounds for the data cube
+      CHARACTER*40 DESCR         ! Description of the telescope
+      INTEGER DIM( 3 )           ! Dimension sizes
+      INTEGER DIMS               ! Array dimensionality
+      INTEGER EL                 ! Number of mapped elements
+      LOGICAL GOTMAP             ! Have a SPECX map?
+      LOGICAL GRIDFG             ! Write schematic of grid to a file?
+      CHARACTER*70 GRIDFL        ! File containing schematic of map grid
+      DOUBLE PRECISION HT        ! Height above sea level
+      INTEGER I                  ! Lopp counter
+      INTEGER IAT                ! String position
+      INTEGER INDF1              ! Identifier for an input NDF
+      INTEGER INDF2              ! Identifier for an output NDF
+      INTEGER IPIN               ! Pointer to mapped input data
+      INTEGER IPOUT              ! Pointer to mapped output data
+      INTEGER IPVOUT             ! Pointer to output variance array
+      INTEGER IPWORK             ! Pointer to work space
+      DOUBLE PRECISION LAT       ! Geodetic latitude
+      CHARACTER*(DAT__SZLOC) LOC1! HDS locator to input HDS file
+      CHARACTER*(DAT__SZLOC) LOC2! HDS locator to SPECTRUM component
+      CHARACTER*(DAT__SZLOC) LOC3! HDS locator to element of SPECTRUM
+      CHARACTER*(DAT__SZLOC) LOC4! HDS locator to o/p container file
+      CHARACTER*(DAT__SZLOC) LOC5! HDS locator to a component
+      DOUBLE PRECISION LONG      ! Geodetic latitude
+      INTEGER LTTL               ! Length of title for output NDF
+      LOGICAL MKAXIS             ! Create AXIS structures?
+      INTEGER MLWBND( 3 )        ! Lower bounds for the NDF
+      INTEGER MUPBND( 3 )        ! Upper bounds for the NDF
+      INTEGER MXDIM              ! Maximum dimension size
+      CHARACTER*(DAT__SZNAM) NAME
+      INTEGER NCOMP              ! Number of components
+      INTEGER NDIM               ! Number of dimensions of SPECTRUM
+      INTEGER NDONE              ! Number of spectra converted
       INTEGER NERR
       INTEGER NNDF
-      INTEGER IAT
-      CHARACTER NAME*(DAT__SZNAM)
-      CHARACTER OUTNAM*(DAT__SZNAM)
-      CHARACTER HDSOUT*256
-      CHARACTER LOC1*(DAT__SZLOC)
-      CHARACTER LOC2*(DAT__SZLOC)
-      CHARACTER LOC3*(DAT__SZLOC)
-      CHARACTER LOC4*(DAT__SZLOC)
-      CHARACTER LOC5*(DAT__SZLOC)
-      LOGICAL GOTMAP
-      LOGICAL OK
-      CHARACTER CLAT*12        ! Geodetic latitude (sexagesimal format)
-      CHARACTER CLONG*12       ! Geodetic longitude (sexagesimal format)
-      CHARACTER DESCR*40       ! Description of the telescope
-      CHARACTER GRIDFL*70      ! File containing schematic of map grid
-      CHARACTER TELSCP*10      ! Name of telescope
-      CHARACTER TTL*80         ! Title for output NDF
-      CHARACTER SYSTEM*8       ! Celestial coord system for output cube
-      DOUBLE PRECISION HT      ! Height above sea level
-      DOUBLE PRECISION LAT     ! Geodetic latitude
-      DOUBLE PRECISION LONG    ! Geodetic latitude
-      INTEGER CELLCODE         ! 1: AZ, 4: RD, 6: RB, 7: RJ, 8: GA
-      INTEGER CLWBND(3)        ! Lower bounds for the data cube
-      INTEGER CUPBND(3)        ! Upper bounds for the data cube
-      INTEGER DIM( 3 )         ! Dimension sizes
-      INTEGER MXDIM            ! Max dimension size
-      INTEGER DIMS             ! Array dimensionality
-      INTEGER INDF1            ! Identifier for an input NDF
-      INTEGER INDF2            ! Identifier for an output NDF
-      INTEGER IPVOUT           ! Pointer to output variuance array
-      INTEGER IPWORK           ! Pointer to work space
-      INTEGER LTTL             ! Length of title for output NDF
-      INTEGER MLWBND(3)        ! Lower bounds for the ndf
-      INTEGER MUPBND(3)        ! Upper bounds for the ndf
-      INTEGER NDONE            ! Number of spectra converted
-      INTEGER NSPEC            ! Number of spectra
-      INTEGER NX               ! X size of the data cube
-      INTEGER NY               ! Y size of the data cube
-      INTEGER NZ               ! Z size of the data cube
-      INTEGER SPTS             ! Number of points in each spectrum
-      LOGICAL APPHST           ! Append history to output cube?
-      LOGICAL GRIDFG           ! Write schematic of grid to a file?
-      LOGICAL MKAXIS           ! Create AXIS structures?
-      REAL VAR                 ! Constant variance for output spectra
-      REAL VERSN               ! Data format version number
+      INTEGER NSPEC              ! Number of spectra
+      INTEGER NX                 ! X size of the data cube
+      INTEGER NY                 ! Y size of the data cube
+      INTEGER NZ                 ! Z size of the data cube
+      LOGICAL OK                 ! Object present or correct dimensions?
+      CHARACTER*(DAT__SZNAM) OUTNAM ! Component ame of output NDF
+      INTEGER PLACE              ! NDF placeholder creating output NDF
+      INTEGER SPTS               ! Number of points in each spectrum
+      CHARACTER*8 SYSTEM         ! Celestial co-ord system for o/p cube
+      CHARACTER*10 TELSCP        ! Name of telescope
+      CHARACTER*80 TTL           ! Title for output NDF
+      REAL VAR                   ! Constant variance for output spectra
+      REAL VERSN                 ! Data-format version number
+
 *.
 
 *  Check the inherited status. Return if an error has already occurred.
-      IF( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
@@ -372,14 +371,14 @@
       CALL PAR_GET0L( 'AXIS', MKAXIS, STATUS )
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to import the top level object as an NDF.
       CALL NDF_FIND( LOC1, ' ', INDF1, STATUS )
 
-*  If this was succesful, and the NDF is two-dimensional, we assume we
+*  If this was successful, and the NDF is two-dimensional, we assume we
 *  have a SPECX map file as input.
-      IF( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL NDF_BOUND( INDF1, 2, MLWBND, MUPBND, DIMS, STATUS )
          GOTMAP = ( DIMS .EQ. 2 )
       ELSE
@@ -392,17 +391,17 @@
      :                .FALSE., SYSTEM, STATUS )
       CELLCODE = 6
       IF ( SYSTEM .EQ. 'AZ' ) THEN
-        SYSTEM = 'AZEL'
-        CELLCODE = 1
+         SYSTEM = 'AZEL'
+         CELLCODE = 1
       ELSE IF ( SYSTEM .EQ. 'RD' ) THEN
-        SYSTEM = 'APP'
-        CELLCODE = 4
+         SYSTEM = 'APP'
+         CELLCODE = 4
       ELSE IF ( SYSTEM .EQ. 'RB' ) THEN
-        SYSTEM = 'B1950'
-        CELLCODE = 6
+         SYSTEM = 'B1950'
+         CELLCODE = 6
       ELSE IF ( SYSTEM .EQ. 'RJ' ) THEN
-        SYSTEM = 'J2000'
-        CELLCODE = 7
+         SYSTEM = 'J2000'
+         CELLCODE = 7
       ELSE IF ( SYSTEM .EQ. 'GA' ) THEN
          SYSTEM = 'GAL'
          CELLCODE = 8
@@ -412,11 +411,11 @@
       CALL PAR_GET0C( 'TELESCOPE', TELSCP, STATUS )
       CALL CHR_UCASE( TELSCP )
 
-      IF( TELSCP .NE. 'COORDS' ) THEN
+      IF ( TELSCP .NE. 'COORDS' ) THEN
          CALL SLA_OBS( 0, TELSCP, DESCR, LONG, LAT, HT )
 
-         IF( DESCR .EQ. '?' ) THEN
-            IF( STATUS .EQ. SAI__OK ) THEN
+         IF ( DESCR .EQ. '?' ) THEN
+            IF ( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'TELSCP', TELSCP )
                CALL ERR_REP( 'SPECX2NDF_TEL', 'The given telescope '//
@@ -438,29 +437,29 @@
 
 *  First deal with SPECX map file inputs...
 *  ========================================
-      IF( GOTMAP ) THEN
+      IF ( GOTMAP ) THEN
 
-*  Determine the version number of the data format Report an error and
+*  Determine the version number of the data format.  Report an error and
 *  abort if it is less than 4.2.
          CALL NDF_XGT0R( INDF1, 'SPECX_MAP', 'VERSION', VERSN, STATUS )
-         IF( VERSN .LT. 4.2 ) THEN
-            IF( STATUS .EQ. SAI__OK ) THEN
+         IF ( VERSN .LT. 4.2 ) THEN
+            IF ( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( 'SPECX2NDF_BDF', 'SPECX2NDF: the input '//
-     :                       'SPECX data format version is less than '//
+     :                       'SPECX data-format version is less than '//
      :                       '4.2.', STATUS )
             END IF
          END IF
 
 *  Abort if an error has occurred.
-         IF( STATUS .NE. SAI__OK ) GO TO 999
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Determine whether to write a schematic of the map grid.  If no
 *  schematic is required then a null value is returned for GRIDFL;
 *  otherwise it is set to the name of the file to which the schematic
 *  will be written.
          CALL PAR_GET0C( 'GRIDFILE', GRIDFL, STATUS )
-         IF( STATUS .EQ. PAR__NULL ) THEN
+         IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS  )
             GRIDFG = .FALSE.
             GRIDFL = ' '
@@ -476,7 +475,7 @@
          CALL NDF_XGT0I( INDF1, 'SPECX_MAP', 'NSPEC', NSPEC, STATUS )
          CALL NDF_XGT0I( INDF1, 'SPECX_MAP', 'NPTS1', SPTS, STATUS )
 
-*  Attempt to get an identifier for the output cube and proceed if ok.
+*  Attempt to get an identifier for the output cube and proceed if OK.
 *  First construct the array bounds.
          CLWBND( 1 ) = MLWBND( 1 )
          CUPBND( 1 ) = MUPBND( 1 )
@@ -495,8 +494,8 @@
          DIM( 2 ) = CUPBND( 2 ) - CLWBND( 2 ) + 1
          DIM( 3 ) = CUPBND( 3 ) - CLWBND( 3 ) + 1
          MXDIM = DIM( 1 )
-         IF( DIM( 2 ) .GT. MXDIM ) MXDIM = DIM( 2 )
-         IF( DIM( 3 ) .GT. MXDIM ) MXDIM = DIM( 3 )
+         IF ( DIM( 2 ) .GT. MXDIM ) MXDIM = DIM( 2 )
+         IF ( DIM( 3 ) .GT. MXDIM ) MXDIM = DIM( 3 )
 
 *  Copy the data cube.
          CALL CON_CCPY( GRIDFG, GRIDFL, INDF1, 2, MLWBND, MUPBND,
@@ -505,13 +504,13 @@
 *  Create the WCS component.
          IF ( CELLCODE .EQ. 0 ) THEN
            CELLCODE = 6
-         ENDIF
+         END IF
          CALL CON_WCSPX( INDF2, INDF1, CELLCODE, LONG, LAT, VAR,
      :                   STATUS )
 
 *  Map the output variance array and fill it with the constant value
 *  returned by CON_WCSPX.
-         IF( VAR .NE. VAL__BADR ) THEN
+         IF ( VAR .NE. VAL__BADR ) THEN
             CALL NDF_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE',
      :                    IPVOUT, EL, STATUS )
             CALL CON_CONSR( VAR, EL, %VAL( CNF_PVAL( IPVOUT ) ),
@@ -532,14 +531,14 @@
          CALL NDF_XGT0C( INDF1, 'SPECX_MAP', 'ID', TTL, STATUS )
          CALL CHR_LDBLK( TTL )
          LTTL = CHR_LEN( TTL )
-         IF( LTTL .NE. 0 ) CALL NDF_CPUT( TTL( : LTTL ), INDF2, 'TITLE',
-     :                                    STATUS )
+         IF ( LTTL .NE. 0 ) CALL NDF_CPUT( TTL( : LTTL ), INDF2,
+     :                                     'TITLE', STATUS )
          CALL NDF_CPUT( 'T%s60+%v30+A%^50+%<20+*%+   corrected '//
      :                  'antenna temperature', INDF2, 'LABEL', STATUS )
          CALL NDF_CPUT( 'K', INDF2, 'Unit', STATUS )
 
 *  Report success.
-         IF( STATUS .EQ. SAI__OK ) THEN
+         IF ( STATUS .EQ. SAI__OK ) THEN
             NX = CUPBND( 1 ) + 1 - CLWBND( 1 )
             NY = CUPBND( 2 ) + 1 - CLWBND( 2 )
             NZ = CUPBND( 3 ) + 1 - CLWBND( 3 )
@@ -563,8 +562,8 @@
          NNDF = 0
          LOC2 = DAT__NOLOC
          LOC4 = DAT__NOLOC
-         IF( INDF1 .NE. NDF__NOID ) THEN
-            IF( DIMS .NE. 1 ) THEN
+         IF ( INDF1 .NE. NDF__NOID ) THEN
+            IF ( DIMS .NE. 1 ) THEN
                OK = .FALSE.
             ELSE
                NNDF = 1
@@ -579,17 +578,17 @@
 *  cell.
          ELSE
             CALL DAT_THERE( LOC1, 'SPECTRUM', OK, STATUS )
-            IF( OK ) THEN
+            IF ( OK ) THEN
                CALL DAT_FIND( LOC1, 'SPECTRUM', LOC2, STATUS )
                CALL DAT_SHAPE( LOC2, 1, NNDF, NDIM, STATUS )
 
-               IF( NDIM .EQ. 1 ) THEN
+               IF ( NDIM .EQ. 1 ) THEN
                   CALL DAT_CELL( LOC2, 1, 1, LOC3, STATUS )
 
-                  IF( STATUS .NE. SAI__OK ) GO TO 999
+                  IF ( STATUS .NE. SAI__OK ) GO TO 999
 
                   CALL NDF_FIND( LOC3, ' ', INDF1, STATUS )
-                  IF( STATUS .NE. SAI__OK ) THEN
+                  IF ( STATUS .NE. SAI__OK ) THEN
                      CALL ERR_ANNUL( STATUS )
                      OK = .FALSE.
                   ELSE
@@ -607,7 +606,7 @@
                   DO I = 1, NCOMP
                      CALL DAT_INDEX( LOC1, I, LOC5, STATUS )
                      CALL DAT_NAME( LOC5, NAME, STATUS )
-                     IF( NAME(:4) .NE. 'SPEC' ) THEN
+                     IF ( NAME(:4) .NE. 'SPEC' ) THEN
                         CALL DAT_COPY( LOC5, LOC4, NAME, STATUS )
                      END IF
                   END DO
@@ -623,7 +622,7 @@
          END IF
 
 *  Report an error if the array could nto be accessed.
-         IF( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
+         IF ( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SPECX2NDF_IN', 'The input does not seem to'//
      :                    ' contain either a SPECX map or SPECX '//
@@ -635,7 +634,7 @@
 *  the first.
          NDONE = 0
          DO I = 1, NNDF
-            IF( INDF2 .NE. NDF__NOID ) THEN
+            IF ( INDF2 .NE. NDF__NOID ) THEN
                NDONE = NDONE + 1
 
 *  Process this output NDF. First make it 3 dimensional, with the
@@ -648,8 +647,9 @@
                MUPBND( 2 ) = 1
                CALL NDF_SBND( 3, MLWBND, MUPBND, INDF2, STATUS )
 
-*  Copy the data values. GSD uses 9999 to mean a bad value and those will
-*  appear in SPECX data files unmodified. Convert them to Starlink bad values.
+*  Copy the data values.  GSD uses 9999 to mean a bad value and those
+*  will appear in SPECX data files unmodified.  Convert them to Starlink
+*  bad values.
                CALL NDF_MAP( INDF1, 'DATA', '_REAL', 'READ', IPIN, EL,
      :                       STATUS )
                CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'WRITE', IPOUT, EL,
@@ -667,7 +667,7 @@
 
 *  Map the output variance array and fill it with the constant value
 *  returned by CON_WCSPX.
-               IF( VAR .NE. VAL__BADR ) THEN
+               IF ( VAR .NE. VAL__BADR ) THEN
                   CALL NDF_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE',
      :                          IPVOUT, EL, STATUS )
                   CALL CON_CONSR( VAR, EL, %VAL( CNF_PVAL( IPVOUT ) ),
@@ -693,7 +693,7 @@
             CALL NDF_ANNUL( INDF1, STATUS )
 
 *  Get an identifier for the next input NDF if necessary.
-            IF( I .LT. NNDF ) THEN
+            IF ( I .LT. NNDF ) THEN
                CALL DAT_CELL( LOC2, 1, I + 1, LOC3, STATUS )
                CALL NDF_FIND( LOC3, ' ', INDF1, STATUS )
                CALL NDF_BOUND( INDF1, 2, MLWBND, MUPBND, DIMS,
@@ -701,7 +701,7 @@
                CALL DAT_ANNUL( LOC3, STATUS )
 
 *  Create the next output NDF by copying the next input NDF.
-               IF( MUPBND( 1 ) - MLWBND( 1 ) .GT. 0 ) THEN
+               IF ( MUPBND( 1 ) - MLWBND( 1 ) .GT. 0 ) THEN
                   OUTNAM = 'SPECTRUM'
                   IAT = 8
                   CALL CHR_PUTI( I + 1, OUTNAM, IAT )
@@ -714,13 +714,13 @@
          END DO
 
 *  Annul the locator to the array of input spectra.
-         IF( LOC2 .NE. DAT__NOLOC ) CALL DAT_ANNUL( LOC2, STATUS )
+         IF ( LOC2 .NE. DAT__NOLOC ) CALL DAT_ANNUL( LOC2, STATUS )
 
 *  Annul the locator to the output container.
-         IF( LOC4 .NE. DAT__NOLOC ) CALL DAT_ANNUL( LOC4, STATUS )
+         IF ( LOC4 .NE. DAT__NOLOC ) CALL DAT_ANNUL( LOC4, STATUS )
 
 *  Report success.
-         IF( NDONE .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         IF ( NDONE .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
             CALL MSG_SETI( 'N', NDONE )
             CALL MSG_OUT( ' ', '^N spectra converted successfully.',
      :                   STATUS )
@@ -740,7 +740,7 @@
       CALL DAT_ANNUL( LOC1, STATUS )
 
 *  Report a message if any error occurred.
-      IF( STATUS .NE. SAI__OK ) THEN
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'SPECX2NDF_ERR', 'SPECX2NDF: failed to '//
      :                 'convert SPECX map file.', STATUS )
       END IF
@@ -758,9 +758,10 @@
       REAL INDATA( * )
       REAL OUTDATA( * )
       INTEGER STATUS
+
       INTEGER I
 
-      IF (STATUS .NE. SAI__OK) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
       DO I = 1, EL
          IF ( INDATA( I ) .EQ. 9999 ) THEN
