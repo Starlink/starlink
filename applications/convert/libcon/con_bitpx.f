@@ -26,8 +26,9 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1992 Science & Engineering Research Council. All
-*     Rights Reserved.
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -52,7 +53,9 @@
 *  History:
 *     1992 September 16 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2012 April 30 (MJC):
+*        Add 64-bit integer.
+*     {enter_further_changes_here}
 
 *-
 
@@ -74,7 +77,7 @@
 
 *  Local Constants:
       INTEGER MAXTYP             ! Number of numeric data types
-      PARAMETER( MAXTYP=7 )
+      PARAMETER( MAXTYP=8 )
 
 *  Local Variables:
       INTEGER FBITS( MAXTYP )    ! BITPIX values
@@ -82,8 +85,8 @@
       INTEGER I                  ! Loop counter
 
 *  Local Data:
-      DATA FBITS /8, 16, 32, -32, -64, 8, 16/
-      DATA HTYPES/'_BYTE','_WORD','_INTEGER','_REAL','_DOUBLE',
+      DATA FBITS /8, 16, 32, 64, -32, -64, 8, 16/
+      DATA HTYPES/'_BYTE','_WORD','_INTEGER','_INT64','_REAL','_DOUBLE',
      :            '_UBYTE','_UWORD'/
 
 *.
