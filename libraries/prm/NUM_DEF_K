@@ -31,133 +31,134 @@
 *  History:
 *     16-AUG-1988 (RFWS):
 *         Original version
+*     2012-05-04 (TIMJ):
+*         INTEGER*8 cloned from INTEGER
 
 *-
 
 **********************************************
-*   Arithmetic between two INTEGER numbers   *
+*   Arithmetic between two INTEGER*8 numbers *
 **********************************************
 
- sdfsdf
 *   Add.
-      NUM_ADDK( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          NUM_ARGI1 + NUM_ARGI2
+      NUM_ADDK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          NUM_ARGK1 + NUM_ARGK2
 
 *   Subtract.
-      NUM_SUBI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          NUM_ARGI1 - NUM_ARGI2
+      NUM_SUBK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          NUM_ARGK1 - NUM_ARGK2
 
 *   Floating multiply.
-      NUM_MULI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          NUM_ARGI1 * NUM_ARGI2
+      NUM_MULK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          NUM_ARGK1 * NUM_ARGK2
 
 *   Floating divide.
-      NUM_DIVI( NUM_ARGI1, NUM_ARGI2 ) = NUM_RTOI(
-     :                          NUM_ITOR( NUM_ARGI1 ) /
-     :                          NUM_ITOR( NUM_ARGI2 ) )
+      NUM_DIVK( NUM_ARGK1, NUM_ARGK2 ) = NUM_RTOK(
+     :                          NUM_ITOR( NUM_ARGK1 ) /
+     :                          NUM_ITOR( NUM_ARGK2 ) )
 
 *   Integer divide.
-      NUM_IDVI( NUM_ARGI1, NUM_ARGI2 ) = NUM_ARGI1 / NUM_ARGI2
+      NUM_IDVK( NUM_ARGK1, NUM_ARGK2 ) = NUM_ARGK1 / NUM_ARGK2
 
 *   Raise to power.
-      NUM_PWRI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          NUM_ARGI1 ** NUM_ARGI2
+      NUM_PWRK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          NUM_ARGK1 ** NUM_ARGK2
 
 
 
 ********************************************************
-*   INTEGER functions with a single INTEGER argument   *
+*   INTEGER*8 functions with a single INTEGER*8 argument   *
 ********************************************************
 
 
 *   Negate argument.
-      NUM_NEGI( NUM_ARGI ) = - NUM_ARGI
+      NUM_NEGK( NUM_ARGK ) = - NUM_ARGK
 
 *   Square root.
-      NUM_SQRTI( NUM_ARGI ) = NUM_RTOI( SQRT( NUM_ITOR( NUM_ARGI ) ) )
+      NUM_SQRTK( NUM_ARGK ) = NUM_RTOK( SQRT( NUM_ITOR( NUM_ARGK ) ) )
 
 *   Natural logarithm (base e).
-      NUM_LOGI( NUM_ARGI ) = NUM_RTOI( LOG( NUM_ITOR( NUM_ARGI ) ) )
+      NUM_LOGK( NUM_ARGK ) = NUM_RTOK( LOG( NUM_ITOR( NUM_ARGK ) ) )
 
 *   Common logarithm (base 10).
-      NUM_LG10I( NUM_ARGI ) = NUM_RTOI( LOG10( NUM_ITOR( NUM_ARGI ) ) )
+      NUM_LG10K( NUM_ARGK ) = NUM_RTOK( LOG10( NUM_ITOR( NUM_ARGK ) ) )
 
 *   Exponential function.
-      NUM_EXPI( NUM_ARGI ) = NUM_RTOI( EXP( NUM_ITOR( NUM_ARGI ) ) )
+      NUM_EXPK( NUM_ARGK ) = NUM_RTOK( EXP( NUM_ITOR( NUM_ARGK ) ) )
 
 *   Absolute (positive) value.
-      NUM_ABSI( NUM_ARGI ) = ABS( NUM_ARGI )
+      NUM_ABSK( NUM_ARGK ) = ABS( NUM_ARGK )
 
 *   Nearest integer.
-      NUM_NINTI( NUM_ARGI ) = NUM_ARGI
+      NUM_NINTK( NUM_ARGK ) = NUM_ARGK
 
 *   Truncation to integer.
-      NUM_INTI( NUM_ARGI ) = NUM_ARGI
+      NUM_INTK( NUM_ARGK ) = NUM_ARGK
 
 
 
 ***************************************************
-*  INTEGER functions with two INTEGER arguments   *
+*  INTEGER*8 functions with two INTEGER*8 arguments   *
 ***************************************************
 
 
 *   Minimum of two numbers.
-      NUM_MINI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          MIN( NUM_ARGI1, NUM_ARGI2 )
+      NUM_MINK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          MIN( NUM_ARGK1, NUM_ARGK2 )
 
 *   Maximum of two numbers.
-      NUM_MAXI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          MAX( NUM_ARGI1, NUM_ARGI2 )
+      NUM_MAXK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          MAX( NUM_ARGK1, NUM_ARGK2 )
 
 *   Fortran DIM (positive difference) function.
-      NUM_DIMI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          DIM( NUM_ARGI1, NUM_ARGI2 )
+      NUM_DIMK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          DIM( NUM_ARGK1, NUM_ARGK2 )
 
 *   Fortran MOD (remainder) function.
-      NUM_MODI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          MOD( NUM_ARGI1, NUM_ARGI2 )
+      NUM_MODK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          MOD( NUM_ARGK1, NUM_ARGK2 )
 
 *   Fortran SIGN (transfer of sign) function.
-      NUM_SIGNI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          SIGN( NUM_ARGI1, NUM_ARGI2 )
+      NUM_SIGNK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          SIGN( NUM_ARGK1, NUM_ARGK2 )
 
 
 
 *******************************************************
-*   Logical functions comparing two INTEGER numbers   *
+*   Logical functions comparing two INTEGER*8 numbers   *
 *******************************************************
 
 
 *   Equality.
-      NUM_EQI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          NUM_ARGI1 .EQ. NUM_ARGI2
+      NUM_EQK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          NUM_ARGK1 .EQ. NUM_ARGK2
 
 *   Inequality.
-      NUM_NEI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          NUM_ARGI1 .NE. NUM_ARGI2
+      NUM_NEK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          NUM_ARGK1 .NE. NUM_ARGK2
 
 *   Greater than.
-      NUM_GTI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          NUM_ARGI1 .GT. NUM_ARGI2
+      NUM_GTK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          NUM_ARGK1 .GT. NUM_ARGK2
 
 *   Greater than or equal.
-      NUM_GEI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          NUM_ARGI1 .GE. NUM_ARGI2
+      NUM_GEK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          NUM_ARGK1 .GE. NUM_ARGK2
 
 *   Less than.
-      NUM_LTI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          NUM_ARGI1 .LT. NUM_ARGI2
+      NUM_LTK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          NUM_ARGK1 .LT. NUM_ARGK2
 
 *   Less than or equal.
-      NUM_LEI( NUM_ARGI1, NUM_ARGI2 ) =
-     :                          NUM_ARGI1 .LE. NUM_ARGI2
+      NUM_LEK( NUM_ARGK1, NUM_ARGK2 ) =
+     :                          NUM_ARGK1 .LE. NUM_ARGK2
 
 
 
 ************************************************************************
 *                               END                                    *
 *                                                                      *
-*              Definitions of NUM_ INTEGER functions                   *
+*              Definitions of NUM_ INTEGER*8 functions                 *
 *                                                                      *
 *                               END                                    *
 ************************************************************************
