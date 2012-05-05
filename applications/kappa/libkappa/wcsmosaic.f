@@ -460,7 +460,7 @@
       CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...',
      :                 IGRP1, SIZE, STATUS )
 
-*  Get an identifier for the fiorst input NDF.
+*  Get an identifier for the first input NDF.
       CALL NDG_NDFAS( IGRP1, 1, 'READ', INDF0, STATUS )
 
 *  Abort if an error has occurred.
