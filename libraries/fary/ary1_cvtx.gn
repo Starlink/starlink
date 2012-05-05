@@ -72,6 +72,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -80,6 +81,8 @@
 *     30-AUG-1989 (RFWS):
 *        Changed to use message token to prevent '$' affecting error
 *        messages.
+*     2012-05-05 (TIMJ):
+*        Add _INT64
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,6 +155,10 @@
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
          CALL VEC_UWTO<T>( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT,
+     :                    IERR, NERR, STATUS )
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL VEC_KTO<T>( BAD, N, %VAL( CNF_PVAL( PNTR ) ), RESULT,
      :                    IERR, NERR, STATUS )
 
 *  Note if the input data type specified is not valid.

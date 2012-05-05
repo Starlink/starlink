@@ -72,6 +72,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +83,8 @@
 *        messages.
 *     6-APR-1993 (RFWS):
 *        Changed routine name.
+*     2012-05-05 (TIMJ):
+*        Add _INT64
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -154,6 +157,10 @@
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
          CALL VEC_<T>TOUW( BAD, N, ARRAY, %VAL( CNF_PVAL( PNTR ) ), IERR,
+     :                    NERR, STATUS )
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL VEC_<T>TOK( BAD, N, ARRAY, %VAL( CNF_PVAL( PNTR ) ), IERR,
      :                    NERR, STATUS )
 
 *  Note if the output data type specified is not valid.
