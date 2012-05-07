@@ -127,6 +127,8 @@
 *        Added further explanation to the notes section.
 *     24-APR-2006 (DSB):
 *        Added arguments SCLOC.
+*     2012-05-07 (TIMJ):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -220,6 +222,11 @@
             CALL ARY1_GTNUW( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
      :                       LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                       %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
+
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            CALL ARY1_GTNK( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
+     :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
+     :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
 
 
 *  Note if the data type string is not recognised.

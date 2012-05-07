@@ -111,6 +111,8 @@
 *        affecting error messages.
 *     22-MAR-1990 (RFWS):
 *        Added further information to the notes section.
+*     2012-05-07 (TIMJ):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -202,6 +204,11 @@
             CALL ARY1_PTNUW( BAD, NDIM, LBNDA, UBNDA,
      :                       %VAL( CNF_PVAL( PNTR ) ), LSUB, USUB,
      :                       LBNDD, UBNDD, HTYPE, LOC, DCE, STATUS )
+
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            CALL ARY1_PTNK( BAD, NDIM, LBNDA, UBNDA,
+     :                      %VAL( CNF_PVAL( PNTR ) ), LSUB, USUB,
+     :                      LBNDD, UBNDD, HTYPE, LOC, DCE, STATUS )
 
 *  Note if the data type string is not recognised.
          ELSE

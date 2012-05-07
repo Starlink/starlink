@@ -68,6 +68,8 @@
 *        affecting error messages.
 *     13-MAR-1990 (RFWS):
 *        Changed to call ARY1_ZERx instead of VEC_ZERx.
+*     2012-05-07 (TIMJ):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,6 +124,9 @@
 
       ELSE IF ( CHR_SIMLR( TYPE, '_UWORD' ) ) THEN
          CALL ARY1_ZERUW( N, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+
+      ELSE IF ( CHR_SIMLR( TYPE, '_INT64' ) ) THEN
+         CALL ARY1_ZERK( N, %VAL( CNF_PVAL( PNTR ) ), STATUS )
 
 *  If the data type supplied was not valid, then report an error.
       ELSE

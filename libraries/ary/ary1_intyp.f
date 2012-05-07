@@ -56,6 +56,8 @@
 *  History:
 *     7-JUN-1989  (RFWS):
 *        Original version.
+*     2012-05-07 (TIMJ):
+*        Add _INT64 support.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -95,7 +97,8 @@
      :     CHR_SIMLR( TYPE, '_INTEGER' ) .OR.
      :     CHR_SIMLR( TYPE, '_REAL' ) .OR.
      :     CHR_SIMLR( TYPE, '_WORD' ) .OR.
-     :     CHR_SIMLR( TYPE, '_UWORD' ) ) THEN
+     :     CHR_SIMLR( TYPE, '_UWORD' ) .OR.
+     :     CHR_SIMLR( TYPE, '_INT64' ) ) THEN
          NUMER = .TRUE.
 
 *  If the type is not numeric, set NUMER to .FALSE..

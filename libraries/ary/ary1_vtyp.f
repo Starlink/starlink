@@ -61,6 +61,8 @@
 *     22-AUG-1989 (RFWS):
 *        Corrected error in argument list of ARY1_CCPY. Also added more
 *        comments.
+*     2012-05-07 (TIMJ):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -123,6 +125,10 @@
 *  ...unsigned word data type.
       ELSE IF ( CHR_SIMLR( TYPE, '_UWORD' ) ) THEN
          CALL ARY1_CCPY( '_UWORD', VTYPE, STATUS )
+
+*  ...64-bit integer data type.
+      ELSE IF ( CHR_SIMLR( TYPE, '_INT64' ) ) THEN
+         CALL ARY1_CCPY( '_INT64', VTYPE, STATUS )
 
 *  If the data type string is invalid, then report an error.
       ELSE
