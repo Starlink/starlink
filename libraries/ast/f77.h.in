@@ -229,7 +229,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "star/mem.h"
 /*  This initial sections defines values for all macros. These are the	    */
 /*  values that are generally appropriate to an ANSI C compiler on Unix.    */
 /*  For macros that have different values on other systems, the macros	    */
@@ -525,7 +524,7 @@
 #define F77_CREATE_WORD_ARRAY(X,N)
 #define F77_CREATE_UWORD_ARRAY(X,N)
 #define F77_CREATE_POINTER_ARRAY(X,N)\
-        X=(F77_POINTER_TYPE *) starMalloc(N*sizeof(F77_POINTER_TYPE))
+        X=(F77_POINTER_TYPE *) malloc(N*sizeof(F77_POINTER_TYPE))
 
 /* Associate Fortran arrays with C arrays                             */
 /* These macros ensure that there is space somewhere for the Fortran  */
