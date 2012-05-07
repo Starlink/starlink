@@ -1242,6 +1242,22 @@ libraries/prm/vec_pwrx.f
 libraries/prm/vec_sqrtx.f
 libraries/prm/vec_subx.f
 libraries/prm/vec_xtox.f
+libraries/prm/val_btox.f
+libraries/prm/val_dtox.f
+libraries/prm/val_itox.f
+libraries/prm/val_ktox.f
+libraries/prm/val_rtox.f
+libraries/prm/val_ubtox.f
+libraries/prm/val_uwtox.f
+libraries/prm/val_wtox.f
+libraries/prm/vec_btox.f
+libraries/prm/vec_dtox.f
+libraries/prm/vec_itox.f
+libraries/prm/vec_ktox.f
+libraries/prm/vec_rtox.f
+libraries/prm/vec_ubtox.f
+libraries/prm/vec_uwtox.f
+libraries/prm/vec_wtox.f
 
 libraries/shl/browsehlp
 
