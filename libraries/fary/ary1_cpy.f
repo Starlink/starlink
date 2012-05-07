@@ -173,6 +173,8 @@
 *        Include support for delta compressed arrays.
 *     4-NOV-2010 (DSB):
 *        Added EXPAND argument.
+*     2012-05-07 (TIMJ):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -397,6 +399,13 @@
      :                                   %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                                   IERR, NERR, STATUS )
+
+*  ...64-bit integer data.
+                        ELSE IF ( DCB_TYP( IDCB1 ) .EQ. '_INT64' ) THEN
+                           CALL VEC_KTOK( .FALSE., EL,
+     :                                   %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
+     :                                   IERR, NERR, STATUS )
                         END IF
 
 *  Unmap the (cloned) input and output arrays.
@@ -521,6 +530,13 @@
                            ELSE IF ( NEWTYP .EQ. '_UWORD' )
      :                     THEN
                               CALL VEC_UWTOUW( .FALSE., EL,
+     :                               %VAL( CNF_PVAL( PNTR1( ICOMP ) ) ),
+     :                               %VAL( CNF_PVAL( PNTR2( ICOMP ) ) ),
+     :                               IERR, NERR, STATUS )
+*  ...64-bit integer data.
+                           ELSE IF ( NEWTYP .EQ. '_INT64' )
+     :                     THEN
+                              CALL VEC_KTOK( .FALSE., EL,
      :                               %VAL( CNF_PVAL( PNTR1( ICOMP ) ) ),
      :                               %VAL( CNF_PVAL( PNTR2( ICOMP ) ) ),
      :                               IERR, NERR, STATUS )

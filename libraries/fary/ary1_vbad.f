@@ -67,6 +67,8 @@
 *        affecting error messages.
 *     13-MAR-1990 (RFWS):
 *        Changed to call ARY1_BADx instead of VEC_BADx.
+*     2012-05-07 (TIMJ):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,6 +124,9 @@
 
       ELSE IF ( CHR_SIMLR( TYPE, '_UWORD' ) ) THEN
          CALL ARY1_BADUW( N, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+
+      ELSE IF ( CHR_SIMLR( TYPE, '_INT64' ) ) THEN
+         CALL ARY1_BADK( N, %VAL( CNF_PVAL( PNTR ) ), STATUS )
 
 *  If the data type string was not valid, then report an error.
       ELSE

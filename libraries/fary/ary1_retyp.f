@@ -120,6 +120,8 @@
 *        need alteration.
 *     18-JUL-2006 (DSB):
 *        Add DEFER argument.
+*     2012-05-07 (TIMJ):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -260,6 +262,10 @@
             ELSE IF ( CHR_SIMLR( NTYPE, '_UWORD' ) ) THEN
                CALL ARY1_CVTUW( BAD, EL, TYPE, OLDPTR,
      :                          %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
+
+            ELSE IF ( CHR_SIMLR( NTYPE, '_INT64' ) ) THEN
+               CALL ARY1_CVTK( BAD, EL, TYPE, OLDPTR,
+     :                         %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
             END IF
 
 *  Unmap the new object.
