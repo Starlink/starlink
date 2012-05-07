@@ -1,19 +1,19 @@
-      SUBROUTINE VEC_ITOI( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
+      SUBROUTINE VEC_<T>TO<T>( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
 *+
 *  Name:
-*     VEC_ITOI
+*     VEC_<T>TO<T>
 
 *  Purpose:
-*     Copy vectorised INTEGER values.
+*     Copy vectorised <COMM> values.
 
 *  Language:
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL VEC_ITOI( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
+*     CALL VEC_<T>TO<T>( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
 
 *  Description:
-*     The routine copies a vectorised array of INTEGER values.  It forms
+*     The routine copies a vectorised array of <COMM> values.  It forms
 *     part of the set of type conversion routines, but in this instance
 *     the argument and result types are both the same, so the argument
 *     values are simply copied.
@@ -27,12 +27,12 @@
 *        The number of values to be copied.  If N is not positive the
 *        routine returns with IERR and NERR set to zero, but without
 *        copying any values.
-*     ARGV(*) = INTEGER (Given)
-*        A vectorised (1-dimensional) array containing the N INTEGER
+*     ARGV(*) = <TYPE> (Given)
+*        A vectorised (1-dimensional) array containing the N <COMM>
 *        values to be copied.
-*     RESV(*) = INTEGER (Returned)
+*     RESV(*) = <TYPE> (Returned)
 *        A vectoried (1-dimensional) array with at least N elements to
-*        receive the INTEGER results.
+*        receive the <COMM> results.
 *     IERR = INTEGER (Returned)
 *        The index of the first input array element to generate a
 *        numerical error.  It will always be set to zero by this
@@ -94,10 +94,10 @@
 *  Arguments Given:
       LOGICAL BAD                ! Bad data flag
       INTEGER N                  ! Number of elements to process
-      INTEGER ARGV( * )           ! Array of input values
+      <TYPE> ARGV( * )           ! Array of input values
 
 *  Arguments Returned:
-      INTEGER RESV( * )           ! Array of result values
+      <TYPE> RESV( * )           ! Array of result values
       INTEGER IERR               ! Numerical error pointer
       INTEGER NERR               ! Numerical error count
 

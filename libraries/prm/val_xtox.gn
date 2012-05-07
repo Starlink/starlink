@@ -1,19 +1,19 @@
-      INTEGER*2 FUNCTION VAL_WTOW( BAD, ARG, STATUS )
+      <TYPE> FUNCTION VAL_<T>TO<T>( BAD, ARG, STATUS )
 *+
 *  Name:
-*     VAL_WTOW
+*     VAL_<T>TO<T>
 
 *  Purpose:
-*     Copy a WORD value.
+*     Copy a <COMM> value.
 
 *  Language:
 *     Starlink Fortran
 
 *  Invocation:
-*     RESULT = VAL_WTOW( BAD, ARG, STATUS )
+*     RESULT = VAL_<T>TO<T>( BAD, ARG, STATUS )
 
 *  Description:
-*     The routine copies a value of type WORD.  It forms part of the
+*     The routine copies a value of type <COMM>.  It forms part of the
 *     set of type conversion routines, but in this instance the
 *     argument and result types are both the same, so the argument
 *     value is simply copied.
@@ -23,17 +23,17 @@
 *        Whether the argument value (ARG) may be "bad" (this argument
 *        actually has no effect on the behaviour of this routine, but
 *        is present to match the other type conversion routines).
-*     ARG = INTEGER*2 (Given)
-*        The WORD value to be copied.
+*     ARG = <TYPE> (Given)
+*        The <COMM> value to be copied.
 *     STATUS = INTEGER (Given)
 *        This should be set to SAI__OK on entry, otherwise the routine
-*        returns immediately with the result VAL__BADW.  This routine
+*        returns immediately with the result VAL__BAD<T>.  This routine
 *        cannot produce numerical errors, so the STATUS argument will
 *        not be changed.
 
 *  Returned Value:
-*     VAL_WTOW = INTEGER*2
-*        Returns the copied WORD value.  The value VAL__BADW will
+*     VAL_<T>TO<T> = <TYPE>
+*        Returns the copied <COMM> value.  The value VAL__BAD<T> will
 *        be returned if STATUS is not SAI__OK on entry.
 
 *  Copyright:
@@ -81,20 +81,20 @@
 
 *  Arguments Given:
       LOGICAL BAD                ! Bad data flag
-      INTEGER*2 ARG                 ! Value to be copied
+      <TYPE> ARG                 ! Value to be copied
 
 *  Status:
       INTEGER STATUS             ! Error status
 
 *.
 
-*  Check status.  Return the function result VAL__BADW if not OK.
+*  Check status.  Return the function result VAL__BAD<T> if not OK.
       IF( STATUS .NE. SAI__OK ) THEN
-         VAL_WTOW = VAL__BADW
+         VAL_<T>TO<T> = VAL__BAD<T>
 
 *  If OK, return the argument value.
       ELSE
-         VAL_WTOW = ARG
+         VAL_<T>TO<T> = ARG
       ENDIF
 
 *  Exit routine.

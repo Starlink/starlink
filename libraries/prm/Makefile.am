@@ -44,43 +44,44 @@ NONGEN_F_ROUTINES = val_absb.f val_absd.f val_absi.f \
 val_absr.f val_absub.f val_absuw.f val_absw.f val_acosd.f val_acosr.f \
 val_acsdd.f val_acsdr.f val_asind.f val_asinr.f val_asndd.f \
 val_asndr.f val_at2dd.f val_at2dr.f val_atand.f val_atanr.f val_atn2d.f \
-val_atn2r.f val_atndd.f val_atndr.f val_btob.f val_btod.f val_btoi.f \
+val_atn2r.f val_atndd.f val_atndr.f val_btod.f val_btoi.f \
 val_btor.f val_btoub.f val_btouw.f val_btow.f val_cosd.f val_cosdd.f \
 val_cosdr.f val_coshd.f val_coshr.f val_cosr.f \
-val_dtob.f val_dtod.f val_dtoi.f val_dtor.f val_dtoub.f val_dtouw.f \
+val_dtob.f val_dtoi.f val_dtor.f val_dtoub.f val_dtouw.f \
 val_dtow.f val_itob.f val_itod.f \
-val_itoi.f val_itor.f val_itoub.f val_itouw.f val_itow.f \
+val_itor.f val_itoub.f val_itouw.f val_itow.f \
 val_negb.f val_negd.f val_negi.f val_negr.f val_negub.f val_neguw.f \
 val_negw.f val_rtob.f val_rtod.f val_rtoi.f \
-val_rtor.f val_rtoub.f val_rtouw.f val_rtow.f val_signb.f val_signd.f \
+val_rtoub.f val_rtouw.f val_rtow.f val_signb.f val_signd.f \
 val_signi.f val_signr.f val_signub.f val_signuw.f val_signw.f \
 val_sind.f val_sindd.f val_sindr.f val_sinhd.f val_sinhr.f val_sinr.f \
 val_tand.f val_tandd.f val_tandr.f \
 val_tanhd.f val_tanhr.f val_tanr.f val_ubtob.f val_ubtod.f val_ubtoi.f \
-val_ubtor.f val_ubtoub.f val_ubtouw.f val_ubtow.f val_uwtob.f \
-val_uwtod.f val_uwtoi.f val_uwtor.f val_uwtoub.f val_uwtouw.f \
+val_ubtor.f val_ubtouw.f val_ubtow.f val_uwtob.f \
+val_uwtod.f val_uwtoi.f val_uwtor.f val_uwtoub.f \
 val_uwtow.f val_wtob.f val_wtod.f val_wtoi.f val_wtor.f val_wtoub.f \
-val_wtouw.f val_wtow.f vec_absb.f vec_absd.f vec_absi.f vec_absr.f \
+val_wtouw.f \
+vec_absb.f vec_absd.f vec_absi.f vec_absr.f \
 vec_absub.f vec_absuw.f vec_absw.f vec_acosd.f vec_acosr.f vec_acsdd.f \
 vec_acsdr.f vec_asind.f vec_asinr.f vec_asndd.f vec_asndr.f \
 vec_at2dd.f vec_at2dr.f vec_atand.f vec_atanr.f vec_atn2d.f vec_atn2r.f \
-vec_atndd.f vec_atndr.f vec_btob.f vec_btod.f vec_btoi.f vec_btor.f \
+vec_atndd.f vec_atndr.f vec_btod.f vec_btoi.f vec_btor.f \
 vec_btoub.f vec_btouw.f vec_btow.f vec_cosd.f vec_cosdd.f vec_cosdr.f \
 vec_coshd.f vec_coshr.f vec_cosr.f vec_dtob.f \
-vec_dtod.f vec_dtoi.f vec_dtor.f vec_dtoub.f vec_dtouw.f vec_dtow.f \
-vec_itob.f vec_itod.f vec_itoi.f \
+vec_dtoi.f vec_dtor.f vec_dtoub.f vec_dtouw.f vec_dtow.f \
+vec_itob.f vec_itod.f \
 vec_itor.f vec_itoub.f vec_itouw.f vec_itow.f vec_negb.f \
 vec_negd.f vec_negi.f vec_negr.f vec_negub.f vec_neguw.f vec_negw.f \
 vec_rtob.f vec_rtod.f vec_rtoi.f \
-vec_rtor.f vec_rtoub.f vec_rtouw.f vec_rtow.f vec_signb.f vec_signd.f \
+vec_rtoub.f vec_rtouw.f vec_rtow.f vec_signb.f vec_signd.f \
 vec_signi.f vec_signr.f vec_signub.f vec_signuw.f vec_signw.f \
 vec_sind.f vec_sindd.f vec_sindr.f vec_sinhd.f vec_sinhr.f vec_sinr.f \
 vec_tand.f vec_tandd.f vec_tandr.f \
 vec_tanhd.f vec_tanhr.f vec_tanr.f vec_ubtob.f vec_ubtod.f vec_ubtoi.f \
-vec_ubtor.f vec_ubtoub.f vec_ubtouw.f vec_ubtow.f vec_uwtob.f \
-vec_uwtod.f vec_uwtoi.f vec_uwtor.f vec_uwtoub.f vec_uwtouw.f \
+vec_ubtor.f vec_ubtouw.f vec_ubtow.f vec_uwtob.f \
+vec_uwtod.f vec_uwtoi.f vec_uwtor.f vec_uwtoub.f \
 vec_uwtow.f vec_wtob.f vec_wtod.f vec_wtoi.f vec_wtor.f vec_wtoub.f \
-vec_wtouw.f vec_wtow.f \
+vec_wtouw.f \
 num_clearerr.f num_wasok.f num_geterr.f
 
 GEN_F_ROUTINES = $(PRM_N_GEN:.gn=.f)
@@ -89,10 +90,11 @@ PRM_N_GEN = \
 val_addx.gn val_dimx.gn val_divx.gn val_expx.gn  \
 val_idvx.gn val_intx.gn val_lg10x.gn val_logx.gn val_maxx.gn \
 val_minx.gn val_modx.gn val_mulx.gn val_nintx.gn val_pwrx.gn \
-val_sqrtx.gn val_subx.gn vec_addx.gn vec_dimx.gn vec_divx.gn \
+val_sqrtx.gn val_subx.gn val_xtox.gn \
+vec_addx.gn vec_dimx.gn vec_divx.gn \
 vec_expx.gn vec_idvx.gn vec_intx.gn vec_lg10x.gn vec_logx.gn \
 vec_maxx.gn vec_minx.gn vec_modx.gn vec_mulx.gn vec_nintx.gn \
-vec_pwrx.gn vec_sqrtx.gn vec_subx.gn
+vec_pwrx.gn vec_sqrtx.gn vec_subx.gn vec_xtox.gn
 
 # Module num1_cvt.c is not in fact necessary in cases where the
 # Fortran compiler supports the IZEXT (and related) intrinsic.  We
