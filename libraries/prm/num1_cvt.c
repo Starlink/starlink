@@ -398,7 +398,6 @@ unsigned short int num1_itouw_( int *num_argi )
 
 int num1_ktoi_( int64_t *num_argk ) {
   int64_t inval = *num_argk;
-  printf("Go a K int of %"PRIi64" to convert\n", inval );
   if ( inval > VAL__MAXI || inval < VAL__MINI ) {
     return VAL__BADI;
   } else {
@@ -409,7 +408,6 @@ int num1_ktoi_( int64_t *num_argk ) {
 
 char num1_ktob_( int64_t *num_argk ) {
   int64_t inval = *num_argk;
-  printf("Go a K int of %"PRIi64" to convert\n", inval );
   if ( inval > VAL__MAXB || inval < VAL__MINB ) {
     return VAL__BADB;
   } else {
@@ -420,7 +418,6 @@ char num1_ktob_( int64_t *num_argk ) {
 
 unsigned char num1_ktoub_( int64_t *num_argk ) {
   int64_t inval = *num_argk;
-  printf("Go a K int of %"PRIi64" to convert\n", inval );
   if ( inval > VAL__MAXUB || inval < VAL__MINUB ) {
     return VAL__BADUB;
   } else {
@@ -431,7 +428,6 @@ unsigned char num1_ktoub_( int64_t *num_argk ) {
 
 short num1_ktow_( int64_t *num_argk ) {
   int64_t inval = *num_argk;
-  printf("Go a K int of %"PRIi64" to convert\n", inval );
   if ( inval > VAL__MAXW || inval < VAL__MINW ) {
     return VAL__BADW;
   } else {
@@ -442,7 +438,6 @@ short num1_ktow_( int64_t *num_argk ) {
 
 unsigned short num1_ktouw_( int64_t *num_argk ) {
   int64_t inval = *num_argk;
-  printf("Go a K int of %"PRIi64" to convert\n", inval );
   if ( inval > VAL__MAXUW || inval < VAL__MINUW ) {
     return VAL__BADUW;
   } else {

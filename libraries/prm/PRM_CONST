@@ -55,6 +55,9 @@
       INTEGER VAL__ZI
       PARAMETER ( VAL__ZI = 0 )
 
+      INTEGER * 8 VAL__ZK
+      PARAMETER ( VAL__ZK = 0 )
+
       REAL VAL__ZR
       PARAMETER ( VAL__ZR = 0.0 )
 
@@ -84,6 +87,9 @@
       INTEGER VAL__M1I
       PARAMETER ( VAL__M1I = -1 )
 
+      INTEGER * 8 VAL__M1K
+      PARAMETER ( VAL__M1K = -1 )
+
       REAL VAL__M1R
       PARAMETER ( VAL__M1R = -1.0 )
 
@@ -112,6 +118,9 @@
 
       INTEGER VAL__P1I
       PARAMETER ( VAL__P1I = 1 )
+
+      INTEGER * 8 VAL__P1K
+      PARAMETER ( VAL__P1K = 1 )
 
       REAL VAL__P1R
       PARAMETER ( VAL__P1R = 1.0 )

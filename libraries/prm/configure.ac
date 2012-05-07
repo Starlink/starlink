@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(prm, 1.5-1, ussc@star.rl.ac.uk)
+AC_INIT(prm, 1.6-1, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -21,6 +21,8 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
+
+STAR_CHECK_PROGS([fgeneric])
 
 #   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)

@@ -54,8 +54,8 @@
 
 *   Floating divide.
       NUM_DIVK( NUM_ARGK1, NUM_ARGK2 ) = NUM_RTOK(
-     :                          NUM_ITOR( NUM_ARGK1 ) /
-     :                          NUM_ITOR( NUM_ARGK2 ) )
+     :                          NUM_KTOR( NUM_ARGK1 ) /
+     :                          NUM_KTOR( NUM_ARGK2 ) )
 
 *   Integer divide.
       NUM_IDVK( NUM_ARGK1, NUM_ARGK2 ) = NUM_ARGK1 / NUM_ARGK2
@@ -75,16 +75,16 @@
       NUM_NEGK( NUM_ARGK ) = - NUM_ARGK
 
 *   Square root.
-      NUM_SQRTK( NUM_ARGK ) = NUM_RTOK( SQRT( NUM_ITOR( NUM_ARGK ) ) )
+      NUM_SQRTK( NUM_ARGK ) = NUM_RTOK( SQRT( NUM_KTOR( NUM_ARGK ) ) )
 
 *   Natural logarithm (base e).
-      NUM_LOGK( NUM_ARGK ) = NUM_RTOK( LOG( NUM_ITOR( NUM_ARGK ) ) )
+      NUM_LOGK( NUM_ARGK ) = NUM_RTOK( LOG( NUM_KTOR( NUM_ARGK ) ) )
 
 *   Common logarithm (base 10).
-      NUM_LG10K( NUM_ARGK ) = NUM_RTOK( LOG10( NUM_ITOR( NUM_ARGK ) ) )
+      NUM_LG10K( NUM_ARGK ) = NUM_RTOK( LOG10( NUM_KTOR( NUM_ARGK ) ) )
 
 *   Exponential function.
-      NUM_EXPK( NUM_ARGK ) = NUM_RTOK( EXP( NUM_ITOR( NUM_ARGK ) ) )
+      NUM_EXPK( NUM_ARGK ) = NUM_RTOK( EXP( NUM_KTOR( NUM_ARGK ) ) )
 
 *   Absolute (positive) value.
       NUM_ABSK( NUM_ARGK ) = ABS( NUM_ARGK )

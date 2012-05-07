@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="prm" support="S">
-  <version>1.5-1</version>
+  <version>1.6-1</version>
   <path>libraries/prm</path>
   <description>PRM --- Processing of Primitive Numerical Data</description>
   <abstract><p>This document describes the PRM package (once called

@@ -60,6 +60,8 @@
 
 *   INTEGER * 8 dummy arguments
       INTEGER * 8 NUM_ARGK
+      INTEGER * 8 NUM_ARGK1
+      INTEGER * 8 NUM_ARGK2
 
 *   BYTE dummy arguments.
       BYTE NUM_ARGB
