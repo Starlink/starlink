@@ -30,6 +30,7 @@
 *     RFWS: R.F. Warren-Smith (Durham)
 *     AJC: A.J. Chipperfield (STARLINK, RAL)
 *     NXG: Norman Gray (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *    History:
 *     16-AUG-1988 (RFWS):
@@ -39,6 +40,8 @@
 *     12-MAR-2003 (NXG):
 *         Remove INSTALL_INC and change include names to uppercase
 *         (done during import into CVS and autoconfing)
+*     2012-05-07 (TIMJ):
+*        Add K functions
 
 *-
  
@@ -73,6 +76,11 @@
 
 
  
+*   Declare INTEGER*8 routines.
+      INCLUDE 'NUM_DEC_K'
+
+
+
 *   Declare REAL routines.
       INCLUDE 'NUM_DEC_R'
 

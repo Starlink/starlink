@@ -29,6 +29,7 @@
 *  Authors:
 *     R.F. Warren-Smith (DUVAD::RFWS)
 *     A.J. Chipperfield (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     Norman Gray (Starlink)
 
 *  History:
@@ -39,6 +40,8 @@
 *     12-MAR-2003 (NXG):
 *         Remove INSTALL_INC and change include names to uppercase
 *         (done during import into CVS and autoconfing)
+*     2012-05-07 (TIMJ):
+*         Add K support
 
 *-
  
@@ -70,6 +73,10 @@
 
 *   Define INTEGER functions.
       INCLUDE 'NUM_DEF_I'
+
+
+*   Define INTEGER*8 functions.
+      INCLUDE 'NUM_DEF_K'
 
 
  
