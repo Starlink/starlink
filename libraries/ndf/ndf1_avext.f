@@ -165,6 +165,11 @@
             CALL NDF1_AVEUW( UPPER, PIX0, LBNDA, UBNDA,
      :                       %VAL( CNF_PVAL( PNTR ) ), STATUS )
 
+*  ...64-bit integer.
+         ELSE IF ( UTYPE .EQ. '_INT64' ) THEN
+            CALL NDF1_AVEK( UPPER, PIX0, LBNDA, UBNDA,
+     :                      %VAL( CNF_PVAL( PNTR ) ), STATUS )
+
 *  Note if the type string was not recognised.
          ELSE
             TYPOK = .FALSE.

@@ -1,5 +1,9 @@
 NDF Library
 -----------
+
+V1.12
+   - Add _INT64 data type support (INTEGER*8).
+
 V1.11
    - A new function NDF_ZSCAL has been added, which creates a SCALED
    copy of an input NDF.

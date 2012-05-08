@@ -163,6 +163,10 @@
             CALL ARY_PTSZI( IARY, NUM_DTOI( SCALE( ICOMP ) ),
      :                      NUM_DTOI( ZERO( ICOMP ) ), STATUS )
 
+         ELSE IF( TYPE == NDF__TYPK ) THEN
+            CALL ARY_PTSZK( IARY, NUM_DTOK( SCALE( ICOMP ) ),
+     :                      NUM_DTOK( ZERO( ICOMP ) ), STATUS )
+
          ELSE IF( TYPE == NDF__TYPR ) THEN
             CALL ARY_PTSZR( IARY, NUM_DTOR( SCALE( ICOMP ) ),
      :                      NUM_DTOR( ZERO( ICOMP ) ), STATUS )

@@ -132,6 +132,10 @@
       ELSE IF ( CHR_SIMLR( TYPE, '_UWORD' ) ) THEN
          ITYPE = NDF__TYPUW
 
+*  ...64-bit integer data.
+      ELSE IF ( CHR_SIMLR( TYPE, '_INT64' ) ) THEN
+         ITYPE = NDF__TYPK
+
 *  If the data type was not recognised, then report an error.
       ELSE
          STATUS = NDF__TYPIN

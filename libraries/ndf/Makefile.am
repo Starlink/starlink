@@ -123,14 +123,14 @@ ndf1_adex.gn ndf1_adix.gn ndf1_avex.gn ndf1_awex.gn \
 ndf1_awix.gn ndf1_bppx.gn ndf1_cvtx.gn ndf1_qmax.gn \
 ndf1_s2vx.gn ndf1_v2sx.gn
 
-NDF_DIR_GEN = \
-ndf_gtszx.gdir ndf_ptszx.gdir
+NDF_DIKR_GEN = \
+ndf_gtszx.gdikr ndf_ptszx.gdikr
 
-NDF_CDIRL_GEN = \
-ndf_xgt0x.gcdirl ndf_xpt0x.gcdirl
+NDF_CDIKRL_GEN = \
+ndf_xgt0x.gcdikrl ndf_xpt0x.gcdikrl
 
 GEN_F_ROUTINES = \
-$(NDF_N_GEN:.gn=.f) $(NDF_DIR_GEN:.gdir=.f) $(NDF_CDIRL_GEN:.gcdirl=.f)
+$(NDF_N_GEN:.gn=.f) $(NDF_DIKR_GEN:.gdikr=.f) $(NDF_CDIKRL_GEN:.gcdikrl=.f)
 
 #  Additional Fortran routines required for the standalone library.
 
@@ -186,4 +186,10 @@ EXTRA_DIST = $(PRIVATE_INCLUDES)
 
 .gcdirl.f:
 	$(FGENERIC)  -t gcdirl $<
+
+.gdikr.f:
+	$(FGENERIC)  -t dikr $<
+
+.gcdikrl.f:
+	$(FGENERIC)  -t gcdikrl $<
 

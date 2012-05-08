@@ -164,6 +164,11 @@
             CALL NDF1_V2SUW( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), DCE,
      :                       STATUS )
 
+*  ...64-bit integer data.
+         ELSE IF ( UTYPE .EQ. '_INT64' ) THEN
+            CALL NDF1_V2SK( BAD, EL, %VAL( CNF_PVAL( PNTR ) ), DCE,
+     :                       STATUS )
+
 *  Note if the data type string was not recognised.
          ELSE
             TYPOK = .FALSE.

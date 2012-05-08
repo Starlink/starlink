@@ -217,6 +217,15 @@
      :                       %VAL( CNF_PVAL( PNTR( 4 ) ) ),
      :                       BAD, STATUS )
 
+*  ...64-bit integer.
+         ELSE IF ( UTYPE .EQ. '_INT64' ) THEN
+            CALL NDF1_QMAK( EL, QUAL, BADBIT, NPNTR,
+     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                      %VAL( CNF_PVAL( PNTR( 2 ) ) ),
+     :                      %VAL( CNF_PVAL( PNTR( 3 ) ) ),
+     :                      %VAL( CNF_PVAL( PNTR( 4 ) ) ),
+     :                      BAD, STATUS )
+
 *  Note if the data type was not recognised.
          ELSE
             TYPOK = .FALSE.

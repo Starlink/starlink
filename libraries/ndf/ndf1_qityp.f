@@ -22,7 +22,7 @@
 *     DTYPE = INTEGER (Given)
 *        An integer identifying the numeric type of the data to be
 *        processed. One of the symbolic integers NDF__TYPx (where x is
-*        UB, B, UW, W, I, R or D) should be used. These values are
+*        UB, B, UW, W, I, K, R or D) should be used. These values are
 *        defined in the NDF_CONST include file.
 *     ITYPE = INTEGER (Given)
 *        A similar symbolic integer identifying the data type which the
@@ -129,6 +129,10 @@
 *  ...integer.
       ELSE IF ( DTYPE .EQ. NDF__TYPI ) THEN
          OK = ITYPE .GE. NDF__TYPI
+
+*  ...64-bit integer.
+      ELSE IF ( DTYPE .EQ. NDF__TYPK ) THEN
+         OK = ITYPE .GE. NDF__TYPK
 
 *  ...real.
       ELSE IF ( DTYPE .EQ. NDF__TYPR ) THEN

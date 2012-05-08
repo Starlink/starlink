@@ -144,6 +144,10 @@
          ELSE IF ( UTYPE .EQ. '_UWORD' ) THEN
             CALL NDF1_BPPUW( EL, %VAL( CNF_PVAL( PNTR ) ), BAD, STATUS )
 
+*  ...64-bit integer.
+         ELSE IF ( UTYPE .EQ. '_INT64' ) THEN
+            CALL NDF1_BPPK( EL, %VAL( CNF_PVAL( PNTR ) ), BAD, STATUS )
+
 *  Note if the data type string was not recognised.
          ELSE
             TYPOK = .FALSE.

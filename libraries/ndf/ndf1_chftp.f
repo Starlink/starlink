@@ -161,6 +161,14 @@
          CALL NDF1_CCPY( '_UWORD', TYPE, STATUS )
          CMPLX = .TRUE.
 
+*  ...64-bit integer data types.
+      ELSE IF ( CHR_SIMLR( FTYPE, '_INT64' ) ) THEN
+         CALL NDF1_CCPY( '_INT64', TYPE, STATUS )
+         CMPLX = .FALSE.
+      ELSE IF ( CHR_SIMLR( FTYPE, 'COMPLEX_INT64' ) ) THEN
+         CALL NDF1_CCPY( '_INT64', TYPE, STATUS )
+         CMPLX = .TRUE.
+
 *  If the full type specification was not recognised, then report an
 *  error.
       ELSE

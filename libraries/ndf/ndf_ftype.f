@@ -127,6 +127,7 @@
       DATA DATYP( NDF__TYPB ) / '_BYTE' / ! Data type code translations
       DATA DATYP( NDF__TYPD ) / '_DOUBLE' /
       DATA DATYP( NDF__TYPI ) / '_INTEGER' /
+      DATA DATYP( NDF__TYPK ) / '_INT64' /
       DATA DATYP( NDF__TYPR ) / '_REAL' /
       DATA DATYP( NDF__TYPUB ) / '_UBYTE' /
       DATA DATYP( NDF__TYPUW ) / '_UWORD' /

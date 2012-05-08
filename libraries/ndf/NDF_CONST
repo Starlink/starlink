@@ -313,7 +313,7 @@
 
 *  Number of numeric types.
       INTEGER NDF__MXTYP
-      PARAMETER ( NDF__MXTYP = 7 )
+      PARAMETER ( NDF__MXTYP = 8 )
 
 *  Unsigned byte type code.
       INTEGER NDF__TYPUB
@@ -335,13 +335,17 @@
       INTEGER NDF__TYPI
       PARAMETER ( NDF__TYPI = 5 )
 
+*  64-bit integer type code.
+      INTEGER NDF__TYPK
+      PARAMETER ( NDF__TYPK = 6 )
+
 *  Real type code.
       INTEGER NDF__TYPR
-      PARAMETER ( NDF__TYPR = 6 )
+      PARAMETER ( NDF__TYPR = 7 )
 
 *  Double precision type code.
       INTEGER NDF__TYPD
-      PARAMETER ( NDF__TYPD = 7 )
+      PARAMETER ( NDF__TYPD = 8 )
 
 *  History update mode settings.
 *  ============================

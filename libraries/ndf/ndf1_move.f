@@ -159,6 +159,12 @@
      :                       %VAL( CNF_PVAL( PNTR2 ) ), IERR, NERR,
      :                       STATUS )
 
+*  ...64-bit integer data.
+         ELSE IF ( UTYPE .EQ. '_INT64' ) THEN
+            CALL VEC_KTOK( .FALSE., N, %VAL( CNF_PVAL( PNTR1 ) ),
+     :                     %VAL( CNF_PVAL( PNTR2 ) ), IERR, NERR,
+     :                     STATUS )
+
 *  If the data type string was not recognised, then note this fact.
          ELSE
             TYPOK = .FALSE.

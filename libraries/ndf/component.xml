@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ndf" support="S">
-  <version>1.11-2</version>
+  <version>1.12-1</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
