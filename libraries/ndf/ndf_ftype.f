@@ -110,7 +110,7 @@
       LOGICAL NDF1_SIMLR         ! String compare with abbreviation
 
 *  Local variables:
-      CHARACTER * ( NDF__SZTYP ) DATYP( NDF__TYPUB : NDF__TYPD ) ! Data
+      CHARACTER * ( NDF__SZTYP ) DATYP( NDF__TYPUB : NDF__MXTYP ) ! Data
       CHARACTER * ( NDF__SZTYP ) TYPEC ! Numeric data type of component
       INTEGER F                  ! Position of first non-blank character
       INTEGER I1                 ! Position of first component character

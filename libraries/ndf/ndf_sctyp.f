@@ -97,7 +97,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local variables:
-      CHARACTER * ( NDF__SZTYP ) DATYP( NDF__TYPUB : NDF__TYPD ) ! Data
+      CHARACTER * ( NDF__SZTYP ) DATYP( NDF__TYPUB : NDF__MXTYP ) ! Data
       INTEGER IACB               ! Index to NDF entry in the ACB
       INTEGER ITYPE              ! Integer type code of result
 

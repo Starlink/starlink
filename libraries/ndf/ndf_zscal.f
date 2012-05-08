@@ -158,7 +158,7 @@
 
 *  Local Variables:
       CHARACTER COMP( 2 )*8      ! Names of array components to scale
-      CHARACTER DATYP( NDF__TYPUB:NDF__TYPD )*( NDF__SZTYP )  ! Data types
+      CHARACTER DATYP( NDF__TYPUB:NDF__MXTYP )*( NDF__SZTYP )  ! Data types
       CHARACTER FORM*( NDF__SZFRM )! Array storage form
       INTEGER EL                 ! Number of array elements
       INTEGER IACB1              ! Index to input NDF entry in ACB

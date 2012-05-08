@@ -165,7 +165,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( NDF__SZTYP ) DATYP( NDF__TYPUB : NDF__TYPD ) ! Data
+      CHARACTER * ( NDF__SZTYP ) DATYP( NDF__TYPUB : NDF__MXTYP ) ! Data
       INTEGER CDTYPE             ! Component data type code
       INTEGER EITYPE             ! Element implemented type code
       INTEGER F                  ! Position of first non-blank character

@@ -113,11 +113,11 @@
 
 *  Obtain the numerical maximum value of the two input type codes,
 *  constraining it to lie within range.
-      ISTART = MIN( MAX( NDF__TYPUB, ITYPE1, ITYPE2 ), NDF__TYPD )
+      ISTART = MIN( MAX( NDF__TYPUB, ITYPE1, ITYPE2 ), NDF__MXTYP )
 
 *  Loop to increase this value until conversion from both input data
 *  types does not lose precision.
-      DO 1 I = ISTART, NDF__TYPD
+      DO 1 I = ISTART, NDF__MXTYP
 
 *  Test both conversions to see if precision is lost.
          CALL NDF1_QITYP( ITYPE1, I, OK1, STATUS )
