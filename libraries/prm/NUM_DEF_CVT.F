@@ -263,7 +263,7 @@
       NUM_UWTOUB( NUM_ARGUW ) =
      :                         NUM_WTOUB( NUM_UWTOW( NUM_ARGUW ) )
 
-      NUM_KTOUB( NUM_ARGUW )  =
+      NUM_KTOUB( NUM_ARGK )  =
      :                         NUM_WTOUB( NUM_KTOW( NUM_ARGK ) )
 
 
