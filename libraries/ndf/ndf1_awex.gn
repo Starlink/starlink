@@ -1,0 +1,153 @@
+      SUBROUTINE NDF1_AWE<T>( UPPER, PIX0, WIDTH, LBND, UBND, AWIDTH,
+     :                        STATUS )
+*+
+*  Name:
+*     NDF1_AWE<T>
+
+*  Purpose:
+*     Assign extrapolated values to a <COMM> axis width array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL NDF1_AWE<T>( UPPER, PIX0, WIDTH, LBND, UBND, AWIDTH,
+*                       STATUS )
+
+*  Description:
+*     The routine assigns extrapolated values to a <COMM> axis width
+*     array. It is intended for assigning values to those axis width
+*     array elements which are not present in an actual NDF data
+*     structure, but which are encountered when accessing the axis
+*     component of a section which is a super-set of the NDF.  The
+*     extrapolated value assigned is a constant, and is supplied as an
+*     argument.
+
+*  Arguments:
+*     UPPER = LOGICAL (Given)
+*        If a .TRUE. value is given for this argument, then
+*        extrapolation will be performed towards higher array index
+*        values. Otherwise extrapolation will be towards lower array
+*        index values.
+*     PIX0 = INTEGER (Given)
+*        The index of the first "unknown" pixel to be assigned a value.
+*        If UPPER is .TRUE., this will be the index of the pixel
+*        following the last one whose value is known. If UPPER is
+*        .FALSE., it will be the index of the pixel before the first
+*        one whose value is known.
+*     WIDTH = DOUBLE PRECISION (Given)
+*        The extrapolated width value to be assigned.
+*     LBND = INTEGER (Given)
+*        The lower bound of the axis width array.
+*     UBND = INTEGER (Given)
+*        The upper bound of the axis width array.
+*     AWIDTH( LBND : UBND ) = <TYPE> (Given and Returned)
+*        The <COMM> axis width array to be extrapolated.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  If overflow occurs because the extrapolated value cannot be
+*     represented using the array's numeric type, then an error will be
+*     reported and STATUS set.
+
+*  Algorithm:
+*     -  Determine the lower and upper bounds of the array pixels to
+*     have values assigned.
+*     -  Check if the extrapolation value can be represented using the
+*     numeric type of the axis width array. If not, then report an
+*     error.
+*     -  Assign a bad value to all the affected array pixels.
+*     -  If OK, then loop to assign the extrapolated value to the array
+*     elements.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     9-NOV-1990 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT_ public_constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'PRM_PAR'          ! Primitive data constants
+
+*  Arguments Given:
+      LOGICAL UPPER
+      INTEGER PIX0
+      DOUBLE PRECISION WIDTH
+      INTEGER LBND
+      INTEGER UBND
+
+*  Arguments Given and Returned:
+      <TYPE> AWIDTH( LBND : UBND )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      <TYPE> W                   ! Width value after type conversion
+      INTEGER I                  ! Loop counter for array elements
+      INTEGER L                  ! Lower pixel index to consider
+      INTEGER U                  ! Upper pixel index to consider
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion routines
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Determine the lower and upper bounds of the array pixels to have
+*  values assigned.
+      IF ( UPPER ) THEN
+         L = PIX0
+         U = UBND
+      ELSE
+         L = LBND
+         U = PIX0
+      END IF
+
+*  Check if the extrapolation value can be represented using the
+*  numeric type of the axis width array. If not, then report an error.
+      IF ( ( WIDTH .GT. NUM_<T>TOD( NUM__MAX<T> ) ) .OR.
+     :     ( WIDTH .LT. NUM_<T>TOD( NUM__MIN<T> ) ) ) THEN
+         CALL MSG_SETI( 'PIXEL', PIX0 )
+         CALL ERR_REP( 'NDF1_AWE<T>_AXVAL',
+     :                 'Overflow occurred while calculating ' //
+     :                 'an extrapolated value for pixel ^PIXEL of ' //
+     :                 'an axis width array.', STATUS )
+
+*  Assign a bad value to all the affected array pixels.
+         DO 1 I = L, U
+            AWIDTH( I ) = VAL__BAD<T>
+ 1       CONTINUE
+
+*  If OK, then loop to assign the extrapolated value to the array
+*  elements.
+      ELSE
+         W = NUM_DTO<T>( WIDTH )
+         DO 2 I = L, U
+            AWIDTH( I ) = W
+2        CONTINUE
+      END IF
+
+*  Call error tracing routine and exit.
+      IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_AWE<T>',
+     :                                            STATUS )
+
+      END

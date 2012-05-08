@@ -1160,6 +1160,21 @@ libraries/nbs/nbsc.c
 libraries/nbs/nbsclow.c
 libraries/nbs/nbtrace
 
+libraries/ndf/ndf1_adex.f
+libraries/ndf/ndf1_adix.f
+libraries/ndf/ndf1_avex.f
+libraries/ndf/ndf1_awex.f
+libraries/ndf/ndf1_awix.f
+libraries/ndf/ndf1_bppx.f
+libraries/ndf/ndf1_cvtx.f
+libraries/ndf/ndf1_qmax.f
+libraries/ndf/ndf1_s2vx.f
+libraries/ndf/ndf1_v2sx.f
+libraries/ndf/ndf_gtszx.f
+libraries/ndf/ndf_ptszx.f
+libraries/ndf/ndf_xgt0x.f
+libraries/ndf/ndf_xpt0x.f
+
 libraries/pal/palTest
 
 libraries/par/par_def0.f

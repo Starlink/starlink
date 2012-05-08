@@ -1,0 +1,251 @@
+      SUBROUTINE NDF_XGT0<T>( INDF, XNAME, CMPT, VALUE, STATUS )
+*+
+*  Name:
+*     NDF_XGT0<T>
+
+*  Purpose:
+*     Read a scalar value from a component within a named NDF extension.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL NDF_XGT0<T>( INDF, XNAME, CMPT, VALUE, STATUS )
+
+*  Description:
+*     The routine reads a scalar value from a component within a named
+*     NDF extension. The extension must already exist, although the
+*     component within the extension need not exist (a default value,
+*     established beforehand, will be returned if necessary).
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        NDF identifier.
+*     XNAME = CHARACTER * ( * ) (Given)
+*        Name of the NDF extension.
+*     CMPT = CHARACTER * ( * ) (Given)
+*        Name of the component within the extension whose value is to be
+*        obtained.
+*     VALUE = <TYPE> (Given and Returned)
+*        The value obtained from the extension component. Its type is
+*        determined by the name of the routine called (see the Notes
+*        section).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for reading values with each of the
+*     standard Fortran data types: integer, real, double precision,
+*     logical and character.  Replace the (lower case) "x" in the
+*     routine name by I, R, D, L or C as appropriate.
+*     -  The value given for the CMPT argument may be an HDS path name,
+*     consisting of several fields separated by '.', so that an object
+*     can be accessed in a sub-component (or a sub-sub-component...) of
+*     an NDF extension. Array subscripts may also be included. Thus a
+*     string such as 'CALIB.FILTER(3).WAVELENGTH' could be used as a
+*     valid CMPT value.
+*     -  If the requested component in the extension does not exist,
+*     then the VALUE argument will be returned unchanged.  A suitable
+*     default should therefore be established before this routine is
+*     called.
+*     -  If the length of the character VALUE argument passed to the
+*     NDF_XGT0C routine is too short to accommodate the returned result
+*     without losing significant (non-blank) trailing characters, then
+*     this will be indicated by an appended ellipsis, i.e. '...'. No
+*     error will result.
+
+*  Copyright:
+*     Copyright (C) 1990, 1993, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+*     MA 02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-OCT-1990 (RFWS):
+*        Original version, derived from the NDF_XPT0x routine.
+*     9-SEP-1993 (RFWS):
+*        Allow a compound component name.
+*     2-NOV-1993 (RFWS):
+*        Fixed bug: used wrong routine in above change.
+*     29-JUL-1994 (RFWS):
+*        Changed to handle all data types from a single copy of the
+*        source code.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT_ public_constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'DAT_ERR'          ! HDS error codes
+
+*  Global Variables:
+      INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
+*        DCB_XLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
+*           Locator to extension (MORE) structure.
+
+      INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
+*        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
+*           Index to data object entry in the DCB.
+
+*  Arguments Given:
+      INTEGER INDF
+      CHARACTER * ( * ) XNAME
+      CHARACTER * ( * ) CMPT
+
+*  Arguments Given and Returned:
+      <TYPE> VALUE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      LOGICAL NDF1_ABSNT         ! Test for absent NDF or component
+
+*  Local Variables:
+      CHARACTER * ( DAT__SZLOC ) LOC ! Extension locator
+      CHARACTER * ( DAT__SZLOC ) LOC1 ! Component locator
+      INTEGER DIM( 1 )           ! Dimension size (dummy)
+      INTEGER IACB               ! Index to NDF entry in the ACB
+      INTEGER IDCB               ! Index to data object entry in the DCB
+      LOGICAL THERE              ! Whether component is present
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Import the NDF identifier.
+      CALL NDF1_IMPID( INDF, IACB, STATUS )
+
+*  Check the extension name for validity.
+      CALL NDF1_CHXNM( XNAME, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  Obtain an index to the data object entry in the DCB.
+         IDCB = ACB_IDCB( IACB )
+
+*  Ensure that extension information is available in the DCB.
+         CALL NDF1_DX( IDCB, STATUS )
+         IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  If there is no extension (MORE) structure, then the requested
+*  extension cannot be there, so report an error.
+            IF ( DCB_XLOC( IDCB ) .EQ. DAT__NOLOC ) THEN
+               STATUS = NDF__NOEXT
+               CALL MSG_SETC( 'XNAME', XNAME )
+               CALL NDF1_AMSG( 'NDF', IACB )
+               CALL ERR_REP( 'NDF_XGT0<T>_NO1',
+     :         'There is no ''^XNAME'' extension in the NDF ' //
+     :         'structure ^NDF', STATUS )
+
+*  Otherwise, see if the requested extension is present.
+            ELSE
+               CALL DAT_THERE( DCB_XLOC( IDCB ), XNAME, THERE, STATUS )
+               IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  If absent, then report an error.
+                  IF ( .NOT. THERE ) THEN
+                     STATUS = NDF__NOEXT
+                     CALL MSG_SETC( 'XNAME', XNAME )
+                     CALL NDF1_AMSG( 'NDF', IACB )
+                     CALL ERR_REP( 'NDF_XGT0<T>_NO2',
+     :               'There is no ''^XNAME'' extension in the NDF ' //
+     :               'structure ^NDF', STATUS )
+
+*  If present, obtain a locator to it.
+                  ELSE
+                     CALL DAT_FIND( DCB_XLOC( IDCB ), XNAME, LOC,
+     :                              STATUS )
+
+*  Mark the error stack and attempt to obtain a locator to the required
+*  component within the extension.
+                     IF ( STATUS .EQ. SAI__OK ) THEN
+                        THERE = .TRUE.
+                        CALL ERR_MARK
+                        CALL HDS_FIND( LOC, CMPT, 'READ', LOC1,
+     :                                   STATUS )
+
+*  If the component is not present, note this fact and annul the error.
+*  Release the error stack.
+                        IF ( NDF1_ABSNT( STATUS ) ) THEN
+                           THERE = .FALSE.
+                           CALL ERR_ANNUL( STATUS )
+                        END IF
+                        CALL ERR_RLSE
+
+*  If the component exists, then mark the error stack and read its
+*  value.
+                        IF ( STATUS .EQ. SAI__OK ) THEN
+                           IF ( THERE ) THEN
+                              CALL ERR_MARK
+                              CALL DAT_GET( LOC1, '<HTYPE>', 0, DIM,
+     :                                      VALUE, STATUS )
+
+*  If a character string truncation occurred, then annul the error and
+*  append an ellipsis to the returned value.
+                              IF ( ( '<T>' .EQ. 'C' ) .AND.
+     :                             ( ( STATUS .EQ. DAT__CONER ) .OR.
+     :                               ( STATUS .EQ. DAT__TRUNC ) ) ) THEN
+                                 CALL ERR_ANNUL( STATUS )
+                                 CALL NDF1_ELLIP( VALUE )
+                              END IF
+
+*  Release the error stack.
+                              CALL ERR_RLSE
+
+*  Annul the component locator.
+                              CALL DAT_ANNUL( LOC1, STATUS )
+                           END IF
+                        END IF
+                     END IF
+
+*  Annul the extension locator.
+                     CALL DAT_ANNUL( LOC, STATUS )
+                  END IF
+               END IF
+            END IF
+         END IF
+      END IF
+
+*  If an error occurred, then report context information and call the
+*  error tracing routine.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'NDF_XGT0<T>_ERR',
+     :   'NDF_XGT0<T>: Error reading a scalar value from a ' //
+     :   'component within a named NDF extension.', STATUS )
+         CALL NDF1_TRACE( 'NDF_XGT0<T>', STATUS )
+      END IF
+
+      END

@@ -1,0 +1,187 @@
+      SUBROUTINE NDF1_V2S<T>( BAD, EL, ARRAY, DCE, STATUS )
+*+
+*  Name:
+*     NDF1_V2S<T>
+
+*  Purpose:
+*     Convert <COMM> variance values to standard deviations.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL NDF1_V2S<T>( BAD, EL, ARRAY, DCE, STATUS )
+
+*  Description:
+*     The routine converts a vectorised <COMM> array of variance values
+*     into standard deviations by taking the square root. It checks for
+*     "bad" values if required. If a negative variance value is found,
+*     then STATUS is set to NDF__NGVAR, an error is reported, and a
+*     "bad" value is assigned to the affected array element - however,
+*     the routine continues to process the entire array.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether it is necessary to check for bad values.
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     ARRAY( EL ) = <TYPE> (Given and Returned)
+*        On input, an array of <COMM> variance values is supplied. On
+*        output, they are replaced by the standard deviation values.
+*     DCE = LOGICAL (Returned)
+*        Whether a data conversion error occurred resulting in the
+*        introduction of new bad values into the array. This will be
+*        due to replacement of illegal negative variance values.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  This routine works through the array backwards. This is to
+*     minimise page faulting on a virtual memory machine, since it will
+*     usually be followed by a data-processing loop which passes
+*     forwards through the same array.
+
+*  Algorithm:
+*     -  Initialise the count of negative variance values and the data
+*     conversion error flag.
+*     -  If required, loop through the array without checking for bad
+*     values.
+*     -  If the data type is not unsigned, then check if each value is
+*     negative. If so, then increment the negative variance count, set
+*     the data conversion error flag, and set a bad value for the
+*     affected array element.
+*     -  Otherwise, take the square root.
+*     -  If required, loop through the array checking for bad values.
+*     -  Perform the bad value check on each array element, processing
+*     only those which are not bad in the same way as above.
+*     -  If negative variance values were encountered, then report an
+*     error.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-DEC-1989 (RFWS):
+*        Original version.
+*     20-DEC-1989 (RFWS):
+*        Fixed bug in comparing array elements to zero.
+*     17-OCT-1990 (RFWS):
+*        Added the first offending value to the error message.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT_ public_constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER EL
+
+*  Arguments Given and Returned:
+      <TYPE> ARRAY( EL )
+
+*  Arguments Returned:
+      LOGICAL DCE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      <TYPE> ZERO                ! Zero
+      PARAMETER ( ZERO = 0<CONST> )
+
+*  Local Variables:
+      <TYPE> ERRVAL              ! Value causing last error
+      INTEGER I                  ! Loop counter for array elements
+      INTEGER NNEG               ! Number of negative variance values
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEC_<T>'      ! NUM_ <COMM> functions
+
+      INCLUDE 'NUM_DEF_CVT'      ! Declare the functions...
+      INCLUDE 'NUM_DEF_<T>'
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise the count of negative variance values and the data
+*  conversion error flag.
+      NNEG = 0
+      DCE = .FALSE.
+
+*  If required, loop through the array without checking for bad values.
+      IF ( .NOT. BAD ) THEN
+         DO 1 I = EL, 1, -1
+
+*  If the data type is not an unsigned quantity, then check if the
+*  variance value is negative.
+            IF ( ( '<T>' .NE. 'UB' ) .AND.
+     :           ( '<T>' .NE. 'UW' ) .AND.
+     :           ( NUM_LT<T>( ARRAY( I ), ZERO ) ) ) THEN
+
+*  If it is negative, then count it, note a data conversion error and
+*  assign a bad value to the array element.
+               NNEG = NNEG + 1
+               DCE = .TRUE.
+               ERRVAL = ARRAY( I )
+               ARRAY( I ) = VAL__BAD<T>
+
+*  Otherwise, take the square root.
+            ELSE
+               ARRAY( I ) = NUM_SQRT<T>( ARRAY( I ) )
+            END IF
+1        CONTINUE
+
+*  If required, loop through the array checking for bad values.
+      ELSE
+         DO 2 I = EL, 1, -1
+
+*  Perform the bad value check.
+            IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
+
+*  Check the value is not negative.
+               IF ( ( '<T>' .NE. 'UB' ) .AND.
+     :              ( '<T>' .NE. 'UW' ) .AND.
+     :              ( NUM_LT<T>( ARRAY( I ), ZERO ) ) ) THEN
+                  NNEG = NNEG + 1
+                  DCE = .TRUE.
+                  ERRVAL = ARRAY( I )
+                  ARRAY( I ) = VAL__BAD<T>
+
+*  Take the square root.
+               ELSE
+                  ARRAY( I ) = NUM_SQRT<T>( ARRAY( I ) )
+               END IF
+            END IF
+2        CONTINUE
+      END IF
+
+*  If negative variance values were encountered, then report an error.
+      IF ( NNEG .NE. 0 ) THEN
+         STATUS = NDF__NGVAR
+         CALL MSG_SETI( 'NNEG', NNEG )
+         CALL MSG_SETR( 'ERRVAL', NUM_<T>TOR( ERRVAL ) )
+         CALL ERR_REP( 'NDF1_V2S<T>_NEG',
+     :   '^NNEG illegal negative variance value(s) encountered ' //
+     :   '(first offending value was ^ERRVAL).', STATUS )
+      END IF
+
+*  Call error tracing routine and exit.
+      IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_V2S<T>',
+     :                                            STATUS )
+
+      END

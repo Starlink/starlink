@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(ndf, 1.11, ussc@star.rl.ac.uk)
+AC_INIT(ndf, 1.11-2, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -19,6 +19,8 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
+
+STAR_CHECK_PROGS([fgeneric])
 
 dnl    Need these for determining the time to subsecond accuracy, the
 dnl    gettimeofday function is often available but requires special
@@ -57,7 +59,7 @@ AC_FC_LIBRARY_LDFLAGS
 AC_FC_MAIN
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [sae prm hds chr ems ary ast psx])
+STAR_DECLARE_DEPENDENCIES([build], [sae prm hds chr ems ary ast psx generic])
 STAR_DECLARE_DEPENDENCIES([link],  [psx ary hds ems chr prm ast])
 
 dnl    List the sun/ssn/... numbers which document this package and

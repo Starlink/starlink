@@ -1,0 +1,285 @@
+      SUBROUTINE NDF1_S2V<T>( BAD, EL, ARRAY, DCE, STATUS )
+*+
+*  Name:
+*     NDF1_S2V<T>
+
+*  Purpose:
+*     Convert <COMM> standard deviation values to variances.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL NDF1_S2V<T>( BAD, EL, ARRAY, DCE, STATUS )
+
+*  Description:
+*     The routine converts a vectorised <COMM> array of standard
+*     deviation values into variances by squaring them. It checks for
+*     "bad" values if required and handles numerical overflow errors,
+*     replacing them with bad values. If a negative standard deviation
+*     is found, then STATUS is set to NDF__NGSTD, an error is reported
+*     and a bad value is assigned to the affected array element -
+*     however, the routine continues to process the entire array.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether it is necessary to check for bad values.
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     ARRAY( EL ) = <TYPE> (Given and Returned)
+*        On input, an array of <COMM> standard deviation values is
+*        supplied. On output, they are replaced by the variance values.
+*     DCE = LOGICAL (Returned)
+*        Whether a data conversion error occurred resulting in new bad
+*        values being produced. This may result either from numerical
+*        overflow (which the routine handles) or from replacement of
+*        illegal negative standard deviations.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  This routine works through the array backwards. This is to
+*     minimise page faulting on a virtual memory machine, since it will
+*     usually be followed by a data-processing loop which passes
+*     forwards through the same array.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-DEC-1989 (RFWS):
+*        Original version.
+*     17-OCT-1990 (RFWS):
+*        Added the offending value to the error message.
+*     8-SEP-1993 (RFWS):
+*        Re-written to avoid the use of traps to detect overflow.
+*     30-SEP-1993 (RFWS):
+*        Eliminated arithmetic operations which may not compile
+*        correctly for all integer data types. Use NUM_ functions
+*        instead.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT_ public_constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER EL
+
+*  Arguments Given and Returned:
+      <TYPE> ARRAY( EL )
+
+*  Arguments Returned:
+      LOGICAL DCE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      <TYPE> ZERO                ! Zero
+      PARAMETER ( ZERO = 0<CONST> )
+      <TYPE> ONE                 ! One
+      PARAMETER ( ONE = 1<CONST> )
+      <TYPE> TWO                 ! Two
+      PARAMETER ( TWO = 2<CONST> )
+
+*  Local Variables:
+      <TYPE> A                   ! Number to which 1 can't be added
+      <TYPE> B                   ! Number which can be added to A
+      <TYPE> BASE                ! Base of floating point numbers
+      <TYPE> ERRVAL              ! Value causing last error
+      <TYPE> HI                  ! Maximum value that can be squared
+      <TYPE> NEW                 ! New estimate of square root
+      <TYPE> TEST                ! Test value for finding number base
+      INTEGER I                  ! Loop counter for array elements
+      INTEGER ITER               ! Loop counter for iterations
+      INTEGER NNEG               ! Number negative standard deviations
+      LOGICAL FIRST              ! First invocation of this routine?
+
+      SAVE FIRST
+      SAVE HI
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEC_<T>'      ! NUM_ <COMM> functions
+
+      INCLUDE 'NUM_DEF_CVT'      ! Define the functions...
+      INCLUDE 'NUM_DEF_<T>'
+
+*  Local Data:
+      DATA FIRST / .TRUE. /
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If this is the first invocation of this routine, we must first
+*  calculate the limit HI, which is the largest input value which can be
+*  squared without causing overflow.
+      IF ( FIRST ) THEN
+
+*  If we are dealing with a floating point type, then obtain an initial
+*  estimate of HI from the square root of the largest positive number.
+         IF ( ( '<T>' .EQ. 'R' ) .OR. ( '<T>' .EQ. 'D' ) ) THEN
+            HI = NUM_SQRT<T>( NUM__MAX<T> )
+
+*  Since this may not always achieve the full machine precision, we now
+*  apply up to 10 iterations to refine the result, using Newton's
+*  formula to estimate each new value. Note we cannot use arithmetic
+*  operators directly, as the code must also compile correctly for
+*  integer data types which may not support arithmetic (even though it
+*  will never be executed in such cases).
+            DO 1 ITER = 1, 10
+               NEW = NUM_DIV<T>(
+     :               NUM_ADD<T>( HI, NUM_DIV<T>( NUM__MAX<T>, HI ) ),
+     :               TWO )
+
+*  Quit looping if the result is no longer changing.
+               IF ( NUM_EQ<T>( NEW, HI ) ) GO TO 2
+               HI = NEW
+ 1          CONTINUE
+ 2          CONTINUE
+
+*  The current value of HI may still be too large (i.e. may overflow if
+*  squared) if the result has been rounded upwards. To test for this,
+*  we must square a known fraction of HI and check that it does not
+*  exceed the expected value. For this to work, however, the fraction
+*  chosen must be derived using the exponent base for the floating
+*  point number representation in use (so that the mantissa is not
+*  changed). Thus we must first determine this base.
+
+*  Starting with unity, repeatedly double until a value A is found to
+*  which 1 cannot be added without losing precision.
+            A = ONE
+ 3          CONTINUE
+            A = NUM_ADD<T>( A, A )
+            TEST = NUM_ADD<T>( A, ONE )
+            IF ( NUM_EQ<T>( NUM_SUB<T>( TEST, A ), ONE ) ) GO TO 3
+
+*  Again starting with unity, repeatedly double until a value B is
+*  found that can be added to A to give a result that differs from A.
+            B = ONE
+ 4          CONTINUE
+            B = NUM_ADD<T>( B, B )
+            TEST = NUM_ADD<T>( A, B )
+            IF ( NUM_EQ<T>( TEST, A ) ) GO TO 4
+
+*  The number base is now given by the difference between A and the
+*  next representable number that differs from it (TEST).
+            BASE = NUM_SUB<T>( TEST, A )
+
+*  Now test if HI is too large, using an appropriate fraction of it to
+*  prevent overflow occurring. If it is too large, we decrement it to
+*  obtain the next smaller representable value.
+            IF ( NUM_GT<T>( NUM_MUL<T>( NUM_DIV<T>( HI, BASE ),
+     :                                  NUM_DIV<T>( HI, BASE ) ),
+     :                      NUM_DIV<T>( NUM__MAX<T>,
+     :                                  NUM_MUL<T>( BASE, BASE ) ) ) )
+     :         HI = NUM_SUB<T>( HI, NUM_MUL<T>( HI, VAL__EPS<T> ) )
+
+*  If we are dealing with an integer type, then find the square root of
+*  the largest positive number using double precision arithmetic. Round
+*  the result down to an integer and convert back to the required type.
+         ELSE
+            HI = NUM_ITO<T>( INT( SQRT( NUM_<T>TOD( NUM__MAX<T> ) ) ) )
+         END IF
+
+*  Note we do not need to repeat these calculations.
+         FIRST = .FALSE.
+      END IF
+
+*  Initialise the count of negative standard deviations and the data
+*  conversion error flag.
+      NNEG = 0
+      DCE = .FALSE.
+
+*  If required, loop through the array without checking for bad values.
+      IF ( .NOT. BAD ) THEN
+         DO 5 I = EL, 1, -1
+
+*  If the data values are not unsigned, then check if the standard
+*  deviation is negative.
+            IF ( ( '<T>' .NE. 'UB' ) .AND.
+     :           ( '<T>' .NE. 'UW' ) .AND.
+     :           NUM_LT<T>( ARRAY( I ), ZERO ) ) THEN
+
+*  If so, then increment the negative standard deviation count, note a
+*  data conversion error and assign a bad value to the affected array
+*  element.
+               NNEG = NNEG + 1
+               DCE = .TRUE.
+               ERRVAL = ARRAY( I )
+               ARRAY( I ) = VAL__BAD<T>
+
+*  Otherwise, check that the value will not overflow when squared. If
+*  not, then square it.
+            ELSE IF ( NUM_LE<T>( ARRAY( I ), HI ) ) THEN
+               ARRAY( I ) = NUM_MUL<T>( ARRAY( I ), ARRAY( I ) )
+
+*  If it would overflow, then note a data conversion error and assign a
+*  bad result.
+            ELSE
+               DCE = .TRUE.
+               ARRAY( I ) = VAL__BAD<T>
+            END IF
+ 5       CONTINUE
+
+*  If required, loop through the array checking for bad values.
+      ELSE
+         DO 6 I = EL, 1, -1
+
+*  Perform the bad value check.
+            IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
+
+*  Check the value is not negative.
+               IF ( ( '<T>' .NE. 'UB' ) .AND.
+     :              ( '<T>' .NE. 'UW' ) .AND.
+     :              NUM_LT<T>( ARRAY( I ), ZERO ) ) THEN
+                  NNEG = NNEG + 1
+                  DCE = .TRUE.
+                  ERRVAL = ARRAY( I )
+                  ARRAY( I ) = VAL__BAD<T>
+
+*  Check for overflow and square the standard deviation.
+               ELSE IF ( NUM_LE<T>( ARRAY( I ), HI ) ) THEN
+                  ARRAY( I ) = NUM_MUL<T>( ARRAY( I ), ARRAY( I ) )
+
+*  Deal with overflows.
+               ELSE
+                  DCE = .TRUE.
+                  ARRAY( I ) = VAL__BAD<T>
+               END IF
+            END IF
+ 6       CONTINUE
+      END IF
+
+*  If negative standard deviation values were encountered, then report
+*  an error.
+      IF ( NNEG .NE. 0 ) THEN
+         STATUS = NDF__NGSTD
+         CALL MSG_SETI( 'NNEG', NNEG )
+         CALL MSG_SETR( 'ERRVAL', NUM_<T>TOR( ERRVAL ) )
+         CALL ERR_REP( 'NDF1_S2V<T>_NEG',
+     :   '^NNEG illegal negative standard deviation value(s) ' //
+     :   'encountered; first offending value was ^ERRVAL ' //
+     :   '(possible programming error).', STATUS )
+      END IF
+
+*  Call error tracing routine and exit.
+      IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_S2V<T>',
+     :                                            STATUS )
+
+      END

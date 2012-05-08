@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ndf" support="S">
-  <version>1.11</version>
+  <version>1.11-2</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
@@ -16,7 +16,7 @@
   additional user-defined information of any type.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><build>ary</build><build>ast</build><build>psx</build><link>psx</link><link>ary</link><link>hds</link><link>ems</link><link>chr</link><link>prm</link><link>ast</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><build>ary</build><build>ast</build><build>psx</build><build>generic</build><link>psx</link><link>ary</link><link>hds</link><link>ems</link><link>chr</link><link>prm</link><link>ast</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

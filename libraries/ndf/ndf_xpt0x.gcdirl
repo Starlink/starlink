@@ -1,0 +1,295 @@
+      SUBROUTINE NDF_XPT0<T>( VALUE, INDF, XNAME, CMPT, STATUS )
+*+
+*  Name:
+*     NDF_XPT0<T>
+
+*  Purpose:
+*     Write a scalar value to a component within a named NDF extension.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL NDF_XPT0<T>( VALUE, INDF, XNAME, CMPT, STATUS )
+
+*  Description:
+*     The routine writes a scalar value to a component within a named
+*     NDF extension. The extension must already exist, although the
+*     component within the extension need not exist and will be created
+*     if necessary.
+
+*  Arguments:
+*     VALUE = <TYPE> (Given)
+*        The value to be written to the extension component. Its type
+*        is determined by the name of the routine called (see the Notes
+*        section).
+*     INDF = INTEGER (Given)
+*        NDF identifier.
+*     XNAME = CHARACTER * ( * ) (Given)
+*        Name of the NDF extension.
+*     CMPT = CHARACTER * ( * ) (Given)
+*        Name of the component within the extension whose value is to be
+*        assigned.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for writing values with each of the
+*     standard Fortran data types: integer, real, double precision,
+*     logical and character.  Replace the (lower case) "x" in the
+*     routine name by I, R, D, L or C as appropriate.
+*     -  The value given for the CMPT argument may be an HDS path name,
+*     consisting of several fields separated by '.', so that an object
+*     can be accessed in a sub-component (or a sub-sub-component...) of
+*     an NDF extension. Array subscripts may also be included. Thus a
+*     string such as 'CALIB.FILTER(3).WAVELENGTH' could be used as a
+*     valid CMPT value.
+*     -  All HDS structures which lie above the specified component
+*     within the extension must already exist, otherwise an error will
+*     result.
+*     -  If the specified extension component does not already exist,
+*     then it will be created by this routine. If it already exits, but
+*     does not have the correct type or shape, then it will be deleted
+*     and a new scalar component with the appropriate type will be
+*     created in its place.
+
+*  Copyright:
+*     Copyright (C) 1990, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+*     MA 02110-1301, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-MAY-1990 (RFWS):
+*        Original version.
+*     1-AUG-1990 (RFWS):
+*        Changed to perform write access check after validating the
+*        extension name.
+*     30-OCT-1990 (RFWS):
+*        Changed to locate the extension component explicitly and to
+*        use DAT_PUT instead of CMP_PUT0x (which only exists for the
+*        standard Fortran data types).
+*     29-JUL-1994 (RFWS):
+*        Changed to allow a compound component name.
+*     29-JUL-1994 (RFWS):
+*        Make an attempt to write to an object which cannot be deleted,
+*        even if it appears not to have the correct type or shape.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT_ public_constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_CONST'        ! NDF_ private constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+
+*  Global Variables:
+      INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
+*        DCB_XLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
+*           Locator to extension (MORE) structure.
+
+      INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
+*        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
+*           Index to data object entry in the DCB.
+
+*  Arguments Given:
+      <TYPE> VALUE
+      INTEGER INDF
+      CHARACTER * ( * ) XNAME
+      CHARACTER * ( * ) CMPT
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER NDF1_LEN           ! Length of a character string
+      LOGICAL NDF1_ABSNT         ! Test for absent NDF or component
+
+*  Local Variables:
+      CHARACTER * ( DAT__SZLOC ) LOC ! Extension locator
+      CHARACTER * ( DAT__SZLOC ) LOC1 ! Component locator
+      CHARACTER * ( DAT__SZTYP ) RTYPE ! Required component type
+      CHARACTER * ( DAT__SZTYP ) TYPE ! Component type
+      INTEGER DIM( DAT__MXDIM )  ! Dimension array
+      INTEGER IACB               ! Index to NDF entry in the ACB
+      INTEGER IDCB               ! Index to data object entry in the DCB
+      INTEGER NDIM               ! Number of extension dimensions
+      LOGICAL THERE              ! Whether component is present
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Import the NDF identifier.
+      CALL NDF1_IMPID( INDF, IACB, STATUS )
+
+*  Check the extension name for validity.
+      CALL NDF1_CHXNM( XNAME, STATUS )
+
+*  Check that write access to the NDF is available.
+      CALL NDF1_CHACC( IACB, 'WRITE', STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  Obtain an index to the data object entry in the DCB.
+         IDCB = ACB_IDCB( IACB )
+
+*  Ensure that extension information is available in the DCB.
+         CALL NDF1_DX( IDCB, STATUS )
+         IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  If there is no extension (MORE) structure, then the requested
+*  extension cannot be there, so report an error.
+            IF ( DCB_XLOC( IDCB ) .EQ. DAT__NOLOC ) THEN
+               STATUS = NDF__NOEXT
+               CALL MSG_SETC( 'XNAME', XNAME )
+               CALL NDF1_AMSG( 'NDF', IACB )
+               CALL ERR_REP( 'NDF_XPT0<T>_NO1',
+     :         'There is no ''^XNAME'' extension in the NDF ' //
+     :         'structure ^NDF', STATUS )
+
+*  Otherwise, see if the requested extension is present.
+            ELSE
+               CALL DAT_THERE( DCB_XLOC( IDCB ), XNAME, THERE, STATUS )
+               IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  If absent, then report an error.
+                  IF ( .NOT. THERE ) THEN
+                     STATUS = NDF__NOEXT
+                     CALL MSG_SETC( 'XNAME', XNAME )
+                     CALL NDF1_AMSG( 'NDF', IACB )
+                     CALL ERR_REP( 'NDF_XPT0<T>_NO2',
+     :               'There is no ''^XNAME'' extension in the NDF ' //
+     :               'structure ^NDF', STATUS )
+
+*  If present, obtain a locator to it.
+                  ELSE
+                     CALL DAT_FIND( DCB_XLOC( IDCB ), XNAME, LOC,
+     :                              STATUS )
+
+*  Mark the error stack and attempt to obtain a locator to the requested
+*  component within the extension.
+                     IF ( STATUS .EQ. SAI__OK ) THEN
+                        THERE = .TRUE.
+                        CALL ERR_MARK
+                        CALL HDS_FIND( LOC, CMPT, 'WRITE', LOC1,
+     :                                   STATUS )
+
+*  If the component is not present, note this fact and annul the error.
+*  Release the error stack.
+                        IF ( NDF1_ABSNT( STATUS ) ) THEN
+                           THERE = .FALSE.
+                           CALL ERR_ANNUL( STATUS )
+                        END IF
+                        CALL ERR_RLSE
+                     END IF
+
+*  Determine the type which the component should have.
+                     IF ( STATUS .EQ. SAI__OK ) THEN
+                        IF ( '<T>' .EQ. 'C' ) THEN
+                           CALL DAT_CCTYP( NDF1_LEN( VALUE ), RTYPE )
+                        ELSE
+                           RTYPE = '<HTYPE>'
+                        END IF
+
+*  If the component already exists, then determine its actual type and
+*  shape.
+                        IF ( THERE ) THEN
+                           CALL DAT_TYPE( LOC1, TYPE, STATUS )
+                           CALL DAT_SHAPE( LOC1, DAT__MXDIM, DIM, NDIM,
+     :                                     STATUS )
+
+*  Check whether the component has the required type and is scalar. If
+*  not, then mark the error stack and attempt to delete it.
+                           IF ( STATUS .EQ. SAI__OK ) THEN
+                              IF ( ( TYPE .NE. RTYPE ) .OR.
+     :                             ( NDIM .NE. 0 ) ) THEN
+                                 CALL ERR_MARK
+                                 CALL NDF1_DELOB( LOC1, STATUS )
+
+*  If the component could not be deleted because it has invalid bounds
+*  (e.g. it may be a cell within a primitive array, so cannot be deleted
+*  independently of the rest of the array), then annul the error. We
+*  will try and write the value to it anyway, so obtain a new locator
+*  for it.
+                                 IF ( STATUS .EQ. NDF__BNDIN ) THEN
+                                    CALL ERR_ANNUL( STATUS )
+                                    CALL HDS_FIND( LOC, CMPT, 'WRITE',
+     :                                               LOC1, STATUS )
+
+*  Note if the component was deleted successfully.
+                                 ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+                                    THERE = .FALSE.
+                                 END IF
+
+*  Release the error stack.
+                                 CALL ERR_RLSE
+                              END IF
+                           END IF
+                        END IF
+                     END IF
+
+*  If the component is not present (or has been deleted). then create a
+*  new one with the required type.
+                     IF ( STATUS .EQ. SAI__OK ) THEN
+                        IF ( .NOT. THERE ) THEN
+                           CALL NDF1_HNEW( LOC, CMPT, RTYPE, 0, DIM,
+     :                                     LOC1, STATUS )
+                        END IF
+
+*  Write the value to it.
+                        CALL DAT_PUT( LOC1, '<HTYPE>', 0, DIM,
+     :                                VALUE, STATUS )
+
+*  Annul the component locator.
+                        CALL DAT_ANNUL( LOC1, STATUS )
+                     END IF
+
+*  Annul the extension locator.
+                     CALL DAT_ANNUL( LOC, STATUS )
+                  END IF
+               END IF
+            END IF
+         END IF
+      END IF
+
+*  If an error occurred, then report context information and call the
+*  error tracing routine.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'NDF_XPT0<T>_ERR',
+     :   'NDF_XPT0<T>: Error writing a scalar value to a component ' //
+     :   'within a named NDF extension.', STATUS )
+         CALL NDF1_TRACE( 'NDF_XPT0<T>', STATUS )
+      END IF
+
+      END
