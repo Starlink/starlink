@@ -1,9 +1,9 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision: 27534 $)
-  
+
 dnl    Initialisation: package name and version number
-AC_INIT(pal, 0.1.0, stardev@jiscmail.ac.uk)
-  
+AC_INIT(pal, 0.1.1, stardev@jiscmail.ac.uk)
+
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl    Require Starlink automake
@@ -31,7 +31,7 @@ STAR_DECLARE_DEPENDENCIES(link,  [sofa starutil])
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun267)
- 
+
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES(Makefile component.xml)

@@ -4,6 +4,12 @@ The Starlink Positional Astronomy Library (PAL) is a C implementation of the
 SLALIB API. It is distributed under the GPL and uses the SOFA library wherever
 possible.
 
+V0.1.1
+
+The palDrange function has been modified so that it now returns +PI if
+the supplied angle is +PI (previously, it returned -PI in these cases).
+
+
 V0.1.0
 
 Initial release with sufficient SLALIB API for AST and the Astro::Coords perl module.
