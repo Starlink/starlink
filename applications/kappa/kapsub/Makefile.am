@@ -72,8 +72,8 @@ kps1_memou.f kps1_memsa.f kps1_memsy.f kps1_memtr.f opus.f \
 tropus.f uget.f uput.f
 
 GEN_F_ROUTINES = $(KPG_N_GEN:.gen=.f) $(KPG_DR_GEN:.gdr=.f) \
-                 $(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_R_GEN:.gr=.f) \
-                 $(KPG_GN_GEN:.gn=.f) $(KPG_DIR_GEN:.gdir=.f)
+                 $(KPG_BDIKRW_GEN:.gbdikrw=.f) $(KPG_R_GEN:.gr=.f) \
+                 $(KPG_GN_GEN:.gn=.f) $(KPG_DIKR_GEN:.gdikr=.f)
 
 ## Generic
 
@@ -90,9 +90,9 @@ KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
              kps1_xyzw.gdr kps1_mfld.gdr kps1_bafn.gdr kps1_msag.gdr \
              kps1_msgr.gdr kps1_mfno.gdr kps1_cff2.gdr
 
-KPG_DIR_GEN = kps1_trdr.gdir kps1_trnd.gdir kps1_trnv.gdir
+KPG_DIkR_GEN = kps1_trdr.gdikr kps1_trnd.gdikr kps1_trnv.gdikr
 
-KPG_BDIRW_GEN = kps1_dscl.gbdirw kps1_fain.gbdirw
+KPG_BDIKRW_GEN = kps1_dscl.gbdikrw kps1_fain.gbdikrw
 
 KPG_GN_GEN = kps1_clns.gn kps1_hsmo.gn kps1_inle.gn kps1_inli.gn \
              kps1_inls.gn kps1_lft.gn  kps1_lftq.gn kps1_lfts.gn \
@@ -105,7 +105,7 @@ KPG_GN_GEN = kps1_clns.gn kps1_hsmo.gn kps1_inle.gn kps1_inli.gn \
 
 KPG_R_GEN = kps1_pgft.gr
 
-SUFFIXES = .gen .gdr .gdir .gr .gbdirw .gn .f
+SUFFIXES = .gen .gdr .gdir .gr .gbdirw .gn .f .gdikr .gbdikrw
 
 # Need to make sure that a maintainer clean really removes the
 # output of generic
@@ -121,6 +121,9 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 .gdir.f:
 	$(FGENERIC)  -t dir $<
 
+.gdikr.f:
+	$(FGENERIC)  -t dikr $<
+
 .gn.f:
 	$(FGENERIC)  -t n $<
 
@@ -129,6 +132,9 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 
 .gbdirw.f:
 	$(FGENERIC)  -t bdirw $<
+
+.gbdikrw.f:
+	$(FGENERIC)  -t bdikrw $<
 
 # We need KAP_ERR
 AM_FCFLAGS = -I.. @TCL_CFLAGS@ @TK_CFLAGS@
