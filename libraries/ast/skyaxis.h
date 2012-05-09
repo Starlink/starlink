@@ -387,13 +387,11 @@ astINVOKE(O,astLoadSkyAxis_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 
 /* Interfaces to public member functions. */
 /* -------------------------------------- */
-double astDrange_( double );
 
 /* Here we make use of astCheckSkyAxis to validate SkyAxis pointers
    before use. This provides a contextual error report if a pointer to
    the wrong sort of object is supplied. */
 #if defined(astCLASS)            /* Protected */
-#define astDrange(value) astDrange_(value)
 
 #define astClearAxisAsTime(this) \
 astINVOKE(V,astClearAxisAsTime_(astCheckSkyAxis(this),STATUS_PTR))

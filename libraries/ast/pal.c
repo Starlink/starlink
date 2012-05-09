@@ -78,6 +78,7 @@
 #include "pal/palDh2e.c"
 #include "pal/palDjcal.c"
 #include "pal/palDmat.c"
+#include "pal/palDrange.c"
 #include "pal/palDs2tp.c"
 #include "pal/palDtp2s.c"
 #include "pal/palDtps2c.c"

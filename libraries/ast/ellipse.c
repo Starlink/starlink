@@ -95,7 +95,6 @@ c     - AST_ELLIPSEPARS: Get the geometric parameters of the Ellipse
 #include "ellipse.h"             /* Interface definition for this class */
 #include "mapping.h"             /* Position mappings */
 #include "unitmap.h"             /* Unit Mapping */
-#include "skyaxis.h"             /* For astDrange */
 #include "pal.h"                 /* Positional astronomy library */
 
 /* Error code definitions. */
@@ -343,7 +342,7 @@ AstRegion *astBestEllipse_( AstPointSet *mesh, double *cen, AstRegion *unc, int 
       for( ip = maxat + 1; ip < np; ip++ ) {
          if( dist[ ip ] != AST__BAD ) {
             r3 = dist[ ip ];
-            t3 = astDrange( ang[ ip ] - a0 );
+            t3 = palDrange( ang[ ip ] - a0 );
             break;
          }
       }
@@ -351,7 +350,7 @@ AstRegion *astBestEllipse_( AstPointSet *mesh, double *cen, AstRegion *unc, int 
          for( ip = 0; ip < maxat; ip++ ) {
             if( dist[ ip ] != AST__BAD ) {
                r3 = dist[ ip ];
-               t3 = astDrange( ang[ ip ] - a0 );
+               t3 = palDrange( ang[ ip ] - a0 );
                break;
             }
          }
@@ -365,7 +364,7 @@ AstRegion *astBestEllipse_( AstPointSet *mesh, double *cen, AstRegion *unc, int 
       for( ip = maxat - 1; ip > -1; ip-- ) {
          if( dist[ ip ] != AST__BAD ) {
             r1 = dist[ ip ];
-            t1 = astDrange( ang[ ip ] - a0 );
+            t1 = palDrange( ang[ ip ] - a0 );
             break;
          }
       }
@@ -373,7 +372,7 @@ AstRegion *astBestEllipse_( AstPointSet *mesh, double *cen, AstRegion *unc, int 
          for( ip = np - 1; ip > maxat; ip-- ) {
             if( dist[ ip ] != AST__BAD ) {
                r1 = dist[ ip ];
-               t1 = astDrange( ang[ ip ] - a0 );
+               t1 = palDrange( ang[ ip ] - a0 );
                break;
             }
          }

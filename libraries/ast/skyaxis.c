@@ -448,7 +448,7 @@ static double AxisDistance( AstAxis *this_axis, double v1, double v2, int *statu
 
 /* Check both axis values are OK, and form the returned increment,
    normalizing it into the range +PI to -PI. */
-   if( v1 != AST__BAD && v2 != AST__BAD ) result = astDrange( v2 - v1 );
+   if( v1 != AST__BAD && v2 != AST__BAD ) result = palDrange( v2 - v1 );
 
 /* Return the result. */
    return result;
@@ -1094,7 +1094,7 @@ static void AxisNorm( AstAxis *this_axis, double *value, int *status ) {
       centrezero = astGetAxisCentreZero( this );
 
 /* Wrap the value into the appropriate range. */
-      if ( astOK ) *value = centrezero ? astDrange( *value ) :
+      if ( astOK ) *value = centrezero ? palDrange( *value ) :
                                          palDranrm( *value );
    }
 }
@@ -2252,47 +2252,6 @@ static const char *DHmsUnit( const char *fmt, int digs, int output, int *status 
 
 /* Return the result. */
    return result;
-}
-
-
-double astDrange_( double value ) {
-/*
-*+
-*  Name:
-*     astDrange
-
-*  Purpose:
-*     Normalize an angle into the range +PI to -PI.
-
-*  Type:
-*     Protected function.
-
-*  Synopsis:
-*     #include "skyaxis.h"
-*     double astDrange( value )
-
-*  Class Membership:
-*     SkyAxis function
-
-*  Description:
-*     This function returns the the supplied angle normalised into the
-*     range +PI to -PI. The algorithm used seems to be more accurate than
-*     iauAnpm for cases where the angle is extremely close to +/- PI.
-
-*  Parameters:
-*     value
-*        The angle to be normalized, in radians..
-
-*  Returned Value:
-*     The normalized angle, in radians..
-
-*  Notes:
-*     - This function has no status value.
-*-
-*/
-   while( value < -AST__DPI ) value += 2*AST__DPI;
-   while( value > AST__DPI ) value -= 2*AST__DPI;
-   return value;
 }
 
 static int GetObjSize( AstObject *this_object, int *status ) {

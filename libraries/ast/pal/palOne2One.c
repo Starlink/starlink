@@ -122,10 +122,6 @@ double palDpav ( double v1[3], double v2[3] ) {
   return iauPap( v1, v2 );
 }
 
-double palDrange ( double angle ) {
-  return iauAnpm( angle );
-}
-
 double palDranrm ( double angle ) {
   return iauAnp( angle );
 }
