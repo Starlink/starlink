@@ -486,8 +486,8 @@
 
 *  Obtain the numeric type of the NDF array component to be analysed.
       TYPE = '_REAL'
-      CALL NDF_MTYPE( '_BYTE,_WORD,_INTEGER,_REAL,_DOUBLE', NDF, NDF,
-     :                COMP, TYPE, DTYPE, STATUS )
+      CALL NDF_MTYPE( '_BYTE,_WORD,_INTEGER,_INT64,_REAL,_DOUBLE',
+     :                NDF, NDF, COMP, TYPE, DTYPE, STATUS )
 
 *  Map the array using this numeric type and see whether there may be
 *  bad pixels present.
@@ -511,6 +511,11 @@
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          CALL KPG_OSTAI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   NCLIP, CLIP, ISTAT, DSTAT,
+     :                   ISTATC, DSTATC, STATUS )
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL KPG_OSTAK( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   NCLIP, CLIP, ISTAT, DSTAT,
      :                   ISTATC, DSTATC, STATUS )
 
@@ -611,6 +616,10 @@
             CALL KPG_STOSI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
 
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            CALL KPG_STOSK( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
+
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
             CALL KPG_STOSR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
      :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
@@ -624,7 +633,7 @@
 
 *  Display the statistics, using the most appropriate floating-point
 *  precision.
-      IF ( TYPE .EQ. '_DOUBLE' ) THEN
+      IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
          CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
      :                    KURT, MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
@@ -638,7 +647,7 @@
 
 *  Also write the statistics to the logfile, if used.
       IF ( LOGFIL ) THEN
-         IF ( TYPE .EQ. '_DOUBLE' ) THEN
+         IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
             CALL KPG1_STFLD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
      :                       KURT, MEDIAN, MODE, MAX( 1, NUMPER ), 
@@ -679,7 +688,7 @@
 *  Display the heading, followed by the clipped statistics using the
 *  most appropriate floating-point precision.
          CALL MSG_OUT( 'CLIPDONE', BUF( : NC ), STATUS )
-         IF ( TYPE .EQ. '_DOUBLE' ) THEN
+         IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
             CALL KPG1_STDSD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                       STDEVC, SKEWC, KURTC, MEDIAN, MODE, 
@@ -696,7 +705,7 @@
 *  Also write the statistics to the log file, if used.
          IF ( LOGFIL ) THEN
             CALL FIO_WRITE( IFIL, BUF( : NC ), STATUS )
-            IF ( TYPE .EQ. '_DOUBLE' ) THEN
+            IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
                CALL KPG1_STFLD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                          STDEVC, SKEWC, KURTC, MEDIAN, MODE, 
