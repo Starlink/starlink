@@ -1132,7 +1132,7 @@ static double Angle( AstFrame *this_frame, const double a[],
                if( perm[ 0 ] != 0 ) result = piby2 - result;
 
 /* Fold the result into the range +/- PI. */
-               result = astDrange( result );
+               result = palDrange( result );
             }
          }
       }
@@ -6872,7 +6872,7 @@ static void Norm( AstFrame *this_frame, double value[], int *status ) {
 /* Fold the longitude value into the range 0 to 2*pi and the latitude into
    the range -pi to +pi. */
          sky_long = palDranrm( sky_long );
-         sky_lat = astDrange( sky_lat );
+         sky_lat = palDrange( sky_lat );
 
 /* If the latitude now exceeds pi/2, shift the longitude by pi in whichever
    direction will keep it in the range 0 to 2*pi. */
@@ -6899,7 +6899,7 @@ static void Norm( AstFrame *this_frame, double value[], int *status ) {
 
 /* If only the latitude value is valid, wrap it into the range -pi to +pi. */
       } else if ( sky_lat != AST__BAD ) {
-         sky_lat = astDrange( sky_lat );
+         sky_lat = palDrange( sky_lat );
 
 /* Then refect through one of the poles (as above), if necessary, to move it
    into the range -pi/2 to +pi/2. */
@@ -6917,7 +6917,7 @@ static void Norm( AstFrame *this_frame, double value[], int *status ) {
 /* If the NegLon attribute is set, and the longitude value is good,
    convert it into the range -pi to +pi. */
       if( sky_long != AST__BAD && astGetNegLon( this ) ) {
-         sky_long = astDrange( sky_long );
+         sky_long = palDrange( sky_long );
       }
 
 /* Return the new values, allowing for any axis permutation. */
@@ -7027,8 +7027,8 @@ static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
 
 /* Find the lowest latitude after normalisation. */
          if( ub[ 1 ] != AST__BAD &&  lb[ 1 ] != AST__BAD ){
-            t = astDrange( ub[ 1 ] );
-            t2 = astDrange( lb[ 1 ] );
+            t = palDrange( ub[ 1 ] );
+            t2 = palDrange( lb[ 1 ] );
             if( t2 < t ) t = t2;
          } else {
             t = AST__BAD;
@@ -7050,8 +7050,8 @@ static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
 
 /* Find the highest latitude after normalisation. */
          if( ub[ 1 ] != AST__BAD &&  lb[ 1 ] != AST__BAD ){
-            t = astDrange( ub[ 1 ] );
-            t2 = astDrange( lb[ 1 ] );
+            t = palDrange( ub[ 1 ] );
+            t2 = palDrange( lb[ 1 ] );
             if( t2 > t ) t = t2;
          } else {
             t = AST__BAD;

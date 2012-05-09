@@ -1243,7 +1243,7 @@ f     invoked with STATUS set to an error value, or if it should fail for
             angc = atan2( cb[ 0 ], cb[ 1 ] );
 
 /* Find the difference, folded into the range +/- PI. */
-            result = astDrange( angc - anga );
+            result = palDrange( angc - anga );
 
 /* Now deal with Frames with more than 2 axes. */
          } else {
@@ -4811,7 +4811,7 @@ L1:
       if ( astOK ) {
 
 /* Put into range +/- PI. */
-         dval = astDrange( dval );
+         dval = palDrange( dval );
 
 /* If not already created, create an FK5 J2000 SkyFrame which will be used
    for formatting and unformatting ObsLon and ObsLat values. */

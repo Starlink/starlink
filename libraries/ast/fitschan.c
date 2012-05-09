@@ -1211,7 +1211,6 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 #include "permmap.h"
 #include "pointset.h"
 #include "shiftmap.h"
-#include "skyaxis.h"
 #include "skyframe.h"
 #include "timeframe.h"
 #include "keymap.h"
@@ -3016,7 +3015,7 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
       } else {
          rho_b = atan2( -cdlon_lat, cdelt[ axrot2 ] );
       }
-      if( fabs( astDrange( rho_a - rho_b ) ) < 1.0E-2 ){
+      if( fabs( palDrange( rho_a - rho_b ) ) < 1.0E-2 ){
          crota = 0.5*( palDranrm( rho_a ) + palDranrm( rho_b ) );
          coscro = cos( crota );
          sincro = sin( crota );
@@ -3518,7 +3517,7 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
       } else {
          rho_b = atan2( -cdlon_lat, cdelt[ axrot2 ] );
       }
-      if( fabs( astDrange( rho_a - rho_b ) ) < 1.0E-2 ){
+      if( fabs( palDrange( rho_a - rho_b ) ) < 1.0E-2 ){
          crota = 0.5*( palDranrm( rho_a ) + palDranrm( rho_b ) );
          coscro = cos( crota );
          sincro = sin( crota );
@@ -28669,7 +28668,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
              GetValue2( ret, this, FormatKey( "CRPIX", axlon + 1, -1, s, status ),
                         AST__FLOAT, (void *) &dval, 0, method, class, status ) ) {
             if( cdelti != 0.0 ) {
-               dval = 0.5 + AST__DR2D*astDrange( AST__DD2R*( dval - 0.5 )*cdelti )/cdelti;
+               dval = 0.5 + AST__DR2D*palDrange( AST__DD2R*( dval - 0.5 )*cdelti )/cdelti;
                SetValue( ret, FormatKey( "CRPIX", axlon + 1, -1, s, status ),
                          (void *) &dval, AST__FLOAT, CardComm( this, status ), status );
             }
@@ -34416,7 +34415,7 @@ static AstMapping *WcsNative( AstFitsChan *this, FitsStore *store, char s,
 /* Limit the latitude to the range +/- PI/2, issuing a warning if the
    supplied CRVAL value is outside this range. The "alphap" variable is used
    as workspace here. */
-      alphap = astDrange( delta0 );
+      alphap = palDrange( delta0 );
       delta0 = alphap;
       if ( delta0 > AST__DPIBY2 ){
          delta0 = AST__DPIBY2;
@@ -34780,8 +34779,8 @@ static int WcsNatPole( AstFitsChan *this, AstWcsMap *wcsmap, double alpha0,
                } else {
                   t4 = acos( t3 );
                }
-               deltap_1 = astDrange( t1 + t4 );
-               deltap_2 = astDrange( t1 - t4 );
+               deltap_1 = palDrange( t1 + t4 );
+               deltap_2 = palDrange( t1 - t4 );
 
 /* Select which of these two values of deltap to use. Values outside the
    range +/- PI/2 cannot be used. If both values are within this range

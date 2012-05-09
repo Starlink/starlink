@@ -614,7 +614,6 @@ int astTest##attr##_( AstWcsMap *this, int axis, int *status ) { \
 #include "pal.h"                 /* SLALIB function prototypes */
 #include "channel.h"             /* I/O channels */
 #include "proj.h"                /* WCSLIB projections and WCSLIB_MXPAR */
-#include "skyaxis.h"             /* For astDrange */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -2759,17 +2758,17 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    and the latitude is in the range [-90,90] (as required by the WCSLIB
    library). Any point with a latitude outside the range [-90,90] is
    converted to the equivalent point on the complementary meridian. */
-            latitude = AST__DR2D*astDrange(  factor*in1[ point ] );
+            latitude = AST__DR2D*palDrange(  factor*in1[ point ] );
             if ( latitude > 90.0 ){
                latitude = 180.0 - latitude;
-               longitude = AST__DR2D*astDrange( AST__DPI + factor*in0[ point ] );
+               longitude = AST__DR2D*palDrange( AST__DPI + factor*in0[ point ] );
 
             } else if ( latitude < -90.0 ){
                latitude = -180.0 - latitude;
-               longitude = AST__DR2D*astDrange( AST__DPI + factor*in0[ point ] );
+               longitude = AST__DR2D*palDrange( AST__DPI + factor*in0[ point ] );
 
             } else {
-               longitude = AST__DR2D*astDrange( factor*in0[ point ] );
+               longitude = AST__DR2D*palDrange( factor*in0[ point ] );
             }
 
 /* Call the relevant WCSLIB forward projection function. */
