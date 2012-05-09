@@ -46,6 +46,7 @@
 *     -  If the DTYPE value was not recognised, then report an error.
 
 *  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -67,6 +68,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,6 +78,9 @@
 *        Fixed bug in handling of unsigned word type.
 *     1-MAR-1990 (RFWS):
 *        Removed un-referenced include file.
+*     2012-05-09 (TIMJ):
+*        K type should not use _REAL as a fallback but go straight
+*        to _DOUBLE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -132,7 +137,7 @@
 
 *  ...64-bit integer.
       ELSE IF ( DTYPE .EQ. NDF__TYPK ) THEN
-         OK = ITYPE .GE. NDF__TYPK
+         OK = (ITYPE .EQ. NDF__TYPK) .OR. ( ITYPE .GE. NDF__TYPD )
 
 *  ...real.
       ELSE IF ( DTYPE .EQ. NDF__TYPR ) THEN
