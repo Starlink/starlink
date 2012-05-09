@@ -116,6 +116,9 @@
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL CCG1_NABD( %VAL( CNF_PVAL( VEC ) ),
      :                   EL, BAD, VAL, NUM, STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_NABK( %VAL( CNF_PVAL( VEC ) ),
+     :                   EL, BAD, VAL, NUM, STATUS )
       ELSE
 
 *  Unsupported data type.

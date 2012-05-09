@@ -1195,8 +1195,8 @@
 *  the reference NDF (if given) in this process.
          IF ( PRESRV ) THEN
             CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,' //
-     :                      '_REAL,_DOUBLE', NIN, NDF, COMP, ITYPE,
-     :                      DTYPE, STATUS )
+     :                      '_INT64,_REAL,_DOUBLE', NIN, NDF, COMP,
+     :                      ITYPE, DTYPE, STATUS )
          ELSE
             CALL NDF_MTYPN( '_REAL,_DOUBLE', NIN, NDF, COMP, ITYPE,
      :                      DTYPE, STATUS )

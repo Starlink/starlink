@@ -123,6 +123,9 @@
       ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
          CALL CCG1_STMND( BAD, %VAL( CNF_PVAL( IPVEC ) ), SIZE, AVEACC,
      :                    NOISE, VALPIX, STATUS )
+      ELSE IF ( PTYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_STMNK( BAD, %VAL( CNF_PVAL( IPVEC ) ), SIZE, AVEACC,
+     :                    NOISE, VALPIX, STATUS )
       END IF
 
       END

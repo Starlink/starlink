@@ -135,6 +135,10 @@
              CALL CCG1_CPBD( %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOINT )), EL,
      :                       STATUS )
+         ELSE IF ( PTYPE .EQ. '_INT64' ) THEN
+             CALL CCG1_CPBK( %VAL( CNF_PVAL( IPMASK ) ),
+     :                       %VAL( CNF_PVAL( IPOINT )), EL,
+     :                       STATUS )
          END IF
       ELSE
 
@@ -165,6 +169,10 @@
      :                       BBYTE1, STATUS )
          ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
              CALL CCG1_SQBD( %VAL( CNF_PVAL( IPMASK ) ),
+     :                       %VAL( CNF_PVAL( IPOINT ) ), EL ,
+     :                       BBYTE1, STATUS )
+         ELSE IF ( PTYPE .EQ. '_INT64' ) THEN
+             CALL CCG1_SQBK( %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPOINT ) ), EL ,
      :                       BBYTE1, STATUS )
          END IF

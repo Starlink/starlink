@@ -807,6 +807,12 @@
      :                          NPXIN( I ),
      :                          MEANV, VALPIX, STATUS )
 
+*  Get the mean variance from an integer*8 array.
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               CALL CCG1_MEANK( .TRUE., %VAL( CNF_PVAL( IVAR ) ),
+     :                          NPXIN( I ),
+     :                          MEANV, VALPIX, STATUS )
+
 *  Get the mean variance from a single-precision array.
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL CCG1_MEANR( .TRUE., %VAL( CNF_PVAL( IVAR ) ),
@@ -939,6 +945,12 @@
 *  Get the mean variance from an integer array.
                   ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                      CALL CCG1_MEANI( .TRUE., %VAL( CNF_PVAL( IVAR ) ),
+     :                                NPXIN( I ),
+     :                                MEANV, VALPIX, STATUS )
+
+*  Get the mean variance from an integer*8 array.
+                  ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                     CALL CCG1_MEANK( .TRUE., %VAL( CNF_PVAL( IVAR ) ),
      :                                NPXIN( I ),
      :                                MEANV, VALPIX, STATUS )
 
@@ -1332,6 +1344,19 @@
 *  Integer array
          ELSE IF ( OTYPE .EQ. '_INTEGER' ) THEN
             CALL CCG1_DODIZI( NDF(I), WEIGHT(I), NPXIN(I),
+     :                        ITYPE, %VAL(CNF_PVAL(ODAT)),
+     :                        %VAL(CNF_PVAL(OWHT)),
+     :                        %VAL(CNF_PVAL(OCNT)),
+     :                        %VAL(CNF_PVAL(OVAR)),
+     :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI,
+     :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
+     :                        PIXFRAC, GETV, GETS, GETZ, GETM,
+     :                        SCALE(I), ZERO(I), VARFAC, GVAR,
+     :                        %VAL(CNF_PVAL(VWHT)), STATUS )
+
+*  Integer array
+         ELSE IF ( OTYPE .EQ. '_INT64' ) THEN
+            CALL CCG1_DODIZK( NDF(I), WEIGHT(I), NPXIN(I),
      :                        ITYPE, %VAL(CNF_PVAL(ODAT)),
      :                        %VAL(CNF_PVAL(OWHT)),
      :                        %VAL(CNF_PVAL(OCNT)),

@@ -121,6 +121,10 @@
          CALL CCG1_SUBCD( BAD, %VAL( CNF_PVAL( IPSTK ) ),
      :                    NPIX, NLINES, CONST,
      :                    STATUS )
+      ELSE IF ( PTYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_SUBCK( BAD, %VAL( CNF_PVAL( IPSTK ) ),
+     :                    NPIX, NLINES, CONST,
+     :                    STATUS )
       END IF
       END
 * $Id$

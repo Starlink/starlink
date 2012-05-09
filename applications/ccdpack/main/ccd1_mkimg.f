@@ -32,7 +32,7 @@
 *        and its first pixel is centred at coordinates (1, 1).
 *     ITYPE = CHARACTER * ( * ) (Given)
 *        The numeric HDS type of the input array. One of _BYTE, _UBYTE,
-*        _WORD, _UWORD, _INTEGER, _REAL, _DOUBLE.
+*        _WORD, _UWORD, _INTEGER, _INT64, _REAL, _DOUBLE.
 *     IXDIM = INTEGER (Given)
 *        The first dimension of the input array.
 *     IYDIM = INTEGER (Given)
@@ -280,6 +280,16 @@
      :                         %VAL( CNF_PVAL( IPTEMP ) ),
      :                         %VAL( CNF_PVAL( IPOV ) ), STATUS )
 
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         NBAD = AST_RESAMPLEK( IMAP, 2, ILBND, IUBND,
+     :                         %VAL( CNF_PVAL( IPIN ) ),
+     :                         %VAL( CNF_PVAL( IPIV ) ),
+     :                         INTSCH, AST_NULL,
+     :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADD,
+     :                         2, OLBND, OUBND, OLBND, OUBND,
+     :                         %VAL( CNF_PVAL( IPTEMP ) ),
+     :                         %VAL( CNF_PVAL( IPOV ) ), STATUS )
+
       END IF
 
 *  And finally rescale it.
@@ -321,6 +331,12 @@
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL CCG1_ISCLD( OXD, OYD, %VAL( CNF_PVAL( IPTEMP ) ),
+     :                    ILO, IHI, OLO, OHI,
+     :                    OBAD, OXDIM, OYDIM, OLBND( 1 ) - 1,
+     :                    OLBND( 2 ) - 1, OUT, STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_ISCLK( OXD, OYD, %VAL( CNF_PVAL( IPTEMP ) ),
      :                    ILO, IHI, OLO, OHI,
      :                    OBAD, OXDIM, OYDIM, OLBND( 1 ) - 1,
      :                    OLBND( 2 ) - 1, OUT, STATUS )

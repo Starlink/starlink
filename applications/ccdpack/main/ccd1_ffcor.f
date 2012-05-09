@@ -260,6 +260,29 @@
      :                          %VAL( CNF_PVAL( IPVOUT ) ),
      :                         NERR, STATUS )
             END IF
+         ELSE IF ( DTYPE .EQ. '_INT64' ) THEN
+*  Call a routine to do the divisions. If saturations are present then
+*  these values should not be modified.
+            IF ( .NOT. SETSAT ) THEN
+               CALL CCG1_RFFK( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
+     :                         %VAL( CNF_PVAL( IPVIN ) ),
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
+     :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
+     :                         NERR, STATUS )
+            ELSE
+
+*  Have saturated values
+               CALL CCG1_RFSK( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
+     :                         %VAL( CNF_PVAL( IPVIN ) ),
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
+     :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
+     :                          HAVFV, SATVAL,
+     :                         %VAL( CNF_PVAL( IPDOUT ) ),
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
+     :                         NERR, STATUS )
+            END IF
          ELSE IF ( DTYPE .EQ. '_REAL' ) THEN
 *  Call a routine to do the divisions. If saturations are present then
 *  these values should not be modified.
@@ -411,6 +434,27 @@
 
 *  Have saturated values
                CALL CCG1_DFSI( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
+     :                         %VAL( CNF_PVAL( IPVIN ) ),
+     :                          %VAL( CNF_PVAL( IPDFLT ) ),
+     :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
+     :                          HAVFV, SATVAL,
+     :                         %VAL( CNF_PVAL( IPDOUT ) ),
+     :                          %VAL( CNF_PVAL( IPVOUT ) ),
+     :                         NERR, STATUS )
+            END IF
+         ELSE IF ( DTYPE .EQ. '_INT64' ) THEN
+            IF ( .NOT. SETSAT ) THEN
+               CALL CCG1_DFFK( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
+     :                         %VAL( CNF_PVAL( IPVIN ) ),
+     :                         %VAL( CNF_PVAL( IPDFLT ) ),
+     :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,
+     :                         HAVFV, %VAL( CNF_PVAL( IPDOUT ) ),
+     :                         %VAL( CNF_PVAL( IPVOUT ) ),
+     :                         NERR, STATUS )
+            ELSE
+
+*  Have saturated values
+               CALL CCG1_DFSK( BAD, EL, %VAL( CNF_PVAL( IPDIN ) ),
      :                         %VAL( CNF_PVAL( IPVIN ) ),
      :                          %VAL( CNF_PVAL( IPDFLT ) ),
      :                         %VAL( CNF_PVAL( IPVFLT ) ), HAVDV,

@@ -1,5 +1,7 @@
 1 CCDPACK_bugfix_update
 
+  Release v4.1-1 addas support for _INT64 data types.
+
   Release v4.0-25 adds a new parameter NORM to the MAKEFLAT application.
   This allows the output flatfield to not be normalised to have a mean
   of one.

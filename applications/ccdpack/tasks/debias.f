@@ -1084,8 +1084,8 @@
 
 *  No change to data type. If PRESERVE if false then go up to next
 *  floating point precision
-               TYPES = '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                 '_DOUBLE'
+               TYPES = '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                 '_REAL,_DOUBLE'
             ELSE
 
 *  Just floating point arithmetic and result

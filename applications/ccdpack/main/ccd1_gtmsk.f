@@ -255,6 +255,10 @@
             CALL CCG1_CMSKD( %VAL( CNF_PVAL( IPWRK ) ), EL, 0.0D0,
      :                       %VAL( CNF_PVAL( IPDAT ) ),
      :                       STATUS )
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL CCG1_CMSKK( %VAL( CNF_PVAL( IPWRK ) ), EL, 0.0D0,
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
+     :                       STATUS )
          END IF
 
 *  Unmap the mask NDF, ready for use.

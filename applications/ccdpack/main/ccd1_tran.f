@@ -566,6 +566,14 @@
      :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
 
+*  Transform an integer*8 array.
+                  ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                     CALL KPG1_VASVK( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
+     :                                ELIN,
+     :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
+     :                                NBAD, STATUS )
+
 *  Transform a single-precision array.
                   ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                      CALL KPG1_VASVR( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),

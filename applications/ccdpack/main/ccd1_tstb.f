@@ -111,6 +111,9 @@
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL CCG1_TBD( %VAL( CNF_PVAL( IPDATA ) ),
      :                  NEL, ALLBAD, STATUS )
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_TBK( %VAL( CNF_PVAL( IPDATA ) ),
+     :                  NEL, ALLBAD, STATUS )
       ELSE
 
 *  Unsupported numeric type, issue error.

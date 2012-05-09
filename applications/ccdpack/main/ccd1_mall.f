@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine allocates arbitrary amounts of virtual memory for
-*     any of the HDS types _BYTE, _UBYTE, _WORD, _UWORD, _INTEGER,
+*     any of the HDS types _BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _INT64
 *     _REAL, _DOUBLE and _LOGICAL. Using this routine (instead of PSX
 *     directly) allows memory to be freed (by a call CCD1_MFREE)
 *     without remembering which pointers are in use at any time.
@@ -24,8 +24,8 @@
 *        The quantity of memory required in units of TYPE.
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The type of the memory required - can be any of the HDS types
-*        _BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _REAL, _DOUBLE and
-*        _LOGICAL.
+*        _BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _INT64, _REAL, _DOUBLE
+*        and _LOGICAL.
 *     POINT = INTEGER (Returned)
 *        The pointer to the virtual memory.
 *     STATUS = INTEGER (Given and Returned)
@@ -178,6 +178,8 @@
             NREQD = VAL__NBW * QUAN
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
             NREQD = VAL__NBI * QUAN
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            NREQD = VAL__NBK * QUAN
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
             NREQD = VAL__NBR * QUAN
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN

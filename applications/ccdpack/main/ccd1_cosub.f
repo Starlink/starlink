@@ -141,6 +141,12 @@
      :                    NERR, STATUS )
          CALL CCG1_COPAD( EL, %VAL( CNF_PVAL( IPWORK ) ),
      :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_CSUBK( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL,
+     :                    %VAL( CNF_PVAL( IPWORK ) ),
+     :                    NERR, STATUS )
+         CALL CCG1_COPAK( EL, %VAL( CNF_PVAL( IPWORK ) ),
+     :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE
 
 *  Unsupported numeric type, issue error.

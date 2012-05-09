@@ -559,13 +559,14 @@
 *  sufficient to properly represent a normalised flatfield. This means
 *  at least _REAL. The data will be in this precision and will remain
 *  in the processing precision on output.
-         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                   '_DOUBLE', NNDF, STACK, 'Data', ITYPE, DTYPE,
-     :                   STATUS )
+         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                   '_REAL,_DOUBLE', NNDF, STACK, 'Data', ITYPE,
+     :                   DTYPE, STATUS )
 
 *  Set the processing type, ie. the type in which the data will be
 *  stacked etc.
-         IF( ITYPE .EQ.'_INTEGER' .OR. ITYPE .EQ. '_DOUBLE' ) THEN
+         IF( ITYPE .EQ.'_INTEGER' .OR. ITYPE .EQ. '_DOUBLE'
+     :        .OR. ITYPE .EQ. '_INT64' ) THEN
             PTYPE = '_DOUBLE'
          ELSE
             PTYPE = '_REAL'

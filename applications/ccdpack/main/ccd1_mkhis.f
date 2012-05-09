@@ -162,6 +162,10 @@
         CALL CCG1_MKHID( %VAL( CNF_PVAL( ARRAY ) ),
      :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+        CALL CCG1_MKHIK( %VAL( CNF_PVAL( ARRAY ) ),
+     :                   NPIX, BAD, MINBIN, NHIST, HIST,
+     :                   MODE, NBIN, ZERO, WIDTH, STATUS )
       ELSE
 
 *  Unsupported data type.

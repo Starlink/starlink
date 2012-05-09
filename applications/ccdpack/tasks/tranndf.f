@@ -1167,6 +1167,14 @@
      :                                %VAL( CNF_PVAL( OPNTRW ) ),
      :                                NBAD, STATUS )
 
+*  Transform an integer*8 array.
+                  ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                     CALL KPG1_VASVK( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
+     :                                ELIN,
+     :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                                %VAL( CNF_PVAL( OPNTRW ) ),
+     :                                NBAD, STATUS )
+
 *  Transform a single-precision array.
                   ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                      CALL KPG1_VASVR( ELOUT, %VAL( CNF_PVAL( INPNTR ) ),
@@ -1256,7 +1264,7 @@
 
 *  Get the implementation type of the arrays.
                CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,'/
-     :                         /'_REAL,_DOUBLE', IDIN, IDIN,
+     :                         /'_INT64,_REAL,_DOUBLE', IDIN, IDIN,
      :                         'Data,Variance', ITYPE, DTYPE, STATUS )
 
 *  Map the input and output arrays.
@@ -1341,6 +1349,35 @@
      :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                  ELSE
                     CALL KPG1_TDLII( NDIMI, IDIMS,
+     :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
+     :                             TRIDI,
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
+     :                             ODIMS( 1 ),
+     :                             NDIMI, OLBND, ODIMS,
+     :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
+     :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+                 ENDIF
+*  Transform an integer array.
+               ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                  IF ( USEWCS ) THEN
+                    CALL CCG1_ASLIK( NDIMI, IDIMS,
+     :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
+     :                             MAP,
+     :                             FLUX, %VAL( CNF_PVAL( CAXPTR ) ),
+     :                             ODIMS( 1 ),
+     :                             NDIMI, OLBND, ODIMS,
+     :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
+     :                             %VAL( CNF_PVAL( OPNTR( 2 ) ) ),
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+                 ELSE
+                    CALL KPG1_TDLIK( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, %VAL( CNF_PVAL( IPNTR( 2 ) ) ),
      :                             TRIDI,
@@ -1555,6 +1592,33 @@
      :                             STATUS )
                   ELSE
                     CALL KPG1_TDLII( NDIMI, IDIMS,
+     :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                             VAR, VARI, TRIDI, FLUX,
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
+     :                             ODIMS( 1 ), NDIMI,
+     :                             OLBND, ODIMS,
+     :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
+     :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ),
+     :                             STATUS )
+                  ENDIF
+
+               ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                  IF (USEWCS) THEN
+                    CALL CCG1_ASLIK( NDIMI, IDIMS,
+     :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                             VAR, VARI, MAP, FLUX,
+     :                             %VAL( CNF_PVAL( CAXPTR ) ),
+     :                             ODIMS( 1 ), NDIMI,
+     :                             OLBND, ODIMS,
+     :                             %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
+     :                             VARBO, %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ),
+     :                             STATUS )
+                  ELSE
+                    CALL KPG1_TDLIK( NDIMI, IDIMS,
      :                               %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
      :                             VAR, VARI, TRIDI, FLUX,
      :                             %VAL( CNF_PVAL( CAXPTR ) ),

@@ -31,7 +31,7 @@
 *  Arguments:
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The type of the data to be processed. One of
-*        _DOUBLE,_REAL,_INTEGER,_WORD,_UWORD,_BYTE,_UBYTE
+*        _DOUBLE,_REAL,_INTEGER,_INT64,_WORD,_UWORD,_BYTE,_UBYTE
 *     GENVAR = LOGICAL (Given)
 *        Whether or not variances are to be generated for the output
 *        data.
@@ -237,6 +237,14 @@
      :                       %VAL( CNF_PVAL( IPVAR ) ), WRK1, WRK2,
      :                       PP, COVEC, NMAT, NCON, POINT, USED,
      :                       STATUS )
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            CALL CCG1_CM2DK( %VAL( CNF_PVAL( IPSTK ) ),
+     :                       NPIX, NLINES, VARS, IMETH,
+     :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
+     :                       %VAL( CNF_PVAL( IPRES ) ),
+     :                       %VAL( CNF_PVAL( IPVAR ) ), WRK1, WRK2,
+     :                       PP, COVEC, NMAT, NCON, POINT, USED,
+     :                       STATUS )
          END IF
       ELSE
 
@@ -289,6 +297,13 @@
      :                       USED, STATUS )
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL CCG1_CM3DD( %VAL( CNF_PVAL( IPSTK ) ),
+     :                       NPIX, NLINES, VARS, IMETH,
+     :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
+     :                       %VAL( CNF_PVAL( IPRES ) ),
+     :                       WRK1, WRK2, NCON, POINT,
+     :                       USED, STATUS )
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            CALL CCG1_CM3DK( %VAL( CNF_PVAL( IPSTK ) ),
      :                       NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
      :                       %VAL( CNF_PVAL( IPRES ) ),

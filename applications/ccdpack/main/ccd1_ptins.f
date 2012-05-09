@@ -23,7 +23,7 @@
 *     ITYPE = CHARACTER * ( * ) (Given)
 *        The data type of the input and output arrays. Must be one
 *        of the HDS types - '_BYTE, _UBYTE, _WORD, _UWORD, _INTEGER,
-*        _REAL or  _DOUBLE'.
+*        _INT64, _REAL or  _DOUBLE'.
 *     IPSTAK = INTEGER (Given and Returned)
 *        Pointer to stack of lines into which the data line is to be
 *        inserted.
@@ -127,6 +127,10 @@
      :                    %VAL( CNF_PVAL( IPLINE ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL CCG1_PTISD( %VAL( CNF_PVAL( IPSTAK ) ),
+     :                    NPIX, NLINES, ILINE,
+     :                    %VAL( CNF_PVAL( IPLINE ) ), STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_PTISK( %VAL( CNF_PVAL( IPSTAK ) ),
      :                    NPIX, NLINES, ILINE,
      :                    %VAL( CNF_PVAL( IPLINE ) ), STATUS )
       END IF

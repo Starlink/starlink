@@ -127,6 +127,10 @@
          CALL CCG1_CMLTD( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL,
      :                    %VAL( CNF_PVAL( IPOUT ) ),
      :                    NERR, STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_CMLTK( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), CVAL,
+     :                    %VAL( CNF_PVAL( IPOUT ) ),
+     :                    NERR, STATUS )
       ELSE
 
 *  Unsupported numeric type, issue error.

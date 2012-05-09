@@ -142,6 +142,11 @@
      :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_FRACK( EL, %VAL( CNF_PVAL( IPARR ) ),
+     :                    NFRAC, FRAC, BAD, CLFRAC,
+     :                    VALUES, STATUS )
+
 
 *  Unsupported data type.
       ELSE

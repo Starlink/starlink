@@ -30,7 +30,7 @@
 *        scaled prior to display.
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The numeric HDS type of the input array. One of _BYTE, _UBYTE,
-*        _WORD, _UWORD, _INTEGER, _REAL, _DOUBLE.
+*        _WORD, _UWORD, _INTEGER, _INT64, _REAL, _DOUBLE.
 *     XDIMN = INTEGER (Given)
 *        The first dimension of the input array.
 *     YDIMN = INTEGER (Given)
@@ -243,6 +243,12 @@
      :                    YDIMW, .FALSE., SCALE,
      :                    %VAL( CNF_PVAL( IPTEMP ) ),
      :                    BADOUT, STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_RENPK( %VAL( CNF_PVAL( IPIN ) ),
+     :                    XDIMN, YDIMN, BAD, XDIMW,
+     :                    YDIMW, .FALSE., SCALE,
+     :                    %VAL( CNF_PVAL( IPTEMP ) ),
+     :                    BADOUT, STATUS )
       END IF
 
 *  And finally rescale it.
@@ -272,6 +278,10 @@
      :                    NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_ISCLD( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ),
+     :                    .FALSE.,
+     :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_ISCLK( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ),
      :                    .FALSE.,
      :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
       END IF

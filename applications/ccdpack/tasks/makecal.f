@@ -524,8 +524,8 @@
 *  Find a suitable data type for accessing the input data. The output
 *  type will always be one of _REAL or _DOUBLE as the data may be
 *  normalised.
-         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'
-     :                   //'_DOUBLE', NNDF, STACK, 'Data',
+         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'
+     :                   //'_REAL,_DOUBLE', NNDF, STACK, 'Data',
      :                   ITYPE, DTYPE, STATUS )
 
 *  Set the result type, the actual stacking arithmetic will be performed
@@ -533,7 +533,8 @@
 *  accessed at this precision as adjustment of the values occurs prior
 *  to stacking. Memory should not be a problem as a fixed chunking size
 *  is used.
-         IF( ITYPE .EQ.'_INTEGER' .OR. ITYPE .EQ. '_DOUBLE' ) THEN
+         IF( ITYPE .EQ.'_INTEGER' .OR. ITYPE .EQ. '_DOUBLE'
+     :        .OR. ITYPE .EQ. '_INT64' ) THEN
             PTYPE = '_DOUBLE'
          ELSE
             PTYPE = '_REAL'

@@ -171,6 +171,13 @@
          CALL CCG1_STMND( .TRUE., %VAL( CNF_PVAL( IPWORK ) ),
      :                    EL, MEAN, NOISE,
      :                    VALPIX, STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_BEXTK( DIRECT, %VAL( CNF_PVAL( IPIN ) ),
+     :                    IDIM1, IDIM2, BOUNDS,
+     :                    NBOUND, %VAL( CNF_PVAL( IPWORK ) ), STATUS )
+         CALL CCG1_STMNK( .TRUE., %VAL( CNF_PVAL( IPWORK ) ),
+     :                    EL, MEAN, NOISE,
+     :                    VALPIX, STATUS )
       ELSE
 
 *  Unsupported numeric type.

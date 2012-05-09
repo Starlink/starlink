@@ -113,6 +113,9 @@
       ELSE IF (  PTYPE .EQ. '_DOUBLE' ) THEN
          CALL CCG1_COPAD( DIM, %VAL( CNF_PVAL( IPIN ) ) ,
      :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+      ELSE IF (  PTYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_COPAK( DIM, %VAL( CNF_PVAL( IPIN ) ) ,
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE
 
 *  Bad PTYPE.

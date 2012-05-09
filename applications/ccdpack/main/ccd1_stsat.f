@@ -136,6 +136,10 @@
          CALL CCG1_SSATD( BAD, %VAL( CNF_PVAL( IPOINT ) ),
      :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_SSATK( BAD, %VAL( CNF_PVAL( IPOINT ) ),
+     :                    EL, SETSAT, SATVAL, NSAT,
+     :                    STATUS )
       END IF
 
       END

@@ -203,6 +203,11 @@
      :                      NCOL, NLINE,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC, YACC, STATUS )
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            CALL CCG1_CENK( XPOS, YPOS, %VAL( CNF_PVAL( IPDATA ) ),
+     :                      NCOL, NLINE,
+     :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
+     :                       XACC, YACC, STATUS )
          ELSE
 
 *  Unknown data type.

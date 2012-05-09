@@ -178,6 +178,11 @@
      :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_DCNK( %VAL( CNF_PVAL( ARRAY ) ),
+     :                   NCOL, NLINE, BAD, THRES, TOUCH,
+     :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
+     :                   STATUS )
       ELSE
 
 *  Unsupported data type.

@@ -122,6 +122,10 @@
          CALL CCG1_MEAND( BAD, %VAL( CNF_PVAL( IPVEC ) ),
      :                    SIZE, AVEACC, VALPIX,
      :                    STATUS )
+      ELSE IF ( PTYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_MEANK( BAD, %VAL( CNF_PVAL( IPVEC ) ),
+     :                    SIZE, AVEACC, VALPIX,
+     :                    STATUS )
       ELSE
 
 *  Bad data type, issue error message

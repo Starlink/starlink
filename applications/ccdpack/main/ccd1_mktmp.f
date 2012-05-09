@@ -34,8 +34,8 @@
 *        The quantity of workspace required in units of TYPE.
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The numeric type of the workspace which is required. Can only
-*        be one of _BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _REAL, _DOUBLE and
-*        _LOGICAL.
+*        be one of _BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _INT64, _REAL,
+*        _DOUBLE and _LOGICAL.
 *     ID = INTEGER (Returned)
 *        The identifier to the quantity of workspace.
 *     STATUS = INTEGER (Given and Returned)

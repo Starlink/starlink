@@ -611,6 +611,7 @@
                ELSE
 
 *  Need a double precision representation (for _DOUBLE or _INTEGER)
+*  _INT64 will probably need _LDOUBLE...
                   DTYPE = '_DOUBLE'
                END IF
             END IF

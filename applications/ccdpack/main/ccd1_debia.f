@@ -517,6 +517,17 @@
      :                    %VAL( CNF_PVAL( IPWRK ) ),
      :                    %VAL( CNF_PVAL( IPIDI ) ),
      :                    %VAL( CNF_PVAL( IPIDR ) ), STATUS )
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL CCG1_DEBIK( BAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+     :                    IDIM1, IDIM2,
+     :                    %VAL( CNF_PVAL( IPOUT ) ), GOTBIA,
+     :                    %VAL( CNF_PVAL( IPBIAS ) ),
+     :                    OFFSET, FMODE, SMODE, CMODE, WMODE, SIZE,
+     :                    NSIGMA, MEAN, RNOISE, DIRECT, BOUNDS, NBOUND,
+     :                    %VAL( CNF_PVAL( IPIDD ) ),
+     :                    %VAL( CNF_PVAL( IPWRK ) ),
+     :                    %VAL( CNF_PVAL( IPIDI ) ),
+     :                    %VAL( CNF_PVAL( IPIDR ) ), STATUS )
 
       ELSE
 *  Else unsupported type - stop.
@@ -580,6 +591,10 @@
                CALL CCG1_ADDD( BAD, EL, %VAL( CNF_PVAL( IPOVAR )),
      :                         %VAL( CNF_PVAL( IPBVAR ) ),
      :                         NERR, STATUS )
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               CALL CCG1_ADDK( BAD, EL, %VAL( CNF_PVAL( IPOVAR )),
+     :                         %VAL( CNF_PVAL( IPBVAR ) ),
+     :                         NERR, STATUS )
             END IF
 
 *  Check for numeric overflows etc.
@@ -625,6 +640,10 @@
      :                       ADC, NERR, STATUS )
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL CCG1_GVARD( %VAL( CNF_PVAL( IPOUT ) ),
+     :                       %VAL( CNF_PVAL( IPOVAR ) ), EL, RNOISE,
+     :                       ADC, NERR, STATUS )
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL CCG1_GVARK( %VAL( CNF_PVAL( IPOUT ) ),
      :                       %VAL( CNF_PVAL( IPOVAR ) ), EL, RNOISE,
      :                       ADC, NERR, STATUS )
          END IF

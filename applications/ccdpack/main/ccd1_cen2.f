@@ -208,6 +208,7 @@
      :     TYPE1 .NE. '_WORD' .AND.
      :     TYPE1 .NE. '_UWORD' .AND.
      :     TYPE1 .NE. '_INTEGER' .AND.
+     :     TYPE1 .NE. '_INT64' .AND.
      :     TYPE1 .NE. '_REAL' .AND.
      :     TYPE1 .NE. '_DOUBLE' ) THEN
          STATUS  = SAI__ERROR
@@ -221,6 +222,7 @@
      :     TYPE2 .NE. '_WORD' .AND.
      :     TYPE2 .NE. '_UWORD' .AND.
      :     TYPE2 .NE. '_INTEGER' .AND.
+     :     TYPE2 .NE. '_INT64' .AND.
      :     TYPE2 .NE. '_REAL' .AND.
      :     TYPE2 .NE. '_DOUBLE' ) THEN
          STATUS  = SAI__ERROR
@@ -273,6 +275,11 @@
      :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
+         ELSE IF ( TYPE1 .EQ. '_INT64' ) THEN
+            CALL CCG1_CENK( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
+     :                      NCOL1, NLINE1,
+     :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
+     :                       XACC1, YACC1, STATUS )
          ELSE
             CALL CCG1_CEND( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
      :                      NCOL1, NLINE1,
@@ -306,6 +313,11 @@
      :                       XACC2, YACC2, STATUS )
          ELSE IF ( TYPE2 .EQ. '_REAL' ) THEN
             CALL CCG1_CENR( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
+     :                      NCOL2, NLINE2,
+     :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
+     :                       XACC2, YACC2, STATUS )
+         ELSE IF ( TYPE2 .EQ. '_INT64' ) THEN
+            CALL CCG1_CENK( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
      :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )

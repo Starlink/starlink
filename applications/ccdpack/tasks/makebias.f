@@ -555,14 +555,15 @@
 *  will be converted internally to the combination routines so that the
 *  mapped space is limited to only that which is necessary; actual work
 *  usually occurs within the workspace buffers declared above. All
-*  integer precisions, except _INTEGER will be processed as reals,
-*  _INTEGER and _DOUBLE will be processed purely in double precision.
+*  integer precisions, except _INTEGER and _INT64 will be processed as reals,
+*  _INTEGER, _INT64 and _DOUBLE will be processed purely in double precision.
 *  The output precision will be that of the input data array and
 *  variance array, unless the user wants the extra precision.
-         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                   '_DOUBLE', NNDF, STACK, 'Data', ITYPE, DTYPE,
-     :                   STATUS )
-         IF( ITYPE .EQ.'_INTEGER' .OR. ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                   '_REAL,_DOUBLE', NNDF, STACK, 'Data', ITYPE,
+     :                   DTYPE,STATUS )
+         IF( ITYPE .EQ.'_INTEGER' .OR. ITYPE .EQ. '_DOUBLE'
+     :        .OR. ITYPE .EQ. '_INT64' ) THEN
             PTYPE = '_DOUBLE'
          ELSE
             PTYPE = '_REAL'
