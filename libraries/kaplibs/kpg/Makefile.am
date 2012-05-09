@@ -53,9 +53,9 @@ ADAM_C_ROUTINES = kaplibs_adam.c kpg1Config.c
 ADAM_GRAPHIC_F_ROUTINES = $(KPG_GRAPHIC_ADAM_NONGEN)
 
 GEN_F_ROUTINES = $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
-        $(KPG_DI_GEN:.gdi=.f) $(KPG_DIR_GEN:.gdir=.f) \
+        $(KPG_DIK_GEN:.gdik=.f) \
         $(KPG_DIKR_GEN:.gdikr=.f) $(KPG_NXD_GEN:.gnxd=.f) \
-	$(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_NXB_GEN:.gnxb=.f) \
+	$(KPG_BDIKRW_GEN:.gbdikrw=.f) $(KPG_NXB_GEN:.gnxb=.f) \
 	$(KPG_XC_GEN:.gxc=.f) $(KPG_XL_GEN:.gxl=.f) \
 	$(KPG_BIRW_GEN:.gbirw=.f) $(KPG_IR_GEN:.gir=.f)
 
@@ -97,8 +97,8 @@ KPG_XL_GEN = kpg1_qsrt.gxl
 KPG_XC_GEN = kpg1_retv.gxc
 
 # All except unsigned types
-KPG_BDIRW_GEN = kpg1_iscl.gbdirw kpg1_flas.gbdirw \
-                kpg_stos.gbdirw
+KPG_BDIKRW_GEN = kpg1_iscl.gbdikrw kpg1_flas.gbdikrw \
+                 kpg_stos.gbdikrw
 
 # All except unsigned types and double
 KPG_BIRW_GEN =
@@ -121,12 +121,10 @@ kpg1_ssaz.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_tral.gdr \
 kpg1_trbo.gdr kpg1_trig.gdr kpg1_trpi.gdr kpg1_unz2.gdr \
 kpg1_xyzw.gdr kpg1_ker1.gdr kpg_blon.gdr  kpg_bmdn.gdr
 
-KPG_DI_GEN = kpg1_ctcp.gdi
+KPG_DIK_GEN = kpg1_ctcp.gdik
 
-KPG_DIR_GEN = kpg1_chel.gdir kpg1_figr.gdir \
-kpg1_mul.gdir kpg1_sqsu.gdir
-
-KPG_DIKR_GEN = kpg1_prsa.gdikr
+KPG_DIKR_GEN = kpg1_chel.gdikr kpg1_figr.gdikr \
+kpg1_mul.gdikr kpg1_prsa.gdikr kpg1_sqsu.gdikr
 
 KPG_IR_GEN =
 
@@ -178,7 +176,7 @@ kpg1_copy.f \
 kpg1_copyc.f \
 kpg1_cpsty.f \
 kpg1_ctcpc.f \
-kpg1_ctcpk.f \
+kpg1_ctcpkm.f \
 kpg1_cshft.f \
 kpg1_danot.f \
 kpg1_datcp.f \
@@ -400,28 +398,31 @@ kpg1_pltln.f
 
 .gxc.f:
 	cp $< $(<:.gxc=.gen)
-	$(FGENERIC)  -t bdilrwWB $(<:.gxc=.gen)
+	$(FGENERIC)  -t bdiklrwWB $(<:.gxc=.gen)
 	rm $(<:.gxc=.gen)
 
 .gxl.f:
 	cp $< $(<:.gxl=.gen)
-	$(FGENERIC)  -t bcdirwWB $(<:.gxl=.gen)
+	$(FGENERIC)  -t bcdikrwWB $(<:.gxl=.gen)
 	rm $(<:.gxl=.gen)
 
 .gnxd.f:
 	cp $< $(<:.gnxd=.gen)
-	$(FGENERIC)  -t bBirwW $(<:.gnxd=.gen)
+	$(FGENERIC)  -t bBikrwW $(<:.gnxd=.gen)
 	rm $(<:.gnxd=.gen)
 
 .gnxb.f:
 	cp $< $(<:.gnxb=.gen)
-	$(FGENERIC)  -t dirwW $(<:.gnxb=.gen)
+	$(FGENERIC)  -t dikrwW $(<:.gnxb=.gen)
 	rm $(<:.gnxb=.gen)
 
 .gir.f:
 	$(FGENERIC) $(<)
 
 .gdi.f:
+	$(FGENERIC) $(<)
+
+.gdik.f:
 	$(FGENERIC) $(<)
 
 .gdir.f:
@@ -433,7 +434,13 @@ kpg1_pltln.f
 .gbdirw.f:
 	$(FGENERIC) $(<)
 
+.gbdikrw.f:
+	$(FGENERIC) $(<)
+
 .gbirw.f:
+	$(FGENERIC) $(<)
+
+.gbikrw.f:
 	$(FGENERIC) $(<)
 
 AM_FCFLAGS = -I../ira

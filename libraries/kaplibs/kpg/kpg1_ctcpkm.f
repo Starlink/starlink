@@ -1,7 +1,7 @@
-      SUBROUTINE KPG1_CTCPK( CI, NAX, GI, NEL, KEYMAP, STATUS )
+      SUBROUTINE KPG1_CTCPKM( CI, NAX, GI, NEL, KEYMAP, STATUS )
 *+
 *  Name:
-*     KPG1_CTCPK
+*     KPG1_CTCPKM
 
 *  Purpose:
 *     Copies values from catalogue columns to an AST KeyMap.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_CTCPK( CI, NAX, GI, NEL, KEYMAP, STATUS )
+*     CALL KPG1_CTCPKM( CI, NAX, GI, NEL, KEYMAP, STATUS )
 
 *  Description:
 *     This routine gets NEL values for a set of given CAT (see SUN/181)
@@ -62,6 +62,8 @@
 *  History:
 *     3-MAY-2009 (DSB):
 *        Original version.
+*     2012-05-09 (TIMJ):
+*        Rename to stop clash with K generic version of kpg1_ctcp<T>.
 *     {enter_changes_here}
 
 *  Bugs:

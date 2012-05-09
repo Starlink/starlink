@@ -612,7 +612,7 @@
          END DO
 
 *  Read the columns into the KeyMap.
-         CALL KPG1_CTCPK( CI, NCNAM, GAXIS, NPOS, KEYMAP, STATUS )
+         CALL KPG1_CTCPKM( CI, NCNAM, GAXIS, NPOS, KEYMAP, STATUS )
 
       END IF
 
