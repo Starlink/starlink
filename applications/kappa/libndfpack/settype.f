@@ -50,8 +50,8 @@
 *     TYPE = LITERAL (Read)
 *        The new numeric type to which the NDF's array components are
 *        to be converted.  The value given should be one of the
-*        following: _DOUBLE, _REAL, _INTEGER, _WORD, _UWORD, _BYTE or
-*        _UBYTE (note the leading underscore).  Existing pixel values
+*        following: _DOUBLE, _REAL, _INTEGER, _INT64, _WORD, _UWORD, _BYTE
+*        or _UBYTE (note the leading underscore).  Existing pixel values
 *        stored in the NDF will not be lost, but will be converted to
 *        the new type.  Any values which cannot be represented using the
 *        new type will be replaced with the bad-pixel value.
@@ -135,7 +135,7 @@
 
 *  Local Constants:
       INTEGER MXNTYP             ! Number of possible numeric types
-      PARAMETER ( MXNTYP = 7 )
+      PARAMETER ( MXNTYP = 8 )
 
 *  Local Variables:
       CHARACTER * ( 14 ) COMP    ! Component list
@@ -151,8 +151,8 @@
       LOGICAL VAR                ! Set type of variance component?
 
 *  Local Data:
-      DATA NTYPE / '_DOUBLE', '_REAL', '_INTEGER', '_WORD', '_UWORD',
-     :             '_BYTE', '_UBYTE' /
+      DATA NTYPE / '_DOUBLE', '_REAL', '_INTEGER', '_INT64',
+     :             '_WORD', '_UWORD', '_BYTE', '_UBYTE' /
 
 *.
 
