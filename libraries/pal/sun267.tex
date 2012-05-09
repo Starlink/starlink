@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
+\newcommand{\stardoccopyright}
 {Copyright \copyright\ 2012 Science and Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
@@ -86,7 +86,7 @@ implemented using the C SOFA library. It is provided with a GPL license.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -191,10 +191,10 @@ implemented using the C SOFA library. It is provided with a GPL license.
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     The commands defined in the style file html.sty provided with LaTeX2html
 %     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
 %     documentstyle declaration).
 
 %  Authors:
@@ -270,8 +270,8 @@ implemented using the C SOFA library. It is provided with a GPL license.
 % Frame attributes fount.  Need to find a way for these to stand out.
 % San serif doesn't work by default.  Also without the \rm the
 % san serif continues after \sstatt hyperlinks.  Extra braces
-% failed to prevent \sstattribute from using roman fount for its 
-% headings.  The current lash up appears to work, but needs further 
+% failed to prevent \sstattribute from using roman fount for its
+% headings.  The current lash up appears to work, but needs further
 % investigation or a TeX wizard.
 \newcommand{\sstatt}[1]{\sf #1}
 \begin{htmlonly}
@@ -338,7 +338,7 @@ implemented using the C SOFA library. It is provided with a GPL license.
 
 %  Format the parameters section (for an application).
 \newcommand{\sstparameters}[1]{
-   \goodbreak 
+   \goodbreak
    \item[Parameters:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -602,12 +602,12 @@ implemented using the C SOFA library. It is provided with a GPL license.
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -690,7 +690,6 @@ SLA/PAL &  SOFA \\
 \texttt{palDpav} & \texttt{iauPap}\\
 \texttt{palDr2af} & \texttt{iauA2af}\\
 \texttt{palDr2tf} & \texttt{iauA2tf}\\
-\texttt{palDrange} & \texttt{iauAnpm}\\
 \texttt{palDranrm} & \texttt{iauAnp}\\
 \texttt{palDsep} & \texttt{iauSeps}\\
 \texttt{palDsepv} & \texttt{iauSepp}\\
@@ -709,7 +708,6 @@ SLA/PAL &  SOFA \\
 \texttt{palGmsta} & \texttt{iauGmst06}\\
 \texttt{palHfk5z} & \texttt{iauHfk5z} \textit{also calls iauEpj2jd}\\
 \end{tabular}
-
 
 \subsection{More complex functions}
 
@@ -1663,6 +1661,27 @@ SOFA functions.
          \sstitem
          Velocity is obtained by a complete analytical differentiation
            of the Meeus model.
+      }
+   }
+}
+\sstroutine{
+   palDrange
+}{
+   Normalize angle into range $+$/- pi
+}{
+   \sstdescription{
+      The result is {\tt "}angle{\tt "} expressed in the range $+$/- pi. If the
+      supplied value for {\tt "}angle{\tt "} is equal to $+$/- pi, it is returned
+      unchanged.
+   }
+   \sstinvocation{
+      palDrange( double angle )
+   }
+   \sstarguments{
+      \sstsubsection{
+         angle = double (Given)
+      }{
+         The angle in radians.
       }
    }
 }

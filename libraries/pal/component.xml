@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pal" support="S">
-  <version>0.1.0</version>
+  <version>0.1.1</version>
   <path>libraries/pal</path>
   <description>Position Astronomy Library</description>
   <abstract><p>

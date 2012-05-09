@@ -36,7 +36,6 @@
 *     - palDpav
 *     - palDr2af
 *     - palDr2tf
-*     - palDrange
 *     - palDranrm
 *     - palDsep
 *     - palDsepv
@@ -57,6 +56,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -74,6 +74,8 @@
 *        Initial version
 *     2012-03-23 (TIMJ):
 *        Update prologue.
+*     2012-05-09 (DSBJ):
+*        Move palDrange into a separate file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -167,10 +169,6 @@ void palDr2af ( int ndp, double angle, char *sign, int idmsf[4] ) {
 
 void palDr2tf( int ndp, double angle, char *sign, int ihmsf[4] ) {
   iauA2tf( ndp, angle, sign, ihmsf );
-}
-
-double palDrange ( double angle ) {
-  return iauAnpm( angle );
 }
 
 double palDranrm ( double angle ) {
