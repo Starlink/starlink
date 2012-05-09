@@ -348,6 +348,8 @@
 *        Changed to allow display of data values outside range of _REAL.
 *     19-AUG-2011 (DSB):
 *        Added parameter WEIGHTS and WEIGHTSTEP.
+*     2012-05-08 (TIMJ):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -522,6 +524,11 @@
          CALL KPG1_DARAUW( 'RANGE', EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                     'Limit,Percentiles,Range,Sigmas', BAD,
      :                     DRANGE( 1 ), DRANGE( 2 ), STATUS )
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_DARAK( 'RANGE', EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                    'Limit,Percentiles,Range,Sigmas', BAD,
+     :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
       END IF
 
@@ -805,6 +812,29 @@
      :                    NUMBIN, CUMUL,
      :                    NUM_DTOW( DRANGE( 2 ) ),
      :                    NUM_DTOW( DRANGE( 1 ) ),
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
+     :                    STATUS )
+
+*  Report the histogram.
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
+     :                    REAL( DRANGE( 1 ) ),
+     :                    REAL( DRANGE( 2 ) ), STATUS )
+
+*  Write the histogram to the log file.
+         IF ( LOGFIL ) THEN
+            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
+     :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
+     :                       STATUS )
+         END IF
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+
+*  Compute the histogram.
+         CALL KPG1_GHSTK( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( WPNTR ) ), WEIGHT,
+     :                    NUMBIN, CUMUL,
+     :                    NUM_DTOK( DRANGE( 2 ) ),
+     :                    NUM_DTOK( DRANGE( 1 ) ),
      :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    STATUS )
 
