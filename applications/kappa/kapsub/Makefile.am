@@ -90,7 +90,7 @@ KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
              kps1_xyzw.gdr kps1_mfld.gdr kps1_bafn.gdr kps1_msag.gdr \
              kps1_msgr.gdr kps1_mfno.gdr kps1_cff2.gdr
 
-KPG_DIkR_GEN = kps1_trdr.gdikr kps1_trnd.gdikr kps1_trnv.gdikr
+KPG_DIKR_GEN = kps1_trdr.gdikr kps1_trnd.gdikr kps1_trnv.gdikr
 
 KPG_BDIKRW_GEN = kps1_dscl.gbdikrw kps1_fain.gbdikrw
 
