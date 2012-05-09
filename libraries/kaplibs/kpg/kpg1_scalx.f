@@ -36,7 +36,7 @@
 *        Pointer to the input array.
 *     OTYPE = CHARACTER * ( * ) (Given)
 *        The HDS data type of the output array. Must be an integer type
-*        (i.e. one of _INTEGER, _WORD, _UWORD, _BYTE  or _UBYTE ).
+*        (i.e. one of _INTEGER, _INT64, _WORD, _UWORD, _BYTE  or _UBYTE ).
 *     IP2 = INTEGER (Given)
 *        Pointer to the output array.
 *     BADOUT = LOGICAL (Returned)
@@ -144,6 +144,12 @@
      :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
      :                       STATUS )
 
+         ELSE IF( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPG1_SCLIK( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
          ELSE IF( ITYPE .EQ. '_WORD' ) THEN
             CALL KPG1_SCLIW( SCALE, ZERO, BAD, EL,
      :                       %VAL( CNF_PVAL( IP1 ) ),
@@ -176,6 +182,65 @@
          END IF
 
 
+*  Deal with cases where we are creating an _INT64 output array.
+      ELSE IF( OTYPE .EQ. '_INT64' ) THEN
+
+*  Go through each type of input array.
+         IF( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPG1_SCLKD( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
+         ELSE IF( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPG1_SCLKR( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
+         ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
+            CALL KPG1_SCLKI( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
+         ELSE IF( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPG1_SCLKK( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
+         ELSE IF( ITYPE .EQ. '_WORD' ) THEN
+            CALL KPG1_SCLKW( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
+         ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
+            CALL KPG1_SCLKUW( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
+         ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
+            CALL KPG1_SCLKB( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
+         ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
+            CALL KPG1_SCLKUB( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'T', ITYPE )
+            CALL ERR_REP( 'KPG1_SCALX_ERR', 'KPG1_SCALX: Unsupported '//
+     :                    'input data type ''^T'' supplied.', STATUS )
+         END IF
+
 *  Deal with cases where we are creating an _WORD output array.
       ELSE IF( OTYPE .EQ. '_WORD' ) THEN
 
@@ -194,6 +259,12 @@
 
          ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPG1_SCLWI( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
+         ELSE IF( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPG1_SCLWK( SCALE, ZERO, BAD, EL,
      :                       %VAL( CNF_PVAL( IP1 ) ),
      :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
      :                       STATUS )
@@ -252,6 +323,12 @@
      :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
      :                       STATUS )
 
+         ELSE IF( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPG1_SCLUWK( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
          ELSE IF( ITYPE .EQ. '_WORD' ) THEN
             CALL KPG1_SCLUWW( SCALE, ZERO, BAD, EL,
      :                       %VAL( CNF_PVAL( IP1 ) ),
@@ -306,6 +383,13 @@
      :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
      :                       STATUS )
 
+
+         ELSE IF( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPG1_SCLBK( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
          ELSE IF( ITYPE .EQ. '_WORD' ) THEN
             CALL KPG1_SCLBW( SCALE, ZERO, BAD, EL,
      :                       %VAL( CNF_PVAL( IP1 ) ),
@@ -356,6 +440,13 @@
 
          ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPG1_SCLUBI( SCALE, ZERO, BAD, EL,
+     :                       %VAL( CNF_PVAL( IP1 ) ),
+     :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
+     :                       STATUS )
+
+
+         ELSE IF( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPG1_SCLUBK( SCALE, ZERO, BAD, EL,
      :                       %VAL( CNF_PVAL( IP1 ) ),
      :                       %VAL( CNF_PVAL( IP2 ) ), BADOUT, NBAD,
      :                       STATUS )

@@ -31,8 +31,11 @@
 *     -  Error reports are made and flushed inside the loop if the
 *     _CHAR*n has an invalid "n" value.
 *     -  Bad status is returned if no valid type has been obtained.
+*     - _INT64 and _INTEGER require 5 characters for disambiguation.
+*     This is a change from when only _INTEGER was available.
 
 *  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -59,6 +62,9 @@
 *  History:
 *     1995 May 23 (MJC):
 *        Original version.
+*     2012-05-09 (TIMJ):
+*        Add _INT64 support. Note that this changes the match for
+*        _INTEGER to use 5 characters.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -185,8 +191,13 @@
             NOTYPE = .FALSE.
 
 *  Test for _INTEGER.  Exit the loop if there is a match.
-         ELSE IF ( CHR_ABBRV( HDSTYP, '_INTEGER', 2 ) ) THEN
+         ELSE IF ( CHR_ABBRV( HDSTYP, '_INTEGER', 5 ) ) THEN
             HDSTYP = '_INTEGER'
+            NOTYPE = .FALSE.
+
+*  Test for _INTEGER.  Exit the loop if there is a match.
+         ELSE IF ( CHR_ABBRV( HDSTYP, '_INT64', 5 ) ) THEN
+            HDSTYP = '_INT64'
             NOTYPE = .FALSE.
 
 *  Test for _LOGICAL.  Exit the loop if there is a match.

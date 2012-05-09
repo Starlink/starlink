@@ -19,9 +19,9 @@
 *  Arguments:
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The data type to be copied. Must be one of the HDS numeric
-*        types, _BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _REAL or _DOUBLE,
-*        or "_CHAR*<N>)" where "<N>" is an integer giving the length of
-*        the character strings.
+*        types, _BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _INT64, _REAL or
+*         _DOUBLE, or "_CHAR*<N>)" where "<N>" is an integer giving the
+*        length of the character strings.
 *     NEL = INTEGER (Given)
 *        The number of elements in the vectorised arrays pointed to by
 *        IPIN and IPOUT.
@@ -38,7 +38,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -60,6 +60,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     DSB: David S. Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -69,6 +70,8 @@
 *        Converted into KAPLIBS routine.
 *     21-JAN-2008 (DSB):
 *        Added support for copying character arrays.
+*     2012-05-09 (TIMJ):
+*        Add _INT64
 *     {enter_changes_here}
 
 *  Bugs:
@@ -118,6 +121,11 @@
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
          CALL VEC_ITOI( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
+     :                  %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
+     :                  STATUS )
+
+      ELSE IF( TYPE .EQ. '_INT64' ) THEN
+         CALL VEC_KTOK( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
      :                  %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
      :                  STATUS )
 

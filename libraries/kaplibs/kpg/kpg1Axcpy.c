@@ -61,6 +61,7 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
 *     MJC: Malcolm J. Currie (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,6 +69,8 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
 *        Original version.
 *     2012 April 18 (MJC):
 *        Test for character-component existence.
+*     2012-05-09 (TIMJ):
+*        Add _INT64
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -143,6 +146,8 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
          size = VAL__NBR;
       } else if( !strcmp( type, "_INTEGER" ) ) {
          size = VAL__NBI;
+      } else if( !strcmp( type, "_INT64" ) ) {
+         size = VAL__NBK;
       } else if( !strcmp( type, "_WORD" ) ) {
          size = VAL__NBW;
       } else if( !strcmp( type, "_UWORD" ) ) {

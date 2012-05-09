@@ -15,7 +15,7 @@
 
 *  Description:
 *     If the input TYPE is one of the HDS primitive numeric data types,
-*     i.e. one of _REAL, _DOUBLE, _INTEGER, _WORD, _UWORD, _BYTE or
+*     i.e. one of _REAL, _DOUBLE, _INTEGER, _INT64, _WORD, _UWORD, _BYTE or
 *      _UBYTE, then the number of bytes used by that data type is
 *     returned as NBYTES.  The values are those stored as the symbolic
 *     constants VAL__NBx in the PRM_PAR include file.  (See SUN/39.)
@@ -55,6 +55,7 @@
 *  Authors:
 *     JM: Jo Murray (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +65,8 @@
 *     2011 January 11 (MJC):
 *        Transferred from CONVERT (COF_TYPSZ) to KAPLIBS as it is
 *        generically useful.
+*     2012-05-09 (TIMJ):
+*        Add _INT64
 *     {enter_further_changes_here}
 
 *-
@@ -102,6 +105,9 @@
 
       ELSE IF ( CHR_SIMLR( TYPE, '_INTEGER' ) ) THEN
          NBYTES = VAL__NBI
+
+      ELSE IF ( CHR_SIMLR( TYPE, '_INT64' ) ) THEN
+         NBYTES = VAL__NBK
 
       ELSE IF ( CHR_SIMLR( TYPE, '_WORD' ) ) THEN
          NBYTES = VAL__NBW

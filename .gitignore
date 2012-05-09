@@ -1131,6 +1131,7 @@ libraries/kaplibs/kpg/kpg1_rfco.f
 libraries/kaplibs/kpg/kpg1_rmap.f
 libraries/kaplibs/kpg/kpg1_sclb.f
 libraries/kaplibs/kpg/kpg1_scli.f
+libraries/kaplibs/kpg/kpg1_sclk.f
 libraries/kaplibs/kpg/kpg1_sclub.f
 libraries/kaplibs/kpg/kpg1_scluw.f
 libraries/kaplibs/kpg/kpg1_sclw.f

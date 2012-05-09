@@ -1,0 +1,193 @@
+      SUBROUTINE KPG1_SCLK<T>( SCALE, ZERO, BAD, EL, IN, OUT,
+     :                           BADOUT, NBAD, STATUS )
+*+
+*  Name:
+*     KPG1_SCLKx
+
+*  Purpose:
+*     Copies array values into a INTEGER*8 array, scaling them in the
+*     process.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation
+*     CALL KPG1_SCLKx( SCALE, ZERO, BAD, EL, IN, OUT, BADOUT, NBAD,
+*                      STATUS )
+
+*  Description:
+*     This routine copies values from one array to another, applying a
+*     linear scaling in the process. The output array is of type INTEGER*8
+*     but the input array can be of a different type.
+
+*  Arguments:
+*     SCALE = DOUBLE PRECISION (Given)
+*        The scale factor.
+*     ZERO = DOUBLE PRECISION (Given)
+*        The zero offset.
+*     BAD = LOGICAL (Given)
+*        If true there may be bad pixels present in the input array. If
+*        false it is safe not to check for bad values.
+*     EL = INTEGER (Given)
+*        The size of the input array.
+*     IN( EL ) = ? (Given)
+*        The input array.
+*     OUT( EL ) = INTEGER*8 (Returned)
+*        The output array.
+*     BADOUT = LOGICAL (Returned)
+*        True if there are any bad pixels in the output array.
+*     NBAD = INTEGER (Returned)
+*        The number of good input pixels that could not be accomodated
+*        within the dynamic range of the output data type, and were
+*        consequently set bad in the output array.
+*     STATUS = INTEGER  (Given and Returned)
+*        Global status value
+
+*  Notes:
+*     -  There is a routine for the all numeric data types: replace "x"
+*     in the routine name by B, D, I, K, R, UB, UW, or W as appropriate.
+*     The IN argument supplied must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David S Berry (JAC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-JUL-2006 (DSB):
+*        Original version.
+*     2012-05-09 (TIMJ):
+*        Clone from KPG1_SCLI
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE
+
+*  Global Constants:
+      INCLUDE  'SAE_PAR'
+      INCLUDE  'PRM_PAR'
+
+*  Arguments Given:
+      DOUBLE PRECISION SCALE
+      DOUBLE PRECISION ZERO
+      LOGICAL BAD
+      INTEGER EL
+      <TYPE> IN( EL )
+
+*  Arguments Returned:
+      INTEGER*8 OUT( EL )
+      LOGICAL BADOUT
+      INTEGER NBAD
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      DOUBLE PRECISION VAL_DTOD
+      DOUBLE PRECISION VAL_RTOD
+      DOUBLE PRECISION VAL_ITOD
+      DOUBLE PRECISION VAL_KTOD
+      DOUBLE PRECISION VAL_WTOD
+      DOUBLE PRECISION VAL_UWTOD
+      DOUBLE PRECISION VAL_BTOD
+      DOUBLE PRECISION VAL_UBTOD
+
+*  Local Variables:
+      <TYPE> INVAL              ! Input array value
+      DOUBLE PRECISION OUTVAL    ! Output value
+      DOUBLE PRECISION VMN       ! Min output value
+      DOUBLE PRECISION VMX       ! Max output value
+      INTEGER I                  ! Counter
+*.
+
+*  Initialise
+      NBAD = 0
+      BADOUT = .FALSE.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check that the supplied scale value is not zero.
+      IF( SCALE .EQ. 0.0D0 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPG1_SCL_ERR1', 'Cannot scale the array '//
+     :                 'values because a scale factor of zero '//
+     :                 'has been provided.', STATUS )
+         GO TO 999
+      END IF
+
+*  Save the max and min data values for the output array data type.
+      VMX = VAL_KTOD( .FALSE., VAL__MAXK, STATUS ) - 1.0D0
+      VMN = VAL_KTOD( .FALSE., VAL__MINK, STATUS ) + 1.0D0
+
+*  First do it if we are checking for bad pixels.
+      IF( BAD ) THEN
+
+*  Loop round all array elements.
+         DO I = 1, EL
+            INVAL = IN( I )
+            IF( INVAL .NE. VAL__BAD<T> ) THEN
+               OUTVAL = ( VAL_<T>TOD( .FALSE., INVAL, STATUS ) -
+     :                    ZERO )/SCALE
+               IF( OUTVAL .GE. VMX .OR. OUTVAL .LE. VMN ) THEN
+                  OUT( I ) = VAL__BADK
+                  NBAD = NBAD + 1
+               ELSE
+                  OUT( I ) = NINT( OUTVAL )
+               END IF
+
+            ELSE
+               OUT( I ) = VAL__BADK
+               BADOUT = .TRUE.
+            END IF
+
+         END DO
+
+*  Now do it if we are not checking for bad pixels.
+      ELSE
+
+         DO I = 1, EL
+            INVAL = IN( I )
+            OUTVAL = ( VAL_<T>TOD( .FALSE., INVAL, STATUS ) -
+     :                 ZERO )/SCALE
+            IF( OUTVAL .GE. VMX .OR. OUTVAL .LE. VMN ) THEN
+               OUT( I ) = VAL__BADK
+               NBAD = NBAD + 1
+            ELSE
+               OUT( I ) = NINT( OUTVAL )
+            END IF
+         END DO
+
+      END IF
+
+      IF( NBAD .GT. 0 ) BADOUT = .TRUE.
+
+ 999  CONTINUE
+
+      END

@@ -54,7 +54,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2009-2011 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -76,6 +76,7 @@
 *  Authors:
 *     DSB: David S Berry (JACH)
 *     MJC: Malcolm J. Currie (MJC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +86,8 @@
 *        Added argument OPER.
 *     9-MAY-2011 (DSB/MJC):
 *        Set mandatory STATUS bad before issuing an ERR_REP.
+*     2012-05-09 (TIMJ):
+*        Add _INT64
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -187,6 +190,11 @@
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
          CALL KPG1_BBOXUW( NDIM, LBND, UBND, %VAL( CNF_PVAL( IPDATA ) ),
      :                    VAL__BADUW, .FALSE., OLBND, OUBND, NGOOD,
+     :                    STATUS )
+
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_BBOXK( NDIM, LBND, UBND, %VAL( CNF_PVAL( IPDATA ) ),
+     :                    VAL__BADK, .FALSE., OLBND, OUBND, NGOOD,
      :                    STATUS )
 
       END IF

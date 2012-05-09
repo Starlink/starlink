@@ -46,6 +46,7 @@
 *     -  This function simply wraps up the generic KPG1_MXMN<T> routines.
 
 *  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -67,11 +68,14 @@
 
 *  Authors:
 *     DSB: David S Berry (JAC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     11-JUL-2006 (DSB):
 *        Original version.
+*     2012-05-09 (TIMJ):
+*        Add _INT64
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,6 +109,7 @@
 *  External References:
       DOUBLE PRECISION VAL_RTOD
       DOUBLE PRECISION VAL_ITOD
+      DOUBLE PRECISION VAL_KTOD
       DOUBLE PRECISION VAL_WTOD
       DOUBLE PRECISION VAL_UWTOD
       DOUBLE PRECISION VAL_BTOD
@@ -140,6 +145,12 @@
      :                    IMX, IMN, MAXPOS, MINPOS, STATUS )
          MAXMUM = VAL_ITOD( .TRUE., IMX, STATUS )
          MINMUM = VAL_ITOD( .TRUE., IMN, STATUS )
+
+      ELSE IF( TYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_MXMNK( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ), NINVAL,
+     :                    IMX, IMN, MAXPOS, MINPOS, STATUS )
+         MAXMUM = VAL_KTOD( .TRUE., IMX, STATUS )
+         MINMUM = VAL_KTOD( .TRUE., IMN, STATUS )
 
       ELSE IF( TYPE .EQ. '_WORD' ) THEN
          CALL KPG1_MXMNW( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ), NINVAL,
