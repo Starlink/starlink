@@ -258,6 +258,8 @@
 #         Updated FTS2PHASECORR, FTS2PHASECORRDS and FTS2SPECTRUM
 #     2012-04-20 (TIMJ):
 #        Remove QLMAKEMAP
+#     2012-05-10 (AGG):
+#         Added STEPTIME to rawfitmeta
 #     {enter_changes_here}
 
 #  Bugs:
@@ -3165,6 +3167,14 @@ package @PACKAGE@ {
                 prompt {Uncompressed timeseries}
                 helpkey *
             }
+
+	    parameter steptime {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+		default 0
+                helpkey *
+	    }
 
         }
 
