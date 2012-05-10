@@ -6,7 +6,8 @@ lib_LTLIBRARIES = libcat.la libcat_adam.la
 
 libcat_la_SOURCES = \
 	$(BLOCK_DATA_FILES) \
-	$(F_ROUTINES)
+	$(F_ROUTINES) \
+	$(GEN_F_ROUTINES)
 
 libcat_la_DEPENDENCIES = \
 	$(PUBLIC_INCLUDES) \
@@ -42,50 +43,91 @@ PRIVATE_INCLUDES = CAT1_NUL CAT1_PAR CAT1_AST_CMN CAT1_ATTRB_CMN \
 
 F_ROUTINES =   cat1_dceqp.f  cat1_tidnt.f  cat5_wrpar.f               \
  ant_cfind.f   cat1_dcitm.f  cat1_tidtp.f  cat5_wrtbl.f  cat_fgt0f.f  \
- ant_err.f     cat1_dcnlt.f  cat1_topen.f  cat6_cknme.f  cat_fgt0t.f  \
+ ant_err.f     cat1_topen.f  cat6_cknme.f  \
  ant_errc.f    cat1_dcnme.f  cat3_close.f  cat6_close.f  cat_getxt.f  \
  ant_errd.f    cat1_dcrcd.f  cat3_cnew.f   cat6_cnew.f   cat_iinq.f  \
  ant_erri.f    cat1_dctyp.f  cat3_fgcvt.f  cat6_coldt.f  cat_inew.f  \
- ant_fgett.f   cat1_ddscr.f  cat3_fincr.f  cat6_crcol.f  cat_pinq.f  \
- ant_s.f       cat1_dfatt.f  cat3_fiot.f   cat6_crpar.f  cat_pnew0.f  \
- ant_sevalt.f  cat1_dmrcd.f  cat3_fiter.f  cat6_ddscr.f  cat_pptat.f  \
- ant_x.f       cat1_dpatt.f  cat3_getxt.f  cat6_dtype.f  cat_pptst.f  \
- cat1_dxfmt.f  cat3_gtcla.f  cat6_eprse.f  cat_put0t.f  \
- cat0_close.f  cat1_ecnlt.f  cat3_gtclb.f  cat6_fincr.f  cat_putxt.f  \
- cat0_cnew.f   cat1_ecscr.f  cat3_gtpar.f  cat6_fiot.f   cat_rapnd.f  \
+ cat1_ddscr.f  cat3_fincr.f  cat6_crcol.f  cat_pinq.f  \
+ ant_s.f       cat1_dfatt.f  cat6_crpar.f  cat_pnew0.f  \
+ ant_sevalt.f  cat1_dmrcd.f  cat3_fiter.f  cat6_ddscr.f \
+ ant_x.f       cat1_dpatt.f  cat3_getxt.f  cat6_dtype.f \
+ cat1_dxfmt.f  cat3_gtcla.f  cat6_eprse.f  \
+ cat0_close.f  cat3_gtclb.f  cat6_fincr.f  cat_putxt.f  \
+ cat0_cnew.f   cat1_ecscr.f  cat3_gtpar.f  cat_rapnd.f  \
  cat0_fincr.f  cat1_edscr.f  cat3_gtxcl.f  cat6_getxt.f  cat_rget.f  \
- cat0_fiot.f   cat1_eqckt.f  cat3_gvalt.f  cat6_gtaet.f  cat_rset.f  \
+ cat1_eqckl.f  cat_rset.f  \
  cat0_getxt.f  cat1_errep.f  cat3_opnex.f  cat6_gtcae.f  cat_rstxt.f  \
  cat0_opnex.f  cat1_errtr.f  cat3_putxt.f  cat6_gtcld.f  cat_selct.f  \
- cat0_putxt.f  cat1_fincr.f  cat3_pvalt.f  cat6_opnex.f  cat_sfndt.f  \
- cat0_rstxt.f  cat1_fiot.f   cat3_rdord.f  cat6_putxt.f  cat_sinq.f  \
- cat1_addat.f  cat1_frear.f  cat3_rstxt.f  cat6_rdrow.f  cat_slist.f  \
- cat1_addcl.f  cat1_fresp.f  cat3_wtord.f  cat6_rdscr.f  cat_srngt.f  \
+ cat0_putxt.f  cat1_fincr.f  cat6_opnex.f  \
+ cat0_rstxt.f  cat3_rdord.f  cat6_putxt.f  cat_sinq.f  \
+ cat1_frear.f  cat3_rstxt.f  cat6_rdrow.f  cat_slist.f  \
+ cat1_addcl.f  cat1_fresp.f  cat3_wtord.f  cat6_rdscr.f  \
  cat1_addpr.f  cat1_getlu.f  cat5_ancdc.f  cat6_rdtbl.f  cat_sztxt.f  \
- cat1_anew.f   cat1_gnsrt.f  cat5_close.f  cat6_rstxt.f  cat_tattt.f  \
+ cat1_anew.f   cat1_gnsrt.f  cat5_close.f  cat6_rstxt.f  \
  cat1_anfmt.f  cat1_gtdat.f  cat5_cnew.f   cat6_spcol.f  cat_tcols.f  \
  cat1_angdc.f  cat1_gtsra.f  cat5_cntrc.f  cat6_split.f  cat_tdetl.f  \
- cat1_anprs.f  cat1_gtsrw.f  cat5_dcang.f  cat6_staet.f  cat_tidnt.f  \
+ cat1_anprs.f  cat1_gtsrw.f  cat5_dcang.f  cat_tidnt.f  \
  cat1_appnd.f  cat1_ioerr.f  cat5_fincr.f  cat6_stcae.f  cat_tidpr.f  \
- cat1_axset.f  cat1_msg.f    cat5_fiot.f   cat6_stnul.f  cat_tidtp.f  \
- cat1_bhopt.f  cat1_nlckt.f  cat5_getxt.f  cat6_wrcol.f  cat_tiqat.f  \
+ cat1_axset.f  cat1_msg.f    cat6_stnul.f  cat_tidtp.f  \
+ cat5_getxt.f  cat6_wrcol.f  \
  cat1_catra.f  cat1_nmchk.f  cat5_glfmt.f  cat6_wrpar.f  cat_tndnt.f  \
- cat1_catrw.f  cat1_nmunq.f  cat5_gtaet.f  cat6_wrtbl.f  cat_topen.f  \
+ cat1_catrw.f  cat1_nmunq.f  cat6_wrtbl.f  cat_topen.f  \
  cat1_cielm.f  cat1_prsvn.f  cat5_gtcae.f  cat_aexst.f   cat_trlse.f  \
- cat1_ckmut.f  cat1_put.f    cat5_gtcld.f  cat_aget.f    cat_trows.f  \
+ cat1_ckmut.f  cat5_gtcld.f  cat_aget.f    cat_trows.f  \
  cat1_cnmpr.f  cat1_qsrtd.f  cat5_gtval.f  cat_aput.f    cat_tuneg.f  \
  cat1_cpyar.f  cat1_rclsp.f  cat5_opnex.f  cat_aset.f    cat_tunes.f  \
  cat1_crcol.f  cat1_rdscr.f  cat5_putxt.f                cat_tyfmt.f  \
  cat1_crpar.f  cat1_rjlst.f  cat5_rdtbl.f  cat_cinq.f    \
  cat1_crtar.f  cat1_rngls.f  cat5_rdtbx.f  cat_cnewa.f   \
  cat1_crtci.f  cat1_selct.f  cat5_rstxt.f  cat_cnews.f   \
- cat1_crtel.f  cat1_snkta.f  cat5_staet.f                \
+ cat1_crtel.f  cat1_snkta.f                \
  cat1_crtid.f  cat1_srcta.f  cat5_stcae.f  cat_egt0f.f   \
- cat1_crtsl.f  cat1_stdir.f  cat5_stnul.f  cat_egt0t.f   \
+ cat1_crtsl.f  cat1_stdir.f  cat5_stnul.f  \
  cat1_cxfmt.f  cat1_tcnvt.f  cat5_wrcol.f  cat_eidnt.f \
  cat1_fioer.f  cat_gcolc.f   cat_gcold.f   cat_gcolr.f
 
 ADAM_F_ROUTINES = cat_assoc.f cat_creat.f cat_exist.f
+
+GEN_F_ROUTINES = $(CAT_GEN_ROUTINES:.gen=.f) \
+$(CAT_GCN_ROUTINES:.gcn=.f) \
+$(CAT_GN_ROUTINES:.gn=.f)
+
+CAT_GEN_ROUTINES = \
+ant_fgetx.gen \
+cat0_fiox.gen \
+cat1_addax.gen \
+cat1_bhopx.gen \
+cat1_dcnlx.gen \
+cat1_ecnlx.gen \
+cat1_fiox.gen \
+cat1_nlckx.gen \
+cat1_putx.gen \
+cat3_fiox.gen \
+cat3_gvalx.gen \
+cat3_pvalx.gen \
+cat5_fiox.gen \
+cat5_gtaex.gen \
+cat5_staex.gen \
+cat6_fiox.gen \
+cat6_gtaex.gen \
+cat6_staex.gen \
+cat_egt0x.gen \
+cat_fgt0x.gen \
+cat_pptax.gen \
+cat_pptsx.gen \
+cat_put0x.gen \
+cat_sfndx.gen \
+cat_srngx.gen \
+cat_tattx.gen \
+cat_tiqax.gen
+
+# Numeric
+CAT_GN_ROUTINES = \
+ant_sevalx.gn
+
+# All except LOGICAL
+CAT_GCN_ROUTINES = \
+cat1_eqckx.gcn
 
 BLOCK_DATA_FILES = ant_block.f attrbb.f catsb.f ctrlb.f idsb.f
 
@@ -157,3 +199,14 @@ EXTRA_DIST = $(PRIVATE_INCLUDES) CAT1_NUL.F
 
 dist_starnews_DATA = cat.news
 dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)
+
+
+# CAT has not (historically) generated unsigned int variants
+.gen.f:
+	$(FGENERIC) -t bcdilrw -c CAT__SZVAL $<
+
+.gn.f:
+	$(FGENERIC) -t bdirw $<
+
+.gcn.f:
+	$(FGENERIC) -t bcdirw $<

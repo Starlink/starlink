@@ -1,0 +1,406 @@
+      SUBROUTINE CAT1_BHOP<T> (CI, FI, ROWS, ORDER, XVAL<T>, L, STATUS)
+*+
+*  Name:
+*     CAT1_BHOP<T>
+*  Purpose:
+*     Locate row number corresponding to a value by binary chop.
+*  Language:
+*     Fortran 77.
+*  Invocation:
+*     CALL CAT1_BHOP<T> (CI, FI, ROWS, ORDER, XVAL<T>; L; STATUS)
+*  Description:
+*     Perform a binary chop to locate the row in a catalogue for
+*     which the field of a column corresponds to a given value.  The
+*     column must be sorted into ascending or descending order.  The
+*     corresponding row, L, of column X is defined such that:
+*
+*     For an ascending column:   X[L]   .GE. XVAL<T>  and
+*                                X[L-1] .LT. XVAL<T>
+*
+*     For a descending column:   X[L]   .LE. XVAL<T>  and
+*                                X[L-1] .GT. XVAL<T>
+*
+*     where XVAL is the given (target) value.
+*
+*     For a column in ascending order:
+*       if the target value is .LE. the first row then a row number
+*       of zero is returned,
+*
+*       if the target value is .GT. than the last row then a row
+*       number of the number of rows + 1 is returned.
+*
+*     Note that the routine only works for numeric columns and values.
+*     For CHARACTER and LOGICAL columns and values it will compile but
+*     usually will not produce sensible results.
+*  Arguments:
+*     CI  =  INTEGER (Given)
+*        Catalogue identifier.
+*     FI  =  INTEGER (Given)
+*        Column identifier.
+*     ROWS  =  INTEGER (Given)
+*        Number of rows in the catalogue.
+*     ORDER  =  INTEGER (Given)
+*        Flag indicating the ordering of the column.  It must adopt
+*        either of the following two values:
+*        CAT__ASCND   -  for an ascending column,
+*        CAT__DSCND   -  for an descending column.
+*        All other values will cause the routine to exit with an error.
+*     XVAL<T>  =  <TYPE> (Given)
+*        Target value for which the corresponding row is to be located.
+*     L  =  INTEGER (Returned)
+*        Row number corresponding to XVAL.  See the comments above for
+*        the value returned if the target value is outside the range
+*        of the column.
+*     STATUS  =  INTEGER (Given and Returned)
+*        The global status.
+*  Algorithm:
+*     Convert the value to DOUBLE PRECISION.
+*     If the column is in ascending order then
+*       If the first element is .LT. the target value then
+*         If the last element is .GE. the target value then
+*           (the target value lies in the range of the column)
+*           Set the current row to (number of rows / 2).
+*           Set the jump (to the next row) to the number of rows.
+*           Do while (row corresponding to target no found)
+*             If the current row corresponds to the target then
+*               Set the termination flag.
+*               Set the returned row number.
+*             else
+*               Compute the new jump (half the existing jump).
+*               Force the jump to be at least one.
+*               If the current row .GE. the target value then
+*                 new row = current row - jump
+*               else
+*                 new row = current row + jump
+*               end if
+*             end if
+*           end do
+*         else (last element .LT. target)
+*           Set the returned row number to number of rows + 1.
+*         end if
+*       else (first element .GE. than target) then
+*         Set the returned row number to 0.
+*       end if
+*     else if the column is in descending order then
+*       .
+*       . As for an ascending column, but with the tests for
+*       . inqualities reversed.
+*       .
+*     else (the column order is invalid).
+*       Set the returned row to 0.
+*       Set the error status.
+*       Report an error.
+*     end if
+*  Implementation Deficiencies:
+*     Does not handle null values.
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     15/8/94  (ACD): Original version.
+*     8/9/94   (ACD): First stable version.
+*     13/12/96 (ACD): Removed non-standard use of the relational
+*       operators in the LOGICAL instantiation of the routine (which
+*       had been revealed by the port to Linux).
+*     26/5/97  (ACD): Fixed a bug which could cause the routine to loop
+*       indefinitely if the target value lay between the first and
+*       second rows.
+*  Bugs:
+*     None known
+*-
+*  Type Definitions:
+      IMPLICIT NONE
+*  Global Constants:
+      INCLUDE 'CAT_PAR'           ! External CAT constants.
+      INCLUDE 'CAT_ERR'           ! CAT error codes.
+*  Arguments Given:
+      INTEGER
+     :  CI,
+     :  FI,
+     :  ROWS,
+     :  ORDER
+
+*
+*   Note that in the instantiation of the routine for a given data type
+*   only one of the following variables is an argument and all the
+*   others are local variables.
+
+      BYTE             XVALUB
+      BYTE             XVALB
+      INTEGER*2        XVALUW
+      INTEGER*2        XVALW
+      INTEGER          XVALI
+      REAL             XVALR
+      DOUBLE PRECISION XVALD
+      LOGICAL          XVALL
+      CHARACTER        XVALC*(CAT__SZVAL)
+*  Arguments Returned:
+      INTEGER
+     :  L
+*  Status:
+      INTEGER STATUS             ! Global status
+*  Local Variables:
+      LOGICAL
+     :  FOUND,      ! Flag; found the row corresponding to the target?
+     :  NULFLG      ! Null value flag for the current row.
+      INTEGER
+     :  CURROW,     ! Current row number.
+     :  PRVROW,     ! Previous row number.
+     :  JUMP,       ! Number of rows to jump.
+     :  ERRPOS      ! Current position in ERRTXT (excl. trail. blanks).
+      CHARACTER
+     :  ERRTXT*75   ! Error message.
+      DOUBLE PRECISION
+     :  DXVAL,      ! DOUBLE PRECISION copy of the target value, VAL<T>.
+     :  XCUR,       ! Value read for the current row.
+     :  XPREV       ! Value read for the previous row.
+
+*
+*    Dummy variables for arguments to the type conversion routine.
+
+      BYTE             DUMUB
+      BYTE             DUMB
+      INTEGER*2        DUMUW
+      INTEGER*2        DUMW
+      INTEGER          DUMI
+      REAL             DUMR
+      LOGICAL          DUML
+      CHARACTER        DUMC*(CAT__SZVAL)
+
+      LOGICAL
+     :  CONVOK      ! Flag; did value convert to DOUBLE PRECISION ok?
+*.
+
+      IF (STATUS .EQ. CAT__OK) THEN
+
+*
+*       Convert the value to DOUBLE PRECISION.
+
+         CALL CAT1_TCNVT (CAT__TYPE<T>, XVALUB, XVALB, XVALUW, XVALW,
+     :     XVALI, XVALR, XVALD, XVALL, XVALC,   CAT__TYPED, DUMUB,
+     :     DUMB, DUMUW, DUMW, DUMI, DUMR, DXVAL, DUML, DUMC,  CONVOK,
+     :     STATUS)
+
+*
+*       Check for an ascending column.
+
+         IF (ORDER .EQ. CAT__ASCND) THEN
+
+*
+*          Check that the target value lies in the range of the column.
+
+            CALL CAT_RGET (CI, 1, STATUS)
+            CALL CAT_EGT0D (FI, XCUR, NULFLG, STATUS)
+
+            IF (XCUR .LT. DXVAL) THEN
+               CALL CAT_RGET (CI, ROWS, STATUS)
+               CALL CAT_EGT0D (FI, XCUR, NULFLG, STATUS)
+
+               IF (XCUR .GE. DXVAL) THEN
+
+*
+*                The target value does lie within the range of the
+*                column.  Initialise for the binary chop.  Note that the
+*                minimum permitted row is two because the previous row
+*                must also be read.
+
+                  CURROW = ROWS / 2
+                  CURROW = MAX(CURROW, 2)
+                  JUMP = ROWS
+                  FOUND = .FALSE.
+
+*
+*                Perform a binary chop until the required row is found.
+
+                  DO WHILE (.NOT. FOUND)
+
+*
+*                   Get values for the current and previous rows.
+
+                     CALL CAT_RGET (CI, CURROW, STATUS)
+                     CALL CAT_EGT0D (FI, XCUR, NULFLG, STATUS)
+
+                     PRVROW = CURROW - 1
+
+                     CALL CAT_RGET (CI, PRVROW, STATUS)
+                     CALL CAT_EGT0D (FI, XPREV, NULFLG, STATUS)
+
+*
+*                   Check whether the required row has been found.
+
+                     IF (XCUR .GE. DXVAL  .AND.  XPREV .LT. DXVAL) THEN
+                        FOUND = .TRUE.
+                        L = CURROW
+
+                     ELSE
+
+*
+*                      The required row has not been found.  Jump to
+*                      to the next row to be tested.  Note that the
+*                      jump is forced to be at least one row.
+
+                        JUMP = JUMP / 2
+                        JUMP = MAX(JUMP, 1)
+
+                        IF (XCUR .GE. DXVAL) THEN
+                           CURROW = CURROW - JUMP
+                        ELSE
+                           CURROW = CURROW + JUMP
+                        END IF
+
+*
+*                      Force the new row number to be in the range of
+*                      the catalogue.  Note that the minimum permitted
+*                      row is two because the previous row must also be
+*                      read.
+
+                        CURROW = MAX(CURROW, 2)
+                        CURROW = MIN(CURROW, ROWS)
+                     END IF
+                  END DO
+               ELSE
+
+*
+*                The value is beyond the last row of the catalogue.
+
+                  L = ROWS + 1
+               END IF
+            ELSE
+
+*
+*             The value is before the first row of the catalogue.
+
+               L = 0
+            END IF
+
+*
+*       Check for a descending column.
+
+         ELSE IF (ORDER .EQ. CAT__DSCND) THEN
+
+
+*
+*          Check that the target value lies in the range of the column.
+
+            CALL CAT_RGET (CI, 1, STATUS)
+            CALL CAT_EGT0D (FI, XCUR, NULFLG, STATUS)
+
+            IF (XCUR .GT. DXVAL) THEN
+               CALL CAT_RGET (CI, ROWS, STATUS)
+               CALL CAT_EGT0D (FI, XCUR, NULFLG, STATUS)
+
+               IF (XCUR .LE. DXVAL) THEN
+
+*
+*                The target value does lie within the range of the
+*                column.  Initialise for the binary chop.  Note that the
+*                minimum permitted row is two because the previous row
+*                must also be read.
+
+                  CURROW = ROWS / 2
+                  CURROW = MAX(CURROW, 2)
+                  JUMP = ROWS
+                  FOUND = .FALSE.
+
+*
+*                Perform a binary chop until the required row is found.
+
+                  DO WHILE (.NOT. FOUND)
+
+*
+*                   Get values for the current and previous rows.
+
+                     CALL CAT_RGET (CI, CURROW, STATUS)
+                     CALL CAT_EGT0D (FI, XCUR, NULFLG, STATUS)
+
+                     PRVROW = CURROW - 1
+
+                     CALL CAT_RGET (CI, PRVROW, STATUS)
+                     CALL CAT_EGT0D (FI, XPREV, NULFLG, STATUS)
+
+*
+*                   Check whether the required row has been found.
+
+                     IF (XCUR .LE. DXVAL  .AND.  XPREV .GT. DXVAL) THEN
+                        FOUND = .TRUE.
+                        L = CURROW
+
+                     ELSE
+
+*
+*                      The required row has not been found.  Jump to
+*                      to the next row to be tested.  Note that the
+*                      jump is forced to be at least one row.
+
+                        JUMP = JUMP / 2
+                        JUMP = MAX(JUMP, 1)
+
+                        IF (XCUR .LE. DXVAL) THEN
+                           CURROW = CURROW - JUMP
+                        ELSE
+                           CURROW = CURROW + JUMP
+                        END IF
+
+*
+*                      Force the new row number to be in the range of
+*                      the catalogue.  Note that the minimum permitted
+*                      row is two because the previous row must also be
+*                      read.
+
+                        CURROW = MAX(CURROW, 2)
+                        CURROW = MIN(CURROW, ROWS)
+                     END IF
+                  END DO
+               ELSE
+
+*
+*                The value is beyond the last row of the catalogue.
+
+                  L = ROWS + 1
+               END IF
+            ELSE
+
+*
+*             The value is before the first row of the catalogue.
+
+               L = 0
+            END IF
+
+         ELSE
+
+*
+*          The column is neither ascending nor descending.  Set the
+*          return value, set the error status and report an error.
+
+            L = 0
+            STATUS = CAT__INVSR
+
+            CALL CHR_PUTC ('Column has an illegal order for a binary '/
+     :        /'chop (code: ', ERRTXT, ERRPOS)
+            CALL CHR_PUTI (ORDER, ERRTXT, ERRPOS)
+            CALL CHR_PUTC (').', ERRTXT, ERRPOS)
+
+            CALL CAT1_ERREP ('CAT1_CHOP<T>_ERR', ERRTXT(1 : ERRPOS),
+     :        STATUS)
+         END IF
+
+      END IF
+
+      END

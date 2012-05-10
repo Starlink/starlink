@@ -1,7 +1,8 @@
-
+      SUBROUTINE CAT0_FIO<T> (BCKTYP, IOFLG, CIELM, FI, ELEM, ROWNO,
+     :  VALUE, NULFLG, STATUS)
 *+
 *  Name:
-*    ant_sevalt
+*    CAT0_FIO<t>
 
 *  Copyright:
 *    Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -24,36 +25,24 @@
 *    02110-1301, USA
 
 *-
-*
-
-*    Numeric types are in ant_sevalx.gn
-
-*
-*    Logical version.
-
-      SUBROUTINE ANT_SEVALL (XID, NROW, NULFLG, VALUE, STATUS)
       IMPLICIT NONE
+      LOGICAL IOFLG, NULFLG
+      INTEGER BCKTYP, CIELM, FI, ELEM, ROWNO, STATUS
+      <TYPE> VALUE
+      INCLUDE 'CAT_PAR'
+      INCLUDE 'CAT1_PAR'
 
-      INTEGER XID, NROW
-      LOGICAL NULFLG
-      LOGICAL VALUE
-      INTEGER STATUS
+      IF (STATUS .NE. CAT__OK) RETURN
 
-      CALL ANT_XEVALL (XID, NROW, NULFLG, VALUE, STATUS)
-
-      END
-
-*
-*    Character version.
-
-      SUBROUTINE ANT_SEVALC (XID, NROW, NULFLG, VALUE, STATUS)
-      IMPLICIT NONE
-
-      INTEGER XID, NROW
-      LOGICAL NULFLG
-      CHARACTER VALUE*(*)
-      INTEGER STATUS
-
-      CALL ANT_XEVALC (XID, NROW, NULFLG, VALUE, STATUS)
+      IF (BCKTYP .EQ. CAT1__BKFIT) THEN
+         CALL CAT3_FIO<T> (IOFLG, CIELM, FI, ELEM, ROWNO,
+     :     VALUE, NULFLG, STATUS)
+      ELSE IF (BCKTYP .EQ. CAT1__BKSTL) THEN
+         CALL CAT5_FIO<T> (IOFLG, CIELM, FI, ELEM, ROWNO,
+     :     VALUE, NULFLG, STATUS)
+      ELSE IF (BCKTYP .EQ. CAT1__BKTST) THEN
+         CALL CAT6_FIO<T> (IOFLG, CIELM, FI, ELEM, ROWNO,
+     :     VALUE, NULFLG, STATUS)
+      END IF
 
       END

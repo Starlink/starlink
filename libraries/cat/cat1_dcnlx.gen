@@ -1,0 +1,79 @@
+      SUBROUTINE CAT1_DCNL<T> (NULCHR, NULVAL, STATUS)
+*+
+*  Name:
+*     CAT1_DCNL<T>
+*  Purpose:
+*     Decode a null value from a character string.
+*  Language:
+*     Fortran 77.
+*  Invocation:
+*     CALL CAT1_DCNL<T> NULCHR; (NULVAL; STATUS)
+*  Description:
+*     Decode a null value from a character string.
+*  Arguments:
+*     NULCHR  =  CHARACTER*(*) (Given)
+*        Character string from which the null value is to be
+*        decoded.
+*     NULVAL  =  <TYPE> (Returned)
+*        Null value decoded from the string.
+*     STATUS  =  INTEGER (Given and Returned)
+*        The global status.
+*  Algorithm:
+*     Equivalence a local character string with a local buffer of the
+*     same type as the output value.
+*     Copy the input character string to the local string.
+*     Copy the local buffer to the return null value.
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     27/1/94 (ACD): Original version.
+*  Bugs:
+*     None known
+*-
+*  Type Definitions:
+      IMPLICIT NONE
+*  Global Constants:
+      INCLUDE 'CAT_PAR'           ! External CAT constants.
+*  Arguments Given:
+      <TYPE>
+     :  NULVAL
+*  Arguments Returned:
+      CHARACTER
+     :  NULCHR*(*)
+*  Status:
+      INTEGER STATUS         ! Global status
+*  Local Variables:
+      <LTYPE>
+     :  LVAL     ! Local buffer of same data type as input null value.
+      CHARACTER
+     :  BUFFER*(CAT__SZVAL)  ! Local character buffer.
+
+      EQUIVALENCE (LVAL, BUFFER)
+*.
+
+      IF (STATUS .EQ. CAT__OK) THEN
+
+         BUFFER = NULCHR
+         NULVAL = LVAL
+
+      END IF
+
+      END

@@ -1,7 +1,7 @@
-
+      SUBROUTINE ANT_SEVAL<T> (XID, NROW, NULFLG, VALUE, STATUS)
 *+
 *  Name:
-*    ant_sevalt
+*    ANT_SEVAL<T>
 
 *  Copyright:
 *    Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -25,35 +25,45 @@
 
 *-
 *
+*    Byte version.
 
-*    Numeric types are in ant_sevalx.gn
 
-*
-*    Logical version.
-
-      SUBROUTINE ANT_SEVALL (XID, NROW, NULFLG, VALUE, STATUS)
       IMPLICIT NONE
 
       INTEGER XID, NROW
       LOGICAL NULFLG
-      LOGICAL VALUE
+      <TYPE> VALUE
       INTEGER STATUS
 
-      CALL ANT_XEVALL (XID, NROW, NULFLG, VALUE, STATUS)
+      BYTE      VALUEV, BUFFV
+      BYTE      VALUEB, BUFFB
+      INTEGER*2 VALUEU, BUFFU
+      INTEGER*2 VALUEW, BUFFW
+      INTEGER   VALUEI, BUFFI
+      REAL      VALUER, BUFFR
+      DOUBLE PRECISION VALUED, BUFFD
+      LOGICAL   VALUEL, BUFFL
+      CHARACTER VALUEC*100, BUFFC*100
+      LOGICAL CONVOK
+
+      INCLUDE 'CAT_PAR'
+
+      CALL ANT_XEVALD (XID, NROW, NULFLG, BUFFD, STATUS)
+
+      IF ('<HTYPE>' .EQ. '_DOUBLE' ) THEN
+
+         VALUED = BUFFD
+
+      ELSE
+
+         CALL CAT1_TCNVT (CAT__TYPED, BUFFV, BUFFB, BUFFU, BUFFW,
+     :        BUFFI, BUFFR, BUFFD, BUFFL, BUFFC, CAT__TYPE<T>,
+     :        VALUEV, VALUEB, VALUEU, VALUEW, VALUEI, VALUER, VALUED,
+     :        VALUEL, VALUEC, CONVOK, STATUS)
+
+      END IF
+
+      VALUE = VALUE<T>
 
       END
 
-*
-*    Character version.
-
-      SUBROUTINE ANT_SEVALC (XID, NROW, NULFLG, VALUE, STATUS)
-      IMPLICIT NONE
-
-      INTEGER XID, NROW
-      LOGICAL NULFLG
-      CHARACTER VALUE*(*)
-      INTEGER STATUS
-
-      CALL ANT_XEVALC (XID, NROW, NULFLG, VALUE, STATUS)
-
-      END

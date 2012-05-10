@@ -848,6 +848,35 @@ libraries/ast/sun211.tex
 libraries/ast/version.h
 
 libraries/cat/CAT1_NUL
+libraries/cat/ant_fgetx.f
+libraries/cat/ant_sevalx.f
+libraries/cat/cat0_fiox.f
+libraries/cat/cat1_addax.f
+libraries/cat/cat1_bhopx.f
+libraries/cat/cat1_dcnlx.f
+libraries/cat/cat1_ecnlx.f
+libraries/cat/cat1_eqckx.f
+libraries/cat/cat1_fiox.f
+libraries/cat/cat1_nlckx.f
+libraries/cat/cat1_putx.f
+libraries/cat/cat3_fiox.f
+libraries/cat/cat3_gvalx.f
+libraries/cat/cat3_pvalx.f
+libraries/cat/cat5_fiox.f
+libraries/cat/cat5_gtaex.f
+libraries/cat/cat5_staex.f
+libraries/cat/cat6_fiox.f
+libraries/cat/cat6_gtaex.f
+libraries/cat/cat6_staex.f
+libraries/cat/cat_egt0x.f
+libraries/cat/cat_fgt0x.f
+libraries/cat/cat_pptax.f
+libraries/cat/cat_pptsx.f
+libraries/cat/cat_put0x.f
+libraries/cat/cat_sfndx.f
+libraries/cat/cat_srngx.f
+libraries/cat/cat_tattx.f
+libraries/cat/cat_tiqax.f
 
 libraries/cnf/CNF_PAR
 libraries/cnf/CNF_PAR.processed

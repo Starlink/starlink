@@ -1,0 +1,225 @@
+      SUBROUTINE CAT1_NLCK<T> (FI, INVAL, NULFLG, OUTVAL, STATUS)
+*+
+*  Name:
+*     CAT1_NLCK<T>
+*  Purpose:
+*     Check whether a field value is null or not.
+*  Language:
+*     Fortran 77.
+*  Invocation:
+*     CALL CAT1_NLCK<T> (FI, INVAL; NULFLG, OUTVAL; STATUS)
+*  Description:
+*     Check whether a field value is null or not.  The check is made by
+*     comparing the value for the field against the null value (if any)
+*     for the column.  If they are equal then then the field value is
+*     null.
+*
+*     A logical flag is returned indicating whether the value is null
+*     or not.
+*
+*     The behaviour of this routine conforms to the prescription for
+*     handling null values given in document StarBase/ACD/3.4.  See
+*     this document for the rationale behind this behaviour.  Also
+*     see the document for an explanation of the CAT technical
+*     terms used in the comments for this routine, for example
+*     'exception value' and 'locum'.
+*  Arguments:
+*     FI  =  INTEGER (Given)
+*        Column identifier for the column from which the field value
+*        was extracted.
+*     INVAL  =  <TYPE> (Given)
+*        Field value which is to be checked to determine whether it is
+*        null or not.
+*     NULFLG  =  LOGICAL (Returned)
+*        Flag indicating whether or not the field value is null.  It is
+*        coded as follows:
+*        .TRUE.  -  the value is null.
+*        .FALSE. -  the value is not null; a genuine datum is available.
+*     OUTVAL  =  <TYPE> (Returned)
+*        The output value.  If INVAL is a genuine datum then OUTVAL is a
+*        copy of it.  If INVAL is null then OUTVAL contains the
+*        StarBase null value of the appropriate data type.  Note that
+*        in this case OUTVAL *always* contains the appropriate StarBase
+*        null value, *not* any null value which may have been specified
+*        for the column.
+*     STATUS  =  INTEGER (Given and Returned)
+*        The global status.
+*  Algorithm:
+*     Determine the type of exception value supprted by the column.
+*     If the column supports default null values then
+*       If the null value is equal to the actual field value then
+*         Set the null flag to true.
+*         Set the return value to the appropriate StarBase null.
+*       else (not null)
+*         Set the null flag to false.
+*         Set the return value to the given field value.
+*       end if
+*     else if the column supports explicit null values then
+*       Obtain the null value for the column.
+*       If the explicit null value is equal to the actual field value
+*       then
+*         Set the null flag to true.
+*         Set the return value to the appropriate StarBase null.
+*       else (not null)
+*         Set the null flag to false.
+*         Set the return value to the given field value.
+*       end if
+*     else if the column supports locum values (and hence the value
+*     cannot be null)
+*       Set the null flag to false.
+*       Set the return value to the given field value.
+*     else (invalid internal code for the type of exception value)
+*       Set the null flag to true.
+*       Set the return value to the appropriate StarBase null.
+*       Set the status.
+*       Report an error.
+*     end if
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     27/1/94  (ACD): Original version.
+*     13/12/96 (ACD): Removed non-standard use of the relational
+*       operators in the LOGICAL instantiation of the routine (which
+*       had been revealed by the port to Linux).
+*  Bugs:
+*     None known
+*-
+*  Type Definitions:
+      IMPLICIT NONE
+*  Global Constants:
+      INCLUDE 'CAT_PAR'           ! External CAT constants.
+      INCLUDE 'CAT1_PAR'          ! Internal CAT constants.
+      INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CAT1_NUL'          ! CAT null values.
+*  Arguments Given:
+      INTEGER
+     :  FI
+      <TYPE>
+     :  INVAL
+*  Arguments Returned:
+      LOGICAL
+     :  NULFLG
+      <TYPE>
+     :  OUTVAL
+*  Status:
+      INTEGER STATUS             ! Global status
+*  Local Variables:
+      INTEGER
+     :  NULTYP,    ! Type of null: default, explicit or locum.
+     :  ERRLEN     ! Length of ERRMSG (excl. trail. blanks).
+      <LTYPE>
+     :  SNULL      ! Exception value for the column.
+      CHARACTER
+     :  ERRMSG*75, ! Error message.
+     :  EXCEPT*(CAT__SZVAL) ! Exception value for column, coded as char.
+      LOGICAL
+     :  EQUAL      ! Flag; are value and null value equal?
+*.
+
+      IF (STATUS .EQ. CAT__OK) THEN
+
+*
+*       Determine the type of exception value supported by the column.
+
+         CALL CAT_TIQAI (FI, 'NULL', NULTYP, STATUS)
+
+*
+*       Check for the various types of exception values.
+*
+*       First, standard, Starbase null values.
+
+         IF (NULTYP .EQ. CAT__NULLD) THEN
+
+*
+*          Check whether the field value is null and set the return
+*          values accordingly.
+
+            CALL CAT1_EQCK<T> (INVAL, CAT1__DNUL<T>, EQUAL, STATUS)
+            IF (EQUAL) THEN
+               NULFLG = .TRUE.
+               OUTVAL = CAT1__DNUL<T>
+
+            ELSE
+               NULFLG = .FALSE.
+               OUTVAL = INVAL
+
+            END IF
+
+*
+*       Second, a null value has been explictly specified for the
+*       column.
+
+         ELSE IF (NULTYP .EQ. CAT__NULLS) THEN
+
+*
+*          Obtain the null value for the column.
+
+            CALL CAT_TIQAC (FI, 'EXCEPT', EXCEPT, STATUS)
+            CALL CAT1_DCNL<T> (EXCEPT, SNULL, STATUS)
+
+*
+*          Check whether the field value is null and set the return
+*          values accordingly.
+
+            CALL CAT1_EQCK<T> (INVAL, SNULL, EQUAL, STATUS)
+            IF (EQUAL) THEN
+               NULFLG = .TRUE.
+               OUTVAL = CAT1__DNUL<T>
+
+            ELSE
+               NULFLG = .FALSE.
+               OUTVAL = INVAL
+
+            END IF
+
+*
+*       Third, a locum value has been specified for the column; it
+*       cannot be checked for null values and all values are assumed
+*       genuine.
+
+         ELSE IF (NULTYP .EQ. CAT__LOCUM) THEN
+            NULFLG = .FALSE.
+            OUTVAL = INVAL
+
+*
+*       NULTYP has adopted an illegal value.  Set the return arguments,
+*       Set the status and report an error.
+
+         ELSE
+            NULFLG = .TRUE.
+            OUTVAL = CAT1__DNUL<T>
+
+            STATUS = CAT__INVNL
+
+            ERRLEN = 0
+            ERRMSG = ' '
+
+            CALL CHR_PUTC ('Invalid code for type of null: ',
+     :        ERRMSG, ERRLEN)
+            CALL CHR_PUTI (NULTYP, ERRMSG, ERRLEN)
+
+            CALL CAT1_ERREP ('CAT1_NLCK<T>_INL', ERRMSG(1 : ERRLEN),
+     :        STATUS)
+         END IF
+
+      END IF
+
+      END
