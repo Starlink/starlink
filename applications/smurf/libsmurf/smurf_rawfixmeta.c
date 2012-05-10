@@ -36,17 +36,24 @@
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
+*     STEPTIME = _DOUBLE (Write)
+*          Average steptime for the given file in seconds. Only
+*          written if a single file is given.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2009-05-18 (TIMJ):
 *        Original version
+*     2012-05-10 (AGG):
+*        Write steptime into ADAM parameter
 
 *  Copyright:
 *     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2012 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -78,6 +85,8 @@
 #include "star/kaplibs.h"
 #include "sae_par.h"
 #include "mers.h"
+#include "par.h"
+#include "ast.h"
 
 #include "smurf_par.h"
 #include "libsmf/smf.h"
@@ -116,6 +125,12 @@ void smurf_rawfixmeta( int * status ) {
        loops.
      */
 
+    /* If given only a single file, write out the STEPTIME */
+    if (size == 1) {
+      double steptime;
+      astGetFitsF(data->hdr->fitshdr, "STEPTIME", &steptime);
+      parPut0d("STEPTIME", steptime, status);
+    }
 
     smf_close_file( &data, status );
   }
