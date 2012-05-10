@@ -90,13 +90,13 @@ pda_assst.f pda_lmerr.f
 
 C_ROUTINES = pda.c pdaD1mach.c
 
-GEN_F_ROUTINES = $(PDA_BDIRW_GEN:.gbdirw=.f)
+GEN_F_ROUTINES = $(PDA_BDIKRW_GEN:.gbdikrw=.f)
 
 # Need to make sure that a maintainer clean really removes the
 # output of generic
 MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 
-PDA_BDIRW_GEN = pda_qsia.gbdirw pda_qsid.gbdirw
+PDA_BDIKRW_GEN = pda_qsia.gbdikrw pda_qsid.gbdikrw
 
 PUBLIC_F_INCLUDES =
 PUBLIC_C_INCLUDES = pda.h
@@ -104,7 +104,7 @@ PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 
 BUILT_SOURCES = $(include_MESSAGES)
 
-.gbdirw.f:
+.gbdikrw.f:
 	$(FGENERIC) $(<)
 
 # Testing

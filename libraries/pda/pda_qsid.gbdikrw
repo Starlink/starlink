@@ -30,9 +30,9 @@
 
 *  Notes:
 *     -  There is a routine for all numeric data types except unsigned
-*     byte and word: replace "x" in the routine name by D, R, I, W, or B
-*     as appropriate.  The data type of the X argument must match the 
-*     particular routine used.
+*     byte and word: replace "x" in the routine name by D, R, I, K, W,
+*     or B as appropriate.  The data type of the X argument must match
+*     the particular routine used.
   
 *  References:
 *     -  Sedgwick, R., 1988, "Algorithms" (Addison-Wesley).
@@ -44,7 +44,7 @@
 *  Copyright:
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Authors:
@@ -72,6 +72,8 @@
 *        Now returns the index of the first 1..N elements of X.
 *     2009 August 21 (MJC):
 *        Made generic.
+*     2012 May 9 (MJC):
+*        Document 64-bit integer support.
 *     {enter_further_changes_here}
 
 *-
