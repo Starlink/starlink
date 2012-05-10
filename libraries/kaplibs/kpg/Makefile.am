@@ -54,7 +54,7 @@ ADAM_GRAPHIC_F_ROUTINES = $(KPG_GRAPHIC_ADAM_NONGEN)
 
 GEN_F_ROUTINES = $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
         $(KPG_DIK_GEN:.gdik=.f) \
-        $(KPG_DIKR_GEN:.gdikr=.f) $(KPG_NXD_GEN:.gnxd=.f) \
+        $(KPG_DIKR_GEN:.gdikr=.f) $(KPG_NXDK_GEN:.gnxdk=.f) \
 	$(KPG_BDIKRW_GEN:.gbdikrw=.f) $(KPG_NXB_GEN:.gnxb=.f) \
 	$(KPG_XC_GEN:.gxc=.f) $(KPG_XL_GEN:.gxl=.f) \
 	$(KPG_BIRW_GEN:.gbirw=.f) $(KPG_IR_GEN:.gir=.f)
@@ -71,7 +71,9 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES) $(ADAM_GEN_F_ROUTINES)
 # Numeric types except Double precision
 # Note that in this case the suffix is strange since a case insensitive
 # filename can not distinguish b and B or w and W
-KPG_NXD_GEN = kpg1_cmul.gnxd
+KPG_NXDK_GEN = kpg1_cmul.gnxdk
+
+KPG_NDK_GEN = kpg1_cmul.gdk
 
 # All numeric types
 KPG_N_GEN =  kpg1_bl1d.gn kpg1_bor2.gn kpg1_cadd.gn \
@@ -170,6 +172,7 @@ kpg1_bilnr.f \
 kpg1_ceil.f \
 kpg1_cget.f \
 kpg1_cmuld.f \
+kpg1_cmulk.f \
 kpg1_cnlim.f \
 kpg1_colnm.f \
 kpg1_copy.f \
@@ -406,10 +409,10 @@ kpg1_pltln.f
 	$(FGENERIC)  -t bcdikrwWB $(<:.gxl=.gen)
 	rm $(<:.gxl=.gen)
 
-.gnxd.f:
-	cp $< $(<:.gnxd=.gen)
-	$(FGENERIC)  -t bBikrwW $(<:.gnxd=.gen)
-	rm $(<:.gnxd=.gen)
+.gnxdk.f:
+	cp $< $(<:.gnxdk=.gen)
+	$(FGENERIC)  -t bBirwW $(<:.gnxdk=.gen)
+	rm $(<:.gnxdk=.gen)
 
 .gnxb.f:
 	cp $< $(<:.gnxb=.gen)

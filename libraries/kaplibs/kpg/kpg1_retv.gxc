@@ -32,8 +32,8 @@
 
 *  Implementation Status:
 *     -  There is a routine for each of the numerics data types and
-*     logical: replace "x" in the routine name by D, R, I, W, UW, B,
-*     UB, L as appropriate.  The array supplied to the routine must
+*     logical: replace "x" in the routine name by D, R, I, K, W, UW,
+*     B, UB, L as appropriate.  The array supplied to the routine must
 *     have the data type specified.
 *     -  Bad status is returned if the supplied indices lie beyond
 *    the array bounds.
