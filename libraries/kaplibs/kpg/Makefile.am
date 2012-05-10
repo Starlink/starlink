@@ -176,7 +176,7 @@ kpg1_copy.f \
 kpg1_copyc.f \
 kpg1_cpsty.f \
 kpg1_ctcpc.f \
-kpg1_ctcpkm.f \
+kpg1_ctckm.f \
 kpg1_cshft.f \
 kpg1_danot.f \
 kpg1_datcp.f \
