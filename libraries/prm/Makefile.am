@@ -52,8 +52,7 @@ val_signi.f val_signr.f val_signub.f val_signuw.f val_signw.f \
 val_sind.f val_sindd.f val_sindr.f val_sinhd.f val_sinhr.f val_sinr.f \
 val_tand.f val_tandd.f val_tandr.f \
 val_tanhd.f val_tanhr.f val_tanr.f \
-vec_absb.f vec_absd.f vec_absi.f vec_absr.f \
-vec_absub.f vec_absuw.f vec_absw.f vec_acosd.f vec_acosr.f vec_acsdd.f \
+vec_acosd.f vec_acosr.f vec_acsdd.f \
 vec_acsdr.f vec_asind.f vec_asinr.f vec_asndd.f vec_asndr.f \
 vec_at2dd.f vec_at2dr.f vec_atand.f vec_atanr.f vec_atn2d.f vec_atn2r.f \
 vec_atndd.f vec_atndr.f vec_cosd.f vec_cosdd.f vec_cosdr.f \
@@ -78,7 +77,7 @@ val_addx.gn val_dimx.gn val_divx.gn val_expx.gn  \
 val_idvx.gn val_intx.gn val_lg10x.gn val_logx.gn val_maxx.gn \
 val_minx.gn val_modx.gn val_mulx.gn val_nintx.gn val_pwrx.gn \
 val_sqrtx.gn val_subx.gn val_xtox.gn \
-vec_addx.gn vec_dimx.gn vec_divx.gn \
+vec_absx.gn vec_addx.gn vec_dimx.gn vec_divx.gn \
 vec_expx.gn vec_idvx.gn vec_intx.gn vec_lg10x.gn vec_logx.gn \
 vec_maxx.gn vec_minx.gn vec_modx.gn vec_mulx.gn vec_nintx.gn \
 vec_pwrx.gn vec_sqrtx.gn vec_subx.gn vec_xtox.gn
