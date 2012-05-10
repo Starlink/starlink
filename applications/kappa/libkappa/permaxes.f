@@ -78,9 +78,9 @@
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2006 Particle Physics & Astronomy Research
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2008, 2012 Science and Technology Facilities
 *     Council.
-*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -102,6 +102,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -115,6 +116,8 @@
 *        Remove unused variable and wrapped long lines.
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -208,7 +211,7 @@
                CALL MSG_SETI( 'AX', PERM( I ) )
                CALL ERR_REP( 'PERMAXES_ERR1', 'Axis ^AX is included '//
      :                       'more than once in the list supplied for'//
-     :                       ' parameter PERM.', STATUS )
+     :                       ' Parameter PERM.', STATUS )
                GO TO 999
             END IF
          END DO
@@ -270,6 +273,11 @@
 
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                CALL KPS1_PRMXI( NDIM, DIM, DIMO, PERM,
+     :                          %VAL( CNF_PVAL( IP1 ) ),
+     :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
+
+            ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+               CALL KPS1_PRMXK( NDIM, DIM, DIMO, PERM,
      :                          %VAL( CNF_PVAL( IP1 ) ),
      :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
 
@@ -356,6 +364,11 @@
 
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                   CALL VEC_ITOI( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+     :                           %VAL( CNF_PVAL( IP2 ) ),
+     :                           IERR, NERR, STATUS )
+
+               ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                  CALL VEC_KTOK( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 

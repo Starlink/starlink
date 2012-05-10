@@ -490,7 +490,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2009, 2010, Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:

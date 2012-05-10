@@ -81,12 +81,14 @@
 *  Copyright:
 *     Copyright (C) 1991-1992 Science & Engineering Research Council.
 *     Copyright (C) 1998, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -96,8 +98,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -115,7 +117,9 @@
 *     11-JUN-1998 (DSB):
 *        Added propagation of the NDF WCS component.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -138,7 +142,7 @@
       CHARACTER * ( NDF__SZFRM ) FORM ! Form of the NDF array
       CHARACTER * ( NDF__SZTYP ) TYPE ! Array component numeric type
       DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM )! Matrix component of linear mapping
-      DOUBLE PRECISION OFFSET( NDF__MXDIM )   ! Translation component of linear mapping
+      DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Translation component of linear mapping
       INTEGER DIM( NDF__MXDIM )  ! NDF dimension sizes
       INTEGER EL                 ! Number of elements mapped
       INTEGER I                  ! Axis index
@@ -231,6 +235,11 @@
      :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
      :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
 
+            ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+               CALL KPG1_FLIPK( NDIM, DIM,
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
+
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                CALL KPG1_FLIPR( NDIM, DIM,
      :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
@@ -314,6 +323,12 @@
 
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_FLIPI( 1, DIM( IDIM ),
+     :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
+     :                             STATUS )
+
+               ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                  CALL KPG1_FLIPK( 1, DIM( IDIM ),
      :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                             STATUS )

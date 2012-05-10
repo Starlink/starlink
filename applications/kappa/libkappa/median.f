@@ -234,12 +234,14 @@
 *  Copyright:
 *     Copyright (C) 1983-1984, 1986-1989, 1991-1993 Science &
 *     Engineering Research Council. Copyright (C) 1995, 1998, 2004
-*     Central Laboratory of the Research Councils. All Rights Reserved.
+*     Central Laboratory of the Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -249,8 +251,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     DB: Dave Baines (ROE)
@@ -323,6 +325,8 @@
 *     7-SEP-2006 (DSB):
 *        Initialise NSTEP before getting parameter STEP, in order to avoid
 *        seg faults in the event of an earlier error.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -612,6 +616,14 @@
      :                                %VAL( CNF_PVAL( WPNTR ) ),
      :                                STATUS )
 
+                  ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                     CALL KPS1_MDRFK( ST, DIMS( 1 ), DIMS( 2 ),
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
+     :                                WDIMS( 1 ),
+     :                                WDIMS( 2 ),
+     :                                %VAL( CNF_PVAL( WPNTR ) ),
+     :                                STATUS )
+
                   ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                      CALL KPS1_MDRFUB( ST, DIMS( 1 ), DIMS( 2 ),
      :                                 %VAL( CNF_PVAL( PNTRO ) ),
@@ -667,6 +679,14 @@
 
                   ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                      CALL KPS1_MDRPI( ST, DIMS( 1 ), DIMS( 2 ),
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
+     :                                WDIMS( 1 ),
+     :                                WDIMS( 2 ),
+     :                                %VAL( CNF_PVAL( WPNTR ) ),
+     :                                STATUS )
+
+                  ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                     CALL KPS1_MDRPK( ST, DIMS( 1 ), DIMS( 2 ),
      :                                %VAL( CNF_PVAL( PNTRO ) ),
      :                                WDIMS( 1 ),
      :                                WDIMS( 2 ),
@@ -744,6 +764,16 @@
 
                   ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                      CALL KPS1_MDWTI( DIFF, ST, DAMP, NUMSAM, MEDPOS,
+     :                                MEDTHR, SAMSIZ, SAMINF,
+     :                                WDIMS( 1 ), WDIMS( 2 ),
+     :                                %VAL( CNF_PVAL( WPNTR ) ),
+     :                                DIMS( 1 ),
+     :                                DIMS( 2 ), SAMPLE, SAMWT,
+     :                                %VAL( CNF_PVAL( PNTRO ) ),
+     :                                CHANGE, STATUS )
+
+                  ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                     CALL KPS1_MDWTK( DIFF, ST, DAMP, NUMSAM, MEDPOS,
      :                                MEDTHR, SAMSIZ, SAMINF,
      :                                WDIMS( 1 ), WDIMS( 2 ),
      :                                %VAL( CNF_PVAL( WPNTR ) ),

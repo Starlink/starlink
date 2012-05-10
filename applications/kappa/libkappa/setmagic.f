@@ -103,12 +103,14 @@
 *  Copyright:
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 1998, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -119,7 +121,7 @@
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -137,9 +139,11 @@
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     01-OCT-2004 (PWD):
 *        Moved CNF_PAR into declarations.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -165,9 +169,12 @@
       REAL
      :  VAL_DTOR
 
-      INTEGER * 2
+      INTEGER*2
      :  VAL_DTOUW,
      :  VAL_DTOW
+
+      INTEGER*8
+     :  VAL_DTOK
 
       BYTE
      :  VAL_DTOUB,
@@ -186,6 +193,7 @@
       INTEGER I                ! Loop counter
       INTEGER ISUVAL           ! Replacement value
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Processing type of the image
+      INTEGER*8 KSUVAL         ! Replacement value
       LOGICAL LCOMP( 2 )       ! Data, variance components are requested
                                ! to be processed or not
       DOUBLE PRECISION MAXREP  ! Maximum replacement value
@@ -279,9 +287,9 @@
 *  This application supports all the non-complex numeric types
 *  directly.  Therefore for the given type of the image find in which
 *  type it should be processed.
-         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
-     :                   /'_DOUBLE', NDFI, NDFI, 'Data,Variance', ITYPE,
-     :                   DTYPE, STATUS )
+         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'/
+     :                   /'_REAL,_DOUBLE', NDFI, NDFI, 'Data,Variance',
+     :                   ITYPE, DTYPE, STATUS )
 
 *  Set an appropriate data type of the component arrays in the output
 *  NDF.
@@ -291,8 +299,8 @@
          CALL LPG_PROP( NDFI, 'Variance,Quality,Units,Axis,WCS', 'OUT',
      :                  NDFO, STATUS )
 
-         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
-     :                   /'_DOUBLE', NDFI, NDFI, 'Data', ITYPE,
+         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'/
+     :                   /'_REAL,_DOUBLE', NDFI, NDFI, 'Data', ITYPE,
      :                   DTYPE, STATUS )
 
       ELSE IF ( LCOMP( 2 ) ) THEN
@@ -300,9 +308,9 @@
      :                  NDFO, STATUS )
 
 *  For this purpose Error and Variance structures are synonymous.
-         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
-     :                   /'_DOUBLE', NDFI, NDFI, 'Variance', ITYPE,
-     :                   DTYPE, STATUS )
+         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'/
+     :                   /'_REAL,_DOUBLE', NDFI, NDFI, 'Variance',
+     :                   ITYPE, DTYPE, STATUS )
 
       END IF
 
@@ -415,6 +423,29 @@
                CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          ISUVAL,
      :                          VAL__BADI,
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
+     :                          STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+
+*  Define the acceptable range of values and the suggested default
+*  (which is not actually used due to the ppath).
+               MINREP = NUM_KTOD( VAL__MINK )
+               MAXREP = NUM_KTOD( VAL__MAXK )
+               DEFREP = 0.0D0
+
+*  Get the replacement value.
+               CALL PAR_GDR0D( 'REPVAL', DEFREP, MINREP, MAXREP,
+     :                         .FALSE., REPVAL, STATUS )
+
+*  Use VAL_ to protect against potentionally harmful values when there
+*  is a bad status.
+               KSUVAL = VAL_DTOK( .FALSE., REPVAL, STATUS )
+
+*  Replace the magic values in the output array, otherwise copy from
+*  the input to the output NDF.
+               CALL KPG1_CHVAK( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          KSUVAL, VAL__BADK,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
 

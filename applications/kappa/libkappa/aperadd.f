@@ -199,7 +199,8 @@
 *  Copyright:
 *     Copyright (C) 2001, 2003-2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009, 2012 Science and Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -237,6 +238,8 @@
 *     2-JUL-2010 (DSB):
 *        - Report an error if the aperture does not overlap the NDF.
 *        - Correct docs for DIAM parameter.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -452,7 +455,7 @@
 
 *  Calculate the required statistics. Call the appropriate routine for the
 *  data type.
-      IF( TYPE .EQ. '_REAL' ) THEN
+      IF ( TYPE .EQ. '_REAL' ) THEN
          CALL KPS1_APADR( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ),
      :                    %VAL( CNF_PVAL( IPDAT ) ),
      :                    VAR, %VAL( CNF_PVAL( IPVAR ) ),
@@ -475,6 +478,13 @@
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_APADI( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ),
+     :                    %VAL( CNF_PVAL( IPDAT ) ),
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ),
+     :                    NGOOD, MEAN, SGMEAN, TOT,
+     :                    SGTOT, NUMPIX, SIGMA, STATUS )
+
+      ELSE IF( TYPE .EQ. '_INT64' ) THEN
+         CALL KPS1_APADK( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ),
      :                    %VAL( CNF_PVAL( IPDAT ) ),
      :                    VAR, %VAL( CNF_PVAL( IPVAR ) ),
      :                    NGOOD, MEAN, SGMEAN, TOT,

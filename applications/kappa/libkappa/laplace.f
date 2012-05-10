@@ -63,12 +63,14 @@
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -78,8 +80,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -90,7 +92,9 @@
 *     26-NOV-2001 (DSB):
 *        Original NDF version.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -173,8 +177,8 @@
 
 *  Determine the data type to use for processing and set the output data
 *  type accordingly.
-      CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', INDF1, INDF1, COMP, ITYPE, DTYPE,
+      CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                '_REAL,_DOUBLE', INDF1, INDF1, COMP, ITYPE, DTYPE,
      :                STATUS )
       CALL NDF_STYPE( DTYPE, INDF2, COMP, STATUS )
 
@@ -208,6 +212,12 @@
 
       ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_LAPLI( .FALSE., BAD, DIM( 1 ), DIM( 2 ),
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N,
+     :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                    NBAD, STATUS )
+
+      ELSE IF( ITYPE .EQ. '_INT64' ) THEN
+         CALL KPS1_LAPLK( .FALSE., BAD, DIM( 1 ), DIM( 2 ),
      :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N,
      :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
@@ -267,6 +277,12 @@
 
          ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_LAPLI( .TRUE., BAD, DIM( 1 ), DIM( 2 ),
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N,
+     :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                       NBAD, STATUS )
+
+         ELSE IF( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPS1_LAPLK( .TRUE., BAD, DIM( 1 ), DIM( 2 ),
      :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N,
      :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )

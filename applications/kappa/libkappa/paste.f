@@ -199,6 +199,8 @@
 *        to 1000.
 *     2-MAY-2012 (DSB):
 *        Added parameter SHIFT.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -520,12 +522,12 @@
      :   .FALSE., BADQUA, STATUS )
 
 *  Match the data types.  Quality must have type _UBYTE.
-      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
-     :  /'_DOUBLE', NUMNDF, NDFI, 'Data', ITYPE, DTYPE, STATUS )
+      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'/
+     :  /'_REAL,_DOUBLE', NUMNDF, NDFI, 'Data', ITYPE, DTYPE, STATUS )
 
       IF ( VARPRS ) CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,'/
-     :  /'_INTEGER,_REAL,_DOUBLE', NUMNDF, NDFI, 'Variance', ITYPEV,
-     :  DTYPEV, STATUS )
+     :  /'_INTEGER,_INT64,_REAL,_DOUBLE', NUMNDF, NDFI, 'Variance',
+     :  ITYPEV, DTYPEV, STATUS )
 
 *  Create the output NDF.
 *  ======================
@@ -619,6 +621,12 @@
      :                          ODIMS, ELO,
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               CALL KPG1_PASTK( TRANSP, BAD, OFFSET, IDIMS, ELI,
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          ODIMS, ELO,
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                CALL KPG1_PASTI( TRANSP, BAD, OFFSET, IDIMS, ELI,
      :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
@@ -685,6 +693,13 @@
 
                ELSE IF ( ITYPEV .EQ. '_INTEGER' ) THEN
                   CALL KPG1_PASTI( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             ODIMS, ELO,
+     :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ),
+     :                             STATUS )
+
+               ELSE IF ( ITYPEV .EQ. '_INT64' ) THEN
+                  CALL KPG1_PASTK( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             ODIMS, ELO,
      :                             %VAL( CNF_PVAL( PNTROV( 1 ) ) ),

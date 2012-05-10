@@ -108,6 +108,8 @@
 *        Use CNF_PVAL
 *     5-MAY-2007 (DSB):
 *        Propagate the Unit value if it is the same in both NDFs.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -180,7 +182,7 @@
 *  arrays and set an appropriate data type for these components in the
 *  output NDF.
       CALL NDF_MTYPE(
-     : '_BYTE,_WORD,_UBYTE,_UWORD,_INTEGER,_REAL,_DOUBLE',
+     : '_BYTE,_WORD,_UBYTE,_UWORD,_INTEGER,_INT64,_REAL,_DOUBLE',
      :                NDF1, NDF2, 'Data,Variance', ITYPE, DTYPE,
      :                STATUS )
       CALL NDF_STYPE( DTYPE, NDF3, 'Data,Variance', STATUS )
@@ -216,6 +218,12 @@
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL VEC_SUBI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
+     :                  IERR, NERR, STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL VEC_SUBK( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
@@ -291,6 +299,12 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL VEC_ADDI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
+     :                     IERR, NERR, STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL VEC_ADDK( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
      :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )

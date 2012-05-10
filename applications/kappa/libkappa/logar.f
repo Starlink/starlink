@@ -63,12 +63,14 @@
 
 *  Copyright:
 *     Copyright (C) 1997, 1999, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -78,8 +80,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -95,7 +97,9 @@
 *     1-OCT-1999 (DSB):
 *        Changed to use LPG to access NDFs.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -209,6 +213,13 @@
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPG1_LOGAI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
+     :                    NERR, NERRV, STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_LOGAK( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
      :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),

@@ -88,12 +88,14 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -103,8 +105,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -121,7 +123,9 @@
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -231,6 +235,13 @@
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPG1_HSTQI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                    NUMBIN,
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
+     :                    %VAL( CNF_PVAL( MPNTR ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_HSTQK( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    NUMBIN,
      :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    %VAL( CNF_PVAL( MPNTR ) ),

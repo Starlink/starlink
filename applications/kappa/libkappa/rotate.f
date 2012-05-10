@@ -188,7 +188,8 @@
 *     the Research Councils.
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
 *     Council.
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009, 2012 Science and Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -256,6 +257,8 @@
 *     28-AUG-2009 (DSB):
 *        Correct procedure for determining default rotation angle (old
 *        system assumed the WCS was 2-dimensional).
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -820,6 +823,13 @@
      :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                STATUS )
 
+                  ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                     CALL KPS1_RONNK( DIMSI( 1 ), DIMSI( 2 ),
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                ANGLE, DIMSO( 1 ), DIMSO( 2 ),
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                STATUS )
+
                   ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                      CALL KPS1_RONNR( DIMSI( 1 ), DIMSI( 2 ),
      :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
@@ -1081,6 +1091,12 @@
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
 
+                     ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                        CALL KPS1_RORAK( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
+     :                                   DIMSO( 1 ), DIMSO( 2 ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   STATUS )
+
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                         CALL KPS1_RORAR( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                   DIMSO( 1 ), DIMSO( 2 ),
@@ -1134,6 +1150,15 @@
 
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                         CALL KPS1_ROBLI( NUMRA, LONG, SHORT, ROTSZE,
+     :                                   XLARGE, DIMSI( 1 ), DIMSI( 2 ),
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   DIMSO( 1 ), DIMSO( 2 ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   %VAL( CNF_PVAL( WKPNTR ) ),
+     :                                   STATUS )
+
+                     ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                        CALL KPS1_ROBLK( NUMRA, LONG, SHORT, ROTSZE,
      :                                   XLARGE, DIMSI( 1 ), DIMSI( 2 ),
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   DIMSO( 1 ), DIMSO( 2 ),

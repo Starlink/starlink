@@ -141,12 +141,13 @@
 *  Copyright:
 *     Copyright (C) 2002 Central Laboratory of the Research Councils.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -156,8 +157,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
@@ -175,6 +176,8 @@
 *     2005 October 13 (MJC):
 *        Replace bad axis centres arising during resampling with
 *        extrapolated values.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -424,8 +427,8 @@
 
 *  Determine a data type which can be used for operations on the
 *  Data and possibly Variance components of the NDF.
-      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
+      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                '_REAL,_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
      :                DTYPE, STATUS )
 
 *  Set the Data and possibly Variance component data types.
@@ -551,6 +554,16 @@
      :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADI, NDIM, LBNDO, UBNDO, LBNDO,
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ),
+     :                         %VAL( CNF_PVAL( IPVARO ) ),
+     :                         STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         NBAD = AST_RESAMPLEK( MAPHIO, NDIM, LBNDI, UBNDI,
+     :                         %VAL( CNF_PVAL( IPDATI ) ),
+     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
+     :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                         VAL__BADK, NDIM, LBNDO, UBNDO, LBNDO,
      :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ),
      :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
@@ -731,6 +744,23 @@
      :                               STATUS )
                IF ( NBAD .GT. 0 ) THEN
                   CALL KPS1_SLAEI( LBNDO( I ), UBNDO( I ),
+     :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
+     :                             STATUS )
+               END IF
+
+
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               NBAD = AST_RESAMPLEK( MAPA, 1, LBNDI( I ), UBNDI( I ),
+     :                               %VAL( CNF_PVAL( IPAI ) ),
+     :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
+     :                               AST_NULL, PARAMS, FLAGS, TOL,
+     :                               MAXPIX, VAL__BADK, 1, LBNDO( I ),
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ),
+     :                               %VAL( CNF_PVAL( IPAO ) ),
+     :                               %VAL( CNF_PVAL( IPAO ) ),
+     :                               STATUS )
+               IF ( NBAD .GT. 0 ) THEN
+                  CALL KPS1_SLAEK( LBNDO( I ), UBNDO( I ),
      :                             %VAL( CNF_PVAL( IPAO ) ), NREP,
      :                             STATUS )
                END IF

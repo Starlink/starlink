@@ -147,12 +147,14 @@
 *  Copyright:
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 1998-1999, 2002, 2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -162,8 +164,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -194,6 +196,8 @@
 *        Use CNF_PVAL.
 *     01-OCT-2004 (PWD):
 *        Moved CNF_PAR into declarations.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -217,8 +221,10 @@
 
       REAL VAL_DTOR
 
-      INTEGER * 2 VAL_DTOUW
-      INTEGER * 2 VAL_DTOW
+      INTEGER*2 VAL_DTOUW
+      INTEGER*2 VAL_DTOW
+
+      INTEGER*8 VAL_DTOK
 
       BYTE VAL_DTOUB
       BYTE VAL_DTOB
@@ -247,6 +253,8 @@
       INTEGER ISUVAL           ! Replacement value
       INTEGER ISDVAL           ! Sigma value
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Processing type of the image
+      INTEGER*8 KSUVAL         ! Replacement value
+      INTEGER*8 KSDVAL         ! Sigma value
       LOGICAL LCOMP( 2 )       ! Data, variance components are requested
                                ! to be processed
       DOUBLE PRECISION MAXREP  ! Maximum replacement value
@@ -365,9 +373,9 @@
 *  This application supports all the non-complex numeric types
 *  directly.  Therefore for the given type of the image find in which
 *  type it should be processed.
-         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
-     :                   /'_DOUBLE', NDFI, NDFI, 'Data,Variance', ITYPE,
-     :                   DTYPE, STATUS )
+         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'/
+     :                   /'_REAL,_DOUBLE', NDFI, NDFI, 'Data,Variance', 
+     :                   ITYPE, DTYPE, STATUS )
 
 *  Set an appropriate data type of the component arrays in the output
 *  NDF.
@@ -377,17 +385,17 @@
          CALL LPG_PROP( NDFI, 'Variance,Quality,Units,Axis,WCS', 'OUT',
      :                  NDFO, STATUS )
 
-         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
-     :                   /'_DOUBLE', NDFI, NDFI, 'Data', ITYPE,
+         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'/
+     :                   /'_REAL,_DOUBLE', NDFI, NDFI, 'Data', ITYPE,
      :                   DTYPE, STATUS )
 
       ELSE IF ( PROCES( 2 ) ) THEN
          CALL LPG_PROP( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT',
      :                  NDFO, STATUS )
 
-         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
-     :                   /'_DOUBLE', NDFI, NDFI, 'Variance', ITYPE,
-     :                   DTYPE, STATUS )
+         CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'/
+     :                   /'_REAL,_DOUBLE', NDFI, NDFI, 'Variance',
+     :                   ITYPE, DTYPE, STATUS )
 
       ELSE
          CALL LPG_PROP( NDFI, 'Data,Variance,Quality,Units,Axis,WCS',
@@ -498,7 +506,7 @@
      :                                   VAL__BADR, RSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
-                     ENDIF
+                     END IF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
@@ -588,7 +596,7 @@
      :                                   VAL__BADB, BSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
-                     ENDIF
+                     END IF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
@@ -671,7 +679,7 @@
      :                                   VAL__BADD, SIGMA,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
-                     ENDIF
+                     END IF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
@@ -760,7 +768,7 @@
      :                                   VAL__BADI, ISDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
-                     ENDIF
+                     END IF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
@@ -771,6 +779,94 @@
      :                               REPVAL, SIGMA, MINREP, MAXREP,
      :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                               NREP, STATUS )
+                  END IF
+
+               END IF
+
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+
+*  Define the acceptable range of values and the suggested default
+*  (which is not actually used due to the ppath).  If variance is being
+*  processed the minimum value cannot be negative.
+               IF ( PROCES( 2 ) ) THEN
+                  MINREP = MAX( 0.0D0, NUM_KTOD( VAL__MINK ) )
+               ELSE
+                  MINREP = NUM_KTOD( VAL__MINK )
+               END IF
+               MAXREP = NUM_KTOD( VAL__MAXK )
+               DEFREP = 0.0D0
+
+*  Get the replacement value.
+               CALL PAR_GDR0D( 'REPVAL', DEFREP, MINREP, MAXREP,
+     :                         .FALSE., REPVAL, STATUS )
+
+*  Abort if an error has occurred. This clears the way for the check
+*  on STATUS following the attempt to get a value for parameter SIGMA.
+               IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the standard deviation to use if replacing bad pixels with
+*  random values (REPVAL will be used as the mean of the distribution).
+*  SIGMA is restricted so that there is at least NSIGMA*SIGMA between
+*  REPVAL and the nearest limit. A null value is treated as a request
+*  for constant values.
+               MAXSIG = MIN( REPVAL - MINREP, MAXREP - REPVAL )/NSIGMA
+
+               CALL PAR_GDR0D( 'SIGMA', 0.0D0, 0.0D0, MAXSIG, .FALSE.,
+     :                         SIGMA, STATUS )
+
+               IF ( STATUS .EQ. PAR__NULL ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  SIGMA = 0.0D0
+               END IF
+
+*  Convert the replacement value and sigma to the desired type.  Use
+*  VAL_ to protect against potentionally harmful values when there is a
+*  bad status.
+               KSUVAL = VAL_DTOK( .FALSE., REPVAL, STATUS )
+               KSDVAL = VAL_DTOK( .FALSE., SIGMA, STATUS )
+
+*  Replace the magic values in the output array, otherwise copy from
+*  the input to the output NDF. First deal with cases where bad values
+*  are to be replaced by a constant value.
+               IF ( SIGMA .EQ. 0.0D0 ) THEN
+                  CALL KPG1_CHVAK( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             VAL__BADK, KSUVAL,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
+     :                             STATUS )
+
+*  Now deal with cases where random values are to be used.
+               ELSE
+
+*  If both VARIANCE and DATA components were specified, replace bad
+*  VARIANCE values with a constant equal to SIGMA**2, and ERROR values
+*  with a constant equal to SIGMA.
+                  IF ( LCOMP( 1 ) .AND. LCOMP( 2 ) .AND.
+     :                 COMP( I ) .NE. 'Data' ) THEN
+
+                     IF ( COMP( I ) .EQ. 'Variance' ) THEN
+                        CALL KPG1_CHVAK( EL,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   VAL__BADK, KSDVAL * KSDVAL,
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   NREP, STATUS )
+
+                     ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
+                        CALL KPG1_CHVAK( EL,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   VAL__BADK, KSDVAL,
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   NREP, STATUS )
+                     END IF
+
+*  Otherwise, replace bad values with random samples taken from a
+*  normal distribution.
+                  ELSE
+                     CALL KPS1_NOM1K( EL,
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                VAL__BADK,
+     :                                REPVAL, SIGMA, MINREP, MAXREP,
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                NREP, STATUS )
                   END IF
 
                END IF
@@ -849,7 +945,7 @@
      :                                   VAL__BADUB, BSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
-                     ENDIF
+                     END IF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
@@ -939,7 +1035,7 @@
      :                                   VAL__BADUW, WSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
-                     ENDIF
+                     END IF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
@@ -1029,7 +1125,7 @@
      :                                   VAL__BADW, WSDVAL,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
-                     ENDIF
+                     END IF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.

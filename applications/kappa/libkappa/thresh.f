@@ -136,7 +136,9 @@
 *  Copyright:
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1998, 2000-2001, 2004 Central Laboratory of
-*     the Research Councils. All Rights Reserved.
+*     the Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -177,9 +179,11 @@
 *     6-JUL-2001 (DSB):
 *        Correct setting of bad pixel flag in output.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     11-MAY-2009 (BRADC):
 *        Return number of changed and unchanged pixels via parameters.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -219,6 +223,10 @@
       INTEGER ITHRHI           ! Upper threshold value
       INTEGER ITHRLO           ! Lower threshold value
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Processing type of the image
+      INTEGER*8 KNEWLO         ! New value for pixels below THRLO
+      INTEGER*8 KNEWHI         ! New value for pixels above THRHI
+      INTEGER*8 KTHRLO         ! Lower threshold value
+      INTEGER*8 KTHRHI         ! Upper threshold value
       CHARACTER * ( 8 ) MCOMP  ! Component array to be mapped
       INTEGER NDFI             ! Identifier for input NDF
       INTEGER NDFO             ! Identifier for output NDF
@@ -233,10 +241,10 @@
       REAL RNEWLO              ! New value for pixels below THRLO
       REAL RTHRHI              ! Upper threshold value
       REAL RTHRLO              ! Lower threshold value
-      INTEGER * 2 WNEWLO       ! New value for pixels below THRLO
-      INTEGER * 2 WNEWHI       ! New value for pixels above THRHI
-      INTEGER * 2 WTHRLO       ! Lower threshold value
-      INTEGER * 2 WTHRHI       ! Upper threshold value
+      INTEGER*2 WNEWLO         ! New value for pixels below THRLO
+      INTEGER*2 WNEWHI         ! New value for pixels above THRHI
+      INTEGER*2 WTHRLO         ! Lower threshold value
+      INTEGER*2 WTHRHI         ! Upper threshold value
 
 *.
 
@@ -377,6 +385,19 @@
          CALL KPG1_THRSI( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    ITHRLO,
      :                    ITHRHI, INEWLO, INEWHI,
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    NREPLO, NREPHI, STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+
+*  Obtain the threshold parameters in the appropriate data type.
+         CALL KPS1_THGTK( 'THRLO', 'THRHI', 'NEWLO', 'NEWHI', KTHRLO,
+     :                    KTHRHI, KNEWLO, KNEWHI, BAD, STATUS )
+
+*  Replace the values in the output array outside the range with the
+*  new values, otherwise copy from the input to the output NDF.
+         CALL KPG1_THRSK( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                    KTHRLO, KTHRHI, KNEWLO, KNEWHI,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 

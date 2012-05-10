@@ -335,7 +335,7 @@
 *     Copyright (C) 1995, 1998, 2000, 2004 Central Laboratory of the
 *     Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2010 Science & Facilities Research Council.
+*     Copyright (C) 2010, 2012 Science & Facilities Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -432,6 +432,8 @@
 *     1-APR-2011 (DSB):
 *        Use KPG_GDFND in place of KPG1_AGFND in case the most recent
 *        data picture had no WCS.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -845,9 +847,9 @@
 *  This application supports all the non-complex numeric types directly.
 *  Therefore for the given type of the image find in which type it
 *  should be processed.
-      CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', INDF2, INDF2, 'Data', ITYPE, DTYPE,
-     :                STATUS )
+      CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                '_REAL,_DOUBLE', INDF2, INDF2, 'Data', ITYPE,
+     :                DTYPE, STATUS )
 
 *  Map the output data array and variance.  Check whether or not bad
 *  pixels  may be present in the variance.
@@ -890,6 +892,11 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL VEC_ABSI( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                     IERR, NERR, STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL VEC_ABSK( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                     IERR, NERR, STATUS )
 
@@ -1292,6 +1299,19 @@
      :                            STATUS )
                ELSE
                   CALL KPS1_ZPRGI( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
+     :                             NOISE,
+     :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                             STATUS )
+               END IF
+
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               IF ( ZBAD ) THEN
+                  CALL KPG_FISEK( VAL__BADK, 2, DIMS, ZLBND, ZUBND,
+     :                            %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                            STATUS )
+               ELSE
+                  CALL KPS1_ZPRGK( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                             NOISE,
      :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ),

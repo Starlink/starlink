@@ -64,12 +64,14 @@
 
 *  Copyright:
 *     Copyright (C) 1997, 1999, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the free Software foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -79,8 +81,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -94,7 +96,9 @@
 *     1-OCT-1999 (DSB):
 *        Changed to use LPG.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -106,7 +110,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! VAL_ public constants
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'CNF_PAR'          ! for CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -214,8 +218,15 @@
      :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_EXPOR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+         CALL KPG1_EXPOI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
+     :                    NERR, NERRV, STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_EXPOK( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
      :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
@@ -243,7 +254,7 @@
 
       IF ( FORM .NE. 'PRIMITIVE' ) THEN
          CALL NDF_SBAD( BAD .OR. ( NERR .NE. 0 ), NDFO, 'Data', STATUS )
-      END IF
+      END If
 
 *  See if there may be bad pixels in the output variance array and set
 *  the output bad pixel flag value accordingly unless the output NDF is

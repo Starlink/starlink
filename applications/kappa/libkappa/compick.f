@@ -111,12 +111,13 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.  Copyright (C) 2012 Science & Facilities Research
+*     Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -126,8 +127,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -147,7 +148,9 @@
 *        Changed the way in which the bounds of the output image are
 *        determined so that pixel origin information is retained.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -303,14 +306,12 @@
 *  Compute the output NDF's dimensions.
 *  ====================================
 
-
 *  Work out the bounds for the output array and the size of the output
 *  array from the input array dimensions and the compression factor.
 *  The pixel origin is retained. Also modify the input bounds so that
 *  they correspond to the section of the input image which is actually
 *  used.
       DO I = 1, NDIM
-
          LBNDO( I ) = 1 + KPG1_CEIL( REAL( LBND( I ) - 1 )/
      :                               REAL( COMPRS( I ) ) )
 
@@ -319,7 +320,7 @@
          ODIMS( I ) = UBNDO( I ) - LBNDO( I ) + 1
 
          LBND( I ) = 1 + COMPRS( I )*( LBNDO( I ) - 1 )
-         UBND( I ) = COMPRS( I )*UBNDO( I )
+         UBND( I ) = COMPRS( I ) * UBNDO( I )
          IDIMS( I ) = UBND( I ) - LBND( I ) + 1
       END DO
 
@@ -389,6 +390,12 @@
      :                    ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    STATUS )
 
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_CMPKK( NDIM, IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                    COMPRS,
+     :                    ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    STATUS )
+
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
          CALL KPG1_CMPKUB( NDIM, IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     COMPRS,
@@ -451,6 +458,12 @@
 
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
             CALL KPG1_CMPKI( NDIM, IDIMS,
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), COMPRS,
+     :                       ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                       STATUS )
+
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            CALL KPG1_CMPKK( NDIM, IDIMS,
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), COMPRS,
      :                       ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       STATUS )
@@ -549,6 +562,11 @@
      :                          COMPRS( IAXIS ), ORIGIN( IAXIS ),
      :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
+            ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+               CALL KPG1_CMPKK( 1, ELA, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          COMPRS( IAXIS ), ORIGIN( IAXIS ),
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+
             ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                CALL KPG1_CMPKUB( 1, ELA, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           COMPRS( IAXIS ), ORIGIN( IAXIS ),
@@ -620,6 +638,13 @@
 
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_CMPKI( 1, ELA,
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             STATUS )
+
+               ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                  CALL KPG1_CMPKK( 1, ELA,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
@@ -702,6 +727,13 @@
 
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_CMPKI( 1, ELA,
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             STATUS )
+
+               ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+                  CALL KPG1_CMPKK( 1, ELA,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),

@@ -400,12 +400,14 @@
 *  Copyright:
 *     Copyright (C) 2001-2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005-2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -415,8 +417,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -453,6 +455,8 @@
 *        Negate the scale factors for any axis that is normally displayed
 *        reversed. This prevents the RA axis in an (RA,Dec) image being
 *        flipped after regridding.
+*     2012 May 9 (MJC):
+*        Add _INT64 support except for REBIN algorithm.
 *     {enter_further_changes_here}
 
 *-
@@ -953,14 +957,14 @@
       CALL NDF_SBND( NDIMO, LBNDO, UBNDO, NDFO, STATUS )
 
 *  Determine a data type which can be used for operations on the
-*  Data and possibly VARIANCE components of the NDF.
+*  DATA and possibly VARIANCE components of the NDF.
       IF( REBIN ) THEN
          CALL NDF_MTYPN( '_INTEGER,_REAL,_DOUBLE', 1, NDFI,
      :                   'DATA,VARIANCE', ITYPE, DTYPE, STATUS )
       ELSE
-         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
-     :                DTYPE, STATUS )
+         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                   '_REAL,_DOUBLE', 1, NDFI, 'DATA,VARIANCE',
+     :                   ITYPE, DTYPE, STATUS )
       END IF
 
 *  Set the Data and possibly VARIANCE component data types.
@@ -1093,6 +1097,16 @@
      :                         %VAL( CNF_PVAL( IPVARI )), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADI, NDIMO, LBNDO, UBNDO, LBNDO,
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO )),
+     :                         %VAL( CNF_PVAL( IPVARO )),
+     :                         STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            NBAD = AST_RESAMPLEK( MAPHIO, NDIMI, LBNDI, UBNDI,
+     :                         %VAL( CNF_PVAL( IPDATI )),
+     :                         %VAL( CNF_PVAL( IPVARI )), INTERP,
+     :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                         VAL__BADK, NDIMO, LBNDO, UBNDO, LBNDO,
      :                         UBNDO, %VAL( CNF_PVAL( IPDATO )),
      :                         %VAL( CNF_PVAL( IPVARO )),
      :                         STATUS )

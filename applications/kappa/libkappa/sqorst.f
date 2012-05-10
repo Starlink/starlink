@@ -217,7 +217,9 @@
 
 *  Copyright:
 *     Copyright (C) 2002, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -254,6 +256,8 @@
 *     18-MAY-2007 (DSB):
 *        Added MODE=PixelScale option, and the PIXSCALE and AXIS
 *        parameters.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -372,12 +376,12 @@
 
 *  Determine a data type which can be used for operations on its Data
 *  and possibly Variance components.
-      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,' //
-     :                '_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
+      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,' //
+     :                '_REAL,_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
      :                DTYPE, STATUS )
 
 *  Determine the number of bytes per value for the selected data type.
-*  We do this becaise PSX_CALLOC cannot accept the whole range of HDS
+*  We do this because PSX_CALLOC cannot accept the whole range of HDS
 *  data types.  So we work out the number of bytes needed and use
 *  PSX_MALLOC instead.
       CALL KPG_TYPSZ( ITYPE, BPV, STATUS )
@@ -928,6 +932,26 @@
      :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
+               ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                  CALL KPS1_RS1K( NDIM, I, FACTS,
+     :                            DIM1, DIM2, INTERP, PARAMS,
+     :                            HASVAR, HASQUA, HASAXI,
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ),
+     :                            %VAL( CNF_PVAL( IPVAR1 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ),
+     :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
+     :                            %VAL( CNF_PVAL( IPWD1 ) ),
+     :                            %VAL( CNF_PVAL( IPWV1 ) ),
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ),
+     :                            %VAL( CNF_PVAL( IPWD2 ) ),
+     :                            %VAL( CNF_PVAL( IPWV2 ) ),
+     :                            %VAL( CNF_PVAL( IPWQ2 ) ),
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ),
+     :                            %VAL( CNF_PVAL( IPVAR2 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ),
+     :                            %VAL( CNF_PVAL( IPAXO ) ),
+     :                            STATUS )
+
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPS1_RS1R( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
@@ -1056,6 +1080,10 @@
             CALL KPG1_CPNDI( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ),
      :                       1, EL,
      :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPG1_CPNDK( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ),
+     :                       1, EL,
+     :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPG1_CPNDR( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ),
      :                       1, EL,
@@ -1100,6 +1128,11 @@
      :                           EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                CALL KPG1_CPNDI( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ),
+     :                          1, EL,
+     :                          %VAL( CNF_PVAL( IPVARO ) ),
+     :                          EL2, STATUS )
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               CALL KPG1_CPNDK( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ),
      :                          1, EL,
      :                          %VAL( CNF_PVAL( IPVARO ) ),
      :                          EL2, STATUS )

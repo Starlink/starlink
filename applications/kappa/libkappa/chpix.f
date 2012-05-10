@@ -104,7 +104,8 @@
 *  Copyright:
 *     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Research Council.  Copyright (C) 2012 Science & Facilities
+*     Research Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -150,6 +151,8 @@
 *     2008 May 1 (MJC):
 *        Fix bug affecting bad-value substitution for byte and word
 *        data types.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -183,6 +186,7 @@
       CHARACTER * ( 40 ) SUGDEF  ! Suggested default
       INTEGER EL                 ! Number of array elements mapped
       INTEGER IVALUE             ! Replacement value for integer data
+      INTEGER*8 KVALUE           ! Replacement value for 64-bit integer
       CHARACTER * ( DAT__SZLOC ) LOC ! Locators for the NDF
       LOGICAL LOOP               ! Loop for another section to replace
       CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
@@ -391,6 +395,35 @@
 
 *  Fill the array with the constant.
             CALL KPG1_FILLI( IVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       STATUS )
+
+*  64-bit Integer
+*  --------------
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            IF( EL .EQ. 1 ) THEN
+               CALL KPG1_MEANK( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          KVALUE, STATUS )
+               IF( KVALUE .NE. VAL__BADK ) THEN
+                  CALL CHR_ITOC( KVALUE, SUGDEF, NCHAR )
+               ELSE
+                  SUGDEF = 'Bad'
+               END IF
+               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
+            END IF
+
+            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, VAL__MINK, VAL__MAXK,
+     :                      'Bad', .FALSE., CVALUE, STATUS )
+
+*  Convert the returned string to a numerical value.
+            IF ( CVALUE .EQ. 'BAD' ) THEN
+               KVALUE = VAL__BADK
+               BADO = .TRUE.
+            ELSE
+               CALL CHR_CTOK( CVALUE, KVALUE, STATUS )
+            END IF
+
+*  Fill the array with the constant.
+            CALL KPG1_FILLK( KVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       STATUS )
 
 *  Byte

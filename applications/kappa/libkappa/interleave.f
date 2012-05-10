@@ -130,7 +130,7 @@
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
 *     Council.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -166,6 +166,8 @@
 *        Remove unused variable.
 *     2010 August 25 (MJC):
 *        Used KPG_DIMLS instead of old DIMLST.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -507,6 +509,12 @@
      :                          ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               CALL KPS1_INLEK( EXPAND, FIRST, IDIMS, EL,
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS,
+     :                          ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                          STATUS )
+
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                CALL KPS1_INLEUB( EXPAND, FIRST, IDIMS, EL,
      :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS,
@@ -644,6 +652,12 @@
      :                              ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                              STATUS )
 
+                        ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                           CALL KPS1_INLIK( AEXPND( 1 ), AFIRST( 1 ),
+     :                              EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                              ELO, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                              STATUS )
+
                         ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                            CALL KPS1_INLIUB( AEXPND( 1 ), AFIRST( 1 ),
      :                              EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
@@ -690,6 +704,13 @@
 
                         ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                            CALL KPS1_INLEI( AEXPND, AFIRST, AIDIMS, EL,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   AODIMS, ELO,
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   STATUS )
+
+                        ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                           CALL KPS1_INLEK( AEXPND, AFIRST, AIDIMS, EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   AODIMS, ELO,
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),

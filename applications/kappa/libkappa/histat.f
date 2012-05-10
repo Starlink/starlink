@@ -215,8 +215,8 @@
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 2000, 2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2007, 2009, 2010 Science & Technology Facilities
-*     Council.
+*     Copyright (C) 2007, 2009, 2010, 2012 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -269,6 +269,8 @@
 *        not included in the value written to output parameter PERVAL.
 *     2010 August 4 (MJC):
 *        Use extended APIs for KPG1_STDSx and KPG1_STFLx.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -478,6 +480,12 @@
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
 
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_HSTAK( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                    NUMPER, PERCNT,
+     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
+     :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
+
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
          CALL KPG1_HSTAR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    NUMPER, PERCNT,
@@ -521,6 +529,11 @@
 
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_HSMOI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
+     :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
+
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            CALL KPS1_HSMOK( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD,
      :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
 
@@ -653,7 +666,7 @@
 
 *  Display the statistics, using the most appropriate floating-point
 *  precision.
-      IF ( TYPE .EQ. '_DOUBLE' ) THEN
+      IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
          CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                    VAL__BADD, VAL__BADD, MEDIAN, MODE, NUMPER,
@@ -667,7 +680,7 @@
 
 *  Also write the statistics to the logfile, if used.
       IF ( LOGFIL ) THEN
-         IF ( TYPE .EQ. '_DOUBLE' ) THEN
+         IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
             CALL KPG1_STFLD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                       VAL__BADD, VAL__BADD, MEDIAN, MODE,
@@ -701,7 +714,7 @@
       CALL PAR_PUT0C( 'MINWCS', MINWCS, STATUS )
 
 *  Only write percentiles values if any percentiles are left.
-      IF( NUMPER .GT. 0 ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL,
+      IF ( NUMPER .GT. 0 ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL,
      :                                    STATUS )
 
 *  Arrive here if an error occurs.

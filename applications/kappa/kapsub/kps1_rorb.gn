@@ -65,9 +65,9 @@
 
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     ARRIN, ARROUT, and WORK arguments of the routine must have the
-*     data type specified.
+*     the routine name by D, R, I, K, W, UW, B or UB as appropriate.
+*     The ARRIN, ARROUT, and WORK arguments of the routine must have
+*     the data type specified.
 *     - If the number of right-angles for rotation is not 1 or 3 then
 *     STATUS will be set to SAI__ERROR and an error reported.
 

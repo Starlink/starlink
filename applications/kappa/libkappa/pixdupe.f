@@ -101,7 +101,7 @@
 *     Copyright (C) 1995, 1998-1999, 2001, 2004 Central Laboratory of
 *     the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -146,6 +146,8 @@
 *        Remove unused variables and wrapped long lines.
 *     2010 August 25 (MJC):
 *        Used KPG_DIMLS instead of old DIMLST.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -420,6 +422,12 @@
      :                    ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    STATUS )
 
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL KPG1_PXDPK( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                    EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                    ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    STATUS )
+
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPG1_PXDPUB( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
@@ -486,6 +494,12 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPG1_PXDPI( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                       ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                       STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPG1_PXDPK( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
      :                       ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       STATUS )
@@ -605,6 +619,13 @@
      :                          AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               CALL KPG1_PXDPK( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                          AEXPND, .FALSE.,
+     :                          %VAL( CNF_PVAL( PNTRM ) ),
+     :                          AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                          STATUS )
+
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                CALL KPG1_PXDPUB( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           AEXPND, .FALSE.,
@@ -688,6 +709,15 @@
 
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_PXDPI( AIDIMS,
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             AEXPND, .FALSE.,
+     :                             %VAL( CNF_PVAL( PNTRM ) ),
+     :                             AODIMS,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             STATUS )
+
+               ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                  CALL KPG1_PXDPK( AIDIMS,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             AEXPND, .FALSE.,
      :                             %VAL( CNF_PVAL( PNTRM ) ),
@@ -785,6 +815,15 @@
 
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_PXDPI( AIDIMS,
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             AEXPND, .FALSE.,
+     :                             %VAL( CNF_PVAL( PNTRM ) ),
+     :                             AODIMS,
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             STATUS )
+
+               ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+                  CALL KPG1_PXDPK( AIDIMS,
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             AEXPND, .FALSE.,
      :                             %VAL( CNF_PVAL( PNTRM ) ),

@@ -165,8 +165,8 @@
 *     Copyright (C) 1990, 1992, 1994 Science & Engineering Research
 *     Council.  Copyright (C) 1995, 1998, 2004 Central Laboratory of
 *     the Research Councils.  Copyright (C) 2005 Particle Physics &
-*     Astronomy Research Council.  Copyright (C) 2009 Science &
-*     Fsacilities Research Council.  All Rights Reserved.
+*     Astronomy Research Council.  .Copyright (C) 2009 Science &
+*     Facilities Research Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

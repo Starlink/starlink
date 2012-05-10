@@ -89,7 +89,9 @@
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -119,6 +121,8 @@
 *        Use CNF_PVAL.
 *     2010 August 1 (MJC):
 *        Fix bug: DIAM was setting a radius not a diameter.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -303,6 +307,11 @@
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL,
+     :                    %VAL( CNF_PVAL( IPMASK ) ),
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+
+      ELSE IF( TYPE .EQ. '_INT64' ) THEN
+         CALL KPS1_ARDMK( BAD, CONST, INSIDE, EL,
      :                    %VAL( CNF_PVAL( IPMASK ) ),
      :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 

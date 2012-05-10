@@ -75,7 +75,8 @@
 *     Copyright (C) 1998, 2000, 2003-2004 Central Laboratory of the
 *     Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009, 2012 Science and Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -128,7 +129,7 @@
 *     20-MAY-2003 (DSB):
 *        - Set BAD-PIXEL flag in output NDF.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     27-APR-2006 (DSB):
 *        Added parameter INVERT.
 *     2008 July 14 (BEC)
@@ -141,6 +142,8 @@
 *        be the type of IN.
 *     26-NOV-2009 (DSB):
 *        Initialise TY_IN.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -217,6 +220,11 @@
      :                   %VAL( CNF_PVAL( P_OUT ) ),
      :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
+      ELSE IF ( TY_IN .EQ. '_INT64' ) THEN
+         CALL KPS1_CPBK( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ),
+     :                   %VAL( CNF_PVAL( P_OUT ) ),
+     :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
+
       ELSE IF ( TY_IN .EQ. '_BYTE' ) THEN
          CALL KPS1_CPBB( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ),
      :                   %VAL( CNF_PVAL( P_OUT ) ),
@@ -237,7 +245,7 @@
      :                    %VAL( CNF_PVAL( P_OUT ) ),
      :                    %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'TY', TY_IN )
          CALL ERR_REP( 'COPYBAD_UTYP', 'Unsupported data type '//
@@ -249,11 +257,11 @@
 
 *  Report the number of pixels in the output NDF.
       CALL NDF_MSG( 'NDF', OUT )
-      IF( NBAD .EQ. 0 ) THEN
+      IF ( NBAD .EQ. 0 ) THEN
          CALL MSG_OUT( 'COPYBAD_NBAD', '  There are no bad pixels in '//
      :                 'the output NDF ''^NDF''.', STATUS)
 
-      ELSE IF( NBAD .EQ. 1 ) THEN
+      ELSE IF ( NBAD .EQ. 1 ) THEN
          CALL MSG_OUT( 'COPYBAD_NBAD', '  There is 1 bad pixel in the'//
      :                 ' output NDF ''^NDF''.', STATUS)
 

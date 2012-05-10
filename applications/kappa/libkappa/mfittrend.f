@@ -345,7 +345,7 @@
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council.
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008, 2012 Science and Technology Facilities
 *     Council.
 *     All Rights reserved.
 
@@ -432,6 +432,8 @@
 *     2010 December 30 (MJC):
 *        Allow for very large datasets by blocking into manageable
 *        sections.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -1507,6 +1509,11 @@
      :                          BLDIMS, %VAL( CNF_PVAL( IPBS ) ),
      :                          %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
 
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               CALL KPS1_LFTSK( ORDER, JAXIS, SUBTRA,
+     :                          BLDIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                          %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPS1_LFTSR( ORDER, JAXIS, SUBTRA,
      :                          BLDIMS, %VAL( CNF_PVAL( IPBS ) ),
@@ -1556,6 +1563,14 @@
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                CALL KPS1_MFTSI( JAXIS, SUBTRA, BLDIMS, MXKNOT,
+     :                          %VAL( CNF_PVAL( IPNC ) ),
+     :                          %VAL( CNF_PVAL( IPKNOT ) ),
+     :                          %VAL( CNF_PVAL( IPCOEF ) ),
+     :                          %VAL( CNF_PVAL( IPSCAL ) ),
+     :                          %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+               CALL KPS1_MFTSK( JAXIS, SUBTRA, BLDIMS, MXKNOT,
      :                          %VAL( CNF_PVAL( IPNC ) ),
      :                          %VAL( CNF_PVAL( IPKNOT ) ),
      :                          %VAL( CNF_PVAL( IPCOEF ) ),

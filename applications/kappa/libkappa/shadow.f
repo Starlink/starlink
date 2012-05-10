@@ -72,12 +72,14 @@
 
 *  Copyright:
 *     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -87,8 +89,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -102,7 +104,9 @@
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -191,9 +195,9 @@
 *  Determine which data type to use to process the input data/variance
 *  arrays and set an appropriate data type for these components in the
 *  output NDF.
-      CALL NDF_MTYPE( '_BYTE,_WORD,_UBYTE,_UWORD,_INTEGER,_REAL,'/
-     :                /'_DOUBLE', NDFI, NDFS, 'Data,Variance', ITYPE,
-     :                DTYPE, STATUS )
+      CALL NDF_MTYPE( '_BYTE,_WORD,_UBYTE,_UWORD,_INTEGER,_INT64,'/
+     :                /'_REAL,_DOUBLE', NDFI, NDFS, 'Data,Variance',
+     :                ITYPE, DTYPE, STATUS )
       CALL NDF_STYPE( DTYPE, NDFO, 'Data,Variance', STATUS )
 
 *  Map the input and output data arrays.
@@ -227,6 +231,12 @@
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL VEC_SUBI( BAD, EL, %VAL( CNF_PVAL( PNTRS( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                  IERR, NERR, STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL VEC_SUBK( BAD, EL, %VAL( CNF_PVAL( PNTRS( 1 ) ) ),
      :                  %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                  IERR, NERR, STATUS )
@@ -301,6 +311,12 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL VEC_ADDI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTRS( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                     IERR, NERR, STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL VEC_ADDK( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     %VAL( CNF_PVAL( PNTRS( 1 ) ) ),
      :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     IERR, NERR, STATUS )

@@ -382,7 +382,8 @@
 *     Copyright (C) 1990-1993 Science & Engineering Research Council.
 *     Copyright (C) 1998-2001, 2004, 2006 Particle Physics & Astronomy
 *     Research Council.
-*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010, 2012 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -482,6 +483,8 @@
 *        have a gamma value different to 2.0).
 *     2010 October 14 (MJC):
 *        Document temporary style attributes.
+*     2012 May 9 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 *-
 
@@ -644,9 +647,9 @@
 *  This application can only process non-complex types.  Therefore for
 *  the given type of the image find in which type it should be
 *  processed.
-      CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
-     :                /'_DOUBLE', INDF1, INDF1, 'Data', ITYPE, DTYPE,
-     :                STATUS )
+      CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'/
+     :                /'_REAL,_DOUBLE', INDF1, INDF1, 'Data', ITYPE,
+     :                DTYPE, STATUS )
 
 *  Map the image.
       CALL NDF_MAP( INDF1, 'Data', ITYPE, 'READ', IPDIN, EL, STATUS )
@@ -831,6 +834,18 @@
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_SPARI( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ),
+     :                    %VAL( CNF_PVAL( IPDIN ) ),
+     :                    SLBND, ISIZE, RANGE, GAUSS,
+     :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
+     :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM',
+     :                    'GAMMA', 'AMP1', 'CENTRE', 'XCEN', 'YCEN',
+     :                    %VAL( CNF_PVAL( IPID ) ),
+     :                    GOTID, NM, UNITS, AXISR, THETA, FWHM,
+     :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
+     :                    PX, PY, AMP, STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL KPS1_SPARK( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ),
      :                    %VAL( CNF_PVAL( IPDIN ) ),
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,

@@ -99,12 +99,14 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -114,8 +116,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -129,9 +131,11 @@
 *     1995 January 16 (MJC):
 *        Replaced AIF by PAR.  Added ERROR option to parameter COMP.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     2004 October 1 (PWD):
 *        Moved CNF_PAR into declarations.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -160,6 +164,9 @@
       INTEGER * 2
      :  VAL_DTOUW,             ! Double to Unsigned Word conversion
      :  VAL_DTOW               ! Double to Word conversion
+
+      INTEGER * 8
+     :  VAL_DTOK               ! Double to 64-bit integer conversion
 
       REAL
      :  VAL_DTOR               ! Double to Real conversion
@@ -192,6 +199,9 @@
 
       INTEGER * 2
      :  WVALUE                 ! Threshold value to be tested against
+
+      INTEGER * 8
+     :  KVALUE                 ! Threshold value to be tested against
 
       LOGICAL                  ! True if:
      :  ABOVE,                 ! Criterion uses greater than threshold
@@ -379,6 +389,34 @@
 *  Make a common character version later be passed to a token for
 *  reporting the result.
          CALL CHR_ITOC( IVALUE, CVALUE, NCV )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+
+*  Obtain the threshold in the appropriate data type.  Watch for the
+*  cases where it must not be negative.
+         IF ( VABS .OR. COMP .EQ. 'VARIANCE' .OR.
+     :        COMP .EQ. 'QUALITY' ) THEN
+            DVMIN = 0.0
+         ELSE
+            DVMIN = NUM_KTOD( VAL__MINK )
+         END IF
+         DVMAX = NUM_KTOD( VAL__MAXK )
+         CALL PAR_GDR0D( 'VALUE', 0.0D0, DVMIN, DVMAX, .FALSE., DVALUE,
+     :                   STATUS )
+
+*  Convert the threshold value to the desired type.  Use VAL_ to
+*  protect against potentionally harmful values when there is a bad
+*  status.
+         KVALUE = VAL_DTOK( .FALSE., DVALUE, STATUS )
+
+*  Call routine to count up the values.
+         CALL KPG1_NUMBK( BAD, VABS, ABOVE, EL,
+     :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                    KVALUE, NUMBER, STATUS )
+
+*  Make a common character version later be passed to a token for
+*  reporting the result.
+         CALL CHR_KTOC( KVALUE, CVALUE, NCV )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
 

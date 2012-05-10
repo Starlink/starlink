@@ -109,7 +109,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995-1998, 2001, 2004 Central Laboratory of the
 *     Research Councils.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -172,6 +172,8 @@
 *     28-SEP-2011 (DSB):
 *        Added "All" as an option for parameter COMP, and made it the
 *        default.
+*     2012 May 8 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -499,6 +501,12 @@
 
             ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
                CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL,
+     :                          %VAL( CNF_PVAL( IPMASK ) ),
+     :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
+     :                          STATUS )
+
+            ELSE IF( TYPE .EQ. '_INT64' ) THEN
+               CALL KPS1_ARDMK( BAD, CONST, INSIDE, EL,
      :                          %VAL( CNF_PVAL( IPMASK ) ),
      :                          %VAL( CNF_PVAL( IPOUT( ICOMP ) ) ),
      :                          STATUS )
