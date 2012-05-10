@@ -1270,7 +1270,6 @@ libraries/prm/val_pwrx.f
 libraries/prm/val_sqrtx.f
 libraries/prm/val_subx.f
 libraries/prm/val_xtox.f
-libraries/prm/vec_absx.f
 libraries/prm/vec_addx.f
 libraries/prm/vec_dimx.f
 libraries/prm/vec_divx.f

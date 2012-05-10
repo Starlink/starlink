@@ -1,4 +1,4 @@
-      SUBROUTINE VEC_ABS<T>( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
+      SUBROUTINE VEC_ABSK( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
 *+
 *  Name:
 *     VEC_ABSx
@@ -10,12 +10,12 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL VEC_ABS<T>( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
+*     CALL VEC_ABSK( BAD, N, ARGV, RESV, IERR, NERR, STATUS )
 
 *  Description:
 *     The routine evaluates the Fortran ABS function for a vectorised
-*     array ARGV of <COMM> values.  If numerical errors occur, the
-*     value VAL__BAD<T> is returned in appropriate elements of the
+*     array ARGV of INTEGER*8 values.  If numerical errors occur, the
+*     value VAL__BADK is returned in appropriate elements of the
 *     result array RESV and a STATUS value is set.
 
 *  Arguments:
@@ -25,17 +25,17 @@
 *        The number of argument values to be processed.  If N is not
 *        positive the routine returns with IERR and NERR set to zero,
 *        but without processing any values.
-*     ARGV( N ) = ? (Given)
-*        A vectorised (1-dimensional) array containing the N <COMM>
+*     ARGV( N ) = INTEGER*8 (Given)
+*        A vectorised (1-dimensional) array containing the N INTEGER*8
 *        argument values for the Fortran ABS function.
-*     RESV( N ) = ? (Returned)
+*     RESV( N ) = INTEGER*8 (Returned)
 *        A vectorised (1-dimensional) array with at least N elements to
 *        receive the function results.  Each element I of RESV receives
-*        the <COMM> value:
+*        the INTEGER*8 value:
 *
 *           RESV( I ) = ABS( ARGV( I ) )
 *
-*        for I = 1 to N.  The value VAL__BAD<T> will be set in
+*        for I = 1 to N.  The value VAL__BADK will be set in
 *        appropriate elements of RESV under error conditions.
 *     IERR = INTEGER (Returned)
 *        The index of the first input array element to generate a
@@ -50,12 +50,13 @@
 *  Copyright:
 *     Copyright (C) 1988, 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -65,11 +66,13 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     R.F. Warren-Smith (STARLINK)
+*     BKM: Brian McIlwrath (STARRLINK)
+*     MJC: Malcolm J. Currie (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,8 +85,8 @@
 *     27-SEP-1995 (BKM):
 *        Changed LIB$ESTABLISH and LIB$REVERT calls to NUM_HANDL and
 *        NUM_REVRT.
-*     2012 May 9 (MJC):
-*        Made generic.
+*     2012 May 10 (MJC):
+*        Adapted from VEC_ABSI.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,10 +110,10 @@
 *  Arguments Given:
       LOGICAL BAD                ! Bad data flag
       INTEGER N                  ! Number of argument values to process
-      <TYPE> ARGV( * )           ! Function argument array
+      INTEGER*8 ARGV( * )           ! Function argument array
 
 *  Arguments Returned:
-      <TYPE> RESV( * )           ! Function result array
+      INTEGER*8 RESV( * )           ! Function result array
       INTEGER IERR               ! Numerical error pointer
       INTEGER NERR               ! Numerical error count
 
@@ -126,16 +129,16 @@
 
 *  Local Variables:
       INTEGER I                  ! Loop counter
-      <LTYPE> ARG                ! Temporary argument variable
+      INTEGER*8 ARG                ! Temporary argument variable
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declare NUM_ conversion functions
 
-      INCLUDE 'NUM_DEC_<T>'      ! Declare NUM_ arithmetic functions
+      INCLUDE 'NUM_DEC_K'      ! Declare NUM_ arithmetic functions
 
       INCLUDE 'NUM_DEF_CVT'      ! Define NUM_ conversion functions
 
-      INCLUDE 'NUM_DEF_<T>'      ! Define NUM_ arithmetic functions
+      INCLUDE 'NUM_DEF_K'      ! Define NUM_ arithmetic functions
 
 
 *.
@@ -162,15 +165,15 @@
             ARG = ARGV( I )
 
 *  Check if the argument value is bad.  If it is, then put a value of
-*  VAL__BAD<T> in the corresponding element of the result array.
-            IF( ARG .EQ. VAL__BAD<T> ) THEN
-               RESV( I ) = VAL__BAD<T>
+*  VAL__BADK in the corresponding element of the result array.
+            IF( ARG .EQ. VAL__BADK ) THEN
+               RESV( I ) = VAL__BADK
 
 *  Check if the argument value is acceptable.  If not, then put a value
-*  of VAL__BAD<T> in the corresponding element of the result array and
+*  of VAL__BADK in the corresponding element of the result array and
 *  increment the numerical error count.
-            ELSE IF( .NOT. ( BAD .OR. NUM_NE<T>( ARG, NUM__MIN<T> ) ) ) THEN
-               RESV( I ) = VAL__BAD<T>
+            ELSE IF( .NOT. ( BAD .OR. NUM_NEK( ARG, NUM__MINK ) ) ) THEN
+               RESV( I ) = VAL__BADK
                NERR = NERR + 1
 
 *  Set a STATUS value (if not already set) and update the error
@@ -183,14 +186,14 @@
 *  If the argument value is acceptable, then evaluate the Fortran ABS
 *  function.
             ELSE
-               RESV( I ) = NUM_ABS<T>( ARG )
+               RESV( I ) = NUM_ABSK( ARG )
 
 *  If an error handler is established, check if the numerical error
-*  flag is set.  If so, put a value of VAL__BAD<T> in the corresponding
+*  flag is set.  If so, put a value of VAL__BADK in the corresponding
 *  element of the result array and increment the error count.
                IF( .FALSE. ) THEN
                   IF( NUM_ERROR .NE. SAI__OK ) THEN
-                     RESV( I ) = VAL__BAD<T>
+                     RESV( I ) = VAL__BADK
                      NERR = NERR + 1
 
 *  Set a STATUS value (if not already set) and update the error
@@ -215,10 +218,10 @@
             ARG = ARGV( I )
 
 *  Check if the argument value is acceptable.  If not, then put a value
-*  of VAL__BAD<T> in the corresponding element of the result array and
+*  of VAL__BADK in the corresponding element of the result array and
 *  increment the error count.
-            IF( .NOT. ( BAD .OR. NUM_NE<T>( ARG, NUM__MIN<T> ) ) ) THEN
-               RESV( I ) = VAL__BAD<T>
+            IF( .NOT. ( BAD .OR. NUM_NEK( ARG, NUM__MINK ) ) ) THEN
+               RESV( I ) = VAL__BADK
                NERR = NERR + 1
 
 *  Set a STATUS value (if not already set) and update the error
@@ -231,14 +234,14 @@
 *  If the argument value is acceptable, then evaluate the Fortran ABS
 *  function.
             ELSE
-               RESV( I ) = NUM_ABS<T>( ARG )
+               RESV( I ) = NUM_ABSK( ARG )
 
 *  If an error handler is established, check if the numerical error
-*  flag is set.  If so, put a value of VAL__BAD<T> in the corresponding
+*  flag is set.  If so, put a value of VAL__BADK in the corresponding
 *  element of the result array and increment the error count.
                IF( .FALSE. ) THEN
                   IF( NUM_ERROR .NE. SAI__OK ) THEN
-                     RESV( I ) = VAL__BAD<T>
+                     RESV( I ) = VAL__BADK
                      NERR = NERR + 1
 
 *  Set a STATUS value (if not already set) and update the error
