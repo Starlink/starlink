@@ -1,12 +1,12 @@
 s/<T>/C/g
 s/<TYPE>/CHARACTER*(*)/g
-s/<LTYPE>/CHARACTER*<CHASIZ>/g
+s/<LTYPE>/CHARACTER*\(<CHASIZ>\)/g
 s/<CONST>/?/g
 s/<HTYPE>/_CHAR/g
 s/<COMM>/CHARACTER/g
 s/<t>/C/g
 s/<type>/CHARACTER*(*)/g
-s/<ltype>/CHARACTER*<CHASIZ>/g
+s/<ltype>/CHARACTER*\(<CHASIZ>\)/g
 s/<const>/?/g
 s/<htype>/_CHAR/g
 s/<comm>/CHARACTER/g
