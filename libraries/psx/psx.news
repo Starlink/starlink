@@ -1,5 +1,7 @@
 1 PSX - POSIX interface routines
                                                           Expires: **.**.**
+v0.5-6:
+     PSX_CALLOC now understands _INT64 data type
 v0.5-5:
      Added PSX_WORDEXP for shell metacharacter expansion.
 

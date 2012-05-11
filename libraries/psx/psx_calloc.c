@@ -73,7 +73,7 @@
 *        done to increase the portability of the routine.
 *
 *     -  The allowed values of TYPE are _INTEGER, _REAL, _DOUBLE,
-*        _LOGICAL, _CHAR, _BYTE, _UBYTE, _WORD and _UWORD.
+*        _INT64, _LOGICAL, _CHAR, _BYTE, _UBYTE, _WORD and _UWORD.
 *        The number of bytes allocated for each is as defined in the
 *        f77.h header file.
 
@@ -138,6 +138,8 @@
 *        Error message should be unsigned.
 *     25-MAY-2011 (TIMJ):
 *        Simplify error reporting.
+*     2012-05-11 (TIMJ):
+*        Add _INT64
 *     {enter_changes_here}
 
 *  Bugs:
@@ -211,6 +213,8 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
       size = sizeof(F77_REAL_TYPE);
    else if( strcmp( type_c, "_DOUBLE" ) == 0 )
       size = sizeof(F77_DOUBLE_TYPE);
+   else if( strcmp( type_c, "_INT64" ) == 0 )
+      size = sizeof(F77_INTEGER8_TYPE);
    else if( strcmp( type_c, "_LOGICAL" ) == 0 )
       size = sizeof(F77_LOGICAL_TYPE);
    else if( strcmp( type_c, "_CHAR" ) == 0 )
