@@ -50,9 +50,9 @@
 *     CTYPE = LITERAL (Read)
 *        The type of component (residing within the extension) to be
 *        created.  Allowed values are "LITERAL", "_LOGICAL", "_DOUBLE",
-*        "_REAL", "_INTEGER", "_CHAR", "_BYTE", "_UBYTE", "_UWORD",
-*        "_WORD".  The length of the character type may be defined by
-*        appending the length, for example, "_CHAR*32" is a
+*        "_REAL", "_INTEGER", "_INT64", "_CHAR", "_BYTE", "_UBYTE",
+*        "_UWORD", "_WORD".  The length of the character type may be
+*        defined by appending the length, for example, "_CHAR*32" is a
 *        32-character component.  "LITERAL" and "_CHAR" generate
 *        80-character components.  CTYPE is only accessed when
 *        OPTION="Put".
@@ -160,8 +160,8 @@
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1999-2000, 2004 Central Laboratory of the
-*     Research Councils. 
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Research Councils.
+*     Copyright (C) 2010, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -214,6 +214,8 @@
 *        Moved CNF_PAR to declaration section.
 *     2010 August 25 (MJC):
 *        Used KPG_DIMLS instead of old DIMLST.
+*     2012 May 10 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -255,6 +257,7 @@
       INTEGER INDF               ! NDF identifier
       INTEGER IVALUE             ! Integer component value
       LOGICAL IFXLOC             ! Extension locator exists?
+      INTEGER*8 KVALUE           ! 64-bit integer component value
       CHARACTER * ( 80 ) LINE    ! Buffer
       LOGICAL LOOP               ! Running in loop mode?
       LOGICAL LVALUE             ! Logical component value
@@ -580,6 +583,21 @@
      :                                /'^TCTYPE     ^TDVALUE', STATUS )
                      END IF
 
+*  64-bit integer type.  Allow for bad values.
+                  ELSE IF ( CTYPE .EQ. '_INT64' ) THEN
+                     CALL NDF_XGT0K( INDF, XNAME, CNAME, KVALUE,
+     :                               STATUS )
+                     CALL MSG_SETC( 'TCNAME', CNAME )
+                     CALL MSG_SETC( 'TCTYPE', CTYPE )
+                     IF ( KVALUE .EQ. VAL__BADK ) THEN
+                        CALL MSG_OUT( ' ', '  ^TCNAME    '/
+     :                                /'^TCTYPE     *', STATUS )
+                     ELSE
+                        CALL MSG_SETK( 'TKVALUE', KVALUE )
+                        CALL MSG_OUT( ' ', '  ^TCNAME    '/
+     :                                /'^TCTYPE     ^TKVALUE', STATUS )
+                     END IF
+
 *  Integer types.  Allow for bad values.
                   ELSE
                      CALL NDF_XGT0I( INDF, XNAME, CNAME, IVALUE,
@@ -770,6 +788,12 @@
                   ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                      CALL PAR_GET0I( 'CVALUE', IVALUE, STATUS )
                      CALL NDF_XPT0I( IVALUE, INDF, XNAME, CNAME,
+     :                               STATUS )
+
+*  64-bit integer type.
+                  ELSE IF ( CTYPE .EQ. '_INT64' ) THEN
+                     CALL PAR_GET0K( 'CVALUE', KVALUE, STATUS )
+                     CALL NDF_XPT0K( KVALUE, INDF, XNAME, CNAME,
      :                               STATUS )
 
 *  Other integer types.  Do not set up limits for the data value
@@ -964,6 +988,25 @@
 
 *  Write the array to the component.
                      CALL DAT_PUTVI( CLOC, EL,
+     :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
+
+*  Free the workspace.
+                     CALL PSX_FREE( CPNTR, STATUS )
+
+*  64-bit integer type
+*  -------------------
+                  ELSE IF ( CTYPE .EQ. '_INT64' ) THEN
+
+*  Obtain workspace for the array.
+                     CALL PSX_CALLOC( EL, CTYPE, CPNTR, STATUS )
+
+*  Obtain the requested number of values.
+                     CALL PAR_EXACK( 'CVALUE', EL,
+     :                               %VAL( CNF_PVAL( CPNTR ) ),
+     :                               STATUS )
+
+*  Write the array to the component.
+                     CALL DAT_PUTVK( CLOC, EL,
      :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.

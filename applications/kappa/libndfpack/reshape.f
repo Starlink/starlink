@@ -77,12 +77,14 @@
 
 *  Copyright:
 *     Copyright (C) 1997-1998, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -92,8 +94,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -108,9 +110,11 @@
 *        Corrected the name of the output NDF component to receive the
 *        QUALITY values from 'variance' to 'quality'.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     20-MAY-2010 (DSB):
 *        Map output Quality array with type "_UBYTE", not ITYPE.
+*     2012 May 10 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -252,6 +256,11 @@
      :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                  IERR, NERR, STATUS )
 
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL VEC_KTOK( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                  IERR, NERR, STATUS )
+
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL VEC_UBTOUB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
@@ -306,6 +315,11 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL VEC_ITOI( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                     IERR, NERR, STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL VEC_KTOK( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     IERR, NERR, STATUS )
 

@@ -145,7 +145,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -155,8 +155,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -167,7 +167,9 @@
 *     1994 July 15 (MJC):
 *        Original version.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 May 10 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -243,6 +245,7 @@
       CHARACTER * ( KEYLN ) KEYPOS( MXWRIT ) ! Stored position keywords
       CHARACTER * ( KEYLN ) KEYWRD ! Current keyword
       CHARACTER * ( KEYLN ) KEYWDS( MXWRIT ) ! Stored keywords
+      INTEGER*8 KVAL             ! 64-bit integer FITS value
       INTEGER KWCPOS             ! Secondary keyword character pointer
       INTEGER L( 3 )             ! Lengths of the words in a line of the
                                  ! translation file
@@ -673,8 +676,19 @@
      :                          COMNTS( ICOMP ), FOUND, CARD, STATUS,
      :                          %VAL( CNF_CVAL( LENGTH ) ) )
 
+*  64-bit integer:
+*  ===============
+*  Obtain a value for the keyword from the NDF-extension component and
+*  update the card.
+            ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+               CALL DAT_GETVK( CLOCS( ICOMP ), 1, KVAL, NEL, STATUS )
+               CALL FTS1_UKEYK( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
+     :                          KEYWDS( ICOMP ), KVAL, '/',
+     :                          COMNTS( ICOMP ), FOUND, CARD, STATUS,
+     :                          %VAL( CNF_CVAL( LENGTH ) ) )
+
 *  Logical:
-*  =======
+*  ========
 *  Obtain a value for the keyword from the NDF-extension component and
 *  update the card.
             ELSE IF ( TYPE .EQ. '_LOGICAL' ) THEN
@@ -685,7 +699,7 @@
      :                          %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  Real:
-*  ====
+*  =====
 *  Obtain a value for the keyword from the NDF-extension component and
 *  update the card.
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN

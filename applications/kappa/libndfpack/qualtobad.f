@@ -4,7 +4,7 @@
 *     QUALTOBAD
 
 *  Purpose:
-*     Set selected NDF pixels bad on the basis of Quality.
+*     Sets selected NDF pixels bad on the basis of Quality.
 
 *  Language:
 *     Starlink Fortran 77
@@ -57,7 +57,7 @@
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2002, 2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,6 +79,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -88,6 +89,8 @@
 *        Brought into KAPPA.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
+*     2012 May 10 (MJC):
+*        Add _INT64 support.
 *     {enter_further_changes_here}
 
 *-
@@ -163,8 +166,8 @@
      :               ERRPNT, IDQ, STATUS )
 
 *  Get the data type in which to map the DATA array.
-      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', 1, NDFIN, 'DATA', ITYPE, DTYPE,
+      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                '_REAL,_DOUBLE', 1, NDFIN, 'DATA', ITYPE, DTYPE,
      :                STATUS )
 
 *  Map the DATA array in the output NDF.
@@ -191,10 +194,15 @@
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          CALL IRQ_SBADUW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                    ALLBAD, NOBAD,
-     :                   STATUS )
+     :                    STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL IRQ_SBADI( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
+     :                   ALLBAD, NOBAD,
+     :                   STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+         CALL IRQ_SBADK( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                   ALLBAD, NOBAD,
      :                   STATUS )
 
@@ -230,9 +238,9 @@
 *  If it is, process the VARIANCE array in the same way that the DATA
 *  array was processed.
       IF( THERE ) THEN
-         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                   '_DOUBLE', 1, NDFIN, 'VARIANCE', ITYPE, DTYPE,
-     :                   STATUS )
+         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                   '_REAL, _DOUBLE', 1, NDFIN, 'VARIANCE', ITYPE,
+     :                   DTYPE, STATUS )
          CALL NDF_MAP( NDFOUT, 'VARIANCE', ITYPE, 'UPDATE', IPNT, NEL,
      :                 STATUS )
 
@@ -258,6 +266,11 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL IRQ_SBADI( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
+     :                      ALLBAD,
+     :                      NOBAD, STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL IRQ_SBADK( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                      ALLBAD,
      :                      NOBAD, STATUS )
 
