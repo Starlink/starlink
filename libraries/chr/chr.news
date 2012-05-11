@@ -1,6 +1,7 @@
 CHR Version 2.4
    Add CHR_KTOC for formatting a 64-bit INTEGER*8
    Add CHR_CTOK for creating INTEGER*8 values from a string.
+   Add CHR_PUTK for putting 
 
 CHR Version 2.3
    Add CHR_FPARX for finding strings in parentheses

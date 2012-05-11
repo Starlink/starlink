@@ -31,7 +31,7 @@ F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
         chr_isalm.f chr_isdig.f chr_isnam.f chr_itob.f  chr_itoc.f \
         chr_itoh.f  chr_itoo.f  chr_lcase.f chr_ldblk.f chr_len.f \
         chr_linbr.f chr_lower.f chr_ltoc.f  chr_move.f  chr_mtoa.f \
-        chr_nth.f   chr_otoi.f  chr_pform.f chr_prefx.f \
+        chr_nth.f   chr_otoi.f  chr_pform.f chr_prefx.f chr_putk.f \
         chr_putc.f  chr_putd.f  chr_puti.f  chr_putl.f  chr_putr.f \
         chr_rjust.f chr_rmblk.f chr_rmchr.f chr_rtoan.f chr_rtoc.f \
         chr_scomp.f chr_simlr.f chr_size.f  chr_skchr.f chr_sort.f \
