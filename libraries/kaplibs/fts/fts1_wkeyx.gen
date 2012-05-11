@@ -38,7 +38,7 @@
 *        when it is blank, no comment will be appended to the keyword.
 *     COMNT = CHARACTER * ( * ) (Returned)
 *        The comment string of the keyword.  It may be truncated at the
-*        end to put into the space left after writing keyword value. 
+*        end to put into the space left after writing keyword value.
 *     HEADER = CHARACTER * ( 80 ) (Returned)
 *        The created FITS-header card.
 *     STATUS = INTEGER (Given and Returned)
@@ -51,6 +51,27 @@
 *     - The comments are written from column 32 or higher if the value
 *     demands more than the customary 20 characters for the value.  A
 *     comment may be omitted if the value is so long to leave no room.
+
+*  Copyright:
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -65,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -166,7 +187,7 @@
 
 *  Format the value string.
       CALL CHR_<T>TOC( VALUE, VALSTR, VALN )
-         
+
 *  See if there is any error during formation.
       IF ( VALSTR( : VALN ) .EQ. '*' ) THEN
          STATUS = SAI__ERROR
@@ -211,7 +232,7 @@
          CALL CHR_APPND( CMTBGN, HEADER, CARDLN )
          CARDLN = CARDLN + 1
          CALL CHR_APPND( COMNT, HEADER, CARDLN )
-      
+
       END IF
 
   999 CONTINUE

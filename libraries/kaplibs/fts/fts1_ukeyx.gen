@@ -5,7 +5,7 @@
 *     FTS1_UKEYx
 
 *  Purpose:
-*     Writes the value to the specified keyword from a buffer of 
+*     Writes the value to the specified keyword from a buffer of
 *     FITS-header card images.
 
 *  Language:
@@ -83,6 +83,28 @@
 *     WG: Wei Gong (IPMAF)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
+
+*  Copyright:
+*     Copyright (C) 1991, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  History:
 *     1991 September 9 (WG):
