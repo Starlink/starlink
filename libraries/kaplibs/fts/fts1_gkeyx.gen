@@ -71,8 +71,11 @@
 
 *  Notes:
 *     - There is a routine for each of the data types logical, integer,
-*     real and double precision: replace "x" in the routine name by
-*     L, I, R or D as appropriate.
+*     64-bit integer, real, and double precision: replace "x" in the
+*     routine name by L, I, K, R or D as appropriate.
+*     - The comments are written from column 32 or higher if the value
+*     demands more than the customary 20 characters for the value.  A
+*     comment may be omitted if the value is so long to leave no room.
 
 *  Algorithm:
 *     -  Initialise counter and flag.  Test whether the input name is
@@ -129,6 +132,8 @@
 *        more than one occurrence, and "beefed up" error reports.
 *     1996 November 14 (MJC):
 *        Added COMENT argument.
+*     2012 May 10 (MJC):
+*        Added 64-bit integer.
 *     {enter_further_changes_here}
 
 *  Bugs:

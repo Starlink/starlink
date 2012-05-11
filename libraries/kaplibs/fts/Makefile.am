@@ -42,8 +42,9 @@ fts1_rstab.f \
 fts1_sctab.f \
 fts1_sdscf.f
 
-#  Run generic to get dp, integer, logical and real types.
-GFLAGS = dilr
+#  Run generic to get dp, integer, 64-bit integer, logical and real
+#  types.
+GFLAGS = diklr
 .gen.f:
 	$(FGENERIC)  -t $(GFLAGS) $<
 
