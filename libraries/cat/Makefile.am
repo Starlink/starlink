@@ -203,10 +203,10 @@ dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)
 
 # CAT has not (historically) generated unsigned int variants
 .gen.f:
-	$(FGENERIC) -t bcdilrw -c CAT__SZVAL $<
+	$(FGENERIC) -t bcdiklrw -c CAT__SZVAL $<
 
 .gn.f:
-	$(FGENERIC) -t bdirw $<
+	$(FGENERIC) -t bdikrw $<
 
 .gcn.f:
-	$(FGENERIC) -t bcdirw $<
+	$(FGENERIC) -t bcdikrw $<

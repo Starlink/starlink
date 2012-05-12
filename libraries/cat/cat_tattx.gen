@@ -113,6 +113,7 @@
       INTEGER*2 LVALUW
       INTEGER*2 LVALW
       INTEGER   LVALI
+      INTEGER*8 LVALK
       REAL      LVALR
       DOUBLE PRECISION LVALD
       LOGICAL   LVALL
@@ -128,6 +129,7 @@
       INTEGER*2        VALUW ! Unsigned word value.
       INTEGER*2        VALW  ! Word value.
       INTEGER          VALI  ! Integer value.
+      INTEGER*8        VALK  ! Integer*8 value.
       REAL             VALR  ! Real value.
       DOUBLE PRECISION VALD  ! Double precision value.
       LOGICAL          VALL  ! Logical value.
@@ -182,9 +184,9 @@
                   LVAL<T> = VALUE
 
                   CALL CAT1_TCNVT (CAT__TYPE<T>, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
-     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALR, VALD,
-     :              VALL, VALC, CONVOK, STATUS)
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
+     :              ATYPE, VALUB, VALB, VALUW, VALW, VALI, VALK, VALR,
+     :              VALD, VALL, VALC, CONVOK, STATUS)
 
                   IF (STATUS .EQ. CAT__OK) THEN
                      IF (ATYPE .EQ. CAT__TYPEUB) THEN
@@ -201,6 +203,9 @@
 
                      ELSE IF (ATYPE .EQ. CAT__TYPEI) THEN
                         ATTVI__CAT1(ATELM) = VALI
+
+                     ELSE IF (ATYPE .EQ. CAT__TYPEK) THEN
+                        ATTVR__CAT1(ATELM) = VALK
 
                      ELSE IF (ATYPE .EQ. CAT__TYPER) THEN
                         ATTVR__CAT1(ATELM) = VALR

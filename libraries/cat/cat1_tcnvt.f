@@ -1,6 +1,6 @@
-      SUBROUTINE CAT1_TCNVT (ITYPE, INUB, INB, INUW, INW, INI, INR,
-     :  IND, INL, INC, OTYPE, OUTUB, OUTB, OUTUW, OUTW, OUTI, OUTR,
-     :   OUTD, OUTL, OUTC, CONVOK, STATUS)
+      SUBROUTINE CAT1_TCNVT (ITYPE, INUB, INB, INUW, INW, INI, INK,
+     :  INR, IND, INL, INC, OTYPE, OUTUB, OUTB, OUTUW, OUTW, OUTI,
+     :  OUTK, OUTR, OUTD, OUTL, OUTC, CONVOK, STATUS)
 *+
 *  Name:
 *     CAT1_TCNVT
@@ -9,9 +9,9 @@
 *  Language:
 *     Fortran 77.
 *  Invocation:
-*     CALL CAT1_TCNVT (ITYPE, INUB, INB, INUW, INW, INI, INR, IND,
-*       INL, INC, OTYPE; OUTUB, OUTB, OUTUW, OUTW, OUTI, OUTR, OUTD,
-*       OUTL, OUTC, CONVOK; STATUS)
+*     CALL CAT1_TCNVT (ITYPE, INUB, INB, INUW, INW, INI, INK, INR, IND,
+*       INL, INC, OTYPE; OUTUB, OUTB, OUTUW, OUTW, OUTI, OUTK, OUTR,
+*       OUTD, OUTL, OUTC, CONVOK; STATUS)
 *  Description:
 *     Convert a value from one data type to another.
 *
@@ -30,6 +30,8 @@
 *        Input value if the input data type is word.
 *     INI  =  INTEGER (Given)
 *        Input value if the input data type is integer.
+*     INK  =  INTEGER*8 (Given)
+*        Input value if the input data type is integer*8.
 *     INR  =  REAL (Given)
 *        Input value if the input data type is real.
 *     IND  =  DOUBLE PRECISION (Given)
@@ -50,6 +52,8 @@
 *        Output value if the output data type is word.
 *     OUTI  =  INTEGER (Returned)
 *        Output value if the output data type is integer.
+*     OUTK  =  INTEGER*8 (Returned)
+*        Output value if the output data type is integer*8.
 *     OUTR  =  REAL (Returned)
 *        Output value if the output data type is real.
 *     OUTD  =  DOUBLE PRECISION (Returned)
@@ -96,6 +100,8 @@
 *     7/7/93  (ACD): Original version.
 *     23/1/94 (ACD): Modified error reporting.
 *     8/2/94  (ACD): Changed parameters for data type codes.
+*     2012-05-11 (TIMJ):
+*        Add K.
 *  Bugs:
 *     None known
 *-
@@ -113,6 +119,7 @@
       INTEGER*2 INUW
       INTEGER*2 INW
       INTEGER INI
+      INTEGER*8 INK
       REAL INR
       DOUBLE PRECISION IND
       LOGICAL INL
@@ -124,6 +131,7 @@
       INTEGER*2 OUTUW
       INTEGER*2 OUTW
       INTEGER OUTI
+      INTEGER*8 OUTK
       REAL OUTR
       DOUBLE PRECISION OUTD
       LOGICAL OUTL
@@ -137,6 +145,8 @@
      :  POSN,   ! Current position in character string.
      :  IVAL,   ! INTEGER copy of the current value.
      :  LSTAT   ! Local status.
+      INTEGER*8
+     :  KVAL    ! INTEGER*8 copy of the current value
 *
       BYTE
      :  BMIN,   ! Minimum value as a byte number.
@@ -147,6 +157,9 @@
       INTEGER
      :  IMIN,   ! Minimum value as an integer number.
      :  IMAX    ! Maximum   "   "  "     "      "   .
+      INTEGER*8
+     :  KMIN,   ! Minimum value as an integer*8 number.
+     :  KMAX    ! Maximum   "   "  "     "      "   .
       REAL
      :  RMIN,   ! Minimum value as a real number.
      :  RMAX    ! Maximum   "   "  "  "     "   .
@@ -162,6 +175,7 @@
          OUTUW = 0
          OUTW = 0
          OUTI = 0
+         OUTK = 0
          OUTR = 0.0E0
          OUTD = 00.D0
          OUTL = .FALSE.
@@ -188,6 +202,9 @@
 
             ELSE IF (OTYPE .EQ. CAT__TYPEI) THEN
                OUTI = INUB
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEK) THEN
+               OUTK = INUB
 
             ELSE IF (OTYPE .EQ. CAT__TYPER) THEN
                OUTR = INUB
@@ -249,6 +266,9 @@ c               BMAX = VAL__MAXUB
 
             ELSE IF (OTYPE .EQ. CAT__TYPEI) THEN
                OUTI = INB
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEK) THEN
+               OUTK = INB
 
             ELSE IF (OTYPE .EQ. CAT__TYPER) THEN
                OUTR = INB
@@ -316,6 +336,9 @@ c               WMAX = VAL__MAXUB
 
             ELSE IF (OTYPE .EQ. CAT__TYPEI) THEN
                OUTI = INUW
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEK) THEN
+               OUTK = INUW
 
             ELSE IF (OTYPE .EQ. CAT__TYPER) THEN
                OUTR = INUW
@@ -392,6 +415,9 @@ c               WMAX = VAL__MAXUW
 
             ELSE IF (OTYPE .EQ. CAT__TYPEI) THEN
                OUTI = INW
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEK) THEN
+               OUTK = INW
 
             ELSE IF (OTYPE .EQ. CAT__TYPER) THEN
                OUTR = INW
@@ -509,6 +535,99 @@ c 1000          format(1x, 'imin, imax, ini: ', i10, i10, i10 )
             END IF
 
 *
+*       Case where the input value is integer*8.
+
+         ELSE IF (ITYPE .EQ. CAT__TYPEK) THEN
+            IF (OTYPE .EQ. CAT__TYPEUB) THEN
+               KMIN = VAL__MINUB
+               KMAX = VAL__MAXUB
+
+               IF (INK .GE. KMIN  .AND.  INK .LE. KMAX) THEN
+                  OUTUB = INK
+               ELSE
+                  CONVOK = .FALSE.
+               END IF
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEB) THEN
+               KMIN = VAL__MINB
+               KMAX = VAL__MAXB
+
+               IF (INK .GE. KMIN  .AND.  INK .LE. KMAX) THEN
+                  OUTB = INK
+               ELSE
+                  CONVOK = .FALSE.
+               END IF
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEUW) THEN
+c               KMIN = VAL__MINUW
+c               KMAX = VAL__MAXUW
+               KMIN = VAL__MINUW
+               KMAX = VAL__MAXW
+
+c               write(17, 1000) kmin, kmax, ink
+c 1000          format(1x, 'kmin, kmax, ink: ', i10, i10, i10 )
+
+               IF (INK .GE. KMIN  .AND.  INK .LE. KMAX) THEN
+                  OUTUW = INK
+               ELSE
+                  CONVOK = .FALSE.
+               END IF
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEW) THEN
+               KMIN = VAL__MINW
+               KMAX = VAL__MAXW
+
+               IF (INK .GE. KMIN  .AND.  INK .LE. KMAX) THEN
+                  OUTW = INK
+               ELSE
+                  CONVOK = .FALSE.
+               END IF
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEI) THEN
+               KMIN = VAL__MINI
+               KMAX = VAL__MAXI
+
+               IF (INK .GE. KMIN  .AND.  INK .LE. KMAX) THEN
+                  OUTI = INK
+               ELSE
+                  CONVOK = .FALSE.
+               END IF
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEK) THEN
+               OUTK = INK
+
+            ELSE IF (OTYPE .EQ. CAT__TYPER) THEN
+               OUTR = INK
+
+            ELSE IF (OTYPE .EQ. CAT__TYPED) THEN
+               OUTD = INK
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEL) THEN
+               REM = MOD(INK, 2)
+               IF (REM .EQ. 0) THEN
+                  OUTL = .FALSE.
+               ELSE
+                  OUTL = .TRUE.
+               END IF
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEC) THEN
+               KVAL = INK
+
+               POSN = 0
+               OUTC = ' '
+
+               CALL CHR_PUTK (KVAL, OUTC, POSN)
+
+            ELSE
+               STATUS = CAT__INVDT
+               CONVOK = .FALSE.
+
+               CALL CAT1_ERREP ('CAT1_TCNVT_IDT', 'Error during data '/
+     :           /'type conversion.', STATUS)
+
+            END IF
+
+*
 *       Case where the input value is real.
 
          ELSE IF (ITYPE .EQ. CAT__TYPER) THEN
@@ -558,6 +677,16 @@ c 1000          format(1x, 'imin, imax, ini: ', i10, i10, i10 )
 
                IF (INR .GE. RMIN  .AND.  INR .LE. RMAX) THEN
                   OUTI = INR
+               ELSE
+                  CONVOK = .FALSE.
+               END IF
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEK) THEN
+               RMIN = VAL__MINK
+               RMAX = VAL__MAXK
+
+               IF (INR .GE. RMIN  .AND.  INR .LE. RMAX) THEN
+                  OUTK = INR
                ELSE
                   CONVOK = .FALSE.
                END IF
@@ -646,6 +775,16 @@ c 1000          format(1x, 'imin, imax, ini: ', i10, i10, i10 )
                   CONVOK = .FALSE.
                END IF
 
+            ELSE IF (OTYPE .EQ. CAT__TYPEK) THEN
+               DMIN = VAL__MINK
+               DMAX = VAL__MAXK
+
+               IF (IND .GE. DMIN  .AND.  IND .LE. DMAX) THEN
+                  OUTK = IND
+               ELSE
+                  CONVOK = .FALSE.
+               END IF
+
             ELSE IF (OTYPE .EQ. CAT__TYPER) THEN
                DMIN = VAL__MINR
                DMAX = VAL__MAXR
@@ -720,6 +859,13 @@ c 1000          format(1x, 'imin, imax, ini: ', i10, i10, i10 )
                   OUTI = 1
                ELSE
                   OUTI = 0
+               END IF
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEK) THEN
+               IF (INL) THEN
+                  OUTK = 1
+               ELSE
+                  OUTK = 0
                END IF
 
             ELSE IF (OTYPE .EQ. CAT__TYPER) THEN
@@ -834,6 +980,11 @@ c 1000          format(1x, 'imin, imax, ini: ', i10, i10, i10 )
             ELSE IF (OTYPE .EQ. CAT__TYPEI) THEN
                LSTAT = CAT__OK
                CALL CHR_CTOI (INC, OUTI, LSTAT)
+               IF (LSTAT .NE. CAT__OK) CONVOK = .FALSE.
+
+            ELSE IF (OTYPE .EQ. CAT__TYPEK) THEN
+               LSTAT = CAT__OK
+               CALL CHR_CTOK (INC, OUTK, LSTAT)
                IF (LSTAT .NE. CAT__OK) CONVOK = .FALSE.
 
             ELSE IF (OTYPE .EQ. CAT__TYPER) THEN

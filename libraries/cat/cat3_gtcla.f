@@ -90,6 +90,8 @@
 *     20/3/96  (ACD): Fixed bug; variable FITSTT was not being
 *        initialised.
 *     4/6/98   (ACD): Improved the error reporting.
+*     2012-05-11 (TIMJ):
+*        Add K
 *  Bugs:
 *     None known
 *-
@@ -195,6 +197,11 @@ C3000       format(1x, 'pcols, ttype: ', I4, 1x, a15 )
                FDTYPE = CAT__TYPEI
                FCSIZE = 0
                FITYPE = CAT3__FTYPJ
+
+            ELSE IF (TFORM(1 : 1) .EQ. 'K') THEN
+               FDTYPE = CAT__TYPEK
+               FCSIZE = 0
+               FITYPE = CAT3__FTYPK
 
             ELSE IF (TFORM(1 : 1) .EQ. 'A') THEN
                FDTYPE = CAT__TYPEC

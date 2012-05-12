@@ -15,6 +15,8 @@
 *     5/7/94  (ACD): Original version.
 *     22/9/94 (ACD): First stable version.
 *     10/3/95 (ACD): Added CAT3_SZCVL.
+*     2012-05-11 (TIMJ):
+*        Add K
 *-
 
 *
@@ -32,23 +34,26 @@
       INTEGER CAT3__FTYPJ           ! Integer.
       PARAMETER (CAT3__FTYPJ = 4)
 
+      INTEGER CAT3__FTYPK           ! 64-bit Integer.
+      PARAMETER (CAT3__FTYPK = 5)
+
       INTEGER CAT3__FTYPE           ! Real.
-      PARAMETER (CAT3__FTYPE = 5)
+      PARAMETER (CAT3__FTYPE = 6)
 
       INTEGER CAT3__FTYPD           ! Double Precision.
-      PARAMETER (CAT3__FTYPD = 6)
+      PARAMETER (CAT3__FTYPD = 7)
 
       INTEGER CAT3__FTYPL           ! Logical.
-      PARAMETER (CAT3__FTYPL = 7)
+      PARAMETER (CAT3__FTYPL = 8)
 
       INTEGER CAT3__FTYPA           ! Character.
-      PARAMETER (CAT3__FTYPA = 8)
+      PARAMETER (CAT3__FTYPA = 9)
 
       INTEGER CAT3__FTYPC           ! Complex real.
-      PARAMETER (CAT3__FTYPC = 9)
+      PARAMETER (CAT3__FTYPC = 10)
 
       INTEGER CAT3__FTYPM           ! Complex double precision.
-      PARAMETER (CAT3__FTYPM = 10)
+      PARAMETER (CAT3__FTYPM = 11)
 
 *
 *    Minimum value by which either the scale factor must differ from

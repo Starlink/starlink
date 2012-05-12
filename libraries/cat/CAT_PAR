@@ -250,6 +250,9 @@
       INTEGER CAT__TYPEC   ! Character.
       PARAMETER (CAT__TYPEC = 9)
 
+      INTEGER CAT__TYPEK   ! 64-bit Integer.
+      PARAMETER (CAT__TYPEK = 10)
+
 *
 *    Flag to indicate that a row is not paired or joined; it is used
 *    in any list of such pairs or joins.

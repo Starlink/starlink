@@ -129,6 +129,7 @@
       INTEGER*2        UWVAL              ! Unsigned word.
       INTEGER*2        WVAL               ! word.
       INTEGER          IVAL               ! Integer.
+      INTEGER*8        KVAL               ! Integer*8.
       REAL             RVAL               ! Real.
       DOUBLE PRECISION DVAL               ! Double precision.
       LOGICAL          LVAL               ! Logical.
@@ -142,6 +143,7 @@
       INTEGER*2        UWDUM              ! Unsigned word.
       INTEGER*2        WDUM               ! word.
       INTEGER          IDUM               ! Integer.
+      INTEGER*8        KDUM               ! Integer*8.
       REAL             RDUM               ! Real.
       DOUBLE PRECISION DDUM               ! Double precision.
       LOGICAL          LDUM               ! Logical.
@@ -173,9 +175,9 @@
 *             value to the appropriate data type.
 
                CALL CAT1_TCNVT (CAT__TYPEC, UBDUM, BDUM, UWDUM,
-     :           WDUM, IDUM, RDUM, DDUM, LDUM, FIELD,
+     :           WDUM, IDUM, KDUM, RDUM, DDUM, LDUM, FIELD,
      :           FDTYPE, UBVAL, BVAL, UWVAL, WVAL,
-     :           IVAL, RVAL, DVAL, LVAL, CVAL, CONVOK,
+     :           IVAL, KVAL, RVAL, DVAL, LVAL, CVAL, CONVOK,
      :           STATUS)
             ELSE
 
@@ -193,9 +195,9 @@
 
                IF (CONVOK) THEN
                   CALL CAT1_TCNVT (CAT__TYPED, UBDUM, BDUM, UWDUM,
-     :              WDUM, IDUM, RDUM, ANGLE, LDUM, CDUM,
+     :              WDUM, IDUM, KDUM, RDUM, ANGLE, LDUM, CDUM,
      :              FDTYPE, UBVAL, BVAL, UWVAL, WVAL,
-     :              IVAL, RVAL, DVAL, LVAL, CVAL, CONVOK,
+     :              IVAL, KVAL, RVAL, DVAL, LVAL, CVAL, CONVOK,
      :              STATUS)
                END IF
             END IF
@@ -207,18 +209,18 @@
 *          the required data type.
 
             CALL CAT1_TCNVT (CAT__TYPEC, UBDUM, BDUM, UWDUM,
-     :        WDUM, IDUM, RDUM, DDUM, LDUM, FIELD,
+     :        WDUM, IDUM, KDUM, RDUM, DDUM, LDUM, FIELD,
      :        CAT__TYPED, UBVAL, BVAL, UWVAL, WVAL,
-     :        IVAL, RVAL, DVAL, LVAL, CVAL, CONVOK,
+     :        IVAL, KVAL, RVAL, DVAL, LVAL, CVAL, CONVOK,
      :        STATUS)
 
             IF (CONVOK) THEN
                SCALED = (DVAL * FSCALE) + FZERO
 
                CALL CAT1_TCNVT (CAT__TYPED, UBDUM, BDUM, UWDUM,
-     :           WDUM, IDUM, RDUM, SCALED, LDUM, CDUM,
+     :           WDUM, IDUM, KDUM, RDUM, SCALED, LDUM, CDUM,
      :           FDTYPE, UBVAL, BVAL, UWVAL, WVAL,
-     :           IVAL, RVAL, DVAL, LVAL, CVAL, CONVOK,
+     :           IVAL, KVAL, RVAL, DVAL, LVAL, CVAL, CONVOK,
      :           STATUS)
             END IF
          END IF
@@ -242,6 +244,12 @@
 
             ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
                CALL CAT5_STAEI (ROWS, ROW, IVAL, %VAL(CNF_PVAL(PTR)),
+     :                          STATUS)
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE.,
+     :                          %VAL(CNF_PVAL(PTRN)), STATUS)
+
+            ELSE IF (FDTYPE .EQ. CAT__TYPEK) THEN
+               CALL CAT5_STAEK (ROWS, ROW, IVAL, %VAL(CNF_PVAL(PTR)),
      :                          STATUS)
                CALL CAT5_STAEL (ROWS, ROW, .FALSE.,
      :                          %VAL(CNF_PVAL(PTRN)), STATUS)

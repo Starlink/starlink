@@ -77,6 +77,9 @@ C      INCLUDE 'PRM_PAR'
       INTEGER CAT1__DNULI           ! Integer.
       PARAMETER (CAT1__DNULI = VAL__BADI)
 
+      INTEGER*8 CAT1__DNULK         ! 64-bit Integer.
+      PARAMETER (CAT1__DNULK = VAL__BADK)
+
       REAL CAT1__DNULR              ! Real.
       PARAMETER (CAT1__DNULR = VAL__BADR)
 

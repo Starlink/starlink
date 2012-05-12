@@ -107,6 +107,7 @@
       INTEGER*2 VALUEUW
       INTEGER*2 VALUEW
       INTEGER   VALUEI
+      INTEGER*8 VALUEK
       REAL      VALUER
       DOUBLE PRECISION VALUED
       LOGICAL   VALUEL
@@ -130,6 +131,7 @@
       INTEGER*2        BUFFUW
       INTEGER*2        BUFFW
       INTEGER          BUFFI
+      INTEGER*8        BUFFK
       REAL             BUFFR
       DOUBLE PRECISION BUFFD
       LOGICAL          BUFFL
@@ -158,10 +160,9 @@
 
             IF (.NOT. NULFLG) THEN
                CALL CAT1_TCNVT (CAT__TYPE<T>, VALUEUB, VALUEB, VALUEUW,
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
-     :           CAT__TYPEW, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     :
-     :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
+     :           VALUEW, VALUEI, VALUEK, VALUER, VALUED, VALUEL, VALUEC,
+     :           CAT__TYPEW, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFK,
+     :           BUFFR, BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
                   LNULFG = .FALSE.
@@ -198,10 +199,9 @@
 
             IF (.NOT. NULFLG) THEN
                CALL CAT1_TCNVT (CAT__TYPE<T>, VALUEUB, VALUEB, VALUEUW,
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
-     :           CAT__TYPEI, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     :
-     :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
+     :           VALUEW, VALUEI, VALUEK, VALUER, VALUED, VALUEL, VALUEC,
+     :           CAT__TYPEI, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFK,
+     :           BUFFR, BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
                   LNULFG = .FALSE.
@@ -238,10 +238,9 @@
 
             IF (.NOT. NULFLG) THEN
                CALL CAT1_TCNVT (CAT__TYPE<T>, VALUEUB, VALUEB, VALUEUW,
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
-     :           CAT__TYPER, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     :
-     :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
+     :           VALUEW, VALUEI, VALUEK, VALUER, VALUED, VALUEL, VALUEC,
+     :           CAT__TYPER, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFK,
+     :           BUFFR, BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
                   LNULFG = .FALSE.
@@ -278,10 +277,9 @@
 
             IF (.NOT. NULFLG) THEN
                CALL CAT1_TCNVT (CAT__TYPE<T>, VALUEUB, VALUEB, VALUEUW,
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
-     :           CAT__TYPED, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     :
-     :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
+     :           VALUEW, VALUEI, VALUEK, VALUER, VALUED, VALUEL, VALUEC,
+     :           CAT__TYPED, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFK,
+     :           BUFFR, BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
                   LNULFG = .FALSE.
@@ -318,10 +316,9 @@
 
             IF (.NOT. NULFLG) THEN
                CALL CAT1_TCNVT (CAT__TYPE<T>, VALUEUB, VALUEB, VALUEUW,
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
-     :           CAT__TYPEL, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     :
-     :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
+     :           VALUEW, VALUEI, VALUEK, VALUER, VALUED, VALUEL, VALUEC,
+     :           CAT__TYPEL, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFK,
+     :           BUFFR, BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
                   LNULFG = .FALSE.
@@ -358,10 +355,9 @@
 
             IF (.NOT. NULFLG) THEN
                CALL CAT1_TCNVT (CAT__TYPE<T>, VALUEUB, VALUEB, VALUEUW,
-     :           VALUEW, VALUEI, VALUER, VALUED, VALUEL, VALUEC,
-     :           CAT__TYPEC, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFR,
-     :
-     :           BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
+     :           VALUEW, VALUEI, VALUEK, VALUER, VALUED, VALUEL, VALUEC,
+     :           CAT__TYPEC, BUFFUB, BUFFB, BUFFUW, BUFFW, BUFFI, BUFFK,
+     :           BUFFR, BUFFD, BUFFL, BUFFC, CONVOK, STATUS)
 
                IF (CONVOK) THEN
                   LNULFG = .FALSE.
@@ -414,6 +410,9 @@
 
             ELSE IF (FITYPE .EQ. CAT3__FTYPJ) THEN
                CALL CHR_PUTC ('INTEGER', ERRMSG, ERRPOS)
+
+            ELSE IF (FITYPE .EQ. CAT3__FTYPK) THEN
+               CALL CHR_PUTC ('64-BIT INTEGER', ERRMSG, ERRPOS)
 
             ELSE IF (FITYPE .EQ. CAT3__FTYPE) THEN
                CALL CHR_PUTC ('REAL', ERRMSG, ERRPOS)

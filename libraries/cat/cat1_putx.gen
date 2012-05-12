@@ -119,6 +119,7 @@
       BYTE             BLVAL
       INTEGER*2        WLVAL
       INTEGER          ILVAL
+      INTEGER*8        KLVAL
       REAL             RLVAL
       DOUBLE PRECISION DLVAL
       LOGICAL          LLVAL
@@ -128,6 +129,7 @@
       BLVAL = 0
       WLVAL = 0
       ILVAL = 0
+      KLVAL = 0
       RLVAL = 0.0E0
       DLVAL = 0.0D0
       LLVAL = .FALSE.
@@ -201,6 +203,8 @@
                CALL CHR_ITOC (WKVALI, STR1, LSTR1)
             ELSE IF (CURTYP .EQ. 'I') THEN
                CALL CHR_ITOC (ILVAL, STR1, LSTR1)
+            ELSE IF (CURTYP .EQ. 'K') THEN
+               CALL CHR_KTOC (KLVAL, STR1, LSTR1)
             ELSE IF (CURTYP .EQ. 'R') THEN
                CALL CHR_RTOC (RLVAL, STR1, LSTR1)
             ELSE

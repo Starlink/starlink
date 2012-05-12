@@ -1,5 +1,5 @@
 *     SUBROUTINE CAT3_FGCV<t> (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-*    :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
+*    :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK, VALUER,
 *    :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *+
 *  Name:
@@ -10,7 +10,7 @@
 *     Fortran 77.
 *  Invocation:
 *     CALL CAT3_FGCV<t> (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-*       ELEM, DTYPE; VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
+*       ELEM, DTYPE; VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK, VALUER,
 *       VALUED, VALUEL, VALUEC, NULFLG; STATUS)
 *  Description:
 *     Get a value from a FITS table using the FITSIO routines.
@@ -31,6 +31,7 @@
 *       BYTE              B         -         B
 *       WORD              I         -         W
 *       INTEGER           J         I         I
+*       INTEGER*8         K         -         K
 *       REAL              E        F,E        R
 *       DOUBLE PRECISION  D         D         D
 *       LOGICAL           L         -         L
@@ -68,6 +69,8 @@
 *        Value returned if a WORD value is requested.
 *     VALUEI  =  INTEGER (Returned)
 *        Value returned if an INTEGER value is requested.
+*     VALUEI  =  INTEGER*8 (Returned)
+*        Value returned if an INTEGER*8 value is requested.
 *     VALUER  =  REAL (Returned)
 *        Value returned if a REAL value is requested.
 *     VALUED  =  DOUBLE PRECISION (Returned)
@@ -147,8 +150,8 @@
 
 * -- Bit mask version ----------------------------------------------------
       SUBROUTINE CAT3_FGCVX (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
-     :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
@@ -173,6 +176,7 @@
       INTEGER*2        VALUEUW
       INTEGER*2        VALUEW
       INTEGER          VALUEI
+      INTEGER*8        VALUEK
       REAL             VALUER
       DOUBLE PRECISION VALUED
       LOGICAL          VALUEL
@@ -206,6 +210,7 @@
       INTEGER*2        LVALUW
       INTEGER*2        LVALW
       INTEGER          LVALI
+      INTEGER*8        LVALK
       REAL             LVALR
       DOUBLE PRECISION LVALD
       LOGICAL          LVALL
@@ -222,6 +227,7 @@
       INTEGER*2        IVALUW
       INTEGER*2        IVALW
       INTEGER          IVALI
+      INTEGER*8        IVALK
       REAL             IVALR
       DOUBLE PRECISION IVALD
       LOGICAL          IVALL
@@ -264,9 +270,10 @@
 *                the FITS column to the appropriate data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEB, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :              VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
 
                   IF (.NOT. CONVOK) THEN
                      NULFLG = .TRUE.
@@ -281,17 +288,18 @@
 *                data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEB, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
-     :              IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
 
                   IF (CONVOK) THEN
                      IVALD = (IVALD * SCALE) + ZERO
 
                      CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
-     :                 IVALW, IVALI, IVALR, IVALD, IVALL, IVALC,
+     :                 IVALW, IVALI, IVALK, IVALR, IVALD, IVALL, IVALC,
      :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :                 VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
 
                      IF (.NOT. CONVOK) THEN
                         NULFLG = .TRUE.
@@ -342,8 +350,8 @@
 
 * -- Byte version -------------------------------------------------------
       SUBROUTINE CAT3_FGCVB (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
-     :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
@@ -368,6 +376,7 @@
       INTEGER*2        VALUEUW
       INTEGER*2        VALUEW
       INTEGER          VALUEI
+      INTEGER*8        VALUEK
       REAL             VALUER
       DOUBLE PRECISION VALUED
       LOGICAL          VALUEL
@@ -401,6 +410,7 @@
       INTEGER*2        LVALUW
       INTEGER*2        LVALW
       INTEGER          LVALI
+      INTEGER*8        LVALK
       REAL             LVALR
       DOUBLE PRECISION LVALD
       LOGICAL          LVALL
@@ -417,6 +427,7 @@
       INTEGER*2        IVALUW
       INTEGER*2        IVALW
       INTEGER          IVALI
+      INTEGER*8        IVALK
       REAL             IVALR
       DOUBLE PRECISION IVALD
       LOGICAL          IVALL
@@ -459,9 +470,10 @@
 *                the FITS column to the appropriate data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEB, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :              VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
 
                   IF (.NOT. CONVOK) THEN
                      NULFLG = .TRUE.
@@ -476,17 +488,18 @@
 *                data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEB, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
-     :              IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
 
                   IF (CONVOK) THEN
                      IVALD = (IVALD * SCALE) + ZERO
 
                      CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
-     :                 IVALW, IVALI, IVALR, IVALD, IVALL, IVALC,
+     :                 IVALW, IVALI, IVALK, IVALR, IVALD, IVALL, IVALC,
      :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :                 VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
 
                      IF (.NOT. CONVOK) THEN
                         NULFLG = .TRUE.
@@ -537,8 +550,8 @@
 
 * -- Word version -------------------------------------------------------
       SUBROUTINE CAT3_FGCVI (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
-     :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
@@ -563,6 +576,7 @@
       INTEGER*2        VALUEUW
       INTEGER*2        VALUEW
       INTEGER          VALUEI
+      INTEGER*8        VALUEK
       REAL             VALUER
       DOUBLE PRECISION VALUED
       LOGICAL          VALUEL
@@ -596,6 +610,7 @@
       INTEGER*2        LVALUW
       INTEGER*2        LVALW
       INTEGER          LVALI
+      INTEGER*8        LVALK
       REAL             LVALR
       DOUBLE PRECISION LVALD
       LOGICAL          LVALL
@@ -612,6 +627,7 @@
       INTEGER*2        IVALUW
       INTEGER*2        IVALW
       INTEGER          IVALI
+      INTEGER*8        IVALK
       REAL             IVALR
       DOUBLE PRECISION IVALD
       LOGICAL          IVALL
@@ -654,9 +670,10 @@
 *                the FITS column to the appropriate data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEW, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :              VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
 
                   IF (.NOT. CONVOK) THEN
                      NULFLG = .TRUE.
@@ -671,17 +688,18 @@
 *                data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEW, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
-     :              IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
 
                   IF (CONVOK) THEN
                      IVALD = (IVALD * SCALE) + ZERO
 
                      CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
-     :                 IVALW, IVALI, IVALR, IVALD, IVALL, IVALC,
+     :                 IVALW, IVALI, IVALK, IVALR, IVALD, IVALL, IVALC,
      :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :                 VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
 
                      IF (.NOT. CONVOK) THEN
                         NULFLG = .TRUE.
@@ -732,8 +750,8 @@
 
 * -- Integer version ----------------------------------------------------
       SUBROUTINE CAT3_FGCVJ (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
-     :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
@@ -758,6 +776,7 @@
       INTEGER*2        VALUEUW
       INTEGER*2        VALUEW
       INTEGER          VALUEI
+      INTEGER*8        VALUEK
       REAL             VALUER
       DOUBLE PRECISION VALUED
       LOGICAL          VALUEL
@@ -791,6 +810,7 @@
       INTEGER*2        LVALUW
       INTEGER*2        LVALW
       INTEGER          LVALI
+      INTEGER*8        LVALK
       REAL             LVALR
       DOUBLE PRECISION LVALD
       LOGICAL          LVALL
@@ -807,6 +827,7 @@
       INTEGER*2        IVALUW
       INTEGER*2        IVALW
       INTEGER          IVALI
+      INTEGER*8        IVALK
       REAL             IVALR
       DOUBLE PRECISION IVALD
       LOGICAL          IVALL
@@ -849,9 +870,10 @@
 *                the FITS column to the appropriate data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEI, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :              VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
 
                   IF (.NOT. CONVOK) THEN
                      NULFLG = .TRUE.
@@ -866,17 +888,18 @@
 *                data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEI, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
-     :              IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
 
                   IF (CONVOK) THEN
                      IVALD = (IVALD * SCALE) + ZERO
 
                      CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
-     :                 IVALW, IVALI, IVALR, IVALD, IVALL, IVALC,
+     :                 IVALW, IVALI, IVALK, IVALR, IVALD, IVALL, IVALC,
      :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :                 VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
 
                      IF (.NOT. CONVOK) THEN
                         NULFLG = .TRUE.
@@ -925,10 +948,10 @@
 
       END
 
-* -- REAL version ------------------------------------------------------
-      SUBROUTINE CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
-     :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+* -- 64-bit Integer version ----------------------------------------------------
+      SUBROUTINE CAT3_FGCVK (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
@@ -953,6 +976,7 @@
       INTEGER*2        VALUEUW
       INTEGER*2        VALUEW
       INTEGER          VALUEI
+      INTEGER*8        VALUEK
       REAL             VALUER
       DOUBLE PRECISION VALUED
       LOGICAL          VALUEL
@@ -986,6 +1010,7 @@
       INTEGER*2        LVALUW
       INTEGER*2        LVALW
       INTEGER          LVALI
+      INTEGER*8        LVALK
       REAL             LVALR
       DOUBLE PRECISION LVALD
       LOGICAL          LVALL
@@ -1002,6 +1027,207 @@
       INTEGER*2        IVALUW
       INTEGER*2        IVALW
       INTEGER          IVALI
+      INTEGER*8        IVALK
+      REAL             IVALR
+      DOUBLE PRECISION IVALD
+      LOGICAL          IVALL
+      CHARACTER        IVALC*(CAT__SZVAL)
+*.
+
+      IF (STATUS .EQ. CAT__OK) THEN
+
+*
+*       Initialise the null value flag to indicate a non-null value.
+
+         NULFLG = .FALSE.
+
+*
+*       Work out the FITS element from the CAT element.
+
+         FELEM = ELEM
+
+*
+*       Set the FITS status, attempt to get a value and proceed if ok.
+
+         FITSTT = FITOK
+         CALL FTGCFK (FITUNT, COLNO, ROWNO, FELEM, 1, LVALI,
+     :     FLGVAL, ANYF, FITSTT)
+
+         IF (FITSTT .EQ. FITOK) THEN
+
+*
+*          Check that no null values have been obtained.
+
+            IF (.NOT. ANYF) THEN
+
+*
+*             Check if the column is scaled.
+
+               IF (.NOT. SFLAG) THEN
+
+*
+*                The column is not scaled; simply convert the value from
+*                the FITS column to the appropriate data type.
+
+                  CALL CAT1_TCNVT (CAT__TYPEK, LVALUB, LVALB, LVALUW,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
+     :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
+
+                  IF (.NOT. CONVOK) THEN
+                     NULFLG = .TRUE.
+                  END IF
+
+               ELSE
+
+*
+*                The column is scaled.  First convert the value obtained
+*                from the FITS table to DOUBLE PRECISION, then apply the
+*                scaling and finally convert the value to the required
+*                data type.
+
+                  CALL CAT1_TCNVT (CAT__TYPEL, LVALUB, LVALB, LVALUW,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
+     :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+
+                  IF (CONVOK) THEN
+                     IVALD = (IVALD * SCALE) + ZERO
+
+                     CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
+     :                 IVALW, IVALI, IVALK,  IVALR, IVALD, IVALL, IVALC,
+     :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
+
+                     IF (.NOT. CONVOK) THEN
+                        NULFLG = .TRUE.
+                     END IF
+
+                  ELSE
+                     NULFLG = .TRUE.
+                  END IF
+               END IF
+            ELSE
+
+*
+*             A null value was obtained from FITSIO.
+
+               NULFLG = .TRUE.
+
+            END IF
+
+         ELSE
+
+*
+*          FITSIO returned an error status.  Set the null flag, set
+*          the return status and report an error.
+
+            NULFLG = .TRUE.
+
+            STATUS = CAT__ERROR
+
+            ERRPOS = 0
+            ERRMSG = ' '
+
+            CALL CHR_PUTC ('Failure getting field from FITS table '/
+     :        /'(column: ', ERRMSG, ERRPOS)
+            CALL CHR_PUTI (COLNO, ERRMSG, ERRPOS)
+            CALL CHR_PUTC (' element: ', ERRMSG, ERRPOS)
+            CALL CHR_PUTI (ELEM, ERRMSG, ERRPOS)
+            CALL CHR_PUTC (' row: ', ERRMSG, ERRPOS)
+            CALL CHR_PUTI (ROWNO, ERRMSG, ERRPOS)
+            CALL CHR_PUTC (').', ERRMSG, ERRPOS)
+
+            CALL CAT3_FITER ('CAT3_FGCVK_ERR', ERRMSG(1 : ERRPOS),
+     :        FITSTT, STATUS)
+         END IF
+
+      END IF
+
+      END
+
+* -- REAL version ------------------------------------------------------
+      SUBROUTINE CAT3_FGCVE (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+*  Type Definitions:
+      IMPLICIT NONE
+*  Global Constants:
+      INCLUDE 'CAT_PAR'           ! External CAT constants.
+      INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CAT1_NUL'          ! CAT null values.
+*  Arguments Given:
+      LOGICAL
+     :  SFLAG
+      DOUBLE PRECISION
+     :  SCALE,
+     :  ZERO
+      INTEGER
+     :  FITUNT,
+     :  COLNO,
+     :  ROWNO,
+     :  ELEM,
+     :  DTYPE
+*  Arguments Returned:
+      BYTE             VALUEUB
+      BYTE             VALUEB
+      INTEGER*2        VALUEUW
+      INTEGER*2        VALUEW
+      INTEGER          VALUEI
+      INTEGER*8        VALUEK
+      REAL             VALUER
+      DOUBLE PRECISION VALUED
+      LOGICAL          VALUEL
+      CHARACTER        VALUEC*(*)
+
+      LOGICAL
+     :  NULFLG
+*  Status:
+      INTEGER STATUS             ! Global status.
+*  Local Constants:
+      INTEGER FITOK  ! FITSIO success status.
+      PARAMETER (FITOK = 0)
+*  Local Variables:
+      INTEGER
+     :  FELEM,    ! Element of the FITS array to be accessed.
+     :  FITSTT,   ! FITSIO status.
+     :  ERRPOS    ! Current position in ERRMSG (excl. trail. blanks).
+      LOGICAL
+     :  FLGVAL,   ! Null value flag from FITSIO.
+     :  ANYF,     !  "     "    "    "     "   .
+     :  CONVOK    ! Flag; did data type conversion complete ok?
+      CHARACTER
+     :  ERRMSG*75 ! Text of error message.
+
+*
+*    These variables hold the local copy of the value obtained from the
+*    FITS column.  There is one variable per CAT data type.
+
+      BYTE             LVALUB
+      BYTE             LVALB
+      INTEGER*2        LVALUW
+      INTEGER*2        LVALW
+      INTEGER          LVALI
+      INTEGER*8        LVALK
+      REAL             LVALR
+      DOUBLE PRECISION LVALD
+      LOGICAL          LVALL
+      CHARACTER        LVALC*(CAT__SZVAL)
+
+*
+*    These variables hold an intermediate copy of the value obtained
+*    from the FITS column.  They are used in the extra conversion
+*    to data type DOUBLE PRECISION necessary for scaled columns.
+*    There is one variable per CAT data type.
+
+      BYTE             IVALUB
+      BYTE             IVALB
+      INTEGER*2        IVALUW
+      INTEGER*2        IVALW
+      INTEGER          IVALI
+      INTEGER*8        IVALK
       REAL             IVALR
       DOUBLE PRECISION IVALD
       LOGICAL          IVALL
@@ -1044,9 +1270,10 @@
 *                the FITS column to the appropriate data type.
 
                   CALL CAT1_TCNVT (CAT__TYPER, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :              VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
 
                   IF (.NOT. CONVOK) THEN
                      NULFLG = .TRUE.
@@ -1061,17 +1288,18 @@
 *                data type.
 
                   CALL CAT1_TCNVT (CAT__TYPER, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
-     :              IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
 
                   IF (CONVOK) THEN
                      IVALD = (IVALD * SCALE) + ZERO
 
                      CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
-     :                 IVALW, IVALI, IVALR, IVALD, IVALL, IVALC,
+     :                 IVALW, IVALI, IVALK, IVALR, IVALD, IVALL, IVALC,
      :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :                 VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
 
                      IF (.NOT. CONVOK) THEN
                         NULFLG = .TRUE.
@@ -1122,8 +1350,8 @@
 
 * -- DOUBLE PRECISION version ------------------------------------------------
       SUBROUTINE CAT3_FGCVD (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
-     :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
@@ -1148,6 +1376,7 @@
       INTEGER*2        VALUEUW
       INTEGER*2        VALUEW
       INTEGER          VALUEI
+      INTEGER*8        VALUEK
       REAL             VALUER
       DOUBLE PRECISION VALUED
       LOGICAL          VALUEL
@@ -1181,6 +1410,7 @@
       INTEGER*2        LVALUW
       INTEGER*2        LVALW
       INTEGER          LVALI
+      INTEGER*8        LVALK
       REAL             LVALR
       DOUBLE PRECISION LVALD
       LOGICAL          LVALL
@@ -1197,6 +1427,7 @@
       INTEGER*2        IVALUW
       INTEGER*2        IVALW
       INTEGER          IVALI
+      INTEGER*8        IVALK
       REAL             IVALR
       DOUBLE PRECISION IVALD
       LOGICAL          IVALL
@@ -1242,9 +1473,10 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 *                the FITS column to the appropriate data type.
 
                   CALL CAT1_TCNVT (CAT__TYPED, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :              VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
 
                   IF (.NOT. CONVOK) THEN
                      NULFLG = .TRUE.
@@ -1259,17 +1491,18 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 *                data type.
 
                   CALL CAT1_TCNVT (CAT__TYPED, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
-     :              IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
 
                   IF (CONVOK) THEN
                      IVALD = (IVALD * SCALE) + ZERO
 
                      CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
-     :                 IVALW, IVALI, IVALR, IVALD, IVALL, IVALC,
+     :                 IVALW, IVALI, IVALK, IVALR, IVALD, IVALL, IVALC,
      :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :                 VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
 
                      IF (.NOT. CONVOK) THEN
                         NULFLG = .TRUE.
@@ -1320,8 +1553,8 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 
 * -- LOGICAL version ------------------------------------------------------
       SUBROUTINE CAT3_FGCVL (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
-     :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
@@ -1346,6 +1579,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        VALUEUW
       INTEGER*2        VALUEW
       INTEGER          VALUEI
+      INTEGER*8        VALUEK
       REAL             VALUER
       DOUBLE PRECISION VALUED
       LOGICAL          VALUEL
@@ -1379,6 +1613,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        LVALUW
       INTEGER*2        LVALW
       INTEGER          LVALI
+      INTEGER*8        LVALK
       REAL             LVALR
       DOUBLE PRECISION LVALD
       LOGICAL          LVALL
@@ -1395,6 +1630,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        IVALUW
       INTEGER*2        IVALW
       INTEGER          IVALI
+      INTEGER*8        IVALK
       REAL             IVALR
       DOUBLE PRECISION IVALD
       LOGICAL          IVALL
@@ -1437,9 +1673,10 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 *                the FITS column to the appropriate data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEL, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :              VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
 
                   IF (.NOT. CONVOK) THEN
                      NULFLG = .TRUE.
@@ -1454,17 +1691,18 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 *                data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEL, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
-     :              IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
 
                   IF (CONVOK) THEN
                      IVALD = (IVALD * SCALE) + ZERO
 
                      CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
-     :                 IVALW, IVALI, IVALR, IVALD, IVALL, IVALC,
+     :                 IVALW, IVALI, IVALK, IVALR, IVALD, IVALL, IVALC,
      :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :                 VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
 
                      IF (.NOT. CONVOK) THEN
                         NULFLG = .TRUE.
@@ -1515,8 +1753,8 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 
 * -- CHARACTER version ----------------------------------------------------
       SUBROUTINE CAT3_FGCVA (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
-     :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
@@ -1541,6 +1779,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        VALUEUW
       INTEGER*2        VALUEW
       INTEGER          VALUEI
+      INTEGER*8        VALUEK
       REAL             VALUER
       DOUBLE PRECISION VALUED
       LOGICAL          VALUEL
@@ -1574,6 +1813,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        LVALUW
       INTEGER*2        LVALW
       INTEGER          LVALI
+      INTEGER*8        LVALK
       REAL             LVALR
       DOUBLE PRECISION LVALD
       LOGICAL          LVALL
@@ -1590,6 +1830,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        IVALUW
       INTEGER*2        IVALW
       INTEGER          IVALI
+      INTEGER*8        IVALK
       REAL             IVALR
       DOUBLE PRECISION IVALD
       LOGICAL          IVALL
@@ -1632,9 +1873,10 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 *                the FITS column to the appropriate data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEC, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :              VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
 
                   IF (.NOT. CONVOK) THEN
                      NULFLG = .TRUE.
@@ -1649,17 +1891,18 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 *                data type.
 
                   CALL CAT1_TCNVT (CAT__TYPEC, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
-     :              IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
 
                   IF (CONVOK) THEN
                      IVALD = (IVALD * SCALE) + ZERO
 
                      CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
-     :                 IVALW, IVALI, IVALR, IVALD, IVALL, IVALC,
+     :                 IVALW, IVALI, IVALK, IVALR, IVALD, IVALL, IVALC,
      :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :                 VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
 
                      IF (.NOT. CONVOK) THEN
                         NULFLG = .TRUE.
@@ -1710,8 +1953,8 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 
 * -- Complex REAL version --------------------------------------------------
       SUBROUTINE CAT3_FGCVC (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
-     :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
@@ -1736,6 +1979,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        VALUEUW
       INTEGER*2        VALUEW
       INTEGER          VALUEI
+      INTEGER*8        VALUEK
       REAL             VALUER
       DOUBLE PRECISION VALUED
       LOGICAL          VALUEL
@@ -1769,6 +2013,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        LVALUW
       INTEGER*2        LVALW
       INTEGER          LVALI
+      INTEGER*8        LVALK
       REAL             LVALR
       DOUBLE PRECISION LVALD
       LOGICAL          LVALL
@@ -1786,6 +2031,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        IVALUW
       INTEGER*2        IVALW
       INTEGER          IVALI
+      INTEGER*8        IVALK
       REAL             IVALR
       DOUBLE PRECISION IVALD
       LOGICAL          IVALL
@@ -1835,9 +2081,10 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 *                the FITS column to the appropriate data type.
 
                   CALL CAT1_TCNVT (CAT__TYPER, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :              VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
 
                   IF (.NOT. CONVOK) THEN
                      NULFLG = .TRUE.
@@ -1852,17 +2099,18 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 *                data type.
 
                   CALL CAT1_TCNVT (CAT__TYPER, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
-     :              IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
 
                   IF (CONVOK) THEN
                      IVALD = (IVALD * SCALE) + ZERO
 
                      CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
-     :                 IVALW, IVALI, IVALR, IVALD, IVALL, IVALC,
+     :                 IVALW, IVALI, IVALK, IVALR, IVALD, IVALL, IVALC,
      :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :                 VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
 
                      IF (.NOT. CONVOK) THEN
                         NULFLG = .TRUE.
@@ -1913,8 +2161,8 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 
 * -- Complex DOUBLE PRECISION version ----------------------------------------
       SUBROUTINE CAT3_FGCVM (SFLAG, SCALE, ZERO, FITUNT, COLNO, ROWNO,
-     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUER,
-     :   VALUED, VALUEL, VALUEC, NULFLG, STATUS)
+     :   ELEM, DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI, VALUEK,
+     :   VALUER, VALUED, VALUEL, VALUEC, NULFLG, STATUS)
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
@@ -1939,6 +2187,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        VALUEUW
       INTEGER*2        VALUEW
       INTEGER          VALUEI
+      INTEGER*8        VALUEK
       REAL             VALUER
       DOUBLE PRECISION VALUED
       LOGICAL          VALUEL
@@ -1972,6 +2221,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        LVALUW
       INTEGER*2        LVALW
       INTEGER          LVALI
+      INTEGER*8        LVALK
       REAL             LVALR
       DOUBLE PRECISION LVALD
       LOGICAL          LVALL
@@ -1990,6 +2240,7 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
       INTEGER*2        IVALUW
       INTEGER*2        IVALW
       INTEGER          IVALI
+      INTEGER*8        IVALK
       REAL             IVALR
       DOUBLE PRECISION IVALD
       LOGICAL          IVALL
@@ -2039,9 +2290,10 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 *                the FITS column to the appropriate data type.
 
                   CALL CAT1_TCNVT (CAT__TYPED, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :              VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :              VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :              STATUS)
 
                   IF (.NOT. CONVOK) THEN
                      NULFLG = .TRUE.
@@ -2056,17 +2308,18 @@ C    :     / i6, i6, i4, 1pd18.8, l5, l5, i6)
 *                data type.
 
                   CALL CAT1_TCNVT (CAT__TYPED, LVALUB, LVALB, LVALUW,
-     :              LVALW, LVALI, LVALR, LVALD, LVALL, LVALC,
+     :              LVALW, LVALI, LVALK, LVALR, LVALD, LVALL, LVALC,
      :              CAT__TYPED, IVALUB, IVALB, IVALUW, IVALW, IVALI,
-     :              IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
+     :              IVALK, IVALR, IVALD, IVALL, IVALC, CONVOK, STATUS)
 
                   IF (CONVOK) THEN
                      IVALD = (IVALD * SCALE) + ZERO
 
                      CALL CAT1_TCNVT (CAT__TYPED, IVALUB, IVALB, IVALUW,
-     :                 IVALW, IVALI, IVALR, IVALD, IVALL, IVALC,
+     :                 IVALW, IVALI, IVALK, IVALR, IVALD, IVALL, IVALC,
      :                 DTYPE, VALUEUB, VALUEB, VALUEUW, VALUEW, VALUEI,
-     :                 VALUER, VALUED, VALUEL, VALUEC, CONVOK, STATUS)
+     :                 VALUEK, VALUER, VALUED, VALUEL, VALUEC, CONVOK,
+     :                 STATUS)
 
                      IF (.NOT. CONVOK) THEN
                         NULFLG = .TRUE.

@@ -144,6 +144,7 @@
       INTEGER*2        UWVAL              ! Unsigned word.
       INTEGER*2        WVAL               ! word.
       INTEGER          IVAL               ! Integer.
+      INTEGER*8        KVAL               ! Integer*8.
       REAL             RVAL               ! Real.
       DOUBLE PRECISION DVAL               ! Double precision.
       LOGICAL          LVAL               ! Logical.
@@ -157,6 +158,7 @@
       INTEGER*2        UWDUM              ! Unsigned word.
       INTEGER*2        WDUM               ! word.
       INTEGER          IDUM               ! Integer.
+      INTEGER*8        KDUM               ! Integer*8.
       REAL             RDUM               ! Real.
       DOUBLE PRECISION DDUM               ! Double precision.
       LOGICAL          LDUM               ! Logical.
@@ -228,9 +230,9 @@
 *                value to the column array and set the null value flag.
 
                   CALL CAT1_TCNVT (CAT__TYPEC, UBDUM, BDUM, UWDUM,
-     :              WDUM, IDUM, RDUM, DDUM, LDUM, FIELD(CURCOL),
+     :              WDUM, IDUM, KDUM, RDUM, DDUM, LDUM, FIELD(CURCOL),
      :              FDTYPA(CURCOL), UBVAL, BVAL, UWVAL, WVAL,
-     :              IVAL, RVAL, DVAL, LVAL, CVAL, CONVOK,
+     :              IVAL, KVAL, RVAL, DVAL, LVAL, CVAL, CONVOK,
      :              STATUS)
 
                   IF (CONVOK) THEN
@@ -248,6 +250,12 @@
 
                      ELSE IF (FDTYPA(CURCOL) .EQ. CAT__TYPEI) THEN
                         CALL CAT6_STAEI (ROWS, ROW, IVAL,
+     :                    %VAL(CNF_PVAL(FPTRA(CURCOL))), STATUS)
+                        CALL CAT6_STAEL (ROWS, ROW, .FALSE.,
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
+
+                     ELSE IF (FDTYPA(CURCOL) .EQ. CAT__TYPEK) THEN
+                        CALL CAT6_STAEK (ROWS, ROW, IVAL,
      :                    %VAL(CNF_PVAL(FPTRA(CURCOL))), STATUS)
                         CALL CAT6_STAEL (ROWS, ROW, .FALSE.,
      :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)

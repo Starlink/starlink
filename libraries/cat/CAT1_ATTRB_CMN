@@ -78,6 +78,7 @@
       INTEGER*2         ATTVU__CAT1(CAT1__MXATT) ! Unsigned word,
       INTEGER*2         ATTVW__CAT1(CAT1__MXATT) ! Word,
       INTEGER           ATTVI__CAT1(CAT1__MXATT) ! Integer,
+      INTEGER*8         ATTVK__CAT1(CAT1__MXATT) ! Integer*8,
       REAL              ATTVR__CAT1(CAT1__MXATT) ! Real,
       DOUBLE PRECISION  ATTVD__CAT1(CAT1__MXATT) ! Double Precision,
       LOGICAL           ATTVL__CAT1(CAT1__MXATT) ! Logical,
@@ -95,7 +96,7 @@
 
       COMMON /ATTRB/
      :  ATTVD__CAT1,  ATTVR__CAT1,
-     :  ATTID__CAT1,  ATTYP__CAT1,  ATTVI__CAT1,
+     :  ATTID__CAT1,  ATTYP__CAT1,  ATTVI__CAT1, ATTVK__CAT1,
      :  NATT__CAT1,
      :  ATTMU__CAT1,  ATTVL__CAT1,
      :  ATTVU__CAT1,  ATTVW__CAT1,  ATTVV__CAT1,  ATTVB__CAT1

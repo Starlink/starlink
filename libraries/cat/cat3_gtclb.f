@@ -129,6 +129,8 @@
 *        of the dimensionality of CHARACTER columns had to be revised.
 *     15/12/99 (ACD): Fixed a bug in adopting the comments from the
 *        TTYPEn keyword.
+*     2012-05-11 (TIMJ):
+*        Add K
 *  Bugs:
 *     None known
 *-
@@ -309,6 +311,11 @@ C4444          format(1x, 'Initial fdim, fsize: ', i4, i4)
                   FDTYPE = CAT__TYPEI
                   FCSIZE = 0
                   FITYPE = CAT3__FTYPJ
+
+               ELSE IF (DATYPE(LDATYP : LDATYP) .EQ. 'K') THEN
+                  FDTYPE = CAT__TYPEK
+                  FCSIZE = 0
+                  FITYPE = CAT3__FTYPK
 
                ELSE IF (DATYPE(LDATYP : LDATYP) .EQ. 'E') THEN
                   FDTYPE = CAT__TYPER

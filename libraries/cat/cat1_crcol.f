@@ -206,6 +206,9 @@
                ELSE IF (CURVUP .EQ. 'INTEGER') THEN
                   FDTYPE = CAT__TYPEI
 
+               ELSE IF (CURVUP .EQ. 'INT64') THEN
+                  FDTYPE = CAT__TYPEK
+
                ELSE IF (CURVUP .EQ. 'REAL') THEN
                   FDTYPE = CAT__TYPER
 

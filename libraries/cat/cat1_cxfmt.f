@@ -161,6 +161,12 @@
                   FMTOK = .FALSE.
                END IF
 
+            ELSE IF (FDTYPE .EQ. CAT__TYPEK) THEN
+               LETPOS = INDEX(UFXFMT, 'I')
+               IF (LETPOS .LE. 0) THEN
+                  FMTOK = .FALSE.
+               END IF
+
             ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
                LETPOS = INDEX(UFXFMT, 'F')
                LETPO2 = INDEX(UFXFMT, 'E')

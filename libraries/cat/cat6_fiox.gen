@@ -146,6 +146,7 @@
       INTEGER*2        UWVALI              ! Unsigned word.
       INTEGER*2        WVALI               ! word.
       INTEGER          IVALI               ! Integer.
+      INTEGER*8        KVALI               ! Integer*8.
       REAL             RVALI               ! Real.
       DOUBLE PRECISION DVALI               ! Double precision.
       LOGICAL          LVALI               ! Logical.
@@ -159,6 +160,7 @@
       INTEGER*2        UWVALO              ! Unsigned word.
       INTEGER*2        WVALO               ! word.
       INTEGER          IVALO               ! Integer.
+      INTEGER*8        KVALO               ! Integer*8.
       REAL             RVALO               ! Real.
       DOUBLE PRECISION DVALO               ! Double precision.
       LOGICAL          LVALO               ! Logical.
@@ -247,6 +249,10 @@ C4200       format(1x, 'rows: ', i5)
                      CALL CAT6_GTAEI (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)),
      :                                IVALI,
      :                 STATUS)
+                  ELSE IF (FDTYPE .EQ. CAT__TYPEK) THEN
+                     CALL CAT6_GTAEK (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)),
+     :                                IVALI,
+     :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
                      CALL CAT6_GTAER (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)),
      :                                RVALI,
@@ -293,9 +299,9 @@ C4200       format(1x, 'rows: ', i5)
                   <T>VALI = VALUE
 
                   CALL CAT1_TCNVT (CAT__TYPE<T>, UBVALI, BVALI, UWVALI,
-     :              WVALI, IVALI, RVALI, DVALI, LVALI, CVALI,
+     :              WVALI, IVALI, KVALI, RVALI, DVALI, LVALI, CVALI,
      :              FDTYPE, UBVALO, BVALO, UWVALO, WVALO,
-     :              IVALO, RVALO, DVALO, LVALO, CVALO, CONVOK,
+     :              IVALO, KVALO, RVALO, DVALO, LVALO, CVALO, CONVOK,
      :              STATUS)
 
                   IF (CONVOK) THEN
@@ -309,6 +315,10 @@ C4200       format(1x, 'rows: ', i5)
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
                         CALL CAT6_STAEI (ROWS, ROWNO, IVALO,
+     :                                   %VAL(CNF_PVAL(PTR)),
+     :                    STATUS)
+                     ELSE IF (FDTYPE .EQ. CAT__TYPEK) THEN
+                        CALL CAT6_STAEK (ROWS, ROWNO, IVALO,
      :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN

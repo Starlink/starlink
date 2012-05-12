@@ -68,12 +68,15 @@
 
 *  Authors:
 *     ACD: A C Davenhall (Leicester)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *  History:
 *     15/7/93  (ACD): Prologue only.
 *     25/1/94  (ACD): Modified error reporting.
 *     8/2/94   (ACD): Changed parameters for data type codes.
 *     23/11/94 (ACD): Changed all occurrences of 'StarBase' to 'CAT'.
 *     22/1/97  (ACD): Fixed a spelling mistake in the prologue.
+*     2012-05-10 (TIMJ):
+*        Add _INT64
 *  Bugs:
 *     None known
 *-
@@ -125,6 +128,9 @@ C3000    format(1x, 'cat_tyfmt: dtype, csize: ', i4, i4)
 
          ELSE IF (DTYPE .EQ. CAT__TYPED) THEN
             CALL CHR_PUTC ('_DOUBLE', STRING, POSN)
+
+         ELSE IF (DTYPE .EQ. CAT__TYPEK) THEN
+            CALL CHR_PUTC ('_INT64', STRING, POSN)
 
          ELSE IF (DTYPE .EQ. CAT__TYPEL) THEN
             CALL CHR_PUTC ('_LOGICAL', STRING, POSN)

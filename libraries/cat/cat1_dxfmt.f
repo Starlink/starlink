@@ -113,6 +113,9 @@
          ELSE IF (DTYPE .EQ. CAT__TYPEI) THEN
             EXFMT = 'I5'
 
+         ELSE IF (DTYPE .EQ. CAT__TYPEK) THEN
+            EXFMT = 'I10'
+
          ELSE IF (DTYPE .EQ. CAT__TYPER) THEN
             IF (UNITS .NE. ' ') THEN
                LUNITS = UNITS

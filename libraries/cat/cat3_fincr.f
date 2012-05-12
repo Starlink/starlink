@@ -103,6 +103,8 @@
 *        values and column or parameter comments.
 *     1/9/00   (ACD): Added generation of the external format if it has
 *        not already been set.
+*     2012-05-11 (TIMJ):
+*        Add K
 *  Bugs:
 *     None known
 *-
@@ -430,6 +432,10 @@ C    :              'funits: ', i3, i4, a10, i4, i4, a10)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
                      CALL CHR_PUTC ('J', BFORM, LBFORM)
                      FITYPE = CAT3__FTYPJ
+
+                  ELSE IF (FDTYPE .EQ. CAT__TYPEK) THEN
+                     CALL CHR_PUTC ('K', BFORM, LBFORM)
+                     FITYPE = CAT3__FTYPK
 
                   ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
                      CALL CHR_PUTC ('E', BFORM, LBFORM)

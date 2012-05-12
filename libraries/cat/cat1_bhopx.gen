@@ -147,6 +147,7 @@
       INTEGER*2        XVALUW
       INTEGER*2        XVALW
       INTEGER          XVALI
+      INTEGER*8        XVALK
       REAL             XVALR
       DOUBLE PRECISION XVALD
       LOGICAL          XVALL
@@ -180,6 +181,7 @@
       INTEGER*2        DUMUW
       INTEGER*2        DUMW
       INTEGER          DUMI
+      INTEGER*8        DUMK
       REAL             DUMR
       LOGICAL          DUML
       CHARACTER        DUMC*(CAT__SZVAL)
@@ -194,9 +196,9 @@
 *       Convert the value to DOUBLE PRECISION.
 
          CALL CAT1_TCNVT (CAT__TYPE<T>, XVALUB, XVALB, XVALUW, XVALW,
-     :     XVALI, XVALR, XVALD, XVALL, XVALC,   CAT__TYPED, DUMUB,
-     :     DUMB, DUMUW, DUMW, DUMI, DUMR, DXVAL, DUML, DUMC,  CONVOK,
-     :     STATUS)
+     :     XVALI, XVALK, XVALR, XVALD, XVALL, XVALC,   CAT__TYPED,
+     :     DUMUB, DUMB, DUMUW, DUMW, DUMI, DUMK, DUMR, DXVAL, DUML,
+     :     DUMC, CONVOK, STATUS)
 
 *
 *       Check for an ascending column.
