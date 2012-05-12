@@ -166,7 +166,7 @@
 *  Copyright:
 *     Copyright (C) 1996, 1998-1999, 2004 Central Laboratory of the
 *     Research Councils.
-*     Copyright (C) 2010 Science & technology FDacilities Council.
+*     Copyright (C) 2010, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -422,6 +422,13 @@
 
          ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
             CALL KPG1_STATI( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
+     :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
+     :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
+     :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
+     :                       MEANC, STDEVC, STATUS )
+
+         ELSE IF( TYPE .EQ. '_INT64' ) THEN
+            CALL KPG1_STATK( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
