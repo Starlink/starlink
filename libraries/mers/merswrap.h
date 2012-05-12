@@ -45,6 +45,7 @@
 #define MERSWRAP_DEFINED
 
 #include "msg_par.h"
+#include <inttypes.h>
 #include <stdarg.h>
 
 /* If we're not using GNU C, elide __attribute__ */
@@ -174,6 +175,9 @@ void msgSetd( const char *token,
 
 void msgSeti( const char *token,
               int ivalue );
+
+void msgSetk( const char *token,
+              int64_t kvalue );
 
 void msgSetl( const char *token,
               int lvalue );

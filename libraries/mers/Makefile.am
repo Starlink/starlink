@@ -87,6 +87,7 @@ msgRenew.c \
 msgSetc.c \
 msgSetd.c \
 msgSeti.c \
+msgSetk.c \
 msgSetl.c \
 msgSetr.c \
 msgTune.c
@@ -136,6 +137,7 @@ msg_renew.c \
 msg_setc.c \
 msg_setd.c \
 msg_seti.c \
+msg_setk.c \
 msg_setl.c \
 msg_setr.c \
 msg_tune.c

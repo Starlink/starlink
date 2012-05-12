@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="mers" support="U">
-  <version>2.1-0</version>
+  <version>2.2-0</version>
   <path>libraries/mers</path>
   <description>Message and Error Reporting Systems</description>
   <abstract><p>This package contains two Fortran subroutine libraries,
