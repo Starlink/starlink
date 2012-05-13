@@ -100,7 +100,7 @@
 
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B, UB as appropriate.  The 
+*     the routine name by D, R, I, K, W, UW, B, UB as appropriate.  The 
 *     array supplied to the routine must have the data type specified.
 *     -  The resampling applies to both the data array and any variance
 *     array present.  The bad-pixel flag is set.

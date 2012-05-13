@@ -96,7 +96,8 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010, 2012 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -125,6 +126,8 @@
 *     2010 May 11 (MJC):
 *        Still erase the temporary NDF even a bad status has occurred
 *        elsewhere.
+*     2012 May 11 (MJC):
+*        Add support for _INT64.
 *     {enter_further_changes_here}
 
 *-
@@ -218,8 +221,8 @@
       END IF
 
 *  Choose the data type in which to process the data.
-      CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', INDF, INDF, 'Data', ITYPE, DTYPE,
+      CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                '_REAL,_DOUBLE', INDF, INDF, 'Data', ITYPE, DTYPE,
      :                STATUS )
 
 
@@ -378,6 +381,11 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_PLRSI( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
+     :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPS1_PLRSK( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
      :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 

@@ -60,7 +60,8 @@
 
 *  Notes:
 *     -  There is a routine for each of the numeric data types: replace
-*     "x" in the routine name by B, D, I, R, UB, UW or W as appropriate.
+*     "x" in the routine name by B, D, I, K, R, UB, UW or W as
+*     appropriate.
 
 *  Prior Requirements:
 *     -  The text file associated with descriptor FD must already be

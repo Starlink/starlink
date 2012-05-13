@@ -95,7 +95,8 @@
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
 *     Council.
-*     Copyright (C) 2008 Science and technology Facilities Council.
+*     Copyright (C) 2008, 2012 Science and Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -122,6 +123,8 @@
 *  History:
 *     2008 May 15 (MJC):
 *        Original version based upon KPS1_LFT.
+*     2012 May 11 (MJC):
+*        Add support for 64-bit integers.
 *     {enter_further_changes_here}
 
 *-
@@ -187,6 +190,12 @@
      :                      DIMS, %VAL( CNF_PVAL( IPDAT ) ), AS, BS,
      :                      WRK1, WRK2, STATUS )
 
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPS1_LFTK( ORDER, AXIS, NRANGE, RANGES, USEVAR,
+     :                      %VAL( CNF_PVAL( IPVAR ) ), USEMSK, MASK,
+     :                      DIMS, %VAL( CNF_PVAL( IPDAT ) ), AS, BS,
+     :                      WRK1, WRK2, STATUS )
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_LFTR( ORDER, AXIS, NRANGE, RANGES, USEVAR,
      :                      %VAL( CNF_PVAL( IPVAR ) ), USEMSK, MASK,
@@ -226,6 +235,11 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_LFTQI( ORDER, AXIS, NRANGE, RANGES, DIMS,
+     :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
+     :                       STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPS1_LFTQK( ORDER, AXIS, NRANGE, RANGES, DIMS,
      :                       %VAL( CNF_PVAL( IPDAT ) ), BS, WRK1, WRK2,
      :                       STATUS )
 

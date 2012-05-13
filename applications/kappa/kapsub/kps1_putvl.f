@@ -63,12 +63,13 @@
 
 *  Copyright:
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -78,8 +79,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -88,6 +89,8 @@
 *  History:
 *     1995 May 9 (MJC):
 *        Original version based on TRA_PUTVL in HDSTRACE.
+*     2012 May 12 (MJC):
+*        Add support for _INT64.
 *     {enter_further_changes_here}
 
 *-
@@ -147,6 +150,11 @@
       ELSE IF ( CHR_SIMLR( TYPE, '_INTEGER' ) ) THEN
          CALL KPS1_PUTI( OBJLOC, NDIM, DIMS, SIZE, NLINES, INDENT,
      :                    LOGEXM, FD, LINE, LENG, STATUS )
+
+*  64-bit integer.
+      ELSE IF ( CHR_SIMLR( TYPE, '_INT64' ) ) THEN
+         CALL KPS1_PUTK( OBJLOC, NDIM, DIMS, SIZE, NLINES, INDENT,
+     :                   LOGEXM, FD, LINE, LENG, STATUS )
 
 *  Word.
       ELSE IF ( CHR_SIMLR( TYPE,  '_WORD' ) ) THEN

@@ -133,7 +133,9 @@
 
 *  Copyright:
 *     Copyright (C) 1999, 2001, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -154,6 +156,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -164,6 +167,8 @@
 *        centroided.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
+*     2012 May 11 (MJC):
+*        Add support for 64-bit integers.
 *     {enter_further_changes_here}
 
 *-
@@ -298,8 +303,8 @@
      :                NPOS, PIXPOS, STATUS )
 
 *  Choose the data type in which to process the data.
-      CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', INDF, INDF, 'Data', ITYPE, DTYPE,
+      CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,'//
+     :                '_REAL,_DOUBLE', INDF, INDF, 'Data', ITYPE, DTYPE,
      :                STATUS )
 
 *  Map the data array from the NDF.
@@ -357,6 +362,14 @@
 
             ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_LOCTD( NDIMS, SLBND, SUBND,
+     :                          %VAL( CNF_PVAL( IPDIN ) ),
+     :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER,
+     :                          TOLER, SEL, PFINAL,
+     :                          %VAL( CNF_PVAL( IPW2 ) ),
+     :                          STATUS )
+
+            ELSE IF( ITYPE .EQ. '_INT64' ) THEN
+               CALL KPG1_LOCTK( NDIMS, SLBND, SUBND,
      :                          %VAL( CNF_PVAL( IPDIN ) ),
      :                          INIT, SEARCH, POSTVE, MXSHFT, MXITER,
      :                          TOLER, SEL, PFINAL,
@@ -551,6 +564,21 @@
      :                                PFINAL, SEARCH, POSTVE, MXSHFT,
      :                                MXITER, TOLER, SEL, EFINAL,
      :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
+
+                  ELSE IF( ITYPE .EQ. '_INT64' ) THEN
+                     CALL KPS1_CENAK( NDIMS, SLBND, SUBND,
+     :                                %VAL( CNF_PVAL( IPDIN ) ),
+     :                                %VAL( CNF_PVAL( IPVIN ) ),
+     :                                VLBND, VUBND,
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
+     :                                STATUS )
+                     CALL KPG1_LOCTK( NDIMS, VLBND, VUBND,
+     :                                %VAL( CNF_PVAL( IPW1 ) ),
+     :                                PFINAL, SEARCH,
+     :                                POSTVE, MXSHFT, MXITER, TOLER,
+     :                                SEL, EFINAL,
+     :                                %VAL( CNF_PVAL( IPW2 ) ),
+     :                                STATUS )
 
                   ELSE IF( ITYPE .EQ. '_WORD' ) THEN
                      CALL KPS1_CENAW( NDIMS, SLBND, SUBND,

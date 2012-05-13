@@ -79,7 +79,7 @@
 *        comma-separated list.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -113,6 +113,8 @@
 *        Allow excess WCS axes to be trimmed.
 *     2009-12-03 (TIMJ):
 *        Allow COMP=ERROR.
+*     2012 May 11 (MJC):
+*        Add support for _INT64.
 *     {enter_further_changes_here}
 
 *-
@@ -587,6 +589,11 @@
 
                ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
                   CALL VEC_ITOI( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
+     :                           %VAL( CNF_PVAL( IP2 ) ),
+     :                           IERR, NERR, STATUS )
+
+               ELSE IF( TYPE .EQ. '_INT64' ) THEN
+                  CALL VEC_KTOK( BAD, EL, %VAL( CNF_PVAL( IP1 ) ),
      :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 

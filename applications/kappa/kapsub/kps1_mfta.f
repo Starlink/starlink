@@ -129,7 +129,8 @@
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
 *     Council.
-*     Copyright (C) 2008 Science and technology Facilities Council.
+*     Copyright (C) 2008, 2012 Science and Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -157,6 +158,8 @@
 *        Original version.
 *     2008 May 21 (MJC):
 *        Added FKNOT argument.
+*     2012 May 11 (MJC):
+*        Add support for 64-bit integers.
 *     {enter_further_changes_here}
 
 *-
@@ -238,6 +241,14 @@
      :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF,
      :                      SCALE, STATUS )
 
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPS1_MFTK( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
+     :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ),
+     :                      USEMSK, MASK, DIMS,
+     :                      %VAL( CNF_PVAL( IPDAT ) ),
+     :                      X, Z, W, NFIT, NGOOD, KNOT, COEFF, NCOEF,
+     :                      SCALE, STATUS )
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_MFTR( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
      :                      RANGES, USEVAR, %VAL( CNF_PVAL( IPVAR ) ),
@@ -289,6 +300,13 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_MFTQI( INTERP, MXKNOT, NKNOT, FKNOT, AXIS,
+     :                       NRANGE, RANGES, DIMS,
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
+     :                       X, Z, W, NFIT, NGOOD, KNOT,
+     :                       COEFF, NCOEF, SCALE, STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
+            CALL KPS1_MFTQK( INTERP, MXKNOT, NKNOT, FKNOT, AXIS,
      :                       NRANGE, RANGES, DIMS,
      :                       %VAL( CNF_PVAL( IPDAT ) ),
      :                       X, Z, W, NFIT, NGOOD, KNOT,
