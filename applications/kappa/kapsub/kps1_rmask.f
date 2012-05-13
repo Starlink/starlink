@@ -5,7 +5,7 @@
 *     KPS1_RMASK
 
 *  Purpose:
-*     Mask an array component of an NDF.
+*     Masks an array component of an NDF.
 
 *  Language:
 *     Starlink Fortran 77
