@@ -1,20 +1,20 @@
-      SUBROUTINE KPS1_CENAUB( NDIMS, SLBND, SUBND, DIN, VIN,
+      SUBROUTINE KPS1_CENA<T>( NDIMS, SLBND, SUBND, DIN, VIN,
      :                         VLBND, VUBND, OUT, STATUS )
 *+
 *  Name:
-*     KPS1_CENAUB
+*     KPS1_CENAx
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CENAUB( NDIMS, SLBND, SUBND, DIN, VIN, VLBND, VUBND,
+*     CALL KPS1_CENAx( NDIMS, SLBND, SUBND, DIN, VIN, VLBND, VUBND,
 *                      OUT, STATUS )
 
 *  Description:
 *     This routine copies a specified section of the supplied data array
 *     (DIN) to an output array (OUT), and then adds Gaussian noise to the
-*     output values. The variance of the noise to add at each pixel is
+*     output values.  The variance of the noise to add at each pixel is
 *     specified by the VIN array.
 
 *  Arguments:
@@ -24,9 +24,9 @@
 *        The lower pixel index bounds of the DIN and VIN arrays.
 *     SUBND( NDIMS ) = INTEGER (Given)
 *        The upper pixel index bounds of the DIN and VIN arrays.
-*     DIN( * ) = BYTE (Given)
+*     DIN( * ) = <TYPE> (Given)
 *        The data values. Bounds given by SLBND and SUBND.
-*     VIN( * ) = BYTE (Given)
+*     VIN( * ) = <TYPE> (Given)
 *        The variance values. Bounds given by SLBND and SUBND.
 *     VLBND( NDIMS ) = INTEGER (Given)
 *        The lower pixel index bounds of the area of the DIN to be copied
@@ -35,25 +35,31 @@
 *     VUBND( NDIMS ) = INTEGER (Given)
 *        The upper pixel index bounds of the area of the DIN to be copied
 *        to OUT.
-*     OUT( * ) = BYTE (Given)
+*     OUT( * ) = <TYPE> (Given)
 *        The output data values with added noise. Bounds given by VLBND
 *        and VUBND.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
+*     -  There is a routine for each of the numeric data types: replace
+*     "x" in the routine name by B, D, I, K, R, UB, UW or W as
+*     appropriate.  The DIN, VIN, and OUT arrays supplied to the routine
+*     must have the data type specified.
 *     -  If the output array is not completely contained within the input
 *     array, then the sections of the output array which fall outside the
 *     input arrays will be filled with bad values.
 
 *  Copyright:
 *     Copyright (C) 1999, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -63,19 +69,22 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     30-JUN-1999 (DSB):
 *        Original version.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2012 May 11 (MJC):
+*        Made generic.
 *     {enter_further_changes_here}
 
 *-
@@ -91,13 +100,13 @@
       INTEGER NDIMS
       INTEGER SLBND( NDIMS )
       INTEGER SUBND( NDIMS )
-      BYTE DIN( * )
-      BYTE VIN( * )
+      <TYPE> DIN( * )
+      <TYPE> VIN( * )
       INTEGER VLBND( NDIMS )
       INTEGER VUBND( NDIMS )
 
 *  Arguments Returned:
-      BYTE OUT( * )
+      <TYPE> OUT( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -111,21 +120,21 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Copy the N-dimensional section from the input data array to the output.
-      CALL KPG1_CPNDUB( NDIMS, SLBND, SUBND, DIN, VLBND, VUBND, OUT,
+      CALL KPG1_CPND<T>( NDIMS, SLBND, SUBND, DIN, VLBND, VUBND, OUT,
      :                   EL, STATUS )
 
 *  Allocate work array to hold a section copied from the input variance
 *  array.
-      CALL PSX_CALLOC( EL, '_UBYTE', IPW, STATUS )
+      CALL PSX_CALLOC( EL, '<HTYPE>', IPW, STATUS )
 
 *  Copy the N-dimensional section from the input variance array to the
 *  work array.
-      CALL KPG1_CPNDUB( NDIMS, SLBND, SUBND, VIN, VLBND, VUBND,
+      CALL KPG1_CPND<T>( NDIMS, SLBND, SUBND, VIN, VLBND, VUBND,
      :                   %VAL( CNF_PVAL( IPW ) ), EL, STATUS )
 
 *  Add Gaussian noise to the returned data section.
-      CALL KPG1_NOISUB( .TRUE., EL, %VAL( CNF_PVAL( IPW ) ),
-     :                  OUT, STATUS )
+      CALL KPG1_NOIS<T>( .TRUE., EL, %VAL( CNF_PVAL( IPW ) ),
+     :                 OUT, STATUS )
 
 *  Free the work array.
       CALL PSX_FREE( IPW, STATUS )

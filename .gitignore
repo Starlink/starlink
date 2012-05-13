@@ -522,6 +522,7 @@ applications/kappa/kapsub/kps1_ardm.f
 applications/kappa/kapsub/kps1_bafi.f
 applications/kappa/kapsub/kps1_bafn.f
 applications/kappa/kapsub/kps1_bfre.f
+applications/kappa/kapsub/kps1_cena.f
 applications/kappa/kapsub/kps1_cff2.f
 applications/kappa/kapsub/kps1_clns.f
 applications/kappa/kapsub/kps1_clps.f
