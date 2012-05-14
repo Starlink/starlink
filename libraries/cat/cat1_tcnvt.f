@@ -102,6 +102,9 @@
 *     8/2/94  (ACD): Changed parameters for data type codes.
 *     2012-05-11 (TIMJ):
 *        Add K.
+*     2012-05-14 (TIMJ):
+*        g95 does not allow MOD(INTEGER*8,INTEGER*4) so we
+*        create an explicit variable for the second argument.
 *  Bugs:
 *     None known
 *-
@@ -166,6 +169,9 @@
       DOUBLE PRECISION
      :  DMIN,   ! Minimum value as a double precision number.
      :  DMAX    ! Maximum   "   "  "   "        "       "   .
+
+      INTEGER*8 KMODVAL         ! Needed for some compilers using MOD()
+      PARAMETER ( KMODVAL = 2 )
 *.
 
       IF (STATUS .EQ. CAT__OK) THEN
@@ -603,7 +609,7 @@ c 1000          format(1x, 'kmin, kmax, ink: ', i10, i10, i10 )
                OUTD = INK
 
             ELSE IF (OTYPE .EQ. CAT__TYPEL) THEN
-               REM = MOD(INK, 2)
+               REM = MOD(INK, KMODVAL)
                IF (REM .EQ. 0) THEN
                   OUTL = .FALSE.
                ELSE
