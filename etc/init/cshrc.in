@@ -547,8 +547,8 @@ endif
 #
 
 if ( -e ${bindir}/pisa/pisa.csh ) then
-   alias pisasetup source ${bindir}/pisa/start
-   alias pisa source ${bindir}/pisa/start
+   alias pisasetup source ${bindir}/pisa/pisa.csh
+   alias pisa source ${bindir}/pisa/pisa.csh
 else
    alias pisasetup ${staretcdir}/notinst pisasetup
    alias pisa ${staretcdir}/notinst pisa
