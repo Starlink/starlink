@@ -297,6 +297,7 @@ STAR_PAL_FILES = \
     pal/palDh2e.c \
     pal/palDjcal.c \
     pal/palDmat.c \
+    pal/palDrange.c \
     pal/palDs2tp.c \
     pal/palDtp2s.c \
     pal/palDtps2c.c \
