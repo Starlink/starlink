@@ -256,7 +256,8 @@ editext list bball accept
 echo DEMO:
 echo DEMO: Correlate rows 2 and 6 from the image ...
 correl varuse=false inlist=\"bball\(,2\),bball\(,6\)\" out=correl.dat \
-   logfil=/dev/null accept
+   logfil=/tmp/bench.$$ accept
+if (-e /tmp/bench.$$ ) rm /tmp/bench.$$
 echo DEMO: Now read the ASCII table of data from row 2 versus data from
 echo DEMO:    row 6 as a spectrum, the 2000 K intensity becomes the x
 echo DEMO:    coordinate, the 6000 K intensity becomes the y coordinate\;
