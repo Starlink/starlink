@@ -188,7 +188,7 @@
 *  arrays and set an appropriate data type for these components in the
 *  output NDF.
       CALL NDF_MTYPE(
-     : '_BYTE,_WORD,_UBYTE,_UWORD,_INTEGER,INT64,_REAL,_DOUBLE',
+     : '_BYTE,_WORD,_UBYTE,_UWORD,_INTEGER,_INT64,_REAL,_DOUBLE',
      :                NDF1, NDF2, 'Data,Variance', ITYPE, DTYPE,
      :                STATUS )
       CALL NDF_STYPE( DTYPE, NDF3, 'Data,Variance', STATUS )
