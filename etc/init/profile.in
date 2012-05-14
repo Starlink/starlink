@@ -375,6 +375,13 @@ if test -f ${bindir}/photom/photom.sh; then
    export PHOTOM_HELP=${starhelpdir}/photom/photomhelp
 fi
 
+#  PISA
+
+if test -f ${bindir}/pisa/pisa.sh; then
+   export PISA_DIR=${bindir}/pisa
+   export PISA_HELP=${starhelpdir}/pisa/pisahelp
+fi
+
 #  Polpack
 
 if test -f ${bindir}/polpack/polpack.sh; then
@@ -733,6 +740,18 @@ else
    photomstart () { ${STARLINK_DIR}/etc/notinst photomstart; }
    photom () { ${STARLINK_DIR}/etc/notinst photom; }
    photomsetup () { ${STARLINK_DIR}/etc/notinst photomsetup; }
+fi
+
+#
+#   PISA
+#
+
+if test -f ${bindir}/pisa/pisa.sh; then
+   pisa () { . $PISA_DIR/pisa.sh; }
+   pisasetup () { . $PISA_DIR/pisa.sh; }
+else
+   pisa () { ${STARLINK_DIR}/etc/notinst pisa; }
+   pisasetup () { ${STARLINK_DIR}/etc/notinst pisasetup; }
 fi
 
 #

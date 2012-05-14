@@ -1,0 +1,2170 @@
+package pisa {
+   version @PACKAGE_VERSION@
+   prefix pisa
+   executable pisa_mon {
+#+
+#  Name:
+#     ADDNOISE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-12-1990 (PDRAPER):
+#        Original version.
+#     19-MAR-1993 (PDRAPER):
+#     	 Changed to portable help format.
+#     {enter_further_changes_here}
+
+#-
+
+      action addnoise {
+
+         helplib {$PISA_HELP}
+
+         parameter in {
+                       # input NDF
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT {CURRENT }
+            ppath GLOBAL CURRENT
+            association <-ADAM_USER:GLOBAL.DATA_ARRAY
+            prompt {Input NDF}
+            helpkey *
+          }
+
+         parameter noise {
+                          # The type of noise to add
+            position 2
+            type LITERAL
+            access READ
+            vpath PROMPT {CURRENT }
+            ppath CURRENT DEFAULT
+            default P
+            prompt {The noise type to add to data ( P or G ) }
+            helpkey *
+          }
+
+         parameter out {
+                        # The output NDF, with noise
+            position 3
+            type NDF
+            access WRITE
+            vpath PROMPT {CURRENT }
+            ppath CURRENT
+            prompt {The output NDF}
+            helpkey *
+          }
+
+         parameter adu {
+                        # The scaling factor from data to counts
+            type _REAL
+            access READ
+            vpath PROMPT {CURRENT }
+            ppath CURRENT DEFAULT
+            default 1.0
+            range 1.0 1.0E10
+            prompt {The data values to counts scaling factor }
+            helpkey *
+          }
+
+         parameter sigma {
+                          # The gaussian sigma
+            type _REAL
+            access READ
+            vpath PROMPT {CURRENT }
+            ppath CURRENT DEFAULT
+            default 1.0
+            prompt {The Gaussian standard deviation }
+            helpkey *
+          }
+
+      }
+# $Id$
+#+
+#  Name:
+#     PISA2ARD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-MAY-1994 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action pisa2ard {
+
+         helplib {$PISA_HELP}
+
+         parameter results {
+            position 1
+            type LITERAL
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default pisafind.dat
+            prompt {File containing PISAFIND results}
+            helpkey *
+          }
+
+         parameter ardfile {
+            position 2
+            type LITERAL
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default pisa2ard.dat
+            prompt {File for ARD description}
+            helpkey *
+          }
+
+         parameter scale {
+            position 3
+            type _REAL
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0
+            range 0.01 100.0
+            prompt {Ellipse scale factor}
+            helpkey *
+          }
+
+      }
+# $Id$
+#+
+#  Name:
+#     PISACUT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-MAR-1991 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action pisacut {
+
+         helplib {$PISA_HELP}
+
+         parameter input {
+            position 1
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Input file containing data entries}
+            helpkey *
+          }
+
+         parameter column {
+            position 2
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Column number of variable to threshold}
+            helpkey *
+          }
+
+         parameter thresh {
+            position 3
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0
+            prompt {Variable threshold value}
+            helpkey *
+          }
+
+         parameter lower {
+            position 4
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Output file for entries lower than threshold}
+            helpkey *
+          }
+
+         parameter higher {
+            position 5
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Output file for entries higher than threshold}
+            helpkey *
+          }
+
+
+      }
+# $Id$
+#+
+#  Name:
+#     PISAFIND.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     NE: Nick Eaton (STARLINK)
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     (NE):
+#        Original version.
+#     3-SEP-1990 (PDRAPER):
+#        Added global parameters.
+#     {enter_further_changes_here}
+
+#-
+
+      action pisafind {
+
+         helplib {$PISA_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {NDF containing input image}
+            helpkey *
+          }
+
+         parameter prall {
+            position 2
+            type _LOGICAL
+            vpath CURRENT DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Do you want to process all of the area }
+            helpkey *
+          }
+
+         parameter xpixs {
+            position 3
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Initial and final pixels in x-direction }
+            helpkey *
+          }
+
+         parameter ypixs {
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Initial and final pixels in y-direction }
+            helpkey *
+          }
+
+         parameter minpix {
+            position 5
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Minimum pixel size for images (typically 4-16)}
+            helpkey *
+          }
+
+         parameter imneg {
+            position 6
+            type _LOGICAL
+            vpath CURRENT DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want to analyse for negative images}
+            helpkey *
+          }
+
+         parameter deblend {
+            position 7
+            type _LOGICAL
+            vpath CURRENT DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Do you want to analyse for overlapped images}
+            helpkey *
+          }
+
+         parameter method {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0
+            range 0 2
+            prompt {Intensity analysis ( 0=Isophotal, 1=Total, 2=Profile )}
+            helpkey *
+          }
+
+         parameter icirc {
+            position 9
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want a fixed circular aperture}
+            helpkey *
+          }
+
+         parameter rcirc {
+            position 10
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Radius for circular aperture (pixels)}
+            helpkey *
+          }
+
+         parameter gsigm {
+            position 11
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_GSIGM
+            prompt {Gaussian sigma (pixels)}
+            helpkey *
+          }
+
+         parameter cross {
+            position 12
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_CROSS
+            prompt {Crossover point % of peak}
+            helpkey *
+          }
+
+         parameter comix {
+            position 13
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_COMIX
+            prompt {Mixture coefficient}
+            helpkey *
+          }
+
+         parameter uplim {
+            position 14
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Upper intensity limit to use in analysis (saturation)}
+            helpkey *
+          }
+
+         parameter ifull {
+            position 15
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want full surface modelling}
+            helpkey *
+          }
+
+         parameter ibref {
+            position 16
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want background refinement}
+            helpkey *
+          }
+
+         parameter ismoo {
+            position 17
+            type _LOGICAL
+            vpath CURRENT DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want to analyse using smoothed data}
+            helpkey *
+          }
+
+         parameter background {
+                               # The background value
+            position 18
+            type _REAL
+            vpath PROMPT
+            ppath DYNAMIC CURRENT GLOBAL
+            association <->global.pisa_background
+            prompt {Background (global sky) value }
+            helpkey *
+          }
+
+         parameter thresh {
+            position 19
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT GLOBAL DYNAMIC
+            association <->global.pisa_threshold
+            prompt {Threshold for analysis (data units)}
+            helpkey *
+          }
+
+         parameter results {
+            position 20
+            type LITERAL
+            vpath DEFAULT PROMPT
+            ppath DEFAULT
+            default pisafind.dat
+            prompt {File for results}
+            helpkey *
+          }
+
+         parameter sizes {
+            position 21
+            type LITERAL
+            vpath DEFAULT PROMPT
+            ppath DEFAULT
+            default pisasize.dat
+            prompt {File for results of areal sums}
+            helpkey *
+          }
+
+      }
+# $Id$
+#+
+#  Name:
+#     PISAFIT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-SEP-1990 (PDRAPER):
+#        Original version.
+#     2-OCT-1990 (PDRAPER):
+#        Added background parameter.
+#     {enter_further_changes_here}
+
+#-
+      action pisafit {
+
+         helplib {$PISA_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.DATA_ARRAY
+            prompt {NDF containing input image}
+            helpkey *
+          }
+
+         parameter positions {
+            position 2
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default pisafind.dat
+            prompt {File containing star positions}
+            helpkey *
+          }
+
+         parameter prall {
+            position 3
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Do you want to process all of the area }
+            helpkey *
+          }
+
+         parameter xpixs {
+            position 4
+            access READ
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Initial and final pixels in x-direction }
+            helpkey *
+          }
+
+         parameter ypixs {
+            position 5
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Initial and final pixels in y-direction }
+            helpkey *
+          }
+
+         parameter weighted {
+                             # flag controlling whether a weighted fit is
+                             # done or not
+            position 6
+            type _LOGICAL
+            access READ
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want a weighted fit }
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphics device
+            ptype DEVICE
+            position 7
+            vpath CURRENT PROMPT
+            ppath GLOBAL CURRENT DEFAULT
+            association <->GLOBAL.GRAPHICS_DEVICE
+            default IKON
+            prompt {Name of graphics device}
+            helpkey *
+          }
+
+         parameter linew {
+            position 8
+            access READ
+            type _INTEGER
+            vpath CURRENT DEFAULT PROMPT
+            ppath DEFAULT
+            default 1
+            prompt {Line width}
+            helpkey *
+          }
+
+         parameter minmode {
+            position 9
+            type LITERAL
+            vpath CURRENT PROMPT
+            access READ
+            ppath CURRENT DEFAULT
+            default APM
+            prompt {Minimisation bounds mode}
+            helpkey *
+          }
+
+         parameter background {
+                               # The background value
+            position 10
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath DEFAULT CURRENT GLOBAL
+            association <->global.pisa_background
+            prompt {Background (global sky) value }
+            helpkey *
+          }
+
+         parameter gsigmrange {
+            position 11
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.5 5.5
+            prompt {Possible range for GSIGM values}
+            helpkey *
+            size *
+          }
+
+         parameter crossrange {
+            position 12
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0 100.0
+            prompt {Possible range for CROSS values ( % )}
+            helpkey *
+            size *
+          }
+
+         parameter comixrange {
+            position 13
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0 1.0
+            prompt {Possible range for COMIX values}
+            helpkey *
+            size *
+          }
+
+         parameter again {
+            position 14
+            access READ
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Do fit again }
+            helpkey *
+          }
+
+         parameter radius {
+            position 15
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            range 1.0 256.0
+            prompt {Limiting Radius }
+            helpkey *
+          }
+
+         parameter gsigm {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            association ->GLOBAL.PISA_GSIGM
+            default 0.0
+            prompt {object to store GSIGM value in}
+            helpkey *
+          }
+
+         parameter cross {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            association ->GLOBAL.PISA_CROSS
+            default 0.0
+            prompt {object to store CROSS value in}
+            helpkey *
+          }
+
+         parameter comix {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            association ->GLOBAL.PISA_COMIX
+            default 0.0
+            prompt {object to store COMIX value in}
+            helpkey *
+          }
+
+      }
+# $Id$
+#+
+#  Name:
+#     PISAGEN.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-SEP-1990 (PDRAPER):
+#        Original version.
+#     11-12-1990 (PDRAPER):
+#        Added background, saturation and noise.
+#     {enter_further_changes_here}
+
+#-
+
+      action pisagen {
+
+         helplib {$PISA_HELP}
+
+         parameter input {
+                          # input frame
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath CURRENT
+            prompt {Input frame containing objects}
+            helpkey *
+          }
+
+         parameter positions {
+            position 2
+            type LITERAL
+            vpath PROMPT DEFAULT
+            ppath DEFAULT
+            default pisafind.dat
+            prompt {File containing star positions}
+            helpkey *
+          }
+
+         parameter output {
+                           # Output frame
+            position 3
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            ppath CURRENT
+            prompt {Output frame}
+            helpkey *
+          }
+
+         parameter gsigm {
+            position 4
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_GSIGM
+            prompt {Gaussian sigma (pixels)}
+            helpkey *
+          }
+
+         parameter cross {
+            position 5
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_CROSS
+            prompt {Crossover point % of peak}
+            helpkey *
+          }
+
+         parameter comix {
+            position 6
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_COMIX
+            prompt {Mixture coefficient}
+            helpkey *
+          }
+
+         parameter background {
+                               # the background value
+            position 7
+            type _REAL
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default 0.0
+            prompt {Background value }
+            helpkey *
+          }
+
+         parameter sat {
+                        # the saturation value
+            position 8
+            type _REAL
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default 32767
+            prompt {Saturation value }
+            helpkey *
+          }
+
+         parameter nsigma {
+                           # number of sigma to produce objects out to
+            position 9
+            type _REAL
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default 10.0
+            prompt {Number of sigma to generate objects out to }
+            helpkey *
+          }
+
+         parameter noise {
+                          # what sort of noise if any are we to add ?
+            position 10
+            type LITERAL
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default NONE
+            prompt {Add what sort of noise }
+            helpkey *
+          }
+
+         parameter sigma {
+                          # gaussian standard deviation
+            type _REAL
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default 1.0
+            prompt {Standard deviation of Gaussian noise }
+            helpkey *
+          }
+
+         parameter adu {
+                        # scaling factor for data to counts
+            type _REAL
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default 1.0
+            prompt {Poisson scaling factor ( data to counts )}
+            helpkey *
+          }
+
+         parameter scale {
+                          # program mode, either frame or PSF
+            type _INTEGER
+            access READ
+            vpath DYNAMIC DEFAULT {CURRENT }
+            ppath DYNAMIC DEFAULT CURRENT
+            default 5
+            prompt {PSF scaling factor }
+            in 1 3 5 7 9 11 13 15 17 19
+            helpkey *
+          }
+
+         parameter xlow {
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Origin of image in x-direction }
+            helpkey *
+          }
+
+         parameter xhigh {
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Highest extent of image in x-direction }
+            helpkey *
+          }
+
+         parameter ylow {
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Origin of image in y-direction }
+            helpkey *
+          }
+
+         parameter yhigh {
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Highest extent of image in y-direction }
+            helpkey *
+          }
+
+         parameter title {
+                          # title for output frame
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            default {Output from PISAGEN}
+            prompt {Output title}
+            helpkey *
+          }
+
+         parameter ellip {
+            type _REAL
+            vpath DEFAULT PROMPT
+            ppath DEFAULT
+            default 0.0
+            prompt {Ellipticity of output objects}
+            helpkey *
+          }
+
+         parameter angle {
+            type _REAL
+            vpath DEFAULT PROMPT
+            ppath DEFAULT
+            default 0.0
+            prompt {Angle of major axis of output objects}
+            helpkey *
+          }
+
+      }
+# $Id$
+
+#+
+#  Name:
+#     PISAGREY.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-APR-1992 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action pisagrey {
+
+         helplib {$PISA_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Input NDF }
+            helpkey *
+          }
+
+         parameter drange {
+            position 2
+            type _REAL
+            vpath PROMPT
+            ppath DYNAMIC CURRENT
+            prompt {Data range}
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphics device
+            ptype DEVICE
+            position 3
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT DEFAULT
+            association <->GLOBAL.GRAPHICS_DEVICE
+            default IKON
+            prompt {Name of graphics device}
+            helpkey *
+          }
+
+         parameter mintic {
+                           # Minor-tick control
+            type _INTEGER
+            prompt {Give the numbers of minor tick marks between major ticks for x and y axes}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default -1 -1
+            size *
+          }
+
+         parameter majtic {
+                           # Major-tick control
+            type _REAL
+            prompt {Give the parameter controlling the numbers of major ticks for the x and y axes}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default -1. -1.
+            size *
+          }
+
+         parameter axes {
+                         # Draw axes?
+            type _LOGICAL
+            prompt {Are annotated axes to be drawn?}
+            vpath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter pltitl {
+                           # Title of the plot
+            type LITERAL
+            prompt {Give the title of the plot}
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC
+            helpkey *
+            default {PISAGREY }
+          }
+
+         parameter abslab {
+                           # Abscissa label
+            type LITERAL
+            prompt {Give the label for the abscissa axis}
+            vpath DEFAULT
+            ppath CURRENT
+            helpkey *
+            default X
+          }
+
+         parameter ordlab {
+                           # Ordinate label
+            type LITERAL
+            prompt {Give the label for the ordinate axis}
+            vpath DEFAULT
+            ppath CURRENT
+            helpkey *
+            default Y
+          }
+
+         parameter outtic {
+                           # Outward facing tickmarks
+            type _LOGICAL
+            prompt {Do you want the axis tick marks on the outside of the axes?}
+            vpath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter xpixs {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {X pixel range }
+            helpkey *
+          }
+
+         parameter ypixs {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Y pixel range}
+            helpkey *
+          }
+
+      }
+# $Id$
+#+
+#  Name:
+#     PISAKNN.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-3-1991: (PDRAPER)
+#       Original Version.
+
+#-
+
+      action pisaknn {
+
+         helplib {$PISA_HELP}
+
+         parameter peakdata {
+            position 1
+            type LITERAL
+            vpath PROMPT DEFAULT
+            ppath DEFAULT
+            default pisapeak.dat
+            prompt {File containing PISAPEAK results}
+            helpkey *
+          }
+
+         parameter seed1 {
+            position 2
+            type LITERAL
+            vpath PROMPT DEFAULT
+            ppath DEFAULT
+            default seed1.dat
+            prompt {File containing class 1 seed object indices}
+            helpkey *
+          }
+
+
+         parameter seed2 {
+            position 3
+            type LITERAL
+            vpath PROMPT DEFAULT
+            ppath DEFAULT
+            default seed2.dat
+            prompt {File containing class 2 seed object indices}
+            helpkey *
+          }
+
+
+         parameter k {
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath DEFAULT CURRENT
+            default 1
+            prompt {Number of classifying neighbours (in each direction)}
+            helpkey *
+          }
+
+
+         parameter class1 {
+            position 5
+            type LITERAL
+            vpath PROMPT DEFAULT
+            ppath DEFAULT
+            default class1.dat
+            prompt {Name of file to contain class1 indices}
+            helpkey *
+          }
+
+         parameter class2 {
+            position 6
+            type LITERAL
+            vpath PROMPT DEFAULT
+            ppath DEFAULT
+            default class2.dat
+            prompt {Name of file to contain class2 indices}
+            helpkey *
+          }
+
+         parameter ellip {
+            position 7
+            type _LOGICAL
+            vpath DEFAULT PROMPT
+            ppath DEFAULT CURRENT
+            default TRUE
+            prompt {Use ellipticity in the analysis }
+            helpkey *
+          }
+
+
+         parameter niter {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath DEFAULT CURRENT
+            default 10
+            prompt {Maximum number of propagating iterations}
+            helpkey *
+          }
+
+      }
+# $Id$
+#+
+#  Name:
+#     PISAMATCH.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-3-1991 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action pisamatch {
+
+         helplib {$PISA_HELP}
+
+         parameter one {
+            position 1
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {File containing INDICES to match with second file}
+            helpkey *
+          }
+
+         parameter two {
+            position 2
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {File containing ENTRIES to match with first file}
+            helpkey *
+          }
+
+         parameter out {
+            position 3
+            type LITERAL
+            vpath PROMPT DEFAULT
+            ppath CURRENT DEFAULT
+            default pisamatch.dat
+            prompt {File to contain matched ENTRIES }
+            helpkey *
+          }
+
+      }
+# $Id$
+#+
+#  Name:
+#     PISAPEAK.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+
+#-
+
+      action pisapeak {
+
+         helplib {$PISA_HELP}
+
+         parameter in {
+                       # input frame
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath CURRENT GLOBAL
+            association <->global.data_array
+            prompt {Input frame containing objects}
+            helpkey *
+          }
+
+         parameter finddata {
+            position 2
+            type LITERAL
+            vpath PROMPT DEFAULT
+            ppath DEFAULT
+            default pisafind.dat
+            prompt {File containing object positions}
+            helpkey *
+          }
+
+         parameter results {
+            position 3
+            type LITERAL
+            vpath PROMPT DEFAULT
+            ppath DEFAULT
+            default pisapeak.dat
+            prompt {File to contain PISAPEAK results}
+            helpkey *
+          }
+
+         parameter gsigm {
+            position 4
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_GSIGM
+            prompt {Gaussian sigma (pixels)}
+            helpkey *
+          }
+
+         parameter cross {
+            position 5
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_CROSS
+            prompt {Crossover point % of peak}
+            helpkey *
+          }
+
+         parameter comix {
+            position 6
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_COMIX
+            prompt {Mixture coefficient}
+            helpkey *
+          }
+
+         parameter background {
+                               # the background value
+            position 7
+            type _REAL
+            vpath {PROMPT }
+            ppath GLOBAL CURRENT DEFAULT
+            default 0.0
+            association <-global.pisa_background
+            prompt {Background value }
+            helpkey *
+          }
+
+         parameter thresh {
+                           # the saturation value
+            position 8
+            type _REAL
+            vpath {PROMPT }
+            ppath GLOBAL CURRENT DEFAULT
+            default 0.0
+            association <-global.pisa_threshold
+            prompt {Threshold value }
+            helpkey *
+          }
+
+      }
+# $Id$
+## PISAPLOT - Plots an ellipse map from PISAFIND parameterised data.
+
+#+
+#  Name:
+#     PISAPLOT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1990 July 31 (MJC):
+#	 Original version.
+#     1991 Mar 14  (PDRAPER):
+#        Added new parameters clear, defaxes, xpixs, ypixs.
+#     {enter_changes_here}
+
+#-
+      action pisaplot {
+
+         helplib {$PISA_HELP}
+
+         parameter results {
+                            # PISAFIND catalogue file
+            position 1
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {File of PISAFIND parameterised data}
+            helpkey *
+            default pisafind.dat
+          }
+
+         parameter overlay {
+                            # Overlay the plot on a DATA picture?
+            position 2
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Overlay mode?}
+            helpkey *
+            default FALSE
+          }
+
+         parameter clear {
+                          # Clear the Overlay?
+            position 3
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Clear overlay before displaying}
+            helpkey *
+            default FALSE
+          }
+
+         parameter device {
+                           # Graphics device
+            ptype DEVICE
+            position 4
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT DEFAULT
+            association <->GLOBAL.GRAPHICS_DEVICE
+            default IKON
+            prompt {Name of graphics device}
+            helpkey *
+          }
+
+         parameter palnum {
+                           # Palette number
+            position 5
+            type _INTEGER
+            prompt {Palette number}
+            vpath DEFAULT
+            ppath DEFAULT
+            default 3
+            helpkey *
+          }
+
+         parameter annota {
+                           # Annotate the ellipses with id. no.s?
+            position 6
+            type _LOGICAL
+            prompt {Annotate the ellipses?}
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter mintic {
+                           # Minor-tick control
+            type _INTEGER
+            prompt {Give the numbers of minor tick marks between major ticks for x and y axes}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default -1 -1
+            size *
+          }
+
+         parameter majtic {
+                           # Major-tick control
+            type _REAL
+            prompt {Give the parameter controlling the numbers of major ticks for the x and y axes}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default -1. -1.
+            size *
+          }
+
+         parameter axes {
+                         # Draw axes?
+            type _LOGICAL
+            prompt {Are annotated axes to be drawn?}
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter pltitl {
+                           # Title of the plot
+            type LITERAL
+            prompt {Give the title of the plot}
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            helpkey *
+            default { }
+          }
+
+         parameter abslab {
+                           # Abscissa label
+            type LITERAL
+            prompt {Give the label for the abscissa axis}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+            default X
+          }
+
+         parameter ordlab {
+                           # Ordinate label
+            type LITERAL
+            prompt {Give the label for the ordinate axis}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+            default Y
+          }
+
+         parameter outtic {
+                           # Outward facing tickmarks
+            type _LOGICAL
+            prompt {Do you want the axis tick marks on the outside of the axes?}
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter thick {
+                          # Line thickness
+            type _REAL
+            prompt {Give the relative thickness of plotted axis lines and annotations}
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1.0
+            helpkey *
+          }
+
+         parameter pxsize {
+                           # Plot size in x
+            type _REAL
+            prompt {Give size of the plot in the x-direction in metres}
+            vpath DYNAMIC
+            ppath DYNAMIC
+            helpkey *
+          }
+
+         parameter pysize {
+                           # Plot size in y
+            type _REAL
+            prompt {Give size of the plot in the y-direction in metres}
+            vpath DYNAMIC
+            ppath DYNAMIC
+            helpkey *
+          }
+
+         parameter defaxes {
+                            # change plot axes bounds?
+            type _LOGICAL
+            prompt {Do you want to specify the plot axes bounds ?}
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter xpixs {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Initial and final pixel values in x-direction }
+            helpkey *
+          }
+
+         parameter ypixs {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Initial and final pixel values in y-direction }
+            helpkey *
+          }
+
+         parameter annoscale {
+                              # Scaling factor for annotations
+            type _REAL
+            prompt {Scale factor for text height}
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            default 1.0
+            helpkey *
+          }
+
+      }
+# $Id$
+#+
+#  Name:
+#     PISA2CAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-NOV-1995 (PDRAPER):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action pisa2cat {
+
+         helplib {$PISA_HELP}
+
+         parameter datatype {
+                             # Type of the input data file
+            position 1
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default find
+            prompt {Input PISA data type}
+            helpkey *
+          }
+
+         parameter data {
+                         # Pisa dataset
+            position 2
+            type LITERAL
+            access READ
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default pisafind.dat
+            prompt {Name of PISA data file}
+            helpkey *
+          }
+
+         parameter cat {
+                        # Output catlogue name
+            position 3
+            type LITERAL
+            access READ
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default find
+            prompt {Name for catalogue}
+            helpkey *
+          }
+
+      }
+   }
+
+   executable pisa_mon4 {
+#+
+#  Name:
+#     PISAFIND4.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     21-NOV-1995 (PDRAPER):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action pisafind4 {
+
+         helplib {PISA_DIR:pisahelp}
+
+         parameter in {
+            position 1
+            type NDF
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {NDF containing input image}
+            helpkey *
+          }
+
+         parameter prall {
+            position 2
+            type _LOGICAL
+            vpath CURRENT DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Do you want to process all of the area }
+            helpkey *
+          }
+
+         parameter xpixs {
+            position 3
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Initial and final pixels in x-direction }
+            helpkey *
+          }
+
+         parameter ypixs {
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Initial and final pixels in y-direction }
+            helpkey *
+          }
+
+         parameter minpix {
+            position 5
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Minimum pixel size for images (typically 4-16)}
+            helpkey *
+          }
+
+         parameter imneg {
+            position 6
+            type _LOGICAL
+            vpath CURRENT DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want to analyse for negative images}
+            helpkey *
+          }
+
+         parameter deblend {
+            position 7
+            type _LOGICAL
+            vpath CURRENT DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Do you want to analyse for overlapped images}
+            helpkey *
+          }
+
+         parameter method {
+            position 8
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0
+            range 0 2
+            prompt {Intensity analysis ( 0=Isophotal, 1=Total, 2=Profile )}
+            helpkey *
+          }
+
+         parameter icirc {
+            position 9
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want a fixed circular aperture}
+            helpkey *
+          }
+
+         parameter rcirc {
+            position 10
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Radius for circular aperture (pixels)}
+            helpkey *
+          }
+
+         parameter gsigm {
+            position 11
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_GSIGM
+            prompt {Gaussian sigma (pixels)}
+            helpkey *
+          }
+
+         parameter cross {
+            position 12
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_CROSS
+            prompt {Crossover point % of peak}
+            helpkey *
+          }
+
+         parameter comix {
+            position 13
+            type _REAL
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.PISA_COMIX
+            prompt {Mixture coefficient}
+            helpkey *
+          }
+
+         parameter uplim {
+            position 14
+            type _INTEGER
+            vpath CURRENT DYNAMIC
+            ppath CURRENT DYNAMIC
+            prompt {Upper intensity limit to use in analysis}
+            helpkey *
+          }
+
+         parameter ifull {
+            position 15
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want full surface modelling}
+            helpkey *
+          }
+
+         parameter ibref {
+            position 16
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want background refinement}
+            helpkey *
+          }
+
+         parameter ismoo {
+            position 17
+            type _LOGICAL
+            vpath CURRENT DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want to analyse using smoothed data}
+            helpkey *
+          }
+
+         parameter background {
+                               # The background value
+            position 18
+            type _REAL
+            vpath PROMPT
+            ppath DYNAMIC CURRENT GLOBAL
+            association <->global.pisa_background
+            prompt {Background (global sky) value }
+            helpkey *
+          }
+
+         parameter thresh {
+            position 19
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT GLOBAL DYNAMIC
+            association <->global.pisa_threshold
+            prompt {Threshold for analysis (data units)}
+            helpkey *
+          }
+
+         parameter results {
+            position 20
+            type LITERAL
+            vpath DEFAULT PROMPT
+            ppath DEFAULT
+            default pisafind.dat
+            prompt {File for results}
+            helpkey *
+          }
+
+         parameter sizes {
+            position 21
+            type LITERAL
+            vpath DEFAULT PROMPT
+            ppath DEFAULT
+            default pisasize.dat
+            prompt {File for results of areal sums}
+            helpkey *
+          }
+
+      }
+# @(#)pisafind.ifl	1.1     10/7/93     1
+#+
+#  Name:
+#     PISAFIT4.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-SEP-1990 (PDRAPER):
+#        Original version.
+#     2-OCT-1990 (PDRAPER):
+#        Added background parameter.
+#     {enter_further_changes_here}
+
+#-
+      action pisafit4 {
+
+         helplib {$PISA_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.DATA_ARRAY
+            prompt {NDF containing input image}
+            helpkey *
+          }
+
+         parameter positions {
+            position 2
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default pisafind.dat
+            prompt {File containing star positions}
+            helpkey *
+          }
+
+         parameter prall {
+            position 3
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Do you want to process all of the area }
+            helpkey *
+          }
+
+         parameter xpixs {
+            position 4
+            access READ
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Initial and final pixels in x-direction }
+            helpkey *
+          }
+
+         parameter ypixs {
+            position 5
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Initial and final pixels in y-direction }
+            helpkey *
+          }
+
+         parameter weighted {
+                             # flag controlling whether a weighted fit is
+                             # done or not
+            position 6
+            type _LOGICAL
+            access READ
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Do you want a weighted fit }
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphics device
+            ptype DEVICE
+            position 7
+            vpath CURRENT PROMPT
+            ppath GLOBAL CURRENT DEFAULT
+            association <->GLOBAL.GRAPHICS_DEVICE
+            default IKON
+            prompt {Name of graphics device}
+            helpkey *
+          }
+
+         parameter linew {
+            position 8
+            access READ
+            type _INTEGER
+            vpath CURRENT DEFAULT PROMPT
+            ppath DEFAULT
+            default 1
+            prompt {Line width}
+            helpkey *
+          }
+
+         parameter minmode {
+            position 9
+            type LITERAL
+            vpath CURRENT PROMPT
+            access READ
+            ppath CURRENT DEFAULT
+            default APM
+            prompt {Minimisation bounds mode}
+            helpkey *
+          }
+
+         parameter background {
+                               # The background value
+            position 10
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath DEFAULT CURRENT GLOBAL
+            association <->global.pisa_background
+            prompt {Background (global sky) value }
+            helpkey *
+          }
+
+         parameter gsigmrange {
+            position 11
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.5 5.5
+            prompt {Possible range for GSIGM values}
+            helpkey *
+            size *
+          }
+
+         parameter crossrange {
+            position 12
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0 100.0
+            prompt {Possible range for CROSS values ( % )}
+            helpkey *
+            size *
+          }
+
+         parameter comixrange {
+            position 13
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0 1.0
+            prompt {Possible range for COMIX values}
+            helpkey *
+            size *
+          }
+
+         parameter again {
+            position 14
+            access READ
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Do fit again }
+            helpkey *
+          }
+
+         parameter radius {
+            position 15
+            type _REAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            range 1.0 256.0
+            prompt {Limiting Radius }
+            helpkey *
+          }
+
+         parameter gsigm {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            association ->GLOBAL.PISA_GSIGM
+            default 0.0
+            prompt {object to store GSIGM value in}
+            helpkey *
+          }
+
+         parameter cross {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            association ->GLOBAL.PISA_CROSS
+            default 0.0
+            prompt {object to store CROSS value in}
+            helpkey *
+          }
+
+         parameter comix {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            association ->GLOBAL.PISA_COMIX
+            default 0.0
+            prompt {object to store COMIX value in}
+            helpkey *
+          }
+
+      }
+# @(#)pisafit4.ifl	1.2     7/12/95     1
+   }
+
+   executable pisahelp {
+
+#+
+#  Name:
+#     PISAHELP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1986 November 14 (MJC):
+#	 Original version.
+#     1992 August 19 (MJC):
+#     	 Added prologue, and access to help library.
+#     1993 January 5 (PDRAPER):
+#        Rename CCDHELP.
+#     19-MAR-1993 (PDRAPER):
+#     	 Rename PISAHELP.
+#     {enter_further_changes_here}
+
+#-
+
+
+      action pisahelp {
+
+         parameter topic {
+            position 1
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help topic}
+            default {         }
+          }
+
+         parameter subtopic {
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subtopic}
+            default {         }
+          }
+
+         parameter subsubtopic {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubtopic}
+            default {         }
+          }
+
+         parameter subsubsubtopic {
+            position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubsubtopic}
+            default {         }
+          }
+
+      }
+
+   }
+
+   csh {
+
+       alias pisa_demo       'source $PISA_DIR/pisa_demo'
+       alias pisawww         '$PISA_DIR/pisawww'
+
+   }
+
+   sh {
+
+       pisawww () {  $PISA_DIR/pisawww  ${1+"$@"}; }
+
+   }
+
+   icl {
+       defhelp   pisa        $PISA_HELP 0
+       defstring pisa_demo   load $PISA_DIR/pisa_demo
+       defproc pisawww       $PISA_DIR/pisa_proc.icl
+
+       defstring pisahelp    help pisa
+       defhelp pisafind      $PISA_HELP
+       defhelp pisaplot      $PISA_HELP
+       defhelp pisafit       $PISA_HELP
+       defhelp pisagen       $PISA_HELP
+       defhelp pisapeak      $PISA_HELP
+       defhelp pisaknn       $PISA_HELP
+       defhelp pisamatch     $PISA_HELP
+       defhelp pisacut       $PISA_HELP
+       defhelp pisagrey      $PISA_HELP
+       defhelp addnoise      $PISA_HELP
+       defhelp pisa2ard      $PISA_HELP
+
+       set nocheckpars
+
+   }
+
+   display {
+
+       PISA commands are now available - (Version @PACKAGE_VERSION@)
+
+       For help use the commands pisahelp or pisawww
+
+   }
+
+}

@@ -546,7 +546,7 @@ endif
 #   Pisa
 #
 
-if ( -e ${bindir}/pisa/start ) then
+if ( -e ${bindir}/pisa/pisa.csh ) then
    alias pisasetup source ${bindir}/pisa/start
    alias pisa source ${bindir}/pisa/start
 else

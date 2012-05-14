@@ -629,7 +629,8 @@ applications/photom/help/photomhelp
 applications/photom/testphotom
 
 applications/pisa/pisa.icl
-applications/pisa/start
+applications/pisa/pisa.csh
+applications/pisa/pisa.sh
 applications/pisa/pisa_mon4
 applications/pisa/pisahelp
 

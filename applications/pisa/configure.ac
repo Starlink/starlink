@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(pisa, 2.4-7, ussc@star.rl.ac.uk)
+AC_INIT(pisa, 2.4-8, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -23,6 +23,7 @@ AC_PROG_LIBTOOL
 
 dnl    PISA is a couple of monoliths.
 STAR_MONOLITHS
+STAR_CHECK_PROGS( ifd2star )
 
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [agi cat chr fio ndf par pda prm sae shl],[link])
@@ -35,7 +36,7 @@ dnl    Documentation.
 STAR_LATEX_DOCUMENTATION(sun109)
 
 dnl    Configure files.
-AC_CONFIG_FILES([Makefile component.xml start pisa.icl])
+AC_CONFIG_FILES([Makefile component.xml pisa.ifd])
 
 dnl    And the fat lady sings.
 AC_OUTPUT

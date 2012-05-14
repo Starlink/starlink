@@ -1,5 +1,9 @@
 1 PISA_update
 
+ V2.4-7
+
+  PISA now runs on bash shell.
+
  V2.4-6
 
   Now uses native PGPLOT.

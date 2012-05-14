@@ -1,13 +1,21 @@
 ## Process this file with automake to produce Makefile.in
 
-dist_bin_SCRIPTS = start pisa.icl pisa_demo pisa_demo.icl pisa_proc.icl \
- pisahelp.ifc pisawww
+dist_bin_SCRIPTS = pisa_demo pisa_demo.icl pisa_proc.icl \
+ pisahelp.ifc pisawww $(DYNSCRIPTS)
 
 dist_noinst_SCRIPTS = pisa_link_adam
 
 bin_MONOLITHS = pisa_mon pisa_mon4 pisahelp
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun109fig.ps
+
+DYNSCRIPTS = pisa.sh pisa.csh pisa.icl
+
+IFL_FILES = $(pisa_mon_TASKS:=.ifl) pisa_mon.ifl \
+	$(pisa_mon4_TASKS:=.ifl) pisa_mon4.ifl \
+	pisahelp.ifl
+
+BUILT_SOURCES = $(DYNSCRIPTS) $(IFL_FILES)
 
 pisa_mon_SOURCES = \
         pisa_mon.f \
@@ -81,3 +89,7 @@ CLEANFILES = addnoise.ifc pisa2ard.ifc pisa2cat.ifc pisacut.ifc \
              pisaknn.ifc pisamatch.ifc pisapeak.ifc pisaplot.ifc \
              version.dat pisa_mon4 pisa_mon4.ifc pisa_mon4.ifl \
              pisa_mon pisa_mon.ifc pisa_mon.ifl
+
+# Generate IFL files
+$(IFL_FILES) $(DYNSCRIPTS): pisa.ifd
+	$(IFD2STAR) pisa

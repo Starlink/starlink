@@ -485,7 +485,7 @@ endif
 
 #
 #  PISA
-if ( -e ${bindir}/pisa/start ) then
+if ( -e ${bindir}/pisa/pisa.csh ) then
    setenv PISA_DIR ${bindir}/pisa
    setenv PISA_HELP ${starhelpdir}/pisa/pisahelp
 endif
