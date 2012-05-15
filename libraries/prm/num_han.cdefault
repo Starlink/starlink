@@ -201,7 +201,7 @@ int matherr()
 /*.                                                                         */
 
 /* Exit the routine.                                                        */
-    return;
+  return 1; /* Must return something */
 }
 
 
