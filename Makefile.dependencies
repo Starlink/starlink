@@ -58,7 +58,6 @@ $(MANIFESTS)/agi: \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
-		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
@@ -934,7 +933,6 @@ $(MANIFESTS)/fio: \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
-		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
@@ -955,7 +953,6 @@ $(MANIFESTS)/fluxes: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
-		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sla \
@@ -1011,8 +1008,6 @@ $(MANIFESTS)/gaia: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/generic: \
-		$(MANIFESTS)/prm \
-		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html
 	cd applications/generic \
 	  && $(MAKE_CPT)
@@ -1056,7 +1051,6 @@ $(MANIFESTS)/graphpar: \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
-		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sgs \
@@ -1089,6 +1083,7 @@ $(MANIFESTS)/grp: \
 
 $(MANIFESTS)/gsd: \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
@@ -1211,7 +1206,6 @@ $(MANIFESTS)/idi: \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
-		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
@@ -1682,7 +1676,6 @@ $(MANIFESTS)/mag: \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
-		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
@@ -1800,7 +1793,6 @@ $(MANIFESTS)/observe: \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
-		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sla \
@@ -1814,6 +1806,7 @@ $(MANIFESTS)/observe: \
 $(MANIFESTS)/one: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/sae \
@@ -1825,6 +1818,7 @@ $(MANIFESTS)/one: \
 
 $(MANIFESTS)/pal: \
 		$(MANIFESTS)/sofa \
+		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starutil
 	cd libraries/pal \
 	  && $(MAKE_CPT)
@@ -1858,7 +1852,6 @@ $(MANIFESTS)/par: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/pcs \
-		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
@@ -1887,7 +1880,6 @@ $(MANIFESTS)/pda: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/prm \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem
@@ -2124,6 +2116,7 @@ $(MANIFESTS)/pongo: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/prm: \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html
@@ -3033,6 +3026,7 @@ $(MANIFESTS)/trn: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
