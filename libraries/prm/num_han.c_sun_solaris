@@ -254,7 +254,7 @@
 /*.									    */
 
 /* Exit the routine.							    */
-      return;
+      return 1; /* Must return something */
    }
 
    void num_trap_( int sig, siginfo_t *sip, ucontext_t *uap )
