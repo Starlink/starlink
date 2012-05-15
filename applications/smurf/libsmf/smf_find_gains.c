@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     int smf_find_gains( ThrWorkForce *wf, smfData *data,
+*     int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
 *                         const unsigned char *mask, smfData *lut,
 *                         double *template, AstKeyMap *keymap,
 *                         smf_qual_t goodqual, smf_qual_t badqual,
@@ -23,6 +23,19 @@
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
+*     flags = int (Given)
+*        - The first bit indicates if time slices within unusual
+*        bolometer-block should be flagged with "badqual". If the first
+*        bit is unset, then time slices within bad bolo-blocks are flagged.
+*        - The second bit indicates whether to report information about
+*        the number of converged blocks. If unset, messages indicating
+*        how many blocks have converged are reported. If set, these
+*        messages are not reported.
+*        - The third bit indicates whether to check bolo-blocks that have
+*        already converged. If set then all bolo-blocks are checked to
+*        see if they have unusual gains or correlation coefficients. If
+*        unset, only bolo-blocks which have not converged are checked.
+*        messages are not reported.
 *     data = smfData * (Given)
 *        The input data. Each bolometer time series will be compared to
 *        the template. Samples rejected as aberrant will be flagged using
@@ -85,6 +98,9 @@
 *        value more than gain_tol standard deviations from the mean
 *        log(gain) value. Note, all negative gains are removed before
 *        finding the mean and standard deviation of the log(gain) values.
+*
+*        - noflag (int): If non-zero, then no bolometer blocks are
+*        rejected or flagged by this function.
 *
 *        - offset_is_zero (int): If non-zero, the bolometer offsets are
 *        forced to zero within the least squares linear fit. The gains and
@@ -182,6 +198,12 @@
 *        Add noflag keymap option to skip bad bolo flagging
 *     27-FEB-2012 (DSB):
 *        Add args "mask" and "lut".
+*     6-MAY-2012 (DSB):
+*        Add argument "flags". Also changed so that bad blocks are 
+*        indicated by the correlation coefficient being set to 
+*        VAL__BADD (previously, the gain value was set to VAL__BADD) 
+*        but the gains in bad blocks are useful within the context of 
+*        the new COM algorithm.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -256,10 +278,10 @@ static void smf1_find_gains_job( void *job_data, int *status );
 
 
 /* Main entry */
-int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
-                    smfData *lut, double *template, AstKeyMap *keymap,
-                    smf_qual_t goodqual, smf_qual_t badqual, smfData *gain,
-                    int *nrej, int *status ){
+int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
+                    const unsigned char *mask, smfData *lut, double *template,
+                    AstKeyMap *keymap, smf_qual_t goodqual, smf_qual_t badqual,
+                    smfData *gain, int *nrej, int *status ){
 
 /* Local Variables: */
    const int *lut_data = NULL;
@@ -273,10 +295,8 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
    dim_t itime;
    dim_t nblock;
    dim_t nbolo;
-   int noflag;
    dim_t ntime;
    dim_t ntslice;
-   dim_t off_offset;
    double *corr;
    double *dat;
    double *gai;
@@ -308,6 +328,7 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
    int nbad;
    int nboff;
    int nconverged;
+   int noflag;
    int nogains;
    int nooffs;
    int nworker;
@@ -520,8 +541,7 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
       memset( nrej, 0, nblock*sizeof( *reason ) );
 
 /* Get the vector offsets within "gai", from a gain value to the
-   corresponding offset value and correlation coefficient. */
-      off_offset = 1*nblock*gcstride;
+   corresponding correlation coefficient. */
       corr_offset = 2*nblock*gcstride;
 
 /* Initialise the number of time slices left to be processed. */
@@ -533,7 +553,6 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
 /* We now reject bolo-blocks that have unusual gains or correlation
    coefficients compared to the other bolo-blocks in the same block.
    Do each block in turn. We skip this if noflag has been set. */
-
       if( !noflag ) {
         for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ) {
 
@@ -543,8 +562,9 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
           block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
           ntime -= block_size;
 
-/* Skip blocks that have already converged. */
-          if( ! converged[ iblock ] ) {
+/* Unless bit 3 is set in the flags, skip blocks that have already
+   converged. */
+          if( !converged[ iblock ] || ( flags & 4 ) ) {
 
 /* Detection of unusual gain values is based on the logarithm of the gain
    values rather than the gain values themselves. So we need an array
@@ -568,7 +588,7 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
                 c = gai[ igbase + corr_offset ];
 
 /* Ignore bolo-blocks rejected by previous invocations of this function. */
-                if( g == VAL__BADD ) {
+                if( c == VAL__BADD ) {
 
 /* Ignore failed fits, negative gains and very low correlation
    coefficients, recording the reason why the bolometer was rejected.
@@ -660,16 +680,18 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
 
 /* If the current bolometer cannot be used, but it was not flagged as
    rejected on entry, reject it now. */
-              if( badbol && gai[ igbase ] != VAL__BADD ) {
+              if( badbol && gai[ igbase + corr_offset ] != VAL__BADD ) {
 
 /* Set the requested bit in the quality array for all samples for the
    current bolometer in the current block. */
-                for( itime = 0; itime < block_size; itime++ ) {
-                  qua[ ibase + itime*tstride ] |= badqual;
+                if( !( flags & 1 ) ) {
+                   for( itime = 0; itime < block_size; itime++ ) {
+                     qua[ ibase + itime*tstride ] |= badqual;
+                   }
                 }
 
-/* Return a bad gain value */
-                gai[ igbase ] = VAL__BADD;
+/* Return a bad correlation value */
+                gai[ igbase + corr_offset ] = VAL__BADD;
 
 /* Increment the number of bolometers rejected from this block. */
                 nrej[ iblock ]++;
@@ -684,7 +706,6 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
             }
           }
         }
-
 
 /* We now consider the consistency of the 'nblock' gain values for each
    individual bolometer. We reject blocks for which the gain value is very
@@ -709,9 +730,9 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
             csum = 0.0;
 
             for( iblock = 0; iblock < nblock; iblock++ ) {
-              g = gai[ igbase ];
-              if( g != VAL__BADD ) {
-                c = gai[ igbase + corr_offset ];
+              c = gai[ igbase + corr_offset ];
+              if( c != VAL__BADD ) {
+                g = gai[ igbase ];
                 gmean += g*c;
                 csum += c;
                 ggood++;
@@ -735,15 +756,19 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
                 block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
                 ntime -= block_size;
 
-                g = gai[ igbase ];
-                if( g != VAL__BADD ) {
+                c = gai[ igbase + corr_offset ];
+                if( c != VAL__BADD ) {
+                  g = gai[ igbase ];
 
                   if( g > gmax || g < gmin ) {
-                    for( itime = 0; itime < block_size; itime++ ) {
-                      qua[ ibase + itime*tstride ] |= badqual;
+
+                    if( !( flags & 1 ) ) {
+                       for( itime = 0; itime < block_size; itime++ ) {
+                         qua[ ibase + itime*tstride ] |= badqual;
+                       }
                     }
 
-                    gai[ igbase ] = VAL__BADD;
+                    gai[ igbase + corr_offset ] = VAL__BADD;
                     nrej[ iblock ]++;
                     nbad++;
 
@@ -767,16 +792,18 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
    reject all blocks in the current bolometer. */
             } else {
 
-              for( itime = 0; itime < ntslice; itime++ ) {
-                qua[ ibase ] |= ( SMF__Q_BADB | badqual );
-                ibase += tstride;
+              if( !( flags & 1 ) ) {
+                 for( itime = 0; itime < ntslice; itime++ ) {
+                   qua[ ibase ] |= ( SMF__Q_BADB | badqual );
+                   ibase += tstride;
+                 }
               }
 
               igbase = ibolo*gbstride;
               for( iblock = 0; iblock < nblock; iblock++ ) {
-                if( gai[ igbase ] != VAL__BADD ) {
+                if( gai[ igbase + corr_offset ] != VAL__BADD ) {
                   nrej[ iblock ]++;
-                  gai[ igbase ] = VAL__BADD;
+                  gai[ igbase + corr_offset ] = VAL__BADD;
                   reason[ 10 ]++;
                   nbad++;
                 }
@@ -785,56 +812,60 @@ int smf_find_gains( ThrWorkForce *wf, smfData *data, const unsigned char *mask,
             }
           }
         }
+
+/* Calculate and report debugging info only if needed. */
+        if( msgIflev( NULL, status ) >= MSG__VERB ) {
+
+/* Find the number of blocks that have now converged. */
+          nconverged = 0;
+          for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ){
+             ib_lo = iblock - nboff;
+             if( ib_lo < 0 ) ib_lo = 0;
+
+             ib_hi = iblock + nboff;
+             if( ib_hi >= (int) nblock ) ib_hi = nblock - 1;
+
+             conv = 1;
+             for( ib = ib_lo; ib <= ib_hi; ib++ ) {
+                if( nrej[ ib ] > 0 ) conv = 0;
+             }
+             if( conv ) nconverged++;
+          }
+
+/* Display it. */
+          if( !( flags & 2 ) ) {
+             msgSeti( "N", nconverged );
+             msgSeti( "M", nblock );
+             msgOutif( MSG__VERB, "",
+                       "    ^N out of ^M time-slice blocks have now converged", status );
+          }
+
+          msgSeti( "NEW", nbad );
+          msgOutif( MSG__VERB, "",
+                    "    flagged ^NEW new bad bolo time-slice blocks", status );
+
+          for( ireason = 0; ireason < NREASON; ireason++ ) {
+             if( reason[ ireason ] > 0 ) {
+                msgSeti( "N", reason[ ireason ] );
+                msgSetc( "T", reason_text[ ireason ] );
+                msgOutif( MSG__DEBUG, "",
+                          "       (^N were flagged because ^T)", status );
+             }
+          }
+
+          msgSeti( "NG", totgood );
+          msgSeti( "T", nblock*nbolo );
+          msgOutif( MSG__VERB, "",
+                    "    Out of ^T, ^NG bolo time-slice blocks are still good",
+                    status );
+        }
+
       } else {
         msgOutif( MSG__VERB, "",
                   "    NOFLAG is set, template will not be used to flag outlier"
                   " bolometers", status );
       }
 
-/* Calculate and report debugging info only if needed. */
-      if( msgIflev( NULL, status ) >= MSG__VERB ) {
-
-/* Find the number of blocks that have now converged. */
-         nconverged = 0;
-         for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ){
-            ib_lo = iblock - nboff;
-            if( ib_lo < 0 ) ib_lo = 0;
-
-            ib_hi = iblock + nboff;
-            if( ib_hi >= (int) nblock ) ib_hi = nblock - 1;
-
-            conv = 1;
-            for( ib = ib_lo; ib <= ib_hi; ib++ ) {
-               if( nrej[ ib ] > 0 ) conv = 0;
-            }
-            if( conv ) nconverged++;
-         }
-
-/* Display it. */
-         msgSeti( "N", nconverged );
-         msgSeti( "M", nblock );
-         msgOutif( MSG__VERB, "",
-                   "    ^N out of ^M time-slice blocks have now converged", status );
-
-         msgSeti( "NEW", nbad );
-         msgOutif( MSG__VERB, "",
-                   "    flagged ^NEW new bad bolo time-slice blocks", status );
-
-         for( ireason = 0; ireason < NREASON; ireason++ ) {
-            if( reason[ ireason ] > 0 ) {
-               msgSeti( "N", reason[ ireason ] );
-               msgSetc( "T", reason_text[ ireason ] );
-               msgOutif( MSG__DEBUG, "",
-                         "       (^N were flagged because ^T)", status );
-            }
-         }
-
-         msgSeti( "NG", totgood );
-         msgSeti( "T", nblock*nbolo );
-         msgOutif( MSG__VERB, "",
-                   "    Out of ^T, ^NG bolo time-slice blocks are still good",
-                   status );
-      }
    }
 
 /* Free resources. */
@@ -897,6 +928,7 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
    double *template;
    int *converged;
    int delta_box;
+   dim_t corr_offset;
    int fit_end;
    int fit_off;
    int fit_size;
@@ -966,6 +998,10 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
    "dat". */
       block_tstride = gain_box*tstride;
 
+/* Get the vector offsets within "gai", from a gain value to the
+   corresponding correlation coefficient. */
+      corr_offset = 2*block_cstride;
+
 /* Loop round all the bolometers to be processed by this thread. */
       for( ibolo = b1; ibolo <= b2 && *status == SAI__OK; ibolo++ ) {
 
@@ -992,7 +1028,7 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
    gains and offsets since they will not have changed. Also do not
    re-calculate the gain and offset for any bolo-block that has
    previously been rejected. */
-               if( ! converged[ iblock ] && gai[ igbase ] != VAL__BADD ) {
+               if( ! converged[ iblock ] && gai[ igbase + corr_offset ] != VAL__BADD ) {
 
 /* Calculate the number of time slices in this block. The last block (index
    iblock-1 ) contains all remaining time slices, which may not be gain_box
@@ -1052,7 +1088,7 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
    So later code sees this as being equivalent to "rejected on entry". */
          } else {
             for( iblock = 0; iblock < nblock; iblock++ ){
-               gai[ igbase ] = VAL__BADD;
+               gai[ igbase + corr_offset ] = VAL__BADD;
                igbase += gcstride;
             }
          }
@@ -1064,6 +1100,7 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
                  " -- %" DIM_T_FMT " (%.3f sec)",
                  status, b1, b2, smf_timerupdate( &tv1, &tv2, status ) );
    }
+
 }
 
 

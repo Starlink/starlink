@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     int smf_find_gains_array( ThrWorkForce *wf, smfArray *data,
+*     int smf_find_gains_array( ThrWorkForce *wf, int flags, smfArray *data,
 *                               const unsigned char *mask, smfArray *lut,
 *                               double *template, AstKeyMap *keymap,
 *                               smf_qual_t goodqual, smf_qual_t badqual,
@@ -24,6 +24,21 @@
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
+*     flags = int (Given)
+*        - The first bit indicates if unusual bolometer-block should be
+*        rejected. If the first bit is set, then no bad bolometer
+*        blocks are rejected or flagged. If the first bit is unset, then
+*        whether to reject and flag bolometer blocks is determined by the
+*        "NOFLAG" item in the suppledi KeyMap.
+*        - The second bit indicates whether to report information about
+*        the number of converged blocks. If unset, messages indicating
+*        how many blocks have converged are reported. If set, these
+*        messages are not reported.
+*        - The third bit indicates whether to check bolo-blocks that have
+*        already converged. If set then all bolo-blocks are checked to
+*        see if they have unusual gains or correlation coefficients. If
+*        unset, only bolo-blocks which have not converged are checked.
+*        messages are not reported.
 *     data = smfArray * (Given)
 *        The input data. Each bolometer time series will be compared to
 *        the template.
@@ -82,6 +97,9 @@
 *        value more than gain_tol standard deviations from the mean
 *        log(gain) value. Note, all negative gains are removed before
 *        finding the mean and standard deviation of the log(gain) values.
+*
+*        - noflag (int): If non-zero, then no boomeometer blocks are
+*        rejected or flagged by this function. Also see argument "flags".
 *
 *        - offset_is_zero (int): If non-zero, the bolometer offsets are
 *        forced to zero within the least squares linear fit. The gains and
@@ -164,6 +182,8 @@
 *        Original version.
 *     27-FEB-2012 (DSB):
 *        Add args "mask" and "lut".
+*     6-MAY-2012 (DSB):
+*        Add argument "flags".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -200,7 +220,7 @@
 #include "libsmf/smf_typ.h"
 
 /* Main entry */
-int smf_find_gains_array( ThrWorkForce *wf, smfArray *data,
+int smf_find_gains_array( ThrWorkForce *wf, int flags, smfArray *data,
                           const unsigned char *mask, smfArray *lut,
                           double *template, AstKeyMap *keymap,
                           smf_qual_t goodqual, smf_qual_t badqual,
@@ -229,7 +249,7 @@ int smf_find_gains_array( ThrWorkForce *wf, smfArray *data,
 
 /* If there is only one sub-array, just call smf_find_gains. */
    if( nsub == 1 ) {
-      nbad = smf_find_gains( wf, data->sdata[ 0 ], mask,
+      nbad = smf_find_gains( wf, flags, data->sdata[ 0 ], mask,
                              lut ? lut->sdata[0] : NULL, template,
                              keymap, goodqual, badqual,
                              gain->sdata[ 0 ], nrej, status );
@@ -267,7 +287,7 @@ int smf_find_gains_array( ThrWorkForce *wf, smfArray *data,
 
 /* Call smf_find_gains to process the sub-array. This puts the number
    of sub-array bolometers rejected from each block into "nrej_in". */
-            nbad += smf_find_gains( wf, data->sdata[ isub ], mask,
+            nbad += smf_find_gains( wf, flags, data->sdata[ isub ], mask,
                                     lut ? lut->sdata[ isub ] : NULL,
                                     template, keymap, goodqual, badqual,
                                     gain->sdata[ isub ], nrej_in, status );

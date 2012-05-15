@@ -780,15 +780,15 @@
 *       a height just sufficient to remove blobs of a single pixel
 *       form the mask.  A value of "-2.1" would remove blobs of two
 *       pixels form the mask, etc.
-*     COM.BOXCAR = INTEGER
-*       If COM model component specified, boxcar smooth by this number of
-*       samples (if positive) or seconds (if negative) before removing it. [0]
-*     COM.BOXFACT = REAL
-*       If specified, reduce length of boxcar filter after each iteration by
-*       this factor. [0]
-*     COM.BOXMIN = INTEGER
-*       If COM.BOXFACT specified, this value is the minimum boxcar filter length
-*       in samples. [0]
+*     COM.CCLOW = REAL
+*       A correlation coefficient describing the similarity of a bolometer
+*       block and the common-mode. Bolometer blocks that have correlation
+*       coefficients less than or equal to cclow will be given zero wieght
+*       when forming the next estimate of COM. The weight for other
+*       bolometer blocks is linearly related to the correlation
+*       coefficient such as that bolometer blocks with a correlation
+*       coefficient of 1.0 are given a weight of 1.0. See COM.NITER and
+*       COM.NSIGMA.
 *     COM.CORR_ABSTOL = REAL
 *       The absolute lower limit of acceptable correlation. [0.2]
 *     COM.CORR_TOL = REAL
@@ -819,15 +819,18 @@
 *       Ratio of largest usable gain to mean gain for a bolometer. [4.0]
 *     COM.GAIN_TOL = REAL
 *       N-sigma away from mean gain coefficient tolerance. [5.0]
+*     COM.NITER = INTEGER
+*       The number of n-sigma clipping iterations to apply when finding
+*       the common mode signal at any time slice. The n-sigma clipping
+*       algorithm finds the clipped weighted mean of all bolometer values
+*       at a single time slice, and this value is used as the common mode
+*       signal. See COM.CCLOW and COM.NSIGMA.
 *     COM.NOFLAG = LOGICAL
 *       If true, do not use common-mode to flag bad bolometers (e.g.,
 *       ignore COM.*TOL COM.GAIN*). [0]
-*     COM.NOTFIRST = LOGICAL
-*       If true the common mode will not be subtracted on the first
-*       iteration. [0]
-*     COM.NOREMOVE = LOGICAL
-*       If true, common-mode will be estimated only to flag bad data,
-*       but will not be removed from the time-series. [0]
+*     COM.NSIGMA = REAL
+*       The number of standard deviations at which the n-sigma clipping
+*       algorithm clips. See COM.CCLOW and COM.NITER.
 *     COM.OFFSET_IS_ZERO = LOGICAL
 *       Setting com.offset_is_zero non-zero causes all bolometer
 *       offsets to be forced to 0.0. [0]
@@ -931,11 +934,6 @@
 *       See AST.ZERO_SNR.
 *     FLT.ZERO_SNRLO = REAL
 *       See AST.ZERO_SNRLO.
-*     GAI.FLATFIELD = LOGICAL
-*       Use the GAIn/COMmon mode to re-calculate the flatfield? A
-*       reasonable option in many cases, but potentially dangerous for
-*       short scans of very bright sources because the astronomical
-*       signal may completely dominate sky signal. [0]
 *     NOI.BOX_SIZE = REAL
 *       Determines the number of time slices used to determine the
 *       noise level in a section of a bolometer time stream. If zero,
