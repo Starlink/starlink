@@ -42,6 +42,7 @@ smf_calc_telres.c \
 smf_calc_wvm.c \
 smf_calcmodel_ast.c \
 smf_calcmodel_com.c \
+smf_calcmodel_com_old.c \
 smf_calcmodel_dks.c \
 smf_calcmodel_ext.c \
 smf_calcmodel_flt.c \
@@ -358,6 +359,7 @@ smf_select_cqualpntr.c \
 smf_select_qualpntr.c \
 smf_set_clabels.c \
 smf_set_moving.c \
+smf_sigmaclip.c \
 smf_snrmask.c \
 smf_smfFile_msg.c \
 smf_smoothmask.c \

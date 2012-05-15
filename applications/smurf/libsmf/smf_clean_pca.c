@@ -850,7 +850,7 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
                       &gain_group, &gain_array, keymap, status );
 
     /* Compare bolometers to the template in order to flag outliers */
-    smf_find_gains( wf, data, NULL, NULL, template, kmap, SMF__Q_GOOD,
+    smf_find_gains( wf, 0, data, NULL, NULL, template, kmap, SMF__Q_GOOD,
                     SMF__Q_COM, gain_array->sdata[0], &nrej, status );
 
     /* Clean up */

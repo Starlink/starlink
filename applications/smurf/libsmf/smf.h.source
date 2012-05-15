@@ -635,6 +635,10 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status);
 
+void smf_calcmodel_com_old( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
+                            AstKeyMap *keymap, smfArray **allmodel, int flags,
+                            int *status);
+
 void smf_calcmodel_dks( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status);
@@ -1041,12 +1045,12 @@ int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status );
 void smf_find_dateobs(  const smfHead * hdr, double *dateobs,
                         double *dateend, int *status);
 
-int smf_find_gains( ThrWorkForce *wf, smfData *data,
+int smf_find_gains( ThrWorkForce *wf, int noflag, smfData *data,
                     const unsigned char *mask, smfData *lut, double *template,
                     AstKeyMap *keymap, smf_qual_t goodqual, smf_qual_t badqual,
                     smfData *gai, int *nrej, int *status );
 
-int smf_find_gains_array( ThrWorkForce *wf, smfArray *data,
+int smf_find_gains_array( ThrWorkForce *wf, int noflag, smfArray *data,
                           const unsigned char *mask, smfArray *lut,
                           double *template, AstKeyMap *keymap,
                           smf_qual_t goodqual, smf_qual_t badqual,
@@ -1226,7 +1230,7 @@ smfTile *smf_freetiles( smfTile *tiles, int size, int *status );
 void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
                   dim_t gbstride, dim_t gcstride, double *gai_data,
                   dim_t nblock, dim_t gain_box, double *wg, double *woff,
-                  int *status );
+                  double *wcc, int *status );
 
 int  smf_gauest( const double y[], int n, double *p, int np, double rms,
                  double cutamp, double cutsig, int q );
@@ -1767,6 +1771,9 @@ void smf_set_clabels( const char title[], const char label[],
                       const char units[], smfHead* hdr, int * status );
 
 void smf_set_moving( AstFrameSet* wcs, AstFitsChan * fchan, int *status );
+
+double smf_sigmaclip( int nval, double *val, double *wgt,
+                      double nsigma, int niter, int *status );
 
 void smf_smfFile_msg( const smfFile * file, const char token[],
                       int strip, const char fallback[] );

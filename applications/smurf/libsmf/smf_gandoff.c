@@ -16,7 +16,7 @@
 *     void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
 *                       dim_t gbstride, dim_t gcstride, double *gai_data,
 *                       dim_t nblock, dim_t gain_box, double *wg,
-*                       double *woff, int *status )
+*                       double *woff, double *wcc, int *status )
 
 *  Arguments:
 *     ibolo = dim_t (Given)
@@ -64,6 +64,10 @@
 *        Pointer to an array in which to return the offset values for
 *        bolometer "ibolo". It should have at least "time1-time0+1"
 *        elements.
+*     wcc = double * (Returned)
+*        Pointer to an array in which to return the correlation coefficients
+*        for bolometer "ibolo". It should have at least "time1-time0+1"
+*        elements. It may be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -101,9 +105,11 @@
 *        Original version
 *     9-APR-2009 (DSB):
 *        Return default values if no gain data is supplied.
+*     6-MAY-2012 (DSB):
+*        Added argument "wcc".
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -138,14 +144,18 @@
 void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
                   dim_t gbstride, dim_t gcstride, double *gai_data,
                   dim_t nblock, dim_t gain_box, double *wg, double *woff,
-                  int *status ){
+                  double *wcc, int *status ){
 
 /* Local Variables; */
+   dim_t cc_offset;         /* Offset from gradient to corr. coeff value */
    dim_t isection;          /* Index of block at end of *next* section. */
    dim_t next_section;      /* Index of the first time slice in next section */
-   dim_t off_offset=0;      /* Offset from offset to correlation value */
+   dim_t off_offset;        /* Offset from gradient to offset value */
+   double *cc;              /* Pointer to next correlation coefficient */
    double *g;               /* Pointer to next gain value */
    double *off;             /* Pointer to next offset value */
+   double cc0;              /* Corr. coeff at start of interpolation section */
+   double cc1;              /* Corr. coeff at end of interpolation section */
    double end_time;         /* Time at end of interpolation section */
    double gain0;            /* Gain at start of interpolation section */
    double gain1;            /* Gain at end of interpolation section */
@@ -153,12 +163,14 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
    double k2;               /* Gain intercept */
    double k3;               /* Offset gradient */
    double k4;               /* Offset intercept */
+   double k5;               /* Corr. coeff gradient */
+   double k6;               /* Corr. coeff intercept */
    double off0;             /* Offset at start of interpolation section */
    double off1;             /* Offset at end of interpolation section */
    double start_time;       /* Time at start of interpolation section */
    int dt;                  /* No. of time slices in section */
-   size_t itime;            /* Time slice index */
    size_t igbase;           /* Index of first gain value */
+   size_t itime;            /* Time slice index */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -187,23 +199,34 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
          *(g++) = 1.0;
          *(off++) = 0.0;
       }
+      if( wcc ) {
+         cc = wcc;
+         for( itime = time0; itime <= time1; itime++ ) {
+            *(cc++) = 1.0;
+         }
+      }
       return;
    }
 
 /* Offset to start of offset values within gai_data. */
    off_offset = nblock*gcstride;
 
+/* Offset to start of correlation coefficients within gai_data. */
+   cc_offset = 2*nblock*gcstride;
+
 /* Initialise index of gain value associated with the block that occupies
    the second half of the current linear interpolation section. */
    igbase = ibolo*gbstride;
 
-/* Initialise the gain and offset at the start and end of the current
-   linearly interpolated section (i.e. the second half of the current
-   block and the first half of the following block).*/
+/* Initialise the gain, offset and correlation coefficient at the start and
+   end of the current linearly interpolated section (i.e. the second half of
+   the current block and the first half of the following block).*/
    gain1 = gai_data[ igbase ];
    off1 = gai_data[ igbase + off_offset ];
+   cc1 = gai_data[ igbase + cc_offset ];
    gain0 = VAL__BADD;
    off0 = VAL__BADD;
+   cc0 = VAL__BADD;
 
 /* Initialise the (floating point) time at the start and end of the section.
    This is measured from the centre of the first time slice. */
@@ -224,10 +247,13 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
    k2 = VAL__BADD;
    k3 = VAL__BADD;
    k4 = VAL__BADD;
+   k5 = VAL__BADD;
+   k6 = VAL__BADD;
 
 /* Loop over all time slices, up to the last required time slice. */
    g = wg;
    off = woff;
+   cc = wcc;
    for( itime = 0; itime <= time1; itime++ ) {
 
 /* If we have reached the start of a new linear interpolation section, find
@@ -235,30 +261,35 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
    section. */
       if( itime == next_section ) {
 
-/* The gain, offset and time at the end of the previous section are used to
-   define the start of the new section. */
+/* The gain, offset, correlation coefficient and time at the end of the
+   previous section are used to define the start of the new section. */
          gain0 = gain1;
          off0 = off1;
+         cc0 = cc1;
          start_time = end_time;
 
-/* Get the gain, offset and time at the end of the new section. Increment
-   the count of sections and check that a new gain and offset value are
-   available (i.e. we have not already reached the end). Also take care
-   because the last block may contain more than gain_box time slices. */
+/* Get the gain, offset, correlation coefficient and time at the end of the
+   new section. Increment the count of sections and check that a new gain and
+   offset value are available (i.e. we have not already reached the end). Also
+   take care because the last block may contain more than gain_box time
+   slices. */
          isection++;
          if( isection < nblock ) { /* most sections have "gain_box" slices */
             gain1 = gai_data[ igbase ];
             off1 = gai_data[ igbase + off_offset ];
+            cc1 = gai_data[ igbase + cc_offset ];
             dt = gain_box;
 
          } else if( isection == nblock ){ /* penultimate section may be long */
             gain1 = gai_data[ igbase ];
             off1 = gai_data[ igbase + off_offset ];
+            cc1 = gai_data[ igbase + cc_offset ];
             dt = ( ntime - next_section )/2 + gain_box/4;
 
          } else {  /* last section extends beyond last time slice */
             gain1 = VAL__BADD;
             off1 = VAL__BADD;
+            cc1 = VAL__BADD;
             dt = gain_box;
          }
          end_time += (double) dt;
@@ -270,21 +301,26 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
    section. */
          next_section += dt;
 
-/* If we have good gain and offsets at the start and end of the section,
-   calculate the linear interpolation constants for this section (if the
-   section contains any required time slices). */
+/* If we have good values at the start and end of the section, calculate the
+   linear interpolation constants for this section (if the section contains
+   any required time slices). */
          if( time0 < next_section ) {
             if( gain0 != VAL__BADD && off0 != VAL__BADD &&
-                gain1 != VAL__BADD && off1 != VAL__BADD && dt > 0 ) {
+                gain1 != VAL__BADD && off1 != VAL__BADD &&
+                cc0 != VAL__BADD && cc1 != VAL__BADD && dt > 0 ) {
                k1 = ( gain1 - gain0 )/dt;
                k2 = gain0 - k1*start_time;
                k3 = ( off1 - off0 )/dt;
                k4 = off0 - k3*start_time;
+               k5 = ( cc1 - cc0 )/dt;
+               k6 = cc0 - k5*start_time;
             } else {
                k1 = VAL__BADD;
                k2 = VAL__BADD;
                k3 = VAL__BADD;
                k4 = VAL__BADD;
+               k5 = VAL__BADD;
+               k6 = VAL__BADD;
             }
          }
       }
@@ -298,18 +334,22 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
          if( k1 != VAL__BADD ) {
             *(g++) = k1*( (double) itime ) + k2;
             *(off++) = k3*( (double) itime ) + k4;
+            if( cc ) *(cc++) = k5*( (double) itime ) + k6;
 
-         } else if( gain0 != VAL__BADD ) {
+         } else if( cc0 != VAL__BADD ) {
             *(g++) = gain0;
             *(off++) = off0;
+            if( cc ) *(cc++) = cc0;
 
-         } else if( gain1 != VAL__BADD ) {
+         } else if( cc1 != VAL__BADD ) {
             *(g++) = gain1;
             *(off++) = off1;
+            if( cc ) *(cc++) = cc1;
 
          } else {
             *(g++) = 1.0;
             *(off++) = 0.0;
+            if( cc ) *(cc++) = 1.0;
          }
       }
    }

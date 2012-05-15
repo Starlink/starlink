@@ -113,7 +113,6 @@ void smf_calcmodel_gai( ThrWorkForce *wf __attribute__((unused)),
   int gflat=0;                  /* correct flatfield using GAI */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
-  int ival;                     /* Integer argument value */
   dim_t j;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local GAIn keymap */
   smfArray *model=NULL;         /* Pointer to model at chunk */
@@ -128,6 +127,7 @@ void smf_calcmodel_gai( ThrWorkForce *wf __attribute__((unused)),
   size_t noitstride;            /* Time stride for noise */
   dim_t npar;                   /* No. of parameters per bolometer */
   dim_t ntslice;                /* Number of time slices */
+  int oldalg = 1;               /* Is the old COM algorithm being used? */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
@@ -141,13 +141,25 @@ void smf_calcmodel_gai( ThrWorkForce *wf __attribute__((unused)),
   if( *status != SAI__OK ) return;
   if( !(flags&SMF__DIMM_INVERT) ) return;
 
+  /* See if the new sigma-clipping COM algorithm is being used. */
+  astMapGet0A( keymap, "COM", &kmap );
+  astMapGet0I( kmap, "OLDALG", &oldalg );
+  kmap = astAnnul( kmap );
+
   /* Obtain pointer to sub-keymap containing GAI parameters */
+  if( !astMapHasKey( keymap, "GAI" ) ) return;
   astMapGet0A( keymap, "GAI", &kmap );
+
   astMapGet0I( kmap, "FLATFIELD", &gflat );
   if( kmap ) kmap = astAnnul( kmap );
 
+  /* Report an error if gai.flatfield is used with the new COM algorithm. */
+  if( !oldalg && gflat && *status == SAI__OK ) {
+     errRep( "", "Cannot use GAI.FLATFIELD with new COM algorithm.", status );
+  }
+
   /* Only have to do something if gai.flatfield set */
-  if( !gflat ) return;
+  if( !gflat || *status != SAI__OK ) return;
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -206,7 +218,7 @@ void smf_calcmodel_gai( ThrWorkForce *wf __attribute__((unused)),
 
           /* Get the gain and offset for each time slice of this bolometer. */
           smf_gandoff( i, 0, ntslice - 1, ntslice, gbstride, gcstride,
-                       model_data, nblock, gain_box, wg, woff, status );
+                       model_data, nblock, gain_box, wg, woff, NULL, status );
 
           /* First undo the flatfield correction to the signal */
           scale = wg;
