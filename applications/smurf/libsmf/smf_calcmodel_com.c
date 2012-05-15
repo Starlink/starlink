@@ -115,7 +115,6 @@ typedef struct smfCalcModelComData {
    dim_t ntslice;
    dim_t t1;
    dim_t t2;
-   double cclow;
    double mean;
    double nsigma;
    double stddev;
@@ -148,7 +147,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    dim_t nbolo;
    dim_t ntslice;
    dim_t timestep;
-   double cclow;
    double nsigma;
    int *nrej = NULL;
    int iblock;
@@ -228,7 +226,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 /* Get the required configuration parameters. */
    smf_get_nsamp( kmap, "GAIN_BOX", res->sdata[ 0 ], &gain_box, status );
    astMapGet0I( kmap, "PERARRAY", &perarray );
-   astMapGet0D( kmap, "CCLOW", &cclow );
    astMapGet0I( kmap, "NITER", &niter );
    astMapGet0D( kmap, "NSIGMA", &nsigma );
 
@@ -313,7 +310,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          pdata->model = model;
          pdata->nblock = nblock;
          pdata->gain_box = gain_box;
-         pdata->cclow = cclow;
          pdata->mask = mask;
          pdata->niter = niter;
          pdata->nsigma = nsigma;
@@ -453,14 +449,12 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    double *pb;
    double *pm;
    double *pr;
-   double *pw;
    double *pwg;
    double *pwoff;
    double *res_data;
    double *resbuf;
    double *wcc;
    double *wg;
-   double *wgtbuf;
    double *woff;
    double wgt;
    int *pl;
@@ -660,8 +654,6 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    weights at a single time slice. */
       resbuf = astMalloc( pdata->nbolo*( pdata->idx_hi - pdata->idx_lo + 1 )*
                           sizeof( *resbuf ) );
-      wgtbuf = astMalloc( pdata->nbolo*( pdata->idx_hi - pdata->idx_lo + 1 )*
-                          sizeof( *wgtbuf ) );
 
 /* Loop over the time slices to be processed by this thread. */
       for( itime = pdata->t1; itime <= pdata->t2 && *status == SAI__OK;
@@ -683,7 +675,6 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 /* Initialise pointers to the buffers holding the normalised residual,
    and the weights. */
          pb = resbuf;
-         pw = wgtbuf;
 
 /* Initialise pointers to the arrays of gains, offsets and correlation
    coefficients. */
@@ -721,13 +712,8 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 /* Normalise it using the current estimate of the bolometer gain and offset,
    and store it in the sample buffer. Also convert the correlation coefficient
    into a weight, and store it in the weights buffer. */
-                     wgt = ( (*wccp)[ itime - pdata->t1 ] - pdata->cclow )/
-                           ( 1.0 - pdata->cclow );
-                     if( wgt > 0.0 ) {
-                        *(pb++) = ( *pr - (*woffp)[ itime - pdata->t1 ] ) /
-                                    (*wgp)[ itime - pdata->t1 ];
-                        *(pw++) = wgt;
-                     }
+                     *(pb++) = ( *pr - (*woffp)[ itime - pdata->t1 ] ) /
+                               (*wgp)[ itime - pdata->t1 ];
                   }
                }
 
@@ -746,13 +732,12 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 
 /* Find the weighted mean of the normalised samples at the current time
    slice, including nsigma-clipping. */
-         *pm = smf_sigmaclip( (int)( pb - resbuf ), resbuf, wgtbuf,
+         *pm = smf_sigmaclip( (int)( pb - resbuf ), resbuf, NULL,
                               pdata->nsigma, pdata->niter, status );
       }
 
 /* Free resources. */
       resbuf = astFree( resbuf );
-      wgtbuf = astFree( wgtbuf );
       gai_store = astFreeDouble( gai_store );
 
 
