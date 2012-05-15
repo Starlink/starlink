@@ -780,15 +780,6 @@
 *       a height just sufficient to remove blobs of a single pixel
 *       form the mask.  A value of "-2.1" would remove blobs of two
 *       pixels form the mask, etc.
-*     COM.CCLOW = REAL
-*       A correlation coefficient describing the similarity of a bolometer
-*       block and the common-mode. Bolometer blocks that have correlation
-*       coefficients less than or equal to cclow will be given zero wieght
-*       when forming the next estimate of COM. The weight for other
-*       bolometer blocks is linearly related to the correlation
-*       coefficient such as that bolometer blocks with a correlation
-*       coefficient of 1.0 are given a weight of 1.0. See COM.NITER and
-*       COM.NSIGMA.
 *     COM.CORR_ABSTOL = REAL
 *       The absolute lower limit of acceptable correlation. [0.2]
 *     COM.CORR_TOL = REAL

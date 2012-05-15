@@ -23,7 +23,8 @@
 *     val = double * (Given)
 *        Pointer to the array of "nval" values.
 *     wgt = double * (Given)
-*        Pointer to the array of "nval" weights.
+*        Pointer to the array of "nval" weights. May be NULL, in which
+*        all weights are assumed to be 1.0.
 *     nsigma = double (Given)
 *        The number of standard deviations at which to reject values.
 *     niter = int (Given)
@@ -123,19 +124,39 @@ double smf_sigmaclip( int nval, double *val, double *wgt, double nsigma,
       swv = 0.0;
       swvv = 0.0;
 
+/* If weights are provided... */
+      if( wgt ) {
+
 /* Loop round all input values. */
-      pv = val;
-      pw = wgt;
-      for( ival = 0; ival < nval; ival++,pv++,pw++ ) {
+         pv = val;
+         pw = wgt;
+         for( ival = 0; ival < nval; ival++,pv++,pw++ ) {
 
 /* If the input value and weight are good, and the value is between the
    current acceptable limits, add the input value into the running sums. */
-         if( *pv != VAL__BADD && *pw != VAL__BADD &&
-             *pv >= lolim && *pv <= hilim ) {
-            wv = ( *pv )*( *pw );
-            swv += wv;
-            swvv += wv*( *pv );
-            sw += *pw;
+            if( *pv != VAL__BADD && *pw != VAL__BADD &&
+                *pv >= lolim && *pv <= hilim ) {
+               wv = ( *pv )*( *pw );
+               swv += wv;
+               swvv += wv*( *pv );
+               sw += *pw;
+            }
+         }
+
+/* If no weights are provided. */
+      } else {
+
+/* Loop round all input values. */
+         pv = val;
+         for( ival = 0; ival < nval; ival++,pv++ ) {
+
+/* If the input value and weight are good, and the value is between the
+   current acceptable limits, add the input value into the running sums. */
+            if( *pv != VAL__BADD && *pv >= lolim && *pv <= hilim ) {
+               swv += *pv;
+               swvv += ( *pv )*( *pv );
+               sw += 1.0;
+            }
          }
       }
 

@@ -158,14 +158,6 @@ com.gain_is_one = 0
 com.offset_is_zero = 0
 
 gai.flatfield = 0
-#  A correlation coefficient describing the similarity of a bolometer
-#  block and the common-mode. Bolometer blocks that have correlation
-#  coefficients less than or equal to cclow will be given zero wieght
-#  when forming the next estimate of COM. The weight for other bolometer
-#  blocks is linearly related to the correlation coefficient such as that
-#  bolometer blocks with a correlation coefficient of 1.0 are given a weight
-#  of 1.0.
-com.cclow = 0.8
 
 #  The number of n-sigma clipping iterations to apply when finding the
 #  common mode signal at any time slice. The n-sigma clipping algorithm
