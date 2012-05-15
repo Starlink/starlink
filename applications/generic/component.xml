@@ -11,7 +11,7 @@
   routines into a file.  The file can then be compiled with the
   Fortran compiler to produce an object module.</p></abstract>
   <dependencies >
-    <build>prm</build><sourceset>star2html</sourceset>
+    <sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -2,6 +2,10 @@
 
   o  Add in64_t/INTEGER*8 support using the "k" type identifier.
 
+  o  The old DCV data conversion routines and library are now
+     removed. They have been deprecated for many years. Please
+     update any software to use PRIMDAT.
+
 1 GENERIC update
 
   o  Overhauled and updated SUN/7.

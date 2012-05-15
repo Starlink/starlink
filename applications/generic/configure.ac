@@ -17,23 +17,9 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
-AC_PROG_FC
-AC_PROG_FPP
-AC_PROG_LIBTOOL
 AC_PROG_LN_S
 
-# Check intrinsic zext is available (we rely on iand if it's not)
-AC_FC_CHECK_INTRINSICS(zext)
-
-dnl    Check whether we have X'' or ''X notation
-AC_FC_HAVE_OLD_TYPELESS_BOZ
-AC_FC_HAVE_TYPELESS_BOZ
-
-STAR_CNF_COMPATIBLE_SYMBOLS
-STAR_PRM_COMPATIBLE_SYMBOLS
-
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, prm)
 
 STAR_LATEX_DOCUMENTATION(sun7)
 
