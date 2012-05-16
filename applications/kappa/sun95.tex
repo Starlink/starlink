@@ -42671,7 +42671,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          same indices as the two significant NDF pixel axes are used.  {\tt [!]}
       }
       \sstsubsection{
-         XLEFT = \_REAL (Read)
+         XLEFT = \_DOUBLE (Read)
       }{
          The axis value to place at the left hand end of the horizontal
          axis of the plot.  If a null ({\tt{!}}) value is supplied, a suitable
@@ -42679,7 +42679,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          greater than or less than the value supplied for XRIGHT.  {\tt [!]}
       }
       \sstsubsection{
-         XRIGHT = \_REAL (Read)
+         XRIGHT = \_DOUBLE (Read)
       }{
          The axis value to place at the right hand end of the horizontal
          axis of the plot.  If a null ({\tt{!}}) value is supplied, a suitable
@@ -42687,7 +42687,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          greater than or less than the value supplied for XLEFT.  {\tt [!]}
       }
       \sstsubsection{
-         YBOT = \_REAL (Read)
+         YBOT = \_DOUBLE (Read)
       }{
          The axis value to place at the bottom end of the vertical axis of
          the plot.  If a null ({\tt{!}}) value is supplied, a suitable default
@@ -42695,7 +42695,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          than or less than the value supplied for YTOP.  {\tt [!]}
       }
       \sstsubsection{
-         YTOP = \_REAL (Read)
+         YTOP = \_DOUBLE (Read)
       }{
          The axis value to place at the top end of the vertical axis of
          the plot.  If a null ({\tt{!}}) value is supplied, a suitable default
@@ -58218,6 +58218,9 @@ The following applications have been modified:
    scales were previously measured at the first pixel in the array.
    Now the pixel scales are found at a number of places within the
    array, and the median of these values are reported.
+   \item Colourmaps added from MRAO: Dave Green's cubehelix (in two
+   forms), John Richer's colour spiral, and the SPECX bl2yl.
+
 \end{itemize}
 
 \subsection{Modified Commands}
@@ -58240,21 +58243,36 @@ The following applications have been modified:
         these operations.
       \end{itemize}
 
+   \item [\htmlref{FFCLEAN}{FFCLEAN}]\mbox{}
+      \begin{itemize}
+        \item Now ignores a VARIANCE component full of bad values.
+      \end{itemize}
+
    \item [\htmlref{HISTOGRAM}{HISTOGRAM}]\mbox{}
       \begin{itemize}
         \item Now permits plotting of the histogram for data-value
-        limits that exceed the single-precision data range.
+        limits that exceed the single-precision data range.  Plot-bounds
+        parameters have therefore changed type to \_DOUBLE.
         \item The default for the AXES parameter has changed so that by
         default axes are only drawn if the picture is cleared.
         \item New parameter WEIGHTS allows different weights to be
         associated with each value in the input NDF.
+        \item New Parameter WEIGHTSTEP defines the increment in weight
+        value corresponding to a single integer histogram count.
+      \end{itemize}
+
+   \item [\htmlref{LINPLOT}{LINPLOT}]\mbox{}
+      \begin{itemize}
+        \item Monotonic AXIS values are now only required if the NDF
+        current Frame is AXIS, or MODE={\tt "Step"}, or horizontal error
+        bars are being drawn.
       \end{itemize}
 
    \item [\htmlref{LOOK}{LOOK}]\mbox{}
       \begin{itemize}
-        \item New format ``wglist'' has been added, which lists the WCS
+        \item New format {\tt "wglist"} has been added, which lists the WCS
         co-ordinates and pixel values in an image, omitting bad pixels.
-        \item New mode ``all'' has been added, which lists the entire
+        \item New mode {\tt "All"} has been added, which lists the entire
         suppied NDF.
       \end{itemize}
 
@@ -58262,6 +58280,11 @@ The following applications have been modified:
       \begin{itemize}
         \item Permits processing of very large datasets by dividing into
         manageable sections.
+      \end{itemize}
+
+   \item [\htmlref{NDFTRACE}{NDFTRACE}]\mbox{}
+      \begin{itemize}
+        \item Continues when it encounters an error within a WCS Frame.
       \end{itemize}
 
    \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
@@ -58289,11 +58312,14 @@ The following applications have been modified:
         \item The default for the AXES parameter has changed so that by
         default axes are only drawn if the picture is cleared.
         \item The Pearson correlation coefficient of the data in the
-        scatter plot is now displayed, and written to an output parameter.
+        scatter plot is now displayed, and written to the CORR output
+        parameter.
       \end{itemize}
 
    \item [\htmlref{SETAXIS}{SETAXIS}]\mbox{}
       \begin{itemize}
+        \item For MODE={\tt "WCS"} it tries to find the best WCS axis to
+	use when the WCS axes are crossed or not parallel to the pixel axes.
         \item {\tt "Linear\_WCS"} is a new MODE option.  It is a variant
         of {\tt "WCS"} where the axis centres are set to the least-squares
         linear fit to the values of the selected axis.  This is useful for
@@ -58310,9 +58336,9 @@ The following applications have been modified:
 
    \item [\htmlref{TRANDAT}{TRANDAT}]\mbox{}
       \begin{itemize}
-        \item When AUTO=FALSE, the new POFFSET parameter allows a shift to be
-         specified between the data co-ordinates in the input text file, and
-        the pixel co-ordinates in the output NDF.
+        \item When AUTO={\tt FALSE}, the new POFFSET parameter allows a shift
+         to be specified between the data co-ordinates in the input text file,
+         and the pixel co-ordinates in the output NDF.
       \end{itemize}
 
    \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
@@ -58320,7 +58346,7 @@ The following applications have been modified:
         \item If an input NDF has more pixel axes than the reference NDF,
          an attempt will now be made to align the input using the reference
          axes, whilst retaining the other axes. Thus, if a three-dimensional
-         spectral cube is aligned with a two-dimensional image, the resuling
+         spectral cube is aligned with a two-dimensional image, the resulting
          output NDF would be a three-dimensional cube, aligned spatially
          with the image.
       \end{itemize}
