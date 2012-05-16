@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="vtk" support="U">
-  <version>5.4.2</version>
+  <version>5.10.0</version>
   <path>thirdparty/kitware/vtk</path>
   <description>VTK/CMAKE</description>
   <!-- <abstract><p></p></abstract> -->
