@@ -9,6 +9,8 @@ dist_pkgdata_DATA = LICENCE
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+
+
 #  List of package auxiliary files.  These are text files uesd by GENERIC.
 AUX_FILES = byte byte_asterix \
 	character character_asterix \
@@ -33,3 +35,5 @@ install-exec-local:
 TESTS = generic_main
 check_PROGRAMS = generic_main
 generic_main_SOURCES = generic_main.c generic_func.cgen
+include_HEADERS = cgeneric.h cgeneric_defs.h
+
