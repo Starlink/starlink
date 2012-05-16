@@ -1,7 +1,7 @@
 1 KAPPA_Version_1.13
 
-   A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main
-   changes so far are listed below.  For complete details of all
+   A new release of KAPPA (@PACKAGE_VERSION@) has been released.  The main
+   changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
 2 General_changes
@@ -16,20 +16,31 @@
    Now the pixel scales are found at a number of places within the
    array, and the median of these values are reported.
 
+   o  Colourmaps added from MRAO: Dave Green's cubehelix (in two
+   forms), John Richer's colour spiral, and the SPECX bl2yl.
+
+   o  Documentation impovements including on metacharacters,
+   and units of regridding parameters, and updated AST Frame
+   attributes.
+
 2 Modified_applications
 
    o ARDMASK
 
-      - The VARIANCE and DATA arrays in the NDF can now be masked
+      -  The VARIANCE and DATA arrays in the NDF can now be masked
       simultaneously by setting the COMP parameter to "All", which is
       now the default value for COMP.
 
    o FITSMOD
 
-      - New parameter READONLY allows FITSMOD to be used to perform
+      -  New parameter READONLY allows FITSMOD to be used to perform
       read-only edits such as "Print" and "Exist" on write-protected
       NDFs, although FITSVAL and FITSEXIST tasks are recommended for
       these operations.
+
+   o FFCLEAN
+
+      -  Now ignores a VARIANCE component full of bad values.
 
    o HISTOGRAM
 
@@ -37,14 +48,21 @@
       that exceed the single-precision data range.
       -  The default for the AXES parameter has changed so that by
       default axes are only drawn if the picture is cleared.
-      - New parameter WEIGHTS allows different weights to be
+      -  New parameter WEIGHTS allows different weights to be
       associated with each value in the input NDF.
+      -  New Parameter WEIGHTSTEP defines the increment in weight
+      value corresponding to a single integer histogram count.
+
+   o  LINPLOT
+      -  Monotonic AXIS values are now only required if the NDF
+      current Frame is AXIS, or MODE="Step", or horizontal error
+      bars are being drawn.
 
    o  LOOK
 
       -  New format "wglist" has been added, which lists the WCS
       co-ordinates and pixel values in an image, omitting bad pixels.
-      -  New mode "all" has been added, which lists the entire
+      -  New mode "All" has been added, which lists the entire
       supplied NDF.
 
    o  MFITTREND
@@ -52,6 +70,10 @@
       -  Permits processing of very large datasets by dividing into
       manageable sections.
 
+   o  NDFTRACE
+
+      -  Continues when it encounters an error within a WCS Frame.
+       
    o  NORMALIZE
 
       -  The default for the AXES parameter has changed so that by
@@ -75,12 +97,14 @@
       -  The default for the AXES parameter has changed so that by
       default axes are only drawn if the picture is cleared.
 
-      - The Pearson correlation coefficient of the data in the
-      scatter plot is now displayed, and written to an output
+      -  The Pearson correlation coefficient of the data in the
+      scatter plot is now displayed, and written to the CORR output
       parameter.
 
    o  SETAXIS
 
+      - For MODE="WCS" it tries to find the best WCS axis to use
+      when the WCS axes are crossed or not parallel to the pixel axes.
       - "Linear_WCS" is a new MODE option.  It is a variant of "WCS"
       where the axis centres are set to the least-squares linear fit
       to the values of the selected axis.  This is useful for
@@ -105,7 +129,7 @@
       an attempt will now be made to align the input using the
       reference axes, whilst retaining the other axes.  Thus, if a
       three-dimensional spectral cube is aligned with a
-      two-dimensional image, the resuling output NDF would be a
+      two-dimensional image, the resulting output NDF would be a
       three-dimensional cube, aligned spatially with the image.
 
 1 KAPPA_Version_1.12
