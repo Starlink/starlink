@@ -1,8 +1,8 @@
-      SUBROUTINE SUBPAR_GETNI ( NAMECODE, NDIM, MAXD, VALUES, ACTD,
+      SUBROUTINE SUBPAR_GETN<T> ( NAMECODE, NDIM, MAXD, VALUES, ACTD,
      :  STATUS )
 *+
 *  Name:
-*     SUBPAR_GETNI
+*     SUBPAR_GETN<T>
 
 *  Purpose:
 *     Read parameter values.
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBPAR_GETNI ( NAMECODE, NDIM, MAXD, VALUES, ACTD, STATUS )
+*     CALL SUBPAR_GETN<T> ( NAMECODE, NDIM, MAXD, VALUES, ACTD, STATUS )
 
 *  Description:
 *     Read the values from an n-dimensional object associated with a
@@ -20,7 +20,7 @@
 *     actual number of object dimensions.   The dimensions, MAXD, of
 *     the program array must be of sufficient size (along each axis)
 *     to contain the object array.
-*     There is a routine for each access type, INTEGER:
+*     There is a routine for each access type, <TYPE>:
 
 *        SUBPAR_GETND    DOUBLE PRECISION
 *        SUBPAR_GETNR    REAL
@@ -28,7 +28,7 @@
 *        SUBPAR_GETNL    LOGICAL
 *        SUBPAR_GETNC    CHARACTER[*n]
 
-*     If the object data type differs from the access type, INTEGER, then
+*     If the object data type differs from the access type, <TYPE>, then
 *     conversion is performed (if allowed).
 
 *  Arguments:
@@ -39,7 +39,7 @@
 *     MAXD(NDIM)=INTEGER
 *        Array specifying the dimensions of the program array
 *        to receive the data values.
-*     VALUES(*)=INTEGER
+*     VALUES(*)=<TYPE>
 *        Array to receive the values associated with the object.
 *        It must be of sufficient size to contain them all.
 *     ACTD(NDIM)=INTEGER
@@ -132,7 +132,7 @@
       INTEGER MAXD(*)			! Array dimensions
 
 *  Arguments Returned:
-      INTEGER VALUES(*)			! Array to receive values
+      <TYPE> VALUES(*)			! Array to receive values
       INTEGER ACTD(*)			! Object dimensions
 
 *    Status return :
@@ -203,7 +203,7 @@
 
 *              If OK, get the data values and size
                   IF ( STATUS .EQ. SAI__OK )
-     :               CALL DAT_GETNI( BOTLOC, ACTDIM, MAXD,
+     :               CALL DAT_GETN<T>( BOTLOC, ACTDIM, MAXD,
      :                 VALUES, ACTD, STATUS )
 
                ELSE

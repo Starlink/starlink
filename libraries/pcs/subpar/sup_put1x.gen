@@ -1,7 +1,7 @@
-      SUBROUTINE SUBPAR_PUT1D ( NAMECODE, NVAL, VALUES, STATUS )
+      SUBROUTINE SUBPAR_PUT1<T> ( NAMECODE, NVAL, VALUES, STATUS )
 *+
 *  Name:
-*     SUBPAR_PUT1D
+*     SUBPAR_PUT1<T>
 
 *  Purpose:
 *     Write vector parameter values.
@@ -10,12 +10,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBPAR_PUT1D ( NAMECODE, NVAL, DVALUES, STATUS )
+*     CALL SUBPAR_PUT1<T> ( NAMECODE, NVAL, VALUES, STATUS )
 
 *  Description:
 *     Write the values to a vector primitive object associated with
 *     a Parameter.
-*     There is a routine for each access type, DOUBLE PRECISION:
+*     There is a routine for each access type, <TYPE>:
 
 *        SUBPAR_PUT1D    DOUBLE PRECISION
 *        SUBPAR_PUT1R    REAL
@@ -23,7 +23,7 @@
 *        SUBPAR_PUT1L    LOGICAL
 *        SUBPAR_PUT1C    CHARACTER[*n]
 
-*     If the object data type differs from the access type, DOUBLE PRECISION, then
+*     If the object data type differs from the access type, <TYPE>, then
 *     conversion is performed (if allowed).
 
 *  Arguments:
@@ -31,7 +31,7 @@
 *        pointer to the parameter
 *     NVAL=INTEGER
 *        the number of values that are to be written.
-*     VALUES(NVAL)=DOUBLE PRECISION
+*     VALUES(NVAL)=<TYPE>
 *        Array containing the values to be written into the object.
 *     STATUS=INTEGER
 
@@ -106,7 +106,7 @@
 
       INTEGER NVAL                      ! number of values
 
-      DOUBLE PRECISION VALUES(*)                  ! Array to supply values
+      <TYPE> VALUES(*)                  ! Array to supply values
 
 *    Status return :
       INTEGER STATUS                    ! Status Return
@@ -200,7 +200,7 @@
 *
 *         Write the data
 *
-            CALL DAT_PUT1D ( BOTLOC, NVAL, VALUES, STATUS )
+            CALL DAT_PUT1<T> ( BOTLOC, NVAL, VALUES, STATUS )
 *
 *      Report if error - in case HDS doesn't
 *

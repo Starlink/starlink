@@ -1,9 +1,9 @@
-      SUBROUTINE SUBPAR_GETVI ( NAMECODE, MAXVAL, IVALUES, ACTVAL,
+      SUBROUTINE SUBPAR_GETV<T> ( NAMECODE, MAXVAL, <T>VALUES, ACTVAL,
      :  STATUS )
 
 *+
 *  Name:
-*     SUBPAR_GETVI
+*     SUBPAR_GETV<T>
 
 *  Purpose:
 *     Read parameter values as if object were a vector.
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBPAR_GETVI ( NAMECODE, MAXVAL, IVALUES, ACTVAL, STATUS )
+*     CALL SUBPAR_GETV<T> ( NAMECODE, MAXVAL, <T>VALUES, ACTVAL, STATUS )
 
 *  Description:
 *     Read the values from a primitive object associated with a Parameter
 *     as if it were vectorised (ie regardless of dimensionality)
-*     There is a routine for each access type, INTEGER:
+*     There is a routine for each access type, <TYPE>:
 
 *        SUBPAR_GETVD    DOUBLE PRECISION
 *        SUBPAR_GETVR    REAL
@@ -25,7 +25,7 @@
 *        SUBPAR_GETVL    LOGICAL
 *        SUBPAR_GETVC    CHARACTER[*n]
 
-*     If the object data type differs from the access type, INTEGER, then
+*     If the object data type differs from the access type, <TYPE>, then
 *     conversion is performed (if allowed).
 
 *  Arguments:
@@ -33,7 +33,7 @@
 *        pointer to the parameter
 *     MAXVAL=INTEGER
 *        the maximum number of values to be obtained.
-*     IVALUES(MAXVAL)=INTEGER
+*     <T>VALUES(MAXVAL)=<TYPE>
 *        Array containing the values to be read from the object.
 *     ACTVAL=INTEGER
 *        number of values returned
@@ -124,7 +124,7 @@
       INTEGER MAXVAL                    ! maximum number of values
 
 *  Arguments Returned:
-      INTEGER IVALUES(*)               ! Array for values
+      <TYPE> <T>VALUES(*)               ! Array for values
       INTEGER ACTVAL                    ! number of values
 
 *  Status return :
@@ -176,7 +176,7 @@
 
             ELSE
 *           Obtain the 'vectorised' data
-               CALL DAT_GETVI ( BOTLOC, MAXVAL, IVALUES, ACTVAL,
+               CALL DAT_GETV<T> ( BOTLOC, MAXVAL, <T>VALUES, ACTVAL,
      :         STATUS )
 
             ENDIF

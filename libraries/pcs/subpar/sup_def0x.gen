@@ -1,9 +1,9 @@
-      SUBROUTINE SUBPAR_DEF0D ( NAMECODE, DVALUE, STATUS )
+      SUBROUTINE SUBPAR_DEF0<T> ( NAMECODE, <T>VALUE, STATUS )
       IMPLICIT NONE
 
 *+
 *  Name:
-*     SUBPAR_DEF0D
+*     SUBPAR_DEF0<T>
 
 *  Purpose:
 *     Set dynamic default scalar value.
@@ -12,12 +12,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBPAR_DEF0D ( NAMECODE, VALUE, STATUS )
+*     CALL SUBPAR_DEF0<T> ( NAMECODE, VALUE, STATUS )
 
 *  Description:
 *     This routine sets a default value for a scalar primitive object
 *     associated with a Parameter.
-*     There is a routine for each access type, DOUBLE PRECISION:
+*     There is a routine for each access type, <TYPE>:
 
 *        SUBPAR_DEF0D    DOUBLE PRECISION
 *        SUBPAR_DEF0R    REAL
@@ -25,18 +25,18 @@
 *        SUBPAR_DEF0L    LOGICAL
 *        SUBPAR_DEF0C    CHARACTER[*n]
 
-*     If the object data type differs from the access type, DOUBLE PRECISION, then
+*     If the object data type differs from the access type, <TYPE>, then
 *     conversion is performed (if allowed).
 
 *  Arguments:
 *     NAMECODE=INTEGER (given)
 *        code-number of the parameter
-*     DVALUE=DOUBLE PRECISION
+*     <T>VALUE=<TYPE>
 *        Expression specifying the default value for the object.
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Use SUBPAR_DEF1D.
+*     Use SUBPAR_DEF1<T>.
 
 *  Copyright:
 *     Copyright (C) 1984, 1985, 1987, 1992 Science & Engineering Research Council.
@@ -68,9 +68,9 @@
 *     05-JUN-1985 (BDK):
 *        Set PARDYN(2,NAMECODE) values
 *     09-NOV-1987 (BDK):
-*        Use SUBPAR_DEF1D
+*        Use SUBPAR_DEF1<T>
 *     09-MAR-1992 (AJC):
-*        Use the special flag NVAL = 0 in calling _DEF1D
+*        Use the special flag NVAL = 0 in calling _DEF1<T>
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,7 +85,7 @@
 *  Arguments Given:
       INTEGER NAMECODE                  ! Parameter code number
 
-      DOUBLE PRECISION DVALUE			! Scalar to supply value
+      <TYPE> <T>VALUE			! Scalar to supply value
 
 *    Status return :
       INTEGER STATUS			! Status Return
@@ -100,10 +100,10 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
 *
-*   set the number of values and call SUBPAR_DEF1D.
+*   set the number of values and call SUBPAR_DEF1<T>.
 *   NVAL = 0 has special meaning i.e a scalar value
 *
       NVAL = 0
-      CALL SUBPAR_DEF1D ( NAMECODE, NVAL, DVALUE, STATUS )
+      CALL SUBPAR_DEF1<T> ( NAMECODE, NVAL, <T>VALUE, STATUS )
 
       END

@@ -1,8 +1,8 @@
-      SUBROUTINE SUBPAR_PUTND ( NAMECODE, NDIM, MAXD, VALUES, ACTD,
+      SUBROUTINE SUBPAR_PUTN<T> ( NAMECODE, NDIM, MAXD, VALUES, ACTD,
      :  STATUS )
 *+
 *  Name:
-*     SUBPAR_PUTND
+*     SUBPAR_PUTN<T>
 
 *  Purpose:
 *     Write parameter values.
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBPAR_PUTND ( NAMECODE, NDIM, MAXD, VALUES, ACTD,
+*     CALL SUBPAR_PUTN<T> ( NAMECODE, NDIM, MAXD, VALUES, ACTD,
 
 *  Description:
 *     Write the values into an n-dimensional primitive object associated
@@ -20,7 +20,7 @@
 *     actual number of object dimensions.   The dimensions, MAXD, of
 *     the program array must be of sufficient size (along each axis)
 *     to contain the object array.
-*     There is a routine for each access type, DOUBLE PRECISION:
+*     There is a routine for each access type, <TYPE>:
 
 *        SUBPAR_PUTND    DOUBLE PRECISION
 *        SUBPAR_PUTNR    REAL
@@ -28,7 +28,7 @@
 *        SUBPAR_PUTNL    LOGICAL
 *        SUBPAR_PUTNC    CHARACTER[*n]
 
-*     If the object data type differs from the access type, DOUBLE PRECISION, then
+*     If the object data type differs from the access type, <TYPE>, then
 *     conversion is performed (if allowed).
 
 *  Arguments:
@@ -41,7 +41,7 @@
 *     MAXD(NDIM)=INTEGER (given)
 *        Array specifying the dimensions of the program array
 *        containing the data values.
-*     VALUES(*)=DOUBLE PRECISION (given)
+*     VALUES(*)=<TYPE> (given)
 *        Array containing the values to be written into the object.
 *     ACTD(NDIM)=INTEGER (given)
 *        Array containing the actual data dimensions.   These must
@@ -119,7 +119,7 @@
 
       INTEGER MAXD(*)			! Array dimensions
 
-      DOUBLE PRECISION VALUES(*)			! Array to supply values
+      <TYPE> VALUES(*)			! Array to supply values
 
       INTEGER ACTD(*)			! Object dimensions
 
@@ -215,7 +215,7 @@
 *
 *         Write the data
 *
-            CALL DAT_PUTND ( BOTLOC, NDIM, MAXD, VALUES, ACTD,
+            CALL DAT_PUTN<T> ( BOTLOC, NDIM, MAXD, VALUES, ACTD,
      :       STATUS )
 *
 *      Report if error - in case HDS doesn't

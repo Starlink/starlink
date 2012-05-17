@@ -20,7 +20,11 @@ libsubpar_convenience_la_FCFLAGS = $(AM_FCFLAGS) -I../lex -I../adam -I../messys
 
 FPP_ROUTINES = sup_openifc.F
 
-F_ROUTINES = sup_accpt.f \
+GEN_F_ROUTINES = $(SUP_GN_ROUTINES:.gn=.f) $(SUP_GEN_ROUTINES:.gen=.f)
+
+F_ROUTINES = $(NONGEN_F_ROUTINES) $(GEN_F_ROUTINES)
+
+NONGEN_F_ROUTINES = sup_accpt.f \
              sup_accpt1.f \
              sup_actdcl.f \
              sup_activ.f \
@@ -43,21 +47,11 @@ F_ROUTINES = sup_accpt.f \
              sup_cursav.f \
              sup_curval.f \
              sup_deact.f \
-             sup_def0c.f \
-             sup_def0d.f \
-             sup_def0i.f \
-             sup_def0l.f \
-             sup_def0r.f \
              sup_def1c.f \
              sup_def1d.f \
              sup_def1i.f \
              sup_def1l.f \
              sup_def1r.f \
-             sup_defnc.f \
-             sup_defnd.f \
-             sup_defni.f \
-             sup_defnl.f \
-             sup_defnr.f \
              sup_datdef.f \
              sup_datfind.f \
              sup_delet.f \
@@ -81,26 +75,11 @@ F_ROUTINES = sup_accpt.f \
              sup_get0i.f \
              sup_get0l.f \
              sup_get0r.f \
-             sup_get1c.f \
-             sup_get1d.f \
-             sup_get1i.f \
-             sup_get1r.f \
-             sup_get1l.f \
              sup_getfloc.f \
              sup_gethds.f \
              sup_getkey.f \
              sup_getloc.f \
-             sup_getnc.f \
-             sup_getnd.f \
-             sup_getni.f \
-             sup_getnr.f \
-             sup_getnl.f \
              sup_getname.f \
-             sup_getvc.f \
-             sup_getvd.f \
-             sup_getvi.f \
-             sup_getvr.f \
-             sup_getvl.f \
              sup_gref.f \
              sup_hdsarr.f \
              sup_hdsass.f \
@@ -124,13 +103,7 @@ F_ROUTINES = sup_accpt.f \
              sup_limitr.f \
              sup_loadifc.f \
              sup_maxc.f \
-             sup_maxd.f \
-             sup_maxi.f \
-             sup_maxr.f \
              sup_minc.f \
-             sup_mind.f   \
-             sup_mini.f \
-             sup_minr.f \
              sup_mlith.f \
              sup_mnmx.f \
              sup_nameass.f \
@@ -147,25 +120,10 @@ F_ROUTINES = sup_accpt.f \
              sup_put0i.f \
              sup_put0l.f \
              sup_put0r.f \
-             sup_put1c.f \
-             sup_put1d.f \
-             sup_put1i.f \
-             sup_put1r.f \
-             sup_put1l.f \
              sup_putfloc.f \
              sup_putloc.f \
-             sup_putnc.f \
-             sup_putnd.f \
-             sup_putni.f \
-             sup_putnr.f \
-             sup_putnl.f \
              sup_putname.f \
              sup_putpath.f \
-             sup_putvc.f \
-             sup_putvd.f \
-             sup_putvi.f \
-             sup_putvr.f \
-             sup_putvl.f \
              sup_pwhlp.f \
              sup_rangec.f \
              sup_ranged.f \
@@ -205,6 +163,14 @@ C_ROUTINES = sup_admus.c \
              sup_trmsz.c \
 	     subpar.c
 
+SUP_GN_ROUTINES = \
+sup_maxx.gn sup_minx.gn
+
+SUP_GEN_ROUTINES = \
+sup_def0x.gen sup_defnx.gen \
+sup_get1x.gen sup_getnx.gen sup_getvx.gen \
+sup_put1x.gen sup_putnx.gen sup_putvx.gen
+
 # SUBPAR_{CMN,PARERR,SYS} are private to subpar, but they're used additionally
 # by parsecon, dtask and task, by adding a -I../subpar.
 PUBLIC_INCLUDES = SUBPAR_PAR
@@ -217,6 +183,10 @@ EXTRA_DIST = subpar_err.msg
 
 CLEANFILES = fac_170_err SUBPAR_ERR subpar_err.h
 
+.gn.f:
+	$(FGENERIC) -t dir $<
 
+.gen.f:
+	$(FGENERIC) -t cdilr $<
 
 
