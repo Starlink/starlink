@@ -1,10 +1,10 @@
-      SUBROUTINE TASK_ENC1I ( NVALS, IVALS, STRING, STATUS )
+      SUBROUTINE TASK_VAL0<T> ( <T>VAL, STRING, STATUS )
 *+
 *  Name:
-*     TASK_ENC1I
+*     TASK_VAL0<T>
 
 *  Purpose:
-*     Encode a vector as a character string
+*     Encode a value as a character string
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,25 +13,22 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL TASK_ENC1I ( NVALS, IVALS, STRING, STATUS )
+*     CALL TASK_VAL0<T> ( <T>VAL, STRING, STATUS )
 
 *  Description:
-*     Convert the given 1-D array into characters and concatenate the
-*     result into a string with the ADAM syntax, that is the elements of
-*     the array are separated and the whole is surrounded by [].
-*     There is a routine for each type C, D, I, L, R.
+*     Convert the given value of type <TYPE> into a character
+*     string and return it in STRING.
+*     A routine exists for each type C, D, L, I, R.
 
 *  Arguments:
-*     NVALS=INTEGER (given)
-*           number of values in the 1-D array
-*     IVALS(NVALS)=INTEGER (given)
-*           the array to be converted
+*     <T>VAL=<TYPE> (given)
+*           the value to be encoded
 *     STRING=CHARACTER*(*) (returned)
 *           the returned character string
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Call TASK_ENCNI
+*     Call TASK_ENC0<T>
 
 *  Copyright:
 *     Copyright (C) 1987, 1989 Science & Engineering Research Council.
@@ -61,7 +58,7 @@
 *     06-NOV-1987 (REVAD::BDK):
 *        Original
 *     29-APR-1989 (AAOEPP::WFL):
-*        Make it generic
+*        Make it generic (same as TASK_ENC0<T>)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,23 +72,24 @@
       INCLUDE 'SAE_PAR'
 
 *  Arguments Given:
-      INTEGER NVALS         ! number of values in the 1-D array
-
-      INTEGER IVALS(NVALS) ! the array to be encoded
+      <TYPE> <T>VAL         ! the value to be encoded
 
 *  Arguments Returned:
       CHARACTER*(*) STRING  ! the returned character string
 
 *  Status:
       INTEGER STATUS
-
-*  Local Variables:
-      INTEGER NDIMS         ! no of dimensions to be passed
 *.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      NDIMS = 1
-      CALL TASK_ENCNI ( NDIMS, NVALS, IVALS, STRING, STATUS )
+      CALL TASK_ENC0<T> ( <T>VAL, STRING, STATUS )
 
       END
+
+!*+  TASK_VAL0 - encode a value as a character string
+!      SUBROUTINE TASK_VAL0
+!*    Description :
+!*     Dummy routine to allow MMS to maintain the object library properly
+!
+!      END

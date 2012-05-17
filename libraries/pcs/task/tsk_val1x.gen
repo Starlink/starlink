@@ -1,7 +1,7 @@
-      SUBROUTINE TASK_VAL1R ( NVALS, RVALS, STRING, STATUS )
+      SUBROUTINE TASK_VAL1<T> ( NVALS, <T>VALS, STRING, STATUS )
 *+
 *  Name:
-*     TASK_VAL1R
+*     TASK_VAL1<T>
 
 *  Purpose:
 *     Encode a vector as a character string
@@ -13,7 +13,7 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL TASK_VAL1R ( NVALS, RVALS, STRING, STATUS )
+*     CALL TASK_VAL1<T> ( NVALS, <T>VALS, STRING, STATUS )
 
 *  Description:
 *     Convert the given 1-D array into characters and concatenate the
@@ -24,14 +24,14 @@
 *  Arguments:
 *     NVALS=INTEGER (given)
 *           number of values in the 1-D array
-*     RVALS(NVALS)=REAL (given)
+*     <T>VALS(NVALS)=<TYPE> (given)
 *           the array to be converted
 *     STRING=CHARACTER*(*) (returned)
 *           the returned character string
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Call TASK_ENC1R
+*     Call TASK_ENC1<T>
 
 *  Copyright:
 *     Copyright (C) 1987, 1989 Science & Engineering Research Council.
@@ -61,7 +61,7 @@
 *     06-NOV-1987 (REVAD::BDK):
 *        Original
 *     29-APR-1989 (AAOEPP::WFL):
-*        Make it generic (same as TASK_ENC1R)
+*        Make it generic (same as TASK_ENC1<T>)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -77,7 +77,7 @@
 *  Arguments Given:
       INTEGER NVALS         ! number of values in the 1-D array
 
-      REAL RVALS(NVALS) ! the array to be encoded
+      <TYPE> <T>VALS(NVALS) ! the array to be encoded
 
 *  Arguments Returned:
       CHARACTER*(*) STRING  ! the returned character string
@@ -88,6 +88,6 @@
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      CALL TASK_ENC1R ( NVALS, RVALS, STRING, STATUS )
+      CALL TASK_ENC1<T> ( NVALS, <T>VALS, STRING, STATUS )
 
       END

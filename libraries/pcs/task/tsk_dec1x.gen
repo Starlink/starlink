@@ -1,8 +1,8 @@
-      SUBROUTINE TASK_DEC1I ( STRING, MAXVALS, NVALS, IVALS,
+      SUBROUTINE TASK_DEC1<T> ( STRING, MAXVALS, NVALS, <T>VALS,
      :                          STATUS )
 *+
 *  Name:
-*     TASK_DEC1I
+*     TASK_DEC1<T>
 
 *  Purpose:
 *     Decode a character string as a vector
@@ -14,7 +14,7 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL TASK_DEC1I ( STRING, MAXVALS, NVALS, IVALS, STATUS )
+*     CALL TASK_DEC1<T> ( STRING, MAXVALS, NVALS, <T>VALS, STATUS )
 
 *  Description:
 *     Convert the given character string, which is assumed to have
@@ -29,12 +29,12 @@
 *           the maximum number of values that can be returned
 *     NVALS=INTEGER (returned)
 *           number of values in the 1-D array
-*     IVALS(NVALS)=INTEGER (returned)
+*     <T>VALS(NVALS)=<TYPE> (returned)
 *           the returned 1-D array
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Call TASK_DECNI
+*     Call TASK_DECN<T>
 
 *  Copyright:
 *     Copyright (C) 1989 Science & Engineering Research Council. All
@@ -83,7 +83,7 @@
 *  Arguments Returned:
       INTEGER NVALS         ! the number of values in the 1-D array
 
-      INTEGER IVALS(1:*)   ! the returned 1-D array
+      <TYPE> <T>VALS(1:*)   ! the returned 1-D array
 
 *  Status:
       INTEGER STATUS
@@ -96,8 +96,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       NMAXDIMS = 1
-      CALL TASK_DECNI ( STRING, NMAXDIMS, MAXVALS, NDIMS, NVALS,
-     :                    IVALS, STATUS )
+      CALL TASK_DECN<T> ( STRING, NMAXDIMS, MAXVALS, NDIMS, NVALS,
+     :                    <T>VALS, STATUS )
 
       END
 

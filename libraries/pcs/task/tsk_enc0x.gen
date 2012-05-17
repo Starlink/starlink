@@ -1,10 +1,10 @@
-      SUBROUTINE TASK_VAL1L ( NVALS, LVALS, STRING, STATUS )
+      SUBROUTINE TASK_ENC0<T> ( <T>VAL, STRING, STATUS )
 *+
 *  Name:
-*     TASK_VAL1L
+*     TASK_ENC0<T>
 
 *  Purpose:
-*     Encode a vector as a character string
+*     Encode a value as a character string
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,29 +13,26 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL TASK_VAL1L ( NVALS, LVALS, STRING, STATUS )
+*     CALL TASK_ENC0<T> ( <T>VAL, STRING, STATUS )
 
 *  Description:
-*     Convert the given 1-D array into characters and concatenate the
-*     result into a string with the ADAM syntax, that is the elements of
-*     the array are separated and the whole is surrounded by [].
-*     There is a routine for each type C, D, I, L, R.
+*     Convert the given value of type <TYPE> into a character
+*     string and return it in STRING.
+*     A routine exists for each type C, D, L, I, R.
 
 *  Arguments:
-*     NVALS=INTEGER (given)
-*           number of values in the 1-D array
-*     LVALS(NVALS)=LOGICAL (given)
-*           the array to be converted
+*     <T>VAL=<TYPE> (given)
+*           the value to be encoded
 *     STRING=CHARACTER*(*) (returned)
 *           the returned character string
 *     STATUS=INTEGER
 
 *  Algorithm:
-*     Call TASK_ENC1L
+*     Use appropriate CHR routine
 
 *  Copyright:
-*     Copyright (C) 1987, 1989 Science & Engineering Research Council.
-*     All Rights Reserved.
+*     Copyright (C) 1987, 1989, 1992 Science & Engineering Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -61,7 +58,9 @@
 *     06-NOV-1987 (REVAD::BDK):
 *        Original
 *     29-APR-1989 (AAOEPP::WFL):
-*        Make it generic (same as TASK_ENC1L)
+*        Make it generic
+*     04-OCT-1992 (RLVAD::AJC):
+*        Use CHR
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,19 +74,20 @@
       INCLUDE 'SAE_PAR'
 
 *  Arguments Given:
-      INTEGER NVALS         ! number of values in the 1-D array
-
-      LOGICAL LVALS(NVALS) ! the array to be encoded
+      <TYPE> <T>VAL         ! the value to be encoded
 
 *  Arguments Returned:
       CHARACTER*(*) STRING  ! the returned character string
 
 *  Status:
       INTEGER STATUS
+
+*  Local Variables:
+      INTEGER NCHAR         ! length of encoded string
 *.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      CALL TASK_ENC1L ( NVALS, LVALS, STRING, STATUS )
+      CALL CHR_<T>TOC( <T>VAL, STRING, NCHAR )
 
       END
