@@ -1187,6 +1187,16 @@ libraries/pcs/parsecon/SUBPAR_CMN
 libraries/pcs/sock/sock_link
 libraries/pcs/sock/sock_link_adam
 libraries/pcs/subpar/subpar_link_adam
+libraries/pcs/subpar/sup_def0x.f
+libraries/pcs/subpar/sup_defnx.f
+libraries/pcs/subpar/sup_get1x.f
+libraries/pcs/subpar/sup_getnx.f
+libraries/pcs/subpar/sup_getvx.f
+libraries/pcs/subpar/sup_maxx.f
+libraries/pcs/subpar/sup_minx.f
+libraries/pcs/subpar/sup_put1x.f
+libraries/pcs/subpar/sup_putnx.f
+libraries/pcs/subpar/sup_putvx.f
 libraries/pcs/task/tsk_dec1x.f
 libraries/pcs/task/tsk_decnx.f
 libraries/pcs/task/tsk_enc0x.f

@@ -1,62 +1,53 @@
-      SUBROUTINE SUBPAR_GETNR ( NAMECODE, NDIM, MAXD, VALUES, ACTD,
+      SUBROUTINE SUBPAR_GET1<T> ( NAMECODE, MAXVAL, <T>VALUES, ACTVAL,
      :  STATUS )
 *+
 *  Name:
-*     SUBPAR_GETNR
+*     SUBPAR_GET1<T>
 
 *  Purpose:
-*     Read parameter values.
+*     Read vector parameter values.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBPAR_GETNR ( NAMECODE, NDIM, MAXD, VALUES, ACTD, STATUS )
+*     CALL SUBPAR_GET1<T> ( NAMECODE, MAXVAL, <T>VALUES, ACTVAL, STATUS )
 
 *  Description:
-*     Read the values from an n-dimensional object associated with a
-*     parameter.
-*     The supplied number of dimensions, NDIM, must be .GE. the
-*     actual number of object dimensions.   The dimensions, MAXD, of
-*     the program array must be of sufficient size (along each axis)
-*     to contain the object array.
-*     There is a routine for each access type, REAL:
+*     Read the values from a vector (or scalar) primitive object associated
+*     with a Parameter.
+*     There is a routine for each access type, <TYPE>:
 
-*        SUBPAR_GETND    DOUBLE PRECISION
-*        SUBPAR_GETNR    REAL
-*        SUBPAR_GETNI    INTEGER
-*        SUBPAR_GETNL    LOGICAL
-*        SUBPAR_GETNC    CHARACTER[*n]
+*        SUBPAR_GET1D    DOUBLE PRECISION
+*        SUBPAR_GET1R    REAL
+*        SUBPAR_GET1I    INTEGER
+*        SUBPAR_GET1L    LOGICAL
+*        SUBPAR_GET1C    CHARACTER[*n]
 
-*     If the object data type differs from the access type, REAL, then
+*     If the object data type differs from the access type, <TYPE>, then
 *     conversion is performed (if allowed).
 
 *  Arguments:
-*     NAMECODE=INTEGER
+*     NAMECODE=INTEGER ( given)
 *        pointer to the parameter
-*     NDIM=INTEGER
-*        The dimensionality of the VALUES array
-*     MAXD(NDIM)=INTEGER
-*        Array specifying the dimensions of the program array
-*        to receive the data values.
-*     VALUES(*)=REAL
-*        Array to receive the values associated with the object.
-*        It must be of sufficient size to contain them all.
-*     ACTD(NDIM)=INTEGER
-*        Array to receive the actual object dimensions.
+*     MAXVAL=INTEGER
+*        the maximum number of values to be obtained.
+*     <T>VALUES(NVAL)=<TYPE>
+*        Array containing the values to be read from the object.
+*     ACTVAL=INTEGER
+*        number of values returned
 *     STATUS=INTEGER
 
 *  Algorithm:
 *     The HDS locator associated with the parameter is obtained.
-*     If this is successful, the shape of the associated object is found
-*     and checked. Missing dimensions of the ACTD vector are set to 1.
-*     If the object associated is too large, error SUBPAR__ARRDIM is
-*     reported.
-*     If all is OK, the data are extracted into the required array and
-*     the locator annulled.
-*     If an error is detected after an object is associated, error messages
-*     are flushed and another value obtained if possible by prompting up to
-*     a set number of times.
+*     If this is successful, the shape of the object is obtained
+*     If the object is scalar or 1-D and not larger than MAXVAL, the data
+*     are extracted by appropriate means into the given array;
+*     otherwise error SUBPAR__ARRDIM is reported.
+*     If after ASSOC is OK, an error is detected, the value cancelled and
+*     another value obtained if possible by prompting up to a set number
+*     of times.
+*     If the locator was obtained it is annulled.
 
 *  Copyright:
 *     Copyright (C) 1984, 1985, 1986, 1987, 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
@@ -84,28 +75,32 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     06.11.1984 (BDK):
+*     06-NOV-1984 (BDK):
 *        Original version
-*     12.02.1985 (BDK):
+*     12-FEB-1985 (BDK):
 *        Only set STATUS=DAT__BOUND if status is ok
-*     05.06.1985 (BDK):
+*     05-JUN-1985 (BDK):
 *        Call DAT_ASSOC with UPDATE in case of subsequent
-*        calls to DAT_PUT
-*     18.08.1986 (BDK):
+*        PAR_PUT to the parameter
+*     18-AUG-1986 (BDK):
 *        Check status before using pointer
-*     10.06.1987 (BDK):
-*        Allow objects of fewer than NDIM dimensions
-*     23.06.1987 (BDK):
-*        Avoid passing invalid descriptor to OUTCOPY
-*     15.08.1988 (AJC):
+*     10-JUN-1987 (BDK):
+*        Accept scalar as 1-element vector
+*     23-JUN-1987 (BDK):
+*        Trap problem passing pointer to OUTCOPY
+*     15-AUG-1988 (AJC):
 *        Don't annul locator if not obtained
-*     11.07.1991 (AJC):
+*     09-JUL-1991 (AJC):
 *        Use HDS conversion
-*      5.08.1992 (AJC):
-*        Report to cover HDS failure to do so on error
+*     16-OCT-1991 (AJC):
+*        Restore ability to read scalar object
+*      5-AUG-1992 (AJC):
+*        Report to cover HDS failure without report
+*      9-SEP-1992 (AJC):
+*        Allow internal scalar as 1 element array
 *     26-FEB-1993 (AJC):
 *        Add INCLUDE DAT_PAR
-*      2-JUL-1993 (AJC):
+*      1-JUL-1993 (AJC):
 *        Reprompt on all errors up to five times
 *     29-SEP-1994 (AJC):
 *        Use EMS_FACER not DAT_ERMSG to report errors
@@ -126,36 +121,36 @@
       INCLUDE 'SUBPAR_ERR'              ! SUBPAR errors
       INCLUDE 'SUBPAR_PARERR'           ! SUBPAR PAR errors
 
-*  Arguments Given:
-      INTEGER NAMECODE                  ! Parameter number
-      INTEGER NDIM			! Number of dimensions
-      INTEGER MAXD(*)			! Array dimensions
-
-*  Arguments Returned:
-      REAL VALUES(*)			! Array to receive values
-      INTEGER ACTD(*)			! Object dimensions
-
-*    Status return :
-      INTEGER STATUS			! Status Return
-
-*  Global Variables:
-      INCLUDE 'SUBPAR_CMN'
-
 *  Local Constants:
       INTEGER MAXDIM                    ! Maximum number of dimensions
       PARAMETER ( MAXDIM = 7 )
       INTEGER MAXTRY                    ! Maximum attempts to get good value
       PARAMETER ( MAXTRY = 5 )
 
+*  Arguments Given:
+      INTEGER NAMECODE                  ! Parameter number
+
+      INTEGER MAXVAL                    ! maximum number of values
+
+*  Arguments Returned:
+      <TYPE> <T>VALUES(*)               ! Array for values
+
+      INTEGER ACTVAL                    ! number of values
+
+*    Status return :
+      INTEGER STATUS                    ! Status Return
+
+*  Global Variables:
+      INCLUDE 'SUBPAR_CMN'
+
 *  Local Variables:
-      INTEGER DIMS(MAXDIM)                     ! dimensions of HDS object
-      INTEGER ACTDIM                           ! dimensionality of HDS object
-      INTEGER J                                ! loop counter
+      INTEGER DIMS(MAXDIM)                     ! Object dimensions
+      INTEGER ACTDIM                           ! Actual number of dimensions
       INTEGER TRIES                            ! Number of tries
       CHARACTER*(DAT__SZLOC) BOTLOC            ! HDS locator
       LOGICAL ACCEPTED                         ! If no re-prompt required
-*.
 
+*.
       IF (STATUS .NE. SAI__OK) RETURN
 
 *   Protect higher level tokens
@@ -166,9 +161,8 @@
       TRIES = 0
 
       DOWHILE ( .NOT. ACCEPTED )
-*
+
 *      Get an HDS locator to the data for the parameter.
-*
          IF ( PARWRITE(NAMECODE) ) THEN
             CALL SUBPAR_ASSOC ( NAMECODE, 'UPDATE', BOTLOC, STATUS )
          ELSE
@@ -176,48 +170,42 @@
          ENDIF
 
          IF (STATUS .EQ. SAI__OK) THEN
-*        Get the object dimensions
+*        Get shape of object
             CALL DAT_SHAPE ( BOTLOC, MAXDIM, DIMS, ACTDIM, STATUS )
 
-*        Now check size and shape.
-*        If actual dimensionality less than given, set higher dimensions
-*        to 1
-            IF ( STATUS .EQ. SAI__OK ) THEN
-
-*           Ensure DIMS set correct for a scalar object
-               IF ( ACTDIM .EQ. 0 ) DIMS(1) = 0
-
-               IF (ACTDIM .LE. NDIM) THEN
-                  DO J = 1, NDIM
-                     IF ( J .GT. ACTDIM ) ACTD(J) = 1
-                     IF ( DIMS( J ) .GT. MAXD(J) ) THEN
-                        STATUS = SUBPAR__ARRDIM
-                        CALL EMS_SETI( 'DIM', J )
-                        CALL EMS_SETI( 'MAX', MAXD(J) )
-                        CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
-                        CALL EMS_REP ( 'SUP_GETN1', 'SUBPAR: '//
-     :                  'Maximum ^MAX exceeded for dimension ^DIM '//
-     :                  'of parameter ^NAME', STATUS )
-                     ENDIF
-                  ENDDO
-
-*              If OK, get the data values and size
-                  IF ( STATUS .EQ. SAI__OK )
-     :               CALL DAT_GETNR( BOTLOC, ACTDIM, MAXD,
-     :                 VALUES, ACTD, STATUS )
-
-               ELSE
+*        If it is a 1-D object, read it as such provided that the size
+*        is OK.
+            IF (ACTDIM .EQ. 1 ) THEN
+               IF( DIMS(1) .GT. MAXVAL ) THEN
                   STATUS = SUBPAR__ARRDIM
-                  CALL EMS_SETI( 'DIMS', NDIM )
                   CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
-                  CALL EMS_REP ( 'SUP_GETN2',
-     :            'SUBPAR: Maximum ^DIMS dimensions exceeded '//
+                  CALL EMS_SETI( 'MAXVAL', MAXVAL )
+                  CALL EMS_REP ( 'SUP_GET1_1', 'SUBPAR: '//
+     :            'No more than ^MAXVAL elements are allowed '//
      :            'for parameter ^NAME', STATUS )
 
+               ELSE
+*              Get the data values and size
+                  CALL DAT_GET1<T>( BOTLOC, MAXVAL, <T>VALUES,
+     :            ACTVAL, STATUS )
                ENDIF
 
-            ENDIF
+*        Else if it is a scalar object read it as such
+            ELSEIF ( ACTDIM .EQ. 0 ) THEN
+*           Get the data value
+               CALL DAT_GET0<T>( BOTLOC, <T>VALUES(1), STATUS )
+*           and set size = 1
+               ACTVAL = 1
 
+*        Else the object is invalid
+            ELSE
+               STATUS = SUBPAR__ARRDIM
+               CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
+               CALL EMS_REP ( 'SUP_GET1_2',
+     :         'SUBPAR: N-D value supplied for 1-D parameter ^NAME',
+     :          STATUS )
+
+            ENDIF
 
 *        Annul the locator
             CALL DAT_ANNUL( BOTLOC, STATUS )
@@ -227,11 +215,11 @@
                ACCEPTED = .TRUE.
 
 *        Otherwise cancel the parameter - forcing reprompt,
-*        flush error messages and loop
+*        flush error messages and loop up to MAXTRY times
             ELSE
                IF ( STATUS .NE. SUBPAR__ARRDIM ) THEN
                   CALL EMS_FACER( 'MESS', STATUS )
-                  CALL EMS_REP( 'SUP_GETN3', '^MESS', STATUS )
+                  CALL EMS_REP( 'SUP_GET1_3', '^MESS', STATUS )
                ENDIF
                CALL SUBPAR_CANCL ( NAMECODE, STATUS )
 *           Flush error and reset status
@@ -245,7 +233,7 @@
                   PARSTATE(NAMECODE) = SUBPAR__NULL
                   CALL EMS_SETC( 'NAME', PARKEY(NAMECODE) )
                   CALL EMS_SETI( 'TRIES', TRIES )
-                  CALL EMS_REP( 'SUP_GETN4', 'SUBPAR: '//
+                  CALL EMS_REP( 'SUP_GET1_4', 'SUBPAR: '//
      :            '^TRIES prompts failed to get a good value for '//
      :            'parameter ^NAME - NULL assumed', STATUS )
                ENDIF
@@ -253,8 +241,9 @@
             ENDIF
 
 
-*     Else if ASSOC failed - stop loop
+*     Else if ASSOC failed exit
          ELSE
+
             ACCEPTED = .TRUE.
 
          ENDIF

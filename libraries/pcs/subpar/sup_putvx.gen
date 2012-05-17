@@ -1,51 +1,39 @@
-      SUBROUTINE SUBPAR_PUTNI ( NAMECODE, NDIM, MAXD, VALUES, ACTD,
-     :  STATUS )
+      SUBROUTINE SUBPAR_PUTV<T> ( NAMECODE, NVAL, VALUES, STATUS )
 *+
 *  Name:
-*     SUBPAR_PUTNI
+*     SUBPAR_PUTV<T>
 
 *  Purpose:
-*     Write parameter values.
+*     Write parameter values as if object were a vector.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUBPAR_PUTNI ( NAMECODE, NDIM, MAXD, VALUES, ACTD,
+*     CALL SUBPAR_PUTV<T> ( NAMECODE, NVAL, VALUES, STATUS )
 
 *  Description:
-*     Write the values into an n-dimensional primitive object associated
-*     with a Parameter.
-*     The supplied number of dimensions, NDIM, is expected to match the
-*     actual number of object dimensions.   The dimensions, MAXD, of
-*     the program array must be of sufficient size (along each axis)
-*     to contain the object array.
-*     There is a routine for each access type, INTEGER:
+*     Write the values to a primitive object associated with a Parameter
+*     as if it were vectorised (ie regardless of its actual
+*     dimensionality).
+*     There is a routine for each access type, <TYPE>:
 
-*        SUBPAR_PUTND    DOUBLE PRECISION
-*        SUBPAR_PUTNR    REAL
-*        SUBPAR_PUTNI    INTEGER
-*        SUBPAR_PUTNL    LOGICAL
-*        SUBPAR_PUTNC    CHARACTER[*n]
+*        SUBPAR_PUTVD    DOUBLE PRECISION
+*        SUBPAR_PUTVR    REAL
+*        SUBPAR_PUTVI    INTEGER
+*        SUBPAR_PUTVL    LOGICAL
+*        SUBPAR_PUTVC    CHARACTER[*n]
 
-*     If the object data type differs from the access type, INTEGER, then
+*     If the object data type differs from the access type, <TYPE>, then
 *     conversion is performed (if allowed).
 
 *  Arguments:
-*     NAMECODE=INTEGER (given)
+*     NAMECODE=INTEGER ( given)
 *        pointer to the parameter
-*     NDIM=INTEGER (given)
-*        Expression specifying the number of dimensions of the
-*        program array, VALUES.   This must match the actual number
-*        of object dimensions.
-*     MAXD(NDIM)=INTEGER (given)
-*        Array specifying the dimensions of the program array
-*        containing the data values.
-*     VALUES(*)=INTEGER (given)
+*     NVAL=INTEGER
+*        the number of values that are to be written.
+*     VALUES(NVAL)=<TYPE>
 *        Array containing the values to be written into the object.
-*     ACTD(NDIM)=INTEGER (given)
-*        Array containing the actual data dimensions.   These must
-*        match the actual object dimensions.
 *     STATUS=INTEGER
 
 *  Copyright:
@@ -74,12 +62,12 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     07.11.1984 (BDK):
-*        Original version
+*     19.11.1984 (BDK):
+*        Original
 *     18.08.1986 (BDK):
 *        Check status before using pointer
 *     15.08.1988 (AJC):
-*        Don't annul locator if not obtained
+*        Don't annul parameter if not obtained
 *     06.08.1991 (AJC):
 *        Use HDS type conversion
 *        Change PAR__ICACM to SUBPAR__
@@ -115,13 +103,9 @@
 *  Arguments Given:
       INTEGER NAMECODE                  ! Parameter number
 
-      INTEGER NDIM			! Number of dimensions
+      INTEGER NVAL                      ! number of values
 
-      INTEGER MAXD(*)			! Array dimensions
-
-      INTEGER VALUES(*)			! Array to supply values
-
-      INTEGER ACTD(*)			! Object dimensions
+      <TYPE> VALUES(*)               ! Array to supply values
 
 *    Status return :
       INTEGER STATUS                    ! Status Return
@@ -138,6 +122,8 @@
                                         ! user-specified HDS structure.
 
       CHARACTER*(DAT__SZLOC) BOTLOC     ! locator to HDS object
+
+      CHARACTER*(DAT__SZLOC) LOCV       ! locator to vecorised object
 
       CHARACTER*15 HDSTYPE              ! type of primitive data
                                         ! to be stored
@@ -193,43 +179,48 @@
 
          IF ( .NOT. INTERNAL ) THEN
 *
-*         Attempt to get a locator to an HDS structure
+*         Attempt to get a locator to an HDS structure, and vectorise it
 *
             CALL SUBPAR_ASSOC ( NAMECODE, 'WRITE', BOTLOC, STATUS )
             IF ( ( STATUS .EQ. SAI__OK ) .AND.
      :           ( PARTYPE(NAMECODE) .LT. 20 ) ) INTERNAL = .TRUE.
 
+
+            IF (STATUS .EQ. SAI__OK) THEN
+               CALL DAT_VEC ( BOTLOC, LOCV, STATUS )
+               CALL DAT_ANNUL ( BOTLOC, STATUS )
+            ENDIF
+
          END IF
 
          IF ( INTERNAL ) THEN
-*         Value is to be put into the program's private parameter
-*         store.
+*
+*         Value is to be put into the program's private parameter store.
 *         Create the necessary space and return a locator to it
 *
-            CALL SUBPAR_CRINT ( NAMECODE, HDSTYPE, NDIM, ACTD, BOTLOC,
-     :        STATUS )
+            CALL SUBPAR_CRINT ( NAMECODE, HDSTYPE, 1, NVAL, LOCV,
+     :           STATUS )
 
          ENDIF
 
-         IF (STATUS .EQ.SAI__OK) THEN
+         IF ( STATUS .EQ. SAI__OK ) THEN
 *
 *         Write the data
 *
-            CALL DAT_PUTNI ( BOTLOC, NDIM, MAXD, VALUES, ACTD,
-     :       STATUS )
+            CALL DAT_PUTV<T> ( BOTLOC, NVAL, VALUES, STATUS )
 *
 *      Report if error - in case HDS doesn't
 *
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
-               CALL EMS_REP ( 'SUP_PUTN_1',
+               CALL EMS_REP ( 'SUP_PUTV1',
      :         'SUBPAR: HDS failed to ''PUT'' to parameter ^NAME',
      :          STATUS )
             END IF
 *
 *         Annul the locator.
 *
-            CALL DAT_ANNUL ( BOTLOC, STATUS )
+            CALL DAT_ANNUL ( LOCV, STATUS )
 
          ENDIF
 
@@ -238,7 +229,7 @@
 *      No write access to parameter
          STATUS = SUBPAR__ICACM
          CALL EMS_SETC ( 'NAME', PARKEY(NAMECODE) )
-         CALL EMS_REP ( 'SUP_PUTN2',
+         CALL EMS_REP ( 'SUP_PUTV2',
      :   'SUBPAR: Failed to ''PUT'' to parameter ^NAME - '//
      :   'access READ specified', STATUS )
 
