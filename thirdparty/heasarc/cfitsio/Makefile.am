@@ -3,8 +3,8 @@
 ## Library linking script.
 dist_bin_SCRIPTS = cfitsio_link
 
-## Create the imcopy, fitscopy and listhead binaries, very useful.
-bin_SCRIPTS = cfitsio/imcopy cfitsio/fitscopy cfitsio/listhead
+## Create the imcopy, and fitscopy binaries, very useful.
+bin_SCRIPTS = cfitsio/imcopy cfitsio/fitscopy
 
 ## The libraries, static and shared. Note shared needs special handling
 ## as automake doesn't like the unknown extension.
@@ -48,9 +48,6 @@ cfitsio/imcopy: cfitsio/imcopy.c cfitsio/libcfitsio.a
 
 cfitsio/fitscopy: cfitsio/fitscopy.c cfitsio/libcfitsio.a
 	(cd cfitsio; make fitscopy )
-
-cfitsio/listhead: cfitsio/listhead.c cfitsio/libcfitsio.a
-	(cd cfitsio; make listhead )
 
 #  Clean recurses into cfitsio.
 clean-local:
