@@ -46,6 +46,7 @@ CSRCS =  \
 FSRCS =  \
  ardstat.f asc2tab.f autocrop.f cat2tab.f gai1_bswapb.f gai1_bswapd.f \
  gai1_bswapi.f gai1_bswapr.f gai1_bswapub.f gai1_bswapuw.f gai1_bswapw.f \
+ gai1_bswapk.f \
  gai1_nxtab.f gai1_s2ang.f gai1_t2cg.f gai1_t2cn.f gai_a2tab.f \
  gai_c2tab.f gai_t2asc.f gai_t2cat.f rpatch.f \
  rtd1_aqual.f rtd1_ardst.f rtd1_binom.f rtd1_chead.f rtd1_crfit.f \
