@@ -1,7 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(pcs, 4.1-3, ussc@star.rl.ac.uk)
+AC_INIT(pcs, 4.1-4, ussc@star.rl.ac.uk)
 
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
@@ -20,7 +20,7 @@ AC_PROG_LN_S
 
 AC_FC_LIBRARY_LDFLAGS
 STAR_CNF_COMPATIBLE_SYMBOLS
-
+STAR_CHECK_PROGS([fgeneric])
 
 dnl    Prefer GNU m4, but try with what we have.
 AC_PATH_PROGS(M4, gm4 gnum4 m4, m4)

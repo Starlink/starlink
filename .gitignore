@@ -1187,6 +1187,14 @@ libraries/pcs/parsecon/SUBPAR_CMN
 libraries/pcs/sock/sock_link
 libraries/pcs/sock/sock_link_adam
 libraries/pcs/subpar/subpar_link_adam
+libraries/pcs/task/tsk_dec1x.f
+libraries/pcs/task/tsk_decnx.f
+libraries/pcs/task/tsk_enc0x.f
+libraries/pcs/task/tsk_enc1x.f
+libraries/pcs/task/tsk_encnx.f
+libraries/pcs/task/tsk_val0x.f
+libraries/pcs/task/tsk_val1x.f
+libraries/pcs/task/tsk_valnx.f
 
 libraries/pda/pda_qsia.f
 libraries/pda/pda_qsid.f

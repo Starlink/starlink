@@ -1,8 +1,8 @@
-      SUBROUTINE TASK_DECNI ( STRING, NMAXDIMS, MAXDIMS, NDIMS, DIMS,
-     :                          IVALS, STATUS )
+      SUBROUTINE TASK_DECN<T> ( STRING, NMAXDIMS, MAXDIMS, NDIMS, DIMS,
+     :                          <T>VALS, STATUS )
 *+
 *  Name:
-*     TASK_DECNI
+*     TASK_DECN<T>
 
 *  Purpose:
 *     Decode a character string as an array
@@ -14,8 +14,8 @@
 *     SUBROUTINE
 
 *  Invocation:
-*     CALL TASK_DECNI ( STRING, NMAXDIMS, MAXDIMS, NDIMS, DIMS,
-*                         IVALS, STATUS )
+*     CALL TASK_DECN<T> ( STRING, NMAXDIMS, MAXDIMS, NDIMS, DIMS,
+*                         <T>VALS, STATUS )
 
 *  Description:
 *     Convert the given character string, which is assumed to have
@@ -36,7 +36,7 @@
 *           number of dimensions in the decoded array
 *     DIMS(NDIMS)=INTEGER (returned)
 *           sizes of dimensions of the decoded array
-*     IVALS(1:*)=INTEGER (returned)
+*     <T>VALS(1:*)=<TYPE> (returned)
 *           the decoded array, treated as a vector
 *     STATUS=INTEGER
 
@@ -102,7 +102,7 @@
 
       INTEGER DIMS(1:*)    ! sizes of dimensions of the given array
 
-      INTEGER IVALS(1:*)  ! the decoded array, treated as a vector
+      <TYPE> <T>VALS(1:*)  ! the decoded array, treated as a vector
 
 *  Status:
       INTEGER STATUS
@@ -153,7 +153,7 @@
          COUNT = MIN ( DIMS(1), MAXDIMS(1) )
          DO WHILE ( ( J .LT. COUNT ) .AND. ( STATUS .EQ. SAI__OK ) )
             J = J + 1
-            CALL TASK_DEC0I ( CARRAY(J)(1:CLENGTHS(J)), IVALS(J),
+            CALL TASK_DEC0<T> ( CARRAY(J)(1:CLENGTHS(J)), <T>VALS(J),
      :      STATUS )
          ENDDO
       ENDIF

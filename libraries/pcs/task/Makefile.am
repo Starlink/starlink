@@ -24,7 +24,12 @@ PUBLIC_C_INCLUDES = task_adam.h
 PUBLIC_INCLUDES = TASK_PAR
 PRIVATE_INCLUDES = TASK_CMN
 
-F_ROUTINES = tsk_add_msinf.f \
+GEN_F_ROUTINES = $(GEN_ROUTINES:.gen=.f)
+
+F_ROUTINES = $(NONGEN_F_ROUTINES) $(GEN_F_ROUTINES)
+
+NONGEN_F_ROUTINES = \
+             tsk_add_msinf.f \
              tsk_askparam.f \
              tsk_astmsg.f \
              tsk_astsignal.f \
@@ -37,32 +42,7 @@ F_ROUTINES = tsk_add_msinf.f \
              tsk_dec0i.f \
              tsk_dec0l.f \
              tsk_dec0r.f \
-             tsk_dec1c.f \
-             tsk_dec1d.f \
-             tsk_dec1i.f \
-             tsk_dec1l.f \
-             tsk_dec1r.f \
-             tsk_decnc.f \
-             tsk_decnd.f \
-             tsk_decni.f \
-             tsk_decnl.f \
-             tsk_decnr.f \
              tsk_done.f \
-             tsk_enc0c.f \
-             tsk_enc0d.f \
-             tsk_enc0i.f \
-             tsk_enc0l.f \
-             tsk_enc0r.f \
-             tsk_enc1c.f \
-             tsk_enc1d.f \
-             tsk_enc1i.f \
-             tsk_enc1l.f \
-             tsk_enc1r.f \
-             tsk_encnc.f \
-             tsk_encnd.f \
-             tsk_encni.f \
-             tsk_encnl.f \
-             tsk_encnr.f \
              tsk_get.f \
              tsk_get_cntxt.f \
              tsk_get_cntxn.f \
@@ -87,25 +67,23 @@ F_ROUTINES = tsk_add_msinf.f \
              tsk_set.f \
              tsk_split.f \
              tsk_trigger.f \
-             tsk_tstintflg.f \
-             tsk_val0c.f \
-             tsk_val0d.f \
-             tsk_val0i.f \
-             tsk_val0l.f \
-             tsk_val0r.f \
-             tsk_val1c.f \
-             tsk_val1d.f \
-             tsk_val1i.f \
-             tsk_val1l.f \
-             tsk_val1r.f \
-             tsk_valnc.f \
-             tsk_valnd.f \
-             tsk_valni.f \
-             tsk_valnl.f \
-             tsk_valnr.f
+             tsk_tstintflg.f
+
+GEN_ROUTINES = \
+tsk_dec1x.gen \
+tsk_decnx.gen \
+tsk_enc0x.gen \
+tsk_enc1x.gen \
+tsk_encnx.gen \
+tsk_val0x.gen \
+tsk_val1x.gen \
+tsk_valnx.gen
 
 C_ROUTINES = task_adam.c
 
 BUILT_SOURCES = $(include_MESSAGES)
 
 EXTRA_DIST = task_err.msg 
+
+.gen.f:
+	$(FGENERIC) -t cdilr $<
