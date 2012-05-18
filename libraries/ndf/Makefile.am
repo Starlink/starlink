@@ -113,7 +113,7 @@ ndf_scopy.f ndf_sect.f ndf_shift.f ndf_size.f ndf_sqmf.f ndf_ssary.f   \
 ndf_state.f ndf_stype.f ndf_temp.f ndf_trace.f ndf_tune.f ndf_type.f   \
 ndf_unmap.f ndf_valid.f ndf_xdel.f ndf_xiary.f ndf_xloc.f  \
 ndf_xname.f ndf_xnew.f ndf_xnumb.f ndf_xstat.f ndf1_cvcmd.f \
-ndf1_farg.f ndf_sctyp.f ndf1_sctyp.f ndf1_vstyp.f                      \
+ndf1_farg.f ndf_sctyp.f ndf1_sctyp.f ndf1_vstyp.f ndf1_wcspm.f \
 ndf1_wclim.f ndf1_wplim.f ndf1_mpanl.f ndf1_mpspt.f ndf_hgmod.f \
 ndf_hsdat.f ndf1_chtim.f ndf1_hcopy.f ndf1_hsrt.f ndf_isin.f ndf_zscal.f \
 ndf1_zpsca.f ndf1_vclst.f ndf_zdelt.f ndf1_cmpac.f ndf_gtdlt.f
