@@ -113,6 +113,9 @@
 *     20-NOV-2009 (DSB):
 *        Correct conversion from pixel coords bounds to pixel index
 *        bounds.
+*     18-MAY-2012 (DSB):
+*        An attempt to improve the guess as to what the user meant if the
+*        WCS and pixel axes are not aligned and in the same order.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -190,6 +193,7 @@
       INTEGER PFRM
       INTEGER PNAX1
       INTEGER PNAX2
+      INTEGER PERM( NDF__MXDIM )
       INTEGER PPERM( NDF__MXDIM )
       INTEGER TEMP
       INTEGER WBOX
@@ -211,6 +215,13 @@
 
 *  Get the pixel->WCS Mapping. Note, the PIXEL Frame is always index 2.
       FSMAP = AST_GETMAPPING( IWCS, 2, AST__CURRENT, STATUS )
+
+*  Find a permutation array that associates each WCS axis with a pixel
+*  axis. This is really just a guess as to what the user intended, based
+*  on how closely the WCS and pixel axes align. It could be wrong for
+*  instance in an image where the WCS axes are linear and exactly at 45
+*  degrees to the pixel axes.
+      CALL NDF1_WCSPM( FSMAP, LBNDD, UBNDD, PERM, STATUS )
 
 *  Split this Mapping up into two parallel Mappings, one of which (MAP1)
 *  contains those inputs/outputs that have defined inverse transformations,
@@ -291,7 +302,7 @@
 
             END IF
 
-            VALUE1( I ) = CENWCS( I )
+            VALUE1( I ) = CENWCS( PERM( I ) )
             ISPIX1( I ) = .FALSE.
 
          END IF
@@ -346,7 +357,7 @@
                   GO TO 999
                ELSE
                   PLBND( I ) = DLBNDD( I )
-                  WLBND( I ) = VALUE1( I )
+                  WLBND( PERM( I ) ) = VALUE1( I )
                   ALLPIX = .FALSE.
                END IF
             END IF
@@ -366,7 +377,7 @@
                   GO TO 999
                ELSE
                   PUBND( I ) = DUBNDD( I )
-                  WUBND( I ) = VALUE2( I )
+                  WUBND( PERM( I ) ) = VALUE2( I )
                   ALLPIX = .FALSE.
                END IF
             END IF
@@ -398,8 +409,8 @@
                   DELTA = 0.5*VALUE2( I )
                   PLBND( I ) = DLBNDD( I )
                   PUBND( I ) = DUBNDD( I )
-                  WLBND( I ) = VALUE1( I ) - DELTA
-                  WUBND( I ) = VALUE1( I ) + DELTA
+                  WLBND( PERM( I ) ) = VALUE1( I ) - DELTA
+                  WUBND( PERM( I ) ) = VALUE1( I ) + DELTA
                   ALLPIX = .FALSE.
                END IF
             END IF
@@ -422,9 +433,9 @@
 
 *  Store the central WCS values as the upper and lower bounds of the WCS
 *  box.
-               WUBND( I ) = VALUE1( I )
-               WLBND( I ) = VALUE1( I )
-
+               WUBND( PERM( I ) ) = VALUE1( I )
+               WLBND( PERM( I ) ) = VALUE1( I )
+ 
 *  Use defaults for the upper and lower bounds of the pixel box.
                PLBND( I ) = DLBNDD( I )
                PUBND( I ) = DUBNDD( I )
@@ -448,7 +459,7 @@
 
 *  Store the central pixel values as the upper and lower bounds of the
 *  pixel box. Leave the WCS box bounds set to bad so that defaults will
-*  be fund and used.
+*  be found and used.
                PUBND( I ) = VALUE1( I )
                PLBND( I ) = VALUE1( I )
             END IF
@@ -496,11 +507,11 @@ c      write(*,*) '   '
 *  Re-calculate the WCS bounds using the central WCS value and the
 *  supplied WCS width.
                      ISPIX1( I ) = .FALSE.
-                     VALUE1( I ) = CENWCS( I )
+                     VALUE1( I ) = CENWCS( PERM( I ) )
 
                      DELTA = 0.5*VALUE2( I )
-                     WLBND( I ) = VALUE1( I ) - DELTA
-                     WUBND( I ) = VALUE1( I ) + DELTA
+                     WLBND( PERM( I ) ) = VALUE1( I ) - DELTA
+                     WUBND( PERM( I ) ) = VALUE1( I ) + DELTA
                      ALLPIX = .FALSE.
 
 *  Store default bounds for the pixel box on this axis.
@@ -561,22 +572,10 @@ c      write(*,*) '   '
                CALL AST_MAPBOX( MAP, PLBND, PUBND, .FALSE., I, V1, V2,
      :                          XL, XU, STATUS )
 
-*  Find the pixel axis that covers the largest range between the
-*  positions at which the upper and lower WCS limits were found.
-               MAXRNG = -1.0
+*  Find the index of the corresponding pixel axis.
                JJ = 0
                DO J = 1, NPIX
-
-                  IF( XU( J ) .NE. AST__BAD .AND.
-     :                XL( J ) .NE. AST__BAD ) THEN
-
-                     PRANGE = ABS( XU( J ) - XL( J ) )
-                     IF( PRANGE .GT. MAXRNG ) THEN
-                        JJ = J
-                        MAXRNG = PRANGE
-                     END IF
-
-                  END IF
+                  IF( PERM( J ) .EQ. I ) JJ = J
                END DO
 
 *  Whether a WCS value is a "lower" or "upper" bound is determined not by
