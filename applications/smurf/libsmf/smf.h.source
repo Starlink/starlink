@@ -1679,7 +1679,7 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int *ubnd_out, double *map, double *variance,
                    double *weights, int *nused, int *status );
 
-void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
+void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut,
                     size_t tslice1, size_t tslice2, int trange,
                     int *whichmap, dim_t nmap, smf_qual_t mask, int sampvar,
                     int flags, double *map, double *mapweight,
@@ -1866,7 +1866,7 @@ int smf_validate_smfHead( const smfHead * hdr, int hasfits, int hasstate,
 void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
                  int complement, int *status );
 
-void smf_write_bolomap( smfArray *res, smfArray *lut,
+void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,
                         const Grp *bolrootgrp, int varmapmethod,
                         const int *lbnd_out, const int *ubnd_out,
@@ -1892,7 +1892,7 @@ void smf_write_sampcube( const smfArray *res, const smfArray *lut,
                          size_t contchunk, const int *lbnd, const int *ubnd,
                          int *status );
 
-void smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
+void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res, smfArray *lut,
                          smfArray *qua, smfDIMMData *dat,
                          dim_t msize, const Grp *shortrootgrp, size_t contchunk,
                          int varmapmethod, const int *lbnd_out,
