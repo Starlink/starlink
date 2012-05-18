@@ -1820,7 +1820,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             /* Rebin the residual + astronomical signal into a map */
-            smf_rebinmap1( res[0]->sdata[idx],
+            smf_rebinmap1( wf, res[0]->sdata[idx],
                            dat.noi ? dat.noi[0]->sdata[idx] : NULL,
                            lut_data, 0, 0, 0, NULL, 0, SMF__Q_GOOD,
                            varmapmethod, rebinflags, thismap, thisweight,
@@ -2158,7 +2158,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Create sub-maps for each bolometer if requested. */
       if( bolomap ) {
-        smf_write_bolomap( res[0], lut[0], qua[0], &dat, msize,
+        smf_write_bolomap( wf, res[0], lut[0], qua[0], &dat, msize,
                            bolrootgrp, varmapmethod, lbnd_out, ubnd_out,
                            outfset, status );
 
@@ -2171,7 +2171,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Create short maps using every SHORTMAP samples if requested */
 
       if( shortmap ) {
-        smf_write_shortmap( shortmap, res[0], lut[0], qua[0], &dat,
+        smf_write_shortmap( wf, shortmap, res[0], lut[0], qua[0], &dat,
                             msize, shortrootgrp, contchunk, varmapmethod,
                             lbnd_out, ubnd_out, outfset, status );
         /*** TIMER ***/

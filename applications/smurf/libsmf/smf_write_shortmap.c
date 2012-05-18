@@ -13,14 +13,16 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
-*                         smfArray *qua, smfDIMMData *dat,
+*     smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
+*                         smfArray *lut, smfArray *qua, smfDIMMData *dat,
 *                         dim_t msize, const Grp *shortrootgrp,size_t contchunk,
 *                         int varmapmethod, const int *lbnd_out,
 *                         const int *ubnd_out, AstFrameSet *outfset,
 *                         int *status );
 
 *  Arguments:
+*     wf = ThrWOrkForce * (Given)
+*        Threads work force.
 *     shortmap = int (Given)
 *        Number of time slices per short map, or if set to -1, create a map
 *        each time TCS_INDEX is incremented (i.e., produce a map each time
@@ -122,8 +124,8 @@
 
 #define FUNC_NAME "smf_write_shortmap"
 
-void smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
-                         smfArray *qua, smfDIMMData *dat,
+void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
+                         smfArray *lut, smfArray *qua, smfDIMMData *dat,
                          dim_t msize, const Grp *shortrootgrp, size_t contchunk,
                          int varmapmethod, const int *lbnd_out,
                          const int *ubnd_out, AstFrameSet *outfset,
@@ -293,7 +295,7 @@ void smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
         rebinflag |= AST__REBINEND;
       }
 
-      smf_rebinmap1( res->sdata[idx],
+      smf_rebinmap1( wf, res->sdata[idx],
                      dat->noi ? dat->noi[0]->sdata[idx] : NULL,
                      lut_data, shortstart, shortend, 1, NULL, 0,
                      SMF__Q_GOOD, varmapmethod,

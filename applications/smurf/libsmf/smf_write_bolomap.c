@@ -13,13 +13,15 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_bolomap( smfArray *res, smfArray *lut,
+*     smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
 *                        smfArray *qua, smfDIMMData *dat, dim_t msize,
 *                        const Grp *bolrootgrp, int varmapmethod,
 *                        const int *lbnd_out, const int *ubnd_out,
 *                        AstFrameSet *outfset, int *status ) {
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to thread workforce.
 *     res = smfArray* (Given)
 *        RES model smfArray
 *     lut = smfArray* (Given)
@@ -116,7 +118,7 @@
 
 #define FUNC_NAME "smf_write_bolomap"
 
-void smf_write_bolomap( smfArray *res, smfArray *lut,
+void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,
                         const Grp *bolrootgrp, int varmapmethod,
                         const int *lbnd_out, const int *ubnd_out,
@@ -256,7 +258,7 @@ void smf_write_bolomap( smfArray *res, smfArray *lut,
              about variance weighting because all samples from
              same detector are about the same. */
 
-          smf_rebinmap1( res->sdata[idx],
+          smf_rebinmap1( wf, res->sdata[idx],
                          dat->noi ? dat->noi[0]->sdata[idx] : NULL,
                          lut_data, 0, 0, 0, NULL, 0,
                          SMF__Q_GOOD, varmapmethod,

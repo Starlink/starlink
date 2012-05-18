@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebinmap1( smfData *data, smfData *variance, int *lut,
+*     smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut,
 *                    size_t tslice1, size_t tslice2, int trange, int *whichmap,
 *                    dim_t nmap, smf_qual_t mask, int sampvar, int flags,
 *                    double *map, double *mapweight, double *mapweightsq,
@@ -21,6 +21,8 @@
 *                    double *scalevariance, int *status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to thread workforce.
 *     data = smfData* (Given)
 *        Pointer to data stream to be re-gridded
 *     variance = smfData* (Given)
@@ -115,6 +117,8 @@
 *        Add whichmap to interface
 *     2011-10-18 (EC):
 *        Change to "weighted incremental" from "naive" variance algorithms
+*     2012-5-16 (DSB):
+*        Use threads.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -198,6 +202,7 @@
 
 /* Starlink includes */
 #include "ast.h"
+#include "star/thr.h"
 #include "mers.h"
 #include "sae_par.h"
 #include "star/ndg.h"
@@ -206,9 +211,44 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
+
+
+/* Local data types */
+typedef struct smfRebinMap1Data {
+   dim_t mbufsize;
+   dim_t msize;
+   dim_t nbolo;
+   dim_t t1;
+   dim_t t2;
+   dim_t vntslice;
+   double *dat;
+   double *map;
+   double *mapvar;
+   double *mapweight;
+   double *mapweightsq;
+   double *var;
+   double scalevar;
+   double scaleweight;
+   int *hitsmap;
+   int *lut;
+   int *whichmap;
+   int operation;
+   size_t dbstride;
+   size_t dtstride;
+   size_t p1;
+   size_t p2;
+   size_t vbstride;
+   size_t vtstride;
+   smf_qual_t *qual;
+   smf_qual_t mask;
+} SmfRebinMap1Data;
+
+static void smf1_rebinmap1( void *job_data_ptr, int *status );
+
+
 #define FUNC_NAME "smf_rebinmap1"
 
-void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
+void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut,
                     size_t tslice1, size_t tslice2, int trange,
                     int *whichmap, dim_t nmap, smf_qual_t mask, int sampvar,
                     int flags, double *map, double *mapweight,
@@ -217,27 +257,23 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                     int *status ) {
 
   /* Local Variables */
+  SmfRebinMap1Data *job_data = NULL;
+  SmfRebinMap1Data *pdata;
   double *dat=NULL;          /* Pointer to data array */
   size_t dbstride;           /* bolo stride of data */
-  double delta;              /* Offset for weighted mean */
-  dim_t di;                  /* data array index */
   size_t dtstride;           /* tstride of data */
-  size_t i;                  /* Loop counter */
-  size_t j;                  /* Loop counter */
-  dim_t mapoff=0;            /* Offset to start of map */
+  int iw;                    /* Thread index */
   dim_t mbufsize;            /* Size of full (multi-map) map buffers */
   dim_t nbolo;               /* number of bolos */
   dim_t ntslice;             /* number of time slices */
+  int nw;                    /* Number of worker threads */
+  size_t pixstep;            /* Number of map pixels per thread */
   smf_qual_t * qual = NULL;  /* Quality pointer */
-  double R;                  /* Another temp variable for variance calc */
   double scalevar;           /* variance scale factor */
   double scaleweight;        /* weights for calculating scalevar */
   size_t t1, t2;             /* range of time slices to re-grid */
-  double temp;               /* Temporary calculation */
-  double thisweight;         /* The weight at this point */
   double *var=NULL;          /* Pointer to variance array */
   size_t vbstride;           /* bolo stride of variance */
-  dim_t vi;                  /* variance array index */
   dim_t vnbolo;              /* number of bolos in variance */
   dim_t vntslice;            /* number of bolos in variance */
   size_t vtstride;           /* tstride of variance */
@@ -319,6 +355,54 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
     memset( hitsmap, 0, mbufsize*sizeof(*hitsmap) );
   }
 
+
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
+
+  /* Find how many map pixels to process in each worker thread. */
+  pixstep = msize/nw;
+  if( pixstep == 0 ) pixstep = 1;
+
+  /* Allocate job data for threads, and store the range of pixels to be
+     processed by each one. Ensure that the last thread picks up any
+     left-over time pixels. */
+  job_data = astCalloc( nw, sizeof(*job_data) );
+  if( *status == SAI__OK ) {
+    for( iw = 0; iw < nw; iw++ ) {
+      pdata = job_data + iw;
+      pdata->p1 = iw*pixstep;
+      if( iw < nw - 1 ) {
+        pdata->p2 = pdata->p1 + pixstep - 1;
+      } else {
+        pdata->p2 = msize - 1 ;
+      }
+
+/* Store other values common to all jobs. */
+      pdata->msize = msize;
+      pdata->nbolo = nbolo;
+      pdata->t1 = t1;
+      pdata->t2 = t2;
+      pdata->vntslice = vntslice;
+      pdata->dat = dat;
+      pdata->map = map;
+      pdata->mapvar = mapvar;
+      pdata->mapweightsq = mapweightsq;
+      pdata->mapweight = mapweight;
+      pdata->var = var;
+      pdata->hitsmap = hitsmap;
+      pdata->lut = lut;
+      pdata->whichmap = whichmap;
+      pdata->dbstride = dbstride;
+      pdata->dtstride = dtstride;
+      pdata->vbstride = vbstride;
+      pdata->vtstride = vtstride;
+      pdata->mask = mask;
+      pdata->qual = qual;
+      pdata->mbufsize = mbufsize;
+    }
+  }
+
+
   if( var ) {
     /* Accumulate data and weights in the case that variances are given*/
 
@@ -327,239 +411,105 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
       /* Measure weighted sample variance for varmap */
       if( qual ) {       /* QUALITY checking version */
 
-        for( i=0; i<nbolo; i++ ) {
-          if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=t1; j<=t2; j++ ) {
-
-            di = i*dbstride + j*dtstride;
-            vi = i*vbstride + (j%vntslice)*vtstride;
-
-            if( whichmap ) {
-              if( whichmap[j] != VAL__BADI ) {
-                mapoff = whichmap[j]*msize;
-              } else {
-                mapoff = SMF__BADDIMT;
-              }
-            }
-
-            /* Check that the LUT, data and variance values are valid */
-            if( (lut[di] != VAL__BADI) && !(qual[di]&mask) &&
-                (var[vi] != 0) && (mapoff != SMF__BADDIMT) ) {
-              hitsmap[mapoff+lut[di]] ++;
-              thisweight = 1/var[vi];
-
-              /* Weighted incremental algorithm */
-              temp = mapweight[mapoff+lut[di]] + thisweight;
-              delta = dat[di] - map[mapoff+lut[di]];
-              R = delta * thisweight / temp;
-              map[mapoff+lut[di]] += R;
-              mapvar[mapoff+lut[di]] += mapweight[mapoff+lut[di]]*delta*R;
-              mapweight[mapoff+lut[di]] = temp;
-
-              /* We don't need this sum anymore, but calculate it for
-                 consistency with the interface */
-              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
-            }
-          }
+        /* Set up jobs to add the previous estimate of COM back on to the
+           residuals, and then wait for the jobs to complete. These jobs also
+           clear any SMF__Q_COM flags set by previous iterations. */
+        for( iw = 0; iw < nw; iw++ ) {
+           pdata = job_data + iw;
+           pdata->operation = 1;
+           thrAddJob( wf, 0, pdata, smf1_rebinmap1, 0, NULL, status );
         }
+        thrWait( wf, status );
+
       } else {           /* VAL__BADD checking version */
-	for( i=0; i<nbolo; i++ ) {
-          for( j=t1; j<=t2; j++ ) {
+        for( iw = 0; iw < nw; iw++ ) {
+           pdata = job_data + iw;
+           pdata->operation = 2;
+           thrAddJob( wf, 0, pdata, smf1_rebinmap1, 0, NULL, status );
+        }
+        thrWait( wf, status );
 
-            di = i*dbstride + j*dtstride;
-            vi = i*vbstride + (j%vntslice)*vtstride;
-
-            if( whichmap ) {
-              if( whichmap[j] != VAL__BADI ) {
-                mapoff = whichmap[j]*msize;
-              } else {
-                mapoff = SMF__BADDIMT;
-              }
-            }
-
-            /* Check that the LUT, data and variance values are valid */
-            if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
-                (var[vi] != VAL__BADD) && (var[vi] != 0) &&
-                (mapoff != SMF__BADDIMT) ) {
-
-              hitsmap[mapoff+lut[di]] ++;
-              thisweight = 1/var[vi];
-
-              /* Weighted incremental algorithm */
-              temp = mapweight[mapoff+lut[di]] + thisweight;
-              delta = dat[di] - map[mapoff+lut[di]];
-              R = delta * thisweight / temp;
-              map[mapoff+lut[di]] += R;
-              mapvar[mapoff+lut[di]] += mapweight[mapoff+lut[di]]*delta*R;
-              mapweight[mapoff+lut[di]] = temp;
-
-              /* We don't need this sum anymore, but calculate it for
-                 consistency with the interface */
-              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
-            }
-          }
-	}
       }
 
     } else {
       /* Otherwise use simple error propagation for varmap */
 
       if( qual ) {       /* QUALITY checking version */
-
-	for( i=0; i<nbolo; i++ ) {
-          if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=t1; j<=t2; j++ ) {
-
-            di = i*dbstride + j*dtstride;
-            vi = i*vbstride + (j%vntslice)*vtstride;
-
-            if( whichmap ) {
-              if( whichmap[j] != VAL__BADI ) {
-                mapoff = whichmap[j]*msize;
-              } else {
-                mapoff = SMF__BADDIMT;
-              }
-            }
-
-            /* Check that the LUT, data and variance values are valid */
-            if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) &&
-                (mapoff != SMF__BADDIMT) ) {
-
-              thisweight = 1/var[vi];
-              map[mapoff+lut[di]] += thisweight*dat[di];
-              mapweight[mapoff+lut[di]] += thisweight;
-              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
-              hitsmap[mapoff+lut[di]] ++;
-            }
-          }
+        for( iw = 0; iw < nw; iw++ ) {
+           pdata = job_data + iw;
+           pdata->operation = 3;
+           thrAddJob( wf, 0, pdata, smf1_rebinmap1, 0, NULL, status );
         }
+        thrWait( wf, status );
+
       } else {           /* VAL__BADD checking version */
-	for( i=0; i<nbolo; i++ ) {
-          for( j=t1; j<=t2; j++ ) {
+        for( iw = 0; iw < nw; iw++ ) {
+           pdata = job_data + iw;
+           pdata->operation = 4;
+           thrAddJob( wf, 0, pdata, smf1_rebinmap1, 0, NULL, status );
+        }
+        thrWait( wf, status );
 
-            di = i*dbstride + j*dtstride;
-            vi = i*vbstride + (j%vntslice)*vtstride;
-
-            if( whichmap ) {
-              if( whichmap[j] != VAL__BADI ) {
-                mapoff = whichmap[j]*msize;
-              } else {
-                mapoff = SMF__BADDIMT;
-              }
-            }
-
-            /* Check that the LUT, data and variance values are valid */
-            if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
-                (var[vi] != VAL__BADD) && (var[vi] != 0) &&
-                (mapoff != SMF__BADDIMT) ) {
-
-              thisweight = 1/var[vi];
-              map[mapoff+lut[di]] += thisweight*dat[di];
-              mapweight[mapoff+lut[di]] += thisweight;
-              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
-              hitsmap[mapoff+lut[di]] ++;
-            }
-          }
-	}
       }
     }
+
+
   } else {
     /* Accumulate data and weights when no variances are given. In this case
        the variance map is always estimated from the sample variance */
 
     if( qual ) {       /* QUALITY checking version */
-      for( i=0; i<nbolo; i++ ) {
-        if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=t1; j<=t2; j++ ) {
-
-          di = i*dbstride + j*dtstride;
-
-          if( whichmap ) {
-            if( whichmap[j] != VAL__BADI ) {
-              mapoff = whichmap[j]*msize;
-            } else {
-              mapoff = SMF__BADDIMT;
-            }
-          }
-
-          /* Check that the LUT, data and variance values are valid */
-          if( (lut[di] != VAL__BADI) && !(qual[di]&mask) &&
-              (mapoff != SMF__BADDIMT) ) {
-
-            map[mapoff+lut[di]] += dat[di];
-            mapweight[mapoff+lut[di]] ++;
-            mapweightsq[mapoff+lut[di]] ++;
-            hitsmap[mapoff+lut[di]] ++;
-
-            /* Calculate this sum to estimate E(x^2) */
-            mapvar[mapoff+lut[di]] += dat[di]*dat[di];
-          }
-        }
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        pdata->operation = 5;
+        thrAddJob( wf, 0, pdata, smf1_rebinmap1, 0, NULL, status );
       }
+      thrWait( wf, status );
+
     } else {           /* VAL__BADD checking version */
-      for( i=0; i<nbolo; i++ ) {
-        for( j=t1; j<=t2; j++ ) {
-          di = i*dbstride + j*dtstride;
-
-          if( whichmap ) {
-            if( whichmap[j] != VAL__BADI ) {
-              mapoff = whichmap[j]*msize;
-            } else {
-              mapoff = SMF__BADDIMT;
-            }
-          }
-
-          /* Check that the LUT and data values are valid */
-          if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
-              (mapoff != SMF__BADDIMT) ) {
-
-            map[mapoff+lut[di]] += dat[di];
-            mapweight[mapoff+lut[di]] ++;
-            mapweightsq[mapoff+lut[di]] ++;
-            hitsmap[mapoff+lut[di]] ++;
-
-            /* Calculate this sum to estimate E(x^2) */
-            mapvar[mapoff+lut[di]] += dat[di]*dat[di];
-          }
-        }
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        pdata->operation = 6;
+        thrAddJob( wf, 0, pdata, smf1_rebinmap1, 0, NULL, status );
       }
+      thrWait( wf, status );
     }
   }
 
   /* If this is the last data to be accumulated re-normalize */
   if( flags & AST__REBINEND ) {
 
+  /* Find how many buffer pixels to process in each worker thread. May be
+     different to the number of map pixels set up earlier. */
+    pixstep = mbufsize/nw;
+    if( pixstep == 0 ) pixstep = 1;
+
+    for( iw = 0; iw < nw; iw++ ) {
+      pdata = job_data + iw;
+      pdata->p1 = iw*pixstep;
+      if( iw < nw - 1 ) {
+        pdata->p2 = pdata->p1 + pixstep - 1;
+      } else {
+        pdata->p2 = mbufsize - 1 ;
+      }
+    }
+
+
     if( sampvar || !var ) {
-      /* Variance also needs re-normalization in sampvar case */
+
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        pdata->operation = 7;
+        thrAddJob( wf, 0, pdata, smf1_rebinmap1, 0, NULL, status );
+      }
+      thrWait( wf, status );
 
       scaleweight=0;
       scalevar=0;
-
-      for( i=0; i<mbufsize; i++ ) {
-        if( !mapweight[i] ) {
-          /* If 0 weight set pixels to bad */
-          mapweight[i] = VAL__BADD;
-          map[i] = VAL__BADD;
-          mapvar[i] = VAL__BADD;
-	} else {
-	  /* Otherwise re-normalize... although variance only reliable
-             if we had enough samples */
-
-          if( hitsmap[i] >= SMF__MINSTATSAMP ) {
-            double variance_n;
-
-            variance_n = mapvar[i] / mapweight[i];
-            mapvar[i] = variance_n  / ((double)hitsmap[i]-1);
-
-            /* Work out average scale factor so that supplied weights
-               would produce the same map variance estimate as the
-               sample variance calculation that we just did. The average
-               value is weighted by number of hits in the pixel to weight
-               well-sampled pixels more heavily */
-
-            scalevar += hitsmap[i]*mapvar[i]*mapweight[i];
-            scaleweight += hitsmap[i];
-          } else {
-            mapvar[i] = VAL__BADD;
-          }
-	}
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        scaleweight += pdata->scaleweight;
+        scalevar += pdata->scalevar;
       }
 
       /* Re-normalize scalevar */
@@ -574,19 +524,346 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
     } else {
       /* Re-normalization for error propagation case */
 
-      for( i=0; i<mbufsize; i++ ) {
-	if( !mapweight[i] ) {
-	  /* If 0 weight set pixels to bad */
-	  mapweight[i] = VAL__BADD;
-	  mapweightsq[i] = VAL__BADD;
-	  map[i] = VAL__BADD;
-	  mapvar[i] = VAL__BADD;
-	} else {
-	  /* Otherwise re-normalize */
-	  mapvar[i] = 1/mapweight[i];
-	  map[i] *= mapvar[i];
-	}
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        pdata->operation = 8;
+        thrAddJob( wf, 0, pdata, smf1_rebinmap1, 0, NULL, status );
       }
+      thrWait( wf, status );
+
     }
   }
+
+  job_data = astFree( job_data );
+
 }
+
+
+
+
+
+
+
+static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
+
+/* Local Variables: */
+   SmfRebinMap1Data *pdata;
+   dim_t di;                  /* data array index */
+   dim_t vi;                  /* variance array index */
+   double R;                  /* Another temp variable for variance calc */
+   double delta;              /* Offset for weighted mean */
+   double temp;               /* Temporary calculation */
+   double thisweight;         /* The weight at this point */
+   size_t ibolo;              /* Bolometer index */
+   size_t ipix;               /* Map pixel index */
+   size_t itime;              /* Time slice index */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfRebinMap1Data *) job_data_ptr;
+
+/* Map variance from spread of input values - quality checking version.
+   ================================================================== */
+   if( pdata->operation == 1 ) {
+
+/* Loop round all bolometers. */
+      for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
+
+/* Skip bad bolometers. */
+         if( !( (pdata->qual)[ ibolo*(pdata->dbstride) ] & SMF__Q_BADB ) ) {
+
+/* Loop round all time slices being included in the map. */
+            for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
+
+/* Get the 1D vector index of the data sample. */
+               di = ibolo*pdata->dbstride + itime*pdata->dtstride;
+
+/* Get the corresponding map pixel index. */
+               ipix = pdata->lut[ di ];
+
+/* Skip to the next sample if the map pixel is not being processed by the
+   current thread. */
+               if( ipix >= pdata->p1 && ipix <= pdata->p2 ) {
+
+/* Get the 1D vector index of the corresponding variane value. */
+                  vi = ibolo*pdata->vbstride +
+                       ( itime % pdata->vntslice )*pdata->vtstride;
+
+/* Get the offset to the start of the buffer in which to store the pixel
+   value. */
+                  if( pdata->whichmap ) {
+                    if( pdata->whichmap[ itime ] != VAL__BADI ) {
+                      ipix += pdata->whichmap[ itime ]*pdata->msize;
+                    } else {
+                      ipix = SMF__BADDIMT;
+                    }
+                  }
+
+/* Check that the data and variance values are valid */
+                  if( !( pdata->qual[ di ] & pdata->mask ) &&
+                       ( pdata->var[ vi ] != 0.0 ) &&
+                       ( ipix != SMF__BADDIMT ) ) {
+
+/* Update things. */
+                     pdata->hitsmap[ ipix ]++;
+                     thisweight = 1/pdata->var[ vi ];
+
+/* Weighted incremental algorithm */
+                     temp = pdata->mapweight[ ipix ] + thisweight;
+                     delta = pdata->dat[ di ] - pdata->map[ ipix ];
+                     R = delta * thisweight / temp;
+                     pdata->map[ ipix ] += R;
+                     pdata->mapvar[ ipix ] += pdata->mapweight[ ipix ]*delta*R;
+                     pdata->mapweight[ ipix ] = temp;
+
+/* We don't need this sum anymore, but calculate it for consistency with the
+   interface */
+                     pdata->mapweightsq[ ipix ] += thisweight*thisweight;
+                  }
+               }
+            }
+         }
+      }
+
+
+/* Map variance from spread of input values - VAL__BADD checking version.
+   ==================================================================== */
+   } else if( pdata->operation == 1 ) {
+
+      for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
+         for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
+
+            di = ibolo*pdata->dbstride + itime*pdata->dtstride;
+            ipix = pdata->lut[ di ];
+            if( ipix >= pdata->p1 && ipix <= pdata->p2 ) {
+               vi = ibolo*pdata->vbstride +
+                    ( itime % pdata->vntslice )*pdata->vtstride;
+
+               if( pdata->whichmap ) {
+                 if( pdata->whichmap[ itime ] != VAL__BADI ) {
+                   ipix += pdata->whichmap[ itime ]*pdata->msize;
+                 } else {
+                   ipix = SMF__BADDIMT;
+                 }
+               }
+
+
+               if( pdata->dat[ di ] != VAL__BADD &&
+                   pdata->var[ vi ] != VAL__BADD &&
+                   pdata->var[ vi ] != 0.0 && ipix != SMF__BADDIMT ) {
+
+                  pdata->hitsmap[ ipix ]++;
+                  thisweight = 1/pdata->var[ vi ];
+
+                  temp = pdata->mapweight[ ipix ] + thisweight;
+                  delta = pdata->dat[ di ] - pdata->map[ ipix ];
+                  R = delta * thisweight / temp;
+                  pdata->map[ ipix ] += R;
+                  pdata->mapvar[ ipix ] += pdata->mapweight[ ipix ]*delta*R;
+                  pdata->mapweight[ ipix ] = temp;
+
+                  pdata->mapweightsq[ ipix ] += thisweight*thisweight;
+               }
+            }
+         }
+      }
+
+/* Map variance from error propagation - quality checking version.
+   ============================================================== */
+   } else if( pdata->operation == 3 ) {
+
+      for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
+         if( !( pdata->qual[ ibolo*pdata->dbstride ] & SMF__Q_BADB ) ) {
+            for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
+               di = ibolo*pdata->dbstride + itime*pdata->dtstride;
+               ipix = pdata->lut[ di ];
+               if( ipix >= pdata->p1 && ipix <= pdata->p2 ) {
+                  vi = ibolo*pdata->vbstride +
+                       ( itime % pdata->vntslice )*pdata->vtstride;
+                  if( pdata->whichmap ) {
+                    if( pdata->whichmap[ itime ] != VAL__BADI ) {
+                      ipix += pdata->whichmap[ itime ]*pdata->msize;
+                    } else {
+                      ipix = SMF__BADDIMT;
+                    }
+                  }
+
+                  if( !( pdata->qual[ di ] & pdata->mask ) &&
+                       ( pdata->var[ vi ] != 0.0 ) &&
+                       ( ipix != SMF__BADDIMT ) ) {
+
+                     thisweight = 1/pdata->var[ vi ];
+                     pdata->map[ ipix ] += thisweight*pdata->dat[ di ];
+                     pdata->mapweight[ ipix ] += thisweight;
+                     pdata->mapweightsq[ ipix ] += thisweight*thisweight;
+                     pdata->hitsmap[ ipix ]++;
+                  }
+               }
+            }
+         }
+      }
+
+/* Map variance from error propagation - VAL__BADD checking version.
+   ============================================================== */
+   } else if( pdata->operation == 4 ) {
+
+      for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
+         for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
+            di = ibolo*pdata->dbstride + itime*pdata->dtstride;
+            ipix = pdata->lut[ di ];
+            if( ipix >= pdata->p1 && ipix <= pdata->p2 ) {
+               vi = ibolo*pdata->vbstride +
+                    ( itime % pdata->vntslice )*pdata->vtstride;
+               if( pdata->whichmap ) {
+                 if( pdata->whichmap[ itime ] != VAL__BADI ) {
+                   ipix += pdata->whichmap[ itime ]*pdata->msize;
+                 } else {
+                   ipix = SMF__BADDIMT;
+                 }
+               }
+
+               if( pdata->dat[ di ] != VAL__BADD &&
+                   pdata->var[ vi ] != VAL__BADD &&
+                   pdata->var[ vi ] != 0.0 && ipix != SMF__BADDIMT  ) {
+
+                  thisweight = 1/pdata->var[ vi ];
+                  pdata->map[ ipix ] += thisweight*pdata->dat[ di ];
+                  pdata->mapweight[ ipix ] += thisweight;
+                  pdata->mapweightsq[ ipix ] += thisweight*thisweight;
+                  pdata->hitsmap[ ipix ]++;
+               }
+            }
+         }
+      }
+
+/* No variances - quality checking version.
+   ========================================= */
+   } else if( pdata->operation == 5 ) {
+
+      for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
+         if( !( pdata->qual[ ibolo*pdata->dbstride ] & SMF__Q_BADB ) ) {
+            for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
+               di = ibolo*pdata->dbstride + itime*pdata->dtstride;
+               ipix = pdata->lut[ di ];
+               if( ipix >= pdata->p1 && ipix <= pdata->p2 ) {
+                  if( pdata->whichmap ) {
+                    if( pdata->whichmap[ itime ] != VAL__BADI ) {
+                      ipix += pdata->whichmap[ itime ]*pdata->msize;
+                    } else {
+                      ipix = SMF__BADDIMT;
+                    }
+                  }
+
+                  if( !( pdata->qual[ di ] & pdata->mask ) &&
+                       ( ipix != SMF__BADDIMT ) ) {
+                     pdata->map[ ipix ] += pdata->dat[ di ];
+                     pdata->mapweight[ ipix ]++;
+                     pdata->mapweightsq[ ipix ]++;
+                     pdata->hitsmap[ ipix ]++;
+                     pdata->mapvar[ ipix ] += pdata->dat[ di ]*pdata->dat[ di ];
+                  }
+               }
+            }
+         }
+      }
+
+/* No variances - VAL__BADD checking version.
+   ========================================= */
+   } else if( pdata->operation == 6 ) {
+
+      for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
+         for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
+            di = ibolo*pdata->dbstride + itime*pdata->dtstride;
+            ipix = pdata->lut[ di ];
+            if( ipix >= pdata->p1 && ipix <= pdata->p2 ) {
+               if( pdata->whichmap ) {
+                 if( pdata->whichmap[ itime ] != VAL__BADI ) {
+                   ipix += pdata->whichmap[ itime ]*pdata->msize;
+                 } else {
+                   ipix = SMF__BADDIMT;
+                 }
+               }
+
+               if( pdata->dat[ di ] != VAL__BADD &&
+                   ipix != SMF__BADDIMT ) {
+                  pdata->map[ ipix ] += pdata->dat[ di ];
+                  pdata->mapweight[ ipix ]++;
+                  pdata->mapweightsq[ ipix ]++;
+                  pdata->hitsmap[ ipix ]++;
+                  pdata->mapvar[ ipix ] += pdata->dat[ di ]*pdata->dat[ di ];
+               }
+            }
+         }
+      }
+
+
+/* Final normalisation - input sample variance
+   ========================================= */
+   } else if( pdata->operation == 7 ) {
+
+      pdata->scaleweight=0;
+      pdata->scalevar=0;
+
+      for( ipix = pdata->p1; ipix <= pdata->p2; ipix++ ) {
+
+/* If 0 weight set pixels to bad */
+         if( pdata->mapweight[ ipix ] == 0.0 ) {
+            pdata->mapweight[ ipix ] = VAL__BADD;
+            pdata->map[ ipix ] = VAL__BADD;
+            pdata->mapvar[ ipix ] = VAL__BADD;
+
+/* Otherwise re-normalize... although variance only reliable if we had
+   enough samples */
+	 } else if( pdata->hitsmap[ ipix ] >= SMF__MINSTATSAMP ) {
+            double variance_n = pdata->mapvar[ ipix ]/pdata->mapweight[ ipix ];
+            pdata->mapvar[ ipix ] = variance_n/( (double)(pdata->hitsmap[ ipix ]) - 1 );
+
+/* Work out average scale factor so that supplied weights would produce the
+   same map variance estimate as the sample variance calculation that we just
+   did. The average value is weighted by number of hits in the pixel to weight
+   well-sampled pixels more heavily */
+            pdata->scalevar += pdata->hitsmap[ ipix ]*pdata->mapvar[ ipix ]
+                                                     *pdata->mapweight[ ipix ];
+            pdata->scaleweight += pdata->hitsmap[ ipix ];
+         } else {
+            pdata->mapvar[ ipix ] = VAL__BADD;
+         }
+      }
+
+/* Final normalisation - error propagation
+   ========================================= */
+   } else if( pdata->operation == 8 ) {
+
+      for( ipix = pdata->p1; ipix <= pdata->p2; ipix++ ) {
+
+/* If 0 weight set pixels to bad */
+         if( pdata->mapweight[ ipix ] == 0.0 ) {
+	    pdata->mapweight[ ipix ] = VAL__BADD;
+            pdata->mapweightsq[ ipix ] = VAL__BADD;
+            pdata->map[ ipix ] = VAL__BADD;
+            pdata->mapvar[ ipix ] = VAL__BADD;
+
+/* Otherwise re-normalize */
+         } else {
+            pdata->mapvar[ ipix ] = 1.0/pdata->mapweight[ ipix ];
+            pdata->map[ ipix ] *= pdata->mapvar[ ipix ];
+	 }
+      }
+
+
+/* Report an error if the worker was to do an unknown job.
+   ====================================================== */
+   } else {
+      *status = SAI__ERROR;
+      errRepf( "", "smf1_rebinmap1: Invalid operation (%d) supplied.",
+               status, pdata->operation );
+   }
+}
+
+
+
+
+
