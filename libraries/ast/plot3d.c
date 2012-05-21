@@ -140,6 +140,10 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 *        Clear up compiler warnings.
 *     4-MAY-2012 (DSB):
 *        Avoid segvio in Grid if no ticks are drawn.
+*     21-MAY-2012 (DSB):
+*        in astLoadPlot3D, do not call SetRootCorner as it requires an
+*        active graphics system to be present which may not yet have been
+*        established.
 *class--
 */
 
@@ -8036,7 +8040,6 @@ AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab,
       } else {
          new->rootcorner = -1;
       }
-      if( TestRootCorner( new, status ) ) SetRootCorner( new, new->rootcorner, status );
       text = astFree( text );
 
 /* Labelled axes */
