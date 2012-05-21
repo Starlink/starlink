@@ -2868,7 +2868,6 @@ modelorder = (com,gai,ast)         # Just do common mode part
 exportndf = (com,gai,ast,res)      # Write models out
 itermap = 1                        # Create map for each iteration
 com.gain_box = 600000              # Single gain map for whole spectrum
-com.boxcar = 200                   # Smooth common mode time series over 1 sec
 order = 0                          # Allow for DC level adjustments
 dclimcorr = 0                      # No correlated step detection/correction
 com.notfirst=0                     # Make sure that COM is run before FLT

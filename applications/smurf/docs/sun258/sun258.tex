@@ -2013,12 +2013,8 @@ filt\_notchlow   & of low frequencies for filt\_notchlow to apply notch filters.
 \hline
                  & \multicolumn{2}{l}{\em Control Model Component Calculation} \\
 \hline
-com.boxcar       & A low-pass boxcar filter that assists with convergence. Specify     & 400 \\
-                 & size, i.e., the number of samples to use.                           & \\
-com.boxfact      & Reduce the width of the boxcar by this box factor in each           &   0.5 \\
-                 & iteration.                                                          & \\
-com.boxmin       & The minimum width below which the boxcar can not be reduced.          & 100 \\
-dks.boxcar       & Boxcar smooth dark SQUID signals before fitting/removing.           & 10 \\
+com.niter	 & Number of clipping iterations to use when finding common mode values & 1 \\
+com.nsigma	 & Number of standard deviations at which to clip when finding common mode values & 3 \\
 noi.spikethresh  & Additional despiking after each iteration, within the $NOI$         & 10 \\
                  & calculation.                                                        & \\
 noi.spikeiter    & Additional despiking after each iteration, within the $NOI$         & 0 \\

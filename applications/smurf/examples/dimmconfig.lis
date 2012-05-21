@@ -426,8 +426,8 @@ com.oldalg = 0
 #  bolometer values at each time slice as the common-mode signal. The
 #  following parameters control the sigma-clipping algorithm.
 #
-#  The number of n-sigma clipping iterations:
-com.niter = 3
+#  The number of n-sigma clipping iterations (1 => no clipping)
+com.niter = 1
 
 #  The number of standard deviations at which the n-sigma clipping
 #  algorithm clips.
