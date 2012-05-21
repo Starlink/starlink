@@ -700,6 +700,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *     15-OCT-2011 (DSB):
 *        Always check that the grf module implements the scales function
 *        before trying to invoke the scales function.
+*      21-MAY-2012 (DSB):
+*        Correct text strings used to represent the "Labelling" attribute 
+*        within dumps of a Plot. Previously they were reversed.
 *class--
 */
 
@@ -1686,7 +1689,7 @@ static char *GrfLabels = "Border Curves Title Markers Strings Axis1 Axis2 Axis3 
 static const char *xedge[4] = { "left", "top", "right", "bottom" };
 
 /* Text values used to represent Labelling externally. */
-static const char *xlbling[2] = { "interior", "exterior" };
+static const char *xlbling[2] = { "exterior", "interior" };
 
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
@@ -15913,7 +15916,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    } else if ( !strcmp( attrib, "labelling" ) ) {
       ival = GetUsedLabelling( this, status );
       if ( astOK ) {
-         result = ival ? xlbling[0] : xlbling[1];
+         result = ival ? xlbling[1] : xlbling[0];
       }
 
 /* Edge(axis). */
