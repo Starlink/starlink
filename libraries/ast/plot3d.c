@@ -141,9 +141,9 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 *     4-MAY-2012 (DSB):
 *        Avoid segvio in Grid if no ticks are drawn.
 *     21-MAY-2012 (DSB):
-*        in astLoadPlot3D, do not call SetRootCorner as it requires an
+*        In astLoadPlot3D, do not call SetRootCorner as it requires an
 *        active graphics system to be present which may not yet have been
-*        established.
+*        established. Also establish the grf routines to be used.
 *class--
 */
 
@@ -5473,6 +5473,10 @@ static void Set3DGrf( AstPlot3D *this, AstPlot *plot, int plane, int *status ){
    astGrfSet( plot, "Scales", (AstGrfFun) Plot3DScales );
    astGrfSet( plot, "Text", (AstGrfFun) Plot3DText );
    astGrfSet( plot, "TxExt", (AstGrfFun) Plot3DTxExt );
+
+/* Ensure that the Plot uses the grf interface registered using
+   astGrfSet. */
+   astSetGrf( plot, 1 );
 
 /* When the above functions are called, they need to know which plane
    they are drawing on. So we put this information into the GrfContext
