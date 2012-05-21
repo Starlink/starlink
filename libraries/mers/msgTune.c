@@ -115,6 +115,8 @@
 *     27-JUL-2009 (TIMJ):
 *        Use msgIfgetenv when reading MSG_FILTER environment variable since
 *        that routine is much more flexible and can handle a string.
+*     2012-05-21 (TIMJ):
+*        We are allowed to get 0 from the environment!
 *     {enter_changes_here}
 
 *  Bugs:
@@ -199,7 +201,7 @@ void msgTune( const char * param, int value, int * status ) {
     if (envval == -1) {
       /* everything okay but no environment variable */
       useval = value;
-    } else if (envval > 0 ) {
+    } else if (envval >= 0 ) { /* Do not allow negative values */
       set = 1;
       useval = envval;
       fromenv = 1;
