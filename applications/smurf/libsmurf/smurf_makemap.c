@@ -815,18 +815,24 @@
 *       the common mode signal at any time slice. The n-sigma clipping
 *       algorithm finds the clipped weighted mean of all bolometer values
 *       at a single time slice, and this value is used as the common mode
-*       signal. See COM.CCLOW and COM.NSIGMA. A value of 1 means that no
-*       clipping is done (i.e. the unclipped mean found in the first
-*       iteration is used). [1]
+*       signal. See COM.NSIGMA. A value of 1 means that no clipping is
+*       done (i.e. the unclipped mean found in the first iteration is
+*       used). [1]
 *     COM.NOFLAG = LOGICAL
 *       If true, do not use common-mode to flag bad bolometers (e.g.,
 *       ignore COM.*TOL COM.GAIN*). [0]
 *     COM.NSIGMA = REAL
 *       The number of standard deviations at which the n-sigma clipping
-*       algorithm clips. See COM.CCLOW and COM.NITER.
+*       algorithm clips. See COM.NITER.
 *     COM.OFFSET_IS_ZERO = LOGICAL
 *       Setting com.offset_is_zero non-zero causes all bolometer
 *       offsets to be forced to 0.0. [0]
+*     COM.OLDALG = LOGICAL
+*       Setting COM.OLDALG non-zero causes the pre-Kapuahi common-mode
+*       algorithm to be used. This older algorith does not use COM.NITER
+*       or COM.NSIGMA, and usually results in fewer data samples being
+*       included in the final map. It can also cause divergence in the
+*       iterative algorithm at higher iterations. [0]
 *     COM.PERARRAY = LOGICAL
 *       If true, a separate common-mode will be estimated for each
 *       sub-array. Otherwise, a single common mode will be estimated from
