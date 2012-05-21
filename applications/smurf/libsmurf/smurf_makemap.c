@@ -815,7 +815,9 @@
 *       the common mode signal at any time slice. The n-sigma clipping
 *       algorithm finds the clipped weighted mean of all bolometer values
 *       at a single time slice, and this value is used as the common mode
-*       signal. See COM.CCLOW and COM.NSIGMA.
+*       signal. See COM.CCLOW and COM.NSIGMA. A value of 1 means that no
+*       clipping is done (i.e. the unclipped mean found in the first
+*       iteration is used). [1]
 *     COM.NOFLAG = LOGICAL
 *       If true, do not use common-mode to flag bad bolometers (e.g.,
 *       ignore COM.*TOL COM.GAIN*). [0]
