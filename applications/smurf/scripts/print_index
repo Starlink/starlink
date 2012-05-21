@@ -134,10 +134,17 @@ if (exists $ENV{SMURF_DIR} && defined $ENV{SMURF_DIR}) {
 
 our $VERSION = "2.0";
 
-my $acsis_root = "/jcmtdata/raw/acsis/spectra";
+# ORAC_DATA_ROOT is a global override
+my $root = "/jcmtdata";
+if (exists $ENV{ORAC_DATA_ROOT} && -d $ENV{ORAC_DATA_ROOT}) {
+  print "Using ORAC_DATA_ROOT override value of $ENV{ORAC_DATA_ROOT}\n";
+  $root = $ENV{ORAC_DATA_ROOT};
+}
+
+my $acsis_root = File::Spec->catdir( $root, "raw/acsis/spectra");
 
 my $default_array = "s8d";
-my $scuba2_root  = File::Spec->catdir("/jcmtdata/raw/scuba2",${default_array});
+my $scuba2_root  = File::Spec->catdir($root, "raw/scuba2",${default_array});
 
 # Store the arguments for debugging purposes
 my @args = @ARGV;
