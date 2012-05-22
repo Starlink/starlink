@@ -40,6 +40,18 @@
 *     regrid in out [method]
 
 *  ADAM Parameters:
+*     AXES() = _INTEGER (Read)
+*        The indices of the pixel axes that are to be re-gridded. These
+*        should be in the range 1 to NDIM (the number of pixel axes in
+*        the NDF). Each value may appear at most once. The order of the
+*        supplied values is insignificant. If a null (!) value is
+*        supplied, then all pixel axes are re-gridded. Otherwise, only
+*        the specified pixel axes are regridded. Note, it is not always
+*        possible to specify completely arbitrary combinations of pixel
+*        axes to be regridded. For instance, if the current WCS Frame
+*        contains RA and Dec axes, then it is not possible to regrid one
+*        of the corresponding pixel axes without the other. An error will
+*        be reported in such cases. [!]
 *     CONSERVE = _LOGICAL (Read)
 *        Only accessed when using the resampling algorithm (i.e. if
 *        REBIN is set FALSE).  If set TRUE, then the output pixel values
@@ -71,7 +83,10 @@
 *        Frame.  If a file is supplied, the forward direction of the
 *        Mapping should transform pixel co-ordinates in the input NDF
 *        into the corresponding pixel co-ordinates in the output NDF.
-*        The file may be one of the following.
+*        If only a subset of pixel axes are being re-gridded, then the
+*        inputs to the Mapping should correspond to the pixel axes
+*        specified via parameter AXES. The file may be one of the
+*        following.
 *
 *        - A text file containing a textual representation of the AST
 *        Mapping to use. Such files can be created by WCSADD.
@@ -453,6 +468,8 @@
 *        Negate the scale factors for any axis that is normally displayed
 *        reversed. This prevents the RA axis in an (RA,Dec) image being
 *        flipped after regridding.
+*     22-MAY-2012 (DSB):
+*        Added parameter AXES.
 *     {enter_further_changes_here}
 
 *-
@@ -505,6 +522,7 @@
       INTEGER ELO                ! Number of elements in output NDF
       INTEGER FLAGS              ! Flags sent to AST_RESAMPLE<X>
       INTEGER I                  ! Loop variable
+      INTEGER INPRM( NDF__MXDIM )! Output axis indices for each input axis
       INTEGER INTERP             ! Resampling scheme identifier
       INTEGER IPDATI             ! Pointer to input Data array
       INTEGER IPDATO             ! Pointer to output Data array
@@ -512,6 +530,7 @@
       INTEGER IPQUAO             ! Pointer to output Quality array
       INTEGER IPVARI             ! Pointer to input Variance array
       INTEGER IPVARO             ! Pointer to output Variance array
+      INTEGER J                  ! Loop variable
       INTEGER JFRM               ! Index of Frame for joining FrameSets
       INTEGER LBDEF( NDF__MXDIM ) ! Default value for LBOUND
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF pixel
@@ -535,11 +554,24 @@
       INTEGER NDIMO              ! Number of dimensions of output NDF
       INTEGER NPARAM             ! Number of parameters required for
                                  ! resampler
+      INTEGER NPAX               ! No. of pixel axes to be regridded
+      INTEGER NQAX               ! No. of pixel axes not to be regridded
       INTEGER NSCALE             ! Number of supplied scale factors
+      INTEGER NWPAX              ! No. of WCS axes to be regridded
+      INTEGER NWQAX              ! No. of WCS axes not to be regridded
+      INTEGER OUTPRM( NDF__MXDIM )! Input axis indices for each output axis
+      INTEGER PAXES( NDF__MXDIM ) ! Pixel axes to be regridded
+      INTEGER PM1                ! PermMap to reorder the pixel axes
+      INTEGER PM2                ! PermMap to reorder the WCS axes
+      INTEGER PM3                ! PermMap to copy non-regridded pixel axes
+      INTEGER QAXES( NDF__MXDIM ) ! Pixel axes not to be regridded
+      INTEGER TMAP               ! Temporary Mapping pointer
       INTEGER UBDEF( NDF__MXDIM ) ! Default value for UBOUND
       INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF pixel
                                  ! co-ordinates
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
+      INTEGER WPAXES( NDF__MXDIM )! WCS axes to be regridded
+      INTEGER WQAXES( NDF__MXDIM )! WCS axes not to be regridded
       INTEGER WCSI               ! WCS FrameSet of input NDF
       LOGICAL BAD                ! May there be bad pixels?
       LOGICAL CONSRV             ! Conserve flux whilst resampling?
@@ -551,6 +583,7 @@
       LOGICAL MORE               ! Continue looping?
       LOGICAL REBIN              ! Create output pixels by rebinning?
       LOGICAL SCEQU              ! Are all axis scale factors equal?
+      LOGICAL SUBSET             ! Regrid only a subset of pixel axes?
       REAL WLIM                  ! Minimum good output weight
 *.
 
@@ -574,8 +607,58 @@
 
 *  See if it has a VARIANCE component.
       CALL NDF_STATE( NDFI, 'VARIANCE', HASVAR, STATUS )
+
 *  Obtain its WCS component.
       CALL KPG1_GTWCS( NDFI, WCSI, STATUS )
+
+*  Abort if an error has opccurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the pixel axes to be regridded. If a null value is supplied,
+*  annul the error and proceed assuming all pixel axes were specified.
+      CALL PAR_GDRVI( 'AXES', NDIMI, 1, NDIMI, PAXES, NPAX, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         NPAX = NDIMI
+         SUBSET = .FALSE.
+
+*  If a subset of pixel axes have been specified...
+      ELSE
+
+*  Sort the specified axis indices into ascending order.
+         CALL KPG1_QSRTI( NPAX, 1, NPAX, PAXES, STATUS )
+
+*  Check that no two axes are equal.
+         DO I = 2, NPAX
+            IF( PAXES( I ) .EQ. PAXES( I - 1 ) .AND.
+     :          STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI( 'I', PAXES( I ) )
+               CALL ERR_REP( 'REGRID_ERR0', 'Pixel axis ^I specified '//
+     :                       'more than once by parameter AXES.',
+     :                       STATUS )
+            END IF
+         END DO
+
+*  See if a subset of pixel axes is to be regridded.
+         SUBSET = ( NPAX .LT. NDIMI )
+
+*  If so, create an array holding the indices of the non-gridded pixel
+*  axes.
+         IF( SUBSET ) THEN
+            NQAX = 0
+            J = 1
+            DO I = 1, NDIMI
+               IF( PAXES( J ) .EQ. I ) THEN
+                  J = J + 1
+               ELSE
+                  NQAX = NQAX + 1
+                  QAXES( NQAX ) = I
+               END IF
+            END DO
+         END IF
+
+      END IF
 
 *  Attempt to get an externally supplied Mapping; read it from a file.
 *  N.B. do not tell KPG1_GTOBJ to look for a Mapping, since in this
@@ -588,7 +671,27 @@
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          CURENT = .TRUE.
-         MAPX = WCSI
+
+*  If we are regridding all pixel axes, just use the WCS FrameSet as the
+*  Mapping.
+         IF( .NOT. SUBSET ) THEN
+            MAPX = WCSI
+
+*  Otherwise, we need to extract the Mapping from the regridded pixel axes
+*  to the corresponding WCS axes from the WCS FrameSet. BNOTE, the PIXEL
+*  Frame is always Frame index 2 in an NDF WCS FRameSet. */
+         ELSE
+            MAPX = AST_GETMAPPING( WCSI, 2, AST__CURRENT, STATUS )
+            CALL AST_MAPSPLIT( MAPX, NPAX, PAXES, WPAXES, TMAP, STATUS )
+            IF( TMAP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( ' ', 'The WCS axes corresponding to the '//
+     :                       'pixel axes specified by parameter AXES '//
+     :                       'cannot be split from the other WCS axes.',
+     :                       STATUS )
+            END IF
+            MAPX = TMAP
+         END IF
 
 *  In the event of any other error, write an explanatory comment
 *  (KPG1_GTOBJ does not generate very user-friendly messages) and bail
@@ -632,14 +735,108 @@
 
 *  Check the base Frame of the Mapping has the right number of
 *  dimensions.
-      IF ( AST_GETI( MAPX, 'Nin', STATUS ) .NE. NDIMI ) THEN
+      IF ( AST_GETI( MAPX, 'Nin', STATUS ) .NE. NPAX ) THEN
          CALL MSG_SETI( 'NAX', AST_GETI( MAPX, 'Nin', STATUS ) )
-         CALL MSG_SETI( 'NDIM', NDIMI )
+         CALL MSG_SETI( 'NDIM', NPAX )
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'REGRID_ERR3', 'REGRID: Mapping has ^NAX '//
-     :                 'input axes and NDF has ^NDIM dimensions',
-     :                 STATUS )
+         IF( SUBSET ) THEN
+            CALL ERR_REP( 'REGRID_ERR3', 'REGRID: Mapping has ^NAX '//
+     :                    'input axes and ^NDIM pixel axes are '//
+     :                    'being regridded', STATUS )
+         ELSE
+            CALL ERR_REP( 'REGRID_ERR3', 'REGRID: Mapping has ^NAX '//
+     :                    'input axes and NDF has ^NDIM dimensions',
+     :                    STATUS )
+         END IF
          GO TO 999
+      END IF
+
+*  If a subset of pixel axes are being regridded, we need to pad the
+*  Mapping out to include a UnitMap for the other pixel axes.
+      IF( SUBSET ) THEN
+
+*  Find the WCS axes that are fed by the regridded pixel axes.
+         CALL AST_MAPSPLIT( WCSI, NPAX, PAXES, WPAXES, TMAP, STATUS )
+         IF( TMAP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'The WCS axes corresponding to the '//
+     :                    'pixel axes specified by parameter AXES '//
+     :                    'cannot be split from the other WCS axes.',
+     :                    STATUS )
+         ELSE
+            NWPAX = AST_GETI( TMAP, 'Nout', STATUS )
+         END IF
+
+*  Find the WCS axes that are fed by the non-gridded pixel axes.
+         CALL AST_MAPSPLIT( WCSI, NQAX, QAXES, WQAXES, TMAP, STATUS )
+         IF( TMAP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'The WCS axes corresponding to the '//
+     :                    'pixel axes specified by parameter AXES '//
+     :                    'cannot be split from the other WCS axes.',
+     :                    STATUS )
+         ELSE
+            NWQAX = AST_GETI( TMAP, 'Nout', STATUS )
+         END IF
+
+*  Create a PermMap that re-orders the pixel axes so that the re-gridded
+*  pixel axes become axes 1 to NPAX, and the non-gridded axes become axes
+*  NPAX+1 to NDIMI.
+         DO I = 1, NPAX
+            OUTPRM( I ) = PAXES( I )
+            INPRM( OUTPRM( I ) ) = I
+         END DO
+         DO I = NPAX + 1, NDIMI
+            OUTPRM( I ) = QAXES( I - NPAX )
+            INPRM( OUTPRM( I ) ) = I
+         END DO
+         PM1 = AST_PERMMAP( NDIMI, INPRM, NDIMI, OUTPRM, AST__BAD, ' ',
+     :                      STATUS )
+
+*  Create a PermMap that re-orders the WCS axes so that the re-gridded
+*  WCS axes become axes 1 to NWPAX, and the non-gridded axes become axes
+*  NWPAX+1 to NWPAX+NWQAX (the total number of WCS axes in the current
+*  Frame).
+         DO I = 1, NWPAX
+            OUTPRM( I ) = WPAXES( I )
+            INPRM( OUTPRM( I ) ) = I
+         END DO
+         DO I = NWPAX + 1, NWPAX + NWQAX
+            OUTPRM( I ) = WQAXES( I - NWPAX )
+            INPRM( OUTPRM( I ) ) = I
+         END DO
+         PM2 = AST_PERMMAP( NWPAX + NWQAX, INPRM, NWPAX + NWQAX, OUTPRM,
+     :                      AST__BAD, ' ', STATUS )
+
+*  Invert this PermMap so that its outputs (rather than its inputs)
+*  correspond to the axes of the current WCS Frame.
+         CALL AST_INVERT( PM2, STATUS )
+
+*  Create a PermMap that maps the non-gridded pixel axes onto the
+*  non-gridded WCS axes.
+         DO I = 1, NWQAX
+            IF( I .LE. NQAX ) THEN
+               OUTPRM( I ) = I
+            ELSE
+               OUTPRM( I ) = 0
+            END IF
+         END DO
+
+         DO I = 1, NQAX
+            IF( I .LE. NWQAX ) THEN
+               INPRM( I ) = I
+            ELSE
+               INPRM( I ) = 0
+            END IF
+         END DO
+
+         PM3 = AST_PERMMAP( NQAX, INPRM, NWQAX, OUTPRM, AST__BAD, ' ',
+     :                      STATUS )
+
+* Now construct the total Mapping from pixel axes to WCS axes.
+         TMAP = AST_CMPMAP( MAPX, PM3, .FALSE., ' ', STATUS )
+         TMAP = AST_CMPMAP( PM1, TMAP, .TRUE., ' ', STATUS )
+         MAPX = AST_CMPMAP( TMAP, PM2, .TRUE., ' ', STATUS )
       END IF
 
 *  Get the number of output axes of the Mapping, which will be the
