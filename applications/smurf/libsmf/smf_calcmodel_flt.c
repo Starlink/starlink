@@ -71,11 +71,13 @@
 *        Remove gap filling since it is now done in smf_filter_execute.
 *     2012-03-16 (DSB):
 *        Allow FLT model to be masked.
+*     2012-05-22 (DSB):
+*        Multi-thread some loops.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2009-2010 University of British Columbia.
-*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -111,6 +113,36 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
+/* Prototypes for local static functions. */
+static void smf1_calcmodel_flt( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfCalcModelFltData {
+   dim_t b1;
+   dim_t b2;
+   dim_t nointslice;
+   dim_t ntslice;
+   double *model_data;
+   double *model_data_copy;
+   double *noi_data;
+   double *res_data;
+   double chisquared;
+   double dchisq;
+   int *lut_data;
+   int chisq;
+   int oper;
+   size_t bstride;
+   size_t nclose;
+   size_t ndchisq;
+   size_t noibstride;
+   size_t noitstride;
+   size_t tstride;
+   smf_qual_t *qua_data;
+   unsigned char *mask;
+} SmfCalcModelFltData;
+
+
+
 #define FUNC_NAME "smf_calcmodel_flt"
 
 void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
@@ -119,14 +151,14 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status) {
 
   /* Local Variables */
+  dim_t bolostep;               /* Number of bolos per thread */
   size_t bstride;               /* bolo stride */
   double dchisq=0;              /* this - last model residual chi^2 */
   int dofft;                    /* flag if we will actually do any filtering */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
-  size_t i;                     /* Loop counter */
-  dim_t ii;                     /* Array index */
   dim_t idx=0;                  /* Index within subgroup */
-  size_t j;                     /* Loop counter */
+  int iw;                       /* Thread index */
+  SmfCalcModelFltData *job_data = NULL; /* Data describing worker jobs */
   AstKeyMap *kmap=NULL;         /* Pointer to FLT-specific keys */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   int *lut_data = NULL;         /* Array holding themap index for each sample */
@@ -144,6 +176,8 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t noitstride;            /* Time stride for noise */
   int notfirst=0;               /* flag for delaying until after 1st iter */
   dim_t ntslice=0;              /* Number of time slices */
+  int nw;                       /* Number of worker threads */
+  SmfCalcModelFltData *pdata = NULL; /* Data describing worker jobs */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
@@ -193,6 +227,12 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   }
   model = allmodel[chunk];
 
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
+
+  /* Allocate job data for threads. */
+  job_data = astCalloc( nw, sizeof(*job_data) );
+
   /* Loop over index in subgrp (subarray) and put the previous iteration
      of the filtered component back into the residual before calculating
      and removing the new filtered component */
@@ -218,6 +258,35 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       errRep( "", FUNC_NAME ": Null data in inputs", status);
     } else {
 
+      /* Find how many bolometers to process in each worker thread. */
+      bolostep = nbolo/nw;
+      if( bolostep == 0 ) bolostep = 1;
+
+      /* Store information for use by the worker threads. */
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        pdata->b1 = iw*bolostep;
+        if( iw < nw - 1 ) {
+           pdata->b2 = pdata->b1 + bolostep - 1;
+        } else {
+           pdata->b2 = nbolo - 1 ;
+        }
+
+        pdata->mask = mask;
+        pdata->ntslice = ntslice;
+        pdata->nointslice = nointslice;
+        pdata->qua_data = qua_data;
+        pdata->model_data = model_data;
+        pdata->model_data_copy = model_data_copy;
+        pdata->res_data = res_data;
+        pdata->noi_data = noi_data;
+        pdata->lut_data = lut_data;
+        pdata->bstride = bstride;
+        pdata->tstride = tstride;
+        pdata->noibstride = noibstride;
+        pdata->noitstride = noitstride;
+      }
+
       /* Create a filter */
       filt = smf_create_smfFilter( res->sdata[idx], status );
       smf_filter_fromkeymap( filt, kmap, res->sdata[idx]->hdr, &dofft,
@@ -239,11 +308,12 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
       if( *status == SAI__OK ) {
         /* Place last iteration of filtered signal back into residual */
-        for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
-          for( j=0; j<ntslice; j++ ) {
-            res_data[i*bstride+j*tstride] += model_data[i*bstride+j*tstride];
-          }
+        for( iw = 0; iw < nw; iw++ ) {
+          pdata = job_data + iw;
+          pdata->oper = 1;
+          thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
         }
+        thrWait( wf, status );
 
         /* Make a copy of the last model if calculating dchisq */
         if( noi ) {
@@ -276,16 +346,13 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
           /* Do the masking. Bad values are filled by smf_fillgaps, regardless
              of quality, so we just set the model values bad. */
-          for( i=0; i<nbolo; i++ ) {
-            if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
-              for( j=nclose; j < ntslice-nclose; j++ ) {
-                int iii = lut_data[ i*bstride+j*tstride ];
-                if( iii != VAL__BADI && !mask[ iii ] ) {
-                   model_data[ i*bstride+j*tstride ] = VAL__BADD;
-                }
-              }
-            }
+          for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->nclose = nclose;
+            pdata->oper = 2;
+            thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
           }
+          thrWait( wf, status );
         }
       }
 
@@ -302,20 +369,22 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Now remove the filtered signals from the residual by subtracting
          off the new iteration of the model. */
       if( *status == SAI__OK ) {
-        for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
-          for( j=0; j<ntslice; j++ ) {
 
-            ii = i*bstride+j*tstride;
-            res_data[ii] -= model_data[ii];
+        /* Submit the jobs */
+        for( iw = 0; iw < nw; iw++ ) {
+          pdata = job_data + iw;
+          pdata->oper = 3;
+          thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
+        }
 
-            /* also measure contribution to dchisq */
-            if( noi && !(qua_data[ii]&SMF__Q_GOOD) ) {
-              dchisq += (model_data[ii] - model_data_copy[ii]) *
-                (model_data[ii] - model_data_copy[ii]) /
-                noi_data[i*noibstride + (j%nointslice)*noitstride];
-              ndchisq++;
-            }
-          }
+        /* Wait for the jobs to finish. */
+        thrWait( wf, status );
+
+        /* Accumlate the values returned by the jobs. */
+        for( iw = 0; iw < nw; iw++ ) {
+          pdata = job_data + iw;
+          ndchisq += pdata->ndchisq;
+          dchisq += pdata->dchisq;
         }
       }
 
@@ -331,6 +400,142 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                dchisq );
   }
 
+  job_data = astFree( job_data );
   if( kmap ) kmap = astAnnul( kmap );
   model_data_copy = astFree( model_data_copy );
 }
+
+
+
+
+static void smf1_calcmodel_flt( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_calcmodel_flt
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_calmodel_flt.
+
+*  Invocation:
+*     smf1_calcmodel_flt( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfCalcModelFltData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfCalcModelFltData *pdata;
+   dim_t ibolo;
+   dim_t itime;
+   double *pmc;
+   double *pm;
+   double *pn;
+   double *pr;
+   int *pl;
+   size_t ibase;
+   smf_qual_t *pq;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfCalcModelFltData *) job_data_ptr;
+
+/* Place last iteration of filtered signal back into residual */
+   if( pdata->oper == 1 ) {
+
+/* Loop round all bolos to be processed by this thread, maintaining the
+   index of the first time slice for the current bolo. */
+      ibase = pdata->b1*pdata->bstride;
+      for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+
+/* Check that the whole bolometer has not been flagged as bad. */
+         if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
+
+/* Get a pointer to the first residual and model value for the current bolo,
+   and then loop round all time slices. */
+            pr = pdata->res_data + ibase;
+            pm = pdata->model_data + ibase;
+            for( itime = 0; itime < pdata->ntslice; itime++ ) {
+
+/*  Add the model value on to the residual. */
+               *pr += *pm;
+
+/* Move residual and model pointers on to the next time slice. */
+               pr += pdata->tstride;
+               pm += pdata->tstride;
+            }
+         }
+
+/* Increment the index of the first value associated with the next
+   bolometer. */
+         ibase += pdata->bstride;
+      }
+
+/* Do the masking. Bad values are filled by smf_fillgaps, regardless
+   of quality, so we just set the model values bad. */
+   } else if( pdata->oper == 2 ) {
+      ibase = pdata->b1*pdata->bstride;
+      for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+         if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
+            pl = pdata->lut_data + ibase;
+            pm = pdata->model_data + ibase;
+            for( itime = pdata->nclose; itime < pdata->ntslice - pdata->nclose;
+                                                                    itime++ ) {
+               if( *pl != VAL__BADI && !pdata->mask[ *pl ] ) *pm = VAL__BADD;
+               pl += pdata->tstride;
+               pm += pdata->tstride;
+            }
+         }
+         ibase += pdata->bstride;
+      }
+
+/* Now remove the filtered signals from the residual by subtracting
+   off the new iteration of the model. */
+   } else if( pdata->oper == 3 ) {
+
+      pdata->dchisq = 0.0;
+      pdata->ndchisq = 0;
+
+      ibase = pdata->b1*pdata->bstride;
+      for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+         pq = pdata->qua_data + ibase;
+         if( !( *pq & SMF__Q_BADB ) ) {
+            pr = pdata->res_data + ibase;
+            pm = pdata->model_data + ibase;
+            pmc = pdata->model_data_copy + ibase;
+            pn = pdata->noi_data + ibolo*pdata->noibstride;
+
+            for( itime = 0; itime < pdata->ntslice; itime++ ) {
+               *pr -= *pm;
+
+               if( pdata->noi_data && !( *pq & SMF__Q_GOOD ) ) {
+                  double change = *pm - *pmc;
+                  pdata->dchisq += change*change /
+                                   pn[ (itime % pdata->nointslice)*pdata->noitstride ];
+                  pdata->ndchisq++;
+               }
+
+               pr += pdata->tstride;
+               pq += pdata->tstride;
+               pm += pdata->tstride;
+               pmc += pdata->tstride;
+            }
+         }
+         ibase += pdata->bstride;
+      }
+
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( "", "smf1_calcmodel_flt: Illegal operation %d requested.",
+               status, pdata->oper );
+   }
+}
+
