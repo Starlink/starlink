@@ -1927,7 +1927,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* Check for consistency between quality and data arrays */
           for( idx=0; (*status==SAI__OK)&&(idx<res[0]->ndat); idx++ ) {
             size_t nbad;
-            nbad = smf_check_quality( res[0]->sdata[idx], 0, status );
+            nbad = smf_check_quality( wf, res[0]->sdata[idx], 0, status );
             if( nbad ) {
               msgOut( "", FUNC_NAME ": *** Possible programming error! ***",
                       status );
