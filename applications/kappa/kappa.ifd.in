@@ -15308,6 +15308,16 @@ iraf! {
 
          helplib {$KAPPA_HELP}
 
+         parameter axes {
+            size *
+            type _INTEGER
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {The pixel axes to be regridded}
+            helpkey *
+         }
+
          parameter in {
             position 1
             type NDF
