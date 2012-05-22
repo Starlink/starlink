@@ -121,11 +121,13 @@
 *        basically flat.
 *     2012-03-27 (DSB):
 *        Modified to allow separate noise estimates for blocks of time slices.
+*     2012-05-22 (DSB):
+*        Multi-thread the chi-squared calculation.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2010 University of British Columbia.
-*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -161,6 +163,30 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
+/* Prototypes for local static functions. */
+static void smf1_calcmodel_noi( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfCalcModelNoiData {
+   dim_t b1;
+   dim_t b2;
+   dim_t mntslice;
+   dim_t ntslice;
+   double *model_data;
+   double *res_data;
+   double chisquared;
+   int chisq;
+   size_t bstride;
+   size_t mbstride;
+   size_t mtstride;
+   size_t nchisq;
+   size_t tstride;
+   smf_qual_t *qua_data;
+} SmfCalcModelNoiData;
+
+
+
+
 #define FUNC_NAME "smf_calcmodel_noi"
 
 
@@ -169,6 +195,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status) {
 
   /* Local Variables */
+  dim_t bolostep;               /* Number of bolos per thread */
   dim_t boxsize;                /* No. of time slices in each noise box */
   smfData *box = NULL;          /* SmfData holding one box of input data */
   size_t bstride;               /* bolometer stride */
@@ -185,10 +212,9 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t ibolo;                  /* Bolometer index */
   int ibox;                     /* Index of current noise box */
   dim_t itime;                  /* Time slice index */
-  dim_t id;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
-  dim_t im;                     /* Loop counter */
   JCMTState *instate=NULL;      /* Pointer to input JCMTState */
+  int iw;                       /* Thread index */
   dim_t j;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
   size_t mbstride;              /* model bolometer stride */
@@ -204,6 +230,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t nflag;                 /* Number of new flags */
   int nleft;                    /* Number of samples not in a noise box */
   dim_t ntslice;                /* Number of time slices */
+  int nw;                       /* Number of worker threads */
   size_t pend;                  /* Last non-PAD sample */
   size_t pstart;                /* First non-PAD sample */
   smf_qual_t *qin;              /* Pointer to next input quality value */
@@ -469,20 +496,58 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
       }
 
-      /* Now calculate contribution to chi^2 */
-      if( *status == SAI__OK ) {
+      /* Now calculate contribution to chi^2. This bit takes along time
+         if there is a lot of data so share the work out amongst the available
+         worker threads. How many threads do we get to play with */
+      nw = wf ? wf->nworker : 1;
 
-        for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
-          for( j=0; j<ntslice; j++ ) {
-            id = i*bstride+j*tstride;              /* index in data array */
-            im = i*mbstride+(j%mntslice)*mtstride; /* index in NOI array */
-            if(model_data[im]>0 && !(qua_data[id]&SMF__Q_GOOD) ) {
-              dat->chisquared[chunk] += res_data[id]*res_data[id] /
-                model_data[im];
-              nchisq++;
-            }
-          }
+      /* Find how many bolometers to process in each worker thread. */
+      bolostep = nbolo/nw;
+      if( bolostep == 0 ) bolostep = 1;
+
+      /* Allocate job data for threads, and store the range of bolos to be
+         processed by each one. Ensure that the last thread picks up any
+         left-over bolos. */
+      SmfCalcModelNoiData *job_data = astCalloc( nw, sizeof(*job_data) );
+      if( *status == SAI__OK ) {
+        SmfCalcModelNoiData *pdata;
+
+        for( iw = 0; iw < nw; iw++ ) {
+           pdata = job_data + iw;
+           pdata->b1 = iw*bolostep;
+           if( iw < nw - 1 ) {
+              pdata->b2 = pdata->b1 + bolostep - 1;
+           } else {
+              pdata->b2 = nbolo - 1 ;
+           }
+
+           /* Store other values common to all jobs. */
+           pdata->ntslice = ntslice;
+           pdata->mntslice = mntslice;
+           pdata->qua_data = qua_data;
+           pdata->model_data = model_data;
+           pdata->res_data = res_data;
+           pdata->bstride = bstride;
+           pdata->tstride = tstride;
+           pdata->mbstride = mbstride;
+           pdata->mtstride = mtstride;
+
+           /* Submit the job to the workforce. */
+           thrAddJob( wf, 0, pdata, smf1_calcmodel_noi, 0, NULL, status );
         }
+
+        /* Wait for all jobs to complete. */
+        thrWait( wf, status );
+
+        /* Accumulate the results from all the worker threads. */
+        for( iw = 0; iw < nw; iw++ ) {
+           pdata = job_data + iw;
+           dat->chisquared[chunk] += pdata->chisquared;
+           nchisq += pdata->nchisq;
+        }
+
+/* Free the job data. */
+        job_data = astFree( job_data );
       }
     }
   }
@@ -501,4 +566,92 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Clean Up */
   if( kmap ) kmap = astAnnul( kmap );
+}
+
+
+
+
+
+static void smf1_calcmodel_noi( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_calcmodel_noi
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_calmodel_noi.
+
+*  Invocation:
+*     smf1_calcmodel_noi( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfCalcModelNoiData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfCalcModelNoiData *pdata;
+   dim_t ibolo;
+   dim_t itime;
+   double *pm;
+   double *pr;
+   size_t ibase;
+   smf_qual_t *pq;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfCalcModelNoiData *) job_data_ptr;
+
+/* Initialise returned chisquared increment and count of values. */
+   pdata->chisquared = 0.0;
+   pdata->nchisq = 0;
+
+/* Loop round all bolos to be processed by this thread, maintaining the
+   index of the first time slice for the current bolo. */
+   ibase = pdata->b1*pdata->bstride;
+   for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+
+/* Get a pointer ot the first quality value for the current bolo, and
+   check that the whole bolometer has not been flagged as bad. */
+      pq = pdata->qua_data + ibase;
+      if( !( *pq & SMF__Q_BADB ) ) {
+
+/* Get a pointer to the first residual for the current bolo, and then
+   loop round all time slices. */
+         pr = pdata->res_data + ibase;
+         for( itime = 0; itime < pdata->ntslice; itime++ ) {
+
+/* Get a pointer to the model value (noise) to be used with the current
+   bolometer sample. Multiple bolometer samples may share the same noise
+   value, so we caclulate the index into the model_data array separately,
+   rather than just using "ibase" as for the residual and quality
+   pointers. */
+            pm = pdata->model_data + ibolo*pdata->mbstride +
+                                  ( itime % pdata->mntslice )*pdata->mtstride;
+
+/* If the noise is positive and the bolometer sample is good, increment
+   the chi-squared value and the number of samples included in the sum. */
+            if( *pm > 0 && !(*pq & SMF__Q_GOOD) ) {
+              pdata->chisquared += (*pr)*(*pr) / (*pm);
+              pdata->nchisq++;
+            }
+
+/* Move residual and quality pointers on to the next time slice. */
+            pq += pdata->tstride;
+            pr += pdata->tstride;
+
+         }
+      }
+
+/* Increment the index of the first value associated with the next
+   bolometer. */
+      ibase += pdata->bstride;
+   }
 }
