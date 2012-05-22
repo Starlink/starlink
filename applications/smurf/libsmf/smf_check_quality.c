@@ -14,10 +14,12 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     size_t smf_check_quality( smfData *data,
+*     size_t smf_check_quality( ThrWorkForce *wf, smfData *data,
 *                               int showbad, int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     data = smfData* (Given)
 *        Pointer to smfData
 *     showbad = int (Given)
@@ -42,6 +44,7 @@
 
 *  Authors:
 *     EC: Ed Chapin (UBC)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -53,10 +56,12 @@
 *         - chain if tests rather than doing all 3 every time
 *     2011-04-06 (TIMJ):
 *        Summarize where the bad values are coming from in VERBOSE mode.
+*     2012-05-22 (DSB):
+*        Multi-thread the chi-squared calculation.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2011-2012 Science & Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -93,30 +98,47 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
-/* Other includes */
-
 #define FUNC_NAME "smf_check_quality"
 
+/* Prototypes for local static functions. */
+static void smf1_check_quality( void *job_data_ptr, int *status );
 static void smf__index_to_tbol( size_t bstride, size_t tstride, size_t bufpos,
                                 size_t *bolnum, size_t *tslice, int *status );
 
-size_t smf_check_quality( smfData *data, int showbad, int *status ) {
+/* Local data types */
+typedef struct smfCheckQualityData {
+   double *d;
+   int showbad;
+   size_t bstride;
+   size_t d1;
+   size_t d2;
+   size_t nbad;
+   size_t ninf;
+   size_t nnan;
+   size_t nqualincon;
+   size_t tstride;
+   smf_qual_t *qual;
+} SmfCheckQualityData;
 
-  int badqual;                  /* Bad quality at this sample? */
-  size_t bolnum;                /* Bolometer number */
+
+
+size_t smf_check_quality( ThrWorkForce *wf, smfData *data, int showbad,
+                          int *status ) {
+
   double *d=NULL;               /* Pointer to data array */
-  size_t i;                     /* loop counter */
-  int isbad;                    /* inconsistency found */
   size_t nbad=0;                /* inconsistency counter */
   size_t nnan = 0;              /* Number of nan values found */
   size_t ninf = 0;              /* Number of inf values found */
   size_t nqualincon = 0;        /* Number of inconsistent bad/qual */
   dim_t ndata;                  /* Number of data points */
   size_t bstride;               /* bol stride */
-  size_t tslice;                /* Time slice */
   size_t tstride;               /* time slice stride */
-  smf_qual_t *qual=NULL;     /* Pointer to the QUALITY array */
-  double val;                   /* Value from DATA array */
+  smf_qual_t *qual=NULL;        /* Pointer to the QUALITY array */
+  int nw;                       /* Number of worker threads */
+  int iw;                       /* Thread index */
+  SmfCheckQualityData *job_data = NULL;  /* Array of job descriptions */
+  SmfCheckQualityData *pdata;   /* Pointer to next job description */
+  size_t sampstep;              /* Number of samples per thread */
 
   if ( *status != SAI__OK ) return 0;
 
@@ -157,49 +179,53 @@ size_t smf_check_quality( smfData *data, int showbad, int *status ) {
                 &tstride, status );
 
   if( *status == SAI__OK ) {
-    for (i = 0; i < ndata; i++) {
-     isbad = 0;
 
-     badqual = qual[i]&SMF__Q_BADDA;
-     val = d[i];
+    /* How many threads do we get to play with */
+    nw = wf ? wf->nworker : 1;
 
-     /* Do the finite test first since if it is not finite
-        there is no point testing if it is BADD as well */
-     if( !isfinite(val) ) {
-       isbad = 1;
-       if (isnan(val)) {
-         nnan++;
-       } else {
-         ninf++;
-       }
-       if( showbad ) {
-         smf__index_to_tbol( bstride, tstride, i, &bolnum, &tslice,
-                             status );
-         msgOutf( "", "b%zu t%zu: non-finite %s value encountered",
-                  status, bolnum, tslice, (isnan(val) ? "NaN" : "Inf") );
-       }
-     } else if( (val==VAL__BADD) && !badqual ) {
-       isbad = 1;
-       if( showbad ) {
-         smf__index_to_tbol( bstride, tstride, i, &bolnum, &tslice,
-                             status );
-         msgOutf( "", "b%zu t%zu: VAL__BADD without SMF__Q_BADDA",
-                  status, bolnum, tslice );
-       }
-     } else if( badqual && (val!=VAL__BADD) ) {
-       isbad = 1;
-       nqualincon++;
-       if( showbad ) {
-         smf__index_to_tbol( bstride, tstride, i, &bolnum, &tslice,
-                             status );
-         msgOutf( "", "b%zu t%zu: SMF__Q_BADDA without VAL__BADD",
-                  status, bolnum, tslice );
-       }
-     }
+    /* Find how many samples to process in each worker thread. */
+    sampstep = ndata/nw;
+    if( sampstep == 0 ) sampstep = 1;
 
-     if( isbad ) {
-       nbad++;
-     }
+    /* Allocate job data for threads, and store the range of samples to be
+       processed by each one. Ensure that the last thread picks up any
+       left-over samples. */
+    job_data = astCalloc( nw, sizeof(*job_data) );
+    if( *status == SAI__OK ) {
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        pdata->d1 = iw*sampstep;
+        if( iw < nw - 1 ) {
+          pdata->d2 = pdata->d1 + sampstep - 1;
+        } else {
+          pdata->d2 = ndata - 1 ;
+        }
+
+        /* Store other values common to all jobs. */
+        pdata->qual = qual;
+        pdata->d = d;
+        pdata->showbad = showbad;
+        pdata->bstride = bstride;
+        pdata->tstride = tstride;
+
+        /* Submit the job to the workforce. */
+        thrAddJob( wf, 0, pdata, smf1_check_quality, 0, NULL, status );
+      }
+
+      /* Wait for all jobs to complete. */
+      thrWait( wf, status );
+
+      /* Accumulate the results from all the worker threads. */
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        nbad += pdata->nbad;
+        nnan += pdata->nnan;
+        ninf += pdata->ninf;
+        nqualincon += pdata->nqualincon;
+      }
+
+      /* Free the job data. */
+      job_data = astFree( job_data );
     }
   }
 
@@ -256,3 +282,103 @@ static void smf__index_to_tbol( size_t bstride, size_t tstride, size_t bufpos,
   if (tslice) *tslice = tpos;
 
 }
+
+
+
+
+static void smf1_check_quality( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_check_quality
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_check_quality.
+
+*  Invocation:
+*     smf1_check_quality( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfCheckQualityData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfCheckQualityData *pdata;
+   double *pd;
+   int badqual;
+   int isbad;
+   size_t bolnum;
+   size_t i;
+   size_t tslice;
+   smf_qual_t *pq;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfCheckQualityData *) job_data_ptr;
+
+/* Initialise returned chisquared increment and count of values. */
+   pdata->nbad = 0;
+   pdata->nnan = 0;
+   pdata->ninf = 0;
+   pdata->nqualincon = 0;
+
+/* Initialise pointers to the first data and quality value to be
+   processed by this thread. */
+   pq = pdata->qual + pdata->d1;
+   pd = pdata->d + pdata->d1;
+
+/* Loop round all values to be processed by this thread. */
+   for( i = pdata->d1; i <= pdata->d2; i++, pq++,pd++ ) {
+      isbad = 0;
+      badqual = (*pq) & SMF__Q_BADDA;
+
+/* Do the finite test first since if it is not finite there is no point
+   testing if it is BADD as well */
+      if( !isfinite( *pd ) ) {
+         isbad = 1;
+
+         if( isnan( *pd ) ) {
+            pdata->nnan++;
+         } else {
+            pdata->ninf++;
+         }
+
+         if( pdata->showbad ) {
+            smf__index_to_tbol( pdata->bstride, pdata->tstride, i, &bolnum,
+                                &tslice, status );
+            msgOutf( "", "b%zu t%zu: non-finite %s value encountered",
+                     status, bolnum, tslice, (isnan(*pd) ? "NaN" : "Inf") );
+         }
+
+      } else if( *pd == VAL__BADD && !badqual ) {
+         isbad = 1;
+         if( pdata->showbad ) {
+            smf__index_to_tbol( pdata->bstride, pdata->tstride, i, &bolnum,
+                                &tslice, status );
+            msgOutf( "", "b%zu t%zu: VAL__BADD without SMF__Q_BADDA",
+                     status, bolnum, tslice );
+         }
+
+      } else if( badqual && *pd != VAL__BADD ) {
+         isbad = 1;
+         pdata->nqualincon++;
+         if( pdata->showbad ) {
+            smf__index_to_tbol( pdata->bstride, pdata->tstride, i, &bolnum,
+                                &tslice, status );
+            msgOutf( "", "b%zu t%zu: SMF__Q_BADDA without VAL__BADD",
+                     status, bolnum, tslice );
+         }
+
+      }
+      if( isbad ) pdata->nbad++;
+   }
+}
+
