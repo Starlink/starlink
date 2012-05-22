@@ -1403,8 +1403,8 @@ double smf_map_getpixsize( const smfData *data, int *status );
 void * smf_map_or_malloc( size_t nelem, smf_dtype type, int zero, int indf,
                           const char * comp, int * status );
 
-void smf_map_spikes( smfData *data, smfData *variance, int *lut,
-                     smf_qual_t mask, double *map, double *mapweight,
+void smf_map_spikes( ThrWorkForce *wf, smfData *data, smfData *variance,
+                     int *lut, smf_qual_t mask, double *map, double *mapweight,
                      int *hitsmap, double *mapvar, double thresh,
                      size_t *nflagged, int *status );
 
