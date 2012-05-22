@@ -243,7 +243,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
   if( (mapspike > 0) && noi && !(flags&SMF__DIMM_FIRSTITER) ) {
     size_t nflagged;
-    smf_map_spikes( res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
+    smf_map_spikes( wf, res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
                     SMF__Q_GOOD, map, mapweight, hitsmap, mapvar, mapspike,
                     &nflagged, status );
 

@@ -13,12 +13,14 @@
 *     C function
 
 *  Invocation:
-*     smf_map_spikes( smfData *data, smfData *variance, int *lut,
-*                     smf_qual_t mask, double *map, double *mapweight,
-*                     int *hitsmap, double *mapvar, double thresh,
-*                     size_t *nflagged, int *status )
+*     smf_map_spikes( ThrWorkForce *wf, smfData *data, smfData *variance,
+*                     int *lut, smf_qual_t mask, double *map,
+*                     double *mapweight, int *hitsmap, double *mapvar,
+*                     double thresh, size_t *nflagged, int *status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to thread workforce.
 *     data = smfData* (Given)
 *        Pointer to data stream to be flagged. Quality will be flagged
 *        with SMF__Q_SPIKE.
@@ -69,7 +71,8 @@
 *     map value subtracted, and are assumed to be scattered about zero.
 
 *  Authors:
-*     Edward Chapin (UBC)
+*     EC: Edward Chapin (UBC)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -80,8 +83,8 @@
 *     2011-03-09 (EC):
 *        Instead of using an average weightnorm, now calculate weighted
 *        sample normalization on per-pixel basis using mapweight
-
-*  Notes:
+*     2012-05-22 (DSB):
+*        Multi-thread.
 
 *  Copyright:
 *     Copyright (C) 2009-2011 University of British Columbia
@@ -121,35 +124,62 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
+/* Prototypes for local static functions. */
+static void smf1_map_spikes( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfMapSpikesData {
+   dim_t b1;
+   dim_t b2;
+   dim_t ntslice;
+   dim_t vntslice;
+   double *dat_data;
+   double *map;
+   double *mapvar;
+   double *mapweight;
+   double *var_data;
+   double threshsq;
+   int *hitsmap;
+   int *lut_data;
+   int nflag;
+   size_t bstride;
+   size_t tstride;
+   size_t vbstride;
+   size_t vtstride;
+   smf_qual_t *qua_data;
+   smf_qual_t mask;
+} SmfMapSpikesData;
+
+
+
+
 #define FUNC_NAME "smf_map_spikes"
 
-void smf_map_spikes( smfData *data, smfData *variance, int *lut,
-                     smf_qual_t mask, double *map, double *mapweight,
+void smf_map_spikes( ThrWorkForce *wf, smfData *data, smfData *variance,
+                     int *lut, smf_qual_t mask, double *map, double *mapweight,
                      int *hitsmap, double *mapvar, double thresh,
                      size_t *nflagged, int *status ) {
 
   /* Local Variables */
   double *dat=NULL;          /* Pointer to data array */
-  size_t dbstride;           /* bolo stride of data */
-  dim_t di;                  /* data array index */
+  dim_t bolostep;            /* Bolos per worker thread */
+  size_t bstride;            /* bolo stride of data */
   dim_t dsize;               /* total number of elements in data */
-  size_t dtstride;           /* tstride of data */
-  size_t i;                  /* Loop counter */
-  size_t j;                  /* Loop counter */
+  size_t tstride;            /* tstride of data */
+  int iw;                    /* Thread index */
   dim_t nbolo;               /* number of bolos */
   size_t nflag=0;            /* Number of samples flagged */
   dim_t ntslice;             /* number of time slices */
-  double popvar;             /* estimate of population variance */
+  int nw;                    /* Number of worker threads */
   smf_qual_t * qual = NULL;  /* Quality to update for flagging */
-  double thisweight;
   double threshsq;           /* square of thresh */
   double *var=NULL;          /* Pointer to variance array */
   size_t vbstride;           /* bolo stride of variance */
-  dim_t vi;                  /* variance array index */
   dim_t vnbolo;              /* number of bolos in variance */
   dim_t vntslice;            /* number of bolos in variance */
   size_t vtstride;           /* tstride of variance */
-  double woffsq;             /* weighted sample offset^2 from map value */
+  SmfMapSpikesData *job_data = NULL; /* Data for jobs */
+  SmfMapSpikesData *pdata;   /* Data for job */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -169,8 +199,8 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
 
   dat = data->pntr[0];
   qual = smf_select_qualpntr( data, NULL, status );
-  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &dsize, &dbstride,
-                &dtstride, status );
+  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &dsize, &bstride,
+                &tstride, status );
 
   var = variance->pntr[0];
   smf_get_dims( variance, NULL, NULL, &vnbolo, &vntslice, NULL, &vbstride,
@@ -192,43 +222,179 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
     return;
   }
 
-  /* Loop over data points and flag outliers */
-  for( i=0; i<nbolo; i++ ) {
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
 
-    if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=0; j<ntslice; j++ ) {
+  /* Find how many bolometers to process in each worker thread. */
+  bolostep = nbolo/nw;
+  if( bolostep == 0 ) bolostep = 1;
 
-      di = i*dbstride + j*dtstride;
-      vi = i*vbstride + (j%vntslice)*vtstride;
+  /* Allocate job data for threads, and store the range of bolos to be
+     processed by each one. Ensure that the last thread picks up any
+     left-over bolos. */
+  job_data = astCalloc( nw, sizeof(*job_data) );
+  if( *status == SAI__OK ) {
 
-      if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) &&
-        (mapvar[lut[di]] != VAL__BADD) ) {
+    for( iw = 0; iw < nw; iw++ ) {
+       pdata = job_data + iw;
+       pdata->b1 = iw*bolostep;
+       if( iw < nw - 1 ) {
+          pdata->b2 = pdata->b1 + bolostep - 1;
+       } else {
+          pdata->b2 = nbolo - 1 ;
+       }
 
-        /* What is the estimated population variance? */
-        popvar = mapvar[lut[di]]*hitsmap[lut[di]];
+       /* Store other values common to all jobs. */
+       pdata->ntslice = ntslice;
+       pdata->vntslice = vntslice;
+       pdata->qua_data = qual;
+       pdata->dat_data = dat;
+       pdata->var_data = var;
+       pdata->bstride = bstride;
+       pdata->tstride = tstride;
+       pdata->vbstride = vbstride;
+       pdata->vtstride = vtstride;
+       pdata->map = map;
+       pdata->mapvar = mapvar;
+       pdata->mapweight = mapweight;
+       pdata->threshsq = threshsq;
+       pdata->hitsmap = hitsmap;
+       pdata->lut_data = lut;
+       pdata->mask = mask;
 
-        /* Estimate the weighted sample offset (squared) from the
-           mean. This definition is slightly odd, but I arrived at it
-           by figuring out the factor you need to multiply (data - map) by
-           in order to plug it straight into the sum_i (residual_i)^2 / N
-           for the variance and get the same answer as the population
-           variance. */
-
-        thisweight = (1/var[vi]);
-        if( map ) woffsq = (dat[di] - map[lut[di]]);
-        else woffsq = dat[di];
-
-        woffsq *= woffsq * thisweight * hitsmap[lut[di]] / mapweight[lut[di]];
-
-        /* Flag it if it's an outlier */
-        if( woffsq > threshsq*popvar ) {
-          qual[di] |= SMF__Q_SPIKE;
-          nflag++;
-        }
-
-      }
+       /* Submit the job to the workforce. */
+       thrAddJob( wf, 0, pdata, smf1_map_spikes, 0, NULL, status );
     }
+
+    /* Wait for all jobs to complete. */
+    thrWait( wf, status );
+
+    /* Accumulate the results from all the worker threads. */
+    for( iw = 0; iw < nw; iw++ ) {
+       pdata = job_data + iw;
+       nflag += pdata->nflag;
+    }
+
+    /* Free the job data. */
+    job_data = astFree( job_data );
   }
 
   /* Return nflagged if requested */
   if( nflagged ) *nflagged = nflag;
 }
+
+
+
+
+
+
+
+
+
+static void smf1_map_spikes( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_map_spikes
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_map_spikes.
+
+*  Invocation:
+*     smf1_map_spikes( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfMapSpikesData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfMapSpikesData *pdata;
+   dim_t ibolo;
+   dim_t itime;
+   double *pd;
+   double *pv;
+   double popvar;
+   double thisweight;
+   double woffsq;
+   int *pl;
+   size_t ibase;
+   size_t vi;
+   smf_qual_t *pq;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfMapSpikesData *) job_data_ptr;
+
+/* Initialise returned values. */
+   pdata->nflag = 0;
+
+/* Loop round all bolos to be processed by this thread, maintaining the
+   index of the first time slice for the current bolo. */
+   ibase = pdata->b1*pdata->bstride;
+   for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+
+/* Get a pointer ot the first quality value for the current bolo, and
+   check that the whole bolometer has not been flagged as bad. */
+      pq = pdata->qua_data + ibase;
+      if( !( *pq & SMF__Q_BADB ) ) {
+
+/* Get a pointer to the first residual for the current bolo, and then
+   loop round all time slices. */
+         pd = pdata->dat_data + ibase;
+         pv = pdata->var_data + ibolo*pdata->vbstride;
+         pl = pdata->lut_data + ibase;
+         for( itime = 0; itime < pdata->ntslice; itime++ ) {
+
+/* Check the sample falls on the map, that it is not flagged, and has a
+   non-zero variance. */
+            vi = ( itime % pdata->vntslice )*pdata->vtstride;
+            if( *pl != VAL__BADI && !( *pq & pdata->mask ) && pv[ vi ] != 0 &&
+                pdata->mapvar[ *pl ] != VAL__BADD ) {
+
+/* What is the estimated population variance? */
+               popvar = pdata->mapvar[ *pl ]*pdata->hitsmap[ *pl ];
+
+/* Estimate the weighted sample offset (squared) from the mean. This
+   definition is slightly odd, but I arrived at it by figuring out the
+   factor you need to multiply (data - map) by in order to plug it
+   straight into the sum_i (residual_i)^2 / N for the variance and get
+   the same answer as the population variance. */
+               thisweight = 1.0 / pv[ vi ];
+               woffsq = pdata->map ? *pd - pdata->map[ *pl ] : *pd;
+               woffsq *= woffsq * thisweight * pdata->hitsmap[ *pl ] /
+                         pdata->mapweight[ *pl ];
+
+/* Flag it if it's an outlier */
+               if( woffsq > pdata->threshsq*popvar ) {
+                  *pq |= SMF__Q_SPIKE;
+                  pdata->nflag++;
+               }
+            }
+
+/* Move data, quality and LUT pointers on to the next time slice. */
+            pd += pdata->tstride;
+            pq += pdata->tstride;
+            pl += pdata->tstride;
+         }
+      }
+
+/* Increment the index of the first value associated with the next
+   bolometer. */
+      ibase += pdata->bstride;
+   }
+}
+
+
+
+
+
+
+
