@@ -456,6 +456,22 @@ void _smf_iteratemap_showmem( int *status ) {
 }
 #endif
 
+
+/* Prototypes for local static functions. */
+static void smf1_iteratemap( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfIterateMapData {
+   size_t d1;
+   size_t d2;
+   smf_qual_t *qua_data;
+   double *res_data;
+   int *lut_data;
+   double *thismap;
+   smf_qual_t *thisqual;
+   int operation;
+} SmfIterateMapData;
+
 #define FUNC_NAME "smf_iteratemap"
 
 /* A flag used to indicate that an interupt has occurred. */
@@ -516,6 +532,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int isize;                    /* Number of files in input group */
   int iter;                     /* Iteration number */
   int itermap=0;                /* If set, produce maps each iteration */
+  int iw;                       /* Thread index */
   size_t j;                     /* Loop counter */
   size_t k;                     /* Loop counter */
   AstKeyMap *keymap=NULL;       /* Copy of supplied keymap */
@@ -553,10 +570,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t ntslice;                /* Number of time slices */
   size_t numdata;               /* Total number of samples in chunk */
   int numiter=0;                /* Total number iterations */
+  int nw;                       /* Number of worker threads */
   dim_t pad=0;                  /* How many samples of padding at both ends */
   size_t qcount_last[SMF__NQBITS_TSERIES];/* quality bit counter -- last iter */
   smfArray **qua=NULL;          /* Quality flags for each file */
-  smf_qual_t *qua_data=NULL; /* Pointer to DATA component of qua */
+  smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
   int quit=0;                   /* flag indicates when to quit */
   int rebinflags;               /* Flags to control rebinning */
@@ -574,7 +592,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int *thishits=NULL;           /* Pointer to this hits map */
   double *thismap=NULL;         /* Pointer to this map */
   smf_modeltype thismodel;      /* Type of current model */
-  smf_qual_t *thisqual=NULL; /* Pointer to this quality map */
+  smf_qual_t *thisqual=NULL;    /* Pointer to this quality map */
   double *thisvar=NULL;         /* Pointer to this variance map */
   double *thisweight=NULL;      /* Pointer to this weights map */
   double *thisweightsq=NULL;    /* Pointer to this weights map^2 */
@@ -588,6 +606,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t whichgai=0;             /* Model index of GAI if present */
   dim_t whichnoi=0;             /* Model index of NOI if present */
   int *whichthetabin=NULL;      /* Which scan angle bin each time slice */
+  SmfIterateMapData *job_data = NULL;  /* Array of job descriptions */
+  SmfIterateMapData *pdata;     /* Pointer to next job description */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -606,6 +626,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     action.sa_flags = SA_RESTART;
     sigaction( SIGINT, &action, NULL );
   }
+
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
+
+  /* Allocate job data for threads. */
+  job_data = astCalloc( nw, sizeof(*job_data) );
 
   /* This function modifies the contents of the config keymap. So take a
      copy of the supplied keymap to avoid modifying it. */
@@ -1776,23 +1802,42 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
                           &dsize, NULL, NULL, status );
 
-            /* Add last iter. of astronomical signal back in to residual.
-               Note that if this is the first iteration we do not yet
-               have a map estimate so we skip this step (in multiple
+            /* Set up jobs to add last iter. of astronomical signal back in
+               to residual. Note that if this is the first iteration we do
+               not yet have a map estimate so we skip this step (in multiple
                chunk case thismap will still contain the old map from
                the previous chunk). Ignore map pixels that have been
-               constrained to zero. */
+               constrained to zero. First find how many samples to process
+               in each worker thread. */
             if( iter > 0 ) {
-              for( k=0; k<dsize; k++ ) {
-                if( !(qua_data[k]&SMF__Q_MOD) &&
-                    (lut_data[k]!=VAL__BADI) ) {
-                  double ast_data = thismap[lut_data[k]];
-                  if( ast_data != VAL__BADD &&
-                      !(thisqual[lut_data[k]] & SMF__MAPQ_ZERO ) ) {
-                    res_data[k] += ast_data;
-                  }
+              size_t sampstep = dsize/nw;
+              if( sampstep == 0 ) sampstep = 1;
+
+              /* Store the range of samples to be processed by each thread.
+                 Ensure that the last thread picks up any left-over samples. */
+              for( iw = 0; iw < nw; iw++ ) {
+                pdata = job_data + iw;
+                pdata->d1 = iw*sampstep;
+                if( iw < nw - 1 ) {
+                  pdata->d2 = pdata->d1 + sampstep - 1;
+                } else {
+                  pdata->d2 = dsize - 1 ;
                 }
+
+                /* Store other values common to all jobs. */
+                pdata->qua_data = qua_data;
+                pdata->res_data = res_data;
+                pdata->lut_data = lut_data;
+                pdata->thismap = thismap;
+                pdata->thisqual = thisqual;
+                pdata->operation = 1;
+
+                /* Submit the job to the workforce. */
+                thrAddJob( wf, 0, pdata, smf1_iteratemap, 0, NULL, status );
               }
+
+              /* Wait for all jobs to complete. */
+              thrWait( wf, status );
             }
           }
 
@@ -2640,8 +2685,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   fakemap = astFree( fakemap );
   if( fakendf != NDF__NOID ) ndfAnnul( &fakendf, status );
 
-  if( lastmap ) lastmap = astFree( lastmap );
-  if( mapchange ) mapchange = astFree( mapchange );
+  lastmap = astFree( lastmap );
+  mapchange = astFree( mapchange );
+  job_data = astFree( job_data );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();
@@ -2672,3 +2718,64 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   astEnd;
 
 }
+
+
+static void smf1_iteratemap( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_iteratemap
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_iteratemap.
+
+*  Invocation:
+*     smf1_iteratemap( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfIterateMapData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfIterateMapData *pdata;
+   double *pr;
+   int *pl;
+   size_t idata;
+   smf_qual_t *pq;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfIterateMapData *) job_data_ptr;
+
+/* Add last iter. of astronomical signal back in to residual. Ignore map
+   pixels that have been constrained to zero. */
+   if( pdata->operation == 1 ) {
+      pr = pdata->res_data +  pdata->d1;
+      pq = pdata->qua_data +  pdata->d1;
+      pl = pdata->lut_data +  pdata->d1;
+      for( idata = pdata->d1; idata <= pdata->d2; idata++,pq++,pl++,pr++ ) {
+         if( !( *pq & SMF__Q_MOD ) && *pl != VAL__BADI ) {
+            double ast_data = pdata->thismap[ *pl ];
+            if( ast_data != VAL__BADD &&
+                !(pdata->thisqual[ *pl ] & SMF__MAPQ_ZERO ) ) {
+               *pr += ast_data;
+            }
+         }
+      }
+
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( "", "smf1_iteratemap: Illegal operation %d requested.",
+               status, pdata->operation );
+   }
+
+}
+
