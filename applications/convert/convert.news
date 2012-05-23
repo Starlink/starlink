@@ -1,7 +1,5 @@
 1 CONVERT_Version_1.6
 
- There have been some fixes to SPECX2NDF SYSTEM handling.
-
  Support for FITS -TAB projection type added.
 
  Add WCSCOMP parameter to FITS2NDF.  It controls where world
@@ -13,8 +11,15 @@
  extension.  The default behaviour is to not write alternate AXIS
  co-ordinates if a WCS component exists in the NDF.
 
+ NDF2FITS now avoids scaling when the range of data values lies
+ within the scaled type's range, such as double to single
+ precision.
+
  Changed the default ORIGIN keyword from "Starlink Project, U.K."
  to "Starlink Software" in NDF2FITS.
+
+ SPECX2NDF has a new SYSTEM parameter that specifies the NDF's
+ co-ordinate system.
 
 1 CONVERT_Version_1.5-19
 
