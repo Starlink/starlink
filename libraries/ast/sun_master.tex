@@ -22664,7 +22664,8 @@ occurred in the AST library between versions V7.0.1 and V7.0.2:
 
 \end{enumerate}
 
-\subsection{Changes Introduced in V7.0.3}
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V7.0.3}
 
 The following describes the most significant changes which
 occurred in the AST library between versions V7.0.2 and V7.0.3:
@@ -22675,7 +22676,7 @@ occurred in the AST library between versions V7.0.2 and V7.0.3:
 accessing axis attributes within CmpFrames. This could happen if axes
 within the CmpFrame have been permuted.
 
-\item A bug has been fixed in the SKyFrame class that could cause the two
+\item A bug has been fixed in the SkyFrame class that could cause the two
 values of the SkyRef and/or SkyRefP attributes to be reversed.
 
 \item Bugs have been fixed in the CmpRegion class that should allow the border
@@ -22683,22 +22684,10 @@ around a compound Region to be plotted more quickly, and more accurately.
 Previously, component Regions nested deeply inside a CmpRegion may have
 been completely or partially ignored.
 
-\item A bug has been fixed in the Plot3D class that caused a sementation
+\item A bug has been fixed in the Plot3D class that caused a segmentation
 violation if the MinTick attribute was set to zero.
 
-\item The astResampleX set of methods now includes astResampleK and
-astResampleUK that handles 64 bit integer data.
-
 \end{enumerate}
-
-
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V7.0.4}
-
-The following describes the most significant changes which have
-occurred in the AST library between versions V7.0.3 and V7.0.4 (the
-current version):
-
 
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.

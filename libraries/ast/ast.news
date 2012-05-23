@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V7.0.4) of the Starlink AST (astrometry) library is
+   A new release (V7.0.3) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -16,12 +16,6 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-(none as yet)
-
-
-Main Changes in V7.0.3
-----------------------
-
 - A bug has been fixed which could cause an incorrect axis to be used when
 accessing axis attributes within CmpFrames. This could happen if axes
 within the CmpFrame have been permuted.
@@ -34,11 +28,8 @@ around a compound Region to be plotted more quickly, and more accurately.
 Previously, component Regions nested deeply inside a CmpRegion may have
 been completely or partially ignored.
 
-- A bug has been fixed in the Plot3D class that caused a sementation
+- A bug has been fixed in the Plot3D class that caused a segmentation
 violation if the MinTick attribute was set to zero.
-
-- The astResampleX set of methods now includes astResampleK and
-astResampleUK that handles 64 bit integer data.
 
 Main Changes in V7.0.2
 ----------------------
