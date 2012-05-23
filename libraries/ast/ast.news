@@ -26,7 +26,7 @@ Main Changes in V7.0.3
 accessing axis attributes within CmpFrames. This could happen if axes
 within the CmpFrame have been permuted.
 
-- A bug has been fixed in the SKyFrame class that could cause the two
+- A bug has been fixed in the SkyFrame class that could cause the two
 values of the SkyRef and/or SkyRefP attributes to be reversed.
 
 - Bugs have been fixed in the CmpRegion class that should allow the border
@@ -34,7 +34,7 @@ around a compound Region to be plotted more quickly, and more accurately.
 Previously, component Regions nested deeply inside a CmpRegion may have
 been completely or partially ignored.
 
-- A bug has been fixed in the Plot3D class that caused a sementation
+- A bug has been fixed in the Plot3D class that caused a segmentation
 violation if the MinTick attribute was set to zero.
 
 - The astResampleX set of methods now includes astResampleK and
