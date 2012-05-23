@@ -43,15 +43,15 @@
 *     AXES() = _INTEGER (Read)
 *        The indices of the pixel axes that are to be re-gridded. These
 *        should be in the range 1 to NDIM (the number of pixel axes in
-*        the NDF). Each value may appear at most once. The order of the
-*        supplied values is insignificant. If a null (!) value is
+*        the NDF).  Each value may appear at most once.  The order of
+*        the supplied values is insignificant.  If a null (!) value is
 *        supplied, then all pixel axes are re-gridded. Otherwise, only
-*        the specified pixel axes are regridded. Note, it is not always
+*        the specified pixel axes are regridded.  Note, it is not always
 *        possible to specify completely arbitrary combinations of pixel
-*        axes to be regridded. For instance, if the current WCS Frame
-*        contains RA and Dec axes, then it is not possible to regrid one
-*        of the corresponding pixel axes without the other. An error will
-*        be reported in such cases. [!]
+*        axes to be regridded.  For instance, if the current WCS Frame
+*        contains RA and Dec. axes, then it is not possible to regrid
+*        one of the corresponding pixel axes without the other.  An
+*        error will be reported in such cases.  [!]
 *     CONSERVE = _LOGICAL (Read)
 *        Only accessed when using the resampling algorithm (i.e. if
 *        REBIN is set FALSE).  If set TRUE, then the output pixel values
@@ -85,7 +85,7 @@
 *        into the corresponding pixel co-ordinates in the output NDF.
 *        If only a subset of pixel axes are being re-gridded, then the
 *        inputs to the Mapping should correspond to the pixel axes
-*        specified via parameter AXES. The file may be one of the
+*        specified via parameter AXES.  The file may be one of the
 *        following.
 *
 *        - A text file containing a textual representation of the AST
@@ -159,9 +159,10 @@
 *        - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel.  This
 *        scheme is similar to the "SincCos" scheme.
 *
-*        - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian
-*        is given by Parameter PARAMS(2), and the point at which to
-*        truncate the Gaussian to zero is given by Parameter PARAMS(1).
+*        - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the
+*        Gaussian is given by Parameter PARAMS(2), and the point at
+*        which to truncate the Gaussian to zero is given by Parameter
+*        PARAMS(1).
 *
 *        - "BlockAve"  -- Block averaging over all pixels in the
 *        surrounding N-dimensional cube. This option is only available
@@ -681,9 +682,9 @@
          IF( .NOT. SUBSET ) THEN
             MAPX = WCSI
 
-*  Otherwise, we need to extract the Mapping from the regridded pixel axes
-*  to the corresponding WCS axes from the WCS FrameSet. BNOTE, the PIXEL
-*  Frame is always Frame index 2 in an NDF WCS FRameSet. */
+*  Otherwise, we need to extract the Mapping from the regridded pixel
+*  axes to the corresponding WCS axes from the WCS FrameSet.  NOTE, the
+*  PIXEL Frame is always Frame Index 2 in an NDF WCS FrameSet.
          ELSE
             MAPX = AST_GETMAPPING( WCSI, 2, AST__CURRENT, STATUS )
             CALL AST_MAPSPLIT( MAPX, NPAX, PAXES, WPAXES, TMAP, STATUS )
@@ -784,8 +785,8 @@
          END IF
 
 *  Create a PermMap that re-orders the pixel axes so that the re-gridded
-*  pixel axes become axes 1 to NPAX, and the non-gridded axes become axes
-*  NPAX+1 to NDIMI.
+*  pixel axes become axes 1 to NPAX, and the non-gridded axes become
+*  axes NPAX+1 to NDIMI.
          DO I = 1, NPAX
             OUTPRM( I ) = PAXES( I )
             INPRM( OUTPRM( I ) ) = I
@@ -1078,8 +1079,8 @@
                CALL MSG_SETR( 'S', REAL( SCALE( I ) ) )
                IF( I .NE. NDIMO ) CALL MSG_SETC( 'S', ',' )
             END DO
-            CALL MSG_OUT( 'REGRID_MSG3', '  The supplied Mapping is'//
-     :                    '  being modified by scale factors of (^S).',
+            CALL MSG_OUT( 'REGRID_MSG3', '  The supplied Mapping is '//
+     :                    'being modified by scale factors of (^S).',
      :                    STATUS )
             MAPJ = AST_MATRIXMAP( NDIMI, NDIMO, 1, SCALE, ' ', STATUS )
          END IF

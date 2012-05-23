@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.39}
 \newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2012 May 2}
+\newcommand{\stardocdate}      {2012 May 22}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -43089,6 +43089,21 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
    }
    \sstparameters{
       \sstsubsection{
+         AXES() = \_INTEGER (Read)
+      }{
+         The indices of the pixel axes that are to be re-gridded. These
+         should be in the range 1 to NDIM (the number of pixel axes in
+         the NDF). Each value may appear at most once. The order of the
+         supplied values is insignificant.  If a null ({\tt{!}}) value is
+         supplied, then all pixel axes are re-gridded.  Otherwise, only
+         the specified pixel axes are regridded.  Note, it is not always
+         possible to specify completely arbitrary combinations of pixel
+         axes to be regridded.  For instance, if the current WCS Frame
+         contains RA and Dec. axes, then it is not possible to regrid one
+         of the corresponding pixel axes without the other.  An error will
+         be reported in such cases.  {\tt [!]}
+      }
+      \sstsubsection{
          CONSERVE = \_LOGICAL (Read)
       }{
          Only accessed when using the resampling algorithm (\emph{i.e.} if REBIN
@@ -43126,11 +43141,13 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       }{
          The name of a file containing the Mapping to be used, or null ({\tt{!}})
          if the input NDF is to be mapped into its own
-         \htmlref{current Frame}{se:domains}.  If a
-         file is supplied, the forward direction of the Mapping should
-         transform pixel co-ordinates in the input NDF into the
-         corresponding pixel co-ordinates in the output NDF. The file
-         may be one of the following.
+	 \htmlref{current Frame}{se:domains}.  If a file is supplied,
+	 the forward direction of the Mapping should transform pixel
+	 co-ordinates in the input NDF into the corresponding pixel
+	 co-ordinates in the output NDF. If only a subset of pixel
+	 axes are being re-gridded, then the inputs to the Mapping
+	 should correspond to the pixel axes specified via parameter
+	 AXES.  The file may be one of the following.
 
          \ssthitemlist{
 
@@ -58305,6 +58322,12 @@ The following applications have been modified:
       \begin{itemize}
         \item The default for the AXES parameter has changed so that by
         default axes are only drawn if the picture is cleared.
+      \end{itemize}
+
+   \item [\htmlref{REGRID}{REGRID}]\mbox{}
+      \begin{itemize}
+        \item The new parameter AXES allows regridding of selected
+        pixel axes.
       \end{itemize}
 
    \item [\htmlref{SCATTER}{SCATTER}]\mbox{}

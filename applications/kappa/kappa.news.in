@@ -73,7 +73,7 @@
    o  NDFTRACE
 
       -  Continues when it encounters an error within a WCS Frame.
-       
+
    o  NORMALIZE
 
       -  The default for the AXES parameter has changed so that by
@@ -91,6 +91,11 @@
 
       -  The default for the AXES parameter has changed so that by
       default axes are only drawn if the picture is cleared.
+
+   o  REGRID
+
+      -  The new parameter AXES allows regridding of selected
+      pixel axes.
 
    o  SCATTER
 
