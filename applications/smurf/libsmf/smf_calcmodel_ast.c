@@ -126,6 +126,8 @@
 *     2012-2-29 (DSB):
 *        Do not modify the values of masked map pixels - just flag them
 *        in mapqual.
+*     2012-5-23 (DSB):
+*        Multi-threaded the data loop.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -166,6 +168,25 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
+/* Prototypes for local static functions. */
+static void smf1_calcmodel_ast( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfCalcModelAstData {
+   dim_t b1;
+   dim_t b2;
+   dim_t ntslice;
+   double *map;
+   double *res_data;
+   int *lut_data;
+   int oper;
+   size_t bstride;
+   size_t tstride;
+   smf_qual_t *qua_data;
+   unsigned char *zmask;
+} SmfCalcModelAstData;
+
+
 #define FUNC_NAME "smf_calcmodel_ast"
 
 void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
@@ -180,18 +201,19 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   int *hitsmap;                 /* Pointer to hitsmap data */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
-  dim_t ii;                     /* array index */
-  dim_t j;                      /* Loop counter */
+  int iw;                       /* Thread index */
+  SmfCalcModelAstData *job_data = NULL; /* Data describing worker jobs */
   AstKeyMap *kmap=NULL;         /* Local keymap */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
-  double m;                     /* Hold temporary value of m */
   double *map;                  /* Pointer to map data */
   double mapspike;              /* Threshold SNR to detect map spikes */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   dim_t ntslice=0;              /* Number of time slices */
+  int nw;                       /* Number of worker threads */
+  SmfCalcModelAstData *pdata = NULL; /* Data describing worker jobs */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
@@ -221,6 +243,12 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   if(dat->noi) {
     noi = dat->noi[chunk];
   }
+
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
+
+  /* Allocate job data for threads. */
+  job_data = astCalloc( nw, sizeof(*job_data) );
 
   /* Parse parameters */
 
@@ -346,36 +374,138 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
       smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice,
                     &ndata, &bstride, &tstride, status);
 
-      /* Loop over data points */
-      for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) )
-        for( j=0; j<ntslice; j++ ) {
+      /* Find how many bolometers to process in each worker thread. */
+      dim_t bolostep = nbolo/nw;
+      if( bolostep == 0 ) bolostep = 1;
 
-        ii = i*bstride+j*tstride;
-
-        if( lut_data[ii] != VAL__BADI ) {
-
-
-          /* update the residual model provided that we have a good map
-             value which is not constrained to zero by the mask.
-             ***NOTE: unlike other model components we do *not* first
-                      add the previous realization back in. This is
-                      because we've already done this in smf_iteratemap
-                      before calling smf_rebinmap1. */
-
-          if( zmask && zmask[ lut_data[ii] ] ) {
-             m = VAL__BADD;
-          } else {
-             m = map[lut_data[ii]];
-          }
-
-          if( (m!=VAL__BADD) && !(qua_data[ii]&SMF__Q_MOD) ){
-            res_data[ii] -= m;
-          }
-
+      /* Create jobs to subtract the map values from the corresponding
+         bolometer values. */
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        pdata->b1 = iw*bolostep;
+        if( iw < nw - 1 ) {
+           pdata->b2 = pdata->b1 + bolostep - 1;
+        } else {
+           pdata->b2 = nbolo - 1 ;
         }
+
+        pdata->zmask = zmask;
+        pdata->ntslice = ntslice;
+        pdata->qua_data = qua_data;
+        pdata->res_data = res_data;
+        pdata->lut_data = lut_data;
+        pdata->bstride = bstride;
+        pdata->tstride = tstride;
+        pdata->map = map;
+        pdata->oper = 1;
+
+        thrAddJob( wf, 0, pdata, smf1_calcmodel_ast, 0, NULL, status );
       }
+
+      /* Wait for all jobs to complete. */
+      thrWait( wf, status );
     }
   }
 
+  job_data = astFree( job_data );
   if( kmap ) kmap = astAnnul( kmap );
 }
+
+
+
+
+
+static void smf1_calcmodel_ast( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_calcmodel_ast
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_calmodel_ast.
+
+*  Invocation:
+*     smf1_calcmodel_ast( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfCalcModelAstData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfCalcModelAstData *pdata;
+   dim_t ibolo;
+   dim_t itime;
+   double *pr;
+   double m;
+   int *pl;
+   size_t ibase;
+   smf_qual_t *pq;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfCalcModelAstData *) job_data_ptr;
+
+/* Remove map values from the corresponding bolometer values. */
+   if( pdata->oper == 1 ) {
+
+/* Loop round all bolos to be processed by this thread, maintaining the
+   index of the first time slice for the current bolo. */
+      ibase = pdata->b1*pdata->bstride;
+      for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+
+/* Get a pointer to the first quality value for the current bolo. */
+         pq = pdata->qua_data + ibase;
+
+/* Check that the whole bolometer has not been flagged as bad. */
+         if( !( *pq & SMF__Q_BADB ) ) {
+
+/* Get a pointer to the first residual, quality and LUT value for the
+   current bolo, and then loop round all time slices. */
+            pr = pdata->res_data + ibase;
+            pl = pdata->lut_data + ibase;
+            for( itime = 0; itime < pdata->ntslice; itime++ ) {
+
+/* Bad LUT values indicate that the sample is off the edge of the map. */
+               if( *pl != VAL__BADI ) {
+
+/* Update the residual model provided that we have a good map value which
+   is not constrained to zero by the mask. ***NOTE: unlike other model
+   components we do *not* first add the previous realization back in. This
+   is because we've already done this in smf_iteratemap before calling
+   smf_rebinmap1. */
+                  if( pdata->zmask && pdata->zmask[ *pl ] ) {
+                     m = VAL__BADD;
+                  } else {
+                     m = pdata->map[ *pl ];
+                  }
+
+                  if( m != VAL__BADD && !( *pq & SMF__Q_MOD ) ) *pr -= m;
+               }
+
+/* Move residual, quality and LUT pointers on to the next time slice. */
+               pr += pdata->tstride;
+               pq += pdata->tstride;
+               pl += pdata->tstride;
+            }
+         }
+
+/* Increment the index of the first value associated with the next
+   bolometer. */
+         ibase += pdata->bstride;
+      }
+
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( "", "smf1_calcmodel_ast: Illegal operation %d requested.",
+               status, pdata->oper );
+   }
+}
+
