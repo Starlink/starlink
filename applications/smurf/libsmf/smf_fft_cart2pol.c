@@ -331,7 +331,7 @@ static void smf1_fft_cart2pol( void *job_data_ptr, int *status ) {
    baseI = baseR + pdata->nf*pdata->ntransforms;
 
 /* Do each bolo in turn. */
-   for( ibolo = pdata->b1; ibolo < pdata->b2 && *status == SAI__OK; ibolo++ ) {
+   for( ibolo = pdata->b1; ibolo <= pdata->b2 && *status == SAI__OK; ibolo++ ) {
 
 /* Inverse transformation (polar to Cartesian). */
       if( pdata->inverse ) {
