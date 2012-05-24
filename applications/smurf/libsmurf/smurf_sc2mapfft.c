@@ -232,7 +232,7 @@ void smurf_sc2mapfft( int *status ) {
 
       /* Transform the data */
       odata = smf_fft_data( wf, idata, NULL, inverse, 0, status );
-      smf_convert_bad( odata, status );
+      smf_convert_bad( wf, odata, status );
 
       if( !inverse && polar ) {
         /* Store FFT of data in polar form */

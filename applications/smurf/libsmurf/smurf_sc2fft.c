@@ -458,7 +458,7 @@ void smurf_sc2fft( int *status ) {
 
             /* Tranform the data */
             odata = smf_fft_data( wf, idata, NULL, inverse, 0, status );
-            smf_convert_bad( odata, status );
+            smf_convert_bad( wf, odata, status );
 
             if( inverse ) {
               /* If output is time-domain, ensure that it is ICD bolo-ordered */

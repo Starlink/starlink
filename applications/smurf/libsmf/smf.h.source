@@ -828,7 +828,7 @@ smfHead *smf_construct_smfHead( smfHead * tofill, inst_t instrument,
                                 const double telpos[], char * ocsconfig,
                                 const char obsidss[], int * status );
 
-void smf_convert_bad( smfData *data, int *status );
+void smf_convert_bad( ThrWorkForce * wf, smfData *data, int *status );
 
 void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
                      dim_t itime_hi, AstSkyFrame *abskyfrm,
