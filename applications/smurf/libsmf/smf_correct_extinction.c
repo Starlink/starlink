@@ -230,6 +230,33 @@
 
 /* internal prototype */
 static int is_large_delta_atau ( double airmass1, double elevation1, double tau, int *status);
+static void smf1_correct_extinction( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfCorrectExtinctionData {
+   dim_t f1;
+   dim_t f2;
+   dim_t nframes;
+   dim_t npts;
+   double *allextcorr;
+   double *indata;
+   double tau;
+   double *vardata;
+   double *wvmtau;
+   double amstart;
+   double amfirst;
+   int *lbnd;
+   int *ubnd;
+   int isTordered;
+   int ndims;
+   smfData *data;
+   smfHead *hdr;
+   smf_extmeth method;
+   smf_tausrc tausrc;
+} SmfCorrectExtinctionData;
+
+/* A mutex used to serialise access to the smfData */
+static pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_correct_extinction"
@@ -239,20 +266,13 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
                             double **wvmtaucache, int *status) {
 
   /* Local variables */
-  double airmass;          /* Airmass */
   double amstart = VAL__BADD; /* Airmass at start */
   double amend = VAL__BADD;   /* Airmass at end */
-  double amprev;           /* Previous airmass in loop */
-  double *azel = NULL;     /* AZEL coordinates */
-  size_t base;             /* Offset into 3d data array */
   double elstart = VAL__BADD; /* Elevation at start (radians) */
   double elend = VAL__BADD; /* Elevation at end (radians) */
-  double extcorr = 1.0;    /* Extinction correction factor */
   smfHead *hdr = NULL;     /* Pointer to full header struct */
-  dim_t i;                 /* Loop counter */
   double *indata = NULL;   /* Pointer to data array */
   int isTordered;          /* data order of input data */
-  dim_t k;                 /* Loop counter */
   int lbnd[2];             /* Lower bound */
   size_t ndims;            /* Number of dimensions in input data */
   dim_t nframes = 0;       /* Number of frames */
@@ -261,8 +281,12 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
   dim_t ny = 0;            /* # pixels in y-direction */
   int ubnd[2];             /* Upper bound */
   double *vardata = NULL;  /* Pointer to variance array */
-  AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
   double * wvmtau = NULL;  /* WVM tau (smoothed or not) for these data */
+  int nw;                  /* Number of worker threads */
+  int iw;                  /* Thread index */
+  SmfCorrectExtinctionData *job_data = NULL;  /* Array of job descriptions */
+  SmfCorrectExtinctionData *pdata;   /* Pointer to next job description */
+  size_t framestep;         /* Number of frames per thread */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -459,11 +483,6 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
     indata = (data->pntr)[0];
     vardata = (data->pntr)[1];
   }
-  /* It is more efficient to call astTranGrid than astTran2
-     Allocate memory in adaptive mode just in case. */
-  if (method == SMF__EXTMETH_FULL || method == SMF__EXTMETH_ADAPT ) {
-    azel = astMalloc( (2*npts)*sizeof(*azel) );
-  }
 
   /* Jump to the cleanup section if status is bad by this point
      since we need to free memory */
@@ -475,151 +494,58 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
   ubnd[0] = nx;
   ubnd[1] = ny;
 
-  /* Store the previous good airmass if we need it for a gap */
-  amprev = amstart;
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
 
-  /* Loop over number of time slices/frames */
+  /* Find how many frames to process in each worker thread. */
+  framestep = nframes/nw;
+  if( framestep == 0 ) {
+    framestep = 1;
+    nw = nframes;
+  }
 
-  for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
-    /* Flags to indicate which mode we are using for this time slice */
-    int quick = 0;  /* use single airmass */
-    int adaptive = 0; /* switch from quick to full if required */
-    if (method == SMF__EXTMETH_SINGLE) {
-      quick = 1;
-    } else if (method == SMF__EXTMETH_ADAPT) {
-      quick = 1;
-      adaptive = 1;
-    }
-
-    /* Call tslice_ast to update the header for the particular
-       timeslice. If we're in QUICK mode then we don't need the WCS */
-    smf_tslice_ast( data, k, !quick, status );
-
-    /* Read the WVM tau value if required */
-    if (tausrc == SMF__TAUSRC_WVMRAW) {
-      tau = wvmtau[k];
-    }
-
-    /* in all modes we need to keep track of the previous airmass in case
-       we need to gap fill bad telescope data */
-    if ( quick && ndims == 2 ) {
-      /* for 2-D we use the FITS header directly */
-      /* This may change depending on exact FITS keyword */
-      airmass = amstart;
-
-      /* speed is not an issue for a 2d image */
-      adaptive = 0;
-
-    } else {
-      /* Else use airmass value in state structure */
-      airmass = hdr->state->tcs_airmass;
-
-      /* if things have gone bad use the previous value else store
-         this value. We also need to switch to quick mode and disable adaptive. */
-      if (airmass == VAL__BADD || airmass == 0.0 ) {
-        if ( hdr->state->tcs_az_ac2 != VAL__BADD ) {
-          /* try the elevation */
-          airmass = palAirmas( M_PI_2 - hdr->state->tcs_az_ac2 );
-        } else {
-          airmass = amprev;
-          quick = 1;
-          adaptive = 0;
-        }
+  /* Allocate job data for threads, and store the range of frames to be
+     processed by each one. Ensure that the last thread picks up any
+     left-over frames. */
+  job_data = astCalloc( nw, sizeof(*job_data) );
+  if( *status == SAI__OK ) {
+    for( iw = 0; iw < nw; iw++ ) {
+      pdata = job_data + iw;
+      pdata->f1 = iw*framestep;
+      if( iw < nw - 1 ) {
+        pdata->f2 = pdata->f1 + framestep - 1;
       } else {
-        amprev = airmass;
+        pdata->f2 = nframes - 1 ;
       }
+
+      pdata->nframes = nframes;
+      pdata->npts = npts;
+      pdata->allextcorr = allextcorr;
+      pdata->indata = indata;
+      pdata->tau = tau;
+      pdata->vardata = vardata;
+      pdata->wvmtau = wvmtau;
+      pdata->amstart = amstart;
+      pdata->amfirst = amstart + ( amend - amstart )*pdata->f1/( nframes - 1 );
+      pdata->lbnd = lbnd;
+      pdata->ubnd = ubnd;
+      pdata->isTordered = isTordered;
+      pdata->ndims = ndims;
+      pdata->data = data;
+      pdata->hdr = hdr;
+      pdata->method = method;
+      pdata->tausrc = tausrc;
+
+      /* Submit the job to the workforce. */
+      thrAddJob( wf, 0, pdata, smf1_correct_extinction, 0, NULL, status );
     }
 
-    /* If we're using the FAST application method, we assume a single
-       airmass and tau for the whole array but we have to consider adaptive mode.
-       If the tau is bad the extinction correction must also be bad. */
-    if (tau == VAL__BADD) {
-      extcorr = VAL__BADD;
-    } else if (quick) {
-      /* we have an airmass, see if we need to provide per-pixel correction */
-      if (adaptive) {
-        if (is_large_delta_atau( airmass, hdr->state->tcs_az_ac2, tau, status) ) {
-          /* we need WCS if we disable fast mode */
-          quick = 0;
-          smf_tslice_ast( data, k, 1, status );
-        }
-      }
+    /* Wait for all jobs to complete. */
+    thrWait( wf, status );
 
-      if (quick) extcorr = exp(airmass*tau);
-    }
-
-    /* The previous test may have forced quick off so we can not combine
-       the tests in one if-then-else block */
-    if (!quick && tau != VAL__BADD )  {
-      /* Not using quick so retrieve WCS to obtain elevation info */
-      wcs = hdr->wcs;
-      /* Check current frame, store it and then select the AZEL
-         coordinate system */
-      if (wcs != NULL) {
-        if (strcmp(astGetC(wcs,"SYSTEM"), "AZEL") != 0) {
-          astSet( wcs, "SYSTEM=AZEL"  );
-        }
-        /* Transfrom from pixels to AZEL */
-        astTranGrid( wcs, 2, lbnd, ubnd, 0.1, 1000000, 1, 2, npts, azel );
-      } else {
-        /* this time slice may have bad telescope data so we trap for this and re-enable
-           "quick" with a default value. We'll only get here if airmass was good but
-           SMU was bad so we use the good airmass. The map-maker won't be using this
-           data but we need to use something plausible so that we do not throw off the FFTs */
-        quick = 1;
-        extcorr = exp(airmass*tau);
-      }
-    }
-    /* Loop over data in time slice. Start counting at 1 since this is
-       the GRID coordinate frame */
-    base = npts * k;  /* Offset into 3d data array (time-ordered) */
-
-    for (i=0; i < npts && ( *status == SAI__OK ); i++ ) {
-      /* calculate array indices - assumes that astTranGrid fills up
-         azel[] array in same order as bolometer data are aligned */
-      size_t index;
-      if ( isTordered ) {
-        index = base + i;
-      } else {
-        index = k + (nframes * i);
-      }
-
-      if (!quick) {
-        if (tau != VAL__BADD) {
-          double zd;
-          zd = M_PI_2 - azel[npts+i];
-          airmass = palAirmas( zd );
-          extcorr = exp(airmass*tau);
-        } else {
-          extcorr = VAL__BADD;
-        }
-      }
-
-      if( allextcorr ) {
-        /* Store extinction correction factor */
-        allextcorr[index] = extcorr;
-      } else {
-        /* Otherwise Correct the data */
-        if (extcorr != VAL__BADD) {
-          if( indata && (indata[index] != VAL__BADD) ) {
-            indata[index] *= extcorr;
-          }
-
-          /* Correct the variance */
-          if( vardata && (vardata[index] != VAL__BADD) ) {
-            vardata[index] *= extcorr * extcorr;
-          }
-        } else {
-          if (indata) indata[index] = VAL__BADD;
-          if (vardata) vardata[index] = VAL__BADD;
-        }
-      }
-
-    }
-
-    /* Note that we do not need to free "wcs" or revert its SYSTEM
-       since smf_tslice_ast will replace the object immediately. */
-  } /* End loop over timeslice */
+    /* Free the job data. */
+    job_data = astFree( job_data );
+  }
 
   /* Add history entry if !allextcorr */
   if( (*status == SAI__OK) && !allextcorr ) {
@@ -627,7 +553,6 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
   }
 
  CLEANUP:
-  if (azel) azel = astFree( azel );
   if (wvmtaucache) {
     if (!*wvmtaucache) {
       *wvmtaucache = wvmtau;
@@ -670,3 +595,236 @@ static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
     return 0;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_correct_extinction
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_correct_extinction.
+
+*  Invocation:
+*     smf1_correct_extinction( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfCorrectExtinctionData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+  /* Local Variables: */
+  SmfCorrectExtinctionData *pdata;
+  double airmass;          /* Airmass */
+  double state_airmass;    /* Airmass read from header */
+  double state_az_ac2;     /* Elevation read from header */
+  double amprev;           /* Previous airmass in loop */
+  double *azel = NULL;     /* AZEL coordinates */
+  size_t base;             /* Offset into 3d data array */
+  double extcorr = 1.0;    /* Extinction correction factor */
+  dim_t i;                 /* Loop counter */
+  dim_t k;                 /* Loop counter */
+  AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
+  AstFrameSet *state_wcs = NULL; /* Pointer to copy of frameset from header */
+
+  /* Check inherited status */
+  if( *status != SAI__OK ) return;
+
+  /* Get a pointer that can be used for accessing the required items in the
+  supplied structure. */
+  pdata = (SmfCorrectExtinctionData *) job_data_ptr;
+
+  /* It is more efficient to call astTranGrid than astTran2
+     Allocate memory in adaptive mode just in case. */
+  if (pdata->method == SMF__EXTMETH_FULL ||
+      pdata->method == SMF__EXTMETH_ADAPT ) {
+    azel = astMalloc( (2*pdata->npts)*sizeof(*azel) );
+  }
+
+  amprev = pdata->amfirst;
+
+  for ( k=pdata->f1; k<=pdata->f2 && (*status == SAI__OK) ; k++) {
+    /* Flags to indicate which mode we are using for this time slice */
+    int quick = 0;  /* use single airmass */
+    int adaptive = 0; /* switch from quick to full if required */
+    if (pdata->method == SMF__EXTMETH_SINGLE) {
+      quick = 1;
+    } else if (pdata->method == SMF__EXTMETH_ADAPT) {
+      quick = 1;
+      adaptive = 1;
+    }
+
+    /* Call tslice_ast to update the header for the particular
+       timeslice. If we're in QUICK mode then we don't need the WCS. Use
+       a mutex to prevent multiple threads writing to the header at the same
+       time.  */
+    thrMutexLock( &data_mutex, status );
+    smf_tslice_ast( pdata->data, k, !quick, status );
+
+    /* Copy the required bit of the header into thread-local storage. */
+    state_airmass = pdata->hdr->state->tcs_airmass;
+    state_az_ac2 = pdata->hdr->state->tcs_az_ac2;
+    if( !quick && pdata->tau != VAL__BADD ) state_wcs = astCopy( pdata->hdr->wcs );
+
+    /* Unlock the mutex. */
+    thrMutexUnlock( &data_mutex, status );
+
+    /* Read the WVM tau value if required */
+    if (pdata->tausrc == SMF__TAUSRC_WVMRAW) {
+      pdata->tau = pdata->wvmtau[k];
+    }
+
+    /* in all modes we need to keep track of the previous airmass in case
+       we need to gap fill bad telescope data */
+    if ( quick && pdata->ndims == 2 ) {
+      /* for 2-D we use the FITS header directly */
+      /* This may change depending on exact FITS keyword */
+      airmass = pdata->amstart;
+
+      /* speed is not an issue for a 2d image */
+      adaptive = 0;
+
+    } else {
+      /* Else use airmass value in state structure */
+      airmass = state_airmass;
+
+      /* if things have gone bad use the previous value else store
+         this value. We also need to switch to quick mode and disable adaptive. */
+      if (airmass == VAL__BADD || airmass == 0.0 ) {
+        if ( state_az_ac2 != VAL__BADD ) {
+          /* try the elevation */
+          airmass = palAirmas( M_PI_2 - state_az_ac2 );
+        } else {
+          airmass = amprev;
+          quick = 1;
+          adaptive = 0;
+        }
+      } else {
+        amprev = airmass;
+      }
+    }
+
+    /* If we're using the FAST application method, we assume a single
+       airmass and tau for the whole array but we have to consider adaptive mode.
+       If the tau is bad the extinction correction must also be bad. */
+    if( pdata->tau == VAL__BADD) {
+      extcorr = VAL__BADD;
+    } else if (quick) {
+      /* we have an airmass, see if we need to provide per-pixel correction */
+      if (adaptive) {
+        if (is_large_delta_atau( airmass, pdata->hdr->state->tcs_az_ac2,
+                                 pdata->tau, status) ) {
+          /* we need WCS if we disable fast mode */
+          quick = 0;
+
+          thrMutexLock( &data_mutex, status );
+          smf_tslice_ast( pdata->data, k, 1, status );
+          state_airmass = pdata->hdr->state->tcs_airmass;
+          state_az_ac2 = pdata->hdr->state->tcs_az_ac2;
+          state_wcs = astCopy( pdata->hdr->wcs );
+          thrMutexUnlock( &data_mutex, status );
+
+        }
+      }
+
+      if (quick) extcorr = exp(airmass*pdata->tau);
+    }
+
+    /* The previous test may have forced quick off so we can not combine
+       the tests in one if-then-else block */
+    if (!quick && pdata->tau != VAL__BADD )  {
+      /* Not using quick so retrieve WCS to obtain elevation info */
+      wcs = state_wcs;
+      /* Check current frame, store it and then select the AZEL
+         coordinate system */
+      if (wcs != NULL) {
+        if (strcmp(astGetC(wcs,"SYSTEM"), "AZEL") != 0) {
+          astSet( wcs, "SYSTEM=AZEL"  );
+        }
+        /* Transfrom from pixels to AZEL */
+        astTranGrid( wcs, 2, pdata->lbnd, pdata->ubnd, 0.1, 1000000, 1, 2,
+                     pdata->npts, azel );
+      } else {
+        /* this time slice may have bad telescope data so we trap for this and re-enable
+           "quick" with a default value. We'll only get here if airmass was good but
+           SMU was bad so we use the good airmass. The map-maker won't be using this
+           data but we need to use something plausible so that we do not throw off the FFTs */
+        quick = 1;
+        extcorr = exp(airmass*pdata->tau);
+      }
+    }
+    /* Loop over data in time slice. Start counting at 1 since this is
+       the GRID coordinate frame */
+    base = pdata->npts * k;  /* Offset into 3d data array (time-ordered) */
+
+    for (i=0; i < pdata->npts && ( *status == SAI__OK ); i++ ) {
+      /* calculate array indices - assumes that astTranGrid fills up
+         azel[] array in same order as bolometer data are aligned */
+      size_t index;
+      if ( pdata->isTordered ) {
+        index = base + i;
+      } else {
+        index = k + (pdata->nframes * i);
+      }
+
+      if (!quick) {
+        if (pdata->tau != VAL__BADD) {
+          double zd;
+          zd = M_PI_2 - azel[pdata->npts+i];
+          airmass = palAirmas( zd );
+          extcorr = exp(airmass*pdata->tau);
+        } else {
+          extcorr = VAL__BADD;
+        }
+      }
+
+      if( pdata->allextcorr ) {
+        /* Store extinction correction factor */
+        pdata->allextcorr[index] = extcorr;
+      } else {
+        /* Otherwise Correct the data */
+        if (extcorr != VAL__BADD) {
+          if( pdata->indata && (pdata->indata[index] != VAL__BADD) ) {
+            pdata->indata[index] *= extcorr;
+          }
+
+          /* Correct the variance */
+          if( pdata->vardata && (pdata->vardata[index] != VAL__BADD) ) {
+            pdata->vardata[index] *= extcorr * extcorr;
+          }
+        } else {
+          if (pdata->indata) pdata->indata[index] = VAL__BADD;
+          if (pdata->vardata) pdata->vardata[index] = VAL__BADD;
+        }
+      }
+
+    }
+
+    /* Note that we do not need to free "wcs" or revert its SYSTEM
+       since smf_tslice_ast will replace the object immediately. */
+  } /* End loop over timeslice */
+
+  azel = astFree( azel );
+
+}
+
