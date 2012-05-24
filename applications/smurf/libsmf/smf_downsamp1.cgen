@@ -13,13 +13,22 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_downsamp1<X>( const CGEN_TYPE *in, size_t instride,
-*                            int inbytestride, size_t inlen, void *out,
-*                            size_t outstride, int outbytestride,
+*     void smf_downsamp1<X>( ThrWorkForce *wf, const CGEN_TYPE *in,
+*                            size_t instride, int inbytestride, size_t inlen,
+*                            void *out, size_t outstride, int outbytestride,
 *                            size_t outlen, int todouble, int init,
 *                            int isang, int *status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        A structure holding a set of workjer threads. NOTE - THIS
+*        ARGUMENT IS USED IN A DIFFERENT WAY THAN IN MOST OTHER SMF
+*        FUNCTIONS. If "wf" is not NULL, then a single job will be
+*        submitted to the workforce to do the resampling, and this
+*        function will return immediately (i.e. it will not wait for
+*        the job to complete). If "wf" is NULL, the ressampling will be
+*        done in the current thread, and this function will not return
+*        until the resampling is completed.
 *     in = const CGEN_TYPE* (Given)
 *        Pointer to input data array
 *     instride = size_t (Given)
@@ -127,12 +136,41 @@
 #include "mers.h"
 #include "msg_par.h"
 #include "prm_par.h"
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "smf.h"
 #include "smurf_par.h"
 #include "smurf_typ.h"
 #include "libsmf/smf_err.h"
+
+
+/* Local data types. */
+typedef struct CGEN_FUNCTION(smfDownSamp1Data) {
+   const void *in;
+   size_t instride;
+   int inbytestride;
+   size_t inlen;
+   void *out;
+   size_t outstride;
+   int outbytestride;
+   size_t outlen;
+   int todouble;
+   int init;
+   int isang ;
+} CGEN_FUNCTION(smfDownSamp1Data);
+
+/* Prototypes for local functions. */
+static void CGEN_FUNCTION(smf1_calldownsamp1)( void *job_data, int *status );
+static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
+                                          int inbytestride, size_t inlen,
+                                          void *out, size_t outstride,
+                                          int outbytestride, size_t outlen,
+                                          int todouble, int init, int isang,
+                                          int *status );
+
+
+
 
 /* A couple of macros to simplify our pointer math. Since we're using
    a base pointer with offset indices multiplied by strides in bytes
@@ -148,11 +186,75 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_downsamp1"
 
-void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
-                                   int inbytestride, size_t inlen, void *out,
-                                   size_t outstride, int outbytestride,
-                                   size_t outlen, int todouble, int init,
-                                   int isang, int *status ) {
+void CGEN_FUNCTION(smf_downsamp1)( ThrWorkForce *wf, const CGEN_TYPE *in,
+                                   size_t instride, int inbytestride,
+                                   size_t inlen, void *out, size_t outstride,
+                                   int outbytestride, size_t outlen,
+                                   int todouble, int init, int isang,
+                                   int *status ) {
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* If a workforce has been supplied, allocate memory to hold the job
+   data, store the supplied arguments in the job data, and then submit a
+   job to the workforce. Use the THR__FREE_JOBDATA flag to Ensure the
+   memory holding the job data is freed automatically when the job is
+   complete. */
+   if( wf ) {
+      CGEN_FUNCTION(smfDownSamp1Data) *pdata = astMalloc( sizeof( *pdata ) );
+      if( *status == SAI__OK ) {
+         pdata->in = in;
+         pdata->instride = instride;
+         pdata->inbytestride = inbytestride;
+         pdata->inlen = inlen;
+         pdata->out = out;
+         pdata->outstride = outstride;
+         pdata->outbytestride = outbytestride;
+         pdata->outlen = outlen;
+         pdata->todouble = todouble;
+         pdata->init = init;
+         pdata->isang = isang;
+
+         thrAddJob( wf, THR__FREE_JOBDATA, pdata,
+                    CGEN_FUNCTION(smf1_calldownsamp1), 0, NULL, status );
+      }
+
+/* If no workforce has been supplied, just execute the job in the current
+   thread directly. */
+   } else {
+      CGEN_FUNCTION(smf1_downsamp1)( in, instride, inbytestride, inlen, out,
+                                     outstride, outbytestride, outlen,
+                                     todouble, init, isang, status );
+   }
+
+}
+
+
+
+/* This function is invoked by the Thr thread manager. It extracts the
+   job data from the supplied structure and calls smf1_downsamp1 to do the
+   work in the current thread. */
+static void CGEN_FUNCTION(smf1_calldownsamp1)( void *job_data, int *status ) {
+   if( *status != SAI__OK ) return;
+   CGEN_FUNCTION(smfDownSamp1Data) *pdata = job_data;
+   CGEN_FUNCTION(smf1_downsamp1)( (const CGEN_TYPE *) pdata->in,
+                                  pdata->instride, pdata->inbytestride,
+                                  pdata->inlen, pdata->out, pdata->outstride,
+                                  pdata->outbytestride, pdata->outlen,
+                                  pdata->todouble, pdata->init, pdata->isang,
+                                  status );
+}
+
+
+
+/* This function does the actual downsampling, in the current thread. */
+static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
+                                          int inbytestride, size_t inlen,
+                                          void *out, size_t outstride,
+                                          int outbytestride, size_t outlen,
+                                          int todouble, int init, int isang,
+                                          int *status ) {
 
   /* Local variables */
   size_t i;                   /* High-res index */
@@ -493,3 +595,7 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
   }
 
 }
+
+
+
+

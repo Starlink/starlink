@@ -13,10 +13,13 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_downsamp_smfData( smfData *idata, smfData **odata, dim_t ontslice,
-*                           int todouble, int method, int *status );
+*     smf_downsamp_smfData( ThrWorkForce *wf, smfData *idata, smfData **odata,
+*                           dim_t ontslice, int todouble, int method,
+*                           int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     idata = smfData* (Given)
 *        Pointer to an input smfData struct
 *     odata = smfData** (Given and Returned)
@@ -51,7 +54,8 @@
 *     This routine does not downsample the VARIANCE or QUALITY components.
 
 *  Authors:
-*     Ed Chapin (UBC)
+*     EC: Ed Chapin (UBC)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +68,8 @@
 *        Add todouble flag
 *     2011-06-22 (EC)
 *        Add FFT-based method
+*     2012-05-24 (DSB)
+*        Multi-thread.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,13 +115,13 @@
 
 /* Macro to simplify resampling of individual JCMTState fields */
 
-#define RESAMPSTATE(in,out,member,intslice,ontslice,isang) smf_downsamp1D( &(in->member),sizeof(JCMTState),1,intslice,&(out->member), sizeof(JCMTState),1,ontslice,1,1,isang,status );
+#define RESAMPSTATE(in,out,member,intslice,ontslice,isang) smf_downsamp1D( wf, &(in->member),sizeof(JCMTState),1,intslice,&(out->member), sizeof(JCMTState),1,ontslice,1,1,isang,status );
 
 #define FUNC_NAME "smf_downsamp_smfData"
 
-void smf_downsamp_smfData( const smfData *idata, smfData **odata,
-                           dim_t ontslice, int todouble, int method,
-                           int *status ) {
+void smf_downsamp_smfData( ThrWorkForce *wf, const smfData *idata,
+                           smfData **odata, dim_t ontslice, int todouble,
+                           int method, int *status ) {
 
   size_t i;                /* loop counter */
   size_t ibstride;         /* bstride of idata */
@@ -330,7 +336,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
           double *odat = (*odata)->pntr[0];
 
           for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
-            smf_downsamp1D( idat+i*ibstride, itstride, 0, intslice,
+            smf_downsamp1D( wf, idat+i*ibstride, itstride, 0, intslice,
                             odat+i*obstride, otstride, 0, ontslice, 1, 0,
                             0, status );
           }
@@ -346,7 +352,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
             (*odata)->dtype = SMF__DOUBLE;
 
             for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
-              smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
+              smf_downsamp1I( wf, idat+i*ibstride, itstride, 0, intslice,
                               odat+i*obstride, otstride, 0, ontslice, 1, 0,
                               0, status);
             }
@@ -355,7 +361,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
             int *odat = (*odata)->pntr[0];
 
             for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
-              smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
+              smf_downsamp1I( wf, idat+i*ibstride, itstride, 0, intslice,
                               odat+i*obstride, otstride, 0, ontslice, 0, 0,
                               0, status);
             }
@@ -365,6 +371,10 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
           errRep( "", FUNC_NAME ": Don't know how to handle data type",
                   status );
         }
+
+        /* Wait for all the above smf_downsamp1 jobs to finish. */
+        thrWait( wf, status );
+
       }
     }
   }
@@ -433,6 +443,10 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
 
         RESAMPSTATE(instate, outstate, tcs_dm_abs, intslice, ontslice, 1);
         RESAMPSTATE(instate, outstate, tcs_dm_rel, intslice, ontslice, 0);
+
+        /* Wait for all the above smf_downsamp1 jobs to finish. */
+        thrWait( wf, status );
+
       }
 
     }
@@ -444,7 +458,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
 
     /* Down-sample the dark squids */
     if( indksquid ) {
-      smf_downsamp_smfData( indksquid, &da->dksquid, ontslice, todouble,
+      smf_downsamp_smfData( wf, indksquid, &da->dksquid, ontslice, todouble,
                             method, status );
     }
   }
