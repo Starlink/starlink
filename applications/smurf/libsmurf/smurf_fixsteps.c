@@ -99,6 +99,11 @@
 *        file can be re-used in a later run via the OLDSTEPS parameter.
 *        It can also be viewed using "topcat -f ascii". If a null (!)
 *        value is supplied for NEWSTEPS, no file is created. [!]
+*     NFIXED = _INTEGER (Write)
+*        The number of steps fixed.
+*     NREJECTED = _INTEGER (Write)
+*        The number of bolometers rejected due to them containing too many
+*        steps.
 *     OLDSTEPS = FILENAME (Read)
 *        Name of a text file holding a description of each step that
 *        should be fixed, if the step fixing algorithm is working
@@ -127,6 +132,8 @@
 *        Initial version.
 *     9-DEC-2011 (DSB):
 *        Added MEANSHIFT parameter.
+*     24-MAY-2012 (DSB):
+*        Added NREJEDCTED and NFIXED parameters.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -310,6 +317,7 @@ void smurf_fixsteps( int *status ) {
       msgSeti( "NREJ", nrej );
       msgOut( "", "^NREJ bolometers were rejected", status );
    }
+   parPut0i( "NREJECTED", nrej, status );
 
    if( nnew == 0 ) {
       msgOut( "", "No steps were fixed", status );
@@ -319,6 +327,7 @@ void smurf_fixsteps( int *status ) {
       msgSeti( "NNEW", nnew );
       msgOut( "", "^NNEW steps were fixed", status );
    }
+   parPut0i( "NFIXED", nnew, status );
 
 /* If required, write out to a text file details of the steps that were
    fixed. */

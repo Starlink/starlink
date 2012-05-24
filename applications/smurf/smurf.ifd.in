@@ -1588,6 +1588,24 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter nfixed {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                prompt {Number of fixed steps}
+                default 0
+                helpkey *
+            }
+
+            parameter nrejected {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                prompt {Number of rejected bolometers}
+                default 0
+                helpkey *
+            }
+
             parameter oldsteps {
                 type LITERAL
                 prompt {Name of input text file holding old step descriptions}
