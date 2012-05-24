@@ -13,10 +13,12 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     void smf_fft_cart2pol( smfData *data, int inverse, int power,
-*                            int *status );
+*     void smf_fft_cart2pol( ThrWorkForce *wf, smfData *data, int inverse,
+*                            int power, int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     data = smfData * (Given)
 *        smfData to convert
 *     inverse = int (Given)
@@ -34,8 +36,9 @@
 *     stored in radians in the range (-PI,PI).
 
 *  Authors:
-*     Ed Chapin (UBC)
+*     EC: Ed Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -53,9 +56,11 @@
 *        Handle 2D FFTs
 *     2011-09-28 (EC):
 *        Handle normalization and units of 2-d PSDs properly
+*     2012-05-24 (DSB):
+*        Multi-thread.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009, 2012 Science & Technology Facilities Council.
 *     Copyright (C) 2008,2011 University of British Columbia.
 *     All Rights Reserved.
 
@@ -105,26 +110,40 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
+/* Prototypes for local static functions. */
+static void smf1_fft_cart2pol( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfFFTCart2PolData {
+   dim_t b1;
+   dim_t b2;
+   dim_t nf;
+   double *dat_data;
+   double df;
+   int inverse;
+   int power;
+   size_t ntransforms;
+} SmfFFTCart2PolData;
+
 #define FUNC_NAME "smf_fft_cart2pol"
 
-void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
+void smf_fft_cart2pol( ThrWorkForce *wf, smfData *data, int inverse, int power,
+                       int *status ) {
 
-  double amp=0;                 /* Amplitude coeff */
-  double *baseR=NULL;           /* base pointer to real/amplitude coeff */
-  double *baseI=NULL;           /* base pointer to imag/argument coeff */
   double df;                    /* Product of df all axes */
   double df_data[2]={1,1};      /* frequency steps in Hz, or (1/arcsec)^2 */
   dim_t fdims[2];               /* Lengths of frequency-space axes */
   size_t i;                     /* Loop counter */
-  double imag;                  /* Imaginary coeff */
-  size_t j;                     /* Loop counter */
   dim_t nbolo=0;                /* Number of detectors  */
   size_t ndims;                 /* Number of real-space dimensions */
   size_t ntransforms;           /* Number of transforms in the data */
   dim_t nf=0;                   /* Number of frequencies in FFT */
   dim_t rdims[2];               /* Lengths of real-space axes */
-  double real;                  /* Real coeff */
-  double theta;                 /* Argument */
+  int nw;                       /* Number of worker threads */
+  int iw;                       /* Thread index */
+  SmfFFTCart2PolData *pdata;    /* Pointer to data for one job */
+  SmfFFTCart2PolData *job_data = NULL; /* Pointer to data for all jobs */
+  dim_t transtep;               /* No. of transforms per thread */
 
   if( *status != SAI__OK ) return;
 
@@ -151,76 +170,50 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
 
   /* Loop over bolometer if time-series, or only a single pass if we
      are looking at the FFT of a map. */
-
   ntransforms = (ndims == 1) ? nbolo : 1;
 
-  for( i=0; (*status==SAI__OK)&&(i<ntransforms); i++ ) {
-    /* Pointers to components of this bolo */
-    baseR = data->pntr[0];
-    baseR += i*nf;
-    baseI = baseR + nf*ntransforms;
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
 
-    if( inverse ) {
+  /* Find how many transformations to process in each worker thread. */
+  transtep = ntransforms/nw;
+  if( transtep == 0 ) {
+     transtep = 1;
+     nw = ntransforms;
+  }
 
-      for( j=0; (*status==SAI__OK)&&(j<nf); j++ ) {
-        if( (baseR[j]!=VAL__BADD) && (baseI[j]!=VAL__BADD) ) {
-          if( fabs(baseI[j]) > AST__DPI ) {
-            /* Check for valid argument */
-            *status = SAI__ERROR;
-            errRep( "", FUNC_NAME
-                    ": abs(argument) > PI. FFT data may not be in polar form.",
-                    status);
-          } else {
-            /* Convert polar --> cartesian */
-            if( power ) {
-              /* Converting from PSD */
-              if( baseR[j] < 0 ) {
-                /* Check for sqrt of negative number */
-                *status = SAI__ERROR;
-                errRep( "", FUNC_NAME
-                        ": amplitude^2 < 0. FFT data may not be in correct "
-                        "form", status);
-              } else {
-                amp = sqrt(baseR[j]*df);
-              }
-            } else {
-              amp = baseR[j];
-            }
+  /* Allocate job data for threads, and store the range of bolos to be
+     processed by each one. Ensure that the last thread picks up any
+     left-over bolos. */
+  job_data = astCalloc( nw, sizeof(*job_data) );
+  if( *status == SAI__OK ) {
 
-            real = amp*cos(baseI[j]);
-            imag = amp*sin(baseI[j]);
-            baseR[j] = real;
-            baseI[j] = imag;
-          }
-        } else {
-          baseR[j] = VAL__BADD;
-          baseI[j] = VAL__BADD;
-        }
+    for( iw = 0; iw < nw; iw++ ) {
+      pdata = job_data + iw;
+      pdata->b1 = iw*transtep;
+      if( iw < nw - 1 ) {
+         pdata->b2 = pdata->b1 + transtep - 1;
+      } else {
+         pdata->b2 = ntransforms - 1 ;
       }
-    } else {
-      for( j=0; j<nf; j++ ) {
-        /* Convert cartesian --> polar */
-        if( (baseR[j]!=VAL__BADD)&&
-            (baseI[j]!=VAL__BADD) ) {
 
-          amp = baseR[j]*baseR[j] + baseI[j]*baseI[j];
+      /* Store other values common to all jobs. */
+      pdata->dat_data = data->pntr[0];
+      pdata->df = df;
+      pdata->inverse = inverse;
+      pdata->power = power;
+      pdata->nf = nf;
+      pdata->ntransforms = ntransforms;
 
-          if( power ) {
-            /* Calculate power spectral density */
-            amp /= df;
-          } else {
-            /* Normal polar form */
-            amp = sqrt(amp);
-          }
-          theta = atan2( baseI[j], baseR[j] );
-          baseR[j] = amp;
-          baseI[j] = theta;
-        } else {
-          baseR[j] = VAL__BADD;
-          baseI[j] = VAL__BADD;
-        }
-      }
+      /* Submit the job to the workforce. */
+      thrAddJob( wf, 0, pdata, smf1_fft_cart2pol, 0, NULL, status );
     }
+
+    /* Wait for all jobs to complete. */
+    thrWait( wf, status );
+
+    /* Free the job data. */
+    job_data = astFree( job_data );
   }
 
   /* Convert the units and labels of the axes using AST */
@@ -276,4 +269,147 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
     }
 
   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static void smf1_fft_cart2pol( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_fft_cart2pol
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_fft_cart2pol.
+
+*  Invocation:
+*     smf1_fft_cart2pol( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfFFTCart2PolData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfFFTCart2PolData *pdata;
+   dim_t ibolo;
+   dim_t ifreq;
+   double *baseI;
+   double *baseR;
+   double amp;
+   double imag;
+   double real;
+   double theta;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfFFTCart2PolData *) job_data_ptr;
+
+/* Pointers to components for the first bolo. */
+   baseR = pdata->dat_data;
+   baseR += pdata->b1*pdata->nf;
+   baseI = baseR + pdata->nf*pdata->ntransforms;
+
+/* Do each bolo in turn. */
+   for( ibolo = pdata->b1; ibolo < pdata->b2 && *status == SAI__OK; ibolo++ ) {
+
+/* Inverse transformation (polar to Cartesian). */
+      if( pdata->inverse ) {
+
+         for( ifreq = 0; ifreq < pdata->nf; ifreq++ ) {
+            if( baseR[ ifreq ] != VAL__BADD && baseI[ ifreq ] != VAL__BADD ) {
+
+
+/* Check for valid argument */
+               if( fabs( baseI[ ifreq ] ) > AST__DPI ) {
+                  *status = SAI__ERROR;
+                  errRep( "", FUNC_NAME ": abs(argument) > PI. FFT data "
+                          "may not be in polar form.", status);
+                  break;
+
+               } else {
+
+/* Convert polar --> cartesian */
+                  if( pdata->power ) {
+
+/* Converting from PSD. Check for sqrt of negative number */
+                     if( baseR[ ifreq ] < 0 ) {
+                        *status = SAI__ERROR;
+                        errRep( "", FUNC_NAME ": amplitude^2 < 0. FFT data "
+                                "may not be in correct form", status);
+                        break;
+
+                     } else {
+                        amp = sqrt( baseR[ ifreq ]*pdata->df );
+                     }
+
+                  } else {
+                     amp = baseR[ ifreq ];
+                  }
+
+                  real = amp*cos( baseI[ ifreq ]);
+                  imag = amp*sin( baseI[ ifreq ]);
+                  baseR[ ifreq ] = real;
+                  baseI[ ifreq ] = imag;
+               }
+
+            } else {
+               baseR[ ifreq ] = VAL__BADD;
+               baseI[ ifreq ] = VAL__BADD;
+            }
+         }
+
+/* Forward transformation (Cartesian to polar). */
+      } else {
+
+         for( ifreq = 0; ifreq < pdata->nf; ifreq++ ) {
+
+/* Convert cartesian --> polar */
+            if( baseR[ ifreq ] != VAL__BADD && baseI[ ifreq ] != VAL__BADD ) {
+               amp = baseR[ ifreq ]*baseR[ ifreq ] + baseI[ ifreq ]*baseI[ ifreq ];
+
+/* Calculate power spectral density */
+               if( pdata->power ) {
+                  amp /= pdata->df;
+
+/* Normal polar form */
+               } else {
+                  amp = sqrt( amp );
+               }
+
+               theta = atan2( baseI[ ifreq ], baseR[ ifreq ] );
+               baseR[ ifreq ] = amp;
+               baseI[ ifreq ] = theta;
+
+            } else {
+               baseR[ ifreq ] = VAL__BADD;
+               baseI[ ifreq ] = VAL__BADD;
+            }
+         }
+      }
+
+/* Prepare for next bolometer. */
+      baseR += pdata->nf;
+      baseI += pdata->nf;
+   }
 }
