@@ -662,7 +662,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         /* If required, downsample the data and if it is raw, convert it to
            double precision. Then release the original data. */
         if( dslen && dslen[j-firstpiece] ) {
-          smf_downsamp_smfData( tmpdata, &refdata, dslen[j-firstpiece],
+          smf_downsamp_smfData( wf, tmpdata, &refdata, dslen[j-firstpiece],
                                 1, 0, status );
           smf_close_file( &tmpdata, status );
 
