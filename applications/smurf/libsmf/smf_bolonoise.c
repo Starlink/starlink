@@ -216,7 +216,7 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data,
   /* FFT the data and convert to polar power spectral density form */
   pow = smf_fft_data( wf, data, NULL, 0, len, status );
   smf_convert_bad(  pow, status );
-  smf_fft_cart2pol( pow, 0, 1, status );
+  smf_fft_cart2pol( wf, pow, 0, 1, status );
 
   {
     dim_t fdims[2];

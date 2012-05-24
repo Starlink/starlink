@@ -162,7 +162,7 @@ void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
 
   /* Calculate azimuthally-averaged angular power spectrum */
   map_fft = smf_fft_data( wf, map, NULL, 0, 0, status );
-  smf_fft_cart2pol( map_fft, 0, 1, status );
+  smf_fft_cart2pol( wf, map_fft, 0, 1, status );
   pspec = smf_fft_2dazav( map_fft, &df, status );
   if( *status == SAI__OK ) {
     nf = pspec->dims[0];
