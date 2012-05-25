@@ -494,6 +494,10 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
   ubnd[0] = nx;
   ubnd[1] = ny;
 
+  /* Unlock the AST objects in the smfData so that the worker threads can
+     lock them. */
+  smf_lock_data( data, 0, status );
+
   /* How many threads do we get to play with */
   nw = wf ? wf->nworker : 1;
 
@@ -546,6 +550,9 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
     /* Free the job data. */
     job_data = astFree( job_data );
   }
+
+  /* Lock the AST objects in the smfData for use by this thread. */
+  smf_lock_data( data, 1, status );
 
   /* Add history entry if !allextcorr */
   if( (*status == SAI__OK) && !allextcorr ) {
@@ -679,15 +686,22 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
        a mutex to prevent multiple threads writing to the header at the same
        time.  */
     thrMutexLock( &data_mutex, status );
+    smf_lock_data( pdata->data, 1, status );
     smf_tslice_ast( pdata->data, k, !quick, status );
 
     /* Copy the required bit of the header into thread-local storage. */
-    state_airmass = pdata->hdr->state->tcs_airmass;
-    state_az_ac2 = pdata->hdr->state->tcs_az_ac2;
-    if( !quick && pdata->tau != VAL__BADD ) state_wcs = astCopy( pdata->hdr->wcs );
+    if( *status == SAI__OK ) {
+       state_airmass = pdata->hdr->state->tcs_airmass;
+       state_az_ac2 = pdata->hdr->state->tcs_az_ac2;
+       if( !quick && pdata->tau != VAL__BADD ) state_wcs = astCopy( pdata->hdr->wcs );
+    }
 
-    /* Unlock the mutex. */
+    /* Unlock the AST Objects in the smfData then unlock the local mutex. */
+    smf_lock_data( pdata->data, 0, status );
     thrMutexUnlock( &data_mutex, status );
+
+    /* Abort if an error has occurred. */
+    if( *status != SAI__OK ) break;
 
     /* Read the WVM tau value if required */
     if (pdata->tausrc == SMF__TAUSRC_WVMRAW) {
@@ -738,10 +752,12 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
           quick = 0;
 
           thrMutexLock( &data_mutex, status );
+          smf_lock_data( pdata->data, 1, status );
           smf_tslice_ast( pdata->data, k, 1, status );
           state_airmass = pdata->hdr->state->tcs_airmass;
           state_az_ac2 = pdata->hdr->state->tcs_az_ac2;
           state_wcs = astCopy( pdata->hdr->wcs );
+          smf_lock_data( pdata->data, 0, status );
           thrMutexUnlock( &data_mutex, status );
 
         }
