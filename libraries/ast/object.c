@@ -7199,7 +7199,7 @@ c--
    Object structure (using astManageLock) since as soon as astManageLock
    returns, another thread that is waiting for the object to be unlocked
    may start up and modify the handle properties. */
-   if( handles[ ihandle ].context >= 0 ) {
+   if( ihandle >= 0 && handles[ ihandle ].context >= 0 ) {
       RemoveHandle( ihandle, &active_handles[ handles[ ihandle ].context ],
                     status );
 #if defined(MEM_DEBUG)
