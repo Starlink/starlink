@@ -23744,7 +23744,7 @@ MAKE_REBINSEQ_(I,int)
 #undef MAKE_REBINSEQ_
 
 double astRate_( AstMapping *this, double *at, int ax1, int ax2, int *status ){
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
 
    if ( !astOK ) return AST__BAD;
 

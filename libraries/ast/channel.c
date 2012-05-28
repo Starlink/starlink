@@ -597,7 +597,7 @@ c++
 *     the AST library.
 c--
 */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    astGET_GLOBALS(NULL);
    return channel_data;
 }
@@ -4487,7 +4487,7 @@ int astWriteInvocations_( int *status ){
 *     the AstUnit class as an example.
 *-
 */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    astGET_GLOBALS(NULL);
    return nwrite_invoc;
 }

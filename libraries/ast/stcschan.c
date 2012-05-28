@@ -875,7 +875,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstStcsChan *this;            /* Pointer to the StcsChan structure */
    const char *result;           /* Pointer value to return */
    int ival;                     /* Integer attribute value */
@@ -1751,7 +1751,7 @@ void astInitStcsChanVtab_(  AstStcsChanVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstChannelVtab *channel;      /* Pointer to Channel component of Vtab */
 
@@ -5920,7 +5920,7 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
    AstRegion *coords;        /* The Region representing the STC Coords */
    AstRegion *new_coords;    /* COORDS Region mapped into frame of AREA */
    AstStcsChan *this;        /* Pointer to the StcsChan structure */
-   astDECLARE_GLOBALS;       /* Declare the thread specific global data */
+   astDECLARE_GLOBALS        /* Declare the thread specific global data */
    const char *class;        /* Pointer to string holding object class */
    const char *errclass;     /* Type of the failed entry */
    const char *errname;      /* Name of the failed entry */
@@ -8031,7 +8031,7 @@ f     pointer.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstStcsChan *new;             /* Pointer to new StcsChan */
    va_list args;                 /* Variable argument list */
 
@@ -8113,7 +8113,7 @@ AstStcsChan *astStcsChanId_( const char *(* source)( void ),
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstStcsChan *new;             /* Pointer to new StcsChan */
    va_list args;                 /* Variable argument list */
 
@@ -8303,8 +8303,8 @@ f     encodings and the internal ASCII encoding. If no such routines
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
-   AstStcsChan *new;              /* Pointer to new StcsChan */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   AstStcsChan *new;             /* Pointer to new StcsChan */
    va_list args;                 /* Variable argument list */
    int *status;                  /* Pointer to inherited status value */
 
@@ -8588,7 +8588,7 @@ AstStcsChan *astLoadStcsChan_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    AstStcsChan *new;            /* Pointer to the new StcsChan */
 
 /* Initialise. */

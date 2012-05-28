@@ -4236,7 +4236,7 @@ int astMemoryId_( const void *ptr, int *status ){
 
 *-
 */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    astGET_GLOBALS(NULL);
    return ptr ? ((Memory *)(ptr-SIZEOF_MEMORY))->id : -1;
 }
@@ -4435,7 +4435,7 @@ void astMemoryUse_( const void *ptr, const char *verb, int *status ){
 *-
 */
 
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    astGET_GLOBALS(NULL);
 
    if( ptr && astMemoryId( ptr ) == Watched_ID ) {
@@ -4781,7 +4781,7 @@ static void Issue( Memory *mem, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
 
 /* Return if no pointer was supplied. */
    if( !mem ) return;
@@ -4852,7 +4852,7 @@ static void DeIssue( Memory *mem, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    Memory *next;
    Memory *prev;
 
