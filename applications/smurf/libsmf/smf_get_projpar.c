@@ -96,6 +96,9 @@
 *        retain their original values.
 *     2011-12-08 (TIMJ):
 *        Increase number of digits in DEFLON/DEFLAT string
+*     2012-05-28 (DSB):
+*        If the user supplies a new celestial reference position, then store
+*        it in the skyframe.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -357,6 +360,14 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
             if( astUnformat( skyframe, 2, reflat, par + 3 ) == 0 && *status == SAI__OK ) {
                msgSetc( "REFLAT", reflat );
                errRep( "", "Bad value supplied for REFLAT: '^REFLAT'", status );
+            }
+
+/* Ensure the reference position in the returned SkyFrame is set to the
+   supplied position (which defaults to the first telescope base pointing
+   position). */
+            if( !moving ){
+               astSetD( skyframe, "SkyRef(1)", par[ 2 ] );
+               astSetD( skyframe, "SkyRef(2)", par[ 3 ] );
             }
          }
 
