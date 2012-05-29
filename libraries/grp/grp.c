@@ -72,13 +72,15 @@
 *     6-JUL-201 (DSB):
 *        - grpValid should return zero without error if the supplied Grp
 *        pointer is invalid.
-*        - grpF2C was not modifing the contents of the returned Grp 
+*        - grpF2C was not modifing the contents of the returned Grp
 *        structure if a previously allocated structure was re-used.
+*     29-MAY-2012 (DSB):
+*        Add grpGetcc
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007, 2008, 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008, 2011-2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -804,4 +806,41 @@ Grp *grpHead( const Grp *grp, int *status ){
 }
 
 
+
+F77_SUBROUTINE(grp_getcc)( INTEGER(igrp), CHARACTER(cclist), CHARACTER(cc),
+                           INTEGER(status) TRAIL(cclist) TRAIL(cc) );
+
+void grpGetcc( const Grp *grp, const char *cclist, char *cc, size_t cc_len,
+               int *status) {
+  DECLARE_INTEGER(IGRP);
+  DECLARE_CHARACTER_DYN(CCLIST);
+  DECLARE_INTEGER(STATUS);
+  DECLARE_CHARACTER_DYN(CC);
+
+  IGRP = grpC2F( grp, status );
+
+  F77_CREATE_CHARACTER( CCLIST, strlen(cclist) );
+  F77_EXPORT_CHARACTER( cclist, CCLIST, CCLIST_length );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  /* Create the fortran string one smaller than
+     the C string so that we can take into account the nul */
+  F77_CREATE_CHARACTER( CC, cc_len - 1 );
+
+  F77_LOCK( F77_CALL(grp_getcc)( INTEGER_ARG( &IGRP ),
+		       CHARACTER_ARG(CCLIST),
+		       CHARACTER_ARG(CC),
+		       INTEGER_ARG(&STATUS)
+		       TRAIL_ARG(CCLIST) TRAIL_ARG(CC) ); )
+
+  F77_FREE_CHARACTER( CCLIST );
+  F77_IMPORT_CHARACTER( CC, CC_length, cc );
+  F77_FREE_CHARACTER( CC );
+  F77_IMPORT_INTEGER( STATUS, *status );
+
+  if (*status != SAI__OK) {
+    /* terminate on bad status */
+    cc[0] = '\0';
+  }
+}
 

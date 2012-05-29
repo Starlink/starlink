@@ -136,6 +136,7 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 /* Local Variables: */
    char *accumulation;          /* Sum of concatenated strings */
    char *pname;                 /* Pointer to pass to grpGet */
+   char ind[3];                 /* GRP indirection character */
    char name[ GRP__SZNAM + 1 ]; /* A single string from the group */
    int acclen;                  /* Length of accumulation exc. trailing null */
    int i;                       /* Index into supplied group */
@@ -157,6 +158,9 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 
 /* Get the number of strings in the group. */
    size = grpGrpsz( igrp, status );
+
+/* Get the indirection character used by the group (default is "^"). */
+   grpGetcc( igrp, "INDIRECTION", ind, 2, status );
 
 /* We need to pass a pointer to the "name" variable to grpGet */
    pname = name;
@@ -195,7 +199,7 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
    accumulation of continuation lines is complete, so parse the total
    accumulation. */
          } else {
-            kpg1Kymp2( accumulation, *keymap, status );
+            kpg1Kymp2( accumulation, ind, *keymap, status );
 
 /* Reset the length of the accumulation back to zero in order to start a
    new accumulation with the next string form the group. We retain the
@@ -207,7 +211,7 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 
 /* If the current accumulation has not yet been parsed (e.g. because the
    last string in the group ended with a backslash), parse it now. */
-   if( acclen ) kpg1Kymp2( accumulation, *keymap, status );
+   if( acclen ) kpg1Kymp2( accumulation, ind, *keymap, status );
 
 /* Free resources. */
    accumulation = astFree( accumulation );

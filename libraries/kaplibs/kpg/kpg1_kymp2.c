@@ -9,21 +9,22 @@
 /* Local Constants: */
 #define MAX_COMPLEN 100
 
-void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
+void kpg1Kymp2( const char *string, const char *ind, AstKeyMap *keymap,
+                int *status ){
 /*
 *+
 *  Name:
 *     kpg1Kymp2
 
 *  Purpose:
-*     Parses a "keyword = value" string for kpg1Kymp1 and add to a
-KeyMap..
+*     Parses a "keyword = value" string for kpg1Kymp1 and add to a KeyMap.
 
 *  Language:
 *     C.
 
 *  Invocation:
-*     void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status );
+*     void kpg1Kymp2( const char *string, const char *ind, AstKeyMap *keymap,
+*                     int *status );
 
 *  Description:
 *     This is a service function for kps1Kymp1. It parses the supplied
@@ -34,6 +35,8 @@ KeyMap..
 *  Arguments:
 *     string
 *        The null-terminated "keyword=value" string to be parsed.
+*     ind
+*        The GRP indirection character - only used in error messages.
 *     keymap
 *        A pointer to the KeyMap in which to store the value.
 *     status
@@ -93,6 +96,8 @@ KeyMap..
 *     25-FEB-2010 (DSB):
 *        Allow "keyword=<undef>" syntax to be used to force a keyword to
 *        be in an undefined state.
+*     29-MAY-2012 (DSB):
+*        Added "ind" argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -126,12 +131,20 @@ KeyMap..
 /* Locate the first equals sign. */
    equals = strchr( string, '=' );
 
-/* Report an error if no equals sign was found. */
+/* Report an error if no equals sign was found. If an indirection
+   character is supplied, the error may actually be a missing indirection
+   character rather than a missing equals sign. */
    if( !equals ) {
       *status = SAI__ERROR;
       msgSetc( "S", string );
-      errRep( "KPG1KYMP2_ERR1", "No equals sign found in \"^S\".",
-               status );
+      if( ind ) {
+         msgSetc( "I", ind );
+         errRepf( "KPG1KYMP2_ERR1", "No indirection character (^I) or "
+                  "equals sign found in \"^S\".", status );
+      } else {
+         errRepf( "KPG1KYMP2_ERR1", "No equals sign found in \"^S\".",
+                  status );
+      }
       goto L999;
    }
 
@@ -256,7 +269,7 @@ KeyMap..
 /* Free resources */
          if( vector ) {
             for( ivec = 0; ivec < veclen; ivec++ ) {
-               vector[ ivec ] = astFree( vector[ ivec ] );
+               vector[ ivec ] = astFree( (char *) vector[ ivec ] );
             }
             vector = astFree( vector );
          }
@@ -290,7 +303,7 @@ KeyMap..
       }
 
 /* Call this function recursively to store the component value. */
-      kpg1Kymp2( dot + 1, compmap, status );
+      kpg1Kymp2( dot + 1, ind, compmap, status );
 
 /* Free the component KeyMap pointer. */
       compmap = astAnnul( compmap );
