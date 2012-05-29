@@ -168,7 +168,7 @@ C
 *  If the conversion can potentially fail, then test if the argument
 *  value lies within its allowed bounds.  If not, then return the value
 *  VAL__BAD<T> and set a STATUS value.
-      ELSE IF( ( .TRUE. ) .AND.
+      ELSE IF( ( '<HTYPE>' .NE. '_DOUBLE' ) .AND.
      :         ( NUM_LTR( ARG, LO ) .OR. NUM_GTR( ARG, HI ) ) ) THEN
          VAL_RTO<T> = VAL__BAD<T>
          STATUS = PRM__INTOF
