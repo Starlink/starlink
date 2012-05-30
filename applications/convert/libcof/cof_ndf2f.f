@@ -1137,6 +1137,10 @@
                   CALL FTPPRJ( FUNIT, 0, 1, EL,
      :                         %VAL( CNF_PVAL( IPNTR ) ), FSTAT )
 
+               ELSE IF ( BPIN .EQ. 64 ) THEN
+                  CALL FTPPRK( FUNIT, 0, 1, EL,
+     :                         %VAL( CNF_PVAL( IPNTR ) ), FSTAT )
+
                ELSE IF ( BPIN .EQ. -32 ) THEN
                   CALL FTPPRE( FUNIT, 0, 1, EL,
      :                         %VAL( CNF_PVAL( IPNTR ) ), FSTAT )
