@@ -266,7 +266,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    that all blocks should be fitted. */
    if( gai ) {
       nrej = astMalloc( nblock*sizeof( *nrej ) );
-      if( status == SAI__OK ) {
+      if( *status == SAI__OK ) {
          for( iblock = 0; iblock < nblock; iblock++ ) {
             nrej[ iblock ] = 1;
          }
