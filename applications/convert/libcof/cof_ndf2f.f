@@ -379,6 +379,8 @@
 *        Add USEAXS argument.
 *     2012 April 30 (MJC):
 *        Add _INT64 support.
+*     2012 May 29 (MJC):
+*        Add scaling using 64-bit integers.
 *     {enter_further_changes_here}
 
 *-
@@ -451,7 +453,6 @@
       LOGICAL FEXIST             ! FITS already exists?
       LOGICAL FITPRE             ! FITS airlock extension is present?
       CHARACTER*( NDF__SZFRM ) FORM ! Storage form
-      DOUBLE PRECISION FSCALE    ! Reduction factor for scale
       INTEGER FSTAT              ! FITSIO error status
       INTEGER FSTATC             ! FITSIO error status for file closure
       INTEGER FUNIT              ! Fortran I/O unit for the FITS file
@@ -462,7 +463,7 @@
       INTEGER IDEL               ! Increment to reduce an integer
                                  ! scaling range
       INTEGER IPNTR              ! Pointer to input array
-      INTEGER KBLANK             ! Data blank for 64-bit integer arrays
+      INTEGER*8 KBLANK           ! Data blank for 64-bit integer arrays
       DOUBLE PRECISION MAXV      ! Max. value to appear in scaled array
       DOUBLE PRECISION MINV      ! Min. value to appear in scaled array
       LOGICAL MULTIN             ! Multi-NDF container?
@@ -478,6 +479,7 @@
       BYTE NULL8                 ! Null value for BITPIX=8
       INTEGER*2 NULL16           ! Null value for BITPIX=16
       INTEGER NULL32             ! Null value for BITPIX=32
+      INTEGER*8 NULL64           ! Null value for BITPIX=64
       REAL NUL_32                ! Null value for BITPIX=-32
       DOUBLE PRECISION NUL_64    ! Null value for BITPIX=-64
       LOGICAL OPEN               ! FITS file exists?
@@ -774,7 +776,6 @@
             SCALE = .FALSE.
             SHIFT = .FALSE.
             DELTA = DBLE( VAL__EPSR )
-            FSCALE = 1.0D0 - DELTA
 
 *  We already know the scaling coefficients for a scaled array.
             IF ( .NOT. NSCALE ) THEN
@@ -785,6 +786,7 @@
 *  Set the null values.  Only one will be needed, depending on the
 *  value of BPOUT, but it as efficient to assign them all.
             NULL32 = VAL__BADI
+            NULL64 = VAL__BADK
             NULL16 = VAL__BADW
             NULL8 = VAL__BADUB
             NUL_32 = VAL__BADR
@@ -951,8 +953,12 @@
                   MINV = DBLE( VAL__MINI - SIGN( IDEL, VAL__MINI ) )
 
                ELSE IF ( BPOUT .EQ. -32 ) THEN
-                  MAXV = DBLE( VAL__MAXR ) * FSCALE
-                  MINV = DBLE( VAL__MINR ) * FSCALE
+                  MAXV = DBLE( VAL__MAXR ) * ( 1.0D0 - DELTA )
+                  MINV = DBLE( VAL__MINR ) * ( 1.0D0 - DELTA )
+
+               ELSE IF ( BPOUT .EQ. -64 ) THEN
+                  MAXV = VAL__MAXD * ( 1.0D0 - VAL__EPSD )
+                  MINV = VAL__MIND * ( 1.0D0 - VAL__EPSD )
 
                END IF
 
@@ -990,8 +996,8 @@
 *  values).
                IF ( STATUS .EQ. SAI__ERROR .AND. BAD ) THEN
                   CALL ERR_ANNUL( STATUS )
-                  BSCALE = 1.0
-                  BZERO = 0.0
+                  BSCALE = 1.0D0
+                  BZERO = 0.0D0
                END IF
 
             ELSE
@@ -1058,7 +1064,11 @@
             IF ( BPOUT .GT. 0 ) THEN
 
 *  Set the data blank value.
-               CALL FTPNUL( FUNIT, BLANK, FSTAT )
+               IF ( TYPE .EQ. '_INT64' ) THEN
+                  CALL FTPNULLL( FUNIT, KBLANK, FSTAT )
+               ELSE
+                  CALL FTPNUL( FUNIT, BLANK, FSTAT )
+               END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
@@ -1092,6 +1102,11 @@
                ELSE IF ( BPIN .EQ. 32 ) THEN
                   CALL FTPPNJ( FUNIT, 0, 1, EL,
      :                         %VAL( CNF_PVAL( IPNTR ) ), NULL32,
+     :                         FSTAT )
+
+               ELSE IF ( BPIN .EQ. 64 ) THEN
+                  CALL FTPPNK( FUNIT, 0, 1, EL,
+     :                         %VAL( CNF_PVAL( IPNTR ) ), NULL64,
      :                         FSTAT )
 
                ELSE IF ( BPIN .EQ. -32 ) THEN
