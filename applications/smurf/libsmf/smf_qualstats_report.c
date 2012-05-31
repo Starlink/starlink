@@ -13,13 +13,15 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily, int nopad,
+*     smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily, int nopad,
 *                           const smfArray *qua, size_t last_qcount[SMF__NQBITS],
 *                           size_t *last_nmap,
 *                           int init, size_t * ngood_tslice,
 *                           size_t *numdata, int *status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pool of worker threads.
 *     msglev = msglev_t (Given)
 *        Messaging level for output.
 *     qfamily = smf_qfam_t (Given)
@@ -127,7 +129,7 @@
 
 #define FUNC_NAME "smf_qualstats_report"
 
-void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily, int nopad,
+void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily, int nopad,
                            const smfArray *qua, size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init,
                            size_t *ngood_tslice, size_t *numdata,
@@ -185,7 +187,7 @@ void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily, int nopad,
   memset( qcount, 0, nqbits*sizeof(*qcount) );
 
   /* Find out the properties of the smfArray */
-  smf_qualstats_model( qfamily, nopad, qua, qcount, &nbolo_tot, &nmap, &nmax,
+  smf_qualstats_model( wf, qfamily, nopad, qua, qcount, &nbolo_tot, &nmap, &nmax,
                        &ntslice, &ntgood, &tbound, &tpad, status );
 
   /* Get a more accurate steptime if we can */

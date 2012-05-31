@@ -13,12 +13,15 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qualstats( smf_qfam_t qfamily, int nopad, const smf_qual_t *qual, dim_t nbolo,
-*                    size_t bstride, size_t ntslice, size_t tstride,
-*                    size_t qcount[SMF__NQBITS], size_t *ngoodbolo, size_t *nmap,
-*                    size_t *nmax, size_t *tpad, int *status )
+*     smf_qualstats( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
+*                    const smf_qual_t *qual, dim_t nbolo, size_t bstride,
+*                    size_t ntslice, size_t tstride,
+*                    size_t qcount[SMF__NQBITS], size_t *ngoodbolo,
+*                    size_t *nmap, size_t *nmax, size_t *tpad, int *status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     qfamily = smf_qfam_t (Given)
 *        Quality family associated with this quality array.
 *     nopad = int (Given)
@@ -75,6 +78,8 @@
 *        Add ability to not include padded data. Add tpad parameter.
 *     2010-10-08 (TIMJ):
 *        Handle common cases with special code.
+*     2012-5-31 (DSB):
+*        Multi-thread.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -113,25 +118,46 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
+/* Prototypes for local static functions. */
+static void smf1_qualstats( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfQualStatsData {
+   dim_t b1;
+   dim_t b2;
+   size_t bstride;
+   size_t nqbits;
+   size_t numgoodbolo;
+   size_t nummap;
+   size_t nummax;
+   size_t qcount[SMF__NQBITS];
+   size_t slice_end;
+   size_t slice_start;
+   size_t tstride;
+   const smf_qual_t *qual;
+} SmfQualStatsData;
+
 #define FUNC_NAME "smf_qualstats"
 
-void smf_qualstats( smf_qfam_t qfamily, int nopad, const smf_qual_t *qual, dim_t nbolo,
-                    size_t bstride, size_t ntslice, size_t tstride,
-                    size_t qcount[SMF__NQBITS], size_t *ngoodbolo,
-                    size_t *nmap, size_t *nmax, size_t *tpad,
-                    int *status ) {
+void smf_qualstats( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
+                    const smf_qual_t *qual, dim_t nbolo, size_t bstride,
+                    size_t ntslice, size_t tstride, size_t qcount[SMF__NQBITS],
+                    size_t *ngoodbolo, size_t *nmap, size_t *nmax,
+                    size_t *tpad, int *status ) {
 
   /* Local Variables */
-  size_t i;                     /* Loop counter */
-  size_t j;                     /* Loop counter */
+  dim_t bolostep;               /* Number of bolos per thread */
   size_t k;                     /* Loop counter */
   size_t numgoodbolo=0;
   size_t nummap=0;
   size_t nummax=0;
   size_t nqbits = 0;            /* Number of quality bits in this family */
-  size_t offset;
   size_t slice_start = 0;       /* First time slice to analyse */
   size_t slice_end = 0;         /* last time slice */
+  int nw;                       /* Number of worker threads */
+  int iw;                       /* Thread index */
+  SmfQualStatsData *job_data;
+  SmfQualStatsData *pdata;
 
   /* init */
   if (tpad) *tpad = 0;
@@ -149,6 +175,13 @@ void smf_qualstats( smf_qfam_t qfamily, int nopad, const smf_qual_t *qual, dim_t
     return;
   }
 
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
+
+  /* Find how many bolometers to process in each worker thread. */
+  bolostep = nbolo/nw;
+  if( bolostep == 0 ) bolostep = 1;
+
   /* Initialize the counters */
   nqbits = smf_qfamily_count( qfamily, status );
   memset( qcount, 0, nqbits*sizeof(*qcount) );
@@ -162,57 +195,48 @@ void smf_qualstats( smf_qfam_t qfamily, int nopad, const smf_qual_t *qual, dim_t
     slice_end = ntslice-1;
   }
 
-  /* Loop over bolo and time slice, and count occurrences of quality bits */
-  for( i=0; i<nbolo; i++ ) {
+  /* Allocate job data for threads, and store the range of bolos to be
+     processed by each one. Ensure that the last thread picks up any
+     left-over bolos. */
+  job_data = astCalloc( nw, sizeof(*job_data) );
+  if( *status == SAI__OK ) {
+    for( iw = 0; iw < nw; iw++ ) {
+      pdata = job_data + iw;
+      pdata->b1 = iw*bolostep;
+      if( iw < nw - 1 ) {
+         pdata->b2 = pdata->b1 + bolostep - 1;
+      } else {
+         pdata->b2 = nbolo - 1 ;
+      }
 
-    /* Count good bolos */
-    if( !(qual[i*bstride]&SMF__Q_BADB) ) {
-      numgoodbolo++;
+      /* Store other values common to all jobs. */
+      pdata->bstride = bstride;
+      pdata->tstride = tstride;
+      pdata->slice_start = slice_start;
+      pdata->slice_end = slice_end;
+      pdata->qual = qual;
+      pdata->nqbits = nqbits;
+
+      /* Submit the job to the workforce. */
+      thrAddJob( wf, 0, pdata, smf1_qualstats, 0, NULL, status );
     }
 
-    for( j=slice_start; j<=slice_end; j++ ) {
-      offset = i*bstride+j*tstride;
+    /* Wait for all jobs to complete. */
+    thrWait( wf, status );
 
-      /* Count samples for nmap and nmax */
-      if( !(qual[offset]&SMF__Q_GOOD) ) {
-        nummap++;
-      }
-
-      if( !(qual[offset]&SMF__Q_BOUND) ) {
-        nummax++;
-      }
-
-      /* if the quality is 0 then we already know the
-         answer without looping over all the bits */
-      if ( qual[offset] != 0) {
-        /* Handle some of the simplest cases explicitly to prevent
-           a loop over all bits. In cases where only a single bit
-           is set this saves a lot of time. BADDA+BADBOL is also
-           very common */
-        switch( qual[offset] ) {
-        case BIT_TO_VAL(0):
-          qcount[0]++;
-          break;
-        case BIT_TO_VAL(1):
-          /* we do not need to worry about exceeding qcount bounds
-             since we will only be accessing it if the case statement
-             is true */
-          qcount[1]++;
-          break;
-        case (BIT_TO_VAL(0)|BIT_TO_VAL(1)):
-          qcount[0]++;
-          qcount[1]++;
-          break;
-        default:
-          /* Loop over bits */
-          for( k=0; k<nqbits; k++ ) {
-            if( qual[offset] & BIT_TO_VAL(k) ) {
-              qcount[k]++;
-            }
-          }
-        }
-      }
+    /* Accumulate the results from all the worker threads. */
+    for( iw = 0; iw < nw; iw++ ) {
+       pdata = job_data + iw;
+       numgoodbolo += pdata->numgoodbolo;
+       nummap += pdata->nummap;
+       nummax += pdata->nummax;
+       for( k = 0; k < nqbits; k++ ) {
+          qcount[ k ] += pdata->qcount[ k ];
+       }
     }
+
+    /* Free the job data. */
+    job_data = astFree( job_data );
   }
 
   /* Return extra requested values */
@@ -240,3 +264,118 @@ void smf_qualstats( smf_qfam_t qfamily, int nopad, const smf_qual_t *qual, dim_t
   }
 
 }
+
+
+
+
+
+
+static void smf1_qualstats( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_qualstats
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_qualstats.
+
+*  Invocation:
+*     smf1_qualstats( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfQualStatsData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfQualStatsData *pdata;
+   dim_t ibolo;
+   dim_t itime;
+   size_t ibase;
+   size_t k;
+   const smf_qual_t *pq;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfQualStatsData *) job_data_ptr;
+
+/* Initialise returned values. */
+   pdata->numgoodbolo = 0;
+   pdata->nummap = 0;
+   pdata->nummax = 0;
+   memset( pdata->qcount, 0, pdata->nqbits*sizeof( *pdata->qcount ) );
+
+/* Loop round all bolos to be processed by this thread, maintaining the
+   index of the first time slice from the current bolo. */
+   ibase = pdata->b1*pdata->bstride;
+   for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+
+/* Get a pointer to the first used quality value for the current bolo, and
+   count the number of good bolometers. */
+      pq = pdata->qual + ibase;
+      if( !( *pq & SMF__Q_BADB ) ) pdata->numgoodbolo++;
+
+/* Increment the pointer to the first slice to be used from the current
+   bolometer. */
+      pq += pdata->tstride*pdata->slice_start;
+
+/* Loop round all time slices to be processed. */
+      for( itime = pdata->slice_start; itime <= pdata->slice_end; itime++ ) {
+
+/* Count samples for nmap and nmax */
+         if( !(*pq & SMF__Q_GOOD) ) pdata->nummap++;
+         if( !(*pq & SMF__Q_BOUND) ) pdata->nummax++;
+
+/* If the quality is 0 then we already know the answer without looping over
+   all the bits */
+         if ( *pq != 0) {
+
+/* Handle some of the simplest cases explicitly to prevent a loop over
+   all bits. In cases where only a single bit is set this saves a lot of
+   time. BADDA+BADBOL is also very common */
+            switch( *pq ) {
+
+               case BIT_TO_VAL(0):
+                  pdata->qcount[0]++;
+                  break;
+
+               case BIT_TO_VAL(1):
+
+/* we do not need to worry about exceeding qcount bounds since we will only
+   be accessing it if the case statement is true */
+                  pdata->qcount[1]++;
+                  break;
+
+               case (BIT_TO_VAL(0)|BIT_TO_VAL(1)):
+                  pdata->qcount[0]++;
+                  pdata->qcount[1]++;
+                  break;
+
+               default:
+
+/* Loop over bits */
+                  for( k = 0; k < pdata->nqbits; k++ ) {
+                     if( *pq & BIT_TO_VAL(k) ) {
+                        pdata->qcount[k]++;
+                     }
+                  }
+            }
+         }
+
+/* Increment the quality pointer to the next time slice. */
+         pq += pdata->tstride;
+      }
+
+/* Increment the index of the first value associated with the next
+   bolometer. */
+      ibase += pdata->bstride;
+   }
+}
+

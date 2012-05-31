@@ -1646,7 +1646,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( iter == 0 ) {
 
           /* initial quality report */
-          smf_qualstats_report( MSG__NORM, SMF__QFAM_TSERIES, 1, qua[0],
+          smf_qualstats_report( wf, MSG__NORM, SMF__QFAM_TSERIES, 1, qua[0],
                                 qcount_last, &nsamples, 1, &ntgood, &numdata,
                                 status );
 
@@ -1882,7 +1882,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              was the last filegroup of data to be added */
 
           if( itermap > 0 ) {
-            smf_write_itermap( thismap, thisvar, msize, iterrootgrp,
+            smf_write_itermap( wf, thismap, thisvar, msize, iterrootgrp,
                                contchunk, iter, lbnd_out, ubnd_out,
                                outfset, res[0]->sdata[0]->hdr, qua[0],
                                status );
@@ -1958,7 +1958,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           /* report on the quality flags for this iterations before closing
            the quality */
-          smf_qualstats_report( MSG__NORM, SMF__QFAM_TSERIES, 1, qua[0],
+          smf_qualstats_report( wf, MSG__NORM, SMF__QFAM_TSERIES, 1, qua[0],
                                 qcount_last, &nsamples, 0, &ntgood, &numdata,
                                 status );
 
@@ -2227,7 +2227,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* If we're writing out only the final map from each chunk, do it here */
       if( itermap < 0 ) {
-        smf_write_itermap( thismap, thisvar, msize, iterrootgrp,
+        smf_write_itermap( wf, thismap, thisvar, msize, iterrootgrp,
                            contchunk, iter, lbnd_out, ubnd_out,
                            outfset, res[0]->sdata[0]->hdr, qua[0],
                            status );

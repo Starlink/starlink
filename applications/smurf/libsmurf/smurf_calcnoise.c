@@ -577,7 +577,7 @@ void smurf_calcnoise( int *status ) {
       if (*status == SAI__OK) {
         size_t last_qcount[SMF__NQBITS];
         size_t last_nmap = 0;
-        smf_qualstats_report( MSG__VERB, SMF__QFAM_TSERIES, 1, concat,
+        smf_qualstats_report( wf, MSG__VERB, SMF__QFAM_TSERIES, 1, concat,
                               last_qcount, &last_nmap, 1, NULL, NULL, status );
       }
     }

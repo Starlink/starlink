@@ -13,12 +13,15 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qualstats_model( smf_qfam_t qfamily, int nopad, const smfArray *qua,
-*                          size_t qcount[SMF__NQBITS], size_t * ngoodbolo, size_t * nmap,
-*                          size_t *nmax, dim_t *ntslice, size_t * ntgood,
-*                          size_t * tbound, size_t * tpad, int * status );
+*     smf_qualstats_model( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
+*                          const smfArray *qua, size_t qcount[SMF__NQBITS],
+*                          size_t * ngoodbolo, size_t * nmap, size_t *nmax,
+*                          dim_t *ntslice, size_t * ntgood, size_t * tbound,
+*                          size_t * tpad, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     qfamily = smf_qfam_t (Given)
 *        Quality family associated with this quality array.
 *     nopad = int (Given)
@@ -124,7 +127,8 @@
 #define FUNC_NAME "smf_qualstats_model"
 
 void
-smf_qualstats_model( smf_qfam_t qfamily, int nopad, const smfArray *qua, size_t qcount[SMF__NQBITS],
+smf_qualstats_model( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
+                     const smfArray *qua, size_t qcount[SMF__NQBITS],
                      size_t * ngoodbolo, size_t * nmap, size_t *nmax, dim_t * ntslice,
                      size_t * ntgood, size_t * tbound, size_t *tpad, int * status ) {
 
@@ -188,7 +192,7 @@ smf_qualstats_model( smf_qfam_t qfamily, int nopad, const smfArray *qua, size_t 
 
 
       /* get quality statistics for the current subarray */
-      smf_qualstats( qfamily, nopad, qual, nbolo, bstride, nslices, tstride, subqcount,
+      smf_qualstats( wf, qfamily, nopad, qual, nbolo, bstride, nslices, tstride, subqcount,
                      NULL, &subnmap, &subnmax, &tpadslices, status );
 
       /* Remove padding from this number if nopad is true */
