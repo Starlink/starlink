@@ -780,6 +780,11 @@
 *       a height just sufficient to remove blobs of a single pixel
 *       form the mask.  A value of "-2.1" would remove blobs of two
 *       pixels form the mask, etc.
+*     AST.ZERO_FREEZE = INTEGER
+*       The number of iterations after which the mask for the AST model
+*       should be frozen. The default is zero, which means "never freeze
+*       the mask". Use of this parameter only affects dynamic masks such
+*       as created by AST.ZERO_LOWHITS or AST.ZERO_SNR.
 *     COM.CORR_ABSTOL = REAL
 *       The absolute lower limit of acceptable correlation. [0.2]
 *     COM.CORR_TOL = REAL
@@ -851,6 +856,8 @@
 *       See AST.ZERO_SNR.
 *     COM.ZERO_SNRLO = REAL
 *       See AST.ZERO_SNRLO.
+*     COM.ZERO_FREEZE = INTEGER
+*       See AST.ZERO_FREEZE.
 *     DKS.BOXCAR = INTEGER
 *       If DKS (dark squid) model component requested, boxcar the dark squid
 *       signal by this many samples (if positive) or seconds (if negative)
@@ -933,6 +940,8 @@
 *       See AST.ZERO_SNR.
 *     FLT.ZERO_SNRLO = REAL
 *       See AST.ZERO_SNRLO.
+*     FLT.ZERO_FREEZE = INTEGER
+*       See AST.ZERO_FREEZE.
 *     NOI.BOX_SIZE = REAL
 *       Determines the number of time slices used to determine the
 *       noise level in a section of a bolometer time stream. If zero,

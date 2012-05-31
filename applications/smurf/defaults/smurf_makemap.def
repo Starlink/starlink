@@ -97,6 +97,7 @@ com.zero_snr = <undef>
 com.zero_snrlo = <undef>
 com.zero_mask = <undef>
 com.zero_niter = 0
+com.zero_freeze = 0
 
 flt.zero_lowhits = 0
 flt.zero_notlast = 1
@@ -105,6 +106,7 @@ flt.zero_snr = <undef>
 flt.zero_snrlo = <undef>
 flt.zero_mask = <undef>
 flt.zero_niter = 0
+flt.zero_freeze = 0
 
 # Load the tau relations from a separate config file
 # Also load this before any other "ext" defaults in case
@@ -133,6 +135,7 @@ ast.zero_snr_fwhm = 0
 ast.zero_snr_low = -1.1
 ast.zero_mask = <undef>
 ast.zero_niter = 0
+ast.zero_freeze = 0
 ast.mapspike = 0
 
 # smf_calcmodel_com -- these are defined in smurf_sc2clean.def
