@@ -76,8 +76,8 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1998, 2003-2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. Copyright (C) 2007-2008, 2011 Science
-*     & Technology Facilities Council. All Rights Reserved.
+*     Astronomy Research Council. Copyright (C) 2007-2008, 2011, 2012
+*     Science & Technology Facilities Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -130,6 +130,8 @@
 *     2008 June 12 (TIMJ):
 *        When modifying units of variance component, allow for the
 *        possibility of trailing spaces.
+*     2012 May 29 (MJC):
+*        Support BITPIX=64.
 *     {enter_further_changes_here}
 
 *-
@@ -687,6 +689,11 @@
             ELSE IF ( BITPIX .EQ. 8 ) THEN
                CALL FTPKYJ( FUNIT, 'BLANK', NUM_UBTOI( VAL__BADUB ),
      :                      'Bad value', FSTAT )
+
+            ELSE IF ( BITPIX .EQ. 64 ) THEN
+               CALL FTPKYK( FUNIT, 'BLANK', VAL__BADK, 'Bad value',
+     :                      FSTAT )
+
             END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
