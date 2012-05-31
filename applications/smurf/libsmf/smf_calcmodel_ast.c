@@ -331,15 +331,18 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
   /* Get a mask to apply to the map. This is determined by the "Zero_..."
      parameters in the configuration KeyMap. */
-   zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
+  zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
 
-  /* Proceed if we need to do zero-masking */
-  if( zmask ) {
-
-    /* Reset the SMF__MAPQ_ZERO bit */
+  /* Reset the SMF__MAPQ_ZERO bit (but retain it on the last iteration so
+    that it gets written to the quality component of the output NDF). */
+  if( zmask || !(flags & SMF__DIMM_LASTITER) ) {
     for( i=0; i<dat->msize; i++ ) {
       mapqual[i] &= ~SMF__MAPQ_ZERO;
     }
+  }
+
+  /* Proceed if we need to do zero-masking */
+  if( zmask ) {
 
     /* Flag background regions in the map (usually round the edges). */
     for( i=0; i<dat->msize; i++ ) {
