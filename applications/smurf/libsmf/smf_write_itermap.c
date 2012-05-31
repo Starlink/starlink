@@ -13,13 +13,15 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_itermap( const double *map, const double *mapvar, dim_t msize,
+*     smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapvar, dim_t msize,
 *                        const Grp *iterrootgrp, size_t contchunk, int iter,
 *                        const int *lbnd_out, const int *ubnd_out,
 *                        AstFrameSet *outfset, const smfHead *hdr,
 *                        const smfArray *qua, int *status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given )
+*        Pool of worker threads.
 *     map = const double* (Given)
 *        The output map array
 *     mapvar = const double* (Given)
@@ -106,7 +108,7 @@
 
 #define FUNC_NAME "smf_write_itermap"
 
-void smf_write_itermap( const double *map, const double *mapvar, dim_t msize,
+void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapvar, dim_t msize,
                         const Grp *iterrootgrp, size_t contchunk, int iter,
                         const int *lbnd_out, const int *ubnd_out,
                         AstFrameSet *outfset, const smfHead *hdr,
@@ -194,8 +196,8 @@ void smf_write_itermap( const double *map, const double *mapvar, dim_t msize,
 
     /* calculate the effective number of bolometers for this
        iteration */
-    smf_qualstats_model( SMF__QFAM_TSERIES, 1, qua, NULL, NULL, &nmap, NULL,
-                         NULL, &ngood_tslices, NULL, NULL, status );
+    smf_qualstats_model( wf, SMF__QFAM_TSERIES, 1, qua, NULL, NULL, &nmap,
+                         NULL, NULL, &ngood_tslices, NULL, NULL, status );
 
     iter_nboloeff = (double)nmap / (double)ngood_tslices;
     atlPtftd( fitschan, "NBOLOEFF", iter_nboloeff,

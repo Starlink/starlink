@@ -1569,16 +1569,18 @@ int smf_qual_to_bit( smf_qual_t q, int *status );
 
 smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int * status );
 
-void smf_qualstats( smf_qfam_t qfamily, int nopad, const smf_qual_t *qual, dim_t nbolo, size_t bstride,
+void smf_qualstats( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
+                    const smf_qual_t *qual, dim_t nbolo, size_t bstride,
                     size_t ntslice, size_t tstride,  size_t qcount[SMF__NQBITS],
                     size_t *ngoodbolo, size_t *nmap, size_t *nmax, size_t * tpad,
                     int *status );
 
-void smf_qualstats_model( smf_qfam_t qfamily, int nopad, const smfArray *qua, size_t qcount[SMF__NQBITS],
+void smf_qualstats_model( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
+                          const smfArray *qua, size_t qcount[SMF__NQBITS],
                           size_t * ngoodbolo, size_t * nmap, size_t *nmax, dim_t * ntslice, size_t * ntgood,
                           size_t * tbound, size_t *tpad, int * status );
 
-void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily, int nopad,
+void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily, int nopad,
                            const smfArray *qua, size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init, size_t *ngood_tslice,
                            size_t *numdata, int *status );
@@ -1880,7 +1882,7 @@ void smf_write_flagmap( smf_qual_t mask, smfArray *lut, smfArray *qua,
                         const int *ubnd_out, AstFrameSet *outfset,
                         int *status );
 
-void smf_write_itermap( const double *map, const double *mapvar, dim_t msize,
+void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapvar, dim_t msize,
                         const Grp *iterrootgrp, size_t contchunk, int iter,
                         const int *lbnd_out, const int *ubnd_out,
                         AstFrameSet *outfset, const smfHead *hdr,
