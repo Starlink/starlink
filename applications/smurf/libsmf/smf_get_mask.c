@@ -59,6 +59,8 @@
 *        Original version.
 *     16-MAR-2012 (DSB):
 *        Add FLT model, and ZERO_NITER parameter.
+*     31-MAY-2012 (DSB):
+*        Add ZERO_FREEZE parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -256,8 +258,17 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Check the pointer can be used. */
             if( *status == SAI__OK ) {
 
+/* Get the number of iterations after which the mask is to be frozen.
+   Zero means "never freeze the mask". */
+               int zero_freeze = 0;
+               astMapGet0I( subkm, "ZERO_FREEZE", &zero_freeze );
+
+/* If we already have a mask, and the mask is now frozen, we just return
+   the existing mask. */
+               if( zero_freeze > 0 && have_mask && dat->iter > zero_freeze ) {
+
 /* Low hits masking... */
-               if( mask_type == LOWHITS ) {
+               } else if( mask_type == LOWHITS ) {
 
 /* Set hits pixels with 0 hits to VAL__BADI so that stats1 ignores them */
                   ph = dat->hitsmap;
