@@ -623,7 +623,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     struct sigaction action;
     action.sa_handler = smf_handler;
     sigemptyset( &action.sa_mask );
-    action.sa_flags = SA_RESTART;
+    action.sa_flags = SA_RESTART | SA_RESETHAND;
     sigaction( SIGINT, &action, NULL );
   }
 
