@@ -107,6 +107,11 @@
 *        Return default values if no gain data is supplied.
 *     6-MAY-2012 (DSB):
 *        Added argument "wcc".
+*     1-JUN-2012 (DSB):
+*        The gains and offsets stored in "gai" for bad blocks are now
+*        interpolated between the neighbouring good blocks, so we no
+*        longer need to distinguish here between good blocks and bad
+*        blocks.
 
 *  Copyright:
 *     Copyright (C) 2010-2012 Science & Technology Facilities Council.
@@ -303,22 +308,29 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
 
 /* If we have good values at the start and end of the section, calculate the
    linear interpolation constants for this section (if the section contains
-   any required time slices). */
+   any required time slices). Note, smf_find_gains ensures that bad
+   blocks (i.e. blocks with VAL__BADD for their correlatrion coefficient)
+   have gains and offsets interpolated from the neighbouring good blocks.
+   So we can use the gains and offsets stored in gai even if the
+   correlation coefficient is bad. */
          if( time0 < next_section ) {
             if( gain0 != VAL__BADD && off0 != VAL__BADD &&
-                gain1 != VAL__BADD && off1 != VAL__BADD &&
-                cc0 != VAL__BADD && cc1 != VAL__BADD && dt > 0 ) {
+                gain1 != VAL__BADD && off1 != VAL__BADD && dt > 0 ) {
                k1 = ( gain1 - gain0 )/dt;
                k2 = gain0 - k1*start_time;
                k3 = ( off1 - off0 )/dt;
                k4 = off0 - k3*start_time;
-               k5 = ( cc1 - cc0 )/dt;
-               k6 = cc0 - k5*start_time;
             } else {
                k1 = VAL__BADD;
                k2 = VAL__BADD;
                k3 = VAL__BADD;
                k4 = VAL__BADD;
+            }
+
+            if( cc0 != VAL__BADD && cc1 != VAL__BADD && dt > 0 ) {
+               k5 = ( cc1 - cc0 )/dt;
+               k6 = cc0 - k5*start_time;
+            } else {
                k5 = VAL__BADD;
                k6 = VAL__BADD;
             }
@@ -334,22 +346,33 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
          if( k1 != VAL__BADD ) {
             *(g++) = k1*( (double) itime ) + k2;
             *(off++) = k3*( (double) itime ) + k4;
-            if( cc ) *(cc++) = k5*( (double) itime ) + k6;
 
-         } else if( cc0 != VAL__BADD ) {
+         } else if( gain0 != VAL__BADD ) {
             *(g++) = gain0;
             *(off++) = off0;
-            if( cc ) *(cc++) = cc0;
 
-         } else if( cc1 != VAL__BADD ) {
+         } else if( gain1 != VAL__BADD ) {
             *(g++) = gain1;
             *(off++) = off1;
-            if( cc ) *(cc++) = cc1;
 
          } else {
             *(g++) = 1.0;
             *(off++) = 0.0;
-            if( cc ) *(cc++) = 1.0;
+         }
+
+         if( cc ) {
+            if( k5 != VAL__BADD ) {
+               *(cc++) = k5*( (double) itime ) + k6;
+
+            } else if( cc0 != VAL__BADD ) {
+               *(cc++) = cc0;
+
+            } else if( cc1 != VAL__BADD ) {
+               *(cc++) = cc1;
+
+            } else {
+               *(cc++) = 1.0;
+            }
          }
       }
    }

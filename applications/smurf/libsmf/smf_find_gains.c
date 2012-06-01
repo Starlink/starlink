@@ -199,11 +199,14 @@
 *     27-FEB-2012 (DSB):
 *        Add args "mask" and "lut".
 *     6-MAY-2012 (DSB):
-*        Add argument "flags". Also changed so that bad blocks are 
-*        indicated by the correlation coefficient being set to 
-*        VAL__BADD (previously, the gain value was set to VAL__BADD) 
-*        but the gains in bad blocks are useful within the context of 
+*        Add argument "flags". Also changed so that bad blocks are
+*        indicated by the correlation coefficient being set to
+*        VAL__BADD (previously, the gain value was set to VAL__BADD)
+*        but the gains in bad blocks are useful within the context of
 *        the new COM algorithm.
+*     1-JUN-2012 (DSB):
+*        Replace gains and offsets for bad blocks with values
+*        interpolated from the neighbouring good blocks.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -293,33 +296,46 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
    dim_t iblock;
    dim_t ibolo;
    dim_t itime;
+   dim_t jblock;
    dim_t nblock;
    dim_t nbolo;
    dim_t ntime;
    dim_t ntslice;
+   dim_t off_offset;
    double *corr;
    double *dat;
    double *gai;
    double *glog;
+   double *pg;
    double c;
    double cmean;
    double corr_abstol;
    double corr_tol;
    double csig;
    double csum;
+   double endgain;
+   double endoffset;
    double g;
    double gain_abstol;
    double gain_fgood;
-   int gain_positive;
    double gain_rat;
    double gain_tol;
    double gmax;
    double gmean;
    double gmin;
    double gsig;
+   double o;
+   double prevgain;
+   double prevoffset;
+   double startgain;
+   double startoffset;
+   double wend;
+   double wstart;
+   double wsum;
    int *converged;
    int badbol;
    int conv;
+   int gain_positive;
    int ib;
    int ib_hi;
    int ib_lo;
@@ -332,6 +348,7 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
    int nogains;
    int nooffs;
    int nworker;
+   int prevblock;
    int reason[ NREASON ];
    int step;
    int totgood;
@@ -541,7 +558,8 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
       memset( nrej, 0, nblock*sizeof( *reason ) );
 
 /* Get the vector offsets within "gai", from a gain value to the
-   corresponding correlation coefficient. */
+   corresponding offset, and correlation coefficient. */
+      off_offset = nblock*gcstride;
       corr_offset = 2*nblock*gcstride;
 
 /* Initialise the number of time slices left to be processed. */
@@ -858,6 +876,88 @@ int smf_find_gains( ThrWorkForce *wf, int flags, smfData *data,
           msgOutif( MSG__VERB, "",
                     "    Out of ^T, ^NG bolo time-slice blocks are still good",
                     status );
+        }
+
+/* Now replace gains and offsets stored for rejected bolo-blocks, so that
+   smf_gandoff produces smooth interpolation within neighbouring good
+   bolo-blocks. */
+        for( ibolo = 0; ibolo < nbolo && *status == SAI__OK; ibolo++ ) {
+
+/* Skip entirely bad bolometers. */
+           ibase = ibolo*bstride;
+           if( !( qua[ ibase ] & SMF__Q_BADB) ) {
+
+/* Get the index within "gai" of the gain value for the first block for
+   the current bolometer. */
+              igbase = ibolo*gbstride;
+
+/* No previous good block as yet. */
+              prevblock = -1;
+
+/* Loop round all blocks of time slices from the current bolometer. */
+              for( iblock = 0; iblock < nblock; iblock++ ) {
+
+/* If this block has not been rejected... */
+                 if( gai[ igbase + corr_offset ] != VAL__BADD ) {
+                    g =  gai[ igbase ];
+                    o = gai[ igbase + off_offset ];
+
+/* If one or more previous blocks were bad, we assign them new gains and
+   offsets by interpolation between the current (good) block and the
+   previous good block. */
+                    if( iblock - prevblock > 1 ) {
+                       endgain = g;
+                       endoffset = o;
+
+/* If this is the first good block, arrange that the same values are used
+   for all previous bad blocks. */
+                       if( prevblock == -1 ) {
+                          startgain = g;
+                          startoffset = o;
+                       } else {
+                          startgain = prevgain;
+                          startoffset = prevoffset;
+                       }
+
+/* Loop over all bad blocks since the previous good block. */
+                       pg = gai + ibolo*gbstride + (prevblock + 1)*gcstride;
+                       for( jblock = prevblock + 1; jblock < iblock; jblock++ ) {
+
+/* Assign new interpolated gain and offset to the bad block. */
+                          wend = jblock - prevblock;
+                          wstart = iblock - jblock;
+                          wsum = wstart + wend;
+                          pg[ 0 ] = ( startgain*wstart + endgain*wend )/wsum;
+                          pg[ off_offset ] = ( startoffset*wstart + endoffset*wend )/wsum;
+
+                          pg += gcstride;
+                       }
+                    }
+
+/* Record the index of this block as the most recent good block. Also,
+   record its gain and offset. */
+                    prevblock = iblock;
+                    prevgain =  g;
+                    prevoffset = o;
+                 }
+
+/* Get the index within "gai" of the gain value for the first block for
+   the next bolometer. */
+                 igbase += gcstride;
+              }
+
+/* If one or more blocks at the end of the time stream were rejected,
+   replace their gains and offsets with the gains and offsets of the
+   previous good block. */
+              if( prevblock < (int) nblock - 1 ) {
+                 pg = gai + ibolo*gbstride + (prevblock + 1)*gcstride;
+                 for( jblock = prevblock + 1; jblock < nblock; jblock++ ) {
+                    pg[ 0 ] = prevgain;
+                    pg[ off_offset ] = prevoffset;
+                    pg += gcstride;
+                 }
+              }
+           }
         }
 
       } else {
