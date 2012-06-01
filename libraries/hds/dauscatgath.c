@@ -148,7 +148,7 @@ dau_gather_data( int bad, struct LCP_DATA *data, int *nbad )
 
       {
          nval = _min(nval, count);
-         obj.body = dom + pos + stride[1]*n;
+         obj.body = dom + pos + (INT_BIG)stride[ 1 ] * (INT_BIG)n;
 
 /* If the data could not be mapped in one go, then map this chunk.  Ensure  */
 /* that this occurs even if the global status is set to DAT__CONER because  */
@@ -156,7 +156,7 @@ dau_gather_data( int bad, struct LCP_DATA *data, int *nbad )
          if (bitty)
          {
             len= nval * obj.length;
-            off = lower + pos + stride[ 1 ] * n;
+            off = lower + pos + (INT_BIG)stride[ 1 ] * (INT_BIG)n;
             temp_status = hds_gl_status;
             if ( hds_gl_status == DAT__CONER )
                hds_gl_status = DAT__OK;
@@ -341,7 +341,7 @@ dau_scatter_data( int bad, struct LCP_DATA *data, int *nbad )
 
       {
          nval = _min(nval, count);
-         obj.body = dom + pos + stride[1]*n;
+         obj.body = dom + pos + (INT_BIG)stride[ 1 ] * (INT_BIG)n;
 
 /* If the data could not be mapped in one go, then map this chunk. Ensure   */
 /* that this occurs even if the global status is set to DAT__CONER because  */
@@ -350,7 +350,7 @@ dau_scatter_data( int bad, struct LCP_DATA *data, int *nbad )
          if ( bitty )
          {
             len = nval * obj.length;
-            off = lower + pos + stride[ 1 ] * n;
+            off = lower + pos + (INT_BIG)stride[ 1 ] * (INT_BIG)n;
             temp_status = hds_gl_status;
             if ( hds_gl_status == DAT__CONER )
                hds_gl_status = DAT__OK;
