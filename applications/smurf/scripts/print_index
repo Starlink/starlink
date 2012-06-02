@@ -380,6 +380,11 @@ sub sdf_header {
     my $fitsitem = read_fits_header( $sdffile );
     return "" unless defined $fitsitem;
 
+    # Assume we have problems if the fits header has fewer than
+    # five entries
+    my @keys = keys %$fitsitem;
+    return "" unless @keys > 5;
+
 # Branch between SCUBA, SCUBA2 and ACSIS
 
     my $cur_obs = "";
