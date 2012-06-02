@@ -432,8 +432,8 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 /* Local Variables: */
    SmfCalcModelComData *pdata;
    dim_t btime;
-   dim_t gbstride;
-   dim_t gcstride;
+   size_t gbstride;
+   size_t gcstride;
    dim_t ibolo;
    dim_t idx;
    dim_t itime;
