@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="skycat" support="U">
-  <version>3.0.2</version>
+  <version>3.1.2</version>
   <path>thirdparty/eso/skycat</path>
   <description>The main skycat component</description>
   <!-- <abstract><p></p></abstract> -->
