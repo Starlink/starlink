@@ -231,7 +231,7 @@
      :                     %VAL( CNF_PVAL( IPDAT ) ),
      :                     IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_INT64' ) THEN
-            CALL VEC_ITOK( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
+            CALL VEC_KTOK( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
      :                     %VAL( CNF_PVAL( IPDAT ) ),
      :                     IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN
