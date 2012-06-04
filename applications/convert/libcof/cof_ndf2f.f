@@ -381,6 +381,11 @@
 *        Add _INT64 support.
 *     2012 May 29 (MJC):
 *        Add scaling using 64-bit integers.
+*     2012 June 2 (MJC):
+*        Need to treat TYPE=_REAL -> BITPIX=64 as a special case.
+*        Hitherto all the scaled integer output data type used fewer
+*        bits than the floating-point values.  For 64-bit integers
+*        this breaks down.
 *     {enter_further_changes_here}
 
 *-
@@ -464,6 +469,8 @@
                                  ! scaling range
       INTEGER IPNTR              ! Pointer to input array
       INTEGER*8 KBLANK           ! Data blank for 64-bit integer arrays
+      INTEGER*8 KDEL             ! Increment to reduce a 64-bit integer
+                                 ! scaling range
       DOUBLE PRECISION MAXV      ! Max. value to appear in scaled array
       DOUBLE PRECISION MINV      ! Min. value to appear in scaled array
       LOGICAL MULTIN             ! Multi-NDF container?
@@ -775,7 +782,11 @@
 *  Set the defaults.
             SCALE = .FALSE.
             SHIFT = .FALSE.
-            DELTA = DBLE( VAL__EPSR )
+            IF ( ABS( BPOUT ) .EQ. 64 ) THEN
+               DELTA = VAL__EPSD
+            ELSE
+               DELTA = DBLE( VAL__EPSR )
+            END IF
 
 *  We already know the scaling coefficients for a scaled array.
             IF ( .NOT. NSCALE ) THEN
@@ -849,8 +860,12 @@
 
                END IF
 
-*  Compare the component's BITPIX with that supplied.
-            ELSE IF ( BPOUTU .LT. BPINU ) THEN
+*  Determine whether or not scaling is required.  In most cases, 
+*  we can compare the component's BITPIX with that supplied for the
+*  output FITS file.  However, there is one exception, converting
+*  a _REAL array to 64-bit integer.
+            ELSE IF ( BPOUTU .LT. BPINU .OR.
+     :                ( BPOUT .EQ. 64 .AND. BPIN .EQ. -32 ) ) THEN
 
 *  The data must be rescaled and the bad-pixel value altered to that of
 *  the output type.
@@ -866,6 +881,9 @@
 
                ELSE IF ( BPOUT .EQ. 8 ) THEN
                   BLANK = NUM_UBTOI( VAL__BADUB )
+
+               ELSE IF ( BPOUT .EQ. 64 ) THEN
+                  KBLANK = VAL__BADK
 
                END IF
 
@@ -901,7 +919,7 @@
 *  The header should already contain a BLANK keyword.
 *  Reset the BLANK keyword in the header.  Ampersand instructs the
 *  routine not to modify the comment of the BLANK header card.
-               IF ( TYPE .EQ. '_INT64' ) THEN
+               IF ( BPOUT .EQ. 64 ) THEN
                   CALL FTMKYK( FUNIT, 'BLANK', KBLANK, '&', FSTAT )
                   ROUTIN = 'FTMKYK'
                ELSE
@@ -952,13 +970,19 @@
                   MAXV = DBLE( VAL__MAXI - SIGN( IDEL, VAL__MAXI ) )
                   MINV = DBLE( VAL__MINI - SIGN( IDEL, VAL__MINI ) )
 
+               ELSE IF ( BPOUT .EQ. 64 ) THEN
+                  KDEL = MAX( INT( DBLE( VAL__MAXK ) * DELTA ) ,
+     :                        INT( DBLE( VAL__MINK ) * DELTA ) ) + 1
+                  MAXV = DBLE( VAL__MAXK - SIGN( KDEL, VAL__MAXK ) )
+                  MINV = DBLE( VAL__MINK - SIGN( KDEL, VAL__MINK ) )
+
                ELSE IF ( BPOUT .EQ. -32 ) THEN
                   MAXV = DBLE( VAL__MAXR ) * ( 1.0D0 - DELTA )
                   MINV = DBLE( VAL__MINR ) * ( 1.0D0 - DELTA )
 
                ELSE IF ( BPOUT .EQ. -64 ) THEN
-                  MAXV = VAL__MAXD * ( 1.0D0 - VAL__EPSD )
-                  MINV = VAL__MIND * ( 1.0D0 - VAL__EPSD )
+                  MAXV = VAL__MAXD * ( 1.0D0 - DELTA )
+                  MINV = VAL__MIND * ( 1.0D0 - DELTA )
 
                END IF
 
@@ -1064,7 +1088,7 @@
             IF ( BPOUT .GT. 0 ) THEN
 
 *  Set the data blank value.
-               IF ( TYPE .EQ. '_INT64' ) THEN
+               IF ( BPOUT .EQ. 64 ) THEN
                   CALL FTPNULLL( FUNIT, KBLANK, FSTAT )
                ELSE
                   CALL FTPNUL( FUNIT, BLANK, FSTAT )
