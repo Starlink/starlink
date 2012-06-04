@@ -7244,6 +7244,6 @@ void StarRtdImage::processMotionEvent()
 
             sprintf( buffer, "%f", (float) sBox.getStd() );
             Tcl_SetVar2( interp_, var, "STD", buffer, TCL_GLOBAL_ONLY );
-	}
+        }
     }
 }

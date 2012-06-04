@@ -170,6 +170,10 @@
          CALL RTD1_STATI( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
      :                    %VAL( CNF_PVAL( IPMASK ) ), NGOOD, DMIN, DMAX,
      :                    SUM, MEAN, STDEV, STATUS )
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL RTD1_STATK( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
+     :                    %VAL( CNF_PVAL( IPMASK ) ), NGOOD, DMIN, DMAX,
+     :                    SUM, MEAN, STDEV, STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
          CALL RTD1_STATR( BAD, DIM1 * DIM2, %VAL( CNF_PVAL( IPIN ) ),
      :                    %VAL( CNF_PVAL( IPMASK ) ), NGOOD, DMIN, DMAX,

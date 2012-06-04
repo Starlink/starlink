@@ -163,10 +163,19 @@ void RegionStats::calc()
             break;
         case LONG_IMAGE:
             if ( swap_ ) {
-                calcSwap( (FITS_LONG *) image, nx, ny, bscale, bzero,
+                calcSwap( (int *) image, nx, ny, bscale, bzero,
                           x0, y0, x1, y1 );
             } else {
-                calcNative( (FITS_LONG *) image, nx, ny, bscale, bzero,
+                calcNative( (int *) image, nx, ny, bscale, bzero,
+                            x0, y0, x1, y1 );
+            }
+            break;
+        case LONGLONG_IMAGE:
+            if ( swap_ ) {
+                calcSwap( (INT64 *) image, nx, ny, bscale, bzero,
+                          x0, y0, x1, y1 );
+            } else {
+                calcNative( (INT64 *) image, nx, ny, bscale, bzero,
                             x0, y0, x1, y1 );
             }
             break;
@@ -212,7 +221,11 @@ void RegionStats::calc()
 #include "RegionStatsTemplates.icc"
 #undef DATA_TYPE
 
-#define DATA_TYPE FITS_LONG
+#define DATA_TYPE int
+#include "RegionStatsTemplates.icc"
+#undef DATA_TYPE
+
+#define DATA_TYPE INT64
 #include "RegionStatsTemplates.icc"
 #undef DATA_TYPE
 

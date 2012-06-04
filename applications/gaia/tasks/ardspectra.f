@@ -216,6 +216,11 @@
      :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ),
      :                     DIMS( 2 ), DIMS( 3 ),
      :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL GAI1_ARDSPK( BAD, %VAL( CNF_PVAL( IPIN ) ),
+     :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ),
+     :                     DIMS( 2 ), DIMS( 3 ),
+     :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
          CALL GAI1_ARDSPR( BAD, %VAL( CNF_PVAL( IPIN ) ),
      :                     %VAL( CNF_PVAL( IPMASK ) ), DIMS( 1 ),

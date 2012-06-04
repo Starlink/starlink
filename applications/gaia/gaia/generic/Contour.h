@@ -52,15 +52,6 @@ extern "C" {
 #include "config.h"
 #endif
 
-// The type "long" may have up to 64 bits on alpha machines. FITS
-// defines the long we want to use as 32 bits, so use a macro to
-// replace the long data type with plain int when appropriate.
-#if SIZEOF_LONG == 8
-#define FITS_LONG int
-#else
-#define FITS_LONG long
-#endif
-
 // Macro function to join two strings, when the strings may themselves
 // be macros requiring further expansion.
 #define DEFER_JOIN_STRINGS(string1,string2) string1 ## string2
@@ -176,7 +167,8 @@ public:
   GENERATE_ARRAYVAL(unsigned char);
   GENERATE_ARRAYVAL(short);
   GENERATE_ARRAYVAL(unsigned short);
-  GENERATE_ARRAYVAL(FITS_LONG);
+  GENERATE_ARRAYVAL(int);
+  GENERATE_ARRAYVAL(INT64);
   GENERATE_ARRAYVAL(float);
   GENERATE_ARRAYVAL(double);
 
@@ -209,18 +201,32 @@ public:
         return ntohs(arrayPtr[iy*span + ix]);
      }
 
-  inline FITS_LONG swapArrayVal( const FITS_LONG *arrayPtr,
-                                 const int& span,
-                                 const int &ix,
-                                 const int& iy )
+  inline int swapArrayVal( const int *arrayPtr,
+                           const int& span,
+                           const int &ix,
+                           const int& iy )
      {
         return ntohl(arrayPtr[iy*span + ix]);
+     }
+
+  inline double swapArrayVal( const INT64 *arrayPtr,
+                              const int& span,
+                              const int &ix,
+                              const int& iy )
+     {
+         int tmp;
+         union { unsigned int raw[2]; INT64 typed; } ret;
+         ret.typed = arrayPtr[iy*span + ix];
+         tmp = ret.raw[0];
+         ret.raw[0] = ntohl( ret.raw[1] );
+         ret.raw[1] = ntohl( tmp );
+         return ret.typed;
      }
 
   inline float swapArrayVal( const float *arrayPtr, const int& span,
                              const int &ix, const int& iy )
      {
-        union { unsigned FITS_LONG raw; float typed; } ret;
+        union { unsigned int raw; float typed; } ret;
         ret.typed = arrayPtr[iy*span + ix];
         ret.raw = ntohl(ret.raw);
         return ret.typed;
@@ -229,8 +235,8 @@ public:
   inline double swapArrayVal( const double *arrayPtr, const int& span,
                               const int &ix, const int& iy )
      {
-         FITS_LONG tmp;
-         union { unsigned FITS_LONG raw[2]; double typed; } ret;
+         int tmp;
+         union { unsigned int raw[2]; double typed; } ret;
          ret.typed = arrayPtr[iy*span + ix];
          tmp = ret.raw[0];
          ret.raw[0] = ntohl( ret.raw[1] );
@@ -247,7 +253,8 @@ public:
   GENERATE_SETARRAYVAL(unsigned char);
   GENERATE_SETARRAYVAL(short);
   GENERATE_SETARRAYVAL(unsigned short);
-  GENERATE_SETARRAYVAL(FITS_LONG);
+  GENERATE_SETARRAYVAL(int);
+  GENERATE_SETARRAYVAL(INT64);
   GENERATE_SETARRAYVAL(float);
   GENERATE_SETARRAYVAL(double);
 
@@ -259,7 +266,8 @@ public:
   GENERATE_MAX(unsigned char);
   GENERATE_MAX(short);
   GENERATE_MAX(unsigned short);
-  GENERATE_MAX(FITS_LONG);
+  GENERATE_MAX(int);
+  GENERATE_MAX(INT64);
   GENERATE_MAX(float);
   GENERATE_MAX(double);
 
@@ -271,7 +279,8 @@ public:
   GENERATE_MIN(unsigned char);
   GENERATE_MIN(short);
   GENERATE_MIN(unsigned short);
-  GENERATE_MIN(FITS_LONG);
+  GENERATE_MIN(int);
+  GENERATE_MIN(INT64);
   GENERATE_MIN(float);
   GENERATE_MIN(double);
 
@@ -287,7 +296,8 @@ public:
   GENERATE_BADPIXNDF(unsigned char, VAL__BADUB);
   GENERATE_BADPIXNDF(short, VAL__BADS);
   GENERATE_BADPIXNDF(unsigned short, VAL__BADUS);
-  GENERATE_BADPIXNDF(FITS_LONG, VAL__BADI);
+  GENERATE_BADPIXNDF(int, VAL__BADI);
+  GENERATE_BADPIXNDF(INT64, VAL__BADK);
   GENERATE_BADPIXNDF(float, VAL__BADF);
   GENERATE_BADPIXNDF(double, VAL__BADD);
 
@@ -303,7 +313,8 @@ public:
   GENERATE_SWAPBADPIXNDF(unsigned char, VAL__BADUB);
   GENERATE_SWAPBADPIXNDF(short, VAL__BADS);
   GENERATE_SWAPBADPIXNDF(unsigned short, VAL__BADUS);
-  GENERATE_SWAPBADPIXNDF(FITS_LONG, VAL__BADI);
+  GENERATE_SWAPBADPIXNDF(int, VAL__BADI);
+  GENERATE_SWAPBADPIXNDF(INT64, VAL__BADK);
   GENERATE_SWAPBADPIXNDF(float, VAL__BADF);
   GENERATE_SWAPBADPIXNDF(double, VAL__BADD);
 
@@ -379,7 +390,13 @@ public:
 #undef DATA_TYPE
 #undef DATA_FORMAT
 
-#define DATA_TYPE FITS_LONG
+#define DATA_TYPE int
+#define DATA_FORMAT NDF
+#include "ContourTemplates.h"
+#undef DATA_TYPE
+#undef DATA_FORMAT
+
+#define DATA_TYPE INT64
 #define DATA_FORMAT NDF
 #include "ContourTemplates.h"
 #undef DATA_TYPE

@@ -394,6 +394,9 @@ int gaiaCopyComponent( int ndfid, void **data, const char* component,
    else if ( strncmp( dtype, "_REAL", 5 ) == 0 ) {
        CHUNK_COPY(float, float)
    }
+   else if ( strncmp( dtype, "_INT64", 8 ) == 0 ) {
+       CHUNK_COPY(INT64, INT64)
+   }
    else if ( strncmp( dtype, "_INTEGER", 8 ) == 0 ) {
        CHUNK_COPY(int, int)
    }

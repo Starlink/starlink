@@ -51,7 +51,7 @@ extern void F77_EXTERNAL_NAME(rtd1_dtrn)( DOUBLE_ARRAY(xold),
                                           INTEGER(npoints),
                                           INTEGER(ifit),
                                           DOUBLE_ARRAY(tr),
-					  DOUBLE(resid),
+                                          DOUBLE(resid),
                                           INTEGER(status));
 
 int rtdDtrn( int fittype, double *xold, double *yold, double *xnew,

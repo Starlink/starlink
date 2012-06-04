@@ -41,21 +41,16 @@
  */
 
 //  Include files:
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/types.h>
 #include <netinet/in.h>
 extern "C" {
 #include "img.h"
 }
 #include "ImageData.h"
-
-// The type "long" may have up to 64 bits on alpha machines. FITS
-// defines the long we want to use as 32 bits, so use a macro to
-// replace the long data type with plain int when appropriate.
-#if SIZEOF_LONG == 8
-#define FITS_LONG int
-#else
-#define FITS_LONG long
-#endif
 
 class RegionStats
 {
@@ -120,7 +115,8 @@ class RegionStats
     GENERATE_ARRAYVAL(unsigned char);
     GENERATE_ARRAYVAL(short);
     GENERATE_ARRAYVAL(unsigned short);
-    GENERATE_ARRAYVAL(FITS_LONG);
+    GENERATE_ARRAYVAL(int);
+    GENERATE_ARRAYVAL(INT64);
     GENERATE_ARRAYVAL(float);
     GENERATE_ARRAYVAL(double);
 
@@ -153,18 +149,32 @@ class RegionStats
             return ntohs(arrayPtr[iy*span + ix]);
         }
 
-    inline FITS_LONG swapArrayVal( const FITS_LONG *arrayPtr,
-                                   const int& span,
-                                   const int &ix,
-                                   const int& iy )
+    inline int swapArrayVal( const int *arrayPtr,
+                             const int& span,
+                             const int &ix,
+                             const int& iy )
         {
             return ntohl(arrayPtr[iy*span + ix]);
+        }
+
+    inline INT64 swapArrayVal( const INT64 *arrayPtr,
+                               const int& span,
+                               const int &ix,
+                               const int& iy )
+        {
+            int tmp;
+            union { unsigned int raw[2]; INT64 typed; } ret;
+            ret.typed = arrayPtr[iy*span + ix];
+            tmp = ret.raw[0];
+            ret.raw[0] = ntohl( ret.raw[1] );
+            ret.raw[1] = ntohl( tmp );
+            return ret.typed;
         }
 
     inline float swapArrayVal( const float *arrayPtr, const int& span,
                                const int &ix, const int& iy )
         {
-            union { unsigned FITS_LONG raw; float typed; } ret;
+            union { unsigned int raw; float typed; } ret;
             ret.typed = arrayPtr[iy*span + ix];
             ret.raw = ntohl(ret.raw);
             return ret.typed;
@@ -173,8 +183,8 @@ class RegionStats
     inline double swapArrayVal( const double *arrayPtr, const int& span,
                                 const int &ix, const int& iy )
         {
-            FITS_LONG tmp;
-            union { unsigned FITS_LONG raw[2]; double typed; } ret;
+            int tmp;
+            union { unsigned int raw[2]; double typed; } ret;
             ret.typed = arrayPtr[iy*span + ix];
             tmp = ret.raw[0];
             ret.raw[0] = ntohl( ret.raw[1] );
@@ -192,7 +202,8 @@ class RegionStats
     GENERATE_BADPIXA(unsigned char, VAL__BADUB);
     GENERATE_BADPIXA(short, VAL__BADS);
     GENERATE_BADPIXA(unsigned short, VAL__BADUS);
-    GENERATE_BADPIXA(FITS_LONG, VAL__BADI);
+    GENERATE_BADPIXA(int, VAL__BADI);
+    GENERATE_BADPIXA(INT64, VAL__BADK);
     GENERATE_BADPIXA(float, VAL__BADF);
     GENERATE_BADPIXA(double, VAL__BADD);
 
@@ -205,7 +216,8 @@ class RegionStats
     GENERATE_SWAPBADPIXA(unsigned char, VAL__BADUB);
     GENERATE_SWAPBADPIXA(short, VAL__BADS);
     GENERATE_SWAPBADPIXA(unsigned short, VAL__BADUS);
-    GENERATE_SWAPBADPIXA(FITS_LONG, VAL__BADI);
+    GENERATE_SWAPBADPIXA(int, VAL__BADI);
+    GENERATE_SWAPBADPIXA(INT64, VAL__BADK);
     GENERATE_SWAPBADPIXA(float, VAL__BADF);
     GENERATE_SWAPBADPIXA(double, VAL__BADD);
 
@@ -226,7 +238,11 @@ class RegionStats
 #include "RegionStatsTemplate.h"
 #undef DATA_TYPE
 
-#define DATA_TYPE FITS_LONG
+#define DATA_TYPE int
+#include "RegionStatsTemplate.h"
+#undef DATA_TYPE
+
+#define DATA_TYPE INT64
 #include "RegionStatsTemplate.h"
 #undef DATA_TYPE
 

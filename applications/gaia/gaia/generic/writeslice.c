@@ -180,6 +180,9 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
     case  LONG_IMAGE:
         cnf_exprt( "_INTEGER", (char *)type, 10 );
         break;
+    case  LONGLONG_IMAGE:
+        cnf_exprt( "_INT64", (char *)type, 10 );
+        break;
     case  FLOAT_IMAGE:
         cnf_exprt( "_REAL", (char *)type, 10 );
         break;

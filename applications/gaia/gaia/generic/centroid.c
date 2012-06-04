@@ -97,16 +97,16 @@
 
 extern F77_SUBROUTINE(rtd_cent)( CHARACTER(type), POINTER(image),
                                  LOGICAL(swap),
-				 INTEGER(nx), INTEGER(ny),
-				 DOUBLE_ARRAY(xin),
+                                 INTEGER(nx), INTEGER(ny),
+                                 DOUBLE_ARRAY(xin),
                                  DOUBLE_ARRAY(yin),
-				 INTEGER(nin), INTEGER(isize),
-				 DOUBLE(maxshf), INTEGER(maxit),
-				 DOUBLE(toler),
+                                 INTEGER(nin), INTEGER(isize),
+                                 DOUBLE(maxshf), INTEGER(maxit),
+                                 DOUBLE(toler),
                                  DOUBLE_ARRAY(xout),
-				 DOUBLE_ARRAY(yout),
+                                 DOUBLE_ARRAY(yout),
                                  INTEGER(nout),
-				 INTEGER(status) TRAIL(type));
+                                 INTEGER(status) TRAIL(type));
 
 int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
 {
@@ -264,6 +264,9 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
          break;
       case  LONG_IMAGE:
          cnf_exprt( "_INTEGER", (char *) type, 10 );
+         break;
+      case  LONGLONG_IMAGE:
+         cnf_exprt( "_INT64", (char *) type, 10 );
          break;
       case  FLOAT_IMAGE:
          cnf_exprt( "_REAL", (char *) type, 10 );

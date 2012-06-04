@@ -450,13 +450,24 @@ int Contour::drawContours()
             break;
          case LONG_IMAGE:
             if ( swap_ ) {
-               ndrawn = scanSwapImageNDF( (FITS_LONG *) image, nx, ny,
-                                       lplot, cval, xlower, ylower,
-                                       xsize, ysize, done );
+               ndrawn = scanSwapImageNDF( (int *) image, nx, ny,
+                                          lplot, cval, xlower, ylower,
+                                          xsize, ysize, done );
             } else {
-               ndrawn = scanNativeImageNDF( (FITS_LONG *) image, nx, ny,
-                                         lplot, cval, xlower, ylower,
-                                         xsize, ysize, done );
+               ndrawn = scanNativeImageNDF( (int *) image, nx, ny,
+                                            lplot, cval, xlower, ylower,
+                                            xsize, ysize, done );
+            }
+            break;
+         case LONGLONG_IMAGE:
+            if ( swap_ ) {
+                ndrawn = scanSwapImageNDF( (INT64 *) image, nx, ny,
+                                           lplot, cval, xlower, ylower,
+                                           xsize, ysize, done );
+            } else {
+                ndrawn = scanNativeImageNDF( (INT64 *) image, nx, ny,
+                                             lplot, cval, xlower, ylower,
+                                             xsize, ysize, done );
             }
             break;
          case FLOAT_IMAGE:
@@ -608,7 +619,13 @@ void Contour::contPlot( const AstPlot *plot, const int npts,
 #undef DATA_TYPE
 #undef DATA_FORMAT
 
-#define DATA_TYPE FITS_LONG
+#define DATA_TYPE int
+#define DATA_FORMAT NDF
+#include "ContourTemplates.icc"
+#undef DATA_TYPE
+#undef DATA_FORMAT
+
+#define DATA_TYPE INT64
 #define DATA_FORMAT NDF
 #include "ContourTemplates.icc"
 #undef DATA_TYPE

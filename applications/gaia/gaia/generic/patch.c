@@ -309,6 +309,9 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
         case  LONG_IMAGE:
             cnf_exprt( "_INTEGER", type, 10 );
             break;
+        case  LONGLONG_IMAGE:
+            cnf_exprt( "_INT64", type, 10 );
+            break;
         case  FLOAT_IMAGE:
             cnf_exprt( "_REAL", type, 10 );
             break;
@@ -587,6 +590,7 @@ void *copyImagetoWork( enum ImageDataType type,
                }
            }
            break;
+       case LONGLONG_IMAGE:
        case DOUBLE_IMAGE: {
            double *iArr = (double *) imagePtr;
            double *iPtr;
@@ -682,6 +686,7 @@ void copyWorktoImage( enum ImageDataType type,
                }
            }
            break;
+       case LONGLONG_IMAGE:
        case DOUBLE_IMAGE:
        {
            double *iArr = (double *) imagePtr;

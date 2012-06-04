@@ -66,19 +66,22 @@
 #define SWAP_DOUBLE_(value) value
 #define SWAP_FLOAT_(value) value
 #define SWAP_INT_(value) value
+#define SWAP_INT64_(value) value
 #define SWAP_SHORT_(value) value
 #define SWAP_USHORT_(value) value
 #else
 #define SWAP_DOUBLE_(value) SWAP_DOUBLE(value)
 #define SWAP_FLOAT_(value) SWAP_FLOAT(value)
 #define SWAP_INT_(value) SWAP_INT(value)
+#define SWAP_INT64_(value) SWAP_INT64(value)
 #define SWAP_SHORT_(value) SWAP_SHORT(value)
 #define SWAP_USHORT_(value) SWAP_USHORT(value)
 #endif
 
 /* Local types as HDS type strings, static for simple export */
 static const char *hdstypes[] = {
-    "_UBYTE", "_BYTE", "_UWORD", "_WORD", "_INTEGER", "_REAL", "_DOUBLE"
+    "_UBYTE", "_BYTE", "_UWORD", "_WORD", "_INTEGER", "_INT64", 
+    "_REAL", "_DOUBLE"
 };
 
 /* A double precistion number just greater than another */
@@ -203,7 +206,12 @@ int gaiaArrayHDSType( char *typePtr )
             type = HDS_WORD;
         }
         else if ( typePtr[1] == 'i' || typePtr[1] == 'I' ) {
-            type = HDS_INTEGER;
+            if ( typePtr[4] == '6' ) {
+                type = HDS_INT64;
+            }
+            else {
+                type = HDS_INTEGER;
+            }
         }
         else if ( typePtr[1] == 'r' || typePtr[1] == 'R' ) {
             type = HDS_REAL;
@@ -245,11 +253,13 @@ int gaiaArrayFITSType( int bitpix )
     case 32:
         type = HDS_INTEGER;
         break;
+    case 64:
+        type = HDS_INT64;
+        break;
     case -64:
         type = HDS_DOUBLE;
         break;
-    case 64:
-        /* This is not supported, should be HDS_LONG... */
+    default:
         type = HDS_UNKNOWN;
         break;
     }
@@ -283,6 +293,9 @@ int gaiaArrayFITSBitpix( int type )
     case HDS_INTEGER:
         bitpix = 32;
         break;
+    case HDS_INT64:
+        bitpix = 64;
+        break;
     case HDS_DOUBLE:
         bitpix = -64;
         break;
@@ -296,7 +309,7 @@ int gaiaArrayFITSBitpix( int type )
  */
 char const *gaiaArrayTypeToHDS( int type )
 {
-    if ( type >= 0 && type < 7 ) {
+    if ( type >= 0 && type < 8 ) {
         return hdstypes[type];
     }
     return "_UBYTE";
@@ -311,7 +324,7 @@ char const *gaiaArrayFullTypeToHDS( int intype, int isfits, double bscale,
                                     double bzero )
 {
     int type = gaiaArrayScaledType( intype, isfits, bscale, bzero );
-    if ( type >= 0 && type < 7 ) {
+    if ( type >= 0 && type < 8 ) {
         return hdstypes[type];
     }
     return "_UBYTE";
@@ -328,7 +341,7 @@ int gaiaArrayScaledType( int intype, int isfits, double bscale, double bzero )
     int scaled = ( intype < HDS_REAL && ( bscale != 1.0 || bzero != 0.0 ) );
 
     if ( scaled ) {
-        if ( intype == HDS_INTEGER ) {
+        if ( intype == HDS_INTEGER || intype == HDS_INT64 ) {
             outtype = HDS_DOUBLE;
         }
         else {
@@ -356,6 +369,10 @@ char const *gaiaArrayHDSBlankValue( int type )
         break;
         case HDS_REAL :
             sprintf( buffer, "%.9g", VAL__BADR );
+        break;
+
+        case HDS_INT64 :
+            sprintf( buffer, "%ld", VAL__BADK );
         break;
 
         case HDS_INTEGER :
@@ -403,6 +420,9 @@ size_t gaiaArraySizeOf( int type )
 
         case HDS_REAL :
             return sizeof( float );
+
+        case HDS_INT64 :
+            return sizeof( INT64 );
 
         case HDS_INTEGER :
             return sizeof( int );
@@ -458,6 +478,10 @@ void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr )
 
         case HDS_REAL:
             CONVERT_AND_COPY(float,VAL__BADR)
+        break;
+
+        case HDS_INT64:
+            CONVERT_AND_COPY(INT64,VAL__BADK)
         break;
 
         case HDS_INTEGER:
@@ -639,6 +663,10 @@ static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
                 EXTRACT_AND_COPY(float)
             break;
 
+            case HDS_INT64:
+                EXTRACT_AND_COPY(INT64)
+            break;
+
             case HDS_INTEGER:
                 EXTRACT_AND_COPY(int)
             break;
@@ -761,6 +789,10 @@ static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
 
             case HDS_REAL:
                 EXTRACT_AND_COPY(float)
+            break;
+
+            case HDS_INT64:
+                EXTRACT_AND_COPY(INT64)
             break;
 
             case HDS_INTEGER:
@@ -973,6 +1005,10 @@ static void RawCubeFromCube( ARRAYinfo *cubeinfo, int dims[3], int lbnd[3],
                 EXTRACT_AND_COPY(float)
             break;
 
+            case HDS_INT64:
+                EXTRACT_AND_COPY(INT64)
+            break;
+
             case HDS_INTEGER:
                 EXTRACT_AND_COPY(int)
             break;
@@ -1163,6 +1199,9 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
             break;
             case HDS_REAL:
                 EXTRACT_AND_COPY(float)
+            break;
+            case HDS_INT64:
+                EXTRACT_AND_COPY(INT64)
             break;
             case HDS_INTEGER:
                 EXTRACT_AND_COPY(int)
@@ -1462,6 +1501,14 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
                     EXTRACT_AND_COMBINE_MEDIAN(float,VAL__BADR)
                 }
             break;
+            case HDS_INT64:
+                if ( method == GAIA_ARRAY_MEAN ) {
+                    EXTRACT_AND_COMBINE_MEAN(INT64,VAL__BADK)
+                }
+                else {
+                    EXTRACT_AND_COMBINE_MEDIAN(INT64,VAL__BADK)
+                }
+            break;
             case HDS_INTEGER:
                 if ( method == GAIA_ARRAY_MEAN ) {
                     EXTRACT_AND_COMBINE_MEAN(int,VAL__BADI)
@@ -1603,6 +1650,14 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
         }
         break;
 
+        case HDS_INT64: {
+            INT64 *ptr = (INT64 *)inPtr;
+            for ( i = 0; i < nel; i++ ) {
+                ptr[i] = SWAP_INT64( ptr[i] );
+            }
+        }
+        break;
+
         case HDS_INTEGER: {
             int *ptr = (int *)inPtr;
             for ( i = 0; i < nel; i++ ) {
@@ -1698,6 +1753,37 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                     if ( isnan( ptr[i] ) ) {
                         ptr[i] = VAL__BADR;
                     }
+                }
+            }
+        }
+        break;
+
+        case HDS_INT64: {
+            if ( scaled && haveblank ) {
+                INT64 *ip = (INT64 *)inPtr;
+                double *op = (double *)*outPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ip[i] != inBlank ) {
+                        op[i] = ip[i] * bscale + bzero;
+                    }
+                    else {
+                        op[i] = VAL__BADD;
+                    }
+                }
+            }
+            else if ( haveblank ) {
+                INT64 *ptr = (INT64 *)inPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ptr[i] == inBlank ) {
+                        ptr[i] = VAL__BADK;
+                    }
+                }
+            }
+            else if ( scaled ) {
+                INT64 *ip = (INT64 *)inPtr;
+                double *op = (double *)*outPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    op[i] = ip[i] * bscale + bzero;
                 }
             }
         }
@@ -2091,6 +2177,10 @@ static void DataNormaliseCopy( void *inPtr, int intype, int nel, int isfits,
                CHECK_AND_REPLACE(float,VAL__BADR)
            break;
 
+           case HDS_INT64:
+               CHECK_AND_REPLACE(INT64,VAL__BADK)
+           break;
+
            case HDS_INTEGER:
                CHECK_AND_REPLACE(int,VAL__BADI)
            break;
@@ -2201,6 +2291,60 @@ static void DataNormaliseCopy( void *inPtr, int intype, int nel, int isfits,
                     }
                     else {
                         op[i] = value;
+                    }
+                }
+            }
+        }
+        break;
+
+        case HDS_INT64: {
+            INT64 *ip = (INT64 *)inPtr;
+            INT64 value;
+            if ( scaled ) {
+                double *op = (double *)*outPtr;
+                if ( haveblank ) {
+                    double badvalue = VAL__BADD;
+                    if ( nullcheck ) {
+                        badvalue = nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        value = SWAP_INT64_( ip[i] );
+                        if ( value == inBlank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = value * bscale + bzero;
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = SWAP_INT64_( ip[i] ) * bscale + bzero;
+                    }
+                }
+            }
+            else {
+                INT64 *op = (INT64 *)*outPtr;
+                if ( haveblank ) {
+                    INT64 badvalue = VAL__BADK;
+                    if ( nullcheck ) {
+                        badvalue = (INT64) nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        value = SWAP_INT64_( ip[i] );
+                        if ( value == inBlank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = value;
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = SWAP_INT64_( ip[i] );
                     }
                 }
             }
@@ -2549,6 +2693,20 @@ unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype )
         }
         break;
 
+        case HDS_INT64: {
+            INT64 *ptr = (INT64 *)info->ptr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( ptr[i] == VAL__BADK ) {
+                    mask[i] = notvisible;
+                    nbad++;
+                }
+                else {
+                    mask[i] = isvisible;
+                }
+            }
+        }
+        break;
+
         case HDS_INTEGER: {
             int *ptr = (int *)info->ptr;
             for ( i = 0; i < nel; i++ ) {
@@ -2762,6 +2920,12 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
             }
             break;
 
+            case HDS_INT64: {
+                INT64 badValue = SWAP_INT64_( VAL__BADK );
+                SWAP_MASK_AND_COPY(INT64,badValue)
+            }
+            break;
+
             case HDS_INTEGER: {
                 int badValue = SWAP_INT_( VAL__BADI );
                 SWAP_MASK_AND_COPY(int,badValue)
@@ -2848,6 +3012,11 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
 
             case HDS_REAL: {
                 MASK_AND_COPY(float,VAL__BADR)
+            }
+            break;
+
+            case HDS_INT64: {
+                MASK_AND_COPY(INT64,VAL__BADK)
             }
             break;
 
@@ -2939,6 +3108,10 @@ void gaiaArrayMinMax( ARRAYinfo *info, double *min, double *max )
                GET_MIN_AND_MAX(float,VAL__BADR,VAL__MINR,VAL__MAXR)
            break;
 
+           case HDS_INT64:
+               GET_MIN_AND_MAX(INT64,VAL__BADK,VAL__MINK,VAL__MAXK)
+           break;
+
            case HDS_INTEGER:
                GET_MIN_AND_MAX(int,VAL__BADI,VAL__MINI,VAL__MAXI)
            break;
@@ -2999,6 +3172,32 @@ void gaiaArrayMinMax( ARRAYinfo *info, double *min, double *max )
             }
             *min = (double) tmin;
             *max = (double) tmax;
+        }
+        break;
+
+        case HDS_INT64: {
+            INT64 *ip = (INT64 *)ptr;
+            INT64 value;
+            INT64 tmin = VAL__MAXK;
+            INT64 tmax = VAL__MINK;
+            if ( haveblank ) {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_INT64_( ip[i] );
+                    if ( value != blank ) {
+                        tmin = MIN( value * bscale + bzero, tmin );
+                        tmax = MAX( value * bscale + bzero, tmax );
+                    }
+                }
+            }
+            else {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_INT64_( ip[i] );
+                    tmin = MIN( value * bscale + bzero, tmin );
+                    tmax = MAX( value * bscale + bzero, tmax );
+                }
+            }
+            *min = (INT64) tmin;
+            *max = (INT64) tmax;
         }
         break;
 

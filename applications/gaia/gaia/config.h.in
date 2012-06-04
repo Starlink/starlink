@@ -68,6 +68,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Type for 64 bit integers */
+#undef INT64
+
 /* Are we building against Mac OS X TkAqua? */
 #undef MAC_OSX_TK
 
@@ -115,6 +118,9 @@
 
 /* The size of a `long', as computed by sizeof. */
 #undef SIZEOF_LONG
+
+/* The size of a `long long', as computed by sizeof. */
+#undef SIZEOF_LONG_LONG
 
 /* Define to a function call which will initialise the Fortran RTL */
 #undef STAR_INITIALISE_FORTRAN

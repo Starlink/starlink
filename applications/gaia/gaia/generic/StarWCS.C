@@ -782,7 +782,7 @@ int StarWCS::pix2wcsDist(double x, double y, double& ra, double& dec) const
     double xDegPix = xSecPix() / 3600.;
     double yDegPix = ySecPix() / 3600.;
     if ( xDegPix == 0.0 || yDegPix == 0.0 ) {
-	return error("can't convert image to world coordinate distance");
+        return error("can't convert image to world coordinate distance");
     }
     ra = fabs( x * xDegPix );
     dec = fabs( y * yDegPix );
@@ -1477,9 +1477,9 @@ int StarWCS::make2D()
 //  Reset the center of the WCS structure
 //
 //  Args:
-// 	ra        = New center right ascension in degrees
-// 	dec       = New center declination in degrees
-// 	equinox   = (must be 2000 or 1950)
+//      ra        = New center right ascension in degrees
+//      dec       = New center declination in degrees
+//      equinox   = (must be 2000 or 1950)
 //-
 int StarWCS::shift(double ra, double dec, double equinox)
 {

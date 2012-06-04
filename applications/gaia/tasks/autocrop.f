@@ -136,6 +136,9 @@
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          CALL RTD1_GBNDI( %VAL( CNF_PVAL( IPIN ) ), XDIM, YDIM,
      :                    LBNDS, UBNDS, STATUS )
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL RTD1_GBNDK( %VAL( CNF_PVAL( IPIN ) ), XDIM, YDIM,
+     :                    LBNDS, UBNDS, STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL RTD1_GBNDD( %VAL( CNF_PVAL( IPIN ) ), XDIM, YDIM,
      :                    LBNDS, UBNDS, STATUS )

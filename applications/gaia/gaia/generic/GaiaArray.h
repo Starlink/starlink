@@ -8,8 +8,8 @@
 /* Enumeration for the support data types, these are supposed to match the HDS
    ones. */
 enum { HDS_UNKNOWN = -1,
-       HDS_UBYTE, HDS_BYTE, HDS_UWORD, HDS_WORD, HDS_INTEGER, HDS_REAL,
-       HDS_DOUBLE };
+       HDS_UBYTE, HDS_BYTE, HDS_UWORD, HDS_WORD, HDS_INTEGER, 
+       HDS_INT64, HDS_REAL, HDS_DOUBLE };
 
 /* Combination types */
 enum { GAIA_ARRAY_MEAN, GAIA_ARRAY_MEDIAN };
@@ -34,7 +34,7 @@ struct ARRAYinfo {
     long el;             /* The number of type elements available */
     int isfits;          /* If FITS data */
     int haveblank;       /* Have a FITS blank value */
-    int blank;           /* The FITS blank value, if applicable */
+    INT64 blank;         /* The FITS blank value, if applicable */
     double bscale;       /* FITS BSCALE value, used for integer types */
     double bzero;        /* FITS BZERO value, used for integer types */
     int memtype;         /* How memory was allocated (enum value) */

@@ -189,11 +189,22 @@ void XYProfile::extractProfiles( double *xCoords, double *xVector,
         break;
     case LONG_IMAGE:
         if ( swap_ ) {
-            extractSwapImage( (FITS_LONG *) image, nx, ny, bscale,
+            extractSwapImage( (int *) image, nx, ny, bscale,
                               bzero, x0, y0, x1, y1, xCoords, xVector,
                               yCoords, yVector, numValues );
         } else {
-            extractNativeImage( (FITS_LONG *) image, nx, ny, bscale,
+            extractNativeImage( (int *) image, nx, ny, bscale,
+                                bzero, x0, y0, x1, y1, xCoords, xVector,
+                                yCoords, yVector, numValues );
+        }
+        break;
+    case LONGLONG_IMAGE:
+        if ( swap_ ) {
+            extractSwapImage( (INT64 *) image, nx, ny, bscale,
+                              bzero, x0, y0, x1, y1, xCoords, xVector,
+                              yCoords, yVector, numValues );
+        } else {
+            extractNativeImage( (INT64 *) image, nx, ny, bscale,
                                 bzero, x0, y0, x1, y1, xCoords, xVector,
                                 yCoords, yVector, numValues );
         }
@@ -244,7 +255,11 @@ void XYProfile::extractProfiles( double *xCoords, double *xVector,
 #include "XYProfileTemplates.icc"
 #undef DATA_TYPE
 
-#define DATA_TYPE FITS_LONG
+#define DATA_TYPE int
+#include "XYProfileTemplates.icc"
+#undef DATA_TYPE
+
+#define DATA_TYPE INT64
 #include "XYProfileTemplates.icc"
 #undef DATA_TYPE
 

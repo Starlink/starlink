@@ -92,8 +92,16 @@ gaia_headers=`cd ${srcdir}; echo generic/*.h generic/*.icc`
 gaia_includes="-I. -I${srcdir}/generic -I${srcdir}/bitmaps -I${prefix}/include/skycat -I${prefix}/include/rtd -I${prefix}/include/cat -I${prefix}/include/astrotcl -I${prefix}/include/tclutil"
 tclsources=`cd ${srcdir}; echo library/*.tcl library/*.itk library/*.xpm library/*.gif library/skycat2.0.cfg`
 
-#  Size of long, used for FITS.
-AC_CHECK_SIZEOF(long,4)
+#  Size of long so we can distinguish 32 and 64 bit integer types. We assume
+#  "int" is 32 bit in GAIA.
+AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(long long)
+if test $ac_cv_sizeof_long_long -eq 8; then
+   AC_DEFINE( INT64, [long long], [Type for 64 bit integers] )
+fi
+if test $ac_cv_sizeof_long -eq 8; then
+   AC_DEFINE( INT64, [long], [Type for 64 bit integers] )
+fi
 
 ]) 
 #  GAIA_CONFIG

@@ -185,6 +185,11 @@
      :                      %VAL( CNF_PVAL( IPIN ) ),
      :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT,
      :                      TOLER, XACC, YACC, STATUS )
+         ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+            CALL RTD1_CENK( XIN( I ), YIN( I ),
+     :                      %VAL( CNF_PVAL( IPIN ) ),
+     :                      SWAP, NX, NY, ISIZE, SIGN, MAXSHF, MAXIT,
+     :                      TOLER, XACC, YACC, STATUS )
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
             CALL RTD1_CENR( XIN( I ), YIN( I ),
      :                      %VAL( CNF_PVAL( IPIN ) ),

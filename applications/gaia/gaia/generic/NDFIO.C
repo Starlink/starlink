@@ -339,12 +339,24 @@ int NDFIO::get(const char* keyword, int& val) const {
 
 int NDFIO::get(const char* keyword, long& val) const {
    if (sizeof(int) != sizeof(long)) {
-      return error("NDFIO: long int size not supported");
+       long long llval = (long long) val;
+       return (int) get( keyword, llval );
    }
    int length = header_.length();
    char* ptr = (char*)header_.ptr();
    set_header_length();
    return length ? ! hgeti4(ptr, keyword, (int*)&val) : 1;
+}
+
+int NDFIO::get(const char* keyword, long long& val) const {
+
+   //  Need this function for BLANK pixel support, so make sure it works.
+   char *value = get( keyword );
+   if ( value == NULL ) return 1;
+
+   //  Translate into long long.
+   val = atoll( value );
+   return 0;
 }
 
 int NDFIO::get(const char* keyword, unsigned char& val) const {

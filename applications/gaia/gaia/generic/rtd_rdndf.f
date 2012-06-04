@@ -38,6 +38,7 @@
 *          -16 = unsiged word
 *           32 = integer
 *          -32 = floating point
+*           64 = long integer
 *          -64 = double precision
 *        Obviously these types limit those that an NDF can have. Note
 *        that type -8, which RTD interprets as X image data (mapped to
@@ -61,6 +62,7 @@
 *  Copyright:
 *     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -109,6 +111,8 @@
 *        a special XImage type in Skycat).
 *     30-MAY-2001 (PWD):
 *        Now supports _DOUBLE directly.
+*     17-MAY-2012 (PWD):
+*        Add long integer (_INT64) support.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -220,6 +224,8 @@
                TYPE = -32
             ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
                TYPE = -64
+            ELSE IF ( DTYPE .EQ. '_INT64' ) THEN
+               TYPE = 64
             ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
                TYPE = 32
             ELSE IF ( DTYPE .EQ. '_WORD' ) THEN

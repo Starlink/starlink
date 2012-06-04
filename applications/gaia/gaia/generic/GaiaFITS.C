@@ -282,7 +282,7 @@ int GaiaFITSCreate( const char* filename, void *data,
         datatype = TFLOAT;
         break;
     case 64:
-        datatype = TLONG;
+        datatype = TLONGLONG;
         needbscale = 1;
         break;
     case -64:

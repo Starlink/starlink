@@ -63,8 +63,10 @@
  *                 24/05/07  Add methods for extracting compressed extension
  *                           images.
  *                 01/03/11  Add support for the -TAB format. Stores look up
- *                           tables to map coordinates to pixel indices in 
+ *                           tables to map coordinates to pixel indices in
  *                           a further extension of an MEF.
+ *                 31/05/11  Add Pan-STARRS log scaled image hack.
+ *                 26/07/11  Add Pan-STARRS asinh scaled image hack.
  */
 static const char* const rcsId="@(#) $Id$";
 
@@ -126,7 +128,7 @@ static char* getFromStdin(char* filename)
 
 /**
  *  Handle a request from AST (which uses C binding) to locate and load a -TAB
- *  table. Note the given AstFitsChan must have the "this" pointer of the 
+ *  table. Note the given AstFitsChan must have the "this" pointer of the
  *  StarFitsIO object stored so we can call the real member that has access to
  *  the FITS file handle.
  */
@@ -833,6 +835,7 @@ int StarFitsIO::write( const char *filename )
     case 16:
     case 32:
     case -32:
+    case  64:
     case -64:
         fwrite((char*)data_.ptr(), tsize, width_*height_, f);
         break;
@@ -941,11 +944,13 @@ int StarFitsIO::saveCompressedImage( const char *filename, const char *object )
     double nulval = 0.0;
     fitsfile *outfptr;
     int anynul = 0;
-    int bitpix = 0;
+    int bitpixin = 0;
+    int bitpixout = 0;
     int bytepix = 0;
-    int datatype = 0;
+    int intype = 0;
     int naxis = 0;
     int nkeys = 0;
+    int outtype = 0;
     int status = 0;
     long naxes[7];
     long nbytes = 0;
@@ -971,15 +976,39 @@ int StarFitsIO::saveCompressedImage( const char *filename, const char *object )
     //  Get dimensions and total number of pixels (may be higher dimensional
     //  than an image, allow that up to the usual 7).
     for ( int i = 0; i < 7; i++ ) naxes[i] = 1;
-    fits_get_img_param( fitsio_, 7, &bitpix, &naxis, naxes, &status );
+    fits_get_img_param( fitsio_, 7, &bitpixin, &naxis, naxes, &status );
     if ( status != 0 ) {
         return cfitsio_error();
     }
     npix = 1;
     for ( int i = 0; i < naxis; i++ ) npix *= naxes[i];
 
+    // If this is a Pan-STARRS log or sinh compressed image we'll need to
+    // expand it, so change the bitpix of the output image.
+    double boffset = 0.0;
+    double bsoften = 0.0;
+    int panstarr = 0;
+    int issinh = 0;
+    if ( get( "BOFFSET", boffset ) == 0 ) {
+        //  Yes it is.
+        panstarr = 1;
+        bitpixout = DOUBLE_IMG;
+
+        //  sinh variant.
+        if ( get( "BSOFTEN", bsoften ) == 0 ) {
+            issinh = 1;
+            cout << "is Pan-STARRS sinh compressed image" << endl;
+        }
+        else {
+            cout << "is Pan-STARRS log compressed image" << endl;
+        }
+    }
+    else {
+        bitpixout = bitpixin;
+    }
+
     // Create the new image
-    fits_create_img( outfptr, bitpix, naxis, naxes, &status );
+    fits_create_img( outfptr, bitpixout, naxis, naxes, &status );
 
     // Set the OBJECT card to hold the original name, if given.
     if ( object != NULL && object[0] != '\0' ) {
@@ -1013,44 +1042,94 @@ int StarFitsIO::saveCompressedImage( const char *filename, const char *object )
 
     // Work out data characteristics and allocate memory to hold
     // decompressed image.
-    switch( bitpix ) {
+    switch( bitpixin ) {
     case BYTE_IMG:
-        datatype = TBYTE;
+        intype = TBYTE;
         break;
     case SHORT_IMG:
-        datatype = TSHORT;
+        intype = TSHORT;
         break;
     case LONG_IMG:
-        datatype = TINT;
+        intype = TINT;
+        break;
+    case LONGLONG_IMG:
+        intype = TLONGLONG;
         break;
     case FLOAT_IMG:
-        datatype = TFLOAT;
+        intype = TFLOAT;
         break;
     case DOUBLE_IMG:
-        datatype = TDOUBLE;
+        intype = TDOUBLE;
         break;
     }
 
-    bytepix = abs(bitpix) / 8;
+    // If this is a Pan-STARRS log compressed image we'll need to expand it.
+    if ( panstarr ) {
+        outtype = TDOUBLE;
+        intype = TDOUBLE;
+    }
+    else {
+        outtype = intype;
+    }
+    bytepix = abs( bitpixout ) / 8;
     nbytes = npix * bytepix;
     array = (double *) malloc( nbytes );
 
-    // Turn off any scaling so that we copy the raw pixel values.
-    // Note should be undone by any call that changes HDU.
-    fits_set_bscale( fitsio_,  bscale, bzero, &status );
+    // Turn off any scaling so that we copy the raw pixel values,
+    // if needed. Note should be undone by any call that changes HDU.
+    fits_set_bscale( fitsio_, bscale, bzero, &status );
     fits_set_bscale( outfptr, bscale, bzero, &status );
 
     // Read image and write it back to the output file.
-    fits_read_img( fitsio_, datatype, 1, npix, &nulval, array, &anynul,
+    fits_read_img( fitsio_, intype, 1, npix, &nulval, array, &anynul,
                    &status );
-    fits_write_img( outfptr, datatype, 1, npix, array, &status );
+    if ( panstarr ) {
+        double v;
+        double blank;
+        long i;
+        get( fitsio_, "BSCALE", bscale );
+        get( fitsio_, "BZERO", bzero );
+        get( fitsio_, "BLANK", blank );
+        if ( issinh ) {
+            for ( i = 0; i < npix; i++ ) {
+                v = array[i];
+                if ( v != blank ) {
+                    v = v * bscale + bzero;
+                    array[i] = 2.0 * bsoften * sinh( v / 1.08573620475813 ) 
+                               + boffset;
+
+                    //  Unscaled to match file BSCALE and BZERO.
+                    array[i] = ( array[i] - bzero ) / bscale;
+                }
+                else {
+                    v = FP_NAN;
+                }
+            }
+        }
+        else {
+            for ( i = 0; i < npix; i++ ) {
+                v = array[i];
+                if ( v != blank ) {
+                    v = v * bscale + bzero;
+                    array[i] = pow( 10.0, v ) + boffset;
+
+                    //  Unscaled to match file BSCALE and BZERO.
+                    array[i] = ( array[i] - bzero ) / bscale;
+                }
+                else {
+                    v = FP_NAN;
+                }
+            }
+        }
+    }
+    fits_write_img( outfptr, outtype, 1, npix, array, &status );
 
     // Expect to be at the end of file.
     if ( status == END_OF_FILE ) {
         status = 0;
     }
 
-    // Close file ans release memory.
+    // Close file and release memory.
     fits_close_file( outfptr,  &status );
     free( array );
 

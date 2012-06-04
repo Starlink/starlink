@@ -31,6 +31,7 @@
 *          -16 = unsiged word
 *           32 = integer
 *          -32 = floating point
+*           64 = long integer
 *          -64 = double precision
 *        Obviously these types limit those that an NDF can have.
 *     ID = INTEGER (Given)
@@ -186,6 +187,8 @@
             DTYPE = '_REAL'
          ELSE IF ( TYPE .EQ. -64 ) THEN
             DTYPE = '_DOUBLE'
+         ELSE IF ( TYPE .EQ. 64 ) THEN
+            DTYPE = '_INT64'
          ELSE IF ( TYPE .EQ. 32 ) THEN
             DTYPE = '_INTEGER'
          ELSE IF ( TYPE .EQ. 16 ) THEN
@@ -225,6 +228,10 @@
      :                     IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
             CALL VEC_ITOI( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
+     :                     %VAL( CNF_PVAL( IPDAT ) ),
+     :                     IERR, NERR, STATUS )
+         ELSE IF ( DTYPE .EQ. '_INT64' ) THEN
+            CALL VEC_ITOK( .FALSE., EL, %VAL( CNF_PVAL( IP ) ),
      :                     %VAL( CNF_PVAL( IPDAT ) ),
      :                     IERR, NERR, STATUS )
          ELSE IF ( DTYPE .EQ. '_WORD' ) THEN

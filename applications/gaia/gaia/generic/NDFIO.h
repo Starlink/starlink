@@ -115,6 +115,7 @@ public:
    int get( const char* keyword, float& val ) const;
    int get( const char* keyword, int& val ) const;
    int get( const char* keyword, long& val ) const;
+   int get( const char* keyword, long long& val ) const;
    int get( const char* keyword, unsigned char& val ) const;
    int get( const char* keyword, unsigned short& val ) const;
    int get( const char* keyword, short& val ) const;

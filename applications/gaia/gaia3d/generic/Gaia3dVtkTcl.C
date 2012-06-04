@@ -284,6 +284,9 @@ static int Gaia3dVtkSetArray( ClientData clientData, Tcl_Interp *interp,
         case HDS_INTEGER:
             vii->SetDataScalarTypeToInt();
             break;
+        case HDS_INT64:
+            vii->SetDataScalarType( VTK_LONG );
+            break;
         case HDS_REAL:
             vii->SetDataScalarTypeToFloat();
             break;

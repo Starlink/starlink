@@ -1,5 +1,5 @@
       SUBROUTINE RTD1_SNDFH( NDF, BITPIX, BAD, NHEAD, IPHEAD, AVAIL,
-     :           STATUS )
+     :                       STATUS )
 *+
 *  Name:
 *     RTD_SNDFH
@@ -143,6 +143,8 @@
          ELSE IF ( BITPIX .EQ. -64 ) THEN
 C            WRITE( VALUE, '(G24.17)') VAL__BADD ! Broken in g77 2.91.66 missing E in exponent
             CALL DENCODE( VAL__BADD, VALUE )
+         ELSE IF ( BITPIX .EQ. 64 ) THEN
+            WRITE( VALUE, '(I24)') VAL__BADK
          ELSE IF ( BITPIX .EQ. 32 ) THEN
             WRITE( VALUE, '(I16)') VAL__BADI
          ELSE IF ( BITPIX .EQ. 16 ) THEN

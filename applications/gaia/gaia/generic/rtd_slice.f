@@ -204,6 +204,14 @@
                   X = X + DELX
                   Y = Y + DELY
                END DO
+            ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+               DO I = 1, NELEM
+                  CALL RTD1_ETERPK( X, Y, NX, NY,
+     :                              %VAL( CNF_PVAL( IPIN ) ), I,
+     :                              SWAP, %VAL( CNF_PVAL( ISPEC ) ) )
+                  X = X + DELX
+                  Y = Y + DELY
+               END DO
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                DO I = 1, NELEM
                   CALL RTD1_ETERPR( X, Y, NX, NY,

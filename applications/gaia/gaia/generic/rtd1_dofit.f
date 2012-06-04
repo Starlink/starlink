@@ -201,6 +201,10 @@
          CALL RTD1_MSTI( MASK, DIM1, DIM2, %VAL( CNF_PVAL( IPIMG ) ),
      :                   .TRUE., XMIN, XMAX, YMIN, YMAX, NVALID,
      :                   STATUS )
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL RTD1_MSTK( MASK, DIM1, DIM2, %VAL( CNF_PVAL( IPIMG ) ),
+     :                   .TRUE., XMIN, XMAX, YMIN, YMAX, NVALID,
+     :                   STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
          CALL RTD1_MSTR( MASK, DIM1, DIM2, %VAL( CNF_PVAL( IPIMG ) ),
      :                   .TRUE., XMIN, XMAX, YMIN, YMAX, NVALID,
@@ -276,6 +280,16 @@
      :                      NVALID, SIGSUM, STATUS )
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          CALL RTD1_SUFITI( MASK,
+     :                     %VAL( CNF_PVAL( IPIMG ) ),
+     :                     %VAL( CNF_PVAL( IPVAR ) ),
+     :                     DIM1, DIM2, HAVVAR,
+     :                     %VAL( CNF_PVAL( IPX ) ),
+     :                     %VAL( CNF_PVAL( IPY ) ),
+     :                     %VAL( CNF_PVAL( IPZ  ) ),
+     :                     %VAL( CNF_PVAL( IPW  ) ),
+     :                     NVALID, SIGSUM, STATUS )
+      ELSE IF ( TYPE .EQ. '_INT64' ) THEN
+         CALL RTD1_SUFITK( MASK,
      :                     %VAL( CNF_PVAL( IPIMG ) ),
      :                     %VAL( CNF_PVAL( IPVAR ) ),
      :                     DIM1, DIM2, HAVVAR,
