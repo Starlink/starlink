@@ -379,6 +379,10 @@
 *        - Remove memiter=0 case. Ticket #885.
 *     2012-05-01 (DSB):
 *        Add control-C handler to allow controlled premature exit.
+*     2012-06-05 (DSB):
+*        Allow the old FLT model to be added back onto the residuals at the start 
+*        of each iteration, rather than just before finding a new FLT (in 
+*        smf_calcmodel_flt). This is controlled by new config parameter FLT.UNDOFIRST.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -514,11 +518,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t count_mcnvg=0;         /* # chunks fail to converge */
   size_t count_minsmp=0;        /* # chunks fail due to insufficient samples */
   smf_qual_t flagmap=0;         /* bit mask for flagmaps */
+  int flt_undofirst = 1;        /* Undo FLT model at start of iteration? */
   double *fmapdata=NULL;        /* fakemap for adding external ast signal */
   int groupsubarray;            /* Handle subarrays separately? */
   int noexportsetbad=0;         /* Don't set bad values in exported models */
   int haveast=0;                /* Set if AST is one of the models */
   int haveext=0;                /* Set if EXT is one of the models */
+  int haveflt=0;                /* Set if FLT is one of the models */
   int havegai=0;                /* Set if GAI is one of the models */
   int havenoi=0;                /* Set if NOI is one of the models */
   smfData *refdata=NULL;        /* Pointer to reference smfData */
@@ -536,6 +542,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t j;                     /* Loop counter */
   size_t k;                     /* Loop counter */
   AstKeyMap *keymap=NULL;       /* Copy of supplied keymap */
+  AstKeyMap *kmap=NULL;         /* Pointer to model-specific keys */
   size_t l;                     /* Loop counter */
   double *lastchisquared=NULL;  /* chisquared for last iter */
   double *lastmap=NULL;         /* map from the last iter */
@@ -603,6 +610,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int varmapmethod=0;           /* Method for calculating varmap */
   dim_t whichast=0;             /* Model index of AST (must be specified) */
   dim_t whichext=0;             /* Model index of EXT if present */
+  dim_t whichflt=0;             /* Model index of FLT if present */
   dim_t whichgai=0;             /* Model index of GAI if present */
   dim_t whichnoi=0;             /* Model index of NOI if present */
   int *whichthetabin=NULL;      /* Which scan angle bin each time slice */
@@ -683,6 +691,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   if( *status == SAI__OK ) {
     if( *status == SAI__OK ) {
+
+      /* See if the FLT model is to be undone at the start of the
+         ioteration or when the FLT model is updated. */
+      if( astMapGet0A( keymap, "FLT", &kmap ) ) {
+         astMapGet0I( kmap, "UNDOFIRST", &flt_undofirst );
+         kmap = astAnnul( kmap );
+      }
 
       /* Chisquared change tolerance for stopping */
       astMapGet0D( keymap, "CHITOL", &chitol );
@@ -885,6 +900,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           if( thismodel == SMF__EXT ) {
             haveext = 1;
             whichext = imodel;
+          }
+
+          /* set haveflt/whichflt */
+          if( thismodel == SMF__FLT ) {
+            haveflt = 1;
+            whichflt = imodel;
           }
 
           /* set havegai/whichgai */
@@ -1710,36 +1731,51 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             j = k%nmodels;
 
             /* If this is the first model component and not the first
-               iteration, we need to undo EXTinction and GAIn (if used
-               for flatfielding) so that RES/NOI are in the correct
-               units. */
+               iteration, we need to undo some models (EXT, GAI, FLT ).
+               Undo them in the reverse order to which they were done. */
 
             if( (j==0) && (iter>0) ) {
-              if( haveext ) {
-                msgOutiff( MSG__VERB, "",
-                           "  ** undoing EXTinction from previous iteration",
-                           status );
-                smf_calcmodel_ext( wf, &dat, 0, keymap, model[whichext],
-                                   SMF__DIMM_INVERT, status );
+              dim_t jj = whichast - 1;
+              while( jj != whichast ) {
+
+                if( jj == whichext && haveext ) {
+                  msgOutiff( MSG__VERB, "",
+                             "  ** undoing EXTinction from previous iteration",
+                             status );
+                  smf_calcmodel_ext( wf, &dat, 0, keymap, model[whichext],
+                                     SMF__DIMM_INVERT, status );
+                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                             ": ** %f s undoing EXT",
+                             status, smf_timerupdate(&tv1,&tv2,status) );
+
+                } else if( jj == whichgai && havegai ) {
+                  msgOutiff( MSG__VERB, "",
+                             "  ** undoing GAIn from previous iteration",
+                             status );
+                  smf_calcmodel_gai( wf, &dat, 0, keymap, model[whichgai],
+                                     SMF__DIMM_INVERT, status );
+                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                             ": ** %f s undoing GAI",
+                             status, smf_timerupdate(&tv1,&tv2,status) );
+
+                } else if( jj == whichflt && haveflt && flt_undofirst ) {
+                  msgOutiff( MSG__VERB, "",
+                             "  ** undoing FLT from previous iteration",
+                             status );
+                  smf_calcmodel_flt( wf, &dat, 0, keymap, model[whichflt],
+                                     SMF__DIMM_INVERT, status );
+                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                             ": ** %f s undoing FLT",
+                             status, smf_timerupdate(&tv1,&tv2,status) );
+                }
+
+                if( jj <= 0 ) {
+                  jj = nmodels - 1;
+                } else {
+                  jj--;
+                }
+
               }
-
-              /*** TIMER ***/
-              msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                         ": ** %f s undoing EXT",
-                         status, smf_timerupdate(&tv1,&tv2,status) );
-
-              if( havegai ) {
-                msgOutiff( MSG__VERB, "",
-                           "  ** undoing GAIn from previous iteration",
-                           status );
-                smf_calcmodel_gai( wf, &dat, 0, keymap, model[whichgai],
-                                   SMF__DIMM_INVERT, status );
-              }
-
-              /*** TIMER ***/
-              msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                         ": ** %f s undoing GAI",
-                         status, smf_timerupdate(&tv1,&tv2,status) );
             }
 
             /* Message stating which model we're in */

@@ -29,7 +29,7 @@
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: not used
+*        Control flags.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -73,6 +73,10 @@
 *        Allow FLT model to be masked.
 *     2012-05-22 (DSB):
 *        Multi-thread some loops.
+*     2012-06-05 (DSB):
+*        Allow the old FLT model to be added back into the residuals at the 
+*        start of the iteration, rather than just before finding the new FLT 
+*        model. This is controlled by config parameter FLT.UNDOFIRST.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -147,8 +151,7 @@ typedef struct smfCalcModelFltData {
 
 void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel,
-                        int flags __attribute__((unused)),
-                        int *status) {
+                        int flags, int *status) {
 
   /* Local Variables */
   dim_t bolostep;               /* Number of bolos per thread */
@@ -183,6 +186,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t tstride;               /* Time slice stride in data array */
+  int undofirst = 1;            /* Undo FLT model at start of iteration? */
   int whiten;                   /* Applying whitening filter? */
   int zeropad;                  /* Pad with zeros? */
 
@@ -196,6 +200,10 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Obtain pointer to sub-keymap containing FLT filter
      parameters. Something will always be available.*/
   astMapGet0A( keymap, "FLT", &kmap );
+
+  /* Was the FLT model undone at the start of the iteration. If so, we do
+     not need to undo it again here. */
+  astMapGet0I( kmap, "UNDOFIRST", &undofirst );
 
   /* Are we skipping the first iteration? */
   astMapGet0I(kmap, "NOTFIRST", &notfirst);
@@ -233,10 +241,9 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Allocate job data for threads. */
   job_data = astCalloc( nw, sizeof(*job_data) );
 
-  /* Loop over index in subgrp (subarray) and put the previous iteration
-     of the filtered component back into the residual before calculating
-     and removing the new filtered component */
+  /* Process each sub-array in turn. */
   for( idx=0; (*status==SAI__OK)&&(idx<res->ndat); idx++ ) {
+
     /* Obtain dimensions of the data */
     smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice,
                   &ndata, &bstride, &tstride, status);
@@ -287,27 +294,9 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->noitstride = noitstride;
       }
 
-      /* Create a filter */
-      filt = smf_create_smfFilter( res->sdata[idx], status );
-      smf_filter_fromkeymap( filt, kmap, res->sdata[idx]->hdr, &dofft,
-                             &whiten, status );
-
-      if( *status == SMF__INFREQ ) {
-        /* If a bad frequency was specified just annul the error and
-           skip the FLT model component */
-        dofft = 0;
-        errAnnul( status );
-        msgOut( "", FUNC_NAME ": invalid frequency for filter specified. "
-                "Skipping FLT model component.", status );
-      } else {
-        if( !dofft ) {
-          msgOutif( MSG__VERB, " ", FUNC_NAME
-                    ": No valid filter specifiers for FLT given", status );
-        }
-      }
-
-      if( *status == SAI__OK ) {
-        /* Place last iteration of filtered signal back into residual */
+      /* If we are just inverting the model, place last iteration of filtered
+         signal back into residual */
+      if( flags & SMF__DIMM_INVERT ) {
         for( iw = 0; iw < nw; iw++ ) {
           pdata = job_data + iw;
           pdata->oper = 1;
@@ -315,81 +304,116 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
         }
         thrWait( wf, status );
 
-        /* Make a copy of the last model if calculating dchisq */
-        if( noi ) {
-          memcpy( model_data_copy, model_data,
-                  ndata*smf_dtype_size(res->sdata[idx], status ) );
-        }
+      /* Otherwise, estimate and remove the FLT model. */
+      } else {
 
-        /* Copy the residual+old model into model_data where it will be
-           filtered again in this iteration. */
-        memcpy( model_data, res_data,
-                ndata*smf_dtype_size(res->sdata[idx],status) );
-
-        /* Set samples bad that correspond to source pixels in the mask map.
-           This seems to improve the speed of convergence and could reduce
-           ringing caused by bright sources. */
-        if( mask && lut ) {
-
-          /* We do not allow the masking to extend close to the start or
-             end of the time stream since this would mean that the FLT
-             model is poorly constrained in the masked area. "Close" is
-             defined as "napod + 2*npad" samples from either end, where
-             "napod" is the number of apodised samples and "npad" is the
-             number of padded samples at each end. */
-          size_t npad, npad_or_apod, nclose;
-          smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD |
-                             SMF__Q_APOD, &npad_or_apod, NULL, status );
-          smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD,
-                             &npad, NULL, status );
-          nclose = npad + npad_or_apod;
-
-          /* Do the masking. Bad values are filled by smf_fillgaps, regardless
-             of quality, so we just set the model values bad. */
+        /* If not already done, add the old FLT model back on again. */
+        if( ! undofirst ) {
           for( iw = 0; iw < nw; iw++ ) {
             pdata = job_data + iw;
-            pdata->nclose = nclose;
-            pdata->oper = 2;
+            pdata->oper = 1;
             thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
           }
           thrWait( wf, status );
         }
-      }
 
-      /* Apply the complementary filter to the copy of the
-         residual+old model stored in the model. So, for example, if
-         the goal is to remove low-frequency noise with a high-pass filter,
-         this operation will place the low-frequencies into the model (and
-         we can then subtract it from the residual).
-      */
-      if( dofft ) {
-        smf_filter_execute( wf, model->sdata[idx], filt, 1, whiten, status );
-      }
+        /* Create a filter */
+        filt = smf_create_smfFilter( res->sdata[idx], status );
+        smf_filter_fromkeymap( filt, kmap, res->sdata[idx]->hdr, &dofft,
+                               &whiten, status );
 
-      /* Now remove the filtered signals from the residual by subtracting
-         off the new iteration of the model. */
-      if( *status == SAI__OK ) {
-
-        /* Submit the jobs */
-        for( iw = 0; iw < nw; iw++ ) {
-          pdata = job_data + iw;
-          pdata->oper = 3;
-          thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
+        if( *status == SMF__INFREQ ) {
+          /* If a bad frequency was specified just annul the error and
+             skip the FLT model component */
+          dofft = 0;
+          errAnnul( status );
+          msgOut( "", FUNC_NAME ": invalid frequency for filter specified. "
+                  "Skipping FLT model component.", status );
+        } else {
+          if( !dofft ) {
+            msgOutif( MSG__VERB, " ", FUNC_NAME
+                      ": No valid filter specifiers for FLT given", status );
+          }
         }
 
-        /* Wait for the jobs to finish. */
-        thrWait( wf, status );
+        if( *status == SAI__OK ) {
 
-        /* Accumlate the values returned by the jobs. */
-        for( iw = 0; iw < nw; iw++ ) {
-          pdata = job_data + iw;
-          ndchisq += pdata->ndchisq;
-          dchisq += pdata->dchisq;
+          /* Make a copy of the last model if calculating dchisq */
+          if( noi ) {
+            memcpy( model_data_copy, model_data,
+                    ndata*smf_dtype_size(res->sdata[idx], status ) );
+          }
+
+          /* Copy the residual+old model into model_data where it will be
+             filtered again in this iteration. */
+          memcpy( model_data, res_data,
+                  ndata*smf_dtype_size(res->sdata[idx],status) );
+
+          /* Set samples bad that correspond to source pixels in the mask map.
+             This seems to improve the speed of convergence and could reduce
+             ringing caused by bright sources. */
+          if( mask && lut ) {
+
+            /* We do not allow the masking to extend close to the start or
+               end of the time stream since this would mean that the FLT
+               model is poorly constrained in the masked area. "Close" is
+               defined as "napod + 2*npad" samples from either end, where
+               "napod" is the number of apodised samples and "npad" is the
+               number of padded samples at each end. */
+            size_t npad, npad_or_apod, nclose;
+            smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD |
+                               SMF__Q_APOD, &npad_or_apod, NULL, status );
+            smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD,
+                               &npad, NULL, status );
+            nclose = npad + npad_or_apod;
+
+            /* Do the masking. Bad values are filled by smf_fillgaps, regardless
+               of quality, so we just set the model values bad. */
+            for( iw = 0; iw < nw; iw++ ) {
+              pdata = job_data + iw;
+              pdata->nclose = nclose;
+              pdata->oper = 2;
+              thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
+            }
+            thrWait( wf, status );
+          }
         }
-      }
 
-      /* Free the filter */
-      filt = smf_free_smfFilter( filt, status );
+        /* Apply the complementary filter to the copy of the
+           residual+old model stored in the model. So, for example, if
+           the goal is to remove low-frequency noise with a high-pass filter,
+           this operation will place the low-frequencies into the model (and
+           we can then subtract it from the residual).
+        */
+        if( dofft ) {
+          smf_filter_execute( wf, model->sdata[idx], filt, 1, whiten, status );
+        }
+
+        /* Now remove the filtered signals from the residual by subtracting
+           off the new iteration of the model. */
+        if( *status == SAI__OK ) {
+
+          /* Submit the jobs */
+          for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->oper = 3;
+            thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
+          }
+
+          /* Wait for the jobs to finish. */
+          thrWait( wf, status );
+
+          /* Accumlate the values returned by the jobs. */
+          for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            ndchisq += pdata->ndchisq;
+            dchisq += pdata->dchisq;
+          }
+        }
+
+        /* Free the filter */
+        filt = smf_free_smfFilter( filt, status );
+      }
     }
   }
 
