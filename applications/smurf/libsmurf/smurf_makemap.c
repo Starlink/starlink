@@ -942,6 +942,12 @@
 *       See AST.ZERO_SNRLO.
 *     FLT.ZERO_FREEZE = INTEGER
 *       See AST.ZERO_FREEZE.
+*     FLT.UNDOFIRST = LOGICAL
+*       If non-zero, the previous estimate of the FLT model is removed
+*       from the residuals at the start of each iteration. If zero, it is
+*       removed immediately before estimating the new FLT model on each
+*       iteration. Older versions of MAKEMAP always assumed zero, but
+*       setting this non-zero often helps convergence. [1]
 *     NOI.BOX_SIZE = REAL
 *       Determines the number of time slices used to determine the
 *       noise level in a section of a bolometer time stream. If zero,

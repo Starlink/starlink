@@ -108,6 +108,11 @@ flt.zero_mask = <undef>
 flt.zero_niter = 0
 flt.zero_freeze = 0
 
+# If non-zero, add the old FLT model back into the residuals at the start
+# of the iteration (and so before COM) rather than just before estimating
+# a new FLT Model. This seems to help with convergence.
+flt.undofirst = 1
+
 # Load the tau relations from a separate config file
 # Also load this before any other "ext" defaults in case
 # they have local overrides for things other than
