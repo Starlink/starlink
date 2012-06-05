@@ -79,8 +79,12 @@
 *     2010-10-19 (DSB):
 *        Do not attempt to fill the padded area if the bolometer has no good values.
 *     2012-03-05 (DSB):
-*        Fix bug which prevented the last sample being filled if it was a 
+*        Fix bug which prevented the last sample being filled if it was a
 *        single isolated flagged value.
+*     2012-06-05 (DSB):
+*        Use a separate random number generator for each thread. This gives
+*        repeatability, and also helps with convergence since each iteration
+*        fills each gap using the same values.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -164,7 +168,6 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
   dim_t nbolo;                  /* Number of bolos */
   dim_t ntslice;                /* Number of time slices */
   double *dat=NULL;             /* Pointer to bolo data */
-  gsl_rng *r;                   /* GSL random number generator */
   int fillpad;                  /* Fill PAD samples? */
   size_t bstride;               /* bolo stride */
   size_t pend;                  /* Last non-PAD sample */
@@ -213,10 +216,6 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
      job_data = astMalloc( sizeof( smfFillGapsData ) );
   }
 
-  /* Create a default GSL random number generator. */
-  type = gsl_rng_default;
-  r = gsl_rng_alloc (type);
-
   /* Find the indices of the first and last non-PAD sample. */
   smf_get_goodrange( qua, ntslice, tstride, SMF__Q_PAD, &pstart, &pend,
                      status );
@@ -232,6 +231,12 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
      fillpad = 0;
   }
 
+  /* Get the default GSL randim number generator type. A separate random
+     number generator is used for each worker thread so that the gap filling
+     process does not depend on the the order in which threads are
+     executed. */
+  type = gsl_rng_default;
+
   /* Begin a job context. */
   thrBeginJobContext( wf, status );
 
@@ -244,7 +249,7 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
     pdata->nbolo = nbolo;
     pdata->ntslice = ntslice;
     pdata->dat = dat;
-    pdata->r = r;
+    pdata->r = gsl_rng_alloc( type );
     pdata->b1 = i;
     pdata->b2 = i + bpt - 1;
     pdata->pend = pend;
@@ -266,8 +271,13 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
   thrEndJobContext( wf, status );
 
   /* Free resources. */
-  gsl_rng_free( r );
-  job_data = astFree( job_data );
+  if( job_data ) {
+    pdata = job_data;
+    for( i = 0; i < nbolo; i += bpt, pdata++ ) {
+      if( pdata->r ) gsl_rng_free( pdata->r );
+    }
+    job_data = astFree( job_data );
+  }
 }
 
 
