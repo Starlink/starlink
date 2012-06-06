@@ -97,6 +97,8 @@
 *        Original version.
 *     26-JUN-2001 (DSB):
 *        Modified for ARD version 2.0.
+*     6-JUN-2012 (DSB):
+*        Handle the zero/2.PI discontinity in celestial longitude.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -143,7 +145,9 @@
      :    PA0,                   ! Requested angle as a position angle
      :    PA1,                   ! The position angle at the end
      :    PA2                    ! The position angle at the end
-
+      INTEGER
+     :    I,                     ! Position index
+     :    J                      ! Axis index
 *.
 
 *  Check inherited global status.
@@ -194,6 +198,19 @@
 
 *  Now offset down by half the box height.
       PA2 = AST_OFFSET2( FRM, LPAR( 9 ), PA1, -HW, LPAR( 11 ), STATUS )
+
+*  If the frame contains a skyframe, there is the possibility that the
+*  celestial longitude may pass through the zero/2.PI discontinuity. Since
+*  the supplied mapping is linear, it cannot handle this. So now ensure
+*  that all points are within +/- PI of the box centre. if the Frame is
+*  not a SkyFrame, the positions are left unchanged.
+      DO I = 0, 14, 2
+         DO J = 1, 2
+            LPAR( I + J ) = P0( J ) + AST_AXDISTANCE( FRM, J, P0( J ),
+     :                                                LPAR( I + J ),
+     :                                                STATUS )
+         END DO
+      END DO
 
 *  The parameters are now in the same format as those for a POLYGON region.
 *  Call the subroutine used to load a POLYGON region.
