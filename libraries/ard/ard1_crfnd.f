@@ -76,6 +76,8 @@
 *  History:
 *     21-AUG-2001 (DSB):
 *        Original version.
+*     6-JUN-2012 (DSB):
+*        Handle the zero/2.PI discontinity in celestial longitude.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -89,6 +91,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
+      INCLUDE 'AST_PAR'          ! AST_ functions and constants
       INCLUDE 'ARD_CONST'        ! ARD private constants
 
 *  Arguments Given:
@@ -151,6 +154,16 @@
          CALL AST_OFFSET( FRM, PAR, P2, ROOT2*PAR( NDIM + 1), USERCO,
      :                    STATUS )
 
+*  If the frame contains a skyframe, there is the possibility that the
+*  celestial longitude may have passed through the zero/2.PI
+*  discontinuity. Since the supplied mapping is linear, it cannot handle
+*  this. So now ensure that the USERCO position is within +/- PI of the
+*  circle centre.
+         DO J = 1, NDIM
+            USERCO( J ) = PAR( J ) + AST_AXDISTANCE( FRM, J, PAR( J ),
+     :                                            USERCO( J ), STATUS )
+         END DO
+
 *  Transform the resulting user position to pixel coordinates.
          CALL ARD1_LTRAN( NDIM, D, 1, USERCO, PIXCO, STATUS )
 
@@ -169,6 +182,13 @@
 *  negating the offset distance).
          CALL AST_OFFSET( FRM, PAR, P2, -ROOT2*PAR( NDIM + 1), USERCO,
      :                    STATUS )
+
+*  For skyframes, ensure that the USERCO position is within +/- PI of the
+*  circle centre. Other Frame clases leave USERCO unchanged.
+         DO J = 1, NDIM
+            USERCO( J ) = PAR( J ) + AST_AXDISTANCE( FRM, J, PAR( J ),
+     :                                            USERCO( J ), STATUS )
+         END DO
 
 *  Transform the resulting user position to pixel coordinates.
          CALL ARD1_LTRAN( NDIM, D, 1, USERCO, PIXCO, STATUS )
