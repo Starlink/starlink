@@ -134,6 +134,9 @@
          ELSE IF ( BITPIX .EQ. 32 ) THEN
             TYPE = '_INTEGER'
 
+         ELSE IF ( BITPIX .EQ. 64 ) THEN
+            TYPE = '_INT64'
+
          ELSE IF ( BITPIX .EQ. -32 ) THEN
             TYPE = '_REAL'
 
