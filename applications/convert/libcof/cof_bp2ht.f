@@ -90,8 +90,8 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If a floating point data type is required, use _DOUBLE for 32 bit
-*  integers, and _REAL for all other integer types.
+*  If a floating point data type is required, use _DOUBLE for 32-bit
+*  and 64-bit integers, and _REAL for all other integer types.
       IF( FMTCNV ) THEN
          IF ( BITPIX .EQ. 8 ) THEN
             TYPE = '_REAL'
@@ -103,7 +103,7 @@
             TYPE = '_DOUBLE'
 
          ELSE IF ( BITPIX .EQ. 64 ) THEN
-            TYPE = '_INT64'
+            TYPE = '_DOUBLE'
 
          ELSE IF ( BITPIX .EQ. -32 ) THEN
             TYPE = '_REAL'
