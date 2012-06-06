@@ -1340,12 +1340,12 @@
 
                      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                         CALL FTGPVJ( FUNITD, IGROUP, 1, EL, VAL__BADI,
-     :                               %VAL( CNF_PVAL( PNTR(1) ) ), BAD,
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
 
                      ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
-                        CALL FTGPVK( FUNITD, IGROUP, 1, EL, VAL__BADI,
-     :                               %VAL( CNF_PVAL( PNTR(1) ) ), BAD,
+                        CALL FTGPVK( FUNITD, IGROUP, 1, EL, VAL__BADK,
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
 
                      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
