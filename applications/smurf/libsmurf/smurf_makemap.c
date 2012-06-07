@@ -444,10 +444,14 @@
 *     FAKEMAP = STRING
 *       To test the impact of map-making on known astronomical sources, an
 *       external map may be specified to this parameter, and its flux will
-*       be added to an existing data set prior to map-making. At present,
-*       the dimensions of this map must be identical to that of the output
-*       map. Note that this is a fully-parsed NDF identified, so, for example, a
-*       subset of a larger map may be specified using ranges. [undef]
+*       be added to an existing data set prior to map-making. The supplied
+*       NDF is aligned with the output map in pixel coordinates, and a
+*       section used from it that matches the pixel bounds of the output map.
+*       In other words, the (0,0) pixel in the fake map is assumed to be
+*       at the same point on the sky as the (0,0) pixel in the output
+*       map. Note that this is a fully-parsed NDF identified, so, for
+*       example, a subset of a larger map may be specified using ranges.
+*       [undef]
 *     FAKESCALE = REAL
 *       If a FAKEMAP is specified, FAKESCALE can be used to apply an arbitrary
 *       scake factor to the map before adding it to the time series. [1]
