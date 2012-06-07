@@ -16,7 +16,8 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-(none as yet)
+- The previously private grf3d.h header file is now installed into
+prefix/include.
 
 
 Main Changes in V7.0.3
