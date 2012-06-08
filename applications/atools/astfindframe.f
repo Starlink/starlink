@@ -51,6 +51,12 @@
 *        This list is case-insensitive and all white space is ignored.
 *        If you do not wish to restrict the domain in this way,
 *        you should supply a blank string or null (!) value.
+*     FMT = LITERAL (Read)
+*        The format in which to store output objects. Can be "AST", "XML",
+*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
+*        if the output object is written to a text file. An error is
+*        reported if the output object cannot be written using the
+*        requested format. ["AST"]
 *     IFRAME = INTEGER (Write)
 *        On exit, this holds the index of the closest matching Frame in the
 *        target FrameSet, or zero if no matching Frame was found. If the

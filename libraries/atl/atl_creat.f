@@ -1,4 +1,4 @@
-      SUBROUTINE ATL_CREAT( PARAM, IAST, STATUS )
+      SUBROUTINE ATL_CREAT( FPARAM, IAST, STATUS )
 *+
 *  Name:
 *     ATL_CREAT
@@ -11,15 +11,27 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL_CREAT( PARAM, IAST, STATUS )
+*     CALL ATL_CREAT( FPARAM, IAST, STATUS )
 
 *  Description:
 *     Write an AST Object to a text file or NDF specified using an environment
 *     parameter.
 
 *  Arguments:
-*     PARAM = CHARACTER * ( * ) (Given)
-*        The parameter name.
+*     FPARAM = CHARACTER * ( * ) (Given)
+*        The parameter name. If the supplied string contains a colon,
+*        then the parameter name is taken to be the string following
+*        the colon. The string before the colon indicates the format
+*        required for the output text file:
+*
+*        "AST:"      - AST_SHOW format
+*        "STCS:"     - STCS format
+*        "XML:"      - AST XML format
+*        "FITS-xxx:" - FITS, using the specified encoding
+*        "NATIVE:"   - FITS, using NATIVE encoding
+*
+*        The default (i.e. used if the string does not contain a
+*        colon) is "AST".
 *     IAST = INTEGER (Given)
 *        The AST Object, or AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
@@ -60,6 +72,9 @@
 *        Increase maximum line length to 300 characters.
 *     30-MAY-2006 (DSB):
 *        Moved into ATL library and changed prefix from "ATL1_" to "ATL_".
+*     8-JUN-2012 (DSB):
+*        Allow required format to specified via PARAM argument (doing it
+*        this way provides backward compatibility in the API).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,7 +90,7 @@
       INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
-      CHARACTER PARAM*(*)
+      CHARACTER FPARAM*(*)
       INTEGER IAST
 
 *  Status:
@@ -87,15 +102,29 @@
 
 *  External References:
       EXTERNAL ATL_SNK
+      EXTERNAL ATL_FITSSNK
 
 *  Local Variables:
+      CHARACTER FMT*50
+      CHARACTER PARAM*50
       CHARACTER FNAME*255
       INTEGER CHAN
+      INTEGER COLON
       INTEGER NOBJ
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Extract any format specified from the PARAM value.
+      FMT = 'AST'
+      PARAM = FPARAM
+
+      COLON = INDEX( FPARAM, ':' )
+      IF( COLON .GT. 0 ) THEN
+         IF( COLON .GT. 1  ) FMT = FPARAM( : COLON - 1 )
+         PARAM =  FPARAM( COLON + 1 : )
+      END IF
 
 *  Get the name of the output file.
       CALL PAR_GET0C( PARAM, FNAME, STATUS )
@@ -106,8 +135,28 @@
 *  Open a new file and get an FIO identifier for it.
       CALL FIO_OPEN( FNAME, 'WRITE', 'LIST', 300, FD, STATUS )
 
-*  Create an AST Channel to write to the file.
-      CHAN = AST_CHANNEL( AST_NULL, ATL_SNK, ' ', STATUS )
+*  Create an AST Channel of the appropriate class to write to the file.
+      IF( FMT .EQ. 'AST' ) THEN
+         CHAN = AST_CHANNEL( AST_NULL, ATL_SNK, ' ', STATUS )
+
+      ELSE IF( FMT .EQ. 'STCS' ) THEN
+         CHAN = AST_STCSCHAN( AST_NULL, ATL_SNK, 'Indent=1,'//
+     :                        'StcsLength=200 ', STATUS )
+
+      ELSE IF( FMT .EQ. 'XML' ) THEN
+         CHAN = AST_XMLCHAN( AST_NULL, ATL_SNK, 'XmlLength=200',
+     :                       STATUS )
+
+      ELSE IF( FMT( :5 ) .EQ. 'FITS-' .OR. FMT .EQ. 'NATIVE' ) THEN
+         CHAN = AST_FITSCHAN( AST_NULL, ATL_FITSSNK, ' ',  STATUS )
+         CALL AST_SETC( CHAN, 'Encoding', FMT, STATUS )
+
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'F', FPARAM )
+         CALL ERR_REP( ' ', 'ATL_CREAT: Unknown format specified '//
+     :                'in ''^F''.', STATUS )
+      END IF
 
 *  Write the Object to the Channel.
       NOBJ = AST_WRITE( CHAN, IAST, STATUS )
@@ -158,5 +207,39 @@
 
 *  If succesful, write it to the file.
       IF( NC .GT. 0 ) CALL FIO_WRITE( FD, BUF( : NC ), STATUS )
+
+      END
+
+
+
+      SUBROUTINE ATL_FITSSNK( CARD, STATUS )
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'FIO_ERR'
+
+*  Arguments:
+      CHARACTER CARD*80
+      INTEGER STATUS
+
+*  Global Variables.
+      INTEGER FD
+      COMMON /ATL1SNK/ FD
+
+*  External References:
+      INTEGER CHR_LEN
+
+*  Local Variables:
+      INTEGER NC
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Write the supplied card to the file.
+      NC = CHR_LEN( CARD )
+      IF( NC .GT. 0 ) THEN
+         CALL FIO_WRITE( FD, CARD( : NC ), STATUS )
+      ELSE
+         CALL FIO_WRITE( FD, '       ', STATUS )
+      END IF
 
       END

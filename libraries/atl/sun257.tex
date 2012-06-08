@@ -812,13 +812,25 @@ higher-level utility tasks.
       parameter.
    }
    \sstinvocation{
-      CALL ATL\_CREAT( PARAM, IAST, STATUS )
+      CALL ATL\_CREAT( FPARAM, IAST, STATUS )
    }
    \sstarguments{
       \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+         FPARAM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The parameter name.
+         The parameter name. If the supplied string contains a colon,
+         then the parameter name is taken to be the string following
+         the colon. The string before the colon indicates the format
+         required for the output text file:
+
+         {\tt "}AST:{\tt "}      - AST\_SHOW format
+         {\tt "}STCS:{\tt "}     - STCS format
+         {\tt "}XML:{\tt "}      - AST XML format
+         {\tt "}FITS-xxx:{\tt "} - FITS, using the specified encoding
+         {\tt "}NATIVE:{\tt "}   - FITS, using NATIVE encoding
+
+         The default (i.e. used if the string does not contain a
+         colon) is {\tt "}AST{\tt "}.
       }
       \sstsubsection{
          IAST = INTEGER (Given)

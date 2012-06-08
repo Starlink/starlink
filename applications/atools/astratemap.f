@@ -53,6 +53,12 @@
 *        varied. This corresponds to the delta quantity forming the
 *        denominator of the required element of the Jacobian matrix.
 *        The first axis has index 1.
+*     FMT = LITERAL (Read)
+*        The format in which to store output objects. Can be "AST", "XML",
+*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
+*        if the output object is written to a text file. An error is
+*        reported if the output object cannot be written using the
+*        requested format. ["AST"]
 *     MAP = LITERAL (Read)
 *        An NDF or text file holding the encapsulated Mapping. If an NDF is
 *        supplied, the Mapping from the base Frame of the WCS FrameSet to

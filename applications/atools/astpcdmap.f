@@ -50,6 +50,12 @@
 *        The distortion coefficient. Negative values give barrel
 *        distortion, positive values give pincushion distortion, and
 *        zero gives no distortion.
+*     FMT = LITERAL (Read)
+*        The format in which to store output objects. Can be "AST", "XML",
+*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
+*        if the output object is written to a text file. An error is
+*        reported if the output object cannot be written using the
+*        requested format. ["AST"]
 *     OPTIONS = LITERAL (Read)
 *        A string containing an optional comma-separated list of attribute
 *        assignments to be used for initialising the new PcdMap.

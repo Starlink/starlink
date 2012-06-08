@@ -56,6 +56,12 @@
 *     astcmpregion region1 region2 oper options result
 
 *  ADAM Parameters:
+*     FMT = LITERAL (Read)
+*        The format in which to store output objects. Can be "AST", "XML",
+*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
+*        if the output object is written to a text file. An error is
+*        reported if the output object cannot be written using the
+*        requested format. ["AST"]
 *     OPER = LITERAL (Read)
 *        The boolean operator with which to combine the two Regions. This
 *        must be one of "AND", "OR" or "XOR".
