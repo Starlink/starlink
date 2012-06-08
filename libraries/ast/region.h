@@ -147,6 +147,7 @@ typedef struct AstRegionVtab {
    AstPointSet *(* RegGrid)( AstRegion *, int * );
    AstPointSet *(* RegBaseMesh)( AstRegion *, int * );
    AstPointSet *(* RegBaseGrid)( AstRegion *, int * );
+   AstRegion **(* RegSplit)( AstRegion *, int *, int * );
    AstPointSet *(* BndBaseMesh)( AstRegion *, double *, double *, int * );
    AstPointSet *(* BndMesh)( AstRegion *, double *, double *, int * );
    AstRegion *(* GetNegation)( AstRegion *, int * );
@@ -295,6 +296,7 @@ AstPointSet *astRegGrid_( AstRegion *, int * );
 AstPointSet *astRegBaseMesh_( AstRegion *, int * );
 AstPointSet *astRegBaseGrid_( AstRegion *, int * );
 AstPointSet *astBndBaseMesh_( AstRegion *, double *, double *, int * );
+AstRegion **astRegSplit_( AstRegion *, int *, int * );
 AstPointSet *astBndMesh_( AstRegion *, double *, double *, int * );
 AstRegion *astGetUncFrm_( AstRegion *, int, int * );
 AstRegion *astGetDefUnc_( AstRegion *, int * );
@@ -439,6 +441,7 @@ astINVOKE(V,astGetRegionPoints_(astCheckRegion(this),maxpoint,maxcoord,npoint,po
 #define astRegBaseMesh(this) astINVOKE(O,astRegBaseMesh_(astCheckRegion(this),STATUS_PTR))
 #define astRegBasePick(this,naxes,axes) astINVOKE(O,astRegBasePick_(astCheckRegion(this),naxes,axes,STATUS_PTR))
 #define astRegBaseGrid(this) astINVOKE(O,astRegBaseGrid_(astCheckRegion(this),STATUS_PTR))
+#define astRegSplit(this,nlist) astINVOKE(V,astRegSplit_(astCheckRegion(this),nlist,STATUS_PTR))
 #define astBndBaseMesh(this,lbnd,ubnd) astINVOKE(O,astBndBaseMesh_(astCheckRegion(this),lbnd,ubnd,STATUS_PTR))
 #define astBndMesh(this,lbnd,ubnd) astINVOKE(O,astBndMesh_(astCheckRegion(this),lbnd,ubnd,STATUS_PTR))
 #define astRegCentre(this,cen,ptr,index,ifrm) astINVOKE(V,astRegCentre_(astCheckRegion(this),cen,ptr,index,ifrm,STATUS_PTR))

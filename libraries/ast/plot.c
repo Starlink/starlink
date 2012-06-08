@@ -700,9 +700,13 @@ f     - Title: The Plot title drawn using AST_GRID
 *     15-OCT-2011 (DSB):
 *        Always check that the grf module implements the scales function
 *        before trying to invoke the scales function.
-*      21-MAY-2012 (DSB):
-*        Correct text strings used to represent the "Labelling" attribute 
+*     21-MAY-2012 (DSB):
+*        Correct text strings used to represent the "Labelling" attribute
 *        within dumps of a Plot. Previously they were reversed.
+*     7-JUN-2012 (DSB):
+*        Speed up plotting of CmpRegion boundaries by splitting the
+*        CmpRegion up into a set of disjoint Regions, and plotting each
+*        one separately.
 *class--
 */
 
@@ -24304,12 +24308,15 @@ static int RegionOutline( AstPlot *this, AstFrame *frm, const char *method,
 /* Local Variables: */
    AstMapping *map;        /* Mapping with Region masking included */
    AstPlotCurveData cdata; /* Stores information about curve breaks */
+   AstRegion **comps;      /* List of component Regions */
    astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
    double tol;             /* Absolute tolerance value */
    double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
    double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
    int i;                  /* Loop count */
+   int icomp;              /* Index of component Region */
+   int ncomp;              /* Number of component Regions */
    int result;             /* The returned value */
 
 /* Initialise */
@@ -24368,22 +24375,38 @@ static int RegionOutline( AstPlot *this, AstFrame *frm, const char *method,
       Crv_vybrk = cdata.vybrk;
       Crv_clip = astGetClip( this ) & 1;
 
+/* Attempt to split the Region into a set of disjoint component Regions. */
+      comps = astRegSplit( (AstRegion *) frm, &ncomp );
+
+/* Draw each one. */
+      for( icomp = 0; icomp < ncomp; icomp++ ) {
+
+/* A pointer to the Region. */
+         Map5_region = comps[ icomp ];
+
 /* Set up a list of points spread evenly over the curve. */
-      for( i = 0; i < CRV_NPNT; i++ ){
-        d[ i ] = ( (double) i)/( (double) CRV_NSEG );
-      }
+         for( i = 0; i < CRV_NPNT; i++ ){
+           d[ i ] = ( (double) i)/( (double) CRV_NSEG );
+         }
 
 /* Map these points into graphics coordinates. */
-      Map5( CRV_NPNT, d, x, y, method, class, status GLOBALS_NAME );
+         Map5( CRV_NPNT, d, x, y, method, class, status GLOBALS_NAME );
 
 /* Use Crv and Map5 to draw the curve. */
-      Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
+         Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* End the current poly line. */
-      Opoly( this, status );
+         Opoly( this, status );
 
 /* Tidy up the static data used by Map5. */
-      Map5( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
+         Map5( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
+
+/* Annul the component Region pointer. */
+         comps[ icomp ] = astAnnul( Map5_region );
+      }
+
+/* Free the memory holding the list of component Region pointers. */
+      comps = astFree( comps );
 
 /* Annul the Mapping. */
       Map5_map = astAnnul( Map5_map );

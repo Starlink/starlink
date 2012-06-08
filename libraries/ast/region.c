@@ -203,11 +203,14 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        In RegBaseGrid, accept the final try even if it is not within 5%
 *        of the required meshsize.
 *     27-APR-2012 (DSB):
-*        Store a negated copy of itself with each Region. Changing the Negated 
+*        Store a negated copy of itself with each Region. Changing the Negated
 *        attribute of a Region causes the cached information to be reset, and
 *        re-calculating it can be an expensive operation. So instead of changing
 *        "Negatated" in "this", access the negated copy of "this" using the
 *        new protected method astGetNegation.
+*     7-JUN-2012 (DSB):
+*        Added protected astRegSplit method to split a Region into disjoint
+*        component regions.
 *class--
 
 *  Implementation Notes:
@@ -898,6 +901,7 @@ static AstPointSet *RegTransform( AstRegion *, AstPointSet *, int, AstPointSet *
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstRegion *MapRegion( AstRegion *, AstMapping *, AstFrame *, int * );
 static AstRegion *RegBasePick( AstRegion *, int, const int *, int * );
+static AstRegion **RegSplit( AstRegion *, int *, int * );
 static AstSystemType SystemCode( AstFrame *, const char *, int * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char *, int * );
 static const char *Abbrev( AstFrame *, int, const char *, const char *, const char *, int * );
@@ -4330,6 +4334,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    vtab->BndBaseMesh = BndBaseMesh;
    vtab->RegBaseGrid = RegBaseGrid;
    vtab->RegBaseMesh = RegBaseMesh;
+   vtab->RegSplit = RegSplit;
    vtab->RegBaseBox = RegBaseBox;
    vtab->RegBaseBox2 = RegBaseBox2;
    vtab->RegBasePick = RegBasePick;
@@ -7488,6 +7493,77 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
    if( !astOK ) result = astAnnul( result );
 
 /* Return the result */
+   return result;
+}
+
+static AstRegion **RegSplit( AstRegion *this, int *nlist, int *status ){
+/*
+*+
+*  Name:
+*     astRegSplit
+
+*  Purpose:
+*     Split a Region into a list of disjoint component Regions.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstRegion **astRegSplit( AstRegion *this, int *nlist )
+
+*  Class Membership:
+*     Region virtual function.
+
+*  Description:
+*     This function splits the supplied Region into a set of disjoint
+*     component Regions. If the Region cannot be split, then the returned
+*     array contains only one pointer - a clone of the supplied Region
+*     pointer.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     nlist
+*        Pointer to an int in which to return the number of elements in
+*        the returned array.
+
+*  Returned Value:
+*     Pointer to dynamically alloctaed memory holding an array of Region
+*     pointers. The length of this array is given by the value returned
+*     in "*nlist". The pointers in the returned array should be annulled
+*     using astAnnul when no longer needed, and the memory used to hold
+*     the array should be freed using astFree.
+
+*  Notes:
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*-
+*/
+
+/* Local Variables; */
+   AstRegion **result;
+
+/* Initialise. */
+   result = NULL;
+   *nlist = 0;
+
+/* Check the local error status. */
+   if ( !astOK ) return result;
+
+/* The base class just returns an array containing a clone of the
+   supplied Region pointer. */
+   result = astMalloc( sizeof( *result ) );
+   if( astOK ) {
+      result[ 0 ] = astClone( this );
+      *nlist = 1;
+   }
+
+   if( !astOK ) {
+      result = astFree( result );
+      *nlist = 0;
+   }
+
    return result;
 }
 
@@ -12794,6 +12870,10 @@ void astSetRegFS_( AstRegion *this, AstFrame *frm, int *status ){
 AstPointSet *astRegBaseMesh_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Region,RegBaseMesh))( this, status );
+}
+AstRegion **astRegSplit_( AstRegion *this, int *nlist, int *status ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,RegSplit))( this, nlist, status );
 }
 AstPointSet *astRegBaseGrid_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
