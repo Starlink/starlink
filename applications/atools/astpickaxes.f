@@ -41,6 +41,12 @@
 *        each may only be used once.  If additional (default) axes are
 *        also to be included, the corresponding elements of this array
 *        should be set to zero.
+*     FMT = LITERAL (Read)
+*        The format in which to store output objects. Can be "AST", "XML",
+*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
+*        if the output object is written to a text file. An error is
+*        reported if the output object cannot be written using the
+*        requested format. ["AST"]
 *     MAP = LITERAL (Read)
 *        A text file to receive a new Mapping. This will be a PermMap
 *        (or a UnitMap as a special case) that describes the axis

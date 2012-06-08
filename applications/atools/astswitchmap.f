@@ -90,6 +90,12 @@
 *     astswitchmap fsmap ismap route1 route2 options result
 
 *  ADAM Parameters:
+*     FMT = LITERAL (Read)
+*        The format in which to store output objects. Can be "AST", "XML",
+*        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
+*        if the output object is written to a text file. An error is
+*        reported if the output object cannot be written using the
+*        requested format. ["AST"]
 *     FSMAP = LITERAL (Read)
 *        An NDF or text file holding the forward selector Mapping. If an NDF
 *        is supplied, the Mapping from the Base Frame to the Current Frame

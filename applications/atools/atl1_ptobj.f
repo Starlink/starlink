@@ -24,8 +24,19 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     - This routine uses an ADAM parameter with hard-wired name "FMT" to
+*     get the format for the output text file. It may be one of:
+*
+*        "AST:"      - AST_SHOW format (the default)
+*        "STCS:"     - STCS format
+*        "XML:"      - AST XML format
+*        "FITS-xxx:" - FITS, using the specified encoding
+*        "NATIVE:"   - FITS, using NATIVE encoding
+
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -51,6 +62,8 @@
 *  History:
 *     16-JAN-2001 (DSB):
 *        Original version.
+*     8-JUN-2012 (DSB):
+*        Allow output to be created in a variety of formats.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,17 +94,21 @@
 
 *  External References:
       LOGICAL CHR_SIMLR
+      INTEGER CHR_LEN
 
 *  Local Variables:
       CHARACTER CLASS*30
       CHARACTER DOM*50
       CHARACTER FILE*255
+      CHARACTER FPARAM*100
       INTEGER DIM( NDF__MXDIM )
       INTEGER INDF
       INTEGER NAX
+      INTEGER NC
       INTEGER NDIM
       INTEGER PLACE
       INTEGER IPAR
+      LOGICAL DONE
 *.
 
 *  Check the inherited global status.
@@ -107,6 +124,9 @@
 
 *  Get the name of the output file or NDF.
       CALL PAR_GET0C( PARAM, FILE, STATUS )
+
+*  Indicate we have not yet stored the object.
+      DONE = .FALSE.
 
 *  If the object is a FrameSet, it can be stored in an NDF.
       IF( AST_ISAFRAMESET( IAST, STATUS ) ) THEN
@@ -161,18 +181,35 @@
      :                       STATUS )
             CALL NDF_ANNUL( INDF, STATUS )
 
+*  Indicate we have stored the object.
+            DONE = .TRUE.
+
 *  If no NDF was found, annul the error and store the AST Object in a text
 *  file.
          ELSE IF( STATUS .EQ. NDF__FILNF .OR.
      :            STATUS .EQ. DAT__OBJNF .OR.
      :            STATUS .EQ. DAT__FILNF ) THEN
             CALL ERR_ANNUL( STATUS )
-            CALL ATL_CREAT( PARAM, IAST, STATUS )
          END IF
+      END IF
 
-*  If the AST Object was not a FrameSet, store the AST Object in a text file.
-      ELSE
-         CALL ATL_CREAT( PARAM, IAST, STATUS )
+*  If the AST Object was not a FrameSet, or the output was not an NDF,
+*  store the AST Object in a text file.
+      IF( .NOT. DONE ) THEN
+
+*  Get the format to use.
+         CALL PAR_CHOIC( 'FMT', 'AST', 'AST,STCS,XML,NATIVE,FITS-WCS,'//
+     :                   'FITS-PC,FITS-IRAF,FITS-AIPS,FITS-AIPS++,'//
+     :                   'FITS-CLASS', .TRUE., FPARAM, STATUS )
+
+*  Construct a string of the form "<fmt>:<param>".
+         NC = CHR_LEN( FPARAM )
+         CALL CHR_APPND( ':', FPARAM, NC )
+         CALL CHR_APPND( PARAM, FPARAM, NC )
+
+*  Write out the object using the specified format.
+         CALL ATL_CREAT( FPARAM, IAST, STATUS )
+
       END IF
 
  999  CONTINUE
