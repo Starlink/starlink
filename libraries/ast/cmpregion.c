@@ -111,6 +111,8 @@ f     The CmpRegion class does not define any new routines beyond those
 *        from zero to one was used for both component Regions, but this gives
 *        greater priority to Regions higher in the CmpRegion nesting order,
 *        resulting in a high chance that lower Regions will not be seen.
+*     7-JUN-2012 (DSB):
+*        Override astRegSplit method.
 *class--
 */
 
@@ -222,6 +224,7 @@ static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, 
 static AstRegion *GetDefUnc( AstRegion *, int * );
 static AstRegion *MatchRegion( AstRegion *, int, AstRegion *, const char *, int * );
 static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
+static AstRegion **RegSplit( AstRegion *, int *, int * );
 static double GetFillFactor( AstRegion *, int * );
 static int CmpRegionList( AstCmpRegion *, int *, AstRegion ***, int * );
 static int Equal( AstObject *, AstObject *, int * );
@@ -1286,6 +1289,7 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
    region->RegBaseBox = RegBaseBox;
    region->RegBaseBox2 = RegBaseBox2;
    region->RegBaseMesh = RegBaseMesh;
+   region->RegSplit = RegSplit;
    region->RegPins = RegPins;
    region->RegTrace = RegTrace;
    region->GetBounded = GetBounded;
@@ -2464,6 +2468,200 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
    } else {
       bset = astFree( bset );
    }
+}
+
+static AstRegion **RegSplit( AstRegion *this_region, int *nlist, int *status ){
+/*
+*+
+*  Name:
+*     RegSplit
+
+*  Purpose:
+*     Split a Region into a list of disjoint component Regions.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstRegion **astRegSplit( AstRegion *this, int *nlist )
+
+*  Class Membership:
+*     CmpRegion member function (overrides the astRegSplit method
+*     inherited from the parent Region class).
+
+*  Description:
+*     This function splits the supplied Region into a set of disjoint
+*     component Regions. If the Region cannot be split, then the returned
+*     array contains only one pointer - a clone of the supplied Region
+*     pointer.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     nlist
+*        Pointer to an int in which to return the number of elements in
+*        the returned array.
+
+*  Returned Value:
+*     Pointer to dynamically alloctaed memory holding an array of Region
+*     pointers. The length of this array is given by the value returned
+*     in "*nlist". The pointers in the returned array should be annulled
+*     using astAnnul when no longer needed, and the memory used to hold
+*     the array should be freed using astFree.
+
+*  Notes:
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*-
+*/
+
+/* Local Variables; */
+   AstCmpRegion *new;
+   AstCmpRegion *this;
+   AstRegion **cmplist;
+   AstRegion **result;
+   AstRegion *cmpreg;
+   int icomp;
+   int ifirst;
+   int ilist;
+   int iw;
+   int jcomp;
+   int ncomp;
+   int nn;
+   int unbounded;
+
+/* Initialise. */
+   result = NULL;
+   *nlist = 0;
+
+/* Check the local error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the CmpRegion structure. */
+   this = (AstCmpRegion *) this_region;
+
+/* Can only split non-inverted CmpRegions that combine their components
+   using the OR operator. */
+   if( this->oper == AST__OR && !astGetNegated( this->region1 ) &&
+                                !astGetNegated( this->region2 ) ) {
+
+/* Indicate we have not yet found any unbounded component regions. */
+      unbounded = 0;
+
+/* Process each of the two component Regions in turn. */
+      for( icomp = 0; icomp < 2 && !unbounded; icomp++ ) {
+         cmpreg = icomp ? this->region2 : this->region1;
+
+/* Create a set of disjoint Regions that are equivalent to the current
+   component Region, and loop round them. */
+         cmplist = astRegSplit( cmpreg, &ncomp );
+         for( jcomp = 0; jcomp < ncomp; jcomp++ ) {
+
+/* If any of the components are unbounds, we cannot split the supplied
+   Region. */
+            unbounded = unbounded || !astGetBounded( cmplist[ jcomp ] );
+            if( ! unbounded ) {
+
+/* Initialise the index within the returned list of the first Region that
+   overlaps the current disjoint component Region. */
+               ifirst = -1;
+
+/* Loop round all the Regions currently in the returned list. */
+               for( ilist = 0; ilist < *nlist; ilist++ ) {
+                  if( result[ ilist ] ) {
+
+/* See if the current disjoint component overlaps the current entry in
+   the returned list. */
+                     if( astOverlap( cmplist[ jcomp ], result[ ilist ] ) > 1 ) {
+
+/* If this is the first overlap found for the current disjoint component,
+   form a CmpRegion that combines the two overlapping Regions, and use it
+   to replace the current entry in the returned list. */
+                        if( ifirst == -1 ) {
+                           new = astCmpRegion( cmplist[ jcomp ], result[ ilist ],
+                                               AST__OR, " ", status );
+                           (void) astAnnul( result[ ilist ] );
+                           result[ ilist ] = (AstRegion *) new;
+
+/* Note the index within the returned list of the first Region that overlaps
+   the current disjoint component Region. */
+                           ifirst = ilist;
+
+/* If this is the second or later overlap, add the overlapping returned Region
+   into the CmpRegion that it is stored at index "ifirsT" in the returned
+   list. */
+                        } else {
+                           new = astCmpRegion( result[ ilist ], result[ ifirst ],
+                                               AST__OR, " ", status );
+                           result[ ilist ] = astAnnul( result[ ilist ] );
+                           (void) astAnnul( result[ ifirst ] );
+                           result[ ifirst ] = (AstRegion *) new;
+                        }
+                     }
+                  }
+               }
+
+/* If the current disjoint component does not overlap any of the Regions
+   already in the returned list, append the current disjoint component to
+   the end of the returned list. */
+               if( ifirst == -1 ) {
+                  ilist = (*nlist)++;
+                  result = astGrow( result, *nlist, sizeof( *result ) );
+                  if( astOK ) result[ ilist ] = astClone( cmplist[ jcomp ] );
+               }
+            }
+
+/* Annul the pointer to the disjoint component Region. */
+            cmplist[ jcomp ] = astAnnul( cmplist[ jcomp ] );
+         }
+
+/* Free the mnemory holding the list of disjoint components. */
+         cmplist = astFree( cmplist );
+      }
+   }
+
+/* If any unbounded components were found, ensure the returned list is
+   empty. */
+   if( unbounded && result ) {
+      for( ilist = 0; ilist < *nlist; ilist++ ) {
+         if( result[ ilist ] ) result[ ilist ] = astAnnul( result[ ilist ] );
+      }
+      result = astFree( result );
+      *nlist = 0;
+
+/* Otherwise, shuffle later entries down to fill any NULL slots in the returned
+   list. */
+   } else if( result ){
+      nn = *nlist;
+      iw = 0;
+      for( ilist = 0; ilist < nn; ilist++ ) {
+         if( result[ ilist ] ) result[ iw++ ] = result[ ilist ];
+      }
+      *nlist = iw;
+   }
+
+/* If this CmpRegion cannot be split, the returned list just holds a
+   clone of the Region pointer. */
+   if( !result ) {
+      result = astMalloc( sizeof( *result ) );
+      if( astOK ) {
+         result[ 0 ] = astClone( this );
+         *nlist = 1;
+      }
+   }
+
+/* Free all returned pointers if an error has occurred. */
+   if( !astOK && result ) {
+      for( ilist = 0; ilist < *nlist; ilist++ ) {
+         result[ ilist ] = astAnnul( result[ ilist ] );
+      }
+      result = astFree( result );
+      *nlist = 0;
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static int RegTrace( AstRegion *this_region, int n, double *dist, double **ptr,
