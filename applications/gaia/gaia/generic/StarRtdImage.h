@@ -73,6 +73,8 @@
  *        Added autosetcutlevelsCmd.
  *     17-AUG-2009 (PWD):
  *        Added astgetcloneCmd.
+ *     09-JUN-2012 (PWD):
+ *        Added stcplotCmd.
  *-
  */
 
@@ -376,6 +378,9 @@ class StarRtdImage : public Skycat
 
    //  Contour command.
    int contourCmd( int argc, char *argv[] );
+
+   //  STC-S command.
+   int stcplotCmd( int argc, char *argv[] );
 
    //  HDU command.
    int hduCmd( int argc, char *argv[] );
