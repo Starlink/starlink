@@ -196,7 +196,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     heatbounds[3] = (hdr->allState)[nframes-1].sc2_heat;
     for (i = 0; i < nframes; i++ ) {
       int thisheat = (hdr->allState)[i].sc2_heat;
-      if (thisheat == VAL__BADI) {
+      if (thisheat == VAL__BADUW) {
         /* flat ramps should never have bad heater values so if we see one we decide
            that this ramp is invalid */
         if (*status == SAI__OK) {
