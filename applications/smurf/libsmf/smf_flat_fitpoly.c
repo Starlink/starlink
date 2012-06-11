@@ -157,8 +157,8 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
      since we want to have some reliability */
   if ( nheat < order + 6 ) {
     *status = SAI__ERROR;
-    errRepf( "", "Too few measurements to calculate reliable fit. %zd required.",
-             status, order + 6);
+    errRepf( "", "Too few heater measurements to calculate reliable fit. %zd required, got %zd.",
+             status, order + 6, nheat);
     return;
   }
 
