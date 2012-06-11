@@ -1155,6 +1155,9 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, double refres,
                        const smfData * powval, const smfData * bolval,
                        smfData * updata, int *status );
 
+void
+smf_flat_badflat( smfData * refdata, smfData ** resp, int * status );
+
 size_t
 smf_flat_calcflat( msglev_t msglev, const char flatname[],
                    const char resistpar[],

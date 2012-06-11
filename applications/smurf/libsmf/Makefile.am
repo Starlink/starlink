@@ -193,6 +193,7 @@ smf_fix_steps.c \
 smf_flag_slewspeed.c \
 smf_flag_spikes.c \
 smf_flat_assign.c \
+smf_flat_badflat.c \
 smf_flat_calcflat.c \
 smf_flat_fastflat.c \
 smf_flat_fitpoly.c \

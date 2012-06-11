@@ -472,14 +472,19 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
         if (*status == SAI__OK) {
           smf_flat_fastflat( infile, &outfile, status );
           if (*status == SMF__BADFLAT) {
-            errAnnul( status );
-            astMapPut0I( infomap, "ISGOOD", 0, "" );
-            astMapPutElemA( flatmap, keystr, -1, infomap );
-            if (outfile) smf_close_file( &outfile, status );
-            if (infile) smf_close_file( &infile, status );
-            infomap = astAnnul( infomap );
-            ffcount--;
-            continue;
+            errFlush( status );
+
+            if (calcflat) {
+              /* Need to generate an outfile like smf_flat_fastflat
+                 and one heater setting will force smf_flat_calcflat to fail */
+              smf_flat_malloc( 1, infile, NULL, &outfile, status );
+            } else {
+              if (outfile) smf_close_file( &outfile, status );
+              if (infile) smf_close_file( &infile, status );
+              infomap = astAnnul( infomap );
+              ffcount--;
+              continue;
+            }
           }
         }
 
@@ -497,15 +502,16 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                                          "FLATMETH", "FLATORDER", NULL, "RESPMASK",
                                          "FLATSNR", NULL, infile, &curresp, status );
               if (*status != SAI__OK) {
-                /* if we failed to calculate a flatfield we can not analyse a responsivity*/
+                /* if we failed to calculate a flatfield we continue but force the
+                   flatfield to be completely bad. This will force the science data associated
+                   with the flatfield to be correctly blanked. */
                 errAnnul(status);
-                ffcount--;
-                if (curresp) smf_close_file( &curresp, status );
-                if (infile) smf_close_file( &infile, status );
-                astMapPut0I( infomap, "ISGOOD", 0, "" );
-                astMapPutElemA( flatmap, keystr, -1, infomap );
-                infomap = astAnnul( infomap );
-                continue;
+
+                /* parameters of flatfield */
+                ngood = 0;
+
+                /* Generate a blank flatfield and blank responsivity image */
+                smf_flat_badflat( infile, &curresp, status );
               }
 
               /* Retrieve the UT date so we can decide whether to compare
