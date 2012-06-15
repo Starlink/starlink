@@ -211,6 +211,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *     7-JUN-2012 (DSB):
 *        Added protected astRegSplit method to split a Region into disjoint
 *        component regions.
+*     15-JUN-2012 (DSB):
+*        Guard against division by zero in RegBase Grid if "ipr" is zero.
 *class--
 
 *  Implementation Notes:
@@ -7470,7 +7472,11 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
    is in error. Don't do this if we have reached the maximum number of
    re-tries. */
          if( ntry < 3 ) {
-            np *= (double)meshsize/(double)ipr;
+            if( ipr == 0 ) {
+               np *= 10;
+            } else {
+               np *= (double)meshsize/(double)ipr;
+            }
             result = astAnnul( result );
          }
       }
