@@ -844,6 +844,57 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            # These are the generic flatfield parameters. Not in alphabetical order
+            # with the other parameters to make it easier to do bulk copies
+
+            parameter flatmeth {
+                type _CHAR
+                prompt {Flatfield calculation method}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default POLYNOMIAL
+                helpkey *
+            }
+
+            parameter flatorder {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
+            parameter flatsnr {
+                type _DOUBLE
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default 3.0
+                prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
+                helpkey *
+            }
+
         }
 
         action dreamweights {
