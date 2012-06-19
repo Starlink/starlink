@@ -67,8 +67,8 @@ $KAPPA_DIR/ndfcopy ${file}_con_res_cln comp=qua out=qua
 
 #  Set up arrays of input NDF names and corresponding names required by sanepic.
 #  The cleaned time series data must be first.
-set ndfs = `echo "${file}_con_res_cln  ${file}_DRA ${file}_DDEC qua"`
-set names = `echo "signal lon lat mask"`
+set ndfs = `echo "qua ${file}_con_res_cln  ${file}_DRA ${file}_DDEC"`
+set names = `echo "mask signal lon lat"`
 
 #  Process each 3D time series NDF
 set n = 1
@@ -88,9 +88,10 @@ while( $n <= $#ndfs )
 # Swap the axes
    $KAPPA_DIR/permaxes tmp5 perm=\[2,1\] out=tmp6
 
-# Use the first file (which should be the cleaned time series data) to create a mask of bolometers to use
+# Use the first file (which should be the quality array) to create a mask of bolometers to use
    if( !( -e bmask.log ) ) then
-      $KAPPA_DIR/collapse tmp6 axis=p1 wlim=0 out=bmask
+      $KAPPA_DIR/maths exp='"qif((ia>0),<bad>,0)"' ia=tmp6 out=tmp7
+      $KAPPA_DIR/collapse tmp7 axis=p1 wlim=0 out=bmask
       $KAPPA_DIR/look bmask'(,1)' mode=all format=vlist log=bmask.log quiet
       $KAPPA_DIR/stats bmask quiet
       set ngood = `$KAPPA_DIR/parget NUMGOOD stats`
