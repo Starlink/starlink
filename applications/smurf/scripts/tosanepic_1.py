@@ -17,11 +17,11 @@ iv = 0
 for i in range( 32 ):
    for j in range( 40 ):
       name = "B{0:04}C{1:02}R{2:02}".format(iv,i,j)
-      names.append( name )
       maskin = bmask.readline().rstrip()
       if maskin == "BAD":
          bolomask.write("#"+name+"\n" )
       else:
+         names.append( name )
          bolomask.write(name+"\n")
       iv += 1
 
