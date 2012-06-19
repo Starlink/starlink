@@ -4,7 +4,7 @@ import starlink.Ast as Ast
 bmask = open( "bmask.log", "r" )
 
 lut = []
-igood = 0
+igood = -0.5
 for i in range( 32 ):
    for j in range( 40 ):
       maskin = bmask.readline().rstrip()
@@ -19,6 +19,6 @@ bmask.close()
 
 mapping = open( "mapping.ast", "w" )
 mapping.write( str( Ast.CmpMap( Ast.UnitMap( 1 ),
-                                Ast.LutMap( lut, start=1.0, inc=1.0, options="LutInterp=1" ),
+                                Ast.LutMap( lut, 0.5, 1.0, "LutInterp=1" ),
                                 False ) ) )
 mapping.close()
