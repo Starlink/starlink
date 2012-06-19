@@ -6,17 +6,17 @@
 #     If no input file is supplied a default of /star/share/smurf/s4a20091214_00015_0002.sdf is used.
 
 #  Description:
-#     Creates a FITS file suitable for use with sanepic from a single SCUBA-2 raw data file. 
+#     Creates a FITS file suitable for use with sanepic from a single SCUBA-2 raw data file.
 #     The output FITS file is left in the current directory and has the same base=name as
 #     the supplied SCUBA-2 raw file, but with file type ".fits".
 
 #     Also creates a text file ("bolomask") containing the identifiers for the usable bolometers.
 #
-#     In addition, the down-sampled sampling frequency is needed by sanepic. This can be found by 
-#     looking in the makemap.log file for the place where it says how many down-sampled 
+#     In addition, the down-sampled sampling frequency is needed by sanepic. This can be found by
+#     looking in the makemap.log file for the place where it says how many down-sampled
 #     samples there are and how long they last.
 
-#     Note - this will need to be changed when makemap can create lon/lat values for whole chunks 
+#     Note - this will need to be changed when makemap can create lon/lat values for whole chunks
 #     rather than just individual input files.
 
 if( $# > 0 ) then
@@ -33,16 +33,16 @@ rm -f bmask.log >& /dev/null
 #  Get the required time series NDFs by running makemap.
 $SMURF_DIR/makemap $full method=iter out=map msg_filter=debug config=^/star/share/smurf/dimmconfig_export.lis | tee makemap.log
 
-#  Create an HDS container containing a dummy 1 pixel NDF (since ndf2fits 
-#  container=yes seems to put the first NDF it finds into the primary 
+#  Create an HDS container containing a dummy 1 pixel NDF (since ndf2fits
+#  container=yes seems to put the first NDF it finds into the primary
 #  HDU which is not what we want).
 $KAPPA_DIR/maths exp=xa type="_REAL" lbound=1 ubound=1 out=cont.dummy
 
-#  Get a template NDF that is a copy of the cleaned data but with 
+#  Get a template NDF that is a copy of the cleaned data but with
 #  PAD samples trimmed from start and end.
-$KAPPA_DIR/nomagic ${file}_con_res_cln tmp1 0 
+$KAPPA_DIR/nomagic ${file}_con_res_cln tmp1 0
 $KAPPA_DIR/qualtobad tmp1 tmp2 PAD
-$KAPPA_DIR/ndfcopy tmp2 template trimbad=yes 
+$KAPPA_DIR/ndfcopy tmp2 template trimbad=yes
 
 #  Copy the full TCS_TAI array from JCMTSTATE into a separate 1D NDF.
 $HDSTOOLS_DIR/hcreate tai_days NDF
@@ -92,9 +92,11 @@ while( $n <= $#ndfs )
    if( !( -e bmask.log ) ) then
       $KAPPA_DIR/collapse tmp6 axis=p1 wlim=0 out=bmask
       $KAPPA_DIR/look bmask'(,1)' mode=all format=vlist log=bmask.log quiet
+      $KAPPA_DIR/stats bmask quiet
+      set ngood = `$KAPPA_DIR/parget NUMGOOD stats`
 
 #  Create a Mapping that maps (col,bolo1) for all bolos to (col,bolo2) excluding bad bolometers.
-      ./tosanepic_2.py 
+      ./tosanepic_2.py
    endif
 
 #  Replace bad values with zeros.
@@ -102,7 +104,8 @@ while( $n <= $#ndfs )
 
 #  Use this Mapping (mapping.ast) to regrid the array to exclude dead bolometers, storing the new NDF
 #  with the sanepic name in an output HDS container file
-   $KAPPA_DIR/regrid tmp7 out=cont.$name mapping=mapping.ast method=near rebin=false
+   $KAPPA_DIR/regrid tmp7 out=cont.$name mapping=mapping.ast method=near \
+                     rebin=true lbound=\[1,1\] ubound=\[$ntime,$ngood\]
 
 #  For safety erase everything but the DATA array so that ndf2fits does not copy unrequired things.
    $KAPPA_DIR/erase cont.$name.quality ok >& /dev/null
