@@ -91,3 +91,57 @@
 [submodule "thirdparty/sofa/sofa"]
 	path = thirdparty/sofa/sofa
 	url = ../sofa.git
+[submodule "thirdparty/perlsys/perlmods/perl-NDF"]
+	path = thirdparty/perlsys/perlmods/perl-NDF
+	url = ../perl-NDF.git
+[submodule "thirdparty/perlsys/perlmods/perl-GSD"]
+	path = thirdparty/perlsys/perlmods/perl-GSD
+	url = ../perl-GSD.git
+[submodule "thirdparty/perlsys/perlmods/perl-Starlink-AMS"]
+	path = thirdparty/perlsys/perlmods/perl-Starlink-AMS
+	url = ../perl-Starlink-AMS.git
+[submodule "thirdparty/perlsys/perlmods/perl-Starlink-Config"]
+	path = thirdparty/perlsys/perlmods/perl-Starlink-Config
+	url = ../perl-Starlink-Config.git
+[submodule "thirdparty/perlsys/perlmods/perl-Starlink-Versions"]
+	path = thirdparty/perlsys/perlmods/perl-Starlink-Versions
+	url = ../perl-Starlink-Versions.git
+[submodule "thirdparty/perlsys/perlmods/perl-Starlink-HDSPACK"]
+	path = thirdparty/perlsys/perlmods/perl-Starlink-HDSPACK
+	url = ../perl-Starlink-HDSPACK.git
+[submodule "thirdparty/perlsys/perlmods/perl-Starlink-ADAM"]
+	path = thirdparty/perlsys/perlmods/perl-Starlink-ADAM
+	url = ../perl-Starlink-ADAM.git
+[submodule "thirdparty/perlsys/perlmods/perl-Starlink-Prologue"]
+	path = thirdparty/perlsys/perlmods/perl-Starlink-Prologue
+	url = ../perl-Starlink-Prologue.git
+[submodule "thirdparty/perlsys/perlmods/perl-Starlink-Astrom"]
+	path = thirdparty/perlsys/perlmods/perl-Starlink-Astrom
+	url = ../perl-Starlink-Astrom.git
+[submodule "thirdparty/perlsys/perlmods/perl-Starlink-Autoastrom"]
+	path = thirdparty/perlsys/perlmods/perl-Starlink-Autoastrom
+	url = ../perl-Starlink-Autoastrom.git
+[submodule "thirdparty/perlsys/perlmods/perl-Starlink-EMS"]
+	path = thirdparty/perlsys/perlmods/perl-Starlink-EMS
+	url = ../perl-Starlink-EMS.git
+[submodule "thirdparty/perlsys/perlmods/perl-Starlink-Extractor"]
+	path = thirdparty/perlsys/perlmods/perl-Starlink-Extractor
+	url = ../perl-Starlink-Extractor.git
+[submodule "thirdparty/perlsys/perlmods/perl-JCMT-Pointing"]
+	path = thirdparty/perlsys/perlmods/perl-JCMT-Pointing
+	url = ../perl-JCMT-Pointing.git
+[submodule "thirdparty/perlsys/perlmods/perl-JCMT-Tau"]
+	path = thirdparty/perlsys/perlmods/perl-JCMT-Tau
+	url = ../perl-JCMT-Tau.git
+[submodule "thirdparty/perlsys/perlmods/perl-JCMT-MapArea"]
+	path = thirdparty/perlsys/perlmods/perl-JCMT-MapArea
+	url = ../perl-JCMT-MapArea.git
+[submodule "thirdparty/perlsys/perlmods/perl-JSA"]
+	path = thirdparty/perlsys/perlmods/perl-JSA
+	url = ../perl-JSA.git
+[submodule "thirdparty/perlsys/perlmods/perl-JCMT-ACSIS-Array"]
+	path = thirdparty/perlsys/perlmods/perl-JCMT-ACSIS-Array
+	url = ../perl-JCMT-ACSIS-Array.git
+[submodule "thirdparty/perlsys/perlmods/perl-JAC-Setup"]
+	path = thirdparty/perlsys/perlmods/perl-JAC-Setup
+	url = ../perl-JAC-Setup.git
