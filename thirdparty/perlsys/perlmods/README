@@ -1,0 +1,20 @@
+
+This directory contains the means of building the perl modules required
+to run Starlink perl software such as ORAC-DR.
+
+Run build-modules.sh and it will install CPANMINUS, retrieve required
+CPAN modules and then build Starlink modules.
+
+If new CPAN dependencies are required update the contents of the
+file cpan.deps. The file perlmods-order.txt contains the order which
+should be used to build the local Starlink modules.
+
+Starlink modules are attached to the main repository as git submodules.
+More modules can be added by issuing the command
+
+  git submodule add ../perl-XXX.git thirdparty/perlsys/perlmods/perl-XXX
+
+assuming that perl-XXX.git is in the same location as the main Starlink
+repository. We currently prefer to install other modules from CPAN as
+CPAN modules although it would be easy to add additional github repositories
+as submodules.
