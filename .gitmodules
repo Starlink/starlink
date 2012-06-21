@@ -145,3 +145,9 @@
 [submodule "thirdparty/perlsys/perlmods/perl-JAC-Setup"]
 	path = thirdparty/perlsys/perlmods/perl-JAC-Setup
 	url = ../perl-JAC-Setup.git
+[submodule "thirdparty/perlsys/perlmods/perl-JCMT-SCUBA"]
+	path = thirdparty/perlsys/perlmods/perl-JCMT-SCUBA
+	url = ../perl-JCMT-SCUBA.git
+[submodule "thirdparty/perlsys/perlmods/perl-JCMT-DAS"]
+	path = thirdparty/perlsys/perlmods/perl-JCMT-DAS
+	url = ../perl-JCMT-DAS.git

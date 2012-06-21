@@ -14,5 +14,7 @@ perl-JCMT-Tau
 perl-JCMT-Pointing
 perl-JCMT-MapArea
 perl-JCMT-ACSIS-Array
+perl-JCMT-DAS
+perl-JCMT-SCUBA
 perl-JAC-Setup
 perl-JSA
