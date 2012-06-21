@@ -10,9 +10,13 @@ DateTime::Format::Strptime
 DateTime::Format::ISO8601
 Tk
 Tk::TextANSIColor
+Statistics::Descriptive
+Image::ExifTool
 Starlink::AST
+Astro::FITS::CFITSIO
 Astro::SLA
 Astro::PAL
+Astro::Telescope
 Astro::Coords
 Astro::FITS::HdrTrans
 Astro::FITS::Header
