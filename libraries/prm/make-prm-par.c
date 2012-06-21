@@ -93,8 +93,10 @@
  *     12-OCT-2010 (DSB):
  *        Added VAL__NAM<X> constants which hold character strings "_DOUBLE",
  *        "_REAL" etc.
-*      20-APR-2012 (TIMJ):
-*         Add _INT64
+ *     20-APR-2012 (TIMJ):
+ *        Add _INT64
+ *     2012-06-21 (TIMJ):
+ *        Declare _INT64 constants with LL.
 
  *  Copyright:
  *     Copyright (C) 2009-2010,2012 Science and Technology Facilities Council.
@@ -808,6 +810,7 @@ void par_c(const char* name, const char* val)
 void par_i(const int size, const char* name, int64_t val)
 {
     const char *type = NULL;
+    const char *csuffix = "";
     int64_t min = 0;
 
     switch (size) {
@@ -829,6 +832,7 @@ void par_i(const int size, const char* name, int64_t val)
       case 8:
       case -8:
         type = "INTEGER*8";
+        csuffix = "LL";
         min = INT64_MIN;
         break;
       default:
@@ -894,7 +898,7 @@ void par_i(const int size, const char* name, int64_t val)
 
     if (COutput) {
         if (val >= 0)
-            fprintf(COutput, "#define %s %"PRId64"\n", name, val);
+           fprintf(COutput, "#define %s %"PRId64"%s\n", name, val, csuffix);
         else {
             /* Output negative numbers in brackets, to guarantee no
                parsing surprises.  Also, write numbers like INT_MIN as
@@ -904,9 +908,9 @@ void par_i(const int size, const char* name, int64_t val)
                (sometimes?) parsed as a positive number plus a
                negation.  I admit there's a hint of voodoo here. */
             if (val == min)
-                fprintf(COutput, "#define %s (%"PRId64" - 1)\n", name, val+1);
+               fprintf(COutput, "#define %s (%"PRId64"%s - 1)\n", name, val+1, csuffix);
             else
-                fprintf(COutput, "#define %s (%"PRId64")\n", name, val);
+               fprintf(COutput, "#define %s (%"PRId64"%s)\n", name, val, csuffix);
         }
     }
 }
