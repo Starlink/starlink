@@ -109,5 +109,9 @@ static const double PAL__GCON = 0.01720209895;
 /* DMAX(A,B) - return maximum value - evaluates arguments multiple times */
 #define DMAX(A,B) (A > B ? A : B )
 
+/* We actually prefer to use C99 copysign() but we define this here as a backup
+   but it will not detect -0.0 so is not useful for palDfltin. */
+/* DSIGN(A,B) - magnitude of A with sign of B (double) */
+#define DSIGN(A,B) ((B)<0.0?-fabs(A):fabs(A))
 
 #endif
