@@ -151,6 +151,8 @@
 *  History:
 *     2012-03-12 (TIMJ):
 *        Initial version direct conversion of SLA/F.
+*     2012-06-21 (TIMJ):
+*        Support a lack of copysign() function.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -178,6 +180,10 @@
 *-
 */
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <math.h>
 
 #include "pal.h"
@@ -187,6 +193,13 @@
 /* Only needed in one place */
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+/* copysign is C99 */
+#if HAVE_COPYSIGN
+# define COPYSIGN copysign
+#else
+# define COPYSIGN(a,b) DSIGN(a,b)
+#endif
 
 void palPertue( double date, double u[13], int *jstat ) {
 
@@ -344,7 +357,7 @@ void palPertue( double date, double u[13], int *jstat ) {
   if (fabs(TSPAN) > 36525.0) *jstat=101;
 
   /*  Time direction: +1 for forwards, -1 for backwards. */
-  FB = copysign(1.0,TSPAN);
+  FB = COPYSIGN(1.0,TSPAN);
 
   /*  Initialize relative epoch for start of current timestep. */
   RTN = 0.0;

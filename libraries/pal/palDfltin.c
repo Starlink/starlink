@@ -52,9 +52,16 @@
 *     - Unlike slaDfltin a standalone "E" will return status 1 (could not find
 *       a number) rather than 2 (bad number).
 
+*  Implementation Status:
+*     - The code is more robust if the C99 copysign() function is available.
+*     This can recognize the -0.0 values returned by strtod. If copysign() is
+*     missing we try to scan the string looking for minus signs.
+
 *  History:
 *     2012-03-08 (TIMJ):
 *        Initial version based on strtod
+*     2012-06-21 (TIMJ):
+*        Provide a backup for missing copysign.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -82,6 +89,10 @@
 *-
 */
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 /* Shenanigans for isblank() which is C99 only */
 #define _POSIX_C_SOURCE 200112L
 #define _ISOC99_SOURCE
@@ -92,6 +103,12 @@
 #include <ctype.h>
 
 #include "pal.h"
+
+#if HAVE_COPYSIGN
+# define SCAN_FOR_MINUS 0
+#else
+# define SCAN_FOR_MINUS 1
+#endif
 
 /* We prefer to use the starutil package */
 #if NOSTARUTIL
@@ -111,6 +128,28 @@ void palDfltin( const char * string, int *nstrt,
      buffer. Technically we only have to do the copy if we have a
      D or d in the string. */
   char tempbuf[256];
+
+#if SCAN_FOR_MINUS
+  int dreslt_sign = 1;
+  int ipos = *nstrt;
+  const char * cctemp = NULL;
+
+  /* Scan the string looking for a minus sign. Then update the
+     start position for the subsequent copy iff we find a '-'.
+     Note  that commas are a special delimiter so we stop looking for a
+     minus if we find one or if we find a digit. */
+  cctemp = &(string[ipos-1]);
+  while (!isdigit(*cctemp) && (*cctemp != ',') && (*cctemp != '\0')) {
+    printf("Looking at char %d '%c'\n",ipos-1, *cctemp);
+    if (*cctemp == '-') {
+      *nstrt = ipos;
+      dreslt_sign = -1;
+      break;
+    }
+    ipos++;
+    cctemp++;
+  }
+#endif
 
   /* Correct for SLA use of fortran convention */
 #if NOSTARUTIL
@@ -149,6 +188,9 @@ void palDfltin( const char * string, int *nstrt,
   } else if ( errno == ERANGE ) {
     *jflag = 2;
   } else {
+#if SCAN_FOR_MINUS
+    *jflag = (dreslt_sign < 0 ? -1 : 0);
+#else
     if ( retval < 0.0 ) {
       *jflag = -1;
     } else if ( retval == 0.0 ) {
@@ -162,6 +204,7 @@ void palDfltin( const char * string, int *nstrt,
     } else {
       *jflag = 0;
     }
+#endif
   }
 
   /* Sort out the position for the next index */

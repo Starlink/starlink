@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision: 27534 $)
 
 dnl    Initialisation: package name and version number
-AC_INIT(pal, 0.1.1, stardev@jiscmail.ac.uk)
+AC_INIT(pal, 0.1.2, stardev@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -23,6 +23,8 @@ AC_PROG_LIBTOOL
 #   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
+dnl    copysign is a c99 feature
+AC_CHECK_FUNCS(copysign)
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [sofa starutil])
