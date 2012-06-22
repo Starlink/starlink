@@ -20,6 +20,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -28,6 +29,8 @@
 *  History:
 *     2012-02-08 (TIMJ):
 *        Initial version.
+*     2012-04-13 (DSB):
+*        Added PAL__DR2H and PAL__DR2S
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -70,28 +73,45 @@ static const double PAL__DR2AS = 2.062648062470963551564733573307786131966597008
 /* Arcseconds to radians */
 static const double PAL__DAS2R = 4.8481368110953599358991410235794797595635330237270e-6;
 
+/* Radians to hours */
+static const double PAL__DR2H = 3.8197186342054880584532103209403446888270314977709;
+
+/* Radians to seconds of time */
+static const double PAL__DR2S = 1.3750987083139757010431557155385240879777313391975e4;
+
 /* Start of SLA modified Julian date epoch */
 static const double PAL__MJD0 = 2400000.5;
 
 /* Light time for 1 AU (sec) */
 static const double PAL__CR = 499.004782;
 
+/* Seconds per day */
+static const double PAL__SPD = 86400.0;
+
 /* Km per sec to AU per tropical century
    = 86400 * 36524.2198782 / 149597870 */
 static const double PAL__VF = 21.095;
 
-/*  Radians per year to arcsec per century. Note - must be a macro since
-    its value is not a literal constant (i.e. it refers to PAL__D2PI). */
-#define PAL__PMF (100.0*60.0*60.0*360.0/PAL__D2PI)
+/*  Radians per year to arcsec per century. This needs to be a macro since it
+    is an expression including other constants. */
+#define PAL__PMF (100.0*60.0*60.0*360.0/PAL__D2PI);
 
 /* Mean sidereal rate - the rotational angular velocity of Earth
    in radians/sec from IERS Conventions (2003). */
 static const double PAL__SR = 7.2921150e-5;
 
+/*  Gaussian gravitational constant (exact) */
+static const double PAL__GCON = 0.01720209895;
+
 /* DNINT(A) - round to nearest whole number (double) */
 #define DNINT(A) ((A)<0.0?ceil((A)-0.5):floor((A)+0.5))
 
+/* DMAX(A,B) - return maximum value - evaluates arguments multiple times */
+#define DMAX(A,B) (A > B ? A : B )
 
-
+/* We actually prefer to use C99 copysign() but we define this here as a backup
+   but it will not detect -0.0 so is not useful for palDfltin. */
+/* DSIGN(A,B) - magnitude of A with sign of B (double) */
+#define DSIGN(A,B) ((B)<0.0?-fabs(A):fabs(A))
 
 #endif

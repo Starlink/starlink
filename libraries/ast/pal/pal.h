@@ -61,6 +61,7 @@ extern "C" {
 #endif
 
 #include <math.h>
+#include <stdlib.h>
 
 void palAddet ( double rm, double dm, double eq, double *rc, double *dc );
 
@@ -249,7 +250,7 @@ void palEg50 ( double dr, double dd, double *dl, double *db );
 
 void palEl2ue ( double date, int jform, double epoch, double orbinc,
                 double anode, double perih, double aorq, double e,
-                double aorl, double dm, double u[], int *jstat );
+                double aorl, double dm, double u[13], int *jstat );
 
 double palEpb ( double date );
 
@@ -260,6 +261,9 @@ double palEpco ( char k0, char k, double e );
 double palEpj ( double date );
 
 double palEpj2d ( double epj );
+
+void palEpv( double date, double ph[3], double vh[3],
+             double pb[3], double vb[3] );
 
 void palEqecl ( double dr, double dd, double date, double *dl, double *db );
 
@@ -370,7 +374,10 @@ void palOap ( const char *type, double ob1, double ob2, double date,
 void palOapqk ( const char *type, double ob1, double ob2, double aoprms[14],
                 double *rap, double *dap );
 
-void palObs ( int n, char *c, char *name, double *w, double *p, double *h );
+int palObs( size_t n, const char * c,
+            char * ident, size_t identlen,
+            char * name, size_t namelen,
+            double * w, double * p, double * h );
 
 double palPa ( double ha, double dec, double phi );
 
@@ -393,7 +400,7 @@ void palPertel (int jform, double date0, double date1,
                 double *perih1, double *aorq1, double *e1, double *am1,
                 int *jstat );
 
-void palPertue ( double date, double u[], int *jstat );
+void palPertue ( double date, double u[13], int *jstat );
 
 void palPlanel ( double date, int jform, double epoch, double orbinc,
                  double anode, double perih, double aorq,  double e,
@@ -406,7 +413,7 @@ void palPlante ( double date, double elong, double phi, int jform,
                  double aorq, double e, double aorl, double dm,
                  double *ra, double *dec, double *r, int *jstat );
 
-void palPlantu ( double date, double elong, double phi, double u[],
+void palPlantu ( double date, double elong, double phi, const double u[13],
                  double *ra, double *dec, double *r, int *jstat );
 
 void palPm ( double r0, double d0, double pr, double pd,
@@ -427,13 +434,13 @@ void palPreces ( const char sys[3], double ep0, double ep1,
 
 void palPrenut ( double epoch, double date, double rmatpn[3][3] );
 
-void palPv2el ( double pv[], double date, double pmass, int jformr,
+void palPv2el ( const double pv[6], double date, double pmass, int jformr,
                 int *jform, double *epoch, double *orbinc,
                 double *anode, double *perih, double *aorq, double *e,
                 double *aorl, double *dm, int *jstat );
 
-void palPv2ue ( double pv[], double date, double pmass,
-                double u[], int *jstat );
+void palPv2ue ( const double pv[6], double date, double pmass,
+                double u[13], int *jstat );
 
 void palPvobs ( double p, double h, double stl, double pv[6] );
 
@@ -465,7 +472,7 @@ void palRefv ( double vu[3], double refa, double refb, double vr[3] );
 
 void palRefz ( double zu, double refa, double refb, double *zr );
 
-float palRverot ( float phi, float ra, float da, float st );
+double palRverot ( double phi, double ra, double da, double st );
 
 double palRvgalc ( double r2000, double d2000 );
 
@@ -512,12 +519,12 @@ void palTps2c ( float xi, float eta, float ra, float dec,
 void palTpv2c ( float xi, float eta, float v[3],
                 float v01[3], float v02[3], int *n );
 
-void palUe2el ( double u[], int jformr,
+void palUe2el ( const double u[13], int jformr,
                 int *jform, double *epoch, double *orbinc,
                 double *anode, double *perih, double *aorq, double *e,
                 double *aorl, double *dm, int *jstat );
 
-void palUe2pv ( double date, double u[], double pv[], int *jstat );
+void palUe2pv ( double date, double u[13], double pv[], int *jstat );
 
 void palUnpcd ( double disco, double *x, double *y );
 
