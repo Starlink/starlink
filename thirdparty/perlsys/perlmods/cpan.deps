@@ -8,12 +8,13 @@ IO::Tee
 DateTime
 DateTime::Format::Strptime
 DateTime::Format::ISO8601
+Starlink::AST
 Tk
 Tk::TextANSIColor
 Statistics::Descriptive
 Image::ExifTool
-Starlink::AST
 Astro::FITS::CFITSIO
+ExtUtils::F77
 Astro::SLA
 Astro::PAL
 Astro::Telescope
