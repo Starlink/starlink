@@ -612,7 +612,7 @@ fi
 # Fluxes
 
 if test -f ${bindir}/fluxes/fluxes; then
-  fluxes () { $FLUXES_DIR/fluxes.csh; }
+  fluxes () { $FLUXES_DIR/fluxes.csh ${1+"$@"}; }
   fluxnow () { $FLUXES_DIR/fluxnow.csh; }
 else
   fluxes () { ${STARLINK_DIR}/etc/notinst fluxes; }
