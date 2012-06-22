@@ -62,6 +62,8 @@
 *        Initial version based on strtod
 *     2012-06-21 (TIMJ):
 *        Provide a backup for missing copysign.
+*     2012-06-22 (TIMJ):
+*        Check __STDC_VERSION__
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -89,14 +91,23 @@
 *-
 */
 
-#if HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 /* Shenanigans for isblank() which is C99 only */
 #define _POSIX_C_SOURCE 200112L
 #define _ISOC99_SOURCE
 
+/* Use the config file if we have one, else look at
+   compiler defines to see if we have C99 */
+#if HAVE_CONFIG_H
+#include <config.h>
+#else
+#ifdef __STDC_VERSION__
+#  if (__STDC_VERSION__ >= 199901L)
+#    define HAVE_COPYSIGN 1
+#  endif
+#endif
+#endif
+
+/* System include files */
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>

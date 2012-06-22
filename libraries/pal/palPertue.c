@@ -153,6 +153,8 @@
 *        Initial version direct conversion of SLA/F.
 *     2012-06-21 (TIMJ):
 *        Support a lack of copysign() function.
+*     2012-06-22 (TIMJ):
+*        Check __STDC_VERSION__
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -180,8 +182,16 @@
 *-
 */
 
+/* Use the config file if we have one, else look at
+   compiler defines to see if we have C99 */
 #if HAVE_CONFIG_H
 #include <config.h>
+#else
+#ifdef __STDC_VERSION__
+#  if (__STDC_VERSION__ >= 199901L)
+#    define HAVE_COPYSIGN 1
+#  endif
+#endif
 #endif
 
 #include <math.h>
