@@ -1033,6 +1033,8 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        coefficients. Issue a warning and ignore the distortion in such
 *        cases.
 *        - Remove all set but unused variables.
+*        - Convert SAO distorted TAN projections (which use COi_j keywords
+*        for polynomial coeffs) to TPN.
 *class--
 */
 
@@ -1754,6 +1756,7 @@ static void ReadFromSource( AstFitsChan *, int * );
 static void RemoveTables( AstFitsChan *, const char *, int * );
 static void RetainFits( AstFitsChan *, int * );
 static void RoundFString( char *, int, int * );
+static void SAOTrans( AstFitsChan *, AstFitsChan *, const char *, const char *, int * );
 static void SetAlgCode( char *, const char *, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 static void SetFitsCF( AstFitsChan *, const char *, double *, const char *, int, int * );
@@ -24702,6 +24705,262 @@ static void RoundFString( char *text, int width, int *status ){
 #undef NSEQ
 }
 
+static void SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
+                      const char *class, int *status ){
+/*
+*  Name:
+*     SAOTrans
+
+*  Purpose:
+*     Translate an SAO encoded header into a TPN encoded header.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     void SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
+*                    const char *class, int *status )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     Search "this" for keywords that give a description of a distorted
+*     TAN projection using the SAO representation and, if found, write
+*     keywords to "out" that describe an equivalent projection using TPN
+*     representation. The definition of the SAO polynomial is taken from
+*     the platepos.c file included in Doug Mink's WCSTools.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan to read.
+*     out
+*        Pointer to a FitsCHan in which to store translated keywords.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+*/
+
+#define NC 13
+
+/* Local Variables: */
+   char keyname[10];
+   double pv;
+   int i;
+   int is_sao;
+   int m;
+   int ok;
+   double co[ 2 ][ NC ];
+   int ubnd;
+   int lbnd;
+
+/* Check the inherited status. */
+   if( !astOK ) return;
+
+/* Check there are exactly two CTYPE keywords in the header. */
+   if( 2 == astKeyFields( this, "CTYPE%d", 2, &ubnd, &lbnd ) ){
+
+/* Get the required SAO keywords. */
+      is_sao = 1;
+      ok = 1;
+      for( i = 0; i < 2 && ok && is_sao; i++ ) {
+
+         ok = 0;
+         for( m = 0; m < NC; m++ ) {
+
+/* Get the value of the next "COi_j" keyword. If the keyword is not found
+   in the header, store a default value. If any of the first 3 values are
+   missing on either axis, we assume this is not an SAO header. */
+            sprintf( keyname, "CO%d_%d", i + 1, m + 1 );
+            if( !GetValue( this, keyname, AST__FLOAT, &co[ i ][ m ], 0, 1, method,
+                           class, status ) ) {
+               co[ i ][ m ] = ( m == i + 1 ) ? 1.0 : 0.0;
+               if( m < 3 ) is_sao = 0;
+               break;
+            }
+
+/* Check that we have at least one non-zero coefficient (excluding the
+   first constant term ). */
+            if( co[ i ][ m ] != 0.0 && m > 0 ) ok = 1;
+         }
+      }
+
+/* If this is an SAO header..  */
+      if( is_sao ) {
+
+/* Issue a warning if all coefficients for this axis are zero. */
+         if( !ok ) {
+            Warn( this, "badpv", "This FITS header describes an SAO encoded "
+                  "distorted TAN projection, but all the distortion "
+                  "coefficients for at least one axis are zero.", method, class,
+                  status );
+
+/* Otherwise, calculate and store the equivalent PV projection parameters. */
+         } else {
+            pv = co[ 0 ][ 0 ];
+            if( pv != AST__BAD ) SetValue( out, "PV1_0", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = co[ 0 ][ 1 ];
+            if( pv != AST__BAD ) SetValue( out, "PV1_1", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = co[ 0 ][ 2 ];
+            if( pv != AST__BAD ) SetValue( out, "PV1_2", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 0 ][ 3 ] != AST__BAD ) pv += co[ 0 ][ 3 ];
+            if( co[ 0 ][ 10 ] != AST__BAD ) pv += co[ 0 ][ 10 ];
+            if( pv != AST__BAD ) SetValue( out, "PV1_4", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = co[ 0 ][ 5 ];
+            if( pv != AST__BAD ) SetValue( out, "PV1_5", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 0 ][ 4 ] != AST__BAD ) pv += co[ 0 ][ 4 ];
+            if( co[ 0 ][ 10 ] != AST__BAD ) pv += co[ 0 ][ 10 ];
+            if( pv != AST__BAD ) SetValue( out, "PV1_6", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 0 ][ 6 ] != AST__BAD ) pv += co[ 0 ][ 6 ];
+            if( co[ 0 ][ 11 ] != AST__BAD ) pv += co[ 0 ][ 11 ];
+            if( pv != AST__BAD ) SetValue( out, "PV1_7", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 0 ][ 8 ] != AST__BAD ) pv += co[ 0 ][ 8 ];
+            if( co[ 0 ][ 12 ] != AST__BAD ) pv += co[ 0 ][ 12 ];
+            if( pv != AST__BAD ) SetValue( out, "PV1_8", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 0 ][ 9 ] != AST__BAD ) pv += co[ 0 ][ 9 ];
+            if( co[ 0 ][ 11 ] != AST__BAD ) pv += co[ 0 ][ 11 ];
+            if( pv != AST__BAD ) SetValue( out, "PV1_9", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 0 ][ 7 ] != AST__BAD ) pv += co[ 0 ][ 7 ];
+            if( co[ 0 ][ 12 ] != AST__BAD ) pv += co[ 0 ][ 12 ];
+            if( pv != AST__BAD ) SetValue( out, "PV1_10", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = co[ 1 ][ 0 ];
+            if( pv != AST__BAD ) SetValue( out, "PV2_0", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = co[ 1 ][ 2 ];
+            if( pv != AST__BAD ) SetValue( out, "PV2_1", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = co[ 1 ][ 1 ];
+            if( pv != AST__BAD ) SetValue( out, "PV2_2", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 1 ][ 4 ] != AST__BAD ) pv += co[ 1 ][ 4 ];
+            if( co[ 1 ][ 10 ] != AST__BAD ) pv += co[ 1 ][ 10 ];
+            if( pv != AST__BAD ) SetValue( out, "PV2_4", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = co[ 1 ][ 5 ];
+            if( pv != AST__BAD ) SetValue( out, "PV2_5", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 1 ][ 3 ] != AST__BAD ) pv += co[ 1 ][ 3 ];
+            if( co[ 1 ][ 10 ] != AST__BAD ) pv += co[ 1 ][ 10 ];
+            if( pv != AST__BAD ) SetValue( out, "PV2_6", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 1 ][ 7 ] != AST__BAD ) pv += co[ 1 ][ 7 ];
+            if( co[ 1 ][ 12 ] != AST__BAD ) pv += co[ 1 ][ 12 ];
+            if( pv != AST__BAD ) SetValue( out, "PV2_7", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 1 ][ 9 ] != AST__BAD ) pv += co[ 1 ][ 9 ];
+            if( co[ 1 ][ 11 ] != AST__BAD ) pv += co[ 1 ][ 11 ];
+            if( pv != AST__BAD ) SetValue( out, "PV2_8", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 1 ][ 8 ] != AST__BAD ) pv += co[ 1 ][ 8 ];
+            if( co[ 1 ][ 12 ] != AST__BAD ) pv += co[ 1 ][ 12 ];
+            if( pv != AST__BAD ) SetValue( out, "PV2_9", &pv,
+                                           AST__FLOAT, NULL, status );
+
+            pv = 0.0;
+            if( co[ 1 ][ 6 ] != AST__BAD ) pv += co[ 1 ][ 6 ];
+            if( co[ 1 ][ 11 ] != AST__BAD ) pv += co[ 1 ][ 11 ];
+            if( pv != AST__BAD ) SetValue( out, "PV2_10", &pv,
+                                           AST__FLOAT, NULL, status );
+
+/* From an example header provided by Bill Joye, it seems that the SAO
+   polynomial includes the rotation and scaling effects of the CD matrix.
+   Therefore we mark as read all CDi_j, CDELT and CROTA values. Without
+   this, the rotation and scaling would be applied twice. First, mark the
+   original values as having been used, no matter which FitsChan they are
+   in. */
+            GetValue( this, "CD1_1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "CD1_2", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "CD2_1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "CD2_2", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "PC1_1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "PC1_2", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "PC2_1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "PC2_2", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "CDELT1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "CDELT2", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "CROTA1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( this, "CROTA2", AST__FLOAT, &pv, 0, 1, method, class, status );
+
+            GetValue( out, "CD1_1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "CD1_2", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "CD2_1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "CD2_2", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "PC1_1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "PC1_2", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "PC2_1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "PC2_2", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "CDELT1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "CDELT2", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "CROTA1", AST__FLOAT, &pv, 0, 1, method, class, status );
+            GetValue( out, "CROTA2", AST__FLOAT, &pv, 0, 1, method, class, status );
+
+/* Now store new default values in the returned FitsChan. */
+            pv = 1.0;
+            SetValue( out, "PC1_1", &pv, AST__FLOAT, NULL,
+                      status );
+            SetValue( out, "PC2_2", &pv, AST__FLOAT, NULL,
+                      status );
+            SetValue( out, "CDELT1", &pv, AST__FLOAT, NULL,
+                      status );
+            SetValue( out, "CDELT2", &pv, AST__FLOAT, NULL,
+                      status );
+
+            pv = 0.0;
+            SetValue( out, "PC1_2", &pv, AST__FLOAT, NULL,
+                      status );
+            SetValue( out, "PC2_1", &pv, AST__FLOAT, NULL,
+                      status );
+         }
+      }
+   }
+}
+#undef NC
+
 static int SearchCard( AstFitsChan *this, const char *name,
                        const char *method, const char *class, int *status ){
 
@@ -27698,9 +27957,12 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *
 *     21) Various translations specific to the FITS-CLASS encoding.
 *
-*     21) CTYPE == "LAMBDA" changed to CTYPE = "WAVE"
+*     22) SAO distorted TAN projections (uses COi_j keywords to store
+*     polynomial coefficients) are converted to TPN projections.
+
+*     23) CTYPE == "LAMBDA" changed to CTYPE = "WAVE"
 *
-*     22) if the projection is TAN and the PolyTan attribute is non-zero,
+*     24) if the projection is TAN and the PolyTan attribute is non-zero,
 *     or if the projection is TPV (produced by SCAMP), the projection is
 *     changed to TPN (the AST code for the draft FITS-WCS paper II
 *     conventions for a distorted TAN projection).
@@ -28413,6 +28675,25 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    ------------------------------------- */
       if( encoding == FITSCLASS_ENCODING ) ClassTrans( this, ret, axlat,
                                                        axlon, method, class, status );
+
+/* Convert SAO distorted TAN headers to TPN distorted TAN headers.
+   -------------------------------------------------------------- */
+      if( s == ' ' && !Ustrcmp( prj, "-TAN", status ) ){
+
+/* Translate the COi_m keywords into PV i+m keywords. */
+         SAOTrans( this, ret, method, class, status );
+
+/* Change the CTYPE projection form TAN to TPV. */
+         strcpy( prj, "-TPN" );
+         strcpy( lontype + 4, "-TPN" );
+         cval = lontype;
+         SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, s, status ),
+                      (void *) &cval, AST__STRING, NULL, status );
+         strcpy( lattype + 4, "-TPN" );
+         cval = lattype;
+         SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, s, status ),
+                   (void *) &cval, AST__STRING, NULL, status );
+      }
 
 /* AIPS "NCP" projections
    --------------------- */
