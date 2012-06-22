@@ -140,7 +140,6 @@ void palDfltin( const char * string, int *nstrt,
      minus if we find one or if we find a digit. */
   cctemp = &(string[ipos-1]);
   while (!isdigit(*cctemp) && (*cctemp != ',') && (*cctemp != '\0')) {
-    printf("Looking at char %d '%c'\n",ipos-1, *cctemp);
     if (*cctemp == '-') {
       *nstrt = ipos;
       dreslt_sign = -1;
