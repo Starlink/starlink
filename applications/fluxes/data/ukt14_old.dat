@@ -1,4 +1,5 @@
  Number of filters defined =  9
+ Number beams defined per filter =  1
 
  NF  Wavelngth     Freq.  Width  HPBW
   1  2000          155.6   40.0  27.5
