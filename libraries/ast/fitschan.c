@@ -1674,7 +1674,7 @@ static int GetMaxJMC( char *****item, char, int * );
 static int GetNcard( AstFitsChan *, int * );
 static int GetNkey( AstFitsChan *, int * );
 static int GetSkip( AstChannel *, int * );
-static int GetUsedPolyTan( AstFitsChan *, int, int, char, const char *, const char *, int * );
+static int GetUsedPolyTan( AstFitsChan *, AstFitsChan *, int, int, char, const char *, const char *, int * );
 static int GetValue( AstFitsChan *, const char *, int, void *, int, int, const char *, const char *, int * );
 static int GetValue2( AstFitsChan *, AstFitsChan *, const char *, int, void *, int, const char *, const char *, int * );
 static int GoodWarns( const char *, int * );
@@ -1692,6 +1692,7 @@ static int MatchChar( char, char, const char *, const char *, const char *, int 
 static int MatchFront( const char *, const char *, char *, int *, int *, int *, const char *, const char *, const char *, int * );
 static int MoveCard( AstFitsChan *, int, const char *, const char *, int * );
 static int PCFromStore( AstFitsChan *, FitsStore *, const char *, const char *, int * );
+static int SAOTrans( AstFitsChan *, AstFitsChan *, const char *, const char *, int * );
 static int SearchCard( AstFitsChan *, const char *, const char *, const char *, int * );
 static int SetFits( AstFitsChan *, const char *, void *, int, const char *, int, int * );
 static int Similar( const char *, const char *, int * );
@@ -1756,7 +1757,6 @@ static void ReadFromSource( AstFitsChan *, int * );
 static void RemoveTables( AstFitsChan *, const char *, int * );
 static void RetainFits( AstFitsChan *, int * );
 static void RoundFString( char *, int, int * );
-static void SAOTrans( AstFitsChan *, AstFitsChan *, const char *, const char *, int * );
 static void SetAlgCode( char *, const char *, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 static void SetFitsCF( AstFitsChan *, const char *, double *, const char *, int, int * );
@@ -7536,7 +7536,6 @@ static double DateObs( const char *dateobs, int *status ) {
 
 static void DeleteCard( AstFitsChan *this, const char *method,
                         const char *class, int *status ){
-
 /*
 *  Name:
 *     DeleteCard
@@ -7549,7 +7548,6 @@ static void DeleteCard( AstFitsChan *this, const char *method,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     void DeleteCard( AstFitsChan *this, const char *method,
 *                      const char *class )
 
@@ -12648,9 +12646,9 @@ f     function is invoked with STATUS set to an error value, or if it
    return result;
 }
 
-static int GetUsedPolyTan( AstFitsChan *this, int latax, int lonax,
-                           char s, const char *method, const char *class,
-                           int *status ){
+static int GetUsedPolyTan( AstFitsChan *this, AstFitsChan *out, int latax,
+                           int lonax, char s, const char *method,
+                           const char *class, int *status ){
 /*
 *  Name:
 *     GetUsedPolyTan
@@ -12663,9 +12661,9 @@ static int GetUsedPolyTan( AstFitsChan *this, int latax, int lonax,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int GetUsedPolyTan( AstFitsChan *this, int latax, int lonax,
-*                         char s, const char *method, const char *class,
-*                         int *status )
+*     int GetUsedPolyTan( AstFitsChan *this, AstFitsChan *out, int latax,
+*                         int lonax, char s, const char *method,
+*                         const char *class, int *status )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -12684,6 +12682,10 @@ static int GetUsedPolyTan( AstFitsChan *this, int latax, int lonax,
 *  Parameters:
 *     this
 *        Pointer to the FitsChan.
+*     out
+*        Pointer to a secondary FitsChan. If the PV values in "this" are
+*        found to be unusable, they will be marked as used in both "this"
+*        and "out".
 *     latax
 *        The one-based index of the latitude axis within the FITS header.
 *     lonax
@@ -12797,6 +12799,20 @@ static int GetUsedPolyTan( AstFitsChan *this, int latax, int lonax,
                   class, status );
             ret = 0;
 
+
+/* Also, delete the PV keywords so that no attempt is made to use them. */
+            for( m = 1; m <= ubnd_lat; m++ ) {
+               if( s != ' ' ) {
+                  sprintf( template, "PV%d_%d%c", latax, m, s );
+               } else {
+                  sprintf( template, "PV%d_%d", latax, m );
+               }
+               astClearCard( this );
+               if( FindKeyCard( this, template, method, class, status ) ) {
+                  DeleteCard( this, method, class, status );
+               }
+            }
+
 /* Otherwise, do the same check for the longitude axis. */
          } else {
             ok = 0;
@@ -12823,6 +12839,18 @@ static int GetUsedPolyTan( AstFitsChan *this, int latax, int lonax,
                      "PVi_m headers) on the longitude axis are zero.", method,
                      class, status );
                ret = 0;
+
+               for( m = 1; m <= ubnd_lon; m++ ) {
+                  if( s != ' ' ) {
+                     sprintf( template, "PV%d_%d%c", lonax, m, s );
+                  } else {
+                     sprintf( template, "PV%d_%d", lonax, m );
+                  }
+                  astClearCard( this );
+                  if( FindKeyCard( this, template, method, class, status ) ) {
+                     DeleteCard( this, method, class, status );
+                  }
+               }
             }
          }
       }
@@ -13533,7 +13561,6 @@ f     RESULT = AST_FINDFITS( FITSCHAN, 'CRVAL%1d', CARD, .TRUE., STATUS )
 
 static int FindKeyCard( AstFitsChan *this, const char *name,
                         const char *method, const char *class, int *status ){
-
 /*
 *  Name:
 *     FindKeyCard
@@ -13546,7 +13573,6 @@ static int FindKeyCard( AstFitsChan *this, const char *name,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     int FindKeyCard( AstFitsChan *this, const char *name,
 *                      const char *method, const char *class, int *status )
 
@@ -24705,8 +24731,8 @@ static void RoundFString( char *text, int width, int *status ){
 #undef NSEQ
 }
 
-static void SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
-                      const char *class, int *status ){
+static int SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
+                     const char *class, int *status ){
 /*
 *  Name:
 *     SAOTrans
@@ -24719,8 +24745,8 @@ static void SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     void SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
-*                    const char *class, int *status )
+*     int SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
+*                   const char *class, int *status )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -24745,23 +24771,31 @@ static void SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
 *        This is only for use in constructing error messages.
 *     status
 *        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Non-zero if "this" contained an SAO encoded header. Zero otherwise.
+
 */
 
 #define NC 13
 
 /* Local Variables: */
    char keyname[10];
+   double co[ 2 ][ NC ];
    double pv;
    int i;
    int is_sao;
+   int lbnd;
    int m;
    int ok;
-   double co[ 2 ][ NC ];
+   int result;
    int ubnd;
-   int lbnd;
+
+/* Initialise */
+   result = 0;
 
 /* Check the inherited status. */
-   if( !astOK ) return;
+   if( !astOK ) return result;
 
 /* Check there are exactly two CTYPE keywords in the header. */
    if( 2 == astKeyFields( this, "CTYPE%d", 2, &ubnd, &lbnd ) ){
@@ -24955,9 +24989,15 @@ static void SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
                       status );
             SetValue( out, "PC2_1", &pv, AST__FLOAT, NULL,
                       status );
+
+/* Indicate we have converted an SAO header. */
+            result = 1;
          }
       }
    }
+
+/* Return a flag indicating if an SAO header was found. */
+   return result;
 }
 #undef NC
 
@@ -28681,18 +28721,19 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
       if( s == ' ' && !Ustrcmp( prj, "-TAN", status ) ){
 
 /* Translate the COi_m keywords into PV i+m keywords. */
-         SAOTrans( this, ret, method, class, status );
+         if( SAOTrans( this, ret, method, class, status ) ) {
 
 /* Change the CTYPE projection form TAN to TPV. */
-         strcpy( prj, "-TPN" );
-         strcpy( lontype + 4, "-TPN" );
-         cval = lontype;
-         SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, s, status ),
+            strcpy( prj, "-TPN" );
+            strcpy( lontype + 4, "-TPN" );
+            cval = lontype;
+            SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, s, status ),
+                         (void *) &cval, AST__STRING, NULL, status );
+            strcpy( lattype + 4, "-TPN" );
+            cval = lattype;
+            SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, s, status ),
                       (void *) &cval, AST__STRING, NULL, status );
-         strcpy( lattype + 4, "-TPN" );
-         cval = lattype;
-         SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, s, status ),
-                   (void *) &cval, AST__STRING, NULL, status );
+         }
       }
 
 /* AIPS "NCP" projections
@@ -28866,7 +28907,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    is non-zero. Also change any TPV projection to TPN projection.
    --------------------------------------------------- */
       if( ( !Ustrcmp( prj, "-TAN", status ) &&
-            GetUsedPolyTan( this, axlat + 1, axlon + 1, s, method, class, status ) ) ||
+            GetUsedPolyTan( this, ret, axlat + 1, axlon + 1, s, method, class, status ) ) ||
           !Ustrcmp( prj, "-TPV", status ) ){
          strcpy( prj, "-TPN" );
          strcpy( lontype + 4, "-TPN" );
