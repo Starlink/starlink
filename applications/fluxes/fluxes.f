@@ -23,6 +23,7 @@
 
 *     Modifications:
 
+*     22 Jun 12 : TIMJ- Add two component gaussian beam support
 *     30 Aug 11 : TIMJ- Add simple SCUBA-2
 *     31 Mar 05 : TIMJ- Fix infinite loop when time invalid
 *     18 Mar 05 : TIMJ- A THUMPER tweak to the output formatting
@@ -185,11 +186,11 @@
 
       DOUBLE PRECISION COSE,DEC,DIFF,ER(15),ERROR(15,10),
      :     FREQ(15,2),GD,GHZ90,GHZ857,HD,
-     :     HPBW(15),OMEGA,PI,R,RA,
+     :     HPBW(15), HPBW2(15), AMP1(15), AMP2(15), OMEGA,PI,R,RA,
      :     RAD,RJD,RJDATE,S,SDEC,SGD,SRA,TB(15),
      :     TBNORM(15,10),TB90,TB857,TLONG,TLAT,THEIGHT
-      REAL*8  FREQUENCY,WIDTH,BW
-      INTEGER I,IC,ID,IH,IM,IP,IY,IR,IQ,J,M,NF,FIOD,FIOD2,IS
+      REAL*8  FREQUENCY,WIDTH,BW,BW2,A1,A2
+      INTEGER I,IC,ID,IH,IM,IP,IY,IR,IQ,J,M,NF,NB,FIOD,FIOD2,IS
       INTEGER START(3),ASTOP(3),LSTAT,LPATH,LEN,LUP(10)
       INTEGER II,JJ,KK,INOTE,JUNK
 
@@ -610,16 +611,29 @@ C     The system time in seconds
          ENDIF
          READ(FIOD2,122) NF
  122     FORMAT(29X,I2)
+         READ(FIOD2,1122) NB
+ 1122    FORMAT(35X,I2)
          READ(FIOD2,322) DUMMY
          READ(FIOD2,322) DUMMY
  322     FORMAT(A10)
          DO II=1,15
-            READ(FIOD2,123)KK,FILT,FREQUENCY,WIDTH,BW
- 123        FORMAT(I3,2X,A10,2X,2(F7.1),F6.1)
+            IF (NB .EQ. 1) THEN
+               READ(FIOD2,123)KK,FILT,FREQUENCY,WIDTH,BW
+ 123           FORMAT(I3,2X,A10,2X,2(F7.1),F6.1)
+               BW2 = 0.0D0
+               A1 = 1.0D0
+               A2 = 0.0D0
+            ELSE
+               READ(FIOD2,1123)KK,FILT,FREQUENCY,WIDTH,BW,BW2,A1,A2
+ 1123          FORMAT(I3,2X,A10,2X,2(F7.1),F6.1,F7.1,2(F6.2))
+            END IF
             FNAME(II)=FILT
             FREQ(II,1)=FREQUENCY
             FREQ(II,2)=WIDTH
             HPBW(II)=BW
+            HPBW2(II)=BW2
+            AMP1(II)=A1
+            AMP2(II)=A2
          ENDDO
          DO JJ=1,4
             READ(FIOD2,322)DUMMY
@@ -800,8 +814,8 @@ C     The system time in seconds
                TB(I) = TBNORM(I,LUP(J))
                ER(I) = ERROR(I,LUP(J))
             ENDDO
-            CALL PBFLUX(OMEGA,FREQ,TB,RAD,HPBW,NF,FNAME,ER,
-     :           REQFILT,PLANET(J),STATUS)
+            CALL PBFLUX(OMEGA,FREQ,TB,RAD,HPBW,HPBW2,AMP1,AMP2,
+     :           NF,FNAME,ER,REQFILT,PLANET(J),STATUS)
 
          ENDDO
 
@@ -860,8 +874,8 @@ C     The system time in seconds
 
 ****************************************************************************
 
-      SUBROUTINE PBFLUX(OMEGA,FREQ,TB,RAD,HPBW,NF,FNAME,ER,
-     :     FILTER,BODY,STATUS)
+      SUBROUTINE PBFLUX(OMEGA,FREQ,TB,RAD,HPBW,HPBW2,AMP1,AMP2,
+     :     NF,FNAME,ER,FILTER,BODY,STATUS)
 
 *  Purpose:
 *     Calculate integrated flux densities of planet at earth
@@ -874,7 +888,11 @@ C     The system time in seconds
 
 *  Variables:
       DOUBLE PRECISION DENOM, ER(15), FLUX(15), FLUXBC(15), FREQ(15,2),
-     :     HPBW(15), OMEGA, RAD, RATIO, TB(15)
+     :     HPBW(15), HPBW2(15), AMP1(15), AMP2(15), OMEGA,
+     :     RAD, RATIO, TB(15)
+
+      DOUBLE PRECISION PDIAM    ! Planet diameter in arcsec
+      DOUBLE PRECISION LN2      ! LN(2)
 
       INTEGER I,NF,NP,FIOD,K,LUP(10),JUNK
 
@@ -890,6 +908,12 @@ C     The system time in seconds
 
       COMMON/INPUT/LUP,PLANET
 
+*  Parameters
+      DOUBLE PRECISION PI
+      PARAMETER ( PI = 3.141592654D0 )
+      DOUBLE PRECISION DR2AS
+      PARAMETER ( DR2AS = (3600.0 * 180.0 / PI ) )
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
 
@@ -902,11 +926,24 @@ C     The system time in seconds
 
       NP=NF
 
+*     The multi-beam formula is written in terms of arcsec values
+*     so convert OMEGA back to a diameter in ARCSEC.
+      PDIAM = 2.0D0 * DR2AS * SQRT( OMEGA / PI )
+      LN2 = LOG(2.0D0)
+
       DO I=1,NP
          DENOM = DEXP(0.04799D0*FREQ(I,1)/TB(I))-1.0D0
          FLUX(I) = 1.475D3*OMEGA*(FREQ(I,1)**3)/DENOM
-         RATIO = 1.133D0*(HPBW(I)*RAD/3600.0D0)**2/OMEGA
-         FLUXBC(I) = RATIO*FLUX(I)*(1.0D0-DEXP(-1.0D0/RATIO))
+
+         RATIO = (1/LN2) * (
+     :        AMP1(I) * (HPBW(I)/PDIAM)**2 *
+     :        (1-EXP(-LN2*(PDIAM/HPBW(I))**2)) +
+     :        AMP2(I) * (HPBW2(I)/PDIAM)**2 *
+     :        (1-EXP(-LN2*(PDIAM/HPBW2(I))**2))
+     :        )
+
+         FLUXBC(I) = RATIO*FLUX(I)
+
       ENDDO
 
 *     Output integrated and beam-corrected flux densities for six
