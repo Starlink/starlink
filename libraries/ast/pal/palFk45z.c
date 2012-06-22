@@ -71,14 +71,14 @@
 *     century in proper motion.
 *
 *  References:
-*     1  - Aoki,S., et al, 1983.  Astron.Astrophys., 128, 263.
-*     2  - Smith, C.A. et al, 1989.  "The transformation of astrometric
-*        catalog systems to the equinox J2000.0".  Astron.J. 97, 265.
-*     3  - Yallop, B.D. et al, 1989.  "Transformation of mean star places
-*        from FK4 B1950.0 to FK5 J2000.0 using matrices in 6-space".
-*        Astron.J. 97, 274.
-*     4  - Seidelmann, P.K. (ed), 1992.  "Explanatory Supplement to
-*        the Astronomical Almanac", ISBN 0-935702-68-7.
+*     - Aoki,S., et al, 1983.  Astron.Astrophys., 128, 263.
+*     - Smith, C.A. et al, 1989.  "The transformation of astrometric
+*       catalog systems to the equinox J2000.0".  Astron.J. 97, 265.
+*     - Yallop, B.D. et al, 1989.  "Transformation of mean star places
+*       from FK4 B1950.0 to FK5 J2000.0 using matrices in 6-space".
+*       Astron.J. 97, 274.
+*     - Seidelmann, P.K. (ed), 1992.  "Explanatory Supplement to
+*       the Astronomical Almanac", ISBN 0-935702-68-7.
 
 *  Authors:
 *     PTW: Pat Wallace (STFC)

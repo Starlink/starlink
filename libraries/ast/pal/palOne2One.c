@@ -6,6 +6,9 @@
 *  Purpose:
 *     File containing simple PAL wrappers for SLA routines that are identical in SOFA
 
+*  Invocation:
+*     Matches SLA API
+
 *  Language:
 *     Starlink ANSI C
 
@@ -16,9 +19,44 @@
 *     Some SOFA routines are identical to their SLA counterparts. PAL provides
 *     direct counterparts to these although it is generally a better idea to
 *     use the SOFA routine directly in new code.
+*
+*     The PAL routines with direct equivalents in SOFA are:
+*     - palCldj
+*     - palDbear
+*     - palDaf2r
+*     - palDav2m
+*     - palDcc2s
+*     - palDcs2c
+*     - palDd2tf
+*     - palDimxv
+*     - palDm2av
+*     - palDjcl
+*     - palDmxm
+*     - palDmxv
+*     - palDpav
+*     - palDr2af
+*     - palDr2tf
+*     - palDranrm
+*     - palDsep
+*     - palDsepv
+*     - palDtf2d
+*     - palDtf2r
+*     - palDvdv
+*     - palDvn
+*     - palDvxv
+*     - palEpb
+*     - palEpb2d
+*     - palEpj
+*     - palEpj2d
+*     - palEqeqx
+*     - palFk5hz
+*     - palGmst
+*     - palGmsta
+*     - palHfk5z
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -29,12 +67,15 @@
 *       version instead of the SOFA version.
 *     - Routines that take MJDs have SOFA equivalents that have an explicit
 *       MJD offset included.
-*     - palGeoc uses the WGS84 model.
-*     - palGmst uses the IAU 2006 precession.
+*     - palEqeqx, palGmst and palGmsta use the IAU 2006 precession model.
 
 *  History:
 *     2012-02-10 (TIMJ):
 *        Initial version
+*     2012-03-23 (TIMJ):
+*        Update prologue.
+*     2012-05-09 (DSBJ):
+*        Move palDrange into a separate file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -122,6 +163,14 @@ double palDpav ( double v1[3], double v2[3] ) {
   return iauPap( v1, v2 );
 }
 
+void palDr2af ( int ndp, double angle, char *sign, int idmsf[4] ) {
+  iauA2af( ndp, angle, sign, idmsf );
+}
+
+void palDr2tf( int ndp, double angle, char *sign, int ihmsf[4] ) {
+  iauA2tf( ndp, angle, sign, ihmsf );
+}
+
 double palDranrm ( double angle ) {
   return iauAnp( angle );
 }
@@ -194,19 +243,16 @@ void palFk5hz ( double r5, double d5, double epoch,
   iauFk5hz( r5, d5, date1, date2, rh, dh );
 }
 
-void palGeoc ( double p, double h, double *r, double *z ) {
-  double xyz[3];
-  const double elong = 0.0;   /* Use zero longitude */
-  const double AU = 1.49597870E11;
-  /* WGS84 looks to be the closest match */
-  iauGd2gc( 1, elong, p, h, xyz );
-  *r = xyz[0] / (AU * cos(elong) );
-  *z = xyz[2] / AU;
-}
-
 /* Note that SOFA has more accurate time arguments and we use the 2006 precession model */
 double palGmst ( double ut1 ) {
   return iauGmst06( PAL__MJD0, ut1, PAL__MJD0, ut1 );
+}
+
+/* Slightly better but still not as accurate as SOFA */
+
+double palGmsta( double date, double ut ) {
+  date += PAL__MJD0;
+  return iauGmst06( date, ut, date, ut );
 }
 
 void palHfk5z ( double rh, double dh, double epoch,

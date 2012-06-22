@@ -28,7 +28,7 @@
 *        Declination (radians)
 
 *  Description:
-
+*     Convert horizon to equatorial coordinates.
 
 *  Authors:
 *     PTW: Pat Wallace (STFC)

@@ -92,6 +92,7 @@
 #include "pal/palFk54z.c"
 #include "pal/palGaleq.c"
 #include "pal/palGalsup.c"
+#include "pal/palGeoc.c"
 #include "pal/palMappa.c"
 #include "pal/palMapqkz.c"
 #include "pal/palOne2One.c"

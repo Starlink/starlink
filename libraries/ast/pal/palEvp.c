@@ -73,6 +73,7 @@
 */
 
 #include "pal.h"
+#include "palmac.h"
 #include "sofa.h"
 
 void palEvp( double date, double deqx, double dvb[3], double dpb[3],
@@ -99,8 +100,8 @@ void palEvp( double date, double deqx, double dvb[3], double dpb[3],
 
 /* Return the required vectors. */
    for ( i = 0; i < 3; i++ ) {
-      dvh[i] = pvh[1][i] / 86400.0;
-      dvb[i] = pvb[1][i] / 86400.0;
+      dvh[i] = pvh[1][i] / PAL__SPD;
+      dvb[i] = pvb[1][i] / PAL__SPD;
       dph[i] = pvh[0][i];
       dpb[i] = pvb[0][i];
    }

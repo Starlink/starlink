@@ -28,7 +28,7 @@
 *        Elevation (radians)
 
 *  Description:
-
+*     Convert equatorial to horizon coordinates.
 
 *  Authors:
 *     PTW: Pat Wallace (STFC)
