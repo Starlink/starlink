@@ -91,10 +91,6 @@
 *-
 */
 
-/* Shenanigans for isblank() which is C99 only */
-#define _POSIX_C_SOURCE 200112L
-#define _ISOC99_SOURCE
-
 /* Use the config file if we have one, else look at
    compiler defines to see if we have C99 */
 #if HAVE_CONFIG_H
@@ -105,6 +101,20 @@
 #    define HAVE_COPYSIGN 1
 #  endif
 #endif
+#endif
+
+/* isblank() is a C99 feature so we just reimplement it if it is missing */
+#if HAVE_ISBLANK
+#define _POSIX_C_SOURCE 200112L
+#define _ISOC99_SOURCE
+#include <ctype.h>
+# define ISBLANK isblank
+#else
+
+static int ISBLANK( int c ) {
+  return ( c == ' ' || c == '\t' );
+}
+
 #endif
 
 /* System include files */
@@ -191,7 +201,7 @@ void palDfltin( const char * string, int *nstrt,
        through to remove leading spaces. We also step
        through alphabetic characters since they can never
        be numbers standalone (no number starts with an 'E') */
-    while (isblank(*endptr) || isalpha(*endptr) ) {
+    while (ISBLANK(*endptr) || isalpha(*endptr) ) {
       endptr++;
     }
 
@@ -226,7 +236,7 @@ void palDfltin( const char * string, int *nstrt,
   } else {
     /* jump past any leading spaces for the next part of the string */
     ctemp = endptr;
-    while ( isblank(*ctemp) ) {
+    while ( ISBLANK(*ctemp) ) {
       (*nstrt)++;
       ctemp++;
     }
