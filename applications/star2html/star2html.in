@@ -975,7 +975,7 @@ sub clear_up {
    my $file;
 
 #  Print informational message
-   if ( defined( @_ ) ) { print( "@_ \n") };
+   if ( @_ ) { print( "@_ \n") };
 
 #  Now remove the copy of the main file if appropriate to the current
 #  situation.
