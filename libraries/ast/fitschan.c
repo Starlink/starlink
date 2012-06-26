@@ -1035,6 +1035,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        - Remove all set but unused variables.
 *        - Convert SAO distorted TAN projections (which use COi_j keywords
 *        for polynomial coeffs) to TPN.
+*     26-JUN-2012 (DSB):
+*        Correct call to astKeyFields in SAOTrans (thanks to Bill Joye
+*        for pointing out this error).
 *class--
 */
 
@@ -24785,11 +24788,9 @@ static int SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
    double pv;
    int i;
    int is_sao;
-   int lbnd;
    int m;
    int ok;
    int result;
-   int ubnd;
 
 /* Initialise */
    result = 0;
@@ -24798,7 +24799,7 @@ static int SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
    if( !astOK ) return result;
 
 /* Check there are exactly two CTYPE keywords in the header. */
-   if( 2 == astKeyFields( this, "CTYPE%d", 2, &ubnd, &lbnd ) ){
+   if( 2 == astKeyFields( this, "CTYPE%d", 0, NULL, NULL ) ){
 
 /* Get the required SAO keywords. */
       is_sao = 1;
