@@ -47,6 +47,8 @@
 #        New 850 coefficients
 #     2012-12-09 (RPT):
 #        Final 850 and 450 coefficients
+#     2012-06-25 (JTD):
+#        Updates to make 450 more physical
 
 #-
 
@@ -62,7 +64,7 @@
 
 # Original filters delivered for SCUBA-2. Named "450" and "850".
 
-ext.taurelation.450 = (26.0,-0.019)
+ext.taurelation.450 = (26.0,-0.012)
 ext.taurelation.850 =  (4.6,-0.0043)
 
 # Control whether we want WVM smoothing. The value is the
