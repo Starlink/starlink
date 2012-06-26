@@ -61,6 +61,12 @@
 *  History:
 *     16-MAR-2011 (DSB):
 *        Original version, based on earlier verion of KPG1_PIXSC.
+*     26-JUN-2012 (DSB):
+*        If the grid->wcs Mapping has a PermMap in it, transforming AT
+*        into WCS and then back to GRID may not result in the original
+*        AT values.  Take account of this by comparing the mapped WCS
+*        values with the round-tripped AT values rather than the original
+*        AT values when calculating "DPIX".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,6 +99,7 @@
       PARAMETER ( MAXPNT = 3**NDF__MXDIM )
 
 *  Local Variables:
+      DOUBLE PRECISION ATGRID( NDF__MXDIM )
       DOUBLE PRECISION ATWCS( NDF__MXDIM )
       DOUBLE PRECISION DAX
       DOUBLE PRECISION DAXMAX
@@ -219,6 +226,12 @@
             Q( I ) = ATWCS( I )
          END DO
 
+*  Transform the AT position back into GRID coords. This may not be the
+*  same as the original AT if the there are any non-reversible PermMaps in
+*  the Mapping.
+         CALL AST_TRANN( MAP, 1, NWCS, 1, ATWCS, .FALSE., NPIX, 1,
+     :                   ATGRID, STATUS )
+
 *  Now loop round each WCS axis.
          DO I = 1, NWCS
 
@@ -235,7 +248,7 @@
      :                      STATUS )
 
 *  Find the distance between the two points in the GRID frame.
-            DPIX = AST_DISTANCE( FGRID, AT, QGRID, STATUS )
+            DPIX = AST_DISTANCE( FGRID, ATGRID, QGRID, STATUS )
 
 *  Find and return the axis scale.
             IF( DWCS .NE. AST__BAD .AND. DPIX .NE. AST__BAD .AND.
