@@ -116,6 +116,9 @@
 *     18-MAY-2012 (DSB):
 *        An attempt to improve the guess as to what the user meant if the
 *        WCS and pixel axes are not aligned and in the same order.
+*     28-JUN-2012 (DSB):
+*        If any part of an axis specification uses WCS values, check that
+*        there is a corresponding pixel axis and report an error if not.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -302,9 +305,18 @@
 
             END IF
 
-            VALUE1( I ) = CENWCS( PERM( I ) )
-            ISPIX1( I ) = .FALSE.
+            IF( PERM( I ) .GT. 0 ) THEN
+               VALUE1( I ) = CENWCS( PERM( I ) )
+               ISPIX1( I ) = .FALSE.
 
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = NDF__WCSIN
+               CALL MSG_SETI( 'I', I )
+               CALL ERR_REP( ' ', 'The supplied NDF section cannot '//
+     :                       'be interpreted since pixel axis ^I has '//
+     :                       'no corresponding WCS axis.', STATUS )
+               GO TO 999
+            END IF
          END IF
       END DO
 
@@ -355,10 +367,20 @@
      :                          'value, but there are only ^N axes '//
      :                          'in the current WCS Frame.', STATUS )
                   GO TO 999
-               ELSE
+
+               ELSE IF( PERM( I ) .GT. 0 ) THEN
                   PLBND( I ) = DLBNDD( I )
                   WLBND( PERM( I ) ) = VALUE1( I )
                   ALLPIX = .FALSE.
+
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = NDF__WCSIN
+                  CALL MSG_SETI( 'I', I )
+                  CALL ERR_REP( ' ', 'The supplied NDF section cannot'//
+     :                          ' be interpreted since pixel axis ^I '//
+     :                          'has no corresponding WCS axis.',
+     :                          STATUS )
+                  GO TO 999
                END IF
             END IF
 
@@ -375,10 +397,20 @@
      :                          'value, but there are only ^N axes '//
      :                          'in the current WCS Frame.', STATUS )
                   GO TO 999
-               ELSE
+
+               ELSE IF( PERM( I ) .GT. 0 ) THEN
                   PUBND( I ) = DUBNDD( I )
                   WUBND( PERM( I ) ) = VALUE2( I )
                   ALLPIX = .FALSE.
+
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = NDF__WCSIN
+                  CALL MSG_SETI( 'I', I )
+                  CALL ERR_REP( ' ', 'The supplied NDF section cannot'//
+     :                          ' be interpreted since pixel axis ^I '//
+     :                          'has no corresponding WCS axis.',
+     :                          STATUS )
+                  GO TO 999
                END IF
             END IF
 
@@ -405,13 +437,23 @@
      :                          'width, but there are only ^N axes '//
      :                          'in the current WCS Frame.', STATUS )
                   GO TO 999
-               ELSE
+
+               ELSE IF( PERM( I ) .GT. 0 ) THEN
                   DELTA = 0.5*VALUE2( I )
                   PLBND( I ) = DLBNDD( I )
                   PUBND( I ) = DUBNDD( I )
                   WLBND( PERM( I ) ) = VALUE1( I ) - DELTA
                   WUBND( PERM( I ) ) = VALUE1( I ) + DELTA
                   ALLPIX = .FALSE.
+
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = NDF__WCSIN
+                  CALL MSG_SETI( 'I', I )
+                  CALL ERR_REP( ' ', 'The supplied NDF section cannot'//
+     :                          ' be interpreted since pixel axis ^I '//
+     :                          'has no corresponding WCS axis.',
+     :                          STATUS )
+                  GO TO 999
                END IF
             END IF
 
@@ -427,7 +469,8 @@
      :                       'but there are only ^N axes '//
      :                       'in the current WCS Frame.', STATUS )
                GO TO 999
-            ELSE
+
+            ELSE IF( PERM( I ) .GT. 0 ) THEN
                ALLPIX = .FALSE.
                MIXED = .TRUE.
 
@@ -435,10 +478,19 @@
 *  box.
                WUBND( PERM( I ) ) = VALUE1( I )
                WLBND( PERM( I ) ) = VALUE1( I )
- 
+
 *  Use defaults for the upper and lower bounds of the pixel box.
                PLBND( I ) = DLBNDD( I )
                PUBND( I ) = DUBNDD( I )
+
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = NDF__WCSIN
+               CALL MSG_SETI( 'I', I )
+               CALL ERR_REP( ' ', 'The supplied NDF section cannot'//
+     :                       ' be interpreted since pixel axis ^I '//
+     :                       'has no corresponding WCS axis.',
+     :                       STATUS )
+               GO TO 999
             END IF
 
 *  If the bounds for this axis are specified by centre and width, and the
@@ -503,20 +555,31 @@ c      write(*,*) '   '
 
 *  ...and the centre is a PIXEL value...
                   IF( ISPIX1( I ) ) THEN
+                     IF( PERM( I ) .GT. 0 ) THEN
 
 *  Re-calculate the WCS bounds using the central WCS value and the
 *  supplied WCS width.
-                     ISPIX1( I ) = .FALSE.
-                     VALUE1( I ) = CENWCS( PERM( I ) )
+                        ISPIX1( I ) = .FALSE.
+                        VALUE1( I ) = CENWCS( PERM( I ) )
 
-                     DELTA = 0.5*VALUE2( I )
-                     WLBND( PERM( I ) ) = VALUE1( I ) - DELTA
-                     WUBND( PERM( I ) ) = VALUE1( I ) + DELTA
-                     ALLPIX = .FALSE.
+                        DELTA = 0.5*VALUE2( I )
+                        WLBND( PERM( I ) ) = VALUE1( I ) - DELTA
+                        WUBND( PERM( I ) ) = VALUE1( I ) + DELTA
+                        ALLPIX = .FALSE.
 
 *  Store default bounds for the pixel box on this axis.
-                     PLBND( I ) = DLBNDD( I )
-                     PUBND( I ) = DUBNDD( I )
+                        PLBND( I ) = DLBNDD( I )
+                        PUBND( I ) = DUBNDD( I )
+
+                     ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                        STATUS = NDF__WCSIN
+                        CALL MSG_SETI( 'I', I )
+                        CALL ERR_REP( ' ', 'The supplied NDF section '//
+     :                       'cannot be interpreted since pixel axis '//
+     :                       '^I has no corresponding WCS axis.',
+     :                       STATUS )
+                        GO TO 999
+                     END IF
 
 *  If the centre was originally a WCS value, we have some WCS bounds.
                   ELSE
@@ -582,21 +645,33 @@ c      write(*,*) '   '
 *  the WCS values themselves but by which one gives the lower or upper
 *  value on the corresponding pixel axis. Use this criterion to fill in
 *  values for which ever WCS bound has not been supplied.
-               IF( WLBND( I ) .EQ. AST__BAD .AND. JJ .GT. 0 ) THEN
-                  IF( XL( JJ ) .LT. XU( JJ ) ) THEN
-                     WLBND( I ) = V1
-                  ELSE
-                     WLBND( I ) = V2
+               IF( JJ .GT. 0 ) THEN
+                  IF( WLBND( I ) .EQ. AST__BAD .AND. JJ .GT. 0 ) THEN
+                     IF( XL( JJ ) .LT. XU( JJ ) ) THEN
+                        WLBND( I ) = V1
+                     ELSE
+                        WLBND( I ) = V2
+                     END IF
                   END IF
+
+                  IF( WUBND( I ) .EQ. AST__BAD  .AND. JJ .GT. 0 ) THEN
+                     IF( XL( JJ ) .GT. XU( JJ ) ) THEN
+                        WUBND( I ) = V1
+                     ELSE
+                        WUBND( I ) = V2
+                     END IF
+                  END IF
+
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = NDF__WCSIN
+                  CALL MSG_SETI( 'I', I )
+                  CALL ERR_REP( ' ', 'The supplied NDF section '//
+     :                       'cannot be interpreted since WCS axis '//
+     :                       '^I has no corresponding pixel axis.',
+     :                       STATUS )
+                  GO TO 999
                END IF
 
-               IF( WUBND( I ) .EQ. AST__BAD  .AND. JJ .GT. 0 ) THEN
-                  IF( XL( JJ ) .GT. XU( JJ ) ) THEN
-                     WUBND( I ) = V1
-                  ELSE
-                     WUBND( I ) = V2
-                  END IF
-               END IF
             END IF
 
 *  The AST Box class knows nothing about axis normalisation. To avoid
