@@ -693,7 +693,7 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
     if( *status == SAI__OK ) {
        state_airmass = pdata->hdr->state->tcs_airmass;
        state_az_ac2 = pdata->hdr->state->tcs_az_ac2;
-       if( !quick && pdata->tau != VAL__BADD ) state_wcs = astCopy( pdata->hdr->wcs );
+       if( !quick && pdata->tau != VAL__BADD && pdata->hdr->wcs) state_wcs = astCopy( pdata->hdr->wcs );
     }
 
     /* Unlock the AST Objects in the smfData then unlock the local mutex. */
@@ -756,7 +756,7 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
           smf_tslice_ast( pdata->data, k, 1, status );
           state_airmass = pdata->hdr->state->tcs_airmass;
           state_az_ac2 = pdata->hdr->state->tcs_az_ac2;
-          state_wcs = astCopy( pdata->hdr->wcs );
+          if (pdata->hdr->wcs) state_wcs = astCopy( pdata->hdr->wcs );
           smf_lock_data( pdata->data, 0, status );
           thrMutexUnlock( &data_mutex, status );
 
