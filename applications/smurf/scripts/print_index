@@ -558,7 +558,7 @@ sub acsis_header {
       $mode =~ s/RASTER/RAS/;
       $mode =~ s/GRID/GRD/;
     }
-
+    $mode = $A{INBEAM}.$mode;
 
 #    print "$A{RUN} $mode $A{UT} \'$A{OBJECT}\' $A{PROJECT} $rx $boloms $filter $A{CSOTAU} $A{SEEING}\n";
 
@@ -668,6 +668,7 @@ sub scuba2_header {
     } else {
       $mode =~ s/FIELD/FLD/i;
     }
+    $mode = $S{INBEAM}.$mode;
 
 #    print "$S{RUN} $mode $S{UT} \'$S{OBJECT}\' $S{PROJECT} $rx $boloms $filter $S{CSOTAU} $S{SEEING}\n";
 
@@ -1074,6 +1075,27 @@ sub calc_shared_scuba2_acsis {
                       sprintf("%5.1f",1.0*$fitsitem->{UEL}) :
                       sprintf("%5s","n/a") );
 
+  # Calculate a concatenated INBEAM string
+  # Look for INBEAM modifier for aux instruments
+  my $inbeam = '';
+  if (defined $fitsitem->{INBEAM}) {
+    $inbeam = $fitsitem->{INBEAM};
+
+    # remove shutter
+    $inbeam =~ s/shutter\s*//i;
+
+    # replace all POL strings with a single pol string
+    my $havepol = ($inbeam =~ /\bpol/i);
+    $inbeam =~ s/\b(pol[2]?[_\w]*(\s+|\b))//gi;
+    $inbeam .= "pol" if $havepol;
+
+    # remove spaces for concatenation so POL + FTS2 => POLFTS2
+    $inbeam =~ s/\s//g;
+
+    # force upper case for consistency with mode
+    $inbeam = uc($inbeam);
+  }
+
   # Convert timestamps
   my %genitem  = translate_from_FITS( $fitsitem );
   my %genitem2 = translate_from_FITS( $fitsitem2 );
@@ -1115,6 +1137,7 @@ sub calc_shared_scuba2_acsis {
                LSEEING => $lseeing,
                LCSOTAU => $lcsotau,
                LWVMTAU => $lwvmtau,
+               INBEAM => $inbeam,
              );
 
   return %results;
