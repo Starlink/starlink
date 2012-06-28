@@ -38,7 +38,9 @@
 *        Upper pixel index bounds for the NDF.
 *     PERM( * ) = INTEGER (Returned)
 *        The index into this array is pixel index, and the values stored
-*        in the array are the corresponding WCS axis indices.
+*        in the array are the corresponding WCS axis indices. A value of
+*        0 is returned for any pixel axes that have no corresponding WCS
+*        axis.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -69,6 +71,9 @@
 *  History:
 *     17-MAY-2012 (DSB):
 *        Original version.
+*     27-JUN-2012 (DSB):
+*        Return 0 for any pixel axis that has no WCS axis rather than
+*        reporting an error.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -278,17 +283,6 @@
             END DO
          END IF
       END IF
-
-*  Check a valid permutation was found.
-      DO IPIX = 1, NPIX
-         IF( PERM( IPIX ) .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
-            STATUS = NDF__WCSIN
-            CALL MSG_SETI( 'I', IPIX )
-            CALL ERR_REP( ' ', 'Cannot find a WCS axis that is '//
-     :                    'aligned with pixel axis ^I.', STATUS )
-
-         END IF
-      END DO
 
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_WCSPM', STATUS )
