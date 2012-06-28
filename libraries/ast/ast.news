@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V7.0.4) of the Starlink AST (astrometry) library is
+   A new release (V7.0.5) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -16,12 +16,16 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-- The previously private grf3d.h header file is now installed into
-prefix/include.
-
 - The FitsChan class can now read FITS headers that use the SAO
 convention for representing distorted TAN projections, based on the use
 of "COi_j" keywords to hold the coefficients of the distortion polynomial.
+
+
+Main Changes in V7.0.4
+----------------------
+
+- The previously private grf3d.h header file is now installed into
+prefix/include.
 
 
 Main Changes in V7.0.3
