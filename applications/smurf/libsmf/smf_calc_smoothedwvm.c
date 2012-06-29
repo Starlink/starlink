@@ -109,6 +109,22 @@
 #include <math.h>
 #include <sys/time.h>
 
+  /* Macro to find a smfData in the smfGroup that contains valid
+     data at this time slice */
+#define SELECT_DATA( ALLDATA, SMFDATA, BADVAL, ITEM, INDEX )     \
+  {                                                              \
+    size_t _ii;                                                  \
+    SMFDATA = NULL;                                              \
+    for (_ii=0; _ii<nrelated; _ii++) {                           \
+      smfData *DATA = (ALLDATA->sdata)[_ii];                     \
+      smf_tslice_ast( DATA, INDEX, 0, status );                  \
+      if ( DATA->hdr->state->ITEM != BADVAL ) {                  \
+        SMFDATA = DATA;                                          \
+        break;                                                   \
+      }                                                          \
+    }                                                            \
+  }
+
 /* Local data type */
 typedef struct {
   double airmass;
@@ -253,14 +269,132 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
         tstep = nframes/nworker;
       }
 
-      for( iworker = 0; iworker < nworker; iworker++ ) {
-         pdata = job_data + iworker;
-         pdata->t1 = iworker*tstep;
-         pdata->t2 = pdata->t1 + tstep - 1;
-      }
+      /* to return the same values for one thread and multiple threads
+         we need to break the threads on wvm sample boundaries wherever
+         possible. We make an initial estimate of the number of WVM measurements
+         by assuming one every two seconds. */
+      {
+        smfData * curdata = NULL;
+        size_t nwvm = 0;
+        double prevtime = VAL__BADD;
+        double curtime;
+        size_t *boundaries = astGrow(NULL, nframes*(size_t)(steptime/2.0), sizeof(*boundaries));
+        for (i=0; i<nframes; i++) {
+          if (!curdata) {
+            SELECT_DATA( thesedata, curdata, VAL__BADD, wvm_time, i );
+          }
 
-      /* Ensure that the last thread picks up any left-over time slices */
-      pdata->t2 = nframes - 1;
+          if (curdata) smf_tslice_ast( curdata, i, 0, status );
+
+          if ( !curdata || curdata->hdr->state->wvm_time == VAL__BADD ) {
+            /* Try the other datas */
+            SELECT_DATA( thesedata, curdata, VAL__BADD, wvm_time, i );
+          }
+          if (*status != SAI__OK) break;
+
+          if (!curdata) {
+            curtime = VAL__BADD;
+          } else {
+            curtime = curdata->hdr->state->wvm_time;
+          }
+
+          if (curtime != prevtime || nwvm == 0 ) {
+            /* Store the index in the boundaries array */
+            nwvm++;
+            boundaries = astGrow(boundaries, nwvm, sizeof(*boundaries));
+            if (!boundaries) { /* this is serious */
+              if (*status == SAI__OK) *status = SAI__ERROR;
+              errRep("", "Error allocating temporary memory for WVM calculation\n",
+                     status );
+              break;
+            }
+            boundaries[nwvm-1] = i;
+            prevtime = curtime;
+          }
+        }
+
+        /* No point using too many threads */
+        if (*status == SAI__OK) {
+          if (nworker >= (int)nwvm) {
+            nworker = nwvm;
+
+            /* Allocate a measurement per thread */
+            for( iworker = 0; iworker < nworker; iworker++ ) {
+              pdata = job_data + iworker;
+              pdata->t1 = boundaries[iworker];
+              if (iworker+1 < nworker) pdata->t2 = boundaries[iworker+1]-1;
+            }
+
+            /* Ensure that the last thread picks up any left-over time slices */
+            pdata->t2 = nframes - 1;
+
+          } else {
+            /* Allocate the workers to slices of approximate size tstep */
+            size_t prevend = 0; /* End of previous slice */
+            size_t prevbnd = 0; /* Index into previous boundaries[] array selection */
+            for( iworker = 0; iworker < nworker; iworker++ ) {
+              size_t belowidx = prevend+1;
+              size_t aboveidx = nframes;
+              size_t lbnd;
+              size_t ubnd;
+              size_t j;
+              size_t guess;
+
+              pdata = job_data + iworker;
+
+              if (iworker == 0) { /* always start at the beginning */
+                pdata->t1 = 0;
+              } else { /* Start one after the previous block */
+                pdata->t1 = prevend + 1;
+              }
+
+              /* Now we have to find the end of this slice */
+              guess = (iworker*tstep) + tstep - 1;
+              if (guess <= pdata->t1) guess = pdata->t1 + tstep;
+
+              /* find nearest boundaries */
+              for (j=prevbnd; j<nwvm; j++) {
+                if ( boundaries[j] > guess ) {
+                  aboveidx = boundaries[j];
+                  ubnd = j;
+                  if (j>0) {
+                    belowidx = boundaries[j-1];
+                    lbnd = j -1 ;
+                  } else {
+                    lbnd = 0;
+                  }
+                  break;
+                }
+              }
+
+              /* Choose the closest, making sure that we are not choosing t1 */
+              if ( (guess - belowidx < aboveidx - guess) && belowidx > pdata->t1 ) {
+                pdata->t2 = belowidx - 1;
+                prevbnd = lbnd;
+              } else {
+                pdata->t2 = aboveidx - 1;
+                prevbnd = ubnd;
+              }
+
+              prevend = pdata->t2;
+
+              if (prevend == nframes - 1 && iworker < nworker-1 ) {
+                /* we have run out of slices so just use fewer workers */
+                nworker = iworker + 1;
+                break;
+              }
+
+            }
+
+            /* Ensure that the last thread picks up any left-over time slices */
+            pdata->t2 = nframes - 1;
+
+          }
+
+          /* Tidy up */
+          boundaries = astFree( boundaries );
+        }
+      }
 
       /* Store all the other info needed by the worker threads, and submit the
          jobs to fix the steps in each bolo, and then wait for them to complete. */
@@ -434,23 +568,6 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
              " -- %" DIM_T_FMT,
              status, t1, t2 );
   smf_timerinit( &tv1, &tv2, status);
-
-  /* Macro to find a smfData in the smfGroup that contains valid
-     data at this time slice */
-#define SELECT_DATA( ALLDATA, SMFDATA, BADVAL, ITEM, INDEX )     \
-  {                                                              \
-    size_t _ii;                                                  \
-    SMFDATA = NULL;                                              \
-    for (_ii=0; _ii<nrelated; _ii++) {                           \
-      smfData *DATA = (ALLDATA->sdata)[_ii];                     \
-      smf_tslice_ast( DATA, INDEX, 0, status );                  \
-      if ( DATA->hdr->state->ITEM != BADVAL ) {                  \
-        SMFDATA = DATA;                                          \
-        break;                                                   \
-      }                                                          \
-    }                                                            \
-  }
-
 
   for (i=t1; i<=t2; i++) {
 
