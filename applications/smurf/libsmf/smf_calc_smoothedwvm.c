@@ -69,6 +69,10 @@
 *  History:
 *     2011-04-06 (TIMJ):
 *        Initial version
+*     2012-01-18 (TIMJ):
+*        Multi-threaded implementation.
+*     2012-06-29 (TIMJ):
+*        Fix critical indexing bugs in multi-threaded implementation
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -448,7 +452,7 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
   }
 
 
-  for (i=t1; i<t2; i++) {
+  for (i=t1; i<=t2; i++) {
 
     if (!curdata) {
       SELECT_DATA( thesedata, curdata, VAL__BADD, wvm_time, i );
@@ -528,7 +532,7 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
           size_t j;
           if (lastgoodidx == SMF__BADSZT) {
             /* gap is at the start so fill with current value */
-            for (j=0; j<i;j++) {
+            for (j=t1; j<i;j++) {
               taudata[j] = prevtau;
               ngood++;
             }
@@ -559,7 +563,7 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
   /* if the last value in the time series was bad we need to see about
      filling with the last good value */
   if (*status == SAI__OK && nbadidx > 0 && nbadidx < maxgap) {
-    for (i=lastgoodidx+1; i<nframes; i++) {
+    for (i=lastgoodidx+1; i<=t2; i++) {
       taudata[i] = lastgoodtau;
       ngood++;
     }
