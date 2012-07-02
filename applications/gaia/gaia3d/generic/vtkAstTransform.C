@@ -64,8 +64,7 @@ vtkAstTransform::~vtkAstTransform()
 {
     //  Release the AST mapping.
     if ( Mapping != NULL ) {
-        astAnnul( Mapping );
-        Mapping = (AstMapping *) NULL;
+        Mapping = (AstMapping *)astAnnul( Mapping );
     }
 }
 
