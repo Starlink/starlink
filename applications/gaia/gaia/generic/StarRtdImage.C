@@ -253,6 +253,9 @@
 #include <ast.h>
 #include "grf_tkcan.h"
 #include "tcl_err.h"
+extern "C" {
+#include "ast_tclerr.h"
+}
 #include "rtdDtrn.h"
 #include "GaiaRtdRemote.h"
 #include "gaiaNDF.h"
@@ -4658,6 +4661,8 @@ int StarRtdImage::stcplotCmd( int argc, char *argv[] )
     if ( !image_ ) {
         return error( "no image loaded" );
     }
+    const char *errmsg = NULL;
+
 
     //  Read the STC-S description and create the AST region.
     AstStcsChan *chan = astStcsChan( ChannelSource, NULL, " " );
@@ -4669,56 +4674,76 @@ int StarRtdImage::stcplotCmd( int argc, char *argv[] )
     //  Create the mapping from region coordinates to the image WCS.
     if ( region != NULL ) {
         StarWCS* wcsp = getStarWCSPtr();
-        AstFrameSet *wcs = wcsp->astWCSCopy();
+        if ( wcsp != NULL ) {
+            AstFrameSet *wcs = wcsp->astWCSCopy();
 
-        //  Get alignment between the coordinate systems.
-        int base = astGetI( wcs, "Base" );
-        AstFrameSet *fs = (AstFrameSet *) astConvert( region, wcs, " " );
-        astSetI( wcs, "Base", base );
+            //  Get alignment between the coordinate systems.
+            int base = astGetI( wcs, "Base" );
+            AstFrameSet *fs = (AstFrameSet *) astConvert( region, wcs, " " );
+            astSetI( wcs, "Base", base );
 
-        //  Get Region in coordinates of the image.
-        AstRegion *wcsreg = (AstRegion *) astMapRegion( region, fs, fs );
+            //  Get Region in coordinates of the image.
+            AstRegion *wcsreg = (AstRegion *) astMapRegion( region, fs, fs );
 
-        //  Create an AstPlot based on the full image WCS.
-        AstPlot *plot = createPlot( wcs, NULL, NULL, 1, 0, NULL, 1 );
+            //  Create an AstPlot based on the full image WCS.
+            AstPlot *plot = createPlot( wcs, NULL, NULL, 1, 0, NULL, 1 );
 
-        //  Set any attributes... Doesn't work...?
-        astSet( plot, argv[1], " " );
+            //  Set any attributes.
+            astSet( plot, argv[1], " " );
 
-        //  Initialise the interpreter and canvas name for the Tk plotting
-        //  routines.
-        astTk_Init( interp_, canvasName_ );
+            //  Initialise the interpreter and canvas name for the Tk plotting
+            //  routines.
+            astTk_Init( interp_, canvasName_ );
 
-        //  We want to draw polylines, not line segments. Polylines may be
-        //  smooth. XXX extra option.
-        //astTk_LineType( 0, smooth );
+            //  Define a tag for all items created in the plot.
+            astTk_Tag( ast_tag() );
 
-        //  Define a tag for all items created in the plot.
-        astTk_Tag( ast_tag() );
+            //  Add the STC-S region to the plot.
+            astAddFrame( plot, AST__CURRENT, astUnitMap( 2, " " ), wcsreg );
 
-        //  Add the STC-S region to the plot. XXX check for overlap...
-        astAddFrame( plot, AST__CURRENT, astUnitMap( 2, " " ), wcsreg );
+            // Now draw the border round the STC-S Region (outside coordinates
+            // are BAD so this defines the border).
+            astBorder( plot );
 
-        // Now draw the border round the STC-S Region (outside coordinates are
-        // BAD so this defines the border). 
-        astBorder( plot );
+            //  Free the plot etc,
+            plot = (AstPlot *) astAnnul( plot );
+            wcsreg = (AstRegion *) astAnnul( wcsreg );
+            wcs = (AstFrameSet *) astAnnul( wcs );
+            fs = (AstFrameSet *) astAnnul( fs );
 
-        //  Free the plot etc,
-        plot = (AstPlot *) astAnnul( plot );
-        wcsreg = (AstRegion *) astAnnul( wcsreg );
-        region = (AstRegion *) astAnnul( region );
-        wcs = (AstFrameSet *) astAnnul( wcs );
-
-        //  Reset the tag associated with AST grid items.
-        astTk_Tag( NULL );
-
-        //  Switch line type back to default.
-        //astTk_LineType( 1, 0 );
+            //  Reset the tag associated with AST grid items.
+            astTk_Tag( NULL );
+        }
+        else {
+            //  No WCS available for image, STC-S requires this.
+            errmsg = "no WCS available";
+        }
+    }
+    else {
+        if ( ! astOK ) {
+            //  Get informative error message.
+            int status_check;
+            errTcl_LastError( &status_check, &errmsg );
+        }
+        else {
+            errmsg = "not a valid STC-S region";
+        }
     }
 
     //  Tidy up.
-    if ( !astOK ) {
-        astClearStatus;
+    if ( region != NULL ) {
+        (AstRegion *) astAnnul( region );
+    }
+    if ( chan != NULL ) {
+        (AstStcsChan *) astAnnul( chan );
+    }
+    if ( !astOK || errmsg != NULL ) {
+        if ( ! astOK ) {
+            astClearStatus;
+        }
+        if ( errmsg != NULL ) {
+            return error( errmsg );
+        }
         return TCL_ERROR;
     }
     return TCL_OK;

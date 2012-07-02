@@ -338,7 +338,9 @@ itcl::class gaia::GaiaStcs {
          if { $line != {} } {
             append region $line
          } else {
-            lappend regions $region
+            if { $region != {} } {
+               lappend regions $region
+            }
             set region {}
          }
       }
