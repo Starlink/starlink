@@ -859,6 +859,10 @@ itcl::class gaia::Gaia {
          -accelerator {Control-r}
       bind $w_ <Control-r> [code $this make_toolbox ard]
 
+      add_menuitem $m command "STC-S regions..." \
+         {Drawn STC-S regions over image} \
+         -command [code $this make_toolbox stcs]
+
       add_menuitem $m command "Patch image..." \
          {Realistically replace parts of image} \
          -command [code $this make_toolbox patch] \
@@ -1086,6 +1090,22 @@ itcl::class gaia::Gaia {
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -clone_cmd [code $this make_toolbox ard 1]
+      }
+   }
+
+   #  Make an STC-S toolbox.
+   public method make_stcs_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaStcs $w_.\#auto \
+            -canvasdraw [$image_ component draw] \
+            -canvas [$image_ get_canvas] \
+            -rtdimage [$image_ get_image]\
+            -ast_tag ast_tag_ \
+            -image $image_ \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox stcs 1] \
+            -really_die $cloned
       }
    }
 

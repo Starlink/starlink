@@ -124,7 +124,7 @@ itcl::class gaia::ColourMenu {
    #  callback and makes the colour current.
    public method select_colour {index args} {
       set colour [gaia::AstColours::lookup_colour $index]
-      $menu configure -value $colour
+      set value_ $colour
       if { $change_cmd != {} } {
          eval $change_cmd $index
       }
@@ -149,17 +149,18 @@ itcl::class gaia::ColourMenu {
    #  Add a colour to the menu. The arguments are the colour name and
    #  the related index. The button has its background set to the colour.
    protected method add_menu_colour_ {name index} {
-      $menu add \
+      $menu add radiobutton \
          -label {    } \
          -value $name \
          -background $name \
+         -variable [scope value_] \
          -command [code $this select_colour $index]
    }
 
    #  Add the customizer option to the menu. This should always be last.
    protected method add_customizer_ {} {
       if { $show_custom } {
-         $menu add \
+         $menu add radiobutton \
             -label {Custom} \
             -command [code $this get_custom_colour_]
       }
@@ -205,6 +206,9 @@ itcl::class gaia::ColourMenu {
 
    #  Protected variables: (available to instance)
    #  --------------------
+
+   #  Radiobutton shared variable.
+   protected variable value_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
