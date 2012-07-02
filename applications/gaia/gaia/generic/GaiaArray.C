@@ -49,6 +49,7 @@
 #include <string.h>
 #include <float.h>
 #include <math.h>
+#include <inttypes.h>
 
 #include <GaiaArray.h>
 #include <gaiaUtils.h>
@@ -372,7 +373,7 @@ char const *gaiaArrayHDSBlankValue( int type )
         break;
 
         case HDS_INT64 :
-            sprintf( buffer, "%ld", VAL__BADK );
+            sprintf( buffer, "%" PRId64, VAL__BADK );
         break;
 
         case HDS_INTEGER :
