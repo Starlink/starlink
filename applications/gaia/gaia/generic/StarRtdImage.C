@@ -1329,7 +1329,7 @@ int StarRtdImage::originCmd( int argc, char *argv[] )
     char *out_name;
     char *value;
     char name[10];
-    char *base;
+    const char *base;
 
     // If any ELBOUND cards are defined we use them, otherwise LBOUND (of
     // which there should only ever be two).
@@ -5822,7 +5822,7 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     double x0, y0, x1, y1;
     int show_angle;
     char* from_type = argv[4];
-    char* to_type = "canvas";
+    const char* to_type = "canvas";
     char buf[1024];
 
     if (Tcl_GetInt(interp_, argv[5], &show_angle) != TCL_OK) {
@@ -5905,9 +5905,9 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     double my = (y0 + y1)/2;
     int offset = 10;               // offset of labels from lines
 
-    char* diag_anchor = "c";       // label anchors
-    char* width_anchor = "c";
-    char* height_anchor = "c";
+    const char* diag_anchor = "c";       // label anchors
+    const char* width_anchor = "c";
+    const char* height_anchor = "c";
 
     int diag_xoffset = 0,          // x,y offsets for labels
         diag_yoffset = 0,
