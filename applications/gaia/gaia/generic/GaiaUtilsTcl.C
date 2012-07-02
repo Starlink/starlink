@@ -475,7 +475,7 @@ static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    astAnnul( (AstObject *) adr );
+    (void) astAnnul( (AstObject *) adr );
 
     if ( ! astOK ) {
         astClearStatus;
@@ -632,7 +632,7 @@ static int GaiaUtilsAstCreate( ClientData clientData, Tcl_Interp *interp,
 
     /* Read the object */
     object = (AstObject *) astRead( chan );
-    astAnnul( chan );
+    (void) astAnnul( chan );
 
     free( buf );
     free( SOURCEInfo.lines );
@@ -750,12 +750,12 @@ static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
         sprintf( buf, "not a known frame type (%s)", type );
         astClearStatus;
         Tcl_SetResult( interp, buf, TCL_DYNAMIC );
-        astAnnul( picked );
+        (void) astAnnul( picked );
         return TCL_ERROR;
     }
 
     Tcl_SetObjResult( interp, Tcl_NewBooleanObj( isa ) );
-    astAnnul( picked );
+    (void) astAnnul( picked );
     return TCL_OK;
 }
 
@@ -1326,7 +1326,7 @@ static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
         Tcl_ListObjAppendElement( interp, resultObj,
                                   Tcl_NewLongObj( (long) roiPlot ) );
     }
-    astAnnul( rplots );
+    (void) astAnnul( rplots );
 
     return TCL_OK;
 }
@@ -1418,7 +1418,7 @@ static int GaiaUtilsAstSkyFrameSet( ClientData clientData, Tcl_Interp *interp,
 
     /* Create the FrameSet */
     frameset = (AstFrameSet *) astFrameSet( skyframe, " " );
-    astAnnul( skyframe );
+    (void) astAnnul( skyframe );
 
     /* Export the new object as a long containing the address */
     if ( astOK ) {
@@ -2023,7 +2023,7 @@ static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
         /* Create copies of the input FrameSet and remap then base frame. */
         AstFrameSet *copy = (AstFrameSet *) astCopy( frameset );
         astRemapFrame( copy, AST__BASE, shiftMap );
-        astAnnul( shiftMap );
+        (void) astAnnul( shiftMap );
 
         /* Export the new FrameSet. */
         if ( astOK ) {
@@ -2036,7 +2036,7 @@ static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
     else {
         /* Just remap the base frame. */
         astRemapFrame( frameset, AST__BASE, shiftMap );
-        astAnnul( shiftMap );
+        (void) astAnnul( shiftMap );
         return TCL_OK;
     }
     return TCL_ERROR;
@@ -2263,7 +2263,7 @@ static int GaiaUtilsRegionType( ClientData clientData, Tcl_Interp *interp,
     AstRegion *region = (AstRegion *) adr;
 
     /* Check and return the type. */
-    char *result = "unsupported";
+    const char *result = "unsupported";
     if ( astIsABox( region ) ) {
         result = "box";
     }
@@ -2289,6 +2289,6 @@ static int GaiaUtilsRegionType( ClientData clientData, Tcl_Interp *interp,
         result = "prism";
     }
 
-    Tcl_SetResult( interp, result, TCL_VOLATILE );
+    Tcl_SetResult( interp, const_cast< char *>(result), TCL_VOLATILE );
     return TCL_OK;
 }

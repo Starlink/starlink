@@ -2653,7 +2653,7 @@ int StarRtdImage::astwriteCmd( int argc, char *argv[] )
 
     if ( astPtr ) {
         astShow( astPtr );
-        astAnnul( astPtr );
+        (void) astAnnul( astPtr );
         if ( argc >= 2 ) {
             AstFitsChan *chan = (AstFitsChan *)
                 astFitsChan( NULL, &write_out, "Encoding=%s", argv[1] );
@@ -2918,7 +2918,7 @@ int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
         for ( int i = 0; i < dims; i++ ) {
             append_element( astFormat( iwcs, i+1, wcs[i] ) );
         }
-        astAnnul( iwcs );
+        (void) astAnnul( iwcs );
         return TCL_OK;
     }
     else {
@@ -3788,10 +3788,10 @@ int StarRtdImage::draw_stcshape( double x, double y, const char *stc_shape,
             //  the region).
             stcMapping_ = (AstMapping *) astRemoveRegions( map );
 
-            astAnnul( map );
-            astAnnul( fs );
+            (void) astAnnul( map );
+            (void) astAnnul( fs );
         }
-        astAnnul( wcs );
+        (void) astAnnul( wcs );
     }
     if ( !astOK ) {
         astClearStatus;
@@ -4732,10 +4732,10 @@ int StarRtdImage::stcplotCmd( int argc, char *argv[] )
 
     //  Tidy up.
     if ( region != NULL ) {
-        (AstRegion *) astAnnul( region );
+        region = (AstRegion *) astAnnul( region );
     }
     if ( chan != NULL ) {
-        (AstStcsChan *) astAnnul( chan );
+        chan = (AstStcsChan *) astAnnul( chan );
     }
     if ( !astOK || errmsg != NULL ) {
         if ( ! astOK ) {
@@ -4924,7 +4924,7 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
                 if ( strcasecmp( astGetC( base , "Domain" ), domain ) != 0 ) {
                     plotset = (AstFrameSet *) astAnnul( plotset );
                 }
-                astAnnul( base );
+                (void) astAnnul( base );
             }
         }
         if ( ! astOK || plotset == (AstFrameSet *) NULL ) {
@@ -5655,10 +5655,10 @@ int StarRtdImage::colorrampCmd( int argc, char *argv[] )
         //  And make the new FrameSet current.
         StarWCS* wcsp = getStarWCSPtr();
         wcsp->astWCSReplace( fset );
-        astAnnul( base );
-        astAnnul( current );
-        astAnnul( fset );
-        astAnnul( map );
+        (void) astAnnul( base );
+        (void) astAnnul( current );
+        (void) astAnnul( fset );
+        (void) astAnnul( map );
     }
     return TCL_OK;
 }

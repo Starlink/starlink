@@ -168,9 +168,9 @@ Contour::Contour( const ImageIO imio, const AstPlot *plot,
       astAddFrame( plot_, AST__BASE, newmap, frame );
 
       //  Release intermediary products.
-      astAnnul( oldmap );
-      astAnnul( newmap );
-      astAnnul( frame );
+      (void) astAnnul( oldmap );
+      (void) astAnnul( newmap );
+      (void) astAnnul( frame );
    }
 
    //  Copy the contour levels.
