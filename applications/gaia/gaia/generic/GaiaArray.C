@@ -49,6 +49,9 @@
 #include <string.h>
 #include <float.h>
 #include <math.h>
+
+/* We need to define this for PRId64 with C++ */
+#define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
 #include <GaiaArray.h>
