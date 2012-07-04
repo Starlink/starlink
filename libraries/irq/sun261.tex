@@ -17,11 +17,11 @@
 {Copyright \copyright\ 2009 Science and Technology Facilities Council.}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {261.1}
+\newcommand{\stardocnumber}    {261.2}
 \newcommand{\stardocauthors}   {D.S. Berry \& Malcolm J. Currie}
-\newcommand{\stardocdate}      {2009 August 9}
+\newcommand{\stardocdate}      {4th July 2012}
 \newcommand{\stardoctitle}     {IRQ --- Handling of QUALITY in NDFs}
-\newcommand{\stardocversion}   {Version 3.0}
+\newcommand{\stardocversion}   {Version 4.0}
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {
 This library is a set of Fortran routines for manipulation of quality
@@ -2985,13 +2985,21 @@ Evaluation stack underflow.
 No bits left in QUALITY component.
 \end{description}
 
-\section {Changes Introduced in the Current Version of this Document}
-\label {SEC:CHANGES}
+\section {Changes Introduced in Version 3.0 of this Document}
 
 \begin{itemize}
    \item It has a separate identity.  It was previously bundled into
    KAPLIBS after being recovered from IRAS90.
    \item There is documentation.
+\end{itemize}
+
+\section {Changes Introduced in the Current Version of this Document}
+\label {SEC:CHANGES}
+
+\begin{itemize}
+   \item The ``VALID'' component in the quality extension was previously
+   intentionally left with an undefined value. It is now set to the
+   defined value of TRUE.
 \end{itemize}
 
 \end{document}

@@ -82,6 +82,8 @@
 *  History:
 *     25-JUL-1991 (DSB):
 *        Original version.
+*     4-JUL-2012 (DSB):
+*        21 years on - ensure the VALID component has a defined value.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -230,6 +232,7 @@
 *  Add a logical component called VALID to the QUALITY_NAMES structure
 *  to indicate that the structure is now valid.
       CALL DAT_NEW0L( QILOC, IRQ__VANAM, STATUS )
+      CALL CMP_PUT0L( QILOC, IRQ__VANAM, .TRUE., STATUS )
 
 *  Annul the locators to the extension and the QUALITY_NAMES
 *  structure.
