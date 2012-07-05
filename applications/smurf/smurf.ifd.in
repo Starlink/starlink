@@ -1385,7 +1385,7 @@ package @PACKAGE@ {
                 access READ
                 vpath {PROMPT }
                 association <-GLOBAL.DATA_ARRAY
-                prompt {Input timeseries}
+                prompt {NDF with profiles to be fitted}
                 helpkey *
             }
 
@@ -1395,7 +1395,7 @@ package @PACKAGE@ {
                 access WRITE
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
-                prompt {Sky-subtracted timeseries}
+                prompt {NDF for fitted profiles}
                 helpkey *
             }
 
