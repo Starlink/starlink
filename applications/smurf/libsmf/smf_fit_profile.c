@@ -237,7 +237,7 @@ void smf_fit_profile( smfData  *data, int axis, int range[], int ncomp,
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-#define MULTETHREADED 0
+#define MULTITHREADED 0
 #if (MULTITHREADED)
   nw = thrGetNThread( SMF__THREADS, status );
 #endif
