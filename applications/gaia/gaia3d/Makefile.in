@@ -188,7 +188,7 @@ CXXCOMPILE	= $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) 
 
 # Libtool linking.
 LIBTOOL      = @LIBTOOL@
-LTLINK       = $(LIBTOOL) --mode=link $(CXX) $(CFLAGS) $(CXXFLAGS)
+LTLINK       = $(LIBTOOL) --mode=link --tag=CXX $(CXX) $(CFLAGS) $(CXXFLAGS)
 
 
 #========================================================================
