@@ -20,7 +20,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
 *     This program is distributed in the hope that it will be
@@ -30,12 +30,13 @@
 *     
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     NXG: Norman Gray (Starlink)
+*     MJC: Malcolm J. Currie (Starlink)
 
 *  History:
 *     20-AUG-1993 (AJC):
@@ -45,6 +46,8 @@
 *     01-FEB-2004 (NXG):
 *       Checked into CVS repository cvs.starlink.ac.uk.  See there for any
 *       further changes.
+*     2012 July 4 (MJC):
+*       Increased SUBPAR__MAXPAR again for ECHOMOP.
 *-
 
 *
@@ -55,7 +58,7 @@
       PARAMETER ( SUBPAR__NAMELEN = 15 )
 
       INTEGER SUBPAR__MAXPAR           ! maximum number of parameters 
-      PARAMETER ( SUBPAR__MAXPAR = 1500 )
+      PARAMETER ( SUBPAR__MAXPAR = 1560 )
 
       INTEGER SUBPAR__MAXACT           ! maximum number of actions
       PARAMETER ( SUBPAR__MAXACT = 300 )
