@@ -157,7 +157,8 @@ if test "${@LD_LIB_PATH@}" != ""; then
             export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
          ;;
          *86*-apple-darwin*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
+            # We just add both architectures
+            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386:${starjavadir}/lib/x86_64"
          ;;
       esac
    fi
@@ -188,7 +189,8 @@ else
         export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
      ;;
      *86*-apple-darwin*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
+        # We just add both architectures
+        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386:${starjavadir}/lib/x86_64"
      ;;
    esac
 fi

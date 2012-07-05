@@ -150,7 +150,8 @@ if ( ${?@LD_LIB_PATH@} ) then
             setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
          breaksw
          case *86*-apple-darwin*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
+            # Add both architectures to search path
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/i386:${starjavadir}/lib/x86_64"
          breaksw
       endsw
 
@@ -183,7 +184,8 @@ else
         setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
      breaksw
      case *86*-apple-darwin*:
-        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
+        # Add both architectures to search path
+        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/i386:${starjavadir}/lib/x86_64"
      breaksw
    endsw
 
