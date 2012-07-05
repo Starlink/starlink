@@ -492,14 +492,14 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
   if (*status == SAI__OK) {
     smfData *data = (thesedata->sdata)[0];
     smfHead *hdr = data->hdr;
+    printf("# IDX TAU RTS_NUM RTS_END WVM_TIME\n");
     for (i=0; i<nframes;i++) {
       JCMTState * state;
       state = &(hdr->allState)[i];
       printf("%zu %.*g %d %.*g %.*g\n", i, DBL_DIG, taudata[i], state->rts_num,
              DBL_DIG, state->rts_end, DBL_DIG, state->wvm_time);
     }
-  }
-  */
+  } */
 
   /* Free resources */
   if (tmpthesedata) smf_close_related( &tmpthesedata, status );
@@ -689,8 +689,8 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
 /* Report the time taken in this thread. */
   msgOutiff( SMF__TIMER_MSG, "",
              "smfCalcSmoothedWVM: thread finishing slices %" DIM_T_FMT
-             " -- %" DIM_T_FMT " (%.3f sec)",
-             status, t1, t2, smf_timerupdate( &tv1, &tv2, status ) );
+             " -- %" DIM_T_FMT " (%zu good) (%.3f sec)",
+             status, t1, t2, ngood, smf_timerupdate( &tv1, &tv2, status ) );
 
   /* Store number of good values */
   pdata->ngood = ngood;
