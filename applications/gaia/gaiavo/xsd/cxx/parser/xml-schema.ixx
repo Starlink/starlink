@@ -1,6 +1,6 @@
 // file      : xsd/cxx/parser/xml-schema.ixx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #include <new>     // operator new/delete
@@ -128,7 +128,8 @@ namespace xsd
       inline buffer::
       ~buffer ()
       {
-        operator delete (data_);
+        if (data_)
+	  operator delete (data_);
       }
 
       inline buffer::
@@ -324,11 +325,11 @@ namespace xsd
           if (copy && size_ > 0)
             std::memcpy (data, data_, size_);
 
-          char* tmp (data_);
+          if (data_)
+            operator delete (data_);
+
           data_ = data;
           capacity_ = capacity;
-
-          operator delete (tmp);
 
           return true;
         }
@@ -1019,4 +1020,3 @@ namespace xsd
     }
   }
 }
-

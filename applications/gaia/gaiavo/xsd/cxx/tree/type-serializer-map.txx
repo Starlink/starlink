@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/type-serializer-map.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #include <xercesc/util/XMLUni.hpp>
@@ -115,7 +115,7 @@ namespace xsd
           &serializer_impl<id>,
           false);
 
-        typedef idref<type, C, ncname> idref;
+        typedef idref<C, ncname, type> idref;
         register_type (
           typeid (idref),
           qualified_name (bits::idref<C> (), xsd),
@@ -263,12 +263,34 @@ namespace xsd
 
       template <typename C>
       void type_serializer_map<C>::
+      unregister_type (const type_id& tid)
+      {
+        type_map_.erase (&tid);
+      }
+
+      template <typename C>
+      void type_serializer_map<C>::
       register_element (const qualified_name& root,
                         const qualified_name& subst,
                         const type_id& tid,
                         serializer s)
       {
         element_map_[root][&tid] = type_info (subst, s);
+      }
+
+      template <typename C>
+      void type_serializer_map<C>::
+      unregister_element (const qualified_name& root, const type_id& tid)
+      {
+        typename element_map::iterator i (element_map_.find (root));
+
+        if (i != element_map_.end ())
+        {
+          i->second.erase (&tid);
+
+          if (i->second.empty ())
+            element_map_.erase (root);
+        }
       }
 
       template <typename C>
@@ -508,7 +530,6 @@ namespace xsd
         e << static_cast<const T&> (x);
       }
 
-
       // type_serializer_initializer
       //
       template<unsigned long id, typename C, typename T>
@@ -523,16 +544,32 @@ namespace xsd
 
       template<unsigned long id, typename C, typename T>
       type_serializer_initializer<id, C, T>::
-      type_serializer_initializer (const C* root_name,
-                             const C* root_ns,
-                             const C* subst_name,
-                             const C* subst_ns)
+      ~type_serializer_initializer ()
+      {
+        type_serializer_map_instance<id, C> ().unregister_type (typeid (T));
+      }
+
+      // element_serializer_initializer
+      //
+      template<unsigned long id, typename C, typename T>
+      element_serializer_initializer<id, C, T>::
+      element_serializer_initializer (const C* root_name, const C* root_ns,
+                                   const C* subst_name, const C* subst_ns)
+          : root_name_ (root_name), root_ns_ (root_ns)
       {
         type_serializer_map_instance<id, C> ().register_element (
           xml::qualified_name<C> (root_name, root_ns),
           xml::qualified_name<C> (subst_name, subst_ns),
           typeid (T),
           &serializer_impl<T>);
+      }
+
+      template<unsigned long id, typename C, typename T>
+      element_serializer_initializer<id, C, T>::
+      ~element_serializer_initializer ()
+      {
+        type_serializer_map_instance<id, C> ().unregister_element (
+          xml::qualified_name<C> (root_name_, root_ns_), typeid (T));
       }
     }
   }

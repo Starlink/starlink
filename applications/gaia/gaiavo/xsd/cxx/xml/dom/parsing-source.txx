@@ -1,13 +1,11 @@
 // file      : xsd/cxx/xml/dom/parsing-source.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
-
-// Starlink mods:  Set options to stop access of external DTDs and to 
-//                 permit attempts to parse after an error.
 
 #if _XERCES_VERSION >= 30000
 #  include <xercesc/dom/DOMLSParser.hpp>
+#  include <xercesc/dom/DOMLSException.hpp>
 #else
 #  include <xercesc/dom/DOMBuilder.hpp>
 #endif
@@ -47,7 +45,7 @@ namespace xsd
           {
             for (next_element_ = e.getFirstChild ();
                  next_element_ != 0 &&
-                 next_element_->getNodeType () != DOMNode::ELEMENT_NODE;
+                   next_element_->getNodeType () != DOMNode::ELEMENT_NODE;
                  next_element_ = next_element_->getNextSibling ()) /*noop*/;
           }
 
@@ -152,13 +150,19 @@ namespace xsd
             conf->setParameter (XMLUni::fgDOMValidate, false);
             conf->setParameter (XMLUni::fgXercesSchema, false);
             conf->setParameter (XMLUni::fgXercesSchemaFullChecking, false);
-            conf->setParameter (XMLUni::fgXercesLoadExternalDTD, false);
-            conf->setParameter (XMLUni::fgXercesContinueAfterFatalError, true);
           }
           else
           {
             conf->setParameter (XMLUni::fgDOMValidate, true);
             conf->setParameter (XMLUni::fgXercesSchema, true);
+
+            // Xerces-C++ 3.1.0 is the first version with working multi import
+            // support.
+            //
+#if _XERCES_VERSION >= 30100
+            if (!(flags & no_muliple_imports))
+              conf->setParameter (XMLUni::fgXercesHandleMultipleImports, true);
+#endif
 
             // This feature checks the schema grammar for additional
             // errors. We most likely do not need it when validating
@@ -195,6 +199,16 @@ namespace xsd
               const_cast<void*> (v));
           }
 
+          // If external schema location was specified, disable loading
+          // schemas via the schema location attributes in the document.
+          //
+#if _XERCES_VERSION >= 30100
+          if (!prop.schema_location ().empty () ||
+              !prop.no_namespace_schema_location ().empty ())
+          {
+            conf->setParameter (XMLUni::fgXercesLoadSchema, false);
+          }
+#endif
           // Set error handler.
           //
           bits::error_handler_proxy<C> ehp (eh);
@@ -218,8 +232,6 @@ namespace xsd
             parser->setFeature (XMLUni::fgDOMValidation, false);
             parser->setFeature (XMLUni::fgXercesSchema, false);
             parser->setFeature (XMLUni::fgXercesSchemaFullChecking, false);
-            parser->setFeature (XMLUni::fgXercesLoadExternalDTD, false);
-            parser->setFeature (XMLUni::fgXercesContinueAfterFatalError, true);
           }
           else
           {
@@ -258,7 +270,15 @@ namespace xsd
           xercesc::Wrapper4InputSource wrap (&is, false);
 
 #if _XERCES_VERSION >= 30000
-          auto_ptr<DOMDocument> doc (parser->parse (&wrap));
+          auto_ptr<DOMDocument> doc;
+
+          try
+          {
+            doc.reset (parser->parse (&wrap));
+          }
+          catch (const xercesc::DOMLSException&)
+          {
+          }
 #else
           auto_ptr<DOMDocument> doc (parser->parse (wrap));
 #endif
@@ -346,13 +366,19 @@ namespace xsd
             conf->setParameter (XMLUni::fgDOMValidate, false);
             conf->setParameter (XMLUni::fgXercesSchema, false);
             conf->setParameter (XMLUni::fgXercesSchemaFullChecking, false);
-            conf->setParameter (XMLUni::fgXercesLoadExternalDTD, false);
-            conf->setParameter (XMLUni::fgXercesContinueAfterFatalError, true);
           }
           else
           {
             conf->setParameter (XMLUni::fgDOMValidate, true);
             conf->setParameter (XMLUni::fgXercesSchema, true);
+
+            // Xerces-C++ 3.1.0 is the first version with working multi import
+            // support.
+            //
+#if _XERCES_VERSION >= 30100
+            if (!(flags & no_muliple_imports))
+              conf->setParameter (XMLUni::fgXercesHandleMultipleImports, true);
+#endif
 
             // This feature checks the schema grammar for additional
             // errors. We most likely do not need it when validating
@@ -389,6 +415,16 @@ namespace xsd
               const_cast<void*> (v));
           }
 
+          // If external schema location was specified, disable loading
+          // schemas via the schema location attributes in the document.
+          //
+#if _XERCES_VERSION >= 30100
+          if (!prop.schema_location ().empty () ||
+              !prop.no_namespace_schema_location ().empty ())
+          {
+            conf->setParameter (XMLUni::fgXercesLoadSchema, false);
+          }
+#endif
           // Set error handler.
           //
           bits::error_handler_proxy<C> ehp (eh);
@@ -412,8 +448,6 @@ namespace xsd
             parser->setFeature (XMLUni::fgDOMValidation, false);
             parser->setFeature (XMLUni::fgXercesSchema, false);
             parser->setFeature (XMLUni::fgXercesSchemaFullChecking, false);
-            parser->setFeature (XMLUni::fgXercesLoadExternalDTD, false);
-            parser->setFeature (XMLUni::fgXercesContinueAfterFatalError, true);
           }
           else
           {
@@ -449,8 +483,21 @@ namespace xsd
 
 #endif // _XERCES_VERSION >= 30000
 
+
+#if _XERCES_VERSION >= 30000
+          auto_ptr<DOMDocument> doc;
+
+          try
+          {
+            doc.reset (parser->parseURI (string (uri).c_str ()));
+          }
+          catch (const xercesc::DOMLSException&)
+          {
+          }
+#else
           auto_ptr<DOMDocument> doc (
             parser->parseURI (string (uri).c_str ()));
+#endif
 
           if (ehp.failed ())
             doc.reset ();
@@ -461,4 +508,3 @@ namespace xsd
     }
   }
 }
-

@@ -1,11 +1,10 @@
 // file      : xsd/cxx/tree/containers.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_CONTAINERS_HXX
 #define XSD_CXX_TREE_CONTAINERS_HXX
-
 
 #include <cstddef>   // std::ptrdiff_t
 #include <string>
@@ -167,6 +166,15 @@ namespace xsd
         present () const
         {
           return x_ != 0;
+        }
+
+        std::auto_ptr<T>
+        detach ()
+        {
+          T* x (x_);
+          x->_container (0);
+          x_ = 0;
+          return std::auto_ptr<T> (x);
         }
 
       protected:
@@ -331,6 +339,15 @@ namespace xsd
 
         void
         reset ();
+
+        std::auto_ptr<T>
+        detach ()
+        {
+          T* x (x_);
+          x->_container (0);
+          x_ = 0;
+          return std::auto_ptr<T> (x);
+        }
 
       private:
         void
@@ -714,7 +731,7 @@ namespace xsd
       operator< (const iterator_adapter<I, T1>& i,
                  const iterator_adapter<J, T2>& j)
       {
-        return i.base() < j.base();
+        return i.base () < j.base ();
       }
 
       template <typename I, typename J, typename T1, typename T2>
@@ -722,7 +739,7 @@ namespace xsd
       operator> (const iterator_adapter<I, T1>& i,
                  const iterator_adapter<J, T2>& j)
       {
-        return i.base() > j.base();
+        return i.base () > j.base ();
       }
 
       template <typename I, typename J, typename T1, typename T2>
@@ -730,7 +747,7 @@ namespace xsd
       operator<= (const iterator_adapter<I, T1>& i,
                   const iterator_adapter<J, T2>& j)
       {
-        return i.base() <= j.base();
+        return i.base () <= j.base ();
       }
 
       template <typename I, typename J, typename T1, typename T2>
@@ -738,7 +755,7 @@ namespace xsd
       operator>= (const iterator_adapter<I, T1>& i,
                   const iterator_adapter<J, T2>& j)
       {
-        return i.base() >= j.base();
+        return i.base () >= j.base ();
       }
 
       template <typename I, typename J, typename T1, typename T2>
@@ -754,7 +771,7 @@ namespace xsd
       operator+ (typename iterator_adapter<I, T>::difference_type n,
                  const iterator_adapter<I, T>& i)
       {
-        return iterator_adapter<I, T> (i.base() + n);
+        return iterator_adapter<I, T> (i.base () + n);
       }
 
       //
@@ -809,9 +826,23 @@ namespace xsd
           }
 
           type*
+          operator-> () const
+          {
+            return x_;
+          }
+
+          type*
           get () const
           {
             return x_;
+          }
+
+          type*
+          release ()
+          {
+            type* x (x_);
+            x_ = 0;
+            return x;
           }
 
         private:
@@ -833,15 +864,15 @@ namespace xsd
         {
         }
 
-        sequence_common (size_type n, const type& x)
-            : flags_ (0), container_ (0)
+        sequence_common (size_type n, const type& x, container* c)
+            : flags_ (0), container_ (c)
         {
           assign (n, x);
         }
 
         template <typename I>
-        sequence_common (const I& begin, const I& end)
-            : flags_ (0), container_ (0)
+        sequence_common (const I& begin, const I& end, container* c)
+            : flags_ (0), container_ (c)
         {
           assign (begin, end);
         }
@@ -1056,26 +1087,26 @@ namespace xsd
         //
 #ifdef _MSC_VER
         explicit
-        sequence (size_type n, const T& x = T ())
-            : sequence_common (n, x)
+        sequence (size_type n, const T& x = T (), container* c = 0)
+            : sequence_common (n, x, c)
         {
         }
 #else
         explicit
-        sequence (size_type n)
-            : sequence_common (n, T ())
+        sequence (size_type n, container* c = 0)
+            : sequence_common (n, T (), c)
         {
         }
 
-        sequence (size_type n, const T& x)
-            : sequence_common (n, x)
+        sequence (size_type n, const T& x, container* c = 0)
+            : sequence_common (n, x, c)
         {
         }
 #endif
 
         template <typename I>
-        sequence (const I& begin, const I& end)
-            : sequence_common (begin, end)
+        sequence (const I& begin, const I& end, container* c = 0)
+            : sequence_common (begin, end, c)
         {
         }
 
@@ -1247,6 +1278,19 @@ namespace xsd
           v_.pop_back ();
         }
 
+        std::auto_ptr<T>
+        detach_back (bool pop = true)
+        {
+          ptr& p (v_.back ());
+          p->_container (0);
+          T* x (static_cast<T*> (p.release ()));
+
+          if (pop)
+            v_.pop_back ();
+
+          return std::auto_ptr<T> (x);
+        }
+
         iterator
         insert (iterator position, const T& x)
         {
@@ -1289,6 +1333,20 @@ namespace xsd
           return iterator (v_.erase (begin.base (), end.base ()));
         }
 
+        iterator
+        detach (iterator position, std::auto_ptr<T>& r, bool erase = true)
+        {
+          ptr& p (*position.base ());
+          p->_container (0);
+          std::auto_ptr<T> tmp (static_cast<T*> (p.release ()));
+          r = tmp;
+
+          if (erase)
+            return iterator (v_.erase (position.base ()));
+          else
+            return ++position;
+        }
+
         // Note that the container object of the two sequences being
 	// swapped should be the same.
         //
@@ -1315,13 +1373,15 @@ namespace xsd
         }
 
         explicit
-        sequence (typename base_sequence::size_type n, const T& x = T ())
+        sequence (typename base_sequence::size_type n,
+                  const T& x = T (),
+                  container* = 0)
             : base_sequence (n, x)
         {
         }
 
         template <typename I>
-        sequence (const I& begin, const I& end)
+        sequence (const I& begin, const I& end, container* = 0)
             : base_sequence (begin, end)
         {
         }

@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/std-ostream-operators.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_STD_OSTREAM_OPERATORS_HXX
@@ -180,9 +180,9 @@ namespace xsd
 
       // idref
       //
-      template <typename T, typename C, typename B>
+      template <typename C, typename B, typename T>
       inline std::basic_ostream<C>&
-      operator<< (std::basic_ostream<C>& os, const idref<T, C, B>& v)
+      operator<< (std::basic_ostream<C>& os, const idref<C, B, T>& v)
       {
         const B& r (v);
         return os << r;

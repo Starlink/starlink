@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/serialization.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #include <string>
@@ -32,7 +32,9 @@ namespace XERCES_CPP_NAMESPACE
   operator<< (xercesc::DOMElement& e, const C* s)
   {
     xsd::cxx::xml::dom::clear<char> (e);
-    e.setTextContent (xsd::cxx::xml::string (s).c_str ());
+
+    if (*s != C (0))
+      e.setTextContent (xsd::cxx::xml::string (s).c_str ());
   }
 
   template <typename C>
@@ -51,7 +53,9 @@ namespace XERCES_CPP_NAMESPACE
   operator<< (xercesc::DOMElement& e, const std::basic_string<C>& s)
   {
     xsd::cxx::xml::dom::clear<char> (e);
-    e.setTextContent (xsd::cxx::xml::string (s).c_str ());
+
+    if (!s.empty ())
+      e.setTextContent (xsd::cxx::xml::string (s).c_str ());
   }
 
   template <typename C>
@@ -131,8 +135,6 @@ namespace xsd
       void
       operator<< (xercesc::DOMElement& e, const list<T, C, ST, fund>& v)
       {
-        xml::dom::clear<char> (e);
-
         std::basic_ostringstream<C> os;
         list_stream<C> ls (os, e);
 
@@ -531,23 +533,23 @@ namespace xsd
 
       // idref
       //
-      template <typename T, typename C, typename B>
+      template <typename C, typename B, typename T>
       inline void
-      operator<< (xercesc::DOMElement& e, const idref<T, C, B>& x)
+      operator<< (xercesc::DOMElement& e, const idref<C, B, T>& x)
       {
         bits::insert<C> (e, x);
       }
 
-      template <typename T, typename C, typename B>
+      template <typename C, typename B, typename T>
       inline void
-      operator<< (xercesc::DOMAttr& a, const idref<T, C, B>& x)
+      operator<< (xercesc::DOMAttr& a, const idref<C, B, T>& x)
       {
         bits::insert<C> (a, x);
       }
 
-      template <typename T, typename C, typename B>
+      template <typename C, typename B, typename T>
       inline void
-      operator<< (list_stream<C>& ls, const idref<T, C, B>& x)
+      operator<< (list_stream<C>& ls, const idref<C, B, T>& x)
       {
         ls.os_ << x;
       }

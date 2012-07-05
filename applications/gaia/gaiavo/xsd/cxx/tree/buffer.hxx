@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/buffer.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 /**
@@ -45,11 +45,12 @@ namespace xsd
         virtual
         ~buffer_base ()
         {
-          operator delete (data_);
+          if (free_ && data_)
+            operator delete (data_);
         }
 
         buffer_base ()
-            : data_ (0), size_ (0), capacity_ (0)
+            : data_ (0), size_ (0), capacity_ (0), free_ (true)
         {
         }
 
@@ -57,6 +58,7 @@ namespace xsd
         char* data_;
         size_t size_;
         size_t capacity_;
+        bool free_;
       };
 
       //@endcond
@@ -137,13 +139,13 @@ namespace xsd
         buffer (const void* data, size_t size, size_t capacity);
 
         /**
-         * @brief Assume ownership of the specified %buffer.
+         * @brief Reuse an existing %buffer.
          *
          * If the @a assume_ownership argument is true, the %buffer will
          * assume ownership of @a data and will release the memory
          * by calling @c operator @c delete().
          *
-         * @param data A %buffer to assume ownership of.
+         * @param data A %buffer to reuse.
          * @param size A %buffer size in bytes.
          * @param capacity A %buffer capacity in bytes.
          * @param assume_ownership A boolean value indication whether to

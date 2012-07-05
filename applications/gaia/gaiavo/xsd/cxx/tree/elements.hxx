@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/elements.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 /**
@@ -419,23 +419,68 @@ namespace xsd
         virtual void
         _container (container* c)
         {
-          assert (container_ == 0);
+          container* dr (0);
 
           if (c != 0)
           {
-            if (map_.get () != 0)
+            dr = c->_root ();
+
+            if (dr == 0)
+              dr = c;
+          }
+
+          std::auto_ptr<map>& m (dr ? dr->map_ : map_);
+
+          if (container_ == 0)
+          {
+            if (c != 0 && map_.get () != 0)
             {
-              // Propagate our IDs to the new container.
+              // Transfer our IDs to the new root.
               //
-              for (map::iterator i (map_->begin ()), e (map_->end ());
-                   i != e; ++i)
+              if (m.get () != 0)
               {
-                c->_register_id (*i->first, i->second);
+                m->insert (map_->begin (), map_->end ());
+                std::auto_ptr<map> tmp (0);
+                map_ = tmp;
+              }
+              else
+                m = map_;
+            }
+          }
+          else
+          {
+            container* sr (_root ());
+
+            if (sr->map_.get () != 0)
+            {
+              // Transfer IDs that belong to this subtree.
+              //
+              for (map::iterator i (sr->map_->begin ()), e (sr->map_->end ());
+                   i != e;)
+              {
+                type* x (i->second);
+                for (; x != this && x != sr; x = x->_container ()) ;
+
+                if (x != sr)
+                {
+                  // Part of our subtree.
+                  //
+                  if (m.get () == 0)
+                  {
+                    std::auto_ptr<map> tmp (new map);
+                    m = tmp;
+                  }
+
+                  m->insert (*i);
+                  sr->map_->erase (i++);
+                }
+                else
+                  ++i;
               }
             }
-
-            container_ = c;
           }
+
+          container_ = c;
         }
 
         /**
@@ -585,15 +630,15 @@ namespace xsd
         void
         _register_id (const identity& id, type* t)
         {
-          if (map_.get () == 0)
-            map_.reset (new map);
-
-          // First register on our container. If there are any duplications,
-          // they will be detected by this call and we don't need to clean
-          // the map.
+          // We should be the root.
           //
-          if (container_ != 0)
-	    container_->_register_id (id, t);
+          assert (container_ == 0);
+
+          if (map_.get () == 0)
+          {
+            std::auto_ptr<map> tmp (new map);
+            map_ = tmp;
+          }
 
           if (!map_->insert (
                 std::pair<const identity*, type*> (&id, t)).second)
@@ -616,22 +661,12 @@ namespace xsd
         void
         _unregister_id (const identity& id)
         {
-          if (map_.get ())
-          {
-            map::iterator it (map_->find (&id));
+          // We should be the root.
+          //
+          assert (container_ == 0);
 
-            if (it != map_->end ())
-            {
-              map_->erase (it);
-
-              if (container_ != 0)
-	        container_->_unregister_id (id);
-
-              return;
-            }
-          }
-
-          throw not_registered ();
+          if (map_.get () == 0 || map_->erase (&id) == 0)
+            throw not_registered ();
         }
 
         type*
@@ -947,9 +982,15 @@ namespace xsd
         /**
          * @brief Default constructor.
          */
-        simple_type ()
-        {
-        }
+        simple_type ();
+
+        /**
+         * @brief Create an instance from a string.
+         *
+         * @param s A string to initialize the instance with.
+         */
+        template <typename C>
+        simple_type (const C* s);
 
       public:
         /**
@@ -1029,6 +1070,74 @@ namespace xsd
                      flags f = 0,
                      container* c = 0);
         //@}
+      };
+
+
+      /**
+       * @brief Base class for element types.
+       *
+       * This class is a base for every generated element type.
+       *
+       * @nosubgrouping
+       */
+      template <typename C, typename T>
+      class element_type
+      {
+      public:
+        virtual
+        ~element_type ()
+        {
+        }
+
+        /**
+         * @brief Copy the instance polymorphically.
+         *
+         * @param f Flags to create the copy with.
+         * @return A pointer to the dynamically allocated copy.
+         *
+         * This function ensures that the dynamic type of the instance
+         * is used for copying and should be used for polymorphic object
+         * models instead of the copy constructor.
+         */
+        virtual element_type*
+        _clone (flags f = 0) const = 0;
+
+        /**
+         * @brief Return the element name.
+         *
+         * @return A read-only string reference containing the element
+         * name.
+         */
+        virtual const std::basic_string<C>&
+        _name () const = 0;
+
+        /**
+         * @brief Return the element namespace.
+         *
+         * @return A read-only string reference containing the element
+         * namespace. Empty string is returned if the element is
+         * unqualified.
+         */
+        virtual const std::basic_string<C>&
+        _namespace () const = 0;
+
+        /**
+         * @brief Return the element value.
+         *
+         * @return A pointer to the element value or 0 if the element
+         * is of a fundamental type.
+         */
+        virtual T*
+        _value () = 0;
+
+        /**
+         * @brief Return the element value.
+         *
+         * @return A read-only pointer to the element value or 0 if the
+         * element is of a fundamental type.
+         */
+        virtual const T*
+        _value () const = 0;
       };
 
 
@@ -1375,6 +1484,7 @@ namespace xsd
   }
 }
 
+#include <xsd/cxx/tree/elements.ixx>
 #include <xsd/cxx/tree/elements.txx>
 
 #endif  // XSD_CXX_TREE_ELEMENTS_HXX

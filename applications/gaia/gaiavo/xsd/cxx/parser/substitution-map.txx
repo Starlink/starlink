@@ -1,6 +1,6 @@
 // file      : xsd/cxx/parser/substitution-map.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 namespace xsd
@@ -67,9 +67,17 @@ namespace xsd
                               const C* root_ns,
                               const C* root_name,
                               const C* member_type)
+          : member_ns_ (member_ns), member_name_ (member_name)
       {
         substitution_map_instance<C> ().insert (
           member_ns, member_name, root_ns, root_name, member_type);
+      }
+
+      template<typename C>
+      substitution_map_entry<C>::
+      ~substitution_map_entry ()
+      {
+        substitution_map_instance<C> ().erase (member_ns_, member_name_);
       }
     }
   }

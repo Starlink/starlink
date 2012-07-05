@@ -1,6 +1,6 @@
 // file      : xsd/cxx/parser/expat/elements.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #include <new>     // std::bad_alloc
@@ -234,10 +234,23 @@ namespace xsd
           {
             ~stream_exception_controller ()
             {
-              if (is_.fail () && is_.eof ())
-                is_.clear (is_.rdstate () & ~std::ios_base::failbit);
+              std::ios_base::iostate s = is_.rdstate ();
+              s &= ~std::ios_base::failbit;
 
-              is_.exceptions (old_state_);
+              // If our error state (sans failbit) intersects with the
+              // exception state then that means we have an active
+              // exception and changing error/exception state will
+              // cause another to be thrown.
+              //
+              if (!(old_state_ & s))
+              {
+                // Clear failbit if it was caused by eof.
+                //
+                if (is_.fail () && is_.eof ())
+                  is_.clear (s);
+
+                is_.exceptions (old_state_);
+              }
             }
 
             stream_exception_controller (std::istream& is)
@@ -581,7 +594,7 @@ namespace xsd
             {
               try
               {
-                start_element (ns, name, 0);
+                this->start_element (ns, name, 0);
               }
               catch (const schema_exception<C>& e)
               {
@@ -608,7 +621,7 @@ namespace xsd
               {
                 try
                 {
-                  start_element (ns, name, 0);
+                  this->start_element (ns, name, 0);
                 }
                 catch (const schema_exception<C>& e)
                 {
@@ -680,7 +693,7 @@ namespace xsd
                   }
 
                   ro_string<C> ro_id (id);
-                  start_element (ns, name, &ro_id);
+                  this->start_element (ns, name, &ro_id);
                 }
                 catch (const schema_exception<C>& e)
                 {
@@ -700,7 +713,7 @@ namespace xsd
 
             try
             {
-              attribute (ns, name, value);
+              this->attribute (ns, name, value);
             }
             catch (const schema_exception<C>& e)
             {
@@ -735,7 +748,7 @@ namespace xsd
 
           try
           {
-            end_element (ns, name);
+            this->end_element (ns, name);
           }
           catch (const schema_exception<C>& e)
           {
@@ -764,7 +777,7 @@ namespace xsd
 
             try
             {
-              characters (str);
+              this->characters (str);
             }
             catch (const schema_exception<C>& e)
             {

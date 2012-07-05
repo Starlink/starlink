@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/bits/literals.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_BITS_LITERALS_HXX
@@ -173,6 +173,84 @@ namespace xsd
         template <typename C>
         const C*
         gmonth_prefix ();
+
+        // Exception and diagnostics string literals.
+        //
+        template <typename C>
+        const C*
+        ex_error_error (); // " error: "
+
+        template <typename C>
+        const C*
+        ex_error_warning (); // " warning: "
+
+        template <typename C>
+        const C*
+        ex_parsing_msg (); // "instance document parsing failed"
+
+        template <typename C>
+        const C*
+        ex_eel_expected (); // "expected element '"
+
+        template <typename C>
+        const C*
+        ex_uel_expected (); // "expected element '"
+
+        template <typename C>
+        const C*
+        ex_uel_instead (); // "' instead of '"
+
+        template <typename C>
+        const C*
+        ex_uel_unexpected (); // "unexpected element '"
+
+        template <typename C>
+        const C*
+        ex_eat_expected (); // "expected attribute '"
+
+        template <typename C>
+        const C*
+        ex_uen_unexpected (); // "unexpected enumerator '"
+
+        template <typename C>
+        const C*
+        ex_etc_msg (); // "expected text content"
+
+        template <typename C>
+        const C*
+        ex_nti_no_type_info (); // "no type information available for type '"
+
+        template <typename C>
+        const C*
+        ex_nei_no_element_info (); // "no parsing or serialization information
+                                   // available for element '"
+        template <typename C>
+        const C*
+        ex_nd_type (); // "type '"
+
+        template <typename C>
+        const C*
+        ex_nd_not_derived (); // "' is not derived from '"
+
+        template <typename C>
+        const C*
+        ex_di_id (); // "ID '"
+
+        template <typename C>
+        const C*
+        ex_di_already_exist (); // "' already exist"
+
+        template <typename C>
+        const C*
+        ex_serialization_msg (); // "serialization failed"
+
+        template <typename C>
+        const C*
+        ex_npm_no_mapping (); // "no mapping provided for namespace prefix '"
+
+        template <typename C>
+        const C*
+        ex_bounds_msg (); // "buffer boundary rules have been violated"
       }
     }
   }

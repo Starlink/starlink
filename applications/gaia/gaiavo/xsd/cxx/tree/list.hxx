@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/list.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_LIST_HXX
@@ -44,14 +44,16 @@ namespace xsd
         {
         }
 
-        list (typename sequence<T>::size_type n, const T& x)
-            : sequence<T> (n, x)
+        list (typename sequence<T>::size_type n,
+              const T& x,
+              container* c = 0)
+            : sequence<T> (n, x, c)
         {
         }
 
         template<typename I>
-        list (const I& b, const I& e)
-            : sequence<T> (b, e)
+        list (const I& b, const I& e, container* c = 0)
+            : sequence<T> (b, e, c)
         {
         }
 
@@ -92,14 +94,14 @@ namespace xsd
         }
 
         explicit
-        list (typename sequence<T>::size_type n, const T& x)
-            : sequence<T> (n, x)
+        list (typename sequence<T>::size_type n, const T& x, container* c = 0)
+            : sequence<T> (n, x, c)
         {
         }
 
         template<typename I>
-        list (const I& b, const I& e)
-            : sequence<T> (b, e)
+        list (const I& b, const I& e, container* c = 0)
+            : sequence<T> (b, e, c)
         {
         }
 
@@ -129,4 +131,4 @@ namespace xsd
   }
 }
 
-#endif  // XSD_CXX_TREE_LIST_HXX
+#endif // XSD_CXX_TREE_LIST_HXX

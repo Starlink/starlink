@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/stream-extraction-map.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_STREAM_EXTRACTION_MAP_HXX
@@ -34,6 +34,9 @@ namespace xsd
         register_type (const qualified_name& name,
                        extractor,
                        bool override = true);
+
+        void
+        unregister_type (const qualified_name& name);
 
         std::auto_ptr<type>
         extract (istream<S>&, flags, container*);
@@ -87,6 +90,11 @@ namespace xsd
       struct stream_extraction_initializer
       {
         stream_extraction_initializer (const C* name, const C* ns);
+        ~stream_extraction_initializer ();
+
+      private:
+        const C* name_;
+        const C* ns_;
       };
     }
   }

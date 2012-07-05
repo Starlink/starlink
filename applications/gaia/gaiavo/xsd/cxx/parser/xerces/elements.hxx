@@ -1,6 +1,6 @@
 // file      : xsd/cxx/parser/xerces/elements.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_PARSER_XERCES_ELEMENTS_HXX
@@ -46,6 +46,11 @@ namespace xsd
           // Do not initialize the Xerces-C++ runtime.
           //
           static const unsigned long dont_initialize = 0x00000002;
+
+          // Disable handling of subsequent imports for the same namespace
+          // in Xerces-C++ 3.1.0 and later.
+          //
+          static const unsigned long no_multiple_imports = 0x00000004;
 
         public:
           flags (unsigned long x = 0)

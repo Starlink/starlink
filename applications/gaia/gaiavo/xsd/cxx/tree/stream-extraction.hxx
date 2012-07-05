@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/stream-extraction.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_STREAM_EXTRACTION_HXX
@@ -68,7 +68,7 @@ namespace xsd
           while (size--)
           {
             std::auto_ptr<T> p (new T (s, f, c));
-            push_back (p);
+            this->push_back (p);
           }
         }
       }
@@ -91,7 +91,7 @@ namespace xsd
           {
             T x;
             s >> x;
-            push_back (x);
+            this->push_back (x);
           }
         }
       }
@@ -152,7 +152,7 @@ namespace xsd
       template <typename S>
       inline nmtokens<C, B, nmtoken>::
       nmtokens (istream<S>& s, flags f, container* c)
-          : B (s, f, c), base_type (s, f, c)
+          : B (s, f, c), base_type (s, f, this)
       {
       }
 
@@ -204,9 +204,9 @@ namespace xsd
 
       // idref
       //
-      template <typename T, typename C, typename B>
+      template <typename C, typename B, typename T>
       template <typename S>
-      inline idref<T, C, B>::
+      inline idref<C, B, T>::
       idref (istream<S>& s, flags f, container* c)
           : B (s, f, c), identity_ (*this)
       {
@@ -219,7 +219,7 @@ namespace xsd
       template <typename S>
       inline idrefs<C, B, idref>::
       idrefs (istream<S>& s, flags f, container* c)
-          : B (s, f, c), base_type (s, f, c)
+          : B (s, f, c), base_type (s, f, this)
       {
       }
 
@@ -291,7 +291,7 @@ namespace xsd
       template <typename S>
       inline entities<C, B, entity>::
       entities (istream<S>& s, flags f, container* c)
-          : B (s, f, c), base_type (s, f, c)
+          : B (s, f, c), base_type (s, f, this)
       {
       }
     }

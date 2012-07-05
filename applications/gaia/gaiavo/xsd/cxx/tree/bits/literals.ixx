@@ -1,10 +1,48 @@
 // file      : xsd/cxx/tree/bits/literals.ixx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_BITS_LITERALS_IXX
 #define XSD_CXX_TREE_BITS_LITERALS_IXX
+
+// The char versions of the following literals are required even
+// if we are using wchar_t as the character type.
+//
+namespace xsd
+{
+  namespace cxx
+  {
+    namespace tree
+    {
+      namespace bits
+      {
+        //
+        //
+        template<>
+        inline const char*
+        positive_inf<char> ()
+        {
+          return "INF";
+        }
+
+        template<>
+        inline const char*
+        negative_inf<char> ()
+        {
+          return "-INF";
+        }
+
+        template<>
+        inline const char*
+        nan<char> ()
+        {
+          return "NaN";
+        }
+      }
+    }
+  }
+}
 
 #endif // XSD_CXX_TREE_BITS_LITERALS_IXX
 
@@ -36,29 +74,6 @@ namespace xsd
         one<char> ()
         {
           return "1";
-        }
-
-        //
-        //
-        template<>
-        inline const char*
-        positive_inf<char> ()
-        {
-          return "INF";
-        }
-
-        template<>
-        inline const char*
-        negative_inf<char> ()
-        {
-          return "-INF";
-        }
-
-        template<>
-        inline const char*
-        nan<char> ()
-        {
-          return "NaN";
         }
 
         //
@@ -290,6 +305,141 @@ namespace xsd
         gmonth_prefix<char> ()
         {
           return "--";
+        }
+
+        //
+        //
+        template <>
+        inline const char*
+        ex_error_error<char> ()
+        {
+          return " error: ";
+        }
+
+        template <>
+        inline const char*
+        ex_error_warning<char> ()
+        {
+          return " warning: ";
+        }
+
+        template <>
+        inline const char*
+        ex_parsing_msg<char> ()
+        {
+          return "instance document parsing failed";
+        }
+
+        template <>
+        inline const char*
+        ex_eel_expected<char> ()
+        {
+          return "expected element '";
+        }
+
+        template <>
+        inline const char*
+        ex_uel_expected<char> ()
+        {
+          return "expected element '";
+        }
+
+        template <>
+        inline const char*
+        ex_uel_instead<char> ()
+        {
+          return "' instead of '";
+        }
+
+        template <>
+        inline const char*
+        ex_uel_unexpected<char> ()
+        {
+          return "unexpected element '";
+        }
+
+        template <>
+        inline const char*
+        ex_eat_expected<char> ()
+        {
+          return "expected attribute '";
+        }
+
+        template <>
+        inline const char*
+        ex_uen_unexpected<char> ()
+        {
+          return "unexpected enumerator '";
+        }
+
+        template <>
+        inline const char*
+        ex_etc_msg<char> ()
+        {
+          return "expected text content";
+        }
+
+        template <>
+        inline const char*
+        ex_nti_no_type_info<char> ()
+        {
+          return "no type information available for type '";
+        }
+
+        template <>
+        inline const char*
+        ex_nei_no_element_info<char> ()
+        {
+          return "no parsing or serialization information available for "
+            "element '";
+        }
+        template <>
+        inline const char*
+        ex_nd_type<char> ()
+        {
+          return "type '";
+        }
+
+        template <>
+        inline const char*
+        ex_nd_not_derived<char> ()
+        {
+          return "' is not derived from '";
+        }
+
+        template <>
+        inline const char*
+        ex_di_id<char> ()
+        {
+          return "ID '";
+        }
+
+        template <>
+        inline const char*
+        ex_di_already_exist<char> ()
+        {
+          return "' already exist";
+        }
+
+        template <>
+        inline const char*
+        ex_serialization_msg<char> ()
+        {
+          return "serialization failed";
+        }
+
+        template <>
+        inline const char*
+        ex_npm_no_mapping<char> ()
+        {
+          return "no mapping provided for namespace prefix '";
+        }
+
+        template <>
+        inline const char*
+        ex_bounds_msg<char> ()
+        {
+          return "buffer boundary rules have been violated";
         }
       }
     }
@@ -581,6 +731,141 @@ namespace xsd
         gmonth_prefix<wchar_t> ()
         {
           return L"--";
+        }
+
+        //
+        //
+        template <>
+        inline const wchar_t*
+        ex_error_error<wchar_t> ()
+        {
+          return L" error: ";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_error_warning<wchar_t> ()
+        {
+          return L" warning: ";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_parsing_msg<wchar_t> ()
+        {
+          return L"instance document parsing failed";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_eel_expected<wchar_t> ()
+        {
+          return L"expected element '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_uel_expected<wchar_t> ()
+        {
+          return L"expected element '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_uel_instead<wchar_t> ()
+        {
+          return L"' instead of '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_uel_unexpected<wchar_t> ()
+        {
+          return L"unexpected element '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_eat_expected<wchar_t> ()
+        {
+          return L"expected attribute '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_uen_unexpected<wchar_t> ()
+        {
+          return L"unexpected enumerator '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_etc_msg<wchar_t> ()
+        {
+          return L"expected text content";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_nti_no_type_info<wchar_t> ()
+        {
+          return L"no type information available for type '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_nei_no_element_info<wchar_t> ()
+        {
+          return L"no parsing or serialization information available for "
+            L"element '";
+        }
+        template <>
+        inline const wchar_t*
+        ex_nd_type<wchar_t> ()
+        {
+          return L"type '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_nd_not_derived<wchar_t> ()
+        {
+          return L"' is not derived from '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_di_id<wchar_t> ()
+        {
+          return L"ID '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_di_already_exist<wchar_t> ()
+        {
+          return L"' already exist";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_serialization_msg<wchar_t> ()
+        {
+          return L"serialization failed";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_npm_no_mapping<wchar_t> ()
+        {
+          return L"no mapping provided for namespace prefix '";
+        }
+
+        template <>
+        inline const wchar_t*
+        ex_bounds_msg<wchar_t> ()
+        {
+          return L"buffer boundary rules have been violated";
         }
       }
     }

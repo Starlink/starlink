@@ -1,6 +1,6 @@
 // file      : xsd/cxx/parser/error-handler.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_PARSER_ERROR_HANDLER_HXX
@@ -19,9 +19,9 @@ namespace xsd
       template <typename C>
       class error_handler: public xml::error_handler<C>
       {
+      public:
         typedef typename xml::error_handler<C>::severity severity;
 
-      public:
         error_handler ()
             : failed_ (false)
         {

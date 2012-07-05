@@ -1,6 +1,6 @@
 // file      : xsd/cxx/xml/dom/parsing-source.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_XML_DOM_PARSING_SOURCE_HXX
@@ -98,7 +98,8 @@ namespace xsd
 
         // Parsing flags.
         //
-        const unsigned long dont_validate = 0x00000400UL;
+        const unsigned long dont_validate      = 0x00000400UL;
+        const unsigned long no_muliple_imports = 0x00000800UL;
 
         template <typename C>
         xml::dom::auto_ptr<xercesc::DOMDocument>

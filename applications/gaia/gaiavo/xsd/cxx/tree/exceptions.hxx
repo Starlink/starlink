@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/exceptions.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 /**
@@ -190,6 +190,16 @@ namespace xsd
         {
           return message_;
         }
+
+        //@cond
+
+        // Default c-tor that shouldn't be. Needed when we completely
+        // instantiate std::vector in diagnostics below.
+        //
+        error ();
+
+        //@endcond
+
 
       private:
         tree::severity severity_;
@@ -652,6 +662,72 @@ namespace xsd
       };
 
       /**
+       * @brief Exception indicating that %parsing or %serialization
+       * information is not available for an element.
+       *
+       * @nosubgrouping
+       */
+      template <typename C>
+      class no_element_info: public exception<C>
+      {
+      public:
+        virtual
+        ~no_element_info () throw ();
+
+        /**
+         * @brief Initialize an instance with the element description.
+         *
+         * @param element_name An element name.
+         * @param element_ns An element namespace.
+         */
+        no_element_info (const std::basic_string<C>& element_name,
+                         const std::basic_string<C>& element_ns);
+
+      public:
+        /**
+         * @brief Get the element name.
+         *
+         * @return The element name.
+         */
+        const std::basic_string<C>&
+        element_name () const
+        {
+          return element_name_;
+        }
+
+        /**
+         * @brief Get the element namespace.
+         *
+         * @return The element namespace.
+         */
+        const std::basic_string<C>&
+        element_namespace () const
+        {
+          return element_namespace_;
+        }
+
+        /**
+         * @brief Get %exception description.
+         *
+         * @return A C %string describing the %exception.
+         */
+        virtual const char*
+        what () const throw ();
+
+      protected:
+        //@cond
+
+        virtual void
+        print (std::basic_ostream<C>&) const;
+
+        //@endcond
+
+      private:
+        std::basic_string<C> element_name_;
+        std::basic_string<C> element_namespace_;
+      };
+
+      /**
        * @brief Exception indicating that the types are not related by
        * inheritance.
        *
@@ -956,5 +1032,3 @@ namespace xsd
 #include <xsd/cxx/tree/exceptions.txx>
 
 #endif  // XSD_CXX_TREE_EXCEPTIONS_HXX
-
-#include <xsd/cxx/tree/exceptions.ixx>

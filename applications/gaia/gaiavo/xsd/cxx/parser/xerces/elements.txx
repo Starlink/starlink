@@ -1,6 +1,6 @@
 // file      : xsd/cxx/parser/xerces/elements.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #include <istream>
@@ -607,6 +607,13 @@ namespace xsd
             sax->setFeature (XMLUni::fgSAX2CoreValidation, true);
             sax->setFeature (XMLUni::fgXercesSchema, true);
 
+            // Xerces-C++ 3.1.0 is the first version with working multi import
+            // support.
+            //
+#if _XERCES_VERSION >= 30100
+            if (!(f & flags::no_multiple_imports))
+              sax->setFeature (XMLUni::fgXercesHandleMultipleImports, true);
+#endif
             // This feature checks the schema grammar for additional
             // errors. We most likely do not need it when validating
             // instances (assuming the schema is valid).

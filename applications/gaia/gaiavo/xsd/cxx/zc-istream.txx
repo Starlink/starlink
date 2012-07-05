@@ -1,6 +1,6 @@
 // file      : xsd/cxx/zc-istream.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 namespace xsd
@@ -32,7 +32,7 @@ namespace xsd
       C* b (const_cast<C*> (str_.data ()));
       C* e (b + str_.size ());
 
-      setg (b, b, e);
+      this->setg (b, b, e);
     }
 
     template <typename C>

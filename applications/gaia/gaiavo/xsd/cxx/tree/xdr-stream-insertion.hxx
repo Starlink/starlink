@@ -1,11 +1,12 @@
 // file      : xsd/cxx/tree/xdr-stream-insertion.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_XDR_STREAM_INSERTION_HXX
 #define XSD_CXX_TREE_XDR_STREAM_INSERTION_HXX
 
+#include <rpc/types.h>
 #include <rpc/xdr.h>
 
 #include <string>

@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/stream-insertion-map.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #include <xsd/cxx/tree/types.hxx>
@@ -108,7 +108,7 @@ namespace xsd
           &inserter_impl<S, id>,
           false);
 
-        typedef idref<type, C, ncname> idref;
+        typedef idref<C, ncname, type> idref;
         register_type (
           typeid (idref),
           qualified_name (bits::idref<C> (), xsd),
@@ -256,6 +256,13 @@ namespace xsd
 
       template <typename S, typename C>
       void stream_insertion_map<S, C>::
+      unregister_type (const type_id& tid)
+      {
+        type_map_.erase (&tid);
+      }
+
+      template <typename S, typename C>
+      void stream_insertion_map<S, C>::
       insert (ostream<S>& s, const type& x)
       {
         if (const type_info* ti = find (typeid (x)))
@@ -319,6 +326,14 @@ namespace xsd
           typeid (T),
           xml::qualified_name<C> (name, ns),
           &inserter_impl<S, T>);
+      }
+
+      template<unsigned long id, typename S, typename C, typename T>
+      stream_insertion_initializer<id, S, C, T>::
+      ~stream_insertion_initializer ()
+      {
+        stream_insertion_map_instance<id, S, C> ().unregister_type (
+          typeid (T));
       }
     }
   }

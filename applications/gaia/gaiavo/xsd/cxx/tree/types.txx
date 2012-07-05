@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/types.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #include <xercesc/util/Base64.hpp>
@@ -185,39 +185,27 @@ namespace xsd
       void id<C, B>::
       register_id ()
       {
-        container* c (this->_container ());
+        container* r (this->_root ());
 
-        if (c != 0 && !this->empty ())
-        {
-          //std::cerr << "registering " << c
-          //          << " as '" << *this
-          //          << "' on " << c << std::endl;
-
-          c->_register_id (identity_, c);
-        }
+        if (r != 0 && !this->empty ())
+          r->_register_id (identity_, this->_container ());
       }
 
       template <typename C, typename B>
       void id<C, B>::
       unregister_id ()
       {
-        container* c (this->_container ());
+        container* r (this->_root ());
 
-        if (c != 0 && !this->empty ())
-        {
-          //std::cerr << "un-registering " << c
-          //          << " as '" << *this
-          //          << "' on " << c << std::endl;
-
-          c->_unregister_id (identity_);
-        }
+        if (r != 0 && !this->empty ())
+          r->_unregister_id (identity_);
       }
 
 
       // idref
       //
-      template <typename T, typename C, typename B>
-      idref<T, C, B>* idref<T, C, B>::
+      template <typename C, typename B, typename T>
+      idref<C, B, T>* idref<C, B, T>::
       _clone (flags f, container* c) const
       {
         return new idref (*this, f, c);
@@ -228,8 +216,8 @@ namespace xsd
       // non-trivial to track down cases. So we are going to use the
       // old-n-ugly this-> techniques.
       //
-      template <typename T, typename C, typename B>
-      const _type* idref<T, C, B>::
+      template <typename C, typename B, typename T>
+      const _type* idref<C, B, T>::
       get_ () const
       {
         if (!this->empty () && this->_container () != 0)
@@ -240,8 +228,8 @@ namespace xsd
           return 0;
       }
 
-      template <typename T, typename C, typename B>
-      _type* idref<T, C, B>::
+      template <typename C, typename B, typename T>
+      _type* idref<C, B, T>::
       get_ ()
       {
         if (!this->empty () && this->_container () != 0)
@@ -252,8 +240,8 @@ namespace xsd
           return 0;
       }
 
-      template <typename T, typename C, typename B>
-      void idref<T, C, B>::
+      template <typename C, typename B, typename T>
+      void idref<C, B, T>::
       true_ ()
       {
       }

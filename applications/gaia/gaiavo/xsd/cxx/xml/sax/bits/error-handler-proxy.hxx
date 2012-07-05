@@ -1,6 +1,6 @@
 // file      : xsd/cxx/xml/sax/bits/error-handler-proxy.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_XML_SAX_ERROR_HANDLER_PROXY_HXX
@@ -78,4 +78,3 @@ namespace xsd
 #include <xsd/cxx/xml/sax/bits/error-handler-proxy.txx>
 
 #endif  // XSD_CXX_XML_SAX_ERROR_HANDLER_PROXY_HXX
-

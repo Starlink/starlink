@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/stream-extraction-map.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #include <xsd/cxx/tree/types.hxx>
@@ -97,7 +97,7 @@ namespace xsd
           &extractor_impl<S, id>,
           false);
 
-        typedef idref<type, C, ncname> idref;
+        typedef idref<C, ncname, type> idref;
         register_type (
           qualified_name (bits::idref<C> (), xsd),
           &extractor_impl<S, idref>,
@@ -226,6 +226,13 @@ namespace xsd
       }
 
       template <typename S, typename C>
+      void stream_extraction_map<S, C>::
+      unregister_type (const qualified_name& name)
+      {
+        type_map_.erase (name);
+      }
+
+      template <typename S, typename C>
       std::auto_ptr<type> stream_extraction_map<S, C>::
       extract (istream<S>& s, flags f, container* c)
       {
@@ -285,9 +292,18 @@ namespace xsd
       template<unsigned long id, typename S, typename C, typename T>
       stream_extraction_initializer<id, S, C, T>::
       stream_extraction_initializer (const C* name, const C* ns)
+          : name_ (name), ns_ (ns)
       {
         stream_extraction_map_instance<id, S, C> ().register_type (
           xml::qualified_name<C> (name, ns), &extractor_impl<S, T>);
+      }
+
+      template<unsigned long id, typename S, typename C, typename T>
+      stream_extraction_initializer<id, S, C, T>::
+      ~stream_extraction_initializer ()
+      {
+        stream_extraction_map_instance<id, S, C> ().unregister_type (
+          xml::qualified_name<C> (name_, ns_));
       }
     }
   }

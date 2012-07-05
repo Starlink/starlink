@@ -1,12 +1,13 @@
 // file      : xsd/cxx/xml/string.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_XML_STRING_HXX
 #define XSD_CXX_XML_STRING_HXX
 
 #include <string>
+#include <cstddef> // std::size_t
 
 #include <xsd/cxx/auto-array.hxx>
 #include <xercesc/util/XercesDefs.hpp> // XMLCh
@@ -17,12 +18,6 @@ namespace xsd
   {
     namespace xml
     {
-      //
-      //
-      struct invalid_utf8_string {};
-      struct invalid_utf16_string {};
-
-
       // Transcode a null-terminated string.
       //
       template <typename C>
@@ -84,7 +79,7 @@ namespace xsd
   }
 }
 
-#endif  // XSD_CXX_XML_STRING_HXX
+#endif // XSD_CXX_XML_STRING_HXX
 
 #include <xsd/cxx/xml/string.ixx>
 #include <xsd/cxx/xml/string.txx>

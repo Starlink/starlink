@@ -1,11 +1,12 @@
 // file      : xsd/cxx/compilers/vc-8/pre.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 // These warnings had to be disabled "for good".
 //
 #pragma warning (disable:4250) // inherits via dominance
+#pragma warning (disable:4661) // no definition for explicit instantiation
 
 
 // Push warning state.

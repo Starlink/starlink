@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/type-serializer-map.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_TYPE_SERIALIZER_MAP_HXX
@@ -38,10 +38,16 @@ namespace xsd
                        bool override = true);
 
         void
+        unregister_type (const type_id&);
+
+        void
         register_element (const qualified_name& root,
                           const qualified_name& subst,
                           const type_id&,
                           serializer);
+
+        void
+        unregister_element (const qualified_name& root, const type_id&);
 
       public:
         void
@@ -118,7 +124,15 @@ namespace xsd
           bool
           operator() (const type_id* x, const type_id* y) const
           {
+            // XL C++ on AIX has buggy type_info::before() in that
+            // it returns true for two different type_info objects
+            // that happened to be for the same type.
+            //
+#if defined(__xlC__) && defined(_AIX)
+            return *x != *y && x->before (*y);
+#else
             return x->before (*y);
+#endif
           }
         };
 
@@ -188,17 +202,29 @@ namespace xsd
       serializer_impl (xercesc::DOMElement&, const type&);
 
 
+      //
+      //
       template<unsigned long id, typename C, typename T>
       struct type_serializer_initializer
       {
-        // Register type.
-        //
         type_serializer_initializer (const C* name, const C* ns);
+        ~type_serializer_initializer ();
+      };
 
-        // Register element.
-        //
-        type_serializer_initializer (const C* root_name, const C* root_ns,
-                                     const C* subst_name, const C* subst_ns);
+
+      //
+      //
+      template<unsigned long id, typename C, typename T>
+      struct element_serializer_initializer
+      {
+        element_serializer_initializer (const C* root_name, const C* root_ns,
+                                        const C* subst_name, const C* subst_ns);
+
+        ~element_serializer_initializer ();
+
+      private:
+        const C* root_name_;
+        const C* root_ns_;
       };
     }
   }

@@ -1,11 +1,12 @@
 // file      : xsd/cxx/tree/xdr-stream-extraction.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_XDR_STREAM_EXTRACTION_HXX
 #define XSD_CXX_TREE_XDR_STREAM_EXTRACTION_HXX
 
+#include <rpc/types.h>
 #include <rpc/xdr.h>
 
 #include <string>
@@ -247,11 +248,16 @@ namespace xsd
 
         // Dangerous but fast.
         //
-        x.resize (n);
-        char* p (const_cast<char*> (x.c_str ()));
+	x.clear ();
+	
+	if (n != 0)
+	{
+          x.resize (n);
+          char* p (const_cast<char*> (x.c_str ()));
 
-        if (!xdr_opaque (&s.impl (), p, n))
-          throw xdr_stream_extraction ();
+          if (!xdr_opaque (&s.impl (), p, n))
+            throw xdr_stream_extraction ();
+	}
 
         return s;
       }

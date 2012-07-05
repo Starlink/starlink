@@ -1,6 +1,6 @@
 // file      : xsd/cxx/parser/substitution-map.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_PARSER_SUBSTITUTION_MAP_HXX
@@ -137,6 +137,12 @@ namespace xsd
           map_.insert (std::pair<key, value> (k, v));
         }
 
+        void
+        erase (const C* member_ns, const C* member_name)
+        {
+          map_.erase (key (member_ns, member_name));
+        }
+
         // Check and get the type set if found.
         //
         bool
@@ -219,6 +225,12 @@ namespace xsd
                                 const C* root_ns,
                                 const C* root_name,
                                 const C* member_type);
+
+        ~substitution_map_entry ();
+
+      private:
+        const C* member_ns_;
+        const C* member_name_;
       };
     }
   }
@@ -227,4 +239,3 @@ namespace xsd
 #include <xsd/cxx/parser/substitution-map.txx>
 
 #endif  // XSD_CXX_PARSER_SUBSTITUTION_MAP_HXX
-

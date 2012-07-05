@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/serialization/decimal.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #ifndef XSD_CXX_TREE_SERIALIZATION_DECIMAL_HXX
@@ -71,16 +71,19 @@ namespace xsd
 
           if (f && n > f->value)
           {
-            // Point does not count so figure out if we have one.
+            // Point and sign do not count so figure out if we have them.
             //
-            typename std::basic_string<C>::size_type point =
-              r.find ('.') < n ? 1 : 0;
+            typename std::basic_string<C>::size_type extra (
+              cr[0] == '-' ? 1 : 0);
+
+            if (r.find ('.') < n)
+              extra++;
 
             // Unless we have a point and the size difference is one,
             // remove some digits.
             //
-            if ((n - point) > f->value)
-              n -= (n - point - f->value);
+            if ((n - extra) > f->value)
+              n -= (n - extra - f->value);
 
             if (n > 0 && cr[n - 1] == '.')
               --n;

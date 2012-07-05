@@ -1,6 +1,6 @@
 // file      : xsd/cxx/tree/parsing.txx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
-// copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
+// copyright : Copyright (c) 2005-2010 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
 #include <string>
@@ -299,7 +299,7 @@ namespace xsd
 
           if (j != basic_string<C>::npos)
           {
-            push_back (
+            this->push_back (
               traits<T, C, ST>::create (
                 basic_string<C> (data + i, j - i), parent, 0, 0));
 
@@ -309,7 +309,7 @@ namespace xsd
           {
             // Last element.
             //
-            push_back (
+            this->push_back (
               traits<T, C, ST>::create (
                 basic_string<C> (data + i, size - i), parent, 0, 0));
 
@@ -503,14 +503,14 @@ namespace xsd
       template <typename C, typename B, typename nmtoken>
       nmtokens<C, B, nmtoken>::
       nmtokens (const xercesc::DOMElement& e, flags f, container* c)
-          : B (e, f, c), base_type (e, f, c)
+          : B (e, f, c), base_type (e, f, this)
       {
       }
 
       template <typename C, typename B, typename nmtoken>
       nmtokens<C, B, nmtoken>::
       nmtokens (const xercesc::DOMAttr& a, flags f, container* c)
-          : B (a, f, c), base_type (a, f, c)
+          : B (a, f, c), base_type (a, f, this)
       {
       }
 
@@ -520,7 +520,7 @@ namespace xsd
                 const xercesc::DOMElement* e,
                 flags f,
                 container* c)
-          : B (s, e, f, c), base_type (s, e, f, c)
+          : B (s, e, f, c), base_type (s, e, f, this)
       {
       }
 
@@ -638,22 +638,22 @@ namespace xsd
 
       // idref
       //
-      template <typename T, typename C, typename B>
-      idref<T, C, B>::
+      template <typename C, typename B, typename T>
+      idref<C, B, T>::
       idref (const xercesc::DOMElement& e, flags f, container* c)
           : base_type (e, f, c), identity_ (*this)
       {
       }
 
-      template <typename T, typename C, typename B>
-      idref<T, C, B>::
+      template <typename C, typename B, typename T>
+      idref<C, B, T>::
       idref (const xercesc::DOMAttr& a, flags f, container* c)
           : base_type (a, f , c), identity_ (*this)
       {
       }
 
-      template <typename T, typename C, typename B>
-      idref<T, C, B>::
+      template <typename C, typename B, typename T>
+      idref<C, B, T>::
       idref (const std::basic_string<C>& s,
              const xercesc::DOMElement* e,
              flags f,
@@ -663,20 +663,19 @@ namespace xsd
       }
 
 
-
       // idrefs
       //
       template <typename C, typename B, typename idref>
       idrefs<C, B, idref>::
       idrefs (const xercesc::DOMElement& e, flags f, container* c)
-          : B (e, f, c), base_type (e, f, c)
+          : B (e, f, c), base_type (e, f, this)
       {
       }
 
       template <typename C, typename B, typename idref>
       idrefs<C, B, idref>::
       idrefs (const xercesc::DOMAttr& a, flags f, container* c)
-          : B (a, f, c), base_type (a, f, c)
+          : B (a, f, c), base_type (a, f, this)
       {
       }
 
@@ -686,7 +685,7 @@ namespace xsd
               const xercesc::DOMElement* e,
               flags f,
               container* c)
-          : B (s, e, f, c), base_type (s, e, f, c)
+          : B (s, e, f, c), base_type (s, e, f, this)
       {
       }
 
@@ -890,14 +889,14 @@ namespace xsd
       template <typename C, typename B, typename entity>
       entities<C, B, entity>::
       entities (const xercesc::DOMElement& e, flags f, container* c)
-          : B (e, f, c), base_type (e, f, c)
+          : B (e, f, c), base_type (e, f, this)
       {
       }
 
       template <typename C, typename B, typename entity>
       entities<C, B, entity>::
       entities (const xercesc::DOMAttr& a, flags f, container* c)
-          : B (a, f, c), base_type (a, f, c)
+          : B (a, f, c), base_type (a, f, this)
       {
       }
 
@@ -907,7 +906,7 @@ namespace xsd
                 const xercesc::DOMElement* e,
                 flags f,
                 container* c)
-          : B (s, e, f, c), base_type (s, e, f, c)
+          : B (s, e, f, c), base_type (s, e, f, this)
       {
       }
     }
