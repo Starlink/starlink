@@ -309,6 +309,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        performed, if set to "1" NaNs are changed to AST__BAD but no
 *        error is reported, if set to anything else NaNs are changed to
 *        AST__BAD and an error is reported.
+*     6-JUL-2012 (DSB):
+*        The astRebinSeq<X> family was nomalising the returned data and
+*        variances values correctly, when the AST__REBINEND flag was supplied.
 *class--
 */
 
@@ -11534,11 +11537,11 @@ f     FLAGS argument.
 *     before being returned. This normalisation consists of dividing the data
 *     array by the weights array, and can eliminate artifacts which may be
 *     introduced into the rebinned data as a consequence of aliasing between
-*     the input and output grids. However, it can also result in small changes to
-*     the total pixel value in any given area of the output array. In addition to
-*     normalisation of the output data values, any output variances are also
-*     appropriately normalised, and any output data values with weight less
-*     than
+*     the input and output grids. The normalised values are then multiplied
+*     by a constant scaling factor to ensure that the total data sum is
+*     unchanged. In addition to normalisation of the output data values, any
+*     output variances are also appropriately normalised, and any output data
+*     values with weight less than
 c     "wlim" are set to "badval".
 f     WLIM are set to BADVAL.
 *
@@ -11925,8 +11928,11 @@ f     OUT and OUT_VAR
 *     returned. The normalisation factor for each output data value is just the
 *     corresponding value from the weights array. The normalisation factor
 *     for each output variance value is the square of the data value
-*     normalisation factor. It also causes output data values to be set
-*     bad if the corresponding weight is less than the value supplied for
+*     normalisation factor. In addition the whole dat aarray is then
+*     scaled by a constant factor to ensure the total data value in the output
+*     is unchanged by the earlier normalisation. It also causes output data
+*     values to be set bad if the corresponding weight is less than the value
+*     supplied for
 c     parameter "wlim".
 f     argument WLIM.
 *     It also causes any temporary values stored in the output variance array
@@ -11966,7 +11972,7 @@ f     routine
 *     the generated output variances. If AST__DISVAR is not specified,
 *     generated variances represent variances on the output mean  values. If
 *     AST__DISVAR is specified, the generated variances represent the variance
-*     of the distribution from which the input values were taken. Eaxch output
+*     of the distribution from which the input values were taken. Each output
 *     variance created with AST__DISVAR will be larger than that created
 *     without AST__DISVAR by a factor equal to the number of input samples
 *     that contribute to the output sample.
@@ -12017,9 +12023,12 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    Xtype *v;                     /* Pointer to next output variance value */ \
    double *w;                    /* Pointer to next weight value */ \
    double a;                     /* Weighted mean of input values */ \
+   double factor;                /* Factor needed to retain total data value */ \
    double mwpip;                 /* Mean weight per input pixel */ \
    double nn;                    /* Effective no. of i/p pixels combined */ \
+   double sout;                  /* Sum of unweighted output values */ \
    double sw;                    /* Sum of weights at output pixel */ \
+   double swout;                 /* Sum of weighted output values */ \
    int i;                        /* Loop counter for output pixels */ \
    int idim;                     /* Loop counter for coordinate dimensions */ \
    int ipix_out;                 /* Index into output array */ \
@@ -12342,18 +12351,36 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
          } \
       } \
 \
-/* Normalise the returned data and variance arrays. */ \
+/* Normalise the returned data array. */ \
+      sout = 0.0; \
+      swout = 0.0; \
       for( i = 0; i < npix_out; i++ ) { \
          if( fabs( weights[ i ] ) >= wlim && out[ i ] != badval ) { \
+            sout += out[ i ]; \
             out[ i ] /= weights[ i ]; \
+            swout += out[ i ]; \
          } else { \
             out[ i ] = badval; \
          } \
       } \
+\
+/* Apply an extra normalisation to ensure the total data sum is \
+   unchanged by the previous normalisation. */ \
+      if( swout != 0.0 ) { \
+         factor = sout/swout; \
+         for( i = 0; i < npix_out; i++ ) { \
+            if( out[ i ] != badval ) out[ i ] *= factor; \
+         } \
+      } else { \
+         factor = 1.0; \
+      } \
+\
+/* Normalise the returned variance array. */ \
       if( out_var ) { \
+         factor *= factor; \
          for( i = 0; i < npix_out; i++ ) { \
             if( fabs( weights[ i ] ) >= wlim && out_var[ i ] != badval ) { \
-               out_var[ i ] /= ( weights[ i ]*weights[ i ] ); \
+               out_var[ i ] /= ( weights[ i ]*weights[ i ] )/factor; \
             } else { \
                out_var[ i ] = badval; \
             } \
