@@ -310,8 +310,10 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        error is reported, if set to anything else NaNs are changed to
 *        AST__BAD and an error is reported.
 *     6-JUL-2012 (DSB):
-*        The astRebinSeq<X> family was nomalising the returned data and
-*        variances values correctly, when the AST__REBINEND flag was supplied.
+*        The astRebinSeq<X> family was normalising the returned data and
+*        variances values incorrectly, when the AST__REBINEND flag was
+*        supplied. The exact size of the error depended on the nature of
+*        the Mapping and the spreading method, and so is hard to predict.
 *class--
 */
 
