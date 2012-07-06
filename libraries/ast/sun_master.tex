@@ -22702,18 +22702,31 @@ prefix/include.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V7.0.5}
+\subsection{Changes Introduced in V7.0.5}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V7.0.4 and V7.0.5 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V7.0.4 and V7.0.5:
 
 \begin{enumerate}
 
 \item The FitsChan class can now read FITS headers that use the SAO
 convention for representing distorted TAN projections, based on the use
 of ``COi\_m'' keywords to hold the coefficients of the distortion polynomial.
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V7.0.6}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V7.0.5 and V7.0.6 (the
+current version):
+
+\begin{enumerate}
+
+\item A bug has been fixed in astRebinSeq<X> which could result in
+incorrect normalisation of the final binned data and variance values.
 
 \end{enumerate}
 
