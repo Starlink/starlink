@@ -150,6 +150,11 @@
 *     24-FEB-2011 (DSB):
 *        Correct conversion from pixel coord to pixel index when finding
 *        bounds of output NDF.
+*     6-JUL-2012 (DSB):
+*        Change to use AST_REBINSEQ rather than AST_REBIN, because of the
+*        better normalisation (now) performed by AST_REBINSEQ. This
+*        removes the aliasing effects (regular patterns int he output NDF)
+*        sometimes seen with AST_REBIN.
 *     {enter_further_changes_here}
 
 *-
@@ -214,6 +219,7 @@
       INTEGER IPQ2               ! Pointer to output quality array
       INTEGER IPV1               ! Pointer to input variance array
       INTEGER IPV2               ! Pointer to output variance array
+      INTEGER IPW                ! Pointer to AST_REBINSEQ weights
       INTEGER IWCS1              ! Original input WCS FrameSet
       INTEGER IWCS2              ! Original output WCS FrameSet
       INTEGER IWCSR2             ! New output WCS FrameSet
@@ -228,6 +234,7 @@
       INTEGER MAPR               ! AST Mapping (ref. GRID -> ref. PIXEL)
       INTEGER NAX                ! No. of current Frame axes
       INTEGER NDIM1              ! No. of pixel axes in input NDF
+      INTEGER NUSED              ! No. of i/p pixels pasted into o/p
       INTEGER OPSPAX             ! Spectral axis index in output
       INTEGER IPSPAX             ! Spectral axis index in input
       INTEGER RESULT             ! Value returned from AST_RESAMPLE<x>
@@ -581,35 +588,38 @@
 
 *  Call the appropriate rebinning routine
       ELSE
+         FLAGS = FLAGS + AST__REBININIT + AST__REBINEND
+         CALL PSX_CALLOC( EL, '_DOUBLE', IPW, STATUS )
+
          IF ( TY_IN .EQ. '_INTEGER' ) THEN
-            CALL AST_REBINI( MAP5, DBLE( WLIM ), NDIM1, LGRID1, UGRID1,
-     :                       %VAL( CNF_PVAL( IPD1 ) ),
-     :                       %VAL( CNF_PVAL( IPV1 ) ), METHOD,
-     :                       PARAMS, FLAGS, TOL, MAXPIX, VAL__BADI,
-     :                       NDIM2, LGRID2, UGRID2, LGRID1, UGRID1,
-     :                       %VAL( CNF_PVAL( IPD2 ) ),
-     :                       %VAL( CNF_PVAL( IPV2 ) ),
-     :                       STATUS )
+            CALL AST_REBINSEQI( MAP5, DBLE( WLIM ), NDIM1, LGRID1,
+     :                          UGRID1,%VAL( CNF_PVAL( IPD1 ) ),
+     :                          %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                          PARAMS, FLAGS, TOL, MAXPIX, VAL__BADI,
+     :                          NDIM2, LGRID2, UGRID2, LGRID1, UGRID1,
+     :                          %VAL( CNF_PVAL( IPD2 ) ),
+     :                          %VAL( CNF_PVAL( IPV2 ) ),
+     :                          %VAL( CNF_PVAL( IPW ) ), NUSED, STATUS )
 
          ELSE IF ( TY_IN .EQ. '_REAL' ) THEN
-            CALL AST_REBINR( MAP5, DBLE( WLIM ), NDIM1, LGRID1, UGRID1,
-     :                       %VAL( CNF_PVAL( IPD1 ) ),
-     :                       %VAL( CNF_PVAL( IPV1 ) ), METHOD,
-     :                       PARAMS, FLAGS, TOL, MAXPIX, VAL__BADR,
-     :                       NDIM2, LGRID2, UGRID2, LGRID1, UGRID1,
-     :                       %VAL( CNF_PVAL( IPD2 ) ),
-     :                       %VAL( CNF_PVAL( IPV2 ) ),
-     :                       STATUS )
+            CALL AST_REBINSEQR( MAP5, DBLE( WLIM ), NDIM1, LGRID1,
+     :                          UGRID1,%VAL( CNF_PVAL( IPD1 ) ),
+     :                          %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                          PARAMS, FLAGS, TOL, MAXPIX, VAL__BADR,
+     :                          NDIM2, LGRID2, UGRID2, LGRID1, UGRID1,
+     :                          %VAL( CNF_PVAL( IPD2 ) ),
+     :                          %VAL( CNF_PVAL( IPV2 ) ),
+     :                          %VAL( CNF_PVAL( IPW ) ), NUSED, STATUS )
 
          ELSE IF ( TY_IN .EQ. '_DOUBLE' ) THEN
-            CALL AST_REBIND( MAP5, DBLE( WLIM ), NDIM1, LGRID1, UGRID1,
-     :                       %VAL( CNF_PVAL( IPD1 ) ),
-     :                       %VAL( CNF_PVAL( IPV1 ) ), METHOD,
-     :                       PARAMS, FLAGS, TOL, MAXPIX, VAL__BADD,
-     :                       NDIM2, LGRID2, UGRID2, LGRID1, UGRID1,
-     :                       %VAL( CNF_PVAL( IPD2 ) ),
-     :                       %VAL( CNF_PVAL( IPV2 ) ),
-     :                       STATUS )
+            CALL AST_REBINSEQD( MAP5, DBLE( WLIM ), NDIM1, LGRID1,
+     :                          UGRID1,%VAL( CNF_PVAL( IPD1 ) ),
+     :                          %VAL( CNF_PVAL( IPV1 ) ), METHOD,
+     :                          PARAMS, FLAGS, TOL, MAXPIX, VAL__BADD,
+     :                          NDIM2, LGRID2, UGRID2, LGRID1, UGRID1,
+     :                          %VAL( CNF_PVAL( IPD2 ) ),
+     :                          %VAL( CNF_PVAL( IPV2 ) ),
+     :                          %VAL( CNF_PVAL( IPW ) ), NUSED, STATUS )
 
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
@@ -619,6 +629,7 @@
      :        'error).', STATUS )
          END IF
 
+         CALL PSX_FREE( IPW, STATUS )
          BAD_PIXELS = 1
 
       END IF
