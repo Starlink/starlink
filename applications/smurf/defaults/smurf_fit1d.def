@@ -49,9 +49,6 @@ function = gauss
 
 ncomp = 3
 
-# RMS to use for the input data set in terms of data units.
-rms = 0.8
-
 # Minimum value for the Amplitude to accepts as a genuine fit in terms
 # of the rms. Based on the amplitude alone, at 3-sigma 5% of the profiles
 # selected for fitting can be expected to be noise spikes. This value drops
