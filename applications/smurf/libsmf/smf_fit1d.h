@@ -7,8 +7,8 @@
 #define BETWEEN(a,b,c) ( (a) < (b) ? (b) : ((a) > (c) ? (c) : (a) ) )
 /* #define NINT(a)        ( (a) < 0 ? (int)((a)-.5) : (int)((a)+.5) ) */
 
-#define DISP2FWHM(a)   ( a * 2.0*sqrt(2.0*log(2.0)) )
-#define FWHM2DISP(a)   ( a / 2.0*sqrt(2.0*log(2.0)) )
+#define DISP2FWHM(a)   ( a * (2.0*sqrt(2.0*log(2.0))) )
+#define FWHM2DISP(a)   ( a / (2.0*sqrt(2.0*log(2.0))) )
 
 /* Max array sizes */
 #define MAXGAUSS      10     /* Max. gaussians in estimates routine */

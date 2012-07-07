@@ -31,6 +31,8 @@
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     IN = NDF (Read)
 *          Input file(s).
+*     RMS = DOUBLE (Read) 
+*           rms in input NDF in data units.
 *     CONFIG = GROUP (Read)
 *          Specifies values for the configuration parameters used by the
 *          FIT1D. If the string "def" (case-insensitive) or a null (!)
@@ -42,7 +44,6 @@
 *               are Gaussian, Gauherm3, Gauherm4, and Voigt
 *          - NCOMP = _INT (Read) Number of components to fit to each
 *               data segment (spectrum)
-*          - RMS = rms in data set
 *          - MINAMP = minimum fitted amplitude in terms of RMS
 *          - MINDISP = minimum fitted dispersion to accept in pixels
 *     DIAGNDF = GROUP (READ)
@@ -256,7 +257,10 @@ void smurf_fit1d( int * status )
 
   if (*status != SAI__OK) goto CLEANUP;
 
-  /* Extract read user supplied values using a keymap */
+  /* Get the RMS */
+  parGet0d( "RMS", &rms, status );
+
+  /* Extract and read user supplied values using a keymap */
   get_fit1par( &axis, range, &fid, &ncomp,
 		   &rms, &critamp, &critdisp, &estimate_only, &model_only,
 		   status );
@@ -524,24 +528,6 @@ static void get_fit1par( int *axis, double *range,
       msgOutiff( MSG__VERB, "", "... NCOMP=%d", status, *ncomp );
     } else {
       errRep(FUNC_NAME, "Failed to get parameter NCOMP from config file",
-	     status);
-      return;
-    }
-  }
-
-  /* Rms in input map */
-  if( rms ) {
-    *rms = 0;
-    astMapGet0D( keymap, "RMS", rms );
-    if ( *status == SAI__OK ) {
-      if ( *rms < 0 ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "RMS must be >= 0.", status );
-      } else {
-	msgOutiff( MSG__VERB, "", "... RMS=%f", status, *rms );
-      }
-    } else {
-      errRep(FUNC_NAME, "Failed to get parameter RMS from config file",
 	     status);
       return;
     }
@@ -818,8 +804,14 @@ static void convert_range_to_pixels ( AstMapping **wcsmap, double *range,
   prange[0] = (int) (lrange[0]+0.5);
   prange[1] = (int) (lrange[1]+0.5);
 
-  msgOutiff(MSG__VERB, " ", "Range %f to %f => Pixel range: %d to %d\n",
+  if ( range[0] == VAL__BADD ) {
+     msgOutiff(MSG__VERB, " ", 
+          "Range undefined => Full pixel range: %d to %d\n",  
+          status, prange[0], prange[1]);
+  } else {
+     msgOutiff(MSG__VERB, " ", "Range %f to %f => Pixel range: %d to %d\n",
 	    status, range[0], range[1], prange[0], prange[1]);
+  }
 
   if ( prange[0] >= (int) ndims || prange[1] <= 1 ) {
     msgOutf( "", "Range results in a pixel range %d to %d that is beyond the input ndf axis %d to %d",

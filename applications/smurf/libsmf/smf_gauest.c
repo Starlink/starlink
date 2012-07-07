@@ -129,7 +129,7 @@
 #endif
 
 /* FIT1D includes */
-#include "smf_fit1d.h"
+#include "libsmf/smf_fit1d.h"
 
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_gfauest"

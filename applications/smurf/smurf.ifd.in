@@ -1399,8 +1399,18 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter config {
+            parameter rms {
                 position 3
+                type _DOUBLE
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                prompt {RMS in cube [data units]}
+                helpkey *
+            }
+
+            parameter config {
+                position 4
                 type LITERAL
                 access READ
                 ppath CURRENT
@@ -1411,7 +1421,7 @@ package @PACKAGE@ {
             }
 
             parameter userval {
-                position 4
+                position 5
                 type LITERAL
                 access READ
                 ppath DEFAULT
@@ -1422,7 +1432,7 @@ package @PACKAGE@ {
             }
 
             parameter diagndf {
-                position 5
+                position 6
                 type LITERAL
                 access READ
                 vpath DEFAULT
@@ -1433,7 +1443,7 @@ package @PACKAGE@ {
             }
 
             parameter parndf {
-                position 6
+                position 7
                 type LITERAL
                 access READ
                 vpath DEFAULT
