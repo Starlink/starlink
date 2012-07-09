@@ -363,9 +363,9 @@
 	       hds_gl_status = DAT__FILMP;
 	       emsSyser( "MESSAGE", errno );
 	       rec1_fmsg( "FILE", slot );
-	       emsRep( "REC1_UNMAP_FRAME_2",
-	                  "Error unmapping data in the file ^FILE - ^MESSAGE",
-		          &hds_gl_status );
+	       emsRepf( "REC1_UNMAP_FRAME_2",
+	                "Error unmapping %zu bytes of data in the file ^FILE - ^MESSAGE",
+		        &hds_gl_status, len );
 	    }
 
 /* Unregister the pointer to the exportable mapped memory and reset the     */
