@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "hds1.h"
+#include "rec.h"
+#include "dat1.h"
+
    void dat1_getenv( const char *varname, int def, int *val )
    {
 /*+                                                                         */

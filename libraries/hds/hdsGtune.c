@@ -9,8 +9,10 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 int
-hdsGtune(char *param_str,
+hdsGtune(const char *param_str,
          int *value,
          int *status)
 {

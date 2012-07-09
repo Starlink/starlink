@@ -77,8 +77,8 @@
  */
 
 /* Internal prototypes */
-void decode_type( int type, char **string);
-void decode_pdd( struct PDD *pdd );
+const char * decode_type( int type );
+void decode_pdd( const struct PDD *pdd );
 void add_block(INT_BIG bloc);
 void read_block ( FILE * fp, INT_BIG bloc, size_t nbytes, void * ptr );
 
@@ -106,7 +106,7 @@ main(int argc, char **argv)
    struct ODL odl;		      			   /* ODL           */
    char name[DAT__SZNAM+1];
    unsigned char *ptr;
-   char *type;
+   const char *type;
    char axtype[DAT__SZTYP+1];
    unsigned int cbm;					   /* Chip Bit Mask */
 
@@ -185,7 +185,7 @@ main(int argc, char **argv)
       tlrb++;
       cur_block = nxtblk[0];
       read_block( fp, cur_block, REC__SZBLK, block );
-      printf("\n\n**** LRB block %d", cur_block);
+      printf("\n\n**** LRB block %" HDS_INT_BIG_S, cur_block);
       cbm = (block[1] << 8 | block[0]);
       if( cbm == 0x7fff)
 	 printf("  (All chips used)\n");
@@ -205,7 +205,7 @@ main(int argc, char **argv)
              rcl.size = 1;
              continue;
          }
-         decode_type( rcl.class, &type);
+         type = decode_type( rcl.class );
          printf("\n%s record (%"HDS_INT_BIG_S",%d):\n", type, cur_block, chip);
          printf(" Parent(b=%" HDS_INT_BIG_S ",c=%d),size=%d,chained=%d,active=%d,"
                 "slen=%d,dlen=%"HDS_INT_BIG_U"\n",
@@ -222,7 +222,6 @@ main(int argc, char **argv)
          }
 
          switch (rcl.class) {
-            struct PDD pdd;
             case DAT__CONTAINER:
                _chmove( DAT__SZNAM, ptr, name );
 	       name[DAT__SZNAM] = '\0';
@@ -294,6 +293,8 @@ main(int argc, char **argv)
                   free(tblk);
                break;
             case DAT__PRIMITIVE:
+              {
+               struct PDD pdd;
                dat1_unpack_odl( ptr, &odl );
                dat1_unpack_type( odl.type, &pdd );
 
@@ -313,6 +314,7 @@ main(int argc, char **argv)
                   printf(")\n");
                else
                   printf("\n");
+              }
          }
       }
       for(i=1; i<= blkcnt; i++)
@@ -347,26 +349,28 @@ add_block(INT_BIG bloc)
 }
 
 
-void
-decode_type( int type, char **string)
+const char *
+decode_type( int type )
 {
+   const char * string = "<unknown>";
    switch (type) {
       case 1:
-         *string = "Container";
+         string = "Container";
          break;
       case 2:
-         *string = "Structure";
+         string = "Structure";
          break;
       case 3:
-         *string = "Component";
+         string = "Component";
          break;
       case 4:
-         *string = "Primitive";
+         string = "Primitive";
    }
+   return string;
 }
 
 void
-decode_pdd( struct PDD *pdd )
+decode_pdd( const struct PDD *pdd )
 {
    char *string;
 
