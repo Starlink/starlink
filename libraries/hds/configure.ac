@@ -21,7 +21,7 @@ dnl    declared in the old header file "hds1_feature.h", but we need
 dnl    to make sure all feature-level defines are included in the autoconf
 dnl    tests (this is important for large file support under Solaris, which
 dnl    does not define _LARGEFILE_SOURCE without _POSIX_C_SOURCE).
-AC_DEFINE([_POSIX_C_SOURCE], [2001112L], [Specify the version of the POSIX
+AC_DEFINE([_POSIX_C_SOURCE], [200112L], [Specify the version of the POSIX
 standard we want to work with (should provide POSIX.1, POSIX.2 and POSIX.4, 
 if available)]) 
 
