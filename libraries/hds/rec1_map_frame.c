@@ -626,14 +626,14 @@ file ^FILE - ^MESSAGE",
                   }
                   else if ( !reg )
                   {
-                     if ( munmap( start, len ) )
+                     if ( munmap( start, len ) != 0 )
                      {
                         hds_gl_status = DAT__FILMP;
                         emsSyser( "MESSAGE", errno );
                         rec1_fmsg( "FILE", slot );
-                        emsRep( "REC1_MAP_FRAME_7",
-                                   "Error unmapping data in the file ^FILE - "
-                                   "^MESSAGE", &hds_gl_status );
+                        emsRepf( "REC1_MAP_FRAME_7",
+                                 "Error unmapping %zu bytes of unregistered data in the file ^FILE - "
+                                 "^MESSAGE", &hds_gl_status, len );
                         break;
                      }
                      if ( !where ) where = start;
