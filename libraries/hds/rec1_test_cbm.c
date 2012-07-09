@@ -2,6 +2,9 @@
 #  include <config.h>
 #endif
 
+#include "hds1.h"
+#include "rec1.h"
+
    int rec1_test_cbm( const unsigned char cbm[ 2 ], int start, int nchip )
    {
 /*+                                                                         */

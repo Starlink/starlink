@@ -2,6 +2,9 @@
 #  include <config.h>
 #endif
 
+#include "hds1.h"
+#include "rec1.h"
+
    void rec1_set_cbm( unsigned char cbm[ 2 ], int nchip, int pos )
    {
 /*+                                                                         */

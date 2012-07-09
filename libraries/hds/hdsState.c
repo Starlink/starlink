@@ -7,6 +7,9 @@
 #include "hds1.h"                /* Global definitions for HDS              */
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+
+#include "hds.h"
+
 #define TRUE  1
 #define FALSE 0
 
