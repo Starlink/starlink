@@ -23,4 +23,5 @@ Astro::FITS::HdrTrans
 Astro::FITS::Header
 Astro::WaveBand
 Astro::Catalog
+App::SourcePlot
 
