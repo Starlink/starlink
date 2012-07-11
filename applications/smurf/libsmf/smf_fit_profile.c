@@ -197,8 +197,8 @@ int comp2( const void *s1, const void *s2 );
 int comp3( const void *s1, const void *s2 );
 int comp4( const void *s1, const void *s2 );
 
-static double getresidual( smf_math_function fid, const double fdata[], 
-                           int ndat, int gaussiansfound, double *Destimates,
+static double getresidual( const double fdata[], int ndat, 
+                           int gaussiansfound, double *Destimates,
 			   double zerolev );
 
 
@@ -753,6 +753,8 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 #endif
 	zerolev = 0.0;
       }
+      /* RPT: fix xerolevel at 0 */
+      zerolev = 0.0;
 
       int nfound = 0;
       int nestim = 0;
@@ -775,7 +777,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 
           if ( model_only != YES ) {
 	    /* For the fit store the zerolevel at the end of the parlist */
-	    parlist[npar*icomp+0] = zerolev;
+	    parlist[MAXPAR-3] = zerolev;
 
 	    /*----------------------------------------*/
 	    /* Get initial Estimates                  */
@@ -814,6 +816,10 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 	  iters = dolsqfit( fid, pcoord, fdata, weight, npts, parlist,
 			    errlist, fitmask, npar, &nfound, range, critamp,
 			    critdisp, tol, its, lab, fitopt );
+
+          if ( iters < 0 ) {
+            nfound = 0;
+	  }
 
 #if (MAXDEBUGINFO)
 	  msgOutiff(MSG__DEBUG, " ",
@@ -872,7 +878,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 	    fitval[index] = parlist[(j-1)*npar+i];
 	    fiterr[index] = errlist[(j-1)*npar+i];
 	  } else if ( i == NPAR-1 ) { /* function id in last plane */
-	    fitval[index] = (double) fid;
+            fitval[index] = (double) fid;
 	    fiterr[index] = 0;
 	  } else {
 	    fitval[index] = VAL__BADD;
@@ -898,6 +904,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 	  value = 0.0;
 	}
 
+        /* RPT: Only positive values since no baseline */
         if ( value < 0.0 )
 	  value = 0.0;
 
@@ -1001,8 +1008,8 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
    /*----------------------------------------------------------*/
 
    if (iters < 0) {
-      int   offset = nfound * 3;           /* Reserved for the estimates */
-      for (i = offset; i < MAXPAR; i++) {
+      int   offset = nfound * npar;        /* Reserved for the estimates */
+      for (i = 0; i < MAXPAR; i++) {
          parlist[i] = VAL__BADD;
       }
       nfound = 0;
@@ -1012,6 +1019,7 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
      double refpix = 0.5*(pcoord[0]+pcoord[npts-1]);
 
      int nremaining = nfound;
+     int inpfound = nfound;
 
      /* Weed out fits with fitted peak outside range (can arise from
         edge effects */
@@ -1092,6 +1100,12 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
      if (sortopt > -1 && nfound > 1) {
        mysort( sortopt, refpix, parlist, errlist, npar, nfound );
      }
+
+     /* Log fact that all fits were rejected */
+     if ( nfound ==0 && inpfound > 0 ) {
+       iters = -10 - inpfound;
+     }
+
    }
 
    /* return number of components found */
@@ -1140,7 +1154,7 @@ static int getestimates( smf_math_function fid, const double fdata[], const floa
 #endif
 
    /* Get constant zerolevel */
-   zerolev = parlist[ncomp*npar+0];
+   zerolev = parlist[MAXPAR-3];
 
    rms = fabs( rms );
    usedQ = VAL__BADR;
@@ -1260,7 +1274,7 @@ static int getestimates( smf_math_function fid, const double fdata[], const floa
                    Q );
 	    gaussiansfound = MYMIN( gaussiansfound, ncomp );
 	    if (gaussiansfound > 0) {
-	      residual = getresidual( fid, work, npts, gaussiansfound,
+	      residual = getresidual( work, npts, gaussiansfound,
 				      Destimates, zerolev );
 
 	       /* anyoutf( DEBUG, "Residual for q[%d] = %d: %f", k, smoothingpar[k], residual );*/
@@ -1611,8 +1625,7 @@ static void mysort( int sortopt, double refpix, double *parlist,
 }
 
 
-static double getresidual( smf_math_function fid,
-			   const double fdata[],
+static double getresidual( const double fdata[],
                            int         npts,
                            int         gaussiansfound,
                            double     *Destimates,
@@ -1623,12 +1636,13 @@ static double getresidual( smf_math_function fid,
 /*          Q, the smoothing parameter.                       */
 /*------------------------------------------------------------*/
 {
+   smf_math_function fid = SMF__MATH_GAUSS; /* Estimates alwways gaussians */
+
    int     npar = 3;    /* It is always a standard gauss -> npar=3 */
    int     nvar;        /* Total number of variables */
    int     iopt[1];     /* Option array for smf_math_functions */
    int     i;
    double  chi2 = 0.0;
-
 
    /* Note that the number of gaussians found in the estimate */
    /* routine never exceeds the maximum number of components  */
