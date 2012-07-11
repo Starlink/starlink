@@ -1200,8 +1200,8 @@ static void convert_fitted_values( smfData *data,
   for ( icomp = 1; icomp < ncomp+1; icomp++ ) {
 
     /* Loop over planes in each component: 1=Centre, 2=Dispersions, etc.
-       skip 0=Amp */
-    for ( ipar = 1; ipar < NPAR; ipar++ ) {
+       skip 0=Amp and final plane with FID */
+    for ( ipar = 1; ipar < NPAR-1; ipar++ ) {
 
       /* Go through the process twice: first to get values
 	 then to write the converted values back */
