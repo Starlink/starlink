@@ -139,7 +139,7 @@
 *                 f = A * Exp[ 0.5 * g^2 ] *
 *                     { 1 + h3 * [ c1*g + c3*g^3 ] +
 *                           h4 * [ c0 + c2*g^2 + c4*g^4 ] }
-*              with c1 = 2.0*sqrt(3.0)/3.0, c2 = sqrt(3.0),
+*              with c1 =-sqrt(3.0), c3 = 2.0*sqrt(3.0)/3.0,
 *              c0 = sqrt(6.0)/4.0, c2 = -sqrt(6.0), c4 = sqrt(6.0)/3.0
 *
 *
@@ -398,23 +398,23 @@ static double gauss( double  X,
 
    for (i = 0; i < nfunc; i++)
    {
-      double  E, arg;                  /* Exponent and its argument */
+     double  E, F, arg;                /* Exponent and its argument */
       int     offset = i * npar;
 
       A  = fpar[offset];  X0 = fpar[1+offset];  s = fpar[2+offset];
       X_X0 = X - X0;
 
-      if (A == 0.0 || s == 0.0)
-	E = 0.0;
-      else
+      E = 0.0;
+      if (A != 0.0 && s != 0.0)
       {
-         arg = 0.5*(X_X0/s)*(X_X0/s);
+         F = X_X0 / s;
+         arg = 0.5 * F*F;
          if (-arg > MINARG)         /* 'MINARG' is a global variable */
+	 {
             E = exp( -arg );
-         else
-            E = 0.0;
+	    result += A * E;
+	 }
       }
-      result += A * E;
    }
    if (iopt != NULL && iopt[0] == 1) {
      result += fpar[nfunc*npar+0] + fpar[nfunc*npar+1]*X_X0 +
@@ -466,34 +466,30 @@ static void gaussderv( double  X,
    for (i = 0; i < nfunc; i++)
    {
       int     offset = i * npar;
-      double  E, arg;                  /* Exponent and its argument */
+      double  E, F, arg;               /* Exponent and its argument */
       double  AEX_X0;                  /* A*(X-Xc)*E  */
 
       A  = fpar[offset];  X0 = fpar[1+offset];  s = fpar[2+offset];
 
       X_X0 = X - X0;
 
-      if ( s == 0.0 )
-         E = 0.0;
-      else
-      {
-	arg = 0.5*((X_X0)/s)*((X_X0)/s);
-	if (-arg > MINARG)
-	  E = exp( -arg );
-	else
-	  E = 0.0;
-      }
-
-      AEX_X0 = A * E * X_X0;
-
+      E = 0.0;
       epar[0+offset] = E;               /* Derivative wrt. Amplitude A */
+      epar[1+offset] = 0.0;                     /* Derv. wrt Center Xc */
+      epar[2+offset] = 0.0;                     /* Derv. wrt. dispersion */
 
-      if ( s == 0 ) {
-	epar[1+offset] = 0.0;
-	epar[2+offset] = 0.0;
-      } else {
-	epar[1+offset] = AEX_X0/s/s;         /* Derv. wrt Center Xc */
-	epar[2+offset] = AEX_X0*X_X0/s/s/s;  /* Derv. wrt. dispersion */
+      if ( s != 0.0 )
+      {
+        F = X_X0 / s;
+	arg = 0.5 * F*F;
+	if (-arg > MINARG)
+	{
+           E = exp( -arg );
+           AEX_X0 = A * E * X_X0;
+           epar[0+offset] = E;               /* Derivative wrt. Amplitude A */
+  	   epar[1+offset] = AEX_X0/s/s;         /* Derv. wrt Center Xc */ 
+	   epar[2+offset] = AEX_X0*X_X0/s/s/s;  /* Derv. wrt. dispersion */
+	}
       }
 
    }
@@ -551,21 +547,21 @@ static double gausshermiteh3( double  X,
       h3  = fpar[3+i*npar];
 
       X_X0 = X - X0;
-      F = X_X0/s;
 
-      if (A == 0.0 || s == 0.0)
-         E = 0.0;
-      else
+      E = 0.0;
+      if (A != 0.0 && s != 0.0)
       {
-         arg = 0.5 * F * F;
+         F = X_X0 / s;
+         arg = 0.5 * F*F;
          if (-arg > MINARG)         /* 'MINARG' is a global variable */
+	 {
             E = exp( -arg );
-         else
-            E = 0.0;
+	    E *= ( 1.0 + h3 * F * (c1 + c3*F*F) );
+	    result += A * E;
+	 }
       }
-      E *= ( 1.0 + h3 * F * (c1 + c3*F*F) );
-      result += A * E;
    }
+
    /* Add background components */
    if (iopt != NULL && iopt[0] == 1) {
      result += fpar[nfunc*npar+0] + fpar[nfunc*npar+1]*X_X0 +
@@ -607,37 +603,33 @@ static void gausshermiteh3derv( double  X,
 
       X_X0 = X - X0;
 
-      if (s == 0.0)
-         E = 0.0;
-      else
+      E = 0.0;
+      epar[0+i*npar] = 0.0;
+      epar[1+i*npar] = 0.0;
+      epar[2+i*npar] = 0.0;
+      epar[3+i*npar] = 0.0;
+
+      if (s != 0.0)
       {
-         arg = 0.5 * (X_X0/s) * (X_X0/s);
+	F = X_X0 / s;
+	arg = 0.5 * F*F;
          if (-arg > MINARG)         /* 'MINARG' is a global variable */
+	 {
             E = exp( -arg );
-         else
-            E = 0.0;
-      }
-      if (E == 0.0) {
-         F = Q = 0.0;
-	 epar[0+i*npar] = 0.0;
-	 epar[1+i*npar] = 0.0;
-	 epar[2+i*npar] = 0.0;
-	 epar[3+i*npar] = 0.0;
-      } else {
-         F = X_X0 / s;
-         Q = F * (c1 + c3*F*F);
+	    Q = F * (c1 + c3*F*F);
 
-	 /* Diff amplitude A */
-	 epar[0+i*npar] = E * (1.0 + h3*Q);
+	    /* Diff amplitude A */
+	    epar[0+i*npar] = E * (1.0 + h3*Q);
 
-	 /* Diff center X0 */
-	 epar[1+i*npar] = (A*E/s) * ( -h3*(c1+3.0*c3*F*F) + F*(1.0+h3*Q) );
+	    /* Diff center X0 */
+	    epar[1+i*npar] = (A*E/s) * ( -h3*(c1+3.0*c3*F*F) + F*(1.0+h3*Q) );
 
-	 /* Diff sigma_0 s0 */
-	 epar[2+i*npar] = F * epar[1+i*npar];
+	    /* Diff sigma_0 s0 */
+	    epar[2+i*npar] = F * epar[1+i*npar];
 
-	 /*  Diff h3 */
-	 epar[3+i*npar] = A*E*Q;
+	    /*  Diff h3 */
+	    epar[3+i*npar] = A*E*Q;
+	 }
       }
 
    }
@@ -700,20 +692,19 @@ double gausshermiteh3h4( double  X,
       h4  = fpar[4+i*npar];
 
       X_X0 = X - X0;
-      F = X_X0/s;
 
-      if (A == 0.0 || s == 0.0)
-         E = 0.0;
-      else
+      E = 0.0;
+      if (A != 0.0 && s != 0.0)
       {
+	 F = X_X0 / s;
          arg = 0.5 * F * F;
          if (-arg > MINARG)         /* 'MINARG' is a global variable */
+	 {
             E = exp( -arg );
-         else
-            E = 0.0;
+	    E *= ( 1.0 + h3*F*(c3*F*F+c1) + h4*(c0+F*F*(c2+c4*F*F)) );
+	    result += A * E;
+         }
       }
-      E *= ( 1.0 + h3*F*(c3*F*F+c1) + h4*(c0+F*F*(c2+c4*F*F)) );
-      result += A * E;
    }
    /* Add background components */
    if (iopt != NULL && iopt[0] == 1) {
@@ -761,44 +752,40 @@ static void gausshermiteh3h4derv( double  X,
 
       X_X0 = X - X0;
 
-      if (s == 0.0)
-         E = 0.0;
-      else
+      E = 0.0;
+      epar[0+i*npar] = 0.0;
+      epar[1+i*npar] = 0.0;
+      epar[2+i*npar] = 0.0;
+      epar[3+i*npar] = 0.0;
+      epar[4+i*npar] = 0.0;
+
+      if (s != 0.0)
       {
          arg = 0.5 * (X_X0/s) * (X_X0/s);
          if (-arg > MINARG)         /* 'MINARG' is a global variable */
+	 {
             E = exp( -arg );
-         else
-            E = 0.0;
-      }
-      if (E == 0.0) {
-         F = Q3 = Q4 = 0.0;
-   	 epar[0+i*npar] = 0.0;
-	 epar[1+i*npar] = 0.0;
-	 epar[2+i*npar] = 0.0;
-	 epar[3+i*npar] = 0.0;
-	 epar[4+i*npar] = 0.0;
-      } else {
-         F = X_X0 / s;
-         Q3 = F * (c3*F*F+c1);
-         Q4 = c0 + F*F*(c2+c4*F*F);
+	    F = X_X0 / s;
+	    Q3 = F * (c3*F*F+c1);
+	    Q4 = c0 + F*F*(c2+c4*F*F);
 
-	 /* Diff amplitude A */
-	 epar[0+i*npar] = E * (1.0 + h3*Q3 + h4*Q4);
+	    /* Diff amplitude A */
+	    epar[0+i*npar] = E * (1.0 + h3*Q3 + h4*Q4);
 
-	 /* Diff center X0 */
-	 epar[1+i*npar] = (A*E/s) *(
+	    /* Diff center X0 */
+	    epar[1+i*npar] = (A*E/s) *(
                          -h3*(c1+3.0*c3*F*F) - 2.0*h4*F*(c2+2.0*c4*F*F)
                          + F*(1.0+h3*Q3+h4*Q4) );
 
-	 /* Diff sigma */
-	 epar[2+i*npar] = F * epar[1+i*npar];
+	    /* Diff sigma */
+	    epar[2+i*npar] = F * epar[1+i*npar];
 
-	 /*  Diff h3 */
-	 epar[3+i*npar] = A*E*Q3;
+	    /*  Diff h3 */
+	    epar[3+i*npar] = A*E*Q3;
 
-	 /*  Diff h4 */
-	 epar[4+i*npar] = A*E*Q4;
+	    /*  Diff h4 */
+	    epar[4+i*npar] = A*E*Q4;
+	 }
       }
    }
 
