@@ -396,21 +396,6 @@
 *     wider interpolation kernel (if resampling) or spreading function
 *     (if rebinning), at the cost of degraded resolution.
 *
-*     - Regular patterns of curvy lines covering the whole output image
-*     can be created when using the rebinning algorithm.  These are
-*     caused by a beating effect between the input pixel positions and
-*     the output pixel's position, and their nature and strength depend
-*     critically upon the nature of the Mapping and the spreading
-*     function being used. In general, the nearest-neighbour spreading
-*     function demonstrates this effect more clearly than the other
-*     functions, and for this reason should be used with caution. Again,
-*     wider spreading functions reduce the effect at the cost of
-*     degraded resolution. Note, the resampling algorithm is not subject
-*     to these artifacts. For this reason, you may prefer to use the
-*     resampling algorithm with the CONSERVE parameter set to TRUE. This
-*     causes the resampling algorithm to perform approximate flux
-*     conservation.
-*
 *     - The approximation of the Mapping using a piece-wise linear
 *     transformation (controlled by paremeter ACC) can produce artifacts
 *     at the joints between the panels of the approximation. These can
@@ -422,13 +407,15 @@
 
 *  Copyright:
 *     Copyright (C) 1998-1999, 2001-2002, 2004 Central Laboratory of
-*     the Research Councils. Copyright (C) 2005 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     the Research Councils.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2011-2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -438,8 +425,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
