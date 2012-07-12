@@ -21,14 +21,30 @@
 *        Pointer to global status.
 
 *  Description:
-*     This command can be used to fit 1-D profiles, e.g. gaussians
-*     in a datacube.
+*     This command can be used to fit 1-D profiles, e.g. gaussians in a 
+*     datacube.
+*  
+*     This is a preliminary release of FIT1D. The routine can fit complex 
+*     spectra with multiple components in a data-cube (actually: fit 
+*     along any axis of a hyper-cube). It is multi-threaded and capable
+*     fitting a large number (i.e. of order a million) of spectra in a
+*     few minutes, depending of course on the number of cores available. 
+*     It borrows heavily from the 'xgaufit' routine of the GIPSY package. 
+*     The type of profiles that can be fitted and have been tested are 
+*     'gaussian', 'gausshermite1' (gaussian with asym. wings), and 
+*     'gausshermite2' (peaky gaussians possibly with asym. wings). 
+*     The input cube is expected to have been baselined. 
+*     Output is a (hyper-)cube with the fitted profiles. 
 
-* Parameters:
-*     MSG_FILTER = _CHAR (Read)
-*          Control the verbosity of the application. Values can be
-*          NONE (no messages), QUIET (minimal messages), NORMAL,
-*          VERBOSE, DEBUG or ALL. [NORMAL]
+*     It also stores cubes with the parameters for each fitted component 
+*     in the HDS header as COMP_1,..., COMP_N. For a gaussian the planes 
+*     in these cubes correspond to: amplitude, position, fwhm. 
+*     A default config file is in $SMURF_DIR/smurf_fit1d.def. 
+*     Please note that this routine is still under active development.
+* 
+*     USE: fit1d in=in.sdf out=out.sdf rms=... config=^xxx.def
+*
+*  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input file(s).
 *     RMS = DOUBLE (Read) 
@@ -46,7 +62,14 @@
 *               data segment (spectrum)
 *          - MINAMP = minimum fitted amplitude in terms of RMS
 *          - MINDISP = minimum fitted dispersion to accept in pixels
+*     OUT = NDF (Write)
+*          Output file(s) with the fitted profiles
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a null value is supplied no file is created. [!]
 *     DIAGNDF = GROUP (READ)
+*          (NOT YET USED/TESTED!)
 *          Name of NDF to use as parameter file COMP_0 with diagnostics
 *          and baseline parameters. This component can usually be omitted
 *          unless access to the baseline is needed. This parameter can also
@@ -54,6 +77,7 @@
 *          interpreted to start with COMP_0, i.e. COMP_0, COMP_1 .. COMP_N.
 *          (This parameter is hidden).
 *     PARNDFS = GROUP (Read)
+*          (NOT YET USED/TESTED!)
 *          Name of NDF(s) to use for parameter files COMP_1 .. COMP_N with
 *          parameters for the function(s). These values will be used as
 *          initial values for further processing: for the fit or to generate
@@ -64,6 +88,7 @@
 *          'filename.MORE.SMURF_FIT1D' all the components in the extension
 *          will be copied. (This parameter is hidden).
 *     USERVAL = GROUP (Read)
+*          (NOT YET USED/TESTED!)
 *          Config-style input file with user supplied fixed values or
 *          initial estimates for the fit. Entries are of the form
 *          'letter''number' = ( val1, val2 ) or ... = val1. Val1 is the
@@ -77,16 +102,127 @@
 *             Voigt    a = amplitude, x = position, f = fwhm, l = lorentzian.
 *             Polynominal: c0, c1, c2, ... = c0 + c1*x + c2*x^2 + ...
 *             (Optional) Zerolevel: z0, z1, z2 ( = z0 + z1*x + z2*x^2 )
-*     OUT = NDF (Write)
-*          Output file(s) with the fitted profiles
-*     OUTFILES = LITERAL (Write)
-*          The name of text file to create, in which to put the names of
-*          all the output NDFs created by this application (one per
-*          line). If a null (!) value is supplied no file is created. [!]
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          NONE (no messages), QUIET (minimal messages), NORMAL,
+*          VERBOSE, DEBUG or ALL. [NORMAL]
 
-*  Related Applications:
+*  CONFIGURATION FILE:
+*     A default configuration file can be found at 
+*                     $SMURF_DIR/smurf_fit1d.def:
+*     AXIS = 0
+*          Axis the fit along (nr starting at 1). '0' translates fit along
+*          highest dimension i.e. Vlsr in a Ra, Dec, Vlsr cube.
+*     RANGE = <undef>
+*          Coordinate range along axis to find and fit profiles. The 
+*          format is (x1, x2) including the (). 
+*          E.g. Vlsr -20 35: (-20,35). 
+*          Default is to use the full extent of the axis.
+*     FUNCTION = gauss
+*          Function to fit. See documentation: currently implemented are 
+*          gaussian, gausshermite1, gausshermite2, voigt, polynomial.
+*     NCOMP = 3
+*          Maximum number of 'component' functions to fit to each
+*          profile, e.g.  a multi-component spectrum of max. 3
+*          gaussians. [Note: The complete fit of the gaussians and an
+*          optional zerolevel is done concurrently, not iteratively
+*          starting e.g. with the strongest component]. The routine will
+*          try to find and fit ncomp functions along each profile, but
+*          may settle for less.
+*     MINAMP = 3
+*          Minimum value for the Amplitude to accepts as a genuine fit
+*          in terms of the rms. Based on the amplitude alone, at 3-sigma
+*          5% of the profiles selected for fitting can be expected to be
+*          noise spikes. This value drops to 2% for 5-sigma. All
+*          assuming gaussian statistics of course.  Applies to Gauss*
+*          and Voigt fits only.
+*     MINFWHM = 1.88
+*          Minimum value for the FHWM (~2.35*Dispersion) to accepts as a
+*          genuine fit in terms of ==PIXELS== (!).  
+*          Applies to Gauss* and Voigt fits only.
+*     ESTIMATE_ONLY = 0
+*          Set to 1: The output cube will have the results from the
+*          initial estimates routine instead of the the fit.  Good
+*          initial estimates are critical for the fit and checking
+*          and/or fixing initial estimates may help solve problems.
+*     MODEL_ONLY = 0
+*          Set to 1: Bypass both the initial estimates and fitting
+*          routine and generate profiles directly from the supplied
+*          input parameter cube(s) and/or user supplied fixed values.
+*          Not supplying all parameters will generate an error.
 
-*  Notes:
+*  IMPORTANT INFORMATION:             
+*      FUNCTIONS
+*
+*      The function menu provides the choice of four functions of which 
+*      you can fit the parameters to the data in your profiles.               
+* 
+*      1) A standard Gaussian. Parameters are amplitude, center, and 
+*         dispersion,
+*
+*      NOTE that if one of h3 and h4 is not zero, the mean of the distribution
+*      is not the position of the maximum. 
+*      (Reference; Marel, P. van der, Franx, M., A new method for the 
+*      identification of non-gaussian line profiles in elliptical galaxies. 
+*      A.J., 407 525-539, 1993 April 20).
+*
+*      2) Gauss-Hermite1 polynomial (h3). Parameters are a,b,c, (which 
+*         are *NOT* the same as maximum amplitude, center and dispersion!) 
+*         and h3:
+*                  maximum ~= [determine value and position of max from
+*                              fitted profiles using e.g. collapse]
+*                   center ~= b + h3*sqrt(3)
+*               dispersion ~= abs( c*(1-3h3^2) ) ~= c
+*                 skewness ~= 4*sqrt(3)*h3
+*      3) Gauss-Hermite1 polynomial (h3, h4). Same as above, but an extra 
+*         parameter h4 is included.
+*                  maximum ~= [determine value and position of max from
+*                              fitted profiles using e.g. collapse]
+*                   center ~= b + h3*sqrt(3)
+*               dispersion ~= abs( c*(1+h4*sqrt(6)) )
+*                 skewness ~= 4*sqrt(3)*h3
+*                 kurtosis ~= 8*sqrt(6)*h4
+*      4) Voigt. Parameters are a,b,c,d: Area, center, Doppler and 
+*         Lorentzian HWHM
+*                     area ~= [determine value of max from fitted
+*                              profiles using e.g. collapse]
+*                   center ~= b
+*             doppler fwhm ~= abs( 2*c )
+*          lorentzian fwhm ~= abs( 2*d )
+*               
+*      The fitted parameters are stored in the file header as
+*      FILE.MORE.SMURF_FIT1D.COMP_0 to COMP_N, with N depending on how many 
+*      components are being fitted. These are regular data cubes that can be
+*      inspected with e.g. Gaia or extracted using NDFCOPY. The 'planes' in 
+*      the cubes are:
+*   
+*      COMP_0 diagnostics info, planes: 
+*           1 = number of components found
+*           2 = fit error: (see below)
+*
+*      COMP_1..N fitted profiles, planes:
+*           1 = amplitude (gaussian); 'a' (gausshermite)
+*           2 = position  (gaussian); 'b' (gausshermite)
+*           3 = fwhm      (gaussian); 'c' (gausshermite)
+*           4 = 'h3'      (gausshermite1,2)
+*           5 = 'h4'      (gausshermite2)
+*           last: function id
+*               1 = gaussian; 2 = gausshermite1 (h3); 
+*               3 = gausshermite2 (h3,h4), 4 = voigt
+*
+*     FIT ERRORS:
+*         >0   Number of iterations needed to achieve convergence
+*                according to TOL.
+*         -1   Too many free parameters, maximum is 32.
+*         -2   No free parameters.
+*         -3   Not enough degrees of freedom.
+*         -4   Maximum number of iterations too small to obtain a
+*                solution which satisfies TOL.
+*         -5   Diagonal of matrix contains elements which are zero.
+*         -6   Determinant of the coefficient matrix is zero.
+*         -7   Square root of negative number.
+*         <-10 All fitted components rejected due to minamp, minfwhm,
+*                or range constraints.
 
 *  Authors:
 *     Remo Tilanus (JAC, Hawaii)
@@ -96,8 +232,6 @@
 *     2010-09-29 (RPT):
 *        Initial test version from smurf_remsky
 *     {enter_further_changes_here}
-
-*  Notes:
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
