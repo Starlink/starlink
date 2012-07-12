@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.39}
 \newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2012 May 22}
+\newcommand{\stardocdate}      {2012 July 10}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -58372,6 +58372,9 @@ The following applications have been modified:
          spectral cube is aligned with a two-dimensional image, the resulting
          output NDF would be a three-dimensional cube, aligned spatially
          with the image.
+        \item This now performs an extra normalisation step at the end to
+         remove the effects of aliasing between the input and output pixel
+         grids.
       \end{itemize}
 
 \end{description}

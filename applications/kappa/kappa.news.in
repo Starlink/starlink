@@ -136,6 +136,9 @@
       three-dimensional spectral cube is aligned with a
       two-dimensional image, the resulting output NDF would be a
       three-dimensional cube, aligned spatially with the image.
+      -  This now performs an extra normalisation step at the end to
+      remove the effects of aliasing between the input and output pixel
+      grids.
 
 1 KAPPA_Version_1.12
 
