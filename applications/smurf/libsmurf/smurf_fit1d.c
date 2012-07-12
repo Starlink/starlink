@@ -24,33 +24,33 @@
 *     fit1d in out rms config
 
 *  Description:
-*     This command can be used to fit 1-D profiles, such as gaussians, 
-*     along an axis of a multi-dimensional datacube 
-*  
-*     This is a preliminary release of FIT1D. The routine can fit complex 
-*     spectra with multiple components in a data-cube (actually: fit 
+*     This command can be used to fit 1-D profiles, such as gaussians,
+*     along an axis of a multi-dimensional datacube
+*
+*     This is a preliminary release of FIT1D. The routine can fit complex
+*     spectra with multiple components in a data-cube (actually: fit
 *     along any axis of a hyper-cube). It is multi-threaded and capable of
 *     fitting a large number of (i.e. order a million) spectra in a few
-*     minutes, depending of course on the number of cores available. 
-*     It borrows heavily from the "xgaufit" routine of the GIPSY package. 
-*     The type of profiles that can be fitted and have been tested are 
-*     "gaussian", "gausshermite1" (gaussian with asym. wings), and 
-*     "gausshermite2" (peaky gaussians possibly with asym. wings). 
-*     The input cube is expected to have been baselined. 
-*     Output is a (hyper-)cube with the fitted profiles. 
+*     minutes, depending of course on the number of cores available.
+*     It borrows heavily from the "xgaufit" routine of the GIPSY package.
+*     The type of profiles that can be fitted and have been tested are
+*     "gaussian", "gausshermite1" (gaussian with asym. wings), and
+*     "gausshermite2" (peaky gaussians possibly with asym. wings).
+*     The input cube is expected to have been baselined.
+*     Output is a (hyper-)cube with the fitted profiles.
 
-*     It also stores cubes with the parameters for each fitted component 
-*     in the HDS header as COMP_1,..., COMP_N. For a gaussian the planes 
-*     in these cubes correspond to: amplitude, position, fwhm. 
-*     A default config file is in $SMURF_DIR/smurf_fit1d.def. 
+*     It also stores cubes with the parameters for each fitted component
+*     in the HDS header as COMP_1,..., COMP_N. For a gaussian the planes
+*     in these cubes correspond to: amplitude, position, fwhm.
+*     A default config file is in $SMURF_DIR/smurf_fit1d.def.
 *     Please note that this routine is still under active development.
-* 
+*
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*          Baselined input file(s). 
+*          Baselined input file(s).
 *     OUT = NDF (Write)
 *          Output file(s) with the fitted profiles.
-*     RMS = DOUBLE (Read) 
+*     RMS = DOUBLE (Read)
 *          RMS in input NDF(s) in data units.
 *     CONFIG = GROUP (Read)
 *          Specifies values for the configuration parameters used by the
@@ -102,19 +102,19 @@
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 
 *  Configuration File:
-*     A default configuration file can be found at 
+*     A default configuration file can be found at
 *                     $SMURF_DIR/smurf_fit1d.def:
 *     AXIS = INTEGER
-*          Axis the fit along (nr starting at 1). A value of 0 translates 
+*          Axis the fit along (nr starting at 1). A value of 0 translates
 *          as fit along highest dimension i.e. Vlsr in a Ra, Dec, Vlsr cube.
 *          [0]
 *     RANGE (2) = REAL
-*          Coordinate range along axis to find and fit profiles. The 
-*          format is (x1, x2) including the (). 
-*          E.g. Vlsr -20 35: (-20,35). 
-*          Default is to use the full extent of the axis: [<undef>] 
+*          Coordinate range along axis to find and fit profiles. The
+*          format is (x1, x2) including the ().
+*          E.g. Vlsr -20 35: (-20,35).
+*          Default is to use the full extent of the axis: [<undef>]
 *     FUNCTION = STRING
-*          Function to fit. See documentation: currently implemented are 
+*          Function to fit. See documentation: currently implemented are
 *          gaussian, gausshermite1, gausshermite2, voigt, polynomial.
 *          [gaussian]
 *     NCOMP = INTEGER
@@ -134,10 +134,10 @@
 *          and Voigt fits only. [3]
 *     MINFWHM = REAL
 *          Minimum value for the FHWM (~2.35*Dispersion) to accept as a
-*          genuine fit in terms of ==PIXELS==(!).  
+*          genuine fit in terms of ==PIXELS==(!).
 *          Applies to Gauss* and Voigt fits only. [1.88]
 *     MAXLORZ = REAL
-*          Maximum value for the  FHWM of the Loretzian component in 
+*          Maximum value for the  FHWM of the Loretzian component in
 *          terms of ==PIXELS==(!). A negative value implies no constraint.
 *          Applies Voigt fits only. [-1]
 *     ESTIMATE_ONLY = LOGICAL
@@ -151,23 +151,23 @@
 *          input parameter cube(s) and/or user supplied fixed values.
 *          Not supplying all parameters will generate an error. [0]
 
-*  Important Information:             
+*  Important Information:
 *     FUNCTIONS
 *
-*     The function menu provides the choice of four functions for which 
-*     you can fit the parameters to the data in your profiles.            
-* 
-*     1) A standard GAUSSIAN. Parameters are amplitude, center, and 
+*     The function menu provides the choice of four functions for which
+*     you can fit the parameters to the data in your profiles.
+*
+*     1) A standard GAUSSIAN. Parameters are amplitude, center, and
 *        dispersion,
 *
-*     NOTE that if one of h3 and h4 is not zero, the mean of the 
-*     distribution is not the position of the maximum. 
-*     (Reference; Marel, P. van der, Franx, M., A new method for the 
-*     identification of non-gaussian line profiles in elliptical galaxies. 
+*     NOTE that if one of h3 and h4 is not zero, the mean of the
+*     distribution is not the position of the maximum.
+*     (Reference; Marel, P. van der, Franx, M., A new method for the
+*     identification of non-gaussian line profiles in elliptical galaxies.
 *     A.J., 407 525-539, 1993 April 20).
 *
-*     2) GAUSS-HERMITE1 polynomial (h3). Parameters are a,b,c, (which 
-*        are *NOT* the same as maximum amplitude, center and dispersion!) 
+*     2) GAUSS-HERMITE1 polynomial (h3). Parameters are a,b,c, (which
+*        are *NOT* the same as maximum amplitude, center and dispersion!)
 *        and h3:
 *                 maximum ~= [determine value and position of max from
 *                             fitted profiles using e.g. collapse]
@@ -175,7 +175,7 @@
 *              dispersion ~= abs( c*(1-3h3^2) ) ~= c
 *                skewness ~= 4*sqrt(3)*h3
 *
-*     3) GAUSS-HERMITE2 polynomial (h3, h4). Same as above, but an extra 
+*     3) GAUSS-HERMITE2 polynomial (h3, h4). Same as above, but an extra
 *        parameter h4 is included.
 *                 maximum ~= [determine value and position of max from
 *                             fitted profiles using e.g. collapse]
@@ -191,14 +191,14 @@
 *                  center ~= b
 *            doppler fwhm ~= abs( 2*c )
 *         lorentzian fwhm ~= abs( 2*d )
-*              
+*
 *     The fitted parameters are stored in the file header as
-*     FILE.MORE.SMURF_FIT1D.COMP_0 to COMP_N, with N depending on how many 
+*     FILE.MORE.SMURF_FIT1D.COMP_0 to COMP_N, with N depending on how many
 *     components are being fitted. These are regular data cubes that can be
-*     inspected with e.g. Gaia or extracted using NDFCOPY. The 'planes' in 
+*     inspected with e.g. Gaia or extracted using NDFCOPY. The 'planes' in
 *     the cubes are:
-*   
-*     COMP_0 diagnostics info, planes: 
+*
+*     COMP_0 diagnostics info, planes:
 *          1 = number of components found
 *          2 = fit error: (see below)
 *
@@ -209,7 +209,7 @@
 *          4 = 'h3'      (gausshermite1,2)
 *          5 = 'h4'      (gausshermite2)
 *          last: function id
-*              1 = gaussian; 2 = gausshermite1 (h3); 
+*              1 = gaussian; 2 = gausshermite1 (h3);
 *              3 = gausshermite2 (h3,h4), 4 = voigt
 *
 *     FIT ERRORS:
@@ -958,8 +958,8 @@ static void convert_range_to_pixels ( AstMapping **wcsmap, double *range,
   prange[1] = (int) (lrange[1]+0.5);
 
   if ( range[0] == VAL__BADD ) {
-     msgOutiff(MSG__VERB, " ", 
-          "Range undefined => Full pixel range: %d to %d\n",  
+     msgOutiff(MSG__VERB, " ",
+          "Range undefined => Full pixel range: %d to %d\n",
           status, prange[0], prange[1]);
   } else {
      msgOutiff(MSG__VERB, " ", "Range %f to %f => Pixel range: %d to %d\n",
