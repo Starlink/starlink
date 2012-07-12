@@ -66,6 +66,12 @@ minamp = 3
 
 minfwhm = 1.88
 
+# Maximum value for the  FHWM of the Loretzian component in terms of 
+# ==PIXELS== (!). A negative value implies no constraint.
+# Voigt fits only.
+
+maxlorz = -1.0
+
 # Two options that bypass the actual fitting:
 #
 # - estimate_only: The output cube will have the results from the

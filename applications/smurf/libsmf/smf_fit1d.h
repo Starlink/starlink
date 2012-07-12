@@ -33,7 +33,7 @@ typedef struct {
   double clip[2];                 /* Clip levels for data */
   double rms;                     /* RMS in data */
   double critamp;                 /* Minimal Amplitude */
-  double critdisp;                /* Mimimal Dispersion */
+  double critdisp[2];             /* Mimimal Dispersions */
   int    estimate_only;           /* Initial estimates only, do not fit */
   int    model_only;              /* Generate model from suppplied params */
 } fitStruct;                      /* fit control struct */

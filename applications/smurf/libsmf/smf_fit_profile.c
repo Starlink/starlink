@@ -171,14 +171,14 @@ static void FitProfileThread( void *job_data_ptr, int *status );
 static int getestimates( smf_math_function fid, const double fdata[], 
                          const float weight[], int ndat,
                          double *parlist, int npar, int ncomp, double rms,
-                         double critamp, double critdisp,
+                         double critamp, double critdisp[],
                          const int smoothingpar[], int numq );
 
 static int dolsqfit(  smf_math_function fid, const double pcoord[], 
                       const double fdata[], float *weight,  int npts, 
                       double *parlist, double *errlist, const int fitmask[], 
                       int npar, int *ncomp, const int range[], double critamp,
-                      double critdisp, float tol, int its, float lab, 
+                      double critdisp[], float tol, int its, float lab, 
                       int *fitopt );
 
 static void adjustestimates( smf_math_function fid, int nfound, 
@@ -508,7 +508,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
   /* Initial estimates */
   double          rms = 0.7;
   double          critamp = 3.0*rms;
-  double          critdisp = 0.8;
+  double          critdisp[2] = {0.8,0.0};
   int             smoothingpar[6] = { 1, 2, 3, 5, 10, 20 };
   int             numq = sizeof((int *)smoothingpar)/sizeof(smoothingpar[0]);
   double          maxval = VAL__BADD;
@@ -562,7 +562,8 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
   fid           = fcntrl->fid;
   rms           = fcntrl->rms;
   critamp       = fcntrl->critamp;
-  critdisp      = fcntrl->critdisp;
+  critdisp[0]   = fcntrl->critdisp[0];
+  critdisp[1]   = fcntrl->critdisp[1];
   estimate_only = fcntrl->estimate_only;
   model_only    = fcntrl->model_only;
 
@@ -795,7 +796,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 	    if (nestim == 0) {
 	      parlist[0] = maxval;
 	      parlist[1] = posmax;
-	      parlist[2] = 1.5*critdisp;
+	      parlist[2] = 1.5*critdisp[0];
               nfound = 1;
 	    } else {
               nfound = nestim;
@@ -953,7 +954,7 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
                       const double fdata[], float *weight,  int npts, 
                       double *parlist, double *errlist, const int fitmask[], 
                       int npar, int *ncomp, const int range[], double critamp,
-                      double critdisp, float tol, int its, float lab, 
+                      double critdisp[], float tol, int its, float lab, 
                       int *fitopt )
 /*------------------------------------------------------------*/
 /* PURPOSE: Fit profiles. Wrapper routine for smf_lsqfit.     */
@@ -1058,6 +1059,14 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
      }
      nfound = nremaining;
 
+     double critwidth = critdisp[0];
+     double critlorz = critdisp[1];
+     if ( fid == SMF__MATH_VOIGT ) {
+       critwidth = 0.5 * DISP2FWHM( critwidth );
+       if ( critlorz >= 0 ) {
+         critlorz  = 0.5 * DISP2FWHM( critlorz );
+       }
+     }
 
      /* Weed out fits below critical levels */
      /* step 1: sort in decreasing dispersion */
@@ -1068,7 +1077,7 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
      }
      for (i = nfound-1; i >= 0; i--) {
        int offset = i*npar;
-       if (parlist[offset+2] < critdisp) {
+       if (parlist[offset+2] < critdisp[0]) {
          nremaining -= 1;
 	 for (j = 0; j < npar; j++) {
 	   parlist[offset+j] = VAL__BADD;
@@ -1117,7 +1126,7 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
 
 static int getestimates( smf_math_function fid, const double fdata[], const float weight[], int npts,
 			 double *parlist, int npar, int ncomp,
-			 double rms, double critamp, double critdisp,
+			 double rms, double critamp, double critdisp[],
 			 const int smoothingpar[], int numq)
 /*------------------------------------------------------------*/
 /* PURPOSE: Get initial estimates for gaussian profiles       */
@@ -1126,6 +1135,7 @@ static int getestimates( smf_math_function fid, const double fdata[], const floa
 {
    int          maxgaussians = ncomp;
    double       zerolev;
+   double       critwidth;
    double       Destimates[MAXPAR];
 
    int          gaussiansfound;
@@ -1166,7 +1176,7 @@ static int getestimates( smf_math_function fid, const double fdata[], const floa
    /* Be more lenient on estimates! */
    maxgaussians = BETWEEN( maxgaussians, 1, MAXGAUSS );
    critamp      = 0.5* fabs( critamp );
-   critdisp     /= 3;
+   critwidth    = critdisp[0]/3;
 
    gaussiansfound = 0;
 
@@ -1237,7 +1247,7 @@ static int getestimates( smf_math_function fid, const double fdata[], const floa
 	  Destimates[0] = work[specialindx];
 	  Destimates[1] = specialindx;
 	  Destimates[2] = FWHM2DISP( 1.0 );   /* FWHM --> dispersion */
-	  if (Destimates[0] < critamp || Destimates[2] < critdisp) {
+	  if (Destimates[0] < critamp || Destimates[2] < critwidth) {
 
 	    for (i = 0; i < 3*ncomp; i++) {
 	      parlist[i] = VAL__BADD;
@@ -1321,7 +1331,7 @@ static int getestimates( smf_math_function fid, const double fdata[], const floa
                    maxparameters,       /* 3 * ncomps */
                    rms,
                    critamp,
-                   critdisp,
+                   critwidth,
                    smoothingpar[minindx] );
 	gaussiansfound = MYMIN( gaussiansfound, ncomp );
 
