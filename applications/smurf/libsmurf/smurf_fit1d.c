@@ -20,31 +20,48 @@
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
-*  Description:
-*     This command can be used to fit 1-D profiles, e.g. gaussians
-*     in a datacube.
+*  Usage
+*     fit1d in out rms config
 
-* Parameters:
-*     MSG_FILTER = _CHAR (Read)
-*          Control the verbosity of the application. Values can be
-*          NONE (no messages), QUIET (minimal messages), NORMAL,
-*          VERBOSE, DEBUG or ALL. [NORMAL]
+*  Description:
+*     This command can be used to fit 1-D profiles, such as gaussians, 
+*     along an axis of a multi-dimensional datacube 
+*  
+*     This is a preliminary release of FIT1D. The routine can fit complex 
+*     spectra with multiple components in a data-cube (actually: fit 
+*     along any axis of a hyper-cube). It is multi-threaded and capable of
+*     fitting a large number of (i.e. order a million) spectra in a few
+*     minutes, depending of course on the number of cores available. 
+*     It borrows heavily from the "xgaufit" routine of the GIPSY package. 
+*     The type of profiles that can be fitted and have been tested are 
+*     "gaussian", "gausshermite1" (gaussian with asym. wings), and 
+*     "gausshermite2" (peaky gaussians possibly with asym. wings). 
+*     The input cube is expected to have been baselined. 
+*     Output is a (hyper-)cube with the fitted profiles. 
+
+*     It also stores cubes with the parameters for each fitted component 
+*     in the HDS header as COMP_1,..., COMP_N. For a gaussian the planes 
+*     in these cubes correspond to: amplitude, position, fwhm. 
+*     A default config file is in $SMURF_DIR/smurf_fit1d.def. 
+*     Please note that this routine is still under active development.
+* 
+*  ADAM Parameters:
 *     IN = NDF (Read)
-*          Input file(s).
+*          Baselined input file(s). 
+*     OUT = NDF (Write)
+*          Output file(s) with the fitted profiles.
+*     RMS = DOUBLE (Read) 
+*          RMS in input NDF(s) in data units.
 *     CONFIG = GROUP (Read)
 *          Specifies values for the configuration parameters used by the
 *          FIT1D. If the string "def" (case-insensitive) or a null (!)
 *          value is supplied, a set of default configuration parameter
 *          values will be used from $SMURF_DIR/smurf_fit1d.def.
-*          - AXIS = _INT (Read) Pixel(!) axis to file profiles along
-*          - RANGE = _DOUBLE (Read) Range of pixels to fit to (2 values)
-*          - FUNCTION = _CHAR (Read) 1-D function(s) to be fitted. Choices
-*               are Gaussian, Gauherm3, Gauherm4, and Voigt
-*          - NCOMP = _INT (Read) Number of components to fit to each
-*               data segment (spectrum)
-*          - RMS = rms in data set
-*          - MINAMP = minimum fitted amplitude in terms of RMS
-*          - MINDISP = minimum fitted dispersion to accept in pixels
+*          See help entry on the configuration file for detailed information.
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a null value is supplied no file is created. [!]
 *     DIAGNDF = GROUP (READ)
 *          Name of NDF to use as parameter file COMP_0 with diagnostics
 *          and baseline parameters. This component can usually be omitted
@@ -60,7 +77,7 @@
 *          a warning and remaining components will be left unfilled.
 *          Supplying more than NCOMP files will generate an error. If the
 *          location to a standard SMURF_FIT1D extension is given as
-*          'filename.MORE.SMURF_FIT1D' all the components in the extension
+*          "filename.MORE.SMURF_FIT1D" all the components in the extension
 *          will be copied. (This parameter is hidden).
 *     USERVAL = GROUP (Read)
 *          Config-style input file with user supplied fixed values or
@@ -82,10 +99,131 @@
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
+*
+*  Configuration File:
+*     A default configuration file can be found at 
+*                     $SMURF_DIR/smurf_fit1d.def:
+*     AXIS = INTEGER
+*          Axis the fit along (nr starting at 1). A value of 0 translates 
+*          as fit along highest dimension i.e. Vlsr in a Ra, Dec, Vlsr cube.
+*          [0]
+*     RANGE (2) = REAL
+*          Coordinate range along axis to find and fit profiles. The 
+*          format is (x1, x2) including the (). 
+*          E.g. Vlsr -20 35: (-20,35). 
+*          Default is to use the full extent of the axis: [<undef>] 
+*     FUNCTION = STRING
+*          Function to fit. See documentation: currently implemented are 
+*          gaussian, gausshermite1, gausshermite2, voigt, polynomial.
+*          [gaussian]
+*     NCOMP = INTEGER
+*          Maximum number of 'component' functions to fit to each
+*          profile, e.g.  a multi-component spectrum of max. 3
+*          gaussians. [Note: The complete fit of the gaussians and an
+*          optional zerolevel is done concurrently, not iteratively
+*          starting e.g. with the strongest component]. The routine will
+*          try to find and fit ncomp functions along each profile, but
+*          may settle for less. [3]
+*     MINAMP = REAL
+*          Minimum value for the Amplitude to accept as a genuine fit
+*          in terms of the rms. Based on the amplitude alone, at 3-sigma
+*          5% of the profiles selected for fitting can be expected to be
+*          noise spikes. This value drops to 2% for 5-sigma. All
+*          assuming gaussian statistics of course.  Applies to Gauss*
+*          and Voigt fits only. [3]
+*     MINFWHM = REAL
+*          Minimum value for the FHWM (~2.35*Dispersion) to accept as a
+*          genuine fit in terms of ==PIXELS==(!).  
+*          Applies to Gauss* and Voigt fits only. [1.88]
+*     MAXLORZ = REAL
+*          Maximum value for the  FHWM of the Loretzian component in 
+*          terms of ==PIXELS==(!). A negative value implies no constraint.
+*          Applies Voigt fits only. [-1]
+*     ESTIMATE_ONLY = LOGICAL
+*          Set to 1: The output cube will have the results from the
+*          initial estimates routine instead of the the fit.  Good
+*          initial estimates are critical for the fit and checking
+*          and/or fixing initial estimates may help solve problems. [0]
+*     MODEL_ONLY = LOGICAL
+*          Set to 1: Bypass both the initial estimates and fitting
+*          routine and generate profiles directly from the supplied
+*          input parameter cube(s) and/or user supplied fixed values.
+*          Not supplying all parameters will generate an error. [0]
 
-*  Related Applications:
-
-*  Notes:
+*  Important Information:             
+*     FUNCTIONS
+*
+*     The function menu provides the choice of four functions for which 
+*     you can fit the parameters to the data in your profiles.            
+* 
+*     1) A standard GAUSSIAN. Parameters are amplitude, center, and 
+*        dispersion,
+*
+*     NOTE that if one of h3 and h4 is not zero, the mean of the 
+*     distribution is not the position of the maximum. 
+*     (Reference; Marel, P. van der, Franx, M., A new method for the 
+*     identification of non-gaussian line profiles in elliptical galaxies. 
+*     A.J., 407 525-539, 1993 April 20).
+*
+*     2) GAUSS-HERMITE1 polynomial (h3). Parameters are a,b,c, (which 
+*        are *NOT* the same as maximum amplitude, center and dispersion!) 
+*        and h3:
+*                 maximum ~= [determine value and position of max from
+*                             fitted profiles using e.g. collapse]
+*                  center ~= b + h3*sqrt(3)
+*              dispersion ~= abs( c*(1-3h3^2) ) ~= c
+*                skewness ~= 4*sqrt(3)*h3
+*
+*     3) GAUSS-HERMITE2 polynomial (h3, h4). Same as above, but an extra 
+*        parameter h4 is included.
+*                 maximum ~= [determine value and position of max from
+*                             fitted profiles using e.g. collapse]
+*                  center ~= b + h3*sqrt(3)
+*              dispersion ~= abs( c*(1+h4*sqrt(6)) )
+*                skewness ~= 4*sqrt(3)*h3
+*                kurtosis ~= 8*sqrt(6)*h4
+*
+*     4) VOIGT function. Parameters are a,b,c,d: Area, center, Doppler
+*        and Lorentzian HWHM
+*                 maximum ~= [determine value of max from fitted
+*                             profiles using e.g. collapse]
+*                  center ~= b
+*            doppler fwhm ~= abs( 2*c )
+*         lorentzian fwhm ~= abs( 2*d )
+*              
+*     The fitted parameters are stored in the file header as
+*     FILE.MORE.SMURF_FIT1D.COMP_0 to COMP_N, with N depending on how many 
+*     components are being fitted. These are regular data cubes that can be
+*     inspected with e.g. Gaia or extracted using NDFCOPY. The 'planes' in 
+*     the cubes are:
+*   
+*     COMP_0 diagnostics info, planes: 
+*          1 = number of components found
+*          2 = fit error: (see below)
+*
+*     COMP_1..N fitted profiles, planes:
+*          1 = amplitude (gaussian); 'a' (gausshermite)
+*          2 = position  (gaussian); 'b' (gausshermite)
+*          3 = fwhm      (gaussian); 'c' (gausshermite)
+*          4 = 'h3'      (gausshermite1,2)
+*          5 = 'h4'      (gausshermite2)
+*          last: function id
+*              1 = gaussian; 2 = gausshermite1 (h3); 
+*              3 = gausshermite2 (h3,h4), 4 = voigt
+*
+*     FIT ERRORS:
+*         >0   Number of iterations needed to achieve convergence
+*                according to TOL.
+*         -1   Too many free parameters, maximum is 32.
+*         -2   No free parameters.
+*         -3   Not enough degrees of freedom.
+*         -4   Maximum number of iterations too small to obtain a
+*                solution which satisfies TOL.
+*         -5   Diagonal of matrix contains elements which are zero.
+*         -6   Determinant of the coefficient matrix is zero.
+*         -7   Square root of negative number.
+*         <-10 All fitted components rejected due to minamp, minfwhm,
+*                maxlorz, or range constraints.
 
 *  Authors:
 *     Remo Tilanus (JAC, Hawaii)
@@ -162,7 +300,7 @@
 
 static void get_fit1par( int *axis, double *range,
 		      smf_math_function *fid, int *ncomp, double *rms,
-		      double *critamp, double *critdisp,
+		      double *critamp, double critdisp[],
 		      int *estimate_only, int *model_only, int *status );
 
 static void get_userval ( int in, smf_math_function fid, int ncomp, AstKeyMap **usrvalmap,
@@ -225,7 +363,7 @@ void smurf_fit1d( int * status )
   int      ncomp = 1;            /* Number of components to fit */
   double   rms = 1;              /* RMS in data */
   double   critamp = 1;          /* Minimal Amplitude */
-  double   critdisp = 1;         /* Mimimal Dispersion */
+  double   critdisp[2] = {0.8,0.0};   /* Mimimal Dispersions */
   int      estimate_only = 0;    /* Do estimates only, no fit */
   int      model_only = 0;       /* Create model only from supplied pars */
   fitStruct fcntrl;              /* Pointer to fit control struct */
@@ -258,7 +396,7 @@ void smurf_fit1d( int * status )
 
   /* Extract read user supplied values using a keymap */
   get_fit1par( &axis, range, &fid, &ncomp,
-		   &rms, &critamp, &critdisp, &estimate_only, &model_only,
+		   &rms, &critamp, critdisp, &estimate_only, &model_only,
 		   status );
 
   if (*status != SAI__OK) goto CLEANUP;
@@ -378,7 +516,8 @@ void smurf_fit1d( int * status )
     fcntrl.clip[1]  = VAL__BADD;
     fcntrl.rms      = rms;
     fcntrl.critamp  = critamp*rms;
-    fcntrl.critdisp = critdisp;
+    fcntrl.critdisp[0] = critdisp[0];
+    fcntrl.critdisp[1] = critdisp[1];
     fcntrl.estimate_only = estimate_only;
     fcntrl.model_only = model_only;
 
@@ -443,7 +582,7 @@ void smurf_fit1d( int * status )
 
 static void get_fit1par( int *axis, double *range,
                          smf_math_function *fid, int *ncomp, double *rms,
-                         double *critamp, double *critdisp,
+                         double *critamp, double critdisp[],
                          int *estimate_only, int *model_only, int *status )
 /*
 ** Routine to get parameters from the config file, if parameter is not
@@ -568,16 +707,16 @@ static void get_fit1par( int *axis, double *range,
 
   /* Minimal acceptable dispersion for a component */
   if( critdisp ) {
-    *critdisp = 0;
+    critdisp[0] = 0;
     astMapGet0D( keymap, "MINFWHM", critdisp );
     if ( *status == SAI__OK ) {
-      if( *critdisp < 0 ) {
+      if( critdisp[0] < 0 ) {
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "MINFWHM must be >= 0.", status );
 	return;
       } else {
 	msgOutiff( MSG__VERB, "", "... MINFWHM=%f", status,
-		   *critdisp );
+		   critdisp[0] );
       }
     } else {
       errRep(FUNC_NAME, "Failed to get parameter MINFWHM from config file",
@@ -586,7 +725,23 @@ static void get_fit1par( int *axis, double *range,
     }
   }
   /* Convert to dispersion */
-  *critdisp = FWHM2DISP(*critdisp);
+  critdisp[0] = FWHM2DISP( critdisp[0] );
+
+  /* Minimal acceptable lorenztian FWHM for a component */
+  if( critdisp ) {
+    critdisp[1] = 0;
+    astMapGet0D( keymap, "MAXLORZ", critdisp+1 );
+    if ( *status == SAI__OK ) {
+      msgOutiff( MSG__VERB, "", "... MAXLORZ=%f", status,
+		 critdisp[1] );
+    } else {
+      errRep(FUNC_NAME, "Failed to get parameter MAXLORZ from config file",
+	     status);
+      return;
+    }
+  }
+  /* Convert to dispersion */
+  critdisp[1] = FWHM2DISP( critdisp[1] );
 
   /* Do initial estimates only */
   if( estimate_only ) {
