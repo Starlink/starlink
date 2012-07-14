@@ -409,12 +409,6 @@ if test -f ${bindir}/smurf/smurf.sh; then
 fi
 
 #
-#  SOURCEPLOT
-if test -f ${exec_prefix}/Perl/etc/poi.dat; then
-   export SPLOT_CAT=${exec_prefix}/Perl/etc/poi.dat
-fi
-
-#
 #  SPECX
 #
 

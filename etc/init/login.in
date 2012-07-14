@@ -523,12 +523,6 @@ if ( -e ${bindir}/repack/repack.csh ) then
 endif
 
 #
-#  SOURCEPLOT
-if ( -e ${exec_prefix}/Perl/etc/poi.dat ) then
-   setenv SPLOT_CAT ${exec_prefix}/Perl/etc/poi.dat
-endif
-
-#
 #  SPECDRE
 #  Withdrawn Spring-1998, merged with Figaro
 
