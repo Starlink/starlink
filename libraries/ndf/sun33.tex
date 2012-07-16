@@ -14,11 +14,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {33.10}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
-\newcommand{\stardocdate}      {12th October 2010}
+\newcommand{\stardocdate}      {16th July 2012}
 \newcommand{\stardoctitle}     {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\newcommand{\stardocversion}   {Version 1.11}
+\newcommand{\stardocversion}   {Version 1.12}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -4744,6 +4744,9 @@ array slice always start at (1,1\ldots), and the use of
 are
 preserved in any derived section.}
 
+Note, the tuning parameter SECMAX places a limit on the largest possible
+NDF section that can be created (see \S\ref{ss:tuning}).
+
 \subsection{\xlabel{the_distinction_between_base_ndfs_and_sections}The Distinction between Base NDFs and Sections}
 
 An NDF identifier which refers to an entire NDF dataset (not just a section
@@ -5296,6 +5299,9 @@ default in an interface file, \st{etc.}). Writers of applications may
 also use this method of selecting NDF sections when passing the names
 of datasets to NDF\_ routines which access them (see
 \S\ref{ss:ndfnames}).
+
+Note, the tuning parameter SECMAX places a limit on the largest possible
+NDF section that can be created (see \S\ref{ss:tuning}).
 
 \subsection{\xlabel{specifying_lower_and_upper_bounds}Specifying Lower and Upper Bounds}
 
@@ -9053,6 +9059,16 @@ avoids having to convert them on each occasion.
 The value of KEEP may be changed at any time. It is the value current
 when a foreign format file is first accessed by the NDF\_ library
 which is significant.
+
+\item[{\bf SECMAX:}]\mbox{}\\
+Specifies the maximum number of pixels allowed in an NDF section, in
+units of mega-pixels. An error will be reported if an attempt is made to
+create a section containing more than this number of pixels. The primary
+purpose of this tuning parameter is to guard against accidental use of
+incorrect WCS units within a user-supplied section specified, that may
+result in huge sections being requested. The default value is 2147
+mega-pixels, which is the largest value that can be held by a four byte
+integer.
 
 \item[{\bf SHCVT:}]\mbox{}\\
 Controls whether diagnostic information is displayed to show the
@@ -19691,10 +19707,10 @@ the NDF\_ system between versions V1.9 and V1.10:
 
 \end{enumerate}
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.11}
+\subsection{Changes Introduced in V1.11}
 
 The following describes the most significant changes which occurred in
-the NDF\_ system between versions V1.10 and V1.11 (the current version):
+the NDF\_ system between versions V1.10 and V1.11:
 
 \begin{enumerate}
 
@@ -19709,6 +19725,21 @@ the NDF\_ system between versions V1.10 and V1.11 (the current version):
 
    \item A new function NDF\_CREPL has been added, which allows an NDF
    placeholder to be created via a specified environment parameter.
+
+\end{enumerate}
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.12}
+
+The following describes the most significant changes which occurred in
+the NDF\_ system between versions V1.11 and V1.12 (the current version):
+
+\begin{enumerate}
+
+   \item Support for 64 bit integer data values added.
+
+   \item A new tuning parameter SECMAX has been aded, which allows the
+   maximum number of pixels within an NDF section to be specified. See
+   \S\ref{ss:tuning}.
 
 \end{enumerate}
 

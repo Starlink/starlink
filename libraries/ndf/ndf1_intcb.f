@@ -68,6 +68,8 @@
 *        Add initialisation of TCB_PXT.
 *     18-SEP-2009 (DSB):
 *        Add initialisation of TCB_AUTOHISTORY.
+*     15-JUL-2012 (DSB):
+*        Add initialisation of TCB_SECMAX
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -200,6 +202,18 @@
          CALL NDF1_RDTUN( 'NDF_WARN', 0, IVAL, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
             TCB_WARN = ( IVAL .EQ. 1 )
+         END IF
+
+*  Max no. of pixels in a section
+*  ===============================
+*  Read the value value from its environment variable (if present) and set
+*  the TCB value accordingly. The default of 2147 mega-pixels corresponds
+*  to the largest value that can be held in a four byte integer.
+         CALL NDF1_RDTUN( 'NDF_SECMAX', 2147, IVAL, STATUS )
+         IF ( STATUS .EQ. SAI__OK ) THEN
+            TCB_SECMAX = IVAL
+         ELSE
+            TCB_SECMAX = 2147
          END IF
 
 *  Propagation of extensions

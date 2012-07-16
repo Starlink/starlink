@@ -102,6 +102,9 @@
 *        processed by NDF1_FFS.
 *     2-NOV-1990 (RFWS):
 *        Removed unnecessary resetting of IACB2 to zero.
+*     16-JUL-2012 (DSB):
+*        Report an error if the number of pixels in the section exceeds
+*        the current value of the SECMAX tuning parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,6 +119,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
       INCLUDE 'ARY_PAR'          ! ARY_ public constants
 
@@ -143,6 +147,10 @@
 *        ACB_VID( NDF__MXACB ) = INTEGER (Read and Write)
 *           ARY_ system identifier for the variance array.
 
+      INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
+*        TCB_SECMAX = INTEGER (Read)
+*           The maximum number of pixels in a section.
+
 *  Arguments Given:
       INTEGER IACB1
       INTEGER NDIM
@@ -158,6 +166,9 @@
 *  Local Variables:
       INTEGER IACC               ! Loop counter for access control flags
       INTEGER IDCB               ! Index to data object entry in the DCB
+      INTEGER IDIM               ! Pixel axis index
+      INTEGER*8 SECMAX           ! Maximum number of pixels in section
+      INTEGER*8 SECSIZ           ! Number of pixels in section
       LOGICAL VALID              ! Whether array identifier is valid
 
 *.
@@ -167,6 +178,37 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the number of pixels in the section.
+      SECSIZ = 1
+      DO IDIM = 1, NDIM
+         SECSIZ = SECSIZ*( UBND( IDIM ) - LBND( IDIM ) + 1 )
+      END DO
+
+*  Get the maximum number of pixels in a section. TCB_SECMAX is in units
+*  of maga-pixels to allow use of INTEGER*4 tuning parameters.
+      SECMAX = TCB_SECMAX
+      SECMAX = SECMAX*1E6
+
+*  Report an error if the section size it too large. Also check for
+*  negative section sizes in case of overflow.
+      IF( SECSIZ .GT. SECMAX ) THEN
+         STATUS = NDF__BGSEC
+         CALL MSG_SETK( 'S', SECSIZ )
+         CALL ERR_REP( ' ', 'Requested NDF section contains too '//
+     :                 'many pixels (^S).', STATUS )
+         CALL MSG_SETK( 'L', SECMAX )
+         CALL ERR_REP( ' ', 'Current value of NDF tuning parameter '//
+     :                 'SECMAX limits sections to ^L pixels.', STATUS )
+
+      ELSE IF( SECSIZ .LT. 0 ) THEN
+         STATUS = NDF__BGSEC
+         CALL ERR_REP( ' ', 'Requested NDF section contains too '//
+     :                 'many pixels.', STATUS )
+         CALL MSG_SETK( 'L', SECMAX )
+         CALL ERR_REP( ' ', 'Current value of NDF tuning parameter '//
+     :                 'SECMAX limits sections to ^L pixels.', STATUS )
+      END IF
 
 *  Obtain an index to a free slot for the new NDF in the ACB.
       CALL NDF1_FFS( NDF__ACB, IACB2, STATUS )

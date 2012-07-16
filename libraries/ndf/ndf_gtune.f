@@ -72,6 +72,8 @@
 *        Add the PXT... tuning parameters.
 *     18-SEP-2009 (DSB):
 *        Add the AUTO_HISTORY tuning parameter.
+*     16-JUL-2012 (DSB):
+*        Add the SECMAX tuning parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,6 +102,8 @@
 *           Error tracing flag.
 *        TCB_KEEP = LOGICAL (Read)
 *           Keep NDF data objects flag.
+*        TCB_SECMAX = INTEGER (Read)
+*           Maximum no. of mega-pixels in a section.
 *        TCB_SHCVT = LOGICAL (Read)
 *           Show format conversions flag.
 *        TCB_WARN = LOGICAL (Read)
@@ -226,6 +230,11 @@
      : 'be followed by an NDF extension name (possible programming '//
      : 'error).', STATUS )
             END IF
+
+*  Maximum size of a section.
+*  ==========================
+         ELSE IF ( NDF1_SIMLR( TPAR, 'SECMAX', NDF__MINAB ) ) THEN
+            VALUE = TCB_SECMAX
 
 *  Unknown tuning parameter.
 *  ========================

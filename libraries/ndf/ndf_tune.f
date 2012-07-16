@@ -57,6 +57,11 @@
 *     to convert them on each occasion. The value of KEEP may be changed
 *     at any time. It is the value current when a foreign format file is
 *     first accessed by the NDF_ library which is significant.
+*     -  'SECMAX': Gives the largest size of an NDF section, in units of
+*     maga-pixels. An error is reported if a section is requested that
+*     contains more than this number of pixels. The purpose of this
+*     parameter is to help guard against accidental use of incorrect units
+*     within NDF sections specified by the user. The default value is 1E10.
 *     -  'SHCVT': Controls whether diagnostic information is displayed
 *     to show the actions being taken to convert to and from foreign
 *     data formats (using the facilities described in SSN/20). If SHCVT
@@ -135,6 +140,8 @@
 *        Add the PXT... tuning parameters.
 *     18-SEP-2009 (DSB):
 *        Add the AUTO_HISTORY tuning parameter.
+*     16-JUL-2012 (DSB):
+*        Add the SECMAX tuning parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -163,6 +170,8 @@
 *           Error tracing flag.
 *        TCB_KEEP = LOGICAL (Write)
 *           Keep NDF data objects flag.
+*        TCB_SECMAX = INTEGER (Write)
+*           Max no. of mega-pixels in a section.
 *        TCB_SHCVT = LOGICAL (Write)
 *           Show format conversions flag.
 *        TCB_WARN = LOGICAL (Write)
@@ -337,6 +346,23 @@
      : '''PXT'' is not a valid tuning parameter name - it should '//
      : 'be followed by an NDF extension name (possible programming '//
      : 'error).', STATUS )
+            END IF
+
+*  Maximum section size.
+*  =====================
+*  If AUTO_HISTORY was specified, then set the automatic history creation
+*  flag appropriately.
+         ELSE IF ( NDF1_SIMLR( TPAR, 'SECMAX', NDF__MINAB ) ) THEN
+            IF( VALUE .GT. 0 ) THEN
+               TCB_SECMAX = VALUE
+
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = NDF__TPVIN
+               CALL MSG_SETI( 'VALUE', VALUE )
+               CALL ERR_REP( 'NDF_TUNE_WARN', 'The value ^VALUE is '//
+     :                       'not valid for the tuning parameter ' //
+     :                       'SECMAX; it should be larger than zero '//
+     :                       '(possible programming error).', STATUS )
             END IF
 
 *  Unknown tuning parameter.

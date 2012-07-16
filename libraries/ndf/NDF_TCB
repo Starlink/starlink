@@ -25,12 +25,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
@@ -57,6 +57,8 @@
 *        Added TCB_DOCVT flag to control foreign file access.
 *     1-NOV-2007 (DSB):
 *        Added TCB_PXT to control default propgation of named extensions.
+*     16-JUL-2012 (DSB):
+*        Added TCB_SECMAX.
 *     {enter_further_changes_here}
 
 *-
@@ -131,29 +133,38 @@
 *  NDF1_INTCB routine.
       LOGICAL TCB_WARN
 
-*  Propagation of extensions 
+*  Propagation of extensions
 *  =========================
-*  This is a pointer to an AST KeyMap in which each entry has a key that 
-*  is the name of an NDF extension, and an integer value that is non-zero 
+*  This is a pointer to an AST KeyMap in which each entry has a key that
+*  is the name of an NDF extension, and an integer value that is non-zero
 *  if the extension is to be propagated by default (by NDF_PROP), or zero
-*  if the extension is not to be propagated by default. Any extension that 
+*  if the extension is not to be propagated by default. Any extension that
 *  is not specified within this KeyMap is propagated by default.
       INTEGER TCB_PXT
 
 *  Automatic history creation flag.
 *  ================================
-*  If this flag is .TRUE., the NDF_CREAT and NDF_NEW routines will add a 
-*  History component automatically to the output NDF. If this flag is 
-*  .FALSE. (the default), then NDF_CREAT and NDF_NEW do not include a 
+*  If this flag is .TRUE., the NDF_CREAT and NDF_NEW routines will add a
+*  History component automatically to the output NDF. If this flag is
+*  .FALSE. (the default), then NDF_CREAT and NDF_NEW do not include a
 *  History component in the output NDF.
       LOGICAL TCB_AUTOHISTORY
+
+*  Maximum number of pixels in an NDF section.
+*  ===========================================
+*  An error will be reported if a request is made for an NDF section
+*  containing more than TCB_SECMAX mega-pixels. This is to guard against
+*  (for instance) accidental use of incorrect WCS units when specifying a
+*  section on the command line.
+      INTEGER TCB_SECMAX
 
 *  Common blocks:
 *  =============
 
 *  Non-character data.
       COMMON /NDF1_TCB1/ TCB_DOCVT, TCB_ETFLG, TCB_FNFMT, TCB_KEEP,
-     :                   TCB_SHCVT, TCB_WARN, TCB_PXT, TCB_AUTOHISTORY
+     :                   TCB_SHCVT, TCB_WARN, TCB_PXT, TCB_AUTOHISTORY,
+     :                   TCB_SECMAX
 
 *  Save common block contents.
       SAVE /NDF1_TCB1/
