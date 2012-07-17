@@ -22,10 +22,10 @@
 *  Description:
 *     The routine works along each line of the input stack of lines,
 *     combining the data.  This variant uses a single variance for each
-*     line and and does NOT propagate it.  
+*     line and and does NOT propagate it.
 *
 *     The array NCON holds the actual numbers of pixels which were used
-*     in deriving the output value plus any values already present in 
+*     in deriving the output value plus any values already present in
 *     the array; thus a cumulative sum of contributing pixel numbers may
 *     be kept.
 
@@ -68,12 +68,16 @@
 *        32 = Minimum
 *        33 = Co-ordinate of maximum
 *        34 = Co-ordinate of minimum
+*        35 = Number of good pixel values
+*        36 = Number of bad pixel values
+*        37 = Fraction of good pixel values
+*        38 = Fraction of bad pixel values
 *        300 = Median, but estimating variance from mean variance
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
 *        output pixel.
 *     NITER = INTEGER (Given)
-*        The maximum number of iterations (IMETH = 5). 
+*        The maximum number of iterations (IMETH = 5).
 *     NSIGMA = REAL (Given)
 *        The number of sigmas to clip the data at (IMETH = 5 and 6).
 *     ALPHA = REAL (Given)
@@ -83,7 +87,10 @@
 *     RMAX = REAL (Given)
 *        The maximum allowed data value (IMETH = 7).
 *     RESULT( NPIX ) = ? (Returned)
-*        The output line of data.
+*        The output line of data. This will always be of type _INTEGER
+*        for methods 35 (NGOOD) and 36 (NBAD). Since this routine does
+*        not actually access the array values, the mismatch in data
+*        types does not matter.
 *     WIDTHS( NPIX, NLINES ) = ? (Returned)
 *        The widths along the collapse axis for each pixel.  It is
 *        calculated only for IMETH = 21.
@@ -112,8 +119,9 @@
 *  Notes:
 *     -  There is a routine for real and double-precision: replace "x"
 *     in the routine name by D or R as appropriate.  The STACK, VARS,
-*     COORDS, RESULT, WIDTHS, WRK1, and WRK2 arguments supplied to the 
-*     routine must have the data type specified.
+*     COORDS, RESULT, WIDTHS, WRK1, and WRK2 arguments supplied to the
+*     routine must have the data type specified (except for methods 35
+*     and 36 for which RESULT is always _INTEGER).
 *     - Various of the options are simply variations on a theme.  The
 *     Broadened median is just a trimmed mean with a variable trimming
 *     fraction.  The Mode is an iteratively carried out version of the
@@ -163,7 +171,7 @@
 *     9-SEP-2002 (DSB):
 *        Added unweighted mean method.
 *     2005 December 22 (MJC):
-*        Added several translations for new estimators and moments 
+*        Added several translations for new estimators and moments
 *        (IMETH=12 upwards except 300).
 *     2005 December 24 (MJC):
 *        Added mean absolute deviation.
@@ -187,15 +195,15 @@
 *        two-dimensional co-ordinate array.  Derive the widths for
 *        IMETH = 21 from the co-ordinates.
 *     2007 November 17 (MJC):
-*        WIDTHS is returned, not supplied, so move it in the API.   
+*        WIDTHS is returned, not supplied, so move it in the API.
 *     2007 December 7 (MJC):
-*        Return number of flagged values through new argument NFLAG. 
+*        Return number of flagged values through new argument NFLAG.
 *        Initialise count of the contributing pixels in each line.
 *     2008 September 24 (MJC):
 *        Add Option 14.
 *     2009 July 2 (MJC):
 *         Converted to generic, renamed from CCG1_CM3RR.  Invoke generic
-*         routines.  Made VARS take the generic type.  Converted to 
+*         routines.  Made VARS take the generic type.  Converted to
 *         generic invoking genric routines.  Made VARS take the generic
 *         type.  Move STACK to normal order in the API.
 *     2009 July 4 (MJC):
@@ -210,6 +218,8 @@
 *         Use revised APIs for maxima and minima routines.
 *     2009 July 11 (MJC):
 *         Use revised API for CCG_UM3.
+*     17-JUL-2012 (DSB):
+*         Added methods 35, 36, 37 and 38.
 *     {enter_further_changes_here}
 
 *-
@@ -322,13 +332,13 @@
 
 *  Forming sigma-clipped median.
          CALL CCG_SM3<T>( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
-     :                  RESULT, WRK1, WRK2, POINT, USED, NCON, 
+     :                  RESULT, WRK1, WRK2, POINT, USED, NCON,
      :                  NBAD, STATUS )
 
       ELSE IF ( IMETH .EQ. 11 ) THEN
 
 *  Forming fast median (no weights).
-         CALL CCG_FM3<T>( NPIX, NLINES, STACK, MINPIX, RESULT, 
+         CALL CCG_FM3<T>( NPIX, NLINES, STACK, MINPIX, RESULT,
      :                  WRK1, POINT, USED, NCON, NBAD, STATUS )
 
       ELSE IF ( IMETH .EQ. 12 ) THEN
@@ -417,6 +427,16 @@
 *  the RESULT array.
          CALL CCG_I2WC<T>( NPIX, NLINES, COIND, COORDS, RESULT, NBAD,
      :                   STATUS )
+
+*  Forming array of pixel counts.
+      ELSE IF ( IMETH .EQ. 35 .OR. IMETH .EQ. 36 ) THEN
+         CALL CCG_CNT3<T>( IMETH, NPIX, NLINES, STACK, RESULT, NCON,
+     :                     NBAD, STATUS )
+
+*  Forming array of pixel fractions.
+      ELSE IF ( IMETH .EQ. 37 .OR. IMETH .EQ. 38 ) THEN
+         CALL CCG_FRC3<T>( IMETH, NPIX, NLINES, STACK, RESULT, NCON,
+     :                     NBAD, STATUS )
 
        ELSE
 

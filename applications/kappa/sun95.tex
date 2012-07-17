@@ -18916,6 +18916,12 @@ XV; PBMPLUS; NETPBM.
             {\tt "Comin"}  --- Co-ordinate of the minimum value.
 
             \sstitem
+            {\tt "FBad"}   --- Fraction of bad pixel values.
+
+            \sstitem
+            {\tt "FGood"}  --- Fraction of good pixel values.
+
+            \sstitem
             {\tt "Integ"}  --- Integrated value, being the sum of the products
                         of the value and pixel width in world
                         co-ordinates.
@@ -18935,6 +18941,12 @@ XV; PBMPLUS; NETPBM.
 
             \sstitem
             {\tt "Min"}    --- Minimum value.
+
+            \sstitem
+            {\tt "NBad"}   --- Count of bad pixel values.
+
+            \sstitem
+            {\tt "NGood"}  --- Count of good pixel values.
 
             \sstitem
             {\tt "Rms"}    --- Root-mean-square value.
@@ -58233,6 +58245,12 @@ The following applications have been modified:
         \item The VARIANCE and DATA arrays in the NDF can now be masked
          simultaneously by setting the COMP parameter to ``All'', which is
          now the default value for COMP.
+      \end{itemize}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
+      \begin{itemize}
+        \item Four new estimators are available: FBAD, FGOOD, NBAD and
+        NGOOD, which produce the fraction/count of good/bad pixel values.
       \end{itemize}
 
    \item [\htmlref{FITSMOD}{FITSMOD}]\mbox{}

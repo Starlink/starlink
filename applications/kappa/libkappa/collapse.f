@@ -99,6 +99,8 @@
 *          "Csigma" -- Sigma-clipped standard deviation.
 *          "Comax"  -- Co-ordinate of the maximum value.
 *          "Comin"  -- Co-ordinate of the minimum value.
+*          "FBad"   -- Fraction of bad pixel values.
+*          "FGood"  -- Fraction of good pixel values.
 *          "Integ"  -- Integrated value, being the sum of the products
 *                      of the value and pixel width in world
 *                      co-ordinates.
@@ -110,6 +112,8 @@
 *                      integrated value.
 *          "Max"    -- Maximum value.
 *          "Min"    -- Minimum value.
+*          "NBad"   -- Number of bad pixel values.
+*          "NGood"  -- Number of good pixel values.
 *          "Rms"    -- Root-mean-square value.
 *          "Sigma"  -- Standard deviation about the unweighted mean.
 *          "Sum"    -- The total value.
@@ -440,6 +444,8 @@
 *     2009 November 20 (MJC):
 *        Adjust the precision of the fractions and WLIM in the bad-pixel
 *        warning.
+*     17-JUL-2012 (DSB):
+*        Added "NGood", "NBad", "FGood" and "FBad" estimators.
 *     {enter_further_changes_here}
 
 *-
@@ -483,7 +489,7 @@
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
       CHARACTER FORMAT*6         ! Format for warning
-      CHARACTER ITYPE*( NDF__SZTYP ) ! Numeric type for processing
+      CHARACTER ITYPE*( NDF__SZTYP ) ! Numeric type for input arrays
       CHARACTER LOC1*(DAT__SZLOC)! Locator to the output NDF
       CHARACTER LOC2*(DAT__SZLOC)! Locator to NDF AXIS array
       CHARACTER LOC3*(DAT__SZLOC)! Locator to copy of the original AXIS
@@ -492,6 +498,7 @@
       CHARACTER LOC5*(DAT__SZLOC)! Locator to cell of the old AXIS array
       CHARACTER LOC6*(DAT__SZLOC)! Locator to component of the old cell
       CHARACTER NAME*(DAT__SZNAM)! The component name
+      CHARACTER OTYPE*( NDF__SZTYP ) ! Numeric type for output arrays
       CHARACTER TTLC*( 255 )     ! Title of original current Frame
       CHARACTER UNITS*( 60 )     ! Units of data
       DOUBLE PRECISION AXHIGH    ! High bound of collapse axis in
@@ -973,13 +980,13 @@
       IF ( PROVAR ) THEN
          CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,Mode,Median,Max,'/
      :                   /'Min,Comax,Comin,Absdev,RMS,Sigma,Sum,Iwc,'/
-     :                   /'Iwd,Integ,Cmean,Csigma', .FALSE., ESTIM,
-     :                   STATUS )
+     :                   /'Iwd,Integ,Cmean,Csigma,NGood,NBad,FGood,'/
+     :                   /'FBad', .FALSE., ESTIM, STATUS )
       ELSE
          CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,WMean,Mode,Median,'/
      :                   /'Max,Min,Comax,Comin,Absdev,RMS,Sigma,Sum,'/
-     :                   /'Iwc,Iwd,Integ,Cmean,Csigma', .FALSE., ESTIM,
-     :                   STATUS )
+     :                   /'Iwc,Iwd,Integ,Cmean,Csigma,NGood,NBad,'/
+     :                   /'FGood,FBad', .FALSE., ESTIM, STATUS )
       END IF
 
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
@@ -992,6 +999,18 @@
      :                   CLIP, STATUS )
       ELSE
          CLIP = CLPDEF
+      END IF
+
+*  Adjust output data type if required.
+*  ===================================
+
+*  The NBad and NGood estimators always produce _INTEGER output NDFs.
+      IF ( ESTIM .EQ. 'NGOOD' .OR. ESTIM .EQ. 'NBAD' ) THEN
+         CALL NDF_RESET( INDFO, COMPO, STATUS )
+         CALL NDF_STYPE( '_INTEGER', INDFO, COMPO, STATUS )
+         OTYPE = '_INTEGER'
+      ELSE
+         OTYPE = ITYPE
       END IF
 
 *  Redefine the data units.
@@ -1029,6 +1048,15 @@
          CALL CHR_APPND( AUNITS, UNITS, NC )
 
          CALL NDF_CPUT( UNITS( :NC ), INDFO, 'Units', STATUS )
+
+*  New unit is "pixel"
+      ELSE IF ( ESTIM .EQ. 'NGOOD' .OR. ESTIM .EQ. 'NBAD' ) THEN
+         CALL NDF_CPUT( 'Pixel', INDFO, 'Units', STATUS )
+
+*  Dimensionless...
+      ELSE IF ( ESTIM .EQ. 'FGOOD' .OR. ESTIM .EQ. 'FBAD' ) THEN
+         CALL NDF_CPUT( ' ', INDFO, 'Units', STATUS )
+
       END IF
 
 *  Process in blocks.
@@ -1113,7 +1141,7 @@
 
 *  Map the full input, and output data and (if needed) variance arrays.
          CALL NDF_MAP( IBL, COMP, ITYPE, 'READ', IPIN, EL1, STATUS )
-         CALL NDF_MAP( OBL, COMPO, ITYPE, 'WRITE', IPOUT, EL2, STATUS )
+         CALL NDF_MAP( OBL, COMPO, OTYPE, 'WRITE', IPOUT, EL2, STATUS )
 
          IF ( .NOT. VAR ) THEN
             IPIN( 2 ) = IPIN( 1 )

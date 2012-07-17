@@ -1860,6 +1860,84 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   CCG\_CNT1x
+}{
+   Combines data lines by counting pixels
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then collapsed
+      to the count of good (or bad) values in each line. The output values
+      are returned in the array RESULT.  Each output variance value is set
+      to zero and are returned in the array RESVAR.
+   }
+   \sstinvocation{
+      CALL CCG\_CNT1x( IMETH, NPIX, NLINES, STACK, RESULT, RESVAR,
+                      NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IMETH = INTEGER (Given)
+      }{
+         35 - Return the number of good values in each line.
+         36 - Return the number of bad values in each line.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = INTEGER (Returned)
+      }{
+         The output line of data. Note, the data type is always INTEGER.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = INTEGER (Returned)
+      }{
+         The output variances. Note, the data type is always INTEGER.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line. Each value in this array is set to NPIX.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  This is always returned as zero by this
+         routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK argument supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
    CCG\_COMB1x
 }{
    Combines a stack of array lines into one line, using a variety of
@@ -1937,6 +2015,10 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          32 = Minimum
          33 = Co-ordinate of maximum
          34 = Co-ordinate of minimum
+         35 = Number of good pixel values
+         36 = Number of bad pixel values
+         37 = Fraction of good pixel values
+         38 = Fraction of bad pixel values
          300 = Median, but estimating variance from mean variance
       }
       \sstsubsection{
@@ -1979,12 +2061,16 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
       }{
-         The output line of data.
+         The output line of data. This will always be of type \_INTEGER
+         for methods 35 (NGOOD) and 36 (NBAD). Since this routine does
+         not actually access the array values, the mismatch in data
+         types does not matter.
       }
       \sstsubsection{
          RESVAR( NPIX ) = ? (Returned)
       }{
-         The output variances.
+         The output variances. This will always be of type \_INTEGER
+         for methods 35 (NGOOD) and 36 (NBAD).
       }
       \sstsubsection{
          WIDTHS( NPIX, NLINES ) = ? (Returned)
@@ -2056,7 +2142,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          There is a routine for real and double-precision: replace {\tt "}x{\tt "}
          in the routine name by D or R as appropriate.  The STACK, VARS,
          COORDS, RESULT, RESVAR, WIDTHS, WRK1, and WRK2 arguments supplied
-         to the routine must have the data type specified.
+         to the routine must have the data type specified (except for
+         methods 35 and 36 for which RESULT and RESVAR are always \_INTEGER).
 
          \sstitem
          Various of the options are simply variations on a theme.  The
@@ -2163,6 +2250,10 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          32 = Minimum
          33 = Co-ordinate of maximum
          34 = Co-ordinate of minimum
+         35 = Number of good pixel values
+         36 = Number of bad pixel values
+         37 = Fraction of good pixel values
+         38 = Fraction of bad pixel values
          300 = Median, but estimating variance from mean variance
       }
       \sstsubsection{
@@ -2199,7 +2290,10 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
       }{
-         The output line of data.
+         The output line of data. This will always be of type \_INTEGER
+         for methods 35 (NGOOD) and 36 (NBAD). Since this routine does
+         not actually access the array values, the mismatch in data
+         types does not matter.
       }
       \sstsubsection{
          WIDTHS( NPIX, NLINES ) = ? (Returned)
@@ -2260,7 +2354,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          There is a routine for real and double-precision: replace {\tt "}x{\tt "}
          in the routine name by D or R as appropriate.  The STACK, VARS,
          COORDS, RESULT, WIDTHS, WRK1, and WRK2 arguments supplied to the
-         routine must have the data type specified.
+         routine must have the data type specified (except for methods 35
+         and 36 for which RESULT is always \_INTEGER).
 
          \sstitem
          Various of the options are simply variations on a theme.  The
@@ -2894,6 +2989,156 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          in the routine name by D or R as appropriate.  The STACK, RESULT,
          and WRK1 arguments supplied to the routine must have the data type
          specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_FRC1x
+}{
+   Combines data lines by counting pixels
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then collapsed
+      to the fraction of good (or bad) values in each line. The output values
+      are returned in the array RESULT.  Each output variance value is set
+      to zero and are returned in the array RESVAR.
+   }
+   \sstinvocation{
+      CALL CCG\_FRC1x( IMETH, NPIX, NLINES, STACK, RESULT, RESVAR,
+                      NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IMETH = INTEGER (Given)
+      }{
+         37 - Return the fraction of good values in each line.
+         38 - Return the fraction of bad values in each line.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         RESVAR( NPIX ) = ? (Returned)
+      }{
+         The output variances.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line. Each value in this array is set to NPIX.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  This is always returned as zero by this
+         routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK, RESULT and RESVAR arguments supplied to the routine must
+         have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   CCG\_FRC3x
+}{
+   Combines data lines by counting pixels
+}{
+   \sstdescription{
+      This routine accepts an array consisting a series of (vectorised)
+      lines of data.  The data values in the lines are then collapsed
+      to the fraction of good (or bad) values in each line. The output values
+      are returned in the array RESULT.
+   }
+   \sstinvocation{
+      CALL CCG\_FRC3x( IMETH, NPIX, NLINES, STACK, RESULT,
+                      NCON, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IMETH = INTEGER (Given)
+      }{
+         37 - Return the fraction of good values in each line.
+         38 - Return the fraction of bad values in each line.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Given)
+      }{
+         The number of pixels in a line of data.
+      }
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         The number of lines of data in the stack.
+      }
+      \sstsubsection{
+         STACK( NPIX, NLINES ) = ? (Given)
+      }{
+         The array of lines which are to be combined into a single line.
+      }
+      \sstsubsection{
+         RESULT( NPIX ) = ? (Returned)
+      }{
+         The output line of data.
+      }
+      \sstsubsection{
+         NCON( NLINES ) = DOUBLE PRECISION (Returned)
+      }{
+         The actual number of contributing pixels from each input line
+         to the output line. Each value in this array is set to NPIX.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of bad values in the output array created while
+         forming the statistics.  This is always returned as zero by this
+         routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         STACK and RESULT arguments supplied to the routine must have the
+         data type specified.
       }
    }
 }
@@ -8633,8 +8878,13 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 
          \sstitem
          There is a routine for each of the data types logical, integer,
-         real and double precision: replace {\tt "}x{\tt "} in the routine name by
-         L, I, R or D as appropriate.
+         64-bit integer, real, and double precision: replace {\tt "}x{\tt "} in the
+         routine name by L, I, K, R or D as appropriate.
+
+         \sstitem
+         The comments are written from column 32 or higher if the value
+         demands more than the customary 20 characters for the value.  A
+         comment may be omitted if the value is so long to leave no room.
       }
    }
 }
@@ -11314,8 +11564,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 
          \sstitem
          There is a routine for each of the data types logical, integer,
-         real and double precision: replace {\tt "}x{\tt "} in the routine name by L,
-         I, R or D as appropriate.
+         64-bit integer, real, and double precision: replace {\tt "}x{\tt "} in the
+         routine name by L, I, K, R or D as appropriate.
 
          \sstitem
          The comments are written from column 32 or higher if the value
@@ -11748,8 +11998,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 
          \sstitem
          There is a routine for each of the data types logical, integer,
-         real and double precision: replace {\tt "}x{\tt "} in the routine name by L,
-         I, R or D as appropriate.
+         64-bit integer, real, and double precision: replace {\tt "}x{\tt "} in the
+         routine name by L, I, K, R or D as appropriate.
 
          \sstitem
          The comments are written from column 32 or higher if the value
@@ -14700,7 +14950,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       two-dimensional array.
 
       If EXACT is .FALSE. an error is only reported if the number of
-      significant dimensions is higher than NDIM.  If there are less than
+      significant dimensions is higher than NDIM.  If there are fewer than
       NDIM significant dimensions then the insignificant dimensions are
       used (starting from the lowest) to ensure that the required number
       of dimensions are returned. This mode is intended for cases where (say)
@@ -14725,7 +14975,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       Frame, assigning the value AST\_\_BAD to the axes which have not been
       chosen.
 
-      If the original Current Frame has less than NDIM axes, then simple
+      If the original Current Frame has fewer than NDIM axes, then simple
       axes are added into the new Current Frame to make up a total of
       NDIM. These axes are given the value 1.0.
 
@@ -18121,13 +18371,13 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          The degree of the polynomial along the second dimension.
       }
       \sstsubsection{
-         MCOEF = INTEGER (Given)
+         NCOEF = INTEGER (Given)
       }{
          The number of coefficients.  This must be at least the product
          of (XDEG$+$1) $*$ (YDEG$+$1).
       }
       \sstsubsection{
-         CC( MCOEF ) = ? (Given)
+         CC( NCOEF ) = ? (Given)
       }{
          The Chebyshev coefficients.  These should be the order such
          that CCij is in CC( i$*$(YDEG$+$1)$+$j$+$1 ) for i=0,XDEG; j=0,YDEG.
@@ -18800,6 +19050,73 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   KPG1\_CMULK
+}{
+   Multiplies each element of a vectorised 64-bit integer array by
+   a constant
+}{
+   \sstdescription{
+      The routine multiplies each element of a vectorised 64-bit-
+      integer array by a constant to produce a new 64-bit-integer
+      array.  Bad value checking is performed if required.
+   }
+   \sstinvocation{
+      CALL KPG1\_CMULK( BAD, EL, A, CONST, B, NBAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         Whether to check for bad values in the input array.
+      }
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         Number of array elements to process.
+      }
+      \sstsubsection{
+         A( EL ) = INTEGER $*$ 8 (Given)
+      }{
+         Input array.
+      }
+      \sstsubsection{
+         CONST = DOUBLE PRECISION (Given)
+      }{
+         Constant by which each array element is to be multiplied.
+      }
+      \sstsubsection{
+         B( EL ) = DOUBLE PRECISION (Returned)
+      }{
+         Output array.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         Number of bad values in the output array B.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine is intended for processing 64-bit integer data
+         only. There is a related generic routine for processing other data
+         types, except double precision which has its own routine like this
+         one.
+
+         \sstitem
+         This routine will handle numerical errors (i.e. overflow) by
+         assigning the appropriate {\tt "}bad{\tt "} value to affected output array
+         elements.
+      }
+   }
+}
+\sstroutine{
    KPG1\_CMVDx
 }{
    Compresses n-dimensional data and variance arrays by summing in
@@ -19180,9 +19497,9 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          TYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The data type to be copied. Must be one of the HDS numeric
-         types, \_BYTE, \_UBYTE, \_WORD, \_UWORD, \_INTEGER, \_REAL or \_DOUBLE,
-         or {\tt "}\_CHAR$*$$<$N$>$){\tt "} where {\tt "}$<$N$>${\tt "} is an integer giving the length of
-         the character strings.
+         types, \_BYTE, \_UBYTE, \_WORD, \_UWORD, \_INTEGER, \_INT64, \_REAL or
+          \_DOUBLE, or {\tt "}\_CHAR$*$$<$N$>$){\tt "} where {\tt "}$<$N$>${\tt "} is an integer giving the
+         length of the character strings.
       }
       \sstsubsection{
          NEL = INTEGER (Given)
@@ -19217,7 +19534,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 \sstroutine{
    KPG1\_CORRx
 }{
-   Calculate the correlation coefficient between two arrays
+   Calculates the correlation coefficient between two arrays
 }{
    \sstdescription{
       The routine calculates the sample Pearson correlation coefficient
@@ -19709,6 +20026,56 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   KPG1\_CTCKM
+}{
+   Copies values from catalogue columns to an AST KeyMap
+}{
+   \sstdescription{
+      This routine gets NEL values for a set of given CAT (see SUN/181)
+      columns, derived from rows 1 to NEL of a given catalogue,
+      selection, or index, and stores them in a KeyMap.
+   }
+   \sstinvocation{
+      CALL KPG1\_CTCKM( CI, NAX, GI, NEL, KEYMAP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CI = INTEGER (Given)
+      }{
+         The CAT identifier for the catalogue, selection or index
+         containing the required data.
+      }
+      \sstsubsection{
+         NAX= INTEGER (Given)
+      }{
+         The number of columns from which values are to be read.
+      }
+      \sstsubsection{
+         GI( NAX ) = INTEGER (Given)
+      }{
+         The CAT identifiers for the column, expressions or parameters
+         to be evaluated for rows 1 to NEL of the component identified
+         by CI.
+      }
+      \sstsubsection{
+         NEL = INTEGER (Given)
+      }{
+         The number of rows to copy.
+      }
+      \sstsubsection{
+         KEYMAP = INTEGER (Given)
+      }{
+         The KeyMap. Each column value is stored as a scalar string with
+         key {\tt "}$<$colname$>$\_$<$row index$>${\tt "}.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_CTCPC
 }{
    Copies string values from a catalogue column to a GRP group
@@ -19813,56 +20180,6 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          double precision: replace {\tt "}x{\tt "} in the routine name by I, or D as
          appropriate.  The output array from this routine should have the
          specified data type.
-      }
-   }
-}
-\sstroutine{
-   KPG1\_CTCPK
-}{
-   Copies values from catalogue columns to an AST KeyMap
-}{
-   \sstdescription{
-      This routine gets NEL values for a set of given CAT (see SUN/181)
-      columns, derived from rows 1 to NEL of a given catalogue,
-      selection, or index, and stores them in a KeyMap.
-   }
-   \sstinvocation{
-      CALL KPG1\_CTCPK( CI, NAX, GI, NEL, KEYMAP, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         CI = INTEGER (Given)
-      }{
-         The CAT identifier for the catalogue, selection or index
-         containing the required data.
-      }
-      \sstsubsection{
-         NAX= INTEGER (Given)
-      }{
-         The number of columns from which values are to be read.
-      }
-      \sstsubsection{
-         GI( NAX ) = INTEGER (Given)
-      }{
-         The CAT identifiers for the column, expressions or parameters
-         to be evaluated for rows 1 to NEL of the component identified
-         by CI.
-      }
-      \sstsubsection{
-         NEL = INTEGER (Given)
-      }{
-         The number of rows to copy.
-      }
-      \sstsubsection{
-         KEYMAP = INTEGER (Given)
-      }{
-         The KeyMap. Each column value is stored as a scalar string with
-         key {\tt "}$<$colname$>$\_$<$row index$>${\tt "}.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
       }
    }
 }
@@ -23053,6 +23370,10 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 
          \sstitem
          Bad status is returned if no valid type has been obtained.
+
+         \sstitem
+         \_INT64 and \_INTEGER require 5 characters for disambiguation.
+         This is a change from when only \_INTEGER was available.
       }
    }
 }
@@ -33306,8 +33627,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       \sstitemlist{
 
          \sstitem
-         There is a routine for each numeric data type: replace {\tt "}x{\tt "}
-         in the routine name by D, I, or R as appropriate.  The array
+         There is a routine for four numeric data type: replace {\tt "}x{\tt "}
+         in the routine name by D, I, K, or R as appropriate.  The array
          returned from the routine must have the data type specified.  The
          limitation on other integer types is because there are no
          conversion routines between them and character in the CHR library.
@@ -34548,8 +34869,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 
          \sstitem
           There is a routine for each of the numerics data types and
-          logical: replace {\tt "}x{\tt "} in the routine name by D, R, I, W, UW, B,
-          UB, L as appropriate.  The array supplied to the routine must
+          logical: replace {\tt "}x{\tt "} in the routine name by D, R, I, K, W, UW,
+          B, UB, L as appropriate.  The array supplied to the routine must
           have the data type specified.
 
          \sstitem
@@ -35153,7 +35474,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          OTYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The HDS data type of the output array. Must be an integer type
-         (i.e. one of \_INTEGER, \_WORD, \_UWORD, \_BYTE  or \_UBYTE ).
+         (i.e. one of \_INTEGER, \_INT64, \_WORD, \_UWORD, \_BYTE  or \_UBYTE ).
       }
       \sstsubsection{
          IP2 = INTEGER (Given)
@@ -35332,6 +35653,81 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          \sstitem
          There is a routine for the all numeric data types: replace {\tt "}x{\tt "}
          in the routine name by B, D, I, R, UB, UW, or W as appropriate.
+         The IN argument supplied must have the data type specified.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_SCLKx
+}{
+   Copies array values into a INTEGER$*$8 array, scaling them in the
+   process
+}{
+   \sstdescription{
+      This routine copies values from one array to another, applying a
+      linear scaling in the process. The output array is of type INTEGER$*$8
+      but the input array can be of a different type.
+   }
+   \sstinvocation{
+      CALL KPG1\_SCLKx( SCALE, ZERO, BAD, EL, IN, OUT, BADOUT, NBAD,
+                       STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SCALE = DOUBLE PRECISION (Given)
+      }{
+         The scale factor.
+      }
+      \sstsubsection{
+         ZERO = DOUBLE PRECISION (Given)
+      }{
+         The zero offset.
+      }
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         If true there may be bad pixels present in the input array. If
+         false it is safe not to check for bad values.
+      }
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The size of the input array.
+      }
+      \sstsubsection{
+         IN( EL ) = ? (Given)
+      }{
+         The input array.
+      }
+      \sstsubsection{
+         OUT( EL ) = INTEGER$*$8 (Returned)
+      }{
+         The output array.
+      }
+      \sstsubsection{
+         BADOUT = LOGICAL (Returned)
+      }{
+         True if there are any bad pixels in the output array.
+      }
+      \sstsubsection{
+         NBAD = INTEGER (Returned)
+      }{
+         The number of good input pixels that could not be accomodated
+         within the dynamic range of the output data type, and were
+         consequently set bad in the output array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER  (Given and Returned)
+      }{
+         Global status value
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for the all numeric data types: replace {\tt "}x{\tt "}
+         in the routine name by B, D, I, K, R, UB, UW, or W as appropriate.
          The IN argument supplied must have the data type specified.
       }
    }
@@ -40042,7 +40438,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 }{
    \sstdescription{
       If the input TYPE is one of the HDS primitive numeric data types,
-      i.e. one of \_REAL, \_DOUBLE, \_INTEGER, \_WORD, \_UWORD, \_BYTE or
+      i.e. one of \_REAL, \_DOUBLE, \_INTEGER, \_INT64, \_WORD, \_UWORD, \_BYTE or
        \_UBYTE, then the number of bytes used by that data type is
       returned as NBYTES.  The values are those stored as the symbolic
       constants VAL\_\_NBx in the PRM\_PAR include file.  (See SUN/39.)
@@ -40381,7 +40777,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 \sstroutine{
    kpg1Kymp2
 }{
-   Parses a {\tt "}keyword = value{\tt "} string for kpg1Kymp1 and add to a
+   Parses a {\tt "}keyword = value{\tt "} string for kpg1Kymp1 and add to a KeyMap
 }{
    \sstdescription{
       This is a service function for kps1Kymp1. It parses the supplied
@@ -40390,13 +40786,19 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       the value into the supplied KeyMap at the correct point.
    }
    \sstinvocation{
-      void kpg1Kymp2( const char $*$string, AstKeyMap $*$keymap, int $*$status );
+      void kpg1Kymp2( const char $*$string, const char $*$ind, AstKeyMap $*$keymap,
+                      int $*$status );
    }
    \sstarguments{
       \sstsubsection{
          string
       }{
          The null-terminated {\tt "}keyword=value{\tt "} string to be parsed.
+      }
+      \sstsubsection{
+         ind
+      }{
+         The GRP indirection character - only used in error messages.
       }
       \sstsubsection{
          keymap

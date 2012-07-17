@@ -1,6 +1,6 @@
       SUBROUTINE CCG_COMB1<T>( NPIX, NLINES, STACK, VARS, COORDS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       NMAT, RESULT, RESVAR, WIDTHS, COIND, WRK1, 
+     :                       NMAT, RESULT, RESVAR, WIDTHS, COIND, WRK1,
      :                       WRK2, PP, COVEC, POINT, USED, NCON, NFLAG,
      :                       STATUS )
 *+
@@ -59,7 +59,7 @@
 *        12 = Sum
 *        13 = Standard deviation about the mean
 *        14 = Sigma-clipped standard deviation about the mean
-*        21 = Integrated value (sum of pixel co-ordinate width times 
+*        21 = Integrated value (sum of pixel co-ordinate width times
 *             value)
 *        22 = Intensity-weighted co-ordinate
 *        23 = Intensity-weighted dispersion of the co-ordinate
@@ -69,6 +69,10 @@
 *        32 = Minimum
 *        33 = Co-ordinate of maximum
 *        34 = Co-ordinate of minimum
+*        35 = Number of good pixel values
+*        36 = Number of bad pixel values
+*        37 = Fraction of good pixel values
+*        38 = Fraction of bad pixel values
 *        300 = Median, but estimating variance from mean variance
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
@@ -87,9 +91,13 @@
 *        Number of columns in covariance matrix.   It should be at
 *        least NLINES * ( NLINES + 1 )/ 2.
 *     RESULT( NPIX ) = ? (Returned)
-*        The output line of data.
+*        The output line of data. This will always be of type _INTEGER
+*        for methods 35 (NGOOD) and 36 (NBAD). Since this routine does
+*        not actually access the array values, the mismatch in data
+*        types does not matter.
 *     RESVAR( NPIX ) = ? (Returned)
-*        The output variances.
+*        The output variances. This will always be of type _INTEGER
+*        for methods 35 (NGOOD) and 36 (NBAD).
 *     WIDTHS( NPIX, NLINES ) = ? (Returned)
 *        The widths along the collapse axis for each pixel.  It is
 *        calculated only for IMETH = 21.
@@ -123,8 +131,9 @@
 *  Notes:
 *     -  There is a routine for real and double-precision: replace "x"
 *     in the routine name by D or R as appropriate.  The STACK, VARS,
-*     COORDS, RESULT, RESVAR, WIDTHS, WRK1, and WRK2 arguments supplied 
-*     to the routine must have the data type specified.
+*     COORDS, RESULT, RESVAR, WIDTHS, WRK1, and WRK2 arguments supplied
+*     to the routine must have the data type specified (except for
+*     methods 35 and 36 for which RESULT and RESVAR are always _INTEGER).
 *     -  Various of the options are simply variations on a theme.  The
 *     Broadened median is just a trimmed mean with a variable trimming
 *     fraction. The Mode is an iteratively carried out version of the
@@ -191,7 +200,7 @@
 *        variances for large samples, for which the memory requirements
 *        for the COVEC array would be too large.
 *     2005 December 22 (MJC):
-*        Added several translations for new estimators and moments 
+*        Added several translations for new estimators and moments
 *        (IMETH=12 upwards except 300).
 *     2005 December 24 (MJC):
 *        Added mean absolute deviation.
@@ -217,7 +226,7 @@
 *     2007 November 17 (MJC):
 *        WIDTHS is returned, not supplied, so move it in the API.
 *     2007 December 7 (MJC):
-*        Return number of flagged values through new argument NFLAG. 
+*        Return number of flagged values through new argument NFLAG.
 *        Initialise count of the contributing pixels in each line.
 *     2008 September 24 (MJC):
 *        Add Option 14.
@@ -238,6 +247,8 @@
 *         Use revised APIs for maxima and minima routines.
 *     2009 July 11 (MJC):
 *         Use revised API for CCG_FM1.
+*     17-JUL-2012 (DSB):
+*         Added methods 35, 36, 37 and 38.
 *     {enter_further_changes_here}
 
 *-
@@ -293,12 +304,12 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If we're doing a trimmed mean derive the variance-covariance matrix
-*  for the order statistics of a normal population with up to NLINE 
-*  members.  This also sets up the scale factor for converting mean 
+*  for the order statistics of a normal population with up to NLINE
+*  members.  This also sets up the scale factor for converting mean
 *  variances to median variances.
       IF ( IMETH .GE. 3 .AND. IMETH .LE. 11 .OR. IMETH .EQ. 14 ) THEN
          CALL PSX_CALLOC( NLINES*NLINES, '_DOUBLE', IPW1, STATUS )
-         CALL CCG_ORVAR( NLINES, NMAT, PP, COVEC, 
+         CALL CCG_ORVAR( NLINES, NMAT, PP, COVEC,
      :                   %VAL( CNF_PVAL( IPW1 ) ), STATUS )
          CALL PSX_FREE( IPW1, STATUS )
       END IF
@@ -319,15 +330,15 @@
       ELSE IF ( IMETH .EQ. 3 .OR. IMETH .EQ. 300 ) THEN
 
 *  Forming the weighted median.
-         CALL CCG_MD1<T>( ( IMETH .EQ. 3 ), NPIX, NLINES, STACK, VARS, 
-     :                  MINPIX, NMAT, COVEC, RESULT, RESVAR, WRK1, 
+         CALL CCG_MD1<T>( ( IMETH .EQ. 3 ), NPIX, NLINES, STACK, VARS,
+     :                  MINPIX, NMAT, COVEC, RESULT, RESVAR, WRK1,
      :                  WRK2, POINT, USED, NCON, NBAD, STATUS )
 
       ELSE IF ( IMETH .EQ. 4 ) THEN
 
 *  Forming trimmed mean.
           CALL CCG_TM1<T>( ALPHA, NPIX, NLINES, STACK, VARS, MINPIX,
-     :                   NMAT, COVEC, RESULT, RESVAR, WRK1, POINT, 
+     :                   NMAT, COVEC, RESULT, RESVAR, WRK1, POINT,
      :                   USED, NCON, NBAD, STATUS )
 
       ELSE IF ( IMETH .EQ. 5 ) THEN
@@ -395,7 +406,7 @@
 
 *  Forming sigma-clipped standard deviation.
          CALL CCG_CS1<T>( NSIGMA, NPIX, NLINES, STACK, VARS, MINPIX,
-     :                  NMAT, COVEC, RESULT, RESVAR, WRK1, WRK2, 
+     :                  NMAT, COVEC, RESULT, RESVAR, WRK1, WRK2,
      :                  POINT, USED, NCON, NBAD, STATUS )
 
       ELSE IF ( IMETH .EQ. 21 ) THEN
@@ -465,6 +476,16 @@
 *  the RESULT array.
          CALL CCG_I2WC<T>( NPIX, NLINES, COIND, COORDS, RESULT, NBAD,
      :                   STATUS )
+
+*  Forming array of pixel counts.
+      ELSE IF ( IMETH .EQ. 35 .OR. IMETH .EQ. 36 ) THEN
+         CALL CCG_CNT1<T>( IMETH, NPIX, NLINES, STACK, RESULT, RESVAR,
+     :                     NCON, NBAD, STATUS )
+
+*  Forming array of pixel fractions.
+      ELSE IF ( IMETH .EQ. 37 .OR. IMETH .EQ. 38 ) THEN
+         CALL CCG_FRC1<T>( IMETH, NPIX, NLINES, STACK, RESULT, RESVAR,
+     :                     NCON, NBAD, STATUS )
 
       ELSE
 

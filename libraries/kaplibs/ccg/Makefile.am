@@ -12,7 +12,8 @@ F_ROUTINES = ccg_orvar.f
 # Generic routines.
 CCG_GN_GEN =  ccg_ad1.gn   ccg_ad3.gn   ccg_mn1.gn   ccg_mn3.gn  \
 ccg_mx1.gn    ccg_mx3.gn   ccg_rms1.gn  ccg_rms3.gn  ccg_sd1.gn  \
-ccg_sd3.gn    ccg_sum1.gn  ccg_sum3.gn
+ccg_sd3.gn    ccg_sum1.gn  ccg_sum3.gn  ccg_cnt1.gn  ccg_cnt3.gn \
+ccg_frc1.gn   ccg_frc3.gn
 
 CCG_GDR_GEN = ccg_bm1.gdr  ccg_bm3.gdr  ccg_clip.gdr ccg_comb1.gdr \
 ccg_comb3.gdr ccg_cs1.gdr  ccg_cs3.gdr  ccg_flx1.gdr ccg_flx3.gdr \
