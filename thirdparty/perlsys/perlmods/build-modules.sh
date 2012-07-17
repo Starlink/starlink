@@ -49,3 +49,18 @@ do
     fi
 done
 
+# Create any necessary symlinks from the Starlink bin directory.
+
+PERLMOD_DIR=$PWD
+pushd ${STARLINK_DIR}/bin
+for i in $(< ${PERLMOD_DIR}/perlmods-symlinks.txt)
+do
+    if [ ! -e $i ]
+    then
+        echo Making symlink for ${i}.
+        ln -s ../Perl/bin/$i
+    else
+        echo Symlink for $i does not need to be created, skipping.
+    fi
+done
+popd
