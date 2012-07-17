@@ -90,6 +90,8 @@
 *     RMS = _DOUBLE (Read)
 *          RMS in input NDF(s) in data units.
 *     USERVAL = GROUP (Read)
+*          (NOT YET USED/TESTED!)
+*          Config-style input file with user-supplied fixed values or
 *          initial estimates for the fit. Entries are of the form
 *          'letter''number' = ( val1, val2 ) or ... = val1. Val1 is the
 *          value for the given parameter; Val2 = is the fitmask:
@@ -239,8 +241,6 @@
 *     2010-09-29 (RPT):
 *        Initial test version from smurf_remsky
 *     {enter_further_changes_here}
-
-*  Notes:
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -400,7 +400,10 @@ void smurf_fit1d( int * status )
 
   if (*status != SAI__OK) goto CLEANUP;
 
-  /* Extract read user supplied values using a keymap */
+  /* Get the RMS */
+  parGet0d( "RMS", &rms, status );
+
+  /* Extract and read user supplied values using a keymap */
   get_fit1par( &axis, range, &fid, &ncomp,
 		   &rms, &critamp, critdisp, &estimate_only, &model_only,
 		   status );
@@ -669,24 +672,6 @@ static void get_fit1par( int *axis, double *range,
       msgOutiff( MSG__VERB, "", "... NCOMP=%d", status, *ncomp );
     } else {
       errRep(FUNC_NAME, "Failed to get parameter NCOMP from config file",
-	     status);
-      return;
-    }
-  }
-
-  /* Rms in input map */
-  if( rms ) {
-    *rms = 0;
-    astMapGet0D( keymap, "RMS", rms );
-    if ( *status == SAI__OK ) {
-      if ( *rms < 0 ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "RMS must be >= 0.", status );
-      } else {
-	msgOutiff( MSG__VERB, "", "... RMS=%f", status, *rms );
-      }
-    } else {
-      errRep(FUNC_NAME, "Failed to get parameter RMS from config file",
 	     status);
       return;
     }
@@ -986,6 +971,7 @@ static void convert_range_to_pixels ( AstMapping **wcsmap, double *range,
   } else {
      msgOutiff(MSG__VERB, " ", "Range %f to %f => Pixel range: %d to %d\n",
 	    status, range[0], range[1], prange[0], prange[1]);
+  }
 
   if ( prange[0] >= (int) ndims || prange[1] <= 1 ) {
     msgOutf( "", "Range results in a pixel range %d to %d that is beyond the input ndf axis %d to %d",
