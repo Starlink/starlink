@@ -17,11 +17,11 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {11.5}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {2nd November 2010}
+\newcommand{\stardocdate}      {19th July 2012}
 \newcommand{\stardoctitle}     {ARY\\[\latex{2.5ex}]
                                 A Subroutine Library for Accessing\\
                                 ARRAY Data Structures}
-\newcommand{\stardocversion}   {Version 1.3}
+\newcommand{\stardocversion}   {Version 1.4}
 \newcommand{\stardocmanual}    {Reference Manual}
 \newcommand{\stardocabstract}  {%
 The ARY library is a set of routines for accessing Starlink ARRAY data
@@ -3709,7 +3709,7 @@ re-compilation or re-linking be necessary.
 \section{\xlabel{changes_and_new_features_in_v13}%
 Changes and new features in V1.3}
 \label{changes_and_new_features_in_v13}
-The most significant changes in version (V1.3) of the ARY\_ system are
+The most significant changes in version (V1.3) of the ARY\_ system were
 as follows:
 
 \begin{enumerate}
@@ -3720,6 +3720,19 @@ ARY\_DELTA creates a copy of a supplied array, stored in DELTA form.
 
 \item A new routine called ARY\_LOC returns a locator for the
 HDS data object referred to by the supplied ARY identifier.
+
+\end{enumerate}
+
+\section{\xlabel{changes_and_new_features_in_v14}%
+Changes and new features in V1.4}
+\label{changes_and_new_features_in_v14}
+The most significant changes in version (V1.4) of the ARY\_ system are
+as follows:
+
+\begin{enumerate}
+
+\item A bug in ARY_DUPE has been fixed. This bug resulted in the wrong data
+type for the output array if the input array was compressed.
 
 \end{enumerate}
 
