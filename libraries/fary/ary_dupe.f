@@ -32,7 +32,7 @@
 *        The global status.
 
 *  Notes:
-*     -  Duplicating a scaled or delta array produces and equivalent
+*     -  Duplicating a scaled or delta array produces an equivalent
 *     simple array.
 *     -  If this routine is called with STATUS set, then a value of
 *     ARY__NOID will be returned for the IARY2 argument, although no
@@ -123,6 +123,10 @@
 *        than they need to be.
 *     1-NOV-2010 (DSB):
 *        Include support for delta compressed arrays.
+*     19-JUL-2012 (DSB):
+*        The new array data type should take account of any change in
+*        data type caused by the old array being stored in delta or
+*        scaled form.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -179,6 +183,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER NEWTYP*(DAT__SZTYP)! Data type for new array
       INTEGER IACB1              ! Index to input array entry in ACB
       INTEGER IACB2              ! Index to output array entry in ACB
       INTEGER IDCB1              ! Input data object entry in the DCB
@@ -263,10 +268,13 @@
                   CALL ARY1_DTYP( IDCB1, STATUS )
                   CALL ARY1_DBND( IDCB1, STATUS )
 
+*  Get the required data type for the new array.
+                  CALL ARY1_EXTYP( IDCB1, NEWTYP, STATUS )
+
 *  Create a new data object with the same attributes and an entry in the
 *  DCB. This is a simple array. The act of duplicating a scaled or delta
 *  array creates a simple array.
-                  CALL ARY1_DCRE( .TRUE., DCB_TYP( IDCB1 ),
+                  CALL ARY1_DCRE( .TRUE., NEWTYP,
      :                            DCB_CPX( IDCB1 ), ACB_NDIM( IACB1 ),
      :                            ACB_LBND( 1, IACB1 ),
      :                            ACB_UBND( 1, IACB1 ), PCB_TMP( IPCB ),
