@@ -1,5 +1,5 @@
 /*
-*     smf_fit_profile
+*     SMF_fit_profile
 
 *  Purpose:
 *     Low-level 1-D profile fitter
@@ -168,8 +168,7 @@ qsortstruct;
 
 static void FitProfileThread( void *job_data_ptr, int *status );
 
-static int getestimates( smf_math_function fid, const double fdata[], 
-                         const float weight[], int ndat,
+static int getestimates( const double fdata[], const float weight[], int ndat,
                          double *parlist, int npar, int ncomp, double rms,
                          double critamp, double critdisp[],
                          const int smoothingpar[], int numq );
@@ -192,10 +191,9 @@ static void mysort( int sortopt, double refpix, double *parlist,
 		    double *errlist, int npar, int ncomp );
 
 int comp0( const void *s1, const void *s2 );
-int comp1( const void *s1, const void *s2 );
+int comp11( const void *s1, const void *s2 );
 int comp2( const void *s1, const void *s2 );
-int comp3( const void *s1, const void *s2 );
-int comp4( const void *s1, const void *s2 );
+int comp21( const void *s1, const void *s2 );
 
 static double getresidual( const double fdata[], int ndat, 
                            int gaussiansfound, double *Destimates,
@@ -241,7 +239,9 @@ void smf_fit_profile( smfData  *data, int axis, int range[], int ncomp,
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
+
 #define MULTITHREADED 1
+
 #if (MULTITHREADED)
   nw = thrGetNThread( SMF__THREADS, status );
 #endif
@@ -783,9 +783,10 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 	    /*----------------------------------------*/
 	    /* Get initial Estimates                  */
 	    /*----------------------------------------*/
-	    nestim = getestimates( fid, fdata, weight, npts, parlist, npar,
+	    nestim = getestimates( fdata, weight, npts, parlist, npar,
 				   icomp, rms, critamp, critdisp,
 				   smoothingpar,numq );
+
 #if (MAXDEBUGINFO)
 	    msgOutiff(MSG__DEBUG, " ",
 	    "(FitProfileThread %d) ...profile %d getestimates found %d comps",
@@ -804,13 +805,52 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 
 	    /* Adjust gaussian estimates for function being fitted */
 	    adjustestimates( fid, nfound, parlist, npar );
+
+	    /* Replace estimates with values from any external parameter
+	       ndf or user supplied values */
+	    nfound = fillfromparndf( pardata, pbase, dstride, nfound,
+				     parlist, errlist, npar );
+
+#if (PREFITGAUSSIAN)
+	    /* Prefit gaussian to non-gaussian fits. Does not appear to 
+               lead to overall better results */ 
+	    if ( fid != SMF__MATH_GAUSS ) {
+
+	      /* Do an initial fit with a gaussian */
+	      double parlist2[MAXPAR];   
+	      double errlist2[MAXPAR];
+	      int fitmask2[MAXPAR];
+	      int npar2 = smf_math_fnpar ( SMF__MATH_GAUSS );
+	      int nfound2 = nfound;
+
+	      for ( i = 0; i < nfound-1; i++ ) {
+		int offset = i*npar;
+		int offset2 = i*npar2;
+		parlist2[offset2] = parlist[offset]; 
+		parlist2[offset2+1] = parlist[offset+1]; 
+		parlist2[offset2+2] = parlist[offset+2]; 
+		fitmask2[offset2] = fitmask[offset]; 
+		fitmask2[offset2+1] = fitmask[offset+1]; 
+		fitmask2[offset2+2] = fitmask[offset+2]; 
+	      }
+	      iters = dolsqfit( SMF__MATH_GAUSS, pcoord, fdata, weight, npts, 
+				parlist2, errlist2, 
+				fitmask2, npar2, &nfound2, range, critamp,
+				critdisp, tol, its, lab, fitopt );
+	      if ( iters >= 0 && nfound2 > 0 ) {
+		for ( i = 0; i < nfound2-1; i++ ) {
+		  int offset = i*npar;
+		  int offset2 = i*npar2;
+		  nfound = nfound2;
+		  parlist[offset] = parlist2[offset2]; 
+		  parlist[offset+1] = parlist2[offset2+1]; 
+		  parlist[offset+2] = parlist2[offset2+2]; 
+		}
+	      }
+	    }
+#endif
+
 	  }
-
-          /* Replace estimates with values from any external parameter
-             ndf or user supplied values */
-	  nfound = fillfromparndf( pardata, pbase, dstride, nfound,
-				   parlist, errlist, npar );
-
 	  /*----------------------------------------*/
 	  /* Do the actual fit                      */
 	  /*----------------------------------------*/
@@ -975,12 +1015,10 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
    int          iters = 0;
    int          nfound = 0;
    int          sortopt = -1;   /* placeholder for param with user sort */
-   int          lsortopt = -1;
 
    tolerance = MYMAX( tol, 0.0 );
    mixingpar = fabsf( lab );
    maxits    = MYMIN( its, MAXITERS );
-
 
    nfound = *ncomp;                         /* On input: Nr to fit */
    tpar = nfound * npar + 3;                /* Background pars added. */
@@ -1009,47 +1047,45 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
    /*----------------------------------------------------------*/
 
    if (iters < 0) {
-      int   offset = nfound * npar;        /* Reserved for the estimates */
       for (i = 0; i < MAXPAR; i++) {
          parlist[i] = VAL__BADD;
       }
       nfound = 0;
    } else {
 
+     /* Make sure dispersion-like pars are positive */
+     for (i = 0; i < nfound; i++) {
+       if ( fid >= SMF__MATH_GAUSS && fid <= SMF__MATH_VOIGT ) {
+	 int offset = i*npar;
+	 parlist[offset+2] = fabs( parlist[offset+2] ); 
+	 if ( fid == SMF__MATH_VOIGT ) {
+	   parlist[offset+3] = fabs( parlist[offset+3] ); 
+	 }
+       }
+     }
+
+     /*----------------------------------------------------------*/
+     /* TRY TO WEED OUT SPURIOUS RESULTS                         */
+     /*----------------------------------------------------------*/
+
      /* RPT: for now, make reference pixel middle of the array */
      double refpix = 0.5*(pcoord[0]+pcoord[npts-1]);
 
-     int nremaining = nfound;
-     int inpfound = nfound;
+     /* Set up mask */
+
 
      /* Weed out fits with fitted peak outside range (can arise from
         edge effects */
-     /* Sort in increasing position */
-     lsortopt = 1;
-     if (lsortopt > -1 && nfound > 1) {
-       mysort( lsortopt, refpix, parlist, errlist, npar, nfound );
-     }
-     for (i = nfound-1; i >= 0; i--) {
-       int offset = i*npar;
-       if (parlist[offset+1] > range[1]) {
-         nremaining -= 1;
-	 for (j = 0; j < npar; j++) {
-	   parlist[offset+j] = VAL__BADD;
-	   errlist[offset+j] = VAL__BADD;
-	 }
-       }
-     }
-     nfound = nremaining;
 
-     /* Sort in decreasing position */
-     lsortopt = 2;
-     nremaining = nfound;
-     if (lsortopt > -1 && nfound > 1) {
-       mysort( lsortopt, refpix, parlist, errlist, npar, nfound );
-     }
+     int inifound = nfound;
+     int nremaining = nfound;
+
+     /* Remove fits with centers outside the fit range */
+
      for (i = nfound-1; i >= 0; i--) {
        int offset = i*npar;
-       if (parlist[offset+1] < range[0]) {
+       if ( parlist[offset+1] < range[0] ||
+            parlist[offset+1] > range[1] ) {
          nremaining -= 1;
 	 for (j = 0; j < npar; j++) {
 	   parlist[offset+j] = VAL__BADD;
@@ -1057,27 +1093,61 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
 	 }
        }
      }
-     nfound = nremaining;
+
+     /* Remove fits outside critical dispersion levels */
+     /* Guard against unreasonably large fits as well  */
 
      double critwidth = critdisp[0];
-     double critlorz = critdisp[1];
+     double critlorz  = critdisp[1];
      if ( fid == SMF__MATH_VOIGT ) {
        critwidth = 0.5 * DISP2FWHM( critwidth );
        if ( critlorz >= 0 ) {
          critlorz  = 0.5 * DISP2FWHM( critlorz );
+       } else {
+         /* guard against insanely wide fits */
+	 critlorz = 0.25*npts;
        }
      }
 
-     /* Weed out fits below critical levels */
-     /* step 1: sort in decreasing dispersion */
-     lsortopt = 3;
-     nremaining = nfound;
-     if (lsortopt > -1 && nfound > 1) {
-       mysort( lsortopt, refpix, parlist, errlist, npar, nfound );
-     }
      for (i = nfound-1; i >= 0; i--) {
        int offset = i*npar;
-       if (parlist[offset+2] < critdisp[0]) {
+       if ( fid < SMF__MATH_VOIGT && parlist[offset] != VAL__BADD ) {
+         if ( fabs( parlist[offset+2] ) < critwidth ||
+	      fabs( parlist[offset+2] ) > 0.5*npts ) {
+           nremaining -= 1;
+	   for (j = 0; j < npar; j++) {
+	     parlist[offset+j] = VAL__BADD;
+	     errlist[offset+j] = VAL__BADD;
+	   }
+	 }
+       } else if ( parlist[offset] != VAL__BADD ) {
+         if ( ( fabs( parlist[offset+2] ) < critwidth &&
+                fabs( parlist[offset+3] ) < 0.25*critwidth ) ||
+	      fabs( parlist[offset+2] ) > 0.5*npts ||
+	      fabs( parlist[offset+3] ) > critlorz ) {
+           nremaining -= 1;
+	   for (j = 0; j < npar; j++) {
+	     parlist[offset+j] = VAL__BADD;
+	     errlist[offset+j] = VAL__BADD;
+	   }
+	 }
+       }
+     }
+
+     /* Remove fits with too low an amplitude */
+
+     for (i = nfound-1; i >= 0; i--) {
+       int offset = i*npar;
+
+       double minamp = critamp;
+#if defined (USETHIS)
+       if ( SMF__MATH_VOIGT ) { 
+         /* fitted parameter is the area not the amplitude */
+         minamp *= amp2area( parlist[2], parlist[3] );
+       }
+#endif
+
+       if ( parlist[offset] != VAL__BADD && parlist[offset] < minamp ) {
          nremaining -= 1;
 	 for (j = 0; j < npar; j++) {
 	   parlist[offset+j] = VAL__BADD;
@@ -1085,36 +1155,24 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
 	 }
        }
      }
-     nfound = nremaining;
-
-     /* step 2: sort in decreasing amplitude */
-     lsortopt = 0;
-     nremaining = nfound;
-     if (lsortopt > -1 && nfound > 1) {
+     
+     /* Sort the result: this will move remaining fits to the front */
+ 
+     if ( nremaining > 0 ) {
+       int lsortopt = 0;                /* By default sort in amplitude */
+       if ( sortopt > -1 ) { 
+	 lsortopt = sortopt;            /* Use user defined sort order */
+       }      
        mysort( lsortopt, refpix, parlist, errlist, npar, nfound );
+
+     } else if ( inifound > 0 ) {
+       
+       /* Log fact that all fits were rejected */
+       iters = -10 - inifound;
+     
      }
-     for (i = nfound-1; i >= 0; i--) {
-       int offset = i*npar;
-       if (parlist[offset] < critamp) {
-         nremaining -= 1;
-	 for (j = 0; j < npar; j++) {
-	   parlist[offset+j] = VAL__BADD;
-	   errlist[offset+j] = VAL__BADD;
-	 }
-       }
-     }
+
      nfound = nremaining;
-
-     /* User defined sort if there is more than one fitted component. */
-     if (sortopt > -1 && nfound > 1) {
-       mysort( sortopt, refpix, parlist, errlist, npar, nfound );
-     }
-
-     /* Log fact that all fits were rejected */
-     if ( nfound ==0 && inpfound > 0 ) {
-       iters = -10 - inpfound;
-     }
-
    }
 
    /* return number of components found */
@@ -1124,7 +1182,7 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
 }
 
 
-static int getestimates( smf_math_function fid, const double fdata[], const float weight[], int npts,
+static int getestimates( const double fdata[], const float weight[], int npts,
 			 double *parlist, int npar, int ncomp,
 			 double rms, double critamp, double critdisp[],
 			 const int smoothingpar[], int numq)
@@ -1354,7 +1412,7 @@ static int getestimates( smf_math_function fid, const double fdata[], const floa
       for (i = 0; i < gaussiansfound; i++) {
 	parlist[i*npar+0] = Destimates[i*3+0];
 	parlist[i*npar+1] = Destimates[i*3+1];
-	parlist[i*npar+2] = Destimates[i*3+2];
+	parlist[i*npar+2] = fabs( Destimates[i*3+2] );
       }
       /* Fill with zero's if less gaussians were found */
       for (i = gaussiansfound; i < ncomp; i++) {
@@ -1480,7 +1538,6 @@ static int fillfromparndf( const smfArray *pardata, int pbase, int dstride,
   return( pfound );
 }
 
-
 int comp0( const void  *v1, const void *v2 )
 /*------------------------------------------------------------*/
 /* PURPOSE: Compare function for 'qsort' only! Sort profiles  */
@@ -1497,13 +1554,12 @@ int comp0( const void  *v1, const void *v2 )
       return( -1 );
    if (s1->par[0] == s2->par[0])
       return( 0 );
-   if (fabs(s2->par[0]) > fabs(s1->par[0]))   /* decreasing order */
+   if (s2->par[0] > s1->par[0])    /* decreasing order */
       return( 1 );
    return( -1 );
 }
 
-
-int comp1( const void  *v1, const void *v2 )
+int comp11( const void  *v1, const void *v2 )
 /*------------------------------------------------------------*/
 /* PURPOSE: Compare function for 'qsort' only! Sort profiles  */
 /* in pixel position in increasing order                      */
@@ -1519,34 +1575,12 @@ int comp1( const void  *v1, const void *v2 )
       return( -1 );
    if (s1->par[1] == s1->par[2])
       return( 0 );
-   if (fabs(s1->par[1]) > fabs(s2->par[1]))   /* increasing order */
+   if (s1->par[1] > s2->par[1])    /* increasing order */
       return( 1 );
    return( -1 );
 }
 
 int comp2( const void  *v1, const void *v2 )
-/*------------------------------------------------------------*/
-/* PURPOSE: Compare function for 'qsort' only! Sort profiles  */
-/* in pixel position in decreasing order                      */
-/*------------------------------------------------------------*/
-{
-   const qsortstruct *s1, *s2;
-   s1 = v1;
-   s2 = v2;
-
-   if (s1->par[1] == VAL__BADD)     /* Sort VAL__BADDs to end of array */
-      return( 1 );
-   if (s2->par[1] == VAL__BADD)
-      return( -1 );
-   if (s1->par[1] == s1->par[2])
-      return( 0 );
-   if (fabs(s2->par[1]) > fabs(s1->par[1]))   /* decreasing order */
-      return( 1 );
-   return( -1 );
-}
-
-
-int comp3( const void  *v1, const void *v2 )
 /*------------------------------------------------------------*/
 /* PURPOSE: Compare function for 'qsort' only! Sort profiles  */
 /* in dispersion in decreasing size                           */
@@ -1567,8 +1601,7 @@ int comp3( const void  *v1, const void *v2 )
    return( -1 );
 }
 
-
-int comp4( const void  *v1, const void *v2 )
+int comp21( const void  *v1, const void *v2 )
 /*------------------------------------------------------------*/
 /* PURPOSE: Compare function for 'qsort' only! Sort profiles  */
 /* in increasing pixel distance wrt. to center                */
@@ -1591,6 +1624,7 @@ int comp4( const void  *v1, const void *v2 )
 }
 
 
+
 static void mysort( int sortopt, double refpix, double *parlist,
 		    double *errlist, int npar, int ncomp )
 /*------------------------------------------------------------*/
@@ -1603,7 +1637,7 @@ static void mysort( int sortopt, double refpix, double *parlist,
    int           i, j;
    qsortstruct   comps[MAXGAUSS];
 
-   if ( sortopt < 0 || sortopt > 3 ) {
+   if ( sortopt < 0 ) {
      return;
    }
 
@@ -1615,16 +1649,14 @@ static void mysort( int sortopt, double refpix, double *parlist,
    }
    comps[i].refpix = refpix;
 
-   if      (sortopt == 0)                           /* amplitude */
+   if      (sortopt == 0)                           /* decr. amplitude     */
      qsort( comps, ncomp, sizeof(qsortstruct), comp0 );
-   else if (sortopt == 1)                           /* peak position up*/
-     qsort( comps, ncomp, sizeof(qsortstruct), comp1 );
-   else if (sortopt == 2)                           /* peak position down*/
+   else if (sortopt == 11)                          /* incr. peak position */
+     qsort( comps, ncomp, sizeof(qsortstruct), comp11 );
+   else if (sortopt == 2)                           /* decr. dispersion    */
      qsort( comps, ncomp, sizeof(qsortstruct), comp2 );
-   else if (sortopt == 3)                           /* dispersion */
-     qsort( comps, ncomp, sizeof(qsortstruct), comp3 );
-   else if (sortopt == 4)                           /* Distance from ref */
-     qsort( comps, ncomp, sizeof(qsortstruct), comp4 );
+   else if (sortopt == 21)                          /* incr. distance ref  */
+     qsort( comps, ncomp, sizeof(qsortstruct), comp21 );
 
    for (i = 0; i < ncomp; i++) {
      for (j = 0; j < npar; j++) {
@@ -1684,3 +1716,21 @@ static double getresidual( const double fdata[],
    }
    return( chi2 );
 }
+
+#if defined (USETHIS)
+static double amp2area( double aD,
+                        double aL )
+/*------------------------------------------------------------*/
+/* PURPOSE: Convert an amplitude to the area for a Voigt      */
+/*          function.                                         */
+/*------------------------------------------------------------*/
+{
+   double x, y, Rw, Iw;
+
+   x = 0.0;
+   y = aL * sqrt(log(2.0)) / aD;
+   w( x, y, &Rw, &Iw );
+
+   return(  aD * sqrt(M_PI/log(2.0)) / Rw );
+}
+#endif
