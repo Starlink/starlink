@@ -23,6 +23,7 @@ SC                             STARLINK COOKBOOKS                             SC
 018.01  2002-10-10 vgg   ??   The X-Ray Data Analysis Cookbook
 019.01  2009-MM-DD EC    ??   The SMURF SCUBA-2 SRO data analysis cookbook
 020.01  2012-MM-DD MJC   ??   ACSIS Data-reduction Cookbook
+021.01  2012-MM-DD HST   ??   The SCUBA-2 Data-analysis Cookbook
 
 SG                               STARLINK GUIDES                              SG
 003.05  1996-03-12 dm    76   IUEDR - Reference manual
@@ -325,6 +326,7 @@ AUTHORS                          AUTHORS                                AUTHORS
        HJW   Helen Walker            (RAL)
        HM    Henry Matthews          (JACH)
        HME   Horst Meyerdierks       (EDI)
+       HST   Holly Thomas            (JACH)
        IDH   Ian Howarth             (UCL)
        ISM   Ian McLean              (?)
        JAB   Jeremy Bailey           (AAO)
