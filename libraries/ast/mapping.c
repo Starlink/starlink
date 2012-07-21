@@ -314,6 +314,12 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        variances values incorrectly, when the AST__REBINEND flag was
 *        supplied. The exact size of the error depended on the nature of
 *        the Mapping and the spreading method, and so is hard to predict.
+*     20-JUL-2012 (DSB):
+*        Major re-structuring of astRebinSeq<X> to add further
+*        corrections to the normalisation. The model is now that each
+*        input array is first rebinned and then scaled to preserve the
+*        total data sum, and then each final output pixel is the weighed
+*        mean of all the aligned rebinned  pixels.
 *class--
 */
 
@@ -493,19 +499,102 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Prototypes for private member functions. */
 /* ======================================== */
+
+#define DECLARE_GENERIC(X,Xtype) \
+static int InterpolateKernel1##X( AstMapping *, int, const int *, const int *, \
+                                  const Xtype *, const Xtype *, int, \
+                                  const int *, const double *const *, \
+                                  void (*)( double, const double *, int, \
+                                            double *, int * ), \
+                                  void (*)( double, const double *, int, \
+                                            double * ), \
+                                  int, const double *, int, Xtype, \
+                                  Xtype *, Xtype *, int * );\
+\
+static int InterpolateLinear##X( int, const int *, const int *, const Xtype *, \
+                                 const Xtype *, int, const int *, \
+                                 const double *const *, int, Xtype, Xtype *, \
+                                 Xtype *, int * ); \
+\
+static int InterpolateNearest##X( int, const int *, const int *, const Xtype *, \
+                                  const Xtype *, int, const int *, \
+                                  const double *const *, int, Xtype, Xtype *, \
+                                  Xtype *, int * ); \
+\
+static int Resample##X( AstMapping *, int, const int [], const int [], \
+                        const Xtype [], const Xtype [], int, \
+                        void (*)( void ), const double [], int, double, int, \
+                        Xtype, int, const int [], const int [], \
+                        const int [], const int [], Xtype [], Xtype [], int * ); \
+\
+static void ConserveFlux##X( double, int, const int *, Xtype, Xtype *, Xtype *, \
+                             int * ); \
+\
+static void InterpolateBlockAverage##X( int, const int[], const int[], \
+                             const Xtype [], const Xtype [], int, const int[], \
+                             const double *const[], const double[], int, \
+                             Xtype, Xtype *, Xtype *, int * );
+
+DECLARE_GENERIC(B,signed char)
+DECLARE_GENERIC(D,double)
+DECLARE_GENERIC(F,float)
+DECLARE_GENERIC(I,int)
+DECLARE_GENERIC(L,long int)
+DECLARE_GENERIC(S,short int)
+DECLARE_GENERIC(UB,unsigned char)
+DECLARE_GENERIC(UI,unsigned int)
+DECLARE_GENERIC(UL,unsigned long int)
+DECLARE_GENERIC(US,unsigned short int)
+
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-static void InterpolateBlockAverageLD( int, const int[], const int[], const long double [], const long double [], int, const int[], const double *const[], const double[], int, long double, long double *, long double *, int * );
-static int InterpolateKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double *), int, const double *, int, long double, long double *, long double *, int * );
-static int InterpolateLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double *, int * );
-static int InterpolateNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double *, int * );
-static void SpreadKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, long double, int, long double *, long double *, double *, int *, int * );
-static void SpreadLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, long double *, long double *, double *, int *, int * );
-static void SpreadNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, long double *, long double *, double *, int *, int * );
-static int ResampleLD( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)( void ), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], int * );
-static void RebinLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], int * );
-static void RebinSeqLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [], int *, int * );
-static void ConserveFluxLD( double, int, const int *, long double, long double *, long double *, int * );
+DECLARE_GENERIC(LD,long double)
 #endif
+
+#undef DECLARE_GENERIC
+
+#define DECLARE_GENERIC(X,Xtype) \
+static void Rebin##X( AstMapping *, double, int, const int [], const int [], \
+                      const Xtype [], const Xtype [], int, const double [], int, \
+                      double, int, Xtype, int, const int [], const int [], \
+                      const int [], const int [], Xtype [], Xtype [], int * ); \
+\
+static void RebinSeq##X( AstMapping *, double, int, const int [], const int [], \
+                         const Xtype [], const Xtype [], int, const double [], \
+                         int, double, int, Xtype, int, const int [], \
+                         const int [], const int [], const int [], Xtype [], \
+                         Xtype [], double [], int *, int * ); \
+\
+static void SpreadKernel1##X( AstMapping *, int, const int *, const int *, \
+                         const Xtype *, const Xtype *, int, const int *, \
+                         const double *const *, \
+                         void (*)( double, const double *, int, double *, int * ), \
+                         int, const double *, int, Xtype, int, double *, Xtype *, \
+                         Xtype *, double *, int *, int * ); \
+\
+static void SpreadLinear##X( int, const int *, const int *, const Xtype *, \
+                             const Xtype *, int, const int *, const double *const *, \
+                             int, Xtype, int, double *, Xtype *, Xtype *, double *, int *, \
+                             int * ); \
+\
+static void SpreadNearest##X( int, const int *, const int *, const Xtype *, \
+                              const Xtype *, int, const int *, const double *const *, \
+                              int, Xtype, int, double *, Xtype *, Xtype *, double *, \
+                              int *, int * );
+
+DECLARE_GENERIC(D,double)
+DECLARE_GENERIC(F,float)
+DECLARE_GENERIC(I,int)
+
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+DECLARE_GENERIC(LD,long double)
+#endif
+
+#undef DECLARE_GENERIC
+
+
+
+
+
 
 static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
@@ -534,36 +623,6 @@ static int GetReport( AstMapping *, int * );
 static int GetIsLinear( AstMapping *, int * );
 static int GetTranForward( AstMapping *, int * );
 static int GetTranInverse( AstMapping *, int * );
-static int InterpolateKernel1B( AstMapping *, int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, signed char, signed char *, signed char *, int * );
-static int InterpolateKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, double, double *, double *, int * );
-static int InterpolateKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, float, float *, float *, int * );
-static int InterpolateKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, int, int *, int *, int * );
-static int InterpolateKernel1L( AstMapping *, int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, long int, long int *, long int *, int * );
-static int InterpolateKernel1S( AstMapping *, int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, short int, short int *, short int *, int * );
-static int InterpolateKernel1UB( AstMapping *, int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned char, unsigned char *, unsigned char *, int * );
-static int InterpolateKernel1UI( AstMapping *, int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned int, unsigned int *, unsigned int *, int * );
-static int InterpolateKernel1UL( AstMapping *, int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned long int, unsigned long int *, unsigned long int *, int * );
-static int InterpolateKernel1US( AstMapping *, int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned short int, unsigned short int *, unsigned short int *, int * );
-static int InterpolateLinearB( int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, int, signed char, signed char *, signed char *, int * );
-static int InterpolateLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, int * );
-static int InterpolateLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, int * );
-static int InterpolateLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, int * );
-static int InterpolateLinearL( int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, int, long int, long int *, long int *, int * );
-static int InterpolateLinearS( int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, int, short int, short int *, short int *, int * );
-static int InterpolateLinearUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, int, unsigned char, unsigned char *, unsigned char *, int * );
-static int InterpolateLinearUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, int, unsigned int, unsigned int *, unsigned int *, int * );
-static int InterpolateLinearUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, int, unsigned long int, unsigned long int *, unsigned long int *, int * );
-static int InterpolateLinearUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, int, unsigned short int, unsigned short int *, unsigned short int *, int * );
-static int InterpolateNearestB( int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, int, signed char, signed char *, signed char *, int * );
-static int InterpolateNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, int * );
-static int InterpolateNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, int * );
-static int InterpolateNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, int * );
-static int InterpolateNearestL( int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, int, long int, long int *, long int *, int * );
-static int InterpolateNearestS( int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, int, short int, short int *, short int *, int * );
-static int InterpolateNearestUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, int, unsigned char, unsigned char *, unsigned char *, int * );
-static int InterpolateNearestUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, int, unsigned int, unsigned int *, unsigned int *, int * );
-static int InterpolateNearestUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, int, unsigned long int, unsigned long int *, unsigned long int *, int * );
-static int InterpolateNearestUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, int, unsigned short int, unsigned short int *, unsigned short int *, int * );
 static int LinearApprox( AstMapping *, const double *, const double *, double, double *, int * );
 static int MapList( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
@@ -571,17 +630,7 @@ static int MaxI( int, int, int * );
 static int MinI( int, int, int * );
 static int QuadApprox( AstMapping *, const double[2], const double[2], int, int, double *, double *, int * );
 static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)( void ), const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
-static int ResampleB( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)( void ), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [], int * );
-static int ResampleD( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)( void ), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
-static int ResampleF( AstMapping *, int, const int [], const int [], const float [], const float [], int, void (*)( void ), const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
-static int ResampleI( AstMapping *, int, const int [], const int [], const int [], const int [], int, void (*)( void ), const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
-static int ResampleL( AstMapping *, int, const int [], const int [], const long int [], const long int [], int, void (*)( void ), const double [], int, double, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [], int * );
-static int ResampleS( AstMapping *, int, const int [], const int [], const short int [], const short int [], int, void (*)( void ), const double [], int, double, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [], int * );
 static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)( void ), const double *, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
-static int ResampleUB( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], int, void (*)( void ), const double [], int, double, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [], int * );
-static int ResampleUI( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], int, void (*)( void ), const double [], int, double, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [], int * );
-static int ResampleUL( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)( void ), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [], int * );
-static int ResampleUS( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)( void ), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [], int * );
 static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)( void ), const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
 static int SpecialBounds( const MapData *, double *, double *, double [], double [], int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -591,16 +640,6 @@ static void ClearAttrib( AstObject *, const char *, int * );
 static void ClearInvert( AstMapping *, int * );
 static void ClearReport( AstMapping *, int * );
 static void CombinePN( PN *, PN *, int * );
-static void ConserveFluxB( double, int, const int *, signed char, signed char *, signed char *, int * );
-static void ConserveFluxD( double, int, const int *, double, double *, double *, int * );
-static void ConserveFluxF( double, int, const int *, float, float *, float *, int * );
-static void ConserveFluxI( double, int, const int *, int, int *, int *, int * );
-static void ConserveFluxL( double, int, const int *, long int, long int *, long int *, int * );
-static void ConserveFluxS( double, int, const int *, short int, short int *, short int *, int * );
-static void ConserveFluxUB( double, int, const int *, unsigned char, unsigned char *, unsigned char *, int * );
-static void ConserveFluxUI( double, int, const int *, unsigned int, unsigned int *, unsigned int *, int * );
-static void ConserveFluxUL( double, int, const int *, unsigned long int, unsigned long int *, unsigned long int *, int * );
-static void ConserveFluxUS( double, int, const int *, unsigned short int, unsigned short int *, unsigned short int *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 static void Delete( AstObject *, int * );
@@ -608,27 +647,12 @@ static void Dump( AstObject *, AstChannel *, int * );
 static void FunPN( AstMapping *, double *, int, int, int, double *, double *, int * );
 static void Gauss( double, const double [], int, double *, int * );
 static void GlobalBounds( MapData *, double *, double *, double [], double [], int * );
-static void InterpolateBlockAverageB( int, const int[], const int[], const signed char [], const signed char [], int, const int[], const double *const[], const double[], int, signed char, signed char *, signed char *, int * );
-static void InterpolateBlockAverageD( int, const int[], const int[], const double [], const double [], int, const int[], const double *const[], const double[], int, double, double *, double *, int * );
-static void InterpolateBlockAverageF( int, const int[], const int[], const float [], const float [], int, const int[], const double *const[], const double[], int, float, float *, float *, int * );
-static void InterpolateBlockAverageI( int, const int[], const int[], const int [], const int [], int, const int[], const double *const[], const double[], int, int, int *, int *, int * );
-static void InterpolateBlockAverageL( int, const int[], const int[], const long int [], const long int [], int, const int[], const double *const[], const double[], int, long int, long int *, long int *, int * );
-static void InterpolateBlockAverageS( int, const int[], const int[], const short int [], const short int [], int, const int[], const double *const[], const double[], int, short int, short int *, short int *, int * );
-static void InterpolateBlockAverageUB( int, const int[], const int[], const unsigned char [], const unsigned char [], int, const int[], const double *const[], const double[], int, unsigned char, unsigned char *, unsigned char *, int * );
-static void InterpolateBlockAverageUI( int, const int[], const int[], const unsigned int [], const unsigned int [], int, const int[], const double *const[], const double[], int, unsigned int, unsigned int *, unsigned int *, int * );
-static void InterpolateBlockAverageUL( int, const int[], const int[], const unsigned long int [], const unsigned long int [], int, const int[], const double *const[], const double[], int, unsigned long int, unsigned long int *, unsigned long int *, int * );
-static void InterpolateBlockAverageUS( int, const int[], const int[], const unsigned short int [], const unsigned short int [], int, const int[], const double *const[], const double[], int, unsigned short int, unsigned short int *, unsigned short int *, int * );
 static void Invert( AstMapping *, int * );
 static void MapBox( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [], int * );
-static void RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int *, int * );
-static void RebinD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
-static void RebinF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
-static void RebinI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
-static void RebinSeqD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], double [], int *, int * );
-static void RebinSeqF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], double [], int *, int * );
-static void RebinSeqI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], double [], int *, int * );
-static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int *, int * );
-static void RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int *, int * );
+static void RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, int, double *, void *, void *, double *, int *, int * );
+static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, double *, void *, void *, double *, int *, int * );
+static void RebinUpdate( DataType, int, const void *, int, void *, void *, double *, void *, void *, double *, double, int * );
+static void RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, double *, void *, void *, double *, int *, int * );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet *, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 static void SetInvert( AstMapping *, int, int * );
@@ -639,15 +663,6 @@ static void SincGauss( double, const double [], int, double *, int * );
 static void SincSinc( double, const double [], int, double *, int * );
 static void Somb( double, const double [], int, double *, int * );
 static void SombCos( double, const double [], int, double *, int * );
-static void SpreadKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, double, int, double *, double *, double *, int *, int * );
-static void SpreadKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, float, int, float *, float *, double *, int *, int * );
-static void SpreadKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, int, int, int *, int *, double *, int *, int * );
-static void SpreadLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, int, double *, double *, double *, int *, int * );
-static void SpreadLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, int, float *, float *, double *, int *, int * );
-static void SpreadLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int, int *, int *, double *, int *, int * );
-static void SpreadNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, int, double *, double *, double *, int *, int * );
-static void SpreadNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, int, float *, float *, double *, int *, int * );
-static void SpreadNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int, int *, int *, double *, int *, int * );
 static void Tran1( AstMapping *, int, const double [], int, double [], int * );
 static void Tran2( AstMapping *, int, const double [], const double [], int, double [], double [], int * );
 static void TranGrid( AstMapping *, int, const int[], const int[], double, int, int, int, int, double *, int * );
@@ -2186,7 +2201,6 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    int done_max;                 /* Satisfactory global maximum found? */
    int done_min;                 /* Satisfactory global minimum found? */
    int iter;                     /* Loop counter for iterations */
-   int ncall;                    /* Number of Mapping function calls (junk) */
    int ncoord;                   /* Number of coordinates in search space */
    int nmax;                     /* Number of local maxima found */
    int nmin;                     /* Number of local minima found */
@@ -2200,7 +2214,6 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 /* Initialise. */
    done_max = 0;
    done_min = 0;
-   ncall = 0;
    nmax = 0;
    nmin = 0;
    nsame_max = 0;
@@ -2741,11 +2754,41 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name, int *status )
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+#define VTAB_GENERIC(X) \
+   vtab->Resample##X = Resample##X;
+
+VTAB_GENERIC(B)
+VTAB_GENERIC(D)
+VTAB_GENERIC(F)
+VTAB_GENERIC(I)
+VTAB_GENERIC(L)
+VTAB_GENERIC(S)
+VTAB_GENERIC(UB)
+VTAB_GENERIC(UI)
+VTAB_GENERIC(UL)
+VTAB_GENERIC(US)
+
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-   vtab->ResampleLD = ResampleLD;
-   vtab->RebinLD = RebinLD;
-   vtab->RebinSeqLD = RebinSeqLD;
+VTAB_GENERIC(LD)
 #endif
+
+#undef VTAB_GENERIC
+
+#define VTAB_GENERIC(X) \
+   vtab->Rebin##X = Rebin##X; \
+   vtab->RebinSeq##X = RebinSeq##X;
+
+VTAB_GENERIC(D)
+VTAB_GENERIC(F)
+VTAB_GENERIC(I)
+
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+VTAB_GENERIC(LD)
+#endif
+
+#undef VTAB_GENERIC
+
+
    vtab->ClearInvert = ClearInvert;
    vtab->ClearReport = ClearReport;
    vtab->Decompose = Decompose;
@@ -2766,23 +2809,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name, int *status )
    vtab->QuadApprox = QuadApprox;
    vtab->Rate = Rate;
    vtab->ReportPoints = ReportPoints;
-   vtab->RebinD = RebinD;
-   vtab->RebinF = RebinF;
-   vtab->RebinI = RebinI;
-   vtab->RebinSeqD = RebinSeqD;
-   vtab->RebinSeqF = RebinSeqF;
-   vtab->RebinSeqI = RebinSeqI;
    vtab->RemoveRegions = RemoveRegions;
-   vtab->ResampleB = ResampleB;
-   vtab->ResampleD = ResampleD;
-   vtab->ResampleF = ResampleF;
-   vtab->ResampleI = ResampleI;
-   vtab->ResampleL = ResampleL;
-   vtab->ResampleS = ResampleS;
-   vtab->ResampleUB = ResampleUB;
-   vtab->ResampleUI = ResampleUI;
-   vtab->ResampleUL = ResampleUL;
-   vtab->ResampleUS = ResampleUS;
    vtab->SetInvert = SetInvert;
    vtab->SetReport = SetReport;
    vtab->Simplify = Simplify;
@@ -3898,6 +3925,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
 #define HI_UL  ( 0.5 + (double) ULONG_MAX )
 #define LO_UL ( -0.5 )
 #endif
+
 #define HI_I   ( 0.5 + (double) INT_MAX )
 #define LO_I  ( -0.5 + (double) INT_MIN )
 #define HI_UI  ( 0.5 + (double) UINT_MAX )
@@ -10053,7 +10081,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
                     params, flags, tol, maxpix, \
                     (const void *) &badval, \
                     ndim_out, lbnd_out, ubnd_out, \
-                    lbnd, ubnd, npix_out, \
+                    lbnd, ubnd, npix_out, NULL, \
                     (void *) out, (void *) out_var, work, NULL, status ); \
 \
 /* If required set output pixels bad if they have a total weight less \
@@ -10104,8 +10132,9 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
                             int maxpix, const void *badval_ptr,
                             int ndim_out, const int *lbnd_out,
                             const int *ubnd_out, const int *lbnd,
-                            const int *ubnd, int npix_out, void *out,
-                            void *out_var, double *work, int *nused, int *status ){
+                            const int *ubnd, int npix_out, double *insum,
+                            void *out, void *out_var, double *work,
+                            int *nused, int *status ){
 /*
 *  Name:
 *     RebinAdaptively
@@ -10126,8 +10155,9 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
 *                          int maxpix, const void *badval_ptr,
 *                          int ndim_out, const int *lbnd_out,
 *                          const int *ubnd_out, const int *lbnd,
-*                          const int *ubnd, int npix_out, void *out,
-*                          void *out_var, double *work, int *nused, int *status )
+*                          const int *ubnd, int npix_out, double *insum,
+*                          void *out, void *out_var, double *work, int *nused,
+*                          int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -10292,6 +10322,9 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
 *        grid lying outside this section will be ignored.
 *     npix_out
 *        The number of pixels in the output array.
+*     insum
+*        Pointer to a double in which to return the total input data sum
+*        pasted into "out". Ignored if NULL.
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the rebinned data will be returned.  The
@@ -10320,6 +10353,8 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
 */
 
 /* Local Variables: */
+   double insum1;                /* Total input data sum from 1st half */
+   double insum2;                /* Total input data sum from 2nd half */
    double *flbnd;                /* Array holding floating point lower bounds */
    double *fubnd;                /* Array holding floating point upper bounds */
    double *linear_fit;           /* Pointer to array of fit coefficients */
@@ -10452,7 +10487,8 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
          RebinWithBlocking( this, linear_fit, ndim_in, lbnd_in, ubnd_in,
                             in, in_var, type, spread,  params, flags,
                             badval_ptr, ndim_out, lbnd_out, ubnd_out, lbnd,
-                            ubnd, npix_out, out, out_var, work, nused, status );
+                            ubnd, npix_out, insum, out, out_var, work, nused,
+                            status );
 
 /* Otherwise, allocate workspace to perform the sub-division. */
       } else {
@@ -10477,7 +10513,8 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
             RebinAdaptively( this, ndim_in, lbnd_in, ubnd_in, in, in_var,
                              type, spread, params, flags, tol, maxpix,
                              badval_ptr, ndim_out, lbnd_out, ubnd_out,
-                             lo, hi, npix_out, out, out_var, work, nused, status );
+                             lo, hi, npix_out, &insum1, out, out_var, work,
+                             nused, status );
 
 /* Now set up a second section which covers the remaining half of the
    original input section. */
@@ -10490,8 +10527,12 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
                RebinAdaptively( this, ndim_in, lbnd_in, ubnd_in, in, in_var,
                                 type, spread, params, flags, tol, maxpix,
                                 badval_ptr,  ndim_out, lbnd_out, ubnd_out,
-                                lo, hi, npix_out, out, out_var, work, nused, status );
+                                lo, hi, npix_out, &insum2, out, out_var, work,
+                                nused, status );
             }
+
+/* Return the total input data sum if required. */
+            if( insum ) *insum = insum1 + insum2;
          }
 
 /* Free the workspace. */
@@ -10512,8 +10553,8 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                           const void *badval_ptr, int ndim_out,
                           const int *lbnd_out, const int *ubnd_out,
                           const int *lbnd, const int *ubnd, int npix_out,
-                          void *out, void *out_var, double *work,
-                          int *nused, int *status ) {
+                          double *insum, void *out, void *out_var,
+                          double *work, int *nused, int *status ) {
 /*
 *  Name:
 *     RebinSection
@@ -10533,7 +10574,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 *                        const void *badval_ptr, int ndim_out,
 *                        const int *lbnd_out, const int *ubnd_out,
 *                        const int *lbnd, const int *ubnd, int npix_out,
-*                        void *out, void *out_var, double *work,
+*                        double *insum, void *out, void *out_var, double *work,
 *                        int *nused )
 
 *  Class Membership:
@@ -10666,6 +10707,9 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 *        grid lying outside this section will be ignored.
 *     npix_out
 *        The number of pixels in the output array.
+*     insum
+*        Pointer to a double in which to return the total input data sum
+*        pasted into "out". Ignored if NULL.
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the rebinned data will be returned.  The
@@ -11091,7 +11135,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                                     npoint, offset, \
                                     (const double *const *) ptr_out, \
                                     flags, *( (Xtype *) badval_ptr ), \
-                                    npix_out, (Xtype *) out, \
+                                    npix_out, insum, (Xtype *) out, \
                                     (Xtype *) out_var, work, nused, status ); \
                   break;
 
@@ -11132,7 +11176,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                                    npoint, offset, \
                                    (const double *const *) ptr_out, \
                                    flags, *( (Xtype *) badval_ptr ), \
-                                   npix_out, (Xtype *) out, \
+                                   npix_out, insum, (Xtype *) out, \
                                    (Xtype *) out_var, work, nused, status ); \
                   break;
 
@@ -11328,7 +11372,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                                          (const double *const *) ptr_out, \
                                          kernel, neighb, par, flags, \
                                          *( (Xtype *) badval_ptr ), \
-                                         npix_out, (Xtype *) out, \
+                                         npix_out, insum, (Xtype *) out, \
                                          (Xtype *) out_var, work, nused, status ); \
                   break;
 
@@ -11944,18 +11988,19 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                      double weights[], int *nused, int *status ) { \
 \
 /* Local Variables: */ \
-   astDECLARE_GLOBALS            /* Thread-specific data */ \
    AstMapping *simple;           /* Pointer to simplified Mapping */ \
    Xtype *d;                     /* Pointer to next output data value */ \
    Xtype *v;                     /* Pointer to next output variance value */ \
+   Xtype *worka;                 /* Work array holding rebinned data values */ \
+   Xtype *workc;                 /* Work array holding rebinned variance values */ \
+   astDECLARE_GLOBALS            /* Thread-specific data */ \
    double *w;                    /* Pointer to next weight value */ \
-   double a;                     /* Weighted mean of input values */ \
-   double factor;                /* Factor needed to retain total data value */ \
+   double *workb;                /* Work array holding rebinned weights */ \
+   double insum;                /* Total input data sum to be pasted */ \
    double mwpip;                 /* Mean weight per input pixel */ \
-   double nn;                    /* Effective no. of i/p pixels combined */ \
-   double sout;                  /* Sum of unweighted output values */ \
+   double neff;                  /* Effective number of contributing input pixels */ \
    double sw;                    /* Sum of weights at output pixel */ \
-   double swout;                 /* Sum of weighted output values */ \
+   double wgt;                   /* Output pixel weight */ \
    int i;                        /* Loop counter for output pixels */ \
    int idim;                     /* Loop counter for coordinate dimensions */ \
    int ipix_out;                 /* Index into output array */ \
@@ -12194,20 +12239,39 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
          *nused = 0; \
       } \
 \
-/* Perform the rebinning. Note that we pass all gridded data, the \
-   spread function and the bad pixel value by means of pointer \
-   types that obscure the underlying data type. This is to avoid \
-   having to replicate functions unnecessarily for each data \
-   type. However, we also pass an argument that identifies the data \
-   type we have obscured. */ \
+/* Allocate work arrays and fill with zeros. We paste the input data, weights \
+   and variances into these arrays, and then later on we add the work arrays \
+   onto the supplied arrays. We do this so that we can calculate the factors \
+   needed to ensure conservation of flux for each input array individually. */ \
+      worka = astCalloc( npix_out, sizeof( *worka ) ); \
+      workb = astCalloc( npix_out, sizeof( *workb ) ); \
+      workc = ( flags & AST__USEVAR ) ? astCalloc( npix_out, sizeof( *workc ) ) : NULL; \
+\
+/* Rebin the input array into the work arrays. Note that we pass all gridded \
+   data, the spread function and the bad pixel value by means of pointer \
+   types that obscure the underlying data type. This is to avoid having to \
+   replicate functions unnecessarily for each data type. However, we also \
+   pass an argument that identifies the data type we have obscured. */ \
       RebinAdaptively( simple, ndim_in, lbnd_in, ubnd_in, \
                        (const void *) in, (const void *) in_var, \
                        TYPE_##X, spread, \
                        params, flags, tol, maxpix, \
                        (const void *) &badval, \
                        ndim_out, lbnd_out, ubnd_out, \
-                       lbnd, ubnd, npix_out, \
-                       (void *) out, (void *) out_var, weights, nused, status ); \
+                       lbnd, ubnd, npix_out, &insum, \
+                       (void *) worka, (void *) workc, workb, nused, status ); \
+\
+/* Calculate the scaling factors needed to preserve the total data sum \
+   imported from the current input array, and then use the factor to \
+   increment the supplied arrays. */ \
+      RebinUpdate( TYPE_##X, flags, (const void *) &badval, npix_out, \
+                   (void *) worka, (void *) workc, workb, (void *) out, \
+                   (void *) out_var, weights, insum, status ); \
+\
+/* Free the work arrays. */ \
+      worka = astFree( worka ); \
+      workb = astFree( workb ); \
+      workc = astFree( workc ); \
 \
 /* Annul the pointer to the simplified/cloned Mapping. */ \
       simple = astAnnul( simple ); \
@@ -12220,96 +12284,69 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Ensure "wlim" is not zero. */ \
       if( wlim < 1.0E-10 ) wlim = 1.0E-10; \
 \
-/* Find the average weight per input pixel, if we do not already know it \
-   to be 1.0. Also scale "wlim" by the mean weight. */ \
-      if( flags & AST__VARWGT ) { \
-         if( *nused > 0 ) { \
-            sw = 0.0; \
-            for( i = 0; i < npix_out; i++ ) { \
-               sw += weights[ i ]; \
-            } \
-            mwpip = sw/( *nused ); \
-         } else { \
-            mwpip = AST__BAD; \
-         } \
-         wlim *= mwpip; \
-\
-      } else { \
-         mwpip = 1.0; \
-      } \
-\
-/* If required set the output variances so that they are estimates of \
-   the variance on the mean of the distribution of input values. */ \
-      if( ( flags & AST__GENVAR ) && !( flags & AST__DISVAR ) ) { \
-\
-/* Calculate the variance. We apply a factor that accounts for the \
-   reduction in the number of degrees of freedom when finding the \
-   variance. This factor is based on the number of input values included \
-   in each output value, and is taken to be the output weight dividided \
-   by the mean weight per input pixel. */ \
+/* If it will be needed, find the average weight per input pixel. */ \
+      if( !( flags & AST__GENVAR ) && *nused > 0 ) { \
+         sw = 0.0; \
          for( i = 0; i < npix_out; i++ ) { \
-            sw = weights[ i ]; \
-            nn = ( mwpip != AST__BAD ) ? sw/mwpip : 0.0; \
-            if( nn > 2.0 && fabs( sw ) >= wlim ) { \
-               a = out[ i ]/sw; \
-               out_var[ i ] = ( out_var[ i ]/sw - a*a )*weights[ i + npix_out ]; \
-               if( out_var[ i ] < 0.0 ) { \
-                  out_var[ i ] = badval; \
-               } else { \
-                  out_var[ i ] *= nn/( nn - 1.0 ); \
-               } \
-            } else { \
-               out_var[ i ] = badval; \
-            } \
+            sw += weights[ i ]; \
          } \
+         mwpip = sw/( *nused ); \
+       } else { \
+         mwpip = AST__BAD; \
+       } \
 \
-/* If required set the output variances so that they are estimates of \
-   the variance of the distribution of input values. */ \
-      } else if( flags & AST__GENVAR ) { \
-         for( i = 0; i < npix_out; i++ ) { \
-            sw = weights[ i ]; \
-            if( fabs( sw ) >= wlim ) { \
-               a = out[ i ]; \
-               out_var[ i ] = ( sw*out_var[ i ] - a*a ); \
-               if( out_var[ i ] < 0.0 ) out_var[ i ] = badval; \
-            } else { \
-               out_var[ i ] = badval; \
-            } \
-         } \
-      } \
-\
-/* Normalise the returned data array. */ \
-      sout = 0.0; \
-      swout = 0.0; \
+/* Normalise each output pixel. */ \
       for( i = 0; i < npix_out; i++ ) { \
-         if( fabs( weights[ i ] ) >= wlim && out[ i ] != badval ) { \
-            sout += out[ i ]; \
-            out[ i ] /= weights[ i ]; \
-            swout += out[ i ]; \
-         } else { \
-            out[ i ] = badval; \
-         } \
-      } \
 \
-/* Apply an extra normalisation to ensure the total data sum is \
-   unchanged by the previous normalisation. */ \
-      if( swout != 0.0 ) { \
-         factor = sout/swout; \
-         for( i = 0; i < npix_out; i++ ) { \
-            if( out[ i ] != badval ) out[ i ] *= factor; \
-         } \
-      } else { \
-         factor = 1.0; \
-      } \
-\
-/* Normalise the returned variance array. */ \
-      if( out_var ) { \
-         factor *= factor; \
-         for( i = 0; i < npix_out; i++ ) { \
-            if( fabs( weights[ i ] ) >= wlim && out_var[ i ] != badval ) { \
-               out_var[ i ] /= ( weights[ i ]*weights[ i ] )/factor; \
+/* Find the effective number of input samples that contribute to the \
+   output sample. To do this properly requires the sum of the squared \
+   weights in each output pixel, but this is only available if AST__GENVAR \
+   flag is in use. In order to avoid changing the API for astRebinSeq, we \
+   honour this long-standing restriction, and use an approximation if \
+   AST__GENVAR is not in use. */ \
+         wgt = weights[ i ]; \
+         if( flags & AST__GENVAR ) { \
+            if( wgt > 0.0 ) { \
+               neff = (wgt*wgt)/weights[ i + npix_out ]; \
             } else { \
-               out_var[ i ] = badval; \
+               neff = 0.0; \
+            } \
+\
+/* If the sum of the squared weights is not available, compare the weight \
+   for this output pixel with the mean weight per input pixel. */ \
+         } else { \
+            neff = wgt/mwpip; \
+         } \
+\
+/* Assign bad values to unused output pixels. */ \
+         if( neff < wlim ) { \
+            out[ i ] = badval;  \
+            if( out_var ) out_var[ i ] = badval; \
+\
+/* Otherwise, normalise the returned data value. */ \
+         } else { \
+            out[ i ] /= wgt; \
+\
+/* Normalise the returned variance: propagated from input variances... */ \
+            if( out_var ) { \
+               if( flags & AST__USEVAR ) { \
+                  out_var[ i ] /= wgt*wgt; \
+\
+/* Normalise the returned variance: from spread of input values... */ \
+               } else if( flags & AST__GENVAR ) {  \
+                  out_var[ i ] /= wgt; \
+                  out_var[ i ] -= out[ i ]*out[ i ]; \
+\
+/* If output variances are estimates of the variance of the distribution \
+   from which the input values were sampled... */ \
+                  if( flags & AST__DISVAR ) { \
+                     out_var[ i ] *= neff/( neff - 1.0 ); \
+\
+/* If output variances are estimates of the error on the mean data value... */ \
+                  } else { \
+                     out_var[ i ] *= 1.0/( neff - 1.0 ); \
+                  } \
+               } \
             } \
          } \
       } \
@@ -12328,6 +12365,200 @@ MAKE_REBINSEQ(I,int,1)
 /* Undefine the macro. */
 #undef MAKE_REBIN
 
+static void RebinUpdate( DataType type, int flags, const void *badval_ptr,
+                         int npix_out, void *worka, void *workc, double *workb,
+                         void *out, void *out_var, double *weights,
+                         double insum, int *status ){
+/*
+*  Name:
+*     RebinUpdate
+
+*  Purpose:
+*     Add a rebinned array into the arrays supplied to astRebinSeqRebin.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void RebinUpdate( DataType type, int flags, const void *badval_ptr,
+*                       int npix_out, void *worka, void *workc, double *workb,
+*                       void *out, void *out_var, double *weights,
+*                       double insum, int *status )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function scales the values supplied in "worka", "workc" and
+*     "workb" so that they correspond to the same total data sum as the input
+*     array supplied to astRebinSeq. It then adds these scaled values
+*     into the supplied "out", "out_var" and "weights" arrays.
+
+*  Parameters:
+*     type
+*        A value taken from the "DataType" enum, which specifies the
+*        data type of the input and output arrays containing the
+*        gridded data (and variance) values.
+*     flags
+*        The bitwise OR of a set of flag values which provide additional
+*        control over the resampling operation.
+*     badval_ptr
+*        If the AST__USEBAD flag is set (above), this parameter is a
+*        pointer to a value which is used to identify bad data and/or
+*        variance values in the input array(s). The referenced value's
+*        data type must match that of the "in" (and "in_var")
+*        arrays. The same value will also be used to flag any output
+*        array elements for which rebinned values could not be
+*        obtained.  The output arrays(s) may be flagged with this
+*        value whether or not the AST__USEBAD flag is set (the
+*        function return value indicates whether any such values have
+*        been produced).
+*     npix_out
+*        The number of pixels in the output array.
+*     worka
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the rebinned data will be returned.  The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+*     workc
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the rebinned values may be returned. This array will only be
+*        used if the "in_var" array has been given.
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+*     workb
+*        An optional pointer to a double array with the same size as
+*        the "out" array. The contents of this array (if supplied) are
+*        incremented by the accumulated weights assigned to each output pixel.
+*        If no accumulated weights are required, a NULL pointer should be
+*        given.
+*     out
+*        The array containing the running sum of the data values pasted
+*        by all calls to astRebinSeq. Updated on output to include the
+*        data supplied in "worka", with suitable scaling to preserve the
+*        total data sum within the input array.
+*     out_var
+*        The array containing the running sum of the variance values pasted
+*        by all calls to astRebinSeq. Updated on output to include the
+*        values supplied in "workc", with suitable scaling to preserve the
+*        total data sum within the input array.
+*     weights
+*        The array containing the running sum of the weights pasted
+*        by all calls to astRebinSeq. Updated on output to include the
+*        weights supplied in "workb", with suitable scaling to preserve the
+*        total data sum within the input array.
+*     insum
+*        The total input data sum pasted into "worka".
+*     status
+*        Pointer to the inherited status variable.
+*/
+
+/* Local Variables: */
+   double alpha2;
+   double alpha;
+   double sum;
+   double wb;
+   int i;
+   int j;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Calculate the scaling factor, alpha, to apply to the rebinned data values
+   in "worka" such that the scaled values would have the same total data value
+   as the used input pixel values (i.e. the value supplied in "insum").
+   Define a macro to use a "case" statement to define the code appropriate
+   to a given data type. */
+#define CASE_REBINUP(X,Xtype) \
+   case ( TYPE_##X ): {\
+      Xtype wa; \
+      sum = 0.0; \
+      for( i = 0; i < npix_out; i++ ) { \
+         wa = ((Xtype*)worka)[ i ]; \
+         wb = workb[ i ]; \
+         if( wa != *((Xtype *) badval_ptr) && wb != AST__BAD  && wb > 0.0 ) { \
+            sum += wa/wb; \
+         } \
+      } \
+      alpha = ( sum != 0.0 ) ? insum/sum : AST__BAD; \
+      break; \
+   }
+
+/* Use the above macro to invoke the appropriate code. */
+   switch ( type ) {
+
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+      CASE_REBINUP(LD,long double)
+#endif
+      CASE_REBINUP(D,double)
+      CASE_REBINUP(F,float)
+      CASE_REBINUP(I,int)
+
+      case ( TYPE_L ): break;
+      case ( TYPE_B ): break;
+      case ( TYPE_S ): break;
+      case ( TYPE_UL ): break;
+      case ( TYPE_UI ): break;
+      case ( TYPE_US ): break;
+      case ( TYPE_UB ): break;
+   }
+
+#undef CASE_REBINUP
+
+/* Scale each work value and add it onto the appropriate output array. */
+   if( alpha != AST__BAD ){
+      alpha2 = alpha*alpha;
+
+#define CASE_REBINUP(X,Xtype) \
+      case ( TYPE_##X ): {\
+         Xtype wa; \
+         j = npix_out; \
+         for( i = 0; i < npix_out; i++,j++ ) { \
+            wa = ((Xtype*)worka)[ i ]; \
+            wb = workb[ i ]; \
+            if( wa != *((Xtype *) badval_ptr) && wb != AST__BAD  && wb > 0.0 ) { \
+               sum += wa/wb; \
+               ((Xtype*)out)[ i ] += (Xtype) alpha*wa; \
+               weights[ i ] += wb; \
+               if( flags & AST__USEVAR ) { \
+                  ((Xtype*)out_var)[ i ] += alpha2*((Xtype*)workc)[ i ]; \
+               } else if( flags & AST__GENVAR ) { \
+                  ((Xtype*)out_var)[ i ] += alpha2*wa*wa/wb; \
+                  weights[ j ] += wb*wb; \
+               } \
+            } \
+         } \
+         break; \
+      }
+
+/* Use the above macro to invoke the appropriate code. */
+      switch ( type ) {
+
+#if HAVE_LONG_DOUBLE        /* Not normally implemented */
+         CASE_REBINUP(LD,long double)
+#endif
+         CASE_REBINUP(D,double)
+         CASE_REBINUP(F,float)
+         CASE_REBINUP(I,int)
+
+         case ( TYPE_L ): break;
+         case ( TYPE_B ): break;
+         case ( TYPE_S ): break;
+         case ( TYPE_UL ): break;
+         case ( TYPE_UI ): break;
+         case ( TYPE_US ): break;
+         case ( TYPE_UB ): break;
+      }
+
+#undef CASE_REBINUP
+
+   }
+}
+
 static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
                                int ndim_in, const int *lbnd_in,
                                const int *ubnd_in, const void *in,
@@ -12336,8 +12567,8 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
                                const void *badval_ptr, int ndim_out,
                                const int *lbnd_out, const int *ubnd_out,
                                const int *lbnd, const int *ubnd, int npix_out,
-                               void *out, void *out_var, double *work,
-                               int *nused, int *status ) {
+                               double *insum, void *out, void *out_var,
+                               double *work, int *nused, int *status ) {
 /*
 *  Name:
 *     RebinWithBlocking
@@ -12358,8 +12589,8 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
 *                             const void *badval_ptr, int ndim_out,
 *                             const int *lbnd_out, const int *ubnd_out,
 *                             const int *lbnd, const int *ubnd, int npix_out,
-*                             void *out, void *out_var, double *work,
-*                             int *nused )
+*                             double *insum, void *out, void *out_var,
+*                             double *work, int *nused )
 
 *  Class Membership:
 *     Mapping member function.
@@ -12497,6 +12728,9 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
 *        grid lying outside this section will be ignored.
 *     npix_out
 *        The number of pixels in the output array.
+*     insum
+*        Pointer to a double in which to return the total input data sum
+*        pasted into "out". Ignored if NULL.
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the rebinned data will be returned.  The
@@ -12529,6 +12763,7 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
                                     performance) */
 
 /* Local Variables: */
+   double binsum;                /* Input data sum within block */
    int *dim_block;               /* Pointer to array of block dimensions */
    int *lbnd_block;              /* Pointer to block lower bound array */
    int *ubnd_block;              /* Pointer to block upper bound array */
@@ -12539,6 +12774,9 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
    int lolim;                    /* Lower limit on maximum block dimension */
    int mxdim_block;              /* Maximum block dimension */
    int npix;                     /* Number of pixels in block */
+
+/* Initialise */
+   if( insum ) *insum = 0.0;
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -12628,7 +12866,10 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
          RebinSection( this, linear_fit, ndim_in, lbnd_in, ubnd_in, in,
                        in_var, type, spread, params, flags, badval_ptr,
                        ndim_out, lbnd_out, ubnd_out, lbnd_block, ubnd_block,
-                       npix_out, out, out_var, work, nused, status );
+                       npix_out, &binsum, out, out_var, work, nused, status );
+
+/* Update returned total input data sum,. */
+         if( insum ) *insum += binsum;
 
 /* Update the block extent to identify the next block of input pixels. */
          idim = 0;
@@ -12881,7 +13122,7 @@ c     #include "mapping.h"
 c     int astResample<X>( AstMapping *this, int ndim_in,
 c                         const int lbnd_in[], const int ubnd_in[],
 c                         const <Xtype> in[], const <Xtype> in_var[],
-c                         int interp, void (* finterp)(),
+c                         int interp, void (* finterp)( void ),
 c                         const double params[], int flags,
 c                         double tol, int maxpix,
 c                         <Xtype> badval, int ndim_out,
@@ -13306,8 +13547,8 @@ f     replace <X> in the generic function name AST_RESAMPLE<X> with a
 *     type <Xtype> of the data you are processing, as follows:
 c     - D: double
 c     - F: float
-c     - L: long int
-c     - UL: unsigned long int
+c     - L: long int (may be 32 or 64 bit)
+c     - UL: unsigned long int (may be 32 or 64 bit)
 c     - I: int
 c     - UI: unsigned int
 c     - S: short int
@@ -14648,7 +14889,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    int result;                   /* Result value to be returned */
    int s;                        /* Temporary variable for strides */
    int usevar;                   /* Process variance array? */
-   void (* gifunc)();            /* General interpolation function */
+   void (* gifunc)( void );      /* General interpolation function */
    void (* kernel)( double, const double [], int, double *, int * ); /* Kernel fn. */
    void (* fkernel)( double, const double [], int, double * ); /* User kernel fn. */
 
@@ -16869,8 +17110,9 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 *                           void (* kernel)( double, const double [], int,
 *                                            double *, int * ),
 *                           int neighb, const double *params, int flags,
-*                           <Xtype> badval, int npix_out,  <Xtype> *out,
-*                           <Xtype> *out_var, double *work, int *nused )
+*                           <Xtype> badval, int npix_out, double insum,
+*                           <Xtype> *out, <Xtype> *out_var, double *work,
+*                           int *nused )
 
 *  Class Membership:
 *     Mapping member function.
@@ -16993,6 +17235,9 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 *        been produced).
 *     npix_out
 *        Number of pixels in output array.
+*     insum
+*        Pointer to a double in which to return the total input data sum
+*        pasted into "out". Ignored if NULL.
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the rebinned data will be returned. The
@@ -17037,7 +17282,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                               void (* kernel)( double, const double [], \
                                                int, double *, int * ), \
                               int neighb, const double *params, \
-                              int flags, Xtype badval, int npix_out, \
+                              int flags, Xtype badval, int npix_out, double  *insum, \
                               Xtype *out, Xtype *out_var, double *work, \
                               int *nused, int *status ) { \
 \
@@ -17054,9 +17299,9 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    double *wtprod;               /* Accumulated weight value array pointer */ \
    double *xfilter;              /* Pointer to 1d array of x axis filter values */ \
    double *xnl;                  /* Pointer to previous ofset array (n-d) */ \
-   double error; \
    double pixwt;                 /* Weight to apply to individual pixel */ \
    double sum;                   /* Sum of all filter values */ \
+   double sumin;                 /* Sum of input data */ \
    double wgt;                   /* Weight for input value */ \
    double x;                     /* x coordinate value */ \
    double xn;                    /* Coordinate value (n-d) */ \
@@ -17118,6 +17363,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    kerror = 0; \
    sum = 0.0; \
    bad = 0; \
+   sumin = 0.0; \
 \
 /* Find the total number of pixels in the filter used to spread a single \
    input pixel into the output image. */ \
@@ -17336,6 +17582,9 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
       filter = astFree( filter ); \
    }\
 \
+/* Return the total input data sum if needed. */ \
+   if( insum ) *insum = sumin; \
+\
 /* If an error occurred in the kernel function, then report a \
    contextual error message. */ \
    if ( kerror ) { \
@@ -17403,6 +17652,9 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Increment the number of input pixels pasted into the output array. */ \
             if( nused ) (*nused)++; \
+\
+/* Increment the sum of the used input values. */ \
+            sumin += (double) in_val; \
 \
 /* Convert these output indices to the corresponding indices \
    within a box [ 0, 2*neighb ] holding the kernel values. */ \
@@ -17523,7 +17775,6 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Loop round all input points which are to be rebinned. */ \
    for( point = 0; point < npoint; point++ ) { \
-      error = 0.0; \
 \
 /* Obtain the input data value which is to be added into the output array. */ \
       off_in = offset[ point ]; \
@@ -17581,6 +17832,9 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Increment the number of input pixels pasted into the output array. */ \
                if( nused ) (*nused)++; \
+\
+/* Increment the sum of the used input values. */ \
+               sumin += (double) in_val; \
 \
 /* Convert these output indices to the corresponding indices \
    within a box [ 0:2*neighb, 0:2*neighb ] holding the kernel values. */ \
@@ -17996,6 +18250,9 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 /* Increment the number of input pixels pasted into the output array. */ \
             if( nused ) (*nused)++; \
 \
+/* Increment the sum of the used input values. */ \
+            sumin += (double) in_val; \
+\
 /* Initialise, and loop over the neighbouring output pixels to divide up \
    the input pixel value between them. */ \
             idim = ndim_out - 1; \
@@ -18095,8 +18352,9 @@ MAKE_SPREAD_KERNEL1(I,int,1)
 *                           const <Xtype> *in, const <Xtype> *in_var,
 *                           int npoint, const int *offset,
 *                           const double *const *coords, int flags,
-*                           <Xtype> badval, int npix_out, <Xtype> *out,
-*                           <Xtype> *out_var, double *work, int *nused  )
+*                           <Xtype> badval, int npix_out, double *insum,
+*                           <Xtype> *out, <Xtype> *out_var, double *work,
+*                           int *nused  )
 
 *  Class Membership:
 *     Mapping member function.
@@ -18196,6 +18454,9 @@ MAKE_SPREAD_KERNEL1(I,int,1)
 *        been produced).
 *     npix_out
 *        Number of pixels in output array.
+*     insum
+*        Pointer to a double in which to return the total input data sum
+*        pasted into "out". Ignored if NULL.
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the rebinned data will be returned. The
@@ -18238,7 +18499,7 @@ static void SpreadLinear##X( int ndim_out, \
                             const Xtype *in, const Xtype *in_var, \
                             int npoint, const int *offset, \
                             const double *const *coords, int flags, \
-                            Xtype badval, int npix_out, Xtype *out, \
+                            Xtype badval, int npix_out, double *insum, Xtype *out, \
                             Xtype *out_var, double *work, int *nused, int *status ) { \
 \
 /* Local Variables: */ \
@@ -18255,6 +18516,7 @@ static void SpreadLinear##X( int ndim_out, \
    double frac_hi_y;             /* Pixel weight (y dimension) */ \
    double frac_lo_x;             /* Pixel weight (x dimension) */ \
    double frac_lo_y;             /* Pixel weight (y dimension) */ \
+   double sumin;                 /* Sum of input data */ \
    double wgt;                   /* Weight for input value */ \
    double x;                     /* x coordinate value */ \
    double xmax;                  /* x upper limit */ \
@@ -18268,7 +18530,6 @@ static void SpreadLinear##X( int ndim_out, \
    int *lo;                      /* Pointer to array of lower indices */ \
    int *stride;                  /* Pointer to array of dimension strides */ \
    int bad;                      /* Output pixel bad? */ \
-   int bad_var;                  /* Output variance bad? */ \
    int done;                     /* All pixel indices done? */ \
    int genvar;                   /* Generate output variances? */ \
    int hi_x;                     /* Upper pixel index (x dimension) */ \
@@ -18295,7 +18556,6 @@ static void SpreadLinear##X( int ndim_out, \
 /* Initialise variables to avoid "used of uninitialised variable" \
    messages from dumb compilers. */ \
    bad = 0; \
-   bad_var = 0; \
 \
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
@@ -18307,6 +18567,9 @@ static void SpreadLinear##X( int ndim_out, \
       usevar = in_var && out_var; \
    } \
    varwgt = ( flags & AST__VARWGT ) && in_var && work; \
+\
+/* Initialise total input data sum. */ \
+   sumin = 0.0; \
 \
 /* Handle the 1-dimensional case optimally. */ \
 /* ---------------------------------------- */ \
@@ -18501,6 +18764,9 @@ static void SpreadLinear##X( int ndim_out, \
       xn_min = astFree( xn_min ); \
    } \
 \
+/* Return the total input data sum if needed. */ \
+   if( insum ) *insum = sumin; \
+\
 }
 
 
@@ -18554,6 +18820,9 @@ static void SpreadLinear##X( int ndim_out, \
 \
 /* Increment the number of input pixels pasted into the output array. */ \
          if( nused ) (*nused)++; \
+\
+/* Increment the sum of the used input values. */ \
+         sumin += (double) in_val; \
 \
 /* Obtain the offset within the output array of the first pixel to be \
    updated (the one with the smaller index). */ \
@@ -18640,6 +18909,9 @@ static void SpreadLinear##X( int ndim_out, \
 \
 /* Increment the number of input pixels pasted into the output array. */ \
             if( nused ) (*nused)++; \
+\
+/* Increment the sum of the used input values. */ \
+            sumin += (double) in_val; \
 \
 /* If OK, obtain the indices along the output grid x dimension of the \
    two adjacent pixels which recieve contributions from the input pixel. \
@@ -18818,6 +19090,9 @@ static void SpreadLinear##X( int ndim_out, \
          if ( !bad ) { \
             if( nused ) (*nused)++; \
 \
+/* Increment the sum of the used input values. */ \
+            sumin += (double) in_val; \
+\
 /* Loop over adjacent output pixels to divide up the input value. */ \
             idim = ndim_out - 1; \
             wtprod[ idim ] = 1.0; \
@@ -18923,8 +19198,9 @@ MAKE_SPREAD_LINEAR(I,int,1)
 *                           const <Xtype> *in, const <Xtype> *in_var,
 *                           int npoint, const int *offset,
 *                           const double *const *coords, int flags,
-*                           <Xtype> badval, int npix_out, <Xtype> *out,
-*                           <Xtype> *out_var, double *work, int *nused )
+*                           <Xtype> badval, int npix_out, double *insum,
+*                           <Xtype> *out, <Xtype> *out_var, double *work,
+*                           int *nused )
 
 *  Class Membership:
 *     Mapping member function.
@@ -19028,6 +19304,9 @@ MAKE_SPREAD_LINEAR(I,int,1)
 *        been produced).
 *     npix_out
 *        Number of pixels in output array.
+*     insum
+*        Pointer to a double in which to return the total input data sum
+*        pasted into "out". Ignored if NULL.
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the rebinned data will be returned. The
@@ -19068,7 +19347,7 @@ static void SpreadNearest##X( int ndim_out, \
                              const Xtype *in, const Xtype *in_var, \
                              int npoint, const int *offset, \
                              const double *const *coords, int flags, \
-                             Xtype badval, int npix_out, Xtype *out, \
+                             Xtype badval, int npix_out, double *insum, Xtype *out, \
                              Xtype *out_var, double *work, int *nused, int *status ) { \
 \
 /* Local Variables: */ \
@@ -19077,6 +19356,7 @@ static void SpreadNearest##X( int ndim_out, \
    double *xn_max;               /* Pointer to upper limits array (n-d) */ \
    double *xn_min;               /* Pointer to lower limits array (n-d) */ \
    double cwgt;                  /* Product of input value and weight */ \
+   double sumin;                 /* Sum of input data */ \
    double wgt;                   /* Weight for input value */ \
    double x;                     /* x coordinate value */ \
    double xmax;                  /* x upper limit */ \
@@ -19114,6 +19394,9 @@ static void SpreadNearest##X( int ndim_out, \
       usevar = in_var && out_var; \
    } \
    varwgt = ( flags & AST__VARWGT ) && in_var && work; \
+\
+/* Initialise total input data sum. */ \
+   sumin = 0.0; \
 \
 /* Handle the 1-dimensional case optimally. */ \
 /* ---------------------------------------- */ \
@@ -19294,6 +19577,9 @@ static void SpreadNearest##X( int ndim_out, \
       xn_min = astFree( xn_min ); \
    } \
 \
+/* Return the total input data sum if needed. */ \
+   if( insum ) *insum = sumin; \
+\
 }
 
 
@@ -19338,6 +19624,9 @@ static void SpreadNearest##X( int ndim_out, \
 \
 /* Increment the number of input pixels pasted into the output array. */ \
                   if( nused ) (*nused)++; \
+\
+/* Increment the sum of the used input values. */ \
+                  sumin += (double) in_val; \
 \
 /* If not, then obtain the offset within the output grid of the pixel \
    which contains the current input point. */ \
@@ -19447,6 +19736,9 @@ static void SpreadNearest##X( int ndim_out, \
 \
 /* Increment the number of input pixels pasted into the output array. */ \
                      if( nused ) (*nused)++; \
+\
+/* Increment the sum of the used input values. */ \
+                     sumin += (double) in_val; \
 \
 /* Obtain the offsets along each output grid dimension of the output \
    pixel which is to receive the input pixel value. */ \
@@ -19568,6 +19860,9 @@ static void SpreadNearest##X( int ndim_out, \
 \
 /* Increment the number of input pixels pasted into the output array. */ \
                      if( nused ) (*nused)++; \
+\
+/* Increment the sum of the used input values. */ \
+                     sumin += (double) in_val; \
 \
 /* Note the input data value. */ \
                      c = CONV(IntType,in_val); \
@@ -20689,7 +20984,6 @@ static void TranGridSection( AstMapping *this, const double *linear_fit,
    int idim;                     /* Loop counter for dimensions */
    int ix;                       /* Loop counter for output x coordinate */
    int iy;                       /* Loop counter for output y coordinate */
-   int neighb;                   /* Number of neighbouring pixels */
    int npoint;                   /* Number of output points (pixels) */
    int off1;                     /* Interim pixel offset into output array */
    int off2;                     /* Interim pixel offset into output array */
@@ -20705,7 +20999,6 @@ static void TranGridSection( AstMapping *this, const double *linear_fit,
    ptr_in = NULL;
    ptr_out = NULL;
    pset_out = NULL;
-   neighb = 0;
 
 /* Calculate the number of input points, as given by the product of
    the input grid dimensions. */
@@ -23686,7 +23979,7 @@ MAKE_REBINSEQ_(I,int)
 #undef MAKE_REBINSEQ_
 
 double astRate_( AstMapping *this, double *at, int ax1, int ax2, int *status ){
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
 
    if ( !astOK ) return AST__BAD;
 
@@ -24393,6 +24686,7 @@ f     MAP.
 /* Return an ID value for the Mapping. */
    *map = astMakeId( *map );
 }
+
 
 
 
