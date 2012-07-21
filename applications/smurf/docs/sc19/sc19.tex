@@ -20,7 +20,7 @@
 %     2009-05-22 (EC):
 %        Original version, borrowing from SC11
 %     2009-06-04 (EC):
-%        Changed to SC19 from SC18 to avoid conflict with X-ray cookbook
+%        Changed to SC/19 from SC/18 to avoid conflict with X-ray cookbook
 %     2009-07-24 (EC):
 %        Updated metadata, set version to 0.5, removed .eps from filenames
 %     2010-01-18 (EC):
@@ -1088,7 +1088,7 @@ SC2FFT: power spectrum requested so setting POLAR=TRUE
 
 While there is a \starlink\ standard format for storing complex values
 as described in \cite{ssds}, \fft\ uses its own local format that
-allows both for cartesian and polar forms: a 4-dimensional array, with
+allows both for Cartesian and polar forms: a 4-dimensional array, with
 the first axis indicating frequency, the second and third axes
 bolometer row and column, and the final axis containing the real and
 imaginary parts of each Fourier coefficient. By setting `power=true'
@@ -1163,7 +1163,7 @@ producing `clean4.sdf' in the previous example:
 \end{myquote}
 
 The `count' supplied to \showqual\ indicates that the total number of
-occurences of each Quality flag in the data should be counted and
+occurrences of each Quality flag in the data should be counted and
 displayed.  This example shows that 4416000 samples in total were
 flagged `\texttt{BADDA}' by the flatfielding algorithm or by the data
 acquisition (DA) system itself based on the array setup. Since each
@@ -1513,7 +1513,7 @@ project:
   bolometer. They also identify outlier bolometers that do not
   resemble the template and remove them from the final solution. The
   component \texttt{EXT} applies the extinction correction (derived
-  from the water vapour radiometer by default), and then \texttt{FLT}
+  from the water-vapour radiometer by default), and then \texttt{FLT}
   applies a high-pass filter to the data, above frequencies that
   correspond to angular scales of 600\,arcsec and 300\,arcsec at
   450\micron\ and 850\micron, respectively (as established
@@ -1656,7 +1656,7 @@ and
 \tau_{850} = 4.02 \times (\tau_{225} - 0.001).
 \end{equation}
 
-The JCMT water vapour radiometer (WVM) is now calibrated to provide a
+The JCMT water-vapour radiometer (WVM) is now calibrated to provide a
 higher-frequency opacity value which has been scaled to
 $\tau_{225}$. The WVM (not the CSO 225\,GHz tipper) data were used for
 this analysis.
@@ -1864,7 +1864,7 @@ basic steps:
   effectively fits a point spread function, or PSF, centered over
   every pixel in the map) and a background suppression filter
   (removing additional residual large-scale noise). This is a fairly
-  standard technique used throughout the extra-galactic submillimetre
+  standard technique used throughout the extra-galactic sub-millimetre
   community to identify potential sources.
 
 \end{enumerate}
@@ -2382,7 +2382,7 @@ sc2clean $FILES clean \
 
 \subsection{\label{caldata}Looking at calibration data}
 
-Currently all science observations are preceeded by two calibrations:
+Currently all science observations are preceded by two calibrations:
 a short shutter-closed integration (file 1), followed by a ``sky
 flat'' to determine the response of all the bolometers to a current
 ramp through their heater resistors with the shutter open (file 2).
@@ -3298,7 +3298,7 @@ Explanatory Notes:
 \item Fast ramp flatfield uses a fast heater ramp repeated several
   times - this improves the flatfield accuracy and quality.
 
-\item \param{TABLE} and \param{POLYNOMINAL} are two reduction methods
+\item \param{TABLE} and \param{POLYNOMIAL} are two reduction methods
   used for discrete flatfields (fast ramp always uses a polynomial
   method). Due to the lack of dark frame subtraction the \param{TABLE}
   flatfield only used 2 points of the \about10 heater settings in a
@@ -3327,7 +3327,7 @@ Explanatory Notes:
   the default value each time the shutter was closed. This was done to
   prevents drifts in the heater setting. Such drift affect the
   setup. However, noise observations also reset the heater. Thus the
-  heater drift before this adjustment were small and is not belived to
+  heater drift before this adjustment were small and is not believed to
   have affected the data.
 
 \end{description}
@@ -3342,7 +3342,7 @@ Explanatory Notes:
 
 \item[20100218 -- end of S2SRO] \mbox{}
 
-  The MCE was changed on the s4a array significatly decreasing the
+  The MCE was changed on the s4a array significantly decreasing the
   number of spikes in the s4a data.
 
 \end{description}
