@@ -255,7 +255,6 @@ static void gausshermiteh3h4derv( double  X, const double fpar[], double *epar,
 static double voigt( double  X, const double fpar[], int ncomp, const int iopt[]);
 static void   voigtderv( double  X, const double fpar[], double *epar, int ncomp,
 			 const int iopt[]);
-static void w( double, double, double *, double * );
 
 /* Polynomial */
 static double polynomial( double  X, const double fpar[], int ncomp, const int iopt[]);
@@ -798,115 +797,6 @@ static void gausshermiteh3h4derv( double  X,
 
 }
 
-
-static void w( double Rz,
-               double Iz,
-               double *Rr,
-               double *Ir )
-/*------------------------------------------------------------*/
-/* PURPOSE: Error function for complex arguments.             */
-/*          W(Z) = EXP(-Z*Z)ERFC(-iZ)                         */
-/*          see Abromowitz and Stegun (chapter 7)             */
-/*          |error|  <  2 * 10e-6                             */
-/*------------------------------------------------------------*/
-{
-#define EPS     ( 0.0000001 )
-   double	wdx = 0.0;		/* real part result */
-   double	wdy = 0.0;		/* imag part result */
-   double	x, y;			/* real and imaginary arg */
-
-   x = fabs( Rz );                      /* real part */
-   y = fabs( Iz );                      /* imaginairy part */
-   if ( x > 6.0 || y > 6.0 ) {		/* approximation for large arguments */
-      static double	at[] = { 0.5124242, 0.05176536 };
-      static double	bt[] = { 0.2752551, 2.72474500 };
-      int		i;
-
-      for ( i = 0; i < 2; i++ ) {
-         double	det, dtx, dty, sav;
-
-         sav = ( x * x - y * y - bt[i] );
-         det = ( sav * sav + 4.0 * x * x * y * y );
-         dtx = ( 2.0 * x * x * y - y * sav ) * at[i];
-         dty = ( 2.0 * x * y * y + x * sav ) * at[i];
-         wdx += dtx / det;
-         wdy += dty / det;
-      }
-   } else if ( x > 3.9 || y > 3.0 ) {	/* approximation for intermediate arguments */
-      static double	at[] = { 0.4613135, 0.09999216, 0.002883894 };
-      static double	bt[] = { 0.1901635, 1.78449270, 5.525343700 };
-      int		i;
-
-      for ( i = 0; i < 3; i++ ) {
-         double	det, dtx, dty, sav;
-
-         sav = ( x * x - y * y - bt[i] );
-         det = ( sav * sav + 4.0 * x * x * y * y );
-         dtx = ( 2.0 * x * x * y - y * sav ) * at[i];
-         dty = ( 2.0 * x * y * y + x * sav ) * at[i];
-         wdx += dtx / det;
-         wdy += dty / det;
-      }
-   } else {				/* no approximation */
-      double	r;
-
-      wdx = 1.0;
-      r = sqrt( x * x + y * y );
-      if ( r > 0.0 ) {
-         static double	tt[] = { 1.0000000000, 0.5641895835 };
-         double		tn[2];
-         double		del, csp, snp, tcn, tsn;
-         int		n = 0;
-
-         csp = -y / r;
-         snp = x / r;
-         tcn = 1.0; tsn = 0.0;
-         tn[0] = tt[0]; tn[1] = tt[1];
-         do {
-            double	tc, ts;
-            int		i;
-
-            n += 1;				/* increment interation number */
-            tc = tcn;				/* save */
-            ts = tsn;				/* save */
-            tcn = ( tc * csp - ts * snp );	/* next cosine term */
-            tsn = ( ts * csp + tc * snp );	/* next sine term */
-            i = n%2;				/* argument */
-            tn[i] *= ( 2.0 / (double) n );
-            tn[0] *= r;				/* multiply with radius */
-            tn[1] *= r;				/* multiply with radius */
-            del = tn[i];			/* increment */
-            wdx += ( tcn * del );		/* add increment */
-            wdy += ( tsn * del );		/* add increment */
-         } while ( del > EPS );			/* precision is reached */
-      }
-   }
-   if ( Rz >= 0.0 && Iz >= 0.0 ) {
-      *Rr = wdx; *Ir = wdy;
-   } else if ( Rz >= 0.0 && Iz < 0.0 ) {
-      double	csp, snp, sav;
-
-      csp = cos( 2.0 * x * y );
-      snp = sin( 2.0 * x * y );
-      sav = exp( y * y - x * x );
-      *Rr = sav * csp - wdx;
-      *Ir = sav * snp + wdy;
-   } else if ( Rz < 0.0 && Iz >= 0.0 ) {
-      *Rr = wdx;
-      *Ir = -wdy;
-   } else if ( Rz < 0.0 && Iz < 0.0 ) {
-      double	csp, snp, sav;
-
-      csp = cos( 2.0 * x * y );
-      snp = sin( 2.0 * x * y );
-      sav = exp( y * y - x * x );
-      *Rr = sav * csp - wdx;
-      *Ir = -sav * snp - wdy;
-   }
-#undef EPS
-}
-
-
 static double voigt( double  X,
                      const double fpar[],
                      int     ncomp,
@@ -958,7 +848,7 @@ static double voigt( double  X,
 
          x = X_X0 * sqln2 / aD;
          y = aL * sqln2 / aD;
-         w( x, y, &Rres, &Ires );
+	 smf_math_cmplxerrfunc( x, y, &Rres, &Ires );
          ampfct = Int * sqln2/(aD*sqrt(M_PI));
          V = ampfct * Rres;
       }
@@ -1015,7 +905,7 @@ static void   voigtderv( double  X,
 
          x = X_X0 * sqln2 / aD;              /* Definitions for x and y */
          y = aL * sqln2 / aD;
-         w( x, y, &Rew, &Imw );
+	 smf_math_cmplxerrfunc( x, y, &Rew, &Imw );
          Rezwz  = ( x*Rew - y*Imw );         /* Real part of x.w(z) */
          Imzwz  = ( x*Imw + y*Rew );         /* Imaginary part of x.w(z) */
          dxVoigt = -2.0 * Rezwz;             /* dVoigt/dx */

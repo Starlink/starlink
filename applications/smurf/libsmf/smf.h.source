@@ -412,6 +412,9 @@
  *        Add smf_raw2current.c
  *     2011-10-06 (EC)
  *        Add smf_fit_pspec
+ *     2012-07-19 (RPT)
+ *        Extract smf_math_cmplxerrfunc from smf_math_functions as separate
+ *              routine
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1448,6 +1451,8 @@ void smf_math_fpderv( smf_math_function fid, double xdat, const double fpar[], i
 		      double *epar, const int iopt[], const double dopt[] );
 
 int smf_math_fnpar( smf_math_function fid );
+
+void smf_math_cmplxerrfunc( double Rz, double Iz, double *Rr, double *Ir );
 
 void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         dim_t el, const double *dat,
