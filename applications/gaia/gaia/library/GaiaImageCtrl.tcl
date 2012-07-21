@@ -144,7 +144,7 @@ itcl::class gaia::GaiaImageCtrl {
       }
 
       if { $namer_ != {} } {
-	 catch {delete object $namer_}
+         catch {delete object $namer_}
       }
 
    }
@@ -188,6 +188,9 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  And deep_search
       $image_ configure -deep_search $itk_option(-deep_search)
+
+      #  Allow for local cmaps.
+      configure -cmap_dir "$::rtd_library/colourmaps;$::env(HOME)/.skycat/colormaps"
    }
 
    #  Test for buttons 4, 5 6 and 7 and scroll the main window.
@@ -982,7 +985,7 @@ itcl::class gaia::GaiaImageCtrl {
          clear
       }
       update_title
-      apply_history $itk_option(-file)
+      catch {apply_history $itk_option(-file)}
       if { $itk_option(-with_colorramp) } {
          component colorramp update_colors
       }

@@ -433,6 +433,16 @@ itcl::class gaia::Gaia {
       #  And the other changes to menus that we require.
       make_menu_changes
 
+      #  Load user cmaps.
+      if { [::file exists $::env(HOME)/.skycat/colormaps] } {
+         set files [glob -nocomplain -directory $::env(HOME)/.skycat/colormaps "*.lasc"]
+         if { $files != {} } {
+            foreach file $files {
+               $image_ cmap file $file
+            }
+         }
+      }
+
       #  Center image first time.
       after 0 [code $image_ center]
 
