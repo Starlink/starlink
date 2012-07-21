@@ -271,6 +271,7 @@ smf_math_functions.c \
 smf_math_fvalue.c \
 smf_math_fpderv.c \
 smf_math_fnpar.c \
+smf_math_cmplxerrfunc.c \
 smf_map_or_malloc.c \
 smf_map_spikes.c \
 smf_mapbounds.c \
