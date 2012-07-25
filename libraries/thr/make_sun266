@@ -7,7 +7,7 @@ foreach n (thr.c)
    $STARCONF_DEFAULT_STARLINK/bin/sst/prolat $n out=head \
                             noatask nodocument nosingle nopage
    cat head >> thr_routines.tex
-   rm head
+   rm -f head
 end
 
 ./sort-routines.pl
