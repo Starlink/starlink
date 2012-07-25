@@ -24,10 +24,10 @@
 	url = ../libtool.git
 [submodule "thirdparty/perlsys/perl/perl"]
 	path = thirdparty/perlsys/perl/perl
-	url = ../starperl.git
+	url = git://github.com/mirrors/perl.git
 [submodule "applications/smurf/libacsis/specwrite"]
 	path = applications/smurf/libacsis/specwrite
-	url = ../acsis-libspecwrite.git
+	url = git://github.com/jac-h/acsis-libspecwrite.git
 [submodule "thirdparty/heasarc/cfitsio/cfitsio"]
 	path = thirdparty/heasarc/cfitsio/cfitsio
 	url = ../cfitsio.git
@@ -129,25 +129,25 @@
 	url = ../perl-Starlink-Extractor.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-Pointing"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-Pointing
-	url = ../perl-JCMT-Pointing.git
+	url = git://github.com/jac-h/perl-JCMT-Pointing.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-Tau"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-Tau
-	url = ../perl-JCMT-Tau.git
+	url = git://github.com/jac-h/perl-JCMT-Tau.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-MapArea"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-MapArea
-	url = ../perl-JCMT-MapArea.git
+	url = git://github.com/jac-h/perl-JCMT-MapArea.git
 [submodule "thirdparty/perlsys/perlmods/perl-JSA"]
 	path = thirdparty/perlsys/perlmods/perl-JSA
-	url = ../perl-JSA.git
+	url = git://github.com/jac-h/perl-JSA.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-ACSIS-Array"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-ACSIS-Array
-	url = ../perl-JCMT-ACSIS-Array.git
+	url = git://github.com/jac-h/perl-JCMT-ACSIS-Array.git
 [submodule "thirdparty/perlsys/perlmods/perl-JAC-Setup"]
 	path = thirdparty/perlsys/perlmods/perl-JAC-Setup
-	url = ../perl-JAC-Setup.git
+	url = git://github.com/jac-h/perl-JAC-Setup.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-SCUBA"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-SCUBA
-	url = ../perl-JCMT-SCUBA.git
+	url = git://github.com/jac-h/perl-JCMT-SCUBA.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-DAS"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-DAS
-	url = ../perl-JCMT-DAS.git
+	url = git://github.com/jac-h/perl-JCMT-DAS.git
