@@ -3,6 +3,13 @@
 
     A new toolbox for drawing STC-S regions has been added.
 
+    It is now possible to add local colour and intensity maps to GAIA
+    by adding files to the ~/.skycat/colormaps directory. These files
+    need to be in the correct format, that is simple text files with
+    either three columns (RGB for colour maps) or one column (intensity)
+    whose values are in the range 0 to 1. Colour maps should use the file
+    type ".lasc" and intensity maps ".iasc".
+
   Kapuahi Release
   ===============
 
@@ -37,7 +44,7 @@
     discontinous change that could show up as a false contour (this has been
     present for many years).
 
-    When connecting the coordinate system of a catalogue to that of the 
+    When connecting the coordinate system of a catalogue to that of the
     displayed image the current coordinate system will now always be used
     in preference to any other available system. Previously if you had another
     celestial coordinate system in addition to the current one, that would be
@@ -46,7 +53,7 @@
     one.
 
     FITS files with more than one period in their names will now be handled
-    by the analysis toolboxes. Previously names like "a.b.c.d.fits" would 
+    by the analysis toolboxes. Previously names like "a.b.c.d.fits" would
     give an error when a conversion to the NDF format was attempted. This
     uses enhancements to the CONVERT package.
 

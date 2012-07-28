@@ -16,12 +16,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.42}
+\newcommand{\stardocnumber}    {214.43}
 \newcommand{\stardocauthors}   {Peter W. Draper,
                                 Norman Gray,
                                 David S. Berry \&
                                 Mark Taylor }
-\newcommand{\stardocdate}      {2nd July 2012}
+\newcommand{\stardocdate}      {28nd July 2012}
 \newcommand{\stardoctitle}     {GAIA --
                                 Graphical Astronomy and Image Analysis Tool}
 \newcommand{\stardocversion}   {4.4-4}
@@ -926,9 +926,7 @@ using the command:
 \begin{quote}
 \mytt{\% gaia image\_name -default\_cmap ramp -float\_panel 1}
 \end{quote}
-The colour maps available can be found by listing the
-\mytt{\$STARLINK\_DIR/bin/gaia/colormaps} directory. Or alternatively to save
-some space without floating the panel try:
+Or alternatively to save some space without floating the panel try:
 \begin{quote}
 \mytt{\% gaia image\_name -with\_zoom\_window 0 -with\_pan\_window 0}
 \end{quote}
@@ -970,6 +968,20 @@ choose any remote catalogue. Now in the catalogue window select the
 
 Now fill in the two fields (consult your system administrator if you're
 unclear what to enter here) and press \mytt{OK}.
+
+
+\subsection{\xlabel{colorsmaps}Add new colour and intensity maps}
+The default set of colour and intensity maps used in GAIA can be extended by
+adding new ones to the \mytt{\~{}/.skycat/colormaps} directory. Colour maps
+are simple text files with three columns, each column represents the Red,
+Greed and Blue fractions for values in the range 0 to 255, so the file should
+have 256 rows and three columns of values in the range 0 to 1. Intensity maps
+should also be in this format, but just have one column with values in the
+range 0 to 1. Finally colour maps should have the file extension \mytt{.lasc}
+and intensity maps \mytt{.iasc}. The basename of the files should be unique
+and not match those of any existing colour and intensity maps, if they do so
+then the existing maps will be superceded. The maps themselves can only be
+found in the \mytt{View} menu window \mytt{Colors...}.
 
 \section{\xlabel{gaia_demonstration}GAIA demonstration}
 Rather than just absorbing the rather dry descriptions above, you can
