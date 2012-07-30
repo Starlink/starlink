@@ -123,25 +123,33 @@ void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
   size_t stepi[ndims];  /* Input steps indexed by input axis */
   size_t step[ndims+1]; /*  Input steps indexed by output axis */
 
-
   retval = oldbuf;
   if (*status != SAI__OK) return retval;
   if (!retval) return retval;
 
-  msgOutif( MSG__DEBUG, "","SMF_dataOrder_ndims:", status);
-  msgOutiff( MSG__DEBUG, "",
-             "...dtype: %s, ndata: %d, ndims: %d, inPlace: %d, freeOld %d",
-             status, smf_dtype_str(dtype, status), (int) ndata,
-             (int) ndims, (int) inPlace, (int) freeOld );
+
+  /*  
+  ** msgOutiff( MSG__DEBUG, "",
+  **           "%s dtype: %s, ndata: %d, ndims: %d, inPlace: %d, freeOld %d",
+  **           status, FUNC_NAME, smf_dtype_str(dtype, status), (int) ndata,
+  **           (int) ndims, (int) inPlace, (int) freeOld );
+  */
+
+  char str1[24] = "";
+  char str2[24] = ""; 
+
   for ( i=0; i<ndims; i++ ) {
-    msgOutiff(  MSG__DEBUG, "","...new axis %d will be original axis %d size %d",
-                status, (int) (i+1), (int) perm[i], (int) dims[(perm[i]-1)] );
     if ( perm[i] < 1 || perm[i] > ndims ) {
       msgOutf( "","Permutation axis %d value %d not in range 1..%d",
                status, (int) (i+1), (int) perm[i], (int) ndims );
-      *status = SAI__ERROR;
+      *status = SAI__ERROR;    
     }
+    sprintf( str1, "%s,%d", str1, (int) dims[(perm[i]-1)] );
+    sprintf( str2, "%s,%d", str2, (int) perm[i] );
   }
+  msgOutiff(  MSG__DEBUG, "","%s: new cube dims [%s] with original axes [%s]",
+	      status, FUNC_NAME, str1+1, str2+1);
+
   if (*status != SAI__OK) {
     errRep( FUNC_NAME,": Error.", status ) ;
     return retval;
