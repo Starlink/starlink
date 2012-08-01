@@ -74,21 +74,21 @@ dau_copy_object(int ncomp,
    int comp;                /* Component counter                             */
    int active;              /* Whether dynamic domain is active              */
    struct HAN src1;         /* Handle to source Structure / Primitive Record */
-   struct HAN   des1;         /* Handle to destin Structure / Primitive Record */
+   struct HAN   des1;       /* Handle to destin Structure / Primitive Record */
    unsigned char *spntr1;   /* Pointer to source Struc / Prim dynamic domain */
    unsigned char *dpntr1;   /* Pointer to destin Struc / Prim dynamic domain */
-   int nelem=0;             /* Number of elements in source structure array  */
-   int nelem1;              /* Number of elements in source component array  */
+   UINT_BIG nelem=0;        /* Number of elements in source structure array  */
+   UINT_BIG nelem1;         /* Number of elements in source component array  */
    int axis;                /* Axis counter                                  */
-   int elem;                /* Element counter                               */
+   UINT_BIG elem;           /* Element counter                               */
    struct HAN src2;         /* Handle to source next level Component Record  */
    struct HAN des2;         /* Handle to destin next level Component Record  */
    int ncomp2;              /* Number of components at next level            */
    struct RID src_rid;
    struct RID des_rid;
    struct RID rid1;
-   int dlen1;               /* Record dlen storage                           */
-   int dlen2;               /* Record dlen storage                           */
+   UINT_BIG dlen1;          /* Record dlen storage                           */
+   UINT_BIG dlen2;          /* Record dlen storage                           */
 
 /* Go through each component of the source object copying it to the destination
    object. First stick a handle on the Record ID in the Component Record and
