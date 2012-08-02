@@ -24,6 +24,8 @@ staretc_DATA = xworks.dat xworks.dct
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+AM_CFLAGS = $(X_CFLAGS)
+
 PUBLIC_INCLUDES = IDI_PAR idi.h
 
 PRIVATE_INCLUDES = idistruct_e.h kwm.h vdm.h idi_did \

@@ -25,6 +25,11 @@ AC_PATH_XTRA
 AC_PROG_LIBTOOL
 AC_C_BIGENDIAN
 
+dnl    Having no X11 is fatal.
+if test "$no_x" = "yes"; then
+   AC_MSG_ERROR([No X11 development system found. Cannot continue])
+fi
+
 AC_CHECK_HEADERS([X11/decwmhints.h])
 AC_CHECK_HEADERS([unixlib.h])
 

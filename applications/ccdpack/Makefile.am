@@ -17,6 +17,7 @@ noinst_LTLIBRARIES = libgrf_ccdpack.la
 libgrf_ccdpack_la_SOURCES = grf_ccdpack.c grf.h
 
 ccdwish_SOURCES = ccdwish.c
+ccdwish_CFLAGS = $(X_CFLAGS)
 
 STARTCL_OBJ = $(STARLINK)/lib/tkGwm.o $(STARLINK)/lib/tkGwmCanv.o \
               $(STARLINK)/lib/tkGwmPrint.o $(STARLINK)/lib/tclAdam.o

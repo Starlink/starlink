@@ -24,14 +24,9 @@
 
 #include <stdio.h>
 
-/* Assume we have all X11 includes if Xlib.h is there */
-#if HAVE_X11_XLIB_H
-# include <X11/Xlib.h>
-# include <X11/Xutil.h>
-# include <X11/keysym.h>
-#else
-# error "X11 include files must be installed"
-#endif
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/keysym.h>
 
 #if defined(VMS)
 #  include "gwm_dir:gwm.h"

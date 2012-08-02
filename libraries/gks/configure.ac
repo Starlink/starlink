@@ -33,11 +33,20 @@ dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [cnf gwm])
 STAR_DECLARE_DEPENDENCIES(link,  [ems gwm starx])
 
-dnl    Terminal control
+
 AC_HEADER_STDC
-AC_PATH_XTRA
-AC_CHECK_HEADERS([termios.h termio.h sgtty.h sys/ioctl.h X11/DECWmHints.h X11/Xlib.h])
+
+dnl    Terminal control
+AC_CHECK_HEADERS([termios.h termio.h sgtty.h sys/ioctl.h])
 AC_CHECK_FUNCS([isatty ioctl])
+
+dnl    Check for X11
+AC_PATH_XTRA
+
+dnl    Having no X11 is fatal.
+if test "$no_x" = "yes"; then
+   AC_MSG_ERROR([No X11 development system found. Cannot continue])
+fi
 
 dnl    Fortran features (mostly for ./base/*)
 AC_FC_OPEN_SPECIFIERS(readonly)

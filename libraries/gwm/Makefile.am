@@ -15,6 +15,7 @@ xdestroy_LDADD = libgwm.la $(X_LIBS) $(X_PRE_LIBS) -lX11 -lXt `ems_link` `cnf_li
 gwmXrefresh_SOURCES = gwmXrefresh.c
 gwmXrefresh_LDADD = libgwm.la $(X_LIBS) $(X_PRE_LIBS) -lX11 -lXt `ems_link` `cnf_link`
 
+AM_CFLAGS = $(X_CFLAGS)
 
 lib_LTLIBRARIES = libgwm.la
 
