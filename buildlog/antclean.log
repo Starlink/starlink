@@ -1,8 +1,0 @@
-/apps/jdk
-Buildfile: build.xml
-
-clean:
-   [delete] Deleting directory /apps/cvsbuild/java/source/ant/build
-
-BUILD SUCCESSFUL
-Total time: 0 seconds
