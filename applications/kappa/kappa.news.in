@@ -43,24 +43,24 @@
 
 2 Modified_applications
 
-   o ARDMASK
+   o  ARDMASK
 
       -  The VARIANCE and DATA arrays in the NDF can now be masked
       simultaneously by setting the COMP parameter to "All", which is
       now the default value for COMP.
 
-   o FITSMOD
+   o  FITSMOD
 
       -  New parameter READONLY allows FITSMOD to be used to perform
       read-only edits such as "Print" and "Exist" on write-protected
       NDFs, although FITSVAL and FITSEXIST tasks are recommended for
       these operations.
 
-   o FFCLEAN
+   o  FFCLEAN
 
       -  Now ignores a VARIANCE component full of bad values.
 
-   o HISTOGRAM
+   o  HISTOGRAM
 
       -  Now permits plotting of the histogram for data-value limits
       that exceed the single-precision data range.
@@ -72,6 +72,7 @@
       value corresponding to a single integer histogram count.
 
    o  LINPLOT
+
       -  Monotonic AXIS values are now only required if the NDF
       current Frame is AXIS, or MODE="Step", or horizontal error
       bars are being drawn.
