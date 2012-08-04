@@ -17,7 +17,7 @@
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
 \newcommand{\stardocdate}      {2012 August 31}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.13}
+\newcommand{\stardocversion}   {2.0}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -17401,6 +17401,12 @@ KAPPA: \htmlref{PASTE}{PASTE},
             {\tt "Comin"}  --- Co-ordinate of the minimum value.
 
             \sstitem
+            {\tt "FBad"}   --- Fraction of bad pixel values.
+
+            \sstitem
+            {\tt "FGood"}  --- Fraction of good pixel values.
+
+            \sstitem
             {\tt "Integ"}  --- Integrated value, being the sum of the products
                         of the value and pixel width in world
                         co-ordinates.
@@ -17420,6 +17426,12 @@ KAPPA: \htmlref{PASTE}{PASTE},
 
             \sstitem
             {\tt "Min"}    --- Minimum value.
+
+            \sstitem
+            {\tt "NBad"}   --- Count of bad pixel values.
+
+            \sstitem
+            {\tt "NGood"}  --- Count of good pixel values.
 
             \sstitem
             {\tt "Rms"}    --- Root-mean-square value.  (4)
@@ -36168,6 +36180,12 @@ plot (9k).
             {\tt "Comin"}  --- Co-ordinate of the minimum value.
 
             \sstitem
+            {\tt "FBad"}   --- Fraction of bad pixel values.
+
+            \sstitem
+            {\tt "FGood"}  --- Fraction of good pixel values.
+
+            \sstitem
             {\tt "Integ"}  --- Integrated value, being the sum of the products
                         of the value and pixel width in world
                         co-ordinates.
@@ -36187,6 +36205,18 @@ plot (9k).
 
             \sstitem
             {\tt "Min"}    --- Minimum value.
+
+            \sstitem
+            {\tt "FBad"}   --- Fraction of bad pixel values.
+
+            \sstitem
+            {\tt "FGood"}  --- Fraction of good pixel values.
+
+            \sstitem
+            {\tt "NBad"}   --- Count of bad pixel values.
+
+            \sstitem
+            {\tt "NGood"}  --- Count of good pixel values.
 
             \sstitem
             {\tt "Rms"}    --- Root-mean-square value.  (4)
@@ -58372,7 +58402,7 @@ The following applications have been modified:
 
 \end{description}
 
-\section{\xlabel{se_changes}Release Notes---V1.13\label{se:changes}}
+\section{Release Notes---V1.13}
 
 \subsection{General Changes}
 \begin{itemize}
@@ -58408,12 +58438,6 @@ The following applications have been modified:
         \item The VARIANCE and DATA arrays in the NDF can now be masked
          simultaneously by setting the COMP parameter to ``All'', which is
          now the default value for COMP.
-      \end{itemize}
-
-   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
-      \begin{itemize}
-        \item Four new estimators are available: FBAD, FGOOD, NBAD and
-        NGOOD, which produce the fraction/count of good/bad pixel values.
       \end{itemize}
 
    \item [\htmlref{FITSMOD}{FITSMOD}]\mbox{}
@@ -58562,6 +58586,35 @@ The following applications have been modified:
         conservation and pixel normalisation.
       \end{itemize}
 
+\end{description}
+
+\section{\xlabel{se_changes}Release Notes---V2.0\label{se:changes}}
+
+\subsection{General Changes}
+
+\begin{itemize}
+   \item Now supports 64-bit integer data.
+\end{itemize}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
+   \item [\htmlref{CHANMAP}{CHANMAP}]\mbox{}
+      \begin{itemize}
+        \item Four new estimators are available: FBAD, FGOOD, NBAD and
+        NGOOD, which produce the fraction/count of good/bad pixel values.
+      \end{itemize}
+   \item [\htmlref{COLLAPSE}{COLLAPSE}]\mbox{}
+      \begin{itemize}
+        \item Four new estimators are available: FBAD, FGOOD, NBAD and
+        NGOOD, which produce the fraction/count of good/bad pixel values.
+      \end{itemize}
+   \item [\htmlref{MSTATS}{MSTATS}]\mbox{}
+      \begin{itemize}
+        \item Four new estimators are available: FBAD, FGOOD, NBAD and
+        NGOOD, which produce the fraction/count of good/bad pixel values.
+      \end{itemize}
 \end{description}
 
 \begin{latexonly}

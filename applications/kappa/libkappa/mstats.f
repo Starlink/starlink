@@ -89,6 +89,8 @@
 *          "Csigma" -- Sigma-clipped standard deviation.  (4)
 *          "Comax"  -- Co-ordinate of the maximum value.
 *          "Comin"  -- Co-ordinate of the minimum value.
+*          "FBad"   -- Fraction of bad pixel values.
+*          "FGood"  -- Fraction of good pixel values.
 *          "Integ"  -- Integrated value, being the sum of the products
 *                      of the value and pixel width in world
 *                      co-ordinates.
@@ -100,6 +102,8 @@
 *                      integrated value.  (4)
 *          "Max"    -- Maximum value.
 *          "Min"    -- Minimum value.
+*          "NBad"   -- Number of bad pixel values.
+*          "NGood"  -- Number of good pixel values.
 *          "Rms"    -- Root-mean-square value. (4)
 *          "Sigma"  -- Standard deviation about the unweighted mean. (4)
 *          "Sum"    -- The total value.
@@ -277,7 +281,8 @@
 *     Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research
 *     Council.
-*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009, 2012 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -328,6 +333,8 @@
 *     2009 July 22 (MJC):
 *        Remove ILEVEL parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     2012 August 3 (MJC):
+*        Added "NGood", "NBad", "FGood", and "FBad" estimators.
 *     {enter_further_changes_here}
 
 *-
@@ -369,7 +376,7 @@
       INTEGER ELO                ! Number of elements in output NDF
       CHARACTER*6 ESTIM          ! Method to use to estimate combined
                                  ! values
-      CHARACTER*90 ESTIMO        ! List of available estimators
+      CHARACTER*112 ESTIMO       ! List of available estimators
       LOGICAL HIGHER             ! Significant dimensions above collapse
                                  ! axis?
       INTEGER I                  ! Loop variable
@@ -545,15 +552,16 @@
 *  derive a result.
          IF ( NNDF .GT. 3 ) THEN
             ESTIMO = 'Mean,WMean,Mode,Median,Max,Min,Comax,Comin,'/
-     :               /'Absdev,Cmean,Csigma,RMS,Sigma,Sum,Iwc,Iwd,Integ'
+     :               /'Absdev,Cmean,Csigma,RMS,Sigma,Sum,Iwc,Iwd,'/
+     :               /'Integ,FBad,FGood,NBad,NGood'
          ELSE IF ( NNDF .EQ. 1 ) THEN
             ESTIMO = 'Mean,Max,Min,Comax,Comin,Sum,Iwc,Integ'
          ELSE IF ( NNDF .EQ. 2 ) THEN
             ESTIMO = 'Mean,WMean,Max,Min,Comax,Comin,Absdev,Sum,Iwc,'/
-     :               /'Integ'
+     :               /'Integ,FBad,FGood,NBad,NGood'
          ELSE IF ( NNDF .EQ. 3 ) THEN
             ESTIMO = 'Mean,WMean,Median,Max,Min,Comax,Comin,Absdev,'/
-     :               /'Sum,Iwc,Integ'
+     :               /'Sum,Iwc,Integ,FBad,FGood,NBad,NGood'
          END IF
 
 *  Get the ESTIMATOR and WLIM parameters.
@@ -573,13 +581,29 @@
 
 *  For now obtain just a single number of standard deviations at which
 *  to clip.
-         IF ( ESTIMO .EQ. 'MODE' .OR. ESTIMO .EQ. 'CMEAN' .OR.
-     :        ESTIMO .EQ. 'CSIGMA' ) THEN
+         IF ( ESTIM .EQ. 'MODE' .OR. ESTIM .EQ. 'CMEAN' .OR.
+     :        ESTIM .EQ. 'CSIGMA' ) THEN
             CALL PAR_GDR0R( 'CLIP', CLPDEF, VAL__SMLR, VAL__MAXR,
      :                      .FALSE., CLIP, STATUS )
          ELSE
             CLIP = CLPDEF
          END IF
+
+*  Redefine the data units.
+*  ========================
+
+*  There's no guarantee that all the supplied NDFs have the same units,
+*  hence there's no revision for COMAX, COMIN, IWC, and IWD estimators.
+
+*  New unit is "pixel".
+      IF ( ESTIM .EQ. 'NGOOD' .OR. ESTIM .EQ. 'NBAD' ) THEN
+         CALL NDF_CPUT( 'Pixel', ONDF, 'Units', STATUS )
+
+*  Dimensionless...
+      ELSE IF ( ESTIM .EQ. 'FGOOD' .OR. ESTIM .EQ. 'FBAD' ) THEN
+         CALL NDF_CPUT( ' ', ONDF, 'Units', STATUS )
+
+      END IF
 
 *  Obtain NDF identifiers and bounds.
 *  ----------------------------------
@@ -594,6 +618,18 @@
 
 *  Get a title for it from the parameter system.
          CALL NDF_CINP( 'TITLE', ONDF, 'Title', STATUS )
+
+*  Adjust output data type if required.
+*  ====================================
+
+*  The NBad and NGood estimators always produce _INTEGER output NDFs.
+      IF ( ESTIM .EQ. 'NGOOD' .OR. ESTIM .EQ. 'NBAD' ) THEN
+         CALL NDF_RESET( ONDF, COMP, STATUS )
+         CALL NDF_STYPE( '_INTEGER', ONDF, COMP, STATUS )
+         ITYPE = '_INTEGER'
+      ELSE
+         ITYPE = ITYPE
+      END IF
 
 *  Process in blocks.
 *  ==================

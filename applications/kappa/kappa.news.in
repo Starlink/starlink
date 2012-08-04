@@ -1,3 +1,21 @@
+1 KAPPA_Version_2.0
+
+   A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main
+   changes are listed below.  For complete details of all
+   changes, see the "Release Notes" appendix in SUN/95.
+
+2 General_changes
+   o  Now supports 64-bit integer data.
+
+2 Modified_applications
+
+   o  CHANMAP, COLLAPSE, and MSTATS
+
+      -  Four new estimators are available: FBAD, FGOOD, NBAD and
+      NGOOD, which produce the fraction/count of good/bad pixel
+      values.
+
+
 1 KAPPA_Version_1.13
 
    A new release of KAPPA (@PACKAGE_VERSION@) has been released.  The main

@@ -86,6 +86,8 @@
 *          "Csigma" -- Sigma-clipped standard deviation.  (4)
 *          "Comax"  -- Co-ordinate of the maximum value.
 *          "Comin"  -- Co-ordinate of the minimum value.
+*          "FBad"   -- Fraction of bad pixel values.
+*          "FGood"  -- Fraction of good pixel values.
 *          "Integ"  -- Integrated value, being the sum of the products
 *                      of the value and pixel width in world
 *                      co-ordinates.
@@ -97,6 +99,8 @@
 *                      integrated value.  (4)
 *          "Max"    -- Maximum value.
 *          "Min"    -- Minimum value.
+*          "NBad"   -- Number of bad pixel values.
+*          "NGood"  -- Number of good pixel values.
 *          "Rms"    -- Root-mean-square value.  (4)
 *          "Sigma"  -- Standard deviation about the unweighted mean. (4)
 *          "Sum"    -- The total value.
@@ -275,7 +279,8 @@
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2007 Science & Technology Facilities Council.
-*     Copyright (C) 2008, 2009 Science and Technology Faciities Council.
+*     Copyright (C) 2008, 2009, 2012 Science and Technology Faciities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -356,7 +361,9 @@
 *        list.
 *     2010-12-03 (TIMJ):
 *        Use correct bounds during blocking for estimators that
-*        require the coordinate value.
+*        require the co-ordinate value.
+*     2012 August 3 (MJC):
+*        Added "NGood", "NBad", "FGood", and "FBad" estimators.
 *     {enter_further_changes_here}
 
 *-
@@ -440,7 +447,7 @@
                                  ! mapped array
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
-      CHARACTER ESTIMO*( 90 )    ! List of available estimators
+      CHARACTER ESTIMO*( 112 )   ! List of available estimators
       INTEGER GFRMO              ! Output GRID Frame pointer
       INTEGER GMAP               ! Pointer to Mapping from GRID Frame
                                  ! to Current Frame, input NDF
@@ -480,7 +487,7 @@
       INTEGER IPW3               ! Pointer to third work array
       INTEGER IPWID              ! Pointers to mapped width work array
       INTEGER ISEMAP             ! Inverse-SelectorMap pointer
-      CHARACTER ITYPE*( NDF__SZTYP ) ! Numeric type for processing
+      CHARACTER ITYPE*( NDF__SZTYP ) ! Numeric type for input arrays
       INTEGER IWCS               ! WCS FrameSet pointer
       INTEGER IWCSO              ! Output NDF's WCS FrameSet pointer
       INTEGER J                  ! Loop count
@@ -523,6 +530,7 @@
                                  ! output array
       INTEGER OPERM( NDIM )      ! Output permutation
       INTEGER OTOMAP             ! One-to-one mapping
+      CHARACTER OTYPE*( NDF__SZTYP ) ! Numeric type for output arrays
       INTEGER PERMAP             ! PermMap pointer
       INTEGER PFRMI              ! Input PIXEL Frame pointer
       REAL PIXPCH                ! Collapse-axis pixels per channel
@@ -872,14 +880,16 @@
       PIXPCH = REAL( AEL ) / REAL( NOCHAN )
       IF ( INT( PIXPCH ) .GT. 3 ) THEN
          ESTIMO = 'Mean,WMean,Mode,Median,Max,Min,Comax,Comin,Absdev,'/
-     :            /'Cmean,Csigma,RMS,Sigma,Sum,Iwc,Iwd,Integ'
+     :            /'Cmean,Csigma,RMS,Sigma,Sum,Iwc,Iwd,Integ,FBad,'/
+     :            /'FGood,NBad,NGood'
       ELSE IF ( INT( PIXPCH ) .EQ. 1 ) THEN
          ESTIMO = 'Mean,Max,Min,Comax,Comin,Sum,Iwc,Integ'
       ELSE IF ( INT( PIXPCH ) .EQ. 2 ) THEN
-         ESTIMO = 'Mean,WMean,Max,Min,Comax,Comin,Absdev,Sum,Iwc,Integ'
+         ESTIMO = 'Mean,WMean,Max,Min,Comax,Comin,Absdev,Sum,Iwc,'/
+     :            /'Integ,FBad,FGood,NBad,NGood'
       ELSE IF ( INT( PIXPCH ) .EQ. 3 ) THEN
          ESTIMO = 'Mean,WMean,Median,Max,Min,Comax,Comin,Absdev,Sum,'/
-     :            /'Iwc,Integ'
+     :            /'Iwc,Integ,FBad,FGood,NBad,NGood'
       END IF
 
 *  Get the ESTIMATOR and WLIM parameters.
@@ -896,6 +906,18 @@
      :                   CLIP, STATUS )
       ELSE
          CLIP = CLPDEF
+      END IF
+
+*  Adjust output data type if required.
+*  ====================================
+
+*  The NBad and NGood estimators always produce _INTEGER output NDFs.
+      IF ( ESTIM .EQ. 'NGOOD' .OR. ESTIM .EQ. 'NBAD' ) THEN
+         CALL NDF_RESET( INDFO, COMP, STATUS )
+         CALL NDF_STYPE( '_INTEGER', INDFO, COMP, STATUS )
+         OTYPE = '_INTEGER'
+      ELSE
+         OTYPE = ITYPE
       END IF
 
 *  Redefine the data units.
@@ -933,13 +955,21 @@
          CALL CHR_APPND( AUNITS, UNITS, NC )
 
          CALL NDF_CPUT( UNITS( :NC ), INDFO, 'Units', STATUS )
+
+*  New unit is "pixel".
+      ELSE IF ( ESTIM .EQ. 'NGOOD' .OR. ESTIM .EQ. 'NBAD' ) THEN
+         CALL NDF_CPUT( 'Pixel', INDFO, 'Units', STATUS )
+
+*  Dimensionless...
+      ELSE IF ( ESTIM .EQ. 'FGOOD' .OR. ESTIM .EQ. 'FBAD' ) THEN
+         CALL NDF_CPUT( ' ', INDFO, 'Units', STATUS )
       END IF
 
 *  Prepare for the channel-map loop.
 *  =================================
 
 *  Map the channel map.
-      CALL KPG1_MAP( INDFO, COMP, ITYPE, 'WRITE', IPOUT, ELO, STATUS )
+      CALL KPG1_MAP( INDFO, COMP, OTYPE, 'WRITE', IPOUT, ELO, STATUS )
 
 *  There may be bad pixels present.
       BAD = .TRUE.
