@@ -1,7 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 
 dnl    This is not a package, so the first two arguments are fake.
-AC_INIT(star-libraries, 1.0, ussc@star.rl.ac.uk)
+AC_INIT(star-libraries, 1.0, starlink@jiscmail.ac.uk)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Following sanity-check isn't terribly helpful...

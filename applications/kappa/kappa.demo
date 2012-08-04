@@ -22,8 +22,8 @@
 #       sun  <doc>             ( e.g. "sun sun95" )
 #       info <text>            
 #       version <version>      ( e.g. "version 0.14-5" )
-#       email <email>          ( e.g. "email ussc@star.rl.ac.uk" )
-#       url <url>              ( e.g. "url http://www.ast.man.ac.uk/~dsb/kappa/kappa.html" )
+#       email <email>          ( e.g. "email starlink@jiscmail.ac.uk" )
+#       url <url>              ( e.g. "url http://www.starlink.ac.uk" )
 #       monolith <task> <file> ( e.g. "monolith polpack $POLPACK_DIR/polpack_mon")
 #       link <tag> <text>
 #    }
@@ -186,8 +186,8 @@
 package {
    name "KAPPA"
    version "1.0-1"
-   email "ussc@star.rl.ac.uk"
-   url "http://www.ast.man.ac.uk/~dsb/kappa/kappa.html"
+   email "starlink@jiscmail.ac.uk"
+   url "http://www.starlink.ac.uk"
    sun "sun95"
 
    info "<pack KAPPA> is a package comprising about 180 general-purpose

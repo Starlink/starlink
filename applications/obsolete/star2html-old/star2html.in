@@ -63,7 +63,7 @@
 #     -m "contact email address" (optional)
 #        A contact email address for the document. If not supplied the
 #        value of the environment variable HTX_EMAIL will be
-#        used. If this isn't set then the address "ussc@star.rl.ac.uk"
+#        used. If this isn't set then the address "starlink@jiscmail.ac.uk"
 #        will be used. This appears in the footer of every page. If
 #        you are only reponsible for converting yor own documents then
 #        set by using the environment variable (in your .login).
@@ -113,7 +113,7 @@
 #         Analysis" extracted from the \stardoctitle command and the
 #         authors and document date will be extracted from the
 #         \stardocauthors and \stardoctitle commands. A mail address
-#         of ussc@star.rl.ac.uk will be used unless the HTX_EMAIL
+#         of starlink@jiscmail.ac.uk will be used unless the HTX_EMAIL
 #         environment variable has been set.
 
 #  Notes:

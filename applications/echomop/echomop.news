@@ -116,5 +116,5 @@
  o A missing range check in Option 9.2, which might give rise to
    segmentation faults, has been removed.
 
- Please report bugs to ussc@star.rl.ac.uk and to mjc@star.ucl.ac.uk
+ Please report bugs to starlink@jiscmail.ac.uk and to mjc@star.ucl.ac.uk
 

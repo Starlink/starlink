@@ -28,6 +28,6 @@ IRAS90 is a suite of programs for processing IRAS data.
     </person>
   </developers>
   <documentation> sun161 sun163 sun165</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

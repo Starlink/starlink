@@ -184,7 +184,7 @@ setenv DATACUBE_HELP   ${DATACUBE_DIR}/../../help/datacube/datacube
 #if ($#argv == 0 || $1 != "-quiet") then
       echo " "
       echo "   DATACUBE applications are now available -- (Version @PACKAGE_VERSION@)"
-      echo "    Support is available by emailing datacube@star.rl.ac.uk"
+      echo "    Support is available by emailing starlink@jiscmail.ac.uk"
       echo " "
       echo "        Type cubehelp for help on DATACUBE commands."
       echo "   Type 'showme sun237' to browse the hypertext documentation"

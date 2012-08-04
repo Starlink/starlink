@@ -3,7 +3,7 @@ dnl    Instead, process it with ./bootstrap, which does substitutions
 dnl    on it to generate an appropriate configure.ac.
 
 dnl    This `package name' is a dummy
-AC_INIT(startree, 1.0, ussc@star.rl.ac.uk)
+AC_INIT(startree, 1.0, starlink@jiscmail.ac.uk)
 AC_PREREQ(2.50)
 
 AC_CONFIG_SRCDIR(Makefile.dependencies)

@@ -146,7 +146,7 @@ define ascii2ndf      ${CONVERT_DIR}/ascii2ndf
 {
 print " "
 print "   DATACUBE applications are now available -- (Version @PACKAGE_VERSION@)"
-print "    Support is available by emailing datacube@star.rl.ac.uk"
+print "    Support is available by emailing starlink@jiscmail.ac.uk"
 print " "
 print "   For help use the command 'help datacube'"
 print "   Type 'showme sun237' to browse the hypertext documentation"
