@@ -28,7 +28,7 @@
     </person>
   </developers>
   <documentation> sun5</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -58,7 +58,7 @@ high-level interface to the AST library.
     </person>
   </developers>
   <documentation></documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -134,7 +134,7 @@ system are supported.
     </person>
   </developers>
   <documentation> sun56</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="convert" support="S">
@@ -172,7 +172,7 @@ Starlink applications, and a number of other common data formats.
     </person>
   </developers>
   <documentation> sun55</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="cupid" support="S">
@@ -195,7 +195,7 @@ emission within 2- or 3- dimensional data arrays.
     </person>
   </developers>
   <documentation> sun255</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>2005</year>
     <name>Joint Astronomy Centre Hawaii</name>
@@ -236,7 +236,7 @@ on-line catalogues via the Internet.
     </person>
   </developers>
   <documentation> sun190 ssn76</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -270,7 +270,7 @@ on-line catalogues via the Internet.
     </person>
   </developers>
   <documentation> sun42</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Peter Stetson/DAO</name>
@@ -297,7 +297,7 @@ cube manipulation. </p></abstract>
     </person>
   </developers>
   <documentation> sun237 sc16</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="dipso" support="S">
@@ -319,7 +319,7 @@ cube manipulation. </p></abstract>
     </person>
   </developers>
   <documentation> sun50</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="docfind" support="S">
@@ -341,7 +341,7 @@ cube manipulation. </p></abstract>
     </person>
   </developers>
   <documentation> sun38</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="echomop" support="S">
@@ -380,7 +380,7 @@ cube manipulation. </p></abstract>
     </person>
   </developers>
   <documentation> sun152</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -419,7 +419,7 @@ proposal, or before or during an observing run.
     </person>
   </developers>
   <documentation> sun53</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="esp" support="S">
@@ -454,7 +454,7 @@ proposal, or before or during an observing run.
     </person>
   </developers>
   <documentation> sun180</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1996-1999, 2004</year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -486,7 +486,7 @@ variety of formats.
     </person>
   </developers>
   <documentation> sun226</documentation>
-  <bugreports>extractor@star.rl.ac.uk</bugreports>
+  <bugreports>stardev@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -526,7 +526,7 @@ variety of formats.
     </person>
   </developers>
   <tests status="yes"/>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -593,7 +593,7 @@ wide range of images and spectra.
     </person>
   </developers>
   <documentation> sun86</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="findcoords" support="U">
@@ -615,7 +615,7 @@ and its coordinates are displayed.
     </person>
   </developers>
   <documentation> sun240</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="fluxes">
@@ -654,7 +654,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
     </person>
   </developers>
   <documentation> sun213</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="gaia" support="S">
@@ -708,7 +708,7 @@ and the ability to query on-line (WWW) catalogues.
     </person>
   </developers>
   <documentation> sun7</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="hdstools" support="S">
@@ -727,7 +727,7 @@ package but have now been modified to run as normal Starlink tasks.
     <person>
       <name>A. J. Chipperfield</name>
       <uname>ajc</uname>
-      <email>ussc@star.rl.ac.uk</email>
+      <email>starlink@jiscmail.ac.uk</email>
     </person>
     <person>
       <name>Mark Taylor</name>
@@ -736,7 +736,7 @@ package but have now been modified to run as normal Starlink tasks.
       <role>owner</role>
     </person>  </developers>
   <documentation> sun245</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -766,7 +766,7 @@ Traces an HDS file
     </person>
   </developers>
   <documentation> sun102</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="htx" support="S">
@@ -806,7 +806,7 @@ Traces an HDS file
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -834,7 +834,7 @@ Traces an HDS file
     </person>
   </developers>
   <documentation> sg5</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="ifd" support="S">
@@ -894,7 +894,7 @@ packages.
     </person>
   </developers>
   <documentation> sun95</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="kaprh" support="U">
@@ -923,7 +923,7 @@ them.
     </person>
   </developers>
   <documentation> sun239</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="messgen" support="S">
@@ -958,7 +958,7 @@ them.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="news" support="S">
@@ -985,7 +985,7 @@ them.
     </person>
   </developers>
   <documentation> sun195</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="observe" support="U">
@@ -1011,12 +1011,12 @@ them.
     <person>
       <name>Julian Osborne, Jeremy Ashley, &amp; Grant Privett</name>
       <uname>pwd</uname>
-      <email>ussc@star.rl.ac.uk</email>
+      <email>starlink@jiscmail.ac.uk</email>
       <role>librarian</role>
     </person>
   </developers>
   <documentation> sun146</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="cgs3dr" status="obsolete" support="U">
@@ -1037,7 +1037,7 @@ them.
     </person>
   </developers>
   <documentation> sun206</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="chart" status="obsolete" support="U">
@@ -1075,7 +1075,7 @@ or perform astrometric reductions.
     </person>
   </developers>
   <documentation> sun32</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="email" status="obsolete" support="U">
@@ -1110,7 +1110,7 @@ and astronomy groups in the UK and the rest of the world.
     </person>
   </developers>
   <documentation> sun182</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="iras90" status="obsolete" support="U">
@@ -1139,7 +1139,7 @@ IRAS90 is a suite of programs for processing IRAS data.
     </person>
   </developers>
   <documentation> sun161 sun163 sun165</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="ircamdr" status="obsolete" support="U">
@@ -1165,7 +1165,7 @@ file extension stored in the standard Starlink NDF data format.
     </person>
   </developers>
   <documentation> sun41</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="jcmtdr">
@@ -1201,7 +1201,7 @@ file extension stored in the standard Starlink NDF data format.
     </person>
   </developers>
   <documentation> sun132 sc1</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="star2html" support="S">
@@ -1231,7 +1231,7 @@ file extension stored in the standard Starlink NDF data format.
     </person>
   </developers>
   <documentation> sun199</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -1266,7 +1266,7 @@ the performance of computer systems running astronomy data reduction software.
     </person>
   </developers>
   <documentation> ssn23</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="starman" status="obsolete" support="U">
@@ -1288,7 +1288,7 @@ reduction program.
     </person>
   </developers>
   <documentation> sun141</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="pamela">
@@ -1336,7 +1336,7 @@ A software package designed to search for periodicities in data.
     </person>
   </developers>
   <documentation> sun167</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="photom" support="S">
@@ -1359,7 +1359,7 @@ A software package designed to search for periodicities in data.
     </person>
   </developers>
   <documentation> sun45</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="pisa" support="U">
@@ -1381,7 +1381,7 @@ A software package designed to search for periodicities in data.
     </person>
   </developers>
   <documentation> sun109</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="polpack" support="S">
@@ -1410,7 +1410,7 @@ display of vector maps.
     </person>
   </developers>
   <documentation> sun223</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -1449,7 +1449,7 @@ package.
     </person>
   </developers>
   <documentation> sun137</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="psmerge" support="U">
@@ -1477,7 +1477,7 @@ package.
     </person>
   </developers>
   <documentation> sun164</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="rv" support="S">
@@ -1506,7 +1506,7 @@ package.
     </person>
   </developers>
   <documentation> sun78</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="scb" support="U">
@@ -1536,7 +1536,7 @@ package.
     </person>
   </developers>
   <tests status="yes"/>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -1570,7 +1570,7 @@ package.
     </person>
   </developers>
   <documentation> ssn70</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1999-2004</year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -1694,7 +1694,7 @@ UNIX).
     </person>
   </developers>
   <documentation> sun111</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="sst" support="S">
@@ -1733,7 +1733,7 @@ UNIX).
     </person>
   </developers>
   <documentation> sun110</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -1767,7 +1767,7 @@ UNIX).
     </person>
   </developers>
   <documentation> sun199</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Science and Technology Facilities Council</name>
@@ -1804,7 +1804,7 @@ UNIX).
     </person>
   </developers>
   <documentation> sun186 sun219</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="starx" support="U">
@@ -1823,7 +1823,7 @@ UNIX).
     </person>
   </developers>
   <documentation> ssn21</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="surf">
@@ -1850,7 +1850,7 @@ re-reduce your SCUBA data.
     </person>
   </developers>
   <documentation> sun216 ssn72 sc10 sc11 </documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="tsp" support="U">
@@ -1874,7 +1874,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun66</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="xdisplay" support="S">
@@ -1902,7 +1902,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun129</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 <!--
  !  Copyright:
@@ -1940,7 +1940,7 @@ to handle data from a variety of different instruments.
       <email>norman@astro.gla.ac.uk</email>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 
@@ -1970,7 +1970,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc2</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997</year>
     <name>CLRC</name>
@@ -1997,7 +1997,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc3</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>2000, 2003</year>
     <name>CLRC</name>
@@ -2035,7 +2035,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc4</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997, 1998, 2005</year>
     <name>CLRC</name>
@@ -2077,7 +2077,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc5</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997, 1999, 2001</year>
     <name>CLRC</name>
@@ -2119,7 +2119,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc6</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997, 1998, 1999, 2001</year>
     <name>CLRC</name>
@@ -2152,7 +2152,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc7</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997, 1998</year>
     <name>CLRC</name>
@@ -2176,7 +2176,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc9</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997</year>
     <name>CLRC</name>
@@ -2205,7 +2205,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc12</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997</year>
     <name>CLRC</name>
@@ -2239,7 +2239,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc13</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1999, 2001--2003</year>
     <name>CLRC</name>
@@ -2269,7 +2269,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc14</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1998, 1999</year>
     <name>CLRC</name>
@@ -2297,7 +2297,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc15</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>2000</year>
     <name>CLRC</name>
@@ -2332,7 +2332,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sc17</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>2001</year>
     <name>CLRC</name>
@@ -2356,7 +2356,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sg4</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1990, 1992</year>
     <name>CLRC</name>
@@ -2393,7 +2393,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sg6</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1990, 1992, 1994</year>
     <name>CLRC</name>
@@ -2422,7 +2422,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sg8</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1996, 1997</year>
     <name>CLRC</name>
@@ -2453,7 +2453,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sg9</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1996</year>
     <name>CLRC</name>
@@ -2482,7 +2482,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sg10</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997, 1998</year>
     <name>CLRC</name>
@@ -2516,7 +2516,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sg12</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1998, 1999</year>
     <name>CLRC</name>
@@ -2548,7 +2548,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp1</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1989</year>
     <name>CLRC</name>
@@ -2570,7 +2570,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp2</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1988, 1990</year>
     <name>CLRC</name>
@@ -2599,7 +2599,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp4</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1990, 1994</year>
     <name>CLRC</name>
@@ -2632,7 +2632,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp7</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1991</year>
     <name>CLRC</name>
@@ -2658,7 +2658,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp12</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1992</year>
     <name>CLRC</name>
@@ -2687,7 +2687,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp16</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1981-1992</year>
     <name>CLRC</name>
@@ -2713,7 +2713,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp21</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1981-2000</year>
     <name>CLRC</name>
@@ -2751,7 +2751,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp25</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1981-1997</year>
     <name>CLRC</name>
@@ -2787,7 +2787,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp28</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>?-1997</year>
     <name>CLRC</name>
@@ -2813,7 +2813,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp31</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>?-1996</year>
     <name>CLRC</name>
@@ -2844,7 +2844,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp38</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1988, 1989</year>
     <name>CLRC</name>
@@ -2881,7 +2881,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp41</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1994</year>
     <name>CLRC</name>
@@ -2909,7 +2909,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp42</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>CLRC</name>
@@ -2944,7 +2944,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp44</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>CLRC</name>
@@ -2970,7 +2970,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp45</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>CLRC</name>
@@ -3003,7 +3003,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp47</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997</year>
     <name>CLRC</name>
@@ -3037,7 +3037,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp49</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1996</year>
     <name>CLRC</name>
@@ -3072,7 +3072,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp50</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997</year>
     <name>CLRC</name>
@@ -3114,7 +3114,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp51</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997</year>
     <name>CLRC</name>
@@ -3149,7 +3149,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sgp52</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997</year>
     <name>CLRC</name>
@@ -3181,7 +3181,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn3</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1989</year>
     <name>SERC</name>
@@ -3212,7 +3212,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn6</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1990</year>
     <name>SERC</name>
@@ -3238,7 +3238,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn7</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1991</year>
     <name>SERC</name>
@@ -3262,7 +3262,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn8</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1991</year>
     <name>SERC</name>
@@ -3288,7 +3288,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn18</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1994</year>
     <name>SERC</name>
@@ -3314,7 +3314,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn22</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1983, 1992</year>
     <name>SERC</name>
@@ -3342,7 +3342,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn23</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995, 1996, 1997</year>
     <name>CLRC</name>
@@ -3364,7 +3364,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn24</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997</year>
     <name>CLRC</name>
@@ -3386,7 +3386,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn26</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>PPARC</name>
@@ -3408,7 +3408,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn27</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>PPARRC</name>
@@ -3430,7 +3430,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn30</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995, 1996</year>
     <name>PPARRC</name>
@@ -3452,7 +3452,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn31</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>PPARC</name>
@@ -3474,7 +3474,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn32</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>PPARC</name>
@@ -3496,7 +3496,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn33</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>PPARRC</name>
@@ -3518,7 +3518,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn36</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1996</year>
     <name>PPARC</name>
@@ -3540,7 +3540,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn37</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1996</year>
     <name>PPARC</name>
@@ -3562,7 +3562,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn39</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1992</year>
     <name>SERC</name>
@@ -3588,7 +3588,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn64</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>?-2002</year>
     <name>PPARC</name>
@@ -3616,7 +3616,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn67</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1996</year>
     <name>PPARC</name>
@@ -3650,7 +3650,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn75</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>2000</year>
     <name>CLRC</name>
@@ -3672,7 +3672,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> ssn78</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="sug">
@@ -3697,7 +3697,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sug</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997</year>
     <name>PPARC</name>
@@ -3750,7 +3750,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun1</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1980--2003</year>
     <name>CLRC</name>
@@ -3776,7 +3776,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun9</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1987--1997</year>
     <name>CLRC</name>
@@ -3817,7 +3817,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun20</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1987--1993</year>
     <name>SERC</name>
@@ -3849,7 +3849,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun30</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1988,1989</year>
     <name>SERC</name>
@@ -3874,7 +3874,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun34</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1991</year>
     <name>SERC</name>
@@ -3907,7 +3907,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun58</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1986--1995</year>
     <name>CLRC</name>
@@ -3934,7 +3934,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun63</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1988,1989,1992</year>
     <name>CLRC</name>
@@ -3961,7 +3961,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun73</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1990</year>
     <name>CLRC</name>
@@ -3988,7 +3988,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun82</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1987,1989,1992,1993</year>
     <name>SERC</name>
@@ -4015,7 +4015,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun91</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1987,1989</year>
     <name>SERC</name>
@@ -4048,7 +4048,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun93</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1989,1990,1995</year>
     <name>SERC</name>
@@ -4072,7 +4072,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun101</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1990,1991</year>
     <name>CLRC</name>
@@ -4100,7 +4100,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun107</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1990,1993,1996,1998</year>
     <name>CLRC</name>
@@ -4127,7 +4127,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun119</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1991,1992</year>
     <name>CLRC</name>
@@ -4163,7 +4163,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun127</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1991</year>
     <name>SERC</name>
@@ -4197,7 +4197,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun145</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1992,1993,1994,1995,1996</year>
     <name>CLRC</name>
@@ -4226,7 +4226,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun161</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1993,1994</year>
     <name>CLRC</name>
@@ -4253,7 +4253,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun162</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1993</year>
     <name>CCLRC</name>
@@ -4282,7 +4282,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun163</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1993,1994,1995</year>
     <name>CLRC</name>
@@ -4312,7 +4312,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun165</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1993,1994,1995</year>
     <name>PPARRC</name>
@@ -4340,7 +4340,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun168</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1993,1995,1998</year>
     <name>CLRC</name>
@@ -4366,7 +4366,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun169</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1993,1994</year>
     <name>PPARC</name>
@@ -4395,7 +4395,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun170</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1993,1997</year>
     <name>CLRC</name>
@@ -4418,7 +4418,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun172</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1993</year>
     <name>CLRC</name>
@@ -4454,7 +4454,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun174</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1993</year>
     <name>CLRC</name>
@@ -4479,7 +4479,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun189</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1994,1995,1996</year>
     <name>CLRC</name>
@@ -4506,7 +4506,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun192</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>PPARC</name>
@@ -4530,7 +4530,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun197</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995,1997</year>
     <name>CLRC</name>
@@ -4556,7 +4556,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun201</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>CLRC</name>
@@ -4589,7 +4589,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun202</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1997,1998</year>
     <name>CLRC</name>
@@ -4630,7 +4630,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun205</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1995</year>
     <name>CLRC</name>
@@ -4654,7 +4654,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun207</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1996</year>
     <name>CLRC</name>
@@ -4688,7 +4688,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun247</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>2004</year>
     <name>CLRC</name>
@@ -4715,7 +4715,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun248</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="sun249">
@@ -4738,7 +4738,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun249</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>2005</year>
     <name>CLRC</name>
@@ -4759,7 +4759,7 @@ to handle data from a variety of different instruments.
   <developers>
     <person>
       <name>USSC</name>
-      <email>ussc@star.rl.ac.uk</email>
+      <email>starlink@jiscmail.ac.uk</email>
       <role>owner</role>
     </person>
   </developers>
@@ -4780,7 +4780,7 @@ to handle data from a variety of different instruments.
   <developers>
     <person>
       <name>USSC</name>
-      <email>ussc@star.rl.ac.uk</email>
+      <email>starlink@jiscmail.ac.uk</email>
       <role>owner</role>
     </person>
   </developers>
@@ -4812,7 +4812,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun48</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -4844,7 +4844,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun183</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -4875,7 +4875,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun11</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -4917,7 +4917,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun210 sun211</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -4942,7 +4942,7 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun257</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -4969,7 +4969,7 @@ astronomical catalogues and similar tabular datasets.
     </person>
   </developers>
   <documentation> sun181</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -5016,7 +5016,7 @@ No longer under active control.
       <role>owner</role>
     </person>  </developers>
   <documentation> sun40</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -5058,7 +5058,7 @@ No longer under active control.
       <role>owner</role>
     </person>  </developers>
   <documentation> sun209</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -5089,7 +5089,7 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun262</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="ems" support="S">
@@ -5122,7 +5122,7 @@ No longer under active control.
       <role>owner</role>
     </person>  </developers>
   <documentation> ssn4</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -5160,7 +5160,7 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun143</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="gks" support="U">
@@ -5177,7 +5177,7 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun83</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="gns" support="U">
@@ -5211,7 +5211,7 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun57</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="graphpar" support="S">
@@ -5247,7 +5247,7 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun113</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="grp" support="S">
@@ -5273,7 +5273,7 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun150</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -5338,7 +5338,7 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun130</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="hds" support="S">
@@ -5384,7 +5384,7 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun92</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="hlp" support="S">
@@ -5408,7 +5408,7 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun124</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="idi" support="U">
@@ -5438,7 +5438,7 @@ No longer under active control.
     </person>
   </developers>
   <documentation> sun65</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="img" support="S">
@@ -5462,7 +5462,7 @@ understand.
     </person>
   </developers>
   <documentation> sun160</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -5491,7 +5491,7 @@ understand.
     </person>
   </developers>
   <documentation> sun261</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="jpl" support="S">
@@ -5517,7 +5517,7 @@ understand.
     </person>
   </developers>
   <documentation> sun87</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="kaplibs" support="S">
@@ -5548,7 +5548,7 @@ independently of KAPPA.</p></abstract>
     </person>
   </developers>
   <documentation> sun238</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="lpg" support="U">
@@ -5577,7 +5577,7 @@ independently of KAPPA.</p></abstract>
     </person>
   </developers>
   <documentation> sun263</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="mers" support="U">
@@ -5607,7 +5607,7 @@ independently of KAPPA.</p></abstract>
     </person>
   </developers>
   <documentation> sun104</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="nbs" support="S">
@@ -5636,7 +5636,7 @@ independently of KAPPA.</p></abstract>
     </person>
   </developers>
   <documentation> sun77</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="ndf" support="S">
@@ -5668,7 +5668,7 @@ independently of KAPPA.</p></abstract>
     </person>
   </developers>
   <documentation> ssn20 sun33</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -5697,7 +5697,7 @@ independently of KAPPA.</p></abstract>
     </person>
   </developers>
   <documentation> sun2</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -5743,7 +5743,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun171</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="one" support="U">
@@ -5780,7 +5780,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun234</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="pal" support="S">
@@ -5843,7 +5843,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun114</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="pcs" support="S">
@@ -6004,11 +6004,11 @@ Ultrix and for SunOS and may still work for them.
     </person>
     <person>
       <name>USSC</name>
-      <email>ussc@star.rl.ac.uk</email>
+      <email>starlink@jiscmail.ac.uk</email>
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1999-2004</year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -6050,7 +6050,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun194</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -6087,7 +6087,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun15</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="prm" support="S">
@@ -6121,7 +6121,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun39</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1987, 1988, 1991, 1992, 1995, 2004, 2005</year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -6151,7 +6151,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun121</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="ref" support="U">
@@ -6180,7 +6180,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun31</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="sae" support="U">
@@ -6203,7 +6203,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
  <documentation> sun191</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="sgs" support="S">
@@ -6242,7 +6242,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun85</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="shl" support="S">
@@ -6277,7 +6277,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation></documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="sla" support="S">
@@ -6301,7 +6301,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun67</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1989-2005</year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -6336,7 +6336,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun90</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="starmem" support="S">
@@ -6355,7 +6355,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation></documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="starutil" support="U">
@@ -6396,7 +6396,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun266</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="trn" support="S">
@@ -6429,7 +6429,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun61</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -6447,7 +6447,7 @@ Ultrix and for SunOS and may still work for them.
     <person>
     </person>
   </developers-->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="pgplot" support="S">
@@ -6466,7 +6466,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   -->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="skycat" support="U">
@@ -6484,7 +6484,7 @@ Ultrix and for SunOS and may still work for them.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="autoconf" buildsupport="yes" support="U">
@@ -6537,7 +6537,7 @@ Ultrix and for SunOS and may still work for them.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1994-2004</year>
     <name>Free Software Foundation</name>
@@ -6571,7 +6571,7 @@ Ultrix and for SunOS and may still work for them.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="libtool" buildsupport="yes" support="U">
@@ -6587,7 +6587,7 @@ Ultrix and for SunOS and may still work for them.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1996-2005</year>
     <name>Free Software Foundation</name>
@@ -6617,7 +6617,7 @@ Ultrix and for SunOS and may still work for them.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1990-1994, 2000-2005</year>
     <name>Free Software Foundation</name>
@@ -6646,7 +6646,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
     </person>
   </developers>
   <documentation> sun227</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="jpeg" support="U">
@@ -6660,7 +6660,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
     <person>
     </person>
   </developers-->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="vtk" support="U">
@@ -6678,7 +6678,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="ncar" support="U">
@@ -6710,7 +6710,7 @@ GKS (SUN/83) should be used.</p></abstract>
   </developers>
   -->
   <documentation> sun88</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="latex2html" support="U">
@@ -6726,11 +6726,11 @@ documents to hypertext.
   </dependencies>
   <developers>
     <person>
-      <name>ussc@star.rl.ac.uk</name>
+      <name>starlink@jiscmail.ac.uk</name>
     </person>
   </developers>
   <documentation></documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="mesa" support="U">
@@ -6744,7 +6744,7 @@ documents to hypertext.
     <person>
     </person>
   </developers-->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="fftw" support="U">
@@ -6762,7 +6762,7 @@ documents to hypertext.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="dvi2bitmap" support="S">
@@ -6787,7 +6787,7 @@ documents to hypertext.
   </developers>
   <documentation></documentation>
   <tests status="yes"/>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1999-2005</year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -6805,7 +6805,7 @@ documents to hypertext.
     <person>
     </person>
   </developers-->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="match" support="U">
@@ -6830,7 +6830,7 @@ and some distortion.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="sofa" support="U">
@@ -6846,11 +6846,11 @@ and some distortion.
   <developers>
     <person>
       <name>SOFA Board</name>
-      <uname>sofa@star.rl.ac.uk</uname>
+      <uname>sofa@ukho.gov.uk</uname>
     </person>
   </developers>
   <documentation></documentation>
-  <bugreports>sofa@star.rl.ac.uk</bugreports>
+  <bugreports>sofa@ukho.gov.uk</bugreports>
 </component>
 
 <component id="blt" support="U">
@@ -6868,7 +6868,7 @@ and some distortion.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="itcl" support="U">
@@ -6888,7 +6888,7 @@ and some distortion.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="tcl" support="U">
@@ -6908,7 +6908,7 @@ and some distortion.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="tcllibs" support="U">
@@ -6926,7 +6926,7 @@ and some distortion.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="tclx" support="U">
@@ -6944,7 +6944,7 @@ and some distortion.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="tdom" support="U">
@@ -6962,7 +6962,7 @@ and some distortion.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="tk" support="U">
@@ -6982,7 +6982,7 @@ and some distortion.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="tkimg" support="U">
@@ -7002,6 +7002,6 @@ and some distortion.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 </componentset>

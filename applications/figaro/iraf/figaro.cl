@@ -245,7 +245,7 @@ print ""
 print "--------------------------------------------------"
 print "          Welcome to Figaro for IRAF"
 print "            Version " (version)
-print "      For support contact figaro@star.rl.ac.uk"
+print "      For support contact starlink@jiscmail.ac.uk"
 print "--------------------------------------------------"
 print ""
 

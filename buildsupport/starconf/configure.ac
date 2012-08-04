@@ -1,7 +1,7 @@
 dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(starconf, 1.3, ussc@star.rl.ac.uk)
+AC_INIT(starconf, 1.3, starlink@jiscmail.ac.uk)
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([starconf.m4.in])

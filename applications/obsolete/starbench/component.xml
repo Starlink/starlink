@@ -29,6 +29,6 @@ the performance of computer systems running astronomy data reduction software.
     </person>
   </developers>
   <documentation> ssn23</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

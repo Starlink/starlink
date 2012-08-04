@@ -41,6 +41,6 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun171</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

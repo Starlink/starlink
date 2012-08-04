@@ -4,7 +4,7 @@ AC_REVISION($Revision$)
 dnl    Initialisation: package name and version number
 dnl    Note we use the name "convert" not convert-idl, this is a slight of
 dnl    hand to use the same per-package-dirs as convert.
-AC_INIT(convert, 1.5-4, ussc@star.rl.ac.uk)
+AC_INIT(convert, 1.5-4, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)

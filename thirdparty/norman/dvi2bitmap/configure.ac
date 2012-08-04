@@ -1,7 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision: 16442 $)
 
-AC_INIT(dvi2bitmap, 0.14-alpha, ussc@star.rl.ac.uk)
+AC_INIT(dvi2bitmap, 0.14-alpha, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)

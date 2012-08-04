@@ -25,6 +25,6 @@ file extension stored in the standard Starlink NDF data format.
     </person>
   </developers>
   <documentation> sun41</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

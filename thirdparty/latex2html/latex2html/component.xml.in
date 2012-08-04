@@ -15,7 +15,7 @@ documents to hypertext.
   </dependencies>
   <developers>
     <person>
-      <name>ussc@star.rl.ac.uk</name>
+      <name>starlink@jiscmail.ac.uk</name>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>

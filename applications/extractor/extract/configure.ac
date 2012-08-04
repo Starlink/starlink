@@ -7,7 +7,7 @@
 define([AC_CACHE_LOAD],)
 define([AC_CACHE_SAVE],)
 
-AC_INIT(extractor, 2.5.0, [extractor@star.rl.ac.uk])
+AC_INIT(extractor, 2.5.0, [starlink@jiscmail.ac.uk])
 AC_CONFIG_SRCDIR(src/extractor.c)
 AC_CONFIG_AUX_DIR(autoconf)
 AM_CONFIG_HEADER(config.h)

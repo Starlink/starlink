@@ -185,26 +185,14 @@ If you are experiencing difficulties using xcatview then in the first
 instance you should probably seek advice and assistance from your local
 site manager.  Bug reports should be sent to username:
 
-   cursa@star.rl.ac.uk
+   starlink@jiscmail.ac.uk
 
 In case of difficulty you should contact the Starlink Software Librarian,
 as follows.
 
-e-mail: ussc@star.rl.ac.uk
+e-mail: starlink@jiscmail.ac.uk
 
-post:   Software Librarian.
-        Starlink Project,
-        Rutherford Appleton Laboratory,
-        Chilton,
-        DIDCOT,
-        Oxfordshire,
-        OX11 0QX,
-        United Kingdom.
-
-fax:    from within the United Kingdom:    01235 445 848
-        from overseas:                  +44-1235 445 848
-
-Bug reports should always be sent to username cursa@star.rl.ac.uk.
+Bug reports should always be sent to username starlink@jiscmail.ac.uk.
 However, you are welcome to contact me directly for advice and assistance.
 Suggestions for enhancements and improvements to xcatview are also
 welcome.  Details of how to contact me are given below.

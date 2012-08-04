@@ -1,7 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(jpeg, 6b, ussc@star.rl.ac.uk)
+AC_INIT(jpeg, 6b, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)

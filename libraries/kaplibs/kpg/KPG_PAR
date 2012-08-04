@@ -61,7 +61,7 @@
 	PARAMETER ( KPG_AUTHOR = 'D.S. Berry' )
 
 	CHARACTER KPG_CONTACT*32
-	PARAMETER ( KPG_CONTACT = 'ussc@star.rl.ac.uk' )
+	PARAMETER ( KPG_CONTACT = 'starlink@jiscmail.ac.uk' )
 
 *  World Coordinate Systems.
 *  ========================

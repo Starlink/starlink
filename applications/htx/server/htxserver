@@ -221,7 +221,7 @@ HTX_LOCATIONS='star/docs=/star/docs:star/help=/star/help'
          if test "${SERVER_NAME}${SCRIPT_NAME}" = \
                  "www.starlink.ac.uk/cgi-bin/htxserver"; then
             HTX_SUPPORT='Starlink Software Support
-(<A HREF="mailto:ussc@star.rl.ac.uk">ussc@star.rl.ac.uk</A>)'
+(<A HREF="mailto:starlink@jiscmail.ac.uk">starlink@jiscmail.ac.uk</A>)'
          fi
       fi
 

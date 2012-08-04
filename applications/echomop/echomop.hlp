@@ -169,7 +169,7 @@
 
  Please report bugs to:
 
-   ussc@star.rl.ac.uk and mjc@star.ucl.ac.uk
+   starlink@jiscmail.ac.uk and mjc@star.ucl.ac.uk
 
 1  Old_News
 
@@ -481,7 +481,7 @@
  bugs.   Bug fixes will be made available in releases throughout
  1996 as they become available.
 
- Please report bugs to ussc@star.rl.ac.uk and mjc@star.ucl.ac.uk
+ Please report bugs to starlink@jiscmail.ac.uk and mjc@star.ucl.ac.uk
 
  MJC.
 
@@ -3886,7 +3886,7 @@ and so on.  There are many options for configuring the plots.
  To create a diagnostics event log, set TUNE_DIAGNOSE=YES, then
  repeat the operations which led to the problem or crash.
 
- You should then report the problem to ussc@star.rl.ac.uk.
+ You should then report the problem to starlink@jiscmail.ac.uk.
 
 2  Arc_line_lists
 
@@ -4960,7 +4960,7 @@ and so on.  There are many options for configuring the plots.
  In the event of a problem mail this file, with details of the
  problem, to the Starlink software librarian at:
 
-    ussc@star.rl.ac.uk
+    starlink@jiscmail.ac.uk
 
 2  TUNE_DPRBTHR=_REAL
 

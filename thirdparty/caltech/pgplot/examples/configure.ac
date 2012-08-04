@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(pgplot-examples, 5.2.2-1, ussc@star.rl.ac.uk)
+AC_INIT(pgplot-examples, 5.2.2-1, starlink@jiscmail.ac.uk)
  
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)

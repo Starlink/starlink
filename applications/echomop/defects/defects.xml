@@ -212,7 +212,7 @@ RESULT_TYPE: SCROBJ) the program crashes out with this message:
 <defect
     status="open"
     originator="Martin Bly"
-    originatoremail="ussc@star.rl.ac.uk"
+    originatoremail="starlink@jiscmail.ac.uk"
     date="11-Nov-2002">
 <title>Hyperlinking into sun152 fails</title>
 <p>Although the links within the SUN/152 document still work, for some 

@@ -5,7 +5,7 @@ dnl    Initialisation: package name and version number
 dnl    Note that for GKS the RAL version number is 1.37 but
 dnl    Starlink does not increment that version. Rather than use
 dnl    non-standard nomenclature use the patch level for starlink patching.
-AC_INIT(pgplot, 5.2.2-2, ussc@star.rl.ac.uk)
+AC_INIT(pgplot, 5.2.2-2, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)

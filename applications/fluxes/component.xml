@@ -38,6 +38,6 @@ JCMT telescope based on Mauna Kea, Hawaii.
     </person>
   </developers>
   <documentation> sun213</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
