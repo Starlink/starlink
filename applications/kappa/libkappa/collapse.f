@@ -1002,7 +1002,7 @@
       END IF
 
 *  Adjust output data type if required.
-*  ===================================
+*  ====================================
 
 *  The NBad and NGood estimators always produce _INTEGER output NDFs.
       IF ( ESTIM .EQ. 'NGOOD' .OR. ESTIM .EQ. 'NBAD' ) THEN
@@ -1049,7 +1049,7 @@
 
          CALL NDF_CPUT( UNITS( :NC ), INDFO, 'Units', STATUS )
 
-*  New unit is "pixel"
+*  New unit is "pixel".
       ELSE IF ( ESTIM .EQ. 'NGOOD' .OR. ESTIM .EQ. 'NBAD' ) THEN
          CALL NDF_CPUT( 'Pixel', INDFO, 'Units', STATUS )
 
