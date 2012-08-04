@@ -536,7 +536,7 @@
 *  Extend the list of components to be accessed.
          IF ( PVAR ) THEN
             NC = CHR_LEN( COMP )
-            CALL CHR_APPND( 'VARIANCE', COMP, NC )
+            CALL CHR_APPND( ',VARIANCE', COMP, NC )
          END IF
 
 *  Estimator
