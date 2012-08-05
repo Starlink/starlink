@@ -986,6 +986,10 @@ libraries/kaplibs/ccg/ccg_ad3.f
 libraries/kaplibs/ccg/ccg_bm1.f
 libraries/kaplibs/ccg/ccg_bm3.f
 libraries/kaplibs/ccg/ccg_clip.f
+libraries/kaplibs/ccg/ccg_cnt1.f
+libraries/kaplibs/ccg/ccg_cnt3.f
+libraries/kaplibs/ccg/ccg_frc1.f
+libraries/kaplibs/ccg/ccg_frc3.f
 libraries/kaplibs/ccg/ccg_comb1.f
 libraries/kaplibs/ccg/ccg_comb3.f
 libraries/kaplibs/ccg/ccg_cs1.f
