@@ -4,6 +4,7 @@ noinst_LTLIBRARIES = libkapsub.la libkapsub_tk.la
 
 libkapsub_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES) $(GEN_F_ROUTINES)
 
+libkapsub_tk_la_CFLAGS = $(X_CFLAGS)
 libkapsub_tk_la_SOURCES = $(TK_C_ROUTINES)
 
 F_ROUTINES = cnthlt.f curre.f ftsize.f ftsizt.f getv2.f hstdsp.f \

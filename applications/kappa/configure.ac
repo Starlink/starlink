@@ -30,6 +30,8 @@ STAR_CHECK_PROGS(hlib)
 STAR_CHECK_PROGS(fgeneric)
 STAR_CHECK_PROGS(perl)
  
+dnl    tk requires X11 so we need the X11 include path
+AC_PATH_XTRA
 
 dnl    Look for tcl/tk system
 STAR_PATH_TCLTK(8.5, [tk])
