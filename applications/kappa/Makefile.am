@@ -62,7 +62,7 @@ LUTS = luts/aips0_lut.sdf luts/backgr_lut.sdf luts/bgyrw_lut.sdf       \
 luts/blue_lut.sdf luts/blulut_lut.sdf luts/brown_lut.sdf               \
 luts/cold_lut.sdf luts/color_lut.sdf luts/cont_lut.sdf                 \
 luts/cubehelix0_lut.sdf luts/cubehelix1_lut.sdf luts/fc_lut.sdf        \
-luts/green_lut.sdf luts/heat_lut.sdf luts/idl11_lut.sdf                \
+luts/grey_lut.sdf luts/green_lut.sdf luts/heat_lut.sdf luts/idl11_lut.sdf \
 luts/idl12_lut.sdf luts/idl14_lut.sdf luts/idl15_lut.sdf               \
 luts/idl2_lut.sdf luts/idl4_lut.sdf luts/idl5_lut.sdf                  \
 luts/idl6_lut.sdf luts/ikon_lut.sdf luts/isophot_lut.sdf               \
