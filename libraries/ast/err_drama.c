@@ -118,5 +118,5 @@ void astPutErr_( int status, const char *message ) {
    report the error message through EMS and to associate the error
    status with it. Ignore any returned status value. */
    local_status = status;
-   ErsRep( 0, &local_status, message );
+   ErsRep( 0, &local_status, "%s", message );
 }
