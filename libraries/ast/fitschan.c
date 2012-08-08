@@ -1038,6 +1038,8 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     26-JUN-2012 (DSB):
 *        Correct call to astKeyFields in SAOTrans (thanks to Bill Joye
 *        for pointing out this error).
+*     8-AUG-2012 (DSB):
+*        Correct assignment to lonpole within CLASSFromStore.
 *class--
 */
 
@@ -5819,7 +5821,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    FITS-CLASS imposes a no rotation restriction, it can tolerate lonpole
    values of +/- 180 degrees. */
    if( ok && ( naxis2 != 1 || naxis3 != 1 ) ) {
-      lonpole =  GetItem( &(store->latpole), 0, 0, s, NULL, method, class, status );
+      lonpole =  GetItem( &(store->lonpole), 0, 0, s, NULL, method, class, status );
       if( lonpole != AST__BAD && lonpole != -180.0 && lonpole == 180 ) ok = 0;
       if( GetItem( &(store->latpole), 0, 0, s, NULL, method, class, status )
           != AST__BAD ) ok = 0;
