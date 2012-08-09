@@ -101,6 +101,12 @@
 *        The NDFs within this container file are stored and named in the
 *        same way as those in the "OUTQ" container file, but using "U"
 *        insead of "Q" in the NDF names.
+*     RESIST = GROUP (Read)
+*        A group expression containing the resistor settings for
+*        each bolometer.  Usually specified as a text file using "^"
+*        syntax. An example can be found in
+*        $STARLINK_DIR/share/smurf/resist.cfg
+*        [$STARLINK_DIR/share/smurf/resist.cfg]
 
 *  Configuration Parameters:
 *     APOD = INTEGER

@@ -26,8 +26,13 @@
 
 #-
 
-# These are read in smf_get_cleanpar
 
+#  Include the makemap defaults so that a makemap config file can be
+#  supplied to calcqu. Do it first so that we can then overfride these
+#  default values with values more appropriate for calcqu.
+^$SMURF_DIR/smurf_makemap.def
+
+# These are read in smf_get_cleanpar
 apod = <undef>
 badfrac = 0.05
 dcfitbox = 30

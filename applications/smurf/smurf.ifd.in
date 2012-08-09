@@ -743,6 +743,17 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter resist {
+                position 3
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
         }
 
         action calcresp {
