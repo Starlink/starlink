@@ -303,7 +303,7 @@ struct stat statb;
 *     If neither of these are successful, a null string is returned.
 
 *  Arguments:
-*     admusr = const char * (Given)
+*     admusr = char * (Returned)
 *        Pointer to string where the definition of the ADAM_USER directory
 *
 *     aulen = int (Given)
@@ -348,7 +348,7 @@ struct stat statb;
 *-
 */
 
-static int msp1_admus( const char *admusr, int aulen )
+static int msp1_admus( char *admusr, int aulen )
 {
 
 int status;
