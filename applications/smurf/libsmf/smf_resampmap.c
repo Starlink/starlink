@@ -357,6 +357,9 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
       fullmap = smf_rebin_totmap( data, itime, abskyfrm, sky2map, moving,
                                   status );
 
+/* skip if we did not get a mapping this time round */
+      if (*status == SAI__OK && !fullmap) continue;
+
 /* Invert it as required by astResample. */
       astInvert( fullmap );
 
