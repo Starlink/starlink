@@ -13,17 +13,22 @@
 *     C function
 
 *  Invocation:
-*     smf_polext( int ondf, double angle, int *status )
+*     smf_polext( int ondf, int store_angle, double angle, int *status )
 
 *  Arguments:
 *     ondf = int (Given)
 *        Identifier for the NDF to modify.
+*     store_angle = int (Given)
+*        Indicates if the supplied "angle" value should be stored in a
+*        POLPACK extension in the NDF. If zero, the new POLPACK extension
+*        is left empty, but the POLANAL Frame is still added to the WCS
+*        FrameSet.
 *     angle = double (Given)
-*        The position angle of the analysed intensity. This is the angle
-*        from north in the spatial coordinate system of the output, to
-*        the analyser axis. Posotive rotation is in the same sense as
-*        rotation from the first spatial pixel axis to the second spatial
-*        pixel axis (as required by POLPACK).
+*        Ignored if "store_angle" is zero. The position angle of the analysed
+*        intensity. This is the angle from north in the spatial coordinate
+*        system of the output, to the analyser axis. Posotive rotation is in
+*        the same sense as rotation from the first spatial pixel axis to the
+*        second spatial pixel axis (as required by POLPACK).
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -40,6 +45,8 @@
 *  History:
 *     12-OCT-2007 (DSB):
 *        Initial version.
+*     9-AUG-2012 (DSB):
+*        Added argument store_angle.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -78,7 +85,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_polext( int ondf, double angle, int *status ){
+void smf_polext( int ondf, int store_angle, double angle, int *status ){
 
 /* Local Variables */
    AstFrame *curfrm = NULL;
@@ -151,10 +158,11 @@ void smf_polext( int ondf, double angle, int *status ){
 /* Create the empty POLPACK extension. */
       ndfXnew( ondf, "POLPACK", "POLPACK", 0, &dummy, &loc, status );
 
-/* Store the angle from the reference direction (north) to the effective
-   analyser axis, measured positive in the same sense as rotation from the
-   first to the second pixel axis. */
-      ndfXpt0r( angle*AST__DR2D, ondf, "POLPACK", "ANLANG", status );
+/* If required, ctore the angle from the reference direction (north) to the
+   effective analyser axis, measured positive in the same sense as rotation
+   from the first to the second pixel axis. */
+      if( store_angle ) ndfXpt0r( angle*AST__DR2D, ondf, "POLPACK", "ANLANG",
+                                  status );
 
 /* Annul the extension locator.  */
       (void) datAnnul( &loc, status );

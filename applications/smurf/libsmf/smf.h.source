@@ -1555,7 +1555,7 @@ int smf_pattern_extract ( const char * sourcestr, const char * pattern,
 
 void smf_pcorr( smfHead *head, const Grp *igrp, int *status );
 
-void smf_polext( int ondf, double angle, int *status );
+void smf_polext( int ondf, int store_angle, double angle, int *status );
 
 void smf_pread( Grp *igrp, const char *param, int *status );
 

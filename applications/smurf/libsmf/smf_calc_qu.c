@@ -63,6 +63,9 @@
 *  History:
 *     1-FEB-2011 (DSB):
 *        Original version.
+*     9-AUG-2012 (DSB):
+*        Add POLANAL Frames to the WCS FrameSet fo each output NDF. This
+*        communicates the reference direction to POLPACK.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -253,6 +256,12 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
 /* Wait for the workforce to complete all jobs. */
       thrWait( wf, status );
    }
+
+/* Add POLANAL Frames to the WCS FrameSet in each output NDF. This Frame
+   is used by POLPACK to determine the reference direction of the Stokes
+   vectors (celestial north in this case). */
+   smf_polext( indfq, 0, 0.0, status );
+   smf_polext( indfu, 0, 0.0, status );
 
 /* Free the two output NDFs. */
    ndfAnnul( &indfq, status );
