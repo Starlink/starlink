@@ -1,6 +1,19 @@
 FLUXES -- JCMT planetary position and flux density calibration
                                                             Expires: ??.??.??
 
+Version 1.3
+
+   - Add two-component beam model support
+
+Version 1.2
+
+   - Use more accurate Herschel brightness temperatures for Uranus
+     and Neptune
+
+   - Extend Mars approximation to 2103 (see astro-ph/0703640v1)
+
+   - Support SCUBA-2
+
 Version 1.1-4
 
    - Add THUMPER lookup tables
