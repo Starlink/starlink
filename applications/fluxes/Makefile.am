@@ -9,7 +9,7 @@ bin_MONOLITHS = fluxes
 fluxes_SOURCES = fluxes.f
 fluxes_LDADD = `$(srcdir)/fluxes_link_adam`
 
-dist_starnews_DATA = starlink/fluxes.news
+dist_starnews_DATA = fluxes.news
 dist_pkgdata_DATA = FLUXES_CONDITIONS
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun213_fig1.eps
