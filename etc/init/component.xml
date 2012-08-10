@@ -16,11 +16,11 @@
   <developers>
     <person>
       <name>USSC</name>
-      <email>ussc@star.rl.ac.uk</email>
+      <email>starlink@jiscmail.ac.uk</email>
       <role>owner</role>
     </person>
   </developers>
   <!-- <documentation></documentation> -->
-  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
