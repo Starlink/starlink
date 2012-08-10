@@ -719,7 +719,7 @@ AC_CHECK_FUNCS([strchr])
             <code>configure.ac</code><index>configure.ac!example</index>
             might look like this (with line numbers inserted):
 <verbatim>
-1   AC_INIT(mypack, 1.2, ussc@star.rl.ac.uk)
+1   AC_INIT(mypack, 1.2, starlink@jiscmail.ac.uk)
 2   AC_CONFIG_SRCDIR(src.c)
 3   STAR_DEFAULTS
 4   AC_PROG_CC
@@ -2114,7 +2114,7 @@ libprm_a_la_LDFLAGS = -version-info $(libprm_a_la_version_info)
           and then the corresponding section from
           <code>configure.ac</code>:
 <verbatim>
-AC_INIT(prm, 1.3-1, ussc@star.rl.ac.uk)
+AC_INIT(prm, 1.3-1, starlink@jiscmail.ac.uk)
 # Version-info specifications.  See SSN/78 for guidelines, and update the table
 # below for ANY change of version number.
 #
@@ -3441,7 +3441,7 @@ F_ROUTINES = \
 
         <p>The adam <code>configure.ac</code> looks like this:
 <verbatim>
-AC_INIT(adam, 3.0, ussc@star.rl.ac.uk)
+AC_INIT(adam, 3.0, starlink@jiscmail.ac.uk)
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 AC_CONFIG_SRCDIR([ADAM_DEFNS])
@@ -4388,7 +4388,7 @@ Sticky Options:      -ko
 <verbatim>
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
-AC_INIT(cfitsio, 2.4-90, ussc@star.rl.ac.uk)
+AC_INIT(cfitsio, 2.4-90, starlink@jiscmail.ac.uk)
 
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
@@ -4547,7 +4547,7 @@ ChangeLog  changes  doc/     library/  mac/           tools/  win/
 <verbatim>
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
-AC_INIT(tclsys, 8.2.3, ussc@star.rl.ac.uk)
+AC_INIT(tclsys, 8.2.3, starlink@jiscmail.ac.uk)
 
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
@@ -4791,7 +4791,7 @@ typically be rather simple.</p>
 looks like this:
 <verbatim>
 dnl    Process this file with autoconf to produce a configure script
-AC_INIT(sc3, 2, ussc@star.rl.ac.uk)
+AC_INIT(sc3, 2, starlink@jiscmail.ac.uk)
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 AC_CONFIG_SRCDIR(sc3.tex)

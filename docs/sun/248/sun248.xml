@@ -104,8 +104,8 @@ are aware of some wrinkles, and these are discussed in the
 platform-specific notes in <ref id="platform"/> below.  If you find
 any other problems, or have other comments on the build system, please
 do get in touch with the Project, through the general contact address
-<webref url="mailto:ussc@star.rl.ac.uk"
-><code>ussc@star.rl.ac.uk</code></webref>.</p>
+<webref url="mailto:starlink@jiscmail.ac.uk"
+><code>starlink@jiscmail.ac.uk</code></webref>.</p>
 
 <p>You may be used to Starlink's earlier build system, based on
 <code>./mk</code> scripts.  This is now obsolete, and a migration path
