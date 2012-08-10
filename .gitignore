@@ -962,13 +962,13 @@ libraries/img/img_tmp2x.f
 libraries/img/img_tmp3x.f
 libraries/img/img_tmpx.f
 
-libraries/jpl/ephdsk
-libraries/jpl/jplconst
-libraries/jpl/jpleph.dat
-libraries/jpl/jplpleph
-libraries/jpl/jplstate
-libraries/jpl/runtesteph
-libraries/jpl/shorteph
+libraries/obsolete/jpl/ephdsk
+libraries/obsolete/jpl/jplconst
+libraries/obsolete/jpl/jpleph.dat
+libraries/obsolete/jpl/jplpleph
+libraries/obsolete/jpl/jplstate
+libraries/obsolete/jpl/runtesteph
+libraries/obsolete/jpl/shorteph
 
 libraries/kaplibs/aif/conly-files
 libraries/kaplibs/ccg/conly-files

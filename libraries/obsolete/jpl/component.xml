@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="jpl" support="S">
+<component id="jpl" status="obsolete" support="U">
   <version>2.0-2</version>
-  <path>libraries/jpl</path>
+  <path>libraries/obsolete/jpl</path>
   <description>JPL Ephemeris access routines</description>
   <abstract>The JPL library and data sets provide high-accuracy
   predictions for the positions and velocities of the Sun and planets.

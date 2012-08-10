@@ -949,7 +949,6 @@ $(MANIFESTS)/fluxes: \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
-		$(MANIFESTS)/jpl \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
@@ -1441,9 +1440,10 @@ $(MANIFESTS)/jpeg:
 	  && $(CONFIG_CPT) \
 	  && $(MAKE_CPT)
 
+# Component jpl is OBSOLETE -- do not build
 $(MANIFESTS)/jpl: \
 		$(MANIFESTS)/star2html
-	cd libraries/jpl \
+	cd libraries/obsolete/jpl \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/kaplibs: \
@@ -3129,7 +3129,6 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/info \
 	$(MANIFESTS)/init \
 	$(MANIFESTS)/jcmtdr \
-	$(MANIFESTS)/jpl \
 	$(MANIFESTS)/kaplibs \
 	$(MANIFESTS)/kappa \
 	$(MANIFESTS)/messgen \
