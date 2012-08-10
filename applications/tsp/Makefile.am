@@ -9,7 +9,6 @@ noinst_LTLIBRARIES = libtsp.la
 
 libtsp_la_SOURCES = $(TSP_LIB_F_ROUTINES)
 
-starnewsdir = $(datadir)/doc/@PACKAGE_NAME@-@PACKAGE_VERSION@
 dist_starnews_DATA = tsp.news
 
 mydatadir=$(bindir)
