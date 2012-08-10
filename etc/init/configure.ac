@@ -1,7 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(init, 1.1-27, ussc@star.rl.ac.uk)
+AC_INIT(init, 1.1-27, starlink@jiscmail.ac.uk)
 AC_PREREQ(2.50)
 
 dnl    Under OS X LD_LIBRARY_PATH is DYLD_LIBRARY_PATH.
