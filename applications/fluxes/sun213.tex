@@ -7,22 +7,22 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun213.3}
-\newcommand{\stardocnumber}    {213.3}
+\newcommand{\stardocsource}    {sun213.4}
+\newcommand{\stardocnumber}    {213.4}
 \newcommand{\stardocauthors}   {G. Privett, T. Jenness, H. Matthews, V. Barnard}
-\newcommand{\stardocdate}      {22 June 2005}
+\newcommand{\stardocdate}      {10 August 2012}
 \newcommand{\stardoctitle}     {FLUXES\\[1ex]
                                 JCMT Position and Flux Density Calibration}
 \newcommand{\stardocversion}   {Version 1.1}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
-FLUXES calculates accurate {\bf topocentric positions} of the planets and also
+FLUXES calculates approximate {\bf topocentric positions} of the planets and also
 {\bf integrated flux densities} of five of them at several wavelengths.
 These provide calibration information at the effective frequencies and
 beam-sizes employed by the UKT14 and SCUBA receivers on the
 JCMT telescope based on Mauna Kea, Hawaii.
 
-A script, FLUXNOW, runs FLUXES for the current time and date.
+The FLUXNOW command, runs FLUXES for the current time and date.
 This allows you to obtain planetary positions and flux levels quickly.
 }
 % ? End of document identification
@@ -285,28 +285,26 @@ This allows you to obtain planetary positions and flux levels quickly.
 \xlabel{INTRODUCTION}
 \label{sec:introduction}
 
-FLUXES calculates accurate \textbf{topocentric positions} of the planets and
+FLUXES calculates approximate \textbf{topocentric positions} of the planets and
 also \textbf{integrated flux densities} of five of them at a number of
 wavelengths for the
 \htmladdnormallink{JCMT telescope}{http://www.jach.hawaii.edu/JCMT/home.html}
 on Mauna Kea, Hawaii.  These provide calibration information at the effective
-frequencies and beam-sizes employed by the UKT14 and SCUBA receivers on this
-telescope.
+frequencies and beam-sizes employed by the UKT14, SCUBA and SCUBA-2
+receivers on this telescope.
 
 The filter centre and widths are shown for each wavelength used.  The filter
 frequencies are the effective frequencies for 1mm of water vapour.
 
 The calculated planet positions should normally be accurate to better than 1
-arcsecond. The value for the Moon is less accurate than this, and for critical
+arcminute. The value for the Moon is less accurate than this, and for critical
 applications requiring sub arc-second accuracy you should use a different
 method.
 
-The version distributed by Starlink has been modified to employ the highly
-accurate \xref{JPL ephemeris}{sun87}{} (see \xref{SUN/87}{sun87}{} for
-details) in all planetary position calculations. It also adopts the Starlink
-parameter interface and a more robust file reading system.
+The planet positions are estimated using the SLALIB library. See
+\xref{SUN/67}{sun67}{} for more details on the SLA\_PLANET library function.
 
-A script, FLUXNOW, runs the program for the current time and date.  This gives
+The FLUXNOW command, runs the program for the current time and date.  This gives
 you current planetary positions and flux levels for all the planets.
 
 \section{Frequencies, brightness and beam-width}
@@ -641,12 +639,6 @@ you have chosen to have the FLUXES executable installed in directory
 have placed it elsewhere.   On Starlink systems, the
 {\tt{/star/etc/cshrc}} file is already set up to run FLUXES.
 
-IMPORTANT! Please note: the \xref{JPL ephemeris}{sun87}{} must be installed
-on your system if FLUXES or FLUXNOW are to work. Specifically, the file
-{\tt{JPLEPH}} (a symbolic link to {\tt{jpleph.dat}}) must be available.
-The location of the ephemeris file is placed into the fluxes.csh and
-fluxnow.csh scripts when they are installed.
-
 In addition, the environmental variable {\tt{FLUXES}} in {\tt{fluxes.csh}}
 and {\tt{fluxnow.csh}} must be set to name of the directory where the FLUXES
 executable resides.  The Starlink installations of FLUXES have this set
@@ -714,8 +706,7 @@ output even if SCREEN=yes).
 
 It is possible to run FLUXES as a monolith but this requires
 that the fluxes monolith is run directly (not via the fluxes.csh
-shell script), that the JPL ephemeris is available as JPLEPH in the
-current working directory and that the envrionment variables
+shell script), that the envrionment variables
 FLUXES and FLUXPWD are set to the location of the fluxes binary
 and the current working directory respectively. If it is running
 as a monolith (specifically as an I-task) the parameter values can

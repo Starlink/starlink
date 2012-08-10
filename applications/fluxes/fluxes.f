@@ -1975,10 +1975,7 @@ C     These are the new numbers from astro-ph/0703640
       STL = SLALAST( DATE, ELONG)
 
 *     Geocentric Moon position.
-      CALL PLEPH(DATE,10,3,V,OK)
-      V(4)=V(4)/86400.D0
-      V(5)=V(5)/86400.D0
-      V(6)=V(6)/86400.D0
+      CALL SLA_DMOON(DATE,V)
 
 *     Create nutation matrix.
       CALL SLA_NUT(DATE,RMAT)
@@ -2001,10 +1998,7 @@ C     These are the new numbers from astro-ph/0703640
          CALL SLA_PRENUT(2000.D0,DATE,RMAT)
 
 *     Sun to Earth-Moon Barycentre (J2000). Heliocentric position.
-         CALL PLEPH(DATE,13,11,V,OK)
-         V(4)=V(4)/86400.D0
-         V(5)=V(5)/86400.D0
-         V(6)=V(6)/86400.D0
+         CALL SLA_PLANET(DATE,3,V,OK)
 
 *     Precession and nutation to date
          CALL SLA_DMXV(RMAT,V,VSE)
@@ -2026,10 +2020,7 @@ C     These are the new numbers from astro-ph/0703640
          ELSE
 
 *     No: Sun to Planet. Heliocentric position.
-            CALL PLEPH(DATE,NP,11,V,OK)
-            V(4)=V(4)/86400.D0
-            V(5)=V(5)/86400.D0
-            V(6)=V(6)/86400.D0
+            CALL SLA_PLANET(DATE,NP,V,OK)
 
 *     Precession and nutation to date
             CALL SLA_DMXV(RMAT,V,VSP)
@@ -2131,10 +2122,7 @@ C     These are the new numbers from astro-ph/0703640
       STL = SLALAST( DATE, ELONG )
 
 *     Geocentric Moon position.
-      CALL PLEPH(DATE,10,3,V,OK)
-      V(4)=V(4)/86400.D0
-      V(5)=V(5)/86400.D0
-      V(6)=V(6)/86400.D0
+      CALL SLA_DMOON(DATE,V)
 
 *     Create nutation matrix.
       CALL SLA_NUT(DATE,RMAT)
@@ -2147,10 +2135,7 @@ C     These are the new numbers from astro-ph/0703640
       CALL SLA_PRENUT(2000.D0,DATE,RMAT)
 
 *     Sun to Earth-Moon Barycentre (J2000). Heliocentric position.
-      CALL PLEPH(DATE,13,11,V,OK)
-      V(4)=V(4)/86400.D0
-      V(5)=V(5)/86400.D0
-      V(6)=V(6)/86400.D0
+      CALL SLA_PLANET(DATE,3,V,OK)
 
 *     Precession and nutation to date
       CALL SLA_DMXV(RMAT,V,VSE)
@@ -2172,10 +2157,7 @@ C     These are the new numbers from astro-ph/0703640
       ELSE
 
 *     No: Sun to Planet. Heliocentric position.
-         CALL PLEPH(DATE,NP,11,V,OK)
-         V(4)=V(4)/86400.D0
-         V(5)=V(5)/86400.D0
-         V(6)=V(6)/86400.D0
+         CALL SLA_PLANET(DATE,NP,V,OK)
 
 *     Precession and nutation to date
          CALL SLA_DMXV(RMAT,V,VSP)
