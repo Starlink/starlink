@@ -49,23 +49,18 @@ onintr goto quit
 # This is edited into this script during installation.
 if ($?FLUXES_DIR) then
   if (-d $FLUXES_DIR) then
-    setenv FLUXES $FLUXES_DIR
+    # FLUXES_DIR is fine
   else
     echo FLUXES_DIR environment variable not set to a directory.
     echo Using default fluxes location
-    setenv FLUXES @bindir@
+    setenv FLUXES_DIR @bindir@
   endif
 else
-  setenv FLUXES @bindir@
+  setenv FLUXES_DIR @bindir@
 endif
 
-# Find out working directory and set FLUXPWD to it, so
-# that the code works in JACH style without change.
-unalias pwd
-setenv FLUXPWD `pwd`
-
 # Run the main program.
-$FLUXES/fluxes pos=y flu=y screen=y ofl=y outfile=fluxes.dat now=y apass=n planet=all
+$FLUXES_DIR/fluxes pos=y flu=y screen=y ofl=y outfile=fluxes.dat now=y apass=n planet=all
 
 # Exit
 quit:

@@ -639,7 +639,7 @@ you have chosen to have the FLUXES executable installed in directory
 have placed it elsewhere.   On Starlink systems, the
 {\tt{/star/etc/cshrc}} file is already set up to run FLUXES.
 
-In addition, the environmental variable {\tt{FLUXES}} in {\tt{fluxes.csh}}
+In addition, the environmental variable {\tt{FLUXES\_DIR}} in {\tt{fluxes.csh}}
 and {\tt{fluxnow.csh}} must be set to name of the directory where the FLUXES
 executable resides.  The Starlink installations of FLUXES have this set
 automatically during installation.
@@ -707,7 +707,7 @@ output even if SCREEN=yes).
 It is possible to run FLUXES as a monolith but this requires
 that the fluxes monolith is run directly (not via the fluxes.csh
 shell script), that the envrionment variables
-FLUXES and FLUXPWD are set to the location of the fluxes binary
+FLUXES\_DIR and FLUXPWD are set to the location of the fluxes binary
 and the current working directory respectively. If it is running
 as a monolith (specifically as an I-task) the parameter values can
 then be retrieved from the monolith (e.g.\ by using
