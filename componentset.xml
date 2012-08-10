@@ -486,7 +486,7 @@ variety of formats.
     </person>
   </developers>
   <documentation> sun226</documentation>
-  <bugreports>stardev@jiscmail.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -619,7 +619,7 @@ and its coordinates are displayed.
 </component>
 
 <component id="fluxes">
-  <version>1.2-1</version>
+  <version>1.3-1</version>
   <path>applications/fluxes</path>
   <description>FLUXES - JCMT Postion and Flux Density Calibration</description>
   <abstract><p>
@@ -658,7 +658,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.4-3</version>
+  <version>4.4-4</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -862,11 +862,12 @@ Traces an HDS file
       <name>Alan Chipperfield</name>
     </person>
   </developers>
-  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <documentation> ssn68</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="kappa" support="S">
-  <version>1.13-6</version>
+  <version>1.13-8</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -4763,7 +4764,7 @@ to handle data from a variety of different instruments.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="init" support="S">
@@ -4784,7 +4785,7 @@ to handle data from a variety of different instruments.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="agi" support="S">
@@ -4852,7 +4853,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ary" support="S">
-  <version>1.3-2</version>
+  <version>1.4</version>
   <path>libraries/ary</path>
   <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
   <abstract><p> The ARY library is a set of routines for accessing
@@ -4883,7 +4884,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>7.0.4</version>
+  <version>7.0.6</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -5470,7 +5471,7 @@ understand.
 </component>
 
 <component id="irq" support="U">
-  <version>3.0</version>
+  <version>4.0</version>
   <path>libraries/irq</path>
   <description>Library to manage NDF QUALITY information textually</description>
   <abstract><p> This library is a set of Fortran routines that permit
@@ -5640,7 +5641,7 @@ independently of KAPPA.</p></abstract>
 </component>
 
 <component id="ndf" support="S">
-  <version>1.12-1</version>
+  <version>1.12-2</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
@@ -5784,7 +5785,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="pal" support="S">
-  <version>0.1.1</version>
+  <version>0.1.5</version>
   <path>libraries/pal</path>
   <description>Position Astronomy Library</description>
   <abstract><p>
@@ -5805,7 +5806,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun267</documentation>
-  <bugreports>stardev@jiscmail.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="par" support="S">
@@ -5847,7 +5848,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="pcs" support="S">
-  <version>4.1-3</version>
+  <version>4.1-4</version>
   <path>libraries/pcs</path>
   <description>PCS -- Parameter and Communication Subsystems</description>
   <abstract>
@@ -6470,7 +6471,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="skycat" support="U">
-  <version>3.0.2</version>
+  <version>3.1.2</version>
   <path>thirdparty/eso/skycat</path>
   <description>The main skycat component</description>
   <dependencies >
@@ -6626,7 +6627,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="cfitsio" support="U">
-  <version>3.13</version>
+  <version>3.30</version>
   <path>thirdparty/heasarc/cfitsio</path>
   <description>CFITSIO -- C and Fortran libraries for access to FITS files
         </description>
@@ -6664,7 +6665,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
 </component>
 
 <component id="vtk" support="U">
-  <version>5.4.2</version>
+  <version>5.10.0</version>
   <path>thirdparty/kitware/vtk</path>
   <description>VTK/CMAKE</description>
   <dependencies >
@@ -6795,7 +6796,7 @@ documents to hypertext.
 </component>
 
 <component id="perl" support="U">
-  <version>5.10</version>
+  <version>5.16.1</version>
   <path>thirdparty/perlsys/perl</path>
   <description>Perl</description>
   <dependencies >
