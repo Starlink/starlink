@@ -10,8 +10,8 @@ dist_noinst_SCRIPTS = surf_link_adam
 bin_MONOLITHS = surf_mon
 surf_mon_SOURCES = surf_mon.f surf_set_app_name.f
 
-starnewsdir = $(datadir)/doc/@PACKAGE_NAME@-@PACKAGE_VERSION@
-dist_starnews_DATA = SURF_CONDITIONS surf.news
+dist_starnews_DATA = surf.news
+dist_pkgdata_DATA = SURF_CONDITIONS
 
 # Data files to be installed into bindir
 bindatadir = $(bindir)
