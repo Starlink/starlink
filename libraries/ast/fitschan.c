@@ -1040,6 +1040,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        for pointing out this error).
 *     8-AUG-2012 (DSB):
 *        Correct assignment to lonpole within CLASSFromStore.
+*     10-AUG-2012 (DSB):
+*        Default DSS keywords CNPIX1 and CNPIX2 to zero if they are
+*        absent, rather than reporting an error.
 *class--
 */
 
@@ -8472,9 +8475,13 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
 /* Check the inherited status. */
    if( !astOK ) return;
 
+/* Get the optional DSS keywords, supplying defaults for any missing keywords. */
+   cnpix1 = 0.0;
+   cnpix2 = 0.0;
+   GetValue( this, "CNPIX1", AST__FLOAT, &cnpix1, 0, 1, method, class, status );
+   GetValue( this, "CNPIX2", AST__FLOAT, &cnpix2, 0, 1, method, class, status );
+
 /* Get the required DSS keywords. Report an error if any are missing. */
-   GetValue( this, "CNPIX1", AST__FLOAT, &cnpix1, 1, 1, method, class, status );
-   GetValue( this, "CNPIX2", AST__FLOAT, &cnpix2, 1, 1, method, class, status );
    GetValue( this, "PPO3", AST__FLOAT, &ppo3, 1, 1, method, class, status );
    GetValue( this, "PPO6", AST__FLOAT, &ppo6, 1, 1, method, class, status );
    GetValue( this, "XPIXELSZ", AST__FLOAT, &xpixelsz, 1, 1, method, class, status );

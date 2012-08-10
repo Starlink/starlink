@@ -16,9 +16,11 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-A bug has been fixed in astRebinSeq<X> which could result in
+- A bug has been fixed in astRebinSeq<X> which could result in
 incorrect normalisation of the final binned data and variance values.
 
+- When reading a FrameSet from a FITS-DSS header, the keywords CNPIX1 and
+CNPIX2 now default to zero if absent. Previously an error was reported.
 
 Main Changes in V7.0.5
 ----------------------
