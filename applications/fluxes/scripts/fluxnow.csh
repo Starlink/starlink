@@ -18,9 +18,6 @@
 #     defining some environmental variables appropriately and then
 #     setting the parameters to those that generate the current values.
 #
-#  Notes:
-#     The file JPLEPH is *required* as name for ephemeris file.
-#
 #  Authors:
 #     GJP: G.J. Privett (Starlink, Cardiff)
 #     ACC: A.C. Charles (Starlink, RAL)
@@ -39,6 +36,8 @@
 #     14-JUL-2004 (TIMJ):
 #       Uses @bindir@ rather than INSTALL_BIN
 #       Uses FLUXES_DIR and JPL_DIR environment variable if set
+#     2012-08-10 (TIMJ):
+#       Remove JPL logic.
 #-
 
 # Flag an interrupt for bugging out.
@@ -60,31 +59,6 @@ else
   setenv FLUXES @bindir@
 endif
 
-# Define a link to the jpleph.dat file in the current directory.
-if ( -f JPLEPH ) then
-   echo \
-"File JPLEPH already exists - assuming it is, or points to, the JPL ephemeris."
-   set jpl_ok = "no"
-else
-   # Location of JPL ephemeris. JPL_DIR takes precedence
-   # Note that staretcdir refers to $STARLINK/etc/fluxes
-   # but the JPL files are in $STARLINK/etc
-   set jpl_dir = @staretcdir@/../
-   if ($?JPL_DIR) then
-     if (-d $JPL_DIR) then
-       set jpl_dir = $JPL_DIR
-     endif
-   endif
-
-   if (! -e $jpl_dir/jpleph.dat) then
-     echo Unable to locate ephemeris in directory $jpl_dir
-     exit
-   endif
-
-   ln -s $jpl_dir/jpleph.dat JPLEPH
-   set jpl_ok = "yes"
-endif
-
 # Find out working directory and set FLUXPWD to it, so
 # that the code works in JACH style without change.
 unalias pwd
@@ -95,10 +69,6 @@ $FLUXES/fluxes pos=y flu=y screen=y ofl=y outfile=fluxes.dat now=y apass=n plane
 
 # Exit
 quit:
-if ( ${jpl_ok} == "yes" ) then
-   rm -f JPLEPH
-endif
-
 exit
 
 # end

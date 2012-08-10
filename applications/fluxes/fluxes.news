@@ -1,6 +1,13 @@
 FLUXES -- JCMT planetary position and flux density calibration
                                                             Expires: ??.??.??
 
+Version 1.4
+
+   - No longer use the JPL ephemeris to calculate planetary positions.
+     The SLALIB sla_planet routine is used instead which can have errors
+     of around 60 arcsec for outer planets. See SUN/67 for more details.
+     This change has no effect on the flux calculations.
+
 Version 1.3
 
    - Add two-component beam model support
