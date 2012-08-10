@@ -28,6 +28,6 @@
     </person>
   </developers>
   <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
-  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
