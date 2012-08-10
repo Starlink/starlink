@@ -21,6 +21,6 @@
     </person>
   </developers>
   <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
