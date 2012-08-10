@@ -289,7 +289,7 @@ C     For the time
 
 *     Look for the environmental variable
 *     dealing with the .DAT files and grab the name.
-      CALL PSX_GETENV('FLUXES',PATH,STATUS)
+      CALL PSX_GETENV('FLUXES_DIR',PATH,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 *     Find its length.
       LPATH=CHR_LEN(PATH)
@@ -2343,10 +2343,13 @@ C     These are the new numbers from astro-ph/0703640
 *     Initialise
       EXCLAIM = .FALSE.
 
-*     Look for the environmental variable
-*     dealing with the saving files and grab the name.
+*     If $FLUXPWD is set we use it, else we write to CWD
       CALL PSX_GETENV('FLUXPWD',PATH,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL PSX_GETCWD( PATH, STATUS )
+      END IF
+      IF (STATUS .NE. SAI__OK) GOTO 999
 
 *     Find its length.
       LPATH=CHR_LEN(PATH)
