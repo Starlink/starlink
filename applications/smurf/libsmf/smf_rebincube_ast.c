@@ -579,13 +579,17 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
    of this time slice in order to reduce its influence on the output
    expsoure times if it does not have much spectral overlap with the
    output cube. then fill the 1D work array with this constant value and
-   paste it into the 2D texp_array using the spatial mapping. */
+   paste it into the 2D texp_array using the spatial mapping. Note we
+   want the simple sum of the exposure times, with no normalisation. SO
+   we use the AST__NONORM flag which means we do not need to supply a
+   weights array.  */
          if( texp != VAL__BADR ) {
             texp *= tfac;
             for( iv = 0; iv < ndet; iv++ ) detwork[ iv ] = texp;
             astRebinSeqF( splut, 0.0, 1, ldim, uddim, detwork, NULL,
-                          spread, params, 0, 0.0, 50, VAL__BADR, 2, ldim,
-                          udim, ldim, uddim, texp_array, NULL, NULL, NULL );
+                          spread, params, AST__NONORM, 0.0, 50,
+                          VAL__BADR, 2, ldim, udim, ldim, uddim, texp_array,
+                          NULL, NULL, NULL );
          }
 
 /* Now do the same with the effective exposure time. */
@@ -593,8 +597,9 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
             teff *= tfac;
             for( iv = 0; iv < ndet; iv++ ) detwork[ iv ] = teff;
             astRebinSeqF( splut, 0.0, 1, ldim, uddim, detwork, NULL,
-                          spread, params, 0, 0.0, 50, VAL__BADR, 2, ldim,
-                          udim, ldim, uddim, teff_array, NULL, NULL, NULL );
+                          spread, params, AST__NONORM, 0.0, 50, VAL__BADR, 2,
+                          ldim, udim, ldim, uddim, teff_array, NULL, NULL,
+                          NULL );
          }
       }
 
@@ -618,7 +623,7 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
       ast_flags = AST__USEBAD;
       if( genvar == 1 ) ast_flags = ast_flags | AST__GENVAR;
 
-/* Normalise the data values. */
+/* Normalise the data values. We do not normalise the exposure time arrays. */
       astRebinSeqF( fullmap, 0.0, 2, lbnd_in,
                     ubnd_in, NULL, NULL, spread, params,
                     AST__REBINEND | ast_flags, 0.0, 50, VAL__BADR, 3,
