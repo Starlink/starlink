@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V7.0.6) of the Starlink AST (astrometry) library is
+   A new release (V7.0.7) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,14 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- A new flag AST__NONORM can be used with astRebinSeq<X> to indicate that
+normalisation of the output arrays is not required. In this case no
+weights array need be supplied.
+
+
+Main Changes in V7.0.6
+----------------------
 
 - A bug has been fixed in astRebinSeq<X> which could result in
 incorrect normalisation of the final binned data and variance values.

@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.27}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {16th February 2012}
+\newcommand{\stardocdate}      {13th August 2012}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -22720,12 +22720,10 @@ of ``COi\_m'' keywords to hold the coefficients of the distortion polynomial.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V7.0.6}
+\subsection{Changes Introduced in V7.0.6}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V7.0.5 and V7.0.6 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V7.0.5 and V7.0.6:
 
 \begin{enumerate}
 
@@ -22737,6 +22735,21 @@ and CNPIX2 now default to zero if absent. Previously an error was reported.
 
 \end{enumerate}
 
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V7.0.7}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V7.0.6 and V7.0.7 (the
+current version):
+
+\begin{enumerate}
+
+\item A new flag AST__NONORM can be used with astRebinSeq<X> to indicate that
+normalisation of the output arrays is not required. In this case no
+weights array need be supplied.
+
+\end{enumerate}
 
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
