@@ -320,6 +320,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        input array is first rebinned and then scaled to preserve the
 *        total data sum, and then each final output pixel is the weighed
 *        mean of all the aligned rebinned  pixels.
+*     13-AUG-2012 (DSB):
+*        Added AST__NONORM flag for asstRebuinSeq<X>.
 *class--
 */
 
@@ -11908,6 +11910,7 @@ c     parameter "wlim".
 f     argument WLIM.
 *     It also causes any temporary values stored in the output variance array
 *     (see flag AST__GENVAR below) to be converted into usable variance values.
+*     Note, this flag is ignored if the AST__NONORM flag is set.
 *     - AST__USEBAD: Indicates that there may be bad pixels in the
 *     input array(s) which must be recognised by comparing with the
 c     value given for "badval" and propagated to the output array(s).
@@ -11952,6 +11955,14 @@ f     routine
 *     given equal weight. If this flag is specified, the calculation of the
 *     output variances (if any) is modified to take account of the
 *     varying weights assigned to the input data values.
+*     - AST__NONORM: If the simple unnormalised sum of all input data falling
+*     in each output pixel is required, then this flag should be set on
+*     each call in the sequence and the AST__REBINEND should not be used
+*     on the last call. In this case
+c     NULL pointers can be supplied for "weights" and "nused".
+f     WEIGHTS and NUSED are ignored.
+*     This flag cannot be used with either the AST__GENVAR or AST__VARWGT
+*     flags.
 
 *  Propagation of Missing Data:
 *     Instances of missing data (bad pixels) in the output grid are
@@ -12008,6 +12019,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    int nout;                     /* Number of Mapping output coordinates */ \
    int npix;                     /* Number of pixels in input region */ \
    int npix_out;                 /* Number of pixels in output array */ \
+   int nused_val;                /* Local buffer for "*nused" value  */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -12186,6 +12198,35 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
          } \
       } \
 \
+/* If the AST__NONORM flag has been supplied, ignore any weights array \
+   and use a local buffer for "nused". */ \
+      if( flags & AST__NONORM ) { \
+         weights = NULL; \
+         nused = &nused_val; \
+\
+/* Check no incompatible flags have been specified. */ \
+         if( ( flags & AST__GENVAR ) && astOK ) { \
+            astError( AST__BDPAR, "astRebinSeq"#X"(%s): Incompatible flags " \
+                      "AST__GENVAR and AST__NONORM have been specified " \
+                      "together (programming error).", status, astGetClass( this ) ); \
+         } else if( ( flags & AST__VARWGT ) && astOK ) { \
+            astError( AST__BDPAR, "astRebinSeq"#X"(%s): Incompatible flags " \
+                      "AST__VARWGT and AST__NONORM have been specified " \
+                      "together (programming error).", status, astGetClass( this ) ); \
+         } \
+\
+/* If the AST__NONORM flag has not been supplied, check that a weights array \
+   and nused pointer have been supplied. */ \
+      } else if( !weights ){ \
+         astError( AST__BDPAR, "astRebinSeq"#X"(%s): No weights array " \
+                   "supplied (programming error).", status, \
+                   astGetClass( this )  ); \
+      } else if( !nused ){ \
+         astError( AST__BDPAR, "astRebinSeq"#X"(%s): No 'nused' pointer " \
+                   "supplied (programming error).", status, \
+                   astGetClass( this )  ); \
+      } \
+\
 /* If OK, loop to determine how many input pixels are to be binned. */ \
       npix = 1; \
       unsimplified_mapping = this; \
@@ -12217,26 +12258,28 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 \
 /* If required, initialise the output arrays to hold zeros. */ \
       if( flags & AST__REBININIT ) { \
-         w = weights; \
          d = out; \
          if( out_var ) { \
             v = out_var; \
-            for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, v++, w++ ) { \
+            for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, v++ ) { \
                *d = 0; \
                *v = 0; \
-               *w = 0; \
             } \
          } else { \
-            for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, w++ ) { \
+            for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++ ) { \
                *d = 0; \
-               *w = 0; \
             } \
          } \
-         if( flags & AST__GENVAR ) { \
-            w = weights + npix_out; \
-            for( ipix_out = 0; ipix_out < npix_out; ipix_out++, w++ ) *w = 0; \
+         if( weights ) { \
+            w = weights; \
+            for( ipix_out = 0; ipix_out < npix_out; ipix_out++, w++ ) { \
+               *w = 0; \
+            } \
+            if( flags & AST__GENVAR ) { \
+               for( ipix_out = 0; ipix_out < npix_out; ipix_out++, w++ ) *w = 0; \
+            } \
          } \
-         *nused = 0; \
+         if( nused ) *nused = 0; \
       } \
 \
 /* Allocate work arrays and fill with zeros. We paste the input data, weights \
@@ -12279,7 +12322,8 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    } \
 \
 /* If required, finalise the sequence. */ \
-   if( flags & AST__REBINEND ) { \
+   if( ( flags & AST__REBINEND ) && !( flags & AST__NONORM ) && \
+       weights && nused ) { \
 \
 /* Ensure "wlim" is not zero. */ \
       if( wlim < 1.0E-10 ) wlim = 1.0E-10; \
@@ -12523,12 +12567,14 @@ static void RebinUpdate( DataType type, int flags, const void *badval_ptr,
             if( wa != *((Xtype *) badval_ptr) && wb != AST__BAD  && wb > 0.0 ) { \
                sum += wa/wb; \
                ((Xtype*)out)[ i ] += (Xtype) alpha*wa; \
-               weights[ i ] += wb; \
-               if( flags & AST__USEVAR ) { \
-                  ((Xtype*)out_var)[ i ] += alpha2*((Xtype*)workc)[ i ]; \
-               } else if( flags & AST__GENVAR ) { \
-                  ((Xtype*)out_var)[ i ] += alpha2*wa*wa/wb; \
-                  weights[ j ] += wb*wb; \
+               if( weights ) { \
+                  weights[ i ] += wb; \
+                  if( flags & AST__USEVAR ) { \
+                     ((Xtype*)out_var)[ i ] += alpha2*((Xtype*)workc)[ i ]; \
+                  } else if( flags & AST__GENVAR ) { \
+                     ((Xtype*)out_var)[ i ] += alpha2*wa*wa/wb; \
+                     weights[ j ] += wb*wb; \
+                  } \
                } \
             } \
          } \

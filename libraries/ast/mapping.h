@@ -362,6 +362,7 @@
 #define AST__VARWGT (1024)       /* Use input variances as weights? */
 #define AST__NOBAD (2048)        /* Leave bad output values unchanged? */
 #define AST__DISVAR (4096)       /* Generate distribution (not mean) variance? */
+#define AST__NONORM (8192)       /* No normalisation required at end? */
 
 /* These macros identify standard sub-pixel interpolation algorithms
    for use by astResample<X>. They are used by giving the macro's
