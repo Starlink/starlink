@@ -24,53 +24,87 @@
 
 #-
 
+#
+# IMPORTANT: for gausshermites and voigts the first three parameters
+# (referred to as the amplitude, position, and width) do *NOT*
+# correspond to the maximum, centre, and FWHM as for a basic Gaussian! 
+# Read the "smurfhelp fit1d" section on "Fitting_Functions" to see the
+# relations. 
+
 # Axis the fit along (nr starting at 1). '0' translates fit along
 # highest dimension i.e. Vlsr in a Ra, Dec, Vlsr cube.
 
 axis = 0
 
-# Range along axis to find and fit profiles. The format is (x1, x2)
-# including the (). E.g. Vlsr -20 35: (-20,35). Default is to use the
-# full extent of the axis.
+# Coordinate range along axis to find and fit profiles. The format is 
+# (x1, x2) including the (). E.g. Vlsr -20 to 35 km/s: (-20,35). 
+# Default is to use the full extent of the axis.
 
 range = <undef>
 
 # Function to fit. See documentation: currently implemented are gaussian,
-# gausshermite1, gausshermite2, voigt, polynomial.
+# gausshermite1, gausshermite2, voigt.
 
 function = gauss
 
 # Maximum number of 'component' functions to fit to each profile, e.g.
-# a multi-component spectrum of max. 3 gaussians. [Note: The complete fit
-# of the gaussians and an optional zerolevel is done concurrently, not
-# iteratively starting e.g. with the strongest component]. The routine
-# will try to find and fit ncomp functions along each profile, but may
-# settle for less.
+# a multi-component spectrum of max. 3 gaussians. Note: The complete fit
+# of the gaussians is done concurrently, not iteratively starting e.g. 
+# with the strongest component. The routine will try to find and fit ncomp 
+# functions along each profile, but may settle for less. 
 
 ncomp = 3
 
-# RMS to use for the input data set in terms of data units.
-rms = 0.8
+# Sort the resulting fits:
+#    - amp:   sort by decreasing fitted value of the amp-like parameter
+#    - width: sort by decreasing fitted fwhm of the width-like parameter
+#    - pos:   sort by increasing fitted distance from the centre pixel
+#             in the profile.
+#
+# Sorting can be helpful, but be cautioned that it can also complicate
+# things: if there are two components one at -10 km/s and one at 10 km/s
+# sorting by amplitude or width can result in the parameter file for 
+# component 1 to be a mix of the -10 and 10 features depending on which
+# one was relatively stronger or wider. Similarly, sorting by position
+# can result in low-amplitude fits of noise spikes to be mixed with
+# stronger components. For more precise control try to run the routine 
+# iteratively with e.g. a different restricted velocity range to try pick
+# out the different components. Default sorting is by amplitude.
 
-# Minimum value for the Amplitude to accepts as a genuine fit in terms
-# of the rms. Based on the amplitude alone, at 3-sigma 5% of the profiles
-# selected for fitting can be expected to be noise spikes. This value drops
-# to 2% for 5-sigma. All assuming gaussian statistics of course.
-# Applies to Gauss* and Voigt fits only.
+sort = amp
+# sort = width
+# sort = pos
+
+# Minimum value for the Amplitude-like parameter (see at top) to
+# accepts as a genuine fit in terms of the rms. Based on the amplitude
+# alone, at 3-sigma ~5% of the profiles selected for fitting can be
+# expected to be noise spikes. This value drops to 2% for 5-sigma. All
+# assuming gaussian statistics of course. Be careful that for Voigts
+# the amp-like parameter actually is the 'area' under the profile!
 
 minamp = 3
 
-# Minimum value for the  FHWM (~2.35*Dispersion) to accepts as a genuine
-# fit in terms of ==PIXELS== (!).
-# Applies to Gauss* and Voigt fits only.
+# Minimum value for the  width-like parameter (see at top) to accept as 
+# a genuine fit as FWHM (~2.35*Dispersion) in terms of ==PIXELS== (!).
+# This parameter can make a huge difference to the number of spurious or
+# rejected fits in the end result.
 
-minfwhm = 1.88
+minwidth = 1.88
 
-# Maximum value for the  FHWM of the Loretzian component in terms of 
-# ==PIXELS== (!). A negative value implies no constraint.
+# Maximum value for the  FHWM of the Loretzian component of a voigt in terms 
+# of  ==PIXELS== (!). A negative value implies no constraint.
 # Voigt fits only.
 
-maxlorz = -1.0
+maxlorz = <undef>
+
+# This applies to Gausshermites, which, by their nature, can have negative 
+# "wings" on profiles. Those may indeed be present in the data and wanted 
+# to be fitted, but on many occasions gausshermites are used with the aim
+# to fit complicated positive profiles. This option causes the outputed 
+# fitted profiles to be set to zero whereever the fit would result in a 
+# negative value.
+
+pos_only = 1
 
 # Two options that bypass the actual fitting:
 #

@@ -62,11 +62,10 @@
 *     DIAGNDF = GROUP (Read)
 *          (NOT YET USED/TESTED!)
 *          Name of NDF to use as parameter file COMP_0 with diagnostics
-*          and baseline parameters. This component can usually be omitted
-*          unless access to the baseline is needed. This parameter can also
-*          be used instead of PARNDF except that the given NDFs are
-*          interpreted to start with COMP_0, i.e. COMP_0, COMP_1 .. COMP_N.
-*          A null value requests that no diagnostic NDF be created. [!]
+*          values. This parameter can also be used instead of PARNDF 
+*          except that the given NDFs are interpreted to start with 
+*          COMP_0, i.e. COMP_0, COMP_1 .. COMP_N. A null value requests
+*          that no diagnostic NDF be created. [!]
 *     IN = NDF (Read)
 *          Baselined input file(s).
 *     OUT = NDF (Write)
@@ -90,24 +89,30 @@
 *     RMS = _DOUBLE (Read)
 *          RMS in input NDF(s) in data units.
 *     USERVAL = GROUP (Read)
-*          (NOT YET USED/TESTED!)
-*          Config-style input file with user-supplied fixed values or
-*          initial estimates for the fit. Entries are of the form
-*          'letter''number' = ( val1, val2 ) or ... = val1. Val1 is the
-*          value for the given parameter; Val2 = is the fitmask:
-*          0 (fix, do not fit), 1 (use as initial estimate, but fit).
-*          If Val2 is omitted it defaults to 0 (fixed).
-*          Parameters are indicated by a letter and a number (1..) indicating
-*          the component, with '0' meaning to apply to all components.
+*          Input keymap file name with user-supplied fixed values or initial 
+*          estimates for the fit and to flag whether parameters are to
+*          be kept fixed in the fit. Entries are of the form: 
+*          "comp"#."fid" = value, "comp"#.par = value, or "fix"#.par = [0,1]
+*          with 'par' being a parameter relevant for the function being
+*          fitted or indicating a parameter to be kept fixed or fitted
+*          '#' (1..n) indicates the component profile being described.
+*         
+*          If specified "comp"#.id will override the default function 
+*          selected in the config file.
+*          Parameter names are described in the help item "Fitting_Functions":
+*                              comp.fid      comp.par
+*              Gauss:              1        a, b, c
+*              Gausshermite1:      2        a, b, c, h3
+*              Gausshermite2:      3        a, b, c, h4
+*              Voigt:              4        a, b, c, l
 *
-*          -  Gauss* -- a = amplitude, x = position, f = fwhm,
-*                       s = skewness (hermite h3), k = kurtosis (hermite h4)
-*          -  Voigt  -- a = amplitude, x = position, f = fwhm, l = lorentzian
-*          -  Polynomial -- c0, c1, c2, ... = c0 + c1*x + c2*x^2 + ...
-*          -  Zerolevel -- z0, z1, z2 ( = z0 + z1*x + z2*x^2 ) (Optional)
-*
-*          A null value means that no user-supplied estimates are required.
-*          [!]
+*          The "fix"#.par parameter can have a value of: 
+*               1 = fix parameter at given value, do not fit -or- 
+*               0 = use as initial estimate, but fit.
+*          As for comp, the '#' (1..n) indicates the component.
+*          
+*          A null value for USERVAL means that no user-supplied estimates 
+*          are required.  [!]
 
 *  Configuration Parameters:
 *     A default configuration file can be found at 
@@ -123,12 +128,12 @@
 *          and/or fixing initial estimates may help solve problems. [0]
 *     FUNCTION = STRING
 *          Function to fit.  Currently implemented are "gaussian", 
-*          "gausshermite1", "gausshermite2", "voigt", abnd "polynomial".
+*          "gausshermite1", "gausshermite2", "voigt".
 *          See topic "Fitting Functions" for details. ["gaussian"]
 *     MAXLORZ = REAL
 *          Maximum value for the FHWM of the Lorentzian component in
-*          terms of ==PIXELS==(!). A negative value implies no constraint.
-*          Applies Voigt fits only. [-1]
+*          terms of ==PIXELS==(!). 
+*          Applies Voigt fits only. [<undef>]
 *     MINAMP = REAL
 *          Minimum value for the Amplitude to accept as a genuine fit
 *          in terms of the rms. Based on the amplitude alone, at 3-sigma
@@ -136,7 +141,7 @@
 *          noise spikes. This value drops to 2% for 5-sigma. All
 *          assuming gaussian statistics of course.  Applies to Gauss*
 *          and Voigt fits only. [3]
-*     MINFWHM = REAL
+*     MINWIDTH = REAL
 *          Minimum value for the FHWM (~2.35*Dispersion) to accept as a
 *          genuine fit in terms of ==PIXELS==(!).
 *          Applies to Gauss* and Voigt fits only. [1.88]
@@ -148,11 +153,10 @@
 *     NCOMP = INTEGER
 *          Maximum number of 'component' functions to fit to each
 *          profile, e.g. a multi-component spectrum of maximum three
-*          gaussians. [Note: The complete fit of the gaussians and an
-*          optional zerolevel is done concurrently, not iteratively
-*          starting e.g. with the strongest component]. The routine will
-*          try to find and fit ncomp functions along each profile, but
-*          may settle for less. [3]
+*          gaussians. [Note: The complete fit of the gaussians is done 
+*          concurrently, not iteratively starting e.g. with the strongest
+*          component]. The routine will try to find and fit ncomp
+*          functions along each profile, but may settle for less. [3]
 *     RANGE(2) = REAL
 *          Coordinate range along axis to find and fit profiles. The
 *          format is (x1, x2) including the ().  For example,
@@ -163,40 +167,48 @@
 *     The function menu provides the choice of four functions for which
 *     you can fit the parameters to the data in your profiles.
 *
-*     1) A standard GAUSSIAN. Parameters are amplitude, centre, and
-*        dispersion.
+*     1) A standard GAUSSIAN. Parameters are 
+*            a = maximum, b = centre, and c = FWHM.
 *
-*     NOTE that if one of h3 and h4 is not zero, the mean of the
-*     distribution is not the position of the maximum.
+*     NOTE that if one of h3 and h4 in a gauss-hermite function is non-zero, 
+*     the mean of the distribution is not the position of the maximum
 *     (Reference; Marel, P. van der, Franx, M., A new method for the
 *     identification of non-gaussian line profiles in elliptical galaxies.
-*     A.J., 407 525-539, 1993 April 20).
+*     A.J., 407 525-539, 1993 April 20):
 *
-*     2) GAUSS-HERMITE1 polynomial (h3). Parameters are a,b,c for
-*     amplitude, position and fwhm (which are *NOT* the same as maximum
-*     amplitude, centre, and dispersion!) and h3.
+*     2) GAUSS-HERMITE1 polynomial (h3). Parameters are 
+*            a (amplitude), b (position),c (width), and h3
+*     as mentioned these are *NOT* the same as maximum, centre, and fwhm
+*     of the distribution as for a gaussian:
 *                 maximum ~= [determine value and position of max from
 *                             fitted profiles using e.g. collapse]
 *                  centre ~= b + h3*sqrt(3)
-*              dispersion ~= abs( c*(1-3h3^2) ) ~= c
+*                    FWHM ~= abs( c*(1-3h3^2) ) ~= c
 *                skewness ~= 4*sqrt(3)*h3
 *
-*     3) GAUSS-HERMITE2 polynomial (h3, h4). Same as above, but an extra
-*        parameter h4 is included.
+*     3) GAUSS-HERMITE2 polynomial (h3, h4). Same as previous, but an 
+*        extra parameter h4 is included:
 *                 maximum ~= [determine value and position of max from
 *                             fitted profiles using e.g. collapse]
 *                  centre ~= b + h3*sqrt(3)
-*              dispersion ~= abs( c*(1+h4*sqrt(6)) )
+*                    FWHM ~= abs( c*(1+h4*sqrt(6)) )
 *                skewness ~= 4*sqrt(3)*h3
 *                kurtosis ~= 8*sqrt(6)*h4
 *
-*     4) VOIGT function. Parameters are a,b,c,d: Area, centre, Doppler
-*        and Lorentzian HWHM.
+*     4) VOIGT function. Parameters are 
+*            a (area), b (centre), c (doppler width), l (lorenztian width), 
+*            and v (area factor)
+*        with relations:
 *                 maximum ~= [determine value of max from fitted
 *                             profiles using e.g. collapse]
 *                  centre ~= b
 *            doppler fwhm ~= abs( 2*c )
-*         lorentzian fwhm ~= abs( 2*d )
+*         lorentzian fwhm ~= abs( 2*l )
+*                     amp  = v (OUTPUT ONLY!) amplitude calculated from 
+*                            a (area) using the standard amp2area function
+*                            for a voigt (based on the Faddeeva complex
+*                            error function):
+*                               amp = area / amp2area 
 *
 *  Fitted Parameters:
 *     The fitted parameters are stored in the file header as
@@ -213,8 +225,8 @@
 *          1 = amplitude (gaussian); 'a' (gausshermite)
 *          2 = position  (gaussian); 'b' (gausshermite)
 *          3 = fwhm      (gaussian); 'c' (gausshermite)
-*          4 = 'h3'      (gausshermite1,2)
-*          5 = 'h4'      (gausshermite2)
+*          4 = 'h3'      (gausshermite1,2); 'l' (voigt)
+*          5 = 'h4'      (gausshermite2); 'v' (voigt)
 *          last: function id
 *              1 = gaussian; 2 = gausshermite1 (h3);
 *              3 = gausshermite2 (h3,h4), 4 = voigt
@@ -230,7 +242,7 @@
 *         -5   Diagonal of matrix contains elements which are zero.
 *         -6   Determinant of the coefficient matrix is zero.
 *         -7   Square root of negative number.
-*         <-10 All fitted components rejected due to minamp, minfwhm,
+*         <-10 All fitted components rejected due to minamp, minwidth,
 *                maxlorz, or range constraints.
 
 *  Authors:
@@ -286,6 +298,7 @@
 #include "par.h"
 #include "star/ndg.h"
 #include "star/util.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -304,13 +317,21 @@
 #define FIT1D__EXTNAME  "SMURF_FIT1D"
 #define FIT1D__EXTTYPE  "SMURF_FIT1D"
 
-static void get_fit1par( int *axis, double *range,
-		      smf_math_function *fid, int *ncomp, double *rms,
-		      double *critamp, double critdisp[],
+/* Use a normal smurf defaults file for the userval keymap which
+** enables the normal error checking of supplied keys.
+** If set to 0, no defaults file will be used when opening a
+** user supplied file. */
+#define USERVALDEFAULTFILE 1
+
+
+static void get_fit1par( int *axis, double *range, smf_math_function *fid, 
+                      int *ncomp, double *critamp, double critdisp[],
 		      int *estimate_only, int *model_only, int *status );
 
-static void get_userval ( int in, smf_math_function fid, int ncomp, AstKeyMap **usrvalmap,
-			  smfArray *pardata, int *status );
+static void get_userval ( smfData *data, int axis, AstMapping **wcsmap, 
+			  const char *userfile, smf_math_function fid, 
+			  int *prange, double *fixval, int *fixmask, 
+                          int *status );
 
 static void map_axis_to_wcs ( smfData *data, int axis, AstMapping **wcsmap,
 			       int *status );
@@ -319,10 +340,10 @@ static void convert_range_to_pixels ( AstMapping **wcsmap, double *range,
 				      int lbnd, int ubnd, int *prange,
 				      int *status );
 
-static void convert_coord_to_pixel ( AstMapping **wcsmap, double *coord,
+static void convert_coord_to_pixel ( AstMapping **wcsmap, const double *coord,
 				     int nval, double *pixel, int *status );
 
-static void convert_pixel_to_coord ( AstMapping **wcsmap, double *pixel,
+static void convert_pixel_to_coord ( AstMapping **wcsmap, const double *pixel,
 				     int nval, double *coord, int *status );
 
 static void setup_parameter_ndfs ( smfData *data, int axis, int ncomp,
@@ -331,12 +352,17 @@ static void setup_parameter_ndfs ( smfData *data, int axis, int ncomp,
 
 static void copy_parameter_ndfs ( smfArray *pardata, int *status );
 
-static void convert_fitted_values( smfData *data,
-                            int axis, int ncomp, AstMapping **wcsmap,
-                            smfArray *pardata, int *status );
+static void convert_parunits( int mode, smfData *data, int axis, 
+			      int ncomp, AstMapping **wcsmap,
+			      smfArray *pardata, int *status );
 
 static void ndf2array ( smfData *sdata, int axis, int ipar, int write,
 			double *values, double *errors, int *status );
+
+/* Allowed parameter ids for non-polynomials and seq nr (plane) in 
+   parameter ndfs. See 'Fitted functions in smurf_fit1d.c */
+const char* parkeys[] = { "A", "B", "C", "H3", "H4", "L", "V", "FID" };
+int parloc[]          = {  1,   2,   3,   4,    5,    4,   5,   7 };
 
 /*
 **Main routine
@@ -347,7 +373,6 @@ void smurf_fit1d( int * status )
 
   /* Local Variables */
   smfData *data = NULL;          /* Input data struct */
-  size_t   i = 0;                /* Loop counter */
 
   size_t   in = 0;               /* File counter */
   int      indf;                 /* NDF identifier for input file */
@@ -364,8 +389,8 @@ void smurf_fit1d( int * status )
   smf_math_function fid;         /* Function id */
   int      lbnd[ NDF__MXDIM ];   /* Lower NDF pixel bounds */
   int      ubnd[ NDF__MXDIM ];   /* Upper NDF pixel bounds */
-  double   range[2] = {0.0,0.0}; /* Range of coordinates to fit over */
-  int      prange[2] = {0,0};    /* Range in pixel nrs 1..n */
+  double   range[2] = {VAL__BADD,VAL__BADD};  /* Range of coord to fit over */
+  int      prange[2] = {VAL__BADI,VAL__BADI}; /* Range in pixel nrs 1..n    */
   int      ncomp = 1;            /* Number of components to fit */
   double   rms = 1;              /* RMS in data */
   double   critamp = 1;          /* Minimal Amplitude */
@@ -374,8 +399,10 @@ void smurf_fit1d( int * status )
   int      model_only = 0;       /* Create model only from supplied pars */
   fitStruct fcntrl;              /* Pointer to fit control struct */
 
+  /* File with user defined values for the function's parameters */
+  char f_userval[GRP__SZNAM];    /* name of the file with user defs */
+
   /* Parameter NDFs */
-  AstKeyMap *usrvalmap=NULL;     /* Pointer to keymap for user values  */
   int       *parndfs;            /* Array of parameter NDFs */
   smfArray  *pardata;            /* Array of smfData pointers for par ndfs */
 
@@ -383,7 +410,6 @@ void smurf_fit1d( int * status )
   AstMapping *wcsmap = NULL;     /* Pointer to the Mapping from pixel
 				    value to wcs value */
   /*  AstFrame *wcsframe = NULL;  Pointer to Frame describing the WCS axis */
-
 
 
   /* Initialize ndf */
@@ -403,10 +429,16 @@ void smurf_fit1d( int * status )
   /* Get the RMS */
   parGet0d( "RMS", &rms, status );
 
+  /* Get any user defined  */
+  parGet0c ( "USERVAL", f_userval, GRP__SZNAM, status );
+  if ( *status == PAR__NULL ) {
+    errAnnul ( status );
+    one_strlcpy ( f_userval, "", sizeof(f_userval), status );
+  }
+  
   /* Extract and read user supplied values using a keymap */
-  get_fit1par( &axis, range, &fid, &ncomp,
-		   &rms, &critamp, critdisp, &estimate_only, &model_only,
-		   status );
+  get_fit1par( &axis, range, &fid, &ncomp, &critamp, 
+               critdisp, &estimate_only, &model_only, status );
 
   if (*status != SAI__OK) goto CLEANUP;
 
@@ -495,7 +527,7 @@ void smurf_fit1d( int * status )
       goto CLEANUP;
     }
 
-    /* Each component is described by NPAR-1 parameters plus a id plane.
+    /* Each component is described by NPAR-1 parameters plus an id plane.
        NPAR is defined in the include file and a fixed rather than
        dynamic number is used for easy combination of different type
        of fits. Then initialize the COMP extensions. */
@@ -508,19 +540,28 @@ void smurf_fit1d( int * status )
     copy_parameter_ndfs ( pardata, status );
     if ( *status != SAI__OK) {
       goto CLEANUP;
+    } 
+
+    /* Fitted parameters (centre, dispersion) are in coordinates. Convert
+       values from paramter ndfs to pixels for the fit */
+    convert_parunits( (int) 0, data, (int) axis, (int) ncomp,
+		      &wcsmap, pardata, status );
+    if ( *status != SAI__OK) {
+      goto CLEANUP;
     }
 
     /* Fill the parameter files with user any supplied values */
-    get_userval ( in, fid, ncomp, &usrvalmap, pardata, status );
+    get_userval ( data, (int) axis, &wcsmap, f_userval, fid, prange,
+		  fcntrl.fixval, fcntrl.fixmask, status );
+    if ( *status != SAI__OK) {
+      goto CLEANUP;
+    }
 
     /* Fill the fit control structure */
     msgOutiff(MSG__DEBUG, " ", "Populate %s control struct", status,
 	      FUNC_NAME);
 
     fcntrl.fid      = fid;
-    for (i = 0; i < MAXPAR; i++) {
-      fcntrl.fitmask[i] = 1;
-    }
     fcntrl.clip[0]  = VAL__BADD;
     fcntrl.clip[1]  = VAL__BADD;
     fcntrl.rms      = rms;
@@ -541,8 +582,8 @@ void smurf_fit1d( int * status )
     /* The fit returns results (centre, dispersion) in pixels. Convert
        those back to coordinates */
     msgOutiff(MSG__VERB, " ", "Converting fitted values", status);
-    convert_fitted_values( data, (int) axis, (int) ncomp,
-			   &wcsmap, pardata, status );
+    convert_parunits( (int) 1, data, (int) axis, (int) ncomp,
+		      &wcsmap, pardata, status );
 
     /* Set character labels */
     msgOutiff(MSG__DEBUG, " ", "Set labels", status);
@@ -579,7 +620,6 @@ void smurf_fit1d( int * status )
   msgOutiff(MSG__DEBUG, " ", "Delete groups etc", status);
   if( igrp != NULL ) grpDelet( &igrp, status);
   if( ogrp != NULL ) grpDelet( &ogrp, status);
-  if( usrvalmap ) usrvalmap = astAnnul( usrvalmap );
 
   msgOutiff(MSG__VERB, " ", "%s Finished", status, TASK_NAME);
   ndfEnd( status );
@@ -589,9 +629,8 @@ void smurf_fit1d( int * status )
 /* *** END OF MAIN *** */
 
 
-static void get_fit1par( int *axis, double *range,
-                         smf_math_function *fid, int *ncomp, double *rms,
-                         double *critamp, double critdisp[],
+static void get_fit1par( int *axis, double *range, smf_math_function *fid, 
+                         int *ncomp, double *critamp, double critdisp[],
                          int *estimate_only, int *model_only, int *status )
 /*
 ** Routine to get parameters from the config file, if parameter is not
@@ -612,132 +651,123 @@ static void get_fit1par( int *axis, double *range,
   /* Obtain parameters from keymap when non-NULL pointers given */
 
   /* Get axis to fit along */
-  if( axis ) {
-    *axis = 0;
-    astMapGet0I( keymap, "AXIS", axis );
+  *axis = 0;
+  if ( astMapGet0I( keymap, "AXIS", axis ) )  {
     if ( *status == SAI__OK ) {
-      msgOutiff( MSG__VERB, "", "... AXIS=%d", status,
-		 *axis );
+      msgOutiff( MSG__VERB, "", "... AXIS=%d", status, *axis );
     } else {
       errRep(FUNC_NAME, "Failed to get parameter AXIS from config file",
 	     status);
-      return;
+      goto CLEANUP1;
     }
   }
 
   /* Get range of pixels to fit over */
-  if( range ) {
-    int  nval = 0;
-    if ( astMapGet1D( keymap, "RANGE", 2, &nval, range ) ) {
-      if ( nval < 2 ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "RANGE requires two values", status);
-	return;
-      }
-      if ( *status == SAI__OK ) {
-	msgOutiff( MSG__VERB, "", "... RANGE=[%f,%f]", status,
-		   (float) range[0], (float) range[1] );
-      }
-    } else {
-      range[0] = VAL__BADD;
-      range[1] = VAL__BADD;
+  range[0] = VAL__BADD;
+  range[1] = VAL__BADD;
+  int  nval = 0;
+  if ( astMapGet1D( keymap, "RANGE", 2, &nval, range ) ) {
+    if ( *status == SAI__OK  && nval >  1) {
+      msgOutiff( MSG__VERB, "", "... RANGE=[%f,%f]", status,
+		 (float) range[0], (float) range[1] );
+    }
+    if ( nval < 2 || range[0] == range[1] ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "RANGE requires two differing values", status);
+      goto CLEANUP1;
     }
   }
-  if ( (range[0] == 0 && range[1] == 0) ||
-       (range[0] == range[1]) ) {
-    range[0] = VAL__BADD;
-    range[1] = VAL__BADD;
-  }
 
+  *fid = 1;
   {
     const char * strpntr = NULL;
-    astMapGet0C( keymap, "FUNCTION", &strpntr );
-    if (*status == SAI__OK && strpntr ) {
-      *fid = smf_mathfunc_fromstring( strpntr, status );
-      msgOutiff( MSG__VERB, "", "... FUNCTION=%s (id: %d)", status,
-                 smf_mathfunc_str( *fid, status ), *fid );
-    } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Failed to get parameter FUNCTION from config file",
-	     status);
-      return;
+    if ( astMapGet0C( keymap, "FUNCTION", &strpntr ) ) {
+      if (*status == SAI__OK && strpntr ) {
+	*fid = smf_mathfunc_fromstring( strpntr, status );
+	msgOutiff( MSG__VERB, "", "... FUNCTION=%s (id: %d)", status,
+		   smf_mathfunc_str( *fid, status ), *fid );
+      } else {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "Failed to get parameter FUNCTION from config file",
+	       status);
+	goto CLEANUP1;
+      }
     }
   }
 
   /* Get ncomp to fit along */
-  if( ncomp ) {
-    *ncomp = 1;
-    astMapGet0I( keymap, "NCOMP", ncomp );
+  *ncomp = 1;
+  if ( astMapGet0I( keymap, "NCOMP", ncomp ) ) {
     if ( *status == SAI__OK ) {
       msgOutiff( MSG__VERB, "", "... NCOMP=%d", status, *ncomp );
     } else {
       errRep(FUNC_NAME, "Failed to get parameter NCOMP from config file",
 	     status);
-      return;
+      goto CLEANUP1;
     }
   }
 
   /* Minimal acceptable amplitude for a component */
-  if( critamp ) {
-    *critamp = 0;
-    astMapGet0D( keymap, "MINAMP", critamp );
+  *critamp = 0;
+  if ( astMapGet0D( keymap, "MINAMP", critamp ) ) {
     if ( *status == SAI__OK ) {
       if ( *critamp < 0 ) {
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "MINAMP must be >= 0.", status );
-	return;
+	goto CLEANUP1;
       } else {
 	msgOutiff( MSG__VERB, "", "... MINAMP=%f", status, *critamp );
       }
     } else {
       errRep(FUNC_NAME, "Failed to get parameter MINAMP from config file",
 	     status);
-      return;
+      goto CLEANUP1;
     }
   }
 
   /* Minimal acceptable dispersion for a component */
-  if( critdisp ) {
-    critdisp[0] = 0;
-    astMapGet0D( keymap, "MINFWHM", critdisp );
+  critdisp[0] = 0;
+  if ( astMapGet0D( keymap, "MINWIDTH", critdisp ) ) {
     if ( *status == SAI__OK ) {
       if( critdisp[0] < 0 ) {
 	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "MINFWHM must be >= 0.", status );
-	return;
+	errRep(FUNC_NAME, "MINWIDTH must be >= 0.", status );
+	goto CLEANUP1;
       } else {
-	msgOutiff( MSG__VERB, "", "... MINFWHM=%f", status,
+	msgOutiff( MSG__VERB, "", "... MINWIDTH=%f", status,
 		   critdisp[0] );
       }
     } else {
-      errRep(FUNC_NAME, "Failed to get parameter MINFWHM from config file",
+      errRep(FUNC_NAME, "Failed to get parameter MINWIDTH from config file",
 	     status);
-      return;
+      goto CLEANUP1;
     }
   }
   /* Convert to dispersion */
-  critdisp[0] = FWHM2DISP( critdisp[0] );
+  if ( critdisp[0] != VAL__BADD ) {
+    critdisp[0] = FWHM2DISP( critdisp[0] );
+  }
 
   /* Minimal acceptable lorenztian FWHM for a component */
-  if( critdisp ) {
-    critdisp[1] = 0;
-    astMapGet0D( keymap, "MAXLORZ", critdisp+1 );
+  critdisp[1] = 0;
+  if ( astMapGet0D( keymap, "MAXLORZ", critdisp+1 ) ) {
     if ( *status == SAI__OK ) {
       msgOutiff( MSG__VERB, "", "... MAXLORZ=%f", status,
 		 critdisp[1] );
     } else {
       errRep(FUNC_NAME, "Failed to get parameter MAXLORZ from config file",
 	     status);
-      return;
+      goto CLEANUP1;
     }
   }
   /* Convert to dispersion */
-  critdisp[1] = FWHM2DISP( critdisp[1] );
+  if ( critdisp[1] != VAL__BADD ) {
+    critdisp[1] = FWHM2DISP( critdisp[1] );
+  }
 
   /* Do initial estimates only */
-  if( estimate_only ) {
-    *estimate_only = NO;
-    astMapGet0I( keymap, "ESTIMATE_ONLY", estimate_only );
+  *estimate_only = NO;
+  if ( astMapGet0I( keymap, "ESTIMATE_ONLY", estimate_only ) ) {
     if ( *status == SAI__OK ) {
       msgOutiff( MSG__VERB, "", "... ESTIMATE_ONLY=%d", status,
 		 *estimate_only );
@@ -745,14 +775,13 @@ static void get_fit1par( int *axis, double *range,
       errRep(FUNC_NAME,
          "Failed to get parameter ESTIMATE_ONLY from config file",
 	     status);
-      return;
+      goto CLEANUP1;
     }
   }
 
   /* Do initial estimates only */
-  if( model_only ) {
-    *model_only = NO;
-    astMapGet0I( keymap, "MODEL_ONLY", model_only );
+  *model_only = NO;
+  if ( astMapGet0I( keymap, "MODEL_ONLY", model_only ) ) {
     if ( *status == SAI__OK ) {
       msgOutiff( MSG__VERB, "", "... MODEL_ONLY=%d", status,
 		 *model_only );
@@ -760,122 +789,241 @@ static void get_fit1par( int *axis, double *range,
       errRep(FUNC_NAME,
          "Failed to get parameter MODEL_ONLY from config file",
 	     status);
-      return;
+      goto CLEANUP1;
     }
   }
+
+CLEANUP1:
 
   if( keymap ) keymap = astAnnul( keymap );
 
 }
 
+static void get_userval ( smfData *data, int axis, AstMapping **wcsmap,
+			  const char *userfile, smf_math_function fid, 
+			  int *prange, double *fixval, int *fixmask, 
+			  int *status )
 
-static void get_userval ( int in, smf_math_function fid, int ncomp, AstKeyMap **usrvalmap,
-			  smfArray *pardata, int *status )
 /*
 ** User supplied values. The routine opens a keymap file with parameters
 ** values either to use as initial estimates or to keep fixed in the fit.
-** Parameters are indicated by a letter and a number (1..) indicating
-** the component, with '0' meaning to apply to all components.
-** Gauss*   a = amplitude, x = position, f = fwhm, s = skewness (hermite h3),
-**          k = kurtosis (hermite h4),
-** Voigt    a = amplitude, x = position, f = fwhm, l = lorentzian (voigt).
-** Polynominal: c0, c1, c2, ... = c0 + c1*x + c2*x^2 + ...
-** Optional zerolevel: z0, z1, z2 ( = z0 + z1*x + z2*x^2 )
+** Parameters are indicated by a letter (see help above and smf_fit1d.h.
 **
-** A full entry will be of the form 'a1 = (val1, val2)'. Val1 is the value
-** for the given parameter; Val2 = 0 (fix, do not fit), 1 (use as initial
-** estimate, but fit). Alternatively, the entry can be 'a1 = val1' for
-** which val2 will default to 0 (fixed).
+** Entries can have the form: comp#.par = value or fix#.par = [0.1]
 **
 */
 {
 
-  /* Allowed ids for non-polynomials */
-  const char pars[] = { 'A', 'X', 'F', 'S', 'K', 'L' };
-  int npar=sizeof(pars)/sizeof(pars[0]);
+  char    cpar;                        /* Char code for parameter        */
 
-  /* Sequence nr of par in ndf pars */
-  int ploc[] = {  1,   2,   3,   4,   5,   4 };
+  Grp    *grp = NULL;                  /* Group to hold config values    */
+  int     added;                       /* Number of names added to group */
+  int     flag;                        /* Flag                           */
+  size_t  size;                        /* Size of group                  */
+  char   *value;                       /* Pointer to GRP element buffer  */
 
-  int     icomp, ipar;                 /* Counters */
-  char    cpar;                        /* Char code for parameter */
-  double  dval[2];                     /* For returned value */
+  double  pixscale;                    /* Pixel-scale */
 
-  Grp    *grp = NULL;                  /* Group to hold config values */
-  size_t  size;                        /* Size of group */
-  char   *value;                       /* Pointer to GRP element buffer */
-  char   buffer[ GRP__SZNAM ];         /* Buffer for GRP element */
+  AstKeyMap *uvalkmap=NULL;   /* Pointer to keymap of userval settings   */
+  AstKeyMap *parkmap =NULL;            /*  Hash for par names used       */
 
   if (*status != SAI__OK) return;
 
-  if ( in == 1 ) {
-    msgOutif( MSG__VERB, " ", "Reading user supplied parameters file.",
-	      status );
-    /* Attempt to read the specified defaults file into a GRP group. */
-    grp = grpNew( "GRP", status );
+  /* Find pixel scale */
+  {
+    int    iaxis = axis - 1;             /* 0-based axis nr to fit along */
+    double dval1[2], dval2[2];
+    double centre = (int) (data->dims[iaxis]/2.0+0.51); /* Centrish pixel */
+    dval1[0] = centre - 1;
+    dval1[1] = centre + 1;
+    astTran1( *wcsmap, 2, dval1, 1, dval2 );
+    if (*status != SAI__OK) return;
 
-    /* Read a group of configuration setting from USERVAL */
-    kpg1Gtgrp( "USERVAL", &grp, &size, status );
+    pixscale = fabs(0.5*(dval2[1]-dval2[0]));
+  }
 
-    /* If no group was supplied, just annul any PAR__NULL error. */
-    if( *status == PAR__NULL) {
-      *status = SAI__OK;
-      errAnnul( status );
-      goto CLEANUP3;
+  /* Set up arrays */
+  for ( int i = 0; i < MAXPAR; i++ ) {
+    fixval[i] = VAL__BADD;
+    fixmask[i] = 0;
+  }
 
-      /* If a group was supplied, see if it consists of the single value "def".
-	 If so, we will leave the KeyMap unchanged. */
-    } else if (size > 0 ) {
-      value = buffer;
-      if( size == 1 ) {
-	grpGet( grp, 1, 1, &value, sizeof(buffer), status );
-      } else {
-	strcpy( value, " " );
+  if ( strlen(userfile) <= 0 ) {
+    goto CLEANUP3;
+  }
+
+  /* Set up keymap with parameter name as key and corresponding parameter 
+  ** ndf "plane" as value, effective creating an associative or hash array 
+  */
+  parkmap = astKeyMap( "KeyError=1,KeyCase=0" );
+  int npar=sizeof(parkeys)/sizeof(parkeys[0]);
+  for ( int ikey = 0; ikey < npar; ikey++ ) {
+    int iplane;
+    astMapPut0I( parkmap, parkeys[ikey], parloc[ikey], NULL );
+    astMapGet0I( parkmap, parkeys[ikey], &iplane );
+  }
+
+  msgOutif( MSG__VERB, " ", "Reading user supplied parameters file.", status );
+
+  /*
+  ** Read in parameter file 
+  */
+#if (USERVALDEFAULTFILE) 
+
+  uvalkmap = kpg1Config( "USERVAL", "$SMURF_DIR/smurf_fit1d_uval.def", NULL, status );
+
+#else
+
+  /* Set up the group */
+  grp = grpNew( "GRP", status );
+  grpGrpex( userfile, NULL, grp, &size, &added, &flag, status );
+
+  /* Create a KeyMap from this group. */
+  kpg1Kymap( grp, &uvalkmap, status );
+  
+  /* Delete the group. */
+  grpDelet( &grp, status );
+
+#endif
+
+  /* Obtain parameters from keymap when non-NULL pointers given */
+  int nkey = astMapSize(  uvalkmap );
+
+  for( int ikey = 0; ikey < nkey; ikey++ ) {
+
+    /* Read the base key from the map */
+    const char *bkey = astMapKey( uvalkmap, ikey );
+
+    /* These two are keymaps themselves */
+    if ( strncmp( bkey, "COMP", 4 ) == 0 || 
+         strncmp( bkey, "FIX", 3  ) == 0 ) {
+
+      AstObject *obj = NULL;
+      astMapGet0A( uvalkmap, bkey, &obj );
+      AstKeyMap *compkmap = (AstKeyMap *) obj;
+
+      /* Get the values */
+      int nkey2 = astMapSize( compkmap );
+
+      double  dval;                        /* For returned key value */  
+      int iplane;                          /* From par hash above    */
+
+      for( int ikey2 = 0; ikey2 < nkey2; ikey2++ ) {
+
+        /* Get parameter key  and corresponding ndf plane*/
+	const char *pkey = astMapKey( compkmap, ikey2 );
+  
+        dval = VAL__BADD;
+	astMapGet0D( compkmap, pkey, &dval );
+	astMapGet0I( parkmap,  pkey, &iplane ); ;
+
+	if ( *status != SAI__OK ) {
+          goto CLEANUP3;
+        }
+
+	if ( strncmp( bkey, "COMP", 4 ) == 0 &&  dval != VAL__BADD ) {
+
+          int icomp;
+          sscanf(bkey+4, "%d", &icomp);
+	  fixval[(icomp-1)*NPAR+iplane-1] = dval;
+
+	} else if ( strncmp( bkey, "FIX", 3 ) == 0 &&  dval != VAL__BADD ) {
+
+          int icomp;
+          sscanf(bkey+3, "%d", &icomp);
+          /* fixmask 1: fixed; 0: free hence fit */
+          fixmask[(icomp-1)*NPAR+iplane-1] = 0;
+          if ( dval != 0.0 ) {
+	    fixmask[(icomp-1)*NPAR+iplane-1] = 1;
+	  }
+
+	}
+
       }
 
-      /* Otherwise, store the configuration settings in the KeyMap. */
-      if( ! astChrMatch( value, "DEF" ) ) {
-	kpg1Kymap( grp, usrvalmap, status );
+      if( compkmap ) compkmap = astAnnul( compkmap );
+
+    }
+
+  } /* End loop over keyfile entries */
+
+
+  /* Convert coordinate-based values to pixel-based values */
+
+  for ( int icomp = 0; icomp < MAXCOMPS; icomp++ ) {
+
+    int offset = icomp*NPAR;
+
+    for ( int i = 0; i < NPAR; i++ ) {
+
+      double cval = fixval[offset+i];
+      double pval = cval;
+
+      if ( cval != VAL__BADD ) {
+	if ( i == 1 ) {
+	  convert_coord_to_pixel ( wcsmap, &cval, 1, &pval, status );
+	} else if ( i == 2 ||
+		    ( fixval[offset+NPAR-1] == SMF__MATH_VOIGT && i == 3 ) ||
+		    ( fixval[offset+NPAR-1] == VAL__BADD && 
+		      fid == SMF__MATH_VOIGT && i == 3 ) ) {
+	  pval = FWHM2DISP(cval/pixscale);
+	}
+	fixval[offset+i] = pval;
       }
-    } else {
-      goto CLEANUP3;
+
+      char fixed[7] = "free";
+      if ( fixmask[offset+i] == 1 ) 
+	one_strlcpy ( fixed, "fixed", sizeof(fixed), status );
+
+      if ( cval != VAL__BADD )
+	msgOutiff( MSG__DEBUG, "", 
+		 "... COMP%d.par%d input %.4f: stored as %f (%s)\n", 
+		   status, icomp+1, i+1, (float) cval, (float) pval, fixed );
+      else if ( fixmask[offset+i] == 1 )
+	msgOutiff( MSG__DEBUG, "", 
+		 "... COMP%d.par%d: (%s)\n", status, icomp+1, i+1, fixed );
+
     }
   }
 
-  int nkey = astMapSize(  *usrvalmap );
-  int ikey;
-  for( ikey = 0; ikey < nkey; ikey++ ) {
 
-    const char *key = astMapKey( *usrvalmap, ikey );
-    sscanf( key,"%c%d", &cpar, &icomp );
+  /* Unfortunately need to check here whether any fixed centre position 
+     given is in range since the lsqfit routine otherwise throws an error
+     -5. Remove those and warn the user */
 
-    int  nval = 0;
-    if ( astMapGet1D( *usrvalmap, key, 2, &nval, dval ) ) {
-      if ( nval < 2 ) {
-	dval[1] = 0;
+  int removed = 0;
+  for ( int icomp = 0; icomp < MAXCOMPS; icomp++ ) {
+
+    int offset = icomp*NPAR;
+    
+    if ( fixval[offset+1] != VAL__BADD &&
+	 ( fixval[offset+1] < prange[0] || 
+	   fixval[offset+1] > prange[1] ) ) {
+      for ( int j = offset+NPAR; j < MAXPAR-3; j++ ){
+	fixval[j-NPAR] = fixval[j];
+	fixmask[j-NPAR] = fixmask[j];
       }
-      if ( *status == SAI__OK ) {
-	msgOutiff( MSG__VERB, "", "... %c%d=%f  %d", status,
-		   cpar, icomp, (float) dval[0], (int) dval[1] );
+      for ( int j = MAXPAR-3-NPAR; j < MAXPAR-3; j++ ){
+	fixval[j-NPAR] = VAL__BADD;
+	fixmask[j-NPAR] = 0;
       }
-      if ( fid != SMF__MATH_POLYNOMIAL ) {
-	/*          indf =
-	** iplane = ploc[ipar];
-	** fill_parndfs_plane();
-	** fitmask[] = (int) dval[2]/ABS(dval[2])*((int) ABS(dval[2]+0.5));
-	*/
-      }
-    } else {
-      *status = SAI__OK;
+      removed++;
+      msgOutf( "", 
+       "***SKIPPING*** fixed component %d: centre outside fit-range in %s\n",
+	       status, (int) icomp+removed, userfile );
+
+      /* reset to current position again */
+      icomp--;
     }
-
   }
 
- CLEANUP3:
+
+CLEANUP3:
   if ( grp != NULL ) grpDelet( &grp, status );
+  if ( parkmap ) parkmap = astAnnul( parkmap );
+  if ( uvalkmap ) uvalkmap = astAnnul( uvalkmap );
 
 }
-
 
 static void  map_axis_to_wcs ( smfData *data, int axis, AstMapping **wcsmap,
 			       int *status )
@@ -964,6 +1112,12 @@ static void convert_range_to_pixels ( AstMapping **wcsmap, double *range,
   prange[0] = (int) (lrange[0]+0.5);
   prange[1] = (int) (lrange[1]+0.5);
 
+  if ( prange[0] > prange[1] ) {
+    int temp = prange[0];
+    prange[0] = prange[1];
+    prange[1] = temp;
+  }
+
   if ( range[0] == VAL__BADD ) {
      msgOutiff(MSG__VERB, " ",
           "Range undefined => Full pixel range: %d to %d\n",
@@ -982,10 +1136,10 @@ static void convert_range_to_pixels ( AstMapping **wcsmap, double *range,
 }
 
 
-static void convert_pixel_to_coord ( AstMapping **wcsmap, double *pixel,
+static void convert_pixel_to_coord ( AstMapping **wcsmap, const double *pixel,
 				     int nval, double *coord, int *status )
 /*
-** Convert given pixels (running 1..n) too coordinate values along the
+** Convert given pixels (running 1..n) to coordinate values along the
 ** fit axis.
 */
 {
@@ -994,7 +1148,7 @@ static void convert_pixel_to_coord ( AstMapping **wcsmap, double *pixel,
   /* Change pixels to array indices: if no mapping exists interpret
      range as grid values */
   if ( wcsmap ) {
-      astTran1( *wcsmap, 2, pixel, 1, coord );
+      astTran1( *wcsmap, nval, pixel, 1, coord );
   } else {
     msgOut("",
 	   "*WARNING* No valid axis mapping: returned values are pixels",
@@ -1007,8 +1161,8 @@ static void convert_pixel_to_coord ( AstMapping **wcsmap, double *pixel,
 }
 
 
-static void convert_coord_to_pixel ( AstMapping **wcsmap, double *coord,
-				     int nval, double *pixel, int *status )
+static void convert_coord_to_pixel ( AstMapping **wcsmap, const double *coord,
+                                     int nval, double *pixel, int *status )
 /*
 ** Convert given coordinate values to pixels (running 1..n) along the
 ** fit axis.
@@ -1018,7 +1172,7 @@ static void convert_coord_to_pixel ( AstMapping **wcsmap, double *coord,
 
   /* Only if valid mapping exists */
   if ( wcsmap ) {
-      astTran1( *wcsmap, 2, coord, 0, pixel );
+    astTran1( *wcsmap, nval, coord, 0, pixel );
   } else {
     msgOut("",
 	   "*WARNING* No valid axis mapping: values not converted",
@@ -1270,19 +1424,27 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
     }
   }
 
+ 
+
+
  CLEANUP2:
   if( cgrp != NULL ) grpDelet( &cgrp, status);
   if( pgrp != NULL ) grpDelet( &pgrp, status);
 
+
 }
 
 
-static void convert_fitted_values( smfData *data,
-			  int axis, int ncomp, AstMapping **wcsmap,
-			  smfArray *pardata, int *status )
+static void convert_parunits( int mode, smfData *data,
+			      int axis, int ncomp, AstMapping **wcsmap,
+			      smfArray *pardata, int *status )
 /*
-** This routine converts the pixel-based fitted parameters to coordinate
-** based ones: e.g. pixels (1..n) along the third axis to velocities
+** Input parameters and parameters ndfs are in physical units whereas
+** the program uses pixels. This routine converts the pixel-based 
+** parameters to coordinate based ones or the reverse: 
+** e.g. pixels (1..n) along the third axis to velocities.
+**   mode =  1: convert pixel-based to coordinate-based values
+**        =  0: convert coordinate-based to pixel-based values
 */
 {
   int      idim;                 /* Index of dimension */
@@ -1296,8 +1458,9 @@ static void convert_fitted_values( smfData *data,
   int      nprofiles = 1;        /* Number of profiles fitted */
   size_t   dstride = 1;          /* Data stride: separation of
                                     pixels along AXIS in data cube */
-  double  *pixval, *pixerr;      /* Array for pixel values and errors*/
-  double  *wcsval, *wcserr;      /* Array for coordinate values and errors */
+  double  *inpval, *inperr;      /* Array for pixel values and errors*/
+  double  *fidval, *fiderr;      /* Array for function id values and errors*/
+  double  *outval, *outerr;      /* Array for coordinate values and errors */
 
   double   dval1[2], dval2[2];   /* Doubles... */
   double   centre, pixscale;     /* Pixelscale */
@@ -1307,8 +1470,7 @@ static void convert_fitted_values( smfData *data,
 
   /* No mapping exists between pixel and coordinate */
   if ( !wcsmap ) {
-    msgOut(" ",
-	   "(***WARNING*** Results are in pixels!!!", status );
+    msgOut(" ", "(***WARNING*** Results are in pixels!!!", status );
     return;
   }
 
@@ -1334,10 +1496,12 @@ static void convert_fitted_values( smfData *data,
   pixscale = fabs(0.5*(dval2[1]-dval2[0]));
 
   /* Allocate working buffers */
-  pixval = astMalloc( (nprofiles)*sizeof( *pixval ) );
-  pixerr = astMalloc( (nprofiles)*sizeof( *pixerr ) );
-  wcsval = astMalloc( (nprofiles)*sizeof( *wcsval ) );
-  wcserr = astMalloc( (nprofiles)*sizeof( *wcserr ) );
+  inpval = astMalloc( (nprofiles)*sizeof( *inpval ) );
+  inperr = astMalloc( (nprofiles)*sizeof( *inperr ) );
+  fidval = astMalloc( (nprofiles)*sizeof( *fidval ) );
+  fiderr = astMalloc( (nprofiles)*sizeof( *fiderr ) );
+  outval = astMalloc( (nprofiles)*sizeof( *outval ) );
+  outerr = astMalloc( (nprofiles)*sizeof( *outerr ) );
 
   /* Cycle true the extension cubes with the fitted values.
   ** dstride gives the number of elements that seperate adjacent
@@ -1347,67 +1511,88 @@ static void convert_fitted_values( smfData *data,
   ** profile in the subcube.
   */
 
-
   /* skip COMP_0 diagnostics extension */
-  for ( icomp = 1; icomp < ncomp+1; icomp++ ) {
+
+  for ( icomp = 1; icomp <= ncomp; icomp++ ) {
+
+
+    /* Read function id plane values */
+    ndf2array( pardata->sdata[icomp], axis, (int) NPAR-1, 0, fidval, fiderr,
+	       status );
 
     /* Loop over planes in each component: 1=Centre, 2=Dispersions, etc.
        skip 0=Amp and final plane with FID */
+
     for ( ipar = 1; ipar < NPAR-1; ipar++ ) {
 
-      /* Go through the process twice: first to get values
+      /* Call ndf2array twice: once to read the values
 	 then to write the converted values back */
 
       /* Read fitted values */
-      ndf2array( pardata->sdata[icomp], axis, ipar, 0, pixval, pixerr,
+      ndf2array( pardata->sdata[icomp], axis, ipar, 0, inpval, inperr,
 		 status );
 
+      /* All fitted "centre-like" values need to be converted to coords */
       if (ipar == 1) {
-	/* Fitted centre values */
 
-	astTran1( *wcsmap, (int) nprofiles, pixval, 1, wcsval );
+	astTran1( *wcsmap, (int) nprofiles, inpval, mode, outval );
 	if (*status != SAI__OK) return;
 
 	/* Errors scale with pixscale */
 	for ( iprof = 0; iprof < nprofiles; iprof++ ) {
-	  if ( pixerr[iprof] != VAL__BADD) {
-	    wcserr[iprof] = pixerr[iprof]*pixscale;
+	  if ( inperr[iprof] != VAL__BADD) {
+            if ( mode == 1) 
+	      outerr[iprof] = inperr[iprof]*pixscale;
+            else
+	      outerr[iprof] = inperr[iprof]/pixscale;
 	  } else {
-	    wcserr[iprof] = VAL__BADD;
+	    outerr[iprof] = VAL__BADD;
 	  }
 	}
 
       } else {
-	/* Assume that all remaining scale with pixscale for now */
 
 	for ( iprof = 0; iprof < nprofiles; iprof++ ) {
-	  if ( pixval[iprof] != VAL__BADD) {
-	    wcsval[iprof] = DISP2FWHM(pixval[iprof]*pixscale);
+
+	  /* "width-like" parameters scale with pixscale */      
+	  if ( ipar == 2 ||
+	       ( fidval[iprof] == SMF__MATH_VOIGT && ipar == 3 ) ) {
+	    outval[iprof] = VAL__BADD;
+	    outerr[iprof] = VAL__BADD;
+	    if ( inpval[iprof] != VAL__BADD) {
+	      if ( mode == 1) 
+		outval[iprof] = DISP2FWHM(inpval[iprof]*pixscale);
+	      else 
+		outval[iprof] = FWHM2DISP(inpval[iprof]/pixscale);
+	    }
+	    if ( inperr[iprof] != VAL__BADD) {
+	      if ( mode == 1) 
+		outerr[iprof] = DISP2FWHM(inperr[iprof]*pixscale);
+	      else 
+		outerr[iprof] = FWHM2DISP(inperr[iprof]/pixscale);
+	    }           
+	    
+	  /* Leave the rest alone */
 	  } else {
-	    wcsval[iprof] = VAL__BADD;
+	    outval[iprof] = inpval[iprof];
+	    outerr[iprof] = inperr[iprof];
 	  }
 
-	  if ( pixerr[iprof] != VAL__BADD) {
-	    wcserr[iprof] = DISP2FWHM(pixerr[iprof]*pixscale);
-	  } else {
-	    wcserr[iprof] = VAL__BADD;
-	  }
 	}
 
       }
 
       /* Write converted values back */
-      ndf2array( pardata->sdata[icomp], axis, ipar, 1, wcsval, wcserr,
+      ndf2array( pardata->sdata[icomp], axis, ipar, 1, outval, outerr,
 		 status );
 
     } /* end loop over parameters */
 
   } /* end loop over components */
 
-  pixval = astFree( pixval );
-  pixerr = astFree( pixerr );
-  wcsval = astFree( wcsval );
-  wcserr = astFree( wcserr );
+  inpval = astFree( inpval );  inperr = astFree( inperr );
+  fidval = astFree( fidval );  fiderr = astFree( fiderr );
+  outval = astFree( outval );  outerr = astFree( outerr );
 
 }
 

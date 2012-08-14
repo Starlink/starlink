@@ -143,7 +143,7 @@
 *              c0 = sqrt(6.0)/4.0, c2 = -sqrt(6.0), c4 = sqrt(6.0)/3.0
 *
 *
-*     - Voit (fid=SMF__MATH_VOIGT):
+*     - Voigt (fid=SMF__MATH_VOIGT):
 *              fpar = { Amp A, Xcen xc, Disp s, Lor l  }
 *                 V = Integral {Gaussian * Lorentzian }
 *                 g = (x-xc)/s
@@ -815,6 +815,9 @@ static double voigt( double  X,
 /* Amplitude        Center      dispersions                   */
 /* A = fpar[0],  X0 = fpar[1],  s = fpar[2], l = fpar[3]      */
 /*                                                            */
+/* The Voigt function is also the real part of the Faddeeva   */
+/* or complex error function:                                 */
+/*      w(z) = exp(-z2) erfc(iz),                             */
 /*------------------------------------------------------------*/
 {
    int      npar = 4;                            /* Per component */
