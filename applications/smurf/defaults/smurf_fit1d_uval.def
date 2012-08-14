@@ -1,0 +1,153 @@
+#+
+#  Name:
+#     smurf_fit1d_uval.def
+
+#  Purpose:
+#     User defined fixed/initial estimates for SMURF application FIT1D.
+
+#  Description:
+
+#     This file is a template for a keymap file that has user-defined
+#     values for parameters of functions to be fitted using FIT1D. 
+#     The values can be used as initial estimates (fix#=0) or kept
+#     fixed (i.e. not fitted) in the actual fit.
+#
+#     Up to 10 components can be fitted along each profile which makes
+#     for a rather unwieldy defaults file. It is hoped that a syntax
+#     like comp1 = ( a=..., b=...) will become available.
+#
+
+
+#  Notes:
+
+#  Authors:
+#     RPT: Remo Tilanus (JAC, Hawaii)
+
+#  History:
+#     2012-07-27 (RPT):
+#        Original version.
+
+#-
+
+# Function id: gaussian, gausshermite1, gausshermite2, voigt.
+# IMPORTANT: for gaussian, gausshermite1, and gausshermite2 fits
+# the function can differ per component. However, voigt fits can not
+# be mixed with the other types! 
+#
+# Internally FIT1D treats a gaussian and gausshermite1 as a gausshermite2 
+# with, respectively, h3&h4 or h4 fixed at 0 during the fit.
+
+
+comp1.fid = <undef>
+
+# Parameter names are described in the help item "Fitted functions":
+#                     comp.fid      comp.par
+#     Gauss:              1        a, b, c
+#     Gausshermite1:      2        a, b, c, h3
+#     Gausshermite2:      3        a, b, c, h4
+#     Voigt:              4        a, b, c, l
+#
+# The "fix"#.par parameter can have a value of: 
+#      0 (use as initial estimate, but fit).
+#      1 (fix parameter at given value, do not fit) or 
+#
+comp1.a  = <undef>
+comp1.b  = <undef>
+comp1.c  = <undef>
+comp1.h3 = <undef>
+comp1.h4 = <undef>
+comp1.l  = <undef>
+fix1.a   = <undef>
+fix1.b   = <undef>
+fix1.c   = <undef>
+fix1.h3  = <undef>
+fix1.h4  = <undef>
+fix1.l   = <undef>
+
+#
+# Repeat for other components
+#
+
+comp2.fid = <undef>
+comp2.a  = <undef>
+comp2.b  = <undef>
+comp2.c  = <undef>
+comp2.h3 = <undef>
+comp2.h4 = <undef>
+comp2.l  = <undef>
+fix2.a   = <undef>
+fix2.b   = <undef>
+fix2.c   = <undef>
+fix2.h3  = <undef>
+fix2.h4  = <undef>
+fix2.l   = <undef>
+
+comp3.fid = <undef>
+comp3.a  = <undef>
+comp3.b  = <undef>
+comp3.c  = <undef>
+comp3.h3 = <undef>
+comp3.h4 = <undef>
+comp3.l  = <undef>
+fix3.a   = <undef>
+fix3.b   = <undef>
+fix3.c   = <undef>
+fix3.h3  = <undef>
+fix3.h4  = <undef>
+fix3.l   = <undef>
+
+comp4.fid = <undef>
+comp4.a  = <undef>
+comp4.b  = <undef>
+comp4.c  = <undef>
+comp4.h3 = <undef>
+comp4.h4 = <undef>
+comp4.l  = <undef>
+fix4.a   = <undef>
+fix4.b   = <undef>
+fix4.c   = <undef>
+fix4.h3  = <undef>
+fix4.h4  = <undef>
+fix4.l   = <undef>
+
+comp5.fid = <undef>
+comp5.a  = <undef>
+comp5.b  = <undef>
+comp5.c  = <undef>
+comp5.h3 = <undef>
+comp5.h4 = <undef>
+comp5.l  = <undef>
+fix5.a   = <undef>
+fix5.b   = <undef>
+fix5.c   = <undef>
+fix5.h3  = <undef>
+fix5.h4  = <undef>
+fix5.l   = <undef>
+
+comp6.fid = <undef>
+comp6.a  = <undef>
+comp6.b  = <undef>
+comp6.c  = <undef>
+comp6.h3 = <undef>
+comp6.h4 = <undef>
+comp6.l  = <undef>
+fix6.a   = <undef>
+fix6.b   = <undef>
+fix6.c   = <undef>
+fix6.h3  = <undef>
+fix6.h4  = <undef>
+fix6.l   = <undef>
+
+comp7.fid = <undef>
+comp7.a  = <undef>
+comp7.b  = <undef>
+comp7.c  = <undef>
+comp7.h3 = <undef>
+comp7.h4 = <undef>
+comp7.l  = <undef>
+fix7.a   = <undef>
+fix7.b   = <undef>
+fix7.c   = <undef>
+fix7.h3  = <undef>
+fix7.h4  = <undef>
+fix7.l   = <undef>
