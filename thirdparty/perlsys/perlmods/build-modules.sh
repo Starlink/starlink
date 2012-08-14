@@ -20,7 +20,13 @@ fi
 
 # First do the CPAN dependencies required
 # to run Starlink perl applications
-for i in `cat ./cpan.deps`
+# We include OS-specific entries
+osdeps=cpan.deps.`uname`
+if [ ! -e $osdeps ]
+then
+    osdeps=""
+fi
+for i in `cat ./cpan.deps $osdeps`
 do
     ${cpanm} $i
     if (( $? ))
