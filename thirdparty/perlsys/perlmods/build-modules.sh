@@ -20,19 +20,26 @@ fi
 
 # First do the CPAN dependencies required
 # to run Starlink perl applications
-# We include OS-specific entries
-osdeps=cpan.deps.`uname`
-if [ ! -e $osdeps ]
-then
-    osdeps=""
-fi
-for i in `cat ./cpan.deps $osdeps`
+# We include OS-specific entries and prefer explicit references to
+# general module references.
+for root in cpan.deps cpan.deps.`uname`
 do
-    ${cpanm} $i
-    if (( $? ))
+    if [ -e explicit-$root ]
     then
-        echo Failed to install $i
-        exit 1
+        root=explicit-$root
+    fi
+    if [ -e $root ]
+    then
+        echo Installing modules from $root
+        for i in `cat $root`
+        do
+            ${cpanm} $i
+            if (( $? ))
+            then
+                echo Failed to install $i
+                exit 1
+            fi
+        done
     fi
 done
 
