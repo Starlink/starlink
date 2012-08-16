@@ -17,6 +17,7 @@
 # Location of Perl and support libraries
 perlroot=${STARLINK_DIR}/Perl/bin/
 
+starperl=${perlroot}/perl
 cpanm=${perlroot}/cpanm
 
 # Make sure that CPANM is up to date
