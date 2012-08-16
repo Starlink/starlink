@@ -13744,7 +13744,7 @@ iraf! {
 
          parameter single {
             type _LOGICAL
-            vpath PROMPT
+            vpath DEFAULT
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Statistics at a single point?}
