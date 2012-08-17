@@ -97,6 +97,22 @@ minwidth = 1.88
 
 maxlorz = <undef>
 
+# Limits on the Gausshermite parameters h3 (~skew) and peakiness (~h4).
+# High values here typically mean that multi-component fit may be better
+# or,in case of h3, large negative features. It is possible for the
+# fitting routine to compensate for a negative wing (due to h3) with a 
+# secondary positive component. I.e. unless a fit of negative wings is
+# desired it is better to restrict h3. Small values for h3 and h4 are
+# probably better left fixed at 0. Whenever a hermite1 or hermite2 is
+# being fitted and the fitted parameter is out of bounds, the fitting
+# routine will retry with them fixed to 0. The limits below are limits
+# on the absolute value of h3 and h4:
+
+absh3min = 0.01
+absh3max = 0.5
+absh4min = 0.01
+absh4max = 0.35
+
 # This applies to Gausshermites, which, by their nature, can have negative 
 # "wings" on profiles. Those may indeed be present in the data and wanted 
 # to be fitted, but on many occasions gausshermites are used with the aim

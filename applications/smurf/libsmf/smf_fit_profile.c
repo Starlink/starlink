@@ -147,6 +147,12 @@
 #define MAXDEBUGINFO 0
 
 /*
+** Direct printout debug info on details fitting program for development
+** only. Use on single spectra!
+*/
+#define PRINTFOUT 0
+
+/*
 ** Switch off MULTITHREADING. This may help troubleshoot issues.
 */
 #define MULTITHREADED 1
@@ -182,15 +188,14 @@ static void FitProfileThread( void *job_data_ptr, int *status );
 static void generalize_gauss_fit( void *pfcntrl, int *status );
 
 static int getestimates( const double fdata[], const float weight[], int ndat,
-                         double *parlist, int npar, int ncomp, double rms,
-                         double critamp, double critdisp[],
+                         double *parlist, int npar, int ncomp, void *pfcntrl,
                          const int smoothingpar[], int numq );
 
 static int dolsqfit(  smf_math_function fid, const double pcoord[], 
                       const double fdata[], float *weight,  int npts, 
                       double *parlist, double *errlist, const int fixmask[], 
-                      int npar, int *ncomp, const int range[], double critamp,
-                      double critdisp[], int *fitopt, int *status );
+                      int npar, int *ncomp, void *pfcntrl, int *fitopt, 
+		      int *status );
 
 static void adjustestimates( smf_math_function fid, int nfound, 
                              double *parlist, int npar );
@@ -214,8 +219,8 @@ static double getresidual( const double fdata[], int ndat,
 			   double zerolev );
 
 
-void smf_fit_profile( smfData  *data, int axis, int range[], int ncomp,
-		      smfArray *pardata, void *pfcntrl, int *status )
+void smf_fit_profile( smfData  *data, smfArray *pardata, void *pfcntrl, 
+		      int *status )
 /* Top-level subroutine to fite profiles in a data cube along the specified
 ** axis. The routine will slice up the data into chucks to be process
 ** by each thread.
@@ -251,6 +256,10 @@ void smf_fit_profile( smfData  *data, int axis, int range[], int ncomp,
 
   fcntrl = (fitStruct *) pfcntrl;
 
+  /* Copy some variables to local ones */
+  int axis  = fcntrl->axis;
+  int ncomp = fcntrl->ncomp;
+
   /*
   **  Let's start: Find the number of cores/processors available and 
   **  create a pool of threads of the same size.
@@ -274,9 +283,12 @@ void smf_fit_profile( smfData  *data, int axis, int range[], int ncomp,
   /* Which axis */
   iaxis = axis-1;
   npts = (data->dims)[ (int) (iaxis) ];
-  if ( range[0] == 0 && range[1] == 0 ) {
-    range[0] = 1;
-    range[1] = npts;
+  int range[2] = { 1, npts };
+  if ( fcntrl->lolimit[1] != 0 && fcntrl->lolimit[1] != VAL__BADI ) {
+    range[0] = NINT(fcntrl->lolimit[1]);
+  }
+  if ( fcntrl->hilimit[1] != 0 && fcntrl->hilimit[1] != VAL__BADI ) {
+    range[1] = NINT(fcntrl->hilimit[1]);
   }
 
   /* Sanity check: make sure the axis has any extent */
@@ -664,7 +676,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
       /* Inform user about progress every 1000 profiles: by default
          for the first and last thread only, unless debug output is 
          requested */ 
-     if ( profid % 1000 == 0) {
+      if ( profid % 1000 == 0) {
         if ( ijob == 1 || ijob == threads )
 	  msgOutf(" ",
 	     "(FitProfileThread %3d) ...at profile %6d - %6d of %6d (i=%8d)",
@@ -688,6 +700,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
       posmax = 0;
       zerolev = 0.0;
       zeronum = 0;
+      size_t nbad = 0;
 
       for ( i = 0; i < npts && model_only != YES; i++ ) {
 
@@ -752,7 +765,6 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
           /* else: no clip */
 	  }
 
-
           if ( value != VAL__BADD ) {
             /* find maximum */
             if ( maxval == VAL__BADD || value > maxval ) {
@@ -768,6 +780,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
             weight[i] = 0.0;
 	  }
 	} else {
+          nbad++;
 	  weight[i] = 0.0;
 	}
 
@@ -781,7 +794,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 #if (FITZEROLEVEL)
       if (zeronum > 0) {
 	zerolev /= zeronum;                    /* Mean of all border pixels */
-      } else if ( model_only != YES ) {
+      } else {
 #if (MAXDEBUGINFO)
         msgOutiff(MSG__DEBUG," ",
 	 "(FitProfileThread %d) Profile %d edge of fit box filled with blanks\n0.0 substituded for zero level",
@@ -794,7 +807,6 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
       zerolev = 0.0;
 #endif
 
-
       /* 
       ** Setup for the fit.
       */
@@ -802,8 +814,14 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
       int nfound = 0;              /* Number of components found     */
       int nestim = 0;              /* Number of initial estimates    */
 
-      /* If no fit errors */
-      if ( iters >= 0 ) {
+      /* Initialize parameters */
+      for ( i = 0; (int) i < MAXPAR; i++ ) {
+	parlist[i] = 0.0;
+        errlist[i] = 0.0;
+      }
+
+      /* If no fit errors and enough points */
+      if ( iters >= 0 && (npts-nbad) > NPAR ) {
 
 
         /* 
@@ -837,8 +855,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 	    /* Get initial Estimates                  */
 	    /*----------------------------------------*/
 	    nestim = getestimates( fdata, weight, npts, parlist, npar,
-				   mcomp, fcntrl->rms, fcntrl->critamp, 
-                                   fcntrl->critdisp, smoothingpar,numq );
+				   mcomp, fcntrl, smoothingpar, numq );
 
 #if (MAXDEBUGINFO)
 	    msgOutiff(MSG__DEBUG, " ",
@@ -850,8 +867,8 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 	    if (nestim == 0) {
 	      parlist[0] = maxval;
 	      parlist[1] = posmax;
-              if ( fcntrl->critdisp[0] != VAL__BADD ) {
-	        parlist[2] = 1.5*fcntrl->critdisp[0];
+              if ( fcntrl->lolimit[2] != VAL__BADD ) {
+	        parlist[2] = 1.5*fcntrl->lolimit[2];
 	      } else {
 	        parlist[2] = 1.2;
 	      }
@@ -900,8 +917,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 #endif
 	      iters = dolsqfit( SMF__MATH_GAUSS, pcoord, fdata, weight, npts, 
 				parlist2, errlist2, fixmask2, npar2,  
-				&nfound2, range, fcntrl->critamp, 
-                                fcntrl->critdisp, fitopt, status );
+				&nfound2, fcntrl, fitopt, status );
 	      if ( iters >= 0 && nfound2 > 0 ) {
 		for ( i = 0; (int) i < nfound2-1; i++ ) {
 		  int offset = i*npar;
@@ -932,10 +948,9 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 		    "(FitProfileThread %d) ...profile %d fitting %d comps",
 			status, ijob, (int) profid, nfound);
 #endif
-	  iters = dolsqfit( fid, pcoord, fdata, weight, npts, parlist,
-			    errlist, fcntrl->fixmask, npar, &nfound, range, 
-			    fcntrl->critamp, fcntrl->critdisp, 
-			    fitopt, status );
+          int *fixmask = fcntrl->fixmask;
+	  iters = dolsqfit( fid, pcoord, fdata, weight, npts, parlist, errlist,
+			    fixmask, npar, &nfound, fcntrl, fitopt, status );
 
           if ( iters < 0 ) {
             nfound = 0;
@@ -1037,27 +1052,42 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
       for ( i = 0; i < npts; i++ ) {
 	coord = (double) (i+1);
 
-	value = 0.0;
+	value = VAL__BADD;
         if ( iters >= 0 )
 	  value = (double) smf_math_fvalue( fid, coord, parlist, ncomp,
 					    NULL, NULL );
 
         /* RPT: Only pos values since no baseline: change to user option */
-        if ( value < 0.0 ) value = 0.0;
+        if ( value != VAL__BADD && value < 0.0 ) value = 0.0;
 
 	index = base+i*dstride;
 	if (data->dtype == SMF__DOUBLE) {
-	  ((double *)indata)[index] = value;
+          if ( nbad < npts && value != VAL__BADD )
+	    ((double *)indata)[index] = value;
+          else 
+	    ((double *)indata)[index] = VAL__BADD;
 	} else if (data->dtype == SMF__FLOAT) {
-	  ((float *)indata)[index] = (float) value;
+          if ( nbad < npts && value != VAL__BADD )
+	    ((float *)indata)[index] = (float) value;
+          else 
+	    ((float *)indata)[index] = VAL__BADR;
 	} else if (data->dtype == SMF__INTEGER) {
-	  ((int *)indata)[index] = (int) (value+0.5);
+          if ( nbad < npts && value != VAL__BADD )
+	    ((int *)indata)[index] = (int) (value+0.5);
+          else 
+	    ((int *)indata)[index] = VAL__BADI;
 	} else if (data->dtype == SMF__USHORT) {
-	  ((unsigned short *)indata)[index] =
-	    (unsigned short) (fabs(value)+0.5);
+          if ( nbad < npts && value != VAL__BADD )
+	    ((unsigned short *)indata)[index] =
+	      (unsigned short) (fabs(value)+0.5);
+          else 
+	    ((unsigned short *)indata)[index] = VAL__BADUW;
 	} else if (data->dtype == SMF__UBYTE) {
-	  ((unsigned char *)indata)[index] =
-	    (unsigned char) (fabs(value)+0.5);
+          if ( nbad < npts && value != VAL__BADD )
+	    ((unsigned char *)indata)[index] =
+	      (unsigned char) (fabs(value)+0.5);
+	  else 
+	    ((unsigned char *)indata)[index] = VAL__BADUB;
 	} else {
 	  msgSeti("IJOB", (int) ijob);
 	  msgSeti("PROFID", (int) profid);
@@ -1086,11 +1116,11 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 }
 
 
-static int dolsqfit(  smf_math_function fid, const double pcoord[], 
-                      const double fdata[], float *weight,  int npts, 
-                      double *parlist, double *errlist, const int fixmask[], 
-                      int npar, int *ncomp, const int range[], double critamp,
-                      double critdisp[], int *fitopt,  int *status )
+static int dolsqfit( smf_math_function fid, const double pcoord[], 
+                     const double fdata[], float *weight,  int npts, 
+                     double *parlist, double *errlist, const int fixmask[], 
+                     int npar, int *ncomp, void *pfcntrl, int *fitopt,  
+		     int *status )
 /*------------------------------------------------------------*/
 /* PURPOSE: Fit profiles. Wrapper routine for smf_lsqfit.     */
 /* Return the number of iteration or a number < 0 for an      */
@@ -1111,13 +1141,13 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
    int          nfound = *ncomp;
    int          sortopt = -1;     /* placeholder for param with user sort */
    int          fitmask[MAXPAR];  /* lsq fit uses reversed of fixmask     */ 
+   double       parest[MAXPAR];   /* for saving intial estimates          */
 
    /* lower accuracy for faster fit */
    tolerance = 0.01; 
 
    nfound = *ncomp;                         /* On input: Nr to fit */
 
-#define PRINTFOUT 0
 #if (PRINTFOUT)
    printf("Start dosqlfit for %d components\n", nfound); 
 #endif
@@ -1125,9 +1155,14 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
    /* Do not fit if we do not have to */
    if ( nfound == 0) return( 0 );
 
+   fitStruct *fcntrl = (fitStruct *) pfcntrl;
+
+   /* Save estimates and set fitmask from fixmask */
    for ( j = 0; j < nfound; j++ ) {
-     for ( i = 0; i < npar; i++  )
+     for ( i = 0; i < npar; i++  ) {
+       parest[j*npar+i] = parlist[j*npar+i];            /* Initial estimates */
        fitmask[j*npar+i] = -1*fixmask[j*NPAR+i]+1;      /* Reverse flag */
+     }
    }
 
 #if (PRINTFOUT)
@@ -1159,11 +1194,83 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
 
    if ( fitopt[0] == -1 )
      iters = 0;
-   else
-     iters  = smf_lsqfit ( fid, pcoord, xdim, fdata, weight, ndat,
-			   parlist, errlist, fitmask, tpar, nfound,
-			   tolerance, maxits, mixingpar, fitopt, NULL );
+   else {
 
+     int retry = 5;
+     int ipar = -1;
+     if ( fid == SMF__MATH_GAUSSHERMITE2 ) {
+       ipar = 4;   /* h4 parameter offset */
+     } else if ( fid == SMF__MATH_GAUSSHERMITE1 ) {
+       ipar = 3;
+     }
+
+     /* If fit errors or hermitian parameters out of bounds,
+        try simpler fits immediately */
+
+     while ( retry > 0 ) {
+
+       /* Reset initial gaussian estimates and fixed values */
+       for ( j = 0; j < nfound; j++ ) {
+	 for ( i = 0; i < npar; i++  )
+	   parlist[j*npar+i] = parest[j*npar+i];  
+       }
+
+       iters  = smf_lsqfit ( fid, pcoord, xdim, fdata, weight, ndat,
+			     parlist, errlist, fitmask, tpar, nfound,
+			     tolerance, maxits, mixingpar, fitopt, NULL );
+
+       /* No point to retry
+	*/
+       if ( iters > 0 || ipar < 3 )
+         retry = 0;            /* not working with h3 and h4 params */
+
+       /* check limits on h3 and h4 for gausshermites (ipar = 4 or 3) 
+        */
+       int jpar = ipar;
+       int fixedherm = 0;
+       while ( iters > 0 && jpar > 2 && fixedherm == 0 && retry > 1 ) {
+	 for ( int icomp = 0; icomp < nfound; icomp++ ) {
+	   int offset = icomp*npar;
+	   if (  fcntrl->lolimit[jpar] != VAL__BADD && 
+		 fitmask[offset+jpar] == 1 && 
+		 parlist[offset+jpar] < fcntrl->lolimit[jpar] ) {
+	     fitmask[offset+jpar] = 0;
+	     parlist[offset+jpar] = 0.0;
+	     fixedherm = 1;
+	   }
+	   if (  fcntrl->hilimit[jpar] != VAL__BADD && 
+		 fitmask[offset+jpar] == 1 && 
+		 parlist[offset+jpar] > fcntrl->hilimit[jpar] ) {
+	     fitmask[offset+jpar] = 0;
+	     parlist[offset+jpar] = 0.0;
+	     fixedherm = 1;
+	   }
+	 }
+         if ( fixedherm == 0 ) jpar--;
+       }
+  
+       if ( fixedherm == 1 ) {
+	   retry--;
+           ipar = jpar;
+       }         
+
+       /* Try simplify failed fits 
+        */
+       if ( iters < 0 && retry > 1 ){
+	 for ( int icomp = 0; icomp < nfound; icomp++ ) {
+	   int offset = icomp*npar;
+	   if ( fitmask[offset+ipar] == 1 ) {
+	     fitmask[offset+ipar] = 0;
+	     parlist[offset+ipar] = 0.0;
+	   }
+	   retry--;
+           ipar--;
+	 }
+       }
+
+     }
+   }
+		
    /*----------------------------------------------------------*/
    /* THE ARRAY PARLIST[] NOW CONTAINS FITTED PARAMETERS!      */
    /*----------------------------------------------------------*/
@@ -1184,7 +1291,7 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
    if (iters < 0) {
 
      for (i = 0; i < MAXPAR; i++) {
-       parlist[i] = VAL__BADD;
+       parlist[i] = 0.0;
      }
      *ncomp = 0;
      return( (int) iters );
@@ -1228,51 +1335,54 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
    for (i = nfound-1; i >= 0; i--) {
      int offset = i*npar;
      if ( fitmask[offset+1] == 0 ) continue;  /* Do not filter fixed values */ 
-     if (  parlist[offset+1] < range[0] ||
-            parlist[offset+1] > range[1] ) {
+     if (  parlist[offset+1] < NINT(fcntrl->lolimit[1]) ||
+           parlist[offset+1] > NINT(fcntrl->hilimit[1]) ) {
        nremaining -= 1;
        for (j = 0; j < npar; j++) {
-	 parlist[offset+j] = VAL__BADD;
-	 errlist[offset+j] = VAL__BADD;
+	 parlist[offset+j] = 0.0;
+	 errlist[offset+j] = 0.0;
        }
      }
    }
 
 #if (PRINTFOUT)
-   printf( "(weeding)  Number after range check: %d\n", nremaining );
+   printf( "(weeding)  Number after range [%d,%d] check: %d\n", 
+	   NINT(fcntrl->lolimit[1]), NINT(fcntrl->hilimit[1]), nremaining );
 #endif
 
    /* 
-   **Remove fits outside critical dispersion levels
+   **Remove fits outside critical dispersion levels 
    ** Guard against unreasonably large fits as well
    */
+   /* width larger lower limit */
    double critwidth = 0;
-   if ( critdisp[0] != VAL__BADD ) {
-     critwidth = fabs(critdisp[0]);
+   if ( fcntrl->lolimit[1] != VAL__BADD ) {
+     critwidth = fabs(fcntrl->lolimit[2]);
      if ( fid == SMF__MATH_VOIGT ) critwidth = 0.5 * DISP2FWHM( critwidth );
    }
 
+   /* lorentz lower upper limit */
    double critlorz = 0;
    if ( fid == SMF__MATH_VOIGT ) {
-     if ( critdisp[1] != VAL__BADD && critdisp[1] > 0.0 )
-       critlorz  = 0.5 * DISP2FWHM( critlorz );
+     if ( fcntrl->hilimit[3] != VAL__BADD && fcntrl->hilimit[3] > 0.0 )
+       critlorz  = 0.5 * DISP2FWHM( fcntrl->hilimit[3] );
      else
        critlorz = 0.25*npts;       /* guard against insanely wide fits */
    }
 
    for (i = nfound-1; i >= 0; i--) {
      int offset = i*npar;
-     if ( fid < SMF__MATH_VOIGT && parlist[offset] != VAL__BADD ) {
+     if ( fid < SMF__MATH_VOIGT && parlist[offset] != 0.0 ) {
        if ( fitmask[offset+2] == 0 ) continue;  /* Do not filter fixed vals */ 
        if ( fabs( parlist[offset+2] ) < critwidth ||
 	    fabs( parlist[offset+2] ) > 0.5*npts ) {
 	 nremaining -= 1;
 	 for (j = 0; j < npar; j++) {
-	   parlist[offset+j] = VAL__BADD;
-	   errlist[offset+j] = VAL__BADD;
+	   parlist[offset+j] = 0.0;
+	   errlist[offset+j] = 0.0;
 	 }
        }
-     } else if ( fid == SMF__MATH_VOIGT && parlist[offset] != VAL__BADD ) {
+     } else if ( fid == SMF__MATH_VOIGT && parlist[offset] != 0.0 ) {
        if (  ( fitmask[offset+2] > 0 && 
 	       ( fabs( parlist[offset+2] ) < critwidth ||
 		 fabs( parlist[offset+2] ) > 0.5*npts ) ) ||
@@ -1281,37 +1391,43 @@ static int dolsqfit(  smf_math_function fid, const double pcoord[],
 		 fabs( parlist[offset+3] ) < 0.25*critwidth ) ) ) {
 	 nremaining -= 1;
 	 for (j = 0; j < npar; j++) {
-	   parlist[offset+j] = VAL__BADD;
-	   errlist[offset+j] = VAL__BADD;
+	   parlist[offset+j] = 0.0;
+	   errlist[offset+j] = 0.0;
 	 }
        }
      }
    }
 
 #if (PRINTFOUT)
-   printf( "(weeding)  Number after width check: %d\n", nremaining );
+   printf( "(weeding)  Number after width (>%6.2f) check: %d\n", 
+	   (float) critwidth, nremaining );
 #endif
 
    /* 
    ** Remove fits with too low an amplitude
    */
+   double minamp = 0;
+   if ( fcntrl->lolimit[0] != VAL__BADD ) 
+     minamp = fcntrl->lolimit[0];
+
    for (i = nfound-1; i >= 0; i--) {
 
      int offset = i*npar;
-     double minamp = critamp;
 
      if ( fitmask[offset] == 0 ) continue;  /* Do not filter fixed vals */ 
-     if ( parlist[offset] != VAL__BADD && parlist[offset] < minamp ) {
+     if ( parlist[offset] != 0.0 && 
+	  parlist[offset] < minamp ) {
        nremaining -= 1;
        for (j = 0; j < npar; j++) {
-	 parlist[offset+j] = VAL__BADD;
-	 errlist[offset+j] = VAL__BADD;
+	 parlist[offset+j] = 0.0;
+	 errlist[offset+j] = 0.0;
        }
      } 
    }
 
 #if (PRINTFOUT)
-   printf( "(weeding)  Number after amp check: %d\n", nremaining );
+   printf( "(weeding)  Number after amp (>%6.2f) check: %d\n", 
+	   (float) fcntrl->lolimit[0],  nremaining );
 #endif
 
    /* 
@@ -1391,8 +1507,7 @@ static void generalize_gauss_fit( void *pfcntrl,  int *status )
 
 
 static int getestimates( const double fdata[], const float weight[], int npts,
-			 double *parlist, int npar, int ncomp,
-			 double rms, double critamp, double critdisp[],
+			 double *parlist, int npar, int ncomp, void *pfcntrl,
 			 const int smoothingpar[], int numq)
 /*------------------------------------------------------------*/
 /* PURPOSE: Get initial estimates for gaussian profiles       */
@@ -1401,12 +1516,13 @@ static int getestimates( const double fdata[], const float weight[], int npts,
 {
    int          maxgaussians = ncomp;
    double       zerolev;
-   double       critwidth;
    double       Destimates[MAXPAR];
 
    int          gaussiansfound;
    float        usedQ;
    double       * work;
+
+   fitStruct *fcntrl = (fitStruct *) pfcntrl; /* Pointer fit control struct */
 
 #if defined (TESTBED)
    work = calloc( npts, sizeof(double) );
@@ -1414,26 +1530,19 @@ static int getestimates( const double fdata[], const float weight[], int npts,
    work = astCalloc( npts, sizeof(double) );
 #endif
 
-#if defined (SKIPTHIS)
+#if (FITZEROLEVEL)
    /*--------------------------------------------------*/
-   /* We need initial values for the background,       */
-   /* with this value blanks are replaced for the      */
-   /* estimate routine.                                */
+   /* Replace blanks with zerolevel for get estimates. */
+   /* Need to fix this for higher order baseline       */
    /*--------------------------------------------------*/
-   {
-      int     i;
-      for (i = 0; i < 3; i++) {
-	int   indx = ncomp*npar+i;
-        parlist[indx] = fixedvalues[indx];
-      }
-   }
-#endif
-
+#else
    /* Get constant zerolevel */
    zerolev = parlist[MAXPAR-3];
+#endif
 
-   rms = fabs( rms );
+   double rms = fabs( fcntrl->rms );
    usedQ = VAL__BADR;
+
    /*--------------------------------------------------*/
    /* Next, check the other parameters. The critical   */
    /* dispersion is entered pixels.                    */
@@ -1441,8 +1550,8 @@ static int getestimates( const double fdata[], const float weight[], int npts,
 
    /* Be more lenient on estimates! */
    maxgaussians = BETWEEN( maxgaussians, 1, MAXCOMPS );
-   critamp      = 0.5* fabs( critamp );
-   critwidth    = critdisp[0]/3;
+   double critamp      = 0.5* fabs( fcntrl->lolimit[0] );
+   double critwidth    = fcntrl->lolimit[2]/3;
 
    gaussiansfound = 0;
 
