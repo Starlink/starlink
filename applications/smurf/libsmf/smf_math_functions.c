@@ -477,7 +477,7 @@ static void gaussderv( double  X,
       epar[1+offset] = 0.0;                     /* Derv. wrt Center Xc */
       epar[2+offset] = 0.0;                     /* Derv. wrt. dispersion */
 
-      if ( s != 0.0 )
+      if ( A != 0 && s != 0.0 )
       {
         F = X_X0 / s;
 	arg = 0.5 * F*F;
@@ -608,7 +608,7 @@ static void gausshermiteh3derv( double  X,
       epar[2+i*npar] = 0.0;
       epar[3+i*npar] = 0.0;
 
-      if (s != 0.0)
+      if (A != 0 && s != 0.0)
       {
 	F = X_X0 / s;
 	arg = 0.5 * F*F;
@@ -758,7 +758,7 @@ static void gausshermiteh3h4derv( double  X,
       epar[3+i*npar] = 0.0;
       epar[4+i*npar] = 0.0;
 
-      if (s != 0.0)
+      if (A != 0 && s != 0.0)
       {
          arg = 0.5 * (X_X0/s) * (X_X0/s);
          if (-arg > MINARG)         /* 'MINARG' is a global variable */
