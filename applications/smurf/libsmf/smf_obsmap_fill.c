@@ -55,6 +55,8 @@
 *        Include INBEAM in report.
 *     2009-07-10 (TIMJ):
 *        Include instrument information in report.
+*     2012-08-17 (TIMJ):
+*        Use inbeam header information integer rather than reparsing INBEAM
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -108,7 +110,6 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
   double dateobs = 0.0;    /* MJD UTC of start of observation */
   char object[SZFITSTR];   /* Object name */
   char obsid[SZFITSTR];    /* Observation ID */
-  char inbeam[SZFITSTR];   /* Anything in beam */
   char instrume[SZFITSTR]; /* instrument name */
   AstKeyMap * obsinfo = NULL; /* observation information */
 
@@ -136,6 +137,7 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
       astMapPut0I( obsinfo, "OBSMODE", data->hdr->obsmode, NULL );
       astMapPut0I( obsinfo, "OBSTYPE", data->hdr->obstype, NULL );
       astMapPut0I( obsinfo, "SWMODE", data->hdr->swmode, NULL );
+      astMapPut0I( obsinfo, "INBEAM", data->hdr->inbeam, NULL );
       smf_fits_getI( data->hdr, "OBSNUM", &itemp, status );
       astMapPut0I( obsinfo, "OBSNUM", itemp, NULL );
       smf_fits_getI( data->hdr, "UTDATE", &itemp, status );
@@ -145,14 +147,6 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
       smf_getfitss( data->hdr, "INSTRUME", instrume, sizeof(instrume),
                     status);
       astMapPut0C( obsinfo, "INSTRUME", instrume, NULL );
-
-      /* anything in the beam */
-      inbeam[0] = '\0';
-      if (astTestFits( data->hdr->fitshdr, "INBEAM", NULL ) ) {
-        smf_getfitss( data->hdr, "INBEAM", inbeam, sizeof(inbeam),
-                      status );
-        if (strlen(inbeam)) astMapPut0C( obsinfo, "INBEAM", inbeam, NULL );
-      }
 
       /* store the MJD of observation for sorting purposes */
       smf_find_dateobs( data->hdr, &dateobs, NULL, status );
@@ -164,6 +158,24 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
       astMapPut0I( objmap, object, 0, NULL );
 
       obsinfo = astAnnul( obsinfo );
+    } else {
+      int curbeam = 0;
+
+      astMapGet0A( obsmap, obsid, &obsinfo );
+
+      /* INBEAM is interesting since technically each sequence can involve
+         different hardware being in the beam so we have to retrieve the
+         current value from the keymap and OR it with the current value
+         from the data header. */
+
+      /* we know that the value has been filled in previously so no
+         need to check */
+      astMapGet0I( obsinfo, "INBEAM", &curbeam );
+      curbeam |= data->hdr->inbeam;
+      astMapPut0I( obsinfo, "INBEAM", curbeam, NULL );
+
+      obsinfo = astAnnul( obsinfo );
+
     }
   }
 
