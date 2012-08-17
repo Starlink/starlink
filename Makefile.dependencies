@@ -951,7 +951,6 @@ $(MANIFESTS)/fluxes: \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
-		$(MANIFESTS)/jpl \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
@@ -1825,6 +1824,7 @@ $(MANIFESTS)/one: \
 
 $(MANIFESTS)/pal: \
 		$(MANIFESTS)/sofa \
+		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starutil
 	cd libraries/pal \
 	  && $(MAKE_CPT)
