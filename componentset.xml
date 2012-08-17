@@ -486,7 +486,7 @@ variety of formats.
     </person>
   </developers>
   <documentation> sun226</documentation>
-  <bugreports>stardev@jiscmail.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
@@ -862,7 +862,8 @@ Traces an HDS file
       <name>Alan Chipperfield</name>
     </person>
   </developers>
-  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <documentation> ssn68</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="kappa" support="S">
@@ -1610,7 +1611,7 @@ with the ACSIS correlator at JCMT.
     </person>
   </developers>
   <documentation> sun258 sun259 sc19</documentation>
-  <bugreports>t.jenness@jach.hawaii.edu</bugreports>
+  <bugreports>scuba2dr@phas.ubc.ca</bugreports>
 </component>
 
 <component id="acsisio" support="U">
@@ -4763,7 +4764,7 @@ to handle data from a variety of different instruments.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="init" support="S">
@@ -4784,7 +4785,7 @@ to handle data from a variety of different instruments.
       <role>owner</role>
     </person>
   </developers>
-  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="agi" support="S">
@@ -5805,7 +5806,7 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation></documentation>
-  <bugreports>stardev@jiscmail.ac.uk</bugreports>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
 <component id="par" support="S">
