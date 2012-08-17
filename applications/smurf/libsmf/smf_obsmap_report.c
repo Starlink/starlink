@@ -57,6 +57,8 @@
 *        Handle null pointers explicitly rather than letting MERS write <null>.
 *     2011-01-25 (TIMJ):
 *        Tweak to smfSortInfo struct member.
+*     2012-08-17 (TIMJ):
+*        INBEAM is now stored as an integer.
 
 *  Copyright:
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
@@ -107,7 +109,8 @@
 void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
                       int * status ) {
 
-  AstKeyMap * beaminfo = NULL; /* inbeam information */
+  int beamflag = 0;   /* True if we have an inbeam mismatch */
+  int beamref = -1;    /* a reference inbeam value */
   size_t i;
   AstKeyMap * instmap = NULL; /* instrument information */
   size_t ninst;       /* number of instruments */
@@ -170,9 +173,6 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
     } else {
       msgSetc( "INST", "" );
     }
-
-    /* create something for INBEAM */
-    beaminfo = astKeyMap( " " );
 
     /* Now do the actual summarizing */
     msgOutif(msglev, " ", "Processing data ^INST ^OBJ from the following observation^S :", status);
@@ -244,13 +244,18 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
         }
 
         /* What is in the beam */
-        if ( astMapHasKey( obsinfo, "INBEAM" ) ) {
-          astMapGet0C( obsinfo, "INBEAM", &ctemp );
-          astMapPut0I( beaminfo, ctemp, 0, NULL );
-          msgSetc( "IB", "/" );
-          msgSetc( "IB", ctemp );
+        astMapGet0I( obsinfo, "INBEAM", &itemp );
+        if (beamref == -1) {
+          beamref = itemp;
         } else {
-          astMapPut0I( beaminfo, "none", 0, NULL );
+          if (beamref != itemp) beamflag = 1;
+        }
+        if (itemp > 0) {
+          char beamstr[SZFITSTR];
+          smf_inbeam_str( itemp, beamstr, sizeof(beamstr), status );
+          msgSetc( "IB", "/" );
+          msgSetc( "IB", beamstr );
+        } else {
           msgSetc( "IB", "" );
         }
 
@@ -283,13 +288,11 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
     }
 
     /* Warn if we are mixing observations with different INBEAM settings */
-    if ( astMapSize(beaminfo) > 1) {
+    if ( beamflag ) {
       msgOutif( MSG__QUIET, "", "WARNING: Mixing observations with different hardware in beam",
                 status );
       msgBlankif( msglev, status );
     }
-
-    beaminfo = astAnnul(beaminfo);
 
   }
 
