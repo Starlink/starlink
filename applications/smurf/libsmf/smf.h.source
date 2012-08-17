@@ -1089,8 +1089,8 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
                     double minfreq, double whitefreq, double maxfreq,
                     double *a, double *b, double *w, int *status );
 
-void smf_fit_profile(  smfData *data, int axis, int *range, int ncomp,
-		       smfArray *pardata, void *pfcntrl, int *status );
+void smf_fit_profile(  smfData *data, smfArray *pardata, void *pfcntrl, 
+		       int *status );
 
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
                       int *status);

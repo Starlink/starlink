@@ -39,12 +39,15 @@
 /* Fit control struct */
 typedef struct {
   smf_math_function fid;          /* Function identifier                  */
+  int    axis;                    /* Axis to fit 1,2...; 0=highest        */
+  int    ncomp;                   /* Number of components to fit          */
+  double rms;                     /* RMS in data                          */
+  double range[2];                /* Coordinate range to fit              */
   double fixval[MAXPAR];          /* User defined fixed values            */
   int    fixmask[MAXPAR];         /* Fit mask: 1: fixed; 0: fit           */
   double clip[2];                 /* Clip levels for data                 */
-  double rms;                     /* RMS in data                          */
-  double critamp;                 /* Minimal Amplitude                    */
-  double critdisp[2];             /* Mimimal Dispersions                  */
+  double lolimit[NPAR];           /* Lower limits for parameters          */
+  double hilimit[NPAR];           /* Upper limits for parameters          */
   int    estimate_only;           /* Initial estimates only, do not fit   */
   int    model_only;              /* Generate model from suppplied params */
 } fitStruct;                      /* fit control struct                   */

@@ -324,14 +324,10 @@
 #define USERVALDEFAULTFILE 1
 
 
-static void get_fit1par( int *axis, double *range, smf_math_function *fid, 
-                      int *ncomp, double *critamp, double critdisp[],
-		      int *estimate_only, int *model_only, int *status );
+static void get_fit1par( void *pfcntrl, int *status );
 
-static void get_userval ( smfData *data, int axis, AstMapping **wcsmap, 
-			  const char *userfile, smf_math_function fid, 
-			  int *prange, double *fixval, int *fixmask, 
-                          int *status );
+static void get_userval ( smfData *data, AstMapping **wcsmap, 
+			  const char *userfile, void *pfcntrl, int *status );
 
 static void map_axis_to_wcs ( smfData *data, int axis, AstMapping **wcsmap,
 			       int *status );
@@ -381,22 +377,10 @@ void smurf_fit1d( int * status )
   Grp     *ogrp = NULL;          /* Output group */
   size_t   outsize;              /* Nr of NDF names in the output group */
   size_t   size;                 /* Number of files in input group */
-  int      icomp;                /* Component index (0 for base-line fit) */
   int      idim;                 /* Index of pixel axis */
 
-  int      axis = 0;             /* Axis to fit along */
-  int      iaxis = 0;            /* 0-based axis nr to fit along */
-  smf_math_function fid;         /* Function id */
   int      lbnd[ NDF__MXDIM ];   /* Lower NDF pixel bounds */
   int      ubnd[ NDF__MXDIM ];   /* Upper NDF pixel bounds */
-  double   range[2] = {VAL__BADD,VAL__BADD};  /* Range of coord to fit over */
-  int      prange[2] = {VAL__BADI,VAL__BADI}; /* Range in pixel nrs 1..n    */
-  int      ncomp = 1;            /* Number of components to fit */
-  double   rms = 1;              /* RMS in data */
-  double   critamp = 1;          /* Minimal Amplitude */
-  double   critdisp[2] = {0.8,0.0};   /* Mimimal Dispersions */
-  int      estimate_only = 0;    /* Do estimates only, no fit */
-  int      model_only = 0;       /* Create model only from supplied pars */
   fitStruct fcntrl;              /* Pointer to fit control struct */
 
   /* File with user defined values for the function's parameters */
@@ -427,7 +411,9 @@ void smurf_fit1d( int * status )
   if (*status != SAI__OK) goto CLEANUP;
 
   /* Get the RMS */
+  double   rms = 1;              /* RMS in data */
   parGet0d( "RMS", &rms, status );
+  fcntrl.rms = rms;
 
   /* Get any user defined  */
   parGet0c ( "USERVAL", f_userval, GRP__SZNAM, status );
@@ -437,11 +423,14 @@ void smurf_fit1d( int * status )
   }
   
   /* Extract and read user supplied values using a keymap */
-  get_fit1par( &axis, range, &fid, &ncomp, &critamp, 
-               critdisp, &estimate_only, &model_only, status );
+  get_fit1par( &fcntrl, status );
+
+  /* Copy to local variables */
+  int axis = fcntrl.axis;            /* Axis to fit along           */
+  int ncomp = fcntrl.ncomp;          /* Number of components to fit */
+  double *range = fcntrl.range;      /* Coordinate range            */
 
   if (*status != SAI__OK) goto CLEANUP;
-
 
   /*
   ** Process the group files
@@ -464,7 +453,6 @@ void smurf_fit1d( int * status )
     ndfAnnul( &indf, status);
     ndfAnnul( &outndf, status);
 
-
     /*
     ** Re-open the output file for UPDATE using standard routine
     */
@@ -486,9 +474,10 @@ void smurf_fit1d( int * status )
       errRep( FUNC_NAME, "Error opening output file ^F for UPDATE.", status);
       goto CLEANUP;
     }
+    fcntrl.axis = axis;                  /* Update value in struct */
 
     /* Get data dimensions */
-    iaxis = axis - 1;
+    int iaxis = axis - 1;
     for( idim = 0; idim < (int) data->ndims; idim++ ) {
        lbnd[idim] = data->lbnd[idim];
        ubnd[idim] = lbnd[idim] + data->dims[idim] - 1;
@@ -521,11 +510,14 @@ void smurf_fit1d( int * status )
     }
 
     /* Convert user-specified range to pixels */
+    int prange[2] = {VAL__BADI,VAL__BADI}; /* Range in pixel nrs 1..n */
     convert_range_to_pixels( &wcsmap, range, (int) lbnd[iaxis],
 			     (int) ubnd[iaxis], prange, status );
     if ( *status != SAI__OK) {
       goto CLEANUP;
     }
+    fcntrl.lolimit[1] = prange[0];      /* Prange is limit on centre value */ 
+    fcntrl.hilimit[1] = prange[1];
 
     /* Each component is described by NPAR-1 parameters plus an id plane.
        NPAR is defined in the include file and a fixed rather than
@@ -551,32 +543,23 @@ void smurf_fit1d( int * status )
     }
 
     /* Fill the parameter files with user any supplied values */
-    get_userval ( data, (int) axis, &wcsmap, f_userval, fid, prange,
-		  fcntrl.fixval, fcntrl.fixmask, status );
+    get_userval ( data, &wcsmap, f_userval, &fcntrl, status );
     if ( *status != SAI__OK) {
       goto CLEANUP;
     }
 
-    /* Fill the fit control structure */
+    /* Fill the rest of the fit control structure */
     msgOutiff(MSG__DEBUG, " ", "Populate %s control struct", status,
 	      FUNC_NAME);
-
-    fcntrl.fid      = fid;
+ 
     fcntrl.clip[0]  = VAL__BADD;
     fcntrl.clip[1]  = VAL__BADD;
-    fcntrl.rms      = rms;
-    fcntrl.critamp  = critamp*rms;
-    fcntrl.critdisp[0] = critdisp[0];
-    fcntrl.critdisp[1] = critdisp[1];
-    fcntrl.estimate_only = estimate_only;
-    fcntrl.model_only = model_only;
 
     /*
     ** Fit the profiles
     */
     msgOutiff(MSG__VERB, " ", "Fitting profiles", status);
-    smf_fit_profile( data, (int) axis, prange, (int) ncomp, pardata, &fcntrl,
-		     status );
+    smf_fit_profile( data, pardata, &fcntrl, status );
 
 
     /* The fit returns results (centre, dispersion) in pixels. Convert
@@ -594,8 +577,9 @@ void smurf_fit1d( int * status )
 
     msgOutiff(MSG__DEBUG, " ", "Close parameter NDFs", status);
     /* Close the NDFs used to store the parameter values. */
+
     if( parndfs ) {
-       for( icomp = 0; icomp <= ncomp; icomp++ ) {
+       for( int icomp = 0; icomp <= ncomp; icomp++ ) {
           ndfAnnul( parndfs + icomp, status );
        }
     }
@@ -629,14 +613,20 @@ void smurf_fit1d( int * status )
 /* *** END OF MAIN *** */
 
 
-static void get_fit1par( int *axis, double *range, smf_math_function *fid, 
-                         int *ncomp, double *critamp, double critdisp[],
-                         int *estimate_only, int *model_only, int *status )
+static void get_fit1par( void *pfcntrl, int *status )
 /*
 ** Routine to get parameters from the config file, if parameter is not
 ** NULL. Patterned after smf_get_cleanpar.c
 */
 {
+  fitStruct *fcntrl = (fitStruct *) pfcntrl; /* Pointer fit control struct */
+
+  /* Initialize limits */
+  for ( int i = 0; i < NPAR; i++ ) {
+    fcntrl->lolimit[i] = VAL__BADD;
+    fcntrl->hilimit[i] = VAL__BADD;
+  }
+
   AstKeyMap *keymap=NULL;        /* Pointer to keymap of config settings */
 
   if (*status != SAI__OK) return;
@@ -651,20 +641,20 @@ static void get_fit1par( int *axis, double *range, smf_math_function *fid,
   /* Obtain parameters from keymap when non-NULL pointers given */
 
   /* Get axis to fit along */
-  *axis = 0;
-  if ( astMapGet0I( keymap, "AXIS", axis ) )  {
+  int axis = 0;
+  if ( astMapGet0I( keymap, "AXIS", &axis ) )  {
     if ( *status == SAI__OK ) {
-      msgOutiff( MSG__VERB, "", "... AXIS=%d", status, *axis );
+      msgOutiff( MSG__VERB, "", "... AXIS=%d", status, axis );
     } else {
       errRep(FUNC_NAME, "Failed to get parameter AXIS from config file",
 	     status);
       goto CLEANUP1;
     }
   }
+  fcntrl->axis = axis;
 
   /* Get range of pixels to fit over */
-  range[0] = VAL__BADD;
-  range[1] = VAL__BADD;
+  double range[2] = {VAL__BADD,VAL__BADD};
   int  nval = 0;
   if ( astMapGet1D( keymap, "RANGE", 2, &nval, range ) ) {
     if ( *status == SAI__OK  && nval >  1) {
@@ -677,15 +667,17 @@ static void get_fit1par( int *axis, double *range, smf_math_function *fid,
       goto CLEANUP1;
     }
   }
+  fcntrl->range[0] = range[0];
+  fcntrl->range[1] = range[1];
 
-  *fid = 1;
+  smf_math_function fid = 1;
   {
     const char * strpntr = NULL;
     if ( astMapGet0C( keymap, "FUNCTION", &strpntr ) ) {
       if (*status == SAI__OK && strpntr ) {
-	*fid = smf_mathfunc_fromstring( strpntr, status );
+	fid = smf_mathfunc_fromstring( strpntr, status );
 	msgOutiff( MSG__VERB, "", "... FUNCTION=%s (id: %d)", status,
-		   smf_mathfunc_str( *fid, status ), *fid );
+		   smf_mathfunc_str( fid, status ), fid );
       } else {
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "Failed to get parameter FUNCTION from config file",
@@ -694,29 +686,38 @@ static void get_fit1par( int *axis, double *range, smf_math_function *fid,
       }
     }
   }
+  fcntrl->fid = fid;
 
   /* Get ncomp to fit along */
-  *ncomp = 1;
-  if ( astMapGet0I( keymap, "NCOMP", ncomp ) ) {
+  int ncomp = 1;
+  if ( astMapGet0I( keymap, "NCOMP", &ncomp ) ) {
     if ( *status == SAI__OK ) {
-      msgOutiff( MSG__VERB, "", "... NCOMP=%d", status, *ncomp );
+      msgOutiff( MSG__VERB, "", "... NCOMP=%d", status, ncomp );
+      if ( ncomp > MAXCOMPS ) {
+        *status = SAI__ERROR;
+        msgSeti("C", (int) MAXCOMPS);
+	errRep(FUNC_NAME, "Requested components exceed maximum of ^C",
+	     status);
+	goto CLEANUP1;
+      }
     } else {
       errRep(FUNC_NAME, "Failed to get parameter NCOMP from config file",
 	     status);
       goto CLEANUP1;
     }
   }
+  fcntrl->ncomp = ncomp;
 
   /* Minimal acceptable amplitude for a component */
-  *critamp = 0;
-  if ( astMapGet0D( keymap, "MINAMP", critamp ) ) {
+  double minamp = 0;
+  if ( astMapGet0D( keymap, "MINAMP", &minamp ) ) {
     if ( *status == SAI__OK ) {
-      if ( *critamp < 0 ) {
+      if ( minamp < 0 ) {
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "MINAMP must be >= 0.", status );
 	goto CLEANUP1;
       } else {
-	msgOutiff( MSG__VERB, "", "... MINAMP=%f", status, *critamp );
+	msgOutiff( MSG__VERB, "", "... MINAMP=%f", status, minamp );
       }
     } else {
       errRep(FUNC_NAME, "Failed to get parameter MINAMP from config file",
@@ -724,18 +725,19 @@ static void get_fit1par( int *axis, double *range, smf_math_function *fid,
       goto CLEANUP1;
     }
   }
+  fcntrl->lolimit[0] = minamp * fcntrl->rms;
 
   /* Minimal acceptable dispersion for a component */
-  critdisp[0] = 0;
-  if ( astMapGet0D( keymap, "MINWIDTH", critdisp ) ) {
+  double minwidth = 0.8;
+  if ( astMapGet0D( keymap, "MINWIDTH", &minwidth ) ) {
     if ( *status == SAI__OK ) {
-      if( critdisp[0] < 0 ) {
+      if( minwidth < 0 ) {
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "MINWIDTH must be >= 0.", status );
 	goto CLEANUP1;
       } else {
 	msgOutiff( MSG__VERB, "", "... MINWIDTH=%f", status,
-		   critdisp[0] );
+		   minwidth );
       }
     } else {
       errRep(FUNC_NAME, "Failed to get parameter MINWIDTH from config file",
@@ -744,16 +746,17 @@ static void get_fit1par( int *axis, double *range, smf_math_function *fid,
     }
   }
   /* Convert to dispersion */
-  if ( critdisp[0] != VAL__BADD ) {
-    critdisp[0] = FWHM2DISP( critdisp[0] );
+  if ( minwidth != VAL__BADD ) {
+    minwidth = FWHM2DISP( minwidth );
   }
+  fcntrl->lolimit[2] = minwidth;
 
-  /* Minimal acceptable lorenztian FWHM for a component */
-  critdisp[1] = 0;
-  if ( astMapGet0D( keymap, "MAXLORZ", critdisp+1 ) ) {
+  /* Maximal acceptable lorenztian FWHM for a component */
+  double maxlorz = VAL__BADD;
+  if ( astMapGet0D( keymap, "MAXLORZ", &maxlorz ) ) {
     if ( *status == SAI__OK ) {
       msgOutiff( MSG__VERB, "", "... MAXLORZ=%f", status,
-		 critdisp[1] );
+		 maxlorz );
     } else {
       errRep(FUNC_NAME, "Failed to get parameter MAXLORZ from config file",
 	     status);
@@ -761,16 +764,67 @@ static void get_fit1par( int *axis, double *range, smf_math_function *fid,
     }
   }
   /* Convert to dispersion */
-  if ( critdisp[1] != VAL__BADD ) {
-    critdisp[1] = FWHM2DISP( critdisp[1] );
+  if ( maxlorz != VAL__BADD ) {
+    maxlorz = FWHM2DISP( maxlorz );
   }
+  fcntrl->hilimit[3] = maxlorz;
 
+  /* Min, Max acceptable values for hermite parameters */
+  double absh3min = VAL__BADD;
+  double absh3max = VAL__BADD;
+  double absh4min = VAL__BADD;
+  double absh4max = VAL__BADD;
+  if ( astMapGet0D( keymap, "ABSH3MIN", &absh3min ) ) {
+    if ( *status == SAI__OK ) {
+      msgOutiff( MSG__VERB, "", "... ABSH3MIN=%f", status,
+		 absh3min );
+    } else {
+      errRep(FUNC_NAME, "Failed to get parameter ABSH3MIN from config file",
+	     status);
+      goto CLEANUP1;
+    }
+  }
+  if ( astMapGet0D( keymap, "ABSH3MAX", &absh3max ) ) {
+    if ( *status == SAI__OK ) {
+      msgOutiff( MSG__VERB, "", "... ABSH3MAX=%f", status,
+		 absh3max );
+    } else {
+      errRep(FUNC_NAME, "Failed to get parameter ABSH3MAX from config file",
+	     status);
+      goto CLEANUP1;
+    }
+  }
+  if ( astMapGet0D( keymap, "ABSH4MIN", &absh4min ) ) {
+    if ( *status == SAI__OK ) {
+      msgOutiff( MSG__VERB, "", "... ABSH4MIN=%f", status,
+		 absh4min );
+    } else {
+      errRep(FUNC_NAME, "Failed to get parameter ABSH4MIN from config file",
+	     status);
+      goto CLEANUP1;
+    }
+  }
+  if ( astMapGet0D( keymap, "ABSH4MAX", &absh4max ) ) {
+    if ( *status == SAI__OK ) {
+      msgOutiff( MSG__VERB, "", "... ABSH4MAX=%f", status,
+		 absh4max );
+    } else {
+      errRep(FUNC_NAME, "Failed to get parameter ABSH4MAX from config file",
+	     status);
+      goto CLEANUP1;
+    }
+  }
+  fcntrl->lolimit[3] = absh3min;
+  fcntrl->hilimit[3] = absh3max;
+  fcntrl->lolimit[4] = absh4min;
+  fcntrl->hilimit[4] = absh4max;
+  
   /* Do initial estimates only */
-  *estimate_only = NO;
-  if ( astMapGet0I( keymap, "ESTIMATE_ONLY", estimate_only ) ) {
+  int estimate_only = NO;
+  if ( astMapGet0I( keymap, "ESTIMATE_ONLY", &estimate_only ) ) {
     if ( *status == SAI__OK ) {
       msgOutiff( MSG__VERB, "", "... ESTIMATE_ONLY=%d", status,
-		 *estimate_only );
+		 estimate_only );
     } else {
       errRep(FUNC_NAME,
          "Failed to get parameter ESTIMATE_ONLY from config file",
@@ -778,13 +832,14 @@ static void get_fit1par( int *axis, double *range, smf_math_function *fid,
       goto CLEANUP1;
     }
   }
+  fcntrl->estimate_only = estimate_only;
 
   /* Do initial estimates only */
-  *model_only = NO;
-  if ( astMapGet0I( keymap, "MODEL_ONLY", model_only ) ) {
+  int model_only = NO;
+  if ( astMapGet0I( keymap, "MODEL_ONLY", &model_only ) ) {
     if ( *status == SAI__OK ) {
       msgOutiff( MSG__VERB, "", "... MODEL_ONLY=%d", status,
-		 *model_only );
+		 model_only );
     } else {
       errRep(FUNC_NAME,
          "Failed to get parameter MODEL_ONLY from config file",
@@ -792,6 +847,7 @@ static void get_fit1par( int *axis, double *range, smf_math_function *fid,
       goto CLEANUP1;
     }
   }
+  fcntrl->model_only = model_only;
 
 CLEANUP1:
 
@@ -799,10 +855,8 @@ CLEANUP1:
 
 }
 
-static void get_userval ( smfData *data, int axis, AstMapping **wcsmap,
-			  const char *userfile, smf_math_function fid, 
-			  int *prange, double *fixval, int *fixmask, 
-			  int *status )
+static void get_userval ( smfData *data, AstMapping **wcsmap,
+			  const char *userfile, void *pfcntrl, int *status )
 
 /*
 ** User supplied values. The routine opens a keymap file with parameters
@@ -813,6 +867,7 @@ static void get_userval ( smfData *data, int axis, AstMapping **wcsmap,
 **
 */
 {
+  fitStruct *fcntrl = (fitStruct *) pfcntrl; /* Pointer fit control struct */
 
   char    cpar;                        /* Char code for parameter        */
 
@@ -822,16 +877,26 @@ static void get_userval ( smfData *data, int axis, AstMapping **wcsmap,
   size_t  size;                        /* Size of group                  */
   char   *value;                       /* Pointer to GRP element buffer  */
 
-  double  pixscale;                    /* Pixel-scale */
+  double  fixval[MAXPAR];              /* Fixed/estimated values         */
+  int     fixmask[MAXPAR];             /* Par fixed (1) or free in fit   */
+  double  pixscale;                    /* Pixel-scale                    */
 
   AstKeyMap *uvalkmap=NULL;   /* Pointer to keymap of userval settings   */
   AstKeyMap *parkmap =NULL;            /*  Hash for par names used       */
 
   if (*status != SAI__OK) return;
 
+  /* Initialize arrays */
+  for ( int i = 0; i < MAXPAR; i++ ) {
+    fixval[i] = VAL__BADD;
+    fixmask[i] = 0;
+    fcntrl->fixval[i] = VAL__BADD;
+    fcntrl->fixmask[i] = 0;
+  }
+
   /* Find pixel scale */
   {
-    int    iaxis = axis - 1;             /* 0-based axis nr to fit along */
+    int    iaxis = fcntrl->axis - 1;      /* 0-based axis nr to fit along */
     double dval1[2], dval2[2];
     double centre = (int) (data->dims[iaxis]/2.0+0.51); /* Centrish pixel */
     dval1[0] = centre - 1;
@@ -840,12 +905,6 @@ static void get_userval ( smfData *data, int axis, AstMapping **wcsmap,
     if (*status != SAI__OK) return;
 
     pixscale = fabs(0.5*(dval2[1]-dval2[0]));
-  }
-
-  /* Set up arrays */
-  for ( int i = 0; i < MAXPAR; i++ ) {
-    fixval[i] = VAL__BADD;
-    fixmask[i] = 0;
   }
 
   if ( strlen(userfile) <= 0 ) {
@@ -965,7 +1024,7 @@ static void get_userval ( smfData *data, int axis, AstMapping **wcsmap,
 	} else if ( i == 2 ||
 		    ( fixval[offset+NPAR-1] == SMF__MATH_VOIGT && i == 3 ) ||
 		    ( fixval[offset+NPAR-1] == VAL__BADD && 
-		      fid == SMF__MATH_VOIGT && i == 3 ) ) {
+		      fcntrl->fid == SMF__MATH_VOIGT && i == 3 ) ) {
 	  pval = FWHM2DISP(cval/pixscale);
 	}
 	fixval[offset+i] = pval;
@@ -997,8 +1056,9 @@ static void get_userval ( smfData *data, int axis, AstMapping **wcsmap,
     int offset = icomp*NPAR;
     
     if ( fixval[offset+1] != VAL__BADD &&
-	 ( fixval[offset+1] < prange[0] || 
-	   fixval[offset+1] > prange[1] ) ) {
+	 ( fixval[offset+1] < fcntrl->lolimit[1] || 
+	   fixval[offset+1] > fcntrl->hilimit[1] ) ) {
+      /* Remove this component and shift all others forward */
       for ( int j = offset+NPAR; j < MAXPAR-3; j++ ){
 	fixval[j-NPAR] = fixval[j];
 	fixmask[j-NPAR] = fixmask[j];
@@ -1006,17 +1066,26 @@ static void get_userval ( smfData *data, int axis, AstMapping **wcsmap,
       for ( int j = MAXPAR-3-NPAR; j < MAXPAR-3; j++ ){
 	fixval[j-NPAR] = VAL__BADD;
 	fixmask[j-NPAR] = 0;
-      }
+      }	
       removed++;
       msgOutf( "", 
        "***SKIPPING*** fixed component %d: centre outside fit-range in %s\n",
 	       status, (int) icomp+removed, userfile );
-
+      
       /* reset to current position again */
       icomp--;
-    }
+    }	
   }
 
+  /* Copy local arrays to Struct */
+  /*
+  memcpy (fcntrl->fixval, fixval, MAXPAR*sizeof(double));
+  memcpy (fcntrl->fixmask, fixmask, MAXPAR*sizeof(int));
+  */
+  for ( int i = 0; i < MAXPAR; i++ ) {
+    fcntrl->fixval[i] = fixval[i];
+    fcntrl->fixmask[i] = fixmask[i];
+  }
 
 CLEANUP3:
   if ( grp != NULL ) grpDelet( &grp, status );
@@ -1435,9 +1504,9 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
 }
 
 
-static void convert_parunits( int mode, smfData *data,
-			      int axis, int ncomp, AstMapping **wcsmap,
-			      smfArray *pardata, int *status )
+static void convert_parunits( int mode, smfData *data, int axis, int ncomp, 
+			      AstMapping **wcsmap, smfArray *pardata, 
+			      int *status )
 /*
 ** Input parameters and parameters ndfs are in physical units whereas
 ** the program uses pixels. This routine converts the pixel-based 
