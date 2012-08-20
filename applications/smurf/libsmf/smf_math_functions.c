@@ -486,7 +486,7 @@ static void gaussderv( double  X,
            E = exp( -arg );
            AEX_X0 = A * E * X_X0;
            epar[0+offset] = E;               /* Derivative wrt. Amplitude A */
-  	   epar[1+offset] = AEX_X0/s/s;         /* Derv. wrt Center Xc */ 
+  	   epar[1+offset] = AEX_X0/s/s;         /* Derv. wrt Center Xc */
 	   epar[2+offset] = AEX_X0*X_X0/s/s/s;  /* Derv. wrt. dispersion */
 	}
       }
