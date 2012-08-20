@@ -45,7 +45,7 @@ range = <undef>
 # Function to fit. See documentation: currently implemented are gaussian,
 # gausshermite1, gausshermite2, voigt.
 
-function = gauss
+function = gaussian
 
 # Maximum number of 'component' functions to fit to each profile, e.g.
 # a multi-component spectrum of max. 3 gaussians. Note: The complete fit
@@ -113,12 +113,23 @@ absh3max = 0.5
 absh4min = 0.01
 absh4max = 0.35
 
-# This applies to Gausshermites, which, by their nature, can have negative 
-# "wings" on profiles. Those may indeed be present in the data and wanted 
-# to be fitted, but on many occasions gausshermites are used with the aim
-# to fit complicated positive profiles. This option causes the outputed 
-# fitted profiles to be set to zero whereever the fit would result in a 
-# negative value.
+# Retry: whenever the lorentzian or hermite parameters are out of
+# the routine re-tries the fit with the out-of-bounds parameter(s)
+# fixed at 0. This means that the fit resorts to a simpler function:
+# gausshermite2 -> gausshermite1 -> gaussian; voigt -> gaussian.
+# The result is that there are valid fits for more profiles, but the
+# fitted function may vary.
+# Setting the retry value to 0 prevents this from happening and may
+# cause the fit to fail or be (very) poor.
+
+retry = 1
+
+# This applies to mostly Gausshermites, which, by their nature, can
+# have negative "wings" on profiles. Those may indeed be present in the
+# data and wanted to be fitted, but on many occasions gausshermites are
+# used with the aim to fit complicated positive profiles. This option
+# causes the outputed fitted profiles from any function to be set to
+# zero whereever the fit would result in a negative value.
 
 pos_only = 1
 

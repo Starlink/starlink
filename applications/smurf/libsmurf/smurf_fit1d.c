@@ -62,8 +62,8 @@
 *     DIAGNDF = GROUP (Read)
 *          (NOT YET USED/TESTED!)
 *          Name of NDF to use as parameter file COMP_0 with diagnostics
-*          values. This parameter can also be used instead of PARNDF 
-*          except that the given NDFs are interpreted to start with 
+*          values. This parameter can also be used instead of PARNDF
+*          except that the given NDFs are interpreted to start with
 *          COMP_0, i.e. COMP_0, COMP_1 .. COMP_N. A null value requests
 *          that no diagnostic NDF be created. [!]
 *     IN = NDF (Read)
@@ -89,15 +89,15 @@
 *     RMS = _DOUBLE (Read)
 *          RMS in input NDF(s) in data units.
 *     USERVAL = GROUP (Read)
-*          Input keymap file name with user-supplied fixed values or initial 
+*          Input keymap file name with user-supplied fixed values or initial
 *          estimates for the fit and to flag whether parameters are to
-*          be kept fixed in the fit. Entries are of the form: 
+*          be kept fixed in the fit. Entries are of the form:
 *          "comp"#."fid" = value, "comp"#.par = value, or "fix"#.par = [0,1]
 *          with 'par' being a parameter relevant for the function being
 *          fitted or indicating a parameter to be kept fixed or fitted
 *          '#' (1..n) indicates the component profile being described.
-*         
-*          If specified "comp"#.id will override the default function 
+*
+*          If specified "comp"#.id will override the default function
 *          selected in the config file.
 *          Parameter names are described in the help item "Fitting_Functions":
 *                              comp.fid      comp.par
@@ -106,16 +106,16 @@
 *              Gausshermite2:      3        a, b, c, h4
 *              Voigt:              4        a, b, c, l
 *
-*          The "fix"#.par parameter can have a value of: 
-*               1 = fix parameter at given value, do not fit -or- 
+*          The "fix"#.par parameter can have a value of:
+*               1 = fix parameter at given value, do not fit -or-
 *               0 = use as initial estimate, but fit.
 *          As for comp, the '#' (1..n) indicates the component.
-*          
-*          A null value for USERVAL means that no user-supplied estimates 
+*
+*          A null value for USERVAL means that no user-supplied estimates
 *          are required.  [!]
 
 *  Configuration Parameters:
-*     A default configuration file can be found at 
+*     A default configuration file can be found at
 *                     $SMURF_DIR/smurf_fit1d.def.
 *     AXIS = INTEGER
 *          Axis to fit along (starting at 1). A value of 0 translates
@@ -127,12 +127,12 @@
 *          initial estimates are critical for the fit and checking
 *          and/or fixing initial estimates may help solve problems. [0]
 *     FUNCTION = STRING
-*          Function to fit.  Currently implemented are "gaussian", 
+*          Function to fit.  Currently implemented are "gaussian",
 *          "gausshermite1", "gausshermite2", "voigt".
 *          See topic "Fitting Functions" for details. ["gaussian"]
 *     MAXLORZ = REAL
 *          Maximum value for the FHWM of the Lorentzian component in
-*          terms of ==PIXELS==(!). 
+*          terms of ==PIXELS==(!).
 *          Applies Voigt fits only. [<undef>]
 *     MINAMP = REAL
 *          Minimum value for the Amplitude to accept as a genuine fit
@@ -153,7 +153,7 @@
 *     NCOMP = INTEGER
 *          Maximum number of 'component' functions to fit to each
 *          profile, e.g. a multi-component spectrum of maximum three
-*          gaussians. [Note: The complete fit of the gaussians is done 
+*          gaussians. [Note: The complete fit of the gaussians is done
 *          concurrently, not iteratively starting e.g. with the strongest
 *          component]. The routine will try to find and fit ncomp
 *          functions along each profile, but may settle for less. [3]
@@ -167,16 +167,16 @@
 *     The function menu provides the choice of four functions for which
 *     you can fit the parameters to the data in your profiles.
 *
-*     1) A standard GAUSSIAN. Parameters are 
+*     1) A standard GAUSSIAN. Parameters are
 *            a = maximum, b = centre, and c = FWHM.
 *
-*     NOTE that if one of h3 and h4 in a gauss-hermite function is non-zero, 
+*     NOTE that if one of h3 and h4 in a gauss-hermite function is non-zero,
 *     the mean of the distribution is not the position of the maximum
 *     (Reference; Marel, P. van der, Franx, M., A new method for the
 *     identification of non-gaussian line profiles in elliptical galaxies.
 *     A.J., 407 525-539, 1993 April 20):
 *
-*     2) GAUSS-HERMITE1 polynomial (h3). Parameters are 
+*     2) GAUSS-HERMITE1 polynomial (h3). Parameters are
 *            a (amplitude), b (position),c (width), and h3
 *     as mentioned these are *NOT* the same as maximum, centre, and fwhm
 *     of the distribution as for a gaussian:
@@ -186,7 +186,7 @@
 *                    FWHM ~= abs( c*(1-3h3^2) ) ~= c
 *                skewness ~= 4*sqrt(3)*h3
 *
-*     3) GAUSS-HERMITE2 polynomial (h3, h4). Same as previous, but an 
+*     3) GAUSS-HERMITE2 polynomial (h3, h4). Same as previous, but an
 *        extra parameter h4 is included:
 *                 maximum ~= [determine value and position of max from
 *                             fitted profiles using e.g. collapse]
@@ -195,8 +195,8 @@
 *                skewness ~= 4*sqrt(3)*h3
 *                kurtosis ~= 8*sqrt(6)*h4
 *
-*     4) VOIGT function. Parameters are 
-*            a (area), b (centre), c (doppler width), l (lorenztian width), 
+*     4) VOIGT function. Parameters are
+*            a (area), b (centre), c (doppler width), l (lorenztian width),
 *            and v (area factor)
 *        with relations:
 *                 maximum ~= [determine value of max from fitted
@@ -204,11 +204,11 @@
 *                  centre ~= b
 *            doppler fwhm ~= abs( 2*c )
 *         lorentzian fwhm ~= abs( 2*l )
-*                     amp  = v (OUTPUT ONLY!) amplitude calculated from 
+*                     amp  = v (OUTPUT ONLY!) amplitude calculated from
 *                            a (area) using the standard amp2area function
 *                            for a voigt (based on the Faddeeva complex
 *                            error function):
-*                               amp = area / amp2area 
+*                               amp = area / amp2area
 *
 *  Fitted Parameters:
 *     The fitted parameters are stored in the file header as
@@ -326,7 +326,7 @@
 
 static void get_fit1par( void *pfcntrl, int *status );
 
-static void get_userval ( smfData *data, AstMapping **wcsmap, 
+static void get_userval ( smfData *data, AstMapping **wcsmap,
 			  const char *userfile, void *pfcntrl, int *status );
 
 static void map_axis_to_wcs ( smfData *data, int axis, AstMapping **wcsmap,
@@ -348,14 +348,14 @@ static void setup_parameter_ndfs ( smfData *data, int axis, int ncomp,
 
 static void copy_parameter_ndfs ( smfArray *pardata, int *status );
 
-static void convert_parunits( int mode, smfData *data, int axis, 
+static void convert_parunits( int mode, smfData *data, int axis,
 			      int ncomp, AstMapping **wcsmap,
 			      smfArray *pardata, int *status );
 
 static void ndf2array ( smfData *sdata, int axis, int ipar, int write,
 			double *values, double *errors, int *status );
 
-/* Allowed parameter ids for non-polynomials and seq nr (plane) in 
+/* Allowed parameter ids for non-polynomials and seq nr (plane) in
    parameter ndfs. See 'Fitted functions in smurf_fit1d.c */
 const char* parkeys[] = { "A", "B", "C", "H3", "H4", "L", "V", "FID" };
 int parloc[]          = {  1,   2,   3,   4,    5,    4,   5,   7 };
@@ -421,7 +421,7 @@ void smurf_fit1d( int * status )
     errAnnul ( status );
     one_strlcpy ( f_userval, "", sizeof(f_userval), status );
   }
-  
+
   /* Extract and read user supplied values using a keymap */
   get_fit1par( &fcntrl, status );
 
@@ -516,7 +516,7 @@ void smurf_fit1d( int * status )
     if ( *status != SAI__OK) {
       goto CLEANUP;
     }
-    fcntrl.lolimit[1] = prange[0];      /* Prange is limit on centre value */ 
+    fcntrl.lolimit[1] = prange[0];      /* Prange is limit on centre value */
     fcntrl.hilimit[1] = prange[1];
 
     /* Each component is described by NPAR-1 parameters plus an id plane.
@@ -532,7 +532,7 @@ void smurf_fit1d( int * status )
     copy_parameter_ndfs ( pardata, status );
     if ( *status != SAI__OK) {
       goto CLEANUP;
-    } 
+    }
 
     /* Fitted parameters (centre, dispersion) are in coordinates. Convert
        values from paramter ndfs to pixels for the fit */
@@ -551,7 +551,7 @@ void smurf_fit1d( int * status )
     /* Fill the rest of the fit control structure */
     msgOutiff(MSG__DEBUG, " ", "Populate %s control struct", status,
 	      FUNC_NAME);
- 
+
     fcntrl.clip[0]  = VAL__BADD;
     fcntrl.clip[1]  = VAL__BADD;
 
@@ -688,6 +688,22 @@ static void get_fit1par( void *pfcntrl, int *status )
   }
   fcntrl->fid = fid;
 
+  one_strlcpy ( fcntrl->usort,"amp", sizeof(fcntrl->usort), status );
+  {
+    const char * strpntr = NULL;
+    if ( astMapGet0C( keymap, "SORT", &strpntr ) ) {
+      if (*status == SAI__OK && strpntr ) {
+	msgOutiff( MSG__VERB, "", "... SORT=%s", status, strpntr);
+	one_strlcpy ( fcntrl->usort, strpntr, sizeof(fcntrl->usort), status );
+      } else {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "Failed to get parameter SORT from config file",
+	       status);
+	goto CLEANUP1;
+      }
+    }
+  }
+
   /* Get ncomp to fit along */
   int ncomp = 1;
   if ( astMapGet0I( keymap, "NCOMP", &ncomp ) ) {
@@ -818,7 +834,37 @@ static void get_fit1par( void *pfcntrl, int *status )
   fcntrl->hilimit[3] = absh3max;
   fcntrl->lolimit[4] = absh4min;
   fcntrl->hilimit[4] = absh4max;
-  
+
+  /* Retry bad fits with out-of-bounds parameter fixed? */
+  int do_retry = YES;
+  if ( astMapGet0I( keymap, "RETRY", &do_retry ) ) {
+    if ( *status == SAI__OK ) {
+      msgOutiff( MSG__VERB, "", "... RETRY=%d", status,
+		 do_retry );
+    } else {
+      errRep(FUNC_NAME,
+         "Failed to get parameter RETRY from config file", status);
+      goto CLEANUP1;
+    }
+  }
+  fcntrl->do_retry = do_retry;
+
+  /* Restrict output profile to be positive only (negative value
+     are replaced by zeroes */
+  int pos_only = YES;
+  if ( astMapGet0I( keymap, "POS_ONLY", &pos_only ) ) {
+    if ( *status == SAI__OK ) {
+      msgOutiff( MSG__VERB, "", "... POS_ONLY=%d", status,
+		 pos_only );
+    } else {
+      errRep(FUNC_NAME,
+         "Failed to get parameter POS_ONLY from config file",
+	     status);
+      goto CLEANUP1;
+    }
+  }
+  fcntrl->pos_only = pos_only;
+
   /* Do initial estimates only */
   int estimate_only = NO;
   if ( astMapGet0I( keymap, "ESTIMATE_ONLY", &estimate_only ) ) {
@@ -834,7 +880,7 @@ static void get_fit1par( void *pfcntrl, int *status )
   }
   fcntrl->estimate_only = estimate_only;
 
-  /* Do initial estimates only */
+  /* Do input model only */
   int model_only = NO;
   if ( astMapGet0I( keymap, "MODEL_ONLY", &model_only ) ) {
     if ( *status == SAI__OK ) {
@@ -911,8 +957,8 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
     goto CLEANUP3;
   }
 
-  /* Set up keymap with parameter name as key and corresponding parameter 
-  ** ndf "plane" as value, effective creating an associative or hash array 
+  /* Set up keymap with parameter name as key and corresponding parameter
+  ** ndf "plane" as value, effective creating an associative or hash array
   */
   parkmap = astKeyMap( "KeyError=1,KeyCase=0" );
   int npar=sizeof(parkeys)/sizeof(parkeys[0]);
@@ -925,9 +971,9 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
   msgOutif( MSG__VERB, " ", "Reading user supplied parameters file.", status );
 
   /*
-  ** Read in parameter file 
+  ** Read in parameter file
   */
-#if (USERVALDEFAULTFILE) 
+#if (USERVALDEFAULTFILE)
 
   uvalkmap = kpg1Config( "USERVAL", "$SMURF_DIR/smurf_fit1d_uval.def", NULL, status );
 
@@ -939,7 +985,7 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
 
   /* Create a KeyMap from this group. */
   kpg1Kymap( grp, &uvalkmap, status );
-  
+
   /* Delete the group. */
   grpDelet( &grp, status );
 
@@ -954,7 +1000,7 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
     const char *bkey = astMapKey( uvalkmap, ikey );
 
     /* These two are keymaps themselves */
-    if ( strncmp( bkey, "COMP", 4 ) == 0 || 
+    if ( strncmp( bkey, "COMP", 4 ) == 0 ||
          strncmp( bkey, "FIX", 3  ) == 0 ) {
 
       AstObject *obj = NULL;
@@ -964,14 +1010,14 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
       /* Get the values */
       int nkey2 = astMapSize( compkmap );
 
-      double  dval;                        /* For returned key value */  
+      double  dval;                        /* For returned key value */
       int iplane;                          /* From par hash above    */
 
       for( int ikey2 = 0; ikey2 < nkey2; ikey2++ ) {
 
         /* Get parameter key  and corresponding ndf plane*/
 	const char *pkey = astMapKey( compkmap, ikey2 );
-  
+
         dval = VAL__BADD;
 	astMapGet0D( compkmap, pkey, &dval );
 	astMapGet0I( parkmap,  pkey, &iplane ); ;
@@ -1023,7 +1069,7 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
 	  convert_coord_to_pixel ( wcsmap, &cval, 1, &pval, status );
 	} else if ( i == 2 ||
 		    ( fixval[offset+NPAR-1] == SMF__MATH_VOIGT && i == 3 ) ||
-		    ( fixval[offset+NPAR-1] == VAL__BADD && 
+		    ( fixval[offset+NPAR-1] == VAL__BADD &&
 		      fcntrl->fid == SMF__MATH_VOIGT && i == 3 ) ) {
 	  pval = FWHM2DISP(cval/pixscale);
 	}
@@ -1031,22 +1077,22 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
       }
 
       char fixed[7] = "free";
-      if ( fixmask[offset+i] == 1 ) 
+      if ( fixmask[offset+i] == 1 )
 	one_strlcpy ( fixed, "fixed", sizeof(fixed), status );
 
       if ( cval != VAL__BADD )
-	msgOutiff( MSG__DEBUG, "", 
-		 "... COMP%d.par%d input %.4f: stored as %f (%s)\n", 
+	msgOutiff( MSG__DEBUG, "",
+		 "... COMP%d.par%d input %.4f: stored as %f (%s)\n",
 		   status, icomp+1, i+1, (float) cval, (float) pval, fixed );
       else if ( fixmask[offset+i] == 1 )
-	msgOutiff( MSG__DEBUG, "", 
+	msgOutiff( MSG__DEBUG, "",
 		 "... COMP%d.par%d: (%s)\n", status, icomp+1, i+1, fixed );
 
     }
   }
 
 
-  /* Unfortunately need to check here whether any fixed centre position 
+  /* Unfortunately need to check here whether any fixed centre position
      given is in range since the lsqfit routine otherwise throws an error
      -5. Remove those and warn the user */
 
@@ -1054,9 +1100,9 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
   for ( int icomp = 0; icomp < MAXCOMPS; icomp++ ) {
 
     int offset = icomp*NPAR;
-    
+
     if ( fixval[offset+1] != VAL__BADD &&
-	 ( fixval[offset+1] < fcntrl->lolimit[1] || 
+	 ( fixval[offset+1] < fcntrl->lolimit[1] ||
 	   fixval[offset+1] > fcntrl->hilimit[1] ) ) {
       /* Remove this component and shift all others forward */
       for ( int j = offset+NPAR; j < MAXPAR-3; j++ ){
@@ -1066,15 +1112,15 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
       for ( int j = MAXPAR-3-NPAR; j < MAXPAR-3; j++ ){
 	fixval[j-NPAR] = VAL__BADD;
 	fixmask[j-NPAR] = 0;
-      }	
+      }
       removed++;
-      msgOutf( "", 
+      msgOutf( "",
        "***SKIPPING*** fixed component %d: centre outside fit-range in %s\n",
 	       status, (int) icomp+removed, userfile );
-      
+
       /* reset to current position again */
       icomp--;
-    }	
+    }
   }
 
   /* Copy local arrays to Struct */
@@ -1493,7 +1539,7 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
     }
   }
 
- 
+
 
 
  CLEANUP2:
@@ -1504,13 +1550,13 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
 }
 
 
-static void convert_parunits( int mode, smfData *data, int axis, int ncomp, 
-			      AstMapping **wcsmap, smfArray *pardata, 
+static void convert_parunits( int mode, smfData *data, int axis, int ncomp,
+			      AstMapping **wcsmap, smfArray *pardata,
 			      int *status )
 /*
 ** Input parameters and parameters ndfs are in physical units whereas
-** the program uses pixels. This routine converts the pixel-based 
-** parameters to coordinate based ones or the reverse: 
+** the program uses pixels. This routine converts the pixel-based
+** parameters to coordinate based ones or the reverse:
 ** e.g. pixels (1..n) along the third axis to velocities.
 **   mode =  1: convert pixel-based to coordinate-based values
 **        =  0: convert coordinate-based to pixel-based values
@@ -1610,7 +1656,7 @@ static void convert_parunits( int mode, smfData *data, int axis, int ncomp,
 	/* Errors scale with pixscale */
 	for ( iprof = 0; iprof < nprofiles; iprof++ ) {
 	  if ( inperr[iprof] != VAL__BADD) {
-            if ( mode == 1) 
+            if ( mode == 1)
 	      outerr[iprof] = inperr[iprof]*pixscale;
             else
 	      outerr[iprof] = inperr[iprof]/pixscale;
@@ -1623,24 +1669,24 @@ static void convert_parunits( int mode, smfData *data, int axis, int ncomp,
 
 	for ( iprof = 0; iprof < nprofiles; iprof++ ) {
 
-	  /* "width-like" parameters scale with pixscale */      
+	  /* "width-like" parameters scale with pixscale */
 	  if ( ipar == 2 ||
 	       ( fidval[iprof] == SMF__MATH_VOIGT && ipar == 3 ) ) {
 	    outval[iprof] = VAL__BADD;
 	    outerr[iprof] = VAL__BADD;
 	    if ( inpval[iprof] != VAL__BADD) {
-	      if ( mode == 1) 
+	      if ( mode == 1)
 		outval[iprof] = DISP2FWHM(inpval[iprof]*pixscale);
-	      else 
+	      else
 		outval[iprof] = FWHM2DISP(inpval[iprof]/pixscale);
 	    }
 	    if ( inperr[iprof] != VAL__BADD) {
-	      if ( mode == 1) 
+	      if ( mode == 1)
 		outerr[iprof] = DISP2FWHM(inperr[iprof]*pixscale);
-	      else 
+	      else
 		outerr[iprof] = FWHM2DISP(inperr[iprof]/pixscale);
-	    }           
-	    
+	    }
+
 	  /* Leave the rest alone */
 	  } else {
 	    outval[iprof] = inpval[iprof];

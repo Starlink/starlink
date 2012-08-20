@@ -31,8 +31,8 @@
 
 /* Switch off fitting a zerolevel globally since the option has not been
    tested extensively and MFITTREND is better suited. Smurf_fit1d is not
-   set up to include fitting a zerolevel. Smf_fit_profile should be 
-   reasonably ok (but virtually untested. The main complication is how 
+   set up to include fitting a zerolevel. Smf_fit_profile should be
+   reasonably ok (but virtually untested. The main complication is how
    to deal wit zerolevels with wide profiles such as Voigts               */
 #define FITZEROLEVEL   0
 
@@ -46,8 +46,11 @@ typedef struct {
   double fixval[MAXPAR];          /* User defined fixed values            */
   int    fixmask[MAXPAR];         /* Fit mask: 1: fixed; 0: fit           */
   double clip[2];                 /* Clip levels for data                 */
+  char   usort[7];                /* Sort of output (amp, pos, width)     */
   double lolimit[NPAR];           /* Lower limits for parameters          */
   double hilimit[NPAR];           /* Upper limits for parameters          */
+  int    do_retry;                /* Use re-try cascade for bad fits?     */
+  int    pos_only;                /* Output profile positive only?        */
   int    estimate_only;           /* Initial estimates only, do not fit   */
   int    model_only;              /* Generate model from suppplied params */
 } fitStruct;                      /* fit control struct                   */
