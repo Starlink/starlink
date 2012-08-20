@@ -4788,6 +4788,31 @@ to handle data from a variety of different instruments.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
+<component id="pal" support="S">
+  <version>0.1.5</version>
+  <path>libext/pal</path>
+  <description>Position Astronomy Library</description>
+  <abstract><p>
+    This library is a collection of code designed to aid in
+    replacing the SLA library with code from NOVAS and
+    SOFA.
+
+    Where possible the API is similar to the C SLA API
+    except for the use of a "pal" prefix.
+    </p></abstract>
+  <dependencies >
+    <build>sofa</build><build>starutil</build><link>sofa</link><link>starutil</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>t.jenness@jach.hawaii.edu</uname>
+    </person>
+  </developers>
+  <documentation> sun267</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+</component>
+
 <component id="agi" support="S">
   <version>2.1-2</version>
   <path>libraries/agi</path>
@@ -5781,31 +5806,6 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun234</documentation>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-</component>
-
-<component id="pal" support="S">
-  <version>0.1.5</version>
-  <path>libraries/pal</path>
-  <description>Position Astronomy Library</description>
-  <abstract><p>
-    This library is a collection of code designed to aid in
-    replacing the SLA library with code from NOVAS and
-    SOFA.
-
-    Where possible the API is similar to the C SLA API
-    except for the use of a "pal" prefix.
-    </p></abstract>
-  <dependencies >
-    <build>sofa</build><build>starutil</build><link>sofa</link><link>starutil</link><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Tim Jenness</name>
-      <uname>t.jenness@jach.hawaii.edu</uname>
-    </person>
-  </developers>
-  <documentation> sun267</documentation>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 

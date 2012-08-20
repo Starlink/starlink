@@ -151,3 +151,6 @@
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-DAS"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-DAS
 	url = git://github.com/jac-h/perl-JCMT-DAS.git
+[submodule "libext/pal"]
+	path = libext/pal
+	url = ../pal

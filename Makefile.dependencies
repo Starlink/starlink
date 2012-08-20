@@ -1820,7 +1820,7 @@ $(MANIFESTS)/pal: \
 		$(MANIFESTS)/sofa \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starutil
-	cd libraries/pal \
+	cd libext/pal \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/pamela: \
