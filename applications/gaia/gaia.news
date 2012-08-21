@@ -1,3 +1,5 @@
+  Kapuahi Release
+  ===============
 
     Version 4.4-3
     =============
@@ -47,6 +49,9 @@
     region of the displayed pixel. Previously the region of the end points
     started at the middle of the previous pixel and extended in the middle
     of the selected pixel.
+
+    Fix a bug in the CUPID catalogue import that stopped more than one
+    being imported using the same session.
 
   Kaulia Release
   ==============
