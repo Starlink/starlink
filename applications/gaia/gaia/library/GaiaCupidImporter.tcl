@@ -488,8 +488,10 @@ itcl::class gaia::GaiaCupidImporter {
          return
       }
 
-      if { [info exists tranwcs_] && $tranwcs_($catwin) != 0 } {
-         catch {gaiautils::astannul $tranwcs_($catwin)}
+      if { [info exists tranwcs_] && [info exists tranwcs_($catwin)] } {
+         if { $tranwcs_($catwin) != 0 } {
+            catch {gaiautils::astannul $tranwcs_($catwin)}
+         }
       }
       set comments [$catwin comments]
       set tranwcs 0
