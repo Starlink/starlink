@@ -45,9 +45,8 @@
 *     planes in these cubes correspond to: amplitude, position, and fwhm.
 *     Further details are under topic "Fitted Parameters".
 *
-*     A default config file is in $SMURF_DIR/smurf_fit1d.def.
-*
-*     Please note that this routine is still under active development.
+*     A default config file is in $SMURF_DIR/smurf_fit1d.def. A sample
+*     file for user specified values is $SMURF_DIR/smurf_fit1d_uval.def.
 *
 *  Usage
 *     fit1d in out rms config [userval] [diagndf] [parndf]
@@ -59,13 +58,6 @@
 *          value is supplied, a set of default configuration parameter
 *          values will be used from $SMURF_DIR/smurf_fit1d.def.  See the
 *          "Configuration Parameters" topic for detailed information.
-*     DIAGNDF = GROUP (Read)
-*          (NOT YET USED/TESTED!)
-*          Name of NDF to use as parameter file COMP_0 with diagnostics
-*          values. This parameter can also be used instead of PARNDF
-*          except that the given NDFs are interpreted to start with
-*          COMP_0, i.e. COMP_0, COMP_1 .. COMP_N. A null value requests
-*          that no diagnostic NDF be created. [!]
 *     IN = NDF (Read)
 *          Baselined input file(s).
 *     OUT = NDF (Write)
@@ -74,32 +66,62 @@
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null value is supplied no file is created. [!]
-*     PARNDF = GROUP (Read)
-*          (NOT YET USED/TESTED!)
-*          Name of NDF(s) to use for parameter files COMP_1 .. COMP_N with
-*          parameters for the function(s). These values will be used as
-*          initial values for further processing: for the fit or to generate
-*          the model with. Providing fewer than NCOMP files will result in
-*          a warning and remaining components will be left unfilled.
-*          Supplying more than NCOMP files will generate an error. If the
-*          location to a standard SMURF_FIT1D extension is given as
-*          "filename.MORE.SMURF_FIT1D" all the components in the extension
-*          will be copied.  A null value means no parameter NDFs are
-*          required.  [!]
+*     PARDIR = LITERAL (Read)
+*          Directory with component parameter files or the parameter NDF.
+*          For details see help on PARCOMP. To escape special characters
+*          (",", ".", "@", etc) in the string you may need to use a set of
+*          single+double quotes. A null value results in use of the current
+*          directory. [!]
+*     PARCOMP = GROUP (Read)
+*          Component parameter file(s) to use for initial estimates, fixed
+*          values, or to generate a model with (see "model_only"). Instead
+*          of a comma separated string of filenames a "^list" file can be
+*          submitted with each filename on a separate line. Files will map
+*          to components 1..N in the order as specified. See "Fitted
+*          Parameters" for more information on parameter files.
+*
+*          The full specification of a parameter file name consists of three
+*          parts: an optional directory path ("pardir"), an optional container
+*          ndf ("parndf") and plus the base name for the file ("parcomp"):
+*                   "pardir"/"parndf".MORE.SMURF_FIT1D."parcomp"
+*          For convenience "pardir" and "parndf" can be specified through
+*          their respective parameters, but full name(s) can also be
+*          specified through "parcomp". In case "pardir" is specified, FIT1D
+*          will append a "/". Similarly, if "parndf" is given the string
+*          ".MORE.SMURF_FIT1D." will be appended. Note that leaving "parndf"
+*          blank will result in a conventional "pardir"/"filename" path.
+*
+*          In case "parndf" is specified, but "parcomp" is not, all components
+*          in the container file will be read. Note that COMP_0 will be skipped
+*          since it hold diagnostics information about the fit.
+*
+*          To escape special characters (",", ".", "@", etc) in the string
+*          you may need to use a set of single+double quotes. A null value
+*          means no component parameter files will be used. [!]
+*     PARNDF = LITERAL (Read)
+*          NDF resulting from a previous execution of FIT1D and containing
+*          component parameter files as part of its meta-data to use in the
+*          current fit. The components are stored as
+*          "parndf".MORE.SMURF_FIT1D.COMP_#.
+*          For further details see help on PARCOMP. To escape special
+*          characters (",", ".", "@", etc) in the string you may need to use
+*          a set of single+double quotes. [!]
 *     RMS = _DOUBLE (Read)
 *          RMS in input NDF(s) in data units.
 *     USERVAL = GROUP (Read)
 *          Input keymap file name with user-supplied fixed values or initial
 *          estimates for the fit and to flag whether parameters are to
-*          be kept fixed in the fit. Entries are of the form:
+*          be kept fixed in the fit. The sample/default keymap file is
+*          $SMURF_DIR/smurf_fit1d_uval.def.
+*  Entries are of the form:
 *          "comp"#."fid" = value, "comp"#.par = value, or "fix"#.par = [0,1]
 *          with 'par' being a parameter relevant for the function being
 *          fitted or indicating a parameter to be kept fixed or fitted
 *          '#' (1..n) indicates the component profile being described.
 *
-*          If specified "comp"#.id will override the default function
+*          If specified "comp"#.fid will override the default function
 *          selected in the config file.
-*          Parameter names are described in the help item "Fitting_Functions":
+*          Parameter names are described in the help item "Fitting Functions"
 *                              comp.fid      comp.par
 *              Gauss:              1        a, b, c
 *              Gausshermite1:      2        a, b, c, h3
@@ -112,15 +134,27 @@
 *          As for comp, the '#' (1..n) indicates the component.
 *
 *          A null value for USERVAL means that no user-supplied estimates
-*          are required.  [!]
+*          or fixed values are to be used.  [!]
 
 *  Configuration Parameters:
-*     A default configuration file can be found at
-*                     $SMURF_DIR/smurf_fit1d.def.
+*     A default configuration file can be found at $SMURF_DIR/smurf_fit1d.def.
+*     ABSH3MIN, ABSH3MAX = REAL
+*          Min and Max allowable value for the H3 (~skew) parameter in a
+*          Gausshermite# fit. If RETRY=1 has been set, a pure gaussian fit
+*          (H3=0) will be attempted in case the initial fit of H3 is out
+*          of bounds. Set to <undef> if no limit desired. [0.01, 0.5]
+*     ABSH4MIN, ABSH4MAX = REAL
+*          Min and Max allowable value for the H4 (~peakiness) parameter in
+*          a Gausshermite4 fit. If RETRY=1 has been set, a gausshermite1 fit
+*          (H4=0) will be attempted in case the initial fit of H4 is out of
+*          bounds. Set to <undef> if no limit desired. [0.01, 0.35]
 *     AXIS = INTEGER
 *          Axis to fit along (starting at 1). A value of 0 translates
 *          as fit along highest dimension i.e. Vlsr in a Ra, Dec, Vlsr cube.
 *          [0]
+*     CLIP(2) = REAL
+*          Values in the input profiles outside the specified clip-range
+*          [min,max] will be not be used in the fit.
 *     ESTIMATE_ONLY = LOGICAL
 *          Set to 1: The output cube will have the results from the
 *          initial estimates routine instead of the the fit.  Good
@@ -129,22 +163,24 @@
 *     FUNCTION = STRING
 *          Function to fit.  Currently implemented are "gaussian",
 *          "gausshermite1", "gausshermite2", "voigt".
-*          See topic "Fitting Functions" for details. ["gaussian"]
+*          See topic "Fitting Functions" for details. If your aim is to
+*          capture a much emission as possible e.g. in order to create a
+*          2-D image from a 3-D cube, gausshermite2 profiles are
+*          recommmended. ["gausshermite2"]
 *     MAXLORZ = REAL
-*          Maximum value for the FHWM of the Lorentzian component in
-*          terms of ==PIXELS==(!).
-*          Applies Voigt fits only. [<undef>]
+*          Maximum value for the FHWM of the Lorentzian component ("L") in
+*          a Voigt fit in terms of ==PIXELS==(!). If RETRY=1 has been set,
+*          a pure gaussian fit (L=0) will be attempted in case the initial
+*          fit of H3 is out of bounds. [<undef>]
 *     MINAMP = REAL
-*          Minimum value for the Amplitude to accept as a genuine fit
-*          in terms of the rms. Based on the amplitude alone, at 3-sigma
-*          5% of the profiles selected for fitting can be expected to be
-*          noise spikes. This value drops to 2% for 5-sigma. All
-*          assuming gaussian statistics of course.  Applies to Gauss*
-*          and Voigt fits only. [3]
+*          Minimum value for the Amplitude-like parameter to accept as a
+*          genuine fit in terms of the RMS(!). Based on this alone at 3-sigma
+*          ~5% of the profiles selected for fitting can be expected to be
+*          noise spikes. This value drops to ~2% for 5-sigma. All
+*          assuming gaussian statistics of course.  [3]
 *     MINWIDTH = REAL
 *          Minimum value for the FHWM (~2.35*Dispersion) to accept as a
-*          genuine fit in terms of ==PIXELS==(!).
-*          Applies to Gauss* and Voigt fits only. [1.88]
+*          genuine fit in terms of ==PIXELS==(!). [1.88]
 *     MODEL_ONLY = LOGICAL
 *          Set to 1: Bypass both the initial estimates and fitting
 *          routine and generate profiles directly from the supplied
@@ -157,11 +193,48 @@
 *          concurrently, not iteratively starting e.g. with the strongest
 *          component]. The routine will try to find and fit ncomp
 *          functions along each profile, but may settle for less. [3]
+*     POS_ONLY = LOGICAL
+*          FIT1D expected profiles to have been baselined i.e. fitted
+*          profiles typically should not have a negative values. However,
+*          Gausshermite profiles naturally give rise to undesired negative
+*          features e.g. in fitting skewed profiles. This parameter simply
+*          causes the routine to set values in the output profiles to zero
+*          whereever they are negative. This generally gives better matching
+*          profiles, but of course means the fits are not pur gausshermites
+*          anymore. Make sure to set this parameter to NO of your profiles
+*          have genuine negative features e.g. as in p-cygni profiles. [YES]
 *     RANGE(2) = REAL
 *          Coordinate range along axis to find and fit profiles. The
 *          format is (x1, x2) including the ().  For example,
 *          Vlsr -20 35 is "(-20,35)".
 *          Default is to use the full extent of the axis: [<undef>]
+*     RETRY = LOGICAL
+*          Whenever the lorentzian ("L") or hermite parameters ("H3", "H4")
+*          are out of the routine re-tries the fit with the out-of-bounds
+*          parameter(s) fixed at 0. This means that in effect the fit cascades
+*          to a simpler function:
+*             gausshermite2 -> gausshermite1 -> gaussian; voigt -> gaussian.
+*          The result is that there are valid fits for more profiles, but the
+*          function actually fitted may vary with position.
+*          Setting the retry value to 0 prevents this from happening and may
+*          cause the fit to fail or be (very) poor. [YES]
+*    SORT = STRING
+*          Sort the resulting fits:
+*            "amp": sort by decreasing fitted value of the amp-like parameter
+*          "width": sort by decreasing fitted fwhm of the width-like parameter
+*          "pos":   sort by increasing fitted distance from the centre pixel
+*                   in the profile.
+*          Sorting can be helpful, but be cautioned that it can also
+*          complicate things: if there are two components one at -10 km/s
+*          and one at 10 km/s sorting by amplitude or width can result
+*          in the parameter file for component 1 to be a mix of the -10
+*          and 10 km/s features depending on which one was relatively
+*          stronger or wider. Similarly, sorting by position can result in
+*          low-amplitude fits of noise spikes to be mixed with stronger
+*          components. For more precise control try to run the routine
+*          iteratively with e.g. a different restricted velocity range to
+*          try pick out the different components. Default is to sort by
+*          amplitude. ["amp"]
 
 *  Fitting Functions:
 *     The function menu provides the choice of four functions for which
@@ -299,6 +372,7 @@
 #include "star/ndg.h"
 #include "star/util.h"
 #include "star/one.h"
+#include "one_err.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -552,9 +626,6 @@ void smurf_fit1d( int * status )
     msgOutiff(MSG__DEBUG, " ", "Populate %s control struct", status,
 	      FUNC_NAME);
 
-    fcntrl.clip[0]  = VAL__BADD;
-    fcntrl.clip[1]  = VAL__BADD;
-
     /*
     ** Fit the profiles
     */
@@ -669,6 +740,23 @@ static void get_fit1par( void *pfcntrl, int *status )
   }
   fcntrl->range[0] = range[0];
   fcntrl->range[1] = range[1];
+
+  /* Get clip of pixels to fit over */
+  double clip[2] = {VAL__BADD,VAL__BADD};
+  nval = 0;
+  if ( astMapGet1D( keymap, "CLIP", 2, &nval, clip ) ) {
+    if ( *status == SAI__OK  && nval >  1) {
+      msgOutiff( MSG__VERB, "", "... CLIP=[%f,%f]", status,
+		 (float) clip[0], (float) clip[1] );
+    }
+    if ( nval < 2 || clip[0] == clip[1] ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "CLIP requires two differing values", status);
+      goto CLEANUP1;
+    }
+  }
+  fcntrl->clip[0] = clip[0];
+  fcntrl->clip[1] = clip[1];
 
   smf_math_function fid = 1;
   {
@@ -915,14 +1003,7 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
 {
   fitStruct *fcntrl = (fitStruct *) pfcntrl; /* Pointer fit control struct */
 
-  char    cpar;                        /* Char code for parameter        */
-
   Grp    *grp = NULL;                  /* Group to hold config values    */
-  int     added;                       /* Number of names added to group */
-  int     flag;                        /* Flag                           */
-  size_t  size;                        /* Size of group                  */
-  char   *value;                       /* Pointer to GRP element buffer  */
-
   double  fixval[MAXPAR];              /* Fixed/estimated values         */
   int     fixmask[MAXPAR];             /* Par fixed (1) or free in fit   */
   double  pixscale;                    /* Pixel-scale                    */
@@ -1410,84 +1491,125 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
 */
 {
   /* Parameter NDFs */
-  smfData  *pdata = NULL;           /* smfData for component */
-  int       icomp;                  /* Component index (0 for base-line fit) */
-  int       idim;                   /* Index of pixel axis */
+  Grp      *pgrp = NULL;            /* Parameter ndfs group       */
+  Grp      *cgrp = NULL;            /* Components ndfs group      */
+  char     *pname = NULL;           /* Temporary pointer          */
+  smfData  *pdata = NULL;           /* smfData for component      */
   smfData  *cdata = NULL;           /* Parameter file data struct */
+  size_t    psize = 0;              /* Param ndfs group size      */
+  size_t    csize = 0;              /* Diag ndfs group size       */
+  int       idim;                   /* Index of pixel axis        */
 
-  size_t    csize = 0;              /* Diag ndfs group size */
-  size_t    psize = 0;              /* Param ndfs group size */
-  Grp      *cgrp = NULL;            /* Components ndfs group */
-  Grp      *pgrp = NULL;            /* Parameter ndfs group */
-  char      filename[GRP__SZNAM+1] = ""; /* Filename */
-  char     *pname = NULL;           /* Temporary pointer */
-  int       added;                  /* GRP parameters */
-  int       flag;                   /* GRP parameters */
+  char      pardir[GRP__SZNAM+1]   = ""; /* PARDIR parameter      */
+  char      parndf[GRP__SZNAM+1]   = ""; /* PARNDF parameter      */
+  char      rootname[GRP__SZNAM+1] = ""; /* Dir and ndf name      */
+  char      compname[GRP__SZNAM+1] = ""; /* Component name        */
+  char      filename[GRP__SZNAM+1] = ""; /* Full Filename         */
 
-  void     *parpntr, *comppntr;     /* Void pointers */
+  void     *parpntr, *comppntr;     /* Void pointers              */
 
   if (*status != SAI__OK) return;
 
-  /* Ask for component 0 separately, but if more than one name
-     is returned assume it is the full set of ndfs desired and
-     try to skip PARNDF. */
-
-  /* Get file names from DIAGNDF */
-  kpg1Rgndf( "DIAGNDF", 0, 0, "", &cgrp, &csize, status );
-
+  /* Directory Path  */
+  parGet0c ( "PARDIR", pardir, GRP__SZNAM, status );
   if ( *status == PAR__NULL ) {
-    /* Add empty string in location 1 of the group for COMP_O */
+    errAnnul ( status );
+    one_strlcpy ( pardir, "", sizeof(pardir), status );
+  }
+
+  /* Parameter NDF  */
+  parGet0c ( "PARNDF", parndf, GRP__SZNAM, status );
+  if ( *status == PAR__NULL ) {
+    errAnnul ( status );
+    one_strlcpy ( parndf, "", sizeof(parndf), status );
+  }
+
+  /* Start building up full file name */
+  one_strlcpy ( rootname, "", sizeof(rootname), status );
+  if ( strcmp(pardir, "") != 0 ) {
+    one_strlcpy ( rootname, pardir, sizeof(rootname), status );
+    one_strlcat ( rootname, "/", sizeof(rootname), status );
+  }
+
+  if ( strcmp(parndf, "") != 0 ) {
+    one_strlcat ( rootname, parndf, sizeof(rootname), status );
+    one_strlcat ( rootname, ".MORE.SMURF_FIT1D.", sizeof(rootname),
+		  status );
+  }
+
+  if ( *status == ONE__TRUNC ) {
     *status = SAI__OK;
-    cgrp = grpNew( "GRP", status );
-    grpPut1( cgrp, filename, 0, status );
-    csize = 1;
-  } else if ( *status != SAI__OK ) {
-    errRep(TASK_NAME, "Error reading DIAGNDF parameter", status);
+    msgOutf(" ", "Error: name truncated to '%s'\n", status, rootname );
+    *status = ONE__TRUNC;
+    errRep(TASK_NAME, "Pardir plus parndf too long ", status);
+    goto CLEANUP2;
+  }
+
+  /* Got the root set up, now read the names for each component */
+
+  /* Open new group for full component parameter file names. */
+  pgrp = grpNew( "GRP", status );
+
+  /* Ask for component parameter files */
+  kpg1Rgndf( "PARCOMP",  0, 0, "", &cgrp, &csize, status );
+  if ( *status == PAR__NULL ) {
+    csize = 0;
     *status = SAI__OK;
   }
 
-  /* Get file names from PARNDF if DIAGNDF not a list */
-  if ( csize < 2 ) {
+  if ( *status != SAI__OK )
+    errRep(TASK_NAME, "Error reading PARNDF parameter", status);
+  else {
 
-    kpg1Rgndf( "PARNDF",  0, 0, "", &pgrp, &psize, status );
-
-    if ( *status == PAR__NULL ) {
-      psize = 0;
-      *status = SAI__OK;
-    } else if ( *status != SAI__OK ) {
-      errRep(TASK_NAME, "Error reading PARNDF parameter", status);
-      *status = SAI__OK;
-    } else {
-      pname = filename;
-      for ( int i = 1; i <= (int) psize; i++ ) {
-	grpGet( pgrp, i, 1, &pname, GRP__SZNAM, status );
-	grpPut1( cgrp, filename, 0, status );
-      }
-      csize += psize;
+    int rsize = csize;
+    if ( rsize == 0 &&  strcmp(parndf, "") != 0 ) {
+      /* Try read any and all parameter files from NDF */
+      rsize = MAXCOMPS;
     }
 
+    pname = compname;
+    for ( int i = 1; i <= (int) rsize; i++ ) {
+      if ( csize > 0 )
+	grpGet( cgrp, i, 1, &pname, GRP__SZNAM, status );
+      else
+        sprintf( compname, "COMP_%d", i );
+
+      one_strlcpy ( filename, rootname, sizeof(filename), status );
+      one_strlcat ( filename, compname, sizeof(filename), status );
+      if ( *status == ONE__TRUNC ) {
+	*status = SAI__OK;
+	msgOutf(" ", "Error: name truncated to '%s'\n", status, filename );
+	*status = ONE__TRUNC;
+	errRep(TASK_NAME, "Pardir + parndf + parcomp too long ", status);
+	goto CLEANUP2;
+      }
+
+      grpPut1( pgrp, filename, 0, status );
+
+    }
+    psize += rsize;
   }
 
-  if ( csize == 0 ) goto CLEANUP2;
+  /* No parameter files to read */
+  if ( psize == 0 ) goto CLEANUP2;
 
+  size_t ncomp = pardata->ndat-1;                            /* Skip COMP_0 */
 
-  size_t ncomp = pardata->ndat;
-  if ( ncomp < csize ) {
-    *status = SAI__ERROR;
+  if ( ncomp < psize &&  ( csize != 0 ||  strcmp(parndf, "") == 0 ) ) {
     msgOutf( " ",
-    "ERROR: Nr parameter files (%d) exceeds number of components being fitted (%d)",
-	     status, (int) csize, (int) ncomp );
-    goto CLEANUP2;
-  } else if ( csize > 1 && csize < ncomp ) {
-    msgOutf(" ", "WARNING: Nr par. files (%d) less than components being fitted (%d),\n remaining components will be estimated.\n",
-	    status, (int) csize-1, (int) ncomp-1 );
+    "WARNING: Nr par. files (%d) exceeds number of components being fitted (%d).\n         Excess parameter files will be skipped.",
+	     status, (int) psize, (int) ncomp );
+    psize = ncomp;
+  } else if ( psize < ncomp ) {
+    msgOutf(" ", "WARNING: Nr par. files (%d) less than components being fitted (%d),\n         remaining components will be estimated.",
+	    status, (int) psize, (int) ncomp );
   }
 
-  for ( int in = 1, icomp = 0; in <= (int) csize && icomp < (int) ncomp;
+  for ( int in = 1, icomp = 1; in <= (int) psize && icomp <= (int) ncomp;
 	in++, icomp++ ) {
 
     pname = filename;
-    grpGet( cgrp, in, 1, &pname, GRP__SZNAM, status );
+    grpGet( pgrp, in, 1, &pname, GRP__SZNAM, status );
 
     if ( strcmp(filename, "") != 0 ) {
 
@@ -1498,10 +1620,23 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
 	dpts *= pdata->dims[idim];
       }
 
-      /* Open and copy the NDF data. */
-      smf_open_file( cgrp, in, "READ",
+      /* Open and copy the component NDF data. */
+      smf_open_file( pgrp, in, "READ",
 		 SMF__NOCREATE_DA | SMF__NOTTSERIES | SMF__NOCREATE_QUALITY,
 		 &cdata, status );
+
+      /* Ran out of components in container file */
+      if ( *status != SAI__OK && strcmp(parndf, "") != 0 && csize == 0 ) {
+	*status = SAI__OK;           /* Done */
+	msgOutf( " ",
+		 "Found (%d) component parameters in container file.",
+		 status, icomp-1 );
+        if ( (icomp-1) < (int) ncomp ) {
+	  msgOutf(" ", "WARNING: remaining %d components will be estimated.",
+		  status, (int) (ncomp-icomp+1) );
+	}
+	goto CLEANUP2;
+      }
 
       if ( *status != SAI__OK ) {
 	msgSeti("F", in);
@@ -1538,9 +1673,6 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
 
     }
   }
-
-
-
 
  CLEANUP2:
   if( cgrp != NULL ) grpDelet( &cgrp, status);

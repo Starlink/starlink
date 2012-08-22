@@ -27,31 +27,36 @@
 #
 # IMPORTANT: for gausshermites and voigts the first three parameters
 # (referred to as the amplitude, position, and width) do *NOT*
-# correspond to the maximum, centre, and FWHM as for a basic Gaussian! 
+# correspond to the maximum, centre, and FWHM as for a basic Gaussian!
 # Read the "smurfhelp fit1d" section on "Fitting_Functions" to see the
-# relations. 
+# relations.
 
 # Axis the fit along (nr starting at 1). '0' translates fit along
 # highest dimension i.e. Vlsr in a Ra, Dec, Vlsr cube.
 
 axis = 0
 
-# Coordinate range along axis to find and fit profiles. The format is 
-# (x1, x2) including the (). E.g. Vlsr -20 to 35 km/s: (-20,35). 
+# Coordinate range along axis to find and fit profiles. The format is
+# (x1, x2) including the (). E.g. Vlsr -20 to 35 km/s: (-20,35).
 # Default is to use the full extent of the axis.
 
 range = <undef>
 
+# Values in the input profiles outside the specified clip-range will
+# be not be used in the fit. The format is (min, max) including the ().
+
+clip = <undef>
+
 # Function to fit. See documentation: currently implemented are gaussian,
 # gausshermite1, gausshermite2, voigt.
 
-function = gaussian
+function = gausshermite2
 
 # Maximum number of 'component' functions to fit to each profile, e.g.
 # a multi-component spectrum of max. 3 gaussians. Note: The complete fit
-# of the gaussians is done concurrently, not iteratively starting e.g. 
-# with the strongest component. The routine will try to find and fit ncomp 
-# functions along each profile, but may settle for less. 
+# of the gaussians is done concurrently, not iteratively starting e.g.
+# with the strongest component. The routine will try to find and fit ncomp
+# functions along each profile, but may settle for less.
 
 ncomp = 3
 
@@ -63,11 +68,11 @@ ncomp = 3
 #
 # Sorting can be helpful, but be cautioned that it can also complicate
 # things: if there are two components one at -10 km/s and one at 10 km/s
-# sorting by amplitude or width can result in the parameter file for 
+# sorting by amplitude or width can result in the parameter file for
 # component 1 to be a mix of the -10 and 10 features depending on which
 # one was relatively stronger or wider. Similarly, sorting by position
 # can result in low-amplitude fits of noise spikes to be mixed with
-# stronger components. For more precise control try to run the routine 
+# stronger components. For more precise control try to run the routine
 # iteratively with e.g. a different restricted velocity range to try pick
 # out the different components. Default sorting is by amplitude.
 
@@ -84,14 +89,14 @@ sort = amp
 
 minamp = 3
 
-# Minimum value for the  width-like parameter (see at top) to accept as 
+# Minimum value for the  width-like parameter (see at top) to accept as
 # a genuine fit as FWHM (~2.35*Dispersion) in terms of ==PIXELS== (!).
 # This parameter can make a huge difference to the number of spurious or
 # rejected fits in the end result.
 
 minwidth = 1.88
 
-# Maximum value for the  FHWM of the Loretzian component of a voigt in terms 
+# Maximum value for the  FHWM of the Loretzian component of a voigt in terms
 # of  ==PIXELS== (!). A negative value implies no constraint.
 # Voigt fits only.
 
@@ -100,7 +105,7 @@ maxlorz = <undef>
 # Limits on the Gausshermite parameters h3 (~skew) and peakiness (~h4).
 # High values here typically mean that multi-component fit may be better
 # or,in case of h3, large negative features. It is possible for the
-# fitting routine to compensate for a negative wing (due to h3) with a 
+# fitting routine to compensate for a negative wing (due to h3) with a
 # secondary positive component. I.e. unless a fit of negative wings is
 # desired it is better to restrict h3. Small values for h3 and h4 are
 # probably better left fixed at 0. Whenever a hermite1 or hermite2 is
@@ -118,7 +123,7 @@ absh4max = 0.35
 # fixed at 0. This means that the fit resorts to a simpler function:
 # gausshermite2 -> gausshermite1 -> gaussian; voigt -> gaussian.
 # The result is that there are valid fits for more profiles, but the
-# fitted function may vary.
+# function actually fitted may vary with position.
 # Setting the retry value to 0 prevents this from happening and may
 # cause the fit to fail or be (very) poor.
 

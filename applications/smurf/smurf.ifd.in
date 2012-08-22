@@ -1442,13 +1442,13 @@ package @PACKAGE@ {
                 default !
             }
 
-            parameter diagndf {
+            parameter pardir {
                 position 6
                 type LITERAL
                 access READ
                 vpath DEFAULT
                 ppath DEFAULT
-                prompt {Input ndf for parameter diagnostics cube}
+                prompt {Directory with component parameter files}
                 helpkey *
                 default !
             }
@@ -1459,7 +1459,18 @@ package @PACKAGE@ {
                 access READ
                 vpath DEFAULT
                 ppath DEFAULT
-                prompt {Input ndf(s) for parameter cubes}
+                prompt {Input ndf with component parameter files}
+                helpkey *
+                default !
+            }
+
+            parameter parcomp {
+                position 8
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Component parameter files files}
                 helpkey *
                 default !
             }
