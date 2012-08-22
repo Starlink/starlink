@@ -194,8 +194,7 @@ static int getestimates( const double fdata[], const float weight[], int ndat,
 static int dolsqfit(  smf_math_function fid, const double pcoord[],
                       const double fdata[], float *weight,  int npts,
                       double *parlist, double *errlist, const int fixmask[],
-                      int npar, int *ncomp, void *pfcntrl, int *fitopt,
-		      int *status );
+                      int npar, int *ncomp, void *pfcntrl, int *fitopt );
 
 static void adjustestimates( smf_math_function fid, int nfound,
                              double *parlist, int npar );
@@ -917,7 +916,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 #endif
 	      iters = dolsqfit( SMF__MATH_GAUSS, pcoord, fdata, weight, npts,
 				parlist2, errlist2, fixmask2, npar2,
-				&nfound2, fcntrl, fitopt, status );
+				&nfound2, fcntrl, fitopt );
 	      if ( iters >= 0 && nfound2 > 0 ) {
 		for ( i = 0; (int) i < nfound2-1; i++ ) {
 		  int offset = i*npar;
@@ -950,7 +949,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 #endif
           int *fixmask = fcntrl->fixmask;
 	  iters = dolsqfit( fid, pcoord, fdata, weight, npts, parlist, errlist,
-			    fixmask, npar, &nfound, fcntrl, fitopt, status );
+			    fixmask, npar, &nfound, fcntrl, fitopt );
 
           if ( iters < 0 ) {
             nfound = 0;
@@ -1121,8 +1120,7 @@ static void FitProfileThread ( void *job_data_ptr, int *status ) {
 static int dolsqfit( smf_math_function fid, const double pcoord[],
                      const double fdata[], float *weight,  int npts,
                      double *parlist, double *errlist, const int fixmask[],
-                     int npar, int *ncomp, void *pfcntrl, int *fitopt,
-		     int *status )
+                     int npar, int *ncomp, void *pfcntrl, int *fitopt )
 /*------------------------------------------------------------*/
 /* PURPOSE: Fit profiles. Wrapper routine for smf_lsqfit.     */
 /* Return the number of iteration or a number < 0 for an      */
@@ -1806,7 +1804,7 @@ static int fillfromparndf( void *pfcntrl, const smfArray *pardata, int pbase,
 /*------------------------------------------------------------*/
 {
 
-  int     iters, pfound;          /* parndf: fit error code and nr fitted */
+  int     pfound;                 /* parndf: nr fitted */
   double *fitval, *fiterr;        /* Pointer to supplied data */
   size_t  index;                  /* Current index into array */
 
