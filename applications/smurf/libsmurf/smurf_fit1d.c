@@ -112,8 +112,7 @@
 *          Input keymap file name with user-supplied fixed values or initial
 *          estimates for the fit and to flag whether parameters are to
 *          be kept fixed in the fit. The sample/default keymap file is
-*          $SMURF_DIR/smurf_fit1d_uval.def.
-*  Entries are of the form:
+*          $SMURF_DIR/smurf_fit1d_uval.def. Entries are of the form:
 *          "comp"#."fid" = value, "comp"#.par = value, or "fix"#.par = [0,1]
 *          with 'par' being a parameter relevant for the function being
 *          fitted or indicating a parameter to be kept fixed or fitted
@@ -218,7 +217,7 @@
 *          function actually fitted may vary with position.
 *          Setting the retry value to 0 prevents this from happening and may
 *          cause the fit to fail or be (very) poor. [YES]
-*    SORT = STRING
+*     SORT = STRING
 *          Sort the resulting fits:
 *            "amp": sort by decreasing fitted value of the amp-like parameter
 *          "width": sort by decreasing fitted fwhm of the width-like parameter
@@ -329,7 +328,7 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
