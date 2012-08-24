@@ -43,7 +43,7 @@
 #     This file is tcl source code.
 
 #  Copyright:
-#     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+#     Copyright (C) 2007-2012 Science and Technology Facilities Council.
 #     Copyright (C) 2005-2009 University of British Columbia.
 #     Copyright (C) 2005-2006 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
@@ -70,6 +70,7 @@
 #     EC: Ed Chapin (UBC)
 #     JB: Jennifer Balfour (UBC)
 #     COBA: Coskun Oba (UoL)
+#     MJC: Malcolm J. Currie (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -259,8 +260,10 @@
 #     2012-04-20 (TIMJ):
 #        Remove QLMAKEMAP
 #     2012-05-10 (AGG):
-#         Added STEPTIME to rawfitmeta
-#     {enter_changes_here}
+#        Added STEPTIME to rawfitmeta
+#     2012 August 23 (MJC):
+#        Restore alphabetical order.
+#     {enter_further_changes_here}
 
 #  Bugs:
 #     {note_any_bugs_here}
@@ -407,6 +410,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter order {
+                type _INTEGER
+                access READ
+                vpath PROMPT
+                vpath CURRENT DEFAULT
+                prompt {Order of polynomial to use for flatfield fitting}
+                default 1
+                helpkey *
+            }
+
             parameter out {
                 position 2
                 type NDF
@@ -415,16 +428,6 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Processed flatfield file}
-                helpkey *
-            }
-
-            parameter order {
-                type _INTEGER
-                access READ
-                vpath PROMPT
-                vpath CURRENT DEFAULT
-                prompt {Order of polynomial to use for flatfield fitting}
-                default 1
                 helpkey *
             }
 
@@ -538,21 +541,21 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter nepcliplow {
-                type _DOUBLE
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                default 3
-                prompt {Clip NEP values this many standard deviations below median}
-                helpkey *
-            }
-
             parameter nepcliplog {
                 type _LOGICAL
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
                 default TRUE
                 prompt {Clip based on log of the NEP}
+                helpkey *
+            }
+
+            parameter nepcliplow {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default 3
+                prompt {Clip NEP values this many standard deviations below median}
                 helpkey *
             }
 
@@ -574,21 +577,21 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter noicliplow {
-                type _DOUBLE
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                default 3
-                prompt {Clip NOISE values this many standard deviations below median}
-                helpkey *
-            }
-
             parameter noicliplog {
                 type _LOGICAL
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
                 default TRUE
                 prompt {Clip based on log of the NOISE}
+                helpkey *
+            }
+
+            parameter noicliplow {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default 3
+                prompt {Clip NOISE values this many standard deviations below median}
                 helpkey *
             }
 
@@ -760,16 +763,6 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter resist {
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                ppath DEFAULT
-                default {^$STARLINK_DIR/share/smurf/resist.cfg}
-                prompt {Heater resistance information}
-                helpkey *
-            }
-
             parameter in {
                 position 1
                 type NDF
@@ -797,6 +790,16 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Responsivity images}
+                helpkey *
+            }
+
+            parameter resist {
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default {^$STARLINK_DIR/share/smurf/resist.cfg}
+                prompt {Heater resistance information}
                 helpkey *
             }
 
@@ -1002,19 +1005,19 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter fxlo {
-                type _DOUBLE
-                prompt {Lower focal plane X limit, in mm}
-                vpath CURRENT DEFAULT
-                default -50
-                helpkey *
-            }
-
             parameter fxhi {
                 type _DOUBLE
                 prompt {Upper focal plane X limit, in mm}
                 vpath CURRENT DEFAULT
                 default 50
+                helpkey *
+            }
+
+            parameter fxlo {
+                type _DOUBLE
+                prompt {Lower focal plane X limit, in mm}
+                vpath CURRENT DEFAULT
+                default -50
                 helpkey *
             }
 
@@ -1027,19 +1030,19 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter fylo {
-                type _DOUBLE
-                prompt {Lower focal plane Y limit, in mm}
-                vpath CURRENT DEFAULT
-                default -50
-                helpkey *
-            }
-
             parameter fyhi {
                 type _DOUBLE
                 prompt {Upper focal plane Y limit, in mm}
                 vpath CURRENT DEFAULT
                 default 50
+                helpkey *
+            }
+
+            parameter fylo {
+                type _DOUBLE
+                prompt {Lower focal plane Y limit, in mm}
+                vpath CURRENT DEFAULT
+                default -50
                 helpkey *
             }
 
@@ -1127,6 +1130,20 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outcat {
+                type LITERAL
+                prompt {Name of output catalogue text file}
+                ppath CURRENT
+                helpkey *
+            }
+
+            parameter outcode {
+                type LITERAL
+                prompt {Name of output C source file}
+                ppath CURRENT
+                helpkey *
+            }
+
             parameter outdx {
                 type NDF
                 access WRITE
@@ -1163,20 +1180,6 @@ package @PACKAGE@ {
                 default !
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Output NDF holding focal-plane Y coords}
-                helpkey *
-            }
-
-            parameter outcat {
-                type LITERAL
-                prompt {Name of output catalogue text file}
-                ppath CURRENT
-                helpkey *
-            }
-
-            parameter outcode {
-                type LITERAL
-                prompt {Name of output C source file}
-                ppath CURRENT
                 helpkey *
             }
 
@@ -1390,6 +1393,17 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter config {
+                position 4
+                type LITERAL
+                access READ
+                ppath CURRENT
+                vpath CURRENT
+                prompt {Config file with fit parameters}
+                helpkey *
+                default !
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -1410,34 +1424,22 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter rms {
-                position 3
-                type _DOUBLE
-                access READ
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                prompt {RMS in cube [data units]}
-                helpkey *
-            }
-
-            parameter config {
-                position 4
+            parameter outfiles {
                 type LITERAL
-                access READ
-                ppath CURRENT
-                vpath CURRENT
-                prompt {Config file with fit parameters}
-                helpkey *
+                prompt {Text file in which to put the output NDF names}
                 default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
             }
 
-            parameter userval {
-                position 5
+            parameter parcomp {
+                position 8
                 type LITERAL
                 access READ
-                ppath DEFAULT
                 vpath DEFAULT
-                prompt {File with user values for parameters}
+                ppath DEFAULT
+                prompt {Component parameter files files}
                 helpkey *
                 default !
             }
@@ -1464,24 +1466,25 @@ package @PACKAGE@ {
                 default !
             }
 
-            parameter parcomp {
-                position 8
-                type LITERAL
+            parameter rms {
+                position 3
+                type _DOUBLE
                 access READ
-                vpath DEFAULT
-                ppath DEFAULT
-                prompt {Component parameter files files}
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                prompt {RMS in cube [data units]}
                 helpkey *
-                default !
             }
 
-            parameter outfiles {
+            parameter userval {
+                position 5
                 type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
+                access READ
+                ppath DEFAULT
                 vpath DEFAULT
-                ppath CURRENT DEFAULT
+                prompt {File with user values for parameters}
                 helpkey *
+                default !
             }
 
         }
@@ -1489,6 +1492,28 @@ package @PACKAGE@ {
         action fit1e {
 
             helplib {$SMURF_HELP}
+
+            parameter config {
+                position 3
+                type LITERAL
+                access READ
+                ppath CURRENT
+                vpath CURRENT
+                prompt {Config file with fit parameters}
+                helpkey *
+                default !
+            }
+
+            parameter diagndf {
+                position 5
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Input ndf for parameter diagnostics cube}
+                helpkey *
+                default !
+            }
 
             parameter in {
                 position 1
@@ -1510,37 +1535,13 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter config {
-                position 3
+            parameter outfiles {
                 type LITERAL
-                access READ
-                ppath CURRENT
-                vpath CURRENT
-                prompt {Config file with fit parameters}
-                helpkey *
+                prompt {Text file in which to put the output NDF names}
                 default !
-            }
-
-            parameter userval {
-                position 4
-                type LITERAL
-                access READ
-                ppath DEFAULT
                 vpath DEFAULT
-                prompt {File with user values for parameters}
+                ppath CURRENT DEFAULT
                 helpkey *
-                default !
-            }
-
-            parameter diagndf {
-                position 5
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                ppath DEFAULT
-                prompt {Input ndf for parameter diagnostics cube}
-                helpkey *
-                default !
             }
 
             parameter parndf {
@@ -1554,13 +1555,15 @@ package @PACKAGE@ {
                 default !
             }
 
-            parameter outfiles {
+            parameter userval {
+                position 4
                 type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
+                access READ
+                ppath DEFAULT
                 vpath DEFAULT
-                ppath CURRENT DEFAULT
+                prompt {File with user values for parameters}
                 helpkey *
+                default !
             }
 
         }
@@ -1827,6 +1830,36 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter ccsize {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Core cluster size}
+                default 20
+                helpkey *
+            }
+
+            parameter deglitchmode {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Deglitching mode: 1=CORE, 2=TAIL and 0=ALL}
+                default 0
+                helpkey *
+            }
+
+            parameter dshalflength {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Double-sided interferogrm half-length}
+                default 500
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -1844,36 +1877,6 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {Output data files}
-                helpkey *
-            }
-
-            parameter ccsize {
-                type _INTEGER
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {Core cluster size}
-                default 20
-                helpkey *
-            }
-
-            parameter dshalflength {
-                type _INTEGER
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {Double-sided interferogrm half-length}
-                default 500
-                helpkey *
-            }
-
-            parameter deglitchmode {
-                type _INTEGER
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {Deglitching mode: 1=CORE, 2=TAIL and 0=ALL}
-                default 0
                 helpkey *
             }
 
@@ -2032,23 +2035,13 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter in {
-                position 1
-                type NDF
+            parameter apodization {
+                type _INTEGER
                 access READ
                 vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                prompt {Input data files}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                prompt {Output data files}
+                ppath CURRENT DEFAULT
+                prompt {Apodization method}
+                default 0
                 helpkey *
             }
 
@@ -2069,6 +2062,26 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 prompt {Double-sided interferogram half-length}
                 default 512
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
                 helpkey *
             }
 
@@ -2102,20 +2115,21 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter apodization {
-                type _INTEGER
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {Apodization method}
-                default 0
-                helpkey *
-            }
         }
 
         action fts2phasecorrds {
 
             helplib {$SMURF_HELP}
+
+            parameter degree {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Fitting polynomial degree}
+                default 1
+                helpkey *
+            }
 
             parameter in {
                 position 1
@@ -2134,16 +2148,6 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {Output data files}
-                helpkey *
-            }
-
-            parameter degree {
-                type _INTEGER
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {Fitting polynomial degree}
-                default 1
                 helpkey *
             }
 
@@ -2197,6 +2201,16 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter bse {
+                position 3
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Beamsplitter self emission file}
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -2214,16 +2228,6 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {Output data files}
-                helpkey *
-            }
-
-            parameter bse {
-                position 3
-                type NDF
-                access READ
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                prompt {Beamsplitter self emission file}
                 helpkey *
             }
         }
@@ -2252,16 +2256,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter zeropad {
-                type _INTEGER
-                access READ
-                vpath {PROMPT}
-                ppath CURRENT DEFAULT
-                prompt {Zero padding}
-                default 1
-                helpkey *
-            }
-
             parameter resolution {
                 type _INTEGER
                 access READ
@@ -2271,11 +2265,31 @@ package @PACKAGE@ {
                 default 2
                 helpkey *
             }
+
+            parameter zeropad {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Zero padding}
+                default 1
+                helpkey *
+            }
         }
 
         action fts2transcorr {
 
             helplib {$SMURF_HELP}
+
+            parameter debug {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {If debug, does NOT include dry component!}
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
 
             parameter in {
                 position 1
@@ -2304,16 +2318,6 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {Atmospheric transmission calibration file}
-                helpkey *
-            }
-
-            parameter debug {
-                type _LOGICAL
-                vpath {DEFAULT }
-                prompt {If debug, does NOT include dry component!}
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                default FALSE
                 helpkey *
             }
         }
@@ -2446,6 +2450,13 @@ package @PACKAGE@ {
                 default OR
             }
 
+            parameter catepoch {
+                type _DOUBLE
+                ppath DYNAMIC CURRENT
+                prompt {Output catalogue epoch}
+                helpkey *
+            }
+
             parameter catframe {
                 type LITERAL
                 ppath DEFAULT
@@ -2453,13 +2464,6 @@ package @PACKAGE@ {
                 prompt {Output catalogue coordinate Frame}
                 helpkey *
                 default !
-            }
-
-            parameter catepoch {
-                type _DOUBLE
-                ppath DYNAMIC CURRENT
-                prompt {Output catalogue epoch}
-                helpkey *
             }
 
             parameter crota {
@@ -2586,7 +2590,7 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter ntile {
+            parameter npolbin {
                 type _INTEGER
                 access WRITE
                 vpath DEFAULT
@@ -2594,7 +2598,7 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter npolbin {
+            parameter ntile {
                 type _INTEGER
                 access WRITE
                 vpath DEFAULT
@@ -2623,6 +2627,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter params {
                 size *
                 type _DOUBLE
@@ -2646,15 +2659,6 @@ package @PACKAGE@ {
                 prompt {Output pixel size(s) for spatial part of map (arcsec)}
                 ppath DYNAMIC
                 vpath DYNAMIC
-                helpkey *
-            }
-
-            parameter outfiles {
-                type LITERAL
-                prompt {Text file in which to put the output NDF names}
-                default !
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
                 helpkey *
             }
 
@@ -3387,16 +3391,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                association <-GLOBAL.DATA_ARRAY
-                prompt {Input timeseries}
-                helpkey *
-            }
-
             parameter fit {
                 type _CHAR
                 vpath {PROMPT }
@@ -3411,6 +3405,16 @@ package @PACKAGE@ {
                 prompt {Group related files?}
                 ppath DEFAULT CURRENT
                 default FALSE
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input timeseries}
                 helpkey *
             }
 
@@ -3857,7 +3861,7 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter FLAT {
+            parameter flat {
                 type _LOGICAL
                 vpath {DEFAULT }
                 prompt {If set ensure data are flatfielded}
