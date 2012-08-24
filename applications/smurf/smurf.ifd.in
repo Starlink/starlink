@@ -1450,7 +1450,7 @@ package @PACKAGE@ {
                 access READ
                 vpath DEFAULT
                 ppath DEFAULT
-                prompt {Input ndf with component parameter files}
+                prompt {Input NDF with component parameter files}
                 helpkey *
                 default !
             }
@@ -1499,7 +1499,7 @@ package @PACKAGE@ {
                 access READ
                 vpath DEFAULT
                 ppath DEFAULT
-                prompt {Input ndf for parameter diagnostics cube}
+                prompt {Input NDF for parameter diagnostics cube}
                 helpkey *
                 default !
             }
@@ -1539,7 +1539,7 @@ package @PACKAGE@ {
                 access READ
                 vpath DEFAULT
                 ppath DEFAULT
-                prompt {Input ndf(s) for parameter cubes}
+                prompt {Input NDF(s) for parameter cubes}
                 helpkey *
                 default !
             }
