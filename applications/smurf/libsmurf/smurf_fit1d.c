@@ -49,7 +49,7 @@
 *     file for user specified values is $SMURF_DIR/smurf_fit1d_uval.def.
 *
 *  Usage
-*     fit1d in out rms config [userval] [diagndf] [parndf]
+*     fit1d in out rms config [userval] [pardir] [parndf] [parcomp]
 
 *  ADAM Parameters:
 *     CONFIG = GROUP (Read)
@@ -66,12 +66,6 @@
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null value is supplied no file is created. [!]
-*     PARDIR = LITERAL (Read)
-*          Directory with component parameter files or the parameter NDF.
-*          For details see help on PARCOMP. To escape special characters
-*          (",", ".", "@", etc) in the string you may need to use a set of
-*          single+double quotes. A null value results in use of the current
-*          directory. [!]
 *     PARCOMP = GROUP (Read)
 *          Component parameter file(s) to use for initial estimates, fixed
 *          values, or to generate a model with (see "model_only"). Instead
@@ -98,6 +92,12 @@
 *          To escape special characters (",", ".", "@", etc) in the string
 *          you may need to use a set of single+double quotes. A null value
 *          means no component parameter files will be used. [!]
+*     PARDIR = LITERAL (Read)
+*          Directory with component parameter files or the parameter NDF.
+*          For details see help on PARCOMP. To escape special characters
+*          (",", ".", "@", etc) in the string you may need to use a set of
+*          single+double quotes. A null value results in use of the current
+*          directory. [!]
 *     PARNDF = LITERAL (Read)
 *          NDF resulting from a previous execution of FIT1D and containing
 *          component parameter files as part of its meta-data to use in the
