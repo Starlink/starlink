@@ -51,7 +51,7 @@
 #  Licence:
 #     This program is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU General Public License as
-#     published by the Free Software Foundation; either version 3 of
+#     published by the Free Software Foundation; either Version 3 of
 #     the License, or (at your option) any later version.
 #
 #     This program is distributed in the hope that it will be
@@ -61,8 +61,8 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software
-#     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-#     02110-1301, USA
+#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+#     02110-1301, USA.
 
 #  Authors:
 #     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -83,23 +83,23 @@
 #     10-NOV-2005 (AGG):
 #        Add TAU to EXTINCTION
 #     17-JAN-2006 (EC):
-#        Add PIXRES to MAKEMAP
+#        Add PIXRES to MAKEMAP.
 #     25-JAN-2006 (AGG):
 #        Add new EXTINCTION parameters.
 #     04-FEB-2006 (AGG):
 #        Add QUICK parameter to EXTINCTION.
 #     18-FEB-2006 (AGG):
-#        Add REMSKY
+#        Add REMSKY.
 #     24-FEB-2006 (AGG):
 #        Add FIT parameter to REMSKY.
 #     18-MAR-2006 (AGG):
-#        Add QLMAKEMAP
+#        Add QLMAKEMAP.
 #     05-MAY-2006 (AGG):
 #        Add SCANFIT.
 #     16-MAY-2006 (EC):
-#        Add METHOD to MAKEMAP
+#        Add METHOD to MAKEMAP.
 #     29-MAY-2006 (EC):
-#        Add ASTMODEL, ATMMODEL and NOISEMODEL to MAKEMAP
+#        Add ASTMODEL, ATMMODEL and NOISEMODEL to MAKEMAP.
 #     06-JUN-2006 (AGG):
 #        Add SIM and DREAMWTS actions.
 #     13-JUN-2006 (AGG):
@@ -113,150 +113,150 @@
 #     27-JUL-2006 (TIMJ):
 #        Add initial MAKECUBE parameters.
 #     13-SEP-2006 (JB):
-#        Add BADBOLOS & made SC2SIM seed optional
+#        Add BADBOLOS & made SC2SIM seed optional.
 #     15-SEP-2006 (AGG):
-#        Rename DREAMWEIGHTS
+#        Rename DREAMWEIGHTS.
 #     22-SEP-2006 (JB):
 #        Changed OBSXMLFILE & SIMXMLFILE to OBSFILE & SIMFILE
 #     12-OCT-2006 (AGG):
-#         Add GROUP keyword for REMSKY
+#        Add GROUP keyword for REMSKY.
 #     13-OCT-2006 (JB):
-#         Add USEBAD to MAKEMAP
+#        Add USEBAD to MAKEMAP.
 #     26-OCT-2006 (AGG):
-#         Add STARECALC
+#        Add STARECALC.
 #     01-NOV-2006 (TIMJ):
-#         Add SMURFHELP
-#         Add help location
+#        Add SMURFHELP.
+#        Add help location.
 #     20-NOV-2006 (DSB):
-#         Added AUTOGRID parameter for MAKECUBE
+#        Added AUTOGRID parameter for MAKECUBE.
 #     29-NOV-2006 (DSB):
-#         Added SPECBOUNDS parameter for MAKECUBE
+#        Added SPECBOUNDS parameter for MAKECUBE.
 #     11-JAN-2007 (DSB):
-#         Added UBOUND and LBOUND parameters for MAKECUBE
+#        Added UBOUND and LBOUND parameters for MAKECUBE.
 #     12-JAN-2007 (AGG):
-#         Added SYSTEM parameter for MAKEMAP and QLMAKEMAP
+#        Added SYSTEM parameter for MAKEMAP and QLMAKEMAP.
 #     26-JAN-2007 (AGG):
-#         Added OVERWRITE parameter for SC2SIM
+#        Added OVERWRITE parameter for SC2SIM.
 #     30-JAN-2007 (TIMJ):
-#         Add jcmtstate2cat
+#        Add jcmtstate2cat.
 #     01-MAR-2007 (AGG):
-#         Add SIMSTATS parameter for SC2SIM
+#        Add SIMSTATS parameter for SC2SIM.
 #     28-MAR-2007 (TIMJ):
-#         Add missing helpkey
+#        Add missing helpkey.
 #     10-MAY-2007 (TIMJ):
-#         Add dumpocscfg
+#        Add dumpocscfg.
 #     15-JUN-2007 (TIMJ):
-#         Add gettsys
+#        Add gettsys.
 #     05-OCT-2007 (AGG):
-#         Add default value of 1.8 for skynoise exponent
+#        Add default value of 1.8 for skynoise exponent
 #     19-OCT-2007 (TIMJ):
-#         Add RAWUNPRESS
+#        Add RAWUNPRESS.
 #     25-OCT-2007 (DSB):
-#         Added SPECUNION, POLBINSIZE and NPOLBIN for MAKECUBE
+#        Added SPECUNION, POLBINSIZE and NPOLBIN for MAKECUBE.
 #     8-NOV-2007 (DSB):
-#         Added action TIMESORT.
+#        Added action TIMESORT.
 #     18-DEC-2007 (DSB):
-#         Added parameter REF to MAKECUBE.
+#        Added parameter REF to MAKECUBE.
 #     17-JAN-2008 (DSB):
-#         Added parameter ALIGNSYS to MAKECUBE.
+#        Added parameter ALIGNSYS to MAKECUBE.
 #     25-JAN-2008 (DSB):
 #        Add UNMAKECUBE.
 #     05-FEB-2008 (JB):
-#         Added action GSD2ACSIS
+#        Added action GSD2ACSIS.
 #     12-FEB-2008 (DSB):
-#         Added parameter POLBINZERO to MAKECUBE.
+#        Added parameter POLBINZERO to MAKECUBE.
 #     12-FEB-2008 (AGG):
-#         Add USEBAD parameter to QLMAKEMAP
+#        Add USEBAD parameter to QLMAKEMAP.
 #     13-FEB-2008 (AGG):
-#         Add SPREAD and PARAMS to MAKEMAP and QLMAKEMAP
+#        Add SPREAD and PARAMS to MAKEMAP and QLMAKEMAP.
 #     16-MAR-2008 (BZ):
-#         Added action SC2FTS
+#        Added action SC2FTS.
 #     27-MAR-2008 (EC):
-#         Add SC2CLEAN
+#        Add SC2CLEAN.
 #     16-APR-2008 (AGG):
-#         Remove USEBAD, add GENVAR for QLMAKEMAP
+#        Remove USEBAD, add GENVAR for QLMAKEMAP.
 #     21-APR-2008 (JB):
-#         Add action GSDSHOW
+#        Add action GSDSHOW.
 #     24-APR-2008 (AGG):
-#         Change SIMFILE/OBSFILE to SIMPAR/OBSPAR for SKYNOISE
+#        Change SIMFILE/OBSFILE to SIMPAR/OBSPAR for SKYNOISE.
 #     24-APR-2008 (EC):
-#         Added MAXMEM to MAKEMAP
+#        Added MAXMEM to MAKEMAP.
 #     09-MAY-2008 (AGG):
-#         Remove USEBAD parameter, set MAXMEM default to 2048 for MAKEMAP
+#        Remove USEBAD parameter, set MAXMEM default to 2048 for MAKEMAP.
 #     09-MAY-2008 (TIMJ):
-#         Add EXTINCTION:HASSKYREM
+#        Add EXTINCTION:HASSKYREM
 #     05-JUN-2008 (TIMJ):
-#         Add F* parameters to MAKEMAP.
-#         Add ALIGNSYS to MAKEMAP.
-#         Add REF to MAKEMAP
+#        Add F* parameters to MAKEMAP.
+#        Add ALIGNSYS to MAKEMAP.
+#        Add REF to MAKEMAP.
 #     23-JUL-2008 (EC):
-#         Add SC2FFT
+#        Add SC2FFT.
 #     27-JUL-2008 (EC):
-#         Add OUT parameter to SC2CONCAT
+#        Add OUT parameter to SC2CONCAT.
 #     13-NOV-2008 (AGG):
-#         Add NAVER parameter to STARECALC
+#        Add NAVER parameter to STARECALC.
 #     12-DEC-2008 (TIMJ):
-#         Add BPM masking param
+#        Add BPM masking param.
 #     01-JAN-2009 (EC):
-#         Add FLAGSTAT to SC2CLEAN
+#        Add FLAGSTAT to SC2CLEAN.
 #     27-MAR-2009 (TIMJ):
-#         Add CALCRESP
+#        Add CALCRESP.
 #     2009-03-30 (TIMJ):
-#         Add OUTFILES to all routines.
+#        Add OUTFILES to all routines.
 #     2-JUL-2009 (DSB):
-#         Added EXTRACOLS parameter to MAKECUBE
+#        Added EXTRACOLS parameter to MAKECUBE.
 #     29-JUL-2009 (TIMJ):
-#         Change MSG_FILTER defaulting from NORM to ! to support
-#         new msgIfget behaviour.
+#        Change MSG_FILTER defaulting from NORM to ! to support
+#        new msgIfget behaviour.
 #     14-OCT-2009 (TIMJ):
-#         Alphabetize. Remove MSG_FILTER definitions.
+#        Alphabetize. Remove MSG_FILTER definitions.
 #     2010-01-20 (TIMJ):
-#         Use starperl in perl aliases
+#        Use starperl in perl aliases.
 #     2010-02-09 (AGG):
-#         Add NGOOD output parameter for SC2FFT
+#        Add NGOOD output parameter for SC2FFT.
 #     2010-07-15 (TIMJ):
-#         Remove REFRES parameters since now included in RESIST config file.
+#        Remove REFRES parameters since now included in RESIST config file.
 #     2010-07-19 (COBA):
-#         Add FTS2_FLATFIELD, FTS2_FREQCORR, FTS2_PORTIMBAL,
-#             FTS2_REMOVEBSE, FTS2_SPATIALWCS, FTS2_TRANSCORR
+#        Add FTS2_FLATFIELD, FTS2_FREQCORR, FTS2_PORTIMBAL,
+#            FTS2_REMOVEBSE, FTS2_SPATIALWCS, FTS2_TRANSCORR.
 #     2010-09-17 (COBA):
-#         Add FTS2_DEGLITCH
+#        Add FTS2_DEGLITCH.
 #     2010-09-20 (COBA):
-#         Add FTS2_PHASECORR
+#        Add FTS2_PHASECORR.
 #     2010-09-21 (COBA):
-#         FTS2 ADAM params are alphabetically ordered
+#        FTS2 ADAM params are alphabetically ordered.
 #     2010-09-30 (COBA):
-#         Add FTS2_EQSLICED
+#        Add FTS2_EQSLICED.
 #     2010-10-04 (COBA):
-#         Replace zpdIndex with 2D zpd array ndf for FTS2_PHASECORR
+#        Replace zpdIndex with 2D zpd array ndf for FTS2_PHASECORR.
 #     2010-10-28 (COBA):
-#         Minor changes to FTS2 interface
+#        Minor changes to FTS2 interface.
 #     2010-11-03 (COBA):
-#         Add FTS2SPECRE
+#        Add FTS2SPECRE.
 #     2010-11-25 (COBA):
-#         Add FTS2INIT
+#        Add FTS2INIT.
 #     2010-11-26 (COBA):
-#         - Removed ZPD param from FTS2DEGLITCH
-#         - Removed ZPD param from FTS2PHASECORR
+#        - Removed ZPD param from FTS2DEGLITCH.
+#        - Removed ZPD param from FTS2PHASECORR.
 #     2011-03-18 (EC):
-#         Add sc2pca
+#        Add sc2pca.
 #     2011-05-28 (RPT):
-#         Add mcehead2cat
+#        Add mcehead2cat.
 #     2011-06-08 (DSB):
 #        Add UNMAKEMAP.
 #     2011-07-18 (COBA):
-#         Remove FTS2EQSLICED
-#         Remove FTS2SPECRE
-#         Add FTS2SPECTRUM
-#         Update FTS2PHASECORR
+#        Remove FTS2EQSLICED.
+#        Remove FTS2SPECRE.
+#        Add FTS2SPECTRUM.
+#        Update FTS2PHASECORR
 #     2011-08-04 (COBA):
-#         Replaced FTS2PHASECORR with FTS2PHASECORRDS and FTS2PHASECORRSS
+#        Replaced FTS2PHASECORR with FTS2PHASECORRDS and FTS2PHASECORRSS
 #     2011-09-07 (TIMJ):
 #        On balance I think the RESIST parameter should always use the default
 #        unless there is a specific override. Silently reusing an old value
 #        can be confusing.
 #     2011-10-18 (COBA):
-#         Updated FTS2PHASECORR, FTS2PHASECORRDS and FTS2SPECTRUM
+#        Updated FTS2PHASECORR, FTS2PHASECORRDS and FTS2SPECTRUM
 #     2012-04-20 (TIMJ):
 #        Remove QLMAKEMAP
 #     2012-05-10 (AGG):
