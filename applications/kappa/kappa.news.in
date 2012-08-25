@@ -7,6 +7,14 @@
 2 General_changes
    o  Now supports 64-bit integer data.
 
+2 New_applications
+
+The following new applications have been added:
+
+   o  NDFECHO is intended as a scripting tool. It expands a given
+   group expression into a list of explicit NDF names, and displays
+   a specified subset of the expanded names.
+
 2 Modified_applications
 
    o  CHANMAP, COLLAPSE, and MSTATS

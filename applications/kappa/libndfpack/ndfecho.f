@@ -4,7 +4,7 @@
 *     NDFECHO
 
 *  Purpose:
-*     Display a group of NDF names.
+*     Displays a group of NDF names.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,28 +20,30 @@
 *        The global status.
 
 *  Description:
-*     This application lists the names of the supplied NDFs to the screen.
-*     Its primary use is within scripts that need to process groups of
-*     NDFs. Instead of the full name, a required component of the name
-*     may be displayed instead (see parameter SHOW).
+*     This application lists the names of the supplied NDFs to the
+*     screen. Its primary use is within scripts that need to process
+*     groups of NDFs. Instead of the full name, a required component of
+*     the name may be displayed instead (see Parameter SHOW).
 
 *  Usage:
-*     ndfecho ndf first last show
+*     ndfecho ndf [first] [last] [show]
 
 *  ADAM Parameters:
 *     FIRST = _INTEGER (Read)
-*        The index of the first NDF to be included in the displayed list.
-*        A null (!) value causes the first NDF to be used (index 1). [!]
+*        The index of the first NDF to be included in the displayed
+*        lit. A null (!) value causes the first NDF to be used
+*        (Index 1). [!]
 *     LAST = _INTEGER (Read)
 *        The index of the last NDF to be included in the displayed list.
 *        If a non-null value is supplied for FIRST, then the run-time
 *        default for LAST is equal to the supplied FIRST value (so that
-*        only a single NDF will be displayted). If a null value is
+*        only a single NDF will be displayed). If a null value is
 *        supplied for FIRST, then the run-time default for LAST is the
 *        last NDF in the supplied group. []
 *     NDF = NDF (Read)
-*        A group of NDFs.  This should be given as a comma-separated list,
-*        in which each list element can be one of the following options.
+*        A group of NDFs.  This should be given as a comma-separated
+*        list, in which each list element can be one of the following
+*        options.
 *
 *        - An NDF name, optionally containing wild-cards and/or regular
 *        expressions ("*", "?", "[a-z]" etc.).
@@ -58,40 +60,42 @@
 *        then you are re-prompted for further input until a value is
 *        given which does not end with a hyphen.  All the NDFs given in
 *        this way are concatenated into a single group.
-*     VALUE = LITERAL (Write)
-*        An output parameter to which is written information about the NDF
-*        specified by parameter FIRST, or the first NDF in the group if
-*        FIRST is not specified. The information to write is specified by
-*        the SHOW parameter.
-*     SIZE = _INTEGER (Write)
-*        An output parameter to which is written the number of NDFs in the
-*        specified group.
 *     SHOW = LITERAL (Read)
-*        Specifies the information to be displayed about each NDF:
+*        Specifies the information to be displayed about each NDF.  The
+*        options are as follows.
 *
-*        - "SLICE" -- The NDF slice specification (if any).
+*        - "Base" -- The base file name.
 *
-*        - "HDSPATH" -- The HDS path within the container file (if any).
+*        - "Dir" -- The directory path (if any).
 *
-*        - "FTYPE" -- The file type (usually ".sdf" but may not be if any
-*        foreign NDFs are supplied).
+*        - "Ftype" -- The file type (usually ".sdf" but may not be if
+*        any foreign NDFs are supplied).
 *
-*        - "BASE" -- The base file name.
+*        - "HDSpath" -- The HDS path within the container file (if any).
 *
-*        - "DIR" -- The directory path (if any).
+*        - "Path" -- The full name of the NDF as supplied by the user.
 *
-*        - "PATH" -- The full name of the NDF as supplied by the user.
+*        - "Slice" -- The NDF slice specification (if any).
 *
-*        Note, the fields are extracted from the NDF names as supplied by
-*        the user. No missing fields (except for FTYPE) are filled in. ["PATH"]
+*        Note, the fields are extracted from the NDF names as supplied
+*        by the user. No missing fields (except for "Ftype") are filled
+*        in. ["Path"]
+*     SIZE = _INTEGER (Write)
+*        An output parameter to which is written the number of NDFs in
+*        the specified group.
+*     VALUE = LITERAL (Write)
+*        An output parameter to which is written information about the
+*        NDF specified by Parameter FIRST, or the first NDF in the group
+*        if FIRST is not specified. The information to write is
+*        specified by the SHOW parameter.
 
 *  Examples:
 *     ndfecho mycont
-*        Report the full path of all the NDFs within the HDS container file
-*        "mycont.sdf".
+*        Report the full path of all the NDFs within the HDS container
+*        file "mycont.sdf".
 *     ndfecho ^files.lis first=4 show=base
-*        This reports the file base name for just the fourth NDF in the list
-*        specified within the text file "files.lis".
+*        This reports the file base name for just the fourth NDF in the
+*        list specified within the text file "files.lis".
 
 *  Copyright:
 *     Copyright (C) 2012 Science & Technology Facilities Council.
@@ -100,7 +104,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -110,8 +114,8 @@
 *
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-*     MA 02110-1301, USA
+*     Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*     Boston, MA 02110-1301, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -141,13 +145,13 @@
 *  Local Variables:
       CHARACTER FIELDS( 6 )*(GRP__SZNAM)! Info about next NDF
       CHARACTER SHOW*7       ! What to show
-      INTEGER IGRP           ! GRP id. for group holding input NDFs
+      INTEGER FIRST          ! The index of the first NDF to display
       INTEGER I              ! Index of next NDF to display
+      INTEGER IGRP           ! GRP id. for group holding input NDFs
       INTEGER ILEN           ! Length of the NDF info item
       INTEGER ISHOW          ! What to show
-      INTEGER SIZE           ! Total size of the input group
-      INTEGER FIRST          ! The index of the first NDF to display
       INTEGER LAST           ! The index of the last NDF to display
+      INTEGER SIZE           ! Total size of the input group
 
 *.
 
@@ -184,9 +188,9 @@
 *  Get the index of the first NDF to display.
       CALL PAR_GDR0I( 'FIRST', 0, 1, SIZE, .FALSE., FIRST, STATUS )
 
-*  If a null value was supplied, annull the error and start from the first
-*  NDF  in the group (index 1). Also set the dynamic default for LAST to
-*  the last NDF in the group.
+*  If a null value was supplied, annull the error and start from the
+*  first NDF in the group (Index 1). Also set the dynamic default for
+*  LAST to the last NDF in the group.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          FIRST = 1
@@ -196,7 +200,7 @@
 *  default for LAST.
       ELSE
          LAST = FIRST
-      ENDIF
+      END IF
 
 *  Get the index of the last NDF to display, using the above dynamic
 *  default.

@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.39}
 \newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2012 August 31}
+\newcommand{\stardocdate}      {2012 September 24}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.0}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -12860,7 +12860,7 @@ picture.}
 \menuitem{NDFCOPY}{
  Copies an NDF (or \htmlref{NDF section}{se:ndfsect}) to a new location.}
 \menuitem{NDFECHO}{
- Display a group of NDF names.}
+ Displays a group of NDF names.}
 \menuitem{NDFTRACE}{
  Displays the attributes of an NDF data structure.}
 \menuitem{NOGLOBALS}{
@@ -37073,23 +37073,23 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
 \sstroutine{
    NDFECHO
 }{
-   Display a group of NDF names
+   Displays a group of NDF names
 }{
    \sstdescription{
       This application lists the names of the supplied NDFs to the screen.
       Its primary use is within scripts that need to process groups of
       NDFs. Instead of the full name, a required component of the name
-      may be displayed instead (see parameter SHOW).
+      may be displayed instead (see Parameter SHOW).
    }
    \sstusage{
-      ndfecho ndf first last show
+      ndfecho ndf [first] [last] [show]
    }
    \sstparameters{
       \sstsubsection{
          FIRST = \_INTEGER (Read)
       }{
          The index of the first NDF to be included in the displayed list.
-         A null (!) value causes the first NDF to be used (index 1). {\tt [!]}
+         A null (!) value causes the first NDF to be used (Index 1). {\tt [!]}
       }
       \sstsubsection{
          LAST = \_INTEGER (Read)
@@ -37097,7 +37097,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          The index of the last NDF to be included in the displayed list.
          If a non-null value is supplied for FIRST, then the run-time
          default for LAST is equal to the supplied FIRST value (so that
-         only a single NDF will be displayted). If a null value is
+         only a single NDF will be displayed). If a null value is
          supplied for FIRST, then the run-time default for LAST is the
          last NDF in the supplied group. {\tt []}
       }
@@ -37111,16 +37111,16 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
 
             \sstitem
             An NDF name, optionally containing wild-cards and/or regular
-            expressions ({\tt "}$*${\tt "}, {\tt "}?{\tt "}, {\tt "}[a-z]{\tt "} etc.).
+            expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"} \emph{etc.}).
 
             \sstitem
             The name of a text file, preceded by an up-arrow character
-            {\tt "}$\wedge${\tt "}.  Each line in the text file should contain a
+            {\tt "$\wedge$"}.  Each line in the text file should contain a
             comma-separated list of elements, each of which can in turn be
-            an NDF name (with optional wild-cards, etc.), or another file
+            an NDF name (with optional wild-cards, \emph{etc.}), or another file
             specification (preceded by an up-arrow).  Comments can be
             included in the file by commencing lines with a hash character
-            {\tt "}\#{\tt "}.
+            {\tt "\#"}.
 
          }
          If the value supplied for this parameter ends with a hyphen,
@@ -37129,13 +37129,39 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          this way are concatenated into a single group.
       }
       \sstsubsection{
-         VALUE = LITERAL (Write)
+         SHOW = LITERAL (Read)
       }{
-         An output parameter to which is written information about the NDF
-         specified by parameter FIRST, or the first NDF in the group if
-         FIRST is not specified. The information to write is specified by
-         the SHOW parameter.
+         Specifies the information to be displayed about each NDF.  The
+         options are as follows.
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "Base"} -- The base file name.
+
+            \sstitem
+            {\tt "Dir"} -- The directory path (if any).
+
+            \sstitem
+            {\tt "Ftype"} -- The file type (usually {\tt .sdf} but may not be if
+            any foreign NDFs are supplied).
+
+            \sstitem
+            {\tt "HDSpath"} -- The HDS path within the container file (if any).
+
+            \sstitem
+            {\tt "Path"} -- The full name of the NDF as supplied by the user.
+
+            \sstitem
+            {\tt "Slice"} -- The NDF slice specification (if any).
+
+         }
+         Note, the fields are extracted from the NDF names as supplied by
+         the user. No missing fields (except for {\tt "Ftype"}) are filled in.
+         {\tt ["Path"]}
       }
+   }
+   \sstresparameters{
       \sstsubsection{
          SIZE = \_INTEGER (Write)
       }{
@@ -37143,34 +37169,12 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          specified group.
       }
       \sstsubsection{
-         SHOW = LITERAL (Read)
+         VALUE = LITERAL (Write)
       }{
-         Specifies the information to be displayed about each NDF:
-
-         \sstitemlist{
-
-            \sstitem
-            {\tt "}SLICE{\tt "} -- The NDF slice specification (if any).
-
-            \sstitem
-            {\tt "}HDSPATH{\tt "} -- The HDS path within the container file (if any).
-
-            \sstitem
-            {\tt "}FTYPE{\tt "} -- The file type (usually {\tt "}.sdf{\tt "} but may not be if any
-            foreign NDFs are supplied).
-
-            \sstitem
-            {\tt "}BASE{\tt "} -- The base file name.
-
-            \sstitem
-            {\tt "}DIR{\tt "} -- The directory path (if any).
-
-            \sstitem
-            {\tt "}PATH{\tt "} -- The full name of the NDF as supplied by the user.
-
-         }
-         Note, the fields are extracted from the NDF names as supplied by
-         the user. No missing fields (except for FTYPE) are filled in. {\tt ["PATH"]}
+         An output parameter to which is written information about the NDF
+         specified by Parameter FIRST, or the first NDF in the group if
+         FIRST is not specified. The information to write is specified by
+         the SHOW parameter.
       }
    }
    \sstexamples{
@@ -37178,16 +37182,17 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          ndfecho mycont
       }{
          Report the full path of all the NDFs within the HDS container file
-         {\tt "}mycont.sdf{\tt "}.
+         {\tt mycont.sdf}.
       }
       \sstexamplesubsection{
          ndfecho $\wedge$files.lis first=4 show=base
       }{
          This reports the file base name for just the fourth NDF in the list
-         specified within the text file {\tt "}files.lis{\tt "}.
+         specified within the text file {\tt files.lis}.
       }
    }
 }
+
 \sstroutine{
    NDFTRACE
 }{
@@ -58419,16 +58424,6 @@ The following applications have been modified:
 
 \end{itemize}
 
-\subsection{New Commands}
-The following new applications have been added:
-
-\begin{description}
-   \item [\htmlref{NDFECHO}{NDFECHO}] \mbox{}
-   This is intended as a scripting tool. It expands a given group
-   expression into a list of explicit NDF names, and displays a specified
-   subset of the expanded names.
-\end{description}
-
 \subsection{Modified Commands}
 The following applications have been modified:
 
@@ -58595,6 +58590,16 @@ The following applications have been modified:
 \begin{itemize}
    \item Now supports 64-bit integer data.
 \end{itemize}
+
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+   \item [\htmlref{NDFECHO}{NDFECHO}] \mbox{}
+   This is intended as a scripting tool. It expands a given group
+   expression into a list of explicit NDF names, and displays a specified
+   subset of the expanded names.
+\end{description}
 
 \subsection{Modified Commands}
 The following applications have been modified:

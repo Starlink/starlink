@@ -1187,7 +1187,7 @@ package kappa {
             type LITERAL
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            prompt {The  information to display about each NDF}
+            prompt {The information to display about each NDF}
             default PATH
             helpkey *
          }
