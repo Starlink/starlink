@@ -172,7 +172,8 @@ scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/canfa
 
 DEFAULTS = defaults/smurf_makemap.def defaults/smurf_extinction.def \
 defaults/smurf_sc2clean.def defaults/smurf_calcflat.def \
-defaults/smurf_calcqu.def defaults/smurf_fit1d.def
+defaults/smurf_calcqu.def defaults/smurf_fit1d.def \
+defaults/smurf_fit1d_uval.def
 
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
