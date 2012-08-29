@@ -52,6 +52,14 @@
 *          Signal-to-noise ratio threshold to use when filtering the
 *          responsivity data to determine valid bolometers for the
 *          flatfield. [3.0]
+*     FLATUSENEXT = _LOGICAL (Read)
+*          If true the previous and following flatfield will be used to
+*          determine the overall flatfield to apply to a sequence. If false
+*          only the previous flatfield will be used. A null default will
+*          use both flatfields for data when we did not heater track
+*          at the end, and will use a single flatfield when we did heater
+*          track. The parameter value is not sticky and will revert to
+*          the default unless explicitly over-ridden. [!]
 *     IN = NDF (Read)
 *          Input files to be uncompressed and flatfielded. Any darks provided
 *          will be ignored.

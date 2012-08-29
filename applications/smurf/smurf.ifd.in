@@ -674,6 +674,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
+                helpkey *
+            }
+
             parameter resist {
                 type LITERAL
                 access READ
@@ -885,6 +894,15 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 3.0
                 prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
                 helpkey *
             }
 
@@ -1366,6 +1384,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
+                helpkey *
+            }
+
             parameter resist {
                 type LITERAL
                 access READ
@@ -1800,6 +1827,15 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 3.0
                 prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
                 helpkey *
             }
 
@@ -3226,6 +3262,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
+                helpkey *
+            }
+
             parameter resist {
                 type LITERAL
                 access READ
@@ -3474,6 +3519,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
+                helpkey *
+            }
+
             parameter resist {
                 type LITERAL
                 access READ
@@ -3643,6 +3697,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
+                helpkey *
+            }
+
             parameter resist {
                 type LITERAL
                 access READ
@@ -3776,6 +3839,15 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 3.0
                 prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
                 helpkey *
             }
 
@@ -3982,6 +4054,15 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 3.0
                 prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
                 helpkey *
             }
 
@@ -4268,6 +4349,15 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 3.0
                 prompt {Signal-to-noise threshold for responsivity data}
+                helpkey *
+            }
+
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
                 helpkey *
             }
 

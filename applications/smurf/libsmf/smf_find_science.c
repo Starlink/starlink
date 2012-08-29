@@ -165,6 +165,8 @@
 *     2012-04-03 (TIMJ):
 *        No longer set status to bad if we have a bad flat. Report the problem
 *        and rely on downstream to complain.
+*     2012-08-29 (TIMJ):
+*        Allow the user to control whether the following flat should be used.
 
 *  Copyright:
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
@@ -212,6 +214,8 @@
 #include "ast.h"
 #include "star/one.h"
 #include "prm_par.h"
+#include "par_err.h"
+#include "par.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -571,6 +575,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
               size_t ngood = 0;
               int itemp;
               int utdate = 0;
+              int ratioFlats = 0;
 
               /* Get the UT date - we do not compare flatfields after
                  the time we enabled heater tracking at each sequence. */
@@ -580,8 +585,24 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
               astMapGet0I( infomap, "NGOOD", &itemp );
               ngood = itemp;
 
+              /* Decide if we want to do the ratio test. We default to
+                 not doing it between 20110901 and 20120827 which is
+                 the period when we did mini-heater tracks before each
+                 flat. ! indicates that we choose based on date. */
+              if (*status == SAI__OK) {
+                parGet0l( "FLATUSENEXT", &ratioFlats, status );
+                if ( *status == PAR__NULL ) {
+                  errAnnul( status );
+                  if (utdate >= 20110901 || utdate <= 20120827 ) {
+                    ratioFlats = 0;
+                  } else {
+                    ratioFlats = 1;
+                  }
+                }
+              }
+
               /* Can we compare with the next flatfield? */
-              if (ngood < SMF__MINSTATSAMP || utdate >= 20110901 ) {
+              if (ngood < SMF__MINSTATSAMP || !ratioFlats ) {
                 /* no point doing all the ratio checking for this */
               } else if ( nelem - nf >= 2 ) {
                 AstKeyMap * nextmap = kmaps[nf+1];
