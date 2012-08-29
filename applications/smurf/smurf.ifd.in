@@ -747,7 +747,6 @@ package @PACKAGE@ {
             }
 
             parameter resist {
-                position 3
                 type LITERAL
                 access READ
                 vpath DEFAULT
