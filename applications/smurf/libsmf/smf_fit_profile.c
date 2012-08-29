@@ -1132,7 +1132,8 @@ static int dolsqfit( smf_math_function fid, const double pcoord[],
 {
    float        tolerance = TOLERANCE;
    float        mixingpar = fabs(LAMBDA);  /* Non-linear mixing parameter */
-   int          maxits = MYMIN( 50, MAXITERS );      /* Number iterations */;
+   int          maxits = MYMIN( 50, MAXITERS );      /* Number iterations */
+   int          sortopt = 0;              /* By default sort in amplitude */
    int          i,j;
    int          tpar;
    int          ndat = npts;
@@ -1155,6 +1156,17 @@ static int dolsqfit( smf_math_function fid, const double pcoord[],
    if ( nfound == 0) return( 0 );
 
    fitStruct *fcntrl = (fitStruct *) pfcntrl;
+
+   /* Set up reference pixel as middle of the array */
+   double refpix = 0.5*(pcoord[0]+pcoord[npts-1]);
+
+   /* Did user desired special sorting? */
+   if  ( strncasecmp( fcntrl->usort, "POS", 3 ) == 0 )
+     sortopt = 11;
+   else if ( strncasecmp( fcntrl->usort, "DIS", 3 ) == 0 )
+     sortopt = 21;
+   else if ( strncasecmp( fcntrl->usort, "WID", 3 ) == 0 )
+     sortopt = 2;
 
    /* Save estimates and set fitmask from fixmask */
    for ( j = 0; j < nfound; j++ ) {
@@ -1209,6 +1221,9 @@ static int dolsqfit( smf_math_function fid, const double pcoord[],
 	 for ( i = 0; i < 3; i++  )
 	   parlist[j*npar+i] = parest[j*npar+i];
        }
+
+       if ( fcntrl->sort_estim == 1 )
+	 mysort( sortopt, refpix, parlist, errlist, npar, nfound );
 
        iters  = smf_lsqfit ( fid, pcoord, xdim, fdata, weight, ndat,
 			     parlist, errlist, fitmask, tpar, nfound,
@@ -1309,9 +1324,6 @@ static int dolsqfit( smf_math_function fid, const double pcoord[],
    /*----------------------------------------------------------*/
    /* TRY TO WEED OUT SPURIOUS RESULTS                         */
    /*----------------------------------------------------------*/
-
-   /* RPT: for now, make reference pixel middle of the array */
-   double refpix = 0.5*(pcoord[0]+pcoord[npts-1]);
 
    /* Weed out fits with fitted peak outside range (can arise from
       edge effects */
@@ -1428,13 +1440,6 @@ static int dolsqfit( smf_math_function fid, const double pcoord[],
    ** Sort the result: this will move any remaining fits to the front.
    */
    if ( nremaining > 0 ) {
-
-     int sortopt = 0;                     /* By default sort in amplitude */
-
-     if ( strncasecmp( fcntrl->usort, "POS", 3 ) == 0 )
-       sortopt = 21;
-     else if  ( strncasecmp( fcntrl->usort, "WID", 3 ) == 0 )
-       sortopt = 2;
 
      mysort( sortopt, refpix, parlist, errlist, npar, nfound );
 

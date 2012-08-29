@@ -219,10 +219,12 @@
 *          cause the fit to fail or be (very) poor. [YES]
 *     SORT = STRING
 *          Sort the resulting fits:
-*            "amp": sort by decreasing fitted value of the amp-like parameter
-*          "width": sort by decreasing fitted fwhm of the width-like parameter
-*          "pos":   sort by increasing fitted distance from the centre pixel
-*                   in the profile.
+*          "amp":      sort by decreasing fitted value of the amp-like parameter
+*          "width":    sort by decreasing fitted fwhm of the width-like
+*                      parameter
+*          "position": sort by increasing position along the profile axis
+*          "distance": sort by increasing fitted distance from the centre
+*                      pixel in the profile.
 *          Sorting can be helpful, but be cautioned that it can also
 *          complicate things: if there are two components one at -10 km/s
 *          and one at 10 km/s sorting by amplitude or width can result
@@ -234,6 +236,12 @@
 *          iteratively with e.g. a different restricted velocity range to
 *          try pick out the different components. Default is to sort by
 *          amplitude. ["amp"]
+*     SORT_ESTIMATE = LOGICAL
+*          Sort initial estimates also with the sorting selected in 'sort'.
+*          Estimates can be very inaccurate plus are not checked against
+*          any boundary limits until after the fit. Thus this option may
+*          not be very helpful.
+
 
 *  Fitting Functions:
 *     The function menu provides the choice of four functions for which
@@ -782,6 +790,15 @@ static void get_fit1par( void *pfcntrl, int *status )
       if (*status == SAI__OK && strpntr ) {
 	msgOutiff( MSG__VERB, "", "... SORT=%s", status, strpntr);
 	one_strlcpy ( fcntrl->usort, strpntr, sizeof(fcntrl->usort), status );
+        if  ( strncasecmp( fcntrl->usort, "AMP", 3 ) != 0 &&
+              strncasecmp( fcntrl->usort, "POS", 3 ) != 0 &&
+              strncasecmp( fcntrl->usort, "DIS", 3 ) != 0 &&
+              strncasecmp( fcntrl->usort, "WID", 3 ) != 0 ) {
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "Unrecognized sort option:\nMust use 3-plus characters of 'amplitude', 'position', 'distance', or 'width'.",
+	         status);
+	  goto CLEANUP1;
+	}
       } else {
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "Failed to get parameter SORT from config file",
@@ -790,6 +807,20 @@ static void get_fit1par( void *pfcntrl, int *status )
       }
     }
   }
+
+  /* Get ncomp to fit along */
+  int sort_estim = 0;
+  if ( astMapGet0I( keymap, "SORT_ESTIMATE", &sort_estim ) ) {
+    if ( *status == SAI__OK ) {
+      msgOutiff( MSG__VERB, "", "... SORT_ESTIMATE=%d", status, sort_estim );
+    } else {
+      errRep(FUNC_NAME,
+         "Failed to get parameter SORT_ESTIMATE from config file",
+	     status);
+      goto CLEANUP1;
+    }
+  }
+  fcntrl->sort_estim = sort_estim;
 
   /* Get ncomp to fit along */
   int ncomp = 1;

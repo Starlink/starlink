@@ -61,9 +61,10 @@ function = gausshermite2
 ncomp = 3
 
 # Sort the resulting fits:
-#    - amp:   sort by decreasing fitted value of the amp-like parameter
-#    - width: sort by decreasing fitted fwhm of the width-like parameter
-#    - pos:   sort by increasing fitted distance from the centre pixel
+#   - amp:      sort by decreasing fitted value of the amp-like parameter
+#   - width:    sort by decreasing fitted fwhm of the width-like parameter
+#   - position: sort by increasing position along the axis
+#   - distance: sort by increasing fitted distance from the centre pixel
 #             in the profile.
 #
 # Sorting can be helpful, but be cautioned that it can also complicate
@@ -78,7 +79,15 @@ ncomp = 3
 
 sort = amp
 # sort = width
-# sort = pos
+# sort = position
+# sort = distance
+
+# Sort initial estimates also with the sorting selected in 'sort'.
+# Estimates can be very inaccurate plus are not checked against any
+# boundary limits until after the fit. Thus this option may not be
+# very helpful.
+
+sort_estimate = 0
 
 # Minimum value for the Amplitude-like parameter (see at top) to
 # accepts as a genuine fit in terms of the rms. Based on the amplitude

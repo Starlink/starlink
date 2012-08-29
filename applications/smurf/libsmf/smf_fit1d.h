@@ -47,6 +47,7 @@ typedef struct {
   int    fixmask[MAXPAR];         /* Fit mask: 1: fixed; 0: fit           */
   double clip[2];                 /* Clip levels for data                 */
   char   usort[7];                /* Sort of output (amp, pos, width)     */
+  int    sort_estim;              /* Sort estimates per user sort         */
   double lolimit[NPAR];           /* Lower limits for parameters          */
   double hilimit[NPAR];           /* Upper limits for parameters          */
   int    do_retry;                /* Use re-try cascade for bad fits?     */
