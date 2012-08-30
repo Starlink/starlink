@@ -568,28 +568,29 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
 \
 /* We need the input variances if the AST__USEVAR or AST__VARWGT flag is \
    set. Otherwise use a NULL pointer for the input variances. */ \
-   if ( AST__USEVAR & *FLAGS || AST__VARWGT & *FLAGS ) { \
-      in_var = (const Xtype *) IN_VAR; \
-   } else { \
-      in_var = NULL; \
-   } \
+      if ( AST__USEVAR & *FLAGS || AST__VARWGT & *FLAGS ) { \
+         in_var = (const Xtype *) IN_VAR; \
+      } else { \
+         in_var = NULL; \
+      } \
 \
 /* We need the output variances if the AST__USEVAR or AST__GENVAR flag is \
    set. Otherwise use a NULL pointer for the output variances. */ \
-   if ( AST__USEVAR & *FLAGS || AST__GENVAR & *FLAGS ) { \
-      out_var = (Xtype *) OUT_VAR; \
-   } else { \
-      out_var = NULL; \
-   } \
+      if ( AST__USEVAR & *FLAGS || AST__GENVAR & *FLAGS ) { \
+         out_var = (Xtype *) OUT_VAR; \
+      } else { \
+         out_var = NULL; \
+      } \
 \
       astRebinSeq##X( astI2P( *THIS ), *WLIM, *NDIM_IN, \
                    LBND_IN, UBND_IN, (const Xtype *) IN, in_var, \
                    *INTERP, PARAMS, *FLAGS, \
                    *TOL, *MAXPIX, *BADVAL, \
                    *NDIM_OUT, LBND_OUT, UBND_OUT, \
-                   LBND, UBND, (Xtype *) OUT, out_var, WEIGHTS, NUSED ); \
+                   LBND, UBND, (Xtype *) OUT, out_var, WEIGHTS, \
+                   NUSED ); \
    ) \
-}
+} \
 
 /* Invoke the above macro to define a function for each data
    type. Include synonyms for some functions. */
