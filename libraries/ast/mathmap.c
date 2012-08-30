@@ -83,6 +83,8 @@ f     The MathMap class does not define any new routines beyond those
 *        - Override astEqual method.
 *     20-NOV-2006 (DSB):
 *        Re-implement the Equal method to avoid use of astSimplify.
+*     30-AUG-2012 (DSB):
+*        Fix bug in undocumented Gaussian noise function.
 *class--
 */
 
@@ -4924,6 +4926,13 @@ static double Rand( Rcontext *context, int *status ) {
    shuffle table. */
       itab = (int) ( context->random_int /
                      ( 1L + ( m1 - 1L ) / (long int) ntab ) );
+
+/* The algorithm left by RFWS seems to have a bug that "itab" can
+   sometimes be outside the range of [0.,ntab-1] causing the context->table
+   array to be addressed out of bounds. To avoid this, use the
+   following sticking plaster, since I'm not sure what the correct fix is. */
+      if( itab < 0 ) itab = -itab;
+      itab = itab % ntab;
 
 /* Extract the table entry and replace it with a new random value from
    the first generator "rand1". This is the Bays-Durham shuffle. */
