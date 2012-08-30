@@ -16274,6 +16274,15 @@ iraf! {
             helpkey *
         }
 
+         parameter conserve {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Conserve flux whilst resampling?}
+            helpkey *
+            default FALSE
+         }
+
          parameter factors {
             size *
             position 3

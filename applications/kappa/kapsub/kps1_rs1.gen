@@ -1,8 +1,8 @@
-      SUBROUTINE KPS1_RS1<T>( NDIM, IDIM, FACTS, DIMI, DIMO, INTERP, 
-     :                        PARAMS, HASVAR, HASQUA, HASAXI, DATI, 
-     :                        VARI, QUAI, AXI, BAD, DATWKI, VARWKI, 
-     :                        QUAWKI, DATWKO, VARWKO, QUAWKO, DATO, 
-     :                        VARO, QUAO, AXO, STATUS )
+      SUBROUTINE KPS1_RS1<T>( NDIM, IDIM, FACTS, DIMI, DIMO, INTERP,
+     :                        PARAMS, CONSRV, HASVAR, HASQUA, HASAXI,
+     :                        DATI, VARI, QUAI, AXI, BAD, DATWKI,
+     :                        VARWKI, QUAWKI, DATWKO, VARWKO, QUAWKO,
+     :                        DATO, VARO, QUAO, AXO, STATUS )
 *+
 *  Name:
 *     KPS1_RS1<T>
@@ -15,14 +15,14 @@
 
 *  Invocation:
 *     CALL KPS1_RS1<T>( NDIM, IDIM, FACTS, DIMI, DIMO, INTERP, PARAMS,
-*                       HASVAR, HASQUA, HASAXI, DATI, VARI, QUAI,
-*                       AXI, BAD, DATWKI, VARWKI, QUAWKI,
-*                       DATWKO, VARWKO, QUAWKO, DATO, VARO, 
+*                       CONSRV, HASVAR, HASQUA, HASAXI, DATI, VARI,
+*                       QUAI, AXI, BAD, DATWKI, VARWKI, QUAWKI,
+*                       DATWKO, VARWKO, QUAWKO, DATO, VARO,
 *                       QUAO, AXO, STATUS )
 
 *  Description:
 *     This routine resamples a data and associated variance, quality and
-*     axis arrays by applying a linear transformation to it along a 
+*     axis arrays by applying a linear transformation to it along a
 *     single dimension.
 
 *  Arguments:
@@ -39,8 +39,10 @@
 *     INTERP = INTEGER (Given)
 *        The resampling scheme as passed to AST_RESAMPLE<T>.
 *     PARAMS( * ) = DOUBLE PRECISION (Given)
-*        The auxiliary resampling parameters as passed to 
+*        The auxiliary resampling parameters as passed to
 *        AST_RESAMPLE<T>.
+*     CONSRV = LOGICAL (Given)
+*        Whether to conserve flux when resampling.
 *     HASVAR = LOGICAL (Given)
 *        Whether the variance is to be resampled.
 *     HASQUA = LOGICAL (Given)
@@ -56,7 +58,7 @@
 *     AXI( * ) = DOUBLE PRECISION (Given)
 *        The input AXIS Centre array (only used if HASAXI is true).
 *     BAD = LOGICAL (Given and Returned)
-*        On input, a .TRUE. value indicates that the input data 
+*        On input, a .TRUE. value indicates that the input data
 *        (and variance) arrays may contain bad pixels.  On exit, it will
 *        be set only if the output data (and variance) arrays actually
 *        do contain bad pixels.
@@ -126,6 +128,8 @@
 *        Added argument FACTS.
 *     3-JULY-2007 (DSB):
 *        Corrected calculation of the Mapping parameters.
+*     30-AUG-2012 (DSB):
+*        Added CONSRV argument.
 *     {enter_further_changes_here}
 
 *-
@@ -147,6 +151,7 @@
       INTEGER DIMO( NDIM )
       INTEGER INTERP
       DOUBLE PRECISION PARAMS( * )
+      LOGICAL CONSRV
       LOGICAL HASVAR
       LOGICAL HASQUA
       LOGICAL HASAXI
@@ -227,6 +232,7 @@
 
 *  Set constant values for the resampling routine.
       FLAGS = 0
+      IF ( CONSRV ) FLAGS = FLAGS + AST__CONSERVEFLUX
       IF ( HASVAR ) FLAGS = FLAGS + AST__USEVAR
       IF ( BAD ) FLAGS = FLAGS + AST__USEBAD
       TOL = 0.1D0
@@ -236,7 +242,7 @@
       NBAD = 0
       DONE = .FALSE.
       DO WHILE ( .NOT. DONE )
- 
+
 *  Copy the line we will resample from the input arrays into work
 *  buffers.
          IO = OFFI
@@ -256,7 +262,7 @@
 *  Perform the one-dimensional resampling.
          NBAD = NBAD + AST_RESAMPLE<T>( MAP, 1, 1, DIMI( IDIM ), DATWKI,
      :                                  VARWKI, INTERP, AST_NULL,
-     :                                  PARAMS, FLAGS, TOL, MAXPIX, 
+     :                                  PARAMS, FLAGS, TOL, MAXPIX,
      :                                  VAL__BAD<T>, 1, 1, DIMO( IDIM ),
      :                                  1, DIMO( IDIM ), DATWKO, VARWKO,
      :                                  STATUS )
@@ -327,7 +333,7 @@
          NBAD = 0
          DONE = .FALSE.
          DO WHILE ( .NOT. DONE )
- 
+
 *  Copy the line we will resample from the input arrays into work
 *  buffers.
             IO = OFFI
@@ -337,10 +343,10 @@
             END DO
 
 *  Perform the one-dimensional resampling.
-            NBAD = NBAD + AST_RESAMPLEUB( MAP, 1, 1, DIMI( IDIM ), 
-     :                                    QUAWKI, QUAWKI, INTERP, 
-     :                                    AST_NULL, PARAMS, FLAGS, TOL, 
-     :                                    MAXPIX, VAL__BADUB, 1, 1, 
+            NBAD = NBAD + AST_RESAMPLEUB( MAP, 1, 1, DIMI( IDIM ),
+     :                                    QUAWKI, QUAWKI, INTERP,
+     :                                    AST_NULL, PARAMS, FLAGS, TOL,
+     :                                    MAXPIX, VAL__BADUB, 1, 1,
      :                                    DIMO( IDIM ), 1, DIMO( IDIM ),
      :                                    QUAWKO, QUAWKO, STATUS )
 
@@ -382,9 +388,9 @@
 *  ========================
       IF( HASAXI ) THEN
          FLAGS = AST__USEBAD
-         NBAD = AST_RESAMPLED( MAP, 1, 1, DIMI( IDIM ), AXI, AXI, 
-     :                         INTERP, AST_NULL, PARAMS, FLAGS, TOL, 
-     :                         MAXPIX, VAL__BADD, 1, 1, DIMO( IDIM ), 
+         NBAD = AST_RESAMPLED( MAP, 1, 1, DIMI( IDIM ), AXI, AXI,
+     :                         INTERP, AST_NULL, PARAMS, FLAGS, TOL,
+     :                         MAXPIX, VAL__BADD, 1, 1, DIMO( IDIM ),
      :                         1, DIMO( IDIM ), AXO, AXO, STATUS )
       END IF
 
