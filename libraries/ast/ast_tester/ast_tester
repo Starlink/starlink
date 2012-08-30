@@ -58,7 +58,7 @@ g95 -fno-second-underscore -o simplify simplify.f -I$AST/include -I$STARLINK/inc
 echo ""
 
 
-foreach prog (testchannel testpolymap testcmpmap testlutmap testfitstable testtable teststcschan teststc testspecframe testfitschan testswitchmap testrebin testtrangrid testnormmap testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
+foreach prog (testchannel testpolymap testcmpmap testlutmap testfitstable testtable teststcschan teststc testspecframe testfitschan testswitchmap testrebin testrebinseq testtrangrid testnormmap testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
 
 g95 -fno-second-underscore -w -g -o $prog -g $prog.f -I$AST/include \
      -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` \
