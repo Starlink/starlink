@@ -15357,6 +15357,15 @@ iraf! {
             default {Nearest}
          }
 
+         parameter nonorm {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Leave output values unnormalised?}
+            helpkey *
+            default FALSE
+         }
+
          parameter out {
             position 2
             type NDF
@@ -15387,11 +15396,10 @@ iraf! {
 
          parameter conserve {
             type _LOGICAL
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {Conserve flux whilst resampling?}
+            vpath DYNAMIC
+            ppath CURRENT DYNAMIC
+            prompt {Conserve flux?}
             helpkey *
-            default FALSE
          }
 
          parameter scale {
@@ -17950,6 +17958,15 @@ iraf! {
             helpkey *
          }
 
+         parameter conserve {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Conserve flux whilst rebinning?}
+            helpkey *
+            default TRUE
+         }
+
          parameter flbnd {
             size *
             type _DOUBLE
@@ -18020,6 +18037,15 @@ iraf! {
             default SincSinc
             prompt {Interpolation method}
             helpkey *
+         }
+
+         parameter nonorm {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Leave output values unnormalised?}
+            helpkey *
+            default FALSE
          }
 
          parameter out {
@@ -18113,11 +18139,10 @@ iraf! {
 
          parameter conserve {
             type _LOGICAL
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {Conserve flux whilst resampling?}
+            vpath DYNAMIC
+            ppath CURRENT DYNAMIC
+            prompt {Conserve flux?}
             helpkey *
-            default FALSE
          }
 
          parameter in {

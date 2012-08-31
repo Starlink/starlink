@@ -53,22 +53,19 @@
 *        one of the corresponding pixel axes without the other.  An
 *        error will be reported in such cases.  [!]
 *     CONSERVE = _LOGICAL (Read)
-*        Only accessed when using the resampling algorithm (i.e. if
-*        REBIN is set FALSE).  If set TRUE, then the output pixel values
-*        will be scaled in such a way as to preserve (approximately) the
-*        total data value in a feature on the sky.  The scaling factor
-*        is the ratio of the output pixel size to the input pixel size.
-*        This option can only be used if the Mapping is successfully
-*        approximated by one or more linear transformations.  Thus an
-*        error will be reported if it used when the TOL parameter is
-*        set to zero (which stops the use of linear approximations), or
-*        if the Mapping is too non-linear to be approximated by a
-*        piece-wise linear transformation.  The ratio of output to input
-*        pixel size is evaluated once for each panel of the piece-wise
-*        linear approximation to the Mapping, and is assumed to be
-*        constant for all output pixels in the panel.  Flux conservation
-*        can only be approximate when using the resampling algorithm.
-*        For accurate flux conservation set REBIN to TRUE.  [FALSE]
+*        If set TRUE, then the output pixel values will be scaled in such
+*        a way as to preserve the total data value in a feature on the sky.
+*        The scaling factor is the ratio of the output pixel size to the
+*        input pixel size. This option can only be used if the Mapping is
+*        successfully approximated by one or more linear transformations.
+*        Thus an error will be reported if it used when the ACC parameter
+*        is set to zero (which stops the use of linear approximations), or
+*        if the Mapping is too non-linear to be approximated by a piece-wise
+*        linear transformation. The ratio of output to input pixel size is
+*        evaluated once for each panel of the piece-wise linear approximation
+*        to the Mapping, and is assumed to be constant for all output pixels
+*        in the panel. This parameter is ignored if the NONORM parameter
+*        is set TRUE. [TRUE]
 *     IN = NDF (Read)
 *        The NDF to be transformed.
 *     LBOUND( ) = _INTEGER (Read)
@@ -117,7 +114,7 @@
 *        resampling), or dividing an input pixel value between a group
 *        of neighbouring output pixels (if rebinning). For details of
 *        these schemes, see the descriptions of routines AST_RESAMPLEx
-*        and AST_REBINx in SUN/210. METHOD can take the following
+*        and AST_REBINSEQx in SUN/210. METHOD can take the following
 *        values.
 *
 *        - "Linear" -- When resampling, the output pixel values are
@@ -185,6 +182,16 @@
 *        the output variances, you are generally safer using
 *        nearest-neighbour interpolation.  The initial default is
 *        "Nearest".  [current value]
+*     NONORM = _LOGICAL (Read)
+*        In general, each output pixel contains contributions from
+*        multiple input pixel values, and the number of input pixels
+*        contributing to each output pixel will vary from pixel to pixel.
+*        If NONORM is set .FALSE. (the default), then each output value
+*        is normalised by dividing it by the number of contributing
+*        input pixel, resulting in each output value being the weighted
+*        mean of the contibuting input values. However, if NONORM is set
+*        TRUE, this normalisation is not applied. See also parameter
+*        CONSERVEFLUX. [FALSE]
 *     OUT = NDF (Write)
 *        The transformed NDF.
 *     PARAMS( 2 ) = _DOUBLE (Read)
@@ -313,7 +320,7 @@
 *     above assumption about the input data is correct, because of
 *     the sub-pixel interpolation schemes employed.
 *
-*     - This task is based on the AST_RESAMPLE<X> and AST_REBIN<X>
+*     - This task is based on the AST_RESAMPLE<X> and AST_REBINSEQ<X>
 *     routines described in SUN/210.
 
 *  Related Applications:
@@ -335,81 +342,58 @@
 *     -  There can be an arbitrary number of NDF dimensions.
 
 *  Choice of Algorithm:
-*     The algorithm used to produce the output image is determined by
+*     The algorithm used to produce the output images is determined by
 *     the REBIN parameter, and is based either on resampling the output
-*     image or rebinning the input image.
+*     image or rebinning the corresponding input image.
 *
 *     The resampling algorithm steps through every pixel in the output
 *     image, sampling the input image at the corresponding position and
-*     storing the sampled input value in the output pixel.  The method
+*     storing the sampled input value in the output pixel. The method
 *     used for sampling the input image is determined by the METHOD
-*     parameter.  The rebinning algorithm steps through every pixel in
+*     parameter. The rebinning algorithm steps through every pixel in
 *     the input image, dividing the input pixel value between a group
 *     of neighbouring output pixels, incrementing these output pixel
-*     values by their allocated share of the input pixel value.  The way
-*     in which the input sample is divided between the output pixels
-*     is determined by the METHOD parameter.
+*     values by their allocated share of the input pixel value, and
+*     finally normalising each output value by the total number of
+*     contributing input values. The way in which the input sample is
+*     divided between the output pixels is determined by the METHOD
+*     parameter.
 *
-*     The two algorithms behaviour quite differently if the
-*     transformation from input to output includes any significant
-*     change of scale.  In general, resampling will not alter the pixel
-*     values associated with a source, even if the pixel size changes.
-*     On the other hand, the rebinning algorithm will change the pixel
-*     values in order to correct for a change in pixel size.  Thus,
-*     rebinning conserves the total data value within a given region
-*     where as resampling, in general, does not (but see the discussion
-*     of the CONSERVE parameter below).
+*     Both algorithms produce an output in which the each pixel value is
+*     the weighted mean of the near-by input values, and so do not alter
+*     the mean pixel values associated with a source, even if the pixel
+*     size changes. Thus the total data sum in a source will change if
+*     the input and output pixel sizes differ. However, if the CONSERVE
+*     parameter is set TRUE, the output values are scaled by the ratio of
+*     the output to input pixel size, so that the total data sum in a
+*     source is preserved.
 *
-*     Resampling is appropriate if the input image represents the
-*     spatial density of some physical value (e.g. surface brightness)
-*     because the output image will have the same normalisation as the
-*     input image.  However, rebinning is probably more appropriate if
-*     the image measures (for instance) flux per pixel, since rebinning
-*     takes account of the change in pixel size.
-*
-*     Another difference is that resampling guarantees to fill the
-*     output image with good pixel values (assuming the input image is
-*     filled with good input pixel values), whereas holes can be left by
-*     the rebinning algorithm if the output image has smaller pixels
-*     than the input image.  Such holes occur at output pixels which
-*     receive no contributions from any input pixels, and will be filled
-*     with the value zero in the output image.  If this problem occurs
-*     the solution is probably to change the width of the pixel
-*     spreading function by assigning a larger value to PARAMS(1) and/or
-*     PARAMS(2) (depending on the specific METHOD value being used).
+*     A difference between resampling and rebinning is that resampling
+*     guarantees to fill the output image with good pixel values (assuming
+*     the input image is filled with good input pixel values), whereas
+*     holes can be left by the rebinning algorithm if the output image has
+*     smaller pixels than the input image.  Such holes occur at output
+*     pixels which receive no contributions from any input pixels, and
+*     will be filled with the value zero in the output image. If this
+*     problem occurs the solution is probably to change the width of the
+*     pixel spreading function by assigning a larger value to PARAMS(1)
+*     and/or PARAMS(2) (depending on the specific METHOD value being used).
 *
 *     Both algorithms have the capability to introduce artificial
-*     artefacts into the output image.  These have various causes
+*     artifacts into the output image. These have various causes
 *     described below.
 *
 *     - Particularly sharp features in the input can cause rings around
-*     the corresponding features in the output image.  This can be
+*     the corresponding features in the output image. This can be
 *     minimised by suitable settings for the METHOD and PARAMS
-*     parameters.  In general such rings can be minimised by using a
+*     parameters. In general such rings can be minimised by using a
 *     wider interpolation kernel (if resampling) or spreading function
 *     (if rebinning), at the cost of degraded resolution.
 *
-*     - Regular patterns of curvy lines covering the whole output image
-*     can be created when using the rebinning algorithm.  These are
-*     caused by a beating effect between the input pixel positions and
-*     the output pixel's position, and their nature and strength depend
-*     critically upon the nature of the Mapping and the spreading
-*     function being used.  In general, the nearest-neighbour spreading
-*     function demonstrates this effect more clearly than the other
-*     functions, and for this reason should be used with caution.
-*     Again, wider spreading functions reduce the effect at the cost of
-*     degraded resolution.  Note, the resampling algorithm is not
-*     subject to these artefacts.  For this reason, you may prefer to
-*     use the resampling algorithm with the CONSERVE parameter set to
-*     TRUE.  This causes the resampling algorithm to perform
-*     approximate flux conservation.
-*
 *     - The approximation of the Mapping using a piece-wise linear
-*     transformation (controlled by Parameter TOL) can produce artefacts
-*     at the joints between the panels of the approximation.  These can
-*     occur when using the rebinning algorithm, or when using the
-*     resampling algorithm with CONSERVE set to TRUE.  They are caused
-*     by the discontinuities between the adjacent panels of the
+*     transformation (controlled by paremeter TOL) can produce artifacts
+*     at the joints between the panels of the approximation. They are
+*     caused by the discontinuities  between the adjacent panels of the
 *     approximation, and can be minimised by reducing the value assigned
 *     to the TOL parameter.
 
@@ -475,6 +459,8 @@
 *        Add _INT64 support except for REBIN algorithm.
 *     22-MAY-2012 (DSB):
 *        Added parameter AXES.
+*     30-AUG-2012 (DSB):
+*        Changed to use AST_REBINSEQ instead of AST_REBIN.
 *     {enter_further_changes_here}
 
 *-
@@ -535,6 +521,7 @@
       INTEGER IPQUAO             ! Pointer to output Quality array
       INTEGER IPVARI             ! Pointer to input Variance array
       INTEGER IPVARO             ! Pointer to output Variance array
+      INTEGER IPW                ! Pointer to work space
       INTEGER J                  ! Loop variable
       INTEGER JFRM               ! Index of Frame for joining FrameSets
       INTEGER LBDEF( NDF__MXDIM ) ! Default value for LBOUND
@@ -562,6 +549,7 @@
       INTEGER NPAX               ! No. of pixel axes to be regridded
       INTEGER NQAX               ! No. of pixel axes not to be regridded
       INTEGER NSCALE             ! Number of supplied scale factors
+      INTEGER NUSED              ! No. of used input pixels
       INTEGER NWPAX              ! No. of WCS axes to be regridded
       INTEGER NWQAX              ! No. of WCS axes not to be regridded
       INTEGER OUTPRM( NDF__MXDIM )! Input axis indices for each output axis
@@ -586,6 +574,7 @@
       LOGICAL HASVAR             ! Does the input NDF have VARIANCE
                                  ! component?
       LOGICAL MORE               ! Continue looping?
+      LOGICAL NONORM             ! Skip the normalisation of the o/p values?
       LOGICAL REBIN              ! Create output pixels by rebinning?
       LOGICAL SCEQU              ! Are all axis scale factors equal?
       LOGICAL SUBSET             ! Regrid only a subset of pixel axes?
@@ -1209,11 +1198,24 @@
          FLAGS = FLAGS + AST__USEBAD
       END IF
 
-*  See if flux is to be conserved.
-      IF( .NOT. REBIN ) THEN
+*  See if the normalisation of the output values is to be skipped.
+*  Only applies to rebinning.
+      IF( REBIN ) THEN
+         CALL PAR_GET0L( 'NONORM', NONORM, STATUS )
+         IF( NONORM ) FLAGS = FLAGS + AST__NONORM
+      ELSE
+         NONORM = .FALSE.
+      END IF
+
+*  If not, see if total flux is to be preserved.
+      IF( .NOT. NONORM ) THEN
+         CONSRV = REBIN
+         CALL PAR_DEF0L( 'CONSERVE', CONSRV, STATUS )
          CALL PAR_GET0L( 'CONSERVE', CONSRV, STATUS )
          IF( CONSRV ) FLAGS = FLAGS + AST__CONSERVEFLUX
-      END IF
+      ELSE
+         CONSRV = .FALSE.
+      ENDIF
 
 *  Perform the resampling.
 *  =======================
@@ -1332,37 +1334,45 @@
 
 
       ELSE
+
+         FLAGS = FLAGS + AST__REBININIT + AST__REBINEND
+         CALL PSX_CALLOC( ELO, '_DOUBLE', IPW, STATUS )
+
          IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL AST_REBINI( MAPHIO, DBLE(WLIM), NDIMI, LBNDI, UBNDI,
-     :                       %VAL( CNF_PVAL( IPDATI )),
-     :                       %VAL( CNF_PVAL( IPVARI )), INTERP,
-     :                       PARAMS, FLAGS, TOL, MAXPIX,
-     :                       VAL__BADI, NDIMO, LBNDO, UBNDO, LBNDI,
-     :                       UBNDI, %VAL( CNF_PVAL( IPDATO )),
-     :                       %VAL( CNF_PVAL( IPVARO )),
-     :                       STATUS )
+            CALL AST_REBINSEQI( MAPHIO, DBLE(WLIM), NDIMI, LBNDI, UBNDI,
+     :                          %VAL( CNF_PVAL( IPDATI )),
+     :                          %VAL( CNF_PVAL( IPVARI )), INTERP,
+     :                          PARAMS, FLAGS, TOL, MAXPIX,
+     :                          VAL__BADI, NDIMO, LBNDO, UBNDO, LBNDI,
+     :                          UBNDI, %VAL( CNF_PVAL( IPDATO )),
+     :                          %VAL( CNF_PVAL( IPVARO )),
+     :                          %VAL( CNF_PVAL( IPW )), NUSED,
+     :                          STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL AST_REBINR( MAPHIO, DBLE(WLIM), NDIMI, LBNDI, UBNDI,
-     :                       %VAL( CNF_PVAL( IPDATI )),
-     :                       %VAL( CNF_PVAL( IPVARI )), INTERP,
-     :                       PARAMS, FLAGS, TOL, MAXPIX,
-     :                       VAL__BADR, NDIMO, LBNDO, UBNDO, LBNDI,
-     :                       UBNDI, %VAL( CNF_PVAL( IPDATO )),
-     :                       %VAL( CNF_PVAL( IPVARO )),
-     :                       STATUS )
+            CALL AST_REBINSEQR( MAPHIO, DBLE(WLIM), NDIMI, LBNDI, UBNDI,
+     :                          %VAL( CNF_PVAL( IPDATI )),
+     :                          %VAL( CNF_PVAL( IPVARI )), INTERP,
+     :                          PARAMS, FLAGS, TOL, MAXPIX,
+     :                          VAL__BADR, NDIMO, LBNDO, UBNDO, LBNDI,
+     :                          UBNDI, %VAL( CNF_PVAL( IPDATO )),
+     :                          %VAL( CNF_PVAL( IPVARO )),
+     :                          %VAL( CNF_PVAL( IPW )), NUSED,
+     :                          STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL AST_REBIND( MAPHIO, DBLE(WLIM), NDIMI, LBNDI, UBNDI,
-     :                       %VAL( CNF_PVAL( IPDATI )),
-     :                       %VAL( CNF_PVAL( IPVARI )), INTERP,
-     :                       PARAMS, FLAGS, TOL, MAXPIX,
-     :                       VAL__BADD, NDIMO, LBNDO, UBNDO, LBNDI,
-     :                       UBNDI, %VAL( CNF_PVAL( IPDATO )),
-     :                       %VAL( CNF_PVAL( IPVARO )),
-     :                       STATUS )
+            CALL AST_REBINSEQD( MAPHIO, DBLE(WLIM), NDIMI, LBNDI, UBNDI,
+     :                          %VAL( CNF_PVAL( IPDATI )),
+     :                          %VAL( CNF_PVAL( IPVARI )), INTERP,
+     :                          PARAMS, FLAGS, TOL, MAXPIX,
+     :                          VAL__BADD, NDIMO, LBNDO, UBNDO, LBNDI,
+     :                          UBNDI, %VAL( CNF_PVAL( IPDATO )),
+     :                          %VAL( CNF_PVAL( IPVARO )),
+     :                          %VAL( CNF_PVAL( IPW )), NUSED,
+     :                          STATUS )
          END IF
 
+         CALL PSX_FREE( IPW, STATUS )
          NBAD = 1
 
       END IF
