@@ -58,7 +58,7 @@ function = gausshermite2
 # with the strongest component. The routine will try to find and fit ncomp
 # functions along each profile, but may settle for less.
 
-ncomp = 3
+ncomp = 1
 
 # Sort the resulting fits:
 #   - amp:      sort by decreasing fitted value of the amp-like parameter
