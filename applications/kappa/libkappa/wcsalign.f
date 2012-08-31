@@ -78,13 +78,11 @@
 *        region is used. High accuracy is paid for by larger run times.
 *        [0.05]
 *     CONSERVE = _LOGICAL (Read)
-*        Only accessed when using the resampling algorithm (i.e. if
-*        REBIN is set FALSE). If set TRUE, then the output pixel values
-*        will be scaled in such a way as to preserve (approximately)
-*        the total data value in a feature on the sky. The scaling
-*        factor is the ratio of the output pixel size to the input pixel
-*        size. This option can only be used if the Mapping is
-*        successfully approximated by one or more linear
+*        If set TRUE, then the output pixel values will be scaled in such
+*        a way as to preserve the total data value in a feature on the sky.
+*        The scaling factor is the ratio of the output pixel size to the
+*        input pixel size. This option can only be used if the Mapping
+*        is successfully approximated by one or more linear
 *        transformations. Thus an error will be reported if it used when
 *        the ACC parameter is set to zero (which stops the use of
 *        linear approximations), or if the Mapping is too non-linear to
@@ -92,9 +90,8 @@
 *        ratio of output to input pixel size is evaluated once for each
 *        panel of the piece-wise linear approximation to the Mapping,
 *        and is assumed to be constant for all output pixels in the
-*        panel. Flux conservation can only be approximate when using
-*        the resampling algorithm. For accurate flux conservation, use
-*        rebinning rather than resampling. [FALSE]
+*        panel. The dynamic default is TRUE if rebinning and FALSE if
+*        resampling (see parameter REBIN). []
 *     IN = NDF (Read)
 *        A group of input NDFs (of any dimensionality). This should be
 *        given as  a comma-separated list, in which each list element
@@ -353,37 +350,31 @@
 *     parameter. The rebinning algorithm steps through every pixel in
 *     the input image, dividing the input pixel value between a group
 *     of neighbouring output pixels, incrementing these output pixel
-*     values by their allocated share of the input pixel value. The way
-*     in which the input sample is divided between the output pixels
-*     is determined by the METHOD parameter.
+*     values by their allocated share of the input pixel value, and
+*     finally normalising each output value by the total number of
+*     contributing input values. The way in which the input sample is
+*     divided between the output pixels is determined by the METHOD
+*     parameter.
 *
-*     The two algorithms behaviour quite differently if the
-*     transformation from input to output includes any significant
-*     change of scale. In general, resampling will not alter the pixel
-*     values associated with a source, even if the pixel size changes.
-*     On the other hand, the rebinning algorithm will change the pixel
-*     values in order to correct for a change in pixel size. Thus,
-*     rebinning conserves the total data value within a given region
-*     where as resampling, in general, does not (but see the discussion
-*     of the CONSERVE parameter below).
+*     Both algorithms produce an output in which the each pixel value is
+*     the weighted mean of the near-by input values, and so do not alter
+*     the mean pixel values associated with a source, even if the pixel
+*     size changes. Thus the total data sum in a source will change if
+*     the input and output pixel sizes differ. However, if the CONSERVE
+*     parameter is set TRUE, the output values are scaled by the ratio of
+*     the output to input pixel size, so that the total data sum in a
+*     source is preserved.
 *
-*     Resampling is appropriate if the input image represents the
-*     spatial density of some physical value (e.g. surface brightness)
-*     because the output image will have the same normalisation as the
-*     input image.  However, rebinning is probably more appropriate if
-*     the image measures (for instance) flux per pixel, since rebinning
-*     takes account of the change in pixel size.
-*
-*     Another difference is that resampling guarantees to fill the
-*     output image with good pixel values (assuming the input image is
-*     filled with good input pixel values), whereas holes can be left by
-*     the rebinning algorithm if the output image has smaller pixels
-*     than the input image.  Such holes occur at output pixels which
-*     receive no contributions from any input pixels, and will be filled
-*     with the value zero in the output image. If this problem occurs
-*     the solution is probably to change the width of the pixel
-*     spreading function by assigning a larger value to PARAMS(1) and/or
-*     PARAMS(2) (depending on the specific METHOD value being used).
+*     A difference between resampling and rebinning is that resampling
+*     guarantees to fill the output image with good pixel values (assuming
+*     the input image is filled with good input pixel values), whereas
+*     holes can be left by the rebinning algorithm if the output image has
+*     smaller pixels than the input image.  Such holes occur at output
+*     pixels which receive no contributions from any input pixels, and
+*     will be filled with the value zero in the output image. If this
+*     problem occurs the solution is probably to change the width of the
+*     pixel spreading function by assigning a larger value to PARAMS(1)
+*     and/or PARAMS(2) (depending on the specific METHOD value being used).
 *
 *     Both algorithms have the capability to introduce artificial
 *     artifacts into the output image. These have various causes
@@ -398,10 +389,8 @@
 *
 *     - The approximation of the Mapping using a piece-wise linear
 *     transformation (controlled by paremeter ACC) can produce artifacts
-*     at the joints between the panels of the approximation. These can
-*     occur when using the rebinning algorithm, or when using the
-*     resampling algorithm with CONSERVE set to TRUE. They are caused by
-*     the discontinuities  between the adjacent panels of the
+*     at the joints between the panels of the approximation. They are
+*     caused by the discontinuities  between the adjacent panels of the
 *     approximation, and can be minimised by reducing the value assigned
 *     to the ACC parameter.
 
@@ -455,6 +444,9 @@
 *        Pass the AUTOBN value to kps1_wala0.
 *     23-FEB-2011 (DSB):
 *        Allow input 3D cubes to be aligned with reference 2D images.
+*     30-AUG-2012 (DSB):
+*        The CONSERVE parameter is now used for both rebinning and
+*        resampling. It defaults to the value of REBIN.
 *     {enter_further_changes_here}
 
 *-
@@ -730,9 +722,9 @@
       MAXPIX = MAX( 1, MAXPIX )
 
 *  See if flux is to be conserved.
-      IF( .NOT. REBIN ) THEN
-         CALL PAR_GET0L( 'CONSERVE', CONSRV, STATUS )
-      END IF
+      CONSRV = REBIN
+      CALL PAR_DEF0L( 'CONSERVE', CONSRV, STATUS )
+      CALL PAR_GET0L( 'CONSERVE', CONSRV, STATUS )
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999

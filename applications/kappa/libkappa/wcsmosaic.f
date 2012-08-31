@@ -51,13 +51,21 @@
 *     rebinned into the output NDF in this way, the algorithm proceeds
 *     to rebin the next input NDF in the same way.  Once all input NDFs
 *     have been processed, output pixels which have a weight less than
-*     the value given by Parameter WLIM are set bad.  The mean value in
-*     the weights array (excluding those values less than WLIM) is then
-*     found.  The output NDF is then normalised by dividing it by the
-*     weights array.  This normalisation of the output NDF takes account
-*     of any difference in the number of pixels contributing to each
-*     output pixel, and also removes artifacts which may be produced by
-*     aliasing between the input and output pixel grids.
+*     the value given by Parameter WLIM are set bad.  Optionally (see
+*     parameter NONORM), the output NDF is then normalised by dividing it
+*     by the weights array.  This normalisation of the output NDF takes
+*     account of any difference in the number of pixels contributing to
+*     each output pixel, and also removes artifacts which may be produced
+*     by aliasing between the input and output pixel grids. Thus each
+*     output pixel value is a weighted mean of the input pixel values
+*     from which it receives contributions.  This means that the units of
+*     the output NDF are the same as the input NDF. In particularly, any
+*     difference between the input and output pixel sizes is ignored,
+*     resulting in the total input data sum being preserved only if the
+*     input and output NDFs have equal pixel sizes. However, an option
+*     exists to scale the input values before use so that the total data
+*     sum in each input NDF is preserved even if the input and output
+*     pixel sizes differ (see parameter CONSERVE).
 *
 *     If the input NDFs contain variances, then these are propagated to
 *     the output.  Alternatively, output variances can be generated from
@@ -88,6 +96,20 @@
 *        than the value supplied for ACC (in pixels), then a smaller
 *        region is used.  High accuracy is paid for by longer run times.
 *        [0.05]
+*     CONSERVE = _LOGICAL (Read)
+*        If set TRUE, then the output pixel values will be scaled in such
+*        a way as to preserve the total data value in a feature on the sky.
+*        The scaling factor is the ratio of the output pixel size to the
+*        input pixel size. This option can only be used if the Mapping is
+*        successfully approximated by one or more linear transformations.
+*        Thus an error will be reported if it used when the ACC parameter
+*        is set to zero (which stops the use of linear approximations), or
+*        if the Mapping is too non-linear to be approximated by a piece-wise
+*        linear transformation. The ratio of output to input pixel size is
+*        evaluated once for each panel of the piece-wise linear approximation
+*        to the Mapping, and is assumed to be constant for all output pixels
+*        in the panel. This parameter is ignored if the NONORM parameter
+*        is set TRUE. [TRUE]
 *     FLBND( ) = _DOUBLE (Write)
 *        The lower bounds of the bounding box enclosing the output NDF
 *        in the current WCS Frame. The number of elements in this parameter
@@ -210,6 +232,17 @@
 *        the output variances, you are generally safer using
 *        nearest-neighbour interpolation.  The initial default is
 *        "SincSinc".  [current value]
+*     NONORM = _LOGICAL (Read)
+*        In general, each output pixel contains contributions from
+*        multiple input pixel values, and the number of input pixels
+*        contributing to each output pixel will vary from pixel to pixel.
+*        If NONORM is set .FALSE. (the default), then each output value
+*        is normalised by dividing it by the number of contributing
+*        input pixel, resulting in each output value being the weighted
+*        mean of the contibuting input values. However, if NONORM is set
+*        TRUE, this normalisation is not applied. See also parameter
+*        CONSERVEFLUX. Setting both NONORM and VARIANCE to TRUE results
+*        in an error being reported. [FALSE]
 *     OUT = NDF (Write)
 *        The output NDF. If a null (!) value is supplied, the application
 *        will terminate early without creating an output cube, but
@@ -369,6 +402,8 @@
 *     2009 July 22 (MJC):
 *        Remove ILEVEL parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     30-AUG-2012 (DSB):
+*        Added parameters CONSERVEFLUX and NONORM.
 *     {enter_further_changes_here}
 
 *-
@@ -439,8 +474,10 @@
       INTEGER UBND( NDF__MXDIM ) ! Indices of upper-right corner of o/p
       INTEGER UBND1( NDF__MXDIM )! Indices of upper-right corner of i/p
       LOGICAL BAD_DV         ! Any bad data/variance values in input?
+      LOGICAL CONSRV         ! Conserve flux in each input NDF?
       LOGICAL GENVAR         ! Use i/p spread to create o/p variance?
       LOGICAL HASVAR         ! Do all i/p NDFs have variances? */
+      LOGICAL NONORM         ! Skip the normalisation of the o/p values?
       LOGICAL USEVAR         ! Use i/p variances to create o/p variance?
       LOGICAL VARWGT         ! Use i/p variances as weights?
       REAL ERRLIM            ! Positional accuracy in pixels
@@ -614,6 +651,16 @@
       CALL PAR_GET0I( 'MAXPIX', MAXPIX, STATUS )
       MAXPIX = MAX( 1, MAXPIX )
 
+*  See if the normalisation of the output values is to be skipped.
+      CALL PAR_GET0L( 'NONORM', NONORM, STATUS )
+
+*  If not, see if total flux in each input NDF is to be preserved.
+      IF( .NOT. NONORM ) THEN
+         CALL PAR_GET0L( 'CONSERVE', CONSRV, STATUS )
+      ELSE
+         CONSRV = .FALSE.
+      ENDIF
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -647,6 +694,13 @@
          CALL PAR_GET0L( 'VARIANCE', VARWGT, STATUS )
       ELSE
          VARWGT = .FALSE.
+      END IF
+
+*  Cannot skip the normalisation if we are weighting input data.
+      IF( VARWGT .AND. NONORM .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'The NONORM and VARIANCE parameters '//
+     :                 'are both TRUE - this is not allowed.', STATUS )
       END IF
 
 *  Abort if an error has occurred.
@@ -750,6 +804,8 @@
          FLAGS = 0
          IF( I .EQ. 1 ) FLAGS = FLAGS + AST__REBININIT
          IF( I .EQ. SIZE ) FLAGS = FLAGS + AST__REBINEND
+         IF( CONSRV ) FLAGS = FLAGS + AST__CONSERVEFLUX
+         IF( NONORM ) FLAGS = FLAGS + AST__NONORM
          IF( GENVAR ) FLAGS = FLAGS + AST__GENVAR
          IF( USEVAR ) FLAGS = FLAGS + AST__USEVAR
          IF( VARWGT ) FLAGS = FLAGS + AST__VARWGT
