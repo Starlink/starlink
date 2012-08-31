@@ -18,10 +18,10 @@
 
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {258.2}
-\newcommand{\stardocauthors}   {Edward Chapin, Andrew G. Gibb, Tim Jenness, David S. Berry  \& Douglas Scott}
-\newcommand{\stardocdate}      {30 April 2012}
+\newcommand{\stardocauthors}   {Edward Chapin, Andrew G. Gibb, Tim Jenness, David S. Berry, Douglas Scott \& Remo Tilanus}
+\newcommand{\stardocdate}      {30 Aug 2012}
 \newcommand{\stardoctitle}     {SMURF -- the Sub-Millimetre User Reduction Facillity}
-\newcommand{\stardocversion}   {Version 1.4.0}
+\newcommand{\stardocversion}   {Version 1.4.1}
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {
 
@@ -61,6 +61,8 @@
 %        Comments from Douglas, add more references
 %     2010-01-08 (AGG):
 %        More comments from Douglas, update author list and dates
+%     2012-08-30 (RPT):
+%        Added section on FIT1D
 %     {Add further history here}
 %
 % -
@@ -212,6 +214,8 @@
 \newcommand{\copyflat}{\xref{\task{copyflat}}{sun258}{COPYFLAT}}
 \newcommand{\dreamsolve}{\xref{\task{dreamsolve}}{sun258}{DREAMSOLVE}}
 \newcommand{\dreamweights}{\xref{\task{dreamweights}}{sun258}{DREAMWEIGHTS}}
+%  ...use fitdd instead of fit1d because the 1 breaks the macro
+\newcommand{\fitdd}{\xref{\task{fit1d}}{sun258}{FIT1D}}
 \newcommand{\gsdtoacsis}{\xref{\task{gsd2acsis}}{sun258}{GSD2ACSIS}}
 \newcommand{\gsdshow}{\xref{\task{gsdshow}}{sun258}{GSDSHOW}}
 \newcommand{\smurfhelp}{\xref{\task{smurfhelp}}{sun258}{SMURFHELP}}
@@ -1153,6 +1157,302 @@ that they will be aligned sample-for-sample.
 differences between the ``genuine'' and ``artificial'' time-series cubes.
 \end{enumerate}
 
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{sun258_gaussherm}
+    \caption{Fit1d $-$ Gauss-Hermite shapes as a function of the 3rd-order
+      ``skewness'' coefficient h3 and the 4th-order the ``peakiness''
+      coefficient h4.  the 3rd-order, h3, and the 4th-order, h4,
+      coefficients. The red box indicates the limits on acceptable
+      values for h3 and h4 as defined in the defaults config file. Note
+      that the fitted profile by default is restricted to positive values
+      and this will omit the shown negative features (see
+      the \cparam{POS\_ONLY} configuration paramter.}
+    \label{fig:gaussherm}
+  \end{center}
+\end{figure}
+
+\subsection{The fit1d command}
+
+The \fitdd\ command fits profiles along a particular axis of a NDF
+data file.  It is a generic command that will work on hypercubes with
+upto 7 dimensions, but is here discussed in terms of a typical
+3-D ACSIS data-file with axes RA, Dec, and Vlsr. Specifically, the
+fitting of spectra across the imaged section of the sky. The output of
+\fitdd\ is a cube with the fitted profiles and ``component parameter
+files as NDF extentions''.
+
+What sets \fitdd\ apart from most other fitting routines is that, by
+using ``component parameter files'' as inputs, it gives individual
+control over the fitting at each position. For instance, it is
+possible to fit broad lines on the nucleus of a galaxy but narrow
+lines everywhere else in the disk. Or to fit multiple components in an
+outflow and single components everywhere else in the field. Still,
+these types of fits may require a considerable familiarity with
+handling, cutting, and pasting NDF files in order to ``create'' the
+desired parameter files for input.
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{sun258_fit1d_fits}
+    \caption{Fit1d $-$ Black: original profiles; Red: results of a
+    3-component Gauss-Hermite2 fit (fitting both h3 and h4, see next section)}
+    \label{fig:samplefits}
+  \end{center}
+\end{figure}
+
+\fitdd\ can also fit more complicated shapes than gaussians. In
+particular, gauss-hermite functions are a powerful extention when
+fitting profiles that are skewed, peaky, or only approximately
+gaussian. Figure \ref{fig:gaussherm} shows gauss-hermite profiles as a
+function of the ``skewness'' coefficient h3 and the ``peakiness''
+coefficient h4. The red box indicates the limits on acceptable values
+for h3 and h4 as defined in the defaults config file. The limits were
+chosen such as to exclude fits that look more like multiple components
+rather than a distorted single gaussian, but, admittedly are fairly
+arbitrary.
+
+Because of the ability to fit distorted shapes, gauss-hermites are
+particularly well suited to ``capture'' the maximum amount of emission
+from a cube. Figure \ref{fig:samplefits} shows an example of the
+quality of the fits that can be obtained. For the shown case \fitdd\
+used a 3-component gauss-hermite2 (h3 and h4) function with the range
+around the profiles and the remaining configuration parameters at
+their default setting.  Collapsing the cube with the fitted profiles
+can thus result in an accurate and almost noise-free white light or
+total emission map. Residuals from the fit can of course be studied by
+subtracting the fitted profiles from the original cube.
+
+\subsubsection{Fitting functions}
+
+\fitdd\ does a one-dimensional fit along each ``profile'' (spectrum),
+fitting the number of requested ``components'' concurrently. Function
+shapes that can be fitted are ``gaussians'', ``gausshermite1'',
+``gausshermite2'', and ``voigt'' functions, which are discussed in
+detail in:
+
+\begin{myquote}
+\begin{verbatim}
+% smurfhelp fit1d fitting_functions
+\end{verbatim}
+\end{myquote}
+
+Gauss-hermite profiles are easiest visualized as the combination of a
+gaussian and decaying asymmetric 3rd-order and/or symmetric 4th-order
+polynomials. The 3rd-order polynomial causes a positive bump on one
+side and a negative bump on the other side of the main gaussian,
+resulting in asymmetric wings and a skewed shape. By contrast the
+4th-order polynomial causes a bump in the centre and steeper slopes
+i.e. a peaky shape.
+
+The gauss-hermite profiles in \fitdd\ are called gausshermite1, fitting
+only h3, and gausshermite2, fitting both h3 and h4 (to fit only h4, use
+gausshermite2 and define h3 to be 0 and fixed).
+
+To emphasize a number of issues:
+
+\begin{enumerate}
+\item Be aware that the art of fitting profiles is not in the fits
+  themselves, but rather the initial estimates provided to the
+  fit. Supplying user-defined initial estimates for e.g. the width of
+  the profiles can greatly influence and help the resulting fit. Also, if
+  the initial estimate routine can only find 2 components, the fit will
+  also be restricted to fitting that number of components even if the
+  user is requesting more.
+\item Setting the configuration parameter \cparam{ESTIMATE\_ONLY} to 1
+  will skip the fit and produce an output file with profiles based on the
+  initial estimates, allowing the user to inspect those. The associated
+  component parameter files could be modified and used as initial estimates
+  for a subsequent fit (see next section).
+\item Figure \ref{fig:gaussherm} shows that gauss-hermites can have
+  prominent negative features. By default these are set to zero in the
+  fitted spectra: see information in the configuration file for the
+  parameter \cparam{POS\_ONLY}.
+\item {\em ONLY for gaussians} do the fitted parameters correspond
+  {\em exactly} to amplitude, centre, and FWHM! For the other functions
+  such correspondence does not exist: while they are related, the
+  numerical values are not exact. Users are {\b strongly cautioned} to
+  keep this in mind. The above-mentioned help for ``fitting\_functions''
+  outlines the exact relations.
+\item The fitted ``gauss*'' functions can in principle be mixed along a
+  profile: i.e. the first component can be fitted as a ``gaussian'', the
+  second one as a ``gausshermite2'', etc. Use the ``Userval'' file to
+  accomplish this. It not possible to mix in Voigt profiles.
+\item However, since \fitdd\ fits concurrently and does not do an
+  iterative fit starting with the strongest or center-most component,
+  what is the first, second, etc. component is a fluid concept
+  (see next item on sort).  The initial estimates routine orders the
+  estimates by decreasing amplitude, but estimates can be quite imprecise.
+  The config file options \cparam{SORT} and \cparam{SORT\_ESTIMATE}
+  may help in minimizing problems (see next point).
+\item Sorting of the resulting fits can be done based on the amplitude-like,
+  position, or width-like parameter. This can be helpful, but be cautioned
+  that it can also complicate things: if there are two components one
+  at -10 km/s and one at 10 km/s sorting by amplitude or width can
+  result in the parameter file for component 1 to be a mix of the -10
+  and 10 features depending on which one was relatively stronger or
+  wider. Similarly, sorting by position can result in low-amplitude
+  fits of noise spikes to be mixed with stronger components. For more
+  precise control try to run the routine iteratively with e.g. a
+  different restricted velocity range to try pick out the different
+  components. Default sorting is by amplitude.
+\item In case multiple components are well separated each can be fitted
+separately using \cparam{RANGE}. The resulting component parameter files
+can then be used to generate a combined profile using \fitdd\ with
+\cparam{PARCOMP} and \cparam{MODEL\_ONLY}. This is prefered over
+simply co-adding the output files with the fitted profiles since it
+will put all relevant parameters files in the header of the output
+file.
+\end{enumerate}
+
+\subsubsection{Component Parameter files}
+
+Besides a cube with the fitted profiles \fitdd\ also outputs so-called
+``Component parameter files''. These are added as NDF extentions in
+the header of the output file. They can be accessed there directly but
+also copied out as independent files:
+
+\begin{myquote}
+\begin{verbatim}
+% gaiadisp outfile.more.smurf_fit1d.comp_1 outfile.more.smurf_fit1d.comp_2
+% ndfcopy outfile.more.smurf_fit1d.comp_0 comp_0
+% ndfcopy outfile.more.smurf_fit1d.comp_1 comp_1
+etc.
+\end{verbatim}
+\end{myquote}
+
+There is a parameter file for each component (``line'') that was
+fitted along the profile upto the number of components requested by
+the user. These are labeled ``comp\_1 .. comp\_n''. ``Comp\_0'' is a
+special diagnostics component that lists the number of components
+fitted at each position and a return code from the fitting routine.
+
+The component parameter files have 7 images along the axis that was
+fitted, with each representing a fitted parameter:
+
+\begin{myquote}
+\begin{verbatim}
+    COMP_1..N fitted profiles, planes:
+               (gaussian)          (gausshermite)        (voigt)
+         1 =   amplitude                a                 area
+         2 =   position                 b               position
+         3 =     fwhm                   c             doppler hwhm
+         4 =       -                    h3           lorenztian hwhm `l'
+         5 =       -                    h4           amp2area factor `v'
+         6 =   (empty)
+         7 = function-id (1=gaussian), (2=gausshermite1), (3=gausshermite2)
+                         (4=voigt)
+
+    COMP_0 diagnostics info, planes:
+         1 = number of components found
+         2 = fit error: (see help fit1d)
+\end{verbatim}
+\end{myquote}
+
+Thus, for gaussian fits ``outfile.more.smurf\_fit1d.comp\_1(,,1)'' is
+an image of the fitted amplitudes of component 1 of each profile,
+while ``outfile.more.smurf\_fit1d.comp\_1(,,3)'' shows the fitted FWHMs
+across the field-of-view.
+
+Much of the (anticipated) use of \fitdd\ derives from the fact that
+component parameter files can be used as input as well: either to
+provide initial estimates or fixed values to the fitting routine.
+The hierarchy is as follows:
+\begin{enumerate}
+\item The routine derives initial estimates upto the number of components
+requested by the user.
+\item These initial estimates are replaced by values from component parameter
+files in sequence given (values from the first file specified replace
+the initial estimate for the first component, etc.).
+\item Any parameter values for component(s) specified by the user in
+the ``User definition file'' are then substituted.
+\item Finally, a ``fitmask'' is defined based on which parameters are
+  free to be fitted and which are declared as ``fixed'' in the ``User
+  definition file''. Any non-bad value for a free parameter is treated
+  as an initial estimate.
+\end{enumerate}
+
+The difference between values specified in the component parameter
+files and ones declared in the user definition file is that the former
+can vary across the field-of-view whereas the latter will result in
+the same value being used for all profiles.
+
+In principle a component parameter file can be created from ``scratch'':
+\begin{myquote}
+\begin{verbatim}
+# Copy a 7-image section from the cube and fill with blanks
+% ndfcopy infile'(,,1~7)' temp
+
+# Give the planes pixel coordinates 1..7. Keep the first two dimensions
+# at the original value.
+% setorigin temp '[-56,-56,1]'
+
+# Fill planes with values: here just use a constant gaussian (plane 7 = 1)
+# with Ampl=10, Pos = 10 km/s, and FWHM = 5 km/s (assuming units of km/s).
+% chpix in=temp   out=temp2  section='",,,"' newval=bad
+% chpix in=temp2  out=par1   section='",,1"' newval=10
+% chpix in=par1   out=par12  section='",,2"' newval=20
+% chpix in=par12  out=par123 section='",,3"' newval=5
+% chpix in=par123 out=comp_1 section='",,7"' newval=1
+
+# Generate a cube with the model profiles using fit1d with model_only=1
+% fit1d in=infile out=model rms=1 parcomp=comp_1 \
+%       config='"^/star/bin/smurf/smurf_fit1d.def,model_only=1"'
+\end{verbatim}
+\end{myquote}
+
+Obviously, this is not a very practical example given that the profile
+is the same across the field: setting values in the user definition
+file for component 1 would achieve the same. However, with dedicated
+software or a tediously long script running chpix for every position a
+sophisticated model could, in principle, be created. For instance if a
+feature shifts in velocity across the field, it could be isolated and
+fitted by supplying a parameter file with a shifting initial estimate
+for the position of the peak.
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{sun258_fit1d_fixfit}
+    \caption{Fit1d $-$  {\it Left:} Section of a parameter file showing originally
+      fitted amplitudes; {\it Right:} Amplitudes after using a
+      ``fixed'' parameter file from the original fit as initial estimates
+      for a subsequent fit.}
+    \label{fig:fixfit}
+  \end{center}
+\end{figure}
+
+Another situation where manipulation of parameter files can be useful
+is when parameter files from previous fits require corrections. For
+instance, in case it is possible to identify the troublesome locations
+with ``thresh'' those can be set to bad values and ``fillbad''
+can be used to interpolate from surrounding values.
+
+Figure \ref{fig:fixfit} shows an example. On the left is the a section
+of the Amplitude plane of a parameter file resulting from a
+1-component fit of a gaussian. In a few positions problems can be seen
+(actually due to a secondary component).  These points were isolated
+using a ``thresh'' on the Position plane of the parameters and be
+interpolated over using ``fillbad''. The ``fixed'' parameter file was
+then used to provide initial estimates for a subsequent file,
+resulting in the fitted Amplitudes on the right.
+
+\begin{myquote}
+\begin{verbatim}
+% fit1d in=infile out=outfile rms=0.22 config=^fit1d.def
+% ndfcopy outfile.more.smurf_fit1d.comp_1 comp_1
+% thresh comp_1'(,,2)' out=pos thrlo=2 thrhi=5 newlo=bad newhi=bad
+% fillbad pos out=pos_fix
+% paste comp_1 p1=pos_fix out=comp_1_fix
+% fit1d in=infile out=outfile rms=0.22 config=^fit1d.def parcomp=comp_1b_fix
+\end{verbatim}
+\end{myquote}
+
+These fairly simple examples are presented to illustrate the use of
+``Component parameter files'', but more elaborate schemes are
+possible. For instance, a section of a parameter file that fits broad
+lines in the nucleus of a galaxy can be pasted into a parameter file
+with narrow fits in the remainder of the disk. We'll leave further
+examples to to the imagination of the reader.
 
 \section{\xlabel{scuba2}SCUBA-2 Data Reduction\label{se:sc2dr}}
 
@@ -1182,7 +1482,7 @@ techniques. The iterative map-maker used for SCAN data (see
 Two general approaches may be taken to reducing data. The first,
 outlined by the steps in Sections \ref{se:dsworkflow} and
 \ref{se:rebin}, performs all of the data reduction tasks using a range
-of individual calls to \SMURF\ tasks. This method is useful if the user 
+of individual calls to \SMURF\ tasks. This method is useful if the user
 wishes to interact and view each step of the reduction, although the final
 maps are generally not of `science grade' quality. A second approach is to
 use the Dynamic Iterative Map Maker (DIMM), described in Section
