@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.39}
 \newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2012 July 12}
+\newcommand{\stardocdate}      {2012 August 31}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -43106,21 +43106,20 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       \sstsubsection{
          CONSERVE = \_LOGICAL (Read)
       }{
-         Only accessed when using the resampling algorithm (\emph{i.e.} if REBIN
-         is set {\tt FALSE}). If set {\tt TRUE}, then the output pixel values will
-         be scaled in such a way as to preserve (approximately) the total
-         data value in a feature on the sky.  The scaling factor is the ratio
-         of the output pixel size to the input pixel size.  This option can
-         only be used if the Mapping is successfully approximated by one or
-         more linear transformations.  Thus an error will be reported if it
-         used when the TOL parameter is set to zero (which stops the use of
-         linear approximations), or if the Mapping is too non-linear to be
-         approximated by a piece-wise linear transformation.  The ratio of
-         output to input pixel size is evaluated once for each panel of the
-         piece-wise linear approximation to the Mapping, and is assumed to be
-         constant for all output pixels in the panel.  Flux conservation can
-         only be approximate when using the resampling algorithm. For accurate
-         flux conservation set REBIN to {\tt TRUE}.  {\tt [FALSE]}
+         If set {\tt TRUE}, then the output pixel values will be scaled in
+         such a way as to preserve the total data value in a feature on
+         the sky.  The scaling factor is the ratio of the output pixel
+         size to the input pixel size.  This option can only be used if
+         the Mapping is successfully approximated by one or more linear
+         transformations.  Thus an error will be reported if it used
+         when the ACC parameter is set to zero (which stops the use of
+         linear approximations), or if the Mapping is too non-linear to
+         be approximated by a piece-wise linear transformation.  The
+         ratio of output to input pixel size is evaluated once for each
+         panel of the piece-wise linear approximation to the Mapping,
+         and is assumed to be constant for all output pixels in the
+         panel.  This parameter is ignored if the NORM parameter is set
+         {\tt FALSE}.  {\tt [TRUE]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -43189,7 +43188,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          of neighbouring output pixels (if rebinning).  For details
          of these schemes, see the descriptions of routines
          \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLEX} and
-         \xref{AST\_REBINx}{sun210}{AST_REBINX} in
+         \xref{AST\_REBINSEQx}{sun210}{AST_REBINSEQX} in
          \xref{SUN/210}{sun210}{}. METHOD can take the following values.
 
          \ssthitemlist{
@@ -43270,6 +43269,19 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          output variances, you are generally safer using nearest-neighbour
          interpolation.  The initial default is "Nearest".
          {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         NORM = \_LOGICAL (Read)
+      }{
+         In general, each output pixel contains contributions from
+         multiple input pixel values, and the number of input pixels
+         contributing to each output pixel will vary from pixel to
+         pixel.  If NORM is set {\tt TRUE} (the default), then each output
+         value is normalised by dividing it by the number of
+         contributing input pixels, resulting in each output value being
+         the weighted mean of the contributing input values.  However,
+         if NORM is set {\tt FALSE}, this normalisation is not applied.  See
+         also Parameter CONSERVE.  {\tt [TRUE]}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -43444,7 +43456,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
 
          \sstitem
          This task is based on the \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLEX}
-         and \xref{AST\_REBINx}{sun210}{AST_REBINX} routines described in
+         and \xref{AST\_REBINSEQx}{sun210}{AST_REBINSEQX} routines described in
          \xref{SUN/210}{sun210}{}.
       }
    }
@@ -43454,7 +43466,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
    }{
       The algorithm used to produce the output image is determined by
       the REBIN parameter, and is based either on resampling the output
-      image or rebinning the input image.
+      image or rebinning the corresponding input image.
 
       The resampling algorithm steps through every pixel in the output
       image, sampling the input image at the corresponding position and
@@ -43463,42 +43475,35 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       parameter.  The rebinning algorithm steps through every pixel in
       the input image, dividing the input pixel value between a group
       of neighbouring output pixels, incrementing these output pixel
-      values by their allocated share of the input pixel value.  The way
-      in which the input sample is divided up between the output pixels
-      is determined by the METHOD parameter.
+      values by their allocated share of the input pixel value, and
+      finally normalising each output value by the total number of
+      contributing input values.  The way in which the input sample is
+      divided between the output pixels is determined by the METHOD
+      parameter.
 
-      The two algorithms behaviour quite differently if the
-      transformation from input to output includes any significant
-      change of scale.  In general, resampling will not alter the pixel
-      values associated with a source, even if the pixel size changes.
-      On the other hand, the rebinning algorithm will change the pixel
-      values in order to correct for a change in pixel size.  Thus,
-      rebinning conserves the total data value within a given region
-      where as resampling, in general, does not (but see the discussion
-      of the CONSERVE parameter below).
+      Both algorithms produce an output in which the each pixel value is
+      the weighted mean of the nearby input values, and so do not alter
+      the mean pixel values associated with a source, even if the pixel
+      size changes.  Thus the total data sum in a source will change if
+      the input and output pixel sizes differ.  However, if the CONSERVE
+      parameter is set {\tt TRUE}, the output values are scaled by the ratio 
+      of the output to input pixel size, so that the total data sum in a
+      source is preserved.
 
-      Resampling is appropriate if the input image represents the
-      spatial density of some physical value (\emph{e.g.} surface brightness)
-      because the output image will have the same normalisation as the
-      input image.  However, rebinning is probably more appropriate if
-      the image measures (for instance) flux per pixel, since rebinning
-      takes account of the change in pixel size.
+      A difference between resampling and rebinning is that resampling
+      guarantees to fill the output image with good pixel values
+      (assuming the input image is filled with good input pixel values),
+      whereas holes can be left by the rebinning algorithm if the output
+      image has smaller pixels than the input image.  Such holes occur
+      at output pixels that receive no contributions from any input
+      pixels, and will be filled with the value zero in the output
+      image.  If this problem occurs, the solution is probably to change
+      the width of the pixel spreading function by assigning a larger
+      value to PARAMS(1) and/or PARAMS(2) (depending on the specific
+      METHOD value being used).
 
-      Another difference is that resampling guarantees to fill the
-      output image with good pixel values (assuming the input image is
-      filled with good input pixel values), whereas holes can be left
-      by the rebinning algorithm if the output image has smaller
-      pixels than the input image.  Such holes occur at output pixels
-      which receive no contributions from any input pixels, and will
-      be filled with the value zero in the output image.  If this
-      problem occurs the solution is probably to change the width of
-      the pixel spreading function by assigning a larger value to
-      PARAMS(1) and/or PARAMS(2) (depending on the specific METHOD
-      value being used).
-
-      Both algorithms have the capability to introduce artificial
-      artefacts into the output image.  These have various causes
-      described below.
+      Both algorithms have the capability to introduce artefacts into 
+      the output image.  These have various causes described below.
 
       \sstitemlist{
          \sstitem
@@ -43514,8 +43519,8 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          transformation (controlled by Parameter TOL) can produce artefacts
          at the joints between the panels of the approximation.  These can
          occur when using the rebinning algorithm, or when using the
-         resampling algorithm with CONSERVE set to {\tt TRUE}.  They are caused by
-         the discontinuities  between the adjacent panels of the
+         resampling algorithm with CONSERVE set to {\tt TRUE}.  They are caused
+         by the discontinuities  between the adjacent panels of the
          approximation, and can be minimised by reducing the value assigned
          to the TOL parameter.
       }
@@ -49899,8 +49904,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       If an input NDF has more pixel axes than the reference NDF, then
       the extra pixel axes are retained unchanged in the output NDF.
       Thus, for instance, if an input RA/Dec/velocity cube is aligned
-      with a reference 2D galactic longitude/latitude image, the output
-      NDF will be a galactic longitude/latitude/velocity cube.
+      with a reference two-dimensional galactic-longitude/latitude image, the
+      output NDF will be a galactic-longitude/latitude/velocity cube.
 
       The transformations needed to produce alignment are derived from the
       co-ordinate system information stored in the
@@ -49959,23 +49964,20 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          CONSERVE = \_LOGICAL (Read)
       }{
-         Only accessed when using the resampling algorithm (\emph{i.e.} if
-         REBIN is set {\tt FALSE}). If set {\tt TRUE}, then the output pixel
-         values will be scaled in such a way as to preserve (approximately)
-         the total data value in a feature on the sky. The scaling
-         factor is the ratio of the output pixel size to the input pixel
-         size. This option can only be used if the Mapping is
-         successfully approximated by one or more linear
-         transformations. Thus an error will be reported if it used when
-         the ACC parameter is set to zero (which stops the use of
+         If set {\tt TRUE}, then the output pixel values will be scaled in
+         such a way as to preserve the total data value in a feature on
+         the sky.  The scaling factor is the ratio of the output pixel
+         size to the input pixel size.  This option can only be used if
+         the Mapping is successfully approximated by one or more linear
+         transformations.  Thus an error will be reported if it used
+         when the ACC parameter is set to zero (which stops the use of
          linear approximations), or if the Mapping is too non-linear to
-         be approximated by a piece-wise linear transformation. The
+         be approximated by a piece-wise linear transformation.  The
          ratio of output to input pixel size is evaluated once for each
          panel of the piece-wise linear approximation to the Mapping,
          and is assumed to be constant for all output pixels in the
-         panel. Flux conservation can only be approximate when using
-         the resampling algorithm. For accurate flux conservation, use
-         rebinning rather than resampling.  {\tt [FALSE]}
+         panel.  The dynamic default is {\tt TRUE} if rebinning, and
+         {\tt FALSE} if resampling (see Parameter REBIN).  {\tt []}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -50280,42 +50282,35 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       parameter.  The rebinning algorithm steps through every pixel in
       the input image, dividing the input pixel value between a group
       of neighbouring output pixels, incrementing these output pixel
-      values by their allocated share of the input pixel value.  The way
-      in which the input sample is divided up between the output pixels
-      is determined by the METHOD parameter.
+      values by their allocated share of the input pixel value, and
+      finally normalising each output value by the total number of
+      contributing input values. The way in which the input sample is
+      divided between the output pixels is determined by the METHOD
+      parameter.
 
-      The two algorithms behaviour quite differently if the
-      transformation from input to output includes any significant
-      change of scale.  In general, resampling will not alter the pixel
-      values associated with a source, even if the pixel size changes.
-      On the other hand, the rebinning algorithm will change the pixel
-      values in order to correct for a change in pixel size.  Thus,
-      rebinning conserves the total data value within a given region
-      where as resampling, in general, does not (but see the discussion
-      of the CONSERVE parameter below).
+      Both algorithms produce an output in which the each pixel value is
+      the weighted mean of the near-by input values, and so do not alter
+      the mean pixel values associated with a source, even if the pixel
+      size changes. Thus the total data sum in a source will change if
+      the input and output pixel sizes differ.  However, if the CONSERVE
+      parameter is set {\tt TRUE}, the output values are scaled by the ratio
+      of the output to input pixel size, so that the total data sum in a
+      source is preserved.
 
-      Resampling is appropriate if the input image represents the
-      spatial density of some physical value (\emph{e.g.} surface brightness)
-      because the output image will have the same normalisation as the
-      input image.  However, rebinning is probably more appropriate if
-      the image measures (for instance) flux per pixel, since rebinning
-      takes account of the change in pixel size.
+      A difference between resampling and rebinning is that resampling
+      guarantees to fill the output image with good pixel values
+      (assuming the input image is filled with good input pixel values),
+      whereas holes can be left by the rebinning algorithm if the output
+      image has smaller pixels than the input image.  Such holes occur
+      at output pixels which receive no contributions from any input
+      pixels, and will be filled with the value zero in the output
+      image.  If this problem occurs the solution is probably to change
+      the width of the pixel spreading function by assigning a larger
+      value to PARAMS(1) and/or PARAMS(2) (depending on the specific
+      METHOD value being used).
 
-      Another difference is that resampling guarantees to fill the
-      output image with good pixel values (assuming the input image is
-      filled with good input pixel values), whereas holes can be left
-      by the rebinning algorithm if the output image has smaller
-      pixels than the input image.  Such holes occur at output pixels
-      which receive no contributions from any input pixels, and will
-      be filled with the value zero in the output image.  If this
-      problem occurs the solution is probably to change the width of
-      the pixel spreading function by assigning a larger value to
-      PARAMS(1) and/or PARAMS(2) (depending on the specific METHOD
-      value being used).
-
-      Both algorithms have the capability to introduce artificial
-      artefacts into the output image.  These have various causes
-      described below.
+      Both algorithms have the capability to introduce artefacts into the
+      output image.  These have various causes described below.
 
       \sstitemlist{
          \sstitem
@@ -50327,28 +50322,10 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          (if rebinning), at the cost of degraded resolution.
 
          \sstitem
-         Regular patterns of curvy lines covering the whole output image
-         can be created when using the rebinning algorithm.  These are
-         caused by a beating effect between the input pixel positions and
-         the output pixel's position, and their nature and strength depend
-         critically upon the nature of the Mapping and the spreading
-         function being used. In general, the nearest-neighbour spreading
-         function demonstrates this effect more clearly than the other
-         functions, and for this reason should be used with caution. Again,
-         wider spreading functions reduce the effect at the cost of
-         degraded resolution. Note, the resampling algorithm is not subject
-         to these artefacts. For this reason, you may prefer to use the
-         resampling algorithm with the CONSERVE parameter set to {\tt TRUE}.
-         This causes the resampling algorithm to perform approximate flux
-         conservation.
-
-         \sstitem
          The approximation of the Mapping using a piece-wise linear
          transformation (controlled by Parameter ACC) can produce artefacts
-         at the joints between the panels of the approximation.  These can
-         occur when using the rebinning algorithm, or when using the
-         resampling algorithm with CONSERVE set to {\tt TRUE}.  They are
-         caused by the discontinuities between the adjacent panels of the
+         at the joints between the panels of the approximation.  They are
+         caused by the discontinuities  between the adjacent panels of the
          approximation, and can be minimised by reducing the value assigned
          to the ACC parameter.
       }
@@ -51008,13 +50985,22 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       the output NDF in this way, the algorithm proceeds to rebin the
       next input NDF in the same way.  Once all input NDFs have been
       processed, output pixels which have a weight less than the value
-      given by Parameter WLIM are set bad.  The mean value in the
-      weights array (excluding those values less than WLIM) is then
-      found.  The output NDF is then normalised by dividing it by the
-      weights array.  This normalisation of the output NDF takes account
-      of any difference in the number of pixels contributing to each
-      output pixel, and also removes artefacts which may be produced by
-      aliasing between the input and output pixel grids.
+      given by Parameter WLIM are set bad.  The output NDF may then
+      optionally (see Parameter NORM) be normalised by dividing it
+      by the weights array.  This normalisation of the output NDF takes
+      account of any difference in the number of pixels contributing to
+      each output pixel, and also removes artefacts which may be
+      produced by aliasing between the input and output pixel grids.
+      Thus each output pixel value is a weighted mean of the input pixel
+      values from which it receives contributions.  This means that the
+      units of the output NDF are the same as the input NDF.  In
+      particular, any difference between the input and output pixel
+      sizes is ignored, resulting in the total input data sum being
+      preserved only if the input and output NDFs have equal pixel\
+      sizes.  However, an option exists to scale the input values before
+      use so that the total data sum in each input NDF is preserved even
+      if the input and output pixel sizes differ (see Parameter
+      CONSERVE).
 
       If the input NDFs contain variances, then these are propagated to
       the output.  Alternatively, output variances can be generated from
@@ -51047,6 +51033,24 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          than the value supplied for ACC (in pixels), then a smaller
          region is used.  High accuracy is paid for by longer run times.
          {\tt [0.05]}
+      }
+      \sstsubsection{
+         CONSERVE = \_LOGICAL (Read)
+      }{
+         If set {\tt TRUE}, then the output pixel values will be scaled in
+         such a way as to preserve the total data value in a feature on
+         the sky.  The scaling factor is the ratio of the output pixel
+         size to the input pixel size.  This option can only be used if
+         the Mapping is successfully approximated by one or more linear
+         transformations.  Thus an error will be reported if it used
+         when the ACC parameter is set to zero (which stops the use of
+         linear approximations), or if the Mapping is too non-linear to
+         be approximated by a piece-wise linear transformation.  The
+         ratio of output to input pixel size is evaluated once for each
+         panel of the piece-wise linear approximation to the Mapping,
+         and is assumed to be constant for all output pixels in the
+         panel.  This parameter is ignored if the NORM parameter is set
+         {\tt FALSE}.  {\tt [TRUE]}
       }
       \sstsubsection{
          GENVAR = \_LOGICAL (Read)
@@ -51191,10 +51195,24 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          {\tt "SincSinc"}.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
+         NORM = \_LOGICAL (Read)
+      }{
+         In general, each output pixel contains contributions from
+         multiple input pixel values, and the number of input pixels
+         contributing to each output pixel will vary from pixel to
+         pixel.  If NORM is set {\tt TRUE} (the default), then each
+         output value is normalised by dividing it by the number of
+         contributing input pixels, resulting in each output value being
+         the weighted mean of the contibuting input values.  However, if
+         NORM is set FALSE, this normalisation is not applied.  See also
+         Parameter CONSERVE.  Setting NORM to {\tt FALSE} and VARIANCE to
+         {\tt TRUE} results in an error being reported.  {\tt [TRUE]}
+      }
+      \sstsubsection{
          OUT = NDF (Write)
       }{
-         The output NDF.  If a null ({\tt{!}}) value is supplied, the application
-         will terminate early without creating an output cube, but
+         The output NDF.  If a null ({\tt{!}}) value is supplied, 
+         WCSMOSAIC will terminate early without creating an output cube, but
          without reporting an error.  Note, the pixel bounds which the
          output cube would have had will still be written to output
          Parameters LBOUND and UBOUND, even if a null value is supplied
@@ -58325,6 +58343,12 @@ The following applications have been modified:
       \begin{itemize}
         \item The new parameter AXES allows regridding of selected
         pixel axes.
+        \item It now uses \xref{AST\_REBINSEQx}{sun210}{AST_REBINSEQX} rather
+        than \xref{AST\_REBINx}{sun210}{AST_REBINX}.  This introduces
+        a NORM parameter, which permits normalisation of the
+        output array by the number of contributing input array elements.
+        Access to Parameter CONSERVE now depends on NORM, and 
+        CONSERVE's default has switched to preserve the total value.
       \end{itemize}
 
    \item [\htmlref{SCATTER}{SCATTER}]\mbox{}
@@ -58375,6 +58399,17 @@ The following applications have been modified:
          spectral cube is aligned with a two-dimensional image, the resulting
          output NDF would be a three-dimensional cube, aligned spatially
          with the image.
+        \item This now performs an extra normalisation step at the end to
+         remove the effects of aliasing between the input and output pixel
+         grids.
+        \item The CONSERVE parameter is now used for both rebinning and
+        resampling.  It defaults to the value of REBIN.
+      \end{itemize}
+
+   \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}]\mbox{}
+      \begin{itemize}
+        \item Added new CONSERVE and NORM parameters to control flux
+        conservation and pixel normalisation.
       \end{itemize}
 
 \end{description}

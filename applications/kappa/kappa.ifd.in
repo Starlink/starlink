@@ -15318,7 +15318,15 @@ iraf! {
             helpkey *
          }
 
-         parameter in {
+         parameter conserve {
+            type _LOGICAL
+            vpath DYNAMIC
+            ppath CURRENT DYNAMIC
+            prompt {Conserve flux?}
+            helpkey *
+         }
+
+          parameter in {
             position 1
             type NDF
             access READ
@@ -15357,13 +15365,13 @@ iraf! {
             default {Nearest}
          }
 
-         parameter nonorm {
+         parameter norm {
             type _LOGICAL
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            prompt {Leave output values unnormalised?}
+            prompt {Normalise output values?}
             helpkey *
-            default FALSE
+            default TRUE
          }
 
          parameter out {
@@ -15394,15 +15402,7 @@ iraf! {
             default FALSE
          }
 
-         parameter conserve {
-            type _LOGICAL
-            vpath DYNAMIC
-            ppath CURRENT DYNAMIC
-            prompt {Conserve flux?}
-            helpkey *
-         }
-
-         parameter scale {
+        parameter scale {
             type _DOUBLE
             vpath DEFAULT
             ppath CURRENT DEFAULT
@@ -18039,13 +18039,13 @@ iraf! {
             helpkey *
          }
 
-         parameter nonorm {
+         parameter norm {
             type _LOGICAL
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            prompt {Leave output values unnormalised?}
+            prompt {Normalise output values?}
             helpkey *
-            default FALSE
+            default TRUE
          }
 
          parameter out {

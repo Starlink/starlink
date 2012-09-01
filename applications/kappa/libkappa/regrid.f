@@ -53,19 +53,20 @@
 *        one of the corresponding pixel axes without the other.  An
 *        error will be reported in such cases.  [!]
 *     CONSERVE = _LOGICAL (Read)
-*        If set TRUE, then the output pixel values will be scaled in such
-*        a way as to preserve the total data value in a feature on the sky.
-*        The scaling factor is the ratio of the output pixel size to the
-*        input pixel size. This option can only be used if the Mapping is
-*        successfully approximated by one or more linear transformations.
-*        Thus an error will be reported if it used when the ACC parameter
-*        is set to zero (which stops the use of linear approximations), or
-*        if the Mapping is too non-linear to be approximated by a piece-wise
-*        linear transformation. The ratio of output to input pixel size is
-*        evaluated once for each panel of the piece-wise linear approximation
-*        to the Mapping, and is assumed to be constant for all output pixels
-*        in the panel. This parameter is ignored if the NONORM parameter
-*        is set TRUE. [TRUE]
+*        If set TRUE, then the output pixel values will be scaled in
+*        such a way as to preserve the total data value in a feature on
+*        the sky.  The scaling factor is the ratio of the output pixel
+*        size to the input pixel size.  This option can only be used if
+*        the Mapping is successfully approximated by one or more linear
+*        transformations.  Thus an error will be reported if it used
+*        when the ACC parameter is set to zero (which stops the use of
+*        linear approximations), or if the Mapping is too non-linear to
+*        be approximated by a piece-wise linear transformation.  The
+*        ratio of output to input pixel size is evaluated once for each
+*        panel of the piece-wise linear approximation to the Mapping,
+*        and is assumed to be constant for all output pixels in the
+*        panel.  This parameter is ignored if the NORM parameter is set
+*        FALSE.  [TRUE]
 *     IN = NDF (Read)
 *        The NDF to be transformed.
 *     LBOUND( ) = _INTEGER (Read)
@@ -348,51 +349,51 @@
 *
 *     The resampling algorithm steps through every pixel in the output
 *     image, sampling the input image at the corresponding position and
-*     storing the sampled input value in the output pixel. The method
+*     storing the sampled input value in the output pixel.  The method
 *     used for sampling the input image is determined by the METHOD
-*     parameter. The rebinning algorithm steps through every pixel in
+*     parameter.  The rebinning algorithm steps through every pixel in
 *     the input image, dividing the input pixel value between a group
 *     of neighbouring output pixels, incrementing these output pixel
 *     values by their allocated share of the input pixel value, and
 *     finally normalising each output value by the total number of
-*     contributing input values. The way in which the input sample is
+*     contributing input values.  The way in which the input sample is
 *     divided between the output pixels is determined by the METHOD
 *     parameter.
 *
 *     Both algorithms produce an output in which the each pixel value is
-*     the weighted mean of the near-by input values, and so do not alter
+*     the weighted mean of the nearby input values, and so do not alter
 *     the mean pixel values associated with a source, even if the pixel
-*     size changes. Thus the total data sum in a source will change if
-*     the input and output pixel sizes differ. However, if the CONSERVE
-*     parameter is set TRUE, the output values are scaled by the ratio of
-*     the output to input pixel size, so that the total data sum in a
+*     size changes.  Thus the total data sum in a source will change if
+*     the input and output pixel sizes differ.  However, if the CONSERVE
+*     parameter is set TRUE, the output values are scaled by the ratio 
+*     of the output to input pixel size, so that the total data sum in a
 *     source is preserved.
 *
 *     A difference between resampling and rebinning is that resampling
-*     guarantees to fill the output image with good pixel values (assuming
-*     the input image is filled with good input pixel values), whereas
-*     holes can be left by the rebinning algorithm if the output image has
-*     smaller pixels than the input image.  Such holes occur at output
-*     pixels which receive no contributions from any input pixels, and
-*     will be filled with the value zero in the output image. If this
-*     problem occurs the solution is probably to change the width of the
-*     pixel spreading function by assigning a larger value to PARAMS(1)
-*     and/or PARAMS(2) (depending on the specific METHOD value being used).
+*     guarantees to fill the output image with good pixel values
+*     (assuming the input image is filled with good input pixel values),
+*     whereas holes can be left by the rebinning algorithm if the output
+*     image has smaller pixels than the input image.  Such holes occur
+*     at output pixels that receive no contributions from any input
+*     pixels, and will be filled with the value zero in the output
+*     image.  If this problem occurs, the solution is probably to change
+*     the width of the pixel spreading function by assigning a larger
+*     value to PARAMS(1) and/or PARAMS(2) (depending on the specific
+*     METHOD value being used).
 *
-*     Both algorithms have the capability to introduce artificial
-*     artifacts into the output image. These have various causes
-*     described below.
+*     Both algorithms have the capability to introduce artefacts into
+*     the output image.  These have various causes described below.
 *
 *     - Particularly sharp features in the input can cause rings around
 *     the corresponding features in the output image. This can be
 *     minimised by suitable settings for the METHOD and PARAMS
-*     parameters. In general such rings can be minimised by using a
+*     parameters.  In general such rings can be minimised by using a
 *     wider interpolation kernel (if resampling) or spreading function
 *     (if rebinning), at the cost of degraded resolution.
 *
 *     - The approximation of the Mapping using a piece-wise linear
-*     transformation (controlled by paremeter TOL) can produce artifacts
-*     at the joints between the panels of the approximation. They are
+*     transformation (controlled by Parameter TOL) can produce artefacts
+*     at the joints between the panels of the approximation.  They are
 *     caused by the discontinuities  between the adjacent panels of the
 *     approximation, and can be minimised by reducing the value assigned
 *     to the TOL parameter.
@@ -454,7 +455,7 @@
 *        reversed. This prevents the RA axis in an (RA,Dec) image being
 *        flipped after regridding.
 *     22-MAY-2012 (DSB):
-*        Added parameter AXES.
+*        Added Parameter AXES.
 *     30-AUG-2012 (DSB):
 *        Changed to use AST_REBINSEQ instead of AST_REBIN, thereby
 *        introduce Parameter NORM.
@@ -1212,7 +1213,7 @@
          IF( CONSRV ) FLAGS = FLAGS + AST__CONSERVEFLUX
       ELSE
          CONSRV = .FALSE.
-      ENDIF
+      END IF
 
 *  Perform the resampling.
 *  =======================
