@@ -51,8 +51,8 @@
 *     rebinned into the output NDF in this way, the algorithm proceeds
 *     to rebin the next input NDF in the same way.  Once all input NDFs
 *     have been processed, output pixels which have a weight less than
-*     the value given by Parameter WLIM are set bad.  Optionally (see
-*     parameter NONORM), the output NDF is then normalised by dividing it
+*     the value given by Parameter WLIM are set bad.  The output NDF may
+*     then optionally (see Parameter NORM) be normalised by dividing it
 *     by the weights array.  This normalisation of the output NDF takes
 *     account of any difference in the number of pixels contributing to
 *     each output pixel, and also removes artifacts which may be produced
@@ -232,17 +232,17 @@
 *        the output variances, you are generally safer using
 *        nearest-neighbour interpolation.  The initial default is
 *        "SincSinc".  [current value]
-*     NONORM = _LOGICAL (Read)
+*     NORM = _LOGICAL (Read)
 *        In general, each output pixel contains contributions from
 *        multiple input pixel values, and the number of input pixels
-*        contributing to each output pixel will vary from pixel to pixel.
-*        If NONORM is set .FALSE. (the default), then each output value
-*        is normalised by dividing it by the number of contributing
-*        input pixel, resulting in each output value being the weighted
-*        mean of the contibuting input values. However, if NONORM is set
-*        TRUE, this normalisation is not applied. See also parameter
-*        CONSERVEFLUX. Setting both NONORM and VARIANCE to TRUE results
-*        in an error being reported. [FALSE]
+*        contributing to each output pixel will vary from pixel to
+*        pixel.  If NORM is set TRUE (the default), then each output
+*        value is normalised by dividing it by the number of
+*        contributing input pixels, resulting in each output value being
+*        the weighted mean of the contibuting input values.  However, if
+*        NORM is set FALSE, this normalisation is not applied.  See also
+*        Parameter CONSERVE.  Setting NORM to FALSE and VARIANCE to TRUE
+*        results in an error being reported.  [TRUE]
 *     OUT = NDF (Write)
 *        The output NDF. If a null (!) value is supplied, the application
 *        will terminate early without creating an output cube, but
@@ -403,7 +403,7 @@
 *        Remove ILEVEL parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
 *     30-AUG-2012 (DSB):
-*        Added parameters CONSERVEFLUX and NONORM.
+*        Added Parameters CONSERVE and NORM.
 *     {enter_further_changes_here}
 
 *-
@@ -476,8 +476,8 @@
       LOGICAL BAD_DV         ! Any bad data/variance values in input?
       LOGICAL CONSRV         ! Conserve flux in each input NDF?
       LOGICAL GENVAR         ! Use i/p spread to create o/p variance?
-      LOGICAL HASVAR         ! Do all i/p NDFs have variances? */
-      LOGICAL NONORM         ! Skip the normalisation of the o/p values?
+      LOGICAL HASVAR         ! Do all i/p NDFs have variances?
+      LOGICAL NORM           ! Normalise the o/p values?
       LOGICAL USEVAR         ! Use i/p variances to create o/p variance?
       LOGICAL VARWGT         ! Use i/p variances as weights?
       REAL ERRLIM            ! Positional accuracy in pixels
@@ -652,10 +652,10 @@
       MAXPIX = MAX( 1, MAXPIX )
 
 *  See if the normalisation of the output values is to be skipped.
-      CALL PAR_GET0L( 'NONORM', NONORM, STATUS )
+      CALL PAR_GET0L( 'NORM', NORM, STATUS )
 
 *  If not, see if total flux in each input NDF is to be preserved.
-      IF( .NOT. NONORM ) THEN
+      IF( NORM ) THEN
          CALL PAR_GET0L( 'CONSERVE', CONSRV, STATUS )
       ELSE
          CONSRV = .FALSE.
@@ -697,10 +697,11 @@
       END IF
 
 *  Cannot skip the normalisation if we are weighting input data.
-      IF( VARWGT .AND. NONORM .AND. STATUS .EQ. SAI__OK ) THEN
+      IF( VARWGT .AND. .NOT. NORM .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( ' ', 'The NONORM and VARIANCE parameters '//
-     :                 'are both TRUE - this is not allowed.', STATUS )
+         CALL ERR_REP( ' ', 'The NORM parameter is FALSE while '/
+     :                 /'the VARIANCE parameter is TRUE; this '/
+     :                 /'is not allowed.', STATUS )
       END IF
 
 *  Abort if an error has occurred.
@@ -805,7 +806,7 @@
          IF( I .EQ. 1 ) FLAGS = FLAGS + AST__REBININIT
          IF( I .EQ. SIZE ) FLAGS = FLAGS + AST__REBINEND
          IF( CONSRV ) FLAGS = FLAGS + AST__CONSERVEFLUX
-         IF( NONORM ) FLAGS = FLAGS + AST__NONORM
+         IF( .NOT. NORM ) FLAGS = FLAGS + AST__NONORM
          IF( GENVAR ) FLAGS = FLAGS + AST__GENVAR
          IF( USEVAR ) FLAGS = FLAGS + AST__USEVAR
          IF( VARWGT ) FLAGS = FLAGS + AST__VARWGT

@@ -182,16 +182,16 @@
 *        the output variances, you are generally safer using
 *        nearest-neighbour interpolation.  The initial default is
 *        "Nearest".  [current value]
-*     NONORM = _LOGICAL (Read)
+*     NORM = _LOGICAL (Read)
 *        In general, each output pixel contains contributions from
 *        multiple input pixel values, and the number of input pixels
-*        contributing to each output pixel will vary from pixel to pixel.
-*        If NONORM is set .FALSE. (the default), then each output value
-*        is normalised by dividing it by the number of contributing
-*        input pixel, resulting in each output value being the weighted
-*        mean of the contibuting input values. However, if NONORM is set
-*        TRUE, this normalisation is not applied. See also parameter
-*        CONSERVEFLUX. [FALSE]
+*        contributing to each output pixel will vary from pixel to
+*        pixel.  If NORM is set TRUE (the default), then each output
+*        value is normalised by dividing it by the number of
+*        contributing input pixels, resulting in each output value being
+*        the weighted mean of the contributing input values.  However,
+*        if NORM is set FALSE, this normalisation is not applied.  See
+*        also Parameter CONSERVE.  [TRUE]
 *     OUT = NDF (Write)
 *        The transformed NDF.
 *     PARAMS( 2 ) = _DOUBLE (Read)
@@ -460,7 +460,8 @@
 *     22-MAY-2012 (DSB):
 *        Added parameter AXES.
 *     30-AUG-2012 (DSB):
-*        Changed to use AST_REBINSEQ instead of AST_REBIN.
+*        Changed to use AST_REBINSEQ instead of AST_REBIN, thereby
+*        introduce Parameter NORM.
 *     {enter_further_changes_here}
 
 *-
@@ -574,7 +575,7 @@
       LOGICAL HASVAR             ! Does the input NDF have VARIANCE
                                  ! component?
       LOGICAL MORE               ! Continue looping?
-      LOGICAL NONORM             ! Skip the normalisation of the o/p values?
+      LOGICAL NORM               ! Normalise the o/p values?
       LOGICAL REBIN              ! Create output pixels by rebinning?
       LOGICAL SCEQU              ! Are all axis scale factors equal?
       LOGICAL SUBSET             ! Regrid only a subset of pixel axes?
@@ -1201,14 +1202,14 @@
 *  See if the normalisation of the output values is to be skipped.
 *  Only applies to rebinning.
       IF( REBIN ) THEN
-         CALL PAR_GET0L( 'NONORM', NONORM, STATUS )
-         IF( NONORM ) FLAGS = FLAGS + AST__NONORM
+         CALL PAR_GET0L( 'NORM', NORM, STATUS )
+         IF( .NOT. NORM ) FLAGS = FLAGS + AST__NONORM
       ELSE
-         NONORM = .FALSE.
+         NORM = .TRUE.
       END IF
 
 *  If not, see if total flux is to be preserved.
-      IF( .NOT. NONORM ) THEN
+      IF( NORM ) THEN
          CONSRV = REBIN
          CALL PAR_DEF0L( 'CONSERVE', CONSRV, STATUS )
          CALL PAR_GET0L( 'CONSERVE', CONSRV, STATUS )
