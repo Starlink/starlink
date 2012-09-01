@@ -27,8 +27,9 @@
 *     If an input NDF has more pixel axes than the reference NDF, then
 *     the extra pixel axes are retained unchanged in the output NDF.
 *     Thus, for instance, if an input RA/Dec/velocity cube is aligned
-*     with a reference 2D galactic longitude/latitude image, the output
-*     NDF will be a galactic longitude/latitude/velocity cube.
+*     with a reference two-dimensional galactic-longitude/latitude
+*     image, the output NDF will be a galactic-longitude/latitude/
+*     velocity cube.
 *
 *     The transformations needed to produce alignment are derived from
 *     the co-ordinate system information stored in the WCS components of
@@ -78,23 +79,23 @@
 *        region is used. High accuracy is paid for by larger run times.
 *        [0.05]
 *     CONSERVE = _LOGICAL (Read)
-*        If set TRUE, then the output pixel values will be scaled in such
-*        a way as to preserve the total data value in a feature on the sky.
-*        The scaling factor is the ratio of the output pixel size to the
-*        input pixel size. This option can only be used if the Mapping
-*        is successfully approximated by one or more linear
-*        transformations. Thus an error will be reported if it used when
-*        the ACC parameter is set to zero (which stops the use of
+*        If set TRUE, then the output pixel values will be scaled in
+*        such a way as to preserve the total data value in a feature on
+*        the sky.  The scaling factor is the ratio of the output pixel
+*        size to the input pixel size.  This option can only be used if
+*        the Mapping is successfully approximated by one or more linear
+*        transformations.  Thus an error will be reported if it used
+*        when the ACC parameter is set to zero (which stops the use of
 *        linear approximations), or if the Mapping is too non-linear to
-*        be approximated by a piece-wise linear transformation. The
+*        be approximated by a piece-wise linear transformation.  The
 *        ratio of output to input pixel size is evaluated once for each
 *        panel of the piece-wise linear approximation to the Mapping,
 *        and is assumed to be constant for all output pixels in the
-*        panel. The dynamic default is TRUE if rebinning and FALSE if
-*        resampling (see parameter REBIN). []
+*        panel.  The dynamic default is TRUE if rebinning, and FALSE if
+*        resampling (see Parameter REBIN).  []
 *     IN = NDF (Read)
 *        A group of input NDFs (of any dimensionality). This should be
-*        given as  a comma-separated list, in which each list element
+*        given as a comma-separated list, in which each list element
 *        can be:
 *
 *        - an NDF name, optionally containing wild-cards and/or regular
@@ -360,25 +361,25 @@
 *     the weighted mean of the near-by input values, and so do not alter
 *     the mean pixel values associated with a source, even if the pixel
 *     size changes. Thus the total data sum in a source will change if
-*     the input and output pixel sizes differ. However, if the CONSERVE
-*     parameter is set TRUE, the output values are scaled by the ratio of
-*     the output to input pixel size, so that the total data sum in a
+*     the input and output pixel sizes differ.  However, if the CONSERVE
+*     parameter is set TRUE, the output values are scaled by the ratio
+*     of the output to input pixel size, so that the total data sum in a
 *     source is preserved.
 *
 *     A difference between resampling and rebinning is that resampling
-*     guarantees to fill the output image with good pixel values (assuming
-*     the input image is filled with good input pixel values), whereas
-*     holes can be left by the rebinning algorithm if the output image has
-*     smaller pixels than the input image.  Such holes occur at output
-*     pixels which receive no contributions from any input pixels, and
-*     will be filled with the value zero in the output image. If this
-*     problem occurs the solution is probably to change the width of the
-*     pixel spreading function by assigning a larger value to PARAMS(1)
-*     and/or PARAMS(2) (depending on the specific METHOD value being used).
+*     guarantees to fill the output image with good pixel values
+*     (assuming the input image is filled with good input pixel values),
+*     whereas holes can be left by the rebinning algorithm if the output
+*     image has smaller pixels than the input image.  Such holes occur
+*     at output pixels which receive no contributions from any input
+*     pixels, and will be filled with the value zero in the output
+*     image.  If this problem occurs the solution is probably to change
+*     the width of the pixel spreading function by assigning a larger
+*     value to PARAMS(1) and/or PARAMS(2) (depending on the specific
+*     METHOD value being used).
 *
-*     Both algorithms have the capability to introduce artificial
-*     artifacts into the output image. These have various causes
-*     described below.
+*     Both algorithms have the capability to introduce artefacts into
+*     the output image.  These have various causes described below.
 *
 *     - Particularly sharp features in the input can cause rings around
 *     the corresponding features in the output image. This can be
@@ -388,7 +389,7 @@
 *     (if rebinning), at the cost of degraded resolution.
 *
 *     - The approximation of the Mapping using a piece-wise linear
-*     transformation (controlled by paremeter ACC) can produce artifacts
+*     transformation (controlled by paremeter ACC) can produce artefacts
 *     at the joints between the panels of the approximation. They are
 *     caused by the discontinuities  between the adjacent panels of the
 *     approximation, and can be minimised by reducing the value assigned

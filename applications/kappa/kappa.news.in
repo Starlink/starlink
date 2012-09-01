@@ -96,6 +96,12 @@
 
       -  The new parameter AXES allows regridding of selected
       pixel axes.
+      -  It now uses AST_REBINSEQx rather than AST_REBINx.  This
+      introduces a NORM parameter, which permits normalisation of
+      the output array by the number of contributing input array
+      elements.  Access to Parameter CONSERVE now depends on NORM,
+      and CONSERVE's default has switched to preserve the total
+      value.
 
    o  SCATTER
 
@@ -142,8 +148,17 @@
       two-dimensional image, the resulting output NDF would be a
       three-dimensional cube, aligned spatially with the image.
       -  This now performs an extra normalisation step at the end to
-      remove the effects of aliasing between the input and output pixel
-      grids.
+      remove the effects of aliasing between the input and output
+      pixel grids.
+      -  This now performs an extra normalisation step at the end
+      tp remove the effects of aliasing between the input and output
+      pixel grids.
+      -  The CONSERVE parameter is now used for both rebinning and
+      resampling.  It defaults to the value of REBIN.
+
+   o  WCSMOSAIC
+      -  Added new CONSERVE and NORM parameters to control flux
+      conservation and pixel normalisation.
 
 1 KAPPA_Version_1.12
 

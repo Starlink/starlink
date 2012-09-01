@@ -55,23 +55,24 @@
 *     then optionally (see Parameter NORM) be normalised by dividing it
 *     by the weights array.  This normalisation of the output NDF takes
 *     account of any difference in the number of pixels contributing to
-*     each output pixel, and also removes artifacts which may be produced
-*     by aliasing between the input and output pixel grids. Thus each
-*     output pixel value is a weighted mean of the input pixel values
-*     from which it receives contributions.  This means that the units of
-*     the output NDF are the same as the input NDF. In particularly, any
-*     difference between the input and output pixel sizes is ignored,
-*     resulting in the total input data sum being preserved only if the
-*     input and output NDFs have equal pixel sizes. However, an option
-*     exists to scale the input values before use so that the total data
-*     sum in each input NDF is preserved even if the input and output
-*     pixel sizes differ (see parameter CONSERVE).
+*     each output pixel, and also removes artefacts which may be
+*     produced by aliasing between the input and output pixel grids.
+*     Thus each output pixel value is a weighted mean of the input pixel
+*     values from which it receives contributions.  This means that the
+*     units of the output NDF are the same as the input NDF.  In
+*     particular, any difference between the input and output pixel
+*     sizes is ignored, resulting in the total input data sum being
+*     preserved only if the input and output NDFs have equal pixel\
+*     sizes.  However, an option exists to scale the input values before
+*     use so that the total data sum in each input NDF is preserved even
+*     if the input and output pixel sizes differ (see Parameter
+*     CONSERVE).
 *
 *     If the input NDFs contain variances, then these are propagated to
 *     the output.  Alternatively, output variances can be generated from
 *     the spread of input values contributing to each output pixel (see
 *     Parameter GENVAR). Any input variances can also be used to weight
-*     the input data (see Parameter VARIANCE). By default, all input
+*     the input data (see Parameter VARIANCE).  By default, all input
 *     data is given equal weight.
 *
 *     The transformations needed to produce alignment are derived from
@@ -97,29 +98,30 @@
 *        region is used.  High accuracy is paid for by longer run times.
 *        [0.05]
 *     CONSERVE = _LOGICAL (Read)
-*        If set TRUE, then the output pixel values will be scaled in such
-*        a way as to preserve the total data value in a feature on the sky.
-*        The scaling factor is the ratio of the output pixel size to the
-*        input pixel size. This option can only be used if the Mapping is
-*        successfully approximated by one or more linear transformations.
-*        Thus an error will be reported if it used when the ACC parameter
-*        is set to zero (which stops the use of linear approximations), or
-*        if the Mapping is too non-linear to be approximated by a piece-wise
-*        linear transformation. The ratio of output to input pixel size is
-*        evaluated once for each panel of the piece-wise linear approximation
-*        to the Mapping, and is assumed to be constant for all output pixels
-*        in the panel. This parameter is ignored if the NONORM parameter
-*        is set TRUE. [TRUE]
+*        If set TRUE, then the output pixel values will be scaled in
+*        such a way as to preserve the total data value in a feature on
+*        the sky.  The scaling factor is the ratio of the output pixel
+*        size to the input pixel size.  This option can only be used if
+*        the Mapping is successfully approximated by one or more linear
+*        transformations.  Thus an error will be reported if it used
+*        when the ACC parameter is set to zero (which stops the use of
+*        linear approximations), or if the Mapping is too non-linear to
+*        be approximated by a piece-wise linear transformation.  The
+*        ratio of output to input pixel size is evaluated once for each
+*        panel of the piece-wise linear approximation to the Mapping,
+*        and is assumed to be constant for all output pixels in the
+*        panel.  This parameter is ignored if the NORM parameter is set
+*        FALSE.  [TRUE]
 *     FLBND( ) = _DOUBLE (Write)
 *        The lower bounds of the bounding box enclosing the output NDF
-*        in the current WCS Frame. The number of elements in this parameter
-*        is equal to the number of axes in the current WCS Frame. Celestial
-*        axis values will be in units of radians.
+*        in the current WCS Frame.  The number of elements in this
+*        parameter is equal to the number of axes in the current WCS
+*        Frame.  Celestial axis values will be in units of radians.
 *     FUBND( ) = _DOUBLE (Write)
 *        The upper bounds of the bounding box enclosing the output NDF
-*        in the current WCS Frame. The number of elements in this parameter
-*        is equal to the number of axes in the current WCS Frame. Celestial
-*        axis values will be in units of radians.
+*        in the current WCS Frame.  The number of elements in this
+*        parameter is equal to the number of axes in the current WCS
+*        Frame.  Celestial axis values will be in units of radians.
 *     GENVAR = _LOGICAL (Read)
 *        If TRUE, output variances are generated based on the spread of
 *        input pixel values contributing to each output pixel.  Any
@@ -130,8 +132,8 @@
 *        in the input NDFs, so long as all input NDFs contain variances
 *        (otherwise the output NDF will not contain any Variances). If a
 *        null (!) value is supplied, then a value of FALSE is adopted if
-*        and only if all the input NDFs have variance components (TRUE is
-*        used otherwise). [FALSE]
+*        and only if all the input NDFs have variance components (TRUE
+*        is used otherwise).  [FALSE]
 *     IN = NDF (Read)
 *        A group of input NDFs (of any dimensionality).  This should be
 *        given as a comma-separated list, in which each list element
@@ -159,8 +161,8 @@
 *        these same defaults being used.  [!]
 *     LBOUND() = _INTEGER (Write)
 *        The lower pixel bounds of the output NDF. Note, values will be
-*        written to this output parameter even if a null value is supplied
-*        for Parameter OUT.
+*        written to this output parameter even if a null value is
+*        supplied for Parameter OUT.
 *     MAXPIX = _INTEGER (Read)
 *        A value which specifies an initial scale size in pixels for the
 *        adaptive algorithm which approximates non-linear Mappings with
@@ -244,7 +246,7 @@
 *        Parameter CONSERVE.  Setting NORM to FALSE and VARIANCE to TRUE
 *        results in an error being reported.  [TRUE]
 *     OUT = NDF (Write)
-*        The output NDF. If a null (!) value is supplied, the application
+*        The output NDF.  If a null (!) value is supplied, WCSMOSAIC
 *        will terminate early without creating an output cube, but
 *        without reporting an error. Note, the pixel bounds which the
 *        output cube would have had will still be written to output
@@ -285,8 +287,8 @@
 *        these same defaults being used.  [!]
 *     UBOUND() = _INTEGER (Write)
 *        The upper pixel bounds of the output NDF. Note, values will be
-*        written to this output parameter even if a null value is supplied
-*        for Parameter OUT.
+*        written to this output parameter even if a null value is
+*        supplied for Parameter OUT.
 *     VARIANCE = _LOGICAL (Read)
 *        If TRUE, then any input VARIANCE components in the input NDFs
 *        are used to weight the input data (the weight used for each
@@ -343,7 +345,8 @@
 *     processing.
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
+*     Council.
 *     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -659,7 +662,7 @@
          CALL PAR_GET0L( 'CONSERVE', CONSRV, STATUS )
       ELSE
          CONSRV = .FALSE.
-      ENDIF
+      END IF
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
