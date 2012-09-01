@@ -47368,6 +47368,17 @@ KAPPA: \htmlref{REGRID}{REGRID},
          axis.  {\tt [!]}
      }
       \sstsubsection{
+         CONSERVE = \_LOGICAL (Read)
+      }{
+         If set TRUE, then the output pixel values will be scaled in
+         such a way as to preserve the total data value in a feature on
+         the sky. The scaling factor is the ratio of the output pixel
+         size to the input pixel size. This ratio is evaluated once for 
+         each panel of a piece-wise linear approximation to the Mapping, 
+         and is assumed to be constant for all output pixels in the 
+         panel. {\tt [FALSE]}
+     }
+      \sstsubsection{
          FACTORS( ) = \_DOUBLE (Read)
       }{
          This parameter is used only if MODE={\tt "Factors"}.  It
@@ -47587,7 +47598,9 @@ KAPPA: \htmlref{REGRID}{REGRID},
       parameters can be used.  Detailed discussion of the use of these
       parameters can be found in the
       \xref{``Sub-pixel Interpolation Schemes''}{sun210}{AST_RESAMPLEX}~
-      section of the AST\_RESAMPLE documentation.
+      section of the AST\_RESAMPLE documentation. By default, all
+      interpolation schemes preserve flux density rather than total
+      flux, but this may be changed using the CONSERVE parameter.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -58339,6 +58352,12 @@ The following applications have been modified:
       \begin{itemize}
         \item Add new QNAMES output parameter to list the attribute name
         associated with each QUALITY bit.
+      \end{itemize}
+
+   \item [\htmlref{SQORST}{SQORST}]\mbox{}
+      \begin{itemize}
+        \item A new parameter called CONSERVE has been added, which may
+        be set TRUE to force total flux to be conserved in the output NDF.
       \end{itemize}
 
    \item [\htmlref{TRANDAT}{TRANDAT}]\mbox{}

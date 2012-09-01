@@ -122,6 +122,11 @@
       -  Add new QNAMES output parameter to list the attribute name
       associated with each QUALITY bit.
 
+   o SQORST
+
+      -  A new parameter called CONSERVE has been added, which may
+      be set TRUE to force total flux to be conserved in the output NDF.
+
    o  TRANDAT
 
       -  When AUTO=FALSE, the new POFFSET parameter allows a shift to be

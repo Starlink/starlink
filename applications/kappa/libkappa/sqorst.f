@@ -46,6 +46,14 @@
 *        left unchanged.  If MODE is set to "PixelScale" then the
 *        supplied value should be the index of a WCS axis.  Otherwise
 *        it should be the index of a pixel axis.  [!]
+*     CONSERVE = _LOGICAL (Read)
+*        If set TRUE, then the output pixel values will be scaled in
+*        such a way as to preserve the total data value in a feature on
+*        the sky. The scaling factor is the ratio of the output pixel
+*        size to the input pixel size. This ratio is evaluated once for
+*        each panel of a piece-wise linear approximation to the Mapping,
+*        and is assumed to be constant for all output pixels in the
+*        panel. [FALSE]
 *     FACTORS( ) = _DOUBLE (Read)
 *        This parameter is only used if MODE="Factors".  It defines the
 *        factor by which each dimension will be distorted to produce the
@@ -185,7 +193,9 @@
 *     control over the resampling process the METHOD and PARAMS
 *     parameters can be used.  Detailed discussion of the use of these
 *     parameters can be found in the "Sub-pixel Interpolation Schemes"
-*     section of the REGRID task documentation.
+*     section of the REGRID task documentation. By default, all
+*     interpolation schemes preserve flux density rather than total
+*     flux, but this may be changed using the CONSERVE parameter.
 
 *  Notes:
 *     If the input NDF contains a Variance component, a Variance
@@ -254,6 +264,8 @@
 *     18-MAY-2007 (DSB):
 *        Added MODE=PixelScale option, and the PIXSCALE and AXIS
 *        parameters.
+*     30-AUG-2012 (DSB):
+*        Added paremeter CONSERVE.
 *     {enter_further_changes_here}
 
 *-
@@ -343,6 +355,7 @@
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
       LOGICAL BAD                ! May there be bad pixels?
       LOGICAL COMMA              ! Has a comma been found?
+      LOGICAL CONSRV             ! Conserve flux?
       LOGICAL HASAXI             ! Do we have an AXIS Centre component?
       LOGICAL HASQUA             ! Do we have a quality component?
       LOGICAL HASVAR             ! Do we have a variance component?
@@ -384,6 +397,9 @@
 
 *  Get its pixel index bounds.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
+
+*  See if flux should be conserved.
+      CALL PAR_GET0L( 'CONSERVE', CONSRV, STATUS )
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -831,7 +847,7 @@
                IF ( ITYPE .EQ. '_BYTE' ) THEN
                   CALL KPS1_RS1B( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI,
+     :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
      :                            %VAL( CNF_PVAL( IPQUA1 ) ),
@@ -851,7 +867,7 @@
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL KPS1_RS1UB( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI,
+     :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
      :                            %VAL( CNF_PVAL( IPQUA1 ) ),
@@ -871,7 +887,7 @@
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL KPS1_RS1W( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI,
+     :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
      :                            %VAL( CNF_PVAL( IPQUA1 ) ),
@@ -891,7 +907,7 @@
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   CALL KPS1_RS1UW( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI,
+     :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
      :                            %VAL( CNF_PVAL( IPQUA1 ) ),
@@ -911,7 +927,7 @@
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPS1_RS1I( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI,
+     :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
      :                            %VAL( CNF_PVAL( IPQUA1 ) ),
@@ -931,7 +947,7 @@
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPS1_RS1R( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI,
+     :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
      :                            %VAL( CNF_PVAL( IPQUA1 ) ),
@@ -951,7 +967,7 @@
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   CALL KPS1_RS1D( NDIM, I, FACTS,
      :                            DIM1, DIM2, INTERP, PARAMS,
-     :                            HASVAR, HASQUA, HASAXI,
+     :                            CONSRV, HASVAR, HASQUA, HASAXI,
      :                            %VAL( CNF_PVAL( IPDAT1 ) ),
      :                            %VAL( CNF_PVAL( IPVAR1 ) ),
      :                            %VAL( CNF_PVAL( IPQUA1 ) ),
