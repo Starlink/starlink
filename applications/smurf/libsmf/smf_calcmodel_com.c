@@ -66,6 +66,10 @@
 *        This was the approach used by the previous version of
 *        smf_calcmodel_com, and led to discontinuities at the edges of
 *        blocks, which in turn caused ringing in the FLT model.
+*     3-SEP-2012 (DSB):
+*        Tidy up the code to clarify the fact that the common mode 
+*        esimate is the unweighted mean of the unnormalised bolometer 
+*        residuals.
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
@@ -439,11 +443,6 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    dim_t itime;
    dim_t nbolo;
    dim_t ntslice;
-   double **gai_store;
-   double **pg;
-   double **wccp;
-   double **wgp;
-   double **woffp;
    double *gai_data;
    double *model_data;
    double *pb;
@@ -453,10 +452,8 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    double *pwoff;
    double *res_data;
    double *resbuf;
-   double *wcc;
    double *wg;
    double *woff;
-   double wgt;
    int *pl;
    int iblock;
    size_t izero;
@@ -601,40 +598,6 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    model. */
       qmask = ( SMF__Q_FIT & ~SMF__Q_COM );
 
-/* Allocate room, and then find and store the bolometer gain, offset and
-   correlation coefficients for all time slices being processed by this
-   thread, for all bolometers. */
-      gbstride = 0;
-      gcstride = 0;
-      pg = gai_store = astMalloc( ( pdata->idx_hi - pdata->idx_lo + 1 )*
-                                  pdata->nbolo*3*sizeof( *gai_store ) );
-      for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
-
-         gai_data = pdata->gai ? pdata->gai->sdata[ idx ]->pntr[ 0 ] : NULL;
-         if( gai_data ) smf_get_dims( pdata->gai->sdata[ idx ],  NULL, NULL,
-                                      NULL, NULL, NULL, &gbstride, &gcstride,
-                                      status );
-
-         qua_data = smf_select_qualpntr( pdata->res->sdata[ idx ], NULL,
-                                         status );
-         izero = 0;
-         for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
-            if( !(qua_data[ izero ] & SMF__Q_BADB ) ) {
-               wg = *(pg++) = astMalloc( ( pdata->t2 - pdata->t1 + 1 )*sizeof(**pg) );
-               woff = *(pg++) = astMalloc( ( pdata->t2 - pdata->t1 + 1 )*sizeof(**pg) );
-               wcc = *(pg++) = astMalloc( ( pdata->t2 - pdata->t1 + 1 )*sizeof(**pg) );
-               smf_gandoff( ibolo, pdata->t1, pdata->t2, pdata->ntslice,
-                            gbstride, gcstride, gai_data, pdata->nblock,
-                            pdata->gain_box, wg, woff, wcc, status );
-            } else {
-               *(pg++) = NULL;
-               *(pg++) = NULL;
-               *(pg++) = NULL;
-            }
-            izero += pdata->ntslice;
-         }
-      }
-
 /* Store the index of the block containing the first time slice to be
    processed by this thread. Also store the index of the time slice at which
    the next block begins. */
@@ -650,8 +613,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
       pm = pdata->model->sdata[ pdata->icom ]->pntr[ 0 ];
       pm += pdata->t1;
 
-/* Buffers to hold all normalised bolometer residuals and associated
-   weights at a single time slice. */
+/* Buffer to hold all bolometer residuals at a single time slice. */
       resbuf = astMalloc( pdata->nbolo*( pdata->idx_hi - pdata->idx_lo + 1 )*
                           sizeof( *resbuf ) );
 
@@ -676,12 +638,6 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    and the weights. */
          pb = resbuf;
 
-/* Initialise pointers to the arrays of gains, offsets and correlation
-   coefficients. */
-         wgp = gai_store;
-         woffp = gai_store + 1;
-         wccp = gai_store + 2;
-
 /* Loop over all subarrays that contribute to the current common-mode
    model. */
          for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
@@ -702,25 +658,13 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
             for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
 
 /* Check the sample has not been flagged as unusable. */
-               if( !(*pq & qmask) && *pr != VAL__BADD && *wccp ) {
+               if( !(*pq & qmask) && *pr != VAL__BADD ) {
 
 /* If a mask and LUT have been supplied, check that the sample is not
-   masked out. */
+   masked out. If not, store it in the sample buffer. */
                   if( !pdata->mask || !pl || *pl == VAL__BADI ||
-                       pdata->mask[ *pl ] ) {
-
-/* Normalise it using the current estimate of the bolometer gain and offset,
-   and store it in the sample buffer. Also convert the correlation coefficient
-   into a weight, and store it in the weights buffer. */
-                     *(pb++) = ( *pr - (*woffp)[ itime - pdata->t1 ] ) /
-                               (*wgp)[ itime - pdata->t1 ];
-                  }
+                       pdata->mask[ *pl ] ) *(pb++) = *pr;
                }
-
-/* Move on to get pointers to the GAI values for the next bolometer. */
-               wgp += 3;
-               woffp += 3;
-               wccp += 3;
 
 /* Increment residual and quality pointers to point to the next
    bolometer. */
@@ -730,15 +674,14 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
             }
          }
 
-/* Find the weighted mean of the normalised samples at the current time
-   slice, including nsigma-clipping. */
+/* Find the mean of the samples at the current time slice, including
+   nsigma-clipping. */
          *pm = smf_sigmaclip( (int)( pb - resbuf ), resbuf, NULL,
                               pdata->nsigma, pdata->niter, status );
       }
 
 /* Free resources. */
       resbuf = astFree( resbuf );
-      gai_store = astFreeDouble( gai_store );
 
 
 /* Report an error if the worker was to do an unknown job.
