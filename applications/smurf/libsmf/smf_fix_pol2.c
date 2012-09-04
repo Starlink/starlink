@@ -100,6 +100,7 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
 
 /* Local Variables: */
    JCMTState *state;
+   JCMTState *wstate;
    dim_t *jumps;
    dim_t idx;
    dim_t iframe;
@@ -109,7 +110,6 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    dim_t njump;
    double *angles;
    double *pa;
-   double *paw;
    double *pc;
    double *ps;
    double *pt;
@@ -200,7 +200,7 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    passes through the "iframe" loop. */
                minspeed = *ps;
                jmin = iframe;
-               for( j = iframe + 1; j < ubnd; j++ ) {
+               for( j = iframe + 1; j < (dim_t) ubnd; j++ ) {
                   if( speeds[ j ] != VAL__BADD && speeds[ j ] < minspeed ) {
                      minspeed = speeds[ j ];
                      jmin = j;
@@ -261,11 +261,11 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
 
 /* Now shuffle the POL_ANG values down to remove the accepted bonus values. */
       if( njump > 0 ) {
-         pa = paw = angles;
+         state = wstate = hdr->allState;
          ijump = 0;
-         for( iframe = 0; iframe < hdr->nframes; iframe++,pa++ ) {
+         for( iframe = 0; iframe < hdr->nframes; iframe++,state++ ) {
             if( iframe < jumps[ ijump ] ) {
-               *(paw++) = *pa;
+               (wstate++)->pol_ang = state->pol_ang;
             } else {
                msgOutiff( MSG__VERB, "", "smf_fix_pol2: Removing "
                           "POL_ANG[%d]", status, (int) iframe );
@@ -274,7 +274,7 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
          }
 
 /* Fill the end of the POL_ANG array with bad values. */
-         while( paw < pa ) *(paw++) = VAL__BADD;
+         while( wstate < state ) (wstate++)->pol_ang = VAL__BADD;
       }
 
 /* Release temporary work space */

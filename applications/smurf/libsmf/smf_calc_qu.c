@@ -387,13 +387,16 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
             state = allstates;
             for( itime = block_start; itime <= block_end; itime++,state++ ) {
 
+/* Get the POL_ANG value for this time slice. */
+               angle = state->pol_ang;
+
 /* Check the input sample has not been flagged during cleaning and is
    not bad. */
-               if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD ) {
+               if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
+                   angle != VAL__BADD ) {
 
 /* Get the angle between the half-waveplate and north in the tracking
    system. */
-                  angle = state->pol_ang;
                   if( ipolcrd == 0 ) {
                      angle -= state->tcs_tr_ang;
                   } else if( ipolcrd == 1 ) {
