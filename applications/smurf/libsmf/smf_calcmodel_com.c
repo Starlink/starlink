@@ -677,7 +677,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 /* Find the mean of the samples at the current time slice, including
    nsigma-clipping. */
          *pm = smf_sigmaclip( (int)( pb - resbuf ), resbuf, NULL,
-                              pdata->nsigma, pdata->niter, status );
+                              pdata->nsigma, pdata->niter, NULL, status );
       }
 
 /* Free resources. */

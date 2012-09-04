@@ -738,6 +738,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter fix {
+                type _LOGICAL
+                prompt {Fix triggering issue?}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default FALSE
+                helpkey *
+            }
+
             parameter outq {
                 position 2
                 type NDF

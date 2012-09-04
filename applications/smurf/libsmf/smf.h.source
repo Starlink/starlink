@@ -1141,6 +1141,8 @@ int smf_fix_metadata_acsis( msglev_t msglev, smfData * data, int have_fixed,
 int smf_fix_metadata_scuba2( msglev_t msglev, smfData * data, int have_fixed,
                              int *ncards, int * status );
 
+void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status );
+
 void smf_flag_slewspeed( smfData *data, double smin, double smax,
                          size_t *nflagged, double *average_speed,
                          int *status );
@@ -1783,7 +1785,7 @@ void smf_set_clabels( const char title[], const char label[],
 void smf_set_moving( AstFrameSet* wcs, AstFitsChan * fchan, int *status );
 
 double smf_sigmaclip( int nval, double *val, double *wgt,
-                      double nsigma, int niter, int *status );
+                      double nsigma, int niter, double *stddev, int *status );
 
 void smf_smfFile_msg( const smfFile * file, const char token[],
                       int strip, const char fallback[] );

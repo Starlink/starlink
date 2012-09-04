@@ -77,6 +77,10 @@
 *        default value. Parameters not understood will trigger an error.
 *        Use the "cleandk." namespace for configuring cleaning parameters
 *        for the dark squids. [current value]
+*     FIX = _LOGICAL (Read)
+*        If TRUE, then attempt to fix up the data to take account of the
+*        POL-2 triggering issue that causes extra POL_ANG values to be
+*        introduced into JCMTSTATE. [FALSE]
 *     IN = NDF (Read)
 *        Input file(s).
 *     MSG_FILTER = _CHAR (Read)
@@ -186,10 +190,12 @@
 *  History:
 *     27-JAN-2011 (DSB):
 *        Original version.
+*     4-SEP-2012 (DSB):
+*        Added FIX parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 20011 Science and Technology Facilities Council.
+*     Copyright (C) 2011-2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -261,6 +267,7 @@ void smurf_calcqu( int *status ) {
    int block_end;             /* Index of last time slice in block */
    int block_start;           /* Index of first time slice in block */
    int dkclean;               /* Clean dark squids? */
+   int fix;                   /* Fix the POL-2 triggering issue? */
    int iblock;                /* Index of current block */
    int ipolcrd;               /* Reference direction for waveplate angles */
    int nc;                    /* Number of characters written to a string */
@@ -305,6 +312,9 @@ void smurf_calcqu( int *status ) {
       msgOutif( MSG__NORM, " ", "All supplied input frames were DARK.",
                 status );
    } else {
+
+/* See if a correction should be made for the POL2 triggering issue. */
+      parGet0l( "FIX", &fix, status );
 
 /* Create HDS container files to hold the output NDFs. */
       datCreat( "OUTQ", "CALCQU", 0, 0, status );
@@ -403,6 +413,9 @@ void smurf_calcqu( int *status ) {
 
 /* Now clean the bolometer data */
          smf_clean_smfArray( wf, concat, NULL, NULL, NULL, config, status );
+
+/* If required correct for the POL2 triggering issue. */
+         if( fix ) smf_fix_pol2( wf, concat, status );
 
 /* Loop round each sub-array in the current contiguous chunk of data. */
          for( idx = 0; idx < concat->ndat && *status == SAI__OK; idx++ ) {

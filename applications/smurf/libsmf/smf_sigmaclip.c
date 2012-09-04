@@ -15,7 +15,8 @@
 
 *  Invocation:
 *     double smf_sigmaclip( int nval, double *val, double *wgt,
-*                           double nsigma, int niter, int *status )
+*                           double nsigma, int niter, double *stddev,
+*                           int *status )
 
 *  Arguments:
 *     nval = int (Given)
@@ -29,6 +30,8 @@
 *        The number of standard deviations at which to reject values.
 *     niter = int (Given)
 *        The number of rejection iterations to perform.
+*     stddev = double * (Returned)
+*        The standard deviation of the clipped data values. May be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -90,7 +93,7 @@
 #include "libsmf/smf.h"
 
 double smf_sigmaclip( int nval, double *val, double *wgt, double nsigma,
-                      int niter, int *status ){
+                      int niter, double *stddev, int *status ){
 
 /* Local Variables: */
    double *pw;
@@ -164,19 +167,18 @@ double smf_sigmaclip( int nval, double *val, double *wgt, double nsigma,
       if( sw != 0.0 ) {
          result = swv/sw;
 
-/* If this is not the last iteration, also find the weighted standard
-   deviation and thus find new acceptable data limts ofr the next
-   iteration. */
-         if( iter < niter - 1 ) {
-            sigma = swvv/sw - result*result;
-            sigma = ( sigma > 0.0 ) ? sqrt( sigma ) : 0.0;
-            lolim = result - nsigma*sigma;
-            hilim = result + nsigma*sigma;
-         }
+/* Also find the weighted standard deviation and thus find new acceptable
+   data limts for the next iteration. */
+         sigma = swvv/sw - result*result;
+         sigma = ( sigma > 0.0 ) ? sqrt( sigma ) : 0.0;
+         lolim = result - nsigma*sigma;
+         hilim = result + nsigma*sigma;
+         if( stddev ) *stddev = sigma;
 
 /* Abort, returning a bad value if no good data is found. */
       } else {
          result = VAL__BADD;
+         if( stddev ) *stddev = VAL__BADD;
          break;
       }
    }
