@@ -727,6 +727,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter flatusenext {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                default !
+                prompt {Should we compare with following flatfield?}
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF

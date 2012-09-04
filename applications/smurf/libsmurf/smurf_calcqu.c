@@ -81,6 +81,14 @@
 *        If TRUE, then attempt to fix up the data to take account of the
 *        POL-2 triggering issue that causes extra POL_ANG values to be
 *        introduced into JCMTSTATE. [FALSE]
+*     FLATUSENEXT = _LOGICAL (Read)
+*        If true the previous and following flatfield will be used to
+*        determine the overall flatfield to apply to a sequence. If false
+*        only the previous flatfield will be used. A null default will
+*        use both flatfields for data when we did not heater track
+*        at the end, and will use a single flatfield when we did heater
+*        track. The parameter value is not sticky and will revert to
+*        the default unless explicitly over-ridden. [!]
 *     IN = NDF (Read)
 *        Input file(s).
 *     MSG_FILTER = _CHAR (Read)
