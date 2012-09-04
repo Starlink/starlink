@@ -1176,14 +1176,15 @@ differences between the ``genuine'' and ``artificial'' time-series cubes.
 
 The \fitdd\ command fits profiles along a particular axis of a NDF
 data file.  It is a generic command that will work on hypercubes with
-upto 7 dimensions, but is here discussed in terms of a typical
-3-D ACSIS data-file with axes RA, Dec, and Vlsr. Specifically, the
-fitting of spectra across the imaged section of the sky. The output of
-\fitdd\ is a cube with the fitted profiles and ``component parameter
-files as NDF extentions''.
+upto 7 dimensions, but is here discussed in terms of a typical 3-D
+ACSIS data-file with axes RA, Dec, and Vlsr. Specifically, the fitting
+of spectra across the imaged section of the sky. The output of \fitdd\
+is a cube with the fitted profiles and ``Component parameter files as
+NDF extentions''. Be aware that the input cube is expected to be
+baseline subtracted and to have a zerolevel of 0.
 
 What sets \fitdd\ apart from most other fitting routines is that, by
-using ``component parameter files'' as inputs, it gives individual
+using ``Component parameter files'' as inputs, it gives individual
 control over the fitting at each position. For instance, it is
 possible to fit broad lines on the nucleus of a galaxy but narrow
 lines everywhere else in the disk. Or to fit multiple components in an
@@ -1216,12 +1217,13 @@ Because of the ability to fit distorted shapes, gauss-hermites are
 particularly well suited to ``capture'' the maximum amount of emission
 from a cube. Figure \ref{fig:samplefits} shows an example of the
 quality of the fits that can be obtained. For the shown case \fitdd\
-used a 3-component gauss-hermite2 (h3 and h4) function with the range
-around the profiles and the remaining configuration parameters at
-their default setting.  Collapsing the cube with the fitted profiles
-can thus result in an accurate and almost noise-free white light or
-total emission map. Residuals from the fit can of course be studied by
-subtracting the fitted profiles from the original cube.
+used a 3-component gauss-hermite2 (fitting h3 and h4) function with
+the range around the profiles and the remaining configuration
+parameters at their default setting.  Collapsing the cube with the
+fitted profiles can thus result in an accurate and almost noise-free
+white light or total emission map. Residuals from the fit can of
+course be studied by subtracting the fitted profiles from the original
+cube.
 
 \subsubsection{Fitting functions}
 
@@ -1245,9 +1247,11 @@ resulting in asymmetric wings and a skewed shape. By contrast the
 4th-order polynomial causes a bump in the centre and steeper slopes
 i.e. a peaky shape.
 
-The gauss-hermite profiles in \fitdd\ are called gausshermite1, fitting
-only h3, and gausshermite2, fitting both h3 and h4 (to fit only h4, use
-gausshermite2 and define h3 to be 0 and fixed).
+The gauss-hermite profiles in \fitdd\ are called gausshermite1,
+fitting only h3, and gausshermite2, fitting both h3 and h4 (to fit
+only h4, use gausshermite2 and define h3 to be 0 and fixed). The
+default in the configuration file for \cparam{FUNCTION} is a
+gausshermite2.
 
 To emphasize a number of issues:
 
@@ -1262,7 +1266,7 @@ To emphasize a number of issues:
 \item Setting the configuration parameter \cparam{ESTIMATE\_ONLY} to 1
   will skip the fit and produce an output file with profiles based on the
   initial estimates, allowing the user to inspect those. The associated
-  component parameter files could be modified and used as initial estimates
+  Component parameter files could be modified and used as initial estimates
   for a subsequent fit (see next section).
 \item Figure \ref{fig:gaussherm} shows that gauss-hermites can have
   prominent negative features. By default these are set to zero in the
@@ -1276,8 +1280,9 @@ To emphasize a number of issues:
   outlines the exact relations.
 \item The fitted ``gauss*'' functions can in principle be mixed along a
   profile: i.e. the first component can be fitted as a ``gaussian'', the
-  second one as a ``gausshermite2'', etc. Use the ``Userval'' file to
-  accomplish this. It not possible to mix in Voigt profiles.
+  second one as a ``gausshermite2'', etc. Use the \aparam{USERVAL}
+  ``User parameter values file'' to accomplish this. It not possible to
+  mix in Voigt profiles.
 \item However, since \fitdd\ fits concurrently and does not do an
   iterative fit starting with the strongest or center-most component,
   what is the first, second, etc. component is a fluid concept
@@ -1297,7 +1302,7 @@ To emphasize a number of issues:
   different restricted velocity range to try pick out the different
   components. Default sorting is by amplitude.
 \item In case multiple components are well separated each can be fitted
-separately using \cparam{RANGE}. The resulting component parameter files
+separately using \cparam{RANGE}. The resulting Component parameter files
 can then be used to generate a combined profile using \fitdd\ with
 \cparam{PARCOMP} and \cparam{MODEL\_ONLY}. This is prefered over
 simply co-adding the output files with the fitted profiles since it
@@ -1327,7 +1332,7 @@ the user. These are labeled ``comp\_1 .. comp\_n''. ``Comp\_0'' is a
 special diagnostics component that lists the number of components
 fitted at each position and a return code from the fitting routine.
 
-The component parameter files have 7 images along the axis that was
+The Component parameter files have 7 images along the axis that was
 fitted, with each representing a fitted parameter:
 
 \begin{myquote}
@@ -1355,7 +1360,7 @@ while ``outfile.more.smurf\_fit1d.comp\_1(,,3)'' shows the fitted FWHMs
 across the field-of-view.
 
 Much of the (anticipated) use of \fitdd\ derives from the fact that
-component parameter files can be used as input as well: either to
+Component parameter files can be used as input as well: either to
 provide initial estimates or fixed values to the fitting routine.
 The hierarchy is as follows:
 \begin{enumerate}
@@ -1365,19 +1370,19 @@ requested by the user.
 files in sequence given (values from the first file specified replace
 the initial estimate for the first component, etc.).
 \item Any parameter values for component(s) specified by the user in
-the ``User definition file'' are then substituted.
+the ``User paramter values file'' (\aparam{USERVAL}) are then substituted.
 \item Finally, a ``fitmask'' is defined based on which parameters are
-  free to be fitted and which are declared as ``fixed'' in the ``User
-  definition file''. Any non-bad value for a free parameter is treated
-  as an initial estimate.
+free to be fitted and which are declared as ``fixed'' in the ``User
+parameters values file''. Any non-bad value for a free parameter is treated
+as an initial estimate.
 \end{enumerate}
 
 The difference between values specified in the component parameter
-files and ones declared in the user definition file is that the former
-can vary across the field-of-view whereas the latter will result in
-the same value being used for all profiles.
+files and ones declared in the ``User parameter values file'' is that
+the former can vary across the field-of-view whereas the latter will
+result in the same value being used for all profiles.
 
-In principle a component parameter file can be created from ``scratch'':
+In principle a Component parameter file can be created from ``scratch'':
 \begin{myquote}
 \begin{verbatim}
 # Copy a 7-image section from the cube and fill with blanks
@@ -1413,8 +1418,8 @@ for the position of the peak.
 \begin{figure}[htb]
   \begin{center}
     \includegraphics[width=0.8\linewidth]{sun258_fit1d_fixfit}
-    \caption{Fit1d $-$  {\it Left:} Section of a parameter file showing originally
-      fitted amplitudes; {\it Right:} Amplitudes after using a
+    \caption{Fit1d $-$  {\it Left:} Section of a parameter file showing
+      originally fitted amplitudes; {\it Right:} Amplitudes after using a
       ``fixed'' parameter file from the original fit as initial estimates
       for a subsequent fit.}
     \label{fig:fixfit}
