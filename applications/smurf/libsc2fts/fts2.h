@@ -105,6 +105,13 @@
 #define SMF__DEGLITCH_THRESHOLD 1.0e-9
 #endif
 
+void fts2_validatemirrorpositions(
+    double* positions,
+    int count,
+    int* ni,
+    int* nf,
+    int* status);
+
 void fts2_arraycopy(
     double* source,
     int sourceSize,
