@@ -99,9 +99,8 @@
 
 void smurf_fts2_init(int* status)
 {
-  printf("%s\n", TASK_NAME);
+  msgOut("", TASK_NAME " :: Begin", status );
   if( *status != SAI__OK ) { return; }
-  printf("  :: Begin\n");
 
   const double STAGE_CENTER = 225.0;  // mm
 
@@ -134,14 +133,6 @@ void smurf_fts2_init(int* status)
   kpg1Wgndf("OUT", gOut, nFiles, nFiles, "Equal number of input and output files expected!", &gOut, &nOutFiles, status);
   size_t nZPDFiles = 0;
   kpg1Gtgrp("ZPD", &gZpd, &nZPDFiles, status);
-
-  int debug = 0;
-  int nRow = 0;
-  int nCol = 0;
-  parGet0i("DEBUG", &debug, status);
-  parGet0i("ROW", &nRow, status);
-  parGet0i("COLUMN", &nCol, status);
-  if(debug) { printf("  DEBUG::Pixel [%d, %d]\n", nCol, nRow); }
 
   ndfBegin();
 
@@ -188,7 +179,7 @@ void smurf_fts2_init(int* status)
 
     // THIS IS NO LONGER NECESSARY SINCE THE FTS2 MIRROR POSITIONS ARE READ IN [-225, 225]
     // Transform mirror positions from [0, 450] to [-225, 225]
-    for(k = 0; k < nFrames; k++) { MIRPOS[k] -= STAGE_CENTER; }
+    // for(k = 0; k < nFrames; k++) { MIRPOS[k] -= STAGE_CENTER; }
 
     // Sort mirror positions if necessary
     if(MIRPOS[nStart] > MIRPOS[nStart + 1]) {
@@ -239,20 +230,6 @@ void smurf_fts2_init(int* status)
     for(k = 1; k <= nOPD; k++) {
       OPD_EVEN[k - 1] = (k < nMax) ? -(nMax - k) : (k - nMax + 1);
       OPD_EVEN[k - 1] *= dz;
-    }
-
-    if(debug) {
-      printf("  OBSID        = %s\n", obsID);
-      printf("  OBJECT       = %s\n", object);
-      printf("  SUBARRAY     = %s\n", subarray);
-      printf("  SCAN MODE    = %s\n", scanMode);
-      printf("  OPD[%f, %f]\n", minOPD, maxOPD);
-      printf("  Mirror starts moving at frame index %d\n", nStart);
-      printf("  Mirror stops moving at frame index %d\n", nStop);
-      printf("  Mirror range [%f, %f] (mm)\n", MIRPOS[nStart], MIRPOS[nStop]);
-      printf("  Corresponding step size in OPD grid is %f (mm)\n", dz);
-      printf("  Nyquist frequency is %f (cm^-1)\n", fNyquist);
-      printf("  Data cube size [%d, %d, %d] --> [%d, %d, %d]\n", nWidth, nHeight, nFrames, nWidth, nHeight, nOPD);
     }
 
     // Update FITS component
@@ -314,9 +291,6 @@ void smurf_fts2_init(int* status)
         }
         // If this is a bad pixel, go to next
         if(badPixel) {
-          if(debug && i == nCol && j == nRow) {
-            printf("  Specified pixel [%d, %d] is a bad pixel!\n");
-          }
           for(k = 0; k < nOPD; k++) {
             int index = bolIndex + k * nPixels;
             *((double*)(outData->pntr[0]) + index) = VAL__BADD;
@@ -337,14 +311,6 @@ void smurf_fts2_init(int* status)
           if(OPD_EVEN[k] <= ZPD) { indexZPD = k; }
         }
         *((int*) (zpd->pntr[0]) + bolIndex) = indexZPD;
-
-        if(debug && i == nCol && j == nRow) {
-          FILE* file = fopen("FTS2INIT_InterferogramOPD.txt", "w");
-          for(k = 0; k < nOPD; k++) {
-            fprintf(file, "%f\t%f\n", OPD_EVEN[k], *((double*)(outData->pntr[0]) + (bolIndex + k * nPixels)));
-          }
-          fclose(file);
-        }
       }
     }
 
@@ -402,5 +368,5 @@ void smurf_fts2_init(int* status)
   if(gOut)    { grpDelet(&gOut, status); }
   if(gZpd)    { grpDelet(&gZpd, status); }
 
-  printf("  :: Complete\n");
+  msgOut("", TASK_NAME " :: Complete!", status );
 }
