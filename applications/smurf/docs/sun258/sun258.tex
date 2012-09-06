@@ -255,6 +255,7 @@
 \newcommand{\clinplot}{\xref{\task{clinplot}}{sun95}{CLINPLOT}}
 \newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
 \newcommand{\collapse}{\xref{\task{collapse}}{sun95}{COLLAPSE}}
+\newcommand{\fillbad}{\xref{\task{fillbad}}{sun95}{FILLBAD}}
 \newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
 \newcommand{\kapdiv}{\xref{\task{div}}{sun95}{DIV}}
 \newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
@@ -1167,7 +1168,7 @@ differences between the ``genuine'' and ``artificial'' time-series cubes.
       values for h3 and h4 as defined in the defaults config file. Note
       that the fitted profile by default is restricted to positive values
       and this will omit the shown negative features (see
-      the \cparam{POS\_ONLY} configuration paramter.}
+      the \cparam{POS\_ONLY} configuration parameter).}
     \label{fig:gaussherm}
   \end{center}
 \end{figure}
@@ -1202,18 +1203,18 @@ desired parameter files for input.
   \end{center}
 \end{figure}
 
-\fitdd\ can also fit more complicated shapes than gaussians. In
-particular, gauss-hermite functions are a powerful extention when
+\fitdd\ can also fit more complicated shapes than Gaussians. In
+particular, Gauss-Hermite functions are a powerful extention when
 fitting profiles that are skewed, peaky, or only approximately
-gaussian. Figure \ref{fig:gaussherm} shows gauss-hermite profiles as a
+Gaussian. Figure \ref{fig:gaussherm} shows Gauss-Hermite profiles as a
 function of the ``skewness'' coefficient h3 and the ``peakiness''
 coefficient h4. The red box indicates the limits on acceptable values
 for h3 and h4 as defined in the defaults config file. The limits were
 chosen such as to exclude fits that look more like multiple components
-rather than a distorted single gaussian, but, admittedly are fairly
+rather than a distorted single Gaussian, but, admittedly are fairly
 arbitrary.
 
-Because of the ability to fit distorted shapes, gauss-hermites are
+Because of the ability to fit distorted shapes, Gauss-Hermites are
 particularly well suited to ``capture'' the maximum amount of emission
 from a cube. Figure \ref{fig:samplefits} shows an example of the
 quality of the fits that can be obtained. For the shown case \fitdd\
@@ -1221,7 +1222,7 @@ used a 3-component gauss-hermite2 (fitting h3 and h4) function with
 the range around the profiles and the remaining configuration
 parameters at their default setting.  Collapsing the cube with the
 fitted profiles can thus result in an accurate and almost noise-free
-white light or total emission map. Residuals from the fit can of
+white-light or total-emission map. Residuals from the fit can of
 course be studied by subtracting the fitted profiles from the original
 cube.
 
@@ -1239,16 +1240,16 @@ detail in:
 \end{verbatim}
 \end{myquote}
 
-Gauss-hermite profiles are easiest visualized as the combination of a
-gaussian and decaying asymmetric 3rd-order and/or symmetric 4th-order
+Gauss-Hermite profiles are easiest visualized as the combination of a
+Gaussian and decaying asymmetric 3rd-order and/or symmetric 4th-order
 polynomials. The 3rd-order polynomial causes a positive bump on one
-side and a negative bump on the other side of the main gaussian,
+side and a negative bump on the other side of the main Gaussian,
 resulting in asymmetric wings and a skewed shape. By contrast the
 4th-order polynomial causes a bump in the centre and steeper slopes
 i.e. a peaky shape.
 
-The gauss-hermite profiles in \fitdd\ are called gausshermite1,
-fitting only h3, and gausshermite2, fitting both h3 and h4 (to fit
+The Gauss-Hermite profiles in \fitdd\ are called gausshermite1,
+fitting only h3; and gausshermite2, fitting both h3 and h4 (to fit
 only h4, use gausshermite2 and define h3 to be 0 and fixed). The
 default in the configuration file for \cparam{FUNCTION} is a
 gausshermite2.
@@ -1268,14 +1269,14 @@ To emphasize a number of issues:
   initial estimates, allowing the user to inspect those. The associated
   Component parameter files could be modified and used as initial estimates
   for a subsequent fit (see next section).
-\item Figure \ref{fig:gaussherm} shows that gauss-hermites can have
+\item Figure \ref{fig:gaussherm} shows that Gauss-Hermites can have
   prominent negative features. By default these are set to zero in the
   fitted spectra: see information in the configuration file for the
   parameter \cparam{POS\_ONLY}.
-\item {\em ONLY for gaussians} do the fitted parameters correspond
+\item {\em ONLY for Gaussians} do the fitted parameters correspond
   {\em exactly} to amplitude, centre, and FWHM! For the other functions
   such correspondence does not exist: while they are related, the
-  numerical values are not exact. Users are {\b strongly cautioned} to
+  numerical values are not exact. Users are {\bf strongly cautioned} to
   keep this in mind. The above-mentioned help for ``fitting\_functions''
   outlines the exact relations.
 \item The fitted ``gauss*'' functions can in principle be mixed along a
@@ -1284,7 +1285,7 @@ To emphasize a number of issues:
   ``User parameter values file'' to accomplish this. It not possible to
   mix in Voigt profiles.
 \item However, since \fitdd\ fits concurrently and does not do an
-  iterative fit starting with the strongest or center-most component,
+  iterative fit starting with the strongest or centre-most component,
   what is the first, second, etc. component is a fluid concept
   (see next item on sort).  The initial estimates routine orders the
   estimates by decreasing amplitude, but estimates can be quite imprecise.
@@ -1328,9 +1329,10 @@ etc.
 
 There is a parameter file for each component (``line'') that was
 fitted along the profile upto the number of components requested by
-the user. These are labeled ``comp\_1 .. comp\_n''. ``Comp\_0'' is a
-special diagnostics component that lists the number of components
-fitted at each position and a return code from the fitting routine.
+the user. These are labelled \ndfcomp{COMP\_1} $\ldots$
+\texttt{COMP\_$n$}. \texttt{COMP\_0} is a special diagnostics
+component that lists the number of components fitted at each position
+and a return code from the fitting routine.
 
 The Component parameter files have 7 images along the axis that was
 fitted, with each representing a fitted parameter:
@@ -1354,9 +1356,9 @@ fitted, with each representing a fitted parameter:
 \end{verbatim}
 \end{myquote}
 
-Thus, for gaussian fits ``outfile.more.smurf\_fit1d.comp\_1(,,1)'' is
-an image of the fitted amplitudes of component 1 of each profile,
-while ``outfile.more.smurf\_fit1d.comp\_1(,,3)'' shows the fitted FWHMs
+Thus, for Gaussian fits \ndfcomp{OUTFILE.MORE.SMURF\_FIT1D.COMP\_1(,,1)} is
+an image of the fitted amplitudes of Component 1 of each profile,
+while \ndfcomp{OUTFILE.MORE.SMURF\_FIT1D.COMP\_1(,,3)} shows the fitted FWHMs
 across the field-of-view.
 
 Much of the (anticipated) use of \fitdd\ derives from the fact that
@@ -1392,7 +1394,7 @@ In principle a Component parameter file can be created from ``scratch'':
 # at the original value.
 % setorigin temp '[-56,-56,1]'
 
-# Fill planes with values: here just use a constant gaussian (plane 7 = 1)
+# Fill planes with values: here just use a constant Gaussian (plane 7 = 1)
 # with Ampl=10, Pos = 10 km/s, and FWHM = 5 km/s (assuming units of km/s).
 % chpix in=temp   out=temp2  section='",,,"' newval=bad
 % chpix in=temp2  out=par1   section='",,1"' newval=10
@@ -1429,15 +1431,15 @@ for the position of the peak.
 Another situation where manipulation of parameter files can be useful
 is when parameter files from previous fits require corrections. For
 instance, in case it is possible to identify the troublesome locations
-with ``thresh'' those can be set to bad values and ``fillbad''
-can be used to interpolate from surrounding values.
+by thresholding with \KAPPA\ \thresh, replacing those with bad values; and
+\KAPPA\ \fillbad\ can be used to interpolate from surrounding values.
 
 Figure \ref{fig:fixfit} shows an example. On the left is the a section
 of the Amplitude plane of a parameter file resulting from a
-1-component fit of a gaussian. In a few positions problems can be seen
+1-component fit of a Gaussian. In a few positions problems can be seen
 (actually due to a secondary component).  These points were isolated
-using a ``thresh'' on the Position plane of the parameters and be
-interpolated over using ``fillbad''. The ``fixed'' parameter file was
+using \thresh\ on the Position plane of the parameters and be
+interpolated over using \fillbad. The ``fixed'' parameter file was
 then used to provide initial estimates for a subsequent file,
 resulting in the fitted Amplitudes on the right.
 
