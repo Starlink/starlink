@@ -31,6 +31,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl    GNS does sed replacement on RECL as well. Need to look at that
 
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 
 AC_CONFIG_HEADERS([config.h])
 

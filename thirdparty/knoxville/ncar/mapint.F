@@ -54,7 +54,9 @@ C
 *
       OPEN(UNIT=ITPN,FILE='/star/etc/ezmap.dat', IOSTAT=IOS,
      :     FORM='UNFORMATTED',
-#if HAVE_FC_OPEN_READONLY           
+#if HAVE_FC_OPEN_ACTIONREAD
+     :     ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :     READONLY,
 #endif     
      :     STATUS='OLD')
@@ -71,7 +73,9 @@ C
            ENDIF
            OPEN(UNIT=ITPN,FILE=FNAME, IOSTAT=IOS,
      :          FORM='UNFORMATTED',
-#if HAVE_FC_OPEN_READONLY     
+#if HAVE_FC_OPEN_ACTIONREAD
+     :          ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :     READONLY,
 #endif     
      :     STATUS='OLD')

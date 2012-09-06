@@ -39,6 +39,7 @@ STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl   Test what features the OPEN command can support
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 
 dnl   ISHIFT intrinsic
 AC_FC_CHECK_INTRINSICS( [ishft ishift ishiftc ishftc] )

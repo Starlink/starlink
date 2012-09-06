@@ -13,6 +13,7 @@ STAR_DEFAULTS
 AC_PROG_FC
 AC_PROG_FPP
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 
 dnl    Use libtool for linking since it will try to use the -rpath option
 AC_PROG_LIBTOOL

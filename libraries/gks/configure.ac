@@ -50,6 +50,7 @@ fi
 
 dnl    Fortran features (mostly for ./base/*)
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 AC_FC_RECL_UNIT
 
 # Use Fortran for the remaining function tests

@@ -139,7 +139,9 @@
 *   Open the database file
             CALL GNS_1FNDF('IDI','NAMES',NAMFNI)
             OPEN (UNIT=LUNIDI, FILE=NAMFNI, STATUS='OLD',
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :           ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :           READONLY,
 #endif
      :           ERR=100)
@@ -256,7 +258,9 @@
                CALL GNS_1FNDF('IDI','DEVICES',DEVFNI)
                OPEN( UNIT=LUNIDI, FILE=DEVFNI, STATUS='OLD',
      :              RECL=RECLEN,
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :              ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :              READONLY,
 #endif
      :              ACCESS='DIRECT', FORM='UNFORMATTED', ERR=100 )

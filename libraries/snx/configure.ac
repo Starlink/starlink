@@ -23,6 +23,7 @@ AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 
 dnl   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)

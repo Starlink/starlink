@@ -126,8 +126,10 @@ C
      *          ACCESS='DIRECT',
      *          FORM='UNFORMATTED',
      *          RECL=IRECSZ,
-#if HAVE_FC_OPEN_READONLY
-     *       READONLY,
+#if HAVE_FC_OPEN_ACTIONREAD
+     *          ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
+     *          READONLY,
 #endif
      *          STATUS=STAWD)
         ELSE

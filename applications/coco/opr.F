@@ -31,7 +31,9 @@
 
 
       OPEN (LU,FILE=FILE,STATUS='OLD',
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :     ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :     READONLY,
 #endif
      :     IOSTAT=IOS)

@@ -40,6 +40,8 @@ AC_FC_RECL_UNIT
 
 AC_FC_OPEN_SPECIFIERS(access='append')
 AC_FC_OPEN_SPECIFIERS(position='append')
+AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 
 dnl    How to use %LOC function, as LOC or %LOC. Use LOC otherwise
 dnl    assume %LOC.

@@ -74,7 +74,9 @@
      &        RECL    =  RECL,
      &        FORM    = 'UNFORMATTED',
      &        ACCESS  = 'DIRECT',
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     &        ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      &        READONLY,
 #endif
      &        IOSTAT  =  IERR)

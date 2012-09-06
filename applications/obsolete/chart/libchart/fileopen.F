@@ -199,7 +199,9 @@
 
             OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
      :      ACCESS = ACCESS, FORM = FORM,
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :          ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :          READONLY,
 #endif
      :          ERR = 500)
@@ -208,7 +210,9 @@
 
             OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
      :      ACCESS = ACCESS, RECL = RECL, FORM = FORM,
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :          ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :          READONLY,
 #endif
      :          ERR = 500)
@@ -221,7 +225,9 @@
 
             OPEN ( UNIT = UNIT, FILE = FILE, STATUS = STAT,
      :      ACCESS = ACCESS, FORM = FORM,
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :          ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :          READONLY,
 #endif
 #if HAVE_FC_OPEN_CARRIAGECONTROLLIST
@@ -233,7 +239,9 @@
 
             OPEN ( UNIT = UNIT, FILE = FILE, STATUS = STAT,
      :      ACCESS = ACCESS, RECL = RECL, FORM = FORM,
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :          ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :          READONLY,
 #endif
 #if HAVE_FC_OPEN_CARRIAGECONTROLLIST

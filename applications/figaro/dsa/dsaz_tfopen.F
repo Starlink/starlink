@@ -256,7 +256,9 @@ C
      :                                               IOSTAT=STATUS)
             ELSE
                OPEN (UNIT=LU,FILE=FULL_NAME(:FLEN),STATUS='OLD',
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :               ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :                                      READONLY,
 #endif
      :              IOSTAT=STATUS)

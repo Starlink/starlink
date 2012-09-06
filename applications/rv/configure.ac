@@ -23,6 +23,7 @@ dnl    Use libtool so that we get to use -rpath without pain
 AC_PROG_LIBTOOL
 
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 
 dnl    Probably should look for any expectk in the PATH rather than
 dnl    assuming the Starlink location. Note that this path should be

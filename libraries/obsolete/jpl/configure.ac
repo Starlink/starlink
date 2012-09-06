@@ -31,6 +31,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl  Test what features the OPEN command can support
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 
 dnl  What unit does OPEN's recl specifier assume?
 AC_FC_RECL_UNIT

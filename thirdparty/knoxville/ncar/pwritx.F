@@ -285,7 +285,9 @@ C LOCATE DATA FILE
 C
       OPEN(UNIT=INBIN,FILE='/star/etc/pwritx.dat', IOSTAT=IOS,
      :     FORM='UNFORMATTED',
-#if HAVE_FC_OPEN_READONLY          
+#if HAVE_FC_OPEN_ACTIONREAD
+     :     ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :     READONLY,
 #endif
      :     STATUS='OLD')
@@ -303,7 +305,9 @@ C
            ENDIF
            OPEN(UNIT=INBIN,FILE=FNAME, IOSTAT=IOS,
      :          FORM='UNFORMATTED',
-#if HAVE_FC_OPEN_READONLY          
+#if HAVE_FC_OPEN_ACTIONREAD
+     :          ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :          READONLY,
 #endif     
      :          STATUS='OLD')

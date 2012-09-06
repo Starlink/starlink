@@ -26,7 +26,9 @@
       READ (*,'(A)') FNAME
       N = LEN( FNAME )
       OPEN (UNIT=1,STATUS='OLD',
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :     ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :     READONLY,
 #endif
      :     FILE=FNAME(:N))

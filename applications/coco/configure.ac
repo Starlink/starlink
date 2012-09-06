@@ -23,6 +23,7 @@ dnl    Use libtool for linking since it will try to use the -rpath option
 AC_PROG_LIBTOOL
 
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_CHECK_PROGS(csh)
 

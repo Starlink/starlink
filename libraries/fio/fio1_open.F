@@ -174,7 +174,9 @@
 #if HAVE_FC_OPEN_CARRIAGECONTROLNONE
      :               CARRIAGECONTROL=CC,
 #endif
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :               ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :               READONLY,
 #endif
 #if HAVE_FC_OPEN_POSITIONAPPEND
@@ -196,7 +198,9 @@
                IF ( RDONLY ) THEN
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR,
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :               ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :               READONLY,
 #endif
 #if HAVE_FC_OPEN_POSITIONAPPEND
@@ -219,7 +223,9 @@
 #if HAVE_FC_OPEN_CARRIAGECONTROLNONE
      :               CARRIAGECONTROL=CC,
 #endif
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :               ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :               READONLY,
 #endif
 #if HAVE_FC_OPEN_POSITIONAPPEND
@@ -239,7 +245,9 @@
             ELSE
                IF ( RDONLY ) THEN
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :                  ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :                  READONLY,
 #endif
 #if HAVE_FC_OPEN_POSITIONAPPEND

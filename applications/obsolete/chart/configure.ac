@@ -25,6 +25,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Open specifiers
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 AC_FC_OPEN_SPECIFIERS(carriagecontrol='LIST')
 
 dnl    What unit does OPEN's recl specifier assume?

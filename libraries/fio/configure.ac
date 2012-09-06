@@ -32,6 +32,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 #   Test what features the OPEN command can support
 AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(action='read')
 AC_FC_OPEN_SPECIFIERS(access='append')
 AC_FC_OPEN_SPECIFIERS(position='append')
 AC_FC_OPEN_SPECIFIERS(blocksize=0)

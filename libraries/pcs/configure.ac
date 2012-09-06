@@ -107,6 +107,7 @@ AC_CHECK_FUNCS([getarg get_command_argument iargc command_argument_count])
 
 AC_FC_CHECK_INTRINSICS([getcwd chdir])
 AC_FC_OPEN_SPECIFIERS([readonly])
+AC_FC_OPEN_SPECIFIERS([action='read'])
 
 AC_LANG_POP([Fortran])
 

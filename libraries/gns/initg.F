@@ -153,7 +153,9 @@
 *        Open the GNS names file
             CALL GNS_1FNDF('GKS', 'NAMES', NAMFNG)
             OPEN (UNIT=LUNGKS, FILE=NAMFNG, STATUS='OLD',
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :           ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :           READONLY,
 #endif
      :           ERR=101)
@@ -276,7 +278,9 @@
                CALL GNS_1FNDF('GKS', 'DEVICES', DEVFNG)
                OPEN (UNIT=LUNGKS, FILE=DEVFNG, STATUS='OLD',
      :              RECL=RECLEN,
-#if HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_ACTIONREAD
+     :              ACTION='READ',
+#elif HAVE_FC_OPEN_READONLY
      :              READONLY,
 #endif
      :              ACCESS='DIRECT',
