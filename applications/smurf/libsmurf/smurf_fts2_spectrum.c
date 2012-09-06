@@ -76,11 +76,11 @@
 #include <config.h>
 #endif
 
-/* STANDARD INCLUDES */
+/* STANDARD includes */
 #include <string.h>
 #include <stdio.h>
 
-/* STARLINK INCLUDES */
+/* STARLINK includes */
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
@@ -90,12 +90,12 @@
 #include "star/grp.h"
 #include "star/one.h"
 
-/* SMURF INCLUDES */
+/* SMURF includes */
 #include "smurflib.h"
 #include "libsmf/smf.h"
 #include "libsc2fts/fts2.h"
 
-/* FFTW INCLUDES */
+/* FFTW includes */
 #include <fftw3.h>
 
 #define FUNC_NAME "smurf_fts2_spectrum"
@@ -103,217 +103,185 @@
 
 void smurf_fts2_spectrum(int* status)
 {
-  if(*status != SAI__OK) { return; }
+  if( *status != SAI__OK ) { return; }
 
-  const char*  dataLabel  = "Spectrum";
+  const char*  dataLabel    = "Spectrum";     /* Data label */
+  Grp* gIn                  = NULL;           /* Input group */
+  Grp* gOut                 = NULL;           /* Output group */
+  smfData* inData           = NULL;           /* Pointer to input data */
+  smfData* outData          = NULL;           /* Pointer to output data */
+  smfData* zpdData          = NULL;           /* Pointer to ZPD data */
+  int zeropad               = 1;              /* Determines whether to zeropad */
+  int resolution            = 2;              /* Spectral Resolution, 0=LOW, 1=MEDIUM, *=HIGH */
+  int i                     = 0;              /* Counter */
+  int j                     = 0;              /* Counter */
+  int k                     = 0;              /* Counter */
+  double fNyquist           = 0.0;            /* Nyquist frequency */
+  double dSigma             = 0.0;            /* Spectral Sampling Interval */
+  double* IFG               = NULL;           /* Interferogram */
+  fftw_complex* SPEC        = NULL;           /* Spectrum */
+  fftw_plan plan            = NULL;           /* fftw plan */
 
-  // ADAM VARIABLES
-  int       ZEROPAD       = 1;    // Determines whether to zeropad
-  int       RESOLUTION    = 2;    // Spectral Resolution, 0=LOW, 1=MEDIUM, *=HIGH
+  size_t nFiles             = 0;              /* Size of the input group */
+  size_t nOutFiles          = 0;              /* Size of the output group */
+  size_t fIndex             = 0;              /* File index */
+  size_t nWidth             = 0;              /* Data cube width */
+  size_t nHeight            = 0;              /* Data cube height */
+  size_t nFrames            = 0;              /* Data cube depth */
+  size_t nPixels            = 0;              /* Number of bolometers in the subarray */
 
-  // INTERNAL VARIABLES
-  Grp*      grpInput      = NULL; // Input group
-  Grp*      grpOutput     = NULL; // Output group
-  smfData*  inputData     = NULL; // Pointer to input data
-  smfData*  zpdData       = NULL; // Pointer to ZPD data
-  size_t    fileIndex     = 0;    // File loop counter
-  size_t    numInputFile  = 0;    // Size of the input group
-  size_t    numOutputFile = 0;    // Size of the output group
-  int       srcH          = 0;    // Subarray Height
-  int       srcW          = 0;    // Subarray Width
-  int       srcN          = 0;    // Source interferogram length
-  int       numBol        = 0;    // Number of bolometers in the subarray
-  int       i             = 0;    // Row index
-  int       j             = 0;    // Column index
-  int       k             = 0;    // Frame index
-  int       m             = 0;    // Helper index
-  int       index         = 0;    // Helper index
-  int       bolIndex      = 0;    // Bolometer index
-  int       zpdIndex      = 0;    // Frame index at ZPD
-  int       outN          = 0;    // Output spectrum length
-  double    DSIGMA        = 0.0;  // Spectral Sampling Interval
-  double*   IFG           = NULL; // Interferogram
-  fftw_complex* SPEC      = NULL; // Spectrum
-  fftw_plan plan 			    = NULL; // fftw plan
-  sc2ast_subarray_t srcSubnum   = 0; // Source subarray ID
+  double dIntensity         = 0;
+  int N                     = 0;
+  int N2                    = 0;
+  int bolIndex              = 0;
+  int badPixel              = 0;
+  int indexZPD              = 0;
 
-  // GROUPS
-  kpg1Rgndf("IN", 0, 1, "", &grpInput, &numInputFile, status);
-  kpg1Wgndf("OUT", grpOutput, numInputFile, numInputFile,
-            "Equal number of input and output files expected!",
-            &grpOutput, &numOutputFile, status);
+  /* Get Input & Output groups */
+  kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
+  kpg1Wgndf("OUT", gOut, nFiles, nFiles, "Equal number of input and output files expected!", &gOut, &nOutFiles, status);
 
-  // READ IN ADAM PARAMETERS
-  parGet0i("ZEROPAD", &ZEROPAD, status);
-  parGet0i("RESOLUTION", &RESOLUTION, status);
-
-  switch(RESOLUTION) {
+  /* Read in ADAM parameters */
+  parGet0i("ZEROPAD", &zeropad, status);
+  parGet0i("RESOLUTION", &resolution, status);
+  switch(resolution) {
     case 0:
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Specified resolution is NOT supported!", status);
-      goto CLEANUP;
-      // DSIGMA = SMF__FTS2_LOWRES_SSI;
-      // break;
+      dSigma = SMF__FTS2_LOWRES_SSI;
+      break;
     case 1:
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Specified resolution is NOT supported!", status);
-      goto CLEANUP;
-      // DSIGMA = SMF__FTS2_MEDRES_SSI;
-      // break;
+      dSigma = SMF__FTS2_MEDRES_SSI;
+      break;
     default:
-      DSIGMA = SMF__FTS2_HIGHRES_SSI;
+      dSigma = SMF__FTS2_HIGHRES_SSI;
       break;
   }
 
-  // BEGIN NDF
+  /* BEGIN NDF */
   ndfBegin();
 
-  // ===========================================================================
-  // LOOP THROUGH EACH INPUT FILE
-  // ===========================================================================
-  for(fileIndex = 1; fileIndex <= numInputFile; fileIndex++) {
-    smf_open_file(grpInput, fileIndex, "READ", 0, &inputData, status);
+  /* Loop through each input file */
+  for(fIndex = 1; fIndex <= nFiles; fIndex++) {
+    /* Open Observation file */
+    smf_open_file(gIn, fIndex, "READ", 0, &inData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to open source file!", status);
+      errRep(FUNC_NAME, "Unable to open the source file!", status);
       goto CLEANUP;
     }
 
-    // CHECK FOR ZPD
-    if(!(inputData->fts) || !(inputData->fts->zpd)) {
+    /* Data cube dimensions */
+    nWidth  = inData->dims[0];
+    nHeight = inData->dims[1];
+    nFrames = inData->dims[2];
+    nPixels = nWidth * nHeight;
+
+    /* Check if the file is initialized for FTS2 processing */
+    if(!(inData->fts) || !(inData->fts->zpd)) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "The file is NOT initialized for FTS2 data reduction!", status);
+      errRep( FUNC_NAME, "The file is NOT initialized for FTS2 data reduction!", status);
       goto CLEANUP;
     }
-    zpdData = inputData->fts->zpd;
 
-    // GET SOURCE SUBARRAY ID
-    smf_find_subarray(inputData->hdr, NULL, 0, &srcSubnum, status);
-    if( srcSubnum == SC2AST__NULLSUB ||
-        srcSubnum == S8A || srcSubnum == S8B ||
-        srcSubnum == S4C || srcSubnum == S4D) {
+    /* Read in ZPD 2D array */
+    zpdData = inData->fts->zpd;
+
+    /* Read in the Nyquist frequency from FITS component */
+    smf_fits_getD(inData->hdr, "FNYQUIST", &fNyquist, status);
+    if(*status != SAI__OK) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Source has invalid subarray ID!", status);
+      errRep(FUNC_NAME, "Unable to find the Nyquist frequency in FITS component!", status);
       goto CLEANUP;
     }
 
-    // INPUT FILE DIMENSIONS
-    srcW   = inputData->dims[0];
-    srcH   = inputData->dims[1];
-    srcN   = inputData->dims[2];
-    numBol = srcW * srcH; // NUMBER OF BOLOMETERS IN THE SUBARRAY
+    N2 = 0;
+    if(zeropad) {
+      N2 = ceil(fNyquist / dSigma);
+    } else {
+      N2 = nFrames / 2;
+      dSigma = fNyquist / N2;
+    }
+    N = 2 * N2;
 
-    int zMin = NUM__MAXI; // MIN INDEX OF THE ZPD IN THE SUBARRAY
-    for(i = 0; i < srcH; i++) {
-      for(j = 0; j < srcW; j++) {
-        bolIndex = i + j * srcH;
-        int z = *((int*)(zpdData->pntr[0]) + bolIndex);
-        if(z < zMin) { zMin = z; }
+    /* Save wavenumber factor to FITS extension */
+    smf_fits_updateD(inData->hdr, "WNFACT", dSigma, "Wavenumber factor cm^-1", status);
+
+    /* Copy input data into output data */
+    outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
+    outData->dtype   = SMF__DOUBLE;
+    outData->ndims   = 3;
+    outData->dims[0] = nWidth;
+    outData->dims[1] = nHeight;
+    outData->dims[2] = N2 + 1;
+    outData->pntr[0] = (double*) astMalloc((nPixels * (N2 + 1)) * sizeof(double));
+    if (dataLabel) { one_strlcpy(outData->hdr->dlabel, dataLabel, sizeof(outData->hdr->dlabel), status ); }
+
+    IFG  = astCalloc(N,  sizeof(*IFG));
+    SPEC = fftw_malloc((N2 + 1) * sizeof(*SPEC));
+
+    for(i = 0; i < nWidth; i++) {
+      for(j = 0; j < nHeight; j++) {
+        bolIndex = i + j * nWidth;
+
+        badPixel = 0;
+        for(k = 0; k < nFrames; k++) {
+          dIntensity = *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
+          if(dIntensity == VAL__BADD) {
+            badPixel = 1;
+            break;
+          }
+        }
+        /* If this is a bad pixel, go to next */
+        if(badPixel) {
+          for(k = 0; k <= N2; k++) {
+            *((double*)(outData->pntr[0]) + (bolIndex + nPixels * k)) = VAL__BADD;
+          }
+          continue;
+        }
+
+        /* Get ZPD index */
+        indexZPD = *((int*)(zpdData->pntr[0]) + bolIndex);
+
+        /* Double-Sided interferogram */
+        for(k = indexZPD; k < nFrames; k++) {
+          IFG[k - indexZPD] = *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
+        }
+        for(k = 0; k < indexZPD; k++) {
+          IFG[N - indexZPD + k] =  *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
+        }
+
+        /* FFT butterflied interferogram */
+        plan = fftw_plan_dft_r2c_1d(N, IFG, SPEC, FFTW_ESTIMATE);
+        fftw_execute(plan);
+
+        /* Write out the real component of the spectrum */
+        for(k = 0; k <= N2; k++) {
+          *((double*)(outData->pntr[0]) + (bolIndex + nPixels * k)) = SPEC[k][0];
+        }
       }
     }
 
-    // GET NYQUIST FREQUENCY
-    double FNYQUIST = 0.0;
-    smf_fits_getD(inputData->hdr, "FNYQUIST", &FNYQUIST, status);
-    if(*status != SAI__OK) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to find the Nyquist frequency in FITS header!", status);
-      goto CLEANUP;
-    }
+    if(IFG)  { IFG = astFree(IFG); }
+    if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
 
-    // INTERFEROGRAM HALF-LENGTH
-    int N2 = (ZEROPAD > 0) ? ceil(FNYQUIST / DSIGMA) : (srcN - zMin + 1);
-    int N = N2 << 1;  // INTERFEROGRAM LENGTH
-    outN = N2 + 1;    // SPECTRUM LENGTH
+    /* Close the file */
+    if(inData) { smf_close_file(&inData, status); }
 
-    // SAVE ACTUAL WAVENUMBER FACTOR (REQUIRES NO ZERO PADDING)
-    smf_fits_updateD(inputData->hdr, "WNFACT", FNYQUIST / N2, "Wavenumber factor", status);
-
-    // ALLOCATE MEMORY FOR THE ARRAYS
-    IFG  = astMalloc(N * sizeof(*IFG));
-	  SPEC = fftw_malloc(outN * sizeof(*SPEC));
-
-    // OUTPUT SMFDATA
-    smfData* outputData = smf_deepcopy_smfData(inputData, 0, SMF__NOCREATE_DATA, 0, 0, status);
-
-    // SET DATA LABEL
-    if (dataLabel) {
-      one_strlcpy(outputData->hdr->dlabel, dataLabel, sizeof(outputData->hdr->dlabel), status );
-    }
-
-    // DATA ARRAY
-    outputData->dtype   = SMF__DOUBLE;
-    outputData->ndims   = 3;
-    outputData->dims[0] = srcW;
-    outputData->dims[1] = srcH;
-    outputData->dims[2] = outN;
-    outputData->pntr[0] = (double*) astMalloc((numBol * outN) * sizeof(double));
-
-    // =========================================================================
-    // LOOP THROUGH EACH PIXEL IN THE SUBARRAY
-    // =========================================================================
-    for(i = 0; i < srcH; i++) { // LOOP THROUGH ROWS
-      for(j = 0; j < srcW; j++) { // LOOP THROUGH COLUMNS
-        bolIndex = i + j * srcH;
-
-        // GET ZPD INDEX
-        zpdIndex = *((int*)(zpdData->pntr[0]) + bolIndex);
-
-        // BUTTERFLIED INTERFEROGRAM
-        for(k = 0; k <= N2; k++) {
-          m = zpdIndex + k;
-          index = bolIndex + numBol * m;
-          IFG[k] = (m < srcN) ? *((double*)(inputData->pntr[0]) + index) : 0.0;
-        }
-        for(k = N2 + 1; k < N; k++) { IFG[k] = IFG[N - k]; }
-
-        // FORWARD FFT INTERFEROGRAM
-	      plan = fftw_plan_dft_r2c_1d(N, IFG, SPEC, FFTW_ESTIMATE);
-	      fftw_execute(plan);
-
-        // WRITE OUT THE REAL COMPONENT OF THE SPECTRUM
-        // SUBARRAYS S8C AND S8D ARE COMPLEMENTARY TO S4A AND S4B, RESPECTIVELY.
-        // THE INTERFEROGRAMS ARE FLIPPED AND HENCE THE SPECTRUM.
-        if( srcSubnum == S8C || srcSubnum == S8D ) {
-          for(k = 0; k < outN; k++) {
-            index = bolIndex + numBol * k;
-            *((double*)(outputData->pntr[0]) + index) = SPEC[k][0];
-          }
-        } else {
-          for(k = 0; k < outN; k++) {
-            index = bolIndex + numBol * k;
-            *((double*)(outputData->pntr[0]) + index) = -SPEC[k][0];
-          }
-        }
-      } // END FOR LOOP - COLUMNS
-    } // END FOR LOOP - ROWS
-
-    // CLOSE CURRENT FILE
-    if(inputData) { smf_close_file(&inputData, status); }
-
-    // FREE RESOURCES
-    if(IFG) { astFree(IFG); IFG = NULL; }
-	  if(SPEC){ fftw_free(SPEC); SPEC = NULL; }
-
-    // WRITE OUTPUT
-    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0, MSG__VERB, status);
-    smf_close_file(&outputData, status);
-
-  } // END FOR LOOP - FILES
+    /* Write output */
+    smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, status);
+    smf_close_file(&outData, status);
+  }
 
   CLEANUP:
-    // CLOSE FILES
-    if(inputData) { smf_close_file(&inputData, status); }
+  if(IFG)  { IFG = astFree(IFG); }
+  if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
 
-    // FREE RESOURCES
-    if(IFG) { astFree(IFG); IFG = NULL; }
-	  if(SPEC){ fftw_free(SPEC); SPEC = NULL; }
-	  fftw_cleanup();
+  /* Close files if still open */
+  if(inData) { smf_close_file(&inData, status); }
 
-    // END NDF
-    ndfEnd(status);
+  /* END NDF */
+  ndfEnd(status);
 
-    // DELETE GROUPS
-    grpDelet(&grpInput, status);
-    grpDelet(&grpOutput, status);
+  /* Delete Groups */
+  grpDelet(&gIn, status);
+  grpDelet(&gOut, status);
 }
