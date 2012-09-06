@@ -81,7 +81,7 @@ typedef char bool;
 
 /* internal declarations */
 const char* todaysdate(void);
-void add_line( FILE * file, char * string, int constant, bool isok);
+void add_line( FILE * file, const char * string, int constant, bool isok);
 
 int main (int argc, char ** argv) {
   char * progname = argv[0];
@@ -1143,7 +1143,7 @@ grep define /usr/include/asm/errno.h | awk '{print "add_line(OutputFile, \""$2"\
 }
 
 /* Insert code for a specific errno constant */
-void add_line( FILE * file, char * string, int constant, bool isok) {
+void add_line( FILE * file, const char * string, int constant, bool isok) {
   char * msg;
 
   /* Translate the error code to an error message */
