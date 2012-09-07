@@ -109,14 +109,14 @@
 *     RMS = _DOUBLE (Read)
 *          RMS in input NDF(s) in data units.
 *     USERVAL = GROUP (Read)
-*          Input keymap file name with user-supplied fixed values or initial
-*          estimates for the fit and to flag whether parameters are to
+*          Input keymap file with user-supplied fixed values or initial
+*          estimates for the fit and a flag whether parameters are to
 *          be kept fixed in the fit. The sample/default keymap file is
 *          $SMURF_DIR/smurf_fit1d_uval.def. Entries are of the form:
 *          "comp"#."fid" = value, "comp"#.par = value, or "fix"#.par = [0,1]
 *          with 'par' being a parameter relevant for the function being
-*          fitted or indicating a parameter to be kept fixed or fitted
-*          '#' (1..n) indicates the component profile being described.
+*          fitted. '#' (1..n) indicates the component profile being described.
+*          Fix indicates a parameter to be kept fixed or fitted.
 *
 *          If specified "comp"#.fid will override the default function
 *          selected in the config file.
@@ -242,7 +242,6 @@
 *          any boundary limits until after the fit. Thus this option may
 *          not be very helpful.
 
-
 *  Fitting Functions:
 *     The function menu provides the choice of four functions for which
 *     you can fit the parameters to the data in your profiles.
@@ -289,7 +288,7 @@
 *                            for a voigt (based on the Faddeeva complex
 *                            error function):
 *                               amp = area / amp2area
-*
+
 *  Fitted Parameters:
 *     The fitted parameters are stored in the file header as
 *     FILE.MORE.SMURF_FIT1D.COMP_0 to COMP_N, with N depending on how many
@@ -324,6 +323,50 @@
 *         -7   Square root of negative number.
 *         <-10 All fitted components rejected due to minamp, minwidth,
 *                maxlorz, or range constraints.
+
+*  Examples:
+*    fit1d in=orion out=orion_gauh2 rms=0.22
+*       Fits using the settings as defined in the default Configuration
+*       file "$SMURF_DIR/smurf_fit1d.def": fitting a single gausshermite2
+*       to each profile along the highest dimension of the file "orion.sdf".
+*       The input file is expected to be baselined and the zerolevel
+*       of the profile to be 0. The fitted profiles are stored in the
+*       file "orion_gauh2.sdf" with a component parameter file with the
+*       gauss-hermite parameters a, b, c, h3, h4 as
+*       "orion_gauh2.more.smurf_fit1d.comp_1"
+*       (plus ...comp_0 for the diagnostics component).
+*    fit1d in=orion out=orion_gauss rms=0.22 \
+*          config='"^$SMURF_DIR/smurf_fit1d.def,function=gauss"'
+*        Same as above, but fit a single gaussian instead. Alternatively,
+*        use config='"^myfits1d.def"' having the following lines:
+*               ^$SMURF_DIR/smurf_fit1d.def
+*               function = gaussian
+*    fit1d in=orion out=orion_gauh2 rms=0.22 parndf=orion_gauss
+*        As in the first example fit a gausshermite2, but use the output
+*        from the gaussian fit of the second example for initial estimates.
+*        This can help or do harm: while the "internal" initial estimate
+*        from Fit1d may be in-accurate, in the first example a fit with a
+*        gausshermite2 will be attempted regardless. By contrast, the
+*        gaussian fit to a non-gaussian profile in example 2 may have been
+*        so poor that is was rejected: in that case current gausshermite2 fit
+*        will skip the profile because there won't be any initial estimates.
+*    fit1d in=orion out=orion_gauh2 rms=0.22 userval='"^myvalues.def"' \
+*          config='"^$SMURF_DIR/smurf_fit1d.def,function=gauss,ncomp=3"'
+*        Fit three gaussian components to each profile using initial
+*        estimates and fixed values as defined in the file "myvalues.def"
+*        (template:" $SMURF_DIR/smurf_fit1d_uval'def"), e.g.:
+*             comp1.b  = -5.2
+*             fix1.b   = 1
+*             comp1.c  = 6
+*             comp2.b  = 20.4
+*             fix2.b   = 1
+*             comp2.c  = 4
+*             comp3.b  = 35.3
+*        That is: provide a user-defined fixed value for the position
+*        (parameter "b") of components 1 and 2, and an initial estimate
+*        for component 3. Also provide user-defined initial estimates for
+*        the FWHM (parameter "c") of components 1 and 2. Leave it to fit1d
+*        to find initial estimates for all other parameters.
 
 *  Authors:
 *     Remo Tilanus (JAC, Hawaii)
