@@ -1310,24 +1310,16 @@ dat1_cvt_char(bad, nval, imp, exp, nbad)
          switch (imp->dtype)
          {
             case DAT__I:
-               (void) sprintf( buffer, "%d%n", *((_INTEGER *) src.body),
-                                               &nchar );
+               nchar = snprintf( buffer, sizeof(buffer), "%d", *((_INTEGER *) src.body) );
                break;
-
-/* HORRIBLE TRUTH: we can't allow two "%" signs with a G between them in   */
-/* the format strings that follow, or SCCS replaces them with today's date.*/
-/* I love UNIX (RFWS).                                                     */
             case DAT__R:
-               (void) sprintf( buffer, "%G""%n", *((_REAL *) src.body),
-                                               &nchar );
+               nchar = snprintf( buffer, sizeof(buffer), "%G", *((_REAL *) src.body) );
                break;
             case DAT__D:
-	      (void) sprintf( buffer, "%.*G%n", DBL_DIG,*((_DOUBLE *) src.body),
-                                               &nchar );
+               nchar = snprintf( buffer, sizeof(buffer), "%.*G", DBL_DIG,*((_DOUBLE *) src.body) );
                break;
             case DAT__L:
-               (void) sprintf( buffer, "%d%n", *((int *) src.body),
-                                               &nchar );
+               nchar = snprintf( buffer, sizeof(buffer), "%d", *((int *) src.body) );
                break;
             case DAT__C:
                strncpy(buffer, (_CHAR *) src.body, src.length);
@@ -1335,20 +1327,16 @@ dat1_cvt_char(bad, nval, imp, exp, nbad)
                nchar = src.length;
                break;
             case DAT__B:
-               (void) sprintf( buffer, "%d%n", *((_BYTE *) src.body),
-                                               &nchar );
+               nchar = snprintf( buffer, sizeof(buffer), "%d", *((_BYTE *) src.body) );
                break;
             case DAT__UB:
-               (void) sprintf( buffer, "%u%n", *((_UBYTE *) src.body),
-                                               &nchar );
+               nchar = snprintf( buffer, sizeof(buffer), "%u", *((_UBYTE *) src.body) );
                break;
             case DAT__W:
-               (void) sprintf( buffer, "%d%n", *((_WORD *) src.body),
-                                               &nchar );
+               nchar = snprintf( buffer, sizeof(buffer), "%d", *((_WORD *) src.body) );
                break;
             case DAT__UW:
-               (void) sprintf( buffer, "%u%n", *((_UWORD *) src.body),
-                                               &nchar );
+               nchar = snprintf( buffer, sizeof(buffer), "%u", *((_UWORD *) src.body) );
          }
 
 /* Convert the characters to the destination. The sscanf routine does not

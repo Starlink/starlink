@@ -257,12 +257,11 @@ dat1_make_scratch(void)
    prefix = getenv( "HDS_SCRATCH" );
    if ( prefix == NULL )
    {
-      (void) sprintf( (char *) file.body, "t%x%n", getpid( ), &nc );
+      nc = sprintf( (char *) file.body, "t%x", getpid( ) );
    }
    else
    {
-      (void) sprintf( (char *) file.body, "%s/t%x%n", prefix, getpid( ),
-                                                         &nc );
+      nc = sprintf( (char *) file.body, "%s/t%x", prefix, getpid( ) );
    }
 #endif
    file.length = nc;

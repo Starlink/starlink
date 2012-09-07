@@ -163,9 +163,9 @@ datType(const HDSLoc *locator,
 
          case DAT__C:
          {
-            (void) sprintf( buf, "_CHAR*%d%n",
+            nc = snprintf( buf, sizeof(buf), "_CHAR*%d",
                             (int) ( data->obj.length /
-                            dat_gl_ndr[ DAT__C ].length ), &nc );
+                            dat_gl_ndr[ DAT__C ].length ) );
             _chcopy( nc, buf, ' ', (int) type.length, type.body );
             break;
          }

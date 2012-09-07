@@ -884,17 +884,15 @@ may require modification for use on this machine.",\
 /* If the values are signed, cast to 64-bit int type.                       */\
          if( _signed( dtype ) )\
          {\
-            (void) sprintf( buf, "%-"INT_BIG_S"%n", (INT_BIG) (min), &len1 );\
-            (void) sprintf( buf, "%-"INT_BIG_S"%n", (INT_BIG) (max), &len2 );\
+           len1 = snprintf( buf, sizeof(buf), "%-"INT_BIG_S, (INT_BIG) (min) ); \
+           len2 = snprintf( buf, sizeof(buf), "%-"INT_BIG_S, (INT_BIG) (max) ); \
          }\
 \
 /* If the values are unsigned, cast to unsigned long int                    */\
          else\
          {\
-            (void) sprintf( buf, "%-"INT_BIG_U"%n", (UINT_BIG) (min), \
-                           &len1 );\
-            (void) sprintf( buf, "%-"INT_BIG_U"%n", (UINT_BIG) (max), \
-                           &len2 );\
+           len1 = snprintf( buf, sizeof(buf), "%-"INT_BIG_U, (UINT_BIG) (min) ); \
+           len2 = snprintf( buf, sizeof(buf), "%-"INT_BIG_U, (UINT_BIG) (max) ); \
          }\
 \
 /* Assign the results.                                                      */\
@@ -952,9 +950,9 @@ may require modification for use on this machine.",\
 /* accommodate the additional characters required (including one digit of   */\
 /* the exponent). Record the actual number of characters produced. This     */\
 /* will include additional exponent characters if needed.                   */\
-         (void) sprintf( buf, "%*.*LE%n",\
+         len = snprintf( buf, sizeof(buf), "%*.*LE",                   \
                          (int) ( (digits) + 5 ), (int) ( (digits) - 1 ),\
-                         (long double) (min), &len );\
+                         (long double) (min) );\
 \
 /* Assign the result.                                                       */\
          (txtsize) = len;\
@@ -965,9 +963,9 @@ may require modification for use on this machine.",\
       {\
          char buf[ BUFSIZE + 1 ]; /* Buffer for formatted value             */\
          int len;                /* Number of characters in formatted value */\
-         (void) sprintf( buf, "%*.*E%n",\
+         len = snprintf( buf, sizeof(buf), "%*.*E",                      \
                          (int) ( (digits) + 5 ), (int) ( (digits) - 1 ),\
-                         (double) (min), &len );\
+                         (double) (min) );\
          (txtsize) = len;\
       }
 #endif
