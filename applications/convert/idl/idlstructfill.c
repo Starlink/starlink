@@ -134,7 +134,7 @@ IDL_ARRAY arr;            /* subdirectory array structure */
          strcat( hdsstructype,"(");
          i=strlen(hdsstructype);
          for(j=0;j<ndims;j++) {
-            sprintf(hdsstructype+i,"%d,%n",dims[j],&k);
+            k = sprintf(hdsstructype+i,"%d,",dims[j]);
             i+=k;
          }
          strcpy(hdsstructype+i-1,")");
