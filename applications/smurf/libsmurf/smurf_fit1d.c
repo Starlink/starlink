@@ -275,14 +275,14 @@
 *                kurtosis ~= 8*sqrt(6)*h4
 *
 *     4) VOIGT function. Parameters are
-*            a (area), b (centre), c (doppler width), l (lorenztian width),
+*            a (area), b (centre), c (doppler FWHM), l (lorenztian FWHM),
 *            and v (area factor)
 *        with relations:
 *                 maximum ~= [determine value of max from fitted
 *                             profiles using e.g. collapse]
 *                  centre ~= b
-*            doppler fwhm ~= abs( 2*c )
-*         lorentzian fwhm ~= abs( 2*l )
+*            doppler fwhm ~= c
+*         lorentzian fwhm ~= l
 *                     amp  = v (OUTPUT ONLY!) amplitude calculated from
 *                            a (area) using the standard amp2area function
 *                            for a voigt (based on the Faddeeva complex
@@ -301,11 +301,12 @@
 *          2 = fit error: (see below)
 *
 *     COMP_1..N fitted profiles, planes:
-*          1 = amplitude (gaussian); 'a' (gausshermite)
-*          2 = position  (gaussian); 'b' (gausshermite)
-*          3 = fwhm      (gaussian); 'c' (gausshermite)
-*          4 = 'h3'      (gausshermite1,2); 'l' (voigt)
-*          5 = 'h4'      (gausshermite2); 'v' (voigt)
+*                (gaussian)      (gausshermite)      (voigt)
+*          1 =    amplitude          'a'              area
+*          2 =    position           'b'            position
+*          3 =      fwhm             'c'           doppler fwhm  'd'
+*          4 =       -               'h3'        lorentzian fwhm 'l'
+*          5 =       -               'h4'          amp2area      'v'
 *          last: function id
 *              1 = gaussian; 2 = gausshermite1 (h3);
 *              3 = gausshermite2 (h3,h4), 4 = voigt

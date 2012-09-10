@@ -251,7 +251,7 @@ static double gausshermiteh3h4( double  X, const double fpar[], int ncomp,
 				const int iopt[]);
 static void gausshermiteh3h4derv( double  X, const double fpar[], double *epar,
 				  int ncomp, const int iopt[]);
-/* Voigt plus helper function w*/
+/* Voigt */
 static double voigt( double  X, const double fpar[], int ncomp, const int iopt[]);
 static void   voigtderv( double  X, const double fpar[], double *epar, int ncomp,
 			 const int iopt[]);
@@ -838,9 +838,10 @@ static double voigt( double  X,
    {
       int      offset = i * npar;
       double   Int, X0;
-      double   aD, aL;
-      Int = fpar[0+offset];    X0 = fpar[1+offset];
-      aD  = fpar[2+offset];    aL = fpar[3+offset];
+      double   aD, aL;         /* These are HWHM not dispersions!!! */
+      Int = fpar[0+offset]; X0 = fpar[1+offset];
+      aD  = 0.5 * DISP2FWHM( fpar[2+offset] );
+      aL  = 0.5 * DISP2FWHM( fpar[3+offset] );
       X_X0 = X - X0;
 
       if (aD == 0.0)
@@ -891,10 +892,11 @@ static void   voigtderv( double  X,
    {
       int      offset = i * npar;
       double   Int, X0;
-      double   aD, aL;
+      double   aD, aL;         /* These are HWHM not dispersions!!! */
 
       Int = fpar[0+offset];    X0 = fpar[1+offset];
-      aD  = fpar[2+offset];    aL = fpar[3+offset];
+      aD  = 0.5 * DISP2FWHM( fpar[2+offset] );
+      aL  = 0.5 * DISP2FWHM( fpar[3+offset] );
       X_X0 = X - X0;
 
       if (aD == 0.0)
