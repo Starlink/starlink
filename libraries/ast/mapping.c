@@ -321,9 +321,13 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        total data sum, and then each final output pixel is the weighed
 *        mean of all the aligned rebinned  pixels.
 *     13-AUG-2012 (DSB):
-*        Added AST__NONORM flag for asstRebuinSeq<X>. 
+*        Added AST__NONORM flag for asstRebuinSeq<X>.
 *     30-AUG_2012 (DSB):
 *        Added AST__CONSERVEFLUX flag for astRebinSeq<X>.
+*     10-SEP-2012 (DSB):
+*        Cater for Mappings that have different numbers of inputs and
+*        outputs when finding the flux conservation factor within
+*        astRebinSeq and astResample.
 *class--
 */
 
@@ -611,7 +615,7 @@ static double EvaluatePN( PN *, double, int * );
 static double J1Bessel( double, int * );
 static double LocalMaximum( const MapData *, double, double, double [], int * );
 static double MapFunction( const MapData *, const double [], int *, int * );
-static double MatrixDet( int, const double *, int * );
+static double MatrixDet( int, int, const double *, int * );
 static double MaxD( double, double, int * );
 static double NewVertex( const MapData *, int, double, double [], double [], int *, double [], int * );
 static double Random( long int *, int * );
@@ -8205,47 +8209,63 @@ static int *MapSplit( AstMapping *this, int nin, const int *in,
    return result;
 }
 
-static double MatrixDet( int ndim, const double *matrix, int *status ){
+static double MatrixDet( int nrow, int ncol, const double *matrix, int *status ){
 /*
 *  Name:
 *     MatrixDet
 
 *  Purpose:
-*     Return the determinant of a square matrix.
+*     Return the determinant of a matrix.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "mapping.h"
-*     double MatrixDet( int ndim, const double *matrix, int *status )
+*     double MatrixDet( int nrow, int ncol, const double *matrix, int *status )
 
 *  Class Membership:
 *     Mapping member function.
 
 *  Description:
-*     This function returns the determinant of the supplied square matrix.
+*     This function returns the determinant of the supplied matrix. If it
+*     is not square, an attempt is made to make it square by removing rows or
+*     columns that contain just zeros. If the attempt fails, AST__BAD is
+*     returned.
 
 *  Parameters:
-*     ndim
-*        The number of rows and columns in the matrix.
+*     nrow
+*        The number of rows in the matrix.
+*     ncol
+*        The number of columns in the matrix.
 *     matrix
-*        The matrix element values. The first row of "ndim" elements
+*        The matrix element values. The first row of "ncol" elements
 *        should be supplied first, followed by the second row, etc.
 *     status
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     The determinant.
+*     The determinant, or AST__BAD if the determinant could not be
+*     caclculated.
 */
 
 /* Local Variables: */
-   double result;
+   const double *m;
    double *a;
+   double *sqmat;
+   double *sm;
    double *y;
+   double result;
    int *iw;
+   int all_zero;
+   int excess;
    int i;
+   int icol;
+   int irow;
+   int jcol;
    int jf;
+   int jrow;
+   int ndim;
 
 /* Initialise */
    result = AST__BAD;
@@ -8253,24 +8273,159 @@ static double MatrixDet( int ndim, const double *matrix, int *status ){
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-   if( ndim == 1 ) {
-      result = matrix[ 0 ];
+/* If the matrix has more rows than columns, attempt to make it square by
+   removing any rows that contain only zeros. */
+   excess = nrow - ncol;
+   if( excess > 0 ) {
 
-   } else if( ndim == 2 ) {
-      result = matrix[ 0 ]*matrix[ 3 ] - matrix[ 1 ]*matrix[ 2 ];
+/* Allocate an array to hold a square matrix. */
+      ndim = ncol;
+      sqmat = astMalloc( ndim*ndim*sizeof( *sqmat ) );
+      if( astOK ) {
 
-   } else {
-      a = astStore( NULL, matrix, sizeof( double )*(size_t) (ndim*ndim) );
-      iw = astMalloc( sizeof( int )*(size_t) ndim );
-      y = astMalloc( sizeof( double )*(size_t) ndim );
-      if( y ) {
-         for( i = 0; i < ndim; i++ ) y[ i ] = 1.0;
-         palDmat( ndim, a, y, &result, &jf, iw );
+/* Pointer to to start of the next row in the square matrix. */
+         sm = sqmat;
+
+/* Pointer to to start of the next row in the supplied matrix. */
+         m = matrix;
+
+/* Number of rows written to sqmat */
+         jrow = 0;
+
+/* Check each row of the supplied matrix. */
+         for( irow = 0; irow < nrow; irow++ ) {
+
+/* See if the current row of the supplied matrix contains only zeros. If
+   we have already deleted enough rows to create a square matrix, we do not
+   delete any more. */
+            if( excess ) {
+               all_zero = 1;
+               for( icol = 0; icol < ncol; icol++ ) {
+                  if( m[ icol ] != 0.0 ) {
+                     all_zero = 0;
+                     break;
+                  }
+               }
+            } else {
+               all_zero = 0;
+            }
+
+/* If so we do not copy the supplied row to the used matrix. We therefore
+   have one less excess row. */
+            if( all_zero ) {
+               excess--;
+               m += ncol;
+
+/* If the current row of the supplied matrix was not entirely zero, we
+   copy it to the used matrix so long as the matrix is not already full. */
+            } else if( jrow < ncol ) {
+               for( icol = 0; icol < ncol; icol++ ) {
+                  *(sm++) = *(m++);
+               }
+
+               jrow++;
+
+/* If we have filled the square matrix, we have nothing else to do. */
+            } else {
+               break;
+            }
+         }
       }
-      y = astFree( y );
-      iw = astFree( iw );
-      a = astFree( a );
+
+/* If the matrix has more columns than rows, attempt to make it square by
+   removing any columns that contain only zeros. */
+   } else if( excess < 0 ) {
+      excess = -excess;
+
+/* Allocate an array to hold a square matrix. */
+      ndim = nrow;
+      sqmat = astMalloc( ndim*ndim*sizeof( *sqmat ) );
+      if( astOK ) {
+
+/* Pointer to to start of the next column in the square matrix. */
+         sm = sqmat;
+
+/* Pointer to to start of the next column in the supplied matrix. */
+         m = matrix;
+
+/* Number of columns written to sqmat */
+         jcol = 0;
+
+/* Check each column of the supplied matrix. */
+         for( icol = 0; icol < ncol; icol++ ) {
+
+/* See if the current column of the supplied matrix contains only zeros. If
+   we have already deleted enough columns to create a square matrix, we do
+   not delete any more. */
+            if( excess ) {
+               all_zero = 1;
+               for( irow = 0; irow < nrow; irow++ ) {
+                  if( m[ irow*ncol ] != 0.0 ) {
+                     all_zero = 0;
+                     break;
+                  }
+               }
+            } else {
+               all_zero = 0;
+            }
+
+/* If so we do not copy the supplied column to the used matrix. We therefore
+   have one less excess column. */
+            if( all_zero ) {
+               excess--;
+               m++;
+
+/* If the current column of the supplied matrix was not entirely zero, we
+   copy it to the used matrix so long as the matrix is not already full. */
+            } else if( jcol < nrow ) {
+               for( irow = 0; irow < nrow; irow++ ) {
+                  sm[ irow*nrow ] = m[ irow*ncol ];
+               }
+
+               jcol++;
+               m++;
+               sm++;
+
+/* If we have filled the square matrix, we have nothing else to do. */
+            } else {
+               break;
+            }
+         }
+      }
+
+/* If the supplied matrix is already square, use it as supplied. */
+   } else {
+      sqmat = (double *) matrix;
+      ndim = nrow;
    }
+
+/* We can only calculate the determinant if the matrix is now square and no
+   error happened. */
+   if( excess == 0 && astOK ) {
+
+      if( ndim == 1 ) {
+         result = sqmat[ 0 ];
+
+      } else if( ndim == 2 ) {
+         result = sqmat[ 0 ]*sqmat[ 3 ] - sqmat[ 1 ]*sqmat[ 2 ];
+
+      } else {
+         a = astStore( NULL, sqmat, sizeof( double )*(size_t) (ndim*ndim) );
+         iw = astMalloc( sizeof( int )*(size_t) ndim );
+         y = astMalloc( sizeof( double )*(size_t) ndim );
+         if( y ) {
+            for( i = 0; i < ndim; i++ ) y[ i ] = 1.0;
+            palDmat( ndim, a, y, &result, &jf, iw );
+         }
+         y = astFree( y );
+         iw = astFree( iw );
+         a = astFree( a );
+      }
+
+   }
+
+/* Free the square matrix if it was allocated here. */
+   if( sqmat != matrix ) sqmat = astFree( sqmat );
 
    return result;
 }
@@ -12795,7 +12950,8 @@ static int RebinWithBlocking( AstMapping *this, const double *linear_fit,
       factor = 1.0;
       if( flags & AST__CONSERVEFLUX ) {
          if( linear_fit ) {
-            factor = MatrixDet( ndim_in, linear_fit + ndim_in, status );
+            factor = MatrixDet( ndim_out, ndim_in, linear_fit + ndim_out,
+                                status );
             if( factor != 0.0 ) {
                factor = 1.0/factor;
             } else {
@@ -15962,7 +16118,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 /* Determine the flux conservation constant if needed. */
 /* --------------------------------------------------- */
    if( ( flags & AST__CONSERVEFLUX ) && linear_fit ) {
-      factor = MatrixDet( ndim_in, linear_fit + ndim_in, status );
+      factor = MatrixDet( ndim_in, ndim_out, linear_fit + ndim_in, status );
    } else {
       factor = 1.0;
    }
