@@ -132,14 +132,6 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    for( idx = 0; idx < array->ndat && *status == SAI__OK; idx++ ) {
       hdr = array->sdata[ idx ]->hdr;
 
-
-
-FILE *fd = fopen( "data.asc", "w" );
-fprintf( fd, "# iframe time angle\n" );
-
-
-
-
 /* Allocate work arrays to hold the offset from the start of the chunk in
    days, and the rotation since the start of the chunk, in arbitrary encoder
    units. */
@@ -207,46 +199,10 @@ fprintf( fd, "# iframe time angle\n" );
          *pt = time;
          *pa = angle;
 
-
-
-
-
-   fprintf( fd, "%d ", (int) iframe );
-   if( times[iframe] != VAL__BADD ) { fprintf( fd, "%.*g ", DBL_DIG, times[iframe] ); } else { fprintf( fd, "null " ); }
-   if( angles[iframe] != VAL__BADD ) { fprintf( fd, "%.*g ", DBL_DIG, angles[iframe] ); } else { fprintf( fd, "null " ); }
-   fprintf( fd, "\n" );
-
-
-
-
-
-
-
 /* Record the angle of the current frame for use on the next pass round this
    loop. */
          langle = angle;
       }
-
-
-
-
-
-
-
-fclose( fd );
-
-
-
-
-
-
-fd = fopen( "data2.asc", "w" );
-fprintf( fd, "# iframe time angle resid limit\n" );
-
-
-
-
-
 
 /* Now we have the angles and time, we step through the array, and at
    each frame perform a least squares linear fit to produce the gradient of
@@ -338,16 +294,6 @@ fprintf( fd, "# iframe time angle resid limit\n" );
                   limit = 0.25*( pceny[0] - pceny[-1] );
                   if( lresid != VAL__BADD && lresid < -limit && resid > limit ) {
 
-
-
-
-
-
-fprintf( fd, "%d %d %.*g %.*g %.*g\n", njump + 1, iframe + njump, DBL_DIG,
-         lresid, DBL_DIG, resid, DBL_DIG, limit );
-
-
-
 /* Remove the central value and the upper half of the box from the stats. */
                      jtop = iframe + HALF_BOX + 1;
                      if( jtop > hdr->nframes ) jtop = hdr->nframes;
@@ -422,21 +368,6 @@ fprintf( fd, "%d %d %.*g %.*g %.*g\n", njump + 1, iframe + njump, DBL_DIG,
             }
          }
       }
-
-
-
-
-
-
-
-
-
-fclose( fd );
-
-
-
-
-
 
 /* Now shuffle the POL_ANG values down to remove the accepted bonus values. */
       if( njump > 0 ) {
