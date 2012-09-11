@@ -24,6 +24,8 @@
 %
 %  Authors:
 %     Ed Chapin (UBC)
+%     Holly Thomas (JAC)
+%     Malcolm J. Currie (JAC)
 %
 %  Copyright:
 %     Copyright (C) 2012 JAC
@@ -67,25 +69,27 @@
 \newcommand{\stardoccategory}  {Starlink Cookbook}
 \newcommand{\stardocinitials}  {SC}
 \newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardoccopyright}
-{Copyright \copyright\ 2012 University of British Columbia \\
- Copyright \copyright\ 2012 Science \& Technology Facilities Council}
+\newcommand{\stardoccopyright} {Copyright \copyright\ 2012 University of British Columbia \\
+                                Copyright \copyright\ 2012 Science \& Technology Facilities Council}
 \newcommand{\stardocnumber}    {21.0}
 \newcommand{\stardocauthors}   {H. S. Thomas, J. T. Dempsey, A. G. Gibb, T. Jenness, W. Holland, H. Parsons, D. Scott \& R. Tilanus}
-\newcommand{\stardoceditor}   {Editor: H. S. Thomas}
-\newcommand{\stardocdate}      {15 August 2012}
+\newcommand{\stardoceditor}    {Editor: H. S. Thomas}
+\newcommand{\stardocdate}      {10 September 2012}
 \newcommand{\stardoctitle}     {The SCUBA-2 Data Reduction Manual}
-%\newcommand{\stardocversion}   {1.1}
-%\newcommand{\stardocmanual}    {\ }
-%\newcommand{\stardocabstract}  {
+\newcommand{\stardocversion}   {1.1}
+%\newcommand{\stardocmanual}   {\ }
+\newcommand{\stardocabstract}  {
 
-%  This guide provides a short introduction to \starlink\ facilities,
-%  especially \smurf, the Sub-Millimetre User Reduction Facility, for
-%  reducing and displaying SCUBA-2 data. We describe some of the data
-%  artefacts present in SCUBA-2 time series and methods we employ to
-%  mitigate them. In particular, we illustrate the various steps
-%  required to reduce the data, and the Dynamic Iterative Map-Maker,
-%  which carries out all of these steps using a single command.}
+   This cookbook provides a short introduction to \starlink\
+   facilities, especially \smurf, the Sub-Millimetre User Reduction
+   Facility, for reducing, displaying, and calibrating SCUBA-2 data.
+   It describes some of the data artefacts present in SCUBA-2
+   time-series and methods to mitigate them. In particular, this
+   cookbook illustrates the various steps required to reduce the data;
+   and gives an overview of the Dynamic Iterative Map-Maker, which
+   carries out all of these steps using a single command controlled by
+   a configuration file.  Specialised configuration files are
+   presented.}
 
 % ? End of document identification
 % +
@@ -491,10 +495,10 @@
 % ? End of picture
 
 % ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\textbf{Abstract}}
-%   \end{center}
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
 % ? End of heading for abstract.
 \end{latexonly}
 
@@ -547,14 +551,14 @@
         {stardoccontents}}
 
 % ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
+\section{\xlabel{abstract}Abstract}
 % ? End of new section for abstract
 \end{htmlonly}
 
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
 %  ==================
-%\stardocabstract
+\stardocabstract
 % ? End of document abstract
 
 % -----------------------------------------------------------------------------
