@@ -256,37 +256,33 @@
 \newcommand{\fcfb}{$\mathrm{FCF_{beam}}$}
 \newcommand{\fcfa}{$\mathrm{FCF_{arcsec}}$}
 \newcommand{\fcfm}{$\mathrm{FCF_{match}}$}
+\newcommand\XOR{\mathbin{\char`\^}}
+
 % SCUBA reference
 %\newcommand{\scuba}{\htmladdnormallink{SCUBA}{http://www.jach.hawaii.edu/JCMT/}}
-
 
 % Starlink Package names
 \newcommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}}
 
 % set up some common package names
-\newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
+\newcommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
+\newcommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
 \newcommand{\cupid}{\xref{\textsc{Cupid}}{sun255}{}}
 \newcommand{\Figaro}{\xref{\textsc{Figaro}}{sun86}{}}
-\newcommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
-\newcommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
 \newcommand{\fluxes}{\xref{\textsc{Fluxes}}{sun213}{}}
-\newcommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
-\newcommand{\Iras}{\xref{\textsc{Iras90}}{sun163}{}}
-\newcommand{\ndf}{\xref{NDF}{sun33}{}}
+\newcommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
+\newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
 \newcommand{\agi}{\xref{AGI}{sun48}{}}
+\newcommand{\ndf}{\xref{NDF}{sun33}{}}
 \newcommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
-\newcommand{\Specdre}{\xref{\textsc{Specdre}}{sun140}{}}
 \newcommand{\jcmtdr}{\xref{\textsc{JCMTdr}}{sun132}{}}
-\newcommand{\nod}{\textsc{nod2}}
-\newcommand{\ESP}{\xref{ESP}{sun180}{}}
-\newcommand{\GKS}{\xref{GKS}{sun83}{}}
 \newcommand{\oracdr}{\xref{\textsc{Orac-dr}}{sun231}{}}
-\newcommand{\picard}{\xref{\textsc{Picard}}{sun231}{}}
-\newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
 \newcommand{\photom}{\xref{\textsc{Photom}}{sun45}{}}
-\newcommand{\topcat}{\htmladdnormallink{\textsc{Topcat}}{http://www.starlink.ac.uk/topcat}}
+\newcommand{\picard}{\xref{\textsc{Picard}}{sun265}{}}
+\newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
 \newcommand{\ssds}{\xref{\textsc{Starlink Standard Data Structures}}{sgp38}{}}
-\newcommand\XOR{\mathbin{\char`\^}}
+\newcommand{\topcat}{\htmladdnormallink{\textsc{Topcat}}{http://www.starlink.ac.uk/topcat}}
+
 % DR recipe names
 \newcommand{\drrecipe}[1]{\texttt{#1}}
 
@@ -297,131 +293,45 @@
 \newcommand{\param}[1]{\texttt{#1}}
 
 % SMURF tasks
-\newcommand{\copyflat}{\xref{\task{copyflat}}{sun258}{COPYFLAT}}
-\newcommand{\calcflat}{\xref{\task{calcflat}}{sun258}{CALCFLAT}}
 \newcommand{\calcnoise}{\xref{\task{calcnoise}}{sun258}{CALCNOISE}}
-\newcommand{\concat}{\xref{\task{sc2concat}}{sun258}{SC2CONCAT}}
-\newcommand{\fft}{\xref{\task{sc2fft}}{sun258}{SC2FFT}}
 \newcommand{\clean}{\xref{\task{sc2clean}}{sun258}{SC2CLEAN}}
+\newcommand{\concat}{\xref{\task{sc2concat}}{sun258}{SC2CONCAT}}
 \newcommand{\flatfield}{\xref{\task{flatfield}}{sun258}{FLATFIELD}}
-\newcommand{\makemap}{\xref{\task{makemap}}{sun258}{MAKEMAP}}
-\newcommand{\smurfhelp}{\xref{\task{smurfhelp}}{sun258}{SMURFHELP}}
 \newcommand{\jcmtstate}{\xref{\task{jcmtstate2cat}}{sun258}{JCMTSTATE2CAT}}
-\newcommand{\picardsun}{\xref{\textbf{SUN/265}}{sun265}{}}
-\newcommand{\kappasun}{\xref{\textbf{SUN/95}}{sun95}{}}
-\newcommand{\smurfsun}{\xref{\textbf{SUN/258}}{sun258}{}}
-\newcommand{\gaiasun}{\xref{\textbf{SUN/214}}{sun214}{}}
-\newcommand{\pipelinesun}{\xref{\textbf{SUN/264}}{sun264}{}}
+\newcommand{\makemap}{\xref{\task{makemap}}{sun258}{MAKEMAP}}
 % Non surf tasks
 
 % KAPPA
-\newcommand{\qualtobad}{\xref{\task{qualtobad}}{sun95}{QUALTOBAD}}
-\newcommand{\showqual}{\xref{\task{showqual}}{sun95}{SHOWQUAL}}
-\newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
-\newcommand{\aperadd}{\xref{\task{aperadd}}{sun95}{APERADD}}
-\newcommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
-\newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
-\newcommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
-\newcommand{\centroid}{\xref{\task{centroid}}{sun95}{CENTROID}}
-\newcommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
-\newcommand{\globals}{\xref{\task{globals}}{sun95}{GLOBALS}}
-\newcommand{\setaxis}{\xref{\task{setaxis}}{sun95}{SETAXIS}}
-\newcommand{\kstest}{\xref{\task{kstest}}{sun95}{KSTEST}}
-\newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
-\newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
-\newcommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
 \newcommand{\beamfit}{\xref{\task{beamfit}}{sun95}{BEAMFIT}}
-\newcommand{\autophotom}{\xref{\task{autophotom}}{sun45}{AUTOPHOTOM}}
-
-\newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
-\newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
-
-\newcommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
-\newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
-\newcommand{\gdset}{\xref{\task{gdset}}{sun95}{GDSET}}
-\newcommand{\idset}{\xref{\task{idset}}{sun95}{IDSET}}
-\newcommand{\ovset}{\xref{\task{ovset}}{sun95}{OVSET}}
-\newcommand{\gdnames}{\xref{\task{gdnames}}{sun95}{GDNAMES}}
-\newcommand{\gdclear}{\xref{\task{gdclear}}{sun95}{GDCLEAR}}
-\newcommand{\cursor}{\xref{\task{cursor}}{sun95}{CURSOR}}
-\newcommand{\flip}{\xref{\task{flip}}{sun95}{FLIP}}
-\newcommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
-
-\newcommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
-\newcommand{\Div}{\xref{\task{div}}{sun95}{DIV}}
 \newcommand{\cmult}{\xref{\task{cmult}}{sun95}{CMULT}}
-\newcommand{\mult}{\xref{\task{mult}}{sun95}{MULT}}
-\newcommand{\add}{\xref{\task{add}}{sun95}{ADD}}
-\newcommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
-\newcommand{\csub}{\xref{\task{csub}}{sun95}{CSUB}}
-\newcommand{\psf}{\xref{\task{psf}}{sun95}{PSF}}
-
-\newcommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
-\newcommand{\setunits}{\xref{\task{setunits}}{sun95}{SETUNITS}}
-\newcommand{\fitstext}{\xref{\task{fitstext}}{sun95}{FITSTEXT}}
-\newcommand{\fitsmod}{\xref{\task{fitsmod}}{sun95}{FITSMOD}}
-\newcommand{\fitshead}{\xref{\task{fitshead}}{sun95}{FITSHEAD}}
-\newcommand{\lutbgyrw}{\xref{\task{lutbgyrw}}{sun95}{LUTBGYRW}}
-\newcommand{\contour}{\xref{\task{contour}}{sun95}{CONTOUR}}
-\newcommand{\contover}{\xref{\task{contover}}{sun95}{CONTOVER}}
-
-\newcommand{\turbocont}{\xref{\task{turbocont}}{sun95}{TURBOCONT}}
-\newcommand{\mosaic}{\xref{\task{mosaic}}{sun95}{MOSAIC}}
-\newcommand{\pixdupe}{\xref{\task{pixdupe}}{sun95}{PIXDUPE}}
-\newcommand{\rotate}{\xref{\task{rotate}}{sun95}{ROTATE}}
-\newcommand{\setbound}{\xref{\task{setbound}}{sun95}{SETBOUND}}
-\newcommand{\slide}{\xref{\task{slide}}{sun95}{SLIDE}}
-\newcommand{\gausmooth}{\xref{\task{gausmooth}}{sun95}{GAUSMOOTH}}
-\newcommand{\median}{\xref{\task{median}}{sun95}{MEDIAN}}
-
-\newcommand{\memd}{\xref{\task{mem2d}}{sun95}{MEM2D}}
-\newcommand{\axlabel}{\xref{\task{axlabel}}{sun95}{AXLABEL}}
-\newcommand{\axunits}{\xref{\task{axunits}}{sun95}{AXUNITS}}
-\newcommand{\setlabel}{\xref{\task{setlabel}}{sun95}{SETLABEL}}
-\newcommand{\settitle}{\xref{\task{settitle}}{sun95}{SETTITLE}}
+\newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
+\newcommand{\fitsval}{\xref{\task{fitsval}}{sun95}{FITSVAL}}
+\newcommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
 \newcommand{\histogram}{\xref{\task{histogram}}{sun95}{HISTOGRAM}}
-\newcommand{\normalize}{\xref{\task{normalize}}{sun95}{NORMALIZE}}
-
-\newcommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
-\newcommand{\fitsval}{\xref{\task{fitsval}}{sun95}{NDFTRACE}}
-
 \newcommand{\makesnr}{\xref{\task{makesnr}}{sun95}{MAKESNR}}
+\newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
+\newcommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
+\newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
+\newcommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
 \newcommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
-\newcommand{\mfittrend}{\xref{\task{mfittrend}}{sun95}{MFITTREND}}
-
-% Convert
-\newcommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
-\newcommand{\ndfascii}{\xref{\task{ndf2ascii}}{sun55}{NDF2ASCII}}
-
-% FIGARO
-\newcommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
-\newcommand{\istat}{\xref{\task{istat}}{sun86}{ISTAT}}
-\newcommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
-\newcommand{\copobj}{\xref{\task{copobj}}{sun86}{COPOBJ}}
-\newcommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
-\newcommand{\bclean}{\xref{\task{bclean}}{sun86}{BCLEAN}}
-\newcommand{\ystract}{\xref{\task{ystract}}{sun86}{YSTRACT}}
-\newcommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
 
 % CCDPACK
 \newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
-
-% IRAS90
-\newcommand{\skypos}{\xref{\task{skypos}}{sun163}{SKYPOS}}
-\newcommand{\skygrid}{\xref{\task{skygrid}}{sun163}{SKYGRID}}
-\newcommand{\skyphot}{\xref{\task{skyphot}}{sun163}{SKYPHOT}}
 
 % CUPID
 \newcommand{\findback}{\xref{\task{findback}}{sun255}{FINDBACK}}
 
 % Misc
-\newcommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
-\newcommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
-\newcommand{\fitgauss}{\xref{\task{fitgauss}}{sun140}{FITGAUSS}}
-\newcommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
+\newcommand{\autophotom}{\xref{\task{autophotom}}{sun45}{AUTOPHOTOM}}
+
+% Documents
+\newcommand{\gaiasun}{\xref{\textbf{SUN/214}}{sun214}{}}
+\newcommand{\kappasun}{\xref{\textbf{SUN/95}}{sun95}{}}
+\newcommand{\picardsun}{\xref{\textbf{SUN/265}}{sun265}{}}
+\newcommand{\pipelinesun}{\xref{\textbf{SUN/264}}{sun264}{}}
+\newcommand{\smurfsun}{\xref{\textbf{SUN/258}}{sun258}{}}
 
 % JAC
-
 \newcommand{\Coulson}{\htmladdnormallink{Coulson}{http://www.jach.hawaii.edu/JACdocs/JCMT/SCD/SN/003/ }}
 
 % Special HTML versions of commands
