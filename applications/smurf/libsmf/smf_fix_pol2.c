@@ -39,6 +39,9 @@
 *        Original version.
 *     7-SEP-2012 (DSB):
 *        Complete re-write.
+*     11-SEP-2012 (DSB):
+*        Put VAL__BADD padding at the end of the POL_ANG array rather 
+*        than immediately before the last bonus point.
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
@@ -92,6 +95,7 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    dim_t ijump;
    dim_t j;
    dim_t jtop;
+   dim_t next_jump;
    dim_t njump;
    double *angles;
    double *pa;
@@ -373,19 +377,26 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
       if( njump > 0 ) {
          state = wstate = hdr->allState;
          ijump = 0;
-         for( iframe = 0; iframe < hdr->nframes && ijump < njump;
-              iframe++,state++ ) {
-            if( iframe < jumps[ ijump ] ) {
+         next_jump = jumps[ ijump ];
+         for( iframe = 0; iframe < hdr->nframes; iframe++,state++ ) {
+            if( iframe < next_jump ) {
                (wstate++)->pol_ang = state->pol_ang;
             } else {
                msgOutiff( MSG__VERB, "", "smf_fix_pol2: Removing "
                           "POL_ANG[%d]", status, (int) iframe );
                ijump++;
+               if( ijump == njump ) {
+                  next_jump = hdr->nframes + 1;
+               } else {
+                  next_jump = jumps[ ijump ];
+               }
             }
          }
 
 /* Fill the end of the POL_ANG array with bad values. */
-         while( wstate < state ) (wstate++)->pol_ang = VAL__BADD;
+         while( wstate < hdr->allState + hdr->nframes ) {
+            (wstate++)->pol_ang = VAL__BADD;
+         }
       }
 
 /* Free work space. */
