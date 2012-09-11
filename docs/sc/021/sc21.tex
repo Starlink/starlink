@@ -47,20 +47,13 @@
 \newcommand{\eg}{{\it e.g.}}
 \newcommand{\ie}{{\it i.e.}}
 \newcommand{\micron}{\mbox{\,${\umu}$m}}            % microns
-\newcommand{\arcmin}{{$^\prime$}}
+\newcommand{\arcmin}{\mbox{$^\prime$}}
+\newcommand{\arcsec}{\mbox{\arcmin\hskip -0.1em\arcmin}}
 \newcommand{\degr}{\mbox{\,$^\circ$}}               % degrees sign
 
 % ------------------------------------------------------------------------
 
 \pagenumbering{arabic}
-%\pagestyle{myheadings}
-%\newcommand{\sekshun}[1] 
-%{
-%\section{#1}
-%\markleft{#1 \hfill}\markright{#1 \hfill}
-%}
-
-
 
 % ------------------------------------------------------------------------
 
@@ -120,12 +113,6 @@
 \newenvironment{fmpage}[1]
 {\begin{lrbox}{\fmbox}\begin{minipage}{#1}}
 {\end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}}
-
-%\newcommand{\sekshun}[1] 
-%{
-%\section{#1}
-%\markboth{#1 \hfill}{#1 \hfill}
-%}
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 %\markboth{\stardocname}{\stardocname}
