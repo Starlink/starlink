@@ -494,28 +494,87 @@
 \label{sec:intro}
 
 \subsection{\xlabel{using_guide}This guide}
-The Submillimetre Common User Bolometer Array-2 (SCUBA-2) is a 10,000 pixel bolometer camera for the 15\,m James Clerk Maxwell Telescope (JCMT), designed to produce simultaneous continuum images with
-central wavelengths at 450 and 850\micron.
 
-This guide is designed to help SCUBA-2 users become familiar with the basic facilities for analysing and visualising data using the \starlink\ packages \smurf \cite{smurf}, \Kappa \cite{kappa}, \gaia \cite{gaia} and \picard \cite{picard}.  This guide is {\em not} aimed at users of the polarimeter (POL-2) or Fourier transform spectrometer (FTS-2).
+The Submillimetre Common User Bolometer Array-2 (SCUBA-2) is a
+10,000-pixel bolometer camera for the 15-m James Clerk Maxwell Telescope
+(JCMT), designed to produce simultaneous continuum images with central
+wavelengths at 450 and 850\micron.
 
-A brief description of the instrument and the observign modes is given in Section \ref{sec:s2}. Details on data acqusition and instructions for examing raw data are given in Section~\ref{sec:raw}. Section~\ref{sec:dimm} introduces the Dynamic Iterative Map-Maker (DIMM). This section offers an indepth descprion of the map-making process and introduces the configuration files necessary to run the reduction. The most important secition will be Section \ref{sec:maps}; this outlines all the steps that may be taken to produce your final science map -- this includes running the DIMM, applying the flux conversion factor, coadding mutliple maps and estimating the noise.  Section \ref{sec:eg} covers two worked examples for different science cases -- a blank cosmology field (\S\ref{sec:cosmology}) and a galactic field (\S\ref{sec:bright_ex}) with bright, extended emission. We then discuss data calibration (\S\ref{sec:cal}). For the user who wishes only to produce maps in as little time as possible, jump straight to these later sections.
+This guide is designed to help SCUBA-2 users become familiar with the
+basic facilities for analysing and visualising data using the
+\starlink\ packages \smurf\cite{smurf}, \Kappa \cite{kappa}, \gaia
+\cite{gaia} and \picard \cite{picard}.  This guide is {\em not} aimed
+at users of the polarimeter (POL-2) or Fourier transform spectrometer
+(FTS-2).
+
+A brief description of the instrument and the observign modes is given
+in Section~\ref{sec:s2}. Details on data acqusition and instructions
+for examing raw data are given in Section~\ref{sec:raw}.
+Section~\ref{sec:dimm} introduces the Dynamic Iterative Map-Maker
+(DIMM). This section offers an in-depth description of the map-making
+process and introduces the configuration files necessary to run the
+reduction. The most important section will be Section~\ref{sec:maps};
+this outlines all the steps that may be taken to produce your final
+science map -- this includes running the DIMM, applying the flux
+conversion factor, coadding mutliple maps and estimating the noise.
+Section~\ref{sec:eg} covers two worked examples for different science
+cases -- a blank cosmology field (\S\ref{sec:cosmology}) and a
+galactic field (\S\ref{sec:bright_ex}) with bright, extended emission.
+We then discuss data calibration (\S\ref{sec:cal}). For the user who
+wishes only to produce maps in as little time as possible, jump
+straight to these later sections.
 
 \subsection{\xlabel{computing}Before you start: Computing resources}
-Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker, we recommend you confirm your resources are sufficient for your type of map. 
 
-For large-area maps it is important to process a full observation in a single chunk -- see the text box on page \pageref{page:text} for a discussion of the effects of chunking. For normal map-maker parameters this implies that a machine of 96GB should be acceptable. It is important that the memory is as fast as can be afforded as RAM speed has a direct linear effect on processing time given that the time-series data are continually being funneled through the CPU.  For blank field surveys, data that only use 850 microns, or smaller regions of the sky you can usefully run the map-maker with less memory and 32 to 64GB is reasonable depending on the specifics of your data set. SMURF is multi-threaded so multiple cores do help although above 8 cores the price/performance gains tend to drop off.
+Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker, we
+recommend you confirm your resources are sufficient for your type of
+map.
 
-If you have a very large machine (128GB and 24 cores) you can to run two instances of the map-maker in parallel. Use the SMURF\_THREADS environment variable to restrict each map-maker to half the available cores.
+For large-area maps it is important to process a full observation in a
+single chunk -- see the text box on Page~\pageref{page:text} for a
+discussion of the effects of chunking. For normal map-maker parameters
+this implies that a machine of 96GB should be acceptable. It is
+important that the memory is as fast as can be afforded as RAM speed
+has a direct linear effect on processing time given that the
+time-series data are continually being funneled through the CPU.  For
+blank field surveys, data that only use 850 microns, or smaller
+regions of the sky you can usefully run the map-maker with less memory
+and 32 to 64GB is reasonable depending on the specifics of your data
+set. SMURF is multi-threaded so multiple cores do help although above
+8 cores the price/performance gains tend to drop off.
 
-An alternative option is to download your reduced data from the JCMT Science Archive at CADC\footnote{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}. See Section \ref{sec:pipe} for details on the science pipeline and retrieving your data from CADC.
+If you have a very large machine (128GB and 24 cores) you can to run
+two instances of the map-maker in parallel. Use the SMURF\_THREADS
+environment variable to restrict each map-maker to half the available
+cores.
+
+An alternative option is to download your reduced data from the JCMT
+Science Archive at
+CADC\footnote{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}. See
+Section~\ref{sec:pipe} for details on the science pipeline and
+retrieving your data from CADC.
 
 \subsection{\xlabel{software}Before you start: Software}
-This manual primarily covers software from the \starlink\ package;  \smurf\ \cite{smurf}, \Kappa \cite{kappa} and \gaia \cite{gaia}. \starlink\ must be installed on your system, and \starlink\ aliases and environment variables must be defined before attempting any reduction of SCUBA-2 data detailed here We also  discuss the ORAC-DR Data Reduction Pipeline (hereafter just \oracdr) which is an automated reduction pipeline, and \picard\ which is a similar pipeline system for processing reduced data.
+
+This manual primarily covers software from the \starlink\ package;
+\smurf\ \cite{smurf}, \Kappa \cite{kappa} and \gaia \cite{gaia}.
+\starlink\ must be installed on your system, and \starlink\ aliases
+and environment variables must be defined before attempting any
+reduction of SCUBA-2 data detailed here. We also discuss the ORAC-DR
+Data Reduction Pipeline\cite{oracdr} (hereafter just \oracdr) which is
+an automated reduction pipeline, and \picard\ which is a similar
+pipeline system for processing reduced data.
+
 %For a more detailed description refer to the comprehensive Starlink User Note (\smurfsun)\footnote{currently SUN/258 is not completely up to date}.
 
 %\textbf{\textsc{Smurf}} \textbf{and} \textbf{\textsc{Kappa}}\\*
-The Sub-Millimetre User Reduction Facility, or \smurf, contains the Dynamic Iterative Map-Maker (DIMM) that will process raw SCUBA-2 data into images (see \smurfsun). \Kappa\ meanwhile is an application package comprising general purpose commands for manipulating and visualising NDF data (see \kappasun). Before starting any data reduction you will want to initiate \smurf\ and \Kappa.
+
+The Sub-Millimetre User Reduction Facility, or \smurf, contains the
+Dynamic Iterative Map-Maker (DIMM) that will process raw SCUBA-2 data
+into images (see \smurfsun). \Kappa\ meanwhile is an application
+package comprising general purpose commands for manipulating and
+visualising NDF data (see \kappasun). Before starting any data
+reduction you will want to initiate \smurf\ and \Kappa.
 \begin{myquote}
 \begin{verbatim}
 % smurf
@@ -538,7 +597,10 @@ The Sub-Millimetre User Reduction Facility, or \smurf, contains the Dynamic Iter
 \end{verbatim}
 \end{myquote}
 %\textbf{\textsc{Gaia}}\\*
-Image visualisation can be done with \gaia\ (see \gaiasun). \gaia\ is an image and data-cube display and analysis tool which useful tools such as source detection, 3\textsc{d} visualisation, photometry and the ability to query and overlay on-line  or local catalogues. 
+Image visualisation can be done with \gaia\ (see \gaiasun). \gaia\ is an
+image and data-cube display and analysis tool which incorporates tools such
+as source detection, 3\textsc{d} visualisation, photometry and the ability
+to query and overlay on-line or local catalogues.
 \begin{myquote}
 \begin{verbatim}
 % gaia 850_map.sdf
@@ -546,36 +608,89 @@ Image visualisation can be done with \gaia\ (see \gaiasun). \gaia\ is an image a
 \end{myquote}
 
 %\textbf{\textsc{Picard}}\\*
-Post-processing analysis is performed using \picard. \picard\ documentation can be found on \htmladdnormallinkfoot{the ORAC-DR web page}{http://www.oracdr.org/oracdr/PICARD}, or at \picardsun. All \picard\ recipes follow the same structure and are run like so:
+Post-processing analysis is performed using \picard. \picard\ documentation can be
+found at \htmladdnormallinkfoot{the ORAC-DR web page}{http://www.oracdr.org/oracdr/PICARD},
+or at \picardsun. All \picard\ recipes follow the same structure and are run like so:
 \begin{myquote}
 \begin{verbatim}
 % picard -recpars <recipe_params_file> RECIPE <input_files>
 \end{verbatim}
 \end{myquote}
-where \param{<recipe\_param\_file>} is a text file containing the relevant recipe parameters, \param{RECIPE} is the name of the recipe to be run (note the caps) and \param{<input\_files>} is a list of files to be run, which must be int the current directory, or a directory defined by \param{ORAC\_DATA\_OUT}. A number of \picard\ recipes will be demonstrated in Section \ref{sec:maps}. Note that the \picard\ recipes require all input files to have the .sdf extension included; this is not the case for \Kappa\ commands. 
+where \param{<recipe\_param\_file>} is a text file containing the
+relevant recipe parameters, \param{RECIPE} is the name of the recipe
+to be run (note the caps) and \param{<input\_files>} is a list of
+files to be run, which must be int the current directory, or a
+directory defined by \param{ORAC\_DATA\_OUT}. A number of \picard\
+recipes will be demonstrated in Section~\ref{sec:maps}. Note that the
+\picard\ recipes require all input files to have the \texttt{.sdf}
+extension included; this is not the case for the commands in
+Starlink packages such as \Kappa.
 
 
 \clearpage
 \section{\xlabel{scuba2_overview}SCUBA-2 Overview}
 \subsection{\xlabel{scuba2}The instrument}
 \label{sec:s2}
-The SCUBA-2 bolometers are integrated arrays of superconducting transition edge sensors (TESs) with a characteristic transition temperature, $T_c$. In addition, each TES is ringed with a resistive heater which can compensate for changes in sky power. The SCUBA-2 focal plane is kept at a base temperature slightly below $T_c$, however a voltage is applied across each TES resistance to position the bolometer at the transition temperature.  From this point, any increase of temperature on the bolometers (e.g. from an astronomical signal) will increase the TES resistance and heat it up. This causes a drop in current and therefore a drop in temperature making the system self-regulating.
 
-For properly performing bolometers, the change in current through the TES is proportional to the change in resistance, with the response calibrated using flat-field observations (described below). This changing current generates a magnetic field which is amplified by a chain of superconducting quantum interference devices (SQUIDs). This induces a feedback current which is proportional to the current flowing through the TES, and it is this feedback current that is recorded during data acquisition.
+The SCUBA-2 bolometers are integrated arrays of superconducting
+transition edge sensors (TESs) with a characteristic transition
+temperature, $T_c$. In addition, each TES is ringed with a resistive
+heater which can compensate for changes in sky power. The SCUBA-2
+focal plane is kept at a base temperature slightly below $T_c$,
+however a voltage is applied across each TES resistance to position
+the bolometer at the transition temperature.  From this point, any
+increase of temperature on the bolometers (e.g. from an astronomical
+signal) will increase the TES resistance and heat it up. This causes a
+drop in current and therefore a drop in temperature making the system
+self-regulating.
 
-%Variation in T$_c$ across each subarray place maximum number of bolometer in the transiton range.
+For properly performing bolometers, the change in current through the
+TES is proportional to the change in resistance, with the response
+calibrated using flat-field observations (described below). This
+changing current generates a magnetic field which is amplified by a
+chain of superconducting quantum interference devices (SQUIDs). This
+induces a feedback current which is proportional to the current
+flowing through the TES, and it is this feedback current that is
+recorded during data acquisition.
 
-Before science data can be taken the system must be optimised. These `setups' are performed after slewing to the azimuth of the source, where the SQUID, TES and heater biases are set to pre-determined nominal values, in order to position the bolometers in the middle of the transition range.
+%Variation in T$_c$ across each subarray place maximum number of
+%bolometer in the transition range.
 
- This is followed by a 10 second noise observation carried out while the shutter is still closed. The shutter then opens onto the sky, and as it does so the gradual increase in sky power hitting the array is compensated for by a decrease in the resistive heater power via a servo loop designed to keep the TES output constant. This acts to keep the bolometers positioned at the centre of the transition range and is known as \textbf{heater tracking}. 
+Before science data can be taken the system must be optimised. These
+`setups' are performed after slewing to the azimuth of the source,
+where the SQUID, TES and heater biases are set to pre-determined
+nominal values, in order to position the bolometers in the middle of
+the transition range.
 
-The responsivity of the bolometers will change slightly between the dark and the sky; therefore, once the shutter is fully open a fast \textbf{flat-field} observation is carried out to recalibrate them. \textbf{A flat-field measures the responsivity of each bolometer to changing sky power}. It does this by utilising the resistance heaters which are ramped up and down around the nominal value. The change in current through the TES is then recorded for each bolometer giving a measure of its responsivity. The flat field solution is then the inverse linear gradient of the current as a function of heater power.
+This is followed by a 10-second noise observation carried out while
+the shutter is still closed. The shutter then opens onto the sky, and
+as it does so the gradual increase in sky power hitting the array is
+compensated for by a decrease in the resistive heater power via a
+servo loop designed to keep the TES output constant. This acts to keep
+the bolometers positioned at the centre of the transition range and is
+known as \textbf{heater tracking}.
 
-At this point bolometers with responsivities above or below a threshold limit are rejected, along with bolometers which display a non-linear response or have a poor S/N.  A second flat-field is performed at the end of an observation so bolometers whose responsivity has changed over the course of the observation can be flagged.
+The responsivity of the bolometers will change slightly between the
+dark and the sky; therefore, once the shutter is fully open a fast
+\textbf{flat-field} observation is carried out to recalibrate them.
+\textbf{A flat-field measures the responsivity of each bolometer to
+changing sky power}. It does this by utilising the resistance heaters
+which are ramped up and down around the nominal value. The change in
+current through the TES is then recorded for each bolometer giving a
+measure of its responsivity. The flat field solution is then the
+inverse linear gradient of the current as a function of heater power.
 
- %Typically SCUBA-2 is referred to as having a field of view (FOV) of 8 square arc minutes. As you see in the image above the FOV is not quite square and as such a FOV a value of approximately 600$''$ is more representative.
+At this point bolometers with responsivities above or below a
+threshold limit are rejected, along with bolometers which display a
+non-linear response or have a poor S/N.  A second flat-field is
+performed at the end of an observation so bolometers whose
+responsivity has changed over the course of the observation can be
+flagged.
 
-For full details of the array setup and operation see Holland et al. (2012).
+%Typically SCUBA-2 is referred to as having a field of view (FOV) of 8 square arcminutes. As you see in the image above the FOV is not quite square and as such a FOV a value of approximately 600\arcsec\ is more representative.
+
+For full details of the array setup and operation see Holland et al.
+(2012).
 
 \begin{figure}[t!]
 \begin{center}
@@ -583,39 +698,86 @@ For full details of the array setup and operation see Holland et al. (2012).
 \hspace{1cm}
 \includegraphics[width=0.4\linewidth]{850array.eps}
 \label{fig:arrays}
-\caption{\small The layout of the arrays at 450$\mu$m (left) and 850$\mu$m (right). The labels denote the name assigned to each sub-array. Raw data files are generated separately for each sub-array and must be coadded. This figure was made my running \wcsmosaic\ on raw files from each sub-array.}
+\caption{\small The layout of the arrays at 450$\mu$m (left) and
+850$\mu$m (right). The labels denote the name assigned to each
+sub-array. Raw data files are generated separately for each sub-array
+and must be coadded. This figure was made my running \wcsmosaic\ on
+raw files from each sub-array.}
 \end{center}
 \end{figure}
 
 \subsection{\xlabel{obs_modes}Observing modes}
 \label{sec:mmodes}
 
-Two observing modes are offered for SCUBA-2 -- \textsc{daisy} and \textsc{pong}. As much of the work SCUBA-2 will be doing involves large area mapping, both observing modes are scan patterns. Your choice depends on the size of the area you wish to map, where you would like your integration time concentrated and the degree of extended emission you wish to recover
+Two observing modes are offered for SCUBA-2 -- \textsc{daisy} and
+\textsc{pong}. As much of the work SCUBA-2 will be doing involves
+large area mapping, both observing modes are scan patterns. Your
+choice depends on the size of the area you wish to map, where you
+would like your integration time concentrated and the degree of
+extended emission you wish to recover
 
-In contrast to SCUBA which observed an area of sky while simultaneously chopping, SCUBA-2 removes atmospheric noise in the data processing stage (Holland et al. 2012). The power spectrum of data taken by SCUBA-2 has a $1/f$ noise curve at lower frequencies. To ensure astronomical signals are far away from this $1/f$ noise, fast scanning speeds are required. 
+In contrast to SCUBA which observed an area of sky while
+simultaneously chopping, SCUBA-2 removes atmospheric noise in the data
+processing stage (Holland et al. 2012). The power spectrum of data
+taken by SCUBA-2 has a $1/f$ noise curve at lower frequencies. To
+ensure astronomical signals are far away from this $1/f$ noise, fast
+scanning speeds are required.
 
-In order to disentangle large-scale structure from other slowly-varying signals (e.g. extinction, sky noise, $1/f$ noise), the scan pattern must pass across each region of the map from different directions and at different times. The scan patterns themselves, along with the associated parameters (velocity and scan-spacing), have been designed and optimised to meet both these criteria.
+In order to disentangle large-scale structure from other
+slowly varying signals (e.g. extinction, sky noise, $1/f$ noise), the
+scan pattern must pass across each region of the map from different
+directions and at different times. The scan patterns themselves, along
+with the associated parameters (velocity and scan-spacing), have been
+designed and optimised to meet both these criteria.
 \\*\\*
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{PONG}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}\textsc{pong} maps are the scan strategy for covering large areas. The default options allow for 3 sizes -- 900$''$, 1800$''$ and 3600$''$. A single \textsc{pong} map is a square of these dimensions and the telescope fills in the square by bouncing off the edge of the area. To ensure an even sky background it is recommended a minimum of 3, but preferably more than 5, \textsc{pong} maps are included in a single observation with a rotation introduced between each one. In this way a circular pattern is built up, (see the right hand panel of Figure \ref{fig:scan}), with a diameter equal to your requested map size. 
+\begin{minipage}[t]{0.85\linewidth}\textsc{pong} maps are the scan
+strategy for covering large areas. The default options allow for 3
+sizes -- 900\arcsec, 1800\arcsec\ and 3600\arcsec. A single \textsc{pong} map is
+a square of these dimensions and the telescope fills in the square by
+bouncing off the edge of the area. To ensure an even sky background it
+is recommended a minimum of 3, but preferably more than 5,
+\textsc{pong} maps are included in a single observation with a
+rotation introduced between each one. In this way a circular pattern
+is built up, (see the right hand panel of Figure~\ref{fig:scan}), with
+a diameter equal to your requested map size.
 \vspace{0.2cm}\\
-To recover large scale extended structure you are advised to use larger \textsc{pong} maps which scan at a higher rate. This option is in preference to tiling multiple smaller maps. Ultimately it is the size of the SCUBA-2 field-of-view that determines the sensitivity to large scale structure.
+To recover large scale extended structure you are advised to use
+larger \textsc{pong} maps which scan at a higher rate. This option is
+in preference to tiling multiple smaller maps. Ultimately it is the
+size of the SCUBA-2 field-of-view that determines the sensitivity to
+large scale structure.
 \end{minipage}
 \\*\\*\\*
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{DAISY}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-\textsc{daisy} maps are the option for point-like or compact sources ($<$3\,arcmins) by maximising the exposure time on the centre of the image. The telescope moves at a constant velocity in a `spirograph' pattern that has the advantage of keeping the source on the array throughout the observation. This is shown in the top panel of Figure \ref{fig:scan}.
+\textsc{daisy} maps are the option for point-like or compact sources
+($<$3\,arcmin) by maximising the exposure time on the centre of the
+image. The telescope moves at a constant velocity in a `spirograph'
+pattern that has the advantage of keeping the source on the array
+throughout the observation. This is shown in the top panel of Figure
+\ref{fig:scan}.
 \end{minipage}
 
 
 \begin{figure*}[b!]
 \begin{center}
 \includegraphics[width=0.9\linewidth]{wayne_scan.eps}
-\caption{\small Telescope track in offsets of azimuth and elevation for the SCUBA-2 observing patterns. \textbf{Top Left}: A single rotation of the \textsc{daisy} pattern; \textbf{Top Right}: Multiple rotations of the \textsc{daisy} pattern for a typical map based on a 180arcsec demanded diameter; \textbf{Bottom Left}: A single \textsc{pong} pattern; \textbf{Bottom Right}: Multiple rotations of the \textsc{pong} pattern for a typical map based on an 1800$''$ demanded map size. The scan pattern for your observation can be visualised like this with \topcat\ using the output from \jcmtstate. See Section \ref{sec:exam} for more details. Figure taken from Holland et al. (2012).}
+\caption{\small Telescope track in offsets of azimuth and elevation
+for the SCUBA-2 observing patterns. \textbf{Top Left}: A single
+rotation of the \textsc{daisy} pattern; \textbf{Top Right}: Multiple
+rotations of the \textsc{daisy} pattern for a typical map based on a
+180-arcsec demanded diameter; \textbf{Bottom Left}: A single
+\textsc{pong} pattern; \textbf{Bottom Right}: Multiple rotations of
+the \textsc{pong} pattern for a typical map based on an 1800\arcsec\
+demanded map size. The scan pattern for your observation can be
+visualised like this with \topcat\ using the output from \jcmtstate.
+See Section~\ref{sec:exam} for more details. Figure taken from Holland
+et al. (2012).}
 \label{fig:scan}
 \end{center}
 \end{figure*}
@@ -624,8 +786,10 @@ To recover large scale extended structure you are advised to use larger \textsc{
 
 \section{\xlabel{data_files}Raw SCUBA-2 Data}
 \label{sec:raw}
-The SCUBA-2 data acquisition (DA) system writes data files every 30 seconds. One file is written for each of the 8 sub-arrays. As discussed in Section \ref{sec:s2}, a normal science observation will follow the following sequence.
-\vspace{-2mm} 
+The SCUBA-2 data acquisition (DA) system writes data files every 30 seconds. One file
+is written for each of the 8 sub-arrays. As discussed in Section~\ref{sec:s2}, a normal
+science observation will follow the following sequence.
+\vspace{-2mm}
 \begin{itemize}\itemsep-0.5em
 \item Noise
 \item Flat-field
@@ -633,10 +797,23 @@ The SCUBA-2 data acquisition (DA) system writes data files every 30 seconds. One
 \item Flat-field
 \end{itemize}
 \vspace{-2mm}
-The \param{SEQ\_TYPE} parameter in the fits header may be used to identify the nature of each scan. When you access you data either at the JCMT or by downloading from the Science Archive\footnote{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/} you will get \emph{all} of the files listed above. Later when you reduce your data using the map-maker you will include \emph{all} of the files (noise + flat-fields + science).
+The \param{SEQ\_TYPE} parameter in the fits header may be used to
+identify the nature of each scan. When you access you data either at
+the JCMT or by downloading from the Science
+Archive\footnote{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
+you will get \emph{all} of the files listed above. Later when you
+reduce your data using the map-maker you will include \emph{all} of
+the files (noise + flat-fields + science).
 \\*\\*
-Shown below is a list of the raw files for a single sub-array (in this case s8a) for a short calibration observation. The first file is the short, dark noise; the second and last scans are the fast flat-field observations which occur after the shutter open to the sky at the start of the observation and closes at the end (note the identical file size); all of the scans in between are science. Each science scan contain 23M of data with the exception of the last one. 
-The final science scan will usually be smaller, typically requiring less than 30 secods of data to complete the observation.
+Shown below is a list of the raw files for a single sub-array (in this
+case s8a) for a short calibration observation. The first file is the
+short, dark noise; the second and last scans are the fast flat-field
+observations which occur after the shutter open to the sky at the
+start of the observation and closes at the end (note the identical
+file size); all of the scans in between are science. Each science scan
+contain 23MB of data with the exception of the last one.  The final
+science scan will usually be smaller, typically requiring less than 30
+seconds of data to complete the observation.
 \begin{myquote}
 \begin{verbatim}
 -rw-r--r-- 1 jcmtarch jcmt 6.2M Jul 19 21:33 s8a20120720_00030_0001.sdf
@@ -649,30 +826,56 @@ The final science scan will usually be smaller, typically requiring less than 30
 -rw-r--r-- 1 jcmtarch jcmt 9.6M Jul 19 21:37 s8a20120720_00030_0008.sdf
 \end{verbatim}
 \end{myquote}
-The main data arrays of each file are cubes, with the first two dimensions enumerating columns and rows, and the third time slices (sampled at 200\,Hz).
+The main data arrays of each file are cubes, with the first two
+dimensions enumerating columns and rows, and the third time slices
+(sampled at 200\,Hz).
 
-Raw SCUBA-2 data comes in uncalibrated units. The first calibration step is to scale the raw data to units proportional to picowatts (pW) by applying the flat-field solution. From there the next step is to scale the data by the flux conversion factor (FCF) to give units of Janskys (Jy). 
+Raw SCUBA-2 data comes in uncalibrated units. The first calibration
+step is to scale the raw data to units proportional to picowatts (pW)
+by applying the flat-field solution. From there the next step is to
+scale the data by the flux conversion factor (FCF) to give units of
+Janskys (Jy).
 
-The first step is applied internally by the map-maker but can be done bymanually when examining the raw data -- see Section \ref{sec:concat}. The second step must be done manually -- instructions are given in Section \ref{sec:cmult}.
+The first step is applied internally by the map-maker but can be done
+bymanually when examining the raw data -- see Section
+\ref{sec:concat}. The second step must be done manually --
+instructions are given in Section~\ref{sec:cmult}.
 
 
 \subsection{\xlabel{examine}Examining raw data}
 \label{sec:exam}
-In this section several procedures are described for examining raw SCUBA-2 data.  Working through these options will illustrate some of the features of SCUBA-2 data, but will {\em not} result in a science-grade image at the end. If you are only interested reducing your map using the iterative map-maker you can skip this chapter. You may wish to come back to it at a later stage if you feel any of your raw data needs to be checked.
+
+In this section several procedures are described for examining raw
+SCUBA-2 data.  Working through these options will illustrate some of
+the features of SCUBA-2 data, but will {\em not} result in a
+science-grade image at the end. If you are only interested reducing
+your map using the iterative map-maker you can skip this chapter. You
+may wish to come back to it at a later stage if you feel any of your
+raw data needs to be checked.
 
 \subsubsection{\xlabel{concat}Concatenate \& apply a flat-field}
 \label{sec:concat}
 
-Since SCUBA-2 data for a given sub-array are broken into multiple 30\,second scans by the data acquisition (DA) system, it is useful to concatenate the data into a single file. The \smurf\ task \concat\ can be used for this operation. The example below combines all of the files associated with observation 8 for the s8a array into a single file called s8a20120725\_00058\_con.
+Since SCUBA-2 data for a given sub-array are broken into multiple
+30\,second scans by the data acquisition (DA) system, it is useful to
+concatenate the data into a single file. The \smurf\ task \concat\ can
+be used for this operation. The example below combines all of the
+files associated with observation 8 for the s8a array into a single
+file called \texttt{s8a20120725\_00058\_con}.
 
 \begin{myquote}
 \begin{verbatim}
 % sc2concat 's8a20120725_0008*.sdf' s8a20120725_0008_con
 \end{verbatim}
 \end{myquote}
-\concat\ will automatically filter out any dark or flat-field  observations, so that the concatenated file contains only the science data. Be careful when concatenating a very long observation since the output file may be too large to reasonably handle. Fifteen minute chunks (30 files) should be sufficient.
+\concat\ will automatically filter out any dark or flat-field
+observations, so that the concatenated file contains only the science
+data. Be careful when concatenating a very long observation since the
+output file may be too large to reasonably handle. Fifteen minute
+chunks (30 files) should be sufficient.
 
-\concat\ applies the flat-field by default (although it can be disabled using the `noflat' option on the command-line). 
+\concat\ applies the flat-field by default (although it can be
+disabled using the `noflat' option on the command-line).
 
 The flat-field can also be applied manually using the \flatfield\ command.
 
@@ -681,35 +884,50 @@ The flat-field can also be applied manually using the \flatfield\ command.
 % flatfield 's8a20120701_0008*.sdf' '*_flat'
 \end{verbatim}
 \end{myquote}
-Here, the output will be a flat-fielded version of each science scan in observation number 8; the file names will be the original input names with \_flat appended to them.
+Here, the output will be a flat-fielded version of each science scan
+in observation number 8; the file names will be the original input
+names with \_flat appended to them.
 
-As a rule of thumb, you should apply the flat-field to your data before examining it. \textbf{You do not need to apply the flat-field prior to reducing your data with the map-maker as it will be applied internally.}
+As a rule of thumb, you should apply the flat-field to your data
+before examining it. \textbf{You do not need to apply the flat-field
+prior to reducing your data with the map-maker as it will be applied
+internally.}
 
 
 
 \subsubsection{\xlabel{header}Headers and file structure}
-There are two \Kappa\ tasks which are extremely useful for examining your data: \fitslist\ and \ndftrace, which can be used to view the FITS headers and dimensions of the data.
+
+There are two \Kappa\ tasks which are extremely useful for examining
+your data: \fitslist\ and \ndftrace, which can be used to view the
+FITS headers and dimensions of the data.
 \\*\\*
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{fitslist}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}This lists the fits header information for any file (raw or reduced). This extensive list includes dates \& times, source name, scan type, pattern and velocity, size of the map, exposure time, start and end elevation, opacity and the temperature of the instrument. An example is given below:
+\begin{minipage}[t]{0.85\linewidth}This lists the fits header information
+for any file (raw or reduced). This extensive list includes dates \& times,
+source name, scan type, pattern and velocity, size of the map, exposure
+time, start and end elevation, opacity and the temperature of the
+instrument. An example is given below:
 \begin{myquote}
 \begin{verbatim}
 % fitslist s8a20120720_00030_000\*.sdf | grep SEQ_TYPE
 \end{verbatim}
 \end{myquote}
-If you already know the name of the parameter you want to view you can use the \texttt{fitsval} command instead, e.g.  \texttt{\% fitsval file.sdf TAU225ST}.\\*
+If you already know the name of the parameter you want to view you can
+use the \fitsval\ command instead, e.g.
+\texttt{\% fitsval file.sdf TAU225ST}.\\*
 \end{minipage}
 
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{ndftrace}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-\ndftrace\ displays the attributes of the data structure. This will tell you the units of the data, pixel bounds, dimensions and axis assignations.\\*
+\ndftrace\ displays the attributes of the data structure. This will tell
+you the units of the data, pixel bounds, dimensions and axis assignations.\\*
 \end{minipage}
 \\*\\*
-Full details of these commands can be found in the \Kappa\ manual.
+Full details of these commands can be found in the \xref{\Kappa\ manual}{sun95}{}.
 
 
 \begin{figure}[ht!]
@@ -742,7 +960,8 @@ Load the file into \topcat\ with this command.
 \end{minipage}
 \hspace{0.3cm}
 \begin{minipage}[c]{0.32\linewidth}
-Once the file has loaded into \topcat, select the scatter plot option from the menu bar across the top of the window. 
+Once the file has loaded into \topcat, select the scatter plot option
+from the menu bar across the top of the window.
 \end{minipage}
 
 \vspace{0.5cm}
@@ -754,21 +973,27 @@ Once the file has loaded into \topcat, select the scatter plot option from the m
 \end{minipage}
 \hspace{0.3cm}
 \begin{minipage}[c]{0.32\linewidth}
-When the  scatter plot has loaded, you should adjust the X Axis and Y Axis values to DRA and DDEC respectively to display the scan pattern. If you are interested in seeing how any of the variables change over time, select the the X Axis to be either Id or RTS\_NUM.
-
+When the scatter plot has loaded, you should adjust the $X$-axis and
+$Y$-axis values to DRA and DDEC respectively to display the scan pattern.
+If you are interested in seeing how any of the variables change over time,
+select the the $X$ Axis to be either Id or RTS\_NUM.
 \end{minipage}
 
 \end{fmpage}
 \end{center}
-\caption{\small \topcat\ example demonstrating how to display the scan pattern for an observation.}
-\label{fig:topcat} 
+\caption{\small \topcat\ example demonstrating how to display the scan pattern
+for an observation.}
+\label{fig:topcat}
 \end{figure}
 
 
 \subsubsection{\xlabel{scan_pat}Displaying scan patterns}
 \label{sec:scan}
 
-The movement of the telescope throughout a scan (as well as other state information) is stored in the \texttt{MORE.SMURF.JCMTSTATE} extension of a data file. The \smurf\ task \jcmtstate\ converts this information into a simple ASCII tab separated table.
+The movement of the telescope throughout a scan (as well as other
+state information) is stored in the \texttt{MORE.SMURF.JCMTSTATE}
+extension of a data file. The \smurf\ task \jcmtstate\ converts this
+information into a simple ASCII tab-separated table.
 
 \begin{myquote}
 \begin{verbatim}
@@ -776,11 +1001,15 @@ The movement of the telescope throughout a scan (as well as other state informat
 \end{verbatim}
 \end{myquote}
 
-The `-h' option to \jcmtstate\ can be used to find more information on the command. In particular, multiple files can be supplied to the command using standard shell wild cards. If you have already concatenated your data you can simply input the single concatenated file. \textbf{It may be useful to view the scan pattern for your observation, particularly for maps taken at high elevations, to ensure the pattern completed successfully.}
+The `-h' option to \jcmtstate\ can be used to find more information on
+the command. In particular, multiple files can be supplied to the
+command using standard shell wild cards. If you have already
+concatenated your data you can simply input the single concatenated
+file. \textbf{It may be useful to view the scan pattern for your
+observation, particularly for maps taken at high elevations, to ensure
+the pattern completed successfully.}
 
-% (not escaped) and for SCUBA-2
-%data the `--with-mce' option can be used to dump the low-level MCE
-%header information.
+% (not escaped) and for SCUBA-2 data the `--with-mce' option can be used to dump the low-level MCE header information.
 
 This catalogue can be loaded into \topcat\ for plotting, making sure
 to specify the TST format during loading.
@@ -791,12 +1020,32 @@ to specify the TST format during loading.
 \end{verbatim}
 \end{myquote}
 
-Example of scan patterns displayed with \topcat\ can be seen in Figure \ref{fig:scan}. Detailed instruction on how to display the scan pattern for your observation are given in Figure \ref{fig:topcat}.  All of the time-varying header values are available for plotting. In particular DRA and DDEC will show the RA/Dec offset of the telescope giving the scan pattern. Other values include the azimuth and elevation offsets  (DAZ \& DEL), the WVM and 225\,GHz opacity values (as calculated from the raw WVM measurements) and the intrument temperatures (e.g. SC2\_FPUTEMP gives the temperature of the focal plane).
+Example of scan patterns displayed with \topcat\ can be seen in
+Figure~\ref{fig:scan}. Detailed instruction on how to display the scan
+pattern for your observation are given in Figure~\ref{fig:topcat}.
+All of the time-varying header values are available for plotting. In
+particular DRA and DDEC will show the RA/Dec offset of the telescope
+giving the scan pattern. Other values include the azimuth and
+elevation offsets (DAZ \& DEL), the WVM and 225\,GHz opacity values
+(as calculated from the raw WVM measurements) and the intrument
+temperatures (e.g. SC2\_FPUTEMP gives the temperature of the focal
+plane).
 
-Due to extreme accelerations at ``turn-around'' points of a scan pattern (especially for  \textsc{pong}s), the telescope finds it hard to follow the proscribed scan patterns at high elevations. To mitigate this we try to avoid observing any sources above 70$^\circ$ elevation. If the \fitslist\ parameters \param{ELSTART} and \param{ELEND} indicate that your map was taken at high elevation you may consider checking the success of the scan pattern. If you find your observation has failed to follow the demanded scan pattern dont worry, the data is likely to still be useful. This is especially true for \textsc{daisy} maps where the high exposure-time central region is usually unaffected.
+Due to extreme accelerations at ``turn-around'' points of a scan
+pattern (especially for \textsc{pong}s), the telescope finds it hard
+to follow the proscribed scan patterns at high elevations. To mitigate
+this we try to avoid observing any sources above 70$^\circ$ elevation.
+If the \fitslist\ parameters \param{ELSTART} and \param{ELEND}
+indicate that your map was taken at high elevation you may consider
+checking the success of the scan pattern. If you find your observation
+has failed to follow the demanded scan pattern dont worry, the data is
+likely to still be useful. This is especially true for \textsc{daisy}
+maps where the high exposure-time central region is usually
+unaffected.
 
 \subsubsection{\xlabel{display_cube}Displaying time-series data}
 \label{sec:gaiacube}
+
 %\vspace{-2mm}
 %\begin{itemize}
 %\item \emph{Examine each bolometer to check the stability}
@@ -805,20 +1054,33 @@ Due to extreme accelerations at ``turn-around'' points of a scan pattern (especi
 \begin{figure}[h!]
 \includegraphics[width=\linewidth]{gaia1.eps}
 \vspace{1mm}
-\caption{\small Initial \gaia\ windows displayed upon loading a data cube. The main window in the left shows a map of bolometer values at a fixed sample in time. you may have to zoom in multiple times by clicking the `Z' icon. On the right-hand side, the  `Display image sections of a cube' dialogue enables the user to  navigate the time dimension. The `Index of plane' slider near the   top can be used to select different time slices, and the main window
-  will automatically update.}
+\caption{\small Initial \gaia\ windows displayed upon loading a data cube.
+  The main window in the left shows a map of bolometer values at a fixed
+  sample in time. You may have to zoom in multiple times by clicking the
+  `Z' icon. On the right-hand side, the `Display image sections of a cube'
+  dialogue enables the user to navigate the time dimension. The
+  `Index of plane' slider near the top can be used to select different
+  time slices, and the main window will automatically update.}
 \label{fig:gaia_main}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.8\linewidth]{gaia2}
+\includegraphics[width=0.8\linewidth]{gaia2.eps}
 \vspace{0.3cm}
-\caption{\small The `Spectral Plot' window displaying its time-varying signal, appears automatically once a bolometer is clicked in the main window The vertical red line  indicates the time slice that is currently selected in the `Display  image sections of a cube' dialogue -- this can be dragged across the spectrum to scoll through the time-slices.  You will find the overall shape of the spectrum is common to most bolometers and is determined by the instrument and sky conditions.}
+\caption{\small The \emph{Spectral Plot} window displaying its time-varying
+signal, appears automatically once a bolometer is clicked in the main window.
+The vertical red line indicates the time slice that is currently selected
+in the `Display image sections of a cube' dialogue -- this can be dragged
+across the spectrum to scoll through the time-slices.  You will find the
+overall shape of the spectrum is common to most bolometers and is determined
+by the instrument and sky conditions.}
 \label{fig:gaia_spec}
 \end{figure}
 
-The easiest way to visualise the bolometer time series data (or indeed \emph{any} SCUBA-2 data file) is to use the \starlink\ application \gaia. This is simply initiated with
+The easiest way to visualise the bolometer time series data (or indeed
+\emph{any} SCUBA-2 data file) is to use the \starlink\ application \gaia.
+This is simply initiated with
 
 \begin{myquote}
 \begin{verbatim}
@@ -826,26 +1088,57 @@ The easiest way to visualise the bolometer time series data (or indeed \emph{any
 \end{verbatim}
 \end{myquote}
 
-Loading a file in \gaia\ produces two windows (see Figure~\ref{fig:gaia_main}). The main window shows a map of bolometer values at a given instant in time. The second window can be used to navigate the time axis; by moving the `Index of plane' slider in the `Display image sections of a cube' dialogue, different time slices may be selected, with the main \gaia\ window updating automatically.
+Loading a file in \gaia\ produces two windows (see
+Figure~\ref{fig:gaia_main}). The main window shows a map of bolometer
+values at a given instant in time. The second window can be used to
+navigate the time axis; by moving the `Index of plane' slider in the
+`Display image sections of a cube' dialogue, different time slices may
+be selected, with the main \gaia\ window updating automatically.
 
-For this concatenated data file each bolometer has a large offset relative to its neighbours as well as relative to any smaller time-varying signals, which means that little difference can be seen by moving the slider. However, \gaia\ can produce an automatically scaled plot of the time series for an individual bolometer by simply clicking on it in the main window (see the `Spectral plot'\footnote{This feature  of \gaia\ was originally developed to display spatially-resolved  spectra stored in data cubes, hence the name, `Spectral plot'.}
-window shown in  Figure~\ref{fig:gaia_spec}). Clicking on other bolometers over-writes the plot of the original bolometer in the same window. Looking at the vertical axis range on the left, the mean levels clearly vary significantly from bolometer to bolometer, although the time-varying component of the signals are quite similar.
+For this concatenated data file each bolometer has a large offset
+relative to its neighbours as well as relative to any smaller
+time-varying signals, which means that little difference can be seen
+by moving the slider. However, \gaia\ can produce an automatically
+scaled plot of the time series for an individual bolometer by simply
+clicking on it in the main window (see the `Spectral
+plot'\footnote{This feature of \gaia\ was originally developed to
+display spatially resolved spectra stored in data cubes, hence the
+name, `Spectral plot'.} window shown in Figure~\ref{fig:gaia_spec}).
+Clicking on other bolometers over-writes the plot of the original
+bolometer in the same window. Looking at the vertical axis range on
+the left, the mean levels clearly vary significantly from bolometer to
+bolometer, although the time-varying component of the signals are
+quite similar.
 
 \clearpage
 \subsection{\xlabel{regrid_map}Regridding data into a map}
 \label{sec:regrid}
 
-Any raw time-series data  can be quickly regridded into sky frame coordinates using the \smurf\ \makemap\ task in regrid mode. This involves no processing of the data. The following command produces a map from the raw concatenated data; unlike the iterative mode of \makemap\ described in the next chapter, no configuration file is required.
+Any raw time-series data can be quickly regridded into sky frame
+coordinates using the \smurf\ \makemap\ task in regrid mode. This
+involves no processing of the data. The following command produces a
+map from the raw concatenated data; unlike the iterative mode of
+\makemap\ described in the next chapter, no configuration file is
+required.
 \begin{myquote}
 \begin{verbatim}
 % makemap s8a20120725_00058_con.sdf crl2688_sky method=rebin
 \end{verbatim}
 \end{myquote}
-The \makemap\ task adjusts the bounds of the output image to encompass all of the data. The output map here is called `\texttt{crl2688\_sky.sdf}' and is shown in Figure \ref{fig:regrid}. The pixel scale is left at the default values of 2 arcsec on a side at 450\micron\ and 4 arcsec at 850\micron\ (although this can be changed using the `pixsize=$x$' option on the command-line, where $x$ is in arcsec). 
+The \makemap\ task adjusts the bounds of the output image to encompass
+all of the data. The output map here is called
+`\texttt{crl2688\_sky.sdf}' and is shown in Figure~\ref{fig:regrid}.
+The pixel scale is left at the default values of 2~arcsec on a side at
+450\micron\ and 4~arcsec at 850\micron\ (although this can be changed
+using the `pixsize=$x$' option on the command-line, where $x$ is in
+arcsec).
 
 \subsection{\xlabel{clean}Notes on cleaning your data}
 \label{sec:clean}
-Cleaning raw data is an essential first step towards making a quality final map. The map-maker performs all of these cleaning steps during the pre-processing stage. The commands for manually cleaning your data are given in Appendix \ref{app:clean}.
+Cleaning raw data is an essential first step towards making a quality
+final map. The map-maker performs all of these cleaning steps during
+the pre-processing stage. The commands for manually cleaning your data
+are given in Appendix~\ref{app:clean}.
 
 \begin{figure}[b!]
 \begin{center}
@@ -858,47 +1151,131 @@ Cleaning raw data is an essential first step towards making a quality final map.
 
 \subsection{\xlabel{calcnoise}Checking the array performance}
 \label{sec:calcnoise}
-The on-sky performance of the array can be checked using the \smurf\ command \calcnoise. \calcnoise\ cleans the data then calculates the white noise on the array (between 2 and 10\,Hz by default). If the dark noise scans are given as input, this will track the array sensitivity independent of sky conditions. If you provide the whole observation (as in the example below) then the dark files will be ignored and the on-sky performance of the array is calculated. 
+
+The on-sky performance of the array can be checked using the \smurf\
+command \calcnoise. \calcnoise\ cleans the data then calculates the
+white noise on the array (between 2 and 10\,Hz by default). If the
+dark noise scans are given as input, this will track the array
+sensitivity independent of sky conditions. If you provide the whole
+observation (as in the example below) then the dark files will be
+ignored and the on-sky performance of the array is calculated.
 
 \begin{myquote}
 \begin{verbatim}
 % calcnoise s8a20110720_00030*.sdf s8a_noise method=! power=!
 \end{verbatim}
 \end{myquote}
-It will prompt for a configuration file to describe the cleaning steps -- the default is the supplied \texttt{dimmconfig\_calcnoise.lis}. The output file is created for each sub-array with the NEP map stored in the \texttt{.MORE.SMURF.NEP} extension.
+It will prompt for a configuration file to describe the cleaning
+steps -- the default is the supplied \texttt{dimmconfig\_calcnoise.lis}.
+The output file is created for each sub-array with the NEP map stored
+in the \texttt{.MORE.SMURF.NEP} extension.
 
-Note that is you have a bright source in the field this will contaminate the signal. In this case you should examine the \texttt{NOI} model from the map-maker instead  -- see Section \ref{sec:models} for a description and Section \ref{sec:export} for details on how to access it.
+Note that is you have a bright source in the field this will
+contaminate the signal. In this case you should examine the
+\texttt{NOI} model from the map-maker instead -- see Section
+\ref{sec:models} for a description and Section~\ref{sec:export} for
+details on how to access it.
 \raggedbottom
 
 \clearpage
 \section{\xlabel{dimm}The Dynamic Iterative Map-Maker}
 \label{sec:dimm}
-The Dynamic Iterative Map-Maker (DIMM), hereafter just referred to the the map-make,r is the tool you will use to produce SCUBA-2 maps. It performs all pre-processing steps to clean the data, followed by iteratively solving for multiple signal components and regridding to produce a final science map. 
 
-This section describes the process by which the map-maker reduces data. It is essential reading to gain an understanding of what has happened to produce your reduced image, especially if you wish to modify the default map-maker parameters. Nevertheless, this is manual is intended to present `need to know' information for data reduction. For full details of the map-maker see \textbf{Chapin et al. (2012)}.
+The Dynamic Iterative Map-Maker (DIMM), hereafter just referred to the
+the map-maker is the tool you will use to produce SCUBA-2 maps. It
+performs all pre-processing steps to clean the data, followed by
+iteratively solving for multiple signal components and regridding to
+produce a final science map.
+
+This section describes the process by which the map-maker reduces
+data. It is essential reading to gain an understanding of what has
+happened to produce your reduced image, especially if you wish to
+modify the default map-maker parameters. Nevertheless, this is manual
+is intended to present `need to know' information for data reduction.
+For full details of the map-maker see \textbf{Chapin et al. (2012)}.
 
 \subsection{\xlabel{dimm_theory}The theory}
-The map-maker works by individually modelling the various contributions that make up the signal recorded by each bolometer. It models and then subtracts all the sources of signal in order of decreasing magnitude, ultimately leaving just the astronomical signal plus noise. A list of the modelled components can be seen in Table \ref{tab:mods} and a description found in Section \ref{sec:models}.
 
-The map-maker requires a configuration file to accompany each reduction. This file instructs the map-maker on the pre-processing steps, which components to iteratively model, the parameters to use when doing so, and finally the stopping (or convergence) criteria. There is single `master' configuration file -- \texttt{dimmconfig.lis} -- which contains \emph{all} the available options (though most are commented out by default) and is fully documented. A copy of this file is available in Appendix \ref{app:dimm}. 
+The map-maker works by individually modelling the various
+contributions that make up the signal recorded by each bolometer. It
+models and then subtracts all the sources of signal in order of
+decreasing magnitude, ultimately leaving just the astronomical signal
+plus noise. A list of the modelled components can be seen in Table
+\ref{tab:mods} and a description found in Section~\ref{sec:models}.
 
-Often, the default configuration file will not give optimal results for your particular observation. For this reason, specialised configuration files have been developed which are tailored to different science goals, be they detecting faint galaxies or mapping large molecular clouds. Neevertheless, these specialised models A description of these specialised configuration files can be found in Section \ref{sec:config}.
+The map-maker requires a configuration file to accompany each
+reduction. This file instructs the map-maker on the pre-processing
+steps, which components to iteratively model, the parameters to use
+when doing so, and finally the stopping (or convergence) criteria.
+There is single `master' configuration file -- \texttt{dimmconfig.lis}
+-- which contains \emph{all} the available options (though most are
+commented out by default) and is fully documented. A copy of this file
+is available in Appendix~\ref{app:dimm}.
+
+Often, the default configuration file will not give optimal results
+for your particular observation. For this reason, specialised
+configuration files have been developed which are tailored to
+different science goals, be they detecting faint galaxies or mapping
+large molecular clouds. Neevertheless, these specialised models A
+description of these specialised configuration files can be found in
+Section~\ref{sec:config}.
 \\*\\*
-{\large{\bfseries dimmconfig.lis}}\\*
-Figure \ref{fig:dimm} shows of flow chart of the map making process for \texttt{dimmconfig.lis}. It is divided into two sections: the pre-processing stage where the data are cleaned, then the iterative stage where the different models are subtracted. Table \ref{tab:dimmdef} gives all the variables in \texttt{dimmconfig.lis} again divided into the two main stages. 
+{\large{\texttt{\bf series dimmconfig.lis}}}\\*
 
-The first task the map-maker perform is to down-sample the data. The raw time-series data is re-sampled at a rate that matches the requested pixel size, the equivalent to applying a low-pass filter. Down-sampling saves time and memory usage when running the map-maker. The raw data is then  concatenated and has the flat-field (from the bracketing fast flat scans) applied to calibrate the bolometers. A number of cleaning steps are then run: a polynomial baseline is subtracted from each bolometer; spikes and dc steps are removed; any resulting gaps in the time-series are filled in.
+Figure~\ref{fig:dimm} shows of flow chart of the map making process
+for \texttt{dimmconfig.lis}. It is divided into two sections: the
+pre-processing stage where the data are cleaned, then the iterative
+stage where the different models are subtracted.
+Table~\ref{tab:dimmdef} gives all the variables in
+\texttt{dimmconfig.lis} again divided into the two main stages.
 
-Next comes the iterative stage of the process. First to be modelled and removed are \texttt{COM} and \texttt{GAI} which work together to calculate the average signal template  of all the bolometers, and then fit/remove the templates from each  bolometer. The next model (\texttt{EXT}) applies a multiplicative extinction correction to the data.  Following this, a Fourier transform is applied to the data and the  \texttt{FLT} model is removed in the frequency domain.  \texttt{FLT} applies a high-pass filter to the data, above frequencies that correspond to angular scales of 600\,arcsec and 300\,arcsec at  450\micron\ and 850\micron, respectively.
+The first task the map-maker perform is to down-sample the data. The
+raw time-series data is re-sampled at a rate that matches the
+requested pixel size, the equivalent to applying a low-pass filter.
+Down-sampling saves time and memory usage when running the map-maker.
+The raw data is then concatenated and has the flat-field (from the
+bracketing fast flat scans) applied to calibrate the bolometers. A
+number of cleaning steps are then run: a polynomial baseline is
+subtracted from each bolometer; spikes and dc steps are removed; any
+resulting gaps in the time-series are filled in.
 
-Next comes the \texttt{AST} model, the first step of which involves regridding the data to produce an estimation of the final science map. Since many samples typically contribute to the estimate of the signal in a given pixel, the noise is greatly reduced compared to the time-series data. This map is then projected back into the time series and the  \texttt{AST} model removed. The \texttt{NOI} model then  measures the noise in the residual signals for each bolometer to  establish weights for the data as they are placed into the map in   subsequent iterations.
+Next comes the iterative stage of the process. First to be modelled
+and removed are \texttt{COM} and \texttt{GAI} which work together to
+calculate the average signal template of all the bolometers, and then
+fit/remove the templates from each bolometer. The next model
+(\texttt{EXT}) applies a multiplicative extinction correction to the
+data.  Following this, a Fourier transform is applied to the data and
+the \texttt{FLT} model is removed in the frequency domain.
+\texttt{FLT} applies a high-pass filter to the data, above frequencies
+that correspond to angular scales of 600\,arcsec and 300\,arcsec at
+450\micron\ and 850\micron, respectively.
 
-At this stage convergence is checked against the parameters detailed in the configuration file.  Convergence is achieved either when the requested number of iterations has been completed or when the noise-based convergence criteria  specified in the configuration file is reached. If more iterations are required or (in the latter case) the residual noise has not converged then \texttt{GAI}, \texttt{EXT}, \texttt{FLT} and \texttt{COM} models are all un-done and the time-series is reconstructed. The sequence is then re-run only this time without  \texttt{AST} complicating the model fitting. 
+Next comes the \texttt{AST} model, the first step of which involves
+regridding the data to produce an estimation of the final science map.
+Since many samples typically contribute to the estimate of the signal
+in a given pixel, the noise is greatly reduced compared with the
+time-series data. This map is then projected back into the time series
+and the \texttt{AST} model removed. The \texttt{NOI} model then
+measures the noise in the residual signals for each bolometer to
+establish weights for the data as they are placed into the map in
+subsequent iterations.
+
+At this stage convergence is checked against the parameters detailed
+in the configuration file.  Convergence is achieved either when the
+requested number of iterations has been completed or when the
+noise-based convergence criteria specified in the configuration file
+is reached. If more iterations are required or (in the latter case)
+the residual noise has not converged then \texttt{GAI}, \texttt{EXT},
+\texttt{FLT} and \texttt{COM} models are all un-done and the
+time-series is reconstructed. The sequence is then re-run only this
+time without \texttt{AST} complicating the model fitting.
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.78\linewidth]{flow_dimm_blue.eps}
-\caption{\small A flow chart illustrating the dynamic iterative map-maker. Note that for each iteration the \texttt{AST} model is subtracted from the time-series leaving only the signals to be fitted and removed.}
+\caption{\small A flow chart illustrating the dynamic iterative map-maker.
+Note that for each iteration the \texttt{AST} model is subtracted from
+the time-series leaving only the signals to be fitted and removed.}
 \label{fig:dimm}
 \end{center}
 \end{figure}
@@ -925,13 +1302,19 @@ At this stage convergence is checked against the parameters detailed in the conf
 \hline
 \end{tabular}
 \label{tab:mods}
-\caption{\small Table adopted from Chapin et al. (2012). A fuller explanation of each model is given below.}
+\caption{\small Table adopted from Chapin et al. (2012). A fuller
+explanation of each model is given below.}
 \end{table}
 
 \raggedbottom
 \subsection{\xlabel{models}The individual models}
 \label{sec:models}
-The particular sequence of the models evaluated (and removed) by the map-maker during the iterative stage is indicated by the \texttt{modelorder} parameter in the configuration file. These models are modular however so their order may be changed. The default model order in \texttt{dimmconfig.lis} is given below.
+
+The particular sequence of the models evaluated (and removed) by the
+map-maker during the iterative stage is indicated by the
+\texttt{modelorder} parameter in the configuration file. These models
+are modular however so their order may be changed. The default model
+order in \texttt{dimmconfig.lis} is given below.
 \vspace{-0.1cm}
 \begin{myquote}
 \begin{verbatim}
@@ -939,45 +1322,100 @@ modelorder = (com,gai,ext,flt,ast,noi)
 \end{verbatim}
 \end{myquote}
 \vspace{-0.1cm}
- The only recipe not following this model order is the one tailored for blank field maps which does not include a \texttt{FLT} model in the itertive stage (see Section \ref{sec:config}). Below is a basic description of each model, while more complete descriptions of the models and all the associated caveats can be found in Chapin et al. (2012).
+The only recipe not following this model order is the one tailored for
+blank field maps which does not include a \texttt{FLT} model in the
+itertive stage (see Section~\ref{sec:config}). Below is a basic
+description of each model, while more complete descriptions of the
+models and all the associated caveats can be found in Chapin et al.
+(2012).
 \\*\\*
 \begin{minipage}[t]{0.07\linewidth}
 \texttt{COM}
 \end{minipage}
-\begin{minipage}[t]{0.92\linewidth}The \texttt{COM} model removes the common-mode signal (the signal that is common to all bolometers), the dominant contributor to this signal being the sky noise. It determines this by simply averaging over all bolometers for each time slice.  Bolometers are flagged as bad, (and thus omitted from the final map), if they do not resemble the \texttt{COM} model seen by the majority of the other bolometers. \newline Extended emission on a scale larger than the array footprint on the sky will contribute a signal indistinguishable from a common-mode signal. This puts an upper limit on the spatial scale of astronomical emission that can be recovered. \\*
+\begin{minipage}[t]{0.92\linewidth}The \texttt{COM} model removes the
+common-mode signal (the signal that is common to all bolometers), the
+dominant contributor to this signal being the sky noise. It determines
+this by simply averaging over all bolometers for each time slice.
+Bolometers are flagged as bad, (and thus omitted from the final map), if
+they do not resemble the \texttt{COM} model seen by the majority of the
+other bolometers.
+\newline Extended emission on a scale larger than the array footprint
+on the sky will contribute a signal indistinguishable from a
+common-mode signal. This puts an upper limit on the spatial scale of
+astronomical emission that can be recovered. \\*
 \end{minipage}
 
 \begin{minipage}[t]{0.07\linewidth}
 \texttt{GAI}
 \end{minipage}
-\begin{minipage}[t]{0.92\linewidth}The \texttt{GAI} model works with  \texttt{COM} in removing the common-mode signal. \texttt{GAI} is used to scale the \texttt{COM} model that has been subtracted and is described by a gain and an offset to scale all the bolometers to the same level. This will allow the bolometers to share a common calibration further down the line. \\*
+\begin{minipage}[t]{0.92\linewidth}The \texttt{GAI} model works with
+\texttt{COM} in removing the common-mode signal. \texttt{GAI} is used to
+scale the \texttt{COM} model that has been subtracted and is described by
+a gain and an offset to scale all the bolometers to the same level. This
+will allow the bolometers to share a common calibration further down the
+line. \\*
 \end{minipage}
 \begin{minipage}[t]{0.07\linewidth}
 \texttt{EXT}
 \end{minipage}
-\begin{minipage}[t]{0.92\linewidth}\texttt{EXT} applies the extinction correction. This is a time-varying scaling factor that is derived from the JCMT water vapour radiometer. As it deals with 30 second chucks of data this accounts for varying conditions over a long observation. For more details see Section \ref{sec:cal}. \\*
+\begin{minipage}[t]{0.92\linewidth}\texttt{EXT} applies the extinction
+correction. This is a time-varying scaling factor that is derived from
+the JCMT water vapour radiometer. As it deals with 30-second chunks of
+data this accounts for varying conditions over a long observation. For
+more details see Section~\ref{sec:cal}. \\*
 \end{minipage}
 \begin{minipage}[t]{0.07\linewidth}
 \texttt{FLT}
 \end{minipage}
-\begin{minipage}[t]{0.92\linewidth}The \texttt{GAI} model acts on the FFT of the bolometer data. High-pass (only allows \emph{higher} frequencies to pass) and low-pass (only allows \emph{lower} frequencies to pass) filters can be specified. These cut-off frequencies can either be be specified by the user directly  or as an angular spatial scale (which is subsequently converted into a frequency dependent on the speed at which the telescope is moving). The most important role of this model is to apply a high-pass filter in order to remove the $1/f$ noise. Note that extended emission varies slowly over the array; it therefore appears at low frequencies and complicates the choice of a high-pass filter. A further discussion of this matter is given in Section \ref{sec:bright_ex}\\*
+\begin{minipage}[t]{0.92\linewidth}The \texttt{GAI} model acts on the FFT
+of the bolometer data. High-pass (only allows \emph{higher} frequencies to
+pass) and low-pass (only allows \emph{lower} frequencies to pass) filters
+can be specified. These cut-off frequencies can either be be specified by
+the user directly or as an angular spatial scale (which is subsequently
+converted into a frequency dependent on the speed at which the
+telescope is moving). The most important role of this model is to
+apply a high-pass filter in order to remove the $1/f$ noise. Note that
+extended emission varies slowly over the array; it therefore appears
+at low frequencies and complicates the choice of a high-pass filter. A
+further discussion of this matter is given in
+Section~\ref{sec:bright_ex}\\*
 \end{minipage}
 \begin{minipage}[t]{0.07\linewidth}
 \texttt{AST}
 \end{minipage}
-\begin{minipage}[t]{0.92\linewidth}This step involves both the creation of the \texttt{AST} model and the final science map. Hence, the position of \texttt{AST} in the model order indicates at what stage the astronomical image should be estimated. When the \texttt{AST} model is called, the first step is regridding the raw time-series data, (using nearest-neighbour sampling), to produce an estimate of the final map. Following this, the map is projected back into the time domain and removed (as the \texttt{AST} model).\\*
+\begin{minipage}[t]{0.92\linewidth}This step involves both the creation of the
+\texttt{AST} model and the final science map. Hence, the position of
+\texttt{AST} in the model order indicates at what stage the astronomical
+image should be estimated. When the \texttt{AST} model is called, the first
+step is regridding the raw time-series data, (using nearest-neighbour sampling),
+to produce an estimate of the final map. Following this, the map is
+projected back into the time domain and removed (as the \texttt{AST}
+model).\\*
 \end{minipage}
 \begin{minipage}[t]{0.07\linewidth}
 \texttt{NOI}
 \end{minipage}
-\begin{minipage}[t]{0.92\linewidth}\texttt{NOI} should come last in the model order and calculates the rms noise in each bolometer.   \texttt{NOI} is determined by running \calcnoise\ (see Section \ref{sec:calcnoise}) on the residual signal (the \texttt{RES} model, see Section \ref{sec:export}).  Unlike the other models, \texttt{NOI} is not a subtraction or a correction but if specified, is used (from the second iteration onwards) to weight the bolometers in the map estimate.
+\begin{minipage}[t]{0.92\linewidth}\texttt{NOI} should come last in the model
+order and calculates the rms noise in each bolometer.  \texttt{NOI} is
+determined by running \calcnoise\ (see Section~\ref{sec:calcnoise}) on
+the residual signal (the \texttt{RES} model, see
+Section~\ref{sec:export}).  Unlike the other models, \texttt{NOI} is
+not a subtraction or a correction but if specified, is used (from the
+second iteration onwards) to weight the bolometers in the map
+estimate.
 \end{minipage}
 
 \subsection{\xlabel{convergence}Convergence}
 \label{sec:converge}
-The convergence criteria is crucial to the success of the iterative process. Convergence is achieved when the requested number of iterations has been completed \textbf{OR} when the convergence criteria  specified in the configuration file is reached. 
 
-Specifying the number of iterations in the config file is done via the \texttt{numiter} parameter. In \texttt{dimmconfig.lis}, this is given by:
+The convergence criteria is crucial to the success of the iterative
+process. Convergence is achieved when the requested number of
+iterations has been completed \textbf{OR} when the convergence
+criteria specified in the configuration file is reached.
+
+Specifying the number of iterations in the config file is done via the
+\texttt{numiter} parameter. In \texttt{dimmconfig.lis}, this is given
+by:
 \vspace{-0.1cm}
 \begin{myquote}
 \begin{verbatim}
@@ -985,14 +1423,25 @@ numiter = -5
 \end{verbatim}
 \end{myquote}
 \vspace{-0.2cm}
-A positve value for \texttt{numiter} means that the requested number of iterations will be executed. A negative value, as in the example above,  indicates that no more than this number of iterations should be performed, \emph{but} that it may stop at fewer if convergence (according to the noise criteria below) has been achieved. 
+A positive value for \texttt{numiter} means that the requested number
+of iterations will be executed. A negative value, as in the example
+above, indicates that no more than this number of iterations should be
+performed, \emph{but} that it may stop at fewer if convergence
+(according to the noise criteria below) has been achieved.
 
-Two parameters exist for specifying convergence criteria based on noise in the configuration file:
+Two parameters exist for specifying convergence criteria based on
+noise in the configuration file:
 \\*\\*
 \begin{minipage}[t]{0.1\linewidth}
 \texttt{chitol}
 \end{minipage}
-\begin{minipage}[t]{0.9\linewidth}This test checks the change in the reduced chi-squared, $\chi^2$, with the standard deviations being measured for each of the residual bolometers signals once all the model components have been removed. Note that it is the noise in the time-series data that is being checked. The map has converged once the the change is consecutive values of  $\chi^2$ is less than the parameter \texttt{chitol}.
+\begin{minipage}[t]{0.9\linewidth}This test checks the change in the
+reduced chi-squared, $\chi^2$, with the standard deviations being
+measured for each of the residual bolometers signals once all the
+model components have been removed. Note that it is the noise in the
+time-series data that is being checked. The map has converged once the
+the change is consecutive values of $\chi^2$ is less than the
+parameter \texttt{chitol}.
 \end{minipage}
 \vspace{2mm}
 
@@ -1000,39 +1449,70 @@ Two parameters exist for specifying convergence criteria based on noise in the c
 \texttt{maptol}
 \end{minipage}
 \begin{minipage}[t]{0.9\linewidth}
- This is the average normalised change in the value of map pixels between subsequent iterations. Convergence is reached when the change is less than the parameter \texttt{maptol}. It has units of the noise in the map, thus \texttt{maptol}$=$0.05 means a change of $<$0.05\,$\sigma$. This option has the advantage of directly assessing the noise in the resulting map rather than the time-series. 
+This is the average normalised change in the value of map pixels
+between subsequent iterations. Convergence is reached when the change
+is less than the parameter \texttt{maptol}. It has units of the noise
+in the map, thus \texttt{maptol}$=$0.05 means a change of
+$<$0.05\,$\sigma$. This option has the advantage of directly assessing
+the noise in the resulting map rather than the time-series.
 \vspace{3mm}\\
-Typically the normalized change in pixel values between iterations drops rapidly to begin with and then flattens out, decreasing increasingly slowly. As a result, in some circumstances, the map-maker will fail to stop iterating due to low frequency ripples coming and going between iterations. 
+Typically the normalized change in pixel values between iterations
+drops rapidly to begin with and then flattens out, decreasing
+increasingly slowly. As a result, in some circumstances, the map-maker
+will fail to stop iterating due to low frequency ripples coming and
+going between iterations.
 \vspace{3mm}\\
-\texttt{maptol} is the default for those recipes which use masking -- \texttt{dimmconfig\_bright\_extended.lis} and \texttt{dimmconfig\_bright\_compact.lis} -- where other constraints ensure the map converges. there is limited use in setting \texttt{maptol} to lower than 0.05  as it will dramatically increase the length of time to produce the final map , possibly never converging, but with very marginal improvement.
+\texttt{maptol} is the default for those recipes which use
+masking -- \texttt{dimmconfig\_bright\_extended.lis} and
+\texttt{dimmconfig\_bright\_compact.lis} -- where other constraints
+ensure the map converges. There is limited use in setting
+\texttt{maptol} to lower than 0.05  as it will dramatically increase
+the length of time to produce the final map, possibly never converging,
+yet with marginal improvement.
 \vspace{3mm}\\
 \end{minipage}
-The best way of checking the progress of convergence while running the map-maker is to use the \param{itermaps} option and setting \param{itermaps = 1} (see Section \ref{sec:tweak}).
+The best way of checking the progress of convergence while running the
+map-maker is to use the \param{itermaps} option and setting
+\param{itermaps = 1} (see Section~\ref{sec:tweak}).
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\linewidth]{com} \\
-\includegraphics[width=\linewidth]{flt} \\
-\includegraphics[width=\linewidth]{ast} \\
-\includegraphics[width=\linewidth]{res} \\
-\caption{Time-domain components of the iterative models. These show the solution for the same single bolometer over a 150 second observation of CRL2688. From top to bottom: the COM model containing signal common to all bolometers, the FLT model containing residual low-frequency noise missed by COM, the AST model with the signal showing as a positive spike when this bolometer passes over the source, and the RES model looking (as expected) like white noise. }
+\includegraphics[width=\linewidth]{com.eps} \\
+\includegraphics[width=\linewidth]{flt.eps} \\
+\includegraphics[width=\linewidth]{ast.eps} \\
+\includegraphics[width=\linewidth]{res.eps} \\
+\caption{Time-domain components of the iterative models. These show the
+solution for the same single bolometer over a 150-second observation of
+CRL2688. From top to bottom: the COM model containing signal common to all
+bolometers, the FLT model containing residual low-frequency noise missed
+by COM, the AST model with the signal showing as a positive spike when
+this bolometer passes over the source, and the RES model looking (as
+expected) like white noise. }
 \label{fig:itercomp}
 \end{center}
 \end{figure}
 
 
 
-
-
 \subsection{\xlabel{export}Exporting individual models}
 \label{sec:export}
-By default, the final values of these fitted models are {\em not} written out to files. However, this can be changed by setting \texttt{exportndf} in the configuration file to the list of models that you wish to view. 
 
-Note that you can specify additional components \texttt{RES} and \texttt{QUA} to what may be provided to modelorder if you wish to export the residual model or quality arrays respectively. 
+By default, the final values of these fitted models are {\em not}
+written out to files. However, this can be changed by setting
+\texttt{exportndf} in the configuration file to the list of models
+that you wish to view.
 
-\texttt{RES} is the residual signal remaining after the other models have been removed. By contrast, the \texttt{NOI} model is the noise in \texttt{RES} determined by running \texttt{RES} through \calcnoise\ (see Section \ref{sec:calcnoise}). Exportation of \texttt{RES} is implied if \texttt{NOI} is specified.
-%QUA It tells you which bit of each bolometer time-series has been flagged and the value is the reason for flagging.
-%is specified, as it becomes the variance component of the resulting NDF for \texttt{RES}. \texttt{QUA} will become the quality component of any full 3-dimensional model (i.e. \texttt{RES}, \texttt{AST}, \texttt{FLT}, \texttt{EXT}).
+Note that you can specify additional components \texttt{RES} and
+\texttt{QUA} to what may be provided to modelorder if you wish to
+export the residual model or quality arrays respectively.
+
+\texttt{RES} is the residual signal remaining after the other models
+have been removed. By contrast, the \texttt{NOI} model is the noise in
+\texttt{RES} determined by running \texttt{RES} through \calcnoise\
+(see Section~\ref{sec:calcnoise}). Export of \texttt{RES} is
+implied if \texttt{NOI} is specified.
+%QUA It tells you which bit of each bolometer time-series has been flagged and the value is the reason for flagging. is specified, as it becomes the variance component of the resulting NDF for \texttt{RES}. \texttt{QUA} will become the quality component of any full 3-dimensional model (i.e. \texttt{RES}, \texttt{AST}, \texttt{FLT}, \texttt{EXT}).
+
 \vspace{0cm}
 \begin{myquote}
 \begin{verbatim}
@@ -1040,12 +1520,34 @@ exportndf = (com,gai,ast,flt,res,noi,qua)
 \end{verbatim}
 \end{myquote}
 \vspace{0cm}
-The \texttt{exportndf} parameter will write out the requested models as NDF with names based on the first input file that went into the maps for each sub-array, and the `\texttt{con}' suffix indicating that several
-data files may have been concatenated together. This is then appended by the 3-letter  code for each model (e.g. s8a20120720\_00030\_0003\_con\_com.sdf, s8a20120720\_00030\_0003\_con\_flt.sdf, s8a20120720\_00030\_0003\_con\_res.sdf)\footnote{The filename shows sub-scan 3 of observation 30 since this is the first science file that is encountered (see Section \ref{sec:raw}.}. Note that the variance and quality for the data are stored as the VARIANCE and QUALITY components within the residual file NDF.
+The \texttt{exportndf} parameter will write out the requested models
+as NDF with names based on the first input file that went into the
+maps for each sub-array, and the `\texttt{con}' suffix indicating that
+several data files may have been concatenated together. This is then
+appended by the 3-letter code for each model (such as
+\texttt{s8a20120720\_00030\_0003\_con\_com.sdf},
+\linebreak
+\texttt{s8a20120720\_00030\_0003\_con\_flt.sdf},
+\texttt{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename shows
+sub-scan 3 of Observation 30 since this is the first science file that
+is encountered (see Section~\ref{sec:raw}.}. Note that the variance
+and quality for the data are stored as the VARIANCE and QUALITY
+components within the residual file NDF.
 
-As with the input data, these are all standard \starlink\ NDF files which can be examined using all of the existing \starlink\ tools.
+As with the input data, these are all standard \starlink\ NDF files
+which can be examined using all of the existing \starlink\ tools.
 
-Examples of the time traces for a single bolometer from these output models is shown in Fig.~\ref{fig:itercomp}.  These traces cover a subset of an observation of the secondary calibrator CRL2688. The \texttt{COM} model is removed first, being the dominant source. The  \texttt{FLT} model stores the data removed by the high-pass filter. In the \texttt{AST} model, CRL2688 is clearly seen as positive spikes which appear when the bolometer passes over the source. Finally, the residual signal stored in \texttt{RES} is flat, indicating that most of the signal has been successfully accounted for by the other model components.
+Examples of the time traces for a single bolometer from these output
+models is shown in Figure~\ref{fig:itercomp}.  These traces cover a
+subset of an observation of the secondary calibrator CRL2688. The
+\texttt{COM} model is removed first, being the dominant source. The
+\texttt{FLT} model stores the data removed by the high-pass filter. In
+the \texttt{AST} model, CRL2688 is clearly seen as positive spikes
+which appear when the bolometer passes over the source. Finally, the
+residual signal stored in \texttt{RES} is flat, indicating that most
+of the signal has been successfully accounted for by the other model
+components.
+
 
 \renewcommand*\arraystretch{0.85}
 \begin{table*}
@@ -1135,7 +1637,10 @@ ast.mapspike     &   10 & Throw away spikes in the AST map greater than
 \hline
 \end{tabular}
 \label{tab:dimmdef}
-\caption{\small The active variables from \texttt{dimmconfig.lis} and their default values. For a fuller description of each, as well as other options, see the comments in the file itself. This can be found in Appendix \ref{app:dimm}.}
+\caption{\small The active variables from \texttt{dimmconfig.lis} and their
+default values. For a fuller description of each, as well as other
+options, see the comments in the file itself. This can be found in
+Appendix~\ref{app:dimm}.}
 \end{footnotesize}
 \end{center}
 \end{table*}
@@ -1145,22 +1650,58 @@ ast.mapspike     &   10 & Throw away spikes in the AST map greater than
 \subsection{\xlabel{config}Specialised configuration files}
 \label{sec:config}
 
-The default configuration file \texttt{dimmconfig.lis} is intended to provide a reasonably good map for all types of observational strategies and goals and compromises have been made to reach that balance.
+The default configuration file \texttt{dimmconfig.lis} is intended to
+provide a reasonably good map for all types of observational
+strategies and goals and compromises have been made to reach that
+balance.
 
-Whilst \texttt{dimmconfig.lis} is always a good recipe to start with for your first run through of make-map you will want to follow this up with a specialised recipe that will match your observation. A number of these specialised configuration files are supplied with \smurf\ and can be found in \texttt{\$STARLINK\_DIR/share/smurf/} with filenames of the form \texttt{dimmconfig*.lis}. We suggest that you initially run the map-maker with the default configuration file before trying the configuration file relevant to your project.
+Whilst \texttt{dimmconfig.lis} is always a good recipe to start with
+for your first run through of make-map you will want to follow this up
+with a specialised recipe that will match your observation. A number
+of these specialised configuration files are supplied with \smurf\ and
+can be found in \texttt{\$STARLINK\_DIR/share/smurf/} with filenames
+of the form \texttt{dimmconfig*.lis}. We suggest that you initially
+run the map-maker with the default configuration file before trying
+the configuration file relevant to your project.
 \\*\\*
-The specialised files are all based on \texttt{dimmconfig.lis}, and any parameters in these files simply override the relevant default values.  Table \ref{tab:dimmdef} list all the active variables contained in \texttt{dimmconfig.lis} and gives their default values and a brief description. For comprehensive documentation on \emph{all} available variables see the  \texttt{dimmconfig.lis} file itself in  Appendix \ref{app:dimm}.
+The specialised files are all based on \texttt{dimmconfig.lis}, and
+any parameters in these files simply override the relevant default
+values.  Table~\ref{tab:dimmdef} list all the active variables
+contained in \texttt{dimmconfig.lis} and gives their default values
+and a brief description. For comprehensive documentation on \emph{all}
+available variables see the \texttt{dimmconfig.lis} file itself in
+Appendix~\ref{app:dimm}.
 \\*\\*
-Below is a description of each of the specialised configuration files available; the table following each desfription lists the parameters set for each drecipe. A verbatim copy of these files can be found in Appendix \ref{app:special}.
+Below is a description of each of the specialised configuration files
+available; the table following each desfription lists the parameters
+set for each drecipe. A verbatim copy of these files can be found in
+Appendix~\ref{app:special}.
 
 \subsubsection{dimmconfig\_blank\_field.lis}
- This configuration is tuned for blank field surveys for which the goal is to detect low-S/N point sources. Iteratively applying a high-pass filter (\texttt{FLT}) can result in convergence problems when there  is little or no signal in the map; instead, a single, harsher high-pass filter is  applied as a pre-processing step (corresponding to 200\,arcsec  scales at both 450\micron\ and 850\micron). There are also more  conservative cuts to remove noisy/problematic bolometers. Only 4 (positive) iterations are requested as there is no signal to confuse to models. 
 
-One of the options available in the map-maker allows the fitting of a \texttt{COM} model to each sub-array separately. This option is activated by setting  \texttt{com.perarray}=1. The model fit is improved but with the loss of any structure on scales larger than a single sub-array -- not an issue for blank fields.
+This configuration is tuned for blank field surveys for which the goal
+is to detect low-S/N point sources. Iteratively applying a high-pass
+filter (\texttt{FLT}) can result in convergence problems when there is
+little or no signal in the map; instead, a single, harsher high-pass
+filter is applied as a pre-processing step (corresponding to
+200-arcsec scales at both 450\micron\ and 850\micron). There are also
+more conservative cuts to remove noisy/problematic bolometers. Only 4
+(positive) iterations are requested as there is no signal to confuse
+to models.
 
-Figure \ref{fig:bfcompare} shows the sharp contrast in the output map between reducing data with the default configuration file and using \texttt{dimmconfig\_blank\_field.lis}.
+One of the options available in the map-maker allows the fitting of a
+\texttt{COM} model to each sub-array separately. This option is
+activated by setting \texttt{com.perarray}=1. The model fit is
+improved but with the loss of any structure on scales larger than a
+single sub-array -- not an issue for blank fields.
 
-Normally a blank-field map would subsequently have a matched filter applied to it to aid source detection (see Section~\ref{sec:mf}), however this is not applied by the map-maker.
+Figure~\ref{fig:bfcompare} shows the sharp contrast in the output map
+between reducing data with the default configuration file and using
+\texttt{dimmconfig\_blank\_field.lis}.
+
+Normally blank-field map would subsequently have a matched filter
+applied to it to aid source detection (see Section~\ref{sec:mf}),
+however this is not applied by the map-maker.
 \vspace{0.3cm}
 \renewcommand*\arraystretch{0.8}
 \begin{table}[h!]
@@ -1178,22 +1719,42 @@ Normally a blank-field map would subsequently have a matched filter applied to i
 
 \begin{figure}[b!]
 \begin{center}
-\includegraphics[width=0.47\linewidth]{cosmo1-def}
+\includegraphics[width=0.47\linewidth]{cosmo1-def.eps}
 \hspace{0.3cm}
-\includegraphics[width=0.47\linewidth]{cosmo1-mf} 
-\caption{\small Maps of a deep cosmology field reduced with  \textbf{(left)} \texttt{dimmconfig.lis} and \textbf{(right)} \texttt{dimmconfig\_blank\_field.lis}.}
+\includegraphics[width=0.47\linewidth]{cosmo1-mf.eps}
+\caption{\small Maps of a deep cosmology field reduced with \textbf{(left)}
+\texttt{dimmconfig.lis} and \textbf{(right)} \texttt{dimmconfig\_blank\_field.lis}.}
 \label{fig:bfcompare}
 \end{center}
 \end{figure}
 
 \subsubsection{dimmconfig\_bright\_compact.lis}
-This  configuration is aimed at reducing maps of bright, compact sources  that are isolated at the centre of the map. It references  \texttt{dimmconfig\_bright.lis} (which in turn references \texttt{dimmconfig.lis}),  and thus the parameters from both `bright' recipes override the default values in \texttt{dimmconfig.lis}. 
 
-The addition of  \texttt{ast.zero\_circle} and \texttt{ast.zero\_notlast} parameters  are used to constrain the map to zero beyond a radius of 1\,arcmin  for all but the final iteration. This strategy helps with map  convergence significantly, and can provide good maps of bright  sources, even in cases where scan patterns failed and the telescope  degenerated into scanning back-and-forth along a single position  angle on the sky. 
+This configuration is aimed at reducing maps of bright, compact
+sources that are isolated at the centre of the map. It references
+\texttt{dimmconfig\_bright.lis} (which in turn references
+\texttt{dimmconfig.lis}), and thus the parameters from both `bright'
+recipes override the default values in \texttt{dimmconfig.lis}.
 
-\texttt{com.perarray} is set to 1 indicating that a \texttt{COM} model should be fit separately for each sub-array. This is not advised for extended sources as signal on scales larger than a single sub-array is lost but is fine for a compact central source. Likewise, the filtering is tighter. The S/N threshold for DC steps is relaxed from 25 in the default file to 100 to avoid problems associated with bright sources.
+The addition of \texttt{ast.zero\_circle} and
+\texttt{ast.zero\_notlast} parameters are used to constrain the map to
+zero beyond a radius of 1\,arcmin for all but the final iteration.
+This strategy helps with map convergence significantly, and can
+provide good maps of bright sources, even in cases where scan patterns
+failed and the telescope degenerated into scanning back-and-forth
+along a single position angle on the sky.
 
-This is the recipe that is commonly used to reduce calibraton observations with a pixel size set to 1$''$ -- see Section \ref{sec:fcf} for details on determining the FCFs from calibrators.
+\texttt{com.perarray} is set to 1 indicating that a \texttt{COM} model
+should be fit separately for each sub-array. This is not advised for
+extended sources as signal on scales larger than a single sub-array is
+lost but is fine for a compact central source. Likewise, the filtering
+is tighter. The S/N threshold for DC steps is relaxed from 25 in the
+default file to 100 to avoid problems associated with bright sources.
+
+This is the recipe that is commonly used to reduce calibraton
+observations with a pixel size set to 1\arcsec\ -- see
+Section~\ref{sec:fcf} for details on determining the FCFs from
+calibrators.
 \vspace{0.3cm}
 \renewcommand*\arraystretch{0.8}
 \begin{table}[h!]
@@ -1218,12 +1779,33 @@ This is the recipe that is commonly used to reduce calibraton observations with 
 \end{table}
 
 
-\subsubsection{dimmconfig\_bright\_extended.lis} 
-This  configuration is for reducing maps of bright extended sources, and  is also derived from \texttt{dimmconfig\_bright.lis}. The convergence criteria for this configuration uses \texttt{maptol} set to 5\% (rather than \texttt{chitol}). The S/N threshold for DC steps is relaxed from 25 in the default file to 100 to avoid problems associated with bright sources. Here  \texttt{ast.zero\_snr} is used to constrain the \texttt{AST} model to zero wherever  the S/N is lower than 5$\sigma$.  Everywhere the signal is below this threshold, the map is set to zero for all but the final iteration. \texttt{numiter} has been raised to -40, as more iterations are required to maximise the sensitivty to large dynamic signal ranges in the map.
+\subsubsection{dimmconfig\_bright\_extended.lis}
+This configuration is for reducing maps of bright extended sources,
+and is also derived from \texttt{dimmconfig\_bright.lis}. The
+convergence criteria for this configuration uses \texttt{maptol} set
+to 5\% (rather than \texttt{chitol}). The S/N threshold for DC steps
+is relaxed from 25 in the default file to 100 to avoid problems
+associated with bright sources. Here \texttt{ast.zero\_snr} is used to
+constrain the \texttt{AST} model to zero wherever the S/N is lower
+than 5$\sigma$.  Everywhere the signal is below this threshold, the
+map is set to zero for all but the final iteration. \texttt{numiter}
+has been raised to -40, as more iterations are required to maximise
+the sensitivty to large dynamic signal ranges in the map.
 
-\texttt{dimmconfig\_bright\_extended.lis} does not do as complete a job as the other specialised recipes. This is because recovering both faint extended structure and bright sources in the same field poses an extra challenge. After initially making your map using \texttt{dimmconfig\_bright\_extended.lis} we recommend you generate a mask from the emission and re-run the map-maker with this external mask applied. This method is superior to simply forcing to zero everything below 5$\sigma$. Details on how to do this are outlined in Section \ref{sec:maskbe}.
+\texttt{dimmconfig\_bright\_extended.lis} does not do as complete a
+job as the other specialised recipes. This is because recovering both
+faint extended structure and bright sources in the same field poses an
+extra challenge. After initially making your map using
+\texttt{dimmconfig\_bright\_extended.lis} we recommend you generate a
+mask from the emission and re-run the map-maker with this external
+mask applied. This method is superior to simply forcing to zero
+everything below 5$\sigma$. Details on how to do this are outlined in
+Section~\ref{sec:maskbe}.
 
-Figure \ref{fig:becompare} shows a comparison between maps reduced with the default configuration file and using \texttt{dimmconfig\_bright\_extended.lis}; the most noticeable difference is the improvment in the bowling around strong sources.
+Figure~\ref{fig:becompare} shows a comparison between maps reduced
+with the default configuration file and using
+\texttt{dimmconfig\_bright\_extended.lis}; the most noticeable
+difference is the improvment in the bowling around strong sources.
 
 \renewcommand*\arraystretch{0.8}
 \begin{table}[t!]
@@ -1248,10 +1830,11 @@ Figure \ref{fig:becompare} shows a comparison between maps reduced with the defa
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[width=0.47\linewidth]{gal_def}
+\includegraphics[width=0.47\linewidth]{gal_def.eps}
 \hspace{0.3cm}
-\includegraphics[width=0.47\linewidth]{gal_brex} 
-\caption{\small A region towards the galactic centre reduced with  \textbf{(left)} \texttt{dimmconfig.lis} and \textbf{(right)} \texttt{dimmconfig\_bright\_extended.lis}.}
+\includegraphics[width=0.47\linewidth]{gal_brex.eps}
+\caption{\small A region towards the galactic centre reduced with \textbf{(left)}
+\texttt{dimmconfig.lis} and \textbf{(right)} \texttt{dimmconfig\_bright\_extended.lis}.}
 \label{fig:becompare}
 \end{center}
 \end{figure}
@@ -1262,7 +1845,12 @@ Figure \ref{fig:becompare} shows a comparison between maps reduced with the defa
 
 \section{\xlabel{maps}Reducing Your Data With the Map-Maker}
 \label{sec:maps}
-This chapter describes how to run the map-maker, what to look out for during processing, and finally how to calibrate your science map from pW to Jy and check the noise. Below is a summary of the sequence of commands to reduce a single map, each of which will be elaborated on in this chapter.
+
+This chapter describes how to run the map-maker, what to look out for
+during processing, and finally how to calibrate your science map from
+pW to Jy and check the noise. Below is a summary of the sequence of
+commands to reduce a single map, each of which will be elaborated on
+in this chapter.
 \vspace{-1mm}
 \begin{myquote}
 \begin{verbatim}
@@ -1278,13 +1866,33 @@ This chapter describes how to run the map-maker, what to look out for during pro
 
 \subsection{\xlabel{running_dimm}Running the map-maker}
 
-The DIMM is enabled using the \texttt{method=iterate} option for the \makemap\ task. In the following example we produce a map of CRL2688, one of SCUBA-2's secondary calibrators. As discussed in Section \ref{sec:dimm}, all of the settings for the map-maker are stored in configuration files.  In this example we will just use the default configuration file,\texttt{dimmconfig.lis}. For an overview of the specialised configuration files available see Section~\ref{sec:config}. 
+The DIMM is enabled using the \texttt{method=iterate} option for the
+\makemap\ task. In the following example we produce a map of CRL2688,
+one of SCUBA-2's secondary calibrators. As discussed in
+Section~\ref{sec:dimm}, all of the settings for the map-maker are
+stored in configuration files.  In this example we will just use the
+default configuration file,\texttt{dimmconfig.lis}. For an overview of
+the specialised configuration files available see
+Section~\ref{sec:config}.
 
-As an input to the map-maker, any of the standard \smurf\ configuration files can be called directly from the \starlink\ path with \texttt{\^\,\$STARLINK\_DIR/share/smurf/dimmconfig*.lis}. Alternatively, a local copy can be made and called with \texttt{\^\,dimmconfig*.lis}. Details of how to edit any of the parameters can be found in Section \ref{sec:tweak}. 
+As an input to the map-maker, any of the standard \smurf\
+configuration files can be called directly from the \starlink\ path
+with \texttt{\^\,\$STARLINK\_DIR/share/smurf/dimmconfig*.lis}.
+Alternatively, a local copy can be made and called with
+\texttt{\^\,dimmconfig*.lis}. Details of how to edit any of the
+parameters can be found in Section~\ref{sec:tweak}.
 
-Note that an up-caret (\,\^\,) is required any time you are reading in a file in \starlink. For the map-maker this includes the configuration file and reading in a list of files as the input (e.g. \texttt{in=\^\,rawfilelist.txt}).
-\\*\\*
-The example uses \textbf{the default pixel sizes which are 450$\mu$m = 2$''$ and 850$\mu$m = 4$''$}. This can be overwritten by adding \texttt{pixsize=}$x$ to the command string\footnote{The default sizes are defined as one  quarter of the Airy disk rounded up to the nearest half arcsecond.}, where $x$ is your desired pixel size in arcseconds. We advise that you do not increase the pixel size at this stage as it will compromise model fitting -- instead regrid your map as a post-processing step.
+Note that an up-caret (\,\^\,) is required any time you are reading in
+a file in \starlink. For the map-maker this includes the configuration
+file and reading in a list of files as the input (e.g.
+\texttt{in=\^\,rawfilelist.txt}). \\*\\* The example uses \textbf{the
+default pixel sizes which are 450$\mu$m = 2\arcsec\ and 850$\mu$m =
+4\arcsec}. This can be overwritten by adding \texttt{pixsize=}$x$ to the
+command string\footnote{The default sizes are defined as one quarter
+of the Airy disk rounded up to the nearest half arcsecond.}, where $x$
+is your desired pixel size in arcseconds. We advise that you do not
+increase the pixel size at this stage as it will compromise model
+fitting -- instead regrid your map as a post-processing step.
 
 %\vspace{-3mm}
 %\begin{center}
@@ -1401,22 +2009,34 @@ Total samples available from all chunks: 18273302 (3067.53 bolos)
 \end{center}
 \subsection{\xlabel{look_for}What to look out for}
 \flushbottom
-Once the map-maker has completed you can open your output map using \gaia -- see Figure \ref{fig:itermap}. The excerpt above shows the output written to the terminal as you run the map-maker. There are a number of clues in this output that indicate the status of the reduction.
+Once the map-maker has completed you can open your output map using
+\gaia -- see Figure~\ref{fig:itermap}. The excerpt above shows the
+output written to the terminal as you run the map-maker. There are a
+number of clues in this output that indicate the status of the
+reduction.
 %\raggedbottom
 
 
-\textbf{The number of input files}\\*
-The first to note is the number of input files; it is worth checking this matches your expected number. Also summarised are the source name, UT date and scan number. 
+\textbf{The number of input files}\\* The first to note is the number
+of input files; it is worth checking this matches your expected
+number. Also summarised are the source name, UT date and scan number.
 \\*\\*
 \textbf{Map dimensions}\\*
-Next the basic dimensions of the data being processed are listed near the start of the first iteration. The example above has 4$''$ pixels -- the default at 850$\mu$m.
+Next the basic dimensions of the data being processed are listed near
+the start of the first iteration. The example above has 4\arcsec\ pixels
+-- the default at 850$\mu$m.
 \\*\\*
 \textbf{Chunking}\\*
-The map maker then determines if the raw data should be split and processed in more than one chunk. In this map the data is reduced in one continuous piece: \param{Continuous chunk 1 / 1}. Chunking is where the map-maker processes sub sections of the time-series data independently and should be avoided if possible -- see the text box on page \pageref{page:text}.
+The map-maker then determines if the raw data should be split and
+processed in more than one chunk. In this map the data is reduced in
+one continuous piece: \param{Continuous chunk 1 / 1}. Chunking is
+where the map-maker processes sub sections of the time-series data
+independently and should be avoided if possible -- see the text box on
+Page~\pageref{page:text}.
 \\*
 \begin{figure}[t!]
 \begin{center}
-\includegraphics[width=0.7\linewidth]{crl2688}
+\includegraphics[width=0.7\linewidth]{crl2688.eps}
 \caption{Map of CRL2688 produced with the \smurf\ task \makemap\ using
   the iterative algorithm with default parameters.}
 \label{fig:itermap}
@@ -1424,13 +2044,32 @@ The map maker then determines if the raw data should be split and processed in m
 \end{figure}
 
 \textbf{Quality statistics}\\*
-Next come the QUALITY flagging statistics. At the beginning, the main purpose is to indicate how many bolometers are being used. In the example above you can see that from a total of 5120 bolometers, 1842 were turned off during data acquisition (\texttt{BADDA}). In addition, 136 bolometers exceeded the acceptable noise threshold (\texttt{NOISE}), while tiny fractions of the data  were flagged because the telescope was moving too slowly (\texttt{STAT}) or the sample are adjacent to a step that was removed  (\texttt{DCJUMP}).
+Next come the QUALITY flagging statistics. At the beginning, the main
+purpose is to indicate how many bolometers are being used. In the
+example above you can see that from a total of 5120 bolometers, 1842
+were turned off during data acquisition (\texttt{BADDA}). In addition,
+136 bolometers exceeded the acceptable noise threshold
+(\texttt{NOISE}), while tiny fractions of the data were flagged
+because the telescope was moving too slowly (\texttt{STAT}) or the
+sample are adjacent to a step that was removed (\texttt{DCJUMP}).
 
-The total number of bad bolometers (\texttt{BADBOL}) is 1984. Accounting for these, and the small numbers of additionally flagged samples, 3128.22 effective bolometers are available after initial cleaning\footnote{The fractional number is due to time-slices being removed during cleaning. The number of bolometers is then reconstructed from the number of remaining time-slices}.
+The total number of bad bolometers (\texttt{BADBOL}) is 1984.
+Accounting for these, and the small numbers of additionally flagged
+samples, 3128.22 effective bolometers are available after initial
+cleaning\footnote{The fractional number is due to time-slices being
+removed during cleaning. The number of bolometers is then
+reconstructed from the number of remaining time-slices}.
 
-After each subsequent iteration a new `Quality' report is produced, indicating how the flags have changed. An important flag that appears in the `Quality' report following the first iteration is \texttt{COM}: the DIMM rejects bolometers (or portions of their time series) if they differ significantly from the common-mode (average) of the remaining bolometers. 
+After each subsequent iteration a new `Quality' report is produced,
+indicating how the flags have changed. An important flag that appears
+in the `Quality' report following the first iteration is \texttt{COM}:
+the DIMM rejects bolometers (or portions of their time series) if they
+differ significantly from the common-mode (average) of the remaining
+bolometers.
 
-Note that compared to the initial report, the total number of samples with good `Quality' (\texttt{Total samples available for map}) has dropped from 18634826 to 18273302 (about a 2 per 
+Note that compared with the initial report, the total number of samples
+with good `Quality' (\texttt{Total samples available for map}) has
+dropped from 18634826 to 18273302 (about a 2 per
 \begin{center}
 \begin{fmpage}{0.92\linewidth}
 \label{page:text}
@@ -1440,46 +2079,87 @@ Note that compared to the initial report, the total number of samples with good 
 \begin{minipage}[t]{0.93\linewidth}
 \vspace{0.2cm}
 \textbf{Data Chunking}\\*
-Chunking occurs when there is insufficient computer memory available for the map-maker or when there is a gap in the time-series data (e.g. from a missing sub-scan). In these cases, the map-maker divides up the time-series data and reduces each sub-portion independently, before re-combining all the outputs at a later stage. Ideally you want your data reduced in a single chunk, however this can be unfeasible for large maps.
+Chunking occurs when there is insufficient computer memory available
+for the map-maker or when there is a gap in the time-series data (e.g.
+from a missing sub-scan). In these cases, the map-maker divides up the
+time-series data and reduces each sub-portion independently, before
+re-combining all the outputs at a later stage. Ideally you want your
+data reduced in a single chunk, however this can be unfeasible for
+large maps.
 \vspace{0.2cm}\\
-The more data the map-maker processes at once, the better chance it has of determining the difference between sky signal and background noise. In \textsc{daisy} mode chunking is not a cause for concern as the entire map area is covered many times in the space of a single observation. Although, you would not want to have data split on time scales $<$5mins due to the effects of sky rotation.
+The more data the map-maker processes at once, the better chance it
+has of determining the difference between sky signal and background
+noise. In \textsc{daisy} mode chunking is not a cause for concern as
+the entire map area is covered many times in the space of a single
+observation. Although, you would not want to have data split on time
+scales $<$5mins due to the effects of sky rotation.
 \vspace{0.2cm}\\
-In \textsc{pong} observations chunking is a bigger concern, with the maximum number of chunks that can be tolerated dependent on the number of map rotations. A 40 minute \textsc{pong} map with 8 rotations that is chunked into three or four chunks, although not ideal, will mean that each point is still covered by two or three passes. Fewer passes than this and the map-maker become less effective.
- \vspace{0.2cm}
+In \textsc{pong} observations chunking is a bigger concern, with the
+maximum number of chunks that can be tolerated dependent on the number
+of map rotations. A 40-minute \textsc{pong} map with 8 rotations that
+is chunked into three or four chunks, although not ideal, will mean
+that each point is still covered by two or three passes. Fewer passes
+than this and the map-maker become less effective.
+\vspace{0.2cm}
 \end{minipage}
 \begin{minipage}[t]{0.025\linewidth}
 \hspace{0.1cm}
 \end{minipage}
 \end{fmpage}
 \end{center}
-cent decrease) as additional samples were flagged in each iteration. Be aware thatsome large reductions may take many iterations to reach convergence and you may find significantly fewer bolometers remaining resulting in higher noise than expected.
+cent decrease) as additional samples were flagged in each iteration.
+Be aware that some large reductions may take many iterations to reach
+convergence and you may find significantly fewer bolometers remaining
+resulting in higher noise than expected.
 \\*\\*
 \textbf{Convergence}\\*
-What about the convergence parameter? As discussed in Section \ref{sec:converge} there are two noise based convergence criteria that can be set --  \texttt{maptol} and \texttt{chitol}. Both are reported during processing but only one will be used to determine if convergence has been achieved. 
+What about the convergence parameter? As discussed in
+Section~\ref{sec:converge} there are two noise based convergence
+criteria that can be set -- \texttt{maptol} and \texttt{chitol}. Both
+are reported during processing but only one will be used to determine
+if convergence has been achieved.
 
-Convergence based on \texttt{maptol} can be checked from the line reporting\\*
-\hspace{5mm}\texttt{smf\_iteratemap: *** NORMALIZED MAP CHANGE: 0.10559 (mean) 2.81081 (max)}.\\
-In the line above the number to look out for is the mean value. This will have to drop below your required \texttt{maptol} for successful convergence.
+Convergence based on \texttt{maptol} can be checked from the line
+reporting\\* \hspace{5mm}\texttt{smf\_iteratemap: *** NORMALIZED MAP
+CHANGE: 0.10559 (mean) 2.81081 (max)}.\\ In the line above the number
+to look out for is the mean value. This will have to drop below your
+required \texttt{maptol} for successful convergence.
 
-\texttt{chitol} convergence  can be monitored by the \texttt{CHISQUARED} value -- the RMS of the residual (time series with the various model components removed) for all of the samples with good `Quality', normalised by the measured white noise levels. This can be seen in the line below.\\
+\texttt{chitol} convergence can be monitored by the
+\texttt{CHISQUARED} value -- the RMS of the residual (time series with
+the various model components removed) for all of the samples with good
+`Quality', normalised by the measured white noise levels. This can be
+seen in the line below.\\
 \hspace{0.5cm}\texttt{smf\_iteratemap: *** CHISQUARED = 0.872127100064999}
 
 
-The default configuration file used in this example executes a maximum of 5 iterations, but stops sooner if the change in \texttt{CHISQUARED} is less then 0.001 (i.e. \texttt{numiter=-5}). In this example it stops after 5 iterations: \\
-\texttt{smf\_iteratemap: *** Completed in 5 iterations}.
+The default configuration file used in this example executes a maximum
+of 5 iterations, but stops sooner if the change in \texttt{CHISQUARED}
+is less then 0.001 (i.e. \texttt{numiter=-5}). In this example it
+stops after 5 iterations: \\ \texttt{smf\_iteratemap: *** Completed in
+5 iterations}.
 
 
-\textbf{Note: you can interrupt the processing at any stage with a single Ctrl-C. The map-maker will complete the iteration then write out a final science map. If you enter Ctrl-C a second time it will kill the process immediately.}
+\textbf{Note: you can interrupt the processing at any stage with a
+single Ctrl-C. The map-maker will complete the iteration then write
+out a final science map. If you enter Ctrl-C a second time it will
+kill the process immediately.}
 
 
 \subsection{\xlabel{apply_fcf}Applying the FCF and extracting fluxes}
 \label{sec:cmult}
-Applying the flux conversion factor (FCF) is required to scale your data from units of pW to Janskys. \textbf{The FCF to be applied depends on the reduction date for your data. For data that have been reduced \emph{prior} to July 2012 you should see Appendix \ref{app:fcfs} for alternative FCFs.} For reduction dates from July 2012 onwards the FCF factors are:
+
+Applying the flux conversion factor (FCF) is required to scale your
+data from units of pW to Janskys. \textbf{The FCF to be applied
+depends on the reduction date for your data. For data that have been
+reduced \emph{prior} to July 2012 you should see
+Appendix~\ref{app:fcfs} for alternative FCFs.} For reduction dates
+from July 2012 onwards the FCF factors are:
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|}
  \hline
- \multicolumn{2}{|c|}{FCF$_{arcsec}$ (Jy/pW/arcsec$^2$) }  & 
+ \multicolumn{2}{|c|}{FCF$_{arcsec}$ (Jy/pW/arcsec$^2$) }  &
 \multicolumn{2}{c|}{FCF$_{beam}$ (Jy/pW/beam)}      \\
 \hline
 \hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm} & 850\,$\mu$m & \hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm}& 850\,$\mu$m \\
@@ -1489,11 +2169,25 @@ Applying the flux conversion factor (FCF) is required to scale your data from un
 \end{tabular}
 \end{table}
 
-If you want to read off the \textbf{peak flux} from your map, you should apply the \fcfb\ (also known as the peak FCF). When you open your map in \gaia\ the value of the brightest pixel will be the peak flux of your source. applying \fcfb\ will result in a map with units of Jy/beam. For point-like or compact sources smaller than the beam (with a Gaussian profile), this peak value will be the flux density of your source. Note that the pipeline (see Section \ref{sec:pipe}) reports FCFs in units of mJy/beam.
+If you want to read off the \textbf{peak flux} from your map, you
+should apply the \fcfb\ (also known as the peak FCF). When you open
+your map in \gaia\ the value of the brightest pixel will be the peak
+flux of your source. applying \fcfb\ will result in a map with units
+of Jy/beam. For point-like or compact sources smaller than the beam
+(with a Gaussian profile), this peak value will be the flux density of
+your source. Note that the pipeline (see Section~\ref{sec:pipe})
+reports FCFs in units of mJy/beam.
 
-To get the flux density of extended sources with \textbf{aperture photometry} you should apply the \fcfa.  You can then sum the emission in an aperture. \fcfa\ was determined using a 60$''$ diameter aperture. If your aperture differs from this you should scale your flux accordingly -- the scaling factor can be read off the curve of growth (see Appendix \ref{app:cog}). This graph gives the ratio of aperture flux to total flux for a range of aperture diameters.
+To get the flux density of extended sources with \textbf{aperture
+photometry} you should apply the \fcfa.  You can then sum the emission
+in an aperture. \fcfa\ was determined using a 60\arcsec\ diameter
+aperture. If your aperture differs from this you should scale your
+flux accordingly -- the scaling factor can be read off the curve of
+growth (see Appendix~\ref{app:cog}). This graph gives the ratio of
+aperture flux to total flux for a range of aperture diameters.
 
-Multiplying your data file by the FCF can be done using the \Kappa\ command \cmult.
+Multiplying your data file by the FCF can be done using the \Kappa\
+command \cmult.
 \begin{myquote}
 \begin{verbatim}
 % cmult in=850map.sdf out=850map_cal scalar=537
@@ -1503,17 +2197,27 @@ Multiplying your data file by the FCF can be done using the \Kappa\ command \cmu
 
 \subsection{\xlabel{coadd}Co-adding multiple maps}
 \label{sec:coadd}
-You may have multiple maps of the same source which you would like to co-add. \picard\ has a command for this too -- \param{MOSAIC\_JCMT\_IMAGES}. 
+
+You may have multiple maps of the same source which you would like to
+co-add. \picard\ has a command for this too --
+\param{MOSAIC\_JCMT\_IMAGES}.
 \begin{myquote}
 \begin{verbatim}
 % picard -recpars mypar.lis MOSAIC_JCMT_IMAGES 850map*_cal_crop.sdf
 \end{verbatim}
 \end{myquote}
-This creates a single output file based on the name of the last file in the list, and with a suffix `\_mos'.
+This creates a single output file based on the name of the last file
+in the list, and with a suffix \texttt{\_mos}.
 
-There are a number of options associated with \param{MOSAIC\_JCMT\_IMAGES} (see the \picard\ manual for a full description). However, the main one is choosing between \wcsmosaic\ (default) and the \ccdpack\ option \makemos\ for the combination method. For more information on \makemos\ and advice on choosing the best method see SUN/139.
+There are a number of options associated with
+\param{MOSAIC\_JCMT\_IMAGES} (see the \picard\ manual for a full
+description). However, the main one is choosing between \wcsmosaic\
+(default) and the \ccdpack\ option \makemos\ for the combination
+method. For more information on \makemos\ and advice on choosing the
+best method see SUN/139.
 
-An example parameter file like the one below chooses \makemos\ using a 3\,$\sigma$ clipping threshold.
+An example parameter file like the one below chooses \makemos\ using a
+3-$\sigma$ clipping threshold.
 \begin{myquote}
 \begin{verbatim}
 [MOSAIC_JCMT_IMAGES]
@@ -1522,85 +2226,147 @@ MAKEMOS_METHOD = sigmas
 MAKEMOS_SIGMAS = 3
 \end{verbatim}
 \end{myquote}
-Another option available is to register the images. This can be used when there is a common, known source that is present in \emph{all} of the input maps. The position of that source is given and the internal recipe \param{SCUBA2\_REGISTER\_IMAGES} fits a profile to the source and shifts the map accordingly so they are all aligned. 
+Another option available is to register the images. This can be used
+when there is a common, known source that is present in \emph{all} of
+the input maps. The position of that source is given and the internal
+recipe \param{SCUBA2\_REGISTER\_IMAGES} fits a profile to the source
+and shifts the map accordingly so they are all aligned.
 
-Note that if you want to give \picard\ an input list file you should use \texttt{cat} like so:
+Note that if you want to give \picard\ an input list file you should
+use \texttt{cat} like so:
+\begin{myquote}
+\begin{verbatim}
+% picard MOSAIC_JCMT_IMAGES `cat listoffiles.txt`
+\end{verbatim}
+\end{myquote}
 
-\texttt{\% picard MOSAIC\_JCMT\_IMAGES \`\,cat listoffiles.txt\`}.
 
-Currently there is no advantage in terms of data quality to reducing all observations simultaneously or separately. However, the latter does allow the option of assessing the individual maps before coadding and is the method followed in this example.
+Currently there is no advantage in terms of data quality to reducing
+all observations simultaneously or separately. However, the latter
+does allow the option of assessing the individual maps before coadding
+and is the method followed in this example.
 %%is this still true?
+
 \subsection{\xlabel{crop}Cropping your map}
 \label{sec:crop}
-The nature of the scan patterns results in SCUBA-2 maps significantly larger than the requested size. The high noise  towards the outer edges is a consequence of the scanning operation (i.e. the telescope moving slowly as it reverses direction and reduced integration time) and should not be included in your final map.
 
-You can crop your map to the  map size specified in the data header or to any requested size of box or circle  using the \picard\ command \param{CROP\_JCMT\_IMAGES}. The centre of the cropping area will always be the centre of your map.
+The nature of the scan patterns results in SCUBA-2 maps significantly
+larger than the requested size. The high noise towards the outer edges
+is a consequence of the scanning operation (i.e. the telescope moving
+slowly as it reverses direction and reduced integration time) and
+should not be included in your final map.
+
+You can crop your map to the map size specified in the data header or
+to any requested size of box or circle using the \picard\ command
+\param{CROP\_JCMT\_IMAGES}. The centre of the cropping area will
+always be the centre of your map.
 \begin{myquote}
 \begin{verbatim}
 % picard -recpars mypar.lis CROP_JCMT_IMAGES 850map_cal.sdf
 \end{verbatim}
 \end{myquote}
-The example above includes a parameter file specifying the radius of the circle to be extracted (in arcsecs).  The format for the parameter file is shown below.
+The example above includes a parameter file specifying the radius of
+the circle to be extracted (in arcsecs).  The format for the parameter
+file is shown below.
 \begin{myquote}
 \begin{verbatim}
 [CROP_JCMT_IMAGES]
 MAP_RADIUS = 1800.0
 \end{verbatim}
 \end{myquote}
-If this parameter file is omitted it will default to a box of sides equal to the map size in the header (as requested in the MSB). Be aware that the circular nature of the scan patterns means that good data will be lost of you chose a square or rectangular map.
+If this parameter file is omitted it will default to a box of sides
+equal to the map size in the header (as requested in the MSB). Be
+aware that the circular nature of the scan patterns means that good
+data will be lost of you chose a square or rectangular map.
 
-The output from \param{CROP\_JCMT\_IMAGES} is a file with the suffix `\_crop'. Full details of this recipe can be found in the \picard\ manual\footnote{http://www.oracdr.org/oracdr/PICARD}. 
+The output from \param{CROP\_JCMT\_IMAGES} is a file with the suffix
+\texttt{\_crop}. Full details of this recipe can be found in the \picard\
+manual\footnote{http://www.oracdr.org/oracdr/PICARD}.
 
 \subsection{\xlabel{noise}Calculating the noise}
-These steps apply to the output from the map-maker -- either from running it manually or using the reduced files download from the JCMT Science Archive. One of the first checks you can do is to open your map in \gaia\ and check the flatness of the background. If it passes visual inspection you will want to know what noise level you have reached.
-\\*\\*
-If you have not already cropped your map you should do so. The data at the edges of the map are considerably noisier due to reduced exposure time, so to get an accurate rms you will need to remove these noisy edges -- see Section \ref{sec:crop}. 
 
-Once cropped, the noise can then be read from the statistics of the file. The \Kappa\ command \stats\ may be used for this:
+These steps apply to the output from the map-maker -- either from
+running it manually or using the reduced files download from the JCMT
+Science Archive. One of the first checks you can do is to open your
+map in \gaia\ and check the flatness of the background. If it passes
+visual inspection you will want to know what noise level you have
+reached.
+\\*\\*
+If you have not already cropped your map you should do so. The data at
+the edges of the map are considerably noisier due to reduced exposure
+time, so to get an accurate rms you will need to remove these noisy
+edges -- see Section~\ref{sec:crop}.
+
+Once cropped, the noise can then be read from the statistics of the
+file. The \Kappa\ command \stats\ may be used for this:
 \begin{myquote}
 \begin{verbatim}
 % stats comp=err 850map_cal_crop
 \end{verbatim}
 \end{myquote}
-The \param{comp=err} string specifies that the error component of the file should be read. \textbf{The `Pixel mean' value is then the mean rms for your science map in Jy.}
+The \param{comp=err} string specifies that the error component of the
+file should be read. \textbf{The `Pixel mean' value is then the mean
+rms for your science map in Jy.}
 
-Note if you do not use the \param{comp=err} option, the `Standard deviation' value will give you a similar result; however, it will be slightly higher due to contamination from any sources in your map.
+Note if you do not use the \param{comp=err} option, the `Standard
+deviation' value will give you a similar result; however, it will be
+slightly higher due to contamination from any sources in your map.
 \\*\\*
 \textbf{Visualising the error map}\\*
-You can plot the noise or error component of your map using the \Kappa\ command \histogram. This allows you to visualise the distribution with more ease. Again the \param{comp=err} option is used.
+
+You can plot the noise or error component of your map using the
+\Kappa\ command \histogram. This allows you to visualise the
+distribution with more ease. Again the \param{comp=err} option is
+used.
 \begin{myquote}
 \begin{verbatim}
 % histogram 850_map_cal_crop comp=err numbin=200  style="color=white"
 \end{verbatim}
 \end{myquote}
-The output is shown in the left-hand panel of Figure \ref{fig:noi}.
+The output is shown in the left-hand panel of Figure~\ref{fig:noi}.
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.53\linewidth]{noihist}
-\includegraphics[width=0.45\linewidth]{crl2688_err}
-\caption{\small The error map of the cropped make-map output viewed in two different ways. \textbf{(left)} Histogram of the noise component created using the \Kappa\  command \texttt{histogram}. \textbf{(right)} Opened with \gaia.}
+\includegraphics[width=0.53\linewidth]{noihist.eps}
+\includegraphics[width=0.45\linewidth]{crl2688_err.eps}
+\caption{\small The error map of the cropped make-map output viewed in two
+different ways. \textbf{(left)} Histogram of the noise component created
+using the \Kappa\  command \histogram. \textbf{(right)} Opened with \gaia.}
 \label{fig:noi}
 \end{center}
 \end{figure}
 
-It is also useful to view the error map itself to check its uniformity. To do this you will need to copy out the error component of your map into a new file; this can be done with the \Kappa\ command \ndfcopy.
+It is also useful to view the error map itself to check its
+uniformity. To do this you will need to copy out the error component
+of your map into a new file; this can be done with the \Kappa\ command
+\ndfcopy.
 \begin{myquote}
 \begin{verbatim}
 % ndfcopy 850_map_cal_crop comp=err 850_map_cal_crop_noi
 \end{verbatim}
 \end{myquote}
-The error file (\texttt{850\_map\_cal\_crop\_noi}) can then be viewed with \gaia -- see the right-hand panel of Figure \ref{fig:noi}.
+The error file (\texttt{850\_map\_cal\_crop\_noi}) can then be viewed
+with \gaia -- see the right-hand panel of Figure~\ref{fig:noi}.
 
 %\\*\\*
 %\textbf{From your science map}\\*
-%You can use \gaia\ to give a quick estimate of the noise. First you will need to open your science map with \gaia. Then do to `Image-Analysis', then `Image regions'. You can then select a shape that you wish to use to select the nose region -- this is positioned and altered on your map by dragging the shape out with the mouse. Finally select `Stats selected' on the Image regions pop-up box; this will give you the standard deviation for the selected region.
+%You can use \gaia\ to give a quick estimate of the noise. First you will need to open your science map with \gaia. Then do to `Image-Analysis', then`Image regions'. You can then select a shape that you wish to use to select the nose region -- this is positioned and altered on your map by dragging the shape out with the mouse. Finally select `Stats selected' on the Image regions pop-up box; this will give you the standard deviation for the selected region.
 
 
 \subsection{\xlabel{match_filter}Point source extraction --  Applying a matched filter}
 \label{sec:mf}
-Cosmology maps usually contain very faint sources that often need extra help extracting. The \picard\ recipe \texttt{SCUBA2\_MATCHED\_FILTER} can be used to improve point-source detectability.
 
-The matched filter works by smoothing the map and PSF with a broad Gaussian and then subtracting from the originals. The images are then convolved with the modified PSF.  The output map should be used primarily for source detection only. Although the output is normalised to preserve peak flux density, the accuracy of this depends on how closely the real PSF matches the telescope beam size. In the case of nearby sources, each ends up contributing flux to both peaks.
+Cosmology maps usually contain very faint sources that often need
+extra help extracting. The \picard\ recipe
+\texttt{SCUBA2\_MATCHED\_FILTER} can be used to improve point-source
+detectability.
+
+The matched filter works by smoothing the map and PSF with a broad
+Gaussian and then subtracting from the originals. The images are then
+convolved with the modified PSF.  The output map should be used
+primarily for source detection only. Although the output is normalised
+to preserve peak flux density, the accuracy of this depends on how
+closely the real PSF matches the telescope beam size. In the case of
+nearby sources, each ends up contributing flux to both peaks.
 
  \begin{myquote}
 \begin{verbatim}
@@ -1608,14 +2374,20 @@ The matched filter works by smoothing the map and PSF with a broad Gaussian and 
 \end{verbatim}
 \end{myquote}
 
-An in the example parameter file below we have requested the background should be estimated by first smoothing the map and PSF with a 15$''$ Gaussian. 
+An in the example parameter file below we have requested the
+background should be estimated by first smoothing the map and PSF with
+a 15\arcsec\ Gaussian.
 \begin{myquote}
 \begin{verbatim}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
 \end{verbatim}
 \end{myquote}
- This is a fairly common technique used throughout the extra-galactic sub-millimetre community to identify potential sources. A full description of the matched filter principle is given in Appendix \ref{app:mf}, while the \picard\ manual gives full details of all the available parameters.
+This is a fairly common technique used throughout the extra-galactic
+sub-millimetre community to identify potential sources. A full
+description of the matched filter principle is given in
+Appendix~\ref{app:mf}, while the \picard\ manual gives full details of
+all the available parameters.
 
 \clearpage
 \section{\xlabel{Examples}Examples of Different Reductions}
@@ -1624,12 +2396,23 @@ SMOOTH_FWHM = 15
 \subsection{\xlabel{Cosmology}Deep point-source maps}
 \label{sec:cosmology}
 
-Many deep SCUBA-2 observations are designed to detect unresolved point sources. In this example we work through the reduction of a extra-galactic field A1835.  Since the surface density of these distant sources falls rapidly with increasing brightness, most objects are, on average, only slightly brighter than the extra-galactic confusion limit -- the flux density below which the surface density of sources is so great that there are many blended objects within a telescope beam. Consequently, the sources of interest are usually only a few standard deviations brighter than the noise in the map (caused by a combination of instrumental and source confusion). In light of this, the recommended strategy for reducing such maps involves two basic steps:
+Many deep SCUBA-2 observations are designed to detect unresolved point
+sources. In this example we work through the reduction of a
+extra-galactic field A1835.  Since the surface density of these
+distant sources falls rapidly with increasing brightness, most objects
+are, on average, only slightly brighter than the extra-galactic
+confusion limit -- the flux density below which the surface density of
+sources is so great that there are many blended objects within a
+telescope beam. Consequently, the sources of interest are usually only
+a few standard deviations brighter than the noise in the map (caused
+by a combination of instrumental and source confusion). In light of
+this, the recommended strategy for reducing such maps involves two
+basic steps:
 
 \begin{enumerate}
 
 \item Create a map using \texttt{dimmconfig\_blank\_field.lis} (see
-  Section~\ref{sec:config}) which, compared to the default
+  Section~\ref{sec:config}) which, compared with the default
   configuration, sacrifices structure on large scales to gain the best
   possible noise performance on small scales (i.e.~making the map as
   flat as possible). This is a good compromise, since the sources
@@ -1641,7 +2424,10 @@ Many deep SCUBA-2 observations are designed to detect unresolved point sources. 
   (removing additional residual large-scale noise).
 \end{enumerate}
 
-In this example the raw data is stored locally in a directory called `data'. Two observations (\#13 and \#18) are contributing to the map and we reduce each separately with the \texttt{dimmconfig\_blank\_field} configuration file.
+In this example the raw data is stored locally in a directory called
+`data'. Two observations (\#13 and \#18) are contributing to the map and
+we reduce each separately with the \texttt{dimmconfig\_blank\_field}
+configuration file.
 
 \begin{myquote}
 \begin{verbatim}
@@ -1653,32 +2439,46 @@ config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
 \end{verbatim}
 \end{myquote}
 
-These maps are then combined using the \picard\ recipe  \texttt{MOSAIC\_JCMT\_IMAGES}. In this case we accept the default of \wcsmosaic\ mosaicking and nearest-neightbour pixel spreading and so do not supply a parameter file. 
+These maps are then combined using the \picard\ recipe
+\texttt{MOSAIC\_JCMT\_IMAGES}. In this case we accept the default of
+\wcsmosaic\ mosaicking and nearest-neightbour pixel spreading and so
+do not supply a parameter file.
 \begin{myquote}
 \begin{verbatim}
 % picard MOSAIC_JCMT_IMAGES cosmo*.sdf
 \end{verbatim}
 \end{myquote}
-The output map, \texttt{cosmo2\_mos.sdf}, is shown in the left-hand panel of Figure \ref{fig:cosmomap}. The advantage of using the \picard\ recipe over standalone \Kappa\ commands is that the exposure time is also propagated correctly to the output mosaic (it is stored in the \texttt{MORE.SMURF.EXP\_TIME} extension).
+The output map, \texttt{cosmo2\_mos.sdf}, is shown in the left-hand
+panel of Figure~\ref{fig:cosmomap}. The advantage of using the
+\picard\ recipe over standalone \Kappa\ commands is that the exposure
+time is also propagated correctly to the output mosaic (it is stored
+in the \texttt{MORE.SMURF.EXP\_TIME} extension).
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.47\linewidth]{850cosmo_bf}
+\includegraphics[width=0.47\linewidth]{850cosmo_bf.eps}
 \hspace{0.3cm}
-\includegraphics[width=0.47\linewidth]{850cosmo_mf} \\
-\caption{\small Reduced \textsc{pong} maps of cosmology field A1835. \textbf{Left:} Map reduced with \texttt{dimmconfig\_blank\_field.lis}. \textbf{Right:} Map on the left after the matched filter has been applied.}
+\includegraphics[width=0.47\linewidth]{850cosmo_mf.eps}
+\caption{\small Reduced \textsc{pong} maps of cosmology field A1835.
+\textbf{Left:} Map reduced with \texttt{dimmconfig\_blank\_field.lis}.
+\textbf{Right:} Map on the left after the matched filter has been applied.}
 \label{fig:cosmomap}
 \end{center}
 \end{figure}
- 
-In order to optimally find sources that are the size of the telescope beam, we apply the matched filter recipe -- \drrecipe{SCUBA2\_MATCHED\_FILTER}. We create a simple parameter file called \texttt{smooth.ini}:
+
+In order to optimally find sources that are the size of the telescope
+beam, we apply the matched filter recipe --
+\drrecipe{SCUBA2\_MATCHED\_FILTER}. We create a simple parameter file
+called \texttt{smooth.ini}:
 \begin{myquote}
 \begin{verbatim}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
 \end{verbatim}
 \end{myquote}
-where \texttt{SMOOTH\_FWHM = 15} indicates that the background should be estimated by first smoothing the map and PSF with a 15\,arcsec FWHM Gaussian. Next, the recipe is executed as follows:
+where \texttt{SMOOTH\_FWHM = 15} indicates that the background should be
+estimated by first smoothing the map and PSF with a 15-arcsec FWHM
+Gaussian. Next, the recipe is executed as follows:
 %
 \begin{myquote}
 \begin{verbatim}
@@ -1686,8 +2486,12 @@ where \texttt{SMOOTH\_FWHM = 15} indicates that the background should be estimat
 \end{verbatim}
 \end{myquote}
 %
-The output of this operation is a smoothed image called \texttt{cosmo2\_mos\_mf.sdf} and is shown in the right-hand panel of Figure \ref{fig:cosmomap}.  %%%write about flux etc
-Next, for good measure, we shall crop the map to remove the noisy edges. , in this case 1800$'' \times1800''$. The output file will be named \texttt{cosmo2\_mos\_mf\_crop.sdf}.
+The output of this operation is a smoothed image called
+\texttt{cosmo2\_mos\_mf.sdf} and is shown in the right-hand panel of
+Figure~\ref{fig:cosmomap}.  %%%write about flux etc
+Next, for good measure, we shall crop the map to remove the noisy edges,
+in this case to 1800$'' \times1800''$. The output file will be named
+\texttt{cosmo2\_mos\_mf\_crop.sdf}.
 \begin{myquote}
 \begin{verbatim}
 % picard CROP_JCMT_IMAGES cosmo2_mos_mf.sdf
@@ -1696,13 +2500,15 @@ Next, for good measure, we shall crop the map to remove the noisy edges. , in th
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.6\linewidth]{850cosmo_mf_crop_snr}
+\includegraphics[width=0.6\linewidth]{850cosmo_mf_crop_snr.eps}
 \caption{\small Signal-to-noise map of the left-hand map made the \Kappa\ command \texttt{makesnr}.}
-\label{fig:cosmo_crop}
+\label{fig:snrmask}
 \end{center}
 \end{figure}
 
-Finally, we need to find sources. The filtered map also contains a VARIANCE component, so it is easy to produce a S/N map using the \Kappa\ task \makesnr:
+Finally, we need to find sources. The filtered map also contains a
+VARIANCE component, so it is easy to produce a S/N map using the
+\Kappa\ task \makesnr:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1710,18 +2516,24 @@ Finally, we need to find sources. The filtered map also contains a VARIANCE comp
 \end{verbatim}
 \end{myquote}
 
-The resulting map, \texttt{cosmo2\_mos\_mf\_snr}, is shown in Figure \ref{fig:cosmo_snr}. Compared to the matched filter map the edges no longer appear as noisy because they have been down-weighted
+The resulting map, \texttt{cosmo2\_mos\_mf\_snr}, is shown in
+Figure~\ref{fig:snrmask}. Compared with the matched filter map the
+edges no longer appear as noisy because they have been down-weighted
 by the larger noise values where there were less data.
 
-A basic procedure for identifying sources would be to locate peaks above some threshold S/N.  The SNR image above shows peaks that are likely to be real sources. For a start, a source appears where expected at the 0,0 position. 
+A basic procedure for identifying sources would be to locate peaks
+above some threshold S/N.  The SNR image above shows peaks that are
+likely to be real sources. For a start, a source appears where
+expected at the 0,0 position.
 
-But how can we check if these sources are real? 
+But how can we check if these sources are real?
 \begin{itemize}
 
-\item One option is to split your data into mutually-exclusive subsets and produce
+\item One option is to split your data into mutually exclusive subsets and produce
   independent maps. Are the highest S/N peaks detected in each of
   them?
-\item compare the number of {\em negative} peaks above a given S/N to the number of {\em positive} peaks.
+\item compare the number of {\em negative} peaks above a given S/N with
+  the number of {\em positive} peaks.
 \item Use {\em jackknife} tests to verify the estimated noise levels,
   i.e.~produce two maps from independent portions of the data and
   difference them (e.g., using the \Kappa\ task \sub). This will
@@ -1731,15 +2543,15 @@ But how can we check if these sources are real?
   larger than the noise estimated for either of the original maps?
 \end{itemize}
 
-%In this example we do not expect any real astronomical source, so the S/N map {\em should\/} have a brightness distribution that resembles a Gaussian with standard deviation $\sigma=1$ and mean zero.
-% We perform this comparison for the central $100 \times 100$ pixels of the S/N map in Fig.~\ref{fig:cosmo_snrcompare}, well away from any edge effects. In this case we find that the real distribution is slightly narrower than expected, suggesting that the noise has been mildly over-estimated.
-
-
+% In this example we do not expect any real astronomical source, so the S/N map {\em should\/} have a brightness distribution that  resembles a Gaussian with standard deviation $\sigma=1$ and mean zero. We perform this comparison for the central $100 \times 100$ pixels of the S/N map in Figure~\ref{fig:cosmo_snrcompare}, well away from any edge effects. In this case we find that the real distribution is slightly narrower than expected, suggesting that the noise has been mildly over-estimated.
 
 \subsection{\xlabel{Galactic}Extended galactic sources}
 \label{sec:bright_ex}
 
-We start by running the map-maker using \texttt{dimmconfig\_bright\_extended.lis}. In this example we are giving the map-maker a list of the input files, rather than giving the path on the command line (along with wild cards). 
+We start by running the map-maker using
+\texttt{dimmconfig\_bright\_extended.lis}. In this example we are
+giving the map-maker a list of the input files, rather than giving the
+path on the command line (along with wild cards).
 
 \begin{myquote}
 \begin{verbatim}
@@ -1756,16 +2568,22 @@ config=^$STARLINK_DIR/share/smurf/dimmconfig_bright_extended.lis
 \end{center}
 \end{figure}
 
-%Fig.~\ref{fig:orionmakemap}. Note that these maps were observed as aseries of rotating pong patterns to avoid repetition of any scandirection, hence their distinctive shape.
+%Figure~\ref{fig:orionmakemap}. Note that these maps were observed as a series of rotating pong patterns to avoid repetition of any scand irection, hence their distinctive shape.
 
-This recipe does a good job of recovering extended emission, although a small degree of bowling remains around the brightest sources. the patchiness of the background is an inevitable consequence of recovering extended emission.
+This recipe does a good job of recovering extended emission, although
+a small degree of bowling remains around the brightest sources. the
+patchiness of the background is an inevitable consequence of
+recovering extended emission.
 
-The maximum spatial scale of structure that can be recovered is determined by the scanning speed and frequency cut applied to the data:
+The maximum spatial scale of structure that can be recovered is
+determined by the scanning speed and frequency cut applied to the
+data:
 
 \begin{equation}
 \frac{\mbox{speed}\;(''/\mbox{s)}}{\mbox{frequency cut}\;(\mbox{Hz)}}=\mbox{scale size}\;('')
 \end{equation}
-%Both of these effects can be mitigated by post-processingusing the \picard\ recipe \drrecipe{REMOVE\_BACKGROUND}. A number of different techniques are available in this recipe to control how the background is removed.  In this example we have selected \cupid\ \findback\ which uses spatial filtering to remove structure on a size scale less than that specififed by the parameter \param{FINDBACK\_BOX}.  The modified parameter file (\texttt{params.ini}) is shown below where the method is set to \findback\ and the \findback\ box size to 30 pixels or 120\,arcsec when using 4\,arcsec pixels:
+
+%Both of these effects can be mitigated by post-processingusing the \picard\ recipe \drrecipe{REMOVE\_BACKGROUND}. A number of different techniques are available in this recipe to control how the background is removed.  In this example we have selected \cupid\ \findback\ which uses spatial filtering to remove structure on a size scale less than that specififed by the parameter \param{FINDBACK\_BOX}.  The modified parameter file (\texttt{params.ini}) is shown below where the method is set to \findback\ and the \findback\ box size to 30 pixels or 120\,arcsec when using 4-arcsec pixels:
 
 %\begin{myquote}
 %\begin{verbatim}
@@ -1775,10 +2593,7 @@ The maximum spatial scale of structure that can be recovered is determined by th
 %\end{verbatim}
 %\end{myquote}
 %
-%Caution is advised when selecting the box size, with a smaller box
-%giving a flatter background but at the expense of source flux. This is
-%of particular importance to extended sources where the recovery of
-%faint emission is paramount.
+%Caution is advised when selecting the box size, with a smaller box giving a flatter background but at the expense of source flux. This is of particular importance to extended sources where the recovery of faint emission is paramount.
 %
 %\begin{myquote}
 %\begin{verbatim}
@@ -1787,14 +2602,17 @@ The maximum spatial scale of structure that can be recovered is determined by th
 %\end{verbatim}
 %\end{myquote}
 %
-%The background subtracted maps are shown on the bottom row of
-%Fig.~\ref{fig:orionmakemap} where both the bowling and uneven
-%background have been significantly improved. Before we combine the
+%The background subtracted maps are shown on the bottom row of Figure~\ref{fig:orionmakemap} where both the bowling and uneven background have been significantly improved. Before we combine the
 
 
 %maps we will first crop them to their originally requested size using
+Before we proceed with creating an external mask we need to crop off
+the noisy edges of the data using the \picard\ recipe
+\drrecipe{CROP\_JCMT\_IMAGES}. To determine what to trim we can look
+at the exposure time image with \gaia. Figure~\ref{fig:exptime} shows
+that it drops off sharply at a radius of 30$'$. We can thus specify a
+parameter file like so:
 
-Before we proceed with creating an external mask we need to crop off the noisy edges of the data using the \picard\ recipe \drrecipe{CROP\_JCMT\_IMAGES}. Do determine what to trim we can look at the exposure time image with \gaia. Figure \ref{fig:exptime} shows that it drops off sharply at a radius of 30$'$. We can thus specify a parameter file like so:
 \begin{myquote}
 \begin{verbatim}
 [CROP_JCMT_IMAGES]
@@ -1812,17 +2630,21 @@ MAP_RADIUS = 1800
 \begin{figure}[th!]
 \begin{center}
 \includegraphics[width=0.8\hsize]{gal_exptime.eps}
-\caption{\small The exposure time image of the science map from Figure \ref{fig:galmakemap}. You can right-click and drag the mouse between two points to measure the distance. Here we see the exposure time dropping off sharply at a radius of 30$'$. A non-default colour scale has been chosen to best illustrate the morphology.}
+\caption{\small The exposure time image of the science map from
+Figure~\ref{fig:galmakemap}. You can right-click and drag the mouse between
+two points to measure the distance. Here we see the exposure time dropping
+off sharply at a radius of 30$'$. A non-default colour scale has been chosen
+to illustrate the morphology.}
 \label{fig:exptime}
 \end{center}
 \end{figure}
 
 
-\begin{figure}
+\begin{figure}[th!]
 \begin{center}
 \includegraphics[width=0.8\hsize]{galex_brex_crop.eps}
-\caption{\small The cropped science map from Figure \ref{fig:galmakemap}.}
-\label{fig:exptime}
+\caption{\small The cropped science map from Figure~\ref{fig:galmakemap}.}
+\label{fig:crop_map}
 \end{center}
 \end{figure}
 
@@ -1835,18 +2657,32 @@ filename.
 
 The large-scale noise and negative bowling is compensated for using a
 S/N-based zero mask during map-making. resulting map, and the location of the
-iteratively-determined zero mask are shown in Fig.~\ref{fig:snrmask}.
+iteratively determined zero mask are shown in Figure~\ref{fig:crop_map}.
 
 
 
 \clearpage
 \section{\xlabel{tweak}Tweaking the Config File}
 \label{sec:tweak}
-Any configuration file can be edited by copying it to a local directory beforehand. The first line of each specialised configuration file is a path to the recipe from which it is derived. These paths all lead to recipes in the \starlink\ tree which cannot be edited. If you are creating your own file from scratch, make sure to include this reference to an existing configuration file on the first line.
 
-All the parameters in \texttt{dimmconfig.lis} can be adjusted by simply adding them to your specialised file. Any parameters appearing in the specialised file automatically override those in the default. If a parameter is in use in the default that you wish to disable, you should specify it as \texttt{<undef>} in your specialised file. (e.g. \texttt{chitol=<undef>}).
+Any configuration file can be edited by copying it to a local
+directory beforehand. The first line of each specialised configuration
+file is a path to the recipe from which it is derived. These paths all
+lead to recipes in the \starlink\ tree which cannot be edited. If you
+are creating your own file from scratch, make sure to include this
+reference to an existing configuration file on the first line.
 
-You can also ammend your configuration file by specifying new parameters directly on the command line. They are appended to the configuration  filename as a comma separated list as shown in the example below. Be sure to include all the necessary quotation marks.
+All the parameters in \texttt{dimmconfig.lis} can be adjusted by
+simply adding them to your specialised file. Any parameters appearing
+in the specialised file automatically override those in the default.
+If a parameter is in use in the default that you wish to disable, you
+should specify it as \texttt{<undef>} in your specialised file. (e.g.
+\texttt{chitol=<undef>}).
+
+You can also amend your configuration file by specifying new
+parameters directly on the command line. They are appended to the
+configuration filename as a comma separated list as shown in the
+example below. Be sure to include all the necessary quotation marks.
 
 \begin{myquote}
 \begin{verbatim}
@@ -1856,16 +2692,42 @@ You can also ammend your configuration file by specifying new parameters directl
 \end{myquote}
 
 \subsection{\xlabel{inter}Writing out models \& intermediate maps}
-\textbf{exportmodel}\\*
-This parameter has been introduced in Section \ref{sec:export} and allowed the user to see the model that was fit for each component specified by the \texttt{modelorder} parameter. 
 
-\textbf{itermap}\\*
-Setting the parameter \texttt{itermap=1} writes out a map after each iteration. These can be  visually inspected with \texttt{\% gaia map.more.smurf.itermaps} to help determine an appropriate number of iterations. This is useful when a fixed number of iterations have been requested  (i.e. a positive value for \texttt{numiter}) and the map solution divergences before they have completed.
+\textbf{exportmodel}\\*
+This parameter has been introduced in Section~\ref{sec:export} and
+allowed the user to see the model that was fit for each component
+specified by the \texttt{modelorder} parameter.
+
+\texttt{\bf series itermap}\\*
+Setting the parameter \texttt{itermap=1} writes out a map after each
+iteration. These can be visually inspected with
+
+\begin{myquote}
+\begin{verbatim}
+% gaia map.more.smurf.itermaps
+\end{verbatim}
+\end{myquote}
+to help determine an appropriate number of iterations. This is useful
+when a fixed number of iterations have been requested (i.e. a positive
+value for \texttt{numiter}) and the map solution divergences before
+they have completed.
 
 \textbf{shortmaps}\\*
-Setting the parameter \texttt{shortmaps=1} writes out a re-gridded map for each bolometer. These can be seen with \texttt{\% gaia map.more.smurf.shortmaps}.
+Setting the parameter \texttt{shortmaps=1} writes out a re-gridded map
+for each bolometer. These can be seen with this
 
-You can view the shortmaps and itermaps more conveniently by stacking them into a single cube using the \smurf\ command \texttt{stackframes}. This cube can then be viewed as a `movie' with \gaia, using the animation option to loop through the itermaps. See figure \ref{fig:stack} for instructions.
+\begin{myquote}
+\begin{verbatim}
+% gaia map.more.smurf.shortmaps
+\end{verbatim}
+\end{myquote}
+command.
+
+You can view the shortmaps and itermaps more conveniently by stacking
+them into a single cube using the \smurf\ command
+\texttt{stackframes}. This cube can then be viewed as a `movie' with
+\gaia, using the animation option to loop through the itermaps. See
+figure~\ref{fig:stack} for instructions.
 \begin{figure}[ht!]
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
@@ -1898,7 +2760,13 @@ Stack the individual itermaps into a single cube.
 \end{minipage}
 \hspace{0.3cm}
 \begin{minipage}[c]{0.29\linewidth}
-The output  map map\_itermaps can be opened with \gaia. The data used in this example is the galactic map reduced in Section \ref{sec:bright_ex}. The Spectal plot window shows the value for a single pixel and the 3 chucks are easily identified. You can select the `Animation' tab in the `Display image sections' window and click `Start' to loop through the itermaps for each iteration. the `movie' will appear in the main \gaia\ window.
+The output map map\_itermaps can be opened with \gaia. The data used
+in this example is the galactic map reduced in
+Section~\ref{sec:bright_ex}. The Spectral plot window shows the value
+for a single pixel and the 3 chunks are easily identified. You can
+select the `Animation' tab in the `Display image sections' window and
+click `Start' to loop through the itermaps for each iteration. the
+`movie' will appear in the main \gaia\ window.
 \end{minipage}
 
 \vspace{0.7cm}
@@ -1915,14 +2783,17 @@ The output  map map\_itermaps can be opened with \gaia. The data used in this ex
 \end{minipage}
 \hspace{0.3cm}
 \begin{minipage}[c]{0.29\linewidth}
-These windows show the itermaps map at 1, 10, and 30 iterations. A specific iteration can be selected using the `Index of plane' slider on the `Display image sections' window.
+These windows show the itermaps map at 1, 10, and 30 iterations. A
+specific iteration can be selected using the `Index of plane' slider
+on the `Display image sections' window.
 \vspace{0.2cm}
 \end{minipage}
 
 \end{fmpage}
 \end{center}
-\caption{\small Example using the \smurf\ command \texttt{stackframes} and \gaia\ to view the termaps map for each iteration.}
-\label{fig:stack} 
+\caption{\small Example using the \smurf\ command \texttt{stackframes} and
+\gaia\ to view the termaps map for each iteration.}
+\label{fig:stack}
 \end{figure}
 
 
@@ -1938,15 +2809,23 @@ com.perarray=1 lose large scale structure. Good if one array noisier than others
 
 \subsection{\xlabel{mask}Mask parameters }
 \label{sec:mask}
-The masking options for bright\_compact are very simple -- a circle is defined to mask out the source, with everytihgn outside this circle being ocntrained to zero. the sixe of this circle can be adjusted with ast.zero\_circle. Remeber also that ast.zero\_notlast = 1 menas that the mask should not be applied ont he final iteration. 
 
-The bright\_compact recipe also masks the source during filtering using the flt.zero\_circle option. By default this is set to 60 arcseconds (given as degrees).
+The masking options for bright\_compact are very simple -- a circle is
+defined to mask out the source, with everytihgn outside this circle
+being ocntrained to zero. the sixe of this circle can be adjusted with
+ast.zero\_circle. Remeber also that ast.zero\_notlast = 1 menas that
+the mask should not be applied ont he final iteration.
 
+The bright\_compact recipe also masks the source during filtering
+using the flt.zero\_circle option. By default this is set to
+60\,arcsec (given as degrees).
 
 
 \subsection{\xlabel{maskbe}Supplying an external mask for bright-extended maps}
 \label{sec:maskbe}
-The sequence below is a summary of the steps followed in the example in Section \ref{sec:bright_ex}. 
+
+The sequence below is a summary of the steps followed in the example
+in Section~\ref{sec:bright_ex}.
 
 First a map is made in the standard way.
 \begin{myquote}
@@ -1955,27 +2834,39 @@ First a map is made in the standard way.
   config='"^dimmconfig_bright_extended.lis"'
 \end{verbatim}
 \end{myquote}
-The output from this map is made into a signal to noise map using the \Kappa\ command \texttt{makesnr}
+The output from this map is made into a signal to noise map using the
+\Kappa\ command \makesnr.
 \begin{myquote}
 \begin{verbatim}
 % makesnr 850map 850map_snr
 \end{verbatim}
 \end{myquote}
-This SNR map is thresholded to set everything below 3$\sigma$ to 0 and everything above to 1.
+This SNR map is thresholded to set everything below 3$\sigma$ to 0 and
+everything above to 1.
 \begin{myquote}
 \begin{verbatim}
 % thresh 850map_snr 850map_mask thrlo=3 newlo=0 thrhi=3 newhi=1
 \end{verbatim}
 \end{myquote}
-In the step above you can set everything below 3$\sigma$ to \texttt{bad} and use this as your mask. However this generates a hard 3$\sigma$ cut-off to your map which is realistic for the real data. Instead the following 2 steps are performed to smooth the edges of the mask out. First the thresholded map is smoothed with a Gaussian filter of FWHM of 5 pixels (=20$''$). Then it is again thresholded, this time keeping everything above 5\% of the 0 level as the mask and setting the rest to \texttt{bad}.
- \begin{myquote}
+In the step above you can set everything below 3$\sigma$ to
+\texttt{bad} and use this as your mask. However this generates a hard
+3$\sigma$ cut-off to your map which is realistic for the real data.
+Instead the following 2 steps are performed to smooth the edges of the
+mask out. First the thresholded map is smoothed with a Gaussian filter
+of FWHM of 5 pixels (=20\arcsec). Then it is again thresholded, this time
+keeping everything above 5\% of the 0 level as the mask and setting
+the rest to \texttt{bad}.
+\begin{myquote}
 \begin{verbatim}
 % gausmooth 850map_mask 850map_mask_sm fwhm=5
 % thresh 850map_mask_sm 850map_mask_zm thrlo=0.05 newlo=bad thrhi=0.05 newhi=1
 \end{verbatim}
 \end{myquote}
-Finally the map is re-made with this mask supplied as an external file. Note that the extra parameters required to pick up this external mask are being appended to the configuration file on the command line rather than editing the file itself.
- \begin{myquote}
+Finally the map is re-made with this mask supplied as an external
+file. Note that the extra parameters required to pick up this external
+mask are being appended to the configuration file on the command line
+rather than editing the file itself.
+\begin{myquote}
 \begin{verbatim}
 % makemap in='s8*.sdf' out=850map_zm method=iterate \
   config='"^dimmconfig_bright_extended.lis,ast.zero_mask=1,ast.zero_snr=0"' \
@@ -1989,26 +2880,47 @@ Finally the map is re-made with this mask supplied as an external file. Note tha
 \section{\xlabel{pipeline}The SCUBA-2 Pipeline}
 \label{sec:pipe}
 \subsection{\xlabel{pl_overview}Pipeline overview}
-SCUBA-2 data reduction pipelines have been developed based on the existing ORAC-DR pipeline used for ACSIS (Cavanagh et al. 2008). There are three distinct pipelines currently utilised by SCUBA-2: two of these, the quick-look (QL) and summit pipelines, are run in real time JCMT during data acquisition; the third, the science pipeline, offers a comprehensive reduction which users will be interested in running locally.
+
+SCUBA-2 data reduction pipelines have been developed based on the
+existing ORAC-DR pipeline (Cavanagh et al., 2008\cite{oracdr}) used
+for ACSIS. There are three distinct pipelines currently utilised by
+SCUBA-2: two of these, the quick-look (QL) and summit pipelines, are
+run in real time JCMT during data acquisition; the third, the science
+pipeline, offers a comprehensive reduction which users will be
+interested in running locally.
 
 \begin{itemize}
-\item The QL runs quality assurance checks on the data as it comes in. For science data it calculates the noise between 2\,Hz  and 10\,Hz, along with the NEP and effective NEP, for each 30 second scan. These values undergo quality assurance checked to ensure SCUBA-2 is within an acceptable operating range.
-\item The summit pipeline is designed to provide a quick map of the data, it does this by running fewer iterations and chunking the data more. This is a useful guide to observers who wish to check the quality of their data. 
-\item The science pipeline is run the following day. Data from the previous night is processed using an optimal reduction routine, that includes the map-maker and a number of post-processing steps (outlined below).  This data is transferred to CADC and available for download by project members the following day.
+\item The QL runs quality assurance checks on the data as it comes in.
+For science data it calculates the noise between 2\,Hz and 10\,Hz,
+along with the NEP and effective NEP, for each 30 second scan. These
+values undergo quality assurance checked to ensure SCUBA-2 is within
+an acceptable operating range.
+\item The summit pipeline is designed to provide a quick map of the
+data, it does this by running fewer iterations and chunking the data
+more. This is a useful guide to observers who wish to check the
+quality of their data.
+\item The science pipeline is run the following day. Data from the
+previous night is processed using an optimal reduction routine, that
+includes the map-maker and a number of post-processing steps (outlined
+below).  This data is transferred to CADC and available for download
+by project members the following day.
 \end{itemize}
 %, making a map only when sufficient data has been taken.
 
-The manual for the SCUBA-2 pipeline can be found at \pipelinesun. Note that the pipeline software comes as part of the \starlink\ package.
+The manual for the SCUBA-2 pipeline can be found at \pipelinesun. Note
+that the pipeline software comes as part of the \starlink\ package.
 
 
 \subsection{\xlabel{science_pl}The Science Pipeline}
-The science pipeline will automate many of the steps discussed in Section \ref{sec:maps}:
+The science pipeline will automate many of the steps discussed in
+Section~\ref{sec:maps}:
 \vspace{-0.3cm}
 \begin{itemize}\itemsep-0.3em
 \item Run the iterative map-maker.
 \item Apply the FCF to calibrate to mJy\,beam$^{-1}$.
 \item Co-add multiple observations of the same object.
-\item  Apply the matched-filter if the blank-field configuration file has been requested.
+\item Apply the matched-filter if the blank-field configuration file
+      has been requested.
 \end{itemize}
 
 \subsection{\xlabel{running_pl}Running the Science Pipeline}
@@ -2017,7 +2929,7 @@ The science pipeline will automate many of the steps discussed in Section \ref{s
 \end{minipage}
 \begin{minipage}[t]{0.95\linewidth}
 The first step is to initialise the pipeline software. This is simply done by:
- \begin{myquote}
+\begin{myquote}
 \begin{verbatim}
 % oracdr_scuba2_850 -cwd
 
@@ -2029,11 +2941,18 @@ The first step is to initialise the pipeline software. This is simply done by:
 \textbf{(2)}
 \end{minipage}
 \begin{minipage}[t]{0.95\linewidth}
-Next there are a few  environment variables that must be defined to ensure the data is read from and written to the right places. Many are set automatically when the pipeline is initialised but others must be set manually. Details of the optional variables are given in  \pipelinesun\ but the three mandatory ones are:
+Next there are a few environment variables that must be defined to
+ensure the data is read from and written to the right places. Many are
+set automatically when the pipeline is initialised but others must be
+set manually. Details of the optional variables are given in
+\pipelinesun\ but the three mandatory ones are:
 \begin{itemize}\itemsep-0.1em
 \item \param{STARLINK\_DIR}: Location of the user's Starlink installation.
-\item \param{ORAC\_DATA\_IN}: The location where the data should be read from. If you are supplying a text file listing the raw data this should be the location of that file.
-\item \param{ORAC\_DATA\_OUT}: The location where the data produces should be written. Also used as the location for a user-specified configuration file.\\*
+\item \param{ORAC\_DATA\_IN}: The location where the data should be read from.
+If you are supplying a text file listing the raw data this should be the
+location of that file.
+\item \param{ORAC\_DATA\_OUT}: The location where the data products should be
+written. Also used as the location for a user-specified configuration file.\\*
 \end{itemize}
 \end{minipage}
 
@@ -2041,8 +2960,12 @@ Next there are a few  environment variables that must be defined to ensure the d
 \textbf{(3)}
 \end{minipage}
 \begin{minipage}[t]{0.95\linewidth}
-If you wish to supply a modified configuration file you should create a parameter file (here called mypars.ini)  which follows the \picard\ format. Instead of the command name however, you insert the recipe name assigned to you data and the new configuration filename specified as the \texttt{MAKEMAP\_CONFIG} option. For example:
- \begin{myquote}
+If you wish to supply a modified configuration file you should create
+a parameter file (here called mypars.ini) which follows the \picard\
+format. Instead of the command name however, you insert the recipe
+name assigned to you data and the new configuration filename specified
+as the \texttt{MAKEMAP\_CONFIG} option. For example:
+\begin{myquote}
 \begin{verbatim}
 [REDUCE_SCAN]
 MAKEMAP_CONFIG = myconfigfile.lis
@@ -2054,29 +2977,57 @@ MAKEMAP_CONFIG = myconfigfile.lis
 \textbf{(4)}
 \end{minipage}
 \begin{minipage}[t]{0.95\linewidth}
-Now you are ready to run the pipeline command, this example we use the \texttt{-recpars} option to specify parameter file from which call an external parameter file to call our modified configuration file:
- \begin{myquote}
+Now you are ready to run the pipeline command, this example we use the
+\texttt{-recpars} option to specify parameter file from which call an
+external parameter file to call our modified configuration file:
+\begin{myquote}
 \begin{verbatim}
 % oracdr -loop file -files inputlist.txt -log xf -recpars mypars.ini
- \end{verbatim}
+\end{verbatim}
 \end{myquote}
 \end{minipage}
 
 \subsection{\xlabel{pl_output}Pipeline output}
-The pipeline will produce a  group file for each object being processed. If the pipeline is given data from multiple nights, all those data will be included in the group coadd using inverse variance weighting. 
 
-The final maps in your output directory will have the suffix \param{\_reduced}. Maps will be made for  individual observations, which  will start with an \param{`s'} (e.g. s20120720\_00030\_850\_reduced.sdf). Group maps, which may contain co-added observations from a single night, are also produced which have the prefix \param{`gs'} (e.g. gs20120720\_30\_850\_reduced.sdf). Note that a group file is \emph{always} created, even if only a single observation if being processed.
+The pipeline will produce a group file for each object being
+processed. If the pipeline is given data from multiple nights, all
+those data will be included in the group coadd using inverse variance
+weighting.
 
-Additionally, PNG images are made of the reduced files at a variety of resolutions.
+The final maps in your output directory will have the suffix
+\texttt{\_reduced}. Maps will be made for individual observations,
+which will start with an \texttt{s} (e.g.
+\texttt{s20120720\_00030\_850\_reduced.sdf}). Group maps, which may contain
+co-added observations from a single night, are also produced which
+have the prefix \texttt{gs} (e.g. \texttt{gs20120720\_30\_850\_reduced.sdf}).
+Note that a group file is \emph{always} created, even if only a single
+observation if being processed.
+
+Additionally, PNG images are made of the reduced files at a variety of
+resolutions.
 
 \subsection{\xlabel{cadc}Getting your data from CADC}
-The JCMT Science Archive is hosted by The Canadian Astronomy Data Centre  (CADC). All data processed by the science pipeline is made available to PIs through the CADC interface (\texttt{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}). 
 
-To access proprietry data you will need to have your CADC username registered by the JAC and thereby associated with the project code. 
+The JCMT Science Archive is hosted by The Canadian Astronomy Data
+Centre (CADC). All data processed by the science pipeline is made
+available to PIs through the CADC interface
+(\texttt{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}).
 
-When searching the JCMT Science Archive, be sure to select the correct search option from the `JSA Queries' tab. Here you can select public versus proprietry, raw versus reduced, and SCUBA-2 versus ACSIS data.
+To access proprietry data you will need to have your CADC username
+registered by the JAC and thereby associated with the project code.
 
-An important search option to be aware of is `Group Type', where your options are Simple, Night, Project and Public. Simple (which becomes `obs' on the result page) is an individual observation; night means the group file from the pipeline (these may or may not include more than one observation, the `Group Members' option will tell you), the project option is generated if an entire project has been run through the pipeline and idenitical sources across the project are co-added into master group files.
+When searching the JCMT Science Archive, be sure to select the correct
+search option from the `JSA Queries' tab. Here you can select public
+versus proprietry, raw versus reduced, and SCUBA-2 versus ACSIS data.
+
+An important search option to be aware of is `Group Type', where your
+options are Simple, Night, Project and Public. Simple (which becomes
+`obs' on the result page) is an individual observation; night means
+the group file from the pipeline (these may or may not include more
+than one observation; the `Group Members' option will tell you), the
+project option is generated if an entire project has been run through
+the pipeline and idenitical sources across the project are co-added
+into master group files.
 
 \clearpage
 \section{\xlabel{calib}SCUBA-2 Data Calibration}
@@ -2084,9 +3035,22 @@ An important search option to be aware of is `Group Type', where your options ar
 
 \subsection{\xlabel{extinction}Extinction correction}
 
-Analysis of the SCUBA-2 skydips and heater-tracking data has allowed calculation of the opacity factors for the SCUBA-2 450\micron\ and 850\micron\ filters to be determined. Full details of the analysis and on-sky calibration methods of SCUBA-2 can be found in Dempsey et al.\ (2012)~\cite{dempsey12}. \cite{dempsey-spie}.
+Analysis of the SCUBA-2 skydips and heater-tracking data has allowed
+calculation of the opacity factors for the SCUBA-2 450\micron\ and
+850\micron\ filters to be determined. Full details of the analysis and
+on-sky calibration methods of SCUBA-2 can be found in Dempsey et al.\
+(2012)~\cite{dempsey12}\cite{dempsey-spie}.
 
-Archibald et al. (2002)~\cite{archibald} describes how the Caltech Submillimeter Observatory (CSO) 225\,GHz opacity, $\tau_{225}$, relates to SCUBA opacity terms in each band, $\tau_{450}$ and $\tau_{850}$. It was assumed ??? that the new SCUBA-2 filters are sufficiently similar to the wide-band SCUBA filters that these terms could be used for extinction correction.  The JCMT water-vapour radiometer (WVM) is calibrated to provide a high-frequency opacity value which has been scaled to $\tau_{225}$. The WVM (not the CSO 225\,GHz tipper) data were used for this analysis. The filter opacities as determined from skydip data are as follows:
+Archibald et al. (2002)\,\cite{archibald} describes how the Caltech
+Submillimeter Observatory (CSO) 225\,GHz opacity, $\tau_{225}$,
+relates to SCUBA opacity terms in each band, $\tau_{450}$ and
+$\tau_{850}$. It was assumed that the new SCUBA-2 filters are
+sufficiently similar to the wide-band SCUBA filters that these terms
+could be used for extinction correction.  The JCMT water-vapour
+radiometer (WVM) is calibrated to provide a high-frequency opacity
+value which has been scaled to $\tau_{225}$. The WVM (not the CSO
+225\,GHz tipper) data were used for this analysis. The filter
+opacities as determined from skydip data are as follows:
 
 \begin{equation}
 \tau_{450} = 26.0 \times (\tau_{225} - 0.012);
@@ -2096,9 +3060,25 @@ and
 \tau_{850} = 4.6 \times (\tau_{225} - 0.0043).
 \end{equation}
 
-The SCUBA-2 filters are different from the SCUBA filters, with the 450\micron\ filter, in particular, significantly narrower than its SCUBA counterpart. The SCUBA-2 filter characteristics are described in detail \htmladdnormallinkfoot{on the JCMT  website}{http://www.jach.hawaii.edu/JCMT/continuum/scuba2/filter/}.
+The SCUBA-2 filters are different from the SCUBA filters, with the
+450\micron\ filter, in particular, significantly narrower than its
+SCUBA counterpart. The SCUBA-2 filter characteristics are described in
+detail \htmladdnormallinkfoot{on the JCMT
+website}{http://www.jach.hawaii.edu/JCMT/continuum/scuba2/filter/}.
 
-The extinction correction parameters that scale from $\tau_{225}$ to the relevant filter have been added to the map-maker code. You can override these values by setting \param{ext.taurelation.filtname} in your map-maker config files to the two coefficients `(a,b)' that you want to use (where `\texttt{filtname}' is the name of the filter). The defaults are listed in \texttt{\$SMURF\_DIR/smurf\_extinction.def}. We have also added a slight calibration tweak to WVM-derived values to correct them to the CSO scale. It is worth noting that if an individual science map and corresponding calibrator observation has already been reduced with the old factors (and your source and calibrator are at about the same airmass and if the tau did not change appreciably), any errors in extinction correction should cancel out in the calibration.
+The extinction correction parameters that scale from $\tau_{225}$ to
+the relevant filter have been added to the map-maker code. You can
+override these values by setting \param{ext.taurelation.filtname} in
+your map-maker config files to the two coefficients `($a$,$b$)' that you
+want to use (where `\texttt{filtname}' is the name of the filter). The
+defaults are listed in \texttt{\$SMURF\_DIR/smurf\_extinction.def}. We
+have also added a slight calibration tweak to WVM-derived values to
+correct them to the CSO scale. It is worth noting that if an
+individual science map and corresponding calibrator observation has
+already been reduced with the old factors (and your source and
+calibrator are at about the same airmass and if the tau did not change
+appreciably), any errors in extinction correction should cancel out in
+the calibration.
 
 
 \subsection{\xlabel{fcf}Flux conversion factors}
@@ -2107,7 +3087,7 @@ The extinction correction parameters that scale from $\tau_{225}$ to the relevan
 Primary and secondary calibrator observations have been reduced using
 the specifically designed
 \texttt{dimmconfig\_bright\_compact.lis}. The maps produced from this
-are then analysed using tailor-made \picard\ recipes. 
+are then analysed using tailor-made \picard\ recipes.
 
 A map reduced by the map-maker has units of pW. To calibrate the data
 into units of janskys (Jy), a set of bright, point-source objects with
@@ -2121,12 +3101,12 @@ sensitivity, and while not discussed here, is also produced by the
 calibrators, the FCFs and NEFDs have been calculated as follows:
 \begin{enumerate}
 \item{The \picard\ recipe \drrecipe{SCUBA2\_FCFNEFD} takes the reduced
-  map, crops it, and runs background removal. Surface fitting
+  map, crops it, and runs background removal. Surface-fitting
   parameters are changeable in the \picard\ parameter file.}
 \item{It then runs the \Kappa\ \beamfit\ task on the specified point
   source. The \beamfit\ task will estimate the peak (uncalibrated)
   flux density and the FWHM. The integrated flux density within a
-  given aperture (30\,arcsec radius default) is calculated using
+  given aperture (30-arcsec radius default) is calculated using
   \photom\ \autophotom. Flux densities for calibrators such as Uranus,
   Mars, CRL\,618, CRL\,2688 and HL\,Tau are already known to
   \picard. To derive an FCF for other sources of known flux densities,
@@ -2162,7 +3142,7 @@ LOGFILE=1
 
 \begin{itemize}
 
-\item{\textbf{\fcfa} (surface brightness calibration)}
+\item{\textbf{\fcfa} (surface-brightness calibration)}
 
 \begin{equation}
 \label{eq:fcf_arcsec}
@@ -2174,10 +3154,10 @@ where $S_\mathrm{tot}$ is the total flux density of the calibrator,
 $P_\mathrm{int}$ is the integrated sum of the source in the map (in
 pW) and $A_\mathrm{pix}$ is the pixel area in arcsec$^2$, producing an
 FCF in Jy/arcsec$^2$/pW. This \fcfa\ is the number to
-multiply your map by when you wish to have surface brightness units,
+multiply your map by when you wish to have surface-brightness units,
 and to carry out aperture photometry.
 
-\item{\textbf{\fcfb} (point source calibration)}
+\item{\textbf{\fcfb} (point-source calibration)}
 
 \begin{equation}
 \label{eq:fcf_beam}
@@ -2199,20 +3179,30 @@ an overestimate of the flux density.
 
 \subsection{\xlabel{ownfcf}Calculating your own FCF}
 
-We provide standard FCF value to be applied to your data. These have been monitored regularly and are deemed to be stable and robust. 
+We provide standard FCF value to be applied to your data. These have
+been monitored regularly and are deemed to be stable and robust.
 
-However, you can derive your own FCF numbers if you wish. Calibrator observations are taken 2--3 hours during a normal night of observing. You should chose the one nearest in time to your science observation unless the weather has changed. 
+However, you can derive your own FCF numbers if you wish. Calibrator
+observations are taken 2--3 hours during a normal night of observing.
+You should chose the one nearest in time to your science observation
+unless the weather has changed.
 
 \begin{enumerate}
-\item Run your calibrator through the map-maker. Generally, you should reduce your calibrator using the \emph{same} recipe that you use to reduce your science data; the exception is blank-field maps where the application of the matched filter complicates matters.
+\item Run your calibrator through the map-maker. Generally, you should
+reduce your calibrator using the \emph{same} recipe that you use to
+reduce your science data; the exception is blank-field maps where the
+application of the matched filter complicates matters.
 
-\item Use the \picard\ recipe \texttt{SCUBA2\_FCFNEFD} on your reduced calibrator map. 
+\item Use the \picard\ recipe \texttt{SCUBA2\_FCFNEFD} on your reduced calibrator map.
 \begin{myquote}
 \begin{verbatim}
 % picard SCUBA2_FCFNEFD 850_crl2688.sdf
 \end{verbatim}
 \end{myquote}
-This recipe will produce a log file log.fcfnefd which records the FCFs mentioned above along with a thrid (\fcfm which is not currently recommended). These can then be applied to your data using \texttt{cmult} (see Section \ref{sec:cmult}).
+This recipe will produce a log file log.fcfnefd which records the FCFs
+mentioned above along with a thrid (\fcfm\ which is not currently
+recommended). These can then be applied to your data using
+\texttt{cmult} (see Section~\ref{sec:cmult}).
 \end{enumerate}
 
 
@@ -2285,9 +3275,18 @@ Tech.\ Rep.\ SCD/SN/011, Joint Astronomy Centre
 \section{\xlabel{app_clean}Cleaning the Raw Data}
 \label{app:clean}
 
-You can use the \smurf\ task \clean\ to help inspect time-series. \clean\ can be used to do two basic tasks in one go: concatenate data (with or without applying a flatfield); and cleaning (fix up steps and spikes, remove the means, filter, remove common-mode etc.). It uses the same configuration files as the iterative map-maker (though ignoring the map-making specific items).
+You can use the \smurf\ task \clean\ to help inspect time-series.
+\clean\ can be used to do two basic tasks in one go: concatenate data
+(with or without applying a flatfield); and cleaning (fix up steps and
+spikes, remove the means, filter, remove common-mode etc.). It uses
+the same configuration files as the iterative map-maker (though
+ignoring the map-making specific items).
 
-In this first basic example, we just want to clean up some data enough to see whether the bolometers have been flat-fielded correctly, and more-or-less exhibit the same behaviour over time. the pre-processing or cleaning steps used by the default configuration file are summairsed in table \ref{tab:dimmdef}.
+In this first basic example, we just want to clean up some data enough
+to see whether the bolometers have been flat-fielded correctly, and
+more-or-less exhibit the same behaviour over time. the pre-processing
+or cleaning steps used by the default configuration file are
+summairsed in table~\ref{tab:dimmdef}.
 
 \begin{myquote}
 \begin{verbatim}
@@ -2295,15 +3294,40 @@ In this first basic example, we just want to clean up some data enough to see wh
 \end{verbatim}
 \end{myquote}
 
-Here \texttt{\$FILES} can just be a single file from a subarray, or a subset, e.g. \texttt{s8a20110417\_00051\_0003.sdf} (the first file containing science data), \texttt{s8a20110417\_00051\_000"[1234]"} (file 1 is a noise observation with shutter closed that gets ignored, file 2 is a flatfield observation that will be used to override the flatfield stored in the subsequent files 3 and 4 which are concatenated together, the \texttt{.sdf} is optional), \texttt{s8a20110417\_00051\_000\textbackslash?} (files 1 through 9), \texttt{s8a20110417\_00051\_\textbackslash*} (the whole observation). 
+Here \texttt{\$FILES} can just be a single file from a subarray, or a
+subset, e.g. \texttt{s8a20110417\_00051\_0003.sdf} (the first file
+containing science data), \texttt{s8a20110417\_00051\_000"[1234]"}
+(file 1 is a noise observation with shutter closed that gets ignored,
+file 2 is a flatfield observation that will be used to override the
+flatfield stored in the subsequent files 3 and 4 which are
+concatenated together, the \texttt{.sdf} is optional),
+\texttt{s8a20110417\_00051\_000\textbackslash?} (files 1 through 9),
+\texttt{s8a20110417\_00051\_\textbackslash*} (the whole observation).
 
-If you inspect the resulting \texttt{clean.sdf} in \gaia\ (Section~\ref{sec:gaiacube}) and flip through the data cube you should see all of the bolometers signals go up and down together with about the same amplitude: the hope is that for a well-behaved instrument you are mostly seeing sky noise variations that are seen with roughly the same amplitude by all bolometers. 
+If you inspect the resulting \texttt{clean.sdf} in \gaia\
+(Section~\ref{sec:gaiacube}) and flip through the data cube you should
+see all of the bolometers signals go up and down together with about
+the same amplitude: the hope is that for a well-behaved instrument you
+are mostly seeing sky noise variations that are seen with roughly the
+same amplitude by all bolometers.
 
-Another common feature, if the scans are particularly long and/or fast (e.g. 1\,deg across), is strong periodic signals that are correlated with the scan pattern. See Section~\ref{sec:state} -- in particular you will want to plot \texttt{az} and \texttt{el} (the absolute azimuth and elevation), and also \texttt{daz} and \texttt{del} (the azimuth and elevation offsets from the map centre). This signal is usually azimuth-correlated due to magnetic field pickup. It only shows up in azimuth, because the instrument is on a Nasmyth platform and therefore does not move in elevation.
+Another common feature, if the scans are particularly long and/or fast
+(e.g. 1\,degree across), is strong periodic signals that are correlated
+with the scan pattern. See Section~\ref{sec:scan} -- in particular
+you will want to plot \texttt{az} and \texttt{el} (the absolute
+azimuth and elevation), and also \texttt{daz} and \texttt{del} (the
+azimuth and elevation offsets from the map centre). This signal is
+usually azimuth-correlated due to magnetic field pickup. It only shows
+up in azimuth, because the instrument is on a Nasmyth platform and
+therefore does not move in elevation.
 
-Part of the reason the signals look the same is because they have been flatfielded. You can turn off flatfielding using the \texttt{noflat} option to \clean, and you should then see that all of the detector amplitudes vary.
+Part of the reason the signals look the same is because they have been
+flatfielded. You can turn off flatfielding using the \texttt{noflat}
+option to \clean, and you should then see that all of the detector
+amplitudes vary.
 
-Another very useful option is to remove the common signal observed by all of the bolometers. This may be accomplished by
+Another very useful option is to remove the common signal observed by
+all of the bolometers. This may be accomplished by
 
 \begin{myquote}
 \begin{verbatim}
@@ -2341,18 +3365,26 @@ value of \texttt{order} to remove higher-order polynomials
 \end{verbatim}
 \end{myquote}
 
-Any of the cleaning parameter can be specified independently of the default configuration files like so:
+Any of the cleaning parameter can be specified independently of the
+default configuration files like so:
 \begin{myquote}
 \begin{verbatim}
 % sc2clean $FILES clean config='"order=1,dcfitbox=30,dcthresh=25,dcsmooth=50"'
 \end{verbatim}
 \end{myquote}
-Or you can create your own customised configuration file. All the pre-prcoessing options that may be specified are listed and described in \texttt{dimmconfig.lis} -- see Appendix \ref{app:dimm}.
+Or you can create your own customised configuration file. All the
+pre-prcoessing options that may be specified are listed and described
+in \texttt{dimmconfig.lis} -- see Appendix~\ref{app:dimm}.
 
 
 \section{\xlabel{matchedfilter}SCUBA-2 Matched Filter}
 \label{app:mf}
-In order to optimally find sources that are the size of the telescope beam, and suppress this residual large-scale noise, the \picard\ recipe \drrecipe{SCUBA2\_MATCHED\_FILTER} may be used. If there were no large-scale noise in the map, the filtered signal map would be calculated as follows:
+
+In order to optimally find sources that are the size of the telescope
+beam, and suppress this residual large-scale noise, the \picard\
+recipe \drrecipe{SCUBA2\_MATCHED\_FILTER} may be used. If there were
+no large-scale noise in the map, the filtered signal map would be
+calculated as follows:
 
 \begin{equation}
 \mathcal{M} = \frac{[M(x,y)/\sigma^2(x,y)] \otimes P(x,y)}
@@ -2380,7 +3412,8 @@ kernel to estimate the background, and then subtracts it from the
 image. The same operation is also applied to the PSF to estimate the
 effective shape of a point-source in this background-subtracted map.
 
-Before running \picard\, a simple parameters file called \texttt{smooth.ini} may be created.
+Before running \picard\, a simple parameters file called \texttt{smooth.ini}
+may be created.
 \begin{myquote}
 \begin{verbatim}
 [SCUBA2_MATCHED_FILTER]
@@ -2398,20 +3431,30 @@ Gaussian. The recipe is then executed as follows:
 \end{verbatim}
 \end{myquote}
 %
-The output of this operation is a smoothed image called \texttt{map\_mf.sdf}. By default, the recipe automatically normalizes the output such that the peak flux densities of point sources are conserved. Note that the accuracy of this normalization depends on how closely the real PSF matches the 7.5\,arcsec and 14\,arcsec full-width at half-maximum (FWHM) Gaussian shapes assumed at 450\micron\ and 850\micron, respectively (an explicit PSF can also be supplied using the \param{PSF\_MATCHFILTER} recipe parameter).
+The output of this operation is a smoothed image called
+\texttt{map\_mf.sdf}. By default, the recipe automatically normalizes
+the output such that the peak flux densities of point sources are
+conserved. Note that the accuracy of this normalization depends on how
+closely the real PSF matches the 7.5\,arcsec and 14\,arcsec full-width
+at half-maximum (FWHM) Gaussian shapes assumed at 450\micron\ and
+850\micron, respectively (an explicit PSF can also be supplied using
+the \param{PSF\_MATCHFILTER} recipe parameter).
 
 
 
 \section{\xlabel{fcfsred}FCFs by Reduction Date}
 \label{app:fcfs}
-Ongoing development of the SCUBA-2 anlaysis has resulted in on-going changes to the tau relationship and the FCFs. Depending on when your data was reduced will need to apply different calibration values.
+
+Ongoing development of the SCUBA-2 anlaysis has resulted in on-going
+changes to the tau relationship and the FCFs. Depending on when your
+data was reduced will need to apply different calibration values.
 \\*
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|}
  \hline
  \multicolumn{1}{|c|}{Date}      &
- \multicolumn{2}{c|}{FCF - 450$\mu$m}  & 
+ \multicolumn{2}{c|}{FCF - 450$\mu$m}  &
 \multicolumn{2}{c|}{FCF - 850$\mu$m}      \\
 \cline{2-5}
 & Jy/pW/beam &Jy/pW/arcsec$^2$& Jy/pW/beam &Jy/pW/arcsec$^2$ \\
@@ -2428,29 +3471,28 @@ July 2012 onwards&491 &4.71 &537 &2.34 \\
 \begin{center}
 \begin{tabular}{|l|c|c|}
  \hline
- \multicolumn{1}{|c}{Date}      &
- \multicolumn{2}{|c|}{Tau Relation}  \\
-\cline{2-3}
- &450$\mu$m& 850$\mu$m \\
- \hline
-until January 2012 &32 $\times$ ($\tau_{225}$ - 0.02)& 	5.2 $\times$ ($\tau_{225}$ - 0.013)  \\
-January 2012 - July 2012&26 $\times$ ($\tau_{225}$- 0.01923)&4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
-July 2012 onwards&	26 $\times$ ($\tau_{225}$ - 0.01196) &4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
+ \multicolumn{1}{|c}{Date} & \multicolumn{2}{|c|}{Tau Relation}  \\ \cline{2-3}
+                           & 450$\mu$m  & 850$\mu$m \\ \hline
+until January 2012       & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau_{225}$ - 0.013)  \\
+January 2012 - July 2012 & 26 $\times$ ($\tau_{225}$- 0.01923)  & 4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
+July 2012 onwards        & 26 $\times$ ($\tau_{225}$ - 0.01196) & 4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
 \vspace{-5mm}
 \begin{itemize}
-\item Peak FCF (Jy/pW/beam) -- multiply your map by this when you wish to measure absolute peak fluxes of discrete sources.
-\item Arcsec FCF (Jy/pW/arcsec$^2$) -- multiply your map by this if you wish to use the calibrated map to do aperture photometry.
+\item Peak FCF (Jy/pW/beam) -- multiply your map by this when you wish
+to measure absolute peak fluxes of discrete sources.
+\item Arcsec FCF (Jy/pW/arcsec$^2$) -- multiply your map by this if
+you wish to use the calibrated map to do aperture photometry.
 \end{itemize}
-
-You can find out when your data was reduced and hence what tau relation was applied by using the \Kappa\ command \texttt{hislist}.
+You can find out when your data was reduced and hence what tau
+relation was applied by using the \Kappa\ command \hislist.
 \vspace{-2mm}
 \begin{myquote}
 \begin{verbatim}
->>  hislist file.sdf | grep EXT.TAURELATION
+%  hislist file.sdf | grep EXT.TAURELATION
       , EXT.TAURELATION.450=(26.0,-0.012),
       EXT.TAURELATION.850=(4.6,-0.0043), EXT.TAUSRC=auto, FAKESCALE=1,
 \end{verbatim}
@@ -2458,14 +3500,21 @@ You can find out when your data was reduced and hence what tau relation was appl
 
 \section{\xlabel{fcfsred}Aperture Photometry Curve of Growth}
 \label{app:cog}
-The SCUBA-2 beam has a broad error beam. As the size of the annulus changes, the contribution from the error beam scales according to the curve-of-growth -- see Figure \ref{fig:cog}. To correct for an aperture size differing from 60$''$ diameter you should read off the appropriate scaling factor  for your FCF from the graph below.
 
-%For example, a 100$''$ aperture will mean you are collectng more flux and your FCF will be too high. It will need to be scaled down
+The SCUBA-2 beam has a broad error beam. As the size of the annulus
+changes, the contribution from the error beam scales according to the
+curve-of-growth -- see Figure~\ref{fig:cog}. To correct for an
+aperture size differing from 60\arcsec\ diameter you should read off the
+appropriate scaling factor for your FCF from the graph below.
+
+%For example, a 100\arcsec\ aperture will mean you are collectng more flux and your FCF will be too high. It will need to be scaled down
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.95\linewidth]{curveofgrowth}
-\caption{\small Aperture photometry curve of growth normalised for a 60$''$ aperture at 450$\mu$m \textbf{(left)} and 850$\mu$m \textbf{(right)}. Figure taken from Dempsey et al. (2012).}
+\includegraphics[width=0.95\linewidth]{curveofgrowth.eps}
+\caption{\small Aperture photometry curve of growth normalised for a
+60\arcsec\ aperture at 450$\mu$m \textbf{(left)} and 850$\mu$m \textbf{(right)}.
+Figure taken from Dempsey et al. (2012).}
 \label{fig:cog}
 \end{figure}
 
@@ -2474,7 +3523,7 @@ The SCUBA-2 beam has a broad error beam. As the size of the annulus changes, the
 \begin{myquote}
 \begin{verbatim}
 # Number of iterations
-#  postive number  = fixed number of iterations
+#  positive number  = fixed number of iterations
 #  negative number = max iterations if using chi^2 and/or map stopping criteria
 numiter = -5
 
@@ -2606,7 +3655,7 @@ exportndf = 0
 
 # The gap (in time slices if positive and seconds if negative) between full
 # calculations of the output map bolometer positions. Setting a larger value
-# for this will speed up the map maker but will introduce larger spatial
+# for this will speed up the map-maker but will introduce larger spatial
 # errors. The default value of -0.5 (i.e. 100 samples at a sample rate of
 # 200 Hz) seems to produce spatial errors of under 0.1 arc-sec. This
 # level of errors seems to cause about 1% of bolometers samples to be
@@ -2647,7 +3696,7 @@ downsampscale = -1
 # involve: (i) produce a map withe makemap; (ii) produce an image with
 # simulated data with the same pixel dimensions; (iii) specify this
 # new map for the "fakemap" parameter below. Note that this is a
-# fully-parsed ndf identifier, so you can do things like:
+# fully parsed ndf identifier, so you can do things like:
 #
 # fakemap = fakesky.sdf
 # fakemap = fakesky[1:300,100:450]
@@ -2708,7 +3757,7 @@ badfrac = 0.05
 # and assuming a typical 1/f knee of 1 Hz, the telescope needs to slew
 # at least 30 arcsec/sec to place sources in the signal band above the
 # knee. Also, assuming a sample rate of 200 Hz, we want to be able to
-# fully-sample the 450 and 850 beams. For now just set it to something
+# fully sample the 450 and 850 beams. For now just set it to something
 # that is bigger than we need, but be warned that point-sources may be
 # smeared-out.
 
@@ -3340,7 +4389,11 @@ com.perarray = 1
 
 
 \subsection{dimmconfig\_bright.lis}
-This file is included as although it is not used in its own right it form the basis (on top of \texttt{dimmconfig.lis} for both \texttt{dimmconfig\_bright\_compact.lis} and \texttt{dimmconfig\_bright\_extended.lis}
+
+This file is included as although it is not used in its own right it
+form the basis (on top of \texttt{dimmconfig.lis} for both
+\texttt{dimmconfig\_bright\_compact.lis} and
+\texttt{dimmconfig\_bright\_extended.lis}
 \begin{myquote}
 \begin{verbatim}
 ^$STARLINK_DIR/share/smurf/dimmconfig.lis
