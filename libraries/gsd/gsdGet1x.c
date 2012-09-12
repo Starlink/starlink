@@ -307,7 +307,6 @@ int gsdGet1r( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
    int    status;
    int    first, last;
    char   name[GSD_NAMELEN+1];
-   int i;
 
 /*.
  */
@@ -332,14 +331,10 @@ int gsdGet1r( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
 /* Return.
  */
    abort:
-   printf("Status = %d first=%d last=%d, '%s'\n", status,first,last, name );
    if ( status ) {
      *actvals = 0;
    } else {
      *actvals = last - first + 1;
-   }
-   for (i=0; i<*actvals;i++) {
-     printf("values[%d] = %g\n", i, values[i] );
    }
    return status;
 }
