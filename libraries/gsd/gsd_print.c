@@ -99,7 +99,7 @@ int main( int argc, char *argv[] )
    GSDItemDesc *item_dsc = NULL;  /* GSD item descriptors */
    char  *data_ptr = NULL;  /* Collective data from GSD file */
 
-   char  *message[] =
+   const char  *message[] =
    {  "gsd_print: OK.\n",
       "Usage: gsd_print filename\n",
       "gsd_print: Could not read file.\n",
@@ -364,6 +364,6 @@ int main( int argc, char *argv[] )
  */
    abort:
    (void) gsdClose( fptr, file_dsc, item_dsc, data_ptr );
-   if ( status ) (void) fprintf( stderr, message[status] );
+   if ( status ) (void) fprintf( stderr, "%s", message[status] );
    return status;
 }
