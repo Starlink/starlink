@@ -77,6 +77,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gsd.h"
+#include "gsd1.h"
 
 #define HEADER_FORMAT \
 "------------------------------------------------------------\
