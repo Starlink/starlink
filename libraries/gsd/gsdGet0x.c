@@ -124,7 +124,7 @@ int gsdGet0b( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
               int itemno, char *value )
 {
    int    status;
-   char   name[16];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -154,7 +154,7 @@ int gsdGet0l( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
               int itemno, char *value )
 {
    int    status;
-   char   name[16];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -184,7 +184,7 @@ int gsdGet0w( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
               int itemno, short *value )
 {
    int    status;
-   char   name[16];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -214,7 +214,7 @@ int gsdGet0i( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
               int itemno, int *value )
 {
    int    status;
-   char   name[16];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -244,7 +244,7 @@ int gsdGet0r( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
               int itemno, float *value )
 {
    int    status;
-   char   name[16];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -274,7 +274,7 @@ int gsdGet0d( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
               int itemno, double *value )
 {
    int    status;
-   char   name[16];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -304,7 +304,7 @@ int gsdGet0c( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
               int itemno, char *value )
 {
    int    status;
-   char   name[16];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */

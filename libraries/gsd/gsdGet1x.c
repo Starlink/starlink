@@ -149,7 +149,7 @@ int gsdGet1b( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
 {
    int    status;
    int    first, last;
-   char   name[16];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -188,7 +188,7 @@ int gsdGet1l( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
 {
    int    status;
    int    first, last;
-   char   name[15];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -228,7 +228,7 @@ int gsdGet1w( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
 {
    int    status;
    int    first, last;
-   char   name[15];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -267,7 +267,7 @@ int gsdGet1i( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
 {
    int    status;
    int    first, last;
-   char   name[15];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -306,7 +306,8 @@ int gsdGet1r( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
 {
    int    status;
    int    first, last;
-   char   name[15];
+   char   name[GSD_NAMELEN+1];
+   int i;
 
 /*.
  */
@@ -331,7 +332,15 @@ int gsdGet1r( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
 /* Return.
  */
    abort:
-   if ( status ) *actvals = 0; else *actvals = last - first + 1;
+   printf("Status = %d first=%d last=%d, '%s'\n", status,first,last, name );
+   if ( status ) {
+     *actvals = 0;
+   } else {
+     *actvals = last - first + 1;
+   }
+   for (i=0; i<*actvals;i++) {
+     printf("values[%d] = %g\n", i, values[i] );
+   }
    return status;
 }
 
@@ -345,7 +354,7 @@ int gsdGet1d( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
 {
    int    status;
    int    first, last;
-   char   name[15];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */
@@ -384,7 +393,7 @@ int gsdGet1c( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
 {
    int    status;
    int    first, last;
-   char   name[16];
+   char   name[GSD_NAMELEN+1];
 
 /*.
  */

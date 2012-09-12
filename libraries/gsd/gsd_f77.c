@@ -57,6 +57,7 @@
 #include <stdlib.h>
 #include "f77.h"
 #include "gsd.h"
+#include "gsd1.h"
 
 F77_SUBROUTINE(gsd_open_read)( CHARACTER(file), INTEGER(fd), REAL(version),
    CHARACTER(label), INTEGER(no_items), INTEGER(status)
@@ -488,7 +489,7 @@ F77_SUBROUTINE(gsd_item)( INTEGER(fd), INTEGER(number), CHARACTER(name),
    extern int   gsd_used[];
 
    char  carray;     /* Arrayness       */
-   char  cname[16];  /* Item name       */
+   char  cname[GSD_NAMELEN+1];  /* Item name       */
    char  ctype;      /* Data type       */
    char  ctype2[2];  /* dto.            */
    char  cunit[11];  /* Item unit       */
@@ -602,7 +603,7 @@ F77_SUBROUTINE(gsd_inq_size)( INTEGER(fd), INTEGER(number), INTEGER(maxdims),
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
-   char  adimnames[GSD__MAXDIM][16];  /* Space for names        */
+   char  adimnames[GSD__MAXDIM][GSD_NAMELEN+1];  /* Space for names        */
    char  adimunits[GSD__MAXDIM][11];  /* Space for units        */
    char *cdimnames[GSD__MAXDIM];      /* Pointers for names     */
    char *cdimunits[GSD__MAXDIM];      /* Pointers for units     */
