@@ -74,6 +74,9 @@
 #define  GSD_SZDOUBLE  8
 #define  GSD_SZCHAR   16
 
+/* Number of characters required for a GSD name without nul terminator */
+#define  GSD_NAMELEN  15
+
 enum type_tag
 {  typ_byte  =  1,
    typ_logical,
@@ -102,7 +105,7 @@ typedef struct file_descriptor
 
 typedef struct item_descriptor
 {  char  array;
-   char  name[15];
+   char  name[GSD_NAMELEN];
    short namelen;
    char  unit[10];
    short unitlen;

@@ -150,7 +150,7 @@ int gsd1_getval( const struct file_descriptor *file_dsc,
    const struct item_descriptor *item_dsc2;
 
    const char  *byte_ptr;
-   char   upper_name[16];
+   char   upper_name[GSD_NAMELEN+1];
    int    i, j, status;
    int    dlength;
 
@@ -168,14 +168,14 @@ int gsd1_getval( const struct file_descriptor *file_dsc,
    if ( mode == 2 || mode == 3 )                           /* Number given */
    {  if ( *itemno < 1 || *itemno > file_dsc->no_items ) return -1;
       item_dsc2 = item_dsc + *itemno - 1;
-      (void) memcpy( name, item_dsc2->name, 15 ); name[15] = '\0';
+      (void) memcpy( name, item_dsc2->name, GSD_NAMELEN ); name[GSD_NAMELEN] = '\0';
    }
    else                                                      /* Name given */
    {  for ( i = 0; name[i]; i++ ) upper_name[i] = toupper( name[i] );
-      for (      ; i <  15; i++ ) upper_name[i] = ' ';
-      upper_name[15] = '\0';
+      for (      ; i <  GSD_NAMELEN; i++ ) upper_name[i] = ' ';
+      upper_name[GSD_NAMELEN] = '\0';
       for ( j = 0; j < file_dsc->no_items; j++ )
-         if ( !memcmp( (item_dsc+j)->name, upper_name, 15 ) ) break;
+         if ( !memcmp( (item_dsc+j)->name, upper_name, GSD_NAMELEN ) ) break;
       if ( j >= file_dsc->no_items ) return -1;
       *itemno = j + 1;
       item_dsc2 = item_dsc + *itemno - 1;

@@ -109,12 +109,12 @@ int main( int argc, char *argv[] )
       "gsd_print: Array access failed.\n"
    };
 
-   char   dimnames[5][16];  /* Names of array dimensions */
+   char   dimnames[5][GSD_NAMELEN+1];  /* Names of array dimensions */
    char  *dimnam[5];        /* Pointer array for dimnames */
    char   dimunits[5][11];  /* Units of array dimensions */
    char  *dimunt[5];        /* Pointer array for dimunits */
    char   label[41];        /* File label */
-   char   name[16];         /* Item name */
+   char   name[GSD_NAMELEN+1];         /* Item name */
    char   unit[11];         /* Item unit */
    char   type;             /* Data type code (BLWIRDC) */
    char   table;            /* Arrayness of item */
