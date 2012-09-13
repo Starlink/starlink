@@ -10,7 +10,9 @@ sc21_cosmo1-mf.eps sc21_crl2688.eps sc21_crl2688_err.eps \
 sc21_crl2688_regrid.eps sc21_curveofgrowth.eps \
 sc21_flow_dimm_blue.eps sc21_flt.eps sc21_foo.eps \
 sc21_gaia1.eps sc21_gaia2.eps sc21_gal-def.eps \
-sc21_gal_brex.eps sc21_gal_def.eps sc21_gal_exptime.eps \
+sc21_gal12_crop.eps sc21_gal_11.eps sc21_gal_mask1.eps \
+sc21_gal_mask2.eps sc21_gal_brex.eps \
+sc21_gal_def.eps sc21_gal_exptime.eps \
 sc21_galex_brex.eps sc21_galex_brex_crop.eps \
 sc21_iter1.eps sc21_iter2.eps sc21_iter3.eps \
 sc21_iter31.eps sc21_itermaps_anim.eps sc21_noihist.eps \
