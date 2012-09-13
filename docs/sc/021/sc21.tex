@@ -728,7 +728,7 @@ of data taken by SCUBA-2 has a $1/f$ noise curve at lower frequencies. To
 ensure astronomical signals are far away from this $1/f$ noise, fast
 scanning speeds are required.
 
-In order to disentangle large-scale structure from other
+In order to disentangle source structure from other
 slowly varying signals (e.g. extinction, sky noise, $1/f$ noise), the
 scan pattern must pass across each region of the map from different
 directions and at different times. The scan patterns themselves, along
@@ -1043,7 +1043,7 @@ this we try to avoid observing any sources above 70$^\circ$ elevation.
 If the \fitslist\ parameters \param{ELSTART} and \param{ELEND}
 indicate that your map was taken at high elevation you may consider
 checking the success of the scan pattern. If you find your observation
-has failed to follow the demanded scan pattern dont worry, the data is
+has failed to follow the demanded scan pattern don't worry, the data is
 likely to still be useful. This is especially true for \textsc{daisy}
 maps where the high exposure-time central region is usually
 unaffected.
@@ -1333,7 +1333,7 @@ modelorder = (com,gai,ext,flt,ast,noi)
 \vspace{-0.1cm}
 The only recipe not following this model order is the one tailored for
 blank field maps which does not include a \texttt{FLT} model in the
-itertive stage (see Section~\ref{sec:config}). Below is a basic
+iterative stage (see Section~\ref{sec:config}). Below is a basic
 description of each model, while more complete descriptions of the
 models and all the associated caveats can be found in Chapin et al.
 (2012) \cite{mapmaker}.
@@ -1799,7 +1799,7 @@ constrain the \texttt{AST} model to zero wherever the S/N is lower
 than 5$\sigma$.  Everywhere the signal is below this threshold, the
 map is set to zero for all but the final iteration. \texttt{numiter}
 has been raised to -40, as more iterations are required to maximise
-the sensitivty to large dynamic signal ranges in the map.
+the sensitivity to large dynamic signal ranges in the map.
 
 Recovering both faint extended structure and bright sources in the
 same field poses an extra challenge. After initially making your map using
@@ -1812,7 +1812,7 @@ Section~\ref{sec:maskbe}.
 Figure~\ref{fig:becompare} shows a comparison between maps reduced
 with the default configuration file and using
 \texttt{dimmconfig\_bright\_extended.lis}; the most noticeable
-difference is the improvment in the bowling around strong sources.
+difference is the improvement in the bowling around strong sources.
 
 \renewcommand*\arraystretch{0.8}
 \begin{table}[t!]
@@ -2019,7 +2019,7 @@ Total samples available from all chunks: 18273302 (3067.53 bolos)
 \subsection{\xlabel{look_for}What to look out for}
 \flushbottom
 Once the map-maker has completed you can open your output map using
-\gaia -- see Figure~\ref{fig:itermap}. The excerpt above shows the
+\gaia\ -- see Figure~\ref{fig:itermap}. The excerpt above shows the
 output written to the terminal as you run the map-maker. There are a
 number of clues in this output that indicate the status of the
 reduction.
@@ -4105,7 +4105,7 @@ com.nsigma = 3
 # and then new means and sample standard deviations are measured until
 # convergence. The time axis is divided up into one or more equal sized boxes,
 # and a separate fit is performed for each box. If you wish to completely
-# disable the flagging of outlier bolometers compared to the common-mode,
+# disable the flagging of outlier bolometers compared with the common-mode,
 # simply set com.noflag=1
 #
 # com.noflag: if set, disable flagging of bad bolos using common-mode
@@ -4404,7 +4404,7 @@ ast.zero_snr = 5
 # warning: if the source is near the edge of the map (or has an extent
 # large than the size of this mask!) this configuration may give odd
 # results due to the value of ast.zero_lowhits!  If you suspect a
-# problem, compare the location of the source to the zero-masked
+# problem, compare the location of the source with the zero-masked
 # pixels (see QUALITY component of the resulting map). If the mask
 # overlaps with the source, try modifying the radius.
 #
@@ -4469,7 +4469,7 @@ com.perarray = 1
 # to get a good feel for how well the map is converging (and whether
 # you would like more or less iterations). It is also useful to
 # identify particularly noisy portions of the data. If the last
-# iteration of a given chunk looks poor compared to the other chunks,
+# iteration of a given chunk looks poor compared with the other chunks,
 # you can identify the input files from the FITS header of the
 # extension, and remove them.
 #
