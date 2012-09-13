@@ -24,7 +24,7 @@
 # to get a good feel for how well the map is converging (and whether
 # you would like more or less iterations). It is also useful to
 # identify particularly noisy portions of the data. If the last
-# iteration of a given chunk looks poor compared to the other chunks,
+# iteration of a given chunk looks poor compared with the other chunks,
 # you can identify the input files from the FITS header of the
 # extension, and remove them.
 #

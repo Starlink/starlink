@@ -11,7 +11,7 @@
 # warning: if the source is near the edge of the map (or has an extent
 # large than the size of this mask!) this configuration may give odd
 # results due to the value of ast.zero_lowhits!  If you suspect a
-# problem, compare the location of the source to the zero-masked
+# problem, compare the location of the source with the zero-masked
 # pixels (see QUALITY component of the resulting map). If the mask
 # overlaps with the source, try modifying the radius.
 #
