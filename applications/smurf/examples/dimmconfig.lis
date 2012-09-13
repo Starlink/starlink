@@ -463,7 +463,7 @@ com.nsigma = 3
 # and then new means and sample standard deviations are measured until
 # convergence. The time axis is divided up into one or more equal sized boxes,
 # and a separate fit is performed for each box. If you wish to completely
-# disable the flagging of outlier bolometers compared to the common-mode,
+# disable the flagging of outlier bolometers compared with the common-mode,
 # simply set com.noflag=1
 #
 # com.noflag: if set, disable flagging of bad bolos using common-mode
