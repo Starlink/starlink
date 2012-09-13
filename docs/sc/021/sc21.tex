@@ -1,80 +1,31 @@
 \documentclass[twoside,11pt]{article}
-\usepackage{framed}
-\usepackage{graphicx}
-\usepackage{sidecap}
-\usepackage{picture,xcolor}
-\usepackage{color}
-%\pagestyle{myheadings}
-\usepackage{fancyhdr}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
 \usepackage{array}
-\usepackage{upquote}
 \usepackage{multirow}
-\usepackage{bold-extra}
-%\usepackage[T1]{fontenc}
-\usepackage{titlesec}
-\usepackage{amssymb}
-\usepackage{caption}
+% ? End of specify used packages
 
-% +
-%  Name:
-%     sc21.tex
-%
-%  Purpose:
-%     The SCUBA-2 data analysis cookbook (SC/21)
-%
-%  Authors:
-%     Ed Chapin (UBC)
-%     Holly Thomas (JAC)
-%     Malcolm J. Currie (JAC)
-%
-%  Copyright:
-%     Copyright (C) 2012 JAC
-%
-% ------------------------------------------------------------------------
+\pagestyle{myheadings}
 
-
-% Add any \newcommand or \newenvironment commands here
-
-%%font
-%\renewcommand{\familydefault}{\sfdefault}
-%% Upright micron (code stolen from http://www.superstrate.net/useful/useful.html)
-\DeclareFontFamily{U}{euc}{}% I chose euc because the chart is called Euler cursive
-\DeclareFontShape{U}{euc}{m}{n}{<-6>eurm5<6-8>eurm7<8->eurm10}{}%
-\DeclareSymbolFont{AMSc}{U}{euc}{m}{n} % I chose AMSc because AMSa and AMSb are defined in the amsfonts-package
-\DeclareMathSymbol{\umu}{\mathord}{AMSc}{"16}
-
-\newcommand{\about}{$\sim$}
-\newcommand{\eg}{{\it e.g.}}
-\newcommand{\ie}{{\it i.e.}}
-\newcommand{\micron}{\mbox{\,${\umu}$m}}            % microns
-\newcommand{\arcmin}{\mbox{$^\prime$}}
-\newcommand{\arcsec}{\mbox{\arcmin\hskip -0.1em\arcmin}}
-\newcommand{\degr}{\mbox{\,$^\circ$}}               % degrees sign
-
-% ------------------------------------------------------------------------
-
-\pagenumbering{arabic}
-
-% ------------------------------------------------------------------------
-
+% -----------------------------------------------------------------------------
 
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink Cookbook}
 \newcommand{\stardocinitials}  {SC}
 \newcommand{\stardocsource}    {sc\stardocnumber}
-\newcommand{\stardoccopyright} {Copyright \copyright\ 2012 University of British Columbia \\
-                                Copyright \copyright\ 2012 Science \& Technology Facilities Council}
+\newcommand{\stardoccopyright} {Copyright \copyright\ 2012 Science and Technology Facilities Council}
 \newcommand{\stardocnumber}    {21.0}
 \newcommand{\stardocauthors}   {H. S. Thomas}
-\newcommand{\stardoceditor}    {Editor: H. S. Thomas}
-\newcommand{\stardocdate}      {10 September 2012}
-\newcommand{\stardoctitle}     {The SCUBA-2 Data Reduction Manual}
+\newcommand{\stardocdate}      {12 September 2012}
+\newcommand{\stardoctitle}     {The SCUBA-2 Data Reduction Cookbook}
 \newcommand{\stardocversion}   {1.1}
-%\newcommand{\stardocmanual}   {\ }
+\newcommand{\stardocmanual}    {\ }
 \newcommand{\stardocabstract}  {
 
-   This cookbook provides a short introduction to \starlink\
-   facilities, especially \smurf, the Sub-Millimetre User Reduction
+   This cookbook provides a short introduction to Starlink facilities,
+   especially \textsc{Smurf}, the Sub-Millimetre User Reduction
    Facility, for reducing, displaying, and calibrating SCUBA-2 data.
    It describes some of the data artefacts present in SCUBA-2
    time-series and methods to mitigate them. In particular, this
@@ -85,6 +36,9 @@
    presented.}
 
 % ? End of document identification
+
+% -----------------------------------------------------------------------------
+
 % +
 %  Name:
 %     sc.tex
@@ -109,13 +63,9 @@
 %     {Add further history here}
 %
 % -
-\newsavebox{\fmbox}
-\newenvironment{fmpage}[1]
-{\begin{lrbox}{\fmbox}\begin{minipage}{#1}}
-{\end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}}
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-%\markboth{\stardocname}{\stardocname}
+\markboth{\stardocname}{\stardocname}
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
 \setlength{\topmargin}{-2mm}
@@ -124,22 +74,7 @@
 \setlength{\parindent}{0mm}
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\addtolength{\textheight}{2cm}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\addtolength{\topmargin}{0cm}
 
-\newcounter{box}
-%\pagenumbering{arabic}
-%\pagestyle{myheadings}
-
-\pagestyle{fancy}
-\renewcommand{\sectionmark}[1]{\markboth{#1}{#1}}
-\renewcommand{\subsectionmark}[1]{}
-\renewcommand{\headrulewidth}{0pt}
-\lhead{\thepage}
-\fancyfoot[c]{}
-\fancyfoot[r]{\stardocname}
-
-\renewcommand{\labelitemi}{$\circ$}
 % -----------------------------------------------------------------------------
 %  Hypertext definitions.
 %  ======================
@@ -194,8 +129,6 @@
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
 
-\setlength{\abovecaptionskip}{1pt}
-
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
 %  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
@@ -215,8 +148,6 @@
 \newcommand{\html}[1]{}
 \newcommand{\latexhtml}[2]{#1}
 \newcommand{\HTMLcode}[2][]{}
-
-\definecolor{blue}{rgb}{0.07,0.05,0.91}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -245,18 +176,38 @@
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
+% Include special HTML versions of commands.
+
+\newcommand{\eg}{{\it e.g.}}
+\newcommand{\ie}{{\it i.e.}}
+
+% microns
+\newcommand{\micron}{\mbox{$\mu$m}}
+
+% degrees symbol
+\newcommand{\degr}{\mbox{\,$^\circ$}}
+
+% arcminute symbol
+\newcommand{\arcmin}{\mbox{$^\prime$}}
+
+% arcsec symbol
+\newcommand{\arcsec}{\arcmin\hspace*{-0.1em}\arcmin}
+
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]{\begin{lrbox}{\fmbox}\begin{minipage}{#1}}{\end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}}
+
 % A new environment for quoting verbatim
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
 
-\newcommand{\text}[1]{{\small \texttt{#1}}}
+% Shortcuts
+% ---------
 
 % Typographical shortcuts
 \newcommand{\fcfbe}{$\mathrm{FCF_{beamequiv}}$}
 \newcommand{\fcfb}{$\mathrm{FCF_{beam}}$}
 \newcommand{\fcfa}{$\mathrm{FCF_{arcsec}}$}
 \newcommand{\fcfm}{$\mathrm{FCF_{match}}$}
-\newcommand\XOR{\mathbin{\char`\^}}
 
 % SCUBA reference
 %\newcommand{\scuba}{\htmladdnormallink{SCUBA}{http://www.jach.hawaii.edu/JCMT/}}
@@ -264,7 +215,7 @@
 % Starlink Package names
 \newcommand{\starlink}{\htmladdnormallink{Starlink}{http://starlink.jach.hawaii.edu}}
 
-% set up some common package names
+% Set up some common package names
 \newcommand{\ccdpack}{\xref{\textsc{Ccdpack}}{sun139}{}}
 \newcommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
 \newcommand{\cupid}{\xref{\textsc{Cupid}}{sun255}{}}
@@ -276,7 +227,7 @@
 \newcommand{\ndf}{\xref{NDF}{sun33}{}}
 \newcommand{\surf}{\xref{\textsc{Surf}}{sun216}{}}
 \newcommand{\jcmtdr}{\xref{\textsc{JCMTdr}}{sun132}{}}
-\newcommand{\oracdr}{\xref{\textsc{Orac-dr}}{sun231}{}}
+\newcommand{\oracdr}{\htmladdnormallink{\textsc{Orac-dr}}{http://www.oracdr.org/oracdr}}
 \newcommand{\photom}{\xref{\textsc{Photom}}{sun45}{}}
 \newcommand{\picard}{\xref{\textsc{Picard}}{sun265}{}}
 \newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
@@ -299,7 +250,6 @@
 \newcommand{\flatfield}{\xref{\task{flatfield}}{sun258}{FLATFIELD}}
 \newcommand{\jcmtstate}{\xref{\task{jcmtstate2cat}}{sun258}{JCMTSTATE2CAT}}
 \newcommand{\makemap}{\xref{\task{makemap}}{sun258}{MAKEMAP}}
-% Non surf tasks
 
 % KAPPA
 \newcommand{\beamfit}{\xref{\task{beamfit}}{sun95}{BEAMFIT}}
@@ -334,15 +284,11 @@
 % JAC
 \newcommand{\Coulson}{\htmladdnormallink{Coulson}{http://www.jach.hawaii.edu/JACdocs/JCMT/SCD/SN/003/ }}
 
-% Special HTML versions of commands
-\begin{htmlonly}
-\renewcommand{\micron}{\begin{rawhtml}&mu;m\end{rawhtml}}
-\end{htmlonly}
-
 %FONT
 %\renewcommand\familydefault{\sfdefault}
-\titleformat*{\section}{\LARGE\bfseries}
-\titleformat*{\subsection}{\large\bfseries}
+%\titleformat*{\section}{\LARGE\bfseries}
+%\titleformat*{\subsection}{\large\bfseries}
+
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -355,41 +301,33 @@
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   \textsc{University of British Columbia \&} \hfill \textbf{\stardocname}\\
-   {\textsc{Science \& Technology Facilities Council}}\\
+   \textsc{Joint Astronomy Centre} \hfill \textbf{\stardocname}\\
+   {\large Science \& Technology Facilities Council}\\
    {\large Starlink Project\\}
-   {\large \stardoccategory\ \stardocnumber\\}\\
-%  \vspace{10mm}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\stardoceditor\\
- %\vspace{10mm}
+   {\large \stardoccategory\ \stardocnumber}
    \begin{flushright}
- \vspace{-4mm}
- %  \stardocauthors\\
-   \stardocdate\\
+   \stardocauthors\\
+   \stardocdate
    \end{flushright}
    \vspace{-4mm}
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
    {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-  % {\LARGE\textbf{\stardocversion \\ [4ex]}}
-%   {\Huge\textbf{\stardocmanual}}
- \vspace{5mm}
-\begin{center}
-\includegraphics[scale=0.4]{sc21_s2logo.eps}
-\end{center}
- \vspace{5mm}
-   \rule{\textwidth}{0.5mm}\\
-   \vspace{5mm}
-   \stardocauthors\\
-  \vspace{10mm}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
    \end{center}
    \vspace{5mm}
 
 % ? Add picture here if required for the LaTeX version.
 %   e.g. \includegraphics[scale=0.3]{filename.ps}
-
 % ? End of picture
+   \begin{center}
+   \includegraphics[scale=0.4]{sc21_s2logo.eps}
+   \end{center}
+   \vspace{5mm}
+   \rule{\textwidth}{0.5mm}\\
+   \vspace{15mm}
 
 % ? Heading for abstract if used.
    \vspace{10mm}
@@ -404,28 +342,23 @@
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
-      %\stardoctitle\\
-  %    \stardocversion\\
+      \stardoctitle\\
+      \stardocversion\\
       \stardocmanual
    \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
 % ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
-\includegraphics[width=2.0in]{scuba_logo}
+%   e.g. \includegraphics[scale=0.5]{filename.ps}
+   \includegraphics[width=90mm]{sc21_s2logo.eps}
 % ? End of picture
 
- \begin{rawhtml} <HR><hr> \end{rawhtml}
-
-   \begin{rawhtml} <P> {\sl  \end{rawhtml}
+   \begin{rawhtml} <P> <I> \end{rawhtml}
    \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
-
- \begin{rawhtml} <HR> \end{rawhtml}
-
-   \begin{rawhtml} } </P> <H3> \end{rawhtml}
-      \htmladdnormallink{University of British Columbia}
-                        {http://www.ubc.ca} \\
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{Joint Astronomy Centre}
+                        {http://www.jach.hawaii.edu}\\
       \htmladdnormallink{Science \& Technology Facilities Council}
                         {http://www.scitech.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
@@ -439,7 +372,6 @@
 %  Add table of contents header and a navigation button to return to this
 %  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-
   \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
@@ -448,7 +380,7 @@
         {stardoccontents}}
 
 % ? New section for abstract if used.
-\section{\xlabel{abstract}Abstract}
+  \section{\xlabel{abstract}Abstract}
 % ? End of new section for abstract
 \end{htmlonly}
 
@@ -472,14 +404,9 @@
 % ? Latex document Table of Contents (if used).
 %  ===========================================
   \newpage
-
   \begin{latexonly}
-
     \setlength{\parskip}{0mm}
     \tableofcontents
-%\newpage
-%\listoffigures
-\thispagestyle{empty}
     \setlength{\parskip}{\medskipamount}
     \markboth{\stardocname}{\stardocname}
   \end{latexonly}
