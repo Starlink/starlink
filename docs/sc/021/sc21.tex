@@ -502,7 +502,7 @@ the sky in the atmospheric windows of 450 and 850\micron.
 
 This guide is designed to instruct SCUBA-2 users on the best ways to
 reduce and visualise their data using \starlink\ packages,
-\smurf\cite{smurf}, \Kappa \cite{kappa}, \gaia \cite{gaia} and \picard
+\smurf \cite{smurf}, \Kappa \cite{kappa}, \gaia \cite{gaia} and \picard
 \cite{picard}.  This guide is {\em not} aimed at users of the
 polarimeter (POL-2) or Fourier transform spectrometer (FTS-2). If you
 have shared risk data (SRO) you should refer to the SMURF SRO
@@ -517,8 +517,8 @@ process and introduces the configuration files necessary to run the
 reduction. The most important section will be Section~\ref{sec:maps};
 this outlines all the steps that may be taken to produce your final
 science map, including running the DIMM, applying the flux conversion
-factor (FCF), co-adding multiple maps and estimating the noise. Section
-\ref{sec:tweak} discusses your options for tweaking the configuration
+factor (FCF), co-adding multiple maps and estimating the noise.
+Section~\ref{sec:tweak} discusses your options for tweaking the configuration
 parameters when running the map-maker; this gives you added control
 and flexibility over the map-making routine. Two worked examples
 covering different science case are shown in Section~\ref{sec:eg} -- a
@@ -800,8 +800,8 @@ A normal science observation will follow the following sequence.
 \item Flat-field
 \end{itemize}
 \vspace{-2mm}
-The \param{SEQ\_TYPE} parameter in the fits header may be used to
-identify the nature of each scan (see Section \ref{sec:fitsheader}).
+The \param{SEQ\_TYPE} parameter in the FITS header may be used to
+identify the nature of each scan (see Section~\ref{sec:fitsheader}).
 When you access you data either at
 the JCMT or by downloading from the Science
 Archive\footnote{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
@@ -840,12 +840,12 @@ dimensions enumerating columns and rows, and the third time slices
 Raw SCUBA-2 data comes in uncalibrated units. The first calibration
 step is to scale the raw data to units proportional to picowatts (pW)
 by applying the flat-field solution. From there the data must be
-scaled by the flux conversion factor (FCF) to give units of Janskys
+scaled by the flux conversion factor (FCF) to give units of janskys
 (Jy).
 
 The first step is applied internally by the map-maker but can be done
-manually when examining the raw data -- see Section \ref{sec:concat}.
-The second step must be done manually with instructions are given in
+manually when examining the raw data -- see Section~\ref{sec:concat}.
+The second step must be done manually with the instructions given in
 Section~\ref{sec:cmult}.
 
 
@@ -855,7 +855,7 @@ Section~\ref{sec:cmult}.
 In this section a number of procedures are described for visualising
 and assessing raw data files.  These steps are not a necessary part of
 the data reduction process and do not concern the iterative map-maker.
-However, there are reason you may wish to do examine your raw data in
+However, there are reason you may wish to examine your raw data in
 greater depth. The most likely motivation is unusual result from the
 map-maker. These might be higher noise than anticipated, patterns in
 the data or inconsistent noise across multiple tiles. This section
@@ -865,7 +865,7 @@ will help you get to the bottom of any issues concerning raw data.
 \label{sec:concat}
 
 Since SCUBA-2 data for a given sub-array are broken into multiple
-30\,second scans by the data acquisition (DA) system, it is useful to
+30-second scans by the data acquisition (DA) system, it is useful to
 concatenate the data into a single file. The \smurf\ task \concat\ can
 be used for this operation. The example below combines all of the
 files associated with observation 8 for the s8a array into a single
@@ -912,7 +912,7 @@ FITS headers and dimensions of the data.
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{fitslist}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}This lists the fits header information
+\begin{minipage}[t]{0.85\linewidth}This lists the FITS header information
 for any file (raw or reduced). This extensive list includes dates \& times,
 source name, scan type, pattern and velocity, size of the map, exposure
 time, start and end elevation, opacity and the temperature of the
@@ -1009,7 +1009,7 @@ information into a simple ASCII tab-separated table.
 \end{verbatim}
 \end{myquote}
 
-The `-h' option to \jcmtstate\ can be used to find more information on
+The \texttt{-h} option to \jcmtstate\ can be used to find more information on
 the command. In particular, multiple files can be supplied to the
 command using standard shell wild cards. If you have already
 concatenated your data you can simply input the single concatenated
@@ -1017,7 +1017,7 @@ file. \textbf{It may be useful to view the scan pattern for your
 observation, particularly for maps taken at high elevations, to ensure
 the pattern completed successfully.}
 
-% (not escaped) and for SCUBA-2 data the `--with-mce' option can be used to dump the low-level MCE header information.
+% (not escaped) and for SCUBA-2 data the \texttt{--with-mce} option can be used to dump the low-level MCE header information.
 
 This catalogue can be loaded into \topcat\ for plotting, making sure
 to specify the TST format during loading.
@@ -1033,7 +1033,7 @@ Figure~\ref{fig:scan}. Detailed instruction on how to display the scan
 pattern for your observation are given in Figure~\ref{fig:topcat}. All
 of the time-varying header values are available for plotting.  Other
 values include the azimuth and elevation offsets (DAZ \& DEL), the WVM
-and 225\,GHz opacity values and the instrument temperatures (e.g.
+and 225\,GHz opacity values, and the instrument temperatures (e.g.
 SC2\_FPUTEMP gives the temperature of the focal plane).
 
 Due to extreme accelerations at ``turn-around'' points of a scan
@@ -1128,11 +1128,11 @@ required.
 % makemap s8a20120725_00058_con.sdf crl2688_sky method=rebin
 \end{verbatim}
 \end{myquote}
-The output map here is called `\texttt{crl2688\_sky.sdf}' and is shown
+The output map here is called \texttt{crl2688\_sky.sdf} and is shown
 in Figure~\ref{fig:regrid}.
 The pixel scale is left at the default values of 2~arcsec on a side at
 450\micron\ and 4~arcsec at 850\micron\ (although this can be changed
-using the `pixsize=$x$' option on the command-line, where $x$ is in
+using the \texttt{pixsize=}$x$ option on the command-line, where $x$ is in
 arcsec).
 
 \subsection{\xlabel{clean}Notes on cleaning your data}
@@ -1185,7 +1185,6 @@ contaminate the signal. In this case you should examine the
 \texttt{NOI} model from the map-maker instead -- see Section
 \ref{sec:models} for a description and Section~\ref{sec:export} for
 details on how to examine it.
-%\raggedbottom
 
 \clearpage
 \section{\xlabel{dimm}The Dynamic Iterative Map-Maker}
@@ -1512,7 +1511,7 @@ written out to files. However, this can be changed by setting
 \texttt{exportndf} in the configuration file to the list of models
 that you wish to view.
 
-You can an additional component, \texttt{RES}, if you wish to export
+You can specify an additional component, \texttt{RES}, if you wish to export
 the residual model. \texttt{RES} is the residual signal remaining
 after the other models have been removed. By contrast, the
 \texttt{NOI} model is the noise in \texttt{RES}, as determined by
@@ -1531,15 +1530,15 @@ exportndf = (com,gai,ast,flt,res,noi,qua)
 \vspace{0cm}
 The \texttt{exportndf} parameter will write out the requested models
 as NDF files with names based on the first input file that went into
-the maps for each sub-array. This is first suffixed by `\texttt{con}',
+the maps for each sub-array. This is first suffixed by \texttt{con},
 indicating that several data files may have been concatenated
-together. The filename is then appended by the 3-letter code for each model (such as
+together. The 3-letter code for each model is then appended to the filename (such as
 \texttt{s8a20120720\_00030\_0003\_con\_com.sdf},
 \linebreak
 \texttt{s8a20120720\_00030\_0003\_con\_flt.sdf},
 \texttt{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename shows
 sub-scan 3 of Observation 30 since this is the first science file that
-is encountered (see Section~\ref{sec:raw}.}. The variance
+is encountered (see Section~\ref{sec:raw}}. The variance
 and quality for the data are stored as the VARIANCE and QUALITY
 components within the residual file NDF.
 
@@ -2023,7 +2022,6 @@ Once the map-maker has completed you can open your output map using
 output written to the terminal as you run the map-maker. There are a
 number of clues in this output that indicate the status of the
 reduction.
-%\raggedbottom
 
 
 \textbf{The number of input files}\\* The first to note is the number
@@ -2105,8 +2103,8 @@ observation.
 \vspace{0.2cm}\\
 In \textsc{pong} observations chunking is a bigger concern, with the
 maximum number of chunks that can be tolerated dependent on the number
-of map rotations. for example, a 40-minute \textsc{pong} map with 8
-rotations may get chunked into three or four chunks. Although not
+of map rotations. For example, a 40-minute \textsc{pong} map with 8
+rotations may get divided into three or four chunks. Although not
 ideal, this will mean that each point is still covered by two or three
 passes. Fewer passes than this however and the map-maker become less
 effective.
@@ -2150,8 +2148,8 @@ stops after 5 iterations: \\ \texttt{smf\_iteratemap: *** Completed in
 
 
 \textbf{Note:} you can interrupt the processing at any stage with a
-single Ctrl-C. The map-maker will complete the iteration then write
-out a final science map. If you enter Ctrl-C a second time it will
+single \texttt{Ctrl-C}. The map-maker will complete the iteration then write
+out a final science map. If you enter \texttt{Ctrl-C} a second time it will
 kill the process immediately.
 
 
@@ -2159,7 +2157,7 @@ kill the process immediately.
 \label{sec:cmult}
 
 Applying the flux conversion factor (FCF) is required to scale your
-data from units of pW to Janskys. \textbf{The FCF to be applied
+data from units of pW to janskys. \textbf{The FCF to be applied
 depends on the reduction date for your data. For data that have been
 reduced \emph{prior} to July 2012 you should see
 Appendix~\ref{app:fcfs} for alternative FCFs.} For reduction dates
@@ -2541,13 +2539,13 @@ The filtering options set in \texttt{dimmconfig.lis} are:
 
 To make the users life easier, these parameters allow you to specify
 the filter limits in terms of spatial scale in arcsecs -- in this case
-600$''$ at 850$\mu$m and 300$''$ at 450$\mu$m. In this case for
-850$\mu$m, recovering scales of 600$''$ at a speed of 400$''$/s
-corresponds to a frequency 0.7Hz.
+600\arcsec\ at 850$\mu$m and 300\arcsec\ at 450$\mu$m. In this case for
+850$\mu$m, recovering scales of 600\arcsec at a speed of 400\arcsec/s
+corresponds to a frequency 0.7\,Hz.
 
 The scanning speeds are fixed for a given observing mode; you can put
 the speed for your map from the \texttt{SCAN\_VEL} parameter in the
-fits header (see Section \ref{sec:fitsheader}).
+FITS header (see Section~\ref{sec:fitsheader}).
 
 
 \subsection{\xlabel{filter}Fitting COM for each sub-array}
@@ -2560,7 +2558,7 @@ the others.
 
 This comes with the warning however that you will lose information on
 any scales larger than the area covered by a single sub-array. It is
-therefore not recommended if you have very large scale extended
+therefore not recommended if you have very large-scale extended
 structure.
 
 To initialise this option set \texttt{com.perarray=1}.
@@ -2588,7 +2586,7 @@ Appendix \ref{app:dimm} for details.
 
 The recipe \texttt{dimmconfig\_bright\_extended.lis} also uses zero
 based masking. It uses the parameter \texttt{ast.zero\_snr} to define
-a mask based on the SNR. The default is 5 meaning that pixels below an
+a mask based on the SNR. The default is 5, meaning that pixels below an
 SNR of 5$\sigma$ will be set to zero. This is dynamic with the SNR map
 being determined after each iteration. You may wish to experiment with
 changing this level for you map.
@@ -2677,11 +2675,11 @@ The recommended reduction method for maps like these follow two main
 steps -- running the data through the map-maker using the
 \texttt{dimmconfig\_blank\_field.lis} recipe (see
 Section~\ref{sec:config}). Then applying the \picard\
-\texttt{SCUBA2\_MATCH\_FILTER} recipe (see Section \ref{sec:mf}).
+\texttt{SCUBA2\_MATCH\_FILTER} recipe (see Section~\ref{sec:mf}).
 \\*\\*
 \textbf{(1) Running the map-maker}\\*
 In this example the raw data is stored locally in a directory called
-`data'. We have three observations (\#13, \#18, \#21) of the field
+\texttt{data}. We have three observations (\#13, \#18, \#21) of the field
 which we will reduced independently.
 
 \begin{myquote}
@@ -2852,7 +2850,7 @@ config='"^dimmconfig_bright_extended.lis,maptol=0.04,ast.zero_snr=3.5"'
 
 \textbf{(2) Generating an external mask}\\*
 Next we create an external mask from the output of make-map. Here we
-follow the steps outlined in Section \ref{sec:mask}.
+follow the steps outlined in Section~\ref{sec:mask}.
 
 \begin{myquote}
 \begin{verbatim}
@@ -2870,7 +2868,7 @@ everything above to 1.
 \end{myquote}
 The thresholded map is shown in the left-hand panel of figure
 \ref{fig:mask}. The next step is to smooth this map by convolving it
-with a Gaussian of 16$''$. For this we use a factor of 4 for the FWHM
+with a Gaussian of 16\arcsec. For this we use a factor of 4 for the FWHM
 parameter.
 
 \begin{myquote}
@@ -2882,20 +2880,20 @@ parameter.
 We threshold the map again to produce our mask. In this case all
 values below out threshold are set to `bad'. The the smoothed map now
 has values scaled between 0 and 1, we set our threshold at 0.02 to
-include more of the emission beyond the 3$\sigma$ edge.
+include more of the emission beyond the 3-$\sigma$ edge.
 \begin{myquote}
 \begin{verbatim}
 % thresh 850map_mask_sm 850map_mask_zm thrlo=0.02 newlo=bad thrhi=0.02 newhi=1
 \end{verbatim}
 \end{myquote}
-The final mask is shown in the right-panel of figure \ref{fig:mask},
+The final mask is shown in the right-panel of Figure~\ref{fig:mask},
 note how is encompasses more emission and has softer edges than the
 first threshold map.
 \\*\\*
 \textbf{(3) Re-running the map-maker with an external mask supplied}\\*
 As a last step the map is re-made with this mask supplied as an external
 file. For this run we apply the additional parameters in a
-personalised configuration file, mydimmconfig.lis.
+personalised configuration file, \texttt{mydimmconfig.lis}.
 \begin{myquote}
 \begin{verbatim}
 % makemap in=^filelist.txt 850galactic method=iterate \
@@ -2937,7 +2935,7 @@ thresholding the smoothed map to 0.02.}
 \caption{\small The exposure time image of the science map from
 Figure~\ref{fig:galmakemap}. You can right-click and drag the mouse between
 two points to measure the distance. Here we see the exposure time dropping
-off sharply at a radius of 30$'$. A non-default colour scale has been chosen
+off sharply at a radius of 30\arcmin. A non-default colour scale has been chosen
 to illustrate the morphology.}
 \label{fig:exptime}
 \end{center}
@@ -2979,7 +2977,7 @@ emission. To remove that is to also remove extended emission as they
 are essentially indistinguishable.
 
 There are areas you may wish to experiment with. One is to adjust the
-filtering -- see Section \ref{sec:tweak} for details. Another option
+filtering -- see Section~\ref{sec:tweak} for details. Another option
 is to supply an external mask from a different dataset, e.g. a
 Herschel map.
 
@@ -3026,7 +3024,7 @@ by project members the following day.
 %, making a map only when sufficient data has been taken.
 
 The manual for the SCUBA-2 pipeline can be found at \pipelinesun,
-while the pipeline software comes as part of the \starlink\ package.
+while the pipeline software comes as part of the \starlink\ suite.
 
 
 \subsection{\xlabel{science_pl}The Science Pipeline}
@@ -3091,7 +3089,7 @@ MAKEMAP_CONFIG = myconfigfile.lis
 \end{myquote}
 \end{minipage}
 You can find out which recipe is assigned to your data via the
-\texttt{RECIPE} parameter in the fits header.
+\texttt{RECIPE} parameter in the FITS header.
 
 \begin{minipage}[t]{0.05\linewidth}
 \textbf{(4)}
@@ -3122,7 +3120,7 @@ co-added observations from a single night, are also produced which
 have the prefix \texttt{gs} (e.g. \texttt{gs20120720\_30\_850\_reduced.sdf}).
 
 \textbf{Note:} A group file is \emph{always} created, even if only a single
-observation if being processed.
+observation is being processed.
 
 Additionally, PNG images are made of the reduced files at a variety of
 resolutions.
@@ -3161,7 +3159,7 @@ Primary and secondary calibrator observations have been reduced using
 the specifically designed \texttt{dimmconfig\_bright\_compact.lis}.
 The maps produced from this are then analysed using tailor-made
 \picard\ recipes. For instructions on aplying the FCFs to your map see
-Section \ref{sec:cmult}.
+Section~\ref{sec:cmult}.
 
 A map reduced by the map-maker has units of pW. To calibrate the data
 into units of janskys (Jy), a set of bright, point-source objects with
@@ -3312,7 +3310,7 @@ The extinction correction parameters that scale from $\tau_{225}$ to
 the relevant filter have been added to the map-maker code. You can
 override these values by setting \param{ext.taurelation.filtname} in
 your map-maker config files to the two coefficients `($a$,$b$)' that you
-want to use (where `\texttt{filtname}' is the name of the filter). The
+want to use (where \texttt{filtname} is the name of the filter). The
 defaults are listed in \texttt{\$SMURF\_DIR/smurf\_extinction.def}.
 It is worth noting that if an
 individual science map and corresponding calibrator observation has
