@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sc/021</path>
+  <description>The SCUBA-2 Data-analysis Cookbook</description>
+  <abstract><p>
+     This cookbook provides a short introduction to \starlink\
+     facilities, especially \smurf, the Sub-Millimetre User Reduction
+     Facility, for reducing, displaying, and calibrating SCUBA-2 data.
+     It describes some of the data artefacts present in SCUBA-2
+     time-series and methods to mitigate them. In particular, this
+     cookbook illustrates the various steps required to reduce the data;
+     and gives an overview of the Dynamic Iterative Map-Maker, which
+     carries out all of these steps using a single command controlled by
+     a configuration file.  Specialised configuration files are
+     presented.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>H.S. Thomas</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>2012</year>
+    <name>STFC</name>
+  </copyright>
+</component>
