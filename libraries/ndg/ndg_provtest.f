@@ -199,13 +199,18 @@ c      call ast_watchmemory( 14182 )
             END IF
 
 
-            IF( AST_MAPGET0C( KM, 'DATE', TEXT, L, STATUS ) ) THEN
-               IF( CHR_LEN( TEXT ) .NE. L .OR.
-     :             TEXT( : L ) .NE. DATES( I )( : L ) ) THEN
-                  CALL STOPIT( 11, STATUS)
-               ENDIF
-            ELSE IF( DATES( I ) .NE. ' ' ) THEN
-               CALL STOPIT( 12, STATUS)
+*  Do not test the date string in the main NDF since a new copy of it
+*  may have been taken, changing the date. ALso do not test 6 (fred.sdf)
+*  which is a new copy of the main NDF.
+            IF( I .NE. 1 .AND. I .NE. 6 ) THEN
+               IF( AST_MAPGET0C( KM, 'DATE', TEXT, L, STATUS ) ) THEN
+                  IF( CHR_LEN( TEXT ) .NE. L .OR.
+     :                TEXT( : L ) .NE. DATES( I )( : L ) ) THEN
+                     CALL STOPIT( 11, STATUS)
+                  ENDIF
+               ELSE IF( DATES( I ) .NE. ' ' ) THEN
+                  CALL STOPIT( 12, STATUS)
+               END IF
             END IF
 
 
