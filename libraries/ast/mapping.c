@@ -10318,7 +10318,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
       astError( AST__CNFLX, "astRebin"#X"(%s): Flux conservation was " \
                 "requested but could not be performed because the " \
                 "forward transformation of the supplied Mapping " \
-                "is singular.", status, astGetClass( this ) ); \
+                "is too non-linear.", status, astGetClass( this ) ); \
    } \
 \
 /* If required set output pixels bad if they have a total weight less \
@@ -12598,7 +12598,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
          astError( AST__CNFLX, "astRebinSeq"#X"(%s): Flux conservation was " \
                    "requested but could not be performed because the " \
                    "forward transformation of the supplied Mapping " \
-                   "is singular.", status, astGetClass( this ) ); \
+                   "is too non-linear.", status, astGetClass( this ) ); \
       } \
 \
 /* Annul the pointer to the simplified/cloned Mapping. */ \
