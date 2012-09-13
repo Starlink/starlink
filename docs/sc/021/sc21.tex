@@ -706,7 +706,7 @@ For full details of the array setup and operation see Holland et al.
 \caption{\small The layout of the arrays at 450$\mu$m (left) and
 850$\mu$m (right). The labels denote the name assigned to each
 sub-array. Raw data files are generated separately for each sub-array
-and must be coadded. This figure was made my running \wcsmosaic\ on
+and must be co-added. This figure was made my running \wcsmosaic\ on
 raw files from each sub-array.}
 \end{center}
 \end{figure}
@@ -2204,8 +2204,8 @@ command \cmult.
 \end{myquote}
 
 
-\subsection{\xlabel{co-add}Co-adding multiple maps}
-\label{sec:co-add}
+\subsection{\xlabel{coadd}Co-adding multiple maps}
+\label{sec:coadd}
 
 You may have multiple maps of the same source which you would like to
 co-add. \picard\ has a command for this too --
@@ -2252,7 +2252,7 @@ use the \texttt{cat} command with back quotes like so:
 
 Currently there is no advantage in terms of data quality to reducing
 all observations simultaneously or separately. However, the latter
-does allow the option of assessing the individual maps before coadding
+does allow the option of assessing the individual maps before co-adding
 and is the method followed in this example.
 %%is this still true?
 
@@ -3111,7 +3111,7 @@ external parameter file to call our modified configuration file:
 
 The pipeline will produce a group file for each object being
 processed. If the pipeline is given data from multiple nights, all
-those data will be included in the group coadd using inverse variance
+those data will be included in the group co-add using inverse variance
 weighting.
 
 The final maps in your output directory will have the suffix
