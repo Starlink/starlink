@@ -4304,6 +4304,65 @@ iraf! {
             helpkey *
          }
       }
+
+
+      action asttohds {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter keymap {
+            position 1
+            type LITERAL
+            prompt {The input KeyMap}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter object {
+            type UNIV
+            position 2
+            prompt {HDS object to create}
+            helpkey *
+            association ->GLOBAL.HDSOBJ
+          }
+
+      }
+
+
+      action astfromhds {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter keymap {
+            position 2
+            type LITERAL
+            prompt {The new KeyMap}
+            ppath GLOBAL CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter object {
+            type UNIV
+            position 1
+            prompt {Input HDS object}
+            helpkey *
+            association <-GLOBAL.HDSOBJ
+          }
+
+      }
+
+
    }
 
    command astshow {
