@@ -1,6 +1,6 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
-AC_INIT(kaplibs, 3.3, starlink@jiscmail.ac.uk)
+AC_INIT(kaplibs, 3.4, starlink@jiscmail.ac.uk)
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 

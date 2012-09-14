@@ -6,6 +6,9 @@ which provide general purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
+Version 3.4
+   - New KPG1_KY2HD and kpg1Ky2hd have been moved to the ATL library.
+
 Version 3.3
    - New KPG1_CORR<x> routine to calculate the Pearson correlation
      coefficient of two arrays.

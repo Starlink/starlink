@@ -1018,6 +1018,37 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
+   ATL\_KY2HD
+}{
+   Converts an AST KeyMap into an HDS structure
+}{
+   \sstdescription{
+      This routine copies the contents of an AST KeyMap into a supplied
+      HDS structure.
+   }
+   \sstinvocation{
+      CALL ATL\_KY2HD( KEYMAP, LOC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         KEYMAP = INTEGER (Given)
+      }{
+         The AST KeyMap identifier.
+      }
+      \sstsubsection{
+         LOC = CHARACTER $*$ (DAT\_\_SZLOC) (Given)
+      }{
+         A locator for the HDS object into which the KeyMap contents
+         are to be copied.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    ATL\_KYCHK
 }{
    Reports an error if a given key is not found in a KeyMap

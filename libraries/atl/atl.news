@@ -12,6 +12,11 @@ memory management module (memory.c). This wrapper is in ATL rather than
 AST because it returned the matching strings in a GRP group.
 
 
+Changes introduced by V1.5:
+
+- New functions atlKy2hd and ATL_KY2HD have been added. These have been
+moved from the KAPLIBS library.
+
 Changes introduced by V1.4:
 
 - The functions atlMapGet1S and atlMapPut1S have been renamed as

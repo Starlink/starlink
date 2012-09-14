@@ -80,6 +80,7 @@ void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
 void atlCreat( const char *, AstObject *, int * );
 void atlDumpFits( const char *, AstFitsChan *, int * );
 void atlGetParam( const char *, AstKeyMap *, int * );
+void atlKy2hd( AstKeyMap *, HDSLoc *, int * );
 void atlKychk( AstKeyMap *, const char *, const char *, int * );
 void atlMapPut1C( AstKeyMap *, const char *, const char *, int, int, const char *, int * );
 void atlMgfts( int, AstFitsChan *, AstFitsChan *, AstFitsChan **, int * );

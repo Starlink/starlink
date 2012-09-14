@@ -3698,7 +3698,7 @@ int *status                 /* global status (given and returned) */
 /* Create the extension and write the contents of the AST key map */
    datNew( sc2store_scuba2loc, "MCEHEAD", "KEYMAP_ENTRY", 0, 0, status );
    datFind( sc2store_scuba2loc, "MCEHEAD", &xloc,status );
-   kpg1Ky2hd( mcehead, xloc, status );
+   atlKy2hd( mcehead, xloc, status );
 
 /* tidy up */
 

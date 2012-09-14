@@ -1,14 +1,13 @@
 #include "star/hds.h"
-#include "star/atl.h"
+#include "atl.h"
 #include "ast.h"
 #include "mers.h"
 #include "sae_par.h"
-#include "kaplibs.h"
 
-void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
+void atlKy2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 /*
 *  Name:
-*     kpg1Ky2hd
+*     atlKy2hd
 
 *  Purpose:
 *     Copies values from an AST KeyMap to a primitive HDS object.
@@ -17,7 +16,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *     C.
 
 *  Invocation:
-*     void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status )
+*     void atlKy2hd( AstKeyMap *keymap, HDSLoc *loc, int *status )
 
 *  Description:
 *     This routine copies the contents of an AST KeyMap into a supplied
@@ -33,7 +32,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *        The inherited status.
 
 *  Copyright:
-*     Copyright (C) 2008, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2010, 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -68,6 +67,8 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *        Sort the keys when writing to HDS structured.
 *     2010-10-04 (TIMJ):
 *        Support Short ints in keymap
+*     14-SEP-2012 (DSB):
+*        Moved from kaplibs to atl.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,14 +114,13 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
    }
    astSet( keymap, "SortBy=KeyUp" );
 
-
 /* Loop round each entry in the KeyMap. */
    size = astMapSize( keymap );
    for( i = 0; i < size; i++ ) {
 
      if (*status != SAI__OK) break;
 
-/*  Get the key. the data type and the vector length for the current
+/* Get the key. the data type and the vector length for the current
    KeyMap entry. */
       key = astMapKey( keymap, i );
       type = astMapType( keymap, key );
@@ -138,11 +138,11 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
             (void) astMapGet0A( keymap, key, &obj );
 
             if( astIsAKeyMap( obj ) ) {
-               kpg1Ky2hd( (AstKeyMap *) obj, cloc, status );
+               atlKy2hd( (AstKeyMap *) obj, cloc, status );
 
             } else if( *status == SAI__OK ) {
                *status = SAI__ERROR;
-               errRep( "", "kpg1Ky2hd: Supplied KeyMap contains unusable AST "
+               errRep( "", "atlKy2hd: Supplied KeyMap contains unusable AST "
                        "objects (programming error).", status );
             }
 
@@ -161,11 +161,11 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
                   datCell( cloc, 1, &j, &dloc, status );
 
                   if( astIsAKeyMap( objArray[ j - 1 ] ) ) {
-                     kpg1Ky2hd( (AstKeyMap *) objArray[ j - 1 ], dloc, status );
+                     atlKy2hd( (AstKeyMap *) objArray[ j - 1 ], dloc, status );
 
                   } else if( *status == SAI__OK ) {
                      *status = SAI__ERROR;
-                     errRep( "", "kpg1Ky2hd: Supplied KeyMap contains unusable AST "
+                     errRep( "", "atlKy2hd: Supplied KeyMap contains unusable AST "
                              "objects (programming error).", status );
                   }
 
@@ -271,7 +271,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
       } else if( *status == SAI__OK ) {
          *status = SAI__ERROR;
          msgSeti( "T", type );
-         errRep( "", "kpg1Ky2hd: Supplied KeyMap contains entries with "
+         errRep( "", "atlKy2hd: Supplied KeyMap contains entries with "
                  "unusable data type (^T) (programming error).", status );
       }
    }
@@ -289,6 +289,3 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
    astWatch( oldstat );
 
 }
-
-
-

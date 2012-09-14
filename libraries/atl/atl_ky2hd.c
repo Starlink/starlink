@@ -1,16 +1,15 @@
 #include "star/hds.h"
 #include "star/hds_fortran.h"
 #include "f77.h"
-#include "kaplibs.h"
 #include "ast.h"
 #include "sae_par.h"
 
-F77_SUBROUTINE(kpg1_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
-                            TRAIL(LOC) ) {
+F77_SUBROUTINE(atl_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
+                           TRAIL(LOC) ) {
 /*
 *+
 *  Name:
-*     KPG1_KY2HD
+*     ATL_KY2HD
 
 *  Purpose:
 *     Converts an AST KeyMap into an HDS structure.
@@ -19,7 +18,7 @@ F77_SUBROUTINE(kpg1_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
 *     C, designed to be called from Fortran.
 
 *  Invocation:
-*     CALL KPG1_KY2HD( KEYMAP, LOC, STATUS )
+*     CALL ATL_KY2HD( KEYMAP, LOC, STATUS )
 
 *  Description:
 *     This routine copies the contents of an AST KeyMap into a supplied
@@ -35,7 +34,7 @@ F77_SUBROUTINE(kpg1_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -61,6 +60,8 @@ F77_SUBROUTINE(kpg1_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
 *  History:
 *     29-APR-2008 (DSB):
 *        Original version.
+*     14-SEP-2012 (DSB):
+*        Moved from KAPLIBS to ATL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -80,7 +81,7 @@ F77_SUBROUTINE(kpg1_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
    keymap = astI2P( *KEYMAP );
    datImportFloc( LOC, LOC_length, &locator_c, &cstatus );
 
-   kpg1Ky2hd( keymap,  locator_c, &cstatus );
+   atlKy2hd( keymap,  locator_c, &cstatus );
 
    F77_EXPORT_INTEGER( cstatus, *STATUS );
 }

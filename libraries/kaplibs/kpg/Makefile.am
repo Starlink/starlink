@@ -38,7 +38,7 @@ BUILT_SOURCES = $(include_MESSAGES)
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c \
 kpg1_ieeer.c  kpg1_isfinr.c kpg1_kygrp.c kpg1_kygp1.c kpg1_kymp1.c \
 kpg1_kymp2.c kpg1_kymap.c kaplibs.c kpgGtfts.c kpgPtfts.c kpg1Hdsky.c \
-kpg1_hdsky.c kpg1Kyhds.c kpg1_kyhds.c kpg1_ky2hd.c kpg1Ky2hd.c \
+kpg1_hdsky.c kpg1Kyhds.c kpg1_kyhds.c \
 kpg_gtfts.c kpg_ptfts.c kpg1Ch2pm.c kpg1_ch2pm.c kpg1Chcof.c \
 kpg1Fit1d.c kpg1_fit1d.c kpg1_asndf.c kpg1Asndf.c kpg1Axcpy.c
 

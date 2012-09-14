@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="atl" support="S">
-  <version>1.4</version>
+  <version>1.5</version>
   <path>libraries/atl</path>
   <description>ATL - A Library of AST Utility Routines</description>
   <abstract><p>ATL provides routines that perform high-level AST-related

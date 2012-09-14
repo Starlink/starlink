@@ -164,7 +164,6 @@ void kpg1Ghstd( int, int, const double *, const double *, double, int, int, doub
 void kpg1Ghstr( int, int, const float *, const double *, double, int, int, float *, float *, int *, int * );
 void kpg1Hsstp( int, const int *, double, double, double *, double *, double *, double *, int * );
 void fts1Astwn( AstFitsChan *, int, int * );
-void kpg1Ky2hd( AstKeyMap *, HDSLoc *, int * );
 void kpg1Elgau( float *, float *, float *, float *, int * );
 void kpg1Loctd( int, const int *, const int *, const double *, const float *, const int *, int, const float *, int, float, int, float *, float *, int * );
 void kpg1Ch2pm( HDSLoc *, AstPolyMap **, int * );

@@ -101,7 +101,7 @@
       CALL DAT_TEMP( 'KPG1_GTMOR_TYPE', 0, 0, MORE, STATUS )
 
 *  Copy the contents of the KeyMap into the HDS structure.
-      CALL KPG1_KY2HD( KEYMAP, MORE, STATUS )
+      CALL ATL_KY2HD( KEYMAP, MORE, STATUS )
 
 *  Free resources.
       CALL AST_ANNUL( KEYMAP, STATUS )
