@@ -2,7 +2,7 @@
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-sc21.htx_tar: sc21_450array.eps sc21_850array.eps \
+sc21.htx_tar: sc21.htx_tar.extras sc21_450array.eps sc21_850array.eps \
 sc21_850cosmo_bf.eps \
 sc21_850cosmo_mf_crop.eps sc21_850cosmo_mf_crop_snr.eps \
 sc21_ast.eps sc21_com.eps sc21_cosmo1-def.eps \
