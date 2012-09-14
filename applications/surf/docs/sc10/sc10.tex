@@ -1,18 +1,22 @@
 \documentclass[twoside,11pt,fleqn]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
-
-\usepackage{epsfig}
-
-%  Copyright:
-%     Copyright (C) 1997 Particle Physics and Astronomy
-%     Research Council. All Rights Reserved.
-
 
 % -----------------------------------------------------------------------------
 % ? Document identification
+% Fixed part
 \newcommand{\stardoccategory}  {Starlink Cookbook}
 \newcommand{\stardocinitials}  {SC}
 \newcommand{\stardocsource}    {sc\stardocnumber}
+\newcommand{\stardoccopyright}
+{Copyright \copyright\ 1997 Science and Technology Facilities Council}
+
+% Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {10.1}
 \newcommand{\stardocauthors}   {J.~A. Stevens, R.~J. Ivison, T. Jenness\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
@@ -22,13 +26,150 @@
 \newcommand{\stardocmanual}    {\ }
 \newcommand{\stardocabstract}  {[Text of abstract]}
 % ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sc.tex
+%
+%  Purpose:
+%     Template for Starlink Cookbook (SC) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     16-JUN-1997 (BLY):
+%        Original, based on SUN/SG templates.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
 
 % A new environment for quoting verbatim
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
 
 \newcommand{\text}[1]{{\small \tt #1}}
-
 
 % Starlink Package names
 \newcommand{\starlink}{\htmladdnormallink{Starlink}{http://www.starlink.ac.uk/}}
@@ -107,123 +248,6 @@
 \newcommand{\flip}{\xref{\task{flip}}{sun95}{FLIP}}
 \newcommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
 
-% -----------------------------------------------------------------------------
-
-\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
-\setlength{\textwidth}{160mm}
-\setlength{\textheight}{230mm}
-\setlength{\topmargin}{-2mm}
-\setlength{\oddsidemargin}{0mm}
-\setlength{\evensidemargin}{0mm}
-\setlength{\parindent}{0mm}
-\setlength{\parskip}{\medskipamount}
-\setlength{\unitlength}{1mm}
-
-% -----------------------------------------------------------------------------
-%  Hypertext definitions.
-%  ======================
-%  These are used by the LaTeX2HTML translator in conjunction with star2html.
-
-%  Comment.sty: version 2.0, 19 June 1992
-%  Selectively in/exclude pieces of text.
-%
-%  Author
-%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
-%    Department of Computer Science
-%    University Tennessee at Knoxville
-%    104 Ayres Hall
-%    Knoxville, TN 37996
-%    USA
-
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%begin{latexonly}
-\makeatletter
-\def\makeinnocent#1{\catcode`#1=12 }
-\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
-
-\def\ThrowAwayComment#1{\begingroup
-    \def\CurrentComment{#1}%
-    \let\do\makeinnocent \dospecials
-    \makeinnocent\^^L% and whatever other special cases
-    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
-{\catcode`\^^M=12 \endlinechar=-1 %
- \gdef\xComment#1^^M{\def\test{#1}
-      \csarg\ifx{PlainEnd\CurrentComment Test}\test
-          \let\html@next\endgroup
-      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
-            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \let\html@next\xComment
-      \fi \fi \html@next}
-}
-\makeatother
-
-\def\includecomment
- #1{\expandafter\def\csname#1\endcsname{}%
-    \expandafter\def\csname end#1\endcsname{}}
-\def\excludecomment
- #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
-    {\escapechar=-1\relax
-     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
-     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
-    }}
-
-%  Define environments that ignore their contents.
-\excludecomment{comment}
-\excludecomment{rawhtml}
-\excludecomment{htmlonly}
-
-%  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
-%  should be consulted about all commands (and the environments defined above)
-%  except \xref and \xlabel which are Starlink specific.
-
-\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
-\newcommand{\htmladdnormallink}[2]{#1}
-\newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
-\newcommand{\hyperref}[4]{#2\ref{#4}#3}
-\newcommand{\htmlref}[2]{#1}
-\newcommand{\htmlimage}[1]{}
-\newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\html}[1]{}
-
-%  Starlink cross-references and labels.
-\newcommand{\xref}[3]{#1}
-\newcommand{\xlabel}[1]{}
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnote
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -235,8 +259,8 @@
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
+   \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Science \& Technology Facilities Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
    \begin{flushright}
@@ -247,19 +271,23 @@
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
-   \epsfig{file=sc10_logo.eps,width=2.0in}
-
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
    \end{center}
    \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+\begin{center}
+\includegraphics[width=2.0in]{sc10_logo}
+\end{center}
+% ? End of picture
 
 % ? Heading for abstract if used.
 %   \vspace{10mm}
 %   \begin{center}
-%      {\Large\bf Abstract}
-%   \end{center}
+%      {\Large\textbf{Abstract}}
+%  \end{center}
 % ? End of heading for abstract.
 \end{latexonly}
 
@@ -269,12 +297,12 @@
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
       \stardoctitle\\
-%      \stardocversion\\
-%      \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
-% ? Add picture here if required.
-   \epsfig{width=2.0in,file=sc10_logo.eps}
+% ? Add picture here if required for the hypertext version.
+\includegraphics[width=2.0in]{sc10_logo}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -282,11 +310,10 @@
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
       \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
+                        {http://www.scitech.ac.uk} \\
+      \htmladdnormallink{Science \& Technology Facilities Council}
+                        {http://www.scitech.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
       \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
@@ -302,32 +329,43 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
 % ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
+%%  \section{\xlabel{abstract}Abstract}
 % ? End of new section for abstract
 \end{htmlonly}
 
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
 %  ==================
-%\stardocabstract
+%% \stardocabstract
 % ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
- \end{latexonly}
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
+
 \cleardoublepage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
@@ -793,6 +831,14 @@ Measurement results:
 \end{verbatim}
 \end{myquote}
 
+\begin{figure}[t]
+\includegraphics[angle=-90,width=6.0in]{sc10_fig1}
+\caption{Concatenated data for observations \#70 and \#71. The
+mean and plus and minus 3$\sigma$ levels are indicated with the dashed
+lines.}
+\label{f1}
+\end{figure}
+
 The same procedure is repeated (not shown here) for \#71 to produce
 the file {\tt red71phot.sdf}. We can then combine the two observations
 using \scucat:
@@ -835,16 +881,8 @@ strategy is to remove the two biggest spikes that fall outside the
 3$\sigma$ levels and then replot the data. For this we use the
 \sigclip\ command.
 
-\begin{figure}
-\epsfig{angle=-90,width=6.0in,file=sc10_fig1.eps}
-\caption{Concatenated data for observations \#70 and \#71. The
-mean and plus and minus 3$\sigma$ levels are indicated with the dashed
-lines.}
-\label{f1}
-\end{figure}
-
-\begin{figure}
-\epsfig{angle=-90,width=6.0in,file=sc10_fig2.eps}
+\begin{figure}[t]
+\includegraphics[angle=-90,width=6.0in]{sc10_fig2}
 \caption{Concatenated data for \#70 and \#71 after removal of the
 two largest spikes with {\tt sigclip}. The third spike is now excluded
 with a 3$\sigma$ clip and there are no further spikes at the 2.5$\sigma$ level.}
@@ -1048,7 +1086,7 @@ Each bolometer now has a file called, e.g. {\tt r52\_h7.sdf}. The
 mean sky value for the inner ring.
 
 \begin{figure}
-\epsfig{angle=-90,width=6.0in,file=sc10_fig3.eps}
+\includegraphics[angle=-90,width=6.0in]{sc10_fig3}
 \caption{Comparison of the the signal from the central bolometer of
 the long-wave array with the mean signal from the six surrounding sky
 bolometers. Correlated sky noise is clearly seen in this case.}
@@ -1156,8 +1194,8 @@ removal, concatenated and despiked using \sigclip\ (see Figure~\ref{f4}). Note
 that \sigclip\ must be used rather than \drawsig\ because it produces an
 output file devoid of spikes. I renamed this file 8c\_clip for brevity.
 
-\begin{figure}
-\epsfig{angle=-90,width=6.0in,file=sc10_fig4.eps}
+\begin{figure}[t]
+\includegraphics[angle=-90,width=6.0in]{sc10_fig4}
 \caption{A 48 minute (160 x 9/2.0 jiggle patterns) integration on
 8C1435+635. The \sigclip\ command has been used to produce a
 dataset despiked at the 3$\sigma$ level.}
