@@ -106,7 +106,7 @@
 #define MSP__LOCAL -2
 #define MSP__EXTERNAL -3
 
-#define MAXPATH 100
+#define MAXPATH 1024
 
 /* Older systems do not declare socklen_t */
 #if !HAVE_SOCKLEN_T
