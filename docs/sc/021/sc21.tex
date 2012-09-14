@@ -1447,18 +1447,26 @@ map-maker is to use the \param{itermap} option and setting
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=\linewidth]{sc21_com.eps} \\
-\includegraphics[width=\linewidth]{sc21_flt.eps} \\
-\includegraphics[width=\linewidth]{sc21_ast.eps} \\
-\includegraphics[width=\linewidth]{sc21_res.eps} \\
-\caption{Time-domain components of the iterative models. These show the
-solution for the same single bolometer for part of an observation of
-CRL2688. From top to bottom: the \texttt{COM} model containing signal
-common to all bolometers, the \texttt{FLT} model containing residual
-low-frequency noise missed by \texttt{COM}, the \texttt{AST} model
-with the signal showing as a positive spike when this bolometer passes
-over the source, and the \texttt{RES} model looking (as expected) like
-white noise. }
+\begin{latexonly}
+  \includegraphics[width=\linewidth]{sc21_com.eps} \\
+  \includegraphics[width=\linewidth]{sc21_flt.eps} \\
+  \includegraphics[width=\linewidth]{sc21_ast.eps} \\
+  \includegraphics[width=\linewidth]{sc21_res.eps} \\
+\end{latexonly}
+\begin{htmlonly}
+  \includegraphics[width=136mm]{sc21_com.eps} \\
+  \includegraphics[width=136mm]{sc21_flt.eps} \\
+  \includegraphics[width=136mm]{sc21_ast.eps} \\
+  \includegraphics[width=136mm]{sc21_res.eps} \\
+\end{htmlonly}
+\caption{\small Time-domain components of the iterative models. These
+show the solution for the same single bolometer for part of an
+observation of CRL2688. From top to bottom: the \texttt{COM} model
+containing signal common to all bolometers, the \texttt{FLT} model
+containing residual low-frequency noise missed by \texttt{COM}, the
+\texttt{AST} model with the signal showing as a positive spike when
+this bolometer passes over the source, and the \texttt{RES} model
+looking (as expected) like white noise.}
 \label{fig:itercomp}
 \end{center}
 \end{figure}
@@ -2921,11 +2929,15 @@ Herschel map.
 %  The final cropped, reduced map from the map-maker run with
 %  an external mask supplied.}
 
-\begin{figure}[t!]
+\begin{figure}
 \begin{center}
+\begin{latexonly}
 \includegraphics[width=0.8\hsize]{sc21_gal12_crop.eps}
-\caption{\small The final cropped, reduced map from the map-maker run with
-an external mask supplied.}
+\end{latexonly}
+\begin{htmlonly}
+\includegraphics[width=136mm]{sc21_gal12_crop.eps}
+\end{htmlonly}
+\caption{\small The cropped science map from Figure \ref{fig:galmakemap}.}
 \label{fig:crop_map}
 \end{center}
 \end{figure}
