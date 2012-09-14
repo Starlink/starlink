@@ -186,6 +186,50 @@
 \fancyfoot[c]{}
 \fancyfoot[r]{}
 
+% Figure environment. Defined for latex2html to produce good quality
+% graphics in the hypertext. It assumes that the files are
+% encapsulated PostScript with extension .eps, and PNG with extension
+% .png.  The arguments are: #1 graphics filename without an extension;
+% #2 figure environment location including brackets, or leave empty for
+% none; #3 the includegraphics % qualifiers; #4 the label; and #5 the
+% caption.
+\newcommand{\myfig}[5]{
+  \begin{figure}#2
+    \centering\includegraphics[#3]{#1.eps}
+    \typeout{#1.eps inserted on page \arabic{page}}
+    \caption{\label{#4}\small #5}
+  \end{figure}
+}
+\begin{htmlonly}
+  \newcommand{\myfig}[5]{
+    \label{#4} \htmladdimg{#1.png}\\
+    \\
+    Figure: #5\\
+  }
+\end{htmlonly}
+
+% Address twin (side-by-side) graphics in a similar fashion where the
+% second argument is the second graphic, and the remaining arguments
+% incremented by one slot save an extra argument #6 for the size of
+% the gap between the two graphics, thus #7 is the caption.
+\newcommand{\myfigduo}[7]{
+  \begin{figure}#3
+    \includegraphics[#4]{#1.eps}
+    \typeout{#1.eps inserted on page \arabic{page}}
+    \hspace{#6}
+    \includegraphics[#4]{#2.eps}
+    \typeout{#2.eps inserted on page \arabic{page}}
+    \caption{\label{#5}\small #7}
+  \end{figure}
+}
+\begin{htmlonly}
+  \newcommand{\myfigduo}[7]{
+    \label{#5} \htmladdimg{#1.png}\htmladdimg{#2.png}\\
+    \\
+    Figure: #7\\
+  }
+\end{htmlonly}
+
 
 % Include special HTML versions of commands.
 
@@ -706,24 +750,18 @@ throughout the observation. This is shown in the top panel of Figure
 \ref{fig:scan}.
 \end{minipage}
 
-
-\begin{figure*}[b!]
-\begin{center}
-\includegraphics[width=0.9\linewidth]{sc21_wayne_scan.eps}
-\caption{\small Telescope track in offsets of azimuth and elevation
-for the SCUBA-2 observing patterns. \textbf{Top Left}: A single
-rotation of the \textsc{daisy} pattern; \textbf{Top Right}: Multiple
-rotations of the \textsc{daisy} pattern for a typical map based on a
-180-arcsec demanded diameter; \textbf{Bottom Left}: A single
-\textsc{pong} pattern; \textbf{Bottom Right}: Multiple rotations of
-the \textsc{pong} pattern for a typical map based on an 1800\arcsec\
-demanded map size. The scan pattern for your observation can be
-visualised like this with \topcat\ using the output from \jcmtstate.
-See Section~\ref{sec:exam} for more details. Figure taken from Holland
-et al. (2012).}
-\label{fig:scan}
-\end{center}
-\end{figure*}
+\myfig{sc21_wayne_scan}{[b!]}{width=0.9\linewidth}{fig:scan}{
+  Telescope track in offsets of azimuth and elevation for the SCUBA-2
+  observing patterns. \textbf{Top Left}: A single rotation of the
+  \textsc{daisy} pattern; \textbf{Top Right}: Multiple rotations of
+  the \textsc{daisy} pattern for a typical map based on a 180-arcsec
+  demanded diameter; \textbf{Bottom Left}: A single \textsc{pong}
+  pattern; \textbf{Bottom Right}: Multiple rotations of the
+  \textsc{pong} pattern for a typical map based on an 1800\arcsec\
+  demanded map size. The scan pattern for your observation can be
+  visualised like this with \topcat\ using the output from \jcmtstate.
+  See Section~\ref{sec:exam} for more details. Figure taken from
+  Holland et al. (2012).}
 
 \clearpage
 
@@ -875,7 +913,7 @@ you the units of the data, pixel bounds, dimensions and axis assignations.\\*
 \\*\\*
 Full details of these commands can be found in the \xref{\Kappa\ manual}{sun95}{}.
 
-
+\begin{latexonly}
 \begin{figure}[ht!]
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
@@ -931,6 +969,7 @@ select the the $X$ Axis to be either Id or RTS\_NUM.
 for an observation.}
 \label{fig:topcat}
 \end{figure}
+\end{latexonly}
 
 
 \subsubsection{\xlabel{scan_pat}Displaying scan patterns}
@@ -974,6 +1013,14 @@ values include the azimuth and elevation offsets (DAZ \& DEL), the WVM
 and 225\,GHz opacity values, and the instrument temperatures (e.g.
 SC2\_FPUTEMP gives the temperature of the focal plane).
 
+% The minipages used for the dvi version give latex2html problems.
+\begin{htmlonly}
+ \label{fig:topcat} \htmladdimg{sc21_topcat_example.png}
+ \\
+ Figure: \topcat\ example demonstrating how to display the scan
+ pattern for an observation.\\ \\
+\end{htmlonly}
+
 Due to extreme accelerations at ``turn-around'' points of a scan
 pattern (especially for \textsc{pong}s), the telescope finds it hard
 to follow the proscribed scan patterns at high elevations. To mitigate
@@ -989,33 +1036,19 @@ unaffected.
 \subsubsection{\xlabel{display_cube}Displaying time-series data}
 \label{sec:gaiacube}
 
-%\vspace{-2mm}
-%\begin{itemize}
-%\item \emph{Examine each bolometer to check the stability}
-%\end{itemize}
-%\vspace{-3mm}
-\begin{figure}[h!]
-\includegraphics[width=\linewidth]{sc21_gaia1.eps}
-\vspace{1mm}
-\caption{\small Initial \gaia\ windows displayed upon loading a data cube.
+\myfig{sc21_gaia1}{[h!]}{width=\linewidth}{fig:gaia_main}{
+  Initial \gaia\ windows displayed upon loading a data cube.
   The main window in the left shows a map of bolometer values at a fixed
   sample in time. You may have to zoom in multiple times by clicking the
   `Z' icon. On the right-hand side, the `Display image sections of a cube'
   dialogue enables the user to navigate the time axis.}
-\label{fig:gaia_main}
-\end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.8\linewidth]{sc21_gaia2.eps}
-\vspace{0.3cm}
-\caption{\small The \emph{Spectral Plot} window displaying its time-varying
-signal, appears automatically once a bolometer is clicked in the main window.
-The vertical red line indicates the time slice that is currently selected
-in the `Display image sections of a cube' dialogue -- this can be dragged
-across the spectrum to scroll through the time-slices.}
-\label{fig:gaia_spec}
-\end{figure}
+\myfig{sc21_gaia2}{[h!]}{width=0.8\linewidth}{fig:gaia_spec}{
+  The \emph{Spectral Plot} window displaying its time-varying
+  signal, appears automatically once a bolometer is clicked in the main window.
+  The vertical red line indicates the time slice that is currently selected
+  in the `Display image sections of a cube' dialogue -- this can be dragged
+  across the spectrum to scroll through the time-slices.}
 
 Use the \starlink\ application \gaia\ to visualise the bolometer time
 series data (or indeed \emph{any} SCUBA-2 data file). This is
@@ -1083,13 +1116,9 @@ are given in Appendix~\ref{app:clean}.
 You can also check out the SMURF SRO
 Cookbook\footnote{http://www.starlink.ac.uk/docs/sc19.htx/sc19.html}
 which goes into great depth on the data cleaning options.
-\begin{figure}[b!]
-\begin{center}
-\includegraphics[width=0.65\linewidth]{sc21_crl2688_regrid.eps}
-\caption{\small The regridded map of CRL2688 with the s8a sub-array displayed with \gaia.}
-\label{fig:regrid}
-\end{center}
-\end{figure}
+
+\myfig{sc21_crl2688_regrid}{[b!]}{width=0.65\linewidth}{fig:regrid}{
+  The regridded map of CRL2688 with the s8a sub-array displayed with \gaia.}
 
 
 \subsection{\xlabel{calcnoise}Checking the array performance}
@@ -1175,6 +1204,12 @@ stage where the different models are subtracted.
 Table~\ref{tab:dimmdef} gives all the variables in
 \texttt{dimmconfig.lis} again divided into the two main stages.
 
+\myfig{sc21_flow_dimm_blue}{}{width=0.78\linewidth}{fig:dimm}{
+  A flow chart illustrating the dynamic iterative map-maker. Note that
+  for each iteration the \texttt{AST} model is subtracted from the
+  time-series leaving only those contributions to be fitted and
+  removed.}
+
 The first task the map-maker perform is to down-sample the data. The
 raw time-series data is re-sampled at a rate that matches the
 requested pixel size, the equivalent to applying a low-pass filter.
@@ -1215,17 +1250,6 @@ the residual noise has not converged then \texttt{GAI}, \texttt{EXT},
 \texttt{FLT} and \texttt{COM} models are all un-done and the
 time-series is reconstructed. The sequence is then re-run only this
 time without \texttt{AST} complicating the model fitting.
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.78\linewidth]{sc21_flow_dimm_blue.eps}
-\caption{\small A flow chart illustrating the dynamic iterative map-maker.
-Note that for each iteration the \texttt{AST} model is subtracted from
-the time-series leaving only those contributions to be fitted and removed.}
-\label{fig:dimm}
-\end{center}
-\end{figure}
-
 
 \setlength{\extrarowheight}{3pt}
 \begin{table}
@@ -1663,16 +1687,9 @@ however this is not applied by the map-maker.
 \end{tabular}
 \end{table}
 
-\begin{figure}[b!]
-\begin{center}
-\includegraphics[width=0.47\linewidth]{sc21_cosmo1-def.eps}
-\hspace{0.3cm}
-\includegraphics[width=0.47\linewidth]{sc21_cosmo1-mf.eps}
-\caption{\small Maps of a deep cosmology field reduced with \textbf{(left)}
-\texttt{dimmconfig.lis} and \textbf{(right)} \texttt{dimmconfig\_blank\_field.lis}.}
-\label{fig:bfcompare}
-\end{center}
-\end{figure}
+\myfigduo{sc21_cosmo1-def}{sc21_cosmo1-mf}{[b!]}{width=0.47\linewidth}{fig:bfcompare}{3mm}{
+  Maps of a deep cosmology field reduced with \textbf{(left)}
+  \texttt{dimmconfig.lis} and \textbf{(right)} \texttt{dimmconfig\_blank\_field.lis}.}
 
 \subsubsection{dimmconfig\_bright\_compact.lis}
 
@@ -1771,17 +1788,9 @@ difference is the improvement in the bowling around strong sources.
 \end{tabular}
 \end{table}
 
-
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[width=0.47\linewidth]{sc21_gal_def.eps}
-\hspace{0.3cm}
-\includegraphics[width=0.47\linewidth]{sc21_gal_brex.eps}
-\caption{\small A region towards the galactic centre reduced with \textbf{(left)}
-\texttt{dimmconfig.lis} and \textbf{(right)} \texttt{dimmconfig\_bright\_extended.lis}.}
-\label{fig:becompare}
-\end{center}
-\end{figure}
+\myfigduo{sc21_gal_def}{sc21_gal_brex}{[h!]}{width=0.47\linewidth}{fig:becompare}{3mm}{
+  A region towards the galactic centre reduced with \textbf{(left)}
+  \texttt{dimmconfig.lis} and \textbf{(right)} \texttt{dimmconfig\_bright\_extended.lis}.}
 
 %\vspace{3in}
 
@@ -1961,6 +1970,10 @@ output written to the terminal as you run the map-maker. There are a
 number of clues in this output that indicate the status of the
 reduction.
 
+\myfig{sc21_crl2688}{[t!]}{width=0.7\linewidth}{fig:itermap}{
+  Map of CRL2688 produced with the \smurf\ task \makemap\ using
+  the iterative algorithm with default parameters.}
+
 
 \textbf{The number of input files}\\* The first to note is the number
 of input files; it is worth checking this matches your expected
@@ -1976,17 +1989,21 @@ The map-maker then determines if the raw data should be split and
 processed in more than one chunk. In this map the data is reduced in
 one continuous piece: \param{Continuous chunk 1 / 1}. Chunking is
 where the map-maker processes sub sections of the time-series data
-independently and should be avoided if possible -- see the text box on
-Page~\pageref{page:text}.
-\\*
-\begin{figure}[t!]
-\begin{center}
-\includegraphics[width=0.7\linewidth]{sc21_crl2688.eps}
-\caption{Map of CRL2688 produced with the \smurf\ task \makemap\ using
-  the iterative algorithm with default parameters.}
-\label{fig:itermap}
-\end{center}
-\end{figure}
+independently and should be avoided if possible -- see the text box
+\begin{latexonly}
+on Page~\pageref{page:text}.
+\end{latexonly}
+\begin{htmlonly}
+below.
+\end{htmlonly}
+\\
+
+% The minipages used for the dvi version give latex2html problems.
+\begin{htmlonly}
+ \htmladdimg{sc21_data_chunking.png}
+ \\ \\
+\end{htmlonly}
+
 
 \textbf{Quality statistics}\\*
 Next come the QUALITY flagging statistics. At the beginning, the main
@@ -2016,6 +2033,7 @@ You may note that compared with the initial report, the total number of samples
 with good `Quality' (\texttt{Total samples available for map}) has
 dropped from 18634826 to 18273302 (about a 2 per cent decrease) as
 additional samples were flagged in each iteration.
+\begin{latexonly}
 \begin{center}
 \begin{fmpage}{0.92\linewidth}
 \label{page:text}
@@ -2056,6 +2074,7 @@ effective.
 Be aware that some large reductions may take many iterations to reach
 convergence and you may find significantly fewer bolometers remaining
 resulting in higher noise than expected.
+\end{latexonly}
 
 \textbf{Convergence}\\*
 What about the convergence parameter? As discussed in
@@ -2267,17 +2286,12 @@ used.
 % histogram 850_map_cal_crop comp=err numbin=200  style="color=white"
 \end{verbatim}
 \end{myquote}
-The output is shown in the left-hand panel of Figure~\ref{fig:noi}.
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.53\linewidth]{sc21_noihist.eps}
-\includegraphics[width=0.45\linewidth]{sc21_crl2688_err.eps}
-\caption{\small The error map of the cropped make-map output viewed in two
-different ways. \textbf{(left)} Histogram of the noise component created
-using the \Kappa\  command \histogram. \textbf{(right)} Opened with \gaia.}
-\label{fig:noi}
-\end{center}
-\end{figure}
+The output is shown in the left-hand panel of Figure~\ref{fig:bfnoi}.
+
+\myfigduo{sc21_noihist}{sc21_crl2688_err}{}{width=0.47\linewidth}{fig:bfnoi}{3mm}{
+  The error map of the cropped make-map output viewed in two different
+  ways. \textbf{(left)} Histogram of the noise component created using
+  the \Kappa\ command \histogram. \textbf{(right)} Opened with \gaia.}
 
 It is also useful to view the error map itself to check its
 uniformity. To do this you will need to copy out the error component
@@ -2359,7 +2373,7 @@ parameters directly on the command line. They are appended to the
 configuration filename as a comma separated list as shown in the
 example below. Be sure to include all the necessary quotation marks.
 
-
+\begin{latexonly}
 \begin{myquote}
 \begin{verbatim}
 % gaia map.more.smurf.itermaps
@@ -2452,7 +2466,15 @@ on the `Display image sections' window.
 \gaia\ to view the `itermaps' map for each iteration.}
 \label{fig:stack}
 \end{figure}
+\end{latexonly}
 
+% The minipages used for the dvi version give latex2html problems.
+\begin{htmlonly}
+ \label{fig:stack} \htmladdimg{sc21_view_itermaps.png}
+ \\ \\
+ Figure: Example using the \smurf\ command \texttt{stackframes} and
+ \gaia\ to view the `itermaps' map for each iteration.
+\end{htmlonly}
 
 \subsection{\xlabel{filter}Adjusting the filtering}
 \label{sec:filt}
@@ -2649,19 +2671,13 @@ panel of Figure~\ref{fig:cosmomap}. The advantage of using the
 \picard\ recipe over standalone \Kappa\ commands is that the exposure
 time is also propagated correctly to the output mosaic (it is stored
 in the \texttt{MORE.SMURF.EXP\_TIME} extension).
-\\*
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.5\linewidth]{sc21_850cosmo_bf.eps}
-\hspace{0.2cm}
-\includegraphics[width=0.47\linewidth]{sc21_850cosmo_mf_crop.eps}
-\caption{\small Reduced \textsc{pong} maps of cosmology field A1835.
-\textbf{Left:} Map reduced with \texttt{dimmconfig\_blank\_field.lis}.
-\textbf{Right:} Map on the left after the matched filter has been applied
-and it has been cropped.}
-\label{fig:cosmomap}
-\end{center}
-\end{figure}
+\\
+
+\myfigduo{sc21_850cosmo_bf}{sc21_850cosmo_mf_crop}{}{width=0.48\linewidth}{fig:cosmomap}{2mm}{
+  Reduced \textsc{pong} maps of cosmology field A1835. \textbf{Left:}
+  Map reduced with \texttt{dimmconfig\_blank\_field.lis}.
+  \textbf{Right:} Map on the left after the matched filter has been
+  applied and it has been cropped.}
 
 \textbf{(3) Applying the matched filter}\\*
 In order to optimally find sources that are the size of the telescope
@@ -2701,14 +2717,9 @@ in this case to a 900$''$ radius circle.  The output file will be named
 \end{verbatim}
 \end{myquote}
 
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.6\linewidth]{sc21_850cosmo_mf_crop_snr.eps}
-\caption{\small Signal-to-noise map made the \Kappa\ command \texttt{makesnr}.
-The map has been scaled from 0 to +3.}
-\label{fig:snrmask}
-\end{center}
-\end{figure}
+\myfig{sc21_850cosmo_mf_crop_snr}{}{width=0.6\linewidth}{fig:snrmask}{
+  Signal-to-noise map made the \Kappa\ command \texttt{makesnr}.
+  The map has been scaled from 0 to +3.}
 
 \textbf{(5) Making a SNR map}\\*
 Finally, we need to find sources. The filtered map contains a
@@ -2776,13 +2787,8 @@ config='"^dimmconfig_bright_extended.lis,maptol=0.04,ast.zero_snr=3.5"'
 \end{verbatim}
 \end{myquote}
 
-\begin{figure}[t!]
-\begin{center}
-\includegraphics[width=0.6\hsize]{sc21_gal_11.eps}
-\caption{\small The output from the map-maker using \texttt{dimmconfig\_bright\_extended.lis}.}
-\label{fig:galmakemap}
-\end{center}
-\end{figure}
+\myfig{sc21_gal_11}{[t!]}{width=0.6\linewidth}{fig:galmakemap}{
+  The output from the map-maker using \texttt{dimmconfig\_bright\_extended.lis}.}
 
 %Figure~\ref{fig:orionmakemap}. Note that these maps were observed as a series of rotating pong patterns to avoid repetition of any scand irection, hence their distinctive shape.
 
@@ -2855,29 +2861,10 @@ ast.zero_snr = 0
 \end{verbatim}
 \end{myquote}
 
-\begin{figure}[t!]
-\begin{center}
-\includegraphics[width=0.48\hsize]{sc21_gal_mask1.eps}
-\hspace{0.2cm}
-\includegraphics[width=0.47\hsize]{sc21_gal_mask2.eps}
-\caption{\small \textbf{(left)} The initial mask created by thresholding
-850map\_snr to 3$\sigma$. \textbf{(right)} Second mask made by
-thresholding the smoothed map to 0.02.}
-\label{fig:mask}
-\end{center}
-\end{figure}
-
-\begin{figure}[th!]
-\begin{center}
-\includegraphics[width=0.7\hsize]{sc21_gal_exptime.eps}
-\caption{\small The exposure time image of the science map from
-Figure~\ref{fig:galmakemap}. You can right-click and drag the mouse between
-two points to measure the distance. Here we see the exposure time dropping
-off sharply at a radius of 30\arcmin. A non-default colour scale has been chosen
-to illustrate the morphology.}
-\label{fig:exptime}
-\end{center}
-\end{figure}
+\myfigduo{sc21_gal_mask1}{sc21_gal_mask2}{t!}{width=0.475\linewidth}{fig:mask}{2mm}{
+  \textbf{(left)} The initial mask created by thresholding 850map\_snr
+  to 3$\sigma$. \textbf{(right)} Second mask made by thresholding the
+  smoothed map to 0.02.}
 
 
 
@@ -2904,6 +2891,14 @@ The final cropped map is shown in figure \ref{fig:crop_map}. Compared
 to the first map out of the map-maker (figure \ref{fig:galmakemap}),
 slightly more of the faint extended emission is apparent.
 
+\myfig{sc21_gal_exptime}{[th!]}{width=0.7\linewidth}{fig:exptime}{
+  The exposure-time image of the science map from
+  Figure~\ref{fig:galmakemap}. You can right-click and drag the mouse
+  between two points to measure the distance. Here we see the exposure
+  time dropping off sharply at a radius of 30\arcmin. A non-default
+  colour scale has been chosen to illustrate the morphology.}
+
+
 One of the challenges facing this type of reduction is the need to
 account for both faint extended structure and very bright sources in
 the same map. You may find some degree of bowling remains around the
@@ -2919,6 +2914,10 @@ filtering -- see Section~\ref{sec:tweak} for details. Another option
 is to supply an external mask from a different dataset, e.g. a
 Herschel map.
 
+% Awaiting PNG
+%\myfig{sc21_gal12_crop}{[t!]}{width=0.8\hsize}{fig:crop_map}{
+%  The final cropped, reduced map from the map-maker run with
+%  an external mask supplied.}
 
 \begin{figure}[t!]
 \begin{center}
