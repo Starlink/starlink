@@ -867,7 +867,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.13-8</version>
+  <version>1.13-9</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -2337,6 +2337,38 @@ to handle data from a variety of different instruments.
   <copyright>
     <year>2001</year>
     <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sc21">
+  <version>1</version>
+  <path>docs/sc/021</path>
+  <description>The SCUBA-2 Data-analysis Cookbook</description>
+  <abstract><p>
+     This cookbook provides a short introduction to \starlink\
+     facilities, especially \smurf, the Sub-Millimetre User Reduction
+     Facility, for reducing, displaying, and calibrating SCUBA-2 data.
+     It describes some of the data artefacts present in SCUBA-2
+     time-series and methods to mitigate them. In particular, this
+     cookbook illustrates the various steps required to reduce the data;
+     and gives an overview of the Dynamic Iterative Map-Maker, which
+     carries out all of these steps using a single command controlled by
+     a configuration file.  Specialised configuration files are
+     presented.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>H.S. Thomas</name>
+    </person>
+  </developers>
+  <documentation> sc21</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year>2012</year>
+    <name>STFC</name>
   </copyright>
 </component>
 
@@ -4884,7 +4916,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>7.0.7</version>
+  <version>7.1.0</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -4926,13 +4958,13 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="atl" support="S">
-  <version>1.4</version>
+  <version>1.5</version>
   <path>libraries/atl</path>
   <description>ATL - A Library of AST Utility Routines</description>
   <abstract><p>ATL provides routines that perform high-level AST-related
             functions.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>fio</build><build>grp</build><build>ast</build><build>sae</build><link>chr</link><link>cfitsio</link><link>mers</link><link>ast</link><link>psx</link><link>fio</link><link>grp</link><sourceset>star2html</sourceset>
+    <build>cnf</build><build>fio</build><build>grp</build><build>ast</build><build>sae</build><build>hds</build><link>chr</link><link>cfitsio</link><link>mers</link><link>ast</link><link>psx</link><link>fio</link><link>grp</link><link>hds</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5522,7 +5554,7 @@ understand.
 </component>
 
 <component id="kaplibs" support="S">
-  <version>3.3</version>
+  <version>3.4</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
   <abstract><p>KAPLIBS is a package of Fortran subroutine
