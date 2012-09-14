@@ -37,7 +37,7 @@ PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 BASIC_C_ROUTINES = atl.c atlMapGet1C.c atlMapPut1C.c atlShow.c \
 atlMatchRegion.c atlAddWcsAxis.c atlReadFile.c atl_addwcsaxis.c \
 atlReadTable.c atlTableLutMap.c atl_chrsplitre.c atlKy2hd.c \
-atl_ky2hd.c
+atl_ky2hd.c atlHd2ky.c atl_hd2ky.c
 
 #  List of Fortran routines required by both ADAM and standalone
 #  libraries.
