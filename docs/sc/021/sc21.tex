@@ -1125,9 +1125,9 @@ which goes into great depth on the data cleaning options.
 \label{sec:calcnoise}
 
 The on-sky performance of the array can be assessed using the \smurf\
-command \calcnoise. Rather than give an absolute measure, \calcnoise\
+command \calcnoise. Rather than give an absolute measure, \task{calcnoise}
 should be used as an indicator of array performance and stability.
-\calcnoise\ cleans the data then calculates the
+\task{calcnoise} cleans the data then calculates the
 white noise on the array (between 2 and 10\,Hz by default). If the
 dark noise scans are given as input, this will track the array
 sensitivity independent of sky conditions. If you provide the whole
@@ -1166,7 +1166,7 @@ produce a final science map.
 This section describes the process by which the map-maker reduces
 data. It is essential reading to gain an understanding of what has
 happened to produce your reduced image, especially if you wish to
-modify the default map-maker parameters. Nevertheless, this is manual
+modify the default map-maker parameters. Nevertheless, this manual
 is intended to present `need to know' information for data reduction.
 For full details of the map-maker see \textbf{Chapin et al. (2012)} \cite{mapmaker}.
 
@@ -1481,14 +1481,15 @@ written out to files. However, this can be changed by setting
 \texttt{exportndf} in the configuration file to the list of models
 that you wish to view.
 
-You can specify an additional component, \texttt{RES}, if you wish to export
-the residual model. \texttt{RES} is the residual signal remaining
-after the other models have been removed. By contrast, the
+You can specify an additional component, \texttt{RES}, if you wish to
+export the residual model. \texttt{RES} is the residual signal
+remaining after the other models have been removed. By contrast, the
 \texttt{NOI} model is the noise in \texttt{RES}, as determined by
 running \texttt{RES} through \calcnoise\ (see
 Section~\ref{sec:calcnoise}). If \texttt{NOI} is exported, it can be
 viewed as the VARIANCE component of the \texttt{RES} model; thus,
 export of \texttt{RES} is implied if \texttt{NOI} is specified.
+
 %QUA It tells you which bit of each bolometer time-series has been flagged and the value is the reason for flagging. is specified, as it becomes the variance component of the resulting NDF for \texttt{RES}. \texttt{QUA} will become the quality component of any full 3-dimensional model (i.e. \texttt{RES}, \texttt{AST}, \texttt{FLT}, \texttt{EXT}).
 
 \vspace{0cm}
@@ -1512,8 +1513,8 @@ is encountered (see Section~\ref{sec:raw}}. The variance
 and quality for the data are stored as the VARIANCE and QUALITY
 components within the residual file NDF.
 
-As with the input data, these are all standard \starlink\ NDF files
-which can be examined using all of the existing \starlink\ tools.
+As with the input data, these are all standard {\starlink} NDF files
+which can be examined using all of the existing Starlink tools.
 
 Examples of the time traces for a single bolometer from these output
 models is shown in Figure~\ref{fig:itercomp}.  These traces cover a
@@ -1550,7 +1551,7 @@ downsampscale &   -1 & Down-sample to save memory and time. Negative value = its
                        magnitude will be multiplied by the PIXSIZE for the
                        requested map.\\
 \hline
-\multicolumn{3}{|l|}{\textbf{Pre-Prcoessing}}\\
+\multicolumn{3}{|l|}{\textbf{Pre-Processing}}\\
 \hline
 order         &    1  & Subtract a baseline polynomial of this order\\
 apod          & undef & Use default apodisation based on filter frequency\\
@@ -1722,7 +1723,7 @@ lost but is fine for a compact central source. Likewise, the filtering
 is tighter. The S/N threshold for DC steps is relaxed from 25 in the
 default file to 100 to avoid problems associated with bright sources.
 
-This is the recipe that is commonly used to reduce calibraton
+This is the recipe that is commonly used to reduce calibration
 observations with a pixel size set to 1\arcsec\ -- see
 Section~\ref{sec:fcf} for details on determining the FCFs from
 calibrators.
@@ -1849,8 +1850,8 @@ file and reading in a list of files as the input (e.g.
 \texttt{in=\^\,rawfilelist.txt}).
 
 The example uses \textbf{the
-default pixel sizes which are 450$\mu$m = 2\arcsec\ and 850$\mu$m =
-4\arcsec}. This can be overwritten by adding \texttt{pixsize=}$x$ to the
+default pixel sizes which are 2\arcsec\ for 450$\mu$m and 4\arcsec\ for
+850$\mu$m}. This can be overwritten by adding \texttt{pixsize=}$x$ to the
 command string\footnote{The default sizes are defined as one quarter
 of the Airy disk rounded up to the nearest half arcsecond.}, where $x$
 is your desired pixel size in arcseconds. We advise that you do not
@@ -2134,12 +2135,12 @@ from July 2012 onwards the FCF factors are:
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|}
- \hline
- \multicolumn{2}{|c|}{FCF$_{arcsec}$ (Jy/pW/arcsec$^2$) }  &
+\hline
+\multicolumn{2}{|c|}{FCF$_{arcsec}$ (Jy/pW/arcsec$^2$) }  &
 \multicolumn{2}{c|}{FCF$_{beam}$ (Jy/pW/beam)}      \\
 \hline
 \hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm} & 850\,$\mu$m & \hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm}& 850\,$\mu$m \\
- \hline
+\hline
 4.71 $\pm$ 0.5& 2.34 $\pm$ 0.08& 491 $\pm$ 67& 537 $\pm$ 24 \\
 \hline
 \end{tabular}
@@ -2315,7 +2316,7 @@ of your map into a new file; this can be done with the \Kappa\ command
 \end{verbatim}
 \end{myquote}
 The error file (\texttt{850\_map\_cal\_crop\_noi}) can then be viewed
-with \gaia -- see the right-hand panel of Figure~\ref{fig:noi}.
+with \gaia -- see the right-hand panel of Figure~\ref{fig:bfnoi}.
 
 %\\*\\*
 %\textbf{From your science map}\\*
@@ -2363,7 +2364,7 @@ Appendix~\ref{app:mf}, while the \picard\ manual gives full details of
 all the available parameters.
 
 \clearpage
-\section{\xlabel{tweak}Tweaking the Configuration  File}
+\section{\xlabel{tweak}Tweaking the Configuration File}
 \label{sec:tweak}
 
 Any configuration file can be edited by copying it to a local
@@ -2393,7 +2394,7 @@ example below. Be sure to include all the necessary quotation marks.
 \end{myquote}
 to help determine an appropriate number of iterations. This is useful
 when a fixed number of iterations have been requested (i.e. a positive
-value for \texttt{numiter}) and the map solution divergences before
+value for \texttt{numiter}) and the map solution diverges before
 they have completed.
 
 \textbf{shortmaps}\\
@@ -2410,7 +2411,8 @@ for each bolometer. These can be viewed with \gaia.
 them into a single cube using the \smurf\ command
 \texttt{stackframes}. This cube can then be viewed as a `movie' with
 \gaia, using the animation option to loop through the itermaps. See
-figure~\ref{fig:stack} for instructions.
+Figure~\ref{fig:stack} for instructions.
+
 \begin{figure}[ht!]
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
@@ -2765,7 +2767,7 @@ But how can we check if these sources are real?
 \end{itemize}
 
 \textbf{Note:} A \picard\ recipe dealing specifically with blank field
-maps is under development. Follow the \emph{data reduction
+maps is under development. Follow the \emph{Pipelines and Archives
 blog}\footnote{http://pipelinesandarchives.blogspot.com/} for all the
 latest updates and releases.
 
@@ -2897,8 +2899,8 @@ MAP_RADIUS = 1800
 % picard CROP_JCMT_IMAGES 850galactic.sdf
 \end{verbatim}
 \end{myquote}
-The final cropped map is shown in figure \ref{fig:crop_map}. Compared
-to the first map out of the map-maker (figure \ref{fig:galmakemap}),
+The final cropped map is shown in Figure~\ref{fig:crop_map}. Compared
+to the first map out of the map-maker (Figure~\ref{fig:galmakemap}),
 slightly more of the faint extended emission is apparent.
 
 \myfig{sc21_gal_exptime}{[th!]}{width=0.7\linewidth}{fig:exptime}{
