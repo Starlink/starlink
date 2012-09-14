@@ -2195,6 +2195,11 @@ $(MANIFESTS)/sc2: \
 	cd docs/sc/002 \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sc21: \
+		$(MANIFESTS)/star2html
+	cd docs/sc/021 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/sc3: \
 		$(MANIFESTS)/star2html
 	cd docs/sc/003 \
@@ -3153,6 +3158,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sc15 \
 	$(MANIFESTS)/sc17 \
 	$(MANIFESTS)/sc2 \
+	$(MANIFESTS)/sc21 \
 	$(MANIFESTS)/sc3 \
 	$(MANIFESTS)/sc4 \
 	$(MANIFESTS)/sc5 \
