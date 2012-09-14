@@ -4,6 +4,7 @@
 \usepackage{graphicx}        %  Use this one for final production.
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
 \usepackage{array}
+\usepackage{fancyhdr}
 \usepackage{multirow}
 % ? End of specify used packages
 
@@ -175,6 +176,16 @@
 %end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
+
+% Chapter title in the header.  This is using package fancyhdr.
+\pagestyle{fancy}
+\renewcommand{\sectionmark}[1]{\markboth{\stardocname---#1}{\stardocname---#1}}
+\renewcommand{\subsectionmark}[1]{}
+\renewcommand{\headrulewidth}{0pt}
+\lhead{\thepage}
+\fancyfoot[c]{}
+\fancyfoot[r]{}
+
 
 % Include special HTML versions of commands.
 
