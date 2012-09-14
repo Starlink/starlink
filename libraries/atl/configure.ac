@@ -28,8 +28,8 @@ dnl   We need this for the tests
 AC_FC_LIBRARY_LDFLAGS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [cnf fio grp ast sae])
-STAR_DECLARE_DEPENDENCIES(link,  [chr cfitsio mers ast psx fio grp])
+STAR_DECLARE_DEPENDENCIES(build, [cnf fio grp ast sae hds])
+STAR_DECLARE_DEPENDENCIES(link,  [chr cfitsio mers ast psx fio grp hds])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.

@@ -58,6 +58,7 @@
 */
 
 #include "f77.h"
+#include "star/hds.h"
 #include "ast.h"
 
 /* Public Constants */

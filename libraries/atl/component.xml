@@ -9,7 +9,7 @@
   <abstract><p>ATL provides routines that perform high-level AST-related
             functions.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>fio</build><build>grp</build><build>ast</build><build>sae</build><link>chr</link><link>cfitsio</link><link>mers</link><link>ast</link><link>psx</link><link>fio</link><link>grp</link><sourceset>star2html</sourceset>
+    <build>cnf</build><build>fio</build><build>grp</build><build>ast</build><build>sae</build><build>hds</build><link>chr</link><link>cfitsio</link><link>mers</link><link>ast</link><link>psx</link><link>fio</link><link>grp</link><link>hds</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
