@@ -177,60 +177,6 @@
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
-% Chapter title in the header.  This is using package fancyhdr.
-\pagestyle{fancy}
-\renewcommand{\sectionmark}[1]{\markboth{\stardocname---#1}{\stardocname---#1}}
-\renewcommand{\subsectionmark}[1]{}
-\renewcommand{\headrulewidth}{0pt}
-\lhead{\thepage}
-\fancyfoot[c]{}
-\fancyfoot[r]{}
-
-% Figure environment. Defined for latex2html to produce good quality
-% graphics in the hypertext. It assumes that the files are
-% encapsulated PostScript with extension .eps, and PNG with extension
-% .png.  The arguments are: #1 graphics filename without an extension;
-% #2 figure environment location including brackets, or leave empty for
-% none; #3 the includegraphics % qualifiers; #4 the label; and #5 the
-% caption.
-\newcommand{\myfig}[5]{
-  \begin{figure}#2
-    \centering\includegraphics[#3]{#1.eps}
-    \typeout{#1.eps inserted on page \arabic{page}}
-    \caption{\label{#4}\small #5}
-  \end{figure}
-}
-\begin{htmlonly}
-  \newcommand{\myfig}[5]{
-    \label{#4} \htmladdimg{#1.png}\\
-    \\
-    Figure: #5\\
-  }
-\end{htmlonly}
-
-% Address twin (side-by-side) graphics in a similar fashion where the
-% second argument is the second graphic, and the remaining arguments
-% incremented by one slot save an extra argument #6 for the size of
-% the gap between the two graphics, thus #7 is the caption.
-\newcommand{\myfigduo}[7]{
-  \begin{figure}#3
-    \includegraphics[#4]{#1.eps}
-    \typeout{#1.eps inserted on page \arabic{page}}
-    \hspace{#6}
-    \includegraphics[#4]{#2.eps}
-    \typeout{#2.eps inserted on page \arabic{page}}
-    \caption{\label{#5}\small #7}
-  \end{figure}
-}
-\begin{htmlonly}
-  \newcommand{\myfigduo}[7]{
-    \label{#5} \htmladdimg{#1.png}\htmladdimg{#2.png}\\
-    \\
-    Figure: #7\\
-  }
-\end{htmlonly}
-
-
 % Include special HTML versions of commands.
 
 \newcommand{\eg}{{\it e.g.}}
@@ -343,6 +289,60 @@
 %\renewcommand\familydefault{\sfdefault}
 %\titleformat*{\section}{\LARGE\bfseries}
 %\titleformat*{\subsection}{\large\bfseries}
+
+% Chapter title in the header.  This is using package fancyhdr.
+\pagestyle{fancy}
+\renewcommand{\sectionmark}[1]{\markboth{\stardocname---#1}{\stardocname---#1}}
+\renewcommand{\subsectionmark}[1]{}
+\renewcommand{\headrulewidth}{0pt}
+\lhead{\thepage}
+\fancyfoot[c]{}
+\fancyfoot[r]{}
+
+% Figure environment. Defined for latex2html to produce good quality
+% graphics in the hypertext. It assumes that the files are
+% encapsulated PostScript with extension .eps, and PNG with extension
+% .png.  The arguments are: #1 graphics filename without an extension;
+% #2 figure environment location including brackets, or leave empty for
+% none; #3 the includegraphics % qualifiers; #4 the label; and #5 the
+% caption.
+\newcommand{\myfig}[5]{
+  \begin{figure}#2
+    \centering\includegraphics[#3]{#1.eps}
+    \typeout{#1.eps inserted on page \arabic{page}}
+    \caption{\label{#4}\small #5}
+  \end{figure}
+}
+\begin{htmlonly}
+  \newcommand{\myfig}[5]{
+    \label{#4} \htmladdimg{#1.png}\\
+    \\
+    Figure: #5\\
+  }
+\end{htmlonly}
+
+% Address twin (side-by-side) graphics in a similar fashion where the
+% second argument is the second graphic, and the remaining arguments
+% incremented by one slot save an extra argument #6 for the size of
+% the gap between the two graphics, thus #7 is the caption.
+\newcommand{\myfigduo}[7]{
+  \begin{figure}#3
+    \includegraphics[#4]{#1.eps}
+    \typeout{#1.eps inserted on page \arabic{page}}
+    \hspace{#6}
+    \includegraphics[#4]{#2.eps}
+    \typeout{#2.eps inserted on page \arabic{page}}
+    \caption{\label{#5}\small #7}
+  \end{figure}
+}
+\begin{htmlonly}
+  \newcommand{\myfigduo}[7]{
+    \label{#5} \htmladdimg{#1.png}\htmladdimg{#2.png}\\
+    \\
+    Figure: #7\\
+  }
+\end{htmlonly}
+
 
 
 % ? End of document specific commands
@@ -1528,7 +1528,7 @@ of the signal has been successfully accounted for by the other model
 components.
 
 
-\renewcommand*\arraystretch{0.85}
+\latex{\renewcommand*\arraystretch{0.85}}
 \begin{table*}
 \begin{center}
 \begin{footnotesize}
@@ -1623,7 +1623,7 @@ Appendix~\ref{app:dimm}.}
 \end{footnotesize}
 \end{center}
 \end{table*}
-\renewcommand*\arraystretch{1.0}
+\latex{\renewcommand*\arraystretch{1.0}}
 
 
 \subsection{\xlabel{config}Specialised configuration files}
@@ -1682,7 +1682,7 @@ Normally blank-field map would subsequently have a matched filter
 applied to it to aid source detection (see Section~\ref{sec:mf}),
 however this is not applied by the map-maker.
 \vspace{0.3cm}
-\renewcommand*\arraystretch{0.8}
+\latex{\renewcommand*\arraystretch{0.8}}
 \begin{table}[h!]
 \centering
 \begin{tabular}{|p{6.5cm}p{6.5cm}|}
@@ -1728,7 +1728,7 @@ observations with a pixel size set to 1\arcsec\ -- see
 Section~\ref{sec:fcf} for details on determining the FCFs from
 calibrators.
 \vspace{0.3cm}
-\renewcommand*\arraystretch{0.8}
+\latex{\renewcommand*\arraystretch{0.8}}
 \begin{table}[h!]
 \centering
 \begin{tabular}{|p{6.5cm}p{6.5cm}|}
@@ -1777,7 +1777,7 @@ with the default configuration file and using
 \texttt{dimmconfig\_bright\_extended.lis}; the most noticeable
 difference is the improvement in the bowling around strong sources.
 
-\renewcommand*\arraystretch{0.8}
+\latex{\renewcommand*\arraystretch{0.8}}
 \begin{table}[t!]
 \centering
 \begin{tabular}{|p{6.5cm}p{6.5cm}|}
