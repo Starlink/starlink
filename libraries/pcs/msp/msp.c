@@ -147,7 +147,7 @@ static int mysockets[MSP__MXSOCKETS];       /* list of open sockets */
 static int socket_used[MSP__MXSOCKETS];     /* flags for currently-active
                                                sockets */
 
-static char rendezvous[MAXPATH];            /* name of rendezvous file */
+static char rendezvous[MAXPATH+1+32+1+5];   /* name of rendezvous file (ADAM_USER+/+<task>_<PORT>) */
 
 static char adam_user[MAXPATH];             /* directory for creating msp
                                                files */
@@ -1182,8 +1182,8 @@ int *status              /* global status (given and returned) */
      Creates the directory if necessary */
 
     if ( msp1_admus( adam_user, MAXPATH) ) {
-      sprintf ( string, "%s aborting, failed creating directory %s",
-        my_name, adam_user );
+      sprintf ( string, "%s aborting, failed creating or obtaining ADAM_USER directory",
+        my_name );
       perror ( string );
       exit(1);
     }
@@ -1262,7 +1262,12 @@ int *status              /* global status (given and returned) */
 /*   create task rendezvous file with a name of the form
      ADAM_USER/<taskname>_<portnumber> */
 
-   sprintf ( rendezvous, "%s/%s_%d", adam_user, task_name, portno );
+   istat = snprintf ( rendezvous, sizeof(rendezvous), "%s/%s_%d", adam_user, task_name, portno );
+   if (istat >= sizeof(rendezvous) ) {
+     fprintf( stderr, "%s aborting, ADAM_USER directory (%s) is too long for internal buffer\n", my_name,
+              adam_user );
+     exit(1);
+   }
 
 #if __CYGWIN32__
    /* mknod and mkfifo are dummies, so test works, but cannot be used */
