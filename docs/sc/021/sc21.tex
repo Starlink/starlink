@@ -3109,7 +3109,7 @@ Section~\ref{sec:maps}:
 \vspace{-0.3cm}
 \begin{itemize}\itemsep-0.3em
 \item Run the iterative map-maker.
-\item Apply the FCF to calibrate to mJy\,beam$^{-1}$.
+\item Apply the FCF to calibrate to mJy/beam.
 \item Co-add multiple observations of the same object.
 \item Apply the matched-filter if the blank-field configuration file
       has been requested.
@@ -3294,7 +3294,7 @@ described below.}
 \begin{equation}
 \label{eq:fcf_arcsec}
 \mathrm{FCF_{arcsec}} = \frac{S_\mathrm{tot}}{P_\mathrm{int} \times
-  A_\mathrm{pix}},
+  A_\mathrm{pix}}
 \end{equation}
 
 where $S_\mathrm{tot}$ is the total flux density of the calibrator,
@@ -3579,22 +3579,22 @@ no large-scale noise in the map, the filtered signal map would be
 calculated as follows:
 
 \begin{equation}
-\mathcal{M} = \frac{[M(x,y)/\sigma^2(x,y)] \otimes P(x,y)}
+  {\cal{M}} = \frac{[M(x,y)/\sigma^2(x,y)] \otimes P(x,y)}
   {[1/\sigma^2(x,y)] \otimes [P^2(x,y)]},
 \end{equation}
 
 where $M(x,y)$ and $\sigma(x,y)$ are the signal and RMS
-noise maps produced by \smurf, and $P(x,y)$ is a map of the
-PSF. Here `$\otimes$' denotes the 2-dimensional cross-correlation
+noise maps respectively produced by \smurf, and $P(x,y)$ is a map of the
+PSF. Here \(\otimes\) denotes the 2-dimensional cross-correlation
 operator. Similarly, the variance map would be calculated as
 
 \begin{equation}
-  \mathcal{N}^2 = \frac{1}{[1/\sigma^2(x,y)] \otimes [P^2(x,y)]}.
+  {\cal{N}}^2 = \frac{1}{[1/\sigma^2(x,y)] \otimes [P^2(x,y)]}.
 \end{equation}
 
 This operation is equivalent to calculating the maximum-likelihood fit
 of the PSF centered over every pixel in the map, taking into account
-the noise. Presently $P$ is simply modeled as an ideal Gaussian
+the noise. Presently $P(x,y)$ is simply modelled as an ideal Gaussian
 with a FWHM set to the diffraction limit of the telescope.
 
 However, since there is large-scale (and therefore correlated from
@@ -3649,7 +3649,7 @@ data was reduced will need to apply different calibration values.
  \multicolumn{2}{c|}{FCF - 450$\mu$m}  &
 \multicolumn{2}{c|}{FCF - 850$\mu$m}      \\
 \cline{2-5}
-& Jy/pW/beam &Jy/pW/arcsec$^2$& Jy/pW/beam &Jy/pW/arcsec$^2$ \\
+& Jy/pW/beam &Jy/pW/arcsec$^2$ & Jy/pW/beam &Jy/pW/arcsec$^2$ \\
  \hline
 until January 2012 &383  & 4.9&1080 &5.0 \\
 January 2012 - July 2012&606&6.06 &556 &2.42 \\
