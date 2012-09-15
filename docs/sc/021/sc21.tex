@@ -2105,7 +2105,7 @@ Total samples available from all chunks: 18273302 (3067.53 bolos)
 \end{myquote}
 \vspace{-10mm}
 \begin{center}
-\line(1,0){155}
+\latex{\line(1,0){155}}
 \end{center}
 \subsection{\xlabel{look_for}What to look out for}
 \flushbottom
@@ -2642,6 +2642,7 @@ applied to the data:
 \begin{equation}
 \frac{\mbox{speed}\;(''/\mbox{s)}}{\mbox{frequency cut}\;(\mbox{Hz)}}=\mbox{scale size}\;('')
 \end{equation}
+
 The filtering options set in \texttt{dimmconfig.lis} are:
 
 \texttt{450.flt.filt\_edge\_largescale = 300} \\
@@ -3581,16 +3582,16 @@ calculated as follows:
 \mathcal{M} = \frac{[M(x,y)/\sigma^2(x,y)] \otimes P(x,y)}
   {[1/\sigma^2(x,y)] \otimes [P^2(x,y)]},
 \end{equation}
-%
+
 where $M(x,y)$ and $\sigma(x,y)$ are the signal and RMS
 noise maps produced by \smurf, and $P(x,y)$ is a map of the
 PSF. Here `$\otimes$' denotes the 2-dimensional cross-correlation
 operator. Similarly, the variance map would be calculated as
-%
+
 \begin{equation}
   \mathcal{N}^2 = \frac{1}{[1/\sigma^2(x,y)] \otimes [P^2(x,y)]}.
 \end{equation}
-%
+
 This operation is equivalent to calculating the maximum-likelihood fit
 of the PSF centered over every pixel in the map, taking into account
 the noise. Presently $P$ is simply modeled as an ideal Gaussian
@@ -3671,6 +3672,7 @@ July 2012 onwards        & 26 $\times$ ($\tau_{225}$ - 0.01196) & 4.6 $\times$ (
 \end{tabular}
 \end{center}
 \end{table}
+
 \vspace{-5mm}
 \begin{itemize}
 \item Peak FCF (Jy/pW/beam) -- multiply your map by this when you wish
