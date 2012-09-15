@@ -1236,8 +1236,8 @@ requested number of iterations has been completed or when the
 noise-based convergence criteria specified in the configuration file
 is reached. If more iterations are required or (in the latter case)
 the residual noise has not converged then \texttt{GAI}, \texttt{EXT},
-\texttt{FLT} and \texttt{COM} models are all un-done and the
-time-series is reconstructed. The sequence is then re-run only this
+\texttt{FLT} and \texttt{COM} models are all undone and the
+time-series is reconstructed. The sequence is then rerun only this
 time without \texttt{AST} complicating the model fitting.
 
 \setlength{\extrarowheight}{3pt}
@@ -1524,7 +1524,7 @@ components.
 \begin{footnotesize}
 \begin{tabular}{|p{2.2cm}|p{1.1cm}|p{11.4cm}|}
 \hline
-Param & Value & Description \\
+Parameter & Value & Description \\
 \hline
 \multicolumn{3}{|l|}{\textbf{General}}\\
 \hline
@@ -1623,7 +1623,7 @@ Appendix~\ref{app:dimm}.}
 \begin{footnotesize}
 \begin{tabular}{|p{2.2cm}|p{1.1cm}|p{11.4cm}|}
 \hline
-Param & Value & Description \\
+Parameter & Value & Description \\
 \hline
 \multicolumn{3}{|l|}{\textbf{General}}\\
 \hline
@@ -1880,7 +1880,7 @@ the sensitivity to large dynamic signal ranges in the map.
 Recovering both faint extended structure and bright sources in the
 same field poses an extra challenge. After initially making your map using
 \texttt{dimmconfig\_bright\_extended.lis} you may wish to generate a
-mask from the emission and re-run the map-maker with this external
+mask from the emission and rerun the map-maker with this external
 mask applied. This method is superior to simply forcing to zero
 everything below 5$\sigma$. Details on how to do this are outlined in
 Section~\ref{sec:maskbe}.
@@ -2985,7 +2985,7 @@ The final mask is shown in the right-panel of Figure~\ref{fig:mask},
 note how is encompasses more emission and has softer edges than the
 first threshold map.
 \\ \\
-\textbf{(3) Re-running the map-maker with an external mask supplied}\\
+\textbf{(3) Rerunning the map-maker with an external mask supplied}\\
 As a last step the map is re-made with this mask supplied as an external
 file. For this run we apply the additional parameters in a
 personalised configuration file, \texttt{mydimmconfig.lis}.
@@ -3234,7 +3234,7 @@ into master group files.
 Primary and secondary calibrator observations have been reduced using
 the specifically designed \texttt{dimmconfig\_bright\_compact.lis}.
 The maps produced from this are then analysed using tailor-made
-\picard\ recipes. For instructions on aplying the FCFs to your map see
+\picard\ recipes. For instructions on applying the FCFs to your map see
 Section~\ref{sec:cmult}.
 
 A map reduced by the map-maker has units of pW. To calibrate the data
@@ -3478,7 +3478,7 @@ In this first basic example, we just want to clean up some data enough
 to see whether the bolometers have been flat-fielded correctly, and
 more-or-less exhibit the same behaviour over time. the pre-processing
 or cleaning steps used by the default configuration file are
-summairsed in table~\ref{tab:dimmdef}.
+summarised in table~\ref{tab:dimmdef}.
 
 \begin{myquote}
 \begin{verbatim}
@@ -3565,7 +3565,7 @@ default configuration files like so:
 \end{verbatim}
 \end{myquote}
 Or you can create your own customised configuration file. All the
-pre-prcoessing options that may be specified are listed and described
+pre-processing options that may be specified are listed and described
 in \texttt{dimmconfig.lis} -- see Appendix~\ref{app:dimm}.
 
 
@@ -3637,7 +3637,7 @@ the \param{PSF\_MATCHFILTER} recipe parameter).
 \section{\xlabel{fcfsred}FCFs by Reduction Date}
 \label{app:fcfs}
 
-Ongoing development of the SCUBA-2 anlaysis has resulted in on-going
+Ongoing development of the SCUBA-2 analysis has resulted in on-going
 changes to the tau relationship and the FCFs. Depending on when your
 data was reduced will need to apply different calibration values.
 \\
