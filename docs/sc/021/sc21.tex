@@ -1517,7 +1517,8 @@ of the signal has been successfully accounted for by the other model
 components.
 
 
-\latex{\renewcommand*\arraystretch{0.85}}
+\begin{latexonly}
+\renewcommand*\arraystretch{0.85}
 \begin{table*}
 \begin{center}
 \begin{footnotesize}
@@ -1578,8 +1579,8 @@ com.niter        &    1 & The number of n-sigma clipping iterations (1 = no clip
 com.nsigma       &    3 & The number of standard deviations at which the 3\,$\sigma$
                            clipping algorithm clips\\
 com.noflag       &    0 & If set, disable flagging of bad bolos using common-mode.\\
-com.corr\_tol    &    5 & $n$-sigma away from mean correlation coefficient tolerance\\
-com.gain\_tol    &    5 & $n$-sigma away from mean gain coefficient tolerance\\
+com.corr\_tol    &    5 & Number of sigma away from mean correlation coefficient tolerance\\
+com.gain\_tol    &    5 & Number of sigma away from mean gain coefficient tolerance\\
 com.gain\_abstol &    3 & Absolute factor away from mean gain coefficient tolerance\\
 com.gain\_box    &-30.0 & The number of time slices (or seconds if negative)
                           in a box\\
@@ -1612,7 +1613,105 @@ Appendix~\ref{app:dimm}.}
 \end{footnotesize}
 \end{center}
 \end{table*}
-\latex{\renewcommand*\arraystretch{1.0}}
+\renewcommand*\arraystretch{1.0}
+\end{latexonly}
+
+% Needed because latex2html seems unable to handle multirow
+\begin{htmlonly}
+\begin{table*}
+\begin{center}
+\begin{footnotesize}
+\begin{tabular}{|p{2.2cm}|p{1.1cm}|p{11.4cm}|}
+\hline
+Param & Value & Description \\
+\hline
+\multicolumn{3}{|l|}{\textbf{General}}\\
+\hline
+numiter       &   -5 & Number of iterations. A negative number = max iterations
+                       if using $\chi^2$ and/or map stopping criteria\\
+chitol        & 1e-3 & Threshold change in reduced $\chi^2$ in subsequent
+                       iterations.\\
+varmapmethod  &    1 & Estimate variance map by sample variance of data that
+                       land in each pixel\\
+maxlen        &    0 & Maximum length (secs) for concatenated data. 0 = attempt
+                       to concatenate entire chunks\\
+exportndf     &    0 & Do not export any models\\
+downsampscale &   -1 & Down-sample to save memory and time. Negative value = its
+                       magnitude will be multiplied by the PIXSIZE for the
+                       requested map.\\
+\hline
+\multicolumn{3}{|l|}{\textbf{Pre-Processing}}\\
+\hline
+order         &    1  & Subtract a baseline polynomial of this order\\
+apod          & undef & Use default apodisation based on filter frequency\\
+badfrac       & 0.05  & Fraction of samples to be bad to flag entire bolometer
+                        as dead\\
+flagslow      &    30 & Flag data taken while telescope was moving so slowly
+                        that sources sit in $1/f$ noise\\
+450.flagfast  &  1000 & Flag data taken the telescope was moving too fast
+                        causing source smearing}\\
+850.flagfast  &  1000 & Flag data taken the telescope was moving too fast
+                        causing source smearing}\\
+pcathresh     &     0 & PCA cleaning is the threshold above which components
+                        will be removed from the bolometer time-series.\\
+dcthresh      &  25.0 & S/N threshold to detect DC step\\
+dcfitbox      &    30 & Box size over which to fit data with a straight
+                        line on either side of a potential DC jump\\
+dcmaxsteps    &    10 & The maximum number of steps that can be corrected
+                        in each minute of good data.\\
+dclimcorr     &     0 & If more than DCLIMCORR bolometer have a step at
+                        a given time, then all bolometers are corrected for
+                        a step at that time, using lower thresholds.\\
+dcsmooth      &    50 & The width of the median filter used to smooth a
+                        bolometer data stream prior to finding DC jump\\
+fillgaps      &     1 & Fill vicinity of spikes/DC steps with constrained
+                        realization of noise\\
+noisecliphigh &   4.0 & Clip bolometers based on their noise. This step
+                        will remove any bolometers noisier than noisecliphigh
+                        standard deviations above the median.\\
+\hline
+\multicolumn{3}{|l|}{\textbf{Iterative}}\\
+\hline
+com.oldalg       &    0 & Set this flag to a non-zero value to use the old COM
+                          algorithm. Not recommended.\\
+com.niter        &    1 & The number of n-sigma clipping iterations (1 = no clipping)\\
+com.nsigma       &    3 & The number of standard deviations at which the 3\,$\sigma$
+                           clipping algorithm clips\\
+com.noflag       &    0 & If set, disable flagging of bad bolos using common-mode.\\
+com.corr\_tol    &    5 & Number of sigma away from mean correlation coefficient tolerance\\
+com.gain\_tol    &    5 & Number of sigma away from mean gain coefficient tolerance\\
+com.gain\_abstol &    3 & Absolute factor away from mean gain coefficient tolerance\\
+com.gain\_box    &-30.0 & The number of time slices (or seconds if negative)
+                          in a box\\
+\hline
+noi.fillgaps     &    1 & Additional despiking/step finding after each iteration within NOI calculation\\
+noi.dcfitbox     &    0 & Turn DC step finding on or off. 0 = off\\
+\hline
+flt.apod         &undef & Use default apodisation based on filter frequency\\
+450.flt.filt\_edge_largescale & 300 & Apply a frequency filter to the
+                         FLT model. The value is given in arcsecs which the
+                         map-maker converts to frequency.\\
+850.flt.filt\_edge_largescale & 600 & Apply a frequency filter to the
+                         FLT model. The value is given in arcsecs which the
+                         map-maker converts to frequency.\\
+flt.zero\_niter  &    2 & Apply FLT mask for only the first n=2 iterations\\
+\hline
+ext.tausrc       & auto & Options = auto, wvmraw, csotau, filtertau\\
+ext.taumethod    & adaptive & Options = adaptive, full, quick\\
+\hline
+ast.mapspike     &   10 & Throw away spikes in the AST map greater than
+                          this number of $\sigma$. Not on the first iteration\\
+\hline
+\end{tabular}
+\label{tab:dimmdef}
+\caption{\small The active variables from \texttt{dimmconfig.lis} and their
+default values. For a fuller description of each, as well as other
+options, see the comments in the file itself. This can be found in
+Appendix~\ref{app:dimm}.}
+\end{footnotesize}
+\end{center}
+\end{table*}
+\end{htmlonly}
 
 
 \subsection{\xlabel{config}Specialised configuration files}
@@ -1717,17 +1816,19 @@ observations with a pixel size set to 1~arcsec -- see
 Section~\ref{sec:fcf} for details on determining the FCFs from
 calibrators.
 \vspace{0.3cm}
-\latex{\renewcommand*\arraystretch{0.8}}
+
+\begin{latexonly}
+\renewcommand*\arraystretch{0.8}
 \begin{table}[h!]
 \centering
-\begin{tabular}{|p{6.5cm}p{6.5cm}|}
+\begin{tabular}{|p{6.5cm}p{7.0cm}|}
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_bright\_compact.lis}}\\
 \hline
-\texttt{numiter=-40}&\texttt{flt.zero\_niter = 2}\\
-\texttt{chitol=$<$undef$>$}&\texttt{com.perarray = 1}\\
-\texttt{maptol=0.05}&\texttt{450.flt.filt\_edge\_largescale=200}\\
-\texttt{ast.zero\_notlast = 1}&\texttt{850.flt.filt\_edge\_largescale=200}\\
+\texttt{numiter = -40}&\texttt{flt.zero\_niter = 2}\\
+\texttt{chitol = $<$undef$>$}&\texttt{com.perarray = 1}\\
+\texttt{maptol = 0.05}&\texttt{450.flt.filt\_edge\_largescale = 200}\\
+\texttt{ast.zero\_notlast = 1}&\texttt{850.flt.filt\_edge\_largescale = 200}\\
 \texttt{flt.zero\_circle = (0.016666)}& \texttt{ast.zero\_circle = (0.0166666666)}\\
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
@@ -1738,6 +1839,30 @@ calibrators.
 \hline
 \end{tabular}
 \end{table}
+\end{latexonly}
+
+\begin{htmlonly}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|p{6.5cm}p{7.0cm}|}
+\hline
+\multicolumn{2}{|l|}{\texttt{dimmconfig\_bright\_compact.lis}}\\
+\hline
+\texttt{numiter = -40}&\texttt{flt.zero\_niter = 2}\\
+\texttt{chitol = undef}&\texttt{com.perarray = 1}\\
+\texttt{maptol = 0.05}&\texttt{450.flt.filt\_edge\_largescale = 200}\\
+\texttt{ast.zero\_notlast = 1}&\texttt{850.flt.filt\_edge\_largescale = 200}\\
+\texttt{flt.zero\_circle = (0.016666)}& \texttt{ast.zero\_circle = (0.0166666666)}\\
+\hline
+\multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
+\hline
+\texttt{noisecliphigh = 10.0} & \texttt{dcthresh = 100}\\
+\texttt{com.corr\_tol = 7}& \texttt{com.gain\_tol = 7}\\
+\texttt{com.gain\_abstol = 5}& \\
+\hline
+\end{tabular}
+\end{table}
+\end{htmlonly}
 
 
 \subsubsection{dimmconfig\_bright\_extended.lis}
@@ -1766,15 +1891,37 @@ with the default configuration file and using
 \texttt{dimmconfig\_bright\_extended.lis}; the most noticeable
 difference is the improvement in the bowling around strong sources.
 
-\latex{\renewcommand*\arraystretch{0.8}}
+\begin{latexonly}
+\renewcommand*\arraystretch{0.8}
 \begin{table}[t!]
 \centering
 \begin{tabular}{|p{6.5cm}p{6.5cm}|}
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_bright\_extended.lis}}\\
 \hline
-\texttt{numiter=-40}&\texttt{ast.zero\_notlast = 1}\\
+\texttt{numiter = -40}&\texttt{ast.zero\_notlast = 1}\\
 \texttt{chitol=$<$undef$>$}&\texttt{ast.zero\_snr = 5}\\
+\texttt{maptol = 0.05}& \\
+\hline
+\multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
+\hline
+\texttt{com.corr\_tol = 7}& \texttt{com.gain\_tol = 7}\\
+\texttt{com.gain\_abstol = 5}& \texttt{dcthresh = 100}\\
+\texttt{noisecliphigh = 10.0}& \\
+\hline
+\end{tabular}
+\end{table}
+\end{latexonly}
+
+\begin{htmlonly}
+\begin{table}[t!]
+\centering
+\begin{tabular}{|p{6.5cm}p{6.5cm}|}
+\hline
+\multicolumn{2}{|l|}{\texttt{dimmconfig\_bright\_extended.lis}}\\
+\hline
+\texttt{numiter = -40}&\texttt{ast.zero\_notlast = 1}\\
+\texttt{chitol = undef}&\texttt{ast.zero\_snr = 5}\\
 \texttt{maptol=0.05}& \\
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
@@ -1785,6 +1932,7 @@ difference is the improvement in the bowling around strong sources.
 \hline
 \end{tabular}
 \end{table}
+\end{htmlonly}
 
 \myfigduo{sc21_gal_def}{sc21_gal_brex}{[h!]}{width=0.47\linewidth}{fig:becompare}{3mm}{
   A region towards the galactic centre reduced with \textbf{(left)}
