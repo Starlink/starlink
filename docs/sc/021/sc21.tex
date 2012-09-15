@@ -182,18 +182,6 @@
 \newcommand{\eg}{{\it e.g.}}
 \newcommand{\ie}{{\it i.e.}}
 
-% microns
-\newcommand{\micron}{\mbox{$\mu$m}}
-
-% degrees symbol
-\newcommand{\degr}{\mbox{\,$^\circ$}}
-
-% arcminute symbol
-\newcommand{\arcmin}{\mbox{$^\prime$}}
-
-% arcsec symbol
-\newcommand{\arcsec}{\arcmin\hspace*{-0.1em}\arcmin}
-
 \newsavebox{\fmbox}
 \newenvironment{fmpage}[1]{\begin{lrbox}{\fmbox}\begin{minipage}{#1}}{\end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}}
 
@@ -480,7 +468,7 @@
 The Submillimetre Common User Bolometer Array-2 (SCUBA-2) is a
 10,000-pixel bolometer camera for the 15-m James Clerk Maxwell
 Telescope (JCMT). It has two arrays operating simultaneously to map
-the sky in the atmospheric windows of 450 and 850\micron.
+the sky in the atmospheric windows of 450 and 850$\mu$m.
 
 This guide is designed to instruct SCUBA-2 users on the best ways to
 reduce and visualise their data using \starlink\ packages,
@@ -674,7 +662,7 @@ performed at the end of an observation so bolometers whose
 responsivity has changed over the course of the observation can be
 flagged.
 
-%Typically SCUBA-2 is referred to as having a field of view (FOV) of 8 square arcminutes. As you see in the image above the FOV is not quite square and as such a FOV a value of approximately 600\arcsec\ is more representative.
+%Typically SCUBA-2 is referred to as having a field of view (FOV) of 8 square arcminutes. As you see in the image above the FOV is not quite square and as such a FOV a value of approximately 600arcsec is more representative.
 
 For full details of the array setup and operation see Holland et al.
 (2012) \cite{s2main}.
@@ -722,7 +710,7 @@ designed and optimised to meet both these criteria.
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}\textsc{pong} maps are the scan
 strategy for covering large areas. The default options allow for 3
-sizes -- 900\arcsec, 1800\arcsec\ and 3600\arcsec. A single \textsc{pong} map is
+sizes -- 900~arcsec, 1800~arcsec and 3600~arcsec. A single \textsc{pong} map is
 a square of these dimensions and the telescope fills in the square by
 bouncing off the edge of the area. To ensure an even sky background it
 is recommended a minimum of 3, but preferably more than 5,
@@ -757,7 +745,7 @@ throughout the observation. This is shown in the top panel of Figure
   the \textsc{daisy} pattern for a typical map based on a 180-arcsec
   demanded diameter; \textbf{Bottom Left}: A single \textsc{pong}
   pattern; \textbf{Bottom Right}: Multiple rotations of the
-  \textsc{pong} pattern for a typical map based on an 1800\arcsec\
+  \textsc{pong} pattern for a typical map based on an 1800-arcsec
   demanded map size. The scan pattern for your observation can be
   visualised like this with \topcat\ using the output from \jcmtstate.
   See Section~\ref{sec:exam} for more details. Figure taken from
@@ -1102,7 +1090,7 @@ required.
 The output map here is called \texttt{crl2688\_sky.sdf} and is shown
 in Figure~\ref{fig:regrid}.
 The pixel scale is left at the default values of 2~arcsec on a side at
-450\micron\ and 4~arcsec at 850\micron\ (although this can be changed
+450$\mu$m and 4~arcsec at 850$\mu$m (although this can be changed
 using the \texttt{pixsize=}$x$ option on the command-line, where $x$ is in
 arcsec).
 
@@ -1228,8 +1216,8 @@ fit/remove the templates from each bolometer. The next model
 data.  Following this, a Fourier transform is applied to the data and
 the \texttt{FLT} model is removed in the frequency domain.
 \texttt{FLT} applies a high-pass filter to the data, above frequencies
-that correspond to angular scales of 600\,arcsec and 300\,arcsec at
-450\micron\ and 850\micron, respectively.
+that correspond to angular scales of 600~arcsec and 300~arcsec at
+450$\mu$m and 850$\mu$m, respectively.
 
 Next comes the \texttt{AST} model, the first step of which involves
 regridding the data to produce an estimation of the final science map.
@@ -1663,7 +1651,7 @@ is to detect low-S/N point sources. Iteratively applying a high-pass
 filter (\texttt{FLT}) can result in convergence problems when there is
 little or no signal in the map; instead, a single, harsher high-pass
 filter is applied as a pre-processing step (corresponding to
-200-arcsec scales at both 450\micron\ and 850\micron). There are also
+200-arcsec scales at both 450$\mu$m and 850$\mu$m). There are also
 more conservative cuts to remove noisy/problematic bolometers. Only 4
 (positive) iterations are requested as there is no signal to confuse
 to models.
@@ -1710,7 +1698,7 @@ recipes override the default values in \texttt{dimmconfig.lis}.
 
 The addition of \texttt{ast.zero\_circle} and
 \texttt{ast.zero\_notlast} parameters are used to constrain the map to
-zero beyond a radius of 1\,arcmin for all but the final iteration.
+zero beyond a radius of 1~arcmin for all but the final iteration.
 This strategy helps with map convergence significantly, and can
 provide good maps of bright sources, even in cases where scan patterns
 failed and the telescope degenerated into scanning back-and-forth
@@ -1724,7 +1712,7 @@ is tighter. The S/N threshold for DC steps is relaxed from 25 in the
 default file to 100 to avoid problems associated with bright sources.
 
 This is the recipe that is commonly used to reduce calibration
-observations with a pixel size set to 1\arcsec\ -- see
+observations with a pixel size set to 1~arcsec -- see
 Section~\ref{sec:fcf} for details on determining the FCFs from
 calibrators.
 \vspace{0.3cm}
@@ -1850,7 +1838,7 @@ file and reading in a list of files as the input (e.g.
 \texttt{in=\^\,rawfilelist.txt}).
 
 The example uses \textbf{the
-default pixel sizes which are 2\arcsec\ for 450$\mu$m and 4\arcsec\ for
+default pixel sizes which are 2~arcsec for 450$\mu$m and 4~arcsec for
 850$\mu$m}. This can be overwritten by adding \texttt{pixsize=}$x$ to the
 command string\footnote{The default sizes are defined as one quarter
 of the Airy disk rounded up to the nearest half arcsecond.}, where $x$
@@ -1991,7 +1979,7 @@ name, UT date and scan number.
 \\ \\
 \textbf{Map dimensions}\\
 Next the basic dimensions of the data being processed are listed near
-the start of the first iteration. The example above has 4\arcsec\ pixels
+the start of the first iteration. The example above has 4~arcsec pixels
 -- the default at 850$\mu$m.
 \\ \\
 \textbf{Chunking}\\
@@ -2157,7 +2145,7 @@ reports FCFs in units of mJy/beam.
 
 To get the flux density of extended sources with \textbf{aperture
 photometry} you should apply the \fcfa.  You can then sum the emission
-in an aperture. \fcfa\ was determined using a 60\arcsec\ diameter
+in an aperture. \fcfa\ was determined using a 60-arcsec diameter
 aperture. If your aperture differs from this you should scale your
 flux accordingly -- the scaling factor can be read off the curve of
 growth (see Appendix~\ref{app:cog}). This graph gives the ratio of
@@ -2350,7 +2338,7 @@ nearby sources, each ends up contributing flux to both peaks.
 
 An in the example parameter file below we have requested the
 background should be estimated by first smoothing the map and PSF with
-a 15\arcsec\ Gaussian.
+a 15-arcsec Gaussian.
 \begin{myquote}
 \begin{verbatim}
 [SCUBA2_MATCHED_FILTER]
@@ -2513,8 +2501,8 @@ The filtering options set in \texttt{dimmconfig.lis} are:
 
 To make the users life easier, these parameters allow you to specify
 the filter limits in terms of spatial scale in arcsecs -- in this case
-600\arcsec\ at 850$\mu$m and 300\arcsec\ at 450$\mu$m. In this case for
-850$\mu$m, recovering scales of 600\arcsec at a speed of 400\arcsec/s
+600~arcsec at 850$\mu$m and 300~arcsec at 450$\mu$m. In this case for
+850$\mu$m, recovering scales of 600~arcsec at a speed of 400~arcsec/s
 corresponds to a frequency 0.7\,Hz.
 
 The scanning speeds are fixed for a given observing mode; you can put
@@ -2544,7 +2532,7 @@ To initialise this option set \texttt{com.perarray=1}.
 The masking option in \texttt{dimmconfig\_bright\_compact.lis} is very
 simple -- a circle is defined to mask out the source, with everything
 outside this circle being constrained to zero. The default size of
-this circle is 60$''$, but this can adjusted using
+this circle is 60~arcsec, but this can adjusted using
 \texttt{ast.zero\_circle}. Remember also that
 \texttt{ast.zero\_notlast = 1} means that the mask should not be
 applied on the final iteration.
@@ -2605,7 +2593,7 @@ Instead the following 2 steps are performed to smooth the edges of the
 mask out.
 
 \textbf{(4)} The thresholded map is smoothed with a Gaussian filter
-of FWHM of 5 pixels (=20\arcsec). Then it is again thresholded, this time
+of FWHM of 5 pixels (=20~arcsec). Then it is again thresholded, this time
 keeping everything above 5\% of the 0 level as the mask and setting
 the rest to \texttt{bad}.
 \begin{myquote}
@@ -2722,7 +2710,7 @@ map-maker. A number of signal peaks now as possible sources.
 \\ \\
 \textbf{(4) Cropping the map}\\
 Next we shall crop the map to remove the noisy edges,
-in this case to a 900$''$ radius circle.  The output file will be named
+in this case to a 900-arcsec radius circle.  The output file will be named
 \texttt{cosmo2\_mos\_mf\_crop.sdf}.
 \begin{myquote}
 \begin{verbatim}
@@ -2826,7 +2814,7 @@ everything above to 1.
 \end{myquote}
 The thresholded map is shown in the left-hand panel of figure
 \ref{fig:mask}. The next step is to smooth this map by convolving it
-with a Gaussian of 16\arcsec. For this we use a factor of 4 for the FWHM
+with a Gaussian of 16~arcsec. For this we use a factor of 4 for the FWHM
 parameter.
 
 \begin{myquote}
@@ -2907,7 +2895,7 @@ slightly more of the faint extended emission is apparent.
   The exposure-time image of the science map from
   Figure~\ref{fig:galmakemap}. You can right-click and drag the mouse
   between two points to measure the distance. Here we see the exposure
-  time dropping off sharply at a radius of 30\arcmin. A non-default
+  time dropping off sharply at a radius of 30~arcmin. A non-default
   colour scale has been chosen to illustrate the morphology.}
 
 
@@ -3142,7 +3130,7 @@ calibrators, the FCFs and NEFDs have been calculated as follows:
   for example. }
 
   An example of a \picard\ parameter file (used for reduction of the
-  850\micron\ calibrators) is shown here:
+  850$\mu$m calibrators) is shown here:
 
 \begin{myquote}
 \begin{verbatim}
@@ -3193,7 +3181,7 @@ producing an FCF in units of Jy/beam/pW.
 The measured peak signal here is derived from the Gaussian fit of
 \beamfit. The peak value is susceptible to pointing and focus errors,
 and we have found this number to be somewhat unreliable, particularly
-at 450\micron. \fcfb\ is the number to multiply your
+at 450$\mu$m. \fcfb\ is the number to multiply your
 map by when you wish to measure absolute peak flux densities of
 discrete unresolved point sources. The peak value in the map is then
 the total flux density of the point source. You should not integrate
@@ -3232,8 +3220,8 @@ recommended). These can then be applied to your data using
 \subsection{\xlabel{extinction}Extinction correction}
 
 Analysis of the SCUBA-2 secondary calibrators has allowed calculation
-of the transmission relationships for the SCUBA-2 450\micron\ and
-850\micron\ pass-bands to be determined. Full details of the analysis
+of the transmission relationships for the SCUBA-2 450$\mu$m and
+850$\mu$m pass-bands to be determined. Full details of the analysis
 and on-sky calibration methods of SCUBA-2 can be found in Dempsey et
 al.\ (2012)~\cite{dempsey12}\cite{dempsey-spie}.
 
@@ -3491,7 +3479,7 @@ SMOOTH_FWHM = 15
 \end{myquote}
 %
 where \texttt{SMOOTH\_FWHM = 15} indicates that the background should
-be estimated by first smoothing the map and PSF with a 15\,arcsec FWHM
+be estimated by first smoothing the map and PSF with a 15~arcsec FWHM
 Gaussian. The recipe is then executed as follows:
 %
 \begin{myquote}
@@ -3504,9 +3492,9 @@ The output of this operation is a smoothed image called
 \texttt{map\_mf.sdf}. By default, the recipe automatically normalizes
 the output such that the peak flux densities of point sources are
 conserved. Note that the accuracy of this normalization depends on how
-closely the real PSF matches the 7.5\,arcsec and 14\,arcsec full-width
-at half-maximum (FWHM) Gaussian shapes assumed at 450\micron\ and
-850\micron, respectively (an explicit PSF can also be supplied using
+closely the real PSF matches the 7.5~arcsec and 14~arcsec full-width
+at half-maximum (FWHM) Gaussian shapes assumed at 450$\mu$m and
+850$\mu$m, respectively (an explicit PSF can also be supplied using
 the \param{PSF\_MATCHFILTER} recipe parameter).
 
 
@@ -3573,10 +3561,10 @@ relation was applied by using the \Kappa\ command \hislist.
 The SCUBA-2 beam has a broad error beam. As the size of the annulus
 changes, the contribution from the error beam scales according to the
 curve-of-growth -- see Figure~\ref{fig:cog}. To correct for an
-aperture size differing from 60\arcsec\ diameter you should read off the
+aperture size differing from 60-arcsec diameter you should read off the
 appropriate scaling factor for your FCF from the graph below.
 
-%For example, a 100\arcsec\ aperture will mean you are collectng more flux and your FCF will be too high. It will need to be scaled down
+%For example, a 100-arcsec aperture will mean you are collectng more flux and your FCF will be too high. It will need to be scaled down
 
 \begin{figure}[h!]
 \centering
