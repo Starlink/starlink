@@ -540,11 +540,7 @@ Data Reduction Pipeline\cite{oracdr} (hereafter just \oracdr) which is
 an automated reduction pipeline, and \picard\ which is a similar
 pipeline system for processing reduced data.
 
-%For a more detailed description refer to the comprehensive Starlink User Note (\smurfsun)\footnote{currently SUN/258 is not completely up to date}.
-
-%\textbf{\textsc{Smurf}} \textbf{and} \textbf{\textsc{Kappa}}\\*
-
-The Sub-Millimetre User Reduction Facility, or \smurf, contains the
+The Sub-Millimetre User Reduction Facility, or \textsc{Smurf}, contains the
 Dynamic Iterative Map-Maker (DIMM) that will process raw SCUBA-2 data
 into images (see \smurfsun). \Kappa\ meanwhile is an application
 package comprising general purpose commands for manipulating and
@@ -628,9 +624,6 @@ induces a feedback current which is proportional to the current
 flowing through the TES, and it is this feedback current that is
 recorded during data acquisition.
 
-%Variation in T$_c$ across each subarray place maximum number of
-%bolometer in the transition range.
-
 Before science data can be taken the system must be optimised. These
 `setups' are performed after slewing to the azimuth of the source,
 where the SQUID, TES and heater biases are set to pre-determined
@@ -661,8 +654,6 @@ non-linear response or have a poor S/N.  A second flat-field is
 performed at the end of an observation so bolometers whose
 responsivity has changed over the course of the observation can be
 flagged.
-
-%Typically SCUBA-2 is referred to as having a field of view (FOV) of 8 square arcminutes. As you see in the image above the FOV is not quite square and as such a FOV a value of approximately 600arcsec is more representative.
 
 For full details of the array setup and operation see Holland et al.
 (2012) \cite{s2main}.
@@ -981,8 +972,6 @@ concatenated your data you can simply input the single concatenated
 file. \textbf{It may be useful to view the scan pattern for your
 observation, particularly for maps taken at high elevations, to ensure
 the pattern completed successfully.}
-
-% (not escaped) and for SCUBA-2 data the \texttt{--with-mce} option can be used to dump the low-level MCE header information.
 
 This catalogue can be loaded into \topcat\ for plotting, making sure
 to specify the TST format during loading.
@@ -1478,8 +1467,6 @@ running \texttt{RES} through \calcnoise\ (see
 Section~\ref{sec:calcnoise}). If \texttt{NOI} is exported, it can be
 viewed as the VARIANCE component of the \texttt{RES} model; thus,
 export of \texttt{RES} is implied if \texttt{NOI} is specified.
-
-%QUA It tells you which bit of each bolometer time-series has been flagged and the value is the reason for flagging. is specified, as it becomes the variance component of the resulting NDF for \texttt{RES}. \texttt{QUA} will become the quality component of any full 3-dimensional model (i.e. \texttt{RES}, \texttt{AST}, \texttt{FLT}, \texttt{EXT}).
 
 \vspace{0cm}
 \begin{myquote}
@@ -1994,11 +1981,6 @@ is your desired pixel size in arcseconds. We advise that you do not
 increase the pixel size at this stage as it will compromise model
 fitting -- instead regrid your map as a post-processing step.
 
-%\vspace{-3mm}
-%\begin{center}
-%\line(1,0){155}
-%\end{center}
-%\vspace{-6mm}
 \begin{myquote}
 \begin{verbatim}
 % makemap in='/jcmtdata/raw/scuba2/s8*/20120720/00030/*.sdf' method=iter \
@@ -2358,7 +2340,6 @@ Currently there is no advantage in terms of data quality to reducing
 all observations simultaneously or separately. However, the latter
 does allow the option of assessing the individual maps before co-adding
 and is the method followed in this example.
-%%is this still true?
 
 \subsection{\xlabel{crop}Cropping your map}
 \label{sec:crop}
@@ -2453,11 +2434,6 @@ of your map into a new file; this can be done with the \Kappa\ command
 \end{myquote}
 The error file (\texttt{850\_map\_cal\_crop\_noi}) can then be viewed
 with \gaia -- see the right-hand panel of Figure~\ref{fig:bfnoi}.
-
-%\\*\\*
-%\textbf{From your science map}\\*
-%You can use \gaia\ to give a quick estimate of the noise. First you will need to open your science map with \gaia. Then do to `Image-Analysis', then`Image regions'. You can then select a shape that you wish to use to select the nose region -- this is positioned and altered on your map by dragging the shape out with the mouse. Finally select `Stats selected' on the Image regions pop-up box; this will give you the standard deviation for the selected region.
-
 
 \subsection{\xlabel{match_filter}Point source extraction --  Applying a matched filter}
 \label{sec:mf}
@@ -2908,8 +2884,6 @@ maps is under development. Follow the \emph{Pipelines and Archives
 blog}\footnote{http://pipelinesandarchives.blogspot.com/} for all the
 latest updates and releases.
 
-% In this example we do not expect any real astronomical source, so the S/N map {\em should\/} have a brightness distribution that  resembles a Gaussian with standard deviation $\sigma=1$ and mean zero. We perform this comparison for the central $100 \times 100$ pixels of the S/N map in Figure~\ref{fig:cosmo_snrcompare}, well away from any edge effects. In this case we find that the real distribution is slightly narrower than expected, suggesting that the noise has been mildly over-estimated.
-
 \subsection{\xlabel{Galactic}Extended galactic sources}
 \label{sec:bright_ex}
 
@@ -2940,8 +2914,6 @@ config='"^dimmconfig_bright_extended.lis,maptol=0.04,ast.zero_snr=3.5"'
 
 \myfig{sc21_gal_11}{[t!]}{width=0.6\linewidth}{fig:galmakemap}{
   The output from the map-maker using \texttt{dimmconfig\_bright\_extended.lis}.}
-
-%Figure~\ref{fig:orionmakemap}. Note that these maps were observed as a series of rotating pong patterns to avoid repetition of any scand irection, hence their distinctive shape.
 
 \textbf{(2) Generating an external mask}\\
 Next we create an external mask from the output of make-map. Here we
@@ -3097,7 +3069,6 @@ includes the map-maker and a number of post-processing steps (outlined
 below).  This data is transferred to CADC and available for download
 by project members the following day.
 \end{itemize}
-%, making a map only when sufficient data has been taken.
 
 The manual for the SCUBA-2 pipeline can be found at \pipelinesun,
 while the pipeline software comes as part of the \starlink\ suite.
@@ -3699,8 +3670,6 @@ changes, the contribution from the error beam scales according to the
 curve-of-growth -- see Figure~\ref{fig:cog}. To correct for an
 aperture size differing from 60-arcsec diameter you should read off the
 appropriate scaling factor for your FCF from the graph below.
-
-%For example, a 100-arcsec aperture will mean you are collectng more flux and your FCF will be too high. It will need to be scaled down
 
 \myfig{sc21_curveofgrowth}{[h!]}{width=0.95\hsize}{fig:cog}{
   Aperture photometry curve of growth normalised for a 60-arcsec
