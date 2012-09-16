@@ -533,19 +533,19 @@ retrieving your data from CADC.
 This manual only uses software from the \starlink\ package;
 \smurf\ \cite{smurf}, \Kappa\ \cite{kappa}, \gaia\ \cite{gaia} and
 \picard\ \cite{picard}.
-\starlink\ must be installed on your system, and \starlink\ aliases
+Starlink software must be installed on your system, and Starlink aliases
 and environment variables must be defined before attempting any
 reduction of SCUBA-2 data detailed here. We also discuss the ORAC-DR
 Data Reduction Pipeline\cite{oracdr} (hereafter just \oracdr) which is
-an automated reduction pipeline, and \picard\ which is a similar
+an automated reduction pipeline, and \textsc{Picard} which is a similar
 pipeline system for processing reduced data.
 
 The Sub-Millimetre User Reduction Facility, or \textsc{Smurf}, contains the
 Dynamic Iterative Map-Maker (DIMM) that will process raw SCUBA-2 data
-into images (see \smurfsun). \Kappa\ meanwhile is an application
+into images (see \smurfsun). \textsc{Kappa} meanwhile is an application
 package comprising general purpose commands for manipulating and
 visualising NDF data (see \kappasun). Before starting any data
-reduction you will want to initiate both \smurf\ and \Kappa.
+reduction you will want to initiate both \textsc{Smurf} and \textsc{Kappa}.
 \begin{myquote}
 \begin{verbatim}
 % smurf
@@ -578,10 +578,9 @@ to query and overlay on-line or local catalogues.
 \end{verbatim}
 \end{myquote}
 
-%\textbf{\textsc{Picard}}\\
-Post-processing analysis is performed using \picard. \picard\ documentation can be
+Post-processing analysis is performed using \textsc{Picard}. \textsc{Picard} documentation can be
 found at \htmladdnormallinkfoot{the ORAC-DR web page}{http://www.oracdr.org/oracdr/PICARD},
-or at \picardsun. All \picard\ recipes follow the same structure and are run like so:
+or at \picardsun. All \textsc{Picard} recipes follow the same structure and are run like so:
 \begin{myquote}
 \begin{verbatim}
 % picard -recpars <recipe_params_file> RECIPE <input_files>
@@ -591,12 +590,12 @@ where \param{<recipe\_param\_file>} is a text file containing the
 relevant recipe parameters, \param{RECIPE} is the name of the recipe
 to be run (note the caps) and \param{<input\_files>} is a list of
 files to be run, which must be int the current directory, or a
-directory defined by \param{ORAC\_DATA\_OUT}. A number of \picard\
+directory defined by \param{ORAC\_DATA\_OUT}. A number of \textsc{Picard}
 recipes will be demonstrated in Section~\ref{sec:maps}.
 
-\textbf{Note:} The \picard\ recipes require all input files to have
+\textbf{Note:} The \textsc{Picard} recipes require all input files to have
 the \texttt{.sdf} extension included; this is not the case for the
-Starlink packages \Kappa\ and \smurf.
+Starlink packages \textsc{Kappa} and textsc{Smurf}.
 
 \clearpage
 \section{\xlabel{scuba2_overview}SCUBA-2 Overview}
@@ -831,13 +830,13 @@ file called \texttt{s8a20120725\_00058\_con}.
 % sc2concat 's8a20120725_0008*.sdf' s8a20120725_0008_con
 \end{verbatim}
 \end{myquote}
-\concat\ will automatically filter out any dark or flat-field
+\task{sc2concat} will automatically filter out any dark or flat-field
 observations, so that the concatenated file contains only the science
 data. Be careful when concatenating a very long observation since the
 output file may be too large to reasonably handle. Fifteen minute
 chunks (30 files) should be sufficient.
 
-\concat\ applies the flat-field by default (although it can be
+\task{sc2concat} applies the flat-field by default (although it can be
 disabled using the `noflat' option on the command-line).
 
 The flat-field can also be applied manually using the \flatfield\ command.
@@ -886,11 +885,11 @@ use the \fitsval\ command instead, e.g.
 \textbf{ndftrace}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-\ndftrace\ displays the attributes of the data structure. This will tell
+\task{ndftrace} displays the attributes of the data structure. This will tell
 you the units of the data, pixel bounds, dimensions and axis assignations.\\
 \end{minipage}
 \\ \\
-Full details of these commands can be found in the \xref{\Kappa\ manual}{sun95}{}.
+Full details of these commands can be found in the \xref{\textsc{Kappa} manual}{sun95}{}.
 
 \begin{latexonly}
 \begin{figure}[ht!]
@@ -965,9 +964,9 @@ information into a simple ASCII tab-separated table.
 \end{verbatim}
 \end{myquote}
 
-The \texttt{-h} option to \jcmtstate\ can be used to find more information on
-the command. In particular, multiple files can be supplied to the
-command using standard shell wild cards. If you have already
+The \texttt{-h} option to \task{jcmtstate} can be used to find more
+information on the command. In particular, multiple files can be supplied
+to the command using standard shell wild cards. If you have already
 concatenated your data you can simply input the single concatenated
 file. \textbf{It may be useful to view the scan pattern for your
 observation, particularly for maps taken at high elevations, to ensure
@@ -1027,7 +1026,7 @@ unaffected.
   in the `Display image sections of a cube' dialogue -- this can be dragged
   across the spectrum to scroll through the time-slices.}
 
-Use the \starlink\ application \gaia\ to visualise the bolometer time
+Use the \starlink\ application \textsc{Gaia} to visualise the bolometer time
 series data (or indeed \emph{any} SCUBA-2 data file). This is
 initiated simply typing \texttt{gaia} into a terminal.
 
@@ -1037,7 +1036,7 @@ initiated simply typing \texttt{gaia} into a terminal.
 \end{verbatim}
 \end{myquote}
 
-Loading a file in \gaia\ produces two windows (see
+Loading a file in \textsc{Gaia} produces two windows (see
 Figure~\ref{fig:gaia_main}). The main window shows a map of bolometer
 values at a given point in time. The time slice displayed may be
 changed by scrolling through the time axis. This is done in the second
@@ -1058,8 +1057,8 @@ To highlight small variations between bolometers it is likely you will
 need to change the auto cut and (depending on your preference) the
 colour scheme -- both are controlled by buttons on the sidebar.
 
-See the \xref{\gaia\ manual}{sun214}{} for full
-details.\footnote{http://docs.jach.hawaii.edu/star/sun214.htx/sun214.html}
+See the \xref{\textsc{Gaia} manual}{sun214}{} for full
+details.\latex{\footnote{http://docs.jach.hawaii.edu/star/sun214.htx/sun214.html}}
 
 \clearpage
 \subsection{\xlabel{regrid_map}Regridding data into a map}
@@ -1069,7 +1068,7 @@ Any raw time-series data can be quickly regridded into sky frame
 coordinates using the \smurf\ \makemap\ task in regrid mode. This
 involves no processing of the data. The following command produces a
 map from the raw concatenated data; unlike the iterative mode of
-\makemap\ described in the next chapter, no configuration file is
+\task{makemap} described in the next chapter, no configuration file is
 required.
 \begin{myquote}
 \begin{verbatim}
@@ -1961,7 +1960,7 @@ the specialised configuration files available see
 Section~\ref{sec:config}.
 
 As an input to the map-maker, any of the standard \smurf\
-configuration files can be called directly from the \starlink\ path
+configuration files can be called directly from the Starlink path
 with \texttt{\^\,\$STARLINK\_DIR/share/smurf/dimmconfig*.lis}.
 Alternatively, a local copy can be made and called with
 \texttt{\^\,dimmconfig*.lis}. Details of how to edit any of the
@@ -2305,13 +2304,13 @@ This creates a single output file based on the name of the last file
 in the list, and with a suffix \texttt{\_mos}.
 
 There are a number of options associated with
-\param{MOSAIC\_JCMT\_IMAGES} (see the \picard\ manual for a full
+\param{MOSAIC\_JCMT\_IMAGES} (see the \textsc{Picard} manual for a full
 description). However, the main one is choosing between \wcsmosaic\
 (default) and the \ccdpack\ option \makemos\ for the combination
-method. For more information on \makemos\ and advice on choosing the
+method. For more information on \task{makemos} and advice on choosing the
 best method see SUN/139.
 
-An example parameter file like the one below chooses \makemos\ using a
+An example parameter file like the one below chooses \task{makemos} using a
 3-$\sigma$ clipping threshold.
 \begin{myquote}
 \begin{verbatim}
@@ -2374,8 +2373,9 @@ aware that the circular nature of the scan patterns means that good
 data will be lost of you chose a square or rectangular map.
 
 The output from \param{CROP\_JCMT\_IMAGES} is a file with the suffix
-\texttt{\_crop}. Full details of this recipe can be found in the \picard\
-manual\footnote{http://www.oracdr.org/oracdr/PICARD}.
+\texttt{\_crop}. Full details of this recipe can be found in the
+\htmladdnormallink{\textsc{Picard} website}{http://www.oracdr.org/oracdr/PICARD}
+\latex{\footnote{http://www.oracdr.org/oracdr/PICARD}}.
 
 \subsection{\xlabel{noise}Calculating the noise}
 
@@ -2408,7 +2408,7 @@ slightly higher due to contamination from any sources in your map.
 \\ \\
 \textbf{Visualising the error map}\\
 You can plot the noise or error component of your map using the
-\Kappa\ command \histogram. This allows you to visualise the
+\textsc{Kappa} command \histogram. This allows you to visualise the
 distribution with more ease. Again the \param{comp=err} option is
 used.
 \begin{myquote}
@@ -2421,11 +2421,11 @@ The output is shown in the left-hand panel of Figure~\ref{fig:bfnoi}.
 \myfigduo{sc21_noihist}{sc21_crl2688_err}{}{width=0.47\linewidth}{fig:bfnoi}{3mm}{
   The error map of the cropped make-map output viewed in two different
   ways. \textbf{(left)} Histogram of the noise component created using
-  the \Kappa\ command \histogram. \textbf{(right)} Opened with \gaia.}
+  the \textsc{Kappa} command \task{histogram}. \textbf{(right)} Opened with \gaia.}
 
 It is also useful to view the error map itself to check its
 uniformity. To do this you will need to copy out the error component
-of your map into a new file; this can be done with the \Kappa\ command
+of your map into a new file; this can be done with the \textsc{Kappa} command
 \ndfcopy.
 \begin{myquote}
 \begin{verbatim}
@@ -2472,8 +2472,8 @@ SMOOTH_FWHM = 15
 This is a fairly common technique used throughout the extra-galactic
 sub-millimetre community to identify potential sources. A full
 description of the matched filter principle is given in
-Appendix~\ref{app:mf}, while the \picard\ manual gives full details of
-all the available parameters.
+Appendix~\ref{app:mf}, while the \textsc{Picard} manual gives full details
+of all the available parameters.
 
 \clearpage
 \section{\xlabel{tweak}Tweaking the Configuration File}
@@ -2598,7 +2598,7 @@ on the `Display image sections' window.
 \begin{htmlonly}
  \label{fig:stack} \htmladdimg{sc21_view_itermaps.png}
  \\ \\
- Figure: Example using the \smurf\ command \texttt{stackframes} and
+ Figure: Example using the \textsc{Smurf} command \texttt{stackframes} and
  \gaia\ to view the `itermaps' map for each iteration.
 \end{htmlonly}
 
@@ -2784,7 +2784,7 @@ config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
 \end{myquote}
 
 \textbf{(2) Combining the maps}\\
-These three maps are then combined using the \picard\ recipe
+These three maps are then combined using the \textsc{Picard} recipe
 \texttt{MOSAIC\_JCMT\_IMAGES}. In this case we accept the default of
 \wcsmosaic\ mosaicking and nearest-neighbour pixel spreading and so
 do not supply a parameter file.
@@ -2795,7 +2795,7 @@ do not supply a parameter file.
 \end{myquote}
 The output map, \texttt{cosmo2\_mos.sdf}, is shown in the left-hand
 panel of Figure~\ref{fig:cosmomap}. The advantage of using the
-\picard\ recipe over standalone \Kappa\ commands is that the exposure
+\textsc{Picard} recipe over standalone \Kappa\ commands is that the exposure
 time is also propagated correctly to the output mosaic (it is stored
 in the \texttt{MORE.SMURF.EXP\_TIME} extension).
 \\
@@ -2851,7 +2851,7 @@ in this case to a 900-arcsec radius circle.  The output file will be named
 \textbf{(5) Making a SNR map}\\
 Finally, we need to find sources. The filtered map contains a
 VARIANCE component, so it is easy to produce a S/N map using the
-\Kappa\ task \makesnr:
+\textsc{Kappa} task \makesnr:
 \begin{myquote}
 \begin{verbatim}
 % makesnr cosmo2_mos_mf_crop cosmo2_mos_mf_crop_snr
@@ -3216,15 +3216,15 @@ to obtain a calibrated map. The FCF can also be used to assess the
 relative performance of the instrument from night to night. The noise
 equivalent flux density (NEFD) is a measure of the instrument
 sensitivity, and while not discussed here, is also produced by the
-\picard\ recipe shown here. For calibration of primary and secondary
+\textsc{Picard} recipe shown here. For calibration of primary and secondary
 calibrators, the FCFs and NEFDs have been calculated as follows:
 
 \begin{enumerate}
-\item{The \picard\ recipe \drrecipe{SCUBA2\_FCFNEFD} takes the reduced
+\item{The \textsc{Picard} recipe \drrecipe{SCUBA2\_FCFNEFD} takes the reduced
   map, crops it, and runs background removal. Surface-fitting
-  parameters are changeable in the \picard\ parameter file.}
+  parameters are changeable in the \textsc{Picard} parameter file.}
 \item{It then runs the \Kappa\ \beamfit\ task on the specified point
-  source. The \beamfit\ task will estimate the peak (uncalibrated)
+  source. The \task{beamfit} task will estimate the peak (uncalibrated)
   flux density and the FWHM. The integrated flux density within a
   given aperture (30-arcsec radius default) is calculated using
   \photom\ \autophotom. Flux densities for calibrators such as Uranus,
@@ -3235,7 +3235,7 @@ calibrators, the FCFs and NEFDs have been calculated as follows:
   and \texttt{FLUX\_850.MYSRC = 0.005} (where the values are in Jy),
   for example. }
 
-  An example of a \picard\ parameter file (used for reduction of the
+  An example of a \textsc{Picard} parameter file (used for reduction of the
   850$\mu$m calibrators) is shown here:
 
 \begin{myquote}
@@ -3320,7 +3320,7 @@ application of the matched filter complicates matters.
 This recipe will produce a log file log.fcfnefd which records the FCFs
 mentioned above along with a third (\fcfm\ which is not currently
 recommended). These can then be applied to your data using
-\texttt{cmult} (see Section~\ref{sec:cmult}).
+\cmult\ (see Section~\ref{sec:cmult}).
 \end{enumerate}
 
 \subsection{\xlabel{extinction}Extinction correction}
@@ -3439,7 +3439,7 @@ Scott~D., Van Engelen~A., 2005, \textit{Scan Mode Strategies for
 \label{app:clean}
 
 You can use the \smurf\ task \clean\ to help inspect time-series.
-\clean\ can be used to do two basic tasks in one go: concatenate data
+\task{sc2clean} can be used to do two basic tasks in one go: concatenate data
 (with or without applying a flatfield); and cleaning (fix up steps and
 spikes, remove the means, filter, remove common-mode etc.). It uses
 the same configuration files as the iterative map-maker (though
@@ -3486,7 +3486,7 @@ therefore does not move in elevation.
 
 Part of the reason the signals look the same is because they have been
 flatfielded. You can turn off flatfielding using the \texttt{noflat}
-option to \clean, and you should then see that all of the detector
+option to \task{sc2clean}, and you should then see that all of the detector
 amplitudes vary.
 
 Another very useful option is to remove the common signal observed by
@@ -3575,7 +3575,7 @@ kernel to estimate the background, and then subtracts it from the
 image. The same operation is also applied to the PSF to estimate the
 effective shape of a point-source in this background-subtracted map.
 
-Before running \picard\, a simple parameters file called \texttt{smooth.ini}
+Before running \textsc{Picard}, a simple parameters file called \texttt{smooth.ini}
 may be created.
 \begin{myquote}
 \begin{verbatim}
