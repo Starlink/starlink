@@ -56,8 +56,8 @@
 
 #include <stdlib.h>
 #include "f77.h"
-#include "gsd.h"
 #include "gsd1.h"
+#include "gsd.h"
 
 F77_SUBROUTINE(gsd_open_read)( CHARACTER(file), INTEGER(fd), REAL(version),
    CHARACTER(label), INTEGER(no_items), INTEGER(status)
