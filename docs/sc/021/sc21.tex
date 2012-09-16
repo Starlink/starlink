@@ -475,8 +475,9 @@ reduce and visualise their data using \starlink\ packages,
 \smurf \cite{smurf}, \Kappa \cite{kappa}, \gaia \cite{gaia} and \picard
 \cite{picard}.  This guide is {\em not} aimed at users of the
 polarimeter (POL-2) or Fourier transform spectrometer (FTS-2). If you
-have shared risk data (SRO) you should refer to the SMURF SRO
-Cookbook\footnote{http://www.starlink.ac.uk/docs/sc19.htx/sc19.html}.
+have shared risk data (SRO) you should refer to the
+\xref{SMURF SRO
+Cookbook.}{sc19}{}\latex{\footnote{\texttt{http://www.starlink.ac.uk/docs/sc19.htx/sc19.html}}}
 
 A brief description of the instrument and the observing modes is given
 in Section~\ref{sec:s2}. Details on data acquisition and instructions
@@ -522,10 +523,11 @@ two instances of the map-maker in parallel. Use the SMURF\_THREADS
 environment variable to restrict each map-maker to half the available
 cores.
 
-An alternative option is to download your reduced data from the JCMT
-Science Archive at
-CADC\footnote{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}. See
-Section~\ref{sec:pipe} for details on the science pipeline and
+An alternative option is to download your reduced data from the
+\htmladdnormallink{JCMT Science Archive at
+CADC.}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
+\latex{\footnote{\texttt{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}}}
+See Section~\ref{sec:pipe} for details on the science pipeline and
 retrieving your data from CADC.
 
 \subsection{\xlabel{software}Before you start: Software}
@@ -756,9 +758,11 @@ A normal science observation will follow the following sequence.
 \vspace{-2mm}
 The \param{SEQ\_TYPE} parameter in the FITS header may be used to
 identify the nature of each scan (see Section~\ref{sec:fitsheader}).
-When you access you data either at
-the JCMT or by downloading from the Science
-Archive\footnote{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
+When you access you data either at the JCMT or by downloading from the
+\htmladdnormallink{Science Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
+\begin{latexonly}
+\footnote{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
+\end{latexonly}
 you will get \emph{all} of the files listed above. Later when you
 reduce your data using the map-maker you will include \emph{all} of
 the files (noise + flat-fields + science).
@@ -1093,9 +1097,16 @@ final map. The map-maker performs all of these cleaning steps during
 the pre-processing stage. The commands for manually cleaning your data
 are given in Appendix~\ref{app:clean}.
 
+% Split to avoid paragraph break mid-sentence.
+\begin{htmlonly}
+You can also check out the \xref{SMURF SRO Cookbook}{sc19}{} which
+goes into great depth on the data cleaning options.
+\end{htmlonly}
+\begin{latexonly}
 You can also check out the SMURF SRO
-Cookbook\footnote{http://www.starlink.ac.uk/docs/sc19.htx/sc19.html}
+Cookbook{\footnote{http://www.starlink.ac.uk/docs/sc19.htx/sc19.html}}
 which goes into great depth on the data cleaning options.
+\end{latexonly}
 
 
 \subsection{\xlabel{calcnoise}Checking the array performance}
@@ -2880,8 +2891,9 @@ But how can we check if these sources are real?
 \end{itemize}
 
 \textbf{Note:} A \picard\ recipe dealing specifically with blank field
-maps is under development. Follow the \emph{Pipelines and Archives
-blog}\footnote{http://pipelinesandarchives.blogspot.com/} for all the
+maps is under development. Follow the \htmladdnormallink{\emph{Pipelines and Archives
+blog}}{http://pipelinesandarchives.blogspot.com/}
+\latex{\footnote{http://pipelinesandarchives.blogspot.com/}} for all the
 latest updates and releases.
 
 \subsection{\xlabel{Galactic}Extended galactic sources}
