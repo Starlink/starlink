@@ -27,7 +27,8 @@ void atlKy2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *        An AST pointer to the KeyMap.
 *     loc
 *        A locator for the HDS object into which the KeyMap contents
-*        are to be copied.
+*        are to be copied. A new component is added to the HDS object for
+*        each entry in the KeyMap.
 *     status
 *        The inherited status.
 

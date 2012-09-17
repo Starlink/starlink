@@ -20,25 +20,29 @@ void atlHd2ky( HDSLoc *loc, AstKeyMap *keymap, int *status ){
 *     void atlHd2ky( HDSLoc *loc, AstKeyMap *keymap, int *status )
 
 *  Description:
-*     This routine copies the contents of an HDS structure into a supplied
-*     AST KeyMap. Each entry added to the KeyMap has a key that is equal
-*     to the name of the corresponding HDS component. Any existing entry
-*     in the KeyMap with the same name is replaced.
+*     This routine add a single entry describing the supplied HDS object
+*     to the supplied KeyMap. The new KeyMap entry has a key equal to the
+*     name of the supplied HDS Object. If the supplied HDS object is a
+*     scalar then the new KeyMap entry will also be a scalar. If the
+*     supplied HDS object is a 1D vector then the new KeyMap entry will
+*     also be a 1D vector. Multi-dimensional HDS objects are silently
+*     ignored (i.e. no entry is added to the KeyMap and no error is
+*     reported). If the HDS object holds primitive values then the new
+*     KeyMap entry will hold corresponding primitive values. If the HDS
+*     object is a structure, then the new KeyMap entry will be another
+*     nested KeyMap in which each entry holds a single component in the
+*     supplied HDS structure.
 
 *  Arguments:
 *     loc
 *        A locator for the HDS object.
 *     keymap
 *        An AST pointer to the KeyMap into which the KeyMap contents
-*        are to be copied. ANy existing
+*        are to be copied.
 *     status
 *        The inherited status.
 
 *  Notes;
-*     - Scalar and 1D vector values in the HDS object are copied, but n-D
-*     arrays are silently ignored since KeyMap has no facility for
-*     storing n-D arrays.
-*     - HDS structures are stored within nested KeyMaps.
 *     - Only primitive values with the following HDS types are copied
 *     (all others are silently ignored): _INTEGER, _REAL, _DOUBLE,
 *      _WORD, _UBYTE, _CHAR[*N].
@@ -80,6 +84,7 @@ void atlHd2ky( HDSLoc *loc, AstKeyMap *keymap, int *status ){
    AstKeyMap *subkm;
    AstObject **objArray = NULL;
    HDSLoc *cloc = NULL;
+   HDSLoc *dloc = NULL;
    char *buf;
    char *cval = NULL;
    char name[ DAT__SZNAM + 1 ];
@@ -90,6 +95,7 @@ void atlHd2ky( HDSLoc *loc, AstKeyMap *keymap, int *status ){
    hdsdim icell;
    int *oldstat = NULL;
    int actdim;
+   int defined;
    int iattr;
    int icomp;
    int nc;
@@ -138,35 +144,45 @@ void atlHd2ky( HDSLoc *loc, AstKeyMap *keymap, int *status ){
 /* If it is a scalar primitive, store it in the KeyMap directly. */
       if( prim ) {
 
+/* Does the primitive have a defined value? */
+         datState( loc, &defined, status );
+         if( defined ) {
+
 /* Map the HDS object as a vector. */
-         datMapV( loc, type, "READ", &pntr, &el, status );
+            datMapV( loc, type, "READ", &pntr, &el, status );
 
 /* Store the value in the KeyMap with the corresponding KeyMap data
    type. */
-         if( !strcmp( type, "_INTEGER" ) ) {
-            astMapPut0I( keymap, name, *((int *) pntr), NULL );
+            if( !strcmp( type, "_INTEGER" ) ) {
+               astMapPut0I( keymap, name, *((int *) pntr), NULL );
 
-         } else if( !strcmp( type, "_REAL" ) ) {
-            astMapPut0F( keymap, name, *((float *) pntr), NULL );
+            } else if( !strcmp( type, "_REAL" ) ) {
+               astMapPut0F( keymap, name, *((float *) pntr), NULL );
 
-         } else if( !strcmp( type, "_DOUBLE" ) ) {
-            astMapPut0D( keymap, name, *((double *) pntr), NULL );
+            } else if( !strcmp( type, "_DOUBLE" ) ) {
+               astMapPut0D( keymap, name, *((double *) pntr), NULL );
 
-         } else if( !strcmp( type, "_WORD" ) ) {
-            astMapPut0S( keymap, name, *((short *) pntr), NULL );
+            } else if( !strcmp( type, "_WORD" ) ) {
+               astMapPut0S( keymap, name, *((short *) pntr), NULL );
 
-         } else if( !strcmp( type, "_UBYTE" ) ) {
-            astMapPut0B( keymap, name, *((unsigned char *) pntr), NULL );
+            } else if( !strcmp( type, "_UBYTE" ) ) {
+               astMapPut0B( keymap, name, *((unsigned char *) pntr), NULL );
 
-         } else if( !strncmp( type, "_CHAR", 5 ) ) {
-            cval = astStore( NULL, pntr, el + 1 );
-            cval[ el ] = 0;
-            astMapPut0C( keymap, name, cval, NULL );
-            cval = astFree( cval );
-         }
+            } else if( !strncmp( type, "_CHAR", 5 ) ) {
+               datLen( loc, &len, status );
+               cval = astStore( NULL, pntr, len + 1 );
+               cval[ len ] = 0;
+               astMapPut0C( keymap, name, cval, NULL );
+               cval = astFree( cval );
+            }
 
 /* Unmap the HDS object. */
-         datUnmap( loc, status );
+            datUnmap( loc, status );
+
+/* If the primitive has no value, store an "UNDEF" in the keymap. */
+         } else {
+            astMapPutU( keymap, name, NULL );
+         }
 
 /* If it is a scalar structure, create a new KeyMap and copy each component
    of the structure into the new KeyMap by calling this function
@@ -189,35 +205,44 @@ void atlHd2ky( HDSLoc *loc, AstKeyMap *keymap, int *status ){
 /* If it is a vector primitive, store it in the KeyMap directly. */
       if( prim ) {
 
+/* Does the primitive have a defined value? */
+         datState( loc, &defined, status );
+         if( defined ) {
+
 /* Map the HDS object as a vector. */
-         datMapV( loc, type, "READ", &pntr, &el, status );
+            datMapV( loc, type, "READ", &pntr, &el, status );
 
 /* Store the value in the KeyMap with the corresponding KeyMap data
    type. */
-         if( !strcmp( type, "_INTEGER" ) ) {
-            astMapPut1I( keymap, name, el, (const int *) pntr, NULL );
+            if( !strcmp( type, "_INTEGER" ) ) {
+               astMapPut1I( keymap, name, el, (const int *) pntr, NULL );
 
-         } else if( !strcmp( type, "_REAL" ) ) {
-            astMapPut1F( keymap, name, el, (const float *) pntr, NULL );
+            } else if( !strcmp( type, "_REAL" ) ) {
+               astMapPut1F( keymap, name, el, (const float *) pntr, NULL );
 
-         } else if( !strcmp( type, "_DOUBLE" ) ) {
-            astMapPut1D( keymap, name, el, (const double *) pntr, NULL );
+            } else if( !strcmp( type, "_DOUBLE" ) ) {
+               astMapPut1D( keymap, name, el, (const double *) pntr, NULL );
 
-         } else if( !strcmp( type, "_WORD" ) ) {
-            astMapPut1S( keymap, name, el, (const short *) pntr, NULL );
+            } else if( !strcmp( type, "_WORD" ) ) {
+               astMapPut1S( keymap, name, el, (const short *) pntr, NULL );
 
-         } else if( !strcmp( type, "_UBYTE" ) ) {
-            astMapPut1B( keymap, name, el, (const unsigned char *) pntr, NULL );
+            } else if( !strcmp( type, "_UBYTE" ) ) {
+               astMapPut1B( keymap, name, el, (const unsigned char *) pntr, NULL );
 
-         } else if( !strncmp( type, "_CHAR", 5 ) ) {
-            datLen( loc, &len, status );
-            datSize( loc, &size, status );
-            atlMapPut1C( keymap, name, (const char *) pntr, (int) len,
-                         (int) size, NULL, status );
-         }
+            } else if( !strncmp( type, "_CHAR", 5 ) ) {
+               datLen( loc, &len, status );
+               datSize( loc, &size, status );
+               atlMapPut1C( keymap, name, (const char *) pntr, (int) len,
+                            (int) size, NULL, status );
+            }
 
 /* Unmap the HDS object. */
-         datUnmap( loc, status );
+            datUnmap( loc, status );
+
+/* If the primitive has no value, store an "UNDEF" in the keymap. */
+         } else {
+            astMapPutU( keymap, name, NULL );
+         }
 
 /* Otherwise, create a vector of KeyMaps and store each cell of the array
    in a keymap by calling this function recursively. */
@@ -228,16 +253,25 @@ void atlHd2ky( HDSLoc *loc, AstKeyMap *keymap, int *status ){
          if( *status == SAI__OK ) {
 
 /* Loop round each element of the HDS vector. */
-            for( icell = 0; icell < dims[ 0 ]; icell++ ) {
+            for( icell = 1; icell <= dims[ 0 ]; icell++ ) {
 
 /* Get a locator to the HDS cell. */
                datCell( loc, 1, &icell, &cloc, status );
 
 /* Create a KeyMap to hold the contents of the HDS cell. */
-               objArray[ icell ] = (AstObject *) astKeyMap( attrs );
+               subkm = astKeyMap( attrs );
+               objArray[ icell - 1 ] = (AstObject *) subkm;
 
-/* Store the contents of the HDS cell in the new KeyMap. */
-               atlHd2ky( cloc, (AstKeyMap *) objArray[ icell ], status );
+/* We cannot just add the cell locator into the KeyMap as this would
+   introduce an extra redudunt level in the KeyMap heirarchy. Instead, loop
+   round creating an entry in the above KeyMap for each component of the
+   structure. */
+               datNcomp( cloc, &ncomp, status );
+               for( icomp = 1; icomp <= ncomp; icomp++ ) {
+                  datIndex( cloc, icomp, &dloc, status );
+                  atlHd2ky( dloc, subkm, status );
+                  datAnnul( &dloc, status );
+               }
 
 /* Annul the cell locator. */
                datAnnul( &cloc, status );
