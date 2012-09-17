@@ -2026,7 +2026,7 @@ fitting -- instead regrid your map as a post-processing step.
 \begin{myquote}
 \begin{verbatim}
 % makemap in='/jcmtdata/raw/scuba2/s8*/20120720/00030/*.sdf' method=iter \
-  config=^/stardev/share/smurf/dimmconfig.lis out=850_crl2688
+  config=^$STARLINK_DIR/share/smurf/dimmconfig.lis out=850_crl2688
 
 
 Out of 32 input files, 4 were darks, 8 were fast flats and 20 were science
@@ -3030,7 +3030,7 @@ convergence parameter to \texttt{MAPTOL}=0.03 but increased the number
 of iterations to compensate as 40 is unlikely to be sufficient.
 \begin{myquote}
 \begin{verbatim}
-^/stardev/share/smurf/dimmconfig_bright_extended.lis
+^$STARLINK_DIR/share/smurf/dimmconfig_bright_extended.lis
 numiter = -100
 noisecliphigh = 10.0
 maptol = 0.03
