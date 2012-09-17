@@ -177,6 +177,9 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *     14-JAN-2011 (DSB):
 *         Fix bug that prevented zero length strings being stored in a
 *         keymap.
+*     17-SEP-2012 (DSB):
+*         Fix bug that prevented UNDEF entries from being read back in
+*         from a dump of a KeyMap.
 *class--
 */
 
@@ -10313,6 +10316,10 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
                }
                alist = astFree( alist );
             }
+
+/* Undef values have no value. */
+         } else if( type == AST__UNDEFTYPE ) {
+            MapPutU( new, key, com, status );
 
 /* Report an error if the data type is unknown. */
          } else if( astOK ) {
