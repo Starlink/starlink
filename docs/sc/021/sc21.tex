@@ -775,7 +775,7 @@ A normal science observation will follow the following sequence.
 \end{itemize}
 \vspace{-2mm}
 The \param{SEQ\_TYPE} parameter in the FITS header may be used to
-identify the nature of each scan (see 
+identify the nature of each scan (see
 \cref{Section}{sec:fitsheader}{Headers and file structure}).
 When you access you data either at the JCMT or by downloading from the
 \htmladdnormallink{Science Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
@@ -1382,7 +1382,7 @@ model).\\
 \begin{minipage}[t]{0.92\linewidth}\texttt{NOI} should come last in the model
 order and calculates the RMS noise in each bolometer.  \texttt{NOI} is
 determined by running \calcnoise\ (see \cref{Section}{sec:calcnoise}{Checking the
-array performance}) on the residual signal (the \texttt{RES} 
+array performance}) on the residual signal (the \texttt{RES}
 model, see \cref{Section}{sec:export}{Exporting individual models}).  Unlike
 the other models, \texttt{NOI} is
 not a subtraction or a correction but if specified, is used (from the
@@ -1517,9 +1517,11 @@ The \texttt{exportndf} parameter will write out the requested models
 as NDF files with names based on the first input file that went into
 the maps for each sub-array. This is first suffixed by \texttt{con},
 indicating that several data files may have been concatenated
-together. The 3-letter code for each model is then appended to the filename (such as
+together. The three-letter code for each model is then appended to the filename (such as
 \texttt{s8a20120720\_00030\_0003\_con\_com.sdf},
-\linebreak
+\begin{latexonly}
+\linebreak          % \latex causes a paragraph break.
+\end{latexonly}
 \texttt{s8a20120720\_00030\_0003\_con\_flt.sdf},
 \texttt{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename shows
 sub-scan 3 of Observation 30 since this is the first science file that
@@ -1892,17 +1894,19 @@ determining the FCFs from calibrators.
 
 
 \subsubsection{dimmconfig\_bright\_extended.lis}
+
 This configuration is for reducing maps of bright extended sources,
 and is also derived from \texttt{dimmconfig\_bright.lis}. The
 convergence criteria for this configuration uses \texttt{maptol} set
 to 5\% (rather than \texttt{chitol}). The S/N threshold for DC steps
-is relaxed from 25 in the default file to 100 to avoid problems
-associated with bright sources. Here \texttt{ast.zero\_snr} is used to
-constrain the \texttt{AST} model to zero wherever the S/N is lower
-than 5$\sigma$.  Everywhere the signal is below this threshold, the
-map is set to zero for all but the final iteration. \texttt{numiter}
-has been raised to -40, as more iterations are required to maximise
-the sensitivity to large dynamic signal ranges in the map.
+is relaxed from \texttt{25} in the default file to \texttt{100} to
+avoid problems associated with bright sources. Here
+\texttt{ast.zero\_snr} is used to constrain the \texttt{AST} model to
+zero wherever the S/N is lower than 5$\sigma$.  Everywhere the signal
+is below this threshold, the map is set to zero for all but the final
+iteration. \texttt{numiter} has been raised to \texttt{-40}, as more
+iterations are required to maximise the sensitivity to large dynamic
+signal ranges in the map.
 
 Recovering both faint extended structure and bright sources in the
 same field poses an extra challenge. After initially making your map using
@@ -1997,7 +2001,7 @@ one of SCUBA-2's secondary calibrators. As discussed in
 \cref{Section}{sec:dimm}{The Dynamic Iterative Map-Maker}, all of
 the settings for the map-maker are
 stored in configuration files.  In this example we will just use the
-default configuration file,\texttt{dimmconfig.lis}. For an overview of
+default configuration file, \texttt{dimmconfig.lis}. For an overview of
 the specialised configuration files available see
 \cref{Section}{sec:config}{this section}.
 
@@ -2010,8 +2014,8 @@ parameters can be found in \cref{Section}{sec:tweak}{Tweaking the
 configuration file}.
 
 \textbf{Note:} An up-caret (\,\^\,) is required any time you are reading in
-a file in \starlink. For the map-maker this includes the configuration
-file and reading in a list of files as the input (e.g.
+a group text file in \starlink. For the map-maker this includes the
+configuration file and reading in a list of files as the input (e.g.
 \texttt{in=\^\,rawfilelist.txt}).
 
 The example uses \textbf{the
@@ -2500,7 +2504,7 @@ to preserve peak flux density, the accuracy of this depends on how
 closely the real PSF matches the telescope beam size. In the case of
 nearby sources, each ends up contributing flux to both peaks.
 
- \begin{myquote}
+\begin{myquote}
 \begin{verbatim}
 % picard -recpars mypar.lis SCUBA2_MATCHED_FILTER 850_map_cal_crop.sdf
 \end{verbatim}
@@ -2744,7 +2748,7 @@ external mask from your data. These steps are followed in the example
   config='"^dimmconfig_bright_extended.lis"'
 \end{verbatim}
 \end{myquote}
-\textbf{(2)} The output from this map is made into a signal to noise map using the
+\textbf{(2)} The output from this map is made into a signal-to-noise map using the
 \Kappa\ command \makesnr.
 \begin{myquote}
 \begin{verbatim}
