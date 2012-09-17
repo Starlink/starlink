@@ -1037,20 +1037,6 @@ unaffected.
 \subsubsection{\xlabel{display_cube}Displaying time-series data}
 \label{sec:gaiacube}
 
-\myfig{sc21_gaia1}{[h!]}{width=\linewidth}{fig:gaia_main}{
-  Initial \gaia\ windows displayed upon loading a data cube.
-  The main window in the left shows a map of bolometer values at a fixed
-  sample in time. You may have to zoom in multiple times by clicking the
-  `Z' icon. On the right-hand side, the `Display image sections of a cube'
-  dialogue enables the user to navigate the time axis.}
-
-\myfig{sc21_gaia2}{[h!]}{width=0.8\linewidth}{fig:gaia_spec}{
-  The \emph{Spectral Plot} window displaying its time-varying
-  signal, appears automatically once a bolometer is clicked in the main window.
-  The vertical red line indicates the time slice that is currently selected
-  in the `Display image sections of a cube' dialogue -- this can be dragged
-  across the spectrum to scroll through the time-slices.}
-
 Use the \starlink\ application \textsc{Gaia} to visualise the bolometer time
 series data (or indeed \emph{any} SCUBA-2 data file). This is
 initiated simply typing \texttt{gaia} into a terminal.
@@ -1069,10 +1055,24 @@ window entitled `Display image sections of a cube'. The `Index of
 plane' slider towards the top of this window may be moved to display
 different time slices in the main window.
 
+\myfig{sc21_gaia1}{[h!]}{width=\linewidth}{fig:gaia_main}{
+  Initial \gaia\ windows displayed upon loading a data cube.
+  The main window in the left shows a map of bolometer values at a fixed
+  sample in time. You may have to zoom in multiple times by clicking the
+  `Z' icon. On the right-hand side, the `Display image sections of a cube'
+  dialogue enables you to navigate the time axis.}
+
 A third window will appear when you click on a bolometer -- the
 `Spectral plot'. This shows an automatically scaled plot of the raw
 time stream of data for that given bolometer. It will be overridden
 when you click on a different bolometer.
+
+\myfig{sc21_gaia2}{[h!]}{width=0.8\linewidth}{fig:gaia_spec}{
+  The \emph{Spectral Plot} window displaying its time-varying
+  signal, appears automatically once a bolometer is clicked in the main window.
+  The vertical red line indicates the time slice that is currently selected
+  in the `Display image sections of a cube' dialogue -- this can be dragged
+  across the spectrum to scroll through the time-slices.}
 
 A second way to scroll through the time axis is to click and drag the
 vertical red bar on the `Spectral plot' window. As you do so array
@@ -3006,7 +3006,12 @@ include more of the emission beyond the 3-$\sigma$ edge.
 The final mask is shown in the right-panel of \cref{Figure}{fig:mask}{this figure},
 note how is encompasses more emission and has softer edges than the
 first threshold map.
-\\ \\
+\\
+\myfigduo{sc21_gal_mask1}{sc21_gal_mask2}{t!}{width=0.475\linewidth}{fig:mask}{2mm}{
+  \textbf{(left)} The initial mask created by thresholding 850map\_snr
+  to 3$\sigma$. \textbf{(right)} Second mask made by thresholding the
+  smoothed map to 0.02.}
+
 \textbf{(3) Rerunning the map-maker with an external mask supplied}\\
 As a last step the map is re-made with this mask supplied as an external
 file. For this run we apply the additional parameters in a
@@ -3034,15 +3039,18 @@ ast.zero_snr = 0
 \end{verbatim}
 \end{myquote}
 
-\myfigduo{sc21_gal_mask1}{sc21_gal_mask2}{t!}{width=0.475\linewidth}{fig:mask}{2mm}{
-  \textbf{(left)} The initial mask created by thresholding 850map\_snr
-  to 3$\sigma$. \textbf{(right)} Second mask made by thresholding the
-  smoothed map to 0.02.}
-
 \textbf{(4) Cropping the map}\\
 We can now crop the map to remove the noisy edges using the \picard\ recipe
 \drrecipe{CROP\_JCMT\_IMAGES}. To determine what to trim we can look
 at the exposure-time image with \gaia.
+
+\myfig{sc21_gal_exptime}{[th!]}{width=0.7\linewidth}{fig:exptime}{
+  The exposure-time image of the science map from
+  Figure~\ref{fig:galmakemap}. You can right-click and drag the mouse
+  between two points to measure the distance. Here we see the exposure
+  time dropping off sharply at a radius of 30~arcmin. A non-default
+  colour scale has been chosen to illustrate the morphology.}
+
 \cref{Figure}{fig:exptime}{The exposure-time image} shows a sharp drop
 off at a radius of 30~arcmin.  We can thus specify a parameter file like so:
 
@@ -3062,14 +3070,6 @@ The final cropped map is shown in \cref{Figure}{fig:crop_map}{this plot}. Compar
 with the first map out of the map-maker
 (\cref{Figure}{fig:galmakemap}{first map}),
 slightly more of the faint extended emission is apparent.
-
-\myfig{sc21_gal_exptime}{[th!]}{width=0.7\linewidth}{fig:exptime}{
-  The exposure-time image of the science map from
-  Figure~\ref{fig:galmakemap}. You can right-click and drag the mouse
-  between two points to measure the distance. Here we see the exposure
-  time dropping off sharply at a radius of 30~arcmin. A non-default
-  colour scale has been chosen to illustrate the morphology.}
-
 
 One of the challenges facing this type of reduction is the need to
 account for both faint extended structure and very bright sources in
