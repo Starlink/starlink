@@ -78,7 +78,9 @@
       INTEGER STATUS
 
 *  Local Variables:
+      INTEGER ENTRY
       INTEGER KEYMAP
+      CHARACTER KEY*(AST__SZCHR)
       CHARACTER LOC*(DAT__SZLOC)
 *.
 
@@ -96,6 +98,26 @@
 
 *  Copy the HDS object to the KeyMap.
       CALL ATL_HD2KY( LOC, KEYMAP, STATUS )
+
+*  If the KeyMap contains a single scalar KeyMap pointer, then use the
+*  nested KeyMap in place of the top level keymap (this means that a round
+*  trip of astfromhds and asttohds does not cause the final HDS object to
+*  descend by one level).
+      IF( AST_MAPSIZE( KEYMAP, STATUS ) .EQ. 1 ) THEN
+         KEY = AST_MAPKEY( KEYMAP, 1, STATUS )
+         IF( AST_MAPLENGTH( KEYMAP, KEY, STATUS ) .EQ. 1 .AND.
+     :       AST_MAPTYPE( KEYMAP, KEY, STATUS ) .EQ.
+     :                                           AST__OBJECTTYPE ) THEN
+            IF(  AST_MAPGET0A( KEYMAP, KEY, ENTRY, STATUS ) ) THEN
+               IF( AST_ISAKEYMAP( ENTRY, STATUS ) ) THEN
+                  CALL AST_ANNUL( KEYMAP, STATUS )
+                  KEYMAP = ENTRY
+               ELSE
+                  CALL AST_ANNUL( ENTRY, STATUS )
+               END IF
+            END IF
+         END IF
+      END IF
 
 *  Write the KeyMap out to a text file.
       CALL ATL1_PTOBJ( 'KEYMAP', ' ', KEYMAP, STATUS )
