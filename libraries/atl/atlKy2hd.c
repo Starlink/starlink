@@ -69,6 +69,8 @@ void atlKy2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *        Support Short ints in keymap
 *     14-SEP-2012 (DSB):
 *        Moved from kaplibs to atl.
+*     17-SEP-2012 (DSB):
+*        Add support for undefined values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -268,6 +270,13 @@ void atlKy2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
             datAnnul( &cloc, status );
          }
 
+/* KeyMap "UNDEF" values are always scalar and have no corresponding HDS
+   data type. So arbitrarily use an "_INTEGER" primitive with no defined
+   value to represent a KeyMap UNDEF value. */
+      } else if( type == AST__UNDEFTYPE ){
+         datNew0L( loc, key, status );
+
+/* Unknown or unsupported data types. */
       } else if( *status == SAI__OK ) {
          *status = SAI__ERROR;
          msgSeti( "T", type );
