@@ -263,6 +263,8 @@
 #        Added STEPTIME to rawfitmeta
 #     2012 August 23 (MJC):
 #        Restore alphabetical order.
+#     2012 September 17 (MJC):
+#        Replace SC/19 with SC/21 in startup messages.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -5083,7 +5085,7 @@ package @PACKAGE@ {
 
         Type smurfhelp for help on @PACKAGE_UPCASE@ commands.
         Type "showme sun258" to browse the hypertext documentation.
-        Type "showme sc19" to view the SCUBA-2 map-making cookbook.
+        Type "showme sc21" to view the SCUBA-2 map-making cookbook.
 
     }
 
