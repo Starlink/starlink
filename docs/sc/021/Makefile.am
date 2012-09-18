@@ -6,7 +6,7 @@ sc21.htx_tar: sc21.htx_tar.extras sc21_450array.eps sc21_850array.eps \
 sc21_850cosmo_bf.eps \
 sc21_850cosmo_mf_crop.eps sc21_850cosmo_mf_crop_snr.eps \
 sc21_ast.eps sc21_com.eps sc21_cosmo1-def.eps \
-sc21_cosmo1-mf.eps sc21_crl2688.eps sc21_crl2688_err.eps \
+sc21_cosmo1-bf.eps sc21_crl2688.eps sc21_crl2688_err.eps \
 sc21_crl2688_regrid.eps sc21_curveofgrowth.eps \
 sc21_flow_dimm_blue.eps sc21_flt.eps \
 sc21_gaia1.eps sc21_gaia2.eps sc21_gal_def.eps \
