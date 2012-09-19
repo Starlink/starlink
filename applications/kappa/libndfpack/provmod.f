@@ -248,6 +248,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'NDG_PAR'          ! NDG constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
 
 *  Status:
       INTEGER STATUS
@@ -261,16 +262,15 @@
       PARAMETER( MXANC = 100 )
 
 *  Local Variables:
-      CHARACTER AMORE*(DAT__SZLOC)! Locator for MORE info in ancestor
       CHARACTER ANC*20           ! ANCESTOR parameter value
       CHARACTER CRESUB*400       ! Substitution string
       CHARACTER DATSUB*400       ! Substitution string
-      CHARACTER MORE*(DAT__SZLOC)! Locator for new MORE information
       CHARACTER PTHSUB*400       ! Substitution string
       CHARACTER RESULT*400       ! result of substitutions
       CHARACTER TEST*400         ! String to be tested
       INTEGER I                  ! Ancestor index
       INTEGER IANC( MXANC )      ! Indices of selected ancestors
+      INTEGER IGRP               ! Identifier for group holding input text
       INTEGER INDF               ! NDF identifier
       INTEGER IPROV              ! Identifier for provenance structure
       INTEGER IPW1               ! Pointer to work space
@@ -278,10 +278,11 @@
       INTEGER KM                 ! KeyMap holding provenance info
       INTEGER L                  ! String len
       INTEGER MANC               ! Number of selected ancestors
+      INTEGER MORE               ! KeyMap holding more information
       INTEGER NANC               ! Total number of ancestors
+      INTEGER SIZE               ! Number of elements in the group
       LOGICAL DOALL              ! Modify all ancestors?
       LOGICAL CHANGED            ! Has the component changed?
-      LOGICAL USENDG             ! Use NDG to annul the AMORE locator?
 *.
 
 
@@ -344,13 +345,25 @@
 *  If only a single ancestor is being modified, get additional
 *  information as a set of text strings using the MORETEXT parameter.
       IF( MANC .EQ. 1 .AND. STATUS .EQ. SAI__OK ) THEN
-         CALL KPG1_GTMOR( 'MORETEXT', MORE, STATUS )
+
+* Get a GRP group of strings.
+         IGRP = GRP__NOID
+         CALL KPG1_GTGRP( 'MORETEXT', IGRP, SIZE, STATUS )
+
+* If none supplied, annull the error.
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
-            MORE = DAT__NOLOC
+            MORE = AST__NULL
+
+*  Otherwise, convert the GRP group to an AST KeyMap and then delete the
+*  group.
+         ELSE
+            CALL KPG1_KYMAP( IGRP, MORE, STATUS )
+            CALL GRP_DELET( IGRP, STATUS )
          END IF
+
       ELSE
-         MORE = DAT__NOLOC
+         MORE = AST__NULL
       END IF
 
 *  Loop round all the ancestors that are to be modified.
@@ -365,19 +378,12 @@
 
 *  Get an AST KeyMap holding the existing provenance information for
 *  the specified ancestor.
-         CALL NDG_GETPROV( IPROV, I, KM, AMORE, STATUS )
+         CALL NDG_GETPROV( IPROV, I, KM, STATUS )
 
-*  If a new MORE structure has been specified, use its locator in place
+*  If new MORE info has been specified, use its KeyMap in place
 *  of the old one.
-         IF( MORE .NE. DAT__NOLOC ) THEN
-            CALL NDG_ANTMP( AMORE, STATUS )
-            AMORE = MORE
-            MORE = DAT__NOLOC
-
-*  Note if the AMORE locator should be freed using NDG or HDS.
-            USENDG = .FALSE.
-         ELSE
-            USENDG = .TRUE.
+         IF( MORE .NE. AST__NULL ) THEN
+            CALL AST_MAPPUT0A( KM, 'MORE', MORE, ' ', STATUS )
          END IF
 
 *  Is the CREATOR string to be modified?
@@ -466,16 +472,7 @@
          END IF
 
 *  Store the modified provenance information back in the NDF.
-         CALL NDG_MODIFYPROV( IPROV, I, KM, AMORE, STATUS )
-
-*  Annul any MORE HDS structure.
-         IF( USENDG ) THEN
-            CALL NDG_ANTMP( AMORE, STATUS )
-
-         ELSE IF( AMORE .NE. DAT__NOLOC ) THEN
-            CALL DAT_ANNUL( AMORE, STATUS )
-
-         END IF
+         CALL NDG_MODIFYPROV( IPROV, I, KM, STATUS )
 
 *  Annul the KeyMap holding the ancestor information.
          CALL AST_ANNUL( KM, STATUS )

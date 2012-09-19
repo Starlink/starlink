@@ -224,7 +224,6 @@
       PARAMETER( MXANC = 100 )
 
 *  Local Variables:
-      CHARACTER AMORE*(DAT__SZLOC)! Locator for MORE in ancestor
       CHARACTER ANC*20           ! ANCESTOR parameter value
       CHARACTER ITEM*10          ! Item to check
       CHARACTER PAT*400          ! Pattern matching template
@@ -293,16 +292,15 @@
 
 *  Get an AST KeyMap holding the existing provenance information for
 *  the specified ancestor.
-            CALL NDG_GETPROV( IPROV, I, KM, AMORE, STATUS )
+            CALL NDG_GETPROV( IPROV, I, KM, STATUS )
 
 *  Get the required item of information from the ancestor, use a blank
 *  string if it is not there.
             THERE = AST_MAPGET0C( KM, ITEM, TEST, L, STATUS )
             IF( .NOT. THERE ) TEST = ' '
 
-*  Annul the KeyMap and locator holding information about the I'th ancestor.
+*  Annul the KeyMap holding information about the I'th ancestor.
             CALL AST_ANNUL( KM, STATUS )
-            CALL NDG_ANTMP( AMORE, STATUS )
 
 *  See if the pattern matches the item. If required, hide the ancestor, or
 *  add the ancestor index to the list to be deleted.

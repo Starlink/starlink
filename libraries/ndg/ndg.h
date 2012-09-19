@@ -83,7 +83,7 @@ typedef AstKeyMap NdgProvenance;
 
 /* Public function prototypes */
 /* -------------------------- */
-AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more, int *status );
+AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, int *status );
 AstKeyMap *ndgRootProv( NdgProvenance *prov, int *status );
 Grp *ndgCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, int *status );
 NdgProvenance *ndgCopyProv( NdgProvenance *prov, int clense, int *status );
@@ -95,7 +95,6 @@ int ndgCountProv( NdgProvenance *prov, int *status );
 int ndgIsHiddenProv( NdgProvenance *, int, int * );
 void ndgAddgh( const char param[], const Grp * igrp, int * status );
 void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs, int *status );
-void ndgAntmp( HDSLoc **loc, int *status );
 void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp **igrp2, size_t *size, int *flag, int *status );
 void ndgAssoc( const char *param, int verb, Grp **igrp, size_t *size, int *flag, int *status );
 void ndgBeggh( int *status );
@@ -108,11 +107,11 @@ void ndgEndpv( const char *creator, int *status );
 void ndgFormatProv( NdgProvenance *prov, int base, AstKeyMap **keymap, int *status );
 void ndgGtsup( const Grp *grp, size_t i, char *const fields[6], size_t len, int *status );
 void ndgHideProv( NdgProvenance *, int, int * );
-void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *aprov, HDSLoc *more, int *status );
+void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km, int *status );
 void ndgNdfas( const Grp *igrp, size_t index, const char mode[], int *indf, int *status );
 void ndgNdfcr( const Grp *igrp, size_t index, const char ftype[], int ndim, const hdsdim lbnd[], const hdsdim ubnd[], int *indf, int *status );
 void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, size_t index, int *indf2, int *status);
-void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more, AstKeyMap *more2, int isroot, int *status );
+void ndgPutProv( NdgProvenance *prov, int indf, AstKeyMap *more, int isroot, int *status );
 void ndgRemoveProv( NdgProvenance *prov, int nanc, int *anc, int *status );
 void ndgUnhashProv( NdgProvenance *, int * );
 void ndgUnhideProv( NdgProvenance *, int, int * );

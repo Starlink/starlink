@@ -47,13 +47,9 @@
 *
 *       "More" -- A summary of any extra information about the NDF
 *       stored with the provenance information.  In general this may be
-*       an arbitrary HDS structure and so full details cannot be given
-*       on a single line.  The HDSTRACE command can be used to examine
-*       the MORE field in detail.  To see full details of the NDF with
-*       "ID" value of 12 (say), enter (from a UNIX shell)
-*       "hdstrace fred.more.provenance.ancestors'(12)'", where "fred" is
-*       the name of the NDF supplied for parameter "NDF".  If the NDF
-*       has no extra information, this item will not be present.
+*       completely arbitrary and so full details cannot be given
+*       on a single line.  If the NDF has no extra information, this item
+*       will not be present.
 *
 *       "History" -- This is only displayed if parameter HISTORY is set
 *       to a TRUE value. It contains information copied from the History
@@ -210,7 +206,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
-      INCLUDE 'DAT_PAR'          ! DAT constants
       INCLUDE 'AST_PAR'          ! AST constants
 
 *  Status:
@@ -230,7 +225,6 @@
       CHARACTER C*1              ! Current character
       CHARACTER ID*10            ! Integer index for the current NDF
       CHARACTER KEY*20           ! Key for entry within KeyMap
-      CHARACTER MORE*(DAT__SZLOC)! Locator for MORE info
       CHARACTER PARIDS*255       ! Buffer for direct parent ID list
       CHARACTER QUOTE1*1         ! Outer quote character
       CHARACTER QUOTE2*1         ! Inner quote character
@@ -672,8 +666,7 @@
 *  If a file is being created, get the provenance information for the
 *  supplied NDF. This includes the indices of the NDFs direct parents.
       ELSE
-         CALL NDG_GETPROV( IPROV, 0, KM, MORE, STATUS )
-         CALL NDG_ANTMP( MORE, STATUS )
+         CALL NDG_GETPROV( IPROV, 0, KM, STATUS )
 
 *  Check that the NDF has some parents.
          IF( AST_MAPHASKEY( KM, 'PARENTS', STATUS ) ) THEN
@@ -689,8 +682,7 @@
      :                                  STATUS )
 
 *  Get the provenance information for the parent.
-               CALL NDG_GETPROV( IPROV, PARI, KMP, MORE, STATUS )
-               CALL NDG_ANTMP( MORE, STATUS )
+               CALL NDG_GETPROV( IPROV, PARI, KMP, STATUS )
 
 *  Check the provenance information includes a path to the parent file.
 *  If so, get the path and write it to the output text file.

@@ -322,7 +322,7 @@
 *  of INDF2 to INDF1.
                               ELSE
                                  CALL NDG_PUTPROV( IPROV, INDF2,
-     :                                            DAT__NOLOC, AST__NULL,
+     :                                            AST__NULL,
      :                                            .FALSE., STATUS )
 
 *  Set the flag that indicates if any INPUT NDF had a provenance extension.

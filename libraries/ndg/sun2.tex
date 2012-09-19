@@ -19,10 +19,10 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {2.8}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {10th March 2011}
+\newcommand{\stardocdate}      {19th September 2012}
 \newcommand{\stardoctitle}     {NDG \\ [\latex{1ex}]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 6.0}
+\newcommand{\stardocversion}   {Version 7.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
 This document describes the routines provided within the NDG subroutine
@@ -2343,22 +2343,27 @@ PROVENANCE extension in an NDF contains the following components:
 of all the NDFs that were used to create the main NDF. These descriptions
 are encoded into an opaque set of integer values in order to save time
 and space, but represent the same set of items descibed in ``The Pre V6
-PROVENANCE Extension:'' below (but note, the MORE component is not
-included in the DATA array).
-
-\item [MORE] --- An optional one-dimensional array of structures containing
-arbitrary extra information about selected ancestor NDFs. If present,
-each element of this array contains supplemental information for a single
-ancestor NDF, and the DATA array will contain indices into the MORE array
-for those ancestors which have additional information.
+PROVENANCE Extension:'' below.
 
 \end{description}
+
+In version 6 of NDG, the provevance extension contained an additional
+component called ``MORE'', which held an optional one-dimensional array
+of structures containing arbitrary extra information about selected
+ancestor NDFs. If present, each element of this array contained
+supplemental information for a single ancestor NDF, and the DATA array
+contained indices into the MORE array for those ancestors which had
+additional information.
+
+As of version 7, the information previous held in MORE is now held in the
+main DATA array.
 
 
 \subsection{The Pre V6 PROVENANCE Extension:}
 
 The format in which provenance information is stored within an NDF's
-PROVENANCE extension changed radically at NDG version 6.0. Prior to v6.0,
+PROVENANCE extension changed radically at NDG version 6.0, with another
+more minor change at version 7. Prior to v6.0,
 the seperate numerical values, strings, etc, that form the provenance
 information were stored in separate HDS components. But for large
 provenance systems this proved to be in efficient in terms of both
@@ -2424,6 +2429,60 @@ another statement of the software that performed the action.
 \newpage
 
 \subsection{Full Fortran Function Specifications}
+
+
+
+
+\sstroutine{
+   NDG\_ADDPROV
+}{
+   Record multiple input NDFs as ancestors in an output NDF
+}{
+   \sstdescription{
+      This routine reads provenance from the specified output NDF, and
+      then records each of the specified input NDFs as ancestors within
+      the output provenance. It then writes the modified provenance back
+      out to the output NDF.
+
+      It is a simplified wrapper for NDG\_READPROV, NDG\_PUTPROV AND
+      NDG\_WRITEPROV. It is more restrictive than use of NDF\_PUTPROV
+      since it stores no extra information ({\tt "}MORE{\tt "}) with any of the
+      ancestors, and does not force any of the ancestors to be root
+      ancestors.
+   }
+   \sstinvocation{
+      CALL NDG\_ADDPROV( INDF, CREATOR, NNDF, NDFS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         An identifier for the output NDF.
+      }
+      \sstsubsection{
+         CREATOR = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A text identifier for the software that created INDF (usually the
+         name of the calling application). The format of the identifier
+         is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "} is recommended.
+      }
+      \sstsubsection{
+         NNDF = INTEGER (Given)
+      }{
+         The number of input NDFs.
+      }
+      \sstsubsection{
+         NDFS( NNDF ) = INTEGER (Given)
+      }{
+         An array of identifiers for the input NDFs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
 \sstroutine{
    NDG\_BEGPV
 }{
@@ -2458,7 +2517,7 @@ another statement of the software that performed the action.
       hidden ancestors from the copy.
    }
    \sstinvocation{
-      CALL NDG\_COPYPROV( IPROV, CLEANSE, IPROV2, STATUS )
+      CALL NDG\_COPYPROV( IPROV, CLENSE, IPROV2, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -2473,6 +2532,12 @@ another statement of the software that performed the action.
          If .TRUE., then any ancestors which have been hidden using
          NDG\_HIDEPROV are removed from the returned Provenance structure
          (see NDG\_REMOVEPROV).
+      }
+      \sstsubsection{
+         IPROV2 = INTEGER (Returned)
+      }{
+         An identifier for the new Provenance structure, which should be freed
+         using NDG\_FREEPROV when no longer needed.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -2536,8 +2601,13 @@ another statement of the software that performed the action.
       the input NDFs are added to the provenance information in the
       output NDF. If AUTOPROV is set to anything other than {\tt '}1{\tt '} then the
       output provenance is not updated. If AUTOPROV is not set at all,
-      then the output provenance will be updated only if one or more of
-      the input NDFs contains a PROVENANCE extension.
+      the default behaviour is different for native and foreign format
+      NDFs. For native format output NDFs, the provenance will be updated
+      if one or more of the input NDFs contains a PROVENANCE extension
+      (foreign format input NDFs are ignored). The provenance within foreign
+      format output NDFs is never updated unless AUTPOPROV is set explicitly
+      to {\tt '}1{\tt '} (this is to avoid the potentially costly process of format
+      conversion).
    }
    \sstinvocation{
       CALL NDG\_ENDPV( CREATR, STATUS )
@@ -2546,9 +2616,9 @@ another statement of the software that performed the action.
       \sstsubsection{
          CREATR = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         An identifier for the calling application. The format of the
-         identifier is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "}
-         is recommended.
+         An identifier for the software that created INDF1 (usually the
+         name of the calling application). The format of the identifier
+         is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "} is recommended.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -2701,7 +2771,7 @@ another statement of the software that performed the action.
       supplied provenance structure.
    }
    \sstinvocation{
-      CALL NDG\_GETPROV( IPROV, IANC, KM, MORE, STATUS )
+      CALL NDG\_GETPROV( IPROV, IANC, KM, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -2745,11 +2815,8 @@ another statement of the software that performed the action.
               immediate parents of the ancestor.
 
             \sstitem
-            {\tt "}MORE{\tt "}: A KeyMap containing any scalar or vector primitive
-              values stored at the top level of the associated HDS MORE
-              structure. The HDS name of the component is used as the key.
-              The full contents of the MORE structure are returned by the
-              MORE argument (see above).
+            {\tt "}MORE{\tt "}: A KeyMap containing any extra information that has
+              been stored with the ancestor.
 
             \sstitem
             {\tt "}HISTORY{\tt "}: A vector entry holding one or more KeyMaps. Each
@@ -2794,17 +2861,6 @@ another statement of the software that performed the action.
          the current AST Object context).
       }
       \sstsubsection{
-         MORE = CHARACTER $*$ (DAT\_\_SZLOC) (Returned)
-      }{
-         A locator for a temporary HDS object containing a full deep copy
-         of each component of the MORE structure associated with the
-         requested ancestor. The returned locator should be annulled using
-         DAT\_ANNUL when no longer needed. A value of DAT\_\_NOLOC will be
-         returned if the requested ancestor has no MORE component. Note,
-         the returned object will be assigned an arbitrary HDS Name, which
-         will not in general be {\tt "}MORE{\tt "}.
-      }
-      \sstsubsection{
          STATUS = INTEGER (Given and Returned)
       }{
          The global status.
@@ -2829,7 +2885,7 @@ another statement of the software that performed the action.
          IPROV = INTEGER (Given)
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         read from an NDF, as returned by NDG\_READPROV.
       }
       \sstsubsection{
          IANC = INTEGER (Given)
@@ -2941,7 +2997,7 @@ another statement of the software that performed the action.
       are supplied in an AST KeyMap such as returned by NDG\_GETPROV.
    }
    \sstinvocation{
-      CALL NDG\_MODIFYPROV( IPROV, IANC, KM, MORE, STATUS )
+      CALL NDG\_MODIFYPROV( IPROV, IANC, KM, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -2980,35 +3036,17 @@ another statement of the software that performed the action.
               ancestor NDF.
 
             \sstitem
-            {\tt "}MORE{\tt "}: A KeyMap containing extra information to store at the
-            top level of the MORE component for the ancestor. Only entries
-            holding primitive data values (scalar or vector) are used -
-            entries holding nested KeyMaps, etc, are ignored. If an entry in
-            this KeyMap has the same name as a component in the supplied
-            MORE HDS structure, then the KeyMap value is used in preference to
-            the HDS value.
+            {\tt "}MORE{\tt "}: A KeyMap containing extra information to store with
+              the ancestor.
 
          }
-         If the {\tt "}DATE{\tt "} or {\tt "}CREATOR{\tt "} components are missing then the
+         If the {\tt "}DATE{\tt "}, {\tt "}CREATOR{\tt "} or {\tt "}MORE{\tt "} components are missing then
          corresponding item of information will be deleted from the
-         provenance extension. To delete the {\tt "}MORE{\tt "} component in the
-         provenance extension, supply a KeyMap without a MORE entry, and
-         also supply DAT\_NOLOC for the {\tt "}more{\tt "} argument. An error is
-         reported if the supplied KeyMap has no {\tt "}PATH{\tt "} entry. Note, the
-         PARENTS list and HISTORY information stored with the specified
-         ancestor cannot be modified (any {\tt "}PARENTS{\tt "} or {\tt "}HISTORY{\tt "}
-         component in the supplied HDS structure will be ignored).
-      }
-      \sstsubsection{
-         MORE = CHARACTER $*$ (DAT\_\_SZLOC) (Given)
-      }{
-         A locator for an HDS object containing additional information to
-         be associated with the requested ancestor. DAT\_\_NOLOC may be
-         supplied for this argument. The contents of the MORE component
-         in the provenance extension will be the union of any structure
-         supplied through this argument, and any values supplied through
-         the MORE entry in the supplied KeyMap. If the same component
-         name occurs in both, then the KeyMap value takes precedence.
+         provenance extension. An error is reported if the supplied KeyMap
+         has no {\tt "}PATH{\tt "} entry. Note, the PARENTS list and HISTORY information
+         stored with the specified ancestor cannot be modified (any {\tt "}PARENTS{\tt "}
+         or {\tt "}HISTORY{\tt "} component in the supplied HDS structure will be
+         ignored).
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -3028,7 +3066,7 @@ another statement of the software that performed the action.
       the supplied provenance structure.
    }
    \sstinvocation{
-      CALL NDG\_PUTPROV( IPROV, INDF, MORE, MORE2, ISROOT, STATUS )
+      CALL NDG\_PUTPROV( IPROV, INDF, MORE, ISROOT, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -3044,21 +3082,11 @@ another statement of the software that performed the action.
          ancestor NDFs in the supplied provenance information.
       }
       \sstsubsection{
-         MORE = CHARACTER $*$ (DAT\_\_SZLOC) (Given)
+         MORE = INTEGER (Given)
       }{
-         A locator for an HDS structure containing arbitrary additional
-         information about the new ancestor NDF, and how it was used in the
-         creation of the output NDF.
-      }
-      \sstsubsection{
-         MORE2 = INTEGER (Given)
-      }{
-         A pointer to an AstKeyMap holding extra items of information
-         to be added into the MORE component. Only entries holding primitive
-         data values (scalar or vector) are used - entries holding nested
-         KeyMaps, etc, are ignored. If an entry in this KeyMap has the same
-         name as a component in the supplied MORE HDS structure, then the
-         KeyMap value is used in preference to the HDS value.
+         A pointer to an AstKeyMap holding arbitrary additional information
+         about the new ancestor NDF, and how it was used in the creation of
+         the output NDF.
       }
       \sstsubsection{
          ISROOT = LOGICAL (Given)
@@ -3089,9 +3117,9 @@ another statement of the software that performed the action.
       contents of the structure.
 
       If the NDF has no provenance information (for instance, if it is a
-      newly created NDF), the returned structure will contain just the
-      supplied creator name (which may be blank), and an empty ancestor
-      list.
+      newly created NDF), or if no NDF is supplied, the returned structure
+      will contain just the supplied creator name (which may be blank), and
+      an empty ancestor list.
 
       The structure should be freed when it is no longer needed by
       calling NDG\_FREEPROV.
@@ -3107,7 +3135,9 @@ another statement of the software that performed the action.
          INDF = INTEGER (Given)
       }{
          An identifier for the NDF containing the provenance information
-         to be read.
+         to be read. This may be NDF\_\_NOID, in which case a new provenance
+         structure with the supplied creator name and an empty ancestor
+         list will be created and returned.
       }
       \sstsubsection{
          CREATOR = CHARACTER $*$ ( $*$ ) (Given)
@@ -3370,21 +3400,51 @@ another statement of the software that performed the action.
 \newpage
 \subsection{Full C Function Specifications}
 \sstroutine{
-   ndgBegpv
+   ndgAddProv
 }{
-   Begin an NDF provenance block
+   Record multiple input NDFs as ancestors in an output NDF
 }{
    \sstdescription{
-      This routine should be called to mark the start of an NDF
-      provenance block. The block should be ended by a matching
-      call to ndgEndpv. See ndgEndpv for more details.
+      This routine reads provenance from the specified output NDF, and
+      then records each of the specified input NDFs as ancestors within
+      the output provenance. It then writes the modified provenance back
+      out to the output NDF.
 
-      Note - provenance blocks must not be nested.
+      It is a simplified wrapper for ndgReadProv, ndgPutProv and
+      ndgWriteProv. It is more restrictive than use of ndgPutProv
+      since it stores no extra information ({\tt "}MORE{\tt "}) with any of the
+      ancestors, and does not force any of the ancestors to be root
+      ancestors.
    }
    \sstinvocation{
-      void ndgBegpv( int $*$status )
+      ndgAddProv( int indf, const char $*$creator, int nndf, int $*$ndfs,
+                  int $*$status )
    }
    \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         An identifier for the output NDF.
+      }
+      \sstsubsection{
+         creator
+      }{
+         A text identifier for the software that created INDF (usually the
+         name of the calling application). The format of the identifier
+         is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "} is recommended.
+         This value is only used if the the NDF does not contain any
+         existing provenance information.
+      }
+      \sstsubsection{
+         nndf
+      }{
+         The number of input NDFs.
+      }
+      \sstsubsection{
+         ndfs
+      }{
+         A pointer to an array of identifiers for the input NDFs.
+      }
       \sstsubsection{
          status
       }{
@@ -3410,7 +3470,7 @@ another statement of the software that performed the action.
       \sstsubsection{
          prov
       }{
-         A pointer to the provenance information to be Copied.
+         A pointer to the provenance information to be copied.
       }
       \sstsubsection{
          cleanse
@@ -3453,7 +3513,7 @@ another statement of the software that performed the action.
          prov
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         as returned by ndgReadProv or ndgReadVotProv.
       }
       \sstsubsection{
          status
@@ -3469,51 +3529,6 @@ another statement of the software that performed the action.
       \sstsubsection{
          structure, or zero if an error occurs.
       }{
-      }
-   }
-}
-\sstroutine{
-   ndgEndpv
-}{
-   End an NDF provenance block
-}{
-   \sstdescription{
-      This routine should be called to mark the end of an NDF
-      provenance block. The block should have been started by a
-      matching call to ndgBegpv. Note, provenance blocks must
-      not be nested.
-
-      During a provenance block, a list is maintained of all the
-      existing NDFs that have had their Data array mapped (either in
-      read or update mode) during the block. Another list is maintained
-      of all the NDFs that have been written (either existing NDFs
-      accessed in update mode or new NDFs) during the block.
-
-      When the block ends, the provenance information within each
-      NDF in the second may be modified to include all the NDFs in the
-      first list as parents. Whether or not this occurs is controlled by
-      the AUTOPROV environment variable. If AUTOPROV is set to {\tt '}1{\tt '} then
-      the input NDFs are added to the provenance information in the
-      output NDF. If AUTOPROV is set to anything other than {\tt '}1{\tt '} then the
-      output provenance is not updated. If AUTOPROV is not set at all,
-      then the output provenance will be updated only if one or more of
-      the input NDFs contains a PROVENANCE extension.
-   }
-   \sstinvocation{
-      void ndgEndpv( const char $*$creatr, int $*$status )
-   }
-   \sstarguments{
-      \sstsubsection{
-         creatr
-      }{
-         An identifier for the calling application. The format of the
-         identifier is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "}
-         is recommended.
-      }
-      \sstsubsection{
-         status
-      }{
-         The global status.
       }
    }
 }
@@ -3598,7 +3613,7 @@ another statement of the software that performed the action.
          prov
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         as returned by ndgReadProv or ndgReadVotProv.
       }
       \sstsubsection{
          base
@@ -3667,15 +3682,14 @@ another statement of the software that performed the action.
       supplied provenance structure.
    }
    \sstinvocation{
-      result = ndgGetProv( NdgProvenance $*$prov, int ianc, HDSLoc $*$$*$more,
-                           int $*$status )
+      result = ndgGetProv( NdgProvenance $*$prov, int ianc, int $*$status )
    }
    \sstarguments{
       \sstsubsection{
          prov
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         as returned by ndgReadProv or ndgReadVotProv.
       }
       \sstsubsection{
          ianc
@@ -3686,19 +3700,6 @@ another statement of the software that performed the action.
          read. Otherwise, the {\tt "}ianc{\tt "} value is used as an index into the
          ANCESTORS array. No error is reported if {\tt "}ianc{\tt "} is too large, but a
          NULL pointer will be returned as the function value.
-      }
-      \sstsubsection{
-         more
-      }{
-         The location at which to return a pointer to a locator for a
-         temporary HDS object containing a full deep copy of the MORE
-         structure associated with the requested ancestor. The
-         returned locator should be annulled using datAnnul when no
-         longer needed. A NULL pointer may be supplied for this argument
-         if the MORE structure is not needed. A NULL pointer will be
-         returned if the requested ancestor has no MORE component. Note,
-         the returned object will be assigned an arbitrary HDS Name,
-         which will not in general be {\tt "}MORE{\tt "}.
       }
       \sstsubsection{
          status
@@ -3736,12 +3737,9 @@ another statement of the software that performed the action.
          the immediate parents of the ancestor.
       }
       \sstsubsection{
-         - {\tt "}MORE{\tt "}: A KeyMap containing any scalar or vector primitive
+         - {\tt "}MORE{\tt "}: A KeyMap containing any extra information that has been
       }{
-         values stored at the top level of the associated HDS MORE
-         structure. The HDS name of the component is used as the key.
-         The full contents of the MORE structure are returned by the
-         {\tt "}more{\tt "} argument (see above).
+         stored with the ancestor.
       }
       \sstsubsection{
          - {\tt "}HISTORY{\tt "}: A vector entry holding one or more KeyMaps. Each
@@ -3839,7 +3837,7 @@ another statement of the software that performed the action.
          prov
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         as returned by ndgReadProv or ndgReadVotProv.
       }
       \sstsubsection{
          ianc
@@ -3873,7 +3871,7 @@ another statement of the software that performed the action.
          prov
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         as returned by ndgReadProv or ndgReadVotProv.
       }
       \sstsubsection{
          ianc
@@ -3901,14 +3899,14 @@ another statement of the software that performed the action.
    }
    \sstinvocation{
       void ndgModifyProv( NdgProvenance $*$prov, int ianc, AstKeyMap $*$km,
-                          HDSLoc $*$more, int $*$status )
+                          int $*$status )
    }
    \sstarguments{
       \sstsubsection{
          prov
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         as returned by ndgReadProv or ndgReadVotProv.
       }
       \sstsubsection{
          ianc
@@ -3940,35 +3938,17 @@ another statement of the software that performed the action.
               ancestor NDF.
 
             \sstitem
-            {\tt "}MORE{\tt "}: A KeyMap containing extra information to store at the
-            top level of the MORE component for the ancestor. Only entries
-            holding primitive data values (scalar or vector) are used -
-            entries holding nested KeyMaps, etc, are ignored. If an entry in
-            this KeyMap has the same name as a component in the supplied
-            {\tt "}more{\tt "} HDS structure, then the KeyMap value is used in preference
-            to the HDS value.
+            {\tt "}MORE{\tt "}: A KeyMap containing extra information to store with
+              the ancestor.
 
          }
-         If the {\tt "}DATE{\tt "} or {\tt "}CREATOR{\tt "} components are missing then the
+         If the {\tt "}DATE{\tt "}, {\tt "}CREATOR{\tt "} or {\tt "}MORE{\tt "} components are missing then
          corresponding item of information will be deleted from the
-         provenance extension. To delete the {\tt "}MORE{\tt "} component in the
-         provenance extension, supply a KeyMap without a MORE entry, and
-         also supply DAT\_NOLOC for the {\tt "}more{\tt "} argument. An error is
-         reported if the supplied KeyMap has no {\tt "}PATH{\tt "} entry. Note, the
-         PARENTS list and HISTORY information stored with the specified
-         ancestor cannot be modified (any {\tt "}PARENTS{\tt "} or {\tt "}HISTORY{\tt "}
-         component in the supplied HDS structure will be ignored).
-      }
-      \sstsubsection{
-         more
-      }{
-         A locator for an HDS object containing additional information to
-         be associated with the requested ancestor. A NULL pointer may be
-         supplied for this argument The contents of the MORE component
-         in the provenance extension will be the union of any structure
-         supplied through this argument, and any values supplied through
-         the MORE entry in the supplied KeyMap. If the same component
-         name occurs in both, then the KeyMap value takes precedence.
+         provenance extension. An error is reported if the supplied KeyMap
+         has no {\tt "}PATH{\tt "} entry. Note, the PARENTS list and HISTORY information
+         stored with the specified ancestor cannot be modified (any {\tt "}PARENTS{\tt "}
+         or {\tt "}HISTORY{\tt "} component in the supplied HDS structure will be
+         ignored).
       }
       \sstsubsection{
          status
@@ -3988,15 +3968,15 @@ another statement of the software that performed the action.
       the supplied provenance structure.
    }
    \sstinvocation{
-      ndgPutProv( NdgProvenance $*$prov, int indf, HDSLoc $*$more,
-                  AstKeyMap $*$more2, int isroot, int $*$status )
+      ndgPutProv( NdgProvenance $*$prov, int indf, AstKeyMap $*$more,
+                  int isroot, int $*$status )
    }
    \sstarguments{
       \sstsubsection{
          prov
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         as returned by ndgReadProv or ndgReadVotProv.
       }
       \sstsubsection{
          indf
@@ -4007,21 +3987,9 @@ another statement of the software that performed the action.
       \sstsubsection{
          more
       }{
-         A locator for an HDS structure containing arbitrary additional
-         information about the new ancestor NDF, and how it was used in the
-         creation of the output NDF. A NULL pointer can be supplied if
-         required.
-      }
-      \sstsubsection{
-         more2
-      }{
-         A pointer to an AstKeyMap holding extra items of information
-         to be added into the MORE component. Only entries holding primitive
-         data values (scalar or vector) are used - entries holding nested
-         KeyMaps, etc, are ignored. If an entry in this KeyMap has the same
-         name as a component in the supplied {\tt "}more{\tt "} HDS structure, then the
-         KeyMap value is used in preference to the HDS value. A NULL pointer
-         can be supplied if required.
+         A pointer to an AstKeyMap holding arbitrary additional information
+         about the new ancestor NDF, and how it was used in the creation of
+         the output NDF. A NULL pointer can be supplied if required.
       }
       \sstsubsection{
          isroot
@@ -4052,9 +4020,9 @@ another statement of the software that performed the action.
       the contents of the structure.
 
       If the NDF has no provenance information (for instance, if it is a
-      newly created NDF), the returned structure will contain just the
-      supplied creator name (which may be blank), and an empty ancestor
-      list.
+      newly created NDF), or if no NDF is supplied, the returned structure
+      will contain just the supplied creator name (which may be blank), and
+      an empty ancestor list.
 
       The structure should be freed when it is no longer needed by
       calling ndgFreeProv.
@@ -4067,7 +4035,9 @@ another statement of the software that performed the action.
          indf
       }{
          An identifier for the NDF containing the provenance information
-         to be read.
+         to be read. This may be NDF\_\_NOID, in which case a new provenance
+         structure with the supplied creator name and an empty ancestor
+         list will be created and returned.
       }
       \sstsubsection{
          creator
@@ -4104,6 +4074,80 @@ another statement of the software that performed the action.
    }
 }
 \sstroutine{
+   ndgReadVotProv
+}{
+   Read the provenance information from a VOTABLE
+}{
+   \sstdescription{
+      This function reads provenance information from a string of XML text
+      read from a VOTABLE, storing it in a memory-resident structure for
+      faster access. A pointer that identifies this structure is returned,
+      and can be passed to other NDG provenance functions to manipulate
+      the contents of the structure.
+
+      If the XML text has no provenance information, the returned structure
+      will contain just the supplied creator name (which may be blank), and
+      an empty ancestor list.
+
+      The structure should be freed when it is no longer needed by
+      calling ndgFreeProv.
+   }
+   \sstinvocation{
+      NdgProvenance $*$ndgReadVotProv( const char $*$xml, const char $*$path,
+                                     const char $*$creator, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         xml
+      }{
+         Pointer to a null terminated string holding XML read from a
+         VOTABLE. The provenance information is read from the first
+         element found in the text that has the opening tag:
+
+         {\tt "}$<$GROUP name={\tt "}PROVENANCE{\tt "} utype={\tt "}hds\_type:PROVENANCE{\tt "}$>${\tt "}
+
+         This is the form produced by function ndgWriteVotProv.
+      }
+      \sstsubsection{
+         path
+      }{
+         The path to the file from which the XML provenance text was read.
+      }
+      \sstsubsection{
+         creator
+      }{
+         A text identifier for the software that created the NDF with
+         which the provnance is associated (usually the name of the calling
+         application). The format of the identifier is arbitrary, but the
+         form {\tt "}PACKAGE:COMMAND{\tt "} is recommended. This value is only used if
+         the the supplied XML text does not contain any provenance information.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         A pointer that identifies the structure holding the provenance
+      }{
+      }
+      \sstsubsection{
+         information read from the VOTABLE. Note, this is not a genuine pointer
+      }{
+      }
+      \sstsubsection{
+         to the structure and should not be de-referenced. A NULL pointer is
+      }{
+      }
+      \sstsubsection{
+         returned if an error occurs.
+      }{
+      }
+   }
+}
+\sstroutine{
    ndgRemoveProv
 }{
    Remove one or more ancestors from a provenance structure
@@ -4123,7 +4167,7 @@ another statement of the software that performed the action.
          prov
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         as returned by ndgReadProv or ndgReadVotProv.
       }
       \sstsubsection{
          nanc
@@ -4165,7 +4209,7 @@ another statement of the software that performed the action.
          prov
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         as returned by ndgReadProv or ndgReadVotProv.
       }
       \sstsubsection{
          status
@@ -4281,7 +4325,7 @@ another statement of the software that performed the action.
          prov
       }{
          An identifier for a structure holding the provenance information
-         read from an NDF, as returned by ndgReadProv
+         as returned by ndgReadProv or ndgReadVotProv.
       }
       \sstsubsection{
          ianc
@@ -4363,245 +4407,87 @@ another statement of the software that performed the action.
       }
    }
 }
-
-\section{Routines for controling recording of GRP group contents}
-
-The functions described in this section allow the contents of GRP
-groups to be appended to the default history record written by the
-NDF library.
-
-If an ADAM application accesses a parameter as a GRP group, the default
-history record added by the NDF library to any output NDFs will include
-the group expression supplied in response to the associated parameter
-prompt. This is not always very informative - for instance, if the group
-expression gives the name of a file from which the group contents are to
-be read, rather than giving the group contents directly, then name of the
-file will be recorded in the default history record but not the contents
-of the file.
-
-The NDG functions described below allow the default history record to be
-expanded to include the contents of any GRP group parameters accessed by
-the application. The contents of each such group is described in a new
-line of text that begings with the string ``Group: <PARAM>='', where
-<PARAM> is the name of the parameter with which the group is associated.
-
-There are two parts to using these facilities:
-
-\begin{enumerate}
-\item Each time a group parameter is accessed, the group must be
-``registered'' with NDG using ndgAddgh (NDG\_ADDGH).
-\item Before the application accesses any group parameters, it must begin
-a ``GRP history'' block by calling ndgBeggh (NDG\_BEGGH). When the
-application has finished accessing group parameters, and producing output
-NDFs, it should end the GRP history block by calling ndgEndgh (NDG\_ENDGH).
-\end{enumerate}
-
-During a GRP history block, a record is kept of all NDFs to which the NDF
-library writes default history information. When ndgEndgh is called, the
-contents of all groups registered using ndgAddgh within the GRP history
-block, are appended to the current history record in each of the NDFs to
-which default history has been written.
-
-Note, within a GRP history block, it is possible to prevent selected NDFs
-receiving this extra information by using ndgHltgh (NDG\_HLTGH) to stop
-the recording of NDF names before the NDFs identifiers are annulled
-(which is normally when the default history is written out), and then
-calling ndgHltgh again afterwards to re-establish the recording of NDF
-names.
-
-The C interfaces are the direct equivalent of the F77 interfaces
-described below - convert the F77 name to lower-case, remove the
-underscore and capitalise the following character.
-
 \sstroutine{
-   NDG\_ADDGH
+   ndgWriteVotProv
 }{
-   Register a GRP group for GRP NDF history recording
+   Write provenance information out to a VOTABLE
 }{
    \sstdescription{
-      This routine should be called to indicate that the contents of the
-      supplied GRP group should be included in the default History
-      information written out by the NDF library. It returns without
-      action unless a GRP NDF history block has previously been created
-      by calling NDG\_BEGGH.
+      This function writes the contents of the supplied provenance
+      structure out as a text string holding an XML snippet suitable
+      for inclusion in a VOTABLE.
    }
    \sstinvocation{
-      CALL NDG\_ADDGH( PARAM, IGRP, STATUS )
+      const char $*$ndgWriteVotProv( NdgProvenance $*$prov, int $*$status )
    }
    \sstarguments{
       \sstsubsection{
-         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+         prov
       }{
-         The name of the parameter associated with the group.
+         A pointer to the provenance information to be written out.
       }
       \sstsubsection{
-         IGRP = INTEGER (Given)
-      }{
-         The GRP group identifier.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
+         status
       }{
          The global status.
       }
    }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The group is registered only if the current value of the
-         associated parameter contains an {\tt "}INDIRECTION{\tt "} or {\tt "}NAME\_TOKEN{\tt "}
-         control character (see SUN/150). This prevents group descriptions
-         being added to the NDF history if the contents of the group are
-         already described fully by the parameters list.
-
-         \sstitem
-         This routine records a copy of the group contents at the time
-         this routine is called. Any subsequent changes to the contents of
-         the group are not included in the default NDF history.
-
-         \sstitem
-         This routine can be invoked multiple times for the same parameter.
-         Later invocations will replace the group contents registered by
-         earlier invocations.
+   \sstreturnedvalue{
+      \sstsubsection{
+         A pointer to a dyamically allocated string holding the XML text, or
+      }{
+      }
+      \sstsubsection{
+         NULL if an error occurs. The string should be freed using astFree
+      }{
+      }
+      \sstsubsection{
+         when it is no longer needed. The text will contain a single top
+      }{
+      }
+      \sstsubsection{
+         level element with the following opening tag:
+      }{
+         {\tt "}$<$GROUP name={\tt "}PROVENANCE{\tt "} utype={\tt "}hds\_type:PROVENANCE{\tt "}$>${\tt "}
+      }
+      \sstsubsection{
+         The HDS structure of an NDF PROVENANCE extension is replicated
+      }{
+      }
+      \sstsubsection{
+         using PARAM elements to hold primitive values and GROUP elements to
+      }{
+      }
+      \sstsubsection{
+         hold structures. The {\tt "}utype{\tt "} attributes are used to hold the
+      }{
+      }
+      \sstsubsection{
+         corresponding HDS data types.
+      }{
       }
    }
 }
-\sstroutine{
-   NDG\_BEGGH
-}{
-   Begin a GRP NDF history block
-}{
-   \sstdescription{
-      This routine should be called to mark the start of a GRP NDF
-      history block. The block should be ended by a matching
-      call to NDG\_ENDGH. See NDG\_ENDGH for more details.
 
-      Note - GRP NDF history blocks must not be nested.
-   }
-   \sstinvocation{
-      CALL NDG\_BEGGH( STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   NDG\_ENDGH
-}{
-   End a GRP NDF history block
-}{
-   \sstdescription{
-      This routine should be called to mark the end of a GRP NDF
-      history block. The block should have been started by a
-      matching call to NDG\_BEGGH. Note, GRP NDF history blocks must
-      not be nested.
 
-      During a GRP NDF history block, application code can register GRP
-      groups using routine NDG\_ADDGH. When default history information is
-      written to any NDF, a handler routine is called that adds a new
-      history record to the NDF for each currently registered GRP group.
-      The new history record identifies the ADAM parameter with which the
-      group is associated, and lists the contents of the group (as it
-      existed at the time the group was registered - any subsequent changes
-      to the group contents are ignored).
-   }
-   \sstinvocation{
-      CALL NDG\_ENDGH( STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
-   NDG\_HLTGH
-}{
-   Temporarily halt a GRP history block
-}{
-   \sstdescription{
-      This routine can be called to stop subseqently accessed NDFs
-      being added to the list of NDFs that will receive extra history
-      holding GRP group contents when NDG\_ENDGH is called to end the
-      current GRP history block.
+\section{Changes Introduced in NDG Version 7.0}
+\begin{itemize}
+   \item After provenance has been read into memory using ndgReadProv,
+   any extra information associated with an ancestor NDF via the ``MORE''
+   component is now stored in an AST KeyMap rather than a temporary HDS
+   structure.
 
-      In addition, if the GRP history block is halted, this routine will
-      ensure that the AUTO\_HISTORY tuning parameter used by the NDF
-      library is set to zero, thus preventing the automatic creation of
-      History components in any new NDFs. When the block is un-halted
-      this tuning parameter is set back to the value it had at the time
-      the block was halted.
-   }
-   \sstinvocation{
-      CALL NDG\_HLTGH( NEW, OLD, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         NEW = LOGICAL (Read)
-      }{
-         The new required GRP history-recording state.
-      }
-      \sstsubsection{
-         OLD = LOGICAL (Returned)
-      }{
-         The GRP history-recording state on entry to this routine.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
+   \emph{NOTE, THIS HAS REQUIRED CHANGES TO THE API OF THREE FUNCTIONS:
+   ndgGetProv, ndgPutProv and ndgModifyProv. THESE FUNCTIONS NO LONGER
+   HAVE A HDS LOCATOR ARGUMENT. In addition, ndgAntmp has been withdrawn.}
 
-         \sstitem
-         A .FALSE. GRP history-recording state means that any subseqently
-         accessed NDFs will not be added to the list of NDFs to receive
-         extra history holding GRP group contents when NDG\_ENDPV is called.
-
-         \sstitem
-         A .TRUE. GRP history-recording state means that any subseqently
-         accessed NDFs are added to the list of NDFs to receive  extra
-         history holding GRP group contents when NDG\_ENDPV is called.
-      }
-   }
-}
-\sstroutine{
-   NDG\_HWRGH
-}{
-   Write GRP history to an NDF
-}{
-   \sstdescription{
-      This routine appends a description of each currently registered GRP
-      group to the current History record in the supplied NDF. See
-      NDF\_ENDGH. It returns without action if 1) the NDF library has not
-      yet written a default history record to the NDF, or 2) GRP history
-      has already been written to the NDF.
-   }
-   \sstinvocation{
-      CALL NDG\_HWRGH( INDF, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INDF = INTEGER (Given)
-      }{
-         The NDF identifier.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
+   \item The format in which provenance information is stored within an
+   NDF PROVENANCE extension has changed. Any ``MORE'' information is now
+   included in the opaque array of integers containing all the other
+   information, rather than being stored in a separate HDS structure.
+   Version 7 of NDG will read all earlier formats of provenance
+   information but always writes the new format.
+\end{itemize}
 
 \section{Changes Introduced in NDG Version 5.8}
 \begin{itemize}

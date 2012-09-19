@@ -173,7 +173,7 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
    NDF itself) to see if any of them refer to the same OBSIDSS value. */
       found = 0;
       ianc = 0;
-      anc = ndgGetProv( prov, ianc, NULL, status );
+      anc = ndgGetProv( prov, ianc, status );
       while( anc ) {
          if( astMapGet0A( anc, "MORE", &tkm ) ) {
             if( astMapGet0C( tkm, "OBSIDSS", &vptr ) ) {
@@ -182,7 +182,7 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
             tkm = astAnnul( tkm );
          }
          anc = astAnnul( anc );
-         if( ! found ) anc = ndgGetProv( prov, ++ianc, NULL, status );
+         if( ! found ) anc = ndgGetProv( prov, ++ianc, status );
       }
 
 /* If the OBSIDSS value was not found in any ancestor, then we add it
@@ -209,7 +209,7 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
        oprov = ndgReadProv( ondf, creator, status );
        if (modprov) *modprov = oprov;
      }
-     ndgPutProv( oprov, indf, NULL, tkm, isroot, status );
+     ndgPutProv( oprov, indf, tkm, isroot, status );
      /* do not update the file or free provenance if we
         are using an external provenance struct or returning
         it to the caller */

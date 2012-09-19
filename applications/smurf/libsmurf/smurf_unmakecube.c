@@ -480,7 +480,7 @@ void smurf_unmakecube( int *status ) {
 
 /* Record details of the template in the provenance structure for the
    output time series. */
-      ndgPutProv( oprov, data->file->ndfid, NULL, NULL, 0, status );
+      ndgPutProv( oprov, data->file->ndfid, NULL, 0, status );
 
 /* Loop round all input sky cubes. */
       for( iskycube = 0; iskycube < nskycube; iskycube++ ) {
@@ -488,7 +488,7 @@ void smurf_unmakecube( int *status ) {
 
 /* Record details of the input cube in the provenance extension of the
    output time series. */
-         ndgPutProv( oprov, skycube->indf, NULL, NULL, 0, status );
+         ndgPutProv( oprov, skycube->indf, NULL, 0, status );
 
 /* See if the current time series overlaps the current sky cube. */
          smf_resampcube( data, skycube->abskyfrm,

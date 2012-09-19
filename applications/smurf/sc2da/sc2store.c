@@ -1577,7 +1577,7 @@ int *status              /* global status (given and returned) */
 
 /* Sort out provenance. This is by definition a root of the provenance tree */
       prov = ndgReadProv( uindf, creator, status );
-      ndgPutProv( prov, sc2store_indf, NULL, pkm, 1, status );
+      ndgPutProv( prov, sc2store_indf, pkm, 1, status );
       ndgWriteProv( prov, uindf, 0, status );
       prov = ndgFreeProv( prov, status );
 

@@ -120,6 +120,9 @@
 *     22-DEC-2009 (BRADC):
 *        Handle periods in ancestor path when no file extension is
 *        given.
+*     19-SEP-2012 (DSB):
+*        Incorporate changes to the NDG API introduced at version 7 of
+*        NDG.
 *     {enter_further_changes_here}
 
 *-
@@ -171,7 +174,7 @@
       CHARACTER*8 KEYWRD         ! Header keyword
       INTEGER KMIDSS             ! AST KeyMap of OBSIDSS
       INTEGER L                  ! Used line length
-      CHARACTER*( DAT__SZLOC ) MORLOC ! Locator to MORE component
+      INTEGER MOREKM             ! KeyMap holding MORE information
       CHARACTER*68 NAME          ! Path to ancestor
       INTEGER NCNAME             ! Character length of the name
       INTEGER NHDU               ! HDU number
@@ -223,9 +226,7 @@
 
 *  Meet the direct parents.  There may not be any. Annul any MORE
 *  locator immediately since we do not need it.
-         MORLOC = DAT__NOLOC
-         CALL NDG_GETPROV( IPROV, 0, PRVKM, MORLOC, STATUS )
-         IF ( MORLOC .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORLOC, STATUS )
+         CALL NDG_GETPROV( IPROV, 0, PRVKM, STATUS )
          IF ( AST_MAPHASKEY( PRVKM, 'PARENTS', STATUS ) ) THEN
 
 *  Find the number of parent NDFs.
@@ -260,9 +261,7 @@
 
 *  Obtain the path of the current immediate ancestor. Annul any MORE
 *  locator immediately since we do not need it.
-               CALL NDG_GETPROV( IPROV, IDP, ANCKM, MORLOC, STATUS )
-               IF ( MORLOC .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORLOC,
-     :                                                       STATUS )
+               CALL NDG_GETPROV( IPROV, IDP, ANCKM, STATUS )
                IF ( .NOT. AST_MAPGET0C( ANCKM, 'PATH', PATH, L,
      :                                  STATUS ) ) THEN
                   IF( STATUS .EQ. SAI__OK ) THEN
@@ -336,15 +335,13 @@
             IDPRS = AST_MAPGET0I( KEYMAP, KEY, ID, STATUS )
 
 *  Obtain the identifier of the current immediate ancestor.
-            CALL NDG_GETPROV( IPROV, ID, ANCKM, MORLOC, STATUS )
+            CALL NDG_GETPROV( IPROV, ID, ANCKM, STATUS )
 
 *  Attempt to find the .MORE.OBSIDSS component.
             OBIPRS = .FALSE.
-            IF ( MORLOC .NE. DAT__NOLOC ) THEN
-               CALL DAT_THERE( MORLOC, 'OBSIDSS', THERE, STATUS )
-
-               IF ( THERE ) THEN
-                  CALL CMP_GET0C( MORLOC, 'OBSIDSS', OBIDSS, STATUS )
+            IF ( AST_MAPGET0A( ANCKM, 'MORE', MOREKM, STATUS ) ) THEN
+               IF ( AST_MAPGET0C( MOREKM, 'OBSIDSS', OBIDSS, L,
+     :                            STATUS ) ) THEN
                   IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Test whether or not this OBSIDSS is unique within this NDF.
@@ -374,8 +371,8 @@
                   OBIPRS = .TRUE.
                END IF
 
-*  Free the locator for the MORE component.
-               CALL DAT_ANNUL( MORLOC, STATUS )
+*  Free the identifier for the MORE keymap.
+               CALL AST_ANNUL( MOREKM, STATUS )
             END IF
 
 *  Issue warning if OBSIDSS is absent.

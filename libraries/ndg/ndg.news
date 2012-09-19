@@ -1,5 +1,22 @@
 1 NDG_library
 
+Version 7.0
+
+   o After provenance has been read into memory using ndgReadProv, any extra
+   information associated with an ancestor NDF via the "MORE" component is
+   now stored in an AST KeyMap rather than a temporary HDS structure.
+
+   NOTE, THIS HAS REQUIRED CHANGES TO THE API OF THREE FUNCTIONS:
+   ndgGetProv, ndgPutProv and ndgModifyProv. These functions no longer
+   have a HDS locator argument. In addition, ndgAntmp has been withdrawn.
+
+   o The format in which provenance information is stored within an
+   NDF PROVENANCE extension has changed. Any "MORE" information is now
+   included in the opaque array of integers containing all the other
+   information, rather than being stored in a separate HDS structure.
+   Version 7 of NDG will read all earlier formats of provenance
+   information but always writes the new format.
+
 Version 6.0
 
    o The HDS structure used to store provenance information in an NDF

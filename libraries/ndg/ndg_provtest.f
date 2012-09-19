@@ -54,8 +54,8 @@
 
 * Local Variables:
       INTEGER STATUS, INDF, IPROV, KEYMAP, N, I, KM, L, INDF2, PLACE,
-     :        NANC, ISTAT, CHR_LEN, NVAL, IVALS(20)
-      CHARACTER TEXT*500, KEY*20, LOC*(DAT__SZLOC), MORE*(DAT__SZLOC)
+     :        NANC, ISTAT, CHR_LEN, NVAL, IVALS(20), KKK
+      CHARACTER TEXT*500, KEY*20
       INTEGER IVEC(2), IVAL, NCOMP
       LOGICAL THERE
       REAL RVAL
@@ -109,7 +109,7 @@
 
       CHARACTER MORES( 14 )*60
       DATA MORES / ' ', ' ', ' ',
-     :         ' ', ' ', ' ', ' ', '211', ' ', ' ', ' ', ' ', ' ', ' ' /
+     :         ' ', ' ', ' ', ' ', '96', ' ', ' ', ' ', ' ', ' ', ' ' /
 
       DATA IVEC / 23, 34 /,
      :     DVEC /1.23D0 /,
@@ -148,11 +148,9 @@ c      call ast_watchmemory( 14182 )
 
       CALL NDF_PLACE( DAT__ROOT, 'fred.sdf', PLACE, STATUS )
       CALL NDF_COPY( INDF, PLACE, INDF2, STATUS )
-      CALL NDF_LOC( INDF2, 'READ', LOC, STATUS )
 
-      CALL NDG_PUTPROV( IPROV, INDF2, LOC, KEYMAP, .FALSE., STATUS )
+      CALL NDG_PUTPROV( IPROV, INDF2, KEYMAP, .FALSE., STATUS )
 
-      CALL DAT_ANNUL( LOC, STATUS )
       CALL AST_ANNUL( KEYMAP, STATUS )
 
       CALL NDG_COUNTPROV( IPROV, NANC, STATUS )
@@ -252,7 +250,7 @@ c      call ast_watchmemory( 14182 )
 
 * Test NDG_GETPROV
 * -------------------
-      CALL NDG_GETPROV( IPROV, 1, KM, MORE, STATUS )
+      CALL NDG_GETPROV( IPROV, 1, KM, STATUS )
 
       I = 3
 
@@ -317,8 +315,6 @@ c      call ast_watchmemory( 14182 )
 
       END IF
 
-      IF( MORE .NE. DAT__NOLOC ) CALL STOPIT( 55, STATUS)
-
 
 
 
@@ -355,7 +351,7 @@ c      call ast_watchmemory( 14182 )
       CALL NDG_COUNTPROV( IPROV, NANC, STATUS )
       IF( NANC .NE. 10 ) CALL STOPIT( 197, STATUS)
 
-      CALL NDG_GETPROV( IPROV, 1, KM, MORE, STATUS )
+      CALL NDG_GETPROV( IPROV, 1, KM, STATUS )
 
       IF( .NOT. AST_MAPGET0C( KM, 'PATH', CVAL, L, STATUS ) ) THEN
          CALL STOPIT( 198, STATUS )
@@ -373,10 +369,9 @@ c      call ast_watchmemory( 14182 )
       END IF
 
       CALL AST_ANNUL( KM, STATUS )
-      CALL NDG_ANTMP( MORE, STATUS )
 
 
-      CALL NDG_GETPROV( IPROV, IVALS( 1 ), KM, MORE, STATUS )
+      CALL NDG_GETPROV( IPROV, IVALS( 1 ), KM, STATUS )
 
       IF( .NOT. AST_MAPGET0C( KM, 'PATH', CVAL, L, STATUS ) ) THEN
          CALL STOPIT( 202, STATUS )
@@ -391,16 +386,14 @@ c      call ast_watchmemory( 14182 )
       END IF
 
       CALL AST_ANNUL( KM, STATUS )
-      CALL NDG_ANTMP( MORE, STATUS )
 
 
 * Test NDG_WRITEPROV
 * -----------------
-      CALL NDG_GETPROV( IPROV, 1, KM, MORE, STATUS )
+      CALL NDG_GETPROV( IPROV, 1, KM, STATUS )
       CALL AST_MAPREMOVE( KM, 'MORE', STATUS )
       CALL NDG_MODIFYPROV( IPROV, 1, KM, DAT__NOLOC, STATUS )
       CALL AST_ANNUL( KM, STATUS )
-      CALL NDG_ANTMP( MORE, STATUS )
 
       CALL NDG_WRITEPROV( IPROV, INDF2, .FALSE., STATUS )
       IF( IPROV .EQ. NDG__NULL ) CALL STOPIT( 206, STATUS )
@@ -413,7 +406,7 @@ c      call ast_watchmemory( 14182 )
       CALL NDG_COUNTPROV( IPROV, NANC, STATUS )
       IF( NANC .NE. 10 ) CALL STOPIT( 208, STATUS)
 
-      CALL NDG_GETPROV( IPROV, 1, KM, MORE, STATUS )
+      CALL NDG_GETPROV( IPROV, 1, KM, STATUS )
 
       IF( .NOT. AST_MAPGET0C( KM, 'PATH', CVAL, L, STATUS ) ) THEN
          CALL STOPIT( 209, STATUS )
@@ -431,10 +424,9 @@ c      call ast_watchmemory( 14182 )
       END IF
 
       CALL AST_ANNUL( KM, STATUS )
-      CALL NDG_ANTMP( MORE, STATUS )
 
 
-      CALL NDG_GETPROV( IPROV, IVALS( 1 ), KM, MORE, STATUS )
+      CALL NDG_GETPROV( IPROV, IVALS( 1 ), KM, STATUS )
 
       IF( .NOT. AST_MAPGET0C( KM, 'PATH', CVAL, L, STATUS ) ) THEN
          CALL STOPIT( 213, STATUS )
@@ -449,7 +441,6 @@ c      call ast_watchmemory( 14182 )
       END IF
 
       CALL AST_ANNUL( KM, STATUS )
-      CALL NDG_ANTMP( MORE, STATUS )
 
 
 
@@ -514,14 +505,14 @@ c      CALL AST_ACTIVEMEMORY( ' ' )
       include 'DAT_PAR'
       include 'AST_PAR'
       integer iprov, ianc, status, km, l, i, nval, ivals(20)
-      character more*(dat__szloc), text*200, label*(*)
+      character text*200, label*(*)
 
       if( status .ne. sai__ok ) return
 
       write(*,*) ' '
       write(*,*) label,' anc ',ianc
 
-      CALL NDG_GETPROV( IPROV, ianc, KM, MORE, STATUS )
+      CALL NDG_GETPROV( IPROV, ianc, KM, STATUS )
 
       IF( AST_MAPGET0C( KM, 'PATH', TEXT, L, STATUS ) ) THEN
          write(*,*) 'PATH: ',text( : l )
@@ -547,7 +538,6 @@ c      CALL AST_ACTIVEMEMORY( ' ' )
          write(*,*) 'PARENTS: '
       END IF
 
-      CALL NDG_ANTMP( MORE, STATUS )
       CALL AST_ANNUL( KM, STATUS )
 
       END

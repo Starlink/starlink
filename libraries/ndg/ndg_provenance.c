@@ -271,6 +271,11 @@
 *         the two Provs being compared. But the order is arbitrary.
 *      4-JAN-2012 (DSB):
 *         Added ndgAddProv/NDF_ADDPROV.
+*      17-SEP-2012 (DSB):
+*         Use KeyMaps instead of HDS to store the MORE information for
+*         each ancestor. This limits what can be stored a little but
+*         should speed up access a lot on some file systems. This required
+*         a change in the API for ndgPutProv, ndgGetProv and ndgModifyProv.
 */
 
 
@@ -314,9 +319,13 @@
 #define FNV1_32_INIT ( (unsigned int) 0x811c9dc5 )
 #define FNV_32_PRIME ( (unsigned int) 0x01000193 )
 
-/* The current version number for the structure used to encode Provenance
-   information in an HDS _INTEGER array. */
-#define PDATA_VERSION 1
+/* The version number for the HDS Provenance encoding scheme that used
+   HDS structures to store the MORE information. */
+#define PDATA_VERSION_HDSMORE 1
+
+/* The current version number for the HDS Provenance encoding scheme that
+   uses AST KeyMap to store the MORE information. */
+#define PDATA_VERSION 2
 
 /* "int" value used to flag the end of the encoded provenance data */
 #define END_FLAG -123456789
@@ -364,6 +373,15 @@ static int history_length = 0;
 
 /* Type Definitions. */
 /* ----------------- */
+/* A structure that stores a pointer to a dynamic memory area and its
+   length. It is is used to communicate with source and sink functions used
+   by the AstChannel class. */
+typedef struct ChanData {
+   char *mem;
+   int memsize;
+   char *linebuffer;
+} ChanData;
+
 /* A structure that stores history information for a single ancestor.
    These are just the same as the corresponding fields in the NDF
    history record.  */
@@ -385,8 +403,8 @@ typedef struct Prov {
                                   at which the NDF's provenance was recorded */
    char *creator;              /* String describing the software that created
                                   the NDF */
-   HDSLoc *more;               /* A temporary HDS object holding a copy
-                                  of the MORE structure describing the NDF */
+   AstKeyMap *more;            /* A KeyMap holding extra information about the
+                                  NDF */
    struct Prov **parents;      /* Array of pointers to the Prov structures for
                                   the direct parents of the NDF */
    struct Prov **children;     /* Array of pointers to the Prov structures for
@@ -423,28 +441,32 @@ typedef struct Provenance {
 /* Prototypes for Private Functions. */
 /* --------------------------------- */
 static AstKeyMap *ndg1FormatProv( Provenance *, int, int, AstKeyMap *, int * );
+static AstKeyMap *ndg1Hd2ky( HDSLoc *, int * );
 static AstKeyMap *ndg1ShowProv( Prov *, int, AstKeyMap *, FILE *, int * )__attribute__((unused));
+static AstObject *ndg1ReadObject( char *, int *, int * );
 static HDSLoc *ndg1GtAnc( HDSLoc *, size_t *, int * );
-static HDSLoc *ndg1TCopy( HDSLoc *, int * );
 static HDSLoc *ndg1Temp( const char *, int, int *, int * );
 static NdgProvenance *ndg1Encode( Provenance *, int * );
 static Prov *ndg1CopyProv( Prov *, int * );
 static Prov *ndg1FreeProv( Prov *, int * );
-static Prov *ndg1MakeProv( int, const char *, const char *, const char *, int, HDSLoc *, AstKeyMap *, Provenance *, int, int * );
+static Prov *ndg1MakeProv( int, const char *, const char *, const char *, int, AstKeyMap *, Provenance *, int, int * );
 static Provenance *ndg1Decode( NdgProvenance *, const char *, int * );
 static Provenance *ndg1FreeProvenance( Provenance *, int, int * );
 static Provenance *ndg1MakeProvenance( Prov *, int * );
-static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *, const char *, HDSLoc *, AstKeyMap *, const char *, int, int * );
-static Provenance *ndg1ReadProvenanceExtension( HDSLoc *, const char *, HDSLoc *, AstKeyMap *, const char *, int, int * );
+static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *, const char *, AstKeyMap *, const char *, int, int * );
+static Provenance *ndg1ReadProvenanceExtension( HDSLoc *, const char *, AstKeyMap *, const char *, int, int * );
+static Provenance *ndg1ReadProvenanceNDF( int, AstKeyMap *, const char *, int, int * );
 static Provenance *ndg1ReadProvenanceXml( const char *, const char *, const char *, int * );
-static Provenance *ndg1ReadProvenanceNDF( int, HDSLoc *, AstKeyMap *, const char *, int, int * );
 static char *ndg1DecodeProvData( char *, int, int, HDSLoc *, size_t, Provenance *, int * );
-static char *ndg1EncodeProvData( char *, int, Prov *, Provenance *, size_t *, HDSLoc ***, hdsdim *, int * );
+static char *ndg1EncodeProvData( char *, int, Prov *, Provenance *, size_t *, int * );
 static char *ndg1GetTextComp( HDSLoc *, const char *, char *, size_t, int * );
 static char *ndg1StoreCharData( char *, const void *, size_t, size_t *, int * );
+static char *ndg1StoreObject( char *, AstObject *, size_t *, int * );
 static char ndg1XmlSource( void *, int * );
+static const char *ndg1ChSource( void );
 static const char *ndg1Date( int * );
 static const char *ndg1WriteProvenanceXml( Provenance *, int * );
+static char *ndg1KeyMapSummary( AstKeyMap *, int, int *, int * );
 static int *ndg1ParentIndicies( Prov *, Provenance *, int *, int *, int * );
 static int ndg1CheckSameParents( Prov *, Prov *, int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
@@ -455,23 +477,21 @@ static int ndg1IsWanted( AstXmlElement *, int * );
 static int ndg1ProvCmp( const void *, const void * );
 static int ndg1TheSame( Prov *, Prov *, int * );
 static unsigned int ndg1HashFun( const char *,  unsigned int, int * );
-static void ndg1A2h( AstKeyMap *, HDSLoc *, int * );
 static void ndg1AddHistKM( AstKeyMap *, const char *, Prov *, int * );
+static void ndg1Antmp( HDSLoc **, int * );
 static void ndg1Check( const char *, Prov *, AstKeyMap *, int * )__attribute__((unused));
 static void ndg1ClearProvId( Prov *, int * );
-static void ndg1CopyComps( HDSLoc *, HDSLoc *, int * );
+static void ndg1ChSink( const char * );
 static void ndg1Disown( Prov *, Prov *, int * );
 static void ndg1FindAliens( Prov *, int * );
-static void ndg1H2a( HDSLoc *, AstKeyMap *, int * );
 static void ndg1Hout1( int, char *const[], int * );
 static void ndg1ParentChild( Prov *, Prov *, int, int * );
 static void ndg1ParentChildIndex( Provenance *, int, int, int, int * );
 static void ndg1PurgeProvenance( Provenance *, int * );
-static void ndg1PutTextComp( HDSLoc *, const char *, const char *, int * );
 static void ndg1ReadHistRec( Prov *, int, int, int *, int * );
 static void ndg1ResetIndices( Provenance *, int * );
 static void ndg1Rmprv( Provenance *, int, int * );
-static void ndg1StoreMore( Prov *, HDSLoc *, AstKeyMap *, int * );
+static void ndg1StoreMore( Prov *, AstKeyMap *, int * );
 static void ndg1WriteProvenanceExtension( Provenance *, HDSLoc *, int * );
 static void ndg1WriteProvenanceNDF( Provenance *, int, int, int * );
 
@@ -555,47 +575,6 @@ F77_SUBROUTINE(ndg_addprov)( INTEGER(indf), CHARACTER(fcreator), INTEGER(nndf),
    creator = cnfCreim( fcreator, fcreator_length );
    ndgAddProv( *indf, creator, *nndf, ndfs, status );
    cnfFree( creator );
-}
-
-F77_SUBROUTINE(ndg_antmp)( CHARACTER(floc), INTEGER(status) TRAIL(floc) ){
-/*
-*+
-*  Name:
-*     NDG_ANTMP
-
-*  Purpose:
-*     Erase a temporary HDS object created by the NDG library.
-
-*  Language:
-*     Starlink ANSI C (callable from Fortran)
-
-*  Invocation:
-*     CALL NDG_ANTMP( LOC, STATUS )
-
-*  Description:
-*     The routine annuls a locator to a temporary object created by the
-*     NDG library, thereby causing the associated object to be erased and
-*     the file space associated with it to be released.
-
-*  Arguments:
-*     LOC = CHARACTER * (DAT__SZLOC) (Given and Returned)
-*        An HDS locator for a temporary object created by NDG. The
-*        locator is set to DAT__NOLOC on exit. The routine returns without
-*        action if the supplied locator is DAT__NOLOC.
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
-*-
-*/
-
-   GENPTR_CHARACTER(floc)
-   GENPTR_INTEGER(status)
-   HDSLoc *loc = NULL;
-
-   if( strncmp( DAT__NOLOC, floc, floc_length) ){
-      datImportFloc( floc, floc_length, &loc, status );
-      ndgAntmp( &loc, status );
-   }
 }
 
 F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(cleanse),
@@ -817,8 +796,7 @@ F77_SUBROUTINE(ndg_freeprov)( INTEGER(iprov), INTEGER(status) ){
 }
 
 F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
-                             INTEGER(km), CHARACTER(fmore),
-                             INTEGER(status) TRAIL(fmore) ){
+                             INTEGER(km), INTEGER(status) ){
 /*
 *+
 *  Name:
@@ -831,7 +809,7 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
 *     Starlink ANSI C (callable from Fortran)
 
 *  Invocation:
-*     CALL NDG_GETPROV( IPROV, IANC, KM, MORE, STATUS )
+*     CALL NDG_GETPROV( IPROV, IANC, KM, STATUS )
 
 *  Description:
 *     This routine returns information about a specified ancestor in the
@@ -860,11 +838,8 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
 *          ancestor NDF.
 *        - "PARENTS": A 1D vector of integers that are the indices of the
 *          immediate parents of the ancestor.
-*        - "MORE": A KeyMap containing any scalar or vector primitive
-*          values stored at the top level of the associated HDS MORE
-*          structure. The HDS name of the component is used as the key.
-*          The full contents of the MORE structure are returned by the
-*          MORE argument (see above).
+*        - "MORE": A KeyMap containing any extra information that has
+*          been stored with the ancestor.
 *        - "HISTORY": A vector entry holding one or more KeyMaps. Each
 *          KeyMap contains items that describe an action performed on
 *          the ancestor. The actions are stored in chronological order
@@ -896,14 +871,6 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
 *        either by calling astAnnul explicitly, or by relying on astEnd
 *        to annul it (together with all the other AST Objects created in
 *        the current AST Object context).
-*     MORE = CHARACTER * (DAT__SZLOC) (Returned)
-*        A locator for a temporary HDS object containing a full deep copy
-*        of each component of the MORE structure associated with the
-*        requested ancestor. The returned locator should be freed using
-*        NDG_ANTMP when no longer needed. A value of DAT__NOLOC will be
-*        returned if the requested ancestor has no MORE component. Note,
-*        the returned object will be assigned an arbitrary HDS Name, which
-*        will not in general be "MORE".
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -912,12 +879,9 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
    GENPTR_INTEGER(iprov)
    GENPTR_INTEGER(ianc)
    GENPTR_INTEGER(km)
-   GENPTR_CHARACTER(fmore)
    GENPTR_INTEGER(status)
-   HDSLoc *more = NULL;
 
-   *km = astP2I( ndgGetProv( astI2P( *iprov ), *ianc, &more, status ) );
-   datExportFloc( &more, 0, fmore_length, fmore, status );
+   *km = astP2I( ndgGetProv( astI2P( *iprov ), *ianc, status ) );
 }
 
 F77_SUBROUTINE(ndg_hideprov)( INTEGER(iprov), INTEGER(ianc),
@@ -1000,7 +964,7 @@ F77_SUBROUTINE(ndg_ishiddenprov)( INTEGER(iprov), INTEGER(ianc),
 }
 
 F77_SUBROUTINE(ndg_modifyprov)( INTEGER(iprov), INTEGER(ianc), INTEGER(km),
-                                CHARACTER(fmore), INTEGER(status) TRAIL(fmore) ){
+                                INTEGER(status) ){
 /*
 *+
 *  Name:
@@ -1013,7 +977,7 @@ F77_SUBROUTINE(ndg_modifyprov)( INTEGER(iprov), INTEGER(ianc), INTEGER(km),
 *     Starlink ANSI C (callable from Fortran)
 
 *  Invocation:
-*     CALL NDG_MODIFYPROV( IPROV, IANC, KM, MORE, STATUS )
+*     CALL NDG_MODIFYPROV( IPROV, IANC, KM, STATUS )
 
 *  Description:
 *     This routine modifies the information stored for a given ancestor
@@ -1040,31 +1004,16 @@ F77_SUBROUTINE(ndg_modifyprov)( INTEGER(iprov), INTEGER(ianc), INTEGER(km),
 *          recorded.
 *        - "CREATOR": A string identifying the software that created the
 *          ancestor NDF.
-*        - "MORE": A KeyMap containing extra information to store at the
-*        top level of the MORE component for the ancestor. Only entries
-*        holding primitive data values (scalar or vector) are used -
-*        entries holding nested KeyMaps, etc, are ignored. If an entry in
-*        this KeyMap has the same name as a component in the supplied
-*        MORE HDS structure, then the KeyMap value is used in preference to
-*        the HDS value.
+*        - "MORE": A KeyMap containing extra information to store with
+*          the ancestor.
 *
-*        If the "DATE" or "CREATOR" components are missing then the
+*        If the "DATE", "CREATOR" or "MORE" components are missing then
 *        corresponding item of information will be deleted from the
-*        provenance extension. To delete the "MORE" component in the
-*        provenance extension, supply a KeyMap without a MORE entry, and
-*        also supply DAT_NOLOC for the "more" argument. An error is
-*        reported if the supplied KeyMap has no "PATH" entry. Note, the
-*        PARENTS list and HISTORY information stored with the specified
-*        ancestor cannot be modified (any "PARENTS" or "HISTORY"
-*        component in the supplied HDS structure will be ignored).
-*     MORE = CHARACTER * (DAT__SZLOC) (Given)
-*        A locator for an HDS object containing additional information to
-*        be associated with the requested ancestor. DAT__NOLOC may be
-*        supplied for this argument. The contents of the MORE component
-*        in the provenance extension will be the union of any structure
-*        supplied through this argument, and any values supplied through
-*        the MORE entry in the supplied KeyMap. If the same component
-*        name occurs in both, then the KeyMap value takes precedence.
+*        provenance extension. An error is reported if the supplied KeyMap
+*        has no "PATH" entry. Note, the PARENTS list and HISTORY information
+*        stored with the specified ancestor cannot be modified (any "PARENTS"
+*        or "HISTORY" component in the supplied HDS structure will be
+*        ignored).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 *-
@@ -1072,23 +1021,15 @@ F77_SUBROUTINE(ndg_modifyprov)( INTEGER(iprov), INTEGER(ianc), INTEGER(km),
    GENPTR_INTEGER(iprov)
    GENPTR_INTEGER(ianc)
    GENPTR_INTEGER(km)
-   GENPTR_CHARACTER(fmore)
    GENPTR_INTEGER(status)
-   HDSLoc *more = NULL;
 
    if( *status != SAI__OK ) return;
-
-   if( strncmp( DAT__NOLOC, fmore, fmore_length) ){
-      datImportFloc( fmore, fmore_length, &more, status );
-   }
-
-   ndgModifyProv( astI2P( *iprov ), *ianc, astI2P( *km ), more, status );
+   ndgModifyProv( astI2P( *iprov ), *ianc, astI2P( *km ), status );
 
 }
 
-F77_SUBROUTINE(ndg_putprov)( INTEGER(iprov), INTEGER(indf), CHARACTER(fmore),
-                             INTEGER(more2), LOGICAL(isroot), INTEGER(status)
-                             TRAIL(fmore) ){
+F77_SUBROUTINE(ndg_putprov)( INTEGER(iprov), INTEGER(indf), INTEGER(more),
+                             LOGICAL(isroot), INTEGER(status) ){
 /*
 *+
 *  Name:
@@ -1101,7 +1042,7 @@ F77_SUBROUTINE(ndg_putprov)( INTEGER(iprov), INTEGER(indf), CHARACTER(fmore),
 *     Starlink ANSI C (callable from Fortran)
 
 *  Invocation:
-*     CALL NDG_PUTPROV( IPROV, INDF, MORE, MORE2, ISROOT, STATUS )
+*     CALL NDG_PUTPROV( IPROV, INDF, MORE, ISROOT, STATUS )
 
 *  Description:
 *     This routine modifies the supplied provenance structure to indicate
@@ -1115,17 +1056,10 @@ F77_SUBROUTINE(ndg_putprov)( INTEGER(iprov), INTEGER(indf), CHARACTER(fmore),
 *     INDF = INTEGER (Given)
 *        An identifier for an NDF that is to be added into the list of
 *        ancestor NDFs in the supplied provenance information.
-*     MORE = CHARACTER * (DAT__SZLOC) (Given)
-*        A locator for an HDS structure containing arbitrary additional
-*        information about the new ancestor NDF, and how it was used in the
-*        creation of the output NDF.
-*     MORE2 = INTEGER (Given)
-*        A pointer to an AstKeyMap holding extra items of information
-*        to be added into the MORE component. Only entries holding primitive
-*        data values (scalar or vector) are used - entries holding nested
-*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same
-*        name as a component in the supplied MORE HDS structure, then the
-*        KeyMap value is used in preference to the HDS value.
+*     MORE = INTEGER (Given)
+*        A pointer to an AstKeyMap holding arbitrary additional information
+*        about the new ancestor NDF, and how it was used in the creation of
+*        the output NDF.
 *     ISROOT = LOGICAL (Given)
 *        If TRUE, then the new ancestor NDF will be treated as a root
 *        NDF. That is, any provenance information in the supplied NDF is
@@ -1138,19 +1072,12 @@ F77_SUBROUTINE(ndg_putprov)( INTEGER(iprov), INTEGER(indf), CHARACTER(fmore),
 */
    GENPTR_INTEGER(iprov)
    GENPTR_INTEGER(indf)
-   GENPTR_CHARACTER(fmore)
-   GENPTR_INTEGER(more2)
+   GENPTR_INTEGER(more)
    GENPTR_LOGICAL(isroot)
    GENPTR_INTEGER(status)
-   HDSLoc *more = NULL;
 
    if( *status != SAI__OK ) return;
-
-   if( strncmp( DAT__NOLOC, fmore, fmore_length) ){
-      datImportFloc( fmore, fmore_length, &more, status );
-   }
-
-   ndgPutProv( astI2P( *iprov ), *indf, more, astI2P( *more2 ),
+   ndgPutProv( astI2P( *iprov ), *indf, astI2P( *more ),
                F77_ISTRUE( *isroot ), status );
 }
 
@@ -1485,7 +1412,7 @@ void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs,
 /*
 *+
 *  Name:
-*     ndgPutProv
+*     ndgAddProv
 
 *  Purpose:
 *     Record multiple input NDFs as ancestors in an output NDF.
@@ -1537,7 +1464,7 @@ void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs,
 /* Loop round, adding each input NDF as an ancestor into the output
    provenance info. */
    for( i = 0; i < nndf; i++ ) {
-      ndgPutProv( prov, ndfs[ i ], NULL, NULL, 0, status );
+      ndgPutProv( prov, ndfs[ i ], NULL, 0, status );
    }
 
 /* Write the provenance info back out to the output NDF. Ensure default
@@ -1546,64 +1473,6 @@ void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs,
 
 /* Free the provenance info. */
    prov = ndgFreeProv( prov, status );
-}
-
-void ndgAntmp( HDSLoc **loc, int *status ){
-/*
-*+
-*  Name:
-*     ndgAntmp
-
-*  Purpose:
-*     Erase a temporary HDS object created by the NDG library.
-
-*  Invocation:
-*     void ndgAntmp( HDSLoc **loc, int *status )
-
-*  Description:
-*     The function annuls a locator to a temporary object created by the
-*     NDG library, thereby causing the associated object to be erased and
-*     the file space associated with it to be released.
-
-*  Arguments:
-*     loc
-*        Address of a pointer to an HDS locator for a temporary object
-*        created by NDG. The pointer is returned set to NULL. The
-*        function returns without action if a NULL address or pointer
-*        is supplied.
-*     status
-*        The global status.
-
-*-
-*/
-
-/* Local variables: */
-   HDSLoc *locp = NULL;          /* Locator to parent object */
-   char name[ DAT__SZNAM + 1 ];  /* Name of object to be erased */
-
-/* Check a pointer was supplied. */
-   if( !loc || !*loc ) return;
-
-/* Begin a new error reporting context. */
-   errBegin( status );
-
-/* Find the temporary object's name. */
-   datName( *loc, name, status );
-
-/* Find its parent. */
-   datParen( *loc, &locp, status );
-
-/* Annul the object's locator. */
-   datAnnul( loc, status );
-
-/* Erase the object. */
-   datErase( locp, name, status );
-
-/* Annul the parent's locator. */
-   datAnnul( &locp, status );
-
-/* End the error reporting context. */
-   errEnd( status );
 }
 
 NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, int *status ){
@@ -2008,8 +1877,7 @@ NdgProvenance *ndgFreeProv( NdgProvenance *prov, int *status ){
    return prov;
 }
 
-AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
-                       int *status ){
+AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, int *status ){
 /*
 *+
 *  Name:
@@ -2019,8 +1887,7 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 *     Create a KeyMap holding information about an ancestor.
 
 *  Invocation:
-*     result = ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
-*                          int *status )
+*     result = ndgGetProv( NdgProvenance *prov, int ianc, int *status )
 
 *  Description:
 *     This function returns information about a specified ancestor in the
@@ -2037,16 +1904,6 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 *        read. Otherwise, the "ianc" value is used as an index into the
 *        ANCESTORS array. No error is reported if "ianc" is too large, but a
 *        NULL pointer will be returned as the function value.
-*     more
-*        The location at which to return a pointer to a locator for a
-*        temporary HDS object containing a full deep copy of the MORE
-*        structure associated with the requested ancestor. The
-*        returned locator should be freed using ndgAntmp when no
-*        longer needed. A NULL pointer may be supplied for this argument
-*        if the MORE structure is not needed. A NULL pointer will be
-*        returned if the requested ancestor has no MORE component. Note,
-*        the returned object will be assigned an arbitrary HDS Name,
-*        which will not in general be "MORE".
 *     status
 *        The global status.
 
@@ -2062,11 +1919,8 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 *       ancestor NDF.
 *     - "PARENTS": A 1D vector of integers that are the indices of
 *       the immediate parents of the ancestor.
-*     - "MORE": A KeyMap containing any scalar or vector primitive
-*       values stored at the top level of the associated HDS MORE
-*       structure. The HDS name of the component is used as the key.
-*       The full contents of the MORE structure are returned by the
-*       "more" argument (see above).
+*     - "MORE": A KeyMap containing any extra information that has been
+*       stored with the ancestor.
 *     - "HISTORY": A vector entry holding one or more KeyMaps. Each
 *       KeyMap contains items that describe an action performed on
 *       the ancestor. The actions are stored in chronological order
@@ -2102,16 +1956,13 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 */
 
 /* Local variables: */
-   AstKeyMap *more2 = NULL;
+   AstKeyMap *more = NULL;
    AstKeyMap *result = NULL;
    Prov *prov1 = NULL;
    Provenance *provenance = NULL;
    int *old_status;
    int *parents;
    int npar;
-
-/* Initialise. */
-   if( more ) *more = NULL;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return result;
@@ -2147,25 +1998,16 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
          if( prov1->path ) astMapPut0C( result, PATH_NAME, prov1->path, NULL );
          if( npar ) astMapPut1I( result, PARENTS_NAME, npar, parents, NULL );
 
+/* If the ancestor has a non-empty MORE KeyMap store a deep copy of it in the
+   returned KeyMap. */
+         if( prov1->more && astMapSize( prov1->more ) > 0 ) {
+            more = astCopy( prov1->more );
+            astMapPut0A( result, MORE_NAME, more, NULL );
+            more = astAnnul( more );
+         }
+
 /* Free the parents array. */
          parents = astFree( parents );
-
-/* If the ancestor has a MORE structure... */
-         if( prov1->more ) {
-
-/* If an HDS locator for the full MORE structure is required, create a
-   temporary HDS object containing a copy of it. */
-            if( more ) *more = ndg1TCopy( prov1->more, status );
-
-/* Create a KeyMap containing the top-level primitive values in the MORE
-   structure, and add it into the returned KeyMap. */
-            more2 = astKeyMap( " " );
-            ndg1H2a( prov1->more, more2, status );
-            if( astMapSize( more2 ) > 0 ) {
-               astMapPut0A( result, MORE_NAME, more2, NULL );
-            }
-            more2 = astAnnul( more2 );
-         }
 
 /* Add a vector entry to the KeyMap holding a list of KeyMaps containing
    any history records in the ancestor. */
@@ -2321,7 +2163,7 @@ int ndgIsHiddenProv( NdgProvenance *prov, int ianc, int *status ){
 }
 
 void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
-                    HDSLoc *more, int *status ){
+                    int *status ){
 /*
 *+
 *  Name:
@@ -2332,7 +2174,7 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
 
 *  Invocation:
 *     void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
-*                         HDSLoc *more, int *status )
+*                         int *status )
 
 *  Description:
 *     This function modifies the information stored for a given ancestor
@@ -2359,38 +2201,23 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
 *          recorded.
 *        - "CREATOR": A string identifying the software that created the
 *          ancestor NDF.
-*        - "MORE": A KeyMap containing extra information to store at the
-*        top level of the MORE component for the ancestor. Only entries
-*        holding primitive data values (scalar or vector) are used -
-*        entries holding nested KeyMaps, etc, are ignored. If an entry in
-*        this KeyMap has the same name as a component in the supplied
-*        "more" HDS structure, then the KeyMap value is used in preference
-*        to the HDS value.
+*        - "MORE": A KeyMap containing extra information to store with
+*          the ancestor.
 *
-*        If the "DATE" or "CREATOR" components are missing then the
+*        If the "DATE", "CREATOR" or "MORE" components are missing then
 *        corresponding item of information will be deleted from the
-*        provenance extension. To delete the "MORE" component in the
-*        provenance extension, supply a KeyMap without a MORE entry, and
-*        also supply DAT_NOLOC for the "more" argument. An error is
-*        reported if the supplied KeyMap has no "PATH" entry. Note, the
-*        PARENTS list and HISTORY information stored with the specified
-*        ancestor cannot be modified (any "PARENTS" or "HISTORY"
-*        component in the supplied HDS structure will be ignored).
-*     more
-*        A locator for an HDS object containing additional information to
-*        be associated with the requested ancestor. A NULL pointer may be
-*        supplied for this argument The contents of the MORE component
-*        in the provenance extension will be the union of any structure
-*        supplied through this argument, and any values supplied through
-*        the MORE entry in the supplied KeyMap. If the same component
-*        name occurs in both, then the KeyMap value takes precedence.
+*        provenance extension. An error is reported if the supplied KeyMap
+*        has no "PATH" entry. Note, the PARENTS list and HISTORY information
+*        stored with the specified ancestor cannot be modified (any "PARENTS"
+*        or "HISTORY" component in the supplied HDS structure will be
+*        ignored).
 *     status
 *        The global status.
 *-
 */
 
 /* Local variables: */
-   AstKeyMap *more2 = NULL;
+   AstObject *obj = NULL;
    Prov *anc = NULL;
    Provenance *provenance = NULL;
    const char *cval = NULL;
@@ -2447,39 +2274,39 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
             anc->creator = astFree( anc->creator );
          }
 
-/* Delete any pre-existing MORE component and then, if a new one has been
-   supplied, copy it into the Provenance structure. This copies all the
-   top-level contents of "more" into the top-level of the temporary HDS
-   object. */
-         if( anc->more ) datAnnul( &(anc->more), status );
-         if( more ) {
-            anc->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
-            ndg1CopyComps( more, anc->more, status );
-         }
-
-/* If the KeyMap contains extra MORE information, add it into the HDS
-   MORE Structure. */
-         if( astMapGet0A( km, MORE_NAME, &more2 ) ){
-            if( more2 && astMapSize( more2 ) > 0 ) {
-
-/* First ensure that there is a temporary HDS object. */
-               if( !anc->more ) anc->more = ndg1Temp( TEMP_TYPE, 0, NULL,
-                                                      status );
-
-/* Now copy each primitive top-level entry in the KeyMap into a
-   corresponding component in the HDS structure. */
-               ndg1A2h( more2, anc->more, status );
+/* If the KeyMap contains a MORE component, and it is a pointer to a
+   non-empty KeyMap, store a deep copy in the Prov structure. Delete it
+   otherwise. */
+         if( astMapHasKey( km, MORE_NAME ) ) {
+            if( astMapType( km, MORE_NAME ) == AST__OBJECTTYPE ) {
+               astMapGet0A( km, MORE_NAME, &obj );
+               if( astIsAKeyMap( obj ) ) {
+                  if( astMapSize( (AstKeyMap *) obj ) > 0 ) {
+                     anc->more = astCopy( obj );
+                  } else if( anc->more ) {
+                     anc->more = astAnnul( anc->more );
+                  }
+               } else {
+                  *status = SAI__ERROR;
+                  errRepf( " ", "ndgModifyProv; Cannot modify provenance "
+                           "ancestor %d: supplied MORE component holds a "
+                           "%s (should be a KeyMap).", status, ianc,
+                           astGetC( obj, "Class" ) );
+               }
+            } else {
+               errRepf( " ", "ndgModifyProv; Cannot modify provenance "
+                        "ancestor %d: supplied MORE component does not "
+                        "hold a KeyMap.", status, ianc );
             }
-
-/* Free the KeyMap pointer. */
-            more2 = astAnnul( more2 );
+         } else if( anc->more ) {
+            anc->more = astAnnul( anc->more );
          }
 
 /* Indicate the ProvId value need to be recalculated to take account of
    the changes. */
          ndg1ClearProvId( anc, status );
 
-/* It is possioble that the changes may have resulted in the ancestor
+/* It is possible that the changes may have resulted in the ancestor
    having the same path as another ancestor. So now check for duplicated
    ancestors and purge them. */
          ndg1PurgeProvenance( provenance, status );
@@ -2498,8 +2325,8 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
    astWatch( old_status );
 }
 
-void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
-                 AstKeyMap *more2, int isroot, int *status ){
+void ndgPutProv( NdgProvenance *prov, int indf, AstKeyMap *more, int isroot,
+                 int *status ){
 /*
 *+
 *  Name:
@@ -2509,8 +2336,8 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
 *     Add an NDF to the list of ancestors.
 
 *  Invocation:
-*     ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
-*                 AstKeyMap *more2, int isroot, int *status )
+*     ndgPutProv( NdgProvenance *prov, int indf, AstKeyMap *more,
+*                 int isroot, int *status )
 
 *  Description:
 *     This function modifies the supplied provenance structure to indicate
@@ -2525,18 +2352,9 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
 *        An identifier for an NDF that is to be added into the list of
 *        ancestor NDFs in the supplied provenance information.
 *     more
-*        A locator for an HDS structure containing arbitrary additional
-*        information about the new ancestor NDF, and how it was used in the
-*        creation of the output NDF. A NULL pointer can be supplied if
-*        required.
-*     more2
-*        A pointer to an AstKeyMap holding extra items of information
-*        to be added into the MORE component. Only entries holding primitive
-*        data values (scalar or vector) are used - entries holding nested
-*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same
-*        name as a component in the supplied "more" HDS structure, then the
-*        KeyMap value is used in preference to the HDS value. A NULL pointer
-*        can be supplied if required.
+*        A pointer to an AstKeyMap holding arbitrary additional information
+*        about the new ancestor NDF, and how it was used in the creation of
+*        the output NDF. A NULL pointer can be supplied if required.
 *     isroot
 *        If non-zero, then the new ancestor NDF will be treated as a root
 *        NDF. That is, any provenance information in the supplied NDF is
@@ -2572,7 +2390,7 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
    if( provenance ) {
 
 /* Get the provenance information from the new ancestor NDF. */
-      prov2 = ndg1ReadProvenanceNDF( indf, more, more2, NULL, isroot, status );
+      prov2 = ndg1ReadProvenanceNDF( indf, more, NULL, isroot, status );
 
 /* Indicate that the "Prov" structures referred to by prov2 should be
    freed when ndgFreeProvenance is called. */
@@ -2586,7 +2404,6 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
                                       sizeof( Prov *) );
       }
       if( astOK ) {
-
 
 /* Copy history records from the NDF HISTORY component into the main
    Prov structure in "prov2". We do not copy records that were
@@ -2702,7 +2519,7 @@ NdgProvenance *ndgReadProv( int indf, const char *creator, int *status ){
 
 /* Read the provenance extension from the NDF, and encode the resulting
    "Provenance *" pointer into an opaque identifier to be returned. */
-   return ndg1Encode( ndg1ReadProvenanceNDF( indf, NULL, NULL, creator,
+   return ndg1Encode( ndg1ReadProvenanceNDF( indf, NULL, creator,
                                              0, status ), status );
 }
 
@@ -3223,165 +3040,6 @@ const char *ndgWriteVotProv( NdgProvenance *prov, int *status ){
 
 /* Private functions. */
 /* ================= */
-static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
-/*
-*  Name:
-*     ndg1A2h
-
-*  Purpose:
-*     Copy top level primitive values from an AST KeyMap to an HDS object.
-
-*  Invocation:
-*     void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status )
-
-*  Description:
-*     This routine copies top level primitive (vector or scalar) values
-*     from an AST KeyMap into a supplied HDS structure. Any AST Object
-*     pointers or generic C pointers in the KeyMap are ignored. Any
-*     pre-existing HDS component that has the name of an entry in the
-*     KeyMap is first erased.
-
-*  Arguments:
-*     keymap
-*        An AST pointer to the KeyMap.
-*     loc
-*        A locator for the HDS object into which the KeyMap contents
-*        are to be copied.
-*     status
-*        The inherited status.
-
-*/
-
-/* Local variables: */
-   HDSLoc *cloc = NULL;
-   const char *cval = NULL;
-   const char *key;
-   double dval;
-   float fval;
-   int i;
-   int ival;
-   int lenc;
-   int nval;
-   int size;
-   int there;
-   int type;
-   int veclen;
-   size_t el;
-   void *pntr;
-
-/* Check inherited status */
-   if( *status != SAI__OK ) return;
-
-/* Loop round each entry in the KeyMap. */
-   size = astMapSize( keymap );
-   for( i = 0; i < size; i++ ) {
-
-/* Get the key. the data type and the vector length for the current
-   KeyMap entry. */
-      key = astMapKey( keymap, i );
-      type = astMapType( keymap, key );
-      veclen = astMapLength( keymap, key );
-
-/* Check that the KeyMap entry holds primitive values. */
-      if( type == AST__INTTYPE || type == AST__DOUBLETYPE ||
-          type == AST__FLOATTYPE || type == AST__SINTTYPE ||
-          type == AST__STRINGTYPE ){
-
-/* Erase any pre-existing component with the same name. */
-         datThere( loc, key, &there, status );
-         if( there ) datErase( loc, key, status );
-
-/* Process each primitive data type in turn. */
-         if( type == AST__INTTYPE ){
-            if( veclen == 1 ) {
-               datNew0I( loc, key, status );
-               datFind( loc, key, &cloc, status );
-               (void) astMapGet0I( keymap, key, &ival );
-               datPut0I( cloc, ival, status );
-               datAnnul( &cloc, status );
-
-            } else {
-               datNew1I( loc, key, veclen, status );
-               datFind( loc, key, &cloc, status );
-               datMapV( cloc, "_INTEGER", "WRITE", &pntr, &el, status );
-               (void) astMapGet1I( keymap, key, veclen, &nval, (int *) pntr );
-               datUnmap( cloc, status );
-               datAnnul( &cloc, status );
-            }
-
-         } else if( type == AST__SINTTYPE ){
-            if( veclen == 1 ) {
-               short sval = 0;
-               datNew0W( loc, key, status );
-               datFind( loc, key, &cloc, status );
-               (void) astMapGet0S( keymap, key, &sval );
-               datPut0W( cloc, sval, status );
-               datAnnul( &cloc, status );
-
-            } else {
-               datNew1W( loc, key, veclen, status );
-               datFind( loc, key, &cloc, status );
-               datMapV( cloc, "_WORD", "WRITE", &pntr, &el, status );
-               (void) astMapGet1S( keymap, key, veclen, &nval, (short *) pntr );
-               datUnmap( cloc, status );
-               datAnnul( &cloc, status );
-            }
-
-         } else if( type == AST__DOUBLETYPE ){
-            if( veclen == 1 ) {
-               datNew0D( loc, key, status );
-               datFind( loc, key, &cloc, status );
-               (void) astMapGet0D( keymap, key, &dval );
-               datPut0D( cloc, dval, status );
-               datAnnul( &cloc, status );
-
-            } else {
-               datNew1D( loc, key, veclen, status );
-               datFind( loc, key, &cloc, status );
-               datMapV( cloc, "_DOUBLE", "WRITE", &pntr, &el, status );
-               (void) astMapGet1D( keymap, key, veclen, &nval, (double *) pntr );
-               datUnmap( cloc, status );
-               datAnnul( &cloc, status );
-            }
-
-         } else if( type == AST__FLOATTYPE ){
-            if( veclen == 1 ) {
-               datNew0R( loc, key, status );
-               datFind( loc, key, &cloc, status );
-               (void) astMapGet0F( keymap, key, &fval );
-               datPut0R( cloc, fval, status );
-               datAnnul( &cloc, status );
-
-            } else {
-               datNew1R( loc, key, veclen, status );
-               datFind( loc, key, &cloc, status );
-               datMapV( cloc, "_REAL", "WRITE", &pntr, &el, status );
-               (void) astMapGet1F( keymap, key, veclen, &nval, (float *) pntr );
-               datUnmap( cloc, status );
-               datAnnul( &cloc, status );
-            }
-
-         } else if( type == AST__STRINGTYPE ){
-            lenc = astMapLenC( keymap, key );
-
-            if( veclen == 1 ) {
-               (void) astMapGet0C( keymap, key, &cval );
-               ndg1PutTextComp( loc, key, cval, status );
-
-            } else {
-               datNew1C( loc, key, lenc, veclen, status );
-               datFind( loc, key, &cloc, status );
-               datMapV( cloc, "_CHAR", "WRITE", &pntr, &el, status );
-               (void) atlMapGet1C( keymap, key, veclen*lenc, lenc, &nval,
-                                   (char *) pntr, status );
-               datUnmap( cloc, status );
-               datAnnul( &cloc, status );
-            }
-         }
-      }
-   }
-}
-
 static void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov,
                            int *status ){
 /*
@@ -3460,6 +3118,62 @@ static void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov,
 /* Free the array holding the pointers. */
       vector = astFree( vector );
    }
+}
+
+static void ndg1Antmp( HDSLoc **loc, int *status ){
+/*
+*  Name:
+*     ndg1Antmp
+
+*  Purpose:
+*     Erase a temporary HDS object created by the NDG library.
+
+*  Invocation:
+*     void ndg1Antmp( HDSLoc **loc, int *status )
+
+*  Description:
+*     The function annuls a locator to a temporary object created by the
+*     NDG library, thereby causing the associated object to be erased and
+*     the file space associated with it to be released.
+
+*  Arguments:
+*     loc
+*        Address of a pointer to an HDS locator for a temporary object
+*        created by NDG. The pointer is returned set to NULL. The
+*        function returns without action if a NULL address or pointer
+*        is supplied.
+*     status
+*        The global status.
+
+*/
+
+/* Local variables: */
+   HDSLoc *locp = NULL;          /* Locator to parent object */
+   char name[ DAT__SZNAM + 1 ];  /* Name of object to be erased */
+
+/* Check a pointer was supplied. */
+   if( !loc || !*loc ) return;
+
+/* Begin a new error reporting context. */
+   errBegin( status );
+
+/* Find the temporary object's name. */
+   datName( *loc, name, status );
+
+/* Find its parent. */
+   datParen( *loc, &locp, status );
+
+/* Annul the object's locator. */
+   datAnnul( loc, status );
+
+/* Erase the object. */
+   datErase( locp, name, status );
+
+/* Annul the parent's locator. */
+   datAnnul( &locp, status );
+
+/* End the error reporting context. */
+   errEnd( status );
 }
 
 static void ndg1Check( const char *text, Prov *prov, AstKeyMap *km,
@@ -3693,6 +3407,105 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
    return result;
 }
 
+static void ndg1ChSink( const char *text ) {
+/*
+*  Name:
+*     ndg1ChSink
+
+*  Purpose:
+*     Appends the supplied line of text to dynamic memory area.
+
+*  Invocation:
+*     void ndg1ChSink( const char *text );
+
+*  Description:
+*     This function is invoked by the astWrite method to append a line of
+*     an AST Object dump to a dynamically expanding memory area. The
+*     memory area is accessed via a pointer passed in a thread-safe
+*     global variable.
+
+*  Arguments:
+*     text
+*        Pointer to a null-terminated string to be appended to the
+*        dynamic memory area.
+
+*/
+
+/* Local Variables: */
+   ChanData *data;
+
+/* Get a pointer t the structure holding information about the dynamic
+   memory area. */
+   data = (ChanData *) astChannelData;
+
+/* Expand the dynamic memory and append a copy of the supplied text. This
+   also updates the length of the dynamic memory area. */
+   data->mem = astAppendString( data->mem, &(data->memsize), text );
+
+/* Append a newline to the end so that ndg1ChSource can tell where the
+   line ends. */
+   data->mem = astAppendString( data->mem, &(data->memsize), "\n" );
+}
+
+static const char *ndg1ChSource( void ){
+/*
+*  Name:
+*     ndg1ChSource
+
+*  Purpose:
+*     Return the next line of text from an Object dump held in a dynamic
+*     memory area.
+
+*  Invocation:
+*     const char *ndg1ChSource( void )
+
+*  Description:
+*     This function is invoked by the astRead method to retrieve the next
+*     line of an AST Object dump from a dynamically expanding memory area.
+
+*  Returned Value:
+*     Pointer to a null-terminated string containing the next line from
+*     the AST Object dump.
+
+*/
+
+/* Local Variables: */
+   ChanData *data;
+   char *result;
+   const char *newline;
+   size_t len;
+
+/* Get a pointer to the structure holding information about the dynamic
+   memory area. */
+   data = (ChanData *) astChannelData;
+
+/* Find the next newline. */
+   newline = strchr( data->mem, '\n' );
+   if( newline ) {
+
+/* Get the number of characters in the first line, including the
+   newline. */
+      len = newline - data->mem + 1;
+
+/* Get a temporary copy of the line, including the newline. */
+      result = data->linebuffer = astStore( data->linebuffer, data->mem, len );
+
+/* Change the newline to a null. */
+      result[ len - 1 ] = 0;
+
+/* Increment the pointer to the next line and update the number of
+   characters read. */
+      data->mem += len;
+      data->memsize += len;
+
+/* If no newline is found, something must be wrong so return a NULL. */
+   } else {
+      result = NULL;
+   }
+
+   return result;
+}
+
 static void ndg1ClearProvId( Prov *prov, int *status ) {
 /*
 *  Name:
@@ -3741,59 +3554,6 @@ static void ndg1ClearProvId( Prov *prov, int *status ) {
       for( ichild = 0; ichild < prov->nchild; ichild++ ) {
          ndg1ClearProvId( prov->children[ ichild ], status );
       }
-   }
-}
-
-static void ndg1CopyComps( HDSLoc *loc1, HDSLoc *loc2, int *status ){
-/*
-*  Name:
-*     ndg1CopyComps
-
-*  Purpose:
-*     Copy the contents of "loc1" into "loc2".
-
-*  Invocation:
-*     void ndg1CopyComps( HDSLoc *loc1, HDSLoc *loc2, int *status )
-
-*  Description:
-*     This function copies every component from "loc1" into "loc2".
-
-*  Arguments:
-*     loc1
-*        Locator for the source object.
-*     loc2
-*        Locator for the destination object.
-*     status
-*        The global status.
-
-*/
-
-/* Local variables: */
-   HDSLoc *loc = NULL;
-   char name[ DAT__SZNAM + 1 ];
-   int icomp;
-   int ncomp;
-
-/* Check the inherited status. */
-   if( *status != SAI__OK ) return;
-
-/* Get the number of components to copy. */
-   datNcomp( loc1, &ncomp, status );
-
-/* Loop round every component. */
-   for( icomp = 1; icomp <= ncomp; icomp++ ) {
-
-/* Get a locator for the current component in the source object. */
-      datIndex( loc1, icomp, &loc, status );
-
-/* Get its name. */
-      datName( loc, name, status );
-
-/* Copy it into the destination, using the same name. */
-      datCopy( loc, loc2, name, status );
-
-/* Annull the source component locator. */
-      datAnnul( &loc, status );
    }
 }
 
@@ -3861,13 +3621,8 @@ static Prov *ndg1CopyProv( Prov *prov, int *status ){
       len = prov->creator ? strlen( prov->creator ) + 1 : 0;
       result->creator = astStore( NULL, prov->creator, len*sizeof( char ) );
 
-/* Store a deep copy of the "more" structure in a temporary HDS object.
-   This copies all the top-level contents of "more" into the top-level
-   of the temporary HDS object. */
-      if( prov->more ) {
-         result->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
-         ndg1CopyComps( prov->more, result->more, status );
-      }
+/* Store a deep copy of the "more" KeyMap. */
+      if( prov->more ) result->more = astCopy( prov->more );
 
 /* Create arrays to hold the parent and children pointers, and fill them
    with NULL pointers. */
@@ -4051,9 +3806,11 @@ static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
 *     mloc
 *        An HDS locator for an array of structures. Each structure
 *        contains extra "more" information associated with a single ancestor.
-*        May be NULL.
+*        May be NULL. Only used when decoding data created by version 6
+*        of NDG.
 *     nmore
-*        The length of the array located by "mloc".
+*        The length of the array located by "mloc". Only used when decoding
+*        data created by version 6 of NDG.
 *     provenance
 *        Pointer to the Provenance structure containing the ancestor.
 *     status
@@ -4110,8 +3867,8 @@ static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
    decoded from the integer data array. */
    prov = provenance->provs[ iprov ];
 
-/* If the data array is encoded using encoding version 1 ... */
-   if( version == 1 ) {
+/* If the data array is encoded using encoding version 1 or 2 ... */
+   if( version == 1 || version == 2 ) {
 
 /* Get the ancestor's path. */
       STORESTRING( prov->path, 2000 );
@@ -4156,21 +3913,30 @@ static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
          }
       }
 
-/* Get the index of the associated MORE structure. */
+/* Get the index of the associated MORE information. Pass on if there is no
+   associated MORE information. */
       STOREINT( imore );
-
-/* If there is an associated MORE structure, create one in the returned
-   Prov structure, and copy the components over from the supplied
-   structure. */
       if( imore >= 0 ) {
-         if( imore < nmore ) {
-            dim = imore + 1;
-            datCell( mloc, 1, &dim, &cloc, status );
-            prov->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
-            ndg1CopyComps( cloc, prov->more, status );
-            datAnnul( &cloc, status );
-         } else {
-            result = NULL;
+
+/* For version 1, MORE information is stored in a separate HDS structure. */
+         if( version == 1 ) {
+
+/* If there is an associated MORE structure, create a KeyMap holding all
+   its components and store it in the returned Prov structure. */
+            if( imore < nmore ) {
+               dim = imore + 1;
+               datCell( mloc, 1, &dim, &cloc, status );
+               prov->more = ndg1Hd2ky( cloc, status );
+               datAnnul( &cloc, status );
+            } else {
+               result = NULL;
+            }
+
+/* For version 2, MORE information is stored in KeyMap included in the
+   integer array. */
+         } else if( result ) {
+            prov->more = (AstKeyMap *) ndg1ReadObject( result, &len, status );
+            result += len;
          }
       }
 
@@ -4333,8 +4099,7 @@ static NdgProvenance *ndg1Encode( Provenance *prov, int *status ) {
 
 static char *ndg1EncodeProvData( char *pdata, int ismain, Prov *prov,
                                  Provenance *provenance,
-                                 size_t *pdlen, HDSLoc ***mores,
-                                 hdsdim *nmore, int *status ){
+                                 size_t *pdlen, int *status ){
 /*
 *  Name:
 *     ndg1EncodeProvData
@@ -4345,8 +4110,7 @@ static char *ndg1EncodeProvData( char *pdata, int ismain, Prov *prov,
 *  Invocation:
 *     char *ndg1EncodeProvData( char *pdata, int ismain, Prov *prov,
 *                               Provenance *provenance,
-*                               size_t *pdlen, HDSLoc ***mores,
-*                               hdsdim *nmore, int *status )
+*                               size_t *pdlen, int *status )
 
 *  Description:
 *     This function converts a single Prov structure into a stream of
@@ -4366,17 +4130,6 @@ static char *ndg1EncodeProvData( char *pdata, int ismain, Prov *prov,
 *     pdlen
 *        Pointer to a size of the array, in bytes. This is increased by
 *        this function to take account of the supplied Prov.
-*     mores
-*        The address of a pointer to an array of HDSLoc pointers. The
-*        length of the array is given by "*nmore". If the supplied Prov
-*        contains any MORE structures, this array is extended by the
-*        number or MORE structures in "Prov", and the new array elements
-*        are returned holding copies of the HDSLoc pointers for the MORE
-*        structures in "Prov".
-*     nmore
-*        Pointer to location at which is stored the number of HDSLoc
-*        pointers in the array identified by "mores". Updated on exit to
-*        take account of any new MORE structures found in "Prov".
 *     status
 *        Pointer to the inherited status variable.
 
@@ -4387,7 +4140,7 @@ static char *ndg1EncodeProvData( char *pdata, int ismain, Prov *prov,
 */
 
 /* Local Variables: */
-   HDSLoc *more = NULL;
+   AstKeyMap *more = NULL;
    HistRec *hist_rec = NULL;
    char *path = NULL;
    char cval;
@@ -4497,21 +4250,12 @@ static char *ndg1EncodeProvData( char *pdata, int ismain, Prov *prov,
       }
    }
 
-/* If the supplied Prov has a MORE structure, add it to the end of the
-   "mores" array, and store its index within the main returned array. */
-   if( more ) {
-      imore = (*nmore)++;
-      *mores = astGrow( *mores, *nmore, sizeof( **mores ) );
-      if( *status == SAI__OK ) {
-         (*mores)[ imore ] = more;
-      }
-
-   } else {
-      imore = -1;
-   }
-
+/* If the supplied Prov has a MORE structure, append it to the end of the
+   array. */
+   imore = more ? 1 : -1;
    result = ndg1StoreCharData( result, &imore, sizeof( imore ), pdlen,
                                status );
+   result = ndg1StoreObject( result, (AstObject *) more, pdlen, status );
 
 /* Store the number of parents. */
    result = ndg1StoreCharData( result, &(prov->nparent),
@@ -4753,26 +4497,13 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 
 /* Local Variables: */
    AstKeyMap *result = NULL;
-   HDSLoc *cloc = NULL;
-   HDSLoc *dloc = NULL;
    Prov *prov = NULL;
    char *p = NULL;
    char *list = NULL;
-   char *val = NULL;
    char buf[ 20 ];
-   char name[DAT__SZNAM+1];
-   char type[DAT__SZTYP + 1];
-   hdsdim dims[ NDF__MXDIM ];
-   int icomp;
-   int idim;
-   int iel;
    int k;
-   size_t len;
    int mxlen;
    int nc;
-   int ncomp;
-   int ndim;
-   int prim;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return result;
@@ -4889,152 +4620,24 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 /* Store the new maximum field width. */
    astMapPut0I( mxlenkey, PARENTS_NAME, mxlen, NULL );
 
-/* Initialise a pointer to a dynamic string holding the summary of the
-   MORE structure. */
-   list = NULL;
-   nc = 0;
-
 /* If the supplied Prov structure has a MORE object, create a summary
-   of it. */
+   of it, and store it in the returned KeyMap. */
    if( prov->more ) {
-
-/* See if the MORE object is primtive. */
-      datPrim( prov->more, &prim, status );
-
-/* If the MORE object is an array, we just give its type and shape. */
-      datShape( prov->more, NDF__MXDIM, dims, &ndim, status );
-      if( ndim > 0 ) {
-         datType( prov->more, type, status );
-         list = astAppendString( list, &nc, "<" );
-         list = astAppendString( list, &nc, type );
-         list = astAppendString( list, &nc, ">(" );
-         sprintf( buf, "%d", dims[ 0 ] );
-         list = astAppendString( list, &nc, buf );
-
-         for( idim = 1; idim < ndim; idim++ ) {
-            list = astAppendString( list, &nc, "," );
-            sprintf( buf, "%d", dims[ idim ] );
-            list = astAppendString( list, &nc, buf );
-         }
-         list = astAppendString( list, &nc, ")" );
-
-/* Otherwise if the MORE object is a primitive scalar, just store its value. */
-      } else if( prim ){
-         datLen( prov->more, &len, status );
-         nc = len;
-         list = astMalloc( ( nc + 1 )* sizeof( char ) );
-         datGet0C( prov->more, list, nc + 1, status );
-
-/* Otherwise the MORE object is a single structure. Loop round each of its
-   components. */
-      } else {
-         datNcomp( prov->more, &ncomp, status );
-         for( icomp = 1; icomp <= ncomp; icomp++ ) {
-            datIndex( prov->more, icomp, &cloc, status );
-
-/* Unless this is the first component, add a comma to separate this
-   component from the previous one in the summary string. */
-            if( icomp > 1 ) list = astAppendString( list, &nc, ", " );
-
-/* Get the component name and type, whether it is a primitive, and its
-   shape. */
-            datName( cloc, name, status );
-            datType( cloc, type, status );
-            datPrim( cloc, &prim, status );
-            datShape( cloc, NDF__MXDIM, dims, &ndim, status );
-
-/* If it is scalar... */
-            if( ndim == 0 ) {
-
-/* If it is primitive, display it as "name=value". */
-               if( prim ) {
-                  list = astAppendString( list, &nc, name );
-                  list = astAppendString( list, &nc, "=" );
-                  datClen( cloc, &len, status );
-                  val = astMalloc( ( len + 1 )*sizeof( char ) );
-                  datGet0C( cloc, val, len + 1, status );
-                  list = astAppendString( list, &nc, val );
-                  val = astFree( val );
-
-/* If it is a structure, display it as "name=<type>". */
-               } else {
-                  list = astAppendString( list, &nc, name );
-                  list = astAppendString( list, &nc, "=<" );
-                  list = astAppendString( list, &nc, type );
-                  list = astAppendString( list, &nc, ">" );
-               }
-
-/* If it is an array... */
-            } else {
-
-/* If it is a 1D primitive, display it as "name=(value1,value2,...)" up to a
-   maximum of 10 values. Append an ellipsis if there are more than 10
-   values. */
-               if( prim && ndim == 1 ) {
-                  list = astAppendString( list, &nc, name );
-                  list = astAppendString( list, &nc, "=(" );
-                  datClen( cloc, &len, status );
-                  val = astMalloc( ( len + 1 )*sizeof( char ) );
-
-                  for( iel = 1; iel <= dims[ 0 ]; iel++ ) {
-                     datCell( cloc, 1, (hdsdim *) &iel, &dloc, status );
-                     datGet0C( dloc, val, len + 1, status );
-
-                     if( iel > 1 ) list = astAppendString( list, &nc, "," );
-                     list = astAppendString( list, &nc, val );
-                     datAnnul( &dloc, status );
-
-                     if( iel == 10 ) break;
-                  }
-
-                  if( dims[ 0 ] > 10 ) list = astAppendString( list, &nc,
-                                                               ",..." );
-                  list = astAppendString( list, &nc, ")" );
-                  val = astFree( val );
-
-/* If it is a structure array, or if it is a multi-dimensional primitive
-   array, display it as "name=<type>(shape)". */
-               } else {
-                  list = astAppendString( list, &nc, name );
-                  list = astAppendString( list, &nc, "=<" );
-                  list = astAppendString( list, &nc, type );
-                  list = astAppendString( list, &nc, ">(" );
-                  sprintf( buf, "%d", dims[ 0 ] );
-                  list = astAppendString( list, &nc, buf );
-
-                  for( idim = 1; idim < ndim; idim++ ) {
-                     list = astAppendString( list, &nc, "," );
-                     sprintf( buf, "%d", dims[ idim ] );
-                     list = astAppendString( list, &nc, buf );
-                  }
-                  list = astAppendString( list, &nc, ")" );
-
-               }
-            }
-
-/* Annul the component locator. */
-            datAnnul( &cloc, status );
-         }
-      }
-   }
-
-/* If the summary is not empty, store it in the returned KeyMap, and then
-   free it. */
-   if( list ) {
+      list = ndg1KeyMapSummary( prov->more, 120, &nc, status );
       astMapPut0C( result, MORE_NAME, list, NULL );
       list = astFree( list );
-   }
 
 /* Find the maximum of the current field width and the previous maximum
    field width. */
-   if( astMapGet0I( mxlenkey, MORE_NAME, &mxlen ) ) {
-      mxlen = ( nc > mxlen ) ? nc : mxlen;
-   } else {
-      mxlen = nc;
-   }
+      if( astMapGet0I( mxlenkey, MORE_NAME, &mxlen ) ) {
+         mxlen = ( nc > mxlen ) ? nc : mxlen;
+      } else {
+         mxlen = nc;
+      }
 
 /* Store the new maximum field width. */
-   astMapPut0I( mxlenkey, MORE_NAME, mxlen, NULL );
+      astMapPut0I( mxlenkey, MORE_NAME, mxlen, NULL );
+   }
 
 /* Store the History entry (a vector of KeyMaps, one for each history
    record in the Prov structure). */
@@ -5101,8 +4704,7 @@ static Prov *ndg1FreeProv( Prov *prov, int *status ){
    prov->hist_recs = astFree( prov->hist_recs );
    prov->nhrec = 0;
 
-/* Erase the temporary HDS structure holding the MORE information. */
-   ndgAntmp( &(prov->more), status );
+   if( prov->more ) prov->more = astAnnul( prov->more );
 
 /* Remove the Prov from the list of active Provs. */
    DEISSUE( prov );
@@ -5452,95 +5054,6 @@ static HDSLoc *ndg1GtAnc( HDSLoc *xloc, size_t *nanc, int *status ){
    return result;
 }
 
-static void ndg1H2a( HDSLoc *loc, AstKeyMap *keymap, int *status ){
-/*
-*  Name:
-*     ndg1H2a
-
-*  Purpose:
-*     Copy top level primitive values from an HDS Object to an AST KeyMap.
-
-*  Invocation:
-*     void ndg1H2a( HDSLoc *loc, AstKeyMap *keymap, int *status )
-
-*  Description:
-*     This routine copies top level primitive (vector or scalar) values
-*     from an HDS Object into a supplied AST KeyMap. Any structure
-*     components in the HDS object are ignored. Any pre-existing KeyMap
-*     entry that has the name of an HDS component is first erased.
-
-*  Arguments:
-*     loc
-*        A locator for the HDS object.
-*     keymap
-*        An AST pointer to the KeyMap into which the HDS components
-*        are to be copied
-*     status
-*        The inherited status.
-
-*/
-
-/* Local Varianles: */
-   HDSLoc *cloc = NULL;
-   char name[ DAT__SZNAM + 1 ];
-   char type[ DAT__SZTYP + 1 ];
-   int icomp;
-   int ncomp;
-   int prim;
-   size_t el;
-   size_t elsize;
-   void *pntr;
-
-/* Check inherited status */
-   if( *status != SAI__OK ) return;
-
-/* Loop round all the components in the HDS object. */
-   datNcomp( loc, &ncomp, status );
-   for( icomp = 1; icomp <= ncomp; icomp++ ) {
-      datIndex( loc, icomp, &cloc, status );
-
-/* Skip any components that are not primitive. */
-      datPrim( cloc, &prim, status );
-      if( prim ) {
-
-/* Get the name and data type for the HDS component. */
-         datName( cloc, name, status );
-         datType( cloc, type, status );
-
-/* Map the HDS object as a vector, and create a corresponding KeyMap vector
-   entry to hold the values. For string types, datMapV returns a pointer to
-   a concatenated list of fixed length strings. So we use wrappers in the
-   ATL library that convert to and fro between concatenated fixed length
-   strings and null-terminated strings. */
-         if( !strncmp( type, "_CHAR", 5 ) ) {
-            datMapV( cloc, "_CHAR", "READ", &pntr, &el, status );
-            datLen( cloc, &elsize, status );
-            atlMapPut1C( keymap, name, (char *) pntr, elsize, el, NULL,
-                         status );
-
-         } else if( !strcmp( type, "_REAL" ) ) {
-            datMapV( cloc, "_REAL", "READ", &pntr, &el, status );
-            astMapPut1F( keymap, name, el, (float *) pntr, NULL );
-
-         } else if( !strcmp( type, "_DOUBLE" ) ) {
-            datMapV( cloc, "_DOUBLE", "READ", &pntr, &el, status );
-            astMapPut1D( keymap, name, el, (double *) pntr, NULL );
-
-         } else {
-            datMapV( cloc, "_INTEGER", "READ", &pntr, &el, status );
-            astMapPut1I( keymap, name, el, (int *) pntr, NULL );
-         }
-
-/* Unmap the component locator. */
-         datUnmap( cloc, status );
-      }
-
-/* Annul the component locator. */
-      datAnnul( &cloc, status );
-   }
-
-}
-
 static unsigned int ndg1HashFun( const char *str,  unsigned int hval, int *status ){
 /*
 *  Name:
@@ -5591,6 +5104,75 @@ static unsigned int ndg1HashFun( const char *str,  unsigned int hval, int *statu
 
 /* Return our new hash value */
    return hval;
+}
+
+static AstKeyMap *ndg1Hd2ky( HDSLoc *loc, int *status ){
+/*
+*  Name:
+*     ndg1Hd2ky
+
+*  Purpose:
+*     Create a KeyMap holding the contents of a given HDS object.
+
+*  Invocation:
+*     AstKeyMap *ndg1Hd2ky( HDSLoc *loc, int *status )
+
+*  Description:
+*     If the supplied HDS object is a structure, this function creates and
+*     returns a new KeyMap that holds one entry for each component in the
+*     supplied HDS structure. If the supplied HDS object is a primitive,
+*     this function creates and returns a new KeyMap that holds a single
+*     entry holding the value of the supplied HDS primitive.
+
+*  Arguments:
+*     loc
+*        The HDS object to be copied.
+*     status
+*        Inherited status pointer.
+
+*  Returned Value:
+*     A pointer to a KeyMap holding an entry for each component int he
+*     supplied HDS structure.
+
+*/
+
+/* Local Variables: */
+   AstKeyMap *result;
+   HDSLoc *cloc = NULL;
+   int icomp;
+   int ncomp;
+   int prim;
+
+/* Initialise */
+   result = NULL;
+
+/* Check status */
+   if( *status != SAI__OK ) return result;
+
+/* Create the empty KeyMap. */
+   result = astKeyMap( " " );
+
+/* If the object is a primitive, add an entry to the KeyMap describing
+   it. */
+   datPrim( loc, &prim, status );
+   if( prim ) {
+      atlHd2ky( loc, result, status );
+
+/* If it is a structure, loop round its components. */
+   } else {
+      datNcomp( loc, &ncomp, status );
+      for( icomp = 1; icomp <= ncomp; icomp++ ) {
+         datIndex( loc, icomp, &cloc, status );
+
+/* Create an entry in the KeyMap holding the component's value. */
+         atlHd2ky( cloc, result, status );
+
+/* Annul the component locator. */
+         datAnnul( &cloc, status );
+      }
+   }
+
+   return result;
 }
 
 static void ndg1Hout1( int nlines, char *const text[], int *status ){
@@ -5739,10 +5321,148 @@ static int ndg1IsWanted( AstXmlElement *elem, int *status ){
    return result;
 }
 
+static char *ndg1KeyMapSummary( AstKeyMap *km, int maxlen, int *nc, int *status ){
+/*
+*  Name:
+*     ndg1KeyMapSummary
+
+*  Purpose:
+*     Produces a string summarising the contents of a KeyMap.
+
+*  Invocation:
+*     char *ndg1KeyMapSummary( AstKeyMap *km, int maxlen, int *nc,
+*                                    int *status )
+
+*  Description:
+*     This function returns a dynamically allocated string holding a
+*     summary of the contents of a KeyMap.
+
+*  Arguments:
+*     km
+*        The KeyMap.
+*     maxlen
+*        The maximum allowed length of the returned string.
+*     nc
+*        Pointer to an integer in which to return the actual length of
+*        the returned string.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the dynamic string. Free it using astFree when it is no
+*     longer needed.
+
+*/
+
+/* Local Constants: */
+#define BUFLEN 100
+
+/* Local Variables: */
+   AstObject *aval;
+   char *cval;
+   char *result;
+   char buf[ BUFLEN + 1 ];
+   const char *key;
+   int avlen;
+   int ielem;
+   int ikey;
+   int limit;
+   int mc;
+   int nelem;
+   int nkey;
+   int type;
+
+/* Initialise */
+   result = NULL;
+   *nc = 0;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return result;
+
+/* The number of entries in the KeyMap. */
+   nkey = astMapSize( km );
+
+/* Loop round all entries in the KeyMap. */
+   for( ikey = 0; ikey < nkey && *nc < maxlen; ikey++ ) {
+      key = astMapKey( km, ikey );
+
+/* Get the data type. */
+      type = astMapType( km, key );
+
+/* If this is not the first entry, append a comma to separate it from the
+   previous entry. */
+      if( ikey > 0 ) result = astAppendString( result, nc, "," );
+
+/* Append the entry key name and an equals sign. */
+      result = astAppendString( result, nc, key );
+      result = astAppendString( result, nc, "=" );
+
+/* Get the vector length of the entry. */
+      nelem = astMapLength( km, key );
+
+/* If a vector, start with an open parenthesis. */
+      if( nelem > 1 ) result = astAppendString( result, nc, "(" );
+
+/* Get the average number of characters per entry for the remaining
+   enties, and find the limit for the next entry. */
+      avlen = ( maxlen - *nc )/( nkey - ikey );
+      limit = *nc + avlen;
+
+/* Loop round all element. */
+      for( ielem = 0; ielem < nelem && *nc < limit; ielem++ ) {
+
+/* Delimiting comma comes before every element, except the first. */
+         if( ielem > 0 ) result = astAppendString( result, nc, "," );
+
+/* Get the value and append to the end of the returned string. */
+         if( type == AST__UNDEFTYPE ) {
+            result = astAppendString( result, nc, "<undef>" );
+
+         } else if( type == AST__POINTERTYPE ) {
+            result = astAppendString( result, nc, "<pointer>" );
+
+         } else if( type == AST__OBJECTTYPE ) {
+            astMapGetElemA( km, key, ielem, &aval );
+            if( astIsAKeyMap( aval ) ) {
+               cval = ndg1KeyMapSummary( (AstKeyMap *) aval, 2*avlen, &mc, status );
+               result = astAppendString( result, nc, "{" );
+               result = astAppendString( result, nc, cval );
+               result = astAppendString( result, nc, "}" );
+               cval = astFree( cval );
+            } else {
+               result = astAppendString( result, nc, "<" );
+               result = astAppendString( result, nc, astGetC( aval, "Class" ) );
+               result = astAppendString( result, nc, ">" );
+            }
+
+         } else {
+            astMapGetElemC( km, key, BUFLEN, ielem, buf );
+            result = astAppendString( result, nc, buf );
+         }
+      }
+
+/* If there was not room for all the elements, append an ellipsis. */
+      if( ielem < nelem ) result = astAppendString( result, nc, "..." );
+
+/* If a vector, end with a closing parenthesis. */
+      if( nelem > 1 ) result = astAppendString( result, nc, ")" );
+   }
+
+/* If there was not room for all the entries, append an ellipsis. */
+   if( ikey < nkey ) {
+      if( *nc > maxlen - 3 ) *nc = maxlen - 3;
+      result = astAppendString( result, nc, "..." );
+   } else if( *nc > maxlen ) {
+      *nc = maxlen - 3;
+      result = astAppendString( result, nc, "..." );
+   }
+
+   return result;
+}
+
 static Prov *ndg1MakeProv( int index, const char *path, const char *date,
-                           const char *creator, int hhash, HDSLoc *more,
-                           AstKeyMap *more2, Provenance *provenance,
-                           int hidden, int *status ){
+                           const char *creator, int hhash, AstKeyMap *more,
+                           Provenance *provenance, int hidden, int *status ){
 /*
 *  Name:
 *     ndg1MakeProv
@@ -5752,9 +5472,8 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 
 *  Invocation:
 *     Prov *ndg1MakeProv( int index, const char *path, const char *date,
-*                         const char *creator, int hhash, HDSLoc *more,
-*                         AstKeyMap *more2, Provenance *provenance,
-*                         int hidden, int *status )
+*                         const char *creator, int hhash, AstKeyMap *more,
+*                         Provenance *provenance, int hidden, int *status )
 
 *  Description:
 *     This function allocates dynamic memory to hold a new Prov structure,
@@ -5783,15 +5502,8 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 *     creator
 *        Pointer to a string holding an arbitrary identifier for the
 *     more
-*        Pointer to a locator for an HDS object holding extra information
-*        about the NDF. A deep copy is taken of the supplied structure.
-*     more2
-*        A pointer to an AstKeyMap holding extra items of information
-*        to be added into the MORE component. Only entries holding primitive
-*        data values (scalar or vector) are used - entries holding nested
-*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same
-*        name as a component in the supplied "more" HDS structure, then the
-*        KeyMap value is used in preference to the HDS value.
+*        Pointer to a KeyMap holding extra items of information about
+*        the NDF. A deep copy is taken of the supplied KeyMap.
 *     provenance
 *        Pointer to an existing Provenance structure to which the new
 *        Prov structure will be added, or NULL.
@@ -5841,11 +5553,9 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
    calculated. */
       result->provid = 0;
 
-/* Copy any supplied "more" information into a newly created temporary
-   HDS object and store a locator for this object in the returned Prov
-   structure. */
+/* Store a deep copy of any supplied MORE KeyMap. */
       result->more = NULL;
-      ndg1StoreMore( result, more, more2, status );
+      ndg1StoreMore( result, more, status );
 
 /* Store the hash code that identifies the most recent history record. */
       result->hhash = hhash;
@@ -6380,63 +6090,6 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 
 }
 
-static void ndg1PutTextComp( HDSLoc *loc, const char *comp, const char *value,
-                             int *status ){
-/*
-*  Name:
-*     ndg1PutTextComp
-
-*  Purpose:
-*     Write a string to a new HDS _CHAR component.
-
-*  Invocation:
-*     void ndg1PutTextComp( HDSLoc *loc, const char *comp, const char *value,
-*                           int *status )
-
-*  Description:
-*     This function creates a new _CHAR component in the specified HDS
-*     object and writes the supplied string to it.
-
-*  Arguments:
-*     loc
-*        Locator for the HDS structure.
-*     comp
-*        The name of the component to create.
-*     value
-*        A pointer to the text string to store.
-*     status
-*        Pointer to the inherited status variable.
-
-*/
-
-/* Local Variables: */
-   HDSLoc *cloc = NULL;
-   int there;
-
-/* Check the inherited status value. */
-   if( *status != SAI__OK ) return;
-
-/* Delete the component if it already exists. */
-   datThere( loc, comp, &there, status );
-   if( there ) datErase( loc, comp, status );
-
-/* Check a string pointer was supplied. */
-   if( value ) {
-
-/* Create the component. */
-      datNew0C( loc, comp, strlen( value ), status );
-
-/* Get a locator to the new component. */
-      datFind( loc, comp, &cloc, status );
-
-/* Copy the string to the new component. */
-      datPut0C( cloc, value, status );
-
-/* Annul the component locator. */
-      datAnnul( &cloc, status );
-   }
-}
-
 static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
                              int *status ){
 /*
@@ -6581,8 +6234,74 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
 #undef TEXT_LEN
 }
 
+static AstObject *ndg1ReadObject( char *mem, int *len, int *status ){
+/*
+*  Name:
+*     ndg1ReadObject
+
+*  Purpose:
+*     Read an AST Object from a dump at the start of the supplied
+*     dynamic memory area.
+
+*  Invocation:
+*     AstObject *ndg1ReadObject( char *mem, int *len, int *status )
+
+*  Description:
+*     This function creates a new AST Object by reading a dump from the
+*     start of the supplied memory area.
+
+*  Arguments:
+*     mem
+*        Pointer to the start of a dump of an AST Object.
+*     len
+*        Returned holding the number of characters read from the supplied
+*        memory area.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the new AST Object, or NULL if an error occurs.
+
+*/
+
+/* Local Variables: */
+   AstChannel *ch;
+   ChanData data;
+   AstObject *result;
+
+/* Initialise the returned pointer. */
+   result = NULL;
+
+/* Check the inherited status and the supplied Object pointer. */
+   if( *status != SAI__OK || !mem ) return result;
+
+/* Create an AST Channel to read the dump. */
+   ch = astChannel( ndg1ChSource, NULL, " " );
+
+/* Set up the data to be passed to the Channel source function
+   (ndg1ChSource). */
+   data.mem = mem;
+   data.memsize = 0;
+   data.linebuffer = NULL;
+   astPutChannelData( ch, &data );
+
+/* Read the object from the Channel (and thus from the supplied memory
+   area). */
+   result = astRead( ch );
+
+/* Update the returned values. */
+   *len = data.memsize;
+
+/* Free resources. */
+   data.linebuffer = astFree( data.linebuffer );
+   ch = astAnnul( ch );
+
+/* Return a pointer to the Object. */
+   return result;
+}
+
 static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc, const char *npath,
-                                                   HDSLoc *more, AstKeyMap *more2,
+                                                   AstKeyMap *more,
                                                    const char *creator,
                                                    int isroot, int *status ){
 /*
@@ -6595,7 +6314,7 @@ static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc, const char *npa
 
 *  Invocation:
 *     Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc,  const char *npath,
-*                                                 HDSLoc *more, AstKeyMap *more2,
+*                                                 AstKeyMap *more,
 *                                                 const char *creator,
 *                                                 int isroot, int *status )
 
@@ -6620,12 +6339,8 @@ static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc, const char *npa
 *        The path of the NDF from which the provenance was read. Can be
 *        NULL.
 *     more
-*        An optional HDS structure holding additional information. This is
+*        An optional KeyMap holding additional information. This is
 *        stored in the main Prov structure in the returned Provenance.
-*     more2
-*        An optional KeyMap holding additional primitive (scalar or vector)
-*        information. This is added into the HDS structure specified by
-*        "more", over-writing any components with the same names.
 *     creator
 *        An optional text string to be stored as the "creator" string in
 *        the returned Prov structure. This is only used if the supplied
@@ -6644,6 +6359,7 @@ static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc, const char *npa
 */
 
 /* Local Variables: */
+   AstKeyMap *more2 = NULL;
    HDSLoc *aloc = NULL;
    HDSLoc *cloc = NULL;
    HDSLoc *hcloc = NULL;
@@ -6702,7 +6418,7 @@ static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc, const char *npa
    }
 
 /* Create a Prov structure to describe the main NDF. */
-   main_prov = ndg1MakeProv( 0, npath, date, creator, hhash, more, more2,
+   main_prov = ndg1MakeProv( 0, npath, date, creator, hhash, more,
                              NULL, 0, status );
 
 /* Create the basic Provenance structure. As yet it only contains
@@ -6728,17 +6444,20 @@ static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc, const char *npa
                                  CREATOR_LEN, status );
          hidden = ndg1GetLogicalComp( cloc, HIDDEN_NAME, 0, status );
 
-/* If the ancestor has a MORE structure, get a locator for it. */
+/* If the ancestor has a MORE structure, get a locator for it, convert it
+   to a KeyMap, and then annul the locator. */
          datThere( cloc, MORE_NAME, &there, status );
          if( there ) {
             datFind( cloc, MORE_NAME, &mloc, status );
+            more2 = ndg1Hd2ky( mloc, status );
+            datAnnul( &mloc, status );
          } else {
-            mloc = NULL;
+            more2 = NULL;
          }
 
 /* Create a Prov structure to describe the current ancestor, and add it
    into the returned Provenance structure. */
-         anc_prov = ndg1MakeProv( i, path, date, creator, 0, mloc, NULL,
+         anc_prov = ndg1MakeProv( i, path, date, creator, 0, more2,
                                   result, hidden, status );
 
 /* We now copy any History records from the ancestor into the Prov
@@ -6770,8 +6489,8 @@ static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc, const char *npa
             datAnnul( &hloc, status );
          }
 
-/* Free locators. */
-         if( mloc ) datAnnul( &mloc, status );
+/* Free resources. */
+         if( more2 ) more2 = astAnnul( more2 );
          datAnnul( &cloc, status );
       }
 
@@ -6837,8 +6556,7 @@ static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc, const char *npa
 }
 
 static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
-                                                HDSLoc *more, AstKeyMap *more2,
-                                                const char *creator,
+                                                AstKeyMap *more, const char *creator,
                                                 int isroot, int *status ){
 /*
 *  Name:
@@ -6849,8 +6567,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
 
 *  Invocation:
 *     Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc,  const char *npath,
-*                                              HDSLoc *more, AstKeyMap *more2,
-*                                              const char *creator,
+*                                              AstKeyMap *more, const char *creator,
 *                                              int isroot, int *status )
 
 *  Description:
@@ -6871,12 +6588,8 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
 *        The path of the NDF from which the provenance was read. Can be
 *        NULL.
 *     more
-*        An optional HDS structure holding additional information. This is
+*        An optional KeyMap holding additional information. This is
 *        stored in the main Prov structure in the returned Provenance.
-*     more2
-*        An optional KeyMap holding additional primitive (scalar or vector)
-*        information. This is added into the HDS structure specified by
-*        "more", over-writing any components with the same names.
 *     creator
 *        An optional text string to be stored as the "creator" string in
 *        the returned Prov structure. This is only used if the supplied
@@ -6925,7 +6638,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
    function to read it. */
       datThere( xloc, ANCESTORS_NAME, &there, status );
       if( there ) {
-         result = ndg1ReadOldProvenanceExtension( xloc, npath, more, more2,
+         result = ndg1ReadOldProvenanceExtension( xloc, npath, more,
                                                   creator, isroot, status );
 
 /* Otherwise, we use the new encoded format. */
@@ -6976,11 +6689,17 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
                }
             }
 
-/* If there is a MORE component, get a locator to it, and get its length. */
-            datThere( xloc, MORE_NAME, &there, status );
-            if( there ) {
-               datFind( xloc, MORE_NAME, &mloc, status );
-               datSize( mloc, &nmore, status );
+/* If the extension uses HDS structures to hold the MORE information, see
+   if there is a MORE component, get a locator to it, and get its length. */
+            if( version <= PDATA_VERSION_HDSMORE ) {
+               datThere( xloc, MORE_NAME, &there, status );
+               if( there ) {
+                  datFind( xloc, MORE_NAME, &mloc, status );
+                  datSize( mloc, &nmore, status );
+               }
+            } else {
+               mloc = NULL;
+               nmore = 0;
             }
 
 /* Decode and copy each Prov structure from the integer array into the
@@ -6999,7 +6718,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
                } else {
                   result->main->path = astFree( result->main->path );
                }
-               ndg1StoreMore( result->main, more, more2, status );
+               ndg1StoreMore( result->main, more, status );
             }
 
 /* If the data was decoded succesfully, check that the next integer has
@@ -7056,7 +6775,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
    occurred whilst reading the provenance extension), create one now
    describing just the supplied NDF. */
    if( !result && *status == SAI__OK ) {
-      main_prov = ndg1MakeProv( 0, npath, NULL, creator, 0, more, more2,
+      main_prov = ndg1MakeProv( 0, npath, NULL, creator, 0, more,
                                 NULL, 0, status );
       result = ndg1MakeProvenance( main_prov, status );
    }
@@ -7068,8 +6787,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
    return result;
 }
 
-static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
-                                          AstKeyMap *more2,
+static Provenance *ndg1ReadProvenanceNDF( int indf, AstKeyMap *more,
                                           const char *creator,
                                           int isroot, int *status ){
 /*
@@ -7080,8 +6798,7 @@ static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
 *     Create a new Provenance structure from an NDF PROVENANCE extension.
 
 *  Invocation:
-*     Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
-*                                        AstKeyMap *more2,
+*     Provenance *ndg1ReadProvenanceNDF( int indf, AstKeyMap *more,
 *                                        const char *creator,
 *                                        int isroot, int *status )
 
@@ -7103,14 +6820,8 @@ static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
 *        to be read. This may be NDF__NOID, in which case a new anonymous
 *        provenance structure will be created and returned.
 *     more
-*        An optional HDS structure holding additional information about
-*        the NDF. This is stored in the main Prov structure in the
-*        returned Provenance.
-*     more2
-*        An optional KeyMap holding additional primitive (scalar or vector)
-*        information about the NDF. This is added into the HDS structure
-*        specified by "more", over-writing any components with the same
-*        names.
+*        An optional KeyMap holding additional information about the NDF.
+*        This is stored in the main Prov structure in the returned Provenance.
 *     creator
 *        An optional text string to be stored as the "creator" string in
 *        the returned Prov structure. This is only used if the supplied
@@ -7160,7 +6871,7 @@ static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
    }
 
 /* Read the information from the extension. */
-   result = ndg1ReadProvenanceExtension( xloc, path, more, more2, creator,
+   result = ndg1ReadProvenanceExtension( xloc, path, more, creator,
                                          isroot, status );
 
 /* Free resources */
@@ -7231,11 +6942,11 @@ static Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path,
    xloc = ndgVot2hds( elem, tloc, status );
 
 /* Read provenance information from the HDS structure. */
-   result = ndg1ReadProvenanceExtension( xloc, path, NULL, NULL, creator, 0,
+   result = ndg1ReadProvenanceExtension( xloc, path, NULL, creator, 0,
                                          status );
 /* Free resources. */
    datAnnul( &xloc, status );
-   ndgAntmp( &tloc, status );
+   ndg1Antmp( &tloc, status );
    doc = astXmlAnnul( doc );
 
 /* If an error occurred, free the result. */
@@ -7592,8 +7303,7 @@ static char *ndg1StoreCharData( char *mem, const void *data, size_t len,
    return result;
 }
 
-static void ndg1StoreMore( Prov *prov, HDSLoc *more, AstKeyMap *more2,
-                           int *status ){
+static void ndg1StoreMore( Prov *prov, AstKeyMap *more, int *status ){
 /*
 *  Name:
 *     ndg1StoreMore
@@ -7602,32 +7312,20 @@ static void ndg1StoreMore( Prov *prov, HDSLoc *more, AstKeyMap *more2,
 *     Store supplemental information about an ancestor NDF.
 
 *  Invocation:
-*     void ndg1StoreMore( Prov *prov, HDSLoc *more, AstKeyMap *more2,
-*                         int *status )
+*     void ndg1StoreMore( Prov *prov, AstKeyMap *more, int *status )
 
 *  Description:
 *     This function removes any supplemental information already stored
-*     with the supplied Prov structure. It then creates a temporary HDS
-*     object containing a copy of the supplied "more" structure and
-*     stores a locator for this temporary object in the Prov structure.
-*     It then copies any information contained in the supplied KeyMap
-*     into the temporary HDS object, potentially over-writing items
-*     copied in from "more.
+*     with the supplied Prov structure. It then stores a deep copy of the
+*     supplied KeyMao.
 
 *  Arguments:
 *     prov
 *        Pointer to a Prov structure describing the ancestor NDF that is
 *        to be changed.
 *     more
-*        Pointer to a locator for an HDS object holding extra information
-*        about the NDF. A deep copy is taken of the supplied structure.
-*     more2
-*        A pointer to an AstKeyMap holding extra items of information
-*        to be added into the MORE component. Only entries holding primitive
-*        data values (scalar or vector) are used - entries holding nested
-*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same
-*        name as a component in the supplied "more" HDS structure, then the
-*        KeyMap value is used in preference to the HDS value.
+*        Pointer to a KeyMap holding extra information about the NDF. A
+*        deep copy is taken.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -7636,71 +7334,88 @@ static void ndg1StoreMore( Prov *prov, HDSLoc *more, AstKeyMap *more2,
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
-/* Annul any existing more locator in the Prov structure. */
-   if( prov->more ) datAnnul( &(prov->more), status );
+/* Annul any existing more KeyMap in the Prov structure. */
+   if( prov->more ) prov->more = astAnnul( prov->more );
 
-/* Store a deep copy of any supplied "more" structure in a temporary HDS
-   object. This copies all the top-level contents of "more" into the top-level
-   of the temporary HDS object. */
-   if( more ) {
-      prov->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
-      ndg1CopyComps( more, prov->more, status );
-   }
+/* Store a deep copy of any supplied "more" KeyMap. */
+   if( more ) prov->more = astCopy( more );
 
-/* Copy extra top-level scalar items from the "more2" KeyMap. */
-   if( more2 && astMapSize( more2 ) > 0 ) {
-
-/* First ensure that there is a temporary HDS object. */
-      if( !prov->more ) prov->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
-
-/* Copy primtive values from the KeyMap to the temporary HDS object. */
-      ndg1A2h( more2, prov->more, status );
-   }
 }
 
-static HDSLoc *ndg1TCopy( HDSLoc *loc, int *status ){
+static char *ndg1StoreObject( char *mem, AstObject *obj, size_t *memsize,
+                              int *status ){
 /*
 *  Name:
-*     ndg1TCopy
+*     ndg1StoreObject
 
 *  Purpose:
-*     Create a temporary copy of an HDS object.
+*     Append a dump of the supplied AST Object to the end of a supplied
+*     array, extending the array as required.
 
 *  Invocation:
-*     HDSLoc *ndg1TCopy( HDSLoc *loc, int *status )
+*     char *ndg1StoreObject( char *mem, AstObject *obj, size_t *memsize,
+*                            int *status )
 
 *  Description:
-*     This function creates a new temporary HDS object that is a copy of
-*     a supplied structure.
+*     This function extends a supplied memory area and then appends a
+*     dump of the supplied AST Object to the end of the area.
 
 *  Arguments:
-*     loc
-*        locator for the HDS object to copy.
+*     mem
+*        Pointer to a pre-allocated memory area to which the object
+*        dump should be appended.
+*     obj
+*        Pointer to the AST Object to be appended to "mem".
+*     memsize
+*        Pointer to a location holding the number of bytes in the "mem"
+*        area. The supplied value is increment by the length of the dump
+*        on exit.
 *     status
-*        The global status.
+*        Pointer to the inherited status variable.
+
+*  Notes:
+*     - If "obj" is NULL, this function returns without appending
+*     anything to the end of "mem".
 
 *  Returned Value:
-*     A pointer to a locator for a new temporary HDS object which is a
-*     copy of the specified HDS object.
+*     Pointer to the extended memory area containing the original
+*     contents of "mem" plus the new data. Returned equal to "mem" if an
+*     error occurs.
 
 */
 
-/* Local variables: */
-   HDSLoc *result = NULL;
-   char type[ DAT__SZNAM + 1 ];
+/* Local Variables: */
+   AstChannel *ch;
+   ChanData data;
+   char *result;
 
-/* Check the inherited status. */
-   if( *status != SAI__OK ) return result;
+/* Initialise the returned memory pointer. */
+   result = mem;
 
-/* Create a temporary HDS object with arbitrary name and the type
-   of the supplied object. */
-   datType( loc, type, status );
-   result = ndg1Temp( type, 0, NULL, status );
+/* Check the inherited status and the supplied Object pointer. */
+   if( *status != SAI__OK || !obj ) return result;
 
-/* Copy all the components inside the supplied object into "result". */
-   ndg1CopyComps( loc, result, status );
+/* Create an AST Channel to create the dump. */
+   ch = astChannel( NULL, ndg1ChSink, "Comment=0,Full=-1" );
 
-/* Return the resulting locator. */
+/* Set up the data to be passed to the Channel sink function
+   (ndg1ChSink). */
+   data.mem = mem;
+   data.memsize = *memsize;
+   astPutChannelData( ch, &data );
+
+/* Write the object to the Channel (and thus to the supplied memory
+   area). */
+   astWrite( ch, obj );
+
+/* Update the returned values. */
+   result = data.mem;
+   *memsize = data.memsize;
+
+/* Annull the CHannel. */
+   ch = astAnnul( ch );
+
+/* Return a pointer to the extended memory area. */
    return result;
 }
 
@@ -7738,7 +7453,7 @@ static HDSLoc *ndg1Temp( const char *type, int ndim, int *dim, int *status ){
 
 *  Returned Value:
 *     A pointer to a locator for a new temporary HDS object. It should be
-*     erased using ndgAntmp when no longer needed.
+*     erased using ndg1Antmp when no longer needed.
 
 */
 
@@ -7949,14 +7664,9 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
 
 
 /* Local Variables: */
-   HDSLoc **mores = NULL;
-   HDSLoc *cloc = NULL;
    HDSLoc *dloc = NULL;
-   HDSLoc *mloc = NULL;
    Prov *prov = NULL;
    hdsdim dim;
-   hdsdim imore;
-   hdsdim nmore = 0;
    int *ipdata = NULL;
    int i;
    int ival;
@@ -7978,7 +7688,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
 
 /* Add a description of the main NDF to the above buffer. */
    pdata = ndg1EncodeProvData( pdata, 1, provenance->main, provenance, &pdlen,
-                               &mores, &nmore, status );
+                               status );
 
 /* Loop round all the Prov structures. */
    for( i = 0; i < provenance->nprov; i++ ) {
@@ -7989,7 +7699,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
 
 /* Add the Prov structure to the buffer. */
          pdata = ndg1EncodeProvData( pdata, 0, prov, provenance, &pdlen,
-                                     &mores, &nmore, status );
+                                     status );
       }
    }
 
@@ -8014,27 +7724,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
    }
    datAnnul( &dloc, status );
 
-/* Now create a component to hold any MORE structures found in the
-   provenance information. */
-   if( nmore ) {
-      datNew( xloc, MORE_NAME, MORE_TYPE, 1, &nmore, status );
-      datFind( xloc, MORE_NAME, &mloc, status );
-
-/* Loop round each MORE structure found within the supplied Provenance. */
-      for( imore = 1; imore <= nmore; imore++ ) {
-         datCell( mloc, 1, &imore, &cloc, status );
-
-/* Copy all the components from the input MORE structure to the output
-   HDS object. */
-         ndg1CopyComps( mores[ imore - 1 ], cloc, status );
-
-         datAnnul( &cloc, status );
-      }
-
-      datAnnul( &mloc, status );
-      mores = astFree( mores );
-   }
-
+/* Free the buffer. */
    pdata = astFree( pdata );
 }
 
@@ -8220,7 +7910,7 @@ static const char *ndg1WriteProvenanceXml( Provenance *provenance, int *status )
 /* Free resources. */
    elem = astXmlAnnul( elem );
    datAnnul( &xloc, status );
-   ndgAntmp( &tloc, status );
+   ndg1Antmp( &tloc, status );
 
 /* If an error has occurred, free the returned string. */
    if( *status != SAI__OK ) result = astFree( (void *) result );
@@ -8413,3 +8103,7 @@ F77_SUBROUTINE(ndg_listprov)( INTEGER(status) ){
 }
 
 #endif
+
+
+
+
