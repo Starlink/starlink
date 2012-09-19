@@ -552,6 +552,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    grp4 = grpFree( grp4, STATUS );
    grps = grpFree( grps, STATUS );
 
+#undef BUFLEN
 
 }
 
@@ -1344,6 +1345,9 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
    GENPTR_INTEGER(CIOUT)
    GENPTR_INTEGER(STATUS)
 
+/* Local Constants: */
+#define BUFLEN 81
+
 /* Local Variables: */
    DECLARE_LOGICAL(no);
    DECLARE_INTEGER(gid);
@@ -1354,8 +1358,8 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
    char mess[255];
    char *file;
    int ok, n, use, nc, found, type;
-   char buf[81];
-   char txtbuf[81];
+   char buf[BUFLEN + 1];
+   char txtbuf[BUFLEN + 1];
    char *p, *e, *q, *key, *pkey;
    FILE *fd;
 
@@ -1379,8 +1383,8 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
       }
 
 /* Initialize things. */
-      buf[81] = 0;
-      e = buf + 81;
+      buf[BUFLEN] = 0;
+      e = buf + BUFLEN;
       p = e;
       ok = 0;
       q = txtbuf;
@@ -1395,7 +1399,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
 /* We we have reached the end of the buffer, re-fill it from the file. If
    the end of the file is reached, abort. */
          if( ! *p ) {
-            n = fread( (void *) buf, 1, 81, fd );
+            n = fread( (void *) buf, 1, BUFLEN, fd );
             if( !n ) break;
 
 /* If we have not yet the string "set data_", check the current buffer now.
