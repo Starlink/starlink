@@ -448,6 +448,9 @@
 *     30-AUG-2012 (DSB):
 *        The CONSERVE parameter is now used for both rebinning and
 *        resampling. It defaults to the value of REBIN.
+*     20-SEP-2012 (DSB):
+*        Record ancestor NDFs explicitly in each output NDF to avoid
+*        all input NDFs being used as ancestors of all output NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -488,8 +491,10 @@
       INTEGER MAP4               ! AST id for (grid_in -> pix_in) Mapping
       INTEGER MAXPIX             ! Initial scale size in pixels
       INTEGER METHOD_CODE        ! Integer corresponding to interp. method
+      INTEGER NDFS( 2 )          ! Ancestor NDFs for current output NDF
       INTEGER NDIMR              ! Number of pixel axes in reference NDF
       INTEGER NDIMRT             ! Modified no. of pixel axes in ref. NDF
+      INTEGER NNDF               ! No. of ancestor NDFs
       INTEGER NPAR               ! No. of required interpolation parameters
       INTEGER ORIGIN( NDF__MXDIM )! New pixel origin
       INTEGER SHIFT( NDF__MXDIM )! Pixel axis shifts
@@ -502,8 +507,10 @@
       LOGICAL AUTOBN             ! Determine output bounds automatically?
       LOGICAL CONSRV             ! Conserve flux whilst resampling?
       LOGICAL INSITU             ! Modify input NDFs in-situ?
+      LOGICAL ISECT              ! Do 2 NDF intersect?
       LOGICAL MORE               ! Continue looping?
       LOGICAL REBIN              ! Create output pixels by rebinning?
+      LOGICAL SAME               ! Do 2 NDF identifier refer to the same NDF?
       REAL ERRLIM                ! Positional accuracy in pixels
       REAL WLIM                  ! Minimum good output weight
 *.
@@ -802,6 +809,25 @@
      :                    'in-situ because the Mapping is not a '//
      :                    'simple shift of origin.', STATUS )
          END IF
+
+*  Add provenance to the output NDF. We do it explicitly here, rather
+*  than relying on the NDG provvenance block defined within the kappa
+*  monolith routine, so that the list of ancestors for each single
+*  output NDF contains only the corresponding input NDF as an ancestor,
+*  together with the reference NDF. Using the provenance block within the
+*  monolith routine would result in all input NDFs being used as
+*  ancestors of all output NDFs.
+         CALL NDF_SAME( INDF1, INDFR, SAME, ISECT, STATUS )
+         IF( SAME ) THEN
+            NNDF = 1
+            NDFS( 1 ) = INDF1
+         ELSE
+            NNDF = 2
+            NDFS( 1 ) = INDF1
+            NDFS( 2 ) = INDFR
+         END IF
+         CALL NDG_ADDPROV( INDF2, 'KAPPA:WCSALIGN', NNDF, NDFS, .TRUE.,
+     :                     STATUS )
 
 *  Annul the input NDF identifier.
          CALL NDF_ANNUL( INDF1, STATUS )
