@@ -1787,6 +1787,9 @@ Normally blank-field map would subsequently have a applied to it to aid
 source detection (see \cref{Section}{sec:mf}{Point-source detection}),
 however this is not applied by the map-maker.
 \vspace{0.3cm}
+
+% The tildes around the equal sign are to ensure HTML table field is
+% not wrapped after the parameter name.
 \latex{\renewcommand*\arraystretch{0.8}}
 \begin{table}[h!]
 \centering
@@ -1794,8 +1797,8 @@ however this is not applied by the map-maker.
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_blank\_field.lis}}\\
 \hline
-\texttt{numiter = 4}&\texttt{450.flt.filt\_edge\_largescale = 200}\\
-\texttt{spikethresh = 10}&\texttt{850.flt.filt\_edge\_largescale = 200}\\
+\texttt{numiter = 4}&\texttt{450.flt.filt\_edge\_largescale~=~200}\\
+\texttt{spikethresh = 10}&\texttt{850.flt.filt\_edge\_largescale~=~200}\\
 \texttt{spikebox = 50}&\\
 \hline
 \end{tabular}
@@ -1834,8 +1837,9 @@ observations with a pixel size set to 1~arcsec -- see
 determining the FCFs from calibrators.
 \vspace{0.3cm}
 
-\begin{latexonly}
-\renewcommand*\arraystretch{0.8}
+% The tildes around the equal sign are to ensure HTML table field is
+% not wrapped after the parameter name.
+\latex{\renewcommand*\arraystretch{0.8}}
 \begin{table}[h!]
 \centering
 \begin{tabular}{|p{6.5cm}p{7.0cm}|}
@@ -1844,9 +1848,9 @@ determining the FCFs from calibrators.
 \hline
 \texttt{numiter = -40}&\texttt{flt.zero\_niter = 2}\\
 \texttt{chitol = $<$undef$>$}&\texttt{com.perarray = 1}\\
-\texttt{maptol = 0.05}&\texttt{450.flt.filt\_edge\_largescale = 200}\\
-\texttt{ast.zero\_notlast = 1}&\texttt{850.flt.filt\_edge\_largescale = 200}\\
-\texttt{flt.zero\_circle = (0.016666)}& \texttt{ast.zero\_circle = (0.0166666666)}\\
+\texttt{maptol = 0.05}&\texttt{450.flt.filt\_edge\_largescale~=~200}\\
+\texttt{ast.zero\_notlast = 1}&\texttt{850.flt.filt\_edge\_largescale~=~200}\\
+\texttt{flt.zero\_circle~=~(0.016666)}& \texttt{ast.zero\_circle~=~(0.0166666666)}\\
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
 \hline
@@ -1856,30 +1860,6 @@ determining the FCFs from calibrators.
 \hline
 \end{tabular}
 \end{table}
-\end{latexonly}
-
-\begin{htmlonly}
-\begin{table}[h!]
-\centering
-\begin{tabular}{|p{6.5cm}p{7.0cm}|}
-\hline
-\multicolumn{2}{|l|}{\texttt{dimmconfig\_bright\_compact.lis}}\\
-\hline
-\texttt{numiter = -40}&\texttt{flt.zero\_niter = 2}\\
-\texttt{chitol = undef}&\texttt{com.perarray = 1}\\
-\texttt{maptol = 0.05}&\texttt{450.flt.filt\_edge\_largescale = 200}\\
-\texttt{ast.zero\_notlast = 1}&\texttt{850.flt.filt\_edge\_largescale = 200}\\
-\texttt{flt.zero\_circle = (0.016666)}& \texttt{ast.zero\_circle = (0.0166666666)}\\
-\hline
-\multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
-\hline
-\texttt{noisecliphigh = 10.0} & \texttt{dcthresh = 100}\\
-\texttt{com.corr\_tol = 7}& \texttt{com.gain\_tol = 7}\\
-\texttt{com.gain\_abstol = 5}& \\
-\hline
-\end{tabular}
-\end{table}
-\end{htmlonly}
 
 
 \subsubsection{dimmconfig\_bright\_extended.lis}
