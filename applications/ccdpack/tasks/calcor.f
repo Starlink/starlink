@@ -728,7 +728,8 @@
 *  output NDF.
             ANCS( 1 ) = IDIN
             ANCS( 2 ) = IDCAL
-            CALL NDG_ADDPROV( IDOUT, 'CCDPACK:CALCOR', 2, ANCS, STATUS )
+            CALL NDG_ADDPROV( IDOUT, 'CCDPACK:CALCOR', 2, ANCS, .TRUE.,
+     :                        STATUS )
 
 *  Write terminator for Processing NDF: message.
             CALL CCD1_MSG( ' ', '  ---',STATUS )

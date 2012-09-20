@@ -94,7 +94,7 @@ const char *ndgWriteVotProv( NdgProvenance *prov, int *status );
 int ndgCountProv( NdgProvenance *prov, int *status );
 int ndgIsHiddenProv( NdgProvenance *, int, int * );
 void ndgAddgh( const char param[], const Grp * igrp, int * status );
-void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs, int *status );
+void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs, int, int *status );
 void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp **igrp2, size_t *size, int *flag, int *status );
 void ndgAssoc( const char *param, int verb, Grp **igrp, size_t *size, int *flag, int *status );
 void ndgBeggh( int *status );

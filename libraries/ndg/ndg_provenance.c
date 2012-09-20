@@ -276,6 +276,9 @@
 *         each ancestor. This limits what can be stored a little but
 *         should speed up access a lot on some file systems. This required
 *         a change in the API for ndgPutProv, ndgGetProv and ndgModifyProv.
+*      20-SEP-2012 (DSB):
+*         Modify ndgAddProv so that it can take the AUTOPROV environment
+*         variable into account.
 */
 
 
@@ -522,8 +525,8 @@ static void Issue( Prov * );
 /* ============================= */
 
 F77_SUBROUTINE(ndg_addprov)( INTEGER(indf), CHARACTER(fcreator), INTEGER(nndf),
-                             INTEGER_ARRAY(ndfs), INTEGER(status)
-                             TRAIL(fcreator) ){
+                             INTEGER_ARRAY(ndfs), LOGICAL(autoprov),
+                             INTEGER(status) TRAIL(fcreator) ){
 /*
 *+
 *  Name:
@@ -536,7 +539,7 @@ F77_SUBROUTINE(ndg_addprov)( INTEGER(indf), CHARACTER(fcreator), INTEGER(nndf),
 *     Starlink ANSI C (callable from Fortran)
 
 *  Invocation:
-*     CALL NDG_ADDPROV( INDF, CREATOR, NNDF, NDFS, STATUS )
+*     CALL NDG_ADDPROV( INDF, CREATOR, NNDF, NDFS, AUTOPROV, STATUS )
 
 *  Description:
 *     This routine reads provenance from the specified output NDF, and
@@ -561,19 +564,36 @@ F77_SUBROUTINE(ndg_addprov)( INTEGER(indf), CHARACTER(fcreator), INTEGER(nndf),
 *        The number of input NDFs.
 *     NDFS( NNDF ) = INTEGER (Given)
 *        An array of identifiers for the input NDFs.
+*     AUTOPROV = LOGICAL (Given)
+*        If .TRUE., then the the AUTOPROV environment variable is
+*        checked to see if provenance information should be stored in
+*        the output NDF (see "Notes:" below). If .FALSE., the provenance
+*        information is stored regardless of the environment variable.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     - If the AUTOPROV argument is supplied .TRUE., then the following
+*     checks are performed on the AUTOPROV environment variable: if the
+*     environment variable is set to '1' then the input NDFs are added to the
+*     provenance information in the output NDF. If the environment variable
+*     is set to anything other than '1' then the output provenance is not
+*     updated. If the environment variable is not set at all, the provenance
+*     will be updated if one or more of the input NDFs contains a PROVENANCE
+*     extension.
 *-
 */
    GENPTR_INTEGER(indf)
    GENPTR_CHARACTER(fcreator)
    GENPTR_INTEGER(nndf)
    GENPTR_INTEGER_ARRAY(ndfs)
+   GENPTR_LOGICAL(autoprov)
    GENPTR_INTEGER(status)
    char *creator = NULL;
 
    creator = cnfCreim( fcreator, fcreator_length );
-   ndgAddProv( *indf, creator, *nndf, ndfs, status );
+   ndgAddProv( *indf, creator, *nndf, ndfs, F77_ISTRUE( *autoprov ) ? 1 : 0,
+               status );
    cnfFree( creator );
 }
 
@@ -1408,7 +1428,7 @@ F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(whdef),
 /* =================== */
 
 void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs,
-                 int *status ){
+                 int autoprov, int *status ){
 /*
 *+
 *  Name:
@@ -1419,7 +1439,7 @@ void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs,
 
 *  Invocation:
 *     ndgAddProv( int indf, const char *creator, int nndf, int *ndfs,
-*                 int *status )
+*                 int autoprov, int *status )
 
 *  Description:
 *     This routine reads provenance from the specified output NDF, and
@@ -1446,33 +1466,72 @@ void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs,
 *        The number of input NDFs.
 *     ndfs
 *        A pointer to an array of identifiers for the input NDFs.
+*     autoprov
+*        If non-zero, then the the AUTOPROV environment variable is
+*        checked to see if provenance information should be stored in
+*        the output NDF (see "Notes:" below). If zero, the provenance
+*        information is stored regardless of the environment variable.
 *     status
 *        The global status.
+
+*  Notes:
+*     - If the "autoprov" argument is supplied non-zero, then the following
+*     checks are performed on the AUTOPROV environment variable: if the
+*     environment variable is set to '1' then the input NDFs are added to the
+*     provenance information in the output NDF. If the environment variable
+*     is set to anything other than '1' then the output provenance is not
+*     updated. If the environment variable is not set at all, the provenance
+*     will be updated if one or more of the input NDFs contains a PROVENANCE
+*     extension.
+
 *-
 */
 
 /* Local Variables: */
    NdgProvenance *prov;
+   const char *autopv;
    int i;
+   int store;
 
 /* Return if an error has occurred. */
    if( *status != SAI__OK ) return;
 
+/* Get the value of environment variable AUTOPROV. */
+   if( autoprov ) {
+      autopv = getenv( "AUTOPROV" );
+   } else {
+      autopv = "1";
+   }
+
+/* We only propagate provenance if AUTOPROV is set to '1', or if AUTOPROV
+   is unset and at least one input NDF had a provenance extension. */
+   if( !autopv || !strcmp( autopv, "1" ) ) {
+
 /* Get the provenance info from the output NDF. */
-   prov = ndgReadProv( indf, creator, status );
+      prov = ndgReadProv( indf, creator, status );
+
+/* Initialise a flag saying whether the provenance info should be stored
+   in the output NDF. */
+      store = ( autopv != NULL );
 
 /* Loop round, adding each input NDF as an ancestor into the output
    provenance info. */
-   for( i = 0; i < nndf; i++ ) {
-      ndgPutProv( prov, ndfs[ i ], NULL, 0, status );
-   }
+      for( i = 0; i < nndf; i++ ) {
+         ndgPutProv( prov, ndfs[ i ], NULL, 0, status );
 
-/* Write the provenance info back out to the output NDF. Ensure default
-   NDF history is written to the NDF before writing the provenance info. */
-   ndgWriteProv( prov, indf, 1, status );
+/* If any of the input NDFs contained explicit Pprovenance info then we
+   must always store the output provenance. */
+         if( !store ) ndfXstat( indf, EXT_NAME, &store, status );
+      }
+
+/* If autopv is set, or if any of the input NDFs had provenance info, write
+   the provenance info back out to the output NDF. Ensure default NDF history
+   is written to the NDF before writing the provenance info. */
+      if( store ) ndgWriteProv( prov, indf, 1, status );
 
 /* Free the provenance info. */
-   prov = ndgFreeProv( prov, status );
+      prov = ndgFreeProv( prov, status );
+   }
 }
 
 NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, int *status ){
