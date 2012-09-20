@@ -910,8 +910,11 @@
             CALL MSG_SETI( 'N', NVEC )
             CALL MSG_OUT( 'POL1_PLVEC_1', '   ^N vectors written to '//
      :                    'the output catalogue.', STATUS )
-         ELSE
+         ELSE IF( NVEC .EQ. 1 ) THEN
             CALL MSG_OUT( 'POL1_PLVEC_2', '   One vector written to '//
+     :                    'the output catalogue.', STATUS )
+         ELSE
+            CALL MSG_OUT( 'POL1_PLVEC_2', '   No vectors written to '//
      :                    'the output catalogue.', STATUS )
          END IF
          CALL MSG_BLANK( STATUS )

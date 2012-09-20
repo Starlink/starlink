@@ -202,6 +202,8 @@
 *     21-JAN-2008 (DSB):
 *        Cancel parameter IN before returning to avoid a dangling HDS
 *        locator.
+*     20-SEP-2012 (DSB):
+*        Delete output catalogue if it contains no vectors.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -275,6 +277,7 @@
       INTEGER MINPIX             ! Min. no. of good input pixels per bin
       INTEGER NDIM               ! No. of dimensions in input Stokes cube
       INTEGER NDIMO              ! No. of dimensions in output NDFs
+      INTEGER NROW               ! No of rows in output catalogue
       INTEGER NSTOKE             ! No. of Stokes parameters
       INTEGER NVAL               ! No. of values obtained
       INTEGER NXBIN              ! No. of bins along X axis
@@ -887,13 +890,17 @@
 *  Arrive here if an error occurs.
  999  CONTINUE
 
-*  If a catalogue was created, store the WCS information with it as "textual
-*  information", and release it.
+*  If a catalogue was created, and contains some rows, store the WCS
+*  information with it as "textual information", and release it.
       IF( MAKECT ) THEN
-         CALL POL1_CLCAT( IWCS, CI, STATUS )
+         CALL CAT_TROWS( CI, NROW, STATUS )
+         IF( NROW .GT. 0 ) CALL POL1_CLCAT( IWCS, CI, STATUS )
 
-*  If an error has occurred, delete the output catalogue.
-         IF( STATUS .NE. SAI__OK ) CALL POL1_RM( ONAME )
+*  If an error has occurred, or if the catalogue contains no rows, delete
+*  the output catalogue.
+         IF( NROW .EQ. 0 .OR. STATUS .NE. SAI__OK ) THEN
+            CALL POL1_RM( ONAME )
+         END IF
       END IF
 
 *  Release any work space used to hold the binned Stokes parameters.
