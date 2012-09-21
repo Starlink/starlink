@@ -216,6 +216,7 @@
 #include "prm_par.h"
 #include "par_err.h"
 #include "par.h"
+#include "subpar_err.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -508,8 +509,10 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
               if (*status != SAI__OK) {
                 /* if we failed to calculate a flatfield we continue but force the
                    flatfield to be completely bad. This will force the science data associated
-                   with the flatfield to be correctly blanked. */
-                errAnnul(status);
+                   with the flatfield to be correctly blanked. We do not annul though
+                   if we have a SUBPAR error telling us that we have failed to define
+                   our parameters properly. */
+                if (*status != SUBPAR__NOPAR) errAnnul(status);
 
                 /* parameters of flatfield */
                 ngood = 0;
