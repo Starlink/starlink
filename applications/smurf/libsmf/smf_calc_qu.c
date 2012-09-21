@@ -108,13 +108,13 @@ typedef struct smfCalcQUJobData {
    dim_t b1;
    dim_t b2;
    dim_t nbolo;
-   dim_t ntslice;
    double *dat;
    double *ipq;
    double *ipu;
    int ipolcrd;
    int block_start;
    int block_end;
+   int old;
    size_t bstride;
    size_t tstride;
    smf_qual_t *qua;
@@ -124,25 +124,34 @@ typedef struct smfCalcQUJobData {
 static void smf1_calc_qu_job( void *job_data, int *status );
 
 
+/* Old data has POL_ANG given in arbitrary integer units where
+   SMF__MAXPOLANG is equivalent to 2*PI. Store the factor to convert such
+   values into radians. */
+#define TORADS (2*AST__DPI/SMF__MAXPOLANG)
+
 
 void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
                   int block_end, int ipolcrd, int qplace, int uplace,
                   NdgProvenance *oprov, AstFitsChan *fc, int *status ){
 
 /* Local Variables: */
-   int bstep;                 /* Bolometer step between threads */
+   const JCMTState *state;    /* JCMTState info for current time slice */
    dim_t nbolo;               /* No. of bolometers */
    dim_t ncol;                /* No. of columns of bolometers */
    dim_t nrow;                /* No. of rows of bolometers */
    dim_t ntslice;             /* Number of time-slices in data */
    double *ipq;               /* Pointer to output Q array */
    double *ipu;               /* Pointer to output U array */
+   int bstep;                 /* Bolometer step between threads */
    int el;                    /* Number of mapped array elements */
    int indfq;                 /* Identifier for NDF holding Q values */
    int indfu;                 /* Identifier for NDF holding Q values */
-   int lbnd[ 2 ];             /* Lower pixel bounds of output NDF */
+   int itime;                 /* Time slice index */
    int iworker;               /* Index of a worker thread */
+   int lbnd[ 2 ];             /* Lower pixel bounds of output NDF */
+   int ntime;                 /* Time slices to check */
    int nworker;               /* No. of worker threads */
+   int old;                   /* Data has old-style POL_ANG values? */
    int ubnd[ 2 ];             /* Upper pixel bounds of output NDF */
    size_t bstride;            /* Stride between adjacent bolometer values */
    size_t tstride;            /* Stride between adjacent time slice values */
@@ -216,6 +225,22 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
 /* Check the above pointers can be used safely. */
    if( *status == SAI__OK ) {
 
+/* Go through the first thousand POL_ANG values to see if they are in
+   units of radians (new data) or arbitrary encoder units (old data).
+   They are assumed to be in radians if no POL_ANG value is larger than
+   20. */
+      old = 0;
+      state = hdr->allState;
+      ntime = ( ntslice > 1000 ) ? 1000 : ntslice;
+      for( itime = 0; itime < ntime; itime++,state++ ) {
+         if( state->pol_ang > 20 ) {
+            old = 1;
+            msgOutif( MSG__VERB, "","   POL2 data contains POL_ANG values "
+                      "in encoder units - converting to radians.", status );
+            break;
+         }
+      }
+
 /* Determine which bolometers are to be processed by which threads. */
       bstep = nbolo/nworker;
       if( bstep < 1 ) bstep = 1;
@@ -238,7 +263,6 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
          pdata->bstride = bstride;
          pdata->dat = data->pntr[0];;
          pdata->nbolo = nbolo;
-         pdata->ntslice = ntslice;
          pdata->qua = smf_select_qualpntr( data, NULL, status );;
          pdata->tstride = tstride;
          pdata->allstates = hdr->allState;
@@ -247,6 +271,7 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
          pdata->ipolcrd = ipolcrd;
          pdata->block_start = block_start;
          pdata->block_end = block_end;
+         pdata->old = old;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_calc_qu_job, 0, NULL,
@@ -304,7 +329,6 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
    dim_t b2;                  /* Last bolometer index */
    dim_t ibolo;               /* Bolometer index */
    dim_t nbolo;               /* Total number of bolometers */
-   dim_t ntslice;             /* Number of time-slices in data */
    double *dat;               /* Pointer to start of input data values */
    double *din0;              /* Pointer to input data array for 1st time */
    double *din;               /* Pointer to input data array for bolo/time */
@@ -320,6 +344,7 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
    int ipolcrd;               /* Reference direction for pol_ang */
    int itime;                 /* Time slice index */
    int n;                     /* Number of contributing values in S1 and S2 */
+   int old;                   /* Data has old-style POL_ANG values? */
    size_t bstride;            /* Stride between adjacent bolometer values */
    size_t tstride;            /* Stride between adjacent time slice values */
    smfCalcQUJobData *pdata;   /* Pointer to job data */
@@ -339,7 +364,6 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
    bstride = pdata->bstride;
    dat = pdata->dat;
    nbolo = pdata->nbolo;
-   ntslice = pdata->ntslice;
    qua = pdata->qua;
    tstride = pdata->tstride;
    allstates = pdata->allstates;
@@ -348,6 +372,7 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
    ipolcrd = pdata->ipolcrd;
    block_start = pdata->block_start;
    block_end = pdata->block_end;
+   old = pdata->old;
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
@@ -394,6 +419,9 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
    not bad. */
                if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
                    angle != VAL__BADD ) {
+
+/* If POL_ANG is stored in arbitrary encoder units, convert to radians. */
+                  if( old ) angle = angle*TORADS;
 
 /* Get the angle between the half-waveplate and north in the tracking
    system. */

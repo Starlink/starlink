@@ -40,8 +40,11 @@
 *     7-SEP-2012 (DSB):
 *        Complete re-write.
 *     11-SEP-2012 (DSB):
-*        Put VAL__BADD padding at the end of the POL_ANG array rather 
+*        Put VAL__BADD padding at the end of the POL_ANG array rather
 *        than immediately before the last bonus point.
+*     21-SEP-2012 (DSB):
+*        Recent data contains POL_ANG values in radians rather than
+*        arbitrary encoder units.
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
@@ -76,9 +79,6 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-
-/* POL_ANG is given in integer units where 944000 is equivalent to 2*PI */
-#define MAXANG 944000
 
 /* The half-width of the box over which a linear fit is done to the
    POL_ANG values. */
@@ -117,6 +117,7 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    double limit;
    double lresid;
    double m;
+   double maxang;
    double pop;
    double resid;
    double rts_origin;
@@ -130,6 +131,12 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
+
+/* Set the maximum value of POL_ANG prior to wrapping back to zero. Old
+   data had POL_ANG in arbitrary encoder units, with SMF__MAXPOLANG being
+   equivalent to 360 degrees. New data stored OL_ANG in radians. Assume
+   new data until we find a POL_ANG value greater than 2*PI. */
+   maxang = 2*AST__DPI;
 
 /* Loop over subarray. They probably all shre the same header, but is it
    guaranteed? */
@@ -165,6 +172,13 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
    in case... */
          if( state->rts_end != VAL__BADD && state->pol_ang != VAL__BADD ) {
 
+/* If the POL_ANG value is a lot more than 2.PI we must be dealing with
+   old data in which the POL_ANG value was given in arbitrary encoder units.
+   Change the maximum POL_ANG value appropriately. Since the old-style
+   POL_ANG values increased by several 1000 between steps, checking for a
+   value above 20 should be safe. */
+            if( state->pol_ang > 20 ) maxang = SMF__MAXPOLANG;
+
 /* If this is the first valid frame, record the initial RTS_END and
    POL_ANG values so that "time" and "angle" values are zero for the
    first frame. */
@@ -174,22 +188,21 @@ void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
 /* Store the time since the first valid frame, in days */
             time = state->rts_end - rts_origin;
 
-/* Store the POL_ANG rotation since the first valid frame, in arbitrary
-   encoder counts ( MAXANG corresponds to 360 degs). */
+/* Store the POL_ANG rotation since the first valid frame. */
             angle = state->pol_ang + ang_offset;
 
 /* If the previous frame was also valid, find the increment in POL_ANG. */
             if( langle != VAL__BADD ) {
                ang_change = angle - langle;
 
-/* If there has been a hugedrop in angle, we must have passed through a
+/* If there has been a huge drop in angle, we must have passed through a
    360->zero degs discontinuity. Increase the angle offset by 360 degs to
    remove this discontinity, and adjust the current angle and angle
    increment to use this new angle offset. */
-               if( ang_change < -MAXANG/2 ) {
-                  ang_offset += MAXANG;
-                  angle += MAXANG;
-                  ang_change += MAXANG;
+               if( ang_change < -maxang/2 ) {
+                  ang_offset += maxang;
+                  angle += maxang;
+                  ang_change += maxang;
                }
             }
 

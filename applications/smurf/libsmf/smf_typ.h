@@ -965,4 +965,11 @@ typedef enum {
   SMF__MATH_HISTOGRAM     = 6
 } smf_math_function;
 
+
+/* Some old POL2 data has POL_ANG values in arbitrary integer encoding
+   units rather than radians. This is is the encoder value that
+   corresponds to 2.PI. */
+#define SMF__MAXPOLANG 944000
+
+
 #endif /* SMF_TYP_DEFINED */
