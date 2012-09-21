@@ -57,6 +57,9 @@
 *        Original version.
 *     2012-03-06 (TIMJ):
 *        Use SOFA instead of SLA.
+*     21-SEP-2012 (DSB):
+*        Take 360->zero wrap-around in POL_ANG into account when adjusting the
+*        end time slice to a quarter revolution boundary.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -250,11 +253,20 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
          end_wang -= state->tcs_tr_ang - state->tcs_az_ang ;
       }
 
+/* On the assumption that POL_ANG increases with time, if the
+   half-waveplate angle at the end of the block is less than at the start of
+   the block, it must have reached 2*PI and wrapped back round to zero. So
+   add on 2*PI to the end value. */
+      if( end_wang < start_wang ) end_wang += 2*AST__DPI;
+
 /* Reduce the end angle so that it is an integral number of quarter
    revolutions in front of the start angle. We are assuming here that
    POL_ANG increases (rather than decreasing) with time. */
       end_wang = start_wang +
                   AST__DPIBY2*( (int) ( ( end_wang - start_wang )/AST__DPIBY2 ) );
+
+/* If the end angle is greater than 2*PI, reduce it by 2.PI. */
+      if( end_wang > 2*AST__DPI ) end_wang -= 2*AST__DPI;
 
 /* Work backwards through the time slices, starting at the current end
    time slice, until a time slice is found which has an angle less than the
