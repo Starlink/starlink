@@ -58,6 +58,8 @@
 *  History:
 *     1-DEC-2011 (DSB):
 *        Initial version.
+*     21-SEP-2012 (DSB):
+*        Half box sizes were undefined when using bad value masking.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -144,16 +146,16 @@ void smf_meanshift( double *indata, double *outdata, int nel, int stride,
 /* Initialise a pointer to the current output data value. */
    pout = outdata;
 
+/* Get the half width of each box. */
+   hb1 = box1/2;
+   hb2 = box2/2;
+
 /* First deal with cases where we are using a quality array. */
    if( qual ) {
 
 /* Initialise a pointer to the input quality value at the centre of the
    current filter box. */
       qin = qual;
-
-/* Get the half width of the box. */
-      hb1 = box1/2;
-      hb2 = box2/2;
 
 /* Loop round all output elements. */
       for( iout = 0; iout < nel; iout++,pout++ ) {
