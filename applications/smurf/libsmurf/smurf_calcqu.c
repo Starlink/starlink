@@ -95,6 +95,12 @@
 *        Control the verbosity of the application. Values can be
 *        NONE (no messages), QUIET (minimal messages), NORMAL,
 *        VERBOSE, DEBUG or ALL. [NORMAL]
+*     OUTI = LITERAL (Write)
+*        The name of an output HDS container file containing the I images.
+*        The NDFs within this container file are stored and named in the
+*        same way as those in the "OUTQ" container file, but using "U"
+*        insead of "Q" in the NDF names. No I images are created if a
+*        null (!) value is supplied. [!]
 *     OUTQ = LITERAL (Write)
 *        The name of an output HDS container file containing the Q images.
 *        Each image is held in a separate 2D NDF within the container file.
@@ -200,6 +206,8 @@
 *        Original version.
 *     4-SEP-2012 (DSB):
 *        Added FIX parameter.
+*     21-SEP-2012 (DSB):
+*        Added OUTI parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -264,9 +272,11 @@ void smurf_calcqu( int *status ) {
    Grp *igrp = NULL;          /* Group of input files */
    Grp *ogrp = NULL;          /* Group of output files  */
    Grp *sgrp = NULL;          /* Group of science files */
+   HDSLoc *loci = NULL;       /* Locator for output I container file */
    HDSLoc *locq = NULL;       /* Locator for output Q container file */
    HDSLoc *locu = NULL;       /* Locator for output U container file */
    NdgProvenance *oprov;      /* Provenance to store in each output NDF */
+   ThrWorkForce *wf;          /* Pointer to a pool of worker threads */
    char headval[ 81 ];        /* FITS header value */
    char ndfname[ 30 ];        /* Name of output Q or U NDF */
    char polcrd[ 81 ];         /* FITS 'POL_CRD' header value */
@@ -277,6 +287,7 @@ void smurf_calcqu( int *status ) {
    int dkclean;               /* Clean dark squids? */
    int fix;                   /* Fix the POL-2 triggering issue? */
    int iblock;                /* Index of current block */
+   int iplace;                /* NDF placeholder for current block's I image */
    int ipolcrd;               /* Reference direction for waveplate angles */
    int nc;                    /* Number of characters written to a string */
    int qplace;                /* NDF placeholder for current block's Q image */
@@ -294,7 +305,6 @@ void smurf_calcqu( int *status ) {
    smfData *data = NULL;      /* Concatenated data for one subarray */
    smfData *dkdata = NULL;    /* Concatenated dark squid data for one subarray */
    smfGroup *sgroup = NULL;   /* smfGroup corresponding to sgrp */
-   ThrWorkForce *wf;          /* Pointer to a pool of worker threads */
 
 /* Check inhereited status */
    if( *status != SAI__OK ) return;
@@ -331,6 +341,16 @@ void smurf_calcqu( int *status ) {
 /* Associate the locators with the structures. */
       datAssoc( "OUTQ", "WRITE", &locq, status );
       datAssoc( "OUTU", "WRITE", &locu, status );
+
+/* The I images are optional. */
+      if( *status == SAI__OK ) {
+         datCreat( "OUTI", "CALCQU", 0, 0, status );
+         datAssoc( "OUTI", "WRITE", &loci, status );
+         if( *status == PAR__NULL ) {
+            errAnnul( status );
+            loci = NULL;
+         }
+      }
 
 /* Group the input files so that all files within a single group have the
    same wavelength and belong to the same subscan of the same observation.
@@ -538,7 +558,7 @@ void smurf_calcqu( int *status ) {
             }
 
 /* If not already done, get the maximum spatial drift (in arc-seconds) that
-   can be tolerated whilst creating a single Q/U image. The default value is
+   can be tolerated whilst creating a single I/Q/U image. The default value is
    half the makemap default pixel size. */
             if( arcerror == 0.0 ) {
                parDef0d( "ARCERROR", 0.5*smf_calc_telres( data->hdr->fitshdr,
@@ -546,13 +566,13 @@ void smurf_calcqu( int *status ) {
                parGet0r( "ARCERROR", &arcerror, status );
             }
 
-/* The algorithm that calculates Q and U assumes that all samples for a
+/* The algorithm that calculates I, Q and U assumes that all samples for a
    single bolometer measure flux from the same point on the sky. Due to
    sky rotation, this will not be the case - each bolometer will drift
    slowly across the sky. However, since the drift is (or should be)
-   slow we can apply the Q/U algorithm to blocks of contiguous data over
+   slow we can apply the I/Q/U algorithm to blocks of contiguous data over
    which the bolometers do not move significantly. We produce a separate
-   Q and U image for each such block. The first block starts at the first
+   I, Q and U image for each such block. The first block starts at the first
    time slice in the smfData. */
             block_start = 0;
 
@@ -564,7 +584,7 @@ void smurf_calcqu( int *status ) {
             block_end = smf_block_end( data, block_start, ipolcrd, arcerror,
                                        status );
 
-/* Loop round creating a pair of Q/U images for each block. Count them. */
+/* Loop round creating I/Q/U images for each block. Count them. */
             iblock = 0;
             while( block_end >= 0 && *status == SAI__OK ) {
 
@@ -600,11 +620,20 @@ void smurf_calcqu( int *status ) {
                   ndfname[ 0 ] = 'U';
                   ndfPlace( locu, ndfname, &uplace, status );
 
+/* The name of the I NDF is the same except the initial "Q" is changed to
+   "I". */
+                  if( loci ) {
+                     ndfname[ 0 ] = 'I';
+                     ndfPlace( loci, ndfname, &iplace, status );
+                  } else {
+                     iplace = NDF__NOPL;
+                  }
+
 /* Create the Q and U images for the current block of time slices from
    the subarray given by "idx", storing them in the output container
    file. */
-                  smf_calc_qu( wf, data, block_start, block_end, ipolcrd,
-                               qplace, uplace, oprov, fc, status );
+                  smf_calc_iqu( wf, data, block_start, block_end, ipolcrd,
+                                qplace, uplace, iplace, oprov, fc, status );
 
 /* The next block starts at the first time slice following the previous
    block. */
@@ -633,11 +662,13 @@ void smurf_calcqu( int *status ) {
 /* Annul the locators for the output container files. */
       datAnnul( &locq, status );
       datAnnul( &locu, status );
+      if( loci ) datAnnul( &loci, status );
 
 /* The parameter system hangs onto a primary locator for each container
    file, so cancel the parameters to annul these locators. */
       datCancl( "OUTQ", status );
       datCancl( "OUTU", status );
+      datCancl( "OUTI", status );
    }
 
 /* Free resources. */

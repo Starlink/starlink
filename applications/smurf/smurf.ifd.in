@@ -749,6 +749,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outi {
+                type NDF
+                access WRITE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                prompt {Container file for output I NDFs}
+                helpkey *
+            }
+
             parameter outq {
                 position 2
                 type NDF

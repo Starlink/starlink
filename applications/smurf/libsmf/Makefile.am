@@ -31,7 +31,7 @@ smf_calc_mappa.c \
 smf_calc_meantau.c \
 smf_calc_mmapsize.c \
 smf_calc_mode.c \
-smf_calc_qu.c \
+smf_calc_iqu.c \
 smf_calc_skyframe.c \
 smf_calc_smoothedwvm.c \
 smf_calc_stareimage.c \

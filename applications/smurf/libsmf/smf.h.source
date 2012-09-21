@@ -599,9 +599,9 @@ void smf_calc_mmapsize( size_t headsize, const smfData * data,
 
 void smf_calc_mode( smfHead * hdr, int * status );
 
-void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start, int block_end,
-                  int ipolcrd, int qplace, int uplace, NdgProvenance *oprov,
-                  AstFitsChan *fc, int *status );
+void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start, int block_end,
+                   int ipolcrd, int qplace, int uplace, int iplace, NdgProvenance *oprov,
+                   AstFitsChan *fc, int *status );
 
 void smf_calc_skyframe( const AstFrame * skyin,
                         const char * system, const smfHead* hdr,
@@ -1089,7 +1089,7 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
                     double minfreq, double whitefreq, double maxfreq,
                     double *a, double *b, double *w, int *status );
 
-void smf_fit_profile(  smfData *data, smfArray *pardata, void *pfcntrl, 
+void smf_fit_profile(  smfData *data, smfArray *pardata, void *pfcntrl,
 		       int *status );
 
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,

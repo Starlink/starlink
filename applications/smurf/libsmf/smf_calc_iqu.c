@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_calc_qu
+*     smf_calc_iqu
 
 *  Purpose:
-*     Calculate a pair of Q and U images from a block of time slices.
+*     Calculate I, Q and U images from a block of time slices.
 
 *  Language:
 *     Starlink ANSI C
@@ -13,9 +13,10 @@
 *     C function
 
 *  Invocation:
-*     void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
+*     void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 *                       int block_end, int ipolcrd, int qplace, int uplace,
-*                       NdgProvenance *oprov, AstFitsChan *fc, int *status );
+*                       int iplace, NdgProvenance *oprov, AstFitsChan *fc,
+*                       int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -36,25 +37,29 @@
 *     uplace = int (Given)
 *        A placeholder identifying the location at which to store the
 *        the output NDF holding the U image.
+*     iplace = int (Given)
+*        A placeholder identifying the location at which to store the
+*        the output NDF holding the I image. May be NDF__NOPL if no I
+*        images are required.
 *     oprov = NdgProvenance * (Given)
 *        Pointer to a structure holding the provenance information to
-*        store in the Q and U NDFs.
+*        store in the I, Q and U NDFs.
 *     fc = AstFitsChan * (Given)
 *        Pointer to a FitsChan holding the FITS headers to store in the
-*        FITS extensions of the Q and U NDFs.
+*        FITS extensions of the I, Q and U NDFs.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This function creates a pair of 2D NDFs - one holding Q values and
-*     the other holding U values. Each NDF holds a Q or U value for each
-*     bolometer. Each NDF has its own WCS component, and receives the
-*     supplied provenance information and FITS headers. The Q and U values
-*     are based on the time series data between time slices "block_start"
-*     and "block_end". The spatial position of each bolometer is assumed
-*     not to move significantly over the duration of this block of time
-*     slices. The Q and U bvalues stored in the output NDFs are referenced
-*     to north in the tracking system.
+*     This function creates three 2D NDFs - one holding I values, one holding
+*     Q values and the other holding U values. Each NDF holds a I, Q or U
+*     value for each bolometer. Each NDF has its own WCS component, and
+*     receives the supplied provenance information and FITS headers. The
+*     I, Q and U values are based on the time series data between time slices
+*     "block_start" and "block_end". The spatial position of each bolometer
+*     is assumed not to move significantly over the duration of this block of
+*     time slices. The I, Q and U values stored in the output NDFs are
+*     referenced to north in the tracking system.
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -66,10 +71,13 @@
 *     9-AUG-2012 (DSB):
 *        Add POLANAL Frames to the WCS FrameSet fo each output NDF. This
 *        communicates the reference direction to POLPACK.
+*     21-SEP-2012 (DSB):
+*        Renamed from smf_calc_qu because it now returns I images in
+*        addition to Q and U.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011 Science and Technology Facilities Council.
+*     Copyright (C) 2011-2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -103,7 +111,7 @@
 #include "libsmf/smf.h"
 
 /* Local data types: */
-typedef struct smfCalcQUJobData {
+typedef struct smfCalcIQUJobData {
    const JCMTState *allstates;
    dim_t b1;
    dim_t b2;
@@ -111,6 +119,7 @@ typedef struct smfCalcQUJobData {
    double *dat;
    double *ipq;
    double *ipu;
+   double *ipi;
    int ipolcrd;
    int block_start;
    int block_end;
@@ -118,10 +127,10 @@ typedef struct smfCalcQUJobData {
    size_t bstride;
    size_t tstride;
    smf_qual_t *qua;
-} smfCalcQUJobData;
+} smfCalcIQUJobData;
 
 /* Prototypes for local functions */
-static void smf1_calc_qu_job( void *job_data, int *status );
+static void smf1_calc_iqu_job( void *job_data, int *status );
 
 
 /* Old data has POL_ANG given in arbitrary integer units where
@@ -130,9 +139,10 @@ static void smf1_calc_qu_job( void *job_data, int *status );
 #define TORADS (2*AST__DPI/SMF__MAXPOLANG)
 
 
-void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
+void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
                   int block_end, int ipolcrd, int qplace, int uplace,
-                  NdgProvenance *oprov, AstFitsChan *fc, int *status ){
+                  int iplace, NdgProvenance *oprov, AstFitsChan *fc,
+                  int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
@@ -140,10 +150,12 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
    dim_t ncol;                /* No. of columns of bolometers */
    dim_t nrow;                /* No. of rows of bolometers */
    dim_t ntslice;             /* Number of time-slices in data */
+   double *ipi;               /* Pointer to output I array */
    double *ipq;               /* Pointer to output Q array */
    double *ipu;               /* Pointer to output U array */
    int bstep;                 /* Bolometer step between threads */
    int el;                    /* Number of mapped array elements */
+   int indfi;                 /* Identifier for NDF holding I values */
    int indfq;                 /* Identifier for NDF holding Q values */
    int indfu;                 /* Identifier for NDF holding Q values */
    int itime;                 /* Time slice index */
@@ -155,8 +167,8 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
    int ubnd[ 2 ];             /* Upper pixel bounds of output NDF */
    size_t bstride;            /* Stride between adjacent bolometer values */
    size_t tstride;            /* Stride between adjacent time slice values */
-   smfCalcQUJobData *job_data = NULL; /* Pointer to all job data */
-   smfCalcQUJobData *pdata = NULL;/* Pointer to next job data */
+   smfCalcIQUJobData *job_data = NULL; /* Pointer to all job data */
+   smfCalcIQUJobData *pdata = NULL;/* Pointer to next job data */
    smfHead *hdr;              /* Pointer to data header this time slice */
 
 /* Check the inherited status. */
@@ -178,12 +190,12 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
          msgSeti( "S", block_start );
          msgSeti( "E", block_end );
          msgSeti( "N", ntslice );
-         errRep( " ", "smf_calc_qu: invalid block of time slices - ^S to "
+         errRep( " ", "smf_calc_iqu: invalid block of time slices - ^S to "
                  "^E (^N time slices are available).", status );
       }
    }
 
-/* Create the two output NDFs. Each one is a 2D array with dimensions
+/* Create the output NDFs. Each one is a 2D array with dimensions
    equal to the bolometer array. */
    lbnd[ 0 ] = 1;
    lbnd[ 1 ] = 1;
@@ -191,20 +203,27 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
    ubnd[ 1 ] = nrow;
    ndfNew( "_DOUBLE", 2, lbnd, ubnd, &qplace, &indfq, status );
    ndfNew( "_DOUBLE", 2, lbnd, ubnd, &uplace, &indfu, status );
+   if( iplace != NDF__NOPL ) {
+      ndfNew( "_DOUBLE", 2, lbnd, ubnd, &iplace, &indfi, status );
+   } else {
+      indfi = NDF__NOID;
+   }
 
-/* Store any supplied provenance in both NDFs. */
+/* Store any supplied provenance in all NDFs. */
    if( oprov ) {
       ndgWriteProv( oprov, indfq, 1, status );
       ndgWriteProv( oprov, indfu, 1, status );
+      if( indfi != NDF__NOID ) ndgWriteProv( oprov, indfi, 1, status );
    }
 
-/* Store any supplied FITS headers in both NDFs.*/
+/* Store any supplied FITS headers in all NDFs.*/
    if( fc && astGetI( fc, "NCard" ) > 0 ) {
       kpgPtfts( indfq, fc, status );
       kpgPtfts( indfu, fc, status );
+      if( indfi != NDF__NOID )  kpgPtfts( indfi, fc, status );
    }
 
-/* Store the WCS frameSet in both NDFs. First get the FrameSet for the
+/* Store the WCS frameSet in all NDFs. First get the FrameSet for the
    central time slice in the block, set its current Frame to the tracking
    frame, and then store it in the two NDFs. */
    smf_tslice_ast( data, ( block_start + block_end )/2, 1, status);
@@ -213,10 +232,16 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
                                     status ) );
    ndfPtwcs( hdr->wcs, indfq, status );
    ndfPtwcs( hdr->wcs, indfu, status );
+   if( indfi != NDF__NOID ) ndfPtwcs( hdr->wcs, indfi, status );
 
 /* Map the Data array in each NDF. */
    ndfMap( indfq, "Data", "_DOUBLE", "WRITE", (void **) &ipq, &el, status );
    ndfMap( indfu, "Data", "_DOUBLE", "WRITE", (void **) &ipu, &el, status );
+   if( indfi != NDF__NOID ) {
+      ndfMap( indfi, "Data", "_DOUBLE", "WRITE", (void **) &ipi, &el, status );
+   } else {
+      ipi = NULL;
+   }
 
 /* Create structures used to pass information to the worker threads. */
    nworker = wf ? wf->nworker : 1;
@@ -268,13 +293,14 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
          pdata->allstates = hdr->allState;
          pdata->ipq = ipq;
          pdata->ipu = ipu;
+         pdata->ipi = ipi;
          pdata->ipolcrd = ipolcrd;
          pdata->block_start = block_start;
          pdata->block_end = block_end;
          pdata->old = old;
 
 /* Pass the job to the workforce for execution. */
-         thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_calc_qu_job, 0, NULL,
+         thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_calc_iqu_job, 0, NULL,
                       status );
       }
 
@@ -287,38 +313,40 @@ void smf_calc_qu( ThrWorkForce *wf, smfData *data, int block_start,
    vectors (celestial north in this case). */
    smf_polext( indfq, 0, 0.0, status );
    smf_polext( indfu, 0, 0.0, status );
+   if( ipi ) smf_polext( indfi, 0, 0.0, status );
 
 /* Free the two output NDFs. */
    ndfAnnul( &indfq, status );
    ndfAnnul( &indfu, status );
+   if( ipi ) ndfAnnul( &indfi, status );
 
 /* Free other resources. */
    job_data = astFree( job_data );
 }
 
 
-static void smf1_calc_qu_job( void *job_data, int *status ) {
+static void smf1_calc_iqu_job( void *job_data, int *status ) {
 /*
 *  Name:
-*     smf1_calc_qu_job
+*     smf1_calc_iqu_job
 
 *  Purpose:
-*     Calculate Q and U for a block of bolometers.
+*     Calculate I, Q and U for a block of bolometers.
 
 *  Invocation:
-*     void smf1_calc_qu_job( void *job_data, int *status )
+*     void smf1_calc_iqu_job( void *job_data, int *status )
 
 *  Arguments:
 *     job_data = void * (Given)
 *        Pointer to the data needed by the job. Should be a pointer to a
-*        smfCalcQUJobData structure.
+*        smfCalcIQUJobData structure.
 *     status = int * (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This routine calculate the Q and U values for each bolometer in a
-*     block of bolometers. It runs within a thread instigated by
-*     smf_calc_qu.
+*     This routine calculate the I, Q and U values for each bolometer in
+*     a block of bolometers. It runs within a thread instigated by
+*     smf_calc_iqu.
 
 */
 
@@ -332,22 +360,25 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
    double *dat;               /* Pointer to start of input data values */
    double *din0;              /* Pointer to input data array for 1st time */
    double *din;               /* Pointer to input data array for bolo/time */
+   double *ipi;               /* Pointer to output I array */
    double *ipq;               /* Pointer to output Q array */
    double *ipu;               /* Pointer to output U array */
    double angle;              /* Phase angle for FFT */
+   double i;                  /* Output I value */
    double q;                  /* Output Q value */
    double s1;                 /* Sum of weighted cosine terms */
    double s2;                 /* Sum of weighted sine terms */
+   double s3;                 /* Sum of weights */
    double u;                  /* Output U value */
    int block_end;             /* Last time slice to process */
    int block_start;           /* First time slice to process */
    int ipolcrd;               /* Reference direction for pol_ang */
    int itime;                 /* Time slice index */
-   int n;                     /* Number of contributing values in S1 and S2 */
+   int n;                     /* Number of contributing values in S1, S2 and S3 */
    int old;                   /* Data has old-style POL_ANG values? */
    size_t bstride;            /* Stride between adjacent bolometer values */
    size_t tstride;            /* Stride between adjacent time slice values */
-   smfCalcQUJobData *pdata;   /* Pointer to job data */
+   smfCalcIQUJobData *pdata;   /* Pointer to job data */
    smf_qual_t *qin0;          /* Pointer to input quality array for 1st time */
    smf_qual_t *qin;           /* Pointer to input quality array for bolo/time */
    smf_qual_t *qua;           /* Pointer to start of input quality values */
@@ -357,7 +388,7 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
 
 /* Get a pointer to the job data, and then extract its contents into a
    set of local variables. */
-   pdata = (smfCalcQUJobData *) job_data;
+   pdata = (smfCalcIQUJobData *) job_data;
 
    b1 = pdata->b1;
    b2 = pdata->b2;
@@ -367,6 +398,7 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
    qua = pdata->qua;
    tstride = pdata->tstride;
    allstates = pdata->allstates;
+   ipi = pdata->ipi;
    ipq = pdata->ipq;
    ipu = pdata->ipu;
    ipolcrd = pdata->ipolcrd;
@@ -377,10 +409,11 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
 /* Check we have something to do. */
    if( b1 < nbolo ) {
 
-/* Increment the output Q and U pointers to point to the first bolometer
+/* Increment the output I, Q and U pointers to point to the first bolometer
    processed by this thread. */
       ipq += b1;
       ipu += b1;
+      if( ipi ) ipi += b1;
 
 /* Initialise pointers to the first time slice data and quality value for
    the first bolometer to be processed. */
@@ -392,6 +425,7 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
 
 /* If the whole bolometer is bad, just use bad q and u values. */
          if( *qin0 & SMF__Q_BADB ) {
+            i = VAL__BADD;
             u = VAL__BADD;
             q = VAL__BADD;
 
@@ -406,6 +440,7 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
 /* Initialise the sums used to find Q and U at this bolometer. */
             s1 = 0.0;
             s2 = 0.0;
+            s3 = 0.0;
             n = 0.0;
 
 /* Loop round all time slices. */
@@ -440,6 +475,7 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
                   angle *= 4;
                   s1 += (*din)*cos( angle );
                   s2 += (*din)*sin( angle );
+                  s3 += (*din);
                   n++;
                }
 
@@ -449,18 +485,20 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
                qin += tstride;
             }
 
-/* Calculate the q and u values in the output NDF. The error on these values
+/* Calculate the q, u and i values in the output NDF. The error on these values
    will be enormous if there are not many values, so put a hard lower limit
    of 5 samples. */
             if( n > 4 ) {
                q = 4*s1/n;
                u = 4*s2/n;
+               i = 2*s2/n;
 
 /* Rotate the (q,u) vector so that an angle of zero corresponds to celestial
    north. */
             } else {
                q = VAL__BADD;
                u = VAL__BADD;
+               i = VAL__BADD;
             }
          }
 
@@ -468,6 +506,7 @@ static void smf1_calc_qu_job( void *job_data, int *status ) {
    so that they point to the next output values. */
          *(ipq++) = q;
          *(ipu++) = u;
+         if( ipi ) *(ipi++) = i;
 
 /* Update the pointers to the first time slice data and quality value for
    the next bolometer. */
