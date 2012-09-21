@@ -115,6 +115,8 @@
 *        Allow data to be divided or multiplied by the optical flat-fields.
 *     2011-10-17 (EC):
 *        Add PCA cleaning in chunks (PCALEN parameter)
+*     2011-09-21 (DSB):
+*        Skip the scan velocity calculation if observing mode is "stare".
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -298,7 +300,8 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                                     (data->hdr->seqtype==SMF__TYP_SCIENCE) ||
                                     (data->hdr->seqtype==SMF__TYP_POINTING) ||
                                     (data->hdr->seqtype==SMF__TYP_FOCUS) ||
-                                    (data->hdr->seqtype==SMF__TYP_SKYDIP)) ) {
+                                    (data->hdr->seqtype==SMF__TYP_SKYDIP))
+                                 && (data->hdr->obsmode!=SMF__OBS_STARE) ) {
 
             smf_flag_slewspeed( data, flagslow, flagfast, &nflag, &scanvel,
                               status );
