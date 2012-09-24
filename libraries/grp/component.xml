@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="grp" support="S">
-  <version>3.6</version>
+  <version>3.7</version>
   <path>libraries/grp</path>
   <description>GRP - Routines for Managing Groups of Objects</description>
   <abstract><p>GRP provides facilities for handling groups of objects which

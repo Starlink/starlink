@@ -762,6 +762,27 @@ Grp *grpSlave( const Grp *grp, int *status ){
 }
 
 
+F77_SUBROUTINE(grp_show)( INTEGER(IGRP), LOGICAL(SLAVES), INTEGER(STATUS) );
+
+void grpShow( Grp *grp, int slaves, int *status ){
+   DECLARE_INTEGER(IGRP);
+   DECLARE_LOGICAL(SLAVES);
+   DECLARE_INTEGER(STATUS);
+
+   IGRP = grpC2F( grp, status );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_EXPORT_LOGICAL( slaves, SLAVES );
+
+   F77_LOCK( F77_CALL(grp_show)( INTEGER_ARG(&IGRP),
+                        LOGICAL_ARG(&SLAVES),
+                        INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
 F77_SUBROUTINE(grp_sown)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(STATUS) );
 
 void grpSown( Grp *grp1, Grp *grp2, int *status ){

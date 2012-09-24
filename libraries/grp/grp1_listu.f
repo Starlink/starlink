@@ -25,6 +25,7 @@
 *  Arguments:
 *     UNIT = INTEGER (Given)
 *        The Fortran unit number to which the names should be written.
+*        If -1 then the names are written to the screen using MSG_OUT.
 *     INDXLO = INTEGER (Given)
 *        The low index limit of the group section. If both INDXLO and
 *        INDXHI are zero, then the entire group is used.
@@ -41,6 +42,7 @@
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -66,6 +68,8 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     24-SEP-2012 (DSB):
+*        Allow names to be displayed using MSG_OUT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,33 +188,33 @@
             IAT = 0
             CALL CHR_APPND( COMC, COMSTR, IAT )
             CALL CHR_APPND( COMNT, COMSTR, IAT )
-            WRITE( UNIT, '(A)', IOSTAT = IOERR )  COMSTR( : IAT )
+            IF( UNIT .EQ. -1 ) THEN
+               CALL MSG_OUT( ' ', COMSTR( : IAT ), STATUS )
+            ELSE
+               WRITE( UNIT, '(A)', IOSTAT = IOERR )  COMSTR( : IAT )
 
 *  If an error occurred, then construct a message and report it.
-            IF ( IOERR .NE. 0 ) THEN
-               STATUS = GRP__FIOER
+               IF ( IOERR .NE. 0 ) THEN
+                  STATUS = GRP__FIOER
 
-               INQUIRE ( UNIT = UNIT, NAME = FNAME, IOSTAT = IOS )
+                  INQUIRE ( UNIT = UNIT, NAME = FNAME, IOSTAT = IOS )
 
-               IF( IOS .EQ. 0 ) THEN
-                  CALL MSG_SETC( 'FILE', FNAME )
-               ELSE
-                  CALL MSG_SETC( 'FILE', ' ' )
+                  IF( IOS .EQ. 0 ) THEN
+                     CALL MSG_SETC( 'FILE', FNAME )
+                  ELSE
+                     CALL MSG_SETC( 'FILE', ' ' )
+                  END IF
+
+                  CALL MSG_SETI( 'UNIT', UNIT )
+                  CALL ERR_FIOER( 'MESSAGE', IOERR )
+                  CALL ERR_REP( 'GRP1_LISTU_ERR4', 'GRP1_LISTU: Error'//
+     :                          ' writing to file ^FILE on Fortran '//
+     :                          'unit ^UNIT:- "^MESSAGE".', STATUS )
+                  GO TO 999
+
                END IF
-
-               CALL MSG_SETI( 'UNIT', UNIT )
-               CALL ERR_FIOER( 'MESSAGE', IOERR )
-
-               CALL ERR_REP( 'GRP1_LISTU_ERR4',
-     :'GRP1_LISTU: Error writing to file ^FILE on Fortran unit ^UNIT '//
-     :'- "^MESSAGE".', STATUS )
-
-               GO TO 999
-
             END IF
-
          END IF
-
       END IF
 
 *  Call GRP1_ILIST to write the names into the file.  NB, the final

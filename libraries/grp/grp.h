@@ -148,6 +148,7 @@ Grp *grpRemov( const Grp *, const char *, int * );
 void grpMsg( const char *, const Grp *, int );
 Grp *grpOwn( const Grp *, int * );
 Grp *grpSlave( const Grp *, int * );
+void grpShow( Grp *, int, int * );
 void grpSown( Grp *, Grp *, int * );
 Grp *grpHead( const Grp *, int * );
 

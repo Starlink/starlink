@@ -6,13 +6,13 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun150.9}
-\newcommand{\stardocnumber}    {150.9}
+\newcommand{\stardocsource}    {sun150.10}
+\newcommand{\stardocnumber}    {150.10}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {17th May 2011}
+\newcommand{\stardocdate}      {24th September 2012}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of Objects}
-\newcommand{\stardocversion}   {Version 3.6}
+\newcommand{\stardocversion}   {Version 3.7}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -3540,6 +3540,51 @@ environment}
    }
 }
 \sstroutine{
+   GRP\_SHOW
+}{
+   List contents ofa group to the screen
+}{
+   \sstdescription{
+      The contents of the supplied group are listed to the screen, with
+      one name on each line. If the group has a non-blank type string, it
+      is dislayed first, prefixed with the groups current comment character
+      (see routine GRP\_SETCC). If SLAVES is .TRUE., then any
+      slave group owned by the supplied group is also displayed. This is
+      recursive - any slave group owned by a displayed slave group is also
+      displayed.
+   }
+   \sstinvocation{
+      CALL GRP\_SHOW( IGRP, SLAVES, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         The GRP identifier for the group to be displayed.
+      }
+      \sstsubsection{
+         SLAVES = LOGICAL (Given)
+      }{
+         If TRUE., then the entire chain of slaved groups owned by the
+         specified group are also displayed.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the group is case insensitive (as set up by a call to
+         routine GRP\_SETCS) then the names are written out in upper case,
+         otherwise they are written out as supplied.
+      }
+   }
+}
+\sstroutine{
    GRP\_SLAVE
 }{
    Returns the identifier of the group which is owned by the specified
@@ -3712,6 +3757,13 @@ library (see \xref{SUN/121}{sun121}{}), the CHR library (see
 Peter Draper is thanked for his work on porting the original IRH\_ package to
 UNIX, and Rodney Warren-Smith is thanked for his extensive suggestions for
 improvements to the GRP\_ package.
+
+\section{Changes and New Features in V3.7}
+The following changes have occurred in the GRP\_ system since version 3.6:
+
+\begin{enumerate}
+\item Addition of routine GRP\_SHOW.
+\end{enumerate}
 
 \section{Changes and New Features in V3.6}
 The following changes have occurred in the GRP\_ system since version 3.5:

@@ -33,12 +33,14 @@
 *        High index limit of the group subsection. Values greater than
 *        SIZE cause SIZE to be used instead.
 *     UNIT = INTEGER (Given)
-*        Fortran unit number on which the file is opened.
+*        Fortran unit number on which the file is opened. If -1 then the
+*        names are written to the screen using MSG_OUT.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -64,6 +66,8 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     24-SEP-2012 (DSB):
+*        Allow names to be displayed using MSG_OUT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,15 +122,21 @@
 *  Write out the used sub-string within the name.
          ULEN = CHR_LEN( NAME )
          IF( ULEN .GT. 0 ) THEN
-            WRITE( UNIT, '(A)', IOSTAT = IOERR ) NAME( : ULEN )
-
+            IF( UNIT .EQ. -1 ) THEN
+               CALL MSG_OUT( ' ', NAME( : ULEN ), STATUS )
+            ELSE
+               WRITE( UNIT, '(A)', IOSTAT = IOERR ) NAME( : ULEN )
+            END IF
          ELSE
-            WRITE( UNIT, '(A)', IOSTAT = IOERR ) ' '
-
+            IF( UNIT .EQ. -1 ) THEN
+               CALL MSG_BLANK( STATUS )
+            ELSE
+               WRITE( UNIT, '(A)', IOSTAT = IOERR ) ' '
+            END IF
          END IF
 
 *  If an error occurred, then construct a message and report it.
-         IF ( IOERR .NE. 0 ) THEN
+         IF ( UNIT .NE. -1 .AND. IOERR .NE. 0 ) THEN
             STATUS = GRP__FIOER
 
             INQUIRE ( UNIT = UNIT, NAME = FNAME, IOSTAT = IOS )

@@ -121,6 +121,9 @@
      :                 STATUS )
       END IF
 
+*  Display the contents of the group on the screen.
+      CALL GRP_SHOW( IGRP, .TRUE., STATUS )
+
 *  Get the second name in the group.
       CALL GRP_GET( IGRP, 2, 1, NAME, STATUS )
 

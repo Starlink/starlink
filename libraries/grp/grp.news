@@ -1,8 +1,7 @@
 1 GRP_library
                                              Expires: ???
 
-A new release (V3.6) of the GRP library is now available. It includes
+A new release (V3.7) of the GRP library is now available. It includes
 the following changes:
 
-- A new routine GRP_SLAVE to return the identifier for the group (if any)
-that is owned by a specified group.
+- A new routine GRP_SHOW to list the contents of a group to the screen.
