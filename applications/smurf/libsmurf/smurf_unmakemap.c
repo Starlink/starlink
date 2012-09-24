@@ -451,10 +451,13 @@ void smurf_unmakemap( int *status ) {
    U values, and fill them with bad values. */
       if( inq_data && inu_data ) {
          pq = outq_data = astMalloc( nel*sizeof( *outq_data ) );
-         for( iel = 0; iel < nel; iel++ ) *(pq++) = VAL__BADD;
-
          pu = outu_data = astMalloc( nel*sizeof( *outu_data ) );
-         for( iel = 0; iel < nel; iel++ ) *(pu++) = VAL__BADD;
+         if( *status == SAI__OK ) {
+            for( iel = 0; iel < nel; iel++ ) {
+               *(pu++) = VAL__BADD;
+               *(pq++) = VAL__BADD;
+            }
+         }
 
 /* Resample them both into 3D time series. */
          smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
