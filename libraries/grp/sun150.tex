@@ -3332,6 +3332,42 @@ environment}
    }
 }
 \sstroutine{
+   GRP\_SAME
+}{
+   Determine if two GRP identifiers refer to the same group
+}{
+   \sstdescription{
+      The routines returns a flag indicating if the two supplied GRP
+      identifiers refer to the same group.
+   }
+   \sstinvocation{
+      CALL GRP\_SAME( IGRP1, IGRP2, SAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         The first GRP identifier.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Given)
+      }{
+         The second GRP identifier.
+      }
+      \sstsubsection{
+         SAME = LOGICAL (Returned)
+      }{
+         Returned set to .TRUE. if the two identifiers refer to the
+         same group, and .FALSE. otherwise.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    GRP\_SETCC
 }{
    Sets requested control characters for the specified group
@@ -3762,6 +3798,7 @@ improvements to the GRP\_ package.
 The following changes have occurred in the GRP\_ system since version 3.6:
 
 \begin{enumerate}
+\item Addition of routine GRP\_SAME.
 \item Addition of routine GRP\_SHOW.
 \end{enumerate}
 

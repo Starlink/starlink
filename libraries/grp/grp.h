@@ -148,9 +148,10 @@ Grp *grpRemov( const Grp *, const char *, int * );
 void grpMsg( const char *, const Grp *, int );
 Grp *grpOwn( const Grp *, int * );
 Grp *grpSlave( const Grp *, int * );
-void grpShow( Grp *, int, int * );
+void grpShow( const Grp *, int, int * );
 void grpSown( Grp *, Grp *, int * );
 Grp *grpHead( const Grp *, int * );
+void grpSame( const Grp *, const Grp *, int *, int * );
 
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */

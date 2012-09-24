@@ -762,22 +762,46 @@ Grp *grpSlave( const Grp *grp, int *status ){
 }
 
 
-F77_SUBROUTINE(grp_show)( INTEGER(IGRP), LOGICAL(SLAVES), INTEGER(STATUS) );
+F77_SUBROUTINE(grp_show)( INTEGER(IGRP), INTEGER(SLAVES), INTEGER(STATUS) );
 
-void grpShow( Grp *grp, int slaves, int *status ){
+void grpShow( const Grp *grp, int slaves, int *status ){
    DECLARE_INTEGER(IGRP);
-   DECLARE_LOGICAL(SLAVES);
+   DECLARE_INTEGER(SLAVES);
    DECLARE_INTEGER(STATUS);
 
    IGRP = grpC2F( grp, status );
 
    F77_EXPORT_INTEGER( *status, STATUS );
-   F77_EXPORT_LOGICAL( slaves, SLAVES );
+   F77_EXPORT_INTEGER( slaves, SLAVES );
 
    F77_LOCK( F77_CALL(grp_show)( INTEGER_ARG(&IGRP),
-                        LOGICAL_ARG(&SLAVES),
-                        INTEGER_ARG(&STATUS) ); )
+                                 INTEGER_ARG(&SLAVES),
+                                 INTEGER_ARG(&STATUS) ); )
 
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+F77_SUBROUTINE(grp_same)( INTEGER(IGRP1), INTEGER(IGRP2), LOGICAL(SAME), INTEGER(STATUS) );
+
+void grpSame( const Grp *grp1, const Grp *grp2, int *same, int *status ){
+   DECLARE_INTEGER(IGRP1);
+   DECLARE_INTEGER(IGRP2);
+   DECLARE_LOGICAL(SAME);
+   DECLARE_INTEGER(STATUS);
+
+   IGRP1 = grpC2F( grp1, status );
+   IGRP2 = grpC2F( grp2, status );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(grp_same)( INTEGER_ARG(&IGRP1),
+                                 INTEGER_ARG(&IGRP2),
+                                 LOGICAL_ARG(&SAME),
+                                 INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_LOGICAL( SAME, *same );
    F77_IMPORT_INTEGER( STATUS, *status );
 
    return;
