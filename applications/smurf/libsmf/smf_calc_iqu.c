@@ -74,6 +74,8 @@
 *     21-SEP-2012 (DSB):
 *        Renamed from smf_calc_qu because it now returns I images in
 *        addition to Q and U.
+*     24-SEP-2012 (DSB):
+*        Fix bug in addressing of allStates array.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -444,7 +446,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
             n = 0.0;
 
 /* Loop round all time slices. */
-            state = allstates;
+            state = allstates + block_start;
             for( itime = block_start; itime <= block_end; itime++,state++ ) {
 
 /* Get the POL_ANG value for this time slice. */
