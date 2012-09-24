@@ -1858,6 +1858,9 @@ double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
 
 void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status );
 
+void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
+                     double *qdata, double *udata, int *status );
+
 void smf_update_quality( smfData *data, int syncbad,
                          const int *badmask, smf_qual_t addqual, double badfrac,
                          int *status );

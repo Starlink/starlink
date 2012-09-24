@@ -35,7 +35,8 @@
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*          The input 2D image of the sky.
+*          The input 2D image of the sky. If NDFs are supplied for the
+*          QIN and UIN parameters, then IN should hold I values.
 *     INTERP = LITERAL (Read)
 *          The method to use when resampling the input sky image pixel values.
 *          For details of these schemes, see the descriptions of routines
@@ -105,6 +106,10 @@
 *          run-time default is 1.0.  Good results are often obtained by
 *          approximately matching the FWHM of the envelope function, given
 *          by PARAMS(2), to the point-spread function of the input data. []
+*     QIN = NDF (Read)
+*          The input 2D image of the sky Q values. If QIN and UIN are
+*          both supplied, then the time series specified by the REF parameter
+*          should contain flat-fielded POL2 data. [!]
 *     REF = NDF (Read)
 *          A group of existing time series data cubes. These act as templates
 *          for the new time series cubes created by this application, and
@@ -113,6 +118,10 @@
 *     SIGMA = _DOUBLE (Read)
 *          The standard deviation of the Gaussian noise to add to the
 *          output data. [0.0]
+*     UIN = NDF (Read)
+*          The input 2D image of the sky U values. If QIN and UIN are
+*          both supplied, then the time series specified by the REF parameter
+*          should contain flat-fielded POL2 data. [!]
 *     USEAXIS = LITERAL (Read)
 *          A set of 2 axes to be selected from the Current Frame in the sky
 *          map. Each axis can be specified either by giving its index within
@@ -197,23 +206,35 @@ void smurf_unmakemap( int *status ) {
    AstMapping *skymap;        /* GRID->SkyFrame Mapping from input WCS */
    AstSkyFrame *abskyfrm;     /* Input SkyFrame (always absolute) */
    AstSkyFrame *skyfrm = NULL;/* SkyFrame from the input WCS Frameset */
-   Grp *igrp1 = NULL;         /* Group of input sky cube files */
+   Grp *igrp1 = NULL;         /* Group of input sky files */
    Grp *igrp2 = NULL;         /* Group of input template files */
+   Grp *igrpq = NULL;         /* Group of input Q  sky files */
+   Grp *igrpu = NULL;         /* Group of input U sky files */
    Grp *ogrp = NULL;          /* Group containing output file */
+   ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
-   double *in_data = NULL;    /* Pointer to the input cube data array */
-   double *out_data = NULL;   /* Pointer to the output cube data array */
+   double *in_data = NULL;    /* Pointer to the input I sky map */
+   double *inq_data = NULL;   /* Pointer to the input Q sky map */
+   double *inu_data = NULL;   /* Pointer to the input U sky map */
+   double *outq_data = NULL;  /* Pointer to the Q time series data */
+   double *outu_data = NULL;  /* Pointer to the U time series data */
    double *pd;                /* Pointer to next element */
+   double *pq = NULL;         /* Pointer to next Q time series value */
+   double *pu = NULL;         /* Pointer to next U time series value */
    double params[ 4 ];        /* astResample parameters */
    double sigma;              /* Standard deviation of noise to add to output */
-   int blank;                 /* Was a blank line just output? */
    int flag;                  /* Was the group expression flagged? */
    int iel;                   /* INdex of next element */
    int ifile;                 /* Input file index */
    int indf;                  /* Input sky map NDF identifier */
+   int indfin;                /* Input template cube NDF identifier */
+   int indfout;               /* Output cube NDF identifier */
+   int indfq;                 /* Input Q map NDF identifier */
+   int indfu;                 /* Input U map NDF identifier */
    int interp = 0;            /* Pixel interpolation method */
    int moving;                /* Is the telescope base position changing? */
-   int nel;                   /* Number of elements in 3D array */
+   int nel;                   /* Number of elements in array */
+   int nelqu;                 /* Number of elements in Q or U array */
    int ngood;                 /* No. of good values in putput cube */
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
    int sdim[ 2 ];             /* Array of significant pixel axes */
@@ -222,15 +243,10 @@ void smurf_unmakemap( int *status ) {
    size_t nskymap;            /* Number of supplied sky cubes */
    size_t outsize;            /* Number of files in output group */
    size_t size;               /* Number of files in input group */
-   smfData *data = NULL;      /* Pointer to reference data struct */
    smfData *odata = NULL;     /* Pointer to output data struct */
-   ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
-
-/* We have not yet displayed a blank line on stdout. */
-   blank = 0;
 
 /* Begin an AST context */
    astBegin;
@@ -334,15 +350,63 @@ void smurf_unmakemap( int *status ) {
 /* Get he noise level to add to the output data. */
    parGet0d( "SIGMA", &sigma, status );
 
+/* Get any Q and U input maps. */
+   if( *status == SAI__OK ) {
+
+      kpg1Rgndf( "QIN", 1, 1, "", &igrpq, &nskymap, status );
+      ndgNdfas( igrpq, 1, "READ", &indfq, status );
+      ndfMap( indfq, "DATA", "_DOUBLE", "READ", (void **) &inq_data, &nelqu,
+              status );
+      if( nelqu != nel && *status == SAI__OK ) {
+         ndfMsg( "Q", indfq );
+         *status = SAI__ERROR;
+         errRep( "", "Q image '^Q' is not the same size as the I image.",
+                 status );
+      }
+
+      kpg1Rgndf( "UIN", 1, 1, "", &igrpu, &nskymap, status );
+      ndgNdfas( igrpu, 1, "READ", &indfu, status );
+      ndfMap( indfu, "DATA", "_DOUBLE", "READ", (void **) &inu_data, &nelqu,
+              status );
+      if( nelqu != nel && *status == SAI__OK ) {
+         ndfMsg( "U", indfu );
+         *status = SAI__ERROR;
+         errRep( "", "U image '^U' is not the same size as the I image.",
+                 status );
+      }
+
+      if( *status == PAR__NULL ) {
+         ndfAnnul( &indfq, status );
+         ndfAnnul( &indfu, status );
+         inq_data = NULL;
+         inu_data = NULL;
+         errAnnul( status );
+      }
+   }
+
 /* Loop round all the template time series files. */
    for( ifile = 1; ifile <= (int) size && *status == SAI__OK; ifile++ ) {
 
 /* Start a new NDF context. */
       ndfBegin();
 
-/* Obtain information about the current template NDF, but do not map the
-   arrays. */
-      smf_open_file( igrp2, ifile, "READ", SMF__NOCREATE_DATA, &data, status );
+/* Create the output NDF by propagating everything from the input, except
+   for quality and variance. */
+      ndgNdfas( igrp2, ifile, "READ", &indfin, status );
+
+      ndfMsg( "FILE", indfin );
+      msgSeti( "THISFILE", ifile );
+      msgSeti( "NUMFILES", size );
+      msgOutif( MSG__NORM, " ", "Simulating ^THISFILE/^NUMFILES ^FILE",
+                status );
+
+      ndgNdfpr( indfin, "DATA,HISTORY,LABEL,TITLE,WCS,UNITS,EXTENSION(*)",
+                ogrp, ifile, &indfout, status );
+      ndfAnnul( &indfin, status );
+      ndfAnnul( &indfout, status );
+
+/* We now re-open the output NDF and then modify its data values. */
+      smf_open_file( ogrp, ifile, "UPDATE", 0, &odata, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {
@@ -350,13 +414,13 @@ void smurf_unmakemap( int *status ) {
          break;
 
       } else {
-         if( data->file == NULL ) {
+         if( odata->file == NULL ) {
             *status = SAI__ERROR;
             errRep( FUNC_NAME, "No smfFile associated with smfData.",
                     status );
             break;
 
-         } else if( data->hdr == NULL ) {
+         } else if( odata->hdr == NULL ) {
             *status = SAI__ERROR;
             errRep( FUNC_NAME, "No smfHead associated with smfData.",
                     status );
@@ -364,47 +428,54 @@ void smurf_unmakemap( int *status ) {
          }
       }
 
-/* Report the name of the input template. */
-      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
-      msgSeti( "THISFILE", ifile );
-      msgSeti( "NUMFILES", size );
-      msgOutif( MSG__NORM, " ", "Simulating ^THISFILE/^NUMFILES ^FILE",
-                status );
-
 /* Check the reference time series contains double precision values. */
-     smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
+     smf_dtype_check_fatal( odata, NULL, SMF__DOUBLE, status );
 
-/* Create a time-ordered deep copy of the input data structure to recieve
-   the output data. */
-      odata = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_DATA |
-                                             SMF__NOCREATE_VARIANCE |
-                                             SMF__NOCREATE_QUALITY,
-                                    1, 1, status );
-
-/* Allocate memory for the output data array, and initialise it to hold
-   bad at every element. */
+/* Initialise the output array to hold bad at every element. */
       nel = odata ? odata->dims[ 0 ]*odata->dims[ 1 ]*odata->dims[ 2 ] : 0;
-      out_data = astMalloc( nel*sizeof( *out_data ) );
       if( *status == SAI__OK ) {
-         pd = odata->pntr[ 0 ] = out_data;
+         pd = odata->pntr[ 0 ];
          for( iel = 0; iel < nel; iel++ ) *(pd++) = VAL__BADD;
       }
 
-/* Resample the cube data into the output time series. */
+/* Resample the sky map data into the output time series. */
       smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
-                     interp, params, sigma, in_data, out_data, &ngood,
-                     status );
+                     interp, params, sigma, in_data, odata->pntr[ 0 ],
+                     &ngood, status );
 
 /* Issue a wrning if there is no good data in the output cube. */
       if( ngood == 0 ) msgOutif( MSG__NORM, " ", "   Output contains no "
                                  "good data values.", status );
 
-/* Write the output data to disk. */
-      smf_write_smfData( odata, NULL, NULL, ogrp, ifile, NDF__NOID,
-                         MSG__VERB, status );
+/* If Q and U maps have been given, allocate room to hold resampled Q and
+   U values, and fill them with bad values. */
+      if( inq_data && inu_data ) {
+         pq = outq_data = astMalloc( nel*sizeof( *outq_data ) );
+         for( iel = 0; iel < nel; iel++ ) *(pq++) = VAL__BADD;
 
-/* Close the input time series file. */
-      smf_close_file( &data, status );
+         pu = outu_data = astMalloc( nel*sizeof( *outu_data ) );
+         for( iel = 0; iel < nel; iel++ ) *(pu++) = VAL__BADD;
+
+/* Resample them both into 3D time series. */
+         smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
+                        interp, params, sigma, inq_data, outq_data,
+                        &ngood, status );
+         smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
+                        interp, params, sigma, inu_data, outu_data,
+                        &ngood, status );
+
+/* Combine these time series with the main output time series so that the
+   main output is analysed intensity. */
+         smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data,
+                         outu_data, status );
+
+/* Release work space. */
+         outq_data = astFree( outq_data );
+         outu_data = astFree( outu_data );
+      }
+
+/* Close the output time series file. */
+      smf_close_file( &odata, status );
 
 /* End the NDF context. */
       ndfEnd( status );
@@ -412,14 +483,16 @@ void smurf_unmakemap( int *status ) {
 
 /* Close any input data file that is still open due to an early exit from
    the above loop. */
-   if( data != NULL ) {
-      smf_close_file( &data, status );
-      data = NULL;
+   if( odata != NULL ) {
+      smf_close_file( &odata, status );
+      odata = NULL;
    }
 
 /* Free remaining resources. */
    if( igrp1 != NULL) grpDelet( &igrp1, status);
    if( igrp2 != NULL) grpDelet( &igrp2, status);
+   if( igrpq != NULL) grpDelet( &igrpq, status);
+   if( igrpu != NULL) grpDelet( &igrpu, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
 
 /* End the NDF context. */
