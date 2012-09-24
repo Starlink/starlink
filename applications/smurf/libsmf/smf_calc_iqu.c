@@ -493,7 +493,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
             if( n > 4 ) {
                q = 4*s1/n;
                u = 4*s2/n;
-               i = 2*s2/n;
+               i = 2*s3/n;
 
 /* Rotate the (q,u) vector so that an angle of zero corresponds to celestial
    north. */
