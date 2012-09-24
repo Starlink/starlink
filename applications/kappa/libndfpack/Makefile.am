@@ -11,7 +11,7 @@ setbb.f setbound.f setext.f setlabel.f setnorm.f setorigin.f setsky.f   \
 settitle.f settype.f setunits.f setvar.f wcsadd.f wcsattrib.f wcscopy.f \
 wcsframe.f wcsremove.f wcsshow.f chain.f reshape.f showqual.f setqual.f \
 remqual.f qualtobad.f ndfcompress.f provshow.f provadd.f provmod.f \
-provrem.f
+provrem.f ndfecho.f
 
 # Create help for this library
 ndfpack.hlp: $(F_ROUTINES)

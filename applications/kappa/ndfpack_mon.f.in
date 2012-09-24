@@ -290,6 +290,10 @@
          ELSE IF ( NAME .EQ. 'NDFCOPY' ) THEN
             CALL NDFCOPY ( STATUS )
 
+*  Displays a group of NDF paths on the screen.
+         ELSE IF ( NAME .EQ. 'NDFECHO' ) THEN
+            CALL NDFECHO ( STATUS )
+
 *  Compresses an NDF
          ELSE IF ( NAME .EQ. 'NDFCOMPRESS' ) THEN
             CALL NDFCOMPRESS ( STATUS )

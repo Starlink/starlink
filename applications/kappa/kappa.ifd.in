@@ -1148,6 +1148,68 @@ package kappa {
          }
       }
 
+      action ndfecho {
+         alias {ndfec(ho)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter first {
+            position 2
+            type _INTEGER
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Index of first NDF to display}
+            helpkey *
+         }
+
+         parameter last {
+            position 3
+            type _INTEGER
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Index of last NDF to display}
+            helpkey *
+         }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input NDFs}
+            helpkey *
+         }
+
+         parameter show {
+            position 4
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {The  information to display about each NDF}
+            default PATH
+            helpkey *
+         }
+
+         parameter size {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+         }
+
+         parameter value {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+         }
+
+      }
+
       action ndftrace {
          alias {ndft(race)}
 

@@ -12859,6 +12859,8 @@ picture.}
  Compresses an NDF so that it occupies less disk space.}
 \menuitem{NDFCOPY}{
  Copies an NDF (or \htmlref{NDF section}{se:ndfsect}) to a new location.}
+\menuitem{NDFECHO}{
+ Display a group of NDF names.}
 \menuitem{NDFTRACE}{
  Displays the attributes of an NDF data structure.}
 \menuitem{NOGLOBALS}{
@@ -13721,6 +13723,8 @@ WCS component of an NDF.
 \begin{description}
 \classitem{CALC}
  Evaluates a mathematical expression.
+\classitem{NDFECHO}
+ Expands a group expression into a list of explicit NDF names.
 \classitem{PARGET}
  Obtains the value or values of an \htmlref{application parameter}{se:parout}.
 \end{description}
@@ -37037,6 +37041,124 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
    }
 }
 \sstroutine{
+   NDFECHO
+}{
+   Display a group of NDF names
+}{
+   \sstdescription{
+      This application lists the names of the supplied NDFs to the screen.
+      Its primary use is within scripts that need to process groups of
+      NDFs. Instead of the full name, a required component of the name
+      may be displayed instead (see parameter SHOW).
+   }
+   \sstusage{
+      ndfecho ndf first last show
+   }
+   \sstparameters{
+      \sstsubsection{
+         FIRST = \_INTEGER (Read)
+      }{
+         The index of the first NDF to be included in the displayed list.
+         A null (!) value causes the first NDF to be used (index 1). {\tt [!]}
+      }
+      \sstsubsection{
+         LAST = \_INTEGER (Read)
+      }{
+         The index of the last NDF to be included in the displayed list.
+         If a non-null value is supplied for FIRST, then the run-time
+         default for LAST is equal to the supplied FIRST value (so that
+         only a single NDF will be displayted). If a null value is
+         supplied for FIRST, then the run-time default for LAST is the
+         last NDF in the supplied group. {\tt []}
+      }
+      \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         A group of NDFs.  This should be given as a comma-separated list,
+         in which each list element can be one of the following options.
+
+         \sstitemlist{
+
+            \sstitem
+            An NDF name, optionally containing wild-cards and/or regular
+            expressions ({\tt "}$*${\tt "}, {\tt "}?{\tt "}, {\tt "}[a-z]{\tt "} etc.).
+
+            \sstitem
+            The name of a text file, preceded by an up-arrow character
+            {\tt "}$\wedge${\tt "}.  Each line in the text file should contain a
+            comma-separated list of elements, each of which can in turn be
+            an NDF name (with optional wild-cards, etc.), or another file
+            specification (preceded by an up-arrow).  Comments can be
+            included in the file by commencing lines with a hash character
+            {\tt "}\#{\tt "}.
+
+         }
+         If the value supplied for this parameter ends with a hyphen,
+         then you are re-prompted for further input until a value is
+         given which does not end with a hyphen.  All the NDFs given in
+         this way are concatenated into a single group.
+      }
+      \sstsubsection{
+         VALUE = LITERAL (Write)
+      }{
+         An output parameter to which is written information about the NDF
+         specified by parameter FIRST, or the first NDF in the group if
+         FIRST is not specified. The information to write is specified by
+         the SHOW parameter.
+      }
+      \sstsubsection{
+         SIZE = \_INTEGER (Write)
+      }{
+         An output parameter to which is written the number of NDFs in the
+         specified group.
+      }
+      \sstsubsection{
+         SHOW = LITERAL (Read)
+      }{
+         Specifies the information to be displayed about each NDF:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}SLICE{\tt "} -- The NDF slice specification (if any).
+
+            \sstitem
+            {\tt "}HDSPATH{\tt "} -- The HDS path within the container file (if any).
+
+            \sstitem
+            {\tt "}FTYPE{\tt "} -- The file type (usually {\tt "}.sdf{\tt "} but may not be if any
+            foreign NDFs are supplied).
+
+            \sstitem
+            {\tt "}BASE{\tt "} -- The base file name.
+
+            \sstitem
+            {\tt "}DIR{\tt "} -- The directory path (if any).
+
+            \sstitem
+            {\tt "}PATH{\tt "} -- The full name of the NDF as supplied by the user.
+
+         }
+         Note, the fields are extracted from the NDF names as supplied by
+         the user. No missing fields (except for FTYPE) are filled in. {\tt ["PATH"]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndfecho mycont
+      }{
+         Report the full path of all the NDFs within the HDS container file
+         {\tt "}mycont.sdf{\tt "}.
+      }
+      \sstexamplesubsection{
+         ndfecho $\wedge$files.lis first=4 show=base
+      }{
+         This reports the file base name for just the fourth NDF in the list
+         specified within the text file {\tt "}files.lis{\tt "}.
+      }
+   }
+}
+\sstroutine{
    NDFTRACE
 }{
    Displays the attributes of an NDF data structure
@@ -43498,7 +43620,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       the mean pixel values associated with a source, even if the pixel
       size changes.  Thus the total data sum in a source will change if
       the input and output pixel sizes differ.  However, if the CONSERVE
-      parameter is set {\tt TRUE}, the output values are scaled by the ratio 
+      parameter is set {\tt TRUE}, the output values are scaled by the ratio
       of the output to input pixel size, so that the total data sum in a
       source is preserved.
 
@@ -43514,7 +43636,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       value to PARAMS(1) and/or PARAMS(2) (depending on the specific
       METHOD value being used).
 
-      Both algorithms have the capability to introduce artefacts into 
+      Both algorithms have the capability to introduce artefacts into
       the output image.  These have various causes described below.
 
       \sstitemlist{
@@ -47390,9 +47512,9 @@ KAPPA: \htmlref{REGRID}{REGRID},
          If set TRUE, then the output pixel values will be scaled in
          such a way as to preserve the total data value in a feature on
          the sky. The scaling factor is the ratio of the output pixel
-         size to the input pixel size. This ratio is evaluated once for 
-         each panel of a piece-wise linear approximation to the Mapping, 
-         and is assumed to be constant for all output pixels in the 
+         size to the input pixel size. This ratio is evaluated once for
+         each panel of a piece-wise linear approximation to the Mapping,
+         and is assumed to be constant for all output pixels in the
          panel. {\tt [FALSE]}
      }
       \sstsubsection{
@@ -51223,7 +51345,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          OUT = NDF (Write)
       }{
-         The output NDF.  If a null ({\tt{!}}) value is supplied, 
+         The output NDF.  If a null ({\tt{!}}) value is supplied,
          WCSMOSAIC will terminate early without creating an output cube, but
          without reporting an error.  Note, the pixel bounds which the
          output cube would have had will still be written to output
@@ -58267,6 +58389,16 @@ The following applications have been modified:
 
 \end{itemize}
 
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+   \item [\htmlref{NDFECHO}{NDFECHO}] \mbox{}
+   This is intended as a scripting tool. It expands a given group
+   expression into a list of explicit NDF names, and displays a specified
+   subset of the expanded names.
+\end{description}
+
 \subsection{Modified Commands}
 The following applications have been modified:
 
@@ -58365,7 +58497,7 @@ The following applications have been modified:
         than \xref{AST\_REBINx}{sun210}{AST_REBINX}.  This introduces
         a NORM parameter, which permits normalisation of the
         output array by the number of contributing input array elements.
-        Access to Parameter CONSERVE now depends on NORM, and 
+        Access to Parameter CONSERVE now depends on NORM, and
         CONSERVE's default has switched to preserve the total value.
       \end{itemize}
 
@@ -59109,6 +59241,8 @@ functions as follows.
 \begin{description}
 \classitem{CALC}
  Evaluates a mathematical expression.
+\classitem{NDFECHO}
+ Expands a group expression into a list of explicit NDF names.
 \classitem{PARGET}
  Obtains the value or values of an application parameter.
 \end{description}
