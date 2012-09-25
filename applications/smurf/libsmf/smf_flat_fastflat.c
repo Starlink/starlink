@@ -461,9 +461,9 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
           /* Obtain the measurements for that bolometer */
           for (idx = 0; idx < (size_t)nind; idx++ ) {
             size_t slice = indices[idx];
-            idata[idx] = ffdata[ bol*bstride + slice*tstride ];
+            int thisdata = ffdata[ bol*bstride + slice*tstride ];
 
-            if (idata[idx] != VAL__BADI) {
+            if (thisdata != VAL__BADI) {
               /* calculate the reference value */
               double poly = 0.0;
               EVALPOLY( poly, slice, skyorder, coeff );
@@ -477,20 +477,56 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
               }
               */
 
-              if (poly != VAL__BADD) idata[idx] -= poly;
+              if (poly != VAL__BADD) thisdata -= (int)poly;
+
+              idata[ngood] = thisdata;
               ngood++;
             }
           }
 
-          if (nind > 1) {
-            smf_stats1I( idata, 1, nind, NULL, 0, 0, &mean, &sigma, NULL,
-                         &ngood, status );
+          /* We need to get statistics but smf_stats1I won't give us values
+             if we do not have enough data points. We do an estimate by hand */
+
+          if ( ngood < SMF__MINSTATSAMP ) {
+
+            /* Calculate the mean but for sigma we put in the min/max difference
+               just to have an estimate that is large for down weighting */
+            double minval = VAL__BADD;
+            double maxval = VAL__BADD;
+            double isum = 0.0;
+
+            for (idx=0; idx < (size_t)ngood; idx++) {
+              if (idata[idx] != VAL__BADI) {
+                if (minval == VAL__BADD) {
+                  minval = idata[idx];
+                } else if (minval > idata[idx]) {
+                  minval = idata[idx];
+                }
+                if (maxval == VAL__BADD) {
+                  maxval = idata[idx];
+                } else if (maxval < idata[idx]) {
+                  maxval = idata[idx];
+                }
+                isum += idata[idx];
+              }
+            }
+            if (ngood > 1) {
+              mean = isum / (int)ngood;
+              sigma = (maxval - minval) / 2.0;
+            } else if (ngood == 1) {
+              /* Make up a number for sigma to stop the fit going crazy */
+              mean = isum;
+              sigma = 0.1 * isum;
+            } else {
+              mean = VAL__BADD;
+              sigma = VAL__BADD;
+            }
+
           } else {
-            mean = idata[0];
-            /* put in a small value rather than zero so that everything will be
-               equally weighted. Currently the polynomial fitter thinks that 0
-               variance is a bad point */
-            sigma = 0.1;
+            /* Calculate properly */
+            smf_stats1I( idata, 1, ngood, NULL, 0, 0, &mean, &sigma, NULL,
+                         &ngood, status );
+
           }
 
           /* Need to put the sky signal back into the data to ensure that the
