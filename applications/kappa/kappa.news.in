@@ -45,7 +45,7 @@ The following new applications have been added:
    o  Colourmaps added from MRAO: Dave Green's cubehelix (in two
    forms), John Richer's colour spiral, and the SPECX bl2yl.
 
-   o  Documentation impovements including on metacharacters,
+   o  Documentation improvements including on metacharacters,
    and units of regridding parameters, and updated AST Frame
    attributes.
 
@@ -155,16 +155,17 @@ The following new applications have been added:
       -  Add new QNAMES output parameter to list the attribute name
       associated with each QUALITY bit.
 
-   o SQORST
+   o  SQORST
 
       -  A new parameter called CONSERVE has been added, which may
-      be set TRUE to force total flux to be conserved in the output NDF.
+      be set TRUE to force total flux to be conserved in the output
+      NDF.
 
    o  TRANDAT
 
-      -  When AUTO=FALSE, the new POFFSET parameter allows a shift to be
-      specified between the data co-ordinates in the input text file, and
-      the pixel co-ordinates in the output NDF.
+      -  When AUTO=FALSE, the new POFFSET parameter allows a shift
+      to be specified between the data co-ordinates in the input text
+      file, and the pixel co-ordinates in the output NDF.
 
    o  WCSALIGN
 
