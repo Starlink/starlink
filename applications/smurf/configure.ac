@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(smurf, 1.4.0, scuba2dr@phas.ubc.ca)
+AC_INIT(smurf, 1.5.0, scuba2dr@phas.ubc.ca)
 PACKAGE_UPCASE='SMURF'
 AC_DEFINE( [PACKAGE_UPCASE], "SMURF", [Upper cased package name] )
 AC_SUBST(PACKAGE_UPCASE)
