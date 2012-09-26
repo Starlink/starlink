@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, DUBND,
-     :                      NEEDIM, NARG, II, UWCS, MAP, STAT, IWCS,
+     :                      NARG, II, UWCS, MAP, STAT, IWCS,
      :                      WCSDAT, STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, DUBND, NEEDIM,
+*     CALL ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, DUBND,
 *                     NARG, II, UWCS, MAP, STAT, IWCS, WCSDAT, STATUS )
 
 *  Description:
@@ -40,9 +40,6 @@
 *        The lower bounds of pixel coordinates.
 *     DUBND( * ) = DOUBLE PRECISION (Given)
 *        The upper bounds of pixel coordinates.
-*     NEEDIM = LOGICAL (Given and Returned)
-*        .TRUE. if a DIMENSION statement is still needed to define the
-*        dimensionality of the ARD description.
 *     NARG = INTEGER (Given and Returned)
 *        The number of arguments extracted from the ARD description so
 *        far for the current statement. Supplied equal to -1 if a new
@@ -116,6 +113,9 @@
 *     18-NOV-2009 (DSB):
 *        Ensure that the current UWCS Frame on exit has the number of axes
 *        specified by any DIMENSION statement.
+*     24-SEP-2012 (DSB):
+*        Remove NEEDIM argument. A default of "DIMENSION(2)" is now
+*        assumed if noDIMENHSION statement is found.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -150,7 +150,6 @@
       DOUBLE PRECISION DUBND( * )
 
 *  Arguments Given and Returned:
-      LOGICAL NEEDIM
       INTEGER NARG
       INTEGER II
       INTEGER UWCS
@@ -217,18 +216,6 @@
 *  for such statements.
             IF( ARGREQ .LT. 0 ) THEN
 
-*  Report an error and abort if the dimensionality of the ARD
-*  description has not yet been determined (NEEDIM is supplied .FALSE.
-*  if NWCS is 2).
-               IF( NEEDIM .AND. STATUS .EQ. SAI__OK ) THEN
-                  STATUS = ARD__BADDM
-                  CALL MSG_SETI( 'NWCS', NWCS )
-                  CALL ERR_REP( 'ARD1_STAT_ERR1', 'ARD description is'//
-     :                     ' defaulting to 2-dimensions. It should be'//
-     :                     ' ^NWCS dimensional.', STATUS )
-                  GO TO 999
-               END IF
-
 *  OFFSET - The number of arguments required for the OFFSET statement
 *  equals the dimensionality of the ARD description.
                IF( TYPE .EQ. ARD__OFF ) THEN
@@ -272,7 +259,6 @@
 *  been found, and ensure that the current Frame in the UWCS FrameSet has
 *  the requested number of axes..
          IF( TYPE .EQ. ARD__DIM ) THEN
-            NEEDIM = .FALSE.
             CALL ARD1_DMWCS( AWCS, STARGS, UWCS, STATUS )
 
 *  If it is a WCS statement, read the UWCS FrameSet from the GRP group and

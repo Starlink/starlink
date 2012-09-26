@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L,
+      SUBROUTINE ARD1_KEYW( TYPE, NWCS, IWCS, WCSDAT, ELEM, L,
      :                      CFRM, IPOPND, IOPND, PNARG, SZOPND, NARG, I,
      :                      KEYW, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L, CFRM, IPOPND,
+*     CALL ARD1_KEYW( TYPE, NWCS, IWCS, WCSDAT, ELEM, L, CFRM, IPOPND,
 *                     IOPND, PNARG, SZOPND, NARG, I, KEYW, STATUS )
 
 *  Description:
@@ -26,10 +26,6 @@
 *  Arguments:
 *     TYPE = INTEGER (Given)
 *        An integer value identifying the current keyword.
-*     NEEDIM = LOGICAL (Given)
-*        Supplied .TRUE. if a DIMENSION statement is still needed to
-*        establish the dimensionality of the ARD description. An error
-*        is reported if this is supplied .TRUE.
 *     NWCS = INTEGER (Given)
 *        The number of axes in the user coord system.
 *     IWCS = INTEGER (Given)
@@ -114,6 +110,9 @@
 *     1-OCT-2007 (DSB):
 *        Check that NDIM is not 2 before reporting an error about needing
 *        a DIMENSION statement.
+*     24-SEP-2012 (DSB):
+*        Remove NEEDIM argument. A default of "DIMENSION(2)" is now
+*        assumed if noDIMENHSION statement is found.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -139,7 +138,6 @@
 
 *  Arguments Given:
       INTEGER TYPE
-      LOGICAL NEEDIM
       INTEGER NWCS
       INTEGER IWCS
       DOUBLE PRECISION WCSDAT( * )
@@ -188,22 +186,6 @@
 *  start of the argument list. The routine then exits and is called
 *  again to continue reading the argument list.
       IF( NARG .EQ. -1 ) THEN
-
-*  Report an error and abort if a dimension statement is still needed.
-*  No dimension statement is needed if NWCS is 2 (because 2 is the
-*  default dimensionality).
-         IF( NEEDIM ) THEN
-            IF( NWCS .NE. 2 ) THEN
-               STATUS = ARD__BADDM
-               CALL MSG_SETI( 'NWCS', NWCS )
-               CALL ERR_REP( 'ARD1_KEYW_ERR1', 'ARD description is '//
-     :                       'defaulting to 2-dimensions. It should '//
-     :                       'be ^NWCS dimensional.', STATUS )
-               GO TO 999
-            ELSE
-               NEEDIM = .FALSE.
-            END IF
-         END IF
 
 *  Save the current index of the top of the operand stack.
          IOPND0 = IOPND

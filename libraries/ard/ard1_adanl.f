@@ -84,7 +84,7 @@
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 2000, 2001 Central Laboratory of the Research Councils.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007,2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -118,6 +118,10 @@
 *        Modified for ARD version 2.0.
 *     1-OCT-2007 (DSB):
 *        Added IWCS argument.
+*     24-SEP-2012 (DSB):
+*        Pre-suppose a "DIMENSION(2)" statement has been given. Any
+*        DIMENSION statement subsequently found will modify the expected
+*        dimensionality.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -193,7 +197,6 @@
       LOGICAL
      : KEYW,                     ! Is current field a keyword?
      : MORE,                     ! More GRP elements to be processed?
-     : NEEDIM,                   ! Is a DIMENSION statement needed?
      : NOARGS,                   ! No argument list required?
      : OPER,                     ! Is current field an operator?
      : STAT                      ! Is current field a statement?
@@ -243,12 +246,6 @@
       IEXPR = 1
       IOPND = 1
 
-*  Set a flag to indicate if a DIMENSION statement is needed before any
-*  keyword fields can be interpreted. This will be the case unless the
-*  mask supplied to routine ARD_WORK is 2-dimensional (the default
-*  case).
-      NEEDIM = NDIM .NE. 2
-
 *  Assume there are the same number of WCS axes as there are pixel axes.
       NWCS = NDIM
 
@@ -256,6 +253,11 @@
 *  coords are connected by a UnitMap.
       UWCS = AST__NULL
       CALL ARD1_COWCS( AWCS, AST__BAD, UWCS, STATUS )
+
+*  Modify it as if a DIMENSION(2) statement has been read (this is the default
+*  DIMENSION value).
+      NWCS = 2
+      CALL ARD1_DMWCS( AWCS, DBLE( NWCS ), UWCS, STATUS )
 
 *  Merge the UWCS and AWCS to get the Mapping from PIXEL to user coords.
       CALL ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS, WCSDAT,
@@ -292,11 +294,11 @@
 *  ARD1_KEYW twice; the first time initializes things, the second one
 *  completes things.
                      IF( KEYW ) THEN
-                        CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS,
+                        CALL ARD1_KEYW( TYPE, NWCS, IWCS,
      :                                  WCSDAT, ELEM, L, CFRM, IPOPND,
      :                                  IOPND, PNARG, SZOPND, NARG, I,
      :                                  KEYW, STATUS )
-                        CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS,
+                        CALL ARD1_KEYW( TYPE, NWCS, IWCS,
      :                                  WCSDAT, ELEM, L, CFRM, IPOPND,
      :                                  IOPND, PNARG, SZOPND, NARG, I,
      :                                  KEYW, STATUS )
@@ -346,7 +348,7 @@
 *  keyword field, copy any remaining keyword arguments from the current
 *  GRP element into the returned operand array.
          ELSE IF( KEYW ) THEN
-            CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L,
+            CALL ARD1_KEYW( TYPE, NWCS, IWCS, WCSDAT, ELEM, L,
      :                      CFRM, IPOPND, IOPND, PNARG, SZOPND, NARG, I,
      :                      KEYW, STATUS )
 
@@ -356,7 +358,7 @@
 *  etc, specified by the statement.
          ELSE IF( STAT ) THEN
             CALL ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND,
-     :                      DUBND, NEEDIM, NARG, I, UWCS, MAP, STAT,
+     :                      DUBND, NARG, I, UWCS, MAP, STAT,
      :                      IWCS, WCSDAT, STATUS )
 
 *  Update the current Frame pointer.

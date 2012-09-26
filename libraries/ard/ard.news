@@ -1,6 +1,12 @@
      Recent changes
      --------------
 
+ 2.3 (September 2012)
+ ---
+
+    A bug has been fixed that could cause an error to be reported when
+    using an ARD description given in 2D PIXEL coords with a 3D pixel mask.
+
  2.2 (October 2007)
  ---
 

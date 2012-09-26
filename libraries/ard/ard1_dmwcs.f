@@ -16,8 +16,10 @@
 *     This routine creates a new user FrameSet (UWCS) from the
 *     supplied parameters. If the current Frame already has the
 *     required number of axes, then it is returned unchanged.
-*     Otherwise, the first "NDIM" axex are picked form the supplied
-*     FrameSet and made the new current Frame.
+*     Otherwise, if the current Frame has more than "NDIM" axes,
+*     the first "NDIM" axex are picked form the supplied FrameSet.
+*     Otherwise, if the current Frame has less than "NDIM" axes,
+*     extra axes are added to the supplied FrameSet.
 
 *  Arguments:
 *     AWCS = INTEGER (Given)
@@ -31,7 +33,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009,2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -57,6 +59,9 @@
 *  History:
 *     18-NOV-2009 (DSB):
 *        Original version.
+*     26-SEP-2012 (DSB):
+*        Cater for cases where the original current Frame has
+*        insufficient axes.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -93,6 +98,7 @@
       INTEGER IFRAME             ! Index of Frame being picked from
       INTEGER JUNK               ! Unused Mapping
       INTEGER MAP                ! Mapping for picked axes
+      INTEGER NCURAX             ! No. of axes in current frame
       INTEGER NDIM               ! No. of axes in user coords
       INTEGER NEWFR              ! Frame containing picked axes
       INTEGER NFRAME             ! Number of Frames in FrameSet
@@ -106,8 +112,11 @@
 *  Get the required number of current Frame axes.
       NDIM = NINT( PAR( 1 ) )
 
+*  How many axes in the current Frame?
+      NCURAX = AST_GETI( UWCS, 'NAXES', STATUS )
+
 *  If the current Frame already has the right number of axes, do nothing.
-      IF( NDIM .NE. AST_GETI( UWCS, 'NAXES', STATUS ) ) THEN
+      IF( NDIM .NE. NCURAX ) THEN
 
 *  Create a unit array of the maximum possible size.
          DO I = 1, ARD__MXDIM
@@ -138,11 +147,13 @@
                MAP = AST_GETMAPPING( UWCS, AST__CURRENT, IFRAME,
      :                               STATUS )
 
-*  Split of the required axes from this mapping. Report an error if this
-*  cannot be done.
-               CALL AST_MAPSPLIT( MAP, NDIM, AXES, OUTAX, MAP, STATUS )
-               IF( MAP .EQ. AST__NULL ) THEN
-                  IF( STATUS .EQ. SAI__OK ) THEN
+*  If we are reducing the number of axes, split of the required axes from
+*  this mapping. Report an error if this cannot be done.
+               IF( NDIM .LT. NCURAX ) THEN
+                  CALL AST_MAPSPLIT( MAP, NDIM, AXES, OUTAX, MAP,
+     :                               STATUS )
+                  IF( MAP .EQ. AST__NULL .AND.
+     :                STATUS .EQ. SAI__OK ) THEN
                      STATUS = ARD__NOTAL
                      CALL MSG_SETI( 'N', NDIM )
                      CALL MSG_SETI( 'M', NDIM )
@@ -153,10 +164,18 @@
      :                             'WCS axes.', status )
                   END IF
 
-*  If the required axes could be split from the Mapping, pick the
-*  appropriate axes from the frame, and add the split Frame into the new
-*  FrameSet using the split Mapping.
+*  If we are increasing the number of axes, put a UnitMap in parallel
+*  with the mapping.
                ELSE
+                  MAP = AST_CMPMAP( MAP, AST_UNITMAP( NDIM - NCURAX,
+     :                                                ' ', STATUS ),
+     :                              .FALSE., ' ', STATUS )
+               END IF
+
+*  If the mapping has been modified succesfully, pick the appropriate axes
+*  from the frame, and add the picked Frame into the new FrameSet using the
+*  modified mapping.
+               IF( STATUS .EQ. SAI__OK ) THEN
                   NOUT = AST_GETI( MAP, 'Nout', STATUS )
                   NEWFR = AST_PICKAXES( FR, NOUT, AXES, JUNK, STATUS )
                   CALL AST_ANNUL( JUNK, STATUS )
