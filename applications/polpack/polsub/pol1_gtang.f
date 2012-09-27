@@ -56,6 +56,11 @@
 *        Original version.
 *     20-SEP-2000 (DSB):
 *        Report an error if neither ANGROT nor POLANAL Frame can be found.
+*     25-SEP-2012 (DSB):
+*        Caters for cases where the pixel coords atthe origin of the
+*        POLANAL Frame are undefined. This can happen if POLANAL is a
+*        copy of a SkyFrame connected to the pixel grid via a typical
+*        spherical projection.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,6 +116,12 @@
       IF( INDF .NE. NDF__NOID ) THEN
          CALL NDF_XGT0R( INDF, 'POLPACK', 'ANGROT', LANG, STATUS )
 
+*  Annul the error if no ANGROT value was found in the polpack extension.
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            LANG = VAL__BADR
+         END IF
+
 *  Otherwise, attempt to get a CAT identifier for the ANGROT catalogue
 *  parameter.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
@@ -163,23 +174,44 @@
 *  Get the number of axes in it.
             NPOL = AST_GETI( FS, 'NAXES', STATUS )
 
-*  Transform 2 points along the first axis of the reference Frame into
-*  the Base Frame. The first point is the origin, the second point is a
-*  unit distance along the first axis.
-            DO I = 1, NPOL
+*  Transform the base frame origin into the POLANAL Frame.
+            DO I = 1, NDIM
                IN( 1, I ) = 0.0D0
-               IN( 2, I ) = 0.0D0
             END DO
-            IN( 2, 1 ) = 1.0D0
+
+            CALL AST_TRANN( FS, 1, NDIM, 2, IN, .TRUE., NPOL, 2,
+     :                      OUT, STATUS )
+
+*  Transform 2 points along the first axis of the reference Frame into
+*  the Base Frame. The first point corresponds to the base Frame origin,
+*  the second point is a small distance along the first axis.
+            DO I = 1, NPOL
+               IN( 1, I ) = OUT( 1, I )
+               IN( 2, I ) = OUT( 1, I )
+            END DO
+
+            IF( IN( 1, 1 ) .NE. AST__BAD ) THEN
+               IF( IN( 1, 1 ) .NE. 0.0D0 ) THEN
+                  IN( 2, 1 ) = IN( 1, 1 ) + ABS( IN( 1, 1 )*1.001D0 )
+               ELSE
+                  IN( 2, 1 ) = IN( 1, 1 ) + 1.0D0
+               END IF
+            END IF
 
             CALL AST_TRANN( FS, 2, NPOL, 2, IN, .FALSE., NDIM, 2,
      :                      OUT, STATUS )
 
 *  Find the anti-clockwise angle from the first axis of the Base Frame to
 *  the line from point 1 to point 2. Convert from radians to degrees.
-            ANGROT = REAL( ATAN2( OUT( 2, 2 ) - OUT( 1, 2 ),
-     :                            OUT( 2, 1 ) - OUT( 1, 1 ) )/DTOR )
-
+            IF( OUT( 2, 2 ) .NE. AST__BAD .AND.
+     :          OUT( 1, 2 ) .NE. AST__BAD .AND.
+     :          OUT( 2, 1 ) .NE. AST__BAD .AND.
+     :          OUT( 1, 1 ) .NE. AST__BAD ) THEN
+               ANGROT = REAL( ATAN2( OUT( 2, 2 ) - OUT( 1, 2 ),
+     :                               OUT( 2, 1 ) - OUT( 1, 1 ) )/DTOR )
+            ELSE
+               ANGROT = AST__BAD
+            END IF
          END IF
 
 *  Reinstate the original Current Frame.
@@ -188,6 +220,13 @@
 *  End the AST context.
          CALL AST_END( STATUS )
 
+      END IF
+
+*  Report an error if ANGROT is undefined.
+      IF( ANGROT .EQ. AST__BAD .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'The reference direction is undefined.',
+     :                 STATUS )
       END IF
 
       END

@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(polpack, 3.1-4, starlink@jiscmail.ac.uk)
+AC_INIT(polpack, 3.1-5, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -28,7 +28,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl    Look for tck/tk system
 STAR_PATH_TCLTK(8.5, [tcl])
 
-dnl POLPACK source files depend on include files from the following components  
+dnl POLPACK source files depend on include files from the following components
 STAR_DECLARE_DEPENDENCIES([build], [ast cat chr cnf hds fio grp mers ndf ndg par prm sae startcl tcl trn ifd])
 
 dnl The POLPACK link script links against the following components

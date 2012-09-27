@@ -220,6 +220,8 @@
 *        Added parameter STOKES, and output parameters.
 *     31-JUL-2009 (TIMJ):
 *        QUIET handling is done via MSG_IFGET now.
+*     27-SEP-2012 (DSB):
+*        Cater for cases where there is a POLANAL Frame but no POLPACK extension.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -584,21 +586,28 @@
 *  The existing ANGROT value is obtained from the POLANAL WCS Frame.
             CALL POL1_GTANG( INDF, 0, IWCS, ANG, STATUS )
 
-*  If there is no POLPACK extension, report an error if the extension
-*  is not being changed.
-         ELSE IF( RDONLY ) THEN
-            IF( STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'POLEXT_4', 'No POLPACK extension found.',
-     :                       STATUS )
-            END IF
+*  If there is no POLPACK extension, attempt to read the ANGROT value
+*  from a polanal Frame. If it cannot be obtained, annul the error.
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            CALL POL1_GTANG( INDF, 0, IWCS, ANG, STATUS )
+            IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
 
-*  If any new values have been supplied to be stored inthe extension,
+*  If there is no POLPACK extension, and no POLANAL Frame, report an error
+*  if the extension is not being changed.
+            IF( RDONLY ) THEN
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( 'POLEXT_4', 'No POLPACK '//
+     :                          'extension found.', STATUS )
+               END IF
+
+*  If any new values have been supplied to be stored in the extension,
 *  create an extension.
-         ELSE
-            CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, POLLOC,
-     :                     STATUS )
-            CALL DAT_ANNUL( POLLOC, STATUS )
+            ELSE
+               CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0,
+     :                        POLLOC, STATUS )
+               CALL DAT_ANNUL( POLLOC, STATUS )
+            END IF
          END IF
 
 *  Replace these defaults with any supplied values.
