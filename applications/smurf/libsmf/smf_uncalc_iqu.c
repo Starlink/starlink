@@ -359,6 +359,8 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    An angle of zero corresponds to north in the tracking system. */
                angle *= 4;
                *iin = 0.5*( (*iin) + (*qin)*cos( angle ) + (*uin)*sin( angle ) );
+            } else {
+               *iin = VAL__BADD;
             }
 
 /* Update pointers to the next I, Q and U time slice values. */
