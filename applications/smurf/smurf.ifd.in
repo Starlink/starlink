@@ -2456,10 +2456,11 @@ package @PACKAGE@ {
                 position 3
                 type _INTEGER
                 access WRITE
-                vpath {PROMPT }
+                vpath DEFAULT
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Observation Number}
-                ppath GLOBAL CURRENT
+                ppath DEFAULT
+                default !
                 helpkey *
             }
 

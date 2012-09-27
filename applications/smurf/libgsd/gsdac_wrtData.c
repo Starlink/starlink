@@ -197,10 +197,17 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
   /* If the UTDate is prior to 20030202, prompt the user for the observation
      number.  Otherwise, use the value in NOBS. */
-  if ( utDate < 20030202 )
-    parGet0i ( "OBSNUM", &obsNum, status );
-  else
-    obsNum = (int)gsdVars->nObs;
+  parGet0i ( "OBSNUM", &obsNum, status );
+  if ( *status == PAR__NULL ) {
+    if ( utDate < 20030202 ) {
+      *status = SAI__ERROR;
+      errRep ( FUNC_NAME, "OBSNUM parameter mandatory for ut < 2003-02-02",
+	       status );
+      return;
+    } else {
+      obsNum = (int)gsdVars->nObs;
+    }
+  }
 
   for ( i = 0; i < gsdVars->nFEChans; i++ ) {
     recepNames[i] = astMalloc( 3*sizeof( char ) );
