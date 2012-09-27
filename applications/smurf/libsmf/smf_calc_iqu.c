@@ -376,6 +376,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    int block_start;           /* First time slice to process */
    int ipolcrd;               /* Reference direction for pol_ang */
    int itime;                 /* Time slice index */
+   int limit;                 /* Min no of good i/p values for a godo o/p value */
    int n;                     /* Number of contributing values in S1, S2 and S3 */
    int old;                   /* Data has old-style POL_ANG values? */
    size_t bstride;            /* Stride between adjacent bolometer values */
@@ -410,6 +411,10 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
+
+/* The minimum number of samples required for a good output value. Half
+   of the available input samples must be good. */
+      limit = 0.5*( block_end - block_start );
 
 /* Increment the output I, Q and U pointers to point to the first bolometer
    processed by this thread. */
@@ -488,9 +493,8 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
             }
 
 /* Calculate the q, u and i values in the output NDF. The error on these values
-   will be enormous if there are not many values, so put a hard lower limit
-   of 5 samples. */
-            if( n > 4 ) {
+   will be enormous if there are not many values, so use a large lower limit. */
+            if( n > limit ) {
                q = 4*s1/n;
                u = 4*s2/n;
                i = 2*s3/n;
