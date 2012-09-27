@@ -668,7 +668,9 @@ sub scuba2_header {
     } else {
       $mode =~ s/FIELD/FLD/i;
     }
-    $mode = $S{INBEAM}.$mode;
+
+    # Prepend in-beam information to mode unless the shutter is closed
+    $mode = $S{INBEAM}.$mode unless $S{SHUTTER} < 0.5;
 
 #    print "$S{RUN} $mode $S{UT} \'$S{OBJECT}\' $S{PROJECT} $rx $boloms $filter $S{CSOTAU} $S{SEEING}\n";
 
