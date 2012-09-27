@@ -13,6 +13,8 @@
     A bug in the handling of the WCS from FITS files with size greater
     than 2Gb has been fixed. Previously GAIA could fail to show the world
     coordinates for such images.
+
+    The UCAC4 catalogue has been added to the standard Skycat catalogues.
     
 
   Kapuahi Release
