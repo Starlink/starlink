@@ -10,6 +10,11 @@
     whose values are in the range 0 to 1. Colour maps should use the file
     type ".lasc" and intensity maps ".iasc".
 
+    A bug in the handling of the WCS from FITS files with size greater
+    than 2Gb has been fixed. Previously GAIA could fail to show the world
+    coordinates for such images.
+    
+
   Kapuahi Release
   ===============
 

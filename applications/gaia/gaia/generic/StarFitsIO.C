@@ -402,7 +402,7 @@ int StarFitsIO::wcsinit()
                                  &staticLoadTabTable ) );
         return wcs_.status();
     }
-    wcs_ = WCS( new StarWCS( (const char *)header_.ptr(), header_.size(),
+    wcs_ = WCS( new StarWCS( (const char *)header_.ptr(), header_.length(),
                              (void *) this, &staticLoadTabTable ) );
     return wcs_.status();
 }
