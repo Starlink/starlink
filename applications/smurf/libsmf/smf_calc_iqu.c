@@ -418,9 +418,9 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
       if( ipi ) ipi += b1;
 
 /* Initialise pointers to the first time slice data and quality value for
-   the first bolometer to be processed. */
-      din0 = dat + bstride*b1;
-      qin0 = qua + bstride*b1;
+   the first bolometer to be processed in the current block of time slices. */
+      din0 = dat + bstride*b1 + tstride*block_start;
+      qin0 = qua + bstride*b1 + tstride*block_start;
 
 /* Loop round all bolometers to be processed by this thread. */
       for( ibolo = b1; ibolo <= b2; ibolo++ ) {
