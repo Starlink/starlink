@@ -2516,7 +2516,24 @@ parameters directly on the command line. They are appended to the
 configuration filename as a comma separated list as shown in the
 example below. Be sure to include all the necessary quotation marks.
 
-\begin{latexonly}
+\begin{myquote}
+\begin{verbatim}
+% makemap in='s8*.sdf' out=850map method=iterate \
+  config='"^dimmconfig.lis,numiter=20,exportndf=(flt,noi),itermap=1"'
+\end{verbatim}
+\end{myquote}
+
+\subsection{\xlabel{inter}Writing out models \& intermediate maps}
+\textbf{exportmodel}\\
+This parameter has been introduced in
+\cref{Section}{sec:export}{Exporting individual models} and
+allowed you to see the model that was fit for each component
+specified by the \texttt{modelorder} parameter.
+
+{\bf itermap}\\
+Setting the parameter \texttt{itermap=1} writes out a map after each
+iteration. These can be visually inspected with
+
 \begin{myquote}
 \begin{verbatim}
 % gaia map.more.smurf.itermaps
@@ -2543,6 +2560,7 @@ command \texttt{stackframes}. This cube can then be viewed as a
 `movie' with \gaia, using the animation option to loop through the
 itermaps. See \cref{Figure}{fig:stack}{the box below} for instructions.
 
+\begin{latexonly}
 \begin{figure}[ht!]
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
