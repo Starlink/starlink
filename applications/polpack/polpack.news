@@ -1,21 +1,14 @@
 1 POLPACK
 
- Version 3.1-4 of POLPACK (an applications package for processing imaging
+ Version 3.1-5 of POLPACK (an applications package for processing imaging
  polarimetry data) is now available. It is fully documented in SUN/223.
- The main changes since V3.1-3 are:
 
- o  The ILEVEL parameter has been removed from POLCAL and POLSTACK.
- Use the standard MSG_FILTER instead. ILEVELs of 0, 1, 2 and 3 correspond
- to filter levels QUIET, NORM, VERBOSE and DEBUG respectively.
+ The main changes since V3.1-4 are:
 
- o  Internal changes to use message filtering rather than explicitly
- using a QUIET parameter.
+ o  A bug in POLIMAGE that caused an error to be reported when deleting
+ an AXIS Frame from the NDF WCS FrameSet has been fixed.
 
- Version 3.1-3 of POLPACK (an applications package for processing imaging
- polarimetry data) is now available. It is fully documented in SUN/223.
- The main changes since V3.1-2 are:
-
- o  Error messages indicating that a required column is not available
- have been expanded to suggest that deleting your $HOME/.polpackrc
- file may solve the problem. This file can be left in a corrupt condition
- if a command fails whilst using the GAIA polarimetry toolbox.
+ o  POLVEC now uses the absloute value of I to normalise the other STokes
+ vectors. Previously, a negative value of I would cause the normalised Q
+ and U values to change sign, resulting in the vector rotating by 90
+ degrees.

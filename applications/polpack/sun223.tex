@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.7}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {26th February 2003}
+\newcommand{\stardocdate}      {28th September 2012}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 3.1-3}
+\newcommand{\stardocversion}   {Version 3.1-5}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for
 reducing imaging polarimetry or spectropolarimetry data. They cover
@@ -6734,6 +6734,21 @@ The allowed items within the POLPACK extension.}
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
+
+
+
+\subsection{V3.1-5}
+
+\begin{itemize}
+ \item A bug in POLIMAGE that caused an error to be reported when deleting
+ an AXIS Frame from the NDF WCS FrameSet has been fixed.
+
+ \item POLVEC now uses the absloute value of I to normalise the other STokes
+ vectors. Previously, a negative value of I would cause the normalised Q
+ and U values to change sign, resulting in the vector rotating by 90
+ degrees.
+\end{itemize}
+
 
 \subsection{V3.1-3}
 

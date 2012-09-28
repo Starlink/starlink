@@ -148,6 +148,9 @@
 *        Added EQMAP argument.
 *     2-FEB-2001 (DSB):
 *        Added support for 4D Stokes cubes.
+*     28-SEP-2012 (DSB):
+*        Use the absolute value of I to normalise Q and U. This avoids a
+*        negative I value causing the vector to rotate by 90 degs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -458,8 +461,8 @@
                      END IF
 
 *  Normalise theStokes parameters.
-                     Q = QIN / IIN
-                     U = UIN / IIN
+                     Q = QIN / ABS( IIN )
+                     U = UIN / ABS( IIN )
 
 *  Get the squared Q and U values.
                      Q2 = Q * Q
@@ -740,7 +743,7 @@
                      I = IIN
 
 *  Normalised Stokes parameter
-                     V = VIN / IIN
+                     V = VIN / ABS( IIN )
 
 *  Percentage polarisation.
                      P = 100.0 * ABS( V )
