@@ -177,6 +177,8 @@
 *        Correct binning of pixel coords.
 *     13-JUL-2009 (DSB):
 *        Changed IPVAR array from DOUBLE PRECISION to REAL.
+*     28-SEP-2012 (DSB):
+*        Correct indexing of WCS Frames when removing the AXIS Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -669,11 +671,15 @@
 
 *  Remove the AXIS Frame in the output NDF default FrameSet, so that any
 *  AXIS Frame in the catalogue WCS FrameSet will be retained.
-            DO I = 1, AST_GETI( IWCSO, 'NFRAME', STATUS )
+            I = 1
+            DO WHILE( I .LE.  AST_GETI( IWCSO, 'NFRAME', STATUS ) .AND.
+     :                STATUS .EQ. SAI__OK )
                FRM = AST_GETFRAME( IWCSO, I, STATUS )
                IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ.
      :                       'AXIS' ) THEN
                   CALL AST_REMOVEFRAME( IWCSO, I, STATUS )
+               ELSE
+                  I = I + 1
                END IF
             END DO
 
