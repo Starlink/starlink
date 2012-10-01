@@ -171,7 +171,11 @@
 *        based on input noise temperatures.
 *     11-FEB-2009 (DSB):
 *        Ignore negative or zero input Tsys values.
-*     {enter_further_changes_here}
+*     1-OCT-2012 (DSB):
+*        Retain all flags when calling astRebinSeq for the last time to 
+*        normalise the returned values. Previously, lack of the AST__USEVAR
+*        flag was causing all output varianes to be set bad within astRebinseq.
+.*     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science & Technology Facilities Council.
@@ -618,10 +622,6 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
    actually used for anything since we are not adding any more data into the
    output arrays). */
       fullmap = (AstMapping *) astPermMap( 2, NULL, 3, NULL, NULL, " " );
-
-/* Exclude flags that require access to the input variances. */
-      ast_flags = AST__USEBAD;
-      if( genvar == 1 ) ast_flags = ast_flags | AST__GENVAR;
 
 /* Normalise the data values. We do not normalise the exposure time arrays. */
       astRebinSeqF( fullmap, 0.0, 2, lbnd_in,
