@@ -328,6 +328,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Cater for Mappings that have different numbers of inputs and
 *        outputs when finding the flux conservation factor within
 *        astRebinSeq and astResample.
+*     1-OCT-2012 (DSB):
+*        Ensure astRebinSeq<X> does not create any negative output
+*        variances.
 *class--
 */
 
@@ -12666,6 +12669,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                } else if( flags & AST__GENVAR && neff > 1.0 ) {  \
                   out_var[ i ] /= wgt; \
                   out_var[ i ] -= out[ i ]*out[ i ]; \
+                  if( out_var[ i ] < 0.0 ) out_var[ i ] = 0.0; \
 \
 /* If output variances are estimates of the variance of the distribution \
    from which the input values were sampled... */ \
