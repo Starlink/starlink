@@ -115,6 +115,9 @@
 *        SPECX supplied tinme and date appear to be UTC rather than UT1.
 *     16-APR-2008 (DSB):
 *        Replace the DIM argument (array dimensions) with CRPIX.
+*     2-OCT-2012 (DSB):
+*        Report an error if the rate of change of topocentric frequency with 
+*        respect to source frequency cannot be evaluated.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -532,6 +535,12 @@
 *  at the frequency given by JFCEN.
       DTBYDS = AST_RATE( AST_CONVERT( SPCFRM, TPFRM, ' ', STATUS ),
      :                   CRVAL3, 1, 1, STATUS )
+      IF( DTBYDS .EQ. AST__BAD .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'Cannot determine  rate of change of '//
+     :                 'topocentric frequency wrt source frequency.',
+     :                 STATUS )
+      END IF
 
 *  Convert the frequency increment from topocentric to source.
       CD3 = CD3/DTBYDS
