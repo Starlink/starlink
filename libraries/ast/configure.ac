@@ -119,6 +119,9 @@ AC_PATH_PROG(PERL, perl, [/usr/bin/env perl], [$STARLINK/Perl/bin:$PATH])
 AC_CHECK_FUNCS([isnan])
 AC_CHECK_DECLS([isnan],,,[#include <math.h>
                          ])
+AC_CHECK_FUNCS([isfinite])
+AC_CHECK_DECLS([isfinite],,,[#include <math.h>
+                         ])
 STAR_DECLARE_DEPENDENCIES(sourceset, [sst htx])
 
 #  Perform the check that configures f77.h.in for the return type of REAL

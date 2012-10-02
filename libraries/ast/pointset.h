@@ -195,12 +195,22 @@
 #  if HAVE_ISNAN
      /* Seems that math.h does not include a prototype for isnan etc */
      int isnan( double );
-     int isfinite( double );
 #  else
-     /* isinf and isfinite are not available prior to C99 so define
-        alternative macros. Note multiple evaluations of "x" in these
+     /* isnan is not available prior to C99 so define
+        alternative macros Note multiple evaluations of "x" in these
         macros!!! */
 #    define isnan(x) ((x) != (x))
+#  endif
+#endif
+
+#if !HAVE_DECL_ISFINITE
+#  if HAVE_ISFINITE
+     /* Seems that math.h does not include a prototype for isfinite */
+     int isfinite( double );
+#  else
+     /* isfinite is not available prior to C99 so define
+        alternative macros. Note multiple evaluations of "x" in these
+        macros!!! */
 #    define isfinite(x) (!isnan(x) && ((x) != (1.0/0.0)) && ((x) != (-1.0/0.0)))
 #  endif
 #endif
