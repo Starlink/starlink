@@ -332,7 +332,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Ensure astRebinSeq<X> does not create any negative output
 *        variances.
 *     2-OCT-2012 (DSB):
-*        Check for Infs as well as NaNs.
+*        - Check for Infs as well as NaNs.
+*        - In Rate, break out of the loop if the RMS is very small, not
+*          just if it is exactly zero.
 *class--
 */
 
@@ -9423,9 +9425,9 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
                fitted = 1;
                fitok = 1;
 
-/* If we come across an exact fit, use it to determine the returned
+/* If we come across an almost exact fit, use it to determine the returned
    values and break. */
-               if( rms == 0.0 ) {
+               if( rms < 1.0E-13*fabs( s1 ) ) {
                   ret = fit->coeff[ 1 ];
                   fit = astFree( fit );
                   break;
