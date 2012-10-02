@@ -190,10 +190,11 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   sprintf ( dateString, "%8.4f", gsdVars->obsUT1d );
   sscanf ( dateString, "%04d.%02d%02d", &year, &month, &day );
 
-  /* Parse time to get hour/min/sec. */
-  hour = (double)( (int)gsdVars->obsUT1h );
-  min = (double) ( (int)( ( gsdVars->obsUT1h - hour ) * 60.0 ) );
-  sec = ( ( ( gsdVars->obsUT1h - hour ) * 60.0 ) - min ) * 60.0;
+  /* Parse time to get hour/min/sec: can not use usual (int) scoping
+     because of danger to get hh:05:60.00 instead of hh:06:00.00 */
+  hour = (int) gsdVars->obsUT1h;
+  min =  60.0 * fmodf( gsdVars->obsUT1h, 1.0 );
+  sec =  60.0 * fmodf( 60.0*gsdVars->obsUT1h, 1.0 );
 
   /* Set up the timeframe. */
   tFrame = astTimeFrame ( "TimeScale=UT1" );

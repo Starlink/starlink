@@ -83,6 +83,7 @@
 
 /* Standard includes */
 #include <string.h>
+#include <math.h>
 
 /* Starlink includes */
 #include "ast.h"
@@ -113,7 +114,8 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
   int month;                  /* months */
   float sec;                  /* seconds */
   int tableDims;              /* dimensionality of data table */
-  unsigned int tableSize;     /* number of elements of data table */
+  int tableSize;              /* number of elements of data table */
+  int tableElement;           /* index of element in data table */
   AstTimeFrame *tempFrame = NULL; /* AstTimeFrame for UT1-UTC conversion */
   const char *tempString;     /* temporary string */
   AstTimeFrame *tFrame = NULL;  /* AstTimeFrame for UT1-UTC conversion */
@@ -132,10 +134,11 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
   sprintf ( dateString, "%8.4f", gsdVars->obsUT1d );
   sscanf ( dateString, "%04d.%02d%02d", &year, &month, &day );
 
-  /* Parse time to get hour/min/sec. */
-  hour = (double)( (int)gsdVars->obsUT1h );
-  min = (double) ( (int)( ( gsdVars->obsUT1h - hour ) * 60.0 ) );
-  sec = ( ( ( gsdVars->obsUT1h - hour ) * 60.0 ) - min ) * 60.0;
+  /* Parse time to get hour/min/sec: can not use usual (int) scoping
+     because of danger to get hh:05:60.00 instead of hh:06:00.00 */
+  hour = (int) gsdVars->obsUT1h;
+  min =  60.0 * fmodf( gsdVars->obsUT1h, 1.0 );
+  sec =  60.0 * fmodf( 60.0*gsdVars->obsUT1h, 1.0 );
 
   /* Set up the timeframe. */
   tFrame = astTimeFrame ( "timescale=UT1" );
@@ -179,9 +182,13 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
   /* Get the DATE-END. This will be DATE-OBS + ( last LST - first LST ). */
   tableSize = gsdVars->nScanVars1 * gsdVars->nScan;
   tableDims = gsdVars->nScanVars1;
+  tableElement = 0;          /* In case unfilled table */
+  if ( (tableSize-tableDims) >= 0 ) {
+    tableElement = tableSize-tableDims;
+  }
 
-  dLST = ( gsdVars->scanTable1[tableSize-tableDims] -
-           gsdVars->scanTable1[0] ) / 24.0;
+  dLST = ( gsdVars->scanTable1[tableElement] -
+	     gsdVars->scanTable1[0] ) / 24.0;
 
   /* Correct for difference between solar and sidereal time. */
   utcEnd = utcStart + ( dLST / SOLSID );
@@ -194,17 +201,16 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
   strcpy ( &(dateVars->dateEnd[11]), &(tempString[11]) );
 
   /* Get the LSTstart. */
-  hour = (int)( gsdVars->scanTable1[0] );
-  min = (int)(( gsdVars->scanTable1[0] - hour ) * 60.0 );
-  sec = ( gsdVars->scanTable1[0] - hour - ( min / 60.0 ) ) * 3600.0;
+  hour = (int) gsdVars->scanTable1[0];
+  min =  60.0 * fmodf( gsdVars->scanTable1[0], 1.0 );
+  sec =  60.0 * fmodf( 60.0*gsdVars->scanTable1[0], 1.0 );
 
   sprintf ( dateVars->LSTstart, "%02d:%02d:%6.4f", hour, min, sec );
 
   /* Get the LSTend. */
-  hour = (int)( gsdVars->scanTable1[tableSize-tableDims] );
-  min = (int)(( gsdVars->scanTable1[tableSize-tableDims] - hour ) * 60.0 );
-  sec = ( gsdVars->scanTable1[tableSize-tableDims] - hour -
-        ( min / 60.0 ) ) * 3600.0;
+  hour = (int) gsdVars->scanTable1[tableElement];
+  min =  60.0 * fmodf( gsdVars->scanTable1[tableElement], 1.0 );
+  sec =  60.0 * fmodf( 60.0*gsdVars->scanTable1[tableElement], 1.0 );
 
   sprintf ( dateVars->LSTend, "%02d:%02d:%6.4f", hour, min, sec );
 
