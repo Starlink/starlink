@@ -80,6 +80,8 @@ f     - AST_PUTTABLEHEADER: Store FITS headers within a FitsTable
 *  History:
 *     25-NOV-2010 (DSB):
 *        Original version.
+*     2-OCT-2012 (DSB):
+*        Check for Infs as well as NaNs.
 *class--
 */
 
@@ -1318,9 +1320,9 @@ f     AST_COLUMNNULL functiom.
       } else if(  type == AST__DOUBLETYPE ){
          ok = astMapGet1D( this, key, nel, &nval, pout );
 
-         if( ok && !astISNAN(dnull) ) {
+         if( ok && astISFINITE(dnull) ) {
             for( iel = 0; iel < nel; iel++ ) {
-               if( astISNAN( ((double *)pout)[ iel ] ) ) {
+               if( !astISFINITE( ((double *)pout)[ iel ] ) ) {
                   ((double *)pout)[ iel ] = dnull;
                }
             }
@@ -1329,9 +1331,9 @@ f     AST_COLUMNNULL functiom.
       } else if(  type == AST__FLOATTYPE ){
          ok = astMapGet1F( this, key, nel, &nval, pout );
 
-         if( ok && !astISNAN(fnull) ) {
+         if( ok && astISFINITE(fnull) ) {
             for( iel = 0; iel < nel; iel++ ) {
-               if( astISNAN( ((float *)pout)[ iel ] ) ) {
+               if( !astISFINITE( ((float *)pout)[ iel ] ) ) {
                   ((float *)pout)[ iel ] = fnull;
                }
             }
@@ -2014,7 +2016,7 @@ f        The global status.
 
       } else if(  type == AST__DOUBLETYPE ){
          for( iel = 0; iel < nel; iel++ ) {
-            if( ! astISNAN( ((double *)pin)[ iel ] ) ) {
+            if( astISFINITE( ((double *)pin)[ iel ] ) ) {
                astMapPut1D( this, key, nel, pin, NULL );
                break;
             }
@@ -2022,7 +2024,7 @@ f        The global status.
 
       } else if(  type == AST__FLOATTYPE ){
          for( iel = 0; iel < nel; iel++ ) {
-            if( ! astISNAN( ((double *)pin)[ iel ] ) ) {
+            if( astISFINITE( ((double *)pin)[ iel ] ) ) {
                astMapPut1F( this, key, nel, pin, NULL );
                break;
             }

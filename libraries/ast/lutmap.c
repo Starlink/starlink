@@ -106,6 +106,8 @@ f     The LutMap class does not define any new routines beyond those
 *     6-JUL-2011 (DSB):
 *        Avoid indexing the lut array beyond the end when doing an
 *        inverse transform.
+*     2-OCT-2012 (DSB):
+*        Check for Infs as well as NaNs.
 *class--
 */
 
@@ -2296,7 +2298,7 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
 /* Replace an NaN values by AST__BAD */
          p = new->lut;
          for ( ilut = 0; ilut < nlut; ilut++, p++ ) {
-            if( astISNAN(*p) ) *p = AST__BAD;
+            if( !astISFINITE(*p) ) *p = AST__BAD;
          }
 
 /* Initialise the retained input and output coordinate values. */

@@ -331,6 +331,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     1-OCT-2012 (DSB):
 *        Ensure astRebinSeq<X> does not create any negative output
 *        variances.
+*     2-OCT-2012 (DSB):
+*        Check for Infs as well as NaNs.
 *class--
 */
 
@@ -6632,7 +6634,7 @@ static PN *InterpPN( int np, double *x, double *y, int *status ) {
 /* If any of the coefficients could not be found return NULL. */
     ret = pn[ 0 ];
     for( i = 0; i < np; i++ ) {
-       if( astISNAN( ret->coeff[ i ] ) ) {
+       if( !astISFINITE( ret->coeff[ i ] ) ) {
           ret = astFree( ret );
           break;
        }

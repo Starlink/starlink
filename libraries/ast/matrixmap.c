@@ -141,6 +141,8 @@ f     The MatrixMap class does not define any new routines beyond those
 *        depends on a mixture of selected and unselected inputs.
 *     16-JUL-2009 (DSB):
 *        MatPerm: Fix memory leak (mm2 was not being annulled).
+*     2-OCT-2012 (DSB):
+*        Check for Infs as well as NaNs.
 *class--
 */
 
@@ -5215,7 +5217,7 @@ AstMatrixMap *astInitMatrixMap_( void *mem, size_t size, int init,
                                      sizeof(double)*(size_t)nel );
 /* Replace any NaNs by AST__BAD */
          for( i = 0; i < nel; i++ ) {
-            if( astISNAN(fmat[ i ]) ) fmat[ i ] = AST__BAD;
+            if( !astISFINITE(fmat[ i ]) ) fmat[ i ] = AST__BAD;
          }
 
 /* Create an inverse matrix if possible. */

@@ -64,6 +64,8 @@
 *        Added astBndPoints.
 *     16-JUN-2011 (DSB):
 *        Added astReplaceNan.
+*     2-OCT-2012 (DSB):
+*        Check for Infs as well as NaNs.
 */
 
 /* Module Macros. */
@@ -1872,7 +1874,7 @@ static int ReplaceNaN( AstPointSet *this, int *status ) {
             p = ptr[ ic ];
             p0 = p + np;
             for( ; p < p0; p++ ) {
-               if( astISNAN(*p) ) {
+               if( !astISFINITE(*p) ) {
                   result = 1;
                   *p = AST__BAD;
                }
