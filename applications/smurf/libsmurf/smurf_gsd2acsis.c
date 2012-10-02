@@ -248,10 +248,15 @@ void smurf_gsd2acsis( int *status ) {
            status,
            errRep ( FUNC_NAME, "gsdClose : Error closing GSD file.", status ); );
 
-  if ( *status != SAI__OK ) return;
 
   /* Get the number of time steps in the observation. */
   nSteps = gsdVars.nScan * gsdVars.nScanPts;
+  if ( nSteps <= 0 ) {
+    *status = SAI__WARN;
+    errRep ( FUNC_NAME, "Nr. steps 0: observation terminated without data", status );
+  }
+
+  if ( *status != SAI__OK ) return;
 
   /* Convert and write out the new file. */
   gsdac_wrtData ( &gsdVars, directory, nSteps, dasFlag, status );

@@ -205,6 +205,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 	       status );
       return;
     } else {
+      errAnnul( status );
       obsNum = (int)gsdVars->nObs;
     }
   }
@@ -295,6 +296,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
                           record, status );
 
     /* For each subband, write the files. */
+
     for ( subBandNum = 0; subBandNum < gsdVars->nBESections; subBandNum++ ) {
 
       /* Get the pointing and time values. */
@@ -359,8 +361,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   }
 
   /* Update the FITS headers for amStart, amEnd, azStart, azEnd,
-     elStart, and elEnd. */
-  for ( i = 0; i < nSubsys; i++ ) {
+     elStart, and elEnd, but only if we actually observed */
+  for ( i = 0; i < nSubsys && nSteps > 0; i++ ) {
 
     astClear( fitschan[i], "Card" );
 
@@ -390,7 +392,9 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
 
   /* Close the file. */
-  acsSpecCloseTS ( fitschan, 0, 0, NULL, status );
+  if ( nSteps > 0 ) {
+    acsSpecCloseTS ( fitschan, 0, 0, NULL, status );
+  }
 
   /* Free allocated memory. */
   astFree( record );
