@@ -275,7 +275,7 @@
 
 *  If it could not be read as a foreign NDF, re-read it as an AST dump.
 *  This is so that we end up with a useful error message being displayed.
-            ELSE
+            ELSE IF( IGRP .NE. GRP__NOID ) THEN
                CALL ATL_RDGRP( IGRP, IAST, STATUS )
             END IF
          END IF
