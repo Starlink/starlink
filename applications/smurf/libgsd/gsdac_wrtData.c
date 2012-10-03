@@ -196,7 +196,15 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   utDate = (int)( ( gsdVars->obsUT1d + 0.00001 ) * 10000.0 );
 
   /* If the UTDate is prior to 20030202, prompt the user for the observation
-     number.  Otherwise, use the value in NOBS. */
+     number.  Otherwise, use the value in NOBS. Null parameter response will
+     use the default for newer observations. We need to have an option for
+     newer data to be over-ridden. We only provide a dynamic default for
+     newer data in order to force a prompt. */
+  if (utDate >= 20030202) {
+    parDef0i( "OBSNUM", gsdVars->nObs, status );
+  }
+  parMini( "OBSNUM", 1, status );
+  parMaxi( "OBSNUM", 9999, status );
   parGet0i ( "OBSNUM", &obsNum, status );
   if ( *status == PAR__NULL ) {
     if ( utDate < 20030202 ) {
