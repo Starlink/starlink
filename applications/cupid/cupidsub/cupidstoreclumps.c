@@ -157,6 +157,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        Use MERS for message filtering.
 *     27-APR-2009 (DSB):
 *        Added parameters "velax" and "stccol".
+*     3-OCT-2012 (DSB):
+*        Clean up static resources allocated in cupidClumpDesc.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -463,6 +465,11 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
          ndfAnnul( &indf, status );
       }
    }
+
+/* Clean up static resources in cupidClumpDesc. */
+   cupidClumpDesc( NDF__NOID, deconv, wcsmap, wcsfrm, dataunits, beamcorr,
+                   backoff, stccol, velax, cpars, &names, &units, &ncpar,
+                   &ok, &stcptr, &region, status );
 
 /* Tell the user how many usable clumps there are and how many were rejected
    due to being smaller than the beam size. */

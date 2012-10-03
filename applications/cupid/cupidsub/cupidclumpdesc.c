@@ -71,12 +71,18 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *     components within the CUPID extension are used as additional column
 *     names, following the above names. All components in the CUPID extension
 *     should be scalar primitive numerical values.
+*
+*     The first invocation of this function may allocate static
+*     resources, which should be released when no longer needed by
+*     invoking this function one further time with "indf" set to NDF__NOID.
 
 *  Parameters:
 *     indf
 *        Identifier for an NDF holding the data values associated with
 *        the clump. Any pixels which are not part of the clump should be
-*        set bad.
+*        set bad. If this is NDF__NOID, the function will just clean up
+*        static resources and then return immediately, without any
+*        further action.
 *     deconv
 *        If non-zero then the clump property values stored in the
 *        catalogue and NDF are modified to remove the smoothing effect
@@ -210,6 +216,8 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *        Added arguments "stcs" and "velax".
 *     25-MAY-2009 (DSB):
 *        Added argument "shape".
+*     3-OCT-2012 (DSB):
+*        Provide facility for cleaning up static resources.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -287,6 +295,17 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    static int skyaxis[ 3 ];    /* Flags indicating which axes are skyaxes */
    static int space_axes[ 2 ]; /* Zero based indices of spatial pixel axes */
    static int warn = 1;        /* Display astWrite warnings? */
+
+/* If requested clean up static resources and return (do this before
+   checking inherited status so that resources are freed even if an error
+   has already occurred). */
+   if( indf == NDF__NOID ) {
+      if( pixel_frm ) pixel_frm = astAnnul( pixel_frm );
+      if( space_frm ) space_frm = astAnnul( space_frm );
+      if( space_map ) space_map = astAnnul( space_map );
+      if( stcs_chan ) stcs_chan = astAnnul( stcs_chan );
+      return NULL;
+   }
 
 /* Initialise. */
    ret = cpars;
