@@ -22761,6 +22761,23 @@ input values.
 normalisation of the output arrays is not required. In this case no
 weights array need be supplied.
 
+\item A bug has been fixed in
+c+
+astAddFrame method
+c-
+f+
+AST\_ADDFRAME routine
+f-
+that could result in the incorrect inversion of Mappings within the FrameSet
+when the AST\_\_ALLFRAMES flag is supplied for the
+c+
+"iframe" parameter.
+c-
+f+
+IFRAME argument.
+f-
+
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

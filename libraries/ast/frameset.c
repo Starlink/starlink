@@ -241,6 +241,10 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     2-SEP-2011 (DSB):
 *        Fix FrameSet implememntation of astEqual (mapping comparison
 *        tests were logically inverted).
+*     3-OCT-2012 (DSB):
+*        Fix bug in AppendAxes that could cause internal Mappings to
+*        be inverted unintentionally when astAddFrame is called with
+*        iframe=AST__ALLFRAMES.
 *class--
 */
 
@@ -1675,6 +1679,7 @@ static void AppendAxes( AstFrameSet *this, AstFrame *frame, int *status ) {
    AstUnitMap *umap;             /* UnitMap to feed the new axes */
    int iframe;                   /* Frame index */
    int imap;                     /* Mapping index */
+   int inv_orig;                 /* Original value of Invert attribute */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1697,14 +1702,30 @@ static void AppendAxes( AstFrameSet *this, AstFrame *frame, int *status ) {
 /* Loop round every Mapping in the FrameSet. */
    for ( imap = 0; imap < this->nnode - 1; imap++ ) {
 
-/*  Crate a parallel CmpMap holding the original Mapping and the UnitMap. */
+/* The Invert attribute of the Mapping may have been changed via a
+   different pointer since it was first added into the FrameSet. To
+   ensure that the FrameSet continues to behave as was originally
+   intended, we set the Invert attribute back to the value it had when
+   the Mapping was first added into the FrameSet. First, note the
+   current value of the Invert flag so that it can be re-instated later. */
+      inv_orig = astGetInvert( this->map[ imap ] );
+      astSetInvert( this->map[ imap ], this->invert[ imap ] );
+
+/*  Create a parallel CmpMap holding the original Mapping and the UnitMap. */
       map = astCmpMap( this->map[ imap ], umap, 0, " ", status );
 
-/* Annul the original Mapping pointer. */
+/* Re-instate the original value for the Invert flag, and then annul the
+   original Mapping pointer. */
+      astSetInvert( this->map[ imap ], inv_orig );
       (void) astAnnul( this->map[ imap ] );
 
 /* Simplify the new Mapping, and store it in the FrameSet. */
       this->map[ imap ] = astSimplify( map );
+
+/* Store a copy of the Invert attribute that should be used with this
+   Mapping within the FrameSet (just in case it  is modified via some
+   excternal reference). */
+      this->invert[ imap ] = astGetInvert( this->map[ imap ] );
 
 /* Annul the un-simplified Mapping pointer. */
       map = astAnnul( map );

@@ -25,6 +25,9 @@ weighted mean of the neighbouring input values.
 normalisation of the output arrays is not required. In this case no
 weights array need be supplied.
 
+- A bug has been fixed in astAddFrame (AST_ADDFRAME) method that could
+result in the incorrect inversion of Mappings within the FrameSet when
+the AST__ALLFRAMES flag is supplied for the "iframe" parameter.
 
 Main Changes in V7.0.6
 ----------------------
