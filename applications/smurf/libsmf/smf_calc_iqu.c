@@ -76,6 +76,9 @@
 *        addition to Q and U.
 *     24-SEP-2012 (DSB):
 *        Fix bug in addressing of allStates array.
+*     4-OCT-2012 (DSB):
+*        Reverse the pixels along the X axis of the output NDFs so that
+*        they presents a normal right-handed view of the sky.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,6 +129,7 @@ typedef struct smfCalcIQUJobData {
    int block_start;
    int block_end;
    int old;
+   int ncol;
    size_t bstride;
    size_t tstride;
    smf_qual_t *qua;
@@ -147,6 +151,8 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
                   int *status ){
 
 /* Local Variables: */
+   AstFrameSet *wcs;          /* WCS FrameSet for output NDFs */
+   AstWinMap *wm;             /* Mapping to reverse the X GRID axis */
    const JCMTState *state;    /* JCMTState info for current time slice */
    dim_t nbolo;               /* No. of bolometers */
    dim_t ncol;                /* No. of columns of bolometers */
@@ -155,6 +161,10 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    double *ipi;               /* Pointer to output I array */
    double *ipq;               /* Pointer to output Q array */
    double *ipu;               /* Pointer to output U array */
+   double ina[ 2 ];           /* Bolometer coords at bottom left */
+   double inb[ 2 ];           /* Bolometer coords at top right */
+   double outa[ 2 ];          /* NDF GRID coords at bottom left */
+   double outb[ 2 ];          /* NDF GRID coords at top right */
    int bstep;                 /* Bolometer step between threads */
    int el;                    /* Number of mapped array elements */
    int indfi;                 /* Identifier for NDF holding I values */
@@ -226,15 +236,37 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    }
 
 /* Store the WCS frameSet in all NDFs. First get the FrameSet for the
-   central time slice in the block, set its current Frame to the tracking
-   frame, and then store it in the two NDFs. */
+   central time slice in the block, and set its current Frame to the
+   tracking frame. */
    smf_tslice_ast( data, ( block_start + block_end )/2, 1, status);
    astSetC( hdr->wcs, "System",
             sc2ast_convert_system( (data->hdr->allState)[0].tcs_tr_sys,
                                     status ) );
-   ndfPtwcs( hdr->wcs, indfq, status );
-   ndfPtwcs( hdr->wcs, indfu, status );
-   if( indfi != NDF__NOID ) ndfPtwcs( hdr->wcs, indfi, status );
+
+/* Take a copy and then reverse the X axis of the GRID Frame by remaping the
+   base Frame using a WinMap. This produces a pixel grid such as you would
+   see by looking up at the sky from underneath the array, rather than looking
+   down at the ground from above the array. */
+   wcs = astCopy( hdr->wcs );
+   ina[ 0 ] = 1.0;
+   inb[ 0 ] = ncol;
+   ina[ 1 ] = 1.0;
+   inb[ 1 ] = nrow;
+
+   outa[ 0 ] = ncol;
+   outb[ 0 ] = 1.0;
+   outa[ 1 ] = 1.0;
+   outb[ 1 ] = nrow;
+
+   wm = astWinMap( 2, ina, inb, outa, outb, " " );
+   astRemapFrame( wcs, AST__BASE, wm );
+   wm = astAnnul( wm );
+
+/* Store the FrameSet in the output NDFs, then annull the copy. */
+   ndfPtwcs( wcs, indfq, status );
+   ndfPtwcs( wcs, indfu, status );
+   if( indfi != NDF__NOID ) ndfPtwcs( wcs, indfi, status );
+   wcs = astAnnul( wcs );
 
 /* Map the Data array in each NDF. */
    ndfMap( indfq, "Data", "_DOUBLE", "WRITE", (void **) &ipq, &el, status );
@@ -300,6 +332,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
          pdata->block_start = block_start;
          pdata->block_end = block_end;
          pdata->old = old;
+         pdata->ncol = ncol;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_calc_iqu_job, 0, NULL,
@@ -358,6 +391,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    dim_t b1;                  /* First bolometer index */
    dim_t b2;                  /* Last bolometer index */
    dim_t ibolo;               /* Bolometer index */
+   dim_t ipix;                /* Pixel index */
    dim_t nbolo;               /* Total number of bolometers */
    double *dat;               /* Pointer to start of input data values */
    double *din0;              /* Pointer to input data array for 1st time */
@@ -379,9 +413,10 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    int limit;                 /* Min no of good i/p values for a godo o/p value */
    int n;                     /* Number of contributing values in S1, S2 and S3 */
    int old;                   /* Data has old-style POL_ANG values? */
+   int ncol;                  /* No. of bolometers in one row */
    size_t bstride;            /* Stride between adjacent bolometer values */
    size_t tstride;            /* Stride between adjacent time slice values */
-   smfCalcIQUJobData *pdata;   /* Pointer to job data */
+   smfCalcIQUJobData *pdata;  /* Pointer to job data */
    smf_qual_t *qin0;          /* Pointer to input quality array for 1st time */
    smf_qual_t *qin;           /* Pointer to input quality array for bolo/time */
    smf_qual_t *qua;           /* Pointer to start of input quality values */
@@ -408,6 +443,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    block_start = pdata->block_start;
    block_end = pdata->block_end;
    old = pdata->old;
+   ncol = pdata->ncol;
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
@@ -415,12 +451,6 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 /* The minimum number of samples required for a good output value. Half
    of the available input samples must be good. */
       limit = 0.5*( block_end - block_start );
-
-/* Increment the output I, Q and U pointers to point to the first bolometer
-   processed by this thread. */
-      ipq += b1;
-      ipu += b1;
-      if( ipi ) ipi += b1;
 
 /* Initialise pointers to the first time slice data and quality value for
    the first bolometer to be processed in the current block of time slices. */
@@ -508,11 +538,15 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
             }
          }
 
-/* Store the q and u values in the output NDFs, and increment the pointers
-   so that they point to the next output values. */
-         *(ipq++) = q;
-         *(ipu++) = u;
-         if( ipi ) *(ipi++) = i;
+/* Calculate the vector index into the output NDFs at which to store the
+   current bolometer. This implements a reversal of the pixels along each
+   row, in order to produce the usual right-handed view of the sky. */
+         ipix = ncol + ibolo - 2*( ibolo % ncol ) - 1;
+
+/* Store the q and u values in the output NDFs. */
+         ipq[ ipix ] = q;
+         ipu[ ipix ] = u;
+         if( ipi ) ipi[ ipix ] = i;
 
 /* Update the pointers to the first time slice data and quality value for
    the next bolometer. */
