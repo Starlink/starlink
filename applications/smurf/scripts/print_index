@@ -260,7 +260,7 @@ my @obsfiles;
 # Pattern matches for certain types of file
 my $SCU2PATT = qr/s\d\w\d{8}_\d{5}_\d{4}/;
 my $NONSCU2PATT = qr/dem_|obs_|cbe_|das_|ac\d{8}_\d{5}|a\d{8}_\d{5}|\@/;
-my $FILSUFPATT = qr/\.(sdf|data|gsd)$/;
+my $FILSUFPATT = qr/\.(sdf|data|gsd|dat)$/;
 
 # and determine which one to use
 my $FILE_PATTERN = ( $prog =~ /scuba/ ? $SCU2PATT : $FILSUFPATT );
@@ -349,7 +349,8 @@ exit;
 # Sort routine for GSD data
 sub sort_by_scan {
   if ($a =~ /gsd$/) {
-    (split(/\_/,$a,4))[3] <=> (split(/\_/,$b,4))[3];
+    (split(/\_/,(split(/\./,$a))[0]))[-1] <=>
+    (split(/\_/,(split(/\./,$b))[0]))[-1];
   } else {
     (split(/\_/,$a,3))[2] <=> (split(/\_/,$b,3))[2];
   }
@@ -911,8 +912,14 @@ sub gsd_header {
     my $el     = $gsditem{C4EL};
     my $uaz    = $gsditem{UAZ};
     my $uel    = $gsditem{UEL};
-    my $seeing = 0.01 * int(100.0*$gsditem{C7SEEING}+0.5);
-    my $csotau = 0.01 * int(100.0*$gsditem{C7TAU225}+0.5);
+    my $seeing = "n/a";
+    my $csotau = "n/a";
+    if ( defined $gsditem{C7SEEING}) {
+      $seeing = 0.01 * int(100.0*$gsditem{C7SEEING}+0.5);
+    }
+    if ( defined $gsditem{C7TAU225}) {
+      $csotau = 0.01 * int(100.0*$gsditem{C7TAU225}+0.5);
+    }
 
     # Set format
 format STDOUT_SHORT_HET =
