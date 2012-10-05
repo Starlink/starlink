@@ -359,7 +359,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   if ( parse == 0 || parse == EOF ) {
 
-    msgOut ( FUNC_NAME, "Couldn't convert CSO tau time, continuing anyway.", status );
+    msgOutf ( FUNC_NAME, "Couldn't convert CSO tau time of '%s', continuing anyway.",
+              status, gsdVars->tauTime );
     strcpy ( tauDatSt, "" );
 
   } else {
@@ -380,8 +381,9 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                    &month, &day, &hour, &min );
 
   if ( parse == 0 || parse == EOF ) {
-    msgOutif(MSG__VERB," ",
-	     "Couldn't convert seeing time, continuing anyway.", status);
+    msgOutiff(MSG__VERB," ",
+	     "Couldn't convert seeing time of '%s', continuing anyway.", status,
+             gsdVars->seeTime );
     strcpy ( seeDatSt, "" );
   } else {
 
