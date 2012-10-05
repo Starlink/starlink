@@ -751,13 +751,13 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   gsdac_get1r ( gsd, "C13DAT", gsdVars->data, status );
 
   if ( dasFlag == DAS_CROSS_CORR ) {
-    gsdac_get0r ( gsd, "C55HOTPOWER", gsdVars->hotPower, status );
-    gsdac_get0r ( gsd, "C55SKYPOWER", gsdVars->skyPower, status );
-    gsdac_get0r ( gsd, "C55SAM", gsdVars->samples, status );
+    gsdac_get1r ( gsd, "C55HOTPOWER", gsdVars->hotPower, status );
+    gsdac_get1r ( gsd, "C55SKYPOWER", gsdVars->skyPower, status );
+    gsdac_get1r ( gsd, "C55SAM", gsdVars->samples, status );
   }
 
   if ( dasFlag == DAS_TP || dasFlag == DAS_CROSS_CORR ) {
-    gsdac_get0r ( gsd, "C55POWER", gsdVars->totPower, status );
+    gsdac_get1r ( gsd, "C55POWER", gsdVars->totPower, status );
   }
 
   if ( *status != SAI__OK ) {
