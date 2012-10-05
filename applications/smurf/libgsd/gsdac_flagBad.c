@@ -259,7 +259,7 @@ void gsdac_flagBad ( const dasFlag dasFlag, gsdVars *gsdVars,
   if ( dasFlag == DAS_TP ) {
 
     for ( i = 0; i < gsdVars->nBESections * gsdVars->IFPerSection *
-	  gsdVars->IFONPhase *
+	  gsdVars->IFONPhase * gsdVars->nPhases *
           gsdVars->noCycles; i++ ) {
       if ( gsdVars->totPower[i] == gsdVars->badVal )
         gsdVars->totPower[i] = VAL__BADR;

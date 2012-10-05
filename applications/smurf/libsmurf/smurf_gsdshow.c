@@ -1363,7 +1363,7 @@ void smurf_gsdshow ( int *status ) {
                      "Total power measurement per subband per integration",
                      gsdVars.totPower, 1,
                      gsdVars.nBESections * gsdVars.IFPerSection *
-                     gsdVars.IFONPhase * gsdVars.noCycles,
+                     gsdVars.IFONPhase * gsdVars.nPhases * gsdVars.noCycles,
                      showDesc, status );
 
   }

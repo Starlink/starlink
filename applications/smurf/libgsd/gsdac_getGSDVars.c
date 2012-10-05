@@ -596,7 +596,7 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
                                      sizeof(float) );
   } else if ( dasFlag == DAS_TP ) {
     gsdVars->totPower = astMalloc ( gsdVars->nBESections * gsdVars->IFPerSection *
-                                     gsdVars->IFONPhase *
+                                     gsdVars->IFONPhase * gsdVars->nPhases *
                                      gsdVars->noCycles*sizeof(float) );
   }
 
