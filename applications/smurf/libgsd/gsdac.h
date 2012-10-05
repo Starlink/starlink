@@ -102,6 +102,7 @@
     gsdstat = routine;\
     if ( gsdstat != 0 ){\
        *status = SAI__ERROR;\
+       msgSeti( "GSDERR", gsdstat ); \
        errmsg;\
     }\
   }
