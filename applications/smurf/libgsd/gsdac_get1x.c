@@ -93,7 +93,7 @@
 /* SMURF includes */
 #include "gsdac.h"
 
-#define MAXDIMS 3
+#define MAXDIMS 4
 
 void gsdac_get1b ( const gsd *gsd,
                    const char *name, char *values, int *status ) {
