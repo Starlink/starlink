@@ -29,6 +29,9 @@ weights array need be supplied.
 result in the incorrect inversion of Mappings within the FrameSet when
 the AST__ALLFRAMES flag is supplied for the "iframe" parameter.
 
+- The astRate method has been re-written to make it faster and more
+reliable.
+
 Main Changes in V7.0.6
 ----------------------
 

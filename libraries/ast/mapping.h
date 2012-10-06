@@ -342,7 +342,7 @@
 #define STATUS_PTR astGetStatusPtr
 #endif
 #define AST__MAPPING_GETATTRIB_BUFF_LEN 50
-#define AST__MAPPING_FUNPN_MAX_CACHE  5
+#define AST__MAPPING_RATEFUN_MAX_CACHE  5
 
 /* Resampling flags. */
 /* ----------------- */
@@ -532,10 +532,10 @@ typedef struct AstMappingGlobals {
    char GetAttrib_Buff[ AST__MAPPING_GETATTRIB_BUFF_LEN + 1 ];
    AstMapping *Unsimplified_Mapping;
    int Rate_Disabled;
-   AstPointSet *FunPN_Pset1_Cache[ AST__MAPPING_FUNPN_MAX_CACHE ];
-   AstPointSet *FunPN_Pset2_Cache[ AST__MAPPING_FUNPN_MAX_CACHE ];
-   int FunPN_Next_Slot;
-   int FunPN_Pset_Size[ AST__MAPPING_FUNPN_MAX_CACHE ];
+   AstPointSet *RateFun_Pset1_Cache[ AST__MAPPING_RATEFUN_MAX_CACHE ];
+   AstPointSet *RateFun_Pset2_Cache[ AST__MAPPING_RATEFUN_MAX_CACHE ];
+   int RateFun_Next_Slot;
+   int RateFun_Pset_Size[ AST__MAPPING_RATEFUN_MAX_CACHE ];
 } AstMappingGlobals;
 
 #endif
