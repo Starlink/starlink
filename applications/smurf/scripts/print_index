@@ -348,12 +348,8 @@ exit;
 
 # Sort routine for GSD data
 sub sort_by_scan {
-  if ($a =~ /gsd$/) {
     (split(/\_/,(split(/\./,$a))[0]))[-1] <=>
     (split(/\_/,(split(/\./,$b))[0]))[-1];
-  } else {
-    (split(/\_/,$a,3))[2] <=> (split(/\_/,$b,3))[2];
-  }
 };
 
 
