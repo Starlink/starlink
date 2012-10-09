@@ -14399,6 +14399,14 @@ iraf! {
             helpkey *
         }
 
+         parameter vector {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Display vector as comma-separated list in square brackets?}
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+         }
       }
 
       action paste {

@@ -54,6 +54,12 @@
 *        The name of the application from which the parameter comes.
 *     PARNAME = LITERAL (Read)
 *        The parameter whose value or values are to be reported.
+*     VECTOR = _LOGICAL (Read)
+*        If TRUE, then vector parameters will be displayed as a 
+*        comma-separated list of values enclosed in square brackets. String
+*        values will be enclosed in single quotes. If FALSE, vector values
+*        are printed as a space-separated list with no enclosing brackets
+*        and with no quotes around string values. [FALSE]
 
 *  Examples:
 *     parget mean stats
@@ -78,6 +84,7 @@
 *  Copyright:
 *     Copyright (C) 1995 Science & Engineering Research Council
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -118,6 +125,8 @@
 *        Increase the maximum path length.
 *     2-FEB-2006 (TIMJ):
 *        Use HDS_FIND rather than attempting to kluge DAT_ASSOC
+*     9-OCT-2012 (DSB):
+*        Added parameter VECTOR.
 *     {enter_further_changes_here}
 
 *-
@@ -128,6 +137,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Status:
       INTEGER STATUS             ! Global inherited status
@@ -137,23 +147,21 @@
                                  ! trailing blanks
 
 *  Local Constants:
-      INTEGER BUFLEN             ! Maximum number of characters in a
-                                 ! line of output
-      PARAMETER ( BUFLEN = 132 )
-
-      INTEGER MXCHAR             ! Maximum number of characters in line
-                                 ! of output before new line is started
+      INTEGER MXCHAR             ! Default screen width
       PARAMETER ( MXCHAR = 80 )
 
 *  Local Variables:
       CHARACTER * ( DAT__SZNAM ) APPLIC ! Name of application
-      CHARACTER * ( BUFLEN ) BUFFER ! Buffer to hold output
-      CHARACTER * ( BUFLEN ) CVALUE ! A value (stored as a string)
+      CHARACTER * ( MSG__SZMSG ) BUFFER ! Buffer to hold output
+      INTEGER CLEN               ! Length of modified string
+      CHARACTER * ( MSG__SZMSG ) CVALUE ! A value (stored as a string)
+      CHARACTER * ( MSG__SZMSG ) CVAL   ! Quoted value
       INTEGER DIM( DAT__MXDIM )  ! Object dimensions
       INTEGER EL                 ! Number of elements returned
       CHARACTER * ( 256 ) FILE   ! Path to the filename
       INTEGER HEIGHT             ! Height of the screen in characters
       INTEGER I                  ! Loop counter
+      LOGICAL ISCHAR             ! Is the value a string?
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator to the parameter file
       CHARACTER * ( DAT__SZLOC ) LOCO ! Locator to the object
       CHARACTER * ( DAT__SZLOC ) LOCS ! Locator to the structure object
@@ -169,6 +177,7 @@
       CHARACTER * ( DAT__SZLOC ) SLICE ! Locator to an element of the
                                  ! object
       CHARACTER * ( DAT__SZTYP ) TYPE ! Data type of the object
+      LOGICAL VECTOR             ! Format as a vector?
       INTEGER WIDTH              ! Width of the screen in characters
 
 *.
@@ -273,25 +282,47 @@
 
          ELSE
 
-*  Find the height and width of the screen.  Use the full screen area.
-*  Use a default when there has been an error.  Hide the error in its
-*  own context.  Constrain the width to the size of the buffer.
+*  See if the values are strings, and if so get their length.
+            CALL DAT_TYPE( LOCO, TYPE, STATUS )
+            IF( TYPE( :5 ) .EQ. '_CHAR' ) THEN
+               ISCHAR = .TRUE.
+               CALL DAT_CLEN( LOCO, CLEN, STATUS )
+               IF( CLEN .GT. MSG__SZMSG - 5 .AND.
+     :             STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__OK
+                  CALL ERR_REP( ' ', 'Formatted length of each '//
+     :                          'value is too large.', STATUS )
+               END IF
+            ELSE
+               ISCHAR = .FALSE.
+            END IF
+
+*  See  how the values are to be displayed.
+            CALL PAR_GET0L( 'VECTOR', VECTOR, STATUS )
+
+*  Find the height and width of the screen.  Use the full screen area. Use
+*  a default when there has been an error.  Hide the error in its own
+*  context.  Constrain the width to the size of the buffer.
             CALL ERR_MARK
             CALL ONE_SCRSZ( WIDTH, HEIGHT, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
                WIDTH = MXCHAR
-            ELSE
-               WIDTH = MIN( BUFLEN, WIDTH )
             END IF
+            WIDTH = MIN( MSG__SZMSG, WIDTH )
             CALL ERR_RLSE
 
 *  Vectorise the object.
             CALL DAT_VEC( LOCO, LOCV, STATUS )
 
 *  Initialise output string and length.
-            BUFFER = ' '
-            NC = 0
+            IF( VECTOR ) THEN
+               BUFFER = '['
+               NC = 1
+            ELSE
+               BUFFER = ' '
+               NC = 0
+            END IF
 
 *  Loop for each object.
             CALL DAT_SIZE( LOCV, SIZE, STATUS )
@@ -307,18 +338,34 @@
 *  Obtain the length of the value.
                NCV = CHR_LEN( CVALUE )
 
-*  See if it can be appended to the current record, leaving a space
-*  between values to delimit them.
-               IF ( NCV + NC .LT. MXCHAR ) THEN
-                  NC = NC + 1
-                  CALL CHR_APPND( CVALUE, BUFFER, NC )
+*  If the value is a string, and we are using vector format, obtain
+*  a quoted copy of it.
+               IF( VECTOR .AND. ISCHAR ) THEN
+                  CALL KPG1_QUOTE( CVALUE( : NCV ), CVAL, STATUS )
+                  NCV = CHR_LEN( CVAL )
+               ELSE
+                  CVAL = CVALUE( : NCV )
+               END IF
+
+*  If this is not the last element, append a comma to the value if using
+*  vector format.
+               IF( VECTOR .AND. I .LT. SIZE ) THEN
+                  CALL CHR_APPND( ',', CVAL, NCV )
+               END IF
+
+*  See if it can be appended to the current record. Add a space first if
+*  not using vector format and if this is not the first element.
+               IF ( NCV + NC .LT. WIDTH ) THEN
+                  IF( .NOT. VECTOR .AND. I .GT. 1 ) NC = NC + 1
+                  CALL CHR_APPND( CVAL( : NCV ), BUFFER, NC )
+
                ELSE
 
 *  Report the values so far on this line.
                   CALL MSG_OUT( 'VALUE', BUFFER( :NC ), STATUS )
 
 *  Start a new string.  Set the length of the buffer filled so far.
-                  BUFFER = CVALUE
+                  BUFFER = CVAL
                   NC = NCV
 
                END IF
@@ -328,8 +375,8 @@
             END DO
 
 *  Report the remaining values.
+            IF( VECTOR ) CALL CHR_APPND( ']', BUFFER, NC )
             CALL MSG_OUT( 'VALUE', BUFFER( :NC ), STATUS )
-
 
 *  Tidy the vectorised locator.
             CALL DAT_ANNUL( LOCV, STATUS )

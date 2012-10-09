@@ -234,6 +234,7 @@ kpg1_pseed.f \
 kpg1_pvers.f \
 kpg1_px2ax.f \
 kpg1_pxscl.f \
+kpg1_quote.f \
 kpg1_r2nag.f \
 kpg1_rcatw.f \
 kpg1_rdast.f \

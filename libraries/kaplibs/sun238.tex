@@ -34328,6 +34328,46 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   KPG1\_QUOTE
+}{
+   Quote a supplied string
+}{
+   \sstdescription{
+      This routine returns a new string holding a copy of the supplied
+      string within single quotes. Any single quotes within the supplied
+      string are escaped using a backslash.
+   }
+   \sstinvocation{
+      CALL KPG1\_QUOTE( IN, OUT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IN = CHARACTER$*$($*$) (Given)
+      }{
+         The input string. Any trailing spaces are included in the
+         returned quoted string.
+      }
+      \sstsubsection{
+         OUT = CHARACTER$*$($*$) (Returned)
+      }{
+         The quoted string.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error is reported if the output string is not large enough to
+         hold the quoted string.
+      }
+   }
+}
+\sstroutine{
    KPG1\_R2NAG
 }{
    Converts an FFTPACK Hermitian Fourier transform array into

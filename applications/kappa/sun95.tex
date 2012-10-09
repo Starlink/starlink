@@ -38905,6 +38905,15 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
       }{
          The parameter whose value or values are to be reported.
       }
+      \sstsubsection{
+         VECTOR = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, then vector parameters will be displayed as a
+         comma-separated list of values enclosed in square brackets. String
+         values will be enclosed in single quotes. If {\tt FALSE}, vector values
+         are printed as a space-separated list with no enclosing brackets
+         and with no quotes around string values.  {\tt [FALSE]}
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -58619,6 +58628,11 @@ The following applications have been modified:
       \begin{itemize}
         \item Four new estimators are available: FBAD, FGOOD, NBAD and
         NGOOD, which produce the fraction/count of good/bad pixel values.
+      \end{itemize}
+   \item [\htmlref{PARGET}{PARGET}]\mbox{}
+      \begin{itemize}
+        \item A new boolean parameter called VECTOR specifies the output
+        format to use for vector-valued parameters.
       \end{itemize}
 \end{description}
 
