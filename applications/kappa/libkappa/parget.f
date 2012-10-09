@@ -41,7 +41,10 @@
 *        set perval = `parget perval histat`
 *
 *     would assign elements of the shell array perval[1], perval[2],
-*     etc. to the last-computed percentile values of HISTAT.
+*     etc. to the last-computed percentile values of HISTAT. For other
+*     scripting languages such as Python, the alternative vector
+*     format produced by setting parameter VECTOR to TRUE may be more
+*     appropriate.
 *
 *     Single elements of an parameter array may also be accessed using
 *     the array index in parentheses.
@@ -55,11 +58,12 @@
 *     PARNAME = LITERAL (Read)
 *        The parameter whose value or values are to be reported.
 *     VECTOR = _LOGICAL (Read)
-*        If TRUE, then vector parameters will be displayed as a 
-*        comma-separated list of values enclosed in square brackets. String
-*        values will be enclosed in single quotes. If FALSE, vector values
-*        are printed as a space-separated list with no enclosing brackets
-*        and with no quotes around string values. [FALSE]
+*        If TRUE, then vector parameters will be displayed as a
+*        comma-separated list of values enclosed in square brackets. If
+*        FALSE, vector values are printed as a space-separated list with
+*        no enclosing brackets. Additionally, if VECTOR is TRUE, string
+*        values (whether vector or scalar) are enclosed in single quotes
+*        and any embedded quotes are escaped using a backslash. [FALSE]
 
 *  Examples:
 *     parget mean stats
@@ -271,34 +275,40 @@
 
          END IF
 
+*  See how the values are to be displayed.
+         CALL PAR_GET0L( 'VECTOR', VECTOR, STATUS )
+
+*  See if the values are strings, and if so get their length.
+         CALL DAT_TYPE( LOCO, TYPE, STATUS )
+         IF( TYPE( :5 ) .EQ. '_CHAR' ) THEN
+            ISCHAR = .TRUE.
+            CALL DAT_CLEN( LOCO, CLEN, STATUS )
+            IF( CLEN .GT. MSG__SZMSG - 5 .AND.
+     :          STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__OK
+               CALL ERR_REP( ' ', 'Formatted length of each '//
+     :                       'value is too large.', STATUS )
+            END IF
+         ELSE
+            ISCHAR = .FALSE.
+         END IF
+
 *  Find the number of elements associated with the object.
          CALL DAT_SHAPE( LOCO, DAT__MXDIM, DIM, NDIM, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Obtain and report a scalar value.
+*  Obtain and report a scalar value. If using VECTOR format, quote the
+*  value if it is a string.
          IF ( NDIM .EQ. 0 ) THEN
             CALL DAT_GET0C( LOCO, CVALUE, STATUS )
-            CALL MSG_OUT( 'VALUE', CVALUE, STATUS )
-
-         ELSE
-
-*  See if the values are strings, and if so get their length.
-            CALL DAT_TYPE( LOCO, TYPE, STATUS )
-            IF( TYPE( :5 ) .EQ. '_CHAR' ) THEN
-               ISCHAR = .TRUE.
-               CALL DAT_CLEN( LOCO, CLEN, STATUS )
-               IF( CLEN .GT. MSG__SZMSG - 5 .AND.
-     :             STATUS .EQ. SAI__OK ) THEN
-                  STATUS = SAI__OK
-                  CALL ERR_REP( ' ', 'Formatted length of each '//
-     :                          'value is too large.', STATUS )
-               END IF
+            IF( VECTOR ) THEN
+               NCV = CHR_LEN( CVALUE )
+               CALL KPG1_QUOTE( CVALUE( : NCV ), CVAL, STATUS )
             ELSE
-               ISCHAR = .FALSE.
+               CVAL =  CVALUE
             END IF
-
-*  See  how the values are to be displayed.
-            CALL PAR_GET0L( 'VECTOR', VECTOR, STATUS )
+            CALL MSG_OUT( 'VALUE', CVAL, STATUS )
+         ELSE
 
 *  Find the height and width of the screen.  Use the full screen area. Use
 *  a default when there has been an error.  Hide the error in its own

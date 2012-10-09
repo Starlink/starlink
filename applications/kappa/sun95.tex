@@ -38887,6 +38887,9 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
 
       would assign elements of the shell array perval[1], perval[2],
       {\em etc.}\ to the last-computed percentile values of HISTAT.
+      For other scripting languages such as Python, the alternative
+      vector format produced by setting parameter VECTOR to {\tt TRUE}
+      may be more appropriate.
 
       Single elements of an parameter array may also be accessed using
       the array index in parentheses.
@@ -38909,10 +38912,11 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
          VECTOR = \_LOGICAL (Read)
       }{
          If {\tt TRUE}, then vector parameters will be displayed as a
-         comma-separated list of values enclosed in square brackets. String
-         values will be enclosed in single quotes. If {\tt FALSE}, vector values
-         are printed as a space-separated list with no enclosing brackets
-         and with no quotes around string values.  {\tt [FALSE]}
+	 comma-separated list of values enclosed in square brackets. If
+	 FALSE, vector values are printed as a space-separated list with
+	 no enclosing brackets. Additionally, if VECTOR is TRUE, string
+	 values (whether vector or scalar) are enclosed in single quotes
+	 and any embedded quotes are escaped using a backslash. {\tt [FALSE]}
       }
    }
    \sstexamples{
