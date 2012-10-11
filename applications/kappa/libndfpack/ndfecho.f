@@ -39,6 +39,9 @@
 *     ndfecho ndf [mod] [first] [last] [show]
 
 *  ADAM Parameters:
+*     ABSPATH = _LOGICAL (Read)
+*        If TRUE, any relative NDF paths are converted to absolute, using
+*        the current working directory. [FALSE]
 *     FIRST = _INTEGER (Read)
 *        The index of the first NDF to be included in the displayed
 *        lit. A null (!) value causes the first NDF to be used
@@ -162,7 +165,7 @@
 *     24-SEP-2012 (DSB):
 *        Original version.
 *     11-OCT-2012 (DSB):
-*        Added parameters MOD and LOGFILE.
+*        Added parameters MOD, LOGFILE and ABSPATH.
 *     {enter_further_changes_here}
 
 *-
@@ -194,6 +197,7 @@
       INTEGER LAST           ! The index of the last NDF to display
       INTEGER SIZE0          ! Size of group IGRP0
       INTEGER SIZE1          ! Size of group IGRP1
+      LOGICAL ABSPTH         ! Convert to absolute paths?
       LOGICAL FLAG           ! Was group expression flagged?
 *.
 
@@ -290,6 +294,10 @@
 *  default.
          CALL PAR_GDR0I( 'LAST', LAST, FIRST, SIZE1, .TRUE., LAST,
      :                   STATUS )
+
+*  If required, ensure all paths in the group are absolute.
+         CALL PAR_GET0L( 'ABSPATH', ABSPTH, STATUS )
+         IF( ABSPTH ) CALL NDG_ABPTH( IGRP1, STATUS )
 
 *  Loop round displaying the required NDFs.
          DO I = FIRST, LAST

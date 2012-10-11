@@ -1153,6 +1153,17 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+
+         parameter abspath {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Convert relative NDF paths to absolute?}
+            helpkey *
+            default FALSE
+         }
+
          parameter first {
             position 3
             type _INTEGER
