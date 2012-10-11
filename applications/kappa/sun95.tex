@@ -37119,6 +37119,12 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          last NDF in the supplied group. {\tt []}
       }
       \sstsubsection{
+         LOGFILE = FILENAME (Write)
+      }{
+         The name of a text file in which to store the listed NDF names.
+         If a null (!) value is supplied, no log file is created. {\tt [!]}
+      }
+      \sstsubsection{
          MOD = LITERAL (Read)
       }{
          An optional GRP modification expression that will be used to
@@ -37225,10 +37231,11 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          exist.
       }
       \sstexamplesubsection{
-         ndfecho $\wedge$files.lis $*$\_a
+         ndfecho $\wedge$files.lis $*$\_a logfile=log.lis
       }{
          This reports the names of the NDFs listed in text file files.lis,
          but appending {\tt "}\_a{\tt "} to the end of each name. The NDFs must all exist.
+         The listed NDF names are written to a new text file called {\tt "}log.lis{\tt "}.
       }
       \sstexamplesubsection{
          ndfecho in=! mod=\{$\wedge$base\}$|$\_a$|$\_b$|$

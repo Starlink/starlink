@@ -50,6 +50,9 @@
 *        only a single NDF will be displayed). If a null value is
 *        supplied for FIRST, then the run-time default for LAST is the
 *        last NDF in the supplied group. []
+*     LOGFILE = FILENAME (Write)
+*        The name of a text file in which to store the listed NDF names.
+*        If a null (!) value is supplied, no log file is created. [!]
 *     MOD = LITERAL (Read)
 *        An optional GRP modification expression that will be used to
 *        modify any names obtained via the "NDF" parameter. For instance,
@@ -121,9 +124,10 @@
 *        This reports the file base name for just the fourth NDF in the
 *        list specified within the text file "files.lis". The NDFs must
 *        all exist.
-*     ndfecho ^files.lis *_a
+*     ndfecho ^files.lis *_a logfile=log.lis
 *        This reports the names of the NDFs listed in text file files.lis,
 *        but appending "_a" to the end of each name. The NDFs must all exist.
+*        The listed NDF names are written to a new text file called "log.lis".
 *     ndfecho in=! mod={^base}|_a|_b|
 *        This reports the names of the NDFs listed in text file "base", but
 *        replacing "_a" with "_b" in their names. The NDFs need not exist
@@ -158,7 +162,7 @@
 *     24-SEP-2012 (DSB):
 *        Original version.
 *     11-OCT-2012 (DSB):
-*        Added parameter MOD.
+*        Added parameters MOD and LOGFILE.
 *     {enter_further_changes_here}
 
 *-
@@ -184,6 +188,7 @@
       INTEGER I              ! Index of next NDF to display
       INTEGER IGRP0          ! GRP id. for group holding existing NDFs
       INTEGER IGRP1          ! GRP id. for group holding listed NDFs
+      INTEGER IGRP2          ! GRP id. for log file group
       INTEGER ILEN           ! Length of the NDF info item
       INTEGER ISHOW          ! What to show
       INTEGER LAST           ! The index of the last NDF to display
@@ -234,6 +239,9 @@
          IGRP0 = GRP__NOID
          SIZE1 = SIZE0
       END IF
+
+*  Create a group in which to store the names to be logged.
+      CALL GRP_NEW( ' ', IGRP2, STATUS )
 
 *  Only proceed if some NDFs were specified.
       IF( SIZE1 .GT. 0 ) THEN
@@ -293,6 +301,9 @@
             CALL MSG_SETC( 'I', FIELDS( ISHOW ) )
             CALL MSG_OUT( ' ', '^I', STATUS )
 
+*  Add it to the log group.
+            CALL GRP_PUT1( IGRP2, FIELDS( ISHOW ), 0, STATUS )
+
 *  Write the first NDF to an output parameter.
             IF( I .EQ. FIRST ) THEN
                ILEN = CHR_LEN( FIELDS( ISHOW ) )
@@ -303,6 +314,9 @@
 
          END DO
 
+*  Create the log file.
+         CALL GRP_LIST( 'LOGFILE', 0, 0, ' ', IGRP2, STATUS )
+
       END IF
 
 *  Tidy up.
@@ -312,6 +326,7 @@
 *  Free resourcee.
       IF( IGRP0 .NE. GRP__NOID ) CALL GRP_DELET( IGRP0, STATUS )
       IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )
+      CALL GRP_DELET( IGRP2, STATUS )
 
 *  Add a context report if anything went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN

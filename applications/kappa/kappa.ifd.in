@@ -1172,6 +1172,16 @@ package kappa {
             helpkey *
          }
 
+         parameter logfile {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Log file}
+            default !
+            helpkey *
+         }
+
          parameter mod {
             position 2
             type LITERAL
