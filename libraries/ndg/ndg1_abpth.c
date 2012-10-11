@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "f77.h"
 #include "cnf.h"
 #include "star/grp.h"
@@ -70,6 +72,8 @@ F77_SUBROUTINE(ndg1_abpth)( CHARACTER(PATH), CHARACTER(ABPATH),
    char abpath[ GRP__SZNAM + 1 ];
    char *s;
    char *priorSlash;
+   int lin;
+   int lout;
 
 /* Check the global status. */
    if( *STATUS != SAI__OK ) return;
@@ -98,6 +102,25 @@ F77_SUBROUTINE(ndg1_abpth)( CHARACTER(PATH), CHARACTER(ABPATH),
    while( ( s = strstr(abpath, "//")) ) removeJunk( s, s + 1 );
    s = abpath + ( strlen(abpath) - 1 );
    if( s != abpath && *s == '/') *s=0;
+
+/* If the supplied path ended with a slash, ensure the returned path ends
+   with a slash. */
+   lin = strlen( path );
+   lout = strlen( abpath );
+   if( path[ lin - 1 ] == '/' && lout < GRP__SZNAM ) {
+      if( abpath[ lout - 1 ] != '/' ) {
+         abpath[ lout ] = '/';
+         abpath[ lout + 1 ] = 0;
+      }
+
+/* If the supplied path does not end with a slash, ensure the returned
+   path does not end with a slash. */
+   } else if( path[ lin - 1 ] != '/' ) {
+      if( abpath[ lout - 1 ] == '/' ) {
+         abpath[ lout ] = '/';
+         abpath[ lout ] = 0;
+      }
+   }
 
 /* Export returned absolute path */
    cnfExpn( abpath, GRP__SZNAM, ABPATH, ABPATH_length );
