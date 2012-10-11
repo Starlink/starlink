@@ -19,7 +19,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {2.8}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {19th September 2012}
+\newcommand{\stardocdate}      {11th October 2012}
 \newcommand{\stardoctitle}     {NDG \\ [\latex{1ex}]
                                 Routines for Accessing Groups of NDFs}
 \newcommand{\stardocversion}   {Version 7.0}
@@ -858,6 +858,31 @@ to add further members.
 % =====================
 \small
 
+\sstroutine{
+   NDG\_ABPTH
+}{
+   Ensure all NDFs in a group have absolute paths
+}{
+   \sstdescription{
+      Any NDFs in the group that have relative paths are converted to
+      absolute paths on exit.
+   }
+   \sstinvocation{
+      CALL NDG\_ABPTH( IGRP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         The NDG group as returned by NDG\_ASSOC, etc.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
 
 \sstroutine{
    NDG\_ASEXP
@@ -4469,6 +4494,13 @@ another statement of the software that performed the action.
    }
 }
 
+
+\section{Changes Introduced in NDG Version 7.1}
+\begin{itemize}
+   \item New routine NDG\_ABPTH added to convert a group of NDF paths
+    from relative to absolute (with respect to the current working
+    directory).
+\end{itemize}
 
 \section{Changes Introduced in NDG Version 7.0}
 \begin{itemize}

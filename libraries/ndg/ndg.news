@@ -1,5 +1,10 @@
 1 NDG_library
 
+Version 7.1
+
+   o New routine NDG_ABPTH added to convert a grouyp of NDF paths from
+   relative to absolue, with respect to the current working directory.
+
 Version 7.0
 
    o After provenance has been read into memory using ndgReadProv, any extra
