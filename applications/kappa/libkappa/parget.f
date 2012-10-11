@@ -301,7 +301,7 @@
 *  value if it is a string.
          IF ( NDIM .EQ. 0 ) THEN
             CALL DAT_GET0C( LOCO, CVALUE, STATUS )
-            IF( VECTOR ) THEN
+            IF( VECTOR .AND. ISCHAR ) THEN
                NCV = CHR_LEN( CVALUE )
                CALL KPG1_QUOTE( CVALUE( : NCV ), CVAL, STATUS )
             ELSE
