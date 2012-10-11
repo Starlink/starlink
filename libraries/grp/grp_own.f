@@ -22,7 +22,8 @@
 *  Arguments:
 *     IGRP1 = INTEGER (Given)
 *        An identifier for the slave group whose owner is to be
-*        returned.
+*        returned. If GRP__NOID is supplied, then IGRP2 is returned
+*        holding GRP__NOID and no error is reported.
 *     IGRP2 = INTEGER (Returned)
 *        An identifier for the group which owns the group identified by
 *        IGRP1. Returned equal to GRP__NOID if an error occurs.
@@ -56,6 +57,9 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     11-OCT-2012 (DSB):
+*        Return GRP__NOID without error if the supplied group identifier
+*       is GRP__NOID.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -97,8 +101,9 @@
 *  exists on entry.
       IGRP2 = GRP__NOID
 
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Check inherited global status. Return without error if a null group
+*  was supplied.
+      IF ( STATUS .NE. SAI__OK .OR. IGRP1 .EQ. GRP__NOID ) RETURN
 
 *  Check that the supplied GRP identifier is valid, and find the index
 *  within the common arrays at which information describing the group is

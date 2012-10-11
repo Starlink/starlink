@@ -5,5 +5,7 @@ A new release (V3.7) of the GRP library is now available. It includes
 the following changes:
 
 - A new routine GRP_SAME determines if two identifiers refer to the same
-group.
+   group.
 - A new routine GRP_SHOW to list the contents of a group to the screen.
+- The GRP_OWN routine returns GRP__NOID without error if the supplied
+  group identifier is GRP__NOID.
