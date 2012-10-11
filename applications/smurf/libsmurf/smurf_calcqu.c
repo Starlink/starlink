@@ -104,16 +104,10 @@
 *     OUTQ = LITERAL (Write)
 *        The name of an output HDS container file containing the Q images.
 *        Each image is held in a separate 2D NDF within the container file.
-*        At their simplest the NDF names will be "Q<i>", where "<i>" is the
+*        The NDF names will be "Q<i>_<s>_<c>", where "<i>" is the
 *        integer one-based index of the time slice block from which the
-*        image was made. However, if the supplied input NDFs contain data
-*        from more than one subarray, these names will be modified to
-*        "Q<i>_<s>", where "<s>" is the name of the subarray (e.g. "s4a",
-*        etc). Further, if the supplied input NDFs do not form a contiguous
-*        sequence of time slices but are instead broken up into a set of
-*        non-contiguous chunks (for instance if the input NDFs contained
-*        data from more than one observation), the names will be modified
-*        to "Q<i>_<s>_<c>", where "<c>" is an integer one-based chunk index.
+*        image was made, "<s>" is the name of the subarray (e.g. "s4a",
+*        etc), and "<c>" is an integer one-based chunk index.
 *     OUTU = LITERAL (Write)
 *        The name of an output HDS container file containing the U images.
 *        The NDFs within this container file are stored and named in the
@@ -208,6 +202,9 @@
 *        Added FIX parameter.
 *     21-SEP-2012 (DSB):
 *        Added OUTI parameter.
+*     9-OCT-2012 (DSB):
+*        Use a single consistent naming scheme for the output NDFs in all
+*        situations.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -601,15 +598,11 @@ void smurf_calcqu( int *status ) {
                   iblock++;
                   nc = sprintf( ndfname, "Q%d", iblock );
 
-/* If we are producing Q images for more than one subarray, append the
-   subarray name to the NDF name. */
-                  if( concat->ndat > 1 ) nc += sprintf( ndfname + nc, "_%s",
-                                                        subarray );
+/* Append the subarray name to the NDF name. */
+                  nc += sprintf( ndfname + nc, "_%s", subarray );
 
-/* If we are producing Q images for more than one contiguous chunk of
-   data, append the chunk index to the NDF name. */
-                  if( nchunk > 1 ) nc += sprintf( ndfname + nc, "_%d",
-                                                  (int) ichunk );
+/* Append the chunk index to the NDF name. */
+                  nc += sprintf( ndfname + nc, "_%d", (int) ichunk );
 
 /* Get NDF placeholder for the Q NDF. The NDFs are created inside the
    output container file. */
