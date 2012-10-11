@@ -101,6 +101,9 @@
 *        - "Ftype" -- The file type (usually ".sdf" but may not be if
 *        any foreign NDFs are supplied).
 *
+*        - "Fspec" -- The directory, base name and file type concatenated
+*        to form a full file specification.
+*
 *        - "HDSpath" -- The HDS path within the container file (if any).
 *
 *        - "Path" -- The full name of the NDF as supplied by the user.
@@ -187,8 +190,10 @@
 *  Local Variables:
       CHARACTER FIELDS( 6 )*(GRP__SZNAM)! Info about next NDF
       CHARACTER SHOW*7       ! What to show
+      CHARACTER TEXT*(GRP__SZNAM)! Info to display
       INTEGER FIRST          ! The index of the first NDF to display
       INTEGER I              ! Index of next NDF to display
+      INTEGER IAT            ! Used length of string
       INTEGER IGRP0          ! GRP id. for group holding existing NDFs
       INTEGER IGRP1          ! GRP id. for group holding listed NDFs
       INTEGER IGRP2          ! GRP id. for log file group
@@ -252,7 +257,7 @@
 
 *  See what the user wants to display.
          CALL PAR_CHOIC( 'SHOW', 'PATH', 'SLICE,HDSPATH,FTYPE,BASE,'//
-     :                   'DIR,PATH', .TRUE., SHOW, STATUS )
+     :                   'DIR,PATH,FSPEC', .TRUE., SHOW, STATUS )
          IF( SHOW .EQ. 'SLICE' ) THEN
             ISHOW = 1
          ELSE IF( SHOW .EQ. 'HDSPATH' ) THEN
@@ -263,8 +268,10 @@
             ISHOW = 4
          ELSE IF( SHOW .EQ. 'DIR' ) THEN
             ISHOW = 5
-         ELSE
+         ELSE IF( SHOW .EQ. 'PATH' ) THEN
             ISHOW = 6
+         ELSE
+            ISHOW = 7
          END IF
 
 *  Write the group size to an output parameter.
@@ -305,19 +312,29 @@
 *  Get all items of information about the NDF.
             CALL NDG_GTSUP( IGRP1, I, FIELDS, STATUS )
 
+*  Form the full file spec if required.
+            IF( ISHOW .EQ. 7 ) THEN
+               TEXT = ' '
+               IAT = 0
+               CALL CHR_APPND( FIELDS( 5 ), TEXT, IAT )
+               CALL CHR_APPND( FIELDS( 4 ), TEXT, IAT )
+               CALL CHR_APPND( FIELDS( 3 ), TEXT, IAT )
+            ELSE
+               TEXT = FIELDS( ISHOW )
+            END IF
+
 *  Display the required item.
-            CALL MSG_SETC( 'I', FIELDS( ISHOW ) )
+            CALL MSG_SETC( 'I', TEXT )
             CALL MSG_OUT( ' ', '^I', STATUS )
 
 *  Add it to the log group.
-            CALL GRP_PUT1( IGRP2, FIELDS( ISHOW ), 0, STATUS )
+            CALL GRP_PUT1( IGRP2, TEXT, 0, STATUS )
 
 *  Write the first NDF to an output parameter.
             IF( I .EQ. FIRST ) THEN
-               ILEN = CHR_LEN( FIELDS( ISHOW ) )
+               ILEN = CHR_LEN( TEXT )
                IF( ILEN .EQ. 0 ) ILEN = 1
-               CALL PAR_PUT0C( 'VALUE', FIELDS( ISHOW )( : ILEN ),
-     :                         STATUS )
+               CALL PAR_PUT0C( 'VALUE', TEXT( : ILEN ), STATUS )
             END IF
 
          END DO
