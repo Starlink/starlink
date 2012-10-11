@@ -37080,9 +37080,26 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       Its primary use is within scripts that need to process groups of
       NDFs. Instead of the full name, a required component of the name
       may be displayed instead (see Parameter SHOW).
+
+      Two modes are available:
+
+      \sstitemlist{
+
+         \sstitem
+
+         If the NDFs are specified via the {\tt "}NDF{\tt "} parameter,
+	 then the NDFs must exist and be accessible (an error is reported
+	 otherwise). The NDF names obtained can then be modified by
+	 supplying a suitable GRP modification expression such as
+	 {\tt "}$*$\_A{\tt "} for parameter {\tt "}MOD{\tt "}
+
+         \sstitem
+         To list NDFs that may not exist, supply a null (!) value for
+         parameter {\tt "}NDF{\tt "} and the main group expression to parameter {\tt "}MOD{\tt "}.
+      }
    }
    \sstusage{
-      ndfecho ndf [first] [last] [show]
+      ndfecho ndf [mod] [first] [last] [show]
    }
    \sstparameters{
       \sstsubsection{
@@ -37102,10 +37119,26 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          last NDF in the supplied group. {\tt []}
       }
       \sstsubsection{
+         MOD = LITERAL (Read)
+      }{
+         An optional GRP modification expression that will be used to
+	 modify any names obtained via the {\tt "}NDF{\tt "} parameter.
+	 For instance, if {\tt "}MOD{\tt "} is {\tt "}$*$\_A{\tt "} then
+	 the supplied NDF names will be modified by appending
+	 {\tt "}\_A{\tt "} to them. No modification occurs if a null (!)
+	 value is supplied.
+
+         If a null value is supplied for {\tt "}NDF{\tt "} then the value
+	 supplied for {\tt "}MOD{\tt "} should not include an asterisk,
+	 since there are no names to be modified. Instead, the
+	 {\tt "}MOD{\tt "} value should specify an explicit group of NDF
+         names do not need to exist. {\tt [!]}
+      }
+      \sstsubsection{
          NDF = NDF (Read)
       }{
-         A group of NDFs.  This should be given as a comma-separated list,
-         in which each list element can be one of the following options.
+         A group of existing NDFs.  This should be given as a comma-separated
+         list, in which each list element can be one of the following options.
 
          \sstitemlist{
 
@@ -37182,13 +37215,28 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          ndfecho mycont
       }{
          Report the full path of all the NDFs within the HDS container file
-         {\tt mycont.sdf}.
+         {\tt mycont.sdf}. The NDFs must all exist.
       }
       \sstexamplesubsection{
          ndfecho $\wedge$files.lis first=4 show=base
       }{
          This reports the file base name for just the fourth NDF in the list
-         specified within the text file {\tt files.lis}.
+         specified within the text file {\tt files.lis}. The NDFs must all
+         exist.
+      }
+      \sstexamplesubsection{
+         ndfecho $\wedge$files.lis $*$\_a
+      }{
+         This reports the names of the NDFs listed in text file files.lis,
+         but appending {\tt "}\_a{\tt "} to the end of each name. The NDFs must all exist.
+      }
+      \sstexamplesubsection{
+         ndfecho in=! mod=\{$\wedge$base\}$|$\_a$|$\_b$|$
+      }{
+         This reports the names of the NDFs listed in text file {\tt "}base{\tt "}, but
+         replacing {\tt "}\_a{\tt "} with {\tt "}\_b{\tt "} in their names. The NDFs need not exist
+         since they are completely specified by parameter {\tt "}MOD{\tt "} and not by
+         parameter {\tt "}NDF{\tt "}.
       }
    }
 }

@@ -1154,7 +1154,7 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter first {
-            position 2
+            position 3
             type _INTEGER
             vpath DEFAULT
             ppath CURRENT DEFAULT
@@ -1164,11 +1164,22 @@ package kappa {
          }
 
          parameter last {
-            position 3
+            position 4
             type _INTEGER
             vpath DYNAMIC
             ppath DYNAMIC
             prompt {Index of last NDF to display}
+            helpkey *
+         }
+
+         parameter mod {
+            position 2
+            type LITERAL
+            access READ
+            ppath CURRENT,DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {The NDFs to be listed}
             helpkey *
          }
 
@@ -1178,12 +1189,12 @@ package kappa {
             access READ
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            prompt {The input NDFs}
+            prompt {A group of existing NDFs}
             helpkey *
          }
 
          parameter show {
-            position 4
+            position 5
             type LITERAL
             vpath DEFAULT
             ppath CURRENT DEFAULT
