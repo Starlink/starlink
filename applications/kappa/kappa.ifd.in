@@ -1214,6 +1214,24 @@ package kappa {
             helpkey *
          }
 
+         parameter nmatch {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+         }
+
+         parameter pattern {
+            type LITERAL
+            access READ
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Pattern matching template}
+            default !
+            helpkey *
+         }
+
          parameter show {
             position 5
             type LITERAL

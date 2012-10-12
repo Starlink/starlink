@@ -21,9 +21,10 @@
 
 *  Description:
 *     This application lists the names of the supplied NDFs to the
-*     screen. Its primary use is within scripts that need to process
-*     groups of NDFs. Instead of the full name, a required component of
-*     the name may be displayed instead (see Parameter SHOW).
+*     screen, optionally filtering them using a regular expression. Its
+*     primary use is within scripts that need to process groups of NDFs.
+*     Instead of the full name, a required component of the name may be
+*     displayed instead (see parameter SHOW).
 *
 *     Two modes are available:
 *
@@ -43,16 +44,14 @@
 *        If TRUE, any relative NDF paths are converted to absolute, using
 *        the current working directory. [FALSE]
 *     FIRST = _INTEGER (Read)
-*        The index of the first NDF to be included in the displayed
-*        lit. A null (!) value causes the first NDF to be used
-*        (Index 1). [!]
+*        The index of the first NDF to be tested. A null (!) value
+*        causes the first NDF to be used (Index 1). [!]
 *     LAST = _INTEGER (Read)
-*        The index of the last NDF to be included in the displayed list.
-*        If a non-null value is supplied for FIRST, then the run-time
-*        default for LAST is equal to the supplied FIRST value (so that
-*        only a single NDF will be displayed). If a null value is
-*        supplied for FIRST, then the run-time default for LAST is the
-*        last NDF in the supplied group. []
+*        The index of the last NDF to be tested. If a non-null value is
+*        supplied for FIRST, then the run-time default for LAST is equal
+*        to the supplied FIRST value (so that only a single NDF will be
+*        tested). If a null value is supplied for FIRST, then the
+*        run-time default for LAST is the last NDF in the supplied group. []
 *     LOGFILE = FILENAME (Write)
 *        The name of a text file in which to store the listed NDF names.
 *        If a null (!) value is supplied, no log file is created. [!]
@@ -90,8 +89,17 @@
 *
 *        If a null (!) value is supplied, then the displayed list of NDFs
 *        is determined by the value supplied for the "MOD" parameter.
+*     NMATCH = _INTEGER (Write)
+*        An output parameter to which is written the number of NDFs
+*        between FIRST and LAST that match the pattern supplied by PATTERN.
+*     PATTERN = LITERAL (Read)
+*        Specifies a pattern matching template using the syntax described
+*        below in "Pattern Matching Syntax".  Each NDF is displayed only
+*        if a match is found between this pattern and the item specified
+*        by parameter SHOW.   A null (!) value causes all NDFs to be
+*        displayed. [!]
 *     SHOW = LITERAL (Read)
-*        Specifies the information to be displayed about each NDF.  The
+*        Specifies the information to be displayed about each NDF. The
 *        options are as follows.
 *
 *        - "Base" -- The base file name.
@@ -110,17 +118,15 @@
 *
 *        - "Slice" -- The NDF slice specification (if any).
 *
-*        Note, the fields are extracted from the NDF names as supplied
-*        by the user. No missing fields (except for "Ftype") are filled
-*        in. ["Path"]
+*        Items that do not match the pattern specified by parameter
+*        PATTERN are not displayed. ["Path"]
 *     SIZE = _INTEGER (Write)
-*        An output parameter to which is written the number of NDFs in
-*        the specified group.
+*        An output parameter to which is written the total number of
+*        NDFs in the specified group.
 *     VALUE = LITERAL (Write)
 *        An output parameter to which is written information about the
-*        NDF specified by Parameter FIRST, or the first NDF in the group
-*        if FIRST is not specified. The information to write is
-*        specified by the SHOW parameter.
+*        first NDF that matches the pattern specified by parameter PATTERN.
+*        The information to write is specified by the SHOW parameter.
 
 *  Examples:
 *     ndfecho mycont
@@ -139,6 +145,53 @@
 *        replacing "_a" with "_b" in their names. The NDFs need not exist
 *        since they are completely specified by parameter "MOD" and not by
 *        parameter "NDF".
+
+*  Pattern Matching Syntax:
+*     The syntax for the PATTERN parameter value is a minimal form of
+*     regular expression. The following atoms are allowed.
+*
+*     "[chars]" -- Matches any of the characters within the brackets.
+*     "[^chars]" -- Matches any character that is not within the
+*                   brackets (ignoring the initial "^" character).
+*     "." -- Matches any single character.
+*     "\d" -- Matches a single digit.
+*     "\D" -- Matches anything but a single digit.
+*     "\w" -- Matches any alphanumeric character, and "_".
+*     "\W" -- Matches anything but alphanumeric characters, and "_".
+*     "\s" -- Matches white space.
+*     "\S" -- Matches anything but white space.
+*
+*     Any other character that has no special significance within a
+*     regular expression matches itself.  Characters that have special
+*     significance can be matched by preceeding them with a backslash
+*     (\) in which case their special significance is ignored (note,
+*     this does not apply to the characters in the set dDsSwW).
+*
+*     Note, minus signs ("-") within brackets have no special
+*     significance, so ranges of characters must be specified
+*     explicitly.
+*
+*     The following quantifiers are allowed.
+*
+*     "*" -- Matches zero or more of the preceeding atom, choosing the
+*            largest possible number that gives a match.
+*     "*?"-- Matches zero or more of the preceeding atom, choosing the
+*           smallest possible number that gives a match.
+*     "+" -- Matches one or more of the preceeding atom, choosing the
+*            largest possible number that gives a match.
+*     "+?"-- Matches one or more of the preceeding atom, choosing the
+*            smallest possible number that gives a match.
+*     "?" -- Matches zero or one of the preceeding atom.
+*     "{n}" -- Matches exactly "n" occurrences of the preceeding atom.
+*
+*     The following constraints are allowed.
+*
+*     "^" -- Matches the start of the test string.
+*     "$" -- Matches the end of the test string.
+*
+*     Multiple templates can be concatenated, using the "|" character to
+*     separate them.  The test string is compared against each one in
+*     turn until a match is found.
 
 *  Copyright:
 *     Copyright (C) 2012 Science & Technology Facilities Council.
@@ -169,6 +222,8 @@
 *        Original version.
 *     11-OCT-2012 (DSB):
 *        Added parameters MOD, LOGFILE and ABSPATH.
+*     12-OCT-2012 (DSB):
+*        Added parameter PATTERN.
 *     {enter_further_changes_here}
 
 *-
@@ -180,6 +235,7 @@
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Status:
       INTEGER STATUS             ! Global inherited status
@@ -189,6 +245,8 @@
 
 *  Local Variables:
       CHARACTER FIELDS( 6 )*(GRP__SZNAM)! Info about next NDF
+      CHARACTER PAT*400      ! Pattern matching template
+      CHARACTER RESULT*400   ! Result of substitutions
       CHARACTER SHOW*7       ! What to show
       CHARACTER TEXT*(GRP__SZNAM)! Info to display
       INTEGER FIRST          ! The index of the first NDF to display
@@ -200,10 +258,12 @@
       INTEGER ILEN           ! Length of the NDF info item
       INTEGER ISHOW          ! What to show
       INTEGER LAST           ! The index of the last NDF to display
+      INTEGER NMATCH         ! Number of matching NDFs
       INTEGER SIZE0          ! Size of group IGRP0
       INTEGER SIZE1          ! Size of group IGRP1
       LOGICAL ABSPTH         ! Convert to absolute paths?
       LOGICAL FLAG           ! Was group expression flagged?
+      LOGICAL MATCH          ! DId the NDF match the pattern?
 *.
 
 *  Check the inherited status.
@@ -274,13 +334,10 @@
             ISHOW = 7
          END IF
 
-*  Write the group size to an output parameter.
-         CALL PAR_PUT0I( 'SIZE', SIZE1, STATUS )
-
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get the index of the first NDF to display.
+*  Get the index of the first NDF to test.
          CALL PAR_GDR0I( 'FIRST', 0, 1, SIZE1, .FALSE., FIRST, STATUS )
 
 *  If a null value was supplied, annull the error and start from the
@@ -297,7 +354,7 @@
             LAST = FIRST
          END IF
 
-*  Get the index of the last NDF to display, using the above dynamic
+*  Get the index of the last NDF to test, using the above dynamic
 *  default.
          CALL PAR_GDR0I( 'LAST', LAST, FIRST, SIZE1, .TRUE., LAST,
      :                   STATUS )
@@ -306,7 +363,16 @@
          CALL PAR_GET0L( 'ABSPATH', ABSPTH, STATUS )
          IF( ABSPTH ) CALL NDG_ABPTH( IGRP1, STATUS )
 
-*  Loop round displaying the required NDFs.
+*  Get the filter pattern
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+         CALL PAR_GET0C( 'PATTERN', PAT, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            PAT = ' '
+         END IF
+
+*  Loop round testing the required NDFs.
+         NMATCH = 0
          DO I = FIRST, LAST
 
 *  Get all items of information about the NDF.
@@ -323,24 +389,44 @@
                TEXT = FIELDS( ISHOW )
             END IF
 
-*  Display the required item.
-            CALL MSG_SETC( 'I', TEXT )
-            CALL MSG_OUT( ' ', '^I', STATUS )
-
-*  Add it to the log group.
-            CALL GRP_PUT1( IGRP2, TEXT, 0, STATUS )
-
-*  Write the first NDF to an output parameter.
-            IF( I .EQ. FIRST ) THEN
-               ILEN = CHR_LEN( TEXT )
-               IF( ILEN .EQ. 0 ) ILEN = 1
-               CALL PAR_PUT0C( 'VALUE', TEXT( : ILEN ), STATUS )
+*  See if the pattern matches the item.
+            IF( PAT .NE. ' ' ) THEN
+               MATCH = AST_CHRSUB( TEXT, PAT, RESULT, STATUS )
+            ELSE
+               RESULT = TEXT
+               MATCH = .TRUE.
             END IF
 
+*  If so...
+            IF( MATCH ) THEN
+
+*  Display the required item.
+               CALL MSG_SETC( 'I', RESULT )
+               CALL MSG_OUT( ' ', '^I', STATUS )
+
+*  Add it to the log group.
+               CALL GRP_PUT1( IGRP2, RESULT, 0, STATUS )
+
+*  Write the first NDF to an output parameter.
+               IF( I .EQ. FIRST ) THEN
+                  ILEN = CHR_LEN( RESULT )
+                  IF( ILEN .EQ. 0 ) ILEN = 1
+                  CALL PAR_PUT0C( 'VALUE', RESULT( : ILEN ), STATUS )
+               END IF
+
+*  Count the number of matches
+               NMATCH = NMATCH + 1
+            END IF
          END DO
 
 *  Create the log file.
          CALL GRP_LIST( 'LOGFILE', 0, 0, ' ', IGRP2, STATUS )
+
+*  Write the group size to an output parameter.
+         CALL PAR_PUT0I( 'SIZE', SIZE1, STATUS )
+
+*  Write the number of matches to an output parameter.
+         CALL PAR_PUT0I( 'NMATCH', NMATCH, STATUS )
 
       END IF
 

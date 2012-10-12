@@ -37076,10 +37076,11 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
    Displays a group of NDF names
 }{
    \sstdescription{
-      This application lists the names of the supplied NDFs to the screen.
-      Its primary use is within scripts that need to process groups of
-      NDFs. Instead of the full name, a required component of the name
-      may be displayed instead (see Parameter SHOW).
+      This application lists the names of the supplied NDFs to the
+      screen, optionally filtering them using a regular expression. Its
+      primary use is within scripts that need to process groups of NDFs.
+      Instead of the full name, a required component of the name may be
+      displayed instead (see parameter SHOW).
 
       Two modes are available:
 
@@ -37111,18 +37112,18 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       \sstsubsection{
          FIRST = \_INTEGER (Read)
       }{
-         The index of the first NDF to be included in the displayed list.
-         A null (!) value causes the first NDF to be used (Index 1). {\tt [!]}
+         The index of the first NDF to be tested.  A null (!) value causes
+         the first NDF to be used (index 1). {\tt [!]}
       }
       \sstsubsection{
          LAST = \_INTEGER (Read)
       }{
-         The index of the last NDF to be included in the displayed list.
-         If a non-null value is supplied for FIRST, then the run-time
-         default for LAST is equal to the supplied FIRST value (so that
-         only a single NDF will be displayed). If a null value is
-         supplied for FIRST, then the run-time default for LAST is the
-         last NDF in the supplied group. {\tt []}
+         The index of the last NDF to be tested. If a non-null value is
+	 supplied for FIRST, then the run-time default for LAST is equal
+	 to the supplied FIRST value (so that only a single NDF will be
+	 tested). If a null value is supplied for FIRST, then the
+	 run-time default for LAST is the last NDF in the supplied group.
+	 {\tt []}
       }
       \sstsubsection{
          LOGFILE = FILENAME (Write)
@@ -37174,6 +37175,15 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          this way are concatenated into a single group.
       }
       \sstsubsection{
+         PATTERN = LITERAL (Read)
+      }{
+         Specifies a pattern matching template using the syntax described
+	 below in ``Pattern Matching Syntax''.  Each NDF is displayed only
+	 if a match is found between this pattern and the item specified
+	 by parameter SHOW.  A null (!) value causes all NDFs to be
+	 displayed. {\tt [!]}
+      }
+      \sstsubsection{
          SHOW = LITERAL (Read)
       }{
          Specifies the information to be displayed about each NDF.  The
@@ -37212,10 +37222,16 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
    }
    \sstresparameters{
       \sstsubsection{
+         NMATCH = \_INTEGER (Write)
+      }{
+         An output parameter to which is written the number of NDFs
+         between FIRST and LAST that match the pattern supplied by PATTERN.
+      }
+      \sstsubsection{
          SIZE = \_INTEGER (Write)
       }{
-         An output parameter to which is written the number of NDFs in the
-         specified group.
+         An output parameter to which is written the total number of NDFs
+	 in the specified group.
       }
       \sstsubsection{
          VALUE = LITERAL (Write)
@@ -37255,6 +37271,127 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          since they are completely specified by parameter {\tt "}MOD{\tt "} and not by
          parameter {\tt "}NDF{\tt "}.
       }
+   }
+   \sstdiytopic{
+      Pattern Matching Syntax
+   }{
+      The syntax for the PATTERN parameter value is a minimal form of
+      regular expression. The following atoms are allowed.
+
+% This conditional text is to avoid a space appearing before the backslash
+% in the hypertext, such as " \W" instead of "\W".
+      \latex{
+         \sstitemlist{
+
+         \sstitem
+         {\tt "[chars]"} --- Matches any of the characters within the brackets.
+
+         \sstitem
+         {\tt "[$\wedge$chars]"} --- Matches any character that is not within the
+                       brackets (ignoring the initial {\tt "$\wedge$"} character).
+         \sstitem
+         {\tt "."} --- Matches any single character.
+
+         \sstitem
+         {\tt "$\backslash$d"} --- Matches a single digit.
+
+         \sstitem
+         {\tt "$\backslash$D"} --- Matches anything but a single digit.
+
+         \sstitem
+         {\tt "$\backslash$w"} --- Matches any alphanumeric character, and {\tt "\_"}.
+
+         \sstitem
+         {\tt "$\backslash$W"} --- Matches anything but alphanumeric characters, and {\tt "\_"}.
+
+         \sstitem
+         {\tt "$\backslash$s"} --- Matches white space.
+
+         \sstitem
+         {\tt "$\backslash$S"} --- Matches anything but white space.
+         }
+      }
+      \html{
+        \sstitemlist{
+
+         \sstitem
+         {\tt "[chars]"} --- Matches any of the characters within the brackets.
+
+         \sstitem
+         {\tt "[$\wedge$chars]"} --- Matches any character that is not within the
+                       brackets (ignoring the initial {\tt "$\wedge$"} character).
+         \sstitem
+         {\tt "."} --- Matches any single character.
+
+         \sstitem
+         \verb+"\d"+ --- Matches a single digit.
+
+         \sstitem
+         \verb+"\D"+ --- Matches anything but a single digit.
+
+         \sstitem
+         \verb+"\w"+ --- Matches any alphanumeric character, and {\tt "\_"}.
+
+         \sstitem
+         \verb+"\W"+ --- Matches anything but alphanumeric characters, and {\tt "\_"}.
+
+         \sstitem
+         \verb+"\s"+ --- Matches white space.
+
+         \sstitem
+         \verb+"\S"+ --- Matches anything but white space.
+         }
+      }
+
+      Any other character that has no special significance within a
+      regular expression matches itself.  Characters that have special
+      significance can be matched by preceeding them with a backslash
+      ($\backslash$) in which case their special significance is ignored (note,
+      this does not apply to the characters in the set dDsSwW).
+
+      Note, minus signs ({\tt "-"}) within brackets have no special
+      significance, so ranges of characters must be specified
+      explicitly.
+
+      The following quantifiers are allowed.
+      \ssthitemlist{
+
+         \sstitem
+         {\tt "*"} --- Matches zero or more of the preceeding atom, choosing the
+             largest possible number that gives a match.
+
+         \sstitem
+         {\tt "*?"}--- Matches zero or more of the preceeding atom, choosing the
+            smallest possible number that gives a match.
+
+         \sstitem
+         {\tt "+"} --- Matches one or more of the preceeding atom, choosing the
+             largest possible number that gives a match.
+
+         \sstitem
+         {\tt "+?"}--- Matches one or more of the preceeding atom, choosing the
+             smallest possible number that gives a match.
+
+         \sstitem
+         {\tt "?"} --- Matches zero or one of the preceeding atom.
+
+         \sstitem
+         {\tt "\{n\}"} --- Matches exactly $n$ occurrences of the preceeding atom.
+      }
+
+      The following constraints are allowed.
+      \ssthitemlist{
+
+         \sstitem
+         {\tt "$\wedge$"} --- Matches the start of the test string.
+
+         \sstitem
+         {\tt "\$"} --- Matches the end of the test string.
+      }
+
+      Multiple templates can be concatenated, using the {\tt "|"} character to
+      separate them.  The test string is compared against each one in
+      turn until a match is found.
    }
 }
 
