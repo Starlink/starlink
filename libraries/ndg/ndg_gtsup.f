@@ -18,8 +18,7 @@
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
-*        The NDG group as returned by NDG_ASSOC, etc. This should be the last
-*        group in a GRP owner-slave chain.
+*        The NDG group as returned by NDG_ASSOC, etc.
 *     I = INTEGER (Given)
 *        The index of the required entry.
 *     FIELDS( 6 ) = CHARACTER * ( * ) (Returned)
@@ -33,17 +32,18 @@
 *           5 - Directory path
 *           6 - Full NDF specification
 *
-*        This information is obtained from a set of groups associated with
-*        the supplied group IGRP by means of a chain of GRP "owner-slave"
-*        relationships. If any of these groups do not exist, the corresponding
-*        elements of the above array are returned blank. Note, Element 6,
-*        the full NDF specification, is obtained directly from the supplied
-*        group IGRP.
+*        If the supplied group is the last group in a GRP owner-slave chain,
+*        then this information is obtained from these groups. If any of these
+*        groups do not exist, the corresponding elements of the above array
+*        are returned holding values formed by parsing the full file
+*        specifications in the supplied group. Note, Element 6, the full NDF
+*        specification, is obtained directly from the supplied group.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -71,6 +71,11 @@
 *        Original version.
 *     22-FEB-2001 (DSB):
 *        Changed ".EQ. GRP__NOID" to ".NE. GRP__NOID" through out.
+*     12-OCT-2012 (DSB):
+*        If the supplied group has no associated groups holding
+*        supplemental information (e.g. if the group was created by
+*        NDG_CREXP), then return field values formed by parsing the
+*        full file spec.
 *     {enter_further_changes_here}
 
 *-
@@ -113,6 +118,10 @@
 
 *  Get the full file spec from the supplied group.
       CALL GRP_GET( IGRP, I, 1, FIELDS( 6 ), STATUS )
+
+*  Parse the full file spec to get defaults for any missing fields.
+      CALL NDG1_FSPLIT( FIELDS( 6 ), FIELDS( 5 ), FIELDS( 4 ),
+     :                  FIELDS( 3 ), FIELDS( 2 ), FIELDS( 1 ), STATUS )
 
 *  Get the owner of the supplied group.
       CALL GRP_OWN( IGRP, IGRPD, STATUS )

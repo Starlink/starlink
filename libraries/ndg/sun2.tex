@@ -1706,8 +1706,7 @@ to add further members.
       \sstsubsection{
          IGRP = INTEGER (Given)
       }{
-         The NDG group as returned by NDG\_ASSOC, etc. This should be the last
-         group in a GRP owner-slave chain.
+         The NDG group as returned by NDG\_ASSOC, etc.
       }
       \sstsubsection{
          I = INTEGER (Given)
@@ -1719,21 +1718,20 @@ to add further members.
       }{
          The supplemental information associated with the entry specified
          by I. Each element of the returned array contains the following:
-         \begin{enumerate}
-            \item NDF slice specification (if any)
-            \item HDS path (if any)
-            \item File type
-            \item Base file name
-            \item Directory path
-            \item Full NDF specification
-         \end{enumerate}
 
-         This information is obtained from a set of groups associated with
-         the supplied group IGRP by means of a chain of GRP {\tt "}owner-slave{\tt "}
-         relationships. If any of these groups do not exist, the corresponding
-         elements of the above array are returned blank. Note, Element 6,
-         the full NDF specification, is obtained directly from the supplied
-         group IGRP.
+            1 - NDF slice specification (if any)
+            2 - HDS path (if any)
+            3 - File type
+            4 - Base file name
+            5 - Directory path
+            6 - Full NDF specification
+
+         If the supplied group is the last group in a GRP owner-slave chain,
+         then this information is obtained from these groups. If any of these
+         groups do not exist, the corresponding elements of the above array
+         are returned holding values formed by parsing the full file
+         specifications in the supplied group. Note, Element 6, the full NDF
+         specification, is obtained directly from the supplied group.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1742,7 +1740,6 @@ to add further members.
       }
    }
 }
-
 
 \sstroutine{
    NDF\_MOREG
@@ -4500,6 +4497,10 @@ another statement of the software that performed the action.
    \item New routine NDG\_ABPTH added to convert a group of NDF paths
     from relative to absolute (with respect to the current working
     directory).
+   \item Routine NDG\_GTSUP now returns field values formed by parsing
+    the file specifications in the supplied group, if the supplied group
+    has no supplemental information. Previously, it returned blank field
+    values in such cases.
 \end{itemize}
 
 \section{Changes Introduced in NDG Version 7.0}

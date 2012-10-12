@@ -37,7 +37,7 @@ BASIC_C_ROUTINES = ndg1_regsb.c ndg1_match.c ndg_provenance.c \
 ndg_votutils.c ndg1_abpth.c
 
 BASIC_F_ROUTINES = ndg1_appen.f ndg_asexp.f ndg_crexp.f \
-ndg1_expan.f ndg1_fpars.f ndg1_gtyps.f \
+ndg1_expan.f ndg1_fpars.f ndg1_gtyps.f ndg1_fsplit.f \
 ndg1_ndfch.f ndg1_hndlr.f ndg1_hwrgh.f \
 ndg1_ndfdl.f ndg1_sdfex.f ndg_ndfco.f ndg_ndfpl.f \
 ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \

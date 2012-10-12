@@ -5,6 +5,11 @@ Version 7.1
    o New routine NDG_ABPTH added to convert a grouyp of NDF paths from
    relative to absolue, with respect to the current working directory.
 
+   o Routine NDG_GTSUP now returns field values formed by parsing
+   the file specifications in the supplied group, if the supplied group
+   has no supplemental information. Previously, it returned blank field
+   values in such cases.
+
 Version 7.0
 
    o After provenance has been read into memory using ndgReadProv, any extra
