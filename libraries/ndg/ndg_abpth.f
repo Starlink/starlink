@@ -67,6 +67,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN
+
 *  Local Variables:
       CHARACTER ABDIR*(GRP__SZNAM) ! Absolute directory
       CHARACTER ABPATH*(GRP__SZNAM)! Absolute full path
@@ -84,9 +87,6 @@
       INTEGER IGRPT              ! Group holding file type fields
       INTEGER LPATH              ! Length of full path
       INTEGER SIZE               ! Group size
-
-      integer chr_len
-
 *.
 
 *  Check inherited global status.
@@ -110,8 +110,19 @@
 *  Get the directory specification.
             CALL GRP_GET( IGRPD, I, 1, DIR, STATUS )
 
-*  Convert to absolute, and store if changed.
+*  Convert to absolute.
             CALL NDG1_ABPTH( DIR, ABDIR, STATUS )
+
+*  Ensure the absolute path ends with a slash.
+            LPATH = CHR_LEN( ABDIR )
+            IF( LPATH .EQ. 0 ) THEN
+               ABDIR = '/'
+            ELSE IF( ABDIR( LPATH:LPATH ) .NE. '/' ) THEN
+               LPATH = LPATH + 1
+               ABDIR( LPATH:LPATH ) = '/'
+            END IF
+
+*  Store if changed.
             IF( DIR .NE. ABDIR ) then
                CALL GRP_PUT1( IGRPD, ABDIR, I,  STATUS )
 
@@ -125,7 +136,6 @@
                PATH = ' '
                LPATH = 0
                CALL CHR_APPND( ABDIR, PATH, LPATH )
-               CALL CHR_APPND( '/', PATH, LPATH )
                CALL CHR_APPND( BNM, PATH, LPATH )
                IF( TYP .NE. DAT__FLEXT ) CALL CHR_APPND( TYP, PATH,
      :                                                   LPATH )
