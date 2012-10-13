@@ -23,6 +23,10 @@ The following new applications have been added:
       NGOOD, which produce the fraction/count of good/bad pixel
       values.
 
+   o  PARGET
+
+      -  A new boolean parameter called VECTOR specifies the output
+      format to use for vector-valued parameters.
 
 1 KAPPA_Version_1.13
 
