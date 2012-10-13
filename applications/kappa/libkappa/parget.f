@@ -87,14 +87,15 @@
 
 *  Copyright:
 *     Copyright (C) 1995 Science & Engineering Research Council
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Council.
 *     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -104,8 +105,8 @@
 *
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-*     MA 02110-1301, USA
+*     Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*     Boston, MA 02110-1301, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -128,7 +129,7 @@
 *        access a single element of an array of parameter values.
 *        Increase the maximum path length.
 *     2-FEB-2006 (TIMJ):
-*        Use HDS_FIND rather than attempting to kluge DAT_ASSOC
+*        Use HDS_FIND rather than attempting to kluge DAT_ASSOC.
 *     9-OCT-2012 (DSB):
 *        Added parameter VECTOR.
 *     {enter_further_changes_here}
@@ -310,9 +311,9 @@
             CALL MSG_OUT( 'VALUE', CVAL, STATUS )
          ELSE
 
-*  Find the height and width of the screen.  Use the full screen area. Use
-*  a default when there has been an error.  Hide the error in its own
-*  context.  Constrain the width to the size of the buffer.
+*  Find the height and width of the screen.  Use the full screen area.
+*  Use a default when there has been an error.  Hide the error in its
+*  own context.  Constrain the width to the size of the buffer.
             CALL ERR_MARK
             CALL ONE_SCRSZ( WIDTH, HEIGHT, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN

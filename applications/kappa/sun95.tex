@@ -37080,23 +37080,22 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       screen, optionally filtering them using a regular expression. Its
       primary use is within scripts that need to process groups of NDFs.
       Instead of the full name, a required component of the name may be
-      displayed instead (see parameter SHOW).
+      displayed instead (see Parameter SHOW).
 
-      Two modes are available:
+      Two modes are available.
 
-      \sstitemlist{
+      \ssthitemlist{
 
          \sstitem
-
-         If the NDFs are specified via the {\tt "}NDF{\tt "} parameter,
+         If the NDFs are specified via the NDF parameter,
 	 then the NDFs must exist and be accessible (an error is reported
 	 otherwise). The NDF names obtained can then be modified by
 	 supplying a suitable GRP modification expression such as
-	 {\tt "}$*$\_A{\tt "} for parameter {\tt "}MOD{\tt "}
+	 {\tt "$*$\_A"} for Parameter MOD.
 
          \sstitem
-         To list NDFs that may not exist, supply a null (!) value for
-         parameter {\tt "}NDF{\tt "} and the main group expression to parameter {\tt "}MOD{\tt "}.
+         To list NDFs that may not exist, supply a null ({\tt{!}}) value for
+         Parameter NDF and the main group expression to Parameter MOD.
       }
    }
    \sstusage{
@@ -37106,14 +37105,14 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       \sstsubsection{
          ABSPATH = \_LOGICAL (Read)
       }{
-         If TRUE, any relative NDF paths are converted to absolute, using
+         If {\tt TRUE}, any relative NDF paths are converted to absolute, using
          the current working directory. {\tt [FALSE]}
       }
       \sstsubsection{
          FIRST = \_INTEGER (Read)
       }{
-         The index of the first NDF to be tested.  A null (!) value causes
-         the first NDF to be used (index 1). {\tt [!]}
+         The index of the first NDF to be tested.  A null ({\tt{!}}) value causes
+         the first NDF to be used (Index 1). {\tt [!]}
       }
       \sstsubsection{
          LAST = \_INTEGER (Read)
@@ -37135,53 +37134,58 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          MOD = LITERAL (Read)
       }{
          An optional GRP modification expression that will be used to
-	 modify any names obtained via the {\tt "}NDF{\tt "} parameter.
-	 For instance, if {\tt "}MOD{\tt "} is {\tt "}$*$\_A{\tt "} then
-	 the supplied NDF names will be modified by appending
-	 {\tt "}\_A{\tt "} to them. No modification occurs if a null (!)
-	 value is supplied.
+	 modify any names obtained via the NDF parameter.  For instance,
+         if MOD is {\tt "$*$\_A"} then the supplied NDF names will be
+         modified by appending {\tt "\_A"} to them. No modification occurs
+         if a null ({\tt{!}}) value is supplied.
 
-         If a null value is supplied for {\tt "}NDF{\tt "} then the value
-	 supplied for {\tt "}MOD{\tt "} should not include an asterisk,
+         If a null value is supplied for Parameter NDF then the value
+	 supplied for Parameter MOD should not include an asterisk,
 	 since there are no names to be modified. Instead, the
-	 {\tt "}MOD{\tt "} value should specify an explicit group of NDF
-         names do not need to exist. {\tt [!]}
+	 MOD value should specify an explicit group of NDF
+         names do not need to exist.  {\tt [!]}
       }
       \sstsubsection{
          NDF = NDF (Read)
       }{
-         A group of existing NDFs.  This should be given as a comma-separated
-         list, in which each list element can be one of the following options.
+         A group of existing NDFs.  This should be given as a
+         comma-separated list, in which each list element can be one of
+         the following options.
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             An NDF name, optionally containing wild-cards and/or regular
-            expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"} \emph{etc.}).
+            expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"}
+            \emph{etc.}).
 
             \sstitem
             The name of a text file, preceded by an up-arrow character
-            {\tt "$\wedge$"}.  Each line in the text file should contain a
-            comma-separated list of elements, each of which can in turn be
-            an NDF name (with optional wild-cards, \emph{etc.}), or another file
-            specification (preceded by an up-arrow).  Comments can be
-            included in the file by commencing lines with a hash character
-            {\tt "\#"}.
+            {\tt "$\wedge$"}.  Each line in the text file should
+            contain a comma-separated list of elements, each of which
+            can in turn be an NDF name (with optional wild-cards,
+            \emph{etc.}), or another file specification (preceded by an
+            up-arrow).  Comments can be included in the file by
+            commencing lines with a hash character {\tt "\#"}.
 
          }
          If the value supplied for this parameter ends with a hyphen,
          then you are re-prompted for further input until a value is
          given which does not end with a hyphen.  All the NDFs given in
          this way are concatenated into a single group.
+
+         If a null ({\tt{!}}) value is supplied, then the displayed list of
+         NDFs is determined by the value supplied for the MOD parameter.
       }
       \sstsubsection{
          PATTERN = LITERAL (Read)
       }{
-         Specifies a pattern matching template using the syntax described
-	 below in ``Pattern Matching Syntax''.  Each NDF is displayed only
-	 if a match is found between this pattern and the item specified
-	 by parameter SHOW.  A null (!) value causes all NDFs to be
-	 displayed. {\tt [!]}
+         Specifies a pattern matching template using the syntax
+         described below in \htmlref{``Pattern Matching
+         Syntax''}{pattern_matching:ndfecho}.  Each NDF is
+         displayed only if a match is found between this pattern and the
+         item specified by Parameter SHOW.  A null ({\tt{!}}) value
+         causes all NDFs to be displayed.  {\tt [!]}
       }
       \sstsubsection{
          SHOW = LITERAL (Read)
@@ -37198,12 +37202,12 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
             {\tt "Dir"} -- The directory path (if any).
 
             \sstitem
-            {\tt "Ftype"} -- The file type (usually {\tt .sdf} but may not be if
-            any foreign NDFs are supplied).
-
-            \sstitem
             {\tt "Fspec"} -- The directory, base name and file type
             concatenated to form a full file specification.
+
+            \sstitem
+            {\tt "Ftype"} -- The file type (usually {\tt .sdf} but may not be if
+            any foreign NDFs are supplied).
 
             \sstitem
             {\tt "HDSpath"} -- The HDS path within the container file (if any).
@@ -37225,7 +37229,8 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          NMATCH = \_INTEGER (Write)
       }{
          An output parameter to which is written the number of NDFs
-         between FIRST and LAST that match the pattern supplied by PATTERN.
+         between FIRST and LAST that match the pattern supplied by
+         Parameter PATTERN.
       }
       \sstsubsection{
          SIZE = \_INTEGER (Write)
@@ -37259,19 +37264,20 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       \sstexamplesubsection{
          ndfecho $\wedge$files.lis $*$\_a logfile=log.lis
       }{
-         This reports the names of the NDFs listed in text file files.lis,
-         but appending {\tt "}\_a{\tt "} to the end of each name. The NDFs must all exist.
-         The listed NDF names are written to a new text file called {\tt "}log.lis{\tt "}.
+         This reports the names of the NDFs listed in text file {\tt files.lis},
+         but appending {\tt "\_a"} to the end of each name. The NDFs must all exist.
+         The listed NDF names are written to a new text file called {\tt log.lis}.
       }
       \sstexamplesubsection{
          ndfecho in=! mod=\{$\wedge$base\}$|$\_a$|$\_b$|$
       }{
-         This reports the names of the NDFs listed in text file {\tt "}base{\tt "}, but
-         replacing {\tt "}\_a{\tt "} with {\tt "}\_b{\tt "} in their names. The NDFs need not exist
-         since they are completely specified by parameter {\tt "}MOD{\tt "} and not by
-         parameter {\tt "}NDF{\tt "}.
+         This reports the names of the NDFs listed in text file {\tt base}, but
+         replacing {\tt "\_a"} with {\tt "\_b"} in their names. The NDFs need not
+         exist since they are completely specified by Parameter MOD and not by
+         Parameter NDF.
       }
    }
+   \label{pattern_matching:ndfecho}
    \sstdiytopic{
       Pattern Matching Syntax
    }{
@@ -37340,16 +37346,16 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
 
          \sstitem
          \verb+"\S"+ --- Matches anything but white space.
-         }
+        }
       }
 
       Any other character that has no special significance within a
       regular expression matches itself.  Characters that have special
-      significance can be matched by preceeding them with a backslash
+      significance can be matched by preceding them with a backslash
       ($\backslash$) in which case their special significance is ignored (note,
       this does not apply to the characters in the set dDsSwW).
 
-      Note, minus signs ({\tt "-"}) within brackets have no special
+      Note, minus signs ({\tt{"-"}}) within brackets have no special
       significance, so ranges of characters must be specified
       explicitly.
 
@@ -37357,26 +37363,26 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       \ssthitemlist{
 
          \sstitem
-         {\tt "*"} --- Matches zero or more of the preceeding atom, choosing the
+         {\tt "*"} --- Matches zero or more of the preceding atom, choosing the
              largest possible number that gives a match.
 
          \sstitem
-         {\tt "*?"}--- Matches zero or more of the preceeding atom, choosing the
+         {\tt "*?"}--- Matches zero or more of the preceding atom, choosing the
             smallest possible number that gives a match.
 
          \sstitem
-         {\tt "+"} --- Matches one or more of the preceeding atom, choosing the
+         {\tt "+"} --- Matches one or more of the preceding atom, choosing the
              largest possible number that gives a match.
 
          \sstitem
-         {\tt "+?"}--- Matches one or more of the preceeding atom, choosing the
+         {\tt "+?"}--- Matches one or more of the preceding atom, choosing the
              smallest possible number that gives a match.
 
          \sstitem
-         {\tt "?"} --- Matches zero or one of the preceeding atom.
+         {\tt "?"} --- Matches zero or one of the preceding atom.
 
          \sstitem
-         {\tt "\{n\}"} --- Matches exactly $n$ occurrences of the preceeding atom.
+         {\tt "\{n\}"} --- Matches exactly $n$ occurrences of the preceding atom.
       }
 
       The following constraints are allowed.
@@ -42221,7 +42227,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 
       Any other character that has no special significance within a
       regular expression matches itself.  Characters that have special
-      significance can be matched by preceeding them with a backslash
+      significance can be matched by preceding them with a backslash
       ($\backslash$) in which case their special significance is ignored (note,
       this does not apply to the characters in the set \emph{dDsSwW}).
 
@@ -42233,26 +42239,26 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       \ssthitemlist{
 
          \sstitem
-         {\tt "*"} --- Matches zero or more of the preceeding atom, choosing the
+         {\tt "*"} --- Matches zero or more of the preceding atom, choosing the
              largest possible number that gives a match.
 
          \sstitem
-         {\tt "*?"}--- Matches zero or more of the preceeding atom, choosing the
+         {\tt "*?"}--- Matches zero or more of the preceding atom, choosing the
             smallest possible number that gives a match.
 
          \sstitem
-         {\tt "+"} --- Matches one or more of the preceeding atom, choosing the
+         {\tt "+"} --- Matches one or more of the preceding atom, choosing the
              largest possible number that gives a match.
 
          \sstitem
-         {\tt "+?"}--- Matches one or more of the preceeding atom, choosing the
+         {\tt "+?"}--- Matches one or more of the preceding atom, choosing the
              smallest possible number that gives a match.
 
          \sstitem
-         {\tt "?"} --- Matches zero or one of the preceeding atom.
+         {\tt "?"} --- Matches zero or one of the preceding atom.
 
          \sstitem
-         {\tt "\{n\}"} --- Matches exactly $n$ occurrences of the preceeding atom.
+         {\tt "\{n\}"} --- Matches exactly $n$ occurrences of the preceding atom.
       }
 
       The following constraints are allowed.
@@ -42515,7 +42521,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 
       Any other character that has no special significance within a
       regular expression matches itself.  Characters that have special
-      significance can be matched by preceeding them with a backslash
+      significance can be matched by preceding them with a backslash
       ($\backslash$) in which case their special significance is ignored (note,
       this does not apply to the characters in the set dDsSwW).
 
@@ -42527,26 +42533,26 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       \ssthitemlist{
 
          \sstitem
-         {\tt "*"} --- Matches zero or more of the preceeding atom, choosing the
+         {\tt "*"} --- Matches zero or more of the preceding atom, choosing the
              largest possible number that gives a match.
 
          \sstitem
-         {\tt "*?"}--- Matches zero or more of the preceeding atom, choosing the
+         {\tt "*?"}--- Matches zero or more of the preceding atom, choosing the
             smallest possible number that gives a match.
 
          \sstitem
-         {\tt "+"} --- Matches one or more of the preceeding atom, choosing the
+         {\tt "+"} --- Matches one or more of the preceding atom, choosing the
              largest possible number that gives a match.
 
          \sstitem
-         {\tt "+?"}--- Matches one or more of the preceeding atom, choosing the
+         {\tt "+?"}--- Matches one or more of the preceding atom, choosing the
              smallest possible number that gives a match.
 
          \sstitem
-         {\tt "?"} --- Matches zero or one of the preceeding atom.
+         {\tt "?"} --- Matches zero or one of the preceding atom.
 
          \sstitem
-         {\tt "\{n\}"} --- Matches exactly $n$ occurrences of the preceeding atom.
+         {\tt "\{n\}"} --- Matches exactly $n$ occurrences of the preceding atom.
       }
 
       The following constraints are allowed.

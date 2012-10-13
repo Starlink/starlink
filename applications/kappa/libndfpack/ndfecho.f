@@ -24,25 +24,25 @@
 *     screen, optionally filtering them using a regular expression. Its
 *     primary use is within scripts that need to process groups of NDFs.
 *     Instead of the full name, a required component of the name may be
-*     displayed instead (see parameter SHOW).
+*     displayed instead (see Parameter SHOW).
 *
-*     Two modes are available:
+*     Two modes are available.
 *
-*     - If the NDFs are specified via the "NDF" parameter, then the NDFs
+*     - If the NDFs are specified via the NDF parameter, then the NDFs
 *     must exist and be accessible (an error is reported otherwise). The
-*     NDF names obtained can then be modified by supplying a suitable GRP
-*     modification expression such as "*_A" for parameter "MOD"
+*     NDF names obtained can then be modified by supplying a suitable
+*     GRP modification expression such as "*_A" for Parameter MOD.
 *
 *     - To list NDFs that may not exist, supply a null (!) value for
-*     parameter "NDF" and the main group expression to parameter "MOD".
+*     Parameter NDF and the main group expression to Parameter MOD.
 
 *  Usage:
 *     ndfecho ndf [mod] [first] [last] [show]
 
 *  ADAM Parameters:
 *     ABSPATH = _LOGICAL (Read)
-*        If TRUE, any relative NDF paths are converted to absolute, using
-*        the current working directory. [FALSE]
+*        If TRUE, any relative NDF paths are converted to absolute,
+*        using the current working directory. [FALSE]
 *     FIRST = _INTEGER (Read)
 *        The index of the first NDF to be tested. A null (!) value
 *        causes the first NDF to be used (Index 1). [!]
@@ -51,21 +51,23 @@
 *        supplied for FIRST, then the run-time default for LAST is equal
 *        to the supplied FIRST value (so that only a single NDF will be
 *        tested). If a null value is supplied for FIRST, then the
-*        run-time default for LAST is the last NDF in the supplied group. []
+*        run-time default for LAST is the last NDF in the supplied
+*        group. []
 *     LOGFILE = FILENAME (Write)
 *        The name of a text file in which to store the listed NDF names.
 *        If a null (!) value is supplied, no log file is created. [!]
 *     MOD = LITERAL (Read)
 *        An optional GRP modification expression that will be used to
-*        modify any names obtained via the "NDF" parameter. For instance,
-*        if "MOD" is "*_A" then the supplied NDF names will be modified
+*        modify any names obtained via the Parameter NDF.  For instance,
+*        if MOD is "*_A" then the supplied NDF names will be modified
 *        by appending "_A" to them. No modification occurs if a null (!)
 *        value is supplied.
 *
-*        If a null value is supplied for "NDF" then the value supplied
-*        for "MOD" should not include an asterisk, since there are no
-*        names to be modified. Instead, the "MOD" value should specify an
-*        explicit group of NDF names that do not need to exist. [!]
+*        If a null value is supplied for Parameter NDF then the value
+*        supplied for Parameter MOD should not include an asterisk,
+*        since there are no names to be modified. Instead, the MOD value
+*        should specify an explicit group of NDF names that do not need
+*        to exist. [!]
 *     NDF = NDF (Read)
 *        A group of existing NDFs, or null (!).  This should be given as
 *        a comma-separated list, in which each list element can be one
@@ -87,17 +89,18 @@
 *        given which does not end with a hyphen.  All the NDFs given in
 *        this way are concatenated into a single group.
 *
-*        If a null (!) value is supplied, then the displayed list of NDFs
-*        is determined by the value supplied for the "MOD" parameter.
+*        If a null (!) value is supplied, then the displayed list of
+*        NDFs is determined by the value supplied for the MOD parameter.
 *     NMATCH = _INTEGER (Write)
 *        An output parameter to which is written the number of NDFs
-*        between FIRST and LAST that match the pattern supplied by PATTERN.
+*        between FIRST and LAST that match the pattern supplied by
+*        Parameter PATTERN.
 *     PATTERN = LITERAL (Read)
-*        Specifies a pattern matching template using the syntax described
-*        below in "Pattern Matching Syntax".  Each NDF is displayed only
-*        if a match is found between this pattern and the item specified
-*        by parameter SHOW.   A null (!) value causes all NDFs to be
-*        displayed. [!]
+*        Specifies a pattern matching template using the syntax
+*        described below in "Pattern Matching Syntax".  Each NDF is
+*        displayed only if a match is found between this pattern and the
+*        item specified by Parameter SHOW.   A null (!) value causes
+*        all NDFs to be displayed. [!]
 *     SHOW = LITERAL (Read)
 *        Specifies the information to be displayed about each NDF. The
 *        options are as follows.
@@ -106,11 +109,11 @@
 *
 *        - "Dir" -- The directory path (if any).
 *
+*        - "Fspec" -- The directory, base name and file type
+*        concatenated to form a full file specification.
+*
 *        - "Ftype" -- The file type (usually ".sdf" but may not be if
 *        any foreign NDFs are supplied).
-*
-*        - "Fspec" -- The directory, base name and file type concatenated
-*        to form a full file specification.
 *
 *        - "HDSpath" -- The HDS path within the container file (if any).
 *
@@ -118,15 +121,16 @@
 *
 *        - "Slice" -- The NDF slice specification (if any).
 *
-*        Items that do not match the pattern specified by parameter
+*        Items that do not match the pattern specified by Parameter
 *        PATTERN are not displayed. ["Path"]
 *     SIZE = _INTEGER (Write)
 *        An output parameter to which is written the total number of
 *        NDFs in the specified group.
 *     VALUE = LITERAL (Write)
 *        An output parameter to which is written information about the
-*        first NDF that matches the pattern specified by parameter PATTERN.
-*        The information to write is specified by the SHOW parameter.
+*        first NDF that matches the pattern specified by Parameter
+*        PATTERN. The information to write is specified by the SHOW
+*        parameter.
 
 *  Examples:
 *     ndfecho mycont
@@ -137,14 +141,15 @@
 *        list specified within the text file "files.lis". The NDFs must
 *        all exist.
 *     ndfecho ^files.lis *_a logfile=log.lis
-*        This reports the names of the NDFs listed in text file files.lis,
-*        but appending "_a" to the end of each name. The NDFs must all exist.
-*        The listed NDF names are written to a new text file called "log.lis".
+*        This reports the names of the NDFs listed in text file
+*        files.lis, but appending "_a" to the end of each name. The NDFs
+*        must all exist. The listed NDF names are written to a new text
+*        file called "log.lis".
 *     ndfecho in=! mod={^base}|_a|_b|
-*        This reports the names of the NDFs listed in text file "base", but
-*        replacing "_a" with "_b" in their names. The NDFs need not exist
-*        since they are completely specified by parameter "MOD" and not by
-*        parameter "NDF".
+*        This reports the names of the NDFs listed in text file "base",
+*        but replacing "_a" with "_b" in their names. The NDFs need not
+*        exist since they are completely specified by Parameter MOD and
+*        not by Parameter NDF.
 
 *  Pattern Matching Syntax:
 *     The syntax for the PATTERN parameter value is a minimal form of
@@ -163,7 +168,7 @@
 *
 *     Any other character that has no special significance within a
 *     regular expression matches itself.  Characters that have special
-*     significance can be matched by preceeding them with a backslash
+*     significance can be matched by preceding them with a backslash
 *     (\) in which case their special significance is ignored (note,
 *     this does not apply to the characters in the set dDsSwW).
 *
@@ -173,16 +178,16 @@
 *
 *     The following quantifiers are allowed.
 *
-*     "*" -- Matches zero or more of the preceeding atom, choosing the
+*     "*" -- Matches zero or more of the preceding atom, choosing the
 *            largest possible number that gives a match.
-*     "*?"-- Matches zero or more of the preceeding atom, choosing the
-*           smallest possible number that gives a match.
-*     "+" -- Matches one or more of the preceeding atom, choosing the
+*     "*?" -- Matches zero or more of the preceding atom, choosing the
+*             smallest possible number that gives a match.
+*     "+" -- Matches one or more of the preceding atom, choosing the
 *            largest possible number that gives a match.
-*     "+?"-- Matches one or more of the preceeding atom, choosing the
-*            smallest possible number that gives a match.
-*     "?" -- Matches zero or one of the preceeding atom.
-*     "{n}" -- Matches exactly "n" occurrences of the preceeding atom.
+*     "+?" -- Matches one or more of the preceding atom, choosing the
+*             smallest possible number that gives a match.
+*     "?" -- Matches zero or one of the preceding atom.
+*     "{n}" -- Matches exactly "n" occurrences of the preceding atom.
 *
 *     The following constraints are allowed.
 *
@@ -221,9 +226,9 @@
 *     24-SEP-2012 (DSB):
 *        Original version.
 *     11-OCT-2012 (DSB):
-*        Added parameters MOD, LOGFILE and ABSPATH.
+*        Added Parameters MOD, LOGFILE and ABSPATH.
 *     12-OCT-2012 (DSB):
-*        Added parameter PATTERN.
+*        Added Parameter PATTERN.
 *     {enter_further_changes_here}
 
 *-
@@ -275,8 +280,8 @@
       CALL KPG1_RGNDF( 'NDF', 0, 0, '  Give more NDFs...',
      :                 IGRP0, SIZE0, STATUS )
 
-*  If no value was supplied for NDF, annull the error, and continue to use
-*  IGRP0 in place of IGRP1
+*  If no value was supplied for NDF, annul the error, and continue to
+*  ue IGRP0 in place of IGRP1.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL GRP_DELET( IGRP0, STATUS )
          CALL ERR_ANNUL( STATUS )
@@ -299,8 +304,8 @@
          END IF
       END DO
 
-*  If no value was supplied for MOD, annull the error, and continue to use
-*  IGRP0 in place of IGRP1
+*  If no value was supplied for MOD, annul the error, and continue to
+*  use IGRP0 in place of IGRP1.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL GRP_DELET( IGRP1, STATUS )
          CALL ERR_ANNUL( STATUS )
