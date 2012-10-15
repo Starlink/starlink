@@ -52,6 +52,7 @@
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -97,6 +98,9 @@
 *     3-SEP-2007 (DSB):
 *        Report an error if the reference NDF does not have a defined
 *        inverse WCS transformation.
+*     15-OCT-2012 (DSB):
+*        Allow 2D input images to align with 3D reference images, if the
+*        extra reference axis is a degenerate pixel axis.
 *     {enter_further_changes_here}
 
 *-
@@ -108,6 +112,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'AST_ERR'          ! AST error constants
       INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
@@ -133,29 +138,36 @@
       CHARACTER DOMLST*50        ! List of preferred alignment domains
       DOUBLE PRECISION ALBND     ! Lower axis bound
       DOUBLE PRECISION AUBND     ! Upper axis bound
+      DOUBLE PRECISION CON( NDF__MXDIM )! Constant axius values
       DOUBLE PRECISION DLBND1( NDF__MXDIM )! Lower bounds of input NDF
       DOUBLE PRECISION DUBND1( NDF__MXDIM )! Upper bounds of input NDF
+      DOUBLE PRECISION SHIFT( NDF__MXDIM )! 0.5 pixel shifts
       DOUBLE PRECISION XL( NDF__MXDIM )! Input position at lower bound
       DOUBLE PRECISION XU( NDF__MXDIM )! Input position at upper bound
-      DOUBLE PRECISION SHIFT( NDF__MXDIM )! 0.5 pixel shifts
       INTEGER I                  ! Loop count
       INTEGER IAT                ! No. of characters in string
       INTEGER IL                 ! Integer lower bound
       INTEGER INDF1              ! Input NDF identifier
+      INTEGER INPRM( NDF__MXDIM )! Output axis for each input axis
       INTEGER IPIX1              ! Index of PIXEL Frame in input NDF FrameSet
       INTEGER IPIXR              ! Index of PIXEL Frame in ref. NDF FrameSet
       INTEGER IU                 ! Integer upper bound
       INTEGER IWCS1              ! AST pointer to input WCS FrameSet
       INTEGER J                  ! Axis count
       INTEGER LBND1( NDF__MXDIM )! Lower bounds of input NDF
+      INTEGER LBNDR( NDF__MXDIM )! Lower bounds of reference NDF
+      INTEGER NCON               ! No. of used constants in CON array
       INTEGER NDIM1              ! No. of pixel axes in input NDF
+      INTEGER NDIMR              ! No. of pixel axes in reference NDF
       INTEGER NFRM               ! No. of Frames in input NDF FrameSet
-      INTEGER SM                 ! ShiftMap pointer
+      INTEGER OUTPRM( NDF__MXDIM )! Input axis for each output axis
+      INTEGER PMAP               ! PermMap that assigns fixed pixel coords
       INTEGER SIZE               ! No. of input NDFs
+      INTEGER SM                 ! ShiftMap pointer
       INTEGER UBND1( NDF__MXDIM )! Upper bounds of input NDF
+      INTEGER UBNDR( NDF__MXDIM )! Upper bounds of reference NDF
       REAL RLBND                 ! Lower axis bound
       REAL RUBND                 ! Upper axis bound
-
 *.
 
 *  Check inherited global status.
@@ -192,10 +204,21 @@
 *  Find the index of the PIXEL Frame in the reference NDF.
       CALL KPG1_ASFFR( IWCSR, 'PIXEL', IPIXR, STATUS )
 
-*  Initialise the returned values.
+*  Get the pixel index bounds of the reference NDF.
+      CALL NDF_BOUND( INDFR, NDF__MXDIM, LBNDR, UBNDR, NDIMR,
+     :                STATUS )
+
+*  Initialise the returned values. If the reference NDF extends over only
+*  one pixel on any pixel axis, use this value as both limits. Otherwise
+*  set extreme limts.
       DO J = 1, NDIM
-         LBND( J ) = VAL__MAXI
-         UBND( J ) = VAL__MINI
+         IF( LBNDR( J ) .EQ. UBNDR( J ) ) THEN
+            LBND( J ) = LBNDR( J )
+            UBND( J ) = UBNDR( J )
+         ELSE
+            LBND( J ) = VAL__MAXI
+            UBND( J ) = VAL__MINI
+         END IF
       END DO
       USEVAR = .TRUE.
 
@@ -259,9 +282,6 @@
 *  Simplify the total Mapping.
          MAPS( I ) = AST_SIMPLIFY( MAPS( I ), STATUS )
 
-*  Export the AST pointer to the parent AST context.
-         CALL AST_EXPORT( MAPS( I ), STATUS )
-
 *  Get the pixel index bounds of this input NDF, and convert to double
 *  precision pixel coordinates which have integral values at the centre of
 *  each pixel. Note, this is different to the usual Starlink convention
@@ -275,16 +295,56 @@
          END DO
 
 *  Extend the output pixel bounds to encompass this input image.
+         NCON = 0
          DO J = 1, NDIM
             CALL AST_MAPBOX( MAPS( I ), DLBND1, DUBND1, .TRUE., J,
      :                       ALBND, AUBND, XL, XU, STATUS )
-            RLBND = REAL( ALBND )
-            RUBND = REAL( AUBND )
-            IU = KPG1_FLOOR( RUBND )
-            IL = KPG1_CEIL( RLBND )
-            IF( IU .GT. UBND( J ) ) UBND( J ) = IU
-            IF( IL .LT. LBND( J ) ) LBND( J ) = IL
+
+*  If the range of the bounding box on the current output pixel axis
+*  could not be found, and the output NDF spans only a single pixel on
+*  the current axis, then it is probably a degenerate pixel axis that is
+*  not present in the input NDF (e.g. reference is a scuba-2 map with
+*  (RA,Dec) axes and a third degenerate wavelength axis, and the input is
+*  simple 2D (RA,Dec) map).
+            IF( STATUS .EQ. AST__MBBNF .AND.
+     :          LBNDR( J ) .EQ. UBNDR( J ) ) THEN
+               CALL ERR_ANNUL( STATUS )
+
+*  Indicate that the Mapping should be modified to assign the fixed value
+*  to the current output pixel axis.
+               NCON = NCON + 1
+               OUTPRM( J ) = -NCON
+               CON( NCON ) = LBNDR( J ) - 0.5D0
+
+*  If the range of the bounding box on the current output pixel axis
+*  was found, extend the bounding box limits.
+           ELSE
+               OUTPRM( J ) = J
+               RLBND = REAL( ALBND )
+               RUBND = REAL( AUBND )
+               IU = KPG1_FLOOR( RUBND )
+               IL = KPG1_CEIL( RLBND )
+               IF( IU .GT. UBND( J ) ) UBND( J ) = IU
+               IF( IL .LT. LBND( J ) ) LBND( J ) = IL
+            END IF
+
+            INPRM( J ) = J
+
          END DO
+
+*  If any degenerate axes were found above, modify the Mapping by
+*  appending a PermMap that assigns the constant output pixel value to
+*  the degenerate axes.
+         IF( NCON .GT. 0 ) THEN
+            PMAP = AST_PERMMAP( NDIM, INPRM, NDIM, OUTPRM, CON, ' ',
+     :                          STATUS )
+            MAPS( I ) = AST_CMPMAP( MAPS( I ), PMAP, .TRUE., ' ',
+     :                              STATUS )
+            CALL AST_ANNUL( PMAP, STATUS )
+         END IF
+
+*  Export the AST pointer to the parent AST context.
+         CALL AST_EXPORT( MAPS( I ), STATUS )
 
 *  Annul the input NDF identifier.
          CALL NDF_ANNUL( INDF1, STATUS )
