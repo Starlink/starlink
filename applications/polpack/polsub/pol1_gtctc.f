@@ -129,9 +129,10 @@
 *  Get a value for the parameter.
          CALL PAR_GET0C( PARAM, NAME, STATUS )
 
-*  Abort if an abort request or null value was obtained.
+*  Abort if an abort request or null value or "no user" error was obtained.
          IF( STATUS .EQ. PAR__ABORT .OR.
-     :       STATUS .EQ. PAR__NULL ) GO TO 999
+     :       STATUS .EQ. PAR__NULL .OR.
+     :       STATUS .EQ. PAR__NOUSR ) GO TO 999
 
 *  Attempt to get an identifier for the named item.
          CALL CAT_TIDNT( CI, NAME, GI, STATUS )
