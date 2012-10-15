@@ -307,6 +307,10 @@
 *     20-JUL-2011 (DSB):
 *        Set dynamic default for AXES so that by default axes are only
 *        drawn if the existing picture is cleared.
+*     20-JUL-2011 (DSB):
+*        Ensure the DEVICE parameter is not cancelled if a null value is
+*        supplied for it. This is so that multiple LPG invocations of
+*        graphics apps such as NORMALIZE can work with "device=!".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -599,14 +603,14 @@
      :                ' ', 0.0, 0.0, 'DATAPLOT', BOX, IPICD, IPICF,
      :                IVAL, IPLOT, IVAL, LVAL, STATUS )
 
-*  If a null value was supplied for any graphics parameter, annul the
-*  Plot, shut down PGPLOT and annul the error if allowed, and do not
-*  plot anything.
+*  If a null value was supplied for any graphics parameter, annull any
+*  Plot, annull the error, and shut down PGPLOT. Annull the error first
+*  so that KPG1_PGCLS does not cancel  the 'DEVICE' parameter.
       IF( STATUS .EQ. PAR__NULL ) THEN
          IF( NULL ) THEN
             CALL AST_ANNUL( IPLOT, STATUS )
-            CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
             CALL ERR_ANNUL( STATUS )
+            CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
          END IF
 
 *  Otherwise, if the device was opened successfully...
