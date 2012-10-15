@@ -1,6 +1,7 @@
       SUBROUTINE KPS1_WALA0( NDIM2, INDF1, INDF2, MAP, MAP4, IWCSR,
      :                       METHOD, PARAMS, AUTOBN, XY1, XY2, ERRLIM,
-     :                       MAXPIX, REBIN, CONSRV, WLIM, STATUS )
+     :                       MAXPIX, REBIN, CONSRV, WLIM, LBNDR, UBNDR,
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_WALA0
@@ -14,7 +15,7 @@
 *  Invocation:
 *     CALL KPS1_WALA0( NDIM2, INDF1, INDF2, MAP, MAP4, IWCSR, METHOD,
 *                      PARAMS, AUTOBN, XY1, XY2, ERRLIM, MAXPIX, REBIN,
-*                      CONSRV, WLIM, STATUS )
+*                      CONSRV, WLIM, LBNDR, UBNDR, STATUS )
 
 *  Description:
 *     This routine first finds the Mapping from the input pixel
@@ -77,6 +78,10 @@
 *        Conserve flux whilst resampling?
 *     WLIM = REAL (Given)
 *        The lower weight limit for a valid output pixel.
+*     LBNDR( NDIM2 ) = INTEGER (Given)
+*        The lower pixel bounds of the reference NDF.
+*     UBNDR( NDIM2 ) = INTEGER (Given)
+*        The upper pixel bounds of the reference NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -157,6 +162,9 @@
 *        better normalisation (now) performed by AST_REBINSEQ. This
 *        removes the aliasing effects (regular patterns int he output NDF)
 *        sometimes seen with AST_REBIN.
+*     5-OCT-2012 (DSB):
+*        Added args LBNDR and UBNDR so that 2D input NDFs can be aligned
+*        with 3D reference NDFs that have a degenerate pixel axis.
 *     {enter_further_changes_here}
 
 *-
@@ -169,6 +177,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'AST_PAR'          ! AST constants and function
                                  ! declarations
+      INCLUDE 'AST_ERR'          ! AST error constants
       INCLUDE 'MSG_PAR'          ! MSG constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -190,6 +199,8 @@
       LOGICAL REBIN
       LOGICAL CONSRV
       REAL WLIM
+      INTEGER LBNDR( NDIM2 )
+      INTEGER UBNDR( NDIM2 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -199,6 +210,7 @@
       CHARACTER ASYSR*30         ! Reference alignement system
       CHARACTER DTYPE*(NDF__SZFTP) ! Data type
       CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
+      DOUBLE PRECISION CON( NDF__MXDIM )! Constant axius values
       DOUBLE PRECISION DUMMY( 1 ) ! Dummy array
       DOUBLE PRECISION PLBND1( NDF__MXDIM ) ! Lower i/p pixel bounds
       DOUBLE PRECISION PLBND2( NDF__MXDIM ) ! Lower o/p pixel bounds
@@ -213,12 +225,14 @@
       INTEGER EL                 ! No. of elements in a mapped array
       INTEGER FLAGS              ! Sum of AST__USEBAD and AST__USEVAR
       INTEGER I                  ! Loop count
+      INTEGER INPRM( NDF__MXDIM )! Output axis for each input axis
       INTEGER IPD1               ! Pointer to input data array
       INTEGER IPD2               ! Pointer to output data array
       INTEGER IPIX2              ! Index of PIXEL Frame in o/p FrameSet
       INTEGER IPIXR              ! Index of PIXEL Frame in ref. FrameSet
       INTEGER IPQ1               ! Pointer to input quality array
       INTEGER IPQ2               ! Pointer to output quality array
+      INTEGER IPSPAX             ! Spectral axis index in input
       INTEGER IPV1               ! Pointer to input variance array
       INTEGER IPV2               ! Pointer to output variance array
       INTEGER IPW                ! Pointer to AST_REBINSEQ weights
@@ -235,10 +249,12 @@
       INTEGER MAP5               ! AST Mapping (i/p GRID -> o/p GRID)
       INTEGER MAPR               ! AST Mapping (ref. GRID -> ref. PIXEL)
       INTEGER NAX                ! No. of current Frame axes
+      INTEGER NCON               ! No. of used constants in CON array
       INTEGER NDIM1              ! No. of pixel axes in input NDF
       INTEGER NUSED              ! No. of i/p pixels pasted into o/p
       INTEGER OPSPAX             ! Spectral axis index in output
-      INTEGER IPSPAX             ! Spectral axis index in input
+      INTEGER OUTPRM( NDF__MXDIM )! Input axis for each output axis
+      INTEGER PMAP               ! PermMap that assigns fixed pixel coords
       INTEGER RESULT             ! Value returned from AST_RESAMPLE<x>
       INTEGER TFRM               ! Temporary Frame pointer
       INTEGER TMAP               ! Temporary Mapping pointer
@@ -291,6 +307,7 @@
 *  Find the bounds on each axis of the corresponding area in the output
 *  image (just use the supplied bounds on any axis that has good supplied
 *  bounds - these are added to the reference NDF by KPS1_WALA8).
+         NCON = 0
          DO I = 1, NDIM2
             IF( XY1( I ) .EQ. VAL__BADI .OR.
      :          XY2( I ) .EQ. VAL__BADI ) THEN
@@ -298,16 +315,51 @@
      :                          PLBND2( I ), PUBND2( I ), XL, XU,
      :                          STATUS )
 
-*  Convert to pixel index bounds.
-               LBND2( I ) = NINT( PLBND2( I ) ) + 1
-               UBND2( I ) = NINT( PUBND2( I ) )
+*  If the range of the bounding box on the current output pixel axis
+*  could not be found, and the output NDF spans only a single pixel on
+*  the current axis, then it is probably a degenerate pixel axis that is
+*  not present in the input NDF (e.g. reference is a scuba-2 map with
+*  (RA,Dec) axes and a third degenerate wavelength axis, and the input is
+*  simple 2D (RA,Dec) map).
+               IF( STATUS .EQ. AST__MBBNF .AND.
+     :             LBNDR( I ) .EQ. UBNDR( I ) ) THEN
+                  LBND2( I ) = LBNDR( I )
+                  UBND2( I ) = UBNDR( I )
+                  CALL ERR_ANNUL( STATUS )
 
+*  Indicate that the Mapping should be modified to assign the fixed value
+*  to the current output pixel axis.
+                  NCON = NCON + 1
+                  OUTPRM( I ) = -NCON
+                  CON( NCON ) = LBNDR( I ) - 0.5D0
+
+*  If the range of the bounding box on the current output pixel axis
+*  was found, extend the bounding box limits.
+               ELSE
+                  OUTPRM( I ) = I
+                  LBND2( I ) = NINT( PLBND2( I ) ) + 1
+                  UBND2( I ) = NINT( PUBND2( I ) )
+               END IF
+
+*  Convert to pixel index bounds.
             ELSE
+               OUTPRM( I ) = I
                LBND2( I ) = XY1( I )
                UBND2( I ) = XY2( I )
             END IF
 
+            INPRM( I ) = I
          END DO
+
+*  If any degenerate axes were found above, modify the Mapping by
+*  appending a PermMap that assigns the constant output pixel value to
+*  the degenerate axes.
+         IF( NCON .GT. 0 ) THEN
+            PMAP = AST_PERMMAP( NDIM2, INPRM, NDIM2, OUTPRM, CON, ' ',
+     :                          STATUS )
+            MAP = AST_CMPMAP( MAP, PMAP, .TRUE., ' ', STATUS )
+            CALL AST_ANNUL( PMAP, STATUS )
+         END IF
       END IF
 
 *  Report the bounds of the output NDF.

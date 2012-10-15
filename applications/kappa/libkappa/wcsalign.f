@@ -799,7 +799,7 @@
             CALL KPS1_WALA0( NDIMRT, INDF1, INDF2, MAP, MAP4, IWCSRT,
      :                       METHOD_CODE, PARAMS, AUTOBN, LBNDT, UBNDT,
      :                       ERRLIM, MAXPIX, REBIN, CONSRV, WLIM,
-     :                       STATUS )
+     :                       LBNDR, UBNDR, STATUS )
 
 *  Report an error if in-situ alignment was requested but the Mapping is
 *  not a shift of origin.
