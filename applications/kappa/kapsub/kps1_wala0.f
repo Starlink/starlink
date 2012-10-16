@@ -162,9 +162,12 @@
 *        better normalisation (now) performed by AST_REBINSEQ. This
 *        removes the aliasing effects (regular patterns int he output NDF)
 *        sometimes seen with AST_REBIN.
-*     5-OCT-2012 (DSB):
+*     15-OCT-2012 (DSB):
 *        Added args LBNDR and UBNDR so that 2D input NDFs can be aligned
 *        with 3D reference NDFs that have a degenerate pixel axis.
+*     16-OCT-2012 (DSB):
+*        For any additional WCS Frames that are present in the input NDF
+*        but not in the reference NDF, add the Frame to the output NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -224,10 +227,14 @@
       INTEGER CFRMR              ! Reference current Frame
       INTEGER EL                 ! No. of elements in a mapped array
       INTEGER FLAGS              ! Sum of AST__USEBAD and AST__USEVAR
+      INTEGER FRM                ! Frame from input WCS FrameSet
+      INTEGER FSET               ! FrameSet holding matching Frames
       INTEGER I                  ! Loop count
+      INTEGER IFRAME             ! Index of frame in input WCS FrameSet
       INTEGER INPRM( NDF__MXDIM )! Output axis for each input axis
       INTEGER IPD1               ! Pointer to input data array
       INTEGER IPD2               ! Pointer to output data array
+      INTEGER IPIX1              ! Index of PIXEL Frame in i/p FrameSet
       INTEGER IPIX2              ! Index of PIXEL Frame in o/p FrameSet
       INTEGER IPIXR              ! Index of PIXEL Frame in ref. FrameSet
       INTEGER IPQ1               ! Pointer to input quality array
@@ -247,10 +254,13 @@
       INTEGER MAP2               ! AST Mapping (o/p PIXEL -> o/p GRID)
       INTEGER MAP3               ! AST Mapping (ref. GRID -> o/p GRID)
       INTEGER MAP5               ! AST Mapping (i/p GRID -> o/p GRID)
+      INTEGER MAP6               ! AST Mapping (i/p PIXEL -> ref PIXEL)
+      INTEGER MAP7               ! AST Mapping (o/p PIXEL -> i/p frame)
       INTEGER MAPR               ! AST Mapping (ref. GRID -> ref. PIXEL)
       INTEGER NAX                ! No. of current Frame axes
       INTEGER NCON               ! No. of used constants in CON array
       INTEGER NDIM1              ! No. of pixel axes in input NDF
+      INTEGER NFRAME             ! No. of frames in input WCS FrameSet
       INTEGER NUSED              ! No. of i/p pixels pasted into o/p
       INTEGER OPSPAX             ! Spectral axis index in output
       INTEGER OUTPRM( NDF__MXDIM )! Input axis for each output axis
@@ -293,6 +303,7 @@
             LBND2( I ) = XY1( I )
             UBND2( I ) = XY2( I )
          END DO
+         MAP6 = MAP
 
 *  Otherwise, find the bounds of the box within the pixel co-ordinate
 *  Frame of the reference image which just includes the input image.
@@ -334,11 +345,14 @@
                   CON( NCON ) = LBNDR( I ) - 0.5D0
 
 *  If the range of the bounding box on the current output pixel axis
-*  was found, extend the bounding box limits.
+*  was found, extend the bounding box limits. Check for pixel axes that
+*  span only one pixel.
                ELSE
                   OUTPRM( I ) = I
                   LBND2( I ) = NINT( PLBND2( I ) ) + 1
                   UBND2( I ) = NINT( PUBND2( I ) )
+                  IF( UBND2( I ) .LT. LBND2( I ) )
+     :                UBND2( I ) = LBND2( I )
                END IF
 
 *  Convert to pixel index bounds.
@@ -357,8 +371,10 @@
          IF( NCON .GT. 0 ) THEN
             PMAP = AST_PERMMAP( NDIM2, INPRM, NDIM2, OUTPRM, CON, ' ',
      :                          STATUS )
-            MAP = AST_CMPMAP( MAP, PMAP, .TRUE., ' ', STATUS )
+            MAP6 = AST_CMPMAP( MAP, PMAP, .TRUE., ' ', STATUS )
             CALL AST_ANNUL( PMAP, STATUS )
+         ELSE
+            MAP6 = MAP
          END IF
       END IF
 
@@ -426,7 +442,7 @@
       MAPR = AST_GETMAPPING( IWCSR2, AST__BASE, IPIXR, STATUS )
 
 *  Get the Mapping from input GRID to output GRID.
-      MAP5 = AST_SIMPLIFY( AST_CMPMAP( AST_CMPMAP( MAP4, MAP, .TRUE.,
+      MAP5 = AST_SIMPLIFY( AST_CMPMAP( AST_CMPMAP( MAP4, MAP6, .TRUE.,
      :                                             ' ', STATUS ),
      :                                 MAP2, .TRUE., ' ', STATUS ),
      :                     STATUS )
@@ -507,6 +523,44 @@
 
          END IF
       END IF
+
+*  Get the index of the PIXEL Frame in the input FrameSet.
+      CALL KPG1_ASFFR( IWCS1, 'PIXEL', IPIX1, STATUS )
+
+*  Invert MAP6 so that it goes from output pixel coords to input pixel
+*  coords.
+      CALL AST_INVERT( MAP6, STATUS )
+
+*  If the input NDF has Frames describing Domains that are not present in the
+*  reference NDF, add them into the output FrameSet. Loop round all
+*  Frames in the input FrameSet.
+      NFRAME = AST_GETI( IWCS1, 'NFRAME', STATUS )
+      DO IFRAME = 1, NFRAME
+         FRM = AST_GETFRAME( IWCS1, IFRAME, STATUS )
+
+*  Allow it to match a Frame of any dimension alityy when used as a
+*  template in AST_FINDFRAME
+         CALL AST_SETI( FRM, 'MaxAxes', NDF__MXDIM, STATUS )
+         CALL AST_SETI( FRM, 'MinAxes', 1, STATUS )
+
+*  Search for a similar frame in the output FrameSet.
+         FSET = AST_FINDFRAME( IWCSR2, FRM, ' ', STATUS )
+
+*  If found, just annul the pointer since we do not need to add it into
+*  the output FrameSet.
+         IF( FSET .NE. AST__NULL ) THEN
+            CALL AST_ANNUL( FSET, STATUS )
+
+*  If not found, get the mapping from output PIXEL coords to the current
+*  Frame within the input FrameSet, and then add the Frame into the output
+*  FrameSet, connecting it to the PIXEL frame in the output FrameSet.
+         ELSE
+            MAP7 = AST_GETMAPPING( IWCS1, IPIX1, IFRAME, STATUS )
+            MAP7 = AST_CMPMAP( MAP6, MAP7, .TRUE., ' ', STATUS )
+            MAP7 = AST_SIMPLIFY( MAP7, STATUS )
+            CALL AST_ADDFRAME( IWCSR2, IPIXR, MAP7, FRM, STATUS )
+         END IF
+      END DO
 
 *  Store this FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCSR2, INDF2, STATUS )
