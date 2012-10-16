@@ -230,6 +230,7 @@
       INTEGER FRM                ! Frame from input WCS FrameSet
       INTEGER FSET               ! FrameSet holding matching Frames
       INTEGER I                  ! Loop count
+      INTEGER ICURR              ! Index of original current Frame
       INTEGER IFRAME             ! Index of frame in input WCS FrameSet
       INTEGER INPRM( NDF__MXDIM )! Output axis for each input axis
       INTEGER IPD1               ! Pointer to input data array
@@ -531,6 +532,9 @@
 *  coords.
       CALL AST_INVERT( MAP6, STATUS )
 
+*  Note the index of the original current Frame
+      ICURR = AST_GETI( IWCSR2, 'CURRENT', STATUS )
+
 *  If the input NDF has Frames describing Domains that are not present in the
 *  reference NDF, add them into the output FrameSet. Loop round all
 *  Frames in the input FrameSet.
@@ -561,6 +565,9 @@
             CALL AST_ADDFRAME( IWCSR2, IPIXR, MAP7, FRM, STATUS )
          END IF
       END DO
+
+*  Re-instate the original current Frame
+      CALL AST_SETI( IWCSR2, 'CURRENT', ICURR, STATUS )
 
 *  Store this FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCSR2, INDF2, STATUS )
