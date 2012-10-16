@@ -1,0 +1,1777 @@
+import os
+import sys
+import re
+import abc
+import subprocess
+import tempfile
+import shutil
+import glob
+
+#  Provide recall and editing facilities for parameter prompts
+import readline
+readline.parse_and_bind('tab: complete')
+
+
+
+
+#  To run the app under the pdb debugger and break at a given line,
+#  copy the following line to the place where the break point is
+#  required, and uncomment.
+# import pdb; pdb.set_trace()
+
+
+
+
+
+#  Function to return the name of the executing script, without any
+#  trailing ".py" suffix.
+__cmd = None
+def cmd():
+   global __cmd
+   if __cmd == None:
+      __cmd = os.path.basename(sys.argv[0])
+   l = len(__cmd)
+   if __cmd[-3:] == ".py":
+      __cmd = __cmd[:-3]
+   return __cmd
+
+#  "Protected" function to return the name of the executing script,
+#  followed by a colon and a space.
+def _cmd_token():
+   return "{0}: ".format(cmd())
+
+
+
+
+
+#  -------------------  Logging ---------------------------
+
+#  Constants defining increasing levels of information to display or log
+NONE = 0
+CRITICAL = 1
+PROGRESS = 2
+ATASK = 3
+DEBUG = 4
+
+#  Level of information to display on the screen, and to log. These are
+#  set to NONE here to prevent any information being displayed or logged
+#  by default prior to the creation of the ParSys object.
+ilevel = NONE
+glevel = NONE
+
+#  The requested log file.
+logfile = None
+
+#  File descriptor and name for the currently open log file (if any)
+__logfd = None
+__logfile = None
+
+#  Funtion to ensure a log file is open
+def __open_log_file():
+   global logfile
+   global __logfd
+   global __logfile
+
+   # If a log file is currently open, close it if the user has assigned a
+   # different value to the module "logfile" variable.
+   if __logfd != None:
+      if logfile != __logfile:
+         print( "Closing log file {0}".format(__logfile) )
+         __logfd.close()
+         __logfd = None
+         __logfile == None
+
+   # If no log file is currently open, open one now.
+   if __logfd == None:
+      if logfile == None:
+         logfile = "{0}.log".format(cmd())
+      __logfd = open( logfile, "w" )
+      __logfile = logfile
+      print( "Logging to file {0}".format(logfile) )
+
+
+def msg_out(text,level=PROGRESS):
+   """
+
+   Display a string on the screen and store in the starutil log file,
+   subject to the current screen and log file information levels
+   specified by the module variables "ilevel" and "glevel". The name of
+   the log file is specified by the module variable "logfile".If
+   "logfile" is unset, it will default to "<script>.log" if the name of
+   the executing script is known, or to "starutil.log" otherwise.
+
+   Invocation:
+      msg_out(text,level=PROGRESS)
+
+   Arguments:
+      text = string
+         The text to display.
+      level = integer
+         The message will be displayed on the screen if "level" is less
+         than or equal to the current value of "starutil.ilevel". It
+         will be written to the log file (if a log file is open) if
+         "level" is less than or equal to the current value of
+         "starutil.glevel".
+
+   """
+
+   global ilevel
+   global glevel
+   global __logfd
+
+   if level == DEBUG:
+      text = "debug> {0}".format(text)
+
+   if level <= ilevel:
+      print(text)
+
+   if level <= glevel:
+      __open_log_file()
+      __logfd.write(text)
+
+
+def _getLevel( level ):
+   if level == "NONE":
+      return NONE
+   elif level == "CRITICAL":
+      return CRITICAL
+   elif level == "PROGRESS":
+      return PROGRESS
+   elif level == "ATASK":
+      return ATASK
+   elif level == "DEBUG":
+      return DEBUG
+   else:
+      raise UsageError("{0}Illegal information level '{1}' supplied.".format(_cmd_token(),level))
+
+#  -------------------  Using ATASKS ---------------------------
+
+def invoke(command,aslist=False):
+   """
+
+   Invoke an ADAM atask. An AtaskError is raised if the command fails.
+   The standard output from the command is returned as the function value.
+   It may also be written to the screen and to the log file, depending
+   on the value of the "ilevel" and "glevel" module variables.
+
+   Invocation:
+      value = invoke(command,aslist=False)
+
+   Arguments:
+      command = string
+         The full command including directory and arguments. The
+         shell_quote function defined in this module can be used to ensure
+         that any string containing shell metacharacters is properly quoted.
+      aslist = boolean
+         If true, then standard output from the command is returned as a
+         list of lines. If aslist is False, the standard output is
+         returned as a single string with new lines separated by embedded
+         newline characters.
+
+   Returned Value:
+      A single string, or a list of strings, holding the standard output
+      from the command (see "aslist").
+
+   Example
+      out = invoke("$KAPPA_DIR/stats $KAPPA_DIR/m31 clip=\[3,3,3\]")
+         kappa:stats is run.
+
+   """
+
+   global __logfd
+   global ATASK
+   global glevel
+
+   os.environ["ADAM_NOPROMPT"] = "1"
+   os.environ["ADAM_EXIT"] = "1"
+
+   msg_out( "\n>>> {0}\n".format(command), ATASK )
+
+   #  The original scheme used subprocess.check_output to invoke the
+   #  atask. But the process hung for ever if the invoked command
+   #  involved the creation of a gwm graphics window. I presume this is
+   #  because subprocess.chech_call was waiting for the gwmXrefresh
+   #  process (created by the atask) to die, which it never did unless
+   #  the GWM window was closed. SO instead we do the following, which
+   #  involves writing standard output from the atask to a disk file, and
+   #  then reading the disk file back into the script. Any attempt to
+   #  use the stdout argument of subprocess.popen() caused the thing to
+   #  freeze again. StringIO would not work either as subprocess requires
+   #  the stdout file object to "have a real file number".
+   stdout_file ="./starutil.stdout"
+   p = subprocess.Popen("{0} > {1} 2>&1".format(command,stdout_file), shell=True)
+   status = p.wait()
+
+   fd = open(stdout_file,"r")
+   outtxt = fd.read().strip()
+   fd.close()
+   os.remove(stdout_file)
+   msg_out( outtxt, ATASK )
+
+   if status != 0:
+      raise AtaskError("\n\n{0}".format(outtxt))
+   elif aslist:
+      outtxt = outtxt.split("\n")
+
+   #  Original scheme - kept in case someone knows how to fix the GWM
+   # freezing issue.
+   #try:
+   #   bytes = subprocess.check_output(command,shell=True)
+   #   if bytes != None:
+   #      outtxt = bytes.decode("utf-8").strip()
+   #      msg_out( outtxt, ATASK )
+   #      if aslist:
+   #         outtxt = outtxt.split("\n")
+   #   else:
+   #      outtxt = None
+   #
+   #except subprocess.CalledProcessError as err:
+   #   bytes = err.output
+   #   if bytes != None:
+   #      outtxt = bytes.decode("utf-8").strip()
+   #      msg_out( outtxt, ATASK )
+   #      raise AtaskError("\n\n{0}".format(bytes.decode("utf-8")))
+   #   else:
+   #      raise AtaskError()
+
+   msg_out( "\n", ATASK )
+   return outtxt
+
+
+
+def get_task_par( parname, taskname ):
+   """
+
+   Get the current value of an ATASK parameter.
+
+   Invocation:
+      value = get_task_par( parname, taskname )
+
+   Arguments:
+      parname = string
+         The name of the task parameter. This may refer to a single value
+         in a vector valued parameter by appending the one-based index in
+         parentheses to the end of the parameter name.
+      taskname = string
+         The name of the task.
+
+   Returned Value:
+      The parameter value. This will be a single value if the task parameter
+      is a scalar value, and a list if the task parameter is a vector.
+
+   """
+
+   text = invoke("$KAPPA_DIR/parget {0} {1} vector=yes".format( shell_quote(parname),taskname), False )
+   return eval( text.replace('\n', '' ) )
+
+
+def shell_quote(text):
+   """
+
+   Put single quotes around a string (and escape any embedded single
+   quotes) so that it can be used as a command line argument when
+   running an ATASK from the shell.
+
+   Invocation:
+      value = shell_quote(text)
+
+   Arguments:
+      command = string
+         The full command including directory and arguments. The
+
+   Returned Value:
+      The quoted string.
+
+   """
+
+   if text != None:
+      return "'" + text.replace("'", "'\\''") + "'"
+   else:
+      return None
+
+
+
+
+#  -------------------  Parameter System ---------------------------
+
+class ParSys(object):
+   """
+
+   Encapsulates all parameters used by a Python script.
+
+   Each parameter is described by an instance of a subclass of the base
+   "Parameter" class defined within this module. Different subclasses
+   describe parameters of different types, and also encapsulates the
+   parameter name, prompt string, default value, current value, limits,
+   etc., all of which can be specified when the Parameter object is
+   created, or set subsequently by assigning values to the appropriate
+   properties of the Parameter object. These Parameter objects must be
+   created explicitly prior to creating the ParSys object.
+
+   A ParSys can be used as a dictionary in which the keys are the
+   parameter names, and the values are the Parameter objects, as
+   in:
+
+   scalar = parsys_instance["scalar"].value
+   parsys_instance["NDF"].default = Parameter.UNSET
+   etc
+
+   When a new ParSys object is created, any values supplied on the
+   command line of the executing script are stored as the initial values
+   for the corresponding parameters. However, such values are only
+   validated when the calling script attempts to get the parameter
+   value. An UnknownParameterError is raised if the command line
+   includes values for which there are no corresponding Parameters in
+   the ParSys.
+
+   Three parameters controlling the level of information to display and
+   log are created automatically when the ParSys constructor is called.
+   These parameters are:
+
+      MSG_FILTER = _LITERAL (Read)
+         Controls the default level of information reported by Starlink
+         atasks invoked within the executing script. This default can be
+         over-ridden by including a value for the msg_filter parameter
+         within the command string passed to the "invoke" function. The
+         accepted values are the list defined in SUN/104 ("None", "Quiet",
+         "Normal", "Verbose", etc). ["Normal"]
+
+      ILEVEL = _LITERAL (Read)
+         Controls the level of information displayed on the screen by the
+         script. It can take any of the following values (note, these values
+         are purposefully different to the SUN/104 values to avoid confusion
+         in their effects):
+
+         "NONE" - No screen output is created
+
+         "CRITICAL" - Only critical messages are displayed such as warnings.
+
+         "PROGRESS" - Extra messages indicating script progress are also
+            displayed.
+
+         "ATASK" - Extra messages are also displayed describing each atask
+            invocation. Lines starting with ">>>" indicate the command name
+            and parameter values, and subsequent lines hold the screen output
+            generated by the command.
+
+         "DEBUG" - Extra messages are also displayed containing unspecified
+            debugging information.
+
+         In adition, the glevel value can be changed by assigning a new
+         integer value (one of starutil.NONE, starutil.CRITICAL,
+         starutil.PROGRESS, starutil.ATASK or starutil.DEBUG) to the module
+         variable starutil.glevel. ["PROGRESS"]
+
+      GLEVEL = _LITERAL (Read)
+         Controls the level of information to write to a text log file.
+	 Allowed values are as for "ILEVEL". The log file to create is
+	 specified via parameter "LOGFILE. In adition, the glevel value
+	 can be changed by assigning a new integer value (one of
+	 starutil.NONE, starutil.CRITICAL, starutil.PROGRESS,
+	 starutil.ATASK or starutil.DEBUG) to the module variable
+	 starutil.glevel. ["ATASK"]
+
+      LOGFILE = _LITERAL (Read)
+         The name of the log file to create if GLEVEL is not NONE. The
+	 default is "<command>.log", where <command> is the name of the
+	 executing script (minus any trailing ".py" suffix), and will be
+	 created in the current directory. Any file with the same name is
+	 over-written. The script can change the logfile if necessary by
+	 assign the new log file path to the module variable
+	 "starutil.logfile". Any old log file will be closed befopre the
+	 new one is opened. []
+
+   To Do:
+      - Add equivalents to the standard starlink "accept" and "prompt"
+      keywords.
+      - Add system for specifying logical parameters as "param" or
+      "noparam"
+      - Add a system for remembering current values?
+
+   Constructor:
+      parsys_instance = ParSys( params )
+         params = list
+            A list of starutil.Parameter objects. These define all parameters
+            used by the Python application. The order in which they are
+            stored in the list define their expected order on the command
+            line when specified by position rather than keyword.
+
+   Properties:
+      cmd = string
+         The name of the executing python script.
+      cmdline = string
+         A reconstruction of the command line that invoked the executing
+         script.
+      params = dict
+         A dictionary holding all the supplied Parameters, indexed by
+         parameter name.
+      usage = string
+         A string that summarises the usage of the running script. It
+         contains the script name followed by the supplied parameter
+         kewords with default values, if any, in the supplied order.
+
+   """
+
+   def __init__(self,params):
+      global ilevel
+      global glevel
+      global logfile
+
+      #  Store a dictionary holding references to all the supplied Parameters,
+      #  indexed by parameter name. Raise an exception if the list
+      #  contains msg_filter, ilevel or glevel.
+      self.params = {}
+      for p in params:
+         self.params[p.name] = p
+         p._parsys = self
+         if p.name == "MSG_FILTER" or p.name == "ILEVEL" or p.name == "GLEVEL":
+            raise UsageError("{0}The list of starutil parameters includes the reserved parameter name {1} (programming error).".format(_cmd_token(),p.name))
+
+      #  Create the extra message handling parameters, and append them to the
+      #  end of the list.
+      levs = [ "NONE", "QUIET", "NORMAL", "VERBOSE", "DEBUG" ]
+      for i in range(1,21):
+         levs.append("DEBUG{0}".format(i))
+
+      p = ParChoice("MSG_FILTER", levs, "ATASK Message level", "NORMAL",
+                    noprompt=True)
+      params.append(p)
+      self.params[p.name] = p
+
+      levs = [ "NONE", "CRITICAL", "PROGRESS", "ATASK", "DEBUG" ]
+
+      p = ParChoice("ILEVEL", levs, "Level of info. to display on screen",
+                    "PROGRESS", noprompt=True)
+      params.append(p)
+      self.params[p.name] = p
+
+      p = ParChoice("GLEVEL", levs, "Level of info. to store in log file",
+                    "ATASK", noprompt=True)
+      params.append(p)
+      self.params[p.name] = p
+
+      p = Par0S("LOGFILE", "The log file to receive diagnostic messages",
+                "{0}.log".format(cmd()), noprompt=True)
+      params.append(p)
+      self.params[p.name] = p
+
+      #  Store a "usage" string.
+      self.usage = "Usage: {0} ".format(cmd())
+      for p in params:
+         if p.noprompt:
+            self.usage += "[({0}=){1}] ".format(p.name.lower(),p.default)
+         else:
+            self.usage += "({0}=)? ".format(p.name.lower())
+
+      #  Look for "name=value" items on the command line and store them in
+      #  a dictionary ("byName"). Store all other command line items in an
+      #  ordered list ("byPosition"). Also build a copy of the command line.
+      self.cmdline = "{0} ".format(cmd())
+      byName = {}
+      byPosition = []
+      for item in sys.argv[1:]:
+
+         if item == "--help" or item == "-h":
+            print(self.usage)
+            sys.exit(0)
+
+         self.cmdline += "{0} ".format(item)
+         m = re.search( '^(\w+)=(.*)$', item )
+         if m:
+            name = m.group(1).upper()
+            value = m.group(2)
+         else:
+            name = None
+            value = item
+
+         if value[0] == "\"" or value[0] == "'":
+            l = len(value)
+            if value[0] == value[l-1]:
+               value = value[1:l-1]
+
+         if name == None:
+            byPosition.append(value)
+         else:
+            byName[name] = value
+
+      #  Loop round all legal parameter names, maintaining the zero-based
+      #  index of the current parameter..
+      pos = -1
+      for p in params:
+         pos += 1
+         name = p.name
+
+         #  If a value was supplied for the parameter on the command line,
+         #  store it as the initial value for the Parameter and remove it
+         #  from the "byName" dict.
+         if name in byName:
+            p._setValue( byName.pop(name) )
+
+         #  Otherwise use the next positional value (if any).
+         elif len(byPosition) > 0:
+            p._setValue( byPosition.pop(0) )
+
+      #  If the byName dict or the byPosition list is not empty, (i.e. values
+      #  for unknown parameters were supplied on the command line), raise an
+      #  exception.
+      if len(byName) > 0:
+         name = byName.keys()[0]
+         text = "\n\n{0}: Unknown parameter '{1}' specified on the command line.".format(cmd(),name)
+
+      elif len(byPosition) > 0:
+         text = "\n\n{0}: Too many parameter values supplied on command line.".format(cmd())
+      else:
+         text = None
+
+      if text != None:
+         text += "\n{0}\n\n{1}\n".format(self.cmdline,self.usage)
+         raise UnknownParameterError(text)
+
+      #  Set the default MSG_FILTER value for all atasks by setting the
+      #  MSG_FILTER environment variable.
+      msg_filter = self.params["MSG_FILTER"].value
+      if msg_filter != None:
+         os.environ["MSG_FILTER"] = msg_filter
+
+      #  Set the logfile name.
+      logfile = self.params["LOGFILE"].value
+
+      #  Set the module variables holding the screen and log file
+      #  information levels.
+      ilevel = _getLevel(self.params["ILEVEL"].value)
+      glevel = _getLevel(self.params["GLEVEL"].value)
+
+#  Allow the ParSys to be indexed by parameter name (returns the
+#  Parameter object as the value).
+   def __len__(self):
+      return len(self.params)
+   def __getitem__(self, key):
+      return self.params[key.upper()]
+   def __setitem__(self, key, value):
+      raise UsageError("{0}Attempt to set a read-only item in a ParSys object (programming error).".format(_cmd_token()))
+   def __delitem__(self, key):
+      raise UsageError("{0}Attempt to delete a read-only item in a ParSys object (programming error).".format(_cmd_token()))
+   def __iter__(self):
+      self.__inext = -1
+      return self
+   def next(self):
+      self.__inext += 1
+      parnames = self.params.keys()
+      if self.__inext < len( parnames ):
+         return self.params[parnames[ self.__inext ]]
+      else:
+         raise StopIteration
+
+
+#  A method to deliver an error message to the user without affecting
+#  control flow
+   def _error(self,msg):
+      print("{0}\n".format(msg))
+
+
+
+
+
+
+
+
+
+
+
+
+class Unset(object):
+   ''' A singleton object used to represent unset parameter values or defaults '''
+   def __repr__(self):
+      return "<unset>"
+
+
+
+
+
+class Parameter(object):
+   __metaclass__ = abc.ABCMeta
+   '''
+
+   An abstract base class describing a generic parameter.
+
+   Subclasses of Parameter provide facilities for storing and validating
+   parameters of different types. The parameter class itself should never
+   be instantiated. All parameters are initially unset when created.
+
+   Class Constants:
+      Parameter.UNSET = object
+         A value that can be assigned to the "value" or "default" property
+         of a Parameter to indicate that the parameter has no value or
+         default. Note, the Python "None" object is considered to be a
+         plausable value for the "value" or "default" property.
+
+   Properties:
+      name = string
+         The parameter name. Always upper case.
+      prompt = string
+         The prompt string.
+      default = object
+         The default value. This property may be set to Parameter.UNSET
+         to indicate that the parameter has no default value, and can be
+         compared with Parameter.UNSET to test if a default has been set
+         for the parameter.
+      value = object
+         The current value of the parameter. This property may be set to
+         Parameter.UNSET to indicate that the parameter has no value.
+         This clears the parameter so that a new value will be ontained
+         when the value property is next accessed. An InvalidValueError
+         is raised if an invalid value is assigned to the "value" property.
+
+         When the "value" property is read, the returned value is
+         determined as follows:
+
+         I) If the parameter already has a set value, it is returned.
+
+         II) If the parameter was assigned a valid value on the command line,
+         the value is returned.
+
+         III) If the parameter allows prompting (see property "noprompt"),
+         a valid value is obtained from the user and returned.
+
+         IV) If the user supplies a null (!) value, or if prompting is
+         not allowed, then the default value (if set) is returned.
+
+         V) If no default has been set, a NoValueError is raised and
+         Parameter.UNSET is returned.
+      noprompt = boolean
+         If False, then the user may be prompted to obtain a parameter
+         value. The full prompt string contains the parameter name, the
+         "prompt" property, and the default value (if set). If the user
+         enters an abort (!!) then an AbortError is raised. If the user
+         enters a null (!) then the default value is accepted, if set (if
+         no default has been set a NoValueError is raised). If an empty
+         string is supplied, then the default is accepted, if set (if no
+         default has been set then the user is re-prompted). If a single
+         or double question mark is supplied, the "help" property is
+         displayed, and the user is re-prompted. If an invalid value
+         is supplied, an error message is displayed, and the user is
+         re-prompted.
+      help = string
+         The help string. May be "None".
+   '''
+
+
+
+
+   #  __unset is the private value used within the Parameter class
+   #  to indicate an unset value or default. It is never changed. Use
+   #  an instance of a custom class to ensure there is no chance of a
+   #  user-supplied value being equal to __unset.
+   __unset = Unset()
+
+   #  UNSET is the public value used to indicate an unset value or
+   #  default. It may conceivably be changed by the caller.
+   UNSET = __unset
+
+
+
+
+   #  Define the class initialiser
+   @abc.abstractmethod
+   def __init__(self, name, prompt=None, default=UNSET,
+                noprompt=False, help=None ):
+
+      # Initial values for all fields.
+      self.__name = name.strip().upper()
+      self.__prompt = None
+      self.__default = Parameter.__unset
+      self.__noprompt = False
+      self.__help = None
+      self.__value = Parameter.__unset
+      self.__validated = False
+      self._parsys = None
+
+      #  Use "protected" setter methods to set the supplied field values.
+      self._setPrompt( prompt )
+      self._setDefault( default )
+      self._setNoPrompt( noprompt )
+      self._setHelp( help )
+
+
+
+
+   #  Define "protected" accessor methods for all fields
+   def _getName(self):  # Read-only
+      return self.__name
+
+   def _getPrompt(self):
+      return self.__prompt
+   def _setPrompt(self,val):
+      self.__prompt = "{0}".format(val) if val else None
+
+   def _getDefault(self):
+      return self.__default if self._testDefault() else Parameter.UNSET
+   def _setDefault(self,val):
+      if val != Parameter.UNSET:
+         self.__default = val
+      else:
+         self.__default = Parameter.__unset
+   def _clearDefault(self):
+      self.__default = Parameter.__unset
+   def _testDefault(self):
+      return self.__default != Parameter.__unset
+
+   def _getNoPrompt(self):
+      return self.__noprompt
+   def _setNoPrompt(self,val):
+      self.__noprompt = True if val else False
+
+   def _getHelp(self):
+      return self.__help
+   def _setHelp(self,val):
+      self.__help = "{0}".format(val) if val else None
+
+   def _getValue(self):
+      return self.__value if self._testValue() else Parameter.UNSET
+   def _setValue(self,val):
+      self.__validated = False
+      if val != Parameter.UNSET:
+         self.__value = val
+      else:
+         self.__value = Parameter.__unset
+   def _clearValue(self):
+      self.__validated = False
+      self.__value = Parameter.__unset
+   def _testValue(self):
+      return self.__value != Parameter.__unset
+
+
+
+   # Define a function to get the public value of the parameter,
+   # prompting the user if required.
+   def _getParameterValue(self):
+      value = self._getValue()
+      while not self.__validated:
+         defaultUsed = False
+
+         if not self._testValue():
+            if not self.__noprompt:
+               value = self.__promptUser()
+            elif self._testDefault():
+               value = self._getDefault()
+               defaultUsed = True
+            else:
+               raise NoValueError("\n{0}No value obtained for parameter {1}.".format(_cmd_token(),self._getName()))
+         try:
+            self._setValue( value )
+            self.__validate()
+            msg_out( "Parameter '{0} is set to '{1}'\n".format(self.__name,self.__value), DEBUG )
+         except InvalidParameterError as err:
+            self.__error(err)
+
+         if defaultUsed:
+            self._clearDefault()
+
+      return self._getValue()
+
+
+
+
+   # Define a function to set the public value of the parameter, raising
+   # an InvalidParameterError if the value is not valid.
+   def _setParameterValue(self,value):
+      self._setValue( value )
+      self.__validate()
+
+
+
+
+   #  Define public properties for all public fields
+   name = property(_getName, None, None, "The parameter name")
+   prompt = property(_getPrompt, _setPrompt, None, "The user prompt string")
+   default = property(_getDefault, _setDefault, None, "The default value")
+   noprompt = property(_getNoPrompt, _setNoPrompt, None, "Do not prompt the user?")
+   help = property(_getHelp, _setHelp, None, "The parameter help string")
+   value = property(_getParameterValue, _setParameterValue, None, "The parameter value")
+
+
+
+
+
+   #  "Protected" method to check if the current parameter value is a
+   #  valid value for the parameter, raising an InvalidParameterError if
+   #  not. It may modify the stored value if necessary (e.g. changing its
+   #  type) as part of the check.
+   @abc.abstractmethod
+   def _isValid(self):
+      pass
+
+
+
+
+   #  "Protected" method to validate the current value of a Parameter,
+   #  clearing the value and raising an InvalidParameterError if the
+   #  value is not valid.
+   def __validate(self):
+      if not self.__validated:
+
+         if not self._testValue():
+            raise InvalidParameterError("\n{0}Unset value not valid for parameter '{1}'.".format(_cmd_token(),self._getName()))
+
+         elif self._getValue() == None and self._getDefault() == None:
+            self.__validated = True
+
+         else:
+            try:
+               self._isValid()
+               self.__validated = True
+            except InvalidParameterError:
+               self._clearValue()
+               raise
+
+
+
+
+   #  Private function to display an error to the user without raising an
+   #  exception. Delegate it to the enclosing parameter system if possible.
+   #  Do a simple print otherwise.
+   def __error(self,msg):
+      if self._parsys:
+         self._parsys._error(msg)
+      else:
+         print("{0}\n".format(msg))
+
+
+
+
+   #  Prompt the user for a value
+   def __promptUser(self):
+
+      name = self._getName()
+      pmt = "{0} ".format(name)
+
+      prompt = self._getPrompt()
+      if prompt:
+         pmt += "- "+prompt+" "
+
+      default = self._getDefault()
+      if default == None:
+         pmt += "/!/ "
+      elif default != Parameter.UNSET:
+         pmt += "/{0}/ ".format(default)
+
+      pmt += "> "
+
+      while True:
+
+         if sys.hexversion > 0x03000000:
+            result= input(pmt).strip()
+         else:
+            result = raw_input(pmt).strip()
+
+         if result == "" or result.isspace():
+            if default != Parameter.UNSET:
+               result = default
+               break
+
+         elif result == "!" :
+            if default != Parameter.UNSET:
+               result = default
+               break
+            else:
+               raise NoValueError("\n{0}No value obtained for parameter '{1}'.".format(_cmd_token(),name))
+
+         elif result == "!!" :
+            raise AbortError("\n{0}Aborted prompt for parameter '{1}'.".format(_cmd_token(),name))
+
+         elif result == "?" or result == "??":
+            help = self._getHelp()
+            if help:
+               print(help)
+            else:
+               text = "No help available for parameter '{0}'.".format(name)
+               self.__error(text)
+
+         else:
+            break
+
+      return result
+
+
+
+
+   # Provide implementations for some other special functions
+   def __str__(self):
+      val = self._getValue()
+      if val != Parameter.UNSET:
+         return "{0} = {1}".format(self._getName(),val)
+      else:
+         return "{0} = <unset>".format(self._getName())
+
+
+
+
+class Par0S(Parameter):
+   '''
+
+   Describes a scalar string-valued parameter. The parameter is initially
+   in an unset state.
+
+   Constructor:
+      param = Par0S( name, prompt=None, default=Parameter.UNSET,
+                     noprompt=False, help=None  )
+         name = string
+            The parameter name. The supplied string is converted to upper case.
+         prompt = string
+            The prompt string.
+         default = string
+            The initial default value.
+         noprompt = boolean
+            If True, then the user will not be prompted for a parameter value
+            if none was supplied on the command line. Instead, the default
+            value will be used if set (a NoValueError will be raised otherwise).
+         help = string
+            The help string
+
+   Properties:
+      This class has no extra properties over and above those of
+      the Parameter class:
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Parameter class:
+
+   '''
+
+   def __init__(self, name, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None ):
+      Parameter.__init__(self, name, prompt, default, noprompt, help )
+
+   def _isValid(self):
+      value = Parameter._getValue(self)
+      Parameter._setValue(self,"{0}".format(value))
+
+
+
+
+
+class Par0F(Parameter):
+   '''
+
+   Describes a scalar floating-point parameter. The parameter is initially
+   in an unset state.
+
+   Constructor:
+      param = Par0F( name, prompt=None, default=Parameter.UNSET,
+                     noprompt=False, help=None, maxval=None, minval=None )
+         name = string
+            The parameter name. The supplied string is converted to upper case.
+         prompt = string
+            The prompt string.
+         default = float
+            The initial default value.
+         noprompt = boolean
+            If True, then the user will not be prompted for a parameter value
+            if none was supplied on the command line. Instead, the default
+            value will be used if set (a NoValueError will be raised otherwise).
+         help = string
+            The help string
+         maxval = float
+            The maximum acceptable value for the parameter.
+         minval = float
+            The minimum acceptable value for the parameter.
+
+   Properties:
+      This class defines the following properties in addition to those of
+      the Parameter class:
+
+      maxval = float
+         The maximum acceptable value for the parameter. If "None", no
+         upper limit is imposed. If maxval is less than minval, then the
+         range between them is a disallowed range, rather than an allowed
+         range.
+      minval = float
+         The minimum acceptable value for the parameter. If "None", no
+         lower limit is imposed.
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Parameter class:
+
+   '''
+
+   def __init__(self, name, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None, maxval=None, minval=None ):
+      Parameter.__init__(self, name, prompt, default, noprompt, help )
+      self.__maxval = None
+      self.__minval = None
+      self._setMaxVal(maxval)
+      self._setMinVal(minval)
+
+   def _getMaxVal(self):
+      return self.__maxval
+   def _setMaxVal(self,val):
+      self.__maxval = float(val) if  val != None else None
+   def _getMinVal(self):
+      return self.__minval
+   def _setMinVal(self,val):
+      self.__minval = float(val) if  val != None else None
+
+   minval = property(_getMinVal, _setMinVal, None, "The minimum parameter value")
+   maxval = property(_getMaxVal, _setMaxVal, None, "The maximum parameter value")
+
+   def _isValid(self):
+      val = Parameter._getValue(self)
+
+      try:
+         val = float(val)
+         minv = self._getMinVal()
+         maxv = self._getMaxVal()
+
+         big = (val > maxv) if maxv != None else False
+         small = (val < minv) if minv != None else False
+
+         if (maxv != None) and (minv != None):
+            if (maxv > minv) and (big or small):
+                  raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be between {3} and {4}.".format(_cmd_token(),val,self._getName(),minv,maxv))
+            elif (maxv <= minv) and (big and small):
+                  raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must not be between {3} and {4}.".format(_cmd_token(),val,self._getName(),maxv,minv))
+
+         elif big:
+            raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be no more than {3}.".format(_cmd_token(),val,self._getName(),maxv))
+
+         elif small:
+            raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be no less than {3}.".format(_cmd_token(),val,self._getName(),minv))
+
+         Parameter._setValue(self,val)
+
+      except TypeError:
+         raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be numerical value.".format(_cmd_token(),val,self.name))
+
+
+
+
+
+
+class Par0L(Parameter):
+   '''
+
+   Describes a scalar logical/boolean parameter. The parameter is initially
+   in an unset state. Acceptable values are "0", "1", "Y", "N", "T", "F",
+   "YES", "NO", "TRUE", "FALSE" (case insensive).
+
+   Constructor:
+      param = Par0L( name, prompt=None, default=Parameter.UNSET,
+                     noprompt=False, help=None )
+         name = string
+            The parameter name. The supplied string is converted to upper case.
+         prompt = string
+            The prompt string.
+         default = float
+            The initial default value.
+         noprompt = boolean
+            If True, then the user will not be prompted for a parameter value
+            if none was supplied on the command line. Instead, the default
+            value will be used if set (a NoValueError will be raised otherwise).
+         help = string
+            The help string
+
+   Properties:
+      This class has no extra properties over and above those of
+      the Parameter class:
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Parameter class:
+
+   '''
+
+   def __init__(self, name, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None, maxval=None, minval=None ):
+      Parameter.__init__(self, name, prompt, default, noprompt, help )
+
+   def _isValid(self):
+      val = "{0}".format(Parameter._getValue(self)).strip().upper()
+      if val == "0" or val == "F" or val == "FALSE" or val == "N" or val == "NO":
+         val = False
+      elif val == "1" or val == "T" or val == "TRUE" or val == "Y" or val == "YES":
+         val = True
+      else:
+         raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be one of 0,1,n,y,no,yes,t,f,true,false.".format(_cmd_token(),val,self._getName()))
+      Parameter._setValue(self,val)
+
+
+
+
+
+class ParChoice(Parameter):
+   """
+
+   Describes a string parameter that is restricted to one of several
+   allowed values. The parameter is initially in an unset state.
+
+   Constructor:
+      param = ParChoice( name, choices, prompt=None, default=Parameter.UNSET,
+                         noprompt=False, help=None )
+         name = string
+            The parameter name. The supplied string is converted to upper case.
+         choices = list<string>
+            A list of strings giving the allowed values of the parameter.
+            They are converted to upper case, and white space is removed
+            from both ends of each option. Matching is case insensitive.
+         prompt = string
+            The prompt string.
+         default = float
+            The initial default value.
+         noprompt = boolean
+            If True, then the user will not be prompted for a parameter value
+            if none was supplied on the command line. Instead, the default
+            value will be used if set (a NoValueError will be raised otherwise).
+         help = string
+            The help string
+
+   Properties:
+      This class defines the following properties in addition to those of
+      the Parameter class:
+
+      choices = list<string>
+         A list of strings giving the allowed values of the parameter.
+         They are converted to upper case, and white space is removed
+         from both ends of each option. Matching is case insensitive.
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Parameter class:
+
+   """
+
+
+   def __init__(self, name, choices, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None ):
+      Parameter.__init__(self, name, prompt, default, noprompt, help )
+      self.__choices = None
+      self._setChoices(choices)
+
+   def _getChoices(self):
+      return self.__choices
+   def _setChoices(self,val):
+      if val == None:
+         self.__choices = None
+      else:
+         self.__choices = []
+         for opt in val:
+            opt = "{0}".format(opt)
+            self.__choices.append(opt.strip().upper())
+
+   choices = property(_getChoices, _setChoices, None, "The allowed parameter values")
+
+   def _isValid(self):
+      val = "{0}".format(Parameter._getValue(self)).strip()
+      uval = val.upper()
+
+      nmatch = 0
+      choices = self._getChoices()
+
+      for opt in choices:
+         if opt == uval:
+            newval = opt
+            nmatch = 1
+            break
+
+         if opt.find(uval) == 0:
+            newval = opt
+            nmatch += 1
+
+      if nmatch == 0 or nmatch > 1:
+         text = "\n{0}".format(_cmd_token())
+         if nmatch == 0:
+            text += "Illegal "
+         else:
+            text += "Ambiguous "
+         text += "value ('{0}') obtained for parameter '{1}'.\nIt must be one of '".format(val,self._getName())
+         first = True
+         for opt in choices:
+            if first:
+               text += "{0}".format(opt)
+               first = False
+            else:
+               text += ",{0}".format(opt)
+         text += "'"
+         raise InvalidParameterError(text)
+
+      Parameter._setValue(self,newval)
+
+
+
+
+
+class ParNDG(Parameter):
+   '''
+
+   Describes a string parameter that specifies one or more existing NDFs
+   using the syntax of an NDG group expression. The parameter is initially
+   in an unset state. The "value" property of the parameter holds an
+   instance of the starutil.NDG class.
+
+   Constructor:
+      param = ParNDG( name, prompt=None, default=Parameter.UNSET,
+                      noprompt=False, help=None, maxsize=None, minsize=1 )
+         name = string
+            The parameter name. The supplied string is converted to upper case.
+         prompt = string
+            The prompt string.
+         default = string
+            The initial default value.
+         noprompt = boolean
+            If True, then the user will not be prompted for a parameter value
+            if none was supplied on the command line. Instead, the default
+            value will be used if set (a NoValueError will be raised otherwise).
+         help = string
+            The help string
+         maxsize = int
+            The largest number of NDFs allowed in the group. Unlimited if
+            maxsize=None.
+         minsize = int
+            The smallest number of NDFs allowed in the group. May be zero.
+
+   Properties:
+      This class defines the following properties in addition to those of
+      the Parameter class:
+
+      maxsize = int
+         The largest number of NDFs allowed in the group. Unlimited if
+         maxsize=None.
+      minsize = int
+         The smallest number of NDFs allowed in the group. May be zero.
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Parameter class:
+
+   '''
+
+   def __init__(self, name, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None, maxsize=None, minsize=1 ):
+      Parameter.__init__(self, name, prompt, default, noprompt, help )
+      self.__maxsize = None
+      self.__minsize = None
+      self._setMaxSize(maxsize)
+      self._setMinSize(minsize)
+
+   def _getMaxSize(self):
+      return self.__maxsize
+   def _setMaxSize(self,size):
+      if size == None:
+         self.__maxsize = None
+      else:
+         size = int(size)
+         if size < 1 :
+            size = 1
+         self.__maxsize = size
+
+   def _getMinSize(self):
+      return self.__minsize
+   def _setMinSize(self,size):
+      if size == None:
+         self.__minsize = 1
+      else:
+         size = int(size)
+         if size < 0 :
+            size = 0
+         self.__minsize = size
+
+   minsize = property(_getMinSize, _setMinSize, None, "The minimum number of NDFs")
+   maxsize = property(_getMaxSize, _setMaxSize, None, "The maximum number of NDFs")
+
+   def _isValid(self):
+      val = Parameter._getValue(self)
+      if val == None:
+         size = 0
+      else:
+         try:
+            val = NDG("{0}".format(val).strip())
+            size = len(val)
+         except AtaskError:
+            raise InvalidParameterError( "\n{0}Cannot access a group of existing NDFs using parameter '{1}' ('{2}').".format(_cmd_token(),Parameter._getName(self),val) )
+
+      if size < self.minsize:
+         raise InvalidParameterError( "\n{0}Too few NDFs ({1}) given for parameter '{2}' - at least {3} must be supplied.".format(_cmd_token(),size,Parameter._getName(self), self._getMinSize()) )
+      elif self.maxsize != None and size > self.maxsize:
+         raise InvalidParameterError( "\n{0}Too many NDFs ({1}) given for parameter '{2}' - no more than {3} can be supplied.".format(_cmd_token(),size,Parameter._getName(self), self._getMaxSize()) )
+      Parameter._setValue(self,val)
+
+
+
+
+
+
+
+
+
+#  -------------------  Specifying groups of NDFs ---------------------------
+
+class NDG(object):
+   '''
+
+   Encapsulates a immutable group of NDF names.
+
+   Each NDG object that represents more than one NDF has a corresponding
+   text file on disk containing the explicit paths to the NDFs in the
+   group. These text files are stored in a temporary directory with path
+   specified by class variable NDG.tempdir. This directory is created (if
+   it does not already exist) when the first NDG object is created, and
+   is deleted (together with any files in it) when the class method
+   NDG.cleanup() is called. Any temporary NDFs specified by this class
+   are also placed in this directory.
+
+   When used as an iterable, the NDG class behaves liks a Python list
+   in which each element is a string specifying an individual NDF.
+
+   The string representation of an NDG object is a group expression which
+   can be passed to a starlink ATASK.
+
+   Constructors:
+
+      ndg_instance = NDG( gexp, exists=True )
+         gexp = string
+            An NDG group expression.
+         exists = boolean
+            If True, the new NDG represents a group of existing NDFs, and
+            a NoNdfError will be raised if any of the NDF specified by
+            "gexp" do not exist or cannot be accessed. If False, the new
+            NDG represents a group of new NDFs - they do not need to exist.
+
+
+      ndg_instance = NDG( ndfs )
+         ndfs = list | tuple
+            A list or tuple in which each element is either a string
+            holding the name of an NDF, or a reference to an NDG. The
+            new NDG contains all the supplied NDFs.
+
+      ndg_instance = NDG( size )
+         size = integer
+            The new NDG represents a group of new NDFs with the specified
+            size. The NDFs are placed in the temporary directory specified
+            by the class variable NDG.tempdir, and have autmatically
+            generated names.
+
+
+      ndg_instance = NDG( ndg, mod=None )
+         ndg = NDG
+            An existing NDG object that determines the size of the new
+            NDG object. The new object will contain the same number of
+            NDFs as the specified object.
+         mod = string
+            If supplied, the NDF names for the new group are formed by
+	    modifying the names in the supplied group using the "mod"
+	    string as a GRP "modification element" (e.g. "*_a" or
+	    "*|_ed_|bg|"). In this case, the NDFs in the supplied group
+	    must already exist. If "mod" is not supplied, the NDFs in the
+	    new group are placed in the temporary directory specified by
+	    the class variable NDG.tempdir, and have automatically
+	    generated names. In this case the NDFs in the supplied group
+	    need not already exist.
+         pattern = string
+            If supplied, the NDF names for the new group are formed by
+
+   Properties:
+      comment = string
+         Text that is written to the group's list file, if any, as comments
+         at the top of the file.
+      file = string (read-only)
+         The full path to the temporary text file containing the NDFs in
+	 the group.
+      tmpdir = string (read-only)
+         The full path to the directory that holds the groups temporary
+         files. This is either None (if the group has no temporary files),
+         or a copy of the value of the class "tempdir" variable at the time
+         the NDG object was created.
+
+
+   Methods:
+      new_instance = ndg_instance.filter( pattern )
+         Creates a new NDG object by filtering the NDF names contained
+         in an existing NDG object. The pattern should conform to the
+         syntax used for the PATTERN parameter by the KAPPA:NDFECHO
+         command. See SUN/95. "None" is returned if no NDFs match the
+         supplied pattern.
+
+   Class Variables:
+      NDG.tempdir = string
+         The path to the temporary directory in which NDFs and text files
+	 are stored. The default value is None, which causes a new
+	 directory to be created when the first NDG is created, using the
+	 mkdtemp() function in the tempfile module. The used value is
+	 then assigned to the NDG.tempdir class variable. The value of
+	 this variable may be changed to force subsequent NDG objects to
+	 use a different temporary directory.
+
+   Class Methods:
+      NDG.cleanup():
+         The directory specified by the current value of the class
+	 "tempdir" variable is deleted, together with all files in it.
+	 All NDG objects created so far that refer to the deleted
+	 temporary directory are then reset so that each one represents
+	 an empty group.
+
+   To Do:
+      - Allow comment property to be supplied as an argument to each
+      constructor.
+
+   '''
+
+   # The index value to include in the next list file name.
+   __nobj = 0
+
+   #  References for all issued NDG objects
+   instances = []
+
+   # The full path to the temporary directory.
+   tempdir = None
+
+   # Return the path to the directory to hold temporary files. If nothing
+   # has been set for the NDG.tempdir variable, use the tempfile module to
+   # create a tempdir. Otherwise, check the named directory exists. If not,
+   # create it.
+   @classmethod
+   def __gettmpdir(cls):
+      if NDG.tempdir == None:
+         NDG.tempdir = tempfile.mkdtemp( prefix='NDG_' )
+      elif not os.path.isdir(NDG.tempdir):
+         os.mkdir( NDG.tempdir )
+      return NDG.tempdir
+
+   # Return the path to the temporary list file to use for a group. It is
+   # placed in the specified tempdir.
+   @classmethod
+   def __getfile(cls,tempdir):
+      return "{0}/group{1}_.lis".format(tempdir,NDG.__nobj)
+
+
+   # The instance initialiser.
+   def __init__(self, p1, p2=None ):
+
+      # Assume initially that this NDG does not have any files in the
+      # temporary directory
+      self.__tmpdir = None
+      self.__file = None
+
+      # As yet we do not have a list of NDFs to put in the group.
+      self.__ndfs = None
+
+      # As yet we do not have a comment
+      self.__comment = None
+
+      # Assume initially that all NDF paths in the new NDG are absolute
+      isabs = True
+
+      # Assume initially that we are not creating paths to NDFs in the
+      # tempdir.
+      intemp = False
+
+      # Find out how many NDFs there will be in the group.
+      if isinstance(p1,str):
+         gexp = shell_quote(p1)
+         if p2 != None:
+            if p2:
+               exists = True
+            else:
+               exists = False
+         else:
+            exists = True
+
+         # Use KAPPA:NDFECHO to list the NDFs in the group expression to
+         # the above named text file. Also save the NDF names in a Python
+         # list.
+         if exists:
+            try:
+               self.__ndfs = invoke("$KAPPA_DIR/ndfecho {0} abspath=yes".format(gexp),True)
+            except AtaskError:
+               raise NoNdfError("\n\nCannot access one or more of the NDFs specified by '{0}'.".format(p1))
+         else:
+            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ! {0} abspath=yes".format(p1),True)
+
+      # If the first argument is a list or tuple, create a group containing
+      # the contents of the list or tuple as NDF names. Flag that we do not
+      # know these to be absolute.
+      elif ( isinstance(p1,list) or isinstance(p1,tuple) ) and p2 == None:
+         isabs = False
+         self.__ndfs = []
+         for ndf in p1:
+            if isinstance(ndf,str):
+               self.__ndfs.append( ndf )
+            elif isinstance(ndf,NDG):
+               for a in ndf.__ndfs:
+                  self.__ndfs.append( a )
+            else:
+               self.__ndfs.append( "{0}".format(ndf) )
+
+      # If the first argument is an integer, the group will contain the
+      # specified number of NDFs. We cannot determine their paths as
+      # yet since we have not yet decided on a tempdir.
+      elif isinstance(p1,int) and p2 == None:
+         nfile = int(p1)
+         intemp = True
+
+      # If the first argument is an NDG, and the second argument is not
+      # supplied, the group size is the same as the number of NDFs in the
+      # supplied NDG object. Since the supplied NDG may contain one or more
+      # container files, each of which may contain mutliple NDFs, we need to
+      # use kappa:ndfecho to determine the size of the supplied group. Do
+      # this first assuming the NDFs exist in order to get full expansion
+      # of container files, and then try again without this assumption if
+      # an error occurs.
+      elif isinstance(p1,NDG) and p2 == None:
+         try:
+            invoke("$KAPPA_DIR/ndfecho {0} quiet".format(p1))
+            nfile = get_task_par( "size", "ndfecho" )
+            intemp = True
+         except AtaskError:
+            try:
+               invoke("$KAPPA_DIR/ndfecho ! {0} quiet".format(p1))
+               nfile = get_task_par( "size", "ndfecho" )
+            except AtaskError:
+               nfile = len(p1.__ndfs)
+
+      # If the first argument is an NDG, and the second argument is a
+      # string, create names by modifying the supplied NDG using the
+      # string as a modification element.
+      elif isinstance(p1,NDG) and isinstance(p2,str):
+         gexp1 = shell_quote("{0}".format(p1))
+         gexp2 = shell_quote(p2)
+
+         try:
+            self.__ndfs = invoke("$KAPPA_DIR/ndfecho {0} {1} abspath=yes".format(gexp1,gexp2),True)
+         except AtaskError:
+            raise NoNdfError("\n\nCannot access one or more of the NDFs specified by '{0}'.".format(gexp1))
+
+      else:
+         raise UsageError("\n\nArguments for NDG constructor are of inappropriate type '{0}...'.".format(p1.__class__.__name__))
+
+      # Ensure we know the size of the group
+      if self.__ndfs != None:
+         nfile = len( self.__ndfs)
+
+      # If we are going to create a list file (i.e. if there is more than
+      # one NDF in the group), or if we are going to place any NDFs in the
+      # tempdir, get a reference to the tempdir, and find a unique
+      # identifying integer for files belong to the group.
+      if nfile > 1 or intemp:
+         self.__tmpdir = NDG.__gettmpdir()
+         NDG.__nobj += 1
+         pattern = "{0}/group{1}_*".format(self.__tmpdir,NDG.__nobj)
+         while len(glob.glob(pattern)) > 0:
+            NDG.__nobj += 1
+            pattern = "{0}/group{1}_*".format(self.__tmpdir,NDG.__nobj)
+
+      # If the NDG represents more than one NDF, decide on the name of the
+      # text file to hold the NDF list.
+      if nfile > 1:
+         self.__file = NDG.__getfile(self.__tmpdir)
+
+      # Now ensure we have a list of NDFs. Create the specified number
+      # of names for new (currently non-existent) NDFs within the temp
+      # directory.
+      if self.__ndfs == None:
+         self.__ndfs = []
+         for i in range(nfile):
+            ndf = "{0}/group{1}_{2}".format(self.__tmpdir,NDG.__nobj,i+1)
+            self.__ndfs.append(ndf)
+
+
+      # If there is more than one NDF in the group, write th enames of
+      # the NDFs to a text file in the tempdir.
+      if nfile > 1:
+         self.__writeFile()
+
+      # Ensure the NDF paths are absolute.
+      if not isabs:
+         self.__ndfs = invoke("$KAPPA_DIR/ndfecho ! {0} abspath=yes".format(self),True)
+         if len(self.__ndfs) > 1:
+            if not self.__file:
+               self.__tmpdir = NDG.__gettmpdir()
+               self.__file = NDG.__getfile(self.__tmpdir)
+            self.__writeFile()
+
+         elif self.__file != None:
+            os.remove(self.__file)
+            self.__file = None
+
+      #  Record a reference to this instance in the class "instances"
+      #  variables so that the NDG.cleanup() method can empty it.
+      NDG.instances.append(self)
+
+
+   #  Create a new NDG by filtering an existing NDG.
+   def filter( self, pattern ):
+      result = None
+      try:
+         ndfs = invoke("$KAPPA_DIR/ndfecho {0} abspath=yes pattern={1}".format(self,pattern),True)
+      except AtaskError:
+         ndfs = invoke("$KAPPA_DIR/ndfecho ! {0} abspath=yes pattern={1}".format(self,pattern),True)
+      if get_task_par( "nmatch", "ndfecho" ) > 0:
+         result = NDG( ndfs )
+      return result
+
+
+   # Allow the NDG to be indexed like a list of NDF names
+   def __len__(self):
+      return len(self.__ndfs)
+   def __getitem__(self, key):
+      return self.__ndfs[key]
+   def __setitem__(self, key, value):
+      raise UsageError("\n\nAttempt to change the contents of an NDG object (programming error).")
+   def __delitem__(self, key):
+      raise UsageError("\n\nAttempt to delete contents of an NDG object (programming error).")
+   def __iter__(self):
+      self.__inext = -1
+      return self
+   def next(self):
+      self.__inext += 1
+      if self.__inext < len( self.__ndfs ):
+         return self.__ndfs[ self.__inext ]
+      else:
+         raise StopIteration
+
+
+   # Define "protected" accessor methods for all public properties
+   def _getFile(self):  # Read-only
+      return self.__file
+   def _getTmpDir(self):  # Read-only
+      return self.__tmpdir
+   def _getComment(self):
+      return self.__comment
+   def _setComment(self,text):
+      self.__comment = text
+      self.__writeFile()
+
+   # Define public properties for all public fields
+   file = property(_getFile, None, None, "The group list file")
+   tmpdir = property(_getTmpDir, None, None, "The directory containing the groups temporary files")
+   comment = property(_getComment, _setComment, None, "Text describing the group")
+
+   # Write the contents of the group to the list file.
+   def __writeFile(self):
+      global DEBUG
+      if self.__file != None:
+         msg_out( "Writing NDG list file: {0}".format(self.__file), DEBUG )
+         fd = open(self.__file,"w")
+         if self.__comment:
+            if isinstance(self.__comment,list) or isinstance(self.__comment,tuple):
+               for line in self.__comment:
+                  line.strip().replace("\n", "\n# ")
+                  fd.write("# {0}\n".format(line))
+            else:
+               line = "{0}".format(self.__comment).strip().replace("\n", "\n# ")
+               fd.write("# {0}\n".format(line))
+         for ndf in self.__ndfs:
+            fd.write("{0}\n".format(ndf))
+         fd.close()
+
+
+   # The list file and NDFs are deleted for all NDG objects that have
+   # a True "temp" property. All NDG objects, regardless of their
+   # "temp" property, are then reset so that they represent an empty
+   # group. If the NDG.tempdir directory is then empty, it is deleted.
+   @classmethod
+   def cleanup(cls):
+      for ndg in NDG.instances:
+         if ndg.__tmpdir != None and ndg.__tmpdir == NDG.tempdir:
+            ndg.__file = None
+            ndg.__ndfs = []
+            ndg.__tmpdir = None
+      if NDG.tempdir != None:
+         shutil.rmtree( NDG.tempdir )
+
+   # Format an NDG into a shell quoted group expression
+   def __str__(self):
+      if self.__file:
+         return shell_quote("^{0}".format(self.__file))
+      elif len(self.__ndfs) > 0:
+         return shell_quote("{0}".format(self.__ndfs[0]))
+      else:
+         return shell_quote("")
+
+
+
+
+
+
+#  -------------------  Exceptions ---------------------------
+
+class StarUtilError(Exception):
+   """
+
+   A base class for all the classes of Exception that can be raised by
+   this module.
+
+   """
+   pass
+
+class UnknownParameterError(StarUtilError):
+   """
+
+   A class of Exception that is raised when an unknown parameter
+   value is supplied on the command line.
+
+   """
+   pass
+
+
+class NoValueError(StarUtilError):
+   """
+
+   A class of Exception that is raised when a null value is supplied for
+   a parameter.
+
+   """
+   pass
+
+class AbortError(StarUtilError):
+   """
+
+   A class of Exception that is raised when an abort is supplied for
+   a parameter.
+
+   """
+   pass
+
+
+class InvalidParameterError(StarUtilError):
+   """
+
+   A class of Exception that is raised when an invalid value is supplied
+   for a parameter.
+
+   """
+   pass
+
+
+class UsageError(StarUtilError):
+   """
+
+   A class of Exception that is raised when a error in the use of this
+   module's API is detected.
+
+   """
+   pass
+
+
+
+class NoNdfError(StarUtilError):
+   """
+
+   A class of Exception that is raised when an error occurs accessing a
+   group of supposedly existing NDFs.
+
+   """
+   pass
+
+
+
+class AtaskError(StarUtilError):
+   """
+
+   A class of Exception that is raised when a error occurs when running
+   an atask.
+
+   """
+   pass
+
+
+

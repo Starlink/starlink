@@ -5148,6 +5148,10 @@ package @PACKAGE@ {
         obey {starperl $SMURF_DIR/print_index }
     }
 
+    command pol2cat {
+        obey {python $SMURF_DIR/pol2cat.py}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
