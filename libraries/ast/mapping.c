@@ -338,6 +338,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     5-OCT-2012 (DSB):
 *        Complete re-write of Rate. It's now much simpler, faster and
 *        more reliable.
+*     16-OCT-2012 (DSB):
+*        In MatrixDet, ignore rows/columns filled with AST_BAD as well as
+*        rows/columns filled with zeros.
 *class--
 */
 
@@ -7786,10 +7789,10 @@ static double MatrixDet( int nrow, int ncol, const double *matrix, int *status )
 *     Mapping member function.
 
 *  Description:
-*     This function returns the determinant of the supplied matrix. If it
-*     is not square, an attempt is made to make it square by removing rows or
-*     columns that contain just zeros. If the attempt fails, AST__BAD is
-*     returned.
+*     This function returns the determinant of the supplied matrix. Any
+*     rows or columns that hold only zeros or AST_BAD values are first
+*     removed from the matrix. If the resulting matrix is not square, a
+*     value of AST__BAD is returned for the determinant.
 
 *  Parameters:
 *     nrow
@@ -7808,22 +7811,21 @@ static double MatrixDet( int nrow, int ncol, const double *matrix, int *status )
 */
 
 /* Local Variables: */
+   const double *sqmat;
    const double *m;
    double *a;
-   double *sqmat;
-   double *sm;
    double *y;
    double result;
    int *iw;
-   int all_zero;
-   int excess;
+   int *usecol;
+   int *userow;
    int i;
    int icol;
    int irow;
-   int jcol;
    int jf;
-   int jrow;
+   int ncoluse;
    int ndim;
+   int nrowuse;
 
 /* Initialise */
    result = AST__BAD;
@@ -7831,136 +7833,62 @@ static double MatrixDet( int nrow, int ncol, const double *matrix, int *status )
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* If the matrix has more rows than columns, attempt to make it square by
-   removing any rows that contain only zeros. */
-   excess = nrow - ncol;
-   if( excess > 0 ) {
-
-/* Allocate an array to hold a square matrix. */
-      ndim = ncol;
-      sqmat = astMalloc( ndim*ndim*sizeof( *sqmat ) );
-      if( astOK ) {
-
-/* Pointer to to start of the next row in the square matrix. */
-         sm = sqmat;
-
-/* Pointer to to start of the next row in the supplied matrix. */
-         m = matrix;
-
-/* Number of rows written to sqmat */
-         jrow = 0;
-
-/* Check each row of the supplied matrix. */
-         for( irow = 0; irow < nrow; irow++ ) {
-
-/* See if the current row of the supplied matrix contains only zeros. If
-   we have already deleted enough rows to create a square matrix, we do not
-   delete any more. */
-            if( excess ) {
-               all_zero = 1;
-               for( icol = 0; icol < ncol; icol++ ) {
-                  if( m[ icol ] != 0.0 ) {
-                     all_zero = 0;
-                     break;
-                  }
-               }
-            } else {
-               all_zero = 0;
-            }
-
-/* If so we do not copy the supplied row to the used matrix. We therefore
-   have one less excess row. */
-            if( all_zero ) {
-               excess--;
-               m += ncol;
-
-/* If the current row of the supplied matrix was not entirely zero, we
-   copy it to the used matrix so long as the matrix is not already full. */
-            } else if( jrow < ncol ) {
-               for( icol = 0; icol < ncol; icol++ ) {
-                  *(sm++) = *(m++);
-               }
-
-               jrow++;
-
-/* If we have filled the square matrix, we have nothing else to do. */
-            } else {
-               break;
+/* Flag any rows and columns that should be ignored because they contain
+   only bad values or zeros. */
+   userow = astCalloc( nrow, sizeof( *userow ) );
+   usecol = astCalloc( ncol, sizeof( *userow ) );
+   if( astOK ) {
+      m = matrix;
+      for( irow = 0; irow < nrow; irow++ ) {
+         for( icol = 0; icol < ncol; icol++,m++ ) {
+            if( *m != AST__BAD && *m != 0.0 ) {
+               usecol[ icol ] = 1;
+               userow[ irow ] = 1;
             }
          }
       }
 
-/* If the matrix has more columns than rows, attempt to make it square by
-   removing any columns that contain only zeros. */
-   } else if( excess < 0 ) {
-      excess = -excess;
-
-/* Allocate an array to hold a square matrix. */
-      ndim = nrow;
-      sqmat = astMalloc( ndim*ndim*sizeof( *sqmat ) );
-      if( astOK ) {
-
-/* Pointer to to start of the next column in the square matrix. */
-         sm = sqmat;
-
-/* Pointer to to start of the next column in the supplied matrix. */
-         m = matrix;
-
-/* Number of columns written to sqmat */
-         jcol = 0;
-
-/* Check each column of the supplied matrix. */
-         for( icol = 0; icol < ncol; icol++ ) {
-
-/* See if the current column of the supplied matrix contains only zeros. If
-   we have already deleted enough columns to create a square matrix, we do
-   not delete any more. */
-            if( excess ) {
-               all_zero = 1;
-               for( irow = 0; irow < nrow; irow++ ) {
-                  if( m[ irow*ncol ] != 0.0 ) {
-                     all_zero = 0;
-                     break;
-                  }
-               }
-            } else {
-               all_zero = 0;
-            }
-
-/* If so we do not copy the supplied column to the used matrix. We therefore
-   have one less excess column. */
-            if( all_zero ) {
-               excess--;
-               m++;
-
-/* If the current column of the supplied matrix was not entirely zero, we
-   copy it to the used matrix so long as the matrix is not already full. */
-            } else if( jcol < nrow ) {
-               for( irow = 0; irow < nrow; irow++ ) {
-                  sm[ irow*nrow ] = m[ irow*ncol ];
-               }
-
-               jcol++;
-               m++;
-               sm++;
-
-/* If we have filled the square matrix, we have nothing else to do. */
-            } else {
-               break;
-            }
-         }
+/* Find the number of usable rows and columns. */
+      nrowuse = 0;
+      for( irow = 0; irow < nrow; irow++ ) {
+         if( userow[ irow ] ) nrowuse++;
       }
 
-/* If the supplied matrix is already square, use it as supplied. */
-   } else {
-      sqmat = (double *) matrix;
-      ndim = nrow;
+      ncoluse = 0;
+      for( icol = 0; icol < ncol; icol++ ) {
+         if( usecol[ icol ] ) ncoluse++;
+      }
    }
 
-/* We can only calculate the determinant if the matrix is now square and no
-   error happened. */
-   if( excess == 0 && astOK ) {
+/* Return AST__BAD if the resulting matrix is not square. */
+   if( ncoluse == nrowuse ) {
+      ndim = ncoluse;
 
+/* If any rows or columns contained just bad or zero values, create a new
+   matrix that excludes them. */
+      if( ncol > ndim || nrow > ndim ) {
+         sqmat = astMalloc( ndim*ndim*sizeof(*sqmat) );
+         if( astOK ) {
+            m = matrix;
+            a = (double *) sqmat;
+            for( irow = 0; irow < nrow; irow++ ) {
+               if( userow[ irow ] ) {
+                  for( icol = 0; icol < ncol; icol++,m++ ) {
+                     if( usecol[ icol ] ) *(a++) = *m;
+                  }
+               } else {
+                  m += ncol;
+               }
+            }
+         }
+
+/* If no rows or columns contained just bad values, use the supplied
+   matrix. */
+      } else {
+         sqmat = matrix;
+      }
+
+/* Calculate the determinant of the modified matrix */
       if( ndim == 1 ) {
          result = sqmat[ 0 ];
 
@@ -7983,7 +7911,11 @@ static double MatrixDet( int nrow, int ncol, const double *matrix, int *status )
    }
 
 /* Free the square matrix if it was allocated here. */
-   if( sqmat != matrix ) sqmat = astFree( sqmat );
+   if( sqmat != matrix ) sqmat = astFree( (void *) sqmat );
+
+/* Free the usable row/column flags. */
+   userow = astFree( userow );
+   usecol = astFree( usecol );
 
    return result;
 }
