@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 import shutil
 import glob
+import inspect
 
 #  Provide recall and editing facilities for parameter prompts
 import readline
@@ -30,7 +31,6 @@ def cmd():
    global __cmd
    if __cmd == None:
       __cmd = os.path.basename(sys.argv[0])
-   l = len(__cmd)
    if __cmd[-3:] == ".py":
       __cmd = __cmd[:-3]
    return __cmd
@@ -322,7 +322,11 @@ class ParSys(object):
    validated when the calling script attempts to get the parameter
    value. An UnknownParameterError is raised if the command line
    includes values for which there are no corresponding Parameters in
-   the ParSys.
+   the ParSys. If "--help" or "-h" is found on the command line, the
+   docstring from the top-level executing script is displayed. If no
+   docstring is available, a string is displayed holding the script
+   name followed by the names of the script parameters with any
+   associated defaults, in their expected order.
 
    Three parameters controlling the level of information to display and
    log are created automatically when the ParSys constructor is called.
@@ -471,8 +475,19 @@ class ParSys(object):
       byPosition = []
       for item in sys.argv[1:]:
 
+         #  If "-h" or "--help" is encountered at any point, display the
+         #  docstring from the top-level script, if available. Otherwise,
+         #  display a simple list of the command name and parameters.
+         #  Then exit the script.
          if item == "--help" or item == "-h":
-            print(self.usage)
+            try:
+               frm = inspect.stack()[ -1 ][0]
+               text = inspect.getargvalues(frm)[3]["__doc__"]
+            except:
+               text = None;
+            if not text:
+               text = self.usage
+            print(text)
             sys.exit(0)
 
          self.cmdline += "{0} ".format(item)
@@ -485,9 +500,8 @@ class ParSys(object):
             value = item
 
          if value[0] == "\"" or value[0] == "'":
-            l = len(value)
-            if value[0] == value[l-1]:
-               value = value[1:l-1]
+            if value[0] == value[-1]:
+               value = value[1:-1]
 
          if name == None:
             byPosition.append(value)
