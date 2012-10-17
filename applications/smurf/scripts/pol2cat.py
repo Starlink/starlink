@@ -532,7 +532,8 @@ try:
 
 #  Create a FITS catalogue containing the polarisation vectors.
    msg_out( "Creating the output catalogue: {0}...".format(outcat) )
-   invoke( "$POLPACK_DIR/polvec {0} cat={1}".format(cube,outcat) )
+   msg = invoke( "$POLPACK_DIR/polvec {0} cat={1}".format(cube,outcat) )
+   msg_out( "\n{0}\n".format(msg) )
 
 #  If required, produce a vector plot.
    if plot != None:
