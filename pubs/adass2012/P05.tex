@@ -1,0 +1,174 @@
+% This is the aspauthor.tex LaTeX file
+% Copyright 2010, Astronomical Society of the Pacific Conference Series
+
+\documentclass[11pt,twoside]{article}
+\usepackage{asp2010}
+
+\resetcounters
+
+\bibliographystyle{asp2010}
+
+\markboth{Berry et al.}{Starlink 2012 - The Kapuahi Release}
+
+\begin{document}
+
+\title{Starlink 2012 - The Kapuahi Release}
+
+\author{David~Berry$^1$, Malcolm~Currie$^1$, Tim~Jenness$^1$, Peter~Draper$^2$, Graham~Bell$^1$, and Remo~Tilanus$^1$
+\affil{$^1$Joint Astronomy Centre, Hilo, Hawaii}
+\affil{$^2$Dept. of Physics, University of Durham, UK}}
+
+\begin{abstract}
+We present details of the most recent release of the Starlink Software
+Collection, code-named "Kapuahi".
+\end{abstract}
+
+\section{What is Starlink?}
+
+Starlink (\url{www.starlink.ac.uk}) is an open-source project hosted on
+github that provides a wide range of astronomical applications and
+associated infrastructure libraries. From an initial start in 1980, the
+software has been in continuous development and use ever since, and is
+now supported primarily by the Joint Astronomy Centre, Hawaii
+(\url{www.jach.hawaii.edu}).
+
+\subsection{Selected Applications}
+\begin{description}
+\item[GAIA] An interactive display and analysis tool for use with images and
+cubes (\url{star-www.dur.ac.uk/~pdraper/gaia/gaia.html}).
+\item[SPLAT] An interactive spectral display and analysis tool (\url{star-www.dur.ac.uk/~pdraper/splat/splat.html}).
+\item[ORAC-DR] An automated data processing pipe-line system
+(\url{www.oracdr.org}).
+\item[KAPPA] Nearly 200 general purpose commands for the display and manipulation of N-dimensional arrays.
+\item[CCDPACK] Commands for the reduction of CCD data.
+\item[POLPACK] Commands for the creation and display of polarisation vectors from arrays of analysed intensity.
+\item[SMURF] Commands for the reduction of sub-mm data from the James Clerk Maxwell Telescope.
+\item[CUPID] Provides implementations of various clump-finding algorithms such as ClumpFind, GaussClumps, and others, together with other supporting commands.
+\item[ATOOLS] A command-line interface to the WCS management functions provided by the AST library.
+\item[CONVERT] Commands for converting to and from the Starlink NDF data format. Several foreign data formats are supporting, including FITS.
+\end{description}
+
+\subsection{Selected Infra-structure Libraries}
+\begin{description}
+\item[AST] Provides a high-level object-oriented approach to handling
+spatial, spectral and temporal WCS meta-data, with facilities for
+handling STC-S format and a wide range of FITS formats
+(\url{www.starlink.ac.uk/ast}).
+
+\item[NDF] The main data access library for Starlink-implements an extensible, hierarchical astronomical data model. Native NDF files use the HDS format, but the other formats such as FITS can also be read.
+\item[PAL] Provides low-level functions for manipulating celestial coordinate systems-a re-write in C of the earlier Fortran SLALIB library, using the SOFA library.
+\item[PCS] A collection of libraries that provide the integrated messaging and parameter system upon which the Starlink environment is built.
+\item[HDS] A low-level hierarchical data format.
+\end{description}
+
+\section{The Kapuahi Release - What's New?}
+Released in September 2012, the current release of the Starlink Software
+Collection has code name ``Kapuahi'' - the Hawaiian name for Aldebaran.
+This section lists a few of the more important changes since the previous
+release (``Namaka''). The development version adds support for data values
+stored as 64-bit integers.
+
+\subsection{Global Changes}
+\begin{itemize}
+\item Mutexes are used to serialise access to Fortran subroutines from within
+C code, making it safe to call them within a thread.
+\item All use of the SLALIB library within C code has been replaced the new
+PAL library (Fortran still uses SLALIB).
+\end{itemize}
+
+\subsection{Application Changes}
+\begin{description}
+
+\item[ATOOLS] \hfill
+\begin{itemize}
+\item All commands now allow the output WCS information to be created
+in various textual formats, including AST, XML, STC-S, or a variety of
+common FITS header formats.
+\end{itemize}
+
+\item[CUPID] \hfill
+\begin{itemize}
+\item GaussClumps now excludes peaks below the specified threshold from the output catalogue and NDF.
+\item GaussClumps has improved its ability to decompose merged clumps.
+\item FINDBACK now uses multiple processors or cores (if available) to speed up the the processing of independent slices.
+\item FINDBACK can now find and use an independent default noise value for each slice of supplied NDF.
+\end{itemize}
+
+\item[GAIA] \hfill
+\begin{itemize}
+\item A snapshot can now be taken of the whole image, including the off-screen parts, so it is now possible to capture a graphic of the whole image at full or higher resolution when it is larger than the main window.
+\item The "Intensity Map:" selector in the main panel has been replaced by a "Colour Scale:" selector, which gives more careful transformation of intensity into log-like space, reducing the false contouring seen in low intensities.
+\item The Coords menus in the cube and spectral display now also offers a selection of standards of rest.
+\item Several issues with the axes plotting in the three-dimensional visualisation toolboxes have been fixed. There is a new free-form entry area for AST attributes so that the axes can be configured.
+\end{itemize}
+
+\item[KAPPA] \hfill
+\begin{itemize}
+\item HISTOGRAM now allows different weights to be associated with each input pixel value.
+\item MFITTREND now permits processing of very large datasets by dividing into manageable sections.
+\item PASTE now allows a constant shifts of origin between successive pasted data. For instance, this can be used to paste a set of 2D images into a 3D cube.
+\item SCATTER now displays the Pearson coefficient of the data in the scatter plot, and writes it to a parameter.
+\item SETAXIS can now create axes describing a linear approximation to the WCS in the supplied NDF.
+\item SQORST now has an option to conserve flux.
+\item The REGRID, WCSALIGN and WCSMOSAIC commands now have more control over the details of how (as well as if) flux is conserved.
+\end{itemize}
+
+\item[SMURF] \hfill
+\begin{itemize}
+\item Many improvements have been made that allow better maps to be
+created from SCUBA-2 data (\url{scuba2.wordpress.com}).
+\item FIT1D is a new command that fits profiles to spectral lines.  It can fit complex spectra with multiple components and non-Gaussian shapes.
+\end{itemize}
+
+\end{description}
+
+\subsection{Library Changes}
+\begin{description}
+
+\item[AST] \hfill
+\begin{itemize}
+\item Now has a python interface-PyAST (\url{github.com/timj/starlink-pyast}).
+\item Now included in Fedora and Debian repositories.
+\item Now based on the SOFA and PAL libraries rather than SLALIB.
+\item Extended support for a variety of distorted FITS projections including SIP, TPV, TNX, ZPX, SAO, and SCAMP.
+\item Boundaries of complex Regions are now plotted much faster.
+\end{itemize}
+
+\item[NDF] \hfill
+\begin{itemize}
+\item Now has a python interface-PyNDF (\url{github.com/timj/starlink-pyndf}).
+\item Problems with the interpretation of NDF sections specified in WCS coordinates have been fixed.
+\item Foreign format NDFs may now have dots in the file base-name.
+\end{itemize}
+
+\item[PAL] \hfill
+\begin{itemize}
+\item A new C library that provides the functionality of the older Fortran SLALIB library through use of equivalent SOFA routines where available, or by a re-writing of the SLALIB Fortran code otherwise.
+\end{itemize}
+
+\item[THR] \hfill
+\begin{itemize}
+\item A new library that provides facilities to manage pools of persistent threads, allowing jobs to be run in parallel from within C applications.
+\end{itemize}
+
+\end{description}
+
+\section{The Starlink Github Repository}
+The Starlink git repositories have been moved from the Joint Astronomy
+Centre, Hawaii, and are now hosted on github
+(\url{github.com/Starlink/starlink}). It is expected that this
+will ease collaboration, give greater visibility and some degree of
+future-proofing for the Starlink Software Collection.
+
+\section{Obtaining Starlink Software}
+The Starlink Software Collection may be obtained in three ways:
+\begin{itemize}
+\item By downloading a pre-built Kapuahi release. These are available for both Linux and OS X (32 and 64 bit). See the Starlink home page for instructions.
+\item By copying the current cutting-edge build from the Joint Astronomy Centre, using rsync. Again, see the Starlink home page for instructions.
+\item By checking out the current source files from the github repository and building from source. See the README file in the root directory of the checkout for instructions.
+\end{itemize}
+
+
+\bibliography{P011}
+
+\end{document}
