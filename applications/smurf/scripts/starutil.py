@@ -609,7 +609,7 @@ class Parameter(object):
    An abstract base class describing a generic parameter.
 
    Subclasses of Parameter provide facilities for storing and validating
-   parameters of different types. The parameter class itself should never
+   parameters of different types. The Parameter class itself should never
    be instantiated. All parameters are initially unset when created.
 
    Class Constants:
@@ -652,6 +652,11 @@ class Parameter(object):
 
          V) If no default has been set, a NoValueError is raised and
          Parameter.UNSET is returned.
+
+         The string value obtained for the parameter may then be converted
+         to some other data type, depending on the actions of the particular
+         subclass of Parameter being used. The "raw" property can be used
+         to retrieve the uninterpreted string value.
       noprompt = boolean
          If False, then the user may be prompted to obtain a parameter
          value. The full prompt string contains the parameter name, the
@@ -667,6 +672,11 @@ class Parameter(object):
          re-prompted.
       help = string
          The help string. May be "None".
+      raw = string (read-only)
+         The raw string value of the parameter as obtained from the user
+         before any interpretation or conversion to other data types.
+         This will be None if no value has yet been obtained for the
+         parameter, or if a default of None was accepted by the user.
    '''
 
 
@@ -698,6 +708,7 @@ class Parameter(object):
       self.__help = None
       self.__value = Parameter.__unset
       self.__validated = False
+      self.__raw = None
       self._parsys = None
 
       #  Use "protected" setter methods to set the supplied field values.
@@ -712,6 +723,9 @@ class Parameter(object):
    #  Define "protected" accessor methods for all fields
    def _getName(self):  # Read-only
       return self.__name
+
+   def _getRaw(self):  # Read-only
+      return self.__raw
 
    def _getPrompt(self):
       return self.__prompt
@@ -771,12 +785,14 @@ class Parameter(object):
                defaultUsed = True
             else:
                raise NoValueError("\n{0}No value obtained for parameter {1}.".format(_cmd_token(),self._getName()))
+            self.__raw = value
          try:
             self._setValue( value )
             self.__validate()
             msg_out( "Parameter '{0} is set to '{1}'\n".format(self.__name,self.__value), DEBUG )
          except InvalidParameterError as err:
             self.__error(err)
+            self.__raw = None
 
          if defaultUsed:
             self._clearDefault()
@@ -797,6 +813,7 @@ class Parameter(object):
 
    #  Define public properties for all public fields
    name = property(_getName, None, None, "The parameter name")
+   raw = property(_getRaw, None, None, "The raw string value of the parameter")
    prompt = property(_getPrompt, _setPrompt, None, "The user prompt string")
    default = property(_getDefault, _setDefault, None, "The default value")
    noprompt = property(_getNoPrompt, _setNoPrompt, None, "Do not prompt the user?")
