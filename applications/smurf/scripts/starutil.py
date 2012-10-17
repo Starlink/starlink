@@ -1224,7 +1224,8 @@ class ParNDG(Parameter):
 
    Constructor:
       param = ParNDG( name, prompt=None, default=Parameter.UNSET,
-                      noprompt=False, help=None, maxsize=None, minsize=1 )
+                      noprompt=False, help=None, exists=True, maxsize=None,
+                      minsize=1 )
          name = string
             The parameter name. The supplied string is converted to upper case.
          prompt = string
@@ -1237,6 +1238,9 @@ class ParNDG(Parameter):
             value will be used if set (a NoValueError will be raised otherwise).
          help = string
             The help string
+         exists = boolean
+            If True, the supplied NDFs must all exist. If False, no check is
+            made on whether they exist or not.
          maxsize = int
             The largest number of NDFs allowed in the group. Unlimited if
             maxsize=None.
@@ -1247,6 +1251,9 @@ class ParNDG(Parameter):
       This class defines the following properties in addition to those of
       the Parameter class:
 
+      exists = boolean
+         If True, the supplied NDFs must all exist. If False, no check is
+         made on whether they exist or not.
       maxsize = int
          The largest number of NDFs allowed in the group. Unlimited if
          maxsize=None.
@@ -1260,12 +1267,23 @@ class ParNDG(Parameter):
    '''
 
    def __init__(self, name, prompt=None, default=Parameter.UNSET,
-                noprompt=False, help=None, maxsize=None, minsize=1 ):
+                noprompt=False, help=None, exists=True, maxsize=None,
+                minsize=1 ):
       Parameter.__init__(self, name, prompt, default, noprompt, help )
+      self.__exists = None
       self.__maxsize = None
       self.__minsize = None
+      self._setExists(exists)
       self._setMaxSize(maxsize)
       self._setMinSize(minsize)
+
+   def _getExists(self):
+      return self.__exists
+   def _setExists(self,exists):
+      if exists:
+         self.__exists = True
+      else:
+         self.__exists = False
 
    def _getMaxSize(self):
       return self.__maxsize
@@ -1291,6 +1309,7 @@ class ParNDG(Parameter):
 
    minsize = property(_getMinSize, _setMinSize, None, "The minimum number of NDFs")
    maxsize = property(_getMaxSize, _setMaxSize, None, "The maximum number of NDFs")
+   exists = property(_getExists, _setExists, None, "Must the supplied NDFs exist?")
 
    def _isValid(self):
       val = Parameter._getValue(self)
@@ -1298,7 +1317,7 @@ class ParNDG(Parameter):
          size = 0
       else:
          try:
-            val = NDG("{0}".format(val).strip())
+            val = NDG("{0}".format(val).strip(),self.exists)
             size = len(val)
          except AtaskError:
             raise InvalidParameterError( "\n{0}Cannot access a group of existing NDFs using parameter '{1}' ('{2}').".format(_cmd_token(),Parameter._getName(self),val) )
