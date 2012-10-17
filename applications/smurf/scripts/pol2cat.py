@@ -1,199 +1,199 @@
 #!/usr/bin/env python
 
 '''
-#+
-#  Name:
-#     pol2cat
+*+
+*  Name:
+*     pol2cat
 
-#  Purpose:
-#     Create a catalogue of Q,U and I values from a set of POL-2 data
-#     files, and optionally creates a vector plot.
+*  Purpose:
+*     Create a catalogue of Q,U and I values from a set of POL-2 data
+*     files, and optionally creates a vector plot.
 
-#  Language:
-#     python (2.7 or 3.*)
+*  Language:
+*     python (2.7 or 3.*)
 
-#  Description:
-#     This script runs SMURF:CALCQU on the POL-2 data files specified by
-#     parameter IN, to create a set of images holding the mean Q and U
-#     values in each bolometer. Each pair of Q and U images contains data
-#     for a single sub-array from a short period of time over which the
-#     position of each bolometer on the sky does not change significantly.
-#
-#     For each sub-array, images holding the mean bolometer Q and U are
-#     found. These mean Q and U images are then subtracted from the
-#     individual Q and U images.
-#
-#     All the Q images are then mosaiced together into a single Q image,
-#     using the total intensity map specified by parameter IREF to define
-#     the pixel grid. All the U images are mosaiced together in the same
-#     way.
-#
-#     These Q, U and I images are then converted into a set of polarisation
-#     vectors using POLPACK:POLVEC, and are stored in the FITS file
-#     specified by parameter CAT.
-#
-#     Optionally, a map of polarised intensity can be produced. See
-#     parameter PI.
-#
-#     Optionally, a vector plot can then be produced from the catalogue.
-#     See parameter PLOT. However, it is usually much more versatile and
-#     convenient to examine the final catalogue using TOPCAT, or the
-#     polarimetry toolbox in GAIA.
+*  Description:
+*     This script runs SMURF:CALCQU on the POL-2 data files specified by
+*     parameter IN, to create a set of images holding the mean Q and U
+*     values in each bolometer. Each pair of Q and U images contains data
+*     for a single sub-array from a short period of time over which the
+*     position of each bolometer on the sky does not change significantly.
+*
+*     For each sub-array, images holding the mean bolometer Q and U are
+*     found. These mean Q and U images are then subtracted from the
+*     individual Q and U images.
+*
+*     All the Q images are then mosaiced together into a single Q image,
+*     using the total intensity map specified by parameter IREF to define
+*     the pixel grid. All the U images are mosaiced together in the same
+*     way.
+*
+*     These Q, U and I images are then converted into a set of polarisation
+*     vectors using POLPACK:POLVEC, and are stored in the FITS file
+*     specified by parameter CAT.
+*
+*     Optionally, a map of polarised intensity can be produced. See
+*     parameter PI.
+*
+*     Optionally, a vector plot can then be produced from the catalogue.
+*     See parameter PLOT. However, it is usually much more versatile and
+*     convenient to examine the final catalogue using TOPCAT, or the
+*     polarimetry toolbox in GAIA.
 
-#  Usage:
-#     pol2cat.py in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
-#                [config] [device] [retain] [msg_filter] [ilevel] [glevel]
-#                [logfile]
+*  Usage:
+*     pol2cat.py in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
+*                [config] [device] [retain] [msg_filter] [ilevel] [glevel]
+*                [logfile]
 
-#  Parameters:
-#     IN = NDF (Read)
-#        A group of POL-2 time series NDFs.
-#     CAT = LITERAL (Read)
-#        The output FITS vector catalogue.
-#     CONFIG = LITERAL (Read)
-#        The configuration to use when cleaning the raw data. This should
-#        be specified in the same way as the CONFIG parameter for
-#        SMURF:MAKEMAP. ["^$STARLINK_DIR/share/smurf/dimmconfig.lis"]
-#     DEVICE = LITERAL (Read)
-#        The name of the graphics device on which to produce the vector
-#        plot.  [current graphics device]
-#     DOMAIN = LITERAL (Read)
-#        The domain for alignment:
-#
-#        - "FPLANE": Alignment occurs in focal plane coordinates.
-#
-#        - "SKY": Alignment occurs in celestial sky coordinates.
-#
-#        ["SKY"]
-#     GLEVEL = LITERAL (Read)
-#        Controls the level of information to write to a text log file.
-#        Allowed values are as for "ILEVEL". The log file to create is
-#        specified via parameter "LOGFILE. In adition, the glevel value
-#        can be changed by assigning a new integer value (one of
-#        starutil.NONE, starutil.CRITICAL, starutil.PROGRESS,
-#        starutil.ATASK or starutil.DEBUG) to the module variable
-#        starutil.glevel. ["ATASK"]
-#     ILEVEL = LITERAL (Read)
-#        Controls the level of information displayed on the screen by the
-#        script. It can take any of the following values (note, these values
-#        are purposefully different to the SUN/104 values to avoid confusion
-#        in their effects):
-#
-#        - "NONE": No screen output is created
-#
-#        - "CRITICAL": Only critical messages are displayed such as warnings.
-#
-#        - "PROGRESS": Extra messages indicating script progress are also
-#        displayed.
-#
-#        - "ATASK": Extra messages are also displayed describing each atask
-#        invocation. Lines starting with ">>>" indicate the command name
-#        and parameter values, and subsequent lines hold the screen output
-#        generated by the command.
-#
-#        - "DEBUG": Extra messages are also displayed containing unspecified
-#        debugging information. In addition scatter plots showing how each Q
-#        and U image compares to the mean Q and U image are displayed at this
-#        ILEVEL.
-#
-#        In adition, the glevel value can be changed by assigning a new
-#        integer value (one of starutil.NONE, starutil.CRITICAL,
-#        starutil.PROGRESS, starutil.ATASK or starutil.DEBUG) to the module
-#        variable starutil.glevel. ["PROGRESS"]
-#     IREF = NDF (Read)
-#        An optional total intensity map covering the same area. If
-#        supplied, this will be used to determine percentage polarisation,
-#        to determine the pixel size and projection for the Q and U images,
-#        and will also be used a background for the plotted vectors. It
-#        will also determine the extent of the resulting catalogue and
-#        vector plot. If a null value (!) is supplied, then an image of
-#        polarised intensity calculated from the supplied POL-2 data
-#        will be used instead. This will result in percentage polarisation
-#        values being 100%. The extent and WCS of the vector plot and
-#        catalogue will then be determined by the supplied POL-2 data files.
-#     LOGFILE = LITERAL (Read)
-#        The name of the log file to create if GLEVEL is not NONE. The
-#        default is "<command>.log", where <command> is the name of the
-#        executing script (minus any trailing ".py" suffix), and will be
-#        created in the current directory. Any file with the same name is
-#        over-written. The script can change the logfile if necessary by
-#        assign the new log file path to the module variable
-#        "starutil.logfile". Any old log file will be closed befopre the
-#        new one is opened. []
-#     MAXLEN = _REAL (Read)
-#        The maximum length for the plotted vectors, in terms of the
-#        quantity specified by parameter PLOT. Only vectors below this
-#        length are plotted. If a null (!) value is supplied,  no maximum
-#        length is imposed. [!]
-#     MSG_FILTER = LITERAL (Read)
-#        Controls the default level of information reported by Starlink
-#        atasks invoked within the executing script. This default can be
-#        over-ridden by including a value for the msg_filter parameter
-#        within the command string passed to the "invoke" function. The
-#        accepted values are the list defined in SUN/104 ("None", "Quiet",
-#        "Normal", "Verbose", etc). ["Normal"]
-#     PI = NDF (Read)
-#        The output NDF in which to return the polarised intensity map.
-#        No polarised intensity map will be created if null (!) is supplied.
-#        If a value is supplied for parameter IREF, then PI defaults to
-#        null. Otherwise, the user is prompted for a value if none was
-#        supplied on the command line. []
-#     PIXSIZE = _REAL (Read)
-#        The pixel size to use when forming the combined Q and U images,
-#        in arc-seconds. If null (!) is supplied, the pixel size of the
-#        image given by IREF will be used. If no image is given for IREF,
-#        then the default pixel size used by CALCQU will be used (i.e.
-#        pixel size equals bolometer spacing). [!]
-#     PLOT = LITERAL (Read)
-#        The quantity that gives the lengths of the plotted vectors:
-#
-#         - "P": Percentage polarisation.
-#
-#         - "PI": Polarised intensity.
-#
-#        If a null(!) value is supplied, no vectors will be plotted. Only
-#        the vectors that pass the tests specified by parameter SNR and
-#        MAXLEN are plotted. If a value is supplied for parameter IREF, then
-#        only vectors that fall within the IREF image will be displayed.
-#        The plot is displayed on the device specified by parameter DEVICE. [!]
-#     RETAIN = _LOGICAL (Read)
-#        Should the temporary directory containing the intermediate files
-#        created by this script be retained? If not, it will be deleted
-#        before the script exits. If retained, a message will be
-#        displayed at the end specifying the path to the directory. [FALSE]
-#     SNR = _REAL (Read)
-#        The minimum ratio of the polarised intensity to the error on
-#        polarised intensity for vectors to be plotted. [3.0]
+*  Parameters:
+*     IN = NDF (Read)
+*        A group of POL-2 time series NDFs.
+*     CAT = LITERAL (Read)
+*        The output FITS vector catalogue.
+*     CONFIG = LITERAL (Read)
+*        The configuration to use when cleaning the raw data. This should
+*        be specified in the same way as the CONFIG parameter for
+*        SMURF:MAKEMAP. ["^$STARLINK_DIR/share/smurf/dimmconfig.lis"]
+*     DEVICE = LITERAL (Read)
+*        The name of the graphics device on which to produce the vector
+*        plot.  [current graphics device]
+*     DOMAIN = LITERAL (Read)
+*        The domain for alignment:
+*
+*        - "FPLANE": Alignment occurs in focal plane coordinates.
+*
+*        - "SKY": Alignment occurs in celestial sky coordinates.
+*
+*        ["SKY"]
+*     GLEVEL = LITERAL (Read)
+*        Controls the level of information to write to a text log file.
+*        Allowed values are as for "ILEVEL". The log file to create is
+*        specified via parameter "LOGFILE. In adition, the glevel value
+*        can be changed by assigning a new integer value (one of
+*        starutil.NONE, starutil.CRITICAL, starutil.PROGRESS,
+*        starutil.ATASK or starutil.DEBUG) to the module variable
+*        starutil.glevel. ["ATASK"]
+*     ILEVEL = LITERAL (Read)
+*        Controls the level of information displayed on the screen by the
+*        script. It can take any of the following values (note, these values
+*        are purposefully different to the SUN/104 values to avoid confusion
+*        in their effects):
+*
+*        - "NONE": No screen output is created
+*
+*        - "CRITICAL": Only critical messages are displayed such as warnings.
+*
+*        - "PROGRESS": Extra messages indicating script progress are also
+*        displayed.
+*
+*        - "ATASK": Extra messages are also displayed describing each atask
+*        invocation. Lines starting with ">>>" indicate the command name
+*        and parameter values, and subsequent lines hold the screen output
+*        generated by the command.
+*
+*        - "DEBUG": Extra messages are also displayed containing unspecified
+*        debugging information. In addition scatter plots showing how each Q
+*        and U image compares to the mean Q and U image are displayed at this
+*        ILEVEL.
+*
+*        In adition, the glevel value can be changed by assigning a new
+*        integer value (one of starutil.NONE, starutil.CRITICAL,
+*        starutil.PROGRESS, starutil.ATASK or starutil.DEBUG) to the module
+*        variable starutil.glevel. ["PROGRESS"]
+*     IREF = NDF (Read)
+*        An optional total intensity map covering the same area. If
+*        supplied, this will be used to determine percentage polarisation,
+*        to determine the pixel size and projection for the Q and U images,
+*        and will also be used a background for the plotted vectors. It
+*        will also determine the extent of the resulting catalogue and
+*        vector plot. If a null value (!) is supplied, then an image of
+*        polarised intensity calculated from the supplied POL-2 data
+*        will be used instead. This will result in percentage polarisation
+*        values being 100%. The extent and WCS of the vector plot and
+*        catalogue will then be determined by the supplied POL-2 data files.
+*     LOGFILE = LITERAL (Read)
+*        The name of the log file to create if GLEVEL is not NONE. The
+*        default is "<command>.log", where <command> is the name of the
+*        executing script (minus any trailing ".py" suffix), and will be
+*        created in the current directory. Any file with the same name is
+*        over-written. The script can change the logfile if necessary by
+*        assign the new log file path to the module variable
+*        "starutil.logfile". Any old log file will be closed befopre the
+*        new one is opened. []
+*     MAXLEN = _REAL (Read)
+*        The maximum length for the plotted vectors, in terms of the
+*        quantity specified by parameter PLOT. Only vectors below this
+*        length are plotted. If a null (!) value is supplied,  no maximum
+*        length is imposed. [!]
+*     MSG_FILTER = LITERAL (Read)
+*        Controls the default level of information reported by Starlink
+*        atasks invoked within the executing script. This default can be
+*        over-ridden by including a value for the msg_filter parameter
+*        within the command string passed to the "invoke" function. The
+*        accepted values are the list defined in SUN/104 ("None", "Quiet",
+*        "Normal", "Verbose", etc). ["Normal"]
+*     PI = NDF (Read)
+*        The output NDF in which to return the polarised intensity map.
+*        No polarised intensity map will be created if null (!) is supplied.
+*        If a value is supplied for parameter IREF, then PI defaults to
+*        null. Otherwise, the user is prompted for a value if none was
+*        supplied on the command line. []
+*     PIXSIZE = _REAL (Read)
+*        The pixel size to use when forming the combined Q and U images,
+*        in arc-seconds. If null (!) is supplied, the pixel size of the
+*        image given by IREF will be used. If no image is given for IREF,
+*        then the default pixel size used by CALCQU will be used (i.e.
+*        pixel size equals bolometer spacing). [!]
+*     PLOT = LITERAL (Read)
+*        The quantity that gives the lengths of the plotted vectors:
+*
+*         - "P": Percentage polarisation.
+*
+*         - "PI": Polarised intensity.
+*
+*        If a null(!) value is supplied, no vectors will be plotted. Only
+*        the vectors that pass the tests specified by parameter SNR and
+*        MAXLEN are plotted. If a value is supplied for parameter IREF, then
+*        only vectors that fall within the IREF image will be displayed.
+*        The plot is displayed on the device specified by parameter DEVICE. [!]
+*     RETAIN = _LOGICAL (Read)
+*        Should the temporary directory containing the intermediate files
+*        created by this script be retained? If not, it will be deleted
+*        before the script exits. If retained, a message will be
+*        displayed at the end specifying the path to the directory. [FALSE]
+*     SNR = _REAL (Read)
+*        The minimum ratio of the polarised intensity to the error on
+*        polarised intensity for vectors to be plotted. [3.0]
 
-#  Copyright:
-#     Copyright (C) 2012 Science & Technology Facilities Council.
-#     All Rights Reserved.
+*  Copyright:
+*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
-#  Licence:
-#     This program is free software; you can redistribute it and/or
-#     modify it under the terms of the GNU General Public License as
-#     published by the Free Software Foundation; either Version 2 of
-#     the License, or (at your option) any later version.
-#
-#     This program is distributed in the hope that it will be
-#     useful, but WITHOUT ANY WARRANTY; without even the implied
-#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-#     PURPOSE. See the GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with this program; if not, write to the Free Software
-#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-#     02110-1301, USA.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
-#  Authors:
-#     DSB: David S. Berry (JAC, Hawaii)
-#     {enter_new_authors_here}
+*  Authors:
+*     DSB: David S. Berry (JAC, Hawaii)
+*     {enter_new_authors_here}
 
-#  History:
-#     15-OCT-2012 (DSB):
-#        Original version
+*  History:
+*     15-OCT-2012 (DSB):
+*        Original version
 
-#-
+*-
 '''
 
 
