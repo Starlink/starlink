@@ -32,20 +32,23 @@
 #     vectors using POLPACK:POLVEC, and are stored in the FITS file
 #     specified by parameter CAT.
 #
+#     Optionally, a map of polarised intensity can be produced. See
+#     parameter PI.
+#
 #     Optionally, a vector plot can then be produced from the catalogue.
 #     See parameter PLOT. However, it is usually much more versatile and
 #     convenient to examine the final catalogue using TOPCAT, or the
 #     polarimetry toolbox in GAIA.
 
 #  Usage:
-#     pol2cat.py in cat iref [plot] [snr] [maxlen] [domain] [pixsize]
+#     pol2cat.py in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
 #                [config] [device] [retain] [msg_filter] [ilevel] [glevel]
 #                [logfile]
 
 #  Parameters:
 #     IN = NDF (Read)
 #        A group of POL-2 time series NDFs.
-#     CAT = NDF (Read)
+#     CAT = LITERAL (Read)
 #        The output FITS vector catalogue.
 #     CONFIG = LITERAL (Read)
 #        The configuration to use when cleaning the raw data. This should
@@ -129,6 +132,12 @@
 #        within the command string passed to the "invoke" function. The
 #        accepted values are the list defined in SUN/104 ("None", "Quiet",
 #        "Normal", "Verbose", etc). ["Normal"]
+#     PI = NDF (Read)
+#        The output NDF in which to return the polarised intensity map.
+#        No polarised intensity map will be created if null (!) is supplied.
+#        If a value is supplied for parameter IREF, then PI defaults to
+#        null. Otherwise, the user is prompted for a value if none was
+#        supplied on the command line. []
 #     PIXSIZE = _REAL (Read)
 #        The pixel size to use when forming the combined Q and U images,
 #        in arc-seconds. If null (!) is supplied, the pixel size of the
@@ -216,6 +225,9 @@ try:
                                  help="Enter a null (!) to use an artifical total flux map",
                                  minsize=0, maxsize=1 ))
 
+   params.append(starutil.ParNDG("PI", "The output polarised intensity map",
+                                 default=None, exists=False, minsize=0, maxsize=1 ))
+
    params.append(starutil.ParChoice("PLOT", ["P","PI"], "Quantity to define "
                                  "lengths of plotted vectors", None,
                                  noprompt=True))
@@ -261,6 +273,12 @@ try:
 
 #  Get the image to use for the total flux (I) map.
    iref = parsys["IREF"].value
+
+#  If a value was supplied for IREF, indicate that parameter PI should not
+#  be prompted for. The default value (None) will then be used if no value
+#  has been supplied on the command line. Then get the PI value ot use.
+   if iref: parsys["PI"].noprompt = True
+   pimap = parsys["PI"].value
 
 #  Get the output catalogue now to avoid a long wait before the user gets
 #  prompted for it.
@@ -531,8 +549,13 @@ try:
    invoke( "$POLPACK_DIR/polext {0} stokes=qui".format(cube) )
 
 #  Create a FITS catalogue containing the polarisation vectors.
-   msg_out( "Creating the output catalogue: {0}...".format(outcat) )
-   msg = invoke( "$POLPACK_DIR/polvec {0} cat={1}".format(cube,outcat) )
+   command = "$POLPACK_DIR/polvec {0} cat={1}".format(cube,outcat)
+   if pimap:
+      command = "{0} ip={1}".format(command,pimap)
+      msg_out( "Creating the output catalogue {0} and polarised intensity map {1}...".format(outcat,pimap) )
+   else:
+      msg_out( "Creating the output catalogue: {0}...".format(outcat) )
+   msg = invoke( command )
    msg_out( "\n{0}\n".format(msg) )
 
 #  If required, produce a vector plot.
