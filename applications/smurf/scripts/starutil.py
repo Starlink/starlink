@@ -90,6 +90,19 @@ def __open_log_file():
       print( "Logging to file {0}".format(logfile) )
 
 
+#  Funtion to remove the current working directory from the front of a
+#  file path.
+def _rmcwd(path):
+   cwd = os.getcwd()
+   if path.find(cwd) == 0:
+      return path[len(cwd)+1:]
+   elif path.find("./") == 0:
+      return path[3:]
+   else:
+      return path
+
+
+
 def msg_out(text,level=PROGRESS):
    """
 
@@ -1731,9 +1744,9 @@ class NDG(object):
    # Format an NDG into a shell quoted group expression
    def __str__(self):
       if self.__file:
-         return shell_quote("^{0}".format(self.__file))
+         return shell_quote("^{0}".format(_rmcwd(self.__file)))
       elif len(self.__ndfs) > 0:
-         return shell_quote("{0}".format(self.__ndfs[0]))
+         return shell_quote("{0}".format(_rmcwd(self.__ndfs[0])))
       else:
          return shell_quote("")
 
