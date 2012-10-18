@@ -1275,6 +1275,11 @@
 *     2012-05-01 (DSB):
 *        Allow premature termination of iterative algorithm by pressing
 *        control-C.
+*     2012-18-10 (DSB):
+*        Store provenance after the map has been made (rather than before)
+*        so that all parameter values recorded are sure to be the ones which
+*        were actually used rather than ones from the previous invocation
+*        that were stored in the parameter file on start-up.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -2181,37 +2186,6 @@ void smurf_makemap( int *status ) {
     /* Allocate space for hitsmap */
     hitsmap = astCalloc( nxy, sizeof (*hitsmap) );
 
-    /* Loop over all input data files to setup provenance handling */
-    for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {
-      smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
-      if( *status != SAI__OK) {
-        msgSeti("I",i);
-        msgSeti("S",size);
-        errRep(FUNC_NAME, "Error opening input file ^I of ^S for provenance tracking", status);
-      }
-
-      /* Propagate provenance to the output file */
-      smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(ITER)",
-                           &oprov, status);
-
-      /* Handle output FITS header creation (since the file is open and
-         the header is available) */
-      smf_fits_outhdr( data->hdr->fitshdr, &fchan, status );
-
-      /* close the input file */
-      smf_close_file( &data, status );
-    }
-
-    /* Flush the provenance */
-    if (oprov) {
-      ndgWriteProv( oprov, ondf, 1, status );
-      oprov = ndgFreeProv( oprov, status );
-    }
-
-    /*** TIMER ***/
-    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": %f s setting up provenance",
-               status, smf_timerupdate(&tv1,&tv2,status) );
-
     /* We can unlock the config KeyMap now since we have got the user's
        configuration (the point of locking it was to allow the user to
        get error messages describing any unknown parameters the supplied
@@ -2278,6 +2252,39 @@ void smurf_makemap( int *status ) {
                    "map.\n\n", status );
       }
     }
+
+    /* Now that the map is created and all parameters have been accessed,
+       history information and provenance can now be stored in the output.
+       Loop over all input data files to setup provenance handling */
+    for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {
+      smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+      if( *status != SAI__OK) {
+        msgSeti("I",i);
+        msgSeti("S",size);
+        errRep(FUNC_NAME, "Error opening input file ^I of ^S for provenance tracking", status);
+      }
+
+      /* Propagate provenance to the output file */
+      smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(ITER)",
+                           &oprov, status);
+
+      /* Handle output FITS header creation (since the file is open and
+         the header is available) */
+      smf_fits_outhdr( data->hdr->fitshdr, &fchan, status );
+
+      /* close the input file */
+      smf_close_file( &data, status );
+    }
+
+    /* Flush the provenance */
+    if (oprov) {
+      ndgWriteProv( oprov, ondf, 1, status );
+      oprov = ndgFreeProv( oprov, status );
+    }
+
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": %f s setting up provenance",
+               status, smf_timerupdate(&tv1,&tv2,status) );
 
     /* Write ADAM parameters */
     parPut0d( "NBOLOEFF", nboloeff, status );
