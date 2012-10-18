@@ -29,6 +29,15 @@
 *        The global status.
 
 *  Notes:
+*     -  The values stored in the history component for any program
+*     parameters that have not yet been accessed by the program at the
+*     time this routine is called may not be correct. The value left by
+*     the previous invocation of the program will be used, if it is stored
+*     in the program's parameter file. If there is no value for the
+*     parameter in the parameter file, a value of "<not yet accessed>"
+*     will be stored for the parameter in the history component. For this
+*     reason, this routine should usually be called once all program
+*     parameters have been accessed.
 *     -  Default history information will normally be provided
 *     automatically by the NDF_ system when an NDF is released, so a
 *     call to this routine is not usually required. It is provided so

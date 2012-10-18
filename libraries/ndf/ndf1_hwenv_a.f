@@ -94,6 +94,11 @@
 *     2011-09-08 (TIMJ):
 *        Correct offsetting when breaking a long parameter over multiple
 *        lines. We were losing INDENT characters at each line break.
+*     18-OCT-2012 (DSB):
+*        If a parameter value has not yet been retrieved by the application
+*        when this routine is called, it may not have a current value,
+*        causing an error to be reported by SUBPAR_CURVAL. Catch this error
+*        and use a value of "<not yet accessed>".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -233,8 +238,31 @@
                         CALL MSG_SETC( 'P', PARAM )
                         IF ( STATE .EQ. PAR__ACTIVE ) THEN
                            CALL SUBPAR_FINDPAR( PARAM, NCODE, STATUS )
-                           CALL SUBPAR_CURVAL( NCODE, VALUE, STATUS )
-                           CALL MSG_SETC( 'V', VALUE )
+
+*  A parameter will be in the active state if a value is supplied for it
+*  on the command line, but that value is only saved as the current value
+*  when the value of the parameter is accessed by the application using
+*  PAR_GETx etc. So if this routine is called before the parameter is
+*  accessed, it will be in the active state but may not have a current
+*  value. In which case the following call to SUBPAR_CURVAL will report
+*  an error. Annull this error and use a "value" that indicates that the
+*  real value is unknown. This is not fool-proof since even if a
+*  parameter has a current value, it may have been set on a previous
+*  invocation of the application, and a different value may be used on
+*  the current invocation if the parameter has not yet been accessed. For
+*  this reason this routine should be called once all parameters have been
+*  accessed. Maybe this routine should report an error if the parameter
+*  value has not yet been accessed by the application. But how do you
+*  tell if the current value of a parameter has been set during the
+*  current invocation of the application or a previous one?
+                           IF( STATUS .EQ. SAI__OK ) THEN
+                              CALL SUBPAR_CURVAL( NCODE, VALUE, STATUS )
+                              IF( STATUS .NE. SAI__OK ) THEN
+                                 CALL ERR_ANNUL( STATUS )
+                                 VALUE = '<not yet accessed>'
+                              END IF
+                              CALL MSG_SETC( 'V', VALUE )
+                           END IF
                         END IF
 
 *  Expand the message text.
