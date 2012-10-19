@@ -99,4 +99,5 @@ ZERSC   <zero scale factor supplied>
 BADCP   <incompatible data types for compression>
 CMPAC   <attempt to change a read-only property of a compressed array>
 BGSEC   <attempt to create a section containing too many pixels>
+NOPAR   <attempt to cancel a parameter that is not associuated with an NDF>
 .END

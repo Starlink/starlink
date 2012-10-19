@@ -239,24 +239,12 @@ C      END IF
       END IF
 
 *  After importing a valid data structure, check if the parameter
-*  system already has locators for it. If not, then obtain an index for
-*  the data object in the DCB and obtain a top-level locator for its
-*  container file by re-opening the file. Also clone a locator for the
-*  data object itself from its DCB entry.
+*  system already has locators for it. If not, then save locators for
+*  the NDF object and the container file in the parameter system and
+*  link the object locator with the parameter name.
       IF ( STATUS .EQ. SAI__OK ) THEN
-         IF ( .NOT. HASLOC ) THEN
-            IDCB = ACB_IDCB( IACB )
-            CALL HDS_OPEN( DCB_FILE( IDCB ), VMODE, LOC0, STATUS )
-            CALL DAT_CLONE( DCB_LOC( IDCB ), LOC, STATUS )
-
-*  Save these locators in the parameter system and link the object
-*  locator with the parameter name.
-            CALL SUBPAR_PUTFLOC( IPAR, LOC0, STATUS )
-            CALL SUBPAR_PUTLOC( IPAR, LOC, STATUS )
-            CALL HDS_LINK( LOC, PARAM, STATUS )
-            LOC0 = DAT__NOLOC
-            LOC = DAT__NOLOC
-         END IF
+         IF ( .NOT. HASLOC ) CALL NDF1_PTLOC( PARAM, IPAR, VMODE, IACB,
+     :                                        STATUS )
 
 *  If read access was requested, then disable all unwanted access modes.
          IF ( STATUS .EQ. SAI__OK ) THEN

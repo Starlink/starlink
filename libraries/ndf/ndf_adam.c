@@ -108,6 +108,28 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
+F77_SUBROUTINE(ndf_cancl)( CHARACTER(param),
+                           INTEGER(status)
+                           TRAIL(param) );
+
+void ndfCancl( const char *param, int *status ) {
+
+DECLARE_CHARACTER_DYN(fparam);
+DECLARE_INTEGER(fstatus);
+
+   F77_CREATE_EXPORT_CHARACTER( param, fparam );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_LOCK( F77_CALL(ndf_cancl)( CHARACTER_ARG(fparam),
+                                  INTEGER_ARG(&fstatus)
+                                  TRAIL_ARG(fparam) ); )
+
+   F77_FREE_CHARACTER( fparam );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
 F77_SUBROUTINE(ndf_cinp)( CHARACTER(param),
                           INTEGER(indf),
                           CHARACTER(comp),

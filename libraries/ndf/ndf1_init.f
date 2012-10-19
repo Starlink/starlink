@@ -75,6 +75,11 @@
 *        performed by NDF1_INTCB.
 *     20-FEB-2003 (AJC):
 *        Add initialisation of NDF_TMP
+*     19-OCT-2012 (DSB):
+*        Add initialisation of the ADAM Parameter Block. Note, we cannot
+*        include AST_PAR in a block data module because it contains EXTERNAL
+*        statements. So sadly we cannot initialise APB_PARS to AST__NULL.
+*        Instead, use a literal value zero.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -123,6 +128,11 @@
 *        TMPLOC = CHARACTER*(DAT__SZLOC)
 *           Locator for container of temporary NDFs
 
+      INCLUDE 'NDF_APB'          ! NDF_ ADAM Parameter Block
+*        APB_PARS = INTEGER (Read and Write)
+*           An AST KeyMap holding a list of parameters with associated
+*           NDFs.
+
 *  Global Data:
       DATA ACB_IDCNT / NDF__FACNO /
       DATA ACB_IDCTX / 1 /
@@ -138,6 +148,8 @@
 
       DATA COUNT /0/
       DATA TMPLOC /DAT__NOLOC/
+
+      DATA APB_PARS / 0 /
 *.
 
       END

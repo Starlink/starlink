@@ -11265,6 +11265,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
 
 \noteroutine{\htmlref{NDF\_ASSOC}{NDF_ASSOC}( PARAM, MODE, INDF, STATUS )}
             {Associate an existing NDF with an \xref{ADAM}{sg4}{} parameter}
+\noteroutine{\htmlref{NDF\_CANCL}{NDF_CANCL}( PARAM, STATUS )}
+            {Cancel the association of an NDF with an ADAM parameter}
 \noteroutine{\htmlref{NDF\_CINP}{NDF_CINP}( PARAM, INDF, COMP, STATUS )}
             {Obtain an NDF character component value via the ADAM parameter system}
 \noteroutine{\htmlref{NDF\_CREAT}{NDF_CREAT}( PARAM, FTYPE, NDIM, LBND, UBND, INDF, STATUS )}
@@ -12636,6 +12638,54 @@ locator}{sun92}{using_locators}}
          size of the LBND and UBND arguments so that they will be able to
          hold the maximum number of NDF bounds that this routine can
          return. This constant is defined in the include file NDF\_PAR.
+      }
+   }
+}
+\sstroutine{
+   NDF\_CANCL
+}{
+   Cancel the association of an NDF with an ADAM parameter
+}{
+   \sstdescription{
+      This routine cancels the association of an NDF with an ADAM
+      parameter. A subsequent attempt to get a value for the parameter
+      will result in a new value being obtained by the underlying
+      parameter system.
+   }
+   \sstinvocation{
+      CALL NDF\_CANCL( PARAM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the ADAM parameter. If a blank string is supplied, all
+         NDF parameters that have been accessed using NDF\_ASSOC or
+         NDF\_EXIST are cancelled.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The behaviour of this routine is identical to PAR\_CANCL, except
+         that it allows all NDF parameters to be cancelled by supplying a
+         blank parameter name.
+
+         \sstitem
+         Any remaining NDF identifiers for the associated NDF are
+         unaffected by this routine. It{\tt '}s only affect is to cause NDF\_ASSOC
+         or NDF\_EXIST to prompt for a new NDF when called subsequently.
+
+         \sstitem
+         This routine attempts to execute even if STATUS is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances.
       }
    }
 }
@@ -19159,6 +19209,8 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
             {Obtain an NDF section containing a block of adjacent pixels}
 \noteroutineC{\xlabel{ndfBound}void \htmlref{ndfBound}{NDF_BOUND}}{( int indf, int ndimx, int lbnd[~], int ubnd[~], int $*$ndim, int $*$status );}
             {Enquire the pixel-index bounds of an NDF}
+\noteroutineC{\xlabel{ndfCancl}void \htmlref{ndfCancl}{NDF_CANCL}}{( const char $*$param, int $*$status );}
+            {Cancel the association of an NDF with an ADAM parameter}
 \noteroutineC{\xlabel{ndfCget}void \htmlref{ndfCget}{NDF_CGET}}{( int indf, const char $*$comp, char $*$value, int value\_length, int $*$status );}
             {Obtain the value of an NDF character component}
 \noteroutineC{\xlabel{ndfChunk}void \htmlref{ndfChunk}{NDF_CHUNK}}{( int indf1, int mxpix, int ichunk, int $*$indf2, int $*$status );}
@@ -19751,6 +19803,12 @@ the NDF\_ system between versions V1.11 and V1.12 (the current version):
    \item A new tuning parameter SECMAX has been aded, which allows the
    maximum number of pixels within an NDF section to be specified. See
    \S\ref{ss:tuning}.
+
+   \item A new routine NDF\_CANCL can be used to cancel the association
+   between an environment parameter and an NDF. This is identical to
+   calling PAR\_CANCL, except that NDF\_CANCL provides an option to
+   cancel all NDF parameters in a single call, without needing to know
+   their names.
 
 \end{enumerate}
 

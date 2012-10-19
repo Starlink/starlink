@@ -4,6 +4,11 @@ NDF Library
 V1.12
    - Add _INT64 data type support (INTEGER*8).
    - Add tuning parameter SECMAX to limit maximum size of an NDF section.
+   - A new routine NDF_CANCL can be used to cancel the association
+   between an environment parameter and an NDF. This is identical to
+   calling PAR_CANCL, except that NDF_CANCL provides an option to cancel
+   all NDF parameters in a single call, without needing to know their
+   names.
 
 V1.11
    - A new function NDF_ZSCAL has been added, which creates a SCALED

@@ -271,6 +271,9 @@ void ndfBound( int indf,
                int *ndim,
                int *status );
 
+void ndfCancl( const char *param,
+               int *status );
+
 void ndfCget( int indf,
               const char *comp,
               char *value,

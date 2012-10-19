@@ -41,7 +41,7 @@ PUBLIC_INCLUDES = ndf.h NDF_PAR NDF_FUNC_DEC NDF_FUNC_DEF NDF_FUNC
 
 # Include files that are only needed for the build
 PRIVATE_INCLUDES = NDF_ACB NDF_CONST NDF_DCB NDF_ELB NDF_FCB NDF_PCB \
-	NDF_TCB NDF_TMP ndf1.h ndf_const.h
+	NDF_TCB NDF_TMP NDF_APB ndf1.h ndf_const.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
@@ -139,7 +139,8 @@ STANDALONE_F_ROUTINES = ndf1_hwenv.f
 #  Additional Fortran routines required for the ADAM library.
 
 ADAM_F_ROUTINES = ndf_assoc.f ndf_cinp.f ndf_creat.f ndf_crep.f	\
-ndf_exist.f ndf_prop.f ndf1_getap_a.f ndf1_hwenv_a.f ndf_crepl.f
+ndf_exist.f ndf_prop.f ndf1_getap_a.f ndf1_hwenv_a.f ndf_crepl.f \
+ndf1_ptloc.f ndf_cancl.f
 
 #  C routines required for both the standalone and ADAM libraries.
 
