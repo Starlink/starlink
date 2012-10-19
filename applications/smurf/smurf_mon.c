@@ -162,6 +162,10 @@
 *         Add sc2filtermap
 *     2012-04-20 (TIMJ):
 *        Remove QLMAKEMAP
+*     2012-10-19 (DSB):
+*        Use ndfCancl to cancel all newly active NDF parameters at the
+*        end of the monolith. This avoid such parameters causing warnings
+*        about dangling HDS locators.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -250,6 +254,11 @@ void smurf_mon( int * status ) {
   /* If we are watching a particular memory Id reported by astActiveMemory
      we set the watch point here. */
   /* astWatchMemory( 29 ); */
+
+  /* Mark any currently active NDF parameters, so that they will
+     not be cancelled by the call to ndfCancl at the end of this
+     function. */
+  ndfCancl( "*", status );
 
   /* Find out the task name and provenance name we were invoked with */
   smf_get_taskname( taskname, NULL, status );
@@ -420,13 +429,15 @@ void smurf_mon( int * status ) {
   }
   errEnd( status );
 
-  /* For some reason, we need to cancel the REF parameter, otherwise
-     some HDS locators for the associated NDF object are left dangling
-     (e.g. within smf_getrefwcs.c */
-  if (*status == SAI__OK) {
-    parCancl( "REF", status );
-    if (*status != SAI__OK) errAnnul( status );
-  }
+  /* The NDF library registers locators with SUBPAR for any NDFs that
+     are opened directly using ndfAssoc or ndfExist. These locators are
+     only annulled when the associated parameters are cancelled, but most
+     smurf applications do not explicitly cancel their NDF parameters.
+     This means that such locators are picked up by the following check
+     for dangling HDS locators. In order to prevent this, we cancel any
+     remaining NDF parameters now, excluding any that were marked by the
+     call to ndfCancl at the start of this routine. */
+  ndfCancl( " ", status );
 
   /* Check for HDS leaks Do this in a new error reporting context so
    * that we get the correct value even if an error has occurred. */

@@ -99,6 +99,10 @@
 *     19-OCT-2009 (DSB):
 *        Use NDG_BEGGH/NDG_ENDGH to record contents of group parameters in
 *        the history component of output NDFs.
+*     19-OCT-2012 (DSB):
+*        Use NDF_CANCL to cancel all newly active NDF parameters at the
+*        end of the monolith. This avoid such parameters causing warnings
+*        aboud dangling HDS locators.
 *     {enter_further_changes_here}
 
 *-
@@ -137,6 +141,10 @@
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Mark any currently active NDF parameters, so that they will not be
+*  cancelled by the call to NDF_CANCL at the end of this rotuine.
+      CALL NDF_CANCL( '*', STATUS )
 
 *  Note the current number of active GRP identifiers.
       CALL GRP_INFOI( GRP__NOID, 0, 'NGRP', NGRP0, STATUS )
@@ -400,6 +408,17 @@
          CALL MSG_BLANK( STATUS )
       END IF
       CALL ERR_END( STATUS )
+
+*  The NDF library registers locators with SUBPAR for any NDFs that are
+*  opened directly using NDF_ASSOC or NDF_EXIST (most KAPPA routines use
+*  LPG_ASSOC instead). These locators are only annulled when the associated
+*  parameters are cancelled, but most kappa applications do not explicitly
+*  cancel their NDF parameters. This means that such locators are picked
+*  up by the following check for dangling HDS locators. In order to
+*  prevent this, we cancel any remaining NDF parameters now, excluding
+*  any that were marked by the call to NDF_CANCL at the start of this
+*  routine.
+      CALL NDF_CANCL( ' ', STATUS )
 
 *  Note the current number of active locators. Do this in a new
 *  error reporting context so that we get the correct value even if an
