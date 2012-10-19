@@ -1240,13 +1240,13 @@ void findclumps( int *status ) {
    kpg1Gtgrp( "CONFIG", &grp, &size, status );
 
 /* If no group was supplied, annul the error and create an empty KeyMap. */
-   if( *status == PAR__NULL || size == 0 ) {
+   if( *status == PAR__NULL || ( *status == SAI__OK && size == 0 ) ) {
       if( *status != SAI__OK ) errAnnul( status );
       keymap = astKeyMap( " " );
 
 /* If a group was supplied, see if it consists of the single value "def".
    If so, create an empty KeyMap. */
-   } else {
+   } else if( *status == SAI__OK ) {
       keymap = NULL;
       if( size == 1 ) {
          value = buffer;
