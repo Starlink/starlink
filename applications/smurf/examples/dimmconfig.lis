@@ -585,12 +585,18 @@ ext.taumethod =adaptive
 #
 # Another method is to constrain regions of the map to 0.
 #
-# If ast.zero_mask is set, the reference image, as indicated by the
-# makemap ADAM parameter REF, will be interpreted as containing a
-# user-defined mask. Using the REF image ensures that the mask and the
-# output image of MAKEMAP are on the same pixel grid. The pixels in
-# the map that are to be constrained to 0 should be set to the bad
-# value. All other pixels will be allowed to vary during map-making.
+# If ast.zero_mask is set to one of "REF", "MASK2" or "MASK3" then
+# an NDF will be obtained using the specified ADAM parameter and used
+# as a user-defined mask. Setting ast.zero_mask to an integer value
+# larger than zero has the same effect as setting it to "REF". Setting it
+# to an integer less than or equal to zero results in no external mask
+# being used with the AST model. Note, using "REF" ensures that the
+# mask and the output image of MAKEMAP are on the same pixel grid - using
+# "MASK2" or "MASK3" does not provide this guarantee (it is then the
+# users responsibility to ensure that the supplied masks are aligned
+# with the output image in pixel coordinates). The pixels in the map that
+# are to be constrained to 0 should be set to the bad value in the mask.
+# All other pixels will be allowed to vary during map-making.
 #
 # Using ast.zero_lowhits will set a threshold region where
 # the hits are this fraction lower than the mean.
@@ -638,7 +644,7 @@ ext.taumethod =adaptive
 # data around the edges of the map is.
 
 #ast.gaussbg = 120
-#ast.zero_mask = 1
+#ast.zero_mask = REF
 #ast.zero_circle = (70.72333,36.115,0.0083333)
 #ast.zero_lowhits = 0.1
 #ast.zero_notlast = 1
@@ -653,7 +659,7 @@ ext.taumethod =adaptive
 # difference is that the zero_snr and zero_lowhits constraints will be
 # ignored on the first iteration since they require an estimate of the map
 # to be available.
-#com.zero_mask = 1
+#com.zero_mask = REF
 #com.zero_circle = (70.72333,36.115,0.0083333)
 #com.zero_lowhits = 0.1
 #com.zero_notlast = 1
@@ -667,7 +673,7 @@ ext.taumethod =adaptive
 # a zero constraint to the map. The only difference is that the zero_snr and
 # zero_lowhits constriants will be ignored on the first iteration since they
 # require an estimate of the map to be available. Note
-#flt.zero_mask = 1
+#flt.zero_mask = REF
 #flt.zero_circle = (70.72333,36.115,0.0083333)
 #flt.zero_lowhits = 0.1
 #flt.zero_notlast = 1

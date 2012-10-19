@@ -3069,6 +3069,26 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter mask2 {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Second mask NDF}
+                default !
+                helpkey *
+            }
+
+            parameter mask3 {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Third mask NDF}
+                default !
+                helpkey *
+            }
+
             parameter maxmem {
                 type _INTEGER
                 prompt {Maximum memory available for map-making in Mb}

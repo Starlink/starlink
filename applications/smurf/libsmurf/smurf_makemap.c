@@ -157,6 +157,18 @@
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied
 *          for parameter OUT.
+*     MASK2 = NDF (Read)
+*          An existing NDF that can be used to specify a second external mask
+*          for use with either the AST, FLT or COM model. See configuration
+*          parameters AST.ZERO_MASK, FLT.ZERO_MASK and COM.ZERO_MASK. Note,
+*          it is assumed that this image is aligned in pixel coordinate with
+*          the output map. [!]
+*     MASK3 = NDF (Read)
+*          An existing NDF that can be used to specify a third external mask
+*          for use with either the AST, FLT or COM model. See configuration
+*          parameters AST.ZERO_MASK, FLT.ZERO_MASK and COM.ZERO_MASK. Note,
+*          it is assumed that this image is aligned in pixel coordinate with
+*          the output map. [!]
 *     MAXMEM = _INTEGER (Read)
 *          Maximum memory available for map-making in MiB (mebibytes).
 *     METHOD = LITERAL (Read)
@@ -256,7 +268,10 @@
 *          If supplied, the output grid will be aligned with the supplied
 *          reference NDF. The reference can be either 2D or 3D and the spatial
 *          frame will be extracted. If a null (!) value is supplied then the
-*          output grid is determined by parameters REFLON, REFLAT, etc. [!]
+*          output grid is determined by parameters REFLON, REFLAT, etc.
+*          In addition, this NDF can be used to mask the AST, FLT or COM
+*          model. See configuration parameters AST.ZERO_MASK, FLT.ZERO_MASK
+*          and COM.ZERO_MASK. [!]
 *     REFLAT = LITERAL (Read)
 *          The formatted celestial latitude value at the tangent point of
 *          the spatial projection in the output cube. This should be provided
@@ -744,10 +759,22 @@
 *     AST.ZERO_LOWHITS = REAL
 *       Constrain boundary regions with low hit count to 0. The threshold
 *       is where the hits are this fraction lower than the mean. [0]
-*     AST.ZERO_MASK = INTEGER
-*       Constrain map so that pixels that are bad in the reference NDF
-*       are forced to zero in the map. The reference NDF is accessed
-*       using the ADAM parameter "REF". [0]
+*     AST.ZERO_MASK = STRING
+*       Constrain map so that pixels that are bad in an external mask NDF
+*       are forced to zero in the map. The value can either be a string
+*       or an integer. If it is a string it should be the name of the
+*       ADAM parameter associated with the mask NDF, one of "REF",
+*       "MASK2" and "MASK3". If it is an integer, then any value larger
+*       than zero will cause the mask to be obtained using parameter
+*       "REF". Values smaller than or equal to zero will result in no
+*       external mask being used with the AST model. A benefit of using 
+*       REF rather than MASK2 or MASK3 is that REF also determines the 
+*       output pixel grid, and so alignment of the mask and output map 
+*       is guaranteed. This is not the case with MASK2 and MASK3 - it 
+*       is the user's responsibility to ensure that masks specified using 
+*       MASK2 or MASK3 are aligned with the output pixel grid. This can 
+*       be achieved, for isnatnce, by using the output from a previous 
+*       run of MAKEMAP to create the mask. [0]
 *     AST.ZERO_NITER = INTEGER
 *       The number of iterations for which the AST model should be
 *       masked. The default is zero, which means "mask on all
@@ -1029,6 +1056,13 @@
 *     SMURF: QLMAKEMAP
 
 *  Notes:
+*     - If multiple masks are specified for a single model component,
+*     then the source areas of the individual masks are combined together
+*     to form the total mask. For instance, if values are supplied for
+*     both AST.ZERO_MASK and AST.ZERO_LOWHITS, then a pixel in the total
+*     mask will be considered to be a "source" pixel if it is a source
+*     pixel in either the external mask specified by AST.ZERO_MASK, or in
+*     the "low hits" mask.
 *     - The iterative algorithm can be terminated prematurely by pressing
 *     control-C at any time. If this is done, the next iteration of the
 *     current chunk will be completed and a map created. The application

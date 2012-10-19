@@ -1,3 +1,14 @@
+1 SMURF_Version_1.5
+
+ o If multiple types of mask are requested for any of the AST, FLT
+   and COM models (e.g. ZERO_LOWHITS and ZERO_MASK both specified),
+   they will now be combined into a single mask. Previously, only one
+   of the requested masks would be used.
+
+ o Up to three external masks can now be specified using ADAM parameters
+   REF, MASK2 and MASK3. The ZERO_MASK configuration parameter can be set
+   for the AST, FLT or COM model, to indicate which ADAM parameter to use.
+
 1 SMURF_Version_1.1
 
  o SC2CLEAN parameter DCBOX has been renamed DCFITBOX. DCBAD and DCFLAGALL

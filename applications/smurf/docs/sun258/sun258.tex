@@ -2582,6 +2582,18 @@ Van Engelen~A., Scott~D., 2005, {\it A Correlation Study using SCUBA
 
 \section{Release Notes}
 
+\subsection{Changes since kapuahi}
+
+\begin{itemize}
+\item If multiple types of mask are requested for any of the AST, FLT
+and COM models (e.g. ZERO\_LOWHITS and ZERO\_MASK both specified),
+they will now be combined into a single mask. Previously, only one
+of the requested masks would be used.
+\item Up to three external masks can now be specified using ADAM parameters
+REF, MASK2 and MASK3. The ZERO\_MASK configuration parameter can be set
+for the AST, FLT or COM model, to indicate which ADAM parameter to use.
+\end{itemize}
+
 \subsection{kaulia}
 
 Supports compressed SCUBA-2 data files taken since February 2011.

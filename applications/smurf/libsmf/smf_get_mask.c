@@ -49,6 +49,11 @@
 *     (for instance, it is not possible to mask COM on the first iteration
 *     using an SNR or low-hits mask since the map data needed to create
 *     the mask is not known until the end of the first iteration).
+*
+*     If multiple masks are specified (e.g. ZERO_MASK and ZERO_CIRCLE),
+*     they are combined into a single mask such that a mask pixel is
+*     "source" (zero) iff one or more of the indivudal mask pixels are
+*      source.
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
@@ -61,6 +66,8 @@
 *        Add FLT model, and ZERO_NITER parameter.
 *     31-MAY-2012 (DSB):
 *        Add ZERO_FREEZE parameter.
+*     18-OCT-2012 (DSB):
+*        Allow multiple masks to be used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,6 +99,7 @@
 #include "ast.h"
 #include "mers.h"
 #include "sae_par.h"
+#include "dat_par.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -104,6 +112,7 @@
 #define REFNDF     3  /* Mask areas specified by a reference NDF */
 #define SNR        4  /* Mask areas with low SNR */
 #define PREDEFINED 5  /* Use a mask created on an earlier run of smf_iteratemap */
+#define NTYPE      6  /* No. of different mask types */
 
 
 unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
@@ -113,7 +122,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Local Variables: */
    AstCircle *circle;         /* AST Region used to mask a circular area */
    AstKeyMap *subkm;          /* KeyMap holding model config values */
+   char refparam[ DAT__SZNAM ];/* Name for reference NDF parameter */
    char words[100];           /* Buffer for variable message words */
+   const char *cval;          /* The ZERO_MASK string value */
    const char *modname;       /* The name of the model  being masked */
    const char *skyrefis;      /* Pointer to SkyRefIs attribute value */
    dim_t i;                   /* Pixel index */
@@ -130,11 +141,14 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    double zero_snrlo;         /* Lower SNR at which to threshold */
    int *ph;                   /* Pointer to next hits value */
    int have_mask;             /* Did a mask already exist on entry? */
+   int imask;                 /* Index of next mask type */
    int indf1;                 /* Id. for supplied reference NDF */
    int indf2;                 /* Id. for used section of reference NDF */
+   int isstatic;              /* Are all used masks static? */
    int lbnd_grid[ 2 ];        /* Lower bounds of map in GRID coords */
-   int mask_type;             /* Identifier for the type of mask to use */
+   int mask_types[ NTYPE ];   /* Identifier for the types of mask to use */
    int nel;                   /* Number of mapped NDF pixels */
+   int nmask;                 /* The number of masks to be combined */
    int thresh;                /* Absolute threshold on hits */
    int ubnd_grid[ 2 ];        /* Upper bounds of map in GRID coords */
    int zero_c_n;              /* Number of zero circle parameters read */
@@ -143,7 +157,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int zero_niter;            /* Only mask for the first "niter" iterations. */
    size_t ngood;              /* Number good samples for stats */
    unsigned char **mask;      /* Address of model's mask pointer */
-   unsigned char *pm;         /* Pointer to next mask pixel */
+   unsigned char *newmask;    /* Individual mask work space */
+   unsigned char *pm;         /* Pointer to next returned mask pixel */
+   unsigned char *pn;         /* Pointer to next new mask pixel */
    unsigned char *result;     /* Returned mask pointer */
 
 /* Initialise returned values */
@@ -190,21 +206,25 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
       astMapGet0I( subkm, "ZERO_NOTLAST", &zero_notlast );
       if( !( flags & SMF__DIMM_LASTITER ) || !zero_notlast ) {
 
-/* Determine the type of mask being used by looking for non-default
-   values for the corresponding configuration parameters in the supplied
-   KeyMap. These are checked in increasing priority order. Static masks
-   (predefined, circles or external NDFs) may be used on any iteration, but
-   dynamic masks (lowhits, snr) will only be avialable once the map has
-   been determined at the end of the first iteration. This means that when
-   masking anything but the AST model (which is determined after the map),
-   the dynamic masks cannot be used on the first iteration. */
-         mask_type = NONE;
+/* Create a list of the mask types to be combined to get the final mask by
+   looking for non-default values for the corresponding configuration
+   parameters in the supplied KeyMap. Static masks (predefined, circles
+   or external NDFs) may be used on any iteration, but dynamic masks
+   (lowhits, snr) will only be avialable once the map has been determined
+   at the end of the first iteration. This means that when masking anything
+   but the AST model (which is determined after the map), the dynamic masks
+   cannot be used on the first iteration. Make a note if all masks being
+   used are static. */
+
+         isstatic = 1;
+         nmask = 0;
 
          zero_lowhits = 0.0;
          astMapGet0D( subkm, "ZERO_LOWHITS", &zero_lowhits );
          if( zero_lowhits > 0.0 ) {
             if( mtype == SMF__AST || !( flags & SMF__DIMM_FIRSTITER ) ) {
-               mask_type = LOWHITS;
+               mask_types[ nmask++] = LOWHITS;
+               isstatic = 0;
             }
          } else if( zero_lowhits <  0.0 && *status == SAI__OK ) {
             *status = SAI__ERROR;
@@ -214,7 +234,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
          if( astMapGet1D( subkm, "ZERO_CIRCLE", 3, &zero_c_n, zero_circle ) ) {
             if( zero_c_n == 1 || zero_c_n == 3 ) {
-               mask_type = CIRCLE;
+               mask_types[ nmask++] = CIRCLE;
             } else if( *status == SAI__OK ) {
                *status = SAI__ERROR;
                errRepf( " ", "Bad number of values (%d) for config parameter "
@@ -223,15 +243,28 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
             }
          }
 
-         zero_mask = 0;
-         astMapGet0I( subkm, "ZERO_MASK", &zero_mask );
-         if( zero_mask > 0 ) mask_type = REFNDF;
+         cval = NULL;
+         astMapGet0C( subkm, "ZERO_MASK", &cval );
+         if( cval ) {
+            if( !astChrMatch( cval, "REF" ) &&
+                !astChrMatch( cval, "MASK2" ) &&
+                !astChrMatch( cval, "MASK3" ) ) {
+               astMapGet0I( subkm, "ZERO_MASK", &zero_mask );
+               cval = ( zero_mask > 0 ) ? "REF" : NULL;
+            }
+            if( cval ) {
+               strcpy( refparam, cval );
+               astChrCase( NULL, refparam, 1, 0 );
+               mask_types[ nmask++] = REFNDF;
+            }
+         }
 
          zero_snr = 0.0;
          astMapGet0D( subkm, "ZERO_SNR", &zero_snr );
          if( zero_snr > 0.0 ) {
             if( mtype == SMF__AST || !( flags & SMF__DIMM_FIRSTITER ) ) {
-               mask_type = SNR;
+               mask_types[ nmask++] = SNR;
+               isstatic = 0;
             }
          } else if( zero_snr <  0.0 && *status == SAI__OK ) {
             *status = SAI__ERROR;
@@ -241,11 +274,11 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
          if( astMapHasKey( subkm, "ZERO_MASK_POINTER" ) ) {
             astMapGet0P( subkm, "ZERO_MASK_POINTER", (void **) &predef );
-            if( predef ) mask_type = PREDEFINED;
+            if( predef ) mask_types[ nmask++] = PREDEFINED;
          }
 
 /* No need to create a mask if no masking was requested or possible. */
-         if( mask_type != NONE ) {
+         if( nmask > 0 ) {
 
 /* Note if a mask existed on entry. If not, create a mask now. */
             if( *mask == NULL ) {
@@ -255,20 +288,30 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                have_mask = 1;
             }
 
-/* Check the pointer can be used. */
-            if( *status == SAI__OK ) {
+/* If we are combining more than one mask, we need work space to hold
+   an individual mask independently of the total mask. If we are using
+   only one mask, then just use the main mask array. */
+            if( nmask > 1 ) {
+               newmask = astMalloc( dat->msize*sizeof( *newmask ) );
+            } else {
+               newmask = *mask;
+            }
 
 /* Get the number of iterations after which the mask is to be frozen.
    Zero means "never freeze the mask". */
-               int zero_freeze = 0;
-               astMapGet0I( subkm, "ZERO_FREEZE", &zero_freeze );
+            int zero_freeze = 0;
+            astMapGet0I( subkm, "ZERO_FREEZE", &zero_freeze );
+
+/* Loop round each type of mask to be used. */
+            for( imask = 0; imask < nmask && *status == SAI__OK; imask++ ){
 
 /* If we already have a mask, and the mask is now frozen, we just return
-   the existing mask. */
+   the existing mask. So leave the loop. */
                if( zero_freeze > 0 && have_mask && dat->iter > zero_freeze ) {
+                  break;
 
 /* Low hits masking... */
-               } else if( mask_type == LOWHITS ) {
+               } else if( mask_types[ imask ] == LOWHITS ) {
 
 /* Set hits pixels with 0 hits to VAL__BADI so that stats1 ignores them */
                   ph = dat->hitsmap;
@@ -285,9 +328,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Create the mask */
                   thresh = meanhits*zero_lowhits;
                   ph = dat->hitsmap;
-                  pm = *mask;
+                  pn = newmask;
                   for( i = 0; i < dat->msize; i++,ph++ ) {
-                     *(pm++) = ( *ph != VAL__BADI && *ph < thresh ) ? 1 : 0;
+                     *(pn++) = ( *ph != VAL__BADI && *ph < thresh ) ? 1 : 0;
                   }
 
 /* Report masking info. */
@@ -295,11 +338,12 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                              "model at hits = %d.", status, modname, thresh );
 
 /* Circle masking... */
-               } else if( mask_type == CIRCLE ) {
+               } else if( mask_types[ imask ] == CIRCLE ) {
 
 /* If we had a mask on entry, then there is no need to create a new one
-   since it will not have changed. */
-                  if( ! have_mask ) {
+   since it will not have changed. But we need to recalculate the circle
+   mask if are combining it with any non-static masks. */
+                  if( ! have_mask || ! isstatic ) {
 
 /* If only one parameter supplied it is radius, assume reference
    LON/LAT from the frameset to get the centre. If the SkyFrame
@@ -340,13 +384,13 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                                          centre, radius, NULL, " " );
 
 /* Fill the mask with zeros. */
-                     memset( *mask, 0, sizeof( **mask )*dat->msize );
+                     memset( newmask, 0, sizeof( *newmask )*dat->msize );
 
 /* Get the mapping from the sky frame (current) to the grid frame (base),
    and then set the mask to 1 for all of the values outside this circle */
                      astMaskUB( circle, astGetMapping( dat->outfset, AST__CURRENT,
                                                        AST__BASE ),
-                                0, 2, lbnd_grid, ubnd_grid, *mask, 1 );
+                                0, 2, lbnd_grid, ubnd_grid, newmask, 1 );
 
 /* Report masking info. */
                      if( zero_niter == 0 ) {
@@ -366,17 +410,18 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                   }
 
 /* Reference NDF masking... */
-               } else if( mask_type == REFNDF ) {
+               } else if( mask_types[ imask ] == REFNDF ) {
 
 /* If we had a mask on entry, then there is no need to create a new one
-   since it will not have changed. */
-                  if( ! have_mask ) {
+   since it will not have changed. But we need to recalculate the NDF
+   mask if are combining it with any non-static masks. */
+                  if( ! have_mask || ! isstatic ) {
 
 /* Begin an NDF context. */
                      ndfBegin();
 
-/* Get an identifier for the NDF associated with the "REF" ADAM parameter. */
-                     ndfAssoc( "REF", "READ", &indf1, status );
+/* Get an identifier for the NDF using the associated ADAM parameter. */
+                     ndfAssoc( refparam, "READ", &indf1, status );
 
 /* Get a section from this NDF that matches the bounds of the map. */
                      ndfSect( indf1, 2, dat->lbnd_out, dat->ubnd_out, &indf2,
@@ -390,9 +435,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                      if( *status == SAI__OK ) {
 
 /* Find bad pixels in the NDF and set those pixels to 1 in the mask. */
-                        pm = *mask;
+                        pn = newmask;
                         for( i = 0; i < dat->msize; i++ ) {
-                           *(pm++) = ( *(ptr++) == VAL__BADD ) ? 1 : 0;
+                           *(pn++) = ( *(ptr++) == VAL__BADD ) ? 1 : 0;
                         }
 
 /* Report masking info. */
@@ -417,7 +462,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                   }
 
 /* SNR masking... */
-               } else if( mask_type == SNR ) {
+               } else if( mask_types[ imask ] == SNR ) {
 
 /* Get the lower SNR limit. */
                   zero_snrlo = 0.0;
@@ -437,9 +482,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                   if( zero_snr == zero_snrlo ) {
                      pd = dat->map;
                      pv = dat->mapvar;
-                     pm = *mask;
+                     pn = newmask;
                      for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
-                        *(pm++) = ( *pd != VAL__BADI && *pv != VAL__BADI &&
+                        *(pn++) = ( *pd != VAL__BADI && *pv != VAL__BADI &&
                                     *pv >= 0.0 && *pd < zero_snr*sqrt( *pv ) ) ? 1 : 0;
                      }
 
@@ -460,7 +505,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    areas within the mask down to an SNR limit of ZERO_SNRLO. */
                   } else {
                      smf_snrmask( wf, dat->map, dat->mapvar, dat->mdims,
-                                  zero_snr, zero_snrlo, *mask, status );
+                                  zero_snr, zero_snrlo, newmask, status );
 
 /* Report masking info. */
                      if( !have_mask ) {
@@ -477,17 +522,18 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                   }
 
 /* Predefined masking... */
-               } else if( mask_type == PREDEFINED ) {
+               } else if( mask_types[ imask ] == PREDEFINED ) {
 
 /* If we had a mask on entry, then there is no need to create a new one
-   since it will not have changed. */
-                  if( ! have_mask ) {
+   since it will not have changed. But we need to recalculate the
+   mask if are combining it with any non-static masks. */
+                  if( ! have_mask || ! isstatic ) {
 
 /* Find bad pixels in the predefined array and set those pixels to 1 in
    the mask. */
-                     pm = *mask;
+                     pn = newmask;
                      for( i = 0; i < dat->msize; i++ ) {
-                        *(pm++) = ( *(predef++) == VAL__BADD ) ? 1 : 0;
+                        *(pn++) = ( *(predef++) == VAL__BADD ) ? 1 : 0;
                      }
 
 /* Report masking info. */
@@ -502,7 +548,27 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                                 status, modname, words );
                   }
                }
+
+/* If required, add the new mask into the returned mask. If this is the
+   first mask, we just copy the new mask to form the returned mask.
+   Otherwise, we combine it with the existing returned mask. */
+               if( ! have_mask || ! isstatic ) {
+                  if( nmask > 1 ) {
+                     if( imask == 0 ) {
+                        memcpy( *mask, newmask, dat->msize*sizeof(*newmask));
+                     } else {
+                        pm = *mask;
+                        pn = newmask;
+                        for( i = 0; i < dat->msize; i++,pm++ ) {
+                           if( *(pn++) == 0 ) *pm = 0;
+                        }
+                     }
+                  }
+               }
             }
+
+/* Free the individual mask work array if it was used. */
+            if( nmask > 1 ) newmask = astFree( newmask );
 
 /* Return the mask pointer if all has gone well. */
             if( *status == SAI__OK ) result = *mask;
