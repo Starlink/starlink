@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = cupidsub 
+SUBDIRS = cupidsub
 
-dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl outlineclump.csh $(DATA_FILES) 
+dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl outlineclump.csh $(DATA_FILES)
 
 DATA_FILES = test_data.sdf test_data.FIT
 
@@ -10,6 +10,7 @@ dist_noinst_SCRIPTS = cupid_link_adam make_doc make_h
 
 bin_MONOLITHS = cupid_mon
 
+include_MESSAGES = cupid_err.h CUPID_ERR
 
 cupid_mon_SOURCES = \
         cupid.h \
@@ -22,7 +23,7 @@ cupid_mon_LDADD = $(LDADD) cupidsub/libcupidsub.la `$(srcdir)/cupid_link_adam`
 ## cupid_mon_LDFLAGS = -static
 cupid_mon_TASKS = clumpinfo extractclumps findback findclumps cupidhelp makeclumps
 
-CSRC = 
+CSRC =
 
 ##  The on-line help.
 HELP_SOURCES = cupid.hlp
@@ -43,7 +44,7 @@ history.help: cupid.news
 	./make_history_help
 
 cupid.h: cupid.h.source make_h
-	./make_h 
+	./make_h
 
 outlineclump.help: outlineclump.csh
 	cat outlineclump.csh | sed -e 's@^#@*@' > outlineclump.f
@@ -90,7 +91,7 @@ EXTRA_DIST = $(HELP_SOURCES) cupid.star-hlp cupidtest.sh cupid.h.source \
        sun_master.tex
 
 ##  Need to add generated files as BUILT_SOURCES.
-BUILT_SOURCES = cupid.csh cupid.sh cupid.icl cupid.h
+BUILT_SOURCES = cupid.csh cupid.sh cupid.icl cupid.h $(include_MESSAGES)
 
 ##  Simple check.
 TESTS = cupidtest.sh
@@ -105,9 +106,9 @@ cupid_mon version.dat cupid.csh cupid.icl cupid.sh
 
 IFC_FILES = clumpinfo.ifc extractclumps.ifc findback.ifc findclumps.ifc makeclumps.ifc cupidhelp.ifc cupid_mon.ifc
 
-IFL_FILES = $(IFC_FILES:.ifc=.ifl) 
+IFL_FILES = $(IFC_FILES:.ifc=.ifl)
 
-MAINTAINERCLEANFILES = cupid.h 
+MAINTAINERCLEANFILES = cupid.h
 CLEANFILES = $(MISC_FILES) $(IFC_FILES) $(IFL_FILES) cupid.h
 
 

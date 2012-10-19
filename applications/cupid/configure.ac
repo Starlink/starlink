@@ -29,6 +29,8 @@ AC_PROG_LIBTOOL
 dnl    Setup for creating a monolith.
 STAR_MONOLITHS
 
+STAR_MESSGEN( [ cupid_err.msg ] )
+
 dnl CUPID source files depend on include files from the following components
 STAR_DECLARE_DEPENDENCIES([build], [mers cnf ifd irq ndf sae pda thr])
 

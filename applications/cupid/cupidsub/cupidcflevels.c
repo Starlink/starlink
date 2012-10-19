@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "cupid.h"
+#include "cupid_err.h"
 #include "ast.h"
 #include "prm_par.h"
 #include <stdio.h>
@@ -192,7 +193,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 
 /* Check the number of lebels is reasonable. */
             if( ( *nlevels < 2 || *nlevels > 10000000 ) ) {
-               *status = SAI__ERROR;
+               *status = CUPID__CFCNT;
                msgSetd( "T", clow );
                msgSetd( "D", cdelta );
                msgSetd( "R", rms );
