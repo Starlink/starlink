@@ -17,19 +17,26 @@
 *     parameter. A subsequent attempt to get a value for the parameter
 *     will result in a new value being obtained by the underlying
 *     parameter system.
+*
+*     By supplying a blank parameter name, all currently active NDF
+*     parameters can be cancelled in a single call. However, it is
+*     possible to exclude selected parameters from this automatic
+*     cancellation if necessary. To do this, the parameter to be excluded
+*     should be marked by making a prior call to this routine with an
+*     asterisk appended to the end of the parameter name. Any subsequent
+*     call to this routine with a blank parameter name will skip such
+*     marked parameters. To mark all currently active NDF parameters in
+*     this way, supply the PARAM argument holding just an asterisk.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
-*        Name of the ADAM parameter. If a blank string is supplied, all
-*        NDF parameters that have been accessed using NDF_ASSOC or
-*        NDF_EXIST are cancelled.
+*        Name of the ADAM parameter to be cancelled or marked.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*     -  The behaviour of this routine is identical to PAR_CANCL, except
-*     that it allows all NDF parameters to be cancelled by supplying a
-*     blank parameter name.
+*     -  When cancelling a parameter, the behaviour of this routine is
+*     identical to PAR_CANCL.
 *     -  Any remaining NDF identifiers for the associated NDF are
 *     unaffected by this routine. It's only affect is to cause NDF_ASSOC
 *     or NDF_EXIST to prompt for a new NDF when called subsequently.
@@ -95,31 +102,57 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Variables:
       CHARACTER * ( DAT__SZNAM ) KEY ! Current parameter name
+      INTEGER L                  ! Length of parameter name
+      INTEGER MARKED             ! Non-zero if parameter has been marked
+      LOGICAL MARK               ! Mark parameters instead of cancelling?
       LOGICAL THERE              ! Was the parameter found in the APB?
 *.
 
 *  Begin a new error reporting context.
       CALL ERR_BEGIN( STATUS )
 
-*  If a parameter name was supplied...
-      IF( PARAM .NE. ' ' ) THEN
+*  If the last character is an asterisk, set a flag, and note the length
+*  of the preceeding text.
+      L = CHR_LEN( PARAM )
+      IF( L .EQ. 0 ) THEN
+         MARK = .FALSE.
+      ELSE IF( PARAM( L : L ) .EQ. '*' ) THEN
+         MARK = .TRUE.
+         L = L - 1
+      ELSE
+         MARK = .FALSE.
+      END IF
 
-*  Attempt to remove the parameter from the ADAM Parameter Block. This block
-*  contains the names and SUBPAR codes for all parameters that have been
-*  associated with NDFs by the NDF library (e.g. by NDF_ASSOC or NDF_EXIST).
+*  If a parameter name was supplied...
+      IF( L .GT. 0 ) THEN
+
+*  See if the named parameter is in the APB.
          IF( APB_PARS .NE. 0 ) THEN
-            THERE = AST_MAPHASKEY( APB_PARS, PARAM, STATUS )
-            IF( THERE ) CALL AST_MAPREMOVE( APB_PARS, PARAM, STATUS )
+            THERE = AST_MAPHASKEY( APB_PARS, PARAM( : L ), STATUS )
+         ELSE
+            THERE = .FALSE.
          END IF
 
-*  If the parameter was found, cancel it. Otherwise report an error.
+*  If it was found, either mark it by giving it a non-zero value in the
+*  KeyMap, or cancel and remove it from the KeyMap.
          IF( THERE ) THEN
-            CALL PAR_CANCL( PARAM, STATUS )
+            IF( MARK ) THEN
+               CALL AST_MAPPUT0I( APB_PARS, PARAM( : L ), 1, ' ',
+     :                            STATUS )
+            ELSE
+               CALL PAR_CANCL( PARAM( : L ), STATUS )
+               CALL AST_MAPREMOVE( APB_PARS, PARAM( : L ), STATUS )
+            END IF
+
+*  If the parameter was not found, report an error.
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = NDF__NOPAR
-            CALL MSG_SETC( 'P', PARAM )
+            CALL MSG_SETC( 'P', PARAM( : L ) )
             CALL ERR_REP( 'NDF_CANCL_NOP', 'The parameter ''^P'' '//
      :                    'is not associated with an NDF (possible '//
      :                    'programming error).', STATUS )
@@ -129,12 +162,23 @@
 *  available...
       ELSE IF( APB_PARS .NE. 0 ) THEN
 
-*  Loop round all parameters in the APB, cancelling and removing each one.
+*  Loop round all parameters in the APB, marking each one, or cancelling
+*  and removing each one that is not marked.
          DO WHILE( AST_MAPSIZE( APB_PARS, STATUS ) .GT. 0 .AND.
      :             STATUS .EQ. SAI__OK )
             KEY = AST_MAPKEY( APB_PARS, 1, STATUS )
-            CALL PAR_CANCL( KEY, STATUS )
-            CALL AST_MAPREMOVE( APB_PARS, KEY, STATUS )
+
+            IF( MARK ) THEN
+               CALL AST_MAPPUT0I( APB_PARS, KEY, 1, ' ', STATUS )
+
+            ELSE IF( AST_MAPGET0I( APB_PARS, KEY, MARKED,
+     :                             STATUS ) ) THEN
+               IF( MARKED .EQ. 0 ) THEN
+                  CALL PAR_CANCL( KEY, STATUS )
+                  CALL AST_MAPREMOVE( APB_PARS, KEY, STATUS )
+               END IF
+            END IF
+
          END DO
 
       END IF

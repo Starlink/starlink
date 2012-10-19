@@ -12651,6 +12651,16 @@ locator}{sun92}{using_locators}}
       parameter. A subsequent attempt to get a value for the parameter
       will result in a new value being obtained by the underlying
       parameter system.
+
+      By supplying a blank parameter name, all currently active NDF
+      parameters can be cancelled in a single call. However, it is
+      possible to exclude selected parameters from this automatic
+      cancellation if necessary. To do this, the parameter to be excluded
+      should be marked by making a prior call to this routine with an
+      asterisk appended to the end of the parameter name. Any subsequent
+      call to this routine with a blank parameter name will skip such
+      marked parameters. To mark all currently active NDF parameters in
+      this way, supply the PARAM argument holding just an asterisk.
    }
    \sstinvocation{
       CALL NDF\_CANCL( PARAM, STATUS )
@@ -12659,9 +12669,7 @@ locator}{sun92}{using_locators}}
       \sstsubsection{
          PARAM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Name of the ADAM parameter. If a blank string is supplied, all
-         NDF parameters that have been accessed using NDF\_ASSOC or
-         NDF\_EXIST are cancelled.
+         Name of the ADAM parameter to be cancelled or marked.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -12673,9 +12681,8 @@ locator}{sun92}{using_locators}}
       \sstitemlist{
 
          \sstitem
-         The behaviour of this routine is identical to PAR\_CANCL, except
-         that it allows all NDF parameters to be cancelled by supplying a
-         blank parameter name.
+         When cancelling a parameter, the behaviour of this routine is
+         identical to PAR\_CANCL.
 
          \sstitem
          Any remaining NDF identifiers for the associated NDF are

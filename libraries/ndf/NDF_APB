@@ -53,10 +53,11 @@
 *  Global Variables:
 
 *  An AST KeyMap in which each entry has a key that is an ADAM parameter
-*  name, and a value that is the corresponding SUBPAR integer identifier for
-*  the parameter. The parameters stored in the KeyMap are the ones for which
-*  the NDF library has stored explicit locators in the parameter system
-*  using SUBPAR_PUTFLOC and SUBPAR_PUTLOC. These locators are only release
+*  name, and a value that is a boolean flag indicating if NDF_CANCL should
+*  cancel the parameter if supplied with a blank parameter name. The
+*  parameters stored in the KeyMap are the ones for which the NDF library
+*  has stored explicit locators in the parameter system using
+*  SUBPAR_PUTFLOC and SUBPAR_PUTLOC. These locators are only release
 *  when the parameter is cancelled, or the parameter system is shut down.
 *  In order to avoid apparent HDS locator leaks, applications may use
 *  NDF_CANCL to cancel all actice NDF parameters.

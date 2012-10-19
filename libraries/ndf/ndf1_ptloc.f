@@ -130,10 +130,15 @@
 
 *  If the ADAM Parameter Block does not yet have a KeyMap to hold
 *  parameter information, create one now.
-      IF( APB_PARS .EQ. 0 ) APB_PARS = AST_KEYMAP( ' ', STATUS )
+      IF( APB_PARS .EQ. 0 ) THEN
+         APB_PARS = AST_KEYMAP( ' ', STATUS )
+         CALL AST_EXEMPT( APB_PARS, STATUS )
+      END IF
 
-*  Add an entry for the supplied parameter.
-      CALL AST_MAPPUT0I( APB_PARS, PARAM, IPAR, ' ', STATUS )
+*  Add an entry for the supplied parameter, storing a value of zero to
+*  indicate that NDF_CANCL should include it in its automatic parameter
+*  cancellation.
+      CALL AST_MAPPUT0I( APB_PARS, PARAM, 0, ' ', STATUS )
 
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_PTLOC', STATUS )
