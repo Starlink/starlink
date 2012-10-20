@@ -113,7 +113,7 @@ void cupid_mon( int *status ) {
 
 /* For debugging, watch one of the leaked GRP identifiers listed by the
    call to grpWatch at the end of this routine (if any). */
-   grpWatch( 3129345, status );
+   /* grpWatch( 3129345, status ); */
 
 /* Read the input error message stack level */
    emsLevel( &emslev1 );

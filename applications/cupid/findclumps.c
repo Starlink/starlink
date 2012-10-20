@@ -1268,9 +1268,6 @@ void findclumps( int *status ) {
       }
    }
 
-/* Delete the group, if any. */
-   if( grp ) grpDelet( &grp, status );
-
 /* Ensure that NDG will not add provenance or history to the clump
    cut-out NDFs created below. We will re-start the provenance and GRP
    history blocks before creating the main output NDFs. */
@@ -1566,6 +1563,9 @@ void findclumps( int *status ) {
 
 /* Tidy up */
 L999:
+
+/* Delete the input config group, if any. */
+   if( grp ) grpDelet( &grp, status );
 
 /* Close any log file. */
    if( logfile ) fclose( logfile );
