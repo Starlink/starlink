@@ -150,6 +150,11 @@
 
 *  Assign the current identifier context level to the array slot.
          CMN_CTX( SLOT ) = CMN_IDCTX
+
+*  Check if the identifier is being watched.
+         IF( IGRP .EQ. CMN_WATCH ) CALL GRP_ALARM( IGRP, 'CREATE',
+     :                                             STATUS )
+
       END IF
 
       END

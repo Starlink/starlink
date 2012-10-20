@@ -155,6 +155,10 @@
       INTEGER CMN_CHK( GRP__MAXG )
       INTEGER CMN_IDCNT
 
+*  The GRP identifier currently being watched
+*  ==========================================
+      INTEGER CMN_WATCH
+
 *  Context in which each identifier was issued.
 *  ============================================
 *  Identifier context for each common slot and "current" context level.
@@ -167,7 +171,7 @@
      :                  CMN_LVPNT, CMN_FLPNT, CMN_SIZE, CMN_USED,
      :                  CMN_OWNER, CMN_UPPER, CMN_CHK, CMN_IDCNT,
      :                  CMN_CTX, CMN_IDCTX, CMN_INPNT, CMN_FLSIZ,
-     :                  CMN_SLAVE
+     :                  CMN_SLAVE, CMN_WATCH
 
 *  Declare the common block /GRP_C2/, to hold character variables.
       COMMON /GRP_C2/ CMN_TYPE, CMN_CHARS, CMN_CCNAM

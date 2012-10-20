@@ -9,7 +9,7 @@
 \newcommand{\stardocsource}    {sun150.10}
 \newcommand{\stardocnumber}    {150.10}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {24th September 2012}
+\newcommand{\stardocdate}      {20th October 2012}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of Objects}
 \newcommand{\stardocversion}   {Version 3.7}
@@ -2192,6 +2192,13 @@ group}
 environment}
 
 
+\subsection{\label{SEC:ADAM}Debugging Routines}
+
+\noteroutine{\htmlref{GRP\_ALARM}{GRP_ALARM}}{( IGRP, EVENT, STATUS )}
+            { Notify the user of an event in the life of a watched group}
+\noteroutine{\htmlref{GRP\_WATCH}{GRP_WATCH}}{( IGRP, STATUS )}
+            { Watch for events in the life of a specified group}
+
 \newpage
 \section{\label{APP:SPEC}Routine Descriptions}
 
@@ -2199,6 +2206,49 @@ environment}
 % =====================
 \small
 
+\sstroutine{
+   GRP\_ALARM
+}{
+   Notify the user of an event in the life of a watched group
+}{
+   \sstdescription{
+      This routine is called internally by the GRP library when a
+      significant event happens in the life of a group that is being
+      watched as a result of a call to GRP\_WATCH. It is not intended
+      to be called by the user. It{\tt '}s main purpose is to provide a break
+      point target for debugging the creation and destruction of GRP
+      groups.
+   }
+   \sstinvocation{
+      CALL GRP\_ALARM( IGRP, EVENT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         An identifier for the created group. GRP\_\_NOID is returned if
+         an error occurs.
+      }
+      \sstsubsection{
+         EVENT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         This will be {\tt "}CREATE{\tt "} or {\tt "}DELETE{\tt "}.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine attempts to run even if the global status value
+         indicates an error has already occurred.
+      }
+   }
+}
 \sstroutine{
    GRP\_COPY
 }{
@@ -3747,6 +3797,47 @@ environment}
       }
    }
 }
+\sstroutine{
+   GRP\_WATCH
+}{
+   Watch for events in the life of a specified group
+}{
+   \sstdescription{
+      This routine causes messages to be reported when a group with the
+      given integer identifier is created or destroyed. It will also
+      list the integer identifiers for all currently active groups.
+
+      Each event in the life of the group is repoirted by routine
+      GRP\_ALARM, and so a debugger break point can be set there to
+      investigate such events.
+   }
+   \sstinvocation{
+      CALL GRP\_WATCH( IGRP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP= INTEGER (Given)
+      }{
+         The identifier for the group to be watched. If this is GRP\_\_NOID,
+         the identifiers of all currently active groups are listed on
+         standard output. NOTE, in the C interface this should be an
+         integer (or GRP\_\_NOID), not a pointer to a Grp structure.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine attempts to run even if the global status value
+         indicates an error has already occurred.
+      }
+   }
+}
 
 \normalsize
 
@@ -3801,6 +3892,8 @@ The following changes have occurred in the GRP\_ system since version 3.6:
 \begin{enumerate}
 \item Addition of routine GRP\_SAME.
 \item Addition of routine GRP\_SHOW.
+\item Addition of routine GRP\_ALARM.
+\item Addition of routine GRP\_WATCH.
 \end{enumerate}
 
 \section{Changes and New Features in V3.6}

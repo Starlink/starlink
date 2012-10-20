@@ -119,6 +119,10 @@
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
+*  Check if the identifier is being watched.
+      IF( IGRP .EQ. CMN_WATCH ) CALL GRP_ALARM( IGRP, 'DELETE',
+     :                                          STATUS )
+
 *  All related groups are deleted. Initialise the list of group to
 *  be deleted to contain just the supplied group.
       NDEL = 1

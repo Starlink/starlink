@@ -90,6 +90,9 @@
 *  Set the current slot number context level to 1.
       DATA CMN_IDCTX / 1 /
 
+*  No group is currently being watched.
+      DATA CMN_WATCH / GRP__NOID /
+
 *  Set up the control character names.
       DATA (CMN_CCNAM( I ), I = 1, GRP__NCHAR) /
      : 'INDIRECTION',

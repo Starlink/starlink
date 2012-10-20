@@ -889,3 +889,14 @@ void grpGetcc( const Grp *grp, const char *cclist, char *cc, size_t cc_len,
   }
 }
 
+F77_SUBROUTINE(grp_watch)( INTEGER(IGRP), INTEGER(STATUS) );
+void grpWatch( int igrp, int *status ){
+   DECLARE_INTEGER(IGRP);
+   DECLARE_INTEGER(STATUS);
+   F77_EXPORT_INTEGER( igrp, IGRP );
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_LOCK( F77_CALL(grp_watch)( INTEGER_ARG(&IGRP),
+                                  INTEGER_ARG(&STATUS) ); )
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+

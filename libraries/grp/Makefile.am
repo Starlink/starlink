@@ -52,7 +52,7 @@ BASIC_F_ROUTINES = grp1_cdesc.f grp1_conc.f grp1_cpoin.f grp1_eledt.f \
   grp_infoi.f grp_listf.f grp_msg.f grp_new.f grp_own.f grp_ptype.f \
   grp_purge.f grp_put.f grp_put1.f grp_remov.f grp_setcc.f grp_setcs.f \
   grp_setsz.f grp_sown.f grp_valid.f grp1_index.f grp1_chkcc.f grp1_rmesc.f \
-  grp1_vrbtm.f grp_slave.f grp_show.f grp_same.f
+  grp1_vrbtm.f grp_slave.f grp_show.f grp_same.f grp_watch.f grp_alarm.f
 
 #  Additional Fortran routines required for the standalone library.
 STANDALONE_F_ROUTINES =
