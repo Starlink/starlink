@@ -142,6 +142,10 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  For debugging, watch one of the leaked GRP identifiers listed by the
+*  call to GRP_WATCH at the end of this routine (if any).
+*      CALL GRP_WATCH( 3129345, status );
+
 *  Mark any currently active NDF parameters, so that they will not be
 *  cancelled by the call to NDF_CANCL at the end of this rotuine.
       CALL NDF_CANCL( '*', STATUS )
@@ -406,6 +410,7 @@
      :             ' error).', STATUS )
          CALL GRP_INFOI( GRP__NOID, 0, 'ACTIVE', NGRP1, STATUS )
          CALL MSG_BLANK( STATUS )
+         CALL GRP_WATCH( 0, STATUS )
       END IF
       CALL ERR_END( STATUS )
 

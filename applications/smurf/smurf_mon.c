@@ -255,6 +255,10 @@ void smurf_mon( int * status ) {
      we set the watch point here. */
   /* astWatchMemory( 29 ); */
 
+  /* For debugging, watch one of the leaked GRP identifiers listed by the
+     call to grpWatch at the end of this routine (if any). */
+  /* grpWatch( 3129345, status ); */
+
   /* Mark any currently active NDF parameters, so that they will
      not be cancelled by the call to ndfCancl at the end of this
      function. */
@@ -426,6 +430,7 @@ void smurf_mon( int * status ) {
             "during execution of ^NAME (" PACKAGE_UPCASE " programming "
             " error).", status);
     msgBlank(status);
+    grpWatch( 0, status );
   }
   errEnd( status );
 

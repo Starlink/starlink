@@ -111,6 +111,10 @@ void cupid_mon( int *status ) {
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
 
+/* For debugging, watch one of the leaked GRP identifiers listed by the
+   call to grpWatch at the end of this routine (if any). */
+   grpWatch( 3129345, status );
+
 /* Read the input error message stack level */
    emsLevel( &emslev1 );
 
@@ -216,6 +220,7 @@ void cupid_mon( int *status ) {
              "during execution of ^NAME (" PACKAGE_UPCASE " programming "
              " error).", status);
      msgBlank(status);
+     grpWatch( 0, status );
    }
    errEnd( status );
 
