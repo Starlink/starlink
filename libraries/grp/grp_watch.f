@@ -23,10 +23,10 @@
 
 *  Arguments:
 *     IGRP= INTEGER (Given)
-*        The identifier for the group to be watched. If this is GRP__NOID,
+*        The identifier for the group to be watched. If this is zero,
 *        the identifiers of all currently active groups are listed on
 *        standard output. NOTE, in the C interface this should be an
-*        integer (or GRP__NOID), not a pointer to a Grp structure.
+*        integer, not a pointer to a Grp structure.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -95,7 +95,7 @@
 
 *  If a sequence number of zero was supplied, list all the sequence
 *  numbers of all active groups.
-      IF( IGRP .EQ. GRP__NOID ) THEN
+      IF( IGRP .EQ. 0 ) THEN
 
          FIRST = .TRUE.
          DO SLOT = 1, GRP__MAXG
