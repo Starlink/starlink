@@ -20,6 +20,9 @@
  */
 #define COLROW 1
 
+/* True while testing FTS-2 reduction. */
+#define FTS2KLUDGE 0
+
 /* The one-based index for each Frame within the cached FrameSet. Note,
    these values reflect on the order in which the Frames are added to the
    FrameSet. So if the order is changed, these values should be changed
@@ -350,6 +353,12 @@ int *status             /* global status (given and returned) */
    int nin;
    int nout;
    sc2astCache *result;
+
+#if FTS2KLUDGE
+   AstMatrixMap *flipmap;
+   AstMatrixMap *mirrormap;
+   double flip[4] = {-1, 0, 0, 1};
+#endif
 
 #if COLROW
    AstPermMap *permmap;
@@ -1484,6 +1493,24 @@ int *status             /* global status (given and returned) */
          cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
                                                           polymap, 1, " " );
       }
+
+#if FTS2KLUDGE
+/* Copied flip map from the libsc2fts2 directory...
+ * Apply this for the image port. */
+      mirrormap = astMatrixMap(2, 2, 0, flip, "");
+      cache->map[subnum] = (AstMapping *) astCmpMap(cache->map[subnum], mirrormap, 1, " ");
+
+      double ftsshift[] = {-20.43, 0};
+      AstShiftMap* ftsshiftmap = astShiftMap ( 2, ftsshift, " " );
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], ftsshiftmap, 1, " " );
+
+      flipmap = astMatrixMap(2, 2, 0, flip, "");
+      cache->map[subnum] = (AstMapping *) astCmpMap(cache->map[subnum], flipmap, 1, " ");
+
+      ftsshift[0] = - ftsshift[0]; ftsshift[1] = - ftsshift[1];
+      AstShiftMap* ftsshiftmapi = astShiftMap ( 2, ftsshift, " " );
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], ftsshiftmapi, 1, " " );
+#endif
 
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
