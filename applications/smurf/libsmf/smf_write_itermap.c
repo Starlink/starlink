@@ -13,7 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapvar, dim_t msize,
+*     smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapvar,
+*                        const smf_qual_t *mapqua, dim_t msize,
 *                        const Grp *iterrootgrp, size_t contchunk, int iter,
 *                        const int *lbnd_out, const int *ubnd_out,
 *                        AstFrameSet *outfset, const smfHead *hdr,
@@ -26,6 +27,8 @@
 *        The output map array
 *     mapvar = const double* (Given)
 *        Variance of each pixel in map
+*     mapqua = const smf_qual_t * (Given)
+*        Quality of each pixel in map. May be NULL.
 *     msize = dim_t (Given)
 *        Number of pixels in map/mapvar
 *     iterrootgrp = const Grp* (Given)
@@ -58,6 +61,7 @@
 
 *  Authors:
 *     EC: Ed Chapin (UBC)
+*     DSB: David Berry (JAC, Hawaii):
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,6 +69,8 @@
 *        Initial version factored out of smf_iteratemap. Also, always
 *        includr CH## in name, even if only one contchunk (to make naming
 *        more uniform).
+*     2012-10-22 (DSB):
+*        Add mapqua argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -108,12 +114,14 @@
 
 #define FUNC_NAME "smf_write_itermap"
 
-void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapvar, dim_t msize,
+void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapvar,
+                        const smf_qual_t *mapqua, dim_t msize,
                         const Grp *iterrootgrp, size_t contchunk, int iter,
                         const int *lbnd_out, const int *ubnd_out,
                         AstFrameSet *outfset, const smfHead *hdr,
                         const smfArray *qua, int *status ) {
 
+  int flags;                  /* Flags indicating required NDF components */
   Grp *mgrp=NULL;             /* Temporary group to hold map name */
   smfData *imapdata=NULL;     /* smfData for this iteration map */
   char name[GRP__SZNAM+1];    /* Buffer for storing name */
@@ -157,13 +165,17 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
   msgOutf( "", "*** Writing map from this iteration to %s", status,
            name );
 
+  flags = SMF__MAP_VAR;
+  if( mapqua ) flags |= SMF__MAP_QUAL;
+
   smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
-                     ubnd_out, SMF__MAP_VAR, &imapdata, status);
+                     ubnd_out, flags, &imapdata, status);
 
   /* Copy over the signal and variance maps */
   if( *status == SAI__OK ) {
     memcpy( imapdata->pntr[0], map, msize*sizeof(*map) );
     memcpy( imapdata->pntr[1], mapvar, msize*sizeof(*mapvar) );
+    if( mapqua ) memcpy( imapdata->pntr[2], mapqua, msize*sizeof(*mapqua) );
   }
 
   /* Write out a FITS header */

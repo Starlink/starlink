@@ -497,7 +497,9 @@
 *       subarray before they are combined internally.
 *     ITERMAP = LOGICAL
 *       If true each iteration is written to the output file in the
-*       .MORE.SMURF.ITERMAPS extension. [0]
+*       .MORE.SMURF.ITERMAPS extension. If it is larger than 1, then
+*       each itermap will include a quality component that reflects
+*       the AST mask in use. [0]
 *     MAPTOL = REAL
 *       Threshold chance in the mean absolute difference between map pixels
 *       in subsequent iterations, normalized by the estimated map RMS. This
@@ -767,13 +769,13 @@
 *       "MASK2" and "MASK3". If it is an integer, then any value larger
 *       than zero will cause the mask to be obtained using parameter
 *       "REF". Values smaller than or equal to zero will result in no
-*       external mask being used with the AST model. A benefit of using 
-*       REF rather than MASK2 or MASK3 is that REF also determines the 
-*       output pixel grid, and so alignment of the mask and output map 
-*       is guaranteed. This is not the case with MASK2 and MASK3 - it 
-*       is the user's responsibility to ensure that masks specified using 
-*       MASK2 or MASK3 are aligned with the output pixel grid. This can 
-*       be achieved, for isnatnce, by using the output from a previous 
+*       external mask being used with the AST model. A benefit of using
+*       REF rather than MASK2 or MASK3 is that REF also determines the
+*       output pixel grid, and so alignment of the mask and output map
+*       is guaranteed. This is not the case with MASK2 and MASK3 - it
+*       is the user's responsibility to ensure that masks specified using
+*       MASK2 or MASK3 are aligned with the output pixel grid. This can
+*       be achieved, for isnatnce, by using the output from a previous
 *       run of MAKEMAP to create the mask. [0]
 *     AST.ZERO_NITER = INTEGER
 *       The number of iterations for which the AST model should be

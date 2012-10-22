@@ -380,9 +380,11 @@
 *     2012-05-01 (DSB):
 *        Add control-C handler to allow controlled premature exit.
 *     2012-06-05 (DSB):
-*        Allow the old FLT model to be added back onto the residuals at the start 
-*        of each iteration, rather than just before finding a new FLT (in 
+*        Allow the old FLT model to be added back onto the residuals at the start
+*        of each iteration, rather than just before finding a new FLT (in
 *        smf_calcmodel_flt). This is controlled by new config parameter FLT.UNDOFIRST.
+*     2012-10-22 (DSB):
+*        If ( abs(itermaps) > 1 ) then include a quality component in each itermap.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1918,10 +1920,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              was the last filegroup of data to be added */
 
           if( itermap > 0 ) {
-            smf_write_itermap( wf, thismap, thisvar, msize, iterrootgrp,
-                               contchunk, iter, lbnd_out, ubnd_out,
-                               outfset, res[0]->sdata[0]->hdr, qua[0],
-                               status );
+            smf_write_itermap( wf, thismap, thisvar,
+                               ( itermap > 1 ) ? thisqual : NULL, msize,
+                               iterrootgrp, contchunk, iter, lbnd_out,
+                               ubnd_out, outfset, res[0]->sdata[0]->hdr,
+                               qua[0], status );
 
             /*** TIMER ***/
             msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
@@ -2263,11 +2266,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* If we're writing out only the final map from each chunk, do it here */
       if( itermap < 0 ) {
-        smf_write_itermap( wf, thismap, thisvar, msize, iterrootgrp,
-                           contchunk, iter, lbnd_out, ubnd_out,
-                           outfset, res[0]->sdata[0]->hdr, qua[0],
-                           status );
-
+        smf_write_itermap( wf, thismap, thisvar,
+                           ( itermap < -1 ) ? thisqual : NULL, msize,
+                           iterrootgrp, contchunk, iter, lbnd_out,
+                           ubnd_out, outfset, res[0]->sdata[0]->hdr,
+                           qua[0], status );
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                    ": ** %f s writing itermap",
