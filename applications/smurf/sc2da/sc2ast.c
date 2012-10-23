@@ -355,9 +355,25 @@ int *status             /* global status (given and returned) */
    sc2astCache *result;
 
 #if FTS2KLUDGE
-   AstMatrixMap *flipmap;
-   AstMatrixMap *mirrormap;
-   double flip[4] = {-1, 0, 0, 1};
+   const char *fts_port;
+   double fts_shift[] = {0, 0};
+   AstMatrixMap* fts_flipmap;
+   AstShiftMap* fts_shiftmap;
+
+   /* Coordinates of the FTS-2 ports.  These coordinates
+    * should be subtracted before flipping / scaling the
+    * coordinates and added back on afterwards. */
+   double fts_port_1[2] = {-20.43,  20.43};
+   double fts_port_2[2] = { 20.43,  20.43};
+
+   /* A matrix to perform the FTS-2 mirroring, both
+    * within each port, and from a port to its
+    * image -- i.e. this defines the FTS-2 mirroring
+    * axis, assuming it is the same in all cases. */
+   double fts_flip[4] = {-1, 0, 0, 1};
+
+   /* To be set to true if we are looking at the FTS-2's image port. */
+   int fts_mirror_image;
 #endif
 
 #if COLROW
@@ -1495,21 +1511,33 @@ int *status             /* global status (given and returned) */
       }
 
 #if FTS2KLUDGE
-/* Copied flip map from the libsc2fts2 directory...
- * Apply this for the image port. */
-      mirrormap = astMatrixMap(2, 2, 0, flip, "");
-      cache->map[subnum] = (AstMapping *) astCmpMap(cache->map[subnum], mirrormap, 1, " ");
+      fts_port = getenv("SMURF_FTS_PORT");
 
-      double ftsshift[] = {-20.43, 0};
-      AstShiftMap* ftsshiftmap = astShiftMap ( 2, ftsshift, " " );
-      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], ftsshiftmap, 1, " " );
+      if (fts_port) {
+         fts_flipmap = astMatrixMap(2, 2, 0, fts_flip, "");
 
-      flipmap = astMatrixMap(2, 2, 0, flip, "");
-      cache->map[subnum] = (AstMapping *) astCmpMap(cache->map[subnum], flipmap, 1, " ");
+         if (! (strcmp(fts_port, "1") && strcmp(fts_port, "a") && strcmp(fts_port, "d"))) {
+            fts_shift[0] = - fts_port_1[0]; fts_shift[1] = - fts_port_1[1];
+            fts_mirror_image = subnum == S4B || subnum == S8C;
+         }
+         else {
+            fts_shift[0] = - fts_port_2[0]; fts_shift[1] = - fts_port_2[1];
+            fts_mirror_image = subnum == S4A || subnum == S8D;
+         }
 
-      ftsshift[0] = - ftsshift[0]; ftsshift[1] = - ftsshift[1];
-      AstShiftMap* ftsshiftmapi = astShiftMap ( 2, ftsshift, " " );
-      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], ftsshiftmapi, 1, " " );
+         if (fts_mirror_image) {
+            cache->map[subnum] = (AstMapping *) astCmpMap(cache->map[subnum], fts_flipmap, 1, " ");
+         }
+
+         fts_shiftmap = astShiftMap ( 2, fts_shift, " " );
+         cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], fts_shiftmap, 1, " " );
+
+         cache->map[subnum] = (AstMapping *) astCmpMap(cache->map[subnum], fts_flipmap, 1, " ");
+
+         fts_shift[0] = - fts_shift[0]; fts_shift[1] = - fts_shift[1];
+         fts_shiftmap = astShiftMap ( 2, fts_shift, " " );
+         cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], fts_shiftmap, 1, " " );
+      }
 #endif
 
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
