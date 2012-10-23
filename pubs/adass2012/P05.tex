@@ -28,9 +28,9 @@ Collection, code-named "Kapuahi".
 Starlink (\url{www.starlink.ac.uk}) is an open-source project hosted on
 github that provides a wide range of astronomical applications and
 associated infrastructure libraries. From an initial start in 1980, the
-software has been in continuous development and use ever since, and is
-now supported primarily by the Joint Astronomy Centre, Hawaii
-(\url{www.jach.hawaii.edu}).
+software has been in development and use ever since, and is
+now supported by the Joint Astronomy Centre, Hawaii
+\citep{SSC_2009}.
 
 \subsection{Selected Applications}
 \begin{description}
@@ -42,7 +42,7 @@ cubes (\url{star-www.dur.ac.uk/~pdraper/gaia/gaia.html}).
 \item[KAPPA] Nearly 200 general purpose commands for the display and manipulation of N-dimensional arrays.
 \item[CCDPACK] Commands for the reduction of CCD data.
 \item[POLPACK] Commands for the creation and display of polarisation vectors from arrays of analysed intensity.
-\item[SMURF] Commands for the reduction of sub-mm data from the James Clerk Maxwell Telescope.
+\item[SMURF] Sub-mm data reduction facilities for the James Clerk Maxwell Telescope.
 \item[CUPID] Provides implementations of various clump-finding algorithms such as ClumpFind, GaussClumps, and others, together with other supporting commands.
 \item[ATOOLS] A command-line interface to the WCS management functions provided by the AST library.
 \item[CONVERT] Commands for converting to and from the Starlink NDF data format. Several foreign data formats are supporting, including FITS.
@@ -72,21 +72,18 @@ stored as 64-bit integers.
 \begin{itemize}
 \item Mutexes are used to serialise access to Fortran subroutines from within
 C code, making it safe to call them within a thread.
-\item All use of the SLALIB library within C code has been replaced the new
-PAL library (Fortran still uses SLALIB).
+\item All use of the SLALIB library within C code has been replaced by the new
+PAL library \citep{P56_adassxxii}. Fortran code still uses SLALIB.
 \end{itemize}
 
 \subsection{Application Changes}
-\begin{description}
 
-\item[ATOOLS] \hfill
-\begin{itemize}
-\item All commands now allow the output WCS information to be created
-in various textual formats, including AST, XML, STC-S, or a variety of
-common FITS header formats.
-\end{itemize}
+\subsubsection{ATOOLS}
+All commands now allow the output WCS information to be created
+in various textual formats, including AST, XML, STC-S, or
+various FITS header formats.
 
-\item[CUPID] \hfill
+\subsubsection{CUPID}
 \begin{itemize}
 \item GaussClumps now excludes peaks below the specified threshold from the output catalogue and NDF.
 \item GaussClumps has improved its ability to decompose merged clumps.
@@ -94,7 +91,7 @@ common FITS header formats.
 \item FINDBACK can now find and use an independent default noise value for each slice of supplied NDF.
 \end{itemize}
 
-\item[GAIA] \hfill
+\subsubsection{GAIA}
 \begin{itemize}
 \item A snapshot can now be taken of the whole image, including the off-screen parts, so it is now possible to capture a graphic of the whole image at full or higher resolution when it is larger than the main window.
 \item The "Intensity Map:" selector in the main panel has been replaced by a "Colour Scale:" selector, which gives more careful transformation of intensity into log-like space, reducing the false contouring seen in low intensities.
@@ -102,10 +99,10 @@ common FITS header formats.
 \item Several issues with the axes plotting in the three-dimensional visualisation toolboxes have been fixed. There is a new free-form entry area for AST attributes so that the axes can be configured.
 \end{itemize}
 
-\item[KAPPA] \hfill
+\subsubsection{KAPPA}
 \begin{itemize}
-\item HISTOGRAM now allows different weights to be associated with each input pixel value.
-\item MFITTREND now permits processing of very large datasets by dividing into manageable sections.
+\item HISTOGRAM now allows weights to be associated with each input pixel value.
+\item MFITTREND now permits processing of very large datasets.
 \item PASTE now allows a constant shifts of origin between successive pasted data. For instance, this can be used to paste a set of 2D images into a 3D cube.
 \item SCATTER now displays the Pearson coefficient of the data in the scatter plot, and writes it to a parameter.
 \item SETAXIS can now create axes describing a linear approximation to the WCS in the supplied NDF.
@@ -113,62 +110,53 @@ common FITS header formats.
 \item The REGRID, WCSALIGN and WCSMOSAIC commands now have more control over the details of how (as well as if) flux is conserved.
 \end{itemize}
 
-\item[SMURF] \hfill
+\subsubsection{SMURF}
 \begin{itemize}
 \item Many improvements have been made that allow better maps to be
 created from SCUBA-2 data (\url{scuba2.wordpress.com}).
 \item FIT1D is a new command that fits profiles to spectral lines.  It can fit complex spectra with multiple components and non-Gaussian shapes.
 \end{itemize}
 
-\end{description}
 
 \subsection{Library Changes}
-\begin{description}
 
-\item[AST] \hfill
+\subsubsection{AST}
 \begin{itemize}
-\item Now has a python interface-PyAST (\url{github.com/timj/starlink-pyast}).
+\item Now has a python interface-PyAST \citep{P011_adassxxi}. It is
+hosted on github (\url{github.com/timj/starlink-pyast}).
 \item Now included in Fedora and Debian repositories.
 \item Now based on the SOFA and PAL libraries rather than SLALIB.
 \item Extended support for a variety of distorted FITS projections including SIP, TPV, TNX, ZPX, SAO, and SCAMP.
 \item Boundaries of complex Regions are now plotted much faster.
 \end{itemize}
 
-\item[NDF] \hfill
+\subsubsection{NDF}
 \begin{itemize}
 \item Now has a python interface-PyNDF (\url{github.com/timj/starlink-pyndf}).
 \item Problems with the interpretation of NDF sections specified in WCS coordinates have been fixed.
 \item Foreign format NDFs may now have dots in the file base-name.
 \end{itemize}
 
-\item[PAL] \hfill
-\begin{itemize}
-\item A new C library that provides the functionality of the older Fortran SLALIB library through use of equivalent SOFA routines where available, or by a re-writing of the SLALIB Fortran code otherwise.
-\end{itemize}
+\subsubsection{PAL}
+A new C library that provides the functionality of the older Fortran SLALIB library through use of equivalent SOFA routines where available, or by a re-writing of the SLALIB Fortran code otherwise.
 
-\item[THR] \hfill
-\begin{itemize}
-\item A new library that provides facilities to manage pools of persistent threads, allowing jobs to be run in parallel from within C applications.
-\end{itemize}
-
-\end{description}
+\subsubsection{THR}
+A new library that provides facilities to manage pools of persistent threads, allowing jobs to be run in parallel from within C applications.
 
 \section{The Starlink Github Repository}
 The Starlink git repositories have been moved from the Joint Astronomy
 Centre, Hawaii, and are now hosted on github
-(\url{github.com/Starlink/starlink}). It is expected that this
-will ease collaboration, give greater visibility and some degree of
-future-proofing for the Starlink Software Collection.
+(\url{github.com/Starlink/starlink}).
 
 \section{Obtaining Starlink Software}
 The Starlink Software Collection may be obtained in three ways:
 \begin{itemize}
-\item By downloading a pre-built Kapuahi release. These are available for both Linux and OS X (32 and 64 bit). See the Starlink home page for instructions.
-\item By copying the current cutting-edge build from the Joint Astronomy Centre, using rsync. Again, see the Starlink home page for instructions.
-\item By checking out the current source files from the github repository and building from source. See the README file in the root directory of the checkout for instructions.
+\item Downloading a pre-built Kapuahi release. These are available for both Linux and OS X (32 and 64 bit). See the Starlink home page for instructions.
+\item Copying the current cutting-edge build from the Joint Astronomy Centre, using rsync. Again, see the Starlink home page for instructions.
+\item Checking out the source files from the github repository and building from source. See the README file in the checkout root directory for instructions.
 \end{itemize}
 
 
-\bibliography{P011}
+\bibliography{P05}
 
 \end{document}
