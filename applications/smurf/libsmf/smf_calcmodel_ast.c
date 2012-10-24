@@ -269,7 +269,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
            ": WARNING: ignoring negative value for ast.mapspike", status );
   }
 
-  if( (mapspike > 0) && noi && !(flags&SMF__DIMM_FIRSTITER) ) {
+  if( (mapspike > 0) && noi && !(flags&SMF__DIMM_FIRSTITER) &&
+                               !(flags&SMF__DIMM_PREITER) ) {
     size_t nflagged;
     smf_map_spikes( wf, res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
                     SMF__Q_GOOD, map, mapweight, hitsmap, mapvar, mapspike,
@@ -330,8 +331,12 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   }
 
   /* Get a mask to apply to the map. This is determined by the "Zero_..."
-     parameters in the configuration KeyMap. */
-  zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
+     parameters in the configuration KeyMap. Do not mask when subtracting
+     off the initial sky estimate, as the initial sky estimate will
+     already be masked. */
+  if( !(flags&SMF__DIMM_PREITER) ) {
+    zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
+  }
 
   /* Reset the SMF__MAPQ_ZERO bit (but retain it on the last iteration so
     that it gets written to the quality component of the output NDF). */

@@ -430,7 +430,8 @@ typedef enum {
   SMF__DIMM_FIRSTCOMP = BIT_TO_VAL(0),  /* First component in the solution */
   SMF__DIMM_FIRSTITER = BIT_TO_VAL(1),  /* First iteration */
   SMF__DIMM_INVERT    = BIT_TO_VAL(2),  /* Inverse of the model calculation */
-  SMF__DIMM_LASTITER  = BIT_TO_VAL(3)   /* Is this the last iteration? */
+  SMF__DIMM_LASTITER  = BIT_TO_VAL(3),  /* Is this the last iteration? */
+  SMF__DIMM_PREITER   = BIT_TO_VAL(4)   /* Before the first iteration */
 } smf_calcmodel_flags;
 
 /* Flags for smf_create_smf*, smf_open_file and smf_concat_smfGroup

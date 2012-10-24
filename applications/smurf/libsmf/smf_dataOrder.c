@@ -85,6 +85,12 @@
 *        Reorder sidequal
 *     2010-08-31 (EC):
 *        Move private smf__dataOrder_array into public smf_dataOrder_array
+*     2012-10-23 (DSB):
+*        If the smfData pixel values are stored in an NDF, do not attempt
+*        to re-order the smfData in-situ if the NDF is not writable. I've
+*        no idea what the Description comment "If flags set to
+*        SMF__NOCREATE_FILE..." means, so check the NDF access directly
+*        using the NDF library.
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -150,6 +156,8 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   size_t tstr1;                 /* time index stride input */
   size_t tstr2;                 /* time index stride output */
   int waschanged = 0;           /* did we chagne the order? */
+  int writable;                 /* Is the NDF writable? */
+  int freeold;                  /* Free the old array if change is not in place? */
 
   /* Main routine */
   if (*status != SAI__OK) return waschanged;
@@ -194,9 +202,21 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* we are going to change */
   waschanged = 1;
 
-  /* inPlace=1 if smfData was mapped! */
-  if( data->file && (data->file->fd || data->file->ndfid) ) {
-    inPlace = 1;
+  /* inPlace=1 if smfData was mapped! Free the old array if it was not
+     stored in a file. */
+  freeold = 1;
+  if( data->file ){
+     if (data->file->fd ){
+        inPlace = 1;
+        freeold = 0;
+
+     /* Only change NDF values in-place if write access is abvaialble for
+        the NDF. */
+     } else if( data->file->ndfid ) {
+        freeold = 0;
+        ndfIsacc( data->file->ndfid, "WRITE", &writable, status );
+        if( writable ) inPlace = 1;
+     }
   }
 
   /* Calculate input data dimensions (before changing order) */
@@ -229,13 +249,13 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
     data->pntr[i] = smf_dataOrder_array( data->pntr[i], data->dtype,
                                          data->dtype, ndata,
                                          ntslice, nbolo, tstr1, bstr1, tstr2,
-                                         bstr2, inPlace, 1, status );
+                                         bstr2, inPlace, freeold, status );
   }
 
   /* And Quality */
   data->qual = smf_dataOrder_array( data->qual, SMF__QUALTYPE, SMF__QUALTYPE,
                                     ndata, ntslice, nbolo, tstr1, bstr1, tstr2,
-                                    bstr2, inPlace, 1, status );
+                                    bstr2, inPlace, freeold, status );
 
   /* If NDF associated with data, modify dimensions of the data */
   if( data->file && (data->file->ndfid != NDF__NOID) ) {

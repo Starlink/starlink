@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
-*                     smf_extmeth *extmeth, int *status )
+*                     smf_extmeth *extmeth, int *import, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -23,11 +23,15 @@
 *        Source of optical depth data
 *     extmeth = smf_extmeth* (Returned)
 *        Method to use for airmass calculation
+*     import = int * (Returned)
+*        If non-zero, import the EXT model from an NDF created by a
+*        previous run of MAKEMAP. The NDF is expected to have the same
+*        name as would be created by setting "extportNDF=(ext)" in the
+*        makemap configuration.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-
 *     This function parses string representations of the tau source
 *      (TAUSOURCE) and method (TAUMETHOD) for extinction correction,
 *      stored in an astKeyMap, and returns enumerated types. For
@@ -38,6 +42,7 @@
 *  Authors:
 *     EC: Edward Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,12 +50,14 @@
 *        Initial version factored out of smurf_extinction
 *     2010-02-16 (TIMJ):
 *        Add "auto" mode detection.
+*     2012-10-22 (DSB):
+*        Add "import" option.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009,2012 Science & Technology Facilities Council.
 *     Copyright (C) 2009 University of British Columbia
 *     All Rights Reserved.
 
@@ -95,7 +102,7 @@
 #define FUNC_NAME "smf_get_extpar"
 
 void smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
-                     smf_extmeth *extmeth, int *status ) {
+                     smf_extmeth *extmeth, int *import, int *status ) {
 
   const char *tempstr = NULL;
 
@@ -104,6 +111,12 @@ void smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
   if (*status != SAI__OK) return;
 
   /* Obtain parameters from keymap when non-NULL pointers given */
+
+  if( import ) {
+    if( ! astMapGet0I( keymap, "IMPORT", import ) ) {
+       *import = 0;
+    }
+  }
 
   if( tausrc ) {
     if( astMapGet0C( keymap, "TAUSRC", &tempstr ) ) {

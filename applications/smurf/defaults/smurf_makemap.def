@@ -82,6 +82,9 @@ exportclean = 0
 fakemap = <undef>
 fakescale = 1
 
+# Subtract supplied initial guess at sky before iterating?
+importsky = 0
+
 # smf_model_create
 
 # TSTEP is read in two locations.
@@ -127,6 +130,7 @@ ext.filtertau = <undef>
 
 ext.tausrc = auto
 ext.taumethod = adaptive
+ext.import = 0
 
 # smf_calcmodel_ast
 

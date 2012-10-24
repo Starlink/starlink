@@ -252,6 +252,8 @@ smf_history_check.c \
 smf_history_read.c \
 smf_history_write.c \
 smf_inbeam_str.c \
+smf_import_array.c \
+smf_initial_sky.c \
 smf_inst_get.c \
 smf_instap_get.c \
 smf_isdark.c \

@@ -279,6 +279,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   smfData *data = NULL;         /* Data struct for file */
   size_t datalen=0;             /* Size of data buffer in bytes */
   void *dataptr=NULL;           /* Pointer to data portion of buffer */
+  char *ename = NULL;           /* Name of file to import */
   smf_extmeth extmeth;          /* method of extinction correction */
   int flag=0;                   /* Flag */
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
@@ -289,6 +290,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   dim_t ibase;                  /* Base offset */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
   int idx=0;                    /* Index within subgroup */
+  int import;                   /* Import model values from an NDF? */
   int init_mem = 0;             /* Do we initialise the memory ? */
   size_t isize=0;               /* Number of files in input group */
   int is_initialised = 0;       /* Is buffer initialised ? */
@@ -303,6 +305,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
   dim_t nblock=0;               /* Number of time blocks */
   dim_t nbolo;                  /* Number of bolometers */
+  int nc;                       /* Used length of string */
   dim_t ndata=0;                /* Number of elements in data array */
   dim_t nrel=0;                 /* Number of related elements (subarrays) */
   dim_t ntslice=0;              /* Number of time slices */
@@ -995,36 +998,48 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
               astMapGet0A( keymap, "EXT", &kmap );
 
               /* Use sub-keymap containing EXT parameters */
-              smf_get_extpar( kmap, &tausrc, &extmeth, status );
-              if( tausrc == SMF__TAUSRC_CSOTAU ||
-                  tausrc == SMF__TAUSRC_AUTO ) {
-                /* In AUTO mode we can let people specify a fallback CSO tau.
-                   In CSO mode a hard-coded value will be used for all files. */
-                if( astMapGet0D( kmap, "CSOTAU", &tau ) ) {
-                  msgOutf( "", "*** EXTINCTION WARNING: single opacity value "
-                           "of CSO %g %s be used for ALL input files.", status,
-                           tau, ( tausrc == SMF__TAUSRC_CSOTAU ? "will" : "might" ) );
-                }
-              } else if( tausrc == SMF__TAUSRC_TAU ) {
-                if( astMapGet0D( kmap, "FILTERTAU", &tau ) ) {
-                  msgOutf( "", "*** EXTINCTION WARNING: single opacity value "
-                           "of %g will be used for ALL input files.", status, tau );
-                }
+              smf_get_extpar( kmap, &tausrc, &extmeth, &import, status );
+
+              /* If importing the EXT values from an NDF... */
+              if( import ) {
+                 nc = strstr( name, "_con" ) - name + 4;
+                 ename = astStore( NULL, name, nc + 1 );
+                 ename[ nc ] = 0;
+                 ename = astAppendString( ename, &nc, "_ext" );
+                 smf_import_array( idata, ename, 2, (double *) dataptr, status );
+                 ename = astFree( ename );
+
+              /* If calculating new EXT values here... */
+              } else {
+
+                 if( tausrc == SMF__TAUSRC_CSOTAU ||
+                     tausrc == SMF__TAUSRC_AUTO ) {
+                   /* In AUTO mode we can let people specify a fallback CSO tau.
+                      In CSO mode a hard-coded value will be used for all files. */
+                   if( astMapGet0D( kmap, "CSOTAU", &tau ) ) {
+                     msgOutf( "", "*** EXTINCTION WARNING: single opacity value "
+                              "of CSO %g %s be used for ALL input files.", status,
+                              tau, ( tausrc == SMF__TAUSRC_CSOTAU ? "will" : "might" ) );
+                   }
+                 } else if( tausrc == SMF__TAUSRC_TAU ) {
+                   if( astMapGet0D( kmap, "FILTERTAU", &tau ) ) {
+                     msgOutf( "", "*** EXTINCTION WARNING: single opacity value "
+                              "of %g will be used for ALL input files.", status, tau );
+                   }
+                 }
+
+                 /* Trap case where FILTERTAU requsted but no value given */
+                 if( (tausrc==SMF__TAUSRC_TAU) && (tau==VAL__BADD) ) {
+                     *status = SAI__ERROR;
+                     errRep( "", FUNC_NAME
+                            ": FILTERTAU requested but no value provided",
+                            status );
+                 }
+
+                 smf_correct_extinction( wf, idata, tausrc, extmeth, kmap, tau,
+                                         (double *) dataptr, &wvmtaucache, status );
               }
-
-              /* Trap case where FILTERTAU requsted but no value given */
-              if( (tausrc==SMF__TAUSRC_TAU) && (tau==VAL__BADD) ) {
-                  *status = SAI__ERROR;
-                  errRep( "", FUNC_NAME
-                         ": FILTERTAU requested but no value provided",
-                         status );
-              }
-
-              smf_correct_extinction( wf, idata, tausrc, extmeth, kmap, tau,
-                                      (double *) dataptr, &wvmtaucache, status );
-
               kmap = astAnnul( kmap );
-
 
             } else if( mtype == SMF__DKS ) {
               int replacebad;

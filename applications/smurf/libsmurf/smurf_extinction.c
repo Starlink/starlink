@@ -339,7 +339,7 @@ void smurf_extinction( int * status ) {
     if( astOK ) {
       astMapPut0C( keymap, "TAUSRC", tausource, NULL );
       astMapPut0C( keymap, "TAUMETHOD", method, NULL );
-      smf_get_extpar( keymap, &tausrc, &extmeth, status );
+      smf_get_extpar( keymap, &tausrc, &extmeth, NULL, status );
     }
   }
 

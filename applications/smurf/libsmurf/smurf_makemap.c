@@ -495,6 +495,18 @@
 *       into memory simultaneously. In such circumstances it may still
 *       be possible to produce fully cross-linked maps from each
 *       subarray before they are combined internally.
+*     IMPORTSKY = STRING
+*       If IMPORTSKY is set to "REF" or a positive integer, then the NDF
+*       specified by ADAM parameter REF is used as an initial guess at the
+*       sky brightness. Prior to the first iteration, this map is sampled
+*       at the position of each bolometer sample and the sampled values are
+*       subtracted from the cleaned data values. When the map is made at
+*       the end of the first iteration, the sampled IMPORTSKY values are
+*       added back onto the residuals before binning them into a map. If
+*       "MASK"2 or "MASK3" is supplied for IMPORTSKY then the MASK" or
+*       MASK3 ADAM parameters are used to access the initial sky map, in
+*       place of REF. The default value of zero means that no initial sky
+*       map is used. [0]
 *     ITERMAP = LOGICAL
 *       If true each iteration is written to the output file in the
 *       .MORE.SMURF.ITERMAPS extension. If it is larger than 1, then
@@ -917,6 +929,10 @@
 *       the current wavelength. Only used if TAUSRC equals
 *       "FILTERTAU". Note that no check is made to ensure that all the
 *       input files share the same filter. [undef]
+*     EXT.IMPORT = LOGICAL
+*       If non-zero then the EXT model values are read in from a disk file
+*       rather than being calculated anew. The disk file should have been
+*       created by setting "EXPORTNDF=EXT" on a previous run of makemap. [0]
 *     EXT.METHOD = STRING
 *       As with EXTINCTION task, method to use for airmass calculation:
 *          - ADAPTIVE  - Determine whether to use QUICK or FULL

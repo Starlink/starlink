@@ -533,6 +533,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 /*  size_t i;                     */ /* Loop counter */
   size_t idat;                  /* smfData counter */
   size_t imodel;                /* Model counter */
+  size_t importsky;             /* Subtract a supplied initial sky map? */
   size_t ipix;                  /* Pixel counter */
   int ii;                       /* Loop counter */
   size_t idx=0;                 /* index within subgroup */
@@ -695,7 +696,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     if( *status == SAI__OK ) {
 
       /* See if the FLT model is to be undone at the start of the
-         ioteration or when the FLT model is updated. */
+         iteration or when the FLT model is updated. */
       if( astMapGet0A( keymap, "FLT", &kmap ) ) {
          astMapGet0I( kmap, "UNDOFIRST", &flt_undofirst );
          kmap = astAnnul( kmap );
@@ -1598,12 +1599,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       if( noisemaps ) smf_close_related( &noisemaps, status );
 
-
-
-
-
-
-
+      /* Allow an initial guess at the sky brightness to be supplied, in
+         which case copy it into "thismap", sample it and subtract it from
+         the cleaned data. */
+      importsky = smf_initial_sky( wf, keymap, &dat, status );
 
 
 
@@ -1847,7 +1846,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                the previous chunk). Ignore map pixels that have been
                constrained to zero. First find how many samples to process
                in each worker thread. */
-            if( iter > 0 ) {
+            if( iter > 0 || importsky ) {
               size_t sampstep = dsize/nw;
               if( sampstep == 0 ) sampstep = 1;
 
