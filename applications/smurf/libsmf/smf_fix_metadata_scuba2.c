@@ -52,6 +52,7 @@
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     EC: Ed Chapin (UBC)
 *     BRADC: Brad Cavanagh (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 
 *  Notes:
 *     o This function should not be called directly but should be
@@ -78,6 +79,9 @@
 *        Do the RTS_NUM fix for more data since engineering data with a private
 *        sequence has the same problem. Also check that the end value is zero.
 *        Can not check for shutter state either.
+*     2012-10-24 (DSB):
+*        Set POL_CRD to FPLANE for all POL-2 data prior to some date in
+*        the future that has not yet been decided.
 
 *  Copyright:
 *     Copyright (C) 2009-2011 Science & Technology Facilities Council.
@@ -437,6 +441,23 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     }
 
   }
+
+  /* For POL-2 data prior to ???, the POL_CRD header should always have
+     been "FPLANE". REMOVE THE "1 ||" AND USE THE CORRECT UTDATE BELOW
+     WHEN THIS PROBLEM HAS BEEN FIXED. */
+  if ( 1 || fitsvals.utdate < 20121024 ) {
+    char polcrd[80] = "<unset>";
+    smf_getfitss( hdr, "POL_CRD", polcrd, sizeof(polcrd), status );
+    if (*status == SMF__NOKWRD) {
+       errAnnul( status );
+    } else if( !strcmp( polcrd, "TRACKING" ) || !strcmp( polcrd, "AZEL" ) ) {
+      msgOutiff( msglev, "",  INDENT "Changing POL_CRD from %s to FPLANE", status, polcrd);
+      smf_fits_updateS( hdr, "POL_CRD", "FPLANE",
+                        "Coordinate system of polarimeter", status );
+      have_fixed |= SMF__FIXED_FITSHDR;
+    }
+  }
+
 
   return have_fixed;
 }
