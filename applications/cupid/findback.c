@@ -71,15 +71,15 @@ void findback( int *status ){
 *        The dimensions of each of the filters, in pixels. Each value
 *        should be odd (if an even value is supplied, the next higher odd
 *        value will be used). The number of values supplied should not
-*        exceed the number of pixel axes in the input array. If any trailing
-*        values of 1 are supplied, then each pixel value on the corresponding
-*        axes will be fitted independently of its neighbours. For instance,
-*        if the data array is 3-dimensional, and the third BOX value is 1,
-*        then each x-y plane will be fitted independently of the neighbouring
-*        planes. If the NDF has more than 1 pixel axis but only 1 value is
-*        supplied, then the same value will be used for the both the first
-*        and second pixel axes (a value of 1 will be assumed for the third
-*        axis if the input array is 3-dimensional).
+*        exceed the number of significant pixel axes in the input array. If
+*        any trailing values of 1 are supplied, then each pixel value on the
+*        corresponding axes will be fitted independently of its neighbours.
+*        For instance, if the data array is 3-dimensional, and the third BOX
+*        value is 1, then each x-y plane will be fitted independently of the
+*        neighbouring planes. If the NDF has more than 1 pixel axis but only
+*        1 value is supplied, then the same value will be used for the both
+*        the first and second pixel axes (a value of 1 will be assumed for
+*        the third axis if the input array is 3-dimensional).
 *     MSG_FILTER = _CHAR (Read)
 *        Controls the amount of diagnostic information reported. This is the
 *        standard messaging level. The default messaging level is NORM (2).
