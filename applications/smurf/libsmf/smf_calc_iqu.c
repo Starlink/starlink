@@ -79,6 +79,9 @@
 *     4-OCT-2012 (DSB):
 *        Reverse the pixels along the X axis of the output NDFs so that
 *        they presents a normal right-handed view of the sky.
+*     24-OCT-2012 (DSB):
+*        Swap Q and U. This is a result of Per's analysis of the polarised
+*        background with the calibrator in the beam.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -525,8 +528,8 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 /* Calculate the q, u and i values in the output NDF. The error on these values
    will be enormous if there are not many values, so use a large lower limit. */
             if( n > limit ) {
-               q = 4*s1/n;
-               u = 4*s2/n;
+               q = 4*s2/n;
+               u = 4*s1/n;
                i = 2*s3/n;
 
 /* Rotate the (q,u) vector so that an angle of zero corresponds to celestial
