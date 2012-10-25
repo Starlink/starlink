@@ -159,7 +159,7 @@ def _getLevel( level ):
 
 #  -------------------  Using ATASKS ---------------------------
 
-def invoke(command,aslist=False):
+def invoke(command,aslist=False,buffer=None):
    """
 
    Invoke an ADAM atask. An AtaskError is raised if the command fails.
@@ -168,7 +168,7 @@ def invoke(command,aslist=False):
    on the value of the "ilevel" and "glevel" module variables.
 
    Invocation:
-      value = invoke(command,aslist=False)
+      value = invoke(command,aslist=False,buffer=None)
 
    Arguments:
       command = string
@@ -180,6 +180,23 @@ def invoke(command,aslist=False):
          list of lines. If aslist is False, the standard output is
          returned as a single string with new lines separated by embedded
          newline characters.
+      buffer = boolean
+         If true, then standard output from the command is written to a
+         disk file as the atask runs, and only read back into Python when
+         the atask completes. Thus if the screen imformation level
+         ("ILEVEL") is set to ATASK or above, the atask output will only
+         be shown to the user when the atask has completed. If "buffer" is
+         False, then the atask standard output is fed back to Python as
+         the atask creates it, and will appear on the screen in real-time.
+         NOTE - "buffer" should always be set to True if the atask is a
+         graphics application that may cause a GWM window to be created.
+         This is because any new gwmXrefresh process created by the atask
+         will never terminate and so will cause this script to freeze
+         whilst it waits for the gwmXrefresh process to end. Writing
+         standard output to a disk file seems to prevent this for some unknown
+         reason. If "buffer" is not specified, the default is always to
+         buffer unless the screen information level ("ILEVEL") is set to
+         ATASK or higher.
 
    Returned Value:
       A single string, or a list of strings, holding the standard output
@@ -194,58 +211,65 @@ def invoke(command,aslist=False):
    global __logfd
    global ATASK
    global glevel
+   global ilevel
 
    os.environ["ADAM_NOPROMPT"] = "1"
    os.environ["ADAM_EXIT"] = "1"
 
    msg_out( "\n>>> {0}\n".format(command), ATASK )
 
+   if buffer == None:
+      buffer = ( ilevel < ATASK )
+
    #  The original scheme used subprocess.check_output to invoke the
    #  atask. But the process hung for ever if the invoked command
    #  involved the creation of a gwm graphics window. I presume this is
    #  because subprocess.chech_call was waiting for the gwmXrefresh
    #  process (created by the atask) to die, which it never did unless
-   #  the GWM window was closed. SO instead we do the following, which
+   #  the GWM window was closed. So instead we do the following, which
    #  involves writing standard output from the atask to a disk file, and
    #  then reading the disk file back into the script. Any attempt to
    #  use the stdout argument of subprocess.popen() caused the thing to
    #  freeze again. StringIO would not work either as subprocess requires
    #  the stdout file object to "have a real file number".
-   stdout_file ="./starutil.stdout"
-   p = subprocess.Popen("{0} > {1} 2>&1".format(command,stdout_file), shell=True)
-   status = p.wait()
 
-   fd = open(stdout_file,"r")
-   outtxt = fd.read().strip()
-   fd.close()
-   os.remove(stdout_file)
-   msg_out( outtxt, ATASK )
+   if buffer:
+      stdout_file ="./starutil.stdout"
+      p = subprocess.Popen("{0} > {1} 2>&1".format(command,stdout_file), shell=True)
+      status = p.wait()
 
-   if status != 0:
-      raise AtaskError("\n\n{0}".format(outtxt))
-   elif aslist:
-      outtxt = outtxt.split("\n")
+      fd = open(stdout_file,"r")
+      outtxt = fd.read().strip()
+      fd.close()
+      os.remove(stdout_file)
+      msg_out( outtxt, ATASK )
 
-   #  Original scheme - kept in case someone knows how to fix the GWM
-   # freezing issue.
-   #try:
-   #   bytes = subprocess.check_output(command,shell=True)
-   #   if bytes != None:
-   #      outtxt = bytes.decode("utf-8").strip()
-   #      msg_out( outtxt, ATASK )
-   #      if aslist:
-   #         outtxt = outtxt.split("\n")
-   #   else:
-   #      outtxt = None
-   #
-   #except subprocess.CalledProcessError as err:
-   #   bytes = err.output
-   #   if bytes != None:
-   #      outtxt = bytes.decode("utf-8").strip()
-   #      msg_out( outtxt, ATASK )
-   #      raise AtaskError("\n\n{0}".format(bytes.decode("utf-8")))
-   #   else:
-   #      raise AtaskError()
+      if status != 0:
+         raise AtaskError("\n\n{0}".format(outtxt))
+      elif aslist:
+         outtxt = outtxt.split("\n")
+
+   #  Original non-buffering scheme - Does someone knows how to fix the GWM
+   # freezing issue without resorting to the above buffering scheme~
+   else:
+      try:
+         bytes = subprocess.check_output(command,shell=True)
+         if bytes != None:
+            outtxt = bytes.decode("utf-8").strip()
+            msg_out( outtxt, ATASK )
+            if aslist:
+               outtxt = outtxt.split("\n")
+         else:
+            outtxt = None
+
+      except subprocess.CalledProcessError as err:
+         bytes = err.output
+         if bytes != None:
+            outtxt = bytes.decode("utf-8").strip()
+            msg_out( outtxt, ATASK )
+            raise AtaskError("\n\n{0}".format(bytes.decode("utf-8")))
+         else:
+            raise AtaskError()
 
    msg_out( "\n", ATASK )
    return outtxt

@@ -386,7 +386,7 @@ try:
          qnm = NDG(qarray)
          qnm.comment = "qnm"
          invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
-                 format(qcom,qarray,qnm,ndevice) )
+                 format(qcom,qarray,qnm,ndevice), buffer=True )
 
 #  Now substract the normalized mean Q signal from each Q image.
          qsub = NDG(qarray)
@@ -411,7 +411,7 @@ try:
          unm = NDG(uarray)
          unm.comment = "unm"
          invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
-                 format(ucom,uarray,unm,ndevice) )
+                 format(ucom,uarray,unm,ndevice), buffer=True )
          usub = NDG(uarray)
          usub.comment = "usub"
          invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".
@@ -574,13 +574,13 @@ try:
 #  If a total intensity reference was supplied, display it as a background
 #  image, and plot the vectors over the top.
       if iref:
-         invoke( "$KAPPA_DIR/lutable mapping=linear coltab=grey device={0}".format(device))
-         invoke( "$KAPPA_DIR/display {0}'(,,3)' mode=perc percentiles=\[1,99\] badcol=black device={1}".format(cube,device))
-         invoke( "$POLPACK_DIR/polplot {0} clear=no axes=no colmag={1} key=yes style='colour=red' device={2}".format(selcat,plot,device))
+         invoke( "$KAPPA_DIR/lutable mapping=linear coltab=grey device={0}".format(device), buffer=True)
+         invoke( "$KAPPA_DIR/display {0}'(,,3)' mode=perc percentiles=\[1,99\] badcol=black device={1}".format(cube,device), buffer=True)
+         invoke( "$POLPACK_DIR/polplot {0} clear=no axes=no colmag={1} key=yes style='colour=red' device={2}".format(selcat,plot,device), buffer=True)
 
 #  Otherwise, just plot the vectors.
       else:
-         invoke( "$POLPACK_DIR/polplot {0} colmag={1} key=yes style=def device={2}".format(selcat,plot,device))
+         invoke( "$POLPACK_DIR/polplot {0} colmag={1} key=yes style=def device={2}".format(selcat,plot,device), buffer=True)
 
 #  Delete all temporary NDFs etc
    if retain:
