@@ -275,7 +275,6 @@ def invoke(command,aslist=False,buffer=None):
    return outtxt
 
 
-
 def get_task_par( parname, taskname ):
    """
 
@@ -1111,6 +1110,104 @@ class Par0F(Parameter):
 
       except TypeError:
          raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be numerical value.".format(_cmd_token(),val,self.name))
+
+
+
+
+
+
+class Par0I(Parameter):
+   '''
+
+   Describes a scalar integer parameter. The parameter is initially
+   in an unset state.
+
+   Constructor:
+      param = Par0I( name, prompt=None, default=Parameter.UNSET,
+                     noprompt=False, help=None, maxval=None, minval=None )
+         name = string
+            The parameter name. The supplied string is converted to upper case.
+         prompt = string
+            The prompt string.
+         default = float
+            The initial default value.
+         noprompt = boolean
+            If True, then the user will not be prompted for a parameter value
+            if none was supplied on the command line. Instead, the default
+            value will be used if set (a NoValueError will be raised otherwise).
+         help = string
+            The help string
+         maxval = int
+            The maximum acceptable value for the parameter.
+         minval = int
+            The minimum acceptable value for the parameter.
+
+   Properties:
+      This class defines the following properties in addition to those of
+      the Parameter class:
+
+      maxval = int
+         The maximum acceptable value for the parameter. If "None", no
+         upper limit is imposed. If maxval is less than minval, then the
+         range between them is a disallowed range, rather than an allowed
+         range.
+      minval = int
+         The minimum acceptable value for the parameter. If "None", no
+         lower limit is imposed.
+
+   Methods:
+      This class has no extra methods over and above those of
+      the Parameter class:
+
+   '''
+
+   def __init__(self, name, prompt=None, default=Parameter.UNSET,
+                noprompt=False, help=None, maxval=None, minval=None ):
+      Parameter.__init__(self, name, prompt, default, noprompt, help )
+      self.__maxval = None
+      self.__minval = None
+      self._setMaxVal(maxval)
+      self._setMinVal(minval)
+
+   def _getMaxVal(self):
+      return self.__maxval
+   def _setMaxVal(self,val):
+      self.__maxval = int(round(float(val))) if  val != None else None
+   def _getMinVal(self):
+      return self.__minval
+   def _setMinVal(self,val):
+      self.__minval = int(round(float(val))) if  val != None else None
+
+   minval = property(_getMinVal, _setMinVal, None, "The minimum parameter value")
+   maxval = property(_getMaxVal, _setMaxVal, None, "The maximum parameter value")
+
+   def _isValid(self):
+      val = Parameter._getValue(self)
+
+      try:
+         val = int(val)
+         minv = self._getMinVal()
+         maxv = self._getMaxVal()
+
+         big = (val > maxv) if maxv != None else False
+         small = (val < minv) if minv != None else False
+
+         if (maxv != None) and (minv != None):
+            if (maxv > minv) and (big or small):
+                  raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be between {3} and {4}.".format(_cmd_token(),val,self._getName(),minv,maxv))
+            elif (maxv <= minv) and (big and small):
+                  raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must not be between {3} and {4}.".format(_cmd_token(),val,self._getName(),maxv,minv))
+
+         elif big:
+            raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be no more than {3}.".format(_cmd_token(),val,self._getName(),maxv))
+
+         elif small:
+            raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be no less than {3}.".format(_cmd_token(),val,self._getName(),minv))
+
+         Parameter._setValue(self,val)
+
+      except TypeError:
+         raise InvalidParameterError("\n{0}Illegal value ('{1}') obtained for parameter '{2}'.\nIt must be an integer value.".format(_cmd_token(),val,self.name))
 
 
 
