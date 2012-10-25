@@ -40,6 +40,9 @@
 *        Linux does not like '(I4,''-''...)' embedded format style
 *        so pull out as explicit format statements
 *        Added CCYY-MM-DDTHH:MM format for completeness.
+*    25 Oct 2012 (TIMJ)
+*        Formats for READ are not allowed to include constant strings.
+*        Both g95 and gfortran get upset so replace with 1X.
 
 *  Notes:
 *     Guesses at the format of the DATE-OBS string from its length.
@@ -164,11 +167,11 @@
      &     DD, MONTHS(MM), MOD(YY,100)
 
 *     Formats for parsing
- 2221 FORMAT(I2,'/',I2,'/',I2)  ! DD/MM/YY
- 2222 FORMAT(I4,'-',I2,'-',I2)  ! CCYY-MM-DD
- 2223 FORMAT(I4,'-',I2,'-',I2,'T',I2,':',I2,':',I2) ! CCYY-MM-DDTHH:MM:SS[Z]
- 2224 FORMAT(I4,'-',I2,'-',I2,'T',I2,':',I2,':',I2,'.',I3) ! CCYY-MM-DDTHH:MM:SS.SSS[Z]
- 2225 FORMAT(I4,'-',I2,'-',I2,'T',I2,':',I2) ! CCYY-MM-DDTHH:MM
+ 2221 FORMAT(I2,1X,I2,1X,I2)  ! DD/MM/YY
+ 2222 FORMAT(I4,1X,I2,1X,I2)  ! CCYY-MM-DD
+ 2223 FORMAT(I4,1X,I2,1X,I2,1X,I2,1X,I2,1X,I2) ! CCYY-MM-DDTHH:MM:SS[Z]
+ 2224 FORMAT(I4,1X,I2,1X,I2,1X,I2,1X,I2,1X,I2,1X,I3) ! CCYY-MM-DDTHH:MM:SS.SSS[Z]
+ 2225 FORMAT(I4,1X,I2,1X,I2,1X,I2,1X,I2) ! CCYY-MM-DDTHH:MM
 
       END
 
