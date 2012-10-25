@@ -1502,7 +1502,9 @@ class NDG(object):
    it does not already exist) when the first NDG object is created, and
    is deleted (together with any files in it) when the class method
    NDG.cleanup() is called. Any temporary NDFs specified by this class
-   are also placed in this directory.
+   are also placed in this directory. By default, the temporary directory
+   is created within "/tmp" but this can be changed by setting the STAR_TEMP
+   environment variable to something other than "/tmp".
 
    When used as an iterable, the NDG class behaves liks a Python list
    in which each element is a string specifying an individual NDF.
@@ -1521,7 +1523,6 @@ class NDG(object):
             "gexp" do not exist or cannot be accessed. If False, the new
             NDG represents a group of new NDFs - they do not need to exist.
 
-
       ndg_instance = NDG( ndfs )
          ndfs = list | tuple
             A list or tuple in which each element is either a string
@@ -1534,7 +1535,6 @@ class NDG(object):
             size. The NDFs are placed in the temporary directory specified
             by the class variable NDG.tempdir, and have autmatically
             generated names.
-
 
       ndg_instance = NDG( ndg, mod=None )
          ndg = NDG
@@ -1616,7 +1616,8 @@ class NDG(object):
    @classmethod
    def __gettmpdir(cls):
       if NDG.tempdir == None:
-         NDG.tempdir = tempfile.mkdtemp( prefix='NDG_' )
+         dir = os.environ["STAR_TEMP"] if "STAR_TEMP" in os.environ else None
+         NDG.tempdir = tempfile.mkdtemp( prefix='NDG_', dir=dir )
       elif not os.path.isdir(NDG.tempdir):
          os.mkdir( NDG.tempdir )
       return NDG.tempdir
