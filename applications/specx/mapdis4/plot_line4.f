@@ -25,6 +25,7 @@ C-----------------------------------------------------------------------
       INCLUDE 'PLOT2D'
       INCLUDE 'FLAGCOMM'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 *     Functions
 
@@ -225,7 +226,8 @@ CD    PRINT *,'Windows are ',DX,' by',DY,' mm'
 *         Minimum and maximum on map
 
 *         PRINT *, 'Address of current map = ', LOCATION
-          CALL MAP_MAXMIN (%VAL(LOCATION), NAXX, NAXY, XLIM, YLIM,
+          CALL MAP_MAXMIN (%VAL(CNF_PVAL(LOCATION)), 
+     :                     NAXX, NAXY, XLIM, YLIM,
      &                     BADPIX_VAL, ZMIN, ZMAX)
           IF (ZMAX.LT.ZMIN) THEN
             CALL SXGTIDLE
@@ -301,7 +303,8 @@ CD    PRINT *,'Windows are ',DX,' by',DY,' mm'
           CALL SXGLIMITS    (XLIM(1), XLIM(2), YLIM(1), YLIM(2))
 *         PRINT *, 'Address of current map = ', LOCATION
 *         PRINT *, 'Map size (x,y) = ', NAXX, NAXY
-          CALL DRAW_MAP     (ZC(K1), NZ, %VAL(LOCATION), NAXX, NAXY,
+          CALL DRAW_MAP     (ZC(K1), NZ, %VAL(CNF_PVAL(LOCATION)), 
+     :                       NAXX, NAXY,
      &                       CBEG(1), CEND(1), CEND(2), CBEG(2),
      &                       NAX(1)-1, NAX(2)-1, LXPIX, LYPIX,
      &                       LTPOS, LTZ, LTNEG, CONTOURS,
@@ -376,7 +379,7 @@ CD    PRINT *,'Windows are ',DX,' by',DY,' mm'
         OPTIONS = ' ? H C Q E G M W'
         IF (GREYSCALE)    OPTIONS=' 0 1 3'//OPTIONS
         IF (SXGCOLOROK()) OPTIONS=' 2 4 5'//OPTIONS
-        CALL I2DOPT (%VAL(IPTR(1)), OPTIONS, REPEAT,
+        CALL I2DOPT (%VAL(CNF_PVAL(IPTR(1))), OPTIONS, REPEAT,
      &                CONTOURS, GREYSCALE, GRLIMITS)
       END IF
 

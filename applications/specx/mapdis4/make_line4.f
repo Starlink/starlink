@@ -28,6 +28,7 @@
       INCLUDE 'CUBE'
       INCLUDE 'FLAGCOMM'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 *     Functions
 
@@ -162,16 +163,18 @@
       WRITE (ILOUT,*) '--- Make_line4 --- '
       WRITE (ILOUT,*) '    extracting maps from data...'
 
-      CALL GETPARS (BUF1, BUF2, %VAL(IPTR(1)), %VAL(IPTR(2)),
-     &              %VAL(IPTR(3)), %VAL(IPTR(4)), %VAL(IPTR(5)),
-     &              %VAL(IPTR(6)), INTERP_WAIT, IFAIL)
+      CALL GETPARS (BUF1, BUF2, %VAL(CNF_PVAL(IPTR(1))), 
+     :              %VAL(CNF_PVAL(IPTR(2))),
+     &              %VAL(CNF_PVAL(IPTR(3))), %VAL(CNF_PVAL(IPTR(4))), 
+     :              %VAL(CNF_PVAL(IPTR(5))),
+     &              %VAL(CNF_PVAL(IPTR(6))), INTERP_WAIT, IFAIL)
       IF (IFAIL.NE.0) GO TO 999
 
 *     Invert the maps (top to bottom) to make right for graphics
 
       DO I = 1, 6
         LOCATION = IPTR (I)
-        CALL SWAP_ARR (4*NAX(1), %VAL(LOCATION), NAX(2))
+        CALL SWAP_ARR (4*NAX(1), %VAL(CNF_PVAL(LOCATION)), NAX(2))
       END DO
 
 *     Interpolate and/or smooth the maps as required...
@@ -228,7 +231,8 @@
       ELSE
 *       PRINT *, 'Writing file from address ', IPTR_MAP
         WRITE (IFILE) NMAPS, NAXX, NAXY
-        CALL VWRITE (IFILE, NMAPS*NAXX*NAXY, %VAL(IPTR_MAP), ISTAT)
+        CALL VWRITE (IFILE, NMAPS*NAXX*NAXY, %VAL(CNF_PVAL(IPTR_MAP)), 
+     :               ISTAT)
       END IF
 
       CLOSE (IFILE, IOSTAT=IOSTAT)

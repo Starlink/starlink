@@ -20,6 +20,7 @@ C        Unused RARAD, DECRAD
 
 *     Include files
 
+      INCLUDE 'CNF_PAR'
       INCLUDE 'STACKCOMM'
       INCLUDE 'FLAGCOMM'
 
@@ -27,6 +28,7 @@ C        Unused RARAD, DECRAD
 
       INTEGER*4 ISTAT
       LOGICAL*4 TSYMS_OK
+      LOGICAL   ISNEW
       REAL*4    HOUR_ANGLE
       REAL*8    AZ8,   EL8
       REAL*8    L2,    B2
@@ -45,6 +47,7 @@ C        Unused RARAD, DECRAD
 
       IF (.NOT. TSYMS_OK) THEN
         CALL GEN_MAKESYMB ('HOUR_ANGLE',    'R4', 1,
+     :        CNF_PREG(
 #if HAVE_PERCENTLOC
      :   %LOC(HOUR_ANGLE),
 #elif HAVE_INTRINSIC_LOC
@@ -52,8 +55,9 @@ C        Unused RARAD, DECRAD
 #else
     Do not have LOC or %LOC
 #endif
-     :   ISTAT)
+     :   ISNEW ), ISTAT)
         CALL GEN_MAKESYMB ('UT',            'R8', 1,
+     :        CNF_PREG(
 #if HAVE_PERCENTLOC
      :   %LOC(UTD),
 #elif HAVE_INTRINSIC_LOC
@@ -61,8 +65,9 @@ C        Unused RARAD, DECRAD
 #else
     Do not have LOC or %LOC
 #endif
-     :   ISTAT)
+     :   ISNEW ), ISTAT)
         CALL GEN_MAKESYMB ('JULIAN_DATE',   'R8', 1,
+     :        CNF_PREG(
 #if HAVE_PERCENTLOC
      :   %LOC(JULIAN_DATE),
 #elif HAVE_INTRINSIC_LOC
@@ -70,8 +75,9 @@ C        Unused RARAD, DECRAD
 #else
     Do not have LOC or %LOC
 #endif
-     :   ISTAT)
+     :   ISNEW ), ISTAT)
         CALL GEN_MAKESYMB ('GLATITUDE',     'R8', 1,
+     :        CNF_PREG(
 #if HAVE_PERCENTLOC
      :   %LOC(B2),
 #elif HAVE_INTRINSIC_LOC
@@ -79,8 +85,9 @@ C        Unused RARAD, DECRAD
 #else
     Do not have LOC or %LOC
 #endif
-     :   ISTAT)
+     :   ISNEW ), ISTAT)
         CALL GEN_MAKESYMB ('GLONGITUDE',    'R8', 1,
+     :        CNF_PREG(
 #if HAVE_PERCENTLOC
      :   %LOC(L2),
 #elif HAVE_INTRINSIC_LOC
@@ -88,7 +95,7 @@ C        Unused RARAD, DECRAD
 #else
     Do not have LOC or %LOC
 #endif
-     :   ISTAT)
+     :   ISNEW ), ISTAT)
         TSYMS_OK = .TRUE.
       END IF
 

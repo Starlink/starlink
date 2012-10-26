@@ -7,6 +7,8 @@
 
       IMPLICIT   NONE
 
+      INCLUDE 'CNF_PAR'
+
 *     Formal parameters:
 
       CHARACTER  FILENAME*(*)   ! Filename for SMP file
@@ -70,7 +72,7 @@ CD      PRINT *, '    virtual memory got (bytes)  = ', NBYTES
 
 *     Read the data into the image array
 
-      CALL VREAD (UNIT, NMAPS*IMX*IMY, %VAL(IPTR), ISTAT)
+      CALL VREAD (UNIT, NMAPS*IMX*IMY, %VAL(CNF_PVAL(IPTR)), ISTAT)
 
 *     Close the file and release the logical unit
 

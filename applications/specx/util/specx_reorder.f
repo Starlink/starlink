@@ -20,6 +20,7 @@ C  DATA array with variable sized quadrants catered for.
 
       INCLUDE   'FLAGCOMM'
       INCLUDE   'STACKCOMM'
+      INCLUDE   'CNF_PAR'
 
 *     local variables:
 
@@ -55,7 +56,7 @@ C     Get virtual memory and take copy of data
         RETURN
       END IF
 
-      CALL XCOPY  (4*NTOTAL, DATA, %VAL(IPTR))
+      CALL XCOPY  (4*NTOTAL, DATA, %VAL(CNF_PVAL(IPTR)))
 
       OFFSET = 1
 
@@ -76,7 +77,8 @@ C        copy target section into output array
 CD       PRINT *, 'Copy of array segment from: start, end, length = ',
 CD   &            DSTART, DEND, LENTGT
 
-         CALL XCOPY (4*LENTGT, %VAL(IPTR+ 4*DSTART), DATA(OFFSET))
+         CALL XCOPY (4*LENTGT, %VAL(CNF_PVAL(IPTR)+ 4*DSTART),
+     :               DATA(OFFSET))
 
 C        and update offset
 

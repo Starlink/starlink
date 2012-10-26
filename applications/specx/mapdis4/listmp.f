@@ -37,6 +37,7 @@ C    the sky and in the file.
       INCLUDE 'MAPS'
       INCLUDE 'FLAGCOMM'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 *     Local variables:
 
@@ -45,7 +46,6 @@ C    the sky and in the file.
       INTEGER   IERR
       INTEGER   IIN, JIN
       INTEGER   IPOS
-      INTEGER   LOCATION
       INTEGER   NSP
       INTEGER   MAPSIZ
       INTEGER   JDEF               ! Returned by GEN_*
@@ -154,8 +154,8 @@ C   Search INDEX area and output relevant data if scan present
 
         DO J = 1, MAPSIZ
 
-          LOCATION = INDEX_ADDRESS + 4*(J-1)
-          CALL XCOPY (4,%VAL(LOCATION),IPOS)
+          CALL XCOPY (4,
+     :         %VAL(CNF_PVAL(INDEX_ADDRESS)+4*(J-1)),IPOS)
 
           IF (IPOS.GT.0)   THEN
             NSP = NSP+1

@@ -25,6 +25,7 @@
       INCLUDE 'MAPS'
       INCLUDE 'MAPHD'
       INCLUDE 'WEIGHTS'
+      INCLUDE 'CNF_PAR'
 
 *     Local variables
 
@@ -33,7 +34,6 @@
       INTEGER    NMIN, NMAX
       INTEGER    IJOFFSET
       INTEGER    IJPOS
-      INTEGER    LOCATION
       REAL       CURRENT_WEIGHT
       REAL       SIGMA_W
       LOGICAL    GXMINUS, GXPLUS
@@ -68,8 +68,8 @@
         DO I = MMIN, MMAX
 
           IJOFFSET = 4*((J-1)*MSTEP + (I-1))
-          LOCATION = CURRENT_INDEX_ADDRESS + IJOFFSET
-          CALL XCOPY (4, %VAL(LOCATION), IJPOS)
+          CALL XCOPY (4,
+     :         %VAL(CNF_PVAL(CURRENT_INDEX_ADDRESS)+IJOFFSET), IJPOS)
 
 *         IF (M.GE.32 .and. M.LE.45 .and. N.eq.52) THEN
 *           PRINT *,'Index value for (i,j) = ',I,J,' =',IJPOS

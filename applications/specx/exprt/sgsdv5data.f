@@ -17,6 +17,7 @@ C      Unused NO_QUADS, NQ, NSEG
 C      Initialised CONNECTED to .FALSE. and NIF to 0 (so Linux behaves
 C       the same as other platforms)
 C   22-AUG-2005 TIMJ: Use DATA for init
+C   26-OCT-2012 TIMJ: Use CNF
 C-
 
       IMPLICIT  NONE
@@ -27,6 +28,7 @@ C   Formal parameters
       INTEGER*4 IRX
       INTEGER*4 IERR
 
+      INCLUDE  'CNF_PAR'
       INCLUDE  'STAKPAR'
       INCLUDE  'STACKCOMM'
       INCLUDE  'FLAGCOMM'
@@ -413,7 +415,7 @@ C     Print out a picture of the stack with new spectra showing...
 
       NBYTES = 4*LSTK
       CALL IGETVM  (NBYTES, .TRUE., 'SPECX_GSD_V5_DATA', IPTR)
-      CALL DISPST  (KNT, .FALSE., %VAL(IPTR))
+      CALL DISPST  (KNT, .FALSE., %VAL(CNF_PVAL(IPTR)))
       CALL IFREEVM (IPTR)
 
 C  Standard return

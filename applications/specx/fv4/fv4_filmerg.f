@@ -49,6 +49,7 @@
 *  Global Variables:
       INCLUDE 'FLAGCOMM'         ! List file unit ILOUT
       INCLUDE 'FILES'            ! Open files information
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
 
@@ -161,10 +162,13 @@ CD     PRINT *, 'File B has : ',NUMSCAN(2)
 
 
 * Now pass the pointers to subroutine
-      CALL MDATA_READ( MFILE, NUMSCAN, ALLSCANS, %VAL(TJOFFPTR),
-     +     %VAL(TJIDXPTR), %VAL(TJNQUADPTR), %VAL(TJCHANNPTR),
-     +     %VAL(TJVLSRPTR), %VAL(TJFREQPTR), %VAL(TJFINCPTR),
-     +     %VAL(TJRADECPTR), IFAIL, STATUS )
+      CALL MDATA_READ( MFILE, NUMSCAN, ALLSCANS, 
+     :                 %VAL(CNF_PVAL(TJOFFPTR)),
+     +     %VAL(CNF_PVAL(TJIDXPTR)), %VAL(CNF_PVAL(TJNQUADPTR)), 
+     :     %VAL(CNF_PVAL(TJCHANNPTR)),
+     +     %VAL(CNF_PVAL(TJVLSRPTR)), %VAL(CNF_PVAL(TJFREQPTR)), 
+     :     %VAL(CNF_PVAL(TJFINCPTR)),
+     +     %VAL(CNF_PVAL(TJRADECPTR)), IFAIL, STATUS )
 
 
 * Free up memory

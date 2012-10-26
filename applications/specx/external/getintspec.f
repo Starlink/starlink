@@ -92,13 +92,13 @@ C     Include files
       INCLUDE 'PLOT2D'
       INCLUDE 'STAKPAR'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 C     Other variables
 
       INTEGER*4 IX,IY,IZ          ! Link array elements
       INTEGER*4 IFRAC
       INTEGER*4 IPOS              ! Position in map file of required data
-      INTEGER*4 LOCATION
       INTEGER*4 M, N              ! X and Y offsets (Cells) from start of map
       INTEGER*4 MNPOS
       INTEGER*4 MNOFFSET          ! Offset in bytes into cube
@@ -156,12 +156,14 @@ C     there in interpolated form.
 
          NDATA    = 4 * NPTS(1)
          MNOFFSET = 4 * ((N-1)*MSTEP + (M-1))
-         LOCATION = CURRENT_INDEX_ADDRESS + MNOFFSET
-         CALL XCOPY (4, %VAL(LOCATION), MNPOS)
+         CALL XCOPY (4,
+     :        %VAL(CNF_PVAL(CURRENT_INDEX_ADDRESS)+MNOFFSET),
+     :        MNPOS)
 
          IF (MNPOS.GE.0) THEN
-            LOCATION = CURRENT_CUBE_ADDRESS + MNOFFSET*NPTS(1)
-            CALL XCOPY (NDATA, %VAL(LOCATION), DATA)
+            CALL XCOPY (NDATA,
+     :           %VAL(CNF_PVAL(CURRENT_CUBE_ADDRESS)+MNOFFSET*NPTS(1) ),
+     :           DATA)
          ELSE
             IFAIL = 56
          END IF

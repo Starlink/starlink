@@ -19,6 +19,7 @@
 *     Include files
 
       INCLUDE  'GEN_SYMBOLS.INC'
+      INCLUDE  'CNF_PAR'
 
 *     Local variables
 
@@ -62,7 +63,8 @@ CD    Print *,'  input string  = ', string1(:60)
         ierr    = 0
       ELSE
         READ (type(2:gen_ilen(type)), '(I3)') nbytes
-        CALL xcopy (MIN (nbytes,ils), %val(address), %ref(string2))
+        CALL xcopy (MIN (nbytes,ils), %val(cnf_pval(address)), 
+     :              %ref(string2))
       END IF
 
 CD    Print *,'  return string = ', string2(:60)

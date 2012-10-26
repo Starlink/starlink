@@ -45,6 +45,8 @@
 *        Remove the desparate TYPE* statements.
 *     12 Aug 1994 (hme):
 *        Complete review for map version 4.1, and the mv4 library.
+*     2012-10-26 (TIMJ):
+*        Use CNF
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -56,6 +58,7 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Variables:
+      INCLUDE 'CNF_PAR'
       INCLUDE 'CUBE'
       INCLUDE 'MAPHD'
       INCLUDE 'MAPS'
@@ -140,11 +143,11 @@
 *  Read the index and each spectrum.
 *  Non-existent spectra (according to the index) will be returned as an
 *  all-zero row in the cube.
-      CALL MV4_INDXRD( %VAL(INDEX_ADDRESS) )
+      CALL MV4_INDXRD( %VAL(CNF_PVAL(INDEX_ADDRESS)) )
       DO 2 J = 1, NSTEP
          DO 1 I = 1, MSTEP
-            CALL MV4_SPECRD( I, J, %VAL(INDEX_ADDRESS),
-     :         %VAL(CUBE_ADDRESS) )
+            CALL MV4_SPECRD( I, J, %VAL(CNF_PVAL(INDEX_ADDRESS)),
+     :         %VAL(CNF_PVAL(CUBE_ADDRESS)) )
  1       CONTINUE
  2    CONTINUE
 

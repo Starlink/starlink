@@ -21,6 +21,7 @@ C  Formal parameters:
       INCLUDE 'MAPHD'
       INCLUDE 'MAPTITLES'
       INCLUDE 'PLOT2D'
+      INCLUDE 'CNF_PAR'
 
 C  Investigate INDEX array to find maximum extent of good data
 
@@ -31,8 +32,9 @@ C  Investigate INDEX array to find maximum extent of good data
 
       DO I = 1,MSTEP
         DO J = 1, NSTEP
-          LOCATION = INDEX_PTR + (MSTEP*(J-1) + I - 1)*4
-          CALL XCOPY (4, %VAL(LOCATION), IPOS)
+          CALL XCOPY (4,
+     :         %VAL(CNF_PVAL(INDEX_PTR)+(MSTEP*(J-1) + I - 1)*4),
+     :         IPOS)
           IF (IPOS .GE. 0) THEN
             I_MIN = MIN (I_MIN, I)
             I_MAX = MAX (I_MAX, I)

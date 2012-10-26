@@ -25,6 +25,7 @@ C     Formal parameters:
 
 C     Include files:
 
+      INCLUDE 'CNF_PAR'
       INCLUDE 'CUBE'
       INCLUDE 'MAPHD'
       INCLUDE 'MAPS'
@@ -122,7 +123,7 @@ C   Get some virtual memory for the new cube and initialize
      &                 NEW_INDEX_ADDRESS, IFAIL)
 
       LDATA = NPTS1*MSTEP*NSTEP
-      CALL INIT_ARRAY (LDATA, %VAL(NEW_CUBE_ADDRESS), 0.0)
+      CALL INIT_ARRAY (LDATA, %VAL(CNF_PVAL(NEW_CUBE_ADDRESS)), 0.0)
 
 C  Also get virtual memory for BUF and DATA arrays (each NPTS1 long) and
 C  for the updated INDEX array
@@ -138,10 +139,13 @@ C  for the updated INDEX array
 
 C  Rotate map
 
-      CALL ROTATE (THETA, %VAL(IPTR_BUF), %VAL(IPTR_DATA),
+      CALL ROTATE (THETA, %VAL(CNF_PVAL(IPTR_BUF)),
+     &             %VAL(CNF_PVAL(IPTR_DATA)),
      &             MSTEP, NSTEP, NPTS1,
-     &             %VAL(CURRENT_INDEX_ADDRESS), %VAL(NEW_INDEX_ADDRESS),
-     &             %VAL(CURRENT_CUBE_ADDRESS),  %VAL(NEW_CUBE_ADDRESS))
+     &             %VAL(CNF_PVAL(CURRENT_INDEX_ADDRESS)),
+     &             %VAL(CNF_PVAL(NEW_INDEX_ADDRESS)),
+     &             %VAL(CNF_PVAL(CURRENT_CUBE_ADDRESS)),
+     &             %VAL(CNF_PVAL(NEW_CUBE_ADDRESS)))
 
 *     Delete any virtual memory belonging to an *intermediate* processed cube.
 

@@ -33,6 +33,7 @@ C     Include files:
       INCLUDE 'FLAGCOMM'
       INCLUDE 'PLOT2D'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 C     Functions
 
@@ -128,12 +129,12 @@ C  Get virtual memory for map: Note change to ADAM type status return
 C  Extract appropriate plane from data
 
       CALL GETMAP2 (BUF, XSCALE, INTERP_WAIT,
-     &              %VAL(IPTR), IFAIL)
+     &              %VAL(CNF_PVAL(IPTR)), IFAIL)
       IF (IFAIL.NE.0) GO TO 999
 
 C  Flip 2-D array top/bottom to make right for MONGO
 
-      CALL SWAP_ARR (4*NAX(IX), %VAL(IPTR), NAX(IY))
+      CALL SWAP_ARR (4*NAX(IX), %VAL(CNF_PVAL(IPTR)), NAX(IY))
 
 C  Interpolate and/or smooth map as necessary
 
@@ -199,7 +200,7 @@ C     Write map to a file
         IFAIL = 18
       ELSE
         WRITE (IFILE) NMAPS, NAXX, NAXY
-        CALL VWRITE (IFILE, NAXX*NAXY, %VAL(IPTR), ISTAT)
+        CALL VWRITE (IFILE, NAXX*NAXY, %VAL(CNF_PVAL(IPTR)), ISTAT)
       END IF
 
       CLOSE (IFILE, IOSTAT=IOSTAT)

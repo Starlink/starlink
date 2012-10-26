@@ -51,6 +51,7 @@
 *     therefore of plotting them!
 *
 *       SUBROUTINE GDF_IMAGE (NAME,NX,NY,NZ,NT,Z,ERROR)
+C       INCLUDE 'CNF_PAR'
 C----------------------------------------------------------------------
 C GDF   Write a GILDAS image from a Fortran array
 C
@@ -65,7 +66,7 @@ C       ERROR   L       Logical error flag
 C----------------------------------------------------------------------
 
 C      CALL GDF_IMAGE (TITLE//'.GDF', NPTS(1), MSTEP, NSTEP, 1,
-C     &                 %VAL(CURRENT_CUBE_ADDRESS), GDF_ERROR)
+C     &                 %VAL(CNF_PVAL(CURRENT_CUBE_ADDRESS)), GDF_ERROR)
 
       RETURN
       END

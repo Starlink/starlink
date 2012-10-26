@@ -178,6 +178,7 @@ CD    call ttgraph
 
 *  Include files
       INCLUDE   'PLOT2D'
+      INCLUDE   'CNF_PAR'
 
 *  Local variables
       INTEGER*4 I,J
@@ -226,7 +227,8 @@ CD    call sxgttgraph
       DO J = J1,J2
         JG = (IY-1)/(LXPIX-1) + 2 - J
         DO I = I1, I2
-          GOODBOX = GOODBOX .AND. GOODPT (%VAL(INDEX_PTR), I, JG, -1)
+          GOODBOX = GOODBOX .AND. GOODPT (%VAL(CNF_PVAL(INDEX_PTR)), 
+     :                                    I, JG, -1)
         END DO
       END DO
 

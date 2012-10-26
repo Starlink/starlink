@@ -24,6 +24,7 @@
       INCLUDE 'MAPTITLES'
       INCLUDE 'PLOT2D'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 *     Local variables:
 
@@ -38,8 +39,7 @@
       INTEGER   IX, IY, IZ
       INTEGER   ISTAT
       INTEGER   IMX,         IMY
-      INTEGER   IPTR,        IPTR_MAP
-      INTEGER   LOCATION
+      INTEGER   BOFF,        IPTR_MAP
       INTEGER   NCONT1,      NCONT2
       INTEGER   NV,   NW,    NZ
       REAL      ARRMIN, ARRMAX
@@ -129,9 +129,8 @@
       ARRMIN = +1.E20
 
       DO I = 1, NMAP_CM
-        LOCATION = IPTR_MAP + 4*(I-1)*NAXX*NAXY
-        CALL MAP_MAXMIN (%VAL(LOCATION), NAXX, NAXY,
-     &                    XLIM, YLIM, BADPIX_VAL, ZMIN, ZMAX)
+        CALL MAP_MAXMIN (%VAL(CNF_PVAL(IPTR_MAP)+4*(I-1)*NAXX*NAXY),
+     &       NAXX, NAXY, XLIM, YLIM, BADPIX_VAL, ZMIN, ZMAX)
         ARRMIN = MIN (ARRMIN, ZMIN)
         ARRMAX = MAX (ARRMAX, ZMAX)
       END DO
@@ -255,13 +254,14 @@ C  Set up window in mm
 
 C  Set up pointer to this channel map
 
-            IPTR = IPTR_MAP + 4*NAXX*NAXY*((J-1)*NXMAP + (I-1))
+            BOFF = 4*NAXX*NAXY*((J-1)*NXMAP + (I-1))
 
 C   Contour the map on the output device and draw a box
 
             CALL SXGVWINDOW     (XL, XL+DX, YL, YL+DY)
             CALL SXGLIMITS      (XLIM(1), XLIM(2), YLIM(1), YLIM(2))
-            CALL DRAW_MAP       (ZC, NZ, %VAL(IPTR), NAXX, NAXY,
+            CALL DRAW_MAP       (ZC, NZ, %VAL(CNF_PVAL(IPTR_MAP)+BOFF),
+     :                           NAXX, NAXY,
      &                           CBEG(IX), CEND(IX), CEND(IY), CBEG(IY),
      &                           NAX(IX)-1, NAX(IY)-1, LXPIX, LYPIX,
      &                           LTPOS, LTZ, LTNEG, CONTOURS,
@@ -283,7 +283,7 @@ C   Label bottom left hand corner map
 
 C   Mark valid sample points if so wished.
 
-            IF (MVPTS) CALL MARK_SAMPLES (%VAL(IPTR_MAP))
+            IF (MVPTS) CALL MARK_SAMPLES (%VAL(CNF_PVAL(IPTR_MAP)))
 
 C   Label the velocity range (note ZLABEL: redefines the window)
 
@@ -314,7 +314,7 @@ C   If interactive mode ON then invoke the cursor
           IF (IZ.EQ.3)      OPTIONS = ' G'//OPTIONS
           IF (GREYSCALE)    OPTIONS = ' 0 1 3'//OPTIONS
           IF (SXGCOLOROK()) OPTIONS = ' 2 4 5'//OPTIONS
-          CALL I2DOPT (%VAL(IPTR_MAP), OPTIONS,
+          CALL I2DOPT (%VAL(CNF_PVAL(IPTR_MAP)), OPTIONS,
      &                 REPEAT, CONTOURS, GREYSCALE, GRLIMITS)
         END IF
       END DO

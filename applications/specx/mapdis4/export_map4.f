@@ -34,6 +34,7 @@ C-----------------------------------------------------------------------
 
       INCLUDE 'FLAGCOMM'
       INCLUDE 'PLOT2D'
+      INCLUDE 'CNF_PAR'
 
 *     Functions:
 
@@ -76,7 +77,7 @@ C-----------------------------------------------------------------------
 
 *     Now write the file
 
-      CALL MAP_ASCIIWR (%VAL(IPTR), NAXX, NAXY,
+      CALL MAP_ASCIIWR (%VAL(CNF_PVAL(IPTR)), NAXX, NAXY,
      &                   NAX(LINK(1))-1, NAX(LINK(2))-1, P, Q, LUN)
 
 *     Close the map
@@ -117,6 +118,7 @@ C-----------------------------------------------------------------------
 *     Include files
 
       INCLUDE   'PLOT2D'
+      INCLUDE   'CNF_PAR'
 
 *     Local variables
 
@@ -150,7 +152,7 @@ C-----------------------------------------------------------------------
         JJ = 1 + (J-1)*(LYPIX-1)
 
         DO I = 1, (IX-1)/(LXPIX-1) + 1
-          IF (GOODPT (%VAL(INDEX_PTR), I, JG, -1)) THEN
+          IF (GOODPT (%VAL(CNF_PVAL(INDEX_PTR)), I, JG, -1)) THEN
             II   = 1 + (I-1)*(LXPIX-1)
             XPOS = P(1) + (I-1)*DX
             YPOS = Q(2) + (J-1)*DY

@@ -8,6 +8,7 @@
       SUBROUTINE GEN_SETSYM1 (TABLE, LTAB, SYM_INDEX, IOFF, VALUE, IERR)
 
       IMPLICIT NONE
+      INCLUDE 'CNF_PAR'
 
 *     Formal parameters
 
@@ -49,7 +50,7 @@
 *     PRINT *,'  Array element # =  ', IOFF
 *     PRINT *,'  Writing to address ', ADDRESS
 
-      CALL XCOPY ( NBYTES, VALUE, %VAL(ADDRESS) )
+      CALL XCOPY ( NBYTES, VALUE, %VAL(CNF_PVAL(ADDRESS)) )
 
       RETURN
       END

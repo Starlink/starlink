@@ -18,6 +18,7 @@ C  from 3-d file to a 2-d array.
       INCLUDE 'MAPHD'
       INCLUDE 'MAPS'
       INCLUDE 'PLOT2D'
+      INCLUDE 'CNF_PAR'
 
 *     Formal parameters:
 
@@ -163,7 +164,8 @@ C         Get the relevant spectrum from the cube
 
           CALL GET_CUBE_DATA (J+IOFF(1), K+IOFF(2), NPTS1, BUF2,
      &                        INTERP, 1+IOFF(3), NAX(3)+IOFF(3), BUF1,
-     &                        %VAL(INDEX_PTR), MSTEP, NSTEP, GOT_DATA)
+     &                        %VAL(CNF_PVAL(INDEX_PTR)), 
+     :                        MSTEP, NSTEP, GOT_DATA)
 
 C         If we got real data. add them into the map, else mark
 C         affected map points as bad.

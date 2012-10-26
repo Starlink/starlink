@@ -66,6 +66,7 @@
 *     Miscellaneous
 
       INCLUDE  'IODATA'
+      INCLUDE  'CNF_PAR'
 
 *     For GEN_INQSYMB
 
@@ -350,7 +351,7 @@ CD    PRINT *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
         IF (ISTAT.eq.0) THEN
           IF (TYPE(:1).EQ.'C') THEN
             READ (TYPE(2:), *) LOUT
-            CALL GEN_WRITE  (STRING, %VAL(ADDR), LOUT, IERR)
+            CALL GEN_WRITE  (STRING, %VAL(CNF_PVAL(ADDR)), LOUT, IERR)
             IF (IERR.NE.0) IERR = 109   ! Error in PRINT command
           ELSE
             IERR = 98                   ! Must be a string variable
@@ -375,7 +376,7 @@ CD    PRINT *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
           CALL GEN_GETSTR ('Input string?', INSTRING,
      &                    ' ', INSTRING, ISTAT)
           CALL GEN_HDNORM  (INSTRING, INSTRING, ILS, ISTAT)
-          CALL GEN_DECODE  (TYPE, INSTRING, %VAL(ADDR), ISTAT)
+          CALL GEN_DECODE  (TYPE, INSTRING, %VAL(CNF_PVAL(ADDR)), ISTAT)
         ELSE IF (SYM_INDEX.EQ.0) THEN
           IERR = 101
         ELSE IF (READONLY) THEN
@@ -434,25 +435,28 @@ CD    PRINT *,'    if_level, do_to_elseif: ', if_level, do_to_elseif
           CALL GEN_HDNORM (PROMPT, PROMPT, ILS, IERR)
 
           IF (TYPE.EQ.'I4') THEN
-            CALL GEN_GETI4A2 (PROMPT(:ILS), %VAL(ADDR), LENGTH,
-     &                        ' ', %VAL(ADDR), RETLEN, ISTAT)
+            CALL GEN_GETI4A2 (PROMPT(:ILS), %VAL(CNF_PVAL(ADDR)), 
+     :                        LENGTH,
+     &                        ' ', %VAL(CNF_PVAL(ADDR)), RETLEN, ISTAT)
 
           ELSE IF (TYPE.EQ.'R4') THEN
-            CALL GEN_GETR4A2 (PROMPT(:ILS), %VAL(ADDR), LENGTH,
-     &                        ' ', %VAL(ADDR), RETLEN, ISTAT)
+            CALL GEN_GETR4A2 (PROMPT(:ILS), %VAL(CNF_PVAL(ADDR)), 
+     :                        LENGTH,
+     &                        ' ', %VAL(CNF_PVAL(ADDR)), RETLEN, ISTAT)
 
           ELSE IF (TYPE.EQ.'R8') THEN
-            CALL GEN_GETR8A2 (PROMPT(:ILS), %VAL(ADDR), LENGTH,
-     &                        ' ', %VAL(ADDR), RETLEN, ISTAT)
+            CALL GEN_GETR8A2 (PROMPT(:ILS), %VAL(CNF_PVAL(ADDR)), 
+     :                        LENGTH,
+     &                        ' ', %VAL(CNF_PVAL(ADDR)), RETLEN, ISTAT)
 
           ELSE IF (TYPE.EQ.'L4') THEN
-            CALL GEN_YESNO   (PROMPT(:ILS), %VAL(ADDR),
-     &                        %VAL(ADDR), ISTAT)
+            CALL GEN_YESNO   (PROMPT(:ILS), %VAL(CNF_PVAL(ADDR)),
+     &                        %VAL(CNF_PVAL(ADDR)), ISTAT)
 
           ELSE IF (TYPE(:1).EQ.'C') THEN
             READ (TYPE(2:), *) NCH
             CALL GEN_GETSTR (PROMPT(:ILS), ' ', ' ', STRING, ISTAT)
-            CALL XCOPY (NCH, %REF(STRING), %VAL(ADDR))
+            CALL XCOPY (NCH, %REF(STRING), %VAL(CNF_PVAL(ADDR)))
 
           END IF
 

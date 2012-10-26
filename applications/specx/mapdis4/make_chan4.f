@@ -29,16 +29,18 @@
       INCLUDE 'PLOT2D'
       INCLUDE 'FLAGCOMM'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 *     Local variables:
 
       LOGICAL   PUSHED
       LOGICAL   IEXIST
       LOGICAL   INTERP
+      INTEGER   BYTEOFFSET
       INTEGER   I
       INTEGER   IFILE
       INTEGER   ISTAT
-      INTEGER   IPTR,   IPTR_MAP
+      INTEGER   IPTR_MAP
       INTEGER   IX,     IY,      IZ
       REAL      TWID(3),    TEXT(3)
 
@@ -163,7 +165,7 @@ CD    PRINT *,'Channel maps have size ',NAX(IX),NAX(IY)
 
 *       Set up pointer to this (uninterpolated) channel map
 
-        IPTR = IPTR_MAP + 4*(I-1)*NAX(IX)*NAX(IY)
+        BYTEOFFSET = 4*(I-1)*NAX(IX)*NAX(IY)
 
 *       Extract appropriate plane from data (currently using MAP_WINDOW,
 *       but should be able to abbreviate this to a simpler routine)
@@ -175,12 +177,13 @@ CD    PRINT *,'Channel maps have size ',NAX(IX),NAX(IY)
         END IF
 
         CALL GETMAP2 (XSCALE, BUF, INTERP_WAIT,
-     &                %VAL(IPTR), IFAIL)
+     &                %VAL(CNF_PVAL(IPTR_MAP)+BYTEOFFSET), IFAIL)
         IF (IFAIL.NE.0) GO TO 999
 
 *       Invert the map (top to bottom) to make right for MONGO
 
-        CALL SWAP_ARR (4*NAX(IX), %VAL(IPTR), NAX(IY))
+        CALL SWAP_ARR (4*NAX(IX), %VAL(CNF_PVAL(IPTR_MAP)+BYTEOFFSET),
+     :       NAX(IY))
 
 *       Update velocity interval for next map..
 
@@ -248,7 +251,8 @@ C     Write map to a file
         IFAIL = 18
       ELSE
         WRITE (IFILE) NMAPS, NAXX, NAXY
-        CALL VWRITE (IFILE, NMAPS*NAXX*NAXY, %VAL(IPTR_MAP), ISTAT)
+        CALL VWRITE (IFILE, NMAPS*NAXX*NAXY, %VAL(CNF_PVAL(IPTR_MAP)), 
+     :               ISTAT)
       END IF
 
       CLOSE (IFILE, IOSTAT=ISTAT)

@@ -35,13 +35,13 @@ C  offsets.
       INCLUDE 'PLOT2D'
       INCLUDE 'STAKPAR'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 *     Other variables
 
       INTEGER*4 IX,IY,IZ          ! Link array elements
       INTEGER*4 IFRAC
       INTEGER*4 IPOS              ! Position in map file of required data
-      INTEGER*4 LOCATION
       INTEGER*4 M, N              ! X and Y offsets (Cells) from start of map
       INTEGER*4 MNPOS
       INTEGER*4 MNOFFSET          ! Offset in bytes into cube
@@ -114,7 +114,7 @@ CD      PRINT *, '    IPOS = 0, M,N =', M, N
 
       IF (IPOS.NE.0) THEN
         CALL FROMAP (MCHAN, IPOS, XOFF2, YOFF2, DATA, NPTS(1),
-     &               %VAL(INDEX_ADDRESS), IFAIL)
+     &               %VAL(CNF_PVAL(INDEX_ADDRESS)), IFAIL)
 
 *     Get the spectrum from the cube (provided that the corresponding
 *     spectrum is either there or interpolated).
@@ -124,15 +124,14 @@ CD      PRINT *, '    IPOS = 0, M,N =', M, N
 
         NDATA    = 4 * NPTS(1)
         MNOFFSET = 4 * ((N-1)*MSTEP + (M-1))
-        LOCATION = INDEX_ADDRESS + MNOFFSET
-        CALL XCOPY (4, %VAL(LOCATION), MNPOS)
+        CALL XCOPY (4, %VAL(CNF_PVAL(INDEX_ADDRESS)+MNOFFSET), MNPOS)
 
 CD      PRINT *, '    M,N,NDATA;',  M, N, NDATA
 CD      PRINT *, '    MNPOS; ', MNPOS
 
         IF (MNPOS.GE.0) THEN
-          LOCATION = CUBE_ADDRESS + MNOFFSET*NPTS(1)
-          CALL XCOPY (NDATA, %VAL(LOCATION), DATA)
+          CALL XCOPY (NDATA,
+     :         %VAL(CNF_PVAL(CUBE_ADDRESS)+MNOFFSET*NPTS(1)), DATA)
         ELSE
           IFAIL = 56
         END IF

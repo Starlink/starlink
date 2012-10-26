@@ -21,6 +21,7 @@ C       Missing comma in FORMAT
 *     common blocks:
 
       INCLUDE         'FLAGCOMM'
+      INCLUDE         'CNF_PAR'
 
 *     local variables:
 
@@ -28,7 +29,6 @@ C       Missing comma in FORMAT
       INTEGER         NST
       INTEGER         IPTR
       INTEGER         NCH
-      INTEGER         LOCATION
       INTEGER         J
 
       REAL            AINTEG
@@ -47,12 +47,12 @@ C       Missing comma in FORMAT
       NCH = NTOT (NQ) + 1 - NST
 
       ISTAT = IGETVM  (4*NDAT, .TRUE., 'INTSTY', IPTR)
-      CALL SETXNEW (%VAL(IPTR), IFAIL)
+      CALL SETXNEW (%VAL(CNF_PVAL(IPTR)), IFAIL)
       NXSII = NXS
 
       NPR = 1
-      LOCATION = IPTR + 4*(NST-1)
-      CALL GETPTS (IXLOW, 1, 1, NPR, NPR, %VAL(LOCATION),
+      CALL GETPTS (IXLOW, 1, 1, NPR, NPR,
+     &             %VAL(CNF_PVAL(IPTR)+4*(NST-1)),
      &             DATA(NST), NCH, IFAIL)
       IF (IFAIL.NE.0) GO TO 999
 

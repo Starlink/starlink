@@ -35,6 +35,7 @@
 
       INCLUDE  'SCL_BUFFER.INC'
       INCLUDE  'SCL_DO.INC'
+      INCLUDE  'CNF_PAR'
 
 *  Functions:
 
@@ -179,7 +180,8 @@ CD          PRINT *,  BUFFER
 
 *       Initialize the DO variable
 
-        CALL XCOPY (4, DOVALS(1,DO_DEPTH), %VAL(ADDRESS(DO_DEPTH)))
+        CALL XCOPY (4, DOVALS(1,DO_DEPTH), 
+     :              %VAL(CNF_PVAL(ADDRESS(DO_DEPTH))))
 
       END IF
 
@@ -228,6 +230,7 @@ CD    PRINT *, '                 do depth = ', do_depth
 *  Include file(s):
 
       INCLUDE  'SCL_DO.INC'
+      INCLUDE  'CNF_PAR'
 
 *  Functions
 
@@ -246,7 +249,7 @@ CD    PRINT *, '                 do depth = ', do_depth
 
 *     Increment the DO variable and check to see if we have done it all.
 
-      CALL XCOPY (4, %VAL(ADDRESS(DO_DEPTH)), IVAL)
+      CALL XCOPY (4, %VAL(CNF_PVAL(ADDRESS(DO_DEPTH))), IVAL)
       LIMIT = DOVALS(2,DO_DEPTH)
       INCRT = DOVALS(3,DO_DEPTH)
 CD    PRINT *, '-- scl_enddo --  current do variable = ', ival
@@ -258,8 +261,8 @@ CD    PRINT *, '                 updated do variable = ', ival
      &     .OR. INCRT.LT.0 .AND. IVAL.GE.LIMIT ) THEN
 
 *       Update the DO variable
-        CALL XCOPY (4, IVAL, %VAL(ADDRESS(DO_DEPTH)))
-        CALL XCOPY (4, %VAL(ADDRESS(DO_DEPTH)), IVAL)
+        CALL XCOPY (4, IVAL, %VAL(CNF_PVAL(ADDRESS(DO_DEPTH))))
+        CALL XCOPY (4, %VAL(CNF_PVAL(ADDRESS(DO_DEPTH))), IVAL)
 CD    PRINT *, '                 test put do variable = ', ival
 
 *       Rewind the file the appropriate number of records

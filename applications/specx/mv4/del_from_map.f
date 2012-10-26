@@ -21,18 +21,19 @@ C   Include files
       INCLUDE 'MAPHD'
       INCLUDE 'MAPS'
       INCLUDE 'CUBE'
+      INCLUDE 'CNF_PAR'
 
 C   Other variables
 
       INTEGER*4 I,J               ! Counters
       INTEGER*4 ISTAT             ! GEN_ routine status return
       INTEGER*4 ISCAN             ! Scan # to delete
-      INTEGER*4 LOCATION          ! Virtual address
 
       IFAIL = 0
       CALL GEN_GETI4 ('Spectrum # to delete', ISCAN, 'I4', ISCAN, ISTAT)
 
-      CALL SEARCH_INDEX (%VAL(INDEX_ADDRESS), ISCAN, I, J, IFAIL)
+      CALL SEARCH_INDEX (%VAL(CNF_PVAL(INDEX_ADDRESS)), 
+     :                   ISCAN, I, J, IFAIL)
 
       IF (IFAIL.EQ.0) THEN
 
@@ -47,9 +48,9 @@ C       to the file.
 C       Set relevant index element to absence signal.
 C       Then write index to file.
 
-        LOCATION = INDEX_ADDRESS + 4*((J-1)*MSTEP + (I-1))
-        CALL XCOPY (4, -1000, %VAL(LOCATION))
-        CALL MV4_INDXWR( %VAL(INDEX_ADDRESS) )
+        CALL XCOPY (4, -1000,
+     :       %VAL(CNF_PVAL(INDEX_ADDRESS)+4*((J-1)*MSTEP + (I-1))))
+        CALL MV4_INDXWR( %VAL(CNF_PVAL(INDEX_ADDRESS)) )
 
 C       Update map header if we have deleted the last entry, otherwise
 C       don't bother: the value of -1000 in INDEX will suffice to mark

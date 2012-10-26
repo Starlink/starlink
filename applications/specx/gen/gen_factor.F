@@ -31,6 +31,7 @@
 *     Operand and operator stacks
 
       INCLUDE  'EVAL_AE4.INC'
+      INCLUDE  'CNF_PAR'
 
 *     Local variables:
 
@@ -52,6 +53,7 @@
       INTEGER   length
       INTEGER   address
       LOGICAL   readonly
+      LOGICAL   isnew
 
       INTEGER   ivalue
       REAL*4    rvalue
@@ -146,7 +148,7 @@ CD      Print *, '     Unary minus flag set - pushing operator stack...'
           form   = 'I'
           WRITE (form(2:lf), '(I2.2)') idig
           ierr = gen_readnum (string(ist:iend), type, form, ivalue)
-          address =
+          address = cnf_preg(
 #if HAVE_PERCENTLOC
      :   %loc(ivalue)
 #elif HAVE_INTRINSIC_LOC
@@ -154,6 +156,7 @@ CD      Print *, '     Unary minus flag set - pushing operator stack...'
 #else
     Do not have LOC or %LOC
 #endif
+     :         , isnew )
 CD        Print *,'     integer value read'
         ELSE IF (gen_floating (string(ist:iend), idig, fdig)) THEN
           type   = 'R4'
@@ -161,7 +164,7 @@ CD        Print *,'     integer value read'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+1,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, rvalue)
-          address =
+          address = cnf_preg(
 #if HAVE_PERCENTLOC
      :   %loc(rvalue)
 #elif HAVE_INTRINSIC_LOC
@@ -169,6 +172,7 @@ CD        Print *,'     integer value read'
 #else
     Do not have LOC or %LOC
 #endif
+     :        , isnew )
 CD        Print *,'     real*4 value read'
         ELSE IF (gen_eformat (string(ist:iend), idig, fdig, edig)) THEN
           type   = 'R4'
@@ -176,7 +180,7 @@ CD        Print *,'     real*4 value read'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+edig+2,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, rvalue)
-          address =
+          address = cnf_preg(
 #if HAVE_PERCENTLOC
      :   %loc(rvalue)
 #elif HAVE_INTRINSIC_LOC
@@ -184,6 +188,7 @@ CD        Print *,'     real*4 value read'
 #else
     Do not have LOC or %LOC
 #endif
+     :        , isnew )
 CD        Print *,'     real*4 value read'
         ELSE IF (gen_dformat (string(ist:iend), idig, fdig, edig)) THEN
           type   = 'R8'
@@ -191,7 +196,7 @@ CD        Print *,'     real*4 value read'
           WRITE (form(2:lf), '(I2.2,''.'',I3.3)') idig+fdig+edig+2,
      &                                             MAX (0, fdig)
           ierr = gen_readnum (string(ist:iend), type, form, dvalue)
-          address =
+          address = cnf_preg(
 #if HAVE_PERCENTLOC
      :   %loc(dvalue)
 #elif HAVE_INTRINSIC_LOC
@@ -199,13 +204,14 @@ CD        Print *,'     real*4 value read'
 #else
     Do not have LOC or %LOC
 #endif
+     :        , isnew )
 CD        Print *,'     real*8 value read'
         END IF
 
       ELSE IF (strconst) THEN
         CALL gen_hdnorm (string(ist:iend), string(ist:iend), ls, ierr)
         WRITE (type, '(''C'',I3.3)') ls
-        address =
+        address = cnf_preg(
 #if HAVE_PERCENTLOC
      :   %loc(string(ist:ist))
 #elif HAVE_INTRINSIC_LOC
@@ -213,6 +219,7 @@ CD        Print *,'     real*8 value read'
 #else
     Do not have LOC or %LOC
 #endif
+     :      , isnew )
 CD      Print *,'     string constant read: length =', ls
 CD      Print *,'     variable type = ', TYPE
 CD      Print *,'     ', string(ist:ist+ls-1)
@@ -262,14 +269,15 @@ CD        Print *,'    symbol -- has an argument -- pushing all stacks'
 *     copy value to workspace
 
       READ (type(2:gen_ilen(type)), '(I3)') nbytes
-      IF (.not.funct) CALL xcopy (nbytes,%val(address),wksp(next_ws))
+      IF (.not.funct) CALL xcopy (nbytes,%val(cnf_pval(address)),
+     :                            wksp(next_ws))
 
 *     Update the operand stack
 
       ntopnd            = ntopnd + 1
       nopnd(lev)        = nopnd(lev) + 1
       opnd_type(ntopnd) = type
-      opnd_addr(ntopnd) =
+      opnd_addr(ntopnd) = cnf_preg(
 #if HAVE_PERCENTLOC
      :   %LOC(wksp(next_ws))
 #elif HAVE_INTRINSIC_LOC
@@ -277,6 +285,7 @@ CD        Print *,'    symbol -- has an argument -- pushing all stacks'
 #else
     Do not have LOC or %LOC
 #endif
+     :    , isnew )
 
 *     Update the workspace pointer (note: allocate 8 bytes min for 64-bit AXP)
 

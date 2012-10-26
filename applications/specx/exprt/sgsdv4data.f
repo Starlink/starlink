@@ -11,6 +11,7 @@ C                     Replace TYPE with PRINT
 C                     Don't split string constants across lines
 C                     Unused I
 C   TIMJ 22 Aug 2005 - Init using DATA statements
+C   26-OCT-2012 TIMJ: Use CNF
       IMPLICIT  NONE
 
 C   Formal parameters
@@ -19,6 +20,7 @@ C   Formal parameters
       INTEGER*4 IRX
       INTEGER*4 IERR
 
+      INCLUDE  'CNF_PAR'
       INCLUDE  'STAKPAR'
       INCLUDE  'STACKCOMM'
       INCLUDE  'FLAGCOMM'
@@ -262,7 +264,7 @@ C     Print out a picture of the stack with new spectra showing...
 
       NBYTES = 4*LSTK
       CALL IGETVM  (NBYTES, .TRUE., 'SPECX_GSD_V4_DATA', IPTR)
-      CALL DISPST  (KNT, .FALSE., %VAL(IPTR))
+      CALL DISPST  (KNT, .FALSE., %VAL(CNF_PVAL(IPTR)))
       CALL IFREEVM (IPTR)
 
 C  Standard return

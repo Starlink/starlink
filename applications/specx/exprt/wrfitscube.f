@@ -31,6 +31,7 @@
 
       INCLUDE  'STACKCOMM'      !  Info on Stack which is used as temp
       INCLUDE  'STAKPAR'        !  storage space for swapped cube
+      INCLUDE  'CNF_PAR'        ! For CNF_PVAL function
 
 *     externals
       DOUBLE PRECISION SPECXJD_TO_MJD
@@ -153,13 +154,14 @@
 *     Substitute BAD values with RBLANK (returned). Scale RBLANK to
 *     BLANK after call to FIT_SCALC.
 
-      CALL BAD2BLANK (3, %VAL(IPTR), NPTS1*MSTEP*NSTEP, RBLANK,
+      CALL BAD2BLANK (3, %VAL(CNF_PVAL(IPTR)), 
+     :                NPTS1*MSTEP*NSTEP, RBLANK,
      &                NBLANK, IFAIL)
 
 *     Find scaling for data using FIT_SCALC
 
       CHECK = .FALSE.
-      CALL FIT_SCALC  (%VAL(IPTR), NPTS1*MSTEP*NSTEP, CHECK,
+      CALL FIT_SCALC  (%VAL(CNF_PVAL(IPTR)), NPTS1*MSTEP*NSTEP, CHECK,
      &                  DMIN, DMAX, SCALES, ZEROS, ERRORS)
 
 *     Write a standard header using FIT_HSTAN
@@ -480,7 +482,7 @@
 
             DO I = 1, MSTEP
                NVAR = (I-1) * NPTS1 + (J-1) * NPTS1 * MSTEP + K
-               CALL CP_PNT(DATA(I),%VAL(IPTR+4*(NVAR-1)))
+               CALL CP_PNT(DATA(I),%VAL(CNF_PVAL(IPTR)+4*(NVAR-1)))
             END DO
 
 *           Write row to FITS image

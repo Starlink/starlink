@@ -36,6 +36,7 @@ C   DEF-MAP and SET-MAP-SCALES
       INCLUDE 'PLOT2D'
       INCLUDE 'SPECX_PARS'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 *     Local variables
 
@@ -256,7 +257,8 @@ CD    PRINT *, '    ioff(1), ioff(2) = ', ioff(1), ioff(2)
      &     .AND. JJ.GE.1 .AND. JJ.LE.NSTEP) THEN
             CALL GET_CUBE_DATA (II, JJ, NPTS1, XARRAY,
      &                          INTERP, 1+IOFF(3), NAX(3)+IOFF(3),
-     &                          YARRAY, %VAL(INDEX_PTR), MSTEP, NSTEP,
+     &                          YARRAY, %VAL(CNF_PVAL(INDEX_PTR)), 
+     :                          MSTEP, NSTEP,
      &                          STATUS)
           ELSE
             STATUS = .FALSE.

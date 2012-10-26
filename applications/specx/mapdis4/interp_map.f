@@ -23,6 +23,8 @@
 
       IMPLICIT   NONE
 
+      INCLUDE 'CNF_PAR'
+
 *     Formal parameters:
 
       INTEGER   NMAP         ! Number of maps in array
@@ -90,8 +92,10 @@
 
         DO I = 1, NMAP
           IOFF = (I-1)*MAPSIZEIN
-          CALL INTERPARR  (%VAL(IPTR+IOFF),  NAXX1,      NAXY1,
-     &                     %VAL(IPTR2+IOFF), NAXX1,      NAXY1,
+          CALL INTERPARR  (%VAL(CNF_PVAL(IPTR)+IOFF),  
+     :                     NAXX1,      NAXY1,
+     &                     %VAL(CNF_PVAL(IPTR2)+IOFF), 
+     :                     NAXX1,      NAXY1,
      &                     BADPIX_VAL,       FWHMX,      WMAXX,
      &                     FWHMY,            WMAXY,
      &                     CELL_XSIZE,       CELL_YSIZE, IFAIL)
@@ -135,8 +139,8 @@
         DO I = 1, NMAP
           IOFF  = (I-1)*MAPSIZEIN
           IOFF1 = (I-1)*MAPSIZEOUT
-          CALL CONVARR    (%VAL(IPTR+IOFF),   NAXX1,   NAXY1,
-     &                     %VAL(IPTR2+IOFF1), NAXX,    NAXY,
+          CALL CONVARR    (%VAL(CNF_PVAL(IPTR)+IOFF),   NAXX1,   NAXY1,
+     &                     %VAL(CNF_PVAL(IPTR2)+IOFF1), NAXX,    NAXY,
      &                     BADPIX_VAL,        IFAIL)
           IF (IFAIL.NE.0)  GO TO 999
         END DO

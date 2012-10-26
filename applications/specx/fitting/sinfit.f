@@ -42,6 +42,7 @@ C     Global variables:
       INCLUDE 'SPECX_PARS'
       INCLUDE 'STAKPAR'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 C     Local variables:
 
@@ -311,8 +312,9 @@ C   Calculate required workspace and get some virtual memory
 
 C   Calculate parameters of best-fit baseline
 
-  141 CALL LMM2 (PARAM, RESID, %VAL(IAPTR), SUMSQ, N, NPARAM, TOL,
-     &           1.5, 0.5, ITS, IERX, C, G, %VAL(IWPTR), ICON,
+  141 CALL LMM2 (PARAM, RESID, %VAL(CNF_PVAL(IAPTR)), 
+     :           SUMSQ, N, NPARAM, TOL,
+     &           1.5, 0.5, ITS, IERX, C, G, %VAL(CNF_PVAL(IWPTR)), ICON,
      &           ILOUT, FUNVAL)
       IF(IERX.NE.1)   THEN
         WRITE (ILOUT,1060) IERX
@@ -368,7 +370,7 @@ C   Calculate least square baseline
         XSC(I) = XSCALE(NST+I-1)
         Y(I)   = DATA(NST+I-1)
       END DO
-      CALL FUNVAL (PARAM, RESID, %VAL(IAPTR), SUMSQ, 1)
+      CALL FUNVAL (PARAM, RESID, %VAL(CNF_PVAL(IAPTR)), SUMSQ, 1)
       DO I = 1, NCH
         DATA(NST+I-1) = DATA(NST+I-1) - RESID(I)
       END DO

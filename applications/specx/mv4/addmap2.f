@@ -34,13 +34,13 @@ C   appropriately.
       INCLUDE  'CUBE'
       INCLUDE  'MAPHD'
       INCLUDE  'PROTOTYPE'
+      INCLUDE  'CNF_PAR'
 
 *     Local variables:
 
       INTEGER   NSP
       INTEGER   IIN,    JIN
       INTEGER   INS
-      INTEGER   LOCATION
       INTEGER   IROFF2  ! Data x-location relative to map-centre (half-pixels)
       INTEGER   IDOFF2  ! Data y-location relative to map-centre (half-pixels)
 
@@ -90,8 +90,10 @@ C   appropriately.
 *       array --- this is a spectrum position which is not in use.
 
         ELSE
-          CALL INVERT_INDEX (INDEX, MSTEP*NSTEP, %VAL(INVINDEX_ADDRESS))
-          CALL SEARCH_ARRAY (%VAL(INVINDEX_ADDRESS), NSP, IFAIL)
+          CALL INVERT_INDEX (INDEX, MSTEP*NSTEP, 
+     :                       %VAL(CNF_PVAL(INVINDEX_ADDRESS)))
+          CALL SEARCH_ARRAY (%VAL(CNF_PVAL(INVINDEX_ADDRESS)), 
+     :                       NSP, IFAIL)
         END IF
 
 
@@ -104,8 +106,8 @@ C     Check that the value we now have for NSP is reasonable
 
 C     First update cube
 
-      LOCATION = CUBE_ADDRESS + 4*LDATA*(INS-1)
-      CALL XCOPY (4*LDATA, DATA, %VAL(LOCATION))
+      CALL XCOPY (4*LDATA, DATA,
+     :     %VAL(CNF_PVAL(CUBE_ADDRESS)+ 4*LDATA*(INS-1) ))
 
 C     Then update the index and write it to file
 
@@ -114,7 +116,7 @@ C     Then update the index and write it to file
 
 C     Now copy new data from cube to file
 
-      CALL MV4_SPECWR( IIN, JIN, INDEX, %VAL(CUBE_ADDRESS) )
+      CALL MV4_SPECWR( IIN, JIN, INDEX, %VAL(CNF_PVAL(CUBE_ADDRESS)) )
 
 C     If increasing file length modify header and write back
 

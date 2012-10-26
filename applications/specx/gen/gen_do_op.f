@@ -18,6 +18,7 @@
 *     Include files
 
       INCLUDE 'EVAL_AE4.INC'
+      INCLUDE 'CNF_PAR'
 
 *     Local variables:
 
@@ -60,7 +61,7 @@ CD      Print *,'     resolving symbol array index'
 
       ELSE IF (operator.eq.'%') THEN
 CD      Print *,'     calling gen_negate on opnd', ntopnd
-        CALL gen_negate (%val(opnd_addr(ntopnd)),
+        CALL gen_negate (%val(cnf_pval(opnd_addr(ntopnd))),
      &                   opnd_type(ntopnd), ierr)
 
       ELSE
@@ -69,10 +70,10 @@ CD      Print *,'     calling exop on opnds', ntopnd-1, ' and', ntopnd
         opnd_length2 = gen_ilen (opnd_type(ntopnd))
         READ (opnd_type(ntopnd-1)(2:opnd_length1), '(I3)') nbytes1
         READ (opnd_type(ntopnd)(2:opnd_length1), '(I3)') nbytes2
-        CALL gen_exop (%val(opnd_addr(ntopnd-1)),
+        CALL gen_exop (%val(cnf_pval(opnd_addr(ntopnd-1))),
      &                 opnd_type(ntopnd-1),
      &                 nbytes1,
-     &                 %val(opnd_addr(ntopnd)),
+     &                 %val(cnf_pval(opnd_addr(ntopnd))),
      &                 opnd_type(ntopnd),
      &                 nbytes2,
      &                 operator,

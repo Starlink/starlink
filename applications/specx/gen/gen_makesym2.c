@@ -26,7 +26,7 @@
 *-
 */
 
-#include "f77.h"
+#include "cnf.h"
 #include "symbols.h"
 
 F77_SUBROUTINE(gen_makesym2)(INTEGER(entry), CHARACTER(symbol),
@@ -35,10 +35,10 @@ F77_SUBROUTINE(gen_makesym2)(INTEGER(entry), CHARACTER(symbol),
 
 *ierr = 0;
 
-cnf_imprt( symbol, symbol_length, table[*entry].name );
-cnf_imprt( type, type_length, table[*entry].type );
+cnfImprt( symbol, symbol_length, table[*entry].name );
+cnfImprt( type, type_length, table[*entry].type );
 table[*entry].length = *length;
-table[*entry].address = (void *)*address;
+table[*entry].address = cnfCptr(*address);
 
 }
 
@@ -71,7 +71,7 @@ F77_SUBROUTINE(gen_inqsymnam)(INTEGER(entry), CHARACTER(name), INTEGER(ierr)
 
      *ierr = 0;
 
-     cnf_exprt( table[*entry].name, name, name_length );
+     cnfExprt( table[*entry].name, name, name_length );
 }
 
 /*+
@@ -103,7 +103,7 @@ F77_SUBROUTINE(gen_inqsymtyp)(INTEGER(entry), CHARACTER(type), INTEGER(ierr)
 
      *ierr = 0;
 
-     cnf_exprt( table[*entry].type, type, type_length );
+     cnfExprt( table[*entry].type, type, type_length );
 }
 
 /*+
@@ -167,7 +167,7 @@ F77_SUBROUTINE(gen_inqsymaddr)(INTEGER(entry), POINTER(address), INTEGER(ierr) )
 
      *ierr = 0;
 
-     *address = (F77_POINTER_TYPE)table[*entry].address;
+     *address = cnfFptr(table[*entry].address);
 }
 
 /*+
@@ -204,8 +204,8 @@ F77_SUBROUTINE(gen_inqsyment)(INTEGER(entry), CHARACTER(symbol),
 
 *ierr = 0;
 
-cnf_exprt( table[*entry].name, symbol, symbol_length );
-cnf_exprt( table[*entry].type, type, type_length );
+cnfExprt( table[*entry].name, symbol, symbol_length );
+cnfExprt( table[*entry].type, type, type_length );
 *length = table[*entry].length;
 *address = cnfFptr( table[*entry].address );
 

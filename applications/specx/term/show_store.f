@@ -23,6 +23,7 @@
       INCLUDE 'STACKCOMM'
       INCLUDE 'SPECX_PARS'
       INCLUDE 'STAKPAR'
+      INCLUDE 'CNF_PAR'
 
 *     Local variables:
 
@@ -45,7 +46,7 @@
 *     Save the current header
 
       ISTAT = IGETVM (LHEAD*4, .TRUE., 'SHOW_STORE', IPTR)
-      CALL XCOPY  (LHEAD*4, SCAN_HEADER, %VAL(IPTR))
+      CALL XCOPY  (LHEAD*4, SCAN_HEADER, %VAL(CNF_PVAL(IPTR)))
 
 *     Recall the headers of each store position in turn
 
@@ -58,7 +59,7 @@
 
 *     Restore the current header
 
-      CALL XCOPY (LHEAD*4, %VAL(IPTR), SCAN_HEADER)
+      CALL XCOPY (LHEAD*4, %VAL(CNF_PVAL(IPTR)), SCAN_HEADER)
       ISTAT = IFREEVM (IPTR)
 
       RETURN

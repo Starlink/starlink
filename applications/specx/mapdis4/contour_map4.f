@@ -30,6 +30,7 @@ C-----------------------------------------------------------------------
       INCLUDE 'FLAGCOMM'
       INCLUDE 'STACKCOMM'
       INCLUDE 'PLOT2D'
+      INCLUDE 'CNF_PAR'
 
 *     Local constants
       INTEGER   MAX_CONTOURS
@@ -135,7 +136,7 @@ C  through call to NEW_SCALES if requested)
 
 C  Minimum and maximum on map
 
-      CALL MAP_MAXMIN (%VAL(IPTR), NAXX, NAXY, XLIM, YLIM,
+      CALL MAP_MAXMIN (%VAL(CNF_PVAL(IPTR)), NAXX, NAXY, XLIM, YLIM,
      &                 BADPIX_VAL, ZMIN, ZMAX)
       PRINT *, ' -- contour_map --'
       PRINT *, '    Min and Max on map = ', ZMIN, ZMAX
@@ -181,13 +182,13 @@ C  Work out contour levels
           CALL SET_COLOURS
         END IF
 
-        CALL PLOT_MAP (%VAL(IPTR), ZC(NCONT1), DZ, NZ,
+        CALL PLOT_MAP (%VAL(CNF_PVAL(IPTR)), ZC(NCONT1), DZ, NZ,
      &                 GRLIMITS, ARRMAX, ARRMIN,
      &                 CONTOURS, GREYSCALE, XMARGIN, YMARGIN, IFAIL)
 
         REPEAT = .FALSE.
         IF (TERMINAL .AND. INTERACTIVE) THEN
-          CALL I2DOPT (%VAL(IPTR), OPTIONS, REPEAT,
+          CALL I2DOPT (%VAL(CNF_PVAL(IPTR)), OPTIONS, REPEAT,
      &                  CONTOURS, GREYSCALE, GRLIMITS)
         END IF
       END DO

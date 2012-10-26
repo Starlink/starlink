@@ -22,6 +22,7 @@
 *     Symbol table
 
       INCLUDE  'GEN_SYMBOLS.INC'
+      INCLUDE  'CNF_PAR'
 
 *     User variables
 
@@ -51,7 +52,8 @@
       C1 = INDEX (INSYMBOL, '(') - 1
       IF (C1.LT.0) C1 = ILS
 
-      CALL GEN_INQSYMB1 (%VAL(TABLE_ADDRESS), %VAL(LENGTH_ADDRESS),
+      CALL GEN_INQSYMB1 (%VAL(CNF_PVAL(TABLE_ADDRESS)), 
+     :                   %VAL(CNF_PVAL(LENGTH_ADDRESS)),
      &                   INSYMBOL(:C1),
      &                   SYM_INDEX, TYPE, LENGTH, ADDRESS,
      &                   READONLY, IERR)

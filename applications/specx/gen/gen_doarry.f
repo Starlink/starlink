@@ -9,6 +9,7 @@
      &                       address, ierr)
 
       IMPLICIT  none
+      INCLUDE 'CNF_PAR'
 
 *     Formal parameters
 
@@ -34,7 +35,7 @@
 *     First get the array index in integer type:
 
       READ (opnd_type1(2:gen_ilen(opnd_type1)), '(I3)') nbytes
-      CALL gen_cvt_type (%val(opnd_addr2), opnd_type2, nbytes,
+      CALL gen_cvt_type (%val(cnf_pval(opnd_addr2)), opnd_type2, nbytes,
      &                    arg,            'I4',        4,      ierr)
 
 *     Determine the length of individual array element
@@ -49,7 +50,8 @@ CD    Print *,'     new address ', address
 
 *     copy value from this address to reserved part of workspace
 
-      CALL xcopy (nbytes, %val(address), %val(opnd_addr1))
+      CALL xcopy (nbytes, %val(cnf_pval(address)), 
+     :            %val(cnf_pval(opnd_addr1)))
 
       RETURN
       END

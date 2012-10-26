@@ -29,6 +29,7 @@
       INCLUDE 'PLOT2D'
       INCLUDE 'FLAGCOMM'
       INCLUDE 'PROTOTYPE'
+      INCLUDE 'CNF_PAR'
 
 *     Common blocks:
 
@@ -93,7 +94,8 @@ CD    PRINT *,'XSCALE indexing: IOFF, NAX =',IOFF(3),NAX(3)
 
           CALL GET_CUBE_DATA (J+IOFF(1), K+IOFF(2), NPTS(1), XSCALE,
      &                        INTERP, IOFF(3)+1, IOFF(3)+NAX(3),
-     &                        BUF, %VAL(INDEX_PTR), MSTEP, NSTEP,
+     &                        BUF, %VAL(CNF_PVAL(INDEX_PTR)), 
+     :                        MSTEP, NSTEP,
      &                        GOT_DATA)
 
 *         Work out the desired quantities

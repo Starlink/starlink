@@ -16,6 +16,7 @@ C   Routine to close off plot file for either batch or on-line plotting
       CHARACTER  FILNAM*40, SEQUENCE*3, TTNAME*4
 
       INCLUDE  'SPECX_PARS'
+      INCLUDE  'CNF_PAR'
 
       INTEGER*4 PLOT_UNIT
       COMMON /PLTDEV/ PLOT_UNIT
@@ -51,7 +52,8 @@ C       Initialize plot device and plot
 
         ISTAT = IGETVM (4*LSPMAX, .TRUE., 'CLOSE_PLOT', IXPTR)
         ISTAT = IGETVM (4*LSPMAX, .TRUE., 'CLOSE_PLOT', IYPTR)
-        CALL PLOT_FILE (%VAL(IXPTR), %VAL(IYPTR), IFAIL)
+        CALL PLOT_FILE (%VAL(CNF_PVAL(IXPTR)), %VAL(CNF_PVAL(IYPTR)), 
+     :                  IFAIL)
         ISTAT = IFREEVM (IXPTR)
         ISTAT = IFREEVM (IYPTR)
 

@@ -78,6 +78,7 @@
       INCLUDE 'MAPS'
       INCLUDE 'PROTOTYPE'
       INCLUDE 'FLAGCOMM'
+      INCLUDE 'CNF_PAR'
 
 *  Status:
       INTEGER IFAIL
@@ -188,11 +189,11 @@
 
 *  Read the index and each spectrum.
 *  Absent spectra will be returned as all-zero rows.
-      CALL MV4_INDXRD( %VAL(INDEX_ADDRESS) )
+      CALL MV4_INDXRD( %VAL(CNF_PVAL(INDEX_ADDRESS)) )
       DO 2 J = 1, NSTEP
          DO 1 I = 1, MSTEP
-            CALL MV4_SPECRD( I, J, %VAL(INDEX_ADDRESS),
-     :         %VAL(CUBE_ADDRESS) )
+            CALL MV4_SPECRD( I, J, %VAL(CNF_PVAL(INDEX_ADDRESS)),
+     :         %VAL(CNF_PVAL(CUBE_ADDRESS)) )
  1       CONTINUE
  2    CONTINUE
 

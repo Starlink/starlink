@@ -32,6 +32,7 @@ C   current spectrum is left in the stack in unaltered state
       INCLUDE 'MAPS'
       INCLUDE 'FLAGCOMM'
       INCLUDE 'STACKCOMM'
+      INCLUDE 'CNF_PAR'
 
 *     Local variables:
 
@@ -167,7 +168,7 @@ CD    PRINT *, 'DELX, DELY, DMISS  = ', DELX, DELY, DMISS
 *     Now write the spectrum to the map at the right place
 
       CALL ADDMAP2 (IDUP, XCELL, YCELL,
-     &            DATA,  NPTS(1), %VAL(INDEX_ADDRESS),
+     &            DATA,  NPTS(1), %VAL(CNF_PVAL(INDEX_ADDRESS)),
      &            IFAIL)
       IF (IFAIL.NE.0) GO TO 99
 
@@ -179,7 +180,7 @@ CD    PRINT *, 'DELX, DELY, DMISS  = ', DELX, DELY, DMISS
 *     TOMAP has rewritten map header and updated index array;
 *     Rewrite INDEX array and output message to terminal
 
-*     CALL WRITE_MAP_INDEX (MCHAN, %VAL(INDEX_ADDRESS), NREDT)
+*     CALL WRITE_MAP_INDEX (MCHAN, %VAL(CNF_PVAL(INDEX_ADDRESS)),NREDT)
 
 *     Finish and error return
 

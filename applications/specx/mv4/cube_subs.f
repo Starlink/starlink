@@ -163,16 +163,16 @@ C  Include files:
 
       INCLUDE 'CUBE'
       INCLUDE 'MAPHD'
+      INCLUDE 'CNF_PAR'
 
 C  Other variables:
 
       INTEGER*4 INS               ! Effective 1-d index in (x,y) plane
-      INTEGER*4 LOCATION          ! Address of start of data
 
       INS = IIN + MSTEP*(JIN-1)
-      LOCATION = CUBE_ADDRESS + 4*LDATA*(INS-1)
 
-      CALL XCOPY (4*LDATA, %VAL(LOCATION), DATA)
+      CALL XCOPY (4*LDATA,
+     :     %VAL(CNF_PVAL(CUBE_ADDRESS)+4*LDATA*(INS-1)), DATA)
 
       RETURN
       END
@@ -197,16 +197,18 @@ C  Include files:
 
       INCLUDE 'CUBE'
       INCLUDE 'MAPHD'
+      INCLUDE 'CNF_PAR'
 
 C  Other variables:
 
       INTEGER*4 INS               ! Effective 1-d index in (x,y) plane
-      INTEGER*4 LOCATION          ! Address of start of data
 
       INS = IIN + MSTEP*(JIN-1)
-      LOCATION = CURRENT_CUBE_ADDRESS + 4*LDATA*(INS-1) + 4*(I1-1)
 
-      CALL XCOPY (4*(I2+1-I1), %VAL(LOCATION), DATA)
+      CALL XCOPY (4*(I2+1-I1),
+     :     %VAL(CNF_PVAL(CURRENT_CUBE_ADDRESS)
+     :     +4*LDATA*(INS-1)+4*(I1-1)),
+     :     DATA)
 
       RETURN
       END

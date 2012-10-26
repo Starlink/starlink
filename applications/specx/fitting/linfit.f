@@ -33,6 +33,7 @@ C
       INCLUDE 'SPECX_PARS'
       INCLUDE 'STACKCOMM'
       INCLUDE 'STAKPAR'
+      INCLUDE 'CNF_PAR'
 
       REAL      XSC
       REAL      Y
@@ -171,8 +172,9 @@ C         get residuals, so *NCH instead of *N
 
 C   Calculate parameters of best-fit baseline
 
-  145 CALL LMM2 (PARAM,RESID,%VAL(IAPTR),SUMSQ,N,NPARAM,TOL,
-     &          1.5,0.5,ITS,IERX,C,G,%VAL(IWPTR),ICON,ILOUT,GAUSSF)
+  145 CALL LMM2 (PARAM,RESID,%VAL(CNF_PVAL(IAPTR)),SUMSQ,N,NPARAM,TOL,
+     &          1.5,0.5,ITS,IERX,C,G,%VAL(CNF_PVAL(IWPTR)),
+     :          ICON,ILOUT,GAUSSF)
       IF(IERX.NE.1)   THEN
         WRITE(ILOUT,1060) IERX
         IFAIL = 9
@@ -193,7 +195,7 @@ C   Calculate least square baseline
         XSC(I) = XSCALE(NST+I-1)
         Y(I)   = DATA(NST+I-1)
       END DO
-      CALL GAUSSF (PARAM, RESID, %VAL(IAPTR), SUMSQ, 1)
+      CALL GAUSSF (PARAM, RESID, %VAL(CNF_PVAL(IAPTR)), SUMSQ, 1)
       DO I = 1, NCH
         DATA(NST+I-1) = DATA(NST+I-1) - RESID(I)
       END DO

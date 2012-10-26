@@ -37,6 +37,7 @@ C     Include files:
       INCLUDE 'PROTOTYPE'
       INCLUDE 'PLOT2D'
       INCLUDE 'WEIGHTS'
+      INCLUDE 'CNF_PAR'
 
 C     Miscellaneous variables
 
@@ -46,7 +47,6 @@ C     Miscellaneous variables
       INTEGER   ISTAT             ! Status return for GEN_ routines
       INTEGER   INTCUBE_ADDRESS   ! Pointer to new (interpolated) cube.
       INTEGER   INTINDEX_ADDRESS  ! Pointer to new index array
-      INTEGER   LOCATION          ! General addressing variable
       INTEGER   MNPOS             ! Value from INDEX array
       INTEGER   MNOFFSET          ! Offset bytes in (m,n) space
       INTEGER   NDATA             ! Length of spectrum
@@ -113,13 +113,13 @@ C     Get virtual memory for interpolated cube.
 
       CALL MAKE_CUBE2 (NCUBE, NINDEX, INTCUBE_ADDRESS,
      &                 INTINDEX_ADDRESS, IFAIL)
-      CALL XCOPY      (NINDEX, %VAL(CURRENT_INDEX_ADDRESS),
-     &                 %VAL(INTINDEX_ADDRESS))
+      CALL XCOPY      (NINDEX, %VAL(CNF_PVAL(CURRENT_INDEX_ADDRESS)),
+     &                 %VAL(CNF_PVAL(INTINDEX_ADDRESS)))
       NEW_CUBE_LOADED = .TRUE.
 
 C     Debug INDEX array
 
-*     CALL LDEBUG (%VAL(CURRENT_INDEX_ADDRESS), MSTEP, NSTEP)
+*     CALL LDEBUG (%VAL(CNF_PVAL(CURRENT_INDEX_ADDRESS)), MSTEP, NSTEP)
 
 C     Then do the interpolation
 
@@ -138,8 +138,9 @@ C     Then do the interpolation
         DO M = 1, MSTEP
 
           MNOFFSET = 4*((N-1)*MSTEP + (M-1))
-          LOCATION = CURRENT_INDEX_ADDRESS + MNOFFSET
-          CALL XCOPY (4, %VAL(LOCATION), MNPOS)
+          CALL XCOPY (4,
+     :         %VAL(CNF_PVAL(CURRENT_INDEX_ADDRESS)+MNOFFSET),
+     :         MNPOS)
 
           CALL READ_INTERP_DATA (NDATA, M, N, BUF1, BUF2, 1, NDATA,
      &                           HIT_DATA, INTERP)
@@ -149,8 +150,8 @@ C         go ahead and put properly weighted data back into the cube.
 
           IF (INTERP) THEN
 
-            LOCATION = INTCUBE_ADDRESS + MNOFFSET*NDATA
-            CALL XCOPY (4*NDATA, BUF2, %VAL(LOCATION))
+            CALL XCOPY (4*NDATA, BUF2,
+     :           %VAL(CNF_PVAL(INTCUBE_ADDRESS)+MNOFFSET*NDATA))
 
 *           PRINT *,'All logicals set'
 *           PRINT *,'Interpolated array placed in pixel ',M,N
@@ -161,11 +162,13 @@ C         go ahead and put properly weighted data back into the cube.
 *           values for positions where spectra exist in original so
 *           that valid points can be shown on plots.
 
-            LOCATION = INTINDEX_ADDRESS + MNOFFSET
-            CALL XCOPY (4, %VAL(LOCATION), MNPOS)
+            CALL XCOPY (4,
+     :           %VAL(CNF_PVAL(INTINDEX_ADDRESS)+MNOFFSET),
+     :           MNPOS)
             IF (MNPOS.LT.0) THEN
               MNPOS    = 0
-              CALL XCOPY (4, MNPOS, %VAL(LOCATION))
+              CALL XCOPY (4, MNPOS,
+     :             %VAL(CNF_PVAL(INTINDEX_ADDRESS)+MNOFFSET))
             END IF
 
           END IF
@@ -175,7 +178,7 @@ C         go ahead and put properly weighted data back into the cube.
 
 C     Debug new INDEX array
 
-*     CALL LDEBUG (%VAL(INTINDEX_ADDRESS), MSTEP, NSTEP)
+*     CALL LDEBUG (%VAL(CNF_PVAL(INTINDEX_ADDRESS)), MSTEP, NSTEP)
 
       IF (HIT_DATA) THEN
 

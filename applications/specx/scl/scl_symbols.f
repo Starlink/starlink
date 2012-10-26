@@ -171,6 +171,7 @@
 *   I/O control
 
       INCLUDE  'IODATA'
+      INCLUDE  'CNF_PAR'
 
 *     Functions:
 
@@ -190,7 +191,8 @@
 
 *     Search for wildcards:
       IF (INDEX (SYMBOL, '*') .ne. 0) THEN
-        CALL SPECX_SHOW_TABLE1 (%VAL(SYMTAB_ADDRESS), L_SYMTAB,
+        CALL SPECX_SHOW_TABLE1 (%VAL(CNF_PVAL(SYMTAB_ADDRESS)), 
+     :                          L_SYMTAB,
      &                          SYMBOL, ILOUT2)
 
 *     No wildcards, look for exact match
@@ -263,6 +265,7 @@
       SUBROUTINE SPECX_SET_VALUE (SYMBOL, STRING, IFAIL)
 
       IMPLICIT  NONE
+      INCLUDE 'CNF_PAR'
 
 *     Formal parameters
 
@@ -387,10 +390,10 @@
 
 *     IF (TYPE.NE.'C') THEN
 
-        CALL GEN_SETSYM1 (%VAL(SYMTAB_PTR), L_SYMTAB,
+        CALL GEN_SETSYM1 (%VAL(CNF_PVAL(SYMTAB_PTR)), L_SYMTAB,
      &                    SYM_INDEX, IOFF, LVALUE, IERR)
 *     ELSE
-*       CALL GEN_SETSYM1 (%VAL(SYMTAB_PTR), L_SYMTAB,
+*       CALL GEN_SETSYM1 (%VAL(CNF_PVAL(SYMTAB_PTR)), L_SYMTAB,
 *    &                    SYM_INDEX, IOFF, %REF(STRING), IERR)
 *     END IF
 

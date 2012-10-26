@@ -9,6 +9,7 @@
      &                       opnd_addr2, opnd_type2, fnc_index, ierr)
 
       IMPLICIT  none
+      INCLUDE 'CNF_PAR'
 
 *     Formal parameters
 
@@ -41,7 +42,7 @@ CD     CHARACTER function*4
 *     First get the argument in REAL type
 
       READ (opnd_type2(2:gen_ilen(opnd_type2)), '(I3)') nbytes
-      CALL gen_cvt_type (%val(opnd_addr2), opnd_type2, nbytes,
+      CALL gen_cvt_type (%val(cnf_pval(opnd_addr2)), opnd_type2, nbytes,
      &                    arg,            'R4',        4,       ierr)
 
 *     Evaluate function
@@ -123,7 +124,7 @@ CD    PRINT *, '   evaluation of function ', function
 
 *     transfer result to area of memory reserved for it
 
-      CALL xcopy (4, result, %val(opnd_addr1))
+      CALL xcopy (4, result, %val(cnf_pval(opnd_addr1)))
       RETURN
 
 *     error return

@@ -31,6 +31,7 @@
       INCLUDE  'MAPHD'          !  Header of currently open map file
       INCLUDE  'PLOT2D'         !  Info about required 2D maps
       INCLUDE  'SPECX_FITS'     !  FITS file system parameters
+      INCLUDE  'CNF_PAR'        ! For CNF_PVAL function
 
 *     External routines
       DOUBLE PRECISION SPECXJD_TO_MJD
@@ -151,12 +152,13 @@
 *     Substitute BAD values with RBLANK (returned). Scale RBLANK to
 *     BLANK after call to FIT_SCALC.
 
-      CALL BAD2BLANK (2, %VAL(IPTR), IMX*IMY, RBLANK, NBLANK, IFAIL)
+      CALL BAD2BLANK (2, %VAL(CNF_PVAL(IPTR)), 
+     :                IMX*IMY, RBLANK, NBLANK, IFAIL)
 
 *     Find scaling for data using FIT_SCALC
 
       CHECK = .FALSE.
-      CALL FIT_SCALC  (%VAL(IPTR), IMX*IMY, CHECK,
+      CALL FIT_SCALC  (%VAL(CNF_PVAL(IPTR)), IMX*IMY, CHECK,
      &                  DMIN, DMAX, SCALES, ZEROS, ERRORS)
 
 *     Write a standard header using FIT_HSTAN
@@ -476,7 +478,7 @@
 
       CALL FIT_WEND  (STATUS)
       IF (STATUS.NE.0) GO TO 99
-      CALL FIT_WRAYF (%VAL(IPTR), IMX*IMY, BITPIX,
+      CALL FIT_WRAYF (%VAL(CNF_PVAL(IPTR)), IMX*IMY, BITPIX,
      &                 BSCALE, BZERO, STATUS)
       IF (STATUS.NE.0) GO TO 99
 

@@ -12,6 +12,8 @@
 
       IMPLICIT   NONE
 
+      INCLUDE 'CNF_PAR'
+
 *     Formal parameters
 
       INTEGER    NQUAD          ! # of sectors in data
@@ -63,13 +65,13 @@
 *     -- First the initial unchanged block
 
       N = NTOT(NQ-1)
-      IF (N .ne. 0) CALL XCOPY (4*N, DATA(1), %VAL(IPTR))
+      IF (N .ne. 0) CALL XCOPY (4*N, DATA(1), %VAL(CNF_PVAL(IPTR)))
       NOFF = 4*N
 
 *     -- then splice in the new array
 
       N = NREP
-      IF (N .ne. 0) CALL XCOPY (4*N, BUF(1),  %VAL(IPTR+NOFF))
+      IF (N .ne. 0) CALL XCOPY (4*N, BUF(1),  %VAL(CNF_PVAL(IPTR)+NOFF))
       NOFF = NOFF + 4*N
 
 *     -- and finally the tail (if any)
@@ -77,13 +79,13 @@
       IF (NQ .ne. NQUAD) THEN
         N = NTOT(NQUAD) - NTOT(NQ)
         NST = NTOT(NQ) + 1
-        CALL XCOPY (4*N, DATA(NST), %VAL(IPTR+NOFF))
+        CALL XCOPY (4*N, DATA(NST), %VAL(CNF_PVAL(IPTR)+NOFF))
       END IF
 
 *     Update NPTS and copy workspace back to data array
 
       NPTS(NQ) = NREP
-      CALL XCOPY (4*NCHAN, %VAL(IPTR), DATA)
+      CALL XCOPY (4*NCHAN, %VAL(CNF_PVAL(IPTR)), DATA)
 
 *     Free work space
 
