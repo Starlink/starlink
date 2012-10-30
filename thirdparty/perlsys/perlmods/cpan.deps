@@ -13,6 +13,7 @@ Tk
 Tk::TextANSIColor
 Statistics::Descriptive
 Image::ExifTool
+Number::Interval
 Astro::FITS::CFITSIO
 ExtUtils::F77
 Astro::SLA
