@@ -5432,6 +5432,8 @@ f        BADVAL
 *     - A value of zero will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
+*     - An error will be reported if the overlap of the Region and 
+*     the array cannot be determined.
 
 *  Data Type Codes:
 *     To select the appropriate masking function, you should
@@ -5591,15 +5593,21 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
       npix = 1; \
       npixg = 1; \
       for ( idim = 0; idim < ndim; idim++ ) { \
-         lbndg[ idim ] = MAX( lbnd[ idim ], (int)( lbndgd[ idim ] + 0.5 ) - 2 ); \
-         ubndg[ idim ] = MIN( ubnd[ idim ], (int)( ubndgd[ idim ] + 0.5 ) + 2 ); \
-         npix *= ( ubnd[ idim ] - lbnd[ idim ] + 1 ); \
-         npixg *= ( ubndg[ idim ] - lbndg[ idim ] + 1 ); \
-         if( npixg <= 0 ) break; \
+         if( lbndgd[ idim ] != AST__BAD && ubndgd[ idim ] != AST__BAD ) { \
+            lbndg[ idim ] = MAX( lbnd[ idim ], (int)( lbndgd[ idim ] + 0.5 ) - 2 ); \
+            ubndg[ idim ] = MIN( ubnd[ idim ], (int)( ubndgd[ idim ] + 0.5 ) + 2 ); \
+            npix *= ( ubnd[ idim ] - lbnd[ idim ] + 1 ); \
+            npixg *= ( ubndg[ idim ] - lbndg[ idim ] + 1 ); \
+            if( npixg <= 0 ) break; \
+         } else { \
+            astError( AST__PTRNG, "astMask<X>(%s): Cannot determine the overlap of the Region and array.", \
+                      status, astGetClass(this) ); \
+            break; \
+         } \
       } \
 \
 /* If the bounding box is null, return without action. */ \
-      if( npixg > 0 ) { \
+      if( npixg > 0 && astOK ) { \
 \
 /* All points outside this box are either all inside, or all outside, the \
    Region. So we can speed up processing by setting all the points which are \
@@ -8358,6 +8366,8 @@ f        The global status.
 *    returned larger than the upper limit. Note, this is different to an
 *    axis which has a constant value (in which case both lower and upper
 *    limit will be returned set to the constant value).
+*    - If the bounds on an axis cannot be determined, AST__BAD is returned for 
+*    both upper and lower bounds 
 
 *--
 */
@@ -8461,7 +8471,12 @@ f        The global status.
 
       for( i = 0; i < ncur; i++ ) {
          width = astAxDistance( frm, i + 1, lbnd[ i ], ubnd[ i ] );
-         ubnd[ i ] = lbnd[ i ] + width;
+         if( width != AST__BAD ) {
+            ubnd[ i ] = lbnd[ i ] + width;
+         } else {
+            ubnd[ i ] = AST__BAD;
+            lbnd[ i ] = AST__BAD;
+         }
       }
 
 /* Release resources. */
