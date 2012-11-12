@@ -7,6 +7,7 @@ import tempfile
 import shutil
 import glob
 import inspect
+import time
 
 #  Provide recall and editing facilities for parameter prompts
 import readline
@@ -249,25 +250,44 @@ def invoke(command,aslist=False,buffer=None):
       elif aslist:
          outtxt = outtxt.split("\n")
 
-   #  Original non-buffering scheme - Does someone knows how to fix the GWM
+   # Non-buffering scheme - Does someone knows how to fix the GWM
    # freezing issue without resorting to the above buffering scheme~
    else:
-      try:
-         bytes = subprocess.check_output(command,shell=True)
-         if bytes != None:
-            outtxt = bytes.decode("utf-8").strip()
-            msg_out( outtxt, ATASK )
-            if aslist:
-               outtxt = outtxt.split("\n")
-         else:
-            outtxt = None
 
-      except subprocess.CalledProcessError as err:
-         bytes = err.output
-         if bytes != None:
-            outtxt = bytes.decode("utf-8").strip()
-            msg_out( outtxt, ATASK )
-            raise AtaskError("\n\n{0}".format(bytes.decode("utf-8")))
+      if aslist:
+         outtxt = []
+      else:
+         outtxt = ""
+
+      proc = subprocess.Popen(command,shell=True, stdout=subprocess.PIPE,
+                              stderr=subprocess.STDOUT)
+      while True:
+
+         line = proc.stdout.readline()
+         while line != None and len(line) > 0:
+            line = line.rstrip()
+            msg_out( line, ATASK )
+            if aslist:
+               outtxt.append(line)
+            else:
+               outtxt = "{0}\n{1}".format(outtxt,line)
+            line = proc.stdout.readline()
+
+         status = proc.poll()
+         if status != None:
+            break
+
+         time.sleep(1.0)
+
+      if status != 0:
+         if outtxt:
+            if aslist:
+               msg = ""
+               for line in outtxt:
+                  msg = "{0}\n{1}".format(msg,line)
+            else:
+               msg = outtxt
+            raise AtaskError("\n\n{0}".format(msg))
          else:
             raise AtaskError()
 
@@ -826,7 +846,7 @@ class Parameter(object):
          try:
             self._setValue( value )
             self.__validate()
-            msg_out( "Parameter '{0} is set to '{1}'\n".format(self.__name,self.__value), ATASK )
+            msg_out( "Parameter {0} is set to {1}\n".format(self.__name,self.__value), ATASK )
          except InvalidParameterError as err:
             self.__error(err)
             self.__raw = None
