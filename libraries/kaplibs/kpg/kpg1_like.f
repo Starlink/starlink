@@ -60,6 +60,8 @@
 *  History:
 *     26-JAN-2009 (DSB):
 *        Original version.
+*     12-NOV-2012 (DSB):
+*        Correct conversion of GRID to pixel indices.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -152,8 +154,8 @@
      :                          DLBND1, DUBND1, XL, XU, STATUS )
 
 *  Convert to pixel indices
-               UBND1( I ) = LBND1( I ) + NINT( DUBND1 ) - 2
-               LBND1( I ) = LBND1( I ) + NINT( DLBND1 ) - 1
+               UBND1( I ) = LBND1( I ) + NINT( DUBND1 + 0.5 )
+               LBND1( I ) = LBND1( I ) + NINT( DLBND1 + 0.5 )
             END DO
 
 *  Report an error if the two supplied NDFs could not be aligned.
