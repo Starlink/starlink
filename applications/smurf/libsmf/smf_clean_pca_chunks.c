@@ -48,11 +48,14 @@
 *     means removed before entry.
 
 *  Authors:
-*     Ed Chapin (UBC)
+*     EC: Ed Chapin (UBC)
+*     DSB: David Berry (JAC, Hawaii)
 
 *  History:
 *     2011-10-12 (EC):
 *        Initial version
+*     2012-11-12 (DSB):
+*        Fill gaps in the data before cleaning.
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -238,6 +241,9 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
              status, ntslice, clen );
     goto CLEANUP;
   }
+
+  /* Fill any gaps or padding with interpolated data values plus noise.
+  smf_fillgaps( wf, data, SMF__Q_PAD | SMF__Q_GAP, status );
 
   /* Set up the division of labour for threads: independent blocks of time.
      Unlike much of SMURF, we're going to make proper use of the worker
