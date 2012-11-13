@@ -245,6 +245,18 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s updating quality",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
+    /* De-convolve the MCE anti-aliasing filter response */
+    /*
+    filt = smf_create_smfFilter( data, status );
+    smf_filter_mce( filt, 0, status );
+    if( *status == SAI__OK ) {
+      msgOutif( MSG__VERB, "", FUNC_NAME
+                ": de-convolve anti-aliasing filter response", status );
+      smf_filter_execute( wf, data, filt, 0, whiten, status );
+    }
+    filt = smf_free_smfFilter( filt, status );
+    */
+
     /* Fix DC steps */
     if( dcthresh && dcfitbox ) {
       msgOutiff(MSG__VERB, "", FUNC_NAME
