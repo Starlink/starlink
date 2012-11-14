@@ -258,7 +258,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
        if( *status == SAI__OK ) {
          msgOutif( MSG__VERB, "", FUNC_NAME
                    ": de-convolve anti-aliasing filter response", status );
-         smf_filter_execute( wf, data, filt, 0, whiten, status );
+         smf_filter_execute( wf, data, filt, 0, 0, status );
        }
        filt = smf_free_smfFilter( filt, status );
     }
