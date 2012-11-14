@@ -122,7 +122,7 @@
 *  Begin an AST context.
          CALL AST_BEGIN( STATUS )
 
-* Get the pixel index bounds of the template.
+*  Get the pixel index bounds of the template.
          CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1,
      :                   STATUS )
 
@@ -154,8 +154,8 @@
      :                          DLBND1, DUBND1, XL, XU, STATUS )
 
 *  Convert to pixel indices
-               UBND1( I ) = LBND1( I ) + NINT( DUBND1 + 0.5 )
-               LBND1( I ) = LBND1( I ) + NINT( DLBND1 + 0.5 )
+               UBND1( I ) = LBND1( I ) + NINT( DUBND1 ) - 1
+               LBND1( I ) = LBND1( I ) + NINT( DLBND1 ) - 1
             END DO
 
 *  Report an error if the two supplied NDFs could not be aligned.
