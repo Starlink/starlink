@@ -547,7 +547,7 @@ void smurf_calcnoise( int *status ) {
                         &dkclean, NULL, &zeropad, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        status);
+                        NULL, status);
 
       for( idx=0; dkclean&&(*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
         odata = concat->sdata[idx];

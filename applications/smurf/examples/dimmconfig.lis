@@ -371,6 +371,11 @@ fillgaps = 1
 # Should a whitening filter be applied to compensate for 1/f noise?
 # whiten = 1
 
+# Should each boilometer time stream be deconvolved to remove the effects
+# of the MCE anti-aliasing filter? The default is zero. Uncomment this
+# line to switch it on.
+# deconvmce = 1
+
 # Clip bolometers based on their noise. This step will remove any
 # bolometers noisier than noisecliphigh standard deviations above the
 # median, or noisecliplow standard deviations below the

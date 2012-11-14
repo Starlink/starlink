@@ -26,7 +26,7 @@
 *                       double *noisecliplow, int *whiten, int *compreprocess,
 *                       dim_t *pcalen, double *pcathresh, int groupsubarray,
 *                       double *downsampscale, double *downsampfreq,
-*                       int *noiseclipprecom, int *status )
+*                       int *noiseclipprecom, int *deconvmce, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -125,6 +125,8 @@
 *     noiseclipprecom = int * (Returned)
 *        Should clipping of noisy bolometers happen before common-mode cleaning
 *        instead of after as is the default?
+*     deconvmce = int * (Returned)
+*        Should the effects of the anti-aliasing MCE filter be removed?
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -194,6 +196,8 @@
 *     2012-02-21 (EC):
 *        Add argument "data" and allow parameters that represent a number
 *        of time slices to be given in units of seconds instead.
+*     2012-11-14 (DSB):
+*        Add argument "deconvmce".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -255,7 +259,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
                        int *compreprocess, dim_t *pcalen, double *pcathresh,
                        int *groupsubarray, double *downsampscale,
                        double *downsampfreq, int *noiseclipprecom,
-                       int *status ) {
+                       int *deconvmce, int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -625,6 +629,20 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": NOISECLIPPRECOM is %s", status,
                (*noiseclipprecom ? "enabled" : "disabled") );
+  }
+
+  if( deconvmce ) {
+    *deconvmce = 0;
+    astMapGet0I( keymap, "DECONVMCE", &temp );
+    if( temp != 0 && temp != 1 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "DECONVMCE must be either 0 or 1.", status );
+    } else {
+      *deconvmce = temp;
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DECONVMCE is %s", status,
+               (*deconvmce ? "enabled" : "disabled") );
   }
 
 }
