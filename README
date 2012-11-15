@@ -301,6 +301,28 @@ Platform specific build notes
 
   before running "configure".
 
+  - Ubuntu (>= 11.04 "Natty Narwhal) / Debian
+
+  As of version 11.04 of Ubuntu the default handling of shared library
+  linking has changed. In the past indirect linking was enabled, such
+  that a program could link library "A", which in turn uses library
+  "B", and without explicitly linking the latter, routines from "B"
+  would be available (a situation that occurs in Starlink). Now that
+  this capability has been disabled, you will likely see strange
+  linker errors if you follow verbatim the build instructions as
+  described earlier in this document.
+
+  To remedy this situation you need to re-activate indirect linking
+  with LDFLAGS when configuring the build:
+
+      % ./configure -C --LDFLAGS=-Wl,--no-as-needed
+
+  According to the following web page, it is also likely that this
+  problem will occur with Debian (at some point), although it has not
+  been tested:
+
+  https://wiki.ubuntu.com/NattyNarwhal/ToolchainTransition
+
   - OS X
 
   The build situation under OS X follows much like that of GNU/Linux,
