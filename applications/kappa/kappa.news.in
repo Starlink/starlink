@@ -28,6 +28,14 @@ The following new applications have been added:
       -  A new boolean parameter called VECTOR specifies the output
       format to use for vector-valued parameters.
 
+   o  WCSADD
+
+      -  The transfer of set attribute values from basis Frame to new
+      Frame can now be controlled using a new boolean parameter called
+      TRANSFER (previously, set attributes were always transferred). The
+      new default is to transfer attributes only if the two Frames have
+      the same class and Domain.
+
 1 KAPPA_Version_1.13
 
    A new release of KAPPA (@PACKAGE_VERSION@) has been released.  The main

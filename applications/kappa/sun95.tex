@@ -49861,13 +49861,13 @@ plot (7k).
       connect the new Frame to an existing one (called the \emph{basis} Frame:
       see Parameter FRAME).  The specific type of Frame to add is specified
       using Parameter FRMTYPE (the default is to simply copy the basis Frame).
-      Attributes which have been assigned an explicit value in the basis Frame
-      are transferred to the new Frame (but only if they are relevant to the
-      type of the new Frame).  The value of the
-      \htmlattref{Domain}{Domain}~ attribute for the new
-      Frame can be specified using Parameter DOMAIN.  Other attribute values
-      for the new Frame may be specified using Parameters ATTRS.  The new
-      Frame becomes the current co-ordinate Frame in the NDF.
+      Optionally (see Parameter TRANSFER), attributes which have been
+      assigned an explicit value in the basis Frame are transferred to
+      the new Frame (but only if they are relevant to the type of the new
+      Frame). The value of the \htmlattref{Domain}{Domain}~ attribute for
+      the new Frame can be specified using Parameter DOMAIN.  Other attribute
+      values for the new Frame may be specified using Parameters ATTRS.  The
+      new Frame becomes the current co-ordinate Frame in the NDF.
 
       WCSADD will only generate Mappings with the same number of
       input and output axes; this number is determined by the number
@@ -50157,6 +50157,17 @@ plot (7k).
          basis Frame are connected using a unit mapping (\emph{i.e.} corresponding
          axis values are identical in the two Frames).  This parameter
          is only used when MAPTYPE={\tt "LINEAR"}.  {\tt [!]}
+      }
+      \sstsubsection{
+         TRANSFER = \_LOGICAL (Read)
+      }{
+         If TRUE, attributes which have explicitly set values in the basis
+         Frame (specified by Parameter FRAME) are transferred to the new
+         Frame (Specified by Parameter FRMTYPE), if they are applicable
+         to the new Frame. If FALSE, no attribute values are transferred.
+         The dynamic default is TRUE if and only if the two Frames are
+         of the same class and have the same value for their {\att Domain}
+         attributes.  {\tt []}
       }
       \sstsubsection{
          ZOOM = \_DOUBLE (Read)
@@ -58843,6 +58854,14 @@ The following applications have been modified:
       \begin{itemize}
         \item A new boolean parameter called VECTOR specifies the output
         format to use for vector-valued parameters.
+      \end{itemize}
+   \item [\htmlref{WCSADD}{WCSADD}]\mbox{}
+      \begin{itemize}
+        \item The transfer of set attribute values from basis Frame to new
+        Frame can now be controlled using a new boolean parameter called
+        TRANSFER (previously, set attributes were always transferred). The
+        new default is to transfer attributes only if the two Frames have
+        the same class and Domain.
       \end{itemize}
 \end{description}
 

@@ -33,13 +33,13 @@
 *     to connect the new Frame to an existing one (called the "basis"
 *     Frame: see parameter FRAME). The specific type of Frame to add is
 *     specified using parameter FRMTYPE (the default is to simply copy
-*     the basis Frame). Attributes which have been assigned an explicit
-*     value in the basis Frame are transferred to the new Frame (but
-*     only if they are relevant to the type of the new Frame). The
-*     value of the Domain attribute for the new Frame can be specified
-*     using parameter DOMAIN. Other attribute values for the new Frame
-*     may be specified using parameters ATTRS. The new Frame becomes the
-*     current co-ordinate Frame in the NDF.
+*     the basis Frame). Optionally (see parameter TRANSFER), attributes
+*     which have been assigned an explicit value in the basis Frame are
+*     transferred to the new Frame (but only if they are relevant to the
+*     type of the new Frame). The value of the Domain attribute for the
+*     new Frame can be specified using parameter DOMAIN. Other attribute
+*     values for the new Frame may be specified using parameters ATTRS.
+*     The new Frame becomes the current co-ordinate Frame in the NDF.
 *
 *     WCSADD will only generate Mappings with the same number of
 *     input and output axes; this number is determined by the number
@@ -265,6 +265,14 @@
 *        the basis Frame are connected using a unit mapping (i.e.
 *        corresponding axis values are identical in the two Frames).
 *        This parameter is only used when MAPTYPE="LINEAR". [!]
+*     TRANSFER = _LOGICAL (Read)
+*        If TRUE, attributes which have explicitly set values in the basis
+*        Frame (specified by parameter FRAME) are transferred to the new
+*        Frame (Specified by parameter FRMTYPE), if they are applicable
+*        to the new Frame. If FALSE, no attribute values are transferred.
+*        The dynamic default is TRUE if and only if the two Frames are
+*        of the same class and have the same value for their Domain
+*        attributes. []
 *     ZOOM = _DOUBLE (Read)
 *        The scaling factor for a ZoomMap; every coordinate will be
 *        multiplied by this factor in the forward transformation.
@@ -399,6 +407,8 @@
 *        Changed ATL1 prefix to ATL.
 *     29-JUN-2006 (DSB)
 *        Added support for TimeFrames.
+*     15-NOV-2012 (DSB):
+*        Added parameter TRANSFER.
 *     {enter_further_changes_here}
 
 *-
@@ -488,7 +498,7 @@
                                  ! mappings?
       LOGICAL SIMPFI             ! SimpFI attribute of MathMap
       LOGICAL SIMPIF             ! SimpIF attribute of MathMap
-
+      LOGICAL XFER               ! Transfer attributes from basis to new frame?
 *.
 
 *  Check the inherited global status.
@@ -828,30 +838,54 @@
 *  Allow the user to modify the attributes of the Frame.
             CALL KPG1_ASSET( 'WCSADD', 'ATTRS', FRMN, STATUS )
 
-*  Transfer the values of attributes which have been set in the basis
-*  Frame to the new Frame, and modify the Mapping.  We temporarily clear
-*  the Domain in the basis Frame (if set) so that we can transfer
-*  attribute values to Frames with other Domains.
-            IF( AST_TEST( FRMB, 'Domain', STATUS ) ) THEN
-               DOM0 = AST_GETC( FRMB, 'Domain', STATUS )
-               CALL AST_CLEAR( FRMB, 'Domain', STATUS )
-            ELSE
-               DOM0 = ' '
+*  See if attributes that are set in the basis Frame should be
+*  transferred to the new Frame. The dynamnic default is to do so, but only
+*  if the two Frames are off the same class, and have the same Domain.
+            XFER = .FALSE.
+            IF( AST_GETC( FRMN, 'CLASS', STATUS ) .EQ.
+     :          AST_GETC( FRMB, 'CLASS', STATUS ) ) THEN
+               IF( AST_GETC( FRMN, 'Domain', STATUS ) .EQ.
+     :             AST_GETC( FRMB, 'Domain', STATUS ) ) THEN
+                  XFER = .TRUE.
+               END IF
             END IF
+            CALL PAR_DEF0L( 'TRANSFER', XFER, STATUS )
+            CALL PAR_GET0L( 'TRANSFER', XFER, STATUS )
+
+*  If required, transfer the values of attributes which have been set in
+*  the basis Frame to the new Frame, and modify the Mapping. We temporarily
+*  clear the Domain in the basis Frame (if set) so that we can transfer
+*  attribute values to Frames with other Domains.
+            IF( XFER ) THEN
+               IF( AST_TEST( FRMB, 'Domain', STATUS ) ) THEN
+                  DOM0 = AST_GETC( FRMB, 'Domain', STATUS )
+                  CALL AST_CLEAR( FRMB, 'Domain', STATUS )
+               ELSE
+                  DOM0 = ' '
+               END IF
 
 *  Do the transferring.
-            RESULT = AST_FINDFRAME( FRMN, FRMB, ' ', STATUS )
-            IF( DOM0 .NE. ' ' ) CALL AST_SETC( FRMB, 'Domain', DOM0,
-     :                                         STATUS )
+               RESULT = AST_FINDFRAME( FRMN, FRMB, ' ', STATUS )
+               IF( DOM0 .NE. ' ' ) CALL AST_SETC( FRMB, 'Domain', DOM0,
+     :                                            STATUS )
 
 *  If succesful, use the modified new Frame and modify the Mapping.
-            IF( RESULT .NE. AST__NULL ) THEN
-               FRMN = AST_GETFRAME( RESULT, AST__CURRENT, STATUS )
-               MAP = AST_CMPMAP( MAP, AST_GETMAPPING( RESULT, AST__BASE,
-     :                                                AST__CURRENT,
-     :                                                STATUS ), .TRUE.,
-     :                           ' ', STATUS )
-               MAP = AST_SIMPLIFY( MAP, STATUS )
+               IF( RESULT .NE. AST__NULL ) THEN
+                  FRMN = AST_GETFRAME( RESULT, AST__CURRENT, STATUS )
+                  MAP = AST_CMPMAP( MAP, AST_GETMAPPING( RESULT,
+     :                                          AST__BASE, AST__CURRENT,
+     :                                          STATUS ), .TRUE.,
+     :                              ' ', STATUS )
+                  MAP = AST_SIMPLIFY( MAP, STATUS )
+
+*  If not succesful, warn the user.
+               ELSE
+                  CALL MSG_SETC( 'B', AST_GETC( FRMB, 'CLASS', STATUS ))
+                  CALL MSG_SETC( 'N', AST_GETC( FRMN, 'CLASS', STATUS ))
+                  CALL MSG_OUT( ' ', 'WARNING: attribute values '//
+     :                          'could not be transferered from the '//
+     :                          'basis ^B to the new ^N.', STATUS )
+               END IF
             END IF
          END IF
 

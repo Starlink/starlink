@@ -3085,6 +3085,15 @@ package kappa {
             helpkey *
         }
 
+         parameter transfer {
+            type _LOGICAL
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Transfer set attributes from basis Frame to new Frame?}
+            helpkey *
+        }
+
          parameter zoom {
             type _DOUBLE
             access READ
