@@ -855,28 +855,50 @@ class Parameter(object):
    # prompting the user if required.
    def _getParameterValue(self):
       value = self._getValue()
+      default = self._getDefault()
+
       while not self.__validated:
          defaultUsed = False
+         validate = True
 
          if not self._testValue():
             if not self.__noprompt:
                value = self.__promptUser()
-            elif self._testDefault():
-               value = self._getDefault()
+            else:
+               value = "!"
+            self.__raw = value
+
+         if value == "!" :
+            if self._testDefault():
+               value = default
                defaultUsed = True
             else:
-               raise NoValueError("\n{0}No value obtained for parameter {1}.".format(_cmd_token(),self._getName()))
-            self.__raw = value
-         try:
-            self._setValue( value )
-            self.__validate()
-            msg_out( "Parameter {0} is set to {1}\n".format(self.__name,self.__value), ATASK )
-         except InvalidParameterError as err:
-            self.__error(err)
-            self.__raw = None
+               raise NoValueError("\n{0}No value obtained for parameter '{1}'.".format(_cmd_token(),name))
 
-         if defaultUsed:
-            self._clearDefault()
+         elif value == "!!" :
+            raise AbortError("\n{0}Aborted prompt for parameter '{1}'.".format(_cmd_token(),name))
+
+         elif value == "?" or value == "??":
+            help = self._getHelp()
+            if help:
+               print(help)
+            else:
+               text = "No help available for parameter '{0}'.".format(name)
+               self.__error(text)
+            validate = False
+
+         if validate:
+            try:
+               self._setValue( value )
+               self.__validate()
+               msg_out( "Parameter {0} is set to {1}\n".format(self.__name,self.__value), ATASK )
+
+            except InvalidParameterError as err:
+               self.__error(err)
+               self.__raw = None
+
+            if defaultUsed:
+               self._clearDefault()
 
       return self._getValue()
 
@@ -980,24 +1002,6 @@ class Parameter(object):
             if default != Parameter.UNSET:
                result = default
                break
-
-         elif result == "!" :
-            if default != Parameter.UNSET:
-               result = default
-               break
-            else:
-               raise NoValueError("\n{0}No value obtained for parameter '{1}'.".format(_cmd_token(),name))
-
-         elif result == "!!" :
-            raise AbortError("\n{0}Aborted prompt for parameter '{1}'.".format(_cmd_token(),name))
-
-         elif result == "?" or result == "??":
-            help = self._getHelp()
-            if help:
-               print(help)
-            else:
-               text = "No help available for parameter '{0}'.".format(name)
-               self.__error(text)
 
          else:
             break
