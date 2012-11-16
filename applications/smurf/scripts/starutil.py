@@ -384,6 +384,10 @@ class ParSys(object):
    name followed by the names of the script parameters with any
    associated defaults, in their expected order.
 
+   Creation of a new ParSys object also causes the creation of a new,
+   empty, ADAM directory in the user's home directory. This ADAM
+   directory can be deleted using function ParSys.cleanup().
+
    Three parameters controlling the level of information to display and
    log are created automatically when the ParSys constructor is called.
    These parameters are:
@@ -471,7 +475,15 @@ class ParSys(object):
          contains the script name followed by the supplied parameter
          kewords with default values, if any, in the supplied order.
 
+   Class Methods:
+      ParSys.cleanup():
+         Deletes the temporary ADAM directory created when the ParSys was
+         constructed.
+
    """
+
+   # The full path to the temporary ADAM directory.
+   adamdir = None
 
    def __init__(self,params):
       global ilevel
@@ -611,6 +623,18 @@ class ParSys(object):
       #  information levels.
       ilevel = _getLevel(self.params["ILEVEL"].value)
       glevel = _getLevel(self.params["GLEVEL"].value)
+
+      #  Create a new ADAM directory in the user's home directory.
+      if ParSys.adamdir == None:
+         ParSys.adamdir = tempfile.mkdtemp( prefix="adam_", suffix="_py",
+                                            dir=os.environ["HOME"] )
+      os.environ["ADAM_USER"] = ParSys.adamdir
+
+   # Delete the temporary ADAM directory.
+   @classmethod
+   def cleanup(cls):
+      if ParSys.adamdir != None:
+         shutil.rmtree( ParSys.adamdir )
 
 #  Allow the ParSys to be indexed by parameter name (returns the
 #  Parameter object as the value).

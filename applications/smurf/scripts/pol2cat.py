@@ -192,6 +192,8 @@
 *  History:
 *     15-OCT-2012 (DSB):
 *        Original version
+*     16-NOV-2012 (DSB):
+*        Use a temporary ADAM directory for each invocation.
 
 *-
 '''
@@ -200,6 +202,7 @@
 import starutil
 from starutil import invoke
 from starutil import NDG
+from starutil import ParSys
 from starutil import msg_out
 
 
@@ -258,7 +261,7 @@ try:
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
-   parsys = starutil.ParSys( params )
+   parsys = ParSys( params )
 
 #  It's a good idea to get parameter values early if possible, in case
 #  the user goes off for a coffee whilst the script is running and does not
@@ -587,6 +590,9 @@ try:
       msg_out( "Retaining temporary files in {0}".format(NDG.tempdir))
    else:
       NDG.cleanup()
+
+#  Delete the temporary ADAM directory.
+   ParSys.cleanup()
 
 #  If an StarUtilError of any kind occurred, display the message but hide the
 #  python traceback. To see the trace back, uncomment "raise()" instead.
