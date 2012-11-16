@@ -45,7 +45,7 @@ ast.mapspike=0
 zeropad = 1
 
 # back off even further on bad data rejection
-noiseclip=20
+noisecliphigh=20
 com.corr_tol = 20
 com.corr_abstol = 0.01
 com.gain_tol = 20

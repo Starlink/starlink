@@ -5,24 +5,37 @@ if( $# < 1 ) then
    echo
    echo "Create Bolometer Amplitude and Sum images"
    echo
-   echo "Usage: cbas <inlist> [-p] [-c <config-file>]"
+   echo "Usage: cbas <inlist> [-p] [-c <config-file>] [-o]"
    echo
    echo "   <inlist> is a text file in which each line contains the path"
    echo "   to a directory holding the raw time series cubes for a single"
    echo "   planet observation."
    echo
-   echo "   Three images are created for each observation, the first (with"
-   echo "   prefix '_amp') contains the peak amplitude of the fitted source"
-   echo "   in each bolometer map, the second (with prefix '_sum') contains"
-   echo "   the total data sum in the source in each bolometer map, and the"
-   echo "   third (with prefix '_map') contains the map created by"
-   echo "   smurf:makemap (including individual bolometer maps in the SMURF"
-   echo "   extension). "
+   echo "   A set of images are created for each observation and subarray,"
+   echo "   each image having a pixel for each bolometer. Each image in a "
+   echo "   set ends with a suffix as follows:"
    echo
-   echo "   By default, this total data sum is the sum of the pixel values in"
-   echo "   60 arc-sec circular aperture (bad pixels are replaced using"
-   echo "   prior to finding the sum), but if the -p option is"
-   echo "   it will be the integral of the model star profile found"
+   echo "   1) '-amp': the peak amplitude of the fitted source in the bolomap."
+   echo "   2) '-sum': the total data sum of the fitted source in the bolomap."
+   echo "   3) '-axisr': the axis ratio of the fitted source in the bolomap."
+   echo "   4) '-fwhm': the minor FWHM (in arc-sec) of the fitted source in "
+   echo "              the bolomap."
+   echo "   5) '-gamma': the radial fall-off parameter of the fitted source in "
+   echo "              the bolomap (see parameter GAMMA of KAPPA:PSF)."
+   echo "   6) '-orient': the position angle (in deg.s) of the major axis of "
+   echo "              the fitted source in the bolomap."
+   echo "   7) '-map': the  total map created by smurf:makemap (including "
+   echo "              individual bolomaps in the SMURF extension)."
+   echo
+   echo "   By default, only images 1,2 and 7 are created, but a different"
+   echo "   selection can be created by supplying the concatenation of the"
+   echo "   required digits for the option -o (for instance '-o 245' would"
+   echo "   create images 2, 4 and 5)."
+
+   echo "   By default, the total data sum in the '-sum' image is the sum of"
+   echo "   the pixel values in a 60 arc-sec circular aperture (bad pixels are"
+   echo "   replaced using prior to finding the sum), but if the -p option"
+   echo "   is given it will be the integral of the model star profile found"
    echo "   the KAPPA:PSF command."
    echo
    echo "   By default, smurf:makemap uses the configuration parameters"
@@ -52,6 +65,7 @@ end
 #  Initialise other parameter values
 set sum_method = APERADD
 set config = "^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,bolomap=1"
+set outs = "127"
 
 #  loop round all remaining values on the command line
 while( $# > 1 )
@@ -76,6 +90,11 @@ while( $# > 1 )
          set config = "^$config"
       endif
 
+#  Look for -o option
+   else if( "$2" == "-o" ) then
+      shift
+      set outs = $2
+
 #  Unknown command line option.
    else
       echo "Unknown command line argument - $2"
@@ -83,6 +102,36 @@ while( $# > 1 )
    endif
 
    shift
+end
+
+#  See which output images are to be created.
+set make_amp = 0
+set make_sum = 0
+set make_axisr = 0
+set make_fwhm = 0
+set make_gamma = 0
+set make_orient = 0
+set make_map = 0
+
+foreach n (`echo "$outs" | awk 'BEGIN{FS=""}{for (i=1; i<=NF; i++) print $i}'`)
+   if( "$n" == "1" ) then
+      set make_amp = 1
+   else if( "$n" == "2" ) then
+      set make_sum = 1
+   else if( "$n" == "3" ) then
+      set make_axisr = 1
+   else if( "$n" == "4" ) then
+      set make_fwhm = 1
+   else if( "$n" == "5" ) then
+      set make_gamma = 1
+   else if( "$n" == "6" ) then
+      set make_orient = 1
+   else if( "$n" == "7" ) then
+      set make_map = 1
+   else
+      echo "Illegal value in -o option - $n"
+      exit
+   endif
 end
 
 #  Create a temporary directory to hold all the intermediate files, and
@@ -94,6 +143,9 @@ cd cbas-tmp
 #  Create a temporary ADAM directory within the above directory.
 mkdir adam
 setenv ADAM_USER $PWD/adam
+
+#  Ensure ADAM tasks set the shell status value upon completion
+setenv ADAM_EXIT 1
 
 #  Loop round each observation.
 set idir = 0
@@ -119,6 +171,7 @@ foreach indir ($dir_list)
 #  Use the iterative mapmaker to create map for each individual bolometers.
    $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
              alignsys=t config=\"$config\" | tee makemap.log
+   if( $status != 0 ) break
 
 #  Get the subarray name, and its corresponding integer index.
    set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
@@ -143,6 +196,9 @@ foreach indir ($dir_list)
       exit
    endif
 
+#  Get upper case version.
+   set uarray = `echo $subarray | tr "[a-z]" "[A-Z]"`
+
 #  Get the date and the observation number.
    set date = `$KAPPA_DIR/fitsmod junk edit=print keyword=UTDATE`
    set obsnum = `$KAPPA_DIR/fitsmod junk edit=print keyword=OBSNUM`
@@ -152,6 +208,10 @@ foreach indir ($dir_list)
    set amp_ndf = "../../$subarray$date-$obsnum-amp"
    set sum_ndf = "../../$subarray$date-$obsnum-sum"
    set map_ndf = "../../$subarray$date-$obsnum-map"
+   set axisr_ndf = "../../$subarray$date-$obsnum-axisr"
+   set fwhm_ndf = "../../$subarray$date-$obsnum-fwhm"
+   set gamma_ndf = "../../$subarray$date-$obsnum-gamma"
+   set orient_ndf = "../../$subarray$date-$obsnum-orient"
 
 #  See if the data has been flat-fielded (as implied by the map units being "pW"). If not,
 #  the source features will be negative in the bolomaps.
@@ -197,15 +257,42 @@ foreach indir ($dir_list)
    while( $ich < $top_chunk )
       @ ich = $ich + 1
 
-#  Create an image to receive the peak source values for every bolometer in
-#  the current observation and chunk, and another to receive the total data
-#  sum. Fill them with bad values. These NDFs initially have a pixel origin
-#  of (1,1) so that pixel and grid indices are equal.
-      set camp_ndf = "../../$subarray$date-$obsnum-ch$ich-amp"
-      set csum_ndf = "../../$subarray$date-$obsnum-ch$ich-sum"
+#  Create an image holding a bad value for every bolometer. A copy of this
+#  image is used to form each initial output image. These NDFs initially
+#  have a pixel origin of (1,1) so that pixel and grid indices are equal.
       $KAPPA_DIR/maths exp="0*xa*xb+<bad>" lbound=\[1,1\] ubound=\[32,40\] \
-                       type=_double out=$camp_ndf
-      cp $camp_ndf.sdf $csum_ndf.sdf
+                       type=_double out=blank
+
+#  Copy this blank image to create the required output images.
+      if( $make_amp == 1 ) then
+         set camp_ndf = "../../$subarray$date-$obsnum-ch$ich-amp"
+         cp blank.sdf $camp_ndf.sdf
+      endif
+
+      if( $make_sum == 1 ) then
+         set csum_ndf = "../../$subarray$date-$obsnum-ch$ich-sum"
+         cp blank.sdf $csum_ndf.sdf
+      endif
+
+      if( $make_axisr == 1 ) then
+         set caxisr_ndf = "../../$subarray$date-$obsnum-ch$ich-axisr"
+         cp blank.sdf $caxisr_ndf.sdf
+      endif
+
+      if( $make_fwhm == 1 ) then
+         set cfwhm_ndf = "../../$subarray$date-$obsnum-ch$ich-fwhm"
+         cp blank.sdf $cfwhm_ndf.sdf
+      endif
+
+      if( $make_gamma == 1 ) then
+         set cgamma_ndf = "../../$subarray$date-$obsnum-ch$ich-gamma"
+         cp blank.sdf $cgamma_ndf.sdf
+      endif
+
+      if( $make_orient == 1 ) then
+         set corient_ndf = "../../$subarray$date-$obsnum-ch$ich-orient"
+         cp blank.sdf $corient_ndf.sdf
+      endif
 
 #  Loop round all GRID X columns (1 to 32)
       set ix = 0
@@ -219,9 +306,9 @@ foreach indir ($dir_list)
 
 #  Construct the name of the bolometer map.
             if( $top_chunk > 0 ) then
-               set bolo_name = "CH0${ich}"
+               set bolo_name = "${uarray}CH0${ich}"
             else
-               set bolo_name = ""
+               set bolo_name = $uarray
             endif
 
             if( $ix < 10 ) then
@@ -270,53 +357,87 @@ foreach indir ($dir_list)
                set maxco = `$KAPPA_DIR/parget maxcoord stats`
                rm -f coin > /dev/null
                echo $maxco > coin
-               $KAPPA_DIR/psf $ndf incat=! cofile=coin isize=31 norm=f device=! | grep \!\! >& /dev/null
+               $KAPPA_DIR/psf $ndf incat=! cofile=coin isize=31 norm=f device=! quiet
 
-#  Check a psf was found succesfully.
-               if( $status == 1 ) then
+#  Check a psf was found successfully.
+               if( $status == 0 ) then
 
-#  Get the parameters of the psf.
-                  set amp = `$KAPPA_DIR/parget amp1 psf`
-                  set posxy = `$KAPPA_DIR/parget centre psf`
+#  Get the required parameters of the psf, and poke the values into the
+#  returned NDFs for this chunk.
+                  if( $make_amp == 1 ) then
+                     set amp = `$KAPPA_DIR/parget amp1 psf`
+                     $KAPPA_DIR/chpix in=$camp_ndf out=tmp section=\"$ix,$iy\" \
+                                      newval=$amp
+                     mv -f tmp.sdf $camp_ndf.sdf
+                  endif
 
-#  Get the total data sum. Two methods - 1) aperture photometry...
-                  if( $sum_method == APERADD ) then
+                  if( $make_axisr == 1 ) then
+                     set axisr = `$KAPPA_DIR/parget axisr psf`
+                     $KAPPA_DIR/chpix in=$caxisr_ndf out=tmp section=\"$ix,$iy\" \
+                                      newval=$axisr
+                     mv -f tmp.sdf $caxisr_ndf.sdf
+                  endif
+
+                  if( $make_fwhm == 1 ) then
+                     set fwhm = `$KAPPA_DIR/parget fwhm psf`
+                     $KAPPA_DIR/chpix in=$cfwhm_ndf out=tmp section=\"$ix,$iy\" \
+                                      newval=$fwhm
+                     mv -f tmp.sdf $cfwhm_ndf.sdf
+                  endif
+
+                  if( $make_gamma == 1 ) then
+                     set gamma = `$KAPPA_DIR/parget gamma psf`
+                     $KAPPA_DIR/chpix in=$cgamma_ndf out=tmp section=\"$ix,$iy\" \
+                                      newval=$gamma
+                     mv -f tmp.sdf $cgamma_ndf.sdf
+                  endif
+
+                  if( $make_orient == 1 ) then
+                     set orient = `$KAPPA_DIR/parget orient psf`
+                     $KAPPA_DIR/chpix in=$corient_ndf out=tmp section=\"$ix,$iy\" \
+                                      newval=$orient
+                     mv -f tmp.sdf $corient_ndf.sdf
+                  endif
+
+#  If required, get the total data sum. Two methods - 1) aperture photometry...
+                  if( $make_sum == 1 ) then
+                     if( $sum_method == APERADD ) then
 
 #  Choose the aperture size in pixels (60 arc-secs assuming default makemap pixel sizes of 2
 #  and 4 arc-seconds)..
-                     if( $array > 3 ) then
-                        set diam = 30
-                     else
-                        set diam = 15
-                     endif
+                        if( $array > 3 ) then
+                           set diam = 30
+                        else
+                           set diam = 15
+                        endif
+
+#  Get the source centre.
+                        set posxy = `$KAPPA_DIR/parget centre psf`
 
 #  Replace any bad pixels within a box centred on the max pixel with sides twice
 #  the above diameter.
-                     @ size = $diam + $diam
-                     $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled | grep \!\! >& /dev/null
+                        @ size = $diam + $diam
+                        $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled quiet
 
 #  Do the aperture photometry within the filled image. Check some bad pixels
 #  were filled. If not, use $ndf instead of "filled".
-                     if( $status == 1 ) then
-                        $KAPPA_DIR/aperadd filled centre="'$posxy'" diam=$diam
-                     else
-                        $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam
-                     endif
-                     set fsum = `$KAPPA_DIR/parget total aperadd`
+                        if( $status == 0 ) then
+                           $KAPPA_DIR/aperadd filled centre="'$posxy'" diam=$diam
+                        else
+                           $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam
+                        endif
+                        set fsum = `$KAPPA_DIR/parget total aperadd`
 
 #  Alternatively - 2) use the integral of the model PSF as the souce total data sum.
-                  else
-                     set fsum = `$KAPPA_DIR/parget total psf`
+                     else
+                        set fsum = `$KAPPA_DIR/parget total psf`
+                     endif
+
+#  Poke the value into the returned NDF for this chunk.
+                     $KAPPA_DIR/chpix in=$csum_ndf out=tmp section=\"$ix,$iy\" \
+                                      newval=$fsum
+   		     mv -f tmp.sdf $csum_ndf.sdf
                   endif
-
-#  Poke the sum and amplitude values into the returned NDFs for this chunk.
-                  $KAPPA_DIR/chpix in=$camp_ndf out=tmp section=\"$ix,$iy\" \
-                                   newval=$amp
-                  mv -f tmp.sdf $camp_ndf.sdf
-                  $KAPPA_DIR/chpix in=$csum_ndf out=tmp section=\"$ix,$iy\" \
-                                   newval=$fsum
-		  mv -f tmp.sdf $csum_ndf.sdf
-
                else
                   echo "  psf failure"
                endif
@@ -325,38 +446,147 @@ foreach indir ($dir_list)
          end
       end
 
+#  If we are creating a sum image...
+      if( $make_sum == 1 ) then
+
 #  Set the pixel origin to (0,0)
-      $KAPPA_DIR/setorigin $csum_ndf origin=\[0,0\]
-      $KAPPA_DIR/setorigin $camp_ndf origin=\[0,0\]
+         $KAPPA_DIR/setorigin $csum_ndf origin=\[0,0\]
 
-# If we have just done the first chunk, use copies of the chunk amp and sum
-# images to initialise the cumulative amp and sum images for all chunks.
-      if( $ich == 0 ) then
-         if( $top_chunk == 0 ) then
-            mv -f $csum_ndf.sdf $sum_ndf.sdf
-            mv -f $camp_ndf.sdf $amp_ndf.sdf
+#  If we have just done the first chunk, use a copy of the chunk sum image to
+#  initialise the cumulative sum image for all chunks.
+         if( $ich == 0 ) then
+            if( $top_chunk == 0 ) then
+               mv -f $csum_ndf.sdf $sum_ndf.sdf
+            else
+               cp -f $csum_ndf.sdf $sum_ndf.sdf
+            endif
+
+# If the chunk we have just done is not the first chunk, add it onto the
+# cumulative sum image for all chunks.
          else
-            cp -f $csum_ndf.sdf $sum_ndf.sdf
-            cp -f $camp_ndf.sdf $amp_ndf.sdf
+            $KAPPA_DIR/add $sum_ndf $csum_ndf tmp
+            mv -f tmp.sdf $sum_ndf.sdf
          endif
+      endif
 
-# If the chunk we have just done is not the first chunk, add them onto the
-# cumulative amp and sum images for all chunks.
-      else
-         $KAPPA_DIR/add $sum_ndf $csum_ndf tmp
-         mv -f tmp.sdf $sum_ndf.sdf
-         $KAPPA_DIR/add $amp_ndf $camp_ndf tmp
+#  Do the same for the amp image.
+      if( $make_amp == 1 ) then
+         $KAPPA_DIR/setorigin $camp_ndf origin=\[0,0\]
+         if( $ich == 0 ) then
+            if( $top_chunk == 0 ) then
+               mv -f $camp_ndf.sdf $amp_ndf.sdf
+            else
+               cp -f $camp_ndf.sdf $amp_ndf.sdf
+            endif
+         else
+            $KAPPA_DIR/add $amp_ndf $camp_ndf tmp
+            mv -f tmp.sdf $amp_ndf.sdf
+         endif
+      endif
+
+#  Do the same for the axisr image.
+      if( $make_axisr == 1 ) then
+         $KAPPA_DIR/setorigin $caxisr_ndf origin=\[0,0\]
+         if( $ich == 0 ) then
+            if( $top_chunk == 0 ) then
+               mv -f $caxisr_ndf.sdf $axisr_ndf.sdf
+            else
+               cp -f $caxisr_ndf.sdf $axisr_ndf.sdf
+            endif
+         else
+            $KAPPA_DIR/add $axisr_ndf $caxisr_ndf tmp
+            mv -f tmp.sdf $axisr_ndf.sdf
+         endif
+      endif
+
+#  Do the same for the fwhm image.
+      if( $make_fwhm == 1 ) then
+         $KAPPA_DIR/setorigin $cfwhm_ndf origin=\[0,0\]
+         if( $ich == 0 ) then
+            if( $top_chunk == 0 ) then
+               mv -f $cfwhm_ndf.sdf $fwhm_ndf.sdf
+            else
+               cp -f $cfwhm_ndf.sdf $fwhm_ndf.sdf
+            endif
+         else
+            $KAPPA_DIR/add $fwhm_ndf $cfwhm_ndf tmp
+            mv -f tmp.sdf $fwhm_ndf.sdf
+         endif
+      endif
+
+#  Do the same for the gamma image.
+      if( $make_gamma == 1 ) then
+         $KAPPA_DIR/setorigin $cgamma_ndf origin=\[0,0\]
+         if( $ich == 0 ) then
+            if( $top_chunk == 0 ) then
+               mv -f $cgamma_ndf.sdf $gamma_ndf.sdf
+            else
+               cp -f $cgamma_ndf.sdf $gamma_ndf.sdf
+            endif
+         else
+            $KAPPA_DIR/add $gamma_ndf $cgamma_ndf tmp
+            mv -f tmp.sdf $gamma_ndf.sdf
+         endif
+      endif
+
+#  Do the same for the orient image.
+      if( $make_orient == 1 ) then
+         $KAPPA_DIR/setorigin $corient_ndf origin=\[0,0\]
+         if( $ich == 0 ) then
+            if( $top_chunk == 0 ) then
+               mv -f $corient_ndf.sdf $orient_ndf.sdf
+            else
+               cp -f $corient_ndf.sdf $orient_ndf.sdf
+            endif
+         else
+            $KAPPA_DIR/add $orient_ndf $corient_ndf tmp
+            mv -f tmp.sdf $orient_ndf.sdf
+         endif
+      endif
+
+#  Next chunk...
+   end
+
+#  Normalize required images by the number of chunks added together.
+   if( $top_chunk > 1 ) then
+      if( $make_amp == 1 ) then
+         $KAPPA_DIR/cdiv $amp_ndf $top_chunk tmp.sdf
          mv -f tmp.sdf $amp_ndf.sdf
       endif
 
-# Copy the map to its final resting place.
-      mv junk.sdf $map_ndf.sdf
+      if( $make_axisr == 1 ) then
+         $KAPPA_DIR/cdiv $axisr_ndf $top_chunk tmp.sdf
+         mv -f tmp.sdf $axisr_ndf.sdf
+      endif
 
-   end
+      if( $make_fwhm == 1 ) then
+         $KAPPA_DIR/cdiv $fwhm_ndf $top_chunk tmp.sdf
+         mv -f tmp.sdf $fwhm_ndf.sdf
+      endif
+
+      if( $make_gamma == 1 ) then
+         $KAPPA_DIR/cdiv $gamma_ndf $top_chunk tmp.sdf
+         mv -f tmp.sdf $gamma_ndf.sdf
+      endif
+
+      if( $make_orient == 1 ) then
+         $KAPPA_DIR/cdiv $orient_ndf $top_chunk tmp.sdf
+         mv -f tmp.sdf $orient_ndf.sdf
+      endif
+
+   endif
+
+# Either copy the map to its final resting place, or delete it.
+   if( make_map == 1 ) then
+      mv junk.sdf $map_ndf.sdf
+   else
+      rm -f junk.sdf
+   endif
 
 #  Move back to the main working directory
    cd ..
 
+#  Next observation...
 end
 
 
