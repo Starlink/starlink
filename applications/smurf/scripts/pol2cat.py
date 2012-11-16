@@ -41,9 +41,9 @@
 *     polarimetry toolbox in GAIA.
 
 *  Usage:
-*     pol2cat.py in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
-*                [config] [device] [retain] [msg_filter] [ilevel] [glevel]
-*                [logfile]
+*     pol2cat in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
+*             [config] [device] [retain] [msg_filter] [ilevel] [glevel]
+*             [logfile]
 
 *  Parameters:
 *     IN = NDF (Read)
