@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.39}
 \newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2012 September 24}
+\newcommand{\stardocdate}      {2012 November 15}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.0}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -49978,7 +49978,7 @@ plot (7k).
       the new Frame (but only if they are relevant to the type of the new
       Frame). The value of the \htmlattref{Domain}{Domain}~ attribute for
       the new Frame can be specified using Parameter DOMAIN.  Other attribute
-      values for the new Frame may be specified using Parameters ATTRS.  The
+      values for the new Frame may be specified using Parameter ATTRS.  The
       new Frame becomes the current co-ordinate Frame in the NDF.
 
       WCSADD will only generate Mappings with the same number of
@@ -50273,11 +50273,11 @@ plot (7k).
       \sstsubsection{
          TRANSFER = \_LOGICAL (Read)
       }{
-         If TRUE, attributes which have explicitly set values in the basis
+         If {\tt TRUE}, attributes which have explicitly set values in the basis
          Frame (specified by Parameter FRAME) are transferred to the new
          Frame (Specified by Parameter FRMTYPE), if they are applicable
-         to the new Frame. If FALSE, no attribute values are transferred.
-         The dynamic default is TRUE if and only if the two Frames are
+         to the new Frame. If {\tt FALSE}, no attribute values are transferred.
+         The dynamic default is {\tt TRUE} if and only if the two Frames are
          of the same class and have the same value for their {\att Domain}
          attributes.  {\tt []}
       }
@@ -58977,11 +58977,11 @@ The following applications have been modified:
       \end{itemize}
    \item [\htmlref{WCSADD}{WCSADD}]\mbox{}
       \begin{itemize}
-        \item The transfer of set attribute values from basis Frame to new
-        Frame can now be controlled using a new boolean parameter called
-        TRANSFER (previously, set attributes were always transferred). The
+        \item The transfer of set attribute values from basis \xref{Frame}{sun210}{Frame}~
+        to new Frame can now be controlled using a new boolean parameter
+        called TRANSFER (previously, set attributes were always transferred). The
         new default is to transfer attributes only if the two Frames have
-        the same class and Domain.
+        the same class and {\att Domain}.
       \end{itemize}
 \end{description}
 
