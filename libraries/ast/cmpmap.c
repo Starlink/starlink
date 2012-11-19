@@ -1633,6 +1633,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Indicate both sublists are currently empty. */
                   subout1 = subin2 = 0;
                   new = submap1 = submap2 = NULL;
+                  subinv1 = subinv2 = 0;
 
 /* Loop round untill all Mappings have been used. */
                   while( jmap1 <= nmap1 && jmap2 <= nmap2 && astOK ) {

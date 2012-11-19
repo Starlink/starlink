@@ -7050,7 +7050,7 @@ static char *ConcatWAT( AstFitsChan *this, int iaxis, const char *method,
 *  Description:
 *     This function searches the supplied FitsChan for any keywords of
 *     the form "WATi_j", where i and j are integers and i is equal to the
-*     supplied "iaxis" value plus one, and concatenates their strig
+*     supplied "iaxis" value plus one, and concatenates their string
 *     values into a single string. Such keywords are created by IRAF to
 *     describe their non-standard ZPX and TNX projections.
 
@@ -7102,6 +7102,7 @@ static char *ConcatWAT( AstFitsChan *this, int iaxis, const char *method,
    out when the FitsChan is deleted. */
    watlen = 1;
    j = 1;
+   size = 0;
    sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
    while( astOK ) {
 
@@ -15034,6 +15035,9 @@ static void SetFitsCom( AstFitsChan *this, const char *name,
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Initialisation */
+   size = 0;
 
 /* Ensure the source function has been called */
    ReadFromSource( this, status );
@@ -32015,7 +32019,7 @@ static int WATCoeffs( const char *watstr, int iaxis, double **cvals,
 
 /* Other initialisation to avoid compiler warnings. */
    etamin = 0.0;
-   etamin = 0.0;
+   etamax = 0.0;
    ximax = 0.0;
    ximin = 0.0;
    order = 0;
