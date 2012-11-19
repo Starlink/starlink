@@ -944,6 +944,9 @@ static void GenerateColumns( AstFitsTable *this, AstFitsChan *header,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Initialise */
+   type = AST__BADTYPE;
+
 /* Get the number of columns defined in the header. */
    if( !astGetFitsI( header, "TFIELDS", &ncol ) ) ncol = 0;
 
@@ -991,7 +994,6 @@ static void GenerateColumns( AstFitsTable *this, AstFitsChan *header,
          type = AST__STRINGTYPE;
 
       } else if( astOK ){
-         type = AST__BADTYPE;
          astError( AST__BDFTS, "astFitsTable: Keyword '%s' in supplied FITS "
                    "binary table header has unsupported value '%s'.", status,
                    keyword, cval );
@@ -1243,6 +1245,9 @@ f     AST_COLUMNNULL functiom.
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Initialise */
+   nb = 0;
+
 /* Find the number of bytes needed to hold a single element of the value
    in a column cell. */
    type = astGetColumnType( this, column );
@@ -1265,7 +1270,6 @@ f     AST_COLUMNNULL functiom.
       nb = sizeof( char );
 
    } else if( astOK ) {
-      nb = 0;
       astError( AST__INTER, "astGetColumnData(%s): Unsupported column type "
                 "%d (internal AST programming error).", status,
                 astGetClass( this ), type );
@@ -1951,6 +1955,9 @@ f        The global status.
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Initialise */
+   nb = 0;
+
 /* Find the number of bytes in the supplied array holding a single element
    of the value in a column cell. */
    type = astGetColumnType( this, column );
@@ -1973,7 +1980,6 @@ f        The global status.
       nb = sizeof( char );
 
    } else if( astOK ) {
-      nb = 0;
       astError( AST__INTER, "astPutColumnData(%s): Unsupported column type "
                 "%d (internal AST programming error).", status,
                 astGetClass( this ), type );

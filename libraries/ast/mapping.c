@@ -1200,6 +1200,8 @@ static double FindGradient( AstMapping *map, double *at, int ax1, int ax2,
    interval. */
    y1 = AST__BAD;
    y2 = AST__BAD;
+   gmax = AST__BAD;
+   gmin = AST__BAD;
    ngood = 0;
 
    for( i = 0; i < RATE_ORDER; i++ ) {
@@ -1209,7 +1211,7 @@ static double FindGradient( AstMapping *map, double *at, int ax1, int ax2,
 
          g = ( y[ i + 1 ] - y[ i ] )/( x[ i + 1 ] - x[ i ] );
 
-         if( i == 0 ) {
+         if( ngood == 1 ) {
             gmax = gmin = g;
          } else if( g < gmin ) {
             gmin = g;
@@ -7833,6 +7835,11 @@ static double MatrixDet( int nrow, int ncol, const double *matrix, int *status )
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Initialise... */
+   sqmat = NULL;
+   nrowuse = 0;
+   ncoluse = 0;
+
 /* Flag any rows and columns that should be ignored because they contain
    only bad values or zeros. */
    userow = astCalloc( nrow, sizeof( *userow ) );
@@ -7849,12 +7856,10 @@ static double MatrixDet( int nrow, int ncol, const double *matrix, int *status )
       }
 
 /* Find the number of usable rows and columns. */
-      nrowuse = 0;
       for( irow = 0; irow < nrow; irow++ ) {
          if( userow[ irow ] ) nrowuse++;
       }
 
-      ncoluse = 0;
       for( icol = 0; icol < ncol; icol++ ) {
          if( usecol[ icol ] ) ncoluse++;
       }
