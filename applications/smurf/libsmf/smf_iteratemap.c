@@ -385,6 +385,8 @@
 *        smf_calcmodel_flt). This is controlled by new config parameter FLT.UNDOFIRST.
 *     2012-10-22 (DSB):
 *        If ( abs(itermaps) > 1 ) then include a quality component in each itermap.
+*     2012-11-20 (EC):
+*        Add some commented-out code to apply the MCE response to fakemap data
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1450,6 +1452,22 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               }
             }
           }
+
+          {
+            /* Apply the response function of the MCE. Really, instead of
+               convolving with the response after adding the fakemap signal
+               to the time-series, we should be filtering it BEFORE adding
+               (since the real data have already been filtered by this
+               response). */
+            /*
+            smfFilter *filt = smf_create_smfFilter(res[0]->sdata[idx], status);
+            smf_filter_mce( filt, 1, status );
+            smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
+            smf_filter_execute( wf, res[0]->sdata[idx], filt, 0, 0, status );
+            filt = smf_free_smfFilter( filt, status );
+            */
+          }
+
         }
       }
 
