@@ -113,6 +113,9 @@ f     The CmpRegion class does not define any new routines beyond those
 *        resulting in a high chance that lower Regions will not be seen.
 *     7-JUN-2012 (DSB):
 *        Override astRegSplit method.
+*     21-NOV-2012 (DSB):
+*        Map the regions returned by RegSplit into the current Frame of the 
+*        CmpRegion.
 *class--
 */
 
@@ -2519,9 +2522,13 @@ static AstRegion **RegSplit( AstRegion *this_region, int *nlist, int *status ){
 /* Local Variables; */
    AstCmpRegion *new;
    AstCmpRegion *this;
+   AstFrame *frm;
+   AstFrameSet *fs;
+   AstMapping *map;
    AstRegion **cmplist;
    AstRegion **result;
    AstRegion *cmpreg;
+   AstRegion *new_reg;
    int icomp;
    int ifirst;
    int ilist;
@@ -2649,6 +2656,21 @@ static AstRegion **RegSplit( AstRegion *this_region, int *nlist, int *status ){
          result[ 0 ] = astClone( this );
          *nlist = 1;
       }
+   }
+
+/* Remap any returned Regions so that they are defined within the same
+   coordinate system as the supplied Region. */
+   if( result && *nlist > 0 )  {
+      fs = this_region->frameset;
+      map = astGetMapping( fs, AST__BASE, AST__CURRENT );
+      frm = astGetFrame( fs, AST__CURRENT );
+      for( ilist = 0; ilist < *nlist; ilist++ ) {
+         new_reg = astMapRegion( result[ ilist ], map, frm );
+         (void) astAnnul( result[ ilist ] );
+         result[ ilist ] = new_reg;
+      }
+      map = astAnnul( map );
+      frm = astAnnul( frm );
    }
 
 /* Free all returned pointers if an error has occurred. */
