@@ -34,7 +34,7 @@
 *     noinverse flag is set, the inverse is not taken (i.e., if you
 *     wish to calculate the response itself for the purpose of
 *     simulation).
-*     
+*
 
 *  Notes:
 
@@ -92,10 +92,6 @@
 #include "smf_err.h"
 
 #define FUNC_NAME "smf_filter_mce"
-
-/* A bunch of parameters for the MCE 4-pole Butterworth low-pass filter */
-
-
 
 void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
   /* Filter parameters */
@@ -165,7 +161,7 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
   if( filt->dateobs > datechange ) {
     /* Data taken after 20110603 */
     B_1_1 = -1.9712524;   /* -2.*32297./2.^15. */
-    B_1_2 = 0.97253418;   /*  2.*15934./2.^15. */ 
+    B_1_2 = 0.97253418;   /*  2.*15934./2.^15. */
     B_2_1 = -1.9337769;   /* -2.*31683./2.^15. */
     B_2_2 = 0.93505859;   /*  2.*15320./2.^15. */
 
@@ -177,8 +173,8 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
   } else {
     /* Older data */
     B_1_1 = -1.9587402;   /* -2.*32092./2.^15. */
-    B_1_2 = 0.96130371;   /*  2.*15750./2.^15. */ 
-    B_2_1 = -1.9066162;   /* -2.*31238./2.^15. */ 
+    B_1_2 = 0.96130371;   /*  2.*15750./2.^15. */
+    B_2_1 = -1.9066162;   /* -2.*31238./2.^15. */
     B_2_2 = 0.90911865;   /*  2.*14895./2.^15. */
 
     ROW_DWELL = 128.;     /* time to dwell at each row (in clocks) */
@@ -207,7 +203,7 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
     gsl_complex num;
     gsl_complex temp;
     double omega;
-    
+
     f = filt->df[0]*i;              /* Frequency at this step */
     omega = (f / SRATE)*2*AST__DPI; /* Angular frequency */
 
@@ -217,7 +213,7 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
     sin_m_2o = sin(-2*omega);
 
     /*
-      h1_omega=(1 + 2*complex(cos_m_o,sin_m_o) + complex(cos_m_2o,sin_m_2o)) / 
+      h1_omega=(1 + 2*complex(cos_m_o,sin_m_o) + complex(cos_m_2o,sin_m_2o)) /
       (1 + b_1_1*complex(cos_m_o,sin_m_o) + b_1_2 * complex(cos_m_2o,sin_m_2o))
     */
 
@@ -244,10 +240,10 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
     /* quotient */
 
     h1_omega = gsl_complex_div( num, den );
-                              
+
 
     /*
-      h2_omega=(1 + 2*complex(cos_m_o,sin_m_o) + complex(cos_m_2o,sin_m_2o)) / 
+      h2_omega=(1 + 2*complex(cos_m_o,sin_m_o) + complex(cos_m_2o,sin_m_2o)) /
       (1 + b_2_1*complex(cos_m_o,sin_m_o) + b_2_2*complex(cos_m_2o,sin_m_2o))
 
       note: we can re-use numerator from above
@@ -282,16 +278,9 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
       h_omega = gsl_complex_inverse( h_omega );
     }
 
-    /* Then apply this factor to the filter. Since we are un-doing the
-       _cross-correlation_ of the original signal with the filter
-       response using the convolution theorem, I think we have to take
-       the complex conjugate of either the signal or the filter
-       coefficients before multiplying. However, when I do that, the
-       result seems to be worse than if I don't... leaving the complex
-       conjugate version commented-out for now. */
+    /* Then apply this factor to the filter. */
 
     GSL_SET_COMPLEX( &temp, filt->real[i], filt->imag[i] );
-    //temp = gsl_complex_mul( temp, gsl_complex_conjugate(h_omega) );
     temp = gsl_complex_mul( temp, h_omega );
     filt->real[i] = GSL_REAL( temp );
     filt->imag[i] = GSL_IMAG( temp );
