@@ -81,6 +81,7 @@ exportclean = 0
 # add fake astronomical signal to the time series?
 fakemap = <undef>
 fakescale = 1
+fakemce = 0
 
 # Subtract supplied initial guess at sky before iterating?
 importsky = 0

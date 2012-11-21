@@ -475,6 +475,9 @@
 *       map. Note that this is a fully-parsed NDF identified, so, for
 *       example, a subset of a larger map may be specified using ranges.
 *       [undef]
+*     FAKEMCE = LOGICAL
+*       If set to 1, the time-stream data implied by the fake map is
+*       smoothed using the MCE response. [0]
 *     FAKESCALE = REAL
 *       If a FAKEMAP is specified, FAKESCALE can be used to apply an arbitrary
 *       scake factor to the map before adding it to the time series. [1]

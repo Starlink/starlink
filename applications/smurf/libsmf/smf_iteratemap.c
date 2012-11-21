@@ -387,6 +387,9 @@
 *        If ( abs(itermaps) > 1 ) then include a quality component in each itermap.
 *     2012-11-20 (EC):
 *        Add some commented-out code to apply the MCE response to fakemap data
+*     2012-11-21 (DSB):
+*        Add config parameter fakemce to indicate if the fakmap data
+*        should be smoothed using the MCE response.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -517,6 +520,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   char *fakemap=NULL;           /* Name of external map with fake sources */
+  int fakemce;                  /* Smooth fake data with MCE response? */
   int fakendf=NDF__NOID;        /* NDF id for fakemap */
   double fakescale;             /* Scale factor for fakemap */
   size_t count_mcnvg=0;         /* # chunks fail to converge */
@@ -841,6 +845,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
 
       astMapGet0D( keymap, "FAKESCALE", &fakescale );
+      astMapGet0I( keymap, "FAKEMCE", &fakemce );
     }
 
     /* Obtain sample length from header of first file in igrp */
@@ -1459,13 +1464,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                to the time-series, we should be filtering it BEFORE adding
                (since the real data have already been filtered by this
                response). */
-            /*
-            smfFilter *filt = smf_create_smfFilter(res[0]->sdata[idx], status);
-            smf_filter_mce( filt, 1, status );
-            smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
-            smf_filter_execute( wf, res[0]->sdata[idx], filt, 0, 0, status );
-            filt = smf_free_smfFilter( filt, status );
-            */
+            if( fakemce ) {
+               smfFilter *filt = smf_create_smfFilter(res[0]->sdata[idx], status);
+               smf_filter_mce( filt, 1, status );
+               smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
+               smf_filter_execute( wf, res[0]->sdata[idx], filt, 0, 0, status );
+               filt = smf_free_smfFilter( filt, status );
+            }
           }
 
         }

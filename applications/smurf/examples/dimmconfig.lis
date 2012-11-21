@@ -184,6 +184,11 @@ downsampscale = -1
 # the data.
 #
 # fakescale = 23.5
+#
+# Should the time-series data generated from the fakemap be smoothed
+# using the MCE response? The default is zero. Uncomment this line to
+# switch it on.
+# fakemce = 1
 
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start
