@@ -19,7 +19,7 @@
 *     filt = smfFilter * (Given and Returned)
 *        Pointer to smfFilter to be modified
 *     noinverse = int (Given)
-*        If set do not take calculate the filter itself, rather than its inverse
+*        If set  calculate the filter itself, rather than its inverse
 *     status = int* (Given and Returned)
 *        Pointer to global status
 
@@ -45,6 +45,8 @@
 *  History:
 *     2012-11-10 (EC):
 *        Initial version
+*     2012-11-20 (EC):
+*        Filter parameters can change as a function of date
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -77,6 +79,7 @@
 #include <math.h>
 
 /* Starlink includes */
+#include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
@@ -92,19 +95,23 @@
 
 /* A bunch of parameters for the MCE 4-pole Butterworth low-pass filter */
 
-#define MCE_FILT_B_1_1 -1.9587402   /* -2.*32092./2.^15. */
-#define MCE_FILT_B_1_2 0.96130371   /*  2.*15750./2.^15. */ 
-#define MCE_FILT_B_2_1 -1.9066162   /* -2.*31238./2.^15. */ 
-#define MCE_FILT_B_2_2 0.90911865   /* 2.*14895./2.^15.  */
 
-#define MCE_FILT_CLOCK_PERIOD 20E-9 /* 50 MHz clock */
-#define MCE_FILT_ROW_DWELL 128.     /* time to dwell at each row (in clocks) */
-#define MCE_FILT_NUM_ROWS 41.       /* number of rows addressed */
-#define MCE_FILT_DELTA_TIME (MCE_FILT_CLOCK_PERIOD*MCE_FILT_ROW_DWELL*MCE_FILT_NUM_ROWS) /* sample length */
-#define MCE_FILT_SRATE (1./MCE_FILT_DELTA_TIME) /* sample rate */
 
 void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
-  size_t i;             /* Loop counter */
+  /* Filter parameters */
+  double B_1_1;
+  double B_1_2;
+  double B_2_1;
+  double B_2_2;
+  double CLOCK_PERIOD;
+  double ROW_DWELL;
+  double NUM_ROWS=41;
+  double DELTA_TIME;
+  double SRATE;
+
+  double datechange;     /* UTC MJD for change in MCE filter parameters */
+  AstTimeFrame *tf=NULL; /* time frame for date conversion */
+  size_t i;              /* Loop counter */
 
   if( *status != SAI__OK ) return;
 
@@ -128,6 +135,14 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
     return;
   }
 
+  if( filt->dateobs == VAL__BADD ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": dateobs (date of data to which filter will be "
+            "applied) is not set - can't determine correct MCE filter "
+            "parameters.", status );
+    return;
+  }
+
   /* If filt->real is NULL, create a complex identity filter first. Similarly,
      if the filter is currently only real-valued, add an imaginary part. */
   if( !filt->real ) {
@@ -138,6 +153,45 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
     if( *status != SAI__OK ) return;
     filt->isComplex = 1;
   }
+
+  /* Set up filter parameters */
+
+  tf = astTimeFrame( " " );
+  astSet( tf, "TimeScale=UTC" );
+  astSet( tf, "TimeOrigin=%s", "2011-06-03T00:00:00" );
+  datechange = astGetD( tf, "TimeOrigin" );
+  tf = astAnnul( tf );
+
+  if( filt->dateobs > datechange ) {
+    /* Data taken after 20110603 */
+    B_1_1 = -1.9712524;   /* -2.*32297./2.^15. */
+    B_1_2 = 0.97253418;   /*  2.*15934./2.^15. */ 
+    B_2_1 = -1.9337769;   /* -2.*31683./2.^15. */
+    B_2_2 = 0.93505859;   /*  2.*15320./2.^15. */
+
+    ROW_DWELL = 94.;     /* time to dwell at each row (in clocks) */
+
+    msgOutiff(MSG__DEBUG, "", FUNC_NAME
+              ": filter for data UTC MJD %lf after %lf", status,
+              filt->dateobs, datechange );
+  } else {
+    /* Older data */
+    B_1_1 = -1.9587402;   /* -2.*32092./2.^15. */
+    B_1_2 = 0.96130371;   /*  2.*15750./2.^15. */ 
+    B_2_1 = -1.9066162;   /* -2.*31238./2.^15. */ 
+    B_2_2 = 0.90911865;   /*  2.*14895./2.^15. */
+
+    ROW_DWELL = 128.;     /* time to dwell at each row (in clocks) */
+
+    msgOutiff(MSG__DEBUG, "", FUNC_NAME
+              ": filter for data UTC MJD %lf before %lf", status,
+              filt->dateobs, datechange );
+  }
+
+  CLOCK_PERIOD = 20E-9; /* 50 MHz clock */
+  NUM_ROWS = 41.;       /* number of rows addressed */
+  DELTA_TIME = (CLOCK_PERIOD*ROW_DWELL*NUM_ROWS); /* sample length */
+  SRATE = (1./DELTA_TIME); /* sample rate */
 
   /* Loop over all frequencies in the filter */
   for( i=0; i<filt->fdims[0]; i++ ) {
@@ -154,8 +208,8 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
     gsl_complex temp;
     double omega;
     
-    f = filt->df[0]*i;                       /* Frequency at this step */
-    omega = (f / MCE_FILT_SRATE)*2*AST__DPI; /* Angular frequency */
+    f = filt->df[0]*i;              /* Frequency at this step */
+    omega = (f / SRATE)*2*AST__DPI; /* Angular frequency */
 
     cos_m_o = cos(-omega);
     sin_m_o = sin(-omega);
@@ -182,10 +236,10 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
     GSL_SET_COMPLEX(&den, 1, 0);
 
     GSL_SET_COMPLEX(&temp, cos_m_o, sin_m_o);
-    den = gsl_complex_add( den, gsl_complex_mul_real(temp,MCE_FILT_B_1_1) );
+    den = gsl_complex_add( den, gsl_complex_mul_real(temp,B_1_1) );
 
     GSL_SET_COMPLEX(&temp, cos_m_2o, sin_m_2o);
-    den = gsl_complex_add( den, gsl_complex_mul_real(temp,MCE_FILT_B_1_2) );
+    den = gsl_complex_add( den, gsl_complex_mul_real(temp,B_1_2) );
 
     /* quotient */
 
@@ -204,10 +258,10 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
     GSL_SET_COMPLEX(&den, 1, 0);
 
     GSL_SET_COMPLEX(&temp, cos_m_o, sin_m_o);
-    den = gsl_complex_add( den, gsl_complex_mul_real(temp,MCE_FILT_B_2_1) );
+    den = gsl_complex_add( den, gsl_complex_mul_real(temp,B_2_1) );
 
     GSL_SET_COMPLEX(&temp, cos_m_2o, sin_m_2o);
-    den = gsl_complex_add( den, gsl_complex_mul_real(temp,MCE_FILT_B_2_2) );
+    den = gsl_complex_add( den, gsl_complex_mul_real(temp,B_2_2) );
 
     /* quotient */
 
@@ -223,15 +277,22 @@ void smf_filter_mce( smfFilter *filt, int noinverse, int *status ) {
 
 
     /* Normally we are applying the inverse of the filter to remove
-       its effect from the time-series */
+       its effect from the time-series. */
     if( !noinverse ) {
       h_omega = gsl_complex_inverse( h_omega );
     }
 
-    /* Then apply this factor to the filter */
-    GSL_SET_COMPLEX( &temp, filt->real[i], filt->imag[i] );
-    temp = gsl_complex_mul( temp, h_omega );
+    /* Then apply this factor to the filter. Since we are un-doing the
+       _cross-correlation_ of the original signal with the filter
+       response using the convolution theorem, I think we have to take
+       the complex conjugate of either the signal or the filter
+       coefficients before multiplying. However, when I do that, the
+       result seems to be worse than if I don't... leaving the complex
+       conjugate version commented-out for now. */
 
+    GSL_SET_COMPLEX( &temp, filt->real[i], filt->imag[i] );
+    //temp = gsl_complex_mul( temp, gsl_complex_conjugate(h_omega) );
+    temp = gsl_complex_mul( temp, h_omega );
     filt->real[i] = GSL_REAL( temp );
     filt->imag[i] = GSL_IMAG( temp );
   }

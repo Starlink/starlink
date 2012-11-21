@@ -794,6 +794,7 @@ typedef struct smfTile {
 /* Structure to encapsulate frequency-domain filters implemented with FFTW. */
 typedef struct smfFilter {
   size_t apod_length;   /* apodization length */
+  double dateobs;       /* UTC MJD start of obs that filter corresponds to */
   double df[2];         /* frequency steps along each axis [Hz or 1/arcsec] */
   dim_t fdims[2];       /* filter frequency dimensions */
   double *imag;         /* Imaginary part of the filter */

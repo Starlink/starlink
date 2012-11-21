@@ -53,10 +53,12 @@
 *        Steptime is now in smfHead.
 *     2011-10-03 (EC):
 *        Support 2-d map filters
+*     2012-11-20 (EC):
+*        Add dateobs to smfFilter
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2012 Science and Technology Facilities Council.
 *     Copyright (C) 2008,2011 University of British Columbia.
 *     All Rights Reserved.
 
@@ -128,6 +130,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
   if( *status == SAI__OK ) {
 
+    filt->dateobs = VAL__BADD;
     filt->imag = NULL;
     filt->real = NULL;
     filt->wcs = NULL;
@@ -185,6 +188,12 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
         /* Export the frameset before ending the AST context */
         astExport( filt->wcs );
         astEnd;
+
+        /* We also get the MJD start time of the observation for time-series
+           data in case we need it later (e.g. for setting parameters of
+           the MCE filter in smf_filter_mce */
+
+        smf_find_dateobs( template->hdr, &filt->dateobs, NULL, status );
 
       } else if( ndims == 2 ) {
         /* --- Filter for map data  --- */

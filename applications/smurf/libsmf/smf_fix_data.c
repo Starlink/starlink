@@ -193,6 +193,8 @@ int smf_fix_data ( msglev_t msglev, smfData * data, int * status ) {
     astSet( tf, "TimeOrigin=%s", "2011-07-06T10:23:00" );
     dateendfix = astGetD( tf, "TimeOrigin" );
 
+    tf = astAnnul( tf );
+
     /* Proceed with fix if within date range */
     if( (*status == SAI__OK) && (dateobs >= datestartfix) &&
         (dateobs <= dateendfix) ) {
