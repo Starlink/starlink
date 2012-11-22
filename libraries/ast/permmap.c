@@ -82,6 +82,11 @@ f     The PermMap class does not define any new routines beyond those
 *        Add protected PermSplit attribute.
 *     11-FEB-2011 (DSB):
 *        Do not allow MapSplit to return a Mapping with zero outputs.
+*     22-NOV-2012 (DSB):
+*        When using a default inperm array (as indicated by a NULL pointer
+*        for inperm), ensure the array is padded with "-1" values if the
+*        number of inputs exceeds the number of outputs. Also do the 
+*        equivalent for default outperm arrays.
 *class--
 */
 
@@ -116,6 +121,19 @@ f     The PermMap class does not define any new routines beyond those
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+
+/* Module Macros */
+/* ============= */
+/* A macro that returns the inperm or outperm value to use for a given
+   index, taking account of the possibility that the inperm or outperm may
+   be NULL (implying a unit permutation), and that he numbers of inputs
+   and outputs may not be equal. "perms" is a pointer to the integer
+   permutation array (inperm or outperm), "i" is the index of the required
+   element of the permutation array, and "maxperm" is one more than the
+   maximum value allowed in the permutation array (i.e. the number of
+   PermMap outputs if "perms" is inperm, or PermMap inputs if "perms" is
+   outperm). */
+#define PERMVAL( perms, i, maxperm ) ( perms ? perms[ i ] : (  i < maxperm ? i : -1 ))
 
 /* Module Variables. */
 /* ================= */
@@ -233,10 +251,16 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    int *this_outp;
    int i;
    int nin;
+   int nin_that;
    int nout;
+   int nout_that;
    int p1;
    int p2;
    int result;
+   int that_inp_len;
+   int that_outp_len;
+   int this_inp_len;
+   int this_outp_len;
 
 /* Initialise. */
    result = 0;
@@ -261,20 +285,48 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 /* Assume the PermMaps are equivalent. */
          result = 1;
 
+/* Get the number of inputs and outputs in the second PermMap. */
+         nin_that = astGetNin( that );
+         nout_that = astGetNout( that );
+
 /* Get pointers to the effective inperm and outperm array for each PermMap.
    If the Invert flags of the two PermMaps are not equal, we swap the
    arrays for the second PermMap in order to take account of the relative
    inversion of the second PermMap. */
+         this_inp = this->inperm;
+         this_outp = this->outperm;
+
+         if(  astGetInvert( this ) ) {
+            this_inp_len =  nout;
+            this_outp_len =  nin;
+         } else {
+            this_inp_len =  nin;
+            this_outp_len =  nout;
+         }
+
          if( astGetInvert( this ) != astGetInvert( that ) ) {
-            this_inp = this->inperm;
-            this_outp = this->outperm;
             that_inp = that->outperm;
             that_outp = that->inperm;
+
+            if(  astGetInvert( that ) ) {
+               that_inp_len =  nin_that;
+               that_outp_len =  nout_that;
+            } else {
+               that_inp_len =  nout_that;
+               that_outp_len =  nin_that;
+            }
+
          } else {
-            this_inp = this->inperm;
-            this_outp = this->outperm;
             that_inp = that->inperm;
             that_outp = that->outperm;
+
+            if(  astGetInvert( that ) ) {
+               that_inp_len =  nout_that;
+               that_outp_len =  nin_that;
+            } else {
+               that_inp_len =  nin_that;
+               that_outp_len =  nout_that;
+            }
          }
 
 /* Loop round every PermMap input. */
@@ -285,8 +337,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    output with the corresponding index. A negative integer "p" value means
    the input is fed a constant value stored at index (-p-1) in the
    associated constants array. */
-            p1 = this_inp ? this_inp[ i ] : i;
-            p2 = that_inp ? that_inp[ i ] : i;
+            p1 = PERMVAL( this_inp, i, this_outp_len );
+            p2 = PERMVAL( that_inp, i, that_outp_len );
 
 /* If the "p" values differ, we may have evidence that the PermMaps are
    not equivalent. */
@@ -314,8 +366,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    inputs. */
          if( result ) {
             for( i = 0; i < nout; i++ ) {
-               p1 = this_outp ? this_outp[ i ] : i;
-               p2 = that_outp ? that_outp[ i ] : i;
+               p1 = PERMVAL( this_outp, i, this_inp_len );
+               p2 = PERMVAL( that_outp, i, that_inp_len );
+
                if( p1 != p2 ) {
                   if( p1 >= 0 || p2 >= 0 ) {
                      result = 0;
@@ -814,6 +867,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int inc;                      /* Loop increment */
    int invert;                   /* Invert attribute value */
    int istart;                   /* Loop starting value */
+   int maxperm;                  /* Max value (+1) allowed in permutation array */
    int ncon;                     /* Number of constants */
    int ncoord_in;                /* Effective number of input coordinates */
    int ncoord_out;               /* Effective number of output coordinates */
@@ -940,6 +994,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    UnitMap), leave the permutation array pointer NULL, which indicates
    a null permutation. */
                   perm = NULL;
+                  maxperm = astGetNout( map );
                   if ( !strcmp( class, "PermMap" ) ) {
                      permmap = (AstPermMap *) map;
                      perm = invert ? permmap->outperm : permmap->inperm;
@@ -972,7 +1027,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Otherwise, obtain the permuting effect of the current Mapping,
    allowing for the possibility of its permutation array being NULL
    (implying a null permutation). */
-                           p = perm ? perm[ p ] : p;
+                           p = PERMVAL( perm, p, maxperm );
 
 /* If the permuted index refers to a valid (effective) output
    coordinate for the individual Mapping, then accumulate its effect
@@ -1131,6 +1186,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    UnitMap), leave the permutation array pointer NULL, which indicates
    a null permutation. */
                   perm = NULL;
+                  maxperm = astGetNout( map );
                   if ( !strcmp( class, "PermMap" ) ) {
                      permmap = (AstPermMap *) map;
                      perm = invert ? permmap->outperm : permmap->inperm;
@@ -1159,7 +1215,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Obtain the permuting effect of the current Mapping, allowing for
    the possibility of its permutation array being NULL. */
-                        p = perm ? perm[ coord ] : coord;
+                        p = PERMVAL( perm, coord, maxperm );
 
 /* If the permuted index refers to a valid (effective) output
    coordinate for the individual Mapping, then accumulate its effect
@@ -1507,7 +1563,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 /* Is this output fed by one of the selected inputs? If so store the input
    index of the returned Mapping, which feeds this output and add this
    output index to the list of returned outputs. */
-            iin = outp ? outp[ iout ] : iout;
+            iin = PERMVAL( outp, iout, npin );
             if( iin >= 0 && iin < npin ) {
                for( i = 0; i < nin; i++ ) {
                   if( in[ i ] == iin ) {
@@ -1530,7 +1586,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
    the output or constant index in the returned Mapping which feeds this
    input. */
             ok = 0;
-            iout = inp ? inp[ iin ] : iin;
+            iout = PERMVAL( inp, iin, npout );
             if( iout >= 0 && iout < npout ) {
                for( j = 0; j < nout; j++ ) {
                   if( result[ j ] == iout ) {
@@ -1573,7 +1629,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
       result = astMalloc( sizeof( int )*(size_t) nin );
       if( astOK ) {
          for( i = 0; i < nin; i++ ) {
-            result[ i ] = inp[ in[ i ] ];
+            result[ i ] = PERMVAL( inp, in[ i ], npout );
 
 /* Check the input is not fed by a constant. */
             if( result[ i ] < 0 ) {
@@ -1847,18 +1903,19 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
 */
 
 /* Local Variables: */
-   AstPointSet *result;          /* Pointer to output PointSet */
    AstPermMap *this;             /* Pointer to PermMap to be applied */
+   AstPointSet *result;          /* Pointer to output PointSet */
    double **ptr_in;              /* Pointer to input coordinate data */
    double **ptr_out;             /* Pointer to output coordinate data */
+   double constant;              /* Constant coordinate value */
+   int *perm;                    /* Pointer to permutation array */
    int coord;                    /* Loop counter for coordinates */
+   int maxperm;                  /* Max value in permutation array */
    int ncoord_in;                /* Number of coordinates per input point */
    int ncoord_out;               /* Number of coordinates per output point */
    int npoint;                   /* Number of points */
-   int point;                    /* Loop counter for points */
-   int *perm;                    /* Pointer to permutation array */
-   double constant;              /* Constant coordinate value */
    int p;                        /* Permuted coordinate index */
+   int point;                    /* Loop counter for points */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -1884,24 +1941,27 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
    ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
-/* Determine whether to apply the forward or inverse transformation, according
-   to the direction specified and whether the mapping has been inverted. */
-   if ( astGetInvert( this ) ) forward = !forward;
+/* Obtain a pointer to the appropriate coordinate permutation array, according
+   to the direction of transformation required and whether the PermMap has
+   been inverted. Also get the maximum allowed value in the permutation array. */
+   if ( ( astGetInvert( this ) != 0 ) == ( forward != 0 ) ) {
+      perm = this->inperm;
+      maxperm = ncoord_out;
+   } else {
+      perm = this->outperm;
+      maxperm = ncoord_in;
+   }
 
 /* Perform coordinate permutation. */
 /* ------------------------------- */
    if ( astOK ) {
-
-/* Obtain a pointer to the appropriate coordinate permutation array, according
-   to the direction of transformation required. */
-      perm = forward ? this->outperm : this->inperm;
 
 /* Loop to generate values for each output coordinate. */
       for ( coord = 0; coord < ncoord_out; coord++ ) {
 
 /* If the permutation array is not NULL, use it to look up which input
    coordinate to use. Otherwise, use the corresponding input coordinate. */
-         p = perm ? perm[ coord ] : coord;
+         p = PERMVAL( perm, coord, maxperm );
 
 /* If a valid input coordinate has been identified, simply copy the required
    coordinate values from input to output. */
