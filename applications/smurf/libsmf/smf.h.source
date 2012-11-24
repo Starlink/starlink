@@ -1008,6 +1008,8 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
 
 void smf_filter_complement( smfFilter *filt, int *status );
 
+void smf_filter_delay( smfFilter *filt, double delay, int *status );
+
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 
 void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,

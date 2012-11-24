@@ -148,6 +148,7 @@ smf_fft_cart2pol.c \
 smf_fft_data.c \
 smf_fillgaps.c \
 smf_filter_complement.c \
+smf_filter_delay.c \
 smf_filter_edge.c \
 smf_filter_execute.c \
 smf_filter_fromkeymap.c \
