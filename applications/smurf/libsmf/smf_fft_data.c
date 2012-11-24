@@ -364,7 +364,8 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
   /* Call smf_isfft to check to see if we have real-space or FFT
      data, and obtain dimensions. */
 
-  isFFT = smf_isfft( indata, rdims, &nbolo, fdims, df, &ndims, status );
+  isFFT = smf_isfft( indata, rdims, &nbolo, fdims, indata->hdr ? df : NULL,
+                     &ndims, status );
 
   if( *status != SAI__OK ) return NULL;
 
@@ -426,19 +427,35 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
       Re-create the padding based on the current contents of the
       smfData (this also fill any gaps in the data). */
     if( len == SMF__BADSZT ) {
-      smf_fillgaps( wf, data, SMF__Q_PAD | SMF__Q_GAP, status );
+      if( data->qual ) {
+        smf_fillgaps( wf, data, SMF__Q_PAD | SMF__Q_GAP, status );
+      } else {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME
+                ": trying to fill gaps, but no quality array supplied",
+                status );
+      }
 
     /* If required, fill the data (excluding padding) and apodise the data */
     } else if( len > 0 ) {
-      smf_fillgaps( wf, data, SMF__Q_GAP, status );
-      smf_apodize( data, len, 1, status );
+      if( data->qual ) {
+        smf_fillgaps( wf, data, SMF__Q_GAP, status );
+        smf_apodize( data, len, 1, status );
+      } else {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME
+                ": trying to fill gaps and apodize but no quality array "
+                "supplied", status );
+      }
     }
 
     /* Put a bad value at the start of each bad bolometer so that they can
        be identified in the worker thread. */
-    for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
-      if( (data->qual)[ ibolo*inbstr ] & SMF__Q_BADB ) {
-         ((double*)(data->pntr[0]))[ ibolo*inbstr ] = VAL__BADD;
+    if( data-> qual ) {
+      for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+        if( (data->qual)[ ibolo*inbstr ] & SMF__Q_BADB ) {
+          ((double*)(data->pntr[0]))[ ibolo*inbstr ] = VAL__BADD;
+        }
       }
     }
 
