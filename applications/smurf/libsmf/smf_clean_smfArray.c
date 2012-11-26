@@ -122,6 +122,9 @@
 *     2012-11-14 (DSB):
 *        Control the MCE anti-alias filter correction using a new config
 *        parameter - "DECONVMCE".
+*     2012-11-26 (DSB):
+*        Allow time streams toe be delayed by arbitrary times using a new
+*        config parameter - "DELAY".
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -182,6 +185,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
   dim_t dcsmooth;           /* median filter width before finding DC steps */
   double dcthresh;          /* n-sigma threshold for primary DC steps */
   int deconvmce;            /* Remove the effects of the MCE anti-alias filter? */
+  double delay;             /* Delay, in seconds */
   int dofft;                /* are we doing a freq.-domain filter? */
   int dkclean;              /* Flag for dark squid cleaning */
   smfFilter *filt=NULL;     /* Frequency domain filter */
@@ -237,7 +241,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
                     &spikethresh, &spikebox, &noisecliphigh, &noisecliplow,
                     NULL, &compreprocess, &pcalen, &pcathresh, NULL, NULL, NULL,
-                    &noiseclipprecom, &deconvmce, status );
+                    &noiseclipprecom, &deconvmce, &delay, status );
 
   /* Loop over subarray */
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
@@ -251,10 +255,13 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s updating quality",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
-    /* De-convolve the MCE anti-aliasing filter response */
-    if( deconvmce ) {
+    /* De-convolve the MCE anti-aliasing filter response and/or delay the
+       time streams (so that each sample is associated with a different sky
+       position)/ */
+    if( deconvmce || delay != 0.0 ) {
        filt = smf_create_smfFilter( data, status );
-       smf_filter_mce( filt, 0, status );
+       if( deconvmce) smf_filter_mce( filt, 0, status );
+       if( delay != 0.0 ) smf_filter_delay( filt, delay, status );
        if( *status == SAI__OK ) {
          msgOutif( MSG__VERB, "", FUNC_NAME
                    ": de-convolve anti-aliasing filter response", status );

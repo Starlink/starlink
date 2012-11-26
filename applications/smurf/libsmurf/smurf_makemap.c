@@ -672,6 +672,10 @@
 *       If set to 1, each bolometer time stream will be deconvolved to remove
 *       the effects of the MCE anti-aliasing filter. This is performed as
 *       part of the intial data cleaning stage, prior to step-correction. [0]
+*     DELAY = REAL
+*       A delay, in seconds, to apply to each time stream. This results
+*       in each bolometer sample being associated with a different position
+*       on the sky. [0.0]
 *     DKCLEAN = LOGICAL
 *       Clean the bolometers using the dark squids. See CLEANDK.* parameters
 *       to control cleaning. [0]

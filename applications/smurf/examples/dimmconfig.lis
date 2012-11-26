@@ -189,6 +189,11 @@ downsampscale = -1
 # using the MCE response? The default is zero. Uncomment this line to
 # switch it on.
 # fakemce = 1
+#
+# A delay, in seconds, to apply to each time stream. This results in each
+# bolometer sample being associated with a different position on the sky.
+# The default is zero.
+# delay = 0.0
 
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start

@@ -83,6 +83,9 @@ fakemap = <undef>
 fakescale = 1
 fakemce = 0
 
+#  A delay, in seconds, to apply to each timne stream.
+delay = 0.0
+
 # Subtract supplied initial guess at sky before iterating?
 importsky = 0
 

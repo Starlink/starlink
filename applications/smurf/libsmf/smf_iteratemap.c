@@ -390,6 +390,9 @@
 *     2012-11-21 (DSB):
 *        Add config parameter fakemce to indicate if the fakmap data
 *        should be smoothed using the MCE response.
+*     2012-11-26 (DSB):
+*        If time-streams are being delayed, add an equal and opposite
+*        delay to the fakemap data.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -511,6 +514,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
+  double delay = 0.0;           /* Extra time stream delay, in seconds */
   double downsampscale;         /* Downsample factor to preserve this scale */
   int dimmflags;                /* Control flags for DIMM model components */
   int doclean=1;                /* Are we doing data pre-processing? */
@@ -523,6 +527,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int fakemce;                  /* Smooth fake data with MCE response? */
   int fakendf=NDF__NOID;        /* NDF id for fakemap */
   double fakescale;             /* Scale factor for fakemap */
+  double *fakestream = NULL;    /* Time series data from fake map */
   size_t count_mcnvg=0;         /* # chunks fail to converge */
   size_t count_minsmp=0;        /* # chunks fail due to insufficient samples */
   smf_qual_t flagmap=0;         /* bit mask for flagmaps */
@@ -846,6 +851,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       astMapGet0D( keymap, "FAKESCALE", &fakescale );
       astMapGet0I( keymap, "FAKEMCE", &fakemce );
+      astMapGet0D( keymap, "DELAY", &delay );
     }
 
     /* Obtain sample length from header of first file in igrp */
@@ -1065,7 +1071,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                    &groupsubarray, NULL, NULL, NULL, NULL, status );
+                    &groupsubarray, NULL, NULL, NULL, NULL, NULL, status );
 
   smf_grp_related( igrp, isize, 1+groupsubarray, 1, maxlen, &srate_maxlen,
                    keymap, &maxconcat, &maxfile, &igroup, NULL, &pad, status );
@@ -1434,46 +1440,93 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           resptr = res[0]->sdata[idx]->pntr[0];
           lutptr = lut[0]->sdata[idx]->pntr[0];
 
-          if( haveext ) {
-            /* Version in which we are applying extinction correction */
+          /* If we will later be filtering the data to remove the MCE response
+             or delay, we need to apply the opposite effects the fake data
+             before adding it to the real data, so that the later filtering
+             will affect only the real data and not the fake data. */
+          if( fakemce || delay != 0.0 ) {
 
-            extptr = model[whichext][0]->sdata[idx]->pntr[0];
+             /* Sample the fake map at the position of each sample,
+                applying extinction correction or not as required. */
+             fakestream = astGrow( fakestream, dsize, sizeof(*fakestream));
+             if( haveext ) {
+               for( k=0; k<dsize; k++ ) {
+                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
+                     (extptr[k] > 0) && (fmapdata[lutptr[k]] != VAL__BADD) &&
+                     (resptr[k] != VAL__BADD) ) {
+                   fakestream[k] = fakescale*fmapdata[lutptr[k]] / extptr[k];
+                 } else {
+                   fakestream[k] = VAL__BADD;
+                 }
+               }
+             } else {
+               for( k=0; k<dsize; k++ ) {
+                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
+                     (fmapdata[lutptr[k]] != VAL__BADD) &&
+                     (resptr[k] != VAL__BADD) ) {
+                   fakestream[k] = fakescale*fmapdata[lutptr[k]];
+                 } else {
+                   fakestream[k] = VAL__BADD;
+                 }
+               }
+             }
 
-            for( k=0; k<dsize; k++ ) {
-              if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
-                  (extptr[k] > 0) && (fmapdata[lutptr[k]] != VAL__BADD) &&
-                  (resptr[k] != VAL__BADD) ) {
-                resptr[k] += fakescale*fmapdata[lutptr[k]] / extptr[k];
-              }
-            }
+             /* Apply the opposite of any delay specified by the "delay"
+                config parameter, and also smooth with the MCE response.
+                These are done in the opposite order to that used in
+                smf_clean_smfArray. We temporarily hijack the RES smfData
+                for this purpose. */
+             res[0]->sdata[idx]->pntr[0] = fakestream;
+
+             smfFilter *filt = smf_create_smfFilter(res[0]->sdata[idx], status);
+             if( delay != 0.0 ) smf_filter_delay( filt, -delay, status );
+             if( fakemce ) smf_filter_mce( filt, 1, status );
+
+             smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
+             smf_filter_execute( wf, res[0]->sdata[idx], filt, 0, 0, status );
+
+             filt = smf_free_smfFilter( filt, status );
+
+             res[0]->sdata[idx]->pntr[0] = resptr;
+
+             /* Add the modified fake time stream data onto the residuals. */
+             for( k=0; k<dsize; k++ ) {
+                if( resptr[k] != VAL__BADD && fakestream[k] != VAL__BADD ){
+                  resptr[k] += fakestream[k];
+                }
+             }
+
+          /* If we will not be filtering the data later, we do not need
+             to find the intermediate fake time stream data. */
           } else {
-            /* No extinction correction */
+                if( haveext ) {
+               /* Version in which we are applying extinction correction */
 
-            for( k=0; k<dsize; k++ ) {
-              if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
-                  (fmapdata[lutptr[k]] != VAL__BADD) &&
-                  (resptr[k] != VAL__BADD) ) {
-                resptr[k] += fakescale*fmapdata[lutptr[k]];
-              }
-            }
+               extptr = model[whichext][0]->sdata[idx]->pntr[0];
+
+               for( k=0; k<dsize; k++ ) {
+                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
+                     (extptr[k] > 0) && (fmapdata[lutptr[k]] != VAL__BADD) &&
+                     (resptr[k] != VAL__BADD) ) {
+                   resptr[k] += fakescale*fmapdata[lutptr[k]] / extptr[k];
+                 }
+               }
+             } else {
+               /* No extinction correction */
+
+               for( k=0; k<dsize; k++ ) {
+                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
+                     (fmapdata[lutptr[k]] != VAL__BADD) &&
+                     (resptr[k] != VAL__BADD) ) {
+                   resptr[k] += fakescale*fmapdata[lutptr[k]];
+                 }
+               }
+             }
           }
-
-          {
-            /* Apply the response function of the MCE. Really, instead of
-               convolving with the response after adding the fakemap signal
-               to the time-series, we should be filtering it BEFORE adding
-               (since the real data have already been filtered by this
-               response). */
-            if( fakemce ) {
-               smfFilter *filt = smf_create_smfFilter(res[0]->sdata[idx], status);
-               smf_filter_mce( filt, 1, status );
-               smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
-               smf_filter_execute( wf, res[0]->sdata[idx], filt, 0, 0, status );
-               filt = smf_free_smfFilter( filt, status );
-            }
-          }
-
         }
+
+        fakestream = astFree( fakestream );
+
       }
 
       /*** TIMER ***/

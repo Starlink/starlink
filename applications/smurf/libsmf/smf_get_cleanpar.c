@@ -26,7 +26,8 @@
 *                       double *noisecliplow, int *whiten, int *compreprocess,
 *                       dim_t *pcalen, double *pcathresh, int groupsubarray,
 *                       double *downsampscale, double *downsampfreq,
-*                       int *noiseclipprecom, int *deconvmce, int *status )
+*                       int *noiseclipprecom, int *deconvmce, double delay,
+*                       int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -127,6 +128,9 @@
 *        instead of after as is the default?
 *     deconvmce = int * (Returned)
 *        Should the effects of the anti-aliasing MCE filter be removed?
+*     delay = double * (Returned)
+*        A time, in seconds, by which to delay each time stream, causing
+*        each sample to be associated with a different position on the sky.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -198,6 +202,8 @@
 *        of time slices to be given in units of seconds instead.
 *     2012-11-14 (DSB):
 *        Add argument "deconvmce".
+*     2012-11-26 (DSB):
+*        Add argument "delay".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -259,7 +265,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
                        int *compreprocess, dim_t *pcalen, double *pcathresh,
                        int *groupsubarray, double *downsampscale,
                        double *downsampfreq, int *noiseclipprecom,
-                       int *deconvmce, int *status ) {
+                       int *deconvmce, double *delay, int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -644,5 +650,13 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DECONVMCE is %s", status,
                (*deconvmce ? "enabled" : "disabled") );
   }
+
+  if( delay ) {
+    *delay = 0.0;
+    astMapGet0D( keymap, "DELAY", delay );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DELAY=%f", status,
+               *delay );
+  }
+
 
 }
