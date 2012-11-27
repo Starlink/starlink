@@ -59,6 +59,10 @@
 *        Added SMF__Q_LOWAP.
 *     2011-09-19 (DSB):
 *        Added SMF__Q_BADEF.
+*     2012-11-27 (DSB):
+*        Change error handling to avoid segfault if an error is reported
+*        in irqNxtqn, causing "bit" to be zero, which then gets
+*        decremented to -1, and used as an array index...
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -179,7 +183,7 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
     }
 
     /* Now translate each name to a bit */
-    for (i = 0; i < numqn; i++) {
+    for (i = 0; i < numqn && *status == SAI__OK; i++) {
       char qname[IRQ__SZQNM+1];
       char commnt[IRQ__SZCOM+1];
       int fixed;
@@ -198,7 +202,7 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
          less than 9 bits because they are in the NDF file. */
       qval = smf_qual_str_to_val( qname, &tmpfam, status );
 
-      if (*status == SMF__BADQNM || tmpfam == SMF__QFAM_NULL ) {
+      if (*status == SMF__BADQNM ) {
         /* annul status and just copy this bit from the file
            to SMURF without change. This might result in a clash
            of bits but we either do that or drop out the loop
@@ -207,7 +211,7 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
         ndfqtosmf[bit] = bit;
         ndfqtoval[bit] = BIT_TO_VAL(bit);
 
-      } else {
+      } else if( *status == SAI__OK ){
         if (lfamily == SMF__QFAM_NULL) {
           lfamily = tmpfam;
         } else if (lfamily != tmpfam) {
