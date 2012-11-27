@@ -260,11 +260,17 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
        position)/ */
     if( deconvmce || delay != 0.0 ) {
        filt = smf_create_smfFilter( data, status );
-       if( deconvmce) smf_filter_mce( filt, 0, status );
-       if( delay != 0.0 ) smf_filter_delay( filt, delay, status );
-       if( *status == SAI__OK ) {
+       if( deconvmce) {
          msgOutif( MSG__VERB, "", FUNC_NAME
                    ": de-convolve anti-aliasing filter response", status );
+         smf_filter_mce( filt, 0, status );
+       }
+       if( delay != 0.0 ) {
+         msgOutiff( MSG__VERB, "", FUNC_NAME
+                    ": delay bolometer signals by %.4lf s", status, delay );
+         smf_filter_delay( filt, delay, status );
+       }
+       if( *status == SAI__OK ) {
          smf_filter_execute( wf, data, filt, 0, 0, status );
        }
        filt = smf_free_smfFilter( filt, status );
