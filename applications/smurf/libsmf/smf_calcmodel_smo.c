@@ -65,6 +65,8 @@
 *     2010-06-29 (DSB):
 *        - Add option for median smoothing.
 *        - Re-structure to use multi-threading.
+*     2012-11-27 (DSB):
+*        Ensure "res" is assigned before using it.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -161,6 +163,10 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  /* Obtain pointers to relevant smfArrays for this chunk */
+  res = dat->res[chunk];
+  qua = dat->qua[chunk];
+
   /* Obtain pointer to sub-keymap containing PLN parameters. Something will
      always be available.*/
   astMapGet0A( keymap, "SMO", &kmap );
@@ -184,10 +190,6 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       filter_type = SMF__FILT_MEDIAN;
     }
   }
-
-  /* Obtain pointers to relevant smfArrays for this chunk */
-  res = dat->res[chunk];
-  qua = dat->qua[chunk];
 
   /* Assert bolo-ordered data */
   smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA,
