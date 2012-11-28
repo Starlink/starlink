@@ -203,7 +203,7 @@ void smf_filter_delay( smfFilter *filt, double delay, int *status ) {
 
   sfunc_ft = smf_fft_data( NULL, sfunc, NULL, 0, 0, status );
 
-  /* Copy the coefficients into the filter */
+  /* Multiply existing filter by new filter coefficients */
 
   if( *status == SAI__OK ) {
     double *re=NULL;
@@ -214,8 +214,16 @@ void smf_filter_delay( smfFilter *filt, double delay, int *status ) {
     im = re + filt->fdims[0];
 
     for( i=0; i<filt->fdims[0]; i++ ) {
-      filt->real[i] = re[i];
-      filt->imag[i] = im[i];
+      double ac, bd, aPb, cPd;
+
+      ac = filt->real[i] * re[i];
+      bd = filt->imag[i] * im[i];
+
+      aPb = filt->real[i] + filt->imag[i];
+      cPd = re[i] + im[i];
+
+      filt->real[i] = ac - bd;
+      filt->imag[i] = aPb*cPd - ac -bd;
     }
   }
 
