@@ -1447,16 +1447,28 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           if( fakemce || delay != 0.0 ) {
 
              /* Sample the fake map at the position of each sample,
-                applying extinction correction or not as required. */
+                applying extinction correction or not as
+                required. Note that fakestream is set to 0 wherever
+                there are no data, bad value encountered, etc. The
+                quality normally flags wherever there are gaps (which
+                then get filled), but in the case where fmapdata are
+                missing values, QUALITY won't know about it, and we'll
+                get junk when we do the filtering. A better way to do
+                this would be to actually (temporarily) set some sort
+                of quality (so that we can gap fill)... but probably
+                not worth the effort. */
              fakestream = astGrow( fakestream, dsize, sizeof(*fakestream));
              if( haveext ) {
+
+               extptr = model[whichext][0]->sdata[idx]->pntr[0];
+
                for( k=0; k<dsize; k++ ) {
                  if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
                      (extptr[k] > 0) && (fmapdata[lutptr[k]] != VAL__BADD) &&
                      (resptr[k] != VAL__BADD) ) {
                    fakestream[k] = fakescale*fmapdata[lutptr[k]] / extptr[k];
                  } else {
-                   fakestream[k] = VAL__BADD;
+                   fakestream[k] = 0;
                  }
                }
              } else {
@@ -1466,7 +1478,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      (resptr[k] != VAL__BADD) ) {
                    fakestream[k] = fakescale*fmapdata[lutptr[k]];
                  } else {
-                   fakestream[k] = VAL__BADD;
+                   fakestream[k] = 0;
                  }
                }
              }
@@ -1479,8 +1491,19 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              res[0]->sdata[idx]->pntr[0] = fakestream;
 
              smfFilter *filt = smf_create_smfFilter(res[0]->sdata[idx], status);
-             if( delay != 0.0 ) smf_filter_delay( filt, -delay, status );
-             if( fakemce ) smf_filter_mce( filt, 1, status );
+             if( delay != 0.0 ) {
+               msgOutiff( MSG__VERB, "", FUNC_NAME
+                          ": delay fake data by %.4lf s",
+                          status, -delay );
+               smf_filter_delay( filt, -delay, status );
+             }
+
+             if( fakemce ) {
+               msgOutif( MSG__VERB, "", FUNC_NAME
+                          ": convolve fake data with anti-aliasing filter",
+                         status );
+               smf_filter_mce( filt, 1, status );
+             }
 
              smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
              smf_filter_execute( wf, res[0]->sdata[idx], filt, 0, 0, status );
