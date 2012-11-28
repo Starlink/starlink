@@ -195,7 +195,8 @@
 *     16-NOV-2012 (DSB):
 *        Use a temporary ADAM directory for each invocation.
 *     27-NOV-2012 (DSB):
-*        Ensure the script runs even if no ~/adam/GLOBAL.sdf file exists.
+*        - Ensure the script runs even if no ~/adam/GLOBAL.sdf file exists.
+*        - Ensure reference image has units of pW.
 
 *-
 '''
@@ -284,8 +285,18 @@ try:
 
 #  If a value was supplied for IREF, indicate that parameter PI should not
 #  be prompted for. The default value (None) will then be used if no value
-#  has been supplied on the command line. Then get the PI value ot use.
-   if iref: parsys["PI"].noprompt = True
+#  has been supplied on the command line.
+   if iref:
+      parsys["PI"].noprompt = True
+
+#  Ensure the I image has the expected units (pW).
+      invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(iref) )
+      iunits = starutil.get_task_par( "UNITS", "ndftrace" )
+      if iunits != "pW":
+         raise starutil.InvalidParameterError("Reference image ({0}) has "
+                    "incorrect units '{1} - must be 'pW'.".format(iref,iunit))
+
+#  Now get the PI value to use.
    pimap = parsys["PI"].value
 
 #  Get the output catalogue now to avoid a long wait before the user gets
