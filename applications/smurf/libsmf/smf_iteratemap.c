@@ -514,7 +514,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
-  double delay = 0.0;           /* Extra time stream delay, in seconds */
+  double fakedelay = 0.0;       /* Extra fake time stream delay, in seconds */
   double downsampscale;         /* Downsample factor to preserve this scale */
   int dimmflags;                /* Control flags for DIMM model components */
   int doclean=1;                /* Are we doing data pre-processing? */
@@ -851,7 +851,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       astMapGet0D( keymap, "FAKESCALE", &fakescale );
       astMapGet0I( keymap, "FAKEMCE", &fakemce );
-      astMapGet0D( keymap, "DELAY", &delay );
+      astMapGet0D( keymap, "FAKEDELAY", &fakedelay );
     }
 
     /* Obtain sample length from header of first file in igrp */
@@ -1444,7 +1444,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              or delay, we need to apply the opposite effects the fake data
              before adding it to the real data, so that the later filtering
              will affect only the real data and not the fake data. */
-          if( fakemce || delay != 0.0 ) {
+          if( fakemce || fakedelay != 0.0 ) {
 
              /* Sample the fake map at the position of each sample,
                 applying extinction correction or not as
@@ -1483,19 +1483,18 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                }
              }
 
-             /* Apply the opposite of any delay specified by the "delay"
-                config parameter, and also smooth with the MCE response.
-                These are done in the opposite order to that used in
-                smf_clean_smfArray. We temporarily hijack the RES smfData
-                for this purpose. */
+             /* Apply any delay specified by the "fakedelay" config parameter,
+                and also smooth with the MCE response. These are done in the
+                opposite order to that used in smf_clean_smfArray. We
+                temporarily hijack the RES smfData for this purpose. */
              res[0]->sdata[idx]->pntr[0] = fakestream;
 
              smfFilter *filt = smf_create_smfFilter(res[0]->sdata[idx], status);
-             if( delay != 0.0 ) {
+             if( fakedelay != 0.0 ) {
                msgOutiff( MSG__VERB, "", FUNC_NAME
                           ": delay fake data by %.4lf s",
-                          status, -delay );
-               smf_filter_delay( filt, -delay, status );
+                          status, fakedelay );
+               smf_filter_delay( filt, fakedelay, status );
              }
 
              if( fakemce ) {

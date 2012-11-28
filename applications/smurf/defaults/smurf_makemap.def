@@ -83,8 +83,12 @@ fakemap = <undef>
 fakescale = 1
 fakemce = 0
 
-#  A delay, in seconds, to apply to each timne stream.
+#  A delay, in seconds, to apply to each time stream when cleaning the data.
 delay = 0.0
+
+#  A delay, in seconds, to apply to each fake time stream sampled from
+#  the supplied fake map, prior to adding it to the real data.
+fakedelay = 0.0
 
 # Subtract supplied initial guess at sky before iterating?
 importsky = 0
