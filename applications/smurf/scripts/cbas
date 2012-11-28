@@ -31,7 +31,7 @@ if( $# < 1 ) then
    echo "   selection can be created by supplying the concatenation of the"
    echo "   required digits for the option -o (for instance '-o 245' would"
    echo "   create images 2, 4 and 5)."
-
+   echo
    echo "   By default, the total data sum in the '-sum' image is the sum of"
    echo "   the pixel values in a 60 arc-sec circular aperture (bad pixels are"
    echo "   replaced using prior to finding the sum), but if the -p option"
@@ -64,7 +64,7 @@ end
 
 #  Initialise other parameter values
 set sum_method = APERADD
-set config = "^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,bolomap=1"
+set config = "^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis"
 set outs = "127"
 
 #  loop round all remaining values on the command line
@@ -84,7 +84,7 @@ while( $# > 1 )
          echo " "
          exit
 
-#  If the supplied fiel exists, prefix it with an "^" character to convert
+#  If the supplied file exists, prefix it with an "^" character to convert
 #  it into a group expression.
       else
          set config = "^$config"
@@ -170,7 +170,7 @@ foreach indir ($dir_list)
 
 #  Use the iterative mapmaker to create map for each individual bolometers.
    $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
-             alignsys=t config=\"$config\" | tee makemap.log
+             alignsys=t config=\"$config,bolomap=1,exportclean=1\" | tee makemap.log
    if( $status != 0 ) break
 
 #  Get the subarray name, and its corresponding integer index.
@@ -202,6 +202,18 @@ foreach indir ($dir_list)
 #  Get the date and the observation number.
    set date = `$KAPPA_DIR/fitsmod junk edit=print keyword=UTDATE`
    set obsnum = `$KAPPA_DIR/fitsmod junk edit=print keyword=OBSNUM`
+
+#  Extract the mid slice from the cleaned time series data created by makemap,
+#  and fill it with bad values. This will be used as a template for the output
+#  NDFs. Do it this way (rather than just creating a blank 32x40 image using
+#  e.g. kappa:maths), so that we inherited focal plane WCS. We can remove the
+#  (az,el) wcs since it is of no use.
+   $KAPPA_DIR/ndftrace \*_con_res_cln quiet
+   @ islice = `$KAPPA_DIR/parget DIMS'(3)' ndftrace` / 2
+   $SMURF_DIR/dsutils in=\*_con_res_cln itime=$islice outslice=slice outcat=!
+   $KAPPA_DIR/wcsremove slice 7 quiet
+   $KAPPA_DIR/copybad in=slice ref=slice out=blank invert=yes quiet
+   rm -f *_con_res_cln.sdf
 
 #  Set the names for the final returned amp, sum and map NDFs (including all
 #  chunks).
@@ -257,13 +269,7 @@ foreach indir ($dir_list)
    while( $ich < $top_chunk )
       @ ich = $ich + 1
 
-#  Create an image holding a bad value for every bolometer. A copy of this
-#  image is used to form each initial output image. These NDFs initially
-#  have a pixel origin of (1,1) so that pixel and grid indices are equal.
-      $KAPPA_DIR/maths exp="0*xa*xb+<bad>" lbound=\[1,1\] ubound=\[32,40\] \
-                       type=_double out=blank
-
-#  Copy this blank image to create the required output images.
+#  Copy the blank image to create the required output images.
       if( $make_amp == 1 ) then
          set camp_ndf = "../../$subarray$date-$obsnum-ch$ich-amp"
          cp blank.sdf $camp_ndf.sdf
@@ -333,6 +339,11 @@ foreach indir ($dir_list)
 #  Get the full path to the bolomap NDF.
                set ndf = "junk.more.smurf.bolomaps.$bolo_name"
 
+#  Convert the bolometer GRID indices into PIXEL indices within the output
+#  NDFs. Pixel indices go from (0,0) to (31,39).
+               @ ixp = $ix - 1
+               @ iyp = $iy - 1
+
 #  From here on, use pixel coords to refer to positions within the bolomap,
 #  increasing the format precision from the one decimal place provided by
 #  the NDF library. NDF does not allow us to change the Format attributes for
@@ -366,35 +377,35 @@ foreach indir ($dir_list)
 #  returned NDFs for this chunk.
                   if( $make_amp == 1 ) then
                      set amp = `$KAPPA_DIR/parget amp1 psf`
-                     $KAPPA_DIR/chpix in=$camp_ndf out=tmp section=\"$ix,$iy\" \
+                     $KAPPA_DIR/chpix in=$camp_ndf out=tmp section=\"$ixp,$iyp\" \
                                       newval=$amp
                      mv -f tmp.sdf $camp_ndf.sdf
                   endif
 
                   if( $make_axisr == 1 ) then
                      set axisr = `$KAPPA_DIR/parget axisr psf`
-                     $KAPPA_DIR/chpix in=$caxisr_ndf out=tmp section=\"$ix,$iy\" \
+                     $KAPPA_DIR/chpix in=$caxisr_ndf out=tmp section=\"$ixp,$iyp\" \
                                       newval=$axisr
                      mv -f tmp.sdf $caxisr_ndf.sdf
                   endif
 
                   if( $make_fwhm == 1 ) then
                      set fwhm = `$KAPPA_DIR/parget fwhm psf`
-                     $KAPPA_DIR/chpix in=$cfwhm_ndf out=tmp section=\"$ix,$iy\" \
+                     $KAPPA_DIR/chpix in=$cfwhm_ndf out=tmp section=\"$ixp,$iyp\" \
                                       newval=$fwhm
                      mv -f tmp.sdf $cfwhm_ndf.sdf
                   endif
 
                   if( $make_gamma == 1 ) then
                      set gamma = `$KAPPA_DIR/parget gamma psf`
-                     $KAPPA_DIR/chpix in=$cgamma_ndf out=tmp section=\"$ix,$iy\" \
+                     $KAPPA_DIR/chpix in=$cgamma_ndf out=tmp section=\"$ixp,$iyp\" \
                                       newval=$gamma
                      mv -f tmp.sdf $cgamma_ndf.sdf
                   endif
 
                   if( $make_orient == 1 ) then
                      set orient = `$KAPPA_DIR/parget orient psf`
-                     $KAPPA_DIR/chpix in=$corient_ndf out=tmp section=\"$ix,$iy\" \
+                     $KAPPA_DIR/chpix in=$corient_ndf out=tmp section=\"$ixp,$iyp\" \
                                       newval=$orient
                      mv -f tmp.sdf $corient_ndf.sdf
                   endif
@@ -434,7 +445,7 @@ foreach indir ($dir_list)
                      endif
 
 #  Poke the value into the returned NDF for this chunk.
-                     $KAPPA_DIR/chpix in=$csum_ndf out=tmp section=\"$ix,$iy\" \
+                     $KAPPA_DIR/chpix in=$csum_ndf out=tmp section=\"$ixp,$iyp\" \
                                       newval=$fsum
    		     mv -f tmp.sdf $csum_ndf.sdf
                   endif
