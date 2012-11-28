@@ -295,13 +295,13 @@ def invoke(command,aslist=False,buffer=None):
    return outtxt
 
 
-def get_task_par( parname, taskname ):
+def get_task_par( parname, taskname, **kwargs ):
    """
 
    Get the current value of an ATASK parameter.
 
    Invocation:
-      value = get_task_par( parname, taskname )
+      value = get_task_par( parname, taskname, default=??? )
 
    Arguments:
       parname = string
@@ -310,6 +310,11 @@ def get_task_par( parname, taskname ):
          parentheses to the end of the parameter name.
       taskname = string
          The name of the task.
+      default = string
+         A default value to return if the specified parameter cannot be
+         accessed (e.g. if the parameter file does not exist, or does not
+         contain the required parameter). If "default" is not supplied,
+         an exception will be raised if the parameter cannot be accessed.
 
    Returned Value:
       The parameter value. This will be a single value if the task parameter
@@ -317,8 +322,19 @@ def get_task_par( parname, taskname ):
 
    """
 
-   text = invoke("$KAPPA_DIR/parget {0} {1} vector=yes".format( shell_quote(parname),taskname), False )
-   return eval( text.replace('\n', '' ) )
+   cmd = "$KAPPA_DIR/parget {0} {1} vector=yes".format( shell_quote(parname),taskname)
+
+   if 'default' in kwargs:
+      try:
+         text = invoke( cmd, False )
+         result = eval( text.replace('\n', '' ) )
+      except AtaskError:
+         result = kwargs['default']
+   else:
+      text = invoke( cmd, False )
+      result = eval( text.replace('\n', '' ) )
+
+   return result
 
 
 def shell_quote(text):
@@ -873,7 +889,7 @@ class Parameter(object):
                value = default
                defaultUsed = True
             else:
-               raise NoValueError("\n{0}No value obtained for parameter '{1}'.".format(_cmd_token(),name))
+               raise NoValueError("\n{0}No value obtained for parameter '{1}'.".format(_cmd_token(),self.__name))
 
          elif value == "!!" :
             raise AbortError("\n{0}Aborted prompt for parameter '{1}'.".format(_cmd_token(),name))

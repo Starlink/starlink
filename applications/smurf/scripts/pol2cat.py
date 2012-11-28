@@ -194,6 +194,8 @@
 *        Original version
 *     16-NOV-2012 (DSB):
 *        Use a temporary ADAM directory for each invocation.
+*     27-NOV-2012 (DSB):
+*        Ensure the script runs even if no ~/adam/GLOBAL.sdf file exists.
 
 *-
 '''
@@ -202,6 +204,7 @@
 import starutil
 from starutil import invoke
 from starutil import NDG
+from starutil import Parameter
 from starutil import ParSys
 from starutil import msg_out
 
@@ -219,7 +222,8 @@ try:
    params = []
 
    params.append(starutil.ParNDG("IN", "The input POL2 time series NDFs",
-                                 starutil.get_task_par("DATA_ARRAY","GLOBAL")))
+                                 starutil.get_task_par("DATA_ARRAY","GLOBAL",
+                                                       default=Parameter.UNSET)))
 
    params.append(starutil.Par0S("CAT", "The output FITS vector catalogue",
                                  "out.FIT"))
@@ -253,7 +257,8 @@ try:
                                  noprompt=True))
 
    params.append(starutil.Par0S("DEVICE", "Device for graphical output",
-                                 starutil.get_task_par("GRAPHICS_DEVICE","GLOBAL"),
+                                 starutil.get_task_par("GRAPHICS_DEVICE",
+                                                       "GLOBAL",default=None),
                                  noprompt=True))
 
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
