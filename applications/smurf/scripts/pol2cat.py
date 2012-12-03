@@ -54,6 +54,9 @@
 *        The configuration to use when cleaning the raw data. This should
 *        be specified in the same way as the CONFIG parameter for
 *        SMURF:MAKEMAP. ["^$STARLINK_DIR/share/smurf/dimmconfig.lis"]
+*     DEBIAS = LOGICAL (Given)
+*        TRUE if a correction for statistical bias is to be made to
+*        percentage polarization and polarized intensity. [FALSE]
 *     DEVICE = LITERAL (Read)
 *        The name of the graphics device on which to produce the vector
 *        plot.  [current graphics device]
@@ -265,6 +268,9 @@ try:
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
+   params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
+                                "and IP?", False, noprompt=True))
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -340,6 +346,9 @@ try:
 
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
+
+#  See statistical debiasing is to be performed.
+   debias = parsys["DEBIAS"].value
 
 #  The following call to SMURF:CALCQU creates two HDS container files -
 #  one holding a set of Q NDFs and the other holding a set of U NDFs. Create
@@ -568,7 +577,7 @@ try:
    invoke( "$POLPACK_DIR/polext {0} stokes=qui".format(cube) )
 
 #  Create a FITS catalogue containing the polarisation vectors.
-   command = "$POLPACK_DIR/polvec {0} cat={1}".format(cube,outcat)
+   command = "$POLPACK_DIR/polvec {0} cat={1} debias={2}".format(cube,outcat,debias)
    if pimap:
       command = "{0} ip={1}".format(command,pimap)
       msg_out( "Creating the output catalogue {0} and polarised intensity map {1}...".format(outcat,pimap) )
