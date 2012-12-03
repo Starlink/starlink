@@ -584,14 +584,15 @@ class ParSys(object):
             name = None
             value = item
 
-         if value[0] == "\"" or value[0] == "'":
-            if value[0] == value[-1]:
-               value = value[1:-1]
+         if len(value) > 0:
+            if value[0] == "\"" or value[0] == "'":
+               if value[0] == value[-1]:
+                  value = value[1:-1]
 
-         if name == None:
-            byPosition.append(value)
-         else:
-            byName[name] = value
+            if name == None:
+               byPosition.append(value)
+            else:
+               byName[name] = value
 
       #  Loop round all legal parameter names, maintaining the zero-based
       #  index of the current parameter..
