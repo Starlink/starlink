@@ -2677,7 +2677,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
        happened, and will tell the caller. */
 
     if( *status == SMF__INSMP ) {
-      errAnnul( status );
+      if( msgIflev( NULL, status ) >= MSG__VERB ) {
+         errFlush( status );
+      } else {
+         errAnnul( status );
+      }
       msgOut(""," ************************* Warning! *************************",
              status );
       msgOut(""," This continuous chunk failed due to insufficient samples.",
