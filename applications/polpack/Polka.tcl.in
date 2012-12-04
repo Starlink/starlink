@@ -67,6 +67,9 @@ fi
 #        input image is used for reference only.
 #     24-APR-2000 (DSB):
 #        Check that the right versions of CCDPACK and KAPPA are available.
+#     4-DEC-2012 (DSB):
+#        Check for undefined font when creating label describing current 
+#        canvas interaction mode.
 #-
 
 # Uncomment this section to see the names of all procedure as they are
@@ -607,7 +610,11 @@ fi
 
 # Create a label displaying a description of the current canvas
 # interaction mode.
-      set DESC [label $col3.desc -textvariable INFO_TEXT -relief raised -bd 2 -font $RB_FONT -pady 1m]
+      if { $RB_FONT != "" } {
+         set DESC [label $col3.desc -textvariable INFO_TEXT -relief raised -bd 2 -font $RB_FONT -pady 1m]
+      } else {
+         set DESC [label $col3.desc -textvariable INFO_TEXT -relief raised -bd 2 -pady 1m]
+      }
       pack $DESC -padx 3m -pady 2m -expand 1 -fill x
 
 # Create the canvas in column 3...
