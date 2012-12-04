@@ -31031,7 +31031,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 }{
    \sstdescription{
       This routine closes the graphics data base and PGPLOT workstation
-      previously opened by KPG1\_PGOPN.
+      previously opened by KPG1\_PGOPN. It does nothing if PGPLOT is not
+      currently active.
    }
    \sstinvocation{
       CALL KPG1\_PGCLS( PNAME, SAVCUR, STATUS )
@@ -40616,11 +40617,12 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       values for these keys by prepending each key name with the strings
       {\tt "}850{\tt "} and {\tt "}450{\tt "} (say). Thus, the user could supply values for any
       or all of: {\tt "}par1{\tt "}, {\tt "}par2{\tt "}, {\tt "}450.par1{\tt "}, {\tt "}450.par2{\tt "}, {\tt "}850.par1{\tt "},
-      {\tt "}850.par2{\tt "}.
+      {\tt "}850.par2{\tt "}. Note, values supplied without any prefix take priority
+      over values supplied with a prefix.
 
       The {\tt "}nested{\tt "} keymap supplied by the caller serves two functions: 1)
       it defines the known alternatives, and 2) it specifies which of the
-      aternatives is to be used. Each key in the supplied {\tt "}nested{\tt "} keymap
+      alternatives is to be used. Each key in the supplied {\tt "}nested{\tt "} keymap
       should be the name of an allowed alternative. In the above example,
       a KeyMap containing keys {\tt "}850{\tt "} and {\tt "}450{\tt "} could be supplied. No
       error is reported if the user-supplied configuration fails to
@@ -40632,13 +40634,15 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       So first, the configuration parameters specified by the supplied
       defaults file are examined. Any parameter that starts with the name
       of the selected alternative (i.e. the key within {\tt "}nested{\tt "} that has
-      an associated value of 1) has the name of the alternative removed.
+      an associated value of 1) has the name of the alternative removed
+      (but only if no value has been supplied for the parameter without
+      an alternative prefix - thus {\tt "}filt=10{\tt "} takes priority of {\tt "}450.filt=20{\tt "}).
       Any parameter that start with the name of any of the other
       alternatives is simply removed from the configuration. Thus, using
       the above example, if {\tt "}nested{\tt "} contains two entries - one with key
       {\tt "}850{\tt "} and value {\tt "}1{\tt "}, and the other with key {\tt "}450{\tt "} and value {\tt "}0{\tt "} -
       the {\tt "}850.par1{\tt "} and {\tt "}850.par2{\tt "} entries in the defaults file would be
-      renamed as {\tt "}par1{\tt "} and {\tt "}par2{\tt "} (over-writing the original values for
+      renamed as {\tt "}par1{\tt "} and {\tt "}par2{\tt "} (so long as no values already existed for
       {\tt "}par1{\tt "} and {\tt "}par2{\tt "}), and the {\tt "}450.par1{\tt "} and {\tt "}450.par2{\tt "} entries would
       be deleted.
 

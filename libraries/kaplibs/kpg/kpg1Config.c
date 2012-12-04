@@ -8,8 +8,8 @@
 
 
 /* Prototypes for internal helper routines */
-static void kpg1Config_ProcessNesting( AstKeyMap *keymap, AstKeyMap *nested,
-                                       int *status );
+static AstKeyMap *kpg1Config_ProcessNesting( AstKeyMap *keymap, AstKeyMap *nested,
+                                             int *status );
 static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
                                    const char *param, int *status );
 
@@ -51,11 +51,12 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *     values for these keys by prepending each key name with the strings
 *     "850" and "450" (say). Thus, the user could supply values for any
 *     or all of: "par1", "par2", "450.par1", "450.par2", "850.par1",
-*     "850.par2".
+*     "850.par2". Note, values supplied without any prefix take priority
+*     over values supplied with a prefix.
 *
 *     The "nested" keymap supplied by the caller serves two functions: 1)
 *     it defines the known alternatives, and 2) it specifies which of the
-*     aternatives is to be used. Each key in the supplied "nested" keymap
+*     alternatives is to be used. Each key in the supplied "nested" keymap
 *     should be the name of an allowed alternative. In the above example,
 *     a KeyMap containing keys "850" and "450" could be supplied. No
 *     error is reported if the user-supplied configuration fails to
@@ -67,13 +68,15 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *     So first, the configuration parameters specified by the supplied
 *     defaults file are examined. Any parameter that starts with the name
 *     of the selected alternative (i.e. the key within "nested" that has
-*     an associated value of 1) has the name of the alternative removed.
+*     an associated value of 1) has the name of the alternative removed
+*     (but only if no value has been supplied for the parameter without
+*     an alternative prefix - thus "filt=10" takes priority of "450.filt=20").
 *     Any parameter that start with the name of any of the other
 *     alternatives is simply removed from the configuration. Thus, using
 *     the above example, if "nested" contains two entries - one with key
 *     "850" and value "1", and the other with key "450" and value "0" -
 *     the "850.par1" and "850.par2" entries in the defaults file would be
-*     renamed as "par1" and "par2" (over-writing the original values for
+*     renamed as "par1" and "par2" (so long as no values already existed for
 *     "par1" and "par2"), and the "450.par1" and "450.par2" entries would
 *     be deleted.
 *
@@ -152,6 +155,10 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *        Correct handling of case where the user supplied "def" to
 *        indicate that the defaults should be accepted. In this case
 *        there is no "external" keymap.
+*     4-DEC-2012 (DSB):
+*        Changed so that values supplied without any prefix take priority
+*        over values supplied with a prefix (it used to be the other way
+*        round).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -185,7 +192,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
    grpDelet( &grp, status );
 
 /* Handle nested entries */
-   kpg1Config_ProcessNesting( result, nested, status );
+   result = kpg1Config_ProcessNesting( result, nested, status );
 
 /* Lock the KeyMap so that an error will be reported if an attempt
    is made to add any new entries to it. */
@@ -213,7 +220,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
          kpg1Kymap( grp, &external, status );
 
 /* Handle alternate nested entries */
-         kpg1Config_ProcessNesting( external, nested, status );
+         external = kpg1Config_ProcessNesting( external, nested, status );
 
 /* Test every entry in the user-supplied configuration keymap. If an
    entry is found which does not exist in the defaults keymap, report an
@@ -260,17 +267,18 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
  * This function handles the nesting. Does nothing if the supplied "nested" keymap
  * is NULL.
  * For each key in "nested" sees if a corresponding key is present in "keymap".
- * If it is present the value in "nested" is checked. If true the contents are
- * copied to the base keymap. The entry is then deleted.
+ * If it is present the value in "nested" is checked. If true, entries
+ * that exist in "nested" but do not exist in "keymap" are copied into "keymap".
+ * The entry is then deleted.
  */
 
-static void kpg1Config_ProcessNesting( AstKeyMap * keymap, AstKeyMap * nested,
-                                       int * status ) {
+static AstKeyMap *kpg1Config_ProcessNesting( AstKeyMap * keymap, AstKeyMap * nested,
+                                             int * status ) {
   size_t i;
   size_t nnest;
 
-  if (*status != SAI__OK) return;
-  if (! nested ) return;
+  if (*status != SAI__OK) return keymap;
+  if (! nested ) return keymap;
 
   nnest = astMapSize( nested );
   for (i=0; i < nnest; i++) {
@@ -290,6 +298,7 @@ static void kpg1Config_ProcessNesting( AstKeyMap * keymap, AstKeyMap * nested,
         astMapGet0I( nested, testkey, &keep );
 
         if (keep) {
+
           AstObject * obj = NULL;
           AstKeyMap * subkeymap = NULL;
           /* Get the named nested keymap from "keymap" */
@@ -298,7 +307,19 @@ static void kpg1Config_ProcessNesting( AstKeyMap * keymap, AstKeyMap * nested,
           obj = NULL;
 
           if (astIsAKeyMap( subkeymap ) ) {
-            astMapCopy( keymap, subkeymap );
+
+            /* Copy the contents of the main keymap into the test keymap,
+               first removing the test keymap form the main keymap to avoid
+               copying the test keymap into itself. We then continue to
+               use the expanded test keymap in place of the main keymap.
+               This process gives priority to values in the main keymap
+               (i.e. if main keymap has "filt=10" and test keymap "450" has
+               "filt=20", the main keymap is left holding "filt=10"). */
+            astMapRemove( keymap, testkey );
+            astMapCopy( subkeymap, keymap );
+            (void) astAnnul( keymap );
+            keymap = astClone( subkeymap );
+
           } else {
             if (*status == SAI__OK) {
               *status = SAI__ERROR;
@@ -309,7 +330,12 @@ static void kpg1Config_ProcessNesting( AstKeyMap * keymap, AstKeyMap * nested,
             }
           }
           subkeymap = astAnnul( subkeymap );
+
+        /* If we do not need the subkeymap, remove it. */
+        } else {
+          astMapRemove( keymap, testkey );
         }
+
       } else {
         if (*status == SAI__OK) {
           *status = SAI__ERROR;
@@ -318,14 +344,9 @@ static void kpg1Config_ProcessNesting( AstKeyMap * keymap, AstKeyMap * nested,
           break;
         }
       }
-
-      /* Now remove the nested item from "keymap" since we do not need it
-         any more. */
-      astMapRemove( keymap, testkey );
-
     }
   }
-
+  return keymap;
 }
 
 static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
