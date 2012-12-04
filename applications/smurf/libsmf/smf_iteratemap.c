@@ -393,6 +393,9 @@
 *     2012-11-26 (DSB):
 *        If time-streams are being delayed, add an equal and opposite
 *        delay to the fakemap data.
+*     2012-12-04 (DSB):
+*        Re-initialise the "lastmap" array (that holds the map created by
+*        the previous iteration) to zero at the start of each chunk.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -675,8 +678,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   msize = mdims[0] * mdims[1];
 
   /* Allocate space for the previous map and difference for convergence tests */
-  lastmap = astCalloc( msize, sizeof(*lastmap) );
-  mapchange = astCalloc( msize, sizeof(*lastmap) );
+  lastmap = astMalloc( msize*sizeof(*lastmap) );
+  mapchange = astMalloc( msize*sizeof(*mapchange) );
 
   /* Always need to initialize these masks. The buffers will get
      allocated in smf_get_mask if ast.zero_circle (etc) was set. */
@@ -1334,6 +1337,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       chisquared = astCalloc( 1, sizeof(*chisquared) );
       lastchisquared = astCalloc( 1, sizeof(*chisquared) );
     }
+
+    /* Zero the array holding the map created on the previous iteration. */
+    memset( lastmap, 0, msize*sizeof(*lastmap) );
 
     /* Create containers for time-series model components******************* */
 
