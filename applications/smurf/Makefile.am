@@ -168,7 +168,7 @@ DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
 # Install without modification
 STATICSCRIPTS = scripts/jcmtstate2cat scripts/mcehead2cat scripts/dumpocscfg scripts/gettsys \
 scripts/distortion scripts/showdistortion scripts/tobeam scripts/print_index \
-scripts/pol2cat.py scripts/starutil.py \
+scripts/pol2cat.py scripts/starutil.py scripts/skyloop.py \
 scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/canfar_scuba2_map.sh \
 scripts/sc2tsnoise scripts/canfar_sc2noise
 
