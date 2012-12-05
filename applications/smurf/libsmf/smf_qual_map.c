@@ -63,6 +63,9 @@
 *        Change error handling to avoid segfault if an error is reported
 *        in irqNxtqn, causing "bit" to be zero, which then gets
 *        decremented to -1, and used as an array index...
+*     2012-12-5 (DSB):
+*        If the NDF has not Quality component, return an array full of zeros,
+*        with "*family" set to SMF__QFAM_NULL.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,6 +118,7 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
   unsigned char *qmap;  /* pointer to mapped unsigned bytes */
   void *qpntr[1];       /* Somewhere to put the mapped pointer */
   smf_qual_t *retval = NULL; /* Returned pointer */
+  int there;            /* Does the NDF Have a Quality component? */
   char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
 
 
@@ -130,169 +134,173 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
      initialisation. */
   retval = astCalloc( nout, sizeof(*retval) );
 
-  /* READ and UPDATE mode require that the QUALITY is processed
-     and copied before being returned. WRITE mode means that the
-     buffer contains no information to copy yet. WRITE/ZERO
-     and WRITE/BAD also require that we do not do any quality
-     handling */
-  if ( strncmp(mode, "WRITE",5) == 0 ) {
-    /* WRITE and WRITE/ZERO are actually treated the same way
-       because we always initialise */
-    if ( strcmp( mode, "WRITE/BAD") == 0 ) {
-      for (i=0; i<nout; i++) {
-        retval[i] = VAL__BADQ;
-      }
-    }
+  /* If the NDF has no QUality component, return the buffer filled with
+     zeros. */
+  ndfState( indf, "QUALITY", &there, status );
+  if( there ) {
 
-    /* unmap the NDF buffer and return the pointer */
-    if (family) *family = lfamily;
-    return retval;
+     /* READ and UPDATE mode require that the QUALITY is processed
+        and copied before being returned. WRITE mode means that the
+        buffer contains no information to copy yet. WRITE/ZERO
+        and WRITE/BAD also require that we do not do any quality
+        handling */
+     if ( strncmp(mode, "WRITE",5) == 0 ) {
+       /* WRITE and WRITE/ZERO are actually treated the same way
+          because we always initialise */
+       if ( strcmp( mode, "WRITE/BAD") == 0 ) {
+         for (i=0; i<nout; i++) {
+           retval[i] = VAL__BADQ;
+         }
+       }
+
+       /* unmap the NDF buffer and return the pointer */
+       if (family) *family = lfamily;
+       return retval;
+     }
+
+     /* Map the quality component (we always need to do this) */
+     ndfMap( indf, "QUALITY", "_UBYTE", mode, &qpntr[0], &itemp, status );
+     qmap = qpntr[0];
+
+     /* Need to find out what quality names are in play so we
+        can work out which family to translate them to */
+     irqFind( indf, &qlocs, xname, status );
+     numqn = irqNumqn( qlocs, status );
+
+     if ( *status == IRQ__NOQNI || numqn == 0) {
+       /* do not have any names defined so we have no choice
+          in copying the values directly out the file */
+       if (*status != SAI__OK) errAnnul( status );
+
+       /* simple copy with type conversion */
+       for (i=0; i<nout; i++) {
+         retval[i] = qmap[i];
+       }
+
+     } else {
+       IRQcntxt contxt = 0;
+    int ndfqtosmf[NDFBITS];        /* NDF bit (arr index) and SMURF alternative */
+    int ndfqtoval[NDFBITS];        /* NDF bit (arr index) and corresponding Qual value */
+    int ndfqval[NDFBITS];          /* Bit values for NDF quality */
+    int identity = 1;        /* Is this a simple identity map? */
+
+       /* prefill the mapping with bit to bit mapping */
+       for (i=0; i<NDFBITS; i++) {
+         ndfqtosmf[i] = i;
+         ndfqtoval[i] = BIT_TO_VAL(i);
+         ndfqval[i] = ndfqtoval[i];
+       }
+
+       /* Now translate each name to a bit */
+       for (i = 0; i < numqn && *status == SAI__OK; i++) {
+         char qname[IRQ__SZQNM+1];
+         char commnt[IRQ__SZCOM+1];
+         int fixed;
+         int value;
+         int bit;
+         int done;
+         smf_qual_t qval;
+         smf_qfam_t tmpfam = 0;
+
+         irqNxtqn( qlocs, &contxt, qname, &fixed, &value, &bit,
+                   commnt,sizeof(commnt), &done, status );
+      bit--;    /* IRQ starts at 1 */
+
+         /* Now convert the quality name to a quality value
+            and convert that to a bit. These should all be
+            less than 9 bits because they are in the NDF file. */
+         qval = smf_qual_str_to_val( qname, &tmpfam, status );
+
+         if (*status == SMF__BADQNM ) {
+           /* annul status and just copy this bit from the file
+              to SMURF without change. This might result in a clash
+              of bits but we either do that or drop out the loop
+              and assume everything is broken */
+           if (*status != SAI__OK) errAnnul(status);
+           ndfqtosmf[bit] = bit;
+           ndfqtoval[bit] = BIT_TO_VAL(bit);
+
+         } else if( *status == SAI__OK ){
+           if (lfamily == SMF__QFAM_NULL) {
+             lfamily = tmpfam;
+           } else if (lfamily != tmpfam) {
+             msgOutif(MSG__QUIET, "",
+                      "WARNING: Quality names in file come from different families",
+                      status );
+           }
+           ndfqtosmf[bit] = smf_qual_to_bit( qval, status );
+           ndfqtoval[bit] = qval;
+
+           /* not a 1 to 1 bit translation */
+           if (bit != ndfqtosmf[bit]) identity = 0;
+         }
+       }
+
+       /* Now copy from the file and translate the bits. If this is an
+          identity mapping or we do not know the family then we go quick. */
+       if (*status == SAI__OK) {
+         if ( (identity && lfamily != SMF__QFAM_TCOMP) || lfamily == SMF__QFAM_NULL) {
+           for (i=0; i<nout; i++) {
+             retval[i] = qmap[i];
+           }
+         } else {
+           for (i=0; i<nout; i++) {
+             if (qmap[i] == 0) {
+               /* Output buffer would be set to zero but it already has that value */
+             } else {
+               /* this becomes a very laborious bitwise copy.
+                One to one mapping for TSERIES and MAP families. */
+               if (lfamily == SMF__QFAM_TSERIES ||
+                   lfamily == SMF__QFAM_MAP ) {
+                 size_t k;
+                 for (k=0; k<NDFBITS; k++) {
+                   if ( qmap[i] & ndfqval[k] ) retval[i] |= ndfqtoval[k];
+                 }
+
+               } else if (lfamily == SMF__QFAM_TCOMP) {
+                 size_t k;
+                 /* This requires some guess work */
+                 for (k=0; k<NDFBITS; k++) {
+                   if ( qmap[i] & ndfqval[k]) {
+                     if (ndfqtoval[k] & SMF__TCOMPQ_BAD ) {
+                       retval[i] |= (SMF__Q_BADB|SMF__Q_BADDA);
+                     } else if (ndfqtoval[k] & SMF__TCOMPQ_ENDS) {
+                       retval[i] |= (SMF__Q_PAD|SMF__Q_APOD);
+                     } else if (ndfqtoval[k] & SMF__TCOMPQ_BLIP) {
+                       retval[i] |= (SMF__Q_SPIKE | SMF__Q_JUMP | SMF__Q_FILT | SMF__Q_LOWAP | SMF__Q_BADEF);
+                     } else if (ndfqtoval[k] & SMF__TCOMPQ_MATCH) {
+                       retval[i] |= SMF__Q_COM;
+                     } else if (ndfqtoval[k] & SMF__TCOMPQ_TEL) {
+                       retval[i] |= SMF__Q_STAT;
+                     } else {
+                       /* just do the normal mapping */
+                       retval[i] |= ndfqtoval[k];
+                     }
+                   }
+                 }
+
+               } else {
+                 *status = SAI__ERROR;
+                 errRep("", "Did not recognize quality family. "
+                        "(Possible programming error)", status );
+                 break;
+               }
+
+             }
+           }
+
+           /* we have uncompressed */
+           if (lfamily == SMF__QFAM_TCOMP) lfamily = SMF__QFAM_TSERIES;
+         }
+       }
+     }
+
+     /* Free quality */
+     irqRlse( &qlocs, status );
+
+     /* no longer need the mapped data */
+     ndfUnmap( indf, "QUALITY", status );
   }
-
-  /* Map the quality component (we always need to do this) */
-  ndfMap( indf, "QUALITY", "_UBYTE", mode, &qpntr[0], &itemp, status );
-  qmap = qpntr[0];
-
-  /* Need to find out what quality names are in play so we
-     can work out which family to translate them to */
-  irqFind( indf, &qlocs, xname, status );
-  numqn = irqNumqn( qlocs, status );
-
-  if ( *status == IRQ__NOQNI || numqn == 0) {
-    /* do not have any names defined so we have no choice
-       in copying the values directly out the file */
-    if (*status != SAI__OK) errAnnul( status );
-
-    /* simple copy with type conversion */
-    for (i=0; i<nout; i++) {
-      retval[i] = qmap[i];
-    }
-
-  } else {
-    IRQcntxt contxt = 0;
-    int ndfqtosmf[NDFBITS];     /* NDF bit (arr index) and SMURF alternative */
-    int ndfqtoval[NDFBITS];     /* NDF bit (arr index) and corresponding Qual value */
-    int ndfqval[NDFBITS];       /* Bit values for NDF quality */
-    int identity = 1;     /* Is this a simple identity map? */
-
-    /* prefill the mapping with bit to bit mapping */
-    for (i=0; i<NDFBITS; i++) {
-      ndfqtosmf[i] = i;
-      ndfqtoval[i] = BIT_TO_VAL(i);
-      ndfqval[i] = ndfqtoval[i];
-    }
-
-    /* Now translate each name to a bit */
-    for (i = 0; i < numqn && *status == SAI__OK; i++) {
-      char qname[IRQ__SZQNM+1];
-      char commnt[IRQ__SZCOM+1];
-      int fixed;
-      int value;
-      int bit;
-      int done;
-      smf_qual_t qval;
-      smf_qfam_t tmpfam = 0;
-
-      irqNxtqn( qlocs, &contxt, qname, &fixed, &value, &bit,
-                commnt,sizeof(commnt), &done, status );
-      bit--; /* IRQ starts at 1 */
-
-      /* Now convert the quality name to a quality value
-         and convert that to a bit. These should all be
-         less than 9 bits because they are in the NDF file. */
-      qval = smf_qual_str_to_val( qname, &tmpfam, status );
-
-      if (*status == SMF__BADQNM ) {
-        /* annul status and just copy this bit from the file
-           to SMURF without change. This might result in a clash
-           of bits but we either do that or drop out the loop
-           and assume everything is broken */
-        if (*status != SAI__OK) errAnnul(status);
-        ndfqtosmf[bit] = bit;
-        ndfqtoval[bit] = BIT_TO_VAL(bit);
-
-      } else if( *status == SAI__OK ){
-        if (lfamily == SMF__QFAM_NULL) {
-          lfamily = tmpfam;
-        } else if (lfamily != tmpfam) {
-          msgOutif(MSG__QUIET, "",
-                   "WARNING: Quality names in file come from different families",
-                   status );
-        }
-        ndfqtosmf[bit] = smf_qual_to_bit( qval, status );
-        ndfqtoval[bit] = qval;
-
-        /* not a 1 to 1 bit translation */
-        if (bit != ndfqtosmf[bit]) identity = 0;
-      }
-    }
-
-    /* Now copy from the file and translate the bits. If this is an
-       identity mapping or we do not know the family then we go quick. */
-    if ( (identity && lfamily != SMF__QFAM_TCOMP) || lfamily == SMF__QFAM_NULL) {
-      for (i=0; i<nout; i++) {
-        retval[i] = qmap[i];
-      }
-    } else {
-      if (*status == SAI__OK) {
-        for (i=0; i<nout; i++) {
-          if (qmap[i] == 0) {
-            /* Output buffer would be set to zero but it already has that value */
-          } else {
-            /* this becomes a very laborious bitwise copy.
-             One to one mapping for TSERIES and MAP families. */
-            if (lfamily == SMF__QFAM_TSERIES ||
-                lfamily == SMF__QFAM_MAP ) {
-              size_t k;
-              for (k=0; k<NDFBITS; k++) {
-                if ( qmap[i] & ndfqval[k] ) retval[i] |= ndfqtoval[k];
-              }
-
-            } else if (lfamily == SMF__QFAM_TCOMP) {
-              size_t k;
-              /* This requires some guess work */
-              for (k=0; k<NDFBITS; k++) {
-                if ( qmap[i] & ndfqval[k]) {
-                  if (ndfqtoval[k] & SMF__TCOMPQ_BAD ) {
-                    retval[i] |= (SMF__Q_BADB|SMF__Q_BADDA);
-                  } else if (ndfqtoval[k] & SMF__TCOMPQ_ENDS) {
-                    retval[i] |= (SMF__Q_PAD|SMF__Q_APOD);
-                  } else if (ndfqtoval[k] & SMF__TCOMPQ_BLIP) {
-                    retval[i] |= (SMF__Q_SPIKE | SMF__Q_JUMP | SMF__Q_FILT | SMF__Q_LOWAP | SMF__Q_BADEF);
-                  } else if (ndfqtoval[k] & SMF__TCOMPQ_MATCH) {
-                    retval[i] |= SMF__Q_COM;
-                  } else if (ndfqtoval[k] & SMF__TCOMPQ_TEL) {
-                    retval[i] |= SMF__Q_STAT;
-                  } else {
-                    /* just do the normal mapping */
-                    retval[i] |= ndfqtoval[k];
-                  }
-                }
-              }
-
-            } else {
-              *status = SAI__ERROR;
-              errRep("", "Did not recognize quality family. "
-                     "(Possible programming error)", status );
-              break;
-            }
-
-          }
-        }
-      }
-
-      /* we have uncompressed */
-      if (lfamily == SMF__QFAM_TCOMP) lfamily = SMF__QFAM_TSERIES;
-
-    }
-
-  }
-
-  /* Free quality */
-  irqRlse( &qlocs, status );
-
-  /* no longer need the mapped data */
-  ndfUnmap( indf, "QUALITY", status );
 
   if (family) *family = lfamily;
   return retval;
