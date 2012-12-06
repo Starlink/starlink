@@ -28,7 +28,8 @@
 *        1 - Replace them with zero.
 *        2 - Replace them with the mean value in the plane, or with the
 *            most recent valid mean plane value, if the plane has no good
-*            values.
+*            values. 1D and 2D NDFs are padded with pixel aaxes of length
+*            one to define a 3D array.
 *     dataptr = double * (Given)
 *        The array in which to store the imported NDF data values. Must
 *        have the same dimensions as "refdata".
@@ -50,6 +51,8 @@
 *  History:
 *     22-OCT-2012 (DSB):
 *        Original version.
+*     6-DECV-2012 (DSB):
+*        Improve error messages.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -123,28 +126,27 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
    reference NDF. */
       if( data->dtype != SMF__DOUBLE ) {
          *status = SAI__ERROR;
-         errRepf( " ", "EXT model supplied in '%s' has incorrect data "
-                  "type - should be DOUBLE PRECISION.", status, name );
+         errRepf( " ", "NDF '%s' has incorrect data type - should be "
+                  "DOUBLE PRECISION.", status, name );
 
       } else if( data->ndims != refdata->ndims ) {
          *status = SAI__ERROR;
-         errRepf( " ", "EXT model supplied in '%s' is %zu dimensional - "
-                  "must be %zu dimensional.", status, name, data->ndims,
-                  refdata->ndims );
+         errRepf( " ", "NDF '%s' is %zu dimensional - must be %zu "
+                  "dimensional.", status, name, data->ndims, refdata->ndims );
 
       } else {
          for( i = 0; i < refdata->ndims; i++ ) {
             if( data->dims[i] != refdata->dims[i] &&
                 *status == SAI__OK ){
                *status = SAI__ERROR;
-               errRepf( " ", "EXT model supplied in '%s' has incorrect "
-                        "dimension %zu on pixel axis %zu - should be %zu.", status,
+               errRepf( " ", "NDF '%s' has incorrect dimension %zu on "
+                        "pixel axis %zu - should be %zu.", status,
                         name, data->dims[i], i + 1, refdata->dims[i] );
             } else if( data->lbnd[i] != refdata->lbnd[i] &&
                 *status == SAI__OK ){
                *status = SAI__ERROR;
-               errRepf( " ", "EXT model supplied in '%s' has incorrect "
-                        "lower bound %d on pixel axis %zu - should be %d.", status,
+               errRepf( " ", "NDF '%s' has incorrect lower bound %d on "
+                        "pixel axis %zu - should be %d.", status,
                         name, data->lbnd[i], i + 1, refdata->lbnd[i] );
             }
             nel *= data->dims[i];
@@ -158,7 +160,7 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
          if( data->ndims < 3 ) data->dims[2] = 1;
          if( data->ndims < 2 ) data->dims[1] = 1;
 
-/* Retain bad valiues. */
+/* Retain bad values. */
          if( bad == 0 )  {
             memcpy( pout, pin, nel*sizeof(*pin) );
 
@@ -205,7 +207,8 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
                      }
                   } else {
                      *status = SAI__ERROR;
-                     errRepf( " ", "smf_import_array: Plane %d has no good values.", status, i );
+                     errRepf( " ", "NDF '%s' has no good values in plane "
+                              "%d.", status, name, i );
                      break;
                   }
                }
