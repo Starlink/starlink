@@ -26,10 +26,9 @@
 *        Indicates how bad values within the input NDF should be handled:
 *        0 - Retain them
 *        1 - Replace them with zero.
-*        2 - Replace them with the mean value in the plane, or with the
-*            most recent valid mean plane value, if the plane has no good
-*            values. 1D and 2D NDFs are padded with pixel aaxes of length
-*            one to define a 3D array.
+*        2 - Replace them with the mean value in the time-slice, or with the
+*            most recent valid mean time-slice value, if the time-slice has
+*            no good values.
 *     dataptr = double * (Given)
 *        The array in which to store the imported NDF data values. Must
 *        have the same dimensions as "refdata".
@@ -52,7 +51,9 @@
 *     22-OCT-2012 (DSB):
 *        Original version.
 *     6-DECV-2012 (DSB):
-*        Improve error messages.
+*        - Improve error messages.
+*        - Correct ordering of pixel axes when replacing bad values with
+*        time-slice mean values.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -95,17 +96,19 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
 
 /* Local Variables: */
    Grp *igrp;                  /* Group holding NDF name */
-   double *p2;                 /* Pointer to start of plane */
+   dim_t nbolo;                /* Number of bolometers */
+   dim_t ntslice;              /* Number of time slices */
    double *pin;                /* Pointer to next input value */
    double *pout;               /* Pointer to next output value */
    double mean;                /* Mean value int he plane */
    double vsum;                /* Sum of good data values */
    int nbad;                   /* Number of bad data values */
    int ngood;                  /* Number of good data values */
+   size_t bstride;             /* Stride between bolometer values */
    size_t i;                   /* Loop count */
    size_t j;                   /* Loop count */
-   size_t k;                   /* Loop count */
    size_t nel = 1;             /* Number of elements in array */
+   size_t tstride;             /* Stride between time slices */
    smfData *data;              /* Model for one sub-array */
 
 /* Check inherited status. */
@@ -174,41 +177,46 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
                }
             }
 
-/* Replace bad values with the mean value in the plane. */
+/* Replace bad values with the mean value in the time slice. */
          } else if( bad == 2 )  {
+            smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
+                          &tstride, status );
+
             mean = VAL__BADD;
 
-            for( i = 0; i < data->dims[2]; i++ ) {
+            for( i = 0; i < ntslice; i++ ) {
                vsum = 0.0;
                ngood = 0;
                nbad = 0;
-               p2 = pout;
-               for( j = 0; j < data->dims[1]; j++ ) {
-                  for( k = 0; k < data->dims[0]; k++,pin++,pout++ ) {
-                     if( *pin != VAL__BADD ) {
-                        *pout = *pin;
-                        vsum += *pin;
-                        ngood++;
-                     } else {
-                        *pout = VAL__BADD;
-                        nbad++;
-                     }
+               pin = (double *) data->pntr[0] + i*tstride;
+               pout = dataptr + i*tstride;
+
+               for( j = 0; j < nbolo; j++ ) {
+                  if( *pin != VAL__BADD ) {
+                     *pout = *pin;
+                     vsum += *pin;
+                     ngood++;
+                  } else {
+                     *pout = VAL__BADD;
+                     nbad++;
                   }
+                  pin += bstride;
+                  pout += bstride;
                }
 
                if( ngood > 0 ) mean = vsum/ngood;
 
                if( nbad > 0 ) {
                   if( mean != VAL__BADD ) {
-                     for( j = 0; j < data->dims[1]; j++ ) {
-                        for( k = 0; k < data->dims[0]; k++,p2++ ) {
-                           if( *p2 == VAL__BADD ) *p2 = mean;
-                        }
+                     pout = dataptr + i*tstride;
+                     for( j = 0; j < nbolo; j++ ) {
+                        if( *pout == VAL__BADD ) *pout = mean;
+                        pout += bstride;
                      }
                   } else {
                      *status = SAI__ERROR;
                      errRepf( " ", "NDF '%s' has no good values in plane "
-                              "%d.", status, name, i );
+                              "%zu.", status, name, i );
                      break;
                   }
                }
