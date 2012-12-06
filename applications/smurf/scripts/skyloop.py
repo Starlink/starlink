@@ -6,8 +6,8 @@
 *     skyloop
 
 *  Purpose:
-*     Run makemap in a loop such that all continuous chunks of input data
-*     contribute to the map at the end of each iteration.
+*     Create a map using the "inside-out" algorithm described at
+*     http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html
 
 *  Language:
 *     python (2.7 or 3.*)
@@ -15,12 +15,12 @@
 *  Description:
 *     This script makes a map from specified raw time-series data. It
 *     runs SMURF:MAKEMAP multiple times, performing a single iteration of
-*     the Dynamic Iterative Map-Maker algorithm on each invocation. Each
-*     map created by MAKEMAP is used as the initial sky estimate for the
-*     next invocation. MAKEMAP subtracts this initial sky estimate from the
-*     time-series data before starting the first (and only) iteration,
-*     and then adds the initial sky estimate back on at the end prior to
-*     creating the output map.
+*     the Dynamic Iterative Map-Maker algorithm on each invocation,
+*     including data from all chunks. Each map created by MAKEMAP is used
+*     as the initial sky estimate for the next invocation. MAKEMAP subtracts
+*     this initial sky estimate from the time-series data before starting
+*     the first (and only) iteration, and then adds the initial sky estimate
+*     back on at the end prior to creating the output map.
 
 *  Usage:
 *     skyloop in out niter pixsize config [itermap] [ref] [mask2] [mask3]
@@ -36,6 +36,7 @@
 *           itermap=0
 *           noi.calcfirst=1
 *           exportNDF=ext
+*           noexportsetbad=1
 *           exportclean=1
 *           ast.zero_notlast = 0
 *           flt.zero_notlast = 0
@@ -289,6 +290,7 @@ try:
                               # pre-calculate NOI before the iteration starts.
    fd.write("exportNDF=ext\n")# Save the EXT model values to avoid
                               # re-calculation on each invocation of makemap.
+   fd.write("noexportsetbad=1\n")# Export good EXT values for bad bolometers
    fd.write("exportclean=1\n")  # Likewise save the cleaned time-series data.
    fd.write("ast.zero_notlast = 0\n") # Masking is normally not performed
    fd.write("flt.zero_notlast = 0\n") # on the last iteration. But the first
