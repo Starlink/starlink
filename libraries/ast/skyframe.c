@@ -338,10 +338,6 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 #define SOLSID 1.00273790935
 
 /* Define values for the different values of the SkyRefIs attribute. */
-#define BAD_REF 0
-#define POLE_REF 1
-#define ORIGIN_REF 2
-#define IGNORED_REF 3
 #define POLE_STRING "Pole"
 #define ORIGIN_STRING "Origin"
 #define IGNORED_STRING "Ignored"
@@ -2646,9 +2642,9 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    } else if ( !strcmp( attrib, "skyrefis" ) ) {
       ival = astGetSkyRefIs( this );
       if ( astOK ) {
-         if( ival == POLE_REF ){
+         if( ival == AST__POLE_REF ){
             result = POLE_STRING;
-         } else if( ival == IGNORED_REF ){
+         } else if( ival == AST__IGNORED_REF ){
             result = IGNORED_STRING;
          } else {
             result = ORIGIN_STRING;
@@ -3519,7 +3515,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
          }
 
 /* If the SkyRef attribute has a set value, append " offset" to the label. */
-         if( astGetSkyRefIs( this ) != IGNORED_REF &&
+         if( astGetSkyRefIs( this ) != AST__IGNORED_REF &&
              ( astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 ) ) ) {
             sprintf( getlabel_buff, "%s offset", result );
             result = getlabel_buff;
@@ -4109,7 +4105,7 @@ static const char *GetSymbol( AstFrame *this, int axis, int *status ) {
 
 /* If the SkyRef attribute had a set value, prepend "D" (for "delta") to the
    Symbol. */
-         if( astGetSkyRefIs( this ) != IGNORED_REF &&
+         if( astGetSkyRefIs( this ) != AST__IGNORED_REF &&
              ( astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 ) ) ) {
             sprintf( getsymbol_buff, "D%s", result );
             result = getsymbol_buff;
@@ -4326,7 +4322,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 
 /* See if an offset coordinate system is being used.*/
       offset = ( astTestSkyRef( this, 0 ) || astTestSkyRef( this, 1 ) )
-               && ( astGetSkyRefIs( this ) != IGNORED_REF );
+               && ( astGetSkyRefIs( this ) != AST__IGNORED_REF );
 
 /* Use this to determine if the word "coordinates" or "offsets" should be
    used.*/
@@ -4474,7 +4470,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 /* If the SkyRef attribute has set values, create a description of the offset
    coordinate system. */
             if( offset ){
-               word = ( astGetSkyRefIs( this ) == POLE_REF )?"pole":"origin";
+               word = ( astGetSkyRefIs( this ) == AST__POLE_REF )?"pole":"origin";
                lextra = sprintf( gettitle_buff2, "%s at %s ", word,
                            astFormat( this, 0, astGetSkyRef( this, 0 ) ) );
                lextra += sprintf( gettitle_buff2 + lextra, "%s",
@@ -7318,7 +7314,7 @@ f     function is invoked with STATUS set to an error value, or if it
    if ( !astOK ) return result;
 
 /* Return a UnitMap if the offset coordinate system is not defined. */
-   if( astGetSkyRefIs( this ) == IGNORED_REF ||
+   if( astGetSkyRefIs( this ) == AST__IGNORED_REF ||
        ( !astTestSkyRef( this, 0 ) && !astTestSkyRef( this, 1 ) ) ) {
       result = (AstMapping *) astUnitMap( 2, "", status );
 
@@ -7342,7 +7338,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* First deal with cases where the SkyRef attribute holds the standard
    coords at the origin of the offset coordinate system. */
-      if( astGetSkyRefIs( this ) == ORIGIN_REF ) {
+      if( astGetSkyRefIs( this ) == AST__ORIGIN_REF ) {
 
 /* Convert each point into a 3-vector of unit length. The SkyRef position
    defines the X axis in the offset coord system. */
@@ -8522,13 +8518,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
                && ( nc >= len ) ) {
 
       if( astChrMatch( setting + offset, POLE_STRING ) ) {
-         astSetSkyRefIs( this, POLE_REF );
+         astSetSkyRefIs( this, AST__POLE_REF );
 
       } else if( astChrMatch( setting + offset, ORIGIN_STRING ) ) {
-         astSetSkyRefIs( this, ORIGIN_REF );
+         astSetSkyRefIs( this, AST__ORIGIN_REF );
 
       } else if( astChrMatch( setting + offset, IGNORED_STRING ) ) {
-         astSetSkyRefIs( this, IGNORED_REF );
+         astSetSkyRefIs( this, AST__IGNORED_REF );
 
       } else if( astOK ) {
          astError( AST__OPT, "astSet(%s): option '%s' is unknown in '%s'.", status,
@@ -9143,7 +9139,7 @@ static void SetSystem( AstFrame *this_frame, AstSystemType system, int *status )
 /* Also set AlignOffset and SkyRefIs so that the following call to
    astConvert does not align in offset coords. */
       astSetAlignOffset( sfrm, 0 );
-      astSetSkyRefIs( sfrm, IGNORED_REF );
+      astSetSkyRefIs( sfrm, AST__IGNORED_REF );
 
 /* Get the Mapping from the original System to the new System. Invoking
    astConvert will recursively invoke SetSystem again. This is why we need
@@ -9576,10 +9572,10 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    this case we use a UnitMap to connect them. */
       if( ( astGetFrameFlags( target_frame ) & AST__INTFLAG ) == 0 ) {
          if( astGetAlignOffset( target ) &&
-             astGetSkyRefIs( target ) != IGNORED_REF &&
+             astGetSkyRefIs( target ) != AST__IGNORED_REF &&
              template && astIsASkyFrame( template ) ){
             if( astGetAlignOffset( (AstSkyFrame *) template ) &&
-                astGetSkyRefIs( (AstSkyFrame *) template ) != IGNORED_REF ) {
+                astGetSkyRefIs( (AstSkyFrame *) template ) != AST__IGNORED_REF ) {
                match = 1;
                *map = (AstMapping *) astUnitMap( 2, "", status );
             }
@@ -10887,7 +10883,7 @@ astMAKE_CLEAR(SkyFrame,NegLon,neglon,-INT_MAX)
 /* Supply a default of 0 for absolute coords and 1 for offset coords if
    no NegLon value has been set. */
 astMAKE_GET(SkyFrame,NegLon,int,0,( ( this->neglon != -INT_MAX ) ?
-this->neglon : (( astGetSkyRefIs( this ) == ORIGIN_REF )? 1 : 0)))
+this->neglon : (( astGetSkyRefIs( this ) == AST__ORIGIN_REF )? 1 : 0)))
 
 /* Set a NegLon value of 1 if any non-zero value is supplied. */
 astMAKE_SET(SkyFrame,NegLon,int,neglon,( value != 0 ))
@@ -10987,10 +10983,10 @@ astMAKE_TEST(SkyFrame,Projection,( this->projection != NULL ))
 
 *att--
 */
-astMAKE_CLEAR(SkyFrame,SkyRefIs,skyrefis,BAD_REF)
+astMAKE_CLEAR(SkyFrame,SkyRefIs,skyrefis,AST__BAD_REF)
 astMAKE_SET(SkyFrame,SkyRefIs,int,skyrefis,value)
-astMAKE_TEST(SkyFrame,SkyRefIs,( this->skyrefis != BAD_REF ))
-astMAKE_GET(SkyFrame,SkyRefIs,int,IGNORED_REF,(this->skyrefis == BAD_REF ? IGNORED_REF : this->skyrefis))
+astMAKE_TEST(SkyFrame,SkyRefIs,( this->skyrefis != AST__BAD_REF ))
+astMAKE_GET(SkyFrame,SkyRefIs,int,AST__IGNORED_REF,(this->skyrefis == AST__BAD_REF ? AST__IGNORED_REF : this->skyrefis))
 
 /*
 *att++
@@ -11362,11 +11358,11 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* --------- */
    set = TestSkyRefIs( this, status );
    ival = set ? GetSkyRefIs( this, status ) : astGetSkyRefIs( this );
-   if( ival == POLE_REF ) {
+   if( ival == AST__POLE_REF ) {
       astWriteString( channel, "SRefIs", set, 0, POLE_STRING,
                       "Rotated to put pole at ref. pos." );
 
-   } else if( ival == IGNORED_REF ) {
+   } else if( ival == AST__IGNORED_REF ) {
       astWriteString( channel, "SRefIs", set, 0, IGNORED_STRING,
                       "Not rotated (ref. pos. is ignored)" );
 
@@ -11598,7 +11594,7 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
       new->projection = NULL;
       new->neglon = -INT_MAX;
       new->alignoffset = -INT_MAX;
-      new->skyrefis = BAD_REF;
+      new->skyrefis = AST__BAD_REF;
       new->skyref[ 0 ] = AST__BAD;
       new->skyref[ 1 ] = AST__BAD;
       new->skyrefp[ 0 ] = AST__BAD;
@@ -11779,13 +11775,13 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* --------- */
       sval = astReadString( channel, "srefis", " " );
       if( sval ){
-         new->skyrefis = BAD_REF;
+         new->skyrefis = AST__BAD_REF;
          if( astChrMatch( sval, POLE_STRING ) ) {
-            new->skyrefis = POLE_REF;
+            new->skyrefis = AST__POLE_REF;
          } else if( astChrMatch( sval, ORIGIN_STRING ) ) {
-            new->skyrefis = ORIGIN_REF;
+            new->skyrefis = AST__ORIGIN_REF;
          } else if( astChrMatch( sval, IGNORED_STRING ) ) {
-            new->skyrefis = IGNORED_REF;
+            new->skyrefis = AST__IGNORED_REF;
          } else if( !astChrMatch( sval, " " ) && astOK ){
 	    astError( AST__INTER, "astRead(SkyFrame): Corrupt SkyFrame contains "
 		      "invalid SkyRefIs attribute value (%s).", status, sval );

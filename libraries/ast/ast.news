@@ -21,6 +21,12 @@ to be generated when writing a FrameSet to FITS-WCS headers if the
 current Frame describes generalised spherical coordinates (i.e. a
 SkyFrame with System=Unknown).
 
+- When a FitsChan is used to write an "offset" SkyFrame (see attribute
+SkyRefIs) to a FITS-WCS encoded header, two alternate axis descriptions
+are now created - one for the offset coordinates and one for the absolute
+coordinates. If such a header is subsequently read back into AST, the
+original offset SkyFrame is recreated.
+
 
 Main Changes in V7.1.0
 ----------------------
