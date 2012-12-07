@@ -31625,6 +31625,8 @@ static void TidyOffsets( AstFrameSet *fset, int *status ) {
    the FrameSet contains any (absolute) SKY frames. Also set the SkyRefIs
    attribute for any absolute SkyFrames that were marked with domains
    SKY_POLE or SKY_OFFSET in WcsSkyFrame. */
+   hasabs = 0;
+   hasoff = 0;
    nfrm = astGetNframe( fset );
    for( ifrm = 1; ifrm <= nfrm; ifrm++ ){
       skyrefis = NULL;
@@ -31645,12 +31647,10 @@ static void TidyOffsets( AstFrameSet *fset, int *status ) {
                } else if( !strcmp( dom, "SKY_POLE" ) ){
                   hasabs = 1;
                   skyrefis = "POLE";
-                  astClearDomain( pfrm );
                   iax = nax;
                } else if( !strcmp( dom, "SKY_ORIGIN" ) ){
                   hasabs = 1;
                   skyrefis = "ORIGIN";
-                  astClearDomain( pfrm );
                   iax = nax;
                }
             }
@@ -31677,22 +31677,27 @@ static void TidyOffsets( AstFrameSet *fset, int *status ) {
          nax = astGetNaxes( frm );
          for( iax = 0; iax < nax; iax++ ) {
             astPrimaryFrame( frm, iax, &pfrm, &pax );
-            dom = astGetDomain( pfrm );
-            if( dom ) {
-               if( !strcmp( dom, "SKY_OFFSETS" ) ){
-                  remove = 1;
-                  iax = nax;
-               } else if( !strcmp( dom, "SKY" ) ){
-                  astClearIdent( frm );
+            if( astIsASkyFrame( pfrm ) ) {
+               dom = astGetDomain( pfrm );
+               if( dom ) {
+                  if( !strcmp( dom, "SKY_OFFSETS" ) ){
+                     remove = 1;
+                     iax = nax;
+
+                  } else if( !strcmp( dom, "SKY_POLE" ) ||
+                             !strcmp( dom, "SKY_ORIGIN" ) ){
+                     astClearIdent( frm );
+                     astClearDomain( pfrm );
 
 /* If we will be deleting the original current Frame (because it is an
    offset Frame), then mark the first absolute Frame as the new current
    Frame. */
-                  if( icurr_is_offset ) {
-                     astSetCurrent( fset, ifrm );
-                     icurr_is_offset = 0;
+                     if( icurr_is_offset ) {
+                        astSetCurrent( fset, ifrm );
+                        icurr_is_offset = 0;
+                     }
+                     iax = nax;
                   }
-                  iax = nax;
                }
             }
             pfrm = astAnnul( pfrm );
