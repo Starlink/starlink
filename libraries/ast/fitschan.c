@@ -1043,6 +1043,11 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     10-AUG-2012 (DSB):
 *        Default DSS keywords CNPIX1 and CNPIX2 to zero if they are
 *        absent, rather than reporting an error.
+*     7-DEC-2012 (DSB):
+*        When writing out a FrameSet that uses an SkyFrame to describe a
+*        generalised spherical coordinate system ("system=unknown"), ensure
+*        that the generated FITS CTYPE values use FITS-compliant codes
+*        for the axis type ( "xxLN/xxLT" or "xLON/xLAT" ).
 *class--
 */
 
@@ -26850,6 +26855,7 @@ static int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
    int isys;                /* Celestial coordinate system */
    int latax;               /* Index of latitude axis in SkyFrame */
    int lonax;               /* Index of longitude axis in SkyFrame */
+   int ok;                  /* Do axis symbols conform to FITS-WCS CTYPE form? */
    int old_ignore_used;     /* Original setting of external ignore_used variable */
    int ret;                 /* Returned flag */
 
@@ -26982,11 +26988,32 @@ static int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
          strcpy( lontype, "AZ--" );
          strcpy( lattype, "EL--" );
 
-/* For unknown systems, use the axis symbols within CTYPE */
+/* For unknown systems, use the axis symbols within CTYPE if they conform
+   to the requirement of FITS-WCS (i.e. "xxLN/xxLT" or "xLON/xLAT") or use
+   "UNLN/UNLT" otherwise. */
       } else {
          latsym = astGetSymbol( skyfrm, latax );
          lonsym = astGetSymbol( skyfrm, lonax );
          if( astOK ) {
+
+            ok = 0;
+            if( strlen( latsym ) == 4 && strlen( lonsym ) == 4 ) {
+               if( !strcmp( latsym + 2, "LT" ) &&
+                   !strcmp( lonsym + 2, "LN" ) &&
+                   !strncmp( latsym, lonsym, 2 ) ) {
+                  ok = 1;
+               } else if( !strcmp( latsym + 1, "LAT" ) &&
+                   !strcmp( lonsym + 1, "LON" ) &&
+                   !strncmp( latsym, lonsym, 1 ) ) {
+                  ok = 1;
+               }
+            }
+
+            if( !ok ) {
+               latsym = "UNLT";
+               lonsym = "UNLN";
+            }
+
             strncpy( lontype, lonsym, 4 );
             for( i = strlen( lonsym ); i < 4; i++ ) {
                lontype[ i ] = '-';
