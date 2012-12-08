@@ -42,7 +42,6 @@ C     Local variables:
       LOGICAL*4 DO_ROTATE           ! Temporary variable
       INTEGER*4 ISTAT               ! GEN status return
       INTEGER*4 LDATA               ! Total size of the cube (words)
-      INTEGER*4 IPTR_DATA           ! Pointer to DATA array
       INTEGER*4 IPTR_BUF            ! Pointer to BUF array
       INTEGER*4 NEW_CUBE_ADDRESS    ! Address of VM for created cube.
       INTEGER*4 NEW_INDEX_ADDRESS   ! Address of VM for created index.
@@ -135,12 +134,11 @@ C  for the updated INDEX array
         IFAIL = 51
         GO TO 99
       END IF
-      IPTR_DATA = IPTR_BUF + 4*NPTS1
 
 C  Rotate map
 
       CALL ROTATE (THETA, %VAL(CNF_PVAL(IPTR_BUF)),
-     &             %VAL(CNF_PVAL(IPTR_DATA)),
+     &             %VAL(CNF_PVAL(IPTR_BUF)+(4*NPTS1)),
      &             MSTEP, NSTEP, NPTS1,
      &             %VAL(CNF_PVAL(CURRENT_INDEX_ADDRESS)),
      &             %VAL(CNF_PVAL(NEW_INDEX_ADDRESS)),
