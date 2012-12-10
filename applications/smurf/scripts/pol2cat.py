@@ -39,6 +39,15 @@
 *     See parameter PLOT. However, it is usually much more versatile and
 *     convenient to examine the final catalogue using TOPCAT, or the
 *     polarimetry toolbox in GAIA.
+*
+*     The script produces several intermediate files that are placed in a
+*     newly created directory that is normally deleted before the script
+*     exits. The files can be retained for debugging purposes if required
+*     by running the script with "retain=yes" on the command line. These
+*     temporary files are placed in a directory name "NDG_xxxxx", located
+*     within the directory specified by environment variable STAR_TEMP.
+*     If STAR_TEMP is not defined, they are placed in the system's
+*     temporary directory (e.g. "/tmp").
 
 *  Usage:
 *     pol2cat in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
@@ -626,15 +635,18 @@ try:
       else:
          invoke( "$POLPACK_DIR/polplot {0} colmag={1} key=yes style=def device={2}".format(selcat,plot,device), buffer=True)
 
-#  Delete all temporary NDFs etc
-   if retain:
-      msg_out( "Retaining temporary files in {0}".format(NDG.tempdir))
-   else:
-      NDG.cleanup()
+#  Remove temporary files.
+   cleanup()
 
 #  If an StarUtilError of any kind occurred, display the message but hide the
-#  python traceback. To see the trace back, uncomment "raise()" instead.
+#  python traceback. To see the trace back, uncomment "raise" instead.
 except starutil.StarUtilError as err:
-#  raise()
+#  raise
    print( err )
+   cleanup()
+
+# This is to trap control-C etc, so that we can clean up temp files.
+except:
+   cleanup()
+   raise
 

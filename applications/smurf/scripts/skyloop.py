@@ -26,7 +26,7 @@
 *     time-series files that may be 2 to 3 times the size of the entire
 *     set of raw data files included in the map, and a 2D map for every
 *     iteration. These files are placed in a newly created directory that
-*     is normally deleted before the script exist. The files can be retained
+*     is normally deleted before the script exits. The files can be retained
 *     for debugging purposes if required by running the script with
 *     "retain=yes" on the command line.
 *
@@ -492,15 +492,14 @@ try:
    cleanup()
 
 
-
-
 #  If an StarUtilError of any kind occurred, display the message but hide the
-#  python traceback. To see the trace back, uncomment "raise()" instead.
+#  python traceback. To see the trace back, uncomment "raise" instead.
 except starutil.StarUtilError as err:
-#  raise()
+#  raise
    print( err )
    cleanup()
 
+# This is to trap control-C etc, so that we can clean up temp files.
 except:
    cleanup()
    raise
