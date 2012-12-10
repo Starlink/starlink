@@ -33,7 +33,6 @@
 *
 *        - First iteration:
 *           numiter=1
-*           itermap=0
 *           noi.calcfirst=1
 *           exportNDF=ext
 *           noexportsetbad=1
@@ -41,10 +40,14 @@
 *           ast.zero_notlast = 0
 *           flt.zero_notlast = 0
 *           com.zero_notlast = 0
+*           itermap=0
+*           shortmap=0
+*           bolomap=0
+*           flagmap=0
+*           sampcube=0
 *
 *        - Subsequent iterations:
 *           numiter=1
-*           itermap=0
 *           noi.calcfirst=1
 *           doclean=0
 *           importsky=ref
@@ -52,10 +55,14 @@
 *           ast.zero_notlast = 0
 *           flt.zero_notlast = 0
 *           com.zero_notlast = 0
+*           itermap=0
+*           shortmap=0
+*           bolomap=0
+*           flagmap=0
+*           sampcube=0
 *
 *        - Last iteration:
 *           numiter=1
-*           itermap=0
 *           noi.calcfirst=1
 *           doclean=0
 *           importsky=ref
@@ -63,6 +70,11 @@
 *           ast.zero_notlast = 1
 *           flt.zero_notlast = 1
 *           com.zero_notlast = 1
+*           itermap=0
+*           shortmap=0
+*           bolomap=0
+*           flagmap=0
+*           sampcube=0
 *
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
@@ -284,6 +296,11 @@ try:
    fd = open(conf0,"w")       # Open the new config file.
    fd.write("{0}\n".format(config)) # Inherit the supplied config parameter values.
    fd.write("numiter=1\n")    # MAKEMAP should do only one iteration.
+   fd.write("itermap=0\n")    # Itermaps don't make sense
+   fd.write("bolomap=0\n")    # Bolomaps don't make sense
+   fd.write("shortmap=0\n")   # Shortmaps don't make sense
+   fd.write("flagmap=0\n")    # Flagaps don't make sense
+   fd.write("sampcube=0\n")   # Sampcubes don't make sense
    fd.write("noi.calcfirst=1\n")# The NOI model is usually calculated after the
                               # first ieration, which is no use to use as
                               # we are only doing one iteration. So instead
