@@ -212,7 +212,23 @@ from starutil import Parameter
 from starutil import ParSys
 from starutil import msg_out
 
+#  Assume for the moment that we will not be retaining temporary files.
+retain = 0
 
+#  A function to clean up before exiting. Delete all temporary NDFs etc,
+#  unless the script's RETAIN parameter indicates that they are to be
+#  retained. Also delete the script's temporary ADAM directory.
+def cleanup():
+   global retain
+   ParSys.cleanup()
+   if retain:
+      msg_out( "Retaining temporary files in {0}".format(NDG.tempdir))
+   else:
+      NDG.cleanup()
+
+
+#  Catch any exception so that we can always clean up, even if control-C
+#  is pressed.
 try:
 
 #  Declare the script parameters. Their positions in this list define
@@ -615,9 +631,6 @@ try:
       msg_out( "Retaining temporary files in {0}".format(NDG.tempdir))
    else:
       NDG.cleanup()
-
-#  Delete the temporary ADAM directory.
-   ParSys.cleanup()
 
 #  If an StarUtilError of any kind occurred, display the message but hide the
 #  python traceback. To see the trace back, uncomment "raise()" instead.

@@ -28,14 +28,14 @@
 *     iteration. These files are placed in a newly created directory that
 *     is normally deleted before the script exist. The files can be retained
 *     for debugging purposes if required by running the script with
-*     "retain=yes" on the command line. 
+*     "retain=yes" on the command line.
 *
-*     The temporary files are placed in a directory name "NDG_xxxxx", 
-*     located within the directory specified by environment variable 
+*     The temporary files are placed in a directory name "NDG_xxxxx",
+*     located within the directory specified by environment variable
 *     STAR_TEMP. If STAR_TEMP is not defined, they are placed in the system's
 *     temporary directory (e.g. "/tmp").
 *
-*     In addition, files holding the extinction correction factor for each 
+*     In addition, files holding the extinction correction factor for each
 *     data sample are written to the current working directory. These are
 *     deleted when the script ends.
 
@@ -231,14 +231,16 @@ new_ext_ndfs = []
 #  retained. Also delete the script's temporary ADAM directory.
 def cleanup():
    global retain, new_ext_ndfs
-   starutil.ParSys.cleanup()
-   if retain:
-      msg_out( "Retaining EXT models in {0} and temporary files in {1}".format(os.path.getcwd(),NDG.tempdir))
-   else:
-      NDG.cleanup()
-      for ext in new_ext_ndfs:
-         os.remove( ext )
-
+   try:
+      starutil.ParSys.cleanup()
+      if retain:
+         msg_out( "Retaining EXT models in {0} and temporary files in {1}".format(os.getcwd(),NDG.tempdir))
+      else:
+         NDG.cleanup()
+         for ext in new_ext_ndfs:
+            os.remove( ext )
+   except:
+      pass
 
 #  Catch any exception so that we can always clean up, even if control-C
 #  is pressed.
