@@ -871,6 +871,7 @@ class Parameter(object):
    # Define a function to get the public value of the parameter,
    # prompting the user if required.
    def _getParameterValue(self):
+      name = self._getName()
       value = self._getValue()
       default = self._getDefault()
 
@@ -890,7 +891,7 @@ class Parameter(object):
                value = default
                defaultUsed = True
             else:
-               raise NoValueError("\n{0}No value obtained for parameter '{1}'.".format(_cmd_token(),self.__name))
+               raise NoValueError("\n{0}No value obtained for parameter '{1}'.".format(_cmd_token(),name))
 
          elif value == "!!" :
             raise AbortError("\n{0}Aborted prompt for parameter '{1}'.".format(_cmd_token(),name))
@@ -908,7 +909,7 @@ class Parameter(object):
             try:
                self._setValue( value )
                self.__validate()
-               msg_out( "Parameter {0} is set to {1}\n".format(self.__name,self.__value), ATASK )
+               msg_out( "Parameter {0} is set to {1}\n".format(name,self.__value), ATASK )
 
             except InvalidParameterError as err:
                self.__error(err)

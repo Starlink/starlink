@@ -21,6 +21,23 @@
 *     this initial sky estimate from the time-series data before starting
 *     the first (and only) iteration, and then adds the initial sky estimate
 *     back on at the end prior to creating the output map.
+*
+*     The script produces several intermediate files: a set of cleaned
+*     time-series files that may be 2 to 3 times the size of the entire
+*     set of raw data files included in the map, and a 2D map for every
+*     iteration. These files are placed in a newly created directory that
+*     is normally deleted before the script exist. The files can be retained
+*     for debugging purposes if required by running the script with
+*     "retain=yes" on the command line. 
+*
+*     The temporary files are placed in a directory name "NDG_xxxxx", 
+*     located within the directory specified by environment variable 
+*     STAR_TEMP. If STAR_TEMP is not defined, they are placed in the system's
+*     temporary directory (e.g. "/tmp").
+*
+*     In addition, files holding the extinction correction factor for each 
+*     data sample are written to the current working directory. These are
+*     deleted when the script ends.
 
 *  Usage:
 *     skyloop in out niter pixsize config [itermap] [ref] [mask2] [mask3]
@@ -43,7 +60,7 @@
 *           itermap=0
 *           shortmap=0
 *           bolomap=0
-*           flagmap=0
+*           flagmap=<undef>
 *           sampcube=0
 *
 *        - Subsequent iterations:
@@ -58,7 +75,7 @@
 *           itermap=0
 *           shortmap=0
 *           bolomap=0
-*           flagmap=0
+*           flagmap=<undef>
 *           sampcube=0
 *
 *        - Last iteration:
@@ -73,7 +90,7 @@
 *           itermap=0
 *           shortmap=0
 *           bolomap=0
-*           flagmap=0
+*           flagmap=<undef>
 *           sampcube=0
 *
 *     GLEVEL = LITERAL (Read)
@@ -201,6 +218,30 @@ from starutil import NDG
 from starutil import msg_out
 
 
+#  Assume for the moment that we will not be retaining temporary files.
+retain = 0
+
+#  A list of the extinction correction NDFs created by this script. These
+#  are created and used in the current working directory, and are deleted
+#  when the script exist.
+new_ext_ndfs = []
+
+#  A function to clean up before exiting. Delete all temporary NDFs etc,
+#  unless the script's RETAIN parameter indicates that they are to be
+#  retained. Also delete the script's temporary ADAM directory.
+def cleanup():
+   global retain, new_ext_ndfs
+   starutil.ParSys.cleanup()
+   if retain:
+      msg_out( "Retaining EXT models in {0} and temporary files in {1}".format(os.path.getcwd(),NDG.tempdir))
+   else:
+      NDG.cleanup()
+      for ext in new_ext_ndfs:
+         os.remove( ext )
+
+
+#  Catch any exception so that we can always clean up, even if control-C
+#  is pressed.
 try:
 
 #  Declare the script parameters. Their positions in this list define
@@ -281,9 +322,14 @@ try:
 #  than inode numbers since something very strange seems to be happening
 #  with inode numbers for NDFs created by the starutil module (two
 #  succesive NDFs with the same path can have the same inode number).
-   orig_ndfs = {}
+   orig_cln_ndfs = {}
    for path in glob.glob("s*_con_res_cln.sdf"):
-      orig_ndfs[path] = os.stat(path).st_atime
+      orig_cln_ndfs[path] = os.stat(path).st_atime
+
+#  Note any pre-existing NDFs holding extinction values.
+   orig_ext_ndfs = {}
+   for path in glob.glob("s*_con_ext.sdf"):
+      orig_ext_ndfs[path] = os.stat(path).st_atime
 
 #  On the first invocation of makemap, we use the raw data files specified
 #  by the IN parameter to create an initial estimate of the sky. We also
@@ -299,7 +345,7 @@ try:
    fd.write("itermap=0\n")    # Itermaps don't make sense
    fd.write("bolomap=0\n")    # Bolomaps don't make sense
    fd.write("shortmap=0\n")   # Shortmaps don't make sense
-   fd.write("flagmap=0\n")    # Flagaps don't make sense
+   fd.write("flagmap=<undef>\n")# Flagmaps don't make sense
    fd.write("sampcube=0\n")   # Sampcubes don't make sense
    fd.write("noi.calcfirst=1\n")# The NOI model is usually calculated after the
                               # first ieration, which is no use to use as
@@ -345,14 +391,21 @@ try:
 #  checking each file inode number and last-accessed time against the lists
 #  of inode numbers and times that existed before makemap was run.
    for ndf in glob.glob("s*_con_res_cln.sdf"):
-      if not ndf in orig_ndfs:
+      if not ndf in orig_cln_ndfs:
          shutil.move( ndf, NDG.tempdir )
-      elif os.stat(ndf).st_atime > orig_ndfs[ndf]:
+      elif os.stat(ndf).st_atime > orig_cln_ndfs[ndf]:
          shutil.move( ndf, NDG.tempdir )
 
-#  Get the paths to the the moved files.
+#  Get the paths to the the moved cleaned files.
    cleaned = NDG( os.path.join( NDG.tempdir,"s*_con_res_cln.sdf"))
-   ext = NDG( "s*_con_ext.sdf" )
+
+#  Get a list of the extinction correction files created by the first
+#  invocation of makemap.
+   for ndf in glob.glob("s*_con_ext.sdf"):
+      if not ndf in orig_ext_ndfs:
+         new_ext_ndfs.append(ndf)
+      elif os.stat(ndf).st_atime > orig_ext_ndfs[ndf]:
+         new_ext_ndfs.append(ndf)
 
 #  Now do the second and subsequent iterations. These use the cleaned
 #  time-series data created by the first iteration as their time-series
@@ -426,7 +479,6 @@ try:
 
 
 
-
 #  Now we have done all iterations, create the output itermap cube if
 #  required.
    if itermap:
@@ -434,16 +486,20 @@ try:
       inputs = NDG( maps )
       invoke("$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".format(inputs,itermap) )
 
-#  Delete all temporary NDFs etc, unless the script's RETAIN parameter
-#  indicates that they are to be retained.
-   if retain:
-      msg_out( "Retaining temporary files in {0}".format(NDG.tempdir))
-   else:
-      NDG.cleanup()
+#  Remove temporary files.
+   cleanup()
+
+
+
 
 #  If an StarUtilError of any kind occurred, display the message but hide the
 #  python traceback. To see the trace back, uncomment "raise()" instead.
 except starutil.StarUtilError as err:
 #  raise()
    print( err )
+   cleanup()
+
+except:
+   cleanup()
+   raise
 
