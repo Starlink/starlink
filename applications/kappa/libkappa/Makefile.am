@@ -27,7 +27,7 @@ F3_ROUTINES = kaphelp.f
 
 F_ROUTINES = $(F1_ROUTINES) $(F2_ROUTINES) $(F3_ROUTINES)
 
-C_ROUTINES = carpet.c makesnr.c
+C_ROUTINES = carpet.c makesnr.c configecho.c
 
 # Create help for this library
 kapmon.hlp: $(F_ROUTINES) $(C_ROUTINES)

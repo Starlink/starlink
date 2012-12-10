@@ -326,6 +326,10 @@
          ELSE IF ( NAME .EQ. 'COMPICK' ) THEN
             CALL COMPICK ( STATUS )
 
+*  Echo configuration parameter values
+         ELSE IF ( NAME .EQ. 'CONFIGECHO' ) THEN
+            CALL CONFIGECHO ( STATUS )
+
 *  Convolves a pair of one- or two-dimensional NDFs together.
          ELSE IF ( NAME .EQ. 'CONVOLVE' ) THEN
             CALL CONVOLVE ( STATUS )

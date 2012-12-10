@@ -12679,6 +12679,8 @@ picture.}
  Reduces the size of an NDF by picking equally spaced pixels.}
 \menuitem{CONTOUR}{
  Contours a two-dimensional NDF.}
+\menuitem{CONFIGECHO}{
+ Displays a named parameter from a group of configuration parameters.}
 \menuitem{CONVOLVE}{
  Convolves a pair of one- or two-dimensional NDFs together.}
 \menuitem{COPYBAD}{
@@ -13721,6 +13723,8 @@ WCS component of an NDF.
 \begin{description}
 \classitem{CALC}
  Evaluates a mathematical expression.
+\classitem{CONFIGECHO}
+ Displays a named parameter from a group of configuration parameters.
 \classitem{NDFECHO}
  Expands a group expression into a list of explicit NDF names.
 \classitem{PARGET}
@@ -19853,6 +19857,113 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
          \sstitem
          Any number of NDF dimensions is supported.
+      }
+   }
+}
+\sstroutine{
+   CONFIGECHO
+}{
+   Display one or more configuration parameters
+}{
+   \sstdescription{
+      This application displays the name and value of one or more
+      configuration parameters, specified using parameter CONFIG.
+      The value is also written to an output parameter. The string
+      {\tt "}$<$$*$$*$$*$$>${\tt "} is displayed if the parameter is not specified by the
+      CONFIG or DEFAULTS parameter.
+   }
+   \sstusage{
+      configecho name config defaults select
+   }
+   \sstparameters{
+      \sstsubsection{
+         CONFIG = GROUP (Read)
+      }{
+         Specifies values for the configuration parameters. If the string
+         {\tt "}def{\tt "} (case-insensitive) or a null (!) value is supplied, a set
+         of default configuration parameter values will be used, as
+         specified by parameter DEFAULTS.
+
+         The supplied value should be either a comma-separated list of
+         strings or the name of a text file preceded by an up-arrow
+         character {\tt "}$\wedge${\tt "}, containing one or more comma-separated lists of
+         strings. Each string is either a {\tt "}keyword=value{\tt "} setting, or the
+         name of a text file preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such
+         text files should contain further comma-separated lists which
+         will be read and interpreted in the same manner (any blank lines
+         or lines beginning with {\tt "}\#{\tt "} are ignored). Within a text file,
+         newlines can be used as delimiters, as well as commas. Settings
+         are applied in the order in which they occur within the list,
+         with later settings over-riding any earlier settings given for
+         the same keyword.
+
+         Each individual setting should be of the form {\tt "}$<$keyword$>$=$<$value$>${\tt "}.
+         If a non-null value is supplied for parameter DEFAULTS, an error
+         will be reported if CONFIG includes values for any parameters
+         that are not included in DEFAULTS.
+      }
+      \sstsubsection{
+         DEFAULTS = LITERAL (Read)
+      }{
+         The path to a file containing the default value for every
+         allowed configuration parameter. If null (!) is supplied, no
+         defaults will be supplied for parameters that are not specified
+         by CONFIG, and no tests will be performed on the validity of
+         paramter names supplied by CONFIG. {\tt [!]}
+      }
+      \sstsubsection{
+         NAME = LITERAL (Read)
+      }{
+         The name of the configuration parameter to display.
+      }
+      \sstsubsection{
+         SELECT = GROUP (Read)
+      }{
+         A group that specifies any alternative prefixes that can be
+         included at the start of any parameter name. For instance, if
+         this group contains the two entries {\tt "}450=1{\tt "} and {\tt "}850=0{\tt "}, then
+         DEFAULTS can specify two defaults for any single parameter -
+         one for the parameter prefixed by {\tt "}450.{\tt "} and another for the
+         parameter prefixed by {\tt "}850.{\tt "} Thus if DEFAULTS defines a
+         parameter called {\tt "}filter{\tt "}, it could include {\tt "}450.filter=300{\tt "}
+         and {\tt "}850.filter=600{\tt "}. The CONFIG parameter could then either
+         set the filter parameter for a specific wavelength (as in
+         {\tt "}450.filter=234{\tt "}), or it could leave the wavelength unspecified,
+         in which case the wavelength used is the first one with a
+         non-zero value in SELECT (450 in the case of this example - 850
+         has a value zero in SELECT). Thus the names of the items in
+         SELECT define the set of allowed alternative prefixies, and the
+         values indicate which one of these alternatives is to be used
+         (the first one with non-zero value). {\tt [!]}
+      }
+      \sstsubsection{
+         VALUE = LITERAL (Write)
+      }{
+         The value of the configuration parameter, or {\tt "}$<$$*$$*$$*$$>${\tt "} if the
+         parameter has no value in CONFIG and DEFAULTS.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         configecho m81 $\wedge$myconf
+      }{
+         Report the value of configuration parameter {\tt "}m81{\tt "} defined within
+         the file {\tt "}myconf{\tt "}. If the file does not contain a value for
+         {\tt "}m51{\tt "}, then {\tt "}$<$$*$$*$$*$$>${\tt "} is displayed.
+      }
+      \sstexamplesubsection{
+         configecho {\tt '}flt.filt\_edge\_largescale{\tt '} $\backslash$
+      }{
+                 config=$\wedge$/star/share/smurf/dimmconfig.lis $\backslash$
+                 defaults=/star/bin/smurf/smurf\_makemap.def $\backslash$
+                 select={\tt "}{\tt '}450=1,850=0{\tt '}{\tt "}
+         Report the value of configuration parameter {\tt "}flt.filt\_edge\_largescale{\tt "}
+         defined within the file {\tt "}/star/share/smurf/dimmconfig.lis{\tt "}, using
+         defaults from the file {\tt "}/star/bin/smurf/smurf\_makemap.def{\tt "}. If
+         dimmconfig.lis does not contain a value for {\tt "}flt.filt\_edge\_largescale{\tt "}
+         then it is searched for {\tt "}450.flt.filt\_edge\_largescale{\tt "} instead. An
+         error is reported if dimmconfig.lis contains values for any
+         items that are not defined in smurf\_makemap.def.
       }
    }
 }
@@ -58825,6 +58936,9 @@ The following applications have been modified:
 The following new applications have been added:
 
 \begin{description}
+   \item [\htmlref{CONFIGECHO}{CONFIGECHO}] \mbox{}
+   This is intended as a scripting tool. It displays the value
+   of a named entry in a group of configuration parameters.
    \item [\htmlref{NDFECHO}{NDFECHO}] \mbox{}
    This is intended as a scripting tool. It expands a given group
    expression into a list of explicit NDF names, and displays a specified
@@ -59542,6 +59656,8 @@ functions as follows.
 \begin{description}
 \classitem{CALC}
  Evaluates a mathematical expression.
+\classitem{CONFIGECHO}
+ Displays a named parameter from a group of configuration parameters.
 \classitem{NDFECHO}
  Expands a group expression into a list of explicit NDF names.
 \classitem{PARGET}

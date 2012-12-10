@@ -11,6 +11,9 @@
 
 The following new applications have been added:
 
+   o  CONFIGECHO is intended as a scripting tool. It displays the value
+   of a named entry in a group of configuration parameters.
+
    o  NDFECHO is intended as a scripting tool. It expands a given
    group expression into a list of explicit NDF names, and displays
    a specified subset of the expanded names.

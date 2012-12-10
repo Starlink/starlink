@@ -9828,6 +9828,56 @@ package kappa {
 
       }
 
+      action configecho {
+         alias {config(echo)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter config {
+            position 2
+            type LITERAL
+            ppath CURRENT
+            prompt {Configuration parameters}
+            helpkey *
+         }
+
+         parameter defaults {
+            position 3
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Defaults file}
+            helpkey *
+            default !
+         }
+
+         parameter name {
+            position 1
+            type LITERAL
+            ppath CURRENT
+            prompt {Parameter name}
+            helpkey *
+         }
+
+         parameter select {
+            position 4
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Allowed parameter prefix selection}
+            helpkey *
+            default !
+         }
+
+         parameter value {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+         }
+      }
+
       action convolve {
          alias {conv(olve)}
 
