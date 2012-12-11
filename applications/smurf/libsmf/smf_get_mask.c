@@ -68,6 +68,11 @@
 *        Add ZERO_FREEZE parameter.
 *     18-OCT-2012 (DSB):
 *        Allow multiple masks to be used.
+*     11-DEC-2012 (DSB):
+*        Change zero_freeze so that negative values cause permanent
+*        freeze, even on iteration zero (for the benefit of the skyloop.py
+*        command). Also, initialise the new mask to hold the values implied
+*        by the quality array associated with the current map.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -161,6 +166,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    unsigned char *pm;         /* Pointer to next returned mask pixel */
    unsigned char *pn;         /* Pointer to next new mask pixel */
    unsigned char *result;     /* Returned mask pointer */
+   smf_qual_t *pq;            /* Pinter to map quality */
 
 /* Initialise returned values */
    result = NULL;
@@ -280,10 +286,22 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* No need to create a mask if no masking was requested or possible. */
          if( nmask > 0 ) {
 
-/* Note if a mask existed on entry. If not, create a mask now. */
+/* Note if a mask existed on entry. If not, create a mask now, and
+   initialise it to hold the mask defined by the initial sky map. */
             if( *mask == NULL ) {
                have_mask = 0;
-               *mask = astMalloc( dat->msize*sizeof( **mask ) );
+               if( dat->initqual ) {
+                  *mask = astMalloc( dat->msize*sizeof( **mask ) );
+                  if( *mask ) {
+                     pm = *mask;
+                     pq = dat->initqual;
+                     for( i = 0; i < dat->msize; i++ ) {
+                        *(pm++) = ( *(pq++) != 0 );
+                     }
+                  }
+               } else{
+                  *mask = astCalloc( dat->msize, sizeof( **mask ) );
+               }
             } else {
                have_mask = 1;
             }
@@ -305,9 +323,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Loop round each type of mask to be used. */
             for( imask = 0; imask < nmask && *status == SAI__OK; imask++ ){
 
-/* If we already have a mask, and the mask is now frozen, we just return
-   the existing mask. So leave the loop. */
-               if( zero_freeze > 0 && have_mask && dat->iter > zero_freeze ) {
+/* If the mask is now frozen, we just return the existing mask. So leave the
+   loop. */
+               if( zero_freeze != 0 && dat->iter > zero_freeze ) {
                   break;
 
 /* Low hits masking... */

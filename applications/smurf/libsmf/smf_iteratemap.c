@@ -2834,6 +2834,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   lastmap = astFree( lastmap );
   mapchange = astFree( mapchange );
   job_data = astFree( job_data );
+  dat.initqual = astFree( dat.initqual );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();

@@ -741,6 +741,7 @@ typedef struct smfDIMMData {
   double *map;               /* pointer to the current map estimate */
   int *hitsmap;              /* pointer to the current hits map */
   smf_qual_t *mapqual;       /* pointer to the current map quality */
+  smf_qual_t *initqual;      /* pointer to the initial sky quality */
   double *mapvar;            /* pointer to the current map variance estimate */
   double *mapweight;         /* pointer to the current map weight */
   double *mapweightsq;       /* pointer to the current map weight^2 */

@@ -143,7 +143,14 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 
 /* Map the quality array section, and copy it into the map buffer. */
       qptr = smf_qual_map( indf2, "READ", NULL, &size, status );
-      if( *status == SAI__OK ) memcpy( dat->mapqual, qptr, dat->msize*sizeof(*qptr));
+      if( *status == SAI__OK ) {
+         memcpy( dat->mapqual, qptr, dat->msize*sizeof(*qptr));
+
+/* Also copy it into another array where it can be accessed by smf_get_mask. We
+   only need to do this once. */
+         if( ! dat->initqual ) dat->initqual = astStore( NULL, qptr,
+                                                         dat->msize*sizeof(*qptr));
+      }
 
 /* End the NDF context. */
       ndfEnd( status );
