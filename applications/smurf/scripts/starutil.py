@@ -214,8 +214,18 @@ def invoke(command,aslist=False,buffer=None):
    global glevel
    global ilevel
 
+   #  Prevent atasks from prompting for a new value if a bad parameter
+   #  value is supplied.
    os.environ["ADAM_NOPROMPT"] = "1"
+
+   #  Ensure atasks set the shell status variable to indicate if the
+   #  atask succeeded or failed.
    os.environ["ADAM_EXIT"] = "1"
+
+   # Ensure that the MERS library, which atasks use to write text to
+   # standard output, does not split long lines. Without this (for
+   # instance) NDF names reported by KAPPA:NDFECHO can be mangled.
+   os.environ["MSG_SZOUT"] = "0"
 
    msg_out( "\n>>> {0}\n".format(command), ATASK )
 
