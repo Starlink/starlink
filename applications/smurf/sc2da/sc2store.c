@@ -22,6 +22,7 @@
     09Nov2010 : Add delta compression option (dsb)
     11Jan2011 : Compress JCMTSTATE using simple compression scheme (timj)
     23Feb2012 : Add sc2_1kntdtemp (timj)
+    09Dec2012 : Add sc2_mag_xyz (timj)
 */
 
 #define _POSIX_C_SOURCE 200112L
@@ -820,6 +821,9 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( sc2_mixtemp, SC2_MIXTEMP, float, VAL__BADR );
    RETRIEVE_STATE( sc2_fputemp, SC2_FPUTEMP, float, VAL__BADR );
    RETRIEVE_STATE( sc2_1kntdtemp, SC2_1KNTDTEMP, float, VAL__BADR );
+   RETRIEVE_STATE( sc2_mag_x, SC2_MAG_X, float, VAL__BADR );
+   RETRIEVE_STATE( sc2_mag_y, SC2_MAG_Y, float, VAL__BADR );
+   RETRIEVE_STATE( sc2_mag_z, SC2_MAG_Z, float, VAL__BADR );
 
    RETRIEVE_STATE( acs_exposure, ACS_EXPOSURE, float, VAL__BADR );
    RETRIEVE_STATE( acs_offexposure, ACS_OFFEXPOSURE, float, VAL__BADR );
@@ -1074,6 +1078,9 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( sc2_mixtemp, SC2_MIXTEMP, float );
    STORE_STATE( sc2_fputemp, SC2_FPUTEMP, float );
    STORE_STATE( sc2_1kntdtemp, SC2_1KNTDTEMP, float );
+   STORE_STATE( sc2_mag_x, SC2_MAG_X, float );
+   STORE_STATE( sc2_mag_y, SC2_MAG_Y, float );
+   STORE_STATE( sc2_mag_z, SC2_MAG_Z, float );
 
    /* FTS and polarimeter */
    STORE_STATE( fts_pos, FTS_POS, float );
@@ -3171,6 +3178,9 @@ int *status                 /* global status (given and returned) */
   STORE_STATE( sc2_mixtemp, "SC2_MIXTEMP", "_REAL", float, fbuff, 0 );
   STORE_STATE( sc2_fputemp, "SC2_FPUTEMP", "_REAL", float, fbuff, 0 );
   STORE_STATE( sc2_1kntdtemp, "SC2_1KNTDTEMP", "_REAL", float, fbuff, 0 );
+  STORE_STATE( sc2_mag_x, "SC2_MAG_X", "_REAL", float, fbuff, 0 );
+  STORE_STATE( sc2_mag_y, "SC2_MAG_Y", "_REAL", float, fbuff, 0 );
+  STORE_STATE( sc2_mag_z, "SC2_MAG_Z", "_REAL", float, fbuff, 0 );
 
   STORE_STATE( pol_ang, "POL_ANG", "_DOUBLE", double, dbuff, 0 );
   STORE_STATE( fts_pos, "FTS_POS", "_REAL", float, fbuff, 0 );
