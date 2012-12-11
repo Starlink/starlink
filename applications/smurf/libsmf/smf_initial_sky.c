@@ -148,11 +148,19 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 /* End the NDF context. */
       ndfEnd( status );
 
+/* Apply any the existinction correction to the cleaned bolometer data. */
+      if( dat->ext ) smf_calcmodel_ext( wf, dat, 0, keymap, dat->ext, 0,
+                                        status);
+
 /* Sample the above map at the position of each bolometer sample and
    subtract the sampled value from the cleaned nolometer value. This
    includes any masking specified by the AST.ZERO_xxx config parameters. */
       smf_calcmodel_ast( wf, dat, 0, keymap, NULL, SMF__DIMM_PREITER,
                          status);
+
+/* Remove any the existinction correction to the modifed bolometer data. */
+      if( dat->ext ) smf_calcmodel_ext( wf, dat, 0, keymap, dat->ext,
+                                        SMF__DIMM_INVERT, status);
    }
 
 /* Return the pointer to the boolean mask. */
