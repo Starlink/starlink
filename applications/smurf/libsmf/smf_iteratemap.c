@@ -1747,6 +1747,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           converged = 0;
         }
 
+        /* If we have reached the last possible iteration, we will quit
+           after this iteration. */
+        if( iter + 1 >= maxiter ) quit = 0;
+
         /* Some models (e.g. AST) need to know the iteration number, so
            store it now. */
         dat.iter = iter;
