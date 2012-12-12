@@ -57,10 +57,15 @@
 *     20-SEP-2000 (DSB):
 *        Report an error if neither ANGROT nor POLANAL Frame can be found.
 *     25-SEP-2012 (DSB):
-*        Caters for cases where the pixel coords atthe origin of the
+*        Caters for cases where the pixel coords at the origin of the
 *        POLANAL Frame are undefined. This can happen if POLANAL is a
 *        copy of a SkyFrame connected to the pixel grid via a typical
 *        spherical projection.
+*     12-DEC-2012 (DSB):
+*        - The bad ANGROT value is VAL__BADR, not AST__BAD.
+*        - Correct the "small distance" moved along the first axis of
+*        the reference frame. This was a potentially serious bug that
+*        could sometimes give spurious or bad returned values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -192,7 +197,7 @@
 
             IF( IN( 1, 1 ) .NE. AST__BAD ) THEN
                IF( IN( 1, 1 ) .NE. 0.0D0 ) THEN
-                  IN( 2, 1 ) = IN( 1, 1 ) + ABS( IN( 1, 1 )*1.001D0 )
+                  IN( 2, 1 ) = IN( 1, 1 ) + ABS( IN( 1, 1 )*0.001D0 )
                ELSE
                   IN( 2, 1 ) = IN( 1, 1 ) + 1.0D0
                END IF
@@ -210,7 +215,7 @@
                ANGROT = REAL( ATAN2( OUT( 2, 2 ) - OUT( 1, 2 ),
      :                               OUT( 2, 1 ) - OUT( 1, 1 ) )/DTOR )
             ELSE
-               ANGROT = AST__BAD
+               ANGROT = VAL__BADR
             END IF
          END IF
 
@@ -223,7 +228,7 @@
       END IF
 
 *  Report an error if ANGROT is undefined.
-      IF( ANGROT .EQ. AST__BAD .AND. STATUS .EQ. SAI__OK ) THEN
+      IF( ANGROT .EQ. VAL__BADR .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( ' ', 'The reference direction is undefined.',
      :                 STATUS )
