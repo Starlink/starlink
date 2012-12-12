@@ -564,10 +564,10 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
 
       retdata->pntr[0] = astCalloc(nretdata,
                                    smf_dtype_sz(retdata->dtype,status));
-    }
 
     /* Returned data is always bolo-ordered (ignored for maps) */
-    retdata->isTordered=0;
+       retdata->isTordered=0;
+    }
   }
 
   /* Describe the array dimensions for FFTW guru interface
