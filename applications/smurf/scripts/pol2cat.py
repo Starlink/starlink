@@ -325,7 +325,7 @@ try:
       iunits = starutil.get_task_par( "UNITS", "ndftrace" )
       if iunits != "pW":
          raise starutil.InvalidParameterError("Reference image ({0}) has "
-                    "incorrect units '{1} - must be 'pW'.".format(iref,iunit))
+                    "incorrect units '{1} - must be 'pW'.".format(iref,iunits))
 
 #  Now get the PI value to use.
    pimap = parsys["PI"].value
