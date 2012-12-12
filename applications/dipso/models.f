@@ -20,6 +20,8 @@
        LOGICAL EXISTS(MAXARR), OK,MODEL
        LOGICAL BEEP
        COMMON /BEEP/ BEEP
+       CHARACTER*1 BLEEP
+       COMMON /BLEEP / BLEEP
 
        INTEGER I, J, K
        INTEGER DELIM, CLOUD, SHIFT
@@ -121,7 +123,7 @@
             ELSE
              WRITE (*,
      :       '(''   ISINP_QIS: '',I2,'' cloud(s) will be deleted'',
-     :       '' (zero "b" or "N")'',A)') NLOST, 7
+     :       '' (zero "b" or "N")'',A)') NLOST, BLEEP
             ENDIF
              WRITE (*,
      :       '(''      Do you still want to quit (y/n): '',$)')
@@ -182,7 +184,7 @@
      :       '(''   ISINP:  quit command is QIS'')')
           ELSE
              WRITE (*,
-     :       '(''   ISINP:  quit command is QIS'',A)') 7
+     :       '(''   ISINP:  quit command is QIS'',A)') BLEEP
           ENDIF
           GO TO 300
        ENDIF
@@ -299,7 +301,7 @@
      :          '(''   ISINP:  "b" value must be positive'')')
              ELSE
                 WRITE (*,
-     :          '(''   ISINP:  "b" value must be positive'',A)') 7
+     :          '(''   ISINP:  "b" value must be positive'',A)') BLEEP
              ENDIF
           ELSE
              A(J*3-2) = TEMP(2)
@@ -326,7 +328,7 @@
              ELSE
                 WRITE (*,
      :          '(''   ISINP:'',
-     :          ''  (log) column must be greater than 0'',A)') 7
+     :          ''  (log) column must be greater than 0'',A)') BLEEP
              ENDIF
           ELSE
              IF (TEMP(2).LT.35.) THEN
@@ -363,7 +365,7 @@
      :       '(''   ISINP:  input not recognised'')')
           ELSE
              WRITE (*,
-     :       '(''   ISINP:  input not recognised'',A)') 7
+     :       '(''   ISINP:  input not recognised'',A)') BLEEP
           ENDIF
           GO TO 300
        ENDIF

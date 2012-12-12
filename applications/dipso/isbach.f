@@ -337,7 +337,7 @@
                       WRITE (*,
      :                '(''   ISCALC:  error CV-4;  please report '',
      :                ''this error to ZUVAD::IDH with details of '',
-     :                ''data and command sequence used'',A)') 7
+     :                ''data and command sequence used'',A)') BLEEP
                       OK = .FALSE.
                       GOTO 300
                    ENDIF
