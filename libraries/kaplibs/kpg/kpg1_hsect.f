@@ -109,8 +109,6 @@
       INTEGER NDIMIN
       INTEGER UBNDI( DAT__MXDIM )
       LOGICAL PRIM
-      CHARACTER NAME1*( DAT__SZNAM )
-      CHARACTER NAME3*( DAT__SZNAM )
 *.
 
 *  Check the inherited status.
@@ -165,22 +163,6 @@
 
 *  Map it as a vector.
       CALL DAT_MAPV( LOC3, TYPE, 'WRITE', IPOUT, EL, STATUS )
-
-      CALL DAT_NAME( LOC1, NAME1, STATUS )
-      CALL DAT_NAME( LOC3, NAME3, STATUS )
-
-      write(*,*) 'hsect: name=',name
-      write(*,*) '       old name=',name1
-      write(*,*) '       new name=',name3
-      write(*,*) '       ndim=',ndim
-      write(*,*) '       lbnd=',(lbnd(i),i=1,ndim)
-      write(*,*) '       ubnd=',(ubnd(i),i=1,ndim)
-      write(*,*) '       lbndi=',(lbndi(i),i=1,ndim)
-      write(*,*) '       ubndi=',(ubndi(i),i=1,ndim)
-      write(*,*) '       lbnd=',(lbnd(i),i=1,ndim)
-      write(*,*) '       type=',type
-
-
 
 *  Copy the required section of the old array into the new array. A case
 *  for each data type.
