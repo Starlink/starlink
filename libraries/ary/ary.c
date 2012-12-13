@@ -139,7 +139,7 @@ DECLARE_INTEGER(fstatus);
 F77_SUBROUTINE(ary_map)( INTEGER(iary),
                          CHARACTER(type),
                          CHARACTER(mmod),
-                         POINTER_ARRAY(pntr),
+                         POINTER(pntr),
                          INTEGER(el),
                          INTEGER(status)
                          TRAIL(type)
@@ -148,35 +148,34 @@ F77_SUBROUTINE(ary_map)( INTEGER(iary),
 void aryMap( int iary,
              const char *type,
              const char *mmod,
-             void *pntr[],
+             void **pntr,
              int *el,
              int *status ) {
 
 DECLARE_INTEGER(fiary);
 DECLARE_CHARACTER_DYN(ftype);
 DECLARE_CHARACTER_DYN(fmmod);
-DECLARE_POINTER_ARRAY_DYN(fpntr);
+DECLARE_POINTER(fpntr);
 DECLARE_INTEGER(fel);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( iary, fiary );
    F77_CREATE_EXPORT_CHARACTER( type, ftype );
    F77_CREATE_EXPORT_CHARACTER( mmod, fmmod );
-   F77_ASSOC_POINTER_ARRAY( fpntr, pntr );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_LOCK( F77_CALL(ary_map)( INTEGER_ARG(&fiary),
                       CHARACTER_ARG(ftype),
                       CHARACTER_ARG(fmmod),
-                      POINTER_ARRAY_ARG(fpntr),
+                      POINTER_ARG(&fpntr),
                       INTEGER_ARG(&fel),
                       INTEGER_ARG(&fstatus)
                       TRAIL_ARG(ftype)
                       TRAIL_ARG(fmmod) ); )
 
+   F77_IMPORT_POINTER( fpntr, *pntr );
    F77_FREE_CHARACTER( ftype );
    F77_FREE_CHARACTER( fmmod );
-   F77_FREE_POINTER( fpntr );
    F77_IMPORT_INTEGER( fel, *el );
    F77_IMPORT_INTEGER( fstatus, *status );
 
