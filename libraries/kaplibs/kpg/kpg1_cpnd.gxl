@@ -15,45 +15,52 @@
 *                        STATUS )
 
 *  Description:
-*     This routine copies a specified section of the supplied 
+*     This routine copies a specified section of the supplied
 *     n-dimensional array (IN) to an output array (OUT).
 
 *  Arguments:
-*     NDIM = INTEGER (Given) 
+*     NDIM = INTEGER (Given)
 *        The number of axes.
-*     LBNDI( NDIM ) = INTEGER (Given) 
+*     LBNDI( NDIM ) = INTEGER (Given)
 *        The lower pixel index bounds of the IN array.
-*     UBNDI( NDIM ) = INTEGER (Given) 
+*     UBNDI( NDIM ) = INTEGER (Given)
 *        The upper pixel index bounds of the IN array.
 *     IN( * ) = ? (Given)
 *        The input array. Bounds given by LBNDI and UBNDI.
-*     LBNDO( NDIM ) = INTEGER (Given) 
-*        The lower pixel index bounds of the area of the IN array to be 
-*        copied to OUT. 
-*     UBNDO( NDIM ) = INTEGER (Given) 
-*        The upper pixel index bounds of the area of the IN array to be 
-*        copied to OUT. 
+*     LBNDO( NDIM ) = INTEGER (Given)
+*        The lower pixel index bounds of the area of the IN array to be
+*        copied to OUT.
+*     UBNDO( NDIM ) = INTEGER (Given)
+*        The upper pixel index bounds of the area of the IN array to be
+*        copied to OUT.
 *     OUT( * ) = ? (Returned)
 *        The output array. Bounds given by LBNDO and UBNDO.
 *     EL = INTEGER (Returned)
 *        The number of elements in the output array. Derived from LBNDO
-*        and UBNDO. 
+*        and UBNDO.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  There is a routine for each numerical data type: replace "x" in
-*     the routine name by B, D, I, R, W, UB or UW as appropriate.  The
-*     IN and OUT arrays supplied to the routine must have the data type 
+*     the routine name by C, B, D, I, R, W, UB or UW as appropriate.  The
+*     IN and OUT arrays supplied to the routine must have the data type
 *     specified.
 *    -  If the output array is not completely contained within the input
 *    array, then the sections of the output array which fall outside the
-*    input arrays will be filled with bad values.
+*    input arrays will be filled with bad values (spaces for the
+*    CHARACTER version).
+*     - For the CHARACTER version, the input and output arrays are
+*     assumed to hold EL contiguous fix-length strings, with no trailing
+*     null characters. The length of each string is determined using the
+*     Fortran built-in "LEN" function. This should work both for
+*     CHARACATER arrays created by Fortran, and for _CHAR arrays mapped
+*     by DAT_MAPV, etc.
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -61,12 +68,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
@@ -87,13 +94,15 @@
 *        NDF__MXDIM-dimensional data.
 *     4-FEB-2008 (DSB):
 *        Now a wrapper for KPG1_PTND.
+*     13-DEC-2012 (DSB):
+*        Add support for character arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -122,4 +131,4 @@
       CALL KPG1_PTND<T>( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO, .TRUE.,
      :                   OUT, EL, STATUS )
 
-      END 
+      END

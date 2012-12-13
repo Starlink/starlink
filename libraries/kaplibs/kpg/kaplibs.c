@@ -1489,3 +1489,67 @@ void kpg1Pxscl( AstFrameSet *iwcs,
 }
 
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_hsect)( CHARACTER(LOC1),
+                            INTEGER(NDIM),
+                            INTEGER_ARRAY(LBND),
+                            INTEGER_ARRAY(UBND),
+                            CHARACTER(LOC2),
+                            CHARACTER(NAME),
+                            INTEGER(STATUS)
+                            TRAIL(LOC1)
+                            TRAIL(LOC2)
+                            TRAIL(NAME) );
+
+void kpg1Hsect( const HDSLoc *loc1, int ndim, int *lbnd, int *ubnd, HDSLoc *loc2,
+                const char *name, int *status ){
+   DECLARE_CHARACTER(LOC1,DAT__SZLOC);
+   DECLARE_INTEGER(NDIM);
+   DECLARE_INTEGER_ARRAY_DYN(LBND);
+   DECLARE_INTEGER_ARRAY_DYN(UBND);
+   DECLARE_CHARACTER(LOC2,DAT__SZLOC);
+   DECLARE_CHARACTER_DYN(NAME);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_INTEGER_ARRAY( LBND, ndim );
+   F77_CREATE_INTEGER_ARRAY( UBND, ndim );
+
+   if ( loc1 == NULL ) {
+      F77_EXPORT_LOCATOR( DAT__ROOT, LOC1 );
+   } else {
+      HDS_EXPORT_CLOCATOR( loc1, LOC1, status );
+   }
+
+   if ( loc2 == NULL ) {
+      F77_EXPORT_LOCATOR( DAT__ROOT, LOC2 );
+   } else {
+      HDS_EXPORT_CLOCATOR( loc2, LOC2, status );
+   }
+
+   F77_CREATE_EXPORT_CHARACTER( name, NAME );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_EXPORT_INTEGER( ndim, NDIM );
+   F77_EXPORT_INTEGER_ARRAY( lbnd, LBND, ndim );
+   F77_EXPORT_INTEGER_ARRAY( ubnd, UBND, ndim );
+
+
+
+   F77_LOCK( F77_CALL(kpg1_hsect)( CHARACTER_ARG(LOC1),
+                         INTEGER_ARG(&NDIM),
+                         INTEGER_ARRAY_ARG(LBND),
+                         INTEGER_ARRAY_ARG(UBND),
+                         CHARACTER_ARG(LOC2),
+                         CHARACTER_ARG(NAME),
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(LOC1)
+                         TRAIL_ARG(LOC2)
+                         TRAIL_ARG(NAME) ); )
+
+   F77_FREE_CHARACTER( NAME );
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_FREE_INTEGER( LBND );
+   F77_FREE_INTEGER( UBND );
+}
+
