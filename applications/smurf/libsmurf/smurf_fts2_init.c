@@ -32,6 +32,7 @@
  *
  *  Authors:
  *     COBA: Coskun Oba (UoL)
+ *     MSHERWOOD: Matt Sherwood (UofL)
  *
  *  History :
  *     23-NOV-2010 (COBA):
@@ -40,6 +41,8 @@
  *        - Get mirror positions via fts2_getmirrorpositions
  *        - Fixed possible memory leaks
  *        - Removed redundancies
+ *     2012-12-12 (MSHERWOOD):
+ *     	  Put back adjustment for non-centered mirror starting position.
  *
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -204,9 +207,9 @@ void smurf_fts2_init(int* status)
       goto CLEANUP;
     }
 
-    /* THIS IS NO LONGER NECESSARY SINCE THE FTS2 MIRROR POSITIONS ARE READ IN [-225, 225]
-       Transform mirror positions from [0, 450] to [-225, 225]
-       for(k = 0; k < nFrames; k++) { MIRPOS[k] -= STAGE_CENTER; } */
+    /* THIS WILL NO LONGER NECESSARY WHEN THE FTS2 MIRROR POSITIONS ARE READ IN [-225, 225]
+       Transform mirror positions from [0, 450] to [-225, 225] */
+       for(k = 0; k < nFrames; k++) { MIRPOS[k] -= STAGE_CENTER; }
 
     /* Sort mirror positions if necessary */
     if(MIRPOS[nStart] > MIRPOS[nStart + 1]) {

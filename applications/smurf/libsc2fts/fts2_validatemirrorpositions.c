@@ -25,10 +25,13 @@
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
+*     MSHERWOOD: Matt Sherwood (UofL)
 
 *  History :
 *     2012-05-24 (COBA):
 *        Original version.
+*     2012-12-12 (MSHERWOOD):
+*     	  Removed temporary testing code.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -120,13 +123,7 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
       break;
     }
   }
-  // FIND THE END INDEX
-  for(i = 0; i < count - 1; i++) {
-    if(positions[i] > 325.0) {
-      *nf = i - 1;
-      break;
-    }
-  }
+
 /*
   // CHECK TO SEE IF THE POSITIONS HAVE REPEATING VALUES IN BETWEEN
   for(i = *ni + 1; i < *nf; i++) {
