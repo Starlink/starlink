@@ -23,6 +23,7 @@
     11Jan2011 : Compress JCMTSTATE using simple compression scheme (timj)
     23Feb2012 : Add sc2_1kntdtemp (timj)
     09Dec2012 : Add sc2_mag_xyz (timj)
+    13Dec2012 : Use kpg1Hsect to get a section of an HDS array (dsb)
 */
 
 #define _POSIX_C_SOURCE 200112L
@@ -2544,21 +2545,15 @@ int *status              /* Global status (given and returned) */
 /* Only slice the array items */
                if( nelem > 1 ) {
 
-/* Extract a slice of this array that matches the pixel bounds of the NDF
-   on the third pixel axis. */
-                  datSlice( xloc2, 1, lower, upper, &xloc3, status );
-
 /* Delete the old (full-sized) component from the returned temporary HDS
    object. */
                   datErase( *yloc, hdsRecords[ j ].name, status );
 
-/* Copy the resized slice into a component of the returned temporary HDS
-   object. kpg1Datcp is identical to datCopy except that it will
-   succesfully copy an array slice (which datCopy will not). */
-                  kpg1Datcp( xloc3, *yloc, hdsRecords[ j ].name, status );
-
-/* Annul the locators. */
-                  datAnnul( &xloc3, status );
+/* Extract a slice of this array that matches the pixel bounds of the NDF
+   on the third pixel axis, and copy it to a new component in the returned
+   temporary HDS object. */
+                  kpg1Hsect( xloc2, 1, lower, upper, *yloc, hdsRecords[ j ].name,
+                             status );
 
                }
                datAnnul( &xloc2, status );
