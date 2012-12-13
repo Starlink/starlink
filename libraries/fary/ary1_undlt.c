@@ -4,7 +4,7 @@
 #include "star/hds.h"
 #include "star/hds_fortran.h"
 #include "prm_par.h"
-#include "ary_par.h"
+#include "ary.h"
 #include "ary_err.h"
 #include "ary_dlt.h"
 
@@ -334,7 +334,7 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
 *     11-OCT-2010 (DSB):
 *        Original version.
 *     2-MAR-2012 (DSB):
-*        Add checks that the number of VALUE, REPEAT and DATA values used 
+*        Add checks that the number of VALUE, REPEAT and DATA values used
 *        when uncompressing a section of the array are equal to the number
 *        implied by the FIRST_DATA, FIRRST_REPEAT and FIRST_VALUE arrays.
 *     {enter_changes_here}
