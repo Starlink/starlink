@@ -33,7 +33,7 @@ PRIVATE_INCLUDES = ARY_ACB ARY_CONST ARY_DCB ARY_MCB ARY_PCB ARY_TCB \
                    ary_dlt.h
 
 PUBLIC_F_INCLUDES = ARY_PAR
-PUBLIC_C_INCLUDES = ary_par.h
+PUBLIC_C_INCLUDES = ary_par.h ary.h
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 include_MESSAGES = ary_err.h ARY_ERR
 
@@ -45,7 +45,7 @@ ARY_N_GEN = ary_ptszx.gn ary_gtszx.gn ary1_badx.gn ary1_bppx.gn        \
 ary1_gtnx.gn ary1_gt1x.gn ary1_cvfx.gn ary1_cvtx.gn ary1_pt1x.gn       \
 ary1_ptnx.gn ary1_zerx.gn
 
-C_ROUTINES = ary1_s2dlt.c ary1_undlt.c
+C_ROUTINES = ary1_s2dlt.c ary1_undlt.c ary.c
 
 NONGEN_F_ROUTINES = ary1_init.f ary1_accok.f ary1_adiag.f ary1_anl.f   \
 ary1_annpl.f ary1_antmp.f ary1_bad.f \
