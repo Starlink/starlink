@@ -4,7 +4,7 @@
 #include "star/hds.h"
 #include "star/hds_fortran.h"
 #include "prm_par.h"
-#include "ary_par.h"
+#include "ary.h"
 #include "ary_err.h"
 #include "ary_dlt.h"
 
@@ -162,7 +162,7 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
 *     2010-11-30 (TIMJ):
 *        Avoid dereferencing off the end of an array in the check functions
 *     1-DEC-2010 (DSB):
-*        Take care with casting of size_t values used in floating point calculations. 
+*        Take care with casting of size_t values used in floating point calculations.
 *     {enter_changes_here}
 
 *  Bugs:

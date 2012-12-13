@@ -24,8 +24,7 @@ libary_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 libary_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
 
-include_HEADERS = $(PUBLIC_F_INCLUDES)
-cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
+include_HEADERS = $(PUBLIC_INCLUDES)
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
@@ -33,7 +32,7 @@ PRIVATE_INCLUDES = ARY_ACB ARY_CONST ARY_DCB ARY_MCB ARY_PCB ARY_TCB \
                    ary_dlt.h
 
 PUBLIC_F_INCLUDES = ARY_PAR
-PUBLIC_C_INCLUDES = ary_par.h ary.h
+PUBLIC_C_INCLUDES = ary.h
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 include_MESSAGES = ary_err.h ARY_ERR
 
