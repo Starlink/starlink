@@ -46,10 +46,10 @@
 *        rotated.  It must lie between -360 and 360 degrees.  The
 *        suggested default is the current value.  If a null (!) value is
 *        supplied, then the rotation angle is chosen to make north
-*        vertical.  If the current co-ordinate Frame in the input NDF
-*        is not a celestial co-ordinate frame, then the rotation angle
-*        is chosen to make the second axis of the current Frame
-*        vertical.
+*        vertical at the centre of the image.  If the current co-ordinate
+*        Frame in the input NDF is not a celestial co-ordinate frame, then
+*        the rotation angle is chosen to make the second axis of the
+*        current Frame vertical.
 *     AXES(2) = _INTEGER (Read)
 *        This parameter is only accessed if the NDF has exactly three
 *        significant pixel axes.  It should be set to the indices of the
@@ -259,6 +259,9 @@
 *        system assumed the WCS was 2-dimensional).
 *     2012 May 9 (MJC):
 *        Add _INT64 support.
+*     14-DEC-2012 (DSB):
+*        More accurate estimation of north - Estimate north at the centre
+*        of the image, using a 1 pixel increment.
 *     {enter_further_changes_here}
 
 *-
@@ -323,6 +326,8 @@
       INTEGER EL                 ! Number of elements mapped
       CHARACTER * ( NDF__SZFRM ) FORM ! Form of the NDF array
       INTEGER FRM2D              ! WCS rotation plane
+      DOUBLE PRECISION GXC       ! GRID X at centre of image
+      DOUBLE PRECISION GYC       ! GRID Y at centre of image
       INTEGER I                  ! Loop counter
       INTEGER ICOMP              ! Loop counter for array components
       INTEGER IDIM               ! Total number of dimensions
@@ -564,11 +569,15 @@
             IAXIS = 2
          END IF
 
+*  GRID coords at centre of rotation plane.
+         GXC = 0.5D0*( 1.0D0 + DIMSI( 1 ) )
+         GYC = 0.5D0*( 1.0D0 + DIMSI( 2 ) )
+
 *  Transform two points on the second GRID axis into the current Frame.
-         XP( 1 ) = 1.0D0
-         YP( 1 ) = 1.0D0
-         XP( 2 ) = 1.0D0
-         YP( 2 ) = 100.0D0
+         XP( 1 ) = GXC
+         YP( 1 ) = GYC
+         XP( 2 ) = GXC
+         YP( 2 ) = GYC + 1.0D0
          CALL AST_TRAN2( MAP2D, 2, XP, YP, .TRUE., XP, YP, STATUS )
 
 *  Find another point (C) which is to the north of point 1 (A). The

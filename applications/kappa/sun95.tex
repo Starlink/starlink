@@ -44366,7 +44366,8 @@ KAPPA: \htmlref{CADD}{CADD},
          Number of clockwise degrees by which the data array is to be
          rotated.  It must lie between -360 and 360 degrees.  The suggested
          default is the current value.  If a null ({\tt{!}}) value is supplied,
-         then the rotation angle is chosen to make north vertical.  If the
+         then the rotation angle is chosen to make north vertical at the
+         centre of the image.  If the
          current \htmlref{co-ordinate Frame}{se:domains}~  in the input NDF is not a celestial co-ordinate
          frame, then the rotation angle is chosen to make the second axis
          of the \htmlref{current Frame}{se:curframe}~ vertical.
@@ -58968,6 +58969,11 @@ The following applications have been modified:
       \begin{itemize}
         \item A new boolean parameter called VECTOR specifies the output
         format to use for vector-valued parameters.
+      \end{itemize}
+   \item [\htmlref{ROTATE}{ROTATE}]\mbox{}
+      \begin{itemize}
+        \item Now estimates north at the centre of the image rather than
+        at the bottom left corner, and uses a more accurate method.
       \end{itemize}
    \item [\htmlref{WCSADD}{WCSADD}]\mbox{}
       \begin{itemize}

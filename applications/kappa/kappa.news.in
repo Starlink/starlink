@@ -31,6 +31,11 @@ The following new applications have been added:
       -  A new boolean parameter called VECTOR specifies the output
       format to use for vector-valued parameters.
 
+   o  ROTATE
+
+      - Now estimates north at the centre of the image rather than
+      at the bottom left corner, and uses a more accurate method.
+
    o  WCSADD
 
       -  The transfer of set attribute values from basis Frame to new
