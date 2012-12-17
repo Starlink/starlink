@@ -2286,6 +2286,68 @@ package polpack {
           }
 
       }
+
+      action polrotref {
+
+         helplib {$POLPACK_HELP}
+
+         parameter qin {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {Input Q NDF}
+            helpkey *
+         }
+
+         parameter uin {
+            position 2
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {Input U NDF}
+            helpkey *
+         }
+
+         parameter qout {
+            position 3
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Output Q NDF}
+            helpkey *
+         }
+
+         parameter uout {
+            position 4
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Output U NDF}
+            helpkey *
+         }
+
+         parameter like {
+            position 5
+            type NDF
+            access READ
+            ppath CURRENT
+            vpath DEFAULT
+            prompt {Template Q or U NDF}
+            default !
+            helpkey *
+         }
+
+         parameter angle {
+            position 6
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Number of degrees clockwise rotation, or null}
+            helpkey *
+         }
+
+       }
    }
 
    command makecube {

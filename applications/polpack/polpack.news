@@ -1,14 +1,10 @@
 1 POLPACK
 
- Version 3.1-5 of POLPACK (an applications package for processing imaging
+ Version 3.2 of POLPACK (an applications package for processing imaging
  polarimetry data) is now available. It is fully documented in SUN/223.
 
- The main changes since V3.1-4 are:
+ The main changes since V3.2 are:
 
- o  A bug in POLIMAGE that caused an error to be reported when deleting
- an AXIS Frame from the NDF WCS FrameSet has been fixed.
+ o  A new command POLROTREF has been added to rotate the reference
+ direction of a pair of Q and U images.
 
- o  POLVEC now uses the absloute value of I to normalise the other STokes
- vectors. Previously, a negative value of I would cause the normalised Q
- and U values to change sign, resulting in the vector rotating by 90
- degrees.

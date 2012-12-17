@@ -24,6 +24,7 @@ pol1_cnews.f  pol1_gtctc.f  pol1_rdtcl.f  pol1_stats.f \
 pol1_cnfig.f  pol1_gtctw.f  pol1_rmbnd.f  pol1_stbin.f \
 pol1_colnm.f  pol1_gtvrc.f  pol1_setr.f   pol1_stftr.f \
 pol1_cpctd.f  pol1_gtvrs.f  pol1_setft.f  pol1_stk2.f \
-pol1_cpctr.f  pol1_gtwcs.f  pol1_simcl.f  pol1_stk.f
+pol1_cpctr.f  pol1_gtwcs.f  pol1_simcl.f  pol1_stk.f \
+pol1_trang.f  pol1_rotqu.f
 
 C_ROUTINES = polpack.c pol1_ceval.c

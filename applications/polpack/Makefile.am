@@ -6,7 +6,7 @@ dist_bin_SCRIPTS = $(MISC_FILES) $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) ve
 
 LOCAL_LINK = polsub/libpolsub.la ccdpack/libccdpack.la `$(srcdir)/polpack_link_adam`
 
-bin_MONOLITHS = polpack_mon 
+bin_MONOLITHS = polpack_mon
 polpack_mon_SOURCES = $(POLPACK_MONO_SOURCE) $(POLPACK_F_ROUTINES)
 polpack_mon_LDADD = $(LOCAL_LINK)
 polpack_mon_TASKS = $(POLPACK_TASKS)
@@ -46,20 +46,20 @@ polpack.hlp: $(POLPACK_F1_ROUTINES) polpack_master.hlp
 
 F_ROUTINES = $(CCDPACK_F_ROUTINES) \
              $(POLPACK_F_ROUTINES) $(POLSUB_F_ROUTINES) \
-             $(POLPACK_MONO_SOURCE) 
+             $(POLPACK_MONO_SOURCE)
 
 #  All other polpack .f files.
 POLPACK_F1_ROUTINES = polbin.f polcal.f polcent.f polexp.f polexpx.f \
 polext.f polhelp.f polimage.f polimp.f polimpx.f polka.f polplot.f \
 polprep.f polrdtcl.f polsim.f polstack.f polvec.f polversion.f \
-polwrtcl.f polzconv.f
+polwrtcl.f polzconv.f polrotref.f
 
-#  polpack routines for which the atask action name can be derived from the 
+#  polpack routines for which the atask action name can be derived from the
 #  the f file name by remving the .f file suffix.
-POLPACK_F_ROUTINES = $(POLPACK_F1_ROUTINES) 
+POLPACK_F_ROUTINES = $(POLPACK_F1_ROUTINES)
 
 
-MONO_SOURCE = $(POLPACK_MONO_SOURCE) 
+MONO_SOURCE = $(POLPACK_MONO_SOURCE)
 POLPACK_MONO_SOURCE = polpack_mon.f
 
 #  List of ancillary data files (all types).
@@ -72,7 +72,7 @@ left_arrow.bit right_arrow.bit tick.bit
 
 #  Define the tasks for each monolith.
 
-POLPACK_TASKS = $(POLPACK_F_ROUTINES:.f=) 
+POLPACK_TASKS = $(POLPACK_F_ROUTINES:.f=)
 
 
 #  List of public script files.  These are scripts which form part of
@@ -86,11 +86,11 @@ polexp.csh makecube.csh
 
 #  Define the set of all interface files.
 
-IFL_FILES = $(POLPACK_IFL_FILES) 
+IFL_FILES = $(POLPACK_IFL_FILES)
 
 #  Define the interface files required for compilation.
 
-POLPACK_IFL_FILES = $(POLPACK_F_ROUTINES:.f=.ifl) 
+POLPACK_IFL_FILES = $(POLPACK_F_ROUTINES:.f=.ifl)
 MONO_IFL = $(MONO_SOURCE:.f=.ifl)
 
 DYNSCRIPTS = polpack.csh polpack.sh polpack.icl
@@ -126,7 +126,7 @@ polexpx.ifc polext.ifc polhelp.ifc polimage.ifc \
 polimp.ifc polimpx.ifc polka.ifc polplot.ifc \
 polprep.ifc polrdtcl.ifc polsim.ifc polstack.ifc \
 polvec.ifc polversion.ifc polwrtcl.ifc polzconv.ifc \
-polpack_mon.ifc
+polpack_mon.ifc polrotref.ifc
 
 
 BUILT_IFL_FILES = polbin.ifl polcal.ifl polcent.ifl polexp.ifl \
@@ -134,7 +134,7 @@ polexpx.ifl polext.ifl polhelp.ifl polimage.ifl \
 polimp.ifl polimpx.ifl polka.ifl polpack_mon.ifl \
 polplot.ifl polprep.ifl polrdtcl.ifl polsim.ifl \
 polstack.ifl polvec.ifl polversion.ifl polwrtcl.ifl \
-polzconv.ifl
+polzconv.ifl polrotref.ifl
 
 EXTRA_DIST = polpack_master.hlp polka.htx_tar
 

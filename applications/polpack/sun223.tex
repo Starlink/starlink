@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.7}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {28th September 2012}
+\newcommand{\stardocdate}      {17th December 2012}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 3.1-5}
+\newcommand{\stardocversion}   {Version 3.2-0}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for
 reducing imaging polarimetry or spectropolarimetry data. They cover
@@ -2728,6 +2728,9 @@ into Stokes vectors.}{ POLKA }
 \quickdes{POLPLOT}{Displays polarization vectors supplied in a
 catalogue.}{ POLPLOT }
 
+\quickdes{POLROTREF}{Rotates the reference direction for a pair of Q and
+U images.}{ POLROTREF }
+
 \quickdes{POLSIM}{Produces intensity images corresponding to given Stokes
 vectors.}{ POLSIM }
 
@@ -5326,6 +5329,85 @@ for NDF applications.
 }
 \newpage
 \sstroutine{
+   POLROTREF
+}{
+   Rotate the reference direction in a pair of Q and U images
+}{
+   \sstdescription{
+      This application creates a new pair of Q and U images from a
+      supplied pair of Q and U images, by rotating the reference
+      direction by a specified angle. It is assumed that the supplied
+      Q and U images are aligned in pixel coordinates, and have the
+      same reference direction.
+   }
+   \sstusage{
+      polrotref qin uin qout uout like angle
+   }
+   \sstparameters{
+      \sstsubsection{
+         ANGLE = \_REAL (Read)
+      }{
+         Number of clockwise degrees by which the reference direction is
+         to be rotated. It must lie between -360 and 360 degrees. Only
+         accessed if parameter LIKE is set to null (!). The suggested
+         default is the current value.  If a null (!) value is supplied,
+         then the rotation angle is chosen to make north vertical at the
+         centre of the field. If the current co-ordinate Frame in the
+         input NDF is not a celestial co-ordinate frame, then the
+         rotation angle is chosen to make the second axis of the current
+         Frame vertical.
+      }
+      \sstsubsection{
+         LIKE = NDF (Read)
+      }{
+         A 2D Q or U image that defines the new reference direction. The
+         input Q and U images are aligned with this image in the current
+         WCS Frame. If null (!) is supplied, the rotation is defined by
+         parametrer ANGLE. [!]
+      }
+      \sstsubsection{
+         QIN = NDF (Read)
+      }{
+         The 2D input Q image. The WCS component of this NDF must contain
+         a POLANAL Frame.
+      }
+      \sstsubsection{
+         QOUT = NDF (Write)
+      }{
+         The 2D output Q image.
+      }
+      \sstsubsection{
+         UIN = NDF (Read)
+      }{
+         The 2D input U image. The WCS component of this NDF must contain
+         a POLANAL Frame.
+      }
+      \sstsubsection{
+         UOUT = NDF (Write)
+      }{
+         The 2D output U image.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         It is assumed that the supplied Q and U images are aligned in
+         pixel coordinates, and have the same reference direction.
+
+         \sstitem
+         The supplied Q and U arrays are mapped as double precision values.
+
+         \sstitem
+         Variance arrays are rotated in the same was as Data arrays.
+
+         \sstitem
+         Quality arrays are copied unchanged from input to output.
+      }
+   }
+}
+\newpage
+\sstroutine{
    POLSIM
 }{
    Produces intensity data corresponding to given Stokes vectors
@@ -6737,6 +6819,14 @@ POLPACK.
 
 
 
+\subsection{V3.2-0}
+
+\begin{itemize}
+ \item A new command called POLROTREF has been added which will rotate
+ the reference direction used by a pair of Q and U images.
+\end{itemize}
+
+
 \subsection{V3.1-5}
 
 \begin{itemize}
@@ -7068,6 +7158,8 @@ the vector map.
 \quickdes{POLKA}{An X-based GUI which converts raw photometric images into Stokes vectors.}{ POLKA }
 
 \quickdes{POLPLOT}{Displays polarization vectors supplied in a catalogue.}{ POLPLOT }
+
+\quickdes{POLROTREF}{Rotates the reference direction for a pair of Q and U images.}{ POLROTREF }
 
 \quickdes{POLSIM}{Produces intensity images corresponding to given Stokes vectors.}{ POLSIM }
 
