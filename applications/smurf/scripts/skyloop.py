@@ -262,7 +262,9 @@ try:
    params = []
 
    params.append(starutil.ParNDG("IN", "The input time series NDFs",
-                                 starutil.get_task_par("DATA_ARRAY","GLOBAL")))
+                                  starutil.get_task_par("DATA_ARRAY",
+                                                        "GLOBAL",
+                                                    default=starutil.Parameter.UNSET)))
 
    params.append(starutil.ParNDG("OUT", "The output map", default=None,
                                   exists=False, minsize=0, maxsize=1 ))
