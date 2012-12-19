@@ -77,3 +77,24 @@ do
     fi
 done
 popd
+
+# Mangle interpreter path.
+pushd ${STARLINK_DIR}
+for i in $(< ${PERLMOD_DIR}/perlmods-starperl.txt)
+do
+    if [ -e $i ]
+    then
+        echo Mangling interpreter for ${i}.
+        if [ -w $i ]
+        then
+            ed $i < ${PERLMOD_DIR}/perlmods-starperl.ed
+        else
+            chmod u+w $i
+            ed $i < ${PERLMOD_DIR}/perlmods-starperl.ed
+            chmod u-w $i
+        fi
+    else
+        echo Skipped mangling interpreter for ${i}, not found.
+    fi
+done
+popd
