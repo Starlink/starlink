@@ -172,7 +172,7 @@
 *     11-FEB-2009 (DSB):
 *        Ignore negative or zero input Tsys values.
 *     1-OCT-2012 (DSB):
-*        Retain all flags when calling astRebinSeq for the last time to 
+*        Retain all flags when calling astRebinSeq for the last time to
 *        normalise the returned values. Previously, lack of the AST__USEVAR
 *        flag was causing all output varianes to be set bad within astRebinseq.
 .*     {enter_further_changes_here}
@@ -337,6 +337,12 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
 /* Allocate a work array to hold the exposure time for each detector. */
    detwork = astMalloc( ndet * sizeof( float ) );
 
+/* Debug message */
+   if( data->file ) {
+      msgOutiff( MSG__DEBUG, " ", "smf_rebincube_ast: Using %d detectors "
+                 "from data file '%s'.", status, ndet, data->file->name );
+   }
+
 /* If we are dealing with more than 1 detector, create a LutMap that holds
    the input GRID index of every detector to be included in the output, and
    AST__BAD for every detector that is not to be included in the output cube.
@@ -434,6 +440,10 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
 /* Restrict the number of threads to be no more than the number of workers
    available in the work force. */
          if( nthreads > maxthreads ) nthreads = maxthreads;
+         if( data->file ) {
+            msgOutiff( MSG__DEBUG, " ", "smf_rebincube_ast: Using %d threads "
+                       "to process data file '%s'.", status, nthreads, data->file->name );
+         }
 
 /* Find the number of output channels in each spectral block. */
          blk_size = ( dim[ 2 ] - 1 )/( 2*nthreads ) + 1;
@@ -451,6 +461,10 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
    independent blocks of output channels, we process the whole spectrum
    in a single thread. */
       } else {
+         if( data->file ) {
+            msgOutiff( MSG__DEBUG, " ", "smf_rebincube_ast: Using one thread "
+                       "to process data file '%s'.", status, data->file->name );
+         }
          nthreads = 1;
          nblock = 1;
          blk_bot[ 0 ] = 1.0;
@@ -488,11 +502,29 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
       }
    }
 
+/* Count the number of time slices to be processed. */
+   if( ptime ) {
+      itime = 0;
+      while( ptime[ itime ] != VAL__MAXI ) itime++;
+      if( data->file ) {
+         msgOutiff( MSG__DEBUG, " ", "smf_rebincube_ast: Selecting %d time "
+                    "slices from data file '%s'.", status, (int) itime,
+                    data->file->name );
+      }
+   } else {
+      itime = nslice;
+      if( data->file ) {
+         msgOutiff( MSG__DEBUG, " ", "smf_rebincube_ast: Using all %d time "
+                    "slices from data file '%s'.", status, (int) itime,
+                    data->file->name );
+      }
+   }
+
 /* Initialise a pointer to the next time slice index to be used. */
    nexttime = ptime;
 
 /* Initialise the progress meter. */
-   smf_reportprogress( nslice, status );
+   smf_reportprogress( itime, status );
 
 /* Loop round all time slices in the input NDF. */
    for( itime = 0; itime < nslice && *status == SAI__OK; itime++ ) {
@@ -517,7 +549,14 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
    subsequent functions. */
       totmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving,
 				 status );
-      if( !totmap ) break;
+      if( !totmap ) {
+         if( data->file ) {
+            msgOutiff( MSG__DEBUG, " ", "smf_rebincube_ast: Cannot get "
+                       "Mapping for slice %d from data file '%s'.", status,
+                       (int) itime, data->file->name );
+         }
+         break;
+      }
 
 /* Get the effective exposure time, the total exposure time, and the
    Tsys->Variance onversion factor for this time slice. Also get a
@@ -605,6 +644,11 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
                           ldim, udim, ldim, uddim, teff_array, NULL, NULL,
                           NULL );
          }
+
+      } else if( data->file ) {
+         msgOutiff( MSG__DEBUG, " ", "smf_rebincube_ast: Time slice %d "
+                    "is being ignored when processing data file '%s'.",
+                    status, (int) itime, data->file->name );
       }
 
 /* Update the progress meter. */

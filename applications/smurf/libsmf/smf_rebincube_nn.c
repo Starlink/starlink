@@ -370,8 +370,18 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
    if( ptime ) {
       itime = 0;
       while( ptime[ itime ] != VAL__MAXI ) itime++;
+      if( data->file ) {
+         msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Selecting %d time "
+                    "slices from data file '%s'.", status, (int) itime,
+                    data->file->name );
+      }
    } else {
       itime = nslice;
+      if( data->file ) {
+         msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Using all %d time "
+                    "slices from data file '%s'.", status, (int) itime,
+                    data->file->name );
+      }
    }
 
 /* Initialise the progress meter. */
@@ -403,6 +413,11 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
       totmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving,
 				 status );
       if( !totmap ) {
+         if( data->file ) {
+            msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Cannot get "
+                       "Mapping for slice %d from data file '%s'.", status,
+                       (int) itime, data->file->name );
+         }
          astEnd;
          break;
       }
@@ -452,6 +467,11 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 
 /* If we will be using mutiple threads, do some preparation. */
          if( use_threads ) {
+            if( data->file ) {
+               msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Using multiple "
+                          "threads to process data file '%s'.", status,
+                          data->file->name );
+            }
 
 /* Ensure we have a structure holding information which is common to all
    detectors and time slices. */
@@ -502,6 +522,11 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 
 /* If we are using a single threads, do some alternative preparation. */
          } else {
+            if( data->file ) {
+               msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Using a single "
+                          "thread to process data file '%s'.", status,
+                          data->file->name );
+            }
 
 /* We need an extra work array for 2D weighting that can hold a single
    output spectrum. This is used as a staging post for each input
@@ -621,8 +646,22 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                      thrAddJob( wf, 0, detector_data + idet,
                                   smf_rebincube_paste_thread, 0, NULL, status );
                   }
+
+               } else if( data->file ) {
+                  msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %d "
+                             "is being ignored when processing data file '%s'.",
+                             status, idet, data->file->name );
                }
+
+            } else if( data->file ) {
+               msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %d "
+                          "fell outside the output cube when processing "
+                          "data file '%s'.", status, idet, data->file->name );
             }
+         } else if( data->file ) {
+            msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %d has "
+                       "an unknown position in the output cube when processing "
+                       "data file '%s'.", status, idet, data->file->name );
          }
       }
 
