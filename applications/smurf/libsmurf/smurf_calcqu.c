@@ -28,8 +28,8 @@
 *     subsequently using KAPPA:WCSMOSAIC, to form a single Q image
 *     (normally, the "I" image should be used as the reference image when
 *     running WCSMOSIAC). Likewise, the set of U images can be combined in
-*     the same way. All the created Q and U images use celestial north in
-*     the telescope tracking system as the reference direction.
+*     the same way. All the created Q and U images use the focal plane Y
+*     axis as the reference direction.
 *
 *     The supplied time series data files are first flat-fielded, cleaned
 *     and concatenated, before being used to create the Q and U images. The

@@ -59,7 +59,7 @@
 *     "block_start" and "block_end". The spatial position of each bolometer
 *     is assumed not to move significantly over the duration of this block of
 *     time slices. The I, Q and U values stored in the output NDFs are
-*     referenced to north in the tracking system.
+*     referenced to the focal plane Y axis.
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -82,6 +82,8 @@
 *     24-OCT-2012 (DSB):
 *        Swap Q and U. This is a result of Per's analysis of the polarised
 *        background with the calibrator in the beam.
+*     17-DEC-2012 (DSB):
+*        Use focal plane Y instead of north as the reference direction for Q and U.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -348,10 +350,10 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 
 /* Add POLANAL Frames to the WCS FrameSet in each output NDF. This Frame
    is used by POLPACK to determine the reference direction of the Stokes
-   vectors (celestial north in this case). */
-   smf_polext( indfq, 0, 0.0, status );
-   smf_polext( indfu, 0, 0.0, status );
-   if( ipi ) smf_polext( indfi, 0, 0.0, status );
+   vectors (focal plane Y in this case). */
+   smf_polext( indfq, 0, 0.0, "FPLANE", status );
+   smf_polext( indfu, 0, 0.0, "FPLANE", status );
+   if( ipi ) smf_polext( indfi, 0, 0.0, "FPLANE", status );
 
 /* Free the two output NDFs. */
    ndfAnnul( &indfq, status );
@@ -498,20 +500,19 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 /* If POL_ANG is stored in arbitrary encoder units, convert to radians. */
                   if( old ) angle = angle*TORADS;
 
-/* Get the angle between the half-waveplate and north in the tracking
-   system. */
-                  if( ipolcrd == 0 ) {
-                     angle -= state->tcs_tr_ang;
-                  } else if( ipolcrd == 1 ) {
-                     angle -= state->tcs_tr_ang - state->tcs_az_ang ;
+/* Get the anti-clockwise angle from the half-waveplate to the focal plane Y axis. */
+                  if( ipolcrd == 1 ) {
+                     angle += state->tcs_az_ang;
+                  } else if( ipolcrd == 2 ) {
+                     angle += state->tcs_tr_ang;
                   }
 
 /* Increment the sums needed to find the Fourier component of the time
-   series corresponding to the frequency inroduced by by the rotation of
-   the half wave plate. Note, the effective analyser angle rotates twice as
-   fast as the half-wave plate which is why there is a factor of 4 here
-   rather than a factor of 2. An angle of zero corresponds to north in
-   the tracking system. */
+   series corresponding to the frequency introduced by the rotation of
+   the half wave plate. Note, the effective analyser angle rotates twice
+   as fast as the half-wave plate which is why there is a factor of 4 here
+   rather than a factor of 2. An angle of zero corresponds to the focal plane
+   Y axis. */
                   angle *= 4;
                   s1 += (*din)*cos( angle );
                   s2 += (*din)*sin( angle );

@@ -13,7 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_polext( int ondf, int store_angle, double angle, int *status )
+*     smf_polext( int ondf, int store_angle, double angle, const char *domain,
+*                 int *status )
 
 *  Arguments:
 *     ondf = int (Given)
@@ -26,9 +27,13 @@
 *     angle = double (Given)
 *        Ignored if "store_angle" is zero. The position angle of the analysed
 *        intensity. This is the angle from north in the spatial coordinate
-*        system of the output, to the analyser axis. Posotive rotation is in
+*        system of the output, to the analyser axis. Positive rotation is in
 *        the same sense as rotation from the first spatial pixel axis to the
 *        second spatial pixel axis (as required by POLPACK).
+*     domain = const char * (Given)
+*        The domain name for the WCS Frame in which the "angle" value is
+*        specified. If a NULL pointer is supplied, the current Frame is
+*        assumed.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -47,6 +52,8 @@
 *        Initial version.
 *     9-AUG-2012 (DSB):
 *        Added argument store_angle.
+*     15-DEC-2012 (DSB):
+*        Added argument "domain".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -85,19 +92,21 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_polext( int ondf, int store_angle, double angle, int *status ){
+void smf_polext( int ondf, int store_angle, double angle, const char *domain,
+                 int *status ){
 
 /* Local Variables */
    AstFrame *curfrm = NULL;
    AstFrame *polfrm = NULL;
-   AstSkyFrame *template = NULL;
-   int perm[ 2 ];
-   int icur;
-   AstFrameSet *wcs = NULL;
    AstFrameSet *fs = NULL;
+   AstFrameSet *wcs = NULL;
    AstMapping *map = NULL;
+   AstFrame *template = NULL;
    HDSLoc *loc = NULL;
    int dummy;
+   int icur;
+   int ifrm;
+   int perm[ 2 ];
 
 /* Check inherited status, and also check the supplied angle is not bad. */
    if( *status != SAI__OK || angle == AST__BAD ) return;
@@ -112,7 +121,8 @@ void smf_polext( int ondf, int store_angle, double angle, int *status ){
    reference direction, so we need to add such a Frame to the WCS FrameSet.
    The "angle" value supplied by the caller is with respect to north in the
    WCS current Frame, so first get a pointer to the current WCS Frame. */
-   curfrm = astGetFrame( wcs, AST__CURRENT );
+   if( !domain || !strcmp( domain, "SKY" ) ) {
+      curfrm = astGetFrame( wcs, AST__CURRENT );
 
 /* The current Frame is 3D, and should contain a SkyFrame. North should
    usually be axis 2 in the 3D Frame, but we make no assumptions here about
@@ -120,33 +130,75 @@ void smf_polext( int ondf, int store_angle, double angle, int *status ){
    we create a default SkyFrame, permute its axes to make north (latitude)
    the first axis, and then search the 3D current WCS Frame to find a
    Frame that looks like the template. */
-   template = astSkyFrame( "MaxAxes=3" );
-   perm[ 0 ] = 2;
-   perm[ 1 ] = 1;
-   astPermAxes( template, perm );
-   fs = astFindFrame( curfrm, template, " " );
+      template = (AstFrame *) astSkyFrame( "MaxAxes=3" );
+      perm[ 0 ] = 2;
+      perm[ 1 ] = 1;
+      astPermAxes( template, perm );
+      fs = astFindFrame( curfrm, template, " " );
 
 /* Check a match was found. */
-   if( fs ) {
+      if( fs ) {
 
 /* The base Frame in the "fs" FrameSet will be identical to "curfrm", and
    the current Frame will be a SkyFrame with axes permuted like "template",
    but will inherit other attributes from "curfrm". This is the Frame we
    will use as the POLANAL Frame. Extract the Mapping and current Frame
    from "fs". */
-      map = astGetMapping( fs, AST__BASE, AST__CURRENT );
-      polfrm = astGetFrame( fs, AST__CURRENT );
+         map = astGetMapping( fs, AST__BASE, AST__CURRENT );
+         polfrm = astGetFrame( fs, AST__CURRENT );
+         ifrm = AST__CURRENT;
+
+/* If the current WCS Frame did not contain a SkyFrame, warn the user. */
+      } else {
+         ndfMsg( "NDF", ondf );
+         msgOut( "", "The WCS current Frame in output NDF ^NDF does not "
+                 "contain a SkyFrame - no POLPACK extension can be created.",
+                 status );
+      }
+
+/* If a non-SKY Domain was specified, find it. */
+   } else {
+      template = (AstFrame *) astFrame( 2, "MaxAxes=3,Domain=%s", domain );
+      fs = astFindFrame( wcs, template, domain );
+
+/* Check a match was found. */
+      if( fs ) {
+
+/* The base Frame in the "fs" FrameSet will be identical to the base
+   Frame of "wcs", and the current Frame will be a Frame with the
+   required Domain. This is the Frame we will use as the POLANAL Frame.
+   Extract the Mapping and current Frame from "fs". */
+         map = astGetMapping( fs, AST__BASE, AST__CURRENT );
+         polfrm = astGetFrame( fs, AST__CURRENT );
+         ifrm = AST__BASE;
+
+/* If the current WCS Frame did not contain a SkyFrame, warn the user. */
+      } else {
+         ndfMsg( "NDF", ondf );
+         msgOutf( "", "The WCS current Frame in output NDF ^NDF does not "
+                  "contain a Frame with Domain \"%s\" - no POLPACK "
+                  "extension can be created.", status, domain);
+      }
+   }
+
+/* Check a match was found. */
+   if( fs ) {
 
 /* Change the Domain to POLANAL. */
       astSet( polfrm, "Domain=POLANAL" );
+
+/* Change the Frame title, and axis labels. */
+      astSet( polfrm, "Title=Polarimetry reference frame" );
+      astSet( polfrm, "Label(1)=Polarimetry reference direction" );
+      astSet( polfrm, "Label(2)=" );
 
 /* Note the index of the original current Frame in "wcs" so that we can
    re-instate it later. */
       icur = astGetI( wcs, "Current" );
 
 /* Add the POLANAL Frame into the WCS FrameSet using the above Mapping to
-   connect it to the original current Frame. */
-      astAddFrame( wcs, AST__CURRENT, map, polfrm );
+   connect it to the required Frame. */
+      astAddFrame( wcs, ifrm, map, polfrm );
 
 /* Re-instate the original current Frame (astAddFrame changes the current
    Frame). */
@@ -170,9 +222,15 @@ void smf_polext( int ondf, int store_angle, double angle, int *status ){
 /* If the current WCS Frame did not contain a SkyFrame, warn the user. */
    } else {
       ndfMsg( "NDF", ondf );
-      msgOut( "", "The WCS current Frame in output NDF ^NDF does not "
-              "contain a SkyFrame - no POLPACK extenion can be created.",
-              status );
+      if( domain ) {
+         msgOutf( "", "The WCS current Frame in output NDF ^NDF does not "
+                 "contain a Frame with Domain \"%s\" - no POLPACK extension "
+                 "can be created.", status, domain );
+      } else {
+         msgOut( "", "The WCS current Frame in output NDF ^NDF does not "
+                 "contain a SkyFrame - no POLPACK extension can be created.",
+                 status );
+      }
    }
 
 /* End the AST context. */
