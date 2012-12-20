@@ -18,7 +18,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     CONFIGECHO
 
 *  Purpose:
-*     Display one or more configuration parameters.
+*     Displays one or more configuration parameters.
 
 *  Language:
 *     C (designed to be called from Fortran)
@@ -35,20 +35,20 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 
 *  Description:
 *     This application displays the name and value of one or more
-*     configuration parameters, specified using parameter CONFIG.
+*     configuration parameters, specified using Parameter CONFIG.
 *     The value is also written to an output parameter. The string
 *     "<***>" is displayed if the parameter is not specified by the
 *     CONFIG or DEFAULTS parameter.
 
 *  Usage:
-*     configecho name config defaults select
+*     configecho name config [defaults] [select]
 
 *  ADAM Parameters:
 *     CONFIG = GROUP (Read)
 *        Specifies values for the configuration parameters. If the string
 *        "def" (case-insensitive) or a null (!) value is supplied, a set
 *        of default configuration parameter values will be used, as
-*        specified by parameter DEFAULTS.
+*        specified by Parameter DEFAULTS.
 *
 *        The supplied value should be either a comma-separated list of
 *        strings or the name of a text file preceded by an up-arrow
@@ -60,11 +60,11 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        or lines beginning with "#" are ignored). Within a text file,
 *        newlines can be used as delimiters, as well as commas. Settings
 *        are applied in the order in which they occur within the list,
-*        with later settings over-riding any earlier settings given for
+*        with later settings overriding any earlier settings given for
 *        the same keyword.
 *
 *        Each individual setting should be of the form "<keyword>=<value>".
-*        If a non-null value is supplied for parameter DEFAULTS, an error
+*        If a non-null value is supplied for Parameter DEFAULTS, an error
 *        will be reported if CONFIG includes values for any parameters
 *        that are not included in DEFAULTS.
 *     DEFAULTS = LITERAL (Read)
@@ -79,17 +79,17 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        A group that specifies any alternative prefixes that can be
 *        included at the start of any parameter name. For instance, if
 *        this group contains the two entries "450=1" and "850=0", then
-*        DEFAULTS can specify two defaults for any single parameter -
+*        DEFAULTS can specify two defaults for any single parameter--
 *        one for the parameter prefixed by "450." and another for the
-*        parameter prefixed by "850." Thus if DEFAULTS defines a
+*        parameter prefixed by "850.". Thus if DEFAULTS defines a
 *        parameter called "filter", it could include "450.filter=300"
 *        and "850.filter=600". The CONFIG parameter could then either
-*        set the filter parameter for a specific wavelength (as in
-*        "450.filter=234"), or it could leave the wavelength unspecified,
-*        in which case the wavelength used is the first one with a
+*        set the filter parameter for a specific prefix (as in
+*        "450.filter=234"); or it could leave the prefix unspecified,
+*        in which case the prefix used is the first one with a
 *        non-zero value in SELECT (450 in the case of this example - 850
 *        has a value zero in SELECT). Thus the names of the items in
-*        SELECT define the set of allowed alternative prefixies, and the
+*        SELECT define the set of allowed alternative prefixes, and the
 *        values indicate which one of these alternatives is to be used
 *        (the first one with non-zero value). [!]
 *     VALUE = LITERAL (Write)
@@ -100,11 +100,11 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     configecho m81 ^myconf
 *        Report the value of configuration parameter "m81" defined within
 *        the file "myconf". If the file does not contain a value for
-*        "m51", then "<***>" is displayed.
-*     configecho 'flt.filt_edge_largescale' \
+*        "m81", then "<***>" is displayed.
+*     configecho flt.filt_edge_largescale \
 *                config=^/star/share/smurf/dimmconfig.lis \
 *                defaults=/star/bin/smurf/smurf_makemap.def \
-*                select="'450=1,850=0'"
+*                select="450=1,850=0"
 *        Report the value of configuration parameter "flt.filt_edge_largescale"
 *        defined within the file "/star/share/smurf/dimmconfig.lis", using
 *        defaults from the file "/star/bin/smurf/smurf_makemap.def". If

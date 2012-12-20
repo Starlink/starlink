@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.39}
 \newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2012 November 15}
+\newcommand{\stardocdate}      {2012 December 12}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.0}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -19863,42 +19863,43 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 \sstroutine{
    CONFIGECHO
 }{
-   Display one or more configuration parameters
+   Displays one or more configuration parameters
 }{
    \sstdescription{
       This application displays the name and value of one or more
-      configuration parameters, specified using parameter CONFIG.
-      The value is also written to an output parameter. The string
-      {\tt "}$<$$*$$*$$*$$>${\tt "} is displayed if the parameter is not specified by the
+      configuration parameters, specified using Parameter CONFIG.
+      The value is also written to an output parameter.  The string
+      {\tt "$<$$*$$*$$*$$>$"} is displayed if the parameter is not specified by the
       CONFIG or DEFAULTS parameter.
    }
    \sstusage{
-      configecho name config defaults select
+      configecho name config [defaults] [select]
    }
    \sstparameters{
       \sstsubsection{
          CONFIG = GROUP (Read)
       }{
-         Specifies values for the configuration parameters. If the string
-         {\tt "}def{\tt "} (case-insensitive) or a null (!) value is supplied, a set
+         Specifies values for the configuration parameters.  If the string
+         {\tt "def"} (case-insensitive) or a null ({\tt{!}}) value is supplied, a set
          of default configuration parameter values will be used, as
-         specified by parameter DEFAULTS.
+         specified by Parameter DEFAULTS.
 
          The supplied value should be either a comma-separated list of
          strings or the name of a text file preceded by an up-arrow
-         character {\tt "}$\wedge${\tt "}, containing one or more comma-separated lists of
-         strings. Each string is either a {\tt "}keyword=value{\tt "} setting, or the
-         name of a text file preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such
+         character {\tt "$\wedge$"}, containing one or more comma-separated lists of
+         strings.  Each string is either a {\tt "keyword=value"} setting, or the
+         name of a text file preceded by an up-arrow character {\tt "$\wedge$"}.  Such
          text files should contain further comma-separated lists which
          will be read and interpreted in the same manner (any blank lines
-         or lines beginning with {\tt "}\#{\tt "} are ignored). Within a text file,
-         newlines can be used as delimiters, as well as commas. Settings
+         or lines beginning with {\tt "\#"} are ignored).  Within a text file,
+         newlines can be used as delimiters, as well as commas.  Settings
          are applied in the order in which they occur within the list,
-         with later settings over-riding any earlier settings given for
+         with later settings overriding any earlier settings given for
          the same keyword.
 
-         Each individual setting should be of the form {\tt "}$<$keyword$>$=$<$value$>${\tt "}.
-         If a non-null value is supplied for parameter DEFAULTS, an error
+         Each individual setting should be of the form
+         {\tt "$<$keyword$>$=$<$value$>$"}.
+         If a non-null value is supplied for Parameter DEFAULTS, an error
          will be reported if CONFIG includes values for any parameters
          that are not included in DEFAULTS.
       }
@@ -19906,10 +19907,10 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          DEFAULTS = LITERAL (Read)
       }{
          The path to a file containing the default value for every
-         allowed configuration parameter. If null (!) is supplied, no
+         allowed configuration parameter.  If null ({\tt{!}}) is supplied, no
          defaults will be supplied for parameters that are not specified
          by CONFIG, and no tests will be performed on the validity of
-         paramter names supplied by CONFIG. {\tt [!]}
+         paramter names supplied by CONFIG.  {\tt [!]}
       }
       \sstsubsection{
          NAME = LITERAL (Read)
@@ -19920,26 +19921,28 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          SELECT = GROUP (Read)
       }{
          A group that specifies any alternative prefixes that can be
-         included at the start of any parameter name. For instance, if
-         this group contains the two entries {\tt "}450=1{\tt "} and {\tt "}850=0{\tt "}, then
-         DEFAULTS can specify two defaults for any single parameter -
-         one for the parameter prefixed by {\tt "}450.{\tt "} and another for the
-         parameter prefixed by {\tt "}850.{\tt "} Thus if DEFAULTS defines a
-         parameter called {\tt "}filter{\tt "}, it could include {\tt "}450.filter=300{\tt "}
-         and {\tt "}850.filter=600{\tt "}. The CONFIG parameter could then either
-         set the filter parameter for a specific wavelength (as in
-         {\tt "}450.filter=234{\tt "}), or it could leave the wavelength unspecified,
-         in which case the wavelength used is the first one with a
-         non-zero value in SELECT (450 in the case of this example - 850
-         has a value zero in SELECT). Thus the names of the items in
-         SELECT define the set of allowed alternative prefixies, and the
+         included at the start of any parameter name.  For instance, if
+         this group contains the two entries {\tt "450=1"} and {\tt "850=0"}, then
+         DEFAULTS can specify two defaults for any single parameter---one
+         for the parameter prefixed by {\tt "450."} and another for the
+         parameter prefixed by {\tt "850."}.  Thus if DEFAULTS defines a
+         parameter called {\tt "filter"}, it could include {\tt "450.filter=300"}
+         and {\tt "850.filter=600"}.  The CONFIG parameter could then either
+         set the filter parameter for a specific prefix (as in
+         {\tt "450.filter=234"}); or it could leave the prefix unspecified,
+         in which case the prefix used is the first one with a
+         non-zero value in SELECT (450 in the case of this example---850
+         has a value zero in SELECT).  Thus the names of the items in
+         SELECT define the set of allowed alternative prefixes, and the
          values indicate which one of these alternatives is to be used
-         (the first one with non-zero value). {\tt [!]}
+         (the first one with non-zero value).  {\tt [!]}
       }
+   }
+   \sstresparameters{
       \sstsubsection{
          VALUE = LITERAL (Write)
       }{
-         The value of the configuration parameter, or {\tt "}$<$$*$$*$$*$$>${\tt "} if the
+         The value of the configuration parameter, or {\tt "$<$$*$$*$$*$$>$"} if the
          parameter has no value in CONFIG and DEFAULTS.
       }
    }
@@ -19947,23 +19950,22 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       \sstexamplesubsection{
          configecho m81 $\wedge$myconf
       }{
-         Report the value of configuration parameter {\tt "}m81{\tt "} defined within
-         the file {\tt "}myconf{\tt "}. If the file does not contain a value for
-         {\tt "}m51{\tt "}, then {\tt "}$<$$*$$*$$*$$>${\tt "} is displayed.
+         Report the value of configuration parameter {\tt "m81"} defined within
+         the file {\tt myconf}.  If the file does not contain a value for
+         {\tt "m81"}, then {\tt $<$$*$$*$$*$$>$} is displayed.
       }
       \sstexamplesubsection{
-         configecho {\tt '}flt.filt\_edge\_largescale{\tt '} $\backslash$
+         configecho flt.filt\_edge\_largescale $\backslash$ \\
+                 config=$\wedge$/star/share/smurf/dimmconfig.lis $\backslash$ \\
+                 defaults=/star/bin/smurf/smurf\_makemap.def select="450=1,850=0"
       }{
-                 config=$\wedge$/star/share/smurf/dimmconfig.lis $\backslash$
-                 defaults=/star/bin/smurf/smurf\_makemap.def $\backslash$
-                 select={\tt "}{\tt '}450=1,850=0{\tt '}{\tt "}
-         Report the value of configuration parameter {\tt "}flt.filt\_edge\_largescale{\tt "}
-         defined within the file {\tt "}/star/share/smurf/dimmconfig.lis{\tt "}, using
-         defaults from the file {\tt "}/star/bin/smurf/smurf\_makemap.def{\tt "}. If
-         dimmconfig.lis does not contain a value for {\tt "}flt.filt\_edge\_largescale{\tt "}
-         then it is searched for {\tt "}450.flt.filt\_edge\_largescale{\tt "} instead. An
-         error is reported if dimmconfig.lis contains values for any
-         items that are not defined in smurf\_makemap.def.
+         Report the value of configuration parameter {\tt flt.filt\_edge\_largescale}
+         defined within the file {\tt /star/share/smurf/dimmconfig.lis}, using
+         defaults from the file {\tt /star/bin/smurf/smurf\_makemap.def}.  If
+         {\tt dimmconfig.lis} does not contain a value for {\tt flt.filt\_edge\_largescale}
+         then it is searched for {\tt 450.flt.filt\_edge\_largescale} instead.  An
+         error is reported if {\tt dimmconfig.lis} contains values for any
+         items that are not defined in {\tt smurf\_makemap.def}.
       }
    }
 }
@@ -58938,10 +58940,10 @@ The following new applications have been added:
 
 \begin{description}
    \item [\htmlref{CONFIGECHO}{CONFIGECHO}] \mbox{}
-   This is intended as a scripting tool. It displays the value
+   This is intended as a scripting tool.  It displays the value
    of a named entry in a group of configuration parameters.
    \item [\htmlref{NDFECHO}{NDFECHO}] \mbox{}
-   This is intended as a scripting tool. It expands a given group
+   This is intended as a scripting tool.  It expands a given group
    expression into a list of explicit NDF names, and displays a specified
    subset of the expanded names.
 \end{description}
