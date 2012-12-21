@@ -82,6 +82,9 @@
 *     2012-10-24 (DSB):
 *        Set POL_CRD to FPLANE for all POL-2 data prior to some date in
 *        the future that has not yet been decided.
+*     2012-12-21 (DSB):
+*        Ensure that the RTS_END values used to recalculate STEPTIME are
+*        good.
 
 *  Copyright:
 *     Copyright (C) 2009-2011 Science & Technology Facilities Council.
@@ -178,8 +181,19 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
   if (hdr->allState) {
     /* it will be odd if it is not there */
     size_t nframes = hdr->nframes;
-    double start_time = (hdr->allState)[0].rts_end;
-    double end_time = (hdr->allState)[nframes-1].rts_end;
+
+    size_t istart = 0;
+    double start_time = (hdr->allState)[istart].rts_end;
+    while( start_time == VAL__BADD && ++istart < nframes ) {
+      start_time = (hdr->allState)[istart].rts_end;
+    }
+
+    size_t iend = nframes - 1;
+    double end_time = (hdr->allState)[iend].rts_end;
+    while( end_time == VAL__BADD && iend-- > 0 ) {
+      end_time = (hdr->allState)[iend].rts_end;
+    }
+
     double steptime = VAL__BADD;
     double newstep;
 
@@ -189,6 +203,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     /* it is possible for a file to contain only one step since
        the DA just dumps every N-steps. We can not recalculate the
        step time in that case. */
+    nframes = iend - istart + 1;
     if (nframes > 1) {
 
       /* duration of file in days */
@@ -199,13 +214,21 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
 
       /* Convert to step time */
       newstep /= (nframes - 1);
-    } else {
+    } else if( nframes > 0 ) {
       /* work it out from RTS_END and TCS_TAI */
-      JCMTState * onlystate = &((hdr->allState)[0]);
+      JCMTState * onlystate = &((hdr->allState)[istart]);
       if ( onlystate->tcs_tai != VAL__BADD &&
            onlystate->tcs_tai != onlystate->rts_end) {
         /* TCS_TAI is in the middle of the step */
         newstep = 2.0 * ( onlystate->rts_end - onlystate->tcs_tai ) * SPD;
+      }
+    } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      if( data->file ) {
+         smf_smfFile_msg( data->file, "N", 1, "<unknown>" );
+         errRep("", "No valid RTS_END values found in NDF '^N'.", status );
+      } else {
+         errRep("", "No valid RTS_END values found.", status );
       }
     }
 
