@@ -200,7 +200,7 @@ void smurf_fts2_init(int* status)
       errRep( FUNC_NAME, "Unable to get the mirror positions!", status);
       goto CLEANUP;
     }
-    fts2_validatemirrorpositions(MIRPOS, nFrames, &nStart, &nStop, status);
+    fts2_validatemirrorpositions(MIRPOS, nFrames, &nStart, &nStop, inData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Unable to validate the mirror positions!", status);

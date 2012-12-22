@@ -110,6 +110,7 @@ void fts2_validatemirrorpositions(
     int count,
     int* ni,
     int* nf,
+	smfData* inData,
     int* status);
 
 void fts2_arraycopy(

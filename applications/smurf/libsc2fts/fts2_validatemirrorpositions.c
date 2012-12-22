@@ -87,39 +87,94 @@
 
 #define FUNC_NAME "fts2_validatemirrorpositions"
 
-void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf, int* status)
+void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf, smfData* inData, int* status)
 {
   if(*status != SAI__OK) { return; }
 
-  const double EPSILON = 0.001;
+  printf("fts2_validatemirrorpositions: BEGIN\n",ni);
 
-  int i = 0;
+  // Compute EPSILON as a fraction of the expected mirror position step size (s)
+  // calculated from the SCANVEL (v) and the STEPTIME (t), where:
+  // s = vt
+  // and EPSILON should be reasonably large to ignore jitter, but small enough not to miss valid movement, 
+  // let's say at least half way to the next expected mirror position, or:
+  // EPSILON = s/2
+  
+  double s = 0.0;
+  double t = 0.0;
+  smf_fits_getD(inData->hdr, "STEPTIME", &t, status);
+  double v = 0.0;
+  smf_fits_getD(inData->hdr, "SCANVEL", &v, status);
+  s = v*t;
+  double EPSILON = s/2;
 
+  printf("fts2_validatemirrorpositions: StepSize(s): %f = STEPTIME(t): %f * SCANVEL(v): %f\n",s,t,v);
+  printf("fts2_validatemirrorpositions: EPSILON: %f = StepSize(s): %f / 2\n",EPSILON,s);
+  
+  int i,j = 0;
+  double positive = 0.0;
+  double negative = 0.0;
+  double direction = 0.0;
+  
+  
+  
+  // Determine scan direction
+  /* Mirror scans are supposed to be unidirectional (monotonically increasing or decreasing)
+	 but can have slow starts or trailing ends where there is little to no significant change.
+	 Determine the majority direction of this scan: positive or negative.
+  */
+  for(i=0; i<count-1; i++) {
+	if(positions[i] < positions[i+1])
+	  positive += (positions[i+1] - positions[i]);
+	else if(positions[i] > positions[i+1])
+	  negative += (positions[i] - positions[i+1]);
+  }
+  direction = positive - negative;
+  printf("fts2_validatemirrorpositions: direction: %f = positive: %f - negative: %f\n",direction,positive,negative);
+  
+  // Invert negative scan
+  double* inverted = NULL;
+  if(direction < 0) {
+	printf("fts2_validatemirrorpositions: Inverting mirror positions\n");
+	inverted = (double*) astCalloc(count, sizeof(double));
+    for(i=0,j=count-1; i < count; i++,j--) {
+	  inverted[i] = positions[j];
+    }
+	// Copy inverted values back to positions
+    for(i=0; i < count; i++) {
+		positions[i] = inverted[i];
+    }
+  }
+
+/*
   // CREATE SHIFTED MIRROR POSITIONS
   double* shifted = (double*) astCalloc(count, sizeof(double));
   for(i = 1; i < count; i++) {
     shifted[i] = positions[i - 1];
   }
   shifted[0] = positions[count - 1];
-
+*/
+  
   // COMPUTE DELTA MIRROR POSITIONS
   double* delta = (double*) astCalloc(count, sizeof(double));
-  for(i = 0; i < count; i++) {
-    delta[i] = positions[i] - shifted[i];
+  for(i = 0; i < count-1; i++) {
+    delta[i] = positions[i+1] - positions[i];
   }
 
   // FIND THE START INDEX
-  for(i = 0; i < count; i++) {
-    if(fabs(delta[i]) >= EPSILON) {
+  for(i = 0; i < count-1; i++) {
+    if(delta[i] >= EPSILON) {
       *ni = i;
+	  printf("fts2_validatemirrorpositions: ni: %i\n",*ni);
       break;
     }
   }
 
   // FIND THE END INDEX
   for(i = count - 1; i > -1; i--) {
-    if(fabs(delta[i]) >= EPSILON) {
-      *nf = i;
+    if(delta[i] >= EPSILON) {
+      *nf = i+1;
+	  printf("fts2_validatemirrorpositions: nf: %i\n",*nf);
       break;
     }
   }
@@ -127,10 +182,18 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
 /*
   // CHECK TO SEE IF THE POSITIONS HAVE REPEATING VALUES IN BETWEEN
   for(i = *ni + 1; i < *nf; i++) {
-    if(fabs(delta[i]) <= EPSILON) {
+    if(abs(delta[i]) <= EPSILON) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Repeating mirror position values found!", status);
     }
   }
   */
+  
+// CLEANUP:
+  if(delta) {astFree(delta); delta = NULL;}
+//if(shifted) {astFree(shifted); shifted = NULL;}
+  if(direction < 0 && inverted) {astFree(inverted); inverted = NULL;}
+
+  printf("fts2_validatemirrorpositions: END\n",ni);
+
 }
