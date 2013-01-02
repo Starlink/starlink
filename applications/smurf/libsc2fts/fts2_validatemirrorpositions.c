@@ -95,8 +95,6 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
 {
   if(*status != SAI__OK) { return; }
 
-  printf("fts2_validatemirrorpositions: BEGIN\n",ni);
-
   // Compute EPSILON as a fraction of the expected mirror position step size (s)
   // calculated from the SCANVEL (v) and the STEPTIME (t), where:
   // s = vt
@@ -112,9 +110,6 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   s = v*t;
   double EPSILON = s/2;
 
-  printf("fts2_validatemirrorpositions: StepSize(s): %f = STEPTIME(t): %f * SCANVEL(v): %f\n",s,t,v);
-  printf("fts2_validatemirrorpositions: EPSILON: %f = StepSize(s): %f / 2\n",EPSILON,s);
-  
   int i,j = 0;
   double positive = 0.0;
   double negative = 0.0;
@@ -134,12 +129,10 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
 	  negative += (positions[i] - positions[i+1]);
   }
   direction = positive - negative;
-  printf("fts2_validatemirrorpositions: direction: %f = positive: %f - negative: %f\n",direction,positive,negative);
   
   // Invert negative scan
   double* inverted = NULL;
   if(direction < 0) {
-	printf("fts2_validatemirrorpositions: Inverting mirror positions\n");
 	inverted = (double*) astCalloc(count, sizeof(double));
     for(i=0,j=count-1; i < count; i++,j--) {
 	  inverted[i] = positions[j];
@@ -169,7 +162,6 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   for(i = 0; i < count-1; i++) {
     if(delta[i] >= EPSILON) {
       *ni = i;
-	  printf("fts2_validatemirrorpositions: ni: %i\n",*ni);
       break;
     }
   }
@@ -178,7 +170,6 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   for(i = count - 1; i > -1; i--) {
     if(delta[i] >= EPSILON) {
       *nf = i+1;
-	  printf("fts2_validatemirrorpositions: nf: %i\n",*nf);
       break;
     }
   }
@@ -197,7 +188,5 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   if(delta) {astFree(delta); delta = NULL;}
 //if(shifted) {astFree(shifted); shifted = NULL;}
   if(direction < 0 && inverted) {astFree(inverted); inverted = NULL;}
-
-  printf("fts2_validatemirrorpositions: END\n",ni);
 
 }
