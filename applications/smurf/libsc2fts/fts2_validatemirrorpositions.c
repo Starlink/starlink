@@ -32,6 +32,10 @@
 *        Original version.
 *     2012-12-12 (MSHERWOOD):
 *     	  Removed temporary testing code.
+*     2012-12-21 (MSHERWOOD)
+*         Changed validation logic to trim non-uniform data from ends
+*         while adapting to mirror speed.
+*         Also reverse mirror position array in case of opposite scan direction.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.

@@ -43,6 +43,8 @@
  *        - Removed redundancies
  *     2012-12-12 (MSHERWOOD):
  *     	  Put back adjustment for non-centered mirror starting position.
+ *     2012-12-21 (MSHERWOOD)
+ *        Removed unneccessary sort (fts2_validatemirrorpositions now reverses list when needed)
  *
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -210,19 +212,6 @@ void smurf_fts2_init(int* status)
     /* THIS WILL NO LONGER NECESSARY WHEN THE FTS2 MIRROR POSITIONS ARE READ IN [-225, 225]
        Transform mirror positions from [0, 450] to [-225, 225] */
        for(k = 0; k < nFrames; k++) { MIRPOS[k] -= STAGE_CENTER; }
-
-    /* Sort mirror positions if necessary */
-    if(MIRPOS[nStart] > MIRPOS[nStart + 1]) {
-      SORTINFO = NULL;
-      SORTINFO = astCalloc(nFrames, sizeof(*SORTINFO));
-      for(k = 0; k < nFrames; k++) {
-        SORTINFO[k].index = i;
-        SORTINFO[k].sortval = MIRPOS[k];
-      }
-      qsort(SORTINFO, nFrames, sizeof(*SORTINFO), smf_sort_bydouble);
-      for(k = 0; k < nFrames; k++) { MIRPOS[k] = SORTINFO[k].sortval; }
-      if(SORTINFO){ SORTINFO  = astFree(SORTINFO); }
-    }
 
     /* The number of mirror positions with unique values */
     nMirPos = nStop - nStart + 1;
