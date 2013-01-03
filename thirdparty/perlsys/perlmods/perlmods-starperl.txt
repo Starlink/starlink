@@ -1,1 +1,2 @@
+Perl/bin/autoastrom
 Perl/bin/sourceplot
