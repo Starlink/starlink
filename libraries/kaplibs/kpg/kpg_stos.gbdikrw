@@ -58,7 +58,7 @@
 *     supplied array values intact.
  
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009, 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -89,6 +89,8 @@
 *        does not support them.  Fix pasting bug involving KPG1_FLOOR.
 *     2009 September 28 (MJC):
 *        Do not report an error when NGOOD is too small.
+*     2013 January 4 (MJC):
+*        Protect against an index of zero for low percentiles.
 *     {enter_further_changes_here}
  
 *-
@@ -176,7 +178,7 @@
       DOPRCT = PERCNT( 1 ) .NE. VAL__BADR .AND. NUMPER .GT. 0
       IF ( DOPRCT ) THEN
          DO I = 1, NPERC
-            PERIND( I ) = NINT( PERCNT( I ) * 0.01 * REAL( NGOOD ) )
+            PERIND( I ) = INT( PERCNT( I ) * 0.01 * REAL( NGOOD ) ) + 1
          END DO
       END IF
 
