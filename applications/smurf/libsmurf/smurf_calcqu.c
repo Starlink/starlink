@@ -29,7 +29,11 @@
 *     (normally, the "I" image should be used as the reference image when
 *     running WCSMOSIAC). Likewise, the set of U images can be combined in
 *     the same way. All the created Q and U images use the focal plane Y
-*     axis as the reference direction.
+*     axis as the reference direction. Since this direction may vary from
+*     block to block due to sky rotation, the idividual Q and U images should
+*     be processed using POLPACK:POLROTREF before combining them using
+*     KAPPA:WCSMOSAIC, to ensure that they all use the same reference
+*     direction.
 *
 *     The supplied time series data files are first flat-fielded, cleaned
 *     and concatenated, before being used to create the Q and U images. The
