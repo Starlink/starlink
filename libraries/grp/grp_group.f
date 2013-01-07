@@ -132,6 +132,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'DAT_ERR'          ! DAT error constants
       INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_PAR'          ! GRP public constants.
 
@@ -240,12 +241,29 @@
      :    'GRP_GROUP: Aborted attempt to associate a group expression'//
      :    ' with the %^P parameter.', STATUS )
 
-*  If any other error occurred, add a context message.
+*  If the parameter request was aborted, annul the error and re-report
+*  it with a more friendly message.
+      ELSE IF ( STATUS .EQ. PAR__ABORT ) THEN
+         CALL ERR_ANNUL( STATUS )
+         STATUS = PAR__ABORT
+         CALL MSG_SETC( 'P', PARAM )
+         CALL ERR_REP( 'GRP_GROUP_ERR3',
+     :    'GRP_GROUP: Aborted attempt to associate a group expression'//
+     :    ' with the %^P parameter.', STATUS )
+
+*  If the value was truncated add a suitable context message.
+      ELSE IF( STATUS .EQ. DAT__TRUNC ) THEN
+         CALL MSG_SETC( 'P', PARAM )
+         CALL ERR_REP( 'GRP_GROUP_ERR6', 'The list of valuess '//
+     :                 'supplied for parameter %^P was too long.',
+     :                 STATUS )
+
+*  If any other error occurred, add a general context message.
       ELSE IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'P', PARAM )
          CALL ERR_REP( 'GRP_GROUP_ERR4',
      : 'GRP_GROUP: Unable to associate a group of names with'//
-     : ' parameter %^P', STATUS )
+     : ' parameter ''%^P''', STATUS )
       END IF
 
 *  If an error has occurred, set SIZE to the initial group size. If this

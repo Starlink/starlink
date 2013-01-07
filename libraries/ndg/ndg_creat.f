@@ -149,6 +149,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'PAR_ERR'          ! Parameter system error constants.
+      INCLUDE 'DAT_ERR'          ! DAT error constants.
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -325,6 +326,13 @@
          CALL ERR_REP( 'NDG_CREAT_ERR3', 'Aborted attempt to '//
      :                 'associate a group of data sets with '//
      :                 'parameter %^P.', STATUS )
+
+*  If the value was truncated add a suitable context message.
+      ELSE IF( STATUS .EQ. DAT__TRUNC ) THEN
+         CALL MSG_SETC( 'P', PARAM )
+         CALL ERR_REP( 'NDG_CREAT_ERR5', 'The list of NDF names '//
+     :                 'supplied for parameter ''%^P'' was too long.',
+     :                 STATUS )
 
 *  If any other error occurred, add a context message.
       ELSE IF( STATUS .NE. SAI__OK ) THEN
