@@ -15,7 +15,7 @@
 *  Invocation:
 *     void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, int nel,
 *                          double *idata, double *qdata, double *udata,
-*                          int *status );
+*                          double *angdata, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -31,6 +31,9 @@
 *        An array of Q values.
 *     udata = double * (Given)
 *        An array of U values.
+*     angdata = double * (Given)
+*        An array holding the anti-clockwise angle from the focal plane Y
+*        axis to the  Q/U reference direction, at each time slice.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -45,6 +48,8 @@
 *  History:
 *     24-SEP-2012 (DSB):
 *        Original version.
+*     7-JAN-2013 (DSB):
+*        Use focal plane Y axis as the reference direction.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,6 +95,7 @@ typedef struct smfUncalcIQUJobData {
    double *ipq;
    double *ipu;
    double *ipi;
+   double *ipang;
    int ipolcrd;
    int ntslice;
    int old;
@@ -109,7 +115,7 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status );
 
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data,
                      double *idata, double *qdata, double *udata,
-                     int *status ){
+                     double *angdata, int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
@@ -225,6 +231,7 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data,
          pdata->ipi = idata;
          pdata->ipq = qdata;
          pdata->ipu = udata;
+         pdata->ipang = angdata;
          pdata->ipolcrd = ipolcrd;
          pdata->old = old;
          pdata->ntslice = ntslice;
@@ -282,6 +289,7 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    double *ipq;               /* Pointer to supplied Q array */
    double *ipu0;              /* Pointer to input U array for 1st time */
    double *ipu;               /* Pointer to supplied U array */
+   double *ipang;             /* Pointer to supplied FP orientation array */
    double *qin;               /* Pointer to Q array for each bolometer*/
    double *uin;               /* Pointer to U array for each bolometer*/
    double angle;              /* Phase angle for FFT */
@@ -331,33 +339,43 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
          qin = ipq0;
          uin = ipu0;
 
+/* Initialise a pointer to the anti-clockwise angle from the focal plane
+   Y axis to the Q/U reference direction, at the next time slice. */
+         ipang = pdata->ipang;
+
 /* Loop round all time slices. */
          state = allstates;
-         for( itime = 0; itime < ntslice; itime++,state++ ) {
+         for( itime = 0; itime < ntslice; itime++,state++,ipang++ ) {
 
 /* Get the POL_ANG value for this time slice. */
             angle = state->pol_ang;
 
 /* Check the I, Q, U and angle values are good. */
             if( *iin != VAL__BADD && *qin != VAL__BADD &&
-                *uin != VAL__BADD && angle != VAL__BADD ) {
+                *uin != VAL__BADD && angle != VAL__BADD &&
+                *ipang != VAL__BADD ) {
 
 /* If POL_ANG is stored in arbitrary encoder units, convert to radians. */
                if( old ) angle = angle*TORADS;
 
-/* Get the angle between the half-waveplate and north in the tracking
-   system. */
-               if( ipolcrd == 0 ) {
-                  angle -= state->tcs_tr_ang;
-               } else if( ipolcrd == 1 ) {
-                  angle -= state->tcs_tr_ang - state->tcs_az_ang ;
+/* Get the anti-clockwise angle from the half-waveplate to the focal plane Y axis. */
+               if( ipolcrd == 1 ) {
+                  angle += state->tcs_az_ang;
+               } else if( ipolcrd == 2 ) {
+                  angle += state->tcs_tr_ang;
                }
 
+/* Get the anti-clockwise angle from the effective analyser to the focal plane Y
+   axis. */
+               angle *= 2.0;
+
+/* Get the anti-clockwise angle from the effective analyser to the reference
+   direction used by the supplied Q and U values. */
+               angle += *ipang;
+
 /* Calculate the analysed intensity and store it in place of the I value.
-   Note, the effective analyser angle rotates twice as fast as the half-wave
-   plate which is why there is a factor of 4 here rather than a factor of 2.
-   An angle of zero corresponds to north in the tracking system. */
-               angle *= 4;
+   An angle of zero corresponds to the Q/U reference direction. */
+               angle *= 2.0;
                *iin = 0.5*( (*iin) + (*qin)*cos( angle ) + (*uin)*sin( angle ) );
             } else {
                *iin = VAL__BADD;

@@ -107,7 +107,8 @@
 *          approximately matching the FWHM of the envelope function, given
 *          by PARAMS(2), to the point-spread function of the input data. []
 *     QIN = NDF (Read)
-*          The input 2D image of the sky Q values. If QIN and UIN are
+*          The input 2D image of the sky Q values, with respect to the
+*          second pixel axis (i.e. the pixel Y axis). If QIN and UIN are
 *          both supplied, then the time series specified by the REF parameter
 *          should contain flat-fielded POL2 data. [!]
 *     REF = NDF (Read)
@@ -119,7 +120,8 @@
 *          The standard deviation of the Gaussian noise to add to the
 *          output data. [0.0]
 *     UIN = NDF (Read)
-*          The input 2D image of the sky U values. If QIN and UIN are
+*          The input 2D image of the sky U values, with respect to the
+*          second pixel axis (i.e. the pixel Y axis). If QIN and UIN are
 *          both supplied, then the time series specified by the REF parameter
 *          should contain flat-fielded POL2 data. [!]
 *     USEAXIS = LITERAL (Read)
@@ -213,6 +215,10 @@ void smurf_unmakemap( int *status ) {
    Grp *ogrp = NULL;          /* Group containing output file */
    ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
+   dim_t iel;                 /* Index of next element */
+   dim_t ndata;               /* Number of elements in array */
+   dim_t ntslice;             /* Number of time slices in array */
+   double *ang_data = NULL;   /* Pointer to the FP orientation angles */
    double *in_data = NULL;    /* Pointer to the input I sky map */
    double *inq_data = NULL;   /* Pointer to the input Q sky map */
    double *inu_data = NULL;   /* Pointer to the input U sky map */
@@ -224,7 +230,6 @@ void smurf_unmakemap( int *status ) {
    double params[ 4 ];        /* astResample parameters */
    double sigma;              /* Standard deviation of noise to add to output */
    int flag;                  /* Was the group expression flagged? */
-   int iel;                   /* INdex of next element */
    int ifile;                 /* Input file index */
    int indf;                  /* Input sky map NDF identifier */
    int indfin;                /* Input template cube NDF identifier */
@@ -431,17 +436,20 @@ void smurf_unmakemap( int *status ) {
 /* Check the reference time series contains double precision values. */
      smf_dtype_check_fatal( odata, NULL, SMF__DOUBLE, status );
 
-/* Initialise the output array to hold bad at every element. */
-      nel = odata ? odata->dims[ 0 ]*odata->dims[ 1 ]*odata->dims[ 2 ] : 0;
+/* Get the total number of data elements, and the number of time slices. */
+     smf_get_dims( odata, NULL, NULL, NULL, &ntslice, &ndata, NULL,
+                   NULL, status );
+
+/* Fill the output with bad values. */
       if( *status == SAI__OK ) {
          pd = odata->pntr[ 0 ];
-         for( iel = 0; iel < nel; iel++ ) *(pd++) = VAL__BADD;
+         for( iel = 0; iel < ndata; iel++ ) *(pd++) = VAL__BADD;
       }
 
 /* Resample the sky map data into the output time series. */
       smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
                      interp, params, sigma, in_data, odata->pntr[ 0 ],
-                     &ngood, status );
+                     NULL, &ngood, status );
 
 /* Issue a wrning if there is no good data in the output cube. */
       if( ngood == 0 ) msgOutif( MSG__NORM, " ", "   Output contains no "
@@ -450,31 +458,37 @@ void smurf_unmakemap( int *status ) {
 /* If Q and U maps have been given, allocate room to hold resampled Q and
    U values, and fill them with bad values. */
       if( inq_data && inu_data ) {
-         pq = outq_data = astMalloc( nel*sizeof( *outq_data ) );
-         pu = outu_data = astMalloc( nel*sizeof( *outu_data ) );
+         pq = outq_data = astMalloc( ndata*sizeof( *outq_data ) );
+         pu = outu_data = astMalloc( ndata*sizeof( *outu_data ) );
          if( *status == SAI__OK ) {
-            for( iel = 0; iel < nel; iel++ ) {
+            for( iel = 0; iel < ndata; iel++ ) {
                *(pu++) = VAL__BADD;
                *(pq++) = VAL__BADD;
             }
          }
 
+/* Allocate room for an array to hold the anti-clockwise angle from the
+   focal plane Y axis to the Y pixel axis in the reference map, at each
+   time slice. */
+         ang_data = astMalloc( ntslice*sizeof( *ang_data ) );
+
 /* Resample them both into 3D time series. */
          smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
                         interp, params, sigma, inq_data, outq_data,
-                        &ngood, status );
+                        ang_data, &ngood, status );
          smf_resampmap( wf, odata, abskyfrm, skymap, moving, slbnd, subnd,
                         interp, params, sigma, inu_data, outu_data,
-                        &ngood, status );
+                        NULL, &ngood, status );
 
 /* Combine these time series with the main output time series so that the
    main output is analysed intensity. */
          smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data,
-                         outu_data, status );
+                         outu_data, ang_data, status );
 
 /* Release work space. */
          outq_data = astFree( outq_data );
          outu_data = astFree( outu_data );
+         ang_data = astFree( ang_data );
       }
 
 /* Close the output time series file. */

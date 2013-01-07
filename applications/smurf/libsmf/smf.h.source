@@ -1760,8 +1760,8 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
 void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
                     AstMapping *sky2map, int moving, int slbnd[ 2 ],
                     int subnd[ 2 ], int interp, const double params[],
-                    double sigma, double *in_data, double *out_data, int *ngood,
-                    int *status );
+                    double sigma, double *in_data, double *out_data,
+                    double *ang_data, int *ngood, int *status );
 
 void smf_reshapendf( smfData **data, smfTile *tile, int *status );
 
@@ -1868,7 +1868,7 @@ double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
 void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status );
 
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
-                     double *qdata, double *udata, int *status );
+                     double *qdata, double *udata, double *angdata, int *status );
 
 void smf_update_quality( smfData *data, int syncbad,
                          const int *badmask, smf_qual_t addqual, double badfrac,

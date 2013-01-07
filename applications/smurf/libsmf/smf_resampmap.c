@@ -17,7 +17,8 @@
 *                     AstMapping *sky2map, int moving,
 *                     int slbnd[ 2 ], int subnd[ 2 ], int interp,
 *                     const double params[], double sigma, double *in_data,
-*                     double *out_data, int *ngood, int *status );
+*                     double *out_data, double *ang_data, int *ngood,
+*                     int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -60,6 +61,10 @@
 *     out_data = double * (Returned)
 *        The 3D data array for the output time series array. Must be
 *        time-ordered (see smf_dataOrder.c).
+*     ang_data = double * (Returned)
+*        A 1D data array to receive the anti-clockwise angle from the
+*        focal plane Y axis to the Y pixel axis in the reference map, at
+*        each time slice. May be NULL.
 *     ngood = int * (Returned)
 *        Returned holding the number of good values in the output time
 *        series.
@@ -78,6 +83,8 @@
 *  History:
 *     8-JUN-2011 (DSB):
 *        Initial version.
+*     7-JAN-2013 (DSB):
+*        Added argument ang_data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -130,6 +137,7 @@ typedef struct smfResampMapData {
    dim_t ndbolo;
    double *in;
    double *out;
+   double *ang;
    double sigma;
    int interp;
    int moving;
@@ -148,8 +156,8 @@ static void smf1ResampMap( void *job_data_ptr, int *status );
 void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
                     AstMapping *sky2map, int moving, int slbnd[ 2 ],
                     int subnd[ 2 ], int interp, const double params[],
-                    double sigma, double *in_data, double *out_data, int *ngood,
-                    int *status ){
+                    double sigma, double *in_data, double *out_data,
+                    double *ang_data, int *ngood, int *status ){
 
 /* Local Variables */
    const gsl_rng_type *type;
@@ -208,6 +216,9 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 
 /* Pointer to the first input (i.e. sky map) data element. */
          pdata->in = in_data;
+
+/* Pointer to the first returned angle value. */
+         pdata->ang = ang_data;
 
 /* Ensure that the last thread picks up any left-over tslices */
          if( iw == nw - 1 ) pdata->t2 = ntslice - 1;
@@ -292,6 +303,7 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    AstMapping *fullmap;
    AstMapping *sky2map;
    AstSkyFrame *abskyfrm;
+   const double *params;
    dim_t ibolo;
    dim_t itime;
    dim_t nbolo;
@@ -300,7 +312,10 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    double *in;
    double *out;
    double sigma;
-   const double *params;
+   double xin[ 2 ];
+   double xout[ 2 ];
+   double yin[ 2 ];
+   double yout[ 2 ];
    gsl_rng *r;
    int interp;
    int lbnd_bolo[ 2 ];
@@ -370,9 +385,32 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
                            VAL__BADD, 2, lbnd_bolo, ubnd_bolo,
                            lbnd_bolo, ubnd_bolo,  out, NULL );
 
+/* If required, get the anti-clockwise angle from the focal plane Y axis to the
+   Y pixel axis in the sky map, at the current time slice. */
+      if( pdata->ang ) {
+
+/* Transform two positions on the focal plane Y axis into sky map grid
+   coordinates. */
+         xin[ 0 ] = 0.0;
+         xin[ 1 ] = 0.0;
+         yin[ 0 ] = 0.0;
+         yin[ 1 ] = 1.0;
+         astTran2( fullmap, 2, xin, yin, 0, xout, yout );
+
+/* Find the angle from the line between the transformed points, and the Y
+   axis in the sky map grid frame. */
+        if( xout[ 0 ] != AST__BAD && xout[ 1 ] != AST__BAD &&
+            yout[ 0 ] != AST__BAD && yout[ 1 ] != AST__BAD &&
+            ( xout[ 1 ] != xout[ 0 ] || yout[ 1 ] != yout[ 0 ] ) ) {
+           (pdata->ang)[ itime ] = atan2( xout[ 1 ] - xout[ 0 ],
+                                          yout[ 1 ] - yout[ 0 ] );
+        } else {
+           (pdata->ang)[ itime ] = VAL__BADD;
+        }
+     }
+
 /* Return the number of good output sample values. */
       pdata->ngood = nbolo - nbad;
-
 
 /* Add Gaussian noise to the output values. */
       if( r ) {
