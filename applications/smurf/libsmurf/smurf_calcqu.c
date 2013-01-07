@@ -42,6 +42,9 @@
 *     (6 - 12 Hz), and should be largely unaffected by signal at other
 *     frequencies. For this reason, the cleaning specified by parameter
 *     CONFIG should usually not include any filtering.
+*
+*     The current WCS Frame within the generated I, Q and U images will
+*     be SKY (e.g. Right Ascension/Declination).
 
 *  ADAM Parameters:
 *     ARCERROR = _REAL (Read)

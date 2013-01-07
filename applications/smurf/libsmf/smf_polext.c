@@ -54,6 +54,8 @@
 *        Added argument store_angle.
 *     15-DEC-2012 (DSB):
 *        Added argument "domain".
+*     7-JAN-2013 (DSB):
+*        Ensure that the original current WCS Frame is not changed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,6 +119,10 @@ void smf_polext( int ondf, int store_angle, double angle, const char *domain,
 /* Get a pointer to the WCS FrameSet in the output NDF. */
    ndfGtwcs( ondf, &wcs, status );
 
+/* Note the index of the original current Frame in "wcs" so that we can
+   re-instate it later. */
+   icur = astGetI( wcs, "Current" );
+
 /* POLPACK uses the first axis of the WCS Frame with Domain POLANAL as the
    reference direction, so we need to add such a Frame to the WCS FrameSet.
    The "angle" value supplied by the caller is with respect to north in the
@@ -156,10 +162,12 @@ void smf_polext( int ondf, int store_angle, double angle, const char *domain,
                  status );
       }
 
-/* If a non-SKY Domain was specified, find it. */
+/* If a non-SKY Domain was specified, find it, then reset the modified
+   current Frame index. */
    } else {
       template = (AstFrame *) astFrame( 2, "MaxAxes=3,Domain=%s", domain );
       fs = astFindFrame( wcs, template, domain );
+      astSetI( wcs, "Current", icur );
 
 /* Check a match was found. */
       if( fs ) {
@@ -191,10 +199,6 @@ void smf_polext( int ondf, int store_angle, double angle, const char *domain,
       astSet( polfrm, "Title=Polarimetry reference frame" );
       astSet( polfrm, "Label(1)=Polarimetry reference direction" );
       astSet( polfrm, "Label(2)=" );
-
-/* Note the index of the original current Frame in "wcs" so that we can
-   re-instate it later. */
-      icur = astGetI( wcs, "Current" );
 
 /* Add the POLANAL Frame into the WCS FrameSet using the above Mapping to
    connect it to the required Frame. */

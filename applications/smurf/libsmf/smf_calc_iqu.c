@@ -59,7 +59,8 @@
 *     "block_start" and "block_end". The spatial position of each bolometer
 *     is assumed not to move significantly over the duration of this block of
 *     time slices. The I, Q and U values stored in the output NDFs are
-*     referenced to the focal plane Y axis.
+*     referenced to the focal plane Y axis. The current WCS Frame in the output 
+*     NDFs is "SKY".
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
