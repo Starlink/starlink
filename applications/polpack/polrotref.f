@@ -35,16 +35,18 @@
 *        to be rotated. It must lie between -360 and 360 degrees. Only
 *        accessed if parameter LIKE is set to null (!). The suggested
 *        default is the current value.  If a null (!) value is supplied,
-*        then the rotation angle is chosen to make north vertical at the
-*        centre of the field. If the current co-ordinate Frame in the
-*        input NDF is not a celestial co-ordinate frame, then the
-*        rotation angle is chosen to make the second axis of the current
-*        Frame vertical.
+*        then the direction of north at the centre of the field is used
+*        as the new reference direction. If the current co-ordinate Frame
+*        in the input NDF is not a celestial co-ordinate frame, then the
+*        second axis of the current Frame is used as the new reference
+*        direction.
 *     LIKE = NDF (Read)
-*        A 2D Q or U image that defines the new reference direction. The
-*        input Q and U images are aligned with this image in the current
-*        WCS Frame. If null (!) is supplied, the rotation is defined by
-*        parametrer ANGLE. [!]
+*        A 2D Q or U NDF that defines the new reference direction. The
+*        supplied NDF should have a Frame with Domain "POLANAL" in its
+*        WCS component. The supplied Q and U images are modified so that
+*        they use the same reference direction as the supplied NDF. If
+*        null (!) is supplied, the rotation is defined by parametrer
+*        ANGLE. [!]
 *     QIN = NDF (Read)
 *        The 2D input Q image. The WCS component of this NDF must contain
 *        a POLANAL Frame.
@@ -90,6 +92,9 @@
 *  History:
 *     17-DEC-2012 (DSB):
 *        Original version.
+*     7-JAN-2013 (DSB):
+*        Fix degs/rads conversion bug that caused incorrect POLANAL
+*        orientation in the output NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -170,7 +175,7 @@
       CALL KPG1_ASGET( INDFQI, 2, .FALSE., .TRUE., .TRUE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
 
-*  Calculate the original ANGROT value.
+*  Calculate the original ANGROT value, in degrees.
       CALL POL1_GTANG( INDFQI, 0, IWCS, ANGROT, STATUS )
 
 *  If an NDF is specified via parameter LIKE, get it, and determine the
@@ -184,7 +189,7 @@
      :                    SLBNDL, SUBNDL, IWCSL, STATUS )
 
 *  Get the anti-clockwise angle from the GRID X axis to the reference
-*  direction in the template.
+*  direction in the template, in degrees.
          CALL POL1_GTANG( INDFL, 0, IWCSL, ANGLE, STATUS )
 
 *  Modify this angle to that it refers to the GRID coordinate system of
@@ -192,7 +197,7 @@
          CALL POL1_TRANG( IWCS, IWCSL, SLBND, SUBND, ANGLE, STATUS )
 
 *  Find the clockwise rotation angle from the original Q reference
-*  direction to the reference direction of the template.
+*  direction to the reference direction of the template, in degrees.
          IF( ANGLE .NE. VAL__BADR ) THEN
             ANGLE = ANGROT - ANGLE
          ELSE
@@ -338,7 +343,7 @@
       END IF
 
 *  Create a new POLANAL Frame describing the new ANGROT value.
-      CALL POL1_PTANG( REAL( ANGROT - ANGLE*AST__DR2D ), IWCS, STATUS )
+      CALL POL1_PTANG( REAL( ANGROT - ANGLE ), IWCS, STATUS )
 
 * Store the modified WCS FrameSets.
       CALL NDF_PTWCS( IWCS, INDFQO, STATUS )

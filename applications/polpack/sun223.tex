@@ -5347,23 +5347,25 @@ for NDF applications.
       \sstsubsection{
          ANGLE = \_REAL (Read)
       }{
-         Number of clockwise degrees by which the reference direction is
-         to be rotated. It must lie between -360 and 360 degrees. Only
-         accessed if parameter LIKE is set to null (!). The suggested
-         default is the current value.  If a null (!) value is supplied,
-         then the rotation angle is chosen to make north vertical at the
-         centre of the field. If the current co-ordinate Frame in the
-         input NDF is not a celestial co-ordinate frame, then the
-         rotation angle is chosen to make the second axis of the current
-         Frame vertical.
+        Number of clockwise degrees by which the reference direction is
+        to be rotated. It must lie between -360 and 360 degrees. Only
+        accessed if parameter LIKE is set to null (!). The suggested
+        default is the current value.  If a null (!) value is supplied,
+        then the direction of north at the centre of the field is used
+        as the new reference direction. If the current co-ordinate Frame
+        in the input NDF is not a celestial co-ordinate frame, then the
+        second axis of the current Frame is used as the new reference
+        direction.
       }
       \sstsubsection{
          LIKE = NDF (Read)
       }{
-         A 2D Q or U image that defines the new reference direction. The
-         input Q and U images are aligned with this image in the current
-         WCS Frame. If null (!) is supplied, the rotation is defined by
-         parametrer ANGLE. [!]
+        A 2D Q or U NDF that defines the new reference direction. The
+        supplied NDF should have a Frame with Domain "POLANAL" in its
+        WCS component. The supplied Q and U images are modified so that
+        they use the same reference direction as the supplied NDF. If
+        null (!) is supplied, the rotation is defined by parametrer
+        ANGLE. [!]
       }
       \sstsubsection{
          QIN = NDF (Read)
