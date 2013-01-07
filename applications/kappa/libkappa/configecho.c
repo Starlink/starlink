@@ -187,6 +187,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 
       kpg1Gtgrp( "SELECT", &grp, &size, STATUS );
       if( *STATUS == PAR__NULL ) {
+         grpDelet( &grp, STATUS );
          errAnnul( STATUS );
          keymap2 = NULL;
       } else {
