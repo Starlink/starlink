@@ -60,6 +60,10 @@
 *     21-SEP-2012 (DSB):
 *        Take 360->zero wrap-around in POL_ANG into account when adjusting the
 *        end time slice to a quarter revolution boundary.
+*     7-JAN-2012 (DSB):
+*        Use focal plane Y as as the POLCRD reference direction rather
+*        than tracking north. Also take account of old data that uses
+*        arbitrary encoder units rather than radians, and check for bad angles.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,6 +96,7 @@
 /* Starlink includes */
 #include "sofa.h"
 #include "sae_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -105,6 +110,11 @@
      iauSeps( ac1_start, ac2_start, state->tcs_tr_ac1, state->tcs_tr_ac2 ) \
      > arcerror || \
        fabs( ang_start - state->tcs_tr_ang ) > angle )
+
+/* Old data has POL_ANG given in arbitrary integer units where
+   SMF__MAXPOLANG is equivalent to 2*PI. Store the factor to convert such
+   values into radians. */
+#define TORADS (2*AST__DPI/SMF__MAXPOLANG)
 
 
 
@@ -125,6 +135,8 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
    int inc;                   /* No. of time slices between tests */
    int ipass;                 /* Index of last time slice to pass the test */
    int itime;                 /* Time slice index at next test */
+   int ntime;                 /* Number of time slices to check */
+   int old;                   /* Data has old-style POL_ANG values? */
    int result;                /* The returned time slice index at block end */
    smfHead *hdr;              /* Pointer to data header this time slice */
 
@@ -228,60 +240,103 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
          result = ipass;
       }
 
+/* If we have a new block... */
+      if( result != -1 ) {
+
+/* Go through the first thousand POL_ANG values to see if they are in
+   units of radians (new data) or arbitrary encoder units (old data).
+   They are assumed to be in radians if no POL_ANG value is larger than
+   20. */
+         old = 0;
+         state = hdr->allState;
+         ntime = ( ntslice > 1000 ) ? 1000 : ntslice;
+         for( itime = 0; itime < ntime; itime++,state++ ) {
+            if( state->pol_ang > 20 ) {
+               old = 1;
+               msgOutif( MSG__VERB, "","   POL2 data contains POL_ANG values "
+                         "in encoder units - converting to radians.", status );
+               break;
+            }
+         }
+
 /* In order to reduce inaccuracies when finding the required Fourier
    component of the time series, we now shorten the block until it spans an
    integral number of quarter revolutions of the half-waveplate relative to
-   tracking north. We use quarter revolutions rather than whole
+   focal plane Y axis. We use quarter revolutions rather than whole
    revolutions because analysed intensity varies four times faster than
    the half-waveplate position. First find the half-waveplate angle with
-   respect to tracking north, at the start of the block. */
-      state = (hdr->allState) + block_start;
-      start_wang = state->pol_ang;
-      if( ipolcrd == 0 ) {
-         start_wang -= state->tcs_tr_ang;
-      } else if( ipolcrd == 1 ) {
-         start_wang -= state->tcs_tr_ang - state->tcs_az_ang ;
-      }
+   respect to focal plane Y, at the start of the block. */
+         while( result != -1 ) {
+            state = (hdr->allState) + block_start;
+            start_wang = state->pol_ang;
+            if( start_wang != VAL__BADD ) break;
+            block_start++;
+            if( block_start == result ) result = -1;
+         }
 
-/* Now find the half-waveplate angle with respect to tracking north, at
+/* If POL_ANG is stored in arbitrary encoder units, convert to radians. */
+         if( old ) start_wang *= TORADS;
+
+/* Get the anti-clockwise angle from the half-waveplate to the focal plane Y axis. */
+         if( ipolcrd == 1 ) {
+            start_wang += state->tcs_az_ang;
+         } else if( ipolcrd == 2 ) {
+            start_wang += state->tcs_tr_ang;
+         }
+
+/* Now find the half-waveplate angle with respect to focal plane Y, at
    the current end of the block. */
-      state = (hdr->allState) + result;
-      end_wang = state->pol_ang;
-      if( ipolcrd == 0 ) {
-         end_wang -= state->tcs_tr_ang;
-      } else if( ipolcrd == 1 ) {
-         end_wang -= state->tcs_tr_ang - state->tcs_az_ang ;
-      }
+         while( result != -1 ) {
+            state = (hdr->allState) + result;
+            end_wang = state->pol_ang;
+            if( end_wang != VAL__BADD ) break;
+            result--;
+            if( result == block_start ) result = -1;
+         }
+
+         if( old ) end_wang *= TORADS;
+
+         if( ipolcrd == 1 ) {
+            end_wang += state->tcs_az_ang;
+         } else if( ipolcrd == 2 ) {
+            end_wang += state->tcs_tr_ang;
+         }
 
 /* On the assumption that POL_ANG increases with time, if the
    half-waveplate angle at the end of the block is less than at the start of
    the block, it must have reached 2*PI and wrapped back round to zero. So
    add on 2*PI to the end value. */
-      if( end_wang < start_wang ) end_wang += 2*AST__DPI;
+         if( end_wang < start_wang ) end_wang += 2*AST__DPI;
 
 /* Reduce the end angle so that it is an integral number of quarter
    revolutions in front of the start angle. We are assuming here that
    POL_ANG increases (rather than decreasing) with time. */
-      end_wang = start_wang +
-                  AST__DPIBY2*( (int) ( ( end_wang - start_wang )/AST__DPIBY2 ) );
+         end_wang = start_wang +
+                     AST__DPIBY2*( (int) ( ( end_wang - start_wang )/AST__DPIBY2 ) );
 
 /* If the end angle is greater than 2*PI, reduce it by 2.PI. */
-      if( end_wang > 2*AST__DPI ) end_wang -= 2*AST__DPI;
+         if( end_wang > 2*AST__DPI ) end_wang -= 2*AST__DPI;
 
 /* Work backwards through the time slices, starting at the current end
    time slice, until a time slice is found which has an angle less than the
    end angle found above. */
-      for( ; result >= block_start; result-- ) {
-         state = (hdr->allState) + result;
-         wang = state->pol_ang;
-         if( ipolcrd == 0 ) {
-            wang -= state->tcs_tr_ang;
-         } else if( ipolcrd == 1 ) {
-            wang -= state->tcs_tr_ang - state->tcs_az_ang ;
+         for( ; result >= block_start; result-- ) {
+            state = (hdr->allState) + result;
+            wang = state->pol_ang;
+            if( wang != VAL__BADD ) {
+               if( old ) wang *= TORADS;
+               if( ipolcrd == 1 ) {
+                  wang += state->tcs_az_ang;
+               } else if( ipolcrd == 2 ) {
+                  wang += state->tcs_tr_ang;
+               }
+               if( wang < end_wang ) break;
+            }
          }
-         if( wang < end_wang ) break;
-      }
 
+         if( result < block_start ) result = -1;
+
+      }
    }
 
 /* Return the index of the last time slice in the block, or -1 if an
