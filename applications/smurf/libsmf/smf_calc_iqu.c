@@ -372,10 +372,10 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 
 /* Add POLANAL Frames to the WCS FrameSet in each output NDF. This Frame
    is used by POLPACK to determine the reference direction of the Stokes
-   vectors (focal plane Y in this case). */
-   smf_polext( indfq, 0, 0.0, "FPLANE", status );
-   smf_polext( indfu, 0, 0.0, "FPLANE", status );
-   if( ipi ) smf_polext( indfi, 0, 0.0, "FPLANE", status );
+   vectors (focal plane Y in this case, i.e. zero-based axis 1 ). */
+   smf_polext( indfq, 0, 0.0, "FPLANE", 1, status );
+   smf_polext( indfu, 0, 0.0, "FPLANE", 1, status );
+   if( ipi ) smf_polext( indfi, 0, 0.0, "FPLANE", 1, status );
 
 /* Free the two output NDFs. */
    ndfAnnul( &indfq, status );

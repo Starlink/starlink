@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_polext( int ondf, int store_angle, double angle, const char *domain,
-*                 int *status )
+*                 int axis, int *status )
 
 *  Arguments:
 *     ondf = int (Given)
@@ -26,14 +26,19 @@
 *        FrameSet.
 *     angle = double (Given)
 *        Ignored if "store_angle" is zero. The position angle of the analysed
-*        intensity. This is the angle from north in the spatial coordinate
-*        system of the output, to the analyser axis. Positive rotation is in
-*        the same sense as rotation from the first spatial pixel axis to the
-*        second spatial pixel axis (as required by POLPACK).
+*        intensity (what POLPACK calls "ANLANG"). This is the angle from north
+*        in the spatial coordinate system of the output, to the analyser axis.
+*        Positive rotation is in the same sense as rotation from the first
+*        spatial pixel axis to the second spatial pixel axis (as required by
+*        POLPACK).
 *     domain = const char * (Given)
 *        The domain name for the WCS Frame in which the "angle" value is
 *        specified. If a NULL pointer is supplied, the current Frame is
 *        assumed.
+*     axis = int (Given)
+*        The zero-based index of the axis wihin the Frame specified by
+*        "domain" that corresponds to the reference direction. Only used
+*        if "domain" is supplied with a value other than SKY.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -42,6 +47,9 @@
 *     Values are put in the extension that tell POLPACK that the NDF holds
 *     linearly analysed intensity, at the specified angle. These are the
 *     values needed by the POLPACK:POLCAL task.
+*
+*     If the Domain is SKY, the reference direction is assumed to be
+*     north. Otherwise, it is assumed to be the axis specified by "axis".
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
@@ -56,6 +64,8 @@
 *        Added argument "domain".
 *     7-JAN-2013 (DSB):
 *        Ensure that the original current WCS Frame is not changed.
+*     8-JAN-2013 (DSB):
+*        Add argument "axis".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -95,20 +105,23 @@
 #include "libsmf/smf.h"
 
 void smf_polext( int ondf, int store_angle, double angle, const char *domain,
-                 int *status ){
+                 int axis, int *status ){
 
 /* Local Variables */
    AstFrame *curfrm = NULL;
    AstFrame *polfrm = NULL;
+   AstFrame *template = NULL;
    AstFrameSet *fs = NULL;
    AstFrameSet *wcs = NULL;
    AstMapping *map = NULL;
-   AstFrame *template = NULL;
    HDSLoc *loc = NULL;
    int dummy;
+   int iaxis;
    int icur;
    int ifrm;
-   int perm[ 2 ];
+   int iout;
+   int naxes;
+   int perm[ NDF__MXDIM ];
 
 /* Check inherited status, and also check the supplied angle is not bad. */
    if( *status != SAI__OK || angle == AST__BAD ) return;
@@ -174,8 +187,21 @@ void smf_polext( int ondf, int store_angle, double angle, const char *domain,
 
 /* The base Frame in the "fs" FrameSet will be identical to the base
    Frame of "wcs", and the current Frame will be a Frame with the
-   required Domain. This is the Frame we will use as the POLANAL Frame.
-   Extract the Mapping and current Frame from "fs". */
+   required Domain. POLPACK uses the first POLANAL axis as the reference
+   direction - if we are using some other axis we need to permute the
+   Ffame to put it first. */
+         if( axis > 0 ) {
+            naxes = astGetI( fs, "Naxes" );
+            perm[ 0 ] = axis + 1;
+            iout = 1;
+            for( iaxis = 0; iaxis < naxes; iaxis++ ){
+               if( iaxis != axis ) perm[ iout++ ] = iaxis + 1;
+            }
+            astPermAxes( fs, perm );
+         }
+
+/* This is now the Frame we will use as the POLANAL Frame. Extract the Mapping
+   and current Frame from "fs". */
          map = astGetMapping( fs, AST__BASE, AST__CURRENT );
          polfrm = astGetFrame( fs, AST__CURRENT );
          ifrm = AST__BASE;

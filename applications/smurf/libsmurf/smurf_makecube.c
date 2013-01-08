@@ -2023,7 +2023,7 @@ void smurf_makecube( int *status ) {
 
 /* If required ensure that the output NDF has a POLPACK extension holding
    the polarisation angle for the data in the output cube. */
-         if( npbin > 1 ) smf_polext( ondf, 1, pangle[ ipbin ], NULL, status );
+         if( npbin > 1 ) smf_polext( ondf, 1, pangle[ ipbin ], NULL, 0, status );
 
 /* The following calls to smf_reshapendf close the open NDFs. So if we
    will need access to the NDF afterwards, clone the NDF identifier now. */
