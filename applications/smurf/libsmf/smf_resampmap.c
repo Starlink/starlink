@@ -286,7 +286,7 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 /* Wait until all of the jobs have completed */
       thrWait( wf, status );
 
-/* Free resources and count the totql number of good values in the output
+/* Free resources and count the total number of good values in the output
    cube. */
       for( iw = 0; iw < nw; iw++ ) {
          pdata = job_data + iw;
@@ -474,4 +474,5 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    smf_lock_data( data, 0, status );
    astUnlock( abskyfrm, 1 );
    astUnlock( sky2map, 1 );
+   if( fpmap ) astUnlock( fpmap, 1 );
 }
