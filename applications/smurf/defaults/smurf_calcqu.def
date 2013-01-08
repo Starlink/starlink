@@ -133,3 +133,13 @@ com.offset_is_zero = 0
 
 gai.flatfield = 0
 # -------------------------------------------------------------------------
+
+
+#  CALCQU specific parameters:
+pasign = 1
+paoff = 0.0
+angrot = 90.0
+
+
+
+

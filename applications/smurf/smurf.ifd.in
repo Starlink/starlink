@@ -5026,6 +5026,15 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter angrot {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Angle from focal plane X to fixed analyser (degs)}
+                default 90.0
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -5062,6 +5071,24 @@ package @PACKAGE@ {
                 vpath PROMPT
                 ppath CURRENT
                 prompt {Auxiliary interpolation parameters}
+                helpkey *
+            }
+
+            parameter paoff {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Angle from fixed analyser to POL_ANG=0 (degs)}
+                default 0.0
+                helpkey *
+            }
+
+            parameter pasign {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {POL_ANG in sense of rotation from focal plane X to Y?}
+                default TRUE
                 helpkey *
             }
 

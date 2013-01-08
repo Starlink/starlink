@@ -34,6 +34,10 @@
 *     is the values in the NDF "Data" array.
 
 *  ADAM Parameters:
+*     ANGROT = _DOUBLE (Read)
+*          The angle from the focal plane X axis to the fixed analyser, in
+*          degrees. Measured positive in the same sense as rotation from focal
+*          plane X to focal plane Y. [90.0]
 *     IN = NDF (Read)
 *          The input 2D image of the sky. If NDFs are supplied for the
 *          QIN and UIN parameters, then IN should hold I values.
@@ -106,6 +110,16 @@
 *          run-time default is 1.0.  Good results are often obtained by
 *          approximately matching the FWHM of the envelope function, given
 *          by PARAMS(2), to the point-spread function of the input data. []
+*     PAOFF = _DOUBLE (Read)
+*          The angle from the fixed analyser to the have-wave plate for a
+*          POL_ANG value of zero, in degrees. Measured positive in the same
+*          sense as rotation from focal plane X to focal plane Y. [0.0]
+*     PASIGN = _LOGICAL (Read)
+*          Indicates the sense of rotation of the spinning half-wave plate. If
+*          TRUE, it is assumed that a positive POL_ANG value corresponds
+*          to rotation from focal plane X to focal plane Y axis. If FALSE, it
+*          is assumed that a positive POL_ANG value corresponds to rotation
+*          from focal plane Y to focal plane X axis. [TRUE]
 *     QIN = NDF (Read)
 *          The input 2D image of the sky Q values, with respect to the
 *          second pixel axis (i.e. the pixel Y axis). If QIN and UIN are
@@ -143,6 +157,8 @@
 *  History:
 *     8-JUN-2011 (DSB):
 *        Original version.
+*     8-JAN-2013 (DSB):
+*        Added parameters PASIGN, PAOFF and ANGROT.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -227,6 +243,8 @@ void smurf_unmakemap( int *status ) {
    double *pd;                /* Pointer to next element */
    double *pq = NULL;         /* Pointer to next Q time series value */
    double *pu = NULL;         /* Pointer to next U time series value */
+   double angrot;             /* Angle from focal plane X axis to fixed analyser */
+   double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double params[ 4 ];        /* astResample parameters */
    double sigma;              /* Standard deviation of noise to add to output */
    int flag;                  /* Was the group expression flagged? */
@@ -242,6 +260,7 @@ void smurf_unmakemap( int *status ) {
    int nelqu;                 /* Number of elements in Q or U array */
    int ngood;                 /* No. of good values in putput cube */
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
+   int pasign;                /* Indicates sense of POL_ANG value */
    int sdim[ 2 ];             /* Array of significant pixel axes */
    int slbnd[ 2 ];            /* Array of lower bounds of input map */
    int subnd[ 2 ];            /* Array of upper bounds of input map */
@@ -386,6 +405,10 @@ void smurf_unmakemap( int *status ) {
          inq_data = NULL;
          inu_data = NULL;
          errAnnul( status );
+      } else {
+         parGet0d( "ANGROT", &angrot, status );
+         parGet0d( "PAOFF", &paoff, status );
+         parGet0l( "PASIGN", &pasign, status );
       }
    }
 
@@ -482,8 +505,9 @@ void smurf_unmakemap( int *status ) {
 
 /* Combine these time series with the main output time series so that the
    main output is analysed intensity. */
-         smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data,
-                         outu_data, ang_data, status );
+         smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data, outu_data,
+                         ang_data, pasign, AST__DD2R*paoff, AST__DD2R*angrot,
+                         status );
 
 /* Release work space. */
          outq_data = astFree( outq_data );

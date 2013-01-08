@@ -15,7 +15,8 @@
 *  Invocation:
 *     void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, int nel,
 *                          double *idata, double *qdata, double *udata,
-*                          double *angdata, int *status );
+*                          double *angdata, int pasign, double paoff,
+*                          double angrot, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -32,8 +33,22 @@
 *     udata = double * (Given)
 *        An array of U values.
 *     angdata = double * (Given)
-*        An array holding the anti-clockwise angle from the focal plane Y
-*        axis to the  Q/U reference direction, at each time slice.
+*        An array holding the angle from the reference direction used by
+*        the supplied Q and U values, to the focal plane Y axis, in radians,
+*        at each time slice. Positive rotation is in the same sense as
+*        rotation from focal plane X to focal plane Y.
+*     pasign = int (Given)
+*        Should be supplied non-zero if a positive POL_ANG value
+*        corresponds to rotation from focal plane X to focal plane Y axis,
+*        and zero otherwise.
+*     paoff = double (Given)
+*        The angle from the fixed analyser to the have-wave plate for a
+*        POL_ANG value of zero, in radians. Measured positive in the same
+*        sense as rotation from focal plane X to focal plane Y.
+*     angrot = double (Given)
+*        The angle from the focal plane X axis to the fixed analyser, in
+*        radians. Measured positive in the same sense as rotation from focal
+*        plane X to focal plane Y.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -50,6 +65,8 @@
 *        Original version.
 *     7-JAN-2013 (DSB):
 *        Use focal plane Y axis as the reference direction.
+*     8-JAN-2013 (DSB):
+*        Added arguments pasign, paoff and angrot.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,13 +109,16 @@ typedef struct smfUncalcIQUJobData {
    dim_t b1;
    dim_t b2;
    dim_t nbolo;
+   double *ipang;
+   double *ipi;
    double *ipq;
    double *ipu;
-   double *ipi;
-   double *ipang;
+   double angrot;
+   double paoff;
    int ipolcrd;
    int ntslice;
    int old;
+   int pasign;
    size_t bstride;
    size_t tstride;
 } smfUncalcIQUJobData;
@@ -113,9 +133,9 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status );
 #define TORADS (2*AST__DPI/SMF__MAXPOLANG)
 
 
-void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data,
-                     double *idata, double *qdata, double *udata,
-                     double *angdata, int *status ){
+void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
+                     double *qdata, double *udata, double *angdata,
+                     int pasign, double paoff, double angrot, int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
@@ -162,18 +182,24 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data,
 
 /* Get the reference direction for JCMTSTATE:POL_ANG values. */
    smf_getfitss( hdr, "POL_CRD", headval, sizeof(headval), status );
-   if( !strcmp( headval, "FPLANE" ) ) {
-      ipolcrd = 0;
-   } else if( !strcmp( headval, "AZEL" ) ) {
+   ipolcrd = 0;
+   if( !strcmp( headval, "AZEL" ) ) {
       ipolcrd = 1;
    } else if( !strcmp( headval, "TRACKING" ) ) {
       ipolcrd = 2;
-   } else if( *status == SAI__OK ) {
+   } else if( strcmp( headval, "FPLANE" ) && *status == SAI__OK ) {
       *status = SAI__ERROR;
       smf_smfFile_msg( data->file, "N", 0, "" );
       msgSetc( "V", headval );
       errRep( " ", "Input NDF ^N contains unknown value "
               "'^V' for FITS header 'POL_CRD'.", status );
+   }
+
+/* Can only handle POL_CRD = FPLANE at the moment. */
+   if( ipolcrd != 0 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( "", "smf_uncalc_iqu: currently only POL_CRD = FPLANE is "
+               "supported.", status );
    }
 
 /* Obtain number of time slices - will also check for 3d-ness. Also get
@@ -235,6 +261,9 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data,
          pdata->ipolcrd = ipolcrd;
          pdata->old = old;
          pdata->ntslice = ntslice;
+         pdata->pasign = pasign ? +1: -1;
+         pdata->paoff = paoff;
+         pdata->angrot = angrot;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_uncalc_iqu_job, 0, NULL,
@@ -283,20 +312,29 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    dim_t ibolo;               /* Bolometer index */
    dim_t nbolo;               /* Total number of bolometers */
    double *iin;               /* Pointer to I array for each bolometer*/
+   double *ipang;             /* Pointer to supplied FP orientation array */
    double *ipi0;              /* Pointer to input I array for 1st time */
    double *ipi;               /* Pointer to supplied I array */
    double *ipq0;              /* Pointer to input Q array for 1st time */
    double *ipq;               /* Pointer to supplied Q array */
    double *ipu0;              /* Pointer to input U array for 1st time */
    double *ipu;               /* Pointer to supplied U array */
-   double *ipang;             /* Pointer to supplied FP orientation array */
    double *qin;               /* Pointer to Q array for each bolometer*/
    double *uin;               /* Pointer to U array for each bolometer*/
    double angle;              /* Phase angle for FFT */
+   double angrot;             /* Angle from focal plane X axis to fixed analyser */
+   double cosval;             /* Cos of twice reference rotation angle */
+   double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
+   double phi;                /* Angle from fixed analyser to effective analyser */
+   double qval;               /* Q value wrt fixed analyser */
+   double sinval;             /* Sin of twice reference rotation angle */
+   double uval;               /* U value wrt fixed analyser */
+   double wplate;             /* Angle from fixed analyser to have-wave plate */
    int ipolcrd;               /* Reference direction for pol_ang */
    int itime;                 /* Time slice index */
    int ntslice;               /* Number of time slices */
    int old;                   /* Data has old-style POL_ANG values? */
+   int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    size_t bstride;            /* Stride between adjacent bolometer values */
    size_t tstride;            /* Stride between adjacent time slice values */
    smfUncalcIQUJobData *pdata;   /* Pointer to job data */
@@ -320,6 +358,9 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    ipolcrd = pdata->ipolcrd;
    ntslice = pdata->ntslice;
    old = pdata->old;
+   pasign = pdata->pasign;
+   paoff = pdata->paoff;
+   angrot = pdata->angrot;
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
@@ -339,8 +380,8 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
          qin = ipq0;
          uin = ipu0;
 
-/* Initialise a pointer to the anti-clockwise angle from the focal plane
-   Y axis to the Q/U reference direction, at the next time slice. */
+/* Initialise a pointer to the anti-clockwise angle from the Q/U reference
+   direction to the focal plane Y axis, at the next time slice. */
          ipang = pdata->ipang;
 
 /* Loop round all time slices. */
@@ -358,25 +399,48 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
 /* If POL_ANG is stored in arbitrary encoder units, convert to radians. */
                if( old ) angle = angle*TORADS;
 
-/* Get the anti-clockwise angle from the half-waveplate to the focal plane Y axis. */
-               if( ipolcrd == 1 ) {
-                  angle += state->tcs_az_ang;
-               } else if( ipolcrd == 2 ) {
-                  angle += state->tcs_tr_ang;
+/* Following SUN/223 (section "Single-beam polarimetry"/"The Polarimeter"),
+   get the angle from the fixed analyser to the half-waveplate axis, in radians.
+   Positive rotation is from focal plane axis 1 (x) to focal plane axis 2 (y).
+
+   Not sure about the sign of tcs_az/tr_ang at the moment so do not use them
+   yet. */
+               wplate = 0.0;
+               if( ipolcrd == 0 ) {
+                  wplate = pasign*angle + paoff;
+
+               } else if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "smf_uncalc_iqu: currently only POL_CRD = "
+                           "FPLANE is supported.", status );
                }
 
-/* Get the anti-clockwise angle from the effective analyser to the focal plane Y
-   axis. */
-               angle *= 2.0;
+/*
+               if( ipolcrd == 1 ) {
+                  wplate += state->tcs_az_ang;
+               } else if( ipolcrd == 2 ) {
+                  wplate += state->tcs_tr_ang;
+               }
+*/
 
-/* Get the anti-clockwise angle from the effective analyser to the reference
-   direction used by the supplied Q and U values. */
-               angle += *ipang;
+/* Get the angle from the fixed analyser to the effective analyser
+   position (see SUN/223 again). The effective analyser angle rotates twice
+   as fast as the half-wave plate which is why there is a factor of 2 here. */
+               phi = 2*wplate;
+
+/* Rotate the Q,U values so that they refer to a reference direction
+   parallel to the fixed analyser. */
+               angle = 2*( *ipang + angrot - AST__DPIBY2 );
+               cosval = cos( angle );
+               sinval = sin( angle );
+               qval = (*qin)*cosval + (*uin)*sinval;
+               uval = (*uin)*cosval - (*qin)*sinval;
 
 /* Calculate the analysed intensity and store it in place of the I value.
-   An angle of zero corresponds to the Q/U reference direction. */
+   A phi value of zero corresponds to the fixed analyser (i.e. the new Q/U
+   reference direction). */
                angle *= 2.0;
-               *iin = 0.5*( (*iin) + (*qin)*cos( angle ) + (*uin)*sin( angle ) );
+               *iin = 0.5*( (*iin) + qval*cos( 2*phi ) + uval*sin( 2*phi ) );
             } else {
                *iin = VAL__BADD;
             }

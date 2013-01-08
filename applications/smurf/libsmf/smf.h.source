@@ -601,7 +601,7 @@ void smf_calc_mode( smfHead * hdr, int * status );
 
 void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start, int block_end,
                    int ipolcrd, int qplace, int uplace, int iplace, NdgProvenance *oprov,
-                   AstFitsChan *fc, int *status );
+                   AstFitsChan *fc, int pasign, double paoff, double angrot, int *status );
 
 void smf_calc_skyframe( const AstFrame * skyin,
                         const char * system, const smfHead* hdr,
@@ -1868,7 +1868,8 @@ double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
 void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status );
 
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
-                     double *qdata, double *udata, double *angdata, int *status );
+                     double *qdata, double *udata, double *angdata,
+                     int pasign, double paoff, double angrot, int *status );
 
 void smf_update_quality( smfData *data, int syncbad,
                          const int *badmask, smf_qual_t addqual, double badfrac,

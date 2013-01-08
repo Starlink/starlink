@@ -128,6 +128,10 @@
 *        [$STARLINK_DIR/share/smurf/resist.cfg]
 
 *  Configuration Parameters:
+*     ANGROT = REAL
+*        The angle from the focal plane X axis to the fixed analyser, in
+*        degrees. Measured positive in the same sense as rotation from focal
+*        plane X to focal plane Y. [90.0]
 *     APOD = INTEGER
 *        Apodize signals (smoothly roll-off) using sine/cosine functions at
 *        start and end of the signal across this many samples. The supplied
@@ -175,6 +179,16 @@
 *        below which the telescope is considered to be stationary.
 *     ORDER = INTEGER
 *        Subtract a fitted baseline polynomial of this order (0 to remove mean).
+*     PASIGN = BOOLEAN
+*        Indicates the sense of rotation of the spinning half-wave plate. If
+*        non-zero, it is assumed that a positive POL_ANG value corresponds
+*        to rotation from focal plane X to focal plane Y axis. If zero, it
+*        is assumed that a positive POL_ANG value corresponds to rotation
+*        from focal plane Y to focal plane X axis. [1]
+*     PAOFF = REAL
+*        The angle from the fixed analyser to the have-wave plate for a
+*        POL_ANG value of zero, in degrees. Measured positive in the same
+*        sense as rotation from focal plane X to focal plane Y. [0.0]
 *     SPIKEBOX = INTEGER
 *        The size of the filter box for the sigma-clipper. If negative, it is
 *        taken as a duration in seconds, which is converted to a number of
@@ -212,6 +226,8 @@
 *     9-OCT-2012 (DSB):
 *        Use a single consistent naming scheme for the output NDFs in all
 *        situations.
+*     8-JAN-2013 (DSB):
+*        Added config parameters PASIGN, PAOFF and ANGROT.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -285,6 +301,8 @@ void smurf_calcqu( int *status ) {
    char ndfname[ 30 ];        /* Name of output Q or U NDF */
    char polcrd[ 81 ];         /* FITS 'POL_CRD' header value */
    char subarray[ 10 ];       /* Subarray name (e.g. "s4a", etc) */
+   double angrot;             /* Angle from focal plane X axis to fixed analyser */
+   double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    float arcerror;            /* Max acceptable error (arcsec) in one block */
    int block_end;             /* Index of last time slice in block */
    int block_start;           /* Index of first time slice in block */
@@ -294,6 +312,7 @@ void smurf_calcqu( int *status ) {
    int iplace;                /* NDF placeholder for current block's I image */
    int ipolcrd;               /* Reference direction for waveplate angles */
    int nc;                    /* Number of characters written to a string */
+   int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    int qplace;                /* NDF placeholder for current block's Q image */
    int uplace;                /* NDF placeholder for current block's U image */
    size_t ichunk;             /* Continuous chunk counter */
@@ -402,6 +421,12 @@ void smurf_calcqu( int *status ) {
          config = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_calcqu.def",
                                sub_instruments, status );
          sub_instruments = astAnnul( sub_instruments );
+
+
+/* Get the CALCQU specific parameters. */
+         if( !astMapGet0I( config, "PASIGN", &pasign ) ) pasign = 1;
+         if( !astMapGet0D( config, "PAOFF", &paoff ) ) paoff = 0.0;
+         if( !astMapGet0D( config, "ANGROT", &angrot ) ) angrot = 90.0;
 
 /* See if the dark squids should be cleaned. */
          if( !astMapGet0I( config, "DKCLEAN", &dkclean ) ) dkclean = 0;
@@ -633,7 +658,9 @@ void smurf_calcqu( int *status ) {
    the subarray given by "idx", storing them in the output container
    file. */
                   smf_calc_iqu( wf, data, block_start, block_end, ipolcrd,
-                                qplace, uplace, iplace, oprov, fc, status );
+                                qplace, uplace, iplace, oprov, fc,
+                                pasign, AST__DD2R*paoff, AST__DD2R*angrot,
+                                status );
 
 /* The next block starts at the first time slice following the previous
    block. */

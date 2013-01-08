@@ -62,9 +62,10 @@
 *        The 3D data array for the output time series array. Must be
 *        time-ordered (see smf_dataOrder.c).
 *     ang_data = double * (Returned)
-*        A 1D data array to receive the anti-clockwise angle from the
-*        focal plane Y axis to the Y pixel axis in the reference map, at
-*        each time slice. May be NULL.
+*        A 1D data array to receive the angle from the Y pixel axis in
+*        the reference map to the focal plane Y axis, in radians, at each
+*        time slice. Positive rotation is in the same sense as rotation
+*        from focal plane X to focal plane Y. May be NULL.
 *     ngood = int * (Returned)
 *        Returned holding the number of good values in the output time
 *        series.
@@ -120,6 +121,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "sc2da/sc2ast.h"
 
 /* System includes */
 #include <gsl/gsl_rng.h>
@@ -132,6 +134,7 @@
    thread will process */
 typedef struct smfResampMapData {
    AstMapping *sky2map;
+   AstMapping *fpmap;
    AstSkyFrame *abskyfrm;
    const double *params;
    dim_t ndbolo;
@@ -160,6 +163,8 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
                     double *ang_data, int *ngood, int *status ){
 
 /* Local Variables */
+   AstFrameSet *fset = NULL;
+   AstMapping *fpmap = NULL;
    const gsl_rng_type *type;
    dim_t nbolo;
    dim_t ntslice;
@@ -169,6 +174,7 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
    int nw;
    smfResampMapData *job_data;
    smfResampMapData *pdata;
+   int subsysnum;
 
 /* Initialise returned values. */
    *ngood = 0;
@@ -194,6 +200,16 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
          r = gsl_rng_alloc (type);
       } else {
          r = NULL;
+      }
+
+/* If angle data is required, get the mapping from the bolometer GRID
+   coordinate system to the focal plane coordinate system. */
+      if( ang_data ) {
+         smf_find_subarray( data->hdr, NULL, 0, &subsysnum, status );
+         sc2ast_createwcs( subsysnum, NULL, data->hdr->instap,
+                           data->hdr->telpos, &fset, status);
+         fpmap = astGetMapping( fset, AST__BASE, AST__CURRENT );
+         fset = astAnnul( fset );
       }
 
 /* Get the number of time slices to process in each thread. */
@@ -229,6 +245,12 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
          astUnlock( pdata->abskyfrm, 1 );
          pdata->sky2map = astCopy( sky2map );
          astUnlock( pdata->sky2map, 1 );
+         if( fpmap ) {
+            pdata->fpmap = astCopy( fpmap );
+            astUnlock( pdata->fpmap, 1 );
+         } else {
+            pdata->fpmap = NULL;
+         }
 
 /* Similarly, make a copy of the smfData, including only the header
    information which each thread will need in order to make calls to
@@ -279,10 +301,16 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 
          astLock( pdata->sky2map, 0 );
          pdata->sky2map = astAnnul( pdata->sky2map );
+
+         if( fpmap ) {
+            astLock( pdata->fpmap, 0 );
+            pdata->fpmap = astAnnul( pdata->fpmap );
+         }
       }
 
       job_data = astFree( job_data );
       if( r ) gsl_rng_free( r );
+      if( fpmap ) fpmap = astAnnul( fpmap );
    }
 
 }
@@ -300,8 +328,10 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 static void smf1ResampMap( void *job_data_ptr, int *status ) {
 
 /* Local Variables: */
+   AstMapping *fpmap;
    AstMapping *fullmap;
    AstMapping *sky2map;
+   AstCmpMap *tmap;
    AstSkyFrame *abskyfrm;
    const double *params;
    dim_t ibolo;
@@ -338,6 +368,7 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    moving = pdata->moving;
    out = pdata->out;
    params = pdata->params;
+   fpmap = pdata->fpmap;
    sky2map = pdata->sky2map;
    r = pdata->r;
    sigma = pdata->sigma;
@@ -351,6 +382,7 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    starting this job. */
    astLock( abskyfrm, 0 );
    astLock( sky2map, 0 );
+   if( fpmap ) astLock( fpmap, 0 );
    smf_lock_data( data, 1, status );
 
 /* Set lower grid bounds. */
@@ -368,11 +400,11 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    for( itime = t1; itime <= t2; itime++ ){
 
 /* Calculate the full bolometer-grid to skymap-grid transformation for
-   the current time slice */
+   the current time slice. */
       fullmap = smf_rebin_totmap( data, itime, abskyfrm, sky2map, moving,
                                   status );
 
-/* skip if we did not get a mapping this time round */
+/* Skip if we did not get a mapping this time round */
       if (*status == SAI__OK && !fullmap) continue;
 
 /* Invert it as required by astResample. */
@@ -385,28 +417,38 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
                            VAL__BADD, 2, lbnd_bolo, ubnd_bolo,
                            lbnd_bolo, ubnd_bolo,  out, NULL );
 
-/* If required, get the anti-clockwise angle from the focal plane Y axis to the
-   Y pixel axis in the sky map, at the current time slice. */
+/* If required, get the angle from the Y pixel axis in the sky map to the
+   focal plane Y axis, at the current time slice. Positive rotation is
+   from focal plane X to focal plane Y. */
       if( pdata->ang ) {
 
-/* Transform two positions on the focal plane Y axis into sky map grid
-   coordinates. */
-         xin[ 0 ] = 0.0;
-         xin[ 1 ] = 0.0;
-         yin[ 0 ] = 0.0;
-         yin[ 1 ] = 1.0;
-         astTran2( fullmap, 2, xin, yin, 0, xout, yout );
+/* Get the Mapping from grid coords in the sky map to focal plane coords. */
+         tmap = astCmpMap( fullmap, fpmap, 1, " " );
 
-/* Find the angle from the line between the transformed points, and the Y
-   axis in the sky map grid frame. */
-        if( xout[ 0 ] != AST__BAD && xout[ 1 ] != AST__BAD &&
-            yout[ 0 ] != AST__BAD && yout[ 1 ] != AST__BAD &&
+/* Transform a central bolometer into sky map grid coords. */
+         xout[ 0 ] = 16.0;
+         yout[ 0 ] = 20.0;
+         astTran2( fullmap, 1, xout, yout, 0, xin, yin );
+
+/* Get a position that is displaced from the above position by one pixel
+   along the skymap grid Y axis. Transform both position into focal
+   plane coords. */
+         xin[ 1 ] = xin[ 0 ];
+         yin[ 1 ] = yin[ 0 ] + 1.0;
+         astTran2( tmap, 2, xin, yin, 1, xout, yout );
+
+/* Find the angle from the line between the transformed points, and the
+   focal plane Y axis. */
+         if( xout[ 0 ] != AST__BAD && xout[ 1 ] != AST__BAD &&
+             yout[ 0 ] != AST__BAD && yout[ 1 ] != AST__BAD &&
             ( xout[ 1 ] != xout[ 0 ] || yout[ 1 ] != yout[ 0 ] ) ) {
            (pdata->ang)[ itime ] = atan2( xout[ 1 ] - xout[ 0 ],
                                           yout[ 1 ] - yout[ 0 ] );
         } else {
            (pdata->ang)[ itime ] = VAL__BADD;
         }
+
+        tmap = astAnnul( tmap );
      }
 
 /* Return the number of good output sample values. */

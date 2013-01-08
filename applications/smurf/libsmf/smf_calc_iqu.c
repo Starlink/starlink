@@ -16,7 +16,7 @@
 *     void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 *                       int block_end, int ipolcrd, int qplace, int uplace,
 *                       int iplace, NdgProvenance *oprov, AstFitsChan *fc,
-*                       int *status );
+*                       int pasign, double paoff, double angrot, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -47,6 +47,18 @@
 *     fc = AstFitsChan * (Given)
 *        Pointer to a FitsChan holding the FITS headers to store in the
 *        FITS extensions of the I, Q and U NDFs.
+*     pasign = int (Given)
+*        Should be supplied non-zero if a positive POL_ANG value
+*        corresponds to rotation from focal plane X to focal plane Y axis,
+*        and zero otherwise.
+*     paoff = double (Given)
+*        The angle from the fixed analyser to the have-wave plate for a
+*        POL_ANG value of zero, in radians. Measured positive in the same
+*        sense as rotation from focal plane X to focal plane Y.
+*     angrot = double (Given)
+*        The angle from the focal plane X axis to the fixed analyser, in
+*        radians. Measured positive in the same sense as rotation from focal
+*        plane X to focal plane Y.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -59,7 +71,8 @@
 *     "block_start" and "block_end". The spatial position of each bolometer
 *     is assumed not to move significantly over the duration of this block of
 *     time slices. The I, Q and U values stored in the output NDFs are
-*     referenced to the focal plane Y axis. The current WCS Frame in the output 
+*     referenced to the focal plane Y axis, and are defined using the
+*     conventions described in SUN/223. The current WCS Frame in the output
 *     NDFs is "SKY".
 
 *  Authors:
@@ -85,6 +98,8 @@
 *        background with the calibrator in the beam.
 *     17-DEC-2012 (DSB):
 *        Use focal plane Y instead of north as the reference direction for Q and U.
+*     8-JAN-2013 (DSB):
+*        Added arguments pasign, paoff and angrot.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -128,14 +143,17 @@ typedef struct smfCalcIQUJobData {
    dim_t b2;
    dim_t nbolo;
    double *dat;
+   double *ipi;
    double *ipq;
    double *ipu;
-   double *ipi;
-   int ipolcrd;
-   int block_start;
+   double angrot;
+   double paoff;
    int block_end;
-   int old;
+   int block_start;
+   int ipolcrd;
    int ncol;
+   int old;
+   int pasign;
    size_t bstride;
    size_t tstride;
    smf_qual_t *qua;
@@ -154,7 +172,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status );
 void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
                   int block_end, int ipolcrd, int qplace, int uplace,
                   int iplace, NdgProvenance *oprov, AstFitsChan *fc,
-                  int *status ){
+                  int pasign, double paoff, double angrot, int *status ){
 
 /* Local Variables: */
    AstFrameSet *wcs;          /* WCS FrameSet for output NDFs */
@@ -339,6 +357,9 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
          pdata->block_end = block_end;
          pdata->old = old;
          pdata->ncol = ncol;
+         pdata->pasign = pasign ? +1: -1;
+         pdata->paoff = paoff;
+         pdata->angrot = angrot;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_calc_iqu_job, 0, NULL,
@@ -406,20 +427,29 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double *ipq;               /* Pointer to output Q array */
    double *ipu;               /* Pointer to output U array */
    double angle;              /* Phase angle for FFT */
+   double angrot;             /* Angle from focal plane X axis to fixed analyser */
+   double cosval;             /* Cos of twice reference rotation angle */
    double i;                  /* Output I value */
+   double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
+   double phi;                /* Angle from fixed analyser to effective analyser */
+   double q0;                 /* Q value with respect to fixed analyser */
    double q;                  /* Output Q value */
    double s1;                 /* Sum of weighted cosine terms */
    double s2;                 /* Sum of weighted sine terms */
    double s3;                 /* Sum of weights */
+   double sinval;             /* Sin of twice reference rotation angle */
+   double u0;                 /* U value with respect to fixed analyser */
    double u;                  /* Output U value */
+   double wplate;             /* Angle from fixed analyser to have-wave plate */
    int block_end;             /* Last time slice to process */
    int block_start;           /* First time slice to process */
    int ipolcrd;               /* Reference direction for pol_ang */
    int itime;                 /* Time slice index */
    int limit;                 /* Min no of good i/p values for a godo o/p value */
    int n;                     /* Number of contributing values in S1, S2 and S3 */
-   int old;                   /* Data has old-style POL_ANG values? */
    int ncol;                  /* No. of bolometers in one row */
+   int old;                   /* Data has old-style POL_ANG values? */
+   int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    size_t bstride;            /* Stride between adjacent bolometer values */
    size_t tstride;            /* Stride between adjacent time slice values */
    smfCalcIQUJobData *pdata;  /* Pointer to job data */
@@ -450,6 +480,9 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    block_end = pdata->block_end;
    old = pdata->old;
    ncol = pdata->ncol;
+   pasign = pdata->pasign;
+   paoff = pdata->paoff;
+   angrot = pdata->angrot;
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
@@ -501,20 +534,39 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 /* If POL_ANG is stored in arbitrary encoder units, convert to radians. */
                   if( old ) angle = angle*TORADS;
 
-/* Get the anti-clockwise angle from the half-waveplate to the focal plane Y axis. */
-                  if( ipolcrd == 1 ) {
-                     angle += state->tcs_az_ang;
-                  } else if( ipolcrd == 2 ) {
-                     angle += state->tcs_tr_ang;
+/* Following SUN/223 (section "Single-beam polarimetry"/"The Polarimeter"),
+   get the angle from the fixed analyser to the half-waveplate axis, in radians.
+   Positive rotation is from focal plane axis 1 (x) to focal plane axis 2 (y).
+
+   Not sure about the sign of tcs_az/tr_ang at the moment so do not use them
+   yet. */
+                  wplate = 0.0;
+                  if( ipolcrd == 0 ) {
+                     wplate = pasign*angle + paoff;
+
+                  } else if( *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     errRepf( "", "smf_calc_iqu: currently only POL_CRD = "
+                              "FPLANE is supported.", status );
                   }
+
+/*
+                  if( ipolcrd == 1 ) {
+                     wplate += state->tcs_az_ang;
+                  } else if( ipolcrd == 2 ) {
+                     wplate += state->tcs_tr_ang;
+                  }
+*/
+
+/* Get the angle from the fixed analyser to the effective analyser
+   position (see SUN/223 again). The effective analyser angle rotates twice
+   as fast as the half-wave plate which is why there is a factor of 2 here. */
+                  phi = 2*wplate;
 
 /* Increment the sums needed to find the Fourier component of the time
    series corresponding to the frequency introduced by the rotation of
-   the half wave plate. Note, the effective analyser angle rotates twice
-   as fast as the half-wave plate which is why there is a factor of 4 here
-   rather than a factor of 2. An angle of zero corresponds to the focal plane
-   Y axis. */
-                  angle *= 4;
+   the half wave plate. */
+                  angle = 2*phi;
                   s1 += (*din)*cos( angle );
                   s2 += (*din)*sin( angle );
                   s3 += (*din);
@@ -528,14 +580,19 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
             }
 
 /* Calculate the q, u and i values in the output NDF. The error on these values
-   will be enormous if there are not many values, so use a large lower limit. */
+   will be enormous if there are not many values, so use a large lower limit.
+   These use the fixed analyser as the reference direction. */
             if( n > limit ) {
-               q = 4*s2/n;
-               u = 4*s1/n;
+               q0 = 4*s1/n;
+               u0 = 4*s2/n;
                i = 2*s3/n;
 
-/* Rotate the (q,u) vector so that an angle of zero corresponds to celestial
-   north. */
+/* Modify Q and U so they use the focal plane Y as the reference direction. */
+               cosval = cos(2*angrot);
+               sinval = sin(2*angrot);
+               q = -q0*cosval + u0*sinval;
+               u = -q0*sinval - u0*cosval;
+
             } else {
                q = VAL__BADD;
                u = VAL__BADD;
