@@ -38,7 +38,8 @@
 *     axis = int (Given)
 *        The zero-based index of the axis wihin the Frame specified by
 *        "domain" that corresponds to the reference direction. Only used
-*        if "domain" is supplied with a value other than SKY.
+*        if "domain" is supplied with a value other than SKY. Positive
+*        rotation in the frame is assumed to be from axis 0 to axis 1.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -115,11 +116,11 @@ void smf_polext( int ondf, int store_angle, double angle, const char *domain,
    AstFrameSet *wcs = NULL;
    AstMapping *map = NULL;
    HDSLoc *loc = NULL;
+   double matrix[ NDF__MXDIM*NDF__MXDIM ];
    int dummy;
    int iaxis;
    int icur;
    int ifrm;
-   int iout;
    int naxes;
    int perm[ NDF__MXDIM ];
 
@@ -188,16 +189,26 @@ void smf_polext( int ondf, int store_angle, double angle, const char *domain,
 /* The base Frame in the "fs" FrameSet will be identical to the base
    Frame of "wcs", and the current Frame will be a Frame with the
    required Domain. POLPACK uses the first POLANAL axis as the reference
-   direction - if we are using some other axis we need to permute the
-   Ffame to put it first. */
-         if( axis > 0 ) {
+   direction - if we are using some other axis we need to rotate the
+   Frame to put it first. Note, we rotate the frame rather than permute
+   axes because we want to avoid swapping the sense of positive rotation,
+   which should be from axis zero to axis one (as required by polpack).
+   For cubes, we assume the first two axes are the spatial axes. */
+         if( axis ==  1 ) {
+
             naxes = astGetI( fs, "Naxes" );
-            perm[ 0 ] = axis + 1;
-            iout = 1;
-            for( iaxis = 0; iaxis < naxes; iaxis++ ){
-               if( iaxis != axis ) perm[ iout++ ] = iaxis + 1;
-            }
-            astPermAxes( fs, perm );
+            memset( matrix, 0, sizeof( *matrix )*naxes*naxes );
+            matrix[ 1 ] = 1.0;
+            matrix[ naxes ] = -1.0;
+            for( iaxis = 2; iaxis < naxes; iaxis++ ) matrix[ iaxis*naxes + iaxis ] = 1.0;
+            map = (AstMapping *) astMatrixMap( naxes, naxes, 0, matrix, " " );
+            astRemapFrame( fs, AST__CURRENT, map );
+            map = astAnnul( map );
+
+         } else if( axis != 0 && *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRepf( "", "smf_polext: Cannot use axis %d as the "
+                    "polarimetry reference axis.", status, axis );
          }
 
 /* This is now the Frame we will use as the POLANAL Frame. Extract the Mapping
