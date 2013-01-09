@@ -109,7 +109,7 @@
       GY = 0.5D0*( LBND( 2 ) + UBND( 2 ) )
 
 *  Transform into the base Frame of IWCSL.
-      CALL AST_TRAN2( MAP, 1, GX, GY, .TRUE., GXL, GYL, STATUS )
+      CALL AST_TRAN2( MAP, 1, GX, GY, .FALSE., GXL, GYL, STATUS )
 
 *  Get the GRID coords in IWCSL, of a point one pixel away from (GXL,GYL)
 *  along the reference direction.
@@ -117,7 +117,7 @@
       GYL = GYL + SIN( ANGLE*AST__DD2R )
 
 *  Transform back into the base Frame of IWCS.
-      CALL AST_TRAN2( MAP, 1, GXL, GYL, .FALSE., GX2, GY2, STATUS )
+      CALL AST_TRAN2( MAP, 1, GXL, GYL, .TRUE., GX2, GY2, STATUS )
 
 *  Get the orientation of the reference direction from IWCSL within the
 *  base Frame of IWCS.
