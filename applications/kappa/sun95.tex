@@ -51914,15 +51914,19 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          FRAMES() = LITERAL (Read
       }{
-         The list of the indices (within the WCS component of the supplied NDF)
-         of the Frames to be removed.  Any indices outside the range of the
-         available Frames are ignored.  Single Frames or a set of
-         Frames may be specified, \emph{e.g.} typing {\tt [4,6-9,12,14-16]} will remove
-         Frames 4,6,7,8,9,12,14,15,16. (Note that the brackets are required to
-         distinguish this array of characters from a single string
-         commas.  The brackets are unnecessary when there only one item.)  If
-         you wish to remove all the files enter the wildcard $*$.
-         Therefore {\tt 5-}$*$ will remove from 5 to the last Frame.
+         Specifies the Frame(s) to be removed. It can be a list of indices
+         (within the WCS component of the supplied NDF) or list of Domain
+         names. If one or more Domain name are specified, any WCS Frames
+         which have a matching Domain are removed. If a list of indicies is
+         supplied, any indices outside the range of the available Frames are
+         ignored. Single Frames or a set of adjacent Frames may be specified,
+         \emph{e.g.}. typing {\tt [4,6-9,12,14-16] } will remove Frames
+         4,6,7,8,9,12,14,15,16.
+         (Note that the brackets are required to distinguish this array of
+         characters from a single string including commas.  The brackets are
+         unnecessary when there only one item.) If you wish to remove all
+         the files enter the wildcard $*$. {\tt 5-}$*$ will remove from 5 to
+         the last Frame.
       }
       \sstsubsection{
          NDF = NDF (Read and Write)
@@ -58984,6 +58988,11 @@ The following applications have been modified:
         called TRANSFER (previously, set attributes were always transferred). The
         new default is to transfer attributes only if the two Frames have
         the same class and {\att Domain}.
+      \end{itemize}
+   \item [\htmlref{WCSREMOVE}{WCSREMOVE}] \mbox{}
+      \begin{itemize}
+        \item The Frames to remove can now be specified by name as well as
+              by index.
       \end{itemize}
 \end{description}
 

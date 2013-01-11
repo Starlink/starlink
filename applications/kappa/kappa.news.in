@@ -44,6 +44,11 @@ The following new applications have been added:
       new default is to transfer attributes only if the two Frames have
       the same class and Domain.
 
+   o  WCSREMOVE
+
+      - The Frames to remove can now be specified by name as well as
+      by index.
+
 1 KAPPA_Version_1.13
 
    A new release of KAPPA (@PACKAGE_VERSION@) has been released.  The main

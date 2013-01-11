@@ -29,19 +29,24 @@
 
 *  ADAM Parameters:
 *     FRAMES()  = LITERAL (Read
-*        The list of the indices (within the WCS component of the supplied NDF)
-*        of the Frames to be removed. Any indices outside the range of the
-*        available Frames are ignored. Single Frames or a set of adjacent
-*        Frames may be specified, e.g. typing [4,6-9,12,14-16] will remove
-*        Frames 4,6,7,8,9,12,14,15,16. (Note that the brackets are required to
-*        distinguish this array of characters from a single string including
-*        commas.  The brackets are unnecessary when there only one item.) If
-*        you wish to remove all the files enter the wildcard *. 5-* will
-*        remove from 5 to the last Frame.
+*        Specifies the Frame(s) to be removed. It can be a list of indices
+*        (within the WCS component of the supplied NDF) or list of Domain
+*        names. If one or more Domain name are specified, any WCS Frames
+*        which have a matching Domain are removed. If a list of indicies is
+*        supplied, any indices outside the range of the available Frames are
+*        ignored. Single Frames or a set of adjacent Frames may be specified,
+*        e.g. typing [4,6-9,12,14-16] will remove Frames 4,6,7,8,9,12,14,15,16.
+*        (Note that the brackets are required to distinguish this array of
+*        characters from a single string including commas.  The brackets are
+*        unnecessary when there only one item.) If you wish to remove all
+*        the files enter the wildcard *. 5-* will remove from 5 to the last
+*        Frame.
 *     NDF = NDF (Read and Write)
 *        The NDF data structure.
 
 *  Examples:
+*     wcsremove m51 "SKY,SKY-SPECTRUM"
+*        This removes any Frames that have Domain SKY or SKY-SPECTRUM.
 *     wcsremove m51 "3-5"
 *        This removes Frames 3, 4 and 5 from the NDF "m51". Any remaining
 *        Frames with indices higher than 5 will be re-numbered to fill the
@@ -89,6 +94,8 @@
 *        rather than simply reporting an error.
 *     20-SEP-2000 (DSB):
 *        Check STATUS before main loop.
+*     11-JAN-2013 (DSB):
+*        Allow Frames to be specified by Domain name.
 *     {enter_further_changes_here}
 
 *-
@@ -113,10 +120,12 @@
       CHARACTER SPECS( MXSPEC )*10! The given index specifications strings
       INTEGER FIRST              ! First Frame index implied by specification
       INTEGER GIVEN( MXGIVE )    ! The given Frame indices, sorted
+      INTEGER FRM                ! Frame pointer
       INTEGER I                  ! Index into list of given Frame indices
       INTEGER IBASE              ! The index of the Base Frame
       INTEGER IFRM               ! The Frame index in the original FrameSet
       INTEGER IFRM0              ! The previous original Frame index
+      INTEGER IGRP               ! Group holding Domains
       INTEGER INDF               ! NDF identifier
       INTEGER ISPEC              ! The index of the current index specificiation
       INTEGER IWCS               ! AST pointer for WCS FrameSet
@@ -139,12 +148,23 @@
 *  Get the number of Frames in the FrameSet.
       NFRM0 = AST_GETI( IWCS, 'NFRAME', STATUS )
 
+*  Get a case-insensitive group containing the Domain names of all the
+*  Frames.
+      CALL GRP_NEW( ' ', IGRP, STATUS )
+      CALL GRP_SETCS( IGRP, .FALSE., STATUS )
+      DO I = 1, NFRM0
+         FRM = AST_GETFRAME( IWCS, I, STATUS )
+         CALL GRP_PUT1( IGRP, AST_GETC( FRM, 'Domain', STATUS ), 0,
+     :                  STATUS )
+         CALL AST_ANNUL( FRM, STATUS )
+      END DO
+
 *  Get the index of the Base Frame in the FrameSet. The user is not
 *  allowed to remove this Frame since it represents the basic Grid
 *  co-ordinates to which all other Frames are connected.
       IBASE = AST_GETI( IWCS, 'BASE', STATUS )
 
-*  Get a list of Frame index specifications.
+*  Get a list of Frame index or Domain specifications.
       CALL PAR_GET1C( 'FRAMES', MXSPEC, SPECS, NSPEC, STATUS )
 
 *  Abort if an error has occurred.
@@ -153,53 +173,110 @@
 *  Initialise the number of indices given so far.
       NGIVE = 0
 
-*  Process each Frame index specification in turn.
+*  Process each specification in turn.
       DO ISPEC = 1, NSPEC
 
-*  Calculate the Frame index limits implied by this specification.
-         CALL KPG1_CNLIM( SPECS( ISPEC ), FIRST, LAST, STATUS )
+*  Attempt to calculate the Frame index limits implied by this specification.
+         IF( STATUS .EQ. SAI__OK ) THEN
+            CALL KPG1_CNLIM( SPECS( ISPEC ), FIRST, LAST, STATUS )
 
-*  A wildcard in the first part of a range or a full wildcard indicates the
-*  Frames start from beginning, i.e. Frame one.
-         FIRST = MAX( 1, FIRST )
+*  If this failed, assume the string is a domain name. Annul the error
+*  and search for Frames with the required Domain name.
+            IF( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
 
-*  A wildcard in the second part of the range or a full wildcard indicates
-*  the Frames end at the last Frame.
-         LAST = MIN( NFRM0, LAST )
-
-*  Check each index in this range.
-         DO IFRM = FIRST, LAST
+*  Search the group for matching names (there may be more than one). The
+*  index into the GRP group is also the index of the Frame within the
+*  FrameSet.
+               CALL GRP_INDEX( SPECS( ISPEC ), IGRP, 1, IFRM, STATUS )
+               DO WHILE( IFRM .GT. 0 .AND. STATUS .EQ. SAI__OK )
 
 *  Politely refuse if an attempt is made to remove the Base (GRID) Frame.
-            IF( IFRM .EQ. IBASE ) THEN
-               CALL MSG_BLANK( STATUS )
-               CALL NDF_MSG( 'NDF', INDF )
-               CALL MSG_OUT( 'WCSREMOVE_1', '   Attempt to remove '//
-     :                       'Base Frame of ''^NDF'' ignored.', STATUS )
-            ELSE
+                  IF( IFRM .EQ. IBASE ) THEN
+                     CALL MSG_BLANK( STATUS )
+                     CALL NDF_MSG( 'NDF', INDF )
+                     CALL MSG_OUT( 'WCSREMOVE_1', '   Attempt to '//
+     :                             'remove Base Frame of ''^NDF'' '//
+     :                             'ignored.', STATUS )
+                  ELSE
 
 *  Add the Frame index into a list of indices. Report an error if the
 *  list is full.
-               NGIVE = NGIVE + 1
-               IF( NGIVE .LE. MXGIVE ) THEN
-                  GIVEN( NGIVE ) = IFRM
+                     NGIVE = NGIVE + 1
+                     IF( NGIVE .LE. MXGIVE ) THEN
+                        GIVEN( NGIVE ) = IFRM
 
-               ELSE
+                     ELSE
 
-                  IF( STATUS .EQ. SAI__OK ) THEN
-                     STATUS = SAI__ERROR
-                     CALL MSG_SETI( 'N', MXGIVE )
-                     CALL ERR_REP( 'WCSREMOVE_2', 'Too many Frame '//
-     :                          'indices given. Can only handle up '//
-     :                          'to ^N.', STATUS )
+                        IF( STATUS .EQ. SAI__OK ) THEN
+                           STATUS = SAI__ERROR
+                           CALL MSG_SETI( 'N', MXGIVE )
+                           CALL ERR_REP( 'WCSREMOVE_2', 'Too many '//
+     :                                   'matching Frames. Can only '//
+     :                                   'handle up to ^N.', STATUS )
+                        END IF
+                        GO TO 999
+
+                     END IF
+
                   END IF
-                  GO TO 999
 
-               END IF
+*  Find the next matching Frame, if any.
+                  I = IFRM + 1
+                  CALL GRP_INDEX( SPECS( ISPEC ), IGRP, I, IFRM,
+     :                            STATUS )
+               END DO
+
+*  If the specification was parsed succesfully, we have a list of indicies.
+            ELSE
+
+*  A wildcard in the first part of a range or a full wildcard indicates the
+*  Frames start from beginning, i.e. Frame one.
+               FIRST = MAX( 1, FIRST )
+
+*  A wildcard in the second part of the range or a full wildcard indicates
+*  the Frames end at the last Frame.
+               LAST = MIN( NFRM0, LAST )
+
+*  Check each index in this range.
+               DO IFRM = FIRST, LAST
+
+*  Politely refuse if an attempt is made to remove the Base (GRID) Frame.
+                  IF( IFRM .EQ. IBASE ) THEN
+                     CALL MSG_BLANK( STATUS )
+                     CALL NDF_MSG( 'NDF', INDF )
+                     CALL MSG_OUT( 'WCSREMOVE_1', '   Attempt to '//
+     :                             'remove Base Frame of ''^NDF'' '//
+     :                             'ignored.', STATUS )
+                  ELSE
+
+*  Add the Frame index into a list of indices. Report an error if the
+*  list is full.
+                     NGIVE = NGIVE + 1
+                     IF( NGIVE .LE. MXGIVE ) THEN
+                        GIVEN( NGIVE ) = IFRM
+
+                     ELSE
+
+                        IF( STATUS .EQ. SAI__OK ) THEN
+                           STATUS = SAI__ERROR
+                           CALL MSG_SETI( 'N', MXGIVE )
+                           CALL ERR_REP( 'WCSREMOVE_2', 'Too many '//
+     :                                   'Frame indices given. Can '//
+     :                                   'only handle up to ^N.',
+     :                                   STATUS )
+                        END IF
+                        GO TO 999
+
+                     END IF
+
+                  END IF
+
+               END DO
 
             END IF
 
-         END DO
+         END IF
 
       END DO
 
@@ -261,6 +338,9 @@
 
 *  Arrive here if an error occurs.
  999  CONTINUE
+
+*  Delete the Domain names group.
+      CALL GRP_DELET( IGRP, STATUS )
 
 *  Annul the pointer to the FrameSet.
       CALL AST_ANNUL( IWCS, STATUS )
