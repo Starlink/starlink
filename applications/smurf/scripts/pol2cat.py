@@ -485,21 +485,25 @@ try:
          if not ref:
             msg_out( "Creating reference map...")
 
-#  Assume initially that we should use the first Q map as the reference.
-#  Since it was created by CALCQU, we know that this will contain the
-#  POLANAL WCS Frame that POLPACK uses to define the polarimetric reference
-#  direction.
-            ref = NDG( qffb[0] )
-
-#  If a total flux reference map was supplied, we want to use it to
-#  define the output pixel grid, but we need to make sure it has a POLANAL
-#  Frame that describes the polarimetric reference direction used by CALCQU.
-#  To do this we resample the Q map into the coordinate system of the total
-#  flux map, and then use the resampled Q map as the reference.
+#  We use a copy of the total flux reference map, if one was supplied, and the
+#  first Q map otherwise.
             if iref:
-               tmp = NDG( 1 )
-               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} method=near lbnd=!".format(ref,tmp,iref) )
-               ref = tmp
+               ref = NDG( 1 )
+               invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(iref,ref) )
+
+            else:
+               ref = NDG( qffb[0] )
+
+#  We add a WCS Frame with Domain "POLANAL" to define the polarimetric reference
+#  direction (we choose the pixel Y axis). POLPACK expects this Frame to be present
+#  and uses the first axis as the reference direction (positive rotation is
+#  in the sense of rotation from the first to the second axis in the POLANAL
+#  Frame). We take a copy of the PIXEL Frame and then rotate it by 90 degs
+#  so that the first axis is parallel to the original pixel Y axis. First
+#  remove any pre-existing POLANAL Frame.
+            invoke( "$KAPPA_DIR/wcsremove ndf={0} frames=POLANAL".format(ref) )
+            invoke( "$KAPPA_DIR/wcsadd ndf={0} frame=PIXEL domain=POLANAL maptype=linear attrs=! tr=\[0,0,1,0,-1,0\]".format(ref) )
+            invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(ref,domain) )
 
 #  If a specific pixel size was requested, squash or stretch the
 #  reference map so that it has the requested pixel size.
@@ -509,19 +513,28 @@ try:
                        format(ref,tmp,pixscale) )
                ref = tmp
 
+#  Modify the values in each pair of Q and U images so that they refer to
+#  the common reference direction (i.e. the ref image pixel Y axis).
+         msg_out( "Rotating all {0} Q and U reference directions to be parallel...".format(a) )
+         qrot = NDG(qffb)
+         urot = NDG(uffb)
+         for (qin,uin,qout,uout) in zip( qffb, uffb, qrot, urot ):
+            invoke( "$POLPACK_DIR/polrotref qin={0} uin={1} like={2} qout={3} uout={4} ".
+                    format(qin,uin,ref,qout,uout) )
+
 #  Combine all the Q images for the current sub-array together into a single
 #  image. We use a bilinear pixel-pasting scheme here, but maybe SINCSINC
 #  would be better?
          msg_out( "Combining all Q images for {0} into a single map...".format(a))
          qmos[a] = NDG(1)
          invoke( "$KAPPA_DIR/wcsmosaic method=bilin in={0} ref={1} out={2} genvar=yes accept".
-                 format(qffb,ref,qmos[a]) )
+                 format(qrot,ref,qmos[a]) )
 
 #  Combine all the U images together into a single image.
          msg_out( "Combining all U images for {0} into a single map...".format(a))
          umos[a] = NDG(1)
          invoke( "$KAPPA_DIR/wcsmosaic method=bilin in={0} ref={1} out={2} genvar=yes accept".
-                 format(uffb,ref,umos[a]) )
+                 format(urot,ref,umos[a]) )
 
 #  All sub-arrays are done. Now combine the Q images for all sub-arrays
 #  together into a single image. First form a new NDG containing all the
