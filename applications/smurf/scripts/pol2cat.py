@@ -55,8 +55,6 @@
 *             [logfile]
 
 *  Parameters:
-*     IN = NDF (Read)
-*        A group of POL-2 time series NDFs.
 *     CAT = LITERAL (Read)
 *        The output FITS vector catalogue.
 *     CONFIG = LITERAL (Read)
@@ -112,6 +110,13 @@
 *        integer value (one of starutil.NONE, starutil.CRITICAL,
 *        starutil.PROGRESS, starutil.ATASK or starutil.DEBUG) to the module
 *        variable starutil.glevel. ["PROGRESS"]
+*     IN = NDF (Read)
+*        A group of POL-2 time series NDFs. Only used if a null (!) value is 
+*        supplied for INQU.
+*     INQU = NDF (Read)
+*        A group of NDFs containing Q and U images calculated by a previous run 
+*        of SMURF:CALCQU. If not supplied, the IN parameter is used to get input 
+*        NDFs holding POL-2 time series data. [!]
 *     IREF = NDF (Read)
 *        An optional total intensity map covering the same area. If
 *        supplied, this will be used to determine percentage polarisation,
@@ -209,6 +214,8 @@
 *     27-NOV-2012 (DSB):
 *        - Ensure the script runs even if no ~/adam/GLOBAL.sdf file exists.
 *        - Ensure reference image has units of pW.
+*     14-JAN-2013 (DSB):
+*        Added parameter INQU.
 
 *-
 '''
@@ -296,6 +303,10 @@ try:
    params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
                                 "and IP?", False, noprompt=True))
 
+   params.append(starutil.ParNDG("INQU", "NDFs containing previously calculated Q and U values",
+                                 None,noprompt=True))
+
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -304,12 +315,24 @@ try:
 #  the user goes off for a coffee whilst the script is running and does not
 #  see a later parameter propmpt or error...
 
-#  Get the raw POL-2 data files. They should be supplied as the first item
-#  on the command line, in the form of a Starlink "group expression" (i.e.
+#  See if pre-calculated Q and U values have been supplied on the command
+#  line. If so, we use these in preference to any raw time-series files
+#  specified via parameter "IN".
+   inqu = parsys["INQU"].value
+
+#  Get the raw POL-2 data files. They should be supplied as the first item on
+#  the command line, in the form of a Starlink "group expression" (i.e.
 #  the same way they are supplied to other SMURF commands such as makemap).
 #  Quote the string so that it can be used as command line argument when
 #  running an atask from the shell.
-   indata = parsys["IN"].value
+   if inqu == None:
+      indata = parsys["IN"].value
+   else:
+      indata = None
+
+#  See if the indata files are raw time series files, or files created by
+#  a previous run of CALCQU containing Q and U estimates.
+
 
 #  Get the image to use for the total flux (I) map.
    iref = parsys["IREF"].value
@@ -383,13 +406,31 @@ try:
    ucont = NDG(1)
    ucont.comment = "ucont"
 
-#  Create a set of Q images and a set of U images. These are put into the HDS
-#  container files "q_TMP.sdf" and "u_TMP.sdf". Each image contains Q or U
-#  values derived from a short section of raw data during which each bolometer
-#  moves less than half a pixel.
-   msg_out( "Calculating Q and U values for each bolometer...")
-   invoke("$SMURF_DIR/calcqu in={0} config={1} outq={2} outu={3} fix".
-          format(indata,config,qcont,ucont) )
+#  If Q and U values were supplied, use them:
+   if inqu != None:
+      msg_out( "Using pre-calculating Q and U values...")
+      qcont = inqu.filter( "'Q\d'" )
+      qcont.comment = "qcont"
+      ucont = inqu.filter( "'U\d'" )
+      ucont.comment = "ucont"
+
+#  Otherwise create a set of Q images and a set of U images. These are put
+#  into the HDS container files "q_TMP.sdf" and "u_TMP.sdf". Each image
+#  contains Q or U values derived from a short section of raw data during
+#  which each bolometer moves less than half a pixel.
+   else:
+
+#  The following call to SMURF:CALCQU creates two HDS container files -
+#  one holding a set of Q NDFs and the other holding a set of U NDFs. Create
+#  these container files in the NDG temporary directory.
+      qcont = NDG(1)
+      qcont.comment = "qcont"
+      ucont = NDG(1)
+      ucont.comment = "ucont"
+
+      msg_out( "Calculating Q and U values for each bolometer...")
+      invoke("$SMURF_DIR/calcqu in={0} config={1} outq={2} outu={3} fix".
+             format(indata,config,qcont,ucont) )
 
 #  Remove spikes from the Q and U images. The cleaned NDFs are written to
 #  temporary NDFs specified by two new NDG objects "qff" and "uff", which
