@@ -8,3 +8,6 @@
  o  A new command POLROTREF has been added to rotate the reference
  direction of a pair of Q and U images.
 
+ o  The POLVEC command now omits vectors from positions that have
+ negative total intensity values.
+

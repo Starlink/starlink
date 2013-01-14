@@ -151,6 +151,8 @@
 *     28-SEP-2012 (DSB):
 *        Use the absolute value of I to normalise Q and U. This avoids a
 *        negative I value causing the vector to rotate by 90 degs.
+*     14-JAN-2013 (DSB):
+*        Store bad output values if the total intensity is negative.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -413,9 +415,9 @@
                   UIN = STOKE( PIX, ROW, Z, JU )
                   IF( VAR ) VUIN = VSTOKE( PIX, ROW, Z, JU )
 
-*  If any of the intensities are bad, store bad results.
+*  If any of the intensities are bad, or if I is negative, store bad results.
                   IF ( IIN .EQ. VAL__BADR .OR. QIN .EQ. VAL__BADR .OR.
-     :                 UIN .EQ. VAL__BADR ) THEN
+     :                 UIN .EQ. VAL__BADR .OR. IIN .LT. 0.0 ) THEN
 
                      IP = VAL__BADR
                      I = VAL__BADR
