@@ -64,6 +64,8 @@
 *        Use focal plane Y as as the POLCRD reference direction rather
 *        than tracking north. Also take account of old data that uses
 *        arbitrary encoder units rather than radians, and check for bad angles.
+*     14-JAN-2013 (DSB):
+*        Report an error if the waveplate is not spinning.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,6 +133,7 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
    double end_wang;           /* Half-waveplate angle at end of block */
    double start_wang;         /* Half-waveplate angle at start of block */
    double wang;               /* Half-waveplate angle */
+   double oldwang;            /* Previous falf-waveplate angle */
    int ifail;                 /* Index of last time slice to fail the test */
    int inc;                   /* No. of time slices between tests */
    int ipass;                 /* Index of last time slice to pass the test */
@@ -138,6 +141,7 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
    int ntime;                 /* Number of time slices to check */
    int old;                   /* Data has old-style POL_ANG values? */
    int result;                /* The returned time slice index at block end */
+   int spinning;              /* Is half-waveplate spinning? */
    smfHead *hdr;              /* Pointer to data header this time slice */
 
 /* Initialise */
@@ -286,6 +290,7 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
 
 /* Now find the half-waveplate angle with respect to focal plane Y, at
    the current end of the block. */
+         end_wang = VAL__BADD;
          while( result != -1 ) {
             state = (hdr->allState) + result;
             end_wang = state->pol_ang;
@@ -320,6 +325,8 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
 /* Work backwards through the time slices, starting at the current end
    time slice, until a time slice is found which has an angle less than the
    end angle found above. */
+         oldwang = VAL__BADD;
+         spinning = 1;
          for( ; result >= block_start; result-- ) {
             state = (hdr->allState) + result;
             wang = state->pol_ang;
@@ -330,12 +337,29 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
                } else if( ipolcrd == 2 ) {
                   wang += state->tcs_tr_ang;
                }
-               if( wang < end_wang ) break;
+
+               if( oldwang != VAL__BADD &&
+                          fabs( oldwang - wang ) < 1.0E-6 ) {
+                  spinning = 0;
+                  result = -1;
+                  break;
+
+               } else if( wang < end_wang ) {
+                  break;
+               }
+
+               oldwang = wang;
             }
          }
 
          if( result < block_start ) result = -1;
 
+         if( !spinning && *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( "", "The POL-2 half-waveplate is not spinning.",
+                    status );
+
+         }
       }
    }
 
