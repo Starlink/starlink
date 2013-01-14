@@ -2347,6 +2347,14 @@ package polpack {
             helpkey *
          }
 
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            prompt {The WCS axes spanning the spatial plane}
+            helpkey *
+         }
        }
    }
 
