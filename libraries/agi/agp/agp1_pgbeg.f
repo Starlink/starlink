@@ -46,6 +46,8 @@
 *  History:
 *     1-NOV-2001 (DSB):
 *        Original version
+*     14-JAN-2013 (DSB):
+*        Release the error context.
 *-
 
 *  Type Definitions :
@@ -113,6 +115,10 @@
             CALL ERR_REP( 'AGP1_PGBEG_WKNOP',
      :                    'Problems opening workstation', STATUS )
          END IF
+
+*   Release the error context.
+         CALL ERR_RLSE
+
       END IF
 
       END
