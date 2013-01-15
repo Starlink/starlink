@@ -24,15 +24,15 @@
 *     a set of SCUBA-2 fast-spinning polarimeter time series data files.
 *     Each Q or U image is created from a block of time slices over which
 *     the sky position of each bolometer does not change significantly (see
-*     parameter ARCERROR). The resulting set of Q images can be combined
-*     subsequently using KAPPA:WCSMOSAIC, to form a single Q image
-*     (normally, the "I" image should be used as the reference image when
-*     running WCSMOSIAC). Likewise, the set of U images can be combined in
-*     the same way. All the created Q and U images use the focal plane Y
-*     axis as the reference direction. Since this direction may vary from
-*     block to block due to sky rotation, the idividual Q and U images should
-*     be processed using POLPACK:POLROTREF before combining them using
-*     KAPPA:WCSMOSAIC, to ensure that they all use the same reference
+*     parameters ARCERROR, MAXSIZE and MINSIZE). The resulting set of Q
+*     images can be combined subsequently using KAPPA:WCSMOSAIC, to form a
+*     single Q image (normally, the "I" image should be used as the reference
+*     image when running WCSMOSIAC). Likewise, the set of U images can be
+*     combined in the same way. All the created Q and U images use the focal
+*     plane Y axis as the reference direction. Since this direction may vary
+*     from block to block due to sky rotation, the idividual Q and U images
+*     should be processed using POLPACK:POLROTREF before combining them
+*     using KAPPA:WCSMOSAIC, to ensure that they all use the same reference
 *     direction.
 *
 *     The supplied time series data files are first flat-fielded, cleaned
@@ -98,6 +98,14 @@
 *        the default unless explicitly over-ridden. [!]
 *     IN = NDF (Read)
 *        Input file(s).
+*     MAXSIZE = _INTEGER (Read)
+*        The maximum number of time slices to include in any block. No upper
+*        limit is imposed on block size if MAXSIZE is zero or negative. [0]
+*     MINSIZE = _INTEGER (Read)
+*        The minimum number of time slices that can be included in a block
+*        No Q or U values are created for blocks that are shorter than
+*        this value. No lower limit is imposed on block size if MINSIZE is
+*        zero or negative. [200]
 *     MSG_FILTER = _CHAR (Read)
 *        Control the verbosity of the application. Values can be
 *        NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -228,6 +236,8 @@
 *        situations.
 *     8-JAN-2013 (DSB):
 *        Added config parameters PASIGN, PAOFF and ANGROT.
+*     15-JAN-2013 (DSB):
+*        Added parameters MAXSIZE and MINSIZE.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -311,6 +321,8 @@ void smurf_calcqu( int *status ) {
    int iblock;                /* Index of current block */
    int iplace;                /* NDF placeholder for current block's I image */
    int ipolcrd;               /* Reference direction for waveplate angles */
+   int maxsize;               /* Max no. of time slices in a block */
+   int minsize;               /* Min no. of time slices in a block */
    int nc;                    /* Number of characters written to a string */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    int qplace;                /* NDF placeholder for current block's Q image */
@@ -588,11 +600,21 @@ void smurf_calcqu( int *status ) {
 
 /* If not already done, get the maximum spatial drift (in arc-seconds) that
    can be tolerated whilst creating a single I/Q/U image. The default value is
-   half the makemap default pixel size. */
+   half the makemap default pixel size. Also get limits on the number of
+   time slices in any block. */
             if( arcerror == 0.0 ) {
                parDef0d( "ARCERROR", 0.5*smf_calc_telres( data->hdr->fitshdr,
                                                           status ), status );
                parGet0r( "ARCERROR", &arcerror, status );
+
+               parGet0i( "MAXSIZE", &maxsize, status );
+               parGet0i( "MINSIZE", &minsize, status );
+               if( maxsize > 0 && maxsize < minsize && *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "Value of parameter MAXSIZE (%d) is less "
+                           "than value of parameter MINSIZE (%d)", status,
+                           maxsize, minsize );
+               }
             }
 
 /* The algorithm that calculates I, Q and U assumes that all samples for a
@@ -611,14 +633,14 @@ void smurf_calcqu( int *status ) {
    to ensure that the block holds an integral number of half-waveplate
    rotations. */
             block_end = smf_block_end( data, block_start, ipolcrd, arcerror,
-                                       status );
+                                       maxsize, status );
 
 /* Loop round creating I/Q/U images for each block. Count them. */
             iblock = 0;
             while( block_end >= 0 && *status == SAI__OK ) {
 
 /* Skip very short blocks. */
-               if( block_end - block_start > 4 ) {
+               if( block_end - block_start > minsize ) {
 
 /* Display the start and end of the block. */
                   msgOutiff( MSG__VERB, "", "   Doing time slice block %d "
@@ -662,10 +684,16 @@ void smurf_calcqu( int *status ) {
                                 pasign, AST__DD2R*paoff, AST__DD2R*angrot,
                                 status );
 
+/* Warn about short blocks. */
+               } else {
+                  msgOutiff( MSG__VERB, "", "   Skipping short block of %d "
+                             "time slices (parameter MINSIZE=%d).", status,
+                             block_end - block_start - 1, minsize );
+               }
+
 /* The next block starts at the first time slice following the previous
    block. */
-                  block_start = block_end + 1;
-               }
+               block_start = block_end + 1;
 
 /* Find the time slice at which the corner bolometers have moved
    a critical distance (given by parameter ARCERROR) from their
@@ -673,7 +701,7 @@ void smurf_calcqu( int *status ) {
    to ensure that the block holds an integral number of half-waveplate
    rotations. This returns -1 if all time slices have been used. */
                block_end = smf_block_end( data, block_start, ipolcrd,
-                                          arcerror, status );
+                                          arcerror, maxsize, status );
             }
 
 /* Free resources */

@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     result = smf_block_end( smfData *data, int block_start, int ipolcrd,
-*                             float arcerror, int *status );
+*                             float arcerror, int maxsize, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -29,6 +29,9 @@
 *     arcerror = float (Given)
 *        The maximum shift in position (in arc-seconds) allowed within a
 *        single block of time slices.
+*     maxsize = int (Given)
+*        The maximum number of time slices allowed in a block. Zero if
+*        there is no limit.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -44,8 +47,8 @@
 *     arc-seconds from its position at the start of the block. The index
 *     of the final time slice is then reduced in order to ensure that the
 *     whole block spans an integral number of quarter revolutions of the
-*     half-waveplate, relative to north in the tracking system. The index
-*     of this final time slice is returned as the function value.
+*     half-waveplate, relative to focal plane Y. The index of this final
+*     time slice is returned as the function value.
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -66,6 +69,8 @@
 *        arbitrary encoder units rather than radians, and check for bad angles.
 *     14-JAN-2013 (DSB):
 *        Report an error if the waveplate is not spinning.
+*     15-JAN-2013 (DSB):
+*        Added maxsize argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -121,7 +126,7 @@
 
 
 int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
-                   int *status ){
+                   int maxsize, int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
@@ -138,6 +143,7 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
    int inc;                   /* No. of time slices between tests */
    int ipass;                 /* Index of last time slice to pass the test */
    int itime;                 /* Time slice index at next test */
+   int hitime;                /* Highest time slice index to use */
    int ntime;                 /* Number of time slices to check */
    int old;                   /* Data has old-style POL_ANG values? */
    int result;                /* The returned time slice index at block end */
@@ -159,6 +165,15 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
 
 /* Check that we have not used all time slices. */
    if( block_start >= 0 && block_start < (int) ntslice ) {
+
+/* Get the index of the first time slize that must not be included in the
+   block. */
+      if( maxsize <= 0 ) {
+         hitime = ntslice;
+      } else {
+         hitime = block_start + maxsize;
+         if( hitime > ntslice ) hitime = ntslice;
+      }
 
 /* Determine the critical angle (in radians) that produces a shift of
    "arcerror" arc-seconds at a distance of 4 arc-minutes (the rough radius
@@ -185,7 +200,7 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
       ifail = -1;
       inc = 1;
       itime = block_start + inc;
-      while( itime < (int) ntslice ) {
+      while( itime < (int) hitime ) {
          state = (hdr->allState) + itime;
 
 /* The test fails if the actual telescope position in the tracking system
@@ -212,7 +227,7 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
    passes the test then all time slices are in the block. So set the result
    to the index of the last time slice. */
       if( ifail == -1 ) {
-         itime = ntslice - 1;
+         itime = hitime - 1;
          state = (hdr->allState) + itime;
          if( FPMOVED ) {
             ifail = itime;

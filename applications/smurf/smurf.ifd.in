@@ -749,6 +749,24 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter maxsize {
+                type _INTEGER
+                prompt {Max no. of time slices in one block (0=no limit)}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter minsize {
+                type _INTEGER
+                prompt {Min no. of time slices in one block}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default 200
+                helpkey *
+            }
+
             parameter outi {
                 type NDF
                 access WRITE
