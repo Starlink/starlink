@@ -16,7 +16,8 @@
 *     void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 *                       int block_end, int ipolcrd, int qplace, int uplace,
 *                       int iplace, NdgProvenance *oprov, AstFitsChan *fc,
-*                       int pasign, double paoff, double angrot, int *status );
+*                       int pasign, double paoff, double angrot,
+*                       int submean, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -59,6 +60,9 @@
 *        The angle from the focal plane X axis to the fixed analyser, in
 *        radians. Measured positive in the same sense as rotation from focal
 *        plane X to focal plane Y.
+*     submean = int  (Given)
+*        If non-zero, subtract the mean bolometer value from each time
+*        slice before using them to calculate Q and U.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -100,6 +104,8 @@
 *        Use focal plane Y instead of north as the reference direction for Q and U.
 *     8-JAN-2013 (DSB):
 *        Added arguments pasign, paoff and angrot.
+*     14-JAN-2013 (DSB):
+*        Added argument submean.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,6 +163,8 @@ typedef struct smfCalcIQUJobData {
    size_t bstride;
    size_t tstride;
    smf_qual_t *qua;
+   double *mean;
+   int action;
 } smfCalcIQUJobData;
 
 /* Prototypes for local functions */
@@ -172,7 +180,8 @@ static void smf1_calc_iqu_job( void *job_data, int *status );
 void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
                   int block_end, int ipolcrd, int qplace, int uplace,
                   int iplace, NdgProvenance *oprov, AstFitsChan *fc,
-                  int pasign, double paoff, double angrot, int *status ){
+                  int pasign, double paoff, double angrot, int submean,
+                  int *status ){
 
 /* Local Variables: */
    AstFrameSet *wcs;          /* WCS FrameSet for output NDFs */
@@ -206,6 +215,8 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    smfCalcIQUJobData *job_data = NULL; /* Pointer to all job data */
    smfCalcIQUJobData *pdata = NULL;/* Pointer to next job data */
    smfHead *hdr;              /* Pointer to data header this time slice */
+   double *mean;
+   int tstep;                 /* Time slice step between threads */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -301,6 +312,11 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
       ipi = NULL;
    }
 
+
+/* If required, allocate memory to hold the mean bolometer value at each
+   time slice. */
+   mean = submean ? astMalloc( ntslice*sizeof( *mean ) ) : NULL;
+
 /* Create structures used to pass information to the worker threads. */
    nworker = wf ? wf->nworker : 1;
    job_data = astMalloc( nworker*sizeof( *job_data ) );
@@ -322,6 +338,47 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
                       "in encoder units - converting to radians.", status );
             break;
          }
+      }
+
+/* If required, find the mean bolometer value at each time slice. */
+      if( submean ) {
+
+/* Determine which time-slices are to be processed by which threads. */
+         tstep = ntslice/nworker;
+         if( tstep < 1 ) tstep = 1;
+
+         for( iworker = 0; iworker < nworker; iworker++ ) {
+            pdata = job_data + iworker;
+            pdata->block_start = iworker*tstep;
+            if( iworker < nworker - 1 ) {
+               pdata->block_end = pdata->block_start + tstep - 1;
+            } else {
+               pdata->block_end = ntslice - 1;
+            }
+         }
+
+/* Store all the other info needed by the worker threads, and submit the
+   jobs to calculate the Q and U values in each bolo, and then wait for
+   them to complete. */
+         for( iworker = 0; iworker < nworker; iworker++ ) {
+            pdata = job_data + iworker;
+
+            pdata->bstride = bstride;
+            pdata->dat = data->pntr[0];
+            pdata->nbolo = nbolo;
+            pdata->qua = smf_select_qualpntr( data, NULL, status );;
+            pdata->tstride = tstride;
+            pdata->mean = mean;
+            pdata->action = 1;
+
+/* Pass the job to the workforce for execution. */
+            thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_calc_iqu_job, 0, NULL,
+                         status );
+         }
+
+/* Wait for the workforce to complete all jobs. */
+         thrWait( wf, status );
+
       }
 
 /* Determine which bolometers are to be processed by which threads. */
@@ -360,6 +417,8 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
          pdata->pasign = pasign ? +1: -1;
          pdata->paoff = paoff;
          pdata->angrot = angrot;
+         pdata->action = 0;
+         pdata->mean = mean;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_calc_iqu_job, 0, NULL,
@@ -384,6 +443,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 
 /* Free other resources. */
    job_data = astFree( job_data );
+   mean = astFree( mean );
 }
 
 
@@ -426,6 +486,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double *ipi;               /* Pointer to output I array */
    double *ipq;               /* Pointer to output Q array */
    double *ipu;               /* Pointer to output U array */
+   double *pm;                /* Pointer to next time slice mean value */
    double angle;              /* Phase angle for FFT */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double cosval;             /* Cos of twice reference rotation angle */
@@ -438,8 +499,10 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double s2;                 /* Sum of weighted sine terms */
    double s3;                 /* Sum of weights */
    double sinval;             /* Sin of twice reference rotation angle */
+   double sum;                /* Sum of bolometer values */
    double u0;                 /* U value with respect to fixed analyser */
    double u;                  /* Output U value */
+   double v;                  /* Analysed intensity to use */
    double wplate;             /* Angle from fixed analyser to have-wave plate */
    int block_end;             /* Last time slice to process */
    int block_start;           /* First time slice to process */
@@ -448,6 +511,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    int limit;                 /* Min no of good i/p values for a godo o/p value */
    int n;                     /* Number of contributing values in S1, S2 and S3 */
    int ncol;                  /* No. of bolometers in one row */
+   int nn;                    /* Number of good bolometer values */
    int old;                   /* Data has old-style POL_ANG values? */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    size_t bstride;            /* Stride between adjacent bolometer values */
@@ -484,55 +548,60 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    paoff = pdata->paoff;
    angrot = pdata->angrot;
 
+/* Calculate Q and U if required. */
+   if( pdata->action == 0 ) {
+
 /* Check we have something to do. */
-   if( b1 < nbolo ) {
+      if( b1 < nbolo ) {
 
 /* The minimum number of samples required for a good output value. Half
    of the available input samples must be good. */
-      limit = 0.5*( block_end - block_start );
+         limit = 0.5*( block_end - block_start );
 
 /* Initialise pointers to the first time slice data and quality value for
    the first bolometer to be processed in the current block of time slices. */
-      din0 = dat + bstride*b1 + tstride*block_start;
-      qin0 = qua + bstride*b1 + tstride*block_start;
+         din0 = dat + bstride*b1 + tstride*block_start;
+         qin0 = qua + bstride*b1 + tstride*block_start;
 
 /* Loop round all bolometers to be processed by this thread. */
-      for( ibolo = b1; ibolo <= b2; ibolo++ ) {
+         for( ibolo = b1; ibolo <= b2; ibolo++ ) {
 
 /* If the whole bolometer is bad, just use bad q and u values. */
-         if( *qin0 & SMF__Q_BADB ) {
-            i = VAL__BADD;
-            u = VAL__BADD;
-            q = VAL__BADD;
+            if( *qin0 & SMF__Q_BADB ) {
+               i = VAL__BADD;
+               u = VAL__BADD;
+               q = VAL__BADD;
 
 /* If the bolometer is good, calculate and store the q and u values. */
-         } else {
+            } else {
 
 /* Initialise pointers to the next time slice data and quality value for
    the current bolometer. */
-            din = din0;
-            qin = qin0;
+               din = din0;
+               qin = qin0;
 
 /* Initialise the sums used to find Q and U at this bolometer. */
-            s1 = 0.0;
-            s2 = 0.0;
-            s3 = 0.0;
-            n = 0.0;
+               s1 = 0.0;
+               s2 = 0.0;
+               s3 = 0.0;
+               n = 0.0;
 
 /* Loop round all time slices. */
-            state = allstates + block_start;
-            for( itime = block_start; itime <= block_end; itime++,state++ ) {
+               pm = pdata->mean;
+               if( pm )  pm += block_start;
+               state = allstates + block_start;
+               for( itime = block_start; itime <= block_end; itime++,state++ ) {
 
 /* Get the POL_ANG value for this time slice. */
-               angle = state->pol_ang;
+                  angle = state->pol_ang;
 
 /* Check the input sample has not been flagged during cleaning and is
    not bad. */
-               if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
-                   angle != VAL__BADD ) {
+                  if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD &&
+                      angle != VAL__BADD && ( !pm || *pm != VAL__BADD ) ) {
 
 /* If POL_ANG is stored in arbitrary encoder units, convert to radians. */
-                  if( old ) angle = angle*TORADS;
+                     if( old ) angle = angle*TORADS;
 
 /* Following SUN/223 (section "Single-beam polarimetry"/"The Polarimeter"),
    get the angle from the fixed analyser to the half-waveplate axis, in radians.
@@ -540,15 +609,15 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 
    Not sure about the sign of tcs_az/tr_ang at the moment so do not use them
    yet. */
-                  wplate = 0.0;
-                  if( ipolcrd == 0 ) {
-                     wplate = pasign*angle + paoff;
+                     wplate = 0.0;
+                     if( ipolcrd == 0 ) {
+                        wplate = pasign*angle + paoff;
 
-                  } else if( *status == SAI__OK ) {
-                     *status = SAI__ERROR;
-                     errRepf( "", "smf_calc_iqu: currently only POL_CRD = "
-                              "FPLANE is supported.", status );
-                  }
+                     } else if( *status == SAI__OK ) {
+                        *status = SAI__ERROR;
+                        errRepf( "", "smf_calc_iqu: currently only POL_CRD = "
+                                 "FPLANE is supported.", status );
+                     }
 
 /*
                   if( ipolcrd == 1 ) {
@@ -561,61 +630,97 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 /* Get the angle from the fixed analyser to the effective analyser
    position (see SUN/223 again). The effective analyser angle rotates twice
    as fast as the half-wave plate which is why there is a factor of 2 here. */
-                  phi = 2*wplate;
+                     phi = 2*wplate;
 
 /* Increment the sums needed to find the Fourier component of the time
    series corresponding to the frequency introduced by the rotation of
    the half wave plate. */
-                  angle = 2*phi;
-                  s1 += (*din)*cos( angle );
-                  s2 += (*din)*sin( angle );
-                  s3 += (*din);
-                  n++;
-               }
+                     angle = 2*phi;
+                     v = pm ? *din - *pm : *din;
+                     s1 += v*cos( angle );
+                     s2 += v*sin( angle );
+                     s3 += v;
+                     n++;
+                  }
 
 /* Update pointers to the next time slice data and quality value for
    the current bolometer. */
-               din += tstride;
-               qin += tstride;
-            }
+                  din += tstride;
+                  qin += tstride;
+                  if( pm ) pm++;
+               }
 
 /* Calculate the q, u and i values in the output NDF. The error on these values
    will be enormous if there are not many values, so use a large lower limit.
    These use the fixed analyser as the reference direction. */
-            if( n > limit ) {
-               q0 = 4*s1/n;
-               u0 = 4*s2/n;
-               i = 2*s3/n;
+               if( n > limit ) {
+                  q0 = 4*s1/n;
+                  u0 = 4*s2/n;
+                  i = 2*s3/n;
 
 /* Modify Q and U so they use the focal plane Y as the reference direction. */
-               cosval = cos(2*angrot);
-               sinval = sin(2*angrot);
-               q = -q0*cosval + u0*sinval;
-               u = -q0*sinval - u0*cosval;
+                  cosval = cos(2*angrot);
+                  sinval = sin(2*angrot);
+                  q = -q0*cosval + u0*sinval;
+                  u = -q0*sinval - u0*cosval;
 
-            } else {
-               q = VAL__BADD;
-               u = VAL__BADD;
-               i = VAL__BADD;
+               } else {
+                  q = VAL__BADD;
+                  u = VAL__BADD;
+                  i = VAL__BADD;
+               }
             }
-         }
 
 /* Calculate the vector index into the output NDFs at which to store the
    current bolometer. This implements a reversal of the pixels along each
    row, in order to produce the usual right-handed view of the sky. */
-         ipix = ncol + ibolo - 2*( ibolo % ncol ) - 1;
+            ipix = ncol + ibolo - 2*( ibolo % ncol ) - 1;
 
 /* Store the q and u values in the output NDFs. */
-         ipq[ ipix ] = q;
-         ipu[ ipix ] = u;
-         if( ipi ) ipi[ ipix ] = i;
+            ipq[ ipix ] = q;
+            ipu[ ipix ] = u;
+            if( ipi ) ipi[ ipix ] = i;
 
 /* Update the pointers to the first time slice data and quality value for
    the next bolometer. */
-         din0 += bstride;
-         qin0 += bstride;
+            din0 += bstride;
+            qin0 += bstride;
+         }
       }
+
+/* Calculate mean value in each time slice if required. */
+   } else {
+
+      pm = pdata->mean + block_start;
+      for( itime = block_start; itime <= block_end; itime++,pm++ ) {
+         din = dat + itime*tstride;
+         qin = qua + itime*tstride;
+
+         sum = 0;
+         nn = 0;
+
+         for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+
+            if( !( *qin & SMF__Q_FIT ) && *din != VAL__BADD ) {
+               sum += *din;
+               nn++;
+
+            }
+
+            din += bstride;
+            qin += bstride;
+         }
+
+         if( nn > 0 ) {
+            *pm = sum/nn;
+         } else {
+            *pm = VAL__BADD;
+         }
+      }
+
    }
+
+
 }
 
 

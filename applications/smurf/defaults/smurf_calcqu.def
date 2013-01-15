@@ -139,7 +139,7 @@ gai.flatfield = 0
 pasign = 1
 paoff = 0.0
 angrot = 90.0
-
+submean = 0
 
 
 

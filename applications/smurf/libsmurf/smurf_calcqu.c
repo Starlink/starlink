@@ -41,7 +41,9 @@
 *     series corresponding to the frequency of the spinning half-waveplate
 *     (6 - 12 Hz), and should be largely unaffected by signal at other
 *     frequencies. For this reason, the cleaning specified by parameter
-*     CONFIG should usually not include any filtering.
+*     CONFIG should usually not include any filtering. There is an
+*     option (see configuration parameter SUBMEAN) to subtract the mean
+*     value from each time slice before using them to calculate Q and U.
 *
 *     The current WCS Frame within the generated I, Q and U images will
 *     be SKY (e.g. Right Ascension/Declination).
@@ -203,6 +205,10 @@
 *        samples using the data sample rate.
 *     SPIKETHRESH = REAL
 *        Threshold S/N to flag spikes using sigma-clipper.
+*     SUBMEAN = BOOLEAN
+*        If non-zero, the mean value is subtracted from each time-slice
+*        before calculating the Q and U values. This typically has very 
+*        little effect. [0]
 *     ZEROPAD = LOGICAL
 *        Determines the nature of the padding added to the start and end of
 *        each bolometer time stream. Padding is needed to avoid
@@ -237,7 +243,8 @@
 *     8-JAN-2013 (DSB):
 *        Added config parameters PASIGN, PAOFF and ANGROT.
 *     15-JAN-2013 (DSB):
-*        Added parameters MAXSIZE and MINSIZE.
+*        - Added ADAM parameters MAXSIZE and MINSIZE.
+*        - Added config parameter SUBMEAN.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -326,6 +333,7 @@ void smurf_calcqu( int *status ) {
    int nc;                    /* Number of characters written to a string */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    int qplace;                /* NDF placeholder for current block's Q image */
+   int submean;               /* Subtract mean value from each time slice? */
    int uplace;                /* NDF placeholder for current block's U image */
    size_t ichunk;             /* Continuous chunk counter */
    size_t idx;                /* Subarray counter */
@@ -437,8 +445,13 @@ void smurf_calcqu( int *status ) {
 
 /* Get the CALCQU specific parameters. */
          if( !astMapGet0I( config, "PASIGN", &pasign ) ) pasign = 1;
+         msgOutiff( MSG__VERB, "", "PASIGN=%d", status, pasign );
          if( !astMapGet0D( config, "PAOFF", &paoff ) ) paoff = 0.0;
+         msgOutiff( MSG__VERB, "", "PAOFF=%g", status, paoff );
          if( !astMapGet0D( config, "ANGROT", &angrot ) ) angrot = 90.0;
+         msgOutiff( MSG__VERB, "", "ANGROT=%g", status, angrot );
+         if( !astMapGet0I( config, "SUBMEAN", &submean ) ) submean = 0;
+         msgOutiff( MSG__VERB, "", "SUBMEAN=%d", status, submean );
 
 /* See if the dark squids should be cleaned. */
          if( !astMapGet0I( config, "DKCLEAN", &dkclean ) ) dkclean = 0;
@@ -682,7 +695,7 @@ void smurf_calcqu( int *status ) {
                   smf_calc_iqu( wf, data, block_start, block_end, ipolcrd,
                                 qplace, uplace, iplace, oprov, fc,
                                 pasign, AST__DD2R*paoff, AST__DD2R*angrot,
-                                status );
+                                submean, status );
 
 /* Warn about short blocks. */
                } else {
