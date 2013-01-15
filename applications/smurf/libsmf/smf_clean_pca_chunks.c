@@ -242,7 +242,7 @@ void smf_clean_pca_chunks( ThrWorkForce *wf, smfData *data, size_t chunklen,
     goto CLEANUP;
   }
 
-  /* Fill any gaps or padding with interpolated data values plus noise.
+  /* Fill any gaps or padding with interpolated data values plus noise. */
   smf_fillgaps( wf, data, SMF__Q_PAD | SMF__Q_GAP, status );
 
   /* Set up the division of labour for threads: independent blocks of time.
