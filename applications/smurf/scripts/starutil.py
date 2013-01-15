@@ -676,6 +676,8 @@ class ParSys(object):
    def __iter__(self):
       self.__inext = -1
       return self
+   def __next__(self):
+      return self.next()
    def next(self):
       self.__inext += 1
       parnames = self.params.keys()
@@ -1883,6 +1885,8 @@ class NDG(object):
    def __iter__(self):
       self.__inext = -1
       return self
+   def __next__(self):
+      return self.next()
    def next(self):
       self.__inext += 1
       if self.__inext < len( self.__ndfs ):
