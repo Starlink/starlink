@@ -78,6 +78,8 @@
 *        Use NDF_CANCL to cancel all newly active NDF parameters at the
 *        end of the monolith. This avoid such parameters causing warnings
 *        aboud dangling HDS locators.
+*     19-DEC-2012 (DSB):
+*        Implement LPG looping.
 *     {enter_further_changes_here}
 
 *-
@@ -95,6 +97,7 @@
       INTEGER  STATUS
 
 *  External References:
+      LOGICAL LPG_AGAIN           ! Invoke the application again?
       INTEGER CHR_LEN             ! Length of a character string less
                                   ! any trailing blanks
 
@@ -155,86 +158,95 @@
 *  Re-read the polpack configuration file.
       CALL POL1_CNFIG( ' ', STATUS )
 
+*  Initialise the common blocks used to control multiple invocation of
+*  applications to process lists of NDFs.
+      CALL LPG_START( .FALSE., 0.0, .FALSE., STATUS )
+
+*  Loop round invoking the task for each set of NDFs specified by the
+*  user.
+      DO WHILE( LPG_AGAIN( STATUS ) )
+
 *  Begin a provenance block. This causes event handlers to be registered
 *  with the NDF library so that a handler routine in NDG is called every
 *  time an NDF is opened. This handler routine keeps a record of all NDFs
 *  that are opened for input or output, until the block is closed by
 *  calling NDG_ENDPV.
-      CALL NDG_BEGPV( STATUS )
+         CALL NDG_BEGPV( STATUS )
 
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
+         IF ( NAME .EQ. 'POLBIN' ) THEN
+            CALL POLBIN( STATUS )
 
-      IF ( NAME .EQ. 'POLBIN' ) THEN
-         CALL POLBIN( STATUS )
+         ELSE IF ( NAME .EQ. 'POLCAL' ) THEN
+            CALL POLCAL( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLCAL' ) THEN
-         CALL POLCAL( STATUS )
+         ELSE IF ( NAME .EQ. 'POLEXP' ) THEN
+            CALL POLEXP( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLEXP' ) THEN
-         CALL POLEXP( STATUS )
+         ELSE IF ( NAME .EQ. 'POLEXPX' ) THEN
+            CALL POLEXPX( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLEXPX' ) THEN
-         CALL POLEXPX( STATUS )
+         ELSE IF ( NAME .EQ. 'POLEXT' ) THEN
+            CALL POLEXT( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLEXT' ) THEN
-         CALL POLEXT( STATUS )
+         ELSE IF ( NAME .EQ. 'POLIMP' ) THEN
+            CALL POLIMP( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLIMP' ) THEN
-         CALL POLIMP( STATUS )
+         ELSE IF ( NAME .EQ. 'POLIMPX' ) THEN
+            CALL POLIMPX( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLIMPX' ) THEN
-         CALL POLIMPX( STATUS )
+         ELSE IF ( NAME .EQ. 'POLCENT' ) THEN
+            CALL POLCENT( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLCENT' ) THEN
-         CALL POLCENT( STATUS )
+         ELSE IF ( NAME .EQ. 'POLHELP' ) THEN
+            CALL POLHELP( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLHELP' ) THEN
-         CALL POLHELP( STATUS )
+         ELSE IF ( NAME .EQ. 'POLIMAGE' ) THEN
+            CALL POLIMAGE( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLIMAGE' ) THEN
-         CALL POLIMAGE( STATUS )
+         ELSE IF ( NAME .EQ. 'POLKA' ) THEN
+            CALL POLKA( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLKA' ) THEN
-         CALL POLKA( STATUS )
+         ELSE IF ( NAME .EQ. 'POLPLOT' ) THEN
+            CALL POLPLOT( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLPLOT' ) THEN
-         CALL POLPLOT( STATUS )
+         ELSE IF ( NAME .EQ. 'POLPREP' ) THEN
+            CALL POLPREP( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLPREP' ) THEN
-         CALL POLPREP( STATUS )
+         ELSE IF ( NAME .EQ. 'POLRDTCL' ) THEN
+            CALL POLRDTCL( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLRDTCL' ) THEN
-         CALL POLRDTCL( STATUS )
+         ELSE IF ( NAME .EQ. 'POLROTREF' ) THEN
+            CALL POLROTREF( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLSIM' ) THEN
-         CALL POLSIM( STATUS )
+         ELSE IF ( NAME .EQ. 'POLSIM' ) THEN
+            CALL POLSIM( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLSTACK' ) THEN
-         CALL POLSTACK( STATUS )
+         ELSE IF ( NAME .EQ. 'POLSTACK' ) THEN
+            CALL POLSTACK( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLVEC' ) THEN
-         CALL POLVEC( STATUS )
+         ELSE IF ( NAME .EQ. 'POLVEC' ) THEN
+            CALL POLVEC( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLVERSION' ) THEN
-         CALL POLVERSION( STATUS )
+         ELSE IF ( NAME .EQ. 'POLVERSION' ) THEN
+            CALL POLVERSION( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLWRTCL' ) THEN
-         CALL POLWRTCL( STATUS )
+         ELSE IF ( NAME .EQ. 'POLWRTCL' ) THEN
+            CALL POLWRTCL( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLZCONV' ) THEN
-         CALL POLZCONV( STATUS )
+         ELSE IF ( NAME .EQ. 'POLZCONV' ) THEN
+            CALL POLZCONV( STATUS )
 
-      ELSE
+         ELSE
 
 *  No such option exists.
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'CMD', NAME )
+            CALL ERR_REP( 'POLPACK_MON_NOCOM',
+     :                    'POLPACK: No such command ^CMD.', STATUS )
 
-         STATUS = SAI__ERROR
-         CALL MSG_SETC( 'CMD', NAME )
-         CALL ERR_REP( 'POLPACK_MON_NOCOM',
-     :     'POLPACK: No such command ^CMD.', STATUS )
-
-      END IF
+         END IF
 
 *  End the provenance block. This will result in every output NDF being
 *  given a provenance extension containing a record of the input NDFs
@@ -243,7 +255,9 @@
 *  unchanged (so individual application can over-ride this automatic
 *  provenance handling by adding a provenance extension to the output NDF
 *  itself).
-      CALL NDG_ENDPV( 'POLPACK:'//NAME, STATUS )
+         CALL NDG_ENDPV( 'POLPACK:'//NAME, STATUS )
+
+      END DO
 
 *  Note the current number of active GRP identifiers. Do this in a new
 *  error reporting context so that we get the correct value even if an
