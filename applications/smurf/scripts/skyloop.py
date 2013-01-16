@@ -211,8 +211,9 @@
 *     24-OCT-2012 (DSB):
 *        Original version
 *     16-JAN-2013 (DSB):
-*        Only include any supplied REF value in the makemap comamnd line
+*        - Only include any supplied REF value in the makemap comamnd line
 *        on the first iteration.
+*        - Record quality info in the final map.
 
 *-
 '''
@@ -467,8 +468,12 @@ try:
 
 #  Now do the second and subsequent iterations.
    iter = 2
+   newmap = None
    while iter <= niter:
       msg_out( "Iteration {0}...".format(iter))
+
+#  Record the name of hte map created on the previous iteration, if any.
+      prevmap = newmap
 
 #  When "zero_niter" invocations have been performed, switch off zero
 #  masking (so long as zero_niter > 0).  Do this for AST, COM and FLT
@@ -551,6 +556,16 @@ try:
       msg_out( "Creating output itermap cube {0}...".format(itermap) )
       inputs = NDG( maps )
       invoke("$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".format(inputs,itermap) )
+
+#  Since no masking is done on the final iteration, the output map will
+#  not urrently contain a quality array. If the previous iteration has a
+#  quality component copy it to the last iteration, and set bad bits to
+#  zero. This is to provide a record of the final used mask.
+   try:
+      invoke("$HDSTOOLS_DIR/hcopy inp={0} out={1}".format(prevmap,newmap) )
+      invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )
+   except starutil.StarUtilError as err:
+      pass
 
 #  Remove temporary files.
    cleanup()
