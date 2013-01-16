@@ -4494,6 +4494,10 @@ another statement of the software that performed the action.
 
 \section{Changes Introduced in NDG Version 7.1}
 \begin{itemize}
+   \item A bug has been fixed that resulted in the NDF AUTOHISTORY facility
+    being switched off inside an NDG ``group history'' block. For instance,
+    this caused all KAPPA applications to ignore any value set for
+    environment variable NDF\_AUTO\_HISTORY.
    \item New routine NDG\_ABPTH added to convert a group of NDF paths
     from relative to absolute (with respect to the current working
     directory).

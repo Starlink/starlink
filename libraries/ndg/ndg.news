@@ -2,7 +2,12 @@
 
 Version 7.1
 
-   o New routine NDG_ABPTH added to convert a grouyp of NDF paths from
+   o A bug has been fixed that resulted in the NDF AUTOHISTORY facility
+   being switched off inside an NDG "group history" block. For instance,
+   this caused all KAPPA applications to ignore any value set for
+   environment variable NDF_AUTO_HISTORY.
+
+   o New routine NDG_ABPTH added to convert a group of NDF paths from
    relative to absolue, with respect to the current working directory.
 
    o Routine NDG_GTSUP now returns field values formed by parsing

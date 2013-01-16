@@ -50,6 +50,10 @@
 *  History:
 *     16-OCT-2009 (DSB):
 *        Original version.
+*     16-JAN-2012 (DSB):
+*        Record initial value of NDF_AUTO_HISTORY. Prior to this, a
+*        default value of .FALSE was used which meant that NDF_AUTO_HISTORY
+*        was switched off by the subsequent call to NDG_HLTGH.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,6 +84,9 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Record the initial value of the AUTO_HISTORY tuning parameter.
+      CALL NDF_GTUNE( 'AUTO_HISTORY', AUTO_COM2, STATUS )
 
 *  Indicate that NDF event handlers needed to record the NDFs in which
 *  GRP history should be stored have not yet been established, and then
