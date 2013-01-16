@@ -210,6 +210,9 @@
 *  History:
 *     24-OCT-2012 (DSB):
 *        Original version
+*     16-JAN-2013 (DSB):
+*        Only include any supplied REF value in the makemap comamnd line
+*        on the first iteration.
 
 *-
 '''
@@ -520,8 +523,6 @@ try:
             .format(cleaned,newmap,confname,map)
       if pixsize:
          cmd += " pixsize={0}".format(pixsize)
-      if ref:
-         cmd += " ref={0}".format(ref)
       if mask2:
          cmd += " mask2={0}".format(mask2)
       if mask3:
