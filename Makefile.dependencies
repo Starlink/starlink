@@ -2230,9 +2230,10 @@ $(MANIFESTS)/sc9: \
 	cd docs/sc/009 \
 	  && $(MAKE_CPT)
 
+# Component scb is OBSOLETE -- do not build
 $(MANIFESTS)/scb: \
 		$(MANIFESTS)/star2html
-	cd applications/scb \
+	cd applications/obsolete/scb \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sg10: \
