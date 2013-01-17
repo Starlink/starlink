@@ -14149,6 +14149,15 @@ iraf! {
             helpkey *
          }
 
+         parameter loop {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Loop over each row or column of IN1?}
+            helpkey *
+         }
+
          parameter margin {
             size *
             type _REAL

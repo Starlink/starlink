@@ -48,6 +48,10 @@
 *
 *     Optionally, an output NDF can be created containing a normalised
 *     version of the data array from the first input NDF.
+*
+*     For the special case of two-dimensional images, if IN2 spans only a
+*     single row or column, it can be used to normalize each row or column
+*     of IN1 in turn. See parameter LOOP.
 
 *  Usage:
 *     normalize in1 in2 out
@@ -85,6 +89,12 @@
 *        The NDF to be normalised.
 *     IN2 = NDF (Read)
 *        The NDF to which IN1 will be normalised.
+*     LOOP = _LOGICAL (Read)
+*        If both IN1 and IN2 are 2-dimensional, and if IN2 spans only a
+*        single row or column, then setting LOOP to TRUE will cause every
+*        row or column in IN1 to be normalised, in turn, to the values in
+*        the single row or column of IN2. The details of the fit for each
+*        row or column will be displayed separately. [FALSE]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given
 *        as fractions of the corresponding dimension of the current
@@ -352,6 +362,8 @@
 *        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     16-SEP-2011 (DSB):
 *        Added ZEROFF parameter.
+*     17-JAN-2013 (DSB):
+*        Added LOOP parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -362,6 +374,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PAR_ERR'          ! Parameter-system error constants
       INCLUDE 'PRM_PAR'          ! Data-type constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -375,7 +388,13 @@
       PARAMETER ( HISIZE = 1000 )
 
 *  Local Variables:
+      INTEGER  AXIS              ! Index of axis to loop over
+      INTEGER  I                 ! Pixel index on looping axis
+      INTEGER  IHI               ! Highest looping pixel index
+      INTEGER  ILO               ! Lowest looping pixel index
       INTEGER  ISTAT             ! Temporary status value
+      INTEGER  LBND1( NDF__MXDIM )! Lower pixel bounds of ndf1
+      INTEGER  LBND2( NDF__MXDIM )! Lower pixel bounds of ndf2
       INTEGER  MAXPOS( 2 )       ! Position of maximum in IN2 data array
       INTEGER  MINPIX            ! Minimum number of good pixels per bin
                                  ! when fitting
@@ -384,8 +403,13 @@
       INTEGER  NBIN              ! No. of bins to use when fitting
       INTEGER  NDF1B             ! Base NDF identifier for input IN1
       INTEGER  NDF1S             ! NDF section identifier for input IN1
+      INTEGER  NDF1T             ! Identifier for supplied IN1 NDF
       INTEGER  NDF2S             ! NDF section identifier for input IN2
+      INTEGER  NDF2T             ! Identifier for supplied IN2 NDF
+      INTEGER  NDFO              ! Identifier for output NDF
       INTEGER  NDFOUT            ! NDF identifier for OUT
+      INTEGER  NDIM1             ! No. of axis in ndf1
+      INTEGER  NDIM2             ! No. of axis in ndf2
       INTEGER  NEL1B             ! Number of elements mapped from base
                                  ! NDF of IN1
       INTEGER  NELS              ! Number of elements mapped from the
@@ -393,6 +417,8 @@
       INTEGER  NITER             ! Number of rejection iterations to
                                  ! perform
       INTEGER  PNT1BD( 1 )       ! Pointer to mapped base IN1 data array
+      INTEGER  UBND1( NDF__MXDIM )! Upper pixel bounds of ndf1
+      INTEGER  UBND2( NDF__MXDIM )! Upper pixel bounds of ndf2
       INTEGER  PNT1BV( 1 )       ! Pointer to mapped base IN1 variance
                                  ! array
       INTEGER  PNT1S( 1 )        ! Pointer to mapped IN1 section data
@@ -408,8 +434,10 @@
       INTEGER  PNTW3             ! Pointer to temporary work space
       INTEGER  PNTW4             ! Pointer to temporary work space
       INTEGER  PNTW5             ! Pointer to temporary work space
+      INTEGER  SHIFT( 2 )        ! Pixel origin shift
       LOGICAL  BAD               ! Any bad pixels found?
       LOGICAL  DEFIND            ! NDF component is in a defined state?
+      LOGICAL  LOOP              ! Loop over rows or columns?
       LOGICAL  OUTRQD            ! Is an output NDF is to be generated?
       LOGICAL  VAR1              ! IN1 has a defined variance component?
       LOGICAL  ZEROFF            ! Fix fit offset at zero?
@@ -432,8 +460,8 @@
       CALL NDF_BEGIN
 
 *  Get NDF identifiers for the two input NDFs.
-      CALL LPG_ASSOC( 'IN1', 'READ', NDF1S, STATUS )
-      CALL LPG_ASSOC( 'IN2', 'READ', NDF2S, STATUS )
+      CALL LPG_ASSOC( 'IN1', 'READ', NDF1T, STATUS )
+      CALL LPG_ASSOC( 'IN2', 'READ', NDF2T, STATUS )
 
 *  If an error occurred, abort.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -441,16 +469,11 @@
 *  Get an NDF identifier for the output NDF. The output is based on IN1
 *  and inherits all the components of IN1 except the data and variance
 *  arrays.
-      CALL LPG_PROP( NDF1S, 'WCS,Axis,Quality,Units', 'OUT', NDFOUT,
+      CALL LPG_PROP( NDF1T, 'WCS,Axis,Quality,Units', 'OUT', NDFO,
      :               STATUS )
 
 *  If an output NDF was obtained successfully...
       IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  Clone the base NDF identifier for IN1 for use when calculating the
-*  output values.
-         CALL NDF_CLONE( NDF1S, NDF1B, STATUS )
-
 
 *  Set the OUTRQD flag to indicate that the output values should be
 *  calculated.
@@ -459,7 +482,6 @@
 *  If a null value for OUT was given, set OUTRQD flag appropriately
 *  and clear the error condition.
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
-
          OUTRQD = .FALSE.
          CALL ERR_ANNUL( STATUS )
 
@@ -470,193 +492,303 @@
 
       END IF
 
+
+*  Now see if we need to loop over rows or coluns. First get the bounds
+*  Of the two input NDFs.
+      CALL NDF_BOUND( NDF1T, NDF__MXDIM, LBND1, UBND1, NDIM1, STATUS )
+      CALL NDF_BOUND( NDF2T, NDF__MXDIM, LBND2, UBND2, NDIM2, STATUS )
+
+*  We only loop if both are 2-dimensional (this restriction could
+*  probably be removed if needed).
+      IF( NDIM1 .EQ. 2 .AND. NDIM2 .EQ. 2 ) THEN
+
+*  We only loop if IN2 spans a single pixel on one of the two pixel axes.
+         IF( LBND2( 1 ) .EQ. UBND2( 1 ) ) THEN
+            AXIS = 1
+         ELSE IF( LBND2( 2 ) .EQ. UBND2( 2 ) ) THEN
+            AXIS = 2
+         ELSE
+            AXIS = 0
+         END IF
+
+      ELSE
+         AXIS = 0
+      END IF
+
+*  If the above conditions for looping are met, see if the user wants to
+*  loop.
+      IF( AXIS .GT. 0 ) THEN
+         CALL PAR_GET0L( 'LOOP', LOOP, STATUS )
+         IF( .NOT. LOOP ) AXIS = 0
+      END IF
+
+*  If so, set the bounds on the looping axis, and store the initial pixel
+*  shifts that move IN2 NDF so that it is in the correct position to
+*  normalize the first row or column of IN1.
+      IF( AXIS .GT. 0 ) THEN
+         ILO = LBND1( AXIS )
+         IHI = UBND1( AXIS )
+         SHIFT( 1 ) = 0
+         SHIFT( 2 ) = 0
+         SHIFT( AXIS ) = ILO - LBND2( AXIS )
+
+*  If we are not looping, we only pass through the loop once, using the
+*  supplied NDF identifiers without change.
+      ELSE
+         ILO = 1
+         IHI = 1
+         NDF1S = NDF1T
+         NDF2S = NDF2T
+         NDFOUT = NDFO
+      END IF
+
+*  Do all required values on the looping axis (if any)
+      DO I = ILO, IHI
+
+*  Prepare for the next value on the looping axis.
+         IF( AXIS .GT. 0 ) THEN
+
+*  Get a section of IN1 that is restricted to the current value on the
+*  looping axis.
+            LBND1( AXIS ) = I
+            UBND1( AXIS ) = I
+            CALL NDF_SECT( NDF1T, NDIM1, LBND1, UBND1, NDF1S, STATUS )
+
+*  If we are producing an output NDF, get a section of it that is
+*  restricted to the current value on the looping axis.
+            IF( OUTRQD ) CALL NDF_SECT( NDFO, NDIM2, LBND1, UBND1,
+     :                                  NDFOUT, STATUS )
+
+*  Shift the supplied IN2 NDF so that it is aligned with the above IN1
+*  section. We take a section covering the whole supplied IN1 NDF first
+*  because NDF_SHIFT requires write access to the underlying input NDF
+*  otherwise.
+            CALL NDF_SECT( NDF2T, NDIM2, LBND2, UBND2, NDF2S, STATUS )
+            CALL NDF_SHIFT( 2, SHIFT, NDF2S, STATUS )
+
+*  Update the required shift ready for the next pass.
+            SHIFT( AXIS ) = SHIFT( AXIS ) + 1
+
+*  Tell the user what we are doing.
+            CALL MSG_SETI( 'I', I )
+            IF( AXIS .EQ. 1 ) THEN
+               CALL MSG_SETC( 'W', 'column' )
+            ELSE
+               CALL MSG_SETC( 'W', 'row' )
+            END IF
+            CALL MSG_BLANK( STATUS )
+            CALL MSG_BLANK( STATUS )
+            CALL MSG_OUT( ' ', ' Doing ^w ^I ...',
+     :                    STATUS  )
+            CALL MSG_BLANK( STATUS )
+         END IF
+
+*  If an output NDF is being created, clone the NDF identifier for IN1 for
+*  use when calculating the output values.
+         IF( OUTRQD ) CALL NDF_CLONE( NDF1S, NDF1B, STATUS )
+
 *  Create sections of the two input NDFs with matched pixel bounds
 *  by trimming the input NDFs.
-      CALL NDF_MBND( 'TRIM', NDF1S, NDF2S, STATUS )
+         CALL NDF_MBND( 'TRIM', NDF1S, NDF2S, STATUS )
 
 *  Map the data arrays of the two NDF sections.
-      CALL KPG1_MAP( NDF1S, 'DATA', '_REAL', 'READ', PNT1S, NELS,
-     :              STATUS )
-      CALL KPG1_MAP( NDF2S, 'DATA', '_REAL', 'READ', PNT2S, NELS,
-     :              STATUS )
+         CALL KPG1_MAP( NDF1S, 'DATA', '_REAL', 'READ', PNT1S, NELS,
+     :                 STATUS )
+         CALL KPG1_MAP( NDF2S, 'DATA', '_REAL', 'READ', PNT2S, NELS,
+     :                 STATUS )
 
 *  If an error has occured, abort.
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Get percentage histogram range for scaling the binning of NDF2, using
 *  2 to 98 per cent as the dynamic defaults.
-      PCDEF( 1 ) = 2.0
-      PCDEF( 2 ) = 98.0
-      CALL PAR_GDR1R( 'PCRANGE', 2, PCDEF, 0.0, 100.0, .FALSE., PCRANG,
-     :                STATUS )
+         PCDEF( 1 ) = 2.0
+         PCDEF( 2 ) = 98.0
+         CALL PAR_GDR1R( 'PCRANGE', 2, PCDEF, 0.0, 100.0, .FALSE.,
+     :                   PCRANG, STATUS )
 
 *  Convert them to fractions.
-      PCRANG( 1 ) = 0.01 * PCRANG( 1 )
-      PCRANG( 2 ) = 0.01 * PCRANG( 2 )
+         PCRANG( 1 ) = 0.01 * PCRANG( 1 )
+         PCRANG( 2 ) = 0.01 * PCRANG( 2 )
 
 *  Find if there are any bad values in the section of the 2nd input NDF.
-      CALL NDF_BAD( NDF2S, 'Data', .FALSE., BAD, STATUS )
+         CALL NDF_BAD( NDF2S, 'Data', .FALSE., BAD, STATUS )
 
 *  Get maximum and minimum values in the data array of the IN2 NDF
 *  section.
-      CALL KPG1_MXMNR( BAD, NELS, %VAL( CNF_PVAL( PNT2S( 1 ) ) ), NBAD2,
-     :                 MAX2, MIN2, MAXPOS, MINPOS, STATUS )
-      BAD = NBAD2 .NE. 0
+         CALL KPG1_MXMNR( BAD, NELS, %VAL( CNF_PVAL( PNT2S( 1 ) ) ),
+     :                    NBAD2, MAX2, MIN2, MAXPOS, MINPOS, STATUS )
+         BAD = NBAD2 .NE. 0
 
 *  Get temporary workspace to hold the histogram, and map it.
-      CALL PSX_CALLOC( HISIZE, '_INTEGER', PNTW0, STATUS )
+         CALL PSX_CALLOC( HISIZE, '_INTEGER', PNTW0, STATUS )
 
 *  If an error has occurred, abort.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'NORMALIZE_WSP1',
-     :     'NORMALIZE: Unable to get workspace to form the histogram.',
-     :     STATUS )
-         CALL PSX_FREE( PNTW0, STATUS )
-         GOTO 999
-      END IF
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_REP( 'NORMALIZE_WSP1',
+     :        'NORMALIZE: Unable to get workspace to form the '//
+     :        'histogram.', STATUS )
+            CALL PSX_FREE( PNTW0, STATUS )
+            GOTO 999
+         END IF
 
 *  Generate the histogram of the section of IN2.
-      CALL KPG1_GHSTR( BAD, NELS, %VAL( CNF_PVAL( PNT2S( 1 ) ) ),
-     :                 %VAL( CNF_PVAL( PNT2S( 1 ) ) ), 0.0D0,
-     :                 HISIZE, .FALSE.,
-     :                 MAX2, MIN2, %VAL( CNF_PVAL( PNTW0 ) ), STATUS )
+         CALL KPG1_GHSTR( BAD, NELS, %VAL( CNF_PVAL( PNT2S( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNT2S( 1 ) ) ), 0.0D0,
+     :                    HISIZE, .FALSE.,
+     :                    MAX2, MIN2, %VAL( CNF_PVAL( PNTW0 ) ),
+     :                    STATUS )
 
 *  Find the data values in IN2 which correspond to the required
 *  percentage histogram points.
-      CALL KPG1_HSTFR( HISIZE, %VAL( CNF_PVAL( PNTW0 ) ),
-     :                 MAX2, MIN2, 2, PCRANG,
-     :                 DRDEF, STATUS )
+         CALL KPG1_HSTFR( HISIZE, %VAL( CNF_PVAL( PNTW0 ) ),
+     :                    MAX2, MIN2, 2, PCRANG,
+     :                    DRDEF, STATUS )
 
 *  Unmap and release the temporary work space used to hold the
 *  histogram.
-      CALL PSX_FREE( PNTW0, STATUS )
+         CALL PSX_FREE( PNTW0, STATUS )
 
 *  Obtain a data range to limit the data to be fitted.  Only pixels for
 *  which the IN2 data value is inside the given range are used. The
 *  auto-scaled range calculated above is used as the dynamic default.
-      CALL PAR_GDR1R( 'DATARANGE', 2, DRDEF, VAL__MINR, VAL__MAXR,
-     :                .TRUE., DRANGE, STATUS )
+         CALL PAR_GDR1R( 'DATARANGE', 2, DRDEF, VAL__MINR, VAL__MAXR,
+     :                   .TRUE., DRANGE, STATUS )
 
 *  Get required scalar parameters.
-      CALL PAR_GDR0I( 'NBIN', 50, 2, 100000, .TRUE., NBIN, STATUS )
-      CALL PAR_GDR0I( 'NITER', 2, 0, 100, .TRUE., NITER, STATUS )
-      CALL PAR_GDR0R( 'NSIGMA', 3.0, 0.1, 1.0E6, .TRUE., NSIGMA,
-     :                STATUS )
-      CALL PAR_GDR0I( 'MINPIX', 2, 1, NELS / NBIN, .TRUE., MINPIX,
-     :                STATUS )
+         CALL PAR_GDR0I( 'NBIN', 50, 2, 100000, .TRUE., NBIN, STATUS )
+         CALL PAR_GDR0I( 'NITER', 2, 0, 100, .TRUE., NITER, STATUS )
+         CALL PAR_GDR0R( 'NSIGMA', 3.0, 0.1, 1.0E6, .TRUE., NSIGMA,
+     :                   STATUS )
+         CALL PAR_GDR0I( 'MINPIX', 2, 1, NELS / NBIN, .TRUE., MINPIX,
+     :                   STATUS )
 
 *  Get temporary workspace for use in KPS1_NMPLT, and map it.
-      CALL PSX_CALLOC( NBIN, '_INTEGER', PNTW1, STATUS )
-      CALL PSX_CALLOC( NBIN, '_REAL', PNTW2, STATUS )
-      CALL PSX_CALLOC( NBIN, '_REAL', PNTW3, STATUS )
-      CALL PSX_CALLOC( NBIN, '_DOUBLE', PNTW4, STATUS )
-      CALL PSX_CALLOC( NBIN, '_REAL', PNTW5, STATUS )
+         CALL PSX_CALLOC( NBIN, '_INTEGER', PNTW1, STATUS )
+         CALL PSX_CALLOC( NBIN, '_REAL', PNTW2, STATUS )
+         CALL PSX_CALLOC( NBIN, '_REAL', PNTW3, STATUS )
+         CALL PSX_CALLOC( NBIN, '_DOUBLE', PNTW4, STATUS )
+         CALL PSX_CALLOC( NBIN, '_REAL', PNTW5, STATUS )
 
 *  If an error has occurred, abort annulling any workspace already
 *  obtained.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'NORMALIZE_WSP2',
-     :     'NORMALIZE: Unable to get workspace to calculate the '/
-     :     /'mapping.', STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_REP( 'NORMALIZE_WSP2',
+     :        'NORMALIZE: Unable to get workspace to calculate the '/
+     :        /'mapping.', STATUS )
+            CALL PSX_FREE( PNTW1, STATUS )
+            CALL PSX_FREE( PNTW2, STATUS )
+            CALL PSX_FREE( PNTW3, STATUS )
+            CALL PSX_FREE( PNTW4, STATUS )
+            CALL PSX_FREE( PNTW5, STATUS )
+            GOTO 999
+         END IF
+
+*  See if the offset should be fixed at zero.
+         CALL PAR_GET0L( 'ZEROFF', ZEROFF, STATUS )
+
+*  Call KPS1_NMPLT to calculate the linear function which normalises
+*  IN1 to IN2.
+         CALL KPS1_NMPLT( %VAL( CNF_PVAL( PNT2S( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNT1S( 1 ) ) ), NELS,
+     :                DRANGE( 1 ), DRANGE( 2 ), NBIN, NITER, NSIGMA,
+     :                MINPIX, NDF2S, NDF1S, ZEROFF,
+     :                %VAL( CNF_PVAL( PNTW1 ) ),
+     :                %VAL( CNF_PVAL( PNTW2 ) ),
+     :                %VAL( CNF_PVAL( PNTW3 ) ),
+     :                %VAL( CNF_PVAL( PNTW4 ) ),
+     :                %VAL( CNF_PVAL( PNTW5 ) ), SLOPE, OFFSET,
+     :                STATUS )
+
+*  Unmap and release the temporary work space.
          CALL PSX_FREE( PNTW1, STATUS )
          CALL PSX_FREE( PNTW2, STATUS )
          CALL PSX_FREE( PNTW3, STATUS )
          CALL PSX_FREE( PNTW4, STATUS )
          CALL PSX_FREE( PNTW5, STATUS )
-         GOTO 999
-      END IF
-
-*  See if the offset should be fixed at zero.
-      CALL PAR_GET0L( 'ZEROFF', ZEROFF, STATUS )
-
-*  Call KPS1_NMPLT to calculate the linear function which normalises
-*  IN1 to IN2.
-      CALL KPS1_NMPLT( %VAL( CNF_PVAL( PNT2S( 1 ) ) ),
-     :                 %VAL( CNF_PVAL( PNT1S( 1 ) ) ), NELS,
-     :             DRANGE( 1 ), DRANGE( 2 ), NBIN, NITER, NSIGMA,
-     :             MINPIX, NDF2S, NDF1S, ZEROFF,
-     :             %VAL( CNF_PVAL( PNTW1 ) ), %VAL( CNF_PVAL( PNTW2 ) ),
-     :             %VAL( CNF_PVAL( PNTW3 ) ), %VAL( CNF_PVAL( PNTW4 ) ),
-     :             %VAL( CNF_PVAL( PNTW5 ) ), SLOPE, OFFSET, STATUS )
-
-*  Unmap and release the temporary work space.
-      CALL PSX_FREE( PNTW1, STATUS )
-      CALL PSX_FREE( PNTW2, STATUS )
-      CALL PSX_FREE( PNTW3, STATUS )
-      CALL PSX_FREE( PNTW4, STATUS )
-      CALL PSX_FREE( PNTW5, STATUS )
 
 *  Unmap the NDF sections.
-      CALL NDF_UNMAP( NDF1S, '*', STATUS )
-      CALL NDF_UNMAP( NDF2S, '*', STATUS )
+         CALL NDF_UNMAP( NDF1S, '*', STATUS )
+         CALL NDF_UNMAP( NDF2S, '*', STATUS )
 
 *  Write the values of the gradient and offset of the final fit to the
 *  Parameters SLOPE and OFFSET.
-      CALL PAR_PUT0R( 'SLOPE', SLOPE, STATUS )
-      CALL PAR_PUT0R( 'OFFSET', OFFSET, STATUS )
+         CALL PAR_PUT0R( 'SLOPE', SLOPE, STATUS )
+         CALL PAR_PUT0R( 'OFFSET', OFFSET, STATUS )
 
 *  If an output NDF is to be made containing a normalised copy of IN1,
 *  check that calculated slope was not zero.
-      IF ( OUTRQD ) THEN
+         IF ( OUTRQD ) THEN
 
-         IF ( ABS( SLOPE ) .LT. VAL__SMLR ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP('NORMALIZE_ZERO',
-     :        'NORMALIZE: Zero slope.  Cannot normalize output.',
-     :        STATUS )
-            GOTO 999
-         END IF
+            IF ( ABS( SLOPE ) .LT. VAL__SMLR ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP('NORMALIZE_ZERO',
+     :           'NORMALIZE: Zero slope.  Cannot normalize output.',
+     :           STATUS )
+               GOTO 999
+            END IF
 
 *  Map data arrays from base IN1 and output NDFs.
-         CALL KPG1_MAP( NDF1B, 'DATA', '_REAL', 'READ', PNT1BD, NEL1B,
-     :                 STATUS )
-         CALL KPG1_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE', PNTOD, NEL1B,
-     :                 STATUS )
+            CALL KPG1_MAP( NDF1B, 'DATA', '_REAL', 'READ', PNT1BD,
+     :                     NEL1B, STATUS )
+            CALL KPG1_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE', PNTOD,
+     :                     NEL1B, STATUS )
 
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
+            IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Produce the output data array by applying the inverse of the
 *  calculated normalisation function to the IN1 data array.
-         CALL KPG1_SCLOF( NEL1B, %VAL( CNF_PVAL( PNT1BD( 1 ) ) ),
-     :                    DBLE( 1.0 / SLOPE ), DBLE( -OFFSET / SLOPE ),
-     :                    %VAL( CNF_PVAL( PNTOD( 1 ) ) ), BAD, STATUS )
+            CALL KPG1_SCLOF( NEL1B, %VAL( CNF_PVAL( PNT1BD( 1 ) ) ),
+     :                       DBLE( 1.0 / SLOPE ),
+     :                       DBLE( -OFFSET / SLOPE ),
+     :                       %VAL( CNF_PVAL( PNTOD( 1 ) ) ), BAD,
+     :                       STATUS )
 
 *  Set the bad pixel flag for the output data array.
-          CALL NDF_SBAD( BAD, NDFOUT, 'Data', STATUS )
+             CALL NDF_SBAD( BAD, NDFOUT, 'Data', STATUS )
 
 *  Unmap the data arrays so they become defined, and save resources
 *  whilst the variance array is being normalised.
-          CALL NDF_UNMAP( NDF1B, 'Data', STATUS )
-          CALL NDF_UNMAP( NDFOUT, 'Data', STATUS )
+             CALL NDF_UNMAP( NDF1B, 'Data', STATUS )
+             CALL NDF_UNMAP( NDFOUT, 'Data', STATUS )
 
 *  If IN1 contains a variance component, copy it to the output and
 *  multiply by "1/SLOPE" squared to take account of the scaling of the
 *  data array.
-         CALL NDF_STATE( NDF1B, 'VARIANCE', VAR1, STATUS)
+            CALL NDF_STATE( NDF1B, 'VARIANCE', VAR1, STATUS)
 
-         IF ( VAR1 ) THEN
+            IF ( VAR1 ) THEN
 
-            CALL KPG1_MAP( NDF1B, 'VARIANCE', '_REAL', 'READ', PNT1BV,
-     :                    NEL1B, STATUS )
-            CALL KPG1_MAP( NDFOUT, 'VARIANCE', '_REAL', 'WRITE', PNTOV,
-     :                    NEL1B, STATUS )
+               CALL KPG1_MAP( NDF1B, 'VARIANCE', '_REAL', 'READ',
+     :                        PNT1BV, NEL1B, STATUS )
+               CALL KPG1_MAP( NDFOUT, 'VARIANCE', '_REAL', 'WRITE',
+     :                        PNTOV, NEL1B, STATUS )
 
-            IF ( STATUS .NE. SAI__OK ) GOTO 999
+               IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-            CALL KPG1_SCLOF( NEL1B, %VAL( CNF_PVAL( PNT1BV( 1 ) ) ),
-     :                       DBLE( 1.0 / SLOPE**2 ), 0.0D0,
-     :                       %VAL( CNF_PVAL( PNTOV( 1 ) ) ),
-     :                       BAD, STATUS )
+               CALL KPG1_SCLOF( NEL1B, %VAL( CNF_PVAL( PNT1BV( 1 ) ) ),
+     :                          DBLE( 1.0 / SLOPE**2 ), 0.0D0,
+     :                          %VAL( CNF_PVAL( PNTOV( 1 ) ) ),
+     :                          BAD, STATUS )
 
 *  Set the bad pixel flag for the output variance array.
-            CALL NDF_SBAD( BAD, NDFOUT, 'Variance', STATUS )
+               CALL NDF_SBAD( BAD, NDFOUT, 'Variance', STATUS )
+
+            END IF
+
+*  Get a value for the output title and store it.
+            CALL NDF_CINP( 'TITLE', NDFOUT, 'TITLE', STATUS )
 
          END IF
 
-*  Get a value for the output title and store it.
-         CALL NDF_CINP( 'TITLE', NDFOUT, 'TITLE', STATUS )
+*  If we are looping, annul the sections created within this loop.
+         IF( AXIS .GT. 0 ) THEN
+            CALL NDF_ANNUL( NDF1S, STATUS )
+            CALL NDF_ANNUL( NDF2S, STATUS )
+            IF( OUTRQD ) CALL NDF_ANNUL( NDFOUT, STATUS )
+         END IF
 
-      END IF
+      END DO
 
 *  Clear up.
  999  CONTINUE
@@ -668,10 +800,10 @@
 C      CALL ERR_MARK
       ISTAT = SAI__OK
 
-      CALL NDF_VALID( NDFOUT, OUTRQD, ISTAT )
+      CALL NDF_VALID( NDFO, OUTRQD, ISTAT )
       IF ( OUTRQD ) THEN
-         CALL NDF_STATE( NDFOUT, 'Data', DEFIND, ISTAT )
-         IF ( .NOT. DEFIND ) CALL NDF_DELET( NDFOUT, ISTAT )
+         CALL NDF_STATE( NDFO, 'Data', DEFIND, ISTAT )
+         IF ( .NOT. DEFIND ) CALL NDF_DELET( NDFO, ISTAT )
       END IF
 
 C      CALL ERR_ANNUL( ISTAT )
