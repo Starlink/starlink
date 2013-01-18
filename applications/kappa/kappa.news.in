@@ -26,6 +26,12 @@ The following new applications have been added:
       NGOOD, which produce the fraction/count of good/bad pixel
       values.
 
+   o  NORMALIZE
+
+      -  A new boolean parameter called LOOP permits normalisation
+      against a single row or column when comparing two-dimensional
+      NDFs.
+
    o  PARGET
 
       -  A new boolean parameter called VECTOR specifies the output

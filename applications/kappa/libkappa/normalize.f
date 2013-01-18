@@ -49,9 +49,9 @@
 *     Optionally, an output NDF can be created containing a normalised
 *     version of the data array from the first input NDF.
 *
-*     For the special case of two-dimensional images, if IN2 spans only a
-*     single row or column, it can be used to normalize each row or column
-*     of IN1 in turn. See parameter LOOP.
+*     For the special case of two-dimensional images, if IN2 spans only
+*     a single row or column, it can be used to normalize each row or
+*     column of IN1 in turn.  See Parameter LOOP.
 
 *  Usage:
 *     normalize in1 in2 out
@@ -90,11 +90,12 @@
 *     IN2 = NDF (Read)
 *        The NDF to which IN1 will be normalised.
 *     LOOP = _LOGICAL (Read)
-*        If both IN1 and IN2 are 2-dimensional, and if IN2 spans only a
-*        single row or column, then setting LOOP to TRUE will cause every
-*        row or column in IN1 to be normalised, in turn, to the values in
-*        the single row or column of IN2. The details of the fit for each
-*        row or column will be displayed separately. [FALSE]
+*        If both IN1 and IN2 are two-dimensional, and if IN2 spans only
+*        a single row or column, then setting LOOP to TRUE will cause
+*        every row or column in IN1 to be normalised, in turn, to the
+*        values in the single row or column of IN2.  The details of the
+*        fit for each row or column will be displayed separately.
+*        [FALSE]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given
 *        as fractions of the corresponding dimension of the current
@@ -297,7 +298,8 @@
 *     Copyright (C) 1995, 1998-1999, 2001, 2004 Central Laboratory of
 *     the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007, 2010. 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010, 2011, 2013 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -494,15 +496,16 @@
 
 
 *  Now see if we need to loop over rows or coluns. First get the bounds
-*  Of the two input NDFs.
+*  of the two input NDFs.
       CALL NDF_BOUND( NDF1T, NDF__MXDIM, LBND1, UBND1, NDIM1, STATUS )
       CALL NDF_BOUND( NDF2T, NDF__MXDIM, LBND2, UBND2, NDIM2, STATUS )
 
-*  We only loop if both are 2-dimensional (this restriction could
+*  We only loop if both are two-dimensional (this restriction could
 *  probably be removed if needed).
       IF( NDIM1 .EQ. 2 .AND. NDIM2 .EQ. 2 ) THEN
 
-*  We only loop if IN2 spans a single pixel on one of the two pixel axes.
+*  We only loop if IN2 spans a single pixel on one of the two pixel
+*  axes.
          IF( LBND2( 1 ) .EQ. UBND2( 1 ) ) THEN
             AXIS = 1
          ELSE IF( LBND2( 2 ) .EQ. UBND2( 2 ) ) THEN
@@ -522,9 +525,9 @@
          IF( .NOT. LOOP ) AXIS = 0
       END IF
 
-*  If so, set the bounds on the looping axis, and store the initial pixel
-*  shifts that move IN2 NDF so that it is in the correct position to
-*  normalize the first row or column of IN1.
+*  If so, set the bounds on the looping axis, and store the initial
+*  pixel shifts that move IN2 NDF so that it is in the correct position
+*  to normalize the first row or column of IN1.
       IF( AXIS .GT. 0 ) THEN
          ILO = LBND1( AXIS )
          IHI = UBND1( AXIS )
@@ -583,8 +586,8 @@
             CALL MSG_BLANK( STATUS )
          END IF
 
-*  If an output NDF is being created, clone the NDF identifier for IN1 for
-*  use when calculating the output values.
+*  If an output NDF is being created, clone the NDF identifier for IN1
+*  for use when calculating the output values.
          IF( OUTRQD ) CALL NDF_CLONE( NDF1S, NDF1B, STATUS )
 
 *  Create sections of the two input NDFs with matched pixel bounds

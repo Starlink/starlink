@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.39}
 \newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2012 December 12}
+\newcommand{\stardocdate}      {2013 January 17}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.0}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -38106,6 +38106,11 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 
       Optionally, an output NDF can be created containing a normalised
       version of the data array from the first input NDF.
+
+      For the special case of two-dimensional images, if IN2 spans only
+      a single row or column, it can be used to normalize each row or
+      column of IN1 in turn.  See Parameter LOOP.
+
    }
    \sstusage{
       normalize in1 in2 out
@@ -38160,6 +38165,16 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          IN2 = NDF (Read)
       }{
          The NDF to which IN1 will be normalised.
+      }
+      \sstsubsection{
+          LOOP = \_LOGICAL (Read)
+      }{
+         If both IN1 and IN2 are two-dimensional, and if IN2 spans only
+         a single row or column, then setting LOOP to {\tt TRUE} will cause
+         every row or column in IN1 to be normalised, in turn, to the
+         values in the single row or column of IN2.  The details of the
+         fit for each row or column will be displayed separately.
+         {\tt [FALSE]}
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
@@ -58970,6 +58985,11 @@ The following applications have been modified:
       \begin{itemize}
         \item Four new estimators are available: FBAD, FGOOD, NBAD and
         NGOOD, which produce the fraction/count of good/bad pixel values.
+      \end{itemize}
+   \item [\htmlref{NORMALIZE}{NORMALIZE}]\mbox{}
+      \begin{itemize}
+        \item A new boolean parameter called LOOP permits normalisation
+        against a single row or column when comparing two-dimensional NDFs.
       \end{itemize}
    \item [\htmlref{PARGET}{PARGET}]\mbox{}
       \begin{itemize}
