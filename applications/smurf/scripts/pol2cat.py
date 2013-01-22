@@ -306,6 +306,8 @@ try:
    params.append(starutil.ParNDG("INQU", "NDFs containing previously calculated Q and U values",
                                  None,noprompt=True))
 
+   params.append(starutil.Par0S("DIAGFILE", "File to recieve diagnostic information",
+                                 None, noprompt=True))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -398,6 +400,14 @@ try:
 #  See statistical debiasing is to be performed.
    debias = parsys["DEBIAS"].value
 
+#  Open a new file to receive diagnostic info
+   diagfile = parsys["DIAGFILE"].value
+   if diagfile != None:
+      diagfd = open( diagfile, "w" )
+      diagfd.write("# QU block array chunk slope offset")
+   else:
+      diagfd = None
+
 #  The following call to SMURF:CALCQU creates two HDS container files -
 #  one holding a set of Q NDFs and the other holding a set of U NDFs. Create
 #  these container files in the NDG temporary directory.
@@ -481,6 +491,14 @@ try:
          qnm.comment = "qnm"
          invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
                  format(qcom,qarray,qnm,ndevice), buffer=True )
+
+#  If required, store the slope and offset in the diagnostics file.
+         if diagfd != None:
+            slope = get_task_par( "slope", "normalize" )
+            offset = get_task_par( "offset", "normalize" )
+            ichunk = get_fits_header( qarray, "POLCHUNK" )
+            iblock = get_fits_header( qarray, "POLBLOCK" )
+            diagfd.write("Q {0} {1} {2} {3} {4}".format(iblock,a,ichunk,slope,offset))
 
 #  Now substract the normalized mean Q signal from each Q image.
          qsub = NDG(qarray)
@@ -691,6 +709,10 @@ try:
 
 #  Remove temporary files.
    cleanup()
+
+#  close any diagnostics file
+   if diagfd != None:
+      diagfd.close()
 
 #  If an StarUtilError of any kind occurred, display the message but hide the
 #  python traceback. To see the trace back, uncomment "raise" instead.

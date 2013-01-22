@@ -289,6 +289,7 @@
 #include "sae_par.h"
 #include "star/grp.h"
 #include "star/ndg.h"
+#include "star/atl.h"
 #include "star/hdspar.h"
 
 /* SMURF includes */
@@ -688,6 +689,10 @@ void smurf_calcqu( int *status ) {
                   } else {
                      iplace = NDF__NOPL;
                   }
+
+/* Store the chunk and block numbers as FITS headers. */
+                  atlPtfti( fc, "POLCHUNK", (int) ichunk, "Chunk index used by CALCQU", status );
+                  atlPtfti( fc, "POLBLOCK", iblock, "Block index used by CALCQU", status );
 
 /* Create the Q and U images for the current block of time slices from
    the subarray given by "idx", storing them in the output container
