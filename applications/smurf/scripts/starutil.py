@@ -312,8 +312,7 @@ def get_fits_header( ndf, keyword ):
       value = invoke("$KAPPA_DIR/fitsmod {0} edit=print keyword={1}".format( ndf, keyword ), False )
    else:
       value = None
-
-   return result
+   return value
 
 
 

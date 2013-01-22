@@ -111,11 +111,11 @@
 *        starutil.PROGRESS, starutil.ATASK or starutil.DEBUG) to the module
 *        variable starutil.glevel. ["PROGRESS"]
 *     IN = NDF (Read)
-*        A group of POL-2 time series NDFs. Only used if a null (!) value is 
+*        A group of POL-2 time series NDFs. Only used if a null (!) value is
 *        supplied for INQU.
 *     INQU = NDF (Read)
-*        A group of NDFs containing Q and U images calculated by a previous run 
-*        of SMURF:CALCQU. If not supplied, the IN parameter is used to get input 
+*        A group of NDFs containing Q and U images calculated by a previous run
+*        of SMURF:CALCQU. If not supplied, the IN parameter is used to get input
 *        NDFs holding POL-2 time series data. [!]
 *     IREF = NDF (Read)
 *        An optional total intensity map covering the same area. If
@@ -404,7 +404,7 @@ try:
    diagfile = parsys["DIAGFILE"].value
    if diagfile != None:
       diagfd = open( diagfile, "w" )
-      diagfd.write("# QU block array chunk slope offset")
+      diagfd.write("# QU block array chunk slope offset\n")
    else:
       diagfd = None
 
@@ -489,16 +489,17 @@ try:
 #  the mean Q signal.
          qnm = NDG(qarray)
          qnm.comment = "qnm"
-         invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
-                 format(qcom,qarray,qnm,ndevice), buffer=True )
+         for (qin,qout) in zip( qarray, qnm ):
+            invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
+                    format(qcom,qin,qout,ndevice), buffer=True )
 
 #  If required, store the slope and offset in the diagnostics file.
-         if diagfd != None:
-            slope = get_task_par( "slope", "normalize" )
-            offset = get_task_par( "offset", "normalize" )
-            ichunk = get_fits_header( qarray, "POLCHUNK" )
-            iblock = get_fits_header( qarray, "POLBLOCK" )
-            diagfd.write("Q {0} {1} {2} {3} {4}".format(iblock,a,ichunk,slope,offset))
+            if diagfd != None:
+               slope = starutil.get_task_par( "slope", "normalize" )
+               offset = starutil.get_task_par( "offset", "normalize" )
+               ichunk = starutil.get_fits_header( qin, "POLCHUNK" )
+               iblock = starutil.get_fits_header( qin, "POLBLOCK" )
+               diagfd.write("Q {0} {1} {2} {3} {4}\n".format(iblock,a,ichunk,slope,offset))
 
 #  Now substract the normalized mean Q signal from each Q image.
          qsub = NDG(qarray)
@@ -522,8 +523,18 @@ try:
                 format(uarray,ucom))
          unm = NDG(uarray)
          unm.comment = "unm"
-         invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
-                 format(ucom,uarray,unm,ndevice), buffer=True )
+
+         for (uin,uout) in zip( uarray, unm ):
+            invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
+                    format(ucom,uin,uout,ndevice), buffer=True )
+
+            if diagfd != None:
+               slope = starutil.get_task_par( "slope", "normalize" )
+               offset = starutil.get_task_par( "offset", "normalize" )
+               ichunk = starutil.get_fits_header( uin, "POLCHUNK" )
+               iblock = starutil.get_fits_header( uin, "POLBLOCK" )
+               diagfd.write("U {0} {1} {2} {3} {4}\n".format(iblock,a,ichunk,slope,offset))
+
          usub = NDG(uarray)
          usub.comment = "usub"
          invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".
