@@ -98,7 +98,7 @@ def _rmcwd(path):
    if path.find(cwd) == 0:
       return path[len(cwd)+1:]
    elif path.find("./") == 0:
-      return path[3:]
+      return path[2:]
    else:
       return path
 
@@ -665,7 +665,8 @@ class ParSys(object):
       #  Create a new ADAM directory in the user's home directory.
       if ParSys.adamdir == None:
          ParSys.adamdir = tempfile.mkdtemp( prefix="adam_", suffix="_py",
-                                            dir=os.environ["HOME"] )
+                                            dir=NDG._gettmpdir() )
+      msg_out( "Setting ADAM_USER to {0}\n".format(ParSys.adamdir), ATASK )
       os.environ["ADAM_USER"] = ParSys.adamdir
 
    # Delete the temporary ADAM directory.
@@ -1703,7 +1704,7 @@ class NDG(object):
    # create a tempdir. Otherwise, check the named directory exists. If not,
    # create it.
    @classmethod
-   def __gettmpdir(cls):
+   def _gettmpdir(cls):
       if NDG.tempdir == None:
          dir = os.environ["STAR_TEMP"] if "STAR_TEMP" in os.environ else None
          NDG.tempdir = tempfile.mkdtemp( prefix='NDG_', dir=dir )
@@ -1827,7 +1828,7 @@ class NDG(object):
       # tempdir, get a reference to the tempdir, and find a unique
       # identifying integer for files belong to the group.
       if nfile > 1 or intemp:
-         self.__tmpdir = NDG.__gettmpdir()
+         self.__tmpdir = NDG._gettmpdir()
          NDG.__nobj += 1
          pattern = "{0}/group{1}_*".format(self.__tmpdir,NDG.__nobj)
          while len(glob.glob(pattern)) > 0:
@@ -1859,7 +1860,7 @@ class NDG(object):
          self.__ndfs = invoke("$KAPPA_DIR/ndfecho ! {0} abspath=yes".format(self),True)
          if len(self.__ndfs) > 1:
             if not self.__file:
-               self.__tmpdir = NDG.__gettmpdir()
+               self.__tmpdir = NDG._gettmpdir()
                self.__file = NDG.__getfile(self.__tmpdir)
             self.__writeFile()
 

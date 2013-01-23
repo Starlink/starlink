@@ -472,7 +472,7 @@ try:
    while iter <= niter:
       msg_out( "Iteration {0}...".format(iter))
 
-#  Record the name of hte map created on the previous iteration, if any.
+#  Record the name of the map created on the previous iteration, if any.
       prevmap = newmap
 
 #  When "zero_niter" invocations have been performed, switch off zero
@@ -558,14 +558,15 @@ try:
       invoke("$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".format(inputs,itermap) )
 
 #  Since no masking is done on the final iteration, the output map will
-#  not urrently contain a quality array. If the previous iteration has a
+#  not currently contain a quality array. If the previous iteration has a
 #  quality component copy it to the last iteration, and set bad bits to
 #  zero. This is to provide a record of the final used mask.
-   try:
-      invoke("$HDSTOOLS_DIR/hcopy inp={0} out={1}".format(prevmap,newmap) )
-      invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )
-   except starutil.StarUtilError as err:
-      pass
+   if prevmap != None:
+      try:
+         invoke("$HDSTOOLS_DIR/hcopy inp={0} out={1}".format(prevmap,newmap) )
+         invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )
+      except starutil.StarUtilError as err:
+         pass
 
 #  Remove temporary files.
    cleanup()
