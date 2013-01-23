@@ -13,9 +13,9 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc,
-*                            smf_extmeth method, AstKeyMap * extpars, double tau,
-*                            double *allextcorr, double ** wvmtaucache, int *status);
+*     int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc,
+*                             smf_extmeth method, AstKeyMap * extpars, double tau,
+*                             double *allextcorr, double ** wvmtaucache, int *status);
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -53,6 +53,10 @@
 *        Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
+
+*  Returned Value:
+*     Non-zero if the returned extinction corrections are the same for
+*     every bolometer. Zero otherwize.
 
 *  Description:
 *     This is the main low-level routine implementing the EXTINCTION
@@ -249,6 +253,7 @@ typedef struct smfCorrectExtinctionData {
    int *ubnd;
    int isTordered;
    int ndims;
+   int allquick;
    smfData *data;
    smfHead *hdr;
    smf_extmeth method;
@@ -261,15 +266,16 @@ static pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_correct_extinction"
 
-void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, smf_extmeth method,
+int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, smf_extmeth method,
                             AstKeyMap * extpars, double tau, double *allextcorr,
                             double **wvmtaucache, int *status) {
 
   /* Local variables */
+  int allquick = 0;        /* Is the extinction for all bolometers the same? */
   double amstart = VAL__BADD; /* Airmass at start */
   double amend = VAL__BADD;   /* Airmass at end */
   double elstart = VAL__BADD; /* Elevation at start (radians) */
-  double elend = VAL__BADD; /* Elevation at end (radians) */
+  double elend = VAL__BADD;/* Elevation at end (radians) */
   smfHead *hdr = NULL;     /* Pointer to full header struct */
   double *indata = NULL;   /* Pointer to data array */
   int isTordered;          /* data order of input data */
@@ -289,13 +295,13 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
   size_t framestep;         /* Number of frames per thread */
 
   /* Check status */
-  if (*status != SAI__OK) return;
+  if (*status != SAI__OK) return allquick;
 
   /* If no correction requested, return */
   if( method==SMF__EXTMETH_NONE ) {
     msgOutif(MSG__VERB, "", FUNC_NAME ": Extinction method=none, returning",
              status );
-    return;
+    return allquick;
   }
 
   /* If no opacity monitor specified generate bad status */
@@ -303,7 +309,7 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": No extinction monitor specified",
             status );
-    return;
+    return allquick;
   }
 
   if( smf_history_check( data, FUNC_NAME, status) ) {
@@ -313,7 +319,7 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
       msgOutif(MSG__VERB," ",
                "^F has already been run on these data, returning to caller",
                status);
-      return;
+      return allquick;
     }
   }
 
@@ -325,7 +331,7 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
   if( hdr == NULL ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, "Input data has no header", status);
-    return;
+    return allquick;
   }
 
   /* Do we have 2-D image data? */
@@ -346,7 +352,7 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
 
   /* Should check data type for double if not allextcorr case */
   if( !allextcorr ) {
-    if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status)) return;
+    if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status)) return allquick;
   }
 
   /* Check that we're not trying to use the WVM for 2-D data */
@@ -354,14 +360,14 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Method WVMRaw can not be used on 2-D image data", status );
-      return;
+      return allquick;
     }
   } else if (ndims < 2 || ndims > 3) {
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
       errRepf( FUNC_NAME, "Can not extinction correct data with %zd dimension(s)", status,
               ndims );
-      return;
+      return allquick;
     }
   }
 
@@ -547,6 +553,16 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
     /* Wait for all jobs to complete. */
     thrWait( wf, status );
 
+    /* Record if all time slices used a single air mass. */
+    allquick = 1;
+    for( iw = 0; iw < nw; iw++ ) {
+      pdata = job_data + iw;
+      if( ! pdata->allquick ) {
+        allquick = 0;
+        break;
+      }
+    }
+
     /* Free the job data. */
     job_data = astFree( job_data );
   }
@@ -567,6 +583,8 @@ void smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, 
   } else {
     wvmtau = astFree( wvmtau );
   }
+
+  return allquick;
 }
 
 /* Add footprint to the reference elevation and compare it to the reference airmass.
@@ -670,6 +688,9 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
 
   amprev = pdata->amfirst;
 
+  /* Assume we are using quick mode for all time slices. */
+  pdata->allquick = 1;
+
   for ( k=pdata->f1; k<=pdata->f2 && (*status == SAI__OK) ; k++) {
     /* Flags to indicate which mode we are using for this time slice */
     int quick = 0;  /* use single airmass */
@@ -679,6 +700,8 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
     } else if (pdata->method == SMF__EXTMETH_ADAPT) {
       quick = 1;
       adaptive = 1;
+    } else {
+      pdata->allquick = 0;
     }
 
     /* Call tslice_ast to update the header for the particular
@@ -750,6 +773,7 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
                                  pdata->tau, status) ) {
           /* we need WCS if we disable fast mode */
           quick = 0;
+          pdata->allquick = 0;
 
           thrMutexLock( &data_mutex, status );
           smf_lock_data( pdata->data, 1, status );

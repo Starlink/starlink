@@ -1036,8 +1036,21 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                             status );
                  }
 
-                 smf_correct_extinction( wf, idata, tausrc, extmeth, kmap, tau,
-                                         (double *) dataptr, &wvmtaucache, status );
+                 int allquick = smf_correct_extinction( wf, idata, tausrc, extmeth, kmap, tau,
+                                                  (double *) dataptr, &wvmtaucache, status );
+
+                 /* Store a flag saying if all bolometers have the same
+                    extinction corrections. */
+                 astSetI( kmap, "MapLocked", 0 );
+                 astMapPut0I( kmap, "ALLQUICK", allquick, NULL );
+                 astSetI( kmap, "MapLocked", 1 );
+                 if( allquick ) {
+                   msgOutif( MSG__DEBUG, "", FUNC_NAME ": all bolometers "
+                             "have the same extinction corrections", status);
+                 } else {
+                   msgOutif( MSG__DEBUG, "", FUNC_NAME ": all bolometers "
+                             "do not have the same extinction corrections", status);
+                 }
               }
               kmap = astAnnul( kmap );
 

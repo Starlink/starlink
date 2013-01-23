@@ -1809,7 +1809,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               smf_write_smfData( res[0]->sdata[idx], NULL,
                                  name, NULL, 0, NDF__NOID,
-                                 MSG__VERB, status );
+                                 MSG__VERB, 0, status );
 
               /* Revert the order */
               smf_dataOrder( res[0]->sdata[idx], oldorder, status );
@@ -2508,7 +2508,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                    (havenoi && exportNDF_which[whichnoi]) ?
                                    dat.noi[0]->sdata[idx] : NULL,
                                    name, NULL, 0, NDF__NOID,
-                                   MSG__VERB, status );
+                                   MSG__VERB, 0, status );
               } else {
                 msgOut( " ",
                         "SMF__ITERATEMAP: Can't export RES -- NULL filename",
@@ -2580,7 +2580,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                 /* Export AST */
                 smf_write_smfData( ast, NULL, name, NULL, 0, NDF__NOID,
-                                   MSG__VERB, status );
+                                   MSG__VERB, 0, status );
 
                 /* Clean up */
                 smf_close_file( &ast, status );
@@ -2639,9 +2639,20 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                                          NULL, NULL, status );
                 }
 
+                /* Decide if we can dump the EXT model as 1D or if it
+                   needs to be 3D. */
+                int single = 0;
+                if( modeltyps[j] == SMF__EXT ) {
+                  astMapGet0A( keymap, "EXT", &kmap );
+                  if( astMapHasKey( kmap, "ALLQUICK" ) ) {
+                     astMapGet0I( kmap, "ALLQUICK", &single );
+                  }
+                  kmap = astAnnul( kmap );
+                }
+
                 smf_write_smfData( model[j][0]->sdata[idx], NULL,
                                    name, NULL, 0, NDF__NOID,
-                                   MSG__VERB, status );
+                                   MSG__VERB, single, status );
 
                 /* if we had temporary quality free it */
                 if ( modeltyps[j] == SMF__COM && qua_data ) {

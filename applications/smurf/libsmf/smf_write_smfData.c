@@ -16,7 +16,7 @@
 *     smf_write_smfData ( const smfData *data, const smfData *variance,
 *                        const char * filename,
 *                        const Grp * igrp, size_t grpindex,
-*                        int provid, msglev_t msglev, int * status );
+*                        int provid, msglev_t msglev, int single, int * status );
 
 *  Arguments:
 *     data = const smfData* (Given)
@@ -40,6 +40,12 @@
 *        NDF id to propagate provenance from. Can be NDF__NOID.
 *     msglev = msglev_t (Given)
 *        What message level to report the filename?
+*     single = int (Given)
+*        If non-zero, then only a single bolometer is written out, and the
+*        output NDF is 1-dimensional. The bolometer written out is the
+*        first one found to contain any good, unflagged, values. If zero,
+*        then the full 3D data array is written out. Only used if the
+*        smfData is 3-dimensional.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -103,6 +109,8 @@
 *        Added msglev
 *     2012-01-04 (EC):
 *        Try to writing wcs if tswcs doesn't exist to handle images
+*     2013-01-22 (DSB):
+*        Added argument single.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -158,16 +166,21 @@
 void smf_write_smfData( const smfData *data, const smfData *variance,
                         const char * filename,
                         const Grp * igrp, size_t grpindex,
-                        int provid, msglev_t msglev, int * status ) {
+                        int provid, msglev_t msglev, int single, int * status ) {
 
+  double *pd=NULL;              /* Pointer to DATA buffer */
   size_t dbstride;              /* bolo stride of data */
   size_t dtstride;              /* tstride of data */
   size_t i;                     /* Loop counter */
   int flags = 0;                /* Flags for open file */
   size_t j;                     /* Loop counter */
   int lbnd[NDF__MXDIM];         /* Lower pixel bounds */
+  dim_t ibolo;                  /* bolo index */
+  dim_t itime;                  /* time slice index */
+  int singlebolo = -1;          /* The index of the bolometer to use */
   dim_t nbolo;                  /* number of bolos */
   dim_t ncols;                  /* number of columns */
+  dim_t nrows;                  /* number of rows */
   dim_t nelem;                  /* total number of elements in data array */
   dim_t ntslice=0;              /* Number of time slices */
   Grp * ogrp = NULL;            /* Small group for output filename */
@@ -176,8 +189,10 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
   char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
   smf_qfam_t qfamily = SMF__QFAM_NULL; /* Quality family */
   const smf_qual_t *qual=NULL;  /* Pointer to QUALITY buffer */
+  const smf_qual_t *pq=NULL;    /* Pointer to next QUALITY value */
   int ubnd[NDF__MXDIM];         /* Upper pixel bounds */
   double *var=NULL;             /* Pointer to VARIANCE buffer */
+  double *pv=NULL;              /* Pointer to next VARIANCE value */
   size_t vbstride;              /* bolo stride of variance */
   dim_t vnbolo;                 /* number of bolos in variance */
   dim_t vntslice;               /* number of bolos in variance */
@@ -229,7 +244,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     if( var ) flags |= SMF__MAP_VAR;
   } else if( data->ndims == 3 ) {
     /* Dimensions for 3-d data */
-    smf_get_dims( data, NULL, &ncols, &nbolo, &ntslice, &nelem, &dbstride,
+    smf_get_dims( data, &nrows, &ncols, &nbolo, &ntslice, &nelem, &dbstride,
                   &dtstride, status );
 
     /* Only handle variance override for 3d data */
@@ -264,6 +279,35 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     }
 
     if( var ) flags |= SMF__MAP_VAR;
+
+    if( single ) {
+
+       /* Find a bolometer with a good value */
+       for( ibolo = 0; ibolo < nbolo && singlebolo == -1; ibolo++ ) {
+          pd = ((double *) (data->pntr)[0] ) + ibolo*dbstride;
+          pq = qual ? qual + ibolo*dbstride : NULL;
+          for( itime = 0; itime < ntslice; itime++ ) {
+             if( *pd != VAL__BADD && ( !pq || *pq == 0 ) ) {
+                singlebolo = ibolo;
+                break;
+             }
+             pd += dtstride;
+             if( pq ) pq += dtstride;
+          }
+       }
+
+       /* If no good values were found, just use the first bolometer. */
+       if( singlebolo == -1 ) singlebolo = 0;
+
+       /* Modify the bounds for the output NDF to make it effectively 1D. */
+       for (i = 0; i < data->ndims; i++) {
+         if( (data->dims)[i] == nrows || (data->dims)[i] == ncols ) {
+           ubnd[i] = lbnd[i] = 1;
+         }
+       }
+
+    }
+
   } else {
     /* For strange dimensions don't
        try to write variance or quality */
@@ -301,7 +345,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     nbperel = smf_dtype_size( data, status );
 
     /* Copy the data and variance and quality */
-    if (*status == SAI__OK) {
+    if (*status == SAI__OK && ( !single || data->ndims != 3 ) ) {
 
       if( (data->pntr)[0] ) memcpy( (outdata->pntr)[0], (data->pntr)[0],
                                     nelem * nbperel );
@@ -328,6 +372,23 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
       /* Quality. Just copy from input to output */
       outdata->qfamily = qfamily;
       if (qual) memcpy( outdata->qual, qual, nelem * sizeof(*qual) );
+
+    /* Now deal with cases were we are storing only a single bolometer
+    from a 3D smfData. */
+    } else {
+       pd = ((double *) (data->pntr)[0]) + singlebolo*dbstride;
+       pq = qual ? qual + singlebolo*dbstride : NULL;
+       pv = var ? var + singlebolo*vbstride : NULL;
+       for( itime = 0; itime < ntslice; itime++ ) {
+          ((double *)(outdata->pntr)[0])[itime] = *pd;
+          if( pq ) ((smf_qual_t *)(outdata->qual))[itime] = *pq;
+          if( var ) {
+             ((double *)(outdata->pntr)[1])[itime] = pv[(itime%vntslice)*vtstride];
+          }
+          pd += dtstride;
+          if( pq ) pq += dtstride;
+       }
+       outdata->qfamily = qfamily;
     }
 
     /* header information */
