@@ -1363,8 +1363,8 @@ void smf_history_read( smfData* data, int *status);
 
 void smf_history_write( const smfData* data, int *status);
 
-void smf_import_array( smfData *refdata, const char *name, int bad, double *dataptr,
-                       int *status );
+void smf_import_array( smfData *refdata, const char *name, int bad,
+                       int expand, double *dataptr, int *status );
 
 void smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int * status );
 

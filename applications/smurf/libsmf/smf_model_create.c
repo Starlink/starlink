@@ -1006,7 +1006,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  ename = astStore( NULL, name, nc + 1 );
                  ename[ nc ] = 0;
                  ename = astAppendString( ename, &nc, "_ext" );
-                 smf_import_array( idata, ename, 2, (double *) dataptr, status );
+                 smf_import_array( idata, ename, 2, 1, (double *) dataptr, status );
                  ename = astFree( ename );
 
               /* If calculating new EXT values here... */

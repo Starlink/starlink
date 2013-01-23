@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_import_array( smfData *refdata, const char *name,
-*                            int bad, double *dataptr, int *status )
+*                            int bad, int expand, double *dataptr, int *status )
 
 *  Arguments:
 *     refdata = smfData * (Given)
@@ -29,6 +29,8 @@
 *        2 - Replace them with the mean value in the time-slice, or with the
 *            most recent valid mean time-slice value, if the time-slice has
 *            no good values.
+*     expand = int (Given)
+*        If non-zero, then expand 1D arrays into 3D arrays.
 *     dataptr = double * (Given)
 *        The array in which to store the imported NDF data values. Must
 *        have the same dimensions as "refdata".
@@ -50,10 +52,12 @@
 *  History:
 *     22-OCT-2012 (DSB):
 *        Original version.
-*     6-DECV-2012 (DSB):
+*     6-DEC-2012 (DSB):
 *        - Improve error messages.
 *        - Correct ordering of pixel axes when replacing bad values with
 *        time-slice mean values.
+*     22-JAN-2013 (DSB):
+*        Add argument expand.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,7 +96,7 @@
 
 
 void smf_import_array( smfData *refdata, const char *name, int bad,
-                       double *dataptr, int *status ) {
+                       int expand, double *dataptr, int *status ) {
 
 /* Local Variables: */
    Grp *igrp;                  /* Group holding NDF name */
@@ -107,7 +111,7 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
    size_t bstride;             /* Stride between bolometer values */
    size_t i;                   /* Loop count */
    size_t j;                   /* Loop count */
-   size_t nel = 1;             /* Number of elements in array */
+   dim_t nel;                  /* Number of elements in array */
    size_t tstride;             /* Stride between time slices */
    smfData *data;              /* Model for one sub-array */
 
@@ -137,7 +141,9 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
          errRepf( " ", "NDF '%s' is %zu dimensional - must be %zu "
                   "dimensional.", status, name, data->ndims, refdata->ndims );
 
-      } else {
+      } else if( !expand || refdata->ndims != 3 ) {
+         expand = 0;
+
          for( i = 0; i < refdata->ndims; i++ ) {
             if( data->dims[i] != refdata->dims[i] &&
                 *status == SAI__OK ){
@@ -152,9 +158,33 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
                         "pixel axis %zu - should be %d.", status,
                         name, data->lbnd[i], i + 1, refdata->lbnd[i] );
             }
-            nel *= data->dims[i];
          }
+
+      } else {
+         for( i = 0; i < refdata->ndims; i++ ) {
+
+            if( data->dims[i] == 1 ) {
+
+            } else if( data->dims[i] != refdata->dims[i] &&
+                *status == SAI__OK ){
+               *status = SAI__ERROR;
+               errRepf( " ", "NDF '%s' has incorrect dimension %zu on "
+                        "pixel axis %zu - should be %zu.", status,
+                        name, data->dims[i], i + 1, refdata->dims[i] );
+            } else if( data->lbnd[i] != refdata->lbnd[i] &&
+                *status == SAI__OK ){
+               *status = SAI__ERROR;
+               errRepf( " ", "NDF '%s' has incorrect lower bound %d on "
+                        "pixel axis %zu - should be %d.", status,
+                        name, data->lbnd[i], i + 1, refdata->lbnd[i] );
+            }
+         }
+
       }
+
+/* Get the smfData dimensions and strides. */
+      smf_get_dims( refdata, NULL, NULL, &nbolo, &ntslice, &nel, &bstride,
+                    &tstride, status );
 
 /* Copy the values into the model array, replacing bad values as required. */
       if( *status == SAI__OK ) {
@@ -163,44 +193,55 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
          if( data->ndims < 3 ) data->dims[2] = 1;
          if( data->ndims < 2 ) data->dims[1] = 1;
 
+         /* Copy the data into the returned array unchanged. */
+         if( expand ) {
+
+            pin = (double *) data->pntr[0];
+            for( i = 0; i < ntslice; i++,pin++ ) {
+               pout = dataptr + i*tstride;
+
+               for( j = 0; j < nbolo; j++ ) {
+                  if( *pin != VAL__BADD ) {
+                     *pout = *pin;
+                  } else {
+                     *pout = VAL__BADD;
+                  }
+                  pout += bstride;
+               }
+            }
+
+         } else {
+            memcpy( pout, pin, nel*sizeof(*pin) );
+         }
+
 /* Retain bad values. */
          if( bad == 0 )  {
-            memcpy( pout, pin, nel*sizeof(*pin) );
 
 /* Replace bad values with zero. */
          } else if( bad == 1 )  {
-            for( i = 0; i < nel; i++,pin++ ) {
-               if( *pin != VAL__BADD ) {
-                  *(pout++) = *pin;
-               } else {
-                  *(pout++) = 0.0;
-               }
+            pout = dataptr;
+            for( i = 0; i < nel; i++,pout++ ) {
+               if( *pout == VAL__BADD ) *pout = 0.0;
             }
 
 /* Replace bad values with the mean value in the time slice. */
          } else if( bad == 2 )  {
-            smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
-                          &tstride, status );
-
+            pout = dataptr;
             mean = VAL__BADD;
 
             for( i = 0; i < ntslice; i++ ) {
                vsum = 0.0;
                ngood = 0;
                nbad = 0;
-               pin = (double *) data->pntr[0] + i*tstride;
                pout = dataptr + i*tstride;
 
                for( j = 0; j < nbolo; j++ ) {
-                  if( *pin != VAL__BADD ) {
-                     *pout = *pin;
-                     vsum += *pin;
+                  if( *pout != VAL__BADD ) {
+                     vsum += *pout;
                      ngood++;
                   } else {
-                     *pout = VAL__BADD;
                      nbad++;
                   }
-                  pin += bstride;
                   pout += bstride;
                }
 
