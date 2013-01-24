@@ -146,7 +146,7 @@ void smf_write_smfFilter( const smfFilter *filt, const char *filename,
 
   /* Write out the file */
   smf_write_smfData( data, NULL, filename, igrp, grpindex, 0, MSG__NORM,
-                     status );
+                     0, status );
 
   if( data ) smf_close_file( &data, status );
 
