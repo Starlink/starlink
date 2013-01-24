@@ -1756,11 +1756,11 @@ class NDG(object):
          # list.
          if exists:
             try:
-               self.__ndfs = invoke("$KAPPA_DIR/ndfecho {0} abspath=yes".format(gexp),True)
+               self.__ndfs = invoke("$KAPPA_DIR/ndfecho \"{0}\" abspath=yes".format(gexp),True)
             except AtaskError:
                raise NoNdfError("\n\nCannot access one or more of the NDFs specified by '{0}'.".format(p1))
          else:
-            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ! {0} abspath=yes".format(p1),True)
+            self.__ndfs = invoke("$KAPPA_DIR/ndfecho ! \"{0}\" abspath=yes".format(p1),True)
 
       # If the first argument is a list or tuple, create a group containing
       # the contents of the list or tuple as NDF names. Flag that we do not
@@ -1794,12 +1794,12 @@ class NDG(object):
       # an error occurs.
       elif isinstance(p1,NDG) and p2 == None:
          try:
-            invoke("$KAPPA_DIR/ndfecho {0} quiet".format(p1))
+            invoke("$KAPPA_DIR/ndfecho \"{0}\" quiet".format(p1))
             nfile = get_task_par( "size", "ndfecho" )
             intemp = True
          except AtaskError:
             try:
-               invoke("$KAPPA_DIR/ndfecho ! {0} quiet".format(p1))
+               invoke("$KAPPA_DIR/ndfecho ! \"{0}\" quiet".format(p1))
                nfile = get_task_par( "size", "ndfecho" )
             except AtaskError:
                nfile = len(p1.__ndfs)
@@ -1812,7 +1812,7 @@ class NDG(object):
          gexp2 = shell_quote(p2)
 
          try:
-            self.__ndfs = invoke("$KAPPA_DIR/ndfecho {0} {1} abspath=yes".format(gexp1,gexp2),True)
+            self.__ndfs = invoke("$KAPPA_DIR/ndfecho \"{0}\" \"{1}\" abspath=yes".format(gexp1,gexp2),True)
          except AtaskError:
             raise NoNdfError("\n\nCannot access one or more of the NDFs specified by '{0}'.".format(gexp1))
 
@@ -1857,7 +1857,7 @@ class NDG(object):
 
       # Ensure the NDF paths are absolute.
       if not isabs:
-         self.__ndfs = invoke("$KAPPA_DIR/ndfecho ! {0} abspath=yes".format(self),True)
+         self.__ndfs = invoke("$KAPPA_DIR/ndfecho ! \"{0}\" abspath=yes".format(self),True)
          if len(self.__ndfs) > 1:
             if not self.__file:
                self.__tmpdir = NDG._gettmpdir()
@@ -1877,9 +1877,9 @@ class NDG(object):
    def filter( self, pattern ):
       result = None
       try:
-         ndfs = invoke("$KAPPA_DIR/ndfecho {0} abspath=yes pattern={1}".format(self,pattern),True)
+         ndfs = invoke("$KAPPA_DIR/ndfecho \"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
       except AtaskError:
-         ndfs = invoke("$KAPPA_DIR/ndfecho ! {0} abspath=yes pattern={1}".format(self,pattern),True)
+         ndfs = invoke("$KAPPA_DIR/ndfecho ! \"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
       if get_task_par( "nmatch", "ndfecho" ) > 0:
          result = NDG( ndfs )
       return result

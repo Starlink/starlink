@@ -408,21 +408,22 @@ try:
    else:
       diagfd = None
 
-#  The following call to SMURF:CALCQU creates two HDS container files -
-#  one holding a set of Q NDFs and the other holding a set of U NDFs. Create
-#  these container files in the NDG temporary directory.
-   qcont = NDG(1)
-   qcont.comment = "qcont"
-   ucont = NDG(1)
-   ucont.comment = "ucont"
-
 #  If Q and U values were supplied, use them:
    if inqu != None:
       msg_out( "Using pre-calculating Q and U values...")
       qcont = inqu.filter( "'Q\d'" )
-      qcont.comment = "qcont"
+      if qcont == None:
+         raise starutil.InvalidParameterError("Supplied QU files ({0}) "
+                     "do not contain any Q data.".format(inqu))
+      else:
+         qcont.comment = "qcont"
+
       ucont = inqu.filter( "'U\d'" )
-      ucont.comment = "ucont"
+      if ucont == None:
+         raise starutil.InvalidParameterError("Supplied QU files ({0}) "
+                     "do not contain any U data.".format(inqu))
+      else:
+         ucont.comment = "ucont"
 
 #  Otherwise create a set of Q images and a set of U images. These are put
 #  into the HDS container files "q_TMP.sdf" and "u_TMP.sdf". Each image
