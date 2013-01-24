@@ -1,0 +1,191 @@
+#!/usr/bin/env python
+
+# This script extracts the MAKEMAP configuration parameters from
+# the HISTORY component of the given NDF file.
+#
+# Usage:
+#     dumpmakemapcfg in
+
+# Copyright (C) 2013 Science and Technology Facilities Council.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import print_function
+
+from codecs import latin_1_decode
+from contextlib import contextmanager
+import re
+
+import starutil
+import starlink.hds
+
+def main():
+    params = []
+    params.append(starutil.Par0S('IN', 'The input map NDF'))
+    parsys = starutil.ParSys(params)
+    filename = parsys['IN'].value
+
+    text = read_makemap_history(filename)
+
+    if text is None:
+        print('No MAKEMAP history entry found.')
+        exit(1)
+
+    groups = extract_history_groups(text)
+
+    if 'CONFIG' not in groups:
+        print('No configuration found in MAKEMAP history entry.')
+        exit(1)
+
+    config = parse_group(groups['CONFIG'])
+
+    for key in sorted(config.keys()):
+        print(key, '=', config[key])
+
+@contextmanager
+def annulling(loc):
+    '''Context manager to annul a locator, similarly to contextlib.closing.'''
+
+    try:
+        yield loc
+    finally:
+        loc.annul()
+
+def read_makemap_history(filename):
+    """Opens an NDF file to read the MAKEMAP history.
+
+    Returns the contents of the history TEXT if found, or None
+    otherwise."""
+
+    with annulling(starlink.hds.open(filename, 'r')) as loc:
+        history = loc.find('HISTORY').find('RECORDS')
+        makemap = re.compile('MAKEMAP')
+        i = 0
+
+        try:
+            # Loop over history records looking for that relating to MAKEMAP.
+
+            while True:
+                record = history.cell((i,))
+                command = latin_1_decode(record.find('COMMAND').get())[0]
+
+                if not makemap.match(command):
+                    i += 1
+                    continue
+
+                text = [latin_1_decode(x)[0] for x in record.find('TEXT').get()]
+                return text
+
+        except starlink.hds.error:
+            # Will trigger if we try to read beyond the end of the history
+            # in the event of not finding the MAKEMAP entry.
+
+            return None
+
+def extract_history_groups(array):
+    """Extract groups from a history block.
+
+    Takes an array of history lines, and searches for named
+    groups.  Returns a dict of text blocks by group name."""
+
+    # Prepare regular expressions.
+    group = re.compile('Group:')
+    groupname = re.compile(' +([\w]+)="')
+    cont = re.compile('   ')
+
+    # While reading the history block, keep track of where we are.
+    groupstarting = False
+    groupcontinuing = False
+
+    currentgroupname = None
+    currentgroup = ''
+
+    groups = {}
+
+    for line in array:
+        if groupcontinuing:
+            match = cont.match(line)
+
+            if match:
+                currentgroup += line.strip()
+
+            else:
+                groupcontinuing = False
+                groups[currentgroupname] = currentgroup[:-1]
+                currentgroup = ''
+
+        if not groupstarting:
+            match = group.match(line)
+
+            if not match:
+                continue
+
+            groupstarting = True
+
+            line = line[match.end(0):]
+
+        match = groupname.match(line)
+
+        if not match:
+            continue
+
+        currentgroupname = match.group(1)
+        currentgroup = line[match.end(0):].strip()
+
+        groupstarting = False
+        groupcontinuing = True
+
+    # Check whether a group was in progress when we reached the end.
+    if groupcontinuing:
+        groups[currentgroupname] = currentgroup[:-1]
+
+    return groups
+
+def parse_group(text):
+    """Parse a group of configuration parameters.
+
+    The block of text is first split on commas to produce
+    a list of KEY=VALUE pairs.  These are then split on
+    the = symbol and returned as a dict."""
+
+    group = []
+
+    # Keep track of levels of nesting to avoid matching commas
+    # within other structures.
+    level = 0
+
+    # Buffer of characters for a configuration parameter.
+    buff = ''
+
+    for x in text:
+        if x == '(' or x == '[' or (x == '\'' and level == 0):
+            level += 1
+            buff = buff + x
+        elif x == ')' or x == ']' or (x == '\'' and level > 0):
+            level -= 1
+            buff = buff + x
+        elif x == ',' and level == 0:
+            group.append(buff.strip())
+            buff = ''
+        else:
+            buff = buff + x
+    if buff:
+        group.append(buff.strip())
+
+    # Parameters returned in lower case to match the dimmconfig
+    # files.
+    return dict([x.lower().split('=', 1) for x in group])
+
+if __name__ == '__main__':
+    main()
