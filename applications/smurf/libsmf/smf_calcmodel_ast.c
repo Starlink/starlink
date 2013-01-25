@@ -338,11 +338,11 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
   }
 
-  /* Reset the SMF__MAPQ_ZERO bit (but retain it on the last iteration so
+  /* Reset the SMF__MAPQ_AST bit (but retain it on the last iteration so
     that it gets written to the quality component of the output NDF). */
   if( zmask || !(flags & SMF__DIMM_LASTITER) ) {
     for( i=0; i<dat->msize; i++ ) {
-      mapqual[i] &= ~SMF__MAPQ_ZERO;
+      mapqual[i] &= ~SMF__MAPQ_AST;
     }
   }
 
@@ -353,10 +353,10 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     for( i=0; i<dat->msize; i++ ) {
 
       if( map[i] == VAL__BADD || mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) {
-        mapqual[i] |= SMF__MAPQ_ZERO;
+        mapqual[i] |= SMF__MAPQ_AST;
 
       } else if( zmask[i] ) {
-        mapqual[i] |= SMF__MAPQ_ZERO;
+        mapqual[i] |= SMF__MAPQ_AST;
       }
     }
   }

@@ -127,8 +127,14 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
   } else if ( strcmp(qname, "EXT") == 0 ) {
     retval = SMF__Q_EXT;
     lfamily = SMF__QFAM_TSERIES;
-  } else if ( strcmp(qname, "ZERO") == 0 ) {
-    retval = SMF__MAPQ_ZERO;
+  } else if ( strcmp(qname, "AST") == 0 ) {
+    retval = SMF__MAPQ_AST;
+    lfamily = SMF__QFAM_MAP;
+  } else if ( strcmp(qname, "COM") == 0 ) {
+    retval = SMF__MAPQ_COM;
+    lfamily = SMF__QFAM_MAP;
+  } else if ( strcmp(qname, "FLT") == 0 ) {
+    retval = SMF__MAPQ_FLT;
     lfamily = SMF__QFAM_MAP;
   } else if ( strcmp(qname, "BADBOLO") == 0 ) {
     retval = SMF__TCOMPQ_BAD;

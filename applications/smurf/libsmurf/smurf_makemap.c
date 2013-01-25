@@ -2291,7 +2291,7 @@ void smurf_makemap( int *status ) {
       /* Otherwise, if we will be running smf_iteratemap again, create a
          smoothed copy of the SNR mask. */
       } else if( nrun == 2 ) {
-         snr_mask = smf_smoothmask( wf, SMF__MAPQ_ZERO, mapqual,
+         snr_mask = smf_smoothmask( wf, SMF__MAPQ_AST, mapqual,
                                     ubnd_out[0] - lbnd_out[0] + 1,
                                     ubnd_out[1] - lbnd_out[1] + 1, outfset,
                                     zero_snr_fwhm, zero_snr_low, status );

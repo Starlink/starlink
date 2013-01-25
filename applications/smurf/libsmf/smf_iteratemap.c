@@ -2189,7 +2189,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( *status == SAI__OK ) {
           mapchange_max = 0;
           for( ipix = 0; ipix < msize; ipix++ ) {
-            if( !(thisqual[ipix]&SMF__MAPQ_ZERO) && (thismap[ipix] != VAL__BADD) &&
+            if( !(thisqual[ipix]&SMF__MAPQ_AST) && (thismap[ipix] != VAL__BADD) &&
                 (lastmap[ipix] != VAL__BADD) && (thisvar[ipix] != VAL__BADD) &&
                 (thisvar[ipix] > 0) ) {
 
@@ -2927,7 +2927,7 @@ static void smf1_iteratemap( void *job_data_ptr, int *status ) {
          if( !( *pq & SMF__Q_MOD ) && *pl != VAL__BADI ) {
             double ast_data = pdata->thismap[ *pl ];
             if( ast_data != VAL__BADD &&
-                !(pdata->thisqual[ *pl ] & SMF__MAPQ_ZERO ) ) {
+                !(pdata->thisqual[ *pl ] & SMF__MAPQ_AST ) ) {
                *pr += ast_data;
             }
          }

@@ -207,9 +207,19 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
     /* now switch on bit mask */
     /*          012345678901234567890123456789012345678901234567890 << 50 characters */
     switch( qval ) {
-    case SMF__MAPQ_ZERO:
-      retval = "ZERO";
-      ldescr = "Set iff output pixel was zeroed by the map-maker";
+    case SMF__MAPQ_AST:
+      retval = "AST";
+      ldescr = "Set iff AST model is zeroed at the output pixel";
+      break;
+
+    case SMF__MAPQ_FLT:
+      retval = "FLT";
+      ldescr = "Set iff FLT model is blanked at the output pixel";
+      break;
+
+    case SMF__MAPQ_COM:
+      retval = "COM";
+      ldescr = "Set iff COM model is blanked at the output pixel";
       break;
 
     default:

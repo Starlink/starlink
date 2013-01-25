@@ -67,8 +67,8 @@
 *        smf_calcmodel_com, and led to discontinuities at the edges of
 *        blocks, which in turn caused ringing in the FLT model.
 *     3-SEP-2012 (DSB):
-*        Tidy up the code to clarify the fact that the common mode 
-*        esimate is the unweighted mean of the unnormalised bolometer 
+*        Tidy up the code to clarify the fact that the common mode
+*        esimate is the unweighted mean of the unnormalised bolometer
 *        residuals.
 
 *  Copyright:
@@ -142,10 +142,11 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 /* Local Variables: */
    AstKeyMap *kmap;
    AstObject *obj;
-   SmfCalcModelComData *job_data = NULL;
    SmfCalcModelComData *pdata;
+   SmfCalcModelComData *job_data = NULL;
    dim_t bolostep;
    dim_t gain_box;
+   dim_t i;
    dim_t idx_hi;
    dim_t idx_lo;
    dim_t nbolo;
@@ -226,6 +227,26 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 /* See if a mask should be used to exclude bright source areas from
    the COM model. Cannot mask if no LUT is available. */
    mask = lut ? smf_get_mask( wf, SMF__COM, keymap, dat, flags, status ) : NULL;
+
+/* If we have a mask, copy it into the quality array of the map. */
+   if( mask ) {
+      double *map = dat->map;
+      smf_qual_t *mapqual = dat->mapqual;
+      double *mapvar = dat->mapvar;
+
+      for( i=0; i<dat->msize; i++ ) {
+         if( mask[i] ) {
+            mapqual[i] |= SMF__MAPQ_COM;
+
+         } else if( map[i] == VAL__BADD || mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) {
+            mask[i] = 1;
+            mapqual[i] |= SMF__MAPQ_COM;
+
+         } else {
+            mapqual[i] &= ~SMF__MAPQ_COM;
+         }
+      }
+   }
 
 /* Get the required configuration parameters. */
    smf_get_nsamp( kmap, "GAIN_BOX", res->sdata[ 0 ], &gain_box, status );

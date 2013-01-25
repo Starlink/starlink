@@ -516,7 +516,9 @@ typedef enum {
 
 /* Quality bits for maps */
 typedef enum {
-  SMF__MAPQ_ZERO = BIT_TO_VAL(0)   /* Pixels that have been constrained to 0 */
+  SMF__MAPQ_AST = BIT_TO_VAL(0),   /* AST mask */
+  SMF__MAPQ_FLT = BIT_TO_VAL(1),   /* FLT mask */
+  SMF__MAPQ_COM = BIT_TO_VAL(2),   /* COM mask */
 } smf_qual_map_bits;
 
 /* These are used to group SMURF TSERIES quality into related groups that
@@ -547,7 +549,7 @@ typedef enum {
    for declaring array sizes. */
 typedef enum {
   SMF__NQBITS_TSERIES = 13,
-  SMF__NQBITS_MAP     = 1,
+  SMF__NQBITS_MAP     = 3,
   SMF__NQBITS_TCOMP   = 5,
   SMF__NQBITS         = 13    /* Largest number of bits in a family */
 } smf_qfam_count_t;

@@ -74,8 +74,8 @@
 *     2012-05-22 (DSB):
 *        Multi-thread some loops.
 *     2012-06-05 (DSB):
-*        Allow the old FLT model to be added back into the residuals at the 
-*        start of the iteration, rather than just before finding the new FLT 
+*        Allow the old FLT model to be added back into the residuals at the
+*        start of the iteration, rather than just before finding the new FLT
 *        model. This is controlled by config parameter FLT.UNDOFIRST.
 *     {enter_further_changes_here}
 
@@ -159,6 +159,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   double dchisq=0;              /* this - last model residual chi^2 */
   int dofft;                    /* flag if we will actually do any filtering */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
+  dim_t i;                      /* Pixel index */
   dim_t idx=0;                  /* Index within subgroup */
   int iw;                       /* Thread index */
   SmfCalcModelFltData *job_data = NULL; /* Data describing worker jobs */
@@ -196,6 +197,26 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* See if a mask should be used to exclude bright source areas from
      the FLT model. */
   mask = smf_get_mask( wf, SMF__FLT, keymap, dat, flags, status );
+
+  /* If we have a mask, copy it into the quality array of the map. */
+  if( mask ) {
+    double *map = dat->map;
+    smf_qual_t *mapqual = dat->mapqual;
+    double *mapvar = dat->mapvar;
+
+    for( i=0; i<dat->msize; i++ ) {
+      if( mask[i] ) {
+         mapqual[i] |= SMF__MAPQ_FLT;
+
+      } else if( map[i] == VAL__BADD || mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) {
+         mask[i] = 1;
+         mapqual[i] |= SMF__MAPQ_FLT;
+
+      } else {
+         mapqual[i] &= ~SMF__MAPQ_FLT;
+      }
+    }
+  }
 
   /* Obtain pointer to sub-keymap containing FLT filter
      parameters. Something will always be available.*/
