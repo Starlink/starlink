@@ -365,11 +365,11 @@ try:
 
 #  On the first invocation of makemap, we use the raw data files specified
 #  by the IN parameter to create an initial estimate of the sky. We also
-#  save the cleaned time series data, and the EXT model, for use on
-#  subsequent iterations (this speeds them up a bit). First create a
-#  text file holding a suitably modified set of configuration parameters.
-#  This file is put in the NDG temp directory (which is where we store
-#  all temp files).
+#  save the cleaned time series data, and the EXT model (if we are doing
+#  more than one iteration), for use on subsequent iterations (this speeds
+#  them up a bit). First create a text file holding a suitably modified
+#  set of configuration parameters. This file is put in the NDG temp
+#  directory (which is where we store all temp files).
    conf0 = os.path.join(NDG.tempdir,"conf0") # Full path to new config file
    fd = open(conf0,"w")       # Open the new config file.
    fd.write("{0}\n".format(config)) # Inherit the supplied config parameter values.
@@ -383,10 +383,12 @@ try:
                               # first ieration, which is no use to use as
                               # we are only doing one iteration. So instead
                               # pre-calculate NOI before the iteration starts.
-   fd.write("exportNDF=ext\n")# Save the EXT model values to avoid
-                              # re-calculation on each invocation of makemap.
-   fd.write("noexportsetbad=1\n")# Export good EXT values for bad bolometers
-   fd.write("exportclean=1\n")  # Likewise save the cleaned time-series data.
+   if niter > 1:
+      fd.write("exportNDF=ext\n")# Save the EXT model values to avoid
+                                 # re-calculation on each invocation of makemap.
+      fd.write("noexportsetbad=1\n")# Export good EXT values for bad bolometers
+      fd.write("exportclean=1\n")  # Likewise save the cleaned time-series data.
+
    fd.write("ast.zero_notlast = 0\n") # Masking is normally not performed
    fd.write("flt.zero_notlast = 0\n") # on the last iteration. But the first
    fd.write("com.zero_notlast = 0\n") # iteration is also the last iteration
@@ -395,16 +397,21 @@ try:
    fd.close()                 # Close the config file.
 
 #  Get the name of a temporary NDF that can be used to store the first
-#  iteration map. This NDF is put in the NDG temp directory.
-   map = NDG(1)
+#  iteration map. This NDF is put in the NDG temp directory. If we are
+#  only doing one iteration, used the supplied output NDF name.
+   if niter == 1:
+      newmap = outdata
+   else:
+      newmap = NDG(1)
+   prevmap = None
 
 #  Start a list of these maps in case we are creating an output itermap cube.
    maps = []
-   maps.append(map)
+   maps.append(newmap)
 
 # Now construct the text of the makemap command and invoke it.
    msg_out( "Iteration 1...")
-   cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}'".format(indata,map,conf0)
+   cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}'".format(indata,newmap,conf0)
    if pixsize:
       cmd += " pixsize={0}".format(pixsize)
    if ref:
@@ -422,137 +429,134 @@ try:
 #  directory. Avoid moving any other files that have similar names by
 #  checking each file inode number and last-accessed time against the lists
 #  of inode numbers and times that existed before makemap was run.
-   for ndf in glob.glob("s*_con_res_cln.sdf"):
-      if not ndf in orig_cln_ndfs:
-         shutil.move( ndf, NDG.tempdir )
-      elif os.stat(ndf).st_atime > orig_cln_ndfs[ndf]:
-         shutil.move( ndf, NDG.tempdir )
+   if niter > 1:
+      for ndf in glob.glob("s*_con_res_cln.sdf"):
+         if not ndf in orig_cln_ndfs:
+            shutil.move( ndf, NDG.tempdir )
+         elif os.stat(ndf).st_atime > orig_cln_ndfs[ndf]:
+            shutil.move( ndf, NDG.tempdir )
 
 #  Get the paths to the the moved cleaned files.
-   cleaned = NDG( os.path.join( NDG.tempdir,"s*_con_res_cln.sdf"))
+      cleaned = NDG( os.path.join( NDG.tempdir,"s*_con_res_cln.sdf"))
 
 #  Get a list of the extinction correction files created by the first
 #  invocation of makemap.
-   for ndf in glob.glob("s*_con_ext.sdf"):
-      if not ndf in orig_ext_ndfs:
-         new_ext_ndfs.append(ndf)
-      elif os.stat(ndf).st_atime > orig_ext_ndfs[ndf]:
-         new_ext_ndfs.append(ndf)
+      for ndf in glob.glob("s*_con_ext.sdf"):
+         if not ndf in orig_ext_ndfs:
+            new_ext_ndfs.append(ndf)
+         elif os.stat(ndf).st_atime > orig_ext_ndfs[ndf]:
+            new_ext_ndfs.append(ndf)
 
 #  Now do the second and subsequent iterations. These use the cleaned
 #  time-series data created by the first iteration as their time-series
 #  input, and use the output map from the previous iteration as their
 #  initial guess at the sky. First create a map holding things to add
 #  to the config for subsequent invocations.
-   add = {}
-   add["exportNDF"] = 0     # Prevent EXT model being exported.
-   add["exportclean"] = 0   # Prevent cleaned time-series data being exported.
-   add["doclean"] = 0       # Do not clean the supplied data (it has
-   add["importsky"] = "ref" # Get the initial sky estimate from the REF parameter.
-   add["ext.import"] = 1    # Import the EXT model created by the first iteration.
-   add["flt.notfirst"] = 0  # Ensure we use FLT on 2nd and subsequent invocations
-   add["pln.notfirst"] = 0  # Ensure we use PLN on 2nd and subsequent invocations
-   add["smo.notfirst"] = 0  # Ensure we use SMO on 2nd and subsequent invocations
+      add = {}
+      add["exportNDF"] = 0     # Prevent EXT model being exported.
+      add["exportclean"] = 0   # Prevent cleaned time-series data being exported.
+      add["doclean"] = 0       # Do not clean the supplied data (it has
+      add["importsky"] = "ref" # Get the initial sky estimate from the REF parameter.
+      add["ext.import"] = 1    # Import the EXT model created by the first iteration.
+      add["flt.notfirst"] = 0  # Ensure we use FLT on 2nd and subsequent invocations
+      add["pln.notfirst"] = 0  # Ensure we use PLN on 2nd and subsequent invocations
+      add["smo.notfirst"] = 0  # Ensure we use SMO on 2nd and subsequent invocations
 
 #  Now create the config, inheriting the config from the first invocation.
-   iconf = 1
-   confname = os.path.join(NDG.tempdir,"conf1")
-   fd = open(confname,"w")
-   fd.write("^{0}\n".format(conf0))# Inherit the first iteration config.
-   for key in add:
-      fd.write("{0}={1}\n".format( key, add[key] ))
-   fd.close()
+      iconf = 1
+      confname = os.path.join(NDG.tempdir,"conf1")
+      fd = open(confname,"w")
+      fd.write("^{0}\n".format(conf0))# Inherit the first iteration config.
+      for key in add:
+         fd.write("{0}={1}\n".format( key, add[key] ))
+      fd.close()
 
 #  Indicate we do not need to create a new config file yet.
-   newcon = 0
+      newcon = 0
 
 #  Now do the second and subsequent iterations.
-   iter = 2
-   newmap = None
-   while iter <= niter:
-      msg_out( "Iteration {0}...".format(iter))
+      iter = 2
+      while iter <= niter:
+         msg_out( "Iteration {0}...".format(iter))
 
-#  Record the name of the map created on the previous iteration, if any.
-      prevmap = newmap
+#  On this iteration we will want to use the output map from the previous
+#  iteration as the initial guess at the sky. So copy the new map name over
+#  to the "prevmap" variable.
+         prevmap = newmap
 
 #  When "zero_niter" invocations have been performed, switch off zero
 #  masking (so long as zero_niter > 0).  Do this for AST, COM and FLT
 #  models.
-      for model in ["ast", "com", "flt"]:
-         if zero_niter[model] > 0 and iter > zero_niter[model]:
-            zero_niter[model] = 0
-            add[ model+".zero_niter" ] = -1
-            newcon = 1
+         for model in ["ast", "com", "flt"]:
+            if zero_niter[model] > 0 and iter > zero_niter[model]:
+               zero_niter[model] = 0
+               add[ model+".zero_niter" ] = -1
+               newcon = 1
 
 #  When "zero_freeze" invocations have been performed, switch freeze the
 #  mask (so long as zero_freeze > 0).  Do this for AST, COM and FLT models.
-      for model in ["ast", "com", "flt"]:
-         if zero_freeze[model] > 0 and iter > zero_freeze[model] + 1:
-            zero_freeze[model] = 0
-            add[ model+".zero_freeze" ] = -1
-            newcon = 1
+         for model in ["ast", "com", "flt"]:
+            if zero_freeze[model] > 0 and iter > zero_freeze[model] + 1:
+               zero_freeze[model] = 0
+               add[ model+".zero_freeze" ] = -1
+               newcon = 1
 
 #  If this is the last iteration, put the output map in the NDF specified
 #  by the script's "OUT" parameter.
-      if iter == niter:
-         newmap = outdata
+         if iter == niter:
+            newmap = outdata
 
 #  Also, if this is the last iteration, create a modified configuration file
 #  that supresses masking (unless the xxx.zero_notlast value in the
 #  supplied config indicates otjerwise).
-         for model in ["ast", "com", "flt"]:
-            if zero_notlast[model] != 0:
-               add["ast.zero_notlast"] = 1
-               newcon = 1
+            for model in ["ast", "com", "flt"]:
+               if zero_notlast[model] != 0:
+                  add["ast.zero_notlast"] = 1
+                  newcon = 1
 
 #  If this is not the last iteration, get the name of a temporary NDF that
 #  can be used to store the current iteration's map. This NDF is put in
 #  the NDG temp directory.
-      else:
-         newmap = NDG(1)
+         else:
+            newmap = NDG(1)
 
 #  If required, create a new config file.
-      if newcon:
-         newcon = 0
-         iconf += 1
-         confname = os.path.join(NDG.tempdir,"conf{0}".format(iconf))
-         fd = open(confname,"w")
-         fd.write("^{0}\n".format(conf0))# Inherit the first iteration config.
-         for key in add:
-            fd.write("{0}={1}\n".format( key, add[key] ))
-         fd.close()
+         if newcon:
+            newcon = 0
+            iconf += 1
+            confname = os.path.join(NDG.tempdir,"conf{0}".format(iconf))
+            fd = open(confname,"w")
+            fd.write("^{0}\n".format(conf0))# Inherit the first iteration config.
+            for key in add:
+               fd.write("{0}={1}\n".format( key, add[key] ))
+            fd.close()
 
 #  Construct the text of the makemap command and invoke it. We specify
 #  the map from the previous iteration as the REF image.
-      cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}' ref={3}"\
-            .format(cleaned,newmap,confname,map)
-      if pixsize:
-         cmd += " pixsize={0}".format(pixsize)
-      if mask2:
-         cmd += " mask2={0}".format(mask2)
-      if mask3:
-         cmd += " mask3={0}".format(mask3)
-      if extra:
-         cmd += " "+extra
-      invoke(cmd)
+         cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}' ref={3}"\
+               .format(cleaned,newmap,confname,prevmap)
+         if pixsize:
+            cmd += " pixsize={0}".format(pixsize)
+         if mask2:
+            cmd += " mask2={0}".format(mask2)
+         if mask3:
+            cmd += " mask3={0}".format(mask3)
+         if extra:
+            cmd += " "+extra
+         invoke(cmd)
 
 #  Append the output map name to the list of maps to be included in any
 #  itermap cube.
-      maps.append(newmap)
-
-#  On the next iteration we will want to use the output map from this
-#  iteration as the initial guess at the sky. So copy the new map name over
-#  to the "map" variable.
-      map = newmap
+         maps.append(newmap)
 
 #  Increment the iteration number
-      iter += 1
+         iter += 1
 
 
 
 #  Now we have done all iterations, create the output itermap cube if
 #  required.
-   if itermap:
+   if itermap and niter > 1:
       msg_out( "Creating output itermap cube {0}...".format(itermap) )
       inputs = NDG( maps )
       invoke("$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".format(inputs,itermap) )
@@ -564,9 +568,9 @@ try:
    if prevmap != None:
       try:
          invoke("$HDSTOOLS_DIR/hcopy inp={0} out={1}".format(prevmap,newmap) )
-         invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )
       except starutil.StarUtilError as err:
          pass
+   if niter > 1 : invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )
 
 #  Remove temporary files.
    cleanup()
