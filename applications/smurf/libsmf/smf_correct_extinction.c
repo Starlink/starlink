@@ -185,10 +185,15 @@
 *        TCS_AZ_AC2.
 *     2012-03-06 (TIMJ):
 *        Use PAL instead of SLA.
+*     2013-01-25 (DSB):
+*        Change "corrthresh" from 0.01 to 0.02. This is to reduce the
+*        number of cases where per-bolo EXT values are created, since
+*        dumping the EXT model in such cases produces huge files (a
+*        problem when running skyloop).
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2010, 2012 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010, 2012, 2013 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British
 *     Columbia. All Rights Reserved.
@@ -596,7 +601,7 @@ static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
   double airmass2;   /* airmass at edge of array */
   double delta;      /* difference between airmass1 and airmass2 times the tau  */
   const double footprint = 10.0 * DD2R / 60.0;  /* 10 arcmin */
-  const double corrthresh = 0.01; /* threshold to switch from quick to slow as fraction */
+  const double corrthresh = 0.02; /* threshold to switch from quick to slow as fraction */
 
   if (*status != SAI__OK) return 0;
 
