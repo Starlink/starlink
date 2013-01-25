@@ -136,8 +136,14 @@
 *        created in the current directory. Any file with the same name is
 *        over-written. []
 *     NITER = _INTEGER (Read)
-*        The number of iterations to perform. Currently, there are no
-*        other convergence tests avaiulable with the skyloop script.
+*        The number of iterations to perform. A positive value specifies
+*        a fixed number of iterations to perform. A negative value
+*        indicates that iterations should continue until the normalized
+*        change in the map between iterations is less than the value of
+*        the "maptol" parameter in the configuration supplied by
+*        parameter CONFIG. If a value of zero is supplied for NITER, the
+*        value to use will be read from the "numiter" parameter in the
+*        configuration. [0]
 *     MASK2 = NDF (Read)
 *        An existing NDF that can be used to specify a second external mask
 *        for use with either the AST, FLT or COM model. See configuration
@@ -274,7 +280,7 @@ try:
                                   exists=False, minsize=0, maxsize=1 ))
 
    params.append(starutil.Par0I("NITER", "No. of iterations to perform",
-                                10, maxval=1000, minval=1))
+                                0, noprompt=True))
 
    params.append(starutil.Par0F("PIXSIZE", "Pixel size (arcsec)", None,
                                  maxval=1000, minval=0.01))
@@ -321,6 +327,24 @@ try:
    extra = parsys["EXTRA"].value
    retain = parsys["RETAIN"].value
    itermap = parsys["ITERMAP"].value
+
+#  If requested, use numiter from the config file.
+   if niter == 0:
+      niter = int( invoke( "$KAPPA_DIR/configecho name=numiter config={0} "
+                           "defaults=$SMURF_DIR/smurf_makemap.def "
+                           "select=\"\'450=0,850=0\'\"".format(config)))
+
+#  If iterating to convergence, get the maximum allowed normalised map
+#  change between iterations, and set the number of iterations positive.
+   if niter < 0:
+      niter = -niter
+      maptol = float( invoke( "$KAPPA_DIR/configecho name=maptol config={0} "
+                           "defaults=$SMURF_DIR/smurf_makemap.def "
+                           "select=\"\'450=0,850=0\'\"".format(config)))
+   else:
+      maptol = 0
+
+   converged = False
 
 #  Determine the value of the (AST,COM,FLT).ZERO_NITER, ZERO_NOTLAST and
 #  ZERO_FREEZE parameters in the supplied config. We need to ensure that
@@ -474,6 +498,10 @@ try:
 #  Indicate we do not need to create a new config file yet.
       newcon = 0
 
+#  Get the name of an NDF in which to store the normalized map change
+#  after each iteration.
+      mapchange = NDG(1)
+
 #  Now do the second and subsequent iterations.
       iter = 2
       while iter <= niter:
@@ -545,6 +573,24 @@ try:
             cmd += " "+extra
          invoke(cmd)
 
+#  If required, get the mean normalised map change, and see if it has
+#  dropped below maptol. If so, we must do one further iteration to
+#  ensure that the masking is not visible in the final map.
+         invoke("$KAPPA_DIR/maths exp=\"'abs(ia-ib)/sqrt(va)'\" ia={0} "
+                "ib={1} out={2}".format(newmap,prevmap,mapchange))
+         invoke("$KAPPA_DIR/stats ndf={0} clip=\\[3,3,3\\] quiet".format(mapchange))
+         meanchange = starutil.get_task_par( "mean", "stats" )
+         if maptol > 0.0 and converged == False:
+            msg_out( "Normalised mean change in map = {0} (maptol="
+                     "{1})".format(meanchange,maptol) )
+            if meanchange <= maptol:
+               msg_out( "Converged! But we need to do one more iteration..." )
+               converged = True
+               niter = iter + 1
+         else:
+            msg_out( "Normalised mean change in map = {0}".format(meanchange) )
+
+
 #  Append the output map name to the list of maps to be included in any
 #  itermap cube.
          maps.append(newmap)
@@ -552,7 +598,9 @@ try:
 #  Increment the iteration number
          iter += 1
 
-
+#  Report convergence failure.
+   if maptol > 0.0 and not converged:
+        msg_out("Map did not converge.")
 
 #  Now we have done all iterations, create the output itermap cube if
 #  required.
