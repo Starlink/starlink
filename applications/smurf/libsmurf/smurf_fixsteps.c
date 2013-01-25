@@ -341,7 +341,7 @@ void smurf_fixsteps( int *status ) {
 /* If required, create the output NDF. */
    if( outsize > 0 && indata && indata->file ) {
       smf_write_smfData( data, NULL, NULL, ogrp, 1,
-                         indata->file->ndfid, MSG__VERB, status );
+                         indata->file->ndfid, MSG__VERB, 0, status );
    }
 
 /* Save the length of the first pixel axis. */

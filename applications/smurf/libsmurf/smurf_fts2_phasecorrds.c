@@ -385,7 +385,7 @@ void smurf_fts2_phasecorrds(int* status)
 
     /* Write output */
     outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-    smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, status);
+    smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
     smf_close_file(&outData, status);
   }
 

@@ -482,7 +482,7 @@ void smurf_sc2fft( int *status ) {
 
           /* Export the data to a new file */
           smf_write_smfData( odata, NULL, NULL, ogrp, gcount, provid,
-                             MSG__VERB, status );
+                             MSG__VERB, 0, status );
 
           /* Free resources */
           ndfAnnul( &provid, status );

@@ -211,7 +211,7 @@ void smurf_fts2_freqcorr(int* status)
       astFree(specNew);
 
       smf_write_smfData(outData, NULL, NULL, ogrp, fIndex, 0, MSG__VERB,
-                        status);
+                        0, status);
       smf_close_file(&outData, status);
 
       smf_close_file(&inData, status);

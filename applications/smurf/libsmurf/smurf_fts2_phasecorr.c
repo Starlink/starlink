@@ -430,7 +430,7 @@ void smurf_fts2_phasecorr(int* status)
 
     // WRITE OUTPUT
     outputData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0, MSG__VERB, status);
+    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0, MSG__VERB, 0, status);
     smf_close_file(&outputData, status);
   } // END FILE LOOP
 

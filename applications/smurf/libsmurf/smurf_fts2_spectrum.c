@@ -267,7 +267,7 @@ void smurf_fts2_spectrum(int* status)
     if(inData) { smf_close_file(&inData, status); }
 
     /* Write output */
-    smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, status);
+    smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
     smf_close_file(&outData, status);
   }
 

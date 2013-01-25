@@ -249,7 +249,7 @@ void smurf_sc2mapfft( int *status ) {
       }
 
       /* Export the data to a new file */
-      smf_write_smfData( odata, NULL, NULL, ogrp, i, 0, MSG__VERB, status );
+      smf_write_smfData( odata, NULL, NULL, ogrp, i, 0, MSG__VERB, 0, status );
     }  else {
       msgOutif( MSG__NORM, " ",
                 "Data are already transformed. No output will be produced",
