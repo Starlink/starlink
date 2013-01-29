@@ -527,6 +527,14 @@ class ParSys(object):
       global glevel
       global logfile
 
+      #  Ensure starlink has been initialised (i.e. the etc/login and
+      #  etc/cshrc files have been sourced). Do this by checking that
+      #  KAPPA_DIR is defined.
+      if "KAPPA_DIR" not in os.environ:
+         raise UsageError("Starlink has not been initialised. You should "
+                          "source the starlink login and cshrc/profile "
+                          "files before running this script. ")
+
       #  Store a dictionary holding references to all the supplied Parameters,
       #  indexed by parameter name. Raise an exception if the list
       #  contains msg_filter, ilevel or glevel.
