@@ -558,12 +558,11 @@ try:
 
 #  We use a copy of the total flux reference map, if one was supplied, and the
 #  first Q map otherwise.
+            ref = NDG( 1 )
             if iref:
-               ref = NDG( 1 )
                invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(iref,ref) )
-
             else:
-               ref = NDG( qffb[0] )
+               invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(qffb[0],ref) )
 
 #  We add a WCS Frame with Domain "POLANAL" to define the polarimetric reference
 #  direction (we choose the pixel Y axis). POLPACK expects this Frame to be present
