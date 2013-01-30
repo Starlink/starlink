@@ -185,7 +185,7 @@
 *          continually makes a map, constructs models for different
 *          data components (common-mode, spikes etc.). See CONFIG for
 *          parameters controlling the iterative map maker.
-*          [REBIN]
+*          [ITERATE]
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,

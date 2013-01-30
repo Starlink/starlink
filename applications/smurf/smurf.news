@@ -1,5 +1,7 @@
 1 SMURF_Version_1.5
 
+ Some of the changes in this version of smurf include:
+
  o If multiple types of mask are requested for any of the AST, FLT
    and COM models (e.g. ZERO_LOWHITS and ZERO_MASK both specified),
    they will now be combined into a single mask. Previously, only one
@@ -8,6 +10,9 @@
  o Up to three external masks can now be specified using ADAM parameters
    REF, MASK2 and MASK3. The ZERO_MASK configuration parameter can be set
    for the AST, FLT or COM model, to indicate which ADAM parameter to use.
+
+ o When invoking MAKEMAP, the default for the METHOD parameter has been
+   changed from REBIN to ITERATE.
 
 1 SMURF_Version_1.1
 
