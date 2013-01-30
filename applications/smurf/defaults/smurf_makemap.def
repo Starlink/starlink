@@ -171,7 +171,7 @@ flt.notfirst = 0
 
 # which calls smf_filter_fromkeymap which calls smf_get_cleanpar
 
-flt.apod = 0
+flt.apod = <undef>
 flt.zeropad = 0
 flt.filt_edgelow = 0
 flt.filt_edgehigh = 0
@@ -224,9 +224,10 @@ pln.notfirst = 0
 
 # Time Series Smoothing
 
-smo.notfirst = 0
-smo.boxcar = -10
-smo.type = mean
+smo.notfirst = 1
+450.smo.boxcar = -10
+850.smo.boxcar = -3
+smo.type = median
 
 # Two component common-mode
 

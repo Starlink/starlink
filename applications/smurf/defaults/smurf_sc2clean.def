@@ -29,7 +29,7 @@
 
 # These are read in smf_get_cleanpar
 
-apod = 0
+apod = <undef>
 badfrac = 0.05
 dcfitbox = 0
 dcmaxsteps = 10
@@ -38,7 +38,7 @@ dcthresh = 25.0
 dcsmooth = 50
 deconvmce = 0
 dkclean = 0
-fillgaps = 0
+fillgaps = 1
 zeropad = 0
 filt_edgelow = 0
 filt_edgehigh = 0
@@ -81,7 +81,7 @@ opteffdiv = 1
 # routine with a "cleandk" prefix so we have to duplicate all
 # the above values.
 
-cleandk.apod = 0
+cleandk.apod = <undef>
 cleandk.badfrac = 0
 cleandk.dcfitbox = 0
 cleandk.dcmaxsteps = 10
