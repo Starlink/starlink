@@ -116,7 +116,7 @@ flt.zero_circle = <undef>
 flt.zero_snr = <undef>
 flt.zero_snrlo = <undef>
 flt.zero_mask = <undef>
-flt.zero_niter = 0
+flt.zero_niter = 2
 flt.zero_freeze = 0
 
 # If non-zero, add the old FLT model back into the residuals at the start
