@@ -1050,6 +1050,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        for the axis type ( "xxLN/xxLT" or "xLON/xLAT" ).
 *        - Add support for reading and writing offset SkyFrames to
 *        FITS-WCS.
+*     30-JAN-2013 (DSB):
+*        When reading a FITS-CLASS header, use "VLSR" keyword if
+*        "VELO-..." is not available.
 *class--
 */
 
@@ -6117,7 +6120,6 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
 *                      int axlon, const char *method, const char *class )
 
@@ -6187,7 +6189,7 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
                   AST__STRING, (void *) &cval, 0, method, class, status ) ){
 
 /* We can only handle frequency axes at the moment. */
-      if( strcmp( "FREQ    ", cval ) ) {
+      if( !astChrMatch( "FREQ", cval ) ) {
          astError( AST__BDFTS, "%s(%s): FITS-CLASS keyword %s has value "
                    "\"%s\" - CLASS support in AST only includes \"FREQ\" axes.", status,
                    method, class, FormatKey( "CTYPE", axspec + 1, -1, ' ', status ),
@@ -6234,8 +6236,11 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
 
 /* Look for a keyword with name "VELO-...". This specifies the radio velocity
    at the reference channel, in a standard of rest specified by the "..."
-   in the keyword name. */
+   in the keyword name. If "VELO-..." is not found, look for "VLSR",
+   which is the same as "VELO-LSR". */
    if( GetValue2( ret, this, "VELO-%3c", AST__FLOAT, (void *) &vref, 0,
+                  method, class, status ) ||
+       GetValue2( ret, this, "VLSR", AST__FLOAT, (void *) &vref, 0,
                   method, class, status ) ){
 
 /* Calculate the radio velocity (in the rest frame of the source) corresponding
