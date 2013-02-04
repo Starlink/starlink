@@ -443,30 +443,26 @@ try:
       invoke("$SMURF_DIR/calcqu in={0} config={1} outq={2} outu={3} fix".
              format(indata,config,qcont,ucont) )
 
-#  Remove spikes from the Q and U images. The cleaned NDFs are written to
-#  temporary NDFs specified by two new NDG objects "qff" and "uff", which
-#  inherit their size from the existing groups "qcont" and "ucont".
-   msg_out( "Removing spikes from bolometer Q and U values...")
-   qff = NDG(qcont)
-   qff.comment = "qff"
-   uff = NDG(ucont)
-   uff.comment = "uff"
-   invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]"
-           .format(qcont,qff) )
-   invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]"
-           .format(ucont,uff) )
-
 #  The next stuff we do independently for each subarray.
    qmos = {}
    umos = {}
    for a in ('S4A','S4B','S4C','S4D','S8A','S8B','S8C','S8D'):
 
-#  Get an NDG object that contains the cleaned Q maps for the current
-#  subarray.
+#  Get NDG object that contains the Q and U maps for the current subarray.
       qarray = qcont.filter(a)
+      uarray = ucont.filter(a)
 
 #  If any data was found for the current subarray...
-      if qarray != None:
+      if qarray != None and uarray != None:
+
+#  Remove spikes from the Q images for the current subarray. The cleaned NDFs
+#  are written to temporary NDFs specified by the new NDG object "qff", which
+#  inherit its size from the existing group "qarray"".
+         msg_out( "Removing spikes from {0} bolometer Q values...".format(a))
+         qff = NDG(qarray)
+         qff.comment = "qff"
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]"
+                 .format(qarray,qff) )
 
 #  There seems to be a tendency for each bolometer to have its own fixed
 #  bias in Q and U. We now try to remove these biases by removing the Q and
@@ -475,12 +471,14 @@ try:
 #  image as the focal plane is moved on the sky). First we find the mean Q
 #  value in each bolometer by averaging the Q images, aligned in PIXEL (i.e.
 #  bolomter) coords. The mean Q value per bolometer is put in qcom.sdf.
+#  We use nearest neighbour interpolation since we know the images are
+#  aligned in pixel coords.
          msg_out( "Removing background Q level from {0} bolometers...".format(a))
          qcom = NDG(1)
          qcom.comment = "qcom"
-         invoke("$KAPPA_DIR/wcsframe {0} PIXEL".format(qarray))
-         invoke("$KAPPA_DIR/wcsmosaic {0} ref=\! out={1} accept".
-                format(qarray,qcom))
+         invoke("$KAPPA_DIR/wcsframe {0} PIXEL".format(qff))
+         invoke("$KAPPA_DIR/wcsmosaic {0} ref=\! out={1} method=near wlim={2} accept".
+                format(qff,qcom,len(qff)))
 
 #  We simply assume that the fixed bolometer Q bias is linearly related to
 #  the mean Q value per bolometer. Astronomical sources will affect this
@@ -488,9 +486,9 @@ try:
 #  find the gradient and offset of the linear relationship for each Q image,
 #  we use kappa:normalize to do a least squares fit between each Q image and
 #  the mean Q signal.
-         qnm = NDG(qarray)
+         qnm = NDG(qff)
          qnm.comment = "qnm"
-         for (qin,qout) in zip( qarray, qnm ):
+         for (qin,qout) in zip( qff, qnm ):
             invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
                     format(qcom,qin,qout,ndevice), buffer=True )
 
@@ -503,29 +501,35 @@ try:
                diagfd.write("Q {0} {1} {2} {3} {4}\n".format(iblock,a,ichunk,slope,offset))
 
 #  Now substract the normalized mean Q signal from each Q image.
-         qsub = NDG(qarray)
+         qsub = NDG(qff)
          qsub.comment = "qsub"
          invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".
-                 format(qarray,qnm,qsub) )
+                 format(qff,qnm,qsub) )
 
 #  And then remove smaller spikes that have now become visible in the
 #  Q images as a result of subtracting off the bolometer biases.
-         qffb = NDG(qarray)
+         qffb = NDG(qff)
          qffb.comment = "qffb"
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]".
                  format(qsub,qffb) )
 
 #  Now do the same for the U images.
+         msg_out( "Removing spikes from {0} bolometer U values...".format(a))
+         uff = NDG(uarray)
+         uff.comment = "uff"
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]"
+                 .format(uarray,uff) )
+
          msg_out( "Removing background U level from {0} bolometers...".format(a))
-         uarray = ucont.filter(a)
          ucom = NDG(1)
-         invoke("$KAPPA_DIR/wcsframe {0} PIXEL".format(uarray))
-         invoke("$KAPPA_DIR/wcsmosaic {0} ref=\! out={1} accept".
-                format(uarray,ucom))
-         unm = NDG(uarray)
+         invoke("$KAPPA_DIR/wcsframe {0} PIXEL".format(uff))
+         invoke("$KAPPA_DIR/wcsmosaic {0} ref=\! out={1} method=near wlim={2} accept".
+                format(uff,ucom,len(uff)))
+
+         unm = NDG(uff)
          unm.comment = "unm"
 
-         for (uin,uout) in zip( uarray, unm ):
+         for (uin,uout) in zip( uff, unm ):
             invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
                     format(ucom,uin,uout,ndevice), buffer=True )
 
@@ -536,11 +540,11 @@ try:
                iblock = starutil.get_fits_header( uin, "POLBLOCK" )
                diagfd.write("U {0} {1} {2} {3} {4}\n".format(iblock,a,ichunk,slope,offset))
 
-         usub = NDG(uarray)
+         usub = NDG(uff)
          usub.comment = "usub"
          invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".
-                 format(uarray,unm,usub) )
-         uffb = NDG(uarray)
+                 format(uff,unm,usub) )
+         uffb = NDG(uff)
          uffb.comment = "uffb"
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]".
                  format(usub,uffb) )
