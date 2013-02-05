@@ -1609,6 +1609,38 @@ iraf! {
           }
 
       }
+
+      action astsphmap {
+         helplib {$ATOOLS_HELP}
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter options {
+            position 1
+            type LITERAL
+            prompt {Options for the SphMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 2
+            type LITERAL
+            prompt {Name of file in which to store the SphMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
       action astlutmap {
          helplib {$ATOOLS_HELP}
 
