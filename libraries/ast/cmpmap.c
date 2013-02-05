@@ -143,6 +143,9 @@ f     The CmpMap class does not define any new routines beyond those
 *     24-JAN-2012 (DSB):
 *        If efficient MapSplit fails to split (e.g. due to the presence
 *        of PermMaps), then revert to the older slower method.
+*     5-FEB-2013 (DSB):
+*        Take account of Invert flags when combining parallel CmpMaps in
+*        series.
 *class--
 */
 
@@ -1639,9 +1642,24 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                   while( jmap1 <= nmap1 && jmap2 <= nmap2 && astOK ) {
 
 /* Note the number of outputs from submap1 and the number of inputs to
-   submap2. */
-                     subout1 = submap1 ? astGetNout( submap1 ) : 0;
-                     subin2 = submap2 ? astGetNin( submap2 ) : 0;
+   submap2. If the Invert flag is not set to the required value for
+   either Mapping, then inputs become outputs and vice-versa, so swap Nin
+   and Nout. */
+                     if( !submap1 ) {
+                        subout1 = 0;
+                     } else if( subinv1 == astGetInvert( submap1 ) ) {
+                        subout1 = astGetNout( submap1 );
+                     } else {
+                        subout1 = astGetNin( submap1 );
+                     }
+
+                     if( !submap2 ) {
+                        subin2 = 0;
+                     } else if( subinv2 == astGetInvert( submap2 ) ) {
+                        subin2 = astGetNin( submap2 );
+                     } else {
+                        subin2 = astGetNout( submap2 );
+                     }
 
 /* If sublist for cmpmap1 has too few outputs, add the next Mapping from
    the cmpmap1 list into the submap1 sublist. */
