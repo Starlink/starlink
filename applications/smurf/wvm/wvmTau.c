@@ -141,7 +141,7 @@ double pwv2tau_bydate(double mjdate, double mmH2O_z) {
     /* No correction */
   } else if (mjdate >= 56190.0 && mjdate < 56311.0 ) { /* 20120920 to 20130119 */
     /* From Per Friberg 20130131 */
-    mmH2O_z = 0.026938322 * mmH2O_z + 0.000579163;
+    mmH2O_z = 0.926938322 * mmH2O_z + 0.000579163;
 
   } else {
     /* From Jessica Dempsey 20130204 */
