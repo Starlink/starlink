@@ -6,15 +6,16 @@
 *     skyloop
 
 *  Purpose:
-*     Create a map using the "inside-out" algorithm described at
-*     http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html
+*     Create a map using the "inside-out" algorithm.
 
 *  Language:
 *     python (2.7 or 3.*)
 
 *  Description:
-*     This script makes a map from specified raw time-series data. It
-*     runs SMURF:MAKEMAP multiple times, performing a single iteration of
+*     This script makes a map from specified raw time-series data using
+*     the algorithm described at
+*     http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html.
+*     It runs SMURF:MAKEMAP multiple times, performing a single iteration of
 *     the Dynamic Iterative Map-Maker algorithm on each invocation,
 *     including data from all chunks. Each map created by MAKEMAP is used
 *     as the initial sky estimate for the next invocation. MAKEMAP subtracts

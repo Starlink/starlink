@@ -3493,6 +3493,260 @@ as additional lines of median, mean and standard deviation.
 
 \clearpage
 \sstroutine{
+   SKYLOOP
+}{
+   Create a map including data from all chunks in each iteration.
+}{
+   \sstdescription{
+      This script makes a map from specified raw time-series data using the
+      {\tt "}inside-out{\tt "} algorithm described at
+      \htmladdnormallink{
+      \texttt{http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html}
+      }{http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html}.
+      It runs SMURF:MAKEMAP multiple times, performing a single iteration of
+      the Dynamic Iterative Map-Maker algorithm on each invocation,
+      including data from all chunks. Each map created by MAKEMAP is used
+      as the initial sky estimate for the next invocation. MAKEMAP subtracts
+      this initial sky estimate from the time-series data before starting
+      the first (and only) iteration, and then adds the initial sky estimate
+      back on at the end prior to creating the output map.
+
+      The script produces several intermediate files: a set of cleaned
+      time-series files that may be 2 to 3 times the size of the entire
+      set of raw data files included in the map, and a 2D map for every
+      iteration. These files are placed in a newly created directory that
+      is normally deleted before the script exits. The files can be retained
+      for debugging purposes if required by running the script with
+      {\tt "}retain=yes{\tt "} on the command line.
+
+      The temporary files are placed in a directory name {\tt "}NDG\_xxxxx{\tt "},
+      located within the directory specified by environment variable
+      STAR\_TEMP. If STAR\_TEMP is not defined, they are placed in the system{\tt '}s
+      temporary directory (e.g. {\tt "}/tmp{\tt "}).
+
+      In addition, files holding the extinction correction factor for each
+      data sample are written to the current working directory. These are
+      deleted when the script ends.
+   }
+   \sstusage{
+      skyloop in out niter pixsize config [itermap] [ref] [mask2] [mask3]
+              [extra] [retain] [msg\_filter] [ilevel] [glevel] [logfile]
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         CONFIG = LITERAL (Read)
+      }{
+         The MAKEMAP configuration parameter values to use. Additions
+         will be made as follows:
+
+         \sstitemlist{
+            \sstitem
+            First iteration:
+            \begin{verbatim}
+               numiter=1
+               noi.calcfirst=1
+               exportNDF=ext
+               noexportsetbad=1
+               exportclean=1
+               ast.zero_notlast = 0
+               flt.zero_notlast = 0
+               com.zero_notlast = 0
+               itermap=0
+               shortmap=0
+               bolomap=0
+               flagmap=<undef>
+               sampcube=0
+            \end{verbatim}
+
+            \sstitem
+            Subsequent iterations:
+            \begin{verbatim}
+               numiter=1
+               noi.calcfirst=1
+               doclean=0
+               importsky=ref
+               ext.import=1
+               ast.zero_notlast = 0
+               flt.zero_notlast = 0
+               com.zero_notlast = 0
+               flt.notfirst = 0
+               pln.notfirst = 0
+               smo.notfirst = 0
+               itermap=0
+               shortmap=0
+               bolomap=0
+               flagmap=<undef>
+               sampcube=0
+            \end{verbatim}
+
+            \sstitem
+            Last iteration:
+            \begin{verbatim}
+               numiter=1
+               noi.calcfirst=1
+               doclean=0
+               importsky=ref
+               ext.import=1
+               ast.zero_notlast = 1
+               flt.zero_notlast = 1
+               com.zero_notlast = 1
+               flt.notfirst = 0
+               pln.notfirst = 0
+               smo.notfirst = 0
+               itermap=0
+               shortmap=0
+               bolomap=0
+               flagmap=<undef>
+               sampcube=0
+            \end{verbatim}
+         }
+      }
+      \sstsubsection{
+         GLEVEL = LITERAL (Read)
+      }{
+         Controls the level of information to write to a text log file.
+         Allowed values are as for {\tt "}ILEVEL{\tt "}. The log file to create is
+         specified via parameter {\tt "}LOGFILE. [{\tt "}ATASK{\tt "}]
+      }
+      \sstsubsection{
+         ILEVEL = LITERAL (Read)
+      }{
+         Controls the level of information displayed on the screen by the
+         script. It can take any of the following values (note, these values
+         are purposefully different to the SUN/104 values to avoid confusion
+         in their effects):
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}NONE{\tt "}: No screen output is created
+
+            \sstitem
+            {\tt "}CRITICAL{\tt "}: Only critical messages are displayed such as warnings.
+
+            \sstitem
+            {\tt "}PROGRESS{\tt "}: Extra messages indicating script progress are also
+            displayed.
+
+            \sstitem
+            {\tt "}ATASK{\tt "}: Extra messages are also displayed describing each atask
+            invocation. Lines starting with {\tt "}$>$$>$$>${\tt "} indicate the command name
+            and parameter values, and subsequent lines hold the screen output
+            generated by the command.
+
+            \sstitem
+            {\tt "}DEBUG{\tt "}: Extra messages are also displayed containing unspecified
+            debugging information.
+
+         }
+         [{\tt "}PROGRESS{\tt "}]
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The group of time series NDFs to include in the output map.
+      }
+      \sstsubsection{
+         ITERMAP = NDF (Write)
+      }{
+         A 3D NDF to create holding the maps from all iterations. [!]
+      }
+      \sstsubsection{
+         LOGFILE = LITERAL (Read)
+      }{
+         The name of the log file to create if GLEVEL is not NONE. The
+         default is {\tt "}$<$command$>$.log{\tt "}, where $<$command$>$ is the name of the
+         executing script (minus any trailing {\tt "}.py{\tt "} suffix), and will be
+         created in the current directory. Any file with the same name is
+         over-written. []
+      }
+      \sstsubsection{
+         NITER = \_INTEGER (Read)
+      }{
+         The number of iterations to perform. A positive value specifies
+         a fixed number of iterations to perform. A negative value
+         indicates that iterations should continue until the normalized
+         change in the map between iterations is less than the value of
+         the {\tt "}maptol{\tt "} parameter in the configuration supplied by
+         parameter CONFIG. If a value of zero is supplied for NITER, the
+         value to use will be read from the {\tt "}numiter{\tt "} parameter in the
+         configuration. [0]
+      }
+      \sstsubsection{
+         MASK2 = NDF (Read)
+      }{
+         An existing NDF that can be used to specify a second external mask
+         for use with either the AST, FLT or COM model. See configuration
+         parameters AST.ZERO\_MASK, FLT.ZERO\_MASK and COM.ZERO\_MASK. Note,
+         it is assumed that this image is aligned in pixel coordinate with
+         the output map. [!]
+      }
+      \sstsubsection{
+         MASK3 = NDF (Read)
+      }{
+         An existing NDF that can be used to specify a third external mask
+         for use with either the AST, FLT or COM model. See configuration
+         parameters AST.ZERO\_MASK, FLT.ZERO\_MASK and COM.ZERO\_MASK. Note,
+         it is assumed that this image is aligned in pixel coordinate with
+         the output map. [!]
+      }
+      \sstsubsection{
+         EXTRA = LITERAL (Read)
+      }{
+         A string holding any extra command line options to be passed to
+         MAKEMAP (all invocations). [!]
+      }
+      \sstsubsection{
+         MSG\_FILTER = LITERAL (Read)
+      }{
+         Controls the default level of information reported by Starlink
+         atasks invoked within the executing script. The accepted values
+         are the list defined in SUN/104 ({\tt "}None{\tt "}, {\tt "}Quiet{\tt "}, {\tt "}Normal{\tt "},
+         {\tt "}Verbose{\tt "}, etc). [{\tt "}Normal{\tt "}]
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The NDF holding the output map.
+      }
+      \sstsubsection{
+         PIXSIZE = \_REAL (Read)
+      }{
+         Pixel dimensions in the output image, in arcsec. The same value
+         will be used for both axes. The default depends on the wavelength
+         of the input data. []
+      }
+      \sstsubsection{
+         REF = NDF (Read)
+      }{
+         An existing NDF that is to be used to define the output grid.
+         If supplied, the output grid will be aligned with the supplied
+         reference NDF. The reference can be either 2D or 3D and the spatial
+         frame will be extracted. If a null (!) value is supplied then the
+         output grid is determined by parameters REFLON, REFLAT, etc.
+         In addition, this NDF can be used to mask the AST, FLT or COM
+         model. See configuration parameters AST.ZERO\_MASK, FLT.ZERO\_MASK
+         and COM.ZERO\_MASK.
+
+         On the second and subsequent invocations of MAKEMAP, any
+         supplied REF image is replaced by the map created by the previous
+         invocation of MAKEMAP. [!]
+      }
+      \sstsubsection{
+         RETAIN = \_LOGICAL (Read)
+      }{
+         Should the temporary directory containing the intermediate files
+         created by this script be retained? If not, it will be deleted
+         before the script exits. If retained, a message will be
+         displayed at the end specifying the path to the directory. [FALSE]
+      }
+   }
+}
+
+\clearpage
+\sstroutine{
   SMAS
 }{
   Short Map Analysis Script

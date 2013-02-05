@@ -2,6 +2,12 @@
 
  Some of the changes in this version of smurf include:
 
+ o A new command "skyloop" has been added which will create a map using
+   the "inside-out" algorithm, which includes data from all chunk at each
+   iteration. See:
+
+   http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html
+
  o If multiple types of mask are requested for any of the AST, FLT
    and COM models (e.g. ZERO_LOWHITS and ZERO_MASK both specified),
    they will now be combined into a single mask. Previously, only one
