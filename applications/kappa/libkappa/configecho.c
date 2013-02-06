@@ -36,12 +36,12 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *  Description:
 *     This application displays the name and value of one or more
 *     configuration parameters, specified using Parameter CONFIG.
-*     The value is also written to an output parameter. The string
-*     "<***>" is displayed if the parameter is not specified by the
-*     CONFIG or DEFAULTS parameter.
+*     The value is also written to an output parameter. If the
+*     parameter is not specified by the CONFIG or DEFAULTS parameter,
+*     then the value supplied for DEFVAL is returned.
 
 *  Usage:
-*     configecho name config [defaults] [select]
+*     configecho name config [defaults] [select] [defval]
 
 *  ADAM Parameters:
 *     CONFIG = GROUP (Read)
@@ -73,6 +73,9 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        defaults will be supplied for parameters that are not specified
 *        by CONFIG, and no tests will be performed on the validity of
 *        paramter names supplied by CONFIG. [!]
+*     DEFVAL = LITERAL (Read)
+*        The value to return if no value can be obtained for the named
+*        parameter, or if the value is "<undef>".  [<***>]
 *     NAME = LITERAL (Read)
 *        The name of the configuration parameter to display.
 *     SELECT = GROUP (Read)
@@ -140,6 +143,8 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *  History:
 *     10-DEC-2012 (DSB):
 *        Original version.
+*     6-FEB-2012 (DSB):
+*        Added parameter DEFVAL.
 *     {enter_further_changes_here}
 
 *-
@@ -154,6 +159,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
    char *dot;
    char *pname;
    char defs[250];
+   char defval[250];
    char name[250];
    const char *value;
    size_t size;
@@ -163,6 +169,10 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 
 /* Begin an AST context */
    astBegin;
+
+/* Get the value to return if no value can be obtained for the named
+   parameter, of it it has a value of <undef>. */
+   parGet0c( "DEFVAL", defval, sizeof(defval), STATUS );
 
 /* Get any defaults file, annuling the error if null (!) is supplied. */
    if( *STATUS == SAI__OK ) {
@@ -204,7 +214,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 
 /* Loop round each section of the name that ends with a dot. */
    if( *STATUS == SAI__OK ) {
-      value = "<***>";
+      value = defval;
       pname = name;
 
       dot = strchr( pname, '.' );

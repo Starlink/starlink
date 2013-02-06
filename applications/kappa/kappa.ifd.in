@@ -9851,6 +9851,16 @@ package kappa {
             default !
          }
 
+         parameter defval {
+            position 5
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Default value}
+            helpkey *
+            default "<***>"
+         }
+
          parameter name {
             position 1
             type LITERAL

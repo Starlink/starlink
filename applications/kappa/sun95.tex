@@ -19868,12 +19868,18 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
    \sstdescription{
       This application displays the name and value of one or more
       configuration parameters, specified using Parameter CONFIG.
-      The value is also written to an output parameter.  The string
+      The value is also written to an output parameter.  If the
+      parameter is not specified by the CONFIG or DEFAULTS parameter,
+      then the value supplied for DEFVAL is returned.
+
+
+
+The string
       {\tt "$<$$*$$*$$*$$>$"} is displayed if the parameter is not specified by the
       CONFIG or DEFAULTS parameter.
    }
    \sstusage{
-      configecho name config [defaults] [select]
+      configecho name config [defaults] [select] [defval]
    }
    \sstparameters{
       \sstsubsection{
@@ -19911,6 +19917,12 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          defaults will be supplied for parameters that are not specified
          by CONFIG, and no tests will be performed on the validity of
          paramter names supplied by CONFIG.  {\tt [!]}
+      }
+      \sstsubsection{
+         DEFVAL = LITERAL (Read)
+      }{
+         The value to return if no value can be obtained for the named
+         parameter, or if the value is "<undef>".  {\tt [<***>]}
       }
       \sstsubsection{
          NAME = LITERAL (Read)
