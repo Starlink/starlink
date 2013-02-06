@@ -142,8 +142,9 @@
 *        indicates that iterations should continue until the normalized
 *        change in the map between iterations is less than the value of
 *        the "maptol" parameter in the configuration supplied by
-*        parameter CONFIG. If a value of zero is supplied for NITER, the
-*        value to use will be read from the "numiter" parameter in the
+*        parameter CONFIG (a maptol value of 0.05 is used if CONFIG does
+*        not specify maptol). If a value of zero is supplied for NITER,
+*        the value used will be read from the "numiter" parameter in the
 *        configuration. [0]
 *     MASK2 = NDF (Read)
 *        An existing NDF that can be used to specify a second external mask
@@ -333,7 +334,7 @@ try:
    if niter == 0:
       niter = int( invoke( "$KAPPA_DIR/configecho name=numiter config={0} "
                            "defaults=$SMURF_DIR/smurf_makemap.def "
-                           "select=\"\'450=0,850=0\'\"".format(config)))
+                           "select=\"\'450=0,850=0\'\" defval=5".format(config)))
 
 #  If iterating to convergence, get the maximum allowed normalised map
 #  change between iterations, and set the number of iterations positive.
@@ -341,7 +342,7 @@ try:
       niter = -niter
       maptol = float( invoke( "$KAPPA_DIR/configecho name=maptol config={0} "
                            "defaults=$SMURF_DIR/smurf_makemap.def "
-                           "select=\"\'450=0,850=0\'\"".format(config)))
+                           "select=\"\'450=0,850=0\'\" defval=0.05".format(config)))
    else:
       maptol = 0
 
