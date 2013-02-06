@@ -1,0 +1,491 @@
+/*
+*+
+*  Name:
+*     smf_diagnostics
+
+*  Purpose:
+*     Dump diagnostics to disk.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     Library routine
+
+*  Invocation:
+*     smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
+*		       int chunk, AstKeyMap *keymap, smfArray **allmodel,
+*                      smf_modeltype type, int *status )
+
+*  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
+*     where = int (Given)
+*        Indicates where in the algorithm this function is being called,
+*        which is used to determine what information to dump to disk.
+*        Current options are:
+*
+*        0: This function is being called immediately before estimating
+*        a new model and subtracting it from the residuals.
+*
+*        1: This function is being called immediately after estimating
+*        a new model and subtracting it from the residuals.
+*
+*     dat = smfDIMMData * (Given)
+*        Struct of pointers to information required by model calculation
+*     chunk = int (Given)
+*        Index of the contiguous chunk of time-series data being processed.
+*     keymap = AstKeyMap * (Given)
+*        Parameters that control the iterative map-maker. It should
+*        contain an entry with key "DIAG" that is a KeyMap with the
+*        following entries:
+*
+*        OUT - The full path/name for the HDS container file in which to
+*        store the diagnostic info. This will contain components for each
+*        requested model, with names like "COM", "FLT", etc. Each of these
+*        components will contain multiple NDFs with names in the following
+*        format: "<where>_<chunk>_<what>", where <what> is "power" or "time",
+*        <chunk> is the integer chunk index, and <where> is one of:
+*           - "before": the NDF contains the residuals as they were before
+*              the model was subtracted.
+*           - "model": the NDF contains the model values themselves.
+*           - "after": the NDF contains the residuals as they were after
+*              the model was subtracted.
+*        Each NDF will be 2-dimensional, with the first pixel axis
+*        representing time or frequency, and the second pixel axis
+*        representing iteration number.
+*
+*        APPEND - If non-zero, it indicates that diagnostic info should be
+*        appended to the container file specified by OUT, which should
+*        already exist. The non-zero value of APPEND indicates the
+*        one-based index of the row within each NDF at which to store the
+*        first row of diagnostic info created by the current run of makemap.
+*
+*        MODELS - Indicates the models that are to be written out. It
+*        should be a comma separated list of model names (e.g. COM, FLT,
+*        AST, RES, etc) contained within parentheses, or a single model
+*        name. A model name of RES here refers to the residuals after
+*        subtraction of all models in use (typically COM, FLT and AST).
+*        The residuals can also be written out at other times - see
+*        RES_BEFORE and RES_AFTER.
+*
+*        POWER - If non-zero, write out the power spectrum for each
+*        selected model.
+*
+*        TIME - If non-zero, write out the time-series for each selected
+*        model.
+*
+*        MINGOOD - The minimum fraction of good values in a time stream
+*        for which data should be dumped. An error is reported if the
+*        required minimum value is not met.
+*
+*        BOLO - Indicates the bolometer for which diagnostic information
+*        is required (the sub-array is indicated by ARRAY). It can be:
+*
+*           - A pair of integers, separated by a comma, contained in
+*           parentheses, giving the column and row of the bolometer. The
+*           first integer should be in the range 1 to 32, and the second
+*           should be in the range 1 to 40.
+*
+*           - A single integer in the range 1 to 1280.
+*
+*           - The string "MEAN" (case insensitive), in which case all
+*           unflagged data from all good bolometers is averaged to form
+*           the time-stream to dump.
+*
+*           - The string "WMEAN" (case insensitive), in which case all
+*           unflagged data from all good bolometers is averaged using
+*           weights derived from the bolometer noise estimates to form
+*           the time-stream to dump.
+*
+*           - The string "TYPICAL" (case insensitive), in which case a
+*           bolometer with typical noise charactersitics is chosen and
+*           used. The index of the chosen bolometer is reported, and
+*           stored in the dumped NDFs.
+*
+*        ARRAY - The name of the array (S8A, S*b, etc) containing the
+*        data to be written out. If not supplied, the first available
+*        array is used.
+*
+*        MASK - If non-zero, then the AST model will be masked using the
+*        current AST mask before being dumped. Otherwise, the AST model
+*        will not be masked before being dumped.
+*
+*        RES_BEFORE - If non-zero, then in addition to writing out the
+*        requested models, the residuals are also written out immediately
+*        before each requested model is subtracted.
+*
+*        RES_AFTER - If non-zero, then in addition to writing out the
+*        requested models, the residuals are also written out immediately
+*        after each requested model is subtracted.
+*
+*     allmodel = smfArray ** (Returned)
+*        Array of smfArrays holding the model. Only element zero is used.
+*        Should be NULL if the AST model is being dumped.
+*     type = smf_modeltype (Given)
+*        Indicates which model is to be dumped.
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     Dumps diagnostic information for a single (real or mean) bolometer.
+
+*  Authors:
+*     David Berry (JAC)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-JAN-2013 (DSB):
+*        Original version.
+
+*  Copyright:
+*     Copyright (C) 2013 Science and Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+*     MA 02110-1301, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
+/* Starlink includes */
+#include "mers.h"
+#include "sae_par.h"
+#include "star/thr.h"
+#include "sc2da/sc2ast.h"
+
+/* SMURF includes */
+#include "libsmf/smf.h"
+
+#define SUB_NAMELEN 8
+#define MODEL_NAMELEN 4
+
+void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
+                      int chunk, AstKeyMap *keymap, smfArray **allmodel,
+                      smf_modeltype type, int *status ){
+
+/* Local Variables: */
+   AstKeyMap *kmap;
+   AstObject *obj;
+   HDSLoc *cloc = NULL;
+   HDSLoc *dloc = NULL;
+   HDSLoc *mloc = NULL;
+   char modelnames[ SMF_MODEL_MAX*MODEL_NAMELEN ];
+   char root[ 20 ];
+   char subarray[ SUB_NAMELEN + 1 ];
+   const char *cval;
+   const char *modname;
+   const char *out;
+   double mingood;
+   int append;
+   int history;
+   int ibolo = -2;
+   int imodel;
+   int irow;
+   int isub;
+   int ivals[ 2 ];
+   int mask;
+   int new;
+   int nmodel;
+   int nsub;
+   int nval;
+   int power;
+   int repbolo;
+   int res_after;
+   int res_before;
+   int started;
+   int there;
+   int time;
+   smfArray *res;
+   smf_modeltype model;
+
+/* Check inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Start an AST context to record details of AST Objects created in
+   this function. */
+   astBegin;
+
+/* Get a pointer to the KeyMap holding parameters controlling the
+   diagnostics to be dumped. */
+   astMapGet0A( keymap, "DIAG", &obj );
+   kmap = (AstKeyMap *) obj;
+
+/* Get the name of the HDS container file in which to store the
+   diagnostics info. Skip to the end if none is specified. */
+   if( astMapGet0C( kmap, "OUT", &out ) ) {
+
+/* Get pointer to the smfArray containing the current residuals, and the
+   number of available subarrays. */
+      res = dat->res[0];
+      nsub = res->ndat;
+
+/* See if we should append data for the current run of makemap to NDFs
+   created by a previous run (e.g. when running the skyloop script). The
+   value of diag.append is the zero-based row number at which to store
+   the first row of diagnostic info created by the current run of
+   makemap. This defaults to zero. */
+      astMapGet0I( kmap, "APPEND", &append );
+      if( append < 0 && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRepf( "" , "The DIAG.APPEND configuration parameter has "
+                  "illegal value %d - it must not be negative.", status,
+                  append );
+      }
+
+/* We open and close the container file each time this function is
+   called, adding new data into any NDFs created by a previous call to
+   this function. But we need to know if any pre-existing container file
+   was created by this run of makemap or a previous run of makemap. So we
+   store an entry in the KeyMap to indicate if we have written any
+   diagnostics out yet in the current run of makemap. We need to unlock
+   the KeyMap before adding the new entry to it. We only do this if we
+   are NOT intentionally appending to a previously created set of NDFs. */
+      started = astMapHasKey( kmap, "STARTED" );
+      if( !append && !started ) {
+         astSetI( kmap, "MapLocked", 0 );
+         astMapPut0I( kmap, "STARTED", 1, NULL );
+         astSetI( kmap, "MapLocked", 1 );
+      }
+
+/* If we are appending to previously created NDFs, attempt to open the
+   pre-existing container file. */
+      new = 0;
+      if( append || started ) {
+         if( *status == SAI__OK ) {
+            hdsOpen( out, "UPDATE", &cloc, status );
+            if( *status != SAI__OK ) {
+               errRepf( "", "Failed to append new makemap diagnostic "
+                        "info to existing container file \"%s\".", status,
+                        out );
+            }
+         }
+
+/* Otherwise, create a new container file. */
+      } else if( *status == SAI__OK ) {
+         new = 1;
+         hdsNew( out, "DIAGNOSTICS", "DIAGNOSTICS", 0, NULL, &cloc,
+                 status );
+         if( *status != SAI__OK ) {
+            errRepf( "", "Failed to write new makemap diagnostic "
+                     "info to new container file \"%s\".", status,
+                     out );
+         }
+      }
+
+/* Get the zero-based row number within each NDF at which to store the
+   next line of diagnostic info. */
+      irow = dat->iter + append;
+
+/* Get the  other required items from the KeyMap. */
+      astMapGet1C( kmap, "MODELS", MODEL_NAMELEN, SMF_MODEL_MAX, &nmodel,
+                   modelnames );
+      astMapGet0I( kmap, "POWER", &power );
+      astMapGet0I( kmap, "TIME", &time );
+      astMapGet0I( kmap, "RES_BEFORE", &res_before );
+      astMapGet0I( kmap, "RES_AFTER", &res_after );
+      astMapGet0I( kmap, "MASK", &mask );
+      astMapGet0D( kmap, "MINGOOD", &mingood );
+
+      if( *status == SAI__OK ) {
+         astMapGet1I( kmap, "BOLO", 2, &nval, ivals );
+         if( *status == SAI__OK ) {
+            if( nval == 2 ) {
+               if( ivals[ 0 ] < 1 || ivals[ 0 ] > 32 ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "Illegal value %d for column number in "
+                           "config parameter DIAG.BOLO - must be in "
+                           "the range 1 to 32.", status, ivals[ 0 ] );
+               } else if( ivals[ 1 ] < 1 || ivals[ 1 ] > 40 ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "Illegal value %d for row number in "
+                           "config parameter DIAG.BOLO - must be in "
+                           "the range 1 to 40.", status, ivals[ 1 ] );
+               } else {
+                  ibolo = ( ivals[ 1 ] - 1 )*32 + ivals[ 0 ] - 1;
+               }
+            } else {
+               if( ivals[ 0 ] < 1 || ivals[ 0 ] > 1280 ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "Illegal value %d for bolometer index in "
+                           "config parameter DIAG.BOLO - must be in "
+                           "the range 1 to 1280.", status, ivals[ 0 ] );
+               } else {
+                  ibolo = ivals[ 0 ] - 1;
+               }
+            }
+
+/* If the supplied strings could not be converted to integers, annul the error
+   and interpret them as simple strings. */
+         } else if( nval == 1 && *status == AST__MPGER ){
+            errAnnul( status );
+
+/* Only one string allowed. */
+            if( astMapLength( kmap, "BOLO" ) == 1 ) {
+
+/* Get the string, and compare to the allowed values. */
+               astMapGet0C( kmap, "BOLO", &cval );
+               if( astChrMatch( "MEAN", cval ) ) {
+                  ibolo = -1;
+               } else if( astChrMatch( "WMEAN", cval ) ) {
+                  ibolo = -2;
+               } else if( astChrMatch( "TYPICAL", cval ) ) {
+                  ibolo = -3;
+               } else if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "Illegal value %s supplied for config "
+                           "parameter DIAG.BOLO.", status, cval );
+               }
+            } else if( *status == SAI__OK ) {
+               *status = SAI__ERROR;
+               errRepf( "", "Illegal value supplied for config "
+                        "parameter DIAG.BOLO.", status );
+            }
+         }
+      }
+
+/* Get the index of the required sub-array within the supplied smfArrays. */
+      if( astMapGet0C( kmap, "ARRAY", &cval ) ){
+         for( isub = 0; isub < nsub; isub++ ) {
+            smf_find_subarray( res->sdata[isub]->hdr, subarray,
+                               sizeof(subarray), NULL, status );
+            if( astChrMatch( subarray, cval ) ) break;
+         }
+
+         if( isub == nsub && *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRepf( "", "Bad value \"%s\" supplied for config parameter "
+                     "DIAG.ARRAY - no data found for array %s.", status,
+                     cval, cval );
+         }
+
+      } else {
+         isub = 0;
+         smf_find_subarray( res->sdata[isub]->hdr, subarray,
+                            sizeof(subarray), NULL, status );
+      }
+
+/* No need for history in the NDFs so switch it off. */
+      ndfGtune( "AUTO_HISTORY", &history, status );
+      ndfTune( 0, "AUTO_HISTORY", status );
+
+/* We report the used bolometer if the initial bolometer setting
+   indicates that a typical bolometer is to be chosen and used
+   automatically. */
+      repbolo = ( ibolo == -3 );
+
+/* See if the current model (indicated by argument "type") is one of the
+   ones that are to be written out. */
+      for( imodel = 0; imodel < nmodel && *status == SAI__OK; imodel++ ) {
+         model = smf_model_gettype( modelnames + imodel*MODEL_NAMELEN, status );
+         if( *status == SAI__OK && type == model ) {
+
+/* Ensure we have a component for this model within the container file. */
+            modname = smf_model_getname( type, status );
+            datThere( cloc, modname, &there, status );
+            if( !there ) datNew( cloc, modname, "DIAGNOSTICS", 0, NULL,
+                                 status );
+            datFind( cloc, modname, &mloc, status );
+
+/* If this function has been called immediately before estimating the new
+   model, then dump the residuals if requested. */
+            if( where == 0 ) {
+               if( res_before && type != SMF__RES ) {
+                  msgOutf( "", "Diagnostics: Dumping residuals before subtraction of %s",
+                           status, modname );
+                  sprintf( root, "before_%d", chunk );
+                  smf_diag( wf, mloc, &ibolo, irow, power, time, isub, dat,
+                            type, NULL, 1, root, 0, mingood, status );
+               }
+
+/* If this function has been called immediately after estimating the new
+   model, then dump the model and also dump the residuals if requested. */
+            } else if( where == 1 ) {
+               msgOutf( "", "Diagnostics: Dumping %s model", status, modname );
+               sprintf( root, "model_%d", chunk );
+               smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
+                         dat, type, allmodel ? allmodel[ 0 ] : NULL,
+                         0, root, mask, mingood, status );
+               if( res_after && type != SMF__RES ) {
+                  msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
+                           status, modname );
+                  sprintf( root, "after_%d", chunk );
+                  smf_diag( wf, mloc, &ibolo, irow, power, time, isub, dat,
+                            type, NULL, 1, root, 0, mingood, status );
+               }
+
+/* Any other "where" value is currently an error. */
+            } else if( *status == SAI__OK ){
+               *status = SAI__ERROR;
+               errRepf( "", "smf_diagnostics: Illegal value %d for "
+                        "argument \"where\".", status, where );
+            }
+
+/* Annul ther locator for the model info in the container file. */
+            datAnnul( &mloc, status );
+
+/* Report the chosen typical bolometer if required, and store it in the
+   KeyMap in place of the original BOLO value, in order to ensure that he
+   same bolometer is chosen in future. */
+            if( repbolo ) {
+               astMapPut0I( kmap, "BOLO", ibolo, NULL );
+               msgOutf( "", "Diagnostics: using \"typical\" bolometer %d.",
+                        status, ibolo );
+               repbolo = 0;
+            }
+
+         }
+      }
+
+/* Add extra information to the top level of the container file, if it
+   has just been created. */
+      if( new ) {
+         if( ibolo < 0 ) {
+            cval = ( ibolo == -1 ) ? "MEAN" : "WMEAN";
+            datNew0C( cloc, "BOLO", strlen(cval), status );
+            datFind( cloc, "BOLO", &dloc, status );
+            datPut0C( dloc, cval, status );
+         } else {
+            datNew0I( cloc, "BOLO", status );
+            datFind( cloc, "BOLO", &dloc, status );
+            datPut0I( dloc, ibolo, status );
+         }
+         datAnnul( &dloc, status );
+
+         datNew0C( cloc, "ARRAY", strlen(subarray), status );
+         datFind( cloc, "ARRAY", &dloc, status );
+         datPut0C( dloc, subarray, status );
+         datAnnul( &dloc, status );
+
+         datNew0I( cloc, "MASK", status );
+         datFind( cloc, "MASK", &dloc, status );
+         datPut0I( dloc, mask, status );
+         datAnnul( &dloc, status );
+      }
+
+/* Re-instate the original NDF history tuning parameter. */
+      ndfTune( history, "AUTO_HISTORY", status );
+
+/* Close the container file. */
+      datAnnul( &cloc, status );
+   }
+
+/* End the AST context, thus deleting any AST objects created in this
+   function. */
+   astEnd;
+}

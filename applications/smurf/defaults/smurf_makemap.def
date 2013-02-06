@@ -240,3 +240,101 @@ tmp.source = <undef>
 tmp.dosin = 0
 tmp.docos = 0
 tmp.trigoffset = 0
+
+
+
+# DIAGNOSTICS: ------------------------------------------------------
+
+# diag.out - The full path/name for the HDS container file in which to
+# store the diagnostic info. This will contain components for each
+# requested model, with names like "COM", "FLT", etc. Each of these
+# components will contain multiple NDFs with names in the following
+# format: "<where>_<chunk>_<what>", where <what> is "power" or "time",
+# <chunk> is the integer chunk index, and <where> is one of:
+#
+# - "before": the NDF contains the residuals as they were before
+#   the model was subtracted.
+# - "model": the NDF contains the model values themselves.
+# - "after": the NDF contains the residuals as they were after
+#   the model was subtracted.
+#
+# Each NDF will be 2-dimensional, with the first pixel axis
+# representing time or frequency, and the second pixel axis
+# representing iteration number.
+diag.out = <undef>
+
+# diag.append - If non-zero, it indicates that diagnostic info should be
+# appended to the container file specified by diag.out, which should
+# already exist. The non-zero value of diag.append indicates the
+# one-based index of the row within each NDF at which to store the
+# first row of diagnostic info created by the current run of makemap.
+diag.append = 0
+
+# diag.models - Indicates the models that are to be written out. It
+# should be a comma separated list of model names (e.g. COM, FLT,
+# AST, RES, etc) contained within parentheses, or a single model
+# name. A model name of RES here refers to the residuals after
+# subtraction of all models in use (typically COM, FLT and AST).
+# The residuals can also be written out at other times - see
+# diag.res_before and diag.res_after.
+diag.models = (com,flt,ast,res)
+
+# diag.power - If non-zero, write out the power spectrum for each
+# selected model.
+diag.power = 0
+
+# diag.time - If non-zero, write out the time-series for each
+# selected model.
+diag.time = 1
+
+# diag.bolo - Indicates the bolometer for which diagnostic information
+# is required (the sub-array is indicated by ARRAY). It can be:
+#
+#    - A pair of integers, separated by a comma, contained in
+#    parentheses, giving the column and row of the bolometer. The
+#    first integer should be in the range 1 to 32, and the second
+#    should be in the range 1 to 40.
+#
+#    - A single integer in the range 1 to 1280.
+#
+#    - The string "MEAN" (case insensitive), in which case all
+#    unflagged data from all good bolometers is averaged to form
+#    the time-stream to dump.
+#
+#    - The string "WMEAN" (case insensitive), in which case all
+#    unflagged data from all good bolometers is averaged using
+#    weights derived from the bolometer noise estimates to form
+#    the time-stream to dump.
+#
+#    - The string "TYPICAL" (case insensitive), in which case a
+#    bolometer with typical noise charactersitics is chosen and
+#    used. The index of the chosen bolometer is reported, and
+#    stored in the dumped NDFs.
+diag.bolo = WMEAN
+
+# diag.array - The name of the array (S8A, S*b, etc) containing the
+# data to be written out. If not supplied, the first available
+# array is used.
+diag.array = <undef>
+
+# diag.res_before - If non-zero, then in addition to writing out the
+# requested models, the residuals are also written out immediately
+# before each requested model is subtracted.
+diag.res_before = 0
+
+# diag.res_after - If non-zero, then in addition to writing out the
+# requested models, the residuals are also written out immediately
+# after each requested model is subtracted.
+diag.res_after = 0
+
+# diag.mask - If non-zero, then the AST model will be masked using the
+# current AST mask before being dumped. Otherwise, the AST model
+# will not be masked before being dumped.
+diag.mask = 0
+
+# diag.mingood - The minimum fraction of good values in a time stream
+# for which data should be dumped. An error is reported if the
+# required minimum value is not met.
+diag.mingood = 0.2
+
+

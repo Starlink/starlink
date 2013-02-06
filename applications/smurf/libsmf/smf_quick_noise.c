@@ -232,7 +232,8 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
   /* If minsig is still zero, couldn't calculate an estimate */
   if( !minsig ) {
     *status = SMF__INSMP;
-    errRep( FUNC_NAME, "Insufficient good samples for statistics", status );
+    errRepf( FUNC_NAME, "Insufficient good samples to calculate noise in "
+             "bolometer %d.", status, (int) bolo );
   }
 
   return minsig;

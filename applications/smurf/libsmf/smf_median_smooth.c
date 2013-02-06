@@ -173,6 +173,12 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
               "(internal SMURF programming error).", status );
    }
 
+/* Check the box size. */
+   if ( box == 0 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( " ", "smf_median_smooth: Box is zero.", status );
+   }
+
 /* Store the minimum number of valid input values that must be present in
    a filter box to create a valid output value. */
    if( wlim >= 0 && wlim <= 1.0 ) {

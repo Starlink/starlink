@@ -540,6 +540,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int noexportsetbad=0;         /* Don't set bad values in exported models */
   int haveast=0;                /* Set if AST is one of the models */
   int haveext=0;                /* Set if EXT is one of the models */
+  int havecom=0;                /* Set if COM is one of the models */
   int haveflt=0;                /* Set if FLT is one of the models */
   int havegai=0;                /* Set if GAI is one of the models */
   int havenoi=0;                /* Set if NOI is one of the models */
@@ -628,6 +629,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t whichast=0;             /* Model index of AST (must be specified) */
   dim_t whichext=0;             /* Model index of EXT if present */
   dim_t whichflt=0;             /* Model index of FLT if present */
+  dim_t whichcom=0;             /* Model index of COM if present */
   dim_t whichgai=0;             /* Model index of GAI if present */
   dim_t whichnoi=0;             /* Model index of NOI if present */
   int *whichthetabin=NULL;      /* Which scan angle bin each time slice */
@@ -931,6 +933,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           if( thismodel == SMF__GAI ) {
             havegai = 1;
             whichgai = imodel;
+          }
+
+          /* set havecom/whichcom */
+          if( thismodel == SMF__COM ) {
+            havecom = 1;
+            whichcom = imodel;
           }
         }
       }
@@ -1697,6 +1705,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       } else {
         dat.gai = NULL;
       }
+      if( havecom ) {
+        dat.com = model[whichcom];
+      } else {
+        dat.com = NULL;
+      }
 
       /* We can close noisemaps here because they will already have
          been used to initialize the NOI model if needed. */
@@ -1906,7 +1919,19 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             if( quit == 0 ) dimmflags |= SMF__DIMM_LASTITER;
 
             if( *status == SAI__OK ) {
+
+              /* Before subtraction of the model, dump the original
+                 residuals. */
+              smf_diagnostics( wf, 0, &dat, contchunk, keymap, model[j],
+                               modeltyps[j], status );
+
+              /* Estimate the new model and subtract it from the residuals. */
               (*modelptr)( wf, &dat, 0, keymap, model[j], dimmflags, status );
+
+              /* After subtraction of the model, dump the model itself
+                 and the modified residuals. */
+              smf_diagnostics( wf, 1, &dat, contchunk, keymap, model[j],
+                               modeltyps[j], status );
             }
 
             /*** TIMER ***/
@@ -2078,7 +2103,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            change in chisquared and we compare the current map with
            that of the previous iteration as a convergence tests.
         ********************************************************************* */
-
         if( *status == SAI__OK ) {
           msgOut(" ", FUNC_NAME ": Calculate ast", status);
 
@@ -2089,14 +2113,33 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              each filegroup in the main model component loop */
 
           dimmflags=0;
-          if( iter==0 ) dimmflags |= SMF__DIMM_FIRSTITER;
+          if( iter == 0 ) dimmflags |= SMF__DIMM_FIRSTITER;
           if( quit == 0 ) dimmflags |= SMF__DIMM_LASTITER;
+
+
+          /* Before subtraction of the model, dump the original
+             residuals. */
+          smf_diagnostics( wf, 0, &dat, contchunk, keymap, NULL,
+                           SMF__AST, status );
+
+          /* Estimate the AST model and subtract from the residuals. */
           smf_calcmodel_ast( wf, &dat, 0, keymap, NULL, dimmflags, status );
 
           /*** TIMER ***/
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                      ": ** %f s calculating AST",
                      status, smf_timerupdate(&tv1,&tv2,status) );
+
+          /* After subtraction of the model, dump the model itself
+             and the modified residuals. */
+          smf_diagnostics( wf, 1, &dat, contchunk, keymap, NULL,
+                           SMF__AST, status );
+
+
+          /* And dump RES as a model in its own right. */
+          smf_diagnostics( wf, 1, &dat, contchunk, keymap, NULL,
+                           SMF__RES, status );
+
 
 #ifdef __ITERATEMAP_SHOW_MEM
             _smf_iteratemap_showmem(status);

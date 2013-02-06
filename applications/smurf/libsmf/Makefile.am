@@ -120,6 +120,8 @@ smf_deepcopy_smfHead.c \
 smf_deepcopy_smfFts.c \
 smf_detmask.c \
 smf_detpos_wcs.c \
+smf_diag.c \
+smf_diagnostics.c \
 smf_difftime.c \
 smf_display_projpars.c \
 smf_downsamp_smfData.c \
