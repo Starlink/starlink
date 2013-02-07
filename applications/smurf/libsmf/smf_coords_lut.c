@@ -329,8 +329,10 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* If the target is moving, find the offsets within the output map sky
    coordinate system, from base to boresight at the current time slice.
-   These offsets become the new "boresight" position (in xin/yin). */
-         if( moving ) {
+   These offsets become the new "boresight" position (in xin/yin). Guard
+   against assigning bad values to the ref pos, which can cause AST to
+   report errors. */
+         if( moving && xout[ 1 ] != AST__BAD && yout[ 1 ] != AST__BAD ) {
 
 /* Set the current telescope base position as the reference point in
    "offsky". Then get the Mapping from absolute to offset sky coords. */
