@@ -181,7 +181,6 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    int nc;
    int ndim;
    int nw;
-   int ok;
    int place;
    int timestep;
    int bolostep;
@@ -445,7 +444,6 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* If we are dumping the power spectrum, replace the time series with the
    power spectrum within "buffer". Temporarily hijack the COM model for
    this (we choose COM since it has only one bolometer). */
-      ok = 1;
       if( i == 1 ) {
          if( dat->com ) {
             data_tmp = dat->com[ 0 ]->sdata[ isub ];
@@ -486,34 +484,41 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                   ngood += pdata->ngood;
                }
 
+/* If too few good values, just take the FFT of a load of zerso. */
                if( ngood < mingood*ntslice ) {
-                  msgOut( "", "Diagnostics: Cannot dump diagnostic data - "
-                          "too few good samples to form power spectrum.",
-                          status );
-                  ok = 0;
-               } else {
+                  for( itime = 0; itime < ntslice; itime++ ){
+                     buffer[ itime ] = 0.0;
+                  }
+               }
 
-/* Do the fft */
-                  pow = smf_fft_data( wf, data_tmp, NULL, 0, SMF__BADSZT,
-                                      status );
-                  smf_convert_bad( wf, pow, status );
+/* Now do the fft */
+               pow = smf_fft_data( wf, data_tmp, NULL, 0, SMF__BADSZT,
+                                   status );
+               smf_convert_bad( wf, pow, status );
 
 /* Convert to power */
-                  smf_fft_cart2pol( wf, pow, 0, 1, status );
-                  smf_isfft( pow, NULL, NULL, fdims, NULL, NULL, status );
+               smf_fft_cart2pol( wf, pow, 0, 1, status );
+               smf_isfft( pow, NULL, NULL, fdims, NULL, NULL, status );
 
 /* Get the WCS and copy the power spectrum to the buffer. */
-                  ndata = fdims[ 0 ];
-                  if( *status == SAI__OK ) {
-                     if( pow->hdr->tswcs ) {
-                        wcs = astClone( pow->hdr->tswcs );
-                     } else if( pow->hdr->wcs ) {
-                        wcs = astClone( pow->hdr->wcs );
-                     }
-                     memcpy( buffer, pow->pntr[ 0 ], ndata*sizeof( buffer ) );
+               ndata = fdims[ 0 ];
+               if( *status == SAI__OK ) {
+                  if( pow->hdr->tswcs ) {
+                     wcs = astClone( pow->hdr->tswcs );
+                  } else if( pow->hdr->wcs ) {
+                     wcs = astClone( pow->hdr->wcs );
                   }
+                  memcpy( buffer, pow->pntr[ 0 ], ndata*sizeof( buffer ) );
+               }
 
-                  smf_close_file( &pow, status );
+               smf_close_file( &pow, status );
+
+/* If too few good values, store a set of bad values in place of the
+   power spectrum. */
+               if( ngood < mingood*ntslice ) {
+                  for( itime = 0; itime < ndata; itime++ ){
+                     buffer[ itime ] = VAL__BADD;
+                  }
                }
 
                data_tmp->pntr[ 0 ] = oldcom;
@@ -530,9 +535,6 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
       } else {
          ndata = ntslice;
       }
-
-/* Continue on to the next pass if we cannot dump the current array. */
-      if( !ok ) continue;
 
 /* Form the name of the NDF to receive the data. */
       name = NULL;
