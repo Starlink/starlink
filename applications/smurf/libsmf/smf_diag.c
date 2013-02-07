@@ -720,6 +720,8 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
             } else {
                *po = VAL__BADD;
             }
+         } else {
+            *po = VAL__BADD;
          }
       }
 
