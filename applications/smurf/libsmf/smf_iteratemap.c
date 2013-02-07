@@ -2258,9 +2258,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           msgOutf( "", FUNC_NAME ": *** NORMALIZED MAP CHANGE: %lg (mean) "
                    "%lg (max)", status, mapchange_mean, mapchange_max );
 
-          /* Check for the map change stopping criterion */
+          /* Check for the map change stopping criterion. Do not modify
+             the converged flag on the extra iteration that is done after
+             convergence has been reached (i.e. when quit=0).  */
           if( untilconverge && (maptol!=VAL__BADD) &&
-              (mapchange_mean > maptol) ) {
+              (mapchange_mean > maptol) && quit == -1 ) {
             /* Map hasn't converged yet */
             converged=0;
           }
