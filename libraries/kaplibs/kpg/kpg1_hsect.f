@@ -181,6 +181,11 @@
      :                    LBND, UBND, %VAL( CNF_PVAL( IPOUT ) ), EL,
      :                    STATUS )
 
+      ELSE IF( TYPE .EQ. '_WORD' ) THEN
+         CALL KPG1_CPNDW( NDIM, LBNDI, UBNDI, %VAL( CNF_PVAL( IPIN ) ),
+     :                    LBND, UBND, %VAL( CNF_PVAL( IPOUT ) ), EL,
+     :                    STATUS )
+
       ELSE IF( TYPE .EQ. '_UWORD' ) THEN
          CALL KPG1_CPNDUW( NDIM, LBNDI, UBNDI, %VAL( CNF_PVAL( IPIN ) ),
      :                    LBND, UBND, %VAL( CNF_PVAL( IPOUT ) ), EL,
