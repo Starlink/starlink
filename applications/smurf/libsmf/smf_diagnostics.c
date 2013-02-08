@@ -306,27 +306,27 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
          astMapGet1I( kmap, "BOLO", 2, &nval, ivals );
          if( *status == SAI__OK ) {
             if( nval == 2 ) {
-               if( ivals[ 0 ] < 1 || ivals[ 0 ] > 32 ) {
+               if( ivals[ 0 ] < 0 || ivals[ 0 ] >= 32 ) {
                   *status = SAI__ERROR;
                   errRepf( "", "Illegal value %d for column number in "
                            "config parameter DIAG.BOLO - must be in "
-                           "the range 1 to 32.", status, ivals[ 0 ] );
-               } else if( ivals[ 1 ] < 1 || ivals[ 1 ] > 40 ) {
+                           "the range 0 to 31.", status, ivals[ 0 ] );
+               } else if( ivals[ 1 ] < 0 || ivals[ 1 ] >= 40 ) {
                   *status = SAI__ERROR;
                   errRepf( "", "Illegal value %d for row number in "
                            "config parameter DIAG.BOLO - must be in "
-                           "the range 1 to 40.", status, ivals[ 1 ] );
+                           "the range 0 to 39.", status, ivals[ 1 ] );
                } else {
-                  ibolo = ( ivals[ 1 ] - 1 )*32 + ivals[ 0 ] - 1;
+                  ibolo = ivals[ 1 ]*32 + ivals[ 0 ];
                }
             } else {
-               if( ivals[ 0 ] < 1 || ivals[ 0 ] > 1280 ) {
+               if( ivals[ 0 ] < 0 || ivals[ 0 ] >= 1280 ) {
                   *status = SAI__ERROR;
                   errRepf( "", "Illegal value %d for bolometer index in "
                            "config parameter DIAG.BOLO - must be in "
-                           "the range 1 to 1280.", status, ivals[ 0 ] );
+                           "the range 0 to 1279.", status, ivals[ 0 ] );
                } else {
-                  ibolo = ivals[ 0 ] - 1;
+                  ibolo = ivals[ 0 ];
                }
             }
 
@@ -440,7 +440,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
             datAnnul( &mloc, status );
 
 /* Report the chosen typical bolometer if required, and store it in the
-   KeyMap in place of the original BOLO value, in order to ensure that he
+   KeyMap in place of the original BOLO value, in order to ensure that the
    same bolometer is chosen in future. */
             if( repbolo ) {
                astMapPut0I( kmap, "BOLO", ibolo, NULL );

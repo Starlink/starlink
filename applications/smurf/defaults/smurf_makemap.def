@@ -292,10 +292,10 @@ diag.time = 1
 #
 #    - A pair of integers, separated by a comma, contained in
 #    parentheses, giving the column and row of the bolometer. The
-#    first integer should be in the range 1 to 32, and the second
-#    should be in the range 1 to 40.
+#    first integer should be in the range 0 to 31, and the second
+#    should be in the range 0 to 39.
 #
-#    - A single integer in the range 1 to 1280.
+#    - A single integer in the range 0 to 1279.
 #
 #    - The string "MEAN" (case insensitive), in which case all
 #    unflagged data from all good bolometers is averaged to form

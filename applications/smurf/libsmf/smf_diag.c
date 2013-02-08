@@ -130,7 +130,6 @@ typedef struct smfDiagData {
    double *var;
    int *lut;
    int mask;
-   dim_t ngood;
    int oper;
    size_t bstride;
    size_t tstride;
@@ -158,9 +157,11 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    dim_t dsize;
    dim_t fdims[2];
    dim_t itime;
+   dim_t jbolo;
    dim_t nbolo;
-   dim_t ngood;
+   dim_t nbolor;
    dim_t ndata;
+   dim_t ngood;
    dim_t ntslice;
    double *buffer;
    double *ip;
@@ -168,12 +169,12 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    double *oldres = NULL;
    double *pd;
    double *var;
+   int *index;
+   int bolostep;
    int el;
    int fax;
    int i;
    int iax;
-   int *index;
-   int sorted;
    int indf;
    int iw;
    int lbnd[ 2 ];
@@ -182,19 +183,24 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    int ndim;
    int nw;
    int place;
+   int sorted;
    int timestep;
-   int bolostep;
    int ubnd[ 2 ];
    int usebolo;
    size_t bstride;
    size_t tstride;
+   size_t bstrider;
+   size_t tstrider;
    smfArray *array;
    smfData *data = NULL;
    smfData *data_tmp;
    smfData *pow;
    smf_qual_t *oldcomq;
-   smf_qual_t *qual;
+   smf_qual_t *pqr;
    smf_qual_t *pq;
+   smf_qual_t *qual;
+   smf_qual_t qval;
+   smfData *sidequal;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -221,8 +227,8 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    }
 
 /* Get a pointer to the smfData containing the data to be dumped. Deal
-   with cases where we are dumping the AST model first. We need to
-   generate it first from the current map. */
+   with cases where we are dumping the AST model first (we need to
+   generate AST from the current map since it is not stored explicitly). */
    if( ! array ) {
 
 /* Ensure we use the RES model ordering */
@@ -374,7 +380,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
       if( usebolo == -3 ) {
          index = smf_sortD( nbolo, var, &sorted, status );
          if( *status == SAI__OK ) {
-            dim_t jbolo, maxgood, itest;
+            dim_t maxgood, itest;
             maxgood = 0;
             for( itest = 0.4*nbolo; itest <= 0.6*nbolo; itest++ ) {
                jbolo = index[ itest ];
@@ -466,22 +472,39 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                data_tmp->pntr[ 0 ] = buffer;
 
 /* Create a temporary quality array that flags the VAL__BADD values in
-   buffer. */
+   buffer. We base it on a copy of the quality array for a used bolometer
+   in the residuals, so that the new quality array inherits padding and apodisation flags. */
                oldcomq = data_tmp->qual;
+               sidequal = data_tmp->sidequal;
                data_tmp->qual = astMalloc( ntslice*sizeof( *data_tmp->qual ));
-               for( iw = 0; iw < nw; iw++ ) {
-                  pdata = job_data + iw;
-                  pdata->oper = 1;
-                  pdata->in = buffer;
-                  pdata->qua = data_tmp->qual;
-                  thrAddJob( wf, 0, pdata, smf1_diag, 0, NULL, status );
-               }
-               thrWait( wf, status );
+               data_tmp->sidequal = NULL;
 
+/* Examine the residuals quality array to find a bolometer that has not
+   been completey rejected. Then copy the bolometer's quality values into
+   the temporary array created above, retaining PAD and APOD flags but
+   removing all others. Set SPIKE quality (a convenient bad value) for any
+   values that are bad in the time series being dumped (the "buffer" array). */
+               smf_get_dims( dat->res[ 0 ]->sdata[isub], NULL, NULL,
+                             &nbolor, NULL, NULL, &bstrider, &tstrider, status );
+               pqr = smf_select_qualpntr( dat->res[ 0 ]->sdata[isub], NULL, status );
+               pq = data_tmp->qual;
                ngood = 0;
-               for( iw = 0; iw < nw; iw++ ) {
-                  pdata = job_data + iw;
-                  ngood += pdata->ngood;
+               for( jbolo = 0; jbolo < nbolor; jbolo++ ) {
+                  if( !( *pqr & SMF__Q_BADB ) ) {
+                     for( itime = 0; itime < ntslice; itime++ ) {
+                        qval = *pqr & ( SMF__Q_APOD | SMF__Q_PAD );
+                        if( buffer[ itime ] == VAL__BADD ) {
+                           if( !(qval & SMF__Q_PAD) ) qval = SMF__Q_SPIKE;
+                           buffer[ itime ] = 0.0; /* Bad values cause grief in smf_fft_data */
+                        } else {
+                           ngood++;
+                        }
+                        *(pq++) = qval;
+                        pqr += tstrider;
+                     }
+                     break;
+                  }
+                  pqr += bstrider;
                }
 
 /* If too few good values, just take the FFT of a load of zerso. */
@@ -524,6 +547,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                data_tmp->pntr[ 0 ] = oldcom;
                (void) astFree( data_tmp->qual );
                data_tmp->qual = oldcomq;
+               data_tmp->sidequal = sidequal;
             }
 
          } else if( *status == SAI__OK ) {
@@ -632,8 +656,12 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* Return the used bolometer, if required. */
    if( *ibolo == -3 ) *ibolo = usebolo;
 
-/* Re-instate the original RES values if required. */
-   if( oldres ) dat->res[0]->sdata[isub]->pntr[0] = oldres;
+/* Free the array holding the AST model and re-instate the original RES
+   values if required. */
+   if( oldres ) {
+      (void) astFree( dat->res[0]->sdata[isub]->pntr[0] );
+      dat->res[0]->sdata[isub]->pntr[0] = oldres;
+   }
 
 /* Free remaining resources. */
    buffer = astFree( buffer );
@@ -710,9 +738,9 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
 
 /* Sample the map to form the AST signal. */
    if( oper == 0 ) {
-      po = pdata->out +  pdata->t1;
-      pq = pdata->qua +  pdata->t1;
-      pl = pdata->lut +  pdata->t1;
+      po = pdata->out +  pdata->s1;
+      pq = pdata->qua +  pdata->s1;
+      pl = pdata->lut +  pdata->s1;
       for( idata = pdata->s1; idata <= pdata->s2; idata++,pq++,pl++,po++ ) {
          if( !( *pq & SMF__Q_MOD ) && *pl != VAL__BADI ) {
             double ast_data = pdata->map[ *pl ];
@@ -725,16 +753,6 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
          } else {
             *po = VAL__BADD;
          }
-      }
-
-/* Flag bad samples using the quality array. SMF__Q_SPIKE is used as the
-   flag since it is always gap-filled. */
-   } else if( oper == 1 ) {
-      pd = in + t1;
-      pq = qua + t1;
-      pdata->ngood = 0;
-      for( itime = t1; itime <= t2; itime++ ) {
-         *(pq++) = ( *(pd++) != VAL__BADD ) ? (pdata->ngood++,0) : SMF__Q_SPIKE;
       }
 
 /* Get the variances of a range of bolometers. */
