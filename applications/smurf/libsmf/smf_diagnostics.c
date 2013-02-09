@@ -56,10 +56,9 @@
 *        representing iteration number.
 *
 *        APPEND - If non-zero, it indicates that diagnostic info should be
-*        appended to the container file specified by OUT, which should
-*        already exist. The non-zero value of APPEND indicates the
-*        one-based index of the row within each NDF at which to store the
-*        first row of diagnostic info created by the current run of makemap.
+*        appended to the container file specified by diag.out, which should
+*        already exist. If zero, then  any existing container file is first
+*        deleted before storing new diagnostics information in it.
 *
 *        MODELS - Indicates the models that are to be written out. It
 *        should be a comma separated list of model names (e.g. COM, FLT,
@@ -208,7 +207,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    int repbolo;
    int res_after;
    int res_before;
-   int started;
+   int rowoffset;
    int there;
    int time;
    smfArray *res;
@@ -236,37 +235,13 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
       nsub = res->ndat;
 
 /* See if we should append data for the current run of makemap to NDFs
-   created by a previous run (e.g. when running the skyloop script). The
-   value of diag.append is the zero-based row number at which to store
-   the first row of diagnostic info created by the current run of
-   makemap. This defaults to zero. */
+   created by a previous run (e.g. when running the skyloop script). */
       astMapGet0I( kmap, "APPEND", &append );
-      if( append < 0 && *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         errRepf( "" , "The DIAG.APPEND configuration parameter has "
-                  "illegal value %d - it must not be negative.", status,
-                  append );
-      }
-
-/* We open and close the container file each time this function is
-   called, adding new data into any NDFs created by a previous call to
-   this function. But we need to know if any pre-existing container file
-   was created by this run of makemap or a previous run of makemap. So we
-   store an entry in the KeyMap to indicate if we have written any
-   diagnostics out yet in the current run of makemap. We need to unlock
-   the KeyMap before adding the new entry to it. We only do this if we
-   are NOT intentionally appending to a previously created set of NDFs. */
-      started = astMapHasKey( kmap, "STARTED" );
-      if( !append && !started ) {
-         astSetI( kmap, "MapLocked", 0 );
-         astMapPut0I( kmap, "STARTED", 1, NULL );
-         astSetI( kmap, "MapLocked", 1 );
-      }
 
 /* If we are appending to previously created NDFs, attempt to open the
    pre-existing container file. */
       new = 0;
-      if( append || started ) {
+      if( append ) {
          if( *status == SAI__OK ) {
             hdsOpen( out, "UPDATE", &cloc, status );
             if( *status != SAI__OK ) {
@@ -274,10 +249,31 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                         "info to existing container file \"%s\".", status,
                         out );
             }
+
+/* Get the starting row number from the KeyMap. If it is not in the
+   KeyMap, get it form the HDS file and copy it into the KeyMap. */
+            if( astMapHasKey( kmap, "ROWOFFSET" ) ) {
+               astMapGet0I( kmap, "ROWOFFSET", &rowoffset );
+            } else {
+               datFind( cloc, "NROW", &dloc, status );
+               datGet0I( dloc, &rowoffset, status );
+               datAnnul( &dloc, status );
+               astSetI( kmap, "MapLocked", 0 );
+               astMapPut0I( kmap, "ROWOFFSET", rowoffset, NULL );
+               astSetI( kmap, "MapLocked", 1 );
+            }
          }
 
-/* Otherwise, create a new container file. */
+/* Otherwise, create a new container file, and use zero as the row
+   offset. ALso indicate that subsequent iteration should append. */
       } else if( *status == SAI__OK ) {
+
+         rowoffset = 0;
+         astSetI( kmap, "MapLocked", 0 );
+         astMapPut0I( kmap, "ROWOFFSET", rowoffset, NULL );
+         astMapPut0I( kmap, "APPEND", 1, NULL );
+         astSetI( kmap, "MapLocked", 1 );
+
          new = 1;
          hdsNew( out, "DIAGNOSTICS", "DIAGNOSTICS", 0, NULL, &cloc,
                  status );
@@ -288,9 +284,8 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
          }
       }
 
-/* Get the zero-based row number within each NDF at which to store the
-   next line of diagnostic info. */
-      irow = dat->iter + append;
+/* Get the index of the row to add to the container file. */
+      irow = dat->iter + rowoffset;
 
 /* Get the  other required items from the KeyMap. */
       astMapGet1C( kmap, "MODELS", MODEL_NAMELEN, SMF_MODEL_MAX, &nmodel,
@@ -476,7 +471,14 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
          datFind( cloc, "MASK", &dloc, status );
          datPut0I( dloc, mask, status );
          datAnnul( &dloc, status );
+
+         datNew0I( cloc, "NROW", status );
       }
+
+/* Store the number of rows of diagnostics currently stored in the container file. */
+      datFind( cloc, "NROW", &dloc, status );
+      datPut0I( dloc, irow + 1, status );
+      datAnnul( &dloc, status );
 
 /* Re-instate the original NDF history tuning parameter. */
       ndfTune( history, "AUTO_HISTORY", status );

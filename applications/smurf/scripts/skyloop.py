@@ -63,6 +63,7 @@
 *           bolomap=0
 *           flagmap=<undef>
 *           sampcube=0
+*           diag.append=0
 *
 *        - Subsequent iterations:
 *           numiter=1
@@ -81,6 +82,7 @@
 *           bolomap=0
 *           flagmap=<undef>
 *           sampcube=0
+*           diag.append=1
 *
 *        - Last iteration:
 *           numiter=1
@@ -99,6 +101,7 @@
 *           bolomap=0
 *           flagmap=<undef>
 *           sampcube=0
+*           diag.append=1
 *
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
@@ -222,6 +225,8 @@
 *        - Only include any supplied REF value in the makemap comamnd line
 *        on the first iteration.
 *        - Record quality info in the final map.
+*     9-JAN-2013 (DSB):
+*        Add support for diagnostics.
 
 *-
 '''
@@ -420,6 +425,7 @@ try:
    fd.write("com.zero_notlast = 0\n") # iteration is also the last iteration
                               # in our case, so force any enabled
                               # masking to be performed on the last iteration.
+   fd.write("diag.append = 0\n") # Ensure a new diagnostics file is started
    fd.close()                 # Close the config file.
 
 #  Get the name of a temporary NDF that can be used to store the first
@@ -487,6 +493,8 @@ try:
       add["flt.notfirst"] = 0  # Ensure we use FLT on 2nd and subsequent invocations
       add["pln.notfirst"] = 0  # Ensure we use PLN on 2nd and subsequent invocations
       add["smo.notfirst"] = 0  # Ensure we use SMO on 2nd and subsequent invocations
+      add["diag.append"] = 1   # Ensure we append diagnostics to the file
+                               # created on the first iteration.
 
 #  Now create the config, inheriting the config from the first invocation.
       iconf = 1

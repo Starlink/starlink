@@ -265,9 +265,8 @@ diag.out = <undef>
 
 # diag.append - If non-zero, it indicates that diagnostic info should be
 # appended to the container file specified by diag.out, which should
-# already exist. The non-zero value of diag.append indicates the
-# one-based index of the row within each NDF at which to store the
-# first row of diagnostic info created by the current run of makemap.
+# already exist. If zero, then  any existing container file is first
+# deleted before storing new diagnostics information in it.
 diag.append = 0
 
 # diag.models - Indicates the models that are to be written out. It
