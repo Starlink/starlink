@@ -3,173 +3,857 @@
 #     smurf_sc2clean.def
 
 #  Purpose:
-#     Default parameters for SMURF application MAKEMAP.
+#     Default parameters for SMURF application SC2CLEAN
 
 #  Description:
-#     This file specifies the default parameters for the SC2CLEAN
-#     application.The main purpose of this file is to
-#     guarantee an initial state for all parameters and to define all
-#     the allowed parameters so that a user will be notified in case
-#     of spelling mistakes.
-#
-#     This file is also loaded by the map maker defaults file.
+#     This file specifies default values for all parameters for the
+#     SC2CLEAN task. The main purpose of this file is to define the
+#     complete list of all legal parameters, with initial values. Users
+#     will be notified if they specify parameter names that are not
+#     included in this file. This helps to guard against spelling
+#     mistakes, etc, on the part of the user.
 
 #  Notes:
-#     This file does not attempt to document what each value
-#     means.
+#     - The parameters are listed in alphabetical order in this file.
+#     - Different defaults can be specified for 450 and 850 um by
+#     including the parameter name twice, prefixed with "450." and "850."
+#     - This file is also loaded by the map maker defaults file.
 
 #  Authors:
 #     TIMJ: Tim Jenness (JAC, Hawaii)
+#     DSB: David Berry (JAC, Hawaii)
 
 #  History:
 #     2010-06-09 (TIMJ):
 #        Original version. Factored out from smurf_makemap.def for clarity.
+#     2013-01-11 (DSB):
+#        This file is now the primary source od documentation for these
+#	 parameters. It has been reformatted to enable automatic documentation.
 
 #-
 
-# These are read in smf_get_cleanpar
-
+#-----------------------------------------------------------------
+#  Name: 	apod
+#  Type: 	integer
+#  Default: 	<undef>
+#  Purpose: 	Control the removal of low frequencies from the time-stream data.
+#  Description: The number of samples to apodise at each end of the data
+#		stream prior to smoothing as part of the initial cleaning
+#		before the iterative algorithm begins. If <undef>, a default
+#		value is used equal to 1/(steptime*freq) where freq is
+#		the lowest edge or notch frequency. Note, apodisation is
+#		only performed if parameter "zeropad" is set non-zero.
 apod = <undef>
+
+#-----------------------------------------------------------------
+#  Name:
+#  Type: 	real
+#  Default: 	0.05
+#  Purpose: 	Ensures that bad data from DA system are ignored
+#  Description: The fraction of samples to be bad to flag entire bolo as
+#		dead.
 badfrac = 0.05
-dcfitbox = 0
-dcmaxsteps = 10
-dclimcorr = 10
-dcthresh = 25.0
-dcsmooth = 50
-deconvmce = 0
-dkclean = 0
-fillgaps = 1
-zeropad = 0
-filt_edgelow = 0
-filt_edgehigh = 0
-filt_edge_smallscale = 0
-filt_edge_largescale = 0
-filt_notchlow = <undef>
-filt_notchhigh = <undef>
-filt_wlim = <undef>
-whiten = 0
-flagslow = 0
-flagfast = 0
-order = -1
-spikethresh = 0
-spikebox = 50
-noisecliphigh = 0
-noisecliplow = 0
-noiseclipprecom = 0
-pcalen = 0
-pcathresh = 0
-groupsubarray = 0
 
-# These are read in smf_clean_smfArray
-
-opteffs8a = <undef>
-opteffs8b = <undef>
-opteffs8c = <undef>
-opteffs8d = <undef>
-opteffs4a = <undef>
-opteffs4b = <undef>
-opteffs4c = <undef>
-opteffs4d = <undef>
-
-#  If set non-zero, the bolometer data is divided by the values read from
-#  the optical efficiency files. Otherwise, the bolometer data is multiplied by
-#  the values read from the optical efficiency files.
-opteffdiv = 1
-
-# these are analogous cleaning parameters for dark squids
-# We do not have a clever syntax for recursively reading this
-# routine with a "cleandk" prefix so we have to duplicate all
-# the above values.
-
+#-----------------------------------------------------------------
+#  Name: 	cleandk.<xxx>
+#  Purpose: 	Controls the cleaning of the dark squid signals.
+#  Description: The cleaning of dark squid signals is controlled by a set
+#		of parameters that are directly analagous to those that
+#		control the cleaning of the main bolometer time series.
+#		They use the same names, except that they are prefixed by
+#		"cleandk.". So for instance, "apod" becomes "cleandk.apod",
+#               "fillgaps" becomes "cleandk.fillgaps"< etc.
 cleandk.apod = <undef>
 cleandk.badfrac = 0
+cleandk.compreprocess = 0
 cleandk.dcfitbox = 0
-cleandk.dcmaxsteps = 10
 cleandk.dclimcorr = 10
-cleandk.dcthresh = 25.0
+cleandk.dcmaxsteps = 10
 cleandk.dcsmooth = 50
-cleandk.fillgaps = 1
-cleandk.zeropad = 0
+cleandk.dcthresh = 25.0
 cleandk.deconvmce = 0
-cleandk.filt_edgelow = 0
-cleandk.filt_edgehigh = 0
+cleandk.dkclean = 0
+cleandk.fillgaps = 1
 cleandk.filt_edge_smallscale = 0
+cleandk.filt_edgelow = 0
 cleandk.filt_edge_largescale = 0
+cleandk.filt_edgehigh = 0
 cleandk.filt_notchlow = <undef>
 cleandk.filt_notchhigh = <undef>
-cleandk.order = 0
-cleandk.spikethresh = 0
-cleandk.spikebox = 50
-cleandk.noisecliphigh = 0.0
+cleandk.filt_wlim = <undef>
+cleandk.flagfast = 0
+cleandk.flagslow = 0
+cleandk.flagstat = 0
 cleandk.noisecliplow = 0.0
 cleandk.noiseclipprecom = 0
-cleandk.filt_wlim = <undef>
-cleandk.whiten = 0
-cleandk.flagslow = 0
-cleandk.flagfast = 0
-cleandk.compreprocess = 0
+cleandk.noisecliphigh = 0.0
+cleandk.order = 0
 cleandk.pcalen = 0
 cleandk.pcathresh = 0
+cleandk.spikebox = 50
+cleandk.spikethresh = 0
+cleandk.whiten = 0
+cleandk.zeropad = 0
 
-# the following two parameters are included because the same
-# code is used to clean bolometers and the dark squids. However,
-# in the context of cleaning dark squids they are meaningless
-# and are simply turned off.
-
-cleandk.dkclean = 0
-cleandk.flagstat = 0
-
-# -------------------------------------------------------------------------
-# we can use smf_calcmodel_com to remove the common-mode as a
-# pre-processing step, so we have the com.* and gai.* parameter
-# defaults here
-
-# set this parameter to remove common-mode as a pre-processing step.
-# In this case it is still possible to use COM/GAI as model parameters
-# in the iterative solution.
-compreprocess = 0
-
-com.oldalg = 0
-
+#-----------------------------------------------------------------
+#  Name: 	com.boxcar
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: Specifies a low-pass boxcar filter on COM to assist with
+#		convergence. Positive values for com.boxcar are interpreted
+#		as a number of samples, and negative values as a number of
+#		seconds (converted to samples using the downsampled sample
+#		rate). Note, this parameter can only be used with the
+#		"old" COM algorithm (see parameter "com.oldalg").
 com.boxcar = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.boxcard
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: This records the size of the COM boxcar filter on the
+#		previous iteration and should not be set by the user (see
+#		parameter "com.boxcar" and parameter "com.boxfact"). Note,
+#		this parameter is only used with the "old" COM algorithm
+#		(see parameter "com.oldalg").
 com.boxcard = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.boxfact
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: If com.boxfact is non-zero, reduce width of com.boxcar
+#		by this factor each iteration. Note, this parameter is
+#		only used with the "old" COM algorithm (see parameter
+#		"com.oldalg").
 com.boxfact = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.boxmin
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: Specifies a minimum width below which the com boxcar
+#		filter can't be reduced. See parameter "com.boxfact" and
+#		parameter "com.boxcar". Note, this parameter is only used
+#		with the "old" COM algorithm  (see parameter "com.oldalg").
 com.boxmin = 0
 
-com.noflag = 0
-com.corr_tol = 5
+#-----------------------------------------------------------------
+#  Name: 	com.corr_abstol
+#  Type: 	real
+#  Default: 	0.2
+#  Purpose: 	Controls the rejection of bad samples from the COM estimate
+#  Description: Gives the absolute lower limit of acceptable correlation
+#		between a bolometer time-stream and the common-mode. This
+#		is the first of a set of "com.<xxx>" parameters that control
+#		the rejection of bad detectors based on the gain and
+#		correlation coefficients for the fit of the common-mode
+#		signal to each detector (good at identifying bolo signals
+#		with bizarre gains, or shapes if they have for example steps
+#		in them). These are basically sigma-clippers; outliers are
+#		removed at the given threshold and then new means and sample
+#		standard deviations are measured until convergence. The time
+#		axis is divided up into one or more equal sized boxes, and a
+#		separate fit is performed for each box. If you wish to
+#		completely disable the flagging of outlier bolometers
+#		compared with the common-mode, simply set com.noflag=1
 com.corr_abstol = 0.2
-com.gain_positive = 1
-com.gain_tol = 5
-com.gain_fgood = 0.25
-com.gain_rat = 4
-com.gain_abstol = 3
-com.gain_box = -30.0
+
+#-----------------------------------------------------------------
+#  Name: 	com.corr_tol
+#  Type: 	real
+#  Default: 	5.0
+#  Purpose: 	Controls the rejection of bad samples from the COM estimate
+#  Description: The maximum number of standard deviations away from the
+#		mean correlation coefficient that a bolometer can be
+#		without being rejected. See parameter "com.corr_abstol".
+com.corr_tol = 5
+
+#-----------------------------------------------------------------
+#  Name: 	com.fit_box
+#  Type: 	integer
+#  Default: 	<undef>
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: The number of adjacent time slices (or seconds if negative)
+#		that are to be used when fitting the bolometer data to the
+#		common-mode template. The value of com.fit_box should be no
+#		smaller than the value of parameter "com.gain_box". If it
+#		is not supplied, it defaults to the value of com.gain_box.
 com.fit_box = <undef>
-com.notfirst = 0
-com.noremove = 0
-com.perarray = 0
 
-# Setting com.gain_is_one non-zero causes all bolometer gains to be
-# forced to 1.0. Setting com.offset_is_zero non-zero causes all
-# bolometer offsets to be forced to 0.0. The correlation coefficients
-# are retained so that bad bolometer blocks are still identified and
-# rejected.
+#-----------------------------------------------------------------
+#  Name: 	com.gain_abstol
+#  Type: 	real
+#  Default: 	3.0
+#  Purpose: 	Controls the rejection of bad samples from the COM estimate
+#  Description: The maximum absolute ratio between a bolometer's gain
+#		coefficient, and the mean gain coefficient for the bolometer
+#		not to be rejected. See parameter "com.corr_abstol".
+com.gain_abstol = 3
 
+#-----------------------------------------------------------------
+#  Name: 	com.gain_box
+#  Type: 	real
+#  Default: 	-30.0
+#  Purpose: 	Controls the rejection of bad samples from the COM estimate
+#  Description: The number of time slices (or seconds if negative) in
+#		a box. The gain, offset and correlation coefficient
+#		describing the relationship between a bolometer time
+#		stream and the common-mode is re-evauated for each such
+#		box of time slices. See parameter "com.corr_abstol".
+com.gain_box = -30.0
+
+#-----------------------------------------------------------------
+#  Name: 	com.gain_fgood
+#  Type: 	integer
+#  Default: 	0.25
+#  Purpose: 	Controls the rejection of bad samples from the COM estimate
+#  Description: The minimum fraction of good gain boxes for a usable bolometer.
+#		See parameter "com.corr_abstol".
+com.gain_fgood = 0.25
+
+#-----------------------------------------------------------------
+#  Name: 	com.gain_is_one
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: Setting com.gain_is_one non-zero causes all bolometer
+#		gains to be forced to 1.0.
 com.gain_is_one = 0
-com.offset_is_zero = 0
 
-gai.flatfield = 0
+#-----------------------------------------------------------------
+#  Name: 	com.gain_positive
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: By default negative gains are used to flag bad bolometer
+#		data. However, if this parameter is set to 0 negative
+#		values will be allowed
+com.gain_positive = 1
 
-#  The number of n-sigma clipping iterations to apply when finding the
-#  common mode signal at any time slice. The n-sigma clipping algorithm
-#  finds the clipped mean of all bolometer values at a single time slice,
-#  and this value is used as the common mode signal. A value of 1 means
-#  that no clipping is done (the unclipped mean found on the first
-#  iteration is used).
+#-----------------------------------------------------------------
+#  Name: 	com.gain_rat
+#  Type: 	real
+#  Default: 	4.0
+#  Purpose: 	Controls the rejection of bad samples from the COM estimate
+#  Description: The ratio of the largest usable gain to the mean gain for a
+#		bolometer not to be rejected. See parameter "com.corr_abstol".
+com.gain_rat = 4
+
+#-----------------------------------------------------------------
+#  Name: 	com.gain_tol
+#  Type: 	real
+#  Default: 	5
+#  Purpose: 	Controls the rejection of bad samples from the COM estimate
+#  Description: The maximum number of standard deviations away from the
+#		mean gain coefficient that a bolometer can be without being
+#		rejected. See parameter "com.corr_abstol".
+com.gain_tol = 5
+
+#-----------------------------------------------------------------
+#  Name: 	com.niter
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: The number of n-sigma clipping iterations (a value of 1
+#		implies no clipping). Only used by the new COM algorithm
+#		(see parameter "com.oldalg").
 com.niter = 1
 
-#  The number of standard deviations at which the n-sigma clipping
-#  algorithm clips. See com.niter.
+#-----------------------------------------------------------------
+#  Name: 	com.noflag
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the rejection of bad samples from the COM estimate
+#  Description: If non-zero, disable flagging of bad bolometers using the
+#		common-mode. See parameter "com.corr_abstol".
+com.noflag = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.noremove
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: If non-zero, the common-mode will be estimated while
+# 		iteratively flagging and removing outlier detectors as
+# 		usual. However, once the flagging is completed, the
+#		common-mode will not actually be removed from the
+#		time-series (and if the model is exported, it will be
+#		set to 0). Note, this parameter is only used with the
+#		"old" COM algorithm  (see parameter "com.oldalg").
+com.noremove = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.notfirst
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: If non-zero, delay calculation of COM until after the first
+#		iteration (good if the astronomical signal is expected to
+#		dominate the sky signal).
+com.notfirst = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.nsigma
+#  Type: 	real
+#  Default: 	3
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: The number of standard deviations at which the n-sigma
+#		clipping algorithm clips. Only used by the new COM algorithm
+#		(see parameter "com.oldalg").
 com.nsigma = 3
+
+#-----------------------------------------------------------------
+#  Name: 	com.offset_is_zero
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: Setting non-zero causes all bolometer offsets to be forced
+#		to 0.0.
+com.offset_is_zero = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.oldalg
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: If non-zero, us the pre 15-MAY-2012 algorithm for
+#		estimating COM (the "old" algorithm). The new algorithm
+#		in general provides faster and smoother convergence. It
+#		uses the sigma-clipped weighted mean of all bolometer
+#		values at each time slice as the common-mode signal. See
+#		parameter "com.niter" and parameter "com.nsigma".
+com.oldalg = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.perarray
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: If non-zero, calculate a separate common-mode signal
+#		for each subarray. If zero, a single common-mode signal
+#		will be calculated from all subarrays at a given
+#		wavelength simultaneously.
+com.perarray = 0
+
+#-----------------------------------------------------------------
+#  Name: 	compreprocess
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Remove common-mode before the iterative algorithm begins.
+#  Description: If non-zero, the common-mode will be estimated and removed
+#		additionally as a pre-processing step. All the "com.<xxx>" and
+#		"gai.<xxx>" parameters are parsed and used (e.g., to also
+#		flag bad data and optionally flatfield off the relative
+#		response to the common-mode signal). If this pre-processing
+#		step is chosen, it is still possible to specify COM/GAI
+# 		as model components in the iterative solution.
+compreprocess = 0
+
+#-----------------------------------------------------------------
+#  Name: 	dcfitbox
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Control the cleaning of DC steps in bolometer time streams
+#  Description: This gives the box size over which to fit data with a
+#		straight line on either side of a potential DC jump,
+#		prior to estimating the bolometer noise levels when doing
+#		initial data cleaning. If positive, in units of samples. If
+#		negative, in units of seconds. If zero, do not perform step
+#		correction during initial data cleaning.
+dcfitbox = 30
+
+#-----------------------------------------------------------------
+#  Name: 	dclimcorr
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Control the cleaning of DC steps in bolometer time streams
+#  Description: If more than DCLIMCORR bolometer have a step at a given
+#		time, then all bolometers are corrected for a step at that
+#		time, using lower thresholds. A value of zero switches off
+#		the correction of correlated steps within the initial
+#		data cleaning phase. Only used if parameter "dcfitbox" is
+#		non-zero.
+dclimcorr = 0
+
+#-----------------------------------------------------------------
+#  Name: 	dcmaxsteps
+#  Type: 	integer
+#  Default: 	10
+#  Purpose: 	Control the cleaning of DC steps in bolometer time streams
+#  Description: The maximum number of steps that can be corrected in each
+#		minute of good data (i.e. per 12000 samples) from a bolometer
+#		before the entire bolometer is flagged as bad. A value of
+#		zero will cause a bolometer to be rejected if any steps are
+#		found in the bolometer data stream. Only used if parameter
+#		"dcfitbox" is non-zero.
+dcmaxsteps = 10
+
+#-----------------------------------------------------------------
+#  Name: 	dcsmooth
+#  Type: 	integer
+#  Default: 	50
+#  Purpose: 	Control the cleaning of DC steps in bolometer time streams
+#  Description: The width of the median filter used to smooth a bolometer
+#		data stream prior to finding DC jumps. If positive, in units
+#		of samples. If negative, in units of seconds. Only used if
+#		parameter "dcfitbox" is non-zero.
+dcsmooth = 50
+
+#-----------------------------------------------------------------
+#  Name: 	dcthresh
+#  Type: 	integer
+#  Default: 	25.0
+#  Purpose: 	Control the cleaning of DC steps in bolometer time streams
+#  Description: The SNR threshold at which to detect DC steps. Note, this
+#		refers to the noise level in the bolometer data after it
+#		has been smoothed with a median filter of width given by
+#		parameter "dcsmooth". In order to find the equivalent
+#		threshold in the unsmoothed data, multiply the dcthresh
+#		value by 1.25/sqrt(dcsmooth). For instance, the default
+#		values for dcsmooth (50) and dcthresh (25) correspond
+#		to a threshold of 25*1.25/sqrt(50) = 4.4 sigma in the
+#		unsmoothed data. Only used if parameter "dcfitbox" is
+#		non-zero.
+dcthresh = 25.0
+
+#-----------------------------------------------------------------
+#  Name: 	deconvmce
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Diagnostic tool for checking effects of MCE filter.
+#  Description: If non-zero, each bolometer time stream is deconvolved to
+#		remove the effects of the MCE anti-aliasing filter. See
+#		also parameter "fakemce".
+deconvmce = 0
+
+#-----------------------------------------------------------------
+#  Name: 	dkclean
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Control dark squid cleaning.
+#  Description: If non-zero, clean the dark squid signals.
+dkclean = 0
+
+#-----------------------------------------------------------------
+#  Name: 	fillgaps
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls handling of missing data within FFT code
+#  Description: If non-zero, fill vicinity of spikes / DC steps with
+#		constrained realization of noise.
+fillgaps = 1
+
+#-----------------------------------------------------------------
+#  Name: 	filt_edge_largescale
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Specifies the largest scale size to be retained by the
+#		initial data cleaning.
+#  Description: Together with parameter "filt_edge_smallscale", this
+#		specifies the frequencies which the initial data cleaning is
+#		to remove from the data streams, based on a range of requested
+#		spatial scales (in arcsec), and using internal measurements of
+# 		the average slew speed. These will override parameter
+#		"filt_edgehigh" and parameter "filt_edgelow". For example,
+#		suppose the slew speed is 100 arcsec/sec. We want to ensure
+#		that the beam is fully sampled, say 2 arcsec at 450um.
+#		That scale is crossed in 2/100 = 0.02 s, so we don't need
+#		frequencies in the data above 1/0.02 = 50 Hz in this case
+#		(i.e. internally it will set filt_edgelow to 50Hz if
+#		filt_edge_smallscale is set to 2 arcsec). Similarly, if
+#		we would like to attempt to preserve scales of 10 arcmin =
+#		600 arcsec, we would want to keep frequencies that are
+#		greater than 1/(600/100.) = 0.17 Hz (i.e. setting
+# 		filt_edge_largescale=600 would translate into
+#		filt_edgehigh = 0.17 Hz).
+filt_edge_largescale = 0
+
+#-----------------------------------------------------------------
+#  Name: 	filt_edge_smallscale
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Specifies the smallest largest scale size to be retained by
+#		the initial data cleaning.
+#  Description: If non-zero, features with spatial sizes less than this
+#		value (in arcsec) will be removed by the initial data
+#		cleaning. See parameter "filt_edge_largescale".
+filt_edge_smallscale = 0
+
+#-----------------------------------------------------------------
+#  Name: 	filt_edgehigh
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Specifies the lowest frequency to be retained by the
+#		initial data cleaning.
+#  Description: If non-zero, this is the cut-off frequency of a hard-edged
+#		high pass filter that is applied to the data stream as
+#		part of the initial data cleaning. See also parameter
+#		"filt_edge_largescale".
+filt_edgehigh = 0
+
+#-----------------------------------------------------------------
+#  Name: 	filt_edgelow
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Specifies the highest frequency to be retained by the
+#		initial data cleaning.
+#  Description: If non-zero, this is the cut-off frequency of a hard-edged
+#		low pass filter that is applied to the data stream as
+#		part of the initial data cleaning. See also parameter
+#		"filt_edge_largescale".
+filt_edgelow = 0
+
+#-----------------------------------------------------------------
+#  Name: 	filt_notchhigh
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Specifies additional frequencies to be removed by the
+#		initial data cleaning.
+#  Description: Together with parameter "filt_notchlow", this parameter
+#		specifies a set of 1 or more hard-edge band-cut frequency-domain
+#		notch filters, specifying additional frequencies to be removed
+#		by the initial data cleaning. The filt_notchhigh value should
+#		be a comma-separated list of frequencies in Hz, enclosed in
+#		parentheses. These are the frequencies of the upper edges
+#		of the notch filters. The filt_notchlow and filt_notchhigh
+#		parameters should contain the same number of frequencies.
+filt_notchhigh = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	filt_notchlow
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Specifies additional frequencies to be removed by the
+#		initial data cleaning.
+#  Description: Together with parameter "filt_notchhigh", this parameter
+#		specifies a set of 1 or more hard-edge band-cut frequency-domain
+#		notch filters, specifying additional frequencies to be removed
+#		by the initial data cleaning. The filt_notchlow value should
+#		be a comma-separated list of frequencies in Hz, enclosed in
+#		parentheses. These are the frequencies of the lower edges
+#		of the notch filters. The filt_notchlow and filt_notchhigh
+#		parameters should contain the same number of frequencies.
+filt_notchlow = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	filt_wlim
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Enables an experimental filtering method.
+#  Description: If supplied, this will switch on an experimental method for
+#		handling missing or flagged data when filtering the time
+#		streams, based on replacing missing data with zero, and
+#		then normalising the smoothed data using a mask of good
+#		samples smoothed in the same way. The filt_wlim value
+#		specifies the minimum fraction of good values that must
+#		contribute to a filtered value. For instance, if wlim is
+#		0.9 then a filtered data value is flagged as bad unless at
+#	   	least 0.9 of the input values that contribute to it are good
+#		(i.e. have not been flagged as unusable for any reason). Thus
+#		a high filt_wlim value (i.e. close to 1.0) will cause more
+#	  	data to be rejected, and a low value (i.e. close to 0.0) will
+#	 	cause less data to be rejected. A value of <undef> causes the
+#		old filtering algorithm to be used that is based on filling
+#		gaps with artificial data. If the experimental algorithm is
+#		used the following additional settings can be made: "apod=0,
+#		fillgaps=0, noi.fillgaps=0".
+filt_wlim = <undef>
+
+
+#-----------------------------------------------------------------
+#  Name: 	flagfast
+#  Type: 	integer
+#  Default: 	1000
+#  Purpose: 	Flag data when we're moving too fast
+#  Description: Data taken when the telescope was moving too fast such
+#		that sources are smeared can be flagged using this
+#		parameter. The value is a threshold slew velocity (arcsec/sec)
+#		measured in tracking coordinates. Assuming a sample rate of
+#		200 Hz, we want to be able to fully-sample the 450 and 850
+#		beams. For now just set it to something that is bigger than
+#  		we need, but be warned that point-sources may be smeared-out.
+flagfast = 1000
+
+#-----------------------------------------------------------------
+#  Name: 	flagslow
+#  Type: 	integer
+#  Default: 	30
+#  Purpose: 	Flag data when we're moving too slowly
+#  Description: Data taken when the telescope was moving too slowly
+#		such that sources are buried in 1/f noise, can be flagged
+#		using this parameter. The value is a threshold slew velocity
+#		(arcsec/sec) measured in tracking coordinates. Assuming we
+#		would like to be able to sample scales of at least 30 arcsec
+#		(at least two 15 arcsec beams at 850), and assuming a typical
+#		1/f knee of 1 Hz, the telescope needs to slew at least 30
+#		arcsec/sec to place sources in the signal band above the
+# 		knee.
+flagslow = 30
+
+#-----------------------------------------------------------------
+#  Name: 	gai.flatfield
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Provides an alternative flat-fielding mechanism.
+#  Description: If non-zero, use the GAIn/COMmon models to re-calculate the
+#		flatfield. May be useful in some cases, but dangerous for
+#		short scans of very bright sources because the astronomical
+#		signal may completely dominate sky signal. Note, this
+#		parameter is only used with the "old" COM algorithm (see
+#		parameter "com.oldalg").
+gai.flatfield = 0
+
+#-----------------------------------------------------------------
+#  Name: 	groupsubarray
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Produce separate maps for each sub-array.
+#  Description: If non-zero, handle each subarray separately (as if each
+#		subarray was in a different continuous chunk). Normally all
+#		data that were taken simultaneously at a given wavelength
+#		are combined into a single map at each iteration.
+groupsubarray = 0
+
+#-----------------------------------------------------------------
+#  Name: 	noisecliphigh
+#  Type: 	real
+#  Default: 	4
+#  Purpose: 	Reject bolometers based on their noise.
+#  Description: This step will remove any bolometers noisier than
+#		noisecliphigh standard deviations above the median, or
+#		noisecliplow standard deviations below the median. Normally
+#		the noise clipping happens at the end of the cleaning stage,
+#		but if you set noiseclipprecom it will instead occur
+#		immediately prior to common-mode subtraction (see
+#		parameter "comppreprocess").
+noisecliphigh = 4
+
+#-----------------------------------------------------------------
+#  Name: 	noisecliplow
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Reject bolometers based on their noise.
+#  Description: See parameter "noisecliphigh".
+noisecliplow = 0
+
+#-----------------------------------------------------------------
+#  Name: 	noiseclipprecom
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Reject bolometers based on their noise.
+#  Description: See parameter "noisecliphigh".
+noiseclipprecom = 0
+
+#-----------------------------------------------------------------
+#  Name: 	opteffdiv
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls optical efficiency correction.
+#  Description: If non-zero, the bolometer data is divided by the values
+#		read from the optical efficiency files (see parameter
+#		"opteffs4a", etc). Otherwise, the bolometer data is
+#		multiplied by the values read from the optical efficiency
+#		files.
+opteffdiv = 1
+
+#-----------------------------------------------------------------
+#  Name: 	opteffs4a
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Controls optical efficiency correction.
+#  Description: The path to an NDF defining the optical efficiency
+#		correction for each S4A bolometer. This should be a 2D
+#		NDF with pixel bounds (0:31,0:39).
+opteffs4a = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	opteffs4b
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Controls optical efficiency correction.
+#  Description: The path to an NDF defining the optical efficiency
+#		correction for each S4B bolometer. This should be a 2D
+#		NDF with pixel bounds (0:31,0:39).
+opteffs4b = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	opteffs4c
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Controls optical efficiency correction.
+#  Description: The path to an NDF defining the optical efficiency
+#		correction for each S4C bolometer. This should be a 2D
+#		NDF with pixel bounds (0:31,0:39).
+opteffs4c = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	opteffs4d
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Controls optical efficiency correction.
+#  Description: The path to an NDF defining the optical efficiency
+#		correction for each S4D bolometer. This should be a 2D
+#		NDF with pixel bounds (0:31,0:39).
+opteffs4d = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	opteffs8a
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Controls optical efficiency correction.
+#  Description: The path to an NDF defining the optical efficiency
+#		correction for each S8A bolometer. This should be a 2D
+#		NDF with pixel bounds (0:31,0:39).
+opteffs8a = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	opteffs8b
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Controls optical efficiency correction.
+#  Description: The path to an NDF defining the optical efficiency
+#		correction for each S8B bolometer. This should be a 2D
+#		NDF with pixel bounds (0:31,0:39).
+opteffs8b = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	opteffs8c
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Controls optical efficiency correction.
+#  Description: The path to an NDF defining the optical efficiency
+#		correction for each S8C bolometer. This should be a 2D
+#		NDF with pixel bounds (0:31,0:39).
+opteffs8c = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	opteffs8d
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Controls optical efficiency correction.
+#  Description: The path to an NDF defining the optical efficiency
+#		correction for each S8D bolometer. This should be a 2D
+#		NDF with pixel bounds (0:31,0:39).
+opteffs8d = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	order
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Baseline removal
+#  Description: Subtract a baseline polynomial of this order as part of
+#		the initial cleaning phase.
+order = 1
+
+#-----------------------------------------------------------------
+#  Name: 	pcalen
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls PCA cleaning.
+#  Description: This specifies the chunk length that will be cleaned as a
+#		number of time slices (be careful if you have down-sampling
+#		turned on!). If set to 0 it will default to the length of
+#		the full time-series. See parameter "pcathresh".
+pcalen = 0
+
+#-----------------------------------------------------------------
+#  Name: 	pcathresh
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls PCA cleaning.
+#  Description: An alternative to removing the simple common-mode is
+#		cleaning by way of principal component analysis (PCA). In
+#		this case, a new set of basis vectors (components) are
+#		calculated from the bolometer time-series such that they
+#		have 0 covariances. The amplitudes of these new correlated
+# 		signals are then calculated, and the largest amplitude
+#		components can be removed. In this simplest case of white
+#		detectors noise + a common atmospheric signal, this operation
+#		would be similar to using parameter "compreprocess". However,
+#		PCA is capable of detecting multiple signals with different
+# 		correlation patterns across the array.
+#
+# 		It is *ESSENTIAL* that the bolometer data first have their
+#		mean values removed (i.e., parameter "order" should be 0),
+#		as this assumption is used to speed up the calculation.
+#
+# 		The main parameter for PCA cleaning is the threshold above
+# 		which components will be removed from the bolometer
+#		time-series. For each component, the RMS amplitude across
+#		all bolometers is calculated -- a single positive number
+#		related to the average strength of the component. An
+#		iterative sigma clipper is then used to flag components that
+#		are more than thresh*RMS away from the mean value.
+#
+# 		This approach is quite arbitrary, but a value of about 4
+#		seems reasonable for some test data. Be warned that this
+#		statistical black box will remove real correlated astronomical
+#		signals as well! As with common-mode removal, the actual
+#		impact on science will need to be calibrated with simulations.
+#
+# 		If this parameter is set to 0 no pca cleaning will occur.
+pcathresh = 0
+
+#-----------------------------------------------------------------
+#  Name: 	spikebox
+#  Type: 	integer
+#  Default: 	50
+#  Purpose: 	Controls time-based spike detection within initial data
+#		cleaning.
+#  Description: Size of filter box for the sigma-clipper within the
+#		initial data cleaning, in units of samples if positive and
+#		seconds if negative. For instance, setting spikebox to 50
+#		will check for excursions from a rolling median filter in a
+#		box of length 50 samples. Also see parameter "spikethresh".
+spikebox = 50
+
+#-----------------------------------------------------------------
+#  Name: 	spikethresh
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls time-based spike detection within initial data
+#               cleaning.
+#  Description: The SNR value at which to flag spikes within the
+#		sigma-clipper used within initial data cleaning. Also see
+#		parameter "spikebox". No de-spiking is performed in the
+#		initial data cleaning if a value of zero is supplied.
+spikethresh = 0
+
+#-----------------------------------------------------------------
+#  Name: 	whiten
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Experimental.
+#  Description: If non-zero, then a whitening filter will be applied to
+#		each time stream prior to any filtering that is done as
+#		part of the initial data cleaning, as specified by
+#		parameter "flt_edge_largescale", etc.
+whiten = 0
+
+#-----------------------------------------------------------------
+#  Name: 	zeropad
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Avoid unnecessary loss of data due to apodisation.
+#  Description: If zeropad is non-zero, the extra samples used to pad
+#		each end of the data streams are set to 0 prior to
+#		filtering within the initial cleaning, and apodization is
+#		used to slowly roll-off the ends of the time series to 0
+#		(see parameter "apod"). If zeropad is zero, a cubic
+#		polynomial is used to interpolate smoothly between the end
+#		of the time series and the beginning of the time series,
+#		ensuring continuity in both the value and first derivative.
+#		In both cases, the purpose is to remove sharp edges that may
+#		cause ringing in the FFT filtering steps.
+zeropad = 0
+
+
+
+
+
 

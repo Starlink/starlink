@@ -37,6 +37,7 @@
 #     TIMJ: Tim Jenness (JAC, Hawaii)
 #     RPT: Remo Tilanus (JAC, Hawaii)
 
+#  History:
 #     2010-06-02 (TIMJ):
 #        First version.
 #     2011-07-15 (AGG):
@@ -49,26 +50,44 @@
 #        Final 850 and 450 coefficients
 #     2012-06-25 (JTD):
 #        Updates to make 450 more physical
+#     2013-01-11 (DSB):
+#        Reformatted to be consistent with smurf_makemap.def, and
+#        auto-docs extraction.
 
 #-
 
-# The following entries parametrise the tau relations
-# of the form
-#
-#   tau_filt = a ( tau_cso + b )
-#
-# Each entry is named for the filter name as we expect
-# the value to depend on the filter not just the
-# sub-instrument. For this reason they are not simply
-# implemented as "450.ext.taurelation"
-
-# Original filters delivered for SCUBA-2. Named "450" and "850".
-
+#-----------------------------------------------------------------
+#  Name: 	ext.taurelation.450
+#  Type: 	(real,real)
+#  Default: 	(26.0,-0.012)
+#  Purpose: 	Controls the 450 um extinction values used in the EXT model
+#               and the EXTINCTION task.
+#  Description: Each tau relation is parameterised in the form:
+#   		"tau_filt = a ( tau_cso + b )", where "a" and "b" are the
+#		two values supplied for this parameter. See also parameter
+#               "ext.taurelation.850". Here, the trailing ".450" in the
+#		parameter name is the filter name, not the sub-instrument
+#		name as would be the case if it appeared at the start of
+#		parameter name.
 ext.taurelation.450 = (26.0,-0.012)
+
+#-----------------------------------------------------------------
+#  Name: 	ext.taurelation.850
+#  Type: 	(real,real)
+#  Default:     (4.6,-0.0043)
+#  Purpose: 	Controls the 850 um extinction values used in the EXT model
+#               and the EXTINCTION task.
+#  Description: The 850 um equivalent to the parameter "ext.taurelation.450".
 ext.taurelation.850 =  (4.6,-0.0043)
 
-# Control whether we want WVM smoothing. The value is the
-# size in seconds for the tophat function. A value of 0 disables
-# smoothing.
-
+#-----------------------------------------------------------------
+#  Name: 	ext.smoothwvm
+#  Type: 	real
+#  Default:     10.0
+#  Purpose: 	Controls the extinction values used in the EXT model
+#               and the EXTINCTION task.
+#  Description: Indicates if we want WVM smoothing. The value is the
+# 		size in seconds for the tophat function. A value of 0
+#		disables smoothing.
 ext.smoothwvm = 10.0
+
