@@ -11,6 +11,8 @@
 #include <string.h>
 #include <stdio.h>
 
+static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix, int *status );
+
 F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 /*
 *+
@@ -77,7 +79,8 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        The value to return if no value can be obtained for the named
 *        parameter, or if the value is "<undef>".  [<***>]
 *     NAME = LITERAL (Read)
-*        The name of the configuration parameter to display.
+*        The name of the configuration parameter to display. If null (!)
+*	 then all parameters defined in the configuration are displayed.
 *     SELECT = GROUP (Read)
 *        A group that specifies any alternative prefixes that can be
 *        included at the start of any parameter name. For instance, if
@@ -95,6 +98,11 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        SELECT define the set of allowed alternative prefixes, and the
 *        values indicate which one of these alternatives is to be used
 *        (the first one with non-zero value). [!]
+*     SORT = _LOGICAL (Read)
+*        If TRUE then sort the listed parameters in to alphabetical order.
+*        Otherwise, retain the order they have in the supplied
+*	 configuration. Only used if a null (!) value is supplied for
+*        parameter NAME. [FALSE]
 *     VALUE = LITERAL (Write)
 *        The value of the configuration parameter, or "<***>" if the
 *        parameter has no value in CONFIG and DEFAULTS.
@@ -145,6 +153,9 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        Original version.
 *     6-FEB-2012 (DSB):
 *        Added parameter DEFVAL.
+*     11-FEB-2013 (DSB):
+*        Added parameter SORT and allow all parameters to be listed by
+*        providing a null value for NAME.
 *     {enter_further_changes_here}
 
 *-
@@ -162,6 +173,8 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
    char defval[250];
    char name[250];
    const char *value;
+   int showall;
+   int sort;
    size_t size;
 
 /* Abort if an error has already occurred. */
@@ -208,49 +221,78 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
       keymap = kpg1Config( "CONFIG", defs, keymap2, STATUS );
    }
 
-/* Get the name of the required parameter, and convert to upper case. */
+/* Abort if an error has occurred. */
+   if( *STATUS != SAI__OK ) goto L999;
+
+/* Get the name of the required parameter, and convert to upper case (if
+   supplied). If not supplied, set a flag indicating that all parameters
+   should be displayed. */
    parGet0c( "NAME", name, sizeof(name), STATUS );
-   astChrCase( NULL, name, 1, 0 );
+   if( *STATUS == PAR__NULL ) {
+      errAnnul( STATUS );
+      showall = 1;
+   } else {
+      showall = 0;
+      astChrCase( NULL, name, 1, 0 );
+   }
+
+   if( *STATUS == SAI__OK ) {
+
+/* First deal with cases where we are displaying a single parameter
+   value. */
+      if( !showall ) {
 
 /* Loop round each section of the name that ends with a dot. */
-   if( *STATUS == SAI__OK ) {
-      value = defval;
-      pname = name;
+         value = defval;
+         pname = name;
 
-      dot = strchr( pname, '.' );
-      while( dot && keymap ) {
+         dot = strchr( pname, '.' );
+         while( dot && keymap ) {
 
 /* Get a nested keymap with the name that occurs prior to the dot. If
    found, use it in place of the parent keymap. */
-         pname[ dot - pname ] = 0;
-         if( astMapGet0A( keymap, pname, &keymap2 ) ) {
-            astAnnul( keymap );
-            keymap = keymap2;
-         } else {
-            astAnnul( keymap );
-         }
+            pname[ dot - pname ] = 0;
+            if( astMapGet0A( keymap, pname, &keymap2 ) ) {
+               astAnnul( keymap );
+               keymap = keymap2;
+            } else {
+               astAnnul( keymap );
+            }
 
 /* Re-instate the original dot, and move on to find the next dot. */
-         pname[ dot - pname ] = '.';
-         pname = dot + 1;
-         dot = strchr( pname, '.' );
-      }
+            pname[ dot - pname ] = '.';
+            pname = dot + 1;
+            dot = strchr( pname, '.' );
+         }
 
 /* Ensure no error is reported if the parameter is not found in the
    KeyMap. */
-      if( keymap ) {
-         astClear( keymap, "KeyError" );
+         if( keymap ) {
+            astClear( keymap, "KeyError" );
 
 /* Get the parameter value as a string. */
-         astMapGet0C( keymap, pname, &value );
+            astMapGet0C( keymap, pname, &value );
+         }
+
+/* Display it. */
+         msgOut( "", value, STATUS );
+
+/* Write it to the output parameter. */
+         parPut0c( "VALUE", value, STATUS );
+
+/* Now deal with cases were we are displaying all parameter values. */
+      } else {
+
+/* See if the values should be sorted. */
+         parGet0l( "SORT", &sort, STATUS );
+
+/* Display them. */
+         DisplayKeyMap( keymap, sort, "", STATUS );
       }
    }
 
-/* Display it. */
-   msgOut( "", value, STATUS );
-
-/* Write it to the output parameter. */
-   parPut0c( "VALUE", value, STATUS );
+/* Tidy up. */
+L999:;
 
 /* End the AST context */
    astEnd;
@@ -263,4 +305,110 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
    }
 
 }
+
+
+
+
+
+static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
+                           int *status ){
+/*
+*  Name:
+*     DisplayKeyMap
+
+*  Purpose:
+*     Display the contents of a keymap.
+
+*  Synopsis:
+*     void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
+*                         int *status )
+
+*  Arguments:
+*     km
+*        Pointer to the KeyMaps containing the values to display.
+*     sort
+*        If non-zero, sort the values alphabetically by their keys.
+*     prefix
+*        A string to prepend to eack key.
+*     status
+*        Inherited status pointer.
+
+*  Description:
+*     This function displays the contents of a supplied KeyMap as
+*     a series of "key = value" strings, one per line. It calls itself
+*     recursively if a nested KeyMap is found, adding a suitable
+*     prefix to the nested keys.
+*/
+
+/* Local Variables: */
+   AstObject *avalue;
+   char cbuffer[ 255 ];
+   char newpref[ 255 ];
+   const char *cvalue;
+   const char *key;
+   int ikey;
+   int ival;
+   int nc;
+   int nkey;
+   int nval;
+
+/* Check the inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Sort the supplied KeyMap is required. */
+   if( sort ) astSetC( km, "SortBy", "KeyUp" );
+
+/* Loop round all keys in the supplied KeyMap. */
+   nkey = astMapSize( km );
+   for( ikey = 0; ikey < nkey; ikey++ ) {
+      key = astMapKey( km, ikey );
+
+/* If the current entry is a nest KeyMap, get a pointer to it and call
+   this function recurisvely to display it, modifying the prefix to add
+   to each key so that it includes the key associated with the nest keymap. */
+      if( astMapType( km, key ) == AST__OBJECTTYPE ) {
+         astMapGet0A( km, key, &avalue );
+         sprintf( newpref, "%s%s.", prefix, key );
+         DisplayKeyMap( (AstKeyMap *) avalue, sort, newpref, status );
+         avalue = astAnnul( avalue );
+
+/* If the current entry is not a nested keymap, we display it now. */
+      } else {
+
+/* Get the vector length of the entry. */
+         nval = astMapLength( km, key );
+
+/* If it is a scalar, just get its value as a character string using
+   the automatic type conversion provided by the KeyMap class, and
+   display it, putting the supplied prefix at the start of the key. */
+         if( nval <= 1 ) {
+            cvalue = "<undef>";
+            astMapGet0C( km, key, &cvalue );
+            msgOutf( "", "%s%s = %s", status, prefix, key, cvalue );
+
+/* If it is a vector, we construct a string containing a comma-separated
+   list of elements, enclosed in parentheses. */
+         } else {
+            nc = 0;
+            cvalue = astAppendString( NULL, &nc, "(" );
+            for( ival = 0; ival < nval; ival++ ) {
+               if( astMapGetElemC( km, key, sizeof( cbuffer) - 1, ival,
+                                   cbuffer ) ) {
+                  cvalue = astAppendString( (char *) cvalue, &nc, cbuffer );
+               }
+               if( ival < nval - 1 ) cvalue = astAppendString( (char *) cvalue,
+                                                                &nc, "," );
+            }
+            cvalue = astAppendString( (char *) cvalue, &nc, ")" );
+
+/* Display the total string, with the current key prefix, and free the memory
+   used to store it. */
+            msgOutf( "", "%s%s = %s", status, prefix, key, cvalue );
+            cvalue = astFree( (void *) cvalue );
+         }
+      }
+   }
+}
+
+
 

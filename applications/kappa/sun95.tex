@@ -19871,12 +19871,6 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       The value is also written to an output parameter.  If the
       parameter is not specified by the CONFIG or DEFAULTS parameter,
       then the value supplied for DEFVAL is returned.
-
-
-
-The string
-      {\tt "$<$$*$$*$$*$$>$"} is displayed if the parameter is not specified by the
-      CONFIG or DEFAULTS parameter.
    }
    \sstusage{
       configecho name config [defaults] [select] [defval]
@@ -19927,7 +19921,8 @@ The string
       \sstsubsection{
          NAME = LITERAL (Read)
       }{
-         The name of the configuration parameter to display.
+         The name of the configuration parameter to display. If null (!)
+	 then all parameters defined in the configuration are displayed.
       }
       \sstsubsection{
          SELECT = GROUP (Read)
@@ -19949,6 +19944,15 @@ The string
          values indicate which one of these alternatives is to be used
          (the first one with non-zero value).  {\tt [!]}
       }
+      \sstsubsection{
+         SORT = _LOGICAL (Read)
+      }{
+         If TRUE then sort the listed parameters in to alphabetical order.
+         Otherwise, retain the order they have in the supplied
+	 configuration. Only used if a null (!) value is supplied for
+         parameter NAME. {\tt [FALSE]}
+      }
+
    }
    \sstresparameters{
       \sstsubsection{

@@ -9879,6 +9879,15 @@ package kappa {
             default !
          }
 
+         parameter sort {
+            type _LOGICAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Sort displayed configuration parameters?}
+            helpkey *
+            default FALSE
+         }
+
          parameter value {
             type LITERAL
             access WRITE
