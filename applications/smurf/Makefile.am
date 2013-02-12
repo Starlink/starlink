@@ -2,8 +2,8 @@
 
 # Build libsmf before the applications
 
-SUBDIRS = libsmf libsmurf libsc2sim libacsis libaztec libgsd libsc2fts \
-          docs defaults
+SUBDIRS = defaults libsmf libsmurf libsc2sim libacsis libaztec libgsd \
+          libsc2fts docs
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc -Isc2da -Isc2sim
