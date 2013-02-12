@@ -32,113 +32,56 @@
 #  default values with values more appropriate for calcqu.
 ^$SMURF_DIR/smurf_makemap.def
 
-# These are read in smf_get_cleanpar
-apod = <undef>
-badfrac = 0.05
-dcfitbox = 30
-dcmaxsteps = 10
-dclimcorr = 0
-dcthresh = 25.0
-dcsmooth = 50
-dkclean = 0
-fillgaps = 1
-zeropad = 0
-filt_edgelow = 0
-filt_edgehigh = 0
-filt_edge_smallscale = 0
-filt_edge_largescale = 0
-filt_notchlow = <undef>
-filt_notchhigh = <undef>
-filt_wlim = <undef>
-whiten = 0
-flagslow = 0
 flagfast = 0
+flagslow = 0
 order = 0
 spikethresh = 5
-spikebox = 50
-noiseclip = 4.0
-
-# these are analogous cleaning parameters for dark squids
-# We do not have a clever syntax for recursively reading this
-# routine with a "cleandk" prefix so we have to duplicate all
-# the above values.
-
-cleandk.apod = <undef>
-cleandk.badfrac = 0.05
-cleandk.dcfitbox = 30
-cleandk.dcmaxsteps = 10
-cleandk.dclimcorr = 10
-cleandk.dcthresh = 25.0
-cleandk.dcsmooth = 50
-cleandk.fillgaps = 1
-cleandk.zeropad = 0
-cleandk.filt_edgelow = 0
-cleandk.filt_edgehigh = 0
-cleandk.filt_edge_smallscale = 0
-cleandk.filt_edge_largescale = 0
-cleandk.filt_notchlow = <undef>
-cleandk.filt_notchhigh = <undef>
-cleandk.order = 0
-cleandk.spikethresh = 0
-cleandk.spikebox = 50
-cleandk.noiseclip = 0.0
-cleandk.filt_wlim = <undef>
-cleandk.whiten = 0
-cleandk.flagslow = 0
-cleandk.flagfast = 0
-cleandk.compreprocess = 0
-
-# the following two parameters are included because the same
-# code is used to clean bolometers and the dark squids. However,
-# in the context of cleaning dark squids they are meaningless
-# and are simply turned off.
-
-cleandk.dkclean = 0
-cleandk.flagstat = 0
-
-# -------------------------------------------------------------------------
-# we can use smf_calcmodel_com to remove the common-mode as a
-# pre-processing step, so we have the com.* and gai.* parameter
-# defaults here
-
-# set this parameter to remove common-mode as a pre-processing step.
-# In this case it is still possible to use COM/GAI as model parameters
-# in the iterative solution.
-compreprocess = 0
-
-com.boxcar = 0
-com.boxcard = 0
-com.boxfact = 0
-com.boxmin = 0
-
-com.corr_tol = 5
-com.corr_abstol = 0.2
-com.gain_tol = 5
-com.gain_fgood = 0.25
-com.gain_rat = 4
-com.gain_abstol = 3
-com.gain_box = -30.0
-com.fit_box = <undef>
-com.notfirst = 0
-com.perarray = 0
-
-# Setting com.gain_is_one non-zero causes all bolometer gains to be
-# forced to 1.0. Setting com.offset_is_zero non-zero causes all
-# bolometer offsets to be forced to 0.0. The correlation coefficients
-# are retained so that bad bolometer blocks are still identified and
-# rejected.
-
-com.gain_is_one = 0
-com.offset_is_zero = 0
-
-gai.flatfield = 0
-# -------------------------------------------------------------------------
-
 
 #  CALCQU specific parameters:
+
+
+#-----------------------------------------------------------------
+#  Name: 	pasign
+#  Type: 	int
+#  Default: 	1
+#  Purpose: 	Indicates the sense of rotation of the spinning half-wave
+#		plate.
+#  Description: If non-zero, it is assumed that a positive POL_ANG value
+#		corresponds to rotation from focal plane X to focal plane Y
+#		axis. If zero, it is assumed that a positive POL_ANG value
+#		corresponds to rotation from focal plane Y to focal plane X
+#		axis.
 pasign = 1
+
+#-----------------------------------------------------------------
+#  Name: 	paoff
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Specifies the orientation of the have-wave plate origin
+#  Description: This is the angle from the fixed analyser to the have-wave
+#		plate for a POL_ANG value of zero, in degrees. Measured
+#		positive in the same sense as rotation from focal plane X
+#		to focal plane Y.
 paoff = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	angrot
+#  Type: 	real
+#  Default: 	90
+#  Purpose: 	Specifies the orientation of the fixed analyser
+#  Description: The angle from the focal plane X axis to the fixed
+#		analyser, in degrees. Measured positive in the same sense
+#		as rotation from focal plane X to focal plane Y.
 angrot = 90.0
+
+#-----------------------------------------------------------------
+#  Name: 	submean
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Experimental
+#  Description: If non-zero, the mean value is subtracted from each
+#		time-slice before calculating the Q and U values. This
+#		typically has very little effect.
 submean = 0
 
 

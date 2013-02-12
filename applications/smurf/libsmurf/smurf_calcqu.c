@@ -79,8 +79,7 @@
 *        by the SC2CLEAN and MAKEMAP commands, plus additional parameter
 *        related to the calculation of Q and U. Further information
 *        about all these parameters is available in the "Configuration
-*        Parameters" section below, and can be found, with defaults, in
-*        $SMURF_DIR/smurf_calcqu.def. Default values will be used for
+*        Parameters" appendix of SUN/258. Default values will be used for
 *        any unspecified parameters. Assigning the value "<def>" (case
 *        insensitive) to a keyword has the effect of resetting it to its
 *        default value. Parameters not understood will trigger an error.
@@ -136,95 +135,6 @@
 *        syntax. An example can be found in
 *        $STARLINK_DIR/share/smurf/resist.cfg
 *        [$STARLINK_DIR/share/smurf/resist.cfg]
-
-*  Configuration Parameters:
-*     ANGROT = REAL
-*        The angle from the focal plane X axis to the fixed analyser, in
-*        degrees. Measured positive in the same sense as rotation from focal
-*        plane X to focal plane Y. [90.0]
-*     APOD = INTEGER
-*        Apodize signals (smoothly roll-off) using sine/cosine functions at
-*        start and end of the signal across this many samples. The supplied
-*        APOD value is ignored and a value of zero is used if ZEROPAD is set to 0.
-*     BADFRAC = REAL
-*        Flag entire bolometer as dead if at least this fraction of the samples
-*        in a detector time series were flagged as bad by the DA system.
-*     DCFITBOX = REAL
-*        Number of samples (box size) used on either side of a DC step to
-*        estimate the height of the step. If negative, it is taken as a
-*        duration in seconds, which is converted to a number of samples
-*        using the data sample rate.
-*     DCMAXSTEPS = INTEGER
-*        The maximum number of steps that can be corrected in each minute of
-*        good data (i.e. per 12000 samples) from a bolometer before the entire
-*        bolometer is flagged as bad. A value of zero will cause a bolometer to
-*        be rejected if any steps are found in the bolometer data stream.
-*     DCSMOOTH = INTEGER
-*        The number of samples in the median filter used to smooth a bolometer
-*        data stream prior to finding DC steps. If negative, it is taken as a
-*        duration in seconds, which is converted to a number of samples
-*        using the data sample rate.
-*     DCTHRESH = REAL
-*        Threshold S/N to detect and flag DC (baseline) steps.
-*     DKCLEAN = LOGICAL
-*        Clean the bolometers using the dark squids. Defaults to false.
-*     FILLGAPS = LOGICAL
-*        Fill vicinity of spikes / DC steps with constrained realization of
-*        noise. Also (unless ZEROPAD is 1), fill the padded region at the start
-*        and end of each time stream with artificial data. You almost always
-*        want to do this.
-*     FILT_EDGEHIGH = REAL
-*        Hard-edge high-pass frequency-domain filter (Hz).
-*     FILT_EDGELOW = REAL
-*        Hard-edge low-pass frequency-domain filter (Hz).
-*     FILT_NOTCHHIGH( ) = REAL
-*        Hard-edge band-cut frequency-domain notch filters. FILT_NOTCHHIGH is
-*        an array of upper-edge frequencies (Hz).
-*     FILT_NOTCHLOW( ) = REAL
-*        Array of lower-edge frequencies corresponding to FILT_NOTCHHIGH.
-*     FLAGSTAT = REAL
-*        Flag data taken while the telescope was stationary so that it
-*        they are ignored in the final map. The value given is a threshold
-*        slew velocity (arcsec/sec) measured in tracking coordinates
-*        below which the telescope is considered to be stationary.
-*     ORDER = INTEGER
-*        Subtract a fitted baseline polynomial of this order (0 to remove mean).
-*     PASIGN = BOOLEAN
-*        Indicates the sense of rotation of the spinning half-wave plate. If
-*        non-zero, it is assumed that a positive POL_ANG value corresponds
-*        to rotation from focal plane X to focal plane Y axis. If zero, it
-*        is assumed that a positive POL_ANG value corresponds to rotation
-*        from focal plane Y to focal plane X axis. [1]
-*     PAOFF = REAL
-*        The angle from the fixed analyser to the have-wave plate for a
-*        POL_ANG value of zero, in degrees. Measured positive in the same
-*        sense as rotation from focal plane X to focal plane Y. [0.0]
-*     SPIKEBOX = INTEGER
-*        The size of the filter box for the sigma-clipper. If negative, it is
-*        taken as a duration in seconds, which is converted to a number of
-*        samples using the data sample rate.
-*     SPIKETHRESH = REAL
-*        Threshold S/N to flag spikes using sigma-clipper.
-*     SUBMEAN = BOOLEAN
-*        If non-zero, the mean value is subtracted from each time-slice
-*        before calculating the Q and U values. This typically has very 
-*        little effect. [0]
-*     ZEROPAD = LOGICAL
-*        Determines the nature of the padding added to the start and end of
-*        each bolometer time stream. Padding is needed to avoid
-*        interaction between the data values at the start and end of each
-*        bolometer time stream, due to the cyclic wrap-around nature of the
-*        FFTs used to filter each time stream. If ZEROPAD is set to 1, the
-*        padded sections will be filled with zeros. This requires that the
-*        data also be apodised (see APOD) to avoid ringing due the sudden
-*        steps down to zero at the start and end of each time stream). If
-*        ZEROPAD is set to 0, then the padded regions will be filled with
-*        artificial data that links the data values at the start and end of
-*        the time stream smoothly. In this case, no apodisation is
-*        performed, and the value of the APOD parameter is ignored. The
-*        default for ZEROPAD is 0 (i.e. pad with artificial data rather
-*        than zeros) unless FILLGAPS is zero, in which case the supplied
-*        ZEROPAD value is ignored and a value of 1 is always used.
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)

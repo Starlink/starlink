@@ -54,10 +54,9 @@
 *
 *          The available parameters are identical to the cleaning
 *          parameters used by the iterative map-maker (method=ITER)
-*          and the list of parameters is explained in the "Configuration
-*          Parameters" section of the MAKEMAP documentation, and can be
-*          found, with defaults, in $SMURF_DIR/smurf_sc2clean.def.  Default
-*          values will be used for any unspecified parameters. Assigning
+*          and are are described in the "Configuration Parameters"
+*          appendix of SUN/258. Default values will be used for any
+*          unspecified parameters. Assigning
 *          the value "<def>" (case insensitive) to a keyword has the
 *          effect of resetting it to its default value. Options
 *          available to the map-maker but not understood by CALCNOISE

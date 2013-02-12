@@ -1,0 +1,245 @@
+#! /usr/bin/env perl
+
+#  This script requires that Perl be in the path, and that the
+#  environment variable SST_DIR be set to the location of the prolat
+#  binary. It creates a file call "./params.tex" holding latex descriptions
+#  of all the configuration parameters documented in the files "./*.def".
+
+#  Create an empty hash to hold the contents of all .def files. One entry
+#  for every .def file. The key is the smurf command associated with the
+#  .def file.
+   %allfiles = ();
+
+#  Loop over all .def files within the defaults subdirectory.
+   foreach $infile (<./*.def>) {
+
+#  Open the input .def file
+      open INFILE, "<$infile" or die "Cannot find file $infile $!\n";
+
+#  Get the name of the smurf command for which the input file provides
+#  defaults.
+      if( $infile =~ /smurf_(.+)\.def$/ ) {
+         $command = $1;
+      } else {
+         die "Cannot determine the csmurf command name\n";
+      }
+
+#  Create an empty hash to hold the parameters defined in the current .def
+#  file. Store the empty hash in the "allfiles" hash using the smurf command
+#  name as the key. This new hash will have one entry for each parameter
+#  documented in the .def file, and the key will be the parameter name.
+      $allfiles{$command} = ();
+
+#  There will be an additional key "_parents" associated with an entry that
+#  holds a list of the smurf commands that define parameters inherited by the
+#  current .def file. Create an empty list now.
+      $allfiles{$command}{"_parents"} = [];
+
+#  We are currently looking for the start of a parameter description.
+      $state = 0;
+
+#  Read input lines.
+      while( $line = <INFILE> ) {
+         chomp $line;
+
+#  If this is a "#-" line, indicate we are ready to start a parameter block.
+         if( $state == 0 && $line =~ /^#-/ ) {
+            $state = 1
+
+#  If this line holds a parameter name, note the parameter name and
+#  indicate we are now looking for the next field.
+         } elsif( $state == 1 && $line =~ /^#\s+Name:\s+(\S+)/ ) {
+            $name = $1;
+            $state = 2;
+            $type = "?";
+            $default = "?";
+            $purpose = "?";
+            $description = "?";
+
+#  If we have just been reading a parameter block, but the current line does
+#  not start with a comment character # then we have finished the parameter
+#  block.
+         } elsif( $state > 1 && !( $line =~ /^#/) ) {
+
+#  Create an empty hash to hold the documentation fields for the current
+#  parameter. Store the empty hash using the parameter name as the key. This
+#  new hash will have one entry for each documentation field.
+            $allfiles{$command}{$name} = ();
+            $allfiles{$command}{$name}{"name"} = $name;
+            $allfiles{$command}{$name}{"type"} = $type;
+            $allfiles{$command}{$name}{"default"} = $default;
+            $allfiles{$command}{$name}{"purpose"} = $purpose;
+            $allfiles{$command}{$name}{"description"} = $description;
+            $allfiles{$command}{$name}{"applic"} = $command;
+
+#  Indicate we are now looking for a new parameter block.
+            $state = 0;
+
+#  If we are sill reading a parameter block, read the next line and append
+#  it to the variable that holds the value of the field being read.
+         } elsif( $state > 1 && $line =~ /^#\s+Type:\s+(.+)\s*$/ ) {
+            $type = $1;
+
+         } elsif( $state > 1 && $line =~ /^#\s+Default:\s+(.+)\s*$/ ) {
+            $default = $1;
+
+         } elsif( $state > 1 && $line =~ /^#\s+Purpose:\s+(.+)\s*$/ ) {
+            $purpose = $1;
+            $state = 3;
+
+         } elsif( $state > 1 && $line =~ /^#\s+Description:\s+(.+)\s*$/ ) {
+            $description = $1;
+            $state = 4;
+
+         } elsif( $state == 3 && $line =~ /^#\s*(.*)\s*$/ ) {
+            $purpose = "$purpose\n*     $1";
+
+         } elsif( $state == 4 && $line =~ /^#\s*(.*)\s*$/ ) {
+            $description = "$description\n*     $1";
+
+#  If we are looking for the start of a new parameter block, and we find
+#  an indirection element, then note the smurf command associated with the
+#  file that is read by the indirection command.
+         } elsif( $state == 0 && $line =~ /^\s*\^.*smurf_(.+)\.def/ ) {
+            push @{ $allfiles{$command}{"_parents"} }, $1;
+
+         } else {
+            $state = 0;
+         }
+
+      }
+
+#  Close the input .def file.
+      close INFILE;
+   }
+
+#  Now we have read all the parameter blocks from all .def files, we need
+#  to extend the "applicability" field for each parameter, to include and
+#  commands that inherit the parameter from a parent .def file.
+   foreach $command (keys %allfiles) {
+      &applic( $command, $command );
+   }
+
+#  Now merge all the parameters from all .def files into a single list.
+   %allparams = ();
+   foreach $command (keys %allfiles) {
+      foreach $name (keys %{ $allfiles{$command} }) {
+         if( $name ne "_parents" ) {
+            if( exists $allparams{$name} ) {
+               die "Parameter $name defined in more than one .def file\n";
+            } else {
+               $allparams{$name} = ();
+               $allparams{$name}{"name"} = $name;
+               $allparams{$name}{"type"} = $allfiles{$command}{$name}{"type"};
+               $allparams{$name}{"default"} = $allfiles{$command}{$name}{"default"};
+               $allparams{$name}{"purpose"} = $allfiles{$command}{$name}{"purpose"};
+               $allparams{$name}{"description"} = $allfiles{$command}{$name}{"description"};
+               $allparams{$name}{"applic"} = $allfiles{$command}{$name}{"applic"};
+            }
+         }
+      }
+   }
+
+#  Open a temporary text file to hold an SST prologue for each parameter.
+   open( TEMP, '>/tmp/make_pardocs.tmp' );
+
+#  Loop over the parameters in alphabetical order.
+   foreach $name (sort keys %allparams) {
+      $purpose = &trimws( $allparams{$name}{"purpose"} );
+      $type = &trimws( $allparams{$name}{"type"} );
+      $default = &trimws( $allparams{$name}{"default"} );
+      $applic = &trimws( uc( $allparams{$name}{"applic"} ) );
+      $desc = &trimws( $allparams{$name}{"description"} );
+      $Name = uc( $name);
+
+#  Write out an SST prologue for the parameter, appending it to the tmp file.
+      print( TEMP "*+\n" );
+      print( TEMP "*  Name:\n" );
+      print( TEMP "*     $Name\n" );
+      print( TEMP "\n" );
+      print( TEMP "*  Purpose:\n" );
+      print( TEMP "*     $purpose\n" );
+      print( TEMP "\n" );
+      print( TEMP "*  Invocation:\n" );
+      print( TEMP "*     $type\n" );
+      print( TEMP "\n" );
+      print( TEMP "*  Description:\n" );
+      print( TEMP "*     $desc [$default]\n" );
+      print( TEMP "\n" );
+      print( TEMP "*  SMURF Usage:\n" );
+      print( TEMP "*     $applic\n" );
+      print( TEMP "*-\n" );
+   }
+
+#  Close the temp file.
+   close( TEMP );
+
+#  Run PROLAT on the temp file and then delete it.
+   print( STDERR
+      `rm -f /tmp/prolat.tex;
+      \$SST_DIR/prolat in=/tmp/make_pardocs.tmp atask=f single=f page=f document=f out=/tmp/prolat.tex;
+      rm -f /tmp/make_pardocs.tmp`
+   );
+
+#  Read the entire prolat output file into a local variable.
+   local $/;
+   open( LATEX, '/tmp/prolat.tex' );
+   $document = <LATEX>;
+   close( LATEX );
+
+#  Add cross-links. Each reference to a parameter should now be in the form
+#  '(P|p)arameter {\tt "}name{\tt "}'.
+   foreach $name (keys %allparams) {
+      ($pname = $name) =~ s/_/\\_/g;
+      ($rname = $name) =~ s/_/\\\\_/g;
+       $qname = uc( $name );
+       $document =~ s/(arameter\s*\{\\tt \"\})$rname(\{\\tt \"\})/$1\\htmlref{$pname}{$qname}$2/gs;
+   }
+
+#  Edit the Latex macro invocations into their final form.
+   $document =~ s/\\sstinvocation{/\\sstattributetype{/gs;
+
+#  Fix up constructs that don't otherwise convert to HTML properly.
+   $document =~ s/{\\tt \'}/'/gs;
+   $document =~ s/{\\tt \"}/{\\tt{\"}}/gs;
+   $document =~ s/(\$<\$undef\$>\$)/{\\tt $1}/gs;
+
+#  Write the modified latex out to the output file.
+   open( OUTPUT, '>params.tex' );
+   print OUTPUT $document;
+   close( OUTPUT );
+
+#  Add command "$com2" to the "Applicability" field for each parameter defined
+#  in the .def file for command "$com1", and then also add "$com2" to the
+#  parameters defined in any .def files from which "$com2" inherits.
+sub applic {
+   my ($com1,$com2) = @_;
+
+#  For each parent .def file included in the .def file for $com1...
+   foreach $parent ( @{ $allfiles{$com1}{"_parents"} } ){
+
+#  For each parameter defined in the current parent...
+      foreach $name ( keys %{ $allfiles{$parent} } ){
+
+#  Add "com2" to the Applicability field, skipping the "_parents" entry which
+#  does not define a parameter.
+         if( $name ne "_parents" ) {
+            $allfiles{$parent}{$name}{"applic"} .= ", $com2";
+         }
+      }
+
+#  Include "com2" in the applicability fields for any parameters defined in
+#  higher level .def files included by the curent parent.
+      applic( $parent, $com2 );
+   }
+
+}
+
+sub trimws {
+   my $string =$_[0];
+   $string =~ s/^\s+//; #remove leading spaces
+   $string =~ s/\s+$//; #remove trailing spaces
+   return $string;
+}
+
+

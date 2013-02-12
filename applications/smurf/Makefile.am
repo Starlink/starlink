@@ -2,12 +2,13 @@
 
 # Build libsmf before the applications
 
-SUBDIRS = libsmf libsmurf libsc2sim libacsis libaztec libgsd libsc2fts docs
+SUBDIRS = libsmf libsmurf libsc2sim libacsis libaztec libgsd libsc2fts \
+          docs defaults
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc -Isc2da -Isc2sim
 
-dist_bin_SCRIPTS = $(DYNSCRIPTS) $(STATICSCRIPTS) $(DEFAULTS)
+dist_bin_SCRIPTS = $(DYNSCRIPTS) $(STATICSCRIPTS)
 dist_noinst_SCRIPTS = smurf_link_adam
 bin_MONOLITHS = smurf_mon
 smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES)
@@ -172,11 +173,6 @@ scripts/pol2cat.py scripts/starutil.py scripts/skyloop.py \
 scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/canfar_scuba2_map.sh \
 scripts/sc2tsnoise scripts/canfar_sc2noise
 
-DEFAULTS = defaults/smurf_makemap.def defaults/smurf_extinction.def \
-defaults/smurf_sc2clean.def defaults/smurf_calcflat.def \
-defaults/smurf_calcqu.def defaults/smurf_fit1d.def \
-defaults/smurf_fit1d_uval.def
-
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
 
@@ -196,3 +192,5 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 # Make help file
 smurf.hlp: smurf_master.hlp libsmurf/smurfmon.hlp
 	cat smurf_master.hlp libsmurf/smurfmon.hlp > smurf.hlp
+
+

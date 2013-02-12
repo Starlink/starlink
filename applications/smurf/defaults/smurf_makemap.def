@@ -405,7 +405,7 @@ diag.append = 0
 #  Type: 	real
 #  Default: 	<undef>
 #  Purpose: 	Qualifies the required dignostic information.
-#  Description: The name of the array (S8A, S*b, etc) containing the data to
+#  Description: The name of the array (S8A, S8B, etc) containing the data to
 #		be written out. If <undef>, the first available array is
 #		used. Only used if a value is supplied for parameter "diag.out".
 diag.array = <undef>

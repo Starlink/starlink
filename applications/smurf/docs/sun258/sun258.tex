@@ -17,9 +17,9 @@
 {Copyright \copyright\ 2012 University of British Columbia \& the Science \& Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {258.2}
+\newcommand{\stardocnumber}    {258.3}
 \newcommand{\stardocauthors}   {Edward Chapin, Andrew G. Gibb, Tim Jenness, David S. Berry, Douglas Scott \& Remo Tilanus}
-\newcommand{\stardocdate}      {30 Aug 2012}
+\newcommand{\stardocdate}      {14th February 2013}
 \newcommand{\stardoctitle}     {SMURF -- the Sub-Millimetre User Reduction Facillity}
 \newcommand{\stardocversion}   {Version 1.4.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -478,6 +478,12 @@
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
+%  Format the attribute data type section.
+\newcommand{\sstattributetype}[1]{
+   \item[Type:] \mbox{} \\
+      #1
+}
+
 %% Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
@@ -574,6 +580,12 @@
       \end{itemize}
       \\
    }
+
+%  sstattributetype
+   \newcommand{\sstattributetype}[1]{
+      \item[Type:] #1
+   }
+
 %  sstitem
    \newcommand{\sstitem}{\item}
 
@@ -828,8 +840,30 @@ IN - Input flatfield files >
 \subsubsection{SMURF parameters}
 
 \SMURF\ uses named parameters to specify input and output files and
-other variables necessary for data processing. \KAPPA\ \KAPPAref\ has a
-convenient overview of the parameter system used by \SMURF.
+other variables necessary for data processing. There are two types of
+named parameter which should not be confused as they are accessed and
+specified in very different ways:
+
+\begin{description}
+\item[ADAM parameters] - These are specified on the command line when
+running a SMURF command. They behave in just the same way as ADAM
+parameters for other Starlink packages. \KAPPA\ \KAPPAref\ has a
+convenient overview of the Starlink parameter system. ADAM parameters are
+usually used to specify the main inputs and output for each command, and
+to select the main options to be used.
+\item[Configuration parameters] - These are used to fine tune the details
+of specific algorithms, and may be much more numerous than ADAM
+parameters. If required, a SMURF command will access an entire group of
+configuration parameter settings using a single ADAM parameter called
+``CONFIG''. The configuration parameter settings can be specified
+directly as a comma separated list in response to a prompt for CONFIG, or
+may be stored in a text file, the name of which is then supplied when
+prompted for CONFIG. Each SMURF command that requires a group of
+configuration parameters will document what is needed, and how it can be
+supplied, in the reference documentation for the CONFIG (ADAM) parameter.
+Appendix \ref{par:full} describes individual configuration parameters in
+detail.
+\end{description}
 
 \subsubsection{Message filter}
 
@@ -2261,7 +2295,7 @@ makemap in=^input.lis out=mapname method=iterate config=^config.lis \
 
 Table \ref{tab:dimmconfig} summarizes the configuration parameters
 available for the model components used by the DIMM (see also detailed
-comments for the \makemap\ task). The default values are shown in the
+comments in appendix \ref{par:full}). The default values are shown in the
 third column.
 
 \begin{table}
@@ -3499,10 +3533,9 @@ as additional lines of median, mean and standard deviation.
 }{
    \sstdescription{
       This script makes a map from specified raw time-series data using the
-      {\tt "}inside-out{\tt "} algorithm described at
-      \htmladdnormallink{
-      \texttt{http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html}
-      }{http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html}.
+      {\tt "}inside-out{\tt "} algorithm described at \\
+      \htmladdnormallink{\texttt{http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html.}
+      }{http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html}
       It runs SMURF:MAKEMAP multiple times, performing a single iteration of
       the Dynamic Iterative Map-Maker algorithm on each invocation,
       including data from all chunks. Each map created by MAKEMAP is used
@@ -3544,63 +3577,66 @@ as additional lines of median, mean and standard deviation.
          \sstitemlist{
             \sstitem
             First iteration:
-            \begin{verbatim}
-               numiter=1
-               noi.calcfirst=1
-               exportNDF=ext
-               noexportsetbad=1
-               exportclean=1
-               ast.zero_notlast = 0
-               flt.zero_notlast = 0
-               com.zero_notlast = 0
-               itermap=0
-               shortmap=0
-               bolomap=0
-               flagmap=<undef>
-               sampcube=0
-            \end{verbatim}
+            {\tt \\
+               numiter=1 \\
+               noi.calcfirst=1 \\
+               exportNDF=ext \\
+               noexportsetbad=1 \\
+               exportclean=1 \\
+               ast.zero\_notlast=0 \\
+               flt.zero\_notlast=0 \\
+               com.zero\_notlast=0 \\
+               itermap=0 \\
+               shortmap=0 \\
+               bolomap=0 \\
+               flagmap=<undef> \\
+               sampcube=0 \\
+               diag.append=0
+            }
 
             \sstitem
             Subsequent iterations:
-            \begin{verbatim}
-               numiter=1
-               noi.calcfirst=1
-               doclean=0
-               importsky=ref
-               ext.import=1
-               ast.zero_notlast = 0
-               flt.zero_notlast = 0
-               com.zero_notlast = 0
-               flt.notfirst = 0
-               pln.notfirst = 0
-               smo.notfirst = 0
-               itermap=0
-               shortmap=0
-               bolomap=0
-               flagmap=<undef>
-               sampcube=0
-            \end{verbatim}
+            {\tt \\
+               numiter=1 \\
+               noi.calcfirst=1 \\
+               doclean=0 \\
+               importsky=ref \\
+               ext.import=1 \\
+               ast.zero\_notlast=0 \\
+               flt.zero\_notlast=0 \\
+               com.zero\_notlast=0 \\
+               flt.notfirst=0 \\
+               pln.notfirst=0 \\
+               smo.notfirst=0 \\
+               itermap=0 \\
+               shortmap=0 \\
+               bolomap=0 \\
+               flagmap=<undef> \\
+               sampcube=0 \\
+               diag.append=1
+            }
 
             \sstitem
             Last iteration:
-            \begin{verbatim}
-               numiter=1
-               noi.calcfirst=1
-               doclean=0
-               importsky=ref
-               ext.import=1
-               ast.zero_notlast = 1
-               flt.zero_notlast = 1
-               com.zero_notlast = 1
-               flt.notfirst = 0
-               pln.notfirst = 0
-               smo.notfirst = 0
-               itermap=0
-               shortmap=0
-               bolomap=0
-               flagmap=<undef>
-               sampcube=0
-            \end{verbatim}
+            {\tt \\
+               numiter=1 \\
+               noi.calcfirst=1 \\
+               doclean=0 \\
+               importsky=ref \\
+               ext.import=1 \\
+               ast.zero\_notlast=1 \\
+               flt.zero\_notlast=1 \\
+               com.zero\_notlast=1 \\
+               flt.notfirst=0 \\
+               pln.notfirst=0 \\
+               smo.notfirst=0 \\
+               itermap=0 \\
+               shortmap=0 \\
+               bolomap=0 \\
+               flagmap=<undef> \\
+               sampcube=0 \\
+               diag.append=1
+            }
          }
       }
       \sstsubsection{
@@ -3893,6 +3929,26 @@ as additional lines of median, mean and standard deviation.
     }
   }
 }
+
+\section{\xlabel{par_full}Configuration Parameters\label{par:full}}
+
+The following pages describe the values that can be included in the
+configuration supplied via the CONFIG parameter when running a SMURF
+command.
+
+\begin{itemize}
+\item The ``SMURF Usage'' section of each description lists the SMURF
+commands that accept the parameter. This does not mean that all the
+listed commands actually \emph{use} the parameter - it just means that
+any commands \emph{not} in the list will report an error if the parameter
+is supplied.
+\item The default value for each parameter is shown in square brackets at
+the end of the description. This is the default value used by the
+dimmconfig.lis, or equivalent, configuration file. Other configuration
+files may over-ride this default.
+\end{itemize}
+
+\input{../../defaults/params}
 
 \end{document}
 
