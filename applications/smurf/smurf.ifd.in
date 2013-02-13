@@ -5221,6 +5221,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/skyloop.py}
     }
 
+    command configmeld {
+        obey {python $SMURF_DIR/configmeld.py}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {

@@ -3158,6 +3158,60 @@ number within those parentheses indicates the size of the array.
 
 \clearpage
 \sstroutine{
+   CONFIGMELD
+}{
+   Compare two MAKEMAP configs using the unix {\tt "}meld{\tt "} tool
+}{
+   \sstdescription{
+      This script use the unix meld tool to display two sets of
+      configuration parameters, highlighting the differences between
+      them. Each config may be supplied directly, as is done when running
+      MAKEMAP, or can be read from the History component of an NDF that
+      was created by MAKEMAP.
+   }
+   \sstusage{
+      configmeld config1 config2 defaults
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The unix {\tt "}meld{\tt "} command must be installed and available on the
+         unix PATH.
+      }
+   }
+   \sstdiylist{
+      Parameters
+   }{
+      \sstsubsection{
+         CONFIG1 = LITERAL (Read)
+      }{
+         The first configuration. This can be a normal config such as is
+         supplied for the CONFIG parameter of MAKEMAP, or an NDF created
+         by MAKEMAP.
+      }
+      \sstsubsection{
+         CONFIG2 = LITERAL (Read)
+      }{
+         The first configuration. This can be a normal config such as is
+         supplied for the CONFIG parameter of MAKEMAP, or an NDF created
+         by MAKEMAP.
+      }
+      \sstsubsection{
+         DEFAULTS = LITERAL (Read)
+      }{
+         This should be one of {\tt "}450{\tt "}, {\tt "}850{\tt "} or {\tt "}!{\tt "}. It specifies whether
+         default values approriate for 450 or 850 um data are to be supplied
+         for any MAKEMAP config parameters that are not specified in CONFIG1
+         or CONFIG2. If null (!) is supplied, no defaults are used, and the
+         displayed list includes only those parameter for which values
+         are defined by the supplied configurations. [!]
+      }
+   }
+}
+
+\clearpage
+\sstroutine{
    DUMPOCSCFG
 }{
    Retrieve OCS configuration XML from data file.

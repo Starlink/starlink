@@ -171,7 +171,7 @@ STATICSCRIPTS = scripts/jcmtstate2cat scripts/mcehead2cat scripts/dumpocscfg scr
 scripts/distortion scripts/showdistortion scripts/tobeam scripts/print_index \
 scripts/pol2cat.py scripts/starutil.py scripts/skyloop.py \
 scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/canfar_scuba2_map.sh \
-scripts/sc2tsnoise scripts/canfar_sc2noise
+scripts/sc2tsnoise scripts/canfar_sc2noise scripts/configmeld.py
 
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl

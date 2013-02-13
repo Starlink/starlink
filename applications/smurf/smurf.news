@@ -8,6 +8,11 @@
 
    http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html
 
+ o A new command "configmeld" has been added which will use the unix
+   "meld" command to compare two sets of MAKEMAP configuration
+   parameters, specified directly or from the History component of an NDF
+   created by MAKEMAP.
+
  o If multiple types of mask are requested for any of the AST, FLT
    and COM models (e.g. ZERO_LOWHITS and ZERO_MASK both specified),
    they will now be combined into a single mask. Previously, only one
