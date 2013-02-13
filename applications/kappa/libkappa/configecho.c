@@ -169,6 +169,9 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        providing a null value for NAME.
 *     11-FEB-2013 (GSB):
 *        Added ability to read configuration from history entries.
+*     13-FEB-2013 (DSB):
+*        Nullify AST object pointers when the objects are annulled, 
+*        to avoid re-use of dead pointers.
 *     {enter_further_changes_here}
 
 *-
@@ -319,7 +322,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
                astAnnul( keymap );
                keymap = keymap2;
             } else {
-               astAnnul( keymap );
+               keymap = astAnnul( keymap );
             }
 
 /* If historyConfig exists, do the same there. */
@@ -329,7 +332,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
                   historyConfig = keymap2;
                }
                else {
-                  astAnnul(historyConfig);
+                  historyConfig = astAnnul(historyConfig);
                }
             }
 
