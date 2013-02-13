@@ -110,7 +110,7 @@ try:
       select = "850=1,450=0"
       defs = "$SMURF_DIR/smurf_makemap.def"
    elif defs == "450":
-      select = "850=0,450=1"
+      select = starutil.shell_quote( "'850=0,450=1'" )
       defs = "$SMURF_DIR/smurf_makemap.def"
    else:
       raise starutil.InvalidParameterError("Bad value for parameter DEFAULTS "
