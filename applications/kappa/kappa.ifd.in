@@ -9833,6 +9833,13 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter application {
+            type LITERAL
+            prompt {Application for which to find configuration}
+            helpkey *
+            default !
+         }
+
          parameter config {
             position 2
             type LITERAL
@@ -9867,6 +9874,13 @@ package kappa {
             ppath CURRENT
             prompt {Parameter name}
             helpkey *
+         }
+
+         parameter ndf {
+            access READ
+            prompt {NDF from which to read configuration}
+            helpkey *
+            default !
          }
 
          parameter select {

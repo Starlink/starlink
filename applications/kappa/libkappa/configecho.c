@@ -11,7 +11,10 @@
 #include <string.h>
 #include <stdio.h>
 
-static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix, int *status );
+static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
+                           AstKeyMap *refkm, int *status );
+void HistoryKeyMap(int i, char* const text[], int* status);
+AstKeyMap* historyConfig = 0;
 
 F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 /*
@@ -46,6 +49,10 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     configecho name config [defaults] [select] [defval]
 
 *  ADAM Parameters:
+*     APPLICATION = LITERAL (Read)
+*        When reading configuration parameters from the history
+*        of an NDF, specifies the name of the application to find
+*        in the history.
 *     CONFIG = GROUP (Read)
 *        Specifies values for the configuration parameters. If the string
 *        "def" (case-insensitive) or a null (!) value is supplied, a set
@@ -80,7 +87,10 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        parameter, or if the value is "<undef>".  [<***>]
 *     NAME = LITERAL (Read)
 *        The name of the configuration parameter to display. If null (!)
-*	 then all parameters defined in the configuration are displayed.
+*        then all parameters defined in the configuration are displayed.
+*     NDF = NDF (Read)
+*        An NDF file containing history entries which include
+*        configuration parameters.
 *     SELECT = GROUP (Read)
 *        A group that specifies any alternative prefixes that can be
 *        included at the start of any parameter name. For instance, if
@@ -101,7 +111,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     SORT = _LOGICAL (Read)
 *        If TRUE then sort the listed parameters in to alphabetical order.
 *        Otherwise, retain the order they have in the supplied
-*	 configuration. Only used if a null (!) value is supplied for
+*        configuration. Only used if a null (!) value is supplied for
 *        parameter NAME. [FALSE]
 *     VALUE = LITERAL (Write)
 *        The value of the configuration parameter, or "<***>" if the
@@ -146,16 +156,19 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 
 *  Authors:
 *     DSB: David S. Berry
+*     GSB: Graham S. Bell
 *     {enter_new_authors_here}
 
 *  History:
 *     10-DEC-2012 (DSB):
 *        Original version.
-*     6-FEB-2012 (DSB):
+*     6-FEB-2013 (DSB):
 *        Added parameter DEFVAL.
 *     11-FEB-2013 (DSB):
 *        Added parameter SORT and allow all parameters to be listed by
 *        providing a null value for NAME.
+*     11-FEB-2013 (GSB):
+*        Added ability to read configuration from history entries.
 *     {enter_further_changes_here}
 
 *-
@@ -173,9 +186,15 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
    char defval[250];
    char name[250];
    const char *value;
+   char *historyValue = 0;
    int showall;
    int sort;
    size_t size;
+   int indf = 0;
+   int nrec;
+   int i;
+   char application[NDF__SZAPP];
+   char applicationi[NDF__SZAPP];
 
 /* Abort if an error has already occurred. */
    if( *STATUS != SAI__OK ) return;
@@ -196,12 +215,32 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
       }
    }
 
+/* Get the NDF file handle if requested. */
+   if (*STATUS == SAI__OK) {
+      ndfAssoc("NDF", "READ", &indf, STATUS);
+      if (*STATUS == PAR__NULL) {
+         errAnnul(STATUS);
+         indf = 0;
+      }
+      else {
+         parGet0c("APPLICATION", application, sizeof(application), STATUS);
+      }
+   }
+
 /* If no defaults file was supplied, just get the CONFIG group and convert
    to an AST KeyMap. */
    if( ! defs[0] ) {
       kpg1Gtgrp( "CONFIG", &grp, &size, STATUS );
       kpg1Kymap( grp, &keymap, STATUS );
       grpDelet( &grp, STATUS );
+
+/* Allow it to be NULL if we're reading an NDF because we'll replace
+   keymap with historyConfig later if necessary. */
+
+      if (indf && *STATUS == PAR__NULL) {
+         errAnnul(STATUS);
+         keymap = 0;
+      }
 
 /* If a defaults file was supplied, we also allow the user to define the
    allowed alternative prefixes and to select the default prefix, using
@@ -236,6 +275,30 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
       astChrCase( NULL, name, 1, 0 );
    }
 
+/* Attempt to find the NDF's corresponding history record. */
+   if (indf && *STATUS == SAI__OK) {
+      ndfHnrec(indf, &nrec, STATUS);
+      for (i = 0; i < nrec; i ++) {
+         ndfHinfo(indf, "APPLICATION", i + 1, applicationi,
+                  sizeof(applicationi), STATUS);
+         if (! strncasecmp(application, applicationi, strlen(application))) {
+            ndfHout(indf, i + 1, HistoryKeyMap, STATUS);
+            break;
+         }
+      }
+
+      if (! historyConfig) {
+         *STATUS = SAI__ERROR;
+
+         errRep("CONFIGECHO_ERR", "CONFIGECHO: Failed to find application "
+                "configuration in NDF history.", STATUS);
+      }
+      else if (! keymap) {
+         keymap = historyConfig;
+         historyConfig = 0;
+      }
+   }
+
    if( *STATUS == SAI__OK ) {
 
 /* First deal with cases where we are displaying a single parameter
@@ -259,6 +322,17 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
                astAnnul( keymap );
             }
 
+/* If historyConfig exists, do the same there. */
+            if (historyConfig) {
+               if (astMapGet0A(historyConfig, pname, &keymap2)) {
+                  astAnnul(historyConfig);
+                  historyConfig = keymap2;
+               }
+               else {
+                  astAnnul(historyConfig);
+               }
+            }
+
 /* Re-instate the original dot, and move on to find the next dot. */
             pname[ dot - pname ] = '.';
             pname = dot + 1;
@@ -274,11 +348,30 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
             astMapGet0C( keymap, pname, &value );
          }
 
+         if (historyConfig) {
+            astClear(historyConfig, "KeyError");
+            astMapGet0C(historyConfig, pname, &historyValue);
+
+/* In NDF history mode we only want to return a value if it
+   was found in the configuration from the history. */
+
+            if (historyValue) {
+               if (strcmp(value, historyValue)) {
+                  msgOutf("", "+ %s", STATUS, historyValue);
+               }
+               else {
+                  msgOutf("", "- %s", STATUS, historyValue);
+               }
+               parPut0c("VALUE", historyValue, STATUS);
+            }
+         }
+         else {
 /* Display it. */
-         msgOut( "", value, STATUS );
+            msgOut( "", value, STATUS );
 
 /* Write it to the output parameter. */
-         parPut0c( "VALUE", value, STATUS );
+            parPut0c( "VALUE", value, STATUS );
+         }
 
 /* Now deal with cases were we are displaying all parameter values. */
       } else {
@@ -287,7 +380,12 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
          parGet0l( "SORT", &sort, STATUS );
 
 /* Display them. */
-         DisplayKeyMap( keymap, sort, "", STATUS );
+         if (historyConfig) {
+            DisplayKeyMap( historyConfig , sort, "", keymap, STATUS );
+         }
+         else {
+            DisplayKeyMap( keymap, sort, "", 0, STATUS );
+         }
       }
    }
 
@@ -296,6 +394,11 @@ L999:;
 
 /* End the AST context */
    astEnd;
+
+/* Close the NDF if open. */
+   if (indf) {
+      ndfAnnul(&indf, STATUS);
+   }
 
 /* If an error has occurred, issue another error report identifying the
    program which has failed (i.e. this one). */
@@ -311,7 +414,7 @@ L999:;
 
 
 static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
-                           int *status ){
+                           AstKeyMap *refkm, int *status ){
 /*
 *  Name:
 *     DisplayKeyMap
@@ -330,6 +433,9 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 *        If non-zero, sort the values alphabetically by their keys.
 *     prefix
 *        A string to prepend to eack key.
+*     refkm
+*        Reference key map (e.g. values from the supplied configuration
+*        rather than the NDF history).
 *     status
 *        Inherited status pointer.
 
@@ -342,9 +448,11 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 
 /* Local Variables: */
    AstObject *avalue;
+   AstObject *refavalue;
    char cbuffer[ 255 ];
    char newpref[ 255 ];
    const char *cvalue;
+   const char *refcvalue;
    const char *key;
    int ikey;
    int ival;
@@ -354,6 +462,7 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
+   if (refkm) astClear(refkm, "KeyError");
 
 /* Sort the supplied KeyMap is required. */
    if( sort ) astSetC( km, "SortBy", "KeyUp" );
@@ -368,9 +477,19 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
    to each key so that it includes the key associated with the nest keymap. */
       if( astMapType( km, key ) == AST__OBJECTTYPE ) {
          astMapGet0A( km, key, &avalue );
+         if (refkm) {
+            if (! astMapGet0A(refkm, key, &refavalue)) {
+               refavalue = astKeyMap("");
+            }
+         }
+         else {
+            refavalue = 0;
+         }
          sprintf( newpref, "%s%s.", prefix, key );
-         DisplayKeyMap( (AstKeyMap *) avalue, sort, newpref, status );
+         DisplayKeyMap( (AstKeyMap *) avalue, sort, newpref,
+                        (AstKeyMap *) refavalue, status );
          avalue = astAnnul( avalue );
+         if (refavalue) refavalue = astAnnul(refavalue);
 
 /* If the current entry is not a nested keymap, we display it now. */
       } else {
@@ -384,7 +503,19 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
          if( nval <= 1 ) {
             cvalue = "<undef>";
             astMapGet0C( km, key, &cvalue );
-            msgOutf( "", "%s%s = %s", status, prefix, key, cvalue );
+            if (refkm) {
+               refcvalue = "<undef>";
+               if (astMapGet0C(refkm, key, &refcvalue)
+                     && ! strcmp(cvalue, refcvalue)) {
+                  msgOutf("", "- %s%s = %s", status, prefix, key, cvalue);
+               }
+               else {
+                  msgOutf("", "+ %s%s = %s", status, prefix, key, cvalue);
+               }
+            }
+            else {
+               msgOutf( "", "%s%s = %s", status, prefix, key, cvalue );
+            }
 
 /* If it is a vector, we construct a string containing a comma-separated
    list of elements, enclosed in parentheses. */
@@ -401,14 +532,158 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
             }
             cvalue = astAppendString( (char *) cvalue, &nc, ")" );
 
+/* Do the same for the reference KeyMap. */
+
+            if (refkm && (nval = astMapLength(refkm, key))) {
+               nc = 0;
+               refcvalue = astAppendString(NULL, &nc, "(");
+               for (ival = 0; ival < nval; ival++) {
+                  if (ival) {
+                     refcvalue = astAppendString((char*) refcvalue, &nc, "," );
+                  }
+
+                  if (astMapGetElemC(refkm, key, sizeof(cbuffer) - 1, ival,
+                                      cbuffer)) {
+                     refcvalue = astAppendString((char*) refcvalue, &nc,
+                                                 cbuffer);
+                  }
+               }
+               refcvalue = astAppendString((char*) refcvalue, &nc, ")");
+            }
+            else {
+               refcvalue = 0;
+            }
+
 /* Display the total string, with the current key prefix, and free the memory
    used to store it. */
-            msgOutf( "", "%s%s = %s", status, prefix, key, cvalue );
+            if (refkm) {
+               if (refcvalue && ! strcmp(cvalue, refcvalue)) {
+                  msgOutf("", "- %s%s = %s", status, prefix, key, cvalue);
+               }
+               else {
+                  msgOutf("", "+ %s%s = %s", status, prefix, key, cvalue);
+               }
+            }
+            else {
+               msgOutf( "", "%s%s = %s", status, prefix, key, cvalue );
+            }
             cvalue = astFree( (void *) cvalue );
+            if (refcvalue) refcvalue = astFree((void*) refcvalue);
          }
       }
    }
 }
 
+/*
+ * Process an NDF history element and construct a KeyMay.
+ *
+ * This is intended as a handler routine for use with ndfHout,
+ * it reads the supplied text and sets the global historyConfig
+ * variable.
+ */
+void HistoryKeyMap(int n, char* const text[], int* status) {
+   char patt_group[] = "Group:";
+   char patt_cont[] = "   ";
+   char patt_name[] = "CONFIG";
+   char buff[1000000];
+   char line[NDF__SZHIS + 1];
+   char* p;
+   char* q;
+   int i;
+   int groupstarting = 0;
+   int groupcontinuing = 0;
+   Grp* grp;
+   size_t grpsize;
+   int grpadded, grpflag;
 
+/* Loop over history text lines, copying each into line for editing
+   and setting p to point at the start of line. */
 
+   for (i = 0; i < n; i ++) {
+      strncpy(line, text[i], NDF__SZHIS);
+      line[NDF__SZHIS] = '\0';
+      p = line;
+
+/* If a group is in progess, check that it continues, and if so
+   add the line to the buffer, otherwise end the group. Since we
+   only extract one group, we can leave processing buff to the end. */
+
+      if (groupcontinuing) {
+         if (! strncmp(patt_cont, p, strlen(patt_cont))) {
+            p += strlen(patt_cont);
+            while (*p == ' ') p++;
+            while (p[strlen(p) - 1] == ' ') p[strlen(p) - 1] = '\0';
+            strncat(buff, p, sizeof(buff) - strlen(buff) - 1);
+            continue;
+         }
+         else {
+            groupcontinuing = 0;
+         }
+      }
+
+/* If we didn't already detect a group to be starting, see whether
+   one is starting now. */
+
+      if (! groupstarting) {
+         if (strncmp(patt_group, p, strlen(patt_group))) {
+            continue;
+         }
+         else {
+            groupstarting = 1;
+            p += strlen(patt_group);
+         }
+      }
+
+      while (*p == ' ') p ++;
+
+      if (! *p) continue;
+
+/* Group is starting, so check whether the group name is the one
+   for which we are looking, and if so, start collecting the
+   text in buff. */
+
+      if (! strncmp(patt_name, p, strlen(patt_name))) {
+         p += strlen(patt_name);
+         while (*p == ' ') p ++;
+         if (*p == '=') {
+            p++;
+            if (*p == '"') p++;
+            while (*p == ' ') p++;
+            while (p[strlen(p) - 1] == ' ') p[strlen(p) - 1] = '\0';
+            strncpy(buff, p, sizeof(buff));
+            groupcontinuing = 1;
+         }
+      }
+
+      groupstarting = 0;
+   }
+
+/* Convert buff to a KeyMap and set the global variable historyConfig. */
+
+   if (*buff) {
+      if (buff[strlen(buff) - 1] == '"') buff[strlen(buff) - 1] = '\0';
+      grp = grpNew("CONFIG", status);
+
+      p = buff;
+      while (*p) {
+         q = p;
+         i = 0;
+         groupcontinuing = 0;
+         for (q = p; *q; q ++) {
+            if (*q == '(' || *q == '[' || (*q == '\'' && i == 0)) i ++;
+            else if (*q == ')' || *q == ']' || (*q == '\'' && i > 0)) i --;
+            else if (*q == ',' && i == 0) {
+               *q = '\0';
+               groupcontinuing = 1;
+               break;
+            }
+         }
+         grpGrpex(p, GRP__NOID, grp, &grpsize, &grpadded, &grpflag, status);
+         if (!groupcontinuing) break;
+         p = q + 1;
+      }
+
+      kpg1Kymap(grp, &historyConfig, status);
+      grpDelet(&grp, status);
+   }
+}
