@@ -4,17 +4,21 @@
 #  environment variable SST_DIR be set to the location of the prolat
 #  binary. It creates a file call "./params.tex" holding latex descriptions
 #  of all the configuration parameters documented in the files "./*.def". It must
-#  be run from within the defaults subdirectory.
+#  be run from within the defaults subdirectory (except see below).
 #
 #  If a file name is supplied as the first command line argument, it is expected
 #  to be a text file containing a list of config parameter names, one on each
 #  line. In this case, only the named parameters are documented, and the output
 #  is put into a file with the name given by the second command line argument.
+#  In this case a third argument can be supplied giving the path to the .def
+#  files to read. In this case, the script does not need to be run from the
+#  directory containing the .def files.
 
 
 #  Are we processing just a selection of parameters, or all parameters? Get a hash
 #  containing all the selected parameter names in upper case.
    %selected = ();
+   $defdir = ".";
    $subset = 0;
    if( $#ARGV > 0 ) {
       $subset = 1;
@@ -25,6 +29,9 @@
       }
       close( INFILE );
       $outfile = "$ARGV[1]";
+      if( $#ARGV > 1 ) {
+         $defdir = $ARGV[2];
+      }
    } else {
       $outfile = "./params.tex";
    }
@@ -35,7 +42,7 @@
    %allfiles = ();
 
 #  Loop over all .def files within the defaults subdirectory.
-   foreach $infile (<./*.def>) {
+   foreach $infile (<$defdir/*.def>) {
 
 #  Open the input .def file
       open INFILE, "<$infile" or die "Cannot find file $infile $!\n";
