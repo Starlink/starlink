@@ -8,15 +8,15 @@
 #
 #  If a file name is supplied as the first command line argument, it is expected
 #  to be a text file containing a list of config parameter names, one on each
-#  line. In this case, only the named parameters are documented, and the output is put
-#  into a file with the same name as the supplied text file, but with a suffix of ".tex"
+#  line. In this case, only the named parameters are documented, and the output
+#  is put into a file with the name given by the second command line argument.
 
 
 #  Are we processing just a selection of parameters, or all parameters? Get a hash
 #  containing all the selected parameter names in upper case.
    %selected = ();
    $subset = 0;
-   if( $#ARGV > -1 ) {
+   if( $#ARGV > 0 ) {
       $subset = 1;
       open INFILE, "<$ARGV[0]" or die "Cannot find file $ARGV[0] $!\n";
       while( $line = <INFILE> ){
@@ -24,7 +24,7 @@
          $selected{uc($line)} = 1;
       }
       close( INFILE );
-      $outfile = "$ARGV[0].tex";
+      $outfile = "$ARGV[1]";
    } else {
       $outfile = "./params.tex";
    }
