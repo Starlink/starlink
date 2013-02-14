@@ -160,7 +160,9 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *        over values supplied with a prefix (it used to be the other way
 *        round).
 *     14-FEB-2013 (DSB):
-*        Allow NULL to be supplied for "def".
+*        - Allow NULL to be supplied for "def".
+*        - Retain the PAR__NULL status if a null value is supplied for
+*        the parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -205,13 +207,9 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 /* Read a group of configuration setting from the specified environment parameter. */
    kpg1Gtgrp( param, &grp, &size, status );
 
-/* If no group was supplied, just annul any PAR__NULL error. */
-   if( *status == PAR__NULL) {
-      errAnnul( status );
-
 /* If a group was supplied, see if it consists of the single value "def".
    If so, we will leave the KeyMap unchanged. */
-   } else if (size > 0 ) {
+   if( size > 0 && *status == SAI__OK ) {
       value = buffer;
       if( size == 1 ) {
          grpGet( grp, 1, 1, &value, sizeof(buffer), status );
