@@ -101,8 +101,7 @@ noisecliplow = 0
 noiseclipprecom = 0
 
 flagslow = 30
-450.flagfast = 1000
-850.flagfast = 1000
+flagfast = 1000
 
 filt_edgelow = 0
 
