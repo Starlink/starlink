@@ -1,21 +1,51 @@
-^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
+#+
+#  Name:
+#     dimmconfig_bright_extended.lis
 
-# *** Specialized config for scans of bright/extended structure ***
-#
-# For bright extended regions we turn on zero-masking based on a map
-# pixel SNR threshold of 5-sigma. This prefents ringing a round bright
-# sources, but will completely flatten the map in low-SNR regions.
-#
-# ****************************************************************
+#  Purpose:
+#     A MAKEMAP configuration suitable for bright extended sources .
 
-# these set up map-based convergence tests: a maximum of 40 iterations,
-# but it will stop if there is a mean absolute change in the map between
-# subsequent iterations of less than 5% (note also that we explicitly
-# turn the chi^2 test off).
+#  Description:
+#     This file provides values for parameters used by the SMURF:MAKEMAP
+#     command to control the details of the map-making algorithm. To
+#     use it, assign it to the CONFIG parameter on the command line when
+#     running MAKEMAP. For instance:
+#
+#     % makemap config=^/star/share/smurf/dimmconfig_bright_compact.lis
+#
+#     (substitute the path to your Starlink installation in place of
+#     "/star").
+#
+#     For bright extended regions we turn on AST zero-masking based on a map
+#     pixel SNR threshold of 5-sigma. This prevents ringing around bright
+#     sources, but will completely flatten the map in low-SNR regions.
+
+#  Notes:
+#     - This file inherits the parameter values defined in file
+#     /star/share/smurf/dimmconfig.lis.
+#     - For a full list of all available parameters, and their purposes,
+#     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
+#     are also documented in SUN/258, appendix "Configuration Parameters".
+#     - A single parameter can be given different values to use when
+#     processing 450 or 850 um data. This is done by including the
+#     parameter twice, prefixing the parameter name with "450." and "850."
+
+#  Authors:
+#     HP: Harriet Parsons (JAC, Hawaii)
+#     DSB: David Berry (JAC, Hawaii)
+
+#  History:
+#     12-FEB-2013 (HP):
+#        General tidy.
+#     14-FEB-2013 (DSB):
+#        Use a standard prologue format. Re-instated comments describing
+#        rationale for each value.
+#-
+
+#  Inherit the values defined in the parent dimmconfig file
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
 numiter=-40
-chitol=<undef>
-maptol=0.05
-
-ast.zero_notlast = 1
+flt.filt_edge_largescale=600
 ast.zero_snr = 5
+

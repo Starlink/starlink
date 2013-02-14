@@ -1,40 +1,58 @@
+#+
+#  Name:
+#     dimmconfig_bright_compact.lis
+
+#  Purpose:
+#     A MAKEMAP configuration suitable for bright isolated compact sources .
+
+#  Description:
+#     This file provides values for parameters used by the SMURF:MAKEMAP
+#     command to control the details of the map-making algorithm. To
+#     use it, assign it to the CONFIG parameter on the command line when
+#     running MAKEMAP. For instance:
+#
+#     % makemap config=^/star/share/smurf/dimmconfig_bright_compact.lis
+#
+#     (substitute the path to your Starlink installation in place of
+#     "/star").
+#
+#     The strategy provided by this configuration is aimed at short scans
+#     of calibrators (which may be quite bright). We constrain the map
+#     using ast.zero_circle=(0.01666), which sets all pixels beyond 60
+#     arcsec to zero until the last iteration.  A word of warning: if
+#     the source is near the edge of the map (or has an extent large than
+#     the size of this mask!) this configuration may give odd results due
+#     to the value of ast.zero_lowhits!  If you suspect a problem, compare
+#     the location of the source with the zero-masked pixels (see QUALITY
+#     component of the resulting map). If the mask overlaps with the source,
+#     try modifying the radius.
+
+#  Notes:
+#     - This file inherits the parameter values defined in file
+#     /star/share/smurf/dimmconfig_bright.lis.
+#     - For a full list of all available parameters, and their purposes,
+#     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
+#     are also documented in SUN/258, appendix "Configuration Parameters".
+#     - A single parameter can be given different values to use when
+#     processing 450 or 850 um data. This is done by including the
+#     parameter twice, prefixing the parameter name with "450." and "850."
+
+#  Authors:
+#     HP: Harriet Parsons (JAC, Hawaii)
+#     DSB: David Berry (JAC, Hawaii)
+
+#  History:
+#     12-FEB-2013 (HP):
+#        General tidy.
+#     12-FEB-2013 (DSB):
+#        Use a standard prologue format. Re-instated comments describing
+#        rationale for each value.
+#-
+
+#  Inherit the values defined in the parent dimmconfig file
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
 
-# *** Specialized config for bright, isolated compact sources ***
-#
-# This config file is for maps with a bright central compact source. In
-# particular the strategy is aimed at short scans of calibrators (which
-# may be quite bright).
-#
-# We constrain the map using ast.zero_circle=(0.01666), which sets all
-# pixels beyond 60 arcsec to zero until the last iteration.  A word of
-# warning: if the source is near the edge of the map (or has an extent
-# large than the size of this mask!) this configuration may give odd
-# results due to the value of ast.zero_lowhits!  If you suspect a
-# problem, compare the location of the source with the zero-masked
-# pixels (see QUALITY component of the resulting map). If the mask
-# overlaps with the source, try modifying the radius.
-#
-# ***********************************************************
-
-# these set up map-based convergence tests: a maximum of 40 iterations,
-# but it will stop if there is a mean absolute change in the map between
-# subsequent iterations of less than 5% (note also that we explicitly
-# turn the chi^2 test off).
-
 numiter=-40
-chitol=<undef>
-maptol=0.05
-
-# use boundary constraints since the source is assumed to be isolated
-ast.zero_circle = (0.0166666666)
-ast.zero_notlast = 1
-
-#  Mask the data when forming th FLT model in order to exclude the
-#  source, but only on the first two iterations. This usually speeds up
-#  convergence.
-flt.zero_circle = (0.0166666666)
-flt.zero_niter = 2
 
 # Per array common-mode should be fine here since we are dealing with
 # a compact source. It seems to make things more stable.
@@ -42,5 +60,14 @@ com.perarray = 1
 
 # we can get away with harsher filtering since the boundary conditions are
 # quite tight
-450.flt.filt_edge_largescale=200
-850.flt.filt_edge_largescale=200
+flt.filt_edge_largescale=200
+
+# use boundary constraints since the source is assumed to be isolated
+ast.zero_circle = (0.0166666666)
+
+#  Mask the data when forming th FLT model in order to exclude the
+#  source. This only happends on the first two iterations. This usually
+#  speeds up convergence.
+flt.zero_circle = (0.0166666666)
+
+

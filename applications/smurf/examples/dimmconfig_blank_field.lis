@@ -1,58 +1,70 @@
-^$STARLINK_DIR/share/smurf/dimmconfig.lis
+#+
+#  Name:
+#     dimmconfig_bright_compact.lis
 
-# *** Specialized config for deep scans of blank fields ***
+#  Purpose:
+#     A MAKEMAP configuration suitable for deep scans of blank fields.
+
+#  Description:
+#     This file provides values for parameters used by the SMURF:MAKEMAP
+#     command to control the details of the map-making algorithm. To
+#     use it, assign it to the CONFIG parameter on the command line when
+#     running MAKEMAP. For instance:
 #
-# This config is aimed primarily at reducing blank fields -- extremely
-# deep observations for detecting the individual point sources that
-# produce the cosmic infrared background.
+#     % makemap config=^/star/share/smurf/dimmconfig_blank_field.lis
 #
-# Since there are no bright objects, a single high-pass filter is
-# applied at the start, and no other iterative filtering is
-# performed. A harsher high-pass filter is applied than in the default
-# configuration since no appreciable large-scale structure is
-# expected.
+#     (substitute the path to your Starlink installation in place of
+#     "/star").
 #
-# When reducing a large data set it might be useful to write out the
-# maps from each iteration/chunk by setting itermap=1.  This will
-# produce a series of extensions (.MORE.SMURF.ITERMAPS) for each
-# iteration, and for each continuous chunk of data. For example, they
-# can be viewed using:
+#     This config is aimed primarily at reducing blank fields -- extremely
+#     deep observations for detecting the individual point sources that
+#     produce the cosmic infrared background.
 #
-#   gaia [output map name].more.smurf.itermaps
-#
-# By flipping through the more.smurf.itermaps extension it is possible
-# to get a good feel for how well the map is converging (and whether
-# you would like more or less iterations). It is also useful to
-# identify particularly noisy portions of the data. If the last
-# iteration of a given chunk looks poor compared with the other chunks,
-# you can identify the input files from the FITS header of the
-# extension, and remove them.
-#
-# If you only want to see a single itermap written for the final iteration
-# of each chunk set itermap=-1
-#
-# Setting shortmap=1 will give similar information, except now writing
-# out a map each time a single time around the scan pattern has been
-# completed (only for the final iteration).
-#
-# ***********************************************************
+#     Since there are no bright objects, a single high-pass filter
+#     is applied at the start, and no other iterative filtering is
+#     performed. A harsher high-pass filter is applied than in the
+#     default configuration since no appreciable large-scale structure
+#     is expected.
+
+#  Notes:
+#     - This file inherits the parameter values defined in file
+#     /star/share/smurf/dimmconfig.lis.
+#     - For a full list of all available parameters, and their purposes,
+#     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
+#     are also documented in SUN/258, appendix "Configuration Parameters".
+#     - A single parameter can be given different values to use when
+#     processing 450 or 850 um data. This is done by including the
+#     parameter twice, prefixing the parameter name with "450." and "850."
+
+#  Authors:
+#     HP: Harriet Parsons (JAC, Hawaii)
+#     DSB: David Berry (JAC, Hawaii)
+
+#  History:
+#     12-FEB-2013 (HP):
+#        General tidy.
+#     14-FEB-2013 (DSB):
+#        Use a standard prologue format. Re-instated comments describing
+#        rationale for each value.
+#-
+
+#  Inherit the values defined in the parent dimmconfig file
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
 numiter = 4
 
+# No FLT model is needed since we are filtering out low frequencies as
+# part of the initial cleaning process.
 modelorder = (com,ext,ast,noi)
 
-# Use time-domain spiker first because we are only doing a single FFT-based
+# Use time-domain de-spiker first because we are only doing a single FFT-based
 # high-pass filter before the iterations start.
-
 spikethresh = 10
-spikebox = 50
 
 # Heavier high-pass filtering. Note that the default padding/apodization
 # that will be used is the number of samples that corresponds to the
 # period of the knee frequency in the high-pass filter (i.e. 200*(1/freq) )
-
-450.filt_edge_largescale = 200
-850.filt_edge_largescale = 200
+filt_edge_largescale = 200
 
 # Large-scale structure is not an issue so treat each subarray independently
 # for common-mode removal

@@ -1,736 +1,186 @@
-# Number of iterations
-#  postive number  = fixed number of iterations
-#  negative number = max iterations if using chi^2 and/or map stopping criteria
+#+
+#  Name:
+#     dimmconfig.lis
+
+#  Purpose:
+#     A MAKEMAP configuration suitable for general purpose usage.
+
+#  Description:
+#     This file provides values for parameters used by the SMURF:MAKEMAP
+#     command to control the details of the map-making algorithm. To
+#     use it, assign it to the CONFIG parameter on the command line when
+#     running MAKEMAP. For instance:
+#
+#     % makemap config=^/star/share/smurf/dimmconfig.lis
+#
+#     (substitute the path to your Starlink installation in place of
+#     "/star").
+#
+#     The values specified in this file provide a basic configuration
+#     that can be used with most SCUBA-2 observations. But note, SMURF
+#     includes alternative configurations that produce better results
+#     in certain specialised cases. These configurations are defined
+#     within files that start with "dimmconfig..." and are located in
+#     /star/share/smurf. Each of these files inherits, and possibly
+#     modifies, the values specified in this file.
+
+#  Notes:
+#     - This file specifies values for only a sub-set of the available
+#     parameters. This sub-set includes all the parameters that are
+#     likely to be of interest to most users. The full list of all
+#     parameters, together with default values and a description of each
+#     parameter, is stored in the file $SMURF_DIR/smurf_makemap.def.
+#     - All available parameters are also documented in SUN/258, appendix
+#     "Configuration Parameters".
+#     - A single parameter can be given different values to use when
+#     processing 450 or 850 um data. This is done by including the
+#     parameter twice, prefixing the parameter name with "450." and "850."
+
+#  Authors:
+#     HP: Harriet Parsons (JAC, Hawaii)
+#     DSB: David Berry (JAC, Hawaii)
+
+#  History:
+#     12-FEB-2013 (HP):
+#        Removed parameter documention (which is now in smurf_makemap.def,
+#        etc). Re-ordered into function groups. Removed specialised or
+#        experimental values that are simple duplicates of the values set
+#        in the defaults files (smurf_makemap.def, etc)
+#     12-FEB-2013 (DSB):
+#        Added this prologue.
+#-
+
+
+########################
+#   General Iterative  #
+########################
+
 numiter = -5
-
-# Two convergence tests are available (used only if numiter is set to
-# a negative value). They may be used simultaneously.
-#
-# chitol: threshold change in reduced chi^2 in subsequent iterations (requires
-#         noi to be a component of modelorder). If there are any degeneracies
-#         between model components (even if the map is reasonably constrained)
-#         this is a bad test.
-#
-# maptop: threshold chance in the mean absolute difference between map pixels
-#         in subsequent iterations, normalized by the estimated map RMS. This
-#         is much more like a "by eye" test, that will stop the solution
-#         when the map stops changing.
-
-chitol = 1e-3
-#maptol = 0.05
-
-# method of estimating variance map
-#  0 = propagate from the time-domain noise (requires noi model component)
-#  1 = sample variance of data that land in each pixel
-varmapmethod = 1
-
-# Handle each subarray separately? Normally all data that were taken
-# simultaneously at a given wavelength are handlded together.
-#groupsubarray = 1
-
-# If performing iterations in memory, maximum length (seconds) for concatenated
-# data. If 0 attempt to concatenate entire continuous chunks.
-maxlen = 0
-
-# Model components/order (comma separated list in brackets)
-# Note: components specified AFTER 'ast' will not be calculated for the
-# first time until the second iteration.
-#  dks = fit and remove dark squid for the column
-#  com = remove common-mode signal
-#  gai = if com specified, fit gain/offset of common mode
-#  ext = apply extinction correction
-#  ast = estimate the map and astronomical signal
-#  flt = apply filter to time streams
-#  noi = estimate time-domain variance
-#  smo = time series smoothing using a median or mean boxcar filter
-#  pln = remove plane from each time slice
-#  tmp = remove externally define template such as azimuth
+maptol = 0.05
 
 modelorder = (com,gai,ext,flt,ast,noi)
-
-# Export model files as NDF?
-
-# Specify a value of 1 or 0 to export all or none of the components
-# You can also specify an array of components to export using the same
-# format as modelorder. Note that you can specify additional
-# components 'res' and 'qua' to what may be provided to modelorder if
-# you wish to export the residual model or quality arrays
-# respectively. Exportation of 'res' is implied if 'noi' is specified
-# as it becomes the variance components of the resulting NDF for
-# 'res'. 'qua' will become the quality component of any full 3-dimensional
-# model (e.g. 'res', 'ast', 'flt', 'ext'), but no quality will be
-# written to model components with different dimensions.
-
 exportndf = 0
-#exportndf = (com,gai,ast,flt,dks,smo,pln,tmp,res,noi,qua)
 
-# Normally all data points in exported model components are set to BAD values
-# wherever there is a bad bolometer established during map-making. Set
-# this flag to prevent this behaviour.
+itermap = 0
+bolomap = 0
+shortmap = 0
 
-#noexportsetbad = 1
+chitol = <undef>
+varmapmethod = 1
 
-# Export the logitude/latitude of every sample into a pair of NDFs?
-# The file names will be the same as model components, except with
-# sufficies equal to the AST "Symbol" attribute associated with the
-# celestial axes ("ra"/"dec", "glon"/"glat", etc).
-
-#exportlonlat = 1
-
-
-# Create .MORE.SMURF.ITERMAPS extensions? If this parameter is set to
-# a positive value, maps from each iteration and each chunk will be
-# written.  If this is set to a negative value, only the final
-# iteration will be written. If its absolute value is larger than 1, then
-# each itermap will include a quality component that reflects the AST mask
-# in use.
-# itermap = 1
-
-
-# Create .MORE.SMURF.BOLOMAPS single-beam map extensions?
-#bolomap = 1
-
-# Create .MORE.SMURF.SHORTMAPS extensions containing maps of every "shortmap"
-# time slices? Alternatively, set to -1 to produce a map each time TCS_INDEX
-# is incremented (i.e., each time a full pass through the scan pattern has
-# been completed). Any other negative value is interpreted as a duration
-# in seconds, and is converted to time slices using the (possibly
-# down-sampled) sample frequency of the data being mapped.
-#shortmap=-5.0  # This is 5 seconds, i.e. 1000 samples at 200 Hz sample rate
-
-# Create .MORE.SMURF.FLAGMAPS extensions? To enable this feature set flagmap
-# to an array containing a subset of the following bit flags. Each flagmap
-# will then contain a count of the number of samples with a quality bit
-# matching at least one of these flags, for each continuous chunk:
-#
-# BADDA   : flagged bad by the DA system
-# *BADBOL : entire bolometer is turned off
-# SPIKE   : flagged as a spike
-# DCJUMP  : location of a DC level step
-# STAT    : telescope was not moving within flagslow to flagfast
-# COM     : portion of data did not match the common-mode
-# FILT    : filtered data did not have sufficient contributions from good data
-# NOISE   : bolometer was flagged as being too noisy in general
-#
-# *Note: If BADBOL is set the behaviour is slightly different than expected;
-#        the bolometer will be completely ignored when creating the flag map.
-#
-# The flagmap is mostly useful to verify whether the spike, jump, and
-# common-mode rejection is correlated with features in the map (e.g. bright
-# sources), for all of the detectors that were used to produce the map, e.g.
-#
-#flagmap = (BADBOL,SPIKE,DCJUMP,COM)
-
-# Create .MORE.SMURF.SAMPCUBES extensions providing data cubes of data samples
-# that go into each map pixel?
-#sampcube = 1
-
-# Apply the flatfield if loading raw data? Default is 1 (true) -- you must
-# explicitly set this to 0 if you want to produce a map in raw DAC units (and
-# also supply raw data).
-
-# ensureflat=0
-
-# The gap (in time slices if positive and seconds if negative) between full
-# calculations of the output map bolometer positions. Setting a larger value
-# for this will speed up the map maker but will introduce larger spatial
-# errors. The default value of -0.5 (i.e. 100 samples at a sample rate of
-# 200 Hz) seems to produce spatial errors of under 0.1 arc-sec. This
-# level of errors seems to cause about 1% of bolometers samples to be
-# pushed into a neighouring map pixel. For tstep=100, the calculation of
-# bolometer positions speeds up by about a factor of 60. Setting tstep to
-# 1 (or zero) causes all bolometer positions to be calculated in full,
-# without any approximation.
-#tstep = -0.5
-
-# If the telescope is scanning slowly the data may be safely down-sampled
-# to save memory and time. This parameter controls the minimum angular
-# scale on the sky. The new sample frequency is chosen such that this
-# scale will be preserved taking into account the average slew speed and
-# the sample rate of the input files. If a positive value is selected, this
-# gives the angular scale (in arcsec) to which the new sample rate will be
-# matched. Alternatively, if a negative value is supplied, its magnitude will
-# be multiplied by the PIXSIZE for the requested map. For example, the default
-# here is to set it to -1 such that the time-series sample rate matches the
-# pixel grid (in practice, a factor of 2 might make more sense as this would
-# correspond to the Nyquist frequency of the map pixel grid).
-
-#450.downsampscale = 2
-#850.downsampscale = 4
+########################
+#   Preprocessing      #
+########################
 
 downsampscale = -1
 
-# Alternatively, if you wish to downsample to a specific sample rate it
-# can be specified with downsampfreq in Hz.
+maxlen = 0
+doclean = 1
 
-# downsampfreq = 50.
+exportclean = 0
 
-# To test the response of the map-maker to different known
-# astronomical sources, an external "fakemap" can be specified to
-# provide an image of the sky that will produce additional
-# astronomical signal to the time series. At present, the dimensions
-# of this map must be identical to that of the real map. If the pixel
-# ranges are not the same makemap will hault. A typical procedure may
-# involve: (i) produce a map withe makemap; (ii) produce an image with
-# simulated data with the same pixel dimensions; (iii) specify this
-# new map for the "fakemap" parameter below. Note that this is a
-# fully-parsed ndf identifier, so you can do things like:
-#
-# fakemap = fakesky.sdf
-# fakemap = fakesky[1:300,100:450]
-#
-# Additionally, you can specify a scalar scale factor, "fakescale", by
-# which each pixel in the fakemap will be multiplied before adding to
-# the data.
-#
-# fakescale = 23.5
-#
-# Should the time-series data generated from the fakemap be smoothed
-# using the MCE response? The default is zero. Uncomment this line to
-# switch it on.
-# fakemce = 1
-#
-# A delay, in seconds, to apply to each time stream. This results in each
-# bolometer sample being associated with a different position on the sky.
-# The default is zero.
-# delay = 0.0
-
-# ----------------------------------------------------------------------------
-# The following parameters control data-cleaning before iterations start
-# ----------------------------------------------------------------------------
-
-# set this to 0 to turn off all of the pre-mapmaking data cleaning
-
-#doclean = 0
-
-# Export the data immediately after data cleaning / before map-making?
-# The file name will be the same as model components, except with the
-# suffix "_cln". Even if doclean=0, the data will be exported immediately
-# before map-making.
-
-#exportclean = 1
-
-# --- Mean subtraction is fairly useful ---
-
-# subtract a baseline polynomial of this order
 order = 1
-
-# Use default apodisation based on filter frequency. This over-rides
-# the default of zero in smurf_sc2clean.def. Keep the <undef> default
-# for PAD which is set up in smurf_makemap.def.
-apod = <undef>
-
-# If zeropad is set, the padded regions are set to 0, and apodization
-# is used to slowly roll-off the ends of the time series to 0. If zeropad
-# is not set, a cubic is used to smoothly interpolate the end of the time
-# series with the beginning (ensuring continuity in both the value and
-# first derivative). In both cases, the purpose is to remove sharp edges
-# that may cause ringing in the later FFT filtering steps. There are
-# similar flags for DKS cleaning, and the FLT model.
-#zeropad = 1
-
-# --- badfrac ensures that bad data from DA system are ignored ---
-
-# fraction of samples to be bad to flag entire bolo as dead
 badfrac = 0.05
+compreprocess = 0
+pcathresh = 0
+pcalen = 0
 
+dcthresh = 25.0
+dcfitbox = 30
+dcmaxsteps = 10
+dclimcorr = 0
+dcsmooth = 50
 
-# --- flag data when we're moving either too slow or too fast ---
+spikethresh = 0
+spikebox = 50
 
-# Flag data taken while telescope was moving to slow such that sources
-# are buried in 1/f noise, or too fast such that sources are smeared
-# (value is a threshold slew velocity (arcsec/sec) measured in
-# tracking coordinates). Assuming we would like to be able to sample
-# scales of at least 30 arcsec (at least two 15 arcsec beams at 850),
-# and assuming a typical 1/f knee of 1 Hz, the telescope needs to slew
-# at least 30 arcsec/sec to place sources in the signal band above the
-# knee. Also, assuming a sample rate of 200 Hz, we want to be able to
-# fully-sample the 450 and 850 beams. For now just set it to something
-# that is bigger than we need, but be warned that point-sources may be
-# smeared-out.
+whiten = 0
+
+noisecliphigh = 4.0
+noisecliplow = 0
+noiseclipprecom = 0
 
 flagslow = 30
 450.flagfast = 1000
 850.flagfast = 1000
 
-# --- Many of the following may not be useful ---
+filt_edgelow = 0
 
-# If this flag is set, the common-mode calculation will be performed
-# additionally as a pre-processing step. All parameters com.* and gai.*
-# below are parsed and used (e.g., to also flag bad data and optionally
-# flatfield off the relative response to the common-mode signal). If this
-# pre-processing step is chosen, it is still possible to specify COM/GAI
-# as model components in the iterative solution
+########################
+# Preprocess: fakemaps #
+########################
 
-#compreprocess=1
+fakemap = <undef>
+fakescale = 1
 
-# An alternative to removing the simple common-mode is cleaning by way
-# of principal component analysis (PCA). In this case, a new set of
-# basis vectors (components) are calculated from the bolometer time-series
-# such that they have 0 covariances. The amplitudes of these new correlated
-# signals are then calculated, and the largest amplitude components can
-# be removed. In this simplest case of white detectors noise + a common
-# atmospheric signal, this operation would be similar to using compreprocess.
-# However, PCA is capable of detecting multiple signals with different
-# correlation patterns across the array.
-#
-# It is *ESSENTIAL* that the bolometer data first have their mean values
-# removed (i.e., order=0), as this assumption is used to speed up the
-# calculation.
-#
-# The main parameter for PCA cleaning is the threshold above
-# which components will be removed from the bolometer time-series. For
-# each component, the RMS amplitude across all bolometers is
-# calculated -- a single positive number related to the average
-# strength of the component. An iterative sigma clipper is then used
-# to flag components that are more than thresh*RMS away from the mean value.
-# This approach is quite arbitrary, but a value of about 4 seems reasonable
-# for some test data. Be warned that this statistical black box will remove
-# real correlated astronomical signals as well! As with common-mode removal,
-# the actual impact on science will need to be calibrated with simulations.
-# If this parameter is set to 0 no pca cleaning will occur.
-#
-# The other parameter is pcalen. Since the noise properties vary with time,
-# pca cleaning seems to work better on shorter bits of data. pcalen specifies
-# the chunk length that will be cleaned as a number of time slices (be
-# careful if you have down-sampling turned on!). If set to 0 it will
-# default to the length of the full time-series.
+########################
+# Iterative: com model #
+########################
 
-pcathresh = 0
-
-# *** pcalen is currently buggy, don't use! ***
-#pcalen = 0
-
-# S/N threshold to detect DC steps. Note, this refers to the noise level
-# in the bolometer data after it has been smoothed with a median filter of
-# width given by DCSMOOTH. In order to find the equivalent threshold in
-# the unsmoothed data, multiply the DCTHRESH value by # 1.25/sqrt(DCSMOOTH).
-# For instance, the default values for DCSMOOTH (50) and DCTHRESH (25)
-# correspond to a threshold of 25*1.25/sqrt(50) = 4.4 sigma in the
-# unsmoothed data.
-dcthresh = 25.0
-
-# box size over which to fit data with a straight line on either side of
-# a potential DC jump. If positive, in units of samples. If negative, in
-# units of seconds.
-dcfitbox = 30
-
-# The maximum number of steps that can be corrected in each minute of
-# good data (i.e. per 12000 samples) from a bolometer before the entire
-# bolometer is flagged as bad. A value of zero will cause a bolometer to
-# be rejected if any steps are found in the bolometer data stream.
-dcmaxsteps = 10
-
-#  If more than DCLIMCORR bolometer have a step at a given time, then all
-#  bolometers are corrected for a step at that time, using lower thresholds.
-#  Setting it to zero here switches off the correction of correlated
-#  steps. Removing this line causes the default value of 10 to be used.
-dclimcorr = 0
-
-# The width of the median filter used to smooth a bolometer data stream
-# prior to finding DC jumps. If positive, in units of samples. If negative,
-# in units of seconds.
-dcsmooth = 50
-
-# S/N ratio to flag spikes with sigma-clipper
-# spikethresh = 5
-
-# Size of filter box for sigma-clipper, in units of samples if positive
-# and seconds if negative.
-# spikebox = 50
-
-# Fill vicinity of spikes / DC steps with constrained realization of
-# noise
-fillgaps = 1
-
-# The following filters are applied *before* the iterative loop. It is
-# probably a better idea in general to do filtering with the 'flt'
-# model component as described in the next section.
-
-# Hard-edge high- and low-pass frequency-domain filter
-#   e.g. keep only frequencies >= 0.1 Hz, and <= 90Hz
-
-# filt_edgehigh = 0.1
-# filt_edgelow = 90
-
-# Alternatively, determine filter edges based on a range of requested
-# spatial scales (arcsec), and using internal measurements of the
-# average slew speed. These will override filt_edgehigh/filt_edgelow.
-# For example, suppose the slew speed is 100 arcsec/sec. We want to
-# ensure that the beam is fully sampled, say 2 arcsec at 450um. That
-# scale is crossed in 2/100 = 0.02 s, so we don't need frequencies in
-# the data above 1/0.02 = 50 Hz in this case (i.e. internally it will
-# set filt_edgelow to 50Hz if filt_edge_smallscale is set to 2
-# arcsec). Similarly, if we would like to attempt to preserve scales
-# of 10 arcmin = 600 arcsec, we would want to keep frequencies that
-# are greater than 1/(600/100.) = 0.17 Hz (i.e. setting
-# filt_edge_largescale=600 would translate into filt_edgehigh = 0.17
-# Hz).
-
-# filt_edge_largescale = 600.
-# 450.filt_edge_smallscale = 2.
-# 850.filt_edge_smallscale = 4.
-
-# Hard-edge band-cut frequency-domain notch filters.
-# filt_notchlow gives lower edges of frequencies to cut in Hz
-# filt_notchhigh gives upper edges of frequencies to cut in Hz
-#   e.g. remove 25--35 Hz  and 55--65 Hz
-#filt_notchlow  = (25,55)
-#filt_notchhigh = (35,65)
-
-# Should a whitening filter be applied to compensate for 1/f noise?
-# whiten = 1
-
-# Should each boilometer time stream be deconvolved to remove the effects
-# of the MCE anti-aliasing filter? The default is zero. Uncomment this
-# line to switch it on.
-# deconvmce = 1
-
-# Clip bolometers based on their noise. This step will remove any
-# bolometers noisier than noisecliphigh standard deviations above the
-# median, or noisecliplow standard deviations below the
-# median. Normally the noise clipping happens at the end of the
-# cleaning stage, but if you set noiseclipprecom it will instead occur
-# immediately prior to common-mode subtraction (see comppreprocess)
-noisecliphigh = 4.0
-#noisecliplow = 4.0
-#noiseclipprecom = 1
-
-# ----------------------------------------------------------------------------
-# A number of analagous parameters to clean dark squid signals before fitting
-# them to the data (only relevant if DKS is specified as a model component).
-# Note that if padding has been added to the bolometer data, it is
-# automatically added to the dark squids as well (i.e. there is no
-# cleandk.padstart/padend).
-# ----------------------------------------------------------------------------
-
-cleandk.apod=<undef>
-cleandk.badfrac = 0.05
-cleandk.dcfitbox = 30
-cleandk.dcmaxsteps = 10
-cleandk.dcthresh = 25.0
-cleandk.dcsmooth = 50
-cleandk.fillgaps = 1
-#cleandk.filt_edgelow = 0
-#cleandk.filt_edgehigh = 0
-#cleandk.filt_notchlow = <undef>
-#cleandk.filt_notchhigh = <undef>
-#cleandk.noisecliphigh = 0.0
-#cleandk.noisecliplow = 0.0
-#cleandk.noiseclipprecom = 0
-#cleandk.whiten = 0
-cleandk.order = 1
-#cleandk.spikethresh = 0
-#cleandk.spikebox = 50
-#cleandk.zeropad = 1
-
-# ----------------------------------------------------------------------------
-# These parameters control the iterative model components
-# ----------------------------------------------------------------------------
-
-
-#  Set this flag to a non-zero value to use the old COM algorithm that was
-#  used up to 15-MAY-2012. The new algorithm in general provides faster
-#  and smoother convergence.
-com.oldalg = 0
-
-#  Set this flag to calculate a separate common-mode signal for each
-#  subarray. If not set, a single common-mode signal will be calculated from
-#  all subarrays at a given wavelength simultaneously.
-#com.perarray = 1
-
-#  The new COM algorithm uses the sigma-clipped weighted mean of all
-#  bolometer values at each time slice as the common-mode signal. The
-#  following parameters control the sigma-clipping algorithm.
-#
-#  The number of n-sigma clipping iterations (1 => no clipping)
-com.niter = 1
-
-#  The number of standard deviations at which the n-sigma clipping
-#  algorithm clips.
-com.nsigma = 3
-
-# delay calculation of COM until after the first iteration? (good if
-# the astronomical signal is expected to dominate the sky signal)
-#com.notfirst = 1  (can only be used with the old COM algorithm)
-
-# If this flag is set, the common-mode will be estimated while
-# iteratively flagging and removing outlier detectors as
-# usual. However, once the flagging is completed, the common-mode will
-# not actually be removed from the time-series (and if the model is
-# exported, it will be set to 0).
-#com.noremove=1   (can only be used with the old COM algorithm)
-
-# low-pass boxcarfilter on COM (samples) to assist with convergence
-# if boxfact set reduce width of boxcar by this factor each iteration
-# boxmin specifies a minimum width below which it can't be reduced.
-# Positive values for com.boxcar are interpreted as a number of samples,
-# and negative values as a number of seconds (converted to samples using
-# the downsampled sample rate).
-#com.boxcar = 10   (can only be used with the old COM algorithm)
-#com.boxcar  = 400
-#com.boxfact = 0.5
-#com.boxmin  = 10
-
-# the following COM parameters control the rejection of bad detectors
-# based on the gain and correlation coefficients for the fit of the
-# common-mode signal to each detector (good at identifying bolo signals
-# with bizarre gains, or shapes if they have for example steps in them). These
-# are basically sigma-clippers; outliers are removed at the given threshold
-# and then new means and sample standard deviations are measured until
-# convergence. The time axis is divided up into one or more equal sized boxes,
-# and a separate fit is performed for each box. If you wish to completely
-# disable the flagging of outlier bolometers compared with the common-mode,
-# simply set com.noflag=1
-#
-# com.noflag: if set, disable flagging of bad bolos using common-mode
-# com.gain_box: the number of time slices (or seconds if negative) in a box
-# com.corr_tol: n-sigma away from mean correlation coefficient tolerance
-# com.corr_abstol: the absolute lower limit of acceptable correlation
-# com.gain_tol: n-sigma away from mean gain coefficient tolerance
-# com.gain_abstol: absolute factor away from mean gain coefficient tolerance
-# com.gain_fgood: minimum fraction of good boxes for a usable bolometer
-# com.gain_rat: ratio of largest usable gain to mean gain for a bolometer
+com.perarray = 0
 
 com.noflag = 0
 com.corr_tol = 5
+com.corr_abstol = 0.2
 com.gain_tol = 5
 com.gain_abstol = 3
-
-# by default negative gains are used to flag bad bolometer data. However, if
-# this parameter is set to 0 negative values will be allowed
-#com.gain_positive = 0
-
-# Do not set com.gain_box lower than about 6000 (or -30) which corresponds to
-# 30s, or roughly the fridge oscillation period.
 com.gain_box = -30.0
-#com.corr_abstol = 0.2
-#com.gain_fgood = 0.25
-#com.gain_rat = 4.0
+com.gain_fgood = 0.25
+com.gain_rat = 4
 
-# low-pass filter dark squid signals using boxcar of this width (if dks
-# model is specified). Value is in samples (after any downsampling) if
-# positive and seconds if negative.
-dks.boxcar = 100
+com.zero_mask = 0
+com.zero_circle = <undef>
+com.zero_lowhits = 0
+com.zero_snr = 0
+com.zero_snrlo = 0
+com.zero_freeze = 0
 
-# if set, replace dead dark squids with average of working dark squids
-dks.replacebad = 0
+########################
+# Iterative: noi model #
+########################
 
-# do we want to calculate noise weights immediately after pre-conditioning,
-# or wait until we have the first iteration of the residual? The former can
-# reduce execution time if noiseclip is also set since both operations
-# share a single FFT.
-#noi.calcfirst = 1
+noi.calcfirst = 0
+noi.box_size = 0
 
-#  Determines the number of time slices used to determine the noise level
-#  in a section of a bolometer time stream. If zero, then the whole bolometer
-#  time stream is used, and each bolometer has only one variance value. If
-#  non-zero, each bolometer time stream is divided up into boxes
-#  containing the specified number of time slices, and a separate variance
-#  is found for each box. This variance is then used for each sample in the
-#  box, so each bolometer ends up with a variance for every time slice.
-#  Negative values are interpreted as number of seconds, and positive values
-#  as a number of down-sampled time slices. The default is zero.
-#  noi.box_size = -30.0
-
-# additional despiking / DC step finding after each iteration within noi
-# calculation. Setting noi.spikebox to 50 will check for excursions
-# from a rolling median filter in a box of length 50 samples (negative
-# values are interpreted as seconds and converted to samples using the
-# downsampled sample rate).
-#noi.spikethresh = 10
-#noi.spikebox = 50
-noi.fillgaps = 1
-
-# explicitly turn off iterative DC step finding for now
-noi.dcfitbox = 0
-
-#  Use default apodisation based on filter frequency
-flt.apod = <undef>
-
-# iterative filter.
-#450.flt.filt_edgehigh = 0.1
-#850.flt.filt_edgehigh = 0.3
-#flt.filt_edgelow = 90
-#flt.filt_notchlow  = (25,55)
-#flt.filt_notchhigh = (35,65)
-#flt.zeropad = 1
+########################
+# Iterative: flt model #
+########################
 
 450.flt.filt_edge_largescale=600
 850.flt.filt_edge_largescale=300
 
-# delay calculation of FLT until after the first iteration? May help
-# with negative structure around bright sources
+flt.notfirst = 0
 
-#flt.notfirst = 1
-
-# extinction correction (see EXTINCTION task for further information)
-# Best is to use WVM, uses continuously varying measurements as a
-# function of time stored with each observation. This is the default if
-# nothing is specified.
-#
-# tausrc   : auto, wvmraw, csotau, filtertau
-# taumethod: adaptive, full, quick
-
-# filtertau "tausrc" requires a filtertau entry
-# csotau is optional for "auto" and "csotau" tausrc. If not provided
-# the value will be calculated from the header.
-
-# csotau   : use value only if tausrc=csotau
-# filtertau: use only if tausrc=filtertau
-
-ext.tausrc    =auto
-ext.taumethod =adaptive
-#ext.csotau    = 0.2
-#ext.filtertau = 0.2
-
-# Use the GAIn/COMmon mode to re-calculate the flatfield? Probably a
-# good idea in most cases, but dangerous for short scans of very bright
-# sources because the astronomical signal may completely dominate
-# sky signal.
-
-#gai.flatfield = 1 (can only be used with the old COM algorithm)
-
-# Large-scale degenerate structures can grow in the maps with iterations and
-# so some constraints are required.
-#
-# One method is to use an FFT-base high-pass filter after each
-# iteration.  Using ast.gaussbg will effectively smooth the map with a
-# Gaussian of the supplied FWHM and subtract this background from the
-# map after each iteration.  This has the nice property that it is a
-# fairly easily understood linear filtering operation.
-#
-# Another method is to constrain regions of the map to 0.
-#
-# If ast.zero_mask is set to one of "REF", "MASK2" or "MASK3" then
-# an NDF will be obtained using the specified ADAM parameter and used
-# as a user-defined mask. Setting ast.zero_mask to an integer value
-# larger than zero has the same effect as setting it to "REF". Setting it
-# to an integer less than or equal to zero results in no external mask
-# being used with the AST model. Note, using "REF" ensures that the
-# mask and the output image of MAKEMAP are on the same pixel grid - using
-# "MASK2" or "MASK3" does not provide this guarantee (it is then the
-# users responsibility to ensure that the supplied masks are aligned
-# with the output image in pixel coordinates). The pixels in the map that
-# are to be constrained to 0 should be set to the bad value in the mask.
-# All other pixels will be allowed to vary during map-making.
-#
-# Using ast.zero_lowhits will set a threshold region where
-# the hits are this fraction lower than the mean.
-#
-# Using ast.zero_circle defines a circle on the map outside of which
-# the map will be constrained to zero. The 3 parameters are:
-# Longitude, Latitude, Radius of the circle, in decimal degrees, in
-# the coordinate system of the map (e.g., RA and Dec.). Alternatively
-# a single parameter may be given (the radius), and then the centre
-# of the circle will default to the reference coordinates for the
-# centre of the map (e.g. the tangent point).
-#
-# The ast.zero_snr parameter will create a mask based on map SNR. For
-# example, if it is set to 5, after each iteration all pixels with a
-# SNR below this threshold will be set to 1 (other pixels are left at zero).
-# Each contiguous clump of zero-valued pixels (i.e. "source" pixels) in
-# this basic mask can then be expanded to encompass adjacent pixels that
-# are above a second, lower, SNR threshold given by ast.zero_snrlo. So
-# for instance, setting ast.zero_snrlo to 1 will cause the basic mask
-# thresholded at SNR = 5 to be expanded down to an SNR of 1. This dual
-# thresholding system prevents noise spikes above the lower threshold being
-# interpreted as source pixels.
-#
-# The ast.zero_snr_fwhm parameter gives the FWHM of a Gaussian (in arcsec)
-# with which to smooth the final mask produced as a consequence of setting
-# the ast.zero_snr value. If it is set to zero, no smoothing is performed.
-# The smoothing occurs once all chunks of the map have converged, and a new
-# map is then created using the smoothed mask as if it had been supplied via
-# "ast.zero_mask". Consequently, setting ast.zero_snr_fwhm causes the time
-# taken to create the final map to nearly double.
-#
-# The ast.zero_snr_low parameter gives the value (in the range 0.0 to 1.0)
-# at which to threshold the smoothed mask specified by ast.zero_snr_fwhm.
-# If it is negative, the value is taken as the max smoothed value of a blob
-# containing "ast.zero_snr_low" pixels. Thus a value of "-1.1" will cut at
-# a height just sufficient to remove blobs of a single pixel form the mask.
-# A value of "-2.1" would remove blobs of two pixels form the mask, etc.
-#
-# If ast.zero_niter is set, it gives the number of iterations for which
-# the AST model should be masked. The default is zero, which means "mask
-# on all iterations". However, if ast.zero_notlast is set, the mask will
-# will not be applied on the last iteration, even if ast.zero_niter is zero.
-# This feature will probably be useful for deep point-source observations
-# for which the large-scale noise is not as important, but keeping as much
-# data around the edges of the map is.
-
-#ast.gaussbg = 120
-#ast.zero_mask = REF
-#ast.zero_circle = (70.72333,36.115,0.0083333)
-#ast.zero_lowhits = 0.1
-#ast.zero_notlast = 1
-#ast.zero_snr = 5
-#ast.zero_snrlo = 1
-#ast.zero_snr_fwhm = 60
-#ast.zero_snr_low = -1.1
-
-# The common-mode can also be masked to exclude known source areas
-# from the common-mode estimation. The zero of parameters are directly
-# analogous to those for applying a zero constraint to the map. The only
-# difference is that the zero_snr and zero_lowhits constraints will be
-# ignored on the first iteration since they require an estimate of the map
-# to be available.
-#com.zero_mask = REF
-#com.zero_circle = (70.72333,36.115,0.0083333)
-#com.zero_lowhits = 0.1
-#com.zero_notlast = 1
-#com.zero_snr = 5
-#com.zero_snrlo = 1
-
-# The FLT model can also be masked to exclude known source areas. This can
-# reduce the number of iterations needed for convergence, and may also
-# reduce the noise in the final map, and reduce ringing and "bowls" around
-# bright sources. The parameters are directly analogous to those for applying
-# a zero constraint to the map. The only difference is that the zero_snr and
-# zero_lowhits constriants will be ignored on the first iteration since they
-# require an estimate of the map to be available. Note
-#flt.zero_mask = REF
-#flt.zero_circle = (70.72333,36.115,0.0083333)
-#flt.zero_lowhits = 0.1
-#flt.zero_notlast = 1
-#flt.zero_snr = 5
-#flt.zero_snrlo = 1
+flt.zero_mask = 0
+flt.zero_circle = <undef>
+flt.zero_lowhits = 0
+flt.zero_snr = 0
+flt.zero_snrlo = 0
 flt.zero_niter = 2
+flt.zero_freeze = 0
 
-# The AST model can also perform map-based de-spiking after the first
-# iteration provided that there is also a NOI model present. The value
-# of ast.mapspike indicates a SNR threshold sigma-clip based on the
-# scatter of the samples that contribute to a given pixel value about
-# the map value.
+########################
+# Iterative: ext model #
+########################
+
+ext.tausrc    = auto
+ext.taumethod = adaptive
+
+ext.csotau = <undef>
+ext.filtertau = <undef>
+
+########################
+# Iterative: ast model #
+########################
+
 ast.mapspike = 10
 
-# Smooth the time series
+ast.zero_mask = 0
+ast.zero_circle = <undef>
+ast.zero_lowhits = 0
+ast.zero_snr = 0
+ast.zero_snrlo = 0
+ast.zero_snr_fwhm = 0
+ast.zero_snr_low = -1.1
+ast.zero_freeze = 0
 
-# don't smooth on the first iteration
-smo.notfirst = 1
-
-# Type of filter: mean or median
-smo.type = median
-
-# width of smoothing box (roughly equivalent to FLT with a high-pass
-# filter at cutoff frequencies 0.1 and 0.3 Hz for 450 and 850
-# respectively). If positive, value is in samples. If negative, value is
-# in seconds.
-450.smo.boxcar = -10
-850.smo.boxcar = -3
-
-# The TMP model fits an externally defined template to each bolometer
-# time-series. The only parameter defines what that template
-# is. Presently the only two valid options are "state_az" and
-# "state_el" to use the telescope azimuth and elevation
-# respectively. The former seems to be a good way for removing
-# magnetic field pickup. You may also request that the sine or or
-# cosine be taken of the template before fitting (tmp.dosin and
-# tmp.docos respectively), and before doing that a fixed offset may
-# be added (tmp.trigoffset). It is assumed that the template
-# quantities are in radians.
-#
-# tmp.source = state_az
-# tmp.dosin = 1
-# tmp.trigoffset = 0
