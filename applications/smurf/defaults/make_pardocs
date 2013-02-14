@@ -215,6 +215,9 @@
    $document = <LATEX>;
    close( LATEX );
 
+# Delete the output file from PROLAT.
+   print( STDERR `rm -f /tmp/prolat.tex` );
+
 #  Add cross-links. Each reference to a parameter should now be in the form
 #  '(P|p)arameter {\tt "}name{\tt "}'.
    foreach $name (keys %allparams) {
