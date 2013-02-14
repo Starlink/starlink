@@ -19929,14 +19929,14 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       }{
          A group that specifies any alternative prefixes that can be
          included at the start of any parameter name.  For instance, if
-         this group contains the two entries {\tt "450=1"} and {\tt "850=0"}, then
-         DEFAULTS can specify two defaults for any single parameter---one
-         for the parameter prefixed by {\tt "450."} and another for the
-         parameter prefixed by {\tt "850."}.  Thus if DEFAULTS defines a
-         parameter called {\tt "filter"}, it could include {\tt "450.filter=300"}
-         and {\tt "850.filter=600"}.  The CONFIG parameter could then either
-         set the filter parameter for a specific prefix (as in
-         {\tt "450.filter=234"}); or it could leave the prefix unspecified,
+         this group contains the two entries {\tt "450=1"} and {\tt "850=0"},
+         then either CONFIG or DEFAULTS can specify two defaults for any single
+         parameter---one for the parameter prefixed by {\tt "450."} and another
+         for the parameter prefixed by {\tt "850."}.  Thus, for instance, if
+         DEFAULTS defines a parameter called {\tt "filter"}, it could include
+         {\tt "450.filter=300"} and {\tt "850.filter=600"}.  The CONFIG parameter
+         could then either set the filter parameter for a specific prefix (as
+         in {\tt "450.filter=234"}); or it could leave the prefix unspecified,
          in which case the prefix used is the first one with a
          non-zero value in SELECT (450 in the case of this example---850
          has a value zero in SELECT).  Thus the names of the items in
@@ -19971,9 +19971,17 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          {\tt "m81"}, then {\tt $<$$*$$*$$*$$>$} is displayed.
       }
       \sstexamplesubsection{
+         configecho type $\wedge$myconf select="'m57=0,m31=1,m103=0'"
+      }{
+         Report the value of configuration parameter {\tt "type"} defined within
+         the file {\tt myconf}. If the file does not contain a value for
+         {\tt "type"}, then the value of {\tt "m31.type"} will be reported
+         instead. If neither is present, then {\tt $<$$*$$*$$*$$>$} is displayed.
+      }
+      \sstexamplesubsection{
          configecho flt.filt\_edge\_largescale $\backslash$ \\
                  config=$\wedge$/star/share/smurf/dimmconfig.lis $\backslash$ \\
-                 defaults=/star/bin/smurf/smurf\_makemap.def select="450=1,850=0"
+                 defaults=/star/bin/smurf/smurf\_makemap.def select="'450=1,850=0'"
       }{
          Report the value of configuration parameter {\tt flt.filt\_edge\_largescale}
          defined within the file {\tt /star/share/smurf/dimmconfig.lis}, using

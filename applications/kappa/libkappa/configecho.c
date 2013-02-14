@@ -95,13 +95,13 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        A group that specifies any alternative prefixes that can be
 *        included at the start of any parameter name. For instance, if
 *        this group contains the two entries "450=1" and "850=0", then
-*        DEFAULTS can specify two defaults for any single parameter--
-*        one for the parameter prefixed by "450." and another for the
-*        parameter prefixed by "850.". Thus if DEFAULTS defines a
-*        parameter called "filter", it could include "450.filter=300"
-*        and "850.filter=600". The CONFIG parameter could then either
-*        set the filter parameter for a specific prefix (as in
-*        "450.filter=234"); or it could leave the prefix unspecified,
+*        either CONFIG or DEFAULTS can specify two values for any single
+*        parameter -- one for the parameter prefixed by "450." and another
+*        for the parameter prefixed by "850.". Thus, for instance, if
+*        DEFAULTS defines a parameter called "filter", it could include
+*        "450.filter=300" and "850.filter=600". The CONFIG parameter could
+*        then either set the filter parameter for a specific prefix (as
+*        in "450.filter=234"); or it could leave the prefix unspecified,
 *        in which case the prefix used is the first one with a
 *        non-zero value in SELECT (450 in the case of this example - 850
 *        has a value zero in SELECT). Thus the names of the items in
@@ -122,10 +122,15 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        Report the value of configuration parameter "m81" defined within
 *        the file "myconf". If the file does not contain a value for
 *        "m81", then "<***>" is displayed.
+*     configecho type ^myconf select="'m57=0,m31=1,m103=0'"
+*        Report the value of configuration parameter "type" defined within
+*        the file "myconf". If the file does not contain a value for
+*        "type", then the value of "m31.type" will be reported instead. If
+*        neither is present, then "<***>" is displayed.
 *     configecho flt.filt_edge_largescale \
 *                config=^/star/share/smurf/dimmconfig.lis \
 *                defaults=/star/bin/smurf/smurf_makemap.def \
-*                select="450=1,850=0"
+*                select="'450=1,850=0'"
 *        Report the value of configuration parameter "flt.filt_edge_largescale"
 *        defined within the file "/star/share/smurf/dimmconfig.lis", using
 *        defaults from the file "/star/bin/smurf/smurf_makemap.def". If
@@ -170,8 +175,11 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     11-FEB-2013 (GSB):
 *        Added ability to read configuration from history entries.
 *     13-FEB-2013 (DSB):
-*        Nullify AST object pointers when the objects are annulled, 
+*        Nullify AST object pointers when the objects are annulled,
 *        to avoid re-use of dead pointers.
+*     14-FEB-2013 (DSB):
+*        Allow the SELECT feature to be used even if no DEFAULTS file is
+*        supplied (see the new entry in the "Examples:" section).
 *     {enter_further_changes_here}
 
 *-
@@ -230,37 +238,28 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
       }
    }
 
-/* If no defaults file was supplied, just get the CONFIG group and convert
-   to an AST KeyMap. */
-   if( ! defs[0] ) {
-      kpg1Gtgrp( "CONFIG", &grp, &size, STATUS );
-      kpg1Kymap( grp, &keymap, STATUS );
+/* See if any alternate keyword prefixes are allowed, and if so determine
+   which of the alternatices is to be displayed. */
+   kpg1Gtgrp( "SELECT", &grp, &size, STATUS );
+   if( *STATUS == PAR__NULL ) {
       grpDelet( &grp, STATUS );
+      errAnnul( STATUS );
+      keymap2 = NULL;
+   } else {
+      kpg1Kymap( grp, &keymap2, STATUS );
+      grpDelet( &grp, STATUS );
+   }
+
+/* Create a KeyMap holding the selected alternative for each keyword, and
+   also supply defaults for any missing values (if a defaults file was
+   supplied by the user). */
+   keymap = kpg1Config( "CONFIG", defs[0]?defs:NULL, keymap2, STATUS );
 
 /* Allow it to be NULL if we're reading an NDF because we'll replace
    keymap with historyConfig later if necessary. */
-
-      if (indf && *STATUS == PAR__NULL) {
-         errAnnul(STATUS);
-         keymap = 0;
-      }
-
-/* If a defaults file was supplied, we also allow the user to define the
-   allowed alternative prefixes and to select the default prefix, using
-   parameter SELECT. */
-   } else if( *STATUS == SAI__OK ){
-
-      kpg1Gtgrp( "SELECT", &grp, &size, STATUS );
-      if( *STATUS == PAR__NULL ) {
-         grpDelet( &grp, STATUS );
-         errAnnul( STATUS );
-         keymap2 = NULL;
-      } else {
-         kpg1Kymap( grp, &keymap2, STATUS );
-         grpDelet( &grp, STATUS );
-      }
-
-      keymap = kpg1Config( "CONFIG", defs, keymap2, STATUS );
+   if( indf && *STATUS == PAR__NULL ) {
+      errAnnul(STATUS);
+      keymap = 0;
    }
 
 /* Abort if an error has occurred. */

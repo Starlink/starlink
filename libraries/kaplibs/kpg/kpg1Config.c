@@ -97,7 +97,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *        The name of the environment parameter to use.
 *     def = const char * (Given)
 *        The path to a file containing the default value for every allowed config
-*        parameter. For instance, "$SMURF_DIR/dimmconfig.def".
+*        parameter. For instance, "$SMURF_DIR/dimmconfig.def". May be NULL.
 *     nested = AstKeyMap * (Given)
 *        If non-NULL, used to determine which nested keys might be in the config
 *        and which should be merged with the base keymap. The values in the keymap
@@ -159,6 +159,8 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *        Changed so that values supplied without any prefix take priority
 *        over values supplied with a prefix (it used to be the other way
 *        round).
+*     14-FEB-2013 (DSB):
+*        Allow NULL to be supplied for "def".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -170,7 +172,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 /* Local Variables: */
    AstKeyMap *external = NULL;  /* Keymap of externally supplied values */
    AstKeyMap *result = NULL;    /* Returned KeyMap */
-   Grp *grp;                    /* Group to hold config values */
+   Grp *grp = NULL;             /* Group to hold config values */
    char *value;                 /* Pointer to GRP element buffer */
    char buffer[ GRP__SZNAM ];   /* Buffer for GRP element */
    int added;                   /* Number of names added to group */
@@ -181,22 +183,24 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
    if( *status != SAI__OK ) return result;
 
 /* Attempt to read the specified defaults file into a GRP group. */
-   grp = grpNew( "GRP", status );
-   sprintf( buffer, "^%s", def );
-   grpGrpex( buffer, NULL, grp, &size, &added, &flag, status );
+   if( def ) {
+      grp = grpNew( "GRP", status );
+      sprintf( buffer, "^%s", def );
+      grpGrpex( buffer, NULL, grp, &size, &added, &flag, status );
 
 /* Create a KeyMap from this group. */
-   kpg1Kymap( grp, &result, status );
+      kpg1Kymap( grp, &result, status );
 
 /* Delete the group. */
-   grpDelet( &grp, status );
+      grpDelet( &grp, status );
 
 /* Handle nested entries */
-   result = kpg1Config_ProcessNesting( result, nested, status );
+      result = kpg1Config_ProcessNesting( result, nested, status );
 
 /* Lock the KeyMap so that an error will be reported if an attempt
    is made to add any new entries to it. */
-   astSetI( result, "MapLocked", 1 );
+      astSetI( result, "MapLocked", 1 );
+   }
 
 /* Read a group of configuration setting from the specified environment parameter. */
    kpg1Gtgrp( param, &grp, &size, status );
@@ -222,18 +226,24 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 /* Handle alternate nested entries */
          external = kpg1Config_ProcessNesting( external, nested, status );
 
-/* Test every entry in the user-supplied configuration keymap. If an
-   entry is found which does not exist in the defaults keymap, report an
-   error. We could rely on astMapCopy to do this (called below) but the
-   wording of the error message created by astMapCopy is a bit too
-   generalised to be useful. */
-         kpg1Config_CheckNames( result, external, grp, param, status );
+/* If defaults were supplied, test every entry in the user-supplied
+   configuration keymap. If an entry is found which does not exist in the
+   defaults keymap, report an error. We could rely on astMapCopy to do
+   this (called below) but the wording of the error message created by
+   astMapCopy is a bit too generalised to be useful. */
+         if( result ) {
+            kpg1Config_CheckNames( result, external, grp, param, status );
 
 /* Copy the overrides into the default. */
-         astMapCopy( result, external );
+            astMapCopy( result, external );
 
 /* Delete the external KeyMap */
-         external = astAnnul( external );
+            external = astAnnul( external );
+
+/* If no defaults, return the external KeyMap as the result. */
+         } else {
+            result = external;
+         }
       }
    }
 
