@@ -64,9 +64,9 @@ badfrac = 0.05
 #		"cleandk.". So for instance, "apod" becomes "cleandk.apod",
 #               "fillgaps" becomes "cleandk.fillgaps"< etc.
 cleandk.apod = <undef>
-cleandk.badfrac = 0
+cleandk.badfrac = 0.05
 cleandk.compreprocess = 0
-cleandk.dcfitbox = 0
+cleandk.dcfitbox = 30
 cleandk.dclimcorr = 10
 cleandk.dcmaxsteps = 10
 cleandk.dcsmooth = 50
@@ -87,7 +87,7 @@ cleandk.flagstat = 0
 cleandk.noisecliplow = 0.0
 cleandk.noiseclipprecom = 0
 cleandk.noisecliphigh = 0.0
-cleandk.order = 0
+cleandk.order = 1
 cleandk.pcalen = 0
 cleandk.pcathresh = 0
 cleandk.spikebox = 50

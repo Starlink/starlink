@@ -1144,7 +1144,7 @@ itermap = 0
 #-----------------------------------------------------------------
 #  Name: 	maptol
 #  Type: 	real
-#  Default: 	<undef>
+#  Default: 	0.05
 #  Purpose: 	Specifies when to stop iterating.
 #  Description: If the normalised mean change between the maps created on
 #		subsequent iterations falls below the value of maptol, then the
@@ -1157,7 +1157,7 @@ itermap = 0
 #		pixel variances. Compared to parameter "chitol", this is much
 #		more like a "by eye" test, that will stop the solution when
 #		the map stops changing.
-maptol = <undef>
+maptol = 0.05
 
 #-----------------------------------------------------------------
 #  Name: 	maxlen
