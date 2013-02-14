@@ -3,7 +3,31 @@
 #  This script requires that Perl be in the path, and that the
 #  environment variable SST_DIR be set to the location of the prolat
 #  binary. It creates a file call "./params.tex" holding latex descriptions
-#  of all the configuration parameters documented in the files "./*.def".
+#  of all the configuration parameters documented in the files "./*.def". It must
+#  be run from within the defaults subdirectory.
+#
+#  If a file name is supplied as the first command line argument, it is expected
+#  to be a text file containing a list of config parameter names, one on each
+#  line. In this case, only the named parameters are documented, and the output is put
+#  into a file with the same name as the supplied text file, but with a suffix of ".tex"
+
+
+#  Are we processing just a selection of parameters, or all parameters? Get a hash
+#  containing all the selected parameter names in upper case.
+   %selected = ();
+   $subset = 0;
+   if( $#ARGV > -1 ) {
+      $subset = 1;
+      open INFILE, "<$ARGV[0]" or die "Cannot find file $ARGV[0] $!\n";
+      while( $line = <INFILE> ){
+         chomp( $line );
+         $selected{uc($line)} = 1;
+      }
+      close( INFILE );
+      $outfile = "$ARGV[0].tex";
+   } else {
+      $outfile = "./params.tex";
+   }
 
 #  Create an empty hash to hold the contents of all .def files. One entry
 #  for every .def file. The key is the smurf command associated with the
@@ -150,25 +174,29 @@
       $default = &trimws( $allparams{$name}{"default"} );
       $applic = &trimws( uc( $allparams{$name}{"applic"} ) );
       $desc = &trimws( $allparams{$name}{"description"} );
-      $Name = uc( $name);
+      $Name = uc( $name );
+
+#  Skip this parameter if it is not in the selected list
+      if( $subset == 0 || exists $selected{$Name} ) {
 
 #  Write out an SST prologue for the parameter, appending it to the tmp file.
-      print( TEMP "*+\n" );
-      print( TEMP "*  Name:\n" );
-      print( TEMP "*     $Name\n" );
-      print( TEMP "\n" );
-      print( TEMP "*  Purpose:\n" );
-      print( TEMP "*     $purpose\n" );
-      print( TEMP "\n" );
-      print( TEMP "*  Invocation:\n" );
-      print( TEMP "*     $type\n" );
-      print( TEMP "\n" );
-      print( TEMP "*  Description:\n" );
-      print( TEMP "*     $desc [$default]\n" );
-      print( TEMP "\n" );
-      print( TEMP "*  SMURF Usage:\n" );
-      print( TEMP "*     $applic\n" );
-      print( TEMP "*-\n" );
+         print( TEMP "*+\n" );
+         print( TEMP "*  Name:\n" );
+         print( TEMP "*     $Name\n" );
+         print( TEMP "\n" );
+         print( TEMP "*  Purpose:\n" );
+         print( TEMP "*     $purpose\n" );
+         print( TEMP "\n" );
+         print( TEMP "*  Invocation:\n" );
+         print( TEMP "*     $type\n" );
+         print( TEMP "\n" );
+         print( TEMP "*  Description:\n" );
+         print( TEMP "*     $desc [$default]\n" );
+         print( TEMP "\n" );
+         print( TEMP "*  SMURF Usage:\n" );
+         print( TEMP "*     $applic\n" );
+         print( TEMP "*-\n" );
+      }
    }
 
 #  Close the temp file.
@@ -193,7 +221,11 @@
       ($pname = $name) =~ s/_/\\_/g;
       ($rname = $name) =~ s/_/\\\\_/g;
        $qname = uc( $name );
-       $document =~ s/(arameter\s*\{\\tt \"\})$rname(\{\\tt \"\})/$1\\htmlref{$pname}{$qname}$2/gs;
+       if( $subset == 0 ) {
+          $document =~ s/(arameter\s*\{\\tt \"\})$rname(\{\\tt \"\})/$1\\htmlref{$pname}{$qname}$2/gs;
+       } else {
+          $document =~ s/(arameter\s*\{\\tt \"\})$rname(\{\\tt \"\})/$1\\xref{$pname}{sun258}{$pname}$2/gs;
+       }
    }
 
 #  Edit the Latex macro invocations into their final form.
@@ -205,7 +237,7 @@
    $document =~ s/(\$<\$undef\$>\$)/{\\tt $1}/gs;
 
 #  Write the modified latex out to the output file.
-   open( OUTPUT, '>params.tex' );
+   open( OUTPUT, ">$outfile" );
    print OUTPUT $document;
    close( OUTPUT );
 
