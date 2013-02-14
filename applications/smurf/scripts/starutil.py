@@ -48,6 +48,7 @@ def _cmd_token():
 #  -------------------  Logging ---------------------------
 
 #  Constants defining increasing levels of information to display or log
+NOTSET = -1
 NONE = 0
 CRITICAL = 1
 PROGRESS = 2
@@ -57,8 +58,8 @@ DEBUG = 4
 #  Level of information to display on the screen, and to log. These are
 #  set to NONE here to prevent any information being displayed or logged
 #  by default prior to the creation of the ParSys object.
-ilevel = NONE
-glevel = NONE
+ilevel = NOTSET
+glevel = NOTSET
 
 #  The requested log file.
 logfile = None
@@ -155,6 +156,22 @@ def _getLevel( level ):
       return ATASK
    elif level == "DEBUG":
       return DEBUG
+   else:
+      raise UsageError("{0}Illegal information level '{1}' supplied.".format(_cmd_token(),level))
+
+def _findLevel( level, default  ):
+   if level == NOTSET:
+      return default
+   elif level == NONE:
+      return "NONE"
+   elif level == CRITICAL:
+      return "CRITICAL"
+   elif level == PROGRESS:
+      return "PROGRESS"
+   elif level == ATASK:
+      return "ATASK"
+   elif level == DEBUG:
+      return "DEBUG"
    else:
       raise UsageError("{0}Illegal information level '{1}' supplied.".format(_cmd_token(),level))
 
@@ -462,7 +479,10 @@ class ParSys(object):
          In adition, the glevel value can be changed by assigning a new
          integer value (one of starutil.NONE, starutil.CRITICAL,
          starutil.PROGRESS, starutil.ATASK or starutil.DEBUG) to the module
-         variable starutil.glevel. ["PROGRESS"]
+         variable starutil.glevel. The default value is the value of
+         "starutil.ilevel" when the ParSys object is created, which is
+         starutil.PROGRESS unless the caller changes it before creating
+         the ParSys. []
 
       GLEVEL = _LITERAL (Read)
          Controls the level of information to write to a text log file.
@@ -471,7 +491,10 @@ class ParSys(object):
 	 can be changed by assigning a new integer value (one of
 	 starutil.NONE, starutil.CRITICAL, starutil.PROGRESS,
 	 starutil.ATASK or starutil.DEBUG) to the module variable
-	 starutil.glevel. ["ATASK"]
+	 starutil.glevel. The default value is the value of
+         "starutil.ilevel" when the ParSys object is created, which is
+         starutil.ATASK unless the caller changes it before creating
+         the ParSys. []
 
       LOGFILE = _LITERAL (Read)
          The name of the log file to create if GLEVEL is not NONE. The
@@ -559,12 +582,12 @@ class ParSys(object):
       levs = [ "NONE", "CRITICAL", "PROGRESS", "ATASK", "DEBUG" ]
 
       p = ParChoice("ILEVEL", levs, "Level of info. to display on screen",
-                    "PROGRESS", noprompt=True)
+                    _findLevel( ilevel, "PROGRESS"), noprompt=True)
       params.append(p)
       self.params[p.name] = p
 
       p = ParChoice("GLEVEL", levs, "Level of info. to store in log file",
-                    "ATASK", noprompt=True)
+                    _findLevel( glevel, "ATASK"), noprompt=True)
       params.append(p)
       self.params[p.name] = p
 
@@ -946,6 +969,7 @@ class Parameter(object):
             except InvalidParameterError as err:
                self.__error(err)
                self.__raw = None
+               self.__noprompt = False
 
             if defaultUsed:
                self._clearDefault()
@@ -1380,7 +1404,7 @@ class ParChoice(Parameter):
             from both ends of each option. Matching is case insensitive.
          prompt = string
             The prompt string.
-         default = float
+         default = string
             The initial default value.
          noprompt = boolean
             If True, then the user will not be prompted for a parameter value
