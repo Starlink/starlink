@@ -3190,11 +3190,13 @@ number within those parentheses indicates the size of the array.
       \sstsubsection{
          WAVEBAND = LITERAL (Read)
       }{
-         This should be one of {\tt "}450{\tt "}, {\tt "}850{\tt "} or
-         {\tt "}!{\tt "}. It specifies which value should be displayed for
-         configuration parameters that have separate values for 450 and 850
-         um. If null (!) is supplied, then both values are shown, with the
-         ``450.''/``850.'' prefix retained. [!]
+         This parameter is not used if either CONFIG1 or CONFIG2 is
+         an NDF created by MAKEMAP. It should be one of {\tt "}450{\tt"},
+         {\tt "}850{\tt "}. It specifies which value should be displayed
+         for configuration parameters that have separate values for 450
+         and 850 um. If either CONFIG1 or CONFIG2 is an NDF created by
+         MAKEMAP, then the wavebands to use are determined from the
+         headers in the NDFs.
       }
       \sstsubsection{
          DEFAULTS = \_LOGICAL (Read)

@@ -31,10 +31,12 @@
 *        supplied for the CONFIG parameter of MAKEMAP, or an NDF created
 *        by MAKEMAP.
 *     WAVEBAND = LITERAL (Read)
-*        This should be one of "450", "850" or "!". It specifies which
-*        value should be displayed for configuration parameters that have
-*        separate values for 450 and 850 um. If null (!) is supplied, then
-*        both values are shown, with the "450."/"850." prefix retained. [!]
+*        This parameter is not used if either CONFIG1 or CONFIG2 is
+*        an NDF created by MAKEMAP. It should be one of "450" or "850". It
+*        specifies which value should be displayed for configuration
+*        parameters that have separate values for 450 and 850 um. If either
+*        CONFIG1 or CONFIG2 is an NDF created by MAKEMAP, then the
+*        wavebands to use are determined from the headers in the NDFs.
 *     DEFAULTS = _LOGICAL (Read)
 *        If TRUE, then each supplied configuration (CONFIG1 and CONFIG2)
 *        is extended to include default values are any MAKEMAP parameters
@@ -84,6 +86,7 @@ import starutil
 import os
 import subprocess
 from starutil import invoke
+from starutil import msg_out
 from starutil import ParSys
 
 #  A function to clean up before exiting. Delete the text files holding
@@ -102,9 +105,10 @@ def cleanup():
 #  is pressed.
 try:
 
-#  No need for any log or screen output.
+#  Only display critical messages on the scren, and nothing at all in the
+#  log file.
    starutil.glevel = starutil.NONE
-   starutil.ilevel = starutil.NONE
+   starutil.ilevel = starutil.CRITICAL
 
 #  Declare the script parameters. Their positions in this list define
 #  their expected position on the script command line. They can also be
@@ -119,22 +123,13 @@ try:
    params.append(starutil.Par0S("CONFIG2", "The second config" ))
    params.append(starutil.ParChoice("WAVEBAND", ("450","850"),
                                     "The waveband to display - 450 or 850",
-                                    None, True ))
+                                    "850" ))
    params.append(starutil.Par0L("DEFAULTS", "Include defaults for missing "
                                 "values?", True, True ))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
-
-#  Get the waveband to select.
-   waveband = parsys["WAVEBAND"].value
-   if waveband == "450":
-      select = starutil.shell_quote( "'850=0,450=1'" )
-   elif waveband == "850":
-      select = starutil.shell_quote( "'850=1,450=0'" )
-   else:
-      select = "!"
 
 #  Note the path to the defaults file, if required.
    defs = parsys["DEFAULTS"].value
@@ -146,13 +141,117 @@ try:
 #  Get the first config string.
    config1 = parsys["CONFIG1"].value
 
-#  Attempt to list the configuration parameters assuming it is an NDF. If this
-#  fails, try again using it as a standard textual configuration specification.
+#  Assuming it is an NDF, attempt to get the SUBARRAY fits header, and
+#  determine the waveband. If no SUBARRAY header is found, look for
+#  "s4a", etc, in the NDF's provenance info.
    try:
+      subarray = starutil.get_fits_header( config1, "SUBARRAY" )
+      isndf1 = True
+      if subarray == None:
+         text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config1) )
+         if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
+            subarray = "s4"
+         elif "s8a" in text or "s8b" in text or "s8c" in text or "s8d" in text:
+            subarray = "s8"
+         else:
+            subarray = None
+   except:
+      isndf1 = False
+
+   if isndf1:
+      if subarray == None:
+         msg_out("Cannot determine the SCUBA-2 waveband for NDF '{0}' "
+                 "- was it really created by MAKEMAP?".format(config1), starutil.CRITICAL )
+         waveband1 = None
+      elif subarray[1:2] == "4":
+         waveband1 = "450"
+      elif subarray[1:2] == "8":
+         waveband1 = "850"
+      else:
+         raise starutil.InvalidParameterError("Unexpected value '{0}' found "
+                  "for SUBARRAY FITS Header in {1}.".format(subarray,config1))
+   else:
+      waveband1 = None
+
+
+#  Get the second config string.
+   config2 = parsys["CONFIG2"].value
+
+#  Assuming it is an NDF, attempt to get the SUBARRAY fits header, and
+#  determine the waveband.
+   try:
+      subarray = starutil.get_fits_header( config2, "SUBARRAY" )
+      isndf2 = True
+      if subarray == None:
+         text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config2) )
+         if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
+            subarray = "s4"
+         elif "s8a" in text or "s8b" in text or "s8c" in text or "s8d" in text:
+            subarray = "s8"
+         else:
+            subarray = None
+   except:
+      isndf2 = False
+
+   if isndf2:
+      if subarray == None:
+         msg_out("Cannot determine the SCUBA-2 waveband for NDF '{0}' "
+                 "- was it really created by MAKEMAP?".format(config2), starutil.CRITICAL )
+         waveband2 = None
+      elif subarray[1:2] == "4":
+         waveband2 = "450"
+      elif subarray[1:2] == "8":
+         waveband2 = "850"
+      else:
+         raise starutil.InvalidParameterError("Unexpected value '{0}' found "
+                  "for SUBARRAY FITS Header in {1}.".format(subarray,config2))
+   else:
+
+
+
+      waveband2 = None
+
+#  If config1 is an ndf but config2 is not, use the waveband from config1.
+   if waveband1 != None and waveband2 == None:
+      waveband2 = waveband1
+
+#  If config2 is an ndf but config1 is not, use the waveband from config2.
+   elif waveband1 == None and waveband2 != None:
+      waveband1 = waveband2
+
+#  If neither are ndfs, use the WAVEBAND parameter value for both.
+   elif waveband1 == None and waveband2 == None:
+      waveband2 = parsys["WAVEBAND"].value
+      waveband1 = waveband2
+
+#  If both are ndfs, but for different wavebands, issue a warning (even
+#  if the ilevel is not set)
+   else:
+      msg_out( "\n  Supplied NDFs are for different wavebands", starutil.CRITICAL )
+
+#  Tell the user what wavebands are being used.
+   if waveband1 == waveband2:
+      msg_out( "\n  Showing {0} um values".format(waveband1),
+            starutil.CRITICAL)
+   else:
+      msg_out( "\n  Showing {0} um values from {1}".format(waveband1,config1),
+               starutil.CRITICAL)
+      msg_out( "\n  Showing {0} um values from {1}".format(waveband2,config2),
+               starutil.CRITICAL)
+
+#  Get the waveband selection specifier for config1.
+   if waveband1 == "450":
+      select = starutil.shell_quote( "'850=0,450=1'" )
+   else:
+      select = starutil.shell_quote( "'850=1,450=0'" )
+
+
+#  List the configuration parameters in alphabetical order to a text file.
+   if isndf1:
       conf1 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
                      "config=! name=! sort=yes defaults={1} select={2}".
                      format(config1,defs,select) )
-   except:
+   else:
       config1 = starutil.shell_quote( config1 )
       conf1 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
                      "config={0} name=! sort=yes defaults={1} select={2}".
@@ -164,16 +263,21 @@ try:
    fd.close()
 
 #  Do the same with the second configuration.
-   config2 = parsys["CONFIG2"].value
-   try:
+   if waveband2 == "450":
+      select = starutil.shell_quote( "'850=0,450=1'" )
+   else:
+      select = starutil.shell_quote( "'850=1,450=0'" )
+
+   if isndf2:
       conf2 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
                      "config=! name=! sort=yes defaults={1} select={2}".
                      format(config2,defs,select) )
-   except:
+   else:
       config2 = starutil.shell_quote( config2 )
       conf2 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
                      "config={0} name=! sort=yes defaults={1} select={2}".
                      format(config2,defs,select) )
+
    fd = open( "config2.tmp", "w" )
    fd.write( conf2 )
    fd.close()
