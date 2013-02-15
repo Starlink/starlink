@@ -633,8 +633,7 @@ void HistoryKeyMap(int n, char* const text[], int* status) {
    and setting p to point at the start of line. */
 
    for (i = 0; i < n; i ++) {
-      strncpy(line, text[i], NDF__SZHIS);
-      line[NDF__SZHIS] = '\0';
+      one_strlcpy(line, text[i], NDF__SZHIS + 1, status);
       p = line;
 
 /* If a group is in progess, check that it continues, and if so
