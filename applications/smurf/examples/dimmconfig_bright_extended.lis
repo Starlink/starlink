@@ -43,9 +43,9 @@
 #-
 
 #  Inherit the values defined in the parent dimmconfig file
-^$STARLINK_DIR/share/smurf/dimmconfig.lis
+   ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
-numiter=-40
-flt.filt_edge_largescale=600
-ast.zero_snr = 5
+   numiter=-40
+   flt.filt_edge_largescale=600
+   ast.zero_snr = 5
 

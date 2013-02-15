@@ -11,9 +11,8 @@
 #
 #     This file is not intended to be used directly by users. Its purpose
 #     is to provide settings that are common to other, more specialised,
-#     configurations that handle bright extended and compact sources.See
-#     for instance, /star/share/smurf/dimmconfig_bright_extended.lis and
-#     /star/share/smurf/dimmconfig_bright_compact.lis.
+#     configurations that handle various forms of bright sources. See
+#     for instance, /star/share/smurf/dimmconfig_bright_compact.lis.
 #
 #     Maps of bright sources, regardless of their physical extent,
 #     generally require less aggressive rejection of bad data due to the
@@ -48,18 +47,18 @@
 
 
 #  Inherit the values defined in the parent dimmconfig file
-^$STARLINK_DIR/share/smurf/dimmconfig.lis
+   ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
-numiter = 20
+   numiter = 20
 
-# Much weaker bolometer noise clip
-noisecliphigh = 10.0
+#  Much weaker bolometer noise clip
+   noisecliphigh = 10.0
 
-# Less aggressive DC step finder to avoid problems with bright sources
-dcthresh = 100
+#  Less aggressive DC step finder to avoid problems with bright sources
+   dcthresh = 100
 
-# Less aggressive bolo flagging.
-com.corr_tol = 7
-com.gain_tol = 7
-com.gain_abstol = 5
+#  Less aggressive bolo flagging.
+   com.corr_tol = 7
+   com.gain_tol = 7
+   com.gain_abstol = 5
 
