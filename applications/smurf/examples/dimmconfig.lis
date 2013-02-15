@@ -132,6 +132,7 @@ com.zero_circle = <undef>
 com.zero_lowhits = 0
 com.zero_snr = 0
 com.zero_snrlo = 0
+com.zero_union = 1
 com.zero_freeze = 0
 
 ########################
@@ -156,6 +157,7 @@ flt.zero_lowhits = 0
 flt.zero_snr = 0
 flt.zero_snrlo = 0
 flt.zero_niter = 2
+flt.zero_union = 1
 flt.zero_freeze = 0
 
 ########################
@@ -181,5 +183,6 @@ ast.zero_snr = 0
 ast.zero_snrlo = 0
 ast.zero_snr_fwhm = 0
 ast.zero_snr_low = -1.1
+ast.zero_union = 1
 ast.zero_freeze = 0
 

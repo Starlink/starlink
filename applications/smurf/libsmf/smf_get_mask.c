@@ -51,9 +51,13 @@
 *     the mask is not known until the end of the first iteration).
 *
 *     If multiple masks are specified (e.g. ZERO_MASK and ZERO_CIRCLE),
-*     they are combined into a single mask such that a mask pixel is
-*     "source" (zero) iff one or more of the indivudal mask pixels are
-*      source.
+*     they are combined into a single mask. How this is done depends on
+*     the value of the "ZERO_UNION" parameter. If it is non-zero, then
+*     the combined mask is the union of the individual masks (i.e. a mask
+*     pixel is "source" (zero) iff one or more of the indivudal mask pixels
+*     are source). If ZERO_UNION is zero, the combined mask is the
+*     intersection of the individual masks (i.e. a mask pixel is "source"
+*     (zero) iff all the mask pixels are source).
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
@@ -73,6 +77,9 @@
 *        freeze, even on iteration zero (for the benefit of the skyloop.py
 *        command). Also, initialise the new mask to hold the values implied
 *        by the quality array associated with the current map.
+*     15-FEB-2013 (DSB):
+*        - Allow union or intersection of multiple masks to be used.
+*        - Report an error if the mask contains fewer than 5 source pixels.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -154,8 +161,10 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int mask_types[ NTYPE ];   /* Identifier for the types of mask to use */
    int nel;                   /* Number of mapped NDF pixels */
    int nmask;                 /* The number of masks to be combined */
+   int nsource;               /* No. of source pixels in final mask */
    int thresh;                /* Absolute threshold on hits */
    int ubnd_grid[ 2 ];        /* Upper bounds of map in GRID coords */
+   int munion;                /* Use union of supplied masks */
    int zero_c_n;              /* Number of zero circle parameters read */
    int zero_mask;             /* Use the reference NDF as a mask? */
    int zero_notlast;          /* Don't zero on last iteration? */
@@ -285,6 +294,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
 /* No need to create a mask if no masking was requested or possible. */
          if( nmask > 0 ) {
+
+/* Decide if we are using the union or intersection of the masks. */
+            astMapGet0I( subkm, "ZERO_UNION", &munion );
 
 /* Note if a mask existed on entry. If not, create a mask now, and
    initialise it to hold the mask defined by the initial sky map. */
@@ -577,8 +589,14 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                      } else {
                         pm = *mask;
                         pn = newmask;
-                        for( i = 0; i < dat->msize; i++,pm++ ) {
-                           if( *(pn++) == 0 ) *pm = 0;
+                        if( munion ) {
+                           for( i = 0; i < dat->msize; i++,pm++ ) {
+                              if( *(pn++) == 0 ) *pm = 0;
+                           }
+                        } else {
+                           for( i = 0; i < dat->msize; i++,pm++ ) {
+                              if( *(pn++) == 1 ) *pm = 1;
+                           }
                         }
                      }
                   }
@@ -587,6 +605,20 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
 /* Free the individual mask work array if it was used. */
             if( nmask > 1 ) newmask = astFree( newmask );
+
+/* Check that the mask has some source pixels. */
+            if( *status == SAI__OK ) {
+               nsource = 0;
+               pm = *mask;
+               for( i = 0; i < dat->msize; i++ ) {
+                  if( *(pm++) == 0 ) nsource++;
+               }
+               if( nsource < 5 && *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "The %s mask being used has fewer than 5 "
+                           "source pixels.", status, modname );
+               }
+            }
 
 /* Return the mask pointer if all has gone well. */
             if( *status == SAI__OK ) result = *mask;

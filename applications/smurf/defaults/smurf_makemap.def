@@ -237,6 +237,22 @@ ast.zero_snr_low = -1.1
 ast.zero_snrlo = 0
 
 #-----------------------------------------------------------------
+#  Name: 	ast.zero_union
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls how multiple AST masks are combined.
+#  Description: If more than one AST mask is specified (for instance, if
+#		values are supplied for both parameter "ast.zero_lowhits"
+#		and parameter "ast.zero_snr"), then they are combined
+#		into a single mask. If ast.zero_union is true (i.e.
+#		non-zero), then the source region in the combined mask is
+#		the union of the source regions in the individual masks.
+#		If ast.zero_union is false (i.e. zero), then the source
+#		region in the combined mask is the intersection of the
+#		source regions in the individual masks.
+ast.zero_union = 1
+
+#-----------------------------------------------------------------
 #  Name: 	bolomap
 #  Type: 	integer
 #  Default: 	0
@@ -375,6 +391,22 @@ com.zero_snr = 0
 #		isolated source areas. The com.zero_snrlo should be lower than
 #		the com.zero_snr value.
 com.zero_snrlo = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.zero_union
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls how multiple COM masks are combined.
+#  Description: If more than one COM mask is specified (for instance, if
+#		values are supplied for both parameter "com.zero_lowhits"
+#		and parameter "com.zero_snr"), then they are combined
+#		into a single mask. If com.zero_union is true (i.e.
+#		non-zero), then the source region in the combined mask is
+#		the union of the source regions in the individual masks.
+#		If com.zero_union is false (i.e. zero), then the source
+#		region in the combined mask is the intersection of the
+#		source regions in the individual masks.
+com.zero_union = 1
 
 #-----------------------------------------------------------------
 #  Name: 	delay
@@ -1084,6 +1116,22 @@ flt.zero_snr = 0
 #		isolated source areas. The flt.zero_snrlo should be lower than
 #		the flt.zero_snr value.
 flt.zero_snrlo = 0
+
+#-----------------------------------------------------------------
+#  Name: 	flt.zero_union
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Controls how multiple FLT masks are combined.
+#  Description: If more than one FLT mask is specified (for instance, if
+#		values are supplied for both parameter "flt.zero_lowhits"
+#		and parameter "flt.zero_snr"), then they are combined
+#		into a single mask. If flt.zero_union is true (i.e.
+#		non-zero), then the source region in the combined mask is
+#		the union of the source regions in the individual masks.
+#		If flt.zero_union is false (i.e. zero), then the source
+#		region in the combined mask is the intersection of the
+#		source regions in the individual masks.
+flt.zero_union = 1
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zeropad
