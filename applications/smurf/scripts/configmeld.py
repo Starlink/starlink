@@ -173,7 +173,6 @@ try:
    else:
       waveband1 = None
 
-
 #  Get the second config string.
    config2 = parsys["CONFIG2"].value
 
@@ -206,9 +205,6 @@ try:
          raise starutil.InvalidParameterError("Unexpected value '{0}' found "
                   "for SUBARRAY FITS Header in {1}.".format(subarray,config2))
    else:
-
-
-
       waveband2 = None
 
 #  If config1 is an ndf but config2 is not, use the waveband from config1.
@@ -224,9 +220,8 @@ try:
       waveband2 = parsys["WAVEBAND"].value
       waveband1 = waveband2
 
-#  If both are ndfs, but for different wavebands, issue a warning (even
-#  if the ilevel is not set)
-   else:
+#  If both are ndfs, but for different wavebands, issue a critical warning.
+   elif waveband1 != waveband2:
       msg_out( "\n  Supplied NDFs are for different wavebands", starutil.CRITICAL )
 
 #  Tell the user what wavebands are being used.
