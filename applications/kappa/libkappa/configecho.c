@@ -215,7 +215,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
    char defval[250];
    char name[250];
    const char *value;
-   char *historyValue = 0;
+   const char *historyValue = 0;
    int showall;
    int sort;
    size_t size;
@@ -244,7 +244,8 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
       }
    }
 
-/* Get the NDF file handle if requested. */
+/* Get the NDF identifier if requested. */
+   ndfBegin();
    if (*STATUS == SAI__OK) {
       ndfAssoc("NDF", "READ", &indf, STATUS);
       if (*STATUS == PAR__NULL) {
@@ -307,11 +308,11 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
          }
       }
 
-      if (! historyConfig) {
+      if (*STATUS == SAI__OK && ! historyConfig) {
          *STATUS = SAI__ERROR;
 
-         errRep("CONFIGECHO_ERR", "CONFIGECHO: Failed to find application "
-                "configuration in NDF history.", STATUS);
+         errRepf("CONFIGECHO_ERR", "CONFIGECHO: Failed to find %s "
+                 "configuration in NDF history.", STATUS, application);
       }
       else if (! keymap) {
          keymap = historyConfig;
@@ -416,9 +417,7 @@ L999:;
    astEnd;
 
 /* Close the NDF if open. */
-   if (indf) {
-      ndfAnnul(&indf, STATUS);
-   }
+   ndfEnd(STATUS);
 
 /* If an error has occurred, issue another error report identifying the
    program which has failed (i.e. this one). */
@@ -455,7 +454,7 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 *        A string to prepend to eack key.
 *     refkm
 *        Reference key map (e.g. values from the supplied configuration
-*        rather than the NDF history).
+*        rather than the NDF history), or null if not required.
 *     status
 *        Inherited status pointer.
 
@@ -463,7 +462,8 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 *     This function displays the contents of a supplied KeyMap as
 *     a series of "key = value" strings, one per line. It calls itself
 *     recursively if a nested KeyMap is found, adding a suitable
-*     prefix to the nested keys.
+*     prefix to the nested keys.  If a reference key map is supplied then
+*     the output shows how the main key map differs from it.
 */
 
 /* Local Variables: */
@@ -499,7 +499,7 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
          astMapGet0A( km, key, &avalue );
          if (refkm) {
             if (! astMapGet0A(refkm, key, &refavalue)) {
-               refavalue = astKeyMap("");
+               refavalue = (AstObject*) astKeyMap("");
             }
          }
          else {
@@ -605,7 +605,8 @@ void HistoryKeyMap(int n, char* const text[], int* status) {
    char patt_group[] = "Group:";
    char patt_cont[] = "   ";
    char patt_name[] = "CONFIG";
-   char buff[1000000];
+   char* buff = NULL;
+   int nc = 0;
    char line[NDF__SZHIS + 1];
    char* p;
    char* q;
@@ -615,6 +616,7 @@ void HistoryKeyMap(int n, char* const text[], int* status) {
    Grp* grp;
    size_t grpsize;
    int grpadded, grpflag;
+   if (*status != SAI__OK) return;
 
 /* Loop over history text lines, copying each into line for editing
    and setting p to point at the start of line. */
@@ -633,7 +635,7 @@ void HistoryKeyMap(int n, char* const text[], int* status) {
             p += strlen(patt_cont);
             while (*p == ' ') p++;
             while (p[strlen(p) - 1] == ' ') p[strlen(p) - 1] = '\0';
-            strncat(buff, p, sizeof(buff) - strlen(buff) - 1);
+            buff = astAppendString(buff, &nc, p);
             continue;
          }
          else {
@@ -670,7 +672,7 @@ void HistoryKeyMap(int n, char* const text[], int* status) {
             if (*p == '"') p++;
             while (*p == ' ') p++;
             while (p[strlen(p) - 1] == ' ') p[strlen(p) - 1] = '\0';
-            strncpy(buff, p, sizeof(buff));
+            buff = astAppendString(astFree(buff), &nc, p);
             groupcontinuing = 1;
          }
       }
@@ -705,5 +707,6 @@ void HistoryKeyMap(int n, char* const text[], int* status) {
 
       kpg1Kymap(grp, &historyConfig, status);
       grpDelet(&grp, status);
+      buff = astFree(buff);
    }
 }
