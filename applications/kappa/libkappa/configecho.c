@@ -44,6 +44,9 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     The value is also written to an output parameter. If the
 *     parameter is not specified by the CONFIG or DEFAULTS parameter,
 *     then the value supplied for DEFVAL is returned.
+*
+*     If an input NDF is supplied then configuration parameters
+*     are read from its history (see Parameters NDF and APPLICATION).
 
 *  Usage:
 *     configecho name config [defaults] [select] [defval]
@@ -52,7 +55,9 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     APPLICATION = LITERAL (Read)
 *        When reading configuration parameters from the history
 *        of an NDF, specifies the name of the application to find
-*        in the history.
+*        in the history. There must be a history component
+*        corresponding to the value of this parameter, and it
+*        must include a CONFIG group. [!]
 *     CONFIG = GROUP (Read)
 *        Specifies values for the configuration parameters. If the string
 *        "def" (case-insensitive) or a null (!) value is supplied, a set
@@ -90,7 +95,16 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        then all parameters defined in the configuration are displayed.
 *     NDF = NDF (Read)
 *        An NDF file containing history entries which include
-*        configuration parameters.
+*        configuration parameters. If not null (!) the history
+*        of the NDF will be searched for a component corresponding
+*        to the Parameter APPLICATION.  The Parameter CONFIG
+*        is then optional, but if it too is not null (!) then
+*        the output will show the differences between the configuration
+*        stored in the NDF history and the given configuration:
+*        new parameters and those different from the reference
+*        configuration (given by Parameter CONFIG) are prefixed
+*        with "+" and those which are the same as the reference
+*        configuration are prefixed with "-". [!]
 *     SELECT = GROUP (Read)
 *        A group that specifies any alternative prefixes that can be
 *        included at the start of any parameter name. For instance, if
@@ -138,6 +152,10 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        then it is searched for "450.flt.filt_edge_largescale" instead. An
 *        error is reported if dimmconfig.lis contains values for any
 *        items that are not defined in smurf_makemap.def.
+*     configecho ndf=omc1 config=^/star/share/smurf/dimmconfig.lis \
+*                application=makemap name=! sort=true select="'450=0,850=1'"
+*        Show how the configuration used to generate the 850um map
+*        of OMC1 differs from the basic dimmconfig.lis file.
 
 *  Copyright:
 *     Copyright (C) 2012 Science & Technology Facilities Council.

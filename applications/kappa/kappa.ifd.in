@@ -9835,6 +9835,8 @@ package kappa {
 
          parameter application {
             type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
             prompt {Application for which to find configuration}
             helpkey *
             default !
@@ -9878,6 +9880,8 @@ package kappa {
 
          parameter ndf {
             access READ
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
             prompt {NDF from which to read configuration}
             helpkey *
             default !
