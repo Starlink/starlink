@@ -39,14 +39,19 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        The global status.
 
 *  Description:
-*     This application displays the name and value of one or more
-*     configuration parameters, specified using Parameter CONFIG.
-*     The value is also written to an output parameter. If the
-*     parameter is not specified by the CONFIG or DEFAULTS parameter,
-*     then the value supplied for DEFVAL is returned.
+*     This application displays the name and value of one or all
+*     configuration parameters, specified using parameter CONFIG or
+*     NDF. If a single parameter is displayed, its value is also
+*     written to an output parameter. If the parameter value is not
+*     specified by the CONFIG, NDF or DEFAULTS parameter, then the
+*     value supplied for DEFVAL is displayed.
 *
 *     If an input NDF is supplied then configuration parameters
-*     are read from its history (see Parameters NDF and APPLICATION).
+*     are read from its history (see parameters NDF and APPLICATION).
+*
+*     If values are supplied for both CONFIG and NDF, then the
+*     differences between the two sets of configuration parameters
+*     are displayed (see parameter NDF).
 
 *  Usage:
 *     configecho name config [defaults] [select] [defval]
@@ -54,15 +59,17 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *  ADAM Parameters:
 *     APPLICATION = LITERAL (Read)
 *        When reading configuration parameters from the history
-*        of an NDF, specifies the name of the application to find
-*        in the history. There must be a history component
-*        corresponding to the value of this parameter, and it
-*        must include a CONFIG group. [!]
+*        of an NDF, this parameter specifies the name of the application
+*        to find in the history. There must be a history component
+*        corresponding to the value of this parameter, and it must
+*        include a CONFIG group. [current value]
 *     CONFIG = GROUP (Read)
 *        Specifies values for the configuration parameters. If the string
-*        "def" (case-insensitive) or a null (!) value is supplied, a set
-*        of default configuration parameter values will be used, as
-*        specified by Parameter DEFAULTS.
+*        "def" (case-insensitive) or a null (!) value is supplied, the
+*        configuration parameters are obtained using parameter NDF. If
+*        a null value is also supplied for NDF, a set of default
+*        configuration parameter values will be used, as specified by
+*        parameter DEFAULTS.
 *
 *        The supplied value should be either a comma-separated list of
 *        strings or the name of a text file preceded by an up-arrow
@@ -78,7 +85,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        the same keyword.
 *
 *        Each individual setting should be of the form "<keyword>=<value>".
-*        If a non-null value is supplied for Parameter DEFAULTS, an error
+*        If a non-null value is supplied for parameter DEFAULTS, an error
 *        will be reported if CONFIG includes values for any parameters
 *        that are not included in DEFAULTS.
 *     DEFAULTS = LITERAL (Read)
@@ -97,12 +104,12 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        An NDF file containing history entries which include
 *        configuration parameters. If not null (!) the history
 *        of the NDF will be searched for a component corresponding
-*        to the Parameter APPLICATION.  The Parameter CONFIG
+*        to the parameter APPLICATION.  The parameter CONFIG
 *        is then optional, but if it too is not null (!) then
 *        the output will show the differences between the configuration
 *        stored in the NDF history and the given configuration:
 *        new parameters and those different from the reference
-*        configuration (given by Parameter CONFIG) are prefixed
+*        configuration (given by parameter CONFIG) are prefixed
 *        with "+" and those which are the same as the reference
 *        configuration are prefixed with "-". [!]
 *     SELECT = GROUP (Read)
@@ -198,6 +205,8 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     14-FEB-2013 (DSB):
 *        Allow the SELECT feature to be used even if no DEFAULTS file is
 *        supplied (see the new entry in the "Examples:" section).
+*     15-FEB-2013 (DSB):
+*        Expand the prologue docs, and use NULL in place of zero for pointers.
 *     {enter_further_changes_here}
 
 *-
@@ -215,7 +224,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
    char defval[250];
    char name[250];
    const char *value;
-   const char *historyValue = 0;
+   const char *historyValue = NULL;
    int showall;
    int sort;
    size_t size;
@@ -278,7 +287,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
    keymap with historyConfig later if necessary. */
    if( indf && *STATUS == PAR__NULL ) {
       errAnnul(STATUS);
-      keymap = 0;
+      keymap = NULL;
    }
 
 /* Abort if an error has occurred. */
@@ -316,7 +325,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
       }
       else if (! keymap) {
          keymap = historyConfig;
-         historyConfig = 0;
+         historyConfig = NULL;
       }
    }
 
@@ -405,7 +414,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
             DisplayKeyMap( historyConfig , sort, "", keymap, STATUS );
          }
          else {
-            DisplayKeyMap( keymap, sort, "", 0, STATUS );
+            DisplayKeyMap( keymap, sort, "", NULL, STATUS );
          }
       }
    }
@@ -503,7 +512,7 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
             }
          }
          else {
-            refavalue = 0;
+            refavalue = NULL;
          }
          sprintf( newpref, "%s%s.", prefix, key );
          DisplayKeyMap( (AstKeyMap *) avalue, sort, newpref,
@@ -553,7 +562,6 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
             cvalue = astAppendString( (char *) cvalue, &nc, ")" );
 
 /* Do the same for the reference KeyMap. */
-
             if (refkm && (nval = astMapLength(refkm, key))) {
                nc = 0;
                refcvalue = astAppendString(NULL, &nc, "(");
@@ -571,7 +579,7 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
                refcvalue = astAppendString((char*) refcvalue, &nc, ")");
             }
             else {
-               refcvalue = 0;
+               refcvalue = NULL;
             }
 
 /* Display the total string, with the current key prefix, and free the memory
@@ -616,6 +624,9 @@ void HistoryKeyMap(int n, char* const text[], int* status) {
    Grp* grp;
    size_t grpsize;
    int grpadded, grpflag;
+
+/* Check the inherited status */
+
    if (*status != SAI__OK) return;
 
 /* Loop over history text lines, copying each into line for editing
