@@ -77,6 +77,9 @@
 *        Allow the old FLT model to be added back into the residuals at the
 *        start of the iteration, rather than just before finding the new FLT
 *        model. This is controlled by config parameter FLT.UNDOFIRST.
+*     2013-02-17 (DSB):
+*        Do not modify the flt mask to exclude unused map pixels on the first 
+*        iteration as the map has not yet been determined.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -198,7 +201,10 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
      the FLT model. */
   mask = smf_get_mask( wf, SMF__FLT, keymap, dat, flags, status );
 
-  /* If we have a mask, copy it into the quality array of the map. */
+  /* If we have a mask, copy it into the quality array of the map. 
+     Also set map pixels that are not used (e.g. corner pixels, etc) 
+     to be background pixels in the mask. Do not do this on the firrst 
+     iteration as the map has not yet been determined.*/
   if( mask ) {
     double *map = dat->map;
     smf_qual_t *mapqual = dat->mapqual;
@@ -208,7 +214,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       if( mask[i] ) {
          mapqual[i] |= SMF__MAPQ_FLT;
 
-      } else if( map[i] == VAL__BADD || mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) {
+      } else if( dat->iter > 0 && ( map[i] == VAL__BADD || mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) ) {
          mask[i] = 1;
          mapqual[i] |= SMF__MAPQ_FLT;
 
