@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.39}
 \newcommand{\stardocnumber}    {95.39}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2013 January 17}
+\newcommand{\stardocdate}      {2013 February 14}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.0}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -19860,29 +19860,49 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       }
    }
 }
+
 \sstroutine{
    CONFIGECHO
 }{
    Displays one or more configuration parameters
 }{
    \sstdescription{
-      This application displays the name and value of one or more
-      configuration parameters, specified using Parameter CONFIG.
-      The value is also written to an output parameter.  If the
-      parameter is not specified by the CONFIG or DEFAULTS parameter,
-      then the value supplied for DEFVAL is returned.
+      This application displays the name and value of one or all
+      configuration parameters, specified using Parameters CONFIG or
+      NDF. If a single parameter is displayed, its value is also
+      written to an output parameter. If the parameter value is not
+      specified by the CONFIG, NDF or DEFAULTS parameter, then the
+      value supplied for DEFVAL is displayed.
+
+      If an input NDF is supplied then configuration parameters
+      are read from its history (see Parameters NDF and APPLICATION).
+
+      If values are supplied for both CONFIG and NDF, then the
+      differences between the two sets of configuration parameters
+      are displayed (see Parameter NDF).
    }
    \sstusage{
       configecho name config [defaults] [select] [defval]
    }
    \sstparameters{
       \sstsubsection{
+         APPLICATION = LITERAL (Read)
+      }{
+         When reading configuration parameters from the history
+         of an NDF, this parameter specifies the name of the application
+         to find in the history. There must be a history component
+         corresponding to the value of this parameter, and it must
+         include a CONFIG group.  \tt{[!]}
+      }
+      \sstsubsection{
          CONFIG = GROUP (Read)
       }{
          Specifies values for the configuration parameters.  If the string
-         {\tt "def"} (case-insensitive) or a null ({\tt{!}}) value is supplied, a set
-         of default configuration parameter values will be used, as
-         specified by Parameter DEFAULTS.
+         {\tt "def"} (case-insensitive) or a null ({\tt{!}}) value is supplied, the
+         configuration parameters are obtained using Parameter NDF. If
+         a null value is also supplied for NDF, a set of default
+         configuration parameter values will be used, as specified by
+         Parameter DEFAULTS.
 
          The supplied value should be either a comma-separated list of
          strings or the name of a text file preceded by an up-arrow
@@ -19916,13 +19936,20 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          DEFVAL = LITERAL (Read)
       }{
          The value to return if no value can be obtained for the named
-         parameter, or if the value is "<undef>".  {\tt [<***>]}
+         parameter, or if the value is {\tt "$<$undef$>$"}.  {\tt [<***>]}
       }
       \sstsubsection{
          NAME = LITERAL (Read)
       }{
-         The name of the configuration parameter to display. If null (!)
-	 then all parameters defined in the configuration are displayed.
+         The name of the configuration parameter to display. If it is
+         set to null ({\tt{!}}), then all parameters defined in the configuration
+         are displayed.
+      }
+      \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         An NDF file containing history entries which include
+         configuration parameters.
       }
       \sstsubsection{
          SELECT = GROUP (Read)
@@ -19930,7 +19957,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          A group that specifies any alternative prefixes that can be
          included at the start of any parameter name.  For instance, if
          this group contains the two entries {\tt "450=1"} and {\tt "850=0"},
-         then either CONFIG or DEFAULTS can specify two defaults for any single
+         then either CONFIG or DEFAULTS can specify two values for any single
          parameter---one for the parameter prefixed by {\tt "450."} and another
          for the parameter prefixed by {\tt "850."}.  Thus, for instance, if
          DEFAULTS defines a parameter called {\tt "filter"}, it could include
@@ -19947,10 +19974,10 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       \sstsubsection{
          SORT = \_LOGICAL (Read)
       }{
-         If TRUE then sort the listed parameters in to alphabetical order.
+         If {\tt TRUE} then sort the listed parameters in to alphabetical order.
          Otherwise, retain the order they have in the supplied
-	 configuration. Only used if a null (!) value is supplied for
-         parameter NAME. {\tt [FALSE]}
+	 configuration.  Only used if a null ({\tt{!}}) value is supplied for
+         Parameter NAME.  {\tt [FALSE]}
       }
 
    }
@@ -19958,7 +19985,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       \sstsubsection{
          VALUE = LITERAL (Write)
       }{
-         The value of the configuration parameter, or {\tt "$<$$*$$*$$*$$>$"} if the
+         The value of the configuration parameter, or {\tt "<***>"} if the
          parameter has no value in CONFIG and DEFAULTS.
       }
    }
@@ -19968,20 +19995,20 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       }{
          Report the value of configuration parameter {\tt "m81"} defined within
          the file {\tt myconf}.  If the file does not contain a value for
-         {\tt "m81"}, then {\tt $<$$*$$*$$*$$>$} is displayed.
+         {\tt "m81"}, then {\tt <***>} is displayed.
       }
       \sstexamplesubsection{
-         configecho type $\wedge$myconf select="'m57=0,m31=1,m103=0'"
+         configecho type $\wedge$myconf select="m57=0,m31=1,m103=0"
       }{
          Report the value of configuration parameter {\tt "type"} defined within
-         the file {\tt myconf}. If the file does not contain a value for
+         the file {\tt myconf}.  If the file does not contain a value for
          {\tt "type"}, then the value of {\tt "m31.type"} will be reported
-         instead. If neither is present, then {\tt $<$$*$$*$$*$$>$} is displayed.
+         instead.  If neither is present, then {\tt <***>} is displayed.
       }
       \sstexamplesubsection{
          configecho flt.filt\_edge\_largescale $\backslash$ \\
                  config=$\wedge$/star/share/smurf/dimmconfig.lis $\backslash$ \\
-                 defaults=/star/bin/smurf/smurf\_makemap.def select="'450=1,850=0'"
+                 defaults=/star/bin/smurf/smurf\_makemap.def select="450=1,850=0"
       }{
          Report the value of configuration parameter {\tt flt.filt\_edge\_largescale}
          defined within the file {\tt /star/share/smurf/dimmconfig.lis}, using
@@ -19991,8 +20018,16 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          error is reported if {\tt dimmconfig.lis} contains values for any
          items that are not defined in {\tt smurf\_makemap.def}.
       }
+      \sstexamplesubsection{
+         configecho ndf=omc1 config=$\wedge$/star/share/smurf/dimmconfig.lis $\backslash$ \\
+                application=makemap name=! sort select="450=0,850=1"
+      }{
+         Show how the configuration used to generate the 850$\mu$m map
+         of OMC1 differs from the basic {\tt dimmconfig.lis} file.
+      }
    }
 }
+
 \sstroutine{
    CONTOUR
 }{

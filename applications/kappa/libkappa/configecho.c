@@ -40,18 +40,18 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 
 *  Description:
 *     This application displays the name and value of one or all
-*     configuration parameters, specified using parameter CONFIG or
+*     configuration parameters, specified using Parameters CONFIG or
 *     NDF. If a single parameter is displayed, its value is also
 *     written to an output parameter. If the parameter value is not
 *     specified by the CONFIG, NDF or DEFAULTS parameter, then the
 *     value supplied for DEFVAL is displayed.
 *
 *     If an input NDF is supplied then configuration parameters
-*     are read from its history (see parameters NDF and APPLICATION).
+*     are read from its history (see Parameters NDF and APPLICATION).
 *
 *     If values are supplied for both CONFIG and NDF, then the
 *     differences between the two sets of configuration parameters
-*     are displayed (see parameter NDF).
+*     are displayed (see Parameter NDF).
 
 *  Usage:
 *     configecho name config [defaults] [select] [defval]
@@ -66,10 +66,10 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     CONFIG = GROUP (Read)
 *        Specifies values for the configuration parameters. If the string
 *        "def" (case-insensitive) or a null (!) value is supplied, the
-*        configuration parameters are obtained using parameter NDF. If
+*        configuration parameters are obtained using Parameter NDF. If
 *        a null value is also supplied for NDF, a set of default
 *        configuration parameter values will be used, as specified by
-*        parameter DEFAULTS.
+*        Parameter DEFAULTS.
 *
 *        The supplied value should be either a comma-separated list of
 *        strings or the name of a text file preceded by an up-arrow
@@ -85,7 +85,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        the same keyword.
 *
 *        Each individual setting should be of the form "<keyword>=<value>".
-*        If a non-null value is supplied for parameter DEFAULTS, an error
+*        If a non-null value is supplied for Parameter DEFAULTS, an error
 *        will be reported if CONFIG includes values for any parameters
 *        that are not included in DEFAULTS.
 *     DEFAULTS = LITERAL (Read)
@@ -98,18 +98,19 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        The value to return if no value can be obtained for the named
 *        parameter, or if the value is "<undef>".  [<***>]
 *     NAME = LITERAL (Read)
-*        The name of the configuration parameter to display. If null (!)
-*        then all parameters defined in the configuration are displayed.
+*        The name of the configuration parameter to display.  If set to
+*        null (!), then all parameters defined in the configuration are
+*        displayed.
 *     NDF = NDF (Read)
 *        An NDF file containing history entries which include
 *        configuration parameters. If not null (!) the history
 *        of the NDF will be searched for a component corresponding
-*        to the parameter APPLICATION.  The parameter CONFIG
+*        to the Parameter APPLICATION.  The Parameter CONFIG
 *        is then optional, but if it too is not null (!) then
 *        the output will show the differences between the configuration
 *        stored in the NDF history and the given configuration:
 *        new parameters and those different from the reference
-*        configuration (given by parameter CONFIG) are prefixed
+*        configuration (given by Parameter CONFIG) are prefixed
 *        with "+" and those which are the same as the reference
 *        configuration are prefixed with "-". [!]
 *     SELECT = GROUP (Read)
@@ -133,7 +134,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        If TRUE then sort the listed parameters in to alphabetical order.
 *        Otherwise, retain the order they have in the supplied
 *        configuration. Only used if a null (!) value is supplied for
-*        parameter NAME. [FALSE]
+*        Parameter NAME. [FALSE]
 *     VALUE = LITERAL (Write)
 *        The value of the configuration parameter, or "<***>" if the
 *        parameter has no value in CONFIG and DEFAULTS.
@@ -143,7 +144,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        Report the value of configuration parameter "m81" defined within
 *        the file "myconf". If the file does not contain a value for
 *        "m81", then "<***>" is displayed.
-*     configecho type ^myconf select="'m57=0,m31=1,m103=0'"
+*     configecho type ^myconf select="m57=0,m31=1,m103=0"
 *        Report the value of configuration parameter "type" defined within
 *        the file "myconf". If the file does not contain a value for
 *        "type", then the value of "m31.type" will be reported instead. If
@@ -151,7 +152,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     configecho flt.filt_edge_largescale \
 *                config=^/star/share/smurf/dimmconfig.lis \
 *                defaults=/star/bin/smurf/smurf_makemap.def \
-*                select="'450=1,850=0'"
+*                select="450=1,850=0"
 *        Report the value of configuration parameter "flt.filt_edge_largescale"
 *        defined within the file "/star/share/smurf/dimmconfig.lis", using
 *        defaults from the file "/star/bin/smurf/smurf_makemap.def". If
@@ -160,12 +161,12 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        error is reported if dimmconfig.lis contains values for any
 *        items that are not defined in smurf_makemap.def.
 *     configecho ndf=omc1 config=^/star/share/smurf/dimmconfig.lis \
-*                application=makemap name=! sort=true select="'450=0,850=1'"
+*                application=makemap name=! sort select="450=0,850=1"
 *        Show how the configuration used to generate the 850um map
 *        of OMC1 differs from the basic dimmconfig.lis file.
 
 *  Copyright:
-*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2012-3 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
