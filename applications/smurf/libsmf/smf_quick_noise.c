@@ -203,7 +203,7 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
   for( i=0; i<nchunk; i++ ) {
     /* Calculate the r.m.s. of this chunk */
     smf_stats1D( dat+bolo*bstride+(istart+i*len/(nchunk-1))*tstride,
-                 tstride, nsamp, qua+bolo*bstride+(istart+i*len/(nchunk-1))*tstride,
+                 tstride, nsamp, qua?qua+bolo*bstride+(istart+i*len/(nchunk-1))*tstride:NULL,
                  0, mask, NULL, &sig, NULL, &ngood, status );
 
     if( *status == SMF__INSMP ) {
