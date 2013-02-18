@@ -27,7 +27,7 @@
 *                       dim_t *pcalen, double *pcathresh, int groupsubarray,
 *                       double *downsampscale, double *downsampfreq,
 *                       int *noiseclipprecom, int *deconvmce, double delay,
-*                       int *status )
+*                       double *filt_edgewidth, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -131,6 +131,9 @@
 *     delay = double * (Returned)
 *        A time, in seconds, by which to delay each time stream, causing
 *        each sample to be associated with a different position on the sky.
+*     filt_edgewidth = double * (Returned)
+*        Width of the 0->1 transition zone for a high pass or low pass filter edge
+*        (arcsec) (NULL:0)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -202,8 +205,8 @@
 *        of time slices to be given in units of seconds instead.
 *     2012-11-14 (DSB):
 *        Add argument "deconvmce".
-*     2012-11-26 (DSB):
-*        Add argument "delay".
+*     2013-02-18 (DSB):
+*        Add argument "filt_edgewidth".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -265,7 +268,8 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
                        int *compreprocess, dim_t *pcalen, double *pcathresh,
                        int *groupsubarray, double *downsampscale,
                        double *downsampfreq, int *noiseclipprecom,
-                       int *deconvmce, double *delay, int *status ) {
+                       int *deconvmce, double *delay, double *filt_edgewidth,
+                       int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -428,6 +432,12 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
                *filt_edge_smallscale );
   }
 
+  if( filt_edgewidth ) {
+    *filt_edgewidth = 0;
+    astMapGet0D( keymap, "FILT_EDGEWIDTH", filt_edgewidth );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGEWIDTH=%f", status,
+               *filt_edgewidth );
+  }
 
   if( filt_notchlow ) {
     if( !astMapGet1D( keymap, "FILT_NOTCHLOW", SMF__MXNOTCH, &f_nnotch,

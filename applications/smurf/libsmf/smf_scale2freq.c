@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     void smf_scale2freq( double f_edgesmall, double f_edgelarge,
-*                          const smfHead *hdr, double *f_edgelow,
-*                          double *f_edgehigh, int *status )
+*                          double f_edgewidth, const smfHead *hdr, double *f_edgelow,
+*                          double *f_edgehigh, double f_width, int *status )
 
 *  Arguments:
 *     f_edgesmall = double (Given)
@@ -24,6 +24,9 @@
 *     f_edgelarge = double (Given)
 *        The high pass spatial scale in arcseconds to be converted to a
 *        frequency.
+*     f_edgewidth = double (Given)
+*        The width of the edge transition zone for soft edged filters in
+*        arcseconds to be converted to a frequency.
 *     data = smfData * (Given and Returned)
 *        The data that will be repaired (in-place). Locations of steps
 *        will have bit SMF__Q_JUMP set.
@@ -33,6 +36,9 @@
 *     f_edgehigh = double * (Given and Returned)
 *        The high pass frequency, in Hz. The supplied value is left
 *        unchanged if "f_edgelarge" is zero or the telescope is stationary.
+*     f_width = double (Given)
+*        The width of the edge transition zone for soft edged filters in
+*        Hz. May be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -54,10 +60,12 @@
 *     2011-04-20 (TIMJ):
 *        More explicit error message
 *        Set status to SMF__TELSTAT if the telescope is not moving.
+*     18-FEB-2013 (DSB):
+*        Added edge width arguments.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -90,12 +98,15 @@
 #include "libsmf/smf_err.h"
 #include "libsmf/smf_typ.h"
 
-void smf_scale2freq( double f_edgesmall, double f_edgelarge,
+void smf_scale2freq( double f_edgesmall, double f_edgelarge, double f_edgewidth,
                      const smfHead *hdr, double *f_edgelow,
-                     double *f_edgehigh, int *status ){
+                     double *f_edgehigh, double *f_width, int *status ){
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
+
+/* Assume zero for the dge width. */
+   if( f_width ) *f_width = 0;
 
 /* Return without action if neither spatial scale was supplied. */
    if( f_edgesmall || f_edgelarge ) {
@@ -115,11 +126,13 @@ void smf_scale2freq( double f_edgesmall, double f_edgelarge,
 
 /* Ohterwise convert the supplied values. */
       } else {
+         double scale = 0.0;
          msgOutiff( MSG__VERB, "", "smf_scale2freq: Based on a slew "
                     "speed of %.1lf arcsec/sec, setting:", status,
                     hdr->scanvel );
 
          if( f_edgesmall > 0.0 ) {
+            scale = f_edgesmall;
             *f_edgelow = hdr->scanvel / f_edgesmall;
             msgOutiff( MSG__VERB, "", "smf_scale2freq: FILT_EDGELOW = "
                        "%.3lf Hz (> %.1lf arcsec scales)", status, *f_edgelow,
@@ -127,10 +140,18 @@ void smf_scale2freq( double f_edgesmall, double f_edgelarge,
          }
 
          if( f_edgelarge > 0.0 ) {
+            scale = f_edgelarge;
             *f_edgehigh = hdr->scanvel / f_edgelarge;
             msgOutiff( MSG__VERB, "", "smf_scale2freq: FILT_EDGEHIGH = "
                        "%.3lf Hz (< %.1lf arcsec scales)", status, *f_edgehigh,
                        f_edgelarge );
+         }
+
+         if( f_edgewidth > 0.0 && f_width && scale > 0.0 ) {
+            *f_width = f_edgewidth * hdr->scanvel / (scale*scale);
+            msgOutiff( MSG__VERB, "", "smf_scale2freq: FILT_EDGEWIDTH = "
+                       "%.3lf Hz (%.1lf arcsec)", status, *f_width,
+                       f_edgewidth );
          }
       }
    }

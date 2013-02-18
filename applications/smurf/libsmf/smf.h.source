@@ -1021,7 +1021,7 @@ void smf_filter_complement( smfFilter *filt, int *status );
 
 void smf_filter_delay( smfFilter *filt, double delay, int *status );
 
-void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
+void smf_filter_edge( smfFilter *filt, double f, double w, int lowpass, int *status );
 
 void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
                          int complement, int whiten, int *status );
@@ -1274,7 +1274,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
                        double *pcathresh, int *groupsubarray,
                        double *downsampscale, double *downsampfreq,
                        int *noiseclipprecom, int *deconvmce, double *delay,
-                       int *status );
+                       double *filt_edgewidth, int *status );
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
@@ -1783,8 +1783,8 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
 int smf_samedims_smfData( const smfData *data1, const smfData *data2,
                           int *status );
 
-void smf_scale2freq( double f_edgesmall, double f_edgelarge, const smfHead *hdr,
-                     double *f_edgelow, double *f_edgehigh, int *status );
+void smf_scale2freq( double f_edgesmall, double f_edgelarge, double f_edgewidth, const smfHead *hdr,
+                     double *f_edgelow, double *f_edgehigh, double *f_width, int *status );
 
 void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
                      const char *path, const char *param, int div, int *status );

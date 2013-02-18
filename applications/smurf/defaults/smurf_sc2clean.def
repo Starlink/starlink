@@ -79,6 +79,7 @@ cleandk.filt_edge_smallscale = 0
 cleandk.filt_edgelow = 0
 cleandk.filt_edge_largescale = 0
 cleandk.filt_edgehigh = 0
+cleandk.filt_edgewidth = 0
 cleandk.filt_notchlow = <undef>
 cleandk.filt_notchhigh = <undef>
 cleandk.filt_wlim = <undef>
@@ -502,7 +503,7 @@ filt_edge_smallscale = 0
 #  Default: 	0
 #  Purpose: 	Specifies the lowest frequency to be retained by the
 #		initial data cleaning.
-#  Description: If non-zero, this is the cut-off frequency of a hard-edged
+#  Description: If non-zero, this is the cut-off frequency of a
 #		high pass filter that is applied to the data stream as
 #		part of the initial data cleaning. See also parameter
 #		"filt_edge_largescale".
@@ -514,11 +515,28 @@ filt_edgehigh = 0
 #  Default: 	0
 #  Purpose: 	Specifies the highest frequency to be retained by the
 #		initial data cleaning.
-#  Description: If non-zero, this is the cut-off frequency of a hard-edged
+#  Description: If non-zero, this is the cut-off frequency of a
 #		low pass filter that is applied to the data stream as
 #		part of the initial data cleaning. See also parameter
 #		"filt_edge_largescale".
 filt_edgelow = 0
+
+#-----------------------------------------------------------------
+#  Name: 	filt_edgewidth
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Indicates if the edge filter is hard or soft edged.
+#  Description: If filt_edgewidth is zero, then the edge filters defined
+#		by the other "filt_..." parameters are hard-edged. That
+#		is, they change from zero to one without any intermediate
+#		values. If filt_edgewidth is larger than zero, the edge
+#		filters are soft-edged, and the transition between zero
+#		and one occurs over a range of spatial scales given
+#		by the value of filt_edgewidth. It is converted to a
+#		frequency range using the avergae slew speed. The
+#		transition curve is a single 180 degree peak-to-peak
+#		section of a sinusoid.
+filt_edgewidth = 0
 
 #-----------------------------------------------------------------
 #  Name: 	filt_notchhigh

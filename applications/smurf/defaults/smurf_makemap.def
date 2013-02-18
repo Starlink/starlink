@@ -905,6 +905,23 @@ flt.filt_edgehigh = 0
 flt.filt_edgelow = 0
 
 #-----------------------------------------------------------------
+#  Name: 	flt.filt_edgewidth
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Indicates if the edge filter is hard or soft edged.
+#  Description: If flt.filt_edgewidth is zero, then the edge filters defined
+#		by the other "flt.filt_..." parameters are hard-edged. That
+#		is, they change from zero to one without any intermediate
+#		values. If flt.filt_edgewidth is larger than zero, the edge
+#		filters are soft-edged, and the transition between zero
+#		and one occurs over a range of spatial scales given
+#		by the value of flt.filt_edgewidth. It is converted to a
+#		frequency range using the avergae slew speed. The
+#		transition curve is a single 180 degree peak-to-peak
+#		section of a sinusoid.
+flt.filt_edgewidth = 0
+
+#-----------------------------------------------------------------
 #  Name: 	flt.filt_notchhigh
 #  Type: 	real
 #  Default: 	<undef>

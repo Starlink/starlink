@@ -241,7 +241,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
                     &spikethresh, &spikebox, &noisecliphigh, &noisecliplow,
                     NULL, &compreprocess, &pcalen, &pcathresh, NULL, NULL, NULL,
-                    &noiseclipprecom, &deconvmce, &delay, status );
+                    &noiseclipprecom, &deconvmce, &delay, NULL, status );
 
   /* Loop over subarray */
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
