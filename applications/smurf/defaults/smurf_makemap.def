@@ -409,17 +409,6 @@ com.zero_snrlo = 0
 com.zero_union = 1
 
 #-----------------------------------------------------------------
-#  Name: 	delay
-#  Type: 	real
-#  Default: 	0.0
-#  Purpose: 	A diagnostic tool to check for time delays in bolometer
-#		data streams.
-#  Description: A delay, in seconds, to apply to each time stream. This
-#		results in each bolometer sample being associated with a
-#		different position on the sky.
-delay = 0.0
-
-#-----------------------------------------------------------------
 #  Name: 	diag.append
 #  Type: 	integer
 #  Default: 	0

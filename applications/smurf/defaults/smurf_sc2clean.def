@@ -72,6 +72,7 @@ cleandk.dcmaxsteps = 10
 cleandk.dcsmooth = 50
 cleandk.dcthresh = 25.0
 cleandk.deconvmce = 0
+cleandk.delay = 0
 cleandk.dkclean = 0
 cleandk.fillgaps = 1
 cleandk.filt_edge_smallscale = 0
@@ -430,6 +431,17 @@ dcthresh = 25.0
 #		remove the effects of the MCE anti-aliasing filter. See
 #		also parameter "fakemce".
 deconvmce = 0
+
+#-----------------------------------------------------------------
+#  Name: 	delay
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	A diagnostic tool to check for time delays in bolometer
+#		data streams.
+#  Description: A delay, in seconds, to apply to each time stream. This
+#		results in each bolometer sample being associated with a
+#		different position on the sky.
+delay = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	dkclean
