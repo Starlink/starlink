@@ -12,8 +12,8 @@
 *     python (2.7 or 3.*)
 
 *  Description:
-*     This script use the unix meld tool to display two sets of
-*     configuration parameters, highlighting the differences between
+*     This script use the unix meld tool (see meldmerge.org) to display two
+*     sets of configuration parameters, highlighting the differences between
 *     them. Each config may be supplied directly, as is done when running
 *     MAKEMAP, or can be read from the History component of an NDF that
 *     was created by MAKEMAP.
@@ -45,7 +45,8 @@
 
 *  Notes:
 *     - The unix "meld" command must be installed and available on the
-*     unix PATH.
+*     unix PATH. If not already installed, it can be obtained from
+*     "meldmerge.org".
 
 *  Copyright:
 *     Copyright (C) 2013 Science & Technology Facilities Council.
@@ -100,6 +101,11 @@ def cleanup():
    except:
       pass
 
+# First check that "meld" ia available.
+if starutil.which( "meld" ) == None:
+   print( "\n!! The 'configmeld'  command uses the Unix 'meld' command, but "
+          "meld appears not to be installed. See 'meldmerge.org'.\n" )
+   os._exit(1)
 
 #  Catch any exception so that we can always clean up, even if control-C
 #  is pressed.

@@ -24,6 +24,7 @@ readline.parse_and_bind('tab: complete')
 
 
 
+#  -------------------  misc ---------------------------
 
 #  Function to return the name of the executing script, without any
 #  trailing ".py" suffix.
@@ -36,11 +37,48 @@ def cmd():
       __cmd = __cmd[:-3]
    return __cmd
 
+
 #  "Protected" function to return the name of the executing script,
 #  followed by a colon and a space.
 def _cmd_token():
    return "{0}: ".format(cmd())
 
+
+def which(program):
+   """
+
+   This command mimics the UNix 'which' command. It searches the PATH for
+   a named commadn and returns the full path to the executable if found, and
+   None otherwise.
+
+   Invocation:
+      which(command)
+
+   Arguments:
+      command = string
+         The commmand to find
+
+   Returned Value:
+      The full path to the executable, or None of the executanble is not
+      found.
+
+   """
+
+   def is_exe(fpath):
+      return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+   fpath, fname = os.path.split(program)
+   if fpath:
+      if is_exe(program):
+         return program
+   else:
+      for path in os.environ["PATH"].split(os.pathsep):
+          path = path.strip('"')
+          exe_file = os.path.join(path, program)
+          if is_exe(exe_file):
+             return exe_file
+
+   return None
 
 
 
