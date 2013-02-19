@@ -170,7 +170,7 @@ void kpg1Ch2pm( HDSLoc *, AstPolyMap **, int * );
 void kpg1Fit1d( int, int, const double x[], const double y[], double *, double *, double *, int * );
 void kpg1Badbx( int, int, int *, int *, int * );
 void kpg1Pxscl( AstFrameSet *, const double *, double *, int * );
-AstKeyMap *kpg1Config( const char *, const char *, AstKeyMap *, int * );
+AstKeyMap *kpg1Config( const char *, const char *, AstKeyMap *, int, int * );
 
 void kpgPixsc( AstFrameSet * iwcs,
                const double at[],

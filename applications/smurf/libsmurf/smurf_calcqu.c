@@ -350,7 +350,7 @@ void smurf_calcqu( int *status ) {
                                                concat->sdata[ 0 ], NULL,
                                                0, status );
          config = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_calcqu.def",
-                               sub_instruments, status );
+                               sub_instruments, 1, status );
          sub_instruments = astAnnul( sub_instruments );
 
 

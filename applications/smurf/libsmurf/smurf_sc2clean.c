@@ -384,7 +384,7 @@ void smurf_sc2clean( int *status ) {
                                           status );
 
     keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
-                         sub_instruments, status );
+                         sub_instruments, 1, status );
     if( sub_instruments ) sub_instruments = astAnnul( sub_instruments );
 
     /* Now rerun smf_grp_related to figure out how long each downsampled

@@ -987,7 +987,7 @@ void smurf_makemap( int *status ) {
       AstKeyMap * sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE,
                                                         NULL, igrp, 1, status );
       keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
-                           sub_instruments, status );
+                           sub_instruments, 1, status );
       sub_instruments = astAnnul( sub_instruments );
     }
   }

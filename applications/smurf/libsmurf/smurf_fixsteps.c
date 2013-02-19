@@ -263,7 +263,7 @@ void smurf_fixsteps( int *status ) {
    sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE, data, NULL, 0,
                                          status );
    keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
-                        sub_instruments, status );
+                        sub_instruments, 1, status );
    sub_instruments = astAnnul( sub_instruments );
 
 /* Set the default for each of the step fixing config parameters. */

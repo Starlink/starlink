@@ -185,7 +185,8 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
   astMapPut0I( subarrays, thissub, 1, NULL );
 
   /* Read the config file */
-  resmap = kpg1Config( resistpar, "$SMURF_DIR/smurf_calcflat.def", subarrays, status );
+  resmap = kpg1Config( resistpar, "$SMURF_DIR/smurf_calcflat.def",
+                       subarrays, 1, status );
   subarrays = astAnnul( subarrays );
 
   if (*status != SAI__OK) goto CLEANUP;

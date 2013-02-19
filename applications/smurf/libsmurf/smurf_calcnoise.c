@@ -516,7 +516,7 @@ void smurf_calcnoise( int *status ) {
       sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE, firstdata, NULL,
                                             0, status );
       keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
-                           sub_instruments, status );
+                           sub_instruments, 1, status );
       if( sub_instruments ) sub_instruments = astAnnul( sub_instruments );
 
       /* Are we downsampling the data? */

@@ -318,7 +318,8 @@ void smurf_extinction( int * status ) {
   /* Read the tau relations from config file or group. We do not
      allow sub instrument overloading because these are all values
      based on filter name. */
-  keymap = kpg1Config( "TAUREL", "$SMURF_DIR/smurf_extinction.def", NULL, status );
+  keymap = kpg1Config( "TAUREL", "$SMURF_DIR/smurf_extinction.def", NULL,
+                       1, status );
 
   /* and we need to use the EXT entry */
   astMapGet0A( keymap, "EXT", &extpars );

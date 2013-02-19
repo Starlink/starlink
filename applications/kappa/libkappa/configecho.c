@@ -282,7 +282,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 /* Create a KeyMap holding the selected alternative for each keyword, and
    also supply defaults for any missing values (if a defaults file was
    supplied by the user). */
-   keymap = kpg1Config( "CONFIG", defs[0]?defs:NULL, keymap2, STATUS );
+   keymap = kpg1Config( "CONFIG", defs[0]?defs:NULL, keymap2, 0, STATUS );
 
 /* Allow it to be NULL if we're reading an NDF because we'll replace
    keymap with historyConfig later if necessary. */

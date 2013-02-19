@@ -16,7 +16,7 @@ static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
 
 
 AstKeyMap *kpg1Config( const char *param, const char *def,
-                       AstKeyMap *nested, int *status ){
+                       AstKeyMap *nested, int null, int *status ){
 /*
 *+
 *  Name:
@@ -30,7 +30,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 
 *  Invocation:
 *     AstKeyMap *kpg1Config( const char *param, const char *def,
-*                            AstKeyMap *nested, int *status )
+*                            AstKeyMap *nested, int null, int *status )
 
 *  Description:
 *     This function first creates a KeyMap by reading the values from a
@@ -102,6 +102,12 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *        If non-NULL, used to determine which nested keys might be in the config
 *        and which should be merged with the base keymap. The values in the keymap
 *        should be non-zero to indicate merging.
+*     null = int (Given)
+*        Controls what happens if a null (!) value is obtained for the
+*        specified parameter. If "null" is non-zero, no error is reported
+*        and the returned KeyMap holds the values (if any) specified by
+*        "def". If "null" is zero, an error is reported, status is set to
+*        PAR__NULL and a NULL KeyMap pointer is returned.
 *     status = int * (Given & Returned)
 *        The inherited status.
 
@@ -113,7 +119,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *     A pointer to the AST KeyMap, or NULL if an error occurrs.
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -163,6 +169,8 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *        - Allow NULL to be supplied for "def".
 *        - Retain the PAR__NULL status if a null value is supplied for
 *        the parameter.
+*     19-FEB-2013 (DSB):
+*        Added argument "null".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -207,9 +215,14 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 /* Read a group of configuration setting from the specified environment parameter. */
    kpg1Gtgrp( param, &grp, &size, status );
 
+/* If no group was supplied, annul any PAR__NULL error and return the
+   current KeyMap contents (the defaults) if "null" is non-zero. */
+   if( *status == PAR__NULL ){
+      if( null ) errAnnul( status );
+
 /* If a group was supplied, see if it consists of the single value "def".
    If so, we will leave the KeyMap unchanged. */
-   if( size > 0 && *status == SAI__OK ) {
+   } else if( size > 0 && *status == SAI__OK ) {
       value = buffer;
       if( size == 1 ) {
          grpGet( grp, 1, 1, &value, sizeof(buffer), status );

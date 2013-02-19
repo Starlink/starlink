@@ -19703,85 +19703,6 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
-   KPG1\_CPNDx
-}{
-   Copies a section of an n-dimensional array
-}{
-   \sstdescription{
-      This routine copies a specified section of the supplied
-      n-dimensional array (IN) to an output array (OUT).
-   }
-   \sstinvocation{
-      CALL KPG1\_CPNDx( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO, OUT, EL,
-                         STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         NDIM = INTEGER (Given)
-      }{
-         The number of axes.
-      }
-      \sstsubsection{
-         LBNDI( NDIM ) = INTEGER (Given)
-      }{
-         The lower pixel index bounds of the IN array.
-      }
-      \sstsubsection{
-         UBNDI( NDIM ) = INTEGER (Given)
-      }{
-         The upper pixel index bounds of the IN array.
-      }
-      \sstsubsection{
-         IN( $*$ ) = ? (Given)
-      }{
-         The input array. Bounds given by LBNDI and UBNDI.
-      }
-      \sstsubsection{
-         LBNDO( NDIM ) = INTEGER (Given)
-      }{
-         The lower pixel index bounds of the area of the IN array to be
-         copied to OUT.
-      }
-      \sstsubsection{
-         UBNDO( NDIM ) = INTEGER (Given)
-      }{
-         The upper pixel index bounds of the area of the IN array to be
-         copied to OUT.
-      }
-      \sstsubsection{
-         OUT( $*$ ) = ? (Returned)
-      }{
-         The output array. Bounds given by LBNDO and UBNDO.
-      }
-      \sstsubsection{
-         EL = INTEGER (Returned)
-      }{
-         The number of elements in the output array. Derived from LBNDO
-         and UBNDO.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-          There is a routine for each numerical data type: replace {\tt "}x{\tt "} in
-          the routine name by B, D, I, R, W, UB or UW as appropriate.  The
-          IN and OUT arrays supplied to the routine must have the data type
-          specified.
-
-         \sstitem
-         If the output array is not completely contained within the input
-         array, then the sections of the output array which fall outside the
-         input arrays will be filled with bad values.
-      }
-   }
-}
-\sstroutine{
    KPG1\_CPNTx
 }{
    Creates a primitive NDF with a title via the parameter system
@@ -26131,6 +26052,66 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          replace {\tt "}x{\tt "} in the routine name by D or R as appropriate.  The
          extreme values of the histogram must have the data type
          specified.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_HSECT
+}{
+   Copy a section from an HDS array to a new component
+}{
+   \sstdescription{
+      This routine creates a new HDS object holding a copy of a section
+      of a supplied primitive HDS array. The section may extend outside
+      the bounds of the supplied array, in which case the new areas will
+      be filled with bad values (or spaces if the array holds character
+      data).
+   }
+   \sstinvocation{
+      CALL KPG1\_HSECT( LOC1, NDIM, LBND, UBND, LOC2, NAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOC1 = CHARACTER$*$(DAT\_\_SZLOC) (Given)
+      }{
+         An HDS locator for a primitive array object. This array has
+         implicit lower bounds of (1,1,1,...) and upper bounds equal to
+         its dimension sizes.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         The dimensionality of the required section. An error will be
+         reported if this is not the same as the dimensionality of the
+         supplied HDS array.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER (Given)
+      }{
+         The lower bounds of the required array section.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         The upper bounds of the required array section.
+      }
+      \sstsubsection{
+         LOC2 = CHARACTER$*$(DAT\_\_SZLOC) (Given)
+      }{
+         An HDS locator for a structure in which to create the new
+         component holding a copy of the required array section.
+      }
+      \sstsubsection{
+         NAME = CHARACTER$*$(DAT\_\_SZNAM) (Given)
+      }{
+         The name of the new component to create within the {\tt "}LOC2{\tt "}
+         structure. Any existing component with this name will be
+         erased first.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
       }
    }
 }
@@ -33797,88 +33778,6 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
-   KPG1\_PTNDx
-}{
-   Pastes a section of an n-dimensional array into another array
-}{
-   \sstdescription{
-      This routine pastes a specified section of the supplied
-      n-dimensional array (IN) into an output array (OUT).
-   }
-   \sstinvocation{
-      CALL KPG1\_PTNDx( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO, BAD,
-                       OUT, EL, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         NDIM = INTEGER (Given)
-      }{
-         The number of axes.
-      }
-      \sstsubsection{
-         LBNDI( NDIM ) = INTEGER (Given)
-      }{
-         The lower pixel index bounds of the IN array.
-      }
-      \sstsubsection{
-         UBNDI( NDIM ) = INTEGER (Given)
-      }{
-         The upper pixel index bounds of the IN array.
-      }
-      \sstsubsection{
-         IN( $*$ ) = ? (Given)
-      }{
-         The input array. Bounds given by LBNDI and UBNDI.
-      }
-      \sstsubsection{
-         LBNDO( NDIM ) = INTEGER (Given)
-      }{
-         The lower pixel index bounds of the area of the IN array to be
-         pasted into OUT.
-      }
-      \sstsubsection{
-         UBNDO( NDIM ) = INTEGER (Given)
-      }{
-         The upper pixel index bounds of the area of the IN array to be
-         pasted into OUT.
-      }
-      \sstsubsection{
-         BAD = LOGICAL (Given)
-      }{
-         If .TRUE., then any sections of the output array that fall
-         outside the input array are filled with bad values. Otherwise,
-         the supplied values in such output array sections are left
-         unchanged.
-      }
-      \sstsubsection{
-         OUT( $*$ ) = ? (Given and Returned)
-      }{
-         The output array. Bounds given by LBNDO and UBNDO.
-      }
-      \sstsubsection{
-         EL = INTEGER (Returned)
-      }{
-         The number of elements in the output array. Derived from LBNDO
-         and UBNDO.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         There is a routine for each numerical data type: replace {\tt "}x{\tt "} in
-         the routine name by B, D, I, R, W, UB or UW as appropriate.  The
-         IN and OUT arrays supplied to the routine must have the data type
-         specified.
-      }
-   }
-}
-\sstroutine{
    KPG1\_PVERS
 }{
    Parses a package version string
@@ -40660,7 +40559,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
    \sstinvocation{
       AstKeyMap $*$kpg1Config( const char $*$param, const char $*$def,
-                             AstKeyMap $*$nested, int $*$status )
+                             AstKeyMap $*$nested, int null, int $*$status )
    }
    \sstarguments{
       \sstsubsection{
@@ -40672,7 +40571,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          def = const char $*$ (Given)
       }{
          The path to a file containing the default value for every allowed config
-         parameter. For instance, {\tt "}\$SMURF\_DIR/dimmconfig.def{\tt "}.
+         parameter. For instance, {\tt "}\$SMURF\_DIR/dimmconfig.def{\tt "}. May be NULL.
       }
       \sstsubsection{
          nested = AstKeyMap $*$ (Given)
@@ -40680,6 +40579,15 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          If non-NULL, used to determine which nested keys might be in the config
          and which should be merged with the base keymap. The values in the keymap
          should be non-zero to indicate merging.
+      }
+      \sstsubsection{
+         null = int (Given)
+      }{
+         Controls what happens if a null (!) value is obtained for the
+         specified parameter. If {\tt "}null{\tt "} is non-zero, no error is reported
+         and the returned KeyMap holds the values (if any) specified by
+         {\tt "}def{\tt "}. If {\tt "}null{\tt "} is zero, an error is reported, status is set to
+         PAR\_\_NULL and a NULL KeyMap pointer is returned.
       }
       \sstsubsection{
          status = int $*$ (Given \& Returned)

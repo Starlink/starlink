@@ -757,7 +757,7 @@ static void get_fit1par( void *pfcntrl, int *status )
      checking. */
   msgOutif( MSG__VERB, " ", "Reading parameters from config file.", status );
   keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_fit1d.def",
-		       NULL, status );
+		       NULL, 1, status );
 
   msgOutif( MSG__VERB, " ", "Extracting values from keymap", status );
   /* Obtain parameters from keymap when non-NULL pointers given */
@@ -1130,7 +1130,8 @@ static void get_userval ( smfData *data, AstMapping **wcsmap,
   */
 #if (USERVALDEFAULTFILE)
 
-  uvalkmap = kpg1Config( "USERVAL", "$SMURF_DIR/smurf_fit1d_uval.def", NULL, status );
+  uvalkmap = kpg1Config( "USERVAL", "$SMURF_DIR/smurf_fit1d_uval.def",
+                         NULL, 1, status );
 
 #else
 
