@@ -45,7 +45,7 @@
 *     CONFIG = GROUP (Read)
 *        Specifies default values for the configuration parameters used
 *        by the step fixing algorithm. This should be a configuration
-*        such as supplied for the MAKEMAP command.
+*        such as supplied for the MAKEMAP command. [!]
 *     CONTINUE = _LOGICAL (Read)
 *        This parameter is prompted for after each changed step is
 *        described. If TRUE is supplied, then the program continues to
@@ -136,7 +136,7 @@
 *        Added NREJEDCTED and NFIXED parameters.
 
 *  Copyright:
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
