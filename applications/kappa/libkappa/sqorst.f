@@ -83,8 +83,8 @@
 *        The following values are permitted.
 *
 *        -  "Auto"      -- Equivalent to "BlockAve" with an appropriate
-*                          PARAMS for squashes by a factor of 2 or more,
-*                          otherwise equivalent to "Linear".
+*                          PARAMS for squashes by a factor of two or
+*                          more, otherwise equivalent to "Linear".
 *
 *        -  "Nearest"   -- Nearest neighbour sampling.
 *
@@ -187,8 +187,8 @@
 *     resampling operation is performed for each of the dimensions
 *     in which a resize is being done.  By default (when METHOD="Auto")
 *     this is done using linear interpolation, unless it is a
-*     squash of a factor of FACT=2 or more, in which case a block
-*     averaging scheme which averages over FACT pixels.  For many
+*     squash of a factor of two or more, in which case a block-
+*     averaging scheme which averages over 1/FACTOR pixels.  For many
 *     purposes this default scheme will be adequate, but for greater
 *     control over the resampling process the METHOD and PARAMS
 *     parameters can be used.  Detailed discussion of the use of these
@@ -198,7 +198,7 @@
 *     flux, but this may be changed using the CONSERVE parameter.
 
 *  Notes:
-*     If the input NDF contains a Variance component, a Variance
+*     If the input NDF contains a VARIANCE component, a VARIANCE
 *     component will be written to the output NDF.  It will be
 *     calculated on the assumption that errors on the input data
 *     values are statistically independent and that their variance
@@ -251,6 +251,7 @@
 *     MBT: Mark Taylor (Starlink)
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J Currie (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
@@ -361,8 +362,8 @@
       LOGICAL COMMA              ! Has a comma been found?
       LOGICAL CONSRV             ! Conserve flux?
       LOGICAL HASAXI             ! Do we have an AXIS Centre component?
-      LOGICAL HASQUA             ! Do we have a quality component?
-      LOGICAL HASVAR             ! Do we have a variance component?
+      LOGICAL HASQUA             ! Do we have a QUALITY component?
+      LOGICAL HASVAR             ! Do we have a VARIANCE component?
       LOGICAL MORE               ! Continue looping?
 *.
 
@@ -381,14 +382,14 @@
 *  Open the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
-*  Find out if we have a Variance component.
+*  Find out if we have a VARIANCE component.
       CALL NDF_STATE( NDFI, 'VARIANCE', HASVAR, STATUS )
 
-*  Find out if we have a Quality component.
+*  Find out if we have a QUALITY component.
       CALL NDF_STATE( NDFI, 'QUALITY', HASQUA, STATUS )
 
 *  Determine a data type which can be used for operations on its Data
-*  and possibly Variance components.
+*  and possibly VARIANCE components.
       CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,' //
      :                '_REAL,_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
      :                DTYPE, STATUS )
@@ -647,7 +648,7 @@
 *  Reshape it according to the reqested lower and upper bounds.
       CALL NDF_SBND( NDIM, LBNDO, UBNDO, NDFO, STATUS )
 
-*  Set the Data and possibly Variance component data types.
+*  Set the Data and possibly VARIANCE component data types.
       CALL NDF_STYPE( ITYPE, NDFO, 'DATA', STATUS )
       IF ( HASVAR ) THEN
          CALL NDF_STYPE( ITYPE, NDFO, 'VARIANCE', STATUS )
