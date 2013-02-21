@@ -2,6 +2,22 @@
 
  Some of the changes in this version of smurf include:
 
+ o Several dimmconfig files have had cosmetic changes. Parameters of little
+   interest to users have been removed. Descriptions of parameters mave
+   been moved into the defaults files ("smurf_makemap.def" etc in
+   $SMURF_DIR).
+
+ o The dimmconfig.lis file now uses maptol to specify the convergence
+   criterion rather than chitol.
+
+ o The dimmconfig_bright_extended.lis file now inherits from
+   dimmconfig.lis, rather than dimmconfig_bright.lis. This means that the
+   values used for com.corr_tol, com.gain_abstol, com.gain_tol, dcthresh
+   and noisecliphigh have changed.
+
+   IN ADDITION, THE VALUE FOR FLT.FILT_EDGE_LARGESCALE HAS BEEN CHANGED
+   FROM 300 TO 600 ARC-SEC.
+
  o A new command "skyloop" has been added which will create a map using
    the "inside-out" algorithm, which includes data from all chunk at each
    iteration. See:
