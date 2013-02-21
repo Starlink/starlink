@@ -3160,19 +3160,21 @@ number within those parentheses indicates the size of the array.
 \sstroutine{
    CONFIGMELD
 }{
-   Compare two MAKEMAP configs using the unix {\tt "}meld{\tt "} tool
+   Compare two MAKEMAP configs using a visual file comparison tool
 }{
    \sstdescription{
-      This script use the unix meld tool to display two sets of
-      configuration parameters, highlighting the differences between
-      them. Each config may be supplied directly, as is done when running
-      MAKEMAP, or can be read from the History component of an NDF that
-      was created by MAKEMAP.
+      This script uses a visual file comparison tool such as {\tt "}meld{\tt "}, to
+      display two sets of configuration parameters, highlighting the
+      differences between them. Each config may be supplied directly, as
+      is done when running MAKEMAP, or can be read from the History
+      component of an NDF that was created by MAKEMAP.
    }
    \sstusage{
-      configmeld config1 config2 waveband defaults
+      configmeld config1 config2 waveband defaults tool
    }
-   \sstparameters{
+   \sstdiylist{
+      Parameters
+   }{
       \sstsubsection{
          CONFIG1 = LITERAL (Read)
       }{
@@ -3191,12 +3193,11 @@ number within those parentheses indicates the size of the array.
          WAVEBAND = LITERAL (Read)
       }{
          This parameter is not used if either CONFIG1 or CONFIG2 is
-         an NDF created by MAKEMAP. It should be one of {\tt "}450{\tt"},
-         {\tt "}850{\tt "}. It specifies which value should be displayed
-         for configuration parameters that have separate values for 450
-         and 850 um. If either CONFIG1 or CONFIG2 is an NDF created by
-         MAKEMAP, then the wavebands to use are determined from the
-         headers in the NDFs.
+         an NDF created by MAKEMAP. It should be one of {\tt "}450{\tt "} or {\tt "}850{\tt "}. It
+         specifies which value should be displayed for configuration
+         parameters that have separate values for 450 and 850 um. If either
+         CONFIG1 or CONFIG2 is an NDF created by MAKEMAP, then the
+         wavebands to use are determined from the headers in the NDFs.
       }
       \sstsubsection{
          DEFAULTS = \_LOGICAL (Read)
@@ -3204,18 +3205,39 @@ number within those parentheses indicates the size of the array.
          If TRUE, then each supplied configuration (CONFIG1 and CONFIG2)
          is extended to include default values are any MAKEMAP parameters
          that it does not specify. These defaults are read from file
-         {\tt \$SMURF\_DIR/smurf\_makemap.def}. [TRUE]
+         {\tt "}\$SMURF\_DIR/smurf\_makemap.def{\tt "}. [TRUE]
       }
-   }
-   \sstnotes{
-      \sstitemlist{
-         \sstitem
-         The unix {\tt "}meld{\tt "} command must be installed and available on the
-         unix PATH.
+      \sstsubsection{
+         TOOL = LITERAL (Read)
+      }{
+         Gives the name of the file comparison tool to use. The named
+         command should be available on the current PATH. It should take
+         the names of two files to compare as command line arguments. If
+         null (!) is supplied, the first available tool in the following
+         list is used:
+
+         \sstitemlist{
+
+            \sstitem
+            meld: www.meldmerge.org
+
+            \sstitem
+            diffmerge: www.sourcegear.com/diffmerge
+
+            \sstitem
+            kdiff3: kdiff3.sourceforge.net
+
+            \sstitem
+            tkdiff: sourceforge.net/projects/tkdiff
+
+            \sstitem
+            diffuse: diffuse.sourceforge.net
+
+         }
+         [!]
       }
    }
 }
-
 \clearpage
 \sstroutine{
    DUMPOCSCFG

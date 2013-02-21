@@ -6,20 +6,20 @@
 *     CONFIGMELD
 
 *  Purpose:
-*     Compare two MAKEMAP configs using the unix "meld" tool
+*     Compare two MAKEMAP configs using a visual file comparison tool.
 
 *  Language:
 *     python (2.7 or 3.*)
 
 *  Description:
-*     This script use the unix meld tool (see meldmerge.org) to display two
-*     sets of configuration parameters, highlighting the differences between
-*     them. Each config may be supplied directly, as is done when running
-*     MAKEMAP, or can be read from the History component of an NDF that
-*     was created by MAKEMAP.
+*     This script uses a visual file comparison tool such as "meld", to
+*     display two sets of configuration parameters, highlighting the
+*     differences between them. Each config may be supplied directly, as
+*     is done when running MAKEMAP, or can be read from the History
+*     component of an NDF that was created by MAKEMAP.
 
 *  Usage:
-*     configmeld config1 config2 waveband defaults
+*     configmeld config1 config2 waveband defaults tool
 
 *  Parameters:
 *     CONFIG1 = LITERAL (Read)
@@ -42,11 +42,20 @@
 *        is extended to include default values are any MAKEMAP parameters
 *        that it does not specify. These defaults are read from file
 *        "$SMURF_DIR/smurf_makemap.def". [TRUE]
-
-*  Notes:
-*     - The unix "meld" command must be installed and available on the
-*     unix PATH. If not already installed, it can be obtained from
-*     "meldmerge.org".
+*     TOOL = LITERAL (Read)
+*        Gives the name of the file comparison tool to use. The named
+*        command should be available on the current PATH. It should take
+*        the names of two files to compare as command line arguments. If
+*        null (!) is supplied, the first available tool in the following
+*        list is used:
+*
+*        - meld: www.meldmerge.org
+*        - diffmerge: www.sourcegear.com/diffmerge
+*        - kdiff3: kdiff3.sourceforge.net
+*        - tkdiff: sourceforge.net/projects/tkdiff
+*        - diffuse: diffuse.sourceforge.net
+*
+*        [!]
 
 *  Copyright:
 *     Copyright (C) 2013 Science & Technology Facilities Council.
@@ -101,12 +110,6 @@ def cleanup():
    except:
       pass
 
-# First check that "meld" ia available.
-if starutil.which( "meld" ) == None:
-   print( "\n!! The 'configmeld'  command uses the Unix 'meld' command, but "
-          "meld appears not to be installed. See 'meldmerge.org'.\n" )
-   os._exit(1)
-
 #  Catch any exception so that we can always clean up, even if control-C
 #  is pressed.
 try:
@@ -132,10 +135,27 @@ try:
                                     "850" ))
    params.append(starutil.Par0L("DEFAULTS", "Include defaults for missing "
                                 "values?", True, True ))
+   params.append(starutil.Par0S("TOOL", "The file comparison tool to use",
+                                None, True ))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
+
+#  Get the comparison tool to use.
+   tool = parsys["TOOL"].value
+   if tool == None:
+      for trytool in ( "meld", "diffmerge", "kdiff3", "tkdiff", "diffuse" ):
+         if starutil.which( trytool ) != None:
+            tool = trytool
+            break
+      if tool == None:
+         print( "Could not find a usable file comparison tool")
+         os._exit(1)
+   else:
+      if starutil.which( tool ) == None:
+         print( "Could not find the requested file comparison tool: '{0}'.".format(tool) )
+         os._exit(1)
 
 #  Note the path to the defaults file, if required.
    defs = parsys["DEFAULTS"].value
@@ -283,9 +303,9 @@ try:
    fd.write( conf2 )
    fd.close()
 
-#  Invoke meld to view the two config files.
-   subprocess.call( ["meld", "config1.tmp", "config2.tmp"], stdout=open(os.devnull),
-                                                            stderr=subprocess.STDOUT )
+#  Invoke the specified file comparison tool to view the two config files.
+   subprocess.call( [tool, "config1.tmp", "config2.tmp"], stdout=open(os.devnull),
+                                                          stderr=subprocess.STDOUT )
 
 #  Remove the temporary config text files.
    cleanup()
