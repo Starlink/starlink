@@ -50,6 +50,7 @@
 *        list is used:
 *
 *        - meld: www.meldmerge.org
+*        - opendiff: developer.apple.com
 *        - diffmerge: www.sourcegear.com/diffmerge
 *        - kdiff3: kdiff3.sourceforge.net
 *        - tkdiff: sourceforge.net/projects/tkdiff
@@ -145,7 +146,7 @@ try:
 #  Get the comparison tool to use.
    tool = parsys["TOOL"].value
    if tool == None:
-      for trytool in ( "meld", "diffmerge", "kdiff3", "tkdiff", "diffuse" ):
+      for trytool in ( "meld", "opendiff", "diffmerge", "kdiff3", "tkdiff", "diffuse" ):
          if starutil.which( trytool ) != None:
             tool = trytool
             break
