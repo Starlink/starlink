@@ -1,2 +1,10 @@
 Perl/bin/autoastrom
+Perl/bin/cadc_drcopy.pl
+Perl/bin/convert_dr_files
+Perl/bin/dpCapture
+Perl/bin/dpRetrieve
+Perl/bin/gsdprint
+Perl/bin/maparea2region
 Perl/bin/sourceplot
+Perl/bin/stime
+Perl/bin/translatehdr
