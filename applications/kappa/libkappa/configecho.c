@@ -14,7 +14,7 @@
 static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
                            AstKeyMap *refkm, int *status );
 void HistoryKeyMap(int i, char* const text[], int* status);
-AstKeyMap* historyConfig = 0;
+AstKeyMap* historyConfig = NULL;
 
 F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 /*
@@ -209,6 +209,10 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        supplied (see the new entry in the "Examples:" section).
 *     15-FEB-2013 (DSB):
 *        Expand the prologue docs, and use NULL in place of zero for pointers.
+*     22-FEB-2013 (DSB):
+*        Guard against seg fault in HistoryKeymap when the NDF does 
+*        not contain the required CONFIG entry in the History 
+*        component.
 *     {enter_further_changes_here}
 
 *-
@@ -694,7 +698,7 @@ void HistoryKeyMap(int n, char* const text[], int* status) {
 
 /* Convert buff to a KeyMap and set the global variable historyConfig. */
 
-   if (*buff) {
+   if (buff && *buff) {
       if (buff[strlen(buff) - 1] == '"') buff[strlen(buff) - 1] = '\0';
       grp = grpNew("CONFIG", status);
 
