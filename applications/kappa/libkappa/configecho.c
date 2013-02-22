@@ -161,6 +161,7 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *        error is reported if dimmconfig.lis contains values for any
 *        items that are not defined in smurf_makemap.def.
 *     configecho ndf=omc1 config=^/star/share/smurf/dimmconfig.lis \
+*                defaults=/star/bin/smurf/smurf_makemap.def \
 *                application=makemap name=! sort select="450=0,850=1"
 *        Show how the configuration used to generate the 850um map
 *        of OMC1 differs from the basic dimmconfig.lis file.
