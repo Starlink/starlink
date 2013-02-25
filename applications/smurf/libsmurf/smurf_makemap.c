@@ -171,6 +171,10 @@
 *          the output map. [!]
 *     MAXMEM = _INTEGER (Read)
 *          Maximum memory available for map-making in MiB (mebibytes).
+*          For machines with more than 20 GB or memory, the default is to
+*          leave 4 GB free for other processes. For machines with less
+*          than than 20 GB or memory, the default is to leave 20% of the
+*          total memory free for other processes. []
 *     METHOD = LITERAL (Read)
 *          Specify which map-maker should be used to construct the
 *          map. The parameter can take the following values:
@@ -679,6 +683,11 @@
 *        so that all parameter values recorded are sure to be the ones which
 *        were actually used rather than ones from the previous invocation
 *        that were stored in the parameter file on start-up.
+*     2013-02-25 (DSB):
+*        Correct calculation of default MAXMEM value. Previously, the
+*        default was to leave 4GB spare for machines with 4GB or more of
+*        memory, and to leave 20% spare for machines with less than 4GB.
+*        This was bad news for machines with 4GB of memory!
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -915,7 +924,7 @@ void smurf_makemap( int *status ) {
       /* Set default memory as 80% of physical memory, or leaving max_freemem
          MB available for other processes, whichever is larger. */
       maxmem_default = (int) (freemem*0.80);
-      if( (freemem - maxmem) > max_freemem ) {
+      if( (freemem - maxmem_default) > max_freemem ) {
         maxmem_default = freemem - max_freemem;
       }
 
