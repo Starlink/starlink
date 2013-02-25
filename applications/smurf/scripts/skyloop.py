@@ -335,11 +335,12 @@ try:
    retain = parsys["RETAIN"].value
    itermap = parsys["ITERMAP"].value
 
-#  If requested, use numiter from the config file.
+#  If requested, use numiter from the config file. Arbitrarily choose 850 um
+#  values for the waveband-specific parameters, but these are not actually used.
    if niter == 0:
       niter = int( invoke( "$KAPPA_DIR/configecho name=numiter config={0} "
                            "defaults=$SMURF_DIR/smurf_makemap.def "
-                           "select=\"\'450=0,850=0\'\" defval=5".format(config)))
+                           "select=\"\'450=0,850=1\'\" defval=5".format(config)))
 
 #  If iterating to convergence, get the maximum allowed normalised map
 #  change between iterations, and set the number of iterations positive.
@@ -347,7 +348,7 @@ try:
       niter = -niter
       maptol = float( invoke( "$KAPPA_DIR/configecho name=maptol config={0} "
                            "defaults=$SMURF_DIR/smurf_makemap.def "
-                           "select=\"\'450=0,850=0\'\" defval=0.05".format(config)))
+                           "select=\"\'450=0,850=1\'\" defval=0.05".format(config)))
    else:
       maptol = 0
 
@@ -363,13 +364,13 @@ try:
    for model in ["ast", "com", "flt"]:
       zero_niter[model] = int( invoke( "$KAPPA_DIR/configecho name={0}.zero_niter config={1} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
-                                       "select=\"\'450=0,850=0\'\"".format(model,config)))
+                                       "select=\"\'450=0,850=1\'\"".format(model,config)))
       zero_notlast[model] = int( invoke( "$KAPPA_DIR/configecho name={0}.zero_notlast config={1} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
-                                       "select=\"\'450=0,850=0\'\"".format(model,config)))
+                                       "select=\"\'450=0,850=1\'\"".format(model,config)))
       zero_freeze[model] = int( invoke( "$KAPPA_DIR/configecho name={0}.zero_freeze config={1} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
-                                       "select=\"\'450=0,850=0\'\"".format(model,config)))
+                                       "select=\"\'450=0,850=1\'\"".format(model,config)))
 
 #  The first invocation of makemap will create NDFs holding cleaned
 #  time-series data and EXT model values. The NDFs are created with
