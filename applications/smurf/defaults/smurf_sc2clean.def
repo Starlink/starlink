@@ -359,7 +359,7 @@ compreprocess = 0
 #-----------------------------------------------------------------
 #  Name: 	dcfitbox
 #  Type: 	integer
-#  Default: 	0
+#  Default: 	30
 #  Purpose: 	Control the cleaning of DC steps in bolometer time streams
 #  Description: This gives the box size over which to fit data with a
 #		straight line on either side of a potential DC jump,
