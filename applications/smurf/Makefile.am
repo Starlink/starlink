@@ -86,53 +86,19 @@ WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c \
 wvm/Axb.c wvm/lmbc.c wvm/misc.c
 
 EXAMPLE_FILES = \
-examples/README \
-examples/atm.sdf \
-examples/candycanes.sdf \
 examples/dimmconfig.lis \
 examples/dimmconfig_blank_field.lis \
-examples/dimmconfig_bright.lis \
+examples/.dimmconfig_bright.lis \
 examples/dimmconfig_bright_compact.lis \
-examples/dimmconfig_bright_compact_veryshort.lis \
-examples/dimmconfig_export.lis \
 examples/dimmconfig_bright_extended.lis \
 examples/dimmconfig_calcnoise.lis \
-examples/dimmconfig_calcnoise_nocom.lis \
-examples/dimmconfig_calcnoise_pca.lis \
-examples/dimmconfig_compact_whiten.lis \
-examples/dimmconfig_distortionmap.lis \
-examples/dimmconfig_faint_extended.lis \
-examples/dimmconfig_fridgeflat.lis \
 examples/dimmconfig_moon.lis \
-examples/dimmconfig_newfilt.lis \
-examples/dimmconfig_pca.lis \
 examples/dimmconfig_pointing.lis \
-examples/dimmconfig_pointing_extended.lis \
-examples/dimmconfig_veryshort.lis \
 examples/dimmconfig_veryshort_planet.lis \
-examples/dimmconfig_whiten.lis \
-examples/dreamobs.lis \
-examples/dreamsim.lis \
-examples/heatrunobs.lis \
-examples/heatrunsim.lis \
-examples/obspar.lis \
-examples/obspar_dream.lis \
-examples/obspar_heatrun.lis \
-examples/obspar_pong.lis \
-examples/obspar_stare.lis \
-examples/pongobs.lis \
-examples/pongsim.lis \
 examples/resist.cfg \
 examples/s4a20091214_00015_0002.sdf \
 examples/s4a20091214_00015_0003.sdf \
 examples/sc19_clean3.lis \
-examples/simpar.lis \
-examples/simpar_dream.lis \
-examples/simpar_heatrun.lis \
-examples/simpar_pong.lis \
-examples/simpar_stare.lis \
-examples/stareobs.lis \
-examples/staresim.lis \
 data/sg450_m1004d1000_heateff.sdf \
 data/sg450_m1006d1003_heateff.sdf \
 data/sg450_m1007d1002_heateff.sdf \
@@ -140,7 +106,18 @@ data/sg450_m1009d1008_heateff.sdf \
 data/sg850_m0906d1005_heateff.sdf \
 data/sg850_m1002d1006_heateff.sdf \
 data/sg850_m1003d1004_heateff.sdf \
-data/sg850_m1005d1007_heateff.sdf \
+data/sg850_m1005d1007_heateff.sdf
+
+# Files not for use by general users go in share/smurf/experimental
+experimentaldir = $(pkgdatadir)/experimental
+dist_experimental_DATA = \
+examples/experimental/dimmconfig_calcnoise_pca.lis \
+examples/experimental/dimmconfig_compact_whiten.lis \
+examples/experimental/dimmconfig_distortionmap.lis \
+examples/experimental/dimmconfig_export.lis \
+examples/experimental/dimmconfig_newfilt.lis \
+examples/experimental/dimmconfig_pca.lis \
+examples/experimental/dimmconfig_whiten.lis \
 data/opteff-s4a.sdf \
 data/opteff-s4b.sdf \
 data/opteff-s4c.sdf \
@@ -150,6 +127,36 @@ data/opteff-s8b.sdf \
 data/opteff-s8c.sdf \
 data/opteff-s8d.sdf
 
+# Simulator files go in share/smurf/sc2sim
+sc2simdir = $(pkgdatadir)/sc2sim
+dist_sc2sim_DATA = \
+examples/sc2sim/README \
+examples/sc2sim/atm.sdf \
+examples/sc2sim/candycanes.sdf \
+examples/sc2sim/dreamsim.lis \
+examples/sc2sim/dreamobs.lis \
+examples/sc2sim/heatrunsim.lis \
+examples/sc2sim/heatrunobs.lis \
+examples/sc2sim/obspar_dream.lis \
+examples/sc2sim/obspar.lis \
+examples/sc2sim/obspar_stare.lis \
+examples/sc2sim/obspar_pong.lis \
+examples/sc2sim/obspar_heatrun.lis \
+examples/sc2sim/pongsim.lis \
+examples/sc2sim/pongobs.lis \
+examples/sc2sim/simpar_stare.lis \
+examples/sc2sim/simpar_pong.lis \
+examples/sc2sim/simpar_heatrun.lis \
+examples/sc2sim/simpar_dream.lis \
+examples/sc2sim/simpar.lis \
+examples/sc2sim/staresim.lis \
+examples/sc2sim/stareobs.lis
+
+##  Any other misc files that have no where else.
+dist_starnews_DATA = smurf.news
+dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)
+
+
 # Linking
 
 smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
@@ -158,10 +165,6 @@ smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
                   libacsis/libacsis.la \
                   libsc2fts/libsc2fts.la                \
                   `$(srcdir)/smurf_link_adam`
-
-##  Any misc files that have no where else.
-dist_starnews_DATA = smurf.news
-dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)
 
 # Dynamically generated scripts
 DYNSCRIPTS = smurf.sh smurf.csh smurf.icl

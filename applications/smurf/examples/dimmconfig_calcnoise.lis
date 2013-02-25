@@ -1,4 +1,4 @@
-^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise_nocom.lis
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
 # *** Specialized config for CALCNOISE with common-mode subtraction ***
 #
@@ -14,12 +14,63 @@
 #
 # ***********************************************************************
 
+
+# don't flag data where the telescope is moving slowly
+450.flagslow = 0
+450.flagfast = 0
+850.flagslow = 0
+850.flagfast = 0
+
+# ensure that no other filtering happens
+modelorder = <undef>
+
+450.apod = 0
+450.zeropad = 0
+450.filt_edgelow = 0
+450.filt_edgehigh = 0
+450.filt_edge_smallscale = 0
+450.filt_edge_largescale = 0
+450.filt_notchlow = <undef>
+450.filt_notchhigh = <undef>
+450.whiten = 0
+
+850.apod = 0
+850.zeropad = 0
+850.filt_edgelow = 0
+850.filt_edgehigh = 0
+850.filt_edge_smallscale = 0
+850.filt_edge_largescale = 0
+850.filt_notchlow = <undef>
+850.filt_notchhigh = <undef>
+850.whiten = 0
+
+450.flt.apod = 0
+450.flt.zeropad = 0
+450.flt.filt_edgelow = 0
+450.flt.filt_edgehigh = 0
+450.flt.filt_edge_smallscale = 0
+450.flt.filt_edge_largescale = 0
+450.flt.filt_notchlow = <undef>
+450.flt.filt_notchhigh = <undef>
+450.flt.whiten = 0
+
+850.flt.apod = 0
+850.flt.zeropad = 0
+850.flt.filt_edgelow = 0
+850.flt.filt_edgehigh = 0
+850.flt.filt_edge_smallscale = 0
+850.flt.filt_edge_largescale = 0
+850.flt.filt_notchlow = <undef>
+850.flt.filt_notchhigh = <undef>
+850.flt.whiten = 0
+
 # Just remove a linear drift
 order = 1
 
 # clip really noisy bolos prior to common-mode removal
 noiseclipprecom=1
 noisecliphigh=10
+noisecliplow = 0
 
 # use common-mode removal
 compreprocess=1

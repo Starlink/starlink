@@ -1,4 +1,4 @@
-^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
+^$STARLINK_DIR/share/smurf/.dimmconfig_bright.lis
 
 # *** Specialized config for the moon ***
 #

@@ -28,8 +28,9 @@
 #     try modifying the radius.
 
 #  Notes:
-#     - This file inherits the parameter values defined in file
-#     /star/share/smurf/dimmconfig_bright.lis.
+#     - This file inherits the parameter values defined in hidden file
+#     /star/share/smurf/.dimmconfig_bright.lis (note the dot at the start
+#     of the file name).
 #     - For a full list of all available parameters, and their purposes,
 #     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
 #     are also documented in SUN/258, appendix "Configuration Parameters".
@@ -50,7 +51,7 @@
 #-
 
 #  Inherit the values defined in the parent dimmconfig file
-   ^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
+   ^$STARLINK_DIR/share/smurf/.dimmconfig_bright.lis
 
    numiter=-40
 

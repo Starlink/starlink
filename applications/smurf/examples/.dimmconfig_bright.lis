@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     dimmconfig_bright.lis
+#     .dimmconfig_bright.lis
 
 #  Purpose:
 #     A MAKEMAP configuration suitable for bright sources.
@@ -12,7 +12,9 @@
 #     This file is not intended to be used directly by users. Its purpose
 #     is to provide settings that are common to other, more specialised,
 #     configurations that handle various forms of bright sources. See
-#     for instance, /star/share/smurf/dimmconfig_bright_compact.lis.
+#     for instance, /star/share/smurf/dimmconfig_bright_compact.lis. For
+#     this reason, the file has been "hidden" by putting a dot at the
+#     start of the name.
 #
 #     Maps of bright sources, regardless of their physical extent,
 #     generally require less aggressive rejection of bad data due to the
@@ -43,6 +45,9 @@
 #     12-FEB-2013 (DSB):
 #        Use a standard prologue format. Re-instated comments describing
 #        rationale for each value.
+#     25-FEB-2013 (DSB):
+#        Change the name to include an initial dot, thus making the file
+#        hidden.
 #-
 
 
