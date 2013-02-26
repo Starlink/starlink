@@ -464,6 +464,20 @@ diag.array = <undef>
 diag.bolo = WMEAN
 
 #-----------------------------------------------------------------
+#  Name: 	diag.cube
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Qualifies the required dignostic information.
+#  Description: If non-zero, create 3D cubes containing the required
+#               residuals or models for all bolometers at each iteration.
+#               Warning - this can be a huge amount of data so only use
+#               on very short time series (e.g. a single subscan) and for
+#		very few iterations. The cubes have names of the form
+#		"<where>_<chunk>_cube_<iter>", (see parameter "diag.out").
+#		Only used if a value is supplied for diag.out.
+diag.cube = 0
+
+#-----------------------------------------------------------------
 #  Name: 	diag.mask
 #  Type: 	int
 #  Default: 	0

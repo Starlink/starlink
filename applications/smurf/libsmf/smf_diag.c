@@ -16,7 +16,8 @@
 *     smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 *               int power, int time, int isub, smfDIMMData *dat,
 *               smf_modeltype type, smfArray *model, int res,
-*               const char *root, int mask, double mingood, int *status )
+*               const char *root, int mask, double mingood, int cube,
+*               int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -52,7 +53,7 @@
 *        If non-zero dump the residuals. Otherwise dump the model.
 *     root = const char * (Given)
 *        The root name for the NDFs to hold the data within the container
-*        file. The string "_time" and/or "_freq" (depending on arguments
+*        file. The string "_time" and/or "_power" (depending on arguments
 *        power and time) will be added to this root to created the full name.
 *     mask = int (Given)
 *        If non-zero, then the AST model will be masked using the current
@@ -62,6 +63,10 @@
 *        The minimum fraction of good values in a time stream for which
 *        data should be dumped. An error is reported if the required minimum
 *        value is not met.
+*     cube = int (Given)
+*        Is a full cube containing time ordered data for all bolometers
+*        required? If so, it will be stored in an NDF with name
+*        "<root>_cube_<irow>".
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -118,6 +123,7 @@ static void smf1_diag( void *job_data_ptr, int *status );
 typedef struct smfDiagData {
    const double *in;
    dim_t nbolo;
+   dim_t ntslice;
    dim_t s1;
    dim_t s2;
    dim_t t1;
@@ -140,7 +146,8 @@ typedef struct smfDiagData {
 void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                int power, int time, int isub, smfDIMMData *dat,
                smf_modeltype type, smfArray *model, int res,
-               const char *root, int mask, double mingood, int *status ){
+               const char *root, int mask, double mingood, int cube,
+               int *status ){
 
 /* Local Variables: */
    AstCmpFrame *totfrm;
@@ -320,6 +327,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 
 /* Store other values common to all jobs. */
          pdata->nbolo = nbolo;
+         pdata->ntslice = ntslice;
          pdata->bstride = bstride;
          pdata->tstride = tstride;
       }
@@ -656,6 +664,48 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* Return the used bolometer, if required. */
    if( *ibolo == -3 ) *ibolo = usebolo;
 
+/* If required, dump the time series for all bolometers to a new cube. */
+   if( cube && data->ndims == 3 && (data->pntr)[0] ) {
+
+/* Get the name of the NDF to hold the cube. */
+      name = NULL;
+      nc = 0;
+      name = astAppendString( name, &nc, root );
+      name = astAppendString( name, &nc, "_cube_" );
+      sprintf( attr, "%d", irow );
+      name = astAppendString( name, &nc, attr );
+
+/* Get its pixel bounds. */
+      for( i = 0; i < 3; i++ ) {
+         lbnd[ i ] = (data->lbnd)[ i ];
+         ubnd[ i ] = lbnd[ i ] + (data->dims)[ i ] - 1;
+      }
+
+/* Create it and map the Data component. */
+      ndfPlace( loc, name, &place, status );
+      ndfNew( "_DOUBLE", 3, lbnd, ubnd, &place, &indf, status );
+      ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void **) &ip, &el,
+              status );
+
+/* Copy the data values from the smfData to the NDF Data component,
+   setting flagged values to VAL__BADD. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         if( pdata->b1 < nbolo ) {
+            pdata->oper = 3;
+            pdata->out = ip;
+            pdata->in = (data->pntr)[0];
+            pdata->qua = qual;
+            thrAddJob( wf, 0, pdata, smf1_diag, 0, NULL, status );
+         }
+      }
+      thrWait( wf, status );
+
+/* Annul the NDF identifier. */
+      ndfAnnul( &indf, status );
+
+   }
+
 /* Free the array holding the AST model and re-instate the original RES
    values if required. */
    if( oldres ) {
@@ -765,6 +815,24 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
             w = VAL__BADD;
          }
          *(out++) = w;
+      }
+
+/* Copy full cube of data values, masking them in the process. */
+   } else if( oper == 3 ) {
+      for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+         out = pdata->out + ibolo*bstride;
+         in = pdata->in + ibolo*bstride;
+         pq = qua ? qua + ibolo*bstride : NULL;
+         for( itime = 0; itime < pdata->ntslice; itime++) {
+            if( !pq || *pq == 0  ) {
+               *out = *in;
+            } else {
+               *out = VAL__BADD;
+            }
+            in += tstride;
+            out += tstride;
+            if( pq ) pq += tstride;
+         }
       }
 
 /* Form unweighted mean of all good bolos. */

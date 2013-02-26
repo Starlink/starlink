@@ -60,6 +60,13 @@
 *        already exist. If zero, then  any existing container file is first
 *        deleted before storing new diagnostics information in it.
 *
+*        CUBE - If non-zero, a full cube containing time-ordered data for
+*        all bolometers is created at each iteration, for each required
+*        model and set of residuals. These are placed in 3D NDFs with
+*        names in the following format: "<where>_<chunk>_cube_<it>", where
+*        <chunk> and <where> are described above (under "OUT") and <it>
+*        is the iteration number.
+*
 *        MODELS - Indicates the models that are to be written out. It
 *        should be a comma separated list of model names (e.g. COM, FLT,
 *        AST, RES, etc) contained within parentheses, or a single model
@@ -192,6 +199,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    const char *out;
    double mingood;
    int append;
+   int cube;
    int history;
    int ibolo = -2;
    int imodel;
@@ -237,6 +245,10 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* See if we should append data for the current run of makemap to NDFs
    created by a previous run (e.g. when running the skyloop script). */
       astMapGet0I( kmap, "APPEND", &append );
+
+/* See if a full cube containing data for all bolometers is required at
+   each iteration. */
+      astMapGet0I( kmap, "CUBE", &cube );
 
 /* If we are appending to previously created NDFs, attempt to open the
    pre-existing container file. */
@@ -405,7 +417,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                            status, modname );
                   sprintf( root, "before_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub, dat,
-                            type, NULL, 1, root, 0, mingood, status );
+                            type, NULL, 1, root, 0, mingood, cube, status );
                }
 
 /* If this function has been called immediately after estimating the new
@@ -415,13 +427,13 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                sprintf( root, "model_%d", chunk );
                smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                          dat, type, allmodel ? allmodel[ 0 ] : NULL,
-                         0, root, mask, mingood, status );
+                         0, root, mask, mingood, cube, status );
                if( res_after && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
                            status, modname );
                   sprintf( root, "after_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub, dat,
-                            type, NULL, 1, root, 0, mingood, status );
+                            type, NULL, 1, root, 0, mingood, cube, status );
                }
 
 /* Any other "where" value is currently an error. */
