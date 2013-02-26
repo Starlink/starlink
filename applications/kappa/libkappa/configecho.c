@@ -269,6 +269,9 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
       }
       else {
          parGet0c("APPLICATION", application, sizeof(application), STATUS);
+         /* Check now for error because the block below allowing an undefined
+          * CONFIG clears this status otherwise. */
+         if (*STATUS != SAI__OK) goto L999;
       }
    }
 
