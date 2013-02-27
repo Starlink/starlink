@@ -70,6 +70,9 @@
 *        Tidy up the code to clarify the fact that the common mode
 *        esimate is the unweighted mean of the unnormalised bolometer
 *        residuals.
+*     27-FEB-2013 (DSB):
+*        Do not modify the com mask to exclude unused map pixels on the
+*        first iteration as the map has not yet been determined.
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
@@ -228,7 +231,11 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    the COM model. Cannot mask if no LUT is available. */
    mask = lut ? smf_get_mask( wf, SMF__COM, keymap, dat, flags, status ) : NULL;
 
-/* If we have a mask, copy it into the quality array of the map. */
+/* If we have a mask, copy it into the quality array of the map.
+   Also set map pixels that are not used (e.g. corner pixels, etc)
+   to be background pixels in the mask. Do not do this on the firrst
+   iteration as the map has not yet been determined.*/
+
    if( mask ) {
       double *map = dat->map;
       smf_qual_t *mapqual = dat->mapqual;
@@ -238,7 +245,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          if( mask[i] ) {
             mapqual[i] |= SMF__MAPQ_COM;
 
-         } else if( map[i] == VAL__BADD || mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) {
+         } else if( dat->iter > 0 && ( map[i] == VAL__BADD ||
+                    mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) ) {
             mask[i] = 1;
             mapqual[i] |= SMF__MAPQ_COM;
 
