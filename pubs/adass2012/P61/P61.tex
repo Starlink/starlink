@@ -1,0 +1,184 @@
+\documentclass[11pt,twoside]{article}
+\usepackage{asp2010}
+
+\resetcounters
+\bibliographystyle{asp2010}
+
+\markboth{Currie}{Automated removal of bad-baseline heterodyne spectra}
+
+\begin{document}
+
+\title{Automated removal of bad-baseline spectra from ACSIS/HARP
+heterodyne time series}
+\author{Malcolm J. Currie}
+\affil{Joint Astronomy Centre, 660, N.Aohoku Place, Hilo, Hawaii 96720, USA}
+
+\begin{abstract}
+Heterodyne time-series spectral data often exhibit distorted or noisy 
+baselines. These are either transient due to external interference or 
+pickup; or affect a receptor throughout an observation or extended 
+period, possibly due to a poor cable connection. While such spectra can 
+be excluded manually, this is time consuming and prone to omission, 
+especially for the high-frequency interference affecting just one or two 
+spectra in typically several to twenty thousand, yet can produce undesirable 
+artefacts in the reduced spectral cube. Further astronomers have tended 
+to reject an entire receptor if any of its spectra are suspect; as a 
+consequence the reduced products have lower signal-to-noise, and 
+enhanced graticule patterns due to the variable coverage and detector 
+relative sensitivities.
+
+This paper illustrates some of the types of aberrant spectra for
+ACSIS/HARP on the James Clerk Maxwell Telescope and the algorithms
+used to identify and remove them applied within the ORAC-DR pipeline,
+and compares an integrated map with and without baseline filtering. 
+\end{abstract}
+
+\section{Introduction}
+
+ACSIS/HARP \citep{buckle_2009} is a heterodyne system installed on
+the James Clerk Maxwell Telescope. Its now 15-element focal-plane
+array receiver operates in the submillimetre from 325 to 375 GHz
+generating cubes with spectral, receptor, and time-series axes.
+Typical observations are scanned in one spatial direction followed by
+an orthogonal scan to form a `basket weave' thus different receptors
+are used to sample the same sky point.
+
+The data are automatically reduced using the ORAC-DR pipeline system
+\citep{cavanagh_2008,jenness_2008} to generate spectral cubes
+(long,lat,velocity). It encompasses an iterative process to mask the
+spectral lines to improve baseline subtraction.  It also performs
+quality-assurance checks on all the input time series.
+
+Under certain conditions not fully understood---likely sources include 
+cables and their connections, and certain telescope motions---the 
+baselines of the spectra can exhibit interference in the form of noise, 
+uneven or distorted baselines.  Left unfiltered these appear as stripes 
+in the final products, degrading the data both cosmetically and 
+astrophysically.
+
+While many affected spectra could be removed manually, a single 
+observation usually has at least 2000 spectra and typically a few to 
+several times that, 14 or 15 working receptors; and a minimum dataset 
+comprises two orthogonal scan directions.  Not only is manual detection 
+and removal time consuming, it is prone to omission.  Some of the 
+defects appear in isolated spectra easily missed by visual inspection 
+yet they have a dramatic affect on the pipeline products.  Some 
+distortions are subtle or fine-grained and require panning across 
+thousands of spectral elements, and zooming to view individual pixels.  
+In practice astronomers rejected a receptor if it showed any clear bad 
+baselines, as if the issue were instrinsic to the receptor itself rather 
+than external and usually transient sources.
+
+The goal was to automate the filtering of these anomalous spectra in 
+ORAC-DR, yet not be too expensive in cpu time as the biggest maps
+already could take several hours to a day to reduce.
+
+\section{Bad Spectra}
+
+The bad baselines can be divided roughly into two classes: 
+high-frequency, high amplitude; and low frequency, lower amplitude. The 
+former appear mostly in single isolated spectra or in narrow bands,
+but can also manifest as spiky spectra, or weaker-amplitude striations 
+persistent over tens of spectra.  Figure~1 presents the most-common forms.
+
+\begin{figure}[!ht]
+\plottwo{P61_f1a}{P61_f1b}
+\caption{Examples of high-frequency interference in spectral-time axes. 
+The left panel shows high-amplitude interference affecting single
+spectra; and part of an affected spectrum plotted below. The amplitude
+dwarfs the normal signal by an order of magnitude. The right panel shows 
+bands of phase-shifting interference.}
+\end{figure}
+
+The low-frequency ripples tend to occur in time-series blocks that are
+often visible because of baseline drift, but can apply to all spectra
+for a receptor. They have a wide range of morphologies such as
+sinusoids, irregular ripples, and curved, twin headlight-like beams
+that start strong but gradually pan out and fade with time.  Figure~2
+displays some examples.
+
+
+\begin{figure}[!ht]
+\plottwo{P61_f2a}{P61_f2b}
+\caption{Examples of low-frequency interference.  The top-left 
+graphic shows a band of low-frequency oscillations; below it is the 
+band's average spectrum.  The lower-left spectrum has a periodic weak
+ripple hard to detect visually.  The right panel shows time-averaged
+(clipped mean) spectra for each receptor in which the fourth and ninth
+from the bottom exhibit global non-linearity.}
+\end{figure}
+
+\section{Adopted Solution}
+
+The pipeline applies three steps in the quality-assurance stage: 
+\begin{itemize}
+\item Laplacian filtering of high-frequency noise;
+\item non-linearity detection for individual spectra; and
+\item global non-linearity to reject whole receptors.
+\end{itemize}
+
+\subsection{Masking of High-frequency Noise}
+ 
+The recipe applies a one-dimensional Laplacian edge filter to all the
+spectra for each receptor trimming the outer 15\% where noise is
+always present.  This approximates to a difference-of-Gaussian filter.
+It next sums the rms `edginess' along the spectral axis to form a
+profile through the time series.  Drifts or steps in the profile are
+removed.  The final step is to eject spectra whose rms edginess
+exceeds the median level by a nominated number of clipped standard
+deviations.  Affected spectra are easily dilineated.  An optional
+second iteration removes most of the striation noise once the
+pronounced edginess peaks are masked.
+
+\subsection{Non-linearity Filtering}
+
+The low-frequency rippled and wobbly baselines are addressed by 
+determining the non-linearity of each spectrum.  First the recipe
+excludes non-baseline features that would dilute the non-linearity
+signal.  These comprise a threshold to remove spikes and masking a
+central region where the astronomical signal may be present. It
+estimates the background level, effectively smoothing to remove
+structure smaller than a nominated scale.  Next it fits linear
+baselines to these and calculates the rms residuals to provide a
+rectified signal.  Then it averages the signal along the spectral axis
+to form a non-linearity profile through the time series for each
+good receptor.
+
+The non-linear profiles are much noisier than the summed Laplacians
+and discrimation is harder.  To identify anomalous spectra the recipe
+reduces the noise to obtain a smooth profile, correct for drifts or
+steps in the profile.  It rejects spectra whose mean non-linearity
+exceeds the mean level above a nominated number of clipped standard
+deviations.  The derived standard deviation allows for positive
+skewness.  It applies a mask of rejected spectra to the input cube.
+
+The global non-linearity test is applied last so that a block of transient 
+highly deviant spectra will not cause the whole receptor to be rejected.  It 
+operates in a similar fashion to the above.  It diverges by determining a 
+mean rms residual from non-linearity per detector, from which it evaluates 
+the median and standard deviation of the distribution of mean rms 
+residuals from the entire observation, and performs iterative sigma 
+clipping above the median to reject those detectors whose deviations from 
+linearity are anomalous.  There is a tunable minimum threshold.
+
+\section{Results}
+
+The methods appear highly effective at cleaning the pipeline products.
+It has been used to re-reduce one survey and several other datasets.
+Figure~3 presents an example which had originally failed quality assurance,
+but now can be used for science.  
+
+
+\begin{figure}[!ht]
+\plottwo{P61_f3a}{P61_f3b}
+\caption{Comparison of an integrated intensity map using the same
+percentile scaling.  The left panel shows a map without bad-baseline
+removal.  The right panel shows the same data processed using the
+new filters.}
+\end{figure}
+
+\acknowledgements This work was funded by the UK Science and Technology Facilities Council.
+
+\bibliography{P61}
+
+\end{document}
