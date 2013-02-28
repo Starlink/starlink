@@ -1,9 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sc21_selected_params.tex
 
-sc21.htx_tar: sc21.htx_tar.extras sc21_450array.eps sc21_850array.eps \
-sc21_850cosmo_bf.eps \
+sc21.htx_tar: sc21.htx_tar.extras sc21_selected_params.tex \
+sc21_450array.eps sc21_850array.eps sc21_850cosmo_bf.eps \
 sc21_850cosmo_mf_crop.eps sc21_850cosmo_mf_crop_snr.eps \
 sc21_ast.eps sc21_com.eps sc21_cosmo1-def.eps \
 sc21_cosmo1-bf.eps sc21_crl2688.eps sc21_crl2688_err.eps \

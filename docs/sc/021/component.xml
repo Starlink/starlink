@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sc21">
-  <version>1</version>
+  <version>1.2</version>
   <path>docs/sc/021</path>
   <description>The SCUBA-2 Data-analysis Cookbook</description>
   <abstract><p>
