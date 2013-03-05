@@ -458,8 +458,11 @@ void findclumps( int *status ) {
 *  GaussClumps Configuration Parameters:
 *     GaussClumps.FwhmBeam:
 *        The FWHM of the instrument beam, in
-*        pixels. The fitted Gaussians are not allowed to be smaller than the
-*        instrument beam. This prevents noise spikes being fitted. [2.0]
+*        pixels. The fitted Gaussians are not allowed to be smaller than
+*        the instrument beam. This prevents noise spikes being fitted. In
+*        addition, if application paremeter DECONV is set TRUE, the clump
+*        widths written to the output catalogue are reduced (in quadrature)
+*        by this amount. [2.0]
 *     GaussClumps.FwhmStart:
 *        An initial guess at the ratio of the typical
 *        observed clump size to the instrument beam width. This is used to
@@ -528,9 +531,11 @@ void findclumps( int *status ) {
 *        The supplied value is multipled by the RMS noise level before being
 *        used. [2.0]
 *     GaussClumps.VeloRes:
-*        The velocity resolution of the instrument, in
-*        channels. The velocity FWHM of each clump is not allowed to be
-*        smaller than this value. Only used for 3D data. [2.0]
+*        The velocity resolution of the instrument, in channels. The velocity
+*        FWHM of each clump is not allowed to be smaller than this value. Only
+*        used for 3D data. In addition, the velocity width of each clump
+*        written to the output catalogue is reduced (in quadrature) by this
+*        amount. [2.0]
 *     GaussClumps.VeloStart:
 *        An initial guess at the ratio of the typical
 *        observed clump velocity width to the velocity resolution. This is used to
