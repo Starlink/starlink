@@ -15,8 +15,11 @@
    values used for com.corr_tol, com.gain_abstol, com.gain_tol, dcthresh
    and noisecliphigh have changed.
 
-   IN ADDITION, THE VALUE FOR FLT.FILT_EDGE_LARGESCALE HAS BEEN CHANGED
-   FROM 300 TO 600 ARC-SEC.
+   IN ADDITION, DIMMCONFIG_BRIGHT_EXTENDED.LIS NOW SETS THE VALUE OF
+   FLT.FILT_EDGE_LARGESCALE TO 600 ARC-SECONDS FOR BOTH 450 AND 850 UM.
+   PREVIOUSLY, THE DEFAULTS OF 600 (AT 450 UM) AND 300 (AT 850 UM)
+   PROVIDED BY DIMMCONFIG.LIS WERE ACCEPTED. THUS, THE FILTER SIZE HAS
+   CHANGED FROM 300 TO 600 AT 450 UM.
 
  o A new command "skyloop" has been added which will create a map using
    the "inside-out" algorithm, which includes data from all chunk at each
