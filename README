@@ -43,6 +43,9 @@ rebuild the native parts of JNIAST, JNIHDS or SPLAT.
  Preparation
  -----------
 
+ - Ensure the required software development tools and headers are installed
+   on your system (see the "Prerequisites" section below)
+
  - Specify where you want the installed files to end up (_PREFIX) and
    where you want the build to find any previously installed Starlink
    tree (_STARLINK).  If there is no previously existing tree, then
@@ -394,4 +397,30 @@ The build procedures described above are still correct, but much of the
 associated documentation, SSN/78 etc. are becoming rapidly out-of-date.
 Consult the wiki for download instructions and how to access things like
 specific releases.
+
+
+Prerequisites
+-------------
+
+This section lists some of the software development tools and headers
+that are required to build Starlink. The list is not exhastive, but is
+just a suggestion of some packages to check that may not not be provided
+by default by your operating system.
+
+Ubuntu:
+   git
+   gfortran (or g95)
+   libxext-dev
+   libxau-dev
+   libx11-dev
+   libxt-dev
+   libncurses5-dev
+   flex
+   byacc
+   latex
+   texlive-latex-extra
+
+Fedora:
+   As for Ubuntu, but note that package names are usually changed from
+   "libxyz-dev" to "libXyz-devel".
 
