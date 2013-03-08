@@ -439,8 +439,16 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
         double scalelen;
 
         if( downsampscale ) {
-          double oldscale = steptime * data->hdr->scanvel;
-          scalelen = oldscale / downsampscale;
+          if( data->hdr->scanvel != VAL__BADD ) {
+             double oldscale = steptime * data->hdr->scanvel;
+             scalelen = oldscale / downsampscale;
+          } else if( *status == SAI__OK ) {
+             *status = SAI__ERROR;
+            scalelen = VAL__BADD;
+            smf_smfFile_msg( data->file, "FILE", 1, "" );
+            errRep( "", FUNC_NAME ": can't resample ^FILE because it has "
+                    "unknown scan velocity", status );
+          }
         } else {
           if( steptime ) {
             double oldsampfreq = 1./steptime;
@@ -448,7 +456,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
           } else {
             *status = SAI__ERROR;
             scalelen = VAL__BADD;
-            errRep( "", FUNC_NAME ": can't resample because smfData has "
+            smf_smfFile_msg( data->file, "FILE", 1, "" );
+            errRep( "", FUNC_NAME ": can't resample ^FILE because it has "
                     "unknown sample rate", status );
           }
         }
