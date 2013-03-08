@@ -410,6 +410,7 @@ by default by your operating system.
 Ubuntu:
    git
    gfortran (or g95)
+   g++
    libxext-dev
    libxau-dev
    libx11-dev
