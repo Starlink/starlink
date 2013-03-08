@@ -210,6 +210,7 @@
 #include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smf_mapbounds"
+#define MAX_PIXELS (20000*20000)
 
 void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                     const AstFrameSet *spacerefwcs,
@@ -788,6 +789,14 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     msgSeti( "YU", ubnd_out[ 1 ] );
     msgOutif( MSG__NORM, " ", "   Output map pixel bounds: ( ^XL:^XU, ^YL:^YU )",
               status );
+
+    if( ( ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1 )*
+        ( ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1 ) > MAX_PIXELS ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME ": The map is too big. Check your list of input "
+              "data files does not include widely separated observations.",
+              status );
+    }
   }
 
   /* If no error has occurred, export the returned FrameSet pointer from the
