@@ -151,11 +151,11 @@ try:
             tool = trytool
             break
       if tool == None:
-         print( "Could not find a usable file comparison tool")
+         print( "\n!! Could not find a usable file comparison tool")
          os._exit(1)
    else:
       if starutil.which( tool ) == None:
-         print( "Could not find the requested file comparison tool: '{0}'.".format(tool) )
+         print( "\n!! Could not find the requested file comparison tool: '{0}'.".format(tool) )
          os._exit(1)
 
 #  Note the path to the defaults file, if required.
@@ -168,22 +168,32 @@ try:
 #  Get the first config string.
    config1 = parsys["CONFIG1"].value
 
-#  Assuming it is an NDF, attempt to get the SUBARRAY fits header, and
+#  To be a group expression, it must contain at least one of the
+#  following characters: ^,= (NDFs are not allowed any of these).
+   gexp_chars = set( '^=,' )
+   if any( (c in gexp_chars) for c in config1 ):
+      isndf1 = False
+   else:
+      isndf1 = True
+
+#  If it is an NDF, attempt to get the SUBARRAY fits header, and
 #  determine the waveband. If no SUBARRAY header is found, look for
 #  "s4a", etc, in the NDF's provenance info.
-   try:
-      subarray = starutil.get_fits_header( config1, "SUBARRAY" )
-      isndf1 = True
-      if subarray == None:
-         text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config1) )
-         if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
-            subarray = "s4"
-         elif "s8a" in text or "s8b" in text or "s8c" in text or "s8d" in text:
-            subarray = "s8"
-         else:
-            subarray = None
-   except:
-      isndf1 = False
+   if isndf1:
+      try:
+         subarray = starutil.get_fits_header( config1, "SUBARRAY" )
+         if subarray == None:
+            text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config1) )
+            if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
+               subarray = "s4"
+            elif "s8a" in text or "s8b" in text or "s8c" in text or "s8d" in text:
+               subarray = "s8"
+            else:
+               subarray = None
+      except:
+         print( "\n!! It looks like NDF '{0}' either does not exist or is "
+                "corrupt.".format(config1) )
+         os._exit(1)
 
    if isndf1:
       if subarray == None:
@@ -203,21 +213,30 @@ try:
 #  Get the second config string.
    config2 = parsys["CONFIG2"].value
 
-#  Assuming it is an NDF, attempt to get the SUBARRAY fits header, and
-#  determine the waveband.
-   try:
-      subarray = starutil.get_fits_header( config2, "SUBARRAY" )
-      isndf2 = True
-      if subarray == None:
-         text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config2) )
-         if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
-            subarray = "s4"
-         elif "s8a" in text or "s8b" in text or "s8c" in text or "s8d" in text:
-            subarray = "s8"
-         else:
-            subarray = None
-   except:
+#  See if is a group expression or NDF.
+   if any( (c in gexp_chars) for c in config2 ):
       isndf2 = False
+   else:
+      isndf2 = True
+
+#  If it is an NDF, attempt to get the SUBARRAY fits header, and
+#  determine the waveband.
+   if isndf2:
+      try:
+         subarray = starutil.get_fits_header( config2, "SUBARRAY" )
+         isndf2 = True
+         if subarray == None:
+            text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config2) )
+            if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
+               subarray = "s4"
+            elif "s8a" in text or "s8b" in text or "s8c" in text or "s8d" in text:
+               subarray = "s8"
+            else:
+               subarray = None
+      except:
+         print( "\n!! It looks like NDF '{0}' either does not exist or is "
+                "corrupt.".format(config2) )
+         os._exit(1)
 
    if isndf2:
       if subarray == None:
