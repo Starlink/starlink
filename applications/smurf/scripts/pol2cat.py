@@ -217,8 +217,9 @@
 *     14-JAN-2013 (DSB):
 *        Added parameter INQU.
 *     11-MAR-2013 (DSB):
-*        Remove low frequency drift between stare positions in Q and U
+*        - Remove low frequency drift between stare positions in Q and U
 *        values for each bolometer.
+*        - Relax rejection criteria.
 
 *-
 '''
@@ -464,7 +465,7 @@ try:
          msg_out( "Removing spikes from {0} bolometer Q values...".format(a))
          qff = NDG(qarray)
          qff.comment = "qff"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]"
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[3,3,3\]"
                  .format(qarray,qff) )
 
 #  There seems to be a tendency for each bolometer to have its own fixed
@@ -481,7 +482,7 @@ try:
          qcom.comment = "qcom"
          invoke("$KAPPA_DIR/wcsframe {0} PIXEL".format(qff))
          invoke("$KAPPA_DIR/wcsmosaic {0} ref=\! out={1} method=near wlim={2} accept".
-                format(qff,qcom,len(qff)))
+                format(qff,qcom,len(qff)/2))
 
 #  We simply assume that the fixed bolometer Q bias is linearly related to
 #  the mean Q value per bolometer. Astronomical sources will affect this
@@ -513,7 +514,7 @@ try:
 #  Q images as a result of subtracting off the bolometer biases.
          qffb = NDG(qff)
          qffb.comment = "qffb"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]".
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[3,3,3\]".
                  format(qsub,qffb) )
 
 #  Remove the low frequency drift that seems to exist in the Q values for
@@ -549,14 +550,14 @@ try:
          msg_out( "Removing spikes from {0} bolometer U values...".format(a))
          uff = NDG(uarray)
          uff.comment = "uff"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]"
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[3,3,3\]"
                  .format(uarray,uff) )
 
          msg_out( "Removing background U level from {0} bolometers...".format(a))
          ucom = NDG(1)
          invoke("$KAPPA_DIR/wcsframe {0} PIXEL".format(uff))
          invoke("$KAPPA_DIR/wcsmosaic {0} ref=\! out={1} method=near wlim={2} accept".
-                format(uff,ucom,len(uff)))
+                format(uff,ucom,len(uff)/2))
 
          unm = NDG(uff)
          unm.comment = "unm"
@@ -578,7 +579,7 @@ try:
                  format(uff,unm,usub) )
          uffb = NDG(uff)
          uffb.comment = "uffb"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]".
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[3,3,3\]".
                  format(usub,uffb) )
 
          ucube = NDG(1)
