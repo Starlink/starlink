@@ -216,6 +216,9 @@
 *        - Ensure reference image has units of pW.
 *     14-JAN-2013 (DSB):
 *        Added parameter INQU.
+*     11-MAR-2013 (DSB):
+*        Remove low frequency drift between stare positions in Q and U
+*        values for each bolometer.
 
 *-
 '''
@@ -513,6 +516,35 @@ try:
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]".
                  format(qsub,qffb) )
 
+#  Remove the low frequency drift that seems to exist in the Q values for
+#  each bolometer from stare position to stare position. Paste the cleaned,
+#  background-subtracted Q images into a cube.
+         qcube = NDG(1)
+         invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
+                 format(qffb,qcube) )
+
+#  Smooth the cube along the Z axis (the stare position axis). Currently
+#  use a simple top-hat filter, but maybe try Gaussian?
+         qcubebx = NDG(1)
+         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=median box=\[1,1,5\]".
+                 format(qcube,qcubebx) )
+
+#  Find the reisudals after removal of the smoothed cube.
+         qres = NDG(1)
+         invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".
+                 format(qcube,qcubebx,qres) )
+
+#  Split the cube of residuals up into separate 2D planes, and copy the
+#  WCS back.
+         qsm = NDG(qffb)
+         islice = 0
+         for qq in qsm:
+            islice += 1
+            invoke( "$KAPPA_DIR/ndfcopy in={0}\(,,{1}\) out={2} trim=yes".
+                    format(qres,islice,qq) )
+            invoke( "$KAPPA_DIR/wcscopy ndf={0} like={1} ok".
+                    format(qq,qffb[islice-1]) )
+
 #  Now do the same for the U images.
          msg_out( "Removing spikes from {0} bolometer U values...".format(a))
          uff = NDG(uarray)
@@ -549,10 +581,28 @@ try:
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[2,2,2\]".
                  format(usub,uffb) )
 
+         ucube = NDG(1)
+         invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
+                 format(uffb,ucube) )
+         ucubebx = NDG(1)
+         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=median box=\[1,1,5\]".
+                 format(ucube,ucubebx) )
+         ures = NDG(1)
+         invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".
+                 format(ucube,ucubebx,ures) )
+         usm = NDG(uffb)
+         islice = 0
+         for uu in usm:
+            islice += 1
+            invoke( "$KAPPA_DIR/ndfcopy in={0}\(,,{1}\) out={2} trim=yes".
+                    format(ures,islice,uu) )
+            invoke( "$KAPPA_DIR/wcscopy ndf={0} like={1} ok".
+                    format(uu,uffb[islice-1]) )
+
 #  Ensure all images have the required current WCS Frame (as indicated by
 #  the DOMAIN parameter).
-         invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(qffb,domain) )
-         invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(uffb,domain) )
+         invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(qsm,domain) )
+         invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(usm,domain) )
 
 #  The reference map defines the output pixel grid - the origin, pixel size,
 #  sky projection, etc (but not the pixel bounds) - of the final Q, U and I
@@ -566,7 +616,7 @@ try:
             if iref:
                invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(iref,ref) )
             else:
-               invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(qffb[0],ref) )
+               invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(qsm[0],ref) )
 
 #  We add a WCS Frame with Domain "POLANAL" to define the polarimetric reference
 #  direction (we choose the pixel Y axis). POLPACK expects this Frame to be present
@@ -590,9 +640,9 @@ try:
 #  Modify the values in each pair of Q and U images so that they refer to
 #  the common reference direction (i.e. the ref image pixel Y axis).
          msg_out( "Rotating all {0} Q and U reference directions to be parallel...".format(a) )
-         qrot = NDG(qffb)
-         urot = NDG(uffb)
-         for (qin,uin,qout,uout) in zip( qffb, uffb, qrot, urot ):
+         qrot = NDG(qsm)
+         urot = NDG(usm)
+         for (qin,uin,qout,uout) in zip( qsm, usm, qrot, urot ):
             invoke( "$POLPACK_DIR/polrotref qin={0} uin={1} like={2} qout={3} uout={4} ".
                     format(qin,uin,ref,qout,uout) )
 
