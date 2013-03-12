@@ -106,6 +106,8 @@
 *        Added arguments pasign, paoff and angrot.
 *     14-JAN-2013 (DSB):
 *        Added argument submean.
+*     12-MAR-2013 (DSB):
+*        Added calculation of variances.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -152,11 +154,15 @@ typedef struct smfCalcIQUJobData {
    double *ipi;
    double *ipq;
    double *ipu;
+   double *ipiv;
+   double *ipqv;
+   double *ipuv;
    double angrot;
    double paoff;
    int block_end;
    int block_start;
    int ipolcrd;
+   int gotvar;
    int ncol;
    int old;
    int pasign;
@@ -176,6 +182,8 @@ static void smf1_calc_iqu_job( void *job_data, int *status );
    values into radians. */
 #define TORADS (2*AST__DPI/SMF__MAXPOLANG)
 
+/* The angle in radians to be integrated over to produce a single Q/U pair. */
+#define ROT_PER_SAMPLE  4*AST__DPI
 
 void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
                   int block_end, int ipolcrd, int qplace, int uplace,
@@ -194,12 +202,16 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    double *ipi;               /* Pointer to output I array */
    double *ipq;               /* Pointer to output Q array */
    double *ipu;               /* Pointer to output U array */
+   double *ipiv;              /* Pointer to output I variance array */
+   double *ipqv;              /* Pointer to output Q variance array */
+   double *ipuv;              /* Pointer to output U variance array */
    double ina[ 2 ];           /* Bolometer coords at bottom left */
    double inb[ 2 ];           /* Bolometer coords at top right */
    double outa[ 2 ];          /* NDF GRID coords at bottom left */
    double outb[ 2 ];          /* NDF GRID coords at top right */
    int bstep;                 /* Bolometer step between threads */
    int el;                    /* Number of mapped array elements */
+   int gotvar;                /* Were any output variances created? */
    int indfi;                 /* Identifier for NDF holding I values */
    int indfq;                 /* Identifier for NDF holding Q values */
    int indfu;                 /* Identifier for NDF holding Q values */
@@ -312,6 +324,14 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
       ipi = NULL;
    }
 
+/* Map the Variance array in each NDF. */
+   ndfMap( indfq, "Variance", "_DOUBLE", "WRITE", (void **) &ipqv, &el, status );
+   ndfMap( indfu, "Variance", "_DOUBLE", "WRITE", (void **) &ipuv, &el, status );
+   if( indfi != NDF__NOID ) {
+      ndfMap( indfi, "Variance", "_DOUBLE", "WRITE", (void **) &ipiv, &el, status );
+   } else {
+      ipiv = NULL;
+   }
 
 /* If required, allocate memory to hold the mean bolometer value at each
    time slice. */
@@ -409,6 +429,9 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
          pdata->ipq = ipq;
          pdata->ipu = ipu;
          pdata->ipi = ipi;
+         pdata->ipqv = ipqv;
+         pdata->ipuv = ipuv;
+         pdata->ipiv = ipiv;
          pdata->ipolcrd = ipolcrd;
          pdata->block_start = block_start;
          pdata->block_end = block_end;
@@ -427,6 +450,27 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 
 /* Wait for the workforce to complete all jobs. */
       thrWait( wf, status );
+
+/* See if any thread produced non-bad variance values. */
+      gotvar = 0;
+      for( iworker = 0; iworker < nworker; iworker++ ) {
+         pdata = job_data + iworker;
+         if( pdata->gotvar ) gotvar = 1;
+      }
+
+/* If no variances were created, erase the Variance component and tell
+   the user. */
+      ndfUnmap( indfq, "*", status );
+      ndfUnmap( indfu, "*", status );
+      if( ipi ) ndfUnmap( indfi, "*", status );
+
+      if( !gotvar ) {
+         ndfReset( indfq, "Variance", status );
+         ndfReset( indfu, "Variance", status );
+         if( ipi ) ndfReset( indfi, "Variance", status );
+         msgOut( "", "Warning: Insufficient input data to produce variances",
+                 status );
+      }
    }
 
 /* Add POLANAL Frames to the WCS FrameSet in each output NDF. This Frame
@@ -484,34 +528,56 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double *din0;              /* Pointer to input data array for 1st time */
    double *din;               /* Pointer to input data array for bolo/time */
    double *ipi;               /* Pointer to output I array */
+   double *ipiv;
    double *ipq;               /* Pointer to output Q array */
+   double *ipqv;
    double *ipu;               /* Pointer to output U array */
+   double *ipuv;
    double *pm;                /* Pointer to next time slice mean value */
    double angle;              /* Phase angle for FFT */
+   double angle_l;
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double cosval;             /* Cos of twice reference rotation angle */
+   double dang;
+   double den;
    double i;                  /* Output I value */
    double paoff;              /* WPLATE value corresponding to POL_ANG=0.0 */
    double phi;                /* Angle from fixed analyser to effective analyser */
    double q0;                 /* Q value with respect to fixed analyser */
    double q;                  /* Output Q value */
+   double rot;                /* Rotation angle included in current s1/2/3 values */
    double s1;                 /* Sum of weighted cosine terms */
    double s2;                 /* Sum of weighted sine terms */
    double s3;                 /* Sum of weights */
+   double swi;
+   double swii;
    double sinval;             /* Sin of twice reference rotation angle */
+   double swq;
+   double swqq;
+   double swu;
    double sum;                /* Sum of bolometer values */
+   double swuu;
+   double sw;
+   double sww;
    double u0;                 /* U value with respect to fixed analyser */
    double u;                  /* Output U value */
    double v;                  /* Analysed intensity to use */
+   double vi;
+   double vq0;
+   double vq;
+   double vu0;
+   double vu;
    double wplate;             /* Angle from fixed analyser to have-wave plate */
    int block_end;             /* Last time slice to process */
    int block_start;           /* First time slice to process */
    int ipolcrd;               /* Reference direction for pol_ang */
    int itime;                 /* Time slice index */
-   int limit;                 /* Min no of good i/p values for a godo o/p value */
+   int limit;                 /* Min no of good i/p values for a good o/p value */
+   int limit2;                /* Min no of good i/p values for a good single estimate */
    int n;                     /* Number of contributing values in S1, S2 and S3 */
    int ncol;                  /* No. of bolometers in one row */
    int nn;                    /* Number of good bolometer values */
+   int nrot;
    int old;                   /* Data has old-style POL_ANG values? */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    size_t bstride;            /* Stride between adjacent bolometer values */
@@ -539,6 +605,9 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    ipi = pdata->ipi;
    ipq = pdata->ipq;
    ipu = pdata->ipu;
+   ipiv = pdata->ipiv;
+   ipqv = pdata->ipqv;
+   ipuv = pdata->ipuv;
    ipolcrd = pdata->ipolcrd;
    block_start = pdata->block_start;
    block_end = pdata->block_end;
@@ -547,6 +616,9 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    pasign = pdata->pasign;
    paoff = pdata->paoff;
    angrot = pdata->angrot;
+
+/* Assume we are not returning any variance values. */
+   pdata->gotvar = 0;
 
 /* Calculate Q and U if required. */
    if( pdata->action == 0 ) {
@@ -557,6 +629,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
 /* The minimum number of samples required for a good output value. Half
    of the available input samples must be good. */
          limit = 0.5*( block_end - block_start );
+         limit2 = 10;
 
 /* Initialise pointers to the first time slice data and quality value for
    the first bolometer to be processed in the current block of time slices. */
@@ -571,6 +644,9 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
                i = VAL__BADD;
                u = VAL__BADD;
                q = VAL__BADD;
+               vi = VAL__BADD;
+               vu = VAL__BADD;
+               vq = VAL__BADD;
 
 /* If the bolometer is good, calculate and store the q and u values. */
             } else {
@@ -585,6 +661,18 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
                s2 = 0.0;
                s3 = 0.0;
                n = 0.0;
+               rot = 0.0;
+               angle_l = VAL__BADD;
+
+               swq = 0.0;
+               swqq = 0.0;
+               swu = 0.0;
+               swuu = 0.0;
+               swi = 0.0;
+               swii = 0.0;
+               sw = 0.0;
+               sww = 0.0;
+               nrot = 0;
 
 /* Loop round all time slices. */
                pm = pdata->mean;
@@ -636,6 +724,44 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    series corresponding to the frequency introduced by the rotation of
    the half wave plate. */
                      angle = 2*phi;
+
+/* If we have now done the required amount of rotation, calculate new Q and
+   U values. */
+                     if( rot >= ROT_PER_SAMPLE ) {
+
+/* If we have sufficient points, calculate the I, Q and U values for the
+   revolution that has just ended, and then update the running sums used
+   to find the final values and variances. */
+                        if( n > limit2 ) {
+                           q = 4*s1/n;
+                           u = 4*s2/n;
+                           i = 2*s3/n;
+
+                           swq += n*q;
+                           swqq += n*q*q;
+                           swu += n*u;
+                           swuu += n*u*u;
+                           swi += n*i;
+                           swii += n*i*i;
+                           sw += n;
+                           sww += n*n;
+                           nrot++;
+                        }
+
+/* Prepare for a new revolution. */
+                        s1 = 0.0;
+                        s2 = 0.0;
+                        n = 0;
+                        rot = 0.0;
+                     }
+
+/* Increment the total rotation angle since the last calculation of Q and U. */
+                     dang = ( angle_l != VAL__BADD ) ? angle - angle_l : 0.0;
+                     while( dang < -AST__DPI ) dang += 2*AST__DPI;
+                     rot += dang;
+                     angle_l = angle;
+
+/* Increment the sums to include the current time slice. */
                      v = pm ? *din - *pm : *din;
                      s1 += v*cos( angle );
                      s2 += v*sin( angle );
@@ -650,13 +776,40 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
                   if( pm ) pm++;
                }
 
-/* Calculate the q, u and i values in the output NDF. The error on these values
-   will be enormous if there are not many values, so use a large lower limit.
-   These use the fixed analyser as the reference direction. */
-               if( n > limit ) {
-                  q0 = 4*s1/n;
-                  u0 = 4*s2/n;
+/* Add in the I, Q and U values determined from the final block. */
+               if( n > limit2 ) {
+                  q = 4*s1/n;
+                  u = 4*s2/n;
                   i = 2*s3/n;
+
+                  swq += n*q;
+                  swqq += n*q*q;
+                  swu += n*u;
+                  swuu += n*u*u;
+                  swi += n*i;
+                  swii += n*i*i;
+                  sw += n;
+                  sww += n*n;
+                  nrot++;
+               }
+
+/* Calculate the mean q, u and i values variances. These use the
+   fixed analyser as the reference direction. */
+               q = VAL__BADD;
+               u = VAL__BADD;
+               i = VAL__BADD;
+               vq = VAL__BADD;
+               vu = VAL__BADD;
+               vi = VAL__BADD;
+
+               if( sw > limit && nrot > 0 ) {
+                  msgOutiff( MSG__DEBUG, "", "Bolo %d split into %d values "
+                             "(%g samples per value)", status, (int) ibolo,
+                             nrot, sw/nrot );
+
+                  q0 = swq/sw;
+                  u0 = swu/sw;
+                  i = swi/sw;
 
 /* Modify Q and U so they use the focal plane Y as the reference direction. */
                   cosval = cos(2*angrot);
@@ -664,10 +817,19 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
                   q = -q0*cosval + u0*sinval;
                   u = -q0*sinval - u0*cosval;
 
-               } else {
-                  q = VAL__BADD;
-                  u = VAL__BADD;
-                  i = VAL__BADD;
+/* If we had at least 4 rotations, also calculate the variances, and
+   rotate them. */
+                  den = sw*sw - sww;
+                  if( den > 0 && nrot > 3 ) {
+                     vq0 = sww*( swqq/sw - q0*q0 )/den;
+                     vu0 = sww*( swuu/sw - u0*u0 )/den;
+                     vi = sww*( swii/sw - i*i )/den;
+
+                     vq = cosval*cosval*vq0 + sinval*sinval*vu0;
+                     vu = sinval*sinval*vq0 + cosval*cosval*vu0;
+
+                     pdata->gotvar = 1;
+                  }
                }
             }
 
@@ -676,10 +838,14 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    row, in order to produce the usual right-handed view of the sky. */
             ipix = ncol + ibolo - 2*( ibolo % ncol ) - 1;
 
-/* Store the q and u values in the output NDFs. */
+/* Store the values in the output NDFs. */
             ipq[ ipix ] = q;
             ipu[ ipix ] = u;
             if( ipi ) ipi[ ipix ] = i;
+
+            ipqv[ ipix ] = vq;
+            ipuv[ ipix ] = vu;
+            if( ipiv ) ipiv[ ipix ] = vi;
 
 /* Update the pointers to the first time slice data and quality value for
    the next bolometer. */

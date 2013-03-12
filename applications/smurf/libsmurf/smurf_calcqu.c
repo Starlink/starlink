@@ -45,6 +45,15 @@
 *     option (see configuration parameter SUBMEAN) to subtract the mean
 *     value from each time slice before using them to calculate Q and U.
 *
+*     Separate Q, U and I esimates are made for each half revolution of
+*     the half-wave plate. The Data values in the returned NDFs are the
+*     mean of these estimates. If there are four or more estimates per
+*     bolometer, the output will also contain Variance values for each
+*     bolometer (these variances represent the error on the final mean
+*     value, not the variance of the individual values). A warning
+*     message will be displayed if variances cannot be created due to
+*     insufficient input data.
+
 *     The current WCS Frame within the generated I, Q and U images will
 *     be SKY (e.g. Right Ascension/Declination).
 
