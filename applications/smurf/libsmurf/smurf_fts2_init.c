@@ -106,7 +106,7 @@ void smurf_fts2_init(int* status)
 {
   if( *status != SAI__OK ) { return; }
 
-  const double STAGE_CENTER = 225.0;    /* mm */
+  const double STAGE_CENTER = 228.0;    /* mm */
   Grp* gIn                  = NULL;     /* Input group */
   Grp* gOut                 = NULL;     /* Output group */
   Grp* gZpd                 = NULL;     /* ZPD group */
@@ -160,7 +160,7 @@ void smurf_fts2_init(int* status)
   int badPixel              = 0;
   int k0                    = 0;
   int indexZPD              = 0;
-
+  
   /* Get Input, Output and ZPD groups */
   kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
   kpg1Wgndf("OUT", gOut, nFiles, nFiles, "Equal number of input and output files expected!", &gOut, &nOutFiles, status);
@@ -176,7 +176,7 @@ void smurf_fts2_init(int* status)
     errRep(FUNC_NAME, "Unable to open the ZPD calibration file!", status);
     goto CLEANUP;
   }
-
+  
   /* Loop through each input file */
   for(fIndex = 1; fIndex <= nFiles; fIndex++) {
     /* Open Observation file */
@@ -292,6 +292,8 @@ void smurf_fts2_init(int* status)
 
         /* ZPD position in OPD grid */
         ZPD = *((double*) (zpdData->pntr[0]) + bolIndex);
+		/* Convert from mechanical mm (x 4) to optical cm (/ 10) */
+		ZPD = ZPD * 0.4;
 
         badPixel = 0;
         /* Read in interferogram */
@@ -323,9 +325,9 @@ void smurf_fts2_init(int* status)
           index = bolIndex + nPixels * k;
           *((double*)(outData->pntr[0]) + index) = gsl_spline_eval(SPLINE,  OPD_EVEN[k], ACC);
 
-          if(OPD_EVEN[k] <= ZPD) { indexZPD = k; }
+          if(OPD_EVEN[k] <= ZPD) { indexZPD = k;}
         }
-        *((int*) (zpd->pntr[0]) + bolIndex) = indexZPD;
+		*((int*) (zpd->pntr[0]) + bolIndex) = indexZPD;
       }
     }
 
