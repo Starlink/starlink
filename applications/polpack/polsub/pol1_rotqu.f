@@ -47,6 +47,8 @@
 *  History:
 *     17-DEC-2012 (DSB):
 *        Original version.
+*     12-MAR-2013 (DSB):
+*        Correct rotation of variance values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,6 +92,10 @@
 *  Calculate the trig terms in advance.
       COS2A = COS( 2*ANGLE*AST__DD2R )
       SIN2A = SIN( 2*ANGLE*AST__DD2R )
+      IF( VAR ) THEN
+         COS2A = COS2A**2
+         SIN2A = SIN2A**2
+      END IF
 
 *  Loop round all points.
       DO I = 1, EL
@@ -98,8 +104,14 @@
 
 *  If the values are good, calculate the rotated vector.
          IF( QVAL .NE. VAL__BADD .AND. UVAL .NE. VAL__BADD ) THEN
-            QOUT( I ) = QVAL*COS2A - UVAL*SIN2A
-            UOUT( I ) = UVAL*COS2A + QVAL*SIN2A
+            IF( VAR ) THEN
+               QOUT( I ) = QVAL*COS2A + UVAL*SIN2A
+               UOUT( I ) = UVAL*COS2A + QVAL*SIN2A
+            ELSE
+               QOUT( I ) = QVAL*COS2A - UVAL*SIN2A
+               UOUT( I ) = UVAL*COS2A + QVAL*SIN2A
+            END IF
+
          ELSE
             QOUT( I ) = VAL__BADD
             UOUT( I ) = VAL__BADD

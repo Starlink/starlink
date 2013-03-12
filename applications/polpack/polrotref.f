@@ -95,6 +95,8 @@
 *     7-JAN-2013 (DSB):
 *        Fix degs/rads conversion bug that caused incorrect POLANAL
 *        orientation in the output NDFs.
+*     12-MAR-2013 (DSB):
+*        Correct rotation of Variance values.
 *     {enter_further_changes_here}
 
 *-
@@ -324,14 +326,14 @@
       CALL NDF_STATE( INDFQI, 'Variance', QVAR, STATUS )
       CALL NDF_STATE( INDFUI, 'Variance', UVAR, STATUS )
       IF( QVAR .AND. UVAR ) THEN
-         CALL NDF_MAP( INDFQI, 'Data', '_DOUBLE', 'Read', IPQIN, EL,
+         CALL NDF_MAP( INDFQI, 'Variance', '_DOUBLE', 'Read', IPQIN, EL,
      :                 STATUS )
-         CALL NDF_MAP( INDFUI, 'Data', '_DOUBLE', 'Read', IPUIN, EL,
+         CALL NDF_MAP( INDFUI, 'Variance', '_DOUBLE', 'Read', IPUIN, EL,
      :                 STATUS )
-         CALL NDF_MAP( INDFQO, 'Data', '_DOUBLE', 'Write', IPQOUT, EL,
-     :                 STATUS )
-         CALL NDF_MAP( INDFUO, 'Data', '_DOUBLE', 'Write', IPUOUT, EL,
-     :                 STATUS )
+         CALL NDF_MAP( INDFQO, 'Variance', '_DOUBLE', 'Write', IPQOUT,
+     :                 EL, STATUS )
+         CALL NDF_MAP( INDFUO, 'Variance', '_DOUBLE', 'Write', IPUOUT,
+     :                 EL, STATUS )
          CALL POL1_ROTQU( EL, ANGLE, .TRUE., %VAL( CNF_PVAL( IPQIN ) ),
      :                    %VAL( CNF_PVAL( IPUIN ) ),
      :                    %VAL( CNF_PVAL( IPQOUT ) ),
