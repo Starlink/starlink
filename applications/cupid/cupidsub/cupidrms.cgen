@@ -86,6 +86,9 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
 *  History:
 *     5-OCT-2005 (DSB):
 *        Original version.
+*     15-MAR-2013 (DSB):
+*        Ensure max and min data value sinclude *all* data - including
+*        values adjacent to bad values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,25 +136,24 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
       wr = w;
       sum = 0.0;
       n = 0;
-      maxv = 0;
-      minv = 0;
+      maxv = CGEN_MIN;
+      minv = CGEN_MAX;
       for( irow = 0; irow < nrow; irow++ ){
          *(wr++) = CGEN_BAD;
          pr++;
          for( ipix = 1; ipix < rowlen - 1; ipix++, wr++, pr++ ){
-            if( pr[ -1 ] != CGEN_BAD &&
-                pr[ 0 ] != CGEN_BAD &&
-                pr[ 1 ] != CGEN_BAD ){
-               *wr = -pr[ -1 ] + 2*pr[ 0 ] - pr[ 1 ];
-               sum += ( *wr )*( *wr );
-               if( n == 0 ) {
-                  maxv = *pr;
-                  minv = *pr;
-               } else {
-                  if( *pr > maxv ) maxv = *pr;
-                  if( *pr < minv ) minv = *pr;
+            if( pr[ 0 ] != CGEN_BAD ) {
+
+               if( pr[ -1 ] != CGEN_BAD &&
+                   pr[ 1 ] != CGEN_BAD ){
+                  *wr = -pr[ -1 ] + 2*pr[ 0 ] - pr[ 1 ];
+                  sum += ( *wr )*( *wr );
+                  n++;
                }
-               n++;
+
+               if( *pr > maxv ) maxv = *pr;
+               if( *pr < minv ) minv = *pr;
+
             } else {
                *wr = CGEN_BAD;
             }
@@ -160,7 +162,7 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
          pr++;
       }
 
-      if( n == 0 ) {
+      if( n < 2 ) {
          *status = SAI__ERROR;
          errRep( "CUPIDRMS_ERR1", "The supplied data contains insufficient "
                  "good values to continue.", status );
