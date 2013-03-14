@@ -58,6 +58,11 @@
 *  History:
 *     29-MAR-2012 (DSB):
 *        Original version.
+*     14-MAR-2013 (DSB):
+*        - Fix bug in checks for neighbours being off the edge of the map.
+*        - When flagging adjoining clumps as source clumps, work down the
+*        tree of neighbouring clumps as well as up the tree.
+*        - Reduce the number of cleanings from 3 to 2.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -94,7 +99,7 @@
 #include "libsmf/smf.h"
 
 /* The number of cleaning iterations to perform on the returned mask. */
-#define NCLEAN 3
+#define NCLEAN 2
 
 /* Data types */
 typedef struct smfSnrMaskJobData {
@@ -130,6 +135,7 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
    int *table = NULL;
    int iass;
    int iclean;
+   int iclump;
    int ineb;
    int itemp;
    int itop1;
@@ -137,6 +143,7 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
    int iworker;
    int neb_offset[ 4 ];
    int nworker;
+   int ok;
    int rowstep;
    int top;
    smfSnrMaskJobData *job_data = NULL;
@@ -186,8 +193,17 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
 
 /* Get a pointer to the neighbouring clump index value, checking it is not off
    the edge of the array. */
-               psn = ps + neb_offset[ ineb ];
-               if( psn >= cindex ) {
+               if( ineb == 0 ) {
+                  ok = ( i > 0 );
+               } else if( ineb == 1 ) {
+                  ok = ( i > 0 && j > 0 );
+               } else if( ineb == 2 ) {
+                  ok = ( j > 0 );
+               } else {
+                  ok = ( i < dims[ 0 ] - 1 && j > 0 );
+               }
+               if( ok ) {
+                  psn = ps + neb_offset[ ineb ];
 
 /* If this neighbour is flagged as above the lower SNR limit (i.e. has a
    positive clump index), and the current pixel has not yet been assigned to
@@ -196,7 +212,7 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
                      if( *ps == 0 ) {
                         *ps = *psn;
 
-/* Find the clump index at the top of the tree contining the neighbouring pixel. */
+/* Find the clump index at the top of the tree containing the neighbouring pixel. */
                         itop1 = *psn;
                         while( table[ itop1 ] ) itop1 = table[ itop1 ];
 
@@ -276,7 +292,9 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
    value in the clump association table), the two clumps adjoins each other.
    So indicate that the second clump also contains "source" pixels by
    changing its table value to -1. Enter a loop to do this all the way up
-   to the top of the association tree (i.e for all adjoining clumps). */
+   to the top of the association tree. Note, this is not necessarily all
+   adjoining clumps, since we have only gone "up" the tree - there may be
+   other adjoining clumps lower down the tree. */
             while( iass > 0 ) {
                itemp =  table[ iass ];
                table[ iass ] = -1;
@@ -286,10 +304,51 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
       }
    }
 
+/* Now check all cumps to see if they adjoin a "source" clump. */
+   for( iclump = 0; iclump < top; iclump++ ) {
+      iass = table[ iclump ];
+
+/* Work up the tree of neighbouring clumps until we find a clump that has
+   an index of 0 or -1. If 0, it means that we have reached the top of
+   the tree without finding a "source" clump. If -1 it means we have
+   reached a source clump. */
+      while( iass > 0 ) {
+         iass =  table[ iass ];
+      }
+
+/* If we have found a source clump, then all clumps above it in the tree
+   should already be set to -1. We now walk up the tree from the current
+   clump until we reach the source clump, marking all intermediate clumps
+   as source clumps by setting them to -1 in the table. */
+      if( iass < 0 ) {
+         iass = table[ iclump ];
+         while( iass > 0 ) {
+            itemp =  table[ iass ];
+            table[ iass ] = -1;
+            iass = itemp;
+         }
+
+/* If no source clump was found, mark all intermediate clumps as
+   non-source by setting theem to zero in the table. This may give us a
+   little extra speed (maybe) since subsequent walks will terminate
+   sooner. */
+      } else {
+         iass = table[ iclump ];
+         while( iass > 0 ) {
+            itemp =  table[ iass ];
+            table[ iass ] = 0;
+            iass = itemp;
+         }
+      }
+   }
+
 /* One last pass, to store the final mask values. We can multi-thread
    this bit. Create structures used to pass information to the worker
-   threads. */
+   threads. If we have more threads than rows, we will process one row
+   in each thread and so we can reduce the number of threads used to
+   equal the number of rows. */
    nworker = wf ? wf->nworker : 1;
+   if( nworker > (int) dims[ 1 ] ) nworker = dims[ 1 ];
    job_data = astMalloc( nworker*sizeof( *job_data ) );
 
 /* Check we can de-reference the job data pointer safely. */
