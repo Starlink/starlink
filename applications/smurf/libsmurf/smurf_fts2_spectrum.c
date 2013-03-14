@@ -38,6 +38,7 @@
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
+*     MSHERWOOD: Matt Sherwood (UofL)
 
 *  History :
 *     2011-06-24 (COBA):
@@ -46,6 +47,8 @@
 *        Add Zero-Padding.
 *     2011-10-18 (COBA):
 *        Add subarray check.
+*     2013-03-12 (MSHERWOOD)
+*        Beginning to correct zeropadding
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -174,7 +177,7 @@ void smurf_fts2_spectrum(int* status)
     nHeight = inData->dims[1];
     nFrames = inData->dims[2];
     nPixels = nWidth * nHeight;
-
+	
     /* Check if the file is initialized for FTS2 processing */
     if(!(inData->fts) || !(inData->fts->zpd)) {
       *status = SAI__ERROR;
@@ -216,7 +219,7 @@ void smurf_fts2_spectrum(int* status)
     if (dataLabel) { one_strlcpy(outData->hdr->dlabel, dataLabel, sizeof(outData->hdr->dlabel), status ); }
 
     IFG  = astCalloc(N,  sizeof(*IFG));
-    SPEC = fftw_malloc((N2 + 1) * sizeof(*SPEC));
+    SPEC = fftw_malloc((N + 1) * sizeof(*SPEC));
 
     for(i = 0; i < nWidth; i++) {
       for(j = 0; j < nHeight; j++) {
