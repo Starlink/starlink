@@ -465,7 +465,7 @@ try:
          msg_out( "Removing spikes from {0} bolometer Q values...".format(a))
          qff = NDG(qarray)
          qff.comment = "qff"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[3,3,3\]"
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]"
                  .format(qarray,qff) )
 
 #  There seems to be a tendency for each bolometer to have its own fixed
@@ -514,7 +514,7 @@ try:
 #  Q images as a result of subtracting off the bolometer biases.
          qffb = NDG(qff)
          qffb.comment = "qffb"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[3,3,3\]".
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]".
                  format(qsub,qffb) )
 
 #  Remove the low frequency drift that seems to exist in the Q values for
@@ -550,7 +550,7 @@ try:
          msg_out( "Removing spikes from {0} bolometer U values...".format(a))
          uff = NDG(uarray)
          uff.comment = "uff"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[3,3,3\]"
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]"
                  .format(uarray,uff) )
 
          msg_out( "Removing background U level from {0} bolometers...".format(a))
@@ -579,7 +579,7 @@ try:
                  format(uff,unm,usub) )
          uffb = NDG(uff)
          uffb.comment = "uffb"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=3 clip=\[3,3,3\]".
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]".
                  format(usub,uffb) )
 
          ucube = NDG(1)
