@@ -156,12 +156,14 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
    it to hold zeros. */
    cindex = astCalloc( dims[ 0 ]*dims[ 1 ], sizeof( *cindex ) );
 
-/* Initiealise the pointer to the table holding associated clump indices. */
-   table = NULL;
-
 /* Initialise the index to assign to the next clump of pixels found above
    the lower SNR limit. Note, no clump is given an index of zero. */
    top = 1;
+
+/* Initialise the pointer to the table holding associated clump indices.
+   The first element is unused, so set it to a safe value of zero (i.e.
+   "no clump"). */
+   table = astCalloc( top, sizeof( *table ) );
 
 /* Set up the vector offsets to the three neighbouring pixels in the lower
    row, and the left hand neighbour in the current row. */
@@ -304,8 +306,10 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
       }
    }
 
-/* Now check all cumps to see if they adjoin a "source" clump. */
-   for( iclump = 0; iclump < top; iclump++ ) {
+/* Now check all cumps to see if they adjoin a "source" clump. Note, no
+   clumps are given the index zero, so we skip the first element of the
+   table. */
+   for( iclump = 1; iclump < top; iclump++ ) {
       iass = table[ iclump ];
 
 /* Work up the tree of neighbouring clumps until we find a clump that has
