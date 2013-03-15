@@ -63,6 +63,10 @@
 *        - When flagging adjoining clumps as source clumps, work down the
 *        tree of neighbouring clumps as well as up the tree.
 *        - Reduce the number of cleanings from 3 to 2.
+*     15-MAR-2013 (DSB):
+*        - Prevent segfault caused by erroneously using the
+*        uninitialised first value of the "table" arrays.
+*        - Further fixes to merging of adjoining clumps.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -325,7 +329,7 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
    clump until we reach the source clump, marking all intermediate clumps
    as source clumps by setting them to -1 in the table. */
       if( iass < 0 ) {
-         iass = table[ iclump ];
+         iass = iclump;
          while( iass > 0 ) {
             itemp =  table[ iass ];
             table[ iass ] = -1;
@@ -337,7 +341,7 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
    little extra speed (maybe) since subsequent walks will terminate
    sooner. */
       } else {
-         iass = table[ iclump ];
+         iass = iclump;
          while( iass > 0 ) {
             itemp =  table[ iass ];
             table[ iass ] = 0;
