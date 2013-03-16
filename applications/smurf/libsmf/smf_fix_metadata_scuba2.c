@@ -85,9 +85,11 @@
 *     2012-12-21 (DSB):
 *        Ensure that the RTS_END values used to recalculate STEPTIME are
 *        good.
+*     2013-03-15 (TIMJ):
+*        Recalculate start and end WVM taus using current algorithm.
 
 *  Copyright:
-*     Copyright (C) 2009-2011 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -132,6 +134,9 @@ struct FitsHeaderStruct {
   char instrume[81];
   char seq_type[81];
 };
+
+/* Local helper routines */
+static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, size_t index, double *tau, double * time, int * status );
 
 
 #define FUNC_NAME "smf_fix_metadata_scuba2"
@@ -377,6 +382,53 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     }
   }
 
+  /* We always recalculate the WVM start and end tau values so that the header
+     reflects something approximating the value that was actually used in the
+     extinction correction.
+
+     Note that smf_calc_smoothedwvm can do a better job because it has multiple
+     subarrays to get all the values from. We just have to try with what we
+     have from a single subarray. We do step into the time series until we
+     find something good. */
+  {
+    size_t i;
+    size_t nframes = hdr->nframes;
+    double starttau = VAL__BADD;
+    double starttime = VAL__BADD;
+    double endtau = VAL__BADD;
+    double endtime = VAL__BADD;
+
+    for (i=0; i < nframes; i++) {
+      smf__calc_wvm_index( hdr, "AMSTART", i, &starttau, &starttime, status );
+      if (starttau != VAL__BADD) break;
+    }
+
+    /* if we did not get a start tau we are not going to get an end tau */
+    if (starttau != VAL__BADD) {
+      for (i=0; i < nframes; i++) {
+        smf__calc_wvm_index( hdr, "AMEND", nframes - 1 - i, &endtau, &endtime, status );
+        if (endtau != VAL__BADD) break;
+      }
+    }
+
+    /* If we could not find any WVM readings then we have a bit of a problem.
+       Do we clear the FITS headers or do we leave them untouched? Leave them
+       alone for now. */
+    if (starttau != VAL__BADD && starttime != VAL__BADD) {
+      smf_fits_updateD( hdr, "WVMTAUST", starttau, "186GHz Tau from JCMT WVM at start", status );
+      /* Convert startime MJD to ISO format */
+      /* smf_fits_updateS( hdr, "WVMDATST", isostr, "Time of WVMTAUST", status ); */
+    }
+
+    if (endtau != VAL__BADD && endtime != VAL__BADD) {
+      smf_fits_updateD( hdr, "WVMTAUEN", endtau, "186GHz Tau from JCMT WVM at end", status );
+      /* Convert endtime MJD to ISO format */
+      /* smf_fits_updateS( hdr, "WVMDATEN", isostr, "Time of WVMTAUEN", status ); */
+    }
+
+  }
+
+
   /* SEQ_TYPE header turned up in 20091125. Before that date the SEQ_TYPE only
      had two values. If the shutter was open then SEQ_TYPE is just OBS_TYPE. In the
      dark only a FLATFIELD sometimes finished with a noise but in that case CALCFLAT
@@ -483,4 +535,26 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
 
 
   return have_fixed;
+}
+
+
+static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, size_t index, double *tau, double * time, int * status ) {
+  double approxam = VAL__BADD;
+  *tau = VAL__BADD;
+  *time = VAL__BADD;
+
+  if (*status != SAI__OK) return;
+
+  smf_getfitsd( hdr, amhdr, &approxam, status );
+
+  /* This saves us calling smf_tslice_ast as it is the only thing that needs to be set for smf_calc_wvm to run */
+  hdr->state = &((hdr->allState)[index]);
+  if (hdr->state->wvm_time != VAL__BADD) {
+    double thistau = smf_calc_wvm( hdr, approxam, NULL, status );
+    if (thistau != VAL__BADD) {
+      *tau = thistau;
+      *time = hdr->state->wvm_time;
+    }
+  }
+  return;
 }
