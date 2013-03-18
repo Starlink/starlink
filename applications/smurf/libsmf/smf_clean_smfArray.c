@@ -235,8 +235,8 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
   }
 
   /* Get cleaning parameters */
-  smf_get_cleanpar( keymap, array->sdata[0], &badfrac, &dcfitbox, &dcmaxsteps,
-                    &dcthresh, &dcsmooth, &dclimcorr, &dkclean,
+  smf_get_cleanpar( keymap, NULL, array->sdata[0], &badfrac, &dcfitbox,
+                    &dcmaxsteps, &dcthresh, &dcsmooth, &dclimcorr, &dkclean,
                     NULL, &zeropad, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
                     &spikethresh, &spikebox, &noisecliphigh, &noisecliplow,
@@ -542,7 +542,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
        smf_filter_execute). */
 
     filt = smf_create_smfFilter( data, status );
-    smf_filter_fromkeymap( filt, keymap, data->hdr, &dofft, &whiten, status );
+    smf_filter_fromkeymap( filt, keymap, NULL, data->hdr, &dofft, &whiten, status );
 
     if( (*status == SAI__OK) && dofft ) {
       msgOutif( MSG__VERB, "", FUNC_NAME ": frequency domain filter", status );

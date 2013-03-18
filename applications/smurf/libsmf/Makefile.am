@@ -263,6 +263,7 @@ smf_instap_get.c \
 smf_isdark.c \
 smf_isfft.c \
 smf_iteratemap.c \
+smf_keyname.c \
 smf_km2ext.c \
 smf_kmmerge.c \
 smf_labelunit.c \

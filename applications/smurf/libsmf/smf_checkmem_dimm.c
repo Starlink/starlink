@@ -236,7 +236,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
      pre-processing. If so, we need an extra nsamp-sized buffer to
      store the FFT. */
 
-  smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+  smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     &dofft, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,

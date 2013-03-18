@@ -13,7 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
+*     smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
+*                       const smfData *data, double *badfrac,
 *                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
 *                       dim_t *dcsmooth, int *dclimcorr, int *dkclean,
 *                       int *fillgaps, int *zeropad, double *filt_edgelow,
@@ -32,6 +33,14 @@
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters
+*     qualifier = const char * (Given)
+*        A string which is added to the end of the usual "base" configuration
+*        parameter names. For instance, "_LAST" could be used in order to
+*        use an alternate set of parameters names that are like the usual
+*        parameter names but with "_LAST" appended to the end. If the
+*        qualified parameter name has an <undef> value, then the unqualified
+*        parameter name is used instead. Should be NULL to use the normal
+*        base parameter names.
 *     data = const smfData  * (Given)
 *        Pointer to a smfData that is used to define the sample rate
 *        needed when converting parameter values form seconds to time
@@ -207,6 +216,8 @@
 *        Add argument "deconvmce".
 *     2013-02-18 (DSB):
 *        Add argument "filt_edgewidth".
+*     2013-03-18 (DSB):
+*        Added argument "qualifier".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -255,7 +266,8 @@
 
 #define FUNC_NAME "smf_get_cleanpar"
 
-void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
+void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
+                       const smfData *data, double *badfrac,
                        dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
                        dim_t *dcsmooth, int *dclimcorr, int *dkclean,
                        int *fillgaps, int *zeropad, double *filt_edgelow,
@@ -271,6 +283,8 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
                        int *deconvmce, double *delay, double *filt_edgewidth,
                        int *status ) {
 
+  char buf[255];                /* Buffer for qualified parameter names */
+  const char *key;              /* Pointer to used parameter name */
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
   int f_nnotch2=0;              /* Number of notch filters in array */
@@ -285,169 +299,184 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
 
   if( badfrac ) {
     *badfrac = 0.0;
-    astMapGet0D( keymap, "BADFRAC", badfrac );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": BADFRAC=%f", status,
+    key = smf_keyname( keymap, "BADFRAC", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, badfrac );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *badfrac );
   }
 
   if( dcfitbox ) {
     *dcfitbox = 0;
-    smf_get_nsamp( keymap, "DCFITBOX", data, dcfitbox, status );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCFITBOX=%" DIM_T_FMT, status,
-               *dcfitbox );
+    key = smf_keyname( keymap, "DCFITBOX", qualifier, buf, sizeof( buf ), status );
+    smf_get_nsamp( keymap, key, data, dcfitbox, status );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%" DIM_T_FMT, status,
+               key, *dcfitbox );
   }
 
   if( dcmaxsteps ) {
     *dcmaxsteps = 0;
-    astMapGet0I( keymap, "DCMAXSTEPS", &temp );
+    key = smf_keyname( keymap, "DCMAXSTEPS", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, &temp );
     if( (temp < 0) ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DCMAXSTEPS must be 0 or more.", status );
+      errRepf(FUNC_NAME, "%s must be 0 or more.", status, key );
     } else {
       *dcmaxsteps = temp;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMAXSTEPS=%i", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%i", status, key,
                *dcmaxsteps );
   }
 
   if( dclimcorr ) {
     *dclimcorr = 0;
-    astMapGet0I( keymap, "DCLIMCORR", dclimcorr );
+    key = smf_keyname( keymap, "DCLIMCORR", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, dclimcorr );
     if( *dclimcorr < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DCMLIMCORR must be 0 or more.", status );
+      errRepf(FUNC_NAME, "%s must be 0 or more.", status, key );
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCLIMCORR=%i", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%i", status, key,
                *dclimcorr );
   }
 
   if( dcthresh ) {
     *dcthresh = 0;
-    astMapGet0D( keymap, "DCTHRESH", dcthresh );
+    key = smf_keyname( keymap, "DCTHRESH", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, dcthresh );
     if( *dcthresh < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DCTHRESH must be >= 0.", status );
+      errRepf(FUNC_NAME, "%s must be >= 0.", status, key );
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCTHRESH=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *dcthresh );
   }
 
   if( dcsmooth ) {
     *dcsmooth = 0;
-    smf_get_nsamp( keymap, "DCSMOOTH", data, dcsmooth, status );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCSMOOTH=%" DIM_T_FMT, status,
+    key = smf_keyname( keymap, "DCSMOOTH", qualifier, buf, sizeof( buf ), status );
+    smf_get_nsamp( keymap, key, data, dcsmooth, status );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%" DIM_T_FMT, status, key,
                *dcsmooth );
   }
 
   if( dkclean ) {
     *dkclean = 0;
-    astMapGet0I( keymap, "DKCLEAN", &temp );
+    key = smf_keyname( keymap, "DKCLEAN", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, &temp );
     if( temp != 0 && temp != 1 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DKCLEAN must be either 0 or 1.", status );
+      errRepf(FUNC_NAME, "%s must be either 0 or 1.", status, key );
     } else {
       *dkclean = temp;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DKCLEAN is %s", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s is %s", status, key,
                (*dkclean ? "enabled" : "disabled") );
   }
 
   if( fillgaps ) {
     *fillgaps = 0;
-    astMapGet0I( keymap, "FILLGAPS", &temp );
+    key = smf_keyname( keymap, "FILLGAPS", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, &temp );
     if( (temp != 0) && (temp != 1) ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "FILLGAPS must be either 0 or 1.", status );
+      errRepf(FUNC_NAME, "%s must be either 0 or 1.", status, key );
     } else {
       *fillgaps = temp;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILLGAPS is %s", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s is %s", status, key,
                (*fillgaps ? "enabled" : "disabled" ) );
   }
 
   if( zeropad ) {
     *zeropad = 1;
-    astMapGet0I( keymap, "ZEROPAD", &temp );
+    key = smf_keyname( keymap, "ZEROPAD", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, &temp );
     if( (temp != 0) && (temp != 1) ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "ZEROPAD must be either 0 or 1.", status );
+      errRepf(FUNC_NAME, "%s must be either 0 or 1.", status, key );
     } else {
       *zeropad = temp;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ZEROPAD is %s", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s is %s", status, key,
                (*zeropad ? "enabled" : "disabled" ) );
   }
 
   if( filt_edgelow ) {
     *filt_edgelow = 0;
-    astMapGet0D( keymap, "FILT_EDGELOW", filt_edgelow );
+    key = smf_keyname( keymap, "FILT_EDGELOW", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, filt_edgelow );
 
     if( *filt_edgelow ) {
       dofft = 1;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGELOW=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *filt_edgelow );
   }
 
   if( filt_edgehigh ) {
     *filt_edgehigh = 0;
-    astMapGet0D( keymap, "FILT_EDGEHIGH", filt_edgehigh );
+    key = smf_keyname( keymap, "FILT_EDGEHIGH", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, filt_edgehigh );
 
     if( *filt_edgehigh ) {
       dofft = 1;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGEHIGH=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *filt_edgehigh );
   }
 
   if( filt_edge_largescale ) {
     *filt_edge_largescale = 0;
-    astMapGet0D( keymap, "FILT_EDGE_LARGESCALE", filt_edge_largescale );
+    key = smf_keyname( keymap, "FILT_EDGE_LARGESCALE", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, filt_edge_largescale );
 
     if( *filt_edge_largescale ) {
       dofft = 1;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGE_LARGESCALE=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *filt_edge_largescale );
   }
 
   if( filt_edge_smallscale ) {
     *filt_edge_smallscale = 0;
-    astMapGet0D( keymap, "FILT_EDGE_SMALLSCALE", filt_edge_smallscale );
+    key = smf_keyname( keymap, "FILT_EDGE_SMALLSCALE", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, filt_edge_smallscale );
 
     if( *filt_edge_smallscale ) {
       dofft = 1;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGE_SMALLSCALE=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *filt_edge_smallscale );
   }
 
   if( filt_edgewidth ) {
     *filt_edgewidth = 0;
-    astMapGet0D( keymap, "FILT_EDGEWIDTH", filt_edgewidth );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGEWIDTH=%f", status,
+    key = smf_keyname( keymap, "FILT_EDGEWIDTH", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, filt_edgewidth );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *filt_edgewidth );
   }
 
   if( filt_notchlow ) {
-    if( !astMapGet1D( keymap, "FILT_NOTCHLOW", SMF__MXNOTCH, &f_nnotch,
-                      filt_notchlow ) ) {
+    key = smf_keyname( keymap, "FILT_NOTCHLOW", qualifier, buf, sizeof( buf ), status );
+    if( !astMapGet1D( keymap, key, SMF__MXNOTCH, &f_nnotch, filt_notchlow ) ) {
       f_nnotch=0;
     }
   }
 
   if( filt_notchhigh ) {
-    if( !astMapGet1D( keymap, "FILT_NOTCHHIGH", SMF__MXNOTCH, &f_nnotch2,
+    key = smf_keyname( keymap, "FILT_NOTCHHIGH", qualifier, buf, sizeof( buf ), status );
+    if( !astMapGet1D( keymap, key, SMF__MXNOTCH, &f_nnotch2,
                       filt_notchhigh ) ) {
       f_nnotch2=0;
     }
@@ -484,8 +513,9 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
   }
 
   if( whiten ) {
-    astMapGet0I( keymap, "WHITEN", whiten );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": WHITEN is %s", status,
+    key = smf_keyname( keymap, "WHITEN", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, whiten );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s is %s", status, key,
                (*whiten ? "enabled" : "disabled") );
 
     if( *whiten ) {
@@ -501,170 +531,185 @@ void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
 
   if( flagslow ) {
     *flagslow = 0;
-    astMapGet0D( keymap, "FLAGSLOW", flagslow );
+    key = smf_keyname( keymap, "FLAGSLOW", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, flagslow );
     if( *flagslow < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "FLAGSLOW cannot be < 0.", status );
+      errRepf(FUNC_NAME, "%s cannot be < 0.", status, key );
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FLAGSLOW=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *flagslow );
   }
 
   if( flagfast ) {
     *flagfast = 0;
-    astMapGet0D( keymap, "FLAGFAST", flagfast );
+    key = smf_keyname( keymap, "FLAGFAST", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, flagfast );
     if( *flagfast < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "FLAGFAST cannot be < 0.", status );
+      errRepf(FUNC_NAME, "%s cannot be < 0.", status, key );
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FLAGFAST=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *flagfast );
   }
 
   if( order ) {
     *order = -1;
-    astMapGet0I( keymap, "ORDER", order );
+    key = smf_keyname( keymap, "ORDER", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, order );
     if( *order < -1 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "ORDER must be >= -1", status );
+      errRepf(FUNC_NAME, "%s must be >= -1", status, key );
     }
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ORDER=%i", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%i", status, key,
                *order );
   }
 
   if( spikethresh ) {
     *spikethresh = 0;
-    astMapGet0D( keymap, "SPIKETHRESH", spikethresh );
+    key = smf_keyname( keymap, "SPIKETHRESH", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, spikethresh );
     if( *spikethresh < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "SPIKETHRESH must be >= 0.", status );
+      errRepf(FUNC_NAME, "%s must be >= 0.", status, key );
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKETHRESH=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *spikethresh );
   }
 
   if( spikebox ) {
     *spikebox = 0;
-    smf_get_nsamp( keymap, "SPIKEBOX", data, spikebox, status );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKEBOX=%" DIM_T_FMT, status,
+    key = smf_keyname( keymap, "SPIKEBOX", qualifier, buf, sizeof( buf ), status );
+    smf_get_nsamp( keymap, key, data, spikebox, status );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%" DIM_T_FMT, status, key,
                *spikebox );
   }
 
   if( noisecliphigh ) {
-    astMapGet0D( keymap, "NOISECLIPHIGH", noisecliphigh );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": NOISECLIPHIGH=%g", status,
-               *noisecliphigh );
+    key = smf_keyname( keymap, "NOISECLIPHIGH", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, noisecliphigh );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%g", status, key, *noisecliphigh );
   }
 
   if( noisecliplow ) {
-    astMapGet0D( keymap, "NOISECLIPLOW", noisecliplow );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": NOISECLIPLOW=%g", status,
+    key = smf_keyname( keymap, "NOISECLIPLOW", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, noisecliplow );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%g", status, key,
                *noisecliplow );
   }
 
   if( compreprocess ) {
-    astMapGet0I( keymap, "COMPREPROCESS", compreprocess );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": COMPREPROCESS is %s", status,
+    key = smf_keyname( keymap, "COMPREPROCESS", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, compreprocess );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s is %s", status, key,
                (*compreprocess ? "enabled" : "disabled") );
   }
 
   if( pcalen ) {
     *pcalen = 0;
-    smf_get_nsamp( keymap, "PCALEN", data, pcalen, status );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": PCALEN=%" DIM_T_FMT, status,
+    key = smf_keyname( keymap, "PCALEN", qualifier, buf, sizeof( buf ), status );
+    smf_get_nsamp( keymap, key, data, pcalen, status );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%" DIM_T_FMT, status, key,
                *pcalen );
   }
 
   if( pcathresh ) {
     *pcathresh = 0;
-    astMapGet0D( keymap, "PCATHRESH", pcathresh );
+    key = smf_keyname( keymap, "PCATHRESH", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, pcathresh );
     if( *pcathresh < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "PCATHRESH must be >= 0.", status );
+      errRepf(FUNC_NAME, "%s must be >= 0.", status, key );
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": PCATHRESH=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *pcathresh );
   }
 
   if( groupsubarray ) {
     *groupsubarray = 0;
-    astMapGet0I( keymap, "GROUPSUBARRAY", &temp );
+    key = smf_keyname( keymap, "GROUPSUBARRAY", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, &temp );
 
     if( (temp != 0) && (temp != 1) ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "GROUPSUBARRAY must be either 0 or 1.", status );
+      errRepf(FUNC_NAME, "%s must be either 0 or 1.", status, key );
     } else {
       *groupsubarray = temp;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": GROUPSUBARRAY is %s", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s is %s", status, key,
                (*groupsubarray ? "enabled" : "disabled" ) );
   }
 
   if( downsampscale ) {
     *downsampscale = 0;
 
-    astMapGet0D( keymap, "DOWNSAMPSCALE", downsampscale );
+    key = smf_keyname( keymap, "DOWNSAMPSCALE", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, downsampscale );
 
     if( *downsampscale < 0 ) {
-      msgOutif( MSG__DEBUG, "", FUNC_NAME
-                ": WARNING can't convert downsampscale < 0 to a frequency, "
-                "skipping.", status );
+      msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                ": WARNING can't convert %s < 0 to a frequency, "
+                "skipping.", status, key );
       *downsampscale = 0;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DOWNSAMPSCALE=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *downsampscale );
   }
 
   if( downsampfreq ) {
     *downsampfreq = 0;
-    astMapGet0D( keymap, "DOWNSAMPFREQ", downsampfreq );
+    key = smf_keyname( keymap, "DOWNSAMPFREQ", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, downsampfreq );
     if( *downsampfreq < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DOWNSAMPFREQ must be >= 0.", status );
+      errRepf(FUNC_NAME, "%s must be >= 0.", status, key );
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DOWNSAMPFREQ=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *downsampfreq );
   }
 
   if( noiseclipprecom ) {
     *noiseclipprecom = 0;
-    astMapGet0I( keymap, "NOISECLIPPRECOM", &temp );
+    key = smf_keyname( keymap, "NOISECLIPPRECOM", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, &temp );
     if( temp != 0 && temp != 1 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "NOISECLIPPRECOM must be either 0 or 1.", status );
+      errRepf(FUNC_NAME, "%s must be either 0 or 1.", status, key );
     } else {
       *noiseclipprecom = temp;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": NOISECLIPPRECOM is %s", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s is %s", status, key,
                (*noiseclipprecom ? "enabled" : "disabled") );
   }
 
   if( deconvmce ) {
     *deconvmce = 0;
-    astMapGet0I( keymap, "DECONVMCE", &temp );
+    key = smf_keyname( keymap, "DECONVMCE", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, &temp );
     if( temp != 0 && temp != 1 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DECONVMCE must be either 0 or 1.", status );
+      errRepf(FUNC_NAME, "%s must be either 0 or 1.", status, key );
     } else {
       *deconvmce = temp;
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DECONVMCE is %s", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s is %s", status, key,
                (*deconvmce ? "enabled" : "disabled") );
   }
 
   if( delay ) {
     *delay = 0.0;
-    astMapGet0D( keymap, "DELAY", delay );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DELAY=%f", status,
+    key = smf_keyname( keymap, "DELAY", qualifier, buf, sizeof( buf ), status );
+    astMapGet0D( keymap, key, delay );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
                *delay );
   }
 

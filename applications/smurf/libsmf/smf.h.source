@@ -1028,8 +1028,8 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
                          int complement, int whiten, int *status );
 
 void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
-                            const smfHead *hdr, int *dofft, int *whiten,
-                            int *status );
+                            const char *qualifier, const smfHead *hdr,
+                            int *dofft, int *whiten, int *status );
 
 void smf_filter_ident( smfFilter *filt, int complex, int *status );
 
@@ -1261,7 +1261,8 @@ int  smf_gauest( const double y[], int n, double *p, int np, double rms,
 
 void smf_geod( const double pos[3], double *phi, double *h, double *lambda );
 
-void smf_get_cleanpar( AstKeyMap *keymap, const smfData *data, double *badfrac,
+void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
+                       const smfData *data, double *badfrac,
                        dim_t *dcbox, int *dcbad, double *dcthresh,
                        dim_t *dcsmooth, int *dclimcorr, int *dkclean,
                        int *fillgaps, int *zeropad, double *filt_edgelow,
@@ -1401,6 +1402,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      char data_units[], double * nboloeff,
                      size_t *numcontchunks, size_t *numinsmp,
                      size_t *numcnvg, int *status );
+
+const char *smf_keyname( AstKeyMap *keymap, const char *basename,
+                         const char *qualifier, char *buf, size_t lbuf,
+                         int *status );
 
 void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap,
                  int *timeout, int *status );

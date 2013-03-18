@@ -46,7 +46,6 @@
 ^$SMURF_DIR/smurf_extinction.def
 
 
-
 #-----------------------------------------------------------------
 #  Name: 	ast.gaussbg
 #  Type: 	real
@@ -886,15 +885,37 @@ flt.apod = <undef>
 850.flt.filt_edge_largescale=300
 
 #-----------------------------------------------------------------
+#  Name: 	flt.filt_edge_largescale_last
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Specifies the largest scale size to be retained by the
+#		FLT model on the last iteration.
+#  Description: This is the value to be used for parameter "flt.filt_edge_largescale"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+flt.filt_edge_largescale_last=<undef>
+
+#-----------------------------------------------------------------
 #  Name: 	flt.filt_edge_smallscale
 #  Type: 	real
 #  Default: 	0
-#  Purpose: 	Specifies the smallest largest scale size to be retained by the
+#  Purpose: 	Specifies the smallest scale size to be retained by the
 #		FLT model.
 #  Description: If non-zero, features with spatial sizes less than this
 #		value (in arcsec) will be removed by the FLT model. See
 #		parameter "flt.filt_edge_largescale".
 flt.filt_edge_smallscale = 0
+
+#-----------------------------------------------------------------
+#  Name: 	flt.filt_edge_smallscale_last
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Specifies the smallest scale size to be retained by the
+#		FLT model on the last iteration.
+#  Description: This is the value to be used for parameter "flt.filt_edge_smallscale"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+flt.filt_edge_smallscale_last=<undef>
 
 #-----------------------------------------------------------------
 #  Name: 	flt.filt_edgehigh
@@ -908,6 +929,17 @@ flt.filt_edge_smallscale = 0
 flt.filt_edgehigh = 0
 
 #-----------------------------------------------------------------
+#  Name: 	flt.filt_edgehigh_last
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Specifies the lowest frequency to be retained by the FLT model
+#               on the last iteration.
+#  Description: This is the value to be used for parameter "flt.filt_edgehigh"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+flt.filt_edgehigh_last = <undef>
+
+#-----------------------------------------------------------------
 #  Name: 	flt.filt_edgelow
 #  Type: 	real
 #  Default: 	0
@@ -917,6 +949,17 @@ flt.filt_edgehigh = 0
 #		part of the FLT model. See also parameter
 #		"flt.filt_edge_largescale".
 flt.filt_edgelow = 0
+
+#-----------------------------------------------------------------
+#  Name: 	flt.filt_edgelow_last
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Specifies the highest frequency to be retained by the FLT model
+#               on the last iteration.
+#  Description: This is the value to be used for parameter "flt.filt_edgelow"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+flt.filt_edgelow_last = 0
 
 #-----------------------------------------------------------------
 #  Name: 	flt.filt_edgewidth
@@ -936,6 +979,17 @@ flt.filt_edgelow = 0
 flt.filt_edgewidth = 0
 
 #-----------------------------------------------------------------
+#  Name: 	flt.filt_edgewidth_last
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Indicates if the edge filter is hard or soft edged on the
+#               last iteration.
+#  Description: This is the value to be used for parameter "flt.filt_edgewidth"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+flt.filt_edgewidth_last = 0
+
+#-----------------------------------------------------------------
 #  Name: 	flt.filt_notchhigh
 #  Type: 	real
 #  Default: 	<undef>
@@ -952,6 +1006,17 @@ flt.filt_edgewidth = 0
 flt.filt_notchhigh = <undef>
 
 #-----------------------------------------------------------------
+#  Name: 	flt.filt_notchhigh_last
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Specifies additional frequencies to be removed by the FLT model
+#               on the last iteration.
+#  Description: This is the value to be used for parameter "flt.filt_notchhigh"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+flt.filt_notchhigh_last = <undef>
+
+#-----------------------------------------------------------------
 #  Name: 	flt.filt_notchlow
 #  Type: 	real
 #  Default: 	<undef>
@@ -966,6 +1031,17 @@ flt.filt_notchhigh = <undef>
 #		flt.filt_notchhigh parameters should contain the same
 #		number of frequencies.
 flt.filt_notchlow = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	flt.filt_notchlow_last
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Specifies additional frequencies to be removed by the FLT model
+#               on the last iteration.
+#  Description: This is the value to be used for parameter "flt.filt_notchlow"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+flt.filt_notchlow_last = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	flt.filt_wlim
@@ -990,6 +1066,16 @@ flt.filt_notchlow = <undef>
 #		used the following additional settings can be made: "apod=0,
 #		fillgaps=0, noi.fillgaps=0".
 flt.filt_wlim = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	flt.filt_wlim_last
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Enables an experimental filtering method on the last iteration.
+#  Description: This is the value to be used for parameter "flt.filt_wlim"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+flt.filt_wlim_last = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	flt.notfirst
@@ -1019,6 +1105,16 @@ flt.undofirst = 1
 #  Description: If non-zero, then a whitening filter will be applied to
 #		each time stream prior to apply the other FLT filters.
 flt.whiten = 0
+
+#-----------------------------------------------------------------
+#  Name: 	flt.whiten_last
+#  Type: 	integer
+#  Default: 	<undef>
+#  Purpose: 	Experimental.
+#  Description: This is the value to be used for parameter "flt.whiten"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+flt.whiten_last = 0
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zero_circle
@@ -1169,6 +1265,17 @@ flt.zero_union = 1
 #		In both cases, the purpose is to remove sharp edges that may
 #		cause ringing in the FFT filtering steps.
 flt.zeropad = 0
+
+#-----------------------------------------------------------------
+#  Name: 	flt.zeropad_last
+#  Type: 	integer
+#  Default: 	<undef>
+#  Purpose: 	Avoid unnecessary loss of data due to apodisation on the
+#               last iteration.
+#  Description: This is the value to be used for parameter "flt.zeropad"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+flt.zeropad_last = 0
 
 #-----------------------------------------------------------------
 #  Name: 	importsky

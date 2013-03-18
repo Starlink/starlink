@@ -78,8 +78,11 @@
 *        start of the iteration, rather than just before finding the new FLT
 *        model. This is controlled by config parameter FLT.UNDOFIRST.
 *     2013-02-17 (DSB):
-*        Do not modify the flt mask to exclude unused map pixels on the first 
+*        Do not modify the flt mask to exclude unused map pixels on the first
 *        iteration as the map has not yet been determined.
+*     2013-03-18 (DSB):
+*        Allow a different filter size to be used on the last iteration
+*        (specified by parameters "FLT.xxx_LAST").
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -201,9 +204,9 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
      the FLT model. */
   mask = smf_get_mask( wf, SMF__FLT, keymap, dat, flags, status );
 
-  /* If we have a mask, copy it into the quality array of the map. 
-     Also set map pixels that are not used (e.g. corner pixels, etc) 
-     to be background pixels in the mask. Do not do this on the firrst 
+  /* If we have a mask, copy it into the quality array of the map.
+     Also set map pixels that are not used (e.g. corner pixels, etc)
+     to be background pixels in the mask. Do not do this on the firrst
      iteration as the map has not yet been determined.*/
   if( mask ) {
     double *map = dat->map;
@@ -346,8 +349,11 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
         /* Create a filter */
         filt = smf_create_smfFilter( res->sdata[idx], status );
-        smf_filter_fromkeymap( filt, kmap, res->sdata[idx]->hdr, &dofft,
-                               &whiten, status );
+
+
+        smf_filter_fromkeymap( filt, kmap,
+                               (flags & SMF__DIMM_LASTITER) ? "_LAST" : NULL,
+                               res->sdata[idx]->hdr, &dofft, &whiten, status );
 
         if( *status == SMF__INFREQ ) {
           /* If a bad frequency was specified just annul the error and

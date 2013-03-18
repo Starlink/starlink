@@ -298,7 +298,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   /* Get downsampling parameters */
 
   if( keymap ) {
-    smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       NULL, NULL, NULL, NULL, &downsampscale, &downsampfreq,

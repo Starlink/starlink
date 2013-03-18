@@ -13,7 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, smfHead *hdr,
+*     smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
+*                            const char *qualifier, smfHead *hdr,
 *                            int *dofilt, int *whiten, int *status )
 
 *  Arguments:
@@ -21,6 +22,14 @@
 *        Pointer to smfFilter to be modified
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters
+*     qualifier = const char * (Given)
+*        A string which is added to the end of the usual "base" configuration
+*        parameter names. For instance, "_LAST" could be used in order to use
+*        an alternate set of parameters names that are like the usual parameter
+*        names but with "_LAST" appended to the end. If the qualified
+*        parameter name has an <undef> value, then the unqualified parameter
+*        name is used instead. Should be NULL to use the normal base parameter
+*        names.
 *     hdr = smfHead *(Given)
 *        Required if filt_edge_smallscale/largscale requested, otherwise can
 *        be NULL.
@@ -63,6 +72,8 @@
 *     2011-04-14 (DSB):
 *        Store an apodisation length of SMF__BADSZT if no apodisation is
 *        required because we are padding with artifical data.
+*     2013-03-18 (DSB):
+*        Added argument "qualifier".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -108,10 +119,11 @@
 
 #define FUNC_NAME "smf_filter_fromkeymap"
 
-void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
+void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qualifier,
                             const smfHead *hdr, int *dofilt, int *whiten,
                             int *status ) {
 
+  char buf[255];            /* Buffer for qualified parameter names */
   int dofft=0;              /* Set if freq. domain filtering the data */
   double f_edgelow;         /* Freq. cutoff for low-pass edge filter */
   double f_edgehigh;        /* Freq. cutoff for high-pass edge filter */
@@ -146,8 +158,8 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
   /* Search for filtering parameters in the keymap. None of these
      parameters represent a number of time clies, so we can set the
      smfData (the 2nd argument) to NULL. */
-  smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                    NULL, NULL, &f_edgelow, &f_edgehigh, &f_edgesmall,
+  smf_get_cleanpar( keymap, qualifier, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                    NULL, NULL, NULL, &f_edgelow, &f_edgehigh, &f_edgesmall,
                     &f_edgelarge, f_notchlow, f_notchhigh, &f_nnotch, &dofft,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, &whitening, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &f_edgewidth,
@@ -176,10 +188,12 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
   /* If filtering parameters given, create filter  */
   if( dofft ) {
     if( f_edgelow ) {
+printf("EDGELOW %g\n", f_edgelow );
       smf_filter_edge( filt, f_edgelow, f_width, 1, status );
     }
 
     if( f_edgehigh ) {
+printf("EDGEHIGH %g\n", f_edgehigh );
       smf_filter_edge( filt, f_edgehigh, f_width, 0, status );
     }
 
@@ -187,7 +201,9 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
       smf_filter_notch( filt, f_notchlow, f_notchhigh, f_nnotch, status );
     }
 
-    if( ! astMapGet0D( keymap, "FILT_WLIM", &(filt->wlim) ) ) {
+    if( ! astMapGet0D( keymap, smf_keyname( keymap, "FILT_WLIM", qualifier,
+                                            buf, sizeof( buf ), status ),
+                                            &(filt->wlim) ) ) {
        filt->wlim = VAL__BADD;
     }
 
@@ -195,8 +211,12 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
     /* If no apodisation length has been given, use a default of
        1/(steptime*freq) where freq is the lowest edge or notch
        frequency. We only apodise if we are padding data with zeros. */
-    if( astMapGet0I( keymap, "ZEROPAD", &ival ) && ival ) {
-       if( astMapGet0I( keymap, "APOD", &ival ) ) {
+    if( astMapGet0I( keymap, smf_keyname( keymap, "ZEROPAD", qualifier,
+                                          buf, sizeof( buf ), status ),
+                                          &ival ) && ival ) {
+       if( astMapGet0I( keymap, smf_keyname( keymap, "APOD", qualifier,
+                                             buf, sizeof( buf ), status ),
+                                             &ival ) ) {
           filt->apod_length = ival;
 
        } else {

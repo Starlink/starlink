@@ -265,7 +265,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Obtain parameters for NOI */
 
   /* Data-cleaning parameters  */
-  smf_get_cleanpar( kmap, res->sdata[0], NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
+  smf_get_cleanpar( kmap, NULL, res->sdata[0], NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
                     &dcsmooth, &dclimcorr, NULL, &fillgaps, &zeropad, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     &spikethresh, &spikebox, NULL, NULL, NULL, NULL, NULL, NULL,
