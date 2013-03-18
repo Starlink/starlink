@@ -456,6 +456,18 @@ void findclumps( int *status ) {
 *     information on this algorithm.
 
 *  GaussClumps Configuration Parameters:
+*     GaussClumps.ExtraCols:
+*        If set to a positive integer, then extra method-specific columns
+*        are added to the output catalogue. If set to 1, then the catalogue
+*        will include columns with names GCFWHM<i> (where <i> is 1, 2, or
+*        3), holding the FWHM of the fitted Gaussian in units of pixels
+*        (these FWHM values have NOT been reduced to excluded the effect of
+*        the beam width), and "GCANGLE" - the spatial orientation angle (in
+*        degrees, positive from +ve GRID1 axis to +ve GRID2 axis). If set
+*        greater than 1, then additional columns will be included holding
+*        the initial estimates for the peak and background values, the
+*        number of fitting iterations used and the final ch-squared value
+*        for the fit.
 *     GaussClumps.FwhmBeam:
 *        The FWHM of the instrument beam, in
 *        pixels. The fitted Gaussians are not allowed to be smaller than
@@ -874,17 +886,6 @@ void findclumps( int *status ) {
 *     {note_any_bugs_here}
 
 *-
-
-*  Undocumented Features:
-*     - If the parameter "GaussClumps.ExtraCols" is set to a positive
-*     integer, then extra method-specific columns are added to the output
-*     catalogue. If ExtraCols is set to 1, then the catalogue will include
-*     columns with names GCFWHM<i> (where <i> is 1, 2, or 3), holding the
-*     FWHM of the fitted Gaussian in units of pixels (these FWHM values
-*     have NOT been reduced to excluded the effect of the beam width),
-*     and "GCANGLE" - the spatial orientation angle (in degrees, positive
-*     from +ve GRID1 axis to +ve GRID2 axis).
-
 */
 
 /* Local Variables: */
