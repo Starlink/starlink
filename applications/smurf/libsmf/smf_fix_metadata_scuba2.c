@@ -87,6 +87,8 @@
 *        good.
 *     2013-03-15 (TIMJ):
 *        Recalculate start and end WVM taus using current algorithm.
+*     2013-03-18 (DSB):
+*        Update the ISO times for the starting and ending WVM values.
 
 *  Copyright:
 *     Copyright (C) 2009-2013 Science & Technology Facilities Council.
@@ -398,6 +400,10 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     double endtau = VAL__BADD;
     double endtime = VAL__BADD;
 
+    /* Create a TimeFrame that can be used to format MJD values into ISO
+       date-time strings, including a "T" separator between time and date. */
+    AstTimeFrame *tf = astTimeFrame( "Format=iso.0T" );
+
     for (i=0; i < nframes; i++) {
       smf__calc_wvm_index( hdr, "AMSTART", i, &starttau, &starttime, status );
       if (starttau != VAL__BADD) break;
@@ -416,15 +422,24 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
        alone for now. */
     if (starttau != VAL__BADD && starttime != VAL__BADD) {
       smf_fits_updateD( hdr, "WVMTAUST", starttau, "186GHz Tau from JCMT WVM at start", status );
-      /* Convert startime MJD to ISO format */
-      /* smf_fits_updateS( hdr, "WVMDATST", isostr, "Time of WVMTAUST", status ); */
+
+      /* Convert starttime MJD to ISO format and update the value in the
+         FITS header. */
+      smf_fits_updateS( hdr, "WVMDATST", astFormat( tf, 1, starttime ),
+                        "Time of WVMTAUST", status );
     }
 
     if (endtau != VAL__BADD && endtime != VAL__BADD) {
       smf_fits_updateD( hdr, "WVMTAUEN", endtau, "186GHz Tau from JCMT WVM at end", status );
-      /* Convert endtime MJD to ISO format */
-      /* smf_fits_updateS( hdr, "WVMDATEN", isostr, "Time of WVMTAUEN", status ); */
+
+      /* Convert endtime MJD to ISO format and update the value in the
+         FITS header. */
+      smf_fits_updateS( hdr, "WVMDATEN", astFormat( tf, 1, endtime ),
+                        "Time of WVMTAUEN", status );
     }
+
+    /* Free the TimeFrame. */
+    tf = astAnnul( tf );
 
   }
 
