@@ -1004,7 +1004,24 @@ F77_LOGICAL_FUNCTION(ast_maphaskey)( INTEGER(THIS),
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
       RESULT = astMapHasKey( astI2P( *THIS ), key ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+   )
+   return RESULT;
+}
 
+F77_LOGICAL_FUNCTION(ast_mapdefined)( INTEGER(THIS),
+                                      CHARACTER(KEY),
+                                      INTEGER(STATUS)
+                                      TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+
+   astAt( "AST_MAPDEFINED", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapDefined( astI2P( *THIS ), key ) ? F77_TRUE : F77_FALSE;
       astFree( key );
    )
    return RESULT;

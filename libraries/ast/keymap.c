@@ -46,6 +46,7 @@ c     following functions may also be applied to all KeyMaps:
 f     In addition to those routines applicable to all Objects, the
 f     following routines may also be applied to all KeyMaps:
 *
+c     - astMapDefined: Does a KeyMap contain a defined value for a key?
 c     - astMapGet0<X>: Get a named scalar entry from a KeyMap
 c     - astMapGet1<X>: Get a named vector entry from a KeyMap
 c     - astMapGetElem<X>: Get an element of a named vector entry from a KeyMap
@@ -62,6 +63,7 @@ c     - astMapRemove: Removed a named entry from a KeyMap
 c     - astMapRename: Rename an existing entry in a KeyMap
 c     - astMapSize: Get the number of entries in a KeyMap
 c     - astMapType: Return the data type of a named entry in a map
+f     - AST_MAPDEFINED: Does a KeyMap contain a defined value for a key?
 f     - AST_MAPGET0<X>: Get a named scalar entry from a KeyMap
 f     - AST_MAPGET1<X>: Get a named vector entry from a KeyMap
 f     - AST_MAPGETELEM<X>: Get an element of a named vector entry from a KeyMap
@@ -180,6 +182,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *     17-SEP-2012 (DSB):
 *         Fix bug that prevented UNDEF entries from being read back in
 *         from a dump of a KeyMap.
+*     18-MAR-2013 (DSB):
+*         Added astMapDefined.
 *class--
 */
 
@@ -448,6 +452,7 @@ static int ConvertValue( void *, int, void *, int, int * );
 static int GetObjSize( AstObject *, int * );
 static int HashFun( const char *, int, unsigned long *, int * );
 static int KeyCmp( const char *, const char * );
+static int MapDefined( AstKeyMap *, const char *, int * );
 static int MapGet0A( AstKeyMap *, const char *, AstObject **, int * );
 static int MapGet0C( AstKeyMap *, const char *, const char **, int * );
 static int MapGet0D( AstKeyMap *, const char *, double *, int * );
@@ -3523,6 +3528,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapRemove = MapRemove;
    vtab->MapRename = MapRename;
    vtab->MapCopy = MapCopy;
+   vtab->MapDefined = MapDefined;
    vtab->MapSize = MapSize;
    vtab->MapLenC = MapLenC;
    vtab->MapLength = MapLength;
@@ -6636,6 +6642,107 @@ int astMapGetElemAId_( AstKeyMap *this, const char *skey, int elem,
    return result;
 }
 
+static int MapDefined( AstKeyMap *this, const char *skey, int *status ) {
+/*
+*++
+*  Name:
+c     astMapDefined<X>
+f     AST_MAPDEFINED<X>
+
+*  Purpose:
+*     Check if a KeyMap contains a defined value for a key.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "ast.h"
+c     int astMapDefined( AstKeyMap *this, const char *key );
+f     RESULT = AST_MAPDEFINED( THIS, KEY, STATUS )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function checks to see if a KeyMap contains a defined value for
+*     a given key. If the key is present in the KeyMap but has an
+*     undefined value it returns
+c     zero (unlike astMapHasKey which would return non-zero).
+f     .FALSE. (unlike AST_MAPHASKEY which would return .TRUE.).
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the KeyMap.
+c     key
+f     KEY = CHARACTER * ( * ) (Given)
+*        The character string identifying the value to be retrieved. Trailing
+*        spaces are ignored. The supplied string is converted to upper
+*        case before use if the KeyCase attribute is currently set to zero.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astMapDefined()
+f     AST_MAPDEFINED = LOGICAL
+c        A non-zero value
+f        .TRUE.
+*        is returned if the requested key name is present in the KeyMap
+*        and has a defined value.
+
+*--
+*/
+
+/* Local Variables: */
+   AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
+   const char *key;        /* Pointer to key string to use */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
+   int itab;               /* Index of hash table element to use */
+   int result;             /* Returned flag */
+   unsigned long hash;     /* Full width hash value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapDefined",
+                     status );
+
+/* Use the hash function to determine the element of the hash table in
+   which the key will be stored. */
+   itab = HashFun( key, this->mapsize - 1, &hash, status );
+
+/* Search the relevent table entry for the required MapEntry. */
+   mapentry = SearchTableEntry( this, itab, key, status );
+
+/* Skip rest if the key was not found. */
+   if( mapentry ) {
+
+/* Set the result depending on the entry data type. */
+      if( mapentry->type == AST__UNDEFTYPE ){
+         result = 0;
+      } else {
+         result = 1;
+      }
+
+/* If the KeyError attribute is non-zero, report an error if the key is not
+   found */
+   } else if( astGetKeyError( this ) && astOK ) {
+      astError( AST__MPKER, "astMapDefined(%s): No value was found for "
+                "%s in the supplied KeyMap.", status, astGetClass( this ),
+                key );
+   }
+
+/* If an error occurred, return zero. */
+   if( !astOK ) result = 0;
+
+/* Return the result.*/
+   return result;
+}
+
 static int MapHasKey( AstKeyMap *this, const char *skey, int *status ) {
 /*
 *++
@@ -6685,7 +6792,9 @@ c     - A non-zero function value
 f     - .TRUE.
 *     is returned if the key exists but has an undefined value (that is,
 *     the returned value does not depend on whether the entry has a
-*     defined value or not).
+*     defined value or not). See also
+c     astMapDefined, which returns zero in such a case.
+f     AST_MAPDEFINED, which returns zero in such a case.
 *     - A function value of
 c     zero
 f     .FALSE.
@@ -10481,6 +10590,10 @@ void astMapRename_( AstKeyMap *this, const char *oldkey, const char *newkey,
 void astMapCopy_( AstKeyMap *this, AstKeyMap *that, int *status ){
    if ( !astOK ) return;
    (**astMEMBER(this,KeyMap,MapCopy))(this,that,status);
+}
+int astMapDefined_( AstKeyMap *this, const char *key, int *status ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,KeyMap,MapDefined))(this,key,status);
 }
 int astMapSize_( AstKeyMap *this, int *status ){
    if ( !astOK ) return 0;

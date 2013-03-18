@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V7.1.1) of the Starlink AST (astrometry) library is
+   A new release (V7.2.0) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,14 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- A new method call astMapDefined has been added to the KeyMap class.
+It checks if a gtiven key name has a defined value in a given KeyMap.
+
+
+
+Main Changes in V7.1.1
+----------------------
 
 - A bug has been fixed in FitsChan that caused inappropriate CTYPE values
 to be generated when writing a FrameSet to FITS-WCS headers if the

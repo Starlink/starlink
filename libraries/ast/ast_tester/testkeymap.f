@@ -30,6 +30,10 @@ c      call ast_watchmemory( 29286 )
       call ast_MapPut0A( map, 'Freda', ast_skyframe( ' ', status ),
      :                   ' ', status )
 
+      if( .not. ast_mapdefined( map, 'Freda', status ) ) then
+         call stopit( status, 'Error -12' )
+      end if
+
       if( ast_maplenc( map, 'Fredi', status ) .ne. 4 ) then
          write(*,*) ast_maplenc( map, 'Fredi', status )
          call stopit( status, 'Error -11' )
@@ -892,8 +896,9 @@ C  Test ast_mapcopy
 C  Test AST_MAPPUTU and undefined values
       map = ast_keymap( ' ', status )
       call ast_mapputu( map, 'GG', 'A comment', status )
-
-      if( ast_mapget0i( map, 'GG', ival, status ) ) then
+      if( ast_mapdefined( map, 'GG', status ) ) then
+         call stopit( status, 'Error UNDEF_0' )
+      else if( ast_mapget0i( map, 'GG', ival, status ) ) then
          call stopit( status, 'Error UNDEF_1' )
       else if( ast_mapget0s( map, 'GG', sval, status ) ) then
          call stopit( status, 'Error UNDEF_1B' )

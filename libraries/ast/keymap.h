@@ -215,6 +215,7 @@ typedef struct AstKeyMapVtab {
    int (* MapLenC)( AstKeyMap *, const char *, int * );
    int (* MapType)( AstKeyMap *, const char *, int * );
    int (* MapHasKey)( AstKeyMap *, const char *, int * );
+   int (* MapDefined)( AstKeyMap *, const char *, int * );
    const char *(* MapIterate)( AstKeyMap *, int, int * );
    const char *(* MapKey)( AstKeyMap *, int, int * );
 
@@ -338,6 +339,7 @@ int astMapGetElemI_( AstKeyMap *, const char *, int, int *, int * );
 int astMapGetElemP_( AstKeyMap *, const char *, int, void **, int * );
 int astMapGetElemS_( AstKeyMap *, const char *, int, short int *, int * );
 int astMapHasKey_( AstKeyMap *, const char *, int * );
+int astMapDefined_( AstKeyMap *, const char *, int * );
 int astMapLenC_( AstKeyMap *, const char *, int * );
 int astMapLength_( AstKeyMap *, const char *, int * );
 int astMapSize_( AstKeyMap *, int * );
@@ -492,6 +494,7 @@ astINVOKE(O,astLoadKeyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astMapLength(this,key) astINVOKE(V,astMapLength_(astCheckKeyMap(this),key,STATUS_PTR))
 #define astMapLenC(this,key) astINVOKE(V,astMapLenC_(astCheckKeyMap(this),key,STATUS_PTR))
 #define astMapHasKey(this,key) astINVOKE(V,astMapHasKey_(astCheckKeyMap(this),key,STATUS_PTR))
+#define astMapDefined(this,key) astINVOKE(V,astMapDefined_(astCheckKeyMap(this),key,STATUS_PTR))
 #define astMapKey(this,index) astINVOKE(V,astMapKey_(astCheckKeyMap(this),index,STATUS_PTR))
 #define astMapType(this,key) astINVOKE(V,astMapType_(astCheckKeyMap(this),key,STATUS_PTR))
 #define astMapGet0P(this,key,value) astINVOKE(V,astMapGet0P_(astCheckKeyMap(this),key,value,STATUS_PTR))

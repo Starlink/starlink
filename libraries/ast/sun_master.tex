@@ -22786,12 +22786,10 @@ has been re-written to make it faster and more reliable.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V7.1.1}
+\subsection{Changes Introduced in V7.1.1}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V7.1.0 and V7.1.1 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V7.1.0 and V7.1.1:
 
 \begin{enumerate}
 
@@ -22805,6 +22803,27 @@ original offset SkyFrame is recreated.
 to be generated when writing a FrameSet to FITS-WCS headers if the
 current Frame describes generalised spherical coordinates (i.e. a
 SkyFrame with System=Unknown).
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V7.2.0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V7.1.1 and V7.2.0 (the
+current version):
+
+\begin{enumerate}
+
+\item A new method call
+c+
+astMapDefined
+c-
+f+
+AST\_MAPDEFINED
+f-
+has been added to the KeyMap class. It checks if a gtiven key name has
+a defined value in a given KeyMap.
 
 \end{enumerate}
 
