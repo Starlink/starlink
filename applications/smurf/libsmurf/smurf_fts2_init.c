@@ -106,7 +106,7 @@ void smurf_fts2_init(int* status)
 {
   if( *status != SAI__OK ) { return; }
 
-  const double STAGE_CENTER = 228.0;    /* mm */
+  const double STAGE_CENTER = 225.0;    /* mm */
   Grp* gIn                  = NULL;     /* Input group */
   Grp* gOut                 = NULL;     /* Output group */
   Grp* gZpd                 = NULL;     /* ZPD group */
