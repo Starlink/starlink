@@ -74,6 +74,8 @@
 *        Use PAL instead of SLA.
 *     2013-02-04 (TIMJ):
 *        Include date in WVM conversion.
+*     2013-03-18 (DSB):
+*        Ensure VAL__BADD is returned if airmass cannot be determined.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -136,6 +138,9 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
   float twater;             /* Effective temperature of water vapour */
   float wvm[3];             /* WVM temperature in the 3 channels */
   double wvmtime;           /* Date of WVM reading */
+
+  /* Initialise returned value */
+  tau = VAL__BADD;
 
   /* Routine */
   if ( *status != SAI__OK) return VAL__BADD;
@@ -204,10 +209,12 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
   }
 
   /* Scale from CSO to filter tau if necessary */
-  if (extpars) {
-    tau = smf_cso2filt_tau( hdr, tau225, extpars, status );
-  } else {
-    tau = tau225;
+  if ( *status == SAI__OK ) {
+    if (extpars) {
+      tau = smf_cso2filt_tau( hdr, tau225, extpars, status );
+    } else {
+      tau = tau225;
+    }
   }
 
   /*  printf("A = %g tau225 = %g tau = %g\n",airmass,tau225,tau);*/
