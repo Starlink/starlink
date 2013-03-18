@@ -88,7 +88,9 @@
 *     2013-03-15 (TIMJ):
 *        Recalculate start and end WVM taus using current algorithm.
 *     2013-03-18 (DSB):
-*        Update the ISO times for the starting and ending WVM values.
+*        - Update the ISO times for the starting and ending WVM values.
+*        - Ensure WVM headers are left unchanged without error if 
+*        airmass cannot be determined.
 
 *  Copyright:
 *     Copyright (C) 2009-2013 Science & Technology Facilities Council.
@@ -392,7 +394,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
      subarrays to get all the values from. We just have to try with what we
      have from a single subarray. We do step into the time series until we
      find something good. */
-  {
+  if( *status == SAI__OK ){
     size_t i;
     size_t nframes = hdr->nframes;
     double starttau = VAL__BADD;
@@ -407,6 +409,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     for (i=0; i < nframes; i++) {
       smf__calc_wvm_index( hdr, "AMSTART", i, &starttau, &starttime, status );
       if (starttau != VAL__BADD) break;
+      if (*status != SAI__OK) errAnnul( status );
     }
 
     /* if we did not get a start tau we are not going to get an end tau */
@@ -414,6 +417,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
       for (i=0; i < nframes; i++) {
         smf__calc_wvm_index( hdr, "AMEND", nframes - 1 - i, &endtau, &endtime, status );
         if (endtau != VAL__BADD) break;
+        if (*status != SAI__OK) errAnnul( status );
       }
     }
 
