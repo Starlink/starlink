@@ -89,7 +89,7 @@
 *        Recalculate start and end WVM taus using current algorithm.
 *     2013-03-18 (DSB):
 *        - Update the ISO times for the starting and ending WVM values.
-*        - Ensure WVM headers are left unchanged without error if 
+*        - Ensure WVM headers are left unchanged without error if
 *        airmass cannot be determined.
 
 *  Copyright:
@@ -536,10 +536,10 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
 
   }
 
-  /* For POL-2 data prior to ???, the POL_CRD header should always have
-     been "FPLANE". REMOVE THE "1 ||" AND USE THE CORRECT UTDATE BELOW
-     WHEN THIS PROBLEM HAS BEEN FIXED. */
-  if ( 1 || fitsvals.utdate < 20121024 ) {
+  /* For POL-2 data prior to 18-JAN-2013, the POL_CRD header was always
+     "FPLANE" in reality, even if the POL_CRD value in JCMTSTATE said
+     something else. */
+  if ( fitsvals.utdate < 20130118 ) {
     char polcrd[80] = "<unset>";
     smf_getfitss( hdr, "POL_CRD", polcrd, sizeof(polcrd), status );
     if (*status == SMF__NOKWRD) {
