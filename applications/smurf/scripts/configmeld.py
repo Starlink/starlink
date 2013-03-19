@@ -29,7 +29,8 @@
 *     CONFIG2 = LITERAL (Read)
 *        The first configuration. This can be a normal config such as is
 *        supplied for the CONFIG parameter of MAKEMAP, or an NDF created
-*        by MAKEMAP.
+*        by MAKEMAP. If a value is supplied for PARAM, then CONFIG2
+*        defaults to null (!). []
 *     WAVEBAND = LITERAL (Read)
 *        This parameter is not used if either CONFIG1 or CONFIG2 is
 *        an NDF created by MAKEMAP. It should be one of "450" or "850". It
@@ -42,6 +43,11 @@
 *        is extended to include default values are any MAKEMAP parameters
 *        that it does not specify. These defaults are read from file
 *        "$SMURF_DIR/smurf_makemap.def". [TRUE]
+*     PARAM = LITERAL (Read)
+*        If supplied, then the value used for the specified parameter
+*        is displayed on standard output, and no visual comparison is
+*        displayed. Separate values are displayed for CONFIG1 and (if 
+*        supplied) CONFIG2. [!]
 *     TOOL = LITERAL (Read)
 *        Gives the name of the file comparison tool to use. The named
 *        command should be available on the current PATH. It should take
@@ -88,6 +94,8 @@
 *     14-FEB-2013 (DSB):
 *        Allow selection of waveband-specific values without needing also
 *        to display default values.
+*     19-MAR-2013 (DSB):
+*        Allow the value of a single parameter to be listed.
 
 *-
 '''
@@ -138,25 +146,37 @@ try:
                                 "values?", True, True ))
    params.append(starutil.Par0S("TOOL", "The file comparison tool to use",
                                 None, True ))
+   params.append(starutil.Par0S("PARAM", "A single config parameter to display",
+                                None, True ))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
 
-#  Get the comparison tool to use.
-   tool = parsys["TOOL"].value
-   if tool == None:
-      for trytool in ( "meld", "opendiff", "diffmerge", "kdiff3", "tkdiff", "diffuse" ):
-         if starutil.which( trytool ) != None:
-            tool = trytool
-            break
+#  Are we displaying a single parameter?
+   param = parsys["PARAM"].value
+
+#  If not, get the comparison tool to use.
+   if param == None:
+      tool = parsys["TOOL"].value
       if tool == None:
-         print( "\n!! Could not find a usable file comparison tool")
-         os._exit(1)
+         for trytool in ( "meld", "opendiff", "diffmerge", "kdiff3", "tkdiff", "diffuse" ):
+            if starutil.which( trytool ) != None:
+               tool = trytool
+               break
+         if tool == None:
+            print( "\n!! Could not find a usable file comparison tool")
+            os._exit(1)
+      else:
+         if starutil.which( tool ) == None:
+            print( "\n!! Could not find the requested file comparison tool: '{0}'.".format(tool) )
+            os._exit(1)
+
+#  If a parameter name was specified, then config2 defaults to null
+#  unless it was supplied on the command line.
    else:
-      if starutil.which( tool ) == None:
-         print( "\n!! Could not find the requested file comparison tool: '{0}'.".format(tool) )
-         os._exit(1)
+      parsys["CONFIG2"].default = None
+      parsys["CONFIG2"].noprompt = True
 
 #  Note the path to the defaults file, if required.
    defs = parsys["DEFAULTS"].value
@@ -167,6 +187,9 @@ try:
 
 #  Get the first config string.
    config1 = parsys["CONFIG1"].value
+   if config1 == None:
+      print( "\n!! No value supplied for CONFIG1" )
+      os._exit(1)
 
 #  To be a group expression, it must contain at least one of the
 #  following characters: ^,= (NDFs are not allowed any of these).
@@ -212,46 +235,52 @@ try:
 
 #  Get the second config string.
    config2 = parsys["CONFIG2"].value
+   if config2 == None:
+      if param == None:
+         print( "\n!! No value supplied for CONFIG2" )
+         os._exit(1)
+      waveband2 = waveband1
 
 #  See if is a group expression or NDF.
-   if any( (c in gexp_chars) for c in config2 ):
-      isndf2 = False
    else:
-      isndf2 = True
+      if any( (c in gexp_chars) for c in config2 ):
+         isndf2 = False
+      else:
+         isndf2 = True
 
 #  If it is an NDF, attempt to get the SUBARRAY fits header, and
 #  determine the waveband.
-   if isndf2:
-      try:
-         subarray = starutil.get_fits_header( config2, "SUBARRAY" )
-         isndf2 = True
-         if subarray == None:
-            text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config2) )
-            if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
-               subarray = "s4"
-            elif "s8a" in text or "s8b" in text or "s8c" in text or "s8d" in text:
-               subarray = "s8"
-            else:
-               subarray = None
-      except:
-         print( "\n!! It looks like NDF '{0}' either does not exist or is "
-                "corrupt.".format(config2) )
-         os._exit(1)
+      if isndf2:
+         try:
+            subarray = starutil.get_fits_header( config2, "SUBARRAY" )
+            isndf2 = True
+            if subarray == None:
+               text = starutil.invoke( "$KAPPA_DIR/provshow {0}".format(config2) )
+               if "s4a" in text or "s4b" in text or "s4c" in text or "s4d" in text:
+                  subarray = "s4"
+               elif "s8a" in text or "s8b" in text or "s8c" in text or "s8d" in text:
+                  subarray = "s8"
+               else:
+                  subarray = None
+         except:
+            print( "\n!! It looks like NDF '{0}' either does not exist or is "
+                   "corrupt.".format(config2) )
+            os._exit(1)
 
-   if isndf2:
-      if subarray == None:
-         msg_out("Cannot determine the SCUBA-2 waveband for NDF '{0}' "
-                 "- was it really created by MAKEMAP?".format(config2), starutil.CRITICAL )
-         waveband2 = None
-      elif subarray[1:2] == "4":
-         waveband2 = "450"
-      elif subarray[1:2] == "8":
-         waveband2 = "850"
+      if isndf2:
+         if subarray == None:
+            msg_out("Cannot determine the SCUBA-2 waveband for NDF '{0}' "
+                    "- was it really created by MAKEMAP?".format(config2), starutil.CRITICAL )
+            waveband2 = None
+         elif subarray[1:2] == "4":
+            waveband2 = "450"
+         elif subarray[1:2] == "8":
+            waveband2 = "850"
+         else:
+            raise starutil.InvalidParameterError("Unexpected value '{0}' found "
+                     "for SUBARRAY FITS Header in {1}.".format(subarray,config2))
       else:
-         raise starutil.InvalidParameterError("Unexpected value '{0}' found "
-                  "for SUBARRAY FITS Header in {1}.".format(subarray,config2))
-   else:
-      waveband2 = None
+         waveband2 = None
 
 #  If config1 is an ndf but config2 is not, use the waveband from config1.
    if waveband1 != None and waveband2 == None:
@@ -286,49 +315,86 @@ try:
    else:
       select = starutil.shell_quote( "'850=1,450=0'" )
 
+#  Deal with cases where we are comparing two whole configs...
+   if param == None:
 
 #  List the configuration parameters in alphabetical order to a text file.
-   if isndf1:
-      conf1 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
-                     "config=! name=! sort=yes defaults={1} select={2}".
-                     format(config1,defs,select) )
-   else:
-      config1 = starutil.shell_quote( config1 )
-      conf1 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
-                     "config={0} name=! sort=yes defaults={1} select={2}".
-                     format(config1,defs,select) )
+      if isndf1:
+         conf1 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
+                        "config=! name=! sort=yes defaults={1} select={2}".
+                        format(config1,defs,select) )
+      else:
+         config1 = starutil.shell_quote( config1 )
+         conf1 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
+                        "config={0} name=! sort=yes defaults={1} select={2}".
+                        format(config1,defs,select) )
 
 #  Write the config parameters to a disk file.
-   fd = open( "config1.tmp", "w" )
-   fd.write( conf1 )
-   fd.close()
+      fd = open( "config1.tmp", "w" )
+      fd.write( conf1 )
+      fd.close()
 
 #  Do the same with the second configuration.
-   if waveband2 == "450":
-      select = starutil.shell_quote( "'850=0,450=1'" )
-   else:
-      select = starutil.shell_quote( "'850=1,450=0'" )
+      if waveband2 == "450":
+         select = starutil.shell_quote( "'850=0,450=1'" )
+      else:
+         select = starutil.shell_quote( "'850=1,450=0'" )
 
-   if isndf2:
-      conf2 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
-                     "config=! name=! sort=yes defaults={1} select={2}".
-                     format(config2,defs,select) )
-   else:
-      config2 = starutil.shell_quote( config2 )
-      conf2 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
-                     "config={0} name=! sort=yes defaults={1} select={2}".
-                     format(config2,defs,select) )
+      if isndf2:
+         conf2 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
+                        "config=! name=! sort=yes defaults={1} select={2}".
+                        format(config2,defs,select) )
+      else:
+         config2 = starutil.shell_quote( config2 )
+         conf2 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
+                        "config={0} name=! sort=yes defaults={1} select={2}".
+                        format(config2,defs,select) )
 
-   fd = open( "config2.tmp", "w" )
-   fd.write( conf2 )
-   fd.close()
+      fd = open( "config2.tmp", "w" )
+      fd.write( conf2 )
+      fd.close()
 
 #  Invoke the specified file comparison tool to view the two config files.
-   subprocess.call( [tool, "config1.tmp", "config2.tmp"], stdout=open(os.devnull),
-                                                          stderr=subprocess.STDOUT )
+      subprocess.call( [tool, "config1.tmp", "config2.tmp"], stdout=open(os.devnull),
+                                                             stderr=subprocess.STDOUT )
 
 #  Remove the temporary config text files.
-   cleanup()
+      cleanup()
+
+#  Deal with cases where we are displaying a single parameter...
+   else:
+
+#  Get the value of the requested parameter fro config1.
+      if isndf1:
+         value1 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
+                        "config=! name={3} defaults={1} select={2}".
+                        format(config1,defs,select,param) )
+      else:
+         config1 = starutil.shell_quote( config1 )
+         value1 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
+                        "config={0} name={3} defaults={1} select={2}".
+                        format(config1,defs,select,param) )
+
+#  Get the value of the requested parameter fro config2 (if supplied).
+      if config2 != None:
+         if isndf2:
+            value2 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
+                           "config=! name={3} defaults={1} select={2}".
+                           format(config2,defs,select,param) )
+         else:
+            config2 = starutil.shell_quote( config2 )
+            value2 = invoke("$KAPPA_DIR/configecho ndf=! application=makemap "
+                           "config={0} name={3} defaults={1} select={2}".
+                           format(config2,defs,select,param) )
+      else:
+         value2 = None
+
+#  Display them.
+      if value2 == None:
+         msg_out( "\n  {0} = {1}".format(param,value1), starutil.CRITICAL)
+      else:
+         msg_out( "\n  {0} = {1} (config1)".format(param,value1), starutil.CRITICAL)
+         msg_out( "  {0} = {1} (config2)".format(param,value2), starutil.CRITICAL)
 
 #  If an StarUtilError of any kind occurred, display the message but hide the
 #  python traceback. To see the trace back, uncomment "raise" instead.
