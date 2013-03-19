@@ -207,10 +207,13 @@
 *     2012-02-20 (DSB):
 *        Removed "nofile" and "leaveopen" as memiter=0 case is no
 *        longer supported.
+*     2013-03-19 (DSB):
+*        Allocate room for a per-array COM model if either COM.PERARRAY or
+*        COM.PERARRAY_LAST is set.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008,2010-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010-2013 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -354,9 +357,11 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
     nrel = igroup->nrelated;
   }
 
-  /* See if a separate COM model is to be created for each subarray. */
+  /* See if a separate COM model is to be created for each subarray on
+     any iteration. */
   astMapGet0A( keymap, "COM", &kmap );
   astMapGet0I( kmap, "PERARRAY", &perarray );
+  if( ! perarray ) astMapGet0I( kmap, "PERARRAY_LAST", &perarray );
   kmap = astAnnul( kmap );
 
   /* If using igroup as a template use group expressions to make filenames */

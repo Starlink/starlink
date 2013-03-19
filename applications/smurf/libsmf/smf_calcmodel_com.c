@@ -73,6 +73,9 @@
 *     27-FEB-2013 (DSB):
 *        Do not modify the com mask to exclude unused map pixels on the
 *        first iteration as the map has not yet been determined.
+*     19-MAR-2013 (DSB):
+*        Allow a different value to be used for COM.PERARRAY on the final
+*        iteration.
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
@@ -256,28 +259,10 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       }
    }
 
-/* Get the required configuration parameters. */
+/* Get some configuration parameters. */
    smf_get_nsamp( kmap, "GAIN_BOX", res->sdata[ 0 ], &gain_box, status );
-   astMapGet0I( kmap, "PERARRAY", &perarray );
    astMapGet0I( kmap, "NITER", &niter );
    astMapGet0D( kmap, "NSIGMA", &nsigma );
-
-/* If "perarray" is non-zero, a separate common mode signal is calculated
-   for each available subarrays and is stored as a separate 1d vector.
-   If "perarray" is zero, a single common mode signal is calculated from
-   all available subarrays and is stored as a 1d vector. The corresponding
-   smfData is at position 0 in the model sdata. Store the number of COM
-   models to create. */
-   if( perarray ) {
-      ncom = model->ndat;
-      if( (int) res->ndat != ncom && *status == SAI__OK  ) {
-         *status = SAI__ERROR;
-         errRep( "", "smf_calcmodel_com: COM model and residuals contain "
-                 "different number of data arrays!", status);
-      }
-   } else {
-      ncom = 1;
-   }
 
 /* Get the number of time slices in the first residuals smfData. We
    report an error if any subsequent smfData has a different number of
@@ -349,7 +334,32 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       }
    }
 
-/* Loop round creating each COM model. */
+/* See if a single common-mode signal was used for all sub-arrays on the
+   previous iteration. */
+   astMapGet0I( kmap, "PERARRAY", &perarray );
+
+/* If "perarray" is non-zero, a separate common mode signal was calculated
+   for each available subarrays on the previous iteration and is stored as
+   a separate 1d vector. If "perarray" is zero, a single common mode signal
+   was calculated from all available subarrays and is stored as a 1d vector.
+   The corresponding smfData is at position 0 in the model sdata. Store the
+   number of COM models to undo. */
+   if( perarray ) {
+      msgOutif( MSG__VERB, "", "  Undoing separate COM models for each array.",
+                status );
+      ncom = model->ndat;
+      if( (int) res->ndat != ncom && *status == SAI__OK  ) {
+         *status = SAI__ERROR;
+         errRep( "", "smf_calcmodel_com: COM model and residuals contain "
+                 "different number of data arrays!", status);
+      }
+   } else {
+      msgOutif( MSG__VERB, "", "  Undoing a single COM model for all arrays.",
+                status );
+      ncom = 1;
+   }
+
+/* Loop round undoing each old COM model. */
    for( icom = 0; icom < ncom && *status == SAI__OK; icom++ ) {
 
 /* Set the index of the first and last subarray that contributes to the
@@ -357,10 +367,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       if( perarray ) {
          idx_lo = icom;
          idx_hi = icom;
-         msgSeti( "I", icom + 1 );
-         msgSeti( "N", ncom );
-         msgOutif( MSG__VERB, "", "  Calculating COM model for array ^I of ^N",
-                   status );
       } else {
          idx_lo = 0;
          idx_hi = res->ndat - 1;
@@ -389,11 +395,64 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          }
          thrWait( wf, status );
       }
+   }
+
+/* If this is the last iteration, the user may request a different value
+   for COM.PERARRAY by assigning a value ot COM.PERARRAY_LAST. For
+   instance, having used com.perarray=0 together with AST masking for all
+   earlier iterations in order to retain extended structure, they may want
+   to use COM.PERARRAY=1 on the last iteration only, in order to suppress
+   background "mottling" in the regions outside the mask. Note, the current
+   value of the "perarray" variable will be left unchanged by astMapGet0I
+   if PERARRAY_LAST is "<undef>" (the default). */
+   if( flags & SMF__DIMM_LASTITER ) astMapGet0I( kmap, "PERARRAY_LAST",
+                                                 &perarray );
+
+/* If "perarray" is now non-zero, a separate common mode signal will be
+   calculated for each available subarrays on this iteration and will be
+   stored as a separate 1d vector. If "perarray" is zero, a single common
+   mode signal will be calculated from all available subarrays and will be
+   stored as a 1d vector. The corresponding smfData is at position 0 in the
+   model sdata. Store the number of COM models to create. */
+   if( perarray ) {
+      msgOutif( MSG__VERB, "", "  Calculating separate COM models for each array.",
+                status );
+      ncom = model->ndat;
+      if( (int) res->ndat != ncom && *status == SAI__OK  ) {
+         *status = SAI__ERROR;
+         errRep( "", "smf_calcmodel_com: COM model and residuals contain "
+                 "different number of data arrays!", status);
+      }
+   } else {
+      msgOutif( MSG__VERB, "", "  Calculating a single COM model for all arrays.",
+                status );
+      ncom = 1;
+   }
+
+/* Loop round creating each new COM model. */
+   for( icom = 0; icom < ncom && *status == SAI__OK; icom++ ) {
+
+/* Set the index of the first and last subarray that contributes to the
+   current COM model. */
+      if( perarray ) {
+         idx_lo = icom;
+         idx_hi = icom;
+         msgSeti( "I", icom + 1 );
+         msgSeti( "N", ncom );
+         msgOutif( MSG__VERB, "", "  Calculating COM model for array ^I of ^N",
+                   status );
+      } else {
+         idx_lo = 0;
+         idx_hi = res->ndat - 1;
+      }
 
 /* Form a refined COM model. This is just the sigma-clipped mean of the
    residuals at every time slice. */
       for( iw = 0; iw < nw; iw++ ) {
          pdata = job_data + iw;
+         pdata->icom = icom;
+         pdata->idx_lo = idx_lo;
+         pdata->idx_hi = idx_hi;
          pdata->operation = 3;
          thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
       }

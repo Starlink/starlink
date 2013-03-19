@@ -343,6 +343,17 @@ com.oldalg = 0
 com.perarray = 0
 
 #-----------------------------------------------------------------
+#  Name: 	com.perarray_last
+#  Type: 	integer
+#  Default: 	<undef>
+#  Purpose: 	Controls the estimate of the common-mode signal on
+#               the last iteration.
+#  Description: This is the value to be used for parameter "com.perarray"
+#               on the last iteration. If it is "<undef>", then the same value
+#               will be used as for earlier iterations.
+com.perarray_last = <undef>
+
+#-----------------------------------------------------------------
 #  Name: 	compreprocess
 #  Type: 	integer
 #  Default: 	0

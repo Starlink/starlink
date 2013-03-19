@@ -188,12 +188,10 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qual
   /* If filtering parameters given, create filter  */
   if( dofft ) {
     if( f_edgelow ) {
-printf("EDGELOW %g\n", f_edgelow );
       smf_filter_edge( filt, f_edgelow, f_width, 1, status );
     }
 
     if( f_edgehigh ) {
-printf("EDGEHIGH %g\n", f_edgehigh );
       smf_filter_edge( filt, f_edgehigh, f_width, 0, status );
     }
 
