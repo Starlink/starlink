@@ -318,8 +318,8 @@ void smurf_fts2_phasecorrds(int* status)
 			outData->dims[0] = nWidth;
 			outData->dims[1] = nHeight;
 			outData->dims[2] = nFrames;
-			outData_pntr = (double*) outData->pntr[0];
 			outData_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outData_pntr));
+			outData->pntr[0] = outData_pntr;
 			break;
 
 		case 'r':
@@ -330,8 +330,8 @@ void smurf_fts2_phasecorrds(int* status)
 			outDataSR->dims[0] = nWidth;
 			outDataSR->dims[1] = nHeight;
 			outDataSR->dims[2] = nFrames;
-			outDataSR_pntr = (double*) outDataSR->pntr[0];
 			outDataSR_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSR_pntr));
+			outDataSR->pntr[0] = outDataSR_pntr;
 			break;
 		
 		case 'i':
@@ -342,8 +342,8 @@ void smurf_fts2_phasecorrds(int* status)
 			outDataSI->dims[0] = nWidth;
 			outDataSI->dims[1] = nHeight;
 			outDataSI->dims[2] = nFrames;
-			outDataSI_pntr = (double*) outDataSI->pntr[0];
 			outDataSI_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSI_pntr));
+			outDataSI->pntr[0] = outDataSI_pntr;
 			break;
 			
 		case 'p':
@@ -354,8 +354,8 @@ void smurf_fts2_phasecorrds(int* status)
 			outDataSP->dims[0] = nWidth;
 			outDataSP->dims[1] = nHeight;
 			outDataSP->dims[2] = nFrames;
-			outDataSP_pntr = (double*) outDataSP->pntr[0];
 			outDataSP_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSP_pntr));
+			outDataSP->pntr[0] = outDataSP_pntr;
 			break;
 			
 		case 'f':
@@ -366,8 +366,8 @@ void smurf_fts2_phasecorrds(int* status)
 			outDataSPF->dims[0] = nWidth;
 			outDataSPF->dims[1] = nHeight;
 			outDataSPF->dims[2] = nFrames2;
-			outDataSPF_pntr = (double*) outDataSPF->pntr[0];
 			outDataSPF_pntr = (double*) astMalloc((nPixels * nFrames2) * sizeof(*outDataSPF_pntr));
+			outDataSPF->pntr[0] = outDataSPF_pntr;
 			break;
 			
 		case 'w':
@@ -378,8 +378,8 @@ void smurf_fts2_phasecorrds(int* status)
 			outDataWN->dims[0] = nWidth;
 			outDataWN->dims[1] = nHeight;
 			outDataWN->dims[2] = nFrames2;
-			outDataWN_pntr = (double*) outDataWN->pntr[0];
 			outDataWN_pntr = (double*) astMalloc((nPixels * nFrames2) * sizeof(*outDataWN_pntr));
+			outDataWN->pntr[0] = outDataWN_pntr;
 			break;
 			
 		case 't':
@@ -390,8 +390,8 @@ void smurf_fts2_phasecorrds(int* status)
 			outDataWT->dims[0] = nWidth;
 			outDataWT->dims[1] = nHeight;
 			outDataWT->dims[2] = nFrames2;
-			outDataWT_pntr = (double*) outDataWT->pntr[0];
 			outDataWT_pntr = (double*) astMalloc((nPixels * nFrames2) * sizeof(*outDataWT_pntr));
+			outDataWT->pntr[0] = outDataWT_pntr;
 			break;
 			
 		case 'R':
@@ -402,8 +402,8 @@ void smurf_fts2_phasecorrds(int* status)
 			outDataSRC->dims[0] = nWidth;
 			outDataSRC->dims[1] = nHeight;
 			outDataSRC->dims[2] = nFrames;
-			outDataSRC_pntr = (double*) outDataSRC->pntr[0];
 			outDataSRC_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSRC_pntr));
+			outDataSRC->pntr[0] = outDataSRC_pntr;
 			break;
 			
 		case 'I':
@@ -414,8 +414,8 @@ void smurf_fts2_phasecorrds(int* status)
 			outDataSIC->dims[0] = nWidth;
 			outDataSIC->dims[1] = nHeight;
 			outDataSIC->dims[2] = nFrames;
-			outDataSIC_pntr = (double*) outDataSIC->pntr[0];
 			outDataSIC_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSIC_pntr));
+			outDataSIC->pntr[0] = outDataSIC_pntr;
 			break;
 	}
 	
