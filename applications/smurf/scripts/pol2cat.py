@@ -19,9 +19,9 @@
 *     for a single sub-array from a short period of time over which the
 *     position of each bolometer on the sky does not change significantly.
 *
-*     For each sub-array, images holding the mean bolometer Q and U are
-*     found. These mean Q and U images are then subtracted from the
-*     individual Q and U images.
+*     For each sub-array, estimates of the background Q and U values at
+*     each bolometer are made and subtracted form the original Q and U
+*     images.
 *
 *     All the Q images are then mosaiced together into a single Q image,
 *     using the total intensity map specified by parameter IREF to define
@@ -220,6 +220,9 @@
 *        - Remove low frequency drift between stare positions in Q and U
 *        values for each bolometer.
 *        - Relax rejection criteria.
+*     19-MAR-2013 (DSB):
+*        Combine all Q (and U) images together in a single invocation of
+*        makemos (not wcsalign).
 
 *-
 '''
@@ -448,8 +451,8 @@ try:
              format(indata,config,qcont,ucont) )
 
 #  The next stuff we do independently for each subarray.
-   qmos = {}
-   umos = {}
+   qmaps = []
+   umaps = []
    for a in ('S4A','S4B','S4C','S4D','S8A','S8B','S8C','S8D'):
 
 #  Get NDG object that contains the Q and U maps for the current subarray.
@@ -472,17 +475,13 @@ try:
 #  bias in Q and U. We now try to remove these biases by removing the Q and
 #  U values that are common to each image (as opposed to astronomical Q/U
 #  variations, which are  fixed on the sky and so will vary from image to
-#  image as the focal plane is moved on the sky). First we find the mean Q
+#  image as the focal plane is moved on the sky). First we find the median Q
 #  value in each bolometer by averaging the Q images, aligned in PIXEL (i.e.
-#  bolomter) coords. The mean Q value per bolometer is put in qcom.sdf.
-#  We use nearest neighbour interpolation since we know the images are
-#  aligned in pixel coords.
+#  bolometer) coords. The median Q value per bolometer is put in qcom.sdf.
          msg_out( "Removing background Q level from {0} bolometers...".format(a))
          qcom = NDG(1)
          qcom.comment = "qcom"
-         invoke("$KAPPA_DIR/wcsframe {0} PIXEL".format(qff))
-         invoke("$KAPPA_DIR/wcsmosaic {0} ref=\! out={1} method=near wlim={2} accept".
-                format(qff,qcom,len(qff)/2))
+         invoke( "$CCDPACK_DIR/makemos method=median in={0} out={1}".format(qff,qcom) )
 
 #  We simply assume that the fixed bolometer Q bias is linearly related to
 #  the mean Q value per bolometer. Astronomical sources will affect this
@@ -525,18 +524,25 @@ try:
                  format(qffb,qcube) )
 
 #  Smooth the cube along the Z axis (the stare position axis). Currently
-#  use a simple top-hat filter, but maybe try Gaussian?
-         qcubebx = NDG(1)
+#  use a simple top-hat median filter, but maybe try Gaussian? Use median to
+#  avoid the source being smeared out, and so causing rings in the residuals
+#  created below.
+         qcubebx2 = NDG(1)
          invoke( "$KAPPA_DIR/block in={0} out={1} estimator=median box=\[1,1,5\]".
-                 format(qcube,qcubebx) )
+                 format(qcube,qcubebx2) )
 
-#  Find the reisudals after removal of the smoothed cube.
+#  Smooth again using a small mean filter to get better noise statistics.
+         qcubebx = NDG(1)
+         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=mean box=\[1,1,3\]".
+                 format(qcubebx2,qcubebx) )
+
+#  Find the residuals after removal of the smoothed cube.
          qres = NDG(1)
          invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".
                  format(qcube,qcubebx,qres) )
 
 #  Split the cube of residuals up into separate 2D planes, and copy the
-#  WCS back.
+#  WCS back. Could do with a new KAPPA command to do this.
          qsm = NDG(qffb)
          islice = 0
          for qq in qsm:
@@ -545,6 +551,12 @@ try:
                     format(qres,islice,qq) )
             invoke( "$KAPPA_DIR/wcscopy ndf={0} like={1} ok".
                     format(qq,qffb[islice-1]) )
+
+#  Remove smaller spikes from the Q images and estimate variances.
+         msg_out( "Removing smaller spikes from {0} bolometer Q values...".format(a))
+         qff2 = NDG(qsm)
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]"
+                 .format(qsm,qff2) )
 
 #  Now do the same for the U images.
          msg_out( "Removing spikes from {0} bolometer U values...".format(a))
@@ -555,9 +567,7 @@ try:
 
          msg_out( "Removing background U level from {0} bolometers...".format(a))
          ucom = NDG(1)
-         invoke("$KAPPA_DIR/wcsframe {0} PIXEL".format(uff))
-         invoke("$KAPPA_DIR/wcsmosaic {0} ref=\! out={1} method=near wlim={2} accept".
-                format(uff,ucom,len(uff)/2))
+         invoke( "$CCDPACK_DIR/makemos method=median in={0} out={1}".format(uff,ucom) )
 
          unm = NDG(uff)
          unm.comment = "unm"
@@ -585,9 +595,12 @@ try:
          ucube = NDG(1)
          invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
                  format(uffb,ucube) )
-         ucubebx = NDG(1)
+         ucubebx2 = NDG(1)
          invoke( "$KAPPA_DIR/block in={0} out={1} estimator=median box=\[1,1,5\]".
-                 format(ucube,ucubebx) )
+                 format(ucube,ucubebx2) )
+         ucubebx = NDG(1)
+         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=mean box=\[1,1,3\]".
+                 format(ucubebx2,ucubebx) )
          ures = NDG(1)
          invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".
                  format(ucube,ucubebx,ures) )
@@ -599,11 +612,14 @@ try:
                     format(ures,islice,uu) )
             invoke( "$KAPPA_DIR/wcscopy ndf={0} like={1} ok".
                     format(uu,uffb[islice-1]) )
+         uff2 = NDG(usm)
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]"
+                 .format(usm,uff2) )
 
 #  Ensure all images have the required current WCS Frame (as indicated by
 #  the DOMAIN parameter).
-         invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(qsm,domain) )
-         invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(usm,domain) )
+         invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(qff2,domain) )
+         invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(uff2,domain) )
 
 #  The reference map defines the output pixel grid - the origin, pixel size,
 #  sky projection, etc (but not the pixel bounds) - of the final Q, U and I
@@ -617,7 +633,7 @@ try:
             if iref:
                invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(iref,ref) )
             else:
-               invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(qsm[0],ref) )
+               invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trim=yes".format(qff2[0],ref) )
 
 #  We add a WCS Frame with Domain "POLANAL" to define the polarimetric reference
 #  direction (we choose the pixel Y axis). POLPACK expects this Frame to be present
@@ -641,46 +657,36 @@ try:
 #  Modify the values in each pair of Q and U images so that they refer to
 #  the common reference direction (i.e. the ref image pixel Y axis).
          msg_out( "Rotating all {0} Q and U reference directions to be parallel...".format(a) )
-         qrot = NDG(qsm)
-         urot = NDG(usm)
-         for (qin,uin,qout,uout) in zip( qsm, usm, qrot, urot ):
+         qrot = NDG(qff2)
+         urot = NDG(uff2)
+         for (qin,uin,qout,uout) in zip( qff2, uff2, qrot, urot ):
             invoke( "$POLPACK_DIR/polrotref qin={0} uin={1} like={2} qout={3} uout={4} ".
                     format(qin,uin,ref,qout,uout) )
 
-#  Combine all the Q images for the current sub-array together into a single
-#  image. We use a bilinear pixel-pasting scheme here, but maybe SINCSINC
-#  would be better?
-         msg_out( "Combining all Q images for {0} into a single map...".format(a))
-         qmos[a] = NDG(1)
-         invoke( "$KAPPA_DIR/wcsmosaic method=bilin in={0} ref={1} out={2} genvar=yes accept".
-                 format(qrot,ref,qmos[a]) )
-
-#  Combine all the U images together into a single image.
-         msg_out( "Combining all U images for {0} into a single map...".format(a))
-         umos[a] = NDG(1)
-         invoke( "$KAPPA_DIR/wcsmosaic method=bilin in={0} ref={1} out={2} genvar=yes accept".
-                 format(urot,ref,umos[a]) )
+#  Record the NDG objects specifying the cleaned and rotated Q and U maps for
+#  this subarray.
+         qmaps.append( qrot )
+         umaps.append( urot )
 
 #  All sub-arrays are done. Now combine the Q images for all sub-arrays
 #  together into a single image. First form a new NDG containing all the
 #  individual sub-array Q maps, and another one holding the name of the
 #  total Q map.
    msg_out( "Combining all Q and U images for all sub-arrays...")
-
-   qmos_list = []
-   for c in qmos.values():
-      qmos_list.append(c)
-   qmos_all = NDG( qmos_list )
+   qmaps_all = NDG( qmaps )
+   qaligned = NDG( qmaps_all )
+   invoke( "$KAPPA_DIR/wcsalign method=bilin rebin=yes in={0} ref={1} "
+           "out={2} lbnd=!".format(qmaps_all,ref,qaligned) )
    qtotal = NDG( 1 )
-   invoke( "$KAPPA_DIR/wcsmosaic method=bilin in={0} ref={1} out={2} lbnd=!".format(qmos_all,ref,qtotal) )
+   invoke( "$CCDPACK_DIR/makemos method=broad  in={0} out={1}".format(qaligned,qtotal) )
 
 #  Do the same for U.
-   umos_list = []
-   for c in umos.values():
-      umos_list.append(c)
-   umos_all = NDG( umos_list )
+   umaps_all = NDG( umaps )
+   ualigned = NDG( umaps_all )
+   invoke( "$KAPPA_DIR/wcsalign method=bilin rebin=yes in={0} ref={1} "
+           "out={2} lbnd=!".format(umaps_all,ref,ualigned) )
    utotal = NDG( 1 )
-   invoke( "$KAPPA_DIR/wcsmosaic method=bilin in={0} ref={1} out={2} lbnd=!".format(umos_all,ref,utotal) )
+   invoke( "$CCDPACK_DIR/makemos method=broad in={0} out={1}".format(ualigned,utotal) )
 
 #  If no total intensity map was supplied, generate an artificial I image that
 #  is just equal to the polarised intensity image. This is needed because
