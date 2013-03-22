@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(agi, 2.1-2, starlink@jiscmail.ac.uk)
+AC_INIT(agi, 2.2-0, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -28,10 +28,10 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 AC_FC_CHECK_INTRINSICS([SLEEP EXIT])
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [cnf psx gks sae hds par idi])
+STAR_DECLARE_DEPENDENCIES(build, [cnf ast psx gks sae hds par idi])
 dnl    agi_link_adam depends on {pgp,sgs}_link_adam, which are in
 dnl    graphpar
-STAR_DECLARE_DEPENDENCIES(link,  [ref trn sgs pgp pgplot idi hds graphpar])
+STAR_DECLARE_DEPENDENCIES(link,  [ref ast trn sgs pgp pgplot idi hds graphpar])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.

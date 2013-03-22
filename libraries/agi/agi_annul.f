@@ -218,6 +218,10 @@
          ELSE
             CLOSEF = .TRUE.
          ENDIF
+
+*  Ensure any required merging of PGPLOT postscript files has been done.
+         CALL AGP1_EPSMG( STATUS )
+
       ENDIF
 
 *   Return the local error status if the global status is zero

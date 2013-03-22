@@ -1,0 +1,25 @@
+*+
+*   --------
+*   AGI_EPS
+*   --------
+*   This contains the common block holding the name of the original
+*   pre-existing encapculated Postscript file, with which a newly
+*   created EPS file is to be merged. It also holds the name of the
+*   temporary EPS file holding the new data that is to be merged
+*   into the old file. These will both be blank if no EPS merging is
+*   to be performed.
+*
+*   David Berry March 2013
+*-
+
+      INCLUDE 'AGI1_PAR'
+
+      CHARACTER OLDEPS * ( AGI1__MAXPATH )
+      CHARACTER NEWEPS * ( AGI1__MAXPATH )
+      COMMON / AGI_EPSC / OLDEPS, NEWEPS
+      SAVE / AGI_EPSC /
+
+      LOGICAL CLREPS
+      COMMON / AGI_EPS / CLREPS
+      SAVE / AGI_EPS /
+

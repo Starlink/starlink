@@ -28,9 +28,10 @@ libagi_adam_la_SOURCES = $(AGI_ADAM_F_ROUTINES) $(AGI_F_ROUTINES) \
                          $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
 
 # Shared AGP infrastructure
-libagp_la_SOURCES = $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
-libagp_adam_la_SOURCES = $(AGP_ADAM_F_ROUTINES) \
-                         $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
+libagp_la_SOURCES = $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES) \
+                    $(COMMON_C_ROUTINES)
+libagp_adam_la_SOURCES = $(AGP_ADAM_F_ROUTINES) $(COMMON_F_ROUTINES) \
+                    $(BLOCK_DATA_ROUTINES) $(COMMON_C_ROUTINES)
 
 # AGP libraries also need replacement files from agp directory
 # since the files have the same name but different content
@@ -54,8 +55,8 @@ COMMON_F_ROUTINES = agi1_cinit.f  agi1_fdb.f agi1_fetcu.f \
               agi_rcl.f agi_rclp.f agi_rcp.f agi_rcpp.f \
               agi_rcs.f agi_rcsp.f agi_selp.f agi_slab.f \
               agi_sroot.f agi_tcopy.f agi_tddtw.f agi_tdtow.f \
-              agi_tnew.f agi_twtdd.f agi_twtod.f agp_deact.f
-
+              agi_tnew.f agi_twtdd.f agi_twtod.f agp_deact.f \
+              agp1_epsmg.f agp1_epsch.f
 
 AGI_F_ROUTINES = agd1_iidip.f agd1_iinit.f agd1_sidip.f agd_activ.f \
               agd_deact.f agd_nwind.f agd_swind.f agd_updat.f \
@@ -66,6 +67,7 @@ AGI_F_ROUTINES = agd1_iidip.f agd1_iinit.f agd1_sidip.f agd_activ.f \
 AGI_ADAM_F_ROUTINES =  agd_assoc.f agd_deass.f agi_assoc.f agi_cancl.f \
                agp_assoc.f agp_deass.f ags_assoc.f ags_deass.f
 
+COMMON_C_ROUTINES = agp1_merge.c
 
 # These are not duplicated so are in the main directory
 AGP_ADAM_F_ROUTINES = agi_assoc.f agi_cancl.f agp_assoc.f agp_deass.f

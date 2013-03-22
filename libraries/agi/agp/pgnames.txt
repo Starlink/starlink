@@ -1,6 +1,6 @@
 #
 # GNS        PGPLOT    PGPLOT       AGI        Desc
-# type       type      file        name 
+# type       type      file        name
 #----------------------------------------------------------
 #
 
@@ -17,6 +17,12 @@ wd_l/          WD/         -/     AGI_WD/ X Window dump file, landscape/
 wd_p/         VWD/         -/    AGI_VWD/ X Window dump file, portrait/
 xserve/    XSERVE/         -/ AGI_XSERVE/ PGPLOT X window server/
 
+#  These are synonyms for PGPLOT encapculated Postscript devices that automatically
+#  accumulate the results of consecutive plotting programs.
+aps_p/       AVPS/         -/ AGI_2702_0/ Accumulating EPS, monochrome, portrait/
+aps_l/        APS/         -/ AGI_2703_0/ Accumulating EPS, monochrome, landscape/
+apscol_p/   AVCPS/         -/ AGI_2722_0/ Accumulating EPS, color, portrait/
+apscol_l/    ACPS/         -/ AGI_2723_0/ Accumulating EPS, color, landscape/
 
 #  PGPLOT device which are supported by GKS.
 tek_4010/ TEK4010/         -/  AGI_201_0/ Tektronix 4006-4010 storage-tube terminal/

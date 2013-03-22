@@ -83,6 +83,9 @@
 *   Reset the graphics package flag
       CPGPON = .FALSE.
 
+*   Do any required merging of output EPS files.
+      CALL AGP1_EPSMG( STATUS )
+
   99  CONTINUE
 
       END

@@ -1,7 +1,9 @@
 1 AGI_update
 
-  AGI Version 2.1-2
+  AGI Version 2.2-0
 
-  o Use GPL licence
-  o Build using autoconf
+  o Encapsulated Postscript files created by native PGPLOT can now be
+  merged automatically, avoiding the need to use something like psmerge.
+  This is provided by some new "pseudo-device" types: /APS, /ACPS, /AVPS
+  and /AVCPS.
 

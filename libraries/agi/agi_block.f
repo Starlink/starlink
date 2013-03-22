@@ -56,11 +56,15 @@
       INCLUDE 'agi_cref'
       INCLUDE 'agi_nest'
       INCLUDE 'agi_pfree'
+      INCLUDE 'agi_eps'
 
 *  Initialise Common:
       DATA CREF / 0 /
       DATA CNEST / 1 /
       DATA CURPID / 0 /
+      DATA OLDEPS / ' ' /
+      DATA NEWEPS / ' ' /
+      DATA CLREPS / .FALSE. /
 *.
 
       END

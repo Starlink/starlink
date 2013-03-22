@@ -63,3 +63,8 @@
       INTEGER AGI__SZPAR
       PARAMETER ( AGI__SZPAR = 15 )
 
+*     The prefix that is prepended to the name of the
+*     output file when using AGI "acummulating" EPS
+*     pseudo-devices.
+      CHARACTER  AGI__APSPX*6
+      PARAMETER ( AGI__APSPX = 'AGIPS_' )

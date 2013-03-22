@@ -94,6 +94,9 @@
 *        Use AGP1_CHKDV to check the device has not changed.
 *     22-APR-2009 (TIMJ):
 *        ISTAT should not be used. Use STATUS instead.
+*     20-MAR-2013 (DSB):
+*        Set a flag in common if the picture is being cleared to aid merging 
+*        of postscript files.
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -108,6 +111,7 @@
       INCLUDE 'agi_idips'
       INCLUDE 'agi_locs'
       INCLUDE 'agi_pfree'
+      INCLUDE 'agi_eps'
 
 *  Arguments Given :
       LOGICAL BORDER
@@ -175,8 +179,9 @@
 
 *   If PGPLOT is not open then open it now for the current workstation
       IF( PWKNAM .EQ. ' ' ) THEN
-         CALL AGP1_PGBEG( ' ', CGRAWK( CURPID ),STATUS )
+         CALL AGP1_PGBEG( ' ', CGRAWK( CURPID ), STATUS )
          IF (STATUS .EQ. SAI__OK) THEN
+
 *   Check to see that PGPLOT has opened successfully
             CALL PGQINF( 'STATE', STRING, LENSTR )
             IF ( STRING( :LENSTR ) .EQ. 'CLOSED' ) THEN
@@ -248,9 +253,14 @@
 *   If the clear flag is set then clear the window and reset the flag
          IF ( GOTIT ) THEN
 
-*   Do not do the block fill if the device is a hardcopy
+*   If we are using an acummulating postscript device, set a flag
+*   indicating that the picture was cleared.
+            IF( OLDEPS .NE. ' ' ) CLREPS = .TRUE.
+
+*   Do not do the block fill if the device is a hardcopy (unless we are
+*   using an accumulating Postscript device).
             CALL PGQINF( 'HARDCOPY', STRING, LENSTR )
-            IF ( STRING( :LENSTR ) .EQ. 'NO' ) THEN
+            IF ( OLDEPS .NE. ' ' .OR. STRING( :LENSTR ) .EQ. 'NO' ) THEN
 
 *   PGPLOT does not have a specific clearing routine so have to use
 *   a rectangle block fill.

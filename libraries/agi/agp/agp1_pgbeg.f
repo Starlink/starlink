@@ -48,6 +48,8 @@
 *        Original version
 *     14-JAN-2013 (DSB):
 *        Release the error context.
+*     20-MAR-2013 (DSB):
+*        Added merging of EPS output files.
 *-
 
 *  Type Definitions :
@@ -89,6 +91,10 @@
 *  Find the native PGPLOT device specification for the supplied
 *  workstation name.
          CALL AGP1_TRANS( PARAM, WKNAME, DEVNAM, AGINAM, STATUS )
+
+*  Set flags in common to indicate if postscript files need to
+*  be merged when the device is closed.
+         CALL AGP1_EPSCH( DEVNAM, STATUS )
 
 *   Mark a new error context to trap errors from PGBEG
          CALL ERR_MARK

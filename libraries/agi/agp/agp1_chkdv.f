@@ -47,6 +47,10 @@
 *  History:
 *     16-NOV-2001 (DSB):
 *        Original version.
+*     21-MAR-2013 (DSB):
+*        Allow the same AGI device name to be associated with more than
+*        one PGPLOT device name. This is to support accumulating
+*        Postscript pseudo-devices.
 *-
 
 *  Type Definitions:
@@ -72,6 +76,7 @@
 *  Local Variables:
       CHARACTER CURTY*(AGP__SZPTY)! Current PGPLOT device type
       INTEGER I                   ! Loop count
+      INTEGER IBAD                ! Index of non-matching device
       INTEGER NAMLEN              ! Used length of CURTY
 *.
 
@@ -85,24 +90,34 @@
 *  We now find the PGPLOT device type corresponding to the required AGI
 *  device type. Loop through the known device types, looking for the AGI
 *  name.
+      IBAD = 0
       DO I = 1, AGP__NDEV
          IF( AGP_ANM( I ) .EQ. AGINAM ) THEN
 
-*  We've found the entry for the required AGI device type. Compare the
+*  We've found an entry for the required AGI device type. Compare the
 *  corresponding PGPLOT device type with the current PGPLOT device type.
-*  Report an error and abort if they differ.
-            IF( AGP_PTY( I ) .NE. CURTY ) THEN
-               STATUS = AGI__DIFDV
-               CALL MSG_SETC( 'PTY', AGP_PTY( I ) )
-               CALL MSG_SETC( 'CUR', CURTY )
-               CALL ERR_REP( 'AGP1_CHKDV_ERR1', 'Current PGPLOT '//
-     :                       'device has changed from ^PTY to '//
-     :                       '^CUR (programming error).', STATUS )
-               GO TO 999
-            END IF
+*  Set leave the loop and return without error if they match.
+            IF( AGP_PTY( I ) .EQ. CURTY ) GO TO 999
+
+*  Record the index of a non-matching device to use in the error message.
+            IBAD = I
 
          END IF
       END DO
+
+*  Only arrive here if no matching devices were found. Report an error.
+      STATUS = AGI__DIFDV
+      CALL MSG_SETC( 'CUR', CURTY )
+      IF( IBAD .GT. 0 ) THEN
+         CALL MSG_SETC( 'PTY', AGP_PTY( IBAD ) )
+         CALL ERR_REP( 'AGP1_CHKDV_ERR1', 'Current PGPLOT device has '//
+     :                 'changed from ^PTY to ^CUR (programming error).',
+     :                 STATUS )
+      ELSE
+         CALL ERR_REP( 'AGP1_CHKDV_ERR2', 'Current PGPLOT device '//
+     :                 '(^CUR) has no corresponding AGI name '//
+     :                 '(programming error).', STATUS )
+      END IF
 
  999  CONTINUE
 

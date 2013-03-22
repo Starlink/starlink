@@ -71,6 +71,8 @@
 *        Report output file when using PS devices.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     21-MAR-2013 (DSB):
+*        Report output file when using PS devices.
 *     {enter_further_changes_here}
 
 *-
@@ -80,6 +82,7 @@
 
 *  Global Constants:
       INCLUDE  'SAE_PAR'       ! Global SSE definitions
+      INCLUDE  'AGI_PAR'       ! AGI constants
 
 *  Status:
       INTEGER STATUS
@@ -87,6 +90,7 @@
 *  Local Variables:
       CHARACTER STRING*80     ! PGPLOT information
       INTEGER LENSTR          ! Used length of STRING
+      INTEGER LPX             ! Length of AGI__APSPX string
       INTEGER PICID           ! AGI input picture identifier
 *.
 
@@ -96,9 +100,12 @@
 *  Open the AGI workstation to read the device.
       CALL AGI_ASSOC( 'DEVICE', 'READ', PICID, STATUS )
 
-*  If a postscript device has been opedn, tell the user the name of the
-*  output file, and warn them that this file will be over-writen by each
-*  subsequent graphics command.
+*  If a postscript device has been opened, tell the user the name of the
+*  output file, and tell them whether this file will be over-writen or
+*  appended to by each subsequent graphics command (if the PGPLOT file
+*  name starts with the string given by AGI__APSPX, then it is an
+*  "accumulating" PS device and so output will be appended to the file
+*  *without* the AGI__APSPX prefix).
       CALL PGQINF( 'STATE', STRING, LENSTR )
       IF( STRING .EQ. 'OPEN' ) THEN
 
@@ -111,12 +118,27 @@
                CALL PGQINF( 'FILE', STRING, LENSTR )
                IF( STRING .NE. ' ' ) THEN
                   CALL MSG_BLANK( STATUS )
+
+                  LPX = LEN( AGI__APSPX )
+                  IF( STRING( : LPX ) .EQ. AGI__APSPX ) THEN
+
+*  Remove the prefix added by AGI.
+                     STRING( : LPX ) = ' '
+                     CALL CHR_LDBLK( STRING )
+
+                     CALL MSG_SETC( 'X', 'Each subsequent graphics '//
+     :                              'command will append output to '//
+     :                              'any existing file with this '//
+     :                              'name.' )
+                  ELSE
+                     CALL MSG_SETC( 'X', 'Each subsequent graphics '//
+     :                              'command will overwrite any '//
+     :                              'existing file with this name.' )
+                  END IF
+
                   CALL MSG_SETC( 'F', STRING )
                   CALL MSG_OUT( ' ', 'All output will go to file ^F '//
-     :                          'by default. '//
-     :                          'Each subsequent graphics command '//
-     :                          'will overwrite any existing file '//
-     :                          'with this name.', STATUS )
+     :                          'by default. ^X ', STATUS )
                   CALL MSG_BLANK( STATUS )
                END IF
 

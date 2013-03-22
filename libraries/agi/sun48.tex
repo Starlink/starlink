@@ -17,13 +17,13 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {48.8}
 \newcommand{\stardocauthors}   {Nicholas Eaton\\Brian McIlwrath}
-\newcommand{\stardocdate}      {30 January 2002}
+\newcommand{\stardocdate}      {22 March January 2013}
 \newcommand{\stardoctitle}     {AGI --- Applications Graphics Interface
                                 Library}
 %\\[2.5ex]
 %                                A Subroutine Library for Accessing the\\
 %                                Graphics Database}
-\newcommand{\stardocversion}   {Version 2.1}
+\newcommand{\stardocversion}   {Version 2.2}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {}
 % ? End of document identification
@@ -1028,8 +1028,8 @@ a translation the AGI  database records must also be made to match.
 Logic has been incorporated into the AGP library to perform this name
 translation process.
 Also in AGP typing a single ? for the device name will list all the possible
-translations. At
-the time of writing this document these were:
+translations. At the time of writing this document these were (but see also
+section \hyperref{this section}{Section~}{}{aps}):
 \begin{verbatim}
 gif_l     (/GIF)           GIF-format file, landscape
 gif_p     (/VGIF)          GIF-format file, portrait
@@ -2043,7 +2043,87 @@ and therefore the routines {\bf IDI\_ASSOC} and {\bf IDI\_CANCL} or
 {\bf IIDOPN} and {\bf IIDCLO} should not be called when using the
 AGD\_ routines.
 
-%\newpage
+\section {Additional Postscript Features for Native PGPLOT}\label{aps}
+When AGI is used to open the native PGPLOT graphics system for output to
+a Postscript file, several extra ``pseudo-devices'' are recognised that
+provide additional features over and above the corresponding standard
+PGPLOT devices. These device names are:
+
+\begin{center}
+\begin{tabular}{ l l l }
+GNS name  & PGPLOT name  & Description \\
+\hline
+aps\_p    & /AVPS        & Accumulating EPS, monochrome, portrait \\
+aps\_l    & /APS         & Accumulating EPS, monochrome, landscape \\
+apscol\_p & /AVCPS       & Accumulating EPS, color, portrait \\
+apscol\_l & /ACPS        & Accumulating EPS, color, landscape \\
+\end{tabular}
+\end{center}
+
+AGI strips the leading ``A'' from the above PGPLOT device names to create
+the device names that are actually used by PGPLOT. The name of the file
+to receive the Postscript output can be included in the device name as
+normal (\emph{e.g.} ``{\tt fred.ps/ACPS}'' or ``{\tt apscol\_l;fred.ps}'').
+
+If one of these devices is used, then the AGI library will automatically
+concatenate the new Postscript output created by PGPLOT, with any old
+Postscript in the same file after PGPLOT is closed down. It does this by
+temporarily changing the name of the output file by adding the string
+``AGIPS\_'' to the start of the file name before opening PGPLOT. PGPLOT
+then writes the new Postscript to this temporary file. When PGPLOT is
+closed down, AGI appends the contents of this temporary file to the end
+of any pre-existing file with the specified name\footnote{If no file with
+the given name already exists, then the temporary file is just renamed by
+the removal of the ``AGIPS\_'' prefix.}.
+
+Thus, using these devices allows complex composite Postscript pictures to
+be created without the need to use external tools such as psmerge (see
+\xref{SUN/164}{sun164}{}) to merge individual Postscript files.
+
+Some care is taken to keep the size of the merged Postscript file to a
+minimum. For instance, if a new picture obscures an old picture (and the
+new picture has an opaque background) then the old picture is not
+included in the merged Postscript file. Additionally, Postscript files
+that do not generate any visible output are excluded from the merged
+file. Such empty files can be created for instance (when using the
+standard Postscript devices), by the KAPPA:PICSEL command that simply
+selects a different AGI picture but does not draw anything.
+
+An additional minor feature of this merging process - the {\tt BoundingBox}
+comment that PGPLOT places at the end of the Postscript output is moved
+to the start by this process. This allows a wider range of applications
+to read the resulting Postscript file.
+
+Some Postscript viewing tools such as Okular (see {\tt okular.kde.org}) will
+automatically re-draw the display if the contents of the displayed file
+changes on disk. Combined with these ``accumulating'' Postscript devices,
+this provides a scheme that is similar to the use of a traditional
+persistent X-window device. A typical scenario could be:
+
+\begin{verbatim}
+   % rm pgplot.ps
+   % kappa
+   % gdset /acps
+   % gdclear
+   % okular pgplot.ps &
+   % picdef mode=a xpic=2 ypic=2 prefix=a outline=no
+   % display $KAPPA_DIR/m31 accept
+   % picsel a2
+   % linplot $KAPPA_DIR/m31'(,150)' style=def
+   % linplot clear=no $KAPPA_DIR/m31'(,140)' style='+colour=red'
+   % picsel a3
+   % display $KAPPA_DIR/m57 accept
+\end{verbatim}
+
+The {\tt okular} display will update as each KAPPA command adds additional
+pictures into the {\tt pgplot.ps} file. Some notes:
+
+\begin{enumerate}
+\item The {\tt okular} command was put into the background by the trailing
+``\&'' character in order to allow subsequent commands to execute.
+\item The LINPLOT style setting begins with a ``+'' to indicate that it
+should be used only for one invocation of LINPLOT.
+\end{enumerate}
 
 \section {Linking \label{linking}}
 
