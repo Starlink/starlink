@@ -146,6 +146,7 @@ void smurf_fit1d( int * );
 void smurf_fixsteps( int * );
 void smurf_fts2_deglitch( int * );
 void smurf_fts2_flatfield( int * );
+void smurf_fts2_filtermap( int * );
 void smurf_fts2_freqcorr( int * );
 void smurf_fts2_init( int * );
 void smurf_fts2_phasecorr( int * );
