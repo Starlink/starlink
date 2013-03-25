@@ -72,6 +72,8 @@
 *  History:
 *     6-NOV-2001 (DSB):
 *        Original version.
+*     25-MAR-2013 (DSB):
+*        Allow multiple synonyms to be used for a single PGPLOT device.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -122,11 +124,20 @@
          CALL DAT_FIND( LOC1, AGINAM, LOC2, STATUS )
 
 *  Otherwise, we look for a component for a similar device...
-      ELSE
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
-*  Get the GNS device spec for the currently opened device, convert
-*  to upper case, remove spaces, and remove any file specification.
+*  Get the GNS device spec for the currently opened device.
          CALL AGP_ASPEC( AGINAM, .TRUE., SPEC0, STATUS )
+
+*  The same device may be known by several different PGPLOT names (e.g.
+*  the accumulating postscript pseudo-devices managed by AGI). So if the
+*  AGI name is ambiguous, just annul the error and continue with the
+*  first corresponding PGPLOT device found.
+         IF( STATUS .EQ. SAI__ERROR .AND. SPEC0 .NE. ' ' ) THEN
+            CALL ERR_ANNUL( STATUS )
+         END IF
+
+*  Convert to upper case, remove spaces, and remove any file specification.
          CALL CHR_UCASE( SPEC0 )
          CALL CHR_RMBLK( SPEC0 )
          IFILE = INDEX( SPEC0, ';' )
