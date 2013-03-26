@@ -88,13 +88,15 @@
 *     2011-11-21 (EC):
 *        No more need for AST contrib. to static memory usage since we
 *        now just use the map everywhere.
+*     2013-03-25 (TIMJ):
+*        Silence compiler warning in default case.
 *     {enter_further_changes_here}
 
 *  Notes:
 *     This should match memory allocated in smf_grp_related.
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010, 2013 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2011 University of British Columbia.
 *     All Rights Reserved.
@@ -170,8 +172,8 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   dim_t gain_box;              /* Length of blocks for GAI/COM model */
   AstKeyMap *kmap=NULL;        /* Local keymap */
   dim_t nblock;                /* Number of blocks for GAI/COM model */
-  size_t ncol;                 /* Number of columns */
-  size_t ndet;                 /* Number of detectors each time step */
+  size_t ncol = 0;             /* Number of columns */
+  size_t ndet = 0;             /* Number of detectors each time step */
   size_t ndks;                 /* dksquid samples in a subarray, ncol*maxlen */
   size_t nrow;                 /* Number of rows */
   size_t nsamp;                /* bolo samples in a subarray, ndet*maxlen */
