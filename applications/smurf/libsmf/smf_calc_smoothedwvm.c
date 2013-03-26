@@ -539,7 +539,6 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
   double * taudata = NULL;
   size_t ngood = 0;
   dim_t i;
-  dim_t nframes;
   smfCalcWvmJobData *pdata;
   double amprev;
   AstKeyMap * extpars;
@@ -550,7 +549,6 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
   t1 = pdata->t1;
   t2 = pdata->t2;
   amprev = pdata->airmass;
-  nframes = pdata->nframes;
   thesedata = pdata->thesedata;
   taudata = pdata->taudata;
   nrelated = thesedata->ndat;
@@ -595,14 +593,10 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
            (fabs(state->wvm_time - state->rts_end) * SPD) < 60.0 ) {
         /* Only calculate a tau when we have new values */
         if ( prevtime != state->wvm_time ) {
-          float twvm[3]; /* WVM temperatures */
           double thistau = VAL__BADD;
           double airmass = VAL__BADD;
 
           prevtime = state->wvm_time;
-          twvm[0] = state->wvm_t12;
-          twvm[1] = state->wvm_t42;
-          twvm[2] = state->wvm_t78;
 
           airmass = state->tcs_airmass;
           if (airmass == VAL__BADD) {
