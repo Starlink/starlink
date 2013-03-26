@@ -36,7 +36,7 @@
 </component>
 
 <component id="atools" support="S">
-  <version>1.9-10</version>
+  <version>1.9-11</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -184,7 +184,7 @@ CUPID is a package of applications which identify and analyse clumps of
 emission within 2- or 3- dimensional data arrays.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>mers</build><build>cnf</build><build>ifd</build><build>irq</build><build>ndf</build><build>sae</build><build>pda</build><build>thr</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><build option='link'>thr</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>mers</build><build>cnf</build><build>ifd</build><build>irq</build><build>ndf</build><build>sae</build><build>pda</build><build>thr</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><build option='link'>thr</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -867,7 +867,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.13-9</version>
+  <version>2.0-9</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1420,7 +1420,7 @@ A software package designed to search for periodicities in data.
 </component>
 
 <component id="polpack" support="S">
-  <version>3.1-4</version>
+  <version>3.2-0</version>
   <path>applications/polpack</path>
   <description>POLPACK - An Imaging Polarimetry Reduction Package</description>
   <abstract><p>
@@ -1579,7 +1579,7 @@ package.
 </component>
 
 <component id="smurf">
-  <version>1.4.0</version>
+  <version>1.5.0</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>
   <abstract><p>
@@ -2341,7 +2341,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="sc21">
-  <version>1</version>
+  <version>1.2</version>
   <path>docs/sc/021</path>
   <description>The SCUBA-2 Data-analysis Cookbook</description>
   <abstract><p>
@@ -4821,7 +4821,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="pal" support="S">
-  <version>0.1.5</version>
+  <version>0.3.0</version>
   <path>libext/pal</path>
   <description>Position Astronomy Library</description>
   <abstract><p>
@@ -4846,12 +4846,12 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="agi" support="S">
-  <version>2.1-2</version>
+  <version>2.2-0</version>
   <path>libraries/agi</path>
   <description>Applications Graphics Interface Library</description>
   <abstract><p>AGI and AGP interface.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><build>idi</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>pgplot</link><link>idi</link><link>hds</link><link>graphpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>ast</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><build>idi</build><link>ref</link><link>ast</link><link>trn</link><link>sgs</link><link>pgp</link><link>pgplot</link><link>idi</link><link>hds</link><link>graphpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -4878,7 +4878,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ard" support="S">
-  <version>2.2</version>
+  <version>2.3</version>
   <path>libraries/ard</path>
   <description>ASCII Region Definition</description>
   <abstract><p>The ARD (ASCII Region Definition) system provides a
@@ -4941,7 +4941,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>7.1.0</version>
+  <version>7.2.0</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -5309,7 +5309,7 @@ No longer under active control.
 </component>
 
 <component id="grp" support="S">
-  <version>3.6</version>
+  <version>3.7</version>
   <path>libraries/grp</path>
   <description>GRP - Routines for Managing Groups of Objects</description>
   <abstract><p>GRP provides facilities for handling groups of objects which
@@ -5708,7 +5708,7 @@ independently of KAPPA.</p></abstract>
 </component>
 
 <component id="ndg" support="S">
-  <version>6.0</version>
+  <version>7.1</version>
   <path>libraries/ndg</path>
   <description>NDG - Routines for Accessing Groups of NDFs</description>
   <abstract><p>NDG provides facilities for handling groups of NDFs.

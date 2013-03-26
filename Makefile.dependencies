@@ -44,6 +44,7 @@ $(MANIFESTS)/acsisio: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/agi: \
+		$(MANIFESTS)/ast \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
@@ -495,6 +496,7 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
@@ -2083,6 +2085,7 @@ $(MANIFESTS)/polpack: \
 
 $(MANIFESTS)/pongo: \
 		$(MANIFESTS)/agi \
+		$(MANIFESTS)/ast \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
