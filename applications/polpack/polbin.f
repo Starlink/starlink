@@ -66,10 +66,15 @@
 *     METHOD = LITERAL (Read)
 *        The method to be used when binning Stokes parameters. This may be
 *        set to any unique abbreviation of the following:
+*
 *           -  MEAN      -- Mean of the input data values
 *           -  MEDIAN    -- Median of the input data values
 *           -  SIGMA     -- A sigma clipped mean
-*        [MEDIAN]
+*
+*        In all cases, if variances are available for the input Stokes
+*        parameters, then the reciprocals of these variances will be used
+*        to weight the input Stokes parameters when forming the output
+*        Stokes parameters using the selected method. [MEDIAN]
 *     MINVAL = _INTEGER (Read)
 *        The minimum number of good input values which must be present in
 *        a cell to create a good output value. [1]
