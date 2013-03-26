@@ -30,10 +30,10 @@ libagi_adam_la_SOURCES = $(AGI_ADAM_F_ROUTINES) $(AGI_F_ROUTINES) \
                          $(BLOCK_DATA_ROUTINES)
 
 # Shared AGP infrastructure
-libagp_la_SOURCES = $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
-
+libagp_la_SOURCES = $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES) \
+                    $(COMMON_C_ROUTINES)
 libagp_adam_la_SOURCES = $(AGP_ADAM_F_ROUTINES) $(COMMON_F_ROUTINES) \
-                    $(BLOCK_DATA_ROUTINES)
+                    $(BLOCK_DATA_ROUTINES) $(COMMON_C_ROUTINES)
 
 # AGP libraries also need replacement files from agp directory
 # since the files have the same name but different content
@@ -87,7 +87,7 @@ TESTS = agi_test
 check_PROGRAMS = agi_test
 
 agi_test_SOURCES = agi_test.F
-agi_test_LDADD = libagi.la `ref_link` `trn_link` `sgs_link` `pgp_link` `idi_link`
+agi_test_LDADD = libagi.la `ast_link` `ref_link` `trn_link` `sgs_link` `pgp_link` `idi_link`
 
 
 CLEANFILES = AGI_ERR fac_1501_err
