@@ -106,6 +106,15 @@
 *        at the end, and will use a single flatfield when we did heater
 *        track. The parameter value is not sticky and will revert to
 *        the default unless explicitly over-ridden. [!]
+*     HARMONIC = _INTEGER (Read)
+*        The Q and U values are derived from the fourth harmonic of the
+*        half-wave plate rotation. However, to allow investigation of
+*        other instrumental effects, it is possible instead to derive
+*        equivalent quantities from any specified harmonic. These quantities
+*        are calculated in exactly the same way as Q and U, but use the
+*        harmonic specified by this parameter. They are stored in the
+*        output NDFs given by the OUTQ, OUTU and OUTI parameters, in place
+*        of the normal Q, U and I values. [4]
 *     IN = NDF (Read)
 *        Input file(s).
 *     MAXSIZE = _INTEGER (Read)
@@ -164,10 +173,12 @@
 *     15-JAN-2013 (DSB):
 *        - Added ADAM parameters MAXSIZE and MINSIZE.
 *        - Added config parameter SUBMEAN.
+*     26-MAR-2013 (DSB):
+*        Added ADAM parameter HARMONIC.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011-2012 Science and Technology Facilities Council.
+*     Copyright (C) 2011-2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -245,6 +256,7 @@ void smurf_calcqu( int *status ) {
    int block_start;           /* Index of first time slice in block */
    int dkclean;               /* Clean dark squids? */
    int fix;                   /* Fix the POL-2 triggering issue? */
+   int harmonic;              /* The requested harmonic */
    int iblock;                /* Index of current block */
    int iplace;                /* NDF placeholder for current block's I image */
    int ipolcrd;               /* Reference direction for waveplate angles */
@@ -296,6 +308,9 @@ void smurf_calcqu( int *status ) {
 
 /* See if a correction should be made for the POL2 triggering issue. */
       parGet0l( "FIX", &fix, status );
+
+/* See what harmonic is to bused. */
+      parGet0i( "HARMONIC", &harmonic, status );
 
 /* Create HDS container files to hold the output NDFs. */
       datCreat( "OUTQ", "CALCQU", 0, 0, status );
@@ -619,7 +634,7 @@ void smurf_calcqu( int *status ) {
                   smf_calc_iqu( wf, data, block_start, block_end, ipolcrd,
                                 qplace, uplace, iplace, oprov, fc,
                                 pasign, AST__DD2R*paoff, AST__DD2R*angrot,
-                                submean, status );
+                                submean, harmonic, status );
 
 /* Warn about short blocks. */
                } else {

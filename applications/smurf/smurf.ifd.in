@@ -729,6 +729,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter harmonic {
+                type _INTEGER
+                prompt {The half-wave plate harmonic to use}
+                vpath DEFAULT
+                ppath DEFAULT
+                default 4
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF

@@ -17,7 +17,7 @@
 *                       int block_end, int ipolcrd, int qplace, int uplace,
 *                       int iplace, NdgProvenance *oprov, AstFitsChan *fc,
 *                       int pasign, double paoff, double angrot,
-*                       int submean, int *status );
+*                       int submean, int harmonic, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -63,6 +63,11 @@
 *     submean = int  (Given)
 *        If non-zero, subtract the mean bolometer value from each time
 *        slice before using them to calculate Q and U.
+*     harmonic = int  (Given)
+*        The harmonic of the half-wave plate rotation from which the Q
+*        and U values should be derived. This should normally be 4, but
+*        other values can be used to investigate the effects of asymetry in
+*        the half-wave plate, etc.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -108,10 +113,12 @@
 *        Added argument submean.
 *     12-MAR-2013 (DSB):
 *        Added calculation of variances.
+*     26-MAR-2013 (DSB):
+*        Added parameter "harmonic".
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011-2012 Science and Technology Facilities Council.
+*     Copyright (C) 2011-2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -157,6 +164,7 @@ typedef struct smfCalcIQUJobData {
    double *ipiv;
    double *ipqv;
    double *ipuv;
+   double angfac;
    double angrot;
    double paoff;
    int block_end;
@@ -189,7 +197,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
                   int block_end, int ipolcrd, int qplace, int uplace,
                   int iplace, NdgProvenance *oprov, AstFitsChan *fc,
                   int pasign, double paoff, double angrot, int submean,
-                  int *status ){
+                  int harmonic, int *status ){
 
 /* Local Variables: */
    AstFrameSet *wcs;          /* WCS FrameSet for output NDFs */
@@ -440,6 +448,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
          pdata->pasign = pasign ? +1: -1;
          pdata->paoff = paoff;
          pdata->angrot = angrot;
+         pdata->angfac = harmonic/4.0;
          pdata->action = 0;
          pdata->mean = mean;
 
@@ -534,6 +543,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double *ipu;               /* Pointer to output U array */
    double *ipuv;
    double *pm;                /* Pointer to next time slice mean value */
+   double angfac;
    double angle;              /* Phase angle for FFT */
    double angle_l;
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
@@ -616,6 +626,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    pasign = pdata->pasign;
    paoff = pdata->paoff;
    angrot = pdata->angrot;
+   angfac = pdata->angfac;
 
 /* Assume we are not returning any variance values. */
    pdata->gotvar = 0;
@@ -724,6 +735,10 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    series corresponding to the frequency introduced by the rotation of
    the half wave plate. */
                      angle = 2*phi;
+
+/* Allow the angle to be scaled by some user-specified factor. This is to
+   allow the investigation of other harmonics. */
+                     angle *= angfac;
 
 /* If we have now done the required amount of rotation, calculate new Q and
    U values. */

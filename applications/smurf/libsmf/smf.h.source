@@ -603,7 +603,7 @@ void smf_calc_mode( smfHead * hdr, int * status );
 void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start, int block_end,
                    int ipolcrd, int qplace, int uplace, int iplace, NdgProvenance *oprov,
                    AstFitsChan *fc, int pasign, double paoff, double angrot,
-                   int submean, int *status );
+                   int submean, int harmonic, int *status );
 
 void smf_calc_skyframe( const AstFrame * skyin,
                         const char * system, const smfHead* hdr,
