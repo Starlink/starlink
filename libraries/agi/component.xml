@@ -3,12 +3,12 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="agi" support="S">
-  <version>2.1-2</version>
+  <version>2.2-0</version>
   <path>libraries/agi</path>
   <description>Applications Graphics Interface Library</description>
   <abstract><p>AGI and AGP interface.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><build>idi</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>pgplot</link><link>idi</link><link>hds</link><link>graphpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>ast</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><build>idi</build><link>ref</link><link>ast</link><link>trn</link><link>sgs</link><link>pgp</link><link>pgplot</link><link>idi</link><link>hds</link><link>graphpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
