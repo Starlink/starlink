@@ -12,8 +12,8 @@
 
 #  Description:
 #     This script should be invoked by those building ADAM applications
-#     which use AGI in order to generate the correct arguments for the 
-#     compiler (or ld) command. The arguments generated are written to 
+#     which use AGI in order to generate the correct arguments for the
+#     compiler (or ld) command. The arguments generated are written to
 #     the standard output.
 
 #  Invocation:
@@ -44,7 +44,7 @@
 
 #-
 
-      echo -lagi_adam `ref_link_adam` `trn_link_adam` `sgs_link_adam` \
+      echo -lagi_adam `ast_link_adam` `ref_link_adam` `trn_link_adam` `sgs_link_adam` \
                       `pgp_link_adam` `idi_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

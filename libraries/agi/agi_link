@@ -43,7 +43,7 @@
 
 #-
 
-      echo -lagi `ref_link` `trn_link` `sgs_link` `pgp_link` `idi_link` \
+      echo -lagi `ast_link` `ref_link` `trn_link` `sgs_link` `pgp_link` `idi_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

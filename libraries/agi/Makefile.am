@@ -23,15 +23,17 @@ lib_LTLIBRARIES = libagi.la libagi_adam.la libagp.la libagp_adam.la
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 # AGI libraries
-libagi_la_SOURCES = $(COMMON_F_ROUTINES) $(AGI_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
+libagi_la_SOURCES = $(COMMON_F_ROUTINES) $(AGI_F_ROUTINES) \
+                    $(COMMON_C_ROUTINES) $(BLOCK_DATA_ROUTINES)
 libagi_adam_la_SOURCES = $(AGI_ADAM_F_ROUTINES) $(AGI_F_ROUTINES) \
-                         $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
+                         $(COMMON_C_ROUTINES) $(COMMON_F_ROUTINES) \
+                         $(BLOCK_DATA_ROUTINES)
 
 # Shared AGP infrastructure
-libagp_la_SOURCES = $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES) \
-                    $(COMMON_C_ROUTINES)
+libagp_la_SOURCES = $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
+
 libagp_adam_la_SOURCES = $(AGP_ADAM_F_ROUTINES) $(COMMON_F_ROUTINES) \
-                    $(BLOCK_DATA_ROUTINES) $(COMMON_C_ROUTINES)
+                    $(BLOCK_DATA_ROUTINES)
 
 # AGP libraries also need replacement files from agp directory
 # since the files have the same name but different content
