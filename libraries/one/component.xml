@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="one" support="U">
-  <version>1.4-1</version>
+  <version>1.5-1</version>
   <path>libraries/one</path>
   <description>General purpose Starlink odds and ends functions</description>
   <abstract><p> This library is a set of Fortran and C routines of a

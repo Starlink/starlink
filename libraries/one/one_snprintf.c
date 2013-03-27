@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     one_sprintf
+*     one_snprintf
 
 *  Purpose:
 *     Starlink compliant wrapper around the standard snprintf function
@@ -13,11 +13,11 @@
 *     C function
 
 *  Description:
-*     The one_sprintf() function replaces all calls to sprintf() and snprintf()
+*     The one_snprintf() function replaces all calls to sprintf() and snprintf()
 *     to allow the use of inherited status and to trap for truncation.
 
 *  Invocation:
-*     int one_sprintf( char * str, size_t size, const char * format, int * status, ... );
+*     int one_snprintf( char * str, size_t size, const char * format, int * status, ... );
 
 *  Arguments:
 *     str = char * (Returned)
@@ -30,7 +30,7 @@
 *     status = int * (Given and Returned)
 *        Inherited status. Will be set to ONE__TRUNC if the formatted version
 *        of the string does not fit into the buffer "str".
-*     ... = variadic arguments required by sprintf (Given)
+*     ... = variadic arguments required by snprintf (Given)
 
 *  Returned Value:
 *     int retval
@@ -85,10 +85,10 @@
 
 #include "ems.h"
 #include "sae_par.h"
-#include "star/one.h"
+#include "one.h"
 #include "one_err.h"
 
-int one_sprintf( char * str, size_t size, const char * format, int * status, ... ) {
+int one_snprintf( char * str, size_t size, const char * format, int * status, ... ) {
   int len;
   va_list args;
 

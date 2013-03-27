@@ -16,7 +16,7 @@
  *     2008-05-29 (TIMJ):
  *        Initial version.
  *     2013-03-26 (TIMJ):
- *        Add one_sprintf
+ *        Add one_snprintf
 
  *  Copyright:
  *     Copyright (C) 2008, 2013 Science and Technology Facilities Council.
@@ -144,25 +144,25 @@ main ( void ) {
     emsAnnul( &status );
   }
 
-  /* Test sprintf */
-  len = one_sprintf( dest1, ONEBUFSIZ, "->%d", &status, 42 );
+  /* Test snprintf */
+  len = one_snprintf( dest1, ONEBUFSIZ, "->%d", &status, 42 );
   if (status != SAI__OK) {
-    printf("Status bad on one_sprintf when it should be good. Got %s\n", dest1 );
+    printf("Status bad on one_snprintf when it should be good. Got %s\n", dest1 );
     exstat = EXIT_FAILURE;
   }
   if (len != 4) {
-    printf("Got wrong return value from one_sprintf: %d\n", (int)len );
+    printf("Got wrong return value from one_snprintf: %d\n", (int)len );
     exstat = EXIT_FAILURE;
   }
 
   /* truncation */
-  len = one_sprintf( dest1, ONEBUFSIZ, "->%s", &status, src2 );
+  len = one_snprintf( dest1, ONEBUFSIZ, "->%s", &status, src2 );
   if (status == ONE__TRUNC) {
     printf("Correctly truncated string and needed %d characters\n", (int)len );
     printf("--->%s<---\n", dest1);
     emsAnnul( &status );
   } else {
-    printf("Did not set status to ONE__TRUNC in one_sprintf. Needed %d characters\n",
+    printf("Did not set status to ONE__TRUNC in one_snprintf. Needed %d characters\n",
            (int)len);
     exstat = EXIT_FAILURE;
   }

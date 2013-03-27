@@ -18,7 +18,7 @@
  *     2011-05-12 (TIMJ):
  *        Add one_strtod
  *     2013-03-26 (TIMJ):
- *        Add one_sprintf
+ *        Add one_snprintf
 
  *  Copyright:
  *     Copyright (C) 2008,2011,2013 Science and Technology Facilities Council.
@@ -65,8 +65,8 @@ double
 one_strtod( const char * instr, int * status );
 
 int
-one_sprintf( char * str, size_t size, const char * format, int * status,
-             ... ) __attribute__((format ( printf, 3, 5 )));
+one_snprintf( char * str, size_t size, const char * format, int * status,
+              ... ) __attribute__((format ( printf, 3, 5 )));
 
 /* STAR_ONE_H_INCLUDED */
 #endif

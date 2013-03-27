@@ -1,6 +1,6 @@
-1 ONE_Version_1.3
+1 ONE
 
-   The Odds and Ends Library (V1.3) is now released. The full specification
+   The Odds and Ends Library is now released. The full specification
    can be found in sun234.
 
    This Library is a set of Fortran and C routines of a general nature and
@@ -30,7 +30,15 @@
    - one_strtod: Starlink status wrapped version of the standard strtod()
      library function. C only.
 
+   - one_snprintf: Starlink status wrapped version of the standard snprintf()
+     library function. C only.
+
 2 Changes_in_ONE
+
+3 V1.5
+
+  - Add one_snprintf to provide a standardised wrapper around the
+    standard C snprintf routine but supporting Starlink status.
 
 3 V1.4
 
