@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(docfind, 1.3-1, starlink@jiscmail.ac.uk)
+AC_INIT(docfind, 1.3-2, starlink@jiscmail.ac.uk)
  
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -12,7 +12,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
  
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([docfind.in])
+AC_CONFIG_SRCDIR([docfind])
 
  
 dnl    Include defaults for Starlink configurations
