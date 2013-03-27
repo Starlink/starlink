@@ -76,7 +76,7 @@
 #  Define a shell variable to be the top level of the Starlink software.
 #  This is changed when the software is installed.
 
-root=@prefix@  #  Searched for by the makefile at install time.
+root=$STARLINK_DIR  #  Searched for by the makefile at install time.
 
 #  Define shell variables to be the directories containing the
 #  documentation.
