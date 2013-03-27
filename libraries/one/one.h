@@ -17,9 +17,11 @@
  *        Initial version.
  *     2011-05-12 (TIMJ):
  *        Add one_strtod
+ *     2013-03-26 (TIMJ):
+ *        Add one_sprintf
 
  *  Copyright:
- *     Copyright (C) 2008,2011 Science and Technology Facilities Council.
+ *     Copyright (C) 2008,2011,2013 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -50,12 +52,21 @@
 
 #include <sys/types.h>
 
+/* If we're not using GNU C, elide __attribute__ */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 size_t
 one_strlcpy( char * dest, const char * src, size_t size, int * status );
 size_t
 one_strlcat( char * dest, const char * src, size_t size, int * status );
 double
 one_strtod( const char * instr, int * status );
+
+int
+one_sprintf( char * str, size_t size, const char * format, int * status,
+             ... ) __attribute__((format ( printf, 3, 5 )));
 
 /* STAR_ONE_H_INCLUDED */
 #endif

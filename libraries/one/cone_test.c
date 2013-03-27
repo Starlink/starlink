@@ -15,9 +15,11 @@
  *  History:
  *     2008-05-29 (TIMJ):
  *        Initial version.
+ *     2013-03-26 (TIMJ):
+ *        Add one_sprintf
 
  *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008, 2013 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -140,6 +142,29 @@ main ( void ) {
   } else {
     printf("Correctly failed to parse text\n");
     emsAnnul( &status );
+  }
+
+  /* Test sprintf */
+  len = one_sprintf( dest1, ONEBUFSIZ, "->%d", &status, 42 );
+  if (status != SAI__OK) {
+    printf("Status bad on one_sprintf when it should be good. Got %s\n", dest1 );
+    exstat = EXIT_FAILURE;
+  }
+  if (len != 4) {
+    printf("Got wrong return value from one_sprintf: %d\n", (int)len );
+    exstat = EXIT_FAILURE;
+  }
+
+  /* truncation */
+  len = one_sprintf( dest1, ONEBUFSIZ, "->%s", &status, src2 );
+  if (status == ONE__TRUNC) {
+    printf("Correctly truncated string and needed %d characters\n", (int)len );
+    printf("--->%s<---\n", dest1);
+    emsAnnul( &status );
+  } else {
+    printf("Did not set status to ONE__TRUNC in one_sprintf. Needed %d characters\n",
+           (int)len);
+    exstat = EXIT_FAILURE;
   }
 
   return exstat;
