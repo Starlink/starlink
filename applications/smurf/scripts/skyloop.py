@@ -314,6 +314,8 @@ try:
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
+   params.append(starutil.Par0S("RESTART", "Directory holding data from an interrupted run of skyloop",
+                                default=None, noprompt=True ))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line. This automatically adds definitions for the additional parameters
@@ -323,6 +325,15 @@ try:
 #  It's a good idea to get parameter values early if possible, in case
 #  the user goes off for a coffee whilst the script is running and does not
 #  see a later parameter prompt or error.
+   restart = parsys["RESTART"].value
+   if restart == None:
+      retain = parsys["RETAIN"].value
+   else:
+      retain = True
+      NDG.tempdir = restart
+      NDG.overwrite = True
+      msg_out( "Re-starting using data in {0}".format(restart) )
+
    indata = parsys["IN"].value
    outdata = parsys["OUT"].value
    niter = parsys["NITER"].value
@@ -332,7 +343,6 @@ try:
    mask2 = parsys["MASK2"].value
    mask3 = parsys["MASK3"].value
    extra = parsys["EXTRA"].value
-   retain = parsys["RETAIN"].value
    itermap = parsys["ITERMAP"].value
 
 #  If requested, use numiter from the config file. Arbitrarily choose 850 um
@@ -442,43 +452,56 @@ try:
    maps = []
    maps.append(newmap)
 
-# Now construct the text of the makemap command and invoke it.
+#  If we are restarting, check if the NDF already exists and is readable.
+#  If so, we do not re-create it.
    msg_out( "Iteration 1...")
-   cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}'".format(indata,newmap,conf0)
-   if pixsize:
-      cmd += " pixsize={0}".format(pixsize)
-   if ref:
-      cmd += " ref={0}".format(ref)
-   if mask2:
-      cmd += " mask2={0}".format(mask2)
-   if mask3:
-      cmd += " mask3={0}".format(mask3)
-   if extra:
-      cmd += " "+extra
-   invoke(cmd)
+   gotit = False
+   if restart != None:
+      try:
+         invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(newmap))
+         msg_out( "Re-using existing map {0}".format(newmap) )
+         gotit = True
+      except:
+         pass
+
+#  If required, construct the text of the makemap command and invoke it.
+   if not gotit:
+      cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}'".format(indata,newmap,conf0)
+      if pixsize:
+         cmd += " pixsize={0}".format(pixsize)
+      if ref:
+         cmd += " ref={0}".format(ref)
+      if mask2:
+         cmd += " mask2={0}".format(mask2)
+      if mask3:
+         cmd += " mask3={0}".format(mask3)
+      if extra:
+         cmd += " "+extra
+      invoke(cmd)
 
 #  The NDFs holding the cleaned time-series data will have been created by
 #  makemap in the current working directory. Move them to the NDG temporary
 #  directory. Avoid moving any other files that have similar names by
 #  checking each file inode number and last-accessed time against the lists
 #  of inode numbers and times that existed before makemap was run.
-   if niter > 1:
-      for ndf in glob.glob("s*_con_res_cln.sdf"):
-         if not ndf in orig_cln_ndfs:
-            shutil.move( ndf, NDG.tempdir )
-         elif os.stat(ndf).st_atime > orig_cln_ndfs[ndf]:
-            shutil.move( ndf, NDG.tempdir )
-
-#  Get the paths to the the moved cleaned files.
-      cleaned = NDG( os.path.join( NDG.tempdir,"s*_con_res_cln.sdf"))
+      if niter > 1:
+         for ndf in glob.glob("s*_con_res_cln.sdf"):
+            if not ndf in orig_cln_ndfs:
+               shutil.move( ndf, NDG.tempdir )
+            elif os.stat(ndf).st_atime > orig_cln_ndfs[ndf]:
+               shutil.move( ndf, NDG.tempdir )
 
 #  Get a list of the extinction correction files created by the first
 #  invocation of makemap.
-      for ndf in glob.glob("s*_con_ext.sdf"):
-         if not ndf in orig_ext_ndfs:
-            new_ext_ndfs.append(ndf)
-         elif os.stat(ndf).st_atime > orig_ext_ndfs[ndf]:
-            new_ext_ndfs.append(ndf)
+         for ndf in glob.glob("s*_con_ext.sdf"):
+            if not ndf in orig_ext_ndfs:
+               new_ext_ndfs.append(ndf)
+            elif os.stat(ndf).st_atime > orig_ext_ndfs[ndf]:
+               new_ext_ndfs.append(ndf)
+
+#  Get the paths to the the moved cleaned files.
+   if niter > 1:
+      cleaned = NDG( os.path.join( NDG.tempdir,"s*_con_res_cln.sdf"))
 
 #  Now do the second and subsequent iterations. These use the cleaned
 #  time-series data created by the first iteration as their time-series
@@ -570,19 +593,30 @@ try:
                fd.write("{0}={1}\n".format( key, add[key] ))
             fd.close()
 
-#  Construct the text of the makemap command and invoke it. We specify
-#  the map from the previous iteration as the REF image.
-         cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}' ref={3}"\
-               .format(cleaned,newmap,confname,prevmap)
-         if pixsize:
-            cmd += " pixsize={0}".format(pixsize)
-         if mask2:
-            cmd += " mask2={0}".format(mask2)
-         if mask3:
-            cmd += " mask3={0}".format(mask3)
-         if extra:
-            cmd += " "+extra
-         invoke(cmd)
+#  See if the output NDF already exists.
+         gotit = False
+         if restart != None:
+            try:
+               invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(newmap))
+               msg_out( "Re-using existing map {0}".format(newmap) )
+               gotit = True
+            except:
+               pass
+
+#  If required, construct the text of the makemap command and invoke it. We
+#  specify the map from the previous iteration as the REF image.
+         if not gotit:
+            cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}' ref={3}"\
+                  .format(cleaned,newmap,confname,prevmap)
+            if pixsize:
+               cmd += " pixsize={0}".format(pixsize)
+            if mask2:
+               cmd += " mask2={0}".format(mask2)
+            if mask3:
+               cmd += " mask3={0}".format(mask3)
+            if extra:
+               cmd += " "+extra
+            invoke(cmd)
 
 #  If required, get the mean normalised map change, and see if it has
 #  dropped below maptol. If so, we must do one further iteration to

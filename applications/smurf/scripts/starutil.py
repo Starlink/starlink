@@ -8,6 +8,7 @@ import shutil
 import glob
 import inspect
 import time
+import datetime
 
 #  Provide recall and editing facilities for parameter prompts
 import readline
@@ -125,9 +126,23 @@ def __open_log_file():
    if __logfd == None:
       if logfile == None:
          logfile = "{0}.log".format(cmd())
+      print( "Logging to file {0} ".format(logfile) )
+
+      # Rename any existing file by appending a unique version number to
+      # the end of it.
+      version = 0
+      mvto = logfile
+      while os.path.isfile(mvto):
+         version += 1
+         mvto = "{0}.{1}".format(logfile,version)
+
+      if version > 0 :
+         os.rename( logfile, mvto )
+         print( "(existing file {0} moved to {1})\n".format(logfile,mvto) )
+
       __logfd = open( logfile, "w" )
       __logfile = logfile
-      print( "Logging to file {0}".format(logfile) )
+      __logfd.write("{0} log file created at {1}\n".format(cmd(),datetime.datetime.now()))
 
 
 #  Funtion to remove the current working directory from the front of a
@@ -1745,6 +1760,12 @@ class NDG(object):
 	 then assigned to the NDG.tempdir class variable. The value of
 	 this variable may be changed to force subsequent NDG objects to
 	 use a different temporary directory.
+      NDG.overwrite = boolean
+         If False (the default), then the sequence numbers used to create
+         temportary files will exclude any files that already exist in the
+         NDG temporary directory (i.e. any existing files will not be
+         over-written). If True, then the sequence number starts from 1
+         regardless of whether wthis causes existing files to be over-written.
 
    Class Methods:
       NDG.cleanup():
@@ -1768,6 +1789,10 @@ class NDG(object):
 
    # The full path to the temporary directory.
    tempdir = None
+
+   # Start the sequence number for new files at 1, even if files already
+   # exist with these sequence numbers?
+   overwrite = False
 
    # Return the path to the directory to hold temporary files. If nothing
    # has been set for the NDG.tempdir variable, use the tempfile module to
@@ -1895,15 +1920,17 @@ class NDG(object):
 
       # If we are going to create a list file (i.e. if there is more than
       # one NDF in the group), or if we are going to place any NDFs in the
-      # tempdir, get a reference to the tempdir, and find a unique
-      # identifying integer for files belong to the group.
+      # tempdir, get a reference to the tempdir, and (if we are not
+      # over-writing existing files) find a unique identifying integer for
+      # files belonging to the group.
       if nfile > 1 or intemp:
          self.__tmpdir = NDG._gettmpdir()
          NDG.__nobj += 1
          pattern = "{0}/group{1}_*".format(self.__tmpdir,NDG.__nobj)
-         while len(glob.glob(pattern)) > 0:
-            NDG.__nobj += 1
-            pattern = "{0}/group{1}_*".format(self.__tmpdir,NDG.__nobj)
+         if not NDG.overwrite:
+            while len(glob.glob(pattern)) > 0:
+               NDG.__nobj += 1
+               pattern = "{0}/group{1}_*".format(self.__tmpdir,NDG.__nobj)
 
       # If the NDG represents more than one NDF, decide on the name of the
       # text file to hold the NDF list.
