@@ -43,6 +43,7 @@
 *  Usage:
 *     skyloop in out niter pixsize config [itermap] [ref] [mask2] [mask3]
 *             [extra] [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*             [restart]
 
 *  Parameters:
 *     CONFIG = LITERAL (Read)
@@ -188,6 +189,14 @@
 *        On the second and subsequent invocations of MAKEMAP, any
 *        supplied REF image is replaced by the map created by the previous
 *        invocation of MAKEMAP. [!]
+*     RESTART = LITERAL (Read)
+*        If a value is assigned to this parameter, it should be the path
+*        to a directory containing the intermediate files created by a
+*        previous run of SKYLOOP. If supplied, execution of skyloop will
+*        restart from the point where the previous run finished. This is
+*        useful for continuing runs that have been interupted accidentally.
+*        The path to the intermediate files can be found by examining the
+*        log file created by the previous run. [!]
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
 *        created by this script be retained? If not, it will be deleted
@@ -227,6 +236,8 @@
 *        - Record quality info in the final map.
 *     9-JAN-2013 (DSB):
 *        Add support for diagnostics.
+*     28-MAR-2013 (DSB):
+*        Added parameter RESTART.
 
 *-
 '''
@@ -674,10 +685,12 @@ try:
 except starutil.StarUtilError as err:
 #  raise
    print( err )
-   cleanup()
+   print( "\n\nskyloop ended prematurely so intermediate files are being retained in {0}.".format(NDG.tempdir) )
+   print( "It may be possible to re-started skyloop using the RESTART parameter.\n" )
 
 # This is to trap control-C etc, so that we can clean up temp files.
 except:
-   cleanup()
+   print( "\n\nskyloop ended prematurely so intermediate files are being retained in {0}.".format(NDG.tempdir) )
+   print( "It may be possible to re-started skyloop using the RESTART parameter.\n" )
    raise
 
