@@ -46,10 +46,10 @@
 *        components will contain multiple NDFs with names in the following
 *        format: "<where>_<chunk>_<what>", where <what> is "power" or "time",
 *        <chunk> is the integer chunk index, and <where> is one of:
-*           - "before": the NDF contains the residuals as they were before
+*           - "bef": the NDF contains the residuals as they were before
 *              the model was subtracted.
-*           - "model": the NDF contains the model values themselves.
-*           - "after": the NDF contains the residuals as they were after
+*           - "mod": the NDF contains the model values themselves.
+*           - "aft": the NDF contains the residuals as they were after
 *              the model was subtracted.
 *        Each NDF will be 2-dimensional, with the first pixel axis
 *        representing time or frequency, and the second pixel axis
@@ -415,7 +415,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                if( res_before && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals before subtraction of %s",
                            status, modname );
-                  sprintf( root, "before_%d", chunk );
+                  sprintf( root, "bef_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub, dat,
                             type, NULL, 1, root, 0, mingood, cube, status );
                }
@@ -424,14 +424,14 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    model, then dump the model and also dump the residuals if requested. */
             } else if( where == 1 ) {
                msgOutf( "", "Diagnostics: Dumping %s model", status, modname );
-               sprintf( root, "model_%d", chunk );
+               sprintf( root, "mod_%d", chunk );
                smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                          dat, type, allmodel ? allmodel[ 0 ] : NULL,
                          0, root, mask, mingood, cube, status );
                if( res_after && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
                            status, modname );
-                  sprintf( root, "after_%d", chunk );
+                  sprintf( root, "aft_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub, dat,
                             type, NULL, 1, root, 0, mingood, cube, status );
                }

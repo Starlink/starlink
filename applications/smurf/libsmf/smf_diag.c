@@ -653,8 +653,8 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
               status );
 
 /* Copy the data. */
-      if( *status == SAI__OK ) memcpy( ip + irow*ndata, buffer,
-                                       sizeof(double)*ndata );
+      if( *status == SAI__OK ) memcpy( ip + ( irow + 1 - lbnd[1] )*ndata,
+                                       buffer, sizeof(double)*ndata );
 
 /* Free resources. */
       ndfAnnul( &indf, status );

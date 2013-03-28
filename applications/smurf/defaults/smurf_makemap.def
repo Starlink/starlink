@@ -527,12 +527,12 @@ diag.models = (com,ext,flt,ast,res)
 #		"<where>_<chunk>_<what>", where <what> is "power" or "time",
 # 		<chunk> is the integer chunk index, and <where> is one of:
 #
-# 		- "before": the NDF contains the residuals as they were
+# 		- "bef": the NDF contains the residuals as they were
 #		before the model was subtracted.
 #
-# 		- "model": the NDF contains the model values themselves.
+# 		- "mod": the NDF contains the model values themselves.
 #
-# 		- "after": the NDF contains the residuals as they were after
+# 		- "aft": the NDF contains the residuals as they were after
 #   		the model was subtracted.
 #
 # 		Each NDF will be 2-dimensional, with the first pixel axis
