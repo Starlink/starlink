@@ -13,6 +13,8 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'CNF_PAR'
+
 *     Formal parameters
 
       CHARACTER STRING*(*)                 ! Symbol to be defined
@@ -36,6 +38,7 @@
       INTEGER*4 NBYTES
       INTEGER*4 LBRACKET
       INTEGER*4 RBRACKET
+      LOGICAL   ISNEW
       CHARACTER TYPE*4
 
       CHARACTER NAME*16
@@ -100,8 +103,8 @@
       END IF
 
       CALL GEN_MAKESYMB (NAME(:LBRACKET-1), TYPE, ARRAY_LENGTH,
-     &                   UMEMORY_PTR + UMEMORY_LENGTH,
-     &                   IERR)
+     &     CNF_PREG( CNF_PVAL(UMEMORY_PTR) + UMEMORY_LENGTH, ISNEW ),
+     &     IERR )
 
 *     No errors? allocate user memory
 

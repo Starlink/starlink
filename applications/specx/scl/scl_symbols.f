@@ -25,6 +25,8 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'CNF_PAR'
+
 *     Formal parameters
 
       CHARACTER STRING*(*)                 ! Symbol to be defined
@@ -53,6 +55,7 @@
       INTEGER*4 NBTOT
       INTEGER*4 LBRACKET
       INTEGER*4 RBRACKET
+      LOGICAL   ISNEW
       CHARACTER TYPE*4
 
       CHARACTER NAME*16
@@ -116,15 +119,15 @@
       END IF
 
       CALL GEN_MAKESYMB (NAME(:LBRACKET-1), TYPE, ARRAY_LENGTH,
-     &                   UMEMORY_PTR + UMEMORY_LENGTH,
-     &                   IERR)
+     &     CNF_PREG( CNF_PVAL(UMEMORY_PTR) + UMEMORY_LENGTH, ISNEW ),
+     &     IERR )
 
 *     No errors? allocate user memory (note: allocate enough to end
-*     on 4-byte word boundary)
+*     on 8-byte word boundary)
 
       IF (IERR.NE.0) GO TO 99
 
-      NBTOT = 4*((NBYTES*ARRAY_LENGTH-1)/4)+4
+      NBTOT = 8*((NBYTES*ARRAY_LENGTH-1)/8)+8
       IF (UMEMORY_LENGTH + NBTOT .GT.  UMEMORY_SIZE) THEN
         IERR = 90
         GO TO 99
