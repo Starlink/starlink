@@ -64,6 +64,8 @@
 *  History:
 *     13-JAN-2011 (DSB):
 *        Original version.
+*     28-MAR-2013 (DSB):
+*        Do not try to export a null AST pointer.
 *     {enter_further_changes_here}
 
 *-
@@ -379,10 +381,10 @@
 
       END IF
 
-*  Export the returned Object pointer from the current AST context, and
+*  Export any returned Object pointer from the current AST context, and
 *  then end the context, thus annulling any objects created within the
 *  current AST context.
-      CALL AST_EXPORT( TABLE, STATUS )
+      IF( TABLE .NE. AST__NULL ) CALL AST_EXPORT( TABLE, STATUS )
       CALL AST_END( STATUS )
 
       END
