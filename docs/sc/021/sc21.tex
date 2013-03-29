@@ -2872,7 +2872,9 @@ result in a map with units of Jy/beam. For point-like or compact
 sources smaller than the beam (with a Gaussian profile), this peak
 value will be the flux density of your source. Be aware that the
 pipeline (see \cref{Section}{sec:pipe}{SCUBA-2 Pipeline}) reports FCFs
-in units of mJy/beam.
+in units of mJy/beam.  Note that \fcfb\ applies to the default pixel
+sizes (4\,arcsec at 850\,$\mu$m and 2\,arcsec at 450\,$\mu$m). For
+pixel sizes other than these, \fcfb\ will need to be scaled accordingly.
 
 \subsubsection{Aperture FCF}
 
