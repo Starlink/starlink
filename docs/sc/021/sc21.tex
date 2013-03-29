@@ -782,7 +782,7 @@ instructions for examining raw data are given in
 \cref{Section}{sec:dimm}{This page} introduces the Dynamic Iterative Map-Maker
 (DIMM); it offers an in-depth description of the map-making
 process and introduces the configuration files necessary to run the
-reduction. \cref{Section}{sec:maps}{Reducing your Data} covers running 
+reduction. \cref{Section}{sec:maps}{Reducing your Data} covers running
 the map-maker and what to look out for, while
 \cref{Section}{sec:postprocess}{Post-processing Reduction Steps}
 outlines the main post-processing steps you may wish to apply to your
@@ -1707,7 +1707,7 @@ decreasing magnitude, ultimately leaving just the astronomical signal
 plus noise. A list of the modelled components can be seen in
 \cref{Table}{tab:mods}{tabulated} and a description found in
 \cref{Section}{sec:models}{The Individual Models}.
-% tab:mods references the section sec:models not the table in PostScript. 
+% tab:mods references the section sec:models not the table in PostScript.
 % Reason TBD.
 
 The map-maker calls configuration parameters which instruct the
@@ -2500,7 +2500,7 @@ calling the map-maker as this this the default option.
 \begin{myquote}
 \begin{verbatim}
 % makemap in='/jcmtdata/raw/scuba2/s8*/20120720/00030/*.sdf' out=850_crl2688\
-  config=^$STARLINK_DIR/share/smurf/dimmconfig.lis 
+  config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
 
 Out of 32 input files, 4 were darks, 8 were fast flats and 20 were science
@@ -2729,7 +2729,7 @@ resulting in higher noise than expected.
 \textbf{Convergence}\\
 What about the convergence parameter? As discussed in
 \cref{Section}{sec:converge}{Convergence} there are two noise based
-convergence criteria that can be set---\texttt{maptol} and \texttt{chitol}. 
+convergence criteria that can be set---\texttt{maptol} and \texttt{chitol}.
 
 Both are reported during processing but only one will be used to determine
 if convergence has been achieved.
@@ -3522,7 +3522,7 @@ in question.
 \texttt{AST} masking is the option we recommend. On each iteration the
 map is constrained to zero at all points outside the masked region and
 the \texttt{AST} model is estimated based only on data inside the
-mask. 
+mask.
 
 \texttt{FLT} masking is used to omit bright sources from the estimate
 of the low frequency background subtracted from the residuals on each
@@ -3565,7 +3565,7 @@ iteration. Setting \texttt{ast.zero\_snr} too low can cause noise
 spikes to be interpreted as signal. Instead, \texttt{ast.zero\_snrlo}
 can be set which allows the mask to grow to include pixels with an SNR
 down to \texttt{ast.zero\_snrlo}. This typically improves the
-resulting map so is well worth experimenting with. 
+resulting map so is well worth experimenting with.
 
 An alternative to setting \texttt{ast.zero\_snrlo} is to smooth the
 SNR mask by setting the parameter \texttt{ast.zero\_snr\_fwhm}.
@@ -3605,7 +3605,7 @@ As an SNR mask is redetermined after each iteration it varies as the
 map varies which can sometimes cause convergence problems. The mask
 will also depend on the amount of data going into the map and the
 pixel size. An externally supplied mask is fixed and tells the
-map-maker where you expect the emission to be. 
+map-maker where you expect the emission to be.
 
 The sequence below is a summary of the procedure for generating and
 supplying an external mask. In this example the mask is generated from
@@ -4310,7 +4310,7 @@ the dataset and the maps are `whitened' by the removal of the residual
 1/\emph{f} noise. The whitened signal map is processed with the
 matched filter using the whitened PSF map as the PSF input. The data
 are calibrated in mJy/beam using a corrected FCF. See
-\cref{Section}{sec:jk}{Example 2 - Advanced pipeline method} for a 
+\cref{Section}{sec:jk}{Example 2 - Advanced pipeline method} for a
 more-detailed description of this recipe and the files produced.
 
 \subsubsection{\xlabel{assessnoise}ASSESS\_DATA\_NOISE}
