@@ -42,7 +42,7 @@
  *        - Fixed possible memory leaks
  *        - Removed redundancies
  *     2012-12-12 (MSHERWOOD):
- *     	  Put back adjustment for non-centered mirror starting position.
+ *        Put back adjustment for non-centered mirror starting position.
  *     2012-12-21 (MSHERWOOD)
  *        Removed unneccessary sort (fts2_validatemirrorpositions now reverses list when needed)
  *
@@ -292,8 +292,8 @@ void smurf_fts2_init(int* status)
 
         /* ZPD position in OPD grid */
         ZPD = *((double*) (zpdData->pntr[0]) + bolIndex);
-		/* Convert from mechanical mm (x 4) to optical cm (/ 10) */
-		ZPD = ZPD * 0.4;
+        /* Convert from mechanical mm (x 4) to optical cm (/ 10) */
+        ZPD = ZPD * 0.4;
 
         badPixel = 0;
         /* Read in interferogram */
@@ -327,7 +327,7 @@ void smurf_fts2_init(int* status)
 
           if(OPD_EVEN[k] <= ZPD) { indexZPD = k;}
         }
-		*((int*) (zpd->pntr[0]) + bolIndex) = indexZPD;
+        *((int*) (zpd->pntr[0]) + bolIndex) = indexZPD;
       }
     }
 

@@ -111,6 +111,7 @@
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smurflib.h"
@@ -129,39 +130,39 @@
 
 /* DEBUG: */
 int chooseFileType(void) { 
-	int c = 0;
-	char* line;
-	int bytes = 100;
-	int bytes_read;
-	double real;
-	double img;
-	double ari;
-	double air;
-	int args;
-	
-	
-	while (1) { 
-		printf("\nSelect the type of output file you want:\n");
-		printf("'d' : <Default> phase corrected output          => _phs\n");
-		printf("'r' : Real part of spectra                      => _phs_SR\n");
-		printf("'i' : Imaginary part of spectra                 => _phs_SI\n");
-		printf("'p' : Phase part of spectra                     => _phs_SP\n");
-		printf("'f' : Fitted phase part of spectra              => _phs_SPF\n");
-		printf("'w' : Wave numbers                              => _phs_WN\n");
-		printf("'t' : Weights                                   => _phs_WT\n");
-		printf("'R' : Real part of phase corrected spectra      => _phs_SRC\n");
-		printf("'I' : Imaginary part of phase corrected spectra => _phs_SIC\n");
+    int c = 0;
+    char* line;
+    int bytes = 100;
+    int bytes_read;
+    double real;
+    double img;
+    double ari;
+    double air;
+    int args;
+    
+    
+    while (1) { 
+        printf("\nSelect the type of output file you want:\n");
+        printf("'d' : <Default> phase corrected output          => _phs\n");
+        printf("'r' : Real part of spectra                      => _phs_SR\n");
+        printf("'i' : Imaginary part of spectra                 => _phs_SI\n");
+        printf("'p' : Phase part of spectra                     => _phs_SP\n");
+        printf("'f' : Fitted phase part of spectra              => _phs_SPF\n");
+        printf("'w' : Wave numbers                              => _phs_WN\n");
+        printf("'t' : Weights                                   => _phs_WT\n");
+        printf("'R' : Real part of phase corrected spectra      => _phs_SRC\n");
+        printf("'I' : Imaginary part of phase corrected spectra => _phs_SIC\n");
 
-		printf("Select type to continue: ");
-		c = getchar();
-		if (c == '\n' || c == EOF) {
-			c = 'd';
-			break;
-		} else if (c == 'd' || c == 'r' || c == 'i' || c == 'p' || c == 'f' || c == 'w' || c == 't' || c == 'R' || c == 'I') {
-			break;
-		} 	
-	} 
-	return c;
+        printf("Select type to continue: ");
+        c = getchar();
+        if (c == '\n' || c == EOF) {
+            c = 'd';
+            break;
+        } else if (c == 'd' || c == 'r' || c == 'i' || c == 'p' || c == 'f' || c == 'w' || c == 't' || c == 'R' || c == 'I') {
+            break;
+        }     
+    } 
+    return c;
 }
 
 
@@ -174,23 +175,23 @@ void smurf_fts2_phasecorrds(int* status)
   Grp* gOut                 = NULL;               /* Output group */
   smfData* inData           = NULL;               /* Pointer to input data */
   smfData* outData          = NULL;               /* Pointer to output data */
-  double* outData_pntr		= NULL;               /* Pointer to output data values array */
+  double* outData_pntr      = NULL;               /* Pointer to output data values array */
   smfData* outDataSR        = NULL;               /* Pointer to output data Spectrum Real DEBUG */
-  double* outDataSR_pntr	= NULL;               /* Pointer to output data Spectrum Real values array */
+  double* outDataSR_pntr    = NULL;               /* Pointer to output data Spectrum Real values array */
   smfData* outDataSI        = NULL;               /* Pointer to output data Spectrum Imaginary DEBUG */
-  double* outDataSI_pntr	= NULL;               /* Pointer to output data Spectrum Imaginary values array */
+  double* outDataSI_pntr    = NULL;               /* Pointer to output data Spectrum Imaginary values array */
   smfData* outDataSRC       = NULL;               /* Pointer to output data Spectrum Real phase Corrected DEBUG */
-  double* outDataSRC_pntr	= NULL;               /* Pointer to output data Spectrum Real phase Corrected values array */
+  double* outDataSRC_pntr   = NULL;               /* Pointer to output data Spectrum Real phase Corrected values array */
   smfData* outDataSIC       = NULL;               /* Pointer to output data Spectrum Imaginary phase Corrected DEBUG */
-  double* outDataSIC_pntr	= NULL;               /* Pointer to output data Spectrum Imaginary phase Corrected values array */
+  double* outDataSIC_pntr   = NULL;               /* Pointer to output data Spectrum Imaginary phase Corrected values array */
   smfData* outDataSP        = NULL;               /* Pointer to output data Spectrum Phase DEBUG */
-  double* outDataSP_pntr	= NULL;               /* Pointer to output data Spectrum Phase values array */
+  double* outDataSP_pntr    = NULL;               /* Pointer to output data Spectrum Phase values array */
   smfData* outDataSPF       = NULL;               /* Pointer to output data Spectrum Phase Fitted DEBUG */
-  double* outDataSPF_pntr	= NULL;               /* Pointer to output data Spectrum Phase Fitted values array */
+  double* outDataSPF_pntr   = NULL;               /* Pointer to output data Spectrum Phase Fitted values array */
   smfData* outDataWN        = NULL;               /* Pointer to output data Wave Numbers DEBUG */
-  double* outDataWN_pntr	= NULL;               /* Pointer to output data Wave Numbers values array */
+  double* outDataWN_pntr    = NULL;               /* Pointer to output data Wave Numbers values array */
   smfData* outDataWT        = NULL;               /* Pointer to output data Weights DEBUG */
-  double* outDataWT_pntr	= NULL;               /* Pointer to output data Weights values array */
+  double* outDataWT_pntr    = NULL;               /* Pointer to output data Weights values array */
   smfData* zpdData          = NULL;               /* Pointer to ZPD data */
   smfData* zpd              = NULL;               /* Pointer to ZPD index data */
   smfData* fpm              = NULL;               /* Pointer polynomial fit parameters */
@@ -233,7 +234,7 @@ void smurf_fts2_phasecorrds(int* status)
   size_t nPixels            = 0;                  /* Number of bolometers in the subarray */
   size_t wnL                = 0;
   size_t wnU                = 0;
-  double wnTrim				= 5.0;				  /* Trim the first wnTrim wave numbers (zero Real part of spectrum) */
+  double wnTrim             = 5.0;                /* Trim the first wnTrim wave numbers (zero Real part of spectrum) */
 
   double dSigma             = 0;
   double sum                = 0;
@@ -246,9 +247,9 @@ void smurf_fts2_phasecorrds(int* status)
   int indexZPD              = 0;
   int W                     = 1;
   
-  char fileName[SMF_PATH_MAX+1];				/* DEBUG */
-  char outFileType			= '\0';
-  int n						= 0;
+  char fileName[SMF_PATH_MAX+1];                /* DEBUG */
+  char outFileType          = '\0';
+  int n                        = 0;
  
   /* Get Input & Output groups */
   kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
@@ -308,117 +309,117 @@ void smurf_fts2_phasecorrds(int* status)
 
     dSigma   = fNyquist / nFrames2;      /* Spectral sampling interval */
 
-	/* DEBUG: Process default or alternative output type */
-	switch(outFileType) {
-		case 'd':
-			/* Copy input data into output data */
-			outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
-			outData->dtype   = SMF__DOUBLE;
-			outData->ndims   = 3;
-			outData->dims[0] = nWidth;
-			outData->dims[1] = nHeight;
-			outData->dims[2] = nFrames;
-			outData_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outData_pntr));
-			outData->pntr[0] = outData_pntr;
-			break;
+    /* DEBUG: Process default or alternative output type */
+    switch(outFileType) {
+        case 'd':
+            /* Copy input data into output data */
+            outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outData->dtype   = SMF__DOUBLE;
+            outData->ndims   = 3;
+            outData->dims[0] = nWidth;
+            outData->dims[1] = nHeight;
+            outData->dims[2] = nFrames;
+            outData_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outData_pntr));
+            outData->pntr[0] = outData_pntr;
+            break;
 
-		case 'r':
-			/* Copy input data into output data Spectrum Real DEBUG */
-			outDataSR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
-			outDataSR->dtype   = SMF__DOUBLE;
-			outDataSR->ndims   = 3;
-			outDataSR->dims[0] = nWidth;
-			outDataSR->dims[1] = nHeight;
-			outDataSR->dims[2] = nFrames;
-			outDataSR_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSR_pntr));
-			outDataSR->pntr[0] = outDataSR_pntr;
-			break;
-		
-		case 'i':
-			/* Copy input data into output data Spectrum Imaginary DEBUG */
-			outDataSI = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
-			outDataSI->dtype   = SMF__DOUBLE;
-			outDataSI->ndims   = 3;
-			outDataSI->dims[0] = nWidth;
-			outDataSI->dims[1] = nHeight;
-			outDataSI->dims[2] = nFrames;
-			outDataSI_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSI_pntr));
-			outDataSI->pntr[0] = outDataSI_pntr;
-			break;
-			
-		case 'p':
-			/* Copy input data into output data Spectrum Phase DEBUG */
-			outDataSP = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
-			outDataSP->dtype   = SMF__DOUBLE;
-			outDataSP->ndims   = 3;
-			outDataSP->dims[0] = nWidth;
-			outDataSP->dims[1] = nHeight;
-			outDataSP->dims[2] = nFrames;
-			outDataSP_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSP_pntr));
-			outDataSP->pntr[0] = outDataSP_pntr;
-			break;
-			
-		case 'f':
-			/* Copy input data into output data Wave Numbers DEBUG */
-			outDataSPF = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
-			outDataSPF->dtype   = SMF__DOUBLE;
-			outDataSPF->ndims   = 3;
-			outDataSPF->dims[0] = nWidth;
-			outDataSPF->dims[1] = nHeight;
-			outDataSPF->dims[2] = nFrames2;
-			outDataSPF_pntr = (double*) astMalloc((nPixels * nFrames2) * sizeof(*outDataSPF_pntr));
-			outDataSPF->pntr[0] = outDataSPF_pntr;
-			break;
-			
-		case 'w':
-			/* Copy input data into output data Wave Numbers DEBUG */
-			outDataWN = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
-			outDataWN->dtype   = SMF__DOUBLE;
-			outDataWN->ndims   = 3;
-			outDataWN->dims[0] = nWidth;
-			outDataWN->dims[1] = nHeight;
-			outDataWN->dims[2] = nFrames2;
-			outDataWN_pntr = (double*) astMalloc((nPixels * nFrames2) * sizeof(*outDataWN_pntr));
-			outDataWN->pntr[0] = outDataWN_pntr;
-			break;
-			
-		case 't':
-			/* Copy input data into output data Weights DEBUG */
-			outDataWT = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
-			outDataWT->dtype   = SMF__DOUBLE;
-			outDataWT->ndims   = 3;
-			outDataWT->dims[0] = nWidth;
-			outDataWT->dims[1] = nHeight;
-			outDataWT->dims[2] = nFrames2;
-			outDataWT_pntr = (double*) astMalloc((nPixels * nFrames2) * sizeof(*outDataWT_pntr));
-			outDataWT->pntr[0] = outDataWT_pntr;
-			break;
-			
-		case 'R':
-			/* Copy input data into output data Spectrum Real DEBUG */
-			outDataSRC = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
-			outDataSRC->dtype   = SMF__DOUBLE;
-			outDataSRC->ndims   = 3;
-			outDataSRC->dims[0] = nWidth;
-			outDataSRC->dims[1] = nHeight;
-			outDataSRC->dims[2] = nFrames;
-			outDataSRC_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSRC_pntr));
-			outDataSRC->pntr[0] = outDataSRC_pntr;
-			break;
-			
-		case 'I':
-			/* Copy input data into output data Spectrum Imaginary DEBUG */
-			outDataSIC = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
-			outDataSIC->dtype   = SMF__DOUBLE;
-			outDataSIC->ndims   = 3;
-			outDataSIC->dims[0] = nWidth;
-			outDataSIC->dims[1] = nHeight;
-			outDataSIC->dims[2] = nFrames;
-			outDataSIC_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSIC_pntr));
-			outDataSIC->pntr[0] = outDataSIC_pntr;
-			break;
-	}
-	
+        case 'r':
+            /* Copy input data into output data Spectrum Real DEBUG */
+            outDataSR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outDataSR->dtype   = SMF__DOUBLE;
+            outDataSR->ndims   = 3;
+            outDataSR->dims[0] = nWidth;
+            outDataSR->dims[1] = nHeight;
+            outDataSR->dims[2] = nFrames;
+            outDataSR_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSR_pntr));
+            outDataSR->pntr[0] = outDataSR_pntr;
+            break;
+        
+        case 'i':
+            /* Copy input data into output data Spectrum Imaginary DEBUG */
+            outDataSI = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outDataSI->dtype   = SMF__DOUBLE;
+            outDataSI->ndims   = 3;
+            outDataSI->dims[0] = nWidth;
+            outDataSI->dims[1] = nHeight;
+            outDataSI->dims[2] = nFrames;
+            outDataSI_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSI_pntr));
+            outDataSI->pntr[0] = outDataSI_pntr;
+            break;
+            
+        case 'p':
+            /* Copy input data into output data Spectrum Phase DEBUG */
+            outDataSP = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outDataSP->dtype   = SMF__DOUBLE;
+            outDataSP->ndims   = 3;
+            outDataSP->dims[0] = nWidth;
+            outDataSP->dims[1] = nHeight;
+            outDataSP->dims[2] = nFrames;
+            outDataSP_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSP_pntr));
+            outDataSP->pntr[0] = outDataSP_pntr;
+            break;
+            
+        case 'f':
+            /* Copy input data into output data Wave Numbers DEBUG */
+            outDataSPF = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outDataSPF->dtype   = SMF__DOUBLE;
+            outDataSPF->ndims   = 3;
+            outDataSPF->dims[0] = nWidth;
+            outDataSPF->dims[1] = nHeight;
+            outDataSPF->dims[2] = nFrames2;
+            outDataSPF_pntr = (double*) astMalloc((nPixels * nFrames2) * sizeof(*outDataSPF_pntr));
+            outDataSPF->pntr[0] = outDataSPF_pntr;
+            break;
+            
+        case 'w':
+            /* Copy input data into output data Wave Numbers DEBUG */
+            outDataWN = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outDataWN->dtype   = SMF__DOUBLE;
+            outDataWN->ndims   = 3;
+            outDataWN->dims[0] = nWidth;
+            outDataWN->dims[1] = nHeight;
+            outDataWN->dims[2] = nFrames2;
+            outDataWN_pntr = (double*) astMalloc((nPixels * nFrames2) * sizeof(*outDataWN_pntr));
+            outDataWN->pntr[0] = outDataWN_pntr;
+            break;
+            
+        case 't':
+            /* Copy input data into output data Weights DEBUG */
+            outDataWT = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outDataWT->dtype   = SMF__DOUBLE;
+            outDataWT->ndims   = 3;
+            outDataWT->dims[0] = nWidth;
+            outDataWT->dims[1] = nHeight;
+            outDataWT->dims[2] = nFrames2;
+            outDataWT_pntr = (double*) astMalloc((nPixels * nFrames2) * sizeof(*outDataWT_pntr));
+            outDataWT->pntr[0] = outDataWT_pntr;
+            break;
+            
+        case 'R':
+            /* Copy input data into output data Spectrum Real DEBUG */
+            outDataSRC = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outDataSRC->dtype   = SMF__DOUBLE;
+            outDataSRC->ndims   = 3;
+            outDataSRC->dims[0] = nWidth;
+            outDataSRC->dims[1] = nHeight;
+            outDataSRC->dims[2] = nFrames;
+            outDataSRC_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSRC_pntr));
+            outDataSRC->pntr[0] = outDataSRC_pntr;
+            break;
+            
+        case 'I':
+            /* Copy input data into output data Spectrum Imaginary DEBUG */
+            outDataSIC = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outDataSIC->dtype   = SMF__DOUBLE;
+            outDataSIC->ndims   = 3;
+            outDataSIC->dims[0] = nWidth;
+            outDataSIC->dims[1] = nHeight;
+            outDataSIC->dims[2] = nFrames;
+            outDataSIC_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSIC_pntr));
+            outDataSIC->pntr[0] = outDataSIC_pntr;
+            break;
+    }
+    
     /* MORE.FTS2.ZPD */
     zpd = smf_deepcopy_smfData(inData->fts->zpd, 0, SMF__NOCREATE_FTS, 0, 0, status);
     /* MORE.FTS2.FPM, Polynomial fit coefficients */
@@ -441,7 +442,7 @@ void smurf_fts2_phasecorrds(int* status)
     IFG     = astCalloc(nFrames, sizeof(*IFG));
     DS      = astCalloc(nFrames, sizeof(*DS));
     PHASE   = astCalloc(nFrames, sizeof(*PHASE));
-    PHASES  = astCalloc(nFrames, sizeof(*PHASE));	/* DEBUG PHASE Saved */
+    PHASES  = astCalloc(nFrames, sizeof(*PHASE));    /* DEBUG PHASE Saved */
     COEFFS  = astCalloc(coeffLength, sizeof(*COEFFS));
     WN      = astCalloc((nFrames2 + 1), sizeof(*WN));
     WEIGHTS = astCalloc((nFrames2 + 1), sizeof(*WEIGHTS));
@@ -480,41 +481,41 @@ void smurf_fts2_phasecorrds(int* status)
         if(badPixel) {
           for(k = 0; k < nFrames; k++) {
             index = bolIndex + k * nPixels;
-			switch(outFileType) {
-				case 'd':
-					outData_pntr[index] = VAL__BADD;
-					break;
-				case 'r':
-					outDataSR_pntr[index] = VAL__BADD;	/* DEBUG */
-					break;
-				case 'i':
-					outDataSI_pntr[index] = VAL__BADD;	/* DEBUG */
-					break;
-				case 'R':
-					outDataSRC_pntr[index] = VAL__BADD;	/* DEBUG */
-					break;
-				case 'I':
-					outDataSIC_pntr[index] = VAL__BADD;	/* DEBUG */
-					break;
-				case 'p':
-					outDataSP_pntr[index] = VAL__BADD;	/* DEBUG */
-					break;
-				case 'f':
-					if(k < nFrames2) {
-						outDataSPF_pntr[index] = VAL__BADD;	/* DEBUG */
-					}
-					break;
-				case 'w':
-					if(k < nFrames2) {
-						outDataWN_pntr[index] = VAL__BADD;	/* DEBUG */
-					}
-					break;
-				case 't':
-					if(k < nFrames2) {
-						outDataWT_pntr[index] = VAL__BADD;	/* DEBUG */
-					}
-					break;
-			}
+            switch(outFileType) {
+                case 'd':
+                    outData_pntr[index] = VAL__BADD;
+                    break;
+                case 'r':
+                    outDataSR_pntr[index] = VAL__BADD;    /* DEBUG */
+                    break;
+                case 'i':
+                    outDataSI_pntr[index] = VAL__BADD;    /* DEBUG */
+                    break;
+                case 'R':
+                    outDataSRC_pntr[index] = VAL__BADD;   /* DEBUG */
+                    break;
+                case 'I':
+                    outDataSIC_pntr[index] = VAL__BADD;   /* DEBUG */
+                    break;
+                case 'p':
+                    outDataSP_pntr[index] = VAL__BADD;    /* DEBUG */
+                    break;
+                case 'f':
+                    if(k < nFrames2) {
+                        outDataSPF_pntr[index] = VAL__BADD;    /* DEBUG */
+                    }
+                    break;
+                case 'w':
+                    if(k < nFrames2) {
+                        outDataWN_pntr[index] = VAL__BADD;    /* DEBUG */
+                    }
+                    break;
+                case 't':
+                    if(k < nFrames2) {
+                        outDataWT_pntr[index] = VAL__BADD;    /* DEBUG */
+                    }
+                    break;
+            }
           }
           continue;
         }
@@ -535,8 +536,8 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Compute phase */
         for(k = 0; k < nFrames; k++) { PHASE[k] = atan2(DSOUT[k][1], DSOUT[k][0]);
-		  PHASES[k] = PHASE[k];	/* DEBUG */
-		}
+          PHASES[k] = PHASE[k];    /* DEBUG */
+        }
 
         /* Compute weighting factors [0, FNYQ] */
         maxWeight = NUM__MIND;
@@ -555,10 +556,10 @@ void smurf_fts2_phasecorrds(int* status)
         /* Polynomial fit to phase */
         for(k = 0; k <= nFrames2; k++) { TMPPHASE[k] = PHASE[k]; }
         smf_fit_poly1d(pDegree, nFrames2 + 1, CLIP, WN, TMPPHASE, WEIGHTS, NULL, COEFFS, NULL, FIT, &nUsed, status);
-		/* printf("%s DEBUG: smf_fit_poly1d: pDegree=%d, nelem=%d, CLIP=%f, COEFFS[0]=%f, COEFFS[1]=%f, i=%d, j=%d\n", 
-			   TASK_NAME, pDegree, (nFrames2+1), CLIP, COEFFS[0], COEFFS[1], i, j); */
-		for(k = 0; k <= nFrames2; k++) { FITS[k] = FIT[k]; }	/* DEBUG */
-		
+        /* printf("%s DEBUG: smf_fit_poly1d: pDegree=%d, nelem=%d, CLIP=%f, COEFFS[0]=%f, COEFFS[1]=%f, i=%d, j=%d\n", 
+               TASK_NAME, pDegree, (nFrames2+1), CLIP, COEFFS[0], COEFFS[1], i, j); */
+        for(k = 0; k <= nFrames2; k++) { FITS[k] = FIT[k]; }    /* DEBUG */
+        
         /* Update MORE.FTS2.SIGMA values */
         sum   = 0.0;
         error = 0.0;
@@ -580,7 +581,7 @@ void smurf_fts2_phasecorrds(int* status)
         for(k = 0; k < nFrames; k++) {
           PCF[k][0] =  cos(PHASE[k]);
           PCF[k][1] = -sin(PHASE[k]);
-		/* printf("%s DEBUG: PCF[k][0]=%f, PCF[k][1]=%f\n", TASK_NAME, PCF[k][0], PCF[k][1]); */
+        /* printf("%s DEBUG: PCF[k][0]=%f, PCF[k][1]=%f\n", TASK_NAME, PCF[k][0], PCF[k][1]); */
         }
 
         /* Multiplication in frequency domain */
@@ -588,22 +589,22 @@ void smurf_fts2_phasecorrds(int* status)
           SPEC[k][0] = DSOUT[k][0] * PCF[k][0] - DSOUT[k][1] * PCF[k][1];
           /* We should just zero out the imaginary part of the spectrum since all that is left there is noise */
           /*SPEC[k][1] = DSOUT[k][0] * PCF[k][1] + DSOUT[k][1] * PCF[k][0]; */
-           SPEC[k][1] = 0.0;	/* Debug */
-		  SPECS[k][0] = SPEC[k][0];	/* Debug */
-		  SPECS[k][1] = SPEC[k][1];	/* Debug */
+           SPEC[k][1] = 0.0;    /* Debug */
+          SPECS[k][0] = SPEC[k][0];    /* Debug */
+          SPECS[k][1] = SPEC[k][1];    /* Debug */
         }
-		
-		/* Trim (zero out) the first wnTrim wavenumbers of the real part of the spectrum (on both ends) */
-		for(k = 0; k <= wnTrim/(k*dSigma); k++) {
-			SPEC[k][0] = 0.0;
-			SPEC[k+1][0] = 0.0;			/* Maintain an odd number of adjustments */
-			SPEC[nFrames-1-k][0] = 0.0;
-			/* DEBUG: */
-			SPECS[k][0] = 0.0;
-			SPECS[k+1][0] = 0.0;			/* Maintain an odd number of adjustments */
-			SPECS[nFrames-1-k][0] = 0.0;
-		}
-		
+        
+        /* Trim (zero out) the first wnTrim wavenumbers of the real part of the spectrum (on both ends) */
+        for(k = 0; k <= wnTrim/(k*dSigma); k++) {
+            SPEC[k][0] = 0.0;
+            SPEC[k+1][0] = 0.0;            /* Maintain an odd number of adjustments */
+            SPEC[nFrames-1-k][0] = 0.0;
+            /* DEBUG: */
+            SPECS[k][0] = 0.0;
+            SPECS[k+1][0] = 0.0;            /* Maintain an odd number of adjustments */
+            SPECS[nFrames-1-k][0] = 0.0;
+        }
+        
         /* Inverse FFT spectrum to get the phase corrected interferogram */
         planB = fftw_plan_dft_1d(nFrames, SPEC, SPEC, FFTW_BACKWARD, FFTW_ESTIMATE);
         fftw_execute(planB);
@@ -621,34 +622,34 @@ void smurf_fts2_phasecorrds(int* status)
              outData_pntr[index] = IFG[k] / nFrames;
               break;
             case 'r':
-              outDataSR_pntr[index] = DSOUT[k][0] / nFrames;	/* DEBUG */
+              outDataSR_pntr[index] = DSOUT[k][0] / nFrames;    /* DEBUG */
               break;
             case 'i':
-              outDataSI_pntr[index] = DSOUT[k][1] / nFrames;	/* DEBUG */
+              outDataSI_pntr[index] = DSOUT[k][1] / nFrames;    /* DEBUG */
               break;
-			case 'R':
-              outDataSRC_pntr[index] = SPECS[k][0] / nFrames;	/* DEBUG */
+            case 'R':
+              outDataSRC_pntr[index] = SPECS[k][0] / nFrames;    /* DEBUG */
               break;
-			case 'I':
-              outDataSIC_pntr[index] = SPECS[k][1] / nFrames;	/* DEBUG */
+            case 'I':
+              outDataSIC_pntr[index] = SPECS[k][1] / nFrames;    /* DEBUG */
               break;
             case 'p':
-              outDataSP_pntr[index] = PHASES[k];	/* DEBUG */
+              outDataSP_pntr[index] = PHASES[k];    /* DEBUG */
               break;
-			case 'f':
-			  if(k < nFrames2) {
-				outDataSPF_pntr[index] = FITS[k];	/* DEBUG */
-			  }
+            case 'f':
+              if(k < nFrames2) {
+                outDataSPF_pntr[index] = FITS[k];    /* DEBUG */
+              }
               break;
-			case 'w':
-			  if(k < nFrames2) {
-				outDataWN_pntr[index] = WN[k];	/* DEBUG */
-			  }
+            case 'w':
+              if(k < nFrames2) {
+                outDataWN_pntr[index] = WN[k];    /* DEBUG */
+              }
               break;
-			case 't':
-			  if(k < nFrames2) {
-				  outDataWT_pntr[index] = WEIGHTS[k];	/* DEBUG */
-			  }
+            case 't':
+              if(k < nFrames2) {
+                  outDataWT_pntr[index] = WEIGHTS[k];    /* DEBUG */
+              }
               break;
           }
         }
@@ -659,7 +660,7 @@ void smurf_fts2_phasecorrds(int* status)
     if(IFG)      { IFG      = astFree(IFG); }
     if(DS)       { DS       = astFree(DS); }
     if(PHASE)    { PHASE    = astFree(PHASE); }
-    if(PHASES)   { PHASES   = astFree(PHASES); }	/* DEBUG PHASE Saved */
+    if(PHASES)   { PHASES   = astFree(PHASES); }    /* DEBUG PHASE Saved */
     if(COEFFS)   { COEFFS   = astFree(COEFFS); }
     if(TMPPHASE) { TMPPHASE = astFree(TMPPHASE); }
     if(WN)       { WN       = astFree(WN); }
@@ -671,207 +672,207 @@ void smurf_fts2_phasecorrds(int* status)
     if(PCF)      { fftw_free(PCF);            PCF       = NULL; }
     if(SPEC)     { fftw_free(SPEC);           SPEC      = NULL; }
     if(SPECS)    { fftw_free(SPECS);         SPECS      = NULL; }
-	
-	/* Create a temporary base file name from input file name - DEBUG */
-	strncpy(fileName, inData->file->name, strlen(inData->file->name)-3); 
+    
+    /* Create a temporary base file name from input file name - DEBUG */
+    strncpy(fileName, inData->file->name, strlen(inData->file->name)-3); 
 
     /* Close the file */
     if(inData) { smf_close_file(&inData, status); }
-	if(*status != SAI__OK) {
-		printf("%s ERROR: Closing inData file: %s produced status error: %d\n", TASK_NAME, inData->file->name, *status);
-		goto CLEANUP;
-	}
+    if(*status != SAI__OK) {
+        errRepf(TASK_NAME, "Error closing inData file %s", status, inData->file->name);
+        goto CLEANUP;
+    }
 
-	switch(outFileType) {
-		case 'r':
-			/* Write output Spectrum Real DEBUG */
-			outDataSR->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-			/* Append unique suffix to fileName */
-			n = snprintf(outDataSR->file->name, SMF_PATH_MAX, "%sphs_%s", fileName, "SR");
-			if(n < 0 || n >= SMF_PATH_MAX) {
-				printf("%s ERROR: snprintf return value: %d out of range creating outDataSR->file->name\n", TASK_NAME, n);
-				goto CLEANUP;
-			}
-			smf_write_smfData(outDataSR, NULL, outDataSR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Writing outDataSR file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			smf_close_file(&outDataSR, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Closing outDataSR file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			break;
-		
-		case 'i':
-			/* Write output Spectrum Imaginary DEBUG */
-			outDataSI->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-			/* Append unique suffix to fileName */
-			n = snprintf(outDataSI->file->name, SMF_PATH_MAX, "%sphs_%s", fileName, "SI");
-			if(n < 0 || n >= SMF_PATH_MAX) {
-				printf("%s ERROR: snprintf return value: %d out of range creating outDataSI->file->name\n", TASK_NAME, n);
-				goto CLEANUP;
-			}
-			smf_write_smfData(outDataSI, NULL, outDataSI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Writing outDataSI file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			smf_close_file(&outDataSI, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Closing outDataSI file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			break;
-		
-		case 'R':
-			/* Write output Spectrum Real DEBUG */
-			outDataSRC->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-			/* Append unique suffix to fileName */
-			n = snprintf(outDataSRC->file->name, SMF_PATH_MAX, "%sphs_%s", fileName, "SRC");
-			if(n < 0 || n >= SMF_PATH_MAX) {
-				printf("%s ERROR: snprintf return value: %d out of range creating outDataSRC->file->name\n", TASK_NAME, n);
-				goto CLEANUP;
-			}
-			smf_write_smfData(outDataSRC, NULL, outDataSRC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Writing outDataSRC file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			/* printf("%s DEBUG: Closing outFileNameSRC=%s\n", TASK_NAME, outDataSRC->file->name); */
-			smf_close_file(&outDataSRC, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Closing outDataSRC file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			break;
-			
-		case 'I':
-			/* Write output Spectrum Imaginary DEBUG */
-			outDataSIC->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-			/* Append unique suffix to fileName */
-			n = snprintf(outDataSIC->file->name, SMF_PATH_MAX, "%sphs_%s", fileName, "SIC");
-			if(n < 0 || n >= SMF_PATH_MAX) {
-				printf("%s ERROR: snprintf return value: %d out of range creating outDataSIC->file->name\n", TASK_NAME, n);
-				goto CLEANUP;
-			}
-			smf_write_smfData(outDataSIC, NULL, outDataSIC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Writing outDataSIC file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			smf_close_file(&outDataSIC, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Closing outDataSIC file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			break;
-			
-		case 'p':
-			/* Write output Spectrum Phase DEBUG */
-			outDataSP->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-			/* Append unique suffix to fileName */
-			n = snprintf(outDataSP->file->name, SMF_PATH_MAX, "%sphs_%s", fileName, "SP");
-			if(n < 0 || n >= SMF_PATH_MAX) {
-				printf("%s ERROR: snprintf return value: %d out of range creating outDataSP->file->name\n", TASK_NAME, n);
-				goto CLEANUP;
-			}
-			smf_write_smfData(outDataSP, NULL, outDataSP->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Writing outDataSP file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			smf_close_file(&outDataSP, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Closing outDataSP file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			break;
-			
-		case 'f':
-			/* Write output Fitted Phase DEBUG */
-			outDataSPF->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-			/* Append unique suffix to fileName */
-			n = snprintf(outDataSPF->file->name, SMF_PATH_MAX, "%sphs_%s", fileName, "SPF");
-			if(n < 0 || n >= SMF_PATH_MAX) {
-				printf("%s ERROR: snprintf return value: %d out of range creating outDataSPF->file->name\n", TASK_NAME, n);
-				goto CLEANUP;
-			}
-			smf_write_smfData(outDataSPF, NULL, outDataSPF->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Writing outDataSPF file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			smf_close_file(&outDataSPF, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Closing outDataSPF file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			break;
+    switch(outFileType) {
+        case 'r':
+            /* Write output Spectrum Real DEBUG */
+            outDataSR->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+            /* Append unique suffix to fileName */
+            n = one_snprintf(outDataSR->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SR");
+            if(n < 0 || n >= SMF_PATH_MAX) {
+                errRepf(TASK_NAME, "Error creating outDataSR->file->name", status);
+                goto CLEANUP;
+            }
+            smf_write_smfData(outDataSR, NULL, outDataSR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error writing outDataSR file", status);
+                goto CLEANUP;
+            }
+            smf_close_file(&outDataSR, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error closing outDataSR file", status);
+                goto CLEANUP;
+            }
+            break;
+        
+        case 'i':
+            /* Write output Spectrum Imaginary DEBUG */
+            outDataSI->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+            /* Append unique suffix to fileName */
+            n = one_snprintf(outDataSI->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SI");
+            if(n < 0 || n >= SMF_PATH_MAX) {
+                errRepf(TASK_NAME, "Error creating outDataSI->file->name", status);
+                goto CLEANUP;
+            }
+            smf_write_smfData(outDataSI, NULL, outDataSI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error writing outDataSI file", status);
+                goto CLEANUP;
+            }
+            smf_close_file(&outDataSI, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error closing outDataSI file", status);
+                goto CLEANUP;
+            }
+            break;
+        
+        case 'R':
+            /* Write output Spectrum Real DEBUG */
+            outDataSRC->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+            /* Append unique suffix to fileName */
+            n = one_snprintf(outDataSRC->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SRC");
+            if(n < 0 || n >= SMF_PATH_MAX) {
+                errRepf(TASK_NAME, "Error creating outDataSRC->file->name", status);
+                goto CLEANUP;
+            }
+            smf_write_smfData(outDataSRC, NULL, outDataSRC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error writing outDataSRC file", status);
+                goto CLEANUP;
+            }
+            /* printf("%s DEBUG: Closing outFileNameSRC=%s\n", TASK_NAME, outDataSRC->file->name); */
+            smf_close_file(&outDataSRC, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error closing outDataSRC file", status);
+                goto CLEANUP;
+            }
+            break;
+            
+        case 'I':
+            /* Write output Spectrum Imaginary DEBUG */
+            outDataSIC->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+            /* Append unique suffix to fileName */
+            n = one_snprintf(outDataSIC->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SIC");
+            if(n < 0 || n >= SMF_PATH_MAX) {
+                errRepf(TASK_NAME, "Error creating outDataSIC->file->name", status);
+                goto CLEANUP;
+            }
+            smf_write_smfData(outDataSIC, NULL, outDataSIC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error writing outDataSIC file", status);
+                goto CLEANUP;
+            }
+            smf_close_file(&outDataSIC, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error closing outDataSIC file", status);
+                goto CLEANUP;
+            }
+            break;
+            
+        case 'p':
+            /* Write output Spectrum Phase DEBUG */
+            outDataSP->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+            /* Append unique suffix to fileName */
+            n = one_snprintf(outDataSP->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SP");
+            if(n < 0 || n >= SMF_PATH_MAX) {
+                errRepf(TASK_NAME, "Error creating outDataSP->file->name", status);
+                goto CLEANUP;
+            }
+            smf_write_smfData(outDataSP, NULL, outDataSP->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error writing outDataSP file", status);
+                goto CLEANUP;
+            }
+            smf_close_file(&outDataSP, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error closing outDataSP file", status);
+                goto CLEANUP;
+            }
+            break;
+            
+        case 'f':
+            /* Write output Fitted Phase DEBUG */
+            outDataSPF->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+            /* Append unique suffix to fileName */
+            n = one_snprintf(outDataSPF->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SPF");
+            if(n < 0 || n >= SMF_PATH_MAX) {
+                errRepf(TASK_NAME, "Error creating outDataSPF->file->name", status);
+                goto CLEANUP;
+            }
+            smf_write_smfData(outDataSPF, NULL, outDataSPF->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error writing outDataSPF file", status);
+                goto CLEANUP;
+            }
+            smf_close_file(&outDataSPF, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error closing outDataSPF file", status);
+                goto CLEANUP;
+            }
+            break;
 
-		case 'w':
-			/* Write output Wave Numbers DEBUG */
-			outDataWN->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-			/* Append unique suffix to fileName */
-			n = snprintf(outDataWN->file->name, SMF_PATH_MAX, "%sphs_%s", fileName, "WN");
-			if(n < 0 || n >= SMF_PATH_MAX) {
-				printf("%s ERROR: snprintf return value: %d out of range creating outDataWN->file->name\n", TASK_NAME, n);
-				goto CLEANUP;
-			}
-			smf_write_smfData(outDataWN, NULL, outDataWN->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Writing outDataWN file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			smf_close_file(&outDataWN, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Closing outDataWN file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			break;
+        case 'w':
+            /* Write output Wave Numbers DEBUG */
+            outDataWN->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+            /* Append unique suffix to fileName */
+            n = one_snprintf(outDataWN->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "WN");
+            if(n < 0 || n >= SMF_PATH_MAX) {
+                errRepf(TASK_NAME, "Error creating outDataWN->file->name", status);
+                goto CLEANUP;
+            }
+            smf_write_smfData(outDataWN, NULL, outDataWN->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error writing outDataWN file", status);
+                goto CLEANUP;
+            }
+            smf_close_file(&outDataWN, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error closing outDataWN file", status);
+                goto CLEANUP;
+            }
+            break;
 
-		case 't':
-			/* Write output Weights DEBUG */
-			outDataWT->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-			/* Append unique suffix to fileName */
-			n = snprintf(outDataWT->file->name, SMF_PATH_MAX, "%sphs_%s", fileName, "WT");
-			if(n < 0 || n >= SMF_PATH_MAX) {
-				printf("%s ERROR: snprintf return value: %d out of range creating outDataWT->file->name\n", TASK_NAME, n);
-				goto CLEANUP;
-			}
-			smf_write_smfData(outDataWT, NULL, outDataWT->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Writing outDataWT file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			smf_close_file(&outDataWT, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Closing outDataWT file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			break;
+        case 't':
+            /* Write output Weights DEBUG */
+            outDataWT->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+            /* Append unique suffix to fileName */
+            n = one_snprintf(outDataWT->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "WT");
+            if(n < 0 || n >= SMF_PATH_MAX) {
+                errRepf(TASK_NAME, "Error creating outDataWT->file->name", status);
+                goto CLEANUP;
+            }
+            smf_write_smfData(outDataWT, NULL, outDataWT->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error writing outDataWT file", status);
+                goto CLEANUP;
+            }
+            smf_close_file(&outDataWT, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error closing outDataWT file", status);
+                goto CLEANUP;
+            }
+            break;
 
-		case 'd':
-			/* Write output */
-			outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-			n = snprintf(outData->file->name, SMF_PATH_MAX, "%sphs", fileName);
-			if(n < 0 || n >= SMF_PATH_MAX) {
-				printf("%s ERROR: snprintf return value: %d out of range creating outData->file->name\n", TASK_NAME, n);
-				goto CLEANUP;
-			}
-			smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Writing outData file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			smf_close_file(&outData, status);
-			if(*status != SAI__OK) {
-				printf("%s ERROR: Closing outData file produced status error: %d\n", TASK_NAME, *status);
-				goto CLEANUP;
-			}
-			break;
-	}
+        case 'd':
+            /* Write output */
+            outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
+            n = one_snprintf(outData->file->name, SMF_PATH_MAX, "%sphs", status, fileName);
+            if(n < 0 || n >= SMF_PATH_MAX) {
+                errRepf(TASK_NAME, "Error creating outData->file->name", status);
+                goto CLEANUP;
+            }
+            smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error writing outData file", status);
+                goto CLEANUP;
+            }
+            smf_close_file(&outData, status);
+            if(*status != SAI__OK) {
+                errRepf(TASK_NAME, "Error closing outData file", status);
+                goto CLEANUP;
+            }
+            break;
+    }
 
   }
 
@@ -880,7 +881,7 @@ void smurf_fts2_phasecorrds(int* status)
   if(IFG)      { IFG      = astFree(IFG); }
   if(DS)       { DS       = astFree(DS); }
   if(PHASE)    { PHASE    = astFree(PHASE); }
-  if(PHASES)   { PHASES   = astFree(PHASES); }	/* DEBUG PHASE Saved */
+  if(PHASES)   { PHASES   = astFree(PHASES); }    /* DEBUG PHASE Saved */
   if(COEFFS)   { COEFFS   = astFree(COEFFS); }
   if(TMPPHASE) { TMPPHASE = astFree(TMPPHASE); }
   if(WN)       { WN       = astFree(WN); }
@@ -895,8 +896,9 @@ void smurf_fts2_phasecorrds(int* status)
 
   /* Close files if still open */
   if(inData) { 
-	smf_close_file(&inData, status); 
-	if(*status != SAI__OK) printf("%s ERROR: Closing inData file: %s produced status error: %d\n", TASK_NAME, inData->file->name, *status);
+    smf_close_file(&inData, status); 
+    if(*status != SAI__OK) 
+        errRepf(TASK_NAME, "Error closing inData file", status);
   }
   /* END NDF */
   ndfEnd(status);
