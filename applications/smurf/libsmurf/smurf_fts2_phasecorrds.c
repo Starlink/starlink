@@ -112,6 +112,7 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "star/one.h"
+#include "one_err.h"
 
 /* SMURF includes */
 #include "smurflib.h"
@@ -674,7 +675,11 @@ void smurf_fts2_phasecorrds(int* status)
     if(SPECS)    { fftw_free(SPECS);         SPECS      = NULL; }
     
     /* Create a temporary base file name from input file name - DEBUG */
-    strncpy(fileName, inData->file->name, strlen(inData->file->name)-3); 
+    one_strlcpy(fileName, inData->file->name,
+        astMIN(SMF_PATH_MAX + 1, strlen(inData->file->name) - 2), status);
+    if (*status == ONE__TRUNC) {
+      errAnnul(status);
+    }
 
     /* Close the file */
     if(inData) { smf_close_file(&inData, status); }
