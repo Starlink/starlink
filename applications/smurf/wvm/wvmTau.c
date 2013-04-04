@@ -140,12 +140,12 @@ double pwv2tau_bydate(double mjdate, double mmH2O_z) {
   if (mjdate < 56190.0) { /* 20120920 */
     /* No correction */
   } else if (mjdate >= 56190.0 && mjdate < 56311.0 ) { /* 20120920 to 20130119 */
-    /* From Per Friberg 20130214 */
-    mmH2O_z = 0.913493433 * mmH2O_z + 0.016493953;
+    /* From Per Friberg 20130131 */
+    mmH2O_z = 0.926938322 * mmH2O_z + 0.000579163;
 
   } else {
-    /* From Per Friberg 20130214 */
-    mmH2O_z = 0.775627101 * mmH2O_z + 0.025099696;
+    /* From Jessica Dempsey 20130204 */
+    mmH2O_z = 1.0625 * mmH2O_z - 0.35;
   }
 
   /* APPLY THE CSO TAU CONVERSION */
