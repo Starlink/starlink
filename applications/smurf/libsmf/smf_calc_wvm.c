@@ -72,8 +72,6 @@
 *        Return 225 GHz tau if not extinction parameters supplied.
 *     2012-03-06 (TIMJ):
 *        Use PAL instead of SLA.
-*     2013-02-04 (TIMJ):
-*        Include date in WVM conversion.
 *     2013-03-18 (DSB):
 *        Ensure VAL__BADD is returned if airmass cannot be determined.
 *     {enter_further_changes_here}
@@ -137,7 +135,6 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
   double tau225 = 0.0;      /* 225 GHz zenith optical depth */
   float twater;             /* Effective temperature of water vapour */
   float wvm[3];             /* WVM temperature in the 3 channels */
-  double wvmtime;           /* Date of WVM reading */
 
   /* Initialise returned value */
   tau = VAL__BADD;
@@ -153,7 +150,6 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
   wvm[0] = state->wvm_t12;
   wvm[1] = state->wvm_t42;
   wvm[2] = state->wvm_t78;
-  wvmtime = state->wvm_time;
 
   if (wvm[0] == VAL__BADR || wvm[1] == VAL__BADR || wvm[2] == VAL__BADR ) {
     return VAL__BADD;
@@ -203,7 +199,7 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
       pwv /= airmass;
 
       /* convert zenith pwv to zenith tau */
-      tau225 = pwv2tau_bydate( wvmtime, pwv );
+      tau225 = pwv2tau( pwv );
 
     }
   }

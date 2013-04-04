@@ -65,11 +65,6 @@
 
 /* Define the coefficients */
 
-/* This MJD is used internally to indicate that the current
-   conversion factors should be used. It is simply a value
-   long in the future */
-#define CURRENT_MJD 100000.0
-
 /* PWV to CSO TAU */
 #define WVM_COEFF_SIZE 2
 static const double wvm_cso_coefs[WVM_COEFF_SIZE] = {
@@ -92,8 +87,6 @@ static const double tau2pwv_coefs[TAU2PWV_COEFF_SIZE] = {
 	representing the optical depth seen at 225GHz relative to
 	zenith. This is otherwise known as 225Tau.
 
-        Always uses the conversion values for the current epoch.
-
    Support:
 	Jessica Dempsey <j.dempsey@jach.hawaii.edu>
 
@@ -101,52 +94,11 @@ static const double tau2pwv_coefs[TAU2PWV_COEFF_SIZE] = {
 	Tim Jenness <t.jenness@jach.hawaii.edu>
  */
 double pwv2tau(double mmH2O_z) {
-  return pwv2tau_bydate( CURRENT_MJD, mmH2O_z );
-}
-
-/*
-  Function:
-	pwv2tau_bydate converts millimeters of water vapor at zenith into a value
-	representing the optical depth seen at 225GHz relative to
-	zenith. This is otherwise known as 225Tau. This routine uses different
-        conversion factors depending on the date of the WVM reading.
-
-        pwv2tau can be used if the most recent conversion factor should be used.
-
-        First argument is the double precision Modified Julian Date.
-
-   Support:
-	Jessica Dempsey <j.dempsey@jach.hawaii.edu>
-
-   Author:
-	Tim Jenness <t.jenness@jach.hawaii.edu>
-*/
-
-double pwv2tau_bydate(double mjdate, double mmH2O_z) {
   int j;
   double tau = 0.0;
 
-  if (TAU_DEBUG > 4) {
-    if (mjdate == CURRENT_MJD) {
-      printf("You gave me a zenith pwv of %f with current conversion values\n", mmH2O_z);
-    } else {
-      printf("You gave me a zenith pwv of %f using conversion values for MJD %f\n", mmH2O_z, mjdate);
-    }
-  }
-
-  /* Need to tweak the PWV before pushing it through the conversion routine. We have
-     decided to do a PWV correction and keep the tau correction fixed. This references
-     our PWV to the values obtained before Spetember 2012 */
-  if (mjdate < 56190.0) { /* 20120920 */
-    /* No correction */
-  } else if (mjdate >= 56190.0 && mjdate < 56311.0 ) { /* 20120920 to 20130119 */
-    /* From Per Friberg 20130131 (inverted) */
-    mmH2O_z = 1.0788204309 * mmH2O_z - 0.000624813;
-
-  } else {
-    /* From Jessica Dempsey 20130204 */
-    mmH2O_z = 1.0625 * mmH2O_z - 0.35;
-  }
+  if (TAU_DEBUG > 4)
+    printf("You gave me a zenith pwv of %f\n", mmH2O_z);
 
   /* APPLY THE CSO TAU CONVERSION */
   for (j=0; j < WVM_COEFF_SIZE; j++) {
