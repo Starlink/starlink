@@ -45,6 +45,8 @@
  *        Put back adjustment for non-centered mirror starting position.
  *     2012-12-21 (MSHERWOOD)
  *        Removed unneccessary sort (fts2_validatemirrorpositions now reverses list when needed)
+ *     2013-04-04 (MSHERWOOD)
+ *        - Document the previous conversion of ZPD values from mechanical to optical units
  *
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
