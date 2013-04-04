@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     FTS2FILTERMAP
+*     FTS2MASKMAP
 
 *  Purpose:
-*     Filter time series data for a SCUBA-2 map with FTS-2 in the beam.
+*     Mask time series data for a SCUBA-2 map with FTS-2 in the beam.
 
 *  Language:
 *     Starlink ANSI C
@@ -13,20 +13,20 @@
 *     ADAM A-task
 
 *  Invocation:
-*     smurf_fts2_filtermap(int *status);
+*     smurf_fts2_maskmap(int *status);
 
 *  Arguments:
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This routine filters one or more simulated SCUBA-2 time series cubes.
+*     This routine masks one or more simulated SCUBA-2 time series cubes.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          A group of existing time series data cubes.
 *     OUT = NDF (Write)
-*          A group of output NDFs into which the filtered time series data
+*          A group of output NDFs into which the masked time series data
 *          will be written.
 
 *  Related Applications:
@@ -93,11 +93,11 @@
 #include "smurflib.h"
 #include "libsmf/smf.h"
 
-#define FUNC_NAME "smurf_fts2_filtermap"
-#define TASK_NAME "FTS2FILTERMAP"
+#define FUNC_NAME "smurf_fts2_maskmap"
+#define TASK_NAME "FTS2MASKMAP"
 #define LEN__METHOD 20
 
-void smurf_fts2_filtermap(int* status) {
+void smurf_fts2_maskmap(int* status) {
 
 /* Local Variables */
    Grp* igrp = NULL;          /* Group of input template files */

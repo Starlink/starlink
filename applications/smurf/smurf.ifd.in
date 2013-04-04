@@ -1965,31 +1965,6 @@ package @PACKAGE@ {
             }
         }
 
-        action fts2filtermap {
-
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath PROMPT
-                ppath CURRENT
-                prompt {Input time series cubes}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                association ->GLOBAL.DATA_ARRAY
-                prompt {Output time series cubes}
-                helpkey *
-            }
-        }
-
         action fts2flatfield {
 
             helplib {$SMURF_HELP}
@@ -2081,6 +2056,31 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {ZPD calibration file}
+                helpkey *
+            }
+        }
+
+        action fts2maskmap {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath PROMPT
+                ppath CURRENT
+                prompt {Input time series cubes}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output time series cubes}
                 helpkey *
             }
         }

@@ -21,9 +21,9 @@ smurf_fixsteps.c \
 smurf_flatfield.c \
 smurf_fts2_deglitch.c \
 smurf_fts2_flatfield.c \
-smurf_fts2_filtermap.c \
 smurf_fts2_freqcorr.c \
 smurf_fts2_init.c \
+smurf_fts2_maskmap.c \
 smurf_fts2_phasecorr.c \
 smurf_fts2_phasecorrds.c \
 smurf_fts2_portimbal.c \

@@ -319,14 +319,14 @@ void smurf_mon( int * status ) {
     smurf_flatfield( status );
   } else if (strcmp( taskname, "FTS2DEGLITCH" ) == 0 ) {
     smurf_fts2_deglitch( status );
-  } else if (strcmp( taskname, "FTS2FILTERMAP" ) == 0 ) {
-    smurf_fts2_filtermap( status );
   } else if (strcmp( taskname, "FTS2FLATFIELD" ) == 0 ) {
     smurf_fts2_flatfield( status );
   } else if (strcmp( taskname, "FTS2FREQCORR" ) == 0 ) {
     smurf_fts2_freqcorr( status );
   } else if (strcmp( taskname, "FTS2INIT" ) == 0 ) {
     smurf_fts2_init( status );
+  } else if (strcmp( taskname, "FTS2MASKMAP" ) == 0 ) {
+    smurf_fts2_maskmap( status );
   } else if (strcmp( taskname, "FTS2OPCORR" ) == 0 ) {
     smurf_fts2_spatialwcs( status );
   } else if (strcmp( taskname, "FTS2PHASECORR" ) == 0 ) {

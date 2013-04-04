@@ -38,9 +38,9 @@ fixsteps \
 flatfield \
 fts2deglitch \
 fts2flatfield \
-fts2filtermap \
 fts2freqcorr \
 fts2init \
+fts2maskmap \
 fts2opcorr \
 fts2phasecorr \
 fts2phasecorrds \
