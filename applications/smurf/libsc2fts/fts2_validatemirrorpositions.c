@@ -95,12 +95,13 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
 {
   if(*status != SAI__OK) { return; }
 
-  // Compute EPSILON as a fraction of the expected mirror position step size (s)
-  // calculated from the SCANVEL (v) and the STEPTIME (t), where:
-  // s = vt
-  // and EPSILON should be reasonably large to ignore jitter, but small enough not to miss valid movement, 
-  // let's say at least half way to the next expected mirror position, or:
-  // EPSILON = s/2
+  /* Compute EPSILON as a fraction of the expected mirror position step size (s)
+  *  calculated from the SCANVEL (v) and the STEPTIME (t), where:
+  *  s = vt
+  *  and EPSILON should be reasonably large to ignore jitter, but small enough not to miss valid movement, 
+  *  let's say at least half way to the next expected mirror position, or:
+  *  EPSILON = s/2
+  */
   
   double s = 0.0;
   double t = 0.0;
@@ -117,7 +118,7 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   
   
   
-  // Determine scan direction
+  /* Determine scan direction */
   /* Mirror scans are supposed to be unidirectional (monotonically increasing or decreasing)
 	 but can have slow starts or trailing ends where there is little to no significant change.
 	 Determine the majority direction of this scan: positive or negative.
@@ -129,8 +130,8 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
 	  negative += (positions[i] - positions[i+1]);
   }
   direction = positive - negative;
-  
-  // Invert negative scan
+
+  /* Invert negative scan */
   double* inverted = NULL;
   if(direction < 0) {
 	inverted = (double*) astCalloc(count, sizeof(double));
@@ -142,7 +143,7 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
 		positions[i] = inverted[i];
     }
   }
-
+  
 /*
   // CREATE SHIFTED MIRROR POSITIONS
   double* shifted = (double*) astCalloc(count, sizeof(double));
@@ -152,13 +153,13 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   shifted[0] = positions[count - 1];
 */
   
-  // COMPUTE DELTA MIRROR POSITIONS
+  /* COMPUTE DELTA MIRROR POSITIONS */
   double* delta = (double*) astCalloc(count, sizeof(double));
   for(i = 0; i < count-1; i++) {
     delta[i] = positions[i+1] - positions[i];
   }
 
-  // FIND THE START INDEX
+  /* FIND THE START INDEX */
   for(i = 0; i < count-1; i++) {
     if(delta[i] >= EPSILON) {
       *ni = i;
@@ -166,7 +167,7 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
     }
   }
 
-  // FIND THE END INDEX
+  /* FIND THE END INDEX */
   for(i = count - 1; i > -1; i--) {
     if(delta[i] >= EPSILON) {
       *nf = i+1;
@@ -182,11 +183,11 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
       errRep(FUNC_NAME, "Repeating mirror position values found!", status);
     }
   }
-  */
+*/
   
-// CLEANUP:
+/* CLEANUP: */
   if(delta) {astFree(delta); delta = NULL;}
-//if(shifted) {astFree(shifted); shifted = NULL;}
+/*if(shifted) {astFree(shifted); shifted = NULL;}*/
   if(direction < 0 && inverted) {astFree(inverted); inverted = NULL;}
 
 }
