@@ -80,6 +80,14 @@
 *     15-FEB-2013 (DSB):
 *        - Allow union or intersection of multiple masks to be used.
 *        - Report an error if the mask contains fewer than 5 source pixels.
+*     4-APR-2013 (DSB):
+*        - Use VAL__BADD, not VAL__BADI, for checking for bad map and
+*        vartiance values. This bug will have had no effect since an
+*        additional check was made that mapvar is positive, and so caught
+*        bad variances (since VAL__BADD is negative).
+*        - When checking that the mask has significant size, do not
+*        include bad map pixels (eg the map corners, etc) in the count of
+*        source pixels.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -514,7 +522,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                      pv = dat->mapvar;
                      pn = newmask;
                      for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
-                        *(pn++) = ( *pd != VAL__BADI && *pv != VAL__BADI &&
+                        *(pn++) = ( *pd != VAL__BADD && *pv != VAL__BADD &&
                                     *pv >= 0.0 && *pd < zero_snr*sqrt( *pv ) ) ? 1 : 0;
                      }
 
@@ -610,13 +618,20 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
             if( *status == SAI__OK ) {
                nsource = 0;
                pm = *mask;
-               for( i = 0; i < dat->msize; i++ ) {
-                  if( *(pm++) == 0 ) nsource++;
+               pd = dat->map;
+               pv = dat->mapvar;
+               for( i = 0; i < dat->msize; i++,pd++,pv++,pm++ ) {
+                  if( *pd != VAL__BADD && *pv != VAL__BADD && *pv >= 0.0 &&
+                      *pm == 0 ) nsource++;
                }
                if( nsource < 5 && *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   errRepf( "", "The %s mask being used has fewer than 5 "
                            "source pixels.", status, modname );
+                  if( zero_snr > 0.0 ) {
+                     errRepf( "", "Maybe your zero_snr value (%g) is too high?",
+                              status, zero_snr );
+                  }
                }
             }
 
