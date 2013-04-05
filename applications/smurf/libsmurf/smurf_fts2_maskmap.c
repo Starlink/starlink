@@ -100,12 +100,14 @@
 void smurf_fts2_maskmap(int* status) {
 
 /* Local Variables */
+   AstFrameSet *slicefrm = NULL;
    Grp* igrp = NULL;          /* Group of input template files */
    Grp* ogrp = NULL;          /* Group containing output file */
    dim_t i;                   /* Index of time slice */
    dim_t r;
    dim_t c;
    dim_t iel;                 /* Index of element */
+   int icd;
    dim_t nrows;
    dim_t ncols;
    dim_t ndata;               /* Number of elements in array */
@@ -126,6 +128,7 @@ void smurf_fts2_maskmap(int* status) {
    double coord[2 * 32 * 40];
    int lbnd[] = {1, 1};
    int ubnd[] = {32, 40};
+   double limit = pow(AST__DD2R * 100 / 3600, 2);
 
 /* Check inherited status */
    if (*status != SAI__OK) return;
@@ -218,16 +221,23 @@ void smurf_fts2_maskmap(int* status) {
           if (*status != SAI__OK) {
             break;
           }
+          slicefrm = astCopy(hdr->wcs);
+          smf_set_moving(slicefrm, NULL, status);
+          astTranGrid(slicefrm, 2, lbnd, ubnd, /*Tol:*/ 0, /*Maxpix:*/ 0,
+                      /*Forward:*/ 1, 2, 32 * 40, coord);
 
-          for (c = 0; c < ncols; c ++) {
-            for (r = 0; r < nrows; r ++ ) {
-              iel = (tstride * i) + (bstride * (c + r * ncols));
+          for (c = 0; c < 32; c ++) {
+            for (r = 0; r < 40; r ++ ) {
+              iel = (tstride * i) + (bstride * (c + r * 32));
+              icd = c + r * 32;
 
-              if (pi) {
-                pi[iel] = VAL__BADI;
-              }
-              else {
-                pd[iel] = VAL__BADD;
+              if (pow(coord[icd], 2) + pow(coord[icd + 40 * 32], 2) > limit) {
+                if (pi) {
+                  pi[iel] = VAL__BADI;
+                }
+                else {
+                  pd[iel] = VAL__BADD;
+                }
               }
             }
           }
