@@ -36,10 +36,14 @@
 *         Changed validation logic to trim non-uniform data from ends
 *         while adapting to mirror speed.
 *         Also reverse mirror position array in case of opposite scan direction.
+*     2013-04-04 (MSHERWOOD)
+*         - Remove reverse scan mirror position inversion to avoid having to reorder corresponding data
+*         - Swap start and end mirror position index values for reverse scan case instead
+*         - It is the caller's responsibility to detect this and adapt accordingly
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
-*     Copyright (C) 2010 University of Lethbridge. All Rights Reserved.
+*     Copyright (C) 2013 University of Lethbridge. All Rights Reserved.
 
 *  License:
 *     This program is free software; you can redistribute it and/or
@@ -131,19 +135,6 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   }
   direction = positive - negative;
 
-  /* Invert negative scan */
-  double* inverted = NULL;
-  if(direction < 0) {
-	inverted = (double*) astCalloc(count, sizeof(double));
-    for(i=0,j=count-1; i < count; i++,j--) {
-	  inverted[i] = positions[j];
-    }
-	// Copy inverted values back to positions
-    for(i=0; i < count; i++) {
-		positions[i] = inverted[i];
-    }
-  }
-  
 /*
   // CREATE SHIFTED MIRROR POSITIONS
   double* shifted = (double*) astCalloc(count, sizeof(double));
@@ -156,13 +147,19 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   /* COMPUTE DELTA MIRROR POSITIONS */
   double* delta = (double*) astCalloc(count, sizeof(double));
   for(i = 0; i < count-1; i++) {
-    delta[i] = positions[i+1] - positions[i];
+    if(direction > 0)
+      delta[i] = positions[i+1] - positions[i];
+    else
+      delta[i] = positions[i] - positions[i+1];
   }
 
   /* FIND THE START INDEX */
   for(i = 0; i < count-1; i++) {
     if(delta[i] >= EPSILON) {
-      *ni = i;
+      if(direction > 0)
+        *ni = i;
+      else
+        *nf = i;
       break;
     }
   }
@@ -170,7 +167,10 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   /* FIND THE END INDEX */
   for(i = count - 1; i > -1; i--) {
     if(delta[i] >= EPSILON) {
-      *nf = i+1;
+      if(direction > 0)
+        *nf = i+1;
+      else
+        *ni = i+1;
       break;
     }
   }
@@ -188,6 +188,5 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
 /* CLEANUP: */
   if(delta) {astFree(delta); delta = NULL;}
 /*if(shifted) {astFree(shifted); shifted = NULL;}*/
-  if(direction < 0 && inverted) {astFree(inverted); inverted = NULL;}
 
 }
