@@ -87,6 +87,10 @@ void cupid_mon( int *status ) {
 *        the history component of output NDFs.
 *     2011-01-19 (TIMJ):
 *        Add leak checking to CUPID monolith
+*     5-APR-2013 (DSB):
+*        Use astCheckMemory rather than astFlushMemory since we do not want
+*        to free the memory used to hold the singleton workforce returned by
+*        thrGetWorkforce.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -266,8 +270,14 @@ void cupid_mon( int *status ) {
 /* Make AST use its own internal variable for its inherited status. */
    astWatch( NULL );
 
-/* Clear out any remaining memory allocated by AST and report
-   unintentional leaks. */
-   astFlushMemory( 1 );
+/* The astCheckMemory function does nothing unless AST has been compiled
+   with the MEM_DEBUG flag. If this is the case, then it reports the number
+   of memory blocks that have not been freed (useful for identifying memory
+   leaks). Use astActiveMemory() below to list all active memory and
+   then use astWatchMemory() at the start of this routine to get reports
+   when a particular ID is used. Set a breakpoint in the debugger for
+   astMemoryAlarm_ */
+   astActiveMemory("Exit:");
+   astCheckMemory;
 
 }

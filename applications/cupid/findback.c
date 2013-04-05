@@ -157,6 +157,11 @@ void findback( int *status ){
 *        Use sqrt rather than sqrtf when calculating RMS.
 *     12-SEP-2011 (DSB):
 *        Process slices in separate threads.
+*     5-APR-2013 (DSB):
+*        Use thrGetWorkforce instead of thrCreateWorkforce in order to
+*        avoid accumulation of rsource usage associated with each new
+*        created workforce, which can be a problem when running from a
+*        monolith. And do not delete the singleton workforce.
 *     {enter_further_changes_here}
 
 *-
@@ -387,7 +392,7 @@ void findback( int *status ){
    parGet0l( "NEWALG", &newalg, status );
 
 /* Create a pool of worker threads. */
-   wf = thrCreateWorkforce( thrGetNThread( "CUPID_THREADS", status ), status );
+   wf = thrGetWorkforce( thrGetNThread( "CUPID_THREADS", status ), status );
 
 /* Get memory to hold a description of each job passed to a worker. There
    is one job for each slice. */
@@ -488,7 +493,6 @@ L999:;
 
 /* Free workspace. */
    job_data = astFree( job_data );
-   wf = thrDestroyWorkforce( wf );
 
 /* Reinstate the original AST inherited status value. */
    astWatch( old_status );
