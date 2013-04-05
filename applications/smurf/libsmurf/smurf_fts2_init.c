@@ -47,8 +47,6 @@
  *        Removed unneccessary sort (fts2_validatemirrorpositions now reverses list when needed)
  *     2013-04-04 (MSHERWOOD)
  *        - Document the previous conversion of ZPD values from mechanical to optical units
- *        - Detect reverse scan by way of start and end values from fts2_validatemirrorpositions
- *          which no longer reverses the scan list (to avoid having to reorder corresponding data)
  *
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -164,7 +162,6 @@ void smurf_fts2_init(int* status)
   int badPixel              = 0;
   int k0                    = 0;
   int indexZPD              = 0;
-  int scanDirection         = 1;        /* Mirror scan direction: 1 for positive, -1 for negative
   
   /* Get Input, Output and ZPD groups */
   kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
@@ -213,30 +210,17 @@ void smurf_fts2_init(int* status)
       errRep( FUNC_NAME, "Unable to validate the mirror positions!", status);
       goto CLEANUP;
     }
-    
-    /* Set positive or negative mirror scanDirection indicator */
-    if(nStart > nStop) 
-      scanDirection = -1;
-    else
-      scanDirection = 1;
 
     /* THIS WILL NO LONGER NECESSARY WHEN THE FTS2 MIRROR POSITIONS ARE READ IN [-225, 225]
        Transform mirror positions from [0, 450] to [-225, 225] */
        for(k = 0; k < nFrames; k++) { MIRPOS[k] -= STAGE_CENTER; }
 
     /* The number of mirror positions with unique values */
-    if(scanDirection == 1)
-      nMirPos = nStop - nStart + 1;
-    else
-      nMirPos = nStart - nStop + 1;
-    printf("smurf_fts2_init: scanDirection=%d, nFrames=%d, nStart=%d, nStop=%d, nMirPos=%d\n", scanDirection, nFrames, nStart, nStop, nMirPos);
+    nMirPos = nStop - nStart + 1;
 
     /* Corresponding OPD values */
     OPD = astCalloc(nMirPos, sizeof(*OPD));
-    if(scanDirection == 1)
-      for(k = nStart; k <=nStop; k++) { OPD[k - nStart] = 4.0 * MIRPOS[k] / 10.0; }
-    else
-      for(k = nStart; k >=nStop; k--) { OPD[k - nStop] = 4.0 * MIRPOS[k] / 10.0; }
+    for(k = nStart; k <=nStop; k++) { OPD[k - nStart] = 4.0 * MIRPOS[k] / 10.0; }
 
     scanVel   = 0.0;
     stepTime  = 0.0;
@@ -248,17 +232,9 @@ void smurf_fts2_init(int* status)
     smf_fits_getD(inData->hdr, "STEPTIME", &stepTime, status);
 
     /* Nyquist frequency */
-    printf("smurf_fts2_init: scanVel=%f, stepTime=%f\n", scanVel, stepTime);    
     fNyquist = 10.0 / (8.0 * scanVel * stepTime);
-    printf("smurf_fts2_init: fNyquist=%f\n", fNyquist);    
-    
-    if(scanDirection == 1) {
-      minOPD = OPD[0];
-      maxOPD = OPD[nMirPos - 1];
-    } else {
-        maxOPD = OPD[0];
-        minOPD = OPD[nMirPos - 1];
-    }
+    minOPD = OPD[0];
+    maxOPD = OPD[nMirPos - 1];
     if(fabs(minOPD) < fabs(maxOPD)) maxOPD = fabs(minOPD);
     minOPD = -maxOPD;
     dz = 1.0 / (2.0 * fNyquist);
@@ -266,8 +242,6 @@ void smurf_fts2_init(int* status)
     /* Evenly spaced OPD grid */
     nMax = (int) (fabs(maxOPD) / dz) + 1;
     nOPD = 2 * (nMax - 1);
-    
-    printf("smurf_fts2_init: minOPD=%d, maxOPD=%d, dz=%f, nMax=%d, nOPD=%d\n", minOPD, maxOPD, dz, nMax, nOPD);
 
     OPD_EVEN = astCalloc(nOPD, sizeof(*OPD_EVEN));
     for(k = 1; k <= nOPD; k++) {
