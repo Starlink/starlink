@@ -31,11 +31,13 @@
 *     2012-05-24 (COBA):
 *        Original version.
 *     2012-12-12 (MSHERWOOD):
-*     	  Removed temporary testing code.
+*           Removed temporary testing code.
 *     2012-12-21 (MSHERWOOD)
 *         Changed validation logic to trim non-uniform data from ends
 *         while adapting to mirror speed.
 *         Also reverse mirror position array in case of opposite scan direction.
+*     2013-04-05 (MSHERWOOD)
+*         Reverse data also with mirror position array in case of opposite scan direction.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -111,36 +113,61 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   s = v*t;
   double EPSILON = s/2;
 
-  int i,j = 0;
+  int i,j,x,y = 0;
   double positive = 0.0;
   double negative = 0.0;
   double direction = 0.0;
   
-  
+  double * copyData;                /* Array of pointers to DATA/VARIANCE/QUALITY */  
+  size_t nWidth             = 0;
+  size_t nHeight            = 0;
+  size_t nFrames            = 0;
+  size_t nPixels            = 0;
+  int bolIndex              = 0;
+
   
   /* Determine scan direction */
   /* Mirror scans are supposed to be unidirectional (monotonically increasing or decreasing)
-	 but can have slow starts or trailing ends where there is little to no significant change.
-	 Determine the majority direction of this scan: positive or negative.
+     but can have slow starts or trailing ends where there is little to no significant change.
+     Determine the majority direction of this scan: positive or negative.
   */
   for(i=0; i<count-1; i++) {
-	if(positions[i] < positions[i+1])
-	  positive += (positions[i+1] - positions[i]);
-	else if(positions[i] > positions[i+1])
-	  negative += (positions[i] - positions[i+1]);
+    if(positions[i] < positions[i+1])
+      positive += (positions[i+1] - positions[i]);
+    else if(positions[i] > positions[i+1])
+      negative += (positions[i] - positions[i+1]);
   }
   direction = positive - negative;
 
   /* Invert negative scan */
   double* inverted = NULL;
   if(direction < 0) {
-	inverted = (double*) astCalloc(count, sizeof(double));
+    /* Copy input data into output data for inversion */
+    nWidth  = inData->dims[0];
+    nHeight = inData->dims[1];
+    nFrames = inData->dims[2];
+    nPixels = nWidth * nHeight;
+    copyData = (double*) astMalloc((nPixels * nFrames) * sizeof(*copyData));
+      
+    inverted = (double*) astCalloc(count, sizeof(*inverted));
     for(i=0,j=count-1; i < count; i++,j--) {
-	  inverted[i] = positions[j];
+      inverted[i] = positions[j];
+      for(x = 0; x < nWidth; x++) {
+        for(y = 0; y < nHeight; y++) {
+          bolIndex = x + y * nWidth;
+          copyData[i*nPixels+bolIndex] = *((double*) inData->pntr[0] + j*nPixels+bolIndex);
+        }
+      } 
     }
-	// Copy inverted values back to positions
+    // Copy inverted values back to positions
     for(i=0; i < count; i++) {
-		positions[i] = inverted[i];
+      positions[i] = inverted[i];
+      for(x = 0; x < nWidth; x++) {
+        for(y = 0; y < nHeight; y++) {
+          bolIndex = x + y * nWidth;
+          *((double*) (inData->pntr[0]) + i*nPixels+bolIndex) = copyData[i*nPixels+bolIndex];
+        }
+      } 
     }
   }
   
@@ -188,6 +215,15 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
 /* CLEANUP: */
   if(delta) {astFree(delta); delta = NULL;}
 /*if(shifted) {astFree(shifted); shifted = NULL;}*/
-  if(direction < 0 && inverted) {astFree(inverted); inverted = NULL;}
-
+  if(direction < 0) {
+    if(inverted) {
+        astFree(inverted);
+        inverted = NULL;
+    }
+    if(copyData) {
+      astFree(copyData);
+      copyData = NULL;
+    }
+  }
+  
 }
