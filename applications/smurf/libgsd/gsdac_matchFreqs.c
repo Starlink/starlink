@@ -147,20 +147,20 @@ void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
 
   /* Check the index of each spectrum to see if their values are the same
    * or different. If they are the same then we have a special case, If they
-   * they are different we don't have a special case unless the spacing is 
+   * they are different we don't have a special case unless the spacing is
    * geater then 150 MHz. */
-  
+
   i = 1;
   while ( special == 0 && i < gsdVars->nBESections ) {
     if ( gsdVars->BESubsys[i] != gsdVars->BESubsys[i-1] ) {
       special = 1;
     }
     i++;
-  }  
+  }
 
   /* Check for any spacing greater than 150 MHz. */
   if (special == 1) {
-    special = 0; /* Assume it is wideband and set it back to special if there 
+    special = 0; /* Assume it is wideband and set it back to special if there
                   * is no overlap */
     for ( i = 1; i < gsdVars->nBESections; i++ ) {
       if ( 1000.0 * fabs ( centreFreqs[i] - centreFreqs[i - 1] ) > 150.0 ) {
@@ -172,7 +172,7 @@ void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
     }
   }
 
-  
+
   /* Set IF frequency for each subsystem */
 
   for ( i = 0; i < gsdVars->nBESections; i++ ) {
