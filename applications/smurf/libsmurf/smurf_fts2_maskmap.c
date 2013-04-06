@@ -239,7 +239,9 @@ void smurf_fts2_maskmap(int* status) {
               iel = (tstride * i) + (bstride * (c + r * 32));
               icd = c + r * 32;
 
-              if (pow(coord[icd], 2) + pow(coord[icd + 40 * 32], 2) > limit) {
+              if ((pow(c - 15.5, 2) + pow(r - 23.5, 2) > 256.0)
+                  || (pow(coord[icd], 2) + pow(coord[icd + 40 * 32], 2)
+                         > limit)) {
                 if (pi) {
                   pi[iel] = VAL__BADI;
                 }
