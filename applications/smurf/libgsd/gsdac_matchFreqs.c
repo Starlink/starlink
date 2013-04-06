@@ -45,6 +45,7 @@
 *  Authors:
 *     J.Balfour (UBC)
 *     V. Tilanus (JAC)
+*     MJC: Malcolm J. Currie (JAC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -61,9 +62,13 @@
 *        Simplify IF freq logic
 *     2010-07-22 (VT):
 *        Added a check the the freq logic to deal with special cases.
+*     2013 April 4 (MJC):
+*        The line frequencies become the subband central frequencies
+*        for special data.
 
 *  Copyright:
-*     Copyright (C) 2008, 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2010, 2013  Science and Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -173,9 +178,11 @@ void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
   for ( i = 0; i < gsdVars->nBESections; i++ ) {
 
      IFFreqs[i] = gsdVars->totIFs[i];
-     lineFreqs[i] = gsdVars->restFreqs[i];
      if ( special == 0 ) {
        gsdVars->BESubsys[i] = 0;
+       lineFreqs[i] = gsdVars->restFreqs[i];
+     } else {
+       lineFreqs[i] = gsdVars->centreFreqs[i];
      }
   }
 
