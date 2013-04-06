@@ -20,7 +20,8 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine masks one or more simulated SCUBA-2 time series cubes.
+*     This routine masks one or more SCUBA-2 time series cubes taken
+*     with FTS-2 in the beam.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -39,6 +40,8 @@
 *  History:
 *     11-MAR-2013 (GSB):
 *        Original version.
+*     04-APR-2013 (GSB):
+*        Implemented filtering by offset position.
 
 *  Copyright:
 *     Copyright (C) 2013 Science and Technology Facilities Council.
@@ -129,6 +132,7 @@ void smurf_fts2_maskmap(int* status) {
    int lbnd[] = {1, 1};
    int ubnd[] = {32, 40};
    double limit = pow(AST__DD2R * 100 / 3600, 2);
+   double tol = AST__DD2R * 5 / 3600;
 
 /* Check inherited status */
    if (*status != SAI__OK) return;
@@ -217,14 +221,18 @@ void smurf_fts2_maskmap(int* status) {
         }
 
         for (i = 0; i < ntslice; i ++) {
-          smf_tslice_ast(odata, i, 1, status);
-          if (*status != SAI__OK) {
-            break;
+          /* Limit coordinate conversions to only certain timeslices
+           * to avoid excess computation. */
+          if (! (i % 25)) {
+            smf_tslice_ast(odata, i, 1, status);
+            if (*status != SAI__OK) {
+              break;
+            }
+            slicefrm = astCopy(hdr->wcs);
+            smf_set_moving(slicefrm, NULL, status);
+            astTranGrid(slicefrm, 2, lbnd, ubnd, /*Tol:*/ tol,
+                        /*Maxpix:*/ 1000, /*Forward:*/ 1, 2, 32 * 40, coord);
           }
-          slicefrm = astCopy(hdr->wcs);
-          smf_set_moving(slicefrm, NULL, status);
-          astTranGrid(slicefrm, 2, lbnd, ubnd, /*Tol:*/ 0, /*Maxpix:*/ 0,
-                      /*Forward:*/ 1, 2, 32 * 40, coord);
 
           for (c = 0; c < 32; c ++) {
             for (r = 0; r < 40; r ++ ) {
