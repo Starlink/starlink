@@ -41,6 +41,7 @@
 *  Authors:
 *     COBA: Coskun Oba (UoL)
 *     MSHERWOOD: Matt Sherwood (UofL)
+*     GBELL: Graham Bell (JAC)
 
 *  History :
 *     2011-08-03 (COBA):
@@ -69,6 +70,12 @@
 *   
 *        which results in the named suffix being added to a new
 *        output NDF file to hold the corresponding data. 
+*     2013-04-03 (GBELL)
+*       smurf: allow phasecorrds to save all debug files
+*       If compiled with DEBUG set, all debug ouput files will be
+*       saved, avoiding the need for the file selection menu.
+*     2013-03-12 (MSHERWOOD)
+*       Added Phase Correction Function debug output
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -150,6 +157,12 @@ void smurf_fts2_phasecorrds(int* status)
   double* outDataSIC_pntr   = NULL;               /* Pointer to output data Spectrum Imaginary phase Corrected values array */
   smfData* outDataSP        = NULL;               /* Pointer to output data Spectrum Phase DEBUG */
   double* outDataSP_pntr    = NULL;               /* Pointer to output data Spectrum Phase values array */
+
+  smfData* outDataPCFR      = NULL;               /* Pointer to output data Phase Correction Function Real DEBUG */
+  double* outDataPCFR_pntr  = NULL;               /* Pointer to output data Phase Correction Function Real values array */
+  smfData* outDataPCFI      = NULL;               /* Pointer to output data Phase Correction Function Imaginary DEBUG */
+  double* outDataPCFI_pntr  = NULL;               /* Pointer to output data Phase Correction Function Imaginary values array */
+
   smfData* outDataSPF       = NULL;               /* Pointer to output data Spectrum Phase Fitted DEBUG */
   double* outDataSPF_pntr   = NULL;               /* Pointer to output data Spectrum Phase Fitted values array */
   smfData* outDataWN        = NULL;               /* Pointer to output data Wave Numbers DEBUG */
@@ -309,6 +322,26 @@ void smurf_fts2_phasecorrds(int* status)
     outDataSP_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSP_pntr));
     outDataSP->pntr[0] = outDataSP_pntr;
     
+    /* Copy input data into output data Phase Correction Function Real DEBUG */
+    outDataPCFR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+    outDataPCFR->dtype   = SMF__DOUBLE;
+    outDataPCFR->ndims   = 3;
+    outDataPCFR->dims[0] = nWidth;
+    outDataPCFR->dims[1] = nHeight;
+    outDataPCFR->dims[2] = nFrames;
+    outDataPCFR_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataPCFR_pntr));
+    outDataPCFR->pntr[0] = outDataPCFR_pntr;
+    
+    /* Copy input data into output data Phase Correction Function Imaginary DEBUG */
+    outDataPCFI = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+    outDataPCFI->dtype   = SMF__DOUBLE;
+    outDataPCFI->ndims   = 3;
+    outDataPCFI->dims[0] = nWidth;
+    outDataPCFI->dims[1] = nHeight;
+    outDataPCFI->dims[2] = nFrames;
+    outDataPCFI_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataPCFI_pntr));
+    outDataPCFI->pntr[0] = outDataPCFI_pntr;
+    
     /* Copy input data into output data Wave Numbers DEBUG */
     outDataSPF = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
     outDataSPF->dtype   = SMF__DOUBLE;
@@ -339,7 +372,7 @@ void smurf_fts2_phasecorrds(int* status)
     outDataWT_pntr = (double*) astMalloc((nPixels * nFrames2) * sizeof(*outDataWT_pntr));
     outDataWT->pntr[0] = outDataWT_pntr;
     
-    /* Copy input data into output data Spectrum Real DEBUG */
+    /* Copy input data into output data Spectrum Real phase Corrected DEBUG */
     outDataSRC = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
     outDataSRC->dtype   = SMF__DOUBLE;
     outDataSRC->ndims   = 3;
@@ -349,7 +382,7 @@ void smurf_fts2_phasecorrds(int* status)
     outDataSRC_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataSRC_pntr));
     outDataSRC->pntr[0] = outDataSRC_pntr;
     
-    /* Copy input data into output data Spectrum Imaginary DEBUG */
+    /* Copy input data into output data Spectrum Imaginary phase Corrected DEBUG */
     outDataSIC = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
     outDataSIC->dtype   = SMF__DOUBLE;
     outDataSIC->ndims   = 3;
@@ -428,6 +461,8 @@ void smurf_fts2_phasecorrds(int* status)
                     outDataSRC_pntr[index] = VAL__BADD;   /* DEBUG */
                     outDataSIC_pntr[index] = VAL__BADD;   /* DEBUG */
                     outDataSP_pntr[index] = VAL__BADD;    /* DEBUG */
+                    outDataPCFR_pntr[index] = VAL__BADD;    /* DEBUG */
+                    outDataPCFI_pntr[index] = VAL__BADD;    /* DEBUG */
                     if(k < nFrames2) {
                         outDataSPF_pntr[index] = VAL__BADD;    /* DEBUG */
                         outDataWN_pntr[index] = VAL__BADD;    /* DEBUG */
@@ -542,6 +577,8 @@ void smurf_fts2_phasecorrds(int* status)
           outDataSRC_pntr[index] = SPECS[k][0] / nFrames;   /* DEBUG */
           outDataSIC_pntr[index] = SPECS[k][1] / nFrames;   /* DEBUG */
           outDataSP_pntr[index] = PHASES[k];                /* DEBUG */
+          outDataPCFR_pntr[index] = PCF[k][0];              /* DEBUG */
+          outDataPCFI_pntr[index] = PCF[k][1];              /* DEBUG */
           if(k < nFrames2) {
              outDataSPF_pntr[index] = FITS[k];              /* DEBUG */
              outDataWN_pntr[index] = WN[k];                 /* DEBUG */
@@ -672,6 +709,42 @@ void smurf_fts2_phasecorrds(int* status)
     smf_close_file(&outDataSP, status);
     if(*status != SAI__OK) {
         errRepf(TASK_NAME, "Error closing outDataSP file", status);
+        goto CLEANUP;
+    }
+    
+    /* Write output Phase Correction Function Real DEBUG */
+    /* Append unique suffix to fileName */
+    n = one_snprintf(outDataPCFR->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "PCFR");
+    if(n < 0 || n >= SMF_PATH_MAX) {
+        errRepf(TASK_NAME, "Error creating outDataPCFR->file->name", status);
+        goto CLEANUP;
+    }
+    smf_write_smfData(outDataPCFR, NULL, outDataPCFR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+    if(*status != SAI__OK) {
+        errRepf(TASK_NAME, "Error writing outDataPCFR file", status);
+        goto CLEANUP;
+    }
+    smf_close_file(&outDataPCFR, status);
+    if(*status != SAI__OK) {
+        errRepf(TASK_NAME, "Error closing outDataPCFR file", status);
+        goto CLEANUP;
+    }
+    
+    /* Write output Phase Correction Function Imaginary DEBUG */
+    /* Append unique suffix to fileName */
+    n = one_snprintf(outDataPCFI->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "PCFI");
+    if(n < 0 || n >= SMF_PATH_MAX) {
+        errRepf(TASK_NAME, "Error creating outDataPCFI->file->name", status);
+        goto CLEANUP;
+    }
+    smf_write_smfData(outDataPCFI, NULL, outDataPCFI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+    if(*status != SAI__OK) {
+        errRepf(TASK_NAME, "Error writing outDataPCFI file", status);
+        goto CLEANUP;
+    }
+    smf_close_file(&outDataPCFI, status);
+    if(*status != SAI__OK) {
+        errRepf(TASK_NAME, "Error closing outDataPCFI file", status);
         goto CLEANUP;
     }
     
