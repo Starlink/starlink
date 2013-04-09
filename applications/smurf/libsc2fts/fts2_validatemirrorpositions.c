@@ -100,11 +100,11 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   /* Compute EPSILON as a fraction of the expected mirror position step size (s)
   *  calculated from the SCANVEL (v) and the STEPTIME (t), where:
   *  s = vt
-  *  and EPSILON should be reasonably large to ignore jitter, but small enough not to miss valid movement, 
+  *  and EPSILON should be reasonably large to ignore jitter, but small enough not to miss valid movement,
   *  let's say at least half way to the next expected mirror position, or:
   *  EPSILON = s/2
   */
-  
+
   double s = 0.0;
   double t = 0.0;
   smf_fits_getD(inData->hdr, "STEPTIME", &t, status);
@@ -117,15 +117,15 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   double positive = 0.0;
   double negative = 0.0;
   double direction = 0.0;
-  
-  double * copyData;                /* Array of pointers to DATA/VARIANCE/QUALITY */  
+
+  double * copyData;                /* Array of pointers to DATA/VARIANCE/QUALITY */
   size_t nWidth             = 0;
   size_t nHeight            = 0;
   size_t nFrames            = 0;
   size_t nPixels            = 0;
   int bolIndex              = 0;
 
-  
+
   /* Determine scan direction */
   /* Mirror scans are supposed to be unidirectional (monotonically increasing or decreasing)
      but can have slow starts or trailing ends where there is little to no significant change.
@@ -148,7 +148,7 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
     nFrames = inData->dims[2];
     nPixels = nWidth * nHeight;
     copyData = (double*) astMalloc((nPixels * nFrames) * sizeof(*copyData));
-      
+
     inverted = (double*) astCalloc(count, sizeof(*inverted));
     for(i=0,j=count-1; i < count; i++,j--) {
       inverted[i] = positions[j];
@@ -157,7 +157,7 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
           bolIndex = x + y * nWidth;
           copyData[i*nPixels+bolIndex] = *((double*) inData->pntr[0] + j*nPixels+bolIndex);
         }
-      } 
+      }
     }
     // Copy inverted values back to positions
     for(i=0; i < count; i++) {
@@ -167,10 +167,10 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
           bolIndex = x + y * nWidth;
           *((double*) (inData->pntr[0]) + i*nPixels+bolIndex) = copyData[i*nPixels+bolIndex];
         }
-      } 
+      }
     }
   }
-  
+
 /*
   // CREATE SHIFTED MIRROR POSITIONS
   double* shifted = (double*) astCalloc(count, sizeof(double));
@@ -179,7 +179,7 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   }
   shifted[0] = positions[count - 1];
 */
-  
+
   /* COMPUTE DELTA MIRROR POSITIONS */
   double* delta = (double*) astCalloc(count, sizeof(double));
   for(i = 0; i < count-1; i++) {
@@ -211,7 +211,7 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
     }
   }
 */
-  
+
 /* CLEANUP: */
   if(delta) {astFree(delta); delta = NULL;}
 /*if(shifted) {astFree(shifted); shifted = NULL;}*/
@@ -225,5 +225,5 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
       copyData = NULL;
     }
   }
-  
+
 }
