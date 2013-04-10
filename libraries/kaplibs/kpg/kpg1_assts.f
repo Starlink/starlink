@@ -81,6 +81,9 @@
 *        Added DrawDSB.
 *     1-APR-2011: (DSB):
 *        Added TextMargin.
+*     10-APR-2013: (DSB):
+*        Allow multiple qualifiers to be included in a single attribute
+*        name.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -116,8 +119,10 @@
 *  Local Variables:
       CHARACTER NAME*(GRP__SZNAM)  ! Attribute name
       CHARACTER VALUE*(GRP__SZNAM) ! Attribute value
+      INTEGER IQUAL                ! Index of qualifier to use
       INTEGER ISTAT                ! CHR status value
       INTEGER IVAL                 ! Integer value read from string
+      INTEGER NQUAL                ! Number of qualifiers in the setting
       REAL RVAL                    ! Real value read from string
 *.
 
@@ -130,9 +135,21 @@
 *  Return if the setting is blank.
       IF( SETTNG .NE. ' ' ) THEN
 
+*  This routine allows multiple qualifiers to be grouped together. So for
+*  instance it allows a single colour to be set for multiple items using
+*  an attribute setting of the form "colour(border,ticks,title)=black".
+*  Since AST itself does not allow lists of qualifiers, we need to split
+*  this up into three setting: "colour(border)=black", "colour(ticks)=black",
+*  "colour(title)=black". Loop over all qualifiers, starting with the first...
+         IQUAL = 0
+         NQUAL = 1
+         DO WHILE( IQUAL .LT. NQUAL .AND. STATUS .EQ. SAI__OK )
+            IQUAL = IQUAL + 1
+
 *  Extract the attribute name and value, replacing any synonyms
-*  or any colour names.
-         CALL KPG1_ASSTY( SETTNG, NAME, VALUE, STATUS )
+*  or any colour names. This also returns the number of qualifiers in the
+*  attribute name (which may be zero).
+            CALL KPG1_ASSTY( SETTNG, IQUAL, NAME, VALUE, NQUAL, STATUS )
 
 *  First check for KAPPA "pseudo-attributes". These are implememted by KAPPA
 *  rather than AST...
@@ -140,86 +157,89 @@
 *  TEXTBACKCOLOUR: specifies the colour index for the background when text
 *  strings are drawn. A negative value results in the background being
 *  clear.
-         IF( CHR_SIMLR( NAME, 'TEXTBACKCOLOUR' ) ) THEN
+            IF( CHR_SIMLR( NAME, 'TEXTBACKCOLOUR' ) ) THEN
 
 *  Allow the string CL(EAR) to indicate a clear background. Set the text
 *  background colour index used by the grf_kappa.c module to -1.
-            IF( CHR_SIMLR( VALUE( : 2 ), 'CL' ) ) THEN
-               CALL GRF_SETTBG( -1 )
+               IF( CHR_SIMLR( VALUE( : 2 ), 'CL' ) ) THEN
+                  CALL GRF_SETTBG( -1 )
 
 *  For any other value attempt to extract a colour index. Colour names
 *  will have been converted to colour indices by KPG1_ASSTY.
-            ELSE
-               ISTAT = STATUS
-               CALL CHR_CTOI( VALUE, IVAL, ISTAT )
+               ELSE
+                  ISTAT = STATUS
+                  CALL CHR_CTOI( VALUE, IVAL, ISTAT )
 
 *  If a valid integer value was supplied, set it as the colour index.
-               IF( ISTAT .EQ. SAI__OK ) THEN
-                  CALL GRF_SETTBG( IVAL )
-               END IF
+                  IF( ISTAT .EQ. SAI__OK ) THEN
+                     CALL GRF_SETTBG( IVAL )
+                  END IF
 
-            END IF
+               END IF
 
 *  TEXTMARGIN: specifies the margin to clear around each text string. The
 *  value is normalised to the height of the text (i.e. a margin of 1.0
 *  produces a margin equal to the text height).
-         ELSE IF( CHR_SIMLR( NAME, 'TEXTMARGIN' ) ) THEN
+            ELSE IF( CHR_SIMLR( NAME, 'TEXTMARGIN' ) ) THEN
 
 *  Attempt to extract a margin width.
-            ISTAT = STATUS
-            CALL CHR_CTOR( VALUE, RVAL, ISTAT )
+               ISTAT = STATUS
+               CALL CHR_CTOR( VALUE, RVAL, ISTAT )
 
 *  If a valid value was supplied, set it as the margin width.
-            IF( ISTAT .EQ. SAI__OK ) THEN
-               CALL GRF_SETTMG( RVAL )
-            END IF
+               IF( ISTAT .EQ. SAI__OK ) THEN
+                  CALL GRF_SETTMG( RVAL )
+               END IF
 
 *  DrawDSB: specifies whether the unselected sideband of a DSBSpecFrame
 *  should be labelled on the unsused axis by applications such as LINPLOT.
-         ELSE IF( CHR_SIMLR( NAME, 'DRAWDSB' ) ) THEN
+            ELSE IF( CHR_SIMLR( NAME, 'DRAWDSB' ) ) THEN
 
 *  Zero means no, any other integer means yes.
-            ISTAT = STATUS
-            CALL CHR_CTOI( VALUE, IVAL, ISTAT )
-            IF( ISTAT .EQ. SAI__OK ) THEN
-               CALL KPG1_SETASTDSB( IVAL .NE. 0 )
-            END IF
+               ISTAT = STATUS
+               CALL CHR_CTOI( VALUE, IVAL, ISTAT )
+               IF( ISTAT .EQ. SAI__OK ) THEN
+                  CALL KPG1_SETASTDSB( IVAL .NE. 0 )
+               END IF
 
 *  FileInTitle: specifies whether the NDF path should be included in the
 *  Title, formatted on a second line using AST graphical escape sequences.
-         ELSE IF( CHR_SIMLR( NAME, 'FileInTitle' ) ) THEN
+            ELSE IF( CHR_SIMLR( NAME, 'FileInTitle' ) ) THEN
 
 *  Zero means no, any other integer means yes.
-            ISTAT = STATUS
-            CALL CHR_CTOI( VALUE, IVAL, ISTAT )
-            IF( ISTAT .EQ. SAI__OK ) THEN
-               CALL KPG1_SETASTFIT( IVAL .NE. 0 )
-            END IF
+               ISTAT = STATUS
+               CALL CHR_CTOI( VALUE, IVAL, ISTAT )
+               IF( ISTAT .EQ. SAI__OK ) THEN
+                  CALL KPG1_SETASTFIT( IVAL .NE. 0 )
+               END IF
 
 *  If the attribute is not a KAPPA pseudo-attribute, assume it is a
 *  genuine AST attribute.
-         ELSE
+            ELSE
 
 *  Set the attribute in the Plot. If required, check that the attribute
 *  is not already set in the Plot.
-            IF( OVER .OR. .NOT. AST_TEST( IPLOT, NAME, STATUS ) ) THEN
-               CALL AST_SETC( IPLOT, NAME( : CHR_LEN( NAME ) ),
-     :                        VALUE( : CHR_LEN( VALUE ) ), STATUS )
-            END IF
+               IF( OVER .OR. .NOT. AST_TEST( IPLOT, NAME,
+     :                                       STATUS ) ) THEN
+                  CALL AST_SETC( IPLOT, NAME( : CHR_LEN( NAME ) ),
+     :                           VALUE( : CHR_LEN( VALUE ) ), STATUS )
+               END IF
 
-         END IF
+            END IF
 
 *  If AST_SETC or AST_TESTC returned an error indicating that the setting
 *  string was invalid, return a flag to indicate this.
-         BADAT = ( STATUS .EQ. AST__BADAT .OR.
-     :             STATUS .EQ. AST__ATSER .OR.
-     :             STATUS .EQ. AST__ATTIN .OR.
-     :             STATUS .EQ. AST__AXIIN .OR.
-     :             STATUS .EQ. AST__OPT .OR.
-     :             STATUS .EQ. AST__NOWRT )
+            BADAT = ( STATUS .EQ. AST__BADAT .OR.
+     :                STATUS .EQ. AST__ATSER .OR.
+     :                STATUS .EQ. AST__ATTIN .OR.
+     :                STATUS .EQ. AST__AXIIN .OR.
+     :                STATUS .EQ. AST__OPT .OR.
+     :                STATUS .EQ. AST__NOWRT )
 
 *  If no report is wanted, annul "bad attribute" error.
-         IF( .NOT. REPORT .AND. BADAT ) CALL ERR_ANNUL( STATUS )
+            IF( .NOT. REPORT .AND. BADAT ) CALL ERR_ANNUL( STATUS )
+
+         END DO
 
       END IF
 

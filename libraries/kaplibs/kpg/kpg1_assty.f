@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASSTY( SETTNG, NAME, VALUE, STATUS )
+      SUBROUTINE KPG1_ASSTY( SETTNG, IQUAL, NAME, VALUE, NQUAL, STATUS )
 *+
 *  Name:
 *     KPG1_ASSTY
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASSTY( SETTNG, NAME, VALUE, STATUS )
+*     CALL KPG1_ASSTY( SETTNG, IQUAL, NAME, VALUE, NQUAL, STATUS )
 
 *  Description:
 *     This routine splits the supplied AST attribute setting string up
@@ -32,10 +32,19 @@
 *     SETTNG = CHARACTER * ( * ) (Given)
 *        The text to be checked, potetially containing synonyms and
 *        colour names.
+*     IQUAL = INTEGER (Given)
+*        If the attribute name includes one or more qualifiers (e.g.
+*        "colour(ticks,border)" ), then the returned name includes the
+*        qualifier with index IQUAL (starting at one). The IQUAL value
+*        is ignored if the attribute name contains no qualifiers.
 *     NAME = CHARACTER * ( * ) (Returned)
-*        The corresponding AST attribute name (with a possible qualifier).
+*        The corresponding AST attribute name (including at most one
+*        qualifier, as selected by IQUAL).
 *     VALUE = CHARACTER * ( * ) (Returned)
 *        The corresponding AST attribute value.
+*     NQUAL = INTEGER (Returned)
+*        The number of qualifers included in the attribute name within
+*        the supplied SETTNG string. May be zero.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -73,6 +82,8 @@
 *     10-AUG-2007 (DSB):
 *        Use CHR_CLEAN so that TABs as well as spaces are removed from
 *        the attribute name.
+*     10-APR-2013 (DSB):
+*        Added arguments IQUAL and NQUAL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,10 +101,12 @@
 
 *  Arguments Given:
       CHARACTER SETTNG*(*)
+      INTEGER IQUAL
 
 *  Arguments Returned:
       CHARACTER NAME*(*)
       CHARACTER VALUE*(*)
+      INTEGER NQUAL
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -122,8 +135,11 @@
       INTEGER COLIND             ! Colour index
       INTEGER DOWN               ! The lowest colour index available
       INTEGER EQUALS             ! Index of equals sign
+      INTEGER I                  ! Character index
       INTEGER IAT                ! Significant length of text2
       INTEGER ID                 ! PGPLOT device identifier (zero if none)
+      INTEGER IEND               ! Index of last char in required qualifier
+      INTEGER ISTART             ! Index of first char in required qualifier
       INTEGER J                  ! Synonym index
       INTEGER NCH                ! No. of characters used to format COLIND
       INTEGER NPLEN              ! Length of attribute name in synonym
@@ -139,6 +155,9 @@
       LOGICAL VALID2             ! Is attribute name group identifier valid?
 *.
 
+*  Initialise returned values.
+      NQUAL = 0
+
 *  Check the inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
@@ -148,33 +167,86 @@
 *  See if there is an equals in the supplied string.
       EQUALS = INDEX( SETTNG, '=' )
 
-*  If no equals sign is found return a blank value.
+*  If no equals sign is found use a blank value.
       IF( EQUALS .EQ. 0 ) THEN
          NAME = SETTNG
          VALUE = ' '
-         GO TO 999
-      END IF
 
 *  Store everything before the equals (except spaces) as the attribute name
-*  and (maybe) qualifier. Return if it is blank.
-      IF( EQUALS .EQ. 1 .OR. SETTNG( : EQUALS - 1 ) .EQ. ' ' ) THEN
+*  and (maybe) qualifier.
+      ELSE IF( EQUALS .EQ. 1 .OR. SETTNG( : EQUALS - 1 ) .EQ. ' ' ) THEN
          NAME = ' '
-         VALUE = SETTNG
-         GO TO 999
+         IF( EQUALS .LT. LEN(SETTNG) ) THEN
+            VALUE = SETTNG( EQUALS + 1: )
+         ELSE
+            VALUE = ' '
+         END IF
 
       ELSE
          NAME = SETTNG( : EQUALS - 1 )
-         CALL CHR_CLEAN( NAME )
-         CALL CHR_RMBLK( NAME )
-         CALL CHR_UCASE( NAME )
-      END IF
 
 *  Store everything after the equals as the attribute value.
-      IF( EQUALS .LT. LEN( SETTNG ) ) THEN
-         VALUE = SETTNG( EQUALS + 1 : )
-      ELSE
-         VALUE = ' '
+         IF( EQUALS .LT. LEN( SETTNG ) ) THEN
+            VALUE = SETTNG( EQUALS + 1 : )
+         ELSE
+            VALUE = ' '
+         END IF
       END IF
+
+*  See if the supplied name contains one or more qualifiers.
+      CALL KPG1_PRNTH( NAME, OP, CL, STATUS )
+      IF( OP .GT. 0 ) THEN
+
+*  Get the number of qualifiers (one more than the number of commas),
+*  and at the same time find the start and end of the qualifier with
+*  index IQUAL.
+         ISTART = OP + 1
+         IEND = CL - 1
+
+         NQUAL = 1
+         DO I = OP + 1, CL - 1
+            IF( NAME( I : I ) .EQ. ',' ) THEN
+               IF( NQUAL .EQ. IQUAL ) THEN
+                  IEND = I - 1
+               END IF
+
+               NQUAL = NQUAL + 1
+
+               IF( NQUAL .EQ. IQUAL ) THEN
+                  ISTART = I + 1
+               END IF
+            END IF
+
+         END DO
+
+         IF( ( IQUAL .GT. NQUAL .OR. IQUAL .LT. 1 ) .AND.
+     :         STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'I', IQUAL )
+            CALL MSG_SETI( 'N', NQUAL )
+            CALL ERR_REP( ' ', 'KPG1_ASSTY: Qualifier ^I requested - '//
+     :                    'must be in the range 1 to ^N (programming '//
+     :                    'error).', status )
+            CALL MSG_SETC( 'S', SETTNG )
+            CALL ERR_REP( ' ', 'KPG1_ASSTY: Error setting "^S".',
+     :                    status )
+            GO TO 999
+         END IF
+
+*  Blank out all but the requested qualifier within the returned name
+*  string.
+         NAME( OP + 1 : ISTART - 1 ) = ' '
+         NAME( IEND + 1 : CL - 1 ) = ' '
+
+      END IF
+
+*  Clean the name string of spaces, etc, and convert to upper case.
+      CALL CHR_CLEAN( NAME )
+      CALL CHR_RMBLK( NAME )
+      CALL CHR_UCASE( NAME )
+
+*  If the value is blank, there is nothing more to do.
+      IF( VALUE .EQ. ' ' ) GO TO 999
 
 *  Replace synonyms in the attribute name/qualifier.
 *  =================================================
