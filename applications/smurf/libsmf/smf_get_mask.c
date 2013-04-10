@@ -88,6 +88,10 @@
 *        - When checking that the mask has significant size, do not
 *        include bad map pixels (eg the map corners, etc) in the count of
 *        source pixels.
+*     10-APR-2013 (DSB):
+*        When checking that the mask encloses a significant number of source 
+*        pixels, do not require source pixels to have a defined variance 
+*        since variances are usually not available on the first iteration.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -614,15 +618,15 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Free the individual mask work array if it was used. */
             if( nmask > 1 ) newmask = astFree( newmask );
 
-/* Check that the mask has some source pixels. */
+/* Check that the mask has some source pixels (i.e. pixels that have non-bad data values - 
+   we do not also check variance values since they are not available until the second 
+   iteration). */
             if( *status == SAI__OK ) {
                nsource = 0;
                pm = *mask;
                pd = dat->map;
-               pv = dat->mapvar;
                for( i = 0; i < dat->msize; i++,pd++,pv++,pm++ ) {
-                  if( *pd != VAL__BADD && *pv != VAL__BADD && *pv >= 0.0 &&
-                      *pm == 0 ) nsource++;
+                  if( *pd != VAL__BADD && *pm == 0 ) nsource++;
                }
                if( nsource < 5 && *status == SAI__OK ) {
                   *status = SAI__ERROR;
