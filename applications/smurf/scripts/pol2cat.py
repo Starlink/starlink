@@ -51,7 +51,7 @@
 
 *  Usage:
 *     pol2cat in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
-*             [config] [device] [retain] [msg_filter] [ilevel] [glevel]
+*             [config] [device] [retain] [qui] [msg_filter] [ilevel] [glevel]
 *             [logfile]
 
 *  Parameters:
@@ -173,6 +173,13 @@
 *        MAXLEN are plotted. If a value is supplied for parameter IREF, then
 *        only vectors that fall within the IREF image will be displayed.
 *        The plot is displayed on the device specified by parameter DEVICE. [!]
+*     QUI = NDF (Read)
+*        If a value is supplied for QUI, the total Q, U and I images that
+*        go into the final polarisation vector catalogue will be saved to
+*        disk as a set of three 2D NDFs. The three NDFs are stored in a
+*        single container file, with path given by QUI. So for instance if
+*        QUI is set to "stokes.sdf", the Q, U and I images can be accessed 
+*        as "stokes.q", "stokes.u" and "stokes.i". [!]
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
 *        created by this script be retained? If not, it will be deleted
@@ -307,6 +314,10 @@ try:
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
+   params.append(starutil.Par0S("QUI", "An HDS container file in which to "
+                                "store the 2D Q, U and I images",
+                                 default=None ))
+
    params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
                                 "and IP?", False, noprompt=True))
 
@@ -361,6 +372,9 @@ try:
 
 #  Now get the PI value to use.
    pimap = parsys["PI"].value
+
+#  Now get the QUI value to use.
+   qui = parsys["QUI"].value
 
 #  Get the output catalogue now to avoid a long wait before the user gets
 #  prompted for it.
@@ -717,6 +731,12 @@ try:
    invoke( "$KAPPA_DIR/ndfcopy {0} like={1} out={2}".format(utotal,tmp,utrim) )
    itrim = NDG( 1 )
    invoke( "$KAPPA_DIR/ndfcopy {0} like={1} out={2}".format(iref,tmp,itrim) )
+
+#  If required, save the Q, U and I images.
+   if qui != None:
+      invoke( "$KAPPA_DIR/ndfcopy {0} out={1}.Q".format(qtrim,qui) )
+      invoke( "$KAPPA_DIR/ndfcopy {0} out={1}.U".format(utrim,qui) )
+      invoke( "$KAPPA_DIR/ndfcopy {0} out={1}.I".format(itrim,qui) )
 
 #  The polarisation vectors are calculated by the polpack:polvec command,
 #  which requires the input Stokes vectors in the form of a 3D cube. Paste
