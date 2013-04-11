@@ -1534,8 +1534,7 @@ int *status             /* global status (given and returned) */
 
          cache->map[subnum] = (AstMapping *) astCmpMap(cache->map[subnum], fts_flipmap, 1, " ");
 
-         fts_shift[0] = - fts_shift[0]; fts_shift[1] = - fts_shift[1];
-         fts_shiftmap = astShiftMap ( 2, fts_shift, " " );
+         astInvert( fts_shiftmap );
          cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], fts_shiftmap, 1, " " );
       }
 #endif
