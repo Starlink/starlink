@@ -178,7 +178,7 @@
 *        go into the final polarisation vector catalogue will be saved to
 *        disk as a set of three 2D NDFs. The three NDFs are stored in a
 *        single container file, with path given by QUI. So for instance if
-*        QUI is set to "stokes.sdf", the Q, U and I images can be accessed 
+*        QUI is set to "stokes.sdf", the Q, U and I images can be accessed
 *        as "stokes.q", "stokes.u" and "stokes.i". [!]
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
@@ -327,6 +327,9 @@ try:
    params.append(starutil.Par0S("DIAGFILE", "File to recieve diagnostic information",
                                  None, noprompt=True))
 
+   params.append(starutil.ParNDG("MASK", "A 2D image in which source pixels are bad",
+                                 default=None, minsize=0, maxsize=1, noprompt=True ))
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -353,6 +356,8 @@ try:
 #  See if the indata files are raw time series files, or files created by
 #  a previous run of CALCQU containing Q and U estimates.
 
+#  Get the source mask
+   mask = parsys["MASK"].value
 
 #  Get the image to use for the total flux (I) map.
    iref = parsys["IREF"].value
@@ -485,6 +490,21 @@ try:
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]"
                  .format(qarray,qff) )
 
+#  Create a set of Q images in which source pixels are blanked out.
+         if mask != None:
+            msg_out( "Blanking source pixels in {0} Q values...".format(a))
+            method = "mean"
+            qmasked = NDG(qff)
+            tmask = NDG(1)
+            for (qin,qout) in zip( qff, qmasked ):
+               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=! method=near".
+                       format(mask,tmask,qin) )
+               invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2}".
+                       format(qin,qout,tmask) )
+         else:
+            method = "median"
+            qmasked = qff
+
 #  There seems to be a tendency for each bolometer to have its own fixed
 #  bias in Q and U. We now try to remove these biases by removing the Q and
 #  U values that are common to each image (as opposed to astronomical Q/U
@@ -495,19 +515,24 @@ try:
          msg_out( "Removing background Q level from {0} bolometers...".format(a))
          qcom = NDG(1)
          qcom.comment = "qcom"
-         invoke( "$CCDPACK_DIR/makemos method=median in={0} out={1}".format(qff,qcom) )
+         invoke( "$CCDPACK_DIR/makemos method={2} in={0} out={1}".format(qmasked,qcom,method) )
 
 #  We simply assume that the fixed bolometer Q bias is linearly related to
 #  the mean Q value per bolometer. Astronomical sources will affect this
-#  mean to a small extent, but its probably the best we can do for now. To
-#  find the gradient and offset of the linear relationship for each Q image,
+#  mean to a small extent, which is why we have the option to mask them out.
+#  To find the gradient and offset of the linear relationship for each Q image,
 #  we use kappa:normalize to do a least squares fit between each Q image and
 #  the mean Q signal.
          qnm = NDG(qff)
          qnm.comment = "qnm"
-         for (qin,qout) in zip( qff, qnm ):
+
+         for mm in range(len( qff )):
+            qin = qff[ mm ];
+            qout = qnm[ mm ];
+            qm = qmasked[ mm ];
+
             invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
-                    format(qcom,qin,qout,ndevice), buffer=True )
+                    format(qcom,qm,qout,ndevice), buffer=True )
 
 #  If required, store the slope and offset in the diagnostics file.
             if diagfd != None:
@@ -537,17 +562,28 @@ try:
          invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
                  format(qffb,qcube) )
 
+#  Blank out the source pixel in the cube.
+         if mask != None:
+            qcubem = NDG(1)
+            qcube2 = NDG(1)
+            invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
+                    format(qmasked,qcubem) )
+            invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2}".
+                    format(qcube,qcube2,qcubem) )
+         else:
+            qcube2 = qcube
+
 #  Smooth the cube along the Z axis (the stare position axis). Currently
 #  use a simple top-hat median filter, but maybe try Gaussian? Use median to
 #  avoid the source being smeared out, and so causing rings in the residuals
 #  created below.
          qcubebx2 = NDG(1)
-         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=median box=\[1,1,5\]".
-                 format(qcube,qcubebx2) )
+         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=median wlim=0.1 box=\[1,1,5\]".
+                 format(qcube2,qcubebx2) )
 
 #  Smooth again using a small mean filter to get better noise statistics.
          qcubebx = NDG(1)
-         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=mean box=\[1,1,3\]".
+         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=mean wlim=0.1 box=\[1,1,3\]".
                  format(qcubebx2,qcubebx) )
 
 #  Find the residuals after removal of the smoothed cube.
@@ -579,16 +615,33 @@ try:
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]"
                  .format(uarray,uff) )
 
+         if mask != None:
+            msg_out( "Blanking source pixels in {0} U values...".format(a))
+            method = "mean"
+            umasked = NDG(uff)
+            for (uin,uout) in zip( uff, umasked ):
+               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=! method=near".
+                       format(mask,tmask,uin) )
+               invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2}".
+                       format(uin,uout,tmask) )
+         else:
+            method = "median"
+            umasked = uff
+
          msg_out( "Removing background U level from {0} bolometers...".format(a))
          ucom = NDG(1)
-         invoke( "$CCDPACK_DIR/makemos method=median in={0} out={1}".format(uff,ucom) )
+         invoke( "$CCDPACK_DIR/makemos method={2} in={0} out={1}".format(umasked,ucom,method) )
 
          unm = NDG(uff)
          unm.comment = "unm"
 
-         for (uin,uout) in zip( uff, unm ):
+         for mm in range(len( uff )):
+            uin = uff[ mm ];
+            uout = unm[ mm ];
+            um = umasked[ mm ];
+
             invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} device={3}".
-                    format(ucom,uin,uout,ndevice), buffer=True )
+                    format(ucom,um,uout,ndevice), buffer=True )
 
             if diagfd != None:
                slope = starutil.get_task_par( "slope", "normalize" )
@@ -609,11 +662,22 @@ try:
          ucube = NDG(1)
          invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
                  format(uffb,ucube) )
+
+         if mask != None:
+            ucubem = NDG(1)
+            ucube2 = NDG(1)
+            invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
+                    format(umasked,ucubem) )
+            invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2}".
+                    format(ucube,ucube2,ucubem) )
+         else:
+            ucube2 = ucube
+
          ucubebx2 = NDG(1)
-         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=median box=\[1,1,5\]".
-                 format(ucube,ucubebx2) )
+         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=median wlim=0.1 box=\[1,1,5\]".
+                 format(ucube2,ucubebx2) )
          ucubebx = NDG(1)
-         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=mean box=\[1,1,3\]".
+         invoke( "$KAPPA_DIR/block in={0} out={1} estimator=mean wlim=0.1 box=\[1,1,3\]".
                  format(ucubebx2,ucubebx) )
          ures = NDG(1)
          invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".
