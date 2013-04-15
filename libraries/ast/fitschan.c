@@ -1053,6 +1053,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     30-JAN-2013 (DSB):
 *        When reading a FITS-CLASS header, use "VLSR" keyword if
 *        "VELO-..." is not available.
+*     15-APR-2013 (DSB):
+*        Correct initialisation of missing coefficients When reading a
+*        SAO plate solution header.
 *class--
 */
 
@@ -24950,6 +24953,9 @@ static int SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
 /* Check there are exactly two CTYPE keywords in the header. */
    if( 2 == astKeyFields( this, "CTYPE%d", 0, NULL, NULL ) ){
 
+/* Initialise all cooefficients. */
+      memset( co, 0, sizeof( co ) );
+
 /* Get the required SAO keywords. */
       is_sao = 1;
       ok = 1;
@@ -24958,13 +24964,11 @@ static int SAOTrans( AstFitsChan *this, AstFitsChan *out, const char *method,
          ok = 0;
          for( m = 0; m < NC; m++ ) {
 
-/* Get the value of the next "COi_j" keyword. If the keyword is not found
-   in the header, store a default value. If any of the first 3 values are
-   missing on either axis, we assume this is not an SAO header. */
+/* Get the value of the next "COi_j" keyword. If any of the first 3 values
+   are missing on either axis, we assume this is not an SAO header. */
             sprintf( keyname, "CO%d_%d", i + 1, m + 1 );
             if( !GetValue( this, keyname, AST__FLOAT, &co[ i ][ m ], 0, 1, method,
                            class, status ) ) {
-               co[ i ][ m ] = ( m == i + 1 ) ? 1.0 : 0.0;
                if( m < 3 ) is_sao = 0;
                break;
             }
