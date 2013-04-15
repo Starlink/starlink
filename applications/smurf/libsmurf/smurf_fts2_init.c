@@ -47,6 +47,9 @@
  *        Removed unneccessary sort (fts2_validatemirrorpositions now reverses list when needed)
  *     2013-04-04 (MSHERWOOD)
  *        - Document the previous conversion of ZPD values from mechanical to optical units
+ *     2013-04-12 (MSHERWOOD)
+ *        Adjust OPD for each bolometer's measured ZPD position
+ *        Ensure that interpolation onto evenly spaced OPD grid stays within bounds
  *
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -150,7 +153,7 @@ void smurf_fts2_init(int* status)
   char scanMode[SZFITSTR];
 
   double scanVel            = 0.0;      /* Mirror speed in mm/sec */
-  double stepTime           = 0.0;      /* RTS sep time, average sample rate */
+  double stepTime           = 0.0;      /* RTS step time, average sample rate */
   double minOPD             = 0;        /* OPD minimum */
   double maxOPD             = 0;        /* OPD maximum */
   double ZPD                = 0;
@@ -162,7 +165,18 @@ void smurf_fts2_init(int* status)
   int badPixel              = 0;
   int k0                    = 0;
   int indexZPD              = 0;
-  
+
+  double lenLeft,
+         lenRight,
+         minLenLeft,
+         minLenRight,
+         minLen,
+         minZPD,
+         maxZPD,
+         midZPD             = 0.0;      /* Mirror position half side measures */
+  int midZPDPos             = 0;        /* Middle ZPD position in mirror position array */
+
+
   /* Get Input, Output and ZPD groups */
   kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
   kpg1Wgndf("OUT", gOut, nFiles, nFiles, "Equal number of input and output files expected!", &gOut, &nOutFiles, status);
@@ -178,7 +192,7 @@ void smurf_fts2_init(int* status)
     errRep(FUNC_NAME, "Unable to open the ZPD calibration file!", status);
     goto CLEANUP;
   }
-  
+
   /* Loop through each input file */
   for(fIndex = 1; fIndex <= nFiles; fIndex++) {
     /* Open Observation file */
@@ -218,9 +232,78 @@ void smurf_fts2_init(int* status)
     /* The number of mirror positions with unique values */
     nMirPos = nStop - nStart + 1;
 
+    /* Initialize minimum left/right lengths to maximum mirror track length (mm) */
+    minLenLeft = minLenRight = STAGE_CENTER * 2;
+
+    /* Find the minimum distance between the set of ZPD values and the nearest mirror track endpoints */
+    for(i = 0; i < nWidth; i++) {
+        for(j = 0; j < nHeight; j++) {
+            bolIndex = i + j * nWidth;
+            /* ZPD position in OPD grid */
+            ZPD = *((double*) (zpdData->pntr[0]) + bolIndex);
+            /* Measure the length of the left and right half of the MIRPOS track position, relative to ZPD offset */
+            lenLeft = fabs(MIRPOS[nStart]) + ZPD;
+            /*printf("smurf_fts2_init: lenLeft = fabs(MIRPOS[nStart(%d)] (%f)) + ZPD (%f) = %f\n", nStart, fabs(MIRPOS[nStart]), ZPD, lenLeft);*/
+            lenRight = fabs(MIRPOS[nStop]) - ZPD;
+            /*printf("smurf_fts2_init: lenRight = fabs(MIRPOS[nStop(%d)] (%f)) - ZPD (%f) = %f\n", nStop, fabs(MIRPOS[nStop]), ZPD, lenRight);*/
+            /* Remember the shortest half */
+            if(minLenLeft > lenLeft) {
+                minLenLeft = lenLeft;
+                minZPD = ZPD;
+                /*printf("smurf_fts2_init: minLenLeft = MIRPOS[nStart(%d)] (%f) + ZPD (%f) = %f\n", nStart, MIRPOS[nStart], ZPD, minLenLeft);*/
+            } else  if(minLenRight > lenRight) {
+                minLenRight = lenRight;
+                maxZPD = ZPD;
+                /*printf("smurf_fts2_init: minLenRight = MIRPOS[nStop(%d)] (%f) - ZPD (%f) = %f\n", nStop, MIRPOS[nStop], ZPD, minLenRight);*/
+            }
+        }
+    }
+
+    /* Set the minimum half of the mirror track length to the lesser of the left or right minimum */
+    if(minLenLeft < minLenRight) {
+        minLen = minLenLeft;
+    } else {
+        minLen = minLenRight;
+    }
+    /*printf("smurf_fts2_init: minLen = %f\n", minLen);*/
+
+    /* Set the middle ZPD value to the average of the minimum and maximum ZPDs found */
+    midZPD = (minZPD + maxZPD) / 2;
+    /*printf("smurf_fts2_init: minZPD=%f, maxZPD=%f, midZPD=%f\n", minZPD, maxZPD, midZPD);*/
+
+    /* Find the middle ZPD position in the mirror position array */
+    for(k=nStart; k<=nStop; k++) {
+        if(MIRPOS[k] <= midZPD) {
+            midZPDPos = k;
+        } else break;
+    }
+    /*printf("smurf_fts2_init: Adjusted midZPDPos=%d, MIRPOS[midZPD]=%f\n", midZPDPos, MIRPOS[midZPDPos]);*/
+
+    /* Adjust mirror position array start and stop values to agree with midZPD +/- minLen */
+    for(k=nStart; k<=midZPDPos; k++) {
+        if(MIRPOS[midZPDPos] - MIRPOS[k] > minLen) {
+            nStart = k;
+        } else break;
+    }
+    for(k=nStop; k>midZPDPos; k--) {
+        if(MIRPOS[k] - MIRPOS[midZPDPos] > minLen) {
+            nStop = k;
+        } else break;
+    }
+
+    /* Adjust the number of mirror positions remaining */
+    nMirPos = nStop - nStart + 1;
+    /*printf("smurf_fts2_init: Adjusted nStart=%d, nStop=%d, nMirPos=%d\n", nStart, nStop, nMirPos);*/
+    /*printf("smurf_fts2_init: Adjusted MIRPOS[%d]=%f, MIRPOS[%d]=%f\n", nStart, MIRPOS[nStart], nStop, MIRPOS[nStop]);*/
+
     /* Corresponding OPD values */
     OPD = astCalloc(nMirPos, sizeof(*OPD));
-    for(k = nStart; k <=nStop; k++) { OPD[k - nStart] = 4.0 * MIRPOS[k] / 10.0; }
+    /* Adjust mirror position array to be centered about ZPD */
+    /* Subtract maxZPD to ensure OPD_EVEN range will fit */
+    for(k=nStart; k <=nStop; k++) {
+        OPD[k-nStart] = 4.0 * (MIRPOS[k] - maxZPD) / 10.0;
+    }
+    /*printf("smurf_fts2_init: OPD[0]=%f, OPD[%d]=%f\n", OPD[0], nMirPos-1, OPD[nMirPos-1]);*/
 
     scanVel   = 0.0;
     stepTime  = 0.0;
@@ -233,21 +316,34 @@ void smurf_fts2_init(int* status)
 
     /* Nyquist frequency */
     fNyquist = 10.0 / (8.0 * scanVel * stepTime);
-    minOPD = OPD[0];
-    maxOPD = OPD[nMirPos - 1];
-    if(fabs(minOPD) < fabs(maxOPD)) maxOPD = fabs(minOPD);
-    minOPD = -maxOPD;
     dz = 1.0 / (2.0 * fNyquist);
 
     /* Evenly spaced OPD grid */
-    nMax = (int) (fabs(maxOPD) / dz) + 1;
-    nOPD = 2 * (nMax - 1);
+    minOPD = OPD[0];
+    maxOPD = OPD[nMirPos - 1];
+    /* Set the maximum OPD to the smallest magnitude endpoint */
+    if(fabs(minOPD) < fabs(maxOPD)) maxOPD = fabs(minOPD);
+    /* Set the minumum OPD to the negative of the maximum */
+    minOPD = -maxOPD;
+    /* Values in half the evenly spaced grid */
+    nMax = (int) (fabs(maxOPD) / dz);
+    /* Reduce the number of values in the evenly spaced grid
+      if the sum of their values plus any additional ZPD shift would exceed an ODP endpoint */
+    /*printf("smurf_fts2_init: nMax=%d, dz=%f, nMax*dz+midZPD/2=%f, fabs(maxOPD)=%f\n", nMax, dz, nMax*dz+midZPD/2, fabs(maxOPD));*/
+    /*printf("smurf_fts2_init: nMax=%d, dz=%f, nMax*dz=%f, OPD[nMirPos-1]=%f\n", nMax, dz, nMax*dz, OPD[nMirPos-1]);*/
+    while((nMax * dz) > fabs(OPD[nMirPos-1])) {
+        nMax--;
+        /*printf("smurf_fts2_init: Reduced nMax=%d\n", nMax);*/
+    }
+    /* Values in the whole grid */
+    nOPD = 2 * nMax;
 
     OPD_EVEN = astCalloc(nOPD, sizeof(*OPD_EVEN));
     for(k = 1; k <= nOPD; k++) {
-      OPD_EVEN[k - 1] = (k < nMax) ? -(nMax - k) : (k - nMax + 1);
+      OPD_EVEN[k - 1] = (k < nMax) ? -(nMax - k) : (k - nMax);
       OPD_EVEN[k - 1] *= dz;
     }
+    /*printf("smurf_fts2_init: OPD_EVEN[0]=%f, OPD_EVEN[%d]=%f\n", OPD_EVEN[0], nOPD-1, OPD_EVEN[nOPD-1]);*/
 
     /* Update FITS component */
     smf_fits_updateD(inData->hdr, "FNYQUIST", fNyquist, "Nyquist frequency (cm^-1)", status);
@@ -295,7 +391,11 @@ void smurf_fts2_init(int* status)
         /* ZPD position in OPD grid */
         ZPD = *((double*) (zpdData->pntr[0]) + bolIndex);
         /* Convert from mechanical mm (x 4) to optical cm (/ 10) */
-        ZPD = ZPD * 0.4;
+        /* Adjust for bolometer's measured ZPD position */
+        for(k = nStart; k <=nStop; k++) {
+            OPD[k - nStart] = 4.0 * (MIRPOS[k] - ZPD) / 10.0;
+            /*printf("smurf_fts2_init: OPD[%d]=%f for MIRPOS[%d]=%f with ZPD=%F\n", (k-nStart), OPD[k-nStart], k, MIRPOS[k], ZPD);*/
+        }
 
         badPixel = 0;
         /* Read in interferogram */
@@ -325,9 +425,17 @@ void smurf_fts2_init(int* status)
         indexZPD = 0;
         for(k = 0; k < nOPD; k++) {
           index = bolIndex + nPixels * k;
-          *((double*)(outData->pntr[0]) + index) = gsl_spline_eval(SPLINE,  OPD_EVEN[k], ACC);
-
-          if(OPD_EVEN[k] <= ZPD) { indexZPD = k;}
+          /* Prevent interpolation errors by not exceeding OPD bounds */
+          if(OPD_EVEN[k] >= OPD[0] && OPD_EVEN[k] <= OPD[nMirPos-1]){
+            *((double*)(outData->pntr[0]) + index) = gsl_spline_eval(SPLINE,  OPD_EVEN[k], ACC);
+            /* Update the ZPD index position */
+            if(OPD_EVEN[k] <= ZPD) { indexZPD = k;}
+          } else {
+            /* TODO: Convert to Starlink warning message, and maybe only for more than 1 skip per iteration */
+            /* NOTE: This shouldn't be happening anymore since other code has been revised to prevent it */
+            /*printf("smurf_fts2_init: Warning: Skipping OPD_EVEN[k(%d)]=%f of nOPD(%d) positions, with OPD[nMirPos-1(%d)]=%f\n",
+                   k, OPD_EVEN[k], nOPD, nMirPos-1, OPD[nMirPos-1]);*/
+          }
         }
         *((int*) (zpd->pntr[0]) + bolIndex) = indexZPD;
       }
