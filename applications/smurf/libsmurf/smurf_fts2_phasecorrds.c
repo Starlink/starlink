@@ -76,6 +76,8 @@
 *       saved, avoiding the need for the file selection menu.
 *     2013-03-12 (MSHERWOOD)
 *       Added Phase Correction Function debug output
+*     2013-04-12 (MSHERWOOD)
+*       Correct wave number trimming
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -548,7 +550,7 @@ void smurf_fts2_phasecorrds(int* status)
         }
 
         /* Trim (zero out) the first wnTrim wavenumbers of the real part of the spectrum (on both ends) */
-        for(k = 0; k <= wnTrim/(k*dSigma); k++) {
+        for(k = 0; k <= wnTrim/dSigma; k++) {
             SPEC[k][0] = 0.0;
             SPEC[k+1][0] = 0.0;            /* Maintain an odd number of adjustments */
             SPEC[nFrames-1-k][0] = 0.0;
