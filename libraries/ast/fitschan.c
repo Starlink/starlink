@@ -1056,6 +1056,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     15-APR-2013 (DSB):
 *        Correct initialisation of missing coefficients When reading a
 *        SAO plate solution header.
+*     16-APR-2013 (DSB):
+*        When determining default Encoding value, use "VLSR" keyword if
+*        "VELO-..." is not available.
 *class--
 */
 
@@ -11348,7 +11351,6 @@ static int GetEncoding( AstFitsChan *this, int *status ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     int GetEncoding( AstFitsChan *this, int *status )
 
 *  Class Membership:
@@ -11364,8 +11366,7 @@ static int GetEncoding( AstFitsChan *this, int *status ){
 *     i, j and m are integers and s is a single upper case character):
 *
 *     1) Any keywords starting with "BEGAST" = Native encoding
-*     2) DELTAV and VELO-xxx keywords = FITS-CLASS.
-
+*     2) DELTAV and VELO-xxx (or VLSR) keywords = FITS-CLASS.
 *     3) Any AIPS spectral CTYPE values:
 
 *         Any of CDi_j, PROJP, LONPOLE, LATPOLE = FITS-AIPS++ encoding:
@@ -19225,9 +19226,8 @@ static int LooksLikeClass( AstFitsChan *this, const char *method,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
-*      int LooksLikeClass( AstFitsChan *this, const char *method,
-*                          const char *class, int *status )
+*     int LooksLikeClass( AstFitsChan *this, const char *method,
+*                         const char *class, int *status )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -19236,7 +19236,7 @@ static int LooksLikeClass( AstFitsChan *this, const char *method,
 *     Returns non-zero if the supplied FitsChan probably uses FITS-CLASS
 *     encoding. This is the case if it contains a DELTAV keyword and a
 *     keyword of the form VELO-xxx", where xxx is one of the accepted
-*     standards of rest.
+*     standards of rest, or "VLSR".
 
 *  Parameters:
 *     this
@@ -19263,8 +19263,9 @@ static int LooksLikeClass( AstFitsChan *this, const char *method,
 /* Check the global status. */
    if( !astOK ) return ret;
 
-/* See if there is a "DELTAV" card, and a "VELO-xxx" card. */
+/* See if there is a "DELTAV" card, and a "VELO-xxx" or "VLSR" card. */
    if( astKeyFields( this, "DELTAV", 0, NULL, NULL ) && (
+          astKeyFields( this, "VLSR", 0, NULL, NULL ) ||
           astKeyFields( this, "VELO-OBS", 0, NULL, NULL ) ||
           astKeyFields( this, "VELO-HEL", 0, NULL, NULL ) ||
           astKeyFields( this, "VELO-EAR", 0, NULL, NULL ) ||
@@ -38863,7 +38864,7 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     string "BEGAST", then NATIVE encoding is used,
 *     - Otherwise, FITS-CLASS is used if the FitsChan contains a DELTAV
 *     keyword and a keyword of the form VELO-xxx, where xxx indicates one
-*     of the rest frames used by class (e.g. "VELO-LSR").
+*     of the rest frames used by class (e.g. "VELO-LSR"), or "VLSR".
 *     - Otherwise, if the FitsChan contains a CTYPE keyword which
 *     represents a spectral axis using the conventions of the AIPS and
 *     AIPS++ projects (e.g. "FELO-LSR", etc), then one of FITS-AIPS or
