@@ -95,6 +95,7 @@ examples/dimmconfig_bright_extended.lis \
 examples/dimmconfig_calcnoise.lis \
 examples/dimmconfig_moon.lis \
 examples/dimmconfig_pointing.lis \
+examples/dimmconfig_pointing_fts.lis \
 examples/dimmconfig_veryshort_planet.lis \
 examples/resist.cfg \
 examples/s4a20091214_00015_0002.sdf \

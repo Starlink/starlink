@@ -1,0 +1,9 @@
+# Configuration for pointing observations taken with FTS-2 in the beam
+# to allow for masking to have been applied.
+
+^$STARLINK_DIR/share/smurf/dimmconfig_pointing.lis
+
+badfrac = 0.9999
+dcfitbox = 0
+com.noflag = 1
+flt.zero_circle = <undef>
