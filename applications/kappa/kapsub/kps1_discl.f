@@ -121,6 +121,8 @@
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
 *     2011-08-22 (TIMJ):
 *        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
+*     22-APR-2013 (DSB):
+*        Add "CURRENT" as a scaling option.
 *     {enter_further_changes_here}
 
 *-
@@ -176,6 +178,8 @@
       CHARACTER COMP*8              ! Component to be displayed
       CHARACTER DTYPE*( NDF__SZFTP )! Type of the image after processing (not used)
       CHARACTER ITYPE*( NDF__SZTYP )! Processing type of the image
+      CHARACTER HITXT*80            ! SCAHIGH parameter string value
+      CHARACTER LOTXT*80            ! SCALOW parameter string value
       CHARACTER MODE*72             ! Manner in which the array is to be scaled
       DOUBLE PRECISION DMAXV   ! Minimum value in the array
       DOUBLE PRECISION DMINV   ! Maximum value in the array
@@ -184,6 +188,7 @@
       INTEGER BLAVF( 2 )       ! Block averaging factors
       INTEGER CDIMS( 2 )       ! Dimensions of compressed array
       INTEGER CEL              ! Number of elements in compressed array
+      INTEGER CODE             ! SUBPAR identifier for parameter
       INTEGER EL               ! Number of elements in the input and cell arrays
       INTEGER HIST( MAXBIN )   ! Array containing histogram
       INTEGER I                ! General variables
@@ -209,6 +214,7 @@
       LOGICAL BLOCK            ! The image was averaged before display?
       LOGICAL FNDRNG           ! Find the data range for scaling?
       LOGICAL POSTIV           ! The scaling of the array is to be positive?
+      LOGICAL USECUR           ! Use the existing current values?
       REAL DUMMY               ! Used to swap percentiles
       REAL PERCNT( NPRCTL )    ! Percentiles
       REAL PERDEF( NPRCTL )    ! Suggested values for percentiles
@@ -388,9 +394,9 @@
       END IF
 
 *  Determine the scaling method to use.
-      CALL PAR_CHOIC( 'MODE', 'Scale',
-     :                 'Scale,Flash,Faint,Percentiles,Range,Sigma',
-     :                 .TRUE., MODE, STATUS )
+      CALL PAR_CHOIC( 'MODE', 'Scale', 'Scale,Flash,Faint,'//
+     :                'Percentiles,Range,Sigma,Current', .TRUE., MODE,
+     :                STATUS )
       CALL CHR_UCASE( MODE )
 
 *  Faint (positive) display of the array.
@@ -592,8 +598,54 @@
 
 *  Do scaling with limits from the environment.
 *  ============================================
+      ELSE IF ( MODE(1:2) .EQ. 'SC' .OR.
+     :          MODE(1:2) .EQ. 'CU' ) THEN
 
-      ELSE IF ( MODE(1:2) .EQ. 'SC' ) THEN
+*  If the current scaling is to be re-used...
+         USECUR = .FALSE.
+         IF( MODE(1:2) .EQ. 'CU' .AND. STATUS .EQ. SAI__OK ) THEN
+
+*  Get the current value of 'SCALOW', if any. An error will be reported
+*  if it has no current value, but this is annulled below.
+            CALL SUBPAR_FINDPAR( 'SCALOW', CODE, STATUS )
+            CALL SUBPAR_CURVAL( CODE, LOTXT, STATUS )
+
+*  We will later set this value as the dynamic default for 'LOW', so
+*  we tell SUBPAR to accept the suggested default for 'LOW' without
+*  prompting.
+            CALL SUBPAR_FINDPAR( 'LOW', CODE, STATUS )
+            CALL SUBPAR_ACCPT1( CODE, STATUS )
+
+*  Get the current value of 'SCAHIGH', if any. An error will be reported
+*  if it has no current value, but this is annulled below.
+            CALL SUBPAR_FINDPAR( 'SCAHIGH', CODE, STATUS )
+            CALL SUBPAR_CURVAL( CODE, HITXT, STATUS )
+
+*  Indicate that the suggested default for 'HIGH' should be accepted
+*  without prompting.
+            CALL SUBPAR_FINDPAR( 'HIGH', CODE, STATUS )
+            CALL SUBPAR_ACCPT1( CODE, STATUS )
+
+*  If an error occurred above (e.g. no current value is set for 'SCALOW'
+*  or 'SCAHIGH'), then annul it (we will continue to use normal SCALE mode
+*  instead of CURRENT mode).
+            IF( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+
+*  Otherwise report the scaling limits for future use.
+            ELSE
+               CALL CHR_CTOR( LOTXT, RMINV, STATUS )
+               CALL CHR_CTOR( HITXT, RMAXV, STATUS )
+               CALL MSG_SETR( 'MINVAL', RMINV )
+               CALL MSG_SETR( 'MAXVAL', RMAXV )
+               CALL MSG_OUT( 'PVLO', 'Data will be scaled from '//
+     :                       '^MINVAL to ^MAXVAL.', STATUS )
+               USECUR = .TRUE.
+            END IF
+
+*  Use SCALE mode from here on.
+            MODE = 'SCALE'
+         END IF
 
 *  Determine whether or not the scaling parameters have been
 *  found, to avoid finding the maximum and minimum values when
@@ -609,13 +661,18 @@
 *  =============================================================
          IF ( ITYPE .EQ. '_REAL' ) THEN
 
-*  Set the scaling limits to the extreme values.
-            IF ( FNDRNG ) THEN
+*  Use the previous values as defaults.
+            IF( USECUR ) THEN
+               CALL CHR_CTOR( LOTXT, RMINV, STATUS )
+               CALL CHR_CTOR( HITXT, RMAXV, STATUS )
+
+*  Or set the scaling limits to the extreme values.
+            ELSE IF ( FNDRNG ) THEN
                RMINV = VAL__MINR
                RMAXV = VAL__MAXR
-            ELSE
 
-*  Obtain the maximum and minimum values to be used as dynamic defaults.
+*  Or obtain the maximum and minimum values to be used as dynamic defaults.
+            ELSE
                CALL KPG1_MXMNR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          NINVAL,
      :                          RMAXV, RMINV, MAXPOS, MINPOS, STATUS )
@@ -635,8 +692,13 @@
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
 
+*  Use the previous values as defaults.
+            IF( USECUR ) THEN
+               CALL CHR_CTOD( LOTXT, DMINV, STATUS )
+               CALL CHR_CTOD( HITXT, DMAXV, STATUS )
+
 *  Set the scaling limits to the extreme values.
-            IF ( FNDRNG ) THEN
+            ELSE IF ( FNDRNG ) THEN
                DMINV = VAL__MIND
                DMAXV = VAL__MAXD
             ELSE
@@ -661,8 +723,13 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
 
+*  Use the previous values as defaults.
+            IF( USECUR ) THEN
+               CALL CHR_CTOI( LOTXT, IMINV, STATUS )
+               CALL CHR_CTOI( HITXT, IMAXV, STATUS )
+
 *  Set the scaling limits to the extreme values.
-            IF ( FNDRNG ) THEN
+            ELSE IF ( FNDRNG ) THEN
                IMINV = VAL__MINI
                IMAXV = VAL__MAXI
             ELSE
@@ -687,8 +754,15 @@
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
 
+*  Use the previous values as defaults.
+            IF( USECUR ) THEN
+               CALL CHR_CTOI( LOTXT, IMINV, STATUS )
+               CALL CHR_CTOI( HITXT, IMAXV, STATUS )
+               WMINV = IMINV
+               WMAXV = IMAXV
+
 *  Set the scaling limits to the extreme values.
-            IF ( FNDRNG ) THEN
+            ELSE IF ( FNDRNG ) THEN
                WMINV = VAL__MINW
                WMAXV = VAL__MAXW
             ELSE
@@ -713,8 +787,15 @@
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
 
+*  Use the previous values as defaults.
+            IF( USECUR ) THEN
+               CALL CHR_CTOI( LOTXT, IMINV, STATUS )
+               CALL CHR_CTOI( HITXT, IMAXV, STATUS )
+               BMINV = IMINV
+               BMAXV = IMAXV
+
 *  Set the scaling limits to the extreme values.
-            IF ( FNDRNG ) THEN
+            ELSE IF ( FNDRNG ) THEN
                BMINV = VAL__MINB
                BMAXV = VAL__MAXB
             ELSE

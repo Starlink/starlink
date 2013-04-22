@@ -22162,6 +22162,12 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          \ssthitemlist{
 
             \sstitem
+
+            {\tt "Current"} --- The image is scaled between the upper and lower
+            limits that were used by the previous invocation of DISPLAY. If
+            the previous scaling limits cannot be determined, the MODE
+            value reverts to {\tt "Scale"}.
+
             {\tt "Faint"} --- The image is scaled between the mean data value minus
             one standard deviation and the mean data value plus seven standard
             deviations.  The scaling values are reported so that the faster
@@ -59038,6 +59044,11 @@ The following applications have been modified:
       \begin{itemize}
         \item Four new estimators are available: FBAD, FGOOD, NBAD and
         NGOOD, which produce the fraction/count of good/bad pixel values.
+      \end{itemize}
+   \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
+      \begin{itemize}
+        \item The MODE parameter can now be set to ``Current'' to force the
+        current upper and lower limits to be re-used.
       \end{itemize}
    \item [\htmlref{MSTATS}{MSTATS}]\mbox{}
       \begin{itemize}

@@ -274,6 +274,11 @@
 *        The method by which the maximum and minimum data values to be
 *        displayed are chosen.  The options are as follows.
 *
+*        - "Current" -- The image is scaled between the upper and lower
+*        limits that were used by the previous invocation of DISPLAY. If
+*        the previous scaling limits cannot be determined, the MODE
+*        value reverts to "Scale".
+*
 *        - "Faint" -- The image is scaled between the mean data value
 *        minus one standard deviation and the mean data value plus seven
 *        standard deviations.  The scaling values are reported so that
