@@ -95,7 +95,9 @@
 *        Re-written to use KPG1_PGCLR.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
-*     {enter_further_changes_here}
+*     24-APR-2013 (DSB):
+*        Truncate the AGI database in order to keep the file size at a
+*        minimum.
 
 *-
 
@@ -146,6 +148,13 @@
 *  Shut down the workstation and database, retaining the original current
 *  picture only if the whole screen has not been cleared.
       CALL KPG1_PGCLS( 'DEVICE', .NOT.CURRNT, STATUS )
+
+*  If the whole screen was cleared, the database will now contain less
+*  information, but HDS will not have reclaimed the empty space. so to
+*  avoid the database file growing without limit, we now explicitly
+*  truncate the database file. We do it here since the database has to
+*  have been closed before calling AGI_TRUNC.
+      IF( .NOT. CURRNT ) CALL AGI_TRUNC( STATUS )
 
 *  If an error occurred, add a context message.
       IF( STATUS .NE. SAI__OK ) THEN

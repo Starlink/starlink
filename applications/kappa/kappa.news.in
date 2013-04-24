@@ -31,6 +31,11 @@ The following new applications have been added:
       -  The MODE parameter can now be set to "Current" to force the
       current upper and lower limits to be re-used.
 
+   o  GDCLEAR
+
+      -  Will now remove any unused space from the graphics database file,
+      thus keeping its size to a minimum.
+
    o  NORMALIZE
 
       -  A new boolean parameter called LOOP permits normalisation
