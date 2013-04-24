@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {48.8}
 \newcommand{\stardocauthors}   {Nicholas Eaton\\Brian McIlwrath}
-\newcommand{\stardocdate}      {22 March January 2013}
+\newcommand{\stardocdate}      {24 April 2013}
 \newcommand{\stardoctitle}     {AGI --- Applications Graphics Interface
                                 Library}
 %\\[2.5ex]
@@ -766,6 +766,8 @@ newx1, newx2, newy1, newy2, picid, status )}
         {Transform data to world coordinates}
 \noteroutine{AGI\_TNEW( ncd, ncw, dtow, wtod, picid, status )}
         {Store a transformation in the database}
+\noteroutine{AGI\_TRUNC( status )}
+        {Truncate the AGI database file by removing unused space}
 \noteroutine{AGI\_TWTDD( picid, nxy, wx, wy, dx, dy, status )}
         {Transform double precision world to data coordinates}
 \noteroutine{AGI\_TWTOD( picid, nxy, wx, wy, dx, dy, status )}
@@ -1117,6 +1119,10 @@ when the last active identifier has been annulled, either with
 up all their identifiers otherwise unusual side effects may occur if
 the executable image is permanently resident in memory (such as an
 ADAM task).
+
+Once the database has been closed, \htmlref{{\bf AGI\_TRUNC}}{AGI_TRUNC} can
+be called to truncate the database file to remove any unused space, thus
+keeping the file size at a minimum.
 
 \subsection{Begin-End blocks\label{bend}}
 As the database is not closed until all identifiers have been annulled
@@ -3877,6 +3883,30 @@ command line. Thus to compile and link a standalone application called
       }
    }
 }
+
+\sstroutine{
+   AGI\_TRUNC
+}{
+   Truncate the AGI database file by removing unused space
+}{
+   \sstdescription{
+      This routine attempts to reduce the size of the AGI database
+      file by removing any unused space from the end. The database
+      must be closed before calling this routine (an error is reported
+      otherwise).
+   }
+   \sstinvocation{
+      CALL AGI\_TRUNC( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+
 \sstroutine{
    AGI\_TWTDD
 }{

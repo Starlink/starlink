@@ -7,3 +7,6 @@
   This is provided by some new "pseudo-device" types: /APS, /ACPS, /AVPS
   and /AVCPS.
 
+  o A new routine AGI_TRUNC has been added which will reduce the AGI
+  database file size by removing unused space.
+

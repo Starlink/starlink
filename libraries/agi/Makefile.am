@@ -57,8 +57,8 @@ COMMON_F_ROUTINES = agi1_cinit.f  agi1_fdb.f agi1_fetcu.f \
               agi_rcl.f agi_rclp.f agi_rcp.f agi_rcpp.f \
               agi_rcs.f agi_rcsp.f agi_selp.f agi_slab.f \
               agi_sroot.f agi_tcopy.f agi_tddtw.f agi_tdtow.f \
-              agi_tnew.f agi_twtdd.f agi_twtod.f agp_deact.f \
-              agp1_epsmg.f agp1_epsch.f
+              agi_tnew.f agi_trunc.f agi_twtdd.f agi_twtod.f \
+              agp_deact.f agp1_epsmg.f agp1_epsch.f
 
 AGI_F_ROUTINES = agd1_iidip.f agd1_iinit.f agd1_sidip.f agd_activ.f \
               agd_deact.f agd_nwind.f agd_swind.f agd_updat.f \
