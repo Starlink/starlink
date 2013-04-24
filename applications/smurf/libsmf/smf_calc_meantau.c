@@ -118,9 +118,6 @@ double smf_calc_meantau ( const smfHead * hdr, int *status ) {
   if (retval == VAL__BADD) {
     retval = smf__calc_meantau_from_fits( hdr, dateobs, 15.0, "TAUDATEN", "TAU225ST",
                                           "TAU225EN", status );
-  } else {
-    /* convert the WVM value to CSO scale */
-    retval = 1.01 * retval + 0.01;
   }
 
   if (retval == VAL__BADD) {
