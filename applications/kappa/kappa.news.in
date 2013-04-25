@@ -1,6 +1,24 @@
-1 KAPPA_Version_2.0
+1 KAPPA_Version_2.1
 
    A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main
+   changes are listed below.  For complete details of all
+   changes, see the "Release Notes" appendix in SUN/95.
+
+2 Modified_applications
+
+   o  DISPLAY
+
+      -  The MODE parameter can now be set to "Current" to force the
+      current upper and lower limits to be re-used.
+
+   o  GDCLEAR
+
+      -  Will now remove any unused space from the graphics-database
+      file, thus keeping its size to a minimum.
+
+1 KAPPA_Version_2.0
+
+   A new release of KAPPA (@PACKAGE_VERSION@) is available.  The main
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
@@ -25,16 +43,6 @@ The following new applications have been added:
       -  Four new estimators are available: FBAD, FGOOD, NBAD and
       NGOOD, which produce the fraction/count of good/bad pixel
       values.
-
-   o  DISPLAY
-
-      -  The MODE parameter can now be set to "Current" to force the
-      current upper and lower limits to be re-used.
-
-   o  GDCLEAR
-
-      -  Will now remove any unused space from the graphics database file,
-      thus keeping its size to a minimum.
 
    o  NORMALIZE
 

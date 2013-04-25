@@ -12,12 +12,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.39}
-\newcommand{\stardocnumber}    {95.39}
+\newcommand{\stardocsource}    {sun95.40}
+\newcommand{\stardocnumber}    {95.40}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2013 February 14}
+\newcommand{\stardocdate}      {2013 April 24}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {2.0}
+\newcommand{\stardocversion}   {2.1}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -59010,7 +59010,7 @@ The following applications have been modified:
 
 \end{description}
 
-\section{\xlabel{se_changes}Release Notes---V2.0\label{se:changes}}
+\section{Release Notes---V2.0}
 
 \subsection{General Changes}
 
@@ -59045,16 +59045,6 @@ The following applications have been modified:
         \item Four new estimators are available: FBAD, FGOOD, NBAD and
         NGOOD, which produce the fraction/count of good/bad pixel values.
       \end{itemize}
-   \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
-      \begin{itemize}
-        \item The MODE parameter can now be set to ``Current'' to force the
-        current upper and lower limits to be re-used.
-      \end{itemize}
-   \item [\htmlref{GDCLEAR}{GDCLEAR}]\mbox{}
-      \begin{itemize}
-        \item  Will now remove any unused space from the graphics
-        database file, thus keeping its size to a minimum.
-      \end{itemize}
    \item [\htmlref{MSTATS}{MSTATS}]\mbox{}
       \begin{itemize}
         \item Four new estimators are available: FBAD, FGOOD, NBAD and
@@ -59087,6 +59077,24 @@ The following applications have been modified:
       \begin{itemize}
         \item The Frames to remove can now be specified by name as well as
               by index.
+      \end{itemize}
+\end{description}
+
+\section{\xlabel{se_changes}Release Notes---V2.1\label{se:changes}}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
+   \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
+      \begin{itemize}
+        \item The MODE parameter can now be set to {\tt "Current"} to force the
+        current upper and lower limits to be re-used.
+      \end{itemize}
+   \item [\htmlref{GDCLEAR}{GDCLEAR}]\mbox{}
+      \begin{itemize}
+        \item Will now remove any unused space from the graphics-database file,
+        thus keeping its size to a minimum.
       \end{itemize}
 \end{description}
 
