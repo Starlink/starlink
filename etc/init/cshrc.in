@@ -1,7 +1,7 @@
 #!csh -*- shell-script -*-
 #+
 #  Date: 2003-MAY-23
-#  File: @staretc@/cshrc
+#  File: @staretcdir@/cshrc
 #  Version: @VERSION@
 #
 #  This file must be sourced before Starlink software can be used.
@@ -9,7 +9,7 @@
 #  for each C-shell from which you wish to use Starlink software.
 #  This is most easily be done by adding the line:
 #
-#     source @staretc@/cshrc
+#     source @staretcdir@/cshrc
 #
 #  to your .cshrc file.
 #-
