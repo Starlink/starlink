@@ -472,7 +472,7 @@
       INTEGER NDIM           ! Number of pixel axes in output NDF
       INTEGER NDIM1          ! Number of pixel axes in input NDF
       INTEGER NPAR           ! No. of required interpolation parameters
-      INTEGER NUSED          ! No. of input values used so far
+      INTEGER*8 NUSED        ! No. of input values used so far
       INTEGER SIZE           ! Total size of the input group
       INTEGER UBND( NDF__MXDIM ) ! Indices of upper-right corner of o/p
       INTEGER UBND1( NDF__MXDIM )! Indices of upper-right corner of i/p

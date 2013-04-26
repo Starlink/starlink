@@ -365,7 +365,7 @@
 *     the mean pixel values associated with a source, even if the pixel
 *     size changes.  Thus the total data sum in a source will change if
 *     the input and output pixel sizes differ.  However, if the CONSERVE
-*     parameter is set TRUE, the output values are scaled by the ratio 
+*     parameter is set TRUE, the output values are scaled by the ratio
 *     of the output to input pixel size, so that the total data sum in a
 *     source is preserved.
 *
@@ -551,7 +551,7 @@
       INTEGER NPAX               ! No. of pixel axes to be regridded
       INTEGER NQAX               ! No. of pixel axes not to be regridded
       INTEGER NSCALE             ! Number of supplied scale factors
-      INTEGER NUSED              ! No. of used input pixels
+      INTEGER*8 NUSED            ! No. of used input pixels
       INTEGER NWPAX              ! No. of WCS axes to be regridded
       INTEGER NWQAX              ! No. of WCS axes not to be regridded
       INTEGER OUTPRM( NDF__MXDIM )! Input axis indices for each output axis

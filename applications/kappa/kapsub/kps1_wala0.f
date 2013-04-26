@@ -262,7 +262,7 @@
       INTEGER NCON               ! No. of used constants in CON array
       INTEGER NDIM1              ! No. of pixel axes in input NDF
       INTEGER NFRAME             ! No. of frames in input WCS FrameSet
-      INTEGER NUSED              ! No. of i/p pixels pasted into o/p
+      INTEGER*8 NUSED            ! No. of i/p pixels pasted into o/p
       INTEGER OPSPAX             ! Spectral axis index in output
       INTEGER OUTPRM( NDF__MXDIM )! Input axis for each output axis
       INTEGER PMAP               ! PermMap that assigns fixed pixel coords
