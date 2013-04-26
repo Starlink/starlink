@@ -507,7 +507,7 @@ DECLARE_GENERIC_ALL(LD,long double)
                          const Xtype [], const Xtype [], int, const double [], \
                          int, double, int, Xtype, int, const int [], \
                          const int [], const int [], const int [], Xtype [], \
-                         Xtype [], double [], int *, int * );
+                         Xtype [], double [], size_t *, int * );
 
 DECLARE_GENERIC_DFI(D,double)
 DECLARE_GENERIC_DFI(F,float)
@@ -606,7 +606,7 @@ PROTO_GENERIC_ALL(LD,long double)
                          const Xtype [], const Xtype [], int, const double [], \
                          int, double, int, Xtype, int, const int [], \
                          const int [], const int [], const int [], Xtype [], \
-                         Xtype [], double [], int *, int * );
+                         Xtype [], double [], size_t *, int * );
 
 PROTO_GENERIC_DFI(D,double)
 PROTO_GENERIC_DFI(F,float)

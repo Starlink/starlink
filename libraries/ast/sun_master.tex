@@ -24,12 +24,12 @@ f+
 \newcommand{\stardocnumber}    {210.27}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {7th December 2012}
+\newcommand{\stardocdate}      {26th April 2013}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 2012 Science \& Technology Facilities Council}
+\newcommand{\stardoccopyright} {Copyright (C) 2013 Science \& Technology Facilities Council}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
 \newcommand{\stardocversion}   {V<VERSION_NUMBER>}
@@ -22806,12 +22806,10 @@ SkyFrame with System=Unknown).
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V7.2.0}
+\subsection{Changes Introduced in V7.2.0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V7.1.1 and V7.2.0 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V7.1.1 and V7.2.0:
 
 \begin{enumerate}
 
@@ -22824,6 +22822,33 @@ AST\_MAPDEFINED
 f-
 has been added to the KeyMap class. It checks if a gtiven key name has
 a defined value in a given KeyMap.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V7.3.0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V7.2.0 and V7.3.0 (the
+current version):
+
+\begin{enumerate}
+
+c+
+\item The interface for the astRebinSeq<X> family of functions has
+been changed in order to allow a greater number of pixels to be pasted
+into the output array. The "nused" parameter is now a pointer to a
+"size\_t" variable, instead of an "int". APPLICATION CODE SHOULD BE
+CHANGED ACCORDINGLY TO AVOID SEGMENTATION FAULTS AND OTHER ERRATIC
+BEHAVIOUR.
+c-
+f+
+\item The interface for the AST\_REBINSEQ<X> family of routines has
+been changed in order to allow a greater number of pixels to be pasted
+into the output array. The NUSED parameter is now an INTEGER*8 variable,
+instead of an INTEGER. APPLICATION CODE SHOULD BE CHANGED ACCORDINGLY TO
+AVOID SEGMENTATION FAULTS AND OTHER ERRATIC BEHAVIOUR.
+f-
 
 \end{enumerate}
 

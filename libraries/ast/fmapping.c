@@ -534,7 +534,7 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
                               Ftype##_ARRAY(OUT), \
                               Ftype##_ARRAY(OUT_VAR), \
                               DOUBLE_ARRAY(WEIGHTS), \
-                              INTEGER(NUSED), \
+                              INTEGER8(NUSED), \
                               INTEGER(STATUS) ) { \
    GENPTR_INTEGER(THIS) \
    GENPTR_DOUBLE(WLIM) \
@@ -557,11 +557,12 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
    GENPTR_##Ftype##_ARRAY(OUT) \
    GENPTR_##Ftype##_ARRAY(OUT_VAR) \
    GENPTR_DOUBLE_ARRAY(WEIGHTS) \
-   GENPTR_INTEGER(NUSED) \
+   GENPTR_INTEGER8(NUSED) \
    GENPTR_INTEGER(STATUS) \
 \
    Xtype *out_var; \
    const Xtype *in_var; \
+   size_t nused; \
 \
    astAt( "AST_REBINSEQ"#F, NULL, 0 ); \
    astWatchSTATUS( \
@@ -582,13 +583,15 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
          out_var = NULL; \
       } \
 \
+      nused = *NUSED; \
       astRebinSeq##X( astI2P( *THIS ), *WLIM, *NDIM_IN, \
                    LBND_IN, UBND_IN, (const Xtype *) IN, in_var, \
                    *INTERP, PARAMS, *FLAGS, \
                    *TOL, *MAXPIX, *BADVAL, \
                    *NDIM_OUT, LBND_OUT, UBND_OUT, \
                    LBND, UBND, (Xtype *) OUT, out_var, WEIGHTS, \
-                   NUSED ); \
+                   &nused ); \
+      *NUSED = nused; \
    ) \
 } \
 
