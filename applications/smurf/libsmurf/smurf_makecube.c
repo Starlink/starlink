@@ -998,7 +998,7 @@ void smurf_makecube( int *status ) {
    int npos;                  /* Number of samples included in output NDF */
    int nreject;               /* Number of rejected input spectra */
    size_t ntile;              /* Number of output tiles */
-   int nused;                 /* No. of input samples pasted into output cube */
+   size_t nused;              /* No. of input samples pasted into output cube */
    int nval;                  /* Number of parameter values supplied */
    int nwgtdim;               /* No. of axes in the weights array */
    int nxy;                   /* Number of elements in a 2D output tile */

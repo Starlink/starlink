@@ -17,7 +17,7 @@
 *                   int index, int size, AstFrameSet *outfset, int spread,
 *                   const double params[], int moving, int genvar,
 *                   int *lbnd_out, int *ubnd_out, double *map, *variance,
-*                   double *weights, int *nused, int *status );
+*                   double *weights, size_t *nused, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -62,8 +62,8 @@
 *        of the relative weighting for each pixel in the output map. If
 *        "genvar" is non-zero, two doubles are needed for each output pixel.
 *        Otherwise, only one double is needed for each output pixel.
-*     nused = int * (Given and Returned)
-*        A pointer to an integer that is updated to hold the total number
+*     nused = size_t * (Given and Returned)
+*        A pointer to a size_t that is updated to hold the total number
 *        of input samples that have been pasted into the output array so far.
 *     status = int * (Given and Returned)
 *        Pointer to global status.
@@ -175,7 +175,7 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread,
                    const double params[], int moving, int genvar,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
-                   double *weights, int *nused, int *status ) {
+                   double *weights, size_t *nused, int *status ) {
 
 /* Local Variables */
    AstMapping *dummy = NULL;     /* A dummy Mapping */

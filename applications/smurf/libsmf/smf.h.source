@@ -1098,7 +1098,7 @@ void smf_fit_poly( ThrWorkForce *wf, smfData *data, const size_t order,
 void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
                       const double y[], const double vary[],
                       const smf_qual_t qual[], double coeffs[],
-                      double varcoeffs[], double polydata[], size_t * nused,
+                      double varcoeffs[], double polydata[], size_t *nused,
                       int *status );
 
 void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
@@ -1638,7 +1638,7 @@ void smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
                     int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread,
                     const double params[], int genvar, float *data_array,
                     float *var_array, double *wgt_array, float *texp_array,
-                    float *teff_array, double *fcon, int *nused, int *nreject,
+                    float *teff_array, double *fcon, size_t *nused, int *nreject,
                     int *naccept, int *status );
 
 void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
@@ -1650,13 +1650,13 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
                         int genvar, double tfac, double fcon,
                         float *data_array, float *var_array,
                         double *wgt_array, float *texp_array,
-                        float *teff_array, int *good_tsys, int *nused,
+                        float *teff_array, int *good_tsys, size_t *nused,
                         int *status );
 
 void smf_rebincube_init( int is2d, dim_t nxy, dim_t nout, int genvar,
                          float *data_array, float *var_array,
                          double *wgt_array, float *texp_array,
-                         float *teff_array, int *nused, int *status );
+                         float *teff_array, size_t *nused, int *status );
 
 void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
@@ -1666,14 +1666,14 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                        Grp *detgrp, int moving, int usewgt, int genvar,
                        double tcon, double fcon, float *data_array,
                        float *var_array, double *wgt_array, float *texp_array,
-                       float *teff_array, int *nused, int *nreject,
+                       float *teff_array, size_t *nused, int *nreject,
                        int *naccept, int *good_tsys, int *status );
 
 void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar,
                            float *data_array, float *var_array,
                            double *wgt_array, int *pop_array, int *status );
 
-void smf_rebincube_norm3d( dim_t nout, int genvar, int nused, float *data_array,
+void smf_rebincube_norm3d( dim_t nout, int genvar, size_t nused, float *data_array,
                            float *var_array, double *wgt_array, int *status );
 
 void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
@@ -1682,13 +1682,13 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
                             double invar, float *ddata,
                             float *data_array, float *var_array,
                             double *wgt_array, int *pop_array,
-                            int *nused, int *nreject, int *naccept,
+                            size_t *nused, int *nreject, int *naccept,
                             float *work, int *status );
 
 void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
                             dim_t nxy, double wgt, int genvar, double invar,
                             float *pdata, float *data_array,
-                            float *var_array, double *wgt_array, int *nused,
+                            float *var_array, double *wgt_array, size_t *nused,
                             int *status );
 
 void smf_rebincube_paste_thread( void *data, int *status );
@@ -1701,7 +1701,7 @@ void smf_rebincube_seqf( ThrWorkForce *workforce, int nthreads,
                          int maxpix, float badval, int ndim_out,
                          const int lbnd_out[], const int ubnd_out[],
                          const int lbnd[], const int ubnd[], float out[],
-                         float out_var[], double weights[], int *nused,
+                         float out_var[], double weights[], size_t *nused,
                          int *status );
 
 void smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping *ssmap,
@@ -1715,7 +1715,7 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread,
                    const double params[], int moving, int genvar, int *lbnd_out,
                    int *ubnd_out, double *map, double *variance,
-                   double *weights, int *nused, int *status );
+                   double *weights, size_t *nused, int *status );
 
 void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut,
                     size_t tslice1, size_t tslice2, int trange,

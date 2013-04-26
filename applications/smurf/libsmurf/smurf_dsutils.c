@@ -1898,7 +1898,7 @@ static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
    int lbnd[ 2 ];
    int nel;
    int nrej;
-   int nused;
+   size_t nused;
    int outperm[ 2 ];
    int rlbnd[ 1 ];
    int rubnd[ 1 ];

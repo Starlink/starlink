@@ -22,7 +22,7 @@
 *                    const double params[], int lbnd_out[ 3 ],
 *                    int ubnd_out[ 3 ], int genvar, float *data_array,
 *                    float *var_array, double *wgt_array, float *texp_array,
-*                    float *teff_array, double *fcon, int *nused,
+*                    float *teff_array, double *fcon, size_t *nused,
 *                    int *nreject, int *naccept, int *status );
 
 *  Arguments:
@@ -141,7 +141,7 @@
 *        left unchanged on subsequent invocations of this function. If
 *        "first" is zero on entry, the reurned value is VAL__BADD if the
 *        factor for the current file has a different value.
-*     nused = int * (Given and Returned)
+*     nused = size_t * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
 *        have been pasted into the output cube.
 *     nreject = int * (Given and Returned)
@@ -239,7 +239,7 @@ void  smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
                      int ubnd_out[ 3 ], int spread,
                      const double params[], int genvar, float *data_array,
                      float *var_array, double *wgt_array, float *texp_array,
-                     float *teff_array, double *fcon, int *nused,
+                     float *teff_array, double *fcon, size_t *nused,
                      int *nreject, int *naccept, int *status ){
 
 /* Local Variables */

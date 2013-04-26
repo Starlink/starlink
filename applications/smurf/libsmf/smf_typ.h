@@ -844,7 +844,7 @@ typedef struct smfRebinSeqArgs {
   void *out;
   void *out_var;
   double *weights;
-  int nused;
+  size_t nused;
   int ijob;
 } smfRebinSeqArgs;
 
@@ -875,7 +875,7 @@ typedef struct smfRebincubeNNArgs2 {
   double wgt;
   double invar;
   float *ddata;
-  int nused;
+  size_t nused;
   int nreject;
   int naccept;
 } smfRebincubeNNArgs2;
@@ -894,7 +894,7 @@ typedef struct smfRebinMapData {
   double *weights;
   int ijob;
   double *bolovar;
-  int nused;
+  size_t nused;
 } smfRebinMapData;
 
 /* Struct to facilitate sorting of data by time.

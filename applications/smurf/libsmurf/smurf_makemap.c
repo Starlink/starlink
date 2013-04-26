@@ -809,7 +809,7 @@ void smurf_makemap( int *status ) {
   int moving = 0;            /* Is the telescope base position changing? */
   int nparam = 0;            /* Number of extra parameters for pixel spreading*/
   size_t ntile;              /* Number of output tiles */
-  int nused;                 /* No. of used input samples */
+  size_t nused;              /* No. of used input samples */
   int nval;                  /* Number of parameter values supplied */
   size_t nxy;                /* Number of pixels in output image */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */

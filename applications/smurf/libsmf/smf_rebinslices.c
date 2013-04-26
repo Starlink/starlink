@@ -97,10 +97,10 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
    int rebinflags;               /* Control the rebinning procedure */
    int spread;                   /* Pixel spreading scheme */
    int ubnd_in[ 2 ];             /* Upper pixel bounds for input maps */
-   int *nused;                   /* Point to count of i/p samples used */
+   size_t *nused;                /* Point to count of i/p samples used */
    int *udim;                    /* Output array upper GRID bounds */
    smfData *data;                /* Smurf data description */
-   smfRebinMapData *job_data;     /* Pointer to data structure */
+   smfRebinMapData *job_data;    /* Pointer to data structure */
    static int ldim[ 2 ] = {1,1}; /* Output array lower GRID bounds */
 
 /* Check the inherited status */

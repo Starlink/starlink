@@ -22,7 +22,7 @@
 *                        int genvar, double tfac, double fcon,
 *                        float *data_array, float *var_array,
 *                        double *wgt_array, float *texp_array,
-*                        float *teff_array, int *good_tsys, int *nused,
+*                        float *teff_array, int *good_tsys, size_t *nused,
 *                        int *status );
 
 *  Arguments:
@@ -128,7 +128,7 @@
 *     good_tsys = int * (Given and Returned)
 *        Returned set to 1 if any good Tsys values were found in the
 *        input cube.
-*     nused = int * (Given and Returned)
+*     nused = size_t * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
 *        have been pasted into the output cube.
 *     status = int * (Given and Returned)
@@ -232,7 +232,7 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
                       int genvar, double tfac, double fcon,
                       float *data_array, float *var_array,
                       double *wgt_array, float *texp_array,
-                      float *teff_array, int *good_tsys, int *nused,
+                      float *teff_array, int *good_tsys, size_t *nused,
                       int *status ){
 
 /* Local Variables */
@@ -270,7 +270,7 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
    int ignore;                 /* Ignore this time slice? */
    int inperm[ 3 ];            /* Input axis permutation array */
    dim_t itime;                /* Index of current time slice */
-   int junk;                   /* Unused parameter */
+   size_t junk;                /* Unused parameter */
    int lbnd_in[ 2 ];           /* Lower input bounds on receptor axis */
    int ldim[ 3 ];              /* Output array lower GRID bounds */
    int maxthreads;             /* Max no. of threads to use when re-binning */
@@ -339,7 +339,7 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
 
 /* Debug message */
    if( data->file ) {
-      msgOutiff( MSG__DEBUG, " ", "smf_rebincube_ast: Using %d detectors "
+      msgOutiff( MSG__DEBUG, " ", "smf_rebincube_ast: Using %zu detectors "
                  "from data file '%s'.", status, ndet, data->file->name );
    }
 

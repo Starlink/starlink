@@ -18,7 +18,7 @@
 *     smf_rebincube_init( int is2d, dim_t nxy, dim_t nout, int genvar,
 *                         float *data_array, float *var_array,
 *                         double *wgt_array, float *texp_array,
-*                         float *teff_array, int *nused, int *status );
+*                         float *teff_array, size_t *nused, int *status );
 
 *  Arguments:
 *     is2d = (Given)
@@ -51,7 +51,7 @@
 *        A work array, which holds the effective integration time for each
 *        output spectrum, scaled by a factor of 4. It should have "nxy"
 *        elements.
-*     nused = int * (Returned)
+*     nused = size_t * (Returned)
 *        Use to accumulate the total number of input data samples that
 *        have been pasted into the output cube.
 *     status = int * (Given and Returned)
@@ -106,7 +106,7 @@
 void smf_rebincube_init( int is2d, dim_t nxy, dim_t nout, int genvar,
                          float *data_array, float *var_array,
                          double *wgt_array, float *texp_array,
-                         float *teff_array, int *nused, int *status ) {
+                         float *teff_array, size_t *nused, int *status ) {
 
 /* Local Variables */
    dim_t iv;                   /* Vector index into output 3D array */
