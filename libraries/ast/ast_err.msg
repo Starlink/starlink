@@ -192,4 +192,8 @@ NOFIT           <Fit failed>
 ISNAN           <A transformation generated one or more NaN values>
 WRERR           <write error>
 
+! New codes introduced for V7.3
+BDVNM           <Bad variant Mapping name>
+
+
 .END

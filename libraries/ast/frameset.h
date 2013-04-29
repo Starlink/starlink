@@ -463,6 +463,8 @@
 #define AST__CURRENT (-1)        /* Identify current Frame */
 #define AST__NOFRAME (-99)       /* An invalid Frame index */
 #define AST__ALLFRAMES (-199)    /* A value representing all Frames */
+#define AST__FRAMESET_GETALLVARIANTS_BUFF_LEN 200 /* Length for AllVariants buffer */
+#define AST__FRAMESET_GETATTRIB_BUFF_LEN 200 /* Length for GetAtribb buffer */
 
 /* Type Definitions. */
 /* ================= */
@@ -510,12 +512,18 @@ typedef struct AstFrameSetVtab {
    int (* TestCurrent)( AstFrameSet *, int * );
    int (* ValidateFrameIndex)( AstFrameSet *, int, const char *, int * );
    void (* AddFrame)( AstFrameSet *, int, AstMapping *, AstFrame *, int * );
+   void (* AddVariant)( AstFrameSet *, AstMapping *, const char *, int * );
    void (* ClearBase)( AstFrameSet *, int * );
    void (* ClearCurrent)( AstFrameSet *, int * );
    void (* RemapFrame)( AstFrameSet *, int, AstMapping *, int * );
    void (* RemoveFrame)( AstFrameSet *, int, int * );
    void (* SetBase)( AstFrameSet *, int, int * );
    void (* SetCurrent)( AstFrameSet *, int, int * );
+   void (* ClearVariant)( AstFrameSet *, int * );
+   const char *(* GetVariant)( AstFrameSet *, int * );
+   void (* SetVariant)( AstFrameSet *, const char *, int * );
+   int (* TestVariant)( AstFrameSet *, int * );
+   const char *(* GetAllVariants)( AstFrameSet *, int * );
 } AstFrameSetVtab;
 
 #if defined(THREAD_SAFE)
@@ -525,7 +533,8 @@ typedef struct AstFrameSetVtab {
 typedef struct AstFrameSetGlobals {
    AstFrameSetVtab Class_Vtab;
    int Class_Init;
-   char GetAttrib_Buff[ 51 ];
+   char GetAttrib_Buff[ AST__FRAMESET_GETATTRIB_BUFF_LEN + 1 ];
+   char GetAllVariants_Buff[ AST__FRAMESET_GETALLVARIANTS_BUFF_LEN + 1 ];
    AstFrame *Integrity_Frame;
    const char *Integrity_Method;
    int Integrity_Lost;
@@ -574,10 +583,12 @@ void astInitFrameSetGlobals_( AstFrameSetGlobals * );
 AstFrame *astGetFrame_( AstFrameSet *, int, int * );
 AstMapping *astGetMapping_( AstFrameSet *, int, int, int * );
 void astAddFrame_( AstFrameSet *, int , AstMapping *, AstFrame *, int * );
+void astAddVariant_( AstFrameSet *, AstMapping *, const char *, int * );
 void astRemapFrame_( AstFrameSet *, int, AstMapping *, int * );
 void astRemoveFrame_( AstFrameSet *, int, int * );
 
 #if defined(astCLASS)            /* Protected */
+const char *astGetAllVariants_( AstFrameSet *, int * );
 int astGetBase_( AstFrameSet *, int * );
 int astGetCurrent_( AstFrameSet *, int * );
 int astGetNframe_( AstFrameSet *, int * );
@@ -588,6 +599,10 @@ void astClearBase_( AstFrameSet *, int * );
 void astClearCurrent_( AstFrameSet *, int * );
 void astSetBase_( AstFrameSet *, int, int * );
 void astSetCurrent_( AstFrameSet *, int, int * );
+void astClearVariant_( AstFrameSet *, int * );
+const char *astGetVariant_( AstFrameSet *, int * );
+void astSetVariant_( AstFrameSet *, const char *, int * );
+int astTestVariant_( AstFrameSet *, int * );
 #endif
 
 /* Function interfaces. */
@@ -636,6 +651,8 @@ astINVOKE(O,astLoadFrameSet_(mem,size,vtab,name,astCheckChannel(channel),STATUS_
    of object is supplied. */
 #define astAddFrame(this,iframe,map,frame) \
 astINVOKE(V,astAddFrame_(astCheckFrameSet(this),iframe,(((iframe)!=AST__ALLFRAMES)?astCheckMapping(map):NULL),astCheckFrame(frame),STATUS_PTR))
+#define astAddVariant(this,map,name) \
+astINVOKE(V,astAddVariant_(astCheckFrameSet(this),map?astCheckMapping(map):NULL,name,STATUS_PTR))
 #define astGetFrame(this,iframe) \
 astINVOKE(O,astGetFrame_(astCheckFrameSet(this),iframe,STATUS_PTR))
 #define astGetMapping(this,iframe1,iframe2) \
@@ -668,6 +685,16 @@ astINVOKE(V,astTestBase_(astCheckFrameSet(this),STATUS_PTR))
 astINVOKE(V,astTestCurrent_(astCheckFrameSet(this),STATUS_PTR))
 #define astValidateFrameIndex(this,iframe,method) \
 astINVOKE(V,astValidateFrameIndex_(astCheckFrameSet(this),iframe,method,STATUS_PTR))
+#define astClearVariant(this) \
+astINVOKE(V,astClearVariant_(astCheckFrameSet(this),STATUS_PTR))
+#define astGetVariant(this) \
+astINVOKE(V,astGetVariant_(astCheckFrameSet(this),STATUS_PTR))
+#define astSetVariant(this,variant) \
+astINVOKE(V,astSetVariant_(astCheckFrameSet(this),variant,STATUS_PTR))
+#define astTestVariant(this) \
+astINVOKE(V,astTestVariant_(astCheckFrameSet(this),STATUS_PTR))
+#define astGetAllVariants(this) \
+astINVOKE(V,astGetAllVariants_(astCheckFrameSet(this),STATUS_PTR))
 #endif
 #endif
 

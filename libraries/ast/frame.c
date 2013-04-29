@@ -268,6 +268,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        superclass target.
 *     11-APR-2012 (DSB):
 *        Change astValidateAxis so that it can permute in either direction.
+*     29-APR-2013 (DSB):
+*        Added protected methods astSetFrameVariants and astGetFrameVariants.
 *class--
 */
 
@@ -710,6 +712,7 @@ static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 static void (* parent_cleanattribs)( AstObject *, int * );
+static int (* parent_getobjsize)( AstObject *, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
@@ -834,6 +837,7 @@ static int GetIsLinear( AstMapping *, int * );
 static int GetIsSimple( AstMapping *, int * );
 static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
 static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
+static int GetObjSize( AstObject *, int * );
 static void CleanAttribs( AstObject *, int * );
 static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
 
@@ -885,6 +889,9 @@ static void SetDut1( AstFrame *, double, int * );
 static int GetActiveUnit( AstFrame *, int * );
 static int TestActiveUnit( AstFrame *, int * );
 static void SetActiveUnit( AstFrame *, int, int * );
+
+static AstFrameSet *GetFrameVariants( AstFrame *, int * );
+static void SetFrameVariants( AstFrame *, AstFrameSet *, int * );
 
 static int GetFrameFlags( AstFrame *, int * );
 static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
@@ -5480,6 +5487,78 @@ static int GetNout( AstMapping *this_mapping, int *status ) {
    return result;
 }
 
+static int GetObjSize( AstObject *this_object, int *status ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int GetObjSize( AstObject *this, int *status )
+
+*  Class Membership:
+*     Frame member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied Frame,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *this;            /* Pointer to Frame structure */
+   int axis;                  /* Axis index */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the FrameSet structure. */
+   this = (AstFrame *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by this class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object, status );
+   result += astGetObjSize( this->variants );
+   result += astTSizeOf( this->domain );
+   result += astTSizeOf( this->title );
+   result += astTSizeOf( this->axis );
+   result += astTSizeOf( this->perm );
+
+   for ( axis = 0; axis < this->naxes; axis++ ) {
+      result += astGetObjSize( this->axis[ axis ] );
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const int *GetPerm( AstFrame *this, int *status ) {
 /*
 *+
@@ -5538,6 +5617,61 @@ static const int *GetPerm( AstFrame *this, int *status ) {
 
 /* Return a pointer to the axis permutation array. */
    return this->perm;
+}
+
+static AstFrameSet *GetFrameVariants( AstFrame *this, int *status ){
+/*
+*+
+*  Name:
+*     astGetFrameVariants
+
+*  Purpose:
+*     Returns the FrameSet holding the available Frame variants.
+
+*  Type:
+*     Protected  virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     AstFrameSet *astGetVariants( AstFrame *this )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function returns a pointer to any FrameSet previously stored
+*     in the Frame using method astSetVariants.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+
+*  Returned Value:
+*     astGetVariants
+*        A pointer to the FrameSet. It should be annulled using astAnnul
+*        when no longer needed. NULL will be returned if no FrameSet is
+*        stored in the Frame.
+
+*  Notes:
+*     - A NULL value will be returned if this function is invoked with the
+*     AST error status set, or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   AstFrameSet *result;
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a clone of any FrameSet pointer. */
+   if( this->variants ) result = astClone( this->variants );
+
+/* Return the result. */
+   return result;
 }
 
 void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
@@ -5708,6 +5842,9 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->GetActiveUnit = GetActiveUnit;
    vtab->SetActiveUnit = SetActiveUnit;
 
+   vtab->GetFrameVariants = GetFrameVariants;
+   vtab->SetFrameVariants = SetFrameVariants;
+
    vtab->ClearSystem = ClearSystem;
    vtab->GetSystem = GetSystem;
    vtab->SetSystem = SetSystem;
@@ -5757,6 +5894,8 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
 
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;
    parent_getattrib = object->GetAttrib;
@@ -6532,6 +6671,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
       if( !result ) result = astManageLock( this->axis[ i ], mode, extra,
                                             fail );
    }
+   if( this->variants && !result ) result = astManageLock( this->variants, mode,
+                                                           extra, fail );
 
    return result;
 
@@ -9847,6 +9988,52 @@ static void SetFrameFlags( AstFrame *this, int flags, int *status ){
    this->flags = flags;
 }
 
+static void SetFrameVariants( AstFrame *this, AstFrameSet *variants, int *status ){
+/*
+*+
+*  Name:
+*     astSetFrameVariants
+
+*  Purpose:
+*     Store a FrameSet holding alternative Frame properties.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void astSetVariants( AstFrame *this, AstFrameSet *variants )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function adds sets of alternative Frame properties to a Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     variants
+*        Pointer to a FrameSet in which each Frame is of the same class
+*        and dimensionality as "this" and all Frames have unique Domain
+*        names.
+
+*  Notes:
+*     - A clone of the supplied FrameSet pointer is stored in the Frame.
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Annul any variants FrameSet already stored in the Frame. */
+   if( this->variants ) this->variants = astAnnul( this->variants );
+
+/* Store a clone of ht esupplied FrameSet pointer. */
+   if( variants ) this->variants = astClone( variants );
+
+}
+
 static void SetUnit( AstFrame *this, int axis, const char *unit, int *status ) {
 /*
 *  Name:
@@ -13088,6 +13275,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->domain = NULL;
    out->perm = NULL;
    out->title = NULL;
+   out->variants = NULL;
 
 /* If necessary, allocate memory in the output Frame and store a copy of the
    input Title and Domain strings. */
@@ -13120,6 +13308,9 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
          }
       }
    }
+
+/* Other remaining objects */
+   if( in->variants ) out->variants = astCopy( in->variants );
 
 /* If an error occurred, free any allocated memory. */
    if ( !astOK ) {
@@ -13182,6 +13373,9 @@ static void Delete( AstObject *obj, int *status ) {
 
 /* Free memory used for the axis permutation array if necessary. */
    this->perm = astFree( this->perm );
+
+/* Other objects. */
+    if( this->variants ) this->variants = astAnnul( this->variants );
 }
 
 /* Dump function. */
@@ -13663,6 +13857,11 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Free the inverse axis permutation array. */
       invperm = astFree( invperm );
+
+/* Variants */
+/* ------- */
+      if( this->variants ) astWriteObject( channel, "Vrnts", 1, 0,
+                                           this->variants, "Variant Frames" );
    }
 
 /* Undefine macros local to this function. */
@@ -13890,6 +14089,7 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
          new->obslon = AST__BAD;
          new->dut1 = AST__BAD;
          new->flags = 0;
+         new->variants = NULL;
 
 /* Allocate memory to store pointers to the Frame's Axis objects and to store
    its axis permutation array. */
@@ -14300,6 +14500,10 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
 /* Free the string value. */
             sval = astFree( sval );
          }
+
+/* Variants. */
+/* -------- */
+         new->variants = astReadObject( channel, "vrnts", NULL );
       }
 
 /* If an error occurred, clean up by deleting the new Frame. */
@@ -14429,6 +14633,14 @@ int astGetNaxes_( AstFrame *this, int *status ) {
 const int *astGetPerm_( AstFrame *this, int *status ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Frame,GetPerm))( this, status );
+}
+AstFrameSet *astGetFrameVariants_( AstFrame *this, int *status ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Frame,GetFrameVariants))( this, status );
+}
+void astSetFrameVariants_( AstFrame *this, AstFrameSet *variants, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Frame,SetFrameVariants))( this, variants, status );
 }
 
 

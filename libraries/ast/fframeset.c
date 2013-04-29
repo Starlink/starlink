@@ -15,6 +15,7 @@
 
 *  Routines Defined:
 *     AST_ADDFRAME
+*     AST_ADDVARIANT
 *     AST_FRAMESET
 *     AST_GETFRAME
 *     AST_GETMAPPING
@@ -176,3 +177,22 @@ F77_SUBROUTINE(ast_removeframe)( INTEGER(THIS),
       astRemoveFrame( astI2P( *THIS ), *IFRAME );
    )
 }
+
+F77_SUBROUTINE(ast_addvariant)( INTEGER(THIS),
+                                INTEGER(MAP),
+                                CHARACTER(NAME),
+                                INTEGER(STATUS)
+                                TRAIL(NAME) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(MAP)
+   GENPTR_CHARACTER(NAME)
+   char *name;
+
+   astAt( "AST_ADDVARIANT", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      astAddVariant( astI2P( *THIS ), astI2P( *MAP ), name );
+      name = astFree( name );
+   )
+}
+

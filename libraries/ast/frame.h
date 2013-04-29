@@ -622,6 +622,7 @@ typedef struct AstFrame {
    AstSystemType system;         /* Code identifying coordinate system */
    AstSystemType alignsystem;    /* Code for Alignment coordinate system */
    int flags;                    /* Bit mask containing various protected flags */
+   struct AstFrameSet *variants; /* FrameSet defining alternative properties for the Frame */
 } AstFrame;
 
 /* Cached Line structure. */
@@ -759,6 +760,8 @@ typedef struct AstFrameVtab {
    void (* ValidateAxisSelection)( AstFrame *, int, const int *, const char *, int * );
    void (* LineOffset)( AstFrame *, AstLineDef *, double, double, double[2], int * );
    AstPointSet *(* FrameGrid)( AstFrame *, int, const double *, const double *, int * );
+   struct AstFrameSet *(* GetFrameVariants)( AstFrame *, int * );
+   void (* SetFrameVariants)( AstFrame *, struct AstFrameSet *, int * );
 
    double (* GetTop)( AstFrame *, int, int * );
    int (* TestTop)( AstFrame *, int, int * );
@@ -896,6 +899,8 @@ void astNorm_( AstFrame *, double[], int * );
 void astOffset_( AstFrame *, const double[], const double[], double, double[], int * );
 void astResolve_( AstFrame *, const double [], const double [], const double [], double [], double *, double *, int * );
 void astSetActiveUnit_( AstFrame *, int, int * );
+AstFrameSet *astGetFrameVariants_( AstFrame *, int * );
+void astSetFrameVariants_( AstFrame *, AstFrameSet *, int * );
 
 #if defined(astCLASS)            /* Protected */
 void astNormBox_( AstFrame *, double *, double *, AstMapping *, int * );
@@ -1122,6 +1127,10 @@ astINVOKE(V,astGetActiveUnit_(astCheckFrame(this),STATUS_PTR))
 astINVOKE(V,astSetActiveUnit_(astCheckFrame(this),value,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
+#define astGetFrameVariants(this) \
+astINVOKE(O,astGetFrameVariants_(astCheckFrame(this),STATUS_PTR))
+#define astSetFrameVariants(this,variants) \
+astINVOKE(V,astSetFrameVariants_(astCheckFrame(this),astCheckFrameSet(variants),STATUS_PTR))
 #define astNormBox(this,lbnd,ubnd,reg) \
 astINVOKE(V,astNormBox_(astCheckFrame(this),lbnd,ubnd,astCheckMapping(reg),STATUS_PTR))
 #define astFormat(this,axis,value) \

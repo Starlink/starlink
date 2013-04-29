@@ -25,6 +25,11 @@ for AST_REBINSEQ<X> is now an INTEGER*8.
 APPLICATION CODE SHOULD BE CHANGED ACCORDINGLY TO AVOID SEGMENTATION
 FAULTS AND OTHER ERRATIC BEHAVIOUR.
 
+- Added a new facility to the FrameSet class to allow each Frame to be
+associated with multiple Mappings, any one of which can be used to
+connect the Frame to the other Frames in the FrameSet. The choice of
+which Mapping to use is controlled by the new "Variant" attribute of the
+FrameSet class.
 
 Main Changes in V7.2.0
 ----------------------

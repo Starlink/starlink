@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.27}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {26th April 2013}
+\newcommand{\stardocdate}      {29th April 2013}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -22849,6 +22849,12 @@ into the output array. The NUSED parameter is now an INTEGER*8 variable,
 instead of an INTEGER. APPLICATION CODE SHOULD BE CHANGED ACCORDINGLY TO
 AVOID SEGMENTATION FAULTS AND OTHER ERRATIC BEHAVIOUR.
 f-
+
+\item Added a new facility to the FrameSet class to allow each Frame to be
+associated with multiple Mappings, any one of which can be used to
+connect the Frame to the other Frames in the FrameSet. The choice of
+which Mapping to use is controlled by the new ``Variant'' attribute of the
+FrameSet class.
 
 \end{enumerate}
 
