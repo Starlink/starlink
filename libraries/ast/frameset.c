@@ -88,6 +88,7 @@ c     system
 c     - astAddVariant: Add a variant Mapping to the current Frame
 c     - astGetFrame: Obtain a pointer to a specified Frame in a FrameSet
 c     - astGetMapping: Obtain a Mapping between two Frames in a FrameSet
+c     - astMirrorVariants: Make the current Frame mirror variant Mappings
 c     - astRemapFrame: Modify a Frame's relationship to the other Frames in a
 c     FrameSet
 c     - astRemoveFrame: Remove a Frame from a FrameSet
@@ -96,6 +97,7 @@ f     system
 f     - AST_ADDVARIANT: Add a variant Mapping to the current Frame
 f     - AST_GETFRAME: Obtain a pointer to a specified Frame in a FrameSet
 f     - AST_GETMAPPING: Obtain a Mapping between two Frames in a FrameSet
+f     - AST_MIRRORVARIANTS: Make the current Frame mirror variant Mappings
 f     - AST_REMAPFRAME: Modify a Frame's relationship to the other Frames in a
 f     FrameSet
 f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
@@ -250,7 +252,8 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *        be inverted unintentionally when astAddFrame is called with
 *        iframe=AST__ALLFRAMES.
 *     29-APR-2013 (DSB):
-*        Added attributes AllVariants and Variant. Also added method astAddVariant.
+*        Added attributes AllVariants and Variant. Also added methods
+*        astAddVariant and astMirrorVariants.
 *class--
 */
 
@@ -899,6 +902,7 @@ static int GetPermute( AstFrame *, int * );
 static int GetPreserveAxes( AstFrame *, int * );
 static int GetTranForward( AstMapping *, int * );
 static int GetTranInverse( AstMapping *, int * );
+static int GetVarFrm( AstFrameSet *, int * );
 static int IsUnitFrame( AstFrame *, int * );
 static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
 static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
@@ -960,6 +964,7 @@ static void PermAxes( AstFrame *, const int[], int * );
 static void PrimaryFrame( AstFrame *, int, AstFrame **, int *, int * );
 static void RecordIntegrity( AstFrameSet *, int * );
 static void AddVariant( AstFrameSet *, AstMapping *, const char *, int * );
+static void MirrorVariants( AstFrameSet *, int, int * );
 static void RemapFrame( AstFrameSet *, int, AstMapping *, int * );
 static void RemoveFrame( AstFrameSet *, int, int * );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet *, int * );
@@ -1353,6 +1358,8 @@ f     AST_SIMPLIFY
    Frame. */
       this->frame = astGrow( this->frame, this->nframe + 1,
                              sizeof( AstFrame * ) );
+      this->varfrm = astGrow( this->varfrm, this->nframe + 1,
+                             sizeof( int ) );
       this->node = astGrow( this->node, this->nframe + 1, sizeof( int ) );
       this->map = astGrow( this->map, this->nnode, sizeof( AstMapping * ) );
       this->link = astGrow( this->link, this->nnode, sizeof( int ) );
@@ -1363,6 +1370,10 @@ f     AST_SIMPLIFY
    in the FrameSet arrays. */
          this->frame[ this->nframe ] = astClone( frame );
          this->map[ this->nnode - 1 ] = astClone( map );
+
+/* Indicate the Frame does not reflect the variant Mappings of any other
+   Frame. */
+         this->varfrm[ this->nframe ] = 0;
 
 /* Associate the Frame with the Mapping via the "node" array. */
          this->node[ this->nframe ] = this->nnode;
@@ -1410,6 +1421,7 @@ f     AST_SIMPLIFY
 /* Extend the original FrameSet's arrays to accommodate the new Frames
    and nodes. */
       this->frame = astGrow( this->frame, nframe, sizeof( AstFrame * ) );
+      this->varfrm = astGrow( this->varfrm, nframe, sizeof( int ) );
       this->node = astGrow( this->node, nframe, sizeof( int ) );
       this->map = astGrow( this->map, nnode - 1, sizeof( AstMapping * ) );
       this->link = astGrow( this->link, nnode - 1, sizeof( int ) );
@@ -1425,6 +1437,8 @@ f     AST_SIMPLIFY
                astClone( frameset->frame[ ifr - 1 ] );
             this->node[ this->nframe + ifr - 1 ] =
                frameset->node[ ifr - 1 ] + this->nnode;
+            this->varfrm[ this->nframe + ifr - 1 ] =
+               frameset->varfrm[ ifr - 1 ] + this->nframe;
          }
 
 /* Similarly, transfer the new node data, cloning each Mapping
@@ -1559,6 +1573,7 @@ f     AST_SIMPLIFY
                this->frame[ this->nframe + ifr - 1 ] =
                   astAnnul( this->frame[ this->nframe + ifr - 1 ] );
                this->node[ this->nframe + ifr - 1 ] = -1;
+               this->varfrm[ this->nframe + ifr - 1 ] = 0;
             }
             for ( inode = 0; inode < frameset->nnode; inode++ ) {
                this->map[ this->nnode + inode - 1 ] =
@@ -1662,8 +1677,11 @@ f     NAME).
    if( astOK ) {
       myname[ astChrLen( myname ) ] = 0;
 
+/* Get the one-based index of the Frame to use. */
+      icur = GetVarFrm( this, status );
+
 /* Get the Variants FrameSet for the current Frame in "this". */
-      frm = astGetFrame( this, AST__CURRENT );
+      frm = astGetFrame( this, icur );
       vfs = astGetFrameVariants( frm );
 
 /* If current Frame of this has no Variant FrameSet, create a Variants
@@ -1727,7 +1745,7 @@ f     NAME).
 /* Add a copy of parent Frame into Variants FrameSet, using the above
    mapping to connect it to the original current Variants Frame. Set
    its Domain to the supplied name. Re-instate the original current Frame
-   afterwards. Remove the variant frame info befoe adding it. */
+   afterwards. Remove the variant frame info before adding it. */
             (void) astAnnul( vfrm );
             vfrm = astCopy( frm );
             astSetFrameVariants( vfrm, NULL );
@@ -1758,12 +1776,11 @@ f     NAME).
       }
 
 /* If all is well, and the Variants FrameSet is new, store a pointer to
-   it in the current Frame of "this", and then make the new Variant the
-   current variant. */
-      if( new ) {
-         astSetFrameVariants( frm, vfs );
-         if( map ) astSetVariant( this, name );
-      }
+   it in the current Frame of "this". */
+      if( new ) astSetFrameVariants( frm, vfs );
+
+/* Make the new Variant the current variant. */
+      if( map ) astSetVariant( this, name );
 
 /* Free remaining resources. */
       frm = astAnnul( frm );
@@ -2700,12 +2717,16 @@ static void ClearVariant( AstFrameSet *this, int *status ) {
 
 /* Local Variables: */
    AstFrame *frm;
+   int icur;
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get the one-based index of the Frame to use. */
+   icur = GetVarFrm( this, status );
+
 /* Get a pointer to the current Frame in the FrameSet. */
-   frm = astGetFrame( this, AST__CURRENT );
+   frm = astGetFrame( this, icur );
 
 /* Replace any Variants FrameSet in the Frame with a NULL pointer. */
    astSetFrameVariants( frm, NULL );
@@ -3907,7 +3928,7 @@ static int ForceCopy( AstFrameSet *this, int iframe, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            /* Declare the thread specific global data */
+   astDECLARE_GLOBALS           /* Declare the thread specific global data */
    AstFrame *frame;             /* Pointer to Frame */
    AstFrame *tmp;               /* Temporary Frame pointer */
    int ifr;                     /* Loop counter for Frames */
@@ -4181,6 +4202,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    }
 
    result += astTSizeOf( this->frame );
+   result += astTSizeOf( this->varfrm );
    result += astTSizeOf( this->node );
    result += astTSizeOf( this->map );
    result += astTSizeOf( this->link );
@@ -5447,6 +5469,60 @@ static int GetUseDefs( AstObject *this_object, int *status ) {
    return result;
 }
 
+static int GetVarFrm( AstFrameSet *this, int *status ) {
+/*
+*  Name:
+*     GetVarFrm
+
+*  Purpose:
+*     Get the index of the current variants Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int GetVarFrm( AstFrameSet *this, int *status ) {
+
+*  Class Membership:
+*     FrameSet private function.
+
+*  Description:
+*     This function returns the index of the variants Frame associated
+*     with the current Frame. See astMirrorVariants.
+
+*  Parameters:
+*     this
+*        Pointer to the FrameSet.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The one-based Frame index.
+*/
+
+/* Local Variables: */
+   int result;                   /* Value to return */
+
+/* Initialise. */
+   result = AST__NOFRAME;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the index of the current Frame. */
+   result = astGetCurrent( this );
+
+/* If the current Frame is mirroring another Frame, return the index of
+   the mirrored Frame. */
+   if( this->varfrm[ result - 1 ] > 0 ) {
+      result = this->varfrm[ result - 1 ];
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static const char *GetVariant( AstFrameSet *this, int *status ) {
 /*
 *+
@@ -5487,6 +5563,7 @@ static const char *GetVariant( AstFrameSet *this, int *status ) {
    AstFrame *frm;
    AstFrame *vfs;
    const char *result;
+   int icur;
 
 /* Initialise */
    result = NULL;
@@ -5494,8 +5571,11 @@ static const char *GetVariant( AstFrameSet *this, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Get the one-based index of the Frame to use. */
+   icur = GetVarFrm( this, status );
+
 /* Get a pointer to the Variants FrameSet in the current Frame. */
-   frm = astGetFrame( this, AST__CURRENT );
+   frm = astGetFrame( this, icur );
    vfs = astGetFrameVariants( frm );
 
 /* If the current Frame has no Variants FrameSet, return the Domain name
@@ -5593,6 +5673,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    vtab->GetMapping = GetMapping;
    vtab->GetNframe = GetNframe;
    vtab->GetAllVariants = GetAllVariants;
+   vtab->MirrorVariants = MirrorVariants;
    vtab->RemapFrame = RemapFrame;
    vtab->RemoveFrame = RemoveFrame;
    vtab->SetBase = SetBase;
@@ -6295,6 +6376,7 @@ static const char *GetAllVariants( AstFrameSet *this, int *status ) {
    const char *result;
    int ifrm;
    int nc;
+   int icur;
    int nfrm;
 
 /* Check the global error status. */
@@ -6303,8 +6385,11 @@ static const char *GetAllVariants( AstFrameSet *this, int *status ) {
 /* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS( this );
 
+/* Get the one-based index of the Frame to use. */
+   icur = GetVarFrm( this, status );
+
 /* Get the variants FrameSet from the current Frame of the FrameSet. */
-   frm = astGetFrame( this, AST__CURRENT );
+   frm = astGetFrame( this, icur );
    vfs = astGetFrameVariants( frm );
 
 /* If the Frame does not have a variants FrameSet, just return the DOmain
@@ -6839,6 +6924,110 @@ static void MatchAxesX( AstFrame *frm2_frame, AstFrame *frm1, int *axes,
 
 /* Free resources */
    frm2 = astAnnul( frm2 );
+}
+
+static void MirrorVariants( AstFrameSet *this, int iframe, int *status ) {
+/*
+*++
+*  Name:
+c     astMirrorVariants
+f     AST_MIRRORVARIANTS
+
+*  Purpose:
+*     Make the current Frame mirror the variant Mappings in another Frame.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frameset.h"
+c     void astMirrorVariants( AstFrameSet *this, int iframe, int *status )
+f     CALL AST_MIRRORVARIANTS( THIS, IFRAME, STATUS )
+
+*  Class Membership:
+*     FrameSet method.
+
+*  Description:
+c     This function
+f     This routine
+*     indicates that all access to the Variant attribute of the current
+*     Frame should should be forwarded to some other nominated Frame in
+*     the For instance, if subsequently a value is set for the Variant
+*     attribute of the current Frame, the current Frame will be left
+*     unchanged and the setting is instead applied to the nominated Frame.
+*     Likewise, if the value of the Variant attribute is requested, the
+*     value returned is the value stored for the nominated Frame rather
+*     than the current Frame itself. Also, calls to the
+c     astAddVariant function
+f     AST_ADDVARIANT routine
+*     will result in new variants being added to the nominated Frame
+*     rather than the current Frame.
+*
+*     This provides a mechanism for propagating the effects of variant
+*     Mappings around a FrameSet. If a new Frame is added to a FrameSet
+*     by connecting it to an existing Frame that has two or more variant
+*     Mappings, then it may be appropriate to set the new Frame so that
+*     it mirrors the variants Mappings of the original Frame. If this is
+*     done, then it will be possible to select a specific variant Mapping
+*     using either the oiginal Frame or the new Frame.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FrameSet.
+c     iframe
+f     IFRAME = INTEGER (Given)
+*        The index of the Frame within the FrameSet which is to be
+*        mirrored by the current Frame. This value should lie in the range
+*        from 1 to the number of Frames in the FrameSet (as given by its
+*        Nframe attribute). If AST__NOFRAME is supplied (or the current
+*        Frame is specified), then any mirroring established by a previous
+*        call to this
+c        function
+f        routine
+*        is disabled.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - A value of AST__BASE may be given for the
+c     "iframe" parameter
+f     IFRAME argument
+*     to specify the base Frame.
+*     - Any variant Mappings explicitly added to the current Frame using
+c     astAddVariant
+f     AST_ADDVARIANT
+*     will be ignored if the current Frame is mirroring another Frame.
+
+*--
+*/
+
+/* Local Variables: */
+   int icur;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the current Frame index. */
+   icur = astGetCurrent( this );
+
+/* If AST__NOFRAME, disable any mirroring. */
+   if( iframe == AST__NOFRAME ) {
+      this->varfrm[ icur - 1 ] = 0;
+
+/* Otherwise, validate and translate the Frame index supplied. */
+   } else {
+      iframe = astValidateFrameIndex( this, iframe, "astMirrorVariants" );
+
+/* If the current Frame has been specified, disable any mirroring. */
+      if( iframe == icur ) {
+         this->varfrm[ icur - 1 ] = 0;
+
+/* Otherwise, store the one-based variants frame index. */
+      } else {
+         this->varfrm[ icur - 1 ] = iframe;
+      }
+   }
 }
 
 static void Norm( AstFrame *this_frame, double value[], int *status ) {
@@ -7752,6 +7941,7 @@ f     (AST_REMOVEFRAME).
    int naxes;                    /* Number of Frame axes */
    int nin;                      /* Number of Mapping input coordinates */
    int nout;                     /* Number of Mapping output coordinates */
+   int varfrm;                   /* The index of the variants frame */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -7759,10 +7949,19 @@ f     (AST_REMOVEFRAME).
 /* Validate and translate the Frame index supplied. */
    iframe = astValidateFrameIndex( this, iframe, "astRemapFrame" );
 
-/* Remove any variant Mappings from the Frame. */
+/* We cannot remap an arbitrary number of variant mappings, so remove
+   any variant Mappings from the Frame first, leaving just the current
+   variant. We temporarily disable variant mirroring in the current
+   Frame before doing this so that we do not delete variant Mappings
+   unnecessarily. */
    icur = astGetCurrent( this );
    astSetCurrent( this, iframe );
+
+   varfrm = this->varfrm[ iframe - 1 ];
+   this->varfrm[ iframe - 1 ] = 0;
    astClearVariant( this );
+   this->varfrm[ iframe - 1 ] = varfrm;
+
    astSetCurrent( this, icur );
 
 /* Obtain the number of input and output coordinates per point for the
@@ -7914,15 +8113,26 @@ f     IFRAME argument to specify the base Frame or the current
       } else {
          this->frame[ iframe - 1 ] = astAnnul( this->frame[ iframe - 1 ] );
 
+/* If the selected Frame is used as a "variants Frame" by any other Frames
+   in the FrameSet, indicate that those Frames no longer have a variants
+   Frame. */
+         for ( ifr = 1; ifr <= this->nframe; ifr++ ) {
+            if( this->varfrm[ ifr - 1 ] == iframe ) {
+               this->varfrm[ ifr - 1 ] = 0;
+            }
+         }
+
 /* Loop to move all subsequent Frame pointers down in the FrameSet's
    "frame" array to close the resulting gap. Also move the associated
    "node" array contents in the same way. */
          for ( ifr = iframe; ifr < this->nframe; ifr++ ) {
             this->frame[ ifr - 1 ] = this->frame[ ifr ];
             this->node[ ifr - 1 ] = this->node[ ifr ];
+            this->varfrm[ ifr - 1 ] = this->varfrm[ ifr ];
          }
          this->frame[ this->nframe - 1 ] = NULL;
          this->node[ this->nframe - 1 ] = -1;
+         this->varfrm[ this->nframe - 1 ] = 0;
 
 /* Decrement the Frame count. */
          this->nframe--;
@@ -8968,19 +9178,24 @@ static void SetVariant( AstFrameSet *this, const char *variant, int *status ) {
 */
 
 /* Local Variables: */
+   AstCmpMap *map6;
    AstCmpMap *map5;
    AstCmpMap *map4;
    AstFrame *frm;
    AstFrame *vfrm;
-   AstFrameSet *vfs;
    AstFrameSet *tfs;
-   AstMapping *map1;
-   AstMapping *map6;
-   AstMapping *map3;
+   AstFrameSet *vfs;
+   AstMapping *map0;
    AstMapping *map2;
+   AstMapping *map3;
+   AstMapping *map1;
    char *myvar;
    const char *dom;
+   int icur;
    int ifrm;
+   int inode;
+   int inv0;
+   int inv;
    int nfrm;
 
 /* Check the global error status. */
@@ -8993,8 +9208,11 @@ static void SetVariant( AstFrameSet *this, const char *variant, int *status ) {
    if( astOK ) {
       myvar[ astChrLen( myvar ) ] = 0;
 
+/* Get the one-based index of the Frame to use. */
+      icur = GetVarFrm( this, status );
+
 /* Get the variants FrameSet from the current Frame of "this". */
-      frm = astGetFrame( this, AST__CURRENT );
+      frm = astGetFrame( this, icur );
       vfs = astGetFrameVariants( frm );
 
 /* If there is no variants FrameSet in the current Frame, the only
@@ -9058,13 +9276,35 @@ static void SetVariant( AstFrameSet *this, const char *variant, int *status ) {
                   map3 = astGetMapping( tfs, AST__BASE, AST__CURRENT );
                   tfs = astAnnul( tfs );
 
-/* Concatentate the three Mappings, and simplify. */
+/* Concatentate the three Mappings, to get the Mapping from the old
+   variant Frame to the new variant Frame. */
                   map4 = astCmpMap( map1, map2, 1, " ", status );
                   map5 = astCmpMap( map4, map3, 1, " ", status );
-                  map6 = astSimplify( map5 );
 
-/* Remap the current Frame in "this" using the above Mapping. */
-                  astRemapFrame( this, AST__CURRENT, map6 );
+/* Now we modify the Mapping in the FrameSet. First get the index of the node
+   with which the Frame is associated. */
+                  inode = this->node[ icur - 1 ];
+
+/* Get the Mapping that generates the node values, and its Invert flag. */
+                  map0 = this->map[ inode - 1 ];
+                  inv0 = this->invert[ inode - 1 ];
+
+/* Temporarily reset the invert flag in the Mapping to account for any
+   changes to the Mapping via other pointers. */
+                  inv = astGetInvert( map0 );
+                  astSetInvert( map0, inv0 );
+
+/* Concatentate with "map5" to get the Mapping form the the parent node
+   to the new variant of the current node. */
+                  map6 = astCmpMap( map0, map5, 1, " ", status );
+
+/* SImplify it and use it to replace the Mapping in the FrameSet structure. */
+                  this->map[ inode - 1 ] = astSimplify( map6 );
+                  this->invert[ inode - 1 ] = astGetInvert( this->map[ inode - 1 ] );
+
+/* Re-instate the original Invert flag and free the old Mapping pointer. */
+                  astSetInvert( map0, inv );
+                  map0 = astAnnul( map0 );
 
 /* Put the variants FrameSet back into the Frame (it is removed by
    astRemapFrame). */
@@ -10042,6 +10282,7 @@ static int TestVariant( AstFrameSet *this, int *status ) {
    AstFrame *frm;
    AstFrameSet *vfs;
    int result;
+   int icur;
 
 /* Initialise. */
    result = 0;
@@ -10049,8 +10290,11 @@ static int TestVariant( AstFrameSet *this, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Get the one-based index of the Frame to use. */
+   icur = GetVarFrm( this, status );
+
 /* Get a pointer to the Variants FrameSet in the current Frame. */
-   frm = astGetFrame( this, AST__CURRENT );
+   frm = astGetFrame( this, icur );
    vfs = astGetFrameVariants( frm );
 
 /* If it is null, return zero, otherwise 1. */
@@ -11120,7 +11364,13 @@ f     AST_ADDFRAME
 *     Each Frame in a FrameSet can have its own set of variant Mappings.
 *     To control the Mappings in use with a specific Frame, you need first
 *     to make it the current Frame in the FrameSet.
-
+*
+*     The
+c     astMirrorVariants function
+f     AST_MIRRORVARIANTS routine
+*     allows the effects of variant Mappings associated with a nominated
+*     Frame to be propagated to other Frames in the FrameSet.
+*
 *     Once this has been done, setting a new value for the "Variant"
 *     attribute of a FrameSet will cause the current Frame in the
 *     FrameSet to be remapped to use the specified variant Mapping. An
@@ -11317,6 +11567,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /* For safety, first clear any references to the input memory from
    the output FrameSet. */
    out->frame = NULL;
+   out->varfrm = NULL;
    out->node = NULL;
    out->map = NULL;
    out->link = NULL;
@@ -11325,6 +11576,8 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /* Allocate memory in the output FrameSet to store the Frame and node
    information and copy scalar information across. */
    out->frame = astMalloc( sizeof( AstFrame * ) * (size_t) in->nframe );
+   out->varfrm = astStore( NULL, in->varfrm, sizeof( int ) *
+                                         (size_t) in->nframe );
    out->node = astStore( NULL, in->node, sizeof( int ) *
                                          (size_t) in->nframe );
    out->map = astMalloc( sizeof( AstMapping * ) * (size_t) ( in->nnode - 1 ) );
@@ -11359,6 +11612,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /* If an error occurred, clean up by freeing all memory allocated above. */
    if ( !astOK ) {
       out->frame = astFree( out->frame );
+      out->varfrm = astFree( out->varfrm );
       out->node = astFree( out->node );
       out->map = astFree( out->map );
       out->link = astFree( out->link );
@@ -11421,6 +11675,7 @@ static void Delete( AstObject *obj, int *status ) {
 
 /* Free all allocated memory. */
    this->frame = astFree( this->frame );
+   this->varfrm = astFree( this->varfrm );
    this->node = astFree( this->node );
    this->map = astFree( this->map );
    this->link = astFree( this->link );
@@ -11541,6 +11796,24 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       (void) sprintf( key, "Nod%d", ifr );
       (void) sprintf( comment,
                       "Frame %d is associated with node %d", ifr, ival );
+
+/* Write out the value. */
+      astWriteInt( channel, key, set, 0, ival, comment );
+   }
+
+/* Index of variants Frame for each Frame. */
+/* --------------------------------------- */
+   for ( ifr = 1; ifr <= this->nframe; ifr++ ) {
+
+/* Retain the one-based Frame index values in varfrm. Regard a number as
+   "set" if it is greater than zero. */
+      ival = this->varfrm[ ifr - 1 ];
+      set = ( ival > 0 );
+
+/* Create a suitable keyword and comment. */
+      (void) sprintf( key, "VFr%d", ifr );
+      (void) sprintf( comment,
+                      "Frame %d inherits variants from Frame %d", ifr, ival );
 
 /* Write out the value. */
       astWriteInt( channel, key, set, 0, ival, comment );
@@ -11829,6 +12102,7 @@ AstFrameSet *astInitFrameSet_( void *mem, size_t size, int init,
 /* Allocate memory for the arrays of Frame information. */
          new->frame = astMalloc( sizeof( AstFrame * ) );
          new->node = astMalloc( sizeof( int ) );
+         new->varfrm = astMalloc( sizeof( int ) );
 
 /* The node arrays are not required until at least two Frames are
    present. */
@@ -11841,6 +12115,7 @@ AstFrameSet *astInitFrameSet_( void *mem, size_t size, int init,
          if ( astOK ) {
             new->frame[ 0 ] = astClone( frame );
             new->node[ 0 ] = 0;
+            new->varfrm[ 0 ] = 0;
             new->nframe = 1;
             new->nnode = 1;
 
@@ -11864,6 +12139,8 @@ AstFrameSet *astInitFrameSet_( void *mem, size_t size, int init,
    information and copy any scalar information across. */
          new->frame = astMalloc( sizeof( AstFrame * ) * (size_t) old->nframe );
          new->node = astStore( NULL, old->node,
+                               sizeof( int ) * (size_t) old->nframe );
+         new->varfrm = astStore( NULL, old->varfrm,
                                sizeof( int ) * (size_t) old->nframe );
          new->map = astMalloc( sizeof( AstMapping * ) *
                                (size_t) ( old->nnode - 1 ) );
@@ -11901,6 +12178,7 @@ AstFrameSet *astInitFrameSet_( void *mem, size_t size, int init,
          if ( !astOK ) {
             new->frame = astFree( new->frame );
             new->node = astFree( new->node );
+            new->varfrm = astFree( new->varfrm );
             new->map = astFree( new->map );
             new->link = astFree( new->link );
             new->invert = astFree( new->invert );
@@ -12072,6 +12350,7 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size,
 /* Allocate memory to hold Frame and node information. */
    new->frame = astMalloc( sizeof( AstFrame *) * (size_t) new->nframe );
    new->node = astMalloc( sizeof( int ) * (size_t) new->nframe );
+   new->varfrm = astMalloc( sizeof( int ) * (size_t) new->nframe );
    new->link = astMalloc( sizeof( int ) * (size_t) ( new->nnode - 1 ) );
    new->invert = astMalloc( sizeof( int ) * (size_t) ( new->nnode - 1 ) );
    new->map = astMalloc( sizeof( AstMapping * ) *
@@ -12081,6 +12360,7 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size,
    if ( !astOK ) {
       new->frame = astFree( new->frame );
       new->node = astFree( new->node );
+      new->varfrm = astFree( new->varfrm );
       new->link = astFree( new->link );
       new->invert = astFree( new->invert );
       new->map = astFree( new->map );
@@ -12107,6 +12387,11 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size,
 /* -------------------------- */
          (void) sprintf( key, "nod%d", ifr );
          new->node[ ifr - 1 ] = astReadInt( channel, key, ifr ) - 1;
+
+/* Index of variants Frame. */
+/* ------------------------ */
+         (void) sprintf( key, "vfr%d", ifr );
+         new->varfrm[ ifr - 1 ] = astReadInt( channel, key, 0 );
       }
 
 /* Read node data... */
@@ -12211,6 +12496,10 @@ void astRemapFrame_( AstFrameSet *this, int iframe, AstMapping *map, int *status
 void astAddVariant_( AstFrameSet *this, AstMapping *map, const char *name, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,FrameSet,AddVariant))( this, map, name, status );
+}
+void astMirrorVariants_( AstFrameSet *this, int iframe, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,FrameSet,MirrorVariants))( this, iframe, status );
 }
 void astRemoveFrame_( AstFrameSet *this, int iframe, int *status ) {
    if ( !astOK ) return;

@@ -480,6 +480,7 @@ typedef struct AstFrameSet {
 /* Attributes specific to objects in this class. */
    AstFrame **frame;             /* Array of Frame pointers */
    AstMapping **map;             /* Array of Mapping pointers */
+   int *varfrm;                  /* Array of variants Frames indicies */
    int *invert;                  /* Array of Mapping Invert values */
    int *link;                    /* Parent node index for each node */
    int *node;                    /* Index of node associated with Frame */
@@ -513,6 +514,7 @@ typedef struct AstFrameSetVtab {
    int (* ValidateFrameIndex)( AstFrameSet *, int, const char *, int * );
    void (* AddFrame)( AstFrameSet *, int, AstMapping *, AstFrame *, int * );
    void (* AddVariant)( AstFrameSet *, AstMapping *, const char *, int * );
+   void (* MirrorVariants)( AstFrameSet *, int, int * );
    void (* ClearBase)( AstFrameSet *, int * );
    void (* ClearCurrent)( AstFrameSet *, int * );
    void (* RemapFrame)( AstFrameSet *, int, AstMapping *, int * );
@@ -584,6 +586,7 @@ AstFrame *astGetFrame_( AstFrameSet *, int, int * );
 AstMapping *astGetMapping_( AstFrameSet *, int, int, int * );
 void astAddFrame_( AstFrameSet *, int , AstMapping *, AstFrame *, int * );
 void astAddVariant_( AstFrameSet *, AstMapping *, const char *, int * );
+void astMirrorVariants_( AstFrameSet *, int, int * );
 void astRemapFrame_( AstFrameSet *, int, AstMapping *, int * );
 void astRemoveFrame_( AstFrameSet *, int, int * );
 
@@ -653,6 +656,8 @@ astINVOKE(O,astLoadFrameSet_(mem,size,vtab,name,astCheckChannel(channel),STATUS_
 astINVOKE(V,astAddFrame_(astCheckFrameSet(this),iframe,(((iframe)!=AST__ALLFRAMES)?astCheckMapping(map):NULL),astCheckFrame(frame),STATUS_PTR))
 #define astAddVariant(this,map,name) \
 astINVOKE(V,astAddVariant_(astCheckFrameSet(this),map?astCheckMapping(map):NULL,name,STATUS_PTR))
+#define astMirrorVariants(this,iframe) \
+astINVOKE(V,astMirrorVariants_(astCheckFrameSet(this),iframe,STATUS_PTR))
 #define astGetFrame(this,iframe) \
 astINVOKE(O,astGetFrame_(astCheckFrameSet(this),iframe,STATUS_PTR))
 #define astGetMapping(this,iframe1,iframe2) \

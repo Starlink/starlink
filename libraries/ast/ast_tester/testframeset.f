@@ -5,7 +5,7 @@
       include 'AST_ERR'
       include 'SAE_PAR'
 
-      integer status, pfrm, ffrm, p2fmap, fs, p2fmap2, result
+      integer status, pfrm, ffrm, p2fmap, fs, p2fmap2, result, orig
       double precision ina(2), inb(2), outa(2), outb(2), xout, yout
       character text*100
 
@@ -148,6 +148,99 @@ c      call ast_watchmemory(100)
       if( abs( xout - 150.0D0 ) .gt. 1.0E-6 .OR.
      :    abs( yout - 150.0D0 ) .gt. 1.0E-6 )  call stopit( status,
      :                                                      'Error 22' )
+
+
+
+      orig = ast_geti( fs, 'Current', status )
+      call ast_addframe( fs, AST__CURRENT, AST_UNITMAP( 2, '', status ),
+     :                   AST_FRAME( 2, "Domain=DSB", status ) )
+      call ast_tran2( fs, 1, 50.5D0, 100.5D0, .TRUE., xout, yout,
+     :                status )
+      if( abs( xout - 150.0D0 ) .gt. 1.0E-6 .OR.
+     :    abs( yout - 150.0D0 ) .gt. 1.0E-6 )  call stopit( status,
+     :                                                      'Error 23' )
+
+      if( status .eq. sai__ok ) then
+         call ast_setc( fs, 'Variant', 'FP1', status )
+         if( status .eq. ast__attin ) then
+            call err_annul( status )
+         else
+            call err_flush( status )
+            call stopit( status, 'Error 24' )
+         end if
+      end if
+
+      text = ast_getc( fs, 'AllVariants', status )
+      if( text .ne. 'DSB' ) call stopit( status, 'Error 25' )
+
+      text = ast_getc( fs, 'Variant', status )
+      if( text .ne. 'DSB' ) call stopit( status, 'Error 26' )
+
+      if( ast_test( fs, 'Variant', status ) ) call stopit( status,
+     :                                                     'Error 27' )
+
+      call ast_mirrorvariants( fs, orig, status )
+
+      text = ast_getc( fs, 'AllVariants', status )
+      if( text .ne. 'FP1 FP2 FP3' ) call stopit( status, 'Error 28' )
+
+      text = ast_getc( fs, 'Variant', status )
+      if( text .ne. 'FP2' ) call stopit( status, 'Error 29' )
+
+      if( .not. ast_test( fs, 'Variant', status ) ) call stopit( status,
+     :                                                     'Error 30' )
+
+      call ast_tran2( fs, 1, 50.5D0, 100.5D0, .TRUE., xout, yout,
+     :                status )
+      if( abs( xout - 150.0D0 ) .gt. 1.0E-6 .OR.
+     :    abs( yout - 150.0D0 ) .gt. 1.0E-6 )  call stopit( status,
+     :                                                      'Error 31' )
+
+      call ast_set( fs, 'Variant=FP1', status )
+      text = ast_getc( fs, 'Variant', status )
+      if( text .ne. 'FP1' ) call stopit( status, 'Error 32' )
+
+      call ast_tran2( fs, 1, 50.5D0, 100.5D0, .TRUE., xout, yout,
+     :                status )
+      if( abs( xout - 0.0D0 ) .gt. 1.0E-6 .OR.
+     :    abs( yout - 0.0D0 ) .gt. 1.0E-6 )  call stopit( status,
+     :                                                      'Error 33' )
+
+      call checkdump( fs, result, status )
+
+      text = ast_getc( result, 'AllVariants', status )
+      if( text .ne. 'FP1 FP2 FP3' ) call stopit( status, 'Error 34' )
+
+      text = ast_getc( result, 'Variant', status )
+      if( text .ne. 'FP1' ) call stopit( status, 'Error 35' )
+
+      call ast_tran2( result, 1, 50.5D0, 100.5D0, .TRUE., xout, yout,
+     :                status )
+      if( abs( xout - 0.0D0 ) .gt. 1.0E-6 .OR.
+     :    abs( yout - 0.0D0 ) .gt. 1.0E-6 )  call stopit( status,
+     :                                                      'Error 36' )
+
+      result = ast_copy( fs, status )
+
+      text = ast_getc( result, 'AllVariants', status )
+      if( text .ne. 'FP1 FP2 FP3' ) call stopit( status, 'Error 37' )
+
+      text = ast_getc( result, 'Variant', status )
+      if( text .ne. 'FP1' ) call stopit( status, 'Error 38' )
+
+      call ast_tran2( result, 1, 50.5D0, 100.5D0, .TRUE., xout, yout,
+     :                status )
+      if( abs( xout - 0.0D0 ) .gt. 1.0E-6 .OR.
+     :    abs( yout - 0.0D0 ) .gt. 1.0E-6 )  call stopit( status,
+     :                                                      'Error 39' )
+
+
+
+
+
+
+
+
 
       call ast_end( status )
       call err_rlse( status )

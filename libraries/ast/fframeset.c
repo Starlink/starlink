@@ -16,6 +16,7 @@
 *  Routines Defined:
 *     AST_ADDFRAME
 *     AST_ADDVARIANT
+*     AST_MIRRORVARIANTS
 *     AST_FRAMESET
 *     AST_GETFRAME
 *     AST_GETMAPPING
@@ -193,6 +194,18 @@ F77_SUBROUTINE(ast_addvariant)( INTEGER(THIS),
       name = astString( NAME, NAME_length );
       astAddVariant( astI2P( *THIS ), astI2P( *MAP ), name );
       name = astFree( name );
+   )
+}
+
+F77_SUBROUTINE(ast_mirrorvariants)( INTEGER(THIS),
+                                    INTEGER(IFRAME),
+                                    INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(IFRAME)
+
+   astAt( "AST_MIRRORVARIANTS", NULL, 0 );
+   astWatchSTATUS(
+      astMirrorVariants( astI2P( *THIS ), *IFRAME );
    )
 }
 
