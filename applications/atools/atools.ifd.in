@@ -276,6 +276,47 @@ package atools {
           }
 
       }
+      action astmirrorvars {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter iframe {
+            position 2
+            type LITERAL
+            prompt {The index or Domain of the variant Frame to mirror}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {The modified FrameSet}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
       action astaddvariant {
 
          helplib {$ATOOLS_HELP}
