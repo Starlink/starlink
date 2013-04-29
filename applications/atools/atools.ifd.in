@@ -276,6 +276,55 @@ package atools {
           }
 
       }
+      action astaddvariant {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter name {
+            position 3
+            type LITERAL
+            prompt {The name for the new variant Mapping}
+            ppath CURRENT
+            helpkey *
+          }
+
+
+         parameter map {
+            position 2
+            type NDF
+            prompt {The Mapping from current Frame to new variant Frame}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {The modified FrameSet}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
       action astmapregion {
 
          helplib {$ATOOLS_HELP}
