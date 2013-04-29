@@ -5633,7 +5633,7 @@ static AstFrameSet *GetFrameVariants( AstFrame *this, int *status ){
 
 *  Synopsis:
 *     #include "frame.h"
-*     AstFrameSet *astGetVariants( AstFrame *this )
+*     AstFrameSet *astGetFrameVariants( AstFrame *this )
 
 *  Class Membership:
 *     Frame method.
@@ -5647,7 +5647,7 @@ static AstFrameSet *GetFrameVariants( AstFrame *this, int *status ){
 *        Pointer to the Frame.
 
 *  Returned Value:
-*     astGetVariants
+*     astGetFrameVariants
 *        A pointer to the FrameSet. It should be annulled using astAnnul
 *        when no longer needed. NULL will be returned if no FrameSet is
 *        stored in the Frame.

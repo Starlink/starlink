@@ -1741,9 +1741,6 @@ f     NAME).
             map2 = astAnnul( map2 );
             map3 = astAnnul( map3 );
 
-/* Make the new Variant the current variant. */
-            astSetVariant( this, name );
-
 /* Report an error if a Mapping cannot be found from the new variant Frame
    to the current Frame in "this". */
          } else if( astOK ) {
@@ -1761,8 +1758,12 @@ f     NAME).
       }
 
 /* If all is well, and the Variants FrameSet is new, store a pointer to
-   it in the current Frame of "this". */
-      if( new ) astSetFrameVariants( frm, vfs );
+   it in the current Frame of "this", and then make the new Variant the
+   current variant. */
+      if( new ) {
+         astSetFrameVariants( frm, vfs );
+         if( map ) astSetVariant( this, name );
+      }
 
 /* Free remaining resources. */
       frm = astAnnul( frm );
@@ -9016,20 +9017,23 @@ static void SetVariant( AstFrameSet *this, const char *variant, int *status ) {
             vfrm = astGetFrame( vfs, ifrm + 1 );
             dom = astGetDomain( vfrm );
             vfrm = astAnnul( vfrm );
-            if( !astOK || !strcmp( variant, dom ) ) break;
+            if( !astOK || !strcmp( myvar, dom ) ) break;
          }
 
 /* Report an error if no such Frame found. */
          if( ifrm == nfrm && astOK ) {
             astError( AST__ATTIN, "astSetVariant(%s): Unknown Frame "
-                      "variant '%s' requested.", status, astGetClass(this),
-                      myvar );
+                      "variant '%s' requested - available variants are "
+                      "'%s'.", status, astGetClass(this), myvar,
+                      astGetAllVariants(this) );
 
 /* Otherwise, get a Mapping from the current Frame in "this" to the
    currently selected Variant Frame. We cannot assume that they are the
    same as attributes of the current Frame (e.g. System) may have been
-   changed since the variant was added. */
-         } else {
+   changed since the variant was added. If the required Frame is already
+   the current Frame, there is nothing more to do since the required
+   variant is already selected. */
+         } else if( ifrm + 1 != astGetCurrent( vfs ) ){
             vfrm = astGetFrame( vfs, AST__CURRENT );
             dom = astGetDomain( frm );
             if( dom ) dom = astStore( NULL, dom, strlen( dom ) + 1 );
