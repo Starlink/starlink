@@ -234,8 +234,9 @@ c      call ast_watchmemory(100)
      :    abs( yout - 0.0D0 ) .gt. 1.0E-6 )  call stopit( status,
      :                                                      'Error 39' )
 
-
-
+      call ast_clear( fs, 'Variant', status )
+      text = ast_getc( fs, 'Variant', status )
+      if( text .ne. 'DSB' ) call stopit( status, 'Error 40' )
 
 
 

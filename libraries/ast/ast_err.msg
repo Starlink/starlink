@@ -194,6 +194,7 @@ WRERR           <write error>
 
 ! New codes introduced for V7.3
 BDVNM           <Bad variant Mapping name>
+MIRRO           <Attempt to add a variant Mapping to a mirror Frame>
 
 
 .END
