@@ -1,8 +1,12 @@
 1 ATL_library
 
-An new release (V1.5) of the ATL library is now available. The ATL
+An new release (V1.6) of the ATL library is now available. The ATL
 library contains high level AST-related utility functions. See SUN/256
 for details. Changed in the new version include:
+
+- New function atlFindMap locates a component Mapping within a CmpMap.
+
+Changes introduced by V1.5:
 
 - New function astReadTable reads an AST Table from a text file,
 formatted in TOPCAT "ascii" format.
@@ -10,9 +14,6 @@ formatted in TOPCAT "ascii" format.
 - Added a F77 wrapper for the astChrSplitRE function defined the AST
 memory management module (memory.c). This wrapper is in ATL rather than
 AST because it returned the matching strings in a GRP group.
-
-
-Changes introduced by V1.5:
 
 - New functions atlKy2hd and ATL_KY2HD have been added. These have been
 moved from the KAPLIBS library.
