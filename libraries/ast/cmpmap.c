@@ -146,6 +146,9 @@ f     The CmpMap class does not define any new routines beyond those
 *     5-FEB-2013 (DSB):
 *        Take account of Invert flags when combining parallel CmpMaps in
 *        series.
+*     29-APR-2013 (DSB):
+*        In MapList, use the astDoNotSimplify method to check that it is 
+*        OK to expand the CmpMap.
 *class--
 */
 
@@ -1127,8 +1130,9 @@ static int MapList( AstMapping *this_mapping, int series, int invert,
    this = (AstCmpMap *) this_mapping;
 
 /* Check if the CmpMap combines its component Mappings in the same way
-   (series or parallel) as the decomposition requires. */
-   if ( this->series == series ) {
+   (series or parallel) as the decomposition requires. Also, do not
+   expand CmpMaps that are not appropriate for simplification. */
+   if ( this->series == series && !astDoNotSimplify( this ) ) {
 
 /* If so, obtain the Invert attribute values to be applied to each
    component Mapping. */

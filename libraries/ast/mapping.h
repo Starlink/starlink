@@ -443,6 +443,7 @@ typedef struct AstMappingVtab {
    AstMapping *(* Simplify)( AstMapping *, int * );
    AstPointSet *(* Transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
    double (* Rate)( AstMapping *, double *, int, int, int * );
+   int (* DoNotSimplify)( AstMapping *, int * );
    int (* GetInvert)( AstMapping *, int * );
    int (* GetIsSimple)( AstMapping *, int * );
    int (* GetNin)( AstMapping *, int * );
@@ -652,6 +653,7 @@ int astGetReport_( AstMapping *, int * );
 int astGetTranForward_( AstMapping *, int * );
 int astGetTranInverse_( AstMapping *, int * );
 int astGetIsLinear_( AstMapping *, int * );
+int astDoNotSimplify_( AstMapping *, int * );
 int astMapMerge_( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 int astTestInvert_( AstMapping *, int * );
 int astTestReport_( AstMapping *, int * );
@@ -818,6 +820,8 @@ astINVOKE(V,astSetReport_(astCheckMapping(this),value,STATUS_PTR))
 astINVOKE(V,astTestInvert_(astCheckMapping(this),STATUS_PTR))
 #define astTestReport(this) \
 astINVOKE(V,astTestReport_(astCheckMapping(this),STATUS_PTR))
+#define astDoNotSimplify(this) \
+astINVOKE(V,astDoNotSimplify_(astCheckMapping(this),STATUS_PTR))
 
 /* Since a NULL PointSet pointer is acceptable here, we must omit the argument
    checking in that case. (But unfortunately, "out" then gets evaluated

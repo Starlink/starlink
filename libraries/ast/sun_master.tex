@@ -22856,6 +22856,11 @@ connect the Frame to the other Frames in the FrameSet. The choice of
 which Mapping to use is controlled by the new ``Variant'' attribute of the
 FrameSet class.
 
+\item Mappings (but not Frames) that have a value set for their Ident
+attribute are now left unchanged by the
+c astSimplify function.
+f AST\_SIMPLIFY routine.
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

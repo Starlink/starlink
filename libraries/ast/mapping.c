@@ -345,6 +345,13 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Change the "nused" parameter of astRebinSeq<X> from "int *" to
 *        "size_t *" to allow greater amounts of data to be pasted into
 *        the output array.
+*     29-APR-2013 (DSB):
+*        No sot simplify Mappings that have a set value for their Ident
+*        attribute. If an Ident value has been set then it means that we
+*        should be trying to preserve the identify of the Mapping. This 
+*        is implemented via a new protected method (astDoNotSimplify) which 
+*        is overridden by the Frame class so that this restriction applies 
+*        only to genuine Mappings, not Frames.
 *class--
 */
 
@@ -643,6 +650,7 @@ static int MapList( AstMapping *, int, int, int *, AstMapping ***, int **, int *
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int MaxI( int, int, int * );
 static int MinI( int, int, int * );
+static int DoNotSimplify( AstMapping *, int * );
 static int QuadApprox( AstMapping *, const double[2], const double[2], int, int, double *, double *, int * );
 static int RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, size_t *, int * );
 static int RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, size_t *, int * );
@@ -974,6 +982,53 @@ static void Decompose( AstMapping *this, AstMapping **map1, AstMapping **map2,
    if( series ) *series = 1;
    if( invert1 ) *invert1 = astGetInvert( this );
    if( invert2 ) *invert2 = 0;
+}
+
+static int DoNotSimplify( AstMapping *this, int *status ) {
+/*
+*+
+*  Name:
+*     astMapMerge
+
+*  Purpose:
+*     Check if a Mapping is appropriate for simplification.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int astDoNotSImplify( AstMapping *this );
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This function returns a flag indivating if the supplied Mapping is
+*     appropriate for simplification.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping.
+
+*  Returned Value:
+*     Non-zero if the supplied Mapping is not appropriate for
+*     simplification, and zero otherwise.
+
+*  Notes:
+*     - A value of 0 will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Check inherited status. */
+   if( !astOK ) return 0;
+
+/* Mappings that have a set value for the Ident attribute should not be
+   simplified since we want to preserve their individual identify (otherwise 
+   why would the user have given them an Ident value?). */
+   return astTestIdent( this );
 }
 
 int astRateState_( int disabled, int *status ) {
@@ -2425,6 +2480,7 @@ VTAB_GENERIC(LD)
    vtab->ClearInvert = ClearInvert;
    vtab->ClearReport = ClearReport;
    vtab->Decompose = Decompose;
+   vtab->DoNotSimplify = DoNotSimplify;
    vtab->GetInvert = GetInvert;
    vtab->GetIsLinear = GetIsLinear;
    vtab->GetIsSimple = GetIsSimple;
@@ -16277,6 +16333,10 @@ f     AST_SIMPLIFY = INTEGER
 *        inter-Frame Mappings have been simplified.
 
 *  Notes:
+*     - Mappings that have a set value for their Ident attribute are
+*     left unchanged after simplification. This is so that their
+*     individual identity is preserved. This restriction does not
+*     apply to the simplification of Frames.
 *     - This function can safely be applied even to Mappings which
 *     cannot be simplified. If no simplification is possible, it
 c     behaves exactly like astClone and returns a pointer to the
@@ -23544,9 +23604,14 @@ int *astMapSplit_( AstMapping *this, int nin, const int *in, AstMapping **map,
 }
 int astMapMerge_( AstMapping *this, int where, int series, int *nmap,
                   AstMapping ***map_list, int **invert_list, int *status ) {
-   if ( !astOK ) return -1;
+
+   if ( !astOK || astDoNotSimplify( this ) ) return -1;
    return (**astMEMBER(this,Mapping,MapMerge))( this, where, series, nmap,
                                                 map_list, invert_list, status );
+}
+int astDoNotSimplify_( AstMapping *this, int *status ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Mapping,DoNotSimplify))( this, status );
 }
 void astReportPoints_( AstMapping *this, int forward,
                        AstPointSet *in_points, AstPointSet *out_points, int *status ) {
@@ -23682,9 +23747,9 @@ AstMapping *astRemoveRegions_( AstMapping *this, int *status ) {
 AstMapping *astSimplify_( AstMapping *this, int *status ) {
    AstMapping *result;
    if ( !astOK ) return NULL;
-   if( !astGetIsSimple( this ) ) {      /* Only simplify if not already done */
+   if( !astGetIsSimple( this ) && !astDoNotSimplify( this ) ) {
       result = (**astMEMBER(this,Mapping,Simplify))( this, status );
-      if( result ) result->issimple = 1;/* Indicate simplification has been done */
+      if( result ) result->issimple = 1; /* Indicate simplification has been done */
    } else {
       result = astClone( this );
    }

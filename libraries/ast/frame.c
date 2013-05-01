@@ -270,6 +270,12 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Change astValidateAxis so that it can permute in either direction.
 *     29-APR-2013 (DSB):
 *        Added protected methods astSetFrameVariants and astGetFrameVariants.
+*     1-MAY-2013 (DSB):
+*        Override the astDoNotSimplify method to indicate that Frames should 
+*        always be simplified. This is mainly because the STC class uses the 
+*        Ident attribute with Frames, and preventing such frames from 
+*        simplifying (which is what the parent astDoNotSimplify method does)
+*        causes the STC tester in the ast_tester directory to fail.
 *class--
 */
 
@@ -829,6 +835,7 @@ static int ConsistentMaxAxes( AstFrame *, int, int * );
 static int ConsistentMinAxes( AstFrame *, int, int * );
 static int DefaultMaxAxes( AstFrame *, int * );
 static int DefaultMinAxes( AstFrame *, int * );
+static int DoNotSimplify( AstMapping *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
 static int GetDigits( AstFrame *, int * );
@@ -3272,6 +3279,51 @@ f     invoked with STATUS set to an error value, or if it should fail for
 
 /* Return the result. */
    return result;
+}
+
+static int DoNotSimplify( AstMapping *this, int *status ) {
+/*
+*  Name:
+*     DoNotSimplify
+
+*  Purpose:
+*     Check if a Mapping is appropriate for simplification.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     int DoNotSImplify( AstMapping *this );
+
+*  Class Membership:
+*     CmpMap member function (over-rides the astDoNotSimplify protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns a flag indivating if the supplied Mapping is
+*     appropriate for simplification.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Non-zero if the supplied Mapping is not appropriate for
+*     simplification, and zero otherwise.
+
+*  Notes:
+*     - A value of 0 will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+
+*/
+
+/* Unlike basic Mappings, Frames that have a set value for the Ident
+   can be simplified. So always return zero. */
+   return 0;
 }
 
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
@@ -5925,6 +5977,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    mapping->ReportPoints = ReportPoints;
    mapping->Transform = Transform;
    mapping->MapSplit = MapSplit;
+   mapping->DoNotSimplify = DoNotSimplify;
 
 /* Declare the copy constructor, destructor and class dump
    function. */
