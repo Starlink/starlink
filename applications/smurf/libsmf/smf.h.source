@@ -587,7 +587,8 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
 
 void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
                         AstFrameSet *outfset, int moving, int *lbnd_out,
-                        int *ubnd_out, int flags, int *status );
+                        int *ubnd_out, fts2Port fts_port, int flags,
+                        int *status );
 
 double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
                        int *status );
@@ -782,7 +783,8 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *keymap, const smfGroup *i
                           const smfArray *flatramps, AstKeyMap * heateffmap,
                           size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
-                          int *lbnd_out, int *ubnd_out, dim_t padStart,
+                          int *lbnd_out, int *ubnd_out, fts2Port fts_port,
+                          dim_t padStart,
                           dim_t padEnd, int flags, smfArray **concat,
                           smfData **first, int *status );
 
@@ -838,7 +840,8 @@ void smf_convert_bad( ThrWorkForce * wf, smfData *data, int *status );
 void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
                      dim_t itime_hi, AstSkyFrame *abskyfrm,
                      AstMapping *oskymap, int moving, int olbnd[ 2 ],
-                     int oubnd[ 2 ], int *lut, double *angle, double *lon,
+                     int oubnd[ 2 ], fts2Port fts_port, int *lut,
+                     double *angle, double *lon,
                      double *lat, int *status );
 
 void smf_copytime( struct timeval *target, struct timeval *source,
@@ -1396,7 +1399,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      AstKeyMap *keymap,
                      const smfArray *darks, const smfArray *bbms,
                      const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
-                     int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
+                     int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
                      double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
                      char data_units[], double * nboloeff,
@@ -1495,7 +1498,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        AstKeyMap * heateffmap, const smfArray *noisemaps,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
                        AstFrameSet *outfset, int moving,
-                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
+                       int *lbnd_out, int *ubnd_out, fts2Port fts_port,
+                       smfGroup **mgroup,
                        smfArray **mdata, AstKeyMap *keymap, int *status );
 
 void smf_model_createHdr( smfData *model, smf_modeltype type,

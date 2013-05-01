@@ -1645,7 +1645,8 @@ void smurf_makemap( int *status ) {
       /* Call the low-level iterative map-maker */
       smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
                       flagrootgrp, samprootgrp, keymap, NULL, bbms, flatramps,
-                      heateffmap, outfset, moving, lbnd_out, ubnd_out, maxmem-mapmem,
+                      heateffmap, outfset, moving, lbnd_out, ubnd_out,
+                      fts_port, maxmem-mapmem,
                       map, hitsmap, exp_time, variance, mapqual, weights, data_units,
                       &nboloeff, &ncontchunks, &ninsmp, &ncnvg, status );
 

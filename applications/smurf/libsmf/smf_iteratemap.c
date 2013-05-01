@@ -20,7 +20,7 @@
 *                    AstKeyMap *akeymap,
 *                    const smfArray * darks, const smfArray *bbms,
 *                    const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
-*                    int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
+*                    int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
 *                    double *map, int *hitsmap, double *exp_time,
 *                    double *mapvar, smf_qual_t *mapqual, double *weights,
 *                    char data_units[], double *nboloeff,
@@ -69,6 +69,8 @@
 *     ubnd_out = int* (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *        (if outfset specified)
+*     fts_port = fts2Port (Given)
+*        FTS-2 port.
 *     maxmem = size_t (Given)
 *        Maximum memory that me be used by smf_iteratemap (bytes)
 *     map = double* (Returned)
@@ -501,7 +503,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      AstKeyMap *akeymap,
                      const smfArray *darks, const smfArray *bbms,
                      const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
-                     int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
+                     int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
                      double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
                      char data_units[], double * nboloeff,
@@ -1302,7 +1304,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Concatenate (no variance since we calculate it ourselves -- NOI) */
       smf_concat_smfGroup( wf, keymap, igroup, darks, bbms, flatramps, heateffmap,
                            contchunk, ensureflat, 0, outfset, moving,
-                           lbnd_out, ubnd_out, pad, pad,
+                           lbnd_out, ubnd_out, fts_port, pad, pad,
                            SMF__NOCREATE_VARIANCE, &res[0], NULL, status );
 
       /* Assign each time slice to a scan angle bin */
@@ -1381,7 +1383,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          the concatenation stage. */
 
       smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
-                        NULL, 1, SMF__QUA, 0, NULL, 0, NULL, NULL, NULL, qua,
+                        NULL, 1, SMF__QUA, 0, NULL, 0, NULL, NULL, NO_FTS,
+                        NULL, qua,
                         keymap, status );
 
       /* Associate quality with the res model, and do cleaning before we
@@ -1403,7 +1406,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          the LUT model and then free it */
 
       smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
-                        NULL, 1, SMF__LUT, 0, NULL, 0, NULL, NULL, NULL, lut,
+                        NULL, 1, SMF__LUT, 0, NULL, 0, NULL, NULL, NO_FTS,
+                        NULL, lut,
                         keymap, status );
 
       if( *status == SAI__OK ) {
@@ -1422,7 +1426,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( haveext ) {
         smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                           noisemaps, 1, modeltyps[whichext], 0, NULL, 0, NULL,
-                          NULL, NULL, model[whichext], keymap, status);
+                          NULL, NO_FTS, NULL, model[whichext], keymap, status);
       }
 
       /*** TIMER ***/
@@ -1614,7 +1618,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( (modeltyps[imodel] != SMF__LUT) && (modeltyps[imodel] != SMF__EXT) ) {
           smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                             noisemaps, 1, modeltyps[imodel], 0, NULL, 0, NULL, NULL,
-                            NULL, model[imodel], keymap, status );
+                            NO_FTS, NULL, model[imodel], keymap, status );
         }
 
         /* Associate quality with some models */

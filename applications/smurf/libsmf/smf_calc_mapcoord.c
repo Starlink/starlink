@@ -16,7 +16,8 @@
 *  Invocation:
 *     smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
 *                        AstFrameSet *outfset, int moving, int *lbnd_out,
-*                        int *ubnd_out, int flags, int *status );
+*                        int *ubnd_out, fts2Port fts_port, int flags,
+*                        int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -36,6 +37,8 @@
 *        2-element array pixel coord. for the lower bounds of the output map
 *     ubnd_out = double* (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
+*     fts_port = fts2Port (Given)
+*        FTS-2 port.
 *     flags = int (Given)
 *        If set to SMF__NOCREATE_FILE don't attempt to write extension
 *        to file.
@@ -170,6 +173,7 @@ typedef struct smfCalcMapcoordData {
   int tstep;
   double *lat_ptr;
   double *lon_ptr;
+  fts2Port fts_port;
 } smfCalcMapcoordData;
 
 /* Function to be executed in thread: coordinates for blocks of tslices*/
@@ -179,6 +183,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status );
 void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   AstSkyFrame *abskyfrm=NULL;
   smfData *data=NULL;
+  fts2Port fts_port;
   int *lbnd_out=NULL;
   int *lut=NULL;
   int moving;
@@ -212,6 +217,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   moving = pdata->moving;
   sky2map = pdata->sky2map;
   ubnd_out = pdata->ubnd_out;
+  fts_port = pdata->fts_port;
 
   smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, status );
 
@@ -241,7 +247,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
      moving targets, but a faster algorithm can be used for stationary
      targets. */
   smf_coords_lut( data, pdata->tstep, pdata->t1, pdata->t2,
-                  abskyfrm, sky2map, moving, lbnd_out, ubnd_out,
+                  abskyfrm, sky2map, moving, lbnd_out, ubnd_out, fts_port,
                   lut + pdata->t1*nbolo, theta + pdata->t1,
                   pdata->lon_ptr, pdata->lat_ptr, status );
 
@@ -263,7 +269,8 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
 
 void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
                         AstFrameSet *outfset, int moving, int *lbnd_out,
-                        int *ubnd_out, int flags, int *status ) {
+                        int *ubnd_out, fts2Port fts_port, int flags,
+                        int *status ) {
 
   /* Local Variables */
 
@@ -563,6 +570,7 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
           pdata->tstep = tstep;
           pdata->lat_ptr = lat_ptr;
           pdata->lon_ptr = lon_ptr;
+          pdata->fts_port = fts_port;
 
           /* Make deep copies of AST objects and unlock them so that each
              thread can then lock them for their own exclusive use */

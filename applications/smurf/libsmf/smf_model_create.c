@@ -19,7 +19,8 @@
 *                       AstKeyMap * heateffmap, const smfArray *noisemaps,
 *                       dim_t nchunks, smf_modeltype mtype, int isTordered,
 *                       AstFrameSet *outfset, int moving, int *lbnd_out,
-*                       int *ubnd_out, smfGroup **mgroup, smfArray **mdata,
+*                       int *ubnd_out, fts2Port fts_port, smfGroup **mgroup,
+*                       smfArray **mdata,
 *                       AstKeyMap *keymap, int *status )
 
 *  Arguments:
@@ -62,6 +63,8 @@
 *     ubnd_out = double* (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *        (if outfset specified)
+*     fts_port = fts2Port (Given)
+*        FTS-2 port.
 *     mgroup = smfGroup ** (Returned)
 *        Pointer to smfGroup pointer that will contain model file names
 *     mdata = smfArray ** (Given and Returned)
@@ -271,7 +274,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        AstKeyMap * heateffmap, const smfArray *noisemaps,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
                        AstFrameSet *outfset, int moving,
-                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
+                       int *lbnd_out, int *ubnd_out, fts2Port fts_port,
+                       smfGroup **mgroup,
                        smfArray **mdata, AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
@@ -495,7 +499,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
             if( mtype == SMF__LUT ) {
               smf_calc_mapcoord( wf, keymap, idata, outfset, moving, lbnd_out,
-                                 ubnd_out, SMF__NOCREATE_FILE, status );
+                                 ubnd_out, fts_port, SMF__NOCREATE_FILE,
+                                 status );
             }
 
           }

@@ -17,7 +17,8 @@
 *     void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 *                          dim_t itime_hi, AstSkyFrame *abskyfrm,
 *                          AstMapping *oskymap, int moving, int olbnd[ 2 ],
-*                          int oubnd[ 2 ], int *lut, double *angle,
+*                          int oubnd[ 2 ], fts2Port fts_port, int *lut,
+*                          double *angle,
 *                          double *lon, double *lat, int *status );
 
 *  Arguments:
@@ -49,6 +50,8 @@
 *        The lower pixel index bounds of the output map.
 *     oubnd[ 2 ] = int (Given)
 *        The upper pixel index bounds of the output map.
+*     fts_port = fts2Port (Given)
+*        FTS-2 port.
 *     lut = int * (Returned)
 *        Point to array in which to store the 1-d vector index within the
 *        output map, of every bolometer sample in the supplied time slice
@@ -142,7 +145,8 @@
 void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
                      dim_t itime_hi, AstSkyFrame *abskyfrm,
                      AstMapping *oskymap, int moving, int olbnd[ 2 ],
-                     int oubnd[ 2 ], int *lut, double *angle,
+                     int oubnd[ 2 ], fts2Port fts_port, int *lut,
+                     double *angle,
                      double *lon, double *lat, int *status ) {
 
 /* Local Variables */
@@ -365,7 +369,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 /* Calculate the full bolometer to map-pixel transformation for the current
    time slice */
          fullmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving,
-                                     NO_FTS, status );
+                                     fts_port, status );
 
 /* If succesful, use it to transform every bolometer position from bolo
    GRID coords to output map GRID coords. */

@@ -19,7 +19,8 @@
  *                          AstKeyMap * heateffmap, size_t whichchunk,
  *                          int ensureflat, int isTordered,
  *                          AstFrameSet *outfset, int moving, int *lbnd_out,
- *                          int *ubnd_out, dim_t req_padStart,
+ *                          int *ubnd_out, fts2Port fts_port,
+ *                          dim_t req_padStart,
  *                          dim_t req_padEnd, int flags, smfArray **concat,
  *                          smfData **first, int *status )
 
@@ -62,6 +63,8 @@
  *     ubnd_out = double* (Given)
  *        2-element array pixel coord. for the upper bounds of the output map
  *        (if outfset specified)
+ *     fts_port = fts2Port (Given)
+ *        FTS-2 port.
  *     req_padStart = dim_t (Given)
  *        Pad start of concatenated array with this many samples. Will have no
  *        effect if the data have been padded previously.
@@ -92,8 +95,8 @@
  *     contiguous piece of memory for each subarray, and optionally
  *     re-orders the data to bolo-ordered rather than time-ordered if
  *     desired. If a pointing LUT is to be calculated as data is being
- *     loaded, specify outfset, moving, lbnd_out and ubnd_out. Otherwise
- *     set outfset to NULL.
+ *     loaded, specify outfset, moving, lbnd_out, ubnd_out and fts_port.
+ *     Otherwise set outfset to NULL.
  *
  *     In the case of 4D FFT data, no concatenation is performed. Each input
  *     file (subarray) at the given "whichchunk" is propagated as-is to concat.
@@ -288,7 +291,8 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
                           const smfArray *flatramps, AstKeyMap *heateffmap,
                           size_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
-                          int *lbnd_out, int *ubnd_out, dim_t req_padStart,
+                          int *lbnd_out, int *ubnd_out, fts2Port fts_port,
+                          dim_t req_padStart,
                           dim_t req_padEnd, int flags, smfArray **concat,
                           smfData **first, int *status ) {
 
@@ -711,7 +715,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
              performed by the workforce (e.g. opening the next file) do
              not cause the call to block.  */
           smf_calc_mapcoord( wf, config, refdata, outfset, moving, lbnd_out,
-                             ubnd_out, SMF__NOCREATE_FILE, status );
+                             ubnd_out, fts_port, SMF__NOCREATE_FILE, status );
         } else {
           havelut = 0;
         }
