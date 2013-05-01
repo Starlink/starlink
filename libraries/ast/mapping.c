@@ -348,9 +348,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     29-APR-2013 (DSB):
 *        No sot simplify Mappings that have a set value for their Ident
 *        attribute. If an Ident value has been set then it means that we
-*        should be trying to preserve the identify of the Mapping. This 
-*        is implemented via a new protected method (astDoNotSimplify) which 
-*        is overridden by the Frame class so that this restriction applies 
+*        should be trying to preserve the identify of the Mapping. This
+*        is implemented via a new protected method (astDoNotSimplify) which
+*        is overridden by the Frame class so that this restriction applies
 *        only to genuine Mappings, not Frames.
 *class--
 */
@@ -1026,7 +1026,7 @@ static int DoNotSimplify( AstMapping *this, int *status ) {
    if( !astOK ) return 0;
 
 /* Mappings that have a set value for the Ident attribute should not be
-   simplified since we want to preserve their individual identify (otherwise 
+   simplified since we want to preserve their individual identify (otherwise
    why would the user have given them an Ident value?). */
    return astTestIdent( this );
 }
@@ -8986,6 +8986,9 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2,
          }
       }
    }
+
+/* Free resources */
+   RateFun( NULL, NULL, -2, 0, 0, NULL, NULL, status );
 
 /* Return the result. */
    return ret;

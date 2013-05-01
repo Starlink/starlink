@@ -13,8 +13,13 @@
       status = sai__ok
 
       call ast_begin( status )
+
+c      call ast_watchmemory(22617)
+
       oc = ast_tune( 'ObjectCaching', 1, status )
       mc = ast_tune( 'MemoryCaching', 1, status )
+
+
 
 *  A 2D input grid has 2 rows and 101 columns. Each row contains a spectrum.
 *  The two spectra cover overlaping regions of wavelength. The spectrum in
@@ -564,6 +569,7 @@
       oc = ast_tune( 'ObjectCaching', oc, status )
       call ast_end( status )
 
+      call ast_activememory( 'testswitchmap' )
       call ast_flushmemory( 1 )
 
       if( status .eq. sai__ok ) then
