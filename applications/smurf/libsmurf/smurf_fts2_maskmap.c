@@ -24,6 +24,10 @@
 *     with FTS-2 in the beam.
 
 *  ADAM Parameters:
+*     FTSPORT = _CHAR (Read)
+*          The FTS-2 port to use in calculating the mapping to sky
+*          coordinates. This parameter should be "tracking" or
+*          "image". [TRACKING]
 *     IN = NDF (Read)
 *          A group of existing time series data cubes.
 *     OUT = NDF (Write)
@@ -118,6 +122,8 @@ void smurf_fts2_maskmap(int* status) {
    double* pd = NULL;         /* Pointer to next element */
    int32_t* pi = NULL;        /* Pointer to element (INTEGER) */
    int flag;                  /* Was the group expression flagged? */
+   fts2Port fts_port;
+   char fts_port_name[10];
    size_t ifile;              /* Input file index */
    int indfin;                /* Input template cube NDF identifier */
    int indfout;               /* Output cube NDF identifier */
@@ -150,6 +156,21 @@ void smurf_fts2_maskmap(int* status) {
 /* Get output file(s) */
    kpg1Wgndf("OUT", igrp, size, size, "More output files required...",
              &ogrp, &outsize, status);
+
+/* Determine FTS-2 port. */
+    parChoic("FTSPORT", "", "TRACKING,IMAGE", 0, fts_port_name, 10, status);
+    if (*status == PAR__NULL) {
+        errAnnul(status);
+        fts_port = NO_FTS;
+    }
+    else {
+        if (! strcmp("TRACKING", fts_port_name)) {
+            fts_port = FTS_TRACKING;
+        }
+        else {
+            fts_port = FTS_IMAGE;
+        }
+    }
 
 /* Loop round all the template time series files. */
    for (ifile = 0; ifile < size && *status == SAI__OK; ifile ++) {
@@ -224,7 +245,7 @@ void smurf_fts2_maskmap(int* status) {
           /* Limit coordinate conversions to only certain timeslices
            * to avoid excess computation. */
           if (! (i % 25)) {
-            smf_tslice_ast(odata, i, 1, NO_FTS, status);
+            smf_tslice_ast(odata, i, 1, fts_port, status);
             if (*status != SAI__OK) {
               break;
             }
