@@ -1438,8 +1438,12 @@ f     AST_SIMPLIFY
                astClone( frameset->frame[ ifr - 1 ] );
             this->node[ this->nframe + ifr - 1 ] =
                frameset->node[ ifr - 1 ] + this->nnode;
-            this->varfrm[ this->nframe + ifr - 1 ] =
-               frameset->varfrm[ ifr - 1 ] + this->nframe;
+            if( frameset->varfrm[ ifr - 1 ] > 0 ) {
+               this->varfrm[ this->nframe + ifr - 1 ] =
+                  frameset->varfrm[ ifr - 1 ] + this->nframe;
+            } else {
+               this->varfrm[ this->nframe + ifr - 1 ] = 0;
+            }
          }
 
 /* Similarly, transfer the new node data, cloning each Mapping
