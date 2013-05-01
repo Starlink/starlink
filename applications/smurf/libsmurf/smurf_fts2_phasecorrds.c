@@ -78,10 +78,12 @@
 *       Added Phase Correction Function debug output
 *     2013-04-12 (MSHERWOOD)
 *       Correct wave number trimming
+*     2013-04-12 (MSHERWOOD)
+*       Added digital filtering to interferogram prior to phase correction
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
-*     Copyright (C) 2010 University of Lethbridge. All Rights Reserved.
+*     Copyright (C) 2010, 2013 University of Lethbridge. All Rights Reserved.
 
 *  License:
 *     This program is free software; you can redistribute it and/or
@@ -134,6 +136,12 @@
 #define FUNC_NAME "smurf_fts2_phasecorrds"
 #define TASK_NAME "FTS2PHASECORRDS"
 
+#define IFG_PEAK_THRESHOLD          1.0           /* Maximum offset of IFG peak from ZPD in OPD cm */
+#define WAVE_NUMBER_RANGE           5             /* The range of interest of wave numbers */
+#define PHASE_ROLLOVER_THRESHOLD    1.0           /* 1 radian */
+#define FWHM                        8.0           /* Full Width at Half Maximum (standard Gaussian measure) */
+#define KERNEL_LENGTH               1/FWHM        /* Area to trim from both ends of IFG in OPD cm: 1/FWHM */
+
 #ifndef DEBUG
 #define DEBUG 0
 #endif
@@ -149,6 +157,10 @@ void smurf_fts2_phasecorrds(int* status)
   smfData* outData          = NULL;               /* Pointer to output data */
   double* outData_pntr      = NULL;               /* Pointer to output data values array */
 #if DEBUG
+  smfData* outDataIFGDFR    = NULL;               /* Pointer to output data Interferogram Digitally Filtered Real DEBUG */
+  double* outDataIFGDFR_pntr= NULL;               /* Pointer to output data Interferogram Digitally Filtered Real values array */
+  smfData* outDataIFGDFI    = NULL;               /* Pointer to output data Interferogram Digitally Filtered Imaginary DEBUG */
+  double* outDataIFGDFI_pntr= NULL;               /* Pointer to output data Interferogram Digitally Filtered Imaginary values array */
   smfData* outDataSR        = NULL;               /* Pointer to output data Spectrum Real DEBUG */
   double* outDataSR_pntr    = NULL;               /* Pointer to output data Spectrum Real values array */
   smfData* outDataSI        = NULL;               /* Pointer to output data Spectrum Imaginary DEBUG */
@@ -172,7 +184,7 @@ void smurf_fts2_phasecorrds(int* status)
   smfData* outDataWT        = NULL;               /* Pointer to output data Weights DEBUG */
   double* outDataWT_pntr    = NULL;               /* Pointer to output data Weights values array */
 #endif
-  smfData* zpdData          = NULL;               /* Pointer to ZPD data */
+  /*smfData* zpdData          = NULL;*/               /* Pointer to ZPD data */
   smfData* zpd              = NULL;               /* Pointer to ZPD index data */
   smfData* fpm              = NULL;               /* Pointer polynomial fit parameters */
   smfData* sigma            = NULL;
@@ -184,23 +196,31 @@ void smurf_fts2_phasecorrds(int* status)
   double wnLower            = 0.0;                /* Lower bound of wave number range */
   double wnUpper            = 0.0;                /* Upper bound of wave number range */
   double fNyquist           = 0.0;                /* Nyquist frequency */
+  double dz                 = 0.0;               /* Step size in evenly spaced OPD grid */
   double CLIP               = 0.0;                /* Clipping param for the polynomial fit */
   double maxWeight          = NUM__MIND;          /* Max weighting factor */
   double* IFG               = NULL;               /* Interferogram */
   double* DS                = NULL;               /* Double-Sided interferogram */
   double* PHASE             = NULL;               /* Phase */
+#if DEBUG
   double* PHASES            = NULL;               /* DEBUG Phase Saved */
+#endif
   double* WN                = NULL;               /* Wavenumbers */
   double* WEIGHTS           = NULL;               /* Weighting factors */
   double* FIT               = NULL;               /* Fitted phase */
+#if DEBUG
   double* FITS              = NULL;               /* DEBUG Fitted phase Saved */
+#endif
   double* COEFFS            = NULL;               /* Polynomial coefficients */
   double* TMPPHASE          = NULL;               /* Temporary phase */
   fftw_complex* DSIN        = NULL;               /* Double-Sided interferogram, FFT input */
   fftw_complex* DSOUT       = NULL;               /* Double-Sided interferogram, FFT output */
+  fftw_complex* IFGDF       = NULL;               /* Interferogram, Digitally Filtered */
   fftw_complex* PCF         = NULL;               /* Phase Correction Function */
   fftw_complex* SPEC        = NULL;               /* Spectrum */
+#if DEBUG
   fftw_complex* SPECS       = NULL;               /* DEBUG Spectrum Saved */
+#endif
   fftw_plan planA           = NULL;               /* fftw plan */
   fftw_plan planB           = NULL;               /* fftw plan */
 
@@ -214,7 +234,7 @@ void smurf_fts2_phasecorrds(int* status)
   size_t nPixels            = 0;                  /* Number of bolometers in the subarray */
   size_t wnL                = 0;
   size_t wnU                = 0;
-  double wnTrim             = 5.0;                /* Trim the first wnTrim wave numbers (zero Real part of spectrum) */
+  double wnTrim             = WAVE_NUMBER_RANGE;  /* Trim the first wnTrim wave numbers (zero Real part of spectrum) */
 
   double dSigma             = 0;
   double sum                = 0;
@@ -228,7 +248,13 @@ void smurf_fts2_phasecorrds(int* status)
   int W                     = 1;
 
   char fileName[SMF_PATH_MAX+1];                /* DEBUG */
-  int n                        = 0;
+  int n                     = 0;
+
+  /* DF: Digital Filter */
+  double peakIFG            = 0.0;              /* Value of interferogram peak */
+  int peakIFGIndex          = 0;                /* Index of interferogram peak */
+  double phaseDiff          = 0.0;              /* Difference of phase between consecutive values */
+  double phaseRollover      = 0.0;              /* Phase rollover accumulator */
 
   /* Get Input & Output groups */
   kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
@@ -261,7 +287,7 @@ void smurf_fts2_phasecorrds(int* status)
       errRep( FUNC_NAME, "The file is NOT initialized for FTS2 data reduction!", status);
       goto CLEANUP;
     }
-    zpdData = inData->fts->zpd;
+    /*zpdData = inData->fts->zpd;*/
 
     /* Read in the Nyquist frequency from FITS component */
     smf_fits_getD(inData->hdr, "FNYQUIST", &fNyquist, status);
@@ -269,6 +295,14 @@ void smurf_fts2_phasecorrds(int* status)
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to find the Nyquist frequency in FITS component!", status);
       goto CLEANUP;
+    }
+
+    /* Read in the evenly spaced OPD step size from FITS component */
+    smf_fits_getD(inData->hdr, "OPDSTEP", &dz, status);
+    if(*status != SAI__OK) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Unable to find the OPDSTEP size in FITS component!", status);
+        goto CLEANUP;
     }
 
     /* Data cube dimensions */
@@ -280,7 +314,7 @@ void smurf_fts2_phasecorrds(int* status)
     wnL = (size_t) (nFrames2 * wnLower / fNyquist);
     wnU = (size_t) (nFrames2 * wnUpper / fNyquist);
 
-    dSigma   = fNyquist / nFrames2;      /* Spectral sampling interval */
+    dSigma = fNyquist / nFrames2;      /* Spectral sampling interval */
 
     /* Copy input data into output data */
     outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
@@ -294,6 +328,26 @@ void smurf_fts2_phasecorrds(int* status)
 
     /* DEBUG: Process default or alternative output type */
 #if DEBUG
+    /* Copy input data into output data Interferogram Digitally Filtered Real DEBUG */
+    outDataIFGDFR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+    outDataIFGDFR->dtype   = SMF__DOUBLE;
+    outDataIFGDFR->ndims   = 3;
+    outDataIFGDFR->dims[0] = nWidth;
+    outDataIFGDFR->dims[1] = nHeight;
+    outDataIFGDFR->dims[2] = nFrames;
+    outDataIFGDFR_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataIFGDFR_pntr));
+    outDataIFGDFR->pntr[0] = outDataIFGDFR_pntr;
+
+    /* Copy input data into output data Interferogram Digitally Filtered Imaginary DEBUG */
+    outDataIFGDFI = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+    outDataIFGDFI->dtype   = SMF__DOUBLE;
+    outDataIFGDFI->ndims   = 3;
+    outDataIFGDFI->dims[0] = nWidth;
+    outDataIFGDFI->dims[1] = nHeight;
+    outDataIFGDFI->dims[2] = nFrames;
+    outDataIFGDFI_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataIFGDFI_pntr));
+    outDataIFGDFI->pntr[0] = outDataIFGDFI_pntr;
+
     /* Copy input data into output data Spectrum Real DEBUG */
     outDataSR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
     outDataSR->dtype   = SMF__DOUBLE;
@@ -417,18 +471,25 @@ void smurf_fts2_phasecorrds(int* status)
     IFG     = astCalloc(nFrames, sizeof(*IFG));
     DS      = astCalloc(nFrames, sizeof(*DS));
     PHASE   = astCalloc(nFrames, sizeof(*PHASE));
+#if DEBUG
     PHASES  = astCalloc(nFrames, sizeof(*PHASE));    /* DEBUG PHASE Saved */
+#endif
     COEFFS  = astCalloc(coeffLength, sizeof(*COEFFS));
     WN      = astCalloc((nFrames2 + 1), sizeof(*WN));
     WEIGHTS = astCalloc((nFrames2 + 1), sizeof(*WEIGHTS));
     FIT     = astCalloc((nFrames2 + 1), sizeof(*FIT));
+#if DEBUG
     FITS    = astCalloc((nFrames2 + 1), sizeof(*FITS));
+#endif
     TMPPHASE= astCalloc((nFrames2 + 1), sizeof(*TMPPHASE));
     DSIN    = fftw_malloc(nFrames * sizeof(*DSIN));
     DSOUT   = fftw_malloc(nFrames * sizeof(*DSOUT));
+    IFGDF   = fftw_malloc(nFrames * sizeof(*IFGDF));
     PCF     = fftw_malloc(nFrames * sizeof(*PCF));
     SPEC    = fftw_malloc(nFrames * sizeof(*SPEC));
+#if DEBUG
     SPECS   = fftw_malloc(nFrames * sizeof(*SPECS));
+#endif
 
     /* Apply phase correction to interferograms at each pixel */
     for(i = 0; i < nWidth; i++) {
@@ -436,14 +497,18 @@ void smurf_fts2_phasecorrds(int* status)
         bolIndex = i + j * nWidth;
 
         /* Get ZPD index */
-        indexZPD = *((int*)(zpdData->pntr[0]) + bolIndex);
+        /*indexZPD = *((int*)(zpdData->pntr[0]) + bolIndex);*/
+        /* The IFG is now supposed to be centered on its evenly spaced grid */
+        indexZPD = nFrames2;
 
         /* Check if the interferogram is inverted */
         W = 1;    /* (*((double*) (inData->pntr[0]) + (bolIndex + nPixels * indexZPD)) < 0.0) ? -1 : 1; */
 
         badPixel = 0;
+        peakIFGIndex = 0;
+        peakIFG = 0.0;
         /* Read in the interferogram, invert if flipped */
-        for(k = 0; k < nFrames; k++) {
+        for(k=0; k < nFrames; k++) {
           IFG[k] = W * (*((double*) (inData->pntr[0]) + (bolIndex + nPixels * k)));
 
           /* See if this is a bad pixel */
@@ -452,23 +517,26 @@ void smurf_fts2_phasecorrds(int* status)
             break;
           }
         }
+
         /* If this is a bad pixel, go to next */
         if(badPixel) {
           for(k = 0; k < nFrames; k++) {
             index = bolIndex + k * nPixels;
             outData_pntr[index] = VAL__BADD;
 #if DEBUG
-                    outDataSR_pntr[index] = VAL__BADD;    /* DEBUG */
-                    outDataSI_pntr[index] = VAL__BADD;    /* DEBUG */
-                    outDataSRC_pntr[index] = VAL__BADD;   /* DEBUG */
-                    outDataSIC_pntr[index] = VAL__BADD;   /* DEBUG */
-                    outDataSP_pntr[index] = VAL__BADD;    /* DEBUG */
+                    outDataIFGDFR_pntr[index] = VAL__BADD;  /* DEBUG */
+                    outDataIFGDFI_pntr[index] = VAL__BADD;  /* DEBUG */
+                    outDataSR_pntr[index] = VAL__BADD;      /* DEBUG */
+                    outDataSI_pntr[index] = VAL__BADD;      /* DEBUG */
+                    outDataSRC_pntr[index] = VAL__BADD;     /* DEBUG */
+                    outDataSIC_pntr[index] = VAL__BADD;     /* DEBUG */
+                    outDataSP_pntr[index] = VAL__BADD;      /* DEBUG */
                     outDataPCFR_pntr[index] = VAL__BADD;    /* DEBUG */
                     outDataPCFI_pntr[index] = VAL__BADD;    /* DEBUG */
                     if(k < nFrames2) {
-                        outDataSPF_pntr[index] = VAL__BADD;    /* DEBUG */
-                        outDataWN_pntr[index] = VAL__BADD;    /* DEBUG */
-                        outDataWT_pntr[index] = VAL__BADD;    /* DEBUG */
+                        outDataSPF_pntr[index] = VAL__BADD; /* DEBUG */
+                        outDataWN_pntr[index] = VAL__BADD;  /* DEBUG */
+                        outDataWT_pntr[index] = VAL__BADD;  /* DEBUG */
                     }
 #endif
           }
@@ -476,6 +544,7 @@ void smurf_fts2_phasecorrds(int* status)
         }
 
         /* Shift the left half of the interferogram to the end of the right half */
+        /* i.e.,  --/\--  ->  \----/  */
         for(k = indexZPD; k < nFrames; k++) { DS[k - indexZPD] = IFG[k]; }
         for(k = 0; k < indexZPD; k++)       { DS[nFrames - indexZPD + k] = IFG[k]; }
 
@@ -489,9 +558,98 @@ void smurf_fts2_phasecorrds(int* status)
         /* Compute wavenumbers within [0, FNYQ] */
         for(k = 0; k <= nFrames2; k++) { WN[k] = k * dSigma; }
 
+        /* DF: Trim (zero out) the first wnTrim wavenumbers of the spectrum (on both ends)
+        for(k = 0; k <= wnTrim/dSigma; k++) {
+            DSOUT[k][0] = 0.0;
+            DSOUT[k][1] = 0.0;
+            DSOUT[k+1][0] = 0.0;             Maintain an odd number of adjustments
+            DSOUT[k+1][1] = 0.0;
+            DSOUT[nFrames-1-k][0] = 0.0;
+            DSOUT[nFrames-1-k][1] = 0.0;
+        }*/
+
+        /* DF: Apodize spectrum */
+        for(k = 0; k <= nFrames2; k++) {
+            DSOUT[k][0] = DSOUT[k][0] * (1 - exp( -(WN[k] * WN[k]) / (0.36 * FWHM * FWHM) ));
+            DSOUT[k][1] = DSOUT[k][1] * (1 - exp( -(WN[k] * WN[k]) / (0.36 * FWHM * FWHM) ));
+        }
+        for(k=nFrames-1; k > nFrames2; k--) {
+            DSOUT[k][0] = DSOUT[k][0] * (1 - exp( -(WN[nFrames-k] * WN[nFrames-k]) / (0.36 * FWHM * FWHM) ));
+            DSOUT[k][1] = DSOUT[k][1] * (1 - exp( -(WN[nFrames-k] * WN[nFrames-k]) / (0.36 * FWHM * FWHM) ));
+        }
+
+        /* DF: Inverse FFT spectrum to get the back interferogram */
+        planB = fftw_plan_dft_1d(nFrames, DSOUT, IFGDF, FFTW_BACKWARD, FFTW_ESTIMATE);
+        fftw_execute(planB);
+
+        /* DF: Normalize the reverse FFT interferogram back to original scale */
+        for(k=0; k<nFrames; k++) {
+            IFGDF[k][0] /= nFrames;
+            IFGDF[k][1] /= nFrames;
+        }
+
+        /* DF: Zero out kernel length area from both ends of IFG from the middle now, since it was shifted! */
+        for(k = 0; k*dSigma <= KERNEL_LENGTH; k++) {
+            IFGDF[nFrames2+k][0] = 0.0;
+            IFGDF[nFrames2+k][1] = 0.0;
+            IFGDF[nFrames2-1-k][0] = 0.0;
+            IFGDF[nFrames2-1-k][1] = 0.0;
+        }
+
+        /* DF: If index of IFG peak is more than IFG_PEAK_TRESHOLD from ZPD, flag as problematic */
+        for(k=0; k<nFrames; k++) {
+            /* DF: Track IFG peak index */
+            if(peakIFG < fabs(IFGDF[k][0])) {
+                peakIFG = fabs(IFGDF[k][0]);
+                peakIFGIndex = k;
+            }
+        }
+        /* DF: TODO: Save problem flagged pixels to a bolometer mask array */
+        /* DF: TODO: Make peak test more robust so as to handle noisy data better */
+        if(!badPixel && abs(indexZPD - peakIFGIndex) * dz > IFG_PEAK_THRESHOLD){  /* TODO: use dSigma instead of dz? */
+            /*badPixel = 1;*/
+            /*printf("%s DEBUG: Flagging bad pixel[%d,%d] having peak: %f at index %d too far (%f cm) from ZPD index: %d\n",
+                   TASK_NAME, i, j, peakIFG, peakIFGIndex, (abs(indexZPD - peakIFGIndex) * dz), indexZPD);*/
+        } else if(!badPixel) {
+            /*printf("%s DEBUG: Leaving good pixel[%d,%d] having peak: %f at index %d this far (%f cm) from ZPD index: %d\n",
+                   TASK_NAME, i, j, peakIFG, peakIFGIndex, (abs(indexZPD - peakIFGIndex) * dz), indexZPD);*/
+        }
+
+        /* FFT interferogram */
+        planA = fftw_plan_dft_1d(nFrames, IFGDF, DSOUT, FFTW_FORWARD, FFTW_ESTIMATE);
+        fftw_execute(planA);
+
         /* Compute phase */
-        for(k = 0; k < nFrames; k++) { PHASE[k] = atan2(DSOUT[k][1], DSOUT[k][0]);
+        phaseDiff = 0.0;
+        phaseRollover = 0.0;
+        for(k = 0; k < nFrames; k++) {
+          PHASE[k] = atan2(DSOUT[k][1], DSOUT[k][0]);
+
+          /* Fix any phase rollover in the band... */
+          /* If consecutive phase values in the band differ by more than PHASE_ROLLOVER_THRESHOLD (in radians)
+             then subtract the discontinuity to maintain the slope from that point forward in the band        */
+          if(k*dSigma >= wnLower && k*dSigma <= wnUpper) {
+              phaseDiff = PHASE[k]-PHASE[k-1];
+              if(fabs(phaseDiff) > PHASE_ROLLOVER_THRESHOLD) {
+              /*printf("%s DEBUG: Pixel [%d,%d] Phase Rollover Detected at %f cm: PHASE[%d] (%f) - PHASE[%d] (%f) = %f \n",
+                       TASK_NAME, i, j, k*dSigma, k, PHASE[k], k-1, PHASE[k-1], PHASE[k]-PHASE[k-1]); */
+                if(phaseDiff > 0) {
+                    phaseRollover = -M_PI * 2;
+                } else {
+                    phaseRollover =  M_PI * 2;
+                }
+                PHASE[k] += phaseRollover;
+                /*printf("%s DEBUG: Pixel [%d,%d] Phase Rollover Corrected at %f cm: PHASE[%d] (%f) - PHASE[%d] (%f) = %f \n",
+                       TASK_NAME, i, j, k*dSigma, k, PHASE[k], k-1, PHASE[k-1], PHASE[k]-PHASE[k-1]);*/
+              } else {
+                  /*printf("%s DEBUG: Pixel [%d,%d] at %f cm: PHASE[%d] (%f) - PHASE[%d] (%f) = %f \n",
+                         TASK_NAME, i, j, k*dSigma, k, PHASE[k], k-1, PHASE[k-1], PHASE[k]-PHASE[k-1]);*/
+              }
+          }
+
+#if DEBUG
           PHASES[k] = PHASE[k];    /* DEBUG */
+#endif
         }
 
         /* Compute weighting factors [0, FNYQ] */
@@ -510,10 +668,14 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Polynomial fit to phase */
         for(k = 0; k <= nFrames2; k++) { TMPPHASE[k] = PHASE[k]; }
-        smf_fit_poly1d(pDegree, nFrames2 + 1, CLIP, WN, TMPPHASE, WEIGHTS, NULL, COEFFS, NULL, FIT, &nUsed, status);
+        smf_fit_poly1d(pDegree, nFrames2, CLIP, WN, TMPPHASE, WEIGHTS, NULL, COEFFS, NULL, FIT, &nUsed, status);
         /* printf("%s DEBUG: smf_fit_poly1d: pDegree=%d, nelem=%d, CLIP=%f, COEFFS[0]=%f, COEFFS[1]=%f, i=%d, j=%d\n",
                TASK_NAME, pDegree, (nFrames2+1), CLIP, COEFFS[0], COEFFS[1], i, j); */
+#if DEBUG
         for(k = 0; k <= nFrames2; k++) { FITS[k] = FIT[k]; }    /* DEBUG */
+#endif
+
+        /* TODO: If the error on the fit is beyond certain thresholds, flag the pixel as problematic... */
 
         /* Update MORE.FTS2.SIGMA values */
         sum   = 0.0;
@@ -543,21 +705,12 @@ void smurf_fts2_phasecorrds(int* status)
         for(k = 0; k < nFrames; k++) {
           SPEC[k][0] = DSOUT[k][0] * PCF[k][0] - DSOUT[k][1] * PCF[k][1];
           /* We should just zero out the imaginary part of the spectrum since all that is left there is noise */
-          /*SPEC[k][1] = DSOUT[k][0] * PCF[k][1] + DSOUT[k][1] * PCF[k][0]; */
-           SPEC[k][1] = 0.0;    /* Debug */
+          /*SPEC[k][1] = DSOUT[k][0] * PCF[k][1] + DSOUT[k][1] * PCF[k][0];*/
+          SPEC[k][1] = 0.0;    /* Debug */
+#if DEBUG
           SPECS[k][0] = SPEC[k][0];    /* Debug */
           SPECS[k][1] = SPEC[k][1];    /* Debug */
-        }
-
-        /* Trim (zero out) the first wnTrim wavenumbers of the real part of the spectrum (on both ends) */
-        for(k = 0; k <= wnTrim/dSigma; k++) {
-            SPEC[k][0] = 0.0;
-            SPEC[k+1][0] = 0.0;            /* Maintain an odd number of adjustments */
-            SPEC[nFrames-1-k][0] = 0.0;
-            /* DEBUG: */
-            SPECS[k][0] = 0.0;
-            SPECS[k+1][0] = 0.0;            /* Maintain an odd number of adjustments */
-            SPECS[nFrames-1-k][0] = 0.0;
+#endif
         }
 
         /* Inverse FFT spectrum to get the phase corrected interferogram */
@@ -566,25 +719,28 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Phase corrected interferogram */
         M = indexZPD;
-        for(k = 0; k < M; k++) { IFG[k] = SPEC[nFrames - M + k][0]; }
-        for(k = M; k < nFrames; k++) { IFG[k] = SPEC[k - M][0]; }
+        /* Adjust for an even number of points by shifting data to the left by one position */
+        for(k = 0; k < M-1; k++) { IFG[k] = SPEC[M+k+1][0]; }
+        for(k = M-1; k < nFrames; k++) { IFG[k] = SPEC[k+1-M][0]; }
 
         /* Update output */
         for(k = 0; k < nFrames; k++) {
           index = bolIndex + nPixels * k;
           outData_pntr[index] = IFG[k] / nFrames;
 #if DEBUG
-          outDataSR_pntr[index] = DSOUT[k][0] / nFrames;    /* DEBUG */
-          outDataSI_pntr[index] = DSOUT[k][1] / nFrames;    /* DEBUG */
-          outDataSRC_pntr[index] = SPECS[k][0] / nFrames;   /* DEBUG */
-          outDataSIC_pntr[index] = SPECS[k][1] / nFrames;   /* DEBUG */
-          outDataSP_pntr[index] = PHASES[k];                /* DEBUG */
-          outDataPCFR_pntr[index] = PCF[k][0];              /* DEBUG */
-          outDataPCFI_pntr[index] = PCF[k][1];              /* DEBUG */
+          outDataIFGDFR_pntr[index] = IFGDF[k][0] / nFrames;    /* DEBUG */
+          outDataIFGDFI_pntr[index] = IFGDF[k][1] / nFrames;    /* DEBUG */
+          outDataSR_pntr[index] = DSOUT[k][0] / nFrames;        /* DEBUG */
+          outDataSI_pntr[index] = DSOUT[k][1] / nFrames;        /* DEBUG */
+          outDataSRC_pntr[index] = SPECS[k][0] / nFrames;       /* DEBUG */
+          outDataSIC_pntr[index] = SPECS[k][1] / nFrames;       /* DEBUG */
+          outDataSP_pntr[index] = PHASES[k];                    /* DEBUG */
+          outDataPCFR_pntr[index] = PCF[k][0];                  /* DEBUG */
+          outDataPCFI_pntr[index] = PCF[k][1];                  /* DEBUG */
           if(k < nFrames2) {
-             outDataSPF_pntr[index] = FITS[k];              /* DEBUG */
-             outDataWN_pntr[index] = WN[k];                 /* DEBUG */
-             outDataWT_pntr[index] = WEIGHTS[k];            /* DEBUG */
+             outDataSPF_pntr[index] = FITS[k];                  /* DEBUG */
+             outDataWN_pntr[index] = WN[k];                     /* DEBUG */
+             outDataWT_pntr[index] = WEIGHTS[k];                /* DEBUG */
           }
 #endif
         }
@@ -595,18 +751,25 @@ void smurf_fts2_phasecorrds(int* status)
     if(IFG)      { IFG      = astFree(IFG); }
     if(DS)       { DS       = astFree(DS); }
     if(PHASE)    { PHASE    = astFree(PHASE); }
+#if DEBUG
     if(PHASES)   { PHASES   = astFree(PHASES); }    /* DEBUG PHASE Saved */
+#endif
     if(COEFFS)   { COEFFS   = astFree(COEFFS); }
     if(TMPPHASE) { TMPPHASE = astFree(TMPPHASE); }
     if(WN)       { WN       = astFree(WN); }
     if(WEIGHTS)  { WEIGHTS  = astFree(WEIGHTS); }
     if(FIT)      { FIT      = astFree(FIT); }
+#if DEBUG
     if(FITS)     { FITS     = astFree(FITS); }
+#endif
     if(DSIN)     { fftw_free(DSIN);           DSIN      = NULL; }
     if(DSOUT)    { fftw_free(DSOUT);          DSOUT     = NULL; }
+    if(IFGDF)    { fftw_free(IFGDF);          IFGDF     = NULL; }
     if(PCF)      { fftw_free(PCF);            PCF       = NULL; }
     if(SPEC)     { fftw_free(SPEC);           SPEC      = NULL; }
-    if(SPECS)    { fftw_free(SPECS);         SPECS      = NULL; }
+#if DEBUG
+    if(SPECS)    { fftw_free(SPECS);          SPECS     = NULL; }
+#endif
 
     /* Create a temporary base file name from input file name - DEBUG */
     one_strlcpy(fileName, inData->file->name,
@@ -623,6 +786,42 @@ void smurf_fts2_phasecorrds(int* status)
     }
 
 #if DEBUG
+    /* Write output Interferogram Digitally Filtered Real DEBUG */
+    /* Append unique suffix to fileName */
+    n = one_snprintf(outDataIFGDFR->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "IFGDFR");
+    if(n < 0 || n >= SMF_PATH_MAX) {
+        errRepf(TASK_NAME, "Error creating outDataIFGDFR->file->name", status);
+        goto CLEANUP;
+    }
+    smf_write_smfData(outDataIFGDFR, NULL, outDataIFGDFR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+    if(*status != SAI__OK) {
+        errRepf(TASK_NAME, "Error writing outDataIFGDFR file", status);
+        goto CLEANUP;
+    }
+    smf_close_file(&outDataIFGDFR, status);
+    if(*status != SAI__OK) {
+        errRepf(TASK_NAME, "Error closing outDataIFGDFR file", status);
+        goto CLEANUP;
+    }
+
+    /* Write output Interferogram Digitally Filtered Imaginary DEBUG */
+    /* Append unique suffix to fileName */
+    n = one_snprintf(outDataIFGDFI->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "IFGDFI");
+    if(n < 0 || n >= SMF_PATH_MAX) {
+        errRepf(TASK_NAME, "Error creating outDataIFGDFI->file->name", status);
+        goto CLEANUP;
+    }
+    smf_write_smfData(outDataIFGDFI, NULL, outDataIFGDFI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+    if(*status != SAI__OK) {
+        errRepf(TASK_NAME, "Error writing outDataIFGDFI file", status);
+        goto CLEANUP;
+    }
+    smf_close_file(&outDataIFGDFI, status);
+    if(*status != SAI__OK) {
+        errRepf(TASK_NAME, "Error closing outDataIFGDFI file", status);
+        goto CLEANUP;
+    }
+
     /* Write output Spectrum Real DEBUG */
     /* Append unique suffix to fileName */
     n = one_snprintf(outDataSR->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SR");
@@ -659,7 +858,7 @@ void smurf_fts2_phasecorrds(int* status)
         goto CLEANUP;
     }
 
-    /* Write output Spectrum Real DEBUG */
+    /* Write output Spectrum Real Phase Corrected DEBUG */
     /* Append unique suffix to fileName */
     n = one_snprintf(outDataSRC->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SRC");
     if(n < 0 || n >= SMF_PATH_MAX) {
@@ -678,7 +877,7 @@ void smurf_fts2_phasecorrds(int* status)
         goto CLEANUP;
     }
 
-    /* Write output Spectrum Imaginary DEBUG */
+    /* Write output Spectrum Imaginary Phase Corrected DEBUG */
     /* Append unique suffix to fileName */
     n = one_snprintf(outDataSIC->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SIC");
     if(n < 0 || n >= SMF_PATH_MAX) {
@@ -830,18 +1029,25 @@ void smurf_fts2_phasecorrds(int* status)
   if(IFG)      { IFG      = astFree(IFG); }
   if(DS)       { DS       = astFree(DS); }
   if(PHASE)    { PHASE    = astFree(PHASE); }
+#if DEBUG
   if(PHASES)   { PHASES   = astFree(PHASES); }    /* DEBUG PHASE Saved */
+#endif
   if(COEFFS)   { COEFFS   = astFree(COEFFS); }
   if(TMPPHASE) { TMPPHASE = astFree(TMPPHASE); }
   if(WN)       { WN       = astFree(WN); }
   if(WEIGHTS)  { WEIGHTS  = astFree(WEIGHTS); }
   if(FIT)      { FIT      = astFree(FIT); }
+#if DEBUG
   if(FITS)     { FITS     = astFree(FITS); }
+#endif
   if(DSIN)     { fftw_free(DSIN);   DSIN  = NULL; }
   if(DSOUT)    { fftw_free(DSOUT);  DSOUT = NULL; }
+  if(IFGDF)    { fftw_free(IFGDF);  IFGDF = NULL; }
   if(PCF)      { fftw_free(PCF);    PCF   = NULL; }
   if(SPEC)     { fftw_free(SPEC);   SPEC  = NULL; }
+#if DEBUG
   if(SPECS)    { fftw_free(SPECS);  SPECS = NULL; }
+#endif
 
   /* Close files if still open */
   if(inData) {
