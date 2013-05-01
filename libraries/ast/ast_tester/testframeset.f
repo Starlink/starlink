@@ -153,7 +153,7 @@ c      call ast_watchmemory(100)
 
       orig = ast_geti( fs, 'Current', status )
       call ast_addframe( fs, AST__CURRENT, AST_UNITMAP( 2, '', status ),
-     :                   AST_FRAME( 2, "Domain=DSB", status ) )
+     :                   AST_FRAME( 2, "Domain=DSB", status ), status )
       call ast_tran2( fs, 1, 50.5D0, 100.5D0, .TRUE., xout, yout,
      :                status )
       if( abs( xout - 150.0D0 ) .gt. 1.0E-6 .OR.
