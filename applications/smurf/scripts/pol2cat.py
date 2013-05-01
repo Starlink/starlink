@@ -51,8 +51,8 @@
 
 *  Usage:
 *     pol2cat in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
-*             [config] [device] [retain] [qui] [msg_filter] [ilevel] [glevel]
-*             [logfile]
+*             [config] [device] [retain] [qui] [hits] [msg_filter] [ilevel]
+*             [glevel] [logfile]
 
 *  Parameters:
 *     CAT = LITERAL (Read)
@@ -180,6 +180,10 @@
 *        single container file, with path given by QUI. So for instance if
 *        QUI is set to "stokes.sdf", the Q, U and I images can be accessed
 *        as "stokes.q", "stokes.u" and "stokes.i". [!]
+*     HITS = NDF (Read)
+*        If a value is supplied for HITS, a 2D NDF is created holding the
+*        number of grid stare positions contributing to each pixel of the
+*        Q and U images. [!]
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
 *        created by this script be retained? If not, it will be deleted
@@ -318,6 +322,9 @@ try:
                                 "store the 2D Q, U and I images",
                                  default=None ))
 
+   params.append(starutil.ParNDG("HITS", "An output NDF holding the hits per pixel",
+                                 default=None, exists=False, minsize=0, maxsize=1 ))
+
    params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
                                 "and IP?", False, noprompt=True))
 
@@ -380,6 +387,9 @@ try:
 
 #  Now get the QUI value to use.
    qui = parsys["QUI"].value
+
+#  Now get the HITS value to use.
+   hitsmap = parsys["HITS"].value
 
 #  Get the output catalogue now to avoid a long wait before the user gets
 #  prompted for it.
@@ -765,6 +775,20 @@ try:
            "out={2} lbnd=!".format(umaps_all,ref,ualigned) )
    utotal = NDG( 1 )
    invoke( "$CCDPACK_DIR/makemos method=broad in={0} out={1}".format(ualigned,utotal) )
+
+#  Create the hits map if required.
+   if hitsmap:
+
+#  Fill the aligned Q maps with the value 1.0 at all good pixels
+      wone = NDG( qaligned )
+      invoke( "$KAPPA_DIR/maths exp='0*ia+1' ia={0} out={1}".format(qaligned,wone))
+
+#  Put them into a cube.
+      wcube = NDG( 1 )
+      invoke( "$KAPPA_DIR/paste in={0} shift=\[0,0,1\] out={1}".format(wone,wcube))
+
+#  Collapse the cube to get the sum at each pixel.
+      invoke( "$KAPPA_DIR/collapse in={0} out={1} axis=3 estimator=sum".format(wcube,hitsmap) )
 
 #  If no total intensity map was supplied, generate an artificial I image that
 #  is just equal to the polarised intensity image. This is needed because
