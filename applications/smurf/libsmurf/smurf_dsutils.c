@@ -589,7 +589,7 @@ void smurf_dsutils( int *status ) {
    rads) Mapping for the first sub array, and extract the PolyMap from it. */
       parGet0c( "SUBARRAY", subarray, 8, status );
       sc2ast_name2num( subarray, &subnum, status );
-      sc2ast_createwcs( subnum, NULL, NULL, NULL, &fp_fset, status );
+      sc2ast_createwcs( subnum, NULL, NULL, NULL, NO_FTS, &fp_fset, status );
       polymap = FindPolyMap( astGetMapping( fp_fset, AST__BASE, AST__CURRENT ),
                              status );
 
@@ -744,7 +744,7 @@ void smurf_dsutils( int *status ) {
 /* Create the GRID->FP FrameSet for the required subarray. */
       parGet0c( "SUBARRAY", subarray, 8, status );
       sc2ast_name2num( subarray, &subnum, status );
-      sc2ast_createwcs( subnum, NULL, NULL, NULL, &fp_fset, status );
+      sc2ast_createwcs( subnum, NULL, NULL, NULL, NO_FTS, &fp_fset, status );
 
 /* Calculate the focal plane positions at every bolometer. */
       nxy = ( ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1 );

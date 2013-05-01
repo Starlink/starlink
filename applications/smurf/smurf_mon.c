@@ -408,7 +408,7 @@ void smurf_mon( int * status ) {
   ndgEndgh( status );
 
   /* Clear cached info from sc2ast_createwcs. */
-  sc2ast_createwcs(SC2AST__NULLSUB, NULL, NULL, NULL, NULL, status);
+  sc2ast_createwcs(SC2AST__NULLSUB, NULL, NULL, NULL, NO_FTS, NULL, status);
 
   /* Free AST resources */
   astTune( "MemoryCaching", memory_caching );

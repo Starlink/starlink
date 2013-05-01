@@ -222,7 +222,7 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
         /* Need to get the subarray number */
         smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
         hdr->cache1 = sc2ast_createwcs2( subsysnum, tmpState, dut1, hdr->instap,
-                                         hdr->telpos, &(hdr->wcs),
+                                         hdr->telpos, NO_FTS, &(hdr->wcs),
                                          hdr->cache1, status );
       }
       break;

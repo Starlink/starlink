@@ -11,6 +11,7 @@ sc2ast_subarray_t subnum,  /* subarray number, 0-7 (given). If SC2AST__NULLSUB i
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 const double instap[2], /* Offset of subarray in the focal plane */
 const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
+const fts2Port fts_port,/* Whether to apply FTS-2 corrections */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
 );
@@ -25,6 +26,7 @@ const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 double dut1,            /* UT1-UTC (seconds) */
 const double instap[2], /* Offset of subarray in the focal plane */
 const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
+const fts2Port fts_port,/* Whether to apply FTS-2 corrections */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 sc2astCache *cache,     /* A pointer to a structure holding cached info */
 int *status             /* global status (given and returned) */

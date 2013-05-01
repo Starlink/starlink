@@ -273,7 +273,7 @@ void smf_close_file( smfData ** data, int * status ) {
     if (hdr->tswcs != NULL) hdr->tswcs = astAnnul( hdr->tswcs );
     if (hdr->fitshdr != NULL) hdr->fitshdr = astAnnul( hdr->fitshdr );
 
-    if( hdr->cache1 ) hdr->cache1 = sc2ast_createwcs2( SC2AST__NULLSUB, NULL, 0.0, NULL, NULL, NULL,
+    if( hdr->cache1 ) hdr->cache1 = sc2ast_createwcs2( SC2AST__NULLSUB, NULL, 0.0, NULL, NULL, NO_FTS, NULL,
                                                        hdr->cache1, status );
     if( hdr->cache2 ) hdr->cache2 = smf_create_lutwcs( 1, NULL, NULL, 0, NULL, 0.0, NULL,
                                                        NULL, NULL, hdr->cache2, status );

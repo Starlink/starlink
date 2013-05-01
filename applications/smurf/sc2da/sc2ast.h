@@ -105,6 +105,15 @@ typedef struct sc2astCache {
 
 } sc2astCache;
 
+/* An enum type to indicate whether the data were taken without FTS-2 in
+ * the beam, or if FTS-2 was present, which port should be selected. */
+
+typedef enum {
+    NO_FTS = 0,
+    FTS_TRACKING = 1,
+    FTS_IMAGE = -1
+} fts2Port;
+
 /* The function prototypes */
 #include "sc2ast_pro.h"
 

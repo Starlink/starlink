@@ -196,6 +196,7 @@ void smurf_fts2_spatialwcs(int* status)
                         outputData->hdr->state,
                         outputData->hdr->instap,
                         outputData->hdr->telpos,
+                        NO_FTS,
                         &gridfset,
                         status);
     }

@@ -186,7 +186,7 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
 
     /* Create output WCS. Should really extract it from the
        refdata WCS rather than attempting to reconstruct. */
-    sc2ast_createwcs( subnum, NULL, NULL, NULL, &wcs, status );
+    sc2ast_createwcs( subnum, NULL, NULL, NULL, NO_FTS, &wcs, status );
 
     /* and switch to BOLO frame which is best for bolometer analysis */
     kpg1Asffr( wcs, "BOLO", &frnum, status );

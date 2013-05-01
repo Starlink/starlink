@@ -1303,7 +1303,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               sc2ast_name2num( (sinx->subname)[k], &subnum, status );
 
               if( *status == SAI__OK ) {
-                sc2ast_createwcs(subnum, &state, instap, sinx->telpos, &fs,
+                sc2ast_createwcs(subnum, &state, instap, sinx->telpos, NO_FTS, &fs,
                                  status);
               }
 

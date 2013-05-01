@@ -4046,7 +4046,7 @@ AstFrameSet *sc2store_timeWcs
 
 /* Obtain a pointer to a frameset holding the 2D GRID Frame and a 2D Frame
    describing focal plane coordinates */
-   sc2ast_createwcs( subnum, NULL, NULL, NULL, &fset, status );
+   sc2ast_createwcs( subnum, NULL, NULL, NULL, NO_FTS, &fset, status );
 
 /* We are about to change the FrameSet, so take a deep copy. This is
    needed since the FrameSet returned by sc2ast_createwcs is held in a

@@ -249,7 +249,7 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
   smf_calc_telpos( NULL, "JCMT", telpos, status );
   instap[0] = 0;
   instap[1] = 0;
-  sc2ast_createwcs( subnum, &state, instap, telpos, &fset, status );
+  sc2ast_createwcs( subnum, &state, instap, telpos, NO_FTS, &fset, status );
 
   /* If we do an AzEl projection for each bolometer it is very nearly
      a tangent plane projection because we chose El=0 */

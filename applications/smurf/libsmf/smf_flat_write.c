@@ -263,7 +263,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   astBegin;
 
   /* Create frame for focal plane coordinates */
-  sc2ast_createwcs( subnum, NULL, NULL, NULL, &spacefset, status );
+  sc2ast_createwcs( subnum, NULL, NULL, NULL, NO_FTS, &spacefset, status );
 
   /* Copy it to make sure we do not mess with the cache */
   result = astCopy( spacefset );

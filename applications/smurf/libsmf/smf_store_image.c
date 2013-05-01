@@ -198,7 +198,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   /* Derive WCS */
   hdr = data->hdr;
   smf_find_subarray(hdr, NULL, 0, &subnum, status );
-  sc2ast_createwcs( subnum, hdr->state, hdr->instap, hdr->telpos, &wcs, status );
+  sc2ast_createwcs( subnum, hdr->state, hdr->instap, hdr->telpos, NO_FTS, &wcs, status );
 
   /* Shift the coord frame is either vxmin or vymin is non-zero */
   if ( vxmin != 0 || vymin != 0 ) {

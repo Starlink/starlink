@@ -207,7 +207,7 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
       if( ang_data ) {
          smf_find_subarray( data->hdr, NULL, 0, &subsysnum, status );
          sc2ast_createwcs( subsysnum, NULL, data->hdr->instap,
-                           data->hdr->telpos, &fset, status);
+                           data->hdr->telpos, NO_FTS, &fset, status);
          fpmap = astGetMapping( fset, AST__BASE, AST__CURRENT );
          fset = astAnnul( fset );
       }

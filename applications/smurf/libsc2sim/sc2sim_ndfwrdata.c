@@ -824,7 +824,7 @@ void sc2sim_ndfwrdata
       dims[SC2STORE__COL_INDEX] = inx->rowsize;
 
       /* Construct WCS FrameSet */
-      sc2ast_createwcs( subnum, &state, instap, sinx->telpos, &wcs, status );
+      sc2ast_createwcs( subnum, &state, instap, sinx->telpos, NO_FTS, &wcs, status );
 
       /* Set the SkyRef to the current AzEl position and then the
          coordinate system. Allow AST to work out the SkyRef in the

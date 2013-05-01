@@ -20,9 +20,6 @@
  */
 #define COLROW 1
 
-/* True while testing FTS-2 reduction. */
-#define FTS2KLUDGE 0
-
 /* The one-based index for each Frame within the cached FrameSet. Note,
    these values reflect on the order in which the Frames are added to the
    FrameSet. So if the order is changed, these values should be changed
@@ -57,6 +54,7 @@ sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 const double instap[2], /* Offset of subarray in the focal plane */
 const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
+const fts2Port fts_port,/* Whether to apply FTS-2 corrections */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
 )
@@ -147,8 +145,8 @@ int *status             /* global status (given and returned) */
 */
 {
    static sc2astCache *cache = NULL;
-   cache = sc2ast_createwcs2( subnum, state, 0.0, instap, telpos, fset,
-                              cache, status );
+   cache = sc2ast_createwcs2( subnum, state, 0.0, instap, telpos, fts_port,
+                              fset, cache, status );
 }
 
 
@@ -163,6 +161,7 @@ const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 double dut1,            /* UT1-UTC (seconds) */
 const double instap[2], /* Offset of subarray in the focal plane */
 const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
+const fts2Port fts_port,/* Whether to apply FTS-2 corrections */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 sc2astCache *cache,     /* A pointer to a structure holding cached info */
 int *status             /* global status (given and returned) */
@@ -354,8 +353,6 @@ int *status             /* global status (given and returned) */
    int nout;
    sc2astCache *result;
 
-#if FTS2KLUDGE
-   const char *fts_port;
    double fts_shift[] = {0, 0};
    AstMatrixMap* fts_flipmap;
    AstShiftMap* fts_shiftmap;
@@ -371,10 +368,6 @@ int *status             /* global status (given and returned) */
     * image -- i.e. this defines the FTS-2 mirroring
     * axis, assuming it is the same in all cases. */
    double fts_flip[4] = {-1, 0, 0, 1};
-
-   /* To be set to true if we are looking at the FTS-2's image port. */
-   int fts_mirror_image;
-#endif
 
 #if COLROW
    AstPermMap *permmap;
@@ -1510,22 +1503,17 @@ int *status             /* global status (given and returned) */
                                                           polymap, 1, " " );
       }
 
-#if FTS2KLUDGE
-      fts_port = getenv("SMURF_FTS_PORT");
-
       if (fts_port) {
          fts_flipmap = astMatrixMap(2, 2, 0, fts_flip, "");
 
-         if (! (strcmp(fts_port, "1") && strcmp(fts_port, "a") && strcmp(fts_port, "d"))) {
+         if ((subnum == S4A || subnum == S8D) != (fts_port == FTS_IMAGE)) {
             fts_shift[0] = - fts_port_1[0]; fts_shift[1] = - fts_port_1[1];
-            fts_mirror_image = subnum == S4B || subnum == S8C;
          }
          else {
             fts_shift[0] = - fts_port_2[0]; fts_shift[1] = - fts_port_2[1];
-            fts_mirror_image = subnum == S4A || subnum == S8D;
          }
 
-         if (fts_mirror_image) {
+         if (fts_port == FTS_IMAGE) {
             cache->map[subnum] = (AstMapping *) astCmpMap(cache->map[subnum], fts_flipmap, 1, " ");
          }
 
@@ -1537,7 +1525,6 @@ int *status             /* global status (given and returned) */
          astInvert( fts_shiftmap );
          cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], fts_shiftmap, 1, " " );
       }
-#endif
 
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
