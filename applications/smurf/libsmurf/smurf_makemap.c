@@ -146,6 +146,10 @@
 *          even if no output cube is created. Celestial axis values will
 *          be in units of radians.  The parameter is named to be
 *          consistent with KAPPA:NDFTRACE output.
+*     FTSPORT = _CHAR (Read)
+*          The FTS-2 port to use in calculating the mapping to sky
+*          coordinates, or null if FTS-2 was not in the beam.
+*          If set, this parameter should be "tracking" or "image". [!]
 *     IN = NDF (Read)
 *          Input file(s).
 *     LBND( 2 ) = _INTEGER (Read)
@@ -779,6 +783,8 @@ void smurf_makemap( int *status ) {
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int first;                 /* Is this the first input file? */
   smfArray *flatramps = NULL;/* Flatfield ramps */
+  fts2Port fts_port;         /* FTS-2 port */
+  char fts_port_name[10];    /* FTS-2 port name */
   int gotbadflat = 0;        /* Was one of the required flats bad? */
   AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   int *histogram = NULL;     /* Histogram for calculating exposure statistics */
@@ -998,6 +1004,20 @@ void smurf_makemap( int *status ) {
       keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
                            sub_instruments, 1, status );
       sub_instruments = astAnnul( sub_instruments );
+    }
+
+    parChoic("FTSPORT", "", "TRACKING,IMAGE", 0, fts_port_name, 10, status);
+    if (*status == PAR__NULL) {
+        errAnnul(status);
+        fts_port = NO_FTS;
+    }
+    else {
+        if (! strcmp("TRACKING", fts_port_name)) {
+            fts_port = FTS_TRACKING;
+        }
+        else {
+            fts_port = FTS_IMAGE;
+        }
     }
   }
 
