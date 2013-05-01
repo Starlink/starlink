@@ -5539,7 +5539,13 @@ static int GetVarFrm( AstFrameSet *this, int iframe, int *status ) {
    the mirrored Frame. Walk up the chain until we reach a Frame which is
    not a mirror for another Frame. */
    while( this->varfrm[ result - 1 ] > 0 ) {
-      result = this->varfrm[ result - 1 ];
+      if( this->varfrm[ result - 1 ] == result ) {
+         astError( AST__INTER, "GetVarFrm(FrameSet): FrameSet is corrupt "
+                   "(internal programming error).", status );
+         break;
+      } else {
+         result = this->varfrm[ result - 1 ];
+      }
    }
 
 /* Return the result. */
@@ -8161,6 +8167,12 @@ f     IFRAME argument to specify the base Frame or the current
 /* Ensure that the variant Mappings in the Frame being removed are not
    mirrored by any other Frames in the FrameSet. */
          RemoveMirrors( this, iframe, status );
+
+/* Any Frames that are mirroring variants in Frames higher than the
+   removed Frame need to have their mirror frame indicies decremented. */
+         for ( ifr = 1; ifr <= this->nframe; ifr++ ) {
+            if( this->varfrm[ ifr - 1 ] > iframe ) this->varfrm[ ifr - 1 ]--;
+         }
 
 /* Loop to move all subsequent Frame pointers down in the FrameSet's
    "frame" array to close the resulting gap. Also move the associated
@@ -12453,92 +12465,92 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size,
 
 /* Nframe. */
 /* ------- */
-   new->nframe = astReadInt( channel, "nframe", 1 );
-   if ( new->nframe < 0 ) new->nframe = 1;
+      new->nframe = astReadInt( channel, "nframe", 1 );
+      if ( new->nframe < 0 ) new->nframe = 1;
 
 /* Number of nodes. */
 /* ---------------- */
-   new->nnode = astReadInt( channel, "nnode", new->nframe );
-   if ( new->nnode < 1 ) new->nnode = 1;
+      new->nnode = astReadInt( channel, "nnode", new->nframe );
+      if ( new->nnode < 1 ) new->nnode = 1;
 
 /* Allocate memory to hold Frame and node information. */
-   new->frame = astMalloc( sizeof( AstFrame *) * (size_t) new->nframe );
-   new->node = astMalloc( sizeof( int ) * (size_t) new->nframe );
-   new->varfrm = astMalloc( sizeof( int ) * (size_t) new->nframe );
-   new->link = astMalloc( sizeof( int ) * (size_t) ( new->nnode - 1 ) );
-   new->invert = astMalloc( sizeof( int ) * (size_t) ( new->nnode - 1 ) );
-   new->map = astMalloc( sizeof( AstMapping * ) *
-                         (size_t) ( new->nnode - 1 ) );
+      new->frame = astMalloc( sizeof( AstFrame *) * (size_t) new->nframe );
+      new->node = astMalloc( sizeof( int ) * (size_t) new->nframe );
+      new->varfrm = astMalloc( sizeof( int ) * (size_t) new->nframe );
+      new->link = astMalloc( sizeof( int ) * (size_t) ( new->nnode - 1 ) );
+      new->invert = astMalloc( sizeof( int ) * (size_t) ( new->nnode - 1 ) );
+      new->map = astMalloc( sizeof( AstMapping * ) *
+                            (size_t) ( new->nnode - 1 ) );
 
 /* If an error occurs, ensure that all allocated memory is freed. */
-   if ( !astOK ) {
-      new->frame = astFree( new->frame );
-      new->node = astFree( new->node );
-      new->varfrm = astFree( new->varfrm );
-      new->link = astFree( new->link );
-      new->invert = astFree( new->invert );
-      new->map = astFree( new->map );
+      if ( !astOK ) {
+         new->frame = astFree( new->frame );
+         new->node = astFree( new->node );
+         new->varfrm = astFree( new->varfrm );
+         new->link = astFree( new->link );
+         new->invert = astFree( new->invert );
+         new->map = astFree( new->map );
 
 /* Otherwise, initialise the arrays which will hold Object pointers. */
-   } else {
-      for ( ifr = 1; ifr <= new->nframe; ifr++ ) {
-         new->frame[ ifr - 1 ] = NULL;
-      }
-      for ( inode = 1; inode < new->nnode; inode++ ) {
-         new->map[ inode - 1 ] = NULL;
-      }
+      } else {
+         for ( ifr = 1; ifr <= new->nframe; ifr++ ) {
+            new->frame[ ifr - 1 ] = NULL;
+         }
+         for ( inode = 1; inode < new->nnode; inode++ ) {
+            new->map[ inode - 1 ] = NULL;
+         }
 
 /* Read Frame data... */
-      for ( ifr = 1; ifr <= new->nframe; ifr++ ) {
+         for ( ifr = 1; ifr <= new->nframe; ifr++ ) {
 
 /* Frame objects. */
 /* -------------- */
 /* Create the required keyword and then read the Frame. */
-         (void) sprintf( key, "frm%d", ifr );
-         new->frame[ ifr - 1 ] = astReadObject( channel, key, NULL );
+            (void) sprintf( key, "frm%d", ifr );
+            new->frame[ ifr - 1 ] = astReadObject( channel, key, NULL );
 
 /* Node index for each Frame. */
 /* -------------------------- */
-         (void) sprintf( key, "nod%d", ifr );
-         new->node[ ifr - 1 ] = astReadInt( channel, key, ifr ) - 1;
+            (void) sprintf( key, "nod%d", ifr );
+            new->node[ ifr - 1 ] = astReadInt( channel, key, ifr ) - 1;
 
 /* Index of variants Frame. */
 /* ------------------------ */
-         (void) sprintf( key, "vfr%d", ifr );
-         new->varfrm[ ifr - 1 ] = astReadInt( channel, key, 0 );
-      }
+            (void) sprintf( key, "vfr%d", ifr );
+            new->varfrm[ ifr - 1 ] = astReadInt( channel, key, 0 );
+         }
 
 /* Read node data... */
-      for ( inode = 1; inode < new->nnode; inode++ ) {
+         for ( inode = 1; inode < new->nnode; inode++ ) {
 
 /* Links between nodes. */
 /* -------------------- */
-         (void) sprintf( key, "lnk%d", inode + 1 );
-         new->link[ inode - 1 ] = astReadInt( channel, key, 0 ) - 1;
+            (void) sprintf( key, "lnk%d", inode + 1 );
+            new->link[ inode - 1 ] = astReadInt( channel, key, 0 ) - 1;
 
 /* Inversion flags. */
 /* ---------------- */
-         (void) sprintf( key, "inv%d", inode + 1 );
-         new->invert[ inode - 1 ] = astReadInt( channel, key, 0 );
+            (void) sprintf( key, "inv%d", inode + 1 );
+            new->invert[ inode - 1 ] = astReadInt( channel, key, 0 );
 
 /* Mapping objects. */
 /* ---------------- */
-         (void) sprintf( key, "map%d", inode + 1 );
-         new->map[ inode - 1 ] = astReadObject( channel, key, NULL );
-      }
+            (void) sprintf( key, "map%d", inode + 1 );
+            new->map[ inode - 1 ] = astReadObject( channel, key, NULL );
+         }
 
 /* Read remaining data... */
 
 /* Base. */
 /* ----- */
-      new->base = astReadInt( channel, "base", -INT_MAX );
-      if ( new->base < 1 ) new->base = -INT_MAX;
+         new->base = astReadInt( channel, "base", -INT_MAX );
+         if ( new->base < 1 ) new->base = -INT_MAX;
 
 /* Current. */
 /* -------- */
-      new->current = astReadInt( channel, "currnt", -INT_MAX );
-      if ( new->base < 1 ) new->base = -INT_MAX;
-   }
+         new->current = astReadInt( channel, "currnt", -INT_MAX );
+         if ( new->base < 1 ) new->base = -INT_MAX;
+      }
 
 /* If an error occurred, clean up by deleting the new FrameSet. */
       if ( !astOK ) new = astDelete( new );
