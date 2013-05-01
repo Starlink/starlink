@@ -17,7 +17,8 @@
 *                   int index, int size, AstFrameSet *outfset, int spread,
 *                   const double params[], int moving, int genvar,
 *                   int *lbnd_out, int *ubnd_out, double *map, *variance,
-*                   double *weights, size_t *nused, int *status );
+*                   double *weights, size_t *nused, fts2Port fts_port,
+*                   int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -65,6 +66,8 @@
 *     nused = size_t * (Given and Returned)
 *        A pointer to a size_t that is updated to hold the total number
 *        of input samples that have been pasted into the output array so far.
+*     fts_port = fts2Port (Given)
+*        The FTS-2 port.
 *     status = int * (Given and Returned)
 *        Pointer to global status.
 
@@ -175,7 +178,8 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread,
                    const double params[], int moving, int genvar,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
-                   double *weights, size_t *nused, int *status ) {
+                   double *weights, size_t *nused, fts2Port fts_port,
+                   int *status ) {
 
 /* Local Variables */
    AstMapping *dummy = NULL;     /* A dummy Mapping */
@@ -284,6 +288,7 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
             pdata->variance = variance ? variance + nel*j : NULL;
             pdata->weights = weights + nelw*j;
             pdata->ijob = -1;
+            pdata->fts_port = fts_port;
          }
       }
 

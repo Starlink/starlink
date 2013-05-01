@@ -402,7 +402,7 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
 /* Calculate the full bolometer-grid to skymap-grid transformation for
    the current time slice. */
       fullmap = smf_rebin_totmap( data, itime, abskyfrm, sky2map, moving,
-                                  status );
+                                  NO_FTS, status );
 
 /* Skip if we did not get a mapping this time round */
       if (*status == SAI__OK && !fullmap) continue;

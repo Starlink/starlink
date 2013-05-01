@@ -246,7 +246,7 @@ void smurf_smurfcopy ( int * status ) {
       memcpy( (odata->pntr)[0], inptr + offset, nelem * dtypsz );
 
       /* World coordinates - note the 0 indexing relative to GRID */
-      smf_tslice_ast( data, slice-1, 1, status );
+      smf_tslice_ast( data, slice-1, 1, NO_FTS, status );
       ndfPtwcs( data->hdr->wcs, ofile->ndfid, status );
 
       /* Write the FITS header */

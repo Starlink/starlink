@@ -13,7 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_tslice_ast( smfData * data, dim_t index, int needwcs, int * status);
+*     smf_tslice_ast( smfData * data, dim_t index, int needwcs,
+*                    fts2Port fts_port, int * status);
 
 *  Arguments:
 *     data = smfData* (Given & Returned)
@@ -27,6 +28,8 @@
 *        a bad error is reported. Ignored for 2D data.
 *     needwcs = int (Given)
 *        Flag to indicate whether or not a WCS frameset is desired
+*     fts_port = fts2Port (Given)
+*        FTS-2 port.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -153,7 +156,8 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_tslice_ast"
 
-void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
+void smf_tslice_ast (smfData * data, dim_t index, int needwcs,
+                     fts2Port fts_port, int * status ) {
 
   smfHead *hdr;              /* Local copy of the header structure */
   dim_t ntslice;             /* Number of time-slices in data */
@@ -222,7 +226,7 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
         /* Need to get the subarray number */
         smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
         hdr->cache1 = sc2ast_createwcs2( subsysnum, tmpState, dut1, hdr->instap,
-                                         hdr->telpos, NO_FTS, &(hdr->wcs),
+                                         hdr->telpos, fts_port, &(hdr->wcs),
                                          hdr->cache1, status );
       }
       break;

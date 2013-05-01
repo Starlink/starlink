@@ -1566,7 +1566,7 @@ void smurf_dsutils( int *status ) {
    THE SMURF_NOPOLY environment variable should have been assigned a
    non-zero value before running this command in order to supress the
    usage of a polynomial distortion within sc2ast. */
-         smf_tslice_ast( data, itime, 1, status );
+         smf_tslice_ast( data, itime, 1, NO_FTS, status );
          swcsin = hdr->wcs;
 
 /* If the current Frame (the SkyFrame) currrently represents absolute
@@ -2137,7 +2137,7 @@ static int SaveBoloMapping( const char *param, smfData *data, int *status ){
 
 /* Get the WCS FrameSet describing the time slice. Current frame is AZEL
    at the epoch of the time slice. */
-      smf_tslice_ast( data, itime, 1, status );
+      smf_tslice_ast( data, itime, 1, NO_FTS, status );
       swcsin = data->hdr->wcs;
 
 /* If the skyref position is good, leave the loop early. */
@@ -2290,7 +2290,7 @@ static int SaveTimeSlice( const char *param1, const char *param2,
    }
 
 /* Get the WCS FrameSet describing the time slice, and store it in the NDF */
-   smf_tslice_ast( data, itime, 1, status );
+   smf_tslice_ast( data, itime, 1, NO_FTS, status );
    ndfPtwcs( data->hdr->wcs, indf, status );
 
 /* Annul the NDF. */
@@ -2792,7 +2792,7 @@ static int FindSlices( const char *pxbol, const char *pybol, const char *pradius
 
 /* Get the WCS FrameSet describing the time slice. Current frame is AZEL
    at the epoch of the time slice. */
-      smf_tslice_ast( data, itime, 1, status );
+      smf_tslice_ast( data, itime, 1, NO_FTS, status );
       swcsin = data->hdr->wcs;
 
 /* Ensure the current Frame is offsets from the reference point. */
@@ -2875,7 +2875,7 @@ static int ShowSlices( const char *param, smfData *data, int *status ) {
 
 /* Get the WCS FrameSet describing the time slice. Current frame is AZEL
    at the epoch of the time slice. */
-      smf_tslice_ast( data, itime, 1, status );
+      smf_tslice_ast( data, itime, 1, NO_FTS, status );
       swcsin = data->hdr->wcs;
 
 /* Ensure the current Frame is offsets from the reference point. */

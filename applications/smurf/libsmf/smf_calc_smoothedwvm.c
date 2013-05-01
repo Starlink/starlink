@@ -117,7 +117,7 @@
     SMFDATA = NULL;                                              \
     for (_ii=0; _ii<nrelated; _ii++) {                           \
       smfData *DATA = (ALLDATA->sdata)[_ii];                     \
-      smf_tslice_ast( DATA, INDEX, 0, status );                  \
+      smf_tslice_ast( DATA, INDEX, 0, NO_FTS, status );          \
       if ( DATA->hdr->state->ITEM != BADVAL ) {                  \
         SMFDATA = DATA;                                          \
         break;                                                   \
@@ -284,7 +284,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
             SELECT_DATA( thesedata, curdata, VAL__BADD, wvm_time, i );
           }
 
-          if (curdata) smf_tslice_ast( curdata, i, 0, status );
+          if (curdata) smf_tslice_ast( curdata, i, 0, NO_FTS, status );
 
           if ( !curdata || curdata->hdr->state->wvm_time == VAL__BADD ) {
             /* Try the other datas */
@@ -573,7 +573,7 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
       SELECT_DATA( thesedata, curdata, VAL__BADD, wvm_time, i );
     }
 
-    if (curdata) smf_tslice_ast( curdata, i, 0, status );
+    if (curdata) smf_tslice_ast( curdata, i, 0, NO_FTS, status );
 
     if ( !curdata || curdata->hdr->state->wvm_time == VAL__BADD ) {
       /* Try the other datas */

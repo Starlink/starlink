@@ -224,7 +224,7 @@ void smurf_fts2_maskmap(int* status) {
           /* Limit coordinate conversions to only certain timeslices
            * to avoid excess computation. */
           if (! (i % 25)) {
-            smf_tslice_ast(odata, i, 1, status);
+            smf_tslice_ast(odata, i, 1, NO_FTS, status);
             if (*status != SAI__OK) {
               break;
             }

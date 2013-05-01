@@ -241,7 +241,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
   }
 
   /* Construct the WCS for the first time slice in this file */
-  smf_tslice_ast( data, 1, 1, status);
+  smf_tslice_ast( data, 1, 1, NO_FTS, status);
 
   /* Retrieve header for later constructing output WCS */
   if( *status == SAI__OK) {

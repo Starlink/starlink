@@ -895,6 +895,7 @@ typedef struct smfRebinMapData {
   int ijob;
   double *bolovar;
   size_t nused;
+  fts2Port fts_port;
 } smfRebinMapData;
 
 /* Struct to facilitate sorting of data by time.

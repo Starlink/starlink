@@ -216,7 +216,7 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
    in the "smfHead" structure inside "data", and this is needed by
    subsequent functions. */
       totmap = smf_rebin_totmap( data, itime, abskyfrm, iskymap, moving,
-				 status );
+				 NO_FTS, status );
       if( !totmap ) {
          astEnd;
          break;

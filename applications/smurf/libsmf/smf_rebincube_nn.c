@@ -411,7 +411,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
    in the "smfHead" structure inside "data", and this is needed by
    subsequent functions. */
       totmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving,
-				 status );
+				 NO_FTS, status );
       if( !totmap ) {
          if( data->file ) {
             msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Cannot get "

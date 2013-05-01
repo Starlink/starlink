@@ -18,7 +18,7 @@
 *                   const AstFrameSet *refwcs,
 *                   int alignsys, int *lbnd_out, int *ubnd_out,
 *                   AstFrameSet **outframeset, int *moving, smfBox ** boxes,
-*                   int *status );
+*                   fts2Port fts_port, int *status );
 
 *  Arguments:
 *     fast = int (Given)
@@ -53,6 +53,8 @@
 *        of the spatial coverage of the corresponding input file, given as
 *        pixel indices within the output cube. The array should be freed
 *        using astFree when no longer needed.
+*     fts_port = fts2Port (Given)
+*        FTS-2 port.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -216,7 +218,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                     const AstFrameSet *spacerefwcs,
                     int alignsys, int *lbnd_out, int *ubnd_out,
                     AstFrameSet **outframeset, int *moving,
-                    smfBox ** boxes, int *status ) {
+                    smfBox ** boxes, fts2Port fts_port, int *status ) {
 
   /* Local Variables */
   AstSkyFrame *abskyframe = NULL; /* Output Absolute SkyFrame */
@@ -438,7 +440,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
         /* smf_tslice_ast only needs to get called once to set up framesets */
         if( hdr->wcs == NULL ) {
-          smf_tslice_ast( data, goodidx, 1, status);
+          smf_tslice_ast( data, goodidx, 1, fts_port, status);
         }
 
         /* Retrieve input SkyFrame */
@@ -471,7 +473,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
         /* smf_tslice_ast only needs to get called once to set up framesets */
         if( hdr->wcs == NULL ) {
-          smf_tslice_ast( data, goodidx, 1, status);
+          smf_tslice_ast( data, goodidx, 1, fts_port, status);
         }
 
         /* Retrieve input SkyFrame */
@@ -638,7 +640,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         }
         /* Calculate the bolo to map-pixel transformation for this tslice */
         bolo2map = smf_rebin_totmap( data, ts, abskyframe, oskymap,
-                                     *moving, status );
+                                     *moving, fts_port, status );
 
         if ( *status == SAI__OK ) {
           /* skip if we did not get a mapping this time round */

@@ -166,7 +166,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   seqend = seqstart + nsampcycle - 1;
 
   slice = (int)( (seqstart + seqend ) /2);
-  smf_tslice_ast( data, slice, 1, status);
+  smf_tslice_ast( data, slice, 1, NO_FTS, status);
 
   astBegin;
 

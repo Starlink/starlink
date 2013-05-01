@@ -618,7 +618,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame
    System may be any of the JCMT supported systems). The Epoch will be
    set to the epoch of the time slice. */
-         smf_tslice_ast( data, itime, 1, status );
+         smf_tslice_ast( data, itime, 1, NO_FTS, status );
          swcsin = hdr->wcs;
 
 /* Update the flag indicating if any OFF_EXPOSURE values are available in

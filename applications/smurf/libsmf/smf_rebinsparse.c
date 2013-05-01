@@ -429,7 +429,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame
    System may be any of the JCMT supported systems). The Epoch will be
    set to the epoch of the time slice. */
-      smf_tslice_ast( data, itime, 1, status );
+      smf_tslice_ast( data, itime, 1, NO_FTS, status );
       swcsin = hdr->wcs;
 
 /* Note the total exposure time (texp) for all the input spectra produced by

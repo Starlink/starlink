@@ -1038,7 +1038,8 @@ void smurf_makemap( int *status ) {
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
 
   smf_mapbounds( 1, igrp, size, system, spacerefwcs, alignsys,
-                 lbnd_out, ubnd_out, &outfset, &moving, &boxes, status );
+                 lbnd_out, ubnd_out, &outfset, &moving, &boxes, fts_port,
+                 status );
 
   msgBlank( status );
 
@@ -1360,7 +1361,7 @@ void smurf_makemap( int *status ) {
              data file.  */
           smf_rebinmap( wf, data, NULL, (first ? 1 : ifile), ilast, wcstile2d,
                         spread, params, moving, 1, tile->elbnd, tile->eubnd,
-                        map, variance, weights3d, &nused, status );
+                        map, variance, weights3d, &nused, fts_port, status );
           first = 0;
           blank = 0;
 

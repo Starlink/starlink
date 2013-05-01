@@ -365,7 +365,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 /* Calculate the full bolometer to map-pixel transformation for the current
    time slice */
          fullmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving,
-                                     status );
+                                     NO_FTS, status );
 
 /* If succesful, use it to transform every bolometer position from bolo
    GRID coords to output map GRID coords. */

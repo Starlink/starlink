@@ -310,7 +310,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
       for ( kk=0; kk<ndat; kk++) {
         data = (array->sdata)[kk];
         /* Build WCS and set to AzEl */
-        smf_tslice_ast( data, k, 1, status );
+        smf_tslice_ast( data, k, 1, NO_FTS, status );
         hdr = data->hdr;
         wcs = hdr->wcs;
         if (wcs != NULL) {

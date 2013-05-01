@@ -17,7 +17,7 @@
 *     AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
 *                                   AstSkyFrame *abskyfrm,
 *                                   AstMapping *oskymap, int moving,
-*                                   int *status );
+*                                   fts2Port fts_port, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -37,6 +37,8 @@
 *        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        output cube.
+*     fts_port = fts2Port (Given)
+*        FTS-2 port.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -115,7 +117,7 @@
 AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
 			      AstSkyFrame *abskyfrm,
 			      AstMapping *oskymap, int moving,
-			      int *status ){
+                              fts2Port fts_port, int *status ){
 
 /* Local Variables */
    AstFrame *sf1 = NULL;       /* Pointer to copy of input current Frame */
@@ -148,7 +150,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    in the bolometer array. The current Frame will be a SkyFrame (the SkyFrame
    System may be any of the JCMT supported systems). The Epoch will be set
    to the epoch of the time slice. */
-   smf_tslice_ast( data, itime, 1, status );
+   smf_tslice_ast( data, itime, 1, fts_port, status );
    swcsin = hdr->wcs;
    if (!swcsin) return NULL;
 

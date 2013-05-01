@@ -87,6 +87,7 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
    double *boldata = NULL;       /* Pointer to bolometer data */
    double *map;                  /* Pointer to output data array */
    double *bolovar;              /* Pointer to bolometer variance array */
+   fts2Port fts_port;            /* FTS-2 port */
    const double *params;         /* Pointer to array of spreading params */
    double *variance;             /* Pointer to output variance array */
    double *weights;              /* Pointer to output weights array */
@@ -121,6 +122,7 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
    variance = job_data->variance;
    weights = job_data->weights;
    nused = &(job_data->nused);
+   fts_port = job_data->fts_port;
 
 /* Initialise the number of input samples used. */
 
@@ -153,7 +155,7 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
 
 /* Calculate the bolometer to map-pixel transformation for this tslice */
       bolo2map = smf_rebin_totmap( data, islice, abskyfrm, sky2map, moving,
-                                   status );
+                                   fts_port, status );
       /* skip if we did not get a mapping this time round */
       if (*status == SAI__OK && !bolo2map) continue;
 

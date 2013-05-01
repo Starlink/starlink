@@ -715,7 +715,7 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
        time.  */
     thrMutexLock( &data_mutex, status );
     smf_lock_data( pdata->data, 1, status );
-    smf_tslice_ast( pdata->data, k, !quick, status );
+    smf_tslice_ast( pdata->data, k, !quick, NO_FTS, status );
 
     /* Copy the required bit of the header into thread-local storage. */
     if( *status == SAI__OK ) {
@@ -782,7 +782,7 @@ static void smf1_correct_extinction( void *job_data_ptr, int *status ) {
 
           thrMutexLock( &data_mutex, status );
           smf_lock_data( pdata->data, 1, status );
-          smf_tslice_ast( pdata->data, k, 1, status );
+          smf_tslice_ast( pdata->data, k, 1, NO_FTS, status );
           state_airmass = pdata->hdr->state->tcs_airmass;
           state_az_ac2 = pdata->hdr->state->tcs_az_ac2;
           if (pdata->hdr->wcs) state_wcs = astCopy( pdata->hdr->wcs );

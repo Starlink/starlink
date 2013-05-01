@@ -461,7 +461,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame
    System may be any of the JCMT supported systems). The Epoch will be
    set to the epoch of the time slice. */
-         smf_tslice_ast( data, itime, 1, status );
+         smf_tslice_ast( data, itime, 1, NO_FTS, status );
          swcsin = hdr->wcs;
 
 /* Get a pointer to the current WCS Frame in the input file. */

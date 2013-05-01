@@ -293,7 +293,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 /* Store the WCS frameSet in all NDFs. First get the FrameSet for the
    central time slice in the block, and set its current Frame to the
    tracking frame. */
-   smf_tslice_ast( data, ( block_start + block_end )/2, 1, status);
+   smf_tslice_ast( data, ( block_start + block_end )/2, 1, NO_FTS, status);
    astSetC( hdr->wcs, "System",
             sc2ast_convert_system( (data->hdr->allState)[0].tcs_tr_sys,
                                     status ) );

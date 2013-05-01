@@ -1445,7 +1445,8 @@ void smf_map_spikes( ThrWorkForce *wf, smfData *data, smfData *variance,
 void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                     const AstFrameSet * spacesrefwcs, int alignsys,
                     int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset,
-                    int *moving, smfBox ** boxes,int *status );
+                    int *moving, smfBox ** boxes, fts2Port fts_port,
+                    int *status );
 
 void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
                            int *lbnd_out, int *ubnd_out,
@@ -1629,7 +1630,7 @@ double smf_raw2current( smfHead *hdr, int *status );
 AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
                               AstSkyFrame *abskyfrm,
                               AstMapping *oskymap, int moving,
-                              int *status );
+                              fts2Port fts_port, int *status );
 
 void smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
                     int *ptime, int badmask, int is2d, AstSkyFrame *abskyfrm,
@@ -1715,7 +1716,8 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread,
                    const double params[], int moving, int genvar, int *lbnd_out,
                    int *ubnd_out, double *map, double *variance,
-                   double *weights, size_t *nused, int *status );
+                   double *weights, size_t *nused, fts2Port fts_port,
+                   int *status );
 
 void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut,
                     size_t tslice1, size_t tslice2, int trange,
@@ -1882,7 +1884,8 @@ void smf_timerinit( struct timeval *tv1, struct timeval *tv2, int *status);
 
 double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
 
-void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status );
+void smf_tslice_ast (smfData * data, dim_t index, int needwcs, fts2Port fts_port,
+                     int * status );
 
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double *qdata, double *udata, double *angdata,

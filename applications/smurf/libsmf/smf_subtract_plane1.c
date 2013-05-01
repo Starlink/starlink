@@ -311,7 +311,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
     /* If we need the astrometry... i.e. for a 1-D fit in elevation only */
     if ( needast ) {
       /* Update the header for the current timeslice */
-      smf_tslice_ast( data, k, 1, status ); /* We're never in quick mode here */
+      smf_tslice_ast( data, k, 1, NO_FTS, status ); /* We're never in quick mode here */
       /* Retrieve header info */
       hdr = data->hdr;
       /* Set coordinate frame to AzEl: first check current frame and store it */
@@ -363,7 +363,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
         ynew[i] = (xin[i] - 0.5) * cosalpha - (yin[i] - 0.5) * sinalpha;
       }
     } else {
-      smf_tslice_ast( data, k, 0, status );
+      smf_tslice_ast( data, k, 0, NO_FTS, status );
     }
 
     /* Offset into current data array */
