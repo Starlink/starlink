@@ -72,7 +72,7 @@ enum { ATL__MXDIM  = 7 };
 /* Public function prototypes */
 /* -------------------------- */
 AstLutMap *atlTablelutMap( AstTable *, const char *, int * );
-AstMapping *atlFindMap( AstMapping*, const char *ident, AstMapping **map1, AstMapping **map2, int *status );
+AstMapping *atlFindMap( AstMapping *, const char *i, AstMapping **, AstMapping **, int * );
 AstObject *atlReadFile( const char *, const char *, int * );
 AstRegion *atlMatchRegion( AstRegion *, AstFrame *, int * );
 AstTable *atlReadTable( const char *, int * );
