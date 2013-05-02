@@ -83,6 +83,10 @@
 *        starutil.NONE, starutil.CRITICAL, starutil.PROGRESS,
 *        starutil.ATASK or starutil.DEBUG) to the module variable
 *        starutil.glevel. ["ATASK"]
+*     HITS = NDF (Read)
+*        If a value is supplied for HITS, a 2D NDF is created holding the
+*        number of grid stare positions contributing to each pixel of the
+*        Q and U images. [!]
 *     ILEVEL = LITERAL (Read)
 *        Controls the level of information displayed on the screen by the
 *        script. It can take any of the following values (note, these values
@@ -137,6 +141,21 @@
 *        assign the new log file path to the module variable
 *        "starutil.logfile". Any old log file will be closed befopre the
 *        new one is opened. []
+*     MASK = NDF (Read)
+*        An optional NDF covering the same area of sky as the input data,
+*        and in which areas containing significant astronomical flux are
+*        set bad. This mask is used to define the regions that are to be
+*        omitted from the estimate of the sky background. Without a mask,
+*        it is common for there to be significant "bowling" around bright
+*        sources in the final background-subtracted Q and U images. Such a
+*        bowl turn into a bright "halo" in the polarised intensity image,
+*        with the vector orientations rotating through 90 degrees in the
+*        halo.
+*
+*        A suitable mask can often be formed by running pol2cat first
+*        without a mask, and then thresholding the resulting polarised
+*        intensity image. The thresholded image can then be used as the
+*        mask in a second run of pol2cat. [!]
 *     MAXLEN = _REAL (Read)
 *        The maximum length for the plotted vectors, in terms of the
 *        quantity specified by parameter PLOT. Only vectors below this
@@ -180,10 +199,6 @@
 *        single container file, with path given by QUI. So for instance if
 *        QUI is set to "stokes.sdf", the Q, U and I images can be accessed
 *        as "stokes.q", "stokes.u" and "stokes.i". [!]
-*     HITS = NDF (Read)
-*        If a value is supplied for HITS, a 2D NDF is created holding the
-*        number of grid stare positions contributing to each pixel of the
-*        Q and U images. [!]
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
 *        created by this script be retained? If not, it will be deleted
