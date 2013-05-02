@@ -803,7 +803,7 @@ try:
       invoke( "$KAPPA_DIR/paste in={0} shift=\[0,0,1\] out={1}".format(wone,wcube))
 
 #  Collapse the cube to get the sum at each pixel.
-      invoke( "$KAPPA_DIR/collapse in={0} out={1} axis=3 estimator=sum".format(wcube,hitsmap) )
+      invoke( "$KAPPA_DIR/collapse in={0} out={1} axis=3 wlim=0 estimator=sum".format(wcube,hitsmap) )
 
 #  If no total intensity map was supplied, generate an artificial I image that
 #  is just equal to the polarised intensity image. This is needed because
