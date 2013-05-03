@@ -23,7 +23,8 @@
 *     appl = const char * (Given)
 *        Name of "application" to check. Will only compare the
 *        application name against exactly the length of this supplied
-*        string. ie EXTINCTION and EXTINCTIONS will both match "EXTINCTION".
+*        string. ie stored history items called EXTINCTION and EXTINCTIONS
+*        will both match an "appl" value of "EXTINCTION".
 *     status = int* (Given and Returned)
 *        Pointer to global status. Will be bad on return if this smfData
 *        is not associated with a file.
@@ -38,9 +39,10 @@
 *     reference name are compared.
 
 *  Authors:
-*     Tim Jenness (JAC, Hawaii)
-*     Andy Gibb (UBC)
-*     Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     AGG: Andy Gibb (UBC)
+*     EC: Ed Chapin (UBC)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -52,6 +54,11 @@
 *        Remove refappl variable
 *     2008-03-25 (EC):
 *        Check for history pointer
+*     2013-05-03 (DSB):
+*        - Only check the the first "nc" characters, where "nc" is the
+*        length of "appl".
+*        - Guard against an error in astMapKey.
+*        - Clarify prologue docs.
 
 *  Notes:
 *     - Applications names are compared case sensitively. Uppercase
@@ -105,10 +112,11 @@
 #define FUNC_NAME "smf_history_check"
 
 int smf_history_check( const smfData* data, const char * appl, int *status) {
+  const char *key;     /* History item to check */
   int i = 0;           /* Loop counter */
   int nrec = 0;        /* Number of history records */
   int retval = 0;      /* Return value */
-
+  size_t nc;           /* Number of characters to compare */
 
   /* Check entry status */
   if (*status != SAI__OK) return retval;
@@ -127,12 +135,16 @@ int smf_history_check( const smfData* data, const char * appl, int *status) {
     return retval;
   }
 
+  /* Get the number of characters to compare. */
+  nc = strlen( appl );
+
   nrec = astMapSize( data->history );
   if ( nrec != 0 ) {
     for ( i=0; i<nrec; i++ ) {
       msgOutiff(MSG__DEBUG2, " ", "Checking history item '%s' for '%s'",
 		status, astMapKey( data->history, i ), appl);
-      if ( strcmp( astMapKey( data->history, i ), appl ) == 0 ) {
+      key = astMapKey( data->history, i );
+      if ( key && strncmp( key, appl, nc ) == 0 ) {
 	retval = 1;
 	break;
       }
