@@ -98,7 +98,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 */
 
 /* Local Variables: */
-   AstObject *obj;              /* Pointer to nested AST Object */
+   AstObject *obj = NULL;       /* Pointer to nested AST Object */
    char *oldsortby;             /* The old value of the KeyMap's SortBy attribute */
    char *text;                  /* Sum of concatenated strings */
    const char *key;             /* Key string for current entry in KeyMap */
@@ -208,6 +208,9 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
             text = astFree( text );
          }
       }
+
+      if( obj ) obj = astAnnul( obj );
+
    }
 
 /* If it was originally set, re-instate the old SortBy value in the KeyMap,
