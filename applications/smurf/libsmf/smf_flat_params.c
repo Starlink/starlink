@@ -308,6 +308,7 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
   if (outcols) *outcols = datacols;
 
  CLEANUP:
+  resmap = astAnnul( resmap );
   if (*status != SAI__OK) {
     if (resistance && *resistance) *resistance = astFree( *resistance );
     if (heateff && *heateff) smf_close_file( heateff, status );

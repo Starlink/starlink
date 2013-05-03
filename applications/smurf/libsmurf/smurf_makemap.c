@@ -1683,6 +1683,8 @@ void smurf_makemap( int *status ) {
       }
     }
 
+    if( astkmap ) astkmap = astAnnul( astkmap );
+
     /* Now that the map is created and all parameters have been accessed,
        history information and provenance can now be stored in the output.
        Loop over all input data files to setup provenance handling */

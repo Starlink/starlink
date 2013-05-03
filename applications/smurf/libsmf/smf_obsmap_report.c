@@ -123,6 +123,8 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
 
   if (*status != SAI__OK) return;
 
+  astBegin;
+
   /* Now report the details of the observations */
   nobj = astMapSize( objmap );
   nobs = astMapSize( obsmap );
@@ -295,6 +297,8 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
     }
 
   }
+
+  astEnd;
 
   return;
 }

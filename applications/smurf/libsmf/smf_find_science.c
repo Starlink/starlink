@@ -796,6 +796,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
         smf_close_related(&array, status );
         if (fflats) *fflats = NULL;
       }
+
+      if( flatmap ) flatmap = astAnnul( flatmap );
+
     }
   }
 
