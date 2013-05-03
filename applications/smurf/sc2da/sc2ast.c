@@ -8,6 +8,7 @@
 #include "prm_par.h"
 #include "mers.h"
 #include "ast.h"
+#include "star/atl.h"
 #include "ndf.h"
 #include "Ers.h"
 
@@ -19,6 +20,13 @@
    Remove COLROW once we have finished testing.
  */
 #define COLROW 1
+
+/* Prototypes for private functions defined in this file. */
+static void sc2ast_fts_second_port( AstFrameSet *fs, int subnum,
+                                    const fts2Port fts_port, int *status );
+static AstMapping *sc2ast_make_fts2_portmap( const fts2Port fts_port,
+                                             int invert, int subnum,
+                                             int *status );
 
 /* The one-based index for each Frame within the cached FrameSet. Note,
    these values reflect on the order in which the Frames are added to the
@@ -316,6 +324,19 @@ int *status             /* global status (given and returned) */
                  ZoomMap should implement the conversion from mm to radians
                  (i.e. it encapsulates a value to use in place of the MM2RAD
                  constant defined below). (DSB)
+     3May2013  : If FTS-2 is in the beam, return a FrameSet containing two variant
+                 Mappings for the FPLANE and SKY Frames - one for each FTS port.
+                 The variant mappings are labelled PORT1 and PORT2, and can be
+                 selected by setting the "Variant" attribute of the FrameSet to
+                 the name of the required variant (you need to make SKY or FPLANE
+                 the current Frame first). This has required a small change to the
+                 structure of the FrameSet - the SKY Frame is now derived from the
+                 FPLANE Frame, rather than the GRID Frame as before. This causes
+                 the mapping transformations to be applied in a different order. The
+                 old and new orders are mathematically equivalent, but produce
+                 different numerical rounding errors. Consequently some samples that
+                 are close to the edge of map pixels will move into adjacent pixels,
+                 resulting in some small changes to the resulting map.
 */
 {
 
@@ -332,6 +353,7 @@ int *status             /* global status (given and returned) */
    AstShiftMap *zshiftmap;
    AstZoomMap *radmap;
    AstZoomMap *zoommap;
+   AstZoomMap *zm;
    AstChannel *ch_custom = NULL;
    const char *cval;
    const char *distortion;
@@ -345,6 +367,8 @@ int *status             /* global status (given and returned) */
    double shift[2];
    double shifts[ 2 ];
    double zshift[2];
+   double cv;
+   double sv;
    int isub;
    int nc_f;
    int nc_i;
@@ -352,22 +376,6 @@ int *status             /* global status (given and returned) */
    int nin;
    int nout;
    sc2astCache *result;
-
-   double fts_shift[] = {0, 0};
-   AstMatrixMap* fts_flipmap;
-   AstShiftMap* fts_shiftmap;
-
-   /* Coordinates of the FTS-2 ports.  These coordinates
-    * should be subtracted before flipping / scaling the
-    * coordinates and added back on afterwards. */
-   double fts_port_1[2] = {-20.43,  20.43};
-   double fts_port_2[2] = { 20.43,  20.43};
-
-   /* A matrix to perform the FTS-2 mirroring, both
-    * within each port, and from a port to its
-    * image -- i.e. this defines the FTS-2 mirroring
-    * axis, assuming it is the same in all cases. */
-   double fts_flip[4] = {-1, 0, 0, 1};
 
 #if COLROW
    AstPermMap *permmap;
@@ -1162,7 +1170,7 @@ int *status             /* global status (given and returned) */
 
       return NULL;
 
-   } else if ( subnum < 0 || subnum >= SC2AST__NSUB && *status == SAI__OK ) {
+   } else if ( ( subnum < 0 || subnum >= SC2AST__NSUB ) && *status == SAI__OK ) {
      *status = SAI__ERROR;
      sprintf( errmess, "Sub array number '%d' out of range\n", subnum );
      ErsRep( 0, status, errmess );
@@ -1503,27 +1511,14 @@ int *status             /* global status (given and returned) */
                                                           polymap, 1, " " );
       }
 
-      if (fts_port) {
-         fts_flipmap = astMatrixMap(2, 2, 0, fts_flip, "");
-
-         if ((subnum == S4A || subnum == S8D) != (fts_port == FTS_IMAGE)) {
-            fts_shift[0] = - fts_port_1[0]; fts_shift[1] = - fts_port_1[1];
-         }
-         else {
-            fts_shift[0] = - fts_port_2[0]; fts_shift[1] = - fts_port_2[1];
-         }
-
-         if (fts_port == FTS_IMAGE) {
-            cache->map[subnum] = (AstMapping *) astCmpMap(cache->map[subnum], fts_flipmap, 1, " ");
-         }
-
-         fts_shiftmap = astShiftMap ( 2, fts_shift, " " );
-         cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], fts_shiftmap, 1, " " );
-
-         cache->map[subnum] = (AstMapping *) astCmpMap(cache->map[subnum], fts_flipmap, 1, " ");
-
-         astInvert( fts_shiftmap );
-         cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], fts_shiftmap, 1, " " );
+/* If required, create a Mapping appropriate for the selected port and add it
+   into the cached Mapping. The variant Mapping for the other port, will be
+   added once the FrameSet has been completed. */
+      if( fts_port ) {
+         cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
+                                    sc2ast_make_fts2_portmap( fts_port, 0,
+                                                              subnum, status ),
+                                                          1, " " );
       }
 
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
@@ -1602,6 +1597,15 @@ int *status             /* global status (given and returned) */
                                  astZoomMap( 2, AST__DR2D*3600.0, " " ), 1,
                                  " " ) );
 
+/* The GRID->FPLANE Mapping in the FrameSet will currently describe the selected
+   FTS-2 port (if any). Create an alternative GRID->FPLANE Mapping that describes
+   the other port and store it as a variant Mapping in the FPLANE Frame of the
+   FrameSet. The FrameSet can then be switched between these two Mappings by
+   setting the "Variant" attribute of the FrameSet to "PORT1" or "PORT2" (when
+   the FPLANE Frame is the current Frame). */
+      sc2ast_fts_second_port( cache->frameset[ subnum ], subnum, fts_port,
+                              status );
+
 /* Exempt the cached AST objects from AST context handling. This means
    that the pointers will not be annulled as a result of calling
    astEnd.  Therefore the objects need to be annulled explicitly when
@@ -1658,14 +1662,20 @@ int *status             /* global status (given and returned) */
 /* If sky coords are required in the returned FrameSet... */
    } else {
 
+      zm = astZoomMap( 2, AST__DR2D*3600.0, "Invert=1" );
+
 /* Create a MatrixMap that rotates the focal plane so that the second
    pixel axis is parallel to the elevation axis. The rotation angle is
-   just equal to the elevation of the boresight. */
+   just equal to the elevation of the boresight. Also incorporate a
+   conversion from arc-seconds (as described by the FPLANE Frame) to rads
+   (as required by subsequent Mappings). */
       r = state->tcs_az_ac2;
-      rot[ 0 ] =  cos( r );
-      rot[ 1 ] = -sin( r );
-      rot[ 2 ] =  sin( r );
-      rot[ 3 ] =  cos( r );
+      cv = cos( r );
+      sv = sin( r );
+      rot[ 0 ] =  cv;
+      rot[ 1 ] = -sv;
+      rot[ 2 ] =  sv;
+      rot[ 3 ] =  cv;
       rotmap = (AstMapping *) astMatrixMap( 2, 2, 0, rot, " " );
 
 /* Create a ShiftMap that describes the SMU position correction. These
@@ -1687,11 +1697,10 @@ int *status             /* global status (given and returned) */
       azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
    				   cache->azel, status );
 
-/* Combine these with the cached Mapping (from GRID coords for subarray
-   to Tanplane Nasmyth coords in rads), to get total Mapping from GRID
-   coords to spherical AzEl in rads. */
-      mapping = (AstMapping *) astCmpMap( cache->map[ subnum ],
-                                          astCmpMap( rotmap, azelmap, 1, " " ),
+/* Combine these, to get a Mapping from focal plane coords to spherical
+   AzEl in rads. */
+      mapping = (AstMapping *) astCmpMap( zm, astCmpMap( rotmap, azelmap, 1,
+                                                         " " ),
                                           1, " " );
 
 /* If not already created, create a SkyFrame describing (Az,El). Hard-wire
@@ -1740,11 +1749,23 @@ int *status             /* global status (given and returned) */
               DBL_DIG, dut1 );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
-   First remove any existing SKY Frame and then add in the new one. */
+   First remove any existing SKY Frame and then add in the new one.
+   The SKY Frame is derived from the FPLANE Frame so that any FTS-2
+   variant mappings (that affect FPLANE) can be mirrored by the SKY Frame. */
       if( nfrm >= SKY_IFRAME ) astRemoveFrame( cache->frameset[ subnum ],
                                                SKY_IFRAME );
-      astAddFrame( cache->frameset[ subnum ], GRID_IFRAME, mapping,
+      astAddFrame( cache->frameset[ subnum ], FPLANE_IFRAME, mapping,
                    astClone( cache->skyframe ) );
+
+/* If FTS-2 is in use, tell the SKY Frame to mirror the variant mappings
+   provided by the FPLANE Frame. This means that the port mapping can be
+   selected by changing the value of the "Variant" attribute for the
+   FrameSet whilst the SKY Frame is the current Frame. Without this step,
+   the current Frame would need to be changed from SKY to FPLANE before the
+   "Variant" attribute value was changed, and then set back to SKY
+   afterwards. */
+      if( fts_port ) astMirrorVariants( cache->frameset[ subnum ], FPLANE_IFRAME );
+
    }
 
 /* Return the final FrameSet. */
@@ -2300,3 +2321,206 @@ void sc2ast_make_bolo_frame
    shift[ 1 ] = -1;
    *map = (AstMapping *) astShiftMap( 2, shift, " " );
 }
+
+
+static void sc2ast_fts_second_port( AstFrameSet *fs, int subnum,
+                                    const fts2Port fts_port, int *status ){
+/*
+*  Purpose:
+*    Add a description of the non-selected FTS port to the supplied FrameSet.
+
+*  Description:
+*    It is assumed that the supplied FrameSet already contains a
+*    Mapping that describes the Mapping from GRID to FPLANE using the
+*    port indicated by argument "fts_port".
+*/
+
+/* Local Variables: */
+   AstCmpMap *map3;
+   AstCmpMap *map4;
+   AstMapping *map1;
+   AstMapping *map2;
+   AstMapping *map5;
+   AstMapping *map;
+   AstMapping *oportmap;
+   AstMapping *sportmap;
+   const char *ovarname;
+   const char *port;
+   const char *sident;
+   const char *svarname;
+   int icur;
+
+/* Check inherited status */
+   if( *status != SAI__OK || !fts_port ) return;
+
+/* Start an AST context so that we do not need to annul AST objects
+   explicitly. */
+   astBegin;
+
+/* Get the GRID->FPLANE (using the selected port) Mapping from the supplied
+   FrameSet. */
+   map = astGetMapping( fs, AST__BASE, FPLANE_IFRAME );
+
+/* Construct the CmpMap for the other (unselected) port. */
+   oportmap = sc2ast_make_fts2_portmap( fts_port, 1, subnum, status );
+
+/* Get the identifier for the unselected port. */
+   port = astGetC( oportmap, "Ident" );
+
+/* We can now clear its Ident since we do not need to be able to locate
+   it later, and leaving Ident set would prevent the Mapping from
+   simplifying. */
+   astClear( oportmap, "Ident" );
+   if( *status == SAI__OK ) {
+
+/* Select the identifier and variant name for the selected port and the
+   unselected port. */
+      if( !strcmp( port, "port1map" ) ) {
+         sident = "port2map";
+         svarname = "PORT2";
+         ovarname = "PORT1";
+      } else {
+         sident = "port1map";
+         svarname = "PORT1";
+         ovarname = "PORT2";
+      }
+
+/* Locate the CmpMap for the selected port within the total Mapping, and
+   get the Mappings before and after the port's CmpMap. */
+      sportmap = atlFindMap( map, sident, &map1, &map2, status );
+      if( !sportmap && astOK ) {
+         *status = SAI__ERROR;
+         errRepf( " ", "sc2ast: Cannot find '%s' Mapping.", status, sident );
+      }
+
+/* The Ident attribute in the portmap is no longer needed so clear it. This
+   allows the Mapping to be simplified. */
+      astClear( sportmap, "Ident" );
+      sportmap = astAnnul( sportmap );
+
+/* Construct the total GRID->FPLANE (using the unselected port) Mapping. */
+      map3 = astCmpMap( map1, oportmap, 1, " " );
+      map4 = astCmpMap( map3, map2, 1, " " );
+
+/* Get the Mapping from FPLANE (selected port) to FPLANE (unselected port)
+   and simplify it. */
+      astInvert( map );
+      map5 = astSimplify( astCmpMap( map, map4, 1, " " ) );
+
+/* Ensure the FPLANE Frame is the current Frame in the FrameSet. We need
+   to do this since the astAddVariant method always operates on the current
+   Frame. */
+      icur = astGetI( fs, "Current" );
+      astSetI( fs, "Current", FPLANE_IFRAME );
+
+/* Assign a name to the Mapping that generates FPLANE values using the
+   selected port in the original FrameSet. */
+      astAddVariant( fs, NULL, svarname );
+
+/* Store the unselected port  Mapping in the FrameSet as a variant Mapping
+   for the FPLANE Frame. */
+      astAddVariant( fs, map5, ovarname );
+
+/* This will leave unselected port as the current variant Mapping. Swap to
+   back to use the selected port Mapping instead. */
+      astSetC( fs, "Variant", svarname );
+      msgOutiff( MSG__DEBUG1, " ", "sc2ast: Using FTS-2 '%s' Mapping\n",
+                 status, astGetC( fs, "Variant" ) );
+
+/* Re-instate the original current Frame in the FrameSet. */
+      astSetI( fs, "Current", icur );
+   }
+
+/* Tidy up be deleting all AST objects created in this function, except
+   for those that are now in use by the supplied FrameSet. */
+   astEnd;
+
+}
+
+static AstMapping *sc2ast_make_fts2_portmap( const fts2Port fts_port,
+                                             int invert, int subnum,
+                                             int *status ){
+/*
+*  Purpose:
+*     Return the FTS-2 Mapping for a selected port number and sub-array.
+
+*  Description:
+*     The returned Mapping is the part of the GRID->FPLANE Mapping that
+*     relates to FTS-2.
+
+*/
+
+/* Local Variables; */
+   AstMapping *result;
+   AstMatrixMap *fts_flipmap;
+   AstShiftMap *fts_shiftmap;
+   const char *ident;
+   int port;
+
+/* Coordinates of the FTS-2 ports.  These coordinates should be subtracted
+   before flipping / scaling the coordinates and added back on afterwards. */
+   static double fts_port_1[2] = {-20.43,  20.43};
+   static double fts_port_2[2] = { 20.43,  20.43};
+
+/* A matrix to perform the FTS-2 mirroring, both within each port, and from
+   a port to its image -- i.e. this defines the FTS-2 mirroring axis,
+   assuming it is the same in all cases. */
+   static double fts_flip[4] = {-1, 0, 0, 1};
+
+/* Initialise the returned value. */
+   result = NULL;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return result;
+
+/* Start an AST context so we do not need to annull AST objects
+   references explicitly. */
+   astBegin;
+
+/* Get the port to use. */
+   if( (subnum == S4A || subnum == S8D) != (fts_port == FTS_IMAGE) ){
+      port = 1;
+   } else {
+      port = 2;
+   }
+
+/* Invert the choice if required. */
+   if( invert ) port = 3 - port;
+
+/* Get the required ShiftMap for the selected port. */
+   if( port == 1 ){
+      fts_shiftmap = astShiftMap( 2, fts_port_1, " " );
+      ident = "port1map";
+   } else {
+      fts_shiftmap = astShiftMap( 2, fts_port_2, " " );
+      ident = "port2map";
+   }
+   astInvert( fts_shiftmap );
+
+   fts_flipmap = astMatrixMap( 2, 2, 0, fts_flip, " " );
+
+   if( fts_port == FTS_IMAGE ) {
+      result =  (AstMapping *) astCmpMap( fts_flipmap,  fts_shiftmap, 1, " " );
+   } else {
+      result = (AstMapping *) fts_shiftmap;
+   }
+
+   result =  (AstMapping *) astCmpMap( result,  fts_flipmap, 1, " " );
+   astInvert( fts_shiftmap );
+   result =  (AstMapping *) astCmpMap( result,  fts_shiftmap, 1, " " );
+
+/* Set the Ident attribute for the returned Mapping so that the
+   sc2ast_ftsport2 function can identify it within the total Mapping. */
+   astSetC( result, "Ident", ident );
+
+/* Export the returned pointer from the current AST context, and then end
+   the context so that all other AST objects references created within this
+   function are annulled. */
+   astExport( result );
+   astEnd;
+
+/* Return the required items. */
+   return result;
+}
+
+
