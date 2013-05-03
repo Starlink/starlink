@@ -30,6 +30,10 @@
 *     used to extract a slice and so cannot be used when WCS is required.
 
 *  ADAM Parameters:
+*     FTSPORT = _CHAR (Read)
+*          The FTS-2 port to use in calculating the WCS for the output NDF,
+*          or null if FTS-2 was not in the beam. If set, this parameter
+*          should be "tracking" or "image". [!]
 *     IN = NDF (Read)
 *          Input file. Cannot be a DARK frame. If the input file is
 *          raw data it will be flatfielded before writing out. This allows
@@ -138,6 +142,8 @@ void smurf_smurfcopy ( int * status ) {
   smfData * data = NULL;     /* input file struct */
   size_t dtypsz;             /* Number of bytes in data type */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
+  fts2Port fts_port;         /* FTS-2 port */
+  char fts_port_name[10];    /* FTS-2 port name */
   size_t i;                  /* Loop counter */
   smfFile * ifile = NULL;    /* Input smfFile */
   Grp *igrp = NULL;          /* Input group */
@@ -217,6 +223,20 @@ void smurf_smurfcopy ( int * status ) {
     slice = islice;
     if (slice == 0) slice = (data->dims)[2];
 
+    /* See which - if any- fts-2 port should be assumed when creating the
+       WCS FrameSet. */
+    parChoic( "FTSPORT", "", "TRACKING,IMAGE", 0, fts_port_name, 10, status );
+    if( *status == PAR__NULL ) {
+      errAnnul(status);
+      fts_port = NO_FTS;
+    } else {
+      if( !strcmp( "TRACKING", fts_port_name )) {
+        fts_port = FTS_TRACKING;
+      } else {
+        fts_port = FTS_IMAGE;
+      }
+    }
+
     /* construct output bounds */
     lbnd[0] = (data->lbnd)[0];
     lbnd[1] = (data->lbnd)[1];
@@ -246,7 +266,7 @@ void smurf_smurfcopy ( int * status ) {
       memcpy( (odata->pntr)[0], inptr + offset, nelem * dtypsz );
 
       /* World coordinates - note the 0 indexing relative to GRID */
-      smf_tslice_ast( data, slice-1, 1, NO_FTS, status );
+      smf_tslice_ast( data, slice-1, 1, fts_port, status );
       ndfPtwcs( data->hdr->wcs, ofile->ndfid, status );
 
       /* Write the FITS header */
