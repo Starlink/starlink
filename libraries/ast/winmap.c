@@ -106,6 +106,9 @@ f     The WinMap class does not define any new routines beyond those
 *        Correct initialisation of "result" in the Equal function.
 *     19-JAN-2007 (DSB):
 *        Fix memory leak.
+*     3-MAY-2013 (DSB):
+*        Improve simplification by adding check for inverse pairs of
+*        WinMaps in function WinWin.
 *class--
 */
 
@@ -3297,6 +3300,7 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
    double *b0;                   /* Pointer to next scale term from WinMap 1 */
    double *b1;                   /* Pointer to next scale term from WinMap 2 */
    double *br;                   /* Pointer to next scale term in result */
+   int cancel;                   /* Do the two WinMaps cancel out? */
    int i;                        /* Axis index */
    int invert[ 2 ];              /* Array of invert flags */
    int nin[ 2 ];                 /* No. of axes in the two WinMaps */
@@ -3331,35 +3335,63 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
 /* ====== */
       if( series ){
 
-/* Merge the scale and shift terms for the two WinMaps, overwriting the
-   terms for the first WinMap. To be merged in series, both WinMaps must
-   have the same number of axes, so it matters not whether we use nin[ 0 ]
-   or nin[ 1 ] to specify the number of axes. */
-         a0 = a[ 0 ];
-         b0 = b[ 0 ];
-         a1 = a[ 1 ];
-         b1 = b[ 1 ];
-         for( i = 0; i < nin[ 0 ]; i++ ){
+/* Check for equal and opposite WinMaps. Do this explicitly using the
+   supplied Mappings rather than the values returned by astWinTerms to
+   avoid the affects of rounding error sin the inversions performed by
+   astWinTerms. */
+         if( ( inv1 == 0 ) != ( inv2 == 0 ) ) {
+            cancel = 1;
+            for( i = 0; i < nin[ 0 ]; i++ ){
+               if( !EQUAL( (wm1->a)[ i ], (wm2->a)[ i ] ) ||
+                   !EQUAL( (wm1->b)[ i ], (wm2->b)[ i ] ) ) {
+                  cancel = 0;
+                  break;
+               }
+            }
+         } else {
+            cancel = 0;
+         }
 
-            if( *a0 != AST__BAD && *b0 != AST__BAD &&
-                *a1 != AST__BAD && *b1 != AST__BAD ){
-
-               *a0 *= (*b1);
-               *a0 += (*a1);
-               *b0 *= (*b1);
-
-            } else {
-               *a0 = AST__BAD;
-               *b0 = AST__BAD;
-               *a1 = AST__BAD;
-               *b1 = AST__BAD;
+/* If they cancel, just put unit values into the WinMap. */
+         if( cancel ) {
+            a0 = a[ 0 ];
+            b0 = b[ 0 ];
+            for( i = 0; i < nin[ 0 ]; i++ ){
+               *(a0++) = 0.0;
+               *(b0++) = 1.0;
             }
 
-   /* Move on to the next axis. */
-            a0++;
-            b0++;
-            a1++;
-            b1++;
+/* Otherwise, merge the scale and shift terms for the two WinMaps, overwriting
+   the terms for the first WinMap. To be merged in series, both WinMaps must
+   have the same number of axes, so it matters not whether we use nin[ 0 ]
+   or nin[ 1 ] to specify the number of axes. */
+         } else {
+            a0 = a[ 0 ];
+            b0 = b[ 0 ];
+            a1 = a[ 1 ];
+            b1 = b[ 1 ];
+            for( i = 0; i < nin[ 0 ]; i++ ){
+
+               if( *a0 != AST__BAD && *b0 != AST__BAD &&
+                   *a1 != AST__BAD && *b1 != AST__BAD ){
+
+                  *a0 *= (*b1);
+                  *a0 += (*a1);
+                  *b0 *= (*b1);
+
+               } else {
+                  *a0 = AST__BAD;
+                  *b0 = AST__BAD;
+                  *a1 = AST__BAD;
+                  *b1 = AST__BAD;
+               }
+
+/* Move on to the next axis. */
+               a0++;
+               b0++;
+               a1++;
+               b1++;
+            }
          }
 
 /* Create the merged WinMap with unspecified corners. */
