@@ -9416,7 +9416,7 @@ static void SetVariant( AstFrameSet *this, const char *variant, int *status ) {
                   inv0 = this->invert[ inode - 1 ];
 
 /* Temporarily reset the invert flag in the Mapping to account for any
-   changes to the Mapping via other pointers. */
+   changes made to the Mapping via other pointers. */
                   inv = astGetInvert( map0 );
                   astSetInvert( map0, inv0 );
 
@@ -9424,17 +9424,13 @@ static void SetVariant( AstFrameSet *this, const char *variant, int *status ) {
    to the new variant of the current node. */
                   map6 = astCmpMap( map0, map5, 1, " ", status );
 
-/* SImplify it and use it to replace the Mapping in the FrameSet structure. */
+/* Simplify it and use it to replace the Mapping in the FrameSet structure. */
                   this->map[ inode - 1 ] = astSimplify( map6 );
                   this->invert[ inode - 1 ] = astGetInvert( this->map[ inode - 1 ] );
 
 /* Re-instate the original Invert flag and free the old Mapping pointer. */
                   astSetInvert( map0, inv );
                   map0 = astAnnul( map0 );
-
-/* Put the variants FrameSet back into the Frame (it is removed by
-   astRemapFrame). */
-                  astSetFrameVariants( frm, vfs );
 
 /* Make the variant Frame the current Frame within the Variants FrameSet. */
                   astSetCurrent( vfs, ifrm + 1 );
