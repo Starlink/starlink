@@ -47,14 +47,16 @@ AstMapping *atlFindMap( AstMapping *this, const char *ident, AstMapping **map1,
 *     map2
 *        Pointer to a location at which to return the pointer to a deep
 *        copy of the total Mapping that comes after the required Mapping
-*        within "this". Returned as NULL if the requied Mapping is the
+*        within "this". Returned as NULL if the required Mapping is the
 *        last Mapping in "this", or is not found within "this".
 *     status
 *        The inherited status.
 
 *  Returned Value:
 *     A pointer to the required Mapping, or NULL if it is not found in
-*     "this".
+*     "this". Note, this is a cloned pointer to the Mapping itself, not a
+*      deep copy of the Mapping. So any changes made to the Mapping via
+*      this pointer will be reflected in the supplied Mapping "this".
 
 *  Copyright:
 *     Copyright (C) 2013 Science & Technology Facilities Council.
@@ -111,13 +113,13 @@ AstMapping *atlFindMap( AstMapping *this, const char *ident, AstMapping **map1,
 /* Check the inherited status. Also check a Mapping has been supplied. */
    if( *status != SAI__OK || !this ) return result;
 
-/* If the supplied Mapping is the required Mapping, return a deep copy of
+/* If the supplied Mapping is the required Mapping, return a pointer to
    "this" as the function value and retain the NULL pointers in "*map1"
    and "*map2". */
    this_ident = astGetC( this, "Ident" );
    if( astOK ){
       if( !strcmp( this_ident, ident ) ){
-         result = astCopy( this );
+         result = astClone( this );
 
 /* Otherwise, attempt to decompose the supplied Mapping into two component
    Mappings. */
