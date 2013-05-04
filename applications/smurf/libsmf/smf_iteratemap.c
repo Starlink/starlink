@@ -1673,11 +1673,14 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     _smf_iteratemap_showmem(status);
 #endif
 
+    /* We initialize the structure even if status is bad to prevent
+       downstream problems when freeing resources. */
+    memset( &dat, 0, sizeof(dat) );
+
     if( *status == SAI__OK ) {
 
       /* Stuff pointers into smfDIMMData to pass around to model component
          solvers */
-      memset( &dat, 0, sizeof(dat) ); /* Initialize structure */
       dat.res = res;
       dat.qua = qua;
       dat.lut = lut;
