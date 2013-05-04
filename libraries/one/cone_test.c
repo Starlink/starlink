@@ -61,6 +61,8 @@ main ( void ) {
   size_t len;
   char src1[] = "0123456789";
   char src2[] = "01234567890123456789";
+  char src3[] = "$STARLINK_DIR";
+  char dest2[1024];
   char dest1[ONEBUFSIZ];
   int status = SAI__OK;
   int exstat = EXIT_SUCCESS;
@@ -164,6 +166,20 @@ main ( void ) {
   } else {
     printf("Did not set status to ONE__TRUNC in one_snprintf. Needed %d characters\n",
            (int)len);
+    exstat = EXIT_FAILURE;
+  }
+
+  /* Test word expansion */
+  one_wordexp_noglob( src3, dest2, sizeof(dest2), &status );
+  if (status == SAI__OK) {
+    printf("Expand '%s' to '%s'\n", src3, dest2);
+    if (strcmp(src3, dest2) != 0 && dest2[0] != '$') {
+      printf("Looks plausible\n");
+    } else {
+      printf("Expansion does not look ok\n");
+      exstat = EXIT_FAILURE;
+    }
+  } else {
     exstat = EXIT_FAILURE;
   }
 

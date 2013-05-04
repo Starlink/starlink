@@ -68,6 +68,9 @@ int
 one_snprintf( char * str, size_t size, const char * format, int * status,
               ... ) __attribute__((format ( printf, 3, 5 )));
 
+void
+one_wordexp_noglob( const char * words, char * expan, size_t expanlen, int * status );
+
 /* STAR_ONE_H_INCLUDED */
 #endif
 
