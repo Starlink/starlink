@@ -122,16 +122,16 @@ void smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
     if( astMapGet0C( keymap, "TAUSRC", &tempstr ) ) {
 
       switch( toupper(tempstr[0]) ) {
-      case 'A':
+      case 'A': /* AUTO */
         *tausrc = SMF__TAUSRC_AUTO;
         break;
-      case 'C':
+      case 'C': /* CSOTAU */
         *tausrc = SMF__TAUSRC_CSOTAU;
         break;
-      case 'F':
+      case 'F': /* FILTERTAU */
         *tausrc = SMF__TAUSRC_TAU;
         break;
-      case 'W':
+      case 'W': /* WVMRAW */
         *tausrc = SMF__TAUSRC_WVMRAW;
         break;
       default:
