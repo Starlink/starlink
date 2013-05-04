@@ -312,7 +312,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, s
   /* If no opacity monitor specified generate bad status */
   if( tausrc==SMF__TAUSRC_NULL ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": No extinction monitor specified",
+    errRep( "", FUNC_NAME ": No source of opacity information could be determined",
             status );
     return allquick;
   }
