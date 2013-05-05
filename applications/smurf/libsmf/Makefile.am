@@ -389,6 +389,7 @@ smf_subtract_plane3.c \
 smf_subtract_poly.c \
 smf_summarize_obs.c \
 smf_swmode_str.c \
+smf_tai2unix.c \
 smf_telpos_get.c \
 smf_terr.c \
 smf_timerinit.c \
