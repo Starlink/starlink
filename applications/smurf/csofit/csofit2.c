@@ -45,10 +45,10 @@ csofit2_t * csofit2_open(const char * filename)
         char * tok = strtok_r(buf, delim, &saveptr); if(!tok) continue;
         struct tm utc;
         if(!strptime(tok, "%Y-%m-%dT%H:%M:%S", &utc)) continue;
-        poly.start = mktime(&utc);
+        poly.start = timegm(&utc);
         tok = strtok_r(NULL, delim, &saveptr); if(!tok) continue;
         if(!strptime(tok, "%Y-%m-%dT%H:%M:%S", &utc)) continue;
-        poly.end = mktime(&utc);
+        poly.end = timegm(&utc);
         tok = strtok_r(NULL, delim, &saveptr); if(!tok) continue;
         char * endptr = NULL;
         poly.deg = strtol(tok, &endptr, 0); if(*endptr != '\0') continue;

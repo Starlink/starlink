@@ -26,8 +26,8 @@ int main(int argc, char * argv[])
     //strptime("2013-04-03T06:56:55", "%Y-%m-%dT%H:%M:%S", &utc1);
     strptime("2013-03-29T12:27:14", "%Y-%m-%dT%H:%M:%S", &utc0);
     strptime("2013-03-31T12:56:55", "%Y-%m-%dT%H:%M:%S", &utc1);
-    double t0 = mktime(&utc0);
-    double t1 = mktime(&utc1);
+    double t0 = timegm(&utc0);
+    double t1 = timegm(&utc1);
     csofit2_t * subset = csofit2_subset(fits, t0, t1);
     free(fits);
     fprintf(stderr, "%d fits in subset.\n", subset->npolys);
