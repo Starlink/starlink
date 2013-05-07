@@ -6,12 +6,12 @@ SUBDIRS = defaults libsmf libsmurf libsc2sim libacsis libaztec libgsd \
           libsc2fts docs
 
 # can not use surf_mon_FCFLAGS yet
-AM_FCFLAGS = -Isrc -Isc2da -Isc2sim
+AM_FCFLAGS = -Isrc -Isc2da -Isc2sim -Icsofit
 
 dist_bin_SCRIPTS = $(DYNSCRIPTS) $(STATICSCRIPTS)
 dist_noinst_SCRIPTS = smurf_link_adam
 bin_MONOLITHS = smurf_mon
-smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES)
+smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES) $(CSOFIT_FILES)
 
 starhelp_DATA = smurf.shl
 
@@ -86,6 +86,8 @@ sc2da/sc2ast.c
 WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c \
 wvm/Axb.c wvm/lmbc.c wvm/misc.c
 
+CSOFIT_FILES = csofit/csofit2.c
+
 EXAMPLE_FILES = \
 examples/dimmconfig.lis \
 examples/dimmconfig_blank_field.lis \
@@ -108,7 +110,8 @@ data/sg450_m1009d1008_heateff.sdf \
 data/sg850_m0906d1005_heateff.sdf \
 data/sg850_m1002d1006_heateff.sdf \
 data/sg850_m1003d1004_heateff.sdf \
-data/sg850_m1005d1007_heateff.sdf
+data/sg850_m1005d1007_heateff.sdf \
+data/csofit2.dat
 
 # Files not for use by general users go in share/smurf/experimental
 experimentaldir = $(pkgdatadir)/experimental
