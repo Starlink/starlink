@@ -175,6 +175,8 @@
 *        - Added config parameter SUBMEAN.
 *     26-MAR-2013 (DSB):
 *        Added ADAM parameter HARMONIC.
+*     7-MAY-2013 (DSB):
+*        Do not issue warnings about missing darks.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -274,7 +276,6 @@ void smurf_calcqu( int *status ) {
    size_t nchunk;             /* Number continuous chunks outside iter loop */
    size_t ssize;              /* Number of science files in input group */
    smfArray *concat = NULL;   /* Pointer to smfArray holding bolometer data */
-   smfArray *darks = NULL;    /* dark frames */
    smfArray *dkarray = NULL;  /* Pointer to smfArray holding dark squid data */
    smfArray *flatramps = NULL;/* Flatfield ramps */
    smfData *data = NULL;      /* Concatenated data for one subarray */
@@ -296,7 +297,7 @@ void smurf_calcqu( int *status ) {
    kpg1Rgndf( "IN", 0, 1, "  Give more NDFs...", &igrp, &ssize, status );
 
 /* Get a group containing just the files holding science data. */
-   smf_find_science( igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
+   smf_find_science( igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
                      &flatramps, &heateffmap, NULL, status );
 
 /* Check we have at least once science file. */
@@ -361,7 +362,7 @@ void smurf_calcqu( int *status ) {
    smfArray ("concat") containing a smfData for each subarray present in
    the chunk. Each smfData holds the concatenated data for a single
    subarray. */
-         smf_concat_smfGroup( wf, NULL, sgroup, darks, NULL, flatramps,
+         smf_concat_smfGroup( wf, NULL, sgroup, NULL, NULL, flatramps,
                               heateffmap, ichunk, 1, 1, NULL, 0, NULL, NULL,
                               NO_FTS, 0, 0, 0, &concat, NULL, status );
 
@@ -679,7 +680,6 @@ void smurf_calcqu( int *status ) {
    }
 
 /* Free resources. */
-   smf_close_related( &darks, status );
    smf_close_related( &flatramps, status );
 
    if( igrp ) grpDelet( &igrp, status);
