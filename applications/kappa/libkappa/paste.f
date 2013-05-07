@@ -202,7 +202,7 @@
 *     2012 May 9 (MJC):
 *        Add _INT64 support.
 *     7-MAY-2013 (DSB):
-*        Correct bug that caused the pixel origin in the output NDF to 
+*        Correct bug that caused the pixel origin in the output NDF to
 *        be ignored when forming the output WCS FrameSet.
 *     {enter_further_changes_here}
 
@@ -810,7 +810,7 @@
 
 *  Add the input FrameSet inbto the output FrameSet, using a UnitMap to
 *  connect the PIXEL Frames in the two FrameSets.
-      CALL AST_ADDFRAME( IWCSO, IPIX, AST_UNITMAP( NDIM, ' ', STATUS ),
+      CALL AST_ADDFRAME( IWCSO, IPIX, AST_UNITMAP( NDIMO, ' ', STATUS ),
      :                   IWCS, STATUS )
 
 *  Re-instate the original current Frame in the output FrameSet.
