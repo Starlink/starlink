@@ -201,6 +201,9 @@
 *        Added parameter SHIFT.
 *     2012 May 9 (MJC):
 *        Add _INT64 support.
+*     7-MAY-2013 (DSB):
+*        Correct bug that caused the pixel origin in the output NDF to 
+*        be ignored when forming the output WCS FrameSet.
 *     {enter_further_changes_here}
 
 *-
@@ -246,7 +249,10 @@
                                  ! bounds of the output NDF
       INTEGER GRPIN              ! GRP id. for group holding input NDFs
       INTEGER I                  ! Loop counter
-      INTEGER IWCS               ! WCS FrameSet
+      INTEGER ICUR               ! Index of current Frame in WCS FrameSet
+      INTEGER IPIX               ! Index of pixel Frame in WCS FrameSet
+      INTEGER IWCS               ! Input WCS FrameSet
+      INTEGER IWCSO              ! Output WCS FrameSet
       INTEGER J                  ! Loop counter
       INTEGER IDIMS( NDF__MXDIM ) ! Dimensions of an input array
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Processing type of the data
@@ -758,15 +764,10 @@
          CALL NDF_ANNUL( NDFI( I ), STATUS )
       END DO
 
-*  If the number of pixel axes in the first input and the output are
-*  equal, just store the WCS from the first input in the output.
-      IF ( NDIMO .EQ. NDIMP ) THEN
-         CALL NDF_PTWCS( IWCS, NDFO, STATUS )
-
 *  If there are more pixel axes in the output than in the first input,
-*  then we add in some extra default WCS axes that just replicate the
-*  values of the extra output GRID axes.
-      ELSE IF ( NDIMO. GT. NDIMP ) THEN
+*  then we add some extra default WCS axes to the input WCS FrameSet,
+*  that just replicate the values of the extra output GRID axes.
+      IF ( NDIMO. GT. NDIMP ) THEN
 
 *  Number of new WCS axes.
          NDIM = NDIMO - NDIMP
@@ -785,10 +786,38 @@
      :                        AST_FRAME( NDIM, ' ', STATUS ), LBND,
      :                        UBND, STATUS )
 
-*  Store the modified WCS FrameSet in the output NDF.
-         CALL NDF_PTWCS( IWCS, NDFO, STATUS )
-
       END IF
+
+*  The output NDF will in general have a different pixel origin to the
+*  primary input NDF, and so we need to adjust the WCS FrameSet for this
+*  before storing it in the output NDF. First record the current Frame
+*  index in the input's FrameSet so that we can re-instate it later, and
+*  then set the PIXEL Frame to be the current Frame.
+      ICUR = AST_GETI( IWCS, 'CURRENT', STATUS )
+      CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+      CALL AST_SETI( IWCS, 'CURRENT', IPIX, STATUS )
+
+*  Get the default WCS FrameSet for the output NDF.
+      CALL NDF_GTWCS( NDFO, IWCSO, STATUS )
+
+*  We will combined the input FrameSet with the default output FrameSet
+*  to form the final output FrameSet. Find the index that the original
+*  current Frame will have in the combined FrameSet.
+      ICUR = ICUR + AST_GETI( IWCSO, 'NFRAME', STATUS )
+
+*  Find the index of the PIXEL Frame in the default output FrameSet.
+      CALL KPG1_ASFFR( IWCSO, 'PIXEL', IPIX, STATUS )
+
+*  Add the input FrameSet inbto the output FrameSet, using a UnitMap to
+*  connect the PIXEL Frames in the two FrameSets.
+      CALL AST_ADDFRAME( IWCSO, IPIX, AST_UNITMAP( NDIM, ' ', STATUS ),
+     :                   IWCS, STATUS )
+
+*  Re-instate the original current Frame in the output FrameSet.
+      CALL AST_SETI( IWCSO, 'CURRENT', ICUR, STATUS )
+
+*  Store the modified WCS FrameSet in the output NDF.
+      CALL NDF_PTWCS( IWCSO, NDFO, STATUS )
 
 *  Delete the group.
       CALL GRP_DELET( GRPIN, STATUS )
