@@ -853,6 +853,8 @@
 *        If an output NDF is not created because it contains no good
 *        data, then remove it's name from the group written to the text file
 *        specified by the OUTFILES parameter.
+*     7-MAY-2013 (DSB):
+*        Report an error if no NDFs are created.
 
 *  Copyright:
 *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
@@ -2082,6 +2084,12 @@ void smurf_makecube( int *status ) {
 
 /* End the tile's AST context. */
       astEnd;
+   }
+
+/* Report an error if no output NDFs were created. */
+   if( grpGrpsz( igrp4, status ) == 0 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( "", "No output NDFs could be created.", status );
    }
 
 /* Write out the list of output NDF names, annulling the error if a null
