@@ -69,6 +69,7 @@
 #include "sae_par.h"
 #include "mers.h"
 
+#include <time.h>
 
 #define DEBUG 1
 
