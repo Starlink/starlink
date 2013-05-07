@@ -115,9 +115,10 @@
 *     TAUSRC = _CHAR (Read)
 *          Source of optical depth data. Options are:
 *          - WVMRAW    - use the Water Vapour Monitor time series data
+*          - CSOFIT    - use a fit to the CSO 225 GHz tau data
 *          - CSOTAU    - use a single 225 GHz tau value
 *          - FILTERTAU - use a single tau value for this wavelength
-*          - AUTO      - Use WVM if available, else 225 GHz tau
+*          - AUTO      - Use WVM if available and reliable, else CSO fit, else CSO 225GHz tau.
 *
 *          [AUTO]
 
@@ -199,10 +200,12 @@
 *        Support flatfield ramps.
 *     2010-08-03 (TIMJ):
 *        Extract correct part of EXT keymap
+*     2013-04-04 (TIMJ):
+*        Ask for CSOFIT.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010, 2013 Science and Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2010 University of British
 *     Columbia. All Rights Reserved.
@@ -327,7 +330,7 @@ void smurf_extinction( int * status ) {
 
   /* Get tau source */
   parChoic( "TAUSRC", "Auto",
-            "Auto,CSOtau, Filtertau, WVMraw", 1,
+            "Auto,CSOtau,CSOFit, Filtertau, WVMraw", 1,
             tausource, sizeof(tausource), status);
 
   /* Decide how the correction is to be applied - convert to flag */
@@ -382,7 +385,7 @@ void smurf_extinction( int * status ) {
         const char * param = NULL;
         smfHead *ohdr = odata->hdr;
 
-        /* get default CSO tau */
+        /* get default CSO tau -- this could be calculated from CSO fits */
         deftau = smf_calc_meantau( ohdr, status );
 
         /* Now ask for desired CSO tau */
@@ -395,6 +398,8 @@ void smurf_extinction( int * status ) {
         parGdr0d( param, deftau, 0.0,1.0, 1, &tau, status );
       } else if ( tausrc == SMF__TAUSRC_WVMRAW ) {
         msgOutif(MSG__VERB," ", "Using Raw WVM data", status);
+      } else if ( tausrc == SMF__TAUSRC_CSOFIT ) {
+        msgOutif(MSG__VERB," ", "Using fit to CSO data", status);
       } else {
         *status = SAI__ERROR;
         errRep("", "Unsupported opacity source. Possible programming error.",

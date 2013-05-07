@@ -52,12 +52,14 @@
 *        Add "auto" mode detection.
 *     2012-10-22 (DSB):
 *        Add "import" option.
+*     2013-04-04 (TIMJ):
+*        Support CSOFIT option
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2009,2012 Science & Technology Facilities Council.
+*     Copyright (C) 2009,2012,2013 Science & Technology Facilities Council.
 *     Copyright (C) 2009 University of British Columbia
 *     All Rights Reserved.
 
@@ -125,8 +127,18 @@ void smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
       case 'A': /* AUTO */
         *tausrc = SMF__TAUSRC_AUTO;
         break;
-      case 'C': /* CSOTAU */
-        *tausrc = SMF__TAUSRC_CSOTAU;
+      case 'C': /* CSO* */
+        /* Need to compare CSOTAU to CSOFIT */
+        switch( toupper(tempstr[3]) ) {
+        case 'T':
+          *tausrc = SMF__TAUSRC_CSOTAU;
+          break;
+        case 'F':
+          *tausrc = SMF__TAUSRC_CSOFIT;
+          break;
+        default:
+          *tausrc = SMF__TAUSRC_NULL;
+        }
         break;
       case 'F': /* FILTERTAU */
         *tausrc = SMF__TAUSRC_TAU;

@@ -53,6 +53,8 @@
 #     2013-01-11 (DSB):
 #        Reformatted to be consistent with smurf_makemap.def, and
 #        auto-docs extraction.
+#     2013-04-04 (TIMJ):
+#        Add location of CSO fits data file.
 
 #-
 
@@ -91,3 +93,10 @@ ext.taurelation.850 =  (4.6,-0.0043)
 #		disables smoothing.
 ext.smoothwvm = 10.0
 
+#-----------------------------------------------------------------
+#  Name: 	ext.csofit
+#  Type: 	string
+#  Default:     ${STARLINK_DIR}/share/smurf/csofit2.dat
+#  Purpose: 	Path to file containing the CSO fit parameters
+#  Description: Full path to file containing the CSO fit parameters.
+ext.csofit = ${STARLINK_DIR}/share/smurf/csofit2.dat

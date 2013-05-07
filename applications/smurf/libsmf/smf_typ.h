@@ -360,6 +360,7 @@ typedef enum smf_tausrc {
   SMF__TAUSRC_NULL,     /* No correction */
   SMF__TAUSRC_WVMRAW,   /* Use WVM raw time series */
   SMF__TAUSRC_CSOTAU,   /* Use CSO tau scaled to filter */
+  SMF__TAUSRC_CSOFIT,   /* Use an external fit to CSO data, scaled to filter */
   SMF__TAUSRC_TAU,      /* Use this tau number: implements FILTERTAU option */
   SMF__TAUSRC_AUTO      /* Use WVM or CSO */
 } smf_tausrc;
