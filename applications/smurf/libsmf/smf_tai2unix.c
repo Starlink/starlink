@@ -69,6 +69,9 @@
 #include "sae_par.h"
 #include "mers.h"
 
+/* For gmtime_r definitions */
+#define _POSIX_C_SOURCE 200112L
+
 #include <time.h>
 
 #define DEBUG 1
