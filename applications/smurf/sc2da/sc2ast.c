@@ -375,6 +375,7 @@ int *status             /* global status (given and returned) */
    int nfrm;
    int nin;
    int nout;
+   int ok;
    sc2astCache *result;
 
 #if COLROW
@@ -1183,6 +1184,9 @@ int *status             /* global status (given and returned) */
    result = cache;
    if ( *status != SAI__OK ) return result;
 
+/* Assume that we will be able to return a FrameSet. */
+   ok = 1;
+
 /* Start an AST context. This means we do not need to worry about
    annulling AST objects. Note, there should be no "return" statements
    before the matching call to astEnd. */
@@ -1748,10 +1752,11 @@ int *status             /* global status (given and returned) */
                  DBL_DIG, state->tcs_az_bc1,
                  DBL_DIG, state->tcs_az_bc2,
                  DBL_DIG, dut1 );
-      } else if( *status == SAI__OK ){
-         *status = SAI__ERROR;
-         errRep( "", "sc2ast: Telescope base position (TCS_AZ_BC1/2) has "
-                 "bad values.", status );
+
+/* If the telescope base position is undefined for this time slice, indicate
+   we should return a NULL FrameSet pointer. */
+      } else {
+         ok = 0;
       }
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
@@ -1774,8 +1779,12 @@ int *status             /* global status (given and returned) */
 
    }
 
-/* Return the final FrameSet. */
-   *fset = astClone( cache->frameset[ subnum ] );
+/* If the FrameSet could not be created, return a NULL pointer. Otherwise, return
+   the final FrameSet. */
+   if( !ok ) {
+      *fset = NULL;
+   } else {
+      *fset = astClone( cache->frameset[ subnum ] );
 
 /* Export the returned FrameSet pointer, and then end the AST context. This
    will annul all AST objects created since the matching call to astBegin,
@@ -1784,7 +1793,8 @@ int *status             /* global status (given and returned) */
    does not exit prematurely before reaching the astEnd call. Therefore
    there should usually no "return" statements within the body of the AST
    context. */
-   astExport( *fset );
+      astExport( *fset );
+   }
    astEnd;
 
 /* Return a pointer to the cache. */
