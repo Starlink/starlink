@@ -52,6 +52,7 @@
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     EC: Ed Chapin (UBC)
 *     BRADC: Brad Cavanagh (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 
 *  Notes:
 *     o This function should not be called directly but should be
@@ -72,9 +73,11 @@
 *     2011-03-04 (TIMJ):
 *        Report the unsupported mode string
 *        Ensure that we have obsmode information
+*     2013-05-08 (DSB):
+*        Change bad TCS_AZ_JIG_X/Y values to zero in PSSW mode.
 
 *  Copyright:
-*     Copyright (C) 2009-2011 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -777,6 +780,17 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
     }
   }
 
+  /* Older data have BAD values for SMU position entries. Use zero instead. */
+  if (*status == SAI__OK && hdr->swmode == SMF__SWM_PSSW &&
+      ( tmpState[0].smu_az_jig_x == VAL__BADD ||
+        tmpState[0].smu_az_jig_y == VAL__BADD )) {
+    msgOutif( msglev, "", INDENT "Blanked SMU_AZ_JIG entries.", status );
+    for (i = 0; i < hdr->nframes; i++ ) {
+      if (tmpState[i].smu_az_jig_x == VAL__BADD) tmpState[i].smu_az_jig_x = 0.0;
+      if (tmpState[i].smu_az_jig_y == VAL__BADD) tmpState[i].smu_az_jig_y = 0.0;
+    }
+    have_fixed |= SMF__FIXED_JCMTSTATE;
+  }
 
   /* Off exposure time - depends on observing mode.
 
