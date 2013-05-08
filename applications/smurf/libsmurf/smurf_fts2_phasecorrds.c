@@ -78,8 +78,10 @@
 *       Added Phase Correction Function debug output
 *     2013-04-12 (MSHERWOOD)
 *       Correct wave number trimming
-*     2013-04-12 (MSHERWOOD)
+*     2013-05-07 (MSHERWOOD)
 *       Added digital filtering to interferogram prior to phase correction
+*     2013-05-08 (MSHERWOOD)
+*       Bracketed KERNEL_LENGTH macro
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -141,7 +143,7 @@
 #define WAVE_NUMBER_RANGE           5             /* The range of interest of wave numbers */
 #define PHASE_ROLLOVER_THRESHOLD    1.0           /* 1 radian */
 #define FWHM                        8.0           /* Full Width at Half Maximum (standard Gaussian measure) */
-#define KERNEL_LENGTH               1/FWHM        /* Area to trim from both ends of IFG in OPD cm: 1/FWHM */
+#define KERNEL_LENGTH               (1/FWHM)      /* Area to trim from both ends of IFG in OPD cm: 1/FWHM */
 
 #ifndef DEBUG
 #define DEBUG 0
