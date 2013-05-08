@@ -85,6 +85,9 @@
 *        Use a separate random number generator for each thread. This gives
 *        repeatability, and also helps with convergence since each iteration
 *        fills each gap using the same values.
+*     2013-05-08 (DSB):
+*        If filling using a box size of BOX leaves any bad values
+*        unfilled, try again with a smaller box.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -318,6 +321,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   double x[ 2*BOX ];            /* Array of sample positions */
   double y[ 2*BOX ];            /* Array of sample values */
   gsl_rng *r;                   /* GSL random number generator */
+  int box;                      /* Current box size. */
   int count;                    /* No. of unflagged since last flagged sample */
   int fillpad;                  /* Fill PAD samples ? */
   int flagged;                  /* Is the current sample flagged? */
@@ -362,197 +366,237 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   /* Loop over bolometer */
   for( i = b1; i <= b2; i++ ) if( !(qua[ i*bstride ] & SMF__Q_BADB) ) {
 
-    /* Initialise a flag to indicate that the current sample is not
-       inside a block of flagged samples. */
-    inside = 0;
-
-    /* Initialise the count of unflagged samples following the previous
-       block of flagged samples. */
-    count = 0;
-
-    /* Initialise a flag to indicate that no good values have yet been
-       encountered in the input time stream for this bolometer. */
-    good = 0;
-
-    /* Initialise the index of the first sample to be replaced. This
-       initial value is only used if there are fewer than BOX unflagged
-       samples before the first block of flagged samples. */
-    jstart = pstart;
-    jend = -1;
-
-    /* Loop over time series. In this loop we fill gaps within the body
-       of the time series. Filling of the padded regions at start and end
-       is left until the loop has ended. */
+    /* First ensure that all flagged samples have bad data values. This is
+       so we do not subsequently need to use the quality array to identify
+       flagged values. We cannot modify the quality array, so we can't use
+       it for second and subsequent passes with smaller box sizes. */
     for( j = pstart; j <= pend; j++ ) {
-
-      /* Is this sample flagged? Always condsider the last sample to be
-         unflagged, so that any block of flagged samples at the end of
-         the time-series is filled. Samples with bad data values are
-         filled, as well as samples with the specified quality. */
-      flagged = ( qua[ i*bstride + j*tstride ] & mask ) ||
-                ( dat[ i*bstride + j*tstride ] == VAL__BADD );
-
-      if( flagged && j <  pend ) {
-
-        /* If this is the first flagged sample in a new block of flagged
-           samples, set "inside" to indicate that we are now inside a
-           block of flagged samples. */
-        if( ! inside ) {
-          inside = 1;
-
-          /* If the number of unflagged samples since the end of the
-             previous block of flagged samples is at least BOX, then
-             record the index of the first sample to be replaced in this
-             new block. If there have been fewer than BOX samples since
-             the end of the previous block of flagged samples, we consider
-             this new block to be an extension of the previous block,
-             and so we do not change the "jstart" value (the few
-             unflagged samples that were found between the two blocks
-             of flagged samples will be replaced, together with the
-             neighbouring flagged samples). We do this because we need at
-             last BOX unflagged samples between adjacent pairs of flagged
-             blocks. */
-          if( count >= BOX ) jstart = j;
-        }
-
-      /* If this sample is not flagged (or if it is the final sample in
-         the time-series)... */
-      } else {
-
-        /* If this is the first sample following a block of flagged samples,
-           record the index of the last sample in the block (which may be
-           the current sample if the current sample is the last sample), and
-           indicate that we are no longer in a block. Also reset the count
-           of unflagged samples following the end of the flagged block. */
-        if( inside ) {
-          if( flagged ) {
-             jend = j;
-          } else {
-             jend = j - 1;
-          }
-          inside = 0;
-          count = 0;
-
-        /* If the  current (flagged) sample is the last sample, and it is
-           preceeded by an unflagged sample, then indicate that we have a
-           1-sample block to fill. */
-        } else if( flagged ) {
-          jstart = jend = j;
-          count = 0;
-        }
-
-        /* Increment the number of unflagged samples following the end
-           of the previous flagged block. */
-        count++;
-
-        /* If we have now found BOX unflagged samples following the end of
-           the previous block of flagged samples, we can replace the block.
-           Also replace the block if we have reached the end of the time
-           series. */
-        if( ( count == BOX || j == pend ) && jend >= jstart ) {
-
-          /* If the block is only a single pixel wide, just replace it
-             with the mean of the two neighbouring sample values. */
-          if( jend == jstart ) {
-              if( jend == pstart ) {
-                 dat[ i*bstride + jend*tstride ] =
-                         dat[ i*bstride + ( jend + 1 )*tstride ];
-              } else if( jend == pend ) {
-                 dat[ i*bstride + jend*tstride ] =
-                         dat[ i*bstride + ( jend - 1 )*tstride ];
-              } else {
-                 dat[ i*bstride + jend*tstride ] = 0.5*(
-                         dat[ i*bstride + ( jend + 1 )*tstride ] +
-                         dat[ i*bstride + ( jend - 1 )*tstride ] );
-              }
-
-          /* Otherwise, we fill the block using a straight line plus
-             noise... */
-          } else {
-
-            /* If possible fit a straight line to the BOX samples following
-               the end of the flagged block. */
-            rightstart = jend + 1;
-            rightend = jend + BOX;
-            if( rightend > pend ) rightend = pend;
-            if( rightend - rightstart > BOX/2 ) {
-              k = 0;
-              for( jj = rightstart; jj <= rightend; jj++,k++ ) {
-                x[ k ] = jj;
-                y[ k ] = dat[ i*bstride + jj*tstride ];
-              }
-
-              kpg1Fit1d( 1, k, y, x, &mr, &cr, &sigmar, status );
-
-            } else {
-              mr = VAL__BADD;
-              cr = VAL__BADD;
-              sigmar = VAL__BADD;
-            }
-
-            /* If possible fit a straight line to the BOX samples preceeding
-               the start of the flagged block. */
-            leftend = jstart - 1;
-            leftstart = jstart - BOX;
-            if( leftstart < pstart ) leftstart = pstart;
-            if( leftend - leftstart > BOX/2 ) {
-              k = 0;
-              for( jj = leftstart; jj <= leftend; jj++,k++ ) {
-                x[ k ] = jj;
-                y[ k ] = dat[ i*bstride + jj*tstride ];
-              }
-              kpg1Fit1d( 1, k, y, x, &ml, &cl, &sigmal, status );
-            } else {
-              ml = VAL__BADD;
-              cl = VAL__BADD;
-              sigmal = VAL__BADD;
-            }
-
-            /* Find the mean noise level. */
-            if( sigmal != VAL__BADD && sigmar != VAL__BADD ) {
-               sigma = 0.5*( sigmal + sigmar );
-            } else if( sigmal != VAL__BADD ) {
-               sigma = sigmal;
-            } else {
-               sigma = sigmar;
-            }
-
-            /* Find the gradient and offset for the straight line used to
-               create the replacement values for the flagged block. */
-            if( jstart <= pstart || ml == VAL__BADD || cl == VAL__BADD  ) {
-              grad = 0.0;
-              offset = mr*( jend + 1 ) + cr;
-
-            } else if( jend >= pend || mr == VAL__BADD || cr == VAL__BADD  ) {
-              grad = 0.0;
-              offset = ml*( jstart - 1 ) + cl;
-
-            } else {
-              meanl = ml*( jstart - 1 ) + cl;
-              meanr = mr*( jend + 1 ) + cr;
-              grad = ( meanr - meanl )/( jend - jstart + 2 );
-              offset = meanl - grad*( jstart - 1 );
-            }
-
-            /* If at least one of the straight line fits above was
-               succesful, the flagged block is replaced by a straight line
-               plus noise. */
-            if( sigma != VAL__BADD ) {
-              for( jj = jstart; jj <= jend; jj++ ) {
-                dat[ i*bstride + jj*tstride ] = grad*jj + offset +
-                                                gsl_ran_gaussian( r, sigma );
-
-
-              }
-            }
-          }
-        }
+      if( qua[ i*bstride + j*tstride ] & mask ){
+        dat[ i*bstride + j*tstride ] = VAL__BADD;
       }
-
-/* If the sample is not flagged indicate some usable samples have been
-   found. */
-      if( !flagged ) good = 1;
     }
+
+
+    /* We now loop round using succesively smaller box sizes until all
+       gaps are filled or we reach an unusably small box size. */
+    good = 0;
+    box = BOX;
+    while( !good && *status == SAI__OK ) {
+
+       /* Initialise a flag to indicate that the current sample is not
+          inside a block of flagged samples. */
+       inside = 0;
+
+       /* Initialise the count of unflagged samples following the previous
+          block of flagged samples. */
+       count = 0;
+
+       /* Initialise the index of the first sample to be replaced. This
+          initial value is only used if there are fewer than box unflagged
+          samples before the first block of flagged samples. */
+       jstart = pstart;
+       jend = -1;
+
+       /* Loop over time series. In this loop we fill gaps within the body
+          of the time series. Filling of the padded regions at start and end
+          is left until the loop has ended. */
+       for( j = pstart; j <= pend; j++ ) {
+
+         /* Is this sample flagged? Always condsider the last sample to be
+            unflagged, so that any block of flagged samples at the end of
+            the time-series is filled. */
+         flagged = ( dat[ i*bstride + j*tstride ] == VAL__BADD );
+
+         if( flagged && j <  pend ) {
+
+           /* If this is the first flagged sample in a new block of flagged
+              samples, set "inside" to indicate that we are now inside a
+              block of flagged samples. */
+           if( ! inside ) {
+             inside = 1;
+
+             /* If the number of unflagged samples since the end of the
+                previous block of flagged samples is at least box, then
+                record the index of the first sample to be replaced in this
+                new block. If there have been fewer than box samples since
+                the end of the previous block of flagged samples, we consider
+                this new block to be an extension of the previous block,
+                and so we do not change the "jstart" value (the few
+                unflagged samples that were found between the two blocks
+                of flagged samples will be replaced, together with the
+                neighbouring flagged samples). We do this because we need at
+                last box unflagged samples between adjacent pairs of flagged
+                blocks. */
+             if( count >= box ) jstart = j;
+           }
+
+         /* If this sample is not flagged (or if it is the final sample in
+            the time-series)... */
+         } else {
+
+           /* If this is the first sample following a block of flagged samples,
+              record the index of the last sample in the block (which may be
+              the current sample if the current sample is the last sample), and
+              indicate that we are no longer in a block. Also reset the count
+              of unflagged samples following the end of the flagged block. */
+           if( inside ) {
+             if( flagged ) {
+                jend = j;
+             } else {
+                jend = j - 1;
+             }
+             inside = 0;
+             count = 0;
+
+           /* If the  current (flagged) sample is the last sample, and it is
+              preceeded by an unflagged sample, then indicate that we have a
+              1-sample block to fill. */
+           } else if( flagged ) {
+             jstart = jend = j;
+             count = 0;
+           }
+
+           /* Increment the number of unflagged samples following the end
+              of the previous flagged block. */
+           count++;
+
+           /* If we have now found box unflagged samples following the end of
+              the previous block of flagged samples, we can replace the block.
+              Also replace the block if we have reached the end of the time
+              series. */
+           if( ( count == box || j == pend ) && jend >= jstart ) {
+
+             /* If the block is only a single pixel wide, just replace it
+                with the mean of the two neighbouring sample values. */
+             if( jend == jstart ) {
+                 if( jend == pstart ) {
+                    dat[ i*bstride + jend*tstride ] =
+                            dat[ i*bstride + ( jend + 1 )*tstride ];
+                 } else if( jend == pend ) {
+                    dat[ i*bstride + jend*tstride ] =
+                            dat[ i*bstride + ( jend - 1 )*tstride ];
+                 } else {
+                    dat[ i*bstride + jend*tstride ] = 0.5*(
+                            dat[ i*bstride + ( jend + 1 )*tstride ] +
+                            dat[ i*bstride + ( jend - 1 )*tstride ] );
+                 }
+
+             /* Otherwise, we fill the block using a straight line plus
+                noise... */
+             } else {
+
+               /* If possible fit a straight line to the box samples following
+                  the end of the flagged block. */
+               rightstart = jend + 1;
+               rightend = jend + box;
+               if( rightend > pend ) rightend = pend;
+               if( rightend - rightstart > box/2 ) {
+                 k = 0;
+                 for( jj = rightstart; jj <= rightend; jj++,k++ ) {
+                   x[ k ] = jj;
+                   y[ k ] = dat[ i*bstride + jj*tstride ];
+                 }
+
+                 kpg1Fit1d( 1, k, y, x, &mr, &cr, &sigmar, status );
+
+               } else {
+                 mr = VAL__BADD;
+                 cr = VAL__BADD;
+                 sigmar = VAL__BADD;
+               }
+
+               /* If possible fit a straight line to the box samples preceeding
+                  the start of the flagged block. */
+               leftend = jstart - 1;
+               leftstart = jstart - box;
+               if( leftstart < pstart ) leftstart = pstart;
+               if( leftend - leftstart > box/2 ) {
+                 k = 0;
+                 for( jj = leftstart; jj <= leftend; jj++,k++ ) {
+                   x[ k ] = jj;
+                   y[ k ] = dat[ i*bstride + jj*tstride ];
+                 }
+                 kpg1Fit1d( 1, k, y, x, &ml, &cl, &sigmal, status );
+               } else {
+                 ml = VAL__BADD;
+                 cl = VAL__BADD;
+                 sigmal = VAL__BADD;
+               }
+
+               /* Find the mean noise level. */
+               if( sigmal != VAL__BADD && sigmar != VAL__BADD ) {
+                  sigma = 0.5*( sigmal + sigmar );
+               } else if( sigmal != VAL__BADD ) {
+                  sigma = sigmal;
+               } else {
+                  sigma = sigmar;
+               }
+
+               /* Find the gradient and offset for the straight line used to
+                  create the replacement values for the flagged block. */
+               if( jstart <= pstart || ml == VAL__BADD || cl == VAL__BADD  ) {
+                 grad = 0.0;
+                 offset = mr*( jend + 1 ) + cr;
+
+               } else if( jend >= pend || mr == VAL__BADD || cr == VAL__BADD  ) {
+                 grad = 0.0;
+                 offset = ml*( jstart - 1 ) + cl;
+
+               } else {
+                 meanl = ml*( jstart - 1 ) + cl;
+                 meanr = mr*( jend + 1 ) + cr;
+                 grad = ( meanr - meanl )/( jend - jstart + 2 );
+                 offset = meanl - grad*( jstart - 1 );
+               }
+
+               /* If at least one of the straight line fits above was
+                  succesful, the flagged block is replaced by a straight line
+                  plus noise. */
+               if( sigma != VAL__BADD ) {
+                 for( jj = jstart; jj <= jend; jj++ ) {
+                   dat[ i*bstride + jj*tstride ] = grad*jj + offset +
+                                                   gsl_ran_gaussian( r, sigma );
+
+
+                 }
+               }
+             }
+           }
+         }
+
+/* Note if any good input values are found. */
+         if( !flagged ) good = 1;
+       }
+
+/* Can never fill the bolometer if all input values are bad. */
+       if( !good ) break;
+
+/* Now check if the above process left any flagged samples. This can happen if
+   the time stream consists of many short little bits of good and bad values,
+   all shorter in length than box. */
+       good = 1;
+       for( j = pstart; j <= pend; j++ ) {
+         if( dat[ i*bstride + j*tstride ] == VAL__BADD ) {
+            good = 0;
+            break;
+         }
+       }
+
+/* If it did, and the box size is currently at least 20 samples, half the
+   box size and try again. Otherwise report an error. */
+       if( !good ) {
+         if( box > 19 ) {
+           box = box/2;
+           msgOutiff( MSG__DEBUG, "", "smf_fillgaps: Using box=%d for "
+                      "bolo %d\n", status, box, (int) i );
+         } else if( *status == SAI__OK ){
+           *status = SAI__ERROR;
+           errRepf( "", "smf_fillgaps: Cannot fill gaps in bolometer %d.",
+                    status, (int) i );
+           break;
+         }
+       }
+     }
 
    /* Replace the padding at the start and end of the bolometer time series
       with a noisey curve that connects the first and last data samples
