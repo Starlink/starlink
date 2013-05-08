@@ -6,6 +6,9 @@ gcc -pedantic -Wall -std=c99 -O2 -o csofit2_test csofit2_test.c csofit2.c
 /* needed for -std=c99 */
 #define _XOPEN_SOURCE
 
+/* needed for timegm() */
+#define _BSD_SOURCE
+
 #include "csofit2.h"
 #include <stdio.h>
 #include <stdlib.h>

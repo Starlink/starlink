@@ -10,6 +10,8 @@
 
 #include <time.h>
 
+/* Local definition of timegm */
+static time_t my_timegm (struct tm *tm );
 
 csofit2_t * csofit2_open(const char * filename)
 {
@@ -45,10 +47,10 @@ csofit2_t * csofit2_open(const char * filename)
         char * tok = strtok_r(buf, delim, &saveptr); if(!tok) continue;
         struct tm utc;
         if(!strptime(tok, "%Y-%m-%dT%H:%M:%S", &utc)) continue;
-        poly.start = timegm(&utc);
+        poly.start = my_timegm(&utc);
         tok = strtok_r(NULL, delim, &saveptr); if(!tok) continue;
         if(!strptime(tok, "%Y-%m-%dT%H:%M:%S", &utc)) continue;
-        poly.end = timegm(&utc);
+        poly.end = my_timegm(&utc);
         tok = strtok_r(NULL, delim, &saveptr); if(!tok) continue;
         char * endptr = NULL;
         poly.deg = strtol(tok, &endptr, 0); if(*endptr != '\0') continue;
@@ -141,3 +143,33 @@ double csofit2_calc(csofit2_t * fits, double t)
         return y/w;
     }
 }
+
+/*
+  timegm is a BSD and GNU extension and technically not part of POSIX. The version below
+  comes directly from the manpage for timegm(3) on OS X and Linux.
+
+  It may be that simply setting _BSD_SOURCE would be enough on all the systems that matter
+  but for now we are defensive.
+
+  The implementation below messes with the environment and so is not thread-safe.
+
+ */
+
+time_t
+my_timegm(struct tm *tm)
+{
+  time_t ret;
+  char *tz;
+
+  tz = getenv("TZ");
+  setenv("TZ", "", 1);
+  tzset();
+  ret = mktime(tm);
+  if (tz)
+    setenv("TZ", tz, 1);
+  else
+    unsetenv("TZ");
+  tzset();
+  return ret;
+}
+
