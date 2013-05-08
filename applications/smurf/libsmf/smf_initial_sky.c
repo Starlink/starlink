@@ -170,6 +170,9 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
                                         SMF__DIMM_INVERT, status);
    }
 
+/* End the AST context. */
+   astEnd;
+
 /* Return the pointer to the boolean mask. */
    return result;
 }
