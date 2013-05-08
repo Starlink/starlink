@@ -1,6 +1,8 @@
 
 /* needed for -std=c99 */
 #define _XOPEN_SOURCE
+/* for setenv */
+#define _POSIX_C_SOURCE 200112L
 
 #include "csofit2.h"
 #include <stdio.h>
