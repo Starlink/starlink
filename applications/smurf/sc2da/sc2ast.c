@@ -1741,12 +1741,18 @@ int *status             /* global status (given and returned) */
 /* Update the epoch, dut1 and sky reference. Call this every time for
    skyref and dut1 since we can not ensure that we will always have
    cleared the cache when a new observation starts */
-      astSet( cache->skyframe,
-              "Epoch=MJD %.*g,SkyRef(1)=%.*g, SkyRef(2)=%.*g,dut1=%.*g",
-              DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD,
-              DBL_DIG, state->tcs_az_bc1,
-              DBL_DIG, state->tcs_az_bc2,
-              DBL_DIG, dut1 );
+      if( state->tcs_az_bc1 != VAL__BADD && state->tcs_az_bc2 != VAL__BADD ) {
+         astSet( cache->skyframe,
+                 "Epoch=MJD %.*g,SkyRef(1)=%.*g, SkyRef(2)=%.*g,dut1=%.*g",
+                 DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD,
+                 DBL_DIG, state->tcs_az_bc1,
+                 DBL_DIG, state->tcs_az_bc2,
+                 DBL_DIG, dut1 );
+      } else if( *status == SAI__OK ){
+         *status = SAI__ERROR;
+         errRep( "", "sc2ast: Telescope base position (TCS_AZ_BC1/2) has "
+                 "bad values.", status );
+      }
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
    First remove any existing SKY Frame and then add in the new one.
