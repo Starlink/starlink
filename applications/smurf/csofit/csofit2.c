@@ -1,8 +1,6 @@
 
-/* needed for -std=c99 */
+/* needed for strptime, -std=c99 */
 #define _XOPEN_SOURCE
-/* for setenv */
-#define _POSIX_C_SOURCE 200112L
 
 #include "csofit2.h"
 #include <stdio.h>
@@ -147,31 +145,30 @@ double csofit2_calc(csofit2_t * fits, double t)
 }
 
 /*
-  timegm is a BSD and GNU extension and technically not part of POSIX. The version below
-  comes directly from the manpage for timegm(3) on OS X and Linux.
+  timegm is a BSD and GNU extension and technically not part of POSIX.
+  The version below comes from the 'Seconds Since the Epoch' formula
+  presented in the Single Unix Specification, section 4.14 of the XBD:
+  http://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap04.html#tag_04_14
+
+  Since strptime(3) may not set the tm_yday field, the function
+  calls mktime(3) to make sure it is filled in and that tm is normalized.
 
   It may be that simply setting _BSD_SOURCE would be enough on all the systems that matter
   but for now we are defensive.
 
-  The implementation below messes with the environment and so is not thread-safe.
+  This implementation should be thread-safe, unlike alternate implementations
+  (such as that suggested by the timegm(3) manpage) which rely on
+  setenv(TZ) + mktime.
 
  */
 
 time_t
 my_timegm(struct tm *tm)
 {
-  time_t ret;
-  char *tz;
-
-  tz = getenv("TZ");
-  setenv("TZ", "", 1);
-  tzset();
-  ret = mktime(tm);
-  if (tz)
-    setenv("TZ", tz, 1);
-  else
-    unsetenv("TZ");
-  tzset();
-  return ret;
+    mktime(tm);
+    time_t ret = tm->tm_sec + tm->tm_min*60 + tm->tm_hour*3600 + tm->tm_yday*86400;
+    ret += ((time_t)31536000) * (tm->tm_year-70);
+    ret += ((tm->tm_year-69)/4)*86400 - ((tm->tm_year-1)/100)*86400 + ((tm->tm_year+299)/400)*86400;
+    return ret;
 }
 
