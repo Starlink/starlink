@@ -22838,7 +22838,7 @@ c+
 \item The interface for the astRebinSeq<X> family of functions has
 been changed in order to allow a greater number of pixels to be pasted
 into the output array. The "nused" parameter is now a pointer to a
-"size\_t" variable, instead of an "int". APPLICATION CODE SHOULD BE
+"int64\_t" variable, instead of an "int". APPLICATION CODE SHOULD BE
 CHANGED ACCORDINGLY TO AVOID SEGMENTATION FAULTS AND OTHER ERRATIC
 BEHAVIOUR.
 c-

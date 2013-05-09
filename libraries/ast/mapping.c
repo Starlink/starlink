@@ -352,6 +352,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        is implemented via a new protected method (astDoNotSimplify) which
 *        is overridden by the Frame class so that this restriction applies
 *        only to genuine Mappings, not Frames.
+*     9-MAY-2013 (DSB):
+*        Change the "nused" parameter of astRebinSeq<X> from "size_t *" to
+*        "int64_t *" to cater for systems where "size_t" is only 32 bits long.
 *class--
 */
 
@@ -403,6 +406,7 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 #include <limits.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -587,24 +591,24 @@ static void RebinSeq##X( AstMapping *, double, int, const int [], const int [], 
                          const Xtype [], const Xtype [], int, const double [], \
                          int, double, int, Xtype, int, const int [], \
                          const int [], const int [], const int [], Xtype [], \
-                         Xtype [], double [], size_t *, int * ); \
+                         Xtype [], double [], int64_t *, int * ); \
 \
 static void SpreadKernel1##X( AstMapping *, int, const int *, const int *, \
                          const Xtype *, const Xtype *, double, int, const int *, \
                          const double *const *, \
                          void (*)( double, const double *, int, double *, int * ), \
                          int, const double *, int, Xtype, int, Xtype *, \
-                         Xtype *, double *, size_t *, int * ); \
+                         Xtype *, double *, int64_t *, int * ); \
 \
 static void SpreadLinear##X( int, const int *, const int *, const Xtype *, \
                              const Xtype *, double, int, const int *, const double *const *, \
-                             int, Xtype, int, Xtype *, Xtype *, double *, size_t *, \
+                             int, Xtype, int, Xtype *, Xtype *, double *, int64_t *, \
                              int * ); \
 \
 static void SpreadNearest##X( int, const int *, const int *, const Xtype *, \
                               const Xtype *, double, int, const int *, const double *const *, \
                               int, Xtype, int, Xtype *, Xtype *, double *, \
-                              size_t *, int * );
+                              int64_t *, int * );
 
 DECLARE_GENERIC(D,double)
 DECLARE_GENERIC(F,float)
@@ -652,8 +656,8 @@ static int MaxI( int, int, int * );
 static int MinI( int, int, int * );
 static int DoNotSimplify( AstMapping *, int * );
 static int QuadApprox( AstMapping *, const double[2], const double[2], int, int, double *, double *, int * );
-static int RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, size_t *, int * );
-static int RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, size_t *, int * );
+static int RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int64_t *, int * );
+static int RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int64_t *, int * );
 static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)( void ), const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
 static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)( void ), const double *, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
 static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)( void ), const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
@@ -673,7 +677,7 @@ static void GlobalBounds( MapData *, double *, double *, double [], double [], i
 static void Invert( AstMapping *, int * );
 static void MapBox( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [], int * );
 static void RateFun( AstMapping *, double *, int, int, int, double *, double *, int * );
-static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, double, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, size_t *, int * );
+static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, double, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int64_t *, int * );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet *, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 static void SetInvert( AstMapping *, int, int * );
@@ -10000,7 +10004,7 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
                             const int *ubnd_out, const int *lbnd,
                             const int *ubnd, int npix_out,
                             void *out, void *out_var, double *work,
-                            size_t *nused, int *status ){
+                            int64_t *nused, int *status ){
 /*
 *  Name:
 *     RebinAdaptively
@@ -10022,7 +10026,7 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
 *                          int ndim_out, const int *lbnd_out,
 *                          const int *ubnd_out, const int *lbnd,
 *                          const int *ubnd, int npix_out, void *out,
-*                          void *out_var, double *work, size_t *nused,
+*                          void *out_var, double *work, int64_t *nused,
 *                          int *status )
 
 *  Class Membership:
@@ -10209,7 +10213,7 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
 *        If no accumulated weights are required, a NULL pointer should be
 *        given.
 *     nused
-*        An optional pointer to a size_t which will be incremented by the
+*        An optional pointer to a int64_t which will be incremented by the
 *        number of input values pasted into the output array. Ignored if NULL.
 *     status
 *        Pointer to the inherited status variable.
@@ -10437,7 +10441,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                           const int *lbnd_out, const int *ubnd_out,
                           const int *lbnd, const int *ubnd, int npix_out,
                           void *out, void *out_var, double *work,
-                          size_t *nused, int *status ) {
+                          int64_t *nused, int *status ) {
 /*
 *  Name:
 *     RebinSection
@@ -10458,7 +10462,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 *                        const int *lbnd_out, const int *ubnd_out,
 *                        const int *lbnd, const int *ubnd, int npix_out,
 *                        void *out, void *out_var, double *work,
-*                        size_t *nused, int *status )
+*                        int64_t *nused, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -10613,7 +10617,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 *        If no accumulated weights are required, a NULL pointer should be
 *        given.
 *     nused
-*        An optional pointer to a size_t which will be incremented by the
+*        An optional pointer to a int64_t which will be incremented by the
 *        number of input values pasted into the output array. Ignored if NULL.
 
 *  Notes:
@@ -11356,7 +11360,7 @@ c                          double tol, int maxpix, <Xtype> badval,
 c                          int ndim_out, const int lbnd_out[],
 c                          const int ubnd_out[], const int lbnd[],
 c                          const int ubnd[], <Xtype> out[], <Xtype> out_var[],
-c                          double weights[], size_t *nused );
+c                          double weights[], int64_t *nused );
 f     CALL AST_REBINSEQ<X>( THIS, WLIM, NDIM_IN, LBND_IN, UBND_IN, IN, IN_VAR,
 f                           SPREAD, PARAMS, FLAGS, TOL, MAXPIX, BADVAL,
 f                           NDIM_OUT, LBND_OUT, UBND_OUT, LBND, UBND, OUT,
@@ -11739,7 +11743,7 @@ c        (i.e. Fortran array indexing is used).
 f        (i.e. normal Fortran array storage order).
 c     nused
 f     NUSED = INTEGER*8 (Given and Returned)
-c        A pointer to an size_t containing the
+c        A pointer to an int64_t containing the
 f        The
 *        number of input data values that have been added into the output
 *        array so far. The supplied value is incremented on exit by the
@@ -11935,7 +11939,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                      int ndim_out, const int lbnd_out[], \
                      const int ubnd_out[], const int lbnd[], \
                      const int ubnd[], Xtype out[], Xtype out_var[], \
-                     double weights[], size_t *nused, int *status ) { \
+                     double weights[], int64_t *nused, int *status ) { \
 \
 /* Local Variables: */ \
    AstMapping *simple;           /* Pointer to simplified Mapping */ \
@@ -12344,7 +12348,7 @@ static int RebinWithBlocking( AstMapping *this, const double *linear_fit,
                                const int *lbnd_out, const int *ubnd_out,
                                const int *lbnd, const int *ubnd, int npix_out,
                                void *out, void *out_var, double *work,
-                               size_t *nused, int *status ) {
+                               int64_t *nused, int *status ) {
 /*
 *  Name:
 *     RebinWithBlocking
@@ -12366,7 +12370,7 @@ static int RebinWithBlocking( AstMapping *this, const double *linear_fit,
 *                             const int *lbnd_out, const int *ubnd_out,
 *                             const int *lbnd, const int *ubnd, int npix_out,
 *                             void *out, void *out_var, double *work,
-*                             size_t *nused, int *status )
+*                             int64_t *nused, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -12525,7 +12529,7 @@ static int RebinWithBlocking( AstMapping *this, const double *linear_fit,
 *        If no accumulated weights are required, a NULL pointer should be
 *        given.
 *     nused
-*        An optional pointer to a size_t which will be incremented by the
+*        An optional pointer to a int64_t which will be incremented by the
 *        number of input values pasted into the output array. Ignored if NULL.
 
 *  Returned Value:
@@ -16922,7 +16926,7 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 *                                            double *, int * ),
 *                           int neighb, const double *params, int flags,
 *                           <Xtype> badval, int npix_out, <Xtype> *out,
-*                           <Xtype> *out_var, double *work, size_t *nused,
+*                           <Xtype> *out_var, double *work, int64_t *nused,
 *                           int *status )
 
 *  Class Membership:
@@ -17073,7 +17077,7 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 *        array are incremented on exit by the sum of the weights used
 *        with each output pixel.
 *     nused
-*        An optional pointer to a size_t which will be incremented by the
+*        An optional pointer to a int64_t which will be incremented by the
 *        number of input values pasted into the output array. Ignored if NULL.
 
 *  Notes:
@@ -17094,7 +17098,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                               int neighb, const double *params, \
                               int flags, Xtype badval, int npix_out, \
                               Xtype *out, Xtype *out_var, double *work, \
-                              size_t *nused, int *status ) { \
+                              int64_t *nused, int *status ) { \
 \
 /* Local Variables: */ \
    astDECLARE_GLOBALS            /* Thread-specific data */ \
@@ -18166,7 +18170,7 @@ MAKE_SPREAD_KERNEL1(I,int,1)
 *                           double infac, int npoint, const int *offset,
 *                           const double *const *coords, int flags,
 *                           <Xtype> badval, int npix_out, <Xtype> *out,
-*                           <Xtype> *out_var, double *work, size_t *nused  )
+*                           <Xtype> *out_var, double *work, int64_t *nused  )
 
 *  Class Membership:
 *     Mapping member function.
@@ -18294,7 +18298,7 @@ MAKE_SPREAD_KERNEL1(I,int,1)
 *        If no accumulated weights are required, a NULL pointer should be
 *        given.
 *     nused
-*        An optional pointer to a size_t which will be incremented by the
+*        An optional pointer to a int64_t which will be incremented by the
 *        number of input values pasted into the output array. Ignored if NULL.
 
 *  Notes:
@@ -18311,7 +18315,7 @@ static void SpreadLinear##X( int ndim_out, \
                             double infac, int npoint, const int *offset, \
                             const double *const *coords, int flags, \
                             Xtype badval, int npix_out, Xtype *out, \
-                            Xtype *out_var, double *work, size_t *nused, \
+                            Xtype *out_var, double *work, int64_t *nused, \
                             int *status ) { \
 \
 /* Local Variables: */ \
@@ -19002,7 +19006,7 @@ MAKE_SPREAD_LINEAR(I,int,1)
 *                            const <Xtype> *in_var, double infac, int npoint,
 *                            const int *offset, const double *const *coords,
 *                            int flags, <Xtype> badval, int npix_out, <Xtype> *out,
-*                            <Xtype> *out_var, double *work, size_t *nused,
+*                            <Xtype> *out_var, double *work, int64_t *nused,
 *                            int *status )
 
 *  Class Membership:
@@ -19150,7 +19154,7 @@ static void SpreadNearest##X( int ndim_out, \
                              double infac, int npoint, const int *offset, \
                              const double *const *coords, int flags, \
                              Xtype badval, int npix_out, Xtype *out, \
-                             Xtype *out_var, double *work, size_t *nused, \
+                             Xtype *out_var, double *work, int64_t *nused, \
                              int *status ) { \
 \
 /* Local Variables: */ \
@@ -23697,7 +23701,7 @@ void astRebinSeq##X##_( AstMapping *this, double wlim, int ndim_in, const int *l
                         int ndim_out, \
                         const int *lbnd_out, const int *ubnd_out, \
                         const int *lbnd, const int *ubnd, Xtype *out, \
-                        Xtype *out_var, double *weights, size_t *nused, \
+                        Xtype *out_var, double *weights, int64_t *nused, \
                         int *status ) { \
    if ( !astOK ) return; \
    (**astMEMBER(this,Mapping,RebinSeq##X))( this, wlim, ndim_in, lbnd_in, \

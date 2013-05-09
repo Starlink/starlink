@@ -16,11 +16,11 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-- IMPORTANT! The interface for the astRebinSeq<X> family of functions has
-been changed in order to allow a greater number of pixels to be pasted
-into the output array. The "nused" parameter is now a pointer to a
-"size_t" variable, instead of an "int". In Fortran, the NUSED argument
-for AST_REBINSEQ<X> is now an INTEGER*8.
+- IMPORTANT! The interface for the astRebinSeq<X> (AST_REBINSEQ) family
+of functions has been changed in order to allow a greater number of
+pixels to be pasted into the output array. In C, the "nused" parameter
+is now a pointer to a "int64_t" variable, instead of a simple "int". In
+Fortran, the NUSED argument for AST_REBINSEQ<X> is now an INTEGER*8.
 
 APPLICATION CODE SHOULD BE CHANGED ACCORDINGLY TO AVOID SEGMENTATION
 FAULTS AND OTHER ERRATIC BEHAVIOUR.

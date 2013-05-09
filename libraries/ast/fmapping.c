@@ -100,6 +100,8 @@
 #include "error.h"               /* Error reporting facilities */
 #include "mapping.h"             /* C interface to the Mapping class */
 
+#include <stdint.h>
+
 /* Module Variables. */
 /* ================= */
 /* Pointer to user-supplied (FORTRAN 77) interpolation function for
@@ -562,7 +564,7 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
 \
    Xtype *out_var; \
    const Xtype *in_var; \
-   size_t nused; \
+   int64_t nused; \
 \
    astAt( "AST_REBINSEQ"#F, NULL, 0 ); \
    astWatchSTATUS( \
