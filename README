@@ -107,6 +107,8 @@ rebuild the native parts of JNIAST, JNIHDS or SPLAT.
    Andy Vaught for his help with this), which is available from the g95 web
    site: www.g95.org. For GCC3 based systems g77 should be used.
 
+ - Ensure that /tmp has sufficient free space and is writable.
+
 
  The build sequence
  ------------------
