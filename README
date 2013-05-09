@@ -35,8 +35,8 @@ document are at the end of this README.
 
 This procedure will not build the Starlink _Java_ applications.  They are
 built separately, using the procedure described in Java README
-(currently these are available from the subversion repository at
-https://starjava.jach.hawaii.edu/svn/trunk). You do not need to build any of
+(currently these are available from the git repository at
+git://github.com/Starlink/starjava.git). You do not need to build any of
 the Starlink classic applications to build the Java ones, unless you need to
 rebuild the native parts of JNIAST, JNIHDS or SPLAT.
 
