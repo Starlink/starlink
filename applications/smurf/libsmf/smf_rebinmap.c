@@ -17,7 +17,7 @@
 *                   int index, int size, AstFrameSet *outfset, int spread,
 *                   const double params[], int moving, int genvar,
 *                   int *lbnd_out, int *ubnd_out, double *map, *variance,
-*                   double *weights, size_t *nused, fts2Port fts_port,
+*                   double *weights, int64_t *nused, fts2Port fts_port,
 *                   int *status );
 
 *  Arguments:
@@ -63,8 +63,8 @@
 *        of the relative weighting for each pixel in the output map. If
 *        "genvar" is non-zero, two doubles are needed for each output pixel.
 *        Otherwise, only one double is needed for each output pixel.
-*     nused = size_t * (Given and Returned)
-*        A pointer to a size_t that is updated to hold the total number
+*     nused = int64_t * (Given and Returned)
+*        A pointer to a int64_t that is updated to hold the total number
 *        of input samples that have been pasted into the output array so far.
 *     fts_port = fts2Port (Given)
 *        The FTS-2 port.
@@ -163,6 +163,7 @@
 
 /* Standard includes */
 #include <stdio.h>
+#include <stdint.h>
 
 /* Starlink includes */
 #include "ast.h"
@@ -178,7 +179,7 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread,
                    const double params[], int moving, int genvar,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
-                   double *weights, size_t *nused, fts2Port fts_port,
+                   double *weights, int64_t *nused, fts2Port fts_port,
                    int *status ) {
 
 /* Local Variables */

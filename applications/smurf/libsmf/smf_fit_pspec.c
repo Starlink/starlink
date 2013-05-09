@@ -105,6 +105,7 @@
 
 /* System includes */
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <math.h>
 
@@ -222,7 +223,7 @@ void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
   if( *status == SAI__OK ) {
     size_t nfit;
     size_t ngood = 0;
-    size_t nused;
+    int64_t nused;
     double thresh = white + SMF__FPSPEC_KNEESNR*sigma;
 
     /* Initialize ngood -- skip the DC term in the FFT */

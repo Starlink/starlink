@@ -95,6 +95,8 @@
 *-
 */
 
+#include <stdint.h>
+
 #include "smf_typ.h"
 #include "smf.h"
 #include "smurf_par.h"
@@ -248,7 +250,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
        two values we add for flatfield. */
     if (nrgood > 0) {
       int badcoeffs = 0;
-      size_t nused;
+      int64_t nused;
 
       /* initialise scoeff to bad */
       for (i=0; i< order+1; i++) {

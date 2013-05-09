@@ -113,6 +113,7 @@
 /* STANDARD includes */
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 /* STARLINK includes */
 #include "ast.h"
@@ -188,7 +189,7 @@ void smurf_fts2_phasecorrds(int* status)
   smfData* zpd              = NULL;               /* Pointer to ZPD index data */
   smfData* fpm              = NULL;               /* Pointer polynomial fit parameters */
   smfData* sigma            = NULL;
-  size_t nUsed              = 0;                  /* Number of used data points */
+  int64_t nUsed             = 0;                  /* Number of used data points */
   int pDegree               = 0;                  /* Degree of the polynomial used to fit phase */
   int i                     = 0;                  /* Counter */
   int j                     = 0;                  /* Counter */

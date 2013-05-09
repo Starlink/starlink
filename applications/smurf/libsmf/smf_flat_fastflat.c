@@ -97,6 +97,7 @@
 
 /* System includes */
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -351,7 +352,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
       if (*status == SAI__OK) {
         for (bol = 0; bol < nbols; bol++) {
           size_t idx;
-          size_t nused;
+          int64_t nused;
           size_t ndata = nind;
 
           /* copy over the relevant data for this bolometer */
@@ -609,7 +610,7 @@ double smf__calc_refheat_meas ( int indata[], size_t boloffset, size_t tstride, 
                                 double heatdata[], double buffer[], size_t nmeas, int heatref,
                                 int forward, int *status ) {
   double result = VAL__BADD;
-  size_t nused;
+  int64_t nused;
   double coeff[2];
   size_t i;
 

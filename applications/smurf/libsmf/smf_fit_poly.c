@@ -101,6 +101,7 @@
 
 /* Standard includes */
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 
 /* GSL includes */
@@ -159,7 +160,7 @@ static void smfFitPolyPar( void *job_data_ptr, int *status ) {
   dim_t nbolo;                /* Number of bolometers */
   size_t ncoeff;              /* Number of poly coeffs */
   dim_t ntslice;              /* Number of time slices */
-  size_t nused;               /* Number of samples used in fit */
+  int64_t nused;              /* Number of samples used in fit */
   smfFitPolyData *pdata=NULL; /* Pointer to job data */
   double *poly=NULL;          /* Pointer external poly coeff storage buffer */
   smf_qual_t *qual=NULL;      /* Pointer to QUALITY component */

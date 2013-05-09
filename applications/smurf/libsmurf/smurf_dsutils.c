@@ -266,6 +266,7 @@
 #endif
 
 #include <stdio.h>
+#include <stdint.h>
 #include <ctype.h>
 
 /* STARLINK includes */
@@ -1898,7 +1899,7 @@ static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
    int lbnd[ 2 ];
    int nel;
    int nrej;
-   size_t nused;
+   int64_t nused;
    int outperm[ 2 ];
    int rlbnd[ 1 ];
    int rubnd[ 1 ];

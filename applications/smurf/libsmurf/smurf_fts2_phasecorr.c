@@ -86,6 +86,7 @@
 /* STANDARD INCLUDES */
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 /* STARLINK INCLUDES */
 #include "ast.h"
@@ -127,7 +128,7 @@ void smurf_fts2_phasecorr(int* status)
   size_t    fileIndex     = 0;    // File loop counter
   size_t    numInputFile  = 0;    // Size of the input group
   size_t    numOutputFile = 0;    // Size of the output group
-  size_t    nUsed         = 0;    // Number of used data points
+  int64_t   nUsed         = 0;    // Number of used data points
   int       srcH          = 0;    // Subarray Height
   int       srcW          = 0;    // Subarray Width
   int       srcN          = 0;    // Source interferogram length

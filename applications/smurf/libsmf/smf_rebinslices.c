@@ -67,6 +67,8 @@
 *-
 */
 
+#include <stdint.h>
+
 /* Starlink includes */
 #include "ast.h"
 #include "mers.h"
@@ -98,7 +100,7 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
    int rebinflags;               /* Control the rebinning procedure */
    int spread;                   /* Pixel spreading scheme */
    int ubnd_in[ 2 ];             /* Upper pixel bounds for input maps */
-   size_t *nused;                /* Point to count of i/p samples used */
+   int64_t *nused;               /* Point to count of i/p samples used */
    int *udim;                    /* Output array upper GRID bounds */
    smfData *data;                /* Smurf data description */
    smfRebinMapData *job_data;    /* Pointer to data structure */

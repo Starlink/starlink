@@ -23,7 +23,7 @@
 *                       Grp *detgrp, int moving, int usewgt, int genvar,
 *                       double tfac, double fcon, float *data_array,
 *                       float *var_array, double *wgt_array,
-*                       float *texp_array, float *teff_array, size_t *nused,
+*                       float *texp_array, float *teff_array, int64_t *nused,
 *                       int *nreject, int *naccept, int *good_tsys,
 *                       int *status );
 
@@ -134,7 +134,7 @@
 *        output spectrum, scaled by a factor of 4. It is updated on exit to
 *        include the supplied input NDF. It should be big enough to hold a
 *        single spatial plane from the output cube.
-*     nused = size_t * (Given and Returned)
+*     nused = int64_t * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
 *        have been pasted into the output cube.
 *     nreject = int * (Given and Returned)
@@ -219,6 +219,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <stdint.h>
 
 /* Starlink includes */
 #include "ast.h"
@@ -242,7 +243,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                        Grp *detgrp, int moving, int usewgt, int genvar,
                        double tfac, double fcon, float *data_array,
                        float *var_array, double *wgt_array,
-                       float *texp_array, float *teff_array, size_t *nused,
+                       float *texp_array, float *teff_array, int64_t *nused,
                        int *nreject, int *naccept, int *good_tsys,
                        int *status ){
 

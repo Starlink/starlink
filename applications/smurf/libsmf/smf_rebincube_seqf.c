@@ -23,7 +23,7 @@
 *                              int ndim_out, const int lbnd_out[],
 *                              const int ubnd_out[], const int lbnd[],
 *                              const int ubnd[], float out[], float out_var[],
-*                              double weights[], size_t *nused, int *status );
+*                              double weights[], int64_t *nused, int *status );
 
 *  Arguments:
 *     workforce = ThrWorkForce * (Given)
@@ -99,6 +99,7 @@
 
 /* System includes */
 #include <stdio.h>
+#include <stdint.h>
 #include <math.h>
 #include <pthread.h>
 
@@ -122,7 +123,7 @@ void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
                          int ndim_out, const int lbnd_out[],
                          const int ubnd_out[], const int lbnd[],
                          const int ubnd[], float out[], float out_var[],
-                         double weights[], size_t *nused, int *status ){
+                         double weights[], int64_t *nused, int *status ){
 
 /* Local Variables */
    int i;                            /* Thread index */

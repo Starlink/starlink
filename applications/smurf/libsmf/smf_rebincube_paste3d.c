@@ -19,7 +19,7 @@
 *                                 dim_t iv0, dim_t nxy, double wgt,
 *                                 int genvar, double invar, float *ddata,
 *                                 float *data_array, float *var_array,
-*                                 double *wgt_array, size_t *nused,
+*                                 double *wgt_array, int64_t *nused,
 *                                 int *status );
 
 *  Arguments:
@@ -67,7 +67,7 @@
 *        cube (all planes in the output cube will have the same weight). If
 *        "genvar" is 2, this array should be big enough to hold two spatial
 *        planes from the output cube.
-*     nused = size_t * (Given and Returned)
+*     nused = int64_t * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
 *        have been pasted into the output cube.
 *     status = int * (Given and Returned)
@@ -112,6 +112,7 @@
 */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <math.h>
 
 /* Starlink includes */
@@ -126,7 +127,7 @@
 void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
                             dim_t nxy, double wgt, int genvar, double invar,
                             float *ddata, float *data_array,
-                            float *var_array, double *wgt_array, size_t *nused,
+                            float *var_array, double *wgt_array, int64_t *nused,
                             int *status ){
 
 /* Local Variables */

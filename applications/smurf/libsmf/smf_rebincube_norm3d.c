@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     void smf_rebincube_norm3d( dim_t nout, int genvar,
-*                                size_t nused, float *data_array,
+*                                int64_t nused, float *data_array,
 *                                float *var_array, double *wgt_array,
 *                                int *status );
 
@@ -27,7 +27,7 @@
 *           0 = do not calculate any output variances
 *           1 = use spread of input data values
 *           2 = use system noise temperatures
-*     nused = size_t (Given)
+*     nused = int64_t (Given)
 *        Number of input elements pasted into the output cube.
 *     data_array = float * (Given and Returned)
 *        The 3D data array for the output cube.
@@ -83,6 +83,7 @@
 */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <math.h>
 
 /* Starlink includes */
@@ -94,7 +95,7 @@
 
 #define FUNC_NAME "smf_rebincube_norm3d"
 
-void smf_rebincube_norm3d( dim_t nout, int genvar, size_t nused, float *data_array,
+void smf_rebincube_norm3d( dim_t nout, int genvar, int64_t nused, float *data_array,
                            float *var_array, double *wgt_array, int *status ){
 
 /* Local Variables */

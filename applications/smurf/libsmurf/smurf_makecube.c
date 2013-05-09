@@ -890,6 +890,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 /* STARLINK includes */
 #include "ast.h"
@@ -1000,7 +1001,7 @@ void smurf_makecube( int *status ) {
    int npos;                  /* Number of samples included in output NDF */
    int nreject;               /* Number of rejected input spectra */
    size_t ntile;              /* Number of output tiles */
-   size_t nused;              /* No. of input samples pasted into output cube */
+   int64_t nused;             /* No. of input samples pasted into output cube */
    int nval;                  /* Number of parameter values supplied */
    int nwgtdim;               /* No. of axes in the weights array */
    int nxy;                   /* Number of elements in a 2D output tile */

@@ -20,7 +20,7 @@
 *                                 double invar, float *ddata,
 *                                 float *data_array, float *var_array,
 *                                 double *wgt_array, int *pop_array,
-*                                 size_t *nused, int *nreject, int *naccept,
+*                                 int64_t *nused, int *nreject, int *naccept,
 *                                 float *work, int *status );
 
 *  Arguments:
@@ -89,7 +89,7 @@
 *     pop_array = int * (Given and Returned)
 *        An array in which to store the number of input spectra pasted into
 *        each output spectrum. It should be the same size as "var_array".
-*     nused = size_t * (Given and Returned)
+*     nused = int64_t * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
 *        have been pasted into the output cube.
 *     nreject = int * (Given and Returned)
@@ -146,6 +146,7 @@
 */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <math.h>
 
 /* Starlink includes */
@@ -163,7 +164,7 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
                             double invar, float *ddata,
                             float *data_array, float *var_array,
                             double *wgt_array, int *pop_array,
-                            size_t *nused, int *nreject, int *naccept,
+                            int64_t *nused, int *nreject, int *naccept,
                             float *work, int *status ){
 
 /* Local Variables */
@@ -173,7 +174,7 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
    dim_t ichan;                /* Index of input channel */
    int ochan;                  /* Index of output channel */
    int ignore;                 /* Ignore this time slice? */
-   size_t nspecused;           /* No of input values pasted into output spectrum */
+   int64_t nspecused;          /* No of input values pasted into output spectrum */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;

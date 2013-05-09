@@ -17,7 +17,7 @@
 *                           const double x[], const double y[],
 *                           const double vary[], const smf_qual_t qual[],
 *                           double coeffs[], double varcoeffs[],
-*                           double polydata[], size_t *nused,
+*                           double polydata[], int64_t *nused,
 *                           int *status );
 
 *  Arguments:
@@ -48,7 +48,7 @@
 *     polydata = double [] (Given & Returned)
 *        Evaluated polynomial at the x coordinates. Can be NULL. Must have
 *        space for nelem points.
-*     nused = size_t * (Returned)
+*     nused = int64_t * (Returned)
 *        Number of points used in the fit. Can be smaller than nelem if any
 *        of the points are bad or if the points have been removed during
 *        sigma clipping.
@@ -108,6 +108,8 @@
 *-
 */
 
+#include <stdint.h>
+
 #include "smf_typ.h"
 #include "smf.h"
 #include "smurf_par.h"
@@ -123,7 +125,7 @@
 void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
                        const double y[], const double vary[],
                        const smf_qual_t qual[], double coeffs[],
-                       double varcoeffs[], double polydata[], size_t *nused,
+                       double varcoeffs[], double polydata[], int64_t *nused,
                        double * rchisq, int *status );
 
 
@@ -131,7 +133,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
 void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
                       const double y[], const double vary[],
                       const smf_qual_t qual[], double coeffs[],
-                      double varcoeffs[], double polydata[], size_t * nused,
+                      double varcoeffs[], double polydata[], int64_t * nused,
                       int *status ) {
   size_t i;
   double rchisq;     /* Reduced chisq of fit */
@@ -263,7 +265,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
 void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
                        const double y[], const double vary[],
                        const smf_qual_t qual[], double coeffs[],
-                       double varcoeffs[], double polydata[], size_t *nused,
+                       double varcoeffs[], double polydata[], int64_t *nused,
                        double * rchisq, int *status ) {
 
   const double * xx = NULL;

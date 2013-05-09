@@ -221,6 +221,8 @@
 #ifndef SMF_TYP_DEFINED
 #define SMF_TYP_DEFINED
 
+#include <stdint.h>
+
 #include "star/hds_types.h"
 #include "jcmt/state.h"
 #include "sc2da/sc2store_par.h"
@@ -845,7 +847,7 @@ typedef struct smfRebinSeqArgs {
   void *out;
   void *out_var;
   double *weights;
-  size_t nused;
+  int64_t nused;
   int ijob;
 } smfRebinSeqArgs;
 
@@ -876,7 +878,7 @@ typedef struct smfRebincubeNNArgs2 {
   double wgt;
   double invar;
   float *ddata;
-  size_t nused;
+  int64_t nused;
   int nreject;
   int naccept;
 } smfRebincubeNNArgs2;
@@ -895,7 +897,7 @@ typedef struct smfRebinMapData {
   double *weights;
   int ijob;
   double *bolovar;
-  size_t nused;
+  int64_t nused;
   fts2Port fts_port;
 } smfRebinMapData;
 
