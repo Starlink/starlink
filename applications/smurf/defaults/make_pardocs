@@ -1,10 +1,10 @@
 #! /usr/bin/env perl
 
-#  This script requires that Perl be in the path, and that the
-#  environment variable SST_DIR be set to the location of the prolat
-#  binary. It creates a file call "./params.tex" holding latex descriptions
-#  of all the configuration parameters documented in the files "./*.def". It must
-#  be run from within the defaults subdirectory (except see below).
+#  This script requires that Perl be in the path, and that the environment
+#  variable STARLINK_DIR be set. It creates a file call "./params.tex"
+#  holding latex descriptions of all the configuration parameters documented
+#  in the files "./*.def". It must be run from within the defaults subdirectory
+#  (except see below).
 #
 #  If a file name is supplied as the first command line argument, it is expected
 #  to be a text file containing a list of config parameter names, one on each
@@ -212,7 +212,7 @@
 #  Run PROLAT on the temp file and then delete it.
    print( STDERR
       `rm -f /tmp/prolat.tex;
-      \$SST_DIR/prolat in=/tmp/make_pardocs.tmp atask=f single=f page=f document=f out=/tmp/prolat.tex;
+      \$STARLINK_DIR/bin/sst/prolat in=/tmp/make_pardocs.tmp atask=f single=f page=f document=f out=/tmp/prolat.tex;
       rm -f /tmp/make_pardocs.tmp`
    );
 
