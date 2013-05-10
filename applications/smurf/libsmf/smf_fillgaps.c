@@ -88,10 +88,13 @@
 *     2013-05-08 (DSB):
 *        If filling using a box size of BOX leaves any bad values
 *        unfilled, try again with a smaller box.
+*     2013-05-09 (DSB):
+*        If the box size becomes too small, fill using a linear fit without
+*        noise.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -135,6 +138,9 @@
    noise adjacent to each flagged block. The current value is pretty well
    arbitrary. */
 #define BOX 50
+
+/* Define the minimum box size for which noise can be calculated. */
+#define MINBOX 10
 
 /* Structure containing information about blocks of bolos to be
    filled by each thread. */
@@ -222,6 +228,14 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
   /* Find the indices of the first and last non-PAD sample. */
   smf_get_goodrange( qua, ntslice, tstride, SMF__Q_PAD, &pstart, &pend,
                      status );
+
+  /* Report an error if it is too short. */
+  if( pend - pstart <= 2*BOX && *status == SAI__OK ) {
+    *status = SAI__ERROR;
+    errRepf( "", FUNC_NAME ": length of data (%d samples) is too small "
+             "to fill gaps. Must have at least %d samples per bolometer.",
+             status, (int) ( pend - pstart ), 2*BOX + 1 );
+  }
 
   /* If the supplied "mask" value includes SMF__Q_PAD, then we will be
   replacing the zero-padded region at the start and end of each time series
@@ -376,8 +390,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
       }
     }
 
-
-    /* We now loop round using succesively smaller box sizes until all
+    /* We now loop round using successively smaller box sizes until all
        gaps are filled or we reach an unusably small box size. */
     good = 0;
     box = BOX;
@@ -485,11 +498,14 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
                 noise... */
              } else {
 
-               /* If possible fit a straight line to the box samples following
-                  the end of the flagged block. */
+               /* Find the indices of the first and last samples in the
+                  box following the end of the flagged block. */
                rightstart = jend + 1;
                rightend = jend + box;
                if( rightend > pend ) rightend = pend;
+
+               /* If there is enough data in the box, fit a straight line
+                  to it. */
                if( rightend - rightstart > box/2 ) {
                  k = 0;
                  for( jj = rightstart; jj <= rightend; jj++,k++ ) {
@@ -499,9 +515,11 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 
                  kpg1Fit1d( 1, k, y, x, &mr, &cr, &sigmar, status );
 
+               /* Otherwise, we record the first value in the box, and
+                  indicate we have no noise estimate. */
                } else {
-                 mr = VAL__BADD;
-                 cr = VAL__BADD;
+                 mr = 1.0;
+                 cr = dat[ i*bstride + rightstart*tstride ];
                  sigmar = VAL__BADD;
                }
 
@@ -517,9 +535,10 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
                    y[ k ] = dat[ i*bstride + jj*tstride ];
                  }
                  kpg1Fit1d( 1, k, y, x, &ml, &cl, &sigmal, status );
+
                } else {
-                 ml = VAL__BADD;
-                 cl = VAL__BADD;
+                 ml = 1.0;
+                 cl = dat[ i*bstride + leftend*tstride ];
                  sigmal = VAL__BADD;
                }
 
@@ -550,14 +569,20 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
                }
 
                /* If at least one of the straight line fits above was
-                  succesful, the flagged block is replaced by a straight line
+                  successfull, the flagged block is replaced by a straight line
                   plus noise. */
                if( sigma != VAL__BADD ) {
                  for( jj = jstart; jj <= jend; jj++ ) {
                    dat[ i*bstride + jj*tstride ] = grad*jj + offset +
                                                    gsl_ran_gaussian( r, sigma );
+                 }
 
-
+               /* If neither fit was successfull, and if we have reached
+                  the minimum possible box size, the flagged block is
+                  replaced by a straight line without noise. */
+               } else if( box < MINBOX ){
+                 for( jj = jstart; jj <= jend; jj++ ) {
+                   dat[ i*bstride + jj*tstride ] = grad*jj + offset;
                  }
                }
              }
@@ -582,13 +607,15 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
          }
        }
 
-/* If it did, and the box size is currently at least 20 samples, half the
-   box size and try again. Otherwise report an error. */
+/* If it did, half the box size and try again. */
        if( !good ) {
-         if( box > 19 ) {
-           box = box/2;
-           msgOutiff( MSG__DEBUG, "", "smf_fillgaps: Using box=%d for "
-                      "bolo %d\n", status, box, (int) i );
+         if( box >= MINBOX ) {
+            box = box/2;
+            msgOutiff( MSG__DEBUG, "", "smf_fillgaps: Using box=%d for "
+                       "bolo %d\n", status, box, (int) i );
+
+/* We should never get here since when the box size falls below MINBOX,
+   the above algorithm should always fill in all gaps. */
          } else if( *status == SAI__OK ){
            *status = SAI__ERROR;
            errRepf( "", "smf_fillgaps: Cannot fill gaps in bolometer %d.",
