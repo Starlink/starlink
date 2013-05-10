@@ -301,8 +301,8 @@
 *  Copyright:
 *     Copyright (C) 2000-2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005-2006 Particle Physics & Astronomy
-*     Research Council.  Copyright (C) 2007-2009 Science and Technology
-*     Facilities Council.  All Rights Reserved.
+*     Research Council.  Copyright (C) 2007-2009, 2013 Science and
+*     Technology Facilities Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -446,6 +446,8 @@
 *        warning.
 *     17-JUL-2012 (DSB):
 *        Added "NGood", "NBad", "FGood" and "FBad" estimators.
+*     2013 May 10 (MUJC):
+*        Do not pass COMP=Error to NDF_MTYPE.
 *     {enter_further_changes_here}
 
 *-
@@ -497,6 +499,7 @@
       CHARACTER LOC4*(DAT__SZLOC)! Locator to cell of the new AXIS array
       CHARACTER LOC5*(DAT__SZLOC)! Locator to cell of the old AXIS array
       CHARACTER LOC6*(DAT__SZLOC)! Locator to component of the old cell
+      CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
       CHARACTER NAME*(DAT__SZNAM)! The component name
       CHARACTER OTYPE*( NDF__SZTYP ) ! Numeric type for output arrays
       CHARACTER TTLC*( 255 )     ! Title of original current Frame
@@ -623,6 +626,8 @@
       CALL PAR_CHOIC( 'COMP', 'DATA', 'DATA,VARIANCE,QUALITY,ERROR',
      :                .FALSE., COMP, STATUS )
       PROVAR = COMP .EQ. 'VARIANCE' .OR. COMP .EQ. 'ERROR'
+      MCOMP = COMP
+      IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
 
 *  Get the WCS FrameSet from the NDF.
       CALL KPG1_GTWCS( INDFI, IWCS, STATUS )
@@ -1140,7 +1145,7 @@
 *  ==========================================
 
 *  Map the full input, and output data and (if needed) variance arrays.
-         CALL NDF_MAP( IBL, COMP, ITYPE, 'READ', IPIN, EL1, STATUS )
+         CALL NDF_MAP( IBL, MCOMP, ITYPE, 'READ', IPIN, EL1, STATUS )
          CALL NDF_MAP( OBL, COMPO, OTYPE, 'WRITE', IPOUT, EL2, STATUS )
 
          IF ( .NOT. VAR ) THEN
