@@ -62,6 +62,12 @@ csofit2_t * csofit2_open(const char * filename)
             poly.coefs[i] = strtod(tok, &endptr); if(*endptr != '\0') break;
         }
         if(i != (poly.deg+1)) continue;
+        tok = strtok_r(NULL, delim, &saveptr); if(!tok) continue;  /* rms_limit */
+        tok = strtok_r(NULL, delim, &saveptr); if(!tok) continue;  /* dev_limit */
+        tok = strtok_r(NULL, delim, &saveptr); if(!tok) continue;
+        poly.mar = strtod(tok, &endptr); if(*endptr != '\0') continue;
+        tok = strtok_r(NULL, delim, &saveptr); if(!tok) continue;
+        poly.mar_w = strtod(tok, &endptr); if(*endptr != '\0') continue;
         memcpy(&fits->polys[fits->npolys], &poly, sizeof(poly));
         fits->npolys += 1;
     }

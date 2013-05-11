@@ -24,9 +24,11 @@
 #define CSOFIT2_H
 
 typedef struct csofit2_poly_t {
-    double start, end;
-    int deg;
-    double coefs[20];
+    double start, end;  /* range of fit, utc unix epoch; t=(time-start)/(end-start) */
+    int deg;            /* polynomial degree, n */
+    double coefs[20];   /* xn...x0, tau = xn*t^n + ... x1*t + x0 */
+    double mar;         /* mean absolute residual over fit range */
+    double mar_w;       /* ditto, weighted to exclude outliers */
 } csofit2_poly_t;
 
 typedef struct csofit2_t {
