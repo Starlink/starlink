@@ -834,6 +834,7 @@
 *  must start with the DATA_ARRAY.
       COMPO = 'DATA'
       IF ( VAR ) THEN
+         MCOMP = MCOMP( : CHR_LEN( MCOMP ) ) // ',VARIANCE'
          COMP = COMP( : CHR_LEN( COMP ) ) // ',VARIANCE'
          COMPO = COMPO( : 4 ) // ',VARIANCE'
       END IF
