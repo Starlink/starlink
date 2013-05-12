@@ -890,6 +890,12 @@ smfHead* smf_create_smfHead( int * status );
 
 void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status );
 
+double smf_cso2filt_applycoeff( double csotau, const double coeff[2],
+                                int *status );
+
+void smf_cso2filt_coeff( const smfHead *hdr,  AstKeyMap * extpars,
+                         size_t nvals, double coeffs[], size_t *ncoeff, int *status);
+
 double smf_cso2filt_tau( const smfHead *hdr, double csotau, AstKeyMap * extpars, int *status);
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,

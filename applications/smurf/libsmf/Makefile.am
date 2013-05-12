@@ -108,6 +108,8 @@ smf_create_smfFilter.c \
 smf_create_smfFts.c \
 smf_create_smfHead.c \
 smf_create_tswcs.c \
+smf_cso2filt_applycoeff.c \
+smf_cso2filt_coeff.c \
 smf_cso2filt_tau.c \
 smf_cubebounds.c \
 smf_cubegrid.c \

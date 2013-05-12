@@ -43,6 +43,9 @@
 *     - The routine will not attempt to guess a tau relation.
 *     - Since "b" is usually negative, the calculation is skipped if the
 *       CSO tau is zero. The routine returns a tau of 0.0.
+*     - If this routine is to be called in a loop, consider calling
+*       smf_cso2filt_coeff once outside the loop and then calling smf_cso2filt_applycoeff
+*       inside the loop.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -56,10 +59,12 @@
 *        Add external extinction parameters. No longer calls smf_scale_tau.
 *     2011-02-18 (AGG):
 *        Trap CSO tau of 0 and return 0
+*     2013-05-12 (TIMJ):
+*        Recast in terms of coefficient retrieval and application.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010,2013 Science and Technology Facilities Council.
 *     Copyright (C) 2011 the University of British Columbia.
 *     All Rights Reserved.
 
@@ -94,11 +99,8 @@
 
 double smf_cso2filt_tau( const smfHead *hdr, double csotau, AstKeyMap * extpars, int *status) {
   double coeffs[2];        /* Tau relation coefficients */
-  char filter[81];         /* somewhere for the filter name */
-  int nvals;               /* Number of elements in keymap item */
+  size_t nvals;            /* Number of coefficients */
   double tau = VAL__BADD;  /* return filter tau */
-  AstKeyMap * taumap = NULL; /* tau relation keymap */
-
 
   if (*status != SAI__OK) return tau;
 
@@ -110,22 +112,11 @@ double smf_cso2filt_tau( const smfHead *hdr, double csotau, AstKeyMap * extpars,
   /* Trap a CSO tau of 0 and just return 0 */
   if (csotau == 0.0) return 0.0;
 
-  /* Get the filter name */
-  smf_fits_getS( hdr, "FILTER", filter, sizeof(filter), status);
+  /* Get the coefficients */
+  smf_cso2filt_coeff( hdr, extpars, 2, coeffs, &nvals, status );
 
-  /* The supplied keymap is the "ext" entry from the config file so we first need
-     to get the "taurelation" keymap */
-  astMapGet0A( extpars, "TAURELATION", &taumap );
-
-  /* Now look for the filter */
-  if (astMapGet1D( taumap, filter, 2, &nvals, coeffs )) {
-    tau = coeffs[0] * ( csotau + coeffs[1] );
-
-  } else {
-    if (*status == SAI__OK) *status = SAI__ERROR;
-    errRepf( "", "Unable to obtain tau scaling for filter '%s'",
-             status, filter );
-  }
+  /* Now apply them */
+  tau = smf_cso2filt_applycoeff( csotau, coeffs, status );
 
   return tau;
 }
