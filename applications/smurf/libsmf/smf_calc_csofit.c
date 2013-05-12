@@ -47,8 +47,10 @@
 *       is called. This will be extremely inefficient.
 
 *  History:
-*     2013-04-04 (TIMJ):
+*     2013-05-04 (TIMJ):
 *        Initial version
+*     2013-05-12 (TIMJ):
+*        Use new loop-friendly cso2filt functions.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -160,6 +162,11 @@ void smf_calc_csofit( const smfData * data, AstKeyMap* extpars, double **tau,
       size_t i;
       double curepoch;
       csofit2_poly_t *polys;
+      double coeffs[2];
+      size_t ncoeffs = 0;
+
+      /* Get the filter conversion factors */
+      smf_cso2filt_coeff( data->hdr, extpars, 2, coeffs, &ncoeffs, status );
 
       polys = &(subset->polys[0]);
 
@@ -174,7 +181,7 @@ void smf_calc_csofit( const smfData * data, AstKeyMap* extpars, double **tau,
         /* printf("%zu %.*g %.*g\n", i, DBL_DIG, curepoch, DBL_DIG, taudata[i] ); */
 
         /* and convert this value to filter [this needs refactoring] */
-        taudata[i] = smf_cso2filt_tau( data->hdr, taudata[i], extpars, status );
+        taudata[i] = smf_cso2filt_applycoeff( taudata[i], coeffs, status );
 
       }
     }
