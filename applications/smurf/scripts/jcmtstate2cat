@@ -91,6 +91,11 @@ Precipitable water vapor at the zenith in mm.
 
 Precipitable water vaport in the line of sight in mm.
 
+=item B<CSOFIT>
+
+CSO tau as derived from polynomial fits. The column only
+appears if a CSO fit is available.
+
 =back
 
 Note that information from the ACSIS extension is not included at this
@@ -104,11 +109,14 @@ use warnings;
 use NDF;
 use Astro::Coords::Angle::Hour;
 use Astro::PAL;
+use Starlink::AST;
 
+use File::Spec;
 use Getopt::Long;
 use Pod::Usage;
 use JSA::Headers ();
 use JCMT::Tau::WVM::WVMLib 1.10;
+use JCMT::Tau::CsoFit2;
 use Astro::FITS::Header::NDF;
 use NDF; # For VAL__BADD
 use Scalar::Util qw/ looks_like_number /;
@@ -135,8 +143,17 @@ my $isfirst_file = 1;
 my @columns;
 my %cols;
 my @wvmcol;
+my @fitcol;
+
+# Read the CSO fit information from the Starlink install tree
+my $fitfile = File::Spec->catfile( $ENV{STARLINK_DIR}, "share", "smurf", "csofit2.dat" );
+my $csofit;
+$csofit = JCMT::Tau::CsoFit2->new( $fitfile ) if -e $fitfile;
 
 for my $f (@files) {
+
+  # CSO fit information
+  my $csosubset;
 
   # Read JCMTSTATE information
   my %local = JSA::Headers::read_jcmtstate( $f );
@@ -153,7 +170,20 @@ for my $f (@files) {
     if (exists $local{WVM_T12} && exists $local{WVM_T42} && exists $local{WVM_T78}) {
       push(@wvmcol, "WVMTAU", "PWVZEN", "PWVLOS");
     }
+  }
 
+  # See if we have a CSO fit available for this night. If we have one we subset it.
+  if (defined $csofit) {
+    if (exists $local{RTS_END}
+        && defined $local{RTS_END}->[0] && $local{RTS_END}->[0] > 0.0
+        && defined $local{RTS_END}->[-1] && $local{RTS_END}->[-1] > 0.0 ) {
+      my $startepoch = tai2unix( $local{RTS_END}->[0] );
+      my $endepoch = tai2unix( $local{RTS_END}->[-1] );
+      $csosubset = $csofit->get( $startepoch, $endepoch );
+      if (defined $csosubset && $isfirst) {
+        push(@fitcol, "CSOFIT" );
+      }
+    }
   }
 
   # See if we have an MCEHEAD from a SCUBA-2 file
@@ -168,7 +198,7 @@ for my $f (@files) {
   # now dump the contents
   if ($isfirst_file) {
     print "# This is a TST formatted file\n";
-    print join("\t", "Id", "RA", "DEC", "DRA", "DDEC", "AZ","EL", "DAZ", "DEL", "TELSPEED", @wvmcol, @columns) ,"\n";
+    print join("\t", "Id", "RA", "DEC", "DRA", "DDEC", "AZ","EL", "DAZ", "DEL", "TELSPEED", @wvmcol, @fitcol, @columns) ,"\n";
     print join("\t", map { "--" } (0..($#columns+3))),"\n";
     $isfirst_file = 0;
   }
@@ -275,6 +305,17 @@ for my $f (@files) {
         }
       }
       push(@slice, $wvmtau, $pwvzen, $pwvlos );
+    }
+
+    # CSO Fits
+    if (@fitcol) {
+      if (defined $csosubset && $local{RTS_END}->[$i] > 0.0 ) {
+        my $thisepoch = tai2unix( $local{RTS_END}->[$i] );
+        my $fittau = $csosubset->tau( $thisepoch );
+        push(@slice, (defined $fittau ? $fittau : "NaN" ));
+      } else {
+        push(@slice, "NaN" );
+      }
     }
 
     # And append the remaining columns
@@ -577,6 +618,21 @@ sub ver6slot40 {
 	  PSUCCurr5 => $unpack[1]);
 }
 
+# Simple routine to convert TAI MJD to unix epoch seconds
+# See SMURF smf_tai2unix for details
+# There did not seem to be a DateTime module that could handle this.
+sub tai2unix {
+  my $tai = shift;
+  my $tf = Starlink::AST::TimeFrame->new( "TimeScale=TAI" );
+  $tf->SetD( "TimeOrigin", $tai );
+  $tf->Set( "TimeScale=UTC" );
+  my $utc = $tf->GetD( "TimeOrigin" );
+
+  # 86_400 is seconds in a day
+  # 40587.0 is start of Unix epoch in UTC
+  return ($utc - 40587 ) * 86_400;
+}
+
 =head1 SEE ALSO
 
 SMURF: MCEHEAD2CAT
@@ -588,7 +644,7 @@ Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 =head1 COPYRIGHT
 
 Copyright (C) 2007 Particle Physics and Astronomy Research Council.
-Copyright (C) 2007-2012 Science and Technology Facilities Council.
+Copyright (C) 2007-2013 Science and Technology Facilities Council.
 All Rights Reserved.
 
 =head1 LICENCE
