@@ -145,7 +145,6 @@
 /* Structure containing information about blocks of bolos to be
    filled by each thread. */
 typedef struct smfFillGapsData {
-  dim_t nbolo;                  /* Number of bolos */
   int ntslice;                  /* Number of time slices */
   double *dat;                  /* Pointer to bolo data */
   gsl_rng *r;                   /* GSL random number generator */
@@ -208,11 +207,9 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
     return;
   }
 
-  if( *status == SAI__OK ) {
-    /* obtain data dimensions */
-    smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride, &tstride,
-                  status );
-  }
+ /* obtain data dimensions */
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride, &tstride,
+                status );
 
   /* Determine how many bolometers to process in each thread, and create
      the structures used to pass data to the threads. */
@@ -263,7 +260,6 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
 
     /* Store information for this group in the  next smfFillGapsData
        structure. */
-    pdata->nbolo = nbolo;
     pdata->ntslice = ntslice;
     pdata->dat = dat;
     pdata->r = gsl_rng_alloc( type );
@@ -308,7 +304,6 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 /* Local Variables */
   dim_t i;                      /* Bolometer index */
   int j;                        /* Time-slice index */
-  dim_t nbolo;                  /* Number of bolos */
   int ntslice;                /* Number of time slices */
   double *dat = NULL;           /* Pointer to bolo data */
   double a;                     /* Cubic interpolation coefficient */
@@ -367,7 +362,6 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   b2 = pdata->b2;
   bstride = pdata->bstride;
   dat = pdata->dat;
-  nbolo = pdata->nbolo;
   ntslice = pdata->ntslice;
   qua = pdata->qua;
   r = pdata->r;
