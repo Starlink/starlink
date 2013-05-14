@@ -4,6 +4,11 @@
 #    matched-filter
 
 #  Purpose:
+#    WARNING - this script uses a single component model that has been
+#    superceded by a two component model as implemented in the picard
+#    matched filter recipe. Therefore the picard recipe should usually
+#    be used in preference to this script.
+
 #    Applies a matched filter to the supplied input NDF by smoothing it
 #    using either a supplied PSF image or an automatically generated
 #    Gaussian PSF. Each output pixel value is given by:
@@ -86,9 +91,12 @@
 #    2011-8-31 (DSB):
 #       - Added the -f, -h and --help options.
 #       - Allow the input NDF to be stored as a component in a container file.
+#    2013-5-14 (DSB):
+#       - Tell users that the sinlge component model implemented in this file 
+#         has been superceded.
 
 #  Copyright:
-#     Copyright (C) 2010-2011 Science & Technology Facilities Council.
+#     Copyright (C) 2010-2013 Science & Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -107,6 +115,13 @@
 #     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #     MA 02110-1301, USA
 
+#  Issue a warning telling people to uyse the picard recipe instead.
+   echo
+   echo "WARNING - this script uses a single component model that has been"
+   echo "superceded by a two component model as implemented in the picard"
+   echo "matched filter recipe. Therefore the picard recipe should usually"
+   echo "be used in preference to this script."
+   echo
 
 #  Search the command line for options starting with a minus sign, and set
 #  shell variables to the corresponding values. Also copy non-option arguments
