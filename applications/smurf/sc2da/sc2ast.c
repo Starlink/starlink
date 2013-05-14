@@ -2470,18 +2470,22 @@ static AstMapping *sc2ast_make_fts2_portmap( const fts2Port fts_port,
    AstMapping *result;
    AstMatrixMap *fts_flipmap;
    AstShiftMap *fts_shiftmap;
+   AstShiftMap *fts_mirrorshiftmap;
    const char *ident;
    int port;
 
 /* Coordinates of the FTS-2 ports.  These coordinates should be subtracted
    before flipping / scaling the coordinates and added back on afterwards. */
-   static double fts_port_1[2] = {-20.43,  20.43};
-   static double fts_port_2[2] = { 20.43,  20.43};
+   static double fts_port_1[2] = {-18.20,  0.0};
+   static double fts_port_2[2] = { 21.35,  0.0};
 
 /* A matrix to perform the FTS-2 mirroring, both within each port, and from
    a port to its image -- i.e. this defines the FTS-2 mirroring axis,
    assuming it is the same in all cases. */
    static double fts_flip[4] = {-1, 0, 0, 1};
+
+/* Coordinates of the port mirroring axis. */
+   static double fts_port_mirror[2] = {-4.0, 0.0};
 
 /* Initialise the returned value. */
    result = NULL;
@@ -2516,7 +2520,9 @@ static AstMapping *sc2ast_make_fts2_portmap( const fts2Port fts_port,
    fts_flipmap = astMatrixMap( 2, 2, 0, fts_flip, " " );
 
    if( fts_port == FTS_IMAGE ) {
-      result =  (AstMapping *) astCmpMap( fts_flipmap,  fts_shiftmap, 1, " " );
+      fts_mirrorshiftmap = astShiftMap( 2, fts_port_mirror, " " );
+      result = (AstMapping *) astCmpMap( fts_mirrorshiftmap,  fts_flipmap, 1, " " );
+      result = (AstMapping *) astCmpMap( result, fts_shiftmap, 1, " " );
    } else {
       result = (AstMapping *) fts_shiftmap;
    }
