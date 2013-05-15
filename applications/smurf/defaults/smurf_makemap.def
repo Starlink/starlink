@@ -1404,7 +1404,9 @@ noexportsetbad = 0
 #		sample in the box, so each bolometer ends up with a variance
 #		for every time slice. Negative values are interpreted as number
 #		of seconds, and positive values as a number of down-sampled
-#		time slices.
+#		time slices. Note, very small box sizes may produce
+#		unrepresentative noise levels, and there is a hard minimum
+#		of 101 on the number of downsampled time slices in a noise box.
 noi.box_size = 0
 
 #-----------------------------------------------------------------
