@@ -22,6 +22,7 @@ smurf_flatfield.c \
 smurf_fts2_deglitch.c \
 smurf_fts2_flatfield.c \
 smurf_fts2_freqcorr.c \
+smurf_fts2_split.c \
 smurf_fts2_init.c \
 smurf_fts2_maskmap.c \
 smurf_fts2_phasecorr.c \

@@ -49,6 +49,8 @@
 *        Add subarray check.
 *     2013-03-12 (MSHERWOOD)
 *        Beginning to correct zeropadding
+*     2013-03-12 (MS)
+*        Aligned with OPD grid
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -122,6 +124,8 @@ void smurf_fts2_spectrum(int* status)
   double fNyquist           = 0.0;            /* Nyquist frequency */
   double dSigma             = 0.0;            /* Spectral Sampling Interval */
   double* IFG               = NULL;           /* Interferogram */
+  double* DS                = NULL;            /* Double Sided Interferogram */
+  fftw_complex* DSIN        = NULL;           /* Double-Sided interferogram, FFT input */
   fftw_complex* SPEC        = NULL;           /* Spectrum */
   fftw_plan plan            = NULL;           /* fftw plan */
 
@@ -177,7 +181,9 @@ void smurf_fts2_spectrum(int* status)
     nHeight = inData->dims[1];
     nFrames = inData->dims[2];
     nPixels = nWidth * nHeight;
-	
+
+    /*printf("%s: nWidth=%d, nHeight=%d, nPixels=%d, nFrames=%d\n", TASK_NAME, nWidth, nHeight, nPixels, nFrames);*/
+
     /* Check if the file is initialized for FTS2 processing */
     if(!(inData->fts) || !(inData->fts->zpd)) {
       *status = SAI__ERROR;
@@ -205,6 +211,8 @@ void smurf_fts2_spectrum(int* status)
     }
     N = 2 * N2;
 
+    /*printf("%s: N=%d, N2=%d, dSigma=%f, fNyquist=%f\n", TASK_NAME, N, N2, dSigma, fNyquist);*/
+
     /* Save wavenumber factor to FITS extension */
     smf_fits_updateD(inData->hdr, "WNFACT", dSigma, "Wavenumber factor cm^-1", status);
 
@@ -219,6 +227,8 @@ void smurf_fts2_spectrum(int* status)
     if (dataLabel) { one_strlcpy(outData->hdr->dlabel, dataLabel, sizeof(outData->hdr->dlabel), status ); }
 
     IFG  = astCalloc(N,  sizeof(*IFG));
+    DS   = astCalloc(N, sizeof(*DS));
+    DSIN    = fftw_malloc(N * sizeof(*DSIN));
     SPEC = fftw_malloc((N + 1) * sizeof(*SPEC));
 
     for(i = 0; i < nWidth; i++) {
@@ -242,7 +252,8 @@ void smurf_fts2_spectrum(int* status)
         }
 
         /* Get ZPD index */
-        indexZPD = *((int*)(zpdData->pntr[0]) + bolIndex);
+        /*indexZPD = *((int*)(zpdData->pntr[0]) + bolIndex);*/
+        indexZPD = N2;
 
         /* Double-Sided interferogram */
         for(k = indexZPD; k < nFrames; k++) {
@@ -252,8 +263,11 @@ void smurf_fts2_spectrum(int* status)
           IFG[N - indexZPD + k] =  *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
         }
 
-        /* FFT butterflied interferogram */
-        plan = fftw_plan_dft_r2c_1d(N, IFG, SPEC, FFTW_ESTIMATE);
+        /* Convert real-valued interferogram to complex-valued interferogram */
+        for(k = 0; k < nFrames; k++) { DSIN[k][0] = IFG[k]; DSIN[k][1] = 0.0; }
+
+        /* FFT Double-sided complex-valued interferogram */
+        plan = fftw_plan_dft_1d(N, DSIN, SPEC, FFTW_FORWARD, FFTW_ESTIMATE);
         fftw_execute(plan);
 
         /* Write out the real component of the spectrum */
@@ -264,6 +278,8 @@ void smurf_fts2_spectrum(int* status)
     }
 
     if(IFG)  { IFG = astFree(IFG); }
+    if(DS)   { DS = astFree(DS); }
+    if(DSIN) { fftw_free(DSIN); DSIN = NULL; }
     if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
 
     /* Close the file */
@@ -276,6 +292,8 @@ void smurf_fts2_spectrum(int* status)
 
   CLEANUP:
   if(IFG)  { IFG = astFree(IFG); }
+  if(DS)   { DS = astFree(DS); }
+  if(DSIN) { fftw_free(DSIN); DSIN = NULL; }
   if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
 
   /* Close files if still open */

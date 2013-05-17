@@ -82,6 +82,8 @@
 *       Added digital filtering to interferogram prior to phase correction
 *     2013-05-08 (MSHERWOOD)
 *       Bracketed KERNEL_LENGTH macro
+*     2013-05-16 (MSHERWOOD)
+*       Retain imaginary spectrum for DEBUG output
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -707,13 +709,13 @@ void smurf_fts2_phasecorrds(int* status)
         /* Multiplication in frequency domain */
         for(k = 0; k < nFrames; k++) {
           SPEC[k][0] = DSOUT[k][0] * PCF[k][0] - DSOUT[k][1] * PCF[k][1];
-          /* We should just zero out the imaginary part of the spectrum since all that is left there is noise */
-          /*SPEC[k][1] = DSOUT[k][0] * PCF[k][1] + DSOUT[k][1] * PCF[k][0];*/
-          SPEC[k][1] = 0.0;    /* Debug */
+          SPEC[k][1] = DSOUT[k][0] * PCF[k][1] + DSOUT[k][1] * PCF[k][0];
 #if DEBUG
           SPECS[k][0] = SPEC[k][0];    /* Debug */
           SPECS[k][1] = SPEC[k][1];    /* Debug */
 #endif
+          /* We should just zero out the imaginary part of the spectrum since all that is left there is noise */
+          SPEC[k][1] = 0.0;    /* Debug */
         }
 
         /* Inverse FFT spectrum to get the phase corrected interferogram */

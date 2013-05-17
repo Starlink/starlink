@@ -212,7 +212,7 @@ void smurf_fts2_init(int* status)
     /* Mirror positions in mm */
     nTmp = nFrames;
     MIRPOS = astCalloc(nFrames, sizeof(*MIRPOS));
-    fts2_getmirrorpositions(inData, MIRPOS, &nTmp, status); // (mm)
+    fts2_getmirrorpositions(inData, MIRPOS, &nTmp, status); /* (mm) */
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Unable to get the mirror positions!", status);
@@ -337,6 +337,7 @@ void smurf_fts2_init(int* status)
     }
     /* Values in the whole grid */
     nOPD = 2 * nMax;
+    /*printf("%s: nOPD=%d\n", TASK_NAME, nOPD);*/
 
     OPD_EVEN = astCalloc(nOPD, sizeof(*OPD_EVEN));
     for(k = 1; k <= nOPD; k++) {

@@ -39,6 +39,7 @@ flatfield \
 fts2deglitch \
 fts2flatfield \
 fts2freqcorr \
+fts2split \
 fts2init \
 fts2maskmap \
 fts2opcorr \

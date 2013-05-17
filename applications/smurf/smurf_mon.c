@@ -34,6 +34,7 @@
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
 *     COBA: Coskun Oba (UoL)
+*     Matt Sherwood (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -166,6 +167,8 @@
 *        Use ndfCancl to cancel all newly active NDF parameters at the
 *        end of the monolith. This avoid such parameters causing warnings
 *        about dangling HDS locators.
+*     2013-05-08 (MSHERWOOD):
+*         Add FTS2SPLIT
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -323,6 +326,8 @@ void smurf_mon( int * status ) {
     smurf_fts2_flatfield( status );
   } else if (strcmp( taskname, "FTS2FREQCORR" ) == 0 ) {
     smurf_fts2_freqcorr( status );
+  } else if (strcmp( taskname, "FTS2SPLIT" ) == 0 ) {
+    smurf_fts2_split( status );
   } else if (strcmp( taskname, "FTS2INIT" ) == 0 ) {
     smurf_fts2_init( status );
   } else if (strcmp( taskname, "FTS2MASKMAP" ) == 0 ) {

@@ -71,6 +71,7 @@
 #     JB: Jennifer Balfour (UBC)
 #     COBA: Coskun Oba (UoL)
 #     MJC: Malcolm J. Currie (JAC, Hawaii)
+#     MSHERWOOD: Matt Sherwood (UoL)
 #     {enter_new_authors_here}
 
 #  History:
@@ -265,6 +266,8 @@
 #        Restore alphabetical order.
 #     2012 September 17 (MJC):
 #        Replace SC/19 with SC/21 in startup messages.
+#     2013-05-08 (MSHERWOOD):
+#        Add FTS2SPLIT
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -2021,6 +2024,40 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {Theta file storing the off-axis angles}
+                helpkey *
+            }
+        }
+
+        action fts2split {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+            
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
         }
