@@ -38,14 +38,14 @@ liberr_standalone_la_SOURCES = \
 	$(C_INTERFACE_STAND) \
 	$(F_INTERFACE_STAND) \
 	$(PRIVATE_INCLUDES)
-liberr_standalone_la_LIBADD = liberr.la
+liberr_standalone_la_LIBADD = liberr.la `ems_link`
 
 liberr_adam_la_SOURCES = \
 	$(C_ROUTINES_ADAM) \
 	$(C_INTERFACE_ADAM) \
 	$(F_INTERFACE_ADAM) \
 	$(PRIVATE_INCLUDES)
-liberr_adam_la_LIBADD = liberr.la
+liberr_adam_la_LIBADD = liberr.la `ems_link`
 
 PRIVATE_INCLUDES = mers_f77.h mers1.h
 

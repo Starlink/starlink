@@ -27,6 +27,8 @@ libncar_la_SOURCES = $(F_ROUTINES) $(NONSNX_F_ROUTINES) $(BLOCKDATA_ROUTINES) $(
 # Do not link this and libncar at the same time
 libncar_snx_la_SOURCES = $(F_ROUTINES) $(SNX_F_ROUTINES) $(BLOCKDATA_ROUTINES) $(FPP_ROUTINES)
 
+libncar_snx_la_LIBADD = libncar_user.la
+
 libncar_conrecqck_la_SOURCES = conrecqck.f
 libncar_conrecsupr_la_SOURCES = conrecsupr.f
 libncar_dashline_la_SOURCES = dashline.f

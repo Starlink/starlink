@@ -9,6 +9,8 @@ libone_la_SOURCES = \
 	$(include_MESSAGES) \
         $(C_ROUTINES)
 
+libone_la_LIBADD = `psx_link`
+
 include_MESSAGES = ONE_ERR one_err.h
 
 cincludedir = $(includedir)/star

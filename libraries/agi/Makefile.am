@@ -28,6 +28,7 @@ libagi_la_SOURCES = $(COMMON_F_ROUTINES) $(AGI_F_ROUTINES) \
 libagi_adam_la_SOURCES = $(AGI_ADAM_F_ROUTINES) $(AGI_F_ROUTINES) \
                          $(COMMON_C_ROUTINES) $(COMMON_F_ROUTINES) \
                          $(BLOCK_DATA_ROUTINES)
+libagi_adam_la_LIBADD = `idi_link`
 
 # Shared AGP infrastructure
 libagp_la_SOURCES = $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES) \

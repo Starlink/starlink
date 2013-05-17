@@ -16,7 +16,7 @@ libsla_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(C_ROUTINES) \
 	$(FPP_ROUTINES)
-libsla_la_LIBADD = $(LTLIBOBJS)
+libsla_la_LIBADD = $(LTLIBOBJS) `cnf_link`
 libsla_la_LDFLAGS = -version-info $(libsla_la_version_info)
 
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)

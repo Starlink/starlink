@@ -7,6 +7,8 @@ lib_LTLIBRARIES = libsgs.la
 libsgs_la_SOURCES = $(F_ROUTINES) $(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
 
+libsgs_la_LIBADD = `gns_link`
+
 include_MESSAGES = SGS_ERR
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun85_diag1.eps

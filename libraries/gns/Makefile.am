@@ -11,6 +11,8 @@ libgns_la_SOURCES = \
   $(include_MESSAGES) \
   $(PRIVATE_INCLUDES)
 
+libgns_la_LIBADD = `ems_link`
+
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = GNS_ERR
 

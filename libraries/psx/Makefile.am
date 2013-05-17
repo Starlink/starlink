@@ -16,6 +16,8 @@ libpsx_la_SOURCES = \
 	$(include_MESSAGES) \
 	$(noinst_MESSAGES)
 
+libpsx_la_LIBADD = `cnf_link`
+
 include_MESSAGES = PSX_ERR
 noinst_MESSAGES = psx_err.h
 

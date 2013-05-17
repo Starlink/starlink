@@ -8,6 +8,7 @@ libcnf_la_SOURCES = \
 	$(C_ROUTINES)
 
 libcnfrtl_la_SOURCES = $(RTL_ROUTINES)
+libcnfrtl_la_LIBADD = @FCLIBS@
 
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
@@ -74,7 +75,7 @@ c_calls_f_SOURCES = c_calls_f_main.c c_calls_f_sub.f
 c_calls_f_LDADD = libcnf.la libcnfrtl.la @FCLIBS@ `starmem_link`
 
 c_calls_f_args_SOURCES = c_calls_f_args.c f_receive_args.f
-c_calls_f_args_LDADD = libcnfrtl.la @FCLIBS@ `starmem_link`
+c_calls_f_args_LDADD = libcnf.la libcnfrtl.la @FCLIBS@ `starmem_link`
 
 dist_starnews_DATA = cnf.news
 dist_pkgdata_DATA = LICENCE

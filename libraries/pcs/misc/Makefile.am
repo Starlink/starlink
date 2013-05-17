@@ -8,6 +8,8 @@ libmisc_adam_la_SOURCES = \
 	$(C_ROUTINES) \
 	$(F_ROUTINES)
 
+libmisc_adam_la_LIBADD = @CURSES_LIB@
+
 C_ROUTINES = icl_reada.c putenv.c
 
 F_ROUTINES = icl_writea.f

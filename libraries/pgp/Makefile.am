@@ -10,6 +10,7 @@ dist_bin_SCRIPTS = pgp_link grfont.dat rgb.txt
 lib_LTLIBRARIES = libpgp.la
 
 libpgp_la_SOURCES = $(F_ROUTINES) $(include_MESSAGES)
+libpgp_la_LIBADD = `gks_link` `gns_link`
 
 include_MESSAGES = PGP_ERR
 

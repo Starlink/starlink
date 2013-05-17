@@ -18,10 +18,14 @@ libhds_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \
 	$(C_ROUTINES)
 
+libhds_la_LIBADD = `starmem_link` `ems_link`
+
 libhdsf_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(F_C_ROUTINES) \
 	$(BLOCK_DATA_FILES)
+
+libhdsf_la_LIBADD = `ems_link`
 
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).

@@ -14,6 +14,8 @@ libndf_la_SOURCES = \
 	$(STANDALONE_C_ROUTINES) \
 	$(PRIVATE_INCLUDES)
 
+libndf_la_LIBADD = `psx_link`
+
 libndf_adam_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(include_MESSAGES) \
