@@ -70,7 +70,8 @@
 *          slices are in the file.
 
 *  Authors:
-*     Tim Jenness (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +83,8 @@
 *        from raw data.
 *     2011-01-11 (TIMJ):
 *        Now writes out the relevant JCMTSTATE slice.
+*     2013-05-17 (DSB):
+*        Copy any input Quality to the output NDF.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -97,7 +100,7 @@
 *     SMURF: jcmtstate2cat
 
 *  Copyright:
-*     Copyright (C) 2008,2009,2011 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -156,6 +159,7 @@ void smurf_smurfcopy ( int * status ) {
   smfFile * ofile = NULL;    /* output smfFile */
   Grp *ogrp = NULL;          /* Output group */
   size_t outsize;            /* Total number of NDF names in the output group */
+  smf_qual_t *qua;           /* Pointer to input quality array */
   dim_t slice;               /* Time index to extract */
   size_t size;               /* Number of files in input group */
   int ubnd[2];               /* Upper coordinate bounds of output file */
@@ -243,11 +247,14 @@ void smurf_smurfcopy ( int * status ) {
     ubnd[0] = lbnd[0] + (data->dims)[0] - 1;
     ubnd[1] = lbnd[1] + (data->dims)[1] - 1;
 
+    /* Get a pointer to the input quality array (if any). */
+    qua = smf_select_qualpntr( data, NULL, status );
+
     /* Open an output file (losing history) but we do not want
        to propagate the full NDF size to the output file */
 
-    smf_open_newfile( ogrp, i, data->dtype, 2, lbnd, ubnd, 0,
-                      &odata, status );
+    smf_open_newfile( ogrp, i, data->dtype, 2, lbnd, ubnd,
+                      qua?SMF__MAP_QUAL:0, &odata, status );
     ofile = odata->file;
     ifile = data->file;
 
@@ -264,6 +271,13 @@ void smurf_smurfcopy ( int * status ) {
       offset = (slice - 1) * nelem * dtypsz;
       inptr = (data->pntr)[0];
       memcpy( (odata->pntr)[0], inptr + offset, nelem * dtypsz );
+
+      if( qua ) {
+         dtypsz = sizeof( smf_qual_t );
+         offset = (slice - 1) * nelem * dtypsz;
+         inptr = (unsigned char *) qua;
+         memcpy( odata->qual, inptr + offset, nelem * dtypsz );
+      }
 
       /* World coordinates - note the 0 indexing relative to GRID */
       smf_tslice_ast( data, slice-1, 1, fts_port, status );
