@@ -87,7 +87,7 @@ void fts2_getmirrorpositions(smfData* data, double* positions, int* size, int* s
   HDSLoc* hdsLocPos = NULL; /* Pointer to mirror positions */
 
   smf_fits_getS(data->hdr, "FTS_MODE", ftsMode, sizeof(ftsMode), status);
-  if(strncmp(ftsMode, "FSCAN", 5) == 0 ) {
+  if(strncmp(ftsMode, "FSCAN", 5) == 0 || strncmp(ftsMode, "ZPD", 3) == 0) {
     hdsLoc = smf_get_xloc(data, "JCMTSTATE", "EXT", "READ", 0, 0, status);
     datFind(hdsLoc, "FTS_POS", &hdsLocPos, status);
     datSize(hdsLocPos, &count, status);
