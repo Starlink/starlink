@@ -276,7 +276,8 @@
 *        Determines the algorithm used to calculate the output pixel
 *        values. If a TRUE value is given, a rebinning algorithm is
 *        used. Otherwise, a resampling algorithm is used. See the
-*        "Choice of Algorithm" topic below.  [current value]
+*        "Choice of Algorithm" topic below.  The initial default is
+*         FALSE.  [current value]
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned. If a
 *        null value is supplied for this parameter, the first NDF
