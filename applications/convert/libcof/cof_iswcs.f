@@ -56,6 +56,8 @@
 *        Original version.
 *     9-JUN-2003 (DSB):
 *        Corrected logic for breaking out of object reading loop.
+*     20-MAY-2013 (DSB):
+*        Flush error and continue if an invalid FITS card is read.
 *     {enter_further_changes_here}
 
 *-
@@ -66,6 +68,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'AST_ERR'          ! AST error constants
       INCLUDE 'DAT_PAR'          ! HDS constants
 
 *  Arguments Given:
@@ -109,11 +112,21 @@
          CALL NDF_XLOC( INDF, 'FITS', 'READ', LOC, STATUS )
          CALL DAT_SIZE( LOC, NCARD, STATUS )
 
-*  Loop round putting each card into the FitsChan.
+*  Loop round putting each card into the FitsChan. If an invalid card is
+*  read, flush the error and continue in the hope that omitting the card
+*  will have no effect on the WCS.
          DO ICARD = 1, NCARD
             CALL DAT_CELL( LOC, 1, ICARD, CLOC, STATUS )
             CALL DAT_GET0C( CLOC, CARD, STATUS )
-            CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS )
+               IF( STATUS .EQ. AST__BDFTS ) THEN
+                  CALL ERR_REP( ' ', 'Attempting to continuing...',
+     :                          STATUS )
+                  CALL ERR_FLUSH( STATUS )
+               END IF
+            ENDIF
+
             CALL DAT_ANNUL( CLOC, STATUS )
          END DO
 
