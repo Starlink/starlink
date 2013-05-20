@@ -115,7 +115,6 @@ void smurf_fts2_spectrum(int* status)
   Grp* gOut                 = NULL;           /* Output group */
   smfData* inData           = NULL;           /* Pointer to input data */
   smfData* outData          = NULL;           /* Pointer to output data */
-  smfData* zpdData          = NULL;           /* Pointer to ZPD data */
   int zeropad               = 1;              /* Determines whether to zeropad */
   int resolution            = 2;              /* Spectral Resolution, 0=LOW, 1=MEDIUM, *=HIGH */
   int i                     = 0;              /* Counter */
@@ -185,14 +184,11 @@ void smurf_fts2_spectrum(int* status)
     /*printf("%s: nWidth=%d, nHeight=%d, nPixels=%d, nFrames=%d\n", TASK_NAME, nWidth, nHeight, nPixels, nFrames);*/
 
     /* Check if the file is initialized for FTS2 processing */
-    if(!(inData->fts) || !(inData->fts->zpd)) {
+    if(!(inData->fts)) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "The file is NOT initialized for FTS2 data reduction!", status);
       goto CLEANUP;
     }
-
-    /* Read in ZPD 2D array */
-    zpdData = inData->fts->zpd;
 
     /* Read in the Nyquist frequency from FITS component */
     smf_fits_getD(inData->hdr, "FNYQUIST", &fNyquist, status);
@@ -252,7 +248,7 @@ void smurf_fts2_spectrum(int* status)
         }
 
         /* Get ZPD index */
-        /*indexZPD = *((int*)(zpdData->pntr[0]) + bolIndex);*/
+        /* The IFG is now supposed to be centered on its evenly spaced grid */
         indexZPD = N2;
 
         /* Double-Sided interferogram */
