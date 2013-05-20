@@ -3,6 +3,7 @@
 
 #include "star/hds.h"
 #include "ast.h"
+#include "ast_err.h"
 #include "ndf.h"
 #include "mers.h"
 #include "sae_par.h"
@@ -79,13 +80,16 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     25-NOV-2005 (TIMJ):
 *        Original version.
 *     29-NOV-2005 (TIMJ):
-*        Rename from ndfGtfts
+*        Rename from ndfGtfts.
+*     20-MAY-2013 (DSB):
+*        Do not abort just because an invalid header is encountered in the FITS extension.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -190,9 +194,14 @@ int kpgGtfts( int indf, AstFitsChan ** fchan, int * status ) {
     card = fpntr;
 
     /* Extract headers 80 characters at a time. No nul-termination
-       but astPutFits guarantees to only read 80 characters */
-    for (i = 0; i < ncards; i++ ) {
+       but astPutFits guarantees to only read 80 characters, DO not abort
+       just becase an invalid FITS header is encountered.  */
+    for (i = 0; i < ncards && *status == SAI__OK; i++ ) {
       astPutFits( *fchan, card, 0 );
+      if( *status == AST__BDFTS ) {
+         errRep( "", "Attempting to continue....", status );
+         errFlush( status );
+      }
       card += SZFITSCARD;
     }
 
