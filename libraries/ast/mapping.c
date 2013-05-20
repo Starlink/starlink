@@ -355,6 +355,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     9-MAY-2013 (DSB):
 *        Change the "nused" parameter of astRebinSeq<X> from "size_t *" to
 *        "int64_t *" to cater for systems where "size_t" is only 32 bits long.
+*     20-MAY-2013 (DSB):
+*        Always perform a linear fit in RebinAdaptively if flux
+*        conservation is requested.
 *class--
 */
 
@@ -10240,6 +10243,7 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
    int i;                        /* Loop count */
    int isLinear;                 /* Is the transformation linear? */
    int mxdim;                    /* Largest output section dimension size */
+   int need_fit;                 /* Do we need to perform a linear fit? */
    int npix;                     /* Number of pixels in output section */
    int npoint;                   /* Number of points for obtaining a fit */
    int nvertex;                  /* Number of vertices of output section */
@@ -10294,9 +10298,12 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
    user-supplied scale factor. */
    toobig = ( maxpix < mxdim );
 
-/* Assume the Mapping is significantly non-linear before deciding
-   whether to sub-divide the output section. */
+/* Indicate we do not yet have a linear fit. */
    linear_fit = NULL;
+
+/* Initialise a flag indicating if we need to perform a linear fit. This
+   is always the case if flux conservation was requested. */
+   need_fit = ( flags & AST__CONSERVEFLUX );
 
 /* If the output section is too small to be worth obtaining a linear
    fit, or if the accuracy tolerance is zero, we will not
@@ -10314,12 +10321,18 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
    } else if ( toobig ) {
       divide = 1;
 
-/* If neither of the above apply, then attempt to fit a linear
-   approximation to the Mapping's forward transformation over the
-   range of coordinates covered by the input section. We need to
-   temporarily copy the integer bounds into floating point arrays to
-   use astLinearApprox. */
+/* If neither of the above apply, we need to do a fiot regardless of
+   whether flux conservation was requested or not. Whether we divide or
+   not will depend on whether the Mapping is linear or not. */
    } else {
+      need_fit = 1;
+   }
+
+/* If required, attempt to fit a linear approximation to the Mapping's
+   forward transformation over the range of coordinates covered by the
+   input section. We need to temporarily copy the integer bounds into
+   floating point arrays to use astLinearApprox. */
+   if( need_fit ) {
 
 /* Allocate memory for floating point bounds and for the coefficient array */
       flbnd = astMalloc( sizeof( double )*(size_t) ndim_in );
