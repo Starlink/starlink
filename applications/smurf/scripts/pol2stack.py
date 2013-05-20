@@ -127,6 +127,8 @@
 *        Original version
 *     1-MAY-2013 (DSB):
 *        Added parameter "QUI".
+*     20-MAY-2013 (DSB):
+*        Fix bug in regexp that filters out the Q, U and I NDF names.
 
 *-
 '''
@@ -215,9 +217,9 @@ try:
    debias = parsys["DEBIAS"].value
 
 #  Get groups containing all the Q, U and I images.
-   qin = inqui.filter("\.Q" )
-   uin = inqui.filter("\.U" )
-   iin = inqui.filter("\.I" )
+   qin = inqui.filter("'\.Q$'" )
+   uin = inqui.filter("'\.U$'" )
+   iin = inqui.filter("'\.I$'" )
 
 #  Rotate them to use the same polarimetric reference direction.
    qrot = NDG(qin)
