@@ -108,18 +108,18 @@ itcl::class gaia::GaiaRampPrint {
 
       #  Add menu to select the font and its size.
       itk_component add lsize {
-	 LabelEntryScale $w_.lsize \
-	    -text "Label size:" \
-	    -value 1.0 \
-	    -labelwidth 10 \
-	    -valuewidth 5 \
-	    -from 0.25 \
-	    -to 4.0 \
-	    -increment 0.25 \
-	    -resolution 0.25 \
-	    -show_arrows 1 \
-	    -anchor w \
-	    -command [code $this set_label_size_]
+         LabelEntryScale $w_.lsize \
+            -text "Label size:" \
+            -value 1.0 \
+            -labelwidth 10 \
+            -valuewidth 5 \
+            -from 0.25 \
+            -to 4.0 \
+            -increment 0.25 \
+            -resolution 0.25 \
+            -show_arrows 1 \
+            -anchor w \
+            -command [code $this set_label_size_]
       }
       set lsize 1.0
       set parent [winfo parent $w_]
@@ -130,34 +130,34 @@ itcl::class gaia::GaiaRampPrint {
       #  Create a menu that allows the visual selection of one of the
       #  known fonts. Use a LabelMenu widget to host the choice.
       itk_component add lfont {
-	 util::LabelMenu $w_.lfont \
-	    -text "Label font:" \
-	    -relief raised \
-	    -labelwidth 10 \
-	    -valuewidth 5
+         util::LabelMenu $w_.lfont \
+            -text "Label font:" \
+            -relief raised \
+            -labelwidth 10 \
+            -valuewidth 5
       }
       pack $itk_component(lfont) -side top -fill x -ipadx 1m -ipady 1m
       $parent add_short_help $itk_component(lfont) \
          {Font for the labels added around ramp}
 
       catch {
-	 #  Now add all the fonts.
-	 foreach {index xname desc} $fontmap_ {
-	    $itk_component(lfont) add \
-	       -command [code $this set_label_font_ $index] \
-	       -label $desc \
-	       -value $xname \
-	       -font $xname
-	 }
-	 set lfont_ 0
+         #  Now add all the fonts.
+         foreach {index xname desc} $fontmap_ {
+            $itk_component(lfont) add \
+               -command [code $this set_label_font_ $index] \
+               -label $desc \
+               -value $xname \
+               -font $xname
+         }
+         set lfont_ 0
       }
 
       #  Colours, border and font.
       itk_component add lcolour {
-	 util::LabelMenu $w_.lcolour \
-	    -text "Label color:" \
-	    -relief raised \
-	    -labelwidth 10
+         util::LabelMenu $w_.lcolour \
+            -text "Label color:" \
+            -relief raised \
+            -labelwidth 10
       }
       $parent add_short_help $itk_component(lcolour) \
          {Colour for labels added around ramp}
@@ -165,19 +165,19 @@ itcl::class gaia::GaiaRampPrint {
 
       #  Now add all the colours.
       foreach {index xname} $colourmap_ {
-	 $itk_component(lcolour) add \
-	    -command [code $this set_label_colour_ $index] \
-	    -label {    } \
-	    -value $xname \
-	    -background $xname
+         $itk_component(lcolour) add \
+            -command [code $this set_label_colour_ $index] \
+            -label {    } \
+            -value $xname \
+            -background $xname
       }
       set lcolour_ 0
 
       itk_component add bcolour {
-	 util::LabelMenu $w_.bcolour \
-	    -text "Border color:" \
-	    -relief raised \
-	    -labelwidth 10
+         util::LabelMenu $w_.bcolour \
+            -text "Border color:" \
+            -relief raised \
+            -labelwidth 10
       }
       $parent add_short_help $itk_component(bcolour) \
          {Colour of border added around the ramp}
@@ -185,11 +185,11 @@ itcl::class gaia::GaiaRampPrint {
 
       #  Now add all the colours.
       foreach {index xname} $colourmap_ {
-	 $itk_component(bcolour) add \
-	    -command [code $this set_border_colour_ $index] \
-	    -label {    } \
-	    -value $xname \
-	    -background $xname
+         $itk_component(bcolour) add \
+            -command [code $this set_border_colour_ $index] \
+            -label {    } \
+            -value $xname \
+            -background $xname
       }
       set bcolour_ 0
    }
@@ -218,8 +218,8 @@ itcl::class gaia::GaiaRampPrint {
       set xhigh [expr round($xhigh+10)]
       set yhigh [expr round($yhigh+10)]
       $canvas_ create rectangle $xlow $ylow $xhigh $yhigh \
-	 -fill [$itk_option(-maincanvas) cget -background] \
-	 -tags ${this}_back
+         -fill [$itk_option(-maincanvas) cget -background] \
+         -tags ${this}_back
       $canvas_ lower ${this}_back all
    }
 
@@ -244,8 +244,8 @@ itcl::class gaia::GaiaRampPrint {
        global ::$w_.color ::$w_.rotate $w_.colormap
 
        set cmd [list $canvas_ postscript \
-		    -colormode [set $w_.color] \
-		    -rotate [set $w_.rotate]]
+                    -colormode [set $w_.color] \
+                    -rotate [set $w_.rotate]]
 
        #  Get the offsets that correct for the apparent shift of the
        #  image when zoomed.
@@ -265,15 +265,15 @@ itcl::class gaia::GaiaRampPrint {
 
        #  Set the width, height and corner.
        lappend cmd \
-	   -width [expr $x1-$x0+1] \
-	   -height [expr $y1-$y0+1] \
-	   -x $x0 \
-	   -y $y0
+           -width [expr $x1-$x0+1] \
+           -height [expr $y1-$y0+1] \
+           -x $x0 \
+           -y $y0
 
        if {"[set $w_.color]" == "mono"} {
-	   # you can add to this array, see canvas(n) man page
-	   set $w_.colormap(grey) "0.0 0.0 0.0 setrgbcolor"
-	   lappend cmd -colormap $w_.colormap
+           # you can add to this array, see canvas(n) man page
+           set $w_.colormap(grey) "0.0 0.0 0.0 setrgbcolor"
+           lappend cmd -colormap $w_.colormap
        }
 
        #  Shift all canvas items so that they align to the image
