@@ -540,15 +540,14 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                      wcs = astClone( pow->hdr->wcs );
                   }
                   memcpy( buffer, pow->pntr[ 0 ], ndata*sizeof( buffer ) );
-               }
-
-               smf_close_file( &pow, status );
+                  smf_close_file( &pow, status );
 
 /* If too few good values, store a set of bad values in place of the
    power spectrum. */
-               if( ngood < mingood*ntslice ) {
-                  for( itime = 0; itime < ndata; itime++ ){
-                     buffer[ itime ] = VAL__BADD;
+                  if( ngood < mingood*ntslice ) {
+                     for( itime = 0; itime < ndata; itime++ ){
+                        buffer[ itime ] = VAL__BADD;
+                     }
                   }
                }
 
