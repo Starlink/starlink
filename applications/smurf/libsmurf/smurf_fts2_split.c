@@ -294,7 +294,7 @@ void smurf_fts2_split(int* status)
            and for the last scan if it's the only one
            and if it's not too short (compared to the previous one) */
         if(nStart >=0 && nStop > 0 &&
-            (!done || (done && nFramesOutPrev == 0) ||
+            (nFramesOutPrev == 0 ||
               (nFramesOutPrev > 0 && nFramesOut > 0 && nFramesOut/nFramesOutPrev >= 0.5))) {
             /* Copy single scan NDF data from input to output */
             outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
