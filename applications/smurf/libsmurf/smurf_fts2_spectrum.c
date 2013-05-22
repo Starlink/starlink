@@ -53,6 +53,9 @@
 *        Aligned with OPD grid
 *     2013-05-21 (MS)
 *        Reimplemented zero padding
+*     2013-05-22 (MS)
+*        Do not change nyquist frequency when zero padding
+*        to avoid shifting the resulting spectrum
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -227,10 +230,13 @@ void smurf_fts2_spectrum(int* status)
     dSigmain = fNyquistin / N2in;
 
     if(zeropad) {
-      /* Round Nyquist frequency down to nearest integer, for calculation convenience */
+      /* Round Nyquist frequency down to nearest integer, for calculation convenience
       fNyquistzp = floor(fNyquist);
 
-      smf_fits_updateD(inData->hdr, "FNYQUIST", fNyquistzp, "Nyquist frequency (cm^-1)", status);
+      smf_fits_updateD(inData->hdr, "FNYQUIST", fNyquistzp, "Nyquist frequency (cm^-1)", status);*/
+
+      /* Never change nyquist when zero padding */
+      fNyquistzp = fNyquist;
 
       /* If resolution > 0.05, then round down to nearest 0.05 value, else set to 0.005 */
       /* Calculate resolution as 1 / (2*OPDMax) */
