@@ -51,6 +51,8 @@
 *        Beginning to correct zeropadding
 *     2013-03-12 (MS)
 *        Aligned with OPD grid
+*     2013-05-21 (MS)
+*        Reimplemented zero padding
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -116,14 +118,21 @@ void smurf_fts2_spectrum(int* status)
   smfData* inData           = NULL;           /* Pointer to input data */
   smfData* outData          = NULL;           /* Pointer to output data */
   int zeropad               = 1;              /* Determines whether to zeropad */
-  int resolution            = 2;              /* Spectral Resolution, 0=LOW, 1=MEDIUM, *=HIGH */
+  double resolution         = 0.0;            /* Spectral Resolution */
+  double resolutionin       = 0.0;            /* Spectral Resolution input */
+  double resolutionzp       = 0.0;            /* Spectral Resolution zero padded */
   int i                     = 0;              /* Counter */
   int j                     = 0;              /* Counter */
   int k                     = 0;              /* Counter */
+  int l                     = 0;              /* Counter */
   double fNyquist           = 0.0;            /* Nyquist frequency */
+  double fNyquistin         = 0.0;            /* Nyquist frequency input */
+  double fNyquistzp         = 0.0;            /* Nyquist frequency zero padded */
   double dSigma             = 0.0;            /* Spectral Sampling Interval */
+  double dSigmain           = 0.0;            /* Spectral Sampling Interval zero padded */
+  double dSigmazp           = 0.0;            /* Spectral Sampling Interval zero padded */
   double* IFG               = NULL;           /* Interferogram */
-  double* DS                = NULL;            /* Double Sided Interferogram */
+  double* DS                = NULL;           /* Double Sided Interferogram */
   fftw_complex* DSIN        = NULL;           /* Double-Sided interferogram, FFT input */
   fftw_complex* SPEC        = NULL;           /* Spectrum */
   fftw_plan plan            = NULL;           /* fftw plan */
@@ -138,10 +147,24 @@ void smurf_fts2_spectrum(int* status)
 
   double dIntensity         = 0;
   int N                     = 0;
+  int Nin                   = 0;                /* N input */
+  int Nzp                   = 0;                /* N zero padded */
   int N2                    = 0;
+  int N2in                  = 0;                /* N/2 input */
+  int N2zp                  = 0;                /* N/2 zero padded */
   int bolIndex              = 0;
   int badPixel              = 0;
   int indexZPD              = 0;
+  int indexZPDin            = 0;
+  int indexZPDzp            = 0;
+  int pad                   = 0;               /* zero padding (difference between input and zero padded interferogram length) */
+  int pad2                  = 0;               /* zero padding / 2 */
+  double dx                 = 0.0;             /* Delta x */
+  double dxin               = 0.0;             /* Delta x input */
+  double dxzp               = 0.0;             /* Delta x zero padded */
+  double OPDMax             = 0.0;             /* OPD max in cm */
+  double OPDMaxin           = 0.0;             /* OPD max in cm input */
+  double OPDMaxzp           = 0.0;             /* OPD max in cm zero padded */
 
   /* Get Input & Output groups */
   kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
@@ -149,18 +172,6 @@ void smurf_fts2_spectrum(int* status)
 
   /* Read in ADAM parameters */
   parGet0i("ZEROPAD", &zeropad, status);
-  parGet0i("RESOLUTION", &resolution, status);
-  switch(resolution) {
-    case 0:
-      dSigma = SMF__FTS2_LOWRES_SSI;
-      break;
-    case 1:
-      dSigma = SMF__FTS2_MEDRES_SSI;
-      break;
-    default:
-      dSigma = SMF__FTS2_HIGHRES_SSI;
-      break;
-  }
 
   /* BEGIN NDF */
   ndfBegin();
@@ -193,24 +204,87 @@ void smurf_fts2_spectrum(int* status)
     /* Read in the Nyquist frequency from FITS component */
     smf_fits_getD(inData->hdr, "FNYQUIST", &fNyquist, status);
     if(*status != SAI__OK) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to find the Nyquist frequency in FITS component!", status);
-      goto CLEANUP;
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Unable to find the Nyquist frequency in FITS component!", status);
+        goto CLEANUP;
     }
 
-    N2 = 0;
+    fNyquistin = fNyquistzp = 0.0;
+    dx = dxin = dxzp = 0.0;
+    N2 = N2in = N2zp = 0;
+    indexZPD = indexZPDin = indexZPDzp = 0;
+    N = Nin = Nzp = 0;
+    dSigma = dSigmain = dSigmazp = 0.0;
+
+    fNyquistin = fNyquist;
+    dxin = (1/(2*fNyquistin));
+    N2in = (nFrames / 2);
+    indexZPDin = N2in;
+    Nin = 2 * N2in;
+    OPDMaxin = N2in * dxin;
+    resolution = 1 / (2 * OPDMaxin);
+    resolutionin = resolution;
+    dSigmain = fNyquistin / N2in;
+
     if(zeropad) {
-      N2 = ceil(fNyquist / dSigma);
-    } else {
-      N2 = nFrames / 2;
-      dSigma = fNyquist / N2;
-    }
-    N = 2 * N2;
+      /* Round Nyquist frequency down to nearest integer, for calculation convenience */
+      fNyquistzp = floor(fNyquist);
 
-    /*printf("%s: N=%d, N2=%d, dSigma=%f, fNyquist=%f\n", TASK_NAME, N, N2, dSigma, fNyquist);*/
+      smf_fits_updateD(inData->hdr, "FNYQUIST", fNyquistzp, "Nyquist frequency (cm^-1)", status);
+
+      /* If resolution > 0.05, then round down to nearest 0.05 value, else set to 0.005 */
+      /* Calculate resolution as 1 / (2*OPDMax) */
+      /* Calculate OPDMax as N2 * dx */
+
+      if(resolution > 0.05) {
+        resolutionzp = floor(resolution/0.05) * 0.05;
+      } else {
+        resolutionzp = 0.005;
+      }
+
+      /* Calculate OPDMaxOut  as 1 / (2 * resolutionzp) */
+      OPDMaxzp = 1 / (2 * resolutionzp);
+
+      /* Calculate N2 */
+      dxzp = (1/(2*fNyquistzp));
+      N2zp = (OPDMaxzp / dxzp);
+      indexZPDzp = N2zp;
+      Nzp = 2 * N2zp;
+      dSigmazp = fNyquistzp / N2zp;
+    }
+
+    /*printf("%s: Nin=%d, Nzp=%d, N2in=%d, N2zp=%d, dSigmain=%f, dSigmazp=%f, fNyquistin=%f, fNyquistzp=%f, dxin=%f, dxzp=%f, OPDMaxin=%f, OPDMaxzp=%f, resolutionin=%f, resolutionzp=%f\n",
+           TASK_NAME, Nin, Nzp, N2in, N2zp, dSigmain, dSigmazp, fNyquistin, fNyquistzp, dxin, dxzp, OPDMaxin, OPDMaxzp, resolutionin, resolutionzp);*/
+
+    if(zeropad) {
+      N = Nzp;
+      N2 = N2zp;
+      indexZPD = indexZPDzp;
+      dSigma = dSigmazp;
+      fNyquist = fNyquistzp;
+      dx = dxzp;
+      OPDMax = OPDMaxzp;
+      resolution = resolutionzp;
+    } else {
+      N = Nin;
+      N2 = N2in;
+      indexZPD = indexZPDin;
+      dSigma = dSigmain;
+      fNyquist = fNyquistin;
+      dx = dxin;
+      OPDMax = OPDMaxin;
+      resolution = resolutionin;
+    }
 
     /* Save wavenumber factor to FITS extension */
     smf_fits_updateD(inData->hdr, "WNFACT", dSigma, "Wavenumber factor cm^-1", status);
+
+    /* TODO: Update mirror positions
+    smf_fits_updateI(inData->hdr, "MIRSTART", 0, "Frame index in which the mirror starts moving", status);
+    smf_fits_updateI(inData->hdr, "MIRSTOP", N, "Frame index in which the mirror stops moving", status);
+    smf_fits_updateD(inData->hdr, "OPDMIN", OPD_EVEN[0], "Minimum OPD", status);
+    smf_fits_updateD(inData->hdr, "OPDSTEP", dx, "OPD step size", status);
+    */
 
     /* Copy input data into output data */
     outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
@@ -227,12 +301,15 @@ void smurf_fts2_spectrum(int* status)
     DSIN    = fftw_malloc(N * sizeof(*DSIN));
     SPEC = fftw_malloc((N + 1) * sizeof(*SPEC));
 
+    /* Initialize arrays */
+    for(k = 0; k < N; k++) { SPEC[k][0] = SPEC[k][1] = DSIN[k][0] = DSIN[k][1] = DS[k] = IFG[k] = 0.0; }
+
     for(i = 0; i < nWidth; i++) {
       for(j = 0; j < nHeight; j++) {
         bolIndex = i + j * nWidth;
 
         badPixel = 0;
-        for(k = 0; k < nFrames; k++) {
+        for(k = 0; k < Nin; k++) {
           dIntensity = *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
           if(dIntensity == VAL__BADD) {
             badPixel = 1;
@@ -241,26 +318,54 @@ void smurf_fts2_spectrum(int* status)
         }
         /* If this is a bad pixel, go to next */
         if(badPixel) {
-          for(k = 0; k <= N2; k++) {
+          for(k = 0; k <= N2in; k++) {
             *((double*)(outData->pntr[0]) + (bolIndex + nPixels * k)) = VAL__BADD;
           }
           continue;
         }
 
-        /* Get ZPD index */
-        /* The IFG is now supposed to be centered on its evenly spaced grid */
-        indexZPD = N2;
-
         /* Double-Sided interferogram */
-        for(k = indexZPD; k < nFrames; k++) {
-          IFG[k - indexZPD] = *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
-        }
-        for(k = 0; k < indexZPD; k++) {
-          IFG[N - indexZPD + k] =  *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
+        if(zeropad) {
+          pad = Nzp - Nin;
+          pad2 = pad / 2;
+          /* Copy the right half of the input into the left half of this IFG, zero padded in the middle */
+          for(k=indexZPDin,l=indexZPDzp; k<Nin && l<Nzp; k++,l++) {
+            /*printf("%s: IFG: indexZPDin=%d, indexZPDzp=%d, Nin=%d, Nzp=%d, k=%d, l=%d\n", TASK_NAME, indexZPDin, indexZPDzp, Nin, Nzp, k, l);*/
+            IFG[l - indexZPDzp] = *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
+          /*if(i==16 && j==25) {
+              printf("%s: Pixel[%d,%d]: (L<-R) IFG[l(%d)-indexZPDzp(%d)+pad2(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
+                     TASK_NAME, i, j, l, indexZPDzp, pad2, (l - indexZPDzp + pad2), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[l - indexZPDzp + pad2]);
+            }*/
+          }
+          /* Copy the left half of the input into the right half of this IFG, zero padded in the middle */
+          for(k=0,l=0; k<indexZPDin && l<indexZPDzp; k++,l++) {
+            IFG[Nzp - indexZPDin + k] =  *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
+          /*if(i==16 && j==25) {
+              printf("%s: Pixel[%d,%d]: (L->R) IFG[indexZPDzp(%d)+l(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
+                     TASK_NAME, i, j, indexZPDzp, l, (indexZPDzp+l), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[indexZPDzp+l]);
+            }*/
+          }
+        } else {
+          /* Copy the right half of the input into the left half of this IFG */
+          for(k=indexZPDin; k<Nin; k++) {
+              IFG[k - indexZPD] = *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
+              if(i==16 && j==25) {
+                /*printf("%s: Pixel[%d,%d]: (L<-R) IFG[k(%d)-indexZPD(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
+                         TASK_NAME, i, j, k, indexZPD, (k - indexZPD), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[k - indexZPD]);*/
+              }
+          }
+          /* Copy the left half of the input into the right half of this IFG */
+          for(k=0; k<indexZPDin; k++) {
+              IFG[N - indexZPD + k] =  *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
+              if(i==16 && j==25) {
+                /*printf("%s: Pixel[%d,%d]: (L->R) IFG[k(%d)-indexZPD(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
+                         TASK_NAME, i, j, N, indexZPD, k, (N - indexZPD + k), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[N - indexZPD + k]);*/
+              }
+          }
         }
 
         /* Convert real-valued interferogram to complex-valued interferogram */
-        for(k = 0; k < nFrames; k++) { DSIN[k][0] = IFG[k]; DSIN[k][1] = 0.0; }
+        for(k = 0; k < N; k++) { DSIN[k][0] = IFG[k]; DSIN[k][1] = 0.0; }
 
         /* FFT Double-sided complex-valued interferogram */
         plan = fftw_plan_dft_1d(N, DSIN, SPEC, FFTW_FORWARD, FFTW_ESTIMATE);
