@@ -349,18 +349,18 @@ void smurf_fts2_spectrum(int* status)
           /* Copy the right half of the input into the left half of this IFG */
           for(k=indexZPDin; k<Nin; k++) {
               IFG[k - indexZPD] = *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
-              if(i==16 && j==25) {
-                /*printf("%s: Pixel[%d,%d]: (L<-R) IFG[k(%d)-indexZPD(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
-                         TASK_NAME, i, j, k, indexZPD, (k - indexZPD), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[k - indexZPD]);*/
-              }
+            /*if(i==16 && j==25) {
+                  printf("%s: Pixel[%d,%d]: (L<-R) IFG[k(%d)-indexZPD(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
+                         TASK_NAME, i, j, k, indexZPD, (k - indexZPD), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[k - indexZPD]);
+              }*/
           }
           /* Copy the left half of the input into the right half of this IFG */
           for(k=0; k<indexZPDin; k++) {
               IFG[N - indexZPD + k] =  *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
-              if(i==16 && j==25) {
-                /*printf("%s: Pixel[%d,%d]: (L->R) IFG[k(%d)-indexZPD(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
-                         TASK_NAME, i, j, N, indexZPD, k, (N - indexZPD + k), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[N - indexZPD + k]);*/
-              }
+            /*if(i==16 && j==25) {
+                  printf("%s: Pixel[%d,%d]: (L->R) IFG[k(%d)-indexZPD(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
+                         TASK_NAME, i, j, N, indexZPD, k, (N - indexZPD + k), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[N - indexZPD + k]);
+              }*/
           }
         }
 
