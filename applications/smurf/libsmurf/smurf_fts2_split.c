@@ -40,6 +40,8 @@
  *  History :
  *     2013-05-16 (MSHERWOOD)
  *        Initial version
+ *     2013-05-21 (MS)
+ *        Skip scans that are too short
  *
  *  Copyright:
  *     Copyright (C) 2013 University of Lethbridge. All Rights Reserved.
@@ -289,12 +291,11 @@ void smurf_fts2_split(int* status)
         }
 
         /* Output scan if there is a start and stop position found,
-           and for the last scan if
-             it's the only one or
-             it's not the only one and it's not too short (compared to the previous one) */
+           and for the last scan if it's the only one
+           and if it's not too short (compared to the previous one) */
         if(nStart >=0 && nStop > 0 &&
             (!done || (done && nFramesOutPrev == 0) ||
-              (done && nFramesOutPrev > 0 && nFramesOut > 0 && nFramesOut/nFramesOutPrev >= 0.5))) {
+              (nFramesOutPrev > 0 && nFramesOut > 0 && nFramesOut/nFramesOutPrev >= 0.5))) {
             /* Copy single scan NDF data from input to output */
             outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
             outData->dtype   = SMF__DOUBLE;
