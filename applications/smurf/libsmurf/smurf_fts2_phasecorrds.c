@@ -84,6 +84,10 @@
 *       Bracketed KERNEL_LENGTH macro
 *     2013-05-16 (MSHERWOOD)
 *       Retain imaginary spectrum for DEBUG output
+*     2013-05-23 (MSHERWOOD)
+*       Fixed apodization wave number index offset
+*       The right side of the spectrum was being apodized using a wave number
+*       index value that was off by one.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -579,8 +583,8 @@ void smurf_fts2_phasecorrds(int* status)
             DSOUT[k][1] = DSOUT[k][1] * (1 - exp( -(WN[k] * WN[k]) / (0.36 * FWHM * FWHM) ));
         }
         for(k=nFrames-1; k > nFrames2; k--) {
-            DSOUT[k][0] = DSOUT[k][0] * (1 - exp( -(WN[nFrames-k] * WN[nFrames-k]) / (0.36 * FWHM * FWHM) ));
-            DSOUT[k][1] = DSOUT[k][1] * (1 - exp( -(WN[nFrames-k] * WN[nFrames-k]) / (0.36 * FWHM * FWHM) ));
+            DSOUT[k][0] = DSOUT[k][0] * (1 - exp( -(WN[nFrames-1-k] * WN[nFrames-1-k]) / (0.36 * FWHM * FWHM) ));
+            DSOUT[k][1] = DSOUT[k][1] * (1 - exp( -(WN[nFrames-1-k] * WN[nFrames-1-k]) / (0.36 * FWHM * FWHM) ));
         }
 
         /* DF: Inverse FFT spectrum to get the back interferogram */
