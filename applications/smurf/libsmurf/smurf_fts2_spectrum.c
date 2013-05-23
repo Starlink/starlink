@@ -58,6 +58,8 @@
 *        to avoid shifting the resulting spectrum
 *     2013-05-23 (MS)
 *        Reindent spectrum code
+*     2013-05-23 (MS)
+*        Normalize spectrum
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -381,7 +383,7 @@ void smurf_fts2_spectrum(int* status)
 
                 /* Write out the real component of the spectrum */
                 for(k = 0; k <= N2; k++) {
-                    *((double*)(outData->pntr[0]) + (bolIndex + nPixels * k)) = SPEC[k][0];
+                    *((double*)(outData->pntr[0]) + (bolIndex + nPixels * k)) = SPEC[k][0] / N;
                 }
             }
         }
