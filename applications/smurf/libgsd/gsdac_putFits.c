@@ -70,6 +70,7 @@
 *     J.Balfour (UBC)
 *     Tim Jenness (JAC)
 *     V.Tilanus (JAC)
+*     MJC: Malcolm J. Currie (JAC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -135,9 +136,12 @@
 *        Added SPECID FITS header.
 *     2012-01-26 (TIMJ):
 *        Reinstate WCS arg for BASE position
+*     2013 May 25 (MJC):
+*        Select different data-reduction recipes for pointings, planets,
+*        and galaxies.
 
 *  Copyright:
-*     Copyright (C) 2008-2012 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -162,6 +166,7 @@
 
 /* Standard includes */
 #include <string.h>
+#include <strings.h>
 #include <ctype.h>
 
 /* Starlink includes */
@@ -216,6 +221,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                                  INSTR_NNNNN_YYYYMMDDTHHMMSS_N */
   char obsSB[SZFITSTR];       /* observed sideband */
   int parse;                  /* flag for incorrect date string. */
+  char recipe[25];            /* ORAC-DR recipe name */
   char recptors[SZFITSTR];    /* active FE receptor IDs for this obs */
   double refChan;             /* reference IF channel no. */
   char seeDatSt[SZFITSTR];    /* time of seeingSt in format
@@ -310,6 +316,23 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   IFchanSp = gsdVars->freqRes[subBandNum] * 1000000.0;
 
+  strcpy( recipe, "REDUCE_SCIENCE" );
+
+  /* Is this a pointing? */
+  if ( strncasecmp( gsdVars->backend, "DAS", 3 ) == 0 &&
+       strncasecmp( gsdVars->obsType, "FIVEPOINT", 9 ) == 0 )
+     strcpy( recipe, "REDUCE_POINTING" );
+
+  /* Planets have a different default recipe. */
+  else if ( strncasecmp( gsdVars->object1, "MARS", 4 )    == 0 ||
+            strncasecmp( gsdVars->object1, "JUPITER", 7 ) == 0 ||
+            strncasecmp( gsdVars->object1, "URANUS", 6 )  == 0 ||
+            strncasecmp( gsdVars->object1, "NEPTUNE", 7 ) == 0 )
+     strcpy( recipe, "REDUCE_SCIENCE_CONTINUUM" );
+
+  /* Try to catch most galaxies but exclude regions of the Galaxy. */
+  else if ( gsdVars->velocity > 120 )
+     strcpy( recipe, "REDUCE_SCIENCE_BROADLINE" );
 
   /* FE Specific. */
 
@@ -488,9 +511,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "PROJECT", gsdVars->project,
 	        "PATT number", 0 );
 
-/***** NOTE: possiby REDUCE_POINTING for spectral 5 points *****/
-  astSetFitsS ( fitschan, "RECIPE", "REDUCE_SCIENCE",
-	        "ORAC-DR recipe", 0 );
+/***** NOTE: possibly REDUCE_POINTING for spectral 5 points *****/
+  astSetFitsS ( fitschan, "RECIPE", recipe, "ORAC-DR recipe", 0 );
 
   astSetFitsU ( fitschan, "DRGROUP", "Data Reduction group ID", 0 );
 
