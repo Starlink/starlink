@@ -279,6 +279,10 @@
 *      20-SEP-2012 (DSB):
 *         Modify ndgAddProv so that it can take the AUTOPROV environment
 *         variable into account.
+*      27-MAY-2013 (DSB):
+*         Modify ndgAddProv so that it checks the input NDFs for
+*         existing provenance info, rather than (incorrectly) checking the 
+*         output NDF.
 */
 
 
@@ -1519,9 +1523,9 @@ void ndgAddProv( int indf, const char *creator, int nndf, int *ndfs,
       for( i = 0; i < nndf; i++ ) {
          ndgPutProv( prov, ndfs[ i ], NULL, 0, status );
 
-/* If any of the input NDFs contained explicit Pprovenance info then we
+/* If any of the input NDFs contained explicit Provenance info then we
    must always store the output provenance. */
-         if( !store ) ndfXstat( indf, EXT_NAME, &store, status );
+         if( !store ) ndfXstat( ndfs[ i ], EXT_NAME, &store, status );
       }
 
 /* If autopv is set, or if any of the input NDFs had provenance info, write
