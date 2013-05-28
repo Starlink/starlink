@@ -90,6 +90,8 @@
 *       index value that was off by one.
 *     2013-05-23 (MS)
 *       Reindent phase correction code
+*     2013-05-24 (MS)
+*       Added Phase Correction Function double sided InterFeroGram INput Real (IFGINR) debug output
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -168,6 +170,8 @@ void smurf_fts2_phasecorrds(int* status)
     smfData* outData          = NULL;               /* Pointer to output data */
     double* outData_pntr      = NULL;               /* Pointer to output data values array */
 #if DEBUG
+    smfData* outDataIFGINR    = NULL;               /* Pointer to output data Interferogram Input Real DEBUG */
+    double* outDataIFGINR_pntr= NULL;               /* Pointer to output data Interferogram Input Real values array */
     smfData* outDataIFGDFR    = NULL;               /* Pointer to output data Interferogram Digitally Filtered Real DEBUG */
     double* outDataIFGDFR_pntr= NULL;               /* Pointer to output data Interferogram Digitally Filtered Real values array */
     smfData* outDataIFGDFI    = NULL;               /* Pointer to output data Interferogram Digitally Filtered Imaginary DEBUG */
@@ -339,6 +343,16 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* DEBUG: Process default or alternative output type */
 #if DEBUG
+        /* Copy input data into output data Interferogram Digitally Filtered Real DEBUG */
+        outDataIFGINR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataIFGINR->dtype   = SMF__DOUBLE;
+        outDataIFGINR->ndims   = 3;
+        outDataIFGINR->dims[0] = nWidth;
+        outDataIFGINR->dims[1] = nHeight;
+        outDataIFGINR->dims[2] = nFrames;
+        outDataIFGINR_pntr = (double*) astMalloc((nPixels * nFrames) * sizeof(*outDataIFGINR_pntr));
+        outDataIFGINR->pntr[0] = outDataIFGINR_pntr;
+
         /* Copy input data into output data Interferogram Digitally Filtered Real DEBUG */
         outDataIFGDFR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataIFGDFR->dtype   = SMF__DOUBLE;
@@ -535,6 +549,7 @@ void smurf_fts2_phasecorrds(int* status)
                         index = bolIndex + k * nPixels;
                         outData_pntr[index] = VAL__BADD;
 #if DEBUG
+                        outDataIFGINR_pntr[index] = VAL__BADD;  /* DEBUG */
                         outDataIFGDFR_pntr[index] = VAL__BADD;  /* DEBUG */
                         outDataIFGDFI_pntr[index] = VAL__BADD;  /* DEBUG */
                         outDataSR_pntr[index] = VAL__BADD;      /* DEBUG */
@@ -739,6 +754,7 @@ void smurf_fts2_phasecorrds(int* status)
                     index = bolIndex + nPixels * k;
                     outData_pntr[index] = IFG[k] / nFrames;
 #if DEBUG
+                    outDataIFGINR_pntr[index] = DSIN[k][0] / nFrames;     /* DEBUG */
                     outDataIFGDFR_pntr[index] = IFGDF[k][0] / nFrames;    /* DEBUG */
                     outDataIFGDFI_pntr[index] = IFGDF[k][1] / nFrames;    /* DEBUG */
                     outDataSR_pntr[index] = DSOUT[k][0] / nFrames;        /* DEBUG */
@@ -797,6 +813,24 @@ void smurf_fts2_phasecorrds(int* status)
         }
 
 #if DEBUG
+        /* Write output Interferogram Input Real DEBUG */
+        /* Append unique suffix to fileName */
+        n = one_snprintf(outDataIFGINR->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "IFGINR");
+        if(n < 0 || n >= SMF_PATH_MAX) {
+            errRepf(TASK_NAME, "Error creating outDataIFGINR->file->name", status);
+            goto CLEANUP;
+        }
+        smf_write_smfData(outDataIFGINR, NULL, outDataIFGINR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        if(*status != SAI__OK) {
+            errRepf(TASK_NAME, "Error writing outDataIFGINR file", status);
+            goto CLEANUP;
+        }
+        smf_close_file(&outDataIFGINR, status);
+        if(*status != SAI__OK) {
+            errRepf(TASK_NAME, "Error closing outDataIFGINR file", status);
+            goto CLEANUP;
+        }
+
         /* Write output Interferogram Digitally Filtered Real DEBUG */
         /* Append unique suffix to fileName */
         n = one_snprintf(outDataIFGDFR->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "IFGDFR");
