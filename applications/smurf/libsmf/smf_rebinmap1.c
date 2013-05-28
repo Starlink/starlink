@@ -119,6 +119,10 @@
 *        Change to "weighted incremental" from "naive" variance algorithms
 *     2012-5-16 (DSB):
 *        Use threads.
+*     2013-5-28 (DSB):
+*        Ensure the "no variances" cases use the same weighted incremental
+*        algorithm used by the other cases. Prior to this chance, the "no 
+*        variances" cases produced unnormalised maps.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -759,11 +763,17 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
                   if( !( pdata->qual[ di ] & pdata->mask ) &&
                        ( ipix != SMF__BADDIMT ) ) {
-                     pdata->map[ ipix ] += pdata->dat[ di ];
-                     pdata->mapweight[ ipix ]++;
-                     pdata->mapweightsq[ ipix ]++;
                      pdata->hitsmap[ ipix ]++;
-                     pdata->mapvar[ ipix ] += pdata->dat[ di ]*pdata->dat[ di ];
+                     temp = pdata->mapweight[ ipix ] + 1.0;
+                     delta = pdata->dat[ di ] - pdata->map[ ipix ];
+                     R = delta / temp;
+                     pdata->map[ ipix ] += R;
+                     pdata->mapvar[ ipix ] += pdata->mapweight[ ipix ]*delta*R;
+                     pdata->mapweight[ ipix ] = temp;
+
+/* We don't need this sum anymore, but calculate it for consistency with the
+   interface */
+                     pdata->mapweightsq[ ipix ]++;
                   }
                }
             }
@@ -789,11 +799,17 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
                if( pdata->dat[ di ] != VAL__BADD &&
                    ipix != SMF__BADDIMT ) {
-                  pdata->map[ ipix ] += pdata->dat[ di ];
-                  pdata->mapweight[ ipix ]++;
-                  pdata->mapweightsq[ ipix ]++;
-                  pdata->hitsmap[ ipix ]++;
-                  pdata->mapvar[ ipix ] += pdata->dat[ di ]*pdata->dat[ di ];
+                     pdata->hitsmap[ ipix ]++;
+                     temp = pdata->mapweight[ ipix ] + 1.0;
+                     delta = pdata->dat[ di ] - pdata->map[ ipix ];
+                     R = delta / temp;
+                     pdata->map[ ipix ] += R;
+                     pdata->mapvar[ ipix ] += pdata->mapweight[ ipix ]*delta*R;
+                     pdata->mapweight[ ipix ] = temp;
+
+/* We don't need this sum anymore, but calculate it for consistency with the
+   interface */
+                     pdata->mapweightsq[ ipix ]++;
                }
             }
          }
