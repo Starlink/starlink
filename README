@@ -322,11 +322,14 @@ Platform specific build notes
 
       % ./configure -C --LDFLAGS=-Wl,--no-as-needed
 
-  According to the following web page, it is also likely that this
-  problem will occur with Debian (at some point), although it has not
-  been tested:
+  Ubuntu explain the issue here:
 
   https://wiki.ubuntu.com/NattyNarwhal/ToolchainTransition
+
+  According to the following web page, this problem will also occur with
+  Debian (as of the Wheezy release), although it has not been tested:
+
+  http://wiki.debian.org/ToolChain/DSOLinking
 
   - OS X
 
