@@ -139,6 +139,8 @@
 *     2013 May 25 (MJC):
 *        Select different data-reduction recipes for pointings, planets,
 *        and galaxies.
+*     2013 May 28 (MJC):
+*        Add additional continuum-recipe objects.
 
 *  Copyright:
 *     Copyright (C) 2008-2013 Science and Technology Facilities Council.
@@ -323,11 +325,18 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
        strncasecmp( gsdVars->obsType, "FIVEPOINT", 9 ) == 0 )
      strcpy( recipe, "REDUCE_POINTING" );
 
-  /* Planets have a different default recipe. */
-  else if ( strncasecmp( gsdVars->object1, "MARS", 4 )    == 0 ||
+  /* Solar-system objects have a different default recipe. */
+  else if ( strncasecmp( gsdVars->object1, "SUN", 3 )     == 0 ||
+            strncasecmp( gsdVars->object1, "MERCURY", 7 ) == 0 ||
+            strncasecmp( gsdVars->object1, "VENUS", 5 )   == 0 ||
+            strncasecmp( gsdVars->object1, "MOON", 4 )    == 0 ||
+            strncasecmp( gsdVars->object1, "MARS", 4 )    == 0 ||
             strncasecmp( gsdVars->object1, "JUPITER", 7 ) == 0 ||
+            strncasecmp( gsdVars->object1, "SATURN", 6 )  == 0 ||
+            strncasecmp( gsdVars->object1, "TITAN", 5 )   == 0 ||
             strncasecmp( gsdVars->object1, "URANUS", 6 )  == 0 ||
-            strncasecmp( gsdVars->object1, "NEPTUNE", 7 ) == 0 )
+            strncasecmp( gsdVars->object1, "NEPTUNE", 7 ) == 0 ||
+            strncasecmp( gsdVars->object1, "PLUTO", 5 )   == 0 )
      strcpy( recipe, "REDUCE_SCIENCE_CONTINUUM" );
 
   /* Try to catch most galaxies but exclude regions of the Galaxy. */
