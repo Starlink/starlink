@@ -21,8 +21,9 @@
 
 *  Description:
 *     Opens a GSD file for reading, and checks the version (currently
-*     only supports GSD version 5.3). The data are converted to ACSIS
-*     format and written to disk.
+*     only supports GSD Version 5.3). The data are converted to ACSIS
+*     format and written to disk.  Metadata are converted to appropriate
+*     FITS headers.
 
 *  ADAM Parameters:
 *     DIRECTORY = _CHAR (Read)
@@ -48,7 +49,7 @@
 *     CONVERT: SPECX2NDF;
 *     SPECX;
 *     GSDPRINT;
-*     JCMTDR
+*     JCMTDR.
 
 *  Notes:
 *     - Whilst this command does a reasonable job of converting common
