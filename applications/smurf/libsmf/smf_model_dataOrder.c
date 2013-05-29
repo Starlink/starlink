@@ -50,6 +50,9 @@
 *  History:
 *     2010-05-17 (TIMJ):
 *        Initial version
+*     2013-05-29 (DSB):
+*        Re-order GAI when requested. Previously, RES was reordered when
+*        GAI was requested.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -119,7 +122,7 @@ smf_model_dataOrder( smfDIMMData *dat, smfArray ** allmodel, int chunk, smf_mode
   }
 
   if ( toOrder & SMF__EXT && dat->ext ) REORDER( "ext", dat->ext[chunk] );
-  if ( toOrder & SMF__GAI && dat->gai ) REORDER( "gai", dat->res[chunk] );
+  if ( toOrder & SMF__GAI && dat->gai ) REORDER( "gai", dat->gai[chunk] );
   if ( toOrder & SMF__RES && dat->res ) REORDER( "res", dat->res[chunk] );
   if ( toOrder & SMF__NOI && dat->noi ) REORDER( "noi", dat->noi[chunk] );
   if ( toOrder & SMF__QUA && dat->qua ) REORDER( "qua", dat->qua[chunk] );
