@@ -51,14 +51,23 @@
 *     JCMTDR
 
 *  Notes:
-*     Whilst this command does a reasonable job of converting common
+*     - Whilst this command does a reasonable job of converting common
 *     data to ACSIS format it still has to undergo extensive testing
 *     to ensure that it is always doing the correct thing. Testing of
 *     this command and comparing its results with SPECX maps will be
 *     welcomed.
+*     - The ORAC-DR recipe defaults to REDUCE_SCIENCE.  The exceptions
+*     are as follows.
+*       -  REDUCE_SCIENCE_CONTINUUM for solar-system objects (Sun, Moon,
+*       planets, Titan)
+*       -  REDUCE_POINTING for a FIVEPOINT observation type and a DAS
+*       backend.
+*       -  REDUCE_SCIENCE_BROADLINE for objects with radial velocities
+*       above 120 km/s.
 
 *  Authors:
-*     Jen Balfour (JAC, UBC)
+*     JB: Jen Balfour (JAC, UBC)
+*     MJC: Malcolm J. Currie (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -84,9 +93,11 @@
 *        Add ADAM parameter documentation.
 *     22-APR-2008 (JB):
 *        Use gsdac_flagBad.
+*     2013 May 28 (MJC):
+*        Add DR recipe notes.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
