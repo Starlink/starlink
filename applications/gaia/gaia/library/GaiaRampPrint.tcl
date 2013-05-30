@@ -293,7 +293,7 @@ itcl::class gaia::GaiaRampPrint {
        remove_background
 
        #  Remove border.
-       #$canvas_ delete ${this}_border
+       $canvas_ delete ${this}_border
    }
 
    #  Configuration options: (public variables)

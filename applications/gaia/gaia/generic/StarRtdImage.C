@@ -5610,8 +5610,11 @@ int StarRtdImage::hduCmdGet( int argc, char** argv, FitsIO* fits )
 //      drawn around it, so that it may be annotated and have axes which
 //      make the colour correspondence clear.
 //
-//      With no arguments the standard "colorramp" command is invoked.
-//      With the arguments "setwcs" the WCS system is added based on
+//      We also reproduce the full colorramp command so that a StarFitsIO
+//      instance can be used, this is necessary for the AST facility to work.
+//
+//      Note that with no arguments the standard "colorramp" command is
+//      invoked.  With the arguments "setwcs" the WCS system is added based on
 //      the image whose name is given as the second argument.
 //-
 int StarRtdImage::colorrampCmd( int argc, char *argv[] )
@@ -5620,8 +5623,46 @@ int StarRtdImage::colorrampCmd( int argc, char *argv[] )
     cout << "Called StarRtdImage::colorrampCmd" << std::endl;
 #endif
     if ( argc == 0 ) {
-        return RtdImage::colorrampCmd( argc, argv );
-    } else {
+        //  Cut and paste of RtdImage::colorrampCmd with StarFitsIO
+        //  replacement.
+
+        int w = Tk_Width( tkwin_ );
+        int h = Tk_Height( tkwin_ );
+        if ( w == 1 && h == 1 ) {
+            // Waiting for resize event on image window.
+            return TCL_OK;
+        }
+
+        Mem data( w * h, 0 ), header;
+        if ( data.status() != 0 ) {
+            return TCL_ERROR;
+        }
+
+        // Create the ramp data.
+        double scale = 255.0 / w;
+        char* p = (char*) data.ptr();
+        for ( int i = 0; i < w; i++ ) {
+            p[i] = (int)( i * scale );
+        }
+        for ( int j = 0; j < h; j++ ) {
+            memmove( p+(j*w), p, w );
+        }
+
+        //  And the image. Note will associate to the main image as a
+        //  viewmaster. See Tcl wrapper code.
+        if ( image_ ) {
+            delete image_;
+        }
+        StarFitsIO* fits = new StarFitsIO( w, h, BYTE_IMAGE, 0.0, 1.0,
+                                           header, data, NULL );
+        if ( fits ) {
+            image_ = makeImage( fits );
+            image_->name( "Ramp" );
+            return initNewImage();
+        }
+        return ERROR;
+    }
+    else {
 
         //  Get the image, should be named as second argument.
         StarRtdImage *rtdimage = (StarRtdImage *) getView( argv[1] );
