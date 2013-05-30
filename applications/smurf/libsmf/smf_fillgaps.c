@@ -91,6 +91,9 @@
 *     2013-05-09 (DSB):
 *        If the box size becomes too small, fill using a linear fit without
 *        noise.
+*     2013-05-30 (DSB):
+*        Replace padding with bad values in the data array so that fitting 
+*        boxes that extend into the padding can know to omit it. 
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -378,7 +381,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
        so we do not subsequently need to use the quality array to identify
        flagged values. We cannot modify the quality array, so we can't use
        it for second and subsequent passes with smaller box sizes. */
-    for( j = pstart; j <= pend; j++ ) {
+    for( j = 0; j < ntslice; j++ ) {
       if( qua[ i*bstride + j*tstride ] & mask ){
         dat[ i*bstride + j*tstride ] = VAL__BADD;
       }
@@ -512,7 +515,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
                /* Otherwise, we record the first value in the box, and
                   indicate we have no noise estimate. */
                } else {
-                 mr = 1.0;
+                 mr = 0.0;
                  cr = dat[ i*bstride + rightstart*tstride ];
                  sigmar = VAL__BADD;
                }
@@ -531,7 +534,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
                  kpg1Fit1d( 1, k, y, x, &ml, &cl, &sigmal, status );
 
                } else {
-                 ml = 1.0;
+                 ml = 0.0;
                  cl = dat[ i*bstride + leftend*tstride ];
                  sigmal = VAL__BADD;
                }
