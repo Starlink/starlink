@@ -1059,6 +1059,10 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     16-APR-2013 (DSB):
 *        When determining default Encoding value, use "VLSR" keyword if
 *        "VELO-..." is not available.
+*     30-MAY-2013 (DSB):
+*        Prevent seg fault caused by overrunning the coeffs array in
+*        WATCoeffs in cases where the TNX/ZPX projection is found to be
+*        of a form that cannot be implemented as a TPN projection.
 *class--
 */
 
@@ -32416,8 +32420,9 @@ static int WATCoeffs( const char *watstr, int iaxis, double **cvals,
          coeff = NULL;
          porder = -1;
 
-/* Loop round each word. */
-         for( iword = 0; iword < nword; iword++ ) {
+/* Loop round each word. Break early if we find that the projection
+   cannot be represented as a TPN projection. */
+         for( iword = 0; iword < nword && *ok; iword++ ) {
 
 /* Convert the word to double. */
             dval = astChr2Double( w2[ iword ] );
@@ -32496,7 +32501,7 @@ static int WATCoeffs( const char *watstr, int iaxis, double **cvals,
          if( porder == -1 || nword != 8 + nab[ porder ] ) *ok = 0;
 
 /* If we can handle the projection, proceed. */
-         if( *ok ) {
+         if( *ok && astOK ) {
 
 /* If the coefficients were supplied in chebyshev form, convert to simple
    form. */
