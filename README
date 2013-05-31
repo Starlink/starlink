@@ -320,7 +320,7 @@ Platform specific build notes
   To remedy this situation you need to re-activate indirect linking
   with LDFLAGS when configuring the build:
 
-      % ./configure -C --LDFLAGS=-Wl,--no-as-needed
+      % ./configure -C LDFLAGS=-Wl,--no-as-needed
 
   Ubuntu explain the issue here:
 
