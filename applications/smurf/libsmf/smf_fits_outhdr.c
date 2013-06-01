@@ -44,6 +44,7 @@
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     DSB: David Berry (JAC, UCLan)
 *     BRADC: Brad Cavanagh (JAC, Hawaii)
+*     GSB: Graham Bell (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +73,8 @@
 *        This will be called by atlMgfts but only if we are merging headers.
 *     2010-04-22 (TIMJ):
 *        Allow header merging even if a date is not available.
+*     2013-05-31 (GSB):
+*        Copy START and END FITS headers as floating point if possible.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -262,6 +265,7 @@ static void
 smf__fits_copy_items( AstFitsChan * fromfits, AstFitsChan * tofits,
                       const char ** items, int * status ) {
   size_t i = 0;
+  double value;
 
   if (*status != SAI__OK) return;
 
@@ -279,7 +283,13 @@ smf__fits_copy_items( AstFitsChan * fromfits, AstFitsChan * tofits,
       astClear( tofits, "Card" );
       if ( astFindFits( tofits, items[i], NULL, 0 ) ) {
         /* and if we find it replace it */
-        astPutFits( tofits, card, 1 );
+        if (astGetI(fromfits, "CardType") == AST__FLOAT
+            && astGetFitsF(fromfits, NULL, &value)) {
+          astSetFitsF(tofits, items[i], value, NULL, 1);
+        }
+        else {
+          astPutFits( tofits, card, 1 );
+        }
       }
     }
 
