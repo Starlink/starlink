@@ -137,15 +137,18 @@ double pwv2tau_bydate(double mjdate, double mmH2O_z) {
   /* Need to tweak the PWV before pushing it through the conversion routine. We have
      decided to do a PWV correction and keep the tau correction fixed. This references
      our PWV to the values obtained before Spetember 2012 */
-  if (mjdate < 56191.0) { /* 20120921 */
+  if (mjdate < 56191.0) { /* Before 20120921 */
     /* No correction */
-  } else if (mjdate >= 56191.0 && mjdate < 56311.0 ) { /* 20120921 to 20130119 */
+  } else if (mjdate < 56311.0) { /* 20120921 to 20130119 (excl.) */
     /* From Per Friberg 20130319 */
     mmH2O_z = 0.915565960 * mmH2O_z + 0.082403989;
 
-  } else {
+  } else if (mjdate < 56391.0) { /* 20130119 to 20130409 (excl.) */
     /* From Per Friberg 20130319 */
     mmH2O_z = 0.966982186 * mmH2O_z + 0.000062197;
+  } else { /* From 20130409 ("Black" WVM installed) */
+    /* Requested by Jessica Dempsey 20130530 */
+    /* No correction */
   }
 
   /* APPLY THE CSO TAU CONVERSION */
