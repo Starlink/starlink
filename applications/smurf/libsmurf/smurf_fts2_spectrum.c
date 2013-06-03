@@ -64,6 +64,8 @@
 *        Add debug output
 *     2013-05-31 (MS)
 *        Cleanup array indexing
+*     2013-05-31 (MS)
+*        Cleanup fftw plan
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -147,6 +149,7 @@ void smurf_fts2_spectrum(int* status)
     fftw_complex* DSIN        = NULL;           /* Double-Sided interferogram, FFT input */
     fftw_complex* SPEC        = NULL;           /* Spectrum */
     fftw_plan plan            = NULL;           /* fftw plan */
+    int pland                 = 0;              /* fftw plan destroyed? */
 
     size_t nFiles             = 0;              /* Size of the input group */
     size_t nOutFiles          = 0;              /* Size of the output group */
@@ -422,6 +425,7 @@ void smurf_fts2_spectrum(int* status)
 
         if(IFG)  { IFG = astFree(IFG); }
         if(DS)   { DS = astFree(DS); }
+        if(plan) { fftw_destroy_plan(plan); pland = 1; }
         if(DSIN) { fftw_free(DSIN); DSIN = NULL; }
         if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
 
@@ -436,6 +440,7 @@ void smurf_fts2_spectrum(int* status)
 CLEANUP:
     if(IFG)  { IFG = astFree(IFG); }
     if(DS)   { DS = astFree(DS); }
+    if(plan && !pland) { fftw_destroy_plan(plan); }
     if(DSIN) { fftw_free(DSIN); DSIN = NULL; }
     if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
 
