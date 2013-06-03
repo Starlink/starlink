@@ -60,6 +60,8 @@
 *        Reindent spectrum code
 *     2013-05-23 (MS)
 *        Normalize spectrum
+*     2013-05-31 (MS)
+*        Add debug output
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -374,8 +376,33 @@ void smurf_fts2_spectrum(int* status)
                     }
                 }
 
+                /* DEBUG: Write out input data
+                for(k = 0; k < Nin; k++) {
+                    *((double*)(outData->pntr[0]) + (bolIndex + nPixels * k)) =
+                    *((double*)( inData->pntr[0]) + (bolIndex + nPixels * k));
+                    if(i==16 && j==25) {
+                        printf("%s: inData[%d,%d,%d]=%g\n",TASK_NAME, i, j, k, *((double*)( inData->pntr[0]) + (bolIndex + nPixels * k)));
+                    }
+                } */
+
+                /* DEBUG: Write out the shifted IFG
+                for(k = 0; k < N; k++) {
+                    *((double*)(outData->pntr[0]) + (bolIndex + k* nPixels)) = IFG[k];
+                    if(i==16 && j==25) {
+                        printf("%s: IFG[%d,%d,%d]=%g\n",TASK_NAME, i, j, k, IFG[k]);
+                    }
+                } */
+
                 /* Convert real-valued interferogram to complex-valued interferogram */
                 for(k = 0; k < N; k++) { DSIN[k][0] = IFG[k]; DSIN[k][1] = 0.0; }
+
+                /* DEBUG: Write out DSIN
+                for(k = 0; k < N; k++) {
+                    *((double*)(outData->pntr[0]) + (bolIndex + k * nPixels)) = DSIN[k][0];
+                    if(i==16 && j==25) {
+                        printf("%s: DSIN[%d,%d,%d]=%g\n",TASK_NAME, i, j, k, DSIN[k][0]);
+                    }
+                } */
 
                 /* FFT Double-sided complex-valued interferogram */
                 plan = fftw_plan_dft_1d(N, DSIN, SPEC, FFTW_FORWARD, FFTW_ESTIMATE);
@@ -384,6 +411,9 @@ void smurf_fts2_spectrum(int* status)
                 /* Write out the real component of the spectrum */
                 for(k = 0; k <= N2; k++) {
                     *((double*)(outData->pntr[0]) + (bolIndex + nPixels * k)) = SPEC[k][0] / N;
+                  /*if(i==16 && j==25) {
+                        printf("%s: SPEC[%d,%d,%d]=%g\n",TASK_NAME, i, j, k, SPEC[k][0] / N);
+                    }*/
                 }
             }
         }
