@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "cupid.h"
+#include "../cupid_err.h"
 #include "prm_par.h"
 #include "mers.h"
 #include <math.h>
@@ -163,7 +164,7 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
       }
 
       if( n < 2 ) {
-         *status = SAI__ERROR;
+         *status = CUPID__FWVAL;
          errRep( "CUPIDRMS_ERR1", "The supplied data contains insufficient "
                  "good values to continue.", status );
          goto L999;
@@ -206,7 +207,7 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
          }
 
          if( n == 0 ) {
-            *status = SAI__ERROR;
+            *status = CUPID__FWVAL;
             errRep( "CUPIDRMS_ERR3", "The supplied data contains insufficient "
                     "good values to continue.", status );
             goto L999;
