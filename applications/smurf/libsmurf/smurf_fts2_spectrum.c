@@ -66,6 +66,8 @@
 *        Cleanup array indexing
 *     2013-05-31 (MS)
 *        Cleanup fftw plan
+*     2013-06-05 (MS)
+*        Adjust debug output
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -366,18 +368,18 @@ void smurf_fts2_spectrum(int* status)
                     /* Copy the right half of the input into the left half of this IFG */
                     for(k=indexZPD; k<N; k++) {
                         IFG[k - indexZPD] = *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
-                        /*if(i==16 && j==25) {
-                              printf("%s: Pixel[%d,%d]: (L<-R) IFG[k(%d)-indexZPD(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
+                      /*if(i==16 && j==25) {
+                            printf("%s: Pixel[%d,%d]: (L<-R) IFG[k(%d)-indexZPD(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
                                      TASK_NAME, i, j, k, indexZPD, (k - indexZPD), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[k - indexZPD]);
-                          }*/
+                        }*/
                     }
                     /* Copy the left half of the input into the right half of this IFG */
                     for(k=0; k<indexZPD; k++) {
                         IFG[N - indexZPD + k] =  *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
-                        /*if(i==16 && j==25) {
-                              printf("%s: Pixel[%d,%d]: (L->R) IFG[k(%d)-indexZPD(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
+                      /*if(i==16 && j==25) {
+                              printf("%s: Pixel[%d,%d]: (L->R) IFG[N(%d)-indexZPD(%d)+k(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
                                      TASK_NAME, i, j, N, indexZPD, k, (N - indexZPD + k), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[N - indexZPD + k]);
-                          }*/
+                        }*/
                     }
                 }
 
@@ -413,11 +415,11 @@ void smurf_fts2_spectrum(int* status)
                 plan = fftw_plan_dft_1d(N, DSIN, SPEC, FFTW_FORWARD, FFTW_ESTIMATE);
                 fftw_execute(plan);
 
-                /* Write out the real component of the spectrum */
-                for(k = 0; k < N; k++) {
-                    *((double*)(outData->pntr[0]) + (bolIndex + k * nPixels)) = (SPEC[k][0] / N);
+                /* Write out the positive real component of the spectrum and normalize */
+                for(k = 0; k <= N2; k++) {
+                    *((double*)(outData->pntr[0]) + (bolIndex + k * nPixels)) = (SPEC[k][0] / (double)(N * resolution));
                   /*if(i==16 && j==25) {
-                        printf("%s: SPEC[%d,%d,%d]=%g\n",TASK_NAME, i, j, k, SPEC[k][0] / N);
+                      printf("%s: SPEC[%d,%d,%d]=%E\n",TASK_NAME, i, j, k, SPEC[k][0] / (double)(N * resolution));
                     }*/
                 }
             }
