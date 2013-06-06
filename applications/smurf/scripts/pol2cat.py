@@ -207,9 +207,17 @@
 *     SNR = _REAL (Read)
 *        The minimum ratio of the polarised intensity to the error on
 *        polarised intensity for vectors to be plotted. [3.0]
+*     STAREDIR = LITERAL (Read)
+*        A directory in which to store separate angle and polarised
+*        intensity images for each stare position, for each sub-array.
+*        The 2D NDFs created have names of the form "ANG_<A>_<I>.sdf"
+*        and "PI_<A>_<I>.sdf", where <A> is the subarray name ("S8A", etc.)
+*        and <I> is an index that counts from zero to one less than the number
+*        of stare positions. The angles are in degrees, relative to the focal 
+*        plane Y axis. The directory is created if it does not exist. [!]
 
 *  Copyright:
-*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2012-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -249,11 +257,13 @@
 *     19-MAR-2013 (DSB):
 *        Combine all Q (and U) images together in a single invocation of
 *        makemos (not wcsalign).
+*     6-JUN-2013 (DSB):
+*        Added parameter STAREDIR.
 
 *-
 '''
 
-
+import os
 import starutil
 from starutil import invoke
 from starutil import NDG
@@ -351,6 +361,9 @@ try:
 
    params.append(starutil.ParNDG("MASK", "A 2D image in which source pixels are bad",
                                  default=None, minsize=0, maxsize=1, noprompt=True ))
+
+   params.append(starutil.Par0S("STAREDIR", "Directory for stare position images",
+                                 None, noprompt=True))
 
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
@@ -458,6 +471,12 @@ try:
       diagfd.write("# QU block array chunk slope offset\n")
    else:
       diagfd = None
+
+#  If required, ensure the stare data directory exists.
+   staredir = parsys["STAREDIR"].value
+   if staredir != None:
+      if not os.path.exists( staredir ):
+         os.makedirs( staredir )
 
 #  If Q and U values were supplied, use them:
    if inqu != None:
@@ -723,6 +742,19 @@ try:
 #  the DOMAIN parameter).
          invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(qff2,domain) )
          invoke( "$KAPPA_DIR/wcsframe ndf={0} frame={1}".format(uff2,domain) )
+
+#  If required, dump the angles and polarised intensities for each stare
+#  position.
+         if staredir != None:
+            for mm in range(len( uff2 )):
+               qin = qff2[ mm ];
+               uin = uff2[ mm ];
+               out = "{0}/ANG_{1}_{2}".format(staredir,a,mm)
+               invoke( "$KAPPA_DIR/maths exp='0.5*atan2(iu,iq)*57.29578' "
+                       "iu={0} iq={1} out={2}".format(uin,qin,out))
+               out = "{0}/PI_{1}_{2}".format(staredir,a,mm)
+               invoke( "$KAPPA_DIR/maths exp='sqrt(iu**2+iq**2)' iu={0} "
+                       "iq={1} out={2}".format(uin,qin,out))
 
 #  The reference map defines the output pixel grid - the origin, pixel size,
 #  sky projection, etc (but not the pixel bounds) - of the final Q, U and I
