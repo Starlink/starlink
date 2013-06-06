@@ -50,6 +50,8 @@
  *     2013-04-12 (MSHERWOOD)
  *        Adjust OPD for each bolometer's measured ZPD position
  *        Ensure that interpolation onto evenly spaced OPD grid stays within bounds
+ *     2013-06-05 (MS)
+ *        Adjust debug output
  *
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -344,7 +346,7 @@ void smurf_fts2_init(int* status)
       OPD_EVEN[k - 1] = (k < nMax) ? -(nMax - k) : (k - nMax);
       OPD_EVEN[k - 1] *= dz;
     }
-    /*printf("smurf_fts2_init: OPD_EVEN[0]=%f, OPD_EVEN[%d]=%f\n", OPD_EVEN[0], nOPD-1, OPD_EVEN[nOPD-1]);*/
+    /*printf("smurf_fts2_init: OPD_EVEN[%d]=%E\n", nOPD/2-1, OPD_EVEN[nOPD/2-1]);*/
 
     /* Update FITS component */
     smf_fits_updateD(inData->hdr, "FNYQUIST", fNyquist, "Nyquist frequency (cm^-1)", status);
@@ -395,7 +397,9 @@ void smurf_fts2_init(int* status)
         /* Adjust for bolometer's measured ZPD position */
         for(k = nStart; k <=nStop; k++) {
             OPD[k - nStart] = 4.0 * (MIRPOS[k] - ZPD) / 10.0;
-            /*printf("smurf_fts2_init: OPD[%d]=%f for MIRPOS[%d]=%f with ZPD=%F\n", (k-nStart), OPD[k-nStart], k, MIRPOS[k], ZPD);*/
+          /*if(i==16 && j==25) {
+                printf("smurf_fts2_init: Pixel [%d,%d]: OPD[%d]=%f for MIRPOS[%d]=%f with ZPD=%F\n", i, j, (k-nStart), OPD[k-nStart], k, MIRPOS[k], ZPD);
+            }*/
         }
 
         badPixel = 0;
