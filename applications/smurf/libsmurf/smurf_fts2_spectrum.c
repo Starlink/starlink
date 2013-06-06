@@ -68,6 +68,8 @@
 *        Cleanup fftw plan
 *     2013-06-05 (MS)
 *        Adjust debug output
+*     2013-06-05 (MS)
+*        Error check file writing and closures
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -432,11 +434,28 @@ void smurf_fts2_spectrum(int* status)
         if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
 
         /* Close the file */
-        if(inData) { smf_close_file(&inData, status); }
+        if(inData) {
+            smf_close_file(&inData, status);
+            if(*status != SAI__OK) {
+                *status = SAI__ERROR;
+                errRep(FUNC_NAME, "Unable to close the input file!", status);
+                goto CLEANUP;
+            }
+        }
 
         /* Write output */
         smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
+        if(*status != SAI__OK) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "Unable to write the output file!", status);
+            goto CLEANUP;
+        }
         smf_close_file(&outData, status);
+        if(*status != SAI__OK) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "Unable to close the output file!", status);
+            goto CLEANUP;
+        }
     }
 
 CLEANUP:
@@ -447,7 +466,20 @@ CLEANUP:
     if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
 
     /* Close files if still open */
-    if(inData) { smf_close_file(&inData, status); }
+    if(inData) {
+        smf_close_file(&inData, status);
+        if(*status != SAI__OK) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "CLEANUP: Unable to close the input file!", status);
+        }
+    }
+    if(outData) {
+        smf_close_file(&outData, status);
+        if(*status != SAI__OK) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "CLEANUP: Unable to close the output file!", status);
+        }
+    }
 
     /* END NDF */
     ndfEnd(status);
