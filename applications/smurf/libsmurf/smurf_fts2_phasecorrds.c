@@ -92,6 +92,8 @@
 *       Reindent phase correction code
 *     2013-05-24 (MS)
 *       Added Phase Correction Function double sided InterFeroGram INput Real (IFGINR) debug output
+*     2013-06-05 (MS)
+*       Adjust debug output
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -642,6 +644,8 @@ void smurf_fts2_phasecorrds(int* status)
                 }
 
                 /* FFT interferogram */
+                /* DEBUG: Skip DF:
+                planA = fftw_plan_dft_1d(nFrames, DSIN, DSOUT, FFTW_FORWARD, FFTW_ESTIMATE); */
                 planA = fftw_plan_dft_1d(nFrames, IFGDF, DSOUT, FFTW_FORWARD, FFTW_ESTIMATE);
                 fftw_execute(planA);
 
