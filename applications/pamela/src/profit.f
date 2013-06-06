@@ -502,6 +502,11 @@ C
          CALL ERR_REP(' ','Too many polys for MAXCOFF',STATUS)
          RETURN
       END IF
+      IF(NPOLS*NPOLY .GT. 400) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP(' ','Too many polys for LU decomposition',STATUS)
+         RETURN
+      END IF
       CALL MSG_BLANK(STATUS)
       CALL MSG_SETI('XLO',XLO)
       CALL MSG_SETI('XHI',XLO+NXS-1)
