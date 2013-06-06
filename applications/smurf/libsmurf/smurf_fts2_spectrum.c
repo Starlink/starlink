@@ -70,6 +70,8 @@
 *        Adjust debug output
 *     2013-06-05 (MS)
 *        Error check file writing and closures
+*     2013-06-05 (MS)
+*        Correct off-by-one ZPD index error causing attenuation at half nyquist
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -237,7 +239,7 @@ void smurf_fts2_spectrum(int* status)
         fNyquistin = fNyquist;
         dxin = (1/(2*fNyquistin));
         N2in = (nFrames / 2);
-        indexZPDin = N2in;
+        indexZPDin = N2in - 1;
         Nin = 2 * N2in;
         OPDMaxin = N2in * dxin;
         resolution = 1 / (2 * OPDMaxin);
@@ -269,7 +271,7 @@ void smurf_fts2_spectrum(int* status)
             /* Calculate N2 */
             dxzp = (1/(2*fNyquistzp));
             N2zp = (OPDMaxzp / dxzp);
-            indexZPDzp = N2zp;
+            indexZPDzp = N2zp - 1;
             Nzp = 2 * N2zp;
             dSigmazp = fNyquistzp / N2zp;
         }
@@ -313,8 +315,8 @@ void smurf_fts2_spectrum(int* status)
         outData->ndims   = 3;
         outData->dims[0] = nWidth;
         outData->dims[1] = nHeight;
-        outData->dims[2] = N;
-        outData->pntr[0] = (double*) astMalloc((nPixels * N) * sizeof(double));
+        outData->dims[2] = N2+1;
+        outData->pntr[0] = (double*) astMalloc((nPixels * (N2+1)) * sizeof(double));
         if (dataLabel) { one_strlcpy(outData->hdr->dlabel, dataLabel, sizeof(outData->hdr->dlabel), status ); }
 
         IFG  = astCalloc(N,  sizeof(*IFG));
