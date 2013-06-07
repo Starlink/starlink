@@ -90,6 +90,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
 *     15-MAR-2013 (DSB):
 *        Ensure max and min data value sinclude *all* data - including
 *        values adjacent to bad values.
+*     7-JUN-2013 (DSB):
+*        Assign bad value to work values if a neigbouring input value is bad.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -150,6 +152,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
                   *wr = -pr[ -1 ] + 2*pr[ 0 ] - pr[ 1 ];
                   sum += ( *wr )*( *wr );
                   n++;
+               } else {
+                  *wr = CGEN_BAD;
                }
 
                if( *pr > maxv ) maxv = *pr;
