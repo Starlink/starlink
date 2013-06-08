@@ -58,11 +58,12 @@
 *     this command and comparing its results with SPECX maps will be
 *     welcomed.
 *     - The ORAC-DR recipe defaults to REDUCE_SCIENCE.  The exceptions
-*     are as follows.
+*     are as follows:
 *       -  REDUCE_SCIENCE_CONTINUUM for solar-system objects (Sun, Moon,
-*       planets, Titan)
+*       planets, Titan);
 *       -  REDUCE_POINTING for a FIVEPOINT observation type and a DAS
-*       backend.
+*       backend;
+*       -  REDUCE_FOCUS for a focus observation type; and
 *       -  REDUCE_SCIENCE_BROADLINE for objects with radial velocities
 *       above 120 km/s.
 

@@ -141,6 +141,8 @@
 *        and galaxies.
 *     2013 May 28 (MJC):
 *        Add additional continuum-recipe objects.
+*     2013 June 7 (MJC):
+*        Add focus recipe.
 
 *  Copyright:
 *     Copyright (C) 2008-2013 Science and Technology Facilities Council.
@@ -324,6 +326,9 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   if ( strncasecmp( gsdVars->backend, "DAS", 3 ) == 0 &&
        strncasecmp( gsdVars->obsType, "FIVEPOINT", 9 ) == 0 )
      strcpy( recipe, "REDUCE_POINTING" );
+
+  else if ( strncasecmp( gsdVars->obsType, "focus", 5 ) == 0 )
+            strcpy( recipe, "REDUCE_FOCUS" );
 
   /* Solar-system objects have a different default recipe. */
   else if ( strncasecmp( gsdVars->object1, "SUN", 3 )     == 0 ||
