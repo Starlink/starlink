@@ -84,8 +84,9 @@
 *        Allow a different filter size to be used on the last iteration
 *        (specified by parameters "FLT.xxx_LAST").
 *     2013-06-10 (DSB):
-*        The FLT mask was mis-placed by a number of samples equal to
+*        - The FLT mask was mis-placed by a number of samples equal to
 *        twice the padding plus the apodisation.
+*        - Reorder the LUT model if any masking is being one.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -190,6 +191,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   int notfirst=0;               /* flag for delaying until after 1st iter */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
+  int order_list;               /* List of models to re-order */
   SmfCalcModelFltData *pdata = NULL; /* Data describing worker jobs */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
@@ -251,8 +253,9 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   astMapGet0I( kmap, "ZEROPAD", &zeropad );
 
   /* Assert bolo-ordered data */
-  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0,
-                       status );
+  order_list = SMF__RES|SMF__QUA|SMF__NOI;
+  if( mask ) order_list |= SMF__LUT;
+  smf_model_dataOrder( dat, allmodel, chunk, order_list, 0, status );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
