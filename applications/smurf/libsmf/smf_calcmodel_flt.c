@@ -83,6 +83,9 @@
 *     2013-03-18 (DSB):
 *        Allow a different filter size to be used on the last iteration
 *        (specified by parameters "FLT.xxx_LAST").
+*     2013-06-10 (DSB):
+*        The FLT mask was mis-placed by a number of samples equal to
+*        twice the padding plus the apodisation.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -542,8 +545,8 @@ static void smf1_calcmodel_flt( void *job_data_ptr, int *status ) {
       ibase = pdata->b1*pdata->bstride;
       for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
          if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
-            pl = pdata->lut_data + ibase;
-            pm = pdata->model_data + ibase;
+            pl = pdata->lut_data + ibase + pdata->nclose*pdata->tstride;
+            pm = pdata->model_data + ibase + pdata->nclose*pdata->tstride;
             for( itime = pdata->nclose; itime < pdata->ntslice - pdata->nclose;
                                                                     itime++ ) {
                if( *pl != VAL__BADI && !pdata->mask[ *pl ] ) *pm = VAL__BADD;
