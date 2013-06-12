@@ -156,7 +156,7 @@
          NAX = AST_GETI( FRM, 'NAXES', STATUS )
 
 *  If a FrameSet was supplied, return the current Frame.
-         IF( AST_ISAFRAMESET( FRM ) ) THEN
+         IF( AST_ISAFRAMESET( FRM, STATUS ) ) THEN
             NEW = AST_GETFRAME( FRM, AST__CURRENT, STATUS )
             CALL AST_ANNUL( FRM, STATUS )
             FRM = NEW
