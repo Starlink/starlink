@@ -51,8 +51,8 @@
 
 *  Usage:
 *     pol2cat in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
-*             [config] [device] [retain] [qui] [hits] [msg_filter] [ilevel]
-*             [glevel] [logfile]
+*             [config] [device] [nsigma] [retain] [qui] [hits] [msg_filter]
+*             [ilevel] [glevel] [logfile]
 
 *  Parameters:
 *     CAT = LITERAL (Read)
@@ -168,6 +168,17 @@
 *        within the command string passed to the "invoke" function. The
 *        accepted values are the list defined in SUN/104 ("None", "Quiet",
 *        "Normal", "Verbose", etc). ["Normal"]
+*     NSIGMA = _REAL (Read)
+*        Specifies the strength of the spike removal. Features with a
+*        scale size smaller than 3 bolometers are removed by comparison
+*        of each pixel value with the local mean. If a pixel value deviates
+*        by more than NSIGMA standard deviations from the local mean, then
+*        it is set bad. Since the removal of such pixel values will
+*        change the local mean, this process is repeated 3 times. This
+*        cleaning algorithm is performed by the KAPPA FFCLEAN command with
+*        parameter BOX set to 3 and CLIP set to an array of three values
+*        each equal to NSIGMA. Using a larger value for NSIGMA will result
+*        in fewer pixels being removed. [3.0]
 *     PI = NDF (Read)
 *        The output NDF in which to return the polarised intensity map.
 *        No polarised intensity map will be created if null (!) is supplied.
@@ -213,7 +224,7 @@
 *        The 2D NDFs created have names of the form "ANG_<A>_<I>.sdf"
 *        and "PI_<A>_<I>.sdf", where <A> is the subarray name ("S8A", etc.)
 *        and <I> is an index that counts from zero to one less than the number
-*        of stare positions. The angles are in degrees, relative to the focal 
+*        of stare positions. The angles are in degrees, relative to the focal
 *        plane Y axis. The directory is created if it does not exist. [!]
 
 *  Copyright:
@@ -259,6 +270,8 @@
 *        makemos (not wcsalign).
 *     6-JUN-2013 (DSB):
 *        Added parameter STAREDIR.
+*     12-JUN-2013 (DSB):
+*        Added parameter NSIGMA.
 
 *-
 '''
@@ -340,6 +353,9 @@ try:
                                                        "GLOBAL",default=None),
                                  noprompt=True))
 
+   params.append(starutil.Par0F("NSIGMA", "No. of standard deviations at "
+                                "which to clip spikes", 3.0, noprompt=True))
+
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
@@ -348,7 +364,8 @@ try:
                                  default=None ))
 
    params.append(starutil.ParNDG("HITS", "An output NDF holding the hits per pixel",
-                                 default=None, exists=False, minsize=0, maxsize=1 ))
+                                 default=None, exists=False, minsize=0,
+                                 maxsize=1, noprompt=True ))
 
    params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
                                 "and IP?", False, noprompt=True))
@@ -425,6 +442,11 @@ try:
 
 #  Get the alignment domain.
    domain = parsys["DOMAIN"].value
+
+#  Get the clipping limit and create a string to use for the FFCLEAN CLIP
+#  parameter.
+   nsigma = parsys["NSIGMA"].value
+   clip = "{0},{0},{0}".format(nsigma)
 
 #  Get the pixel size to use. If no pixel size is supplied we use the pixel
 #  size of the total intensity map if supplied, or of the Q and U maps
@@ -531,8 +553,8 @@ try:
          msg_out( "Removing spikes from {0} bolometer Q values...".format(a))
          qff = NDG(qarray)
          qff.comment = "qff"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]"
-                 .format(qarray,qff) )
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[{2}\]"
+                 .format(qarray,qff,clip) )
 
 #  Create a set of Q images in which source pixels are blanked out.
          if mask != None:
@@ -596,8 +618,8 @@ try:
 #  Q images as a result of subtracting off the bolometer biases.
          qffb = NDG(qff)
          qffb.comment = "qffb"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]".
-                 format(qsub,qffb) )
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3  clip=\[{2}\]".
+                 format(qsub,qffb,clip) )
 
 #  Remove the low frequency drift that seems to exist in the Q values for
 #  each bolometer from stare position to stare position. Paste the cleaned,
@@ -649,15 +671,15 @@ try:
 #  Remove smaller spikes from the Q images and estimate variances.
          msg_out( "Removing smaller spikes from {0} bolometer Q values...".format(a))
          qff2 = NDG(qsm)
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]"
-                 .format(qsm,qff2) )
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[{2}\]"
+                 .format(qsm,qff2,clip) )
 
 #  Now do the same for the U images.
          msg_out( "Removing spikes from {0} bolometer U values...".format(a))
          uff = NDG(uarray)
          uff.comment = "uff"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]"
-                 .format(uarray,uff) )
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[{2}\]"
+                 .format(uarray,uff,clip) )
 
          if mask != None:
             msg_out( "Blanking source pixels in {0} U values...".format(a))
@@ -700,8 +722,8 @@ try:
                  format(uff,unm,usub) )
          uffb = NDG(uff)
          uffb.comment = "uffb"
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]".
-                 format(usub,uffb) )
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[{2}\]".
+                 format(usub,uffb,clip) )
 
          ucube = NDG(1)
          invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
@@ -735,8 +757,8 @@ try:
             invoke( "$KAPPA_DIR/wcscopy ndf={0} like={1} ok".
                     format(uu,uffb[islice-1]) )
          uff2 = NDG(usm)
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[3,3,3\]"
-                 .format(usm,uff2) )
+         invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[{2}\]"
+                 .format(usm,uff2,clip) )
 
 #  Ensure all images have the required current WCS Frame (as indicated by
 #  the DOMAIN parameter).
