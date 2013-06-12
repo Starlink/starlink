@@ -1063,6 +1063,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        Prevent seg fault caused by overrunning the coeffs array in
 *        WATCoeffs in cases where the TNX/ZPX projection is found to be
 *        of a form that cannot be implemented as a TPN projection.
+*     11-JUN-2013 (DSB):
+*        Fix support for reading GLS projections, and add support for
+*        rotated GLS projections.
 *class--
 */
 
@@ -22770,7 +22773,6 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
 *     Private function.
 
 *  Synopsis:
-
 *     int PCFromStore( AstFitsChan *this, FitsStore *store,
 *                      const char *method, const char *class, int *status )
 
@@ -23252,6 +23254,7 @@ next:
 /* Return zero or ret depending on whether an error has occurred. */
    return astOK ? ret : 0;
 }
+
 static void PreQuote( const char *value,
                       char string[ AST__FITSCHAN_FITSCARDLEN - FITSNAMLEN - 3 ], int *status ) {
 
@@ -28142,7 +28145,6 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *                             const char *method, const char *class, int *status )
 
@@ -28292,13 +28294,10 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    char ss;                       /* Co-ordinate version character */
    char template[ FITSNAMLEN + 1 ];/* General keyword name template */
    double *cvals;                 /* PVi_m values for TPN projection */
-   double cdelt;                  /* CDELT value */
    double cdelti;                 /* CDELT for longitude axis */
    double cdeltj;                 /* CDELT for latitude axis */
    double cosrota;                /* Cos( CROTA ) */
    double crota;                  /* CROTA Value */
-   double crpix;                  /* CRPIX value */
-   double crval;                  /* CRVAL value */
    double dval;                   /* General floating value */
    double lambda;                 /* Ratio of CDELTs */
    double projp;                  /* Projection parameter value */
@@ -28320,8 +28319,8 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    int m;                         /* Co-ordinate version index */
    int naxis;                     /* Number of axes */
    int ncoeff;                    /* Number of PVi_m values */
-   int norot;                     /* Non-zero if there is no axis rotation */
    int ok;                        /* Can projection be represented in FITS-WCS?*/
+   int shifted;                   /* Non-zero if there is an origin shift */
    int tlbnd[ 2 ];                /* Lower index bounds */
    int tubnd[ 2 ];                /* Upper index bounds */
    int ubnd[ 2 ];                 /* Upper index bounds */
@@ -29030,72 +29029,49 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                    (void *) &cval, AST__STRING, NULL, status );
       }
 
-/* AIPS "GLS" projections (see FITS-WCS paper II section 6.1.4)
+/* AIPS "GLS" projections
    --------------------- */
 
 /* Compare the projection type with "-GLS" */
       if( !Ustrcmp( prj, "-GLS", status ) ) {
 
-/* Translation is only possible if there is no rotation on the celestial
-   axes. Check the off-diagonal elements of the PCi_j array are zero. */
-         norot = 1;
-         sprintf( keyname, "PC%d_%d", axlon + 1, axlat + 1 );
+/* Convert to "-SFL" */
+         strcpy( lontype + 4, "-SFL" );
+         cval = lontype;
+         SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, s, status ),
+                   (void *) &cval, AST__STRING, NULL, status );
+         strcpy( lattype + 4, "-SFL" );
+         cval = lattype;
+         SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, s, status ),
+                   (void *) &cval, AST__STRING, NULL, status );
+
+/* FITS-WCS paper 2 (sec. 6.1.4) describes how to handle AIPS GLS
+   projections, but requires that the axes are not rotated. Instead, we
+   modify the native latitude at the fiducial point, theta_0, as is done
+   in wcslib function celfix in file wcsfix.c (see also FITS-WCS paper
+   II sec. 2.5). We only need to change theta_0 if the CRVAL position is
+   not the celestial origin. */
+         shifted = 0;
+         sprintf( keyname, "CRVAL%d", axlon + 1 );
          if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0,
                         method, class, status ) ){
-            if( dval != 0.0 ) norot = 0;
+            if( dval != 0.0 ) shifted = 1;
          }
-         sprintf( keyname, "PC%d_%d", axlat + 1, axlon + 1 );
+         sprintf( keyname, "CRVAL%d", axlat + 1 );
          if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0,
                         method, class, status ) ){
-            if( dval != 0.0 ) norot = 0;
+            if( dval != 0.0 ) shifted = 1;
          }
-         if( norot ) {
 
-/* Get the reference value,reference pixel and cdelt value for the longitude
-   axis. */
-            GetValue2( ret, this, FormatKey( "CRVAL", axlon + 1, -1, s, status ),
-                       AST__FLOAT, (void *) &crval, 1, method, class, status );
-            GetValue2( ret, this, FormatKey( "CDELT", axlon + 1, -1, s, status ),
-                       AST__FLOAT, (void *) &cdelt, 1, method, class, status );
-            GetValue2( ret, this, FormatKey( "CRPIX", axlon + 1, -1, s, status ),
-                       AST__FLOAT, (void *) &crpix, 1, method, class, status );
-
-/* Store the original CRVAL value as RFVAL since it may be used for
-   other purposes (e.g. to hold the spectral source position). */
-            SetValue( ret, FormatKey( "RFVAL", axlon + 1, 1, s, status ),
-                      (void *) &crval, AST__FLOAT, NULL, status );
-
-/* Calculate and store a new CRPIX value which corresponds to a longitude
-   value of zero. Also store zero for CRVAL. */
-            crpix -= crval/cdelt;
-            crval = 0.0;
-            SetValue( ret, FormatKey( "CRPIX", axlon + 1, 1, s, status ),
-                      (void *) &crpix, AST__FLOAT, NULL, status );
-            SetValue( ret, FormatKey( "CRVAL", axlon + 1, 1, s, status ),
-                      (void *) &crval, AST__FLOAT, NULL, status );
-
-/* Get the reference value,reference pixel and cdelt value for the latitude
-   axis. */
-            GetValue2( ret, this, FormatKey( "CRVAL", axlat + 1, -1, s, status ),
-                       AST__FLOAT, (void *) &crval, 1, method, class, status );
-            GetValue2( ret, this, FormatKey( "CDELT", axlat + 1, -1, s, status ),
-                       AST__FLOAT, (void *) &cdelt, 1, method, class, status );
-            GetValue2( ret, this, FormatKey( "CRPIX", axlat + 1, -1, s, status ),
-                       AST__FLOAT, (void *) &crpix, 1, method, class, status );
-
-/* Store the original CRVAL value as RFVAL since it may be used for
-   other purposes (e.g. to hold the spectral source position). */
-            SetValue( ret, FormatKey( "RFVAL", axlat + 1, 1, s, status ),
-                      (void *) &crval, AST__FLOAT, NULL, status );
-
-/* Calculate and store a new CRPIX value which corresponds to a longitude
-   value of zero. Also store zero for CRVAL. */
-            crpix -= crval/cdelt;
-            crval = 0.0;
-            SetValue( ret, FormatKey( "CRPIX", axlat + 1, 1, s, status ),
-                      (void *) &crpix, AST__FLOAT, NULL, status );
-            SetValue( ret, FormatKey( "CRVAL", axlat + 1, 1, s, status ),
-                      (void *) &crval, AST__FLOAT, NULL, status );
+         if( 0 && shifted ) {
+            SetValue( ret, FormatKey( "PV", axlon + 1, 2, s, status ),
+                      (void *) &dval, AST__FLOAT, NULL, status );
+            dval = 0.0;
+            SetValue( ret, FormatKey( "PV", axlon + 1, 1, s, status ),
+                      (void *) &dval, AST__FLOAT, NULL, status );
+            dval = 1.0;
+            SetValue( ret, FormatKey( "PV", axlon + 1, 0, s, status ),
+                      (void *) &dval, AST__FLOAT, NULL, status );
          }
       }
 
@@ -33196,13 +33172,13 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    values. In some circumstances, these may not be the original values in
    the supplied header but may have been translated within the SpecTrans
    function as part of the process of translating an old unsupported
-   projection (e.g. GLS) into a new supported projection (e.g. SFL).
-   Since the returned RefLat and RefLon values may be used to set the
-   reference position for a SpecFrame, we should return the original
-   values rather than the translated values. The original values will
-   have been stored (within SpecTrans) in the FitsChan as keywords
-   RFVALi. If such keywords can be found, use their values in preference
-   to the currently stored CRVAL values.*/
+   projection into a new supported projection. Since the returned RefLat
+   and RefLon values may be used to set the reference position for a
+   SpecFrame, we should return the original values rather than the
+   translated values. The original values will have been stored (within
+   SpecTrans) in the FitsChan as keywords RFVALi. If such keywords can
+   be found, use their values in preference to the currently stored CRVAL
+   values.*/
       if( GetValue( this, FormatKey( "RFVAL", axlon + 1, -1, s, status ),
                     AST__FLOAT, (void *) &lonval, 0, 0, method, class, status ) &&
           GetValue( this, FormatKey( "RFVAL", axlat + 1, -1, s, status ),
