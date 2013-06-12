@@ -22825,12 +22825,10 @@ a defined value in a given KeyMap.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V7.3.0}
+\subsection{Changes Introduced in V7.3.0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V7.2.0 and V7.3.0 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V7.2.0 and V7.3.0:
 
 \begin{enumerate}
 
@@ -22860,6 +22858,33 @@ FrameSet class.
 attribute are now left unchanged by the
 c astSimplify function.
 f AST\_SIMPLIFY routine.
+
+\end{enumerate}
+
+\subsection{Changes Introduced in V7.3.1}
+
+The following describes the most significant changes which
+occurred in the AST library between versions V7.3.0 and V7.3.1:
+
+\begin{enumerate}
+
+\item Fix a bug that could cauise a segmentation violation when reading
+certain FITS headers that use a TNX projection.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V7.3.2}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V7.3.1 and V7.3.2 (the
+current version):
+
+\begin{enumerate}
+
+\item Fix support for reading FITS header that use a GLS projection.
+Previously, an incorrect transformation was used for such projections if
+any CRVAL or CROTA value was non-zero.
 
 \end{enumerate}
 

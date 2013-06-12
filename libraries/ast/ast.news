@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V7.3.0) of the Starlink AST (astrometry) library is
+   A new release (V7.3.2) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,17 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- Fix support for reading GLS projections from FITS headers.
+
+Main Changes in V7.3.1
+----------------------
+
+- Fix bug that could cause a segmenatation fault when reading a FITS TNX
+header.
+
+Main Changes in V7.3.0
+----------------------
 
 - IMPORTANT! The interface for the astRebinSeq<X> (AST_REBINSEQ) family
 of functions has been changed in order to allow a greater number of
