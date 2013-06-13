@@ -186,6 +186,8 @@ void smurf_fts2_spectrum(int* status)
     double OPDMaxin           = 0.0;             /* OPD max in cm input */
     double OPDMaxzp           = 0.0;             /* OPD max in cm zero padded */
 
+#define DEBUG 0
+
     /* Get Input & Output groups */
     kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
     kpg1Wgndf("OUT", gOut, nFiles, nFiles, "Equal number of input and output files expected!", &gOut, &nOutFiles, status);
@@ -247,37 +249,48 @@ void smurf_fts2_spectrum(int* status)
         dSigmain = fNyquistin / N2in;
 
         if(zeropad) {
-            /* Round Nyquist frequency down to nearest integer, for calculation convenience
-            fNyquistzp = floor(fNyquist);
-
-            smf_fits_updateD(inData->hdr, "FNYQUIST", fNyquistzp, "Nyquist frequency (cm^-1)", status);*/
-
-            /* Never change nyquist when zero padding */
-            fNyquistzp = fNyquist;
-
-            /* If resolution > 0.05, then round down to nearest 0.05 value, else set to 0.005 */
-            /* Calculate resolution as 1 / (2*OPDMax) */
-            /* Calculate OPDMax as N2 * dx */
-
-            if(resolution > 0.05) {
-                resolutionzp = floor(resolution/0.05) * 0.05;
+            if(DEBUG) {
+                /* Make the zero-padded array twice the size of the input */
+                fNyquistzp = fNyquist;
+                Nzp = N2in * 4;
+                N2zp = Nzp / 2;
+                dxzp = 1 / (2 * fNyquistzp);
+                OPDMaxzp = N2zp * dxzp;
+                dSigmazp = fNyquistzp / N2zp;
+                resolutionzp = 1 / (2 * OPDMaxzp);
             } else {
-                resolutionzp = 0.005;
+                /* Round Nyquist frequency down to nearest integer, for calculation convenience
+                fNyquistzp = floor(fNyquist);
+
+                smf_fits_updateD(inData->hdr, "FNYQUIST", fNyquistzp, "Nyquist frequency (cm^-1)", status);*/
+
+                /* Never change nyquist when zero padding */
+                fNyquistzp = fNyquist;
+
+                /* If resolution > 0.05, then round down to nearest 0.05 value, else set to 0.005 */
+                /* Calculate resolution as 1 / (2*OPDMax) */
+                /* Calculate OPDMax as N2 * dx */
+
+                if(resolution > 0.05) {
+                    resolutionzp = floor(resolution/0.05) * 0.05;
+                } else {
+                    resolutionzp = 0.005;
+                }
+
+                /* Calculate OPDMaxOut  as 1 / (2 * resolutionzp) */
+                OPDMaxzp = 1 / (2 * resolutionzp);
+
+                /* Calculate N2 */
+                dxzp = (1/(2*fNyquistzp));
+                N2zp = (OPDMaxzp / dxzp);
+                indexZPDzp = N2zp - 1;
+                Nzp = 2 * N2zp;
+                dSigmazp = fNyquistzp / N2zp;
             }
-
-            /* Calculate OPDMaxOut  as 1 / (2 * resolutionzp) */
-            OPDMaxzp = 1 / (2 * resolutionzp);
-
-            /* Calculate N2 */
-            dxzp = (1/(2*fNyquistzp));
-            N2zp = (OPDMaxzp / dxzp);
-            indexZPDzp = N2zp - 1;
-            Nzp = 2 * N2zp;
-            dSigmazp = fNyquistzp / N2zp;
         }
 
-        /*printf("%s: Nin=%d, Nzp=%d, N2in=%d, N2zp=%d, dSigmain=%f, dSigmazp=%f, fNyquistin=%f, fNyquistzp=%f, dxin=%f, dxzp=%f, OPDMaxin=%f, OPDMaxzp=%f, resolutionin=%f, resolutionzp=%f\n",
-               TASK_NAME, Nin, Nzp, N2in, N2zp, dSigmain, dSigmazp, fNyquistin, fNyquistzp, dxin, dxzp, OPDMaxin, OPDMaxzp, resolutionin, resolutionzp);*/
+      /*printf("%s: Nin=%d, Nzp=%d, N2in=%d, N2zp=%d, indexZPDin=%d, indexZPDzp=%d, dSigmain=%f, dSigmazp=%f, fNyquistin=%f, fNyquistzp=%f, dxin=%f, dxzp=%f, OPDMaxin=%f, OPDMaxzp=%f, resolutionin=%f, resolutionzp=%f\n",
+               TASK_NAME, Nin, Nzp, N2in, N2zp, indexZPDin, indexZPDzp, dSigmain, dSigmazp, fNyquistin, fNyquistzp, dxin, dxzp, OPDMaxin, OPDMaxzp, resolutionin, resolutionzp);*/
 
         if(zeropad) {
             N = Nzp;
@@ -302,12 +315,12 @@ void smurf_fts2_spectrum(int* status)
         /* Save wavenumber factor to FITS extension */
         smf_fits_updateD(inData->hdr, "WNFACT", dSigma, "Wavenumber factor cm^-1", status);
 
-        /* TODO: Update mirror positions
+        /* TODO: Update mirror positions */
         smf_fits_updateI(inData->hdr, "MIRSTART", 0, "Frame index in which the mirror starts moving", status);
-        smf_fits_updateI(inData->hdr, "MIRSTOP", N, "Frame index in which the mirror stops moving", status);
-        smf_fits_updateD(inData->hdr, "OPDMIN", OPD_EVEN[0], "Minimum OPD", status);
-        smf_fits_updateD(inData->hdr, "OPDSTEP", dx, "OPD step size", status);
-        */
+        smf_fits_updateI(inData->hdr, "MIRSTOP", N2, "Frame index in which the mirror stops moving", status);
+      /*smf_fits_updateD(inData->hdr, "OPDMIN", OPD_EVEN[0], "Minimum OPD", status);
+        smf_fits_updateD(inData->hdr, "OPDSTEP", dx, "OPD step size", status);*/
+
 
         /* Copy input data into output data */
         outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
@@ -352,21 +365,21 @@ void smurf_fts2_spectrum(int* status)
                     pad = Nzp - Nin;
                     pad2 = pad / 2;
                     /* Copy the right half of the input into the left half of this IFG, zero padded in the middle */
-                    for(k=indexZPDin,l=indexZPDzp; k<Nin && l<Nzp; k++,l++) {
+                    for(k=indexZPDin; k<Nin; k++) {
                         /*printf("%s: IFG: indexZPDin=%d, indexZPDzp=%d, Nin=%d, Nzp=%d, k=%d, l=%d\n", TASK_NAME, indexZPDin, indexZPDzp, Nin, Nzp, k, l);*/
-                        IFG[l - indexZPDzp] = *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
-                        /*if(i==16 && j==25) {
-                            printf("%s: Pixel[%d,%d]: (L<-R) IFG[l(%d)-indexZPDzp(%d)+pad2(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
-                                   TASK_NAME, i, j, l, indexZPDzp, pad2, (l - indexZPDzp + pad2), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[l - indexZPDzp + pad2]);
-                          }*/
+                        IFG[k - indexZPDin] = *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
+                      /*if(i==16 && j==25) {
+                            printf("%s: Pixel[%d,%d]: (L<-R) IFG[k(%d)-indexZPDin(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %g\n",
+                                   TASK_NAME, i, j, k, indexZPDin, (k - indexZPDin), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[k - indexZPDin]);
+                        }*/
                     }
                     /* Copy the left half of the input into the right half of this IFG, zero padded in the middle */
-                    for(k=0,l=0; k<indexZPDin && l<indexZPDzp; k++,l++) {
+                    for(k=0,l=0; k<indexZPDin; k++) {
                         IFG[Nzp - indexZPDin + k] =  *((double*)(inData->pntr[0]) + (bolIndex + k * nPixels));
-                        /*if(i==16 && j==25) {
-                            printf("%s: Pixel[%d,%d]: (L->R) IFG[indexZPDzp(%d)+l(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %f\n",
-                                   TASK_NAME, i, j, indexZPDzp, l, (indexZPDzp+l), bolIndex, k, nPixels, (bolIndex + k * nPixels), IFG[indexZPDzp+l]);
-                          }*/
+                      /*if(i==16 && j==25) {
+                            printf("%s: Pixel[%d,%d]: (L->R) IFG[Nzp(%d)-indexZPDin(%d)+k(%d)=%d] = inData->pntr[bolIndex(%d)+k(%d)*nPixels(%d)=%d] = %g\n",
+                                   TASK_NAME, i, j, Nzp, indexZPDin, k, (Nzp-indexZPDin+k), bolIndex, k, nPixels, (bolIndex+k*nPixels), IFG[Nzp-indexZPDin+k]);
+                        }*/
                     }
                 } else {
                     /* Copy the right half of the input into the left half of this IFG */
@@ -423,7 +436,7 @@ void smurf_fts2_spectrum(int* status)
                 for(k = 0; k <= N2; k++) {
                     *((double*)(outData->pntr[0]) + (bolIndex + k * nPixels)) = (SPEC[k][0] / (double)(N * resolution));
                   /*if(i==16 && j==25) {
-                      printf("%s: SPEC[%d,%d,%d]=%E\n",TASK_NAME, i, j, k, SPEC[k][0] / (double)(N * resolution));
+                        printf("%s: SPEC[%d,%d,%d]=%E\n",TASK_NAME, i, j, k, SPEC[k][0] / (double)(N * resolution));
                     }*/
                 }
             }
