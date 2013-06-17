@@ -34,6 +34,11 @@
       list of displayed NDF paths to be filtered by removing the paths
       for NDFs that do not exist.
 
+   o  OUTSET
+
+      -  The USEAXIS parameter now works, needed when the supplied NDF
+      has more than two axes.
+
 1 KAPPA_Version_2.0
 
    A new release of KAPPA (@PACKAGE_VERSION@) is available.  The main
