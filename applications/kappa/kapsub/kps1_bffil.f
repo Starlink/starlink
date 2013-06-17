@@ -82,6 +82,8 @@
 *        5 -- Are the relative amplitudes fixed?
 *        6 -- Are the separations to the secondary beam positions fixed?
 *        7 -- Is the shape parameter fixed?
+*        8 -- Is the beam fixed to be circular?
+*        9 -- Is the orientation of the Gaussian fixed?
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
 *        The ratios of the secondary beam `sources' to the first beam.
 *        These ratios contrain the fitting provided FIXCON(5) is .TRUE.

@@ -56,7 +56,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010, 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -90,6 +90,8 @@
 *     2010 July 5 (MJC):
 *        Switched to generalised Gaussian fit by the introduction of
 *        the shape exponent.
+*     2013 July 15 (MJC):
+*        Allow for circularity constraint.
 *     {enter_further_changes_here}
 
 *-
@@ -123,6 +125,8 @@
 *           Was the background level set by the user?
 *        FWHMC = LOGICAL (Read)
 *           Was the FWHM fixed by the user?
+*        CIRC = LOGICAL
+*           Circular Gaussian demanded by the user?
 *        LBND( BF__NDIM ) = INTEGER (Read)
 *           The lower pixel bounds of the data and variance arrays.
 *        UBND( BF__NDIM ) = INTEGER (Read)
@@ -192,9 +196,15 @@
 
 *  A supplied FWHM need not imply circularity.
          IF ( .NOT. FWHMC ) THEN
-            I = I + 2
-            PC( 3, IG ) = XC( I - 1 )
-            PC( 4, IG ) = XC( I )
+            IF ( CIRC ) THEN
+               I = I + 1
+               PC( 3, IG ) = XC( I )
+               PC( 4, IG ) = XC( I )
+            ELSE
+               I = I + 2
+               PC( 3, IG ) = XC( I - 1 )
+               PC( 4, IG ) = XC( I )
+            END IF
          END IF
 
 *  An attempt to keep the orientation constrained here fails.

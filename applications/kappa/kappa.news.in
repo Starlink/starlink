@@ -6,6 +6,18 @@
 
 2 Modified_applications
 
+   o  BEAMFIT
+
+      - There is now more control on the initial or fixed sizes and 
+      shapes of the beams.  See the documentation for Parameter
+      FIXFWHM, and new Parameters FWHM, CIRCULAR for details.
+      
+      - Note that this has involved a change of the type and 
+      function of Parameter FIXFWHM.  FIXFWHM like other FIX-
+      parameters is _LOGICAL; it now just constrains whether the FWHM
+      values should be fixed.  FWHM allows you to set actual sizes or
+      initial guesses.
+
    o  DISPLAY
 
       -  The MODE parameter can now be set to "Current" to force the

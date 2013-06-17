@@ -98,6 +98,8 @@
 *     CENTRE( 2 ) = LITERAL (Write)
 *        The formatted co-ordinates and their errors of the primary
 *        beam in the current co-ordinate Frame of the NDF.
+*     CIRCULAR = LOGICAL (Read)
+*        If set TRUE only circular beams will be fit.   [FALSE]
 *     COIN = FILENAME (Read)
 *        Name of a text file containing the initial guesses at the
 *        co-ordinates of beams to be fitted.  It is only accessed if
@@ -130,25 +132,11 @@
 *        If a non-null value is supplied then the model fit will use
 *        that value as the constant background level otherwise the
 *        background is a free parameter of the fit.  [!]
-*     FIXFWHM = LITERAL (Read)
-*        If a non-null value is supplied then the model fit will use
-*        that value as the full-width half-maximum value for the beam
-*        and assumes that the beam is circular.  If two values are
-*        supplied then these are the fixed major- and minor-axis
-*        full-width half maxima.
-*
-*        If the current co-ordinate Frame of the NDF is a SKY Frame
-*        (e.g. right ascension and declination), then the value should
-*        be supplied as an increment of celestial latitude (e.g.
-*        declination).  Thus, "5.7" means 5.7 arcseconds, "20:0" would
-*        mean 20 arcminutes, and "1:0:0" would mean 1 degree.  If the
-*        current co-ordinate Frame is not a SKY Frame, then the widths
-*        should be specified as an increment along Axis 1 of the
-*        current co-ordinate Frame.  Thus, if the Current Frame is
-*        PIXEL, the value should be given simply as a number of pixels.
-*
-*        Null indicates that the FWHM values are free parameters of the
-*        fit.  [!]
+*     FIXFWHM = _LOGICAL (Read)
+*        If this is set TRUE then the model fit will use the full-width
+*        half-maximum values for the beams supplied through Parameter
+*        FWHM.  FALSE demands that the FWHM values are free parameters
+*        of the fit.  [FALSE]
 *     FIXPOS = _LOGICAL (Read)
 *        If TRUE, the supplied position of each beam is used and
 *        the centre co-ordinates of the beam features are not fit.
@@ -164,6 +152,34 @@
 *        (although it is actually the centres being fit).  It is
 *        advisable not to use this option in the inaccurate "Cursor"
 *        mode.  [FALSE]
+*     FWHM = LITERAL (Read)
+*        The initial full-width half-maximum (FWHM) values for each
+*        beam.  These become fixed values if FIXFWHM is set TRUE.
+*
+*        A number of options are available.
+*        -  A single value gives the same circular FWHM for all beams.
+*        -  When Parameter CIRCULAR is TRUE, supply a list of values one
+*        for each of the number of beams.  These should be supplied in
+*        the same order as the corresponding beam positions.
+*        -  A pair of values sets the major- and minor-axis values for
+*        all beams, provided Parameter CIRCULAR is FALSE.
+*        -  Major- and minor-axis pairs, whose order should match that
+*        of the corresponding beams.  Again CIRCULAR should be FALSE.
+*        Multiple values are separated by commas.  An error is issued
+*        should none of these options be offered.
+*
+*        If the current co-ordinate Frame of the NDF is a SKY Frame
+*        (e.g. right ascension and declination), then each value should
+*        be supplied as an increment of celestial latitude (e.g.
+*        declination).  Thus, "5.7" means 5.7 arcseconds, "20:0" would
+*        mean 20 arcminutes, and "1:0:0" would mean 1 degree.  If the
+*        current co-ordinate Frame is not a SKY Frame, then the widths
+*        should be specified as an increment along Axis 1 of the
+*        current co-ordinate Frame.  Thus, if the Current Frame is
+*        PIXEL, the value should be given simply as a number of pixels.
+*
+*        Null requests that BEAMFIT itself estimates the initial FWHM
+*        values.  [!]
 *     GAMMA( 2 ) = _DOUBLE (Write)
 *        The primary beam position's shape exponent and its error.
 *     GAUSS = _LOGICAL (Read)
@@ -405,14 +421,15 @@
 *             fixback=0.0
 *        As above but now the background is fixed to be zero.
 *     beamfit ndf=mars_3pos mode=interface beams=1 pos="5.0,-3.5"
-*             fixfwhm=16.5 gauss=f
+*             fixfwhm fwhm=16.5 gauss=f
 *        As above but now the Gaussian is constrained to have a FWHM of
 *        16.5 arcseconds and be circular, but the shape exponent is not
 *        constrained to be 2.
-*     beamfit mars_3pos in beams=1 fixfwhm=16.5 fitarea=51 pos="5.,-3.5"
+*     beamfit mars_3pos in beams=1 fwhm=16.5 fitarea=51 pos="5.,-3.5"
 *        As above but now the fitted data is restricted to areas 51x51
 *        pixels about the initial guess positions.  All the other
-*        examples use the full array.
+*        examples use the full array.  Also the FWHM value is now just
+*        an initial guess.
 *     beamfit mars_3pos int 3 "5.0,-3.5" ampratio=-0.5 resid=mars_res
 *        As the first example except this finds the Gaussian
 *        coefficients of the primary beam feature and two secondary
@@ -434,6 +451,12 @@
 *     beamfit mars_3pos int 2 "5.0,-3.5" pos2="-60.5,0.6" polar=f fixpos
 *        As the last-but-one example, but now location of the secondary
 *        beam is fixed at (-55.5,-2.9).
+*     beamfit s450 int beams=2 fwhm="7.9,25" ampratio=0.06 circular
+*             pos='"0:0:0,0:0:0"' nopolar pos2="0:0:0,0:0:0"
+*        This fits two superimposed circular Gaussians in the NDF called
+*        s450, whose current WCS is SKY.  The beam second being fixed
+*        at 6 percent the strength of the first, with initial
+*        widths of 7.9 and 25 arcseconds.
 *     beamfit mode=cu beams=1
 *        This finds the Gaussian coefficients of the primary beam
 *        feature of an NDF, using the graphics cursor on the current
@@ -490,7 +513,8 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009, 2010, Science & Technology Facilities Council.
+*     Copyright (C) 2009, 2010, 2011, 2013 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -575,6 +599,10 @@
 *     1-APR-2011 (DSB):
 *        Use KPG_GDFND in place of KPG1_AGFND in case the most recent
 *        data picture had no WCS.
+*     2013 July 12 (MJC):
+*        Add CIRCULAR parameter and set new COMMON constraint flag.
+*        Extended FIXFWHM to FWHM to encompass initial guesses.  Made new
+*        _LOGICAL FIXFWHM parameter solely to set fixed FWHM values.
 *     {enter_further_changes_here}
 
 *-
@@ -611,7 +639,8 @@
       LOGICAL CAT                ! Catalogue mode was selected
       DOUBLE PRECISION CENTRE( BF__NDIM ) ! Map centre pixel co-ords
       INTEGER CFRM               ! Pointer to Current Frame of the NDF
-      LOGICAL CURSOR             ! Cursor mode was selected
+      LOGICAL CIRCUL             ! Fit circular beams?
+      LOGICAL CURSOR             ! Cursor mode was selected?
       LOGICAL DESC               ! Describe the current Frame?
       INTEGER DIMS( BF__NDIM )   ! Dimensions of NDF
       CHARACTER*( NDF__SZFTP ) DTYPE ! Numeric type for results
@@ -622,7 +651,7 @@
       INTEGER FITREG( BF__NDIM ) ! Size of fitting region to be used
       DOUBLE PRECISION FPAR( MXCOEF ) ! Stores fixed parameter values
       LOGICAL FIXCON( BF__NCON ) ! Constraints set?
-      DOUBLE PRECISION FWHM( BF__NDIM ) ! Fixed FWHM
+      DOUBLE PRECISION FWHM( BF__NDIM * BF__MXPOS ) ! Initial or fixed FWHM
       DOUBLE PRECISION GLB( BF__NDIM ) ! GRID lower bounds
       DOUBLE PRECISION GUB( BF__NDIM ) ! GRID upper bounds
       LOGICAL GOTLOC             ! Locator to the NDF obtained?
@@ -648,6 +677,7 @@
       INTEGER IWCS               ! WCS FrameSet from input NDF
       INTEGER IWCSG              ! FrameSet read from input catalogue
       INTEGER J                  ! Loop counter and index
+      INTEGER K                  ! Index work varaible
       INTEGER LBND( NDF__MXDIM ) ! Full NDF lower bounds
       CHARACTER*(DAT__SZLOC) LOCI ! Locator for input data structure
       LOGICAL LOGF               ! Write log of positions to text file?
@@ -1140,21 +1170,31 @@
 
 *  Is the FWHM fixed?
 *  ------------------
+
+*  Fit circular beams?  Keep the variables separate in case there is
+*  a demand to set a fixed but non-circular orientation.  For a circular
+*  fit the orientation is fixed too.
+      CALL PAR_GET0L( 'CIRCULAR', CIRCUL, STATUS )
+      FIXCON( 8 ) = CIRCUL
+      FIXCON( 9 ) = CIRCUL
+
+*  Use the initial FWHM values rather than fitting?
+      CALL PAR_GET0L( 'FIXFWHM', FIXCON( 3 ), STATUS )
+
       S2FWHM = SQRT( 8.D0 * LOG( 2.D0 ) )
 
-*  Obtain the FIXFWHM parameter value(s).  There is no dynamic default.
-      FWHM( 1 ) = AST__BAD
-      FWHM( 2 ) = AST__BAD
-      CALL KPG1_GTAXV( 'FIXFWHM', BF__NDIM, .FALSE., CFRM, WAX, FWHM,
-     :                 NVAL, STATUS )
+*  Obtain the FWHM parameter value(s).  There is no dynamic default.
+      DO I = 1, BF__NDIM * BF__MXPOS
+         FWHM( I ) = AST__BAD
+      END DO
+      CALL KPG1_GTAXV( 'FWHM', BF__NDIM * BF__MXPOS, .FALSE., CFRM, WAX,
+     :                 FWHM, NVAL, STATUS )
 
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         FIXCON( 3 ) = .FALSE.
       ELSE
 
 *  Assign the single (circular) fixed value.
-         FIXCON( 3 ) = .TRUE.
          IF ( NVAL .EQ. 1 ) THEN
             DO I = 1, NPOS
                J = ( I - 1 ) * BF__NCOEF
@@ -1166,8 +1206,13 @@
                FPAR( 5 + J ) = 0.0D0
             END DO
 
-*  We've been supplied with the major and minor axes.
-         ELSE
+*  Since it is circular set the fixed orientation and circularity flags.
+            FIXCON( 8 ) = .TRUE.
+            FIXCON( 9 ) = .TRUE.
+
+*  We've been supplied with the major and minor axes applied to all
+*  beams.
+         ELSE IF ( NVAL .EQ. 2 .AND. .NOT. CIRCUL ) THEN
             DO I = 1, NPOS
                J = ( I - 1 ) * BF__NCOEF
 
@@ -1176,6 +1221,44 @@
                FPAR( 3 + J ) = MAX( FWHM( 1 ), FWHM( 2 ) ) / S2FWHM
                FPAR( 4 + J ) = MIN( FWHM( 1 ), FWHM( 2 ) ) / S2FWHM
             END DO
+
+         ELSE IF ( NVAL .EQ. NPOS .AND. CIRCUL ) THEN
+            DO I = 1, NPOS
+               J = ( I - 1 ) * BF__NCOEF
+
+*  Note we calculate the standard deviations of the Gaussian fit, so
+*  apply the standard scaling.
+               FPAR( 3 + J ) = FWHM( I ) / S2FWHM
+               FPAR( 4 + J ) = FPAR( 3 + J )
+               FPAR( 5 + J ) = 0.0D0
+            END DO
+
+*  Supplied initial elliptical FWHM values.
+         ELSE IF ( NVAL .EQ. 2 * NPOS ) THEN
+            DO I = 1, NPOS
+               J = ( I - 1 ) * BF__NCOEF
+               K = 2 * ( I - 1 ) + 1
+
+*  Note we calculate the standard deviations of the Gaussian fit, so
+*  apply the standard scaling.
+               FPAR( 3 + J ) = MAX( FWHM( K ), FWHM( K + 1 ) ) / S2FWHM
+               FPAR( 4 + J ) = MIN( FWHM( K ), FWHM( K + 1 ) ) / S2FWHM
+            END DO
+
+         ELSE
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'N', NVAL )
+            IF ( CIRCUL ) THEN
+               CALL MSG_SETI( 'NB', NPOS )
+               CALL ERR_REP( 'BEAMFIT_FWHMC', 'The number of FWHM '/
+     :           /'values (^N) is neither 1 nor the number of beams '/
+     :           /'(^NB).', STATUS )
+            ELSE
+               CALL MSG_SETI( 'NB', NPOS * 2 )
+               CALL ERR_REP( 'BEAMFIT_FWHM', 'The number of FWHM '/
+     :           /'values (^N) is neither 1 nor twice the number of '/
+     :           /'beams (^NB).', STATUS )
+            END IF
          END IF
       END IF
 

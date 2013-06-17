@@ -87,8 +87,8 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007, 2010, 2011 Science & Technology Facilities
-*     Council.
+*     Copyright (C) 2007, 2010, 2011, 2013 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -148,7 +148,9 @@
 *        shape exponent.
 *     2011 May 11 (MJC):
 *        Removed no-longer-used argument MAP3.
-*     {enter_further_changes_here}
+*     2013 July 16 (MJC):
+*        Use circular constraint.
+*    {enter_further_changes_here}
 
 *-
 
@@ -161,6 +163,13 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'BF_PAR'           ! BEAMFIT constants
+
+*  Global Variables:
+      INCLUDE 'BF_COM'           ! Used for communicating with PDA
+                                 ! routine
+*        CIRC = LOGICAL (Read)
+*           Circular beam fixed by user?
 
 *  Arguments Given:
       LOGICAL LOGF
@@ -478,11 +487,17 @@
 
             ELSE
 
-* Format to left-justify the angle to two decimal places.
-               WRITE ( FORMAT, '(''F'',I1,''.2'')' )
-     :           MAX( 0, INT( LOG10( POLSIG( 2, IB ) + VAL__EPSD ) ) ) +
-     :           4
-               CALL MSG_FMTR( 'PAE', FORMAT, SNGL( POLSIG( 2, IB ) ) )
+*  Format to left-justify the angle to two decimal places, unless
+*  it is a nonsensical value.
+               IF ( POLSIG( 2, IB ) .GT. 360.0 ) THEN
+                  CALL MSG_SETC( 'PAE', 'undef' )
+               ELSE
+                  WRITE ( FORMAT, '(''F'',I1,''.2'')' )
+     :              MAX( INT( LOG10( POLSIG( 2, IB ) + VAL__EPSD ) ),
+     :                   0 ) + 4
+                  CALL MSG_FMTR( 'PAE', FORMAT,
+     :                           SNGL( POLSIG( 2, IB ) ) )
+               END IF
                CALL MSG_LOAD( 'KPS1_BFLOG_MSG5E', '    Position Angle '/
      :                        /' : ^PA +/- ^PAE degrees ^SENSE',
      :                        BUF, LBUF, STATUS )
@@ -549,9 +564,15 @@
      :                                             STATUS ) )
             END IF
 
-            CALL MSG_LOAD( 'KPS1_BFLOG_MSG6E', '    FWHM (major)'/
-     :                     /'    : ^FWHM +/- ^FWHME ^UNIT',
-     :                     BUF, LBUF, STATUS )
+            IF ( CIRC ) THEN
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG6E', '    FWHM        '/
+     :                        /'    : ^FWHM +/- ^FWHME ^UNIT',
+     :                        BUF, LBUF, STATUS )
+            ELSE
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG6E', '    FWHM (major)'/
+     :                        /'    : ^FWHM +/- ^FWHME ^UNIT',
+     :                        BUF, LBUF, STATUS )
+            END IF
          END IF
 
          IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
@@ -561,91 +582,92 @@
 *  -----
 *  Create a token for minor-axis FWHM value in the chosen co-ordinate
 *  Frame.
-         FWHM = P( MINOR, IB ) * S2FWHM
-         IF ( PIXEL ) THEN
-            CALL MSG_SETR( 'FWHM', SNGL( FWHM ) )
-         ELSE
+         IF ( .NOT. CIRC ) THEN
+            FWHM = P( MINOR, IB ) * S2FWHM
+            IF ( PIXEL ) THEN
+               CALL MSG_SETR( 'FWHM', SNGL( FWHM ) )
+            ELSE
 
-            CALL MSG_SETC( 'FWHM', AST_FORMAT( FRM2, REPAX, FWHM,
-     :                                         STATUS ) )
+               CALL MSG_SETC( 'FWHM', AST_FORMAT( FRM2, REPAX, FWHM,
+     :                                            STATUS ) )
 
 *  Get the Unit value.  Note assume spatial domain comprises the
 *  first two axes.
-            CALL MSG_SETC( 'UNIT',
-     :                     AST_GETC( FRM2, ATTR( : LATTR ), STATUS ) )
-         END IF
+               CALL MSG_SETC( 'UNIT', AST_GETC( FRM2, ATTR( : LATTR ),
+     :                                          STATUS ) )
+            END IF
 
 *  Error in minor-axis width
 *  -------------------------
 *  Bad values for the errors in the FWHM indicate no value exists.
-         IF ( SIGMA( MINOR, IB ) .EQ. VAL__BADD ) THEN
+            IF ( SIGMA( MINOR, IB ) .EQ. VAL__BADD ) THEN
 
 *  So report and log just the FWHM value in the desired Frame.
-            CALL MSG_LOAD( 'KPS1_BFLOG_MSG7', '    FWHM (minor)'/
-     :                     /'    : ^FWHM ^UNIT', BUF, LBUF, STATUS )
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG7', '    FWHM (minor)'/
+     :                        /'    : ^FWHM ^UNIT', BUF, LBUF, STATUS )
 
 *  We have errors on the widths.
-         ELSE
-            FWHME = SIGMA( MINOR, IB ) * S2FWHM
-            IF ( PIXEL ) THEN
-               CALL MSG_SETR( 'FWHME', SNGL( FWHME ) )
-
             ELSE
-               CALL MSG_SETC( 'FWHME', AST_FORMAT( FRM2, REPAX, FWHME,
-     :                                             STATUS ) )
+               FWHME = SIGMA( MINOR, IB ) * S2FWHM
+               IF ( PIXEL ) THEN
+                  CALL MSG_SETR( 'FWHME', SNGL( FWHME ) )
+
+               ELSE
+                  CALL MSG_SETC( 'FWHME', AST_FORMAT( FRM2, REPAX,
+     :                                                FWHME, STATUS ) )
+               END IF
+
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG7E', '    FWHM (minor)'/
+     :                        /'    : ^FWHM +/- ^FWHME ^UNIT',
+     :                        BUF, LBUF, STATUS )
             END IF
 
-            CALL MSG_LOAD( 'KPS1_BFLOG_MSG7E', '    FWHM (minor)'/
-     :                     /'    : ^FWHM +/- ^FWHME ^UNIT',
-     :                     BUF, LBUF, STATUS )
-         END IF
-
-         IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
-         CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
-
+            IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
+            CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
 
 *  Orientation
 *  ===========
-         IF  ( PIXEL .OR. .NOT. ISSKY ) THEN
-            CALL MSG_SETC( 'SENSE', '(measured anticlockwise from Y)' )
-         ELSE
+            IF  ( PIXEL .OR. .NOT. ISSKY ) THEN
+               CALL MSG_SETC( 'SENSE',
+     :                        '(measured anticlockwise from Y)' )
+            ELSE
 
 *  Reverse these if the axis order is swapped in the SkyFrame.
-            CALL MSG_SETC( 'SENSE',
-     :                     '(measured from North through East)' )
-
-         END IF
+               CALL MSG_SETC( 'SENSE',
+     :                        '(measured from North through East)' )
+            END IF
 
 *  The message may generate a line longer than 80 characters especially
 *  if there is an uncertainty too.   Now 80 is normlly where a line will
 *  wrap.  Tune to allow longer lines.
-         CALL MSG_TUNE( 'SZOUT', 100, STATUS )
+            CALL MSG_TUNE( 'SZOUT', 100, STATUS )
 
 *  Display the major-axis orientation, formatting to have left-justified
 *  to two decimal places, unless it's circular then omit reporting the
 *  meaningless orientation.
-         THETA = P( 5, IB ) * R2D
-         IF ( THETA .NE. 0.0D0 ) THEN
-            WRITE ( FORMAT, '(''F'',I1,''.2'')' )
-     :           MAX( 0, INT( LOG10( THETA + VAL__EPSD ) ) ) + 4
-            CALL MSG_FMTR( 'OR', FORMAT, REAL( THETA ) )
-            IF ( SIGMA( 5, IB ) .EQ. VAL__BADD ) THEN
-               CALL MSG_LOAD( 'KPS1_BFLOG_MSG8', '    Orientation    '/
-     :                        /' : ^OR degrees ^SENSE', BUF, LBUF,
-     :                        STATUS )
-            ELSE
-               CALL MSG_FMTR( 'ORE', 'G9.3', SNGL( SIGMA( 5, IB ) ) )
-               CALL MSG_LOAD( 'KPS1_BFLOG_MSG8E', '    Orientation    '/
-     :                        /' : ^OR +/- ^ORE degrees ^SENSE',
-     :                        BUF, LBUF, STATUS )
-            END IF
-            IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
-            CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
+            THETA = P( 5, IB ) * R2D
+            IF ( THETA .NE. 0.0D0 ) THEN
+               WRITE ( FORMAT, '(''F'',I1,''.2'')' )
+     :              MAX( 0, INT( LOG10( THETA + VAL__EPSD ) ) ) + 4
+               CALL MSG_FMTR( 'OR', FORMAT, REAL( THETA ) )
+               IF ( SIGMA( 5, IB ) .EQ. VAL__BADD ) THEN
+                  CALL MSG_LOAD( 'KPS1_BFLOG_MSG8', '    Orientation  '/
+     :                           /'   : ^OR degrees ^SENSE', BUF, LBUF,
+     :                           STATUS )
+               ELSE
+                  CALL MSG_FMTR( 'ORE', 'G9.3', SNGL( SIGMA( 5, IB ) ) )
+                  CALL MSG_LOAD( 'KPS1_BFLOG_MSG8E', '    Orientation '/
+     :                           /'    : ^OR +/- ^ORE degrees ^SENSE',
+     :                           BUF, LBUF, STATUS )
+               END IF
+               IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
+               CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
 
 *  Reset the width.  Is there no inquiry function to obtain previous
 *  width?
-            IF ( PIXEL .OR. .NOT. ISSKY )
-     :        CALL MSG_TUNE( 'SZOUT', 100, STATUS )
+               IF ( PIXEL .OR. .NOT. ISSKY )
+     :           CALL MSG_TUNE( 'SZOUT', 100, STATUS )
+            END IF
          END IF
 
 *  Amplitude

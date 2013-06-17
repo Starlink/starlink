@@ -94,7 +94,8 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009, 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2009, 2011, 2013 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -144,6 +145,8 @@
 *        Switched to generalised Gaussian fit adding its exponent.
 *     2011 May 11 (MJC):
 *        Removed no-longer-used argument MAP.
+*     2013 July 16 (MJC):
+*        Use circular constraint.
 *     {enter_further_changes_here}
 
 *-
@@ -158,6 +161,12 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'BF_PAR'           ! BEAMFIT constants
+
+*  Global Variables:
+      INCLUDE 'BF_COM'           ! Used for communicating with PDA
+                                 ! routine
+*        CIRC = LOGICAL (Read)
+*           Circular beam fixed by user?
 
 *  Arguments Given:
       INTEGER RFRM
@@ -290,8 +299,13 @@
 *  ======
 
 * Convert to degrees.  May need a +/- 90 later...
-      WORK( 1 ) = P( 5 ) * R2D
-      WORK( 2 ) = SIGMA( 5 ) * R2D
+      IF ( CIRC ) THEN
+         WORK( 1 ) = 0.0D0
+         WORK( 2 ) = 0.0D0
+      ELSE
+         WORK( 1 ) = P( 5 ) * R2D
+         WORK( 2 ) = SIGMA( 5 ) * R2D
+      END IF
       CALL PAR_PUT1D( 'ORIENT', 2, WORK, STATUS )
 
 *  AMP

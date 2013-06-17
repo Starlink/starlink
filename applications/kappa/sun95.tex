@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.40}
 \newcommand{\stardocnumber}    {95.40}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2013 July 10}
+\newcommand{\stardocdate}      {2013 July 16}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -15198,6 +15198,11 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          will be the first five.  {\tt [1]}
       }
       \sstsubsection{
+         CIRCULAR = \_LOGICAL (Read)
+      }{
+         If set {\tt TRUE} only circular beams will be fit.   {\tt [FALSE]}
+      }
+      \sstsubsection{
          COIN =  FILENAME (Read)
       }{
          Name of a text file containing the initial guesses at the
@@ -15224,14 +15229,6 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          {\tt [}Current graphics device{\tt{]}}
       }
       \sstsubsection{
-         FIXAMP = \_DOUBLE (Read)
-      }{
-         This specifies the fixed amplitude of the first beam.
-         Secondary sources arising from chopped data use FIXAMP
-         multiplied by the AMPRATIO.  A null value indicates that
-         the amplitude should be fitted.  {\tt [!]}
-      }
-      \sstsubsection{
          FITAREA() = \_INTEGER (Read)
       }{
          Size in pixels of the fitting area to be used.  This should
@@ -15240,6 +15237,14 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          dimensions so that a square region is fitted.  Each value must
          be at least 9.  A null value requests that the full data
          array is used.  {\tt [!]}
+      }
+      \sstsubsection{
+         FIXAMP = \_DOUBLE (Read)
+      }{
+         This specifies the fixed amplitude of the first beam.
+         Secondary sources arising from chopped data use FIXAMP
+         multiplied by the AMPRATIO.  A null value indicates that
+         the amplitude should be fitted.  {\tt [!]}
       }
       \sstsubsection{
          FIXBACK = \_DOUBLE (Read)
@@ -15251,25 +15256,10 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       \sstsubsection{
          FIXFWHM = LITERAL (Read)
       }{
-         If a non-null value is supplied then the model fit will use
-         that value as the full-width half-maximum value for the beam
-         and assumes that the beam is circular.  If two values are
-         supplied then these are the fixed major- and minor-axis
-         full-width half maxima.
-
-         If the current co-ordinate Frame of the NDF is a SKY Frame
-         (\emph{e.g.} right ascension and declination), then the value should
-         be supplied as an increment of celestial latitude (\emph{e.g.}
-         declination).  Thus, {\tt "5.7"} means 5.7 arcseconds, {\tt
-         "20:0"} would mean 20 arcminutes, and {\tt "1:0:0"} would
-         mean 1 degree.  If the current co-ordinate Frame is not a SKY
-         Frame, then the widths should be specified as an increment
-         along Axis 1 of the current co-ordinate Frame.  Thus, if the
-         Current Frame is PIXEL, the value should be given simply as a
-         number of pixels.
-
-         Null indicates that the FWHM values are free parameters of the
-         fit.  {\tt [!]}
+         If this is set {\tt TRUE} then the model fit will use the full-width
+         half-maximum values for the beams supplied through Parameter
+         FWHM.  {\tt FALSE} demands that the FWHM values are free parameters
+         of the fit.  {\tt [FALSE]}
       }
       \sstsubsection{
          FIXPOS = \_LOGICAL (Read)
@@ -15291,6 +15281,49 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          (although it is actually the centres being fit).
          It is advisable not to use this option in the inaccurate
          {\tt "Cursor"} mode.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         FWHM = LITERAL (Read)
+      }{
+         The initial full-width half-maximum (FWHM) values for each
+         beam.  These become fixed values if FIXFWHM is set {\tt TRUE}.
+
+         A number of options are available.
+         \ssthitemlist{
+
+            \sstitem
+            A single value gives the same circular FWHM for all beams.
+
+            \sstitem
+            When Parameter CIRCULAR is TRUE, supply a list of values one
+            for each of the number of beams.  These should be supplied in
+            the same order as the corresponding beam positions.
+
+            \sstitem
+            A pair of values sets the major- and minor-axis values for
+            all beams, provided Parameter CIRCULAR is FALSE.
+
+            \sstitem
+            Major- and minor-axis pairs, whose order should match that
+            of the corresponding beams.  Again CIRCULAR should be FALSE.
+         }
+
+         Multiple values are separated by commas.  An error is issued
+         should none of these options be offered.
+
+         If the current co-ordinate Frame of the NDF is a SKY Frame
+         (\emph{e.g.} right ascension and declination), then the value should
+         be supplied as an increment of celestial latitude (\emph{e.g.}
+         declination).  Thus, {\tt "5.7"} means 5.7 arcseconds, {\tt
+         "20:0"} would mean 20 arcminutes, and {\tt "1:0:0"} would
+         mean 1 degree.  If the current co-ordinate Frame is not a SKY
+         Frame, then the widths should be specified as an increment
+         along Axis 1 of the current co-ordinate Frame.  Thus, if the
+         Current Frame is PIXEL, the value should be given simply as a
+         number of pixels.
+
+         Null requests that BEAMFIT itself estimates the initial FWHM
+         values.  {\tt [!]}
       }
       \sstsubsection{
          GAUSS = \_LOGICAL (Read)
@@ -15651,18 +15684,19 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          is required.
       }
       \sstexamplesubsection{
-         beamfit ndf=mars\_3pos mode=interface beams=1 pos="5.0,-3.5" fixfwhm=16.5 gauss=f
+         beamfit ndf=mars\_3pos mode=interface beams=1 pos="5.0,-3.5" fixfwhm fwhm=16.5 gauss=f
       }{
          As above but now the Gaussian is constrained to have a FWHM of
          16.5 arcseconds and be circular, but the shape exponent is not
          constrained to be 2.
       }
       \sstexamplesubsection{
-         beamfit mars\_3pos in beams=1 fixfwhm=16.5 fitarea=51 pos="5.,-3.5"
+         beamfit mars\_3pos in beams=1 fwhm=16.5 fitarea=51 pos="5.,-3.5"
       }{
          As above but now the fitted data is restricted to areas
          51$\times$51 pixels about the initial guess positions.  All
-         the other examples use the full array.
+         the other examples use the full array.  Also the FWHM value is
+         now just an initial guess.
       }
       \sstexamplesubsection{
          beamfit mars\_3pos int 3 "5.0,-3.5" ampratio=-0.5 resid=mars\_res
@@ -15696,6 +15730,15 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       }{
          As the last-but-one example, but now location of the secondary
          beam is fixed at ($-$55.5,$-$2.9).
+      }
+      \sstexamplesubsection{
+         beamfit s450 int beams=2 fwhm="7.9,25" ampratio=0.06 circular
+                pos='"0:0:0,0:0:0"' nopolar pos2="0:0:0,0:0:0"
+      }{
+         This fits two superimposed circular Gaussians in the NDF called
+         s450, whose current WCS is SKY.  The beam second being fixed
+         at 6 percent the strength of the first, with initial
+         widths of 7.9 and 25 arcseconds.
       }
       \sstexamplesubsection{
          beamfit mode=cu beams=1
@@ -59135,6 +59178,21 @@ The following applications have been modified:
 The following applications have been modified:
 
 \begin{description}
+   \item [\htmlref{BEAMFIT}{BEAMFIT}]\mbox{}
+      \begin{itemize}
+        \item There is now more control of the initial or fixed sizes
+	and shapes of the beams.  Note that {\bf this has involved a
+	change of the type and function of Parameter FIXFWHM}.
+	FIXFWHM like other FIX- parameters is \_LOGICAL; it just
+	constrains whether the FWHM values should be fixed.  A new
+	parameter called FWHM allows you to set either initial values,
+	or when FIXFWHM is also set {\tt TRUE}, it sets fixed FWHM
+	values.  The interpretation of FWHM values depends on a new
+	CIRCULAR parameter, which constrains the fit to be circular
+	thus there is no minor axis and orientation derived.  In
+	combination it is possible to give a list of circular or
+	elliptical FWHMs.
+      \end{itemize}
    \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
       \begin{itemize}
         \item The MODE parameter can now be set to {\tt "Current"} to force the

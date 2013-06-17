@@ -7777,6 +7777,15 @@ package kappa {
             helpkey *
          }
 
+         parameter circular {
+            type _LOGICAL
+            prompt {Are the beams circular?}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+         }
+
          parameter coin {
             type FILENAME
             ppath CURRENT
@@ -7830,11 +7839,11 @@ package kappa {
          }
 
          parameter fixfwhm {
-            type LITERAL
+            type _LOGICAL
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            default !
-            prompt {Fixed FWHM}
+            prompt {Fix beam FWHM(s) at supplied size(s)?}
+            default FALSE
             helpkey *
          }
 
@@ -7853,6 +7862,15 @@ package kappa {
             ppath CURRENT DEFAULT
             prompt {Fix secondary beam seaparation(s) at supplied position(s)?}
             default FALSE
+            helpkey *
+         }
+
+         parameter fwhm {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Initial FWHM(s)}
             helpkey *
          }
 

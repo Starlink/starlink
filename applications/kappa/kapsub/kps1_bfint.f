@@ -105,6 +105,8 @@
 *        5 -- Are the relative amplitudes fixed?
 *        6 -- Are the separations to the secondary beam positions fixed?
 *        7 -- Is the shape parameter fixed?
+*        8 -- Is the beam fixed to be circular?
+*        9 -- Is the orientation of the Gaussian fixed?
 *        
 *        Options 3 and 6 will set to .FALSE. if either is .TRUE. on
 *        entry and if MAP2 does not have the inverse transformation.

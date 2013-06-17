@@ -35,11 +35,13 @@
 *        the array relate to the following constraints.
 *        1 -- Are the beam `source' amplitudes fixed?
 *        2 -- Is the background level fixed?
-*        3 -- Is the FWHM of the beam fixed?
+*        3 -- Are the FWHM values of the beam fixed?
 *        4 -- Are the beam positions fixed at the supplied co-ordinates?
 *        5 -- Are the relative amplitudes fixed?
 *        6 -- Are the separations to the secondary beam positions fixed?
 *        7 -- Is the shape exponent fixed?
+*        8 -- Is the beam fixed to be circular?
+*        9 -- Is the orientation of the Gaussian fixed?
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
 *        The ratios of the secondary beam 'sources' to the first beam.
 *        These ratios contrain the fitting provided FIXCON(5) is .TRUE.
@@ -149,6 +151,9 @@
 *     2010 October 26 (MJC):
 *        Create a special error message for IFAIL=4, setting status to
 *        the new error code.
+*     2013 July 15 (MJC):
+*        Fixed orientation now obtained through the COMMON block, set
+*        in BEAMFIT itself.
 *     {enter_further_changes_here}
 
 *-
@@ -163,6 +168,7 @@
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       INCLUDE 'BF_PAR'           ! BEAMFIT constants
       INCLUDE 'KAP_ERR'          ! KAPPA error constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Global Variables:
       INCLUDE 'BF_COM'           ! Used for communicating with PDA
@@ -182,8 +188,10 @@
 *           Amplitude of Gaussian fixed by user?
 *        BACKC = LOGICAL (Write)
 *           Background level fixed by user?
+*        CIRC = LOGICAL (Write)
+*           Circular beam fixed by user?
 *        FWHMC = LOGICAL (Write)
-*           FWHM of the Gaussian fixed by user?
+*           FWHM(s) of the Gaussian(s) fixed by user?
 *        IPWD = INTEGER (Read)
 *           Pointer to work space for data values
 *        ISTAT = INTEGER (Write)
@@ -240,7 +248,6 @@
       REAL AXRAT                 ! Initial beam axis ratio
       LOGICAL BAD                ! Array may contain bad values?
       INTEGER DIMS( BF__NDIM )   ! Dimensions
-      LOGICAL FIXORI             ! Fix the orientation?
       LOGICAL FLAG( MXCOEF )     ! Problem parameter during inversion?
       DOUBLE PRECISION FS        ! Sum of squared residuals
       INTEGER GO                 ! Offset to current Gaussian's coeffs
@@ -290,10 +297,6 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Need to generate another control flag for fixing the orientation.
-      FIXORI = ABS( P( 3 ) - P( 4 ) ) .LT. ( 10.D0 * VAL__EPSD )
-     :         .AND. FIXCON( 3 )
-
 *  Transfer arguments to initial COMMON-block values.
 *  ==================================================
 
@@ -301,11 +304,12 @@
       AMPC = FIXCON( 1 )
       BACKC = FIXCON( 2 )
       FWHMC = FIXCON( 3 )
-      ORIC = FIXORI
       POSC = FIXCON( 4 )
       RATIOC = FIXCON( 5 )
       SEPARC = FIXCON( 6 )
       SHAPEC = FIXCON( 7 )
+      CIRC = FIXCON( 8 )
+      ORIC = FIXCON( 9 )
 
 *  Arrays
       DO I = 1, BF__NDIM
@@ -430,13 +434,20 @@
 
 *  Just a guess for a circular beam.  PC( 3 ) to PC( 5 ) should
 *  already be filled from BEAMFIT itself, if a fixed value is
-*  wanted.
+*  wanted or initial values were supplied from the environment.
          IF ( .NOT. FWHMC ) THEN
-            N = N + 2
-            XC( N - 1 ) = DBLE( SIGMIN / AXRAT )
-            XC( N ) = DBLE( SIGMIN )
-            PC( 3, IG ) = XC( N - 1 )
-            PC( 4, IG ) = XC( N )
+            IF ( CIRC ) THEN
+               N = N + 1
+               XC( N ) = DBLE( SIGMIN / SQRT( AXRAT ) )
+               PC( 3, IG ) = XC( N )
+               PC( 4, IG ) = PC( 3, IG )
+            ELSE
+               N = N + 2
+               XC( N - 1 ) = DBLE( SIGMIN / AXRAT )
+               XC( N ) = DBLE( SIGMIN )
+               PC( 3, IG ) = XC( N - 1 )
+               PC( 4, IG ) = XC( N )
+            END IF
          END IF
 
 *  Orientation needs fitting when specified as free parameter, or
@@ -603,9 +614,15 @@
          END IF
 
          IF ( .NOT. FWHMC ) THEN
-            N = N + 2
-            SIGMA( 3 + GO ) = SD( N - 1 )
-            SIGMA( 4 + GO ) = SD( N )
+            IF ( CIRC ) THEN
+               N = N + 1
+               SIGMA( 3 + GO ) = SD( N )
+               SIGMA( 4 + GO ) = SIGMA( 3 + GO )
+            ELSE
+               N = N + 2
+               SIGMA( 3 + GO ) = SD( N - 1 )
+               SIGMA( 4 + GO ) = SD( N )
+            END IF
          END IF
 
          IF ( .NOT. ORIC ) THEN
