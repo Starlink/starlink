@@ -30,7 +30,7 @@
 
    o  NDFECHO
 
-      - A new parameter called EXISTS has been added that allows the
+      -  A new parameter called EXISTS has been added that allows the
       list of displayed NDF paths to be filtered by removing the paths
       for NDFs that do not exist.
 
