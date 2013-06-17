@@ -24,7 +24,7 @@
 
 *  Arguments:
 *     PIXPOS( BF__MXPOS, BF__NDIM ) = DOUBLE PRECISION (Given)
-*        The initial guess positions for the beams measurred in pixel
+*        The initial guess positions for the beams measured in pixel
 *        co-ordinates.
 *     FLBND( BF__NDIM ) = INTEGER (Given)
 *        The lower pixel bounds of the data to be fitted.

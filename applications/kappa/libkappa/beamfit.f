@@ -98,7 +98,7 @@
 *     CENTRE( 2 ) = LITERAL (Write)
 *        The formatted co-ordinates and their errors of the primary
 *        beam in the current co-ordinate Frame of the NDF.
-*     CIRCULAR = LOGICAL (Read)
+*     CIRCULAR = _LOGICAL (Read)
 *        If set TRUE only circular beams will be fit.   [FALSE]
 *     COIN = FILENAME (Read)
 *        Name of a text file containing the initial guesses at the
@@ -108,7 +108,7 @@
 *        current Frame of the NDF.  Axis values can be separated by
 *        spaces, tabs or commas.  The file may contain comment lines
 *        with the first character # or !.
-*     DESCRIBE = LOGICAL (Read)
+*     DESCRIBE = _LOGICAL (Read)
 *        If TRUE, a detailed description of the co-ordinate Frame in
 *        which the beam positions will be reported is displayed before
 *        the positions themselves.  [current value]
