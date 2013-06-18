@@ -10881,15 +10881,15 @@ static AstObject *FsetFromStore( AstFitsChan *this, FitsStore *store,
    Frame is the Current Frame. */
       astSetBase( ret, pixel );
       astSetCurrent( ret, physical );
-   }
 
 /* Remove any unneeded Frames that hold a FITS representation of offset
    coordinates. */
-   TidyOffsets( ret, status );
+      TidyOffsets( ret, status );
 
 /* If an error has occurred, free the returned FrameSet and return a null
    pointer. */
-   if( !astOK ) ret = astAnnul( ret );
+      if( !astOK ) ret = astAnnul( ret );
+   }
 
 /* Return the answer. */
    return (AstObject *) ret;
