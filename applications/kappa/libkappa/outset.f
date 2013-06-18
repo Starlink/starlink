@@ -61,6 +61,26 @@
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF. [!]
+*     USEAXIS = GROUP (Read)
+*        USEAXIS is only accessed if the current co-ordinate Frame of
+*        the NDF has more than two axes. A group of strings should be
+*        supplied specifying the axes which are to be used when
+*        specifying the circle parameters CENTRE and DIAM.  Each axis
+*        can be specified using one of the following options.
+*
+*        - Its integer index within the current Frame of the input
+*        NDF (in the range 1 to the number of axes in the current
+*        Frame).
+*        - Its symbol string such as "RA" or "VRAD".
+*        - A generic option where "SPEC" requests the spectral axis,
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the
+*        sky longitude and latitude axes respectively.  Only those axis
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is
+*        supplied.  If a null (!) value is supplied, the axes with the
+*        same indices as the two used pixel axes within the NDF are
+*        used. [!]
 
 *  Examples:
 *     outset neb1 nebm "13.5,201.3" 20 const=0
@@ -208,6 +228,7 @@
       CALL NDF_TYPE( INDF1, COMP, TYPE, STATUS )
 
 *  Get the WCS FrameSet and the bounds of the significant axes.
+*  Obtains Parameter: USEAXIS.
       CALL KPG1_ASGET( INDF1, 2, .FALSE., .TRUE., .TRUE., SDIM,
      :                 SLBND, SUBND, IWCS, STATUS )
 

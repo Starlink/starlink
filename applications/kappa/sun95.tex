@@ -38922,6 +38922,38 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
       }{
          \htmlref{Title}{apndf:title} for the output NDF structure.  A null value ({\tt{!}})
          propagates the title from the input NDF to the output NDF.  {\tt [!]} }
+     \sstsubsection{
+         USEAXIS = \htmlref{GROUP}{se:groups} (Read)
+     }{
+         USEAXIS is only accessed if the current co-ordinate Frame of
+         the NDF has more than two axes. A group of strings should be
+         supplied specifying the axes which are to be used when
+         specifying the circle parameters CENTRE and DIAM.  Each axis
+         can be specified using one of the following options.
+
+         \ssthitemlist{
+           \sstitem
+           Its integer index within the current Frame of the input
+           NDF (in the range 1 to the number of axes in the current
+           Frame).
+
+           \sstitem
+           Its \htmlattref{Symbol}{Symbol(axis)}~ string such as
+           {\tt "RA"} or {\tt "VRAD"}.
+
+           \sstitem
+           A generic option where {\tt "SPEC"} requests the spectral axis,
+           {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and
+           {\tt "SKYLAT"} picks the sky longitude and latitude axes
+           respectively.  Only those axis domains present are
+           available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value is
+         supplied.  If a null ({\tt !}) value is supplied, the axes with the
+         same indices as the two used pixel axes within the NDF are
+         used. {\tt [!]}
+     }
    }
    \sstexamples{
       \sstexamplesubsection{
