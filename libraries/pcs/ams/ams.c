@@ -4071,6 +4071,8 @@ int *status             /* global status (given and returned) */
 *        Pass message components as separate arguments
 *     12-APR-1994 (BDK):
 *        Make function static
+*     2013-06-18 (TIMJ):
+*        Trap buffer overflow for large message_length
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -4086,6 +4088,14 @@ int *status             /* global status (given and returned) */
                                     communications */
 
    if ( *status != SAI__OK ) return;
+
+   /* Sanity check for buffer overflow */
+   if (message_length > MSG_VAL_LEN) {
+     /* will not be able to put this message in mess_out so we have to
+        generate an error (truncating it would not be helpful) */
+     *status = MESSYS__BUFOV;
+     return;
+   }
 
    /* initialise the struct before filling it */
    memset( &mess_out, 0, sizeof(mess_out) );
