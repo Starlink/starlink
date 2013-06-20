@@ -42,6 +42,8 @@
  *        Initial version
  *     2013-05-21 (MS)
  *        Skip scans that are too short
+ *     2013-06-20 (MS)
+ *        Fixed bug that prevented scans any smaller than the previous one from being kept
  *
  *  Copyright:
  *     Copyright (C) 2013 University of Lethbridge. All Rights Reserved.
@@ -271,7 +273,7 @@ void smurf_fts2_split(int* status)
                 nFramesOutPrev = nFramesOut;
                 nFramesOut = nStop - nStart + 1;
                 outDataCount++;
-                /*printf("%s: Split: %d of %d frames found at nStart=%d, nStop=%d\n",
+              /*printf("%s: Split: %d of %d frames found at nStart=%d, nStop=%d\n",
                        TASK_NAME, outDataCount, nFramesOut, nStart, nStop);*/
                 break;
             }
@@ -295,7 +297,7 @@ void smurf_fts2_split(int* status)
            and if it's not too short (compared to the previous one) */
         if(nStart >=0 && nStop > 0 &&
             (nFramesOutPrev == 0 ||
-              (nFramesOutPrev > 0 && nFramesOut > 0 && nFramesOut/nFramesOutPrev >= 0.5))) {
+              (nFramesOutPrev > 0 && nFramesOut > 0 && (double)nFramesOut/(double)nFramesOutPrev >= 0.5))) {
             /* Copy single scan NDF data from input to output */
             outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
             outData->dtype   = SMF__DOUBLE;
@@ -351,6 +353,7 @@ void smurf_fts2_split(int* status)
             /* Append unique suffix to fileName */
             /* This must be modified by the concatenation file scan number to improve uniqueness */
             n = one_snprintf(outData->file->name, SMF_PATH_MAX, "%s%04d_scn.sdf", status, fileName, conNum+outDataCount);
+            /*printf("%s: Writing outData->file->name: %s\n", TASK_NAME, outData->file->name);*/
             if(n < 0 || n >= SMF_PATH_MAX) {
                 errRepf(TASK_NAME, "Error creating outData->file->name", status);
                 goto CLEANUP;
@@ -375,7 +378,11 @@ void smurf_fts2_split(int* status)
                 errRepf(TASK_NAME, "Error closing outData file", status);
                 goto CLEANUP;
             }
-        }
+        }/* else {
+            if(!(nStart >=0 && nStop)) printf("%s: Output scan condition failed: nStart(%d) >= nStop(%d) is FALSE\n",TASK_NAME, nStart, nStop);
+            if(!(nFramesOutPrev == 0 ||
+              (nFramesOutPrev > 0 && nFramesOut > 0 && (double)nFramesOut/(double)nFramesOutPrev >= 0.5))) printf("%s: Output scan condition failed: nFramesOutPrev(%d) == 0 || (nFramesOutPrev(%d) > 0 && nFramesOut(%d) > 0 && nFramesOut/nFramesOutPrev (%f) >= 0.5) is FALSE\n", TASK_NAME, nFramesOutPrev, nFramesOutPrev, nFramesOut, (double)nFramesOut/(double)nFramesOutPrev);
+        }*/
 
         /* Prepare for next iteration */
         nStartNext = nStop + 1;
