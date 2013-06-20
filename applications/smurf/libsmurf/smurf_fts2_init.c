@@ -52,6 +52,8 @@
  *        Ensure that interpolation onto evenly spaced OPD grid stays within bounds
  *     2013-06-05 (MS)
  *        Adjust debug output
+ *     2013-05-19 (MS)
+ *        Set the step time to a nominal value to produce uniformly sized zero-padded spectra
  *
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -178,6 +180,7 @@ void smurf_fts2_init(int* status)
          midZPD             = 0.0;      /* Mirror position half side measures */
   int midZPDPos             = 0;        /* Middle ZPD position in mirror position array */
 
+#define STEPTIME              0.0055    /* Nominal step time to produce uniformly sized zero-padded spectra */
 
   /* Get Input, Output and ZPD groups */
   kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
@@ -316,6 +319,9 @@ void smurf_fts2_init(int* status)
     smf_fits_getD(inData->hdr, "SCANVEL", &scanVel, status);
     smf_fits_getD(inData->hdr, "STEPTIME", &stepTime, status);
 
+    /* Set the step time to a nominal value to produce uniformly sized zero-padded spectra */
+    stepTime = STEPTIME;
+
     /* Nyquist frequency */
     fNyquist = 10.0 / (8.0 * scanVel * stepTime);
     dz = 1.0 / (2.0 * fNyquist);
@@ -349,6 +355,7 @@ void smurf_fts2_init(int* status)
     /*printf("smurf_fts2_init: OPD_EVEN[%d]=%E\n", nOPD/2-1, OPD_EVEN[nOPD/2-1]);*/
 
     /* Update FITS component */
+    smf_fits_updateD(inData->hdr, "STEPTIME", stepTime, "Nominal RTS step time", status);
     smf_fits_updateD(inData->hdr, "FNYQUIST", fNyquist, "Nyquist frequency (cm^-1)", status);
     smf_fits_updateI(inData->hdr, "MIRSTART", nStart, "Frame index in which the mirror starts moving", status);
     smf_fits_updateI(inData->hdr, "MIRSTOP", nStop, "Frame index in which the mirror stops moving", status);
