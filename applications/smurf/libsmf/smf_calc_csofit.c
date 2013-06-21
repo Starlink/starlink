@@ -51,6 +51,8 @@
 *        Initial version
 *     2013-05-12 (TIMJ):
 *        Use new loop-friendly cso2filt functions.
+*     2013-06-16 (TIMJ):
+*        Use BADFIT error code if we do not have any fit information for this observation.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -79,6 +81,7 @@
 */
 
 #include "smf.h"
+#include "smf_err.h"
 #include "csofit/csofit2.h"
 
 #include "sae_par.h"
@@ -155,7 +158,7 @@ void smf_calc_csofit( const smfData * data, AstKeyMap* extpars, double **tau,
     if (!subset || subset->npolys == 0) {
       /* we did not have any fits for this period */
       if (*status == SAI__OK) {
-        *status = SAI__ERROR;
+        *status = SMF__BADFIT;
         errRep("", "No CSO fit data available for this observation", status );
       }
     } else {
