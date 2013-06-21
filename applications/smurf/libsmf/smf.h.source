@@ -1397,6 +1397,8 @@ inst_t smf_inst_get( const smfHead * hdr, int * status );
 
 void smf_instap_get( smfHead * hdr, int * status );
 
+int smf_is_wvm_usable( const smfHead * hdr, int * status );
+
 int smf_isdark( const smfData *data, int * status );
 
 int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,

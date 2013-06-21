@@ -263,6 +263,7 @@ smf_import_array.c \
 smf_initial_sky.c \
 smf_inst_get.c \
 smf_instap_get.c \
+smf_is_wvm_usable.c \
 smf_isdark.c \
 smf_isfft.c \
 smf_iteratemap.c \
