@@ -398,6 +398,9 @@
 *     2012-12-04 (DSB):
 *        Re-initialise the "lastmap" array (that holds the map created by
 *        the previous iteration) to zero at the start of each chunk.
+*     2013-6-21 (DSB):
+*        Ensure bad values in pre-cleaned data are flaged in the quality
+*        array.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1579,6 +1582,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_clean_smfArray( wf, res[0], &noisemaps, NULL, NULL, keymap,
                             status );
       } else {
+
+        /* Ensure all bad values in the pre-cleaned data have a bad
+           quality. */
+        for( idx=0; idx<res[0]->ndat; idx++ ) {
+           smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.25, status );
+        }
+
         msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
                 "so not pre-conditioning data before map-making",
                 status );
