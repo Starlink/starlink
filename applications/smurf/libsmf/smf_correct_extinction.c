@@ -24,7 +24,7 @@
 *        smfData struct
 *     tausrc = smf_tausrc (Given)
 *        Source of opacity value. Options are:
-*          SMF__TAUSRC_AUTO: Use WVM if available and reliable, else use CSO fit, else use CSO tau.
+*          SMF__TAUSRC_AUTO: Use WVM if available and reliable, else use CSO fit.
 *          SMF__TAUSRC_CSOTAU: Use the supplied "tau" argument as if it is CSO tau.
 *          SMF__TAUSRC_CSOFIT: Use an external fit to the CSO data.
 *          SMF__TAUSRC_WVMRAW: Use the WVM time series data.
@@ -191,6 +191,8 @@
 *        number of cases where per-bolo EXT values are created, since
 *        dumping the EXT model in such cases produces huge files (a
 *        problem when running skyloop).
+*     2013-06-21 (TIMJ):
+*        Change AUTO mode so that it looks at WVM then CSO fit and then gives up.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -237,6 +239,7 @@
 #include "smf.h"
 #include "smurf_par.h"
 #include "smurf_typ.h"
+#include "smf_err.h"
 
 /* internal prototype */
 static int is_large_delta_atau ( double airmass1, double elevation1, double tau, int *status);
@@ -388,39 +391,37 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, s
     }
   }
 
-  if (tausrc == SMF__TAUSRC_WVMRAW) {
+  /* if we are WVMRAW, CSOFIT or AUTO and we have a cache we should always use it since
+     we assume it was filled in properly the previous time. */
+  if (wvmtaucache && *wvmtaucache &&
+      (tausrc == SMF__TAUSRC_WVMRAW ||
+       tausrc == SMF__TAUSRC_AUTO ||
+       tausrc == SMF__TAUSRC_CSOFIT)) {
+    wvmtau = *wvmtaucache;
+    smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+    msgOutiff( MSG__VERB, "", "Using cached high resolution data for extinction correction of ^FILE",
+               status);
+    tausrc = SMF__TAUSRC_WVMRAW; /* We are now WVMRAW as we have the data */
+  }
+
+  if (!wvmtau && tausrc == SMF__TAUSRC_WVMRAW) {
     size_t ntotaltau = 0;
     size_t ngoodtau = 0;
-    /* calculate WVM unless we have external values */
-    if (wvmtaucache && *wvmtaucache) {
-      wvmtau = *wvmtaucache;
-      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
-      msgOutiff( MSG__VERB, "", "Using cached WVM data for extinction correction of ^FILE",
-                 status);
-    } else {
-      smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
-                            &ngoodtau, status );
-      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
-      msgOutiff( MSG__VERB, "", "Using WVM mode for extinction correction of ^FILE"
-                 " %.0f %% of WVM data are present", status,
-                 (double)(100.0*(double)ngoodtau/(double)ntotaltau) );
-    }
+    smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
+                          &ngoodtau, status );
+    smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+    msgOutiff( MSG__VERB, "", "Using WVM mode for extinction correction of ^FILE"
+               " %.0f %% of WVM data are present", status,
+               (double)(100.0*(double)ngoodtau/(double)ntotaltau) );
   }
 
   if (*status == SAI__OK && tausrc == SMF__TAUSRC_CSOFIT) {
     /* Calculate the fit but we can use the same cache that WVM uses */
-    if (wvmtaucache && *wvmtaucache) {
-      wvmtau = *wvmtaucache;
-      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
-      msgOutiff( MSG__VERB, "", "Using cached CSO fit data for extinction correction of ^FILE",
-                 status);
-    } else {
-      size_t nframes = 0;
-      smf_calc_csofit( data, extpars, &wvmtau, &nframes, status );
-      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
-      msgOutiff( MSG__QUIET, "", "Using CSO fits for extinction correction of ^FILE",
-                 status );
-    }
+    size_t nframes = 0;
+    smf_calc_csofit( data, extpars, &wvmtau, &nframes, status );
+    smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+    msgOutiff( MSG__QUIET, "", "Using CSO fits for extinction correction of ^FILE",
+               status );
     /* Rebrand as WVM data from this point on */
     tausrc = SMF__TAUSRC_WVMRAW;
   }
@@ -454,18 +455,15 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, s
       /* have to use CSO mode */
       tausrc = SMF__TAUSRC_CSOTAU;
     } else if (ndims == 3) {
-      /* Calculate the WVM tau data and see if we have enough good data */
-      size_t ngoodtau = 0;
-      size_t ntotaltau = 0;
-      double percentgood = 0.0;
+      /* We have already done the cache test so not needed here */
 
-      if (wvmtaucache && *wvmtaucache) {
-        wvmtau = *wvmtaucache;
-        tausrc = SMF__TAUSRC_WVMRAW;
-        smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
-        msgOutiff( MSG__VERB, "", "Using cached WVM data for extinction correction of ^FILE",
-                   status );
-      } else {
+      /* Is the WVM nominally stable for this night? */
+      if (smf_is_wvm_usable( data->hdr, status ) ) {
+
+        /* Calculate the WVM tau data and see if we have enough good data */
+        size_t ngoodtau = 0;
+        size_t ntotaltau = 0;
+        double percentgood = 0.0;
         smf_calc_smoothedwvm( wf, NULL, data, extpars, &wvmtau, &ntotaltau,
                               &ngoodtau, status );
         percentgood = 100.0 * ((double)ngoodtau / (double)ntotaltau);
@@ -475,19 +473,37 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, s
           msgOutiff( MSG__VERB, "", "Selecting WVM mode for extinction correction of ^FILE."
                      " %.0f %% of WVM data are present", status, percentgood );
         } else {
-          tausrc = SMF__TAUSRC_CSOTAU;
+          tausrc = SMF__TAUSRC_AUTO; /* keep it AUTO (a no-op but make it clear) */
           if (wvmtau) wvmtau = astFree( wvmtau );
         }
       }
-    }
-    if (tausrc == SMF__TAUSRC_CSOTAU) {
-      msgOutiff( MSG__VERB, "", "Selecting CSO mode for extinction correction of ^FILE", status );
-    } else if (tausrc == SMF__TAUSRC_WVMRAW) {
-      /* Dealt with this above */
-    } else {
-      /* oops. Fall back position */
-      tausrc = SMF__TAUSRC_CSOTAU;
-      msgOutiff( MSG__VERB, "", "Selecting CSO mode as unexpected fallback for extinction correction of ^FILE", status );
+
+      /* at this point we either have WVM data handled or we still think we are AUTO.
+         Do a CSO FIT check */
+      if (tausrc == SMF__TAUSRC_AUTO && *status == SAI__OK) {
+        size_t nframes = 0;
+        smf_calc_csofit( data, extpars, &wvmtau, &nframes, status );
+        if (*status == SAI__OK) {
+          smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+          msgOutiff( MSG__QUIET, "", "Using CSO fits for extinction correction of ^FILE",
+                     status );
+          /* Rebrand as WVM data from this point on */
+          tausrc = SMF__TAUSRC_WVMRAW;
+        } else if (*status == SMF__BADFIT) {
+          /* No fit, carry on. */
+          errAnnul( status );
+        }
+      }
+
+      /* At this point if we are not WVMRAW then we have a serious issue. It means that
+         WVM was unusable and we did not have a good CSO fit. We should not continue at this
+         point as to continue implies that we know what we should do. The user should decide
+         how much they trust the opacity for the night. There has to be a reason why there
+         is no CSO fit for the night. */
+      if (*status == SAI__OK && tausrc != SMF__TAUSRC_WVMRAW) {
+        *status = SAI__ERROR;
+        errRep("", "Unable to determine opacity data for this observation. Both WVM and CSO fits failed. Please investigate and if necessary use CSO mode explicitly but proceed with caution.", status );
+      }
     }
   }
 
