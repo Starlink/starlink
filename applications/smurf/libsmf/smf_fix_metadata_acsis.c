@@ -169,6 +169,7 @@ typedef struct {
 /* Private routines */
 
 static const ObsIdLUT * smf__find_obsidlut( const struct FitsHeaderStruct * fitsvals, int * status );
+static int smf__fix_wrap( double *start, size_t stride, size_t nel, int have_fixed, int *status );
 
 #define FUNC_NAME "smf_fix_metadata_acsis"
 
@@ -953,6 +954,20 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
 
   }
 
+
+  /* Observations that pass through zero azimuth sometimes have
+     a few spurious TCS_AZ_AC1 values in the middle of the rwap-around
+     from zero to 2.PI. */
+  if( fitsvals.utdate == 20070116 && fitsvals.obsnum == 28 ) {
+     have_fixed = smf__fix_wrap( &(tmpState[0].tcs_az_ac1), sizeof(*tmpState),
+                                 hdr->nframes, have_fixed, status );
+     have_fixed = smf__fix_wrap( &(tmpState[0].tcs_az_bc1), sizeof(*tmpState),
+                                 hdr->nframes, have_fixed, status );
+     have_fixed = smf__fix_wrap( &(tmpState[0].tcs_az_dc1), sizeof(*tmpState),
+                                 hdr->nframes, have_fixed, status );
+  }
+
+
   return have_fixed;
 }
 
@@ -1228,3 +1243,77 @@ static const ObsIdLUT * smf__find_obsidlut( const struct FitsHeaderStruct * fits
   }
   return NULL; /* no match */
 }
+
+
+/* See if the supplied longitude values pass through zero and back to
+   2*PI. If so, it sets bad any values that fall in the middle of the
+   wrap-around. */
+
+static int smf__fix_wrap( double *start, size_t stride, size_t nel,
+                          int have_fixed, int *status ){
+
+  size_t hi;                 /* Index of last value to remove */
+  size_t hi0;                /* Index of first high azimuth value */
+  size_t hi1;                /* Index of last high azimuth value */
+  size_t i;                  /* Time slice index */
+  size_t lo;                 /* Index of first value to remove */
+  size_t lo0;                /* Index of first low azimuth value */
+  size_t lo1;                /* Index of last low azimuth value */
+  double *p;                 /* Pointer to next angle value */
+
+  if( *status != SAI__OK ) return have_fixed;
+
+  /* Convert the stride from bytes to doubles. */
+  stride /= sizeof(double);
+
+  /* Find the indicies of the first and last longitude values that are
+     close to zero (i.e. below 0.01 radians). Also find the indicies of
+     the first and last longitude values that are close to 2.PI (i.e.
+     above 6.27 radians). */
+  p = start;
+  lo0 = lo1 = hi0 = hi1 = SMF__BADSZT;
+  for( i = 0; i < nel; i++ ) {
+    if( *p != VAL__BADD ) {
+      if( *p < 0.01 ) {
+        if( lo0 == SMF__BADSZT ) lo0 = i;
+        lo1 = i;
+      }
+      if( *p > 6.27 ) {
+         if( hi0 == SMF__BADSZT ) hi0 = i;
+         hi1 = i;
+      }
+    }
+    p += stride;
+  }
+
+  /* Check vaalues both below 0.01 and above 6.27 were found. */
+  if( lo1 != SMF__BADSZT && hi1 != SMF__BADSZT ) {
+
+    /* Get the lowest and highest indicies to set bad. This depends on
+      whether the longitude values are generally decreasing or generally
+      increasing. */
+    if( hi1 > lo1 ) {
+       lo = lo1;
+       hi = hi0;
+    } else {
+       lo= hi1;
+       hi = lo0;
+    }
+
+    /* Back off by one sample to avoid removing good samples */
+    lo++;
+    hi--;
+
+    /* Set the required range of longitude values to VAL__BADD. */
+    p = start + lo*stride;
+    for( i = lo; i <= hi; i++ ) {
+      *p = VAL__BADD;
+      p += stride;
+    }
+
+    have_fixed |= SMF__FIXED_JCMTSTATE;
+  }
+
+  return have_fixed;
+}
+

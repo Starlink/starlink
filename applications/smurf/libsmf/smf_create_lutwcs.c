@@ -123,6 +123,9 @@
 *     2009-124-14 (DSB):
 *        Allow "state" to be NULL in order to request a focal plane
 *        FrameSet.
+*     2013-6-27 (DSB):
+*        Return FrameSet that give sbad output values if any of the required state
+*        information is bad.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -402,63 +405,77 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
     /* Otherwise, create a Mapping that rotates focal plane coords so that
        the Y axis is parallel to the projection of the elevation axis. */
     } else {
-      rmat[ 0 ] =  cos( state->tcs_az_ang );
-      rmat[ 1 ] =  sin( state->tcs_az_ang );
-      rmat[ 2 ] = -rmat[ 1 ];
-      rmat[ 3 ] = rmat[ 0 ];
-      rmap = astMatrixMap( 2, 2, 0, rmat, " " );
 
+      /* If any of the required state information is bad, use a Mapping
+         that generates bad values. */
+      if( state->tcs_az_ac1 == VAL__BADD ||
+          state->tcs_az_ac2 == VAL__BADD ||
+          state->tcs_az_ang == VAL__BADD ||
+          state->tcs_tai == VAL__BADD ) {
+         inperm[ 0 ] = 0;
+         inperm[ 1 ] = 0;
+         outperm[ 0 ] = 0;
+         outperm[ 1 ] = 0;
+         mapping = (AstMapping *) astPermMap( 2, inperm, 2, outperm,
+                                             NULL, " " );
 
-      /* Create a Mapping from tanplane AzEl coords (in rads) to spherical
-         AzEl coords (in rads). */
-
-      azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
-  				 cache->azel, status );
-
-
-      /* Get the SMU positional values. Any "bad" value gets set to 0 before
-       using it to calculate the jigglemap. If the values are good, convert
-      them to radians from arcsec */
-
-      if( state->smu_az_jig_x == VAL__BADD ) temp_jig_x = 0;
-      else temp_jig_x = state->smu_az_jig_x/DR2AS;
-
-      if( state->smu_az_jig_y == VAL__BADD ) temp_jig_y = 0;
-      else temp_jig_y = state->smu_az_jig_y/DR2AS;
-
-      if( state->smu_az_chop_x == VAL__BADD ) temp_chop_x = 0;
-      else temp_chop_x = state->smu_az_chop_x/DR2AS;
-
-      if( state->smu_az_chop_y == VAL__BADD ) temp_chop_y = 0;
-      else temp_chop_y = state->smu_az_chop_y/DR2AS;
-
-
-      /* Calculate final mapping with SMU position correction only if needed */
-      if( (!temp_jig_x) && (!temp_jig_y) && (!temp_chop_x) && (!temp_chop_y) ) {
-
-        /* Combine these with the cached Mapping (from GRID coords for subarray
-           to Tanplane Nasmyth coords in rads), to get total Mapping from GRID
-           coords to spherical AzEl in rads. */
-
-        mapping = (AstMapping *) astCmpMap( cache->map,
-                                            astCmpMap( rmap, azelmap, 1, " " ),
-                                            1, " " );
-
+      /* Otherwise reate the mapping from focal plane to sky */
       } else {
-        /* Create a ShiftMap which moves the origin of projection plane (X,Y)
-           coords to take account of the small offsets of SMU jiggle pattern.
-           Add this shifted map to the static cached mapping x*/
+         rmat[ 0 ] =  cos( state->tcs_az_ang );
+         rmat[ 1 ] =  sin( state->tcs_az_ang );
+         rmat[ 2 ] = -rmat[ 1 ];
+         rmat[ 3 ] = rmat[ 0 ];
+         rmap = astMatrixMap( 2, 2, 0, rmat, " " );
 
-        shifts[ 0 ] = temp_jig_x + temp_chop_x;
-        shifts[ 1 ] = temp_jig_y + temp_chop_y;
-        jigglemap = astShiftMap( 2, shifts, " " );
+         /* Create a Mapping from tanplane AzEl coords (in rads) to spherical
+            AzEl coords (in rads). */
+         azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
+     	                              cache->azel, status );
 
-        mapping = (AstMapping *) astCmpMap( cache->map,
-                                            astCmpMap( rmap,
-                                                       astCmpMap( jigglemap, azelmap,
-                                                                  1, " " ),
-                                                       1, " " ),
-                                            1, " " );
+         /* Get the SMU positional values. Any "bad" value gets set to 0 before
+          using it to calculate the jigglemap. If the values are good, convert
+         them to radians from arcsec */
+
+         if( state->smu_az_jig_x == VAL__BADD ) temp_jig_x = 0;
+         else temp_jig_x = state->smu_az_jig_x/DR2AS;
+
+         if( state->smu_az_jig_y == VAL__BADD ) temp_jig_y = 0;
+         else temp_jig_y = state->smu_az_jig_y/DR2AS;
+
+         if( state->smu_az_chop_x == VAL__BADD ) temp_chop_x = 0;
+         else temp_chop_x = state->smu_az_chop_x/DR2AS;
+
+         if( state->smu_az_chop_y == VAL__BADD ) temp_chop_y = 0;
+         else temp_chop_y = state->smu_az_chop_y/DR2AS;
+
+
+         /* Calculate final mapping with SMU position correction only if needed */
+         if( (!temp_jig_x) && (!temp_jig_y) && (!temp_chop_x) && (!temp_chop_y) ) {
+
+           /* Combine these with the cached Mapping (from GRID coords for subarray
+              to Tanplane Nasmyth coords in rads), to get total Mapping from GRID
+              coords to spherical AzEl in rads. */
+
+           mapping = (AstMapping *) astCmpMap( cache->map,
+                                               astCmpMap( rmap, azelmap, 1, " " ),
+                                               1, " " );
+
+         } else {
+           /* Create a ShiftMap which moves the origin of projection plane (X,Y)
+              coords to take account of the small offsets of SMU jiggle pattern.
+              Add this shifted map to the static cached mapping x*/
+
+           shifts[ 0 ] = temp_jig_x + temp_chop_x;
+           shifts[ 1 ] = temp_jig_y + temp_chop_y;
+           jigglemap = astShiftMap( 2, shifts, " " );
+
+           mapping = (AstMapping *) astCmpMap( cache->map,
+                                               astCmpMap( rmap,
+                                                          astCmpMap( jigglemap, azelmap,
+                                                                     1, " " ),
+                                                          1, " " ),
+                                               1, " " );
+         }
       }
 
       /* If not already created, create a SkyFrame describing (Az,El). Hard-wire
