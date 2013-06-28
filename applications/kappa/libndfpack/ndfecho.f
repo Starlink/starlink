@@ -43,6 +43,9 @@
 *     ABSPATH = _LOGICAL (Read)
 *        If TRUE, any relative NDF paths are converted to absolute,
 *        using the current working directory. [FALSE]
+*     EXISTS = _LOGICAL (Read)
+*        If TRUE, then only display paths for NDFs specified by parameter
+*        MOD that actually exist and are accessible. [FALSE]
 *     FIRST = _INTEGER (Read)
 *        The index of the first NDF to be tested. A null (!) value
 *        causes the first NDF to be used (Index 1). [!]
@@ -67,7 +70,10 @@
 *        supplied for Parameter MOD should not include an asterisk,
 *        since there are no names to be modified. Instead, the MOD value
 *        should specify an explicit group of NDF names that do not need
-*        to exist. [!]
+*        to exist.
+*
+*        The list can be filtered to remove any NDFs that do not exist
+*        (see parameter EXISTS). [!]
 *     NDF = NDF (Read)
 *        A group of existing NDFs, or null (!).  This should be given as
 *        a comma-separated list, in which each list element can be one
@@ -229,6 +235,8 @@
 *        Added Parameters MOD, LOGFILE and ABSPATH.
 *     12-OCT-2012 (DSB):
 *        Added Parameter PATTERN.
+*     28-JUN-2013 (DSB):
+*        Added Parameter EXISTS.
 *     {enter_further_changes_here}
 
 *-
@@ -241,6 +249,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'DAT_PAR'          ! DAT constants
 
 *  Status:
       INTEGER STATUS             ! Global inherited status
@@ -261,12 +270,14 @@
       INTEGER IGRP1          ! GRP id. for group holding listed NDFs
       INTEGER IGRP2          ! GRP id. for log file group
       INTEGER ILEN           ! Length of the NDF info item
+      INTEGER INDF           ! Identifier for existing NDF
       INTEGER ISHOW          ! What to show
       INTEGER LAST           ! The index of the last NDF to display
       INTEGER NMATCH         ! Number of matching NDFs
       INTEGER SIZE0          ! Size of group IGRP0
       INTEGER SIZE1          ! Size of group IGRP1
       LOGICAL ABSPTH         ! Convert to absolute paths?
+      LOGICAL EXISTS         ! Only display existing NDFs?
       LOGICAL FLAG           ! Was group expression flagged?
       LOGICAL MATCH          ! DId the NDF match the pattern?
 *.
@@ -376,6 +387,9 @@
             PAT = ' '
          END IF
 
+*  See if only existing and accessible NDFs are to be displayed.
+         CALL PAR_GET0L( 'EXISTS', EXISTS, STATUS )
+
 *  Loop round testing the required NDFs.
          NMATCH = 0
          DO I = FIRST, LAST
@@ -400,6 +414,16 @@
             ELSE
                RESULT = TEXT
                MATCH = .TRUE.
+            END IF
+
+*  If required, test the NDF exists.
+            IF( MATCH .AND. EXISTS .AND. STATUS .EQ. SAI__OK ) THEN
+               CALL NDF_FIND( DAT__ROOT, RESULT, INDF, STATUS )
+               CALL NDF_ANNUL( INDF, STATUS )
+               IF( STATUS .NE. SAI__OK ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  MATCH = .FALSE.
+               END IF
             END IF
 
 *  If so...

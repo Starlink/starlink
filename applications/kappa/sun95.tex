@@ -37284,6 +37284,12 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          the current working directory. {\tt [FALSE]}
       }
       \sstsubsection{
+         EXISTS = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, then only display paths for NDFs specified by parameter
+         MOD that actually exist and are accessible. {\tt [FALSE]}
+      }
+      \sstsubsection{
          FIRST = \_INTEGER (Read)
       }{
          The index of the first NDF to be tested.  A null ({\tt{!}}) value causes
@@ -37318,7 +37324,10 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
 	 supplied for Parameter MOD should not include an asterisk,
 	 since there are no names to be modified. Instead, the
 	 MOD value should specify an explicit group of NDF
-         names do not need to exist.  {\tt [!]}
+         names do not need to exist.
+
+         The list can be filtered to remove any NDFs that do not exist
+         (see parameter EXISTS). {\tt [!]}
       }
       \sstsubsection{
          NDF = NDF (Read)
@@ -59127,6 +59136,12 @@ The following applications have been modified:
       \begin{itemize}
         \item Will now remove any unused space from the graphics-database file,
         thus keeping its size to a minimum.
+      \end{itemize}
+   \item [\htmlref{NDFECHO}{NDFECHO}]\mbox{}
+      \begin{itemize}
+        \item A new parameter called EXISTS has been added that allows
+        the list of displayed NDF paths to be filtered by removing the paths
+        for NDFs that do not exist.
       \end{itemize}
 \end{description}
 

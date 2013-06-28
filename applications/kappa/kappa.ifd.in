@@ -1164,6 +1164,17 @@ package kappa {
             default FALSE
          }
 
+
+         parameter exists {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Only display paths for existing and accessible NDFs?}
+            helpkey *
+            default FALSE
+         }
+
          parameter first {
             position 3
             type _INTEGER

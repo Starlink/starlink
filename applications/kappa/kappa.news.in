@@ -16,6 +16,12 @@
       -  Will now remove any unused space from the graphics-database
       file, thus keeping its size to a minimum.
 
+   o  NDFECHO
+
+      - A new parameter called EXISTS has been added that allows the
+      list of displayed NDF paths to be filtered by removing the paths
+      for NDFs that do not exist.
+
 1 KAPPA_Version_2.0
 
    A new release of KAPPA (@PACKAGE_VERSION@) is available.  The main
