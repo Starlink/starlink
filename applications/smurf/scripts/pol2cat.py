@@ -51,8 +51,8 @@
 
 *  Usage:
 *     pol2cat in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
-*             [config] [device] [nsigma] [retain] [qui] [hits] [msg_filter]
-*             [ilevel] [glevel] [logfile]
+*             [config] [device] [nsigma] [extcor] [retain] [qui] [hits]
+*             [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
 *     CAT = LITERAL (Read)
@@ -75,6 +75,13 @@
 *        - "SKY": Alignment occurs in celestial sky coordinates.
 *
 *        ["SKY"]
+*     EXTCOR = LOGICAL (Given)
+*        If TRUE, the time series data is corrected for extinction using
+*        the SMURF:EXTINCTION task before being used to calculate Q and U
+*        values (the data first have a constant sky background removed using
+*        SMURF:REMSKY). If FALSE, no extinction correction is applied. The
+*        value of this parameter is ignored if pre-calculated Q and U values
+*        are supplied via the INQU parameter. [TRUE]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -272,6 +279,8 @@
 *        Added parameter STAREDIR.
 *     12-JUN-2013 (DSB):
 *        Added parameter NSIGMA.
+*     28-JUN-2013 (DSB):
+*        Added parameter EXTCOR.
 
 *-
 '''
@@ -355,6 +364,9 @@ try:
 
    params.append(starutil.Par0F("NSIGMA", "No. of standard deviations at "
                                 "which to clip spikes", 3.0, noprompt=True))
+
+   params.append(starutil.Par0L("EXTCOR", "Perform extinction correction?",
+                                True, noprompt=True))
 
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
@@ -523,6 +535,28 @@ try:
 #  which each bolometer moves less than half a pixel.
    else:
 
+#  First remove a sky background and perform extinction correction if
+#  requested. REMSKY only creates output files for science files, not
+#  flats, etc, so we need to filter out any NDF paths that do not exist
+#  after REMSKY.
+      if parsys["EXTCOR"].value:
+         nosky = NDG(indata)
+         msg_out( "Removing a background from the time series data...")
+         invoke("$SMURF_DIR/remsky in={0} out={1} method=plane group=no "
+                "fit=slope".format(indata,nosky) )
+
+         nosky = nosky.filter()
+
+         noext = NDG( nosky )
+         msg_out( "Performing extinction correction on the time series data...")
+         invoke("$SMURF_DIR/extinction in={0} out={1} tausrc=auto "
+                "method=adaptive csotau=! ".format(nosky,noext) )
+
+#  Use the supplied input data from now on if no extinction correction is
+#  required.
+      else:
+         noext = indata
+
 #  The following call to SMURF:CALCQU creates two HDS container files -
 #  one holding a set of Q NDFs and the other holding a set of U NDFs. Create
 #  these container files in the NDG temporary directory.
@@ -533,7 +567,7 @@ try:
 
       msg_out( "Calculating Q and U values for each bolometer...")
       invoke("$SMURF_DIR/calcqu in={0} config={1} outq={2} outu={3} fix".
-             format(indata,config,qcont,ucont) )
+             format(noext,config,qcont,ucont) )
 
 #  The next stuff we do independently for each subarray.
    qmaps = []

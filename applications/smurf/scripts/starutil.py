@@ -1726,8 +1726,6 @@ class NDG(object):
 	    the class variable NDG.tempdir, and have automatically
 	    generated names. In this case the NDFs in the supplied group
 	    need not already exist.
-         pattern = string
-            If supplied, the NDF names for the new group are formed by
 
    Properties:
       comment = string
@@ -1744,12 +1742,14 @@ class NDG(object):
 
 
    Methods:
-      new_instance = ndg_instance.filter( pattern )
+      new_instance = ndg_instance.filter( pattern=None )
          Creates a new NDG object by filtering the NDF names contained
          in an existing NDG object. The pattern should conform to the
          syntax used for the PATTERN parameter by the KAPPA:NDFECHO
          command. See SUN/95. "None" is returned if no NDFs match the
-         supplied pattern.
+         supplied pattern. If "pattern" is None, the new NDF is a copy of
+         the supplied NDF, but excluding the names of any NDFs that do not
+         exist.
 
    Class Variables:
       NDG.tempdir = string
@@ -1971,12 +1971,16 @@ class NDG(object):
 
 
    #  Create a new NDG by filtering an existing NDG.
-   def filter( self, pattern ):
+   def filter( self, pattern=None ):
       result = None
-      try:
-         ndfs = invoke("$KAPPA_DIR/ndfecho \"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
-      except AtaskError:
-         ndfs = invoke("$KAPPA_DIR/ndfecho ! \"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
+      if pattern:
+         try:
+            ndfs = invoke("$KAPPA_DIR/ndfecho \"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
+         except AtaskError:
+            ndfs = invoke("$KAPPA_DIR/ndfecho ! \"{0}\" abspath=yes pattern={1}".format(self,pattern),True)
+      else:
+         ndfs = invoke("$KAPPA_DIR/ndfecho ! \"{0}\" abspath=yes exists=yes".format(self),True)
+
       if get_task_par( "nmatch", "ndfecho" ) > 0:
          result = NDG( ndfs )
       return result
