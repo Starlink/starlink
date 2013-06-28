@@ -267,6 +267,14 @@
 *        into groups where each group represents one pixel. For this
 *        reason, loop round trying larger sample spacing until the pixel
 *        size converges.
+*     28-JUN-2013 (DSB):
+*        - The linear interpolation scheme used by kpg1_opgr2 can cause 
+*        some points to fall partially off the end of the histogram, 
+*        so add some extra bins to the start and end of the histogram 
+*        so that these points are not lost.
+*        - If the pixel size in the perpendicular direction cannot be 
+*        found, assume it is the same as in the first direction instead of 
+*        aborting.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -531,9 +539,11 @@ c     :           ' arcsec'
 
 *  Allocate a one-dimensional work array which spans the circle
 *  enclosing the bounding box, but using smaller pixels (one fifth of
-*  the current estimate of the periodicity).
+*  the current estimate of the periodicity). Add a margin of two spare
+*  elements at each end (these allow for slight over-runs caused by the
+*  linear interpolation scheme in KPG1_OPGR2).
             SPC = 0.2*MXWAVE
-            HISTSZ = DIAM/SPC
+            HISTSZ = DIAM/SPC + 4
             IF( ALLOCD .LT. HISTSZ ) THEN
                IF( ALLOCD .GT. 0 ) CALL PSX_FREE( IPHIST, STATUS )
                CALL PSX_CALLOC( HISTSZ, '_REAL', IPHIST, STATUS )
@@ -612,8 +622,12 @@ c      write(*,*)
      :                       %VAL( CNF_PVAL( IPHIST ) ),
      :                       PAMP, PWAVE, PANG, STATUS )
 
+*  If the wavelength on the other axis could not be determined, assume it
+*  is the same as the first axis.
+            IF( PWAVE .LE. 0.0 ) PWAVE = MXWAVE
+
 *  Check that the chosen orientations have some periodicity.
-            IF( MXWAVE .GT. 0.0 .AND. PWAVE .GT. 0.0 ) THEN
+            IF( MXWAVE .GT. 0.0 ) THEN
                OK = .TRUE.
 
 *  The orientation with the most prominent periodicity can be used as
@@ -928,6 +942,7 @@ c      write(*,*)
 *        The Y grid coord of a point on the line.
 *     SPC0 = DOUBLE PRECISION (Given)
 *        The grid co-ordinate within the HIST array, onto which the
+*        central position (XC,YC) will be mapped.
 *     LIN = LOGICAL (Given)
 *        Should the histogram be formed using nearest neighbour or
 *        linear interpolation?
