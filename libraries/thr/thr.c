@@ -116,6 +116,9 @@
 *        - Incorporated the smf_get_nthread function (now thrGetNThread).
 *     2011-09-21 (TIMJ):
 *        Use ems instead of err consistently for error messages.
+*     1-JUL-2013 (DSB):
+*        Allow the app to be run in a single thread (no workers) by
+*        specifying zero for the number of threads.
 */
 
 
@@ -486,7 +489,8 @@ ThrWorkForce *thrCreateWorkforce( int nworker, int *status ) {
 
 *  Arguments:
 *     nworker
-*        The number of threads within the new thread pool.
+*        The number of threads within the new thread pool. If zero, a
+*        NULL pointer will be returned without error.
 *     status
 *        Pointer to the inherited status value.
 
@@ -504,8 +508,8 @@ ThrWorkForce *thrCreateWorkforce( int nworker, int *status ) {
    pthread_t thread_id;
    char *logfile;
 
-/* Check in herited status */
-   if( *status != SAI__OK ) return result;
+/* Check the inherited status and number of threads. */
+   if( *status != SAI__OK || nworker == 0 ) return result;
 
 /* If required, open a log file to receive output from thr1ThreadLog. */
    logfile = getenv( "THR_THREAD_LOG" );
@@ -845,7 +849,8 @@ int thrGetNThread( const char *env, int *status ){
 *     application is started). The default value is the number
 *     of CPU cores available, but this can be over-ridden by setting the
 *     environment variable specified by the "env" argument to some other
-*     value.
+*     value. A value fo zero is returned if the app should run in a
+*     single thread without any worker threads.
 
 *  Arguments:
 *     env = const char * (Given)
@@ -856,7 +861,8 @@ int thrGetNThread( const char *env, int *status ){
 
 *  Returned Value:
 *     The number of threads to use. A value of 1 is returned if an error
-*     occurs.
+*     occurs. A value of zero indicates that the application should run
+*     in a single thread.
 
 *-
 */
@@ -872,15 +878,21 @@ int thrGetNThread( const char *env, int *status ){
    env_text = getenv( env );
    if( env_text ) {
       result = strtol( env_text, NULL, 10 );
-      if( result < 1 ) {
+      if( result < 0 ) {
          *status = SAI__ERROR;
          emsSetc( "S", env_text );
          emsSetc( "E", env );
          emsRep( "", "Illegal value for environment variable ^E: '^S'.",
                  status );
       }
-      msgOutiff( MSG__VERB, "", "Using %d threads obtained from environment "
-                 "variable %s", status, result, env );
+      if( result > 0 ) {
+         msgOutiff( MSG__VERB, "", "Using %d threads obtained from environment "
+                    "variable %s", status, result, env );
+      } else if( result == 0 ) {
+         msgOutiff( MSG__VERB, "", "The application will be run in a single"
+                    " thread since environment variable %s is zero", status,
+                    env );
+      }
 
    } else {
 #ifdef _SC_NPROCESSORS_ONLN
@@ -896,9 +908,6 @@ int thrGetNThread( const char *env, int *status ){
                  status, result );
 #endif
    }
-
-/* Ensure we have at least one thread. */
-   if( result < 1 ) result = 1;
 
 /* If an error has occurred, use 1 thread. */
    if( *status != SAI__OK ) result = 1;
@@ -946,7 +955,10 @@ ThrWorkForce *thrGetWorkforce( int nworker, int *status ) {
 
 *  Arguments:
 *     nworker
-*        The number of threads to use if a new workforce is created.
+*        The number of threads to use if a new workforce is created. If
+*        this is zero, a NULL pointer is returned without error, in
+*        which case the app should be run in a single thread without any
+*        workers.
 *     status
 *        Pointer to the inherited status value.
 
@@ -957,8 +969,8 @@ ThrWorkForce *thrGetWorkforce( int nworker, int *status ) {
 *-
 */
 
-/* Check in herited status */
-   if( *status != SAI__OK ) return NULL;
+/* Check the herited status and number of threads */
+   if( *status != SAI__OK || nworker == 0 ) return NULL;
 
 /* If no singleton workforce is available, create one. Enclose the
    creation in an AST "permanent memory" context, so that the memory
