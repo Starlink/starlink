@@ -12293,10 +12293,10 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
             neff = wgt/mwpip; \
 \
          } else if( astOK ) { \
-            astError( AST__BADIN, "astRebinSeq"#X"(%s): The rebinned data " \
-                      "cannot be normalised - a bad value (%zu) has been " \
-                      "supplied for 'nused' (programming error).", \
-                      status, astGetClass( this ), *nused ); \
+            astError( AST__BADIN, "astRebinSeq"#X"(%s): The input " \
+                      "%d-dimensional array has no overlap with the output " \
+                      "%d-dimensional array.", status, astGetClass( this ), \
+                      nin, nout ); \
          } \
 \
 /* Assign bad values to unused output pixels. */ \
