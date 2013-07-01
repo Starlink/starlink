@@ -238,6 +238,10 @@
 *        Add support for diagnostics.
 *     28-MAR-2013 (DSB):
 *        Added parameter RESTART.
+*     1-JUL-2013 (DSB):
+*        Do not export cleaned data on the first iteration if the supplied 
+*        data has already been cleaned. Instead, re-use the supplied data on
+*        subsequent iterations.
 
 *-
 '''
@@ -356,6 +360,15 @@ try:
    extra = parsys["EXTRA"].value
    itermap = parsys["ITERMAP"].value
 
+#  See if we are using pre-cleaned data, in which case there is no need
+#  to export the cleaned data on the first iteration.
+   if invoke( "$KAPPA_DIR/configecho name=doclean config={0} "
+              "defaults=$SMURF_DIR/smurf_makemap.def "
+              "select=\"\'450=0,850=1\'\" defval=1".format(config)) == 1:
+      precleaned = False
+   else:
+      precleaned = True
+
 #  If requested, use numiter from the config file. Arbitrarily choose 850 um
 #  values for the waveband-specific parameters, but these are not actually used.
    if niter == 0:
@@ -440,7 +453,8 @@ try:
       fd.write("exportNDF=ext\n")# Save the EXT model values to avoid
                                  # re-calculation on each invocation of makemap.
       fd.write("noexportsetbad=1\n")# Export good EXT values for bad bolometers
-      fd.write("exportclean=1\n")  # Likewise save the cleaned time-series data.
+      if not precleaned:
+         fd.write("exportclean=1\n")  # Likewise save the cleaned time-series data.
 
    fd.write("ast.zero_notlast = 0\n") # Masking is normally not performed
    fd.write("flt.zero_notlast = 0\n") # on the last iteration. But the first
@@ -490,17 +504,19 @@ try:
          cmd += " "+extra
       invoke(cmd)
 
-#  The NDFs holding the cleaned time-series data will have been created by
-#  makemap in the current working directory. Move them to the NDG temporary
-#  directory. Avoid moving any other files that have similar names by
-#  checking each file inode number and last-accessed time against the lists
-#  of inode numbers and times that existed before makemap was run.
+#  Unless the supplied data was pre-cleaned, the NDFs holding the cleaned
+#  time-series data will have been created by makemap in the current working
+#  directory. Move them to the NDG temporary directory. Avoid moving any
+#  other files that have similar names by checking each file inode number and
+#  last-accessed time against the lists of inode numbers and times that
+#  existed before makemap was run.
       if niter > 1:
-         for ndf in glob.glob("s*_con_res_cln.sdf"):
-            if not ndf in orig_cln_ndfs:
-               shutil.move( ndf, NDG.tempdir )
-            elif os.stat(ndf).st_atime > orig_cln_ndfs[ndf]:
-               shutil.move( ndf, NDG.tempdir )
+         if not precleaned:
+            for ndf in glob.glob("s*_con_res_cln.sdf"):
+               if not ndf in orig_cln_ndfs:
+                  shutil.move( ndf, NDG.tempdir )
+               elif os.stat(ndf).st_atime > orig_cln_ndfs[ndf]:
+                  shutil.move( ndf, NDG.tempdir )
 
 #  Get a list of the extinction correction files created by the first
 #  invocation of makemap.
@@ -512,7 +528,10 @@ try:
 
 #  Get the paths to the the moved cleaned files.
    if niter > 1:
-      cleaned = NDG( os.path.join( NDG.tempdir,"s*_con_res_cln.sdf"))
+      if not precleaned:
+         cleaned = NDG( os.path.join( NDG.tempdir,"s*_con_res_cln.sdf"))
+      else:
+         cleaned = indata
 
 #  Now do the second and subsequent iterations. These use the cleaned
 #  time-series data created by the first iteration as their time-series
