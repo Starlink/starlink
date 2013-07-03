@@ -268,6 +268,8 @@
 #        Replace SC/19 with SC/21 in startup messages.
 #     2013-05-08 (MSHERWOOD):
 #        Add FTS2SPLIT
+#     2013-07-03 (MSHERWOOD):
+#        Add fts2gaia
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -5260,6 +5262,10 @@ package @PACKAGE@ {
 
     command configmeld {
         obey {python $SMURF_DIR/configmeld.py}
+    }
+
+    command fts2gaia {
+        obey {python $SMURF_DIR/fts2gaia.py}
     }
 
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
