@@ -437,10 +437,13 @@
 *     pixel in either the external mask specified by AST.ZERO_MASK, or in
 *     the "low hits" mask.
 *     - The iterative algorithm can be terminated prematurely by pressing
-*     control-C at any time. If this is done, the next iteration of the
-*     current chunk will be completed and a map created. The application
-*     will then terminate. If control-C is pressed a second time, thw
-*     application will abort immediately.
+*     control-C at any time. If this is done, the current iteration will
+*     complete and the user will then be asked how to continue. Options
+*     include: 1) abort immediately without an output map, 2) close
+*     retaining the current unfinalised output map, and 3) perform one
+*     more iteration to finalise the map and then close. Note, if control-C
+*     is pressed a second time, the application will abort immediately,
+*     potentially leaving files in an unclean state.
 *     - A FITS extension is added to the output NDF containing any keywords
 *     that are common to all input NDFs. To be included in the output
 *     FITS extension, a FITS keyword must be present in the NDF extension

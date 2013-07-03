@@ -3082,6 +3082,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter intoption {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath DEFAULT
+                prompt {What to do now (1-3)}
+                default 3
+                helpkey *
+            }
+
             parameter lbnd {
                 size *
                 type _INTEGER

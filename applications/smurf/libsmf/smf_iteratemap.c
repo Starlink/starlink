@@ -401,6 +401,9 @@
 *     2013-6-21 (DSB):
 *        Ensure bad values in pre-cleaned data are flaged in the quality
 *        array.
+*     2013-7-3 (DSB):
+*        Change handling of interupts - user is now asked what to do when
+*        an interupt is detected, using parameter INTOPTION.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -554,6 +557,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t idat;                  /* smfData counter */
   size_t imodel;                /* Model counter */
   size_t importsky;             /* Subtract a supplied initial sky map? */
+  int intopt;                   /* Interupt option */
   size_t ipix;                  /* Pixel counter */
   int ii;                       /* Loop counter */
   size_t idx=0;                 /* index within subgroup */
@@ -2311,16 +2315,35 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             /* Check to see if a forced exit is required as a result of an
                interupt. If so, indicate that one last iteration should be
                performed before terminating. */
-            if( smf_interupt ) {
+            if( smf_interupt && *status == SAI__OK ) {
                msgBlank( status );
                msgBlank( status );
-               msgOut( "", ">>>> Interupt detected!!! the current map will be "
-                       "finalised before terminating.", status );
-               msgOut( "", "Another interupt will abort the application "
-                       "immediately without creating an output map", status );
+
+               msgOut( "", ">>>> Interupt detected!!! What should we do "
+                       "now? Options are: ", status );
+               msgOut( "", "1 - abort immediately with an error status",
+                       status );
+               msgOut( "", "2 - close the application returning the current "
+                       "output map", status );
+               msgOut( "", "3 - do one more iteration to finialise the "
+                       "map and then close", status );
                msgBlank( status );
+               msgOut( "", "NOTE - another interupt will abort the "
+                       "application, potentially leaving files in an "
+                       "unclean state.", status );
                msgBlank( status );
-               quit = 0;
+               parCancl( "INTOPTION", status );
+               parGdr0i( "INTOPTION", 3, 1, 3, 1, &intopt, status );
+               msgBlank( status );
+
+               if( intopt == 1 ) {
+                  *status = SAI__ERROR;
+                  errRep( "", "Application aborted by an interupt.", status );
+               } else if( intopt == 2 ) {
+                  quit = 1;
+               } else {
+                  quit = 0;
+               }
             }
           }
 
