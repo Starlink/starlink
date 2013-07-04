@@ -1391,7 +1391,8 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
 
 void smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int * status );
 
-int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *config, smfDIMMData *dat, int *status );
+int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *config, smfDIMMData *dat,
+                     int *iters, int *status );
 
 inst_t smf_inst_get( const smfHead * hdr, int * status );
 
@@ -1415,7 +1416,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
                      char data_units[], double * nboloeff,
                      size_t *numcontchunks, size_t *numinsmp,
-                     size_t *numcnvg, int *status );
+                     size_t *numcnvg, int *iters, int *status );
 
 const char *smf_keyname( AstKeyMap *keymap, const char *basename,
                          const char *qualifier, char *buf, size_t lbuf,

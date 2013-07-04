@@ -695,6 +695,10 @@
 *        default was to leave 4GB spare for machines with 4GB or more of
 *        memory, and to leave 20% spare for machines with less than 4GB.
 *        This was bad news for machines with 4GB of memory!
+*     2013-07-03 (DSB):
+*        If makemap is interupted with control-C and the user chooses to
+*        save the current map, add an extension item to the map saying
+*        how many iterations were completed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -801,6 +805,7 @@ void smurf_makemap( int *status ) {
   int iout;                  /* Index of next output NDF name */
   int ipbin=0;               /* Index of current polarisation angle bin */
   int iterate=0;             /* Flag to denote ITERATE method */
+  int iters;                 /* If interupted, the no. of completed iterations */
   size_t itile;              /* Output tile index */
   int jin;                   /* Input NDF index within igrp */
   int junk;                  /* Unused integer */
@@ -1652,7 +1657,7 @@ void smurf_makemap( int *status ) {
                       heateffmap, outfset, moving, lbnd_out, ubnd_out,
                       fts_port, maxmem-mapmem,
                       map, hitsmap, exp_time, variance, mapqual, weights, data_units,
-                      &nboloeff, &ncontchunks, &ninsmp, &ncnvg, status );
+                      &nboloeff, &ncontchunks, &ninsmp, &ncnvg, &iters, status );
 
       /* If we have just run smf_iteratemap for the second time, free the
          snr mask allocated after the first run. */
@@ -1746,6 +1751,14 @@ void smurf_makemap( int *status ) {
     /* Write WCS */
     smf_set_moving(outfset,fchan,status);
     ndfPtwcs( outfset, ondf, status );
+
+    /* If the map was completed prematurely due to an interupt, add an
+       item to the smurf extension of the output map indicating how many
+       iterations were completed. This is only useful if the data was
+       processed in a single chunk. */
+    if( iters != -1 && ncontchunks == 1 ) {
+       ndfXpt0i( iters, ondf, SMURF__EXTNAME, "NUMITER", status );
+    }
 
     /* Set bad bits mask to enable QUALITY. We can have quality bits set
        indicating where a boundary condition to zero the map has been used.

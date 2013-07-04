@@ -25,7 +25,7 @@
 *                    double *mapvar, smf_qual_t *mapqual, double *weights,
 *                    char data_units[], double *nboloeff,
 *                    size_t *numcontchunks, size_t *numinsmp, size_t *numcnvg,
-*                    int *status );
+*                    int *iters, int *masked, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -101,6 +101,10 @@
 *     numcnvg = size_t *(Returned)
 *        If non-NULL, will contain the number of continuous data chunks that
 *        did not converge (although they are still added to the map).
+*     iters = int * (Returned)
+*        Normally returned equal to -1, but if the application is interupted
+*        using control-C it will be returned holding the number of iterations
+*        that were completed.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -402,8 +406,12 @@
 *        Ensure bad values in pre-cleaned data are flaged in the quality
 *        array.
 *     2013-7-3 (DSB):
-*        Change handling of interupts - user is now asked what to do when
+*        - Change handling of interupts - user is now asked what to do when
 *        an interupt is detected, using parameter INTOPTION.
+*        - Added returned argument "iters".
+*        - If an initial sky is supplied that was created by a previous
+*        interupted run of makemap, start counting iterations from where
+*        the previous run of makemap left off.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -514,7 +522,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
                      char data_units[], double * nboloeff,
                      size_t *numcontchunks, size_t *numinsmp,
-                     size_t *numcnvg, int *status ) {
+                     size_t *numcnvg, int *iters, int *status ) {
 
   /* Local Variables */
   int bolomap=0;                /* If set, produce single bolo maps */
@@ -539,6 +547,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int fakendf=NDF__NOID;        /* NDF id for fakemap */
   double fakescale;             /* Scale factor for fakemap */
   double *fakestream = NULL;    /* Time series data from fake map */
+  int firstiter;                /* First iteration in this invocation of makemap? */
   size_t count_mcnvg=0;         /* # chunks fail to converge */
   size_t count_minsmp=0;        /* # chunks fail due to insufficient samples */
   smf_qual_t flagmap=0;         /* bit mask for flagmaps */
@@ -565,6 +574,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int isize;                    /* Number of files in input group */
   int iter;                     /* Iteration number */
   int itermap=0;                /* If set, produce maps each iteration */
+  int itsdone;                  /* Number of previously completed iterations */
   int iw;                       /* Thread index */
   size_t j;                     /* Loop counter */
   size_t k;                     /* Loop counter */
@@ -644,6 +654,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int *whichthetabin=NULL;      /* Which scan angle bin each time slice */
   SmfIterateMapData *job_data = NULL;  /* Array of job descriptions */
   SmfIterateMapData *pdata;     /* Pointer to next job description */
+
+  /* initalise */
+  *iters = -1;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -1739,10 +1752,14 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Allow an initial guess at the sky brightness to be supplied, in
          which case copy it into "thismap", sample it and subtract it from
-         the cleaned data. */
-      importsky = smf_initial_sky( wf, keymap, &dat, status );
+         the cleaned data. The initial guess is returned in "lastmap". */
+      importsky = smf_initial_sky( wf, keymap, &dat, &itsdone, status );
 
-
+      /* If an initial sky was imported, copy it into the "lastmap" array
+         so that we get a reasonable value for the normalised change in the
+         map at the end of the iteration. */
+      if( importsky && *status == SAI__OK ) memcpy( lastmap, dat.map,
+                                                    msize*sizeof(*lastmap) );
 
 
 
@@ -1763,9 +1780,19 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Initialize quit to -1. Once one of the stopping criterion have
          been met set to 0 and do one final loop, then set to 1 at the
-         end of the last loop to exit. */
+         end of the last loop to exit. If an initial sky was supplied
+         that was created by a previous interupted run of makemap, we
+         start counting iterations from where the previous run of makemap
+         left off.  */
       quit = -1;
-      iter = 0;
+      iter = ( itsdone == -1 ) ? 0 : itsdone;
+
+      /* The "iter" variable counts how many iterations have been done in
+         total, including any from a previous run of makemap if an initial sky
+         image was given that was generated by makemap. We also need a
+         flag which indicates if this is the first iteration, ignoring
+         any such previous iterations. */
+      firstiter = 1;
 
       while( quit < 1 ) {
         msgSeti("ITER", iter+1);
@@ -1877,7 +1904,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                iteration, we need to undo some models (EXT, GAI, FLT ).
                Undo them in the reverse order to which they were done. */
 
-            if( (j==0) && (iter>0) ) {
+            if( (j==0) && !firstiter ) {
               dim_t jj = whichast - 1;
               while( jj != whichast ) {
 
@@ -2292,6 +2319,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         /* Increment iteration counter */
         iter++;
+        firstiter = 0;
 
         if( *status == SAI__OK ) {
 
@@ -2340,8 +2368,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   *status = SAI__ERROR;
                   errRep( "", "Application aborted by an interupt.", status );
                } else if( intopt == 2 ) {
+                  *iters = iter;
                   quit = 1;
                } else {
+                  *iters = iter + 1;
                   quit = 0;
                }
             }

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap,
-*                          smfDIMMData *dat, int *status )
+*                          smfDIMMData *dat, int *iters, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -23,6 +23,11 @@
 *        Configuration parameters that control the map-maker.
 *     dat = smfDIMMData * (Given)
 *        Struct of pointers to information required by model calculation.
+*     iters = int * (Returned)
+*        If the initial sky NDF was created by a previous run of makemap
+*        that was interupted using control-C, "*iters" will be returned
+*        holding the number of iterations that were completed before the
+*        map was created. Otherwise, -1 is returned in "*iters".
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -45,10 +50,15 @@
 *  History:
 *     22-OCT-2012 (DSB):
 *        Original version.
+*     3-JUL-2013 (DSB):
+*        - Added argument iters.
+*        - Ensure the bad bits mask is set so that the mapped NDF data
+*        array is masked by the quality array.
+*        - Import variance from supplied NDF if available.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2012-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -84,21 +94,27 @@
 
 
 int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
-                     int *status ) {
+                     int *iters, int *status ) {
 
 /* Local Variables: */
    char refparam[ DAT__SZNAM ];/* Name for reference NDF parameter */
    const char *cval;          /* The IMPORTSKY string value */
-   double *ptr;               /* Pointer to NDF  Data array */
+   double *ptr;               /* Pointer to NDF Data array */
+   double *vptr;              /* Pointer to NDF Variance array */
    int indf1;                 /* Id. for supplied reference NDF */
    int indf2;                 /* Id. for used section of reference NDF */
    int nel;                   /* Number of mapped NDF pixels */
    int result;                /* Returned flag */
    size_t size;               /* Size of mapped array */
    smf_qual_t *qptr;          /* Pointer to mapped quality values */
+   int there;                 /* Is there a smurf extension in the NDF? */
 
 /* Initialise the returned value to indicate no sky has been subtractred. */
    result = 0;
+
+/* Assume the sky map was not created by an interupted previous run of
+   makemap. */
+   *iters = -1;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return result;
@@ -134,38 +150,64 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 /* Get an identifier for the NDF using the associated ADAM parameter. */
       ndfAssoc( refparam, "READ", &indf1, status );
 
+/* Tell the user what we are doing. */
+      ndfMsg( "N", indf1 );
+      msgOut( "", "Using ^N as the initial guess at the sky", status );
+
 /* Get a section from this NDF that matches the bounds of the map. */
       ndfSect( indf1, 2, dat->lbnd_out, dat->ubnd_out, &indf2, status );
+
+/* Ensure masked values are set bad in the mapped data array, using the
+   mask defined in the quality array. */
+      ndfSbb( 255, indf2, status );
 
 /* Map the data array section, and copy it into the map buffer. */
       ndfMap( indf2, "DATA", "_DOUBLE", "READ", (void **) &ptr, &nel, status );
       if( *status == SAI__OK ) memcpy( dat->map, ptr, dat->msize*sizeof(*ptr));
 
+/* Map the variance array section, and copy it into the map buffer. */
+      ndfState( indf2, "VARIANCE", &there, status );
+      if( there ) {
+         ndfMap( indf2, "VARIANCE", "_DOUBLE", "READ", (void **) &vptr, &nel, status );
+         if( *status == SAI__OK ) memcpy( dat->mapvar, vptr, dat->msize*sizeof(*vptr));
+      }
+
 /* Map the quality array section, and copy it into the map buffer. */
-      qptr = smf_qual_map( indf2, "READ", NULL, &size, status );
-      if( *status == SAI__OK ) {
-         memcpy( dat->mapqual, qptr, dat->msize*sizeof(*qptr));
+      ndfState( indf2, "QUALITY", &there, status );
+      if( there ) {
+         qptr = smf_qual_map( indf2, "READ", NULL, &size, status );
+         if( *status == SAI__OK ) {
+            memcpy( dat->mapqual, qptr, dat->msize*sizeof(*qptr));
 
 /* Also copy it into another array where it can be accessed by smf_get_mask. We
    only need to do this once. */
-         if( ! dat->initqual ) dat->initqual = astStore( NULL, qptr,
-                                                         dat->msize*sizeof(*qptr));
+            if( ! dat->initqual ) dat->initqual = astStore( NULL, qptr,
+                                                            dat->msize*sizeof(*qptr));
+         }
       }
+
+/* If the NDF was created by a previous run of makemap that was interupted
+   using control-C, it will contain a NUMITER item in the smurf extension,
+   which gives the number of iterations that were completed before the
+   map was created. Obtain and return this value, if it exists. */
+      ndfXstat( indf1, SMURF__EXTNAME, &there, status );
+      if( there ) ndfXgt0i( indf1, SMURF__EXTNAME, "NUMITER", iters,
+                            status );
 
 /* End the NDF context. */
       ndfEnd( status );
 
-/* Apply any the existinction correction to the cleaned bolometer data. */
+/* Apply any existinction correction to the cleaned bolometer data. */
       if( dat->ext ) smf_calcmodel_ext( wf, dat, 0, keymap, dat->ext, 0,
                                         status);
 
 /* Sample the above map at the position of each bolometer sample and
-   subtract the sampled value from the cleaned nolometer value. This
-   includes any masking specified by the AST.ZERO_xxx config parameters. */
-      smf_calcmodel_ast( wf, dat, 0, keymap, NULL, SMF__DIMM_PREITER,
-                         status);
+   subtract the sampled value from the cleaned bolometer value. Indicate
+   that no masking should be done (SMF__PREITER flag) since the mapped
+   NDF array is assumed to be masked already. */
+      smf_calcmodel_ast( wf, dat, 0, keymap, NULL, SMF__DIMM_PREITER, status);
 
-/* Remove any the existinction correction to the modifed bolometer data. */
+/* Remove any existinction correction to the modifed bolometer data. */
       if( dat->ext ) smf_calcmodel_ext( wf, dat, 0, keymap, dat->ext,
                                         SMF__DIMM_INVERT, status);
    }
