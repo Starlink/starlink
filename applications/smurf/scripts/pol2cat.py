@@ -52,7 +52,7 @@
 *  Usage:
 *     pol2cat in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
 *             [config] [device] [nsigma] [extcor] [retain] [qui] [hits]
-*             [msg_filter] [ilevel] [glevel] [logfile]
+*             [harmonic] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
 *     CAT = LITERAL (Read)
@@ -90,6 +90,13 @@
 *        starutil.NONE, starutil.CRITICAL, starutil.PROGRESS,
 *        starutil.ATASK or starutil.DEBUG) to the module variable
 *        starutil.glevel. ["ATASK"]
+*     HARMONIC = _INTEGER (Read)
+*        The Q and U values are derived from the fourth harmonic of the
+*        half-wave plate rotation. However, to allow investigation of
+*        other instrumental effects, it is possible instead to derive
+*        equivalent quantities from any specified harmonic. These quantities
+*        are calculated in exactly the same way as Q and U, but use the
+*        harmonic specified by this parameter. [4]
 *     HITS = NDF (Read)
 *        If a value is supplied for HITS, a 2D NDF is created holding the
 *        number of grid stare positions contributing to each pixel of the
@@ -281,6 +288,8 @@
 *        Added parameter NSIGMA.
 *     28-JUN-2013 (DSB):
 *        Added parameter EXTCOR.
+*     4-JUL-2013 (DSB):
+*        Added parameter HARMONIC.
 
 *-
 '''
@@ -379,6 +388,9 @@ try:
                                  default=None, exists=False, minsize=0,
                                  maxsize=1, noprompt=True ))
 
+   params.append(starutil.Par0I("HARMONIC", "The harmonic for calculating "
+                                "Q and U", 4, minval=1, noprompt=True))
+
    params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
                                 "and IP?", False, noprompt=True))
 
@@ -447,6 +459,9 @@ try:
 
 #  Now get the HITS value to use.
    hitsmap = parsys["HITS"].value
+
+#  Now get the harmonic to use
+   harmonic = parsys["HARMONIC"].value
 
 #  Get the output catalogue now to avoid a long wait before the user gets
 #  prompted for it.
@@ -566,8 +581,8 @@ try:
       ucont.comment = "ucont"
 
       msg_out( "Calculating Q and U values for each bolometer...")
-      invoke("$SMURF_DIR/calcqu in={0} config={1} outq={2} outu={3} fix".
-             format(noext,config,qcont,ucont) )
+      invoke("$SMURF_DIR/calcqu in={0} config={1} outq={2} outu={3} "
+             "harmonic={4} fix".format(noext,config,qcont,ucont,harmonic) )
 
 #  The next stuff we do independently for each subarray.
    qmaps = []
