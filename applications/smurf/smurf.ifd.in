@@ -2053,7 +2053,7 @@ package @PACKAGE@ {
                 prompt {Output data files}
                 helpkey *
             }
-            
+
             parameter outfiles {
                 type LITERAL
                 prompt {Text file in which to put the output NDF names}
@@ -3091,6 +3091,16 @@ package @PACKAGE@ {
                 ppath DEFAULT
                 prompt {What to do now (1-3)}
                 default 3
+                helpkey *
+            }
+
+            parameter itermaps {
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {The file to receive any itermaps that are requested}
+                default !
                 helpkey *
             }
 

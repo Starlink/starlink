@@ -1307,13 +1307,18 @@ importsky = 0
 #  Type: 	integer
 #  Default: 	0
 #  Purpose: 	Provide extra diagnostic information.
-#  Description: If itermap is set to a positive value, an extension called
-#		.MORE.SMURF.ITERMAPS will be created in the output map
-#		and the map from each iteration of each chunk will be stored
-#		in the extension. If itermap is set to a negative value,
-#		only the final iteration will be written from each chunk. If
-#		its absolute value is larger than 1, then each itermap will
-#		include a quality component that reflects the AST mask in use.
+#  Description: If itermap is set to a positive value, the map from each iteration
+#               of each chunk will be stored in an output NDF. If itermap is set
+#               to a negative value, only the final iteration will be written from
+#               each chunk. If its absolute value is larger than 1, then each
+#               itermap will include a quality component that reflects the AST
+#               mask in use.
+#
+#               By default, each itermap NDF will be stored in an extension
+#		called .MORE.SMURF.ITERMAPS in the main output NDF. However,
+#               an alternative location can be specified by supplying a value
+#               for ADAM parameter ITERMAPS. This is useful as it allows you
+#               to look at earlier itermaps whilst makemap is still running.
 itermap = 0
 
 #-----------------------------------------------------------------

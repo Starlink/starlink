@@ -152,6 +152,12 @@
 *          If set, this parameter should be "tracking" or "image". [!]
 *     IN = NDF (Read)
 *          Input file(s).
+*     ITERMAPS = LITERAL (Read)
+*          Specifies the name of a file in which to place a copy of the
+*          current map at the end of each iteration. If a null (!) value is
+*          supplied, they are placed in the MORE.SMURF.ITERMAPS component of
+*          the main output NDF (see parameter OUT).  See configuration
+*          parameter "Itermap". [!]
 *     LBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the lower pixel index bound on each
 *          spatial axis of the output NDF. The suggested default values
@@ -699,6 +705,8 @@
 *        If makemap is interupted with control-C and the user chooses to
 *        save the current map, add an extension item to the map saying
 *        how many iterations were completed.
+*     2013-07-04 (DSB):
+*        Added parameter ITERMAPS.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1560,11 +1568,18 @@ void smurf_makemap( int *status ) {
     grpPut1( bolrootgrp, tempfile, 0, status );
 
     /* Similarly, work out the name for the root file path if itermaps
-       are being created */
-    grpGet( ogrp, 1, 1, &pname, sizeof(tempfile), status );
-    one_strlcat( tempfile, ".MORE.SMURF.ITERMAPS", sizeof(tempfile), status);
+       are being created, allowing the user to specify an alternative
+       destination other than the SMURF extension of the main output NDF. */
     iterrootgrp = grpNew( "itermap root", status );
-    grpPut1( iterrootgrp, tempfile, 0, status );
+    if( *status == SAI__OK ) {
+       parGet0c( "ITERMAPS", tempfile, sizeof(tempfile), status );
+       if( *status == PAR__NULL ) {
+          errAnnul( status );
+          grpGet( ogrp, 1, 1, &pname, sizeof(tempfile), status );
+          one_strlcat( tempfile, ".MORE.SMURF.ITERMAPS", sizeof(tempfile), status);
+       }
+       grpPut1( iterrootgrp, tempfile, 0, status );
+    }
 
     /* Work out the name for the root file path if shortmaps are being created*/
     grpGet( ogrp, 1, 1, &pname, sizeof(tempfile), status );
