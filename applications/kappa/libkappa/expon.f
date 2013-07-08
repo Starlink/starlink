@@ -245,6 +245,11 @@
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
+      ELSE
+         STATUS = SAI__ERROR
+         CALL MSG_SETC('T', ITYPE)
+         CALL ERR_REP( ' ', 'Unrecognized data type ^T. '//
+     :        '(possible programming error)', STATUS )
       END IF
 
 *  See if there may be bad pixels in the output data array and set the
