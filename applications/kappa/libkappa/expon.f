@@ -112,7 +112,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! VAL_ public constants
-      INCLUDE 'CNF_PAR'          ! for CNF_PVAL function
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -261,7 +261,7 @@
 
       IF ( FORM .NE. 'PRIMITIVE' ) THEN
          CALL NDF_SBAD( BAD .OR. ( NERR .NE. 0 ), NDFO, 'Data', STATUS )
-      END If
+      END IF
 
 *  See if there may be bad pixels in the output variance array and set
 *  the output bad pixel flag value accordingly unless the output NDF is
