@@ -99,6 +99,8 @@
 *        Use CNF_PVAL.
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
+*     2013-07-08 (TIMJ):
+*        Restore _REAL support.
 *     {enter_further_changes_here}
 
 *-
@@ -211,8 +213,8 @@
      :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_EXPOI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+         CALL KPG1_EXPOR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
      :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
