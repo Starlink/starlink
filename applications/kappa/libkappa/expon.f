@@ -213,13 +213,6 @@
      :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
      :                    NERR, NERRV, STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_EXPOR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
-     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
-     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
-     :                    NERR, NERRV, STATUS )
-
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPG1_EXPOI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
      :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
@@ -229,6 +222,13 @@
 
       ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
          CALL KPG1_EXPOK( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
+     :                    NERR, NERRV, STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+         CALL KPG1_EXPOR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
      :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE,
      :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
