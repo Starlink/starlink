@@ -71,6 +71,8 @@
 *        Report an error if the waveplate is not spinning.
 *     15-JAN-2013 (DSB):
 *        Added maxsize argument.
+*     9-JUL-2013 (DSB):
+*        Correct algorithm for setting the block size to a multiple of pi/2.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -359,7 +361,7 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
                   result = -1;
                   break;
 
-               } else if( wang < end_wang ) {
+               } else if( wang < end_wang || wang > oldwang ) {
                   break;
                }
 
