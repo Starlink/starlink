@@ -128,6 +128,8 @@
 *        in mapqual.
 *     2012-5-23 (DSB):
 *        Multi-threaded the data loop.
+*     2013-7-9 (DSB):
+*        Allow an initial number of iterations to be skipped.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -218,6 +220,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
+  int skip;                     /* Number of iterations to skip */
   size_t tstride;               /* Time slice stride in data array */
   smf_qual_t *mapqual = NULL;/* Quality map */
   double *mapvar = NULL;        /* Variance map */
@@ -280,138 +283,147 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
               status, nflagged);
   }
 
-  /* Constrain map. We don't if this is the very last iteration, and
-     if zero_notlast is set. */
 
-  zero_notlast = 0;
-  astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
-  if( gaussbg && !(zero_notlast && (flags&SMF__DIMM_LASTITER)) ) {
-    /* Calculate and remove a background using a simple Gaussian filter...
-       the idea is to help remove saddles. Maybe this should go after
-       zero_lowhits? Really there should be some sort of map apodization
-       routine */
+  /* We only do the rest if we are not skipping this iteration. */
+  astMapGet0I( kmap, "SKIP", &skip );
+  if( dat->iter < skip ) {
+    dat->ast_skipped = 1;
+  } else {
+    dat->ast_skipped = 0;
 
-    smfData *filtermap=NULL;
-    smfFilter *filt=NULL;
+    /* Constrain map. We don't if this is the very last iteration, and
+       if zero_notlast is set. */
 
-    /* Put the map data in a smfData wrapper */
-    filtermap = smf_create_smfData( 0, status );
-    if( *status == SAI__OK ) {
-      filtermap->isFFT = -1;
-      filtermap->dtype = SMF__DOUBLE;
-      filtermap->pntr[0] = map;
-      filtermap->ndims = 2;
-      filtermap->lbnd[0] = dat->lbnd_out[0];
-      filtermap->lbnd[1] = dat->lbnd_out[1];
-      filtermap->dims[0] = dat->ubnd_out[0]-dat->lbnd_out[0]+1;
-      filtermap->dims[1] = dat->ubnd_out[1]-dat->lbnd_out[1]+1;
-      filtermap->hdr->wcs = astClone( dat->outfset );
+    zero_notlast = 0;
+    astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
+    if( gaussbg && !(zero_notlast && (flags&SMF__DIMM_LASTITER)) ) {
+      /* Calculate and remove a background using a simple Gaussian filter...
+         the idea is to help remove saddles. Maybe this should go after
+         zero_lowhits? Really there should be some sort of map apodization
+         routine */
 
-      /* Set bad values to 0... should really be some sort of apodization */
-      for( i=0; i<dat->msize; i++ ) {
-        if( map[i] == VAL__BADD ) map[i] = 0;
-      }
+      smfData *filtermap=NULL;
+      smfFilter *filt=NULL;
 
-      /* Create and apply a Gaussian filter to remove large-scale
-         structures -- we do this by taking the complement of a
-         Gaussian smoothing filter to turn it into a smooth
-         high-pass filter */
+      /* Put the map data in a smfData wrapper */
+      filtermap = smf_create_smfData( 0, status );
+      if( *status == SAI__OK ) {
+        filtermap->isFFT = -1;
+        filtermap->dtype = SMF__DOUBLE;
+        filtermap->pntr[0] = map;
+        filtermap->ndims = 2;
+        filtermap->lbnd[0] = dat->lbnd_out[0];
+        filtermap->lbnd[1] = dat->lbnd_out[1];
+        filtermap->dims[0] = dat->ubnd_out[0]-dat->lbnd_out[0]+1;
+        filtermap->dims[1] = dat->ubnd_out[1]-dat->lbnd_out[1]+1;
+        filtermap->hdr->wcs = astClone( dat->outfset );
 
-      filt = smf_create_smfFilter( filtermap, status );
-      smf_filter2d_gauss( filt, gaussbg, status );
-      smf_filter_complement( filt, status );
-      smf_filter_execute( wf, filtermap, filt, 0, 0, status );
-
-      /* Unset pointers to avoid freeing them */
-      filtermap->pntr[0] = NULL;
-    }
-
-    smf_close_file( &filtermap, status );
-    filt = smf_free_smfFilter( filt, status );
-  }
-
-  /* Get a mask to apply to the map. This is determined by the "Zero_..."
-     parameters in the configuration KeyMap. Do not mask when subtracting
-     off the initial sky estimate, as the initial sky estimate will
-     already be masked. */
-  if( !(flags&SMF__DIMM_PREITER) ) {
-    zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
-  }
-
-  /* Reset the SMF__MAPQ_AST bit (but retain it on the last iteration so
-    that it gets written to the quality component of the output NDF). */
-  if( zmask || !(flags & SMF__DIMM_LASTITER) ) {
-    for( i=0; i<dat->msize; i++ ) {
-      mapqual[i] &= ~SMF__MAPQ_AST;
-    }
-  }
-
-  /* Proceed if we need to do zero-masking */
-  if( zmask ) {
-
-    /* Flag background regions in the map (usually round the edges). */
-    for( i=0; i<dat->msize; i++ ) {
-
-      if( map[i] == VAL__BADD || mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) {
-        mapqual[i] |= SMF__MAPQ_AST;
-
-      } else if( zmask[i] ) {
-        mapqual[i] |= SMF__MAPQ_AST;
-      }
-    }
-  }
-
-  /* Ensure everything is in the same data order */
-  smf_model_dataOrder( dat, NULL, chunk,SMF__LUT|SMF__RES|SMF__QUA,
-                       lut->sdata[0]->isTordered, status );
-
-  /* Loop over index in subgrp (subarray) */
-  for( idx=0; idx<res->ndat; idx++ ) {
-
-    /* Get pointers to DATA components */
-    res_data = (res->sdata[idx]->pntr)[0];
-    lut_data = (lut->sdata[idx]->pntr)[0];
-    qua_data = (qua->sdata[idx]->pntr)[0];
-
-    if( (res_data == NULL) || (lut_data == NULL) || (qua_data == NULL) ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Null data in inputs", status);
-    } else {
-
-      /* Get the raw data dimensions */
-      smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice,
-                    &ndata, &bstride, &tstride, status);
-
-      /* Find how many bolometers to process in each worker thread. */
-      dim_t bolostep = nbolo/nw;
-      if( bolostep == 0 ) bolostep = 1;
-
-      /* Create jobs to subtract the map values from the corresponding
-         bolometer values. */
-      for( iw = 0; iw < nw; iw++ ) {
-        pdata = job_data + iw;
-        pdata->b1 = iw*bolostep;
-        if( iw < nw - 1 ) {
-           pdata->b2 = pdata->b1 + bolostep - 1;
-        } else {
-           pdata->b2 = nbolo - 1 ;
+        /* Set bad values to 0... should really be some sort of apodization */
+        for( i=0; i<dat->msize; i++ ) {
+          if( map[i] == VAL__BADD ) map[i] = 0;
         }
 
-        pdata->zmask = zmask;
-        pdata->ntslice = ntslice;
-        pdata->qua_data = qua_data;
-        pdata->res_data = res_data;
-        pdata->lut_data = lut_data;
-        pdata->bstride = bstride;
-        pdata->tstride = tstride;
-        pdata->map = map;
-        pdata->oper = 1;
+        /* Create and apply a Gaussian filter to remove large-scale
+           structures -- we do this by taking the complement of a
+           Gaussian smoothing filter to turn it into a smooth
+           high-pass filter */
 
-        thrAddJob( wf, 0, pdata, smf1_calcmodel_ast, 0, NULL, status );
+        filt = smf_create_smfFilter( filtermap, status );
+        smf_filter2d_gauss( filt, gaussbg, status );
+        smf_filter_complement( filt, status );
+        smf_filter_execute( wf, filtermap, filt, 0, 0, status );
+
+        /* Unset pointers to avoid freeing them */
+        filtermap->pntr[0] = NULL;
       }
 
-      /* Wait for all jobs to complete. */
-      thrWait( wf, status );
+      smf_close_file( &filtermap, status );
+      filt = smf_free_smfFilter( filt, status );
+    }
+
+    /* Get a mask to apply to the map. This is determined by the "Zero_..."
+       parameters in the configuration KeyMap. Do not mask when subtracting
+       off the initial sky estimate, as the initial sky estimate will
+       already be masked. */
+    if( !(flags&SMF__DIMM_PREITER) ) {
+      zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
+    }
+
+    /* Reset the SMF__MAPQ_AST bit (but retain it on the last iteration so
+      that it gets written to the quality component of the output NDF). */
+    if( zmask || !(flags & SMF__DIMM_LASTITER) ) {
+      for( i=0; i<dat->msize; i++ ) {
+        mapqual[i] &= ~SMF__MAPQ_AST;
+      }
+    }
+
+    /* Proceed if we need to do zero-masking */
+    if( zmask ) {
+
+      /* Flag background regions in the map (usually round the edges). */
+      for( i=0; i<dat->msize; i++ ) {
+
+        if( map[i] == VAL__BADD || mapvar[i] == VAL__BADD || mapvar[i] <= 0.0 ) {
+          mapqual[i] |= SMF__MAPQ_AST;
+
+        } else if( zmask[i] ) {
+          mapqual[i] |= SMF__MAPQ_AST;
+        }
+      }
+    }
+
+    /* Ensure everything is in the same data order */
+    smf_model_dataOrder( dat, NULL, chunk,SMF__LUT|SMF__RES|SMF__QUA,
+                         lut->sdata[0]->isTordered, status );
+
+    /* Loop over index in subgrp (subarray) */
+    for( idx=0; idx<res->ndat; idx++ ) {
+
+      /* Get pointers to DATA components */
+      res_data = (res->sdata[idx]->pntr)[0];
+      lut_data = (lut->sdata[idx]->pntr)[0];
+      qua_data = (qua->sdata[idx]->pntr)[0];
+
+      if( (res_data == NULL) || (lut_data == NULL) || (qua_data == NULL) ) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Null data in inputs", status);
+      } else {
+
+        /* Get the raw data dimensions */
+        smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice,
+                      &ndata, &bstride, &tstride, status);
+
+        /* Find how many bolometers to process in each worker thread. */
+        dim_t bolostep = nbolo/nw;
+        if( bolostep == 0 ) bolostep = 1;
+
+        /* Create jobs to subtract the map values from the corresponding
+           bolometer values. */
+        for( iw = 0; iw < nw; iw++ ) {
+          pdata = job_data + iw;
+          pdata->b1 = iw*bolostep;
+          if( iw < nw - 1 ) {
+             pdata->b2 = pdata->b1 + bolostep - 1;
+          } else {
+             pdata->b2 = nbolo - 1 ;
+          }
+
+          pdata->zmask = zmask;
+          pdata->ntslice = ntslice;
+          pdata->qua_data = qua_data;
+          pdata->res_data = res_data;
+          pdata->lut_data = lut_data;
+          pdata->bstride = bstride;
+          pdata->tstride = tstride;
+          pdata->map = map;
+          pdata->oper = 1;
+
+          thrAddJob( wf, 0, pdata, smf1_calcmodel_ast, 0, NULL, status );
+        }
+
+        /* Wait for all jobs to complete. */
+        thrWait( wf, status );
+      }
     }
   }
 

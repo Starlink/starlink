@@ -2025,9 +2025,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                not yet have a map estimate so we skip this step (in multiple
                chunk case thismap will still contain the old map from
                the previous chunk). Ignore map pixels that have been
-               constrained to zero. First find how many samples to process
-               in each worker thread. */
-            if( iter > 0 || importsky ) {
+               constrained to zero. We also skip this bit if the subtraction
+               of AST was skipped on the previous iteration. */
+            if( ( iter > 0 || importsky ) && !dat.ast_skipped ) {
+
+              /* First find how many samples to process in each worker thread. */
               size_t sampstep = dsize/nw;
               if( sampstep == 0 ) sampstep = 1;
 

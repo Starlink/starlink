@@ -761,6 +761,8 @@ typedef struct smfDIMMData {
   unsigned char *com_mask;   /* Map indicating region to be masked in com */
   unsigned char *flt_mask;   /* Map indicating region to be masked in flt */
   int iter;                  /* Iteration number */
+  int ast_skipped;           /* True if the subtraction of AST was skipped
+                                on the previous iteration */
 } smfDIMMData;
 
 

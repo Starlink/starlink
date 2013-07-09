@@ -76,6 +76,25 @@ ast.gaussbg = 0
 ast.mapspike = 10
 
 #-----------------------------------------------------------------
+#  Name: 	ast.skip
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Skip subtraction of astronomical signal.
+#  Description: If ast.skip is non-zero, it gives the number of initial
+#       iterations for which no AST model (astronomical signal) should
+#       be subtracted. A map is still formed at the end of these iterations
+#       but the astronomical signal implied by this map is not removed from
+#       the residuals (neither is it added back prior to forming the next
+#       map). This means that the residuals at the start of each of these
+#       iterations are unchanging and essentially equal to the cleaned raw
+#       data.
+#
+#       This option is useful when using SNR-based masking for the FLT and/or
+#       COM models, since it allows a reasonable mask to be formed before
+#       subtracting off the first estimate of the astronommical signal.
+ast.skip = 0
+
+#-----------------------------------------------------------------
 #  Name: 	ast.zero_circle
 #  Type: 	real
 #  Default: 	<undef>
@@ -102,7 +121,9 @@ ast.zero_circle = <undef>
 #		of iterations. This can help convergence.
 #  Description: If ast.zero_freeze is non-zero, the AST mask will be frozen
 #		after the specified number of iterations. A value of zero
-#		means that the mask is never frozen.
+#		means that the mask is never frozen. Note, any initial
+#               iterations specified by parameter "ast.skip" are not
+#               included in the count of iterations.
 ast.zero_freeze = 0
 
 #-----------------------------------------------------------------
@@ -157,7 +178,9 @@ ast.zero_mask = 0
 #		is zero. This feature will probably be useful for deep
 #		point-source observations for which the large-scale noise
 #		is not as important, but keeping as much data around the
-#		edges of the map is.
+#		edges of the map is. Note, any initial iterations
+#               specified by parameter "ast.skip" are not included in
+#               the count of iterations.
 ast.zero_niter = 0
 
 #-----------------------------------------------------------------
@@ -293,7 +316,9 @@ com.zero_circle = <undef>
 #		of iterations. This can help convergence.
 #  Description: If com.zero_freeze is non-zero, the COM mask will be frozen
 #		after the specified number of iterations. A value of zero
-#		means that the mask is never frozen.
+#		means that the mask is never frozen. Note, any initial
+#               iterations specified by parameter "ast.skip" are not
+#               included in the count of iterations.
 com.zero_freeze = 0
 
 #-----------------------------------------------------------------
@@ -347,6 +372,8 @@ com.zero_mask = 0
 #		means "mask on all iterations". However, if parameter
 #		"com.zero_notlast" is set, the mask will will not be applied
 #		on the last iteration, even if com.zero_niter is zero.
+#               Note, any initial iterations specified by parameter
+#               "ast.skip" are not included in the count of iterations.
 com.zero_niter = 0
 
 #-----------------------------------------------------------------
@@ -371,9 +398,21 @@ com.zero_notlast = 1
 #  Description: Setting the com.zero_snr parameter will exclude samples from
 #               the COM estimate that fall within map pixels with SNR values
 #               greater than com.zero_snr. A com.zero_snr value of zero means
-#               no SNR mask is used. Note, the SNR values are only available
-#		after the first iteration has completed, and so using this
-#		parameter results in no FLT masking on the first iteration.
+#               no SNR mask is used.
+#
+#               Note, the SNR values are only available once a map has been
+#               created, and so using this parameter results in no COM masking
+#               on the first iteration. Consequently the map at the end of the
+#               first iteration will have a bowl around any bright sources,
+#               since no COM masking was done. Normally, these rings
+#               would polute the AST model derived from the map, and thus
+#               polute the residuals on the next iteration, resulting in
+#               the bowls remaining in later maps. To avoid this, parameter
+#               "ast.skip" can be set to a positive value. This causes the
+#               AST model to be skipped (i.e. no AST signal is subtracted from
+#               the residuals) for the first "ast.skip" iterations. This means
+#               that a good COM mask can be formed from these initial iterations
+#               before any AST model is calculated and used.
 com.zero_snr = 0
 
 #-----------------------------------------------------------------
@@ -1135,7 +1174,9 @@ flt.zero_circle = <undef>
 #		of iterations. This can help convergence.
 #  Description: If flt.zero_freeze is non-zero, the FLT mask will be frozen
 #		after the specified number of iterations. A value of zero
-#		means that the mask is never frozen.
+#		means that the mask is never frozen. Note, any initial
+#               iterations specified by parameter "ast.skip" are not
+#               included in the count of iterations.
 flt.zero_freeze = 0
 
 #-----------------------------------------------------------------
@@ -1191,7 +1232,9 @@ flt.zero_mask = 0
 #		"flt.zero_notlast" is set, the mask will will not be applied
 #		on the last iteration, even if flt.zero_niter is zero.
 #		Note, using FLT masking on many iterations can inhibit
-#		convergence.
+#		convergence. Also, any initial iterations specified by
+#               parameter "ast.skip" are not included in the count of
+#               iterations.
 flt.zero_niter = 2
 
 #-----------------------------------------------------------------
@@ -1212,10 +1255,21 @@ flt.zero_notlast = 1
 #  Description: Setting the flt.zero_snr parameter will prevent samples
 #		contributing to the FLT model if they fall within map pixels
 #		that have SNR values greater than flt.zero_snr. A flt.zero_snr
-#		value of zero means no SNR mask is used. Note, the SNR
-#		values are only available after the first iteration has
-#		completed, and so using this parameter results in no FLT
-#		masking on the first iteration.
+#		value of zero means no SNR mask is used.
+#
+#               Note, the SNR values are only available once a map has been
+#               created, and so using this parameter results in no FLT masking
+#               on the first iteration. Consequently the map at the end of the
+#               first iteration will have deep rings around bright sources,
+#               since no FLT masking was done. Normally, these rings
+#               would polute the AST model derived from the map, and thus
+#               polute the residuals on the next iteration, resulting in
+#               the rings remaining in later maps. To avoid this, parameter
+#               "ast.skip" can be set to a positive value. This causes the
+#               AST model to be skipped (i.e. no AST signal is subtracted from
+#               the residuals) for the first "ast.skip" iterations. This means
+#               that a good FLT mask can be formed from these initial iterations
+#               before any AST model is calculated and used.
 flt.zero_snr = 0
 
 #-----------------------------------------------------------------

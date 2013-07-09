@@ -89,9 +89,13 @@
 *        include bad map pixels (eg the map corners, etc) in the count of
 *        source pixels.
 *     10-APR-2013 (DSB):
-*        When checking that the mask encloses a significant number of source 
-*        pixels, do not require source pixels to have a defined variance 
+*        When checking that the mask encloses a significant number of source
+*        pixels, do not require source pixels to have a defined variance
 *        since variances are usually not available on the first iteration.
+*     9-JUL-2013 (DSB):
+*        The ZERO_NITER and ZERO_FREEZE values should count the iterations 
+*        perfomed *after* any initial iterations for which the AST model was
+*        skipped.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -145,6 +149,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
 /* Local Variables: */
    AstCircle *circle;         /* AST Region used to mask a circular area */
+   AstKeyMap *akm;            /* KeyMap holding AST config values */
    AstKeyMap *subkm;          /* KeyMap holding model config values */
    char refparam[ DAT__SZNAM ];/* Name for reference NDF parameter */
    char words[100];           /* Buffer for variable message words */
@@ -171,23 +176,24 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int isstatic;              /* Are all used masks static? */
    int lbnd_grid[ 2 ];        /* Lower bounds of map in GRID coords */
    int mask_types[ NTYPE ];   /* Identifier for the types of mask to use */
+   int munion;                /* Use union of supplied masks */
    int nel;                   /* Number of mapped NDF pixels */
    int nmask;                 /* The number of masks to be combined */
    int nsource;               /* No. of source pixels in final mask */
+   int skip;                  /* No. of iters for which AST is not subtracted */
    int thresh;                /* Absolute threshold on hits */
    int ubnd_grid[ 2 ];        /* Upper bounds of map in GRID coords */
-   int munion;                /* Use union of supplied masks */
    int zero_c_n;              /* Number of zero circle parameters read */
    int zero_mask;             /* Use the reference NDF as a mask? */
-   int zero_notlast;          /* Don't zero on last iteration? */
    int zero_niter;            /* Only mask for the first "niter" iterations. */
+   int zero_notlast;          /* Don't zero on last iteration? */
    size_t ngood;              /* Number good samples for stats */
+   smf_qual_t *pq;            /* Pinter to map quality */
    unsigned char **mask;      /* Address of model's mask pointer */
    unsigned char *newmask;    /* Individual mask work space */
    unsigned char *pm;         /* Pointer to next returned mask pixel */
    unsigned char *pn;         /* Pointer to next new mask pixel */
    unsigned char *result;     /* Returned mask pointer */
-   smf_qual_t *pq;            /* Pinter to map quality */
 
 /* Initialise returned values */
    result = NULL;
@@ -220,12 +226,20 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    subkm = NULL;
    astMapGet0A( config, modname, &subkm );
 
+/* Get the "ast.skip" value - when considering "zero_niter" and
+   "zero_freeze", we only count iterations for which the AST model
+   is subtracted (i.e. the ones following the initial "ast.skip"
+   iterations). */
+   astMapGet0A( config, "AST", &akm );
+   astMapGet0I( akm, "SKIP", &skip );
+   akm = astAnnul( akm );
+
 /* Get the number of iterations over which the mask is to be applied. Zero
    means all. Return with no mask if this number of iterations has
    already been performed. */
    zero_niter = 0;
    astMapGet0I( subkm, "ZERO_NITER", &zero_niter );
-   if( zero_niter == 0 || dat->iter < zero_niter ) {
+   if( zero_niter == 0 || dat->iter < zero_niter + skip ) {
 
 /* Only return a mask if this is not the last iteration, or if ZERO_NOTLAST
    is unset. */
@@ -349,7 +363,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
 /* If the mask is now frozen, we just return the existing mask. So leave the
    loop. */
-               if( zero_freeze != 0 && dat->iter > zero_freeze ) {
+               if( zero_freeze != 0 && dat->iter > zero_freeze + skip ) {
                   break;
 
 /* Low hits masking... */
@@ -618,8 +632,8 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Free the individual mask work array if it was used. */
             if( nmask > 1 ) newmask = astFree( newmask );
 
-/* Check that the mask has some source pixels (i.e. pixels that have non-bad data values - 
-   we do not also check variance values since they are not available until the second 
+/* Check that the mask has some source pixels (i.e. pixels that have non-bad data values -
+   we do not also check variance values since they are not available until the second
    iteration). */
             if( *status == SAI__OK ) {
                nsource = 0;
