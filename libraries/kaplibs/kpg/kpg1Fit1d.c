@@ -87,6 +87,8 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
 *     1-OCT-2010 (DSB):
 *        - Re-form the expressions for *rms to avoid heavy rounding errors.
 *        - Handle perfect straight lines.
+*     5-JUL-2013 (DSB):
+*        Account for rounding errors when checking for zero values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -95,6 +97,7 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
 */
 
 /* Local Variables: */
+   double d1,d2,d3,d4,d5; /* Various difference values */
    double denom;     /* Denominator */
    double sx;        /* Sum of X values */
    double sxx;       /* Sum of X squared values */
@@ -156,8 +159,20 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
      return;
    }
 
-/* Form the denominator used to calculate the returned values. */
+/* Form the requied differences, checking for values that are so small
+   that they are effectively zero. */
    denom =  n*sxx - sx*sx;
+   if( fabs( denom ) <= 10*VAL__EPSD*(n*sxx + sx*sx) ) denom = 0.0;
+   d1 =  n*sxy - sx*sy;
+   if( fabs( d1 ) <= 10*VAL__EPSD*(n*sxy + sx*sy) ) d1 = 0.0;
+   d2 = sxx*sy - sx*sxy;
+   if( fabs( d2 ) <= 10*VAL__EPSD*( sxx*sy + sx*sxy ) ) d2 = 0.0;
+   d3 = syy - sy*sy/n;
+   if( fabs( d3 ) <= 10*VAL__EPSD*( syy + sy*sy/n ) ) d3 = 0.0;
+   d4 = sxy - sx*sy/n;
+   if( fabs( d4 ) <= 10*VAL__EPSD*( sxy + sx*sy/n ) ) d4 = 0.0;
+   d5 =  d3 - (*m)*d4;
+   if( fabs( d5 ) <= 10*VAL__EPSD*( d3 + (*m)*d4 ) ) d5 = 0.0;
 
 /* Report an error if the denominator is zero. */
    if( denom == 0 ) {
@@ -170,13 +185,13 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
 
 /* Form the gradient. */
    if( *status == SAI__OK ) {
-      *m =  ( n*sxy - sx*sy )/denom;
+      *m =  d1/denom;
 
 /* Form the intercept. */
-      *c =  ( sxx*sy - sx*sxy ) /denom;
+      *c =  d2/denom;
 
 /* Form the RMS residual. */
-      *rms = (syy - sy*sy/n - (*m)*(sxy - sx*sy/n))/n;
+      *rms = d5/n;
 
 /* Do not reject any points if the RMS is zero (e.g. if the supplied data
    is a perfect straight line). */

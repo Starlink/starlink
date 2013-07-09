@@ -92,8 +92,15 @@
 *        If the box size becomes too small, fill using a linear fit without
 *        noise.
 *     2013-05-30 (DSB):
-*        Replace padding with bad values in the data array so that fitting 
-*        boxes that extend into the padding can know to omit it. 
+*        Replace padding with bad values in the data array so that fitting
+*        boxes that extend into the padding can know to omit it.
+*     2013-06-19 (DSB):
+*        Major re-write to make it simpler, and to avoid replacing short
+*        patches of good inter-gap data as if it was part of the
+*        neighbouring gaps. The old version had problems when lots of short
+*        gaps were being filled, as they were all merged into one big gap
+*        and the filled data was thus very unconstrained (which is not
+*        good for FLT masking).
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -140,10 +147,10 @@
 /* Define the width of the patch used to determine the mean level and
    noise adjacent to each flagged block. The current value is pretty well
    arbitrary. */
-#define BOX 50
+#define BOX 20
 
 /* Define the minimum box size for which noise can be calculated. */
-#define MINBOX 10
+#define MINBOX 6
 
 /* Structure containing information about blocks of bolos to be
    filled by each thread. */
@@ -165,7 +172,8 @@ typedef struct smfFillGapsData {
 
 /* Prototype for the function to be executed in each thread. */
 static void smfFillGapsParallel( void *job_data_ptr, int *status );
-
+static void smf1_fillgap( double *data, int pstart, int pend, size_t tstride,
+                          int jstart, int jend, gsl_rng *r, int *status );
 
 
 
@@ -307,8 +315,9 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 /* Local Variables */
   dim_t i;                      /* Bolometer index */
   int j;                        /* Time-slice index */
-  int ntslice;                /* Number of time slices */
+  int ntslice;                  /* Number of time slices */
   double *dat = NULL;           /* Pointer to bolo data */
+  double *pd;
   double a;                     /* Cubic interpolation coefficient */
   double b;                     /* Cubic interpolation coefficient */
   double c;                     /* Cubic interpolation coefficient */
@@ -319,13 +328,10 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   double dlen;                  /* Total number of samples being interpolated */
   double e;                     /* Linear interpolation coefficient */
   double f;                     /* Linear interpolation coefficient */
-  double grad;                  /* Gradient of line joining patch mid-points */
   double meanl;                 /* Mean value in left patch */
   double meanr;                 /* Mean value in right patch */
   double ml;                    /* Gradient of fit at left end of block */
   double mr;                    /* Gradient of fit at right end of block */
-  double offset;                /* Offset of line joining patch mid-points */
-  double sigma;                 /* Mean standard deviation */
   double sigmal;                /* Standard deviation in left patch */
   double sigmar;                /* Standard deviation in right patch */
   double nx2;                   /* nx squared */
@@ -333,13 +339,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   double x[ 2*BOX ];            /* Array of sample positions */
   double y[ 2*BOX ];            /* Array of sample values */
   gsl_rng *r;                   /* GSL random number generator */
-  int box;                      /* Current box size. */
-  int count;                    /* No. of unflagged since last flagged sample */
   int fillpad;                  /* Fill PAD samples ? */
-  int flagged;                  /* Is the current sample flagged? */
   int good;                     /* Were any usable input values found? */
-  int inside;                   /* Was previous sample flagged? */
-  int jend;                     /* Index of last flagged sample in block */
   int jj;                       /* Time-slice index */
   int jstart;                   /* Index of first flagged sample in block */
   int k;                        /* Loop count */
@@ -350,10 +351,11 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   size_t b1;                    /* Index of first bolometer to be filledd */
   size_t b2;                    /* Index of last bolometer to be filledd */
   size_t bstride;               /* bolo stride */
-  int pend;                  /* Last non-PAD sample */
-  int pstart;                /* First non-PAD sample */
+  int pend;                     /* Last non-PAD sample */
+  int pstart;                   /* First non-PAD sample */
   size_t tstride;               /* time slice stride */
   smfFillGapsData *pdata = NULL;/* Pointer to job data */
+  smf_qual_t *pq;
   smf_qual_t *qua = NULL;       /* Pointer to quality array */
   smf_qual_t mask;              /* Quality mask for bad samples */
 
@@ -377,250 +379,50 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   /* Loop over bolometer */
   for( i = b1; i <= b2; i++ ) if( !(qua[ i*bstride ] & SMF__Q_BADB) ) {
 
-    /* First ensure that all flagged samples have bad data values. This is
-       so we do not subsequently need to use the quality array to identify
-       flagged values. We cannot modify the quality array, so we can't use
-       it for second and subsequent passes with smaller box sizes. */
+    /* First, for simplicity, ensure that all flagged samples have bad data
+       values. These are replaced with good values by the filling process. */
+    pd = dat + i*bstride;
+    pq = qua + i*bstride;
     for( j = 0; j < ntslice; j++ ) {
-      if( qua[ i*bstride + j*tstride ] & mask ){
-        dat[ i*bstride + j*tstride ] = VAL__BADD;
-      }
+      if( *pq & mask ) *pd = VAL__BADD;
+      pd += tstride;
+      pq += tstride;
     }
 
-    /* We now loop round using successively smaller box sizes until all
-       gaps are filled or we reach an unusably small box size. */
+    /* Indicate that the start of the next gap is no sooner than the first
+       sample. The "jstart" value is used to record the index of the first
+       sample in a gap (i.e. the first sample to be replaced). */
+    jstart = pstart;
+
+    /* Loop over time series. In this loop we fill gaps within the body
+       of the time series. Filling of the padded regions at start and end
+       is left until the loop has ended. */
     good = 0;
-    box = BOX;
-    while( !good && *status == SAI__OK ) {
+    pd = dat + i*bstride + pstart*tstride;
+    for( j = pstart; j <= pend; j++ ) {
 
-       /* Initialise a flag to indicate that the current sample is not
-          inside a block of flagged samples. */
-       inside = 0;
-
-       /* Initialise the count of unflagged samples following the previous
-          block of flagged samples. */
-       count = 0;
-
-       /* Initialise the index of the first sample to be replaced. This
-          initial value is only used if there are fewer than box unflagged
-          samples before the first block of flagged samples. */
-       jstart = pstart;
-       jend = -1;
-
-       /* Loop over time series. In this loop we fill gaps within the body
-          of the time series. Filling of the padded regions at start and end
-          is left until the loop has ended. */
-       for( j = pstart; j <= pend; j++ ) {
-
-         /* Is this sample flagged? Always condsider the last sample to be
-            unflagged, so that any block of flagged samples at the end of
-            the time-series is filled. */
-         flagged = ( dat[ i*bstride + j*tstride ] == VAL__BADD );
-
-         if( flagged && j <  pend ) {
-
-           /* If this is the first flagged sample in a new block of flagged
-              samples, set "inside" to indicate that we are now inside a
-              block of flagged samples. */
-           if( ! inside ) {
-             inside = 1;
-
-             /* If the number of unflagged samples since the end of the
-                previous block of flagged samples is at least box, then
-                record the index of the first sample to be replaced in this
-                new block. If there have been fewer than box samples since
-                the end of the previous block of flagged samples, we consider
-                this new block to be an extension of the previous block,
-                and so we do not change the "jstart" value (the few
-                unflagged samples that were found between the two blocks
-                of flagged samples will be replaced, together with the
-                neighbouring flagged samples). We do this because we need at
-                last box unflagged samples between adjacent pairs of flagged
-                blocks. */
-             if( count >= box ) jstart = j;
-           }
-
-         /* If this sample is not flagged (or if it is the final sample in
-            the time-series)... */
-         } else {
-
-           /* If this is the first sample following a block of flagged samples,
-              record the index of the last sample in the block (which may be
-              the current sample if the current sample is the last sample), and
-              indicate that we are no longer in a block. Also reset the count
-              of unflagged samples following the end of the flagged block. */
-           if( inside ) {
-             if( flagged ) {
-                jend = j;
-             } else {
-                jend = j - 1;
-             }
-             inside = 0;
-             count = 0;
-
-           /* If the  current (flagged) sample is the last sample, and it is
-              preceeded by an unflagged sample, then indicate that we have a
-              1-sample block to fill. */
-           } else if( flagged ) {
-             jstart = jend = j;
-             count = 0;
-           }
-
-           /* Increment the number of unflagged samples following the end
-              of the previous flagged block. */
-           count++;
-
-           /* If we have now found box unflagged samples following the end of
-              the previous block of flagged samples, we can replace the block.
-              Also replace the block if we have reached the end of the time
-              series. */
-           if( ( count == box || j == pend ) && jend >= jstart ) {
-
-             /* If the block is only a single pixel wide, just replace it
-                with the mean of the two neighbouring sample values. */
-             if( jend == jstart ) {
-                 if( jend == pstart ) {
-                    dat[ i*bstride + jend*tstride ] =
-                            dat[ i*bstride + ( jend + 1 )*tstride ];
-                 } else if( jend == pend ) {
-                    dat[ i*bstride + jend*tstride ] =
-                            dat[ i*bstride + ( jend - 1 )*tstride ];
-                 } else {
-                    dat[ i*bstride + jend*tstride ] = 0.5*(
-                            dat[ i*bstride + ( jend + 1 )*tstride ] +
-                            dat[ i*bstride + ( jend - 1 )*tstride ] );
-                 }
-
-             /* Otherwise, we fill the block using a straight line plus
-                noise... */
-             } else {
-
-               /* Find the indices of the first and last samples in the
-                  box following the end of the flagged block. */
-               rightstart = jend + 1;
-               rightend = jend + box;
-               if( rightend > pend ) rightend = pend;
-
-               /* If there is enough data in the box, fit a straight line
-                  to it. */
-               if( rightend - rightstart > box/2 ) {
-                 k = 0;
-                 for( jj = rightstart; jj <= rightend; jj++,k++ ) {
-                   x[ k ] = jj;
-                   y[ k ] = dat[ i*bstride + jj*tstride ];
-                 }
-
-                 kpg1Fit1d( 1, k, y, x, &mr, &cr, &sigmar, status );
-
-               /* Otherwise, we record the first value in the box, and
-                  indicate we have no noise estimate. */
-               } else {
-                 mr = 0.0;
-                 cr = dat[ i*bstride + rightstart*tstride ];
-                 sigmar = VAL__BADD;
-               }
-
-               /* If possible fit a straight line to the box samples preceeding
-                  the start of the flagged block. */
-               leftend = jstart - 1;
-               leftstart = jstart - box;
-               if( leftstart < pstart ) leftstart = pstart;
-               if( leftend - leftstart > box/2 ) {
-                 k = 0;
-                 for( jj = leftstart; jj <= leftend; jj++,k++ ) {
-                   x[ k ] = jj;
-                   y[ k ] = dat[ i*bstride + jj*tstride ];
-                 }
-                 kpg1Fit1d( 1, k, y, x, &ml, &cl, &sigmal, status );
-
-               } else {
-                 ml = 0.0;
-                 cl = dat[ i*bstride + leftend*tstride ];
-                 sigmal = VAL__BADD;
-               }
-
-               /* Find the mean noise level. */
-               if( sigmal != VAL__BADD && sigmar != VAL__BADD ) {
-                  sigma = 0.5*( sigmal + sigmar );
-               } else if( sigmal != VAL__BADD ) {
-                  sigma = sigmal;
-               } else {
-                  sigma = sigmar;
-               }
-
-               /* Find the gradient and offset for the straight line used to
-                  create the replacement values for the flagged block. */
-               if( jstart <= pstart || ml == VAL__BADD || cl == VAL__BADD  ) {
-                 grad = 0.0;
-                 offset = mr*( jend + 1 ) + cr;
-
-               } else if( jend >= pend || mr == VAL__BADD || cr == VAL__BADD  ) {
-                 grad = 0.0;
-                 offset = ml*( jstart - 1 ) + cl;
-
-               } else {
-                 meanl = ml*( jstart - 1 ) + cl;
-                 meanr = mr*( jend + 1 ) + cr;
-                 grad = ( meanr - meanl )/( jend - jstart + 2 );
-                 offset = meanl - grad*( jstart - 1 );
-               }
-
-               /* If at least one of the straight line fits above was
-                  successfull, the flagged block is replaced by a straight line
-                  plus noise. */
-               if( sigma != VAL__BADD ) {
-                 for( jj = jstart; jj <= jend; jj++ ) {
-                   dat[ i*bstride + jj*tstride ] = grad*jj + offset +
-                                                   gsl_ran_gaussian( r, sigma );
-                 }
-
-               /* If neither fit was successfull, and if we have reached
-                  the minimum possible box size, the flagged block is
-                  replaced by a straight line without noise. */
-               } else if( box < MINBOX ){
-                 for( jj = jstart; jj <= jend; jj++ ) {
-                   dat[ i*bstride + jj*tstride ] = grad*jj + offset;
-                 }
-               }
-             }
-           }
+      /* If the current sample is good, check to see if it is the first
+         good sample following a gap. If so, fill the gap. */
+      if( *pd != VAL__BADD ) {
+         if( jstart < j ) {
+            smf1_fillgap( dat + i*bstride, pstart, pend, tstride, jstart,
+                          j - 1, r, status );
          }
 
-/* Note if any good input values are found. */
-         if( !flagged ) good = 1;
-       }
+         /* Indicate the start of any subsequent gap is no sooner than the
+            next sample. */
+         jstart = j + 1;
 
-/* Can never fill the bolometer if all input values are bad. */
-       if( !good ) break;
+         /* Indicate we have found some good samples. */
+         good = 1;
+      }
 
-/* Now check if the above process left any flagged samples. This can happen if
-   the time stream consists of many short little bits of good and bad values,
-   all shorter in length than box. */
-       good = 1;
-       for( j = pstart; j <= pend; j++ ) {
-         if( dat[ i*bstride + j*tstride ] == VAL__BADD ) {
-            good = 0;
-            break;
-         }
-       }
+      pd += tstride;
+    }
 
-/* If it did, half the box size and try again. */
-       if( !good ) {
-         if( box >= MINBOX ) {
-            box = box/2;
-            msgOutiff( MSG__DEBUG, "", "smf_fillgaps: Using box=%d for "
-                       "bolo %d\n", status, box, (int) i );
-
-/* We should never get here since when the box size falls below MINBOX,
-   the above algorithm should always fill in all gaps. */
-         } else if( *status == SAI__OK ){
-           *status = SAI__ERROR;
-           errRepf( "", "smf_fillgaps: Cannot fill gaps in bolometer %d.",
-                    status, (int) i );
-           break;
-         }
-       }
-     }
+    /* If a gap extends to the last sample, fill it. */
+    if( good && jstart <= pend )  smf1_fillgap( dat + i*bstride, pstart, pend,
+                                                tstride, jstart, pend, r, status );
 
    /* Replace the padding at the start and end of the bolometer time series
       with a noisey curve that connects the first and last data samples
@@ -730,6 +532,237 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 
     }
   }
+}
+
+
+/* Fill a single gap in a single bolometer time-stream. */
+static void smf1_fillgap( double *data, int pstart, int pend, size_t tstride,
+                          int jstart, int jend, gsl_rng *r, int *status ){
+
+
+/* Local Variables: */
+   double *pd;
+   double fillval;
+   double grad;
+   double offset;
+   double s1;
+   double sigma;
+   double sigmal;
+   double sigmar;
+   double vl;
+   double vr;
+   double x[ BOX ];
+   double y[ BOX ];
+   int jhi;
+   int jlo;
+   int k;
+   int s2;
+   int jj;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* If the gap is only a single sample, use the mean of the adjacent
+   samples. These are sure to be good, since they would be part of the
+   gap if they were bad. */
+   if( jstart == jend ) {
+      if( jstart > pstart ) {
+         s1 = data[ ( jstart - 1 )*tstride ];
+         s2 = 1;
+      } else {
+         s1 = 0.0;
+         s2 = 0;
+      }
+
+      if( jend < pend ) {
+         s1 += data[ ( jend + 1 )*tstride ];
+         s2++;
+      }
+
+      data[ jstart*tstride ] = s2 ? s1/s2 : 0.0;
+
+/* For larger gaps, we fill it with a straight line plus noise. */
+   } else {
+
+/* Find an estimate of the mean value and noise level at the start of the
+   gap. We do this by fitting a straight line to the good data immediately
+   before the start of the gap. Indicate we do not yet know the value or
+   noise at the start of the gap. */
+      vl = VAL__BADD;
+      sigmal = VAL__BADD;
+
+/* The last sample in the box is the first sample before the gap. The first
+   sample in the box is BOX samples before that. */
+      jhi = jstart - 1;
+      jlo = jstart - BOX;
+
+/* If the lower end of the box is off the start of the array, set it to
+   the start of the array. */
+      if( jlo < pstart ) jlo = pstart;
+
+/* Check the box is large enough to fit. */
+      if( jhi - jlo + 1 >= MINBOX ) {
+
+/* Copy the box data values into two arrays suitable for kpg1Fit1d. */
+         k = 0;
+         pd = data + jlo*tstride;
+         for( jj = jlo; jj <= jhi; jj++,k++ ) {
+            x[ k ] = jj;
+            y[ k ] = *pd;
+            pd += tstride;
+         }
+
+/* Attempt to do the fit, annulling any error (e.g. caused by too few
+   good values in the box - i.e. if there are other gaps very close to
+   the one we are filling). */
+         if( *status == SAI__OK ) {
+            kpg1Fit1d( 1, k, y, x, &grad, &offset, &sigmal, status );
+            if( *status != SAI__OK ) {
+               errAnnul( status );
+               sigmal = VAL__BADD;
+
+/* If the fit succeeded, find the data value which the line has at the
+   start of the gap. */
+            } else {
+               vl = grad*jstart + offset;
+            }
+         }
+      }
+
+/* If we cannot do the fit, use the mean of the (up to) 3 good values
+   immediately prior to the gap, and use zero noise. */
+      if( sigmal == VAL__BADD ) {
+         s1 = 0.0;
+         s2 = 0;
+
+         jlo = jstart - 3;
+         if( jlo < pstart ) jlo = pstart;
+         pd = data + jlo*tstride;
+         for( jj = jlo; jj <= jhi; jj++ ) {
+            if( *pd != VAL__BADD ) {
+               s1 += *pd;
+               s2++;
+            }
+            pd += tstride;
+         }
+         if( s2 > 0 ) vl = s1/s2;
+      }
+
+/* Now find an estimate of the mean value and noise level at the end of the
+   gap in the same way. Indicate we do not yet know the value or noise at the
+   end of the gap. */
+      vr = VAL__BADD;
+      sigmar = VAL__BADD;
+
+/* The first sample in the box is the first sample after the gap. The last
+   sample in the box is BOX samples after that. */
+      jlo = jend + 1;
+      jhi = jend + BOX;
+
+/* If the upper end of the box is off the end of the array, set it to
+   the end of the array. */
+      if( jhi > pend ) jhi = pend;
+
+/* Check the box is large enough to fit. */
+      if( jhi - jlo + 1 >= MINBOX ) {
+
+/* Copy the box data values into two arrays suitable for kpg1Fit1d. */
+         k = 0;
+         pd = data + jlo*tstride;
+         for( jj = jlo; jj <= jhi; jj++,k++ ) {
+            x[ k ] = jj;
+            y[ k ] = *pd;
+            pd += tstride;
+         }
+
+/* Attempt to do the fit, annulling any error (e.g. caused by too few
+   good values in the box - i.e. if there are other gaps very close to
+   the one we are filling). */
+         if( *status == SAI__OK ) {
+            kpg1Fit1d( 1, k, y, x, &grad, &offset, &sigmar, status );
+            if( *status != SAI__OK ) {
+               errAnnul( status );
+               sigmar = VAL__BADD;
+
+/* If the fit succeeded, find the data value which the line has at the
+   end of the gap. */
+            } else {
+               vr = grad*jend + offset;
+            }
+         }
+      }
+
+/* If we cannot do the fit, use the mean of the (up to) 3 good values
+   immediately after the gap, and use zero noise. */
+      if( sigmar == VAL__BADD ) {
+         s1 = 0.0;
+         s2 = 0;
+
+         jhi = jend + 3;
+         if( jhi > pend ) jhi = pend;
+         pd = data + jlo*tstride;
+         for( jj = jlo; jj <= jhi; jj++ ) {
+            if( *pd != VAL__BADD ) {
+               s1 += *pd;
+               s2++;
+            }
+            pd += tstride;
+         }
+         if( s2 > 0 ) vr = s1/s2;
+      }
+
+/* If we have the mean value at start and end of the box, we fill it with
+   a straight line that interpolates these values, with added noise if
+   possible. */
+      if( vl != VAL__BADD && vr != VAL__BADD ) {
+
+/* Find the noise level to use. */
+         if( sigmal != VAL__BADD && sigmar != VAL__BADD ) {
+            sigma = 0.5*( sigmal + sigmar );
+         } else if( sigmal != VAL__BADD ) {
+            sigma = sigmal;
+         } else if( sigmar != VAL__BADD ) {
+            sigma = sigmar;
+         } else {
+            sigma = 0.0;
+         }
+
+/* Find the gradient and offset for the straight line used to create the
+   replacement values for the gap. */
+         grad = ( vr - vl )/ ( jend - jstart );
+         offset = vl - grad*jstart;
+
+/* Replace the gap values with the straight line values, plus noise. */
+         pd = data + jstart*tstride;
+         if( sigma > 0.0 ) {
+            for( jj = jstart; jj <= jend; jj++ ) {
+               *pd = grad*jj + offset + gsl_ran_gaussian( r, sigma );
+               pd += tstride;
+            }
+         } else {
+            for( jj = jstart; jj <= jend; jj++ ) {
+               *pd = grad*jj + offset;
+               pd += tstride;
+            }
+         }
+
+/* If we do not have the mean value at start or end of the box, we fill it
+   with a constant value. */
+      } else {
+         if( vl != VAL__BADD ) {
+            fillval = vl;
+         } else if( vr != VAL__BADD ) {
+            fillval = vr;
+         } else {
+            fillval = 0.0;
+         }
+         pd = data + jstart*tstride;
+         for( jj = jstart; jj <= jend; jj++ ) {
+            *pd = fillval;
+            pd += tstride;
+         }
+      }
+   }
 }
 
 
