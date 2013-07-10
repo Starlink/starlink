@@ -21,7 +21,7 @@
 *     specified aperture of an NDF. The aperture can either be circular
 *     (specified by parameters CENTRE and DIAM), or arbitrary (specified
 *     by parameter ARDFILE). If the aperture is specified using parameters
-*     CENTRE and DIAM, then it must be either 1 or 2 dimensional.
+*     CENTRE and DIAM, then it must be either one- or two-dimensional.
 *
 *     The following statistics are displayed:
 *

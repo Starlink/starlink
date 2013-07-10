@@ -13997,7 +13997,7 @@ KAPPA: \htmlref{CADD}{CADD},
       specified aperture of an \NDFref{NDF}.  The aperture can either be circular
       (specified by parameters CENTRE and DIAM), or arbitrary (specified
       by Parameter ARDFILE).  If the aperture is specified using parameters
-      CENTRE and DIAM, then it must be either 1 or 2 dimensional.
+      CENTRE and DIAM, then it must be either one- or  two-dimensional.
 
       The following statistics are displayed:
 
@@ -37144,7 +37144,7 @@ KAPPA: \htmlref{ADD}{ADD},
          description of the TRIM parameter, if the input NDF {\tt stokes} has
          a three-dimensional current WCS Frame with axes (RA,Dec,Stokes) and
          TRIMWCS=YES, then an axis will be removed from the current Frame to
-         make it 2 dimensional (that is, to match the number of pixel axes
+         make it two-dimensional (that is, to match the number of pixel axes
          remaining after the removal of insignificant pixel axes). The choice
          of which two axes to retain is controlled by Parameter USEAXIS.  If,
          on the other hand, TRIMWCS was set to {\tt FALSE}, then the output
@@ -56637,7 +56637,7 @@ The following applications have been modified:
          \item New Parameters TRIM, TRIMWCS and USEAXIS control the
          removal of output axes which span only a single pixel.  Thus,
          NDFCOPY can now be used to extract a single plane from a cube
-         and create a genuinely 2 dimensional output image (previously,
+         and create a genuinely two-dimensional output image (previously,
          the third pixel axis was retain with bounds spanning a single
          pixel).
       \end{itemize}
@@ -56680,7 +56680,7 @@ The following applications have been modified:
 
             \begin{description}
                \item[AXES] --- Use new Parameter USEAXIS.  Note, if the
-               data array has more than 2 dimensions and the axes of the
+               data array has more than two dimensions and the axes of the
                current co-ordinate Frame are not parallel to the pixel
                axes, it is usually advisable to set the current co-ordinate
                Frame to PIXEL before using SEGMENT.
