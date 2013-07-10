@@ -178,6 +178,11 @@
 *        square region of pixels into a new NDF of the same shape as
 *        the original, setting the surrounding region to the bad-pixel
 *        value.
+*     ndfcopy survey(12h23m:12h39m,11d:13d50m,) virgo trimwcs trim
+*        Copies a section specified by equatorial co-ordinate ranges
+*        from the three-dimensional NDF called survey, whose third pixel
+*        axis has only one element, to a two-dimensional NDF called
+*        virgo.  Information on the third WCS axis is removed too.
 
 *  Related Applications:
 *     KAPPA: SETBOUND; Figaro: ISUBSET.
@@ -194,7 +199,7 @@
 *     Copyright (C) 1995, 1998, 2000, 2003-2004 Central Laboratory of
 *     the Research Councils. Copyright (C) 2005-2006 Particle Physics &
 *     Astronomy Research Council.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009, 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -264,6 +269,8 @@
 *        Added Parameter COMP.
 *     2009-12-03 (TIMJ):
 *        Allow COMP=ERROR.
+*     2013 July 10 (MJC):
+*        Add an example using TRIM and TRIMWCS.
 *     {enter_further_changes_here}
 
 *-

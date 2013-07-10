@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.40}
 \newcommand{\stardocnumber}    {95.40}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2013 April 24}
+\newcommand{\stardocdate}      {2013 July 10}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -37229,6 +37229,14 @@ KAPPA: \htmlref{ADD}{ADD},
          square region of pixels into a new NDF of the same shape as
          the original, setting the surrounding region to the bad-pixel
          value.
+      }
+      \sstexamplesubsection{
+         ndfcopy survey(12h23m:12h39m,11d:13d50m,) virgo trimwcs trim
+      }{
+         Copies a section specified by equatorial co-ordinate ranges
+         from the three-dimensional NDF called survey, whose third pixel
+         axis has only one element, to a two-dimensional NDF called
+         virgo.  Information on the third WCS axis is removed too.
       }
    }
    \sstdiytopic{
